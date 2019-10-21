@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, adminApiToken } from '../../constants';
+import { describeIfIAMV2p1 } from '../../constants';
 
 describe('roles API', () => {
     const cypressPrefix = 'test-roles-api';
@@ -23,7 +23,7 @@ describe('roles API', () => {
                 ['projects', 'roles', 'policies', 'tokens']);
             for (const project of [project1, project2]) {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/projects',
                     body: project
@@ -31,7 +31,7 @@ describe('roles API', () => {
             }
 
             cy.request({
-                headers: { 'api-token': adminApiToken },
+                headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                 method: 'POST',
                 url: '/apis/iam/v2beta/tokens',
                 body: {
@@ -44,7 +44,7 @@ describe('roles API', () => {
             });
 
             cy.request({
-                headers: { 'api-token': adminApiToken },
+                headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                 method: 'POST',
                 url: '/apis/iam/v2beta/policies',
                 body: {
@@ -80,7 +80,7 @@ describe('roles API', () => {
         describe('POST /apis/iam/v2beta/roles', () => {
             it('admin can create a new role with no projects', () => {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -96,7 +96,7 @@ describe('roles API', () => {
 
             it('admin can create a new role with multiple projects', () => {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -113,7 +113,7 @@ describe('roles API', () => {
             it('admin gets a 404 when it attempts to create ' +
                'a role with a project that does not exist', () => {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     failOnStatusCode: false,
@@ -202,7 +202,7 @@ describe('roles API', () => {
         describe('PUT /apis/iam/v2beta/roles', () => {
             it('admin can update a role with no projects to have projects', () => {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -216,7 +216,7 @@ describe('roles API', () => {
                 });
 
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'PUT',
                     url: `/apis/iam/v2beta/roles/${roleID}`,
                     body: {
@@ -231,7 +231,7 @@ describe('roles API', () => {
 
             it('admin can update a role with projects to have no projects', () => {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -245,7 +245,7 @@ describe('roles API', () => {
                 });
 
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'PUT',
                     url: `/apis/iam/v2beta/roles/${roleID}`,
                     body: {
@@ -260,7 +260,7 @@ describe('roles API', () => {
 
             it('admin cannot update a role to have projects that do not exist', () => {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -274,7 +274,7 @@ describe('roles API', () => {
                 });
 
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'PUT',
                     url: `/apis/iam/v2beta/roles/${roleID}`,
                     failOnStatusCode: false,
@@ -291,7 +291,7 @@ describe('roles API', () => {
             it('non-admin with project1 assignment access can update ' +
             'a role with no projects to have project1', () => {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -321,7 +321,7 @@ describe('roles API', () => {
             it('non-admin with project1 assignment access can update ' +
             'a role to remove project1', () => {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -351,7 +351,7 @@ describe('roles API', () => {
             it('non-admin with project1 assignment access gets a 404 ' +
             'when updating a role to have non-existent roles', () => {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -382,7 +382,7 @@ describe('roles API', () => {
             it('non-admin with project1 assignment access cannot update ' +
             'a role with no projects to have other projects', () => {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {
@@ -413,7 +413,7 @@ describe('roles API', () => {
             it('non-admin with project1 assignment access cannot update ' +
             'a role to remove other projects', () => {
                 cy.request({
-                    headers: { 'api-token': adminApiToken },
+                    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                     method: 'POST',
                     url: '/apis/iam/v2beta/roles',
                     body: {

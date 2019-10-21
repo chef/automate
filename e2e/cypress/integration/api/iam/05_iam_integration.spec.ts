@@ -1,7 +1,6 @@
 import { describeIfIAMV2p1 } from '../../constants';
 
 describeIfIAMV2p1('assigning projects', () => {
-  let adminIdToken = '';
   let apiToken = '';
 
   const modifyError = 'cannot modify projects for this object';
@@ -21,64 +20,61 @@ describeIfIAMV2p1('assigning projects', () => {
   const objectsToCleanUp = iamResourcesToTest.concat(['projects']);
 
   before(() => {
-    cy.adminLogin('/').then(() => {
-      adminIdToken = JSON.parse(<string>localStorage.getItem('chef-automate-user')).id_token;
 
-      // TODO cleanup everything in resources + projects
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+    // TODO cleanup everything in resources + projects
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
 
-      for (const id of [unauthorizedProjectId, authorizedProject1, authorizedProject2]) {
-        cy.request({
-          auth: { bearer: adminIdToken },
-          method: 'POST',
-          url: '/apis/iam/v2beta/projects',
-          failOnStatusCode: false,
-          body: {
-            id: id,
-            name: id
-          }
-        }).then((resp) => {
-          expect(resp.status).to.be.oneOf([200, 409]);
-        });
-      }
-
+    for (const id of [unauthorizedProjectId, authorizedProject1, authorizedProject2]) {
       cy.request({
-        auth: { bearer: adminIdToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
-        url: '/apis/iam/v2beta/tokens',
-        body: {
-          id: tokenId,
-          name: tokenId
-        }
-      }).then((resp) => {
-        apiToken = resp.body.token.value;
-      });
-
-      cy.request({
-        auth: { bearer: adminIdToken },
-        method: 'POST',
-        url: '/apis/iam/v2beta/policies',
+        url: '/apis/iam/v2beta/projects',
         failOnStatusCode: false,
         body: {
-          id: policyId,
-          name: policyId,
-          members: [
-            `token:${tokenId}`
-          ],
-          statements: [
-            {
-              effect: 'ALLOW',
-              actions: ['*'],
-              projects: [
-                authorizedProject1,
-                authorizedProject2
-              ]
-            }
-          ]
+          id: id,
+          name: id
         }
       }).then((resp) => {
-        expect([200, 409]).to.include(resp.status);
+        expect(resp.status).to.be.oneOf([200, 409]);
       });
+    }
+
+    cy.request({
+      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+      method: 'POST',
+      url: '/apis/iam/v2beta/tokens',
+      body: {
+        id: tokenId,
+        name: tokenId
+      }
+    }).then((resp) => {
+      apiToken = resp.body.token.value;
+    });
+
+    cy.request({
+      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+      method: 'POST',
+      url: '/apis/iam/v2beta/policies',
+      failOnStatusCode: false,
+      body: {
+        id: policyId,
+        name: policyId,
+        members: [
+          `token:${tokenId}`
+        ],
+        statements: [
+          {
+            effect: 'ALLOW',
+            actions: ['*'],
+            projects: [
+              authorizedProject1,
+              authorizedProject2
+            ]
+          }
+        ]
+      }
+    }).then((resp) => {
+      expect(resp.status).to.be.oneOf([200, 404]);
     });
   });
 

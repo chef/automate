@@ -14,7 +14,20 @@
 // ***********************************************************
 
 // Import commands.js using ES2015 syntax:
-import './commands'
+import './commands';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
+
+before(function () {
+  if (!Cypress.env('ADMIN_TOKEN')) {
+    cy.adminLogin('/').then(() => {
+      const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
+      cy.generateAdminToken(admin.id_token);
+    });
+
+    // reset test state
+    // each UI test logs in at the beginning, so we don't want any session data lying around
+    cy.clearLocalStorage();
+  }
+});

@@ -21,6 +21,8 @@ cd automate/e2e
 npm install
 ```
 
+### Environment Variables
+
 Next set your environment variables. See "Working with Secrets" in
 dev-docs/DEV_ENVIRONMENT.md for details on setting up vault if you
 don't already have `../dev/secrets-env.sh`:
@@ -48,17 +50,14 @@ Most Cypress tests also expect the following IAM-related environment variables. 
 according to your targeted Automate instance's IAM version.
 
 ```bash
-export CYPRESS_IAM_VERSION=v1
-export CYPRESS_ADMIN_TOKEN=`chef-automate admin-token` # or copy an admin token from the UI or CLI
-
-# or
-export CYPRESS_IAM_VERSION=v2
-export CYPRESS_ADMIN_TOKEN=`chef-automate iam token create TEST --admin` # or copy an admin token from the UI or CLI
-
-# or
-export CYPRESS_IAM_VERSION=v2.1
-export CYPRESS_ADMIN_TOKEN=`chef-automate iam token create TEST --admin` # or copy an admin token from the UI or CLI
+export CYPRESS_IAM_VERSION=v1 || v2 || v2.1
+export CYPRESS_ADMIN_TOKEN=<admin token value> # optional
 ```
+
+The admin token does **not** need to be set beforehand. Cypress runs [the support file](https://docs.cypress.io/guides/core-concepts/writing-and-organizing-tests.html#Support-file) `index.ts` before all tests.
+If `CYPRESS_ADMIN_TOKEN` hasn't been set, this block of code will take care of generating a new admin token and setting its value to the environment variable.
+
+### Opening Cypress
 
 If you are developing Cypress tests, you'll want to open the Cypress
 app so you can watch the browser as the tests run. The Cypress tool is

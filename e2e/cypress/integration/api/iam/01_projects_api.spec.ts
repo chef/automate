@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, adminApiToken } from '../../constants';
+import { describeIfIAMV2p1 } from '../../constants';
 
 describeIfIAMV2p1('projects API', () => {
   const cypressPrefix = 'test-projects-api';
@@ -16,7 +16,7 @@ describeIfIAMV2p1('projects API', () => {
 
     it('gives a 404 when the project does not exist', () => {
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         url: '/apis/iam/v2beta/projects/not_found',
         failOnStatusCode: false
       }).then((response) => {
@@ -26,7 +26,7 @@ describeIfIAMV2p1('projects API', () => {
 
     it('graveyards and then deletes a project that exists', () => {
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         url: '/apis/iam/v2beta/projects',
         method: 'POST',
         body: {
@@ -36,7 +36,7 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         url: `/apis/iam/v2beta/projects/${projectID}`,
         method: 'DELETE'
       });
@@ -44,7 +44,7 @@ describeIfIAMV2p1('projects API', () => {
       waitUntilProjectNotInGraveyard(projectID, 100);
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         url: '/apis/iam/v2beta/projects',
         method: 'POST',
         body: {
@@ -112,7 +112,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
         url: 'api/v0/ingest/events/chef/node-multiple-deletes',
         body: {
@@ -128,7 +128,7 @@ describeIfIAMV2p1('projects API', () => {
 
       for (const project of [avengersProject, xmenProject]) {
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'POST',
           url: '/apis/iam/v2beta/projects',
           body: project
@@ -138,7 +138,7 @@ describeIfIAMV2p1('projects API', () => {
       let totalNodes = 0;
       cy.request({
         headers: {
-          'api-token': adminApiToken,
+          'api-token': Cypress.env('ADMIN_TOKEN'),
           projects: '(unassigned)'
         },
         method: 'GET',
@@ -153,7 +153,7 @@ describeIfIAMV2p1('projects API', () => {
             cy.fixture('converge/xmen2.json').then(node4 => {
               for (const node of [node1, node2, node3, node4]) {
                 cy.request({
-                  headers: { 'api-token': adminApiToken },
+                  headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
                   method: 'POST',
                   url: '/data-collector/v0',
                   body: node
@@ -170,7 +170,7 @@ describeIfIAMV2p1('projects API', () => {
       // confirm nodes are unassigned
       cy.request({
         headers: {
-          'api-token': adminApiToken,
+          'api-token': Cypress.env('ADMIN_TOKEN'),
           projects: '(unassigned)'
         },
         method: 'GET',
@@ -181,7 +181,7 @@ describeIfIAMV2p1('projects API', () => {
 
       cy.request({
         headers: {
-          'api-token': adminApiToken,
+          'api-token': Cypress.env('ADMIN_TOKEN'),
           projects: avengersProject.id
         },
         method: 'GET',
@@ -192,7 +192,7 @@ describeIfIAMV2p1('projects API', () => {
 
       cy.request({
         headers: {
-          'api-token': adminApiToken,
+          'api-token': Cypress.env('ADMIN_TOKEN'),
           projects: xmenProject.id
         },
         method: 'GET',
@@ -210,7 +210,7 @@ describeIfIAMV2p1('projects API', () => {
       // initially no rules
       for (const project of [avengersProject, xmenProject]) {
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
           url: `/apis/iam/v2beta/projects/${project.id}/rules`
         }).then((response) => {
@@ -218,7 +218,7 @@ describeIfIAMV2p1('projects API', () => {
         });
 
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
           url: `/apis/iam/v2beta/projects/${project.id}`
         }).then((response) => {
@@ -227,7 +227,7 @@ describeIfIAMV2p1('projects API', () => {
       }
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: '/apis/iam/v2beta/projects'
       }).then((response) => {
@@ -238,7 +238,7 @@ describeIfIAMV2p1('projects API', () => {
 
       for (const rule of [avengersRule, xmenRule]) {
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'POST',
           url: `/apis/iam/v2beta/projects/${rule.project_id}/rules`,
           body: rule
@@ -248,7 +248,7 @@ describeIfIAMV2p1('projects API', () => {
       // confirm rules are staged
       for (const project of [avengersProject, xmenProject]) {
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
           url: `/apis/iam/v2beta/projects/${project.id}/rules`
         }).then((response) => {
@@ -259,7 +259,7 @@ describeIfIAMV2p1('projects API', () => {
         });
 
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
           url: `/apis/iam/v2beta/projects/${project.id}`
         }).then((response) => {
@@ -268,7 +268,7 @@ describeIfIAMV2p1('projects API', () => {
       }
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: '/apis/iam/v2beta/projects'
       }).then((response) => {
@@ -278,7 +278,7 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       });
@@ -287,7 +287,7 @@ describeIfIAMV2p1('projects API', () => {
       // confirm rules are applied
       for (const project of [avengersProject, xmenProject]) {
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
           url: `/apis/iam/v2beta/projects/${project.id}/rules`
         }).then((response) => {
@@ -298,7 +298,7 @@ describeIfIAMV2p1('projects API', () => {
         });
 
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
           url: `/apis/iam/v2beta/projects/${project.id}`
         }).then((response) => {
@@ -307,7 +307,7 @@ describeIfIAMV2p1('projects API', () => {
       }
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: '/apis/iam/v2beta/projects'
       }).then((response) => {
@@ -319,7 +319,7 @@ describeIfIAMV2p1('projects API', () => {
       // confirm nodes are assigned to projects correctly
       cy.request({
         headers: {
-          'api-token': adminApiToken,
+          'api-token': Cypress.env('ADMIN_TOKEN'),
           projects: avengersProject.id
         },
         method: 'GET',
@@ -330,7 +330,7 @@ describeIfIAMV2p1('projects API', () => {
 
       cy.request({
         headers: {
-          'api-token': adminApiToken,
+          'api-token': Cypress.env('ADMIN_TOKEN'),
           projects: xmenProject.id
         },
         method: 'GET',
@@ -354,7 +354,7 @@ describeIfIAMV2p1('projects API', () => {
       ];
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${avengersProject.id}`
       }).then((response) => {
@@ -362,7 +362,7 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: '/apis/iam/v2beta/projects'
       }).then((response) => {
@@ -372,14 +372,14 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'PUT',
         url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${avengersRule.id}`,
         body: updatedAvengersRule
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${avengersProject.id}`
       }).then((response) => {
@@ -387,7 +387,7 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: '/apis/iam/v2beta/projects'
       }).then((response) => {
@@ -397,7 +397,7 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       });
@@ -405,7 +405,7 @@ describeIfIAMV2p1('projects API', () => {
 
       cy.request({
         headers: {
-          'api-token': adminApiToken,
+          'api-token': Cypress.env('ADMIN_TOKEN'),
           projects: avengersProject.id
         },
         method: 'GET',
@@ -415,7 +415,7 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${avengersProject.id}`
       }).then((response) => {
@@ -423,7 +423,7 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: '/apis/iam/v2beta/projects'
       }).then((response) => {
@@ -436,7 +436,7 @@ describeIfIAMV2p1('projects API', () => {
     it('deleted rules get applied to nodes', () => {
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${avengersProject.id}`
       }).then((response) => {
@@ -444,7 +444,7 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: '/apis/iam/v2beta/projects'
       }).then((response) => {
@@ -454,13 +454,13 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'DELETE',
         url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${avengersRule.id}`
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${avengersProject.id}`
       }).then((response) => {
@@ -468,7 +468,7 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: '/apis/iam/v2beta/projects'
       }).then((response) => {
@@ -478,14 +478,14 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       });
       waitUntilApplyRulesNotRunning(100);
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: `/apis/iam/v2beta/projects/${avengersProject.id}`
       }).then((response) => {
@@ -493,7 +493,7 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       cy.request({
-        headers: { 'api-token': adminApiToken },
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
         url: '/apis/iam/v2beta/projects'
       }).then((response) => {
@@ -504,7 +504,7 @@ describeIfIAMV2p1('projects API', () => {
 
       cy.request({
         headers: {
-          'api-token': adminApiToken,
+          'api-token': Cypress.env('ADMIN_TOKEN'),
           projects: avengersProject.id
         },
         method: 'GET',
@@ -515,7 +515,7 @@ describeIfIAMV2p1('projects API', () => {
 
       cy.request({
         headers: {
-          'api-token': adminApiToken,
+          'api-token': Cypress.env('ADMIN_TOKEN'),
           projects: '(unassigned)'
         },
         method: 'GET',
@@ -555,7 +555,7 @@ describeIfIAMV2p1('projects API', () => {
         };
         // create rule with attribute value
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'POST',
           url: `/apis/iam/v2beta/projects/${rule.project_id}/rules`,
           body: rule
@@ -563,7 +563,7 @@ describeIfIAMV2p1('projects API', () => {
 
         // apply rules
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         });
@@ -572,7 +572,7 @@ describeIfIAMV2p1('projects API', () => {
         // see filter works
         cy.request({
           headers: {
-            'api-token': adminApiToken,
+            'api-token': Cypress.env('ADMIN_TOKEN'),
             projects: avengersProject.id
           },
           method: 'GET',
@@ -584,7 +584,7 @@ describeIfIAMV2p1('projects API', () => {
 
         // delete rule
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'DELETE',
           url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${rule.id}`
         }).then((response) => {
@@ -593,7 +593,7 @@ describeIfIAMV2p1('projects API', () => {
 
         // apply rules to reset node to unassigned
         cy.request({
-          headers: { 'api-token': adminApiToken },
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'POST',
           url: '/apis/iam/v2beta/apply-rules'
         }).then((response) => {
@@ -608,7 +608,7 @@ describeIfIAMV2p1('projects API', () => {
 function waitForNodes(totalNodes: number, maxRetries: number) {
   cy
     .request({
-      headers: { 'api-token': adminApiToken },
+      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'GET',
       url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
     })
@@ -630,7 +630,7 @@ function waitUntilApplyRulesNotRunning(attempts: number): void {
     throw new Error('apply-rules never finished');
   }
   cy.request({
-    headers: { 'api-token': adminApiToken },
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     url: '/apis/iam/v2beta/apply-rules'
   }).then((response) => {
     if (response.body.state === 'not_running') {
@@ -647,9 +647,8 @@ function waitUntilProjectNotInGraveyard(projectID: string, attempts: number): vo
   if (attempts === -1) {
     throw new Error('apply-rules never finished');
   }
-  console.log('here');
   cy.request({
-    headers: { 'api-token': adminApiToken },
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     url: '/apis/iam/v2beta/projects',
     method: 'POST',
     failOnStatusCode: false,

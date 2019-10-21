@@ -88,17 +88,16 @@ if (Cypress.env('SKIP_SSO')) {
           'Signed in as Local Administrator',
           'Profile',
           'Version',
+          'Build',
           'About',
           'License',
           'Release Notes',
           'Sign Out'
         ];
         cy.get('[data-cy=user-profile-button]').click().then(() => {
-          cy.get('ul.dropdown-list li')
-            .should('have.length', menuChoices.length)
-            .each(($li, index) => {
-              expect($li.text()).to.contains(menuChoices[index]);
-            });
+          menuChoices.forEach((choice) => {
+            cy.get('ul.dropdown-list li').contains(choice);
+          });
           cy.get('[data-cy=user-profile-button]').click(); // close profile menu
         });
       });

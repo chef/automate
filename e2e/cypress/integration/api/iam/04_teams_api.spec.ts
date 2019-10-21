@@ -1,9 +1,8 @@
-import { describeIfIAMV2p1, adminApiToken } from '../../constants';
+import { describeIfIAMV2p1 } from '../../constants';
 
 describe('teams API', () => {
   const defaultAdminReq = {
-    headers: { 'api-token': adminApiToken },
-    method: 'GET',
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     url: '/apis/iam/v2beta/teams'
   };
   const cypressPrefix = 'test-teams-api';
@@ -42,10 +41,10 @@ describe('teams API', () => {
     before(() => {
       for (const project of [project1, project2]) {
         cy.request({
-            headers: { 'api-token': adminApiToken },
-            method: 'POST',
-            url: '/apis/iam/v2beta/projects',
-            body: project
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+          method: 'POST',
+          url: '/apis/iam/v2beta/projects',
+          body: project
         });
       }
 

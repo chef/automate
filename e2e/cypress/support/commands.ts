@@ -53,6 +53,58 @@ Cypress.Commands.add('applyProjectsFilter', (projectsToFilterOn: string[]) => {
   }
 });
 
+Cypress.Commands.add('generateAdminToken', (idToken: string) => {
+  const adminTokenObj = {
+    id: 'cypress-api-test-admin-token',
+    name: 'cypress-api-test-admin-token'
+  };
+
+  // delete old token if exists
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'DELETE',
+    url: `/apis/iam/v2beta/tokens/${adminTokenObj.id}`,
+    failOnStatusCode: false
+  }).then((resp: Cypress.ObjectLike) => {
+    expect(resp.status).to.be.oneOf([200, 404]);
+  });
+
+  // create token (OK to run v2 endpoints even if system is v1)
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'POST',
+    url: '/apis/iam/v2beta/tokens',
+    body: adminTokenObj
+  }).then((resp: Cypress.ObjectLike) => {
+    Cypress.env('ADMIN_TOKEN', resp.body.token.value);
+  });
+
+  // grant permissions based on IAM version
+  if (Cypress.env('IAM_VERSION') === 'v1') {
+    cy.request({
+      auth: { bearer: idToken },
+      method: 'POST',
+      url: '/api/v0/auth/policies',
+      body: {
+        action: '*',
+        resource: '*',
+        subjects: [`token:${adminTokenObj.id}`]
+      }
+    });
+  } else {
+    cy.request({
+      auth: { bearer: idToken },
+      method: 'POST',
+      url: '/apis/iam/v2beta/policies/administrator-access/members:add',
+      body: {
+        members: [`token:${adminTokenObj.id}`]
+      }
+    });
+  }
+
+  waitUntilAdminTokenPermissioned(100);
+});
+
 interface MemoryMap {
   [key: string]: any;
 }
@@ -128,7 +180,7 @@ function cleanupV2IAMObjectByIDPrefix(idPrefix: string, iamObject: string): void
           method: 'DELETE',
           url: `/apis/iam/v2beta/${iamObject}/${object.id}`
         }).then((deleteResp) => {
-          expect([200, 404]).to.include(deleteResp.status);
+          expect(deleteResp.status).to.be.oneOf([200, 404]);
         });
       }
     }
@@ -200,4 +252,23 @@ function LoginHelper(username: string) {
 
     cy.wait(['@getAuthPopulateCache', '@getAuthParameterized']);
   });
+}
+
+function waitUntilAdminTokenPermissioned(attempts: number): void {
+  for (let i = 0; i > attempts; i++) {
+    cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: '/apis/iam/v2beta/projects',
+    method: 'GET',
+    failOnStatusCode: false
+  }).then((response) => {
+    if (response.status === 200) {
+      return;
+    } else {
+      cy.log(`${attempts} attempts remaining: waiting for admin token to be permissioned`);
+      cy.wait(1000);
+      ++attempts;
+    }
+  });
+  }
 }
