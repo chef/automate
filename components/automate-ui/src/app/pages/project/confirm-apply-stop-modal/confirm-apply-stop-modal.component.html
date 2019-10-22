@@ -1,4 +1,4 @@
-<chef-modal id="confirm-apply-stop-modal" [visible]="visible" [locked]="stopRulesInProgress" (close)="cancel.emit()">
+<chef-modal id="confirm-apply-stop-modal" [visible]="visible" [locked]="stopRulesInProgress" (closeModal)="cancel.emit()">
   <h2 id="title" slot="title">Stop Updating Projects?</h2>
   <div class="modal-content">
     <chef-progress-bar

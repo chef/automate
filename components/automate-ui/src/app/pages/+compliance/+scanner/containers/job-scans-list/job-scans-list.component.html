@@ -113,7 +113,7 @@
         *ngIf="jobDeletePrompt$ | async as prompt"
         id="delete-prompt"
         [visible]="prompt.visible"
-        (close)="cancelDeleteJob(prompt.job)">
+        (closeModal)="cancelDeleteJob(prompt.job)">
         <h2 id="delete-prompt-title" slot="title">Are you sure you want to delete this job?</h2>
         <div>
           <p>{{ prompt.job?.name }}</p>

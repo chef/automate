@@ -153,7 +153,7 @@
       id="download-modal"
       title="download-title"
       [visible]="downloadStatusVisible"
-      (close)="hideDownloadStatus()">
+      (closeModal)="hideDownloadStatus()">
       <h4 id="download-title" slot="title">
         <ng-container *ngIf="downloadInProgress">Downloading report...</ng-container>
         <ng-container *ngIf="downloadFailed">Download failed.</ng-container>

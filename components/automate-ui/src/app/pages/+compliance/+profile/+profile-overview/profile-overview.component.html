@@ -53,7 +53,7 @@
         <chef-modal
           id="upload-modal"
           [visible]="uploadModalVisible"
-          (close)="hideUploadModal()">
+          (closeModal)="hideUploadModal()">
           <h2 id="upload-modal-title" slot="title">Upload an archived profile (.tar.gz or .zip)</h2>
           <p id="upload-modal-subtitle">See the <a href="https://www.inspec.io/docs/reference/cli/#archive" target="_blank">Inspec CLI documentation</a> for more info on creating a profile archive.</p>
           <chef-table class="file-upload-list">
