@@ -9,12 +9,10 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	secrets "github.com/chef/automate/api/external/secrets"
 	cfgmgmtRequest "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/data-feed-service/config"
-	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
@@ -25,10 +23,7 @@ var (
 
 type DataFeedClientTask struct {
 	cfgMgmt   cfgmgmt.CfgMgmtClient
-	secrets   secrets.SecretsServiceClient
 	reporting reporting.ReportingServiceClient
-	db        *dao.DB
-	manager   *cereal.Manager
 }
 
 type DataFeedClientTaskParams struct {
@@ -39,16 +34,11 @@ type DataFeedClientTaskResults struct {
 	DataFeedMessages map[string]datafeedMessage
 }
 
-func NewDataFeedClientTask(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory, db *dao.DB, manager *cereal.Manager) (*DataFeedClientTask, error) {
+func NewDataFeedClientTask(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory) (*DataFeedClientTask, error) {
 
 	cfgMgmtConn, err := connFactory.Dial("config-mgmt-service", dataFeedConfig.CfgmgmtConfig.Target)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not connect to config-mgmt-service")
-	}
-
-	secretsConn, err := connFactory.Dial("secrets-service", dataFeedConfig.SecretsConfig.Target)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not connect to secrets-service")
 	}
 
 	complianceConn, err := connFactory.Dial("compliance-service", dataFeedConfig.ComplianceConfig.Target)
@@ -57,11 +47,8 @@ func NewDataFeedClientTask(dataFeedConfig *config.DataFeedConfig, connFactory *s
 	}
 
 	return &DataFeedClientTask{
-		secrets:   secrets.NewSecretsServiceClient(secretsConn),
 		reporting: reporting.NewReportingServiceClient(complianceConn),
 		cfgMgmt:   cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
-		db:        db,
-		manager:   manager,
 	}, nil
 }
 
@@ -76,13 +63,6 @@ func (d *DataFeedClientTask) Run(ctx context.Context, task cereal.Task) (interfa
 	datafeedMessages, err := d.buildDatafeed(ctx, params.ClientTaskParams.NodeIDs)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build chef client data")
-	}
-	params.ComplianceTaskParams.DataFeedMessages = datafeedMessages
-	err = d.manager.UpdateWorkflowScheduleByName(context.Background(), dataFeedScheduleName, dataFeedWorkflowName,
-		cereal.UpdateParameters(params),
-		cereal.UpdateEnabled(true))
-	if err != nil {
-		return nil, err
 	}
 
 	return &DataFeedClientTaskResults{DataFeedMessages: datafeedMessages}, nil

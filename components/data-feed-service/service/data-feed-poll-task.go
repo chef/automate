@@ -24,8 +24,6 @@ var (
 
 type DataFeedPollTask struct {
 	cfgMgmt   cfgmgmt.CfgMgmtClient
-	secrets   secrets.SecretsServiceClient
-	reporting reporting.ReportingServiceClient
 	db        *dao.DB
 	manager   *cereal.Manager
 }
@@ -52,22 +50,9 @@ func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, connFactory *sec
 		return nil, errors.Wrap(err, "could not connect to config-mgmt-service")
 	}
 
-	secretsConn, err := connFactory.Dial("secrets-service", dataFeedConfig.SecretsConfig.Target)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not connect to secrets-service")
-	}
-
-	complianceConn, err := connFactory.Dial("compliance-service", dataFeedConfig.ComplianceConfig.Target)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not connect to compliance-service")
-	}
-
-	return &DataFeedPollTask{
-		secrets:   secrets.NewSecretsServiceClient(secretsConn),
-		reporting: reporting.NewReportingServiceClient(complianceConn),
+	return &DataFeedPollTask{}
 		cfgMgmt:   cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
 		db:        db,
-		manager:   manager,
 	}, nil
 }
 

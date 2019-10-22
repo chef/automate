@@ -8,11 +8,9 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	secrets "github.com/chef/automate/api/external/secrets"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/data-feed-service/config"
-	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
@@ -23,10 +21,7 @@ var (
 
 type DataFeedComplianceTask struct {
 	cfgMgmt   cfgmgmt.CfgMgmtClient
-	secrets   secrets.SecretsServiceClient
 	reporting reporting.ReportingServiceClient
-	db        *dao.DB
-	manager   *cereal.Manager
 }
 
 type DataFeedComplianceTaskParams struct {
@@ -39,16 +34,11 @@ type DataFeedComplianceTaskResults struct {
 	DataFeedMessages map[string]datafeedMessage
 }
 
-func NewDataFeedComplianceTask(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory, db *dao.DB, manager *cereal.Manager) (*DataFeedComplianceTask, error) {
+func NewDataFeedComplianceTask(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory) (*DataFeedComplianceTask, error) {
 
 	cfgMgmtConn, err := connFactory.Dial("config-mgmt-service", dataFeedConfig.CfgmgmtConfig.Target)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not connect to config-mgmt-service")
-	}
-
-	secretsConn, err := connFactory.Dial("secrets-service", dataFeedConfig.SecretsConfig.Target)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not connect to secrets-service")
 	}
 
 	complianceConn, err := connFactory.Dial("compliance-service", dataFeedConfig.ComplianceConfig.Target)
@@ -57,11 +47,8 @@ func NewDataFeedComplianceTask(dataFeedConfig *config.DataFeedConfig, connFactor
 	}
 
 	return &DataFeedComplianceTask{
-		secrets:   secrets.NewSecretsServiceClient(secretsConn),
 		reporting: reporting.NewReportingServiceClient(complianceConn),
 		cfgMgmt:   cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
-		db:        db,
-		manager:   manager,
 	}, nil
 }
 
