@@ -9,10 +9,12 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/pgutils"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 func mergeFilters(mergeableFilters []*common.Filter) ([]common.Filter, error) {
@@ -92,6 +94,10 @@ func buildWhereHavingFilter(mergeableFilters []*common.Filter, tableAbbrev strin
 			default:
 				newCondition, err = whereFieldIn(filterField[filter.Key], filter.Values, tableAbbrev)
 			}
+		}
+
+		if newCondition == "" {
+			continue
 		}
 
 		if err != nil {
@@ -245,14 +251,32 @@ func whereProjectsMatch(_ string, arr []string, tableAbbrev string) (string, err
 	var condition string
 
 	if len(arr) == 0 {
-		condition = fmt.Sprintf("not exists (select 1 from projects p join nodes_projects np on p.id = np.project_id where np.node_id = %s.id)", tableAbbrev)
-	} else {
-		value, err := pq.Array(arr).Value()
+		return "", nil
+	}
+
+	refinedValues := stringutils.SliceFilter(arr, func(projectId string) bool {
+		return projectId != authzConstants.UnassignedProjectID
+	})
+
+	if len(refinedValues) > 0 {
+		value, err := pq.Array(refinedValues).Value()
 		if err != nil {
 			return "", err
 		}
 		condition = fmt.Sprintf("exists (select 1 from projects p join nodes_projects np on p.id = np.project_id where np.node_id = %s.id and p.project_id = ANY('%s'::text[]))", tableAbbrev, value)
 	}
+
+	if stringutils.SliceContains(arr, authzConstants.UnassignedProjectID) {
+		unassignedCondition := fmt.Sprintf("not exists (select 1 from projects p join nodes_projects np on p.id = np.project_id where np.node_id = %s.id)", tableAbbrev)
+		if condition == "" {
+			condition = unassignedCondition
+		} else {
+			condition = condition + " OR " + unassignedCondition
+		}
+	}
+
+	// Or the node is manually added
+	condition = condition + " OR n.manager <> ''"
 
 	return condition, nil
 }

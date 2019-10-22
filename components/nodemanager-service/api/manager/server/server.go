@@ -587,7 +587,8 @@ func (srv *Server) searchAwsNodes(ctx context.Context, in *manager.NodeQuery) (*
 	return &nodeIds, nil
 }
 
-func (srv *Server) addManagerNodesToDB(ctx context.Context, managerId string, managerName string, managerType string, managerAcctId string, instanceCredentials []*manager.CredentialsByTags, credential string) error {
+func (srv *Server) addManagerNodesToDB(ctx context.Context, managerId string, managerName string,
+	managerType string, managerAcctId string, instanceCredentials []*manager.CredentialsByTags, credential string) error {
 	var nodeIds []string
 	var err error
 

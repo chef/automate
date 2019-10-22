@@ -11,11 +11,13 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/secretsint"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	"github.com/chef/automate/lib/errorutils"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
 
@@ -265,7 +267,12 @@ func (srv *Server) Delete(ctx context.Context, in *nodes.Id) (*pb.Empty, error) 
 // List nodes based on a query
 func (srv *Server) List(ctx context.Context, in *nodes.Query) (*nodes.Nodes, error) {
 	logrus.Debugf("Getting Nodes with query: %+v", in)
-	dbnodes, totalCount, err := srv.db.GetNodes(in.Sort, in.Order, in.Page, in.PerPage, in.Filters)
+	filters, err := addProjectFilters(ctx, in.Filters)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, "")
+	}
+
+	dbnodes, totalCount, err := srv.db.GetNodes(in.Sort, in.Order, in.Page, in.PerPage, filters)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, "")
 	}
@@ -332,4 +339,32 @@ func (srv *Server) BulkDeleteById(ctx context.Context, in *nodes.Ids) (*nodes.Bu
 		return nil, err
 	}
 	return &nodes.BulkDeleteResponse{Names: names}, nil
+}
+
+func filterByProjects(ctx context.Context) ([]string, error) {
+	projectsFilter, err := auth_context.ProjectsFromIncomingContext(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if auth_context.AllProjectsRequested(projectsFilter) {
+		return []string{}, nil
+	}
+
+	return projectsFilter, nil
+}
+
+func addProjectFilters(ctx context.Context, filters []*common.Filter) ([]*common.Filter, error) {
+	projectFilters, err := filterByProjects(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(projectFilters) == 0 {
+		return filters, nil
+	}
+
+	return append(filters, &common.Filter{
+		Key:    "project",
+		Values: projectFilters,
+	}), nil
 }
