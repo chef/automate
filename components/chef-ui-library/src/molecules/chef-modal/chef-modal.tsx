@@ -10,7 +10,6 @@ import {
   Watch,
   h
 } from '@stencil/core';
-// import { createPartiallyEmittedExpression } from 'typescript';
 
 /**
  * @description
