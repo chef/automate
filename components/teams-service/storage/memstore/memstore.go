@@ -314,6 +314,10 @@ func (m *memstore) UpgradeToV2(ctx context.Context) error {
 	return nil
 }
 
+func (m *memstore) ResetToV1(ctx context.Context) error {
+	return nil
+}
+
 func (m *memstore) PurgeProject(ctx context.Context, projectID string) error {
 	for _, team := range m.teams {
 		for i, v := range team.Projects {

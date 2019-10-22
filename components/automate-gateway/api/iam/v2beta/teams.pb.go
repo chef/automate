@@ -6,6 +6,8 @@ package v2beta
 import (
 	context "context"
 	fmt "fmt"
+	math "math"
+
 	request "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request"
 	response "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/response"
 	_ "github.com/chef/automate/components/automate-grpc/protoc-gen-policy/api"
@@ -15,7 +17,6 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
-	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

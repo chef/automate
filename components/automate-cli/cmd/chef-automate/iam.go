@@ -14,6 +14,7 @@ import (
 	authz_constants "github.com/chef/automate/components/authz-service/constants"
 	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/adminmgmt"
+	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	policies_common "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common"
@@ -269,6 +270,10 @@ func runIAMResetToV1Cmd(cmd *cobra.Command, args []string) error {
 			"Failed to reset IAM state to v1")
 	}
 	return nil
+}
+
+func resetDomainsToV1(ctx context.Context, apiClient client_type.APIClient) error {
+	apiClient.TeamsV2Client().ResetToV1()
 }
 
 func runIAMVersionCmd(cmd *cobra.Command, args []string) error {

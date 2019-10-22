@@ -244,6 +244,17 @@ func (s *Server) UpgradeToV2(ctx context.Context,
 	return &teams.UpgradeToV2Resp{}, nil
 }
 
+// ResetToV1 removes all projects from teams.
+func (s *Server) ResetToV1(ctx context.Context,
+	_ *teams.ResetToV1Req) (*teams.ResetToV1Resp, error) {
+
+	err := s.service.Storage.ResetToV1(ctx)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "there was an error resetting teams to v1: %s", err.Error())
+	}
+	return &teams.ResetToV1Resp{}, nil
+}
+
 func fromStorage(s storage.Team) *teams.Team {
 	return &teams.Team{
 		Id:       s.Name,
