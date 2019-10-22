@@ -64,6 +64,7 @@ message Run {
   string                    policy_group           = 31;
   string                    policy_revision        = 32;
   ExpandedRunList           expanded_run_list      = 33;
+  repeated string           projects               = 34;
 }
 
 message ExpandedRunList {

@@ -737,7 +737,17 @@ func init() {
           "type": "string"
         },
         "expanded_run_list": {
+<<<<<<< HEAD
           "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ExpandedRunList"
+=======
+          "$ref": "#/definitions/responseExpandedRunList"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+>>>>>>> Runs request returns associated projects
         }
       }
     },

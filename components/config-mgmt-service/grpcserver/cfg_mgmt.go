@@ -3,6 +3,7 @@ package grpcserver
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 	gpStruct "github.com/golang/protobuf/ptypes/struct"
@@ -206,23 +207,25 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context,
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	projectFilters, err := filterByProjects(ctx, map[string][]string{})
+	nodeFilters, err := filterByProjects(ctx, map[string][]string{})
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	// Check if the user has access to the node of the run requested
-	exists, err := s.client.NodeExists(run.EntityUuid, projectFilters)
+	nodeFilters["entity_uuid"] = []string{run.EntityUuid}
+
+	nodes, err := s.client.GetNodesPageByCurser(ctx, time.Time{}, time.Time{},
+		nodeFilters, nil, "", 1, "", true)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
 	// Either the user does not have permissions or the node does not exist
-	if !exists {
+	if len(nodes) == 0 {
 		return nil, status.Errorf(codes.NotFound, "Invalid ID")
 	}
 
-	return toResponseRun(run)
+	return toResponseRun(run, nodes[0])
 }
 
 func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,

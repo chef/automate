@@ -258,6 +258,39 @@ func TestNodeRunWithCookbookRunlist(t *testing.T) {
 		})
 }
 
+func TestNodeRunReturnsProjectList(t *testing.T) {
+	var (
+		nodeID = newUUID()
+		run    = iBackend.Run{
+			NodeInfo:  iBackend.NodeInfo{EntityUuid: nodeID, Status: "success"},
+			RunID:     newUUID(),
+			StartTime: time.Now().Add(time.Minute * -5),
+			EndTime:   time.Now(),
+		}
+		req  = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
+		ctx  = context.Background()
+		node = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID,
+			},
+			Projects: []string{"project9", "project7"},
+		}
+	)
+
+	suite.IngestNodes([]iBackend.Node{node})
+	suite.IngestRuns([]iBackend.Run{run})
+	defer suite.DeleteAllDocuments()
+
+	t.Run(fmt.Sprintf("node run requests return the associated projects %v", req),
+		func(t *testing.T) {
+			res, err := cfgmgmt.GetNodeRun(ctx, &req)
+			assert.Nil(t, err)
+
+			assert.Equal(t, node.Projects, res.Projects)
+		})
+}
+
 func TestNodeRunWithOneRoleRunlist(t *testing.T) {
 	var (
 		nodeID = newUUID()
