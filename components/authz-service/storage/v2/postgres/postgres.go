@@ -1649,7 +1649,7 @@ func (p *pg) ensureNoProjectsMissingWithQuerier(ctx context.Context, q Querier, 
 	}
 
 	if len(projectsNotFound) != 0 {
-		return projectassignment.NewProjectsMissingErroror(projectsNotFound)
+		return projectassignment.NewProjectsMissingError(projectsNotFound)
 	}
 
 	return nil
