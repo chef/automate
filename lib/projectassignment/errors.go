@@ -27,20 +27,39 @@ func (e *ProjectsMissingError) Error() string {
 // ProjectsUnauthorizedForAssignmentErr occurs when some of the projects in the project diff
 // were not authorized for a specific set of subjects.
 type ProjectsUnauthorizedForAssignmentErr struct {
+	subjectsUnauthorized []string
 	projectsUnauthorized []string
 }
 
-func NewProjectsUnauthorizedForAssignmentError(projectsUnauthorized []string) error {
-	return &ProjectsUnauthorizedForAssignmentErr{projectsUnauthorized: projectsUnauthorized}
+func NewProjectsUnauthorizedForAssignmentError(projectsUnauthorized, subjectsUnauthorized []string) error {
+	return &ProjectsUnauthorizedForAssignmentErr{
+		projectsUnauthorized: projectsUnauthorized,
+		subjectsUnauthorized: subjectsUnauthorized,
+	}
 }
 
 func (e *ProjectsUnauthorizedForAssignmentErr) Error() string {
-	var errorStr string
-	if len(e.projectsUnauthorized) > 1 {
-		errorStr = fmt.Sprintf("You cannot modify projects for this object because you are missing iam:projects:assign on these projects: %q", e.projectsUnauthorized)
-	} else {
-		errorStr = fmt.Sprintf("You cannot modify projects for this object because you are missing iam:projects:assign on this project: %q", e.projectsUnauthorized)
-	}
-	return errorStr
+	sub := "subject is"
+	proj := "this project"
+	authedSubs := e.subjectsUnauthorized
 
+	if len(e.projectsUnauthorized) > 1 {
+		proj = "these projects"
+	}
+
+	if len(authedSubs) > 1 {
+		sub = "subjects are"
+	}
+
+	// just don't want the error msg out of hand
+	if len(authedSubs) > 5 {
+		sub = "(truncated) subjects are"
+		authedSubs = authedSubs[0:5]
+	}
+
+	return fmt.Sprintf("Projects for this object cannot be modified because the %q %s missing iam:projects:assign on %s: %q",
+		e.subjectsUnauthorized,
+		sub,
+		proj,
+		e.projectsUnauthorized)
 }
