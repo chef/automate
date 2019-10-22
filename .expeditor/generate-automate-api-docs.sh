@@ -12,7 +12,7 @@ pushd /go/src/github.com/chef/automate/components/automate-chef-io
   make sync_swagger_files
 popd
 
-if [[ `git status --porcelain` ]]; then
+if [[ $(git status --porcelain) ]]; then
   git add components/automate-chef-io/data/docs/api_chef_automate
 
   git commit --message "Sync swagger files for Automate docs." --message "This pull request was triggered automatically via Expeditor." --message "This change falls under the obvious fix policy so no Developer Certificate of Origin (DCO) sign-off is required."
