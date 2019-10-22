@@ -3,11 +3,6 @@ log_level = "debug,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 listen = "0.0.0.0"
 port   = 10103
 
-[github]
-api_url        = "https://api.github.com"
-app_id         = 5565
-webhook_secret = ""
-
 [artifactory]
 enabled = false
 api_url = "http://localhost:8080"

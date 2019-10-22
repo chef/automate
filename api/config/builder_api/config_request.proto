@@ -22,20 +22,12 @@ message ConfigRequest {
 			chef.automate.infra.config.TLSCredentials tls = 2;
 
 			Service service = 3;
-			Github github = 4;
-			Artifactory artifactory = 5;
-			Memcache memcache = 6;
+			Artifactory artifactory = 4;
+			Memcache memcache = 5;
 
 			message Service {
 				google.protobuf.StringValue host = 1;
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10103, protocol: "http" } ];
-			}
-
-			message Github {
-				google.protobuf.StringValue api_url = 1;
-				google.protobuf.Int64Value app_id = 2;
-				google.protobuf.StringValue webhook_secret = 3;
-				google.protobuf.StringValue app_private_key = 4;
 			}
 
 			message Artifactory {
