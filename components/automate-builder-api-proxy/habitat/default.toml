@@ -27,23 +27,15 @@ client_id      = "automate-builder-api"
 authorize_url  = "/session/new"
 
 [nginx]
-worker_connections        = 8000
+worker_connections        = 1024
 worker_processes          = "auto"
 worker_rlimit_nofile      = 8192
-max_body_size             = "1024m"
+max_body_size             = 0
 proxy_send_timeout        = 300
 proxy_read_timeout        = 300
 proxy_connect_timeout     = 60
-limit_req_zone_unknown    = "$limit_unknown zone=unknown:10m rate=2r/s"
-limit_req_zone_known      = "$http_x_forwarded_for zone=known:10m rate=20r/s"
-limit_req_unknown         = "burst=20 nodelay"
-limit_req_known           = "burst=40 nodelay"
-limit_req_status          = 429
-limit_ua_known            = "hab|builder|Chef|Mozilla|Github"
-limit_ua_unknown_target   = "$http_x_forwarded_for"
 enable_caching            = false
 enable_gzip               = false
-enable_ipv6               = true
 
 [http]
 keepalive_connections     = 16
