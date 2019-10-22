@@ -291,6 +291,36 @@ func TestNodeRunReturnsProjectList(t *testing.T) {
 		})
 }
 
+// Returns and error because the node ID used to request the run does not match the run's node ID.
+func TestNodeRunRequestedNodeIDNotMatchRunNodeID(t *testing.T) {
+	var (
+		runsNodeID        = newUUID()
+		nonAssociatedNode = newUUID()
+		run               = iBackend.Run{
+			NodeInfo:  iBackend.NodeInfo{EntityUuid: runsNodeID, Status: "success"},
+			RunID:     newUUID(),
+			StartTime: time.Now().Add(time.Minute * -5),
+			EndTime:   time.Now(),
+		}
+		ctx  = context.Background()
+		node = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nonAssociatedNode,
+			},
+		}
+	)
+
+	suite.IngestNodes([]iBackend.Node{node})
+	suite.IngestRuns([]iBackend.Run{run})
+	defer suite.DeleteAllDocuments()
+
+	_, err := cfgmgmt.GetNodeRun(ctx, &request.NodeRun{
+		NodeId: nonAssociatedNode,
+		RunId:  run.RunID})
+	assert.Error(t, err)
+}
+
 func TestNodeRunWithOneRoleRunlist(t *testing.T) {
 	var (
 		nodeID = newUUID()

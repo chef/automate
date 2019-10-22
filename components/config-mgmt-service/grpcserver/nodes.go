@@ -392,6 +392,7 @@ func (s *CfgMgmtServer) nodeExistsAsync(nodeID string, projectFilters map[string
 			exists: exists,
 			err:    err,
 		}
+		close(nodeExistsChan)
 	}()
 
 	return nodeExistsChan
