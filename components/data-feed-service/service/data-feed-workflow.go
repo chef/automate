@@ -1,13 +1,10 @@
 package service
 
 import (
-	"context"
 	"time"
 
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/lib/cereal"
 )
 
@@ -159,58 +156,4 @@ func getComplianceTaskResults(ev cereal.TaskCompleteEvent) (DataFeedComplianceTa
 	err := ev.Result.Get(&taskResults)
 	log.Infof("Compliance task result %v", taskResults)
 	return taskResults, err
-}
-
-func (d *DataFeedComplianceTask) Run2(ctx context.Context, task cereal.Task) (interface{}, error) {
-	params := DataFeedWorkflowParams{}
-	err := task.GetParameters(&params)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse task parameters")
-	}
-	log.Infof("Run params %v", params)
-	now := time.Now()
-
-	feedStartTime := now
-	feedEndTime := now
-	destinations := []dao.Destination{}
-	nodeIDs := []string{}
-	// build messages for any nodes which have had a CCR in last window, include last compliance report
-	datafeedMessages := map[string]datafeedMessage{}
-	// build messages for any reports in last window include last CCR and OHAI
-	d.buildReportFeed(ctx, params.PollTaskParams.ReportsPageSize, feedStartTime, feedEndTime, datafeedMessages)
-	// get the valus from this ipaddress:datafeedMessage map
-	data := make([]datafeedMessage, 0, len(datafeedMessages))
-	for _, value := range datafeedMessages {
-		data = append(data, value)
-	}
-
-	if len(datafeedMessages) == 0 {
-		return nil, nil
-	}
-	for destination := range destinations {
-		log.Debugf("Destination name %v", destinations[destination].Name)
-		log.Debugf("Destination url %v", destinations[destination].URL)
-		log.Debugf("Destination secret %v", destinations[destination].Secret)
-
-		username, password, err := GetCredentials(ctx, d.secrets, destinations[destination].Secret)
-
-		if err != nil {
-			log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
-			// TODO error handling - need some form of report in automate that indicates when data was sent and if it was successful
-		} else {
-			// build and send notification for this rule
-			notification := datafeedNotification{username: username, password: password, url: destinations[destination].URL, data: data}
-
-			client := NewDataClient()
-			err = send(client, notification)
-			if err != nil {
-				handleSendErr(notification, feedStartTime, feedEndTime, err)
-			}
-		}
-	}
-
-	return &DataFeedPollTaskResults{
-		Destinations: destinations,
-		NodeIDs:      nodeIDs,
-	}, nil
 }

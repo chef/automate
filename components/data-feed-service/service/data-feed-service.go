@@ -69,16 +69,16 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		return err
 	}
 
-	dataFeedClientTask, err := NewDataFeedClientTask(dataFeedConfig, connFactory, db, manager)
+	dataFeedClientTask, err := NewDataFeedClientTask(dataFeedConfig, connFactory)
 	if err != nil {
 		return err
 	}
 
-	dataFeedComplianceTask, err := NewDataFeedComplianceTask(dataFeedConfig, connFactory, db, manager)
+	dataFeedComplianceTask, err := NewDataFeedComplianceTask(dataFeedConfig, connFactory)
 	if err != nil {
 		return err
 	}
-	dataFeedNotifierTask, err := NewDataFeedNotifierTask(dataFeedConfig, connFactory, db, manager)
+	dataFeedNotifierTask, err := NewDataFeedNotifierTask(dataFeedConfig, connFactory, db)
 	if err != nil {
 		return err
 	}
