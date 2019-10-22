@@ -204,13 +204,12 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 	// if any projects are non-existed, NotFound is returned.
 	// avoids a potentially expensive authz call.
 	cases := map[string]func(*testing.T){
-		// cases for (unassigned)
 		"when assigning (unassigned) is allowed, from unassigned to authorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
 				Subjects:        []string{assignsAuthorizedAndUnassignedProjUser},
 				OldProjects:     []string{},
 				NewProjects:     []string{authorizedProjectId},
-				IsUpdateRequest: false,
+				IsUpdateRequest: true,
 			})
 			assert.NoError(t, err)
 		},
@@ -219,7 +218,7 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 				Subjects:        []string{assignsAuthorizedAndUnassignedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{},
-				IsUpdateRequest: false,
+				IsUpdateRequest: true,
 			})
 			assert.NoError(t, err)
 		},
@@ -246,23 +245,12 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
 			assert.Contains(t, err.Error(), unassignedProjectId)
 		},
-		"on create, when assigning (unassigned) is not allowed, from unassigned (new) to unassigned": func(t *testing.T) {
-			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
-				Subjects:        []string{onlyAssignsAuthorizedProjUser},
-				OldProjects:     []string{},
-				NewProjects:     []string{},
-				IsUpdateRequest: false,
-			})
-			require.Error(t, err)
-			grpctest.AssertCode(t, codes.PermissionDenied, err)
-			assert.Contains(t, err.Error(), unassignedProjectId)
-		},
 		"when passed one unauthorized project": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{unauthorizedProjectId},
-				IsUpdateRequest: false,
+				IsUpdateRequest: true,
 			})
 			require.Error(t, err)
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
@@ -273,7 +261,7 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{notFoundProjectId},
-				IsUpdateRequest: false,
+				IsUpdateRequest: true,
 			})
 			require.Error(t, err)
 			grpctest.AssertCode(t, codes.NotFound, err)
@@ -284,7 +272,7 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{notFoundProjectId, "also-not-found"},
-				IsUpdateRequest: false,
+				IsUpdateRequest: true,
 			})
 			require.Error(t, err)
 			grpctest.AssertCode(t, codes.NotFound, err)
@@ -296,7 +284,7 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{authorizedProjectId, notFoundProjectId},
-				IsUpdateRequest: false,
+				IsUpdateRequest: true,
 			})
 			require.Error(t, err)
 			grpctest.AssertCode(t, codes.NotFound, err)
@@ -308,7 +296,7 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{unauthorizedProjectId, notFoundProjectId},
-				IsUpdateRequest: false,
+				IsUpdateRequest: true,
 			})
 			require.Error(t, err)
 			grpctest.AssertCode(t, codes.NotFound, err)
@@ -320,7 +308,7 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{unauthorizedProjectId, authorizedProjectId},
-				IsUpdateRequest: false,
+				IsUpdateRequest: true,
 			})
 			require.Error(t, err)
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
@@ -332,7 +320,7 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{unauthorizedProjectId, authorizedProjectId},
-				IsUpdateRequest: false,
+				IsUpdateRequest: true,
 			})
 			require.Error(t, err)
 			grpctest.AssertCode(t, codes.PermissionDenied, err)
@@ -344,7 +332,7 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
 				NewProjects:     []string{authorizedProjectId},
-				IsUpdateRequest: false,
+				IsUpdateRequest: true,
 			})
 			assert.NoError(t, err)
 		},
@@ -384,14 +372,26 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 			})
 			assert.NoError(t, err)
 		},
-		"on create, when project assignment has not changed": func(t *testing.T) {
+		"on create, when assigning (unassigned) is not allowed, from unassigned (new) to unassigned": func(t *testing.T) {
+			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
+				Subjects:        []string{onlyAssignsAuthorizedProjUser},
+				OldProjects:     []string{},
+				NewProjects:     []string{},
+				IsUpdateRequest: false,
+			})
+			require.Error(t, err)
+			grpctest.AssertCode(t, codes.PermissionDenied, err)
+			assert.Contains(t, err.Error(), unassignedProjectId)
+		},
+		"on create, when project assignment has old projects": func(t *testing.T) {
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{unauthorizedProjectId, authorizedProjectId},
-				NewProjects:     []string{unauthorizedProjectId, authorizedProjectId},
+				NewProjects:     []string{authorizedProjectId},
 				IsUpdateRequest: false,
 			})
-			assert.NoError(t, err)
+			require.Error(t, err)
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		},
 	}
 

@@ -11,6 +11,9 @@ const UnassignedProjectID = "(unassigned)"
 func AuthorizeProjectAssignment(ctx context.Context, authorizer engine.V2Authorizer,
 	subjects, oldProjects, newProjects []string, isUpdateRequest bool) error {
 
+	if len(oldProjects) != 0 && !isUpdateRequest {
+		return NewInvalidCreateRequestError()
+	}
 	projectsToAuthz := calculateProjectsToAuthorize(oldProjects, newProjects, isUpdateRequest)
 	if len(projectsToAuthz) == 0 {
 		return nil
@@ -38,7 +41,7 @@ func AuthorizeProjectAssignment(ctx context.Context, authorizer engine.V2Authori
 	}
 
 	if len(unauthorizedProjects) != 0 {
-		return NewProjectsUnauthorizedForAssignmentError(unauthorizedProjects)
+		return NewProjectsUnauthorizedForAssignmentError(unauthorizedProjects, subjects)
 	}
 	return nil
 }

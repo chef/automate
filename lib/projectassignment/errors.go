@@ -63,3 +63,15 @@ func (e *ProjectsUnauthorizedForAssignmentErr) Error() string {
 		proj,
 		e.projectsUnauthorized)
 }
+
+// InvalidCreateRequest occurs when a create request contains original projects
+// when it should only contain new projects.
+type InvalidCreateRequest struct{}
+
+func NewInvalidCreateRequestError() error {
+	return &InvalidCreateRequest{}
+}
+
+func (e *InvalidCreateRequest) Error() string {
+	return fmt.Sprint("OldProjects field must be empty for create request")
+}
