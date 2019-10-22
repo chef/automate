@@ -53,5 +53,5 @@ export interface RequestLicenseResponse {
 }
 
 export function parsedExpirationDate(license: LicenseStatus): string {
-  return moment(license.licensed_period.end).format(DateTime.RFC2822);
+  return moment.utc(license.licensed_period.end).format(DateTime.RFC2822);
 }
