@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/telemetryTelemetryResponse"
+              "$ref": "#/definitions/chef.automate.api.telemetry.TelemetryResponse"
             }
           }
         },
@@ -36,7 +36,7 @@ func init() {
     }
   },
   "definitions": {
-    "telemetryTelemetryResponse": {
+    "chef.automate.api.telemetry.TelemetryResponse": {
       "type": "object",
       "properties": {
         "license_id": {

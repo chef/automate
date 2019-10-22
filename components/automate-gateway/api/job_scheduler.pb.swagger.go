@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseConfigureDeleteNodesScheduler"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.ConfigureDeleteNodesScheduler"
             }
           }
         },
@@ -35,7 +35,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestSchedulerConfig"
+              "$ref": "#/definitions/chef.automate.api.ingest.request.SchedulerConfig"
             }
           }
         ],
@@ -51,7 +51,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseConfigureMissingNodesForDeletionScheduler"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.ConfigureMissingNodesForDeletionScheduler"
             }
           }
         },
@@ -61,7 +61,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestSchedulerConfig"
+              "$ref": "#/definitions/chef.automate.api.ingest.request.SchedulerConfig"
             }
           }
         ],
@@ -77,7 +77,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseConfigureNodesMissingScheduler"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.ConfigureNodesMissingScheduler"
             }
           }
         },
@@ -87,7 +87,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestSchedulerConfig"
+              "$ref": "#/definitions/chef.automate.api.ingest.request.SchedulerConfig"
             }
           }
         ],
@@ -103,7 +103,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseJobSchedulerStatus"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.JobSchedulerStatus"
             }
           }
         },
@@ -114,7 +114,7 @@ func init() {
     }
   },
   "definitions": {
-    "requestSchedulerConfig": {
+    "chef.automate.api.ingest.request.SchedulerConfig": {
       "type": "object",
       "properties": {
         "every": {
@@ -130,16 +130,16 @@ func init() {
       },
       "description": "SchedulerConfig\nThe job message to configure the Delete Node Job\nevery - It accepts '1h30m', '1m', '2h30m', ..."
     },
-    "responseConfigureDeleteNodesScheduler": {
+    "chef.automate.api.ingest.response.ConfigureDeleteNodesScheduler": {
       "type": "object"
     },
-    "responseConfigureMissingNodesForDeletionScheduler": {
+    "chef.automate.api.ingest.response.ConfigureMissingNodesForDeletionScheduler": {
       "type": "object"
     },
-    "responseConfigureNodesMissingScheduler": {
+    "chef.automate.api.ingest.response.ConfigureNodesMissingScheduler": {
       "type": "object"
     },
-    "responseJob": {
+    "chef.automate.api.ingest.response.Job": {
       "type": "object",
       "properties": {
         "running": {
@@ -169,7 +169,7 @@ func init() {
         }
       }
     },
-    "responseJobSchedulerStatus": {
+    "chef.automate.api.ingest.response.JobSchedulerStatus": {
       "type": "object",
       "properties": {
         "running": {
@@ -179,7 +179,7 @@ func init() {
         "jobs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseJob"
+            "$ref": "#/definitions/chef.automate.api.ingest.response.Job"
           }
         }
       }

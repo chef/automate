@@ -26,7 +26,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/legacyStatusResponse"
+              "$ref": "#/definitions/chef.automate.api.legacy.StatusResponse"
             }
           }
         },
@@ -37,7 +37,7 @@ func init() {
     }
   },
   "definitions": {
-    "legacyStatusResponse": {
+    "chef.automate.api.legacy.StatusResponse": {
       "type": "object",
       "properties": {
         "status": {

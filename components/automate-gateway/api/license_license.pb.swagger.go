@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/licenseApplyLicenseResp"
+              "$ref": "#/definitions/chef.automate.api.license.ApplyLicenseResp"
             }
           }
         },
@@ -35,7 +35,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/licenseApplyLicenseReq"
+              "$ref": "#/definitions/chef.automate.api.license.ApplyLicenseReq"
             }
           }
         ],
@@ -51,7 +51,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/licenseRequestLicenseResp"
+              "$ref": "#/definitions/chef.automate.api.license.RequestLicenseResp"
             }
           }
         },
@@ -61,7 +61,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/licenseRequestLicenseReq"
+              "$ref": "#/definitions/chef.automate.api.license.RequestLicenseReq"
             }
           }
         ],
@@ -77,7 +77,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/licenseGetStatusResp"
+              "$ref": "#/definitions/chef.automate.api.license.GetStatusResp"
             }
           }
         },
@@ -88,7 +88,41 @@ func init() {
     }
   },
   "definitions": {
-    "GetStatusRespDateRange": {
+    "chef.automate.api.license.ApplyLicenseReq": {
+      "type": "object",
+      "properties": {
+        "license": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.license.ApplyLicenseResp": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/chef.automate.api.license.GetStatusResp"
+        }
+      }
+    },
+    "chef.automate.api.license.GetStatusResp": {
+      "type": "object",
+      "properties": {
+        "license_id": {
+          "type": "string"
+        },
+        "configured_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "licensed_period": {
+          "$ref": "#/definitions/chef.automate.api.license.GetStatusResp.DateRange"
+        },
+        "customer_name": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.license.GetStatusResp.DateRange": {
       "type": "object",
       "properties": {
         "start": {
@@ -101,41 +135,7 @@ func init() {
         }
       }
     },
-    "licenseApplyLicenseReq": {
-      "type": "object",
-      "properties": {
-        "license": {
-          "type": "string"
-        }
-      }
-    },
-    "licenseApplyLicenseResp": {
-      "type": "object",
-      "properties": {
-        "status": {
-          "$ref": "#/definitions/licenseGetStatusResp"
-        }
-      }
-    },
-    "licenseGetStatusResp": {
-      "type": "object",
-      "properties": {
-        "license_id": {
-          "type": "string"
-        },
-        "configured_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "licensed_period": {
-          "$ref": "#/definitions/GetStatusRespDateRange"
-        },
-        "customer_name": {
-          "type": "string"
-        }
-      }
-    },
-    "licenseRequestLicenseReq": {
+    "chef.automate.api.license.RequestLicenseReq": {
       "type": "object",
       "properties": {
         "first_name": {
@@ -153,14 +153,14 @@ func init() {
         }
       }
     },
-    "licenseRequestLicenseResp": {
+    "chef.automate.api.license.RequestLicenseResp": {
       "type": "object",
       "properties": {
         "license": {
           "type": "string"
         },
         "status": {
-          "$ref": "#/definitions/licenseGetStatusResp"
+          "$ref": "#/definitions/chef.automate.api.license.GetStatusResp"
         }
       }
     }

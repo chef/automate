@@ -23,7 +23,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/authnAuthenticateResponse"
+              "$ref": "#/definitions/chef.automate.domain.authn.AuthenticateResponse"
             }
           }
         },
@@ -34,7 +34,7 @@
     }
   },
   "definitions": {
-    "authnAuthenticateResponse": {
+    "chef.automate.domain.authn.AuthenticateResponse": {
       "type": "object",
       "properties": {
         "subject": {

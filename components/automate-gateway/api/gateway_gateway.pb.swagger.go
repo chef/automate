@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiHealth"
+              "$ref": "#/definitions/chef.automate.api.Health"
             }
           }
         },
@@ -41,7 +41,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/apiVersion"
+              "$ref": "#/definitions/chef.automate.api.Version"
             }
           }
         },
@@ -52,7 +52,7 @@ func init() {
     }
   },
   "definitions": {
-    "apiHealth": {
+    "chef.automate.api.Health": {
       "type": "object",
       "properties": {
         "status": {
@@ -62,7 +62,7 @@ func init() {
       "description": "The automate-gateway service health is constructed with:\n* Status:\n           =\u003e ok:             Everything is alright\n           =\u003e initialization: The service is in its initialization process\n           =\u003e warning:        Something might be wrong?\n           =\u003e critical:       Something is wrong!\n\n@afiune: Here we can add more health information to the response",
       "title": "Health message"
     },
-    "apiVersion": {
+    "chef.automate.api.Version": {
       "type": "object",
       "properties": {
         "version": {

@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseProcessChefActionResponse"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessChefActionResponse"
             }
           }
         },
@@ -35,7 +35,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestAction"
+              "$ref": "#/definitions/chef.automate.api.ingest.request.Action"
             }
           }
         ],
@@ -51,7 +51,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseProcessLivenessResponse"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessLivenessResponse"
             }
           }
         },
@@ -61,7 +61,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestLiveness"
+              "$ref": "#/definitions/chef.automate.api.ingest.request.Liveness"
             }
           }
         ],
@@ -77,7 +77,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseProcessMultipleNodeDeleteResponse"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse"
             }
           }
         },
@@ -87,7 +87,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestMultipleNodeDeleteRequest"
+              "$ref": "#/definitions/chef.automate.api.ingest.request.MultipleNodeDeleteRequest"
             }
           }
         ],
@@ -103,7 +103,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseProcessNodeDeleteResponse"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessNodeDeleteResponse"
             }
           }
         },
@@ -113,7 +113,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestDelete"
+              "$ref": "#/definitions/chef.automate.api.ingest.request.Delete"
             }
           }
         ],
@@ -129,7 +129,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseProcessChefRunResponse"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.ProcessChefRunResponse"
             }
           }
         },
@@ -139,7 +139,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestRun"
+              "$ref": "#/definitions/chef.automate.api.ingest.request.Run"
             }
           }
         ],
@@ -155,7 +155,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/versionVersionInfo"
+              "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
             }
           }
         },
@@ -166,15 +166,24 @@ func init() {
     }
   },
   "definitions": {
-    "protobufNullValue": {
-      "type": "string",
-      "enum": [
-        "NULL_VALUE"
-      ],
-      "default": "NULL_VALUE",
-      "description": "` + "`" + `NullValue` + "`" + ` is a singleton enumeration to represent the null value for the\n` + "`" + `Value` + "`" + ` type union.\n\n The JSON representation for ` + "`" + `NullValue` + "`" + ` is JSON ` + "`" + `null` + "`" + `.\n\n - NULL_VALUE: Null value."
+    "chef.automate.api.common.version.VersionInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "sha": {
+          "type": "string"
+        },
+        "built": {
+          "type": "string"
+        }
+      }
     },
-    "requestAction": {
+    "chef.automate.api.ingest.request.Action": {
       "type": "object",
       "properties": {
         "id": {
@@ -245,7 +254,7 @@ func init() {
         }
       }
     },
-    "requestDelete": {
+    "chef.automate.api.ingest.request.Delete": {
       "type": "object",
       "properties": {
         "id": {
@@ -269,7 +278,7 @@ func init() {
         }
       }
     },
-    "requestDeprecation": {
+    "chef.automate.api.ingest.request.Deprecation": {
       "type": "object",
       "properties": {
         "message": {
@@ -283,7 +292,7 @@ func init() {
         }
       }
     },
-    "requestDescription": {
+    "chef.automate.api.ingest.request.Description": {
       "type": "object",
       "properties": {
         "title": {
@@ -297,7 +306,7 @@ func init() {
         }
       }
     },
-    "requestError": {
+    "chef.automate.api.ingest.request.Error": {
       "type": "object",
       "properties": {
         "class": {
@@ -313,11 +322,11 @@ func init() {
           }
         },
         "description": {
-          "$ref": "#/definitions/requestDescription"
+          "$ref": "#/definitions/chef.automate.api.ingest.request.Description"
         }
       }
     },
-    "requestExpandedRunList": {
+    "chef.automate.api.ingest.request.ExpandedRunList": {
       "type": "object",
       "properties": {
         "id": {
@@ -326,12 +335,12 @@ func init() {
         "run_list": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/requestRunList"
+            "$ref": "#/definitions/chef.automate.api.ingest.request.RunList"
           }
         }
       }
     },
-    "requestLiveness": {
+    "chef.automate.api.ingest.request.Liveness": {
       "type": "object",
       "properties": {
         "event_type": {
@@ -357,7 +366,7 @@ func init() {
         }
       }
     },
-    "requestMultipleNodeDeleteRequest": {
+    "chef.automate.api.ingest.request.MultipleNodeDeleteRequest": {
       "type": "object",
       "properties": {
         "node_ids": {
@@ -368,7 +377,7 @@ func init() {
         }
       }
     },
-    "requestResource": {
+    "chef.automate.api.ingest.request.Resource": {
       "type": "object",
       "properties": {
         "type": {
@@ -415,7 +424,7 @@ func init() {
         }
       }
     },
-    "requestRun": {
+    "chef.automate.api.ingest.request.Run": {
       "type": "object",
       "properties": {
         "id": {
@@ -469,12 +478,12 @@ func init() {
           "type": "string"
         },
         "expanded_run_list": {
-          "$ref": "#/definitions/requestExpandedRunList"
+          "$ref": "#/definitions/chef.automate.api.ingest.request.ExpandedRunList"
         },
         "resources": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/requestResource"
+            "$ref": "#/definitions/chef.automate.api.ingest.request.Resource"
           }
         },
         "run_list": {
@@ -487,7 +496,7 @@ func init() {
           "type": "object"
         },
         "error": {
-          "$ref": "#/definitions/requestError"
+          "$ref": "#/definitions/chef.automate.api.ingest.request.Error"
         },
         "policy_name": {
           "type": "string"
@@ -498,7 +507,7 @@ func init() {
         "deprecations": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/requestDeprecation"
+            "$ref": "#/definitions/chef.automate.api.ingest.request.Deprecation"
           }
         },
         "tags": {
@@ -509,7 +518,7 @@ func init() {
         }
       }
     },
-    "requestRunList": {
+    "chef.automate.api.ingest.request.RunList": {
       "type": "object",
       "properties": {
         "type": {
@@ -528,42 +537,33 @@ func init() {
         "children": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/requestRunList"
+            "$ref": "#/definitions/chef.automate.api.ingest.request.RunList"
           }
         }
       }
     },
-    "responseProcessChefActionResponse": {
+    "chef.automate.api.ingest.response.ProcessChefActionResponse": {
       "type": "object"
     },
-    "responseProcessChefRunResponse": {
+    "chef.automate.api.ingest.response.ProcessChefRunResponse": {
       "type": "object"
     },
-    "responseProcessLivenessResponse": {
+    "chef.automate.api.ingest.response.ProcessLivenessResponse": {
       "type": "object"
     },
-    "responseProcessMultipleNodeDeleteResponse": {
+    "chef.automate.api.ingest.response.ProcessMultipleNodeDeleteResponse": {
       "type": "object"
     },
-    "responseProcessNodeDeleteResponse": {
+    "chef.automate.api.ingest.response.ProcessNodeDeleteResponse": {
       "type": "object"
     },
-    "versionVersionInfo": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "sha": {
-          "type": "string"
-        },
-        "built": {
-          "type": "string"
-        }
-      }
+    "google.protobuf.NullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "` + "`" + `NullValue` + "`" + ` is a singleton enumeration to represent the null value for the\n` + "`" + `Value` + "`" + ` type union.\n\n The JSON representation for ` + "`" + `NullValue` + "`" + ` is JSON ` + "`" + `null` + "`" + `.\n\n - NULL_VALUE: Null value."
     }
   }
 }

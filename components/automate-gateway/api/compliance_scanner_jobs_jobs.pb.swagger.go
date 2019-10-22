@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Id"
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Id"
             }
           }
         },
@@ -35,7 +35,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Job"
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Job"
             }
           }
         ],
@@ -51,7 +51,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Job"
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Job"
             }
           }
         },
@@ -111,7 +111,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Job"
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Job"
             }
           }
         ],
@@ -127,7 +127,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1RerunResponse"
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.RerunResponse"
             }
           }
         },
@@ -151,7 +151,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Jobs"
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Jobs"
             }
           }
         },
@@ -161,7 +161,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Query"
             }
           }
         ],
@@ -172,44 +172,7 @@ func init() {
     }
   },
   "definitions": {
-    "QueryOrderType": {
-      "type": "string",
-      "enum": [
-        "ASC",
-        "DESC"
-      ],
-      "default": "ASC"
-    },
-    "commonFilter": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string"
-        },
-        "exclude": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
-    "commonKv": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string"
-        },
-        "value": {
-          "type": "string"
-        }
-      }
-    },
-    "v1Id": {
+    "chef.automate.api.compliance.scanner.jobs.v1.Id": {
       "type": "object",
       "properties": {
         "id": {
@@ -217,7 +180,7 @@ func init() {
         }
       }
     },
-    "v1Job": {
+    "chef.automate.api.compliance.scanner.jobs.v1.Job": {
       "type": "object",
       "properties": {
         "id": {
@@ -236,7 +199,7 @@ func init() {
         "tags": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/commonKv"
+            "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Kv"
           }
         },
         "start_time": {
@@ -261,7 +224,7 @@ func init() {
         "results": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ResultsRow"
+            "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.ResultsRow"
           }
         },
         "nodes": {
@@ -287,7 +250,7 @@ func init() {
         "node_selectors": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ManagerFilter"
+            "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.ManagerFilter"
           }
         },
         "scheduled_time": {
@@ -310,13 +273,13 @@ func init() {
         }
       }
     },
-    "v1Jobs": {
+    "chef.automate.api.compliance.scanner.jobs.v1.Jobs": {
       "type": "object",
       "properties": {
         "jobs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Job"
+            "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Job"
           }
         },
         "total": {
@@ -325,7 +288,7 @@ func init() {
         }
       }
     },
-    "v1ManagerFilter": {
+    "chef.automate.api.compliance.scanner.jobs.v1.ManagerFilter": {
       "type": "object",
       "properties": {
         "manager_id": {
@@ -334,22 +297,22 @@ func init() {
         "filters": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/commonFilter"
+            "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Filter"
           }
         }
       }
     },
-    "v1Query": {
+    "chef.automate.api.compliance.scanner.jobs.v1.Query": {
       "type": "object",
       "properties": {
         "filters": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/commonFilter"
+            "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Filter"
           }
         },
         "order": {
-          "$ref": "#/definitions/QueryOrderType"
+          "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Query.OrderType"
         },
         "sort": {
           "type": "string"
@@ -364,10 +327,18 @@ func init() {
         }
       }
     },
-    "v1RerunResponse": {
+    "chef.automate.api.compliance.scanner.jobs.v1.Query.OrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "chef.automate.api.compliance.scanner.jobs.v1.RerunResponse": {
       "type": "object"
     },
-    "v1ResultsRow": {
+    "chef.automate.api.compliance.scanner.jobs.v1.ResultsRow": {
       "type": "object",
       "properties": {
         "node_id": {
@@ -392,6 +363,35 @@ func init() {
         "end_time": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "chef.automate.domain.compliance.api.common.Filter": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "exclude": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "chef.automate.domain.compliance.api.common.Kv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
         }
       }
     }

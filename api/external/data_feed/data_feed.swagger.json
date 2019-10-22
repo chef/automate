@@ -22,7 +22,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedAddDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.AddDestinationResponse"
             }
           }
         },
@@ -32,7 +32,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/datafeedAddDestinationRequest"
+              "$ref": "#/definitions/chef.automate.api.datafeed.AddDestinationRequest"
             }
           }
         ],
@@ -48,7 +48,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedGetDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.GetDestinationResponse"
             }
           }
         },
@@ -71,7 +71,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedDeleteDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.DeleteDestinationResponse"
             }
           }
         },
@@ -94,7 +94,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedUpdateDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.UpdateDestinationResponse"
             }
           }
         },
@@ -111,7 +111,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/datafeedUpdateDestinationRequest"
+              "$ref": "#/definitions/chef.automate.api.datafeed.UpdateDestinationRequest"
             }
           }
         ],
@@ -127,7 +127,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedListDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.ListDestinationResponse"
             }
           }
         },
@@ -137,7 +137,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/datafeedListDestinationRequest"
+              "$ref": "#/definitions/chef.automate.api.datafeed.ListDestinationRequest"
             }
           }
         ],
@@ -153,7 +153,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/datafeedTestDestinationResponse"
+              "$ref": "#/definitions/chef.automate.api.datafeed.TestDestinationResponse"
             }
           }
         },
@@ -163,7 +163,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/datafeedURLValidationRequest"
+              "$ref": "#/definitions/chef.automate.api.datafeed.URLValidationRequest"
             }
           }
         ],
@@ -174,7 +174,7 @@
     }
   },
   "definitions": {
-    "datafeedAddDestinationRequest": {
+    "chef.automate.api.datafeed.AddDestinationRequest": {
       "type": "object",
       "properties": {
         "id": {
@@ -192,7 +192,7 @@
         }
       }
     },
-    "datafeedAddDestinationResponse": {
+    "chef.automate.api.datafeed.AddDestinationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -201,7 +201,7 @@
         }
       }
     },
-    "datafeedDeleteDestinationResponse": {
+    "chef.automate.api.datafeed.DeleteDestinationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -210,7 +210,7 @@
         }
       }
     },
-    "datafeedGetDestinationResponse": {
+    "chef.automate.api.datafeed.GetDestinationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -232,21 +232,21 @@
         }
       }
     },
-    "datafeedListDestinationRequest": {
+    "chef.automate.api.datafeed.ListDestinationRequest": {
       "type": "object"
     },
-    "datafeedListDestinationResponse": {
+    "chef.automate.api.datafeed.ListDestinationResponse": {
       "type": "object",
       "properties": {
         "destinations": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/datafeedGetDestinationResponse"
+            "$ref": "#/definitions/chef.automate.api.datafeed.GetDestinationResponse"
           }
         }
       }
     },
-    "datafeedSecretId": {
+    "chef.automate.api.datafeed.SecretId": {
       "type": "object",
       "properties": {
         "id": {
@@ -254,7 +254,7 @@
         }
       }
     },
-    "datafeedTestDestinationResponse": {
+    "chef.automate.api.datafeed.TestDestinationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -263,21 +263,21 @@
         }
       }
     },
-    "datafeedURLValidationRequest": {
+    "chef.automate.api.datafeed.URLValidationRequest": {
       "type": "object",
       "properties": {
         "url": {
           "type": "string"
         },
         "username_password": {
-          "$ref": "#/definitions/datafeedUsernamePassword"
+          "$ref": "#/definitions/chef.automate.api.datafeed.UsernamePassword"
         },
         "secret_id": {
-          "$ref": "#/definitions/datafeedSecretId"
+          "$ref": "#/definitions/chef.automate.api.datafeed.SecretId"
         }
       }
     },
-    "datafeedUpdateDestinationRequest": {
+    "chef.automate.api.datafeed.UpdateDestinationRequest": {
       "type": "object",
       "properties": {
         "id": {
@@ -295,7 +295,7 @@
         }
       }
     },
-    "datafeedUpdateDestinationResponse": {
+    "chef.automate.api.datafeed.UpdateDestinationResponse": {
       "type": "object",
       "properties": {
         "success": {
@@ -304,7 +304,7 @@
         }
       }
     },
-    "datafeedUsernamePassword": {
+    "chef.automate.api.datafeed.UsernamePassword": {
       "type": "object",
       "properties": {
         "username": {

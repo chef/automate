@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseIntrospectResp"
+              "$ref": "#/definitions/chef.automate.api.authz.response.IntrospectResp"
             }
           }
         },
@@ -39,7 +39,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseIntrospectResp"
+              "$ref": "#/definitions/chef.automate.api.authz.response.IntrospectResp"
             }
           }
         },
@@ -49,7 +49,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestIntrospectReq"
+              "$ref": "#/definitions/chef.automate.api.authz.request.IntrospectReq"
             }
           }
         ],
@@ -65,7 +65,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseIntrospectResp"
+              "$ref": "#/definitions/chef.automate.api.authz.response.IntrospectResp"
             }
           }
         },
@@ -75,7 +75,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestIntrospectSomeReq"
+              "$ref": "#/definitions/chef.automate.api.authz.request.IntrospectSomeReq"
             }
           }
         ],
@@ -91,7 +91,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseListPoliciesResp"
+              "$ref": "#/definitions/chef.automate.api.authz.response.ListPoliciesResp"
             }
           }
         },
@@ -105,7 +105,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseCreatePolicyResp"
+              "$ref": "#/definitions/chef.automate.api.authz.response.CreatePolicyResp"
             }
           }
         },
@@ -115,7 +115,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestCreatePolicyReq"
+              "$ref": "#/definitions/chef.automate.api.authz.request.CreatePolicyReq"
             }
           }
         ],
@@ -131,7 +131,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/versionVersionInfo"
+              "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
             }
           }
         },
@@ -147,7 +147,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseDeletePolicyResp"
+              "$ref": "#/definitions/chef.automate.api.authz.response.DeletePolicyResp"
             }
           }
         },
@@ -166,7 +166,7 @@ func init() {
     }
   },
   "definitions": {
-    "requestCreatePolicyReq": {
+    "chef.automate.api.authz.request.CreatePolicyReq": {
       "type": "object",
       "properties": {
         "action": {
@@ -183,7 +183,7 @@ func init() {
         }
       }
     },
-    "requestIntrospectReq": {
+    "chef.automate.api.authz.request.IntrospectReq": {
       "type": "object",
       "properties": {
         "path": {
@@ -197,7 +197,7 @@ func init() {
         }
       }
     },
-    "requestIntrospectSomeReq": {
+    "chef.automate.api.authz.request.IntrospectSomeReq": {
       "type": "object",
       "properties": {
         "paths": {
@@ -208,7 +208,7 @@ func init() {
         }
       }
     },
-    "responseCreatePolicyResp": {
+    "chef.automate.api.authz.response.CreatePolicyResp": {
       "type": "object",
       "properties": {
         "action": {
@@ -240,7 +240,7 @@ func init() {
       },
       "description": "We aren't using a Policy message here since we want to\nreturn a flat object via our external HTTP API."
     },
-    "responseDeletePolicyResp": {
+    "chef.automate.api.authz.response.DeletePolicyResp": {
       "type": "object",
       "properties": {
         "action": {
@@ -271,29 +271,29 @@ func init() {
         }
       }
     },
-    "responseIntrospectResp": {
+    "chef.automate.api.authz.response.IntrospectResp": {
       "type": "object",
       "properties": {
         "endpoints": {
           "type": "object",
           "additionalProperties": {
-            "$ref": "#/definitions/responseMethodsAllowed"
+            "$ref": "#/definitions/chef.automate.api.authz.response.MethodsAllowed"
           }
         }
       }
     },
-    "responseListPoliciesResp": {
+    "chef.automate.api.authz.response.ListPoliciesResp": {
       "type": "object",
       "properties": {
         "policies": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responsePolicy"
+            "$ref": "#/definitions/chef.automate.api.authz.response.Policy"
           }
         }
       }
     },
-    "responseMethodsAllowed": {
+    "chef.automate.api.authz.response.MethodsAllowed": {
       "type": "object",
       "properties": {
         "get": {
@@ -318,7 +318,7 @@ func init() {
         }
       }
     },
-    "responsePolicy": {
+    "chef.automate.api.authz.response.Policy": {
       "type": "object",
       "properties": {
         "action": {
@@ -349,7 +349,7 @@ func init() {
         }
       }
     },
-    "versionVersionInfo": {
+    "chef.automate.api.common.version.VersionInfo": {
       "type": "object",
       "properties": {
         "name": {

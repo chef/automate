@@ -22,7 +22,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseConfigureDeleteNodesScheduler"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.ConfigureDeleteNodesScheduler"
             }
           }
         },
@@ -32,7 +32,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestSchedulerConfig"
+              "$ref": "#/definitions/chef.automate.api.ingest.request.SchedulerConfig"
             }
           }
         ],
@@ -48,7 +48,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseConfigureMissingNodesForDeletionScheduler"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.ConfigureMissingNodesForDeletionScheduler"
             }
           }
         },
@@ -58,7 +58,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestSchedulerConfig"
+              "$ref": "#/definitions/chef.automate.api.ingest.request.SchedulerConfig"
             }
           }
         ],
@@ -74,7 +74,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseConfigureNodesMissingScheduler"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.ConfigureNodesMissingScheduler"
             }
           }
         },
@@ -84,7 +84,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/requestSchedulerConfig"
+              "$ref": "#/definitions/chef.automate.api.ingest.request.SchedulerConfig"
             }
           }
         ],
@@ -100,7 +100,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseJobSchedulerStatus"
+              "$ref": "#/definitions/chef.automate.api.ingest.response.JobSchedulerStatus"
             }
           }
         },
@@ -111,7 +111,7 @@
     }
   },
   "definitions": {
-    "requestSchedulerConfig": {
+    "chef.automate.api.ingest.request.SchedulerConfig": {
       "type": "object",
       "properties": {
         "every": {
@@ -127,16 +127,16 @@
       },
       "description": "SchedulerConfig\nThe job message to configure the Delete Node Job\nevery - It accepts '1h30m', '1m', '2h30m', ..."
     },
-    "responseConfigureDeleteNodesScheduler": {
+    "chef.automate.api.ingest.response.ConfigureDeleteNodesScheduler": {
       "type": "object"
     },
-    "responseConfigureMissingNodesForDeletionScheduler": {
+    "chef.automate.api.ingest.response.ConfigureMissingNodesForDeletionScheduler": {
       "type": "object"
     },
-    "responseConfigureNodesMissingScheduler": {
+    "chef.automate.api.ingest.response.ConfigureNodesMissingScheduler": {
       "type": "object"
     },
-    "responseJob": {
+    "chef.automate.api.ingest.response.Job": {
       "type": "object",
       "properties": {
         "running": {
@@ -166,7 +166,7 @@
         }
       }
     },
-    "responseJobSchedulerStatus": {
+    "chef.automate.api.ingest.response.JobSchedulerStatus": {
       "type": "object",
       "properties": {
         "running": {
@@ -176,7 +176,7 @@
         "jobs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseJob"
+            "$ref": "#/definitions/chef.automate.api.ingest.response.Job"
           }
         }
       }

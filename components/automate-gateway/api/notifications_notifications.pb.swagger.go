@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/notificationsRuleListResponse"
+              "$ref": "#/definitions/chef.automate.api.notifications.RuleListResponse"
             }
           }
         },
@@ -39,7 +39,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/notificationsRuleAddResponse"
+              "$ref": "#/definitions/chef.automate.api.notifications.RuleAddResponse"
             }
           }
         },
@@ -49,7 +49,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/notificationsRuleAddRequest"
+              "$ref": "#/definitions/chef.automate.api.notifications.RuleAddRequest"
             }
           }
         ],
@@ -65,7 +65,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/notificationsRuleGetResponse"
+              "$ref": "#/definitions/chef.automate.api.notifications.RuleGetResponse"
             }
           }
         },
@@ -87,7 +87,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/notificationsRuleDeleteResponse"
+              "$ref": "#/definitions/chef.automate.api.notifications.RuleDeleteResponse"
             }
           }
         },
@@ -109,7 +109,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/notificationsRuleUpdateResponse"
+              "$ref": "#/definitions/chef.automate.api.notifications.RuleUpdateResponse"
             }
           }
         },
@@ -125,7 +125,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/notificationsRuleUpdateRequest"
+              "$ref": "#/definitions/chef.automate.api.notifications.RuleUpdateRequest"
             }
           }
         ],
@@ -141,7 +141,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/notificationsVersionResponse"
+              "$ref": "#/definitions/chef.automate.api.notifications.VersionResponse"
             }
           }
         },
@@ -157,7 +157,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/notificationsURLValidationResponse"
+              "$ref": "#/definitions/chef.automate.api.notifications.URLValidationResponse"
             }
           }
         },
@@ -167,7 +167,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/notificationsURLValidationRequest"
+              "$ref": "#/definitions/chef.automate.api.notifications.URLValidationRequest"
             }
           }
         ],
@@ -178,20 +178,10 @@ func init() {
     }
   },
   "definitions": {
-    "RuleEvent": {
-      "type": "string",
-      "enum": [
-        "CCRFailure",
-        "CCRSuccess",
-        "ComplianceFailure",
-        "ComplianceSuccess"
-      ],
-      "default": "CCRFailure"
-    },
-    "notificationsEmpty": {
+    "chef.automate.api.notifications.Empty": {
       "type": "object"
     },
-    "notificationsRule": {
+    "chef.automate.api.notifications.Rule": {
       "type": "object",
       "properties": {
         "id": {
@@ -201,28 +191,38 @@ func init() {
           "type": "string"
         },
         "event": {
-          "$ref": "#/definitions/RuleEvent"
+          "$ref": "#/definitions/chef.automate.api.notifications.Rule.Event"
         },
         "SlackAlert": {
-          "$ref": "#/definitions/notificationsSlackAlert"
+          "$ref": "#/definitions/chef.automate.api.notifications.SlackAlert"
         },
         "WebhookAlert": {
-          "$ref": "#/definitions/notificationsWebhookAlert"
+          "$ref": "#/definitions/chef.automate.api.notifications.WebhookAlert"
         },
         "ServiceNowAlert": {
-          "$ref": "#/definitions/notificationsServiceNowAlert"
+          "$ref": "#/definitions/chef.automate.api.notifications.ServiceNowAlert"
         }
       }
     },
-    "notificationsRuleAddRequest": {
+    "chef.automate.api.notifications.Rule.Event": {
+      "type": "string",
+      "enum": [
+        "CCRFailure",
+        "CCRSuccess",
+        "ComplianceFailure",
+        "ComplianceSuccess"
+      ],
+      "default": "CCRFailure"
+    },
+    "chef.automate.api.notifications.RuleAddRequest": {
       "type": "object",
       "properties": {
         "rule": {
-          "$ref": "#/definitions/notificationsRule"
+          "$ref": "#/definitions/chef.automate.api.notifications.Rule"
         }
       }
     },
-    "notificationsRuleAddResponse": {
+    "chef.automate.api.notifications.RuleAddResponse": {
       "type": "object",
       "properties": {
         "messages": {
@@ -236,7 +236,7 @@ func init() {
         }
       }
     },
-    "notificationsRuleDeleteResponse": {
+    "chef.automate.api.notifications.RuleDeleteResponse": {
       "type": "object",
       "properties": {
         "messages": {
@@ -247,7 +247,7 @@ func init() {
         }
       }
     },
-    "notificationsRuleGetResponse": {
+    "chef.automate.api.notifications.RuleGetResponse": {
       "type": "object",
       "properties": {
         "messages": {
@@ -257,11 +257,11 @@ func init() {
           }
         },
         "rule": {
-          "$ref": "#/definitions/notificationsRule"
+          "$ref": "#/definitions/chef.automate.api.notifications.Rule"
         }
       }
     },
-    "notificationsRuleListResponse": {
+    "chef.automate.api.notifications.RuleListResponse": {
       "type": "object",
       "properties": {
         "messages": {
@@ -273,23 +273,23 @@ func init() {
         "rules": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/notificationsRule"
+            "$ref": "#/definitions/chef.automate.api.notifications.Rule"
           }
         }
       }
     },
-    "notificationsRuleUpdateRequest": {
+    "chef.automate.api.notifications.RuleUpdateRequest": {
       "type": "object",
       "properties": {
         "rule": {
-          "$ref": "#/definitions/notificationsRule"
+          "$ref": "#/definitions/chef.automate.api.notifications.Rule"
         },
         "id": {
           "type": "string"
         }
       }
     },
-    "notificationsRuleUpdateResponse": {
+    "chef.automate.api.notifications.RuleUpdateResponse": {
       "type": "object",
       "properties": {
         "messages": {
@@ -300,7 +300,7 @@ func init() {
         }
       }
     },
-    "notificationsSecretId": {
+    "chef.automate.api.notifications.SecretId": {
       "type": "object",
       "properties": {
         "id": {
@@ -308,7 +308,7 @@ func init() {
         }
       }
     },
-    "notificationsServiceNowAlert": {
+    "chef.automate.api.notifications.ServiceNowAlert": {
       "type": "object",
       "properties": {
         "url": {
@@ -323,7 +323,7 @@ func init() {
         }
       }
     },
-    "notificationsSlackAlert": {
+    "chef.automate.api.notifications.SlackAlert": {
       "type": "object",
       "properties": {
         "url": {
@@ -331,27 +331,27 @@ func init() {
         }
       }
     },
-    "notificationsURLValidationRequest": {
+    "chef.automate.api.notifications.URLValidationRequest": {
       "type": "object",
       "properties": {
         "url": {
           "type": "string"
         },
         "username_password": {
-          "$ref": "#/definitions/notificationsUsernamePassword"
+          "$ref": "#/definitions/chef.automate.api.notifications.UsernamePassword"
         },
         "secret_id": {
-          "$ref": "#/definitions/notificationsSecretId"
+          "$ref": "#/definitions/chef.automate.api.notifications.SecretId"
         },
         "none": {
-          "$ref": "#/definitions/notificationsEmpty"
+          "$ref": "#/definitions/chef.automate.api.notifications.Empty"
         }
       }
     },
-    "notificationsURLValidationResponse": {
+    "chef.automate.api.notifications.URLValidationResponse": {
       "type": "object"
     },
-    "notificationsUsernamePassword": {
+    "chef.automate.api.notifications.UsernamePassword": {
       "type": "object",
       "properties": {
         "username": {
@@ -362,7 +362,7 @@ func init() {
         }
       }
     },
-    "notificationsVersionResponse": {
+    "chef.automate.api.notifications.VersionResponse": {
       "type": "object",
       "properties": {
         "version": {
@@ -370,7 +370,7 @@ func init() {
         }
       }
     },
-    "notificationsWebhookAlert": {
+    "chef.automate.api.notifications.WebhookAlert": {
       "type": "object",
       "properties": {
         "url": {

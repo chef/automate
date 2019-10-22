@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/secretsId"
+              "$ref": "#/definitions/chef.automate.api.secrets.Id"
             }
           }
         },
@@ -35,7 +35,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/secretsSecret"
+              "$ref": "#/definitions/chef.automate.api.secrets.Secret"
             }
           }
         ],
@@ -51,7 +51,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/secretsSecret"
+              "$ref": "#/definitions/chef.automate.api.secrets.Secret"
             }
           }
         },
@@ -73,7 +73,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/secretsDeleteResponse"
+              "$ref": "#/definitions/chef.automate.api.secrets.DeleteResponse"
             }
           }
         },
@@ -95,7 +95,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/secretsUpdateResponse"
+              "$ref": "#/definitions/chef.automate.api.secrets.UpdateResponse"
             }
           }
         },
@@ -111,7 +111,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/secretsSecret"
+              "$ref": "#/definitions/chef.automate.api.secrets.Secret"
             }
           }
         ],
@@ -127,7 +127,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/secretsSecrets"
+              "$ref": "#/definitions/chef.automate.api.secrets.Secrets"
             }
           }
         },
@@ -137,7 +137,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/secretsQuery"
+              "$ref": "#/definitions/chef.automate.api.secrets.Query"
             }
           }
         ],
@@ -148,18 +148,10 @@ func init() {
     }
   },
   "definitions": {
-    "QueryOrderType": {
-      "type": "string",
-      "enum": [
-        "ASC",
-        "DESC"
-      ],
-      "default": "ASC"
-    },
-    "secretsDeleteResponse": {
+    "chef.automate.api.secrets.DeleteResponse": {
       "type": "object"
     },
-    "secretsFilter": {
+    "chef.automate.api.secrets.Filter": {
       "type": "object",
       "properties": {
         "key": {
@@ -177,7 +169,7 @@ func init() {
         }
       }
     },
-    "secretsId": {
+    "chef.automate.api.secrets.Id": {
       "type": "object",
       "properties": {
         "id": {
@@ -185,7 +177,7 @@ func init() {
         }
       }
     },
-    "secretsKv": {
+    "chef.automate.api.secrets.Kv": {
       "type": "object",
       "properties": {
         "key": {
@@ -196,17 +188,17 @@ func init() {
         }
       }
     },
-    "secretsQuery": {
+    "chef.automate.api.secrets.Query": {
       "type": "object",
       "properties": {
         "filters": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/secretsFilter"
+            "$ref": "#/definitions/chef.automate.api.secrets.Filter"
           }
         },
         "order": {
-          "$ref": "#/definitions/QueryOrderType"
+          "$ref": "#/definitions/chef.automate.api.secrets.Query.OrderType"
         },
         "sort": {
           "type": "string"
@@ -221,7 +213,15 @@ func init() {
         }
       }
     },
-    "secretsSecret": {
+    "chef.automate.api.secrets.Query.OrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "chef.automate.api.secrets.Secret": {
       "type": "object",
       "properties": {
         "id": {
@@ -240,24 +240,24 @@ func init() {
         "tags": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/secretsKv"
+            "$ref": "#/definitions/chef.automate.api.secrets.Kv"
           }
         },
         "data": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/secretsKv"
+            "$ref": "#/definitions/chef.automate.api.secrets.Kv"
           }
         }
       }
     },
-    "secretsSecrets": {
+    "chef.automate.api.secrets.Secrets": {
       "type": "object",
       "properties": {
         "secrets": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/secretsSecret"
+            "$ref": "#/definitions/chef.automate.api.secrets.Secret"
           }
         },
         "total": {
@@ -266,7 +266,7 @@ func init() {
         }
       }
     },
-    "secretsUpdateResponse": {
+    "chef.automate.api.secrets.UpdateResponse": {
       "type": "object"
     }
   }

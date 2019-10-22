@@ -22,7 +22,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/ingestHealth"
+              "$ref": "#/definitions/chef.automate.domain.ingest.Health"
             }
           }
         },
@@ -38,7 +38,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/ingestMigrationStatus"
+              "$ref": "#/definitions/chef.automate.domain.ingest.MigrationStatus"
             }
           }
         },
@@ -49,7 +49,7 @@
     }
   },
   "definitions": {
-    "ingestHealth": {
+    "chef.automate.domain.ingest.Health": {
       "type": "object",
       "properties": {
         "status": {
@@ -59,7 +59,7 @@
       "description": "The ingest-service health is constructed with:\n* Status:\n           =\u003e ok:             Everything is alright\n           =\u003e initialization: The service is in its initialization process\n           =\u003e warning:        Something might be wrong?\n           =\u003e critical:       Something is wrong!\n\n@afiune: Here we can add more health information to the response",
       "title": "Health message"
     },
-    "ingestMetrics": {
+    "chef.automate.domain.ingest.Metrics": {
       "type": "object",
       "properties": {
         "uptime": {
@@ -67,12 +67,12 @@
           "format": "double"
         },
         "pipeline": {
-          "$ref": "#/definitions/ingestPipelineMetrics"
+          "$ref": "#/definitions/chef.automate.domain.ingest.PipelineMetrics"
         }
       },
       "title": "Metrics message"
     },
-    "ingestMigrationStatus": {
+    "chef.automate.domain.ingest.MigrationStatus": {
       "type": "object",
       "properties": {
         "total": {
@@ -93,7 +93,7 @@
       },
       "title": "Migration message"
     },
-    "ingestPipelineMetrics": {
+    "chef.automate.domain.ingest.PipelineMetrics": {
       "type": "object",
       "properties": {
         "total_run_messages": {

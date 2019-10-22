@@ -47,7 +47,7 @@ for i in components/automate-gateway/api/**/; do
     # generates swagger output, only generate if a gateway file was generated
     gw_files=("$i"*.gw.go)
     if [ ${#gw_files[@]} -ne 0 ]; then
-        protoc "${IMPORTS[@]}" --swagger_out=logtostderr=true:"$PWD" "${list[@]}" || exit 1
+        protoc "${IMPORTS[@]}" --swagger_out=logtostderr=true,fqn_for_swagger_name=true:"$PWD" "${list[@]}" || exit 1
     fi
   fi
 done

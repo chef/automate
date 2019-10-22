@@ -84,7 +84,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseNodeAttribute"
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodeAttribute"
             }
           }
         },
@@ -172,7 +172,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responseRun"
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Run"
             }
           }
         },
@@ -228,7 +228,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/responsePolicyCookbooks"
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.PolicyCookbooks"
             }
           }
         },
@@ -271,7 +271,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/cfgmgmtresponseNodesCounts"
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodesCounts"
             }
           }
         },
@@ -299,7 +299,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/cfgmgmtresponseRunsCounts"
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunsCounts"
             }
           }
         },
@@ -388,7 +388,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/versionVersionInfo"
+              "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
             }
           }
         },
@@ -399,85 +399,7 @@
     }
   },
   "definitions": {
-    "cfgmgmtresponseNodesCounts": {
-      "type": "object",
-      "properties": {
-        "total": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "success": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "failure": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "missing": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "cfgmgmtresponseRunsCounts": {
-      "type": "object",
-      "properties": {
-        "total": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "success": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "failure": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "protobufNullValue": {
-      "type": "string",
-      "enum": [
-        "NULL_VALUE"
-      ],
-      "default": "NULL_VALUE",
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
-    },
-    "queryPagination": {
-      "type": "object",
-      "properties": {
-        "page": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "size": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
-    "querySortOrder": {
-      "type": "string",
-      "enum": [
-        "ASC",
-        "DESC"
-      ],
-      "default": "ASC"
-    },
-    "querySorting": {
-      "type": "object",
-      "properties": {
-        "field": {
-          "type": "string"
-        },
-        "order": {
-          "$ref": "#/definitions/querySortOrder"
-        }
-      }
-    },
-    "responseChefError": {
+    "chef.automate.api.cfgmgmt.response.ChefError": {
       "type": "object",
       "properties": {
         "class": {
@@ -493,11 +415,11 @@
           }
         },
         "description": {
-          "$ref": "#/definitions/responseDescription"
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Description"
         }
       }
     },
-    "responseCookbookLock": {
+    "chef.automate.api.cfgmgmt.response.CookbookLock": {
       "type": "object",
       "properties": {
         "cookbook": {
@@ -508,7 +430,7 @@
         }
       }
     },
-    "responseDeprecation": {
+    "chef.automate.api.cfgmgmt.response.Deprecation": {
       "type": "object",
       "properties": {
         "message": {
@@ -522,7 +444,7 @@
         }
       }
     },
-    "responseDescription": {
+    "chef.automate.api.cfgmgmt.response.Description": {
       "type": "object",
       "properties": {
         "title": {
@@ -536,7 +458,7 @@
         }
       }
     },
-    "responseExpandedRunList": {
+    "chef.automate.api.cfgmgmt.response.ExpandedRunList": {
       "type": "object",
       "properties": {
         "id": {
@@ -545,12 +467,12 @@
         "run_list": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseRunList"
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunList"
           }
         }
       }
     },
-    "responseNodeAttribute": {
+    "chef.automate.api.cfgmgmt.response.NodeAttribute": {
       "type": "object",
       "properties": {
         "node_id": {
@@ -602,7 +524,28 @@
         }
       }
     },
-    "responsePolicyCookbooks": {
+    "chef.automate.api.cfgmgmt.response.NodesCounts": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "success": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "failure": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "missing": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.PolicyCookbooks": {
       "type": "object",
       "properties": {
         "policy_name": {
@@ -611,12 +554,12 @@
         "cookbook_locks": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseCookbookLock"
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CookbookLock"
           }
         }
       }
     },
-    "responseResource": {
+    "chef.automate.api.cfgmgmt.response.Resource": {
       "type": "object",
       "properties": {
         "type": {
@@ -659,7 +602,7 @@
         }
       }
     },
-    "responseRun": {
+    "chef.automate.api.cfgmgmt.response.Run": {
       "type": "object",
       "properties": {
         "id": {
@@ -718,7 +661,7 @@
         "resources": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseResource"
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Resource"
           }
         },
         "run_list": {
@@ -730,11 +673,11 @@
         "deprecations": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseDeprecation"
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Deprecation"
           }
         },
         "error": {
-          "$ref": "#/definitions/responseChefError"
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ChefError"
         },
         "tags": {
           "type": "array",
@@ -791,11 +734,11 @@
           "type": "string"
         },
         "expanded_run_list": {
-          "$ref": "#/definitions/responseExpandedRunList"
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ExpandedRunList"
         }
       }
     },
-    "responseRunList": {
+    "chef.automate.api.cfgmgmt.response.RunList": {
       "type": "object",
       "properties": {
         "type": {
@@ -814,12 +757,61 @@
         "children": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/responseRunList"
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunList"
           }
         }
       }
     },
-    "versionVersionInfo": {
+    "chef.automate.api.cfgmgmt.response.RunsCounts": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "success": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "failure": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.common.query.Pagination": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.common.query.SortOrder": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "chef.automate.api.common.query.Sorting": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string"
+        },
+        "order": {
+          "$ref": "#/definitions/chef.automate.api.common.query.SortOrder"
+        }
+      }
+    },
+    "chef.automate.api.common.version.VersionInfo": {
       "type": "object",
       "properties": {
         "name": {
@@ -835,6 +827,14 @@
           "type": "string"
         }
       }
+    },
+    "google.protobuf.NullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     }
   }
 }

@@ -25,7 +25,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateSelfResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateSelfResp"
             }
           }
         },
@@ -42,7 +42,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateSelfReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateSelfReq"
             }
           }
         ],
@@ -58,7 +58,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaListUsersResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ListUsersResp"
             }
           }
         },
@@ -72,7 +72,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaCreateUserResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateUserResp"
             }
           }
         },
@@ -82,7 +82,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaCreateUserReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateUserReq"
             }
           }
         ],
@@ -98,7 +98,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetUserResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.GetUserResp"
             }
           }
         },
@@ -120,7 +120,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaDeleteUserResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.DeleteUserResp"
             }
           }
         },
@@ -142,7 +142,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateUserResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateUserResp"
             }
           }
         },
@@ -159,7 +159,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateUserReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateUserReq"
             }
           }
         ],
@@ -170,7 +170,7 @@ func init() {
     }
   },
   "definitions": {
-    "v2betaCreateUserReq": {
+    "chef.automate.api.iam.v2beta.CreateUserReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -184,37 +184,37 @@ func init() {
         }
       }
     },
-    "v2betaCreateUserResp": {
+    "chef.automate.api.iam.v2beta.CreateUserResp": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/v2betaUser"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.User"
         }
       }
     },
-    "v2betaDeleteUserResp": {
+    "chef.automate.api.iam.v2beta.DeleteUserResp": {
       "type": "object"
     },
-    "v2betaGetUserResp": {
+    "chef.automate.api.iam.v2beta.GetUserResp": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/v2betaUser"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.User"
         }
       }
     },
-    "v2betaListUsersResp": {
+    "chef.automate.api.iam.v2beta.ListUsersResp": {
       "type": "object",
       "properties": {
         "users": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaUser"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.User"
           }
         }
       }
     },
-    "v2betaUpdateSelfReq": {
+    "chef.automate.api.iam.v2beta.UpdateSelfReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -233,15 +233,15 @@ func init() {
         }
       }
     },
-    "v2betaUpdateSelfResp": {
+    "chef.automate.api.iam.v2beta.UpdateSelfResp": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/v2betaUser"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.User"
         }
       }
     },
-    "v2betaUpdateUserReq": {
+    "chef.automate.api.iam.v2beta.UpdateUserReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -256,15 +256,15 @@ func init() {
         }
       }
     },
-    "v2betaUpdateUserResp": {
+    "chef.automate.api.iam.v2beta.UpdateUserResp": {
       "type": "object",
       "properties": {
         "user": {
-          "$ref": "#/definitions/v2betaUser"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.User"
         }
       }
     },
-    "v2betaUser": {
+    "chef.automate.api.iam.v2beta.User": {
       "type": "object",
       "properties": {
         "name": {

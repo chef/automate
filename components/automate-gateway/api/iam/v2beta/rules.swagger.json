@@ -22,7 +22,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaApplyRulesStatusResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ApplyRulesStatusResp"
             }
           }
         },
@@ -36,7 +36,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaApplyRulesCancelResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ApplyRulesCancelResp"
             }
           }
         },
@@ -50,7 +50,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaApplyRulesStartResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ApplyRulesStartResp"
             }
           }
         },
@@ -66,7 +66,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaListRulesForProjectResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.ListRulesForProjectResp"
             }
           }
         },
@@ -90,7 +90,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaCreateRuleResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateRuleResp"
             }
           }
         },
@@ -106,7 +106,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaCreateRuleReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.CreateRuleReq"
             }
           }
         ],
@@ -122,7 +122,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaGetRuleResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.GetRuleResp"
             }
           }
         },
@@ -150,7 +150,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaDeleteRuleResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.DeleteRuleResp"
             }
           }
         },
@@ -178,7 +178,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateRuleResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateRuleResp"
             }
           }
         },
@@ -200,7 +200,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v2betaUpdateRuleReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2beta.UpdateRuleReq"
             }
           }
         ],
@@ -211,13 +211,13 @@
     }
   },
   "definitions": {
-    "v2betaApplyRulesCancelResp": {
+    "chef.automate.api.iam.v2beta.ApplyRulesCancelResp": {
       "type": "object"
     },
-    "v2betaApplyRulesStartResp": {
+    "chef.automate.api.iam.v2beta.ApplyRulesStartResp": {
       "type": "object"
     },
-    "v2betaApplyRulesStatusResp": {
+    "chef.automate.api.iam.v2beta.ApplyRulesStatusResp": {
       "type": "object",
       "properties": {
         "state": {
@@ -244,11 +244,11 @@
         }
       }
     },
-    "v2betaCondition": {
+    "chef.automate.api.iam.v2beta.Condition": {
       "type": "object",
       "properties": {
         "attribute": {
-          "$ref": "#/definitions/v2betaConditionAttribute"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.ConditionAttribute"
         },
         "values": {
           "type": "array",
@@ -257,11 +257,11 @@
           }
         },
         "operator": {
-          "$ref": "#/definitions/v2betaConditionOperator"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.ConditionOperator"
         }
       }
     },
-    "v2betaConditionAttribute": {
+    "chef.automate.api.iam.v2beta.ConditionAttribute": {
       "type": "string",
       "enum": [
         "CONDITION_ATTRIBUTE_UNSET",
@@ -275,7 +275,7 @@
       ],
       "default": "CONDITION_ATTRIBUTE_UNSET"
     },
-    "v2betaConditionOperator": {
+    "chef.automate.api.iam.v2beta.ConditionOperator": {
       "type": "string",
       "enum": [
         "CONDITION_OPERATOR_UNSET",
@@ -284,7 +284,7 @@
       ],
       "default": "CONDITION_OPERATOR_UNSET"
     },
-    "v2betaCreateRuleReq": {
+    "chef.automate.api.iam.v2beta.CreateRuleReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -297,50 +297,50 @@
           "type": "string"
         },
         "type": {
-          "$ref": "#/definitions/v2betaRuleType"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.RuleType"
         },
         "conditions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaCondition"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Condition"
           }
         }
       }
     },
-    "v2betaCreateRuleResp": {
+    "chef.automate.api.iam.v2beta.CreateRuleResp": {
       "type": "object",
       "properties": {
         "rule": {
-          "$ref": "#/definitions/v2betaRule"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Rule"
         }
       }
     },
-    "v2betaDeleteRuleResp": {
+    "chef.automate.api.iam.v2beta.DeleteRuleResp": {
       "type": "object"
     },
-    "v2betaGetRuleResp": {
+    "chef.automate.api.iam.v2beta.GetRuleResp": {
       "type": "object",
       "properties": {
         "rule": {
-          "$ref": "#/definitions/v2betaRule"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Rule"
         }
       }
     },
-    "v2betaListRulesForProjectResp": {
+    "chef.automate.api.iam.v2beta.ListRulesForProjectResp": {
       "type": "object",
       "properties": {
         "rules": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaRule"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Rule"
           }
         },
         "status": {
-          "$ref": "#/definitions/v2betaProjectRulesStatus"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.ProjectRulesStatus"
         }
       }
     },
-    "v2betaProjectRulesStatus": {
+    "chef.automate.api.iam.v2beta.ProjectRulesStatus": {
       "type": "string",
       "enum": [
         "PROJECT_RULES_STATUS_UNSET",
@@ -350,7 +350,7 @@
       ],
       "default": "PROJECT_RULES_STATUS_UNSET"
     },
-    "v2betaRule": {
+    "chef.automate.api.iam.v2beta.Rule": {
       "type": "object",
       "properties": {
         "id": {
@@ -363,20 +363,20 @@
           "type": "string"
         },
         "type": {
-          "$ref": "#/definitions/v2betaRuleType"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.RuleType"
         },
         "conditions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaCondition"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Condition"
           }
         },
         "status": {
-          "$ref": "#/definitions/v2betaRuleStatus"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.RuleStatus"
         }
       }
     },
-    "v2betaRuleStatus": {
+    "chef.automate.api.iam.v2beta.RuleStatus": {
       "type": "string",
       "enum": [
         "RULE_STATUS_UNSET",
@@ -385,7 +385,7 @@
       ],
       "default": "RULE_STATUS_UNSET"
     },
-    "v2betaRuleType": {
+    "chef.automate.api.iam.v2beta.RuleType": {
       "type": "string",
       "enum": [
         "RULE_TYPE_UNSET",
@@ -394,7 +394,7 @@
       ],
       "default": "RULE_TYPE_UNSET"
     },
-    "v2betaUpdateRuleReq": {
+    "chef.automate.api.iam.v2beta.UpdateRuleReq": {
       "type": "object",
       "properties": {
         "id": {
@@ -407,21 +407,21 @@
           "type": "string"
         },
         "type": {
-          "$ref": "#/definitions/v2betaRuleType"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.RuleType"
         },
         "conditions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v2betaCondition"
+            "$ref": "#/definitions/chef.automate.api.iam.v2beta.Condition"
           }
         }
       }
     },
-    "v2betaUpdateRuleResp": {
+    "chef.automate.api.iam.v2beta.UpdateRuleResp": {
       "type": "object",
       "properties": {
         "rule": {
-          "$ref": "#/definitions/v2betaRule"
+          "$ref": "#/definitions/chef.automate.api.iam.v2beta.Rule"
         }
       }
     }

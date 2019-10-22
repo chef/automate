@@ -27,7 +27,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ControlItems"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlItems"
             }
           }
         },
@@ -37,7 +37,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1ControlItemRequest"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlItemRequest"
             }
           }
         ],
@@ -55,7 +55,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Node"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Node"
             }
           }
         },
@@ -82,7 +82,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Nodes"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Nodes"
             }
           }
         },
@@ -92,7 +92,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
             }
           }
         ],
@@ -110,7 +110,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ProfileMins"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMins"
             }
           }
         },
@@ -120,7 +120,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
             }
           }
         ],
@@ -138,7 +138,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1ReportIds"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ReportIds"
             }
           }
         },
@@ -148,7 +148,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
             }
           }
         ],
@@ -166,7 +166,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Reports"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Reports"
             }
           }
         },
@@ -176,7 +176,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
             }
           }
         ],
@@ -194,7 +194,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Report"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Report"
             }
           }
         },
@@ -211,7 +211,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1Query"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query"
             }
           }
         ],
@@ -229,7 +229,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/v1Suggestions"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Suggestions"
             }
           }
         },
@@ -239,7 +239,7 @@ func init() {
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/v1SuggestionRequest"
+              "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.SuggestionRequest"
             }
           }
         ],
@@ -255,7 +255,7 @@ func init() {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/versionVersionInfo"
+              "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
             }
           }
         },
@@ -266,56 +266,24 @@ func init() {
     }
   },
   "definitions": {
-    "QueryOrderType": {
-      "type": "string",
-      "enum": [
-        "ASC",
-        "DESC"
-      ],
-      "default": "ASC",
-      "title": "The two allowed values for ordering results"
-    },
-    "protobufAny": {
+    "chef.automate.api.common.version.VersionInfo": {
       "type": "object",
       "properties": {
-        "type_url": {
-          "type": "string",
-          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n` + "`" + `path/google.protobuf.Duration` + "`" + `). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme ` + "`" + `http` + "`" + `, ` + "`" + `https` + "`" + `, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, ` + "`" + `https` + "`" + ` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than ` + "`" + `http` + "`" + `, ` + "`" + `https` + "`" + ` (or the empty scheme) might be\nused with implementation specific semantics."
-        },
-        "value": {
-          "type": "string",
-          "format": "byte",
-          "description": "Must be a valid serialized protocol buffer of the above specified type."
-        }
-      },
-      "description": "` + "`" + `Any` + "`" + ` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := ptypes.MarshalAny(foo)\n     ...\n     foo := \u0026pb.Foo{}\n     if err := ptypes.UnmarshalAny(any, foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an ` + "`" + `Any` + "`" + ` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field ` + "`" + `@type` + "`" + ` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n` + "`" + `value` + "`" + ` which holds the custom JSON in addition to the ` + "`" + `@type` + "`" + `\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
-    },
-    "runtimeStreamError": {
-      "type": "object",
-      "properties": {
-        "grpc_code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "http_code": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "message": {
+        "name": {
           "type": "string"
         },
-        "http_status": {
+        "version": {
           "type": "string"
         },
-        "details": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/protobufAny"
-          }
+        "sha": {
+          "type": "string"
+        },
+        "built": {
+          "type": "string"
         }
       }
     },
-    "v1Attribute": {
+    "chef.automate.api.compliance.reporting.v1.Attribute": {
       "type": "object",
       "properties": {
         "name": {
@@ -323,12 +291,12 @@ func init() {
           "title": "The name of the attribute"
         },
         "options": {
-          "$ref": "#/definitions/v1Option",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Option",
           "title": "The options defined for the attribute"
         }
       }
     },
-    "v1Control": {
+    "chef.automate.api.compliance.reporting.v1.Control": {
       "type": "object",
       "properties": {
         "id": {
@@ -353,20 +321,20 @@ func init() {
           "title": "The compact description of the control"
         },
         "source_location": {
-          "$ref": "#/definitions/v1SourceLocation",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.SourceLocation",
           "title": "Intentionally blank"
         },
         "results": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Result"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Result"
           },
           "title": "The results of running all tests defined in the control against the node"
         },
         "refs": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Ref"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Ref"
           },
           "title": "External supporting documents for the control"
         },
@@ -379,7 +347,7 @@ func init() {
         }
       }
     },
-    "v1ControlItem": {
+    "chef.automate.api.compliance.reporting.v1.ControlItem": {
       "type": "object",
       "properties": {
         "id": {
@@ -391,7 +359,7 @@ func init() {
           "title": "The compact description of the control"
         },
         "profile": {
-          "$ref": "#/definitions/v1ProfileMin",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMin",
           "title": "Intentionally blank"
         },
         "impact": {
@@ -405,12 +373,12 @@ func init() {
           "title": "The time the report using the control was submitted at"
         },
         "control_summary": {
-          "$ref": "#/definitions/v1ControlSummary",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
           "title": "Intentionally blank"
         }
       }
     },
-    "v1ControlItemRequest": {
+    "chef.automate.api.compliance.reporting.v1.ControlItemRequest": {
       "type": "object",
       "properties": {
         "text": {
@@ -425,25 +393,25 @@ func init() {
         "filters": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ListFilter"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
           },
           "title": "The criteria used to filter the controls returned"
         }
       }
     },
-    "v1ControlItems": {
+    "chef.automate.api.compliance.reporting.v1.ControlItems": {
       "type": "object",
       "properties": {
         "control_items": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ControlItem"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlItem"
           },
           "title": "The paginated results of controls matching the filters"
         }
       }
     },
-    "v1ControlSummary": {
+    "chef.automate.api.compliance.reporting.v1.ControlSummary": {
       "type": "object",
       "properties": {
         "total": {
@@ -452,21 +420,21 @@ func init() {
           "title": "The total number of controls"
         },
         "passed": {
-          "$ref": "#/definitions/v1Total",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Total",
           "title": "Intentionally blank"
         },
         "skipped": {
-          "$ref": "#/definitions/v1Total",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Total",
           "title": "Intentionally blank"
         },
         "failed": {
-          "$ref": "#/definitions/v1Failed",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Failed",
           "title": "Intentionally blank"
         }
       },
       "title": "A minimal represenation of the statuses of the controls"
     },
-    "v1Dependency": {
+    "chef.automate.api.compliance.reporting.v1.Dependency": {
       "type": "object",
       "properties": {
         "name": {
@@ -523,7 +491,7 @@ func init() {
         }
       }
     },
-    "v1ExportData": {
+    "chef.automate.api.compliance.reporting.v1.ExportData": {
       "type": "object",
       "properties": {
         "content": {
@@ -533,7 +501,7 @@ func init() {
         }
       }
     },
-    "v1Failed": {
+    "chef.automate.api.compliance.reporting.v1.Failed": {
       "type": "object",
       "properties": {
         "total": {
@@ -559,7 +527,7 @@ func init() {
       },
       "title": "Stats of failed controls"
     },
-    "v1Group": {
+    "chef.automate.api.compliance.reporting.v1.Group": {
       "type": "object",
       "properties": {
         "id": {
@@ -579,7 +547,7 @@ func init() {
         }
       }
     },
-    "v1Kv": {
+    "chef.automate.api.compliance.reporting.v1.Kv": {
       "type": "object",
       "properties": {
         "key": {
@@ -592,7 +560,7 @@ func init() {
         }
       }
     },
-    "v1LatestReportSummary": {
+    "chef.automate.api.compliance.reporting.v1.LatestReportSummary": {
       "type": "object",
       "properties": {
         "id": {
@@ -609,13 +577,13 @@ func init() {
           "title": "The status of the run the report was made from"
         },
         "controls": {
-          "$ref": "#/definitions/v1ControlSummary",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
           "title": "Intentionally blank"
         }
       },
       "title": "A summary of the information contained in the latest report for this node"
     },
-    "v1ListFilter": {
+    "chef.automate.api.compliance.reporting.v1.ListFilter": {
       "type": "object",
       "properties": {
         "values": {
@@ -631,7 +599,7 @@ func init() {
         }
       }
     },
-    "v1Node": {
+    "chef.automate.api.compliance.reporting.v1.Node": {
       "type": "object",
       "properties": {
         "id": {
@@ -643,7 +611,7 @@ func init() {
           "title": "The name assigned to the node"
         },
         "platform": {
-          "$ref": "#/definitions/v1Platform",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Platform",
           "title": "Intentionally blank"
         },
         "environment": {
@@ -651,32 +619,32 @@ func init() {
           "title": "The environment assigned to the node"
         },
         "latest_report": {
-          "$ref": "#/definitions/v1LatestReportSummary",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.LatestReportSummary",
           "title": "A summary of the information contained in the latest report for this node"
         },
         "tags": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Kv"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Kv"
           },
           "title": "The tags assigned to this node"
         },
         "profiles": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ProfileMeta"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMeta"
           },
           "title": "A minimal represenation of the compliance profiles run against the node"
         }
       }
     },
-    "v1Nodes": {
+    "chef.automate.api.compliance.reporting.v1.Nodes": {
       "type": "object",
       "properties": {
         "nodes": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Node"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Node"
           },
           "title": "The nodes matching the request filters"
         },
@@ -702,7 +670,7 @@ func init() {
         }
       }
     },
-    "v1Option": {
+    "chef.automate.api.compliance.reporting.v1.Option": {
       "type": "object",
       "properties": {
         "description": {
@@ -715,7 +683,7 @@ func init() {
         }
       }
     },
-    "v1Platform": {
+    "chef.automate.api.compliance.reporting.v1.Platform": {
       "type": "object",
       "properties": {
         "name": {
@@ -733,7 +701,7 @@ func init() {
       },
       "title": "The name and version of the node's operating system"
     },
-    "v1Profile": {
+    "chef.automate.api.compliance.reporting.v1.Profile": {
       "type": "object",
       "properties": {
         "name": {
@@ -779,14 +747,14 @@ func init() {
         "supports": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Support"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Support"
           },
           "title": "The supported platform targets"
         },
         "depends": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Dependency"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Dependency"
           },
           "title": "Other profiles that this profile depends on"
         },
@@ -797,21 +765,21 @@ func init() {
         "groups": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Group"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Group"
           },
           "title": "The groups of controls defined in the profile"
         },
         "controls": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Control"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Control"
           },
           "title": "The controls defined on the profile"
         },
         "attributes": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Attribute"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Attribute"
           },
           "title": "The attributes defined on the profile"
         },
@@ -829,7 +797,7 @@ func init() {
         }
       }
     },
-    "v1ProfileCounts": {
+    "chef.automate.api.compliance.reporting.v1.ProfileCounts": {
       "type": "object",
       "properties": {
         "total": {
@@ -855,7 +823,7 @@ func init() {
       },
       "title": "Stats on the statuses of nodes matching the filters"
     },
-    "v1ProfileMeta": {
+    "chef.automate.api.compliance.reporting.v1.ProfileMeta": {
       "type": "object",
       "properties": {
         "name": {
@@ -880,7 +848,7 @@ func init() {
         }
       }
     },
-    "v1ProfileMin": {
+    "chef.automate.api.compliance.reporting.v1.ProfileMin": {
       "type": "object",
       "properties": {
         "name": {
@@ -906,23 +874,23 @@ func init() {
       },
       "title": "Minimal represenation of a profile"
     },
-    "v1ProfileMins": {
+    "chef.automate.api.compliance.reporting.v1.ProfileMins": {
       "type": "object",
       "properties": {
         "profiles": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ProfileMin"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMin"
           },
           "title": "Minimal represenations of the profiles matching the filters"
         },
         "counts": {
-          "$ref": "#/definitions/v1ProfileCounts",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileCounts",
           "title": "Intentionally blank"
         }
       }
     },
-    "v1Query": {
+    "chef.automate.api.compliance.reporting.v1.Query": {
       "type": "object",
       "properties": {
         "id": {
@@ -936,12 +904,12 @@ func init() {
         "filters": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ListFilter"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
           },
           "title": "The list of filters used to narrow down the list"
         },
         "order": {
-          "$ref": "#/definitions/QueryOrderType",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Query.OrderType",
           "title": "Whether to sort in ascending or descending order"
         },
         "sort": {
@@ -960,7 +928,16 @@ func init() {
         }
       }
     },
-    "v1Ref": {
+    "chef.automate.api.compliance.reporting.v1.Query.OrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC",
+      "title": "The two allowed values for ordering results"
+    },
+    "chef.automate.api.compliance.reporting.v1.Ref": {
       "type": "object",
       "properties": {
         "url": {
@@ -973,7 +950,7 @@ func init() {
         }
       }
     },
-    "v1Report": {
+    "chef.automate.api.compliance.reporting.v1.Report": {
       "type": "object",
       "properties": {
         "id": {
@@ -998,7 +975,7 @@ func init() {
           "title": "The status of the run the report was made from"
         },
         "controls": {
-          "$ref": "#/definitions/v1ControlSummary",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
           "title": "Intentionally blank"
         },
         "environment": {
@@ -1010,17 +987,17 @@ func init() {
           "title": "The version of the report"
         },
         "platform": {
-          "$ref": "#/definitions/v1Platform",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Platform",
           "title": "Intentionally blank"
         },
         "statistics": {
-          "$ref": "#/definitions/v1Statistics",
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Statistics",
           "title": "Intentionally blank"
         },
         "profiles": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Profile"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Profile"
           },
           "title": "The profiles run as part of this report"
         },
@@ -1038,7 +1015,7 @@ func init() {
         }
       }
     },
-    "v1ReportIds": {
+    "chef.automate.api.compliance.reporting.v1.ReportIds": {
       "type": "object",
       "properties": {
         "ids": {
@@ -1050,13 +1027,13 @@ func init() {
         }
       }
     },
-    "v1Reports": {
+    "chef.automate.api.compliance.reporting.v1.Reports": {
       "type": "object",
       "properties": {
         "reports": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Report"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Report"
           },
           "title": "The paginated results of reports matching the filters"
         },
@@ -1067,7 +1044,7 @@ func init() {
         }
       }
     },
-    "v1Result": {
+    "chef.automate.api.compliance.reporting.v1.Result": {
       "type": "object",
       "properties": {
         "status": {
@@ -1097,7 +1074,7 @@ func init() {
         }
       }
     },
-    "v1SourceLocation": {
+    "chef.automate.api.compliance.reporting.v1.SourceLocation": {
       "type": "object",
       "properties": {
         "ref": {
@@ -1111,7 +1088,7 @@ func init() {
         }
       }
     },
-    "v1Statistics": {
+    "chef.automate.api.compliance.reporting.v1.Statistics": {
       "type": "object",
       "properties": {
         "duration": {
@@ -1122,7 +1099,7 @@ func init() {
       },
       "title": "Statistics of the report's run"
     },
-    "v1Suggestion": {
+    "chef.automate.api.compliance.reporting.v1.Suggestion": {
       "type": "object",
       "properties": {
         "text": {
@@ -1144,7 +1121,7 @@ func init() {
         }
       }
     },
-    "v1SuggestionRequest": {
+    "chef.automate.api.compliance.reporting.v1.SuggestionRequest": {
       "type": "object",
       "properties": {
         "type": {
@@ -1163,25 +1140,25 @@ func init() {
         "filters": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1ListFilter"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ListFilter"
           },
           "title": "The criteria used to filter the suggestions returned"
         }
       }
     },
-    "v1Suggestions": {
+    "chef.automate.api.compliance.reporting.v1.Suggestions": {
       "type": "object",
       "properties": {
         "suggestions": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/v1Suggestion"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Suggestion"
           },
           "title": "The list of returned suggestions"
         }
       }
     },
-    "v1Support": {
+    "chef.automate.api.compliance.reporting.v1.Support": {
       "type": "object",
       "properties": {
         "os_name": {
@@ -1206,7 +1183,7 @@ func init() {
         }
       }
     },
-    "v1Total": {
+    "chef.automate.api.compliance.reporting.v1.Total": {
       "type": "object",
       "properties": {
         "total": {
@@ -1217,36 +1194,59 @@ func init() {
       },
       "title": "A subtotal of controls"
     },
-    "versionVersionInfo": {
+    "google.protobuf.Any": {
       "type": "object",
       "properties": {
-        "name": {
+        "type_url": {
+          "type": "string",
+          "description": "A URL/resource name that uniquely identifies the type of the serialized\nprotocol buffer message. This string must contain at least\none \"/\" character. The last segment of the URL's path must represent\nthe fully qualified name of the type (as in\n` + "`" + `path/google.protobuf.Duration` + "`" + `). The name should be in a canonical form\n(e.g., leading \".\" is not accepted).\n\nIn practice, teams usually precompile into the binary all types that they\nexpect it to use in the context of Any. However, for URLs which use the\nscheme ` + "`" + `http` + "`" + `, ` + "`" + `https` + "`" + `, or no scheme, one can optionally set up a type\nserver that maps type URLs to message definitions as follows:\n\n* If no scheme is provided, ` + "`" + `https` + "`" + ` is assumed.\n* An HTTP GET on the URL must yield a [google.protobuf.Type][]\n  value in binary format, or produce an error.\n* Applications are allowed to cache lookup results based on the\n  URL, or have them precompiled into a binary to avoid any\n  lookup. Therefore, binary compatibility needs to be preserved\n  on changes to types. (Use versioned type names to manage\n  breaking changes.)\n\nNote: this functionality is not currently available in the official\nprotobuf release, and it is not used for type URLs beginning with\ntype.googleapis.com.\n\nSchemes other than ` + "`" + `http` + "`" + `, ` + "`" + `https` + "`" + ` (or the empty scheme) might be\nused with implementation specific semantics."
+        },
+        "value": {
+          "type": "string",
+          "format": "byte",
+          "description": "Must be a valid serialized protocol buffer of the above specified type."
+        }
+      },
+      "description": "` + "`" + `Any` + "`" + ` contains an arbitrary serialized protocol buffer message along with a\nURL that describes the type of the serialized message.\n\nProtobuf library provides support to pack/unpack Any values in the form\nof utility functions or additional generated methods of the Any type.\n\nExample 1: Pack and unpack a message in C++.\n\n    Foo foo = ...;\n    Any any;\n    any.PackFrom(foo);\n    ...\n    if (any.UnpackTo(\u0026foo)) {\n      ...\n    }\n\nExample 2: Pack and unpack a message in Java.\n\n    Foo foo = ...;\n    Any any = Any.pack(foo);\n    ...\n    if (any.is(Foo.class)) {\n      foo = any.unpack(Foo.class);\n    }\n\n Example 3: Pack and unpack a message in Python.\n\n    foo = Foo(...)\n    any = Any()\n    any.Pack(foo)\n    ...\n    if any.Is(Foo.DESCRIPTOR):\n      any.Unpack(foo)\n      ...\n\n Example 4: Pack and unpack a message in Go\n\n     foo := \u0026pb.Foo{...}\n     any, err := ptypes.MarshalAny(foo)\n     ...\n     foo := \u0026pb.Foo{}\n     if err := ptypes.UnmarshalAny(any, foo); err != nil {\n       ...\n     }\n\nThe pack methods provided by protobuf library will by default use\n'type.googleapis.com/full.type.name' as the type URL and the unpack\nmethods only use the fully qualified type name after the last '/'\nin the type URL, for example \"foo.bar.com/x/y.z\" will yield type\nname \"y.z\".\n\n\nJSON\n====\nThe JSON representation of an ` + "`" + `Any` + "`" + ` value uses the regular\nrepresentation of the deserialized, embedded message, with an\nadditional field ` + "`" + `@type` + "`" + ` which contains the type URL. Example:\n\n    package google.profile;\n    message Person {\n      string first_name = 1;\n      string last_name = 2;\n    }\n\n    {\n      \"@type\": \"type.googleapis.com/google.profile.Person\",\n      \"firstName\": \u003cstring\u003e,\n      \"lastName\": \u003cstring\u003e\n    }\n\nIf the embedded message type is well-known and has a custom JSON\nrepresentation, that representation will be embedded adding a field\n` + "`" + `value` + "`" + ` which holds the custom JSON in addition to the ` + "`" + `@type` + "`" + `\nfield. Example (for message [google.protobuf.Duration][]):\n\n    {\n      \"@type\": \"type.googleapis.com/google.protobuf.Duration\",\n      \"value\": \"1.212s\"\n    }"
+    },
+    "grpc.gateway.runtime.StreamError": {
+      "type": "object",
+      "properties": {
+        "grpc_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "http_code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
           "type": "string"
         },
-        "version": {
+        "http_status": {
           "type": "string"
         },
-        "sha": {
-          "type": "string"
-        },
-        "built": {
-          "type": "string"
+        "details": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
         }
       }
     }
   },
   "x-stream-definitions": {
-    "v1ExportData": {
+    "chef.automate.api.compliance.reporting.v1.ExportData": {
       "type": "object",
       "properties": {
         "result": {
-          "$ref": "#/definitions/v1ExportData"
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ExportData"
         },
         "error": {
-          "$ref": "#/definitions/runtimeStreamError"
+          "$ref": "#/definitions/grpc.gateway.runtime.StreamError"
         }
       },
-      "title": "Stream result of v1ExportData"
+      "title": "Stream result of chef.automate.api.compliance.reporting.v1.ExportData"
     }
   }
 }

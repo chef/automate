@@ -31,7 +31,7 @@ for i in api/external/**/; do
     # generates swagger output, only generate if a gateway file was generated
     gogw=(`find $i -maxdepth 1 -name "*.gw.go"`)
     if [ ${#gogw[@]} -gt 0 ]; then
-        protoc  ${IMPORTS[@]} --swagger_out=logtostderr=true:$PWD ${list[@]} || exit 1
+        protoc  ${IMPORTS[@]} --swagger_out=logtostderr=true,fqn_for_swagger_name=true:$PWD ${list[@]} || exit 1
     fi
   fi
 done
@@ -74,7 +74,7 @@ for i in api/interservice/**/; do
     # generates swagger output, only generate if a gateway file was generated
     gogw=(`find $i -maxdepth 1 -name "*.gw.go"`)
     if [ ${#gogw[@]} -gt 0 ]; then
-        protoc  ${IMPORTS[@]} --swagger_out=logtostderr=true:$PWD ${list[@]} || exit 1
+        protoc  ${IMPORTS[@]} --swagger_out=logtostderr=true,fqn_for_swagger_name=true:$PWD ${list[@]} || exit 1
     fi
 
 
