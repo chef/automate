@@ -43,7 +43,7 @@ do_build(){
 }
 do_install() {
     mkdir -p "${pkg_prefix}/config/"
-    proxypath="$(pkg_path_for ${local_bldr_api_proxy_origin}/builder-api-proxy)"
+    proxypath="$(pkg_path_for ${local_bldr_api_proxy_origin:-habitat}/builder-api-proxy)"
     proxyrel="${proxypath##*/}"
     sed -r "s/BUILDER_API_PROXY_RELEASE/${proxyrel}/g" support/index.html > "${pkg_prefix}/config/index.html"
 

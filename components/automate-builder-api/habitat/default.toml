@@ -9,6 +9,7 @@ app_id         = 5565
 webhook_secret = ""
 
 [artifactory]
+enabled = false
 api_url = "http://localhost:8080"
 api_key = "key"
 repo = "habitat-builder-artifact-store.default"
