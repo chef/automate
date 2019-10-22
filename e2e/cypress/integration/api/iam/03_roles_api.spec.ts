@@ -128,11 +128,12 @@ describe('roles API', () => {
                 });
             });
 
-            it('non-admin with project1 assignment access can create a new role ' +
+            it('non-admin with project1 assignment access cannot create a new role ' +
             'with no projects', () => {
                 cy.request({
                     headers: { 'api-token': nonAdminToken },
                     method: 'POST',
+                    failOnStatusCode: false,
                     url: '/apis/iam/v2beta/roles',
                     body: {
                         name: 'role1',
@@ -141,7 +142,7 @@ describe('roles API', () => {
                         projects: []
                     }
                 }).then((response) => {
-                    expect(response.body.role.projects).to.have.length(0);
+                    expect(response.status).to.equal(403);
                 });
             });
 
@@ -288,7 +289,7 @@ describe('roles API', () => {
                 });
             });
 
-            it('non-admin with project1 assignment access can update ' +
+            it('non-admin with project1 assignment access cannot update ' +
             'a role with no projects to have project1', () => {
                 cy.request({
                     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -307,6 +308,7 @@ describe('roles API', () => {
                 cy.request({
                     headers: { 'api-token': nonAdminToken },
                     method: 'PUT',
+                    failOnStatusCode: false,
                     url: `/apis/iam/v2beta/roles/${roleID}`,
                     body: {
                         name: 'role1',
@@ -314,7 +316,7 @@ describe('roles API', () => {
                         projects: [ project1.id ]
                     }
                 }).then((response) => {
-                    expect(response.body.role.projects).to.have.length(1);
+                    expect(response.status).to.equal(403);
                 });
             });
 
