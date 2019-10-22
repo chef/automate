@@ -551,7 +551,7 @@ func (es *Elastic) waitForYellow(ctx context.Context) error {
 	waitForYellowTimeout, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()
 
-	_, err := es.client.ClusterHealth().WaitForYellowStatus().WaitForNoRelocatingShards(true).Do(waitForYellowTimeout)
+	_, err := es.client.ClusterHealth().WaitForYellowStatus().Do(waitForYellowTimeout)
 	return err
 }
 
