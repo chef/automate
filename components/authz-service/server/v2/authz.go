@@ -236,6 +236,9 @@ func (s *authzServer) ValidateProjectAssignment(
 		if _, ok := err.(*projectassignment.ProjectsUnauthorizedForAssignmentErr); ok {
 			return nil, status.Error(codes.PermissionDenied, err.Error())
 		}
+		if _, ok := err.(*projectassignment.InvalidCreateRequest); ok {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
