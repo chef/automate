@@ -201,7 +201,7 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 	err = ts.PolicyRefresher.Refresh(ctx)
 	require.NoError(t, err)
 
-	// if any projects are non-existed, NotFound is returned.
+	// if any projects are non-existent, NotFound is returned.
 	// avoids a potentially expensive authz call.
 	cases := map[string]func(*testing.T){
 		"when assigning (unassigned) is allowed, from unassigned to authorized project": func(t *testing.T) {
