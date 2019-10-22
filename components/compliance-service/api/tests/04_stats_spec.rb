@@ -615,16 +615,17 @@ if !ENV['NO_STATS_TESTS']
         ]
       )
       expected_data = {
-        "reportSummary" => {
-          "status" => "failed",
-          "stats" => {
-            "nodesCnt" => 1,
-            "nodes" => 1,
-            "platforms" => 1,
-            "environments" => 1,
-            "profiles" => 2
+          "reportSummary" => {
+              "status" => "failed",
+              "stats" => {
+                  "nodesCnt" => 1,
+                  "nodes" => 1,
+                  "platforms" => 1,
+                  "environments" => 1,
+                  "profiles" => 2,
+                  "controls" => 59
+              }
           }
-        }
       }
       assert_equal_json_content(expected_data, actual_data)
 

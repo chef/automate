@@ -346,6 +346,10 @@ func (depth *ProfileDepth) getStatsSummaryAggs() map[string]elastic.Aggregation 
 
 	profilesTerms := elastic.NewTermsAggregation().Field("profiles.profile").Size(1)
 
+	controlsCard := elastic.NewCardinalityAggregation().Field("profiles.controls.id")
+	controlsNested := elastic.NewNestedAggregation().Path("profiles.controls").
+		SubAggregation("control_count", controlsCard)
+
 	aggs := make(map[string]elastic.Aggregation)
 	aggs["passed"] = passedFilter
 	aggs["failed"] = failedFilter
@@ -354,6 +358,7 @@ func (depth *ProfileDepth) getStatsSummaryAggs() map[string]elastic.Aggregation 
 	aggs["platforms"] = elastic.NewReverseNestedAggregation().SubAggregation("platforms", platformTerms)
 	aggs["environment"] = elastic.NewReverseNestedAggregation().SubAggregation("environment", environmentTerms)
 	aggs["profiles"] = profilesTerms
+	aggs["controls"] = controlsNested
 
 	return depth.wrap(aggs)
 }
@@ -410,6 +415,12 @@ func (depth *ProfileDepth) getStatsSummaryResult(searchResult *elastic.SearchRes
 					}
 				}
 				reportSummary.Stats.Profiles = int32(numberOfProfiles)
+			}
+		}
+
+		if controlsAggResult, found := aggRoot.Aggregations.Nested("controls"); found {
+			if controls, found := controlsAggResult.Aggregations.Cardinality("control_count"); found {
+				reportSummary.Stats.Controls = int32(*controls.Value)
 			}
 		}
 	}

@@ -130,6 +130,7 @@ message Stats {
 	int32 environments = 3;
 	int32 profiles = 4;
 	int32 nodes_cnt = 5;
+	int32 controls = 6;
 }
 
 message ReportSummary {
