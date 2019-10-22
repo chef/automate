@@ -2,7 +2,6 @@ package integration
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -92,7 +91,6 @@ func TestChefClientAuthn(t *testing.T) {
 	}
 
 	subjectPurgeClient, authorizationClient, close := newAuthzMock(t)
-	fmt.Printf("pointer %v\n", authorizationClient)
 	defer close()
 
 	serv, err := server.NewServer(ctx, config, authorizationClient)
@@ -135,7 +133,6 @@ func TestChefClientAuthn(t *testing.T) {
 
 			var myTokenID string
 			// set up a token to authenticate with
-			fmt.Println("TEST ABOUT TO RUN")
 			resp, err := tokenClient.CreateToken(ctx, &authn.CreateTokenReq{Active: true, Description: "mytoken", Projects: []string{}})
 			if err != nil {
 				t.Fatalf("create token request: %s", err)
@@ -241,6 +238,5 @@ func defaultMockPurgeFunc(context.Context,
 
 func defaultValidateProjectAssignmentFunc(context.Context,
 	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
-	fmt.Println("WE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HEREWE IN HERE")
 	return &authz_v2.ValidateProjectAssignmentResp{}, nil
 }

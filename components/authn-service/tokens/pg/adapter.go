@@ -3,7 +3,6 @@ package pg
 import (
 	"context"
 	"database/sql"
-	"fmt"
 
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -71,14 +70,12 @@ func (a *adapter) insertToken(ctx context.Context,
 	if projects == nil {
 		projects = []string{}
 	}
-	fmt.Printf("before %v\n", a.validator)
 	_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
 		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 		OldProjects:     []string{},
 		NewProjects:     projects,
 		IsUpdateRequest: false,
 	})
-	fmt.Printf("after %v\n", err)
 	if err != nil {
 		return nil, err
 	}
