@@ -197,5 +197,29 @@ describeIfIAMV2p1('assigning projects', () => {
         expect(resp.body.error).to.have.string(modifyError);
       });
     });
+
+    it(`when updating ${iamResources}, succeeds updating without changing projects`, () => {
+      cy.request({
+        headers: { 'api-token': apiToken },
+        method: 'PUT',
+        url: `/apis/iam/v2beta/${iamResources}/${resource.id}`,
+        failOnStatusCode: false,
+        body: {
+          name: `${resource.name} UpdatedName`,
+          // existing projects (no change)
+          projects: [authorizedProject1, authorizedProject2],
+          actions: ['iam:users:create']
+        }
+      }).then((resp) => {
+        assert.equal(resp.status, 200);
+        assert.isUndefined(resp.body.error);
+        assert.deepEqual(
+            resp.body[`${iamResource}`]['projects'],
+            [authorizedProject1, authorizedProject2]);
+        assert.deepEqual(
+            resp.body[`${iamResource}`]['name'],
+            `${resource.name} UpdatedName`);
+      });
+    });
   });
 });
