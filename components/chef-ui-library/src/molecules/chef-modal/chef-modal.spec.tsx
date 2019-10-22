@@ -34,13 +34,13 @@ describe('chef-modal', () => {
 
     it('emits a close event', () => {
       modal.visible = true;
-      modal.close = {
+      modal.closeModal = {
         emit: jest.fn()
       };
 
       modal.handleClose();
 
-      expect(modal.close.emit.mock.calls.length).toBe(1);
+      expect(modal.closeModal.emit.mock.calls.length).toBe(1);
     });
 
   });
