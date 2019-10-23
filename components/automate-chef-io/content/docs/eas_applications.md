@@ -32,6 +32,7 @@ The Chef Automate interface will group any services with the same package name, 
 
 ## Configuring Chef Habitat to Send Events to Chef Automate
 In the Chef Automate UI, create an API token as described in the Chef Automate documentation. Save this token somewhere safe.
+Please see (https://www.habitat.sh/docs/habitat-cli/#hab-sup-run "habitat documentation") for more habitat options.
 
 On the systems that runs Chef Habitat, you will need to launch the habitat supervisor with the following options:
 
@@ -53,7 +54,7 @@ Disconnected services are defined as services known to the EAS Applications back
 
 ### Periodic disconnection checks
 
-Automate assesses the status of the habitat services based on the receipt of a health check message. If a health check message has not been recieved for a configurable amount of time the service is marked as disconnected. The default amount of time is 5 minutes and this check cannot be disabled. Habitat send the health check messages every 30 seconds by default, this is also configurable.
+Automate assesses the status of the habitat services based on the receipt of a health check message. If a health check message has not been recieved for a configurable amount of time the service is marked as disconnected. The default amount of time is 5 minutes and this check cannot be disabled. Habitat send the health check messages every 30 seconds by default, this is also configurable using the `--health-check-interval` option with habitat supervisor. Please see (https://www.habitat.sh/docs/habitat-cli/#hab-sup-run "habitat documentation") for more information
 
 To configure the threshold for marking a disconnected service, you can do this via the UI or the API directly. To access the configuration settings in the UI, go to the settings tab, then Data Lifecycle on the sidebar. Under service groups you will find settings for Marking and Deleting disconnected services.
 
