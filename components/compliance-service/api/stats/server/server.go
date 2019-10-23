@@ -34,24 +34,21 @@ func (srv *Server) ReadSummary(ctx context.Context, in *stats.Query) (*stats.Sum
 	if in.Type == "" {
 		reportSummary, err := srv.es.GetStatsSummary(formattedFilters)
 		if err != nil {
-			err = errorutils.FormatErrorMsg(err, "")
-			return nil, err
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 		summary.ReportSummary = reportSummary
 	}
 	if in.Type == "nodes" {
 		nodeSummary, err := srv.es.GetStatsSummaryNodes(formattedFilters)
 		if err != nil {
-			err = errorutils.FormatErrorMsg(err, "")
-			return nil, err
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 		summary.NodeSummary = nodeSummary
 	}
 	if in.Type == "controls" {
 		controlSummary, err := srv.es.GetStatsSummaryControls(formattedFilters)
 		if err != nil {
-			err = errorutils.FormatErrorMsg(err, "")
-			return nil, err
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 		summary.ControlsSummary = controlSummary
 	}
@@ -80,8 +77,7 @@ func (srv *Server) ReadTrend(ctx context.Context, in *stats.Query) (*stats.Trend
 
 	trend, err = srv.es.GetTrend(formattedFilters, int(in.Interval), in.Type)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	trends.Trends = trend
@@ -107,8 +103,7 @@ func (srv *Server) ReadProfiles(ctx context.Context, in *stats.Query) (*stats.Pr
 		if in.Type == "summary" {
 			profileSummary, err := srv.es.GetProfileSummaryByProfileId(in.Id, formattedFilters)
 			if err != nil {
-				err = errorutils.FormatErrorMsg(err, "")
-				return nil, err
+				return nil, errorutils.FormatErrorMsg(err, "")
 			}
 			profile.ProfileSummary = profileSummary
 		}
@@ -119,16 +114,14 @@ func (srv *Server) ReadProfiles(ctx context.Context, in *stats.Query) (*stats.Pr
 			}
 			controlStats, err := srv.es.GetControlListStatsByProfileID(in.Id, int(from), int(perPage), formattedFilters, sort, order)
 			if err != nil {
-				err = errorutils.FormatErrorMsg(err, "")
-				return nil, err
+				return nil, errorutils.FormatErrorMsg(err, "")
 			}
 			profile.ControlStats = controlStats
 		}
 	} else {
 		profileList, err := srv.es.GetProfileListWithAggregatedComplianceSummaries(formattedFilters, in.Size)
 		if err != nil {
-			err = errorutils.FormatErrorMsg(err, "")
-			return nil, err
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 		profile.ProfileList = profileList
 	}
@@ -155,8 +148,7 @@ func (srv *Server) ReadFailures(ctx context.Context, in *stats.Query) (*stats.Fa
 	}
 	failures, err := srv.es.GetStatsFailures(formattedFilters["types"], int(in.Size), formattedFilters)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return failures, nil
 }

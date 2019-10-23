@@ -11,6 +11,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/pkg/errors"
+
 	datafeed "github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/data-feed-service/config"
@@ -19,7 +21,6 @@ import (
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/grpc/secureconn"
-	"github.com/pkg/errors"
 )
 
 // DatafeedServer is the interface to this component.
@@ -147,22 +148,19 @@ func (datafeedServer *DatafeedServer) GetDestination(ctx context.Context, destin
 	log.Infof("GetDestination %s", destination)
 	response, err := datafeedServer.db.GetDestination(destination)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
-
-	return response, err
+	return response, nil
 }
 
 func (datafeedServer *DatafeedServer) ListDestinations(ctx context.Context, destination *datafeed.ListDestinationRequest) (*datafeed.ListDestinationResponse, error) {
 	log.Infof("ListDestinations %s", destination)
-
 	response, err := datafeedServer.db.ListDestinations()
-
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
-	return response, err
+	return response, nil
 }
 
 func (datafeedServer *DatafeedServer) UpdateDestination(ctx context.Context, destination *datafeed.UpdateDestinationRequest) (*datafeed.UpdateDestinationResponse, error) {
@@ -171,9 +169,9 @@ func (datafeedServer *DatafeedServer) UpdateDestination(ctx context.Context, des
 	success, err := datafeedServer.db.UpdateDestination(destination)
 	response.Success = success
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
-	return response, err
+	return response, nil
 }
 
 // Health returns the servers embedded health check service

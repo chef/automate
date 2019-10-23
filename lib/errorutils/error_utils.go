@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"fmt"
 	"net"
-	"time"
 
 	"github.com/lib/pq"
 	"github.com/olivere/elastic"
@@ -85,7 +84,7 @@ func FormatErrorMsg(err error, id string) error {
 	if err == nil {
 		return nil
 	}
-	logrus.Error(fmt.Sprintf("%s:%s", time.Now().UTC(), err.Error()))
+	logrus.Error(err.Error())
 	return checkErrorMsg(err, id)
 }
 

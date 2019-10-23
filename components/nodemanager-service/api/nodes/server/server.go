@@ -256,7 +256,7 @@ func (srv *Server) Update(ctx context.Context, in *nodes.Node) (*pb.Empty, error
 
 // Delete a node
 func (srv *Server) Delete(ctx context.Context, in *nodes.Id) (*pb.Empty, error) {
-	logrus.Infof("Node manager is deleting node id: %+v", in)
+	logrus.Infof("deleting node id: %+v", in)
 	_, err := srv.db.DeleteNode(in.Id)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.Id)
