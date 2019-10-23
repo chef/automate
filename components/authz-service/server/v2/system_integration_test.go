@@ -431,9 +431,12 @@ func TestIntegrationFilterAuthorizedProjectsWithSystemPolicies(t *testing.T) {
 		Statements: []*api_v2.Statement{&statement},
 	}
 
-	// force sync refresh to load new policies
+	// // force sync refresh to load new policies
 	err = ts.PolicyRefresher.Refresh(ctx)
 	require.NoError(t, err)
+
+	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx,
+		[]string{"team:local:admins"}, []string{}, "*", "*", "pol"))
 
 	_, err = ts.Policy.CreatePolicy(ctx, &req)
 	require.NoError(t, err)
