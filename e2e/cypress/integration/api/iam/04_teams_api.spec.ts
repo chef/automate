@@ -133,6 +133,23 @@ describe('teams API', () => {
           }).then((response) => {
               expect(response.body.team.projects).to.have.length(2);
           });
+
+          it('can update a team with no projects to have project1', () => {
+            cy.request({ ...defaultAdminReq,
+                method: 'POST',
+                body: teamWithProjects(teamID, [])
+            }).then((response) => {
+                expect(response.body.team.projects).to.have.length(0);
+            });
+
+            cy.request({ ...defaultAdminReq,
+                method: 'PUT',
+                url: `/apis/iam/v2beta/teams/${teamID}`,
+                body: teamWithProjects(teamID, [project1.id])
+            }).then((response) => {
+                expect(response.body.team.projects).to.have.length(1);
+            });
+          });
         });
       });
 
@@ -152,23 +169,6 @@ describe('teams API', () => {
     describe('PUT /apis/iam/v2beta/teams', () => {
       context('both superadmin and project1 admin', () => {
         scenarios.forEach((scenario) => {
-          it(`${scenario.id} can update a team with no projects to have project1`, () => {
-            cy.request({ ...defaultAdminReq,
-                method: 'POST',
-                body: teamWithProjects(teamID, [])
-            }).then((response) => {
-                expect(response.body.team.projects).to.have.length(0);
-            });
-
-            cy.request({ ...scenario.req,
-                method: 'PUT',
-                url: `/apis/iam/v2beta/teams/${teamID}`,
-                body: teamWithProjects(teamID, [project1.id])
-            }).then((response) => {
-                expect(response.body.team.projects).to.have.length(1);
-            });
-          });
-
           it(`${scenario.id} can update a team to remove project1`, () => {
             cy.request({ ...defaultAdminReq,
                 method: 'POST',
