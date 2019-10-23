@@ -187,9 +187,19 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 	a2V4Indices := A2V4ElasticSearchIndices{backend: &backend}
 	err = backend.migrate(a2V4Indices, statusSrv, statusserver.MigrationLabelESa2v4)
 	if err != nil {
-		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelESa2v3))
+		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelESa2v4))
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v4, errMsg.Error())
 		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v4, statusserver.MigrationFailedMsg)
+		return errMsg
+	}
+
+	// Migrates A2 version 5 indices to the current version
+	a2V5Indices := A2V5ElasticSearchIndices{backend: &backend}
+	err = backend.migrate(a2V5Indices, statusSrv, statusserver.MigrationLabelESa2v5)
+	if err != nil {
+		errMsg := errors.Wrap(err, fmt.Sprintf("%s, migration failed for %s", myName, statusserver.MigrationLabelESa2v5))
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v5, errMsg.Error())
+		statusserver.AddMigrationUpdate(statusSrv, statusserver.MigrationLabelESa2v5, statusserver.MigrationFailedMsg)
 		return errMsg
 	}
 	return nil

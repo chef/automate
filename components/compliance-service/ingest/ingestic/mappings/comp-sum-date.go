@@ -182,6 +182,9 @@ var ComplianceSumDate = Mapping{
                 }
               },
               "type": "keyword"
+            },
+            "waived": {
+              "type": "boolean"
             }
           }
         },
@@ -391,6 +394,9 @@ var ComplianceSumDate = Mapping{
 						}
 					},
 					"type": "keyword"
+				},
+				"waived": {
+					"type": "boolean"
 				}
       }
     }

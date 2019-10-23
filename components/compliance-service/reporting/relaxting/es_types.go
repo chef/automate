@@ -76,6 +76,7 @@ type ESInSpecReport struct {
 	// as pointer so we can assign null to it when we get a report without an IP
 	IPAddress *string `json:"ipaddress"`
 	FQDN      string  `json:"fqdn"`
+	Waived    bool    `json:"waived"`
 }
 
 type ESInSpecSummaryProfile struct {
@@ -87,6 +88,7 @@ type ESInSpecSummaryProfile struct {
 	Full         string                       `json:"full"`
 	SHA256       string                       `json:"sha256"`
 	ControlsSums reporting.NodeControlSummary `json:"controls_sums"`
+	Waived       bool                         `json:"waived"`
 }
 
 type ESInSpecReportControlsResult struct {
@@ -96,6 +98,14 @@ type ESInSpecReportControlsResult struct {
 	StartTime   string  `json:"start_time,omitempty"`
 	Message     string  `json:"message,omitempty"`
 	SkipMessage string  `json:"skip_message,omitempty"`
+}
+
+type ESInSpecReportControlsWaiverData struct {
+	ExpirationDate     string `json:"expiration_date"`
+	Justification      string `json:"justification"`
+	Run                bool   `json:"run"`
+	SkippedDueToWaiver bool   `json:"skipped_due_to_waiver"`
+	Message            string `json:"message"`
 }
 
 type ESInSpecReportControlStringTags struct {
@@ -114,6 +124,8 @@ type ESInSpecReportControl struct {
 	Title      string                            `json:"title"`
 	Status     string                            `json:"status"`
 	Results    []*ESInSpecReportControlsResult   `json:"results"`
+	WaiverData *ESInSpecReportControlsWaiverData `json:"waiver_data"`
+	WaivedStr  string                            `json:"waived_str"`
 	StringTags []ESInSpecReportControlStringTags `json:"string_tags"`
 	Refs       []ESInSpecReportControlRefs       `json:"refs"`
 }

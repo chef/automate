@@ -27,6 +27,7 @@ type Compliance struct {
 		AllProfileSums *reportingTypes.NodeControlSummary
 		EndTime        time.Time
 		Status         string
+		Waived         bool
 	}
 }
 

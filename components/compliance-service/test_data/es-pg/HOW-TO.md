@@ -7,8 +7,8 @@ tar -czvf /tmp/es5-a1-data.tar.gz *
 
 # ES6 dump created in Automate 2 via:
 ```
-cd ~/git/a2/components/compliance-service/elasticsearch/.tmp/esdata6/
-tar -czvf ~/git/a2/components/compliance-service/test_data/es-pg/es6-a2v2-data.tar.gz *
+cd ~/git/automate/components/compliance-service/elasticsearch/.tmp/esdata6/
+tar -czvf ~/git/automate/components/compliance-service/test_data/es-pg/es6-a2v2-data.tar.gz *
 ```
 
 # Postgres 9.3 dump created in Automate 1 using:

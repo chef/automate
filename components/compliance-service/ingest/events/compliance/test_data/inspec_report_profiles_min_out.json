@@ -45,7 +45,8 @@
             "key": "stig_id",
             "values": ["RHEL-07-010050"]
           }
-        ]
+        ],
+        "waived_str": "no"
       },
       {
         "id": "ctrl-02",
@@ -69,7 +70,8 @@
             "key": "tag1",
             "values": ["value1"]
           }
-        ]
+        ],
+        "waived_str": "no"
       },
       {
         "id": "ctrl-03",
@@ -83,7 +85,8 @@
             "run_time": 0
           }
         ],
-        "string_tags": []
+        "string_tags": [],
+        "waived_str": "no"
       }
     ],
     "controls_sums": {
@@ -125,7 +128,8 @@
             "run_time": 0
           }
         ],
-        "string_tags": []
+        "string_tags": [],
+        "waived_str": "no"
       },
       {
         "id": "sysctl-02",
@@ -142,7 +146,8 @@
             "run_time": 0
           }
         ],
-        "string_tags": []
+        "string_tags": [],
+        "waived_str": "no"
       },
       {
         "id": "sysctl-03",
@@ -154,7 +159,8 @@
             "run_time": 0
           }
         ],
-        "string_tags": []
+        "string_tags": [],
+        "waived_str": "no"
       }
     ],
     "controls_sums": {

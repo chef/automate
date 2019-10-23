@@ -3,12 +3,15 @@ package compliance
 import (
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 	"unicode/utf8"
 
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
 	"github.com/sirupsen/logrus"
+
+	"reflect"
 
 	"github.com/chef/automate/components/compliance-service/ingest/events/inspec"
 	inspecTypes "github.com/chef/automate/components/compliance-service/inspec"
@@ -31,7 +34,8 @@ func (report *Report) ToJSON() (string, error) {
 // ProfileControlSummary returns a NodeControlSummary struct with the counted controls based on their status and criticality,
 // This is working on all profiles embedded in a full json report.
 // total: count for all controls in the report, e.g. 100
-// passed.total: count for all controls that executed successfully, e.g. 40
+// waived: count for all waived controls, e.g. 5
+// passed.total: count for all controls that executed successfully, e.g. 35
 // skipped.total: count for all skipped controls, e.g. 10
 // failed.total: count for all failed controls, e.g. 50
 // failed.minor/major/critical: split the total failed controls in 3 buckets based on the criticality,
@@ -40,21 +44,25 @@ func ProfileControlSummary(profile *inspec.Profile) *reportingTypes.NodeControlS
 	summary := reportingTypes.NodeControlSummary{}
 	for _, control := range profile.Controls {
 		summary.Total++
-		switch control.Status() {
-		case inspec.ResultStatusPassed:
-			summary.Passed.Total++
-		case inspec.ResultStatusSkipped:
-			summary.Skipped.Total++
-		case inspec.ResultStatusFailed:
-			summary.Failed.Total++
-
-			switch control.ImpactName() {
-			case inspec.ControlImpactCritical:
-				summary.Failed.Critical++
-			case inspec.ControlImpactMajor:
-				summary.Failed.Major++
-			case inspec.ControlImpactMinor:
-				summary.Failed.Minor++
+		if control.WaiverData != nil && !strings.HasPrefix(control.WaiverData.Message, "Waiver expired") {
+			// Expired waived controls are not waived. This way, we can use the actual status of the executed control
+			summary.Waived++
+		} else {
+			switch control.Status() {
+			case inspec.ResultStatusPassed:
+				summary.Passed.Total++
+			case inspec.ResultStatusSkipped:
+				summary.Skipped.Total++
+			case inspec.ResultStatusFailed:
+				summary.Failed.Total++
+				switch control.ImpactName() {
+				case inspec.ControlImpactCritical:
+					summary.Failed.Critical++
+				case inspec.ControlImpactMajor:
+					summary.Failed.Major++
+				case inspec.ControlImpactMinor:
+					summary.Failed.Minor++
+				}
 			}
 		}
 	}
@@ -70,18 +78,38 @@ func AddControlSummary(total *reportingTypes.NodeControlSummary, sum reportingTy
 	total.Failed.Minor += sum.Failed.Minor
 	total.Failed.Major += sum.Failed.Major
 	total.Failed.Critical += sum.Failed.Critical
+	total.Waived += sum.Waived
 }
 
-// ReportComplianceStatus returns the overall compliance status of a report based on the passed/failed/skipped control counts
+// ReportComplianceStatus returns the overall compliance status of a report based on the passed/failed/skipped/waived control counts
 func ReportComplianceStatus(summary *reportingTypes.NodeControlSummary) (status string) {
 	if summary.Failed.Total > 0 {
 		status = inspec.ResultStatusFailed
 	} else if summary.Total == summary.Skipped.Total {
 		status = inspec.ResultStatusSkipped
+	} else if summary.Total == summary.Waived {
+		status = inspec.ResultStatusWaived
 	} else {
 		status = inspec.ResultStatusPassed
 	}
 	return status
+}
+
+// WaivedStr returns a string label based on the control waived status
+func WaivedStr(data *inspec.WaiverData) (str string) {
+	if data == nil || reflect.DeepEqual(*data, inspec.WaiverData{}) {
+		return inspec.ControlWaivedStrNo
+	}
+
+	if strings.HasPrefix(data.Message, "Waiver expired") {
+		return inspec.ControlWaivedStrNoExpired
+	}
+
+	if data.Run {
+		return inspec.ControlWaivedStrYesRun
+	}
+
+	return inspec.ControlWaivedStrYes
 }
 
 // ReportProfilesFromInSpecProfiles extracts the reports specific information
@@ -148,6 +176,18 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 				Results:    minResults,
 				StringTags: stringTags,
 				Refs:       refs,
+				WaivedStr:  WaivedStr(control.WaiverData),
+			}
+
+			// In ingestion old inspec reports can come without control `waiver_data` and new ones can have `waiver_data: {}`
+			if control.WaiverData != nil && !reflect.DeepEqual(*control.WaiverData, inspec.WaiverData{}) {
+				minControls[i].WaiverData = &relaxting.ESInSpecReportControlsWaiverData{
+					ExpirationDate:     control.WaiverData.ExpirationDate,
+					Justification:      control.WaiverData.Justification,
+					Run:                control.WaiverData.Run,
+					SkippedDueToWaiver: control.WaiverData.SkippedDueToWaiver,
+					Message:            control.WaiverData.Message,
+				}
 			}
 		}
 

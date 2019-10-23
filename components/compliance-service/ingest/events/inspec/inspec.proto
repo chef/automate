@@ -53,6 +53,15 @@ message Control {
 	repeated google.protobuf.Struct refs = 23;
 	google.protobuf.Struct tags = 24;
 	repeated Result results = 25;
+	WaiverData waiver_data = 26;
+}
+
+message WaiverData {
+	string expiration_date = 1;
+	string justification = 2;
+	bool run = 3;
+	bool skipped_due_to_waiver = 4;
+	string message = 5;
 }
 
 message Result {
