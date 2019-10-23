@@ -305,18 +305,18 @@ describeIfIAMV2('policies API', () => {
       'a policy with no projects to have project1', () => {
         cy.request({ ...defaultAdminReq,
             method: 'POST',
-            failOnStatusCode: false,
             body: policyWithProjects(policyID, [], statementProjects)
         }).then((response) => {
-            expect(response.status).to.equal(403);
+            expect(response.body.policy.projects).to.have.length(0);
         });
 
         cy.request({ ...defaultNonAdminReq,
             method: 'PUT',
+            failOnStatusCode: false,
             url: `/apis/iam/v2beta/policies/${policyID}`,
             body: policyWithProjects(policyID, [project1.id], statementProjects)
         }).then((response) => {
-            expect(response.body.policy.projects).to.have.length(1);
+            expect(response.status).to.equal(403);
         });
       });
 
