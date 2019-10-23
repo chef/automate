@@ -232,30 +232,10 @@ var ComplianceRepDate = Mapping{
                   "type": "nested",
                   "properties": {
                     "key": {
-                      "type": "keyword",
-                      "fields": {
-                        "engram": {
-                          "type": "text",
-                          "analyzer": "autocomplete"
-                        },
-                        "lower": {
-                          "type": "keyword",
-                          "normalizer": "case_insensitive"
-                        }
-                      }
+                      "type": "keyword"
                     },
                     "values": {
-                      "type": "keyword",
-                      "fields": {
-                        "engram": {
-                          "type": "text",
-                          "analyzer": "autocomplete"
-                        },
-                        "lower": {
-                          "type": "keyword",
-                          "normalizer": "case_insensitive"
-                        }
-                      }
+                      "type": "keyword"
                     }
                   }
                 },
