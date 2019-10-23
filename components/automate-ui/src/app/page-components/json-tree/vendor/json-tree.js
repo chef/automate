@@ -372,6 +372,7 @@ var jsonTree = (function() {
               },
               childNodesUl,
               labelEl,
+              moreContentEl,
               childNodes = [];
   
           self.label = label;
