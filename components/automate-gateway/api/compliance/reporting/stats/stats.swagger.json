@@ -565,55 +565,55 @@
       "properties": {
         "name": {
           "type": "string",
-          "title": "The name of the profile"
+          "description": "The name of the profile."
         },
         "url": {
           "type": "string",
-          "title": "The URL of the profile accessible over HTTP or HTTPS"
+          "description": "The URL of the profile accessible over HTTP or HTTPS."
         },
         "path": {
           "type": "string",
-          "title": "The path to the profile on disk"
+          "description": "The path to the profile on disk."
         },
         "git": {
           "type": "string",
-          "title": "The git URL of the profile"
+          "description": "The git URL of the profile."
         },
         "branch": {
           "type": "string",
-          "title": "The specific git branch of the dependency"
+          "description": "The specific git branch of the dependency."
         },
         "tag": {
           "type": "string",
-          "title": "The specific git tag of the dependency"
+          "description": "The specific git tag of the dependency."
         },
         "commit": {
           "type": "string",
-          "title": "The specific git commit of the dependency"
+          "description": "The specific git commit of the dependency."
         },
         "version": {
           "type": "string",
-          "title": "The specific git version of the dependency"
+          "description": "The specific git version of the dependency."
         },
         "supermarket": {
           "type": "string",
-          "title": "The name of the dependency stored in Chef Supermarket"
+          "description": "The name of the dependency stored in Chef Supermarket."
         },
         "github": {
           "type": "string",
-          "title": "The short name of the dependency stored on Github"
+          "description": "The short name of the dependency stored on Github."
         },
         "compliance": {
           "type": "string",
-          "title": "The short name of the dependency stored on the Chef Automate or Chef Compliance server"
+          "description": "The short name of the dependency stored on the Chef Automate or Chef Compliance server."
         },
         "status": {
           "type": "string",
-          "title": "The status of the dependency in the report"
+          "description": "The status of the dependency in the report."
         },
         "skip_message": {
           "type": "string",
-          "title": "The reason this profile was skipped in the generated report, if any"
+          "description": "The reason this profile was skipped in the generated report, if any."
         }
       }
     }

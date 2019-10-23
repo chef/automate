@@ -1,12 +1,12 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "Chef Automate documentation",
+    "title": "Chef Automate API",
     "version": "1.3.3.7",
     "termsOfService": "https://www.chef.io/terms-and-conditions-of-use/",
     "contact": {
       "email": "support@chef.io",
-      "url": "https://github.com/chef/automate"
+      "url": "https://www.chef.io/support/"
     },
     "x-logo": {
       "url": "/images/chef-automate-logo.svg",
@@ -15,9 +15,10 @@
     "license": {
       "name": "Apache 2.0",
       "url": "https://github.com/chef/automate/blob/master/LICENSE"
-    },
-    "description": ""
+    }
   },
+  "host": "automate.chef.io",
+  "basePath": "/api",
   "schemes": [
     "http",
     "https"
@@ -28,5 +29,10 @@
   "produces": [
     "application/json"
   ],
-  "paths": {}
+  "x-tagGroups": [
+    {
+      "name": "Compliance",
+      "tags": ["Reporting"]
+    }
+  ]
 }
