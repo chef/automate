@@ -155,8 +155,8 @@ export class OverviewTrendComponent implements OnChanges, OnDestroy  {
       .attr('y', this.vbHeight - 3)
       .text(() => {
         return [
-          moment(this.domainX[0]).format(DateTime.CHEF_DATE_TIME),
-          moment(this.domainX[1]).format(DateTime.CHEF_DATE_TIME)
+          moment.utc(this.domainX[0]).format(DateTime.CHEF_DATE_TIME),
+          moment.utc(this.domainX[1]).format(DateTime.CHEF_DATE_TIME)
         ].join(' - ');
       });
 
