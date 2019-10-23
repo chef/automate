@@ -61,9 +61,11 @@ export class ChefInput {
    */
   @Prop() autocomplete = 'off';
 
-  @State() focused = false;
+  @State() focused: boolean;
+  @State() touched: boolean;
 
   @Listen('focusin') handleFocusin() {
+    this.touched = true;
     this.focused = true;
   }
 
@@ -71,9 +73,20 @@ export class ChefInput {
     this.focused = false;
   }
 
+  isFocused(): boolean {
+    return this.focused === true ? true : false;
+  }
+
+  isTouched(): boolean {
+    return this.touched === true ? true : false;
+  }
+
   render() {
     return (
-      <Host class={this.focused ? 'focused' : ''}>
+      <Host class={{
+        'focused': this.isFocused(),
+        'touched': this.isTouched()
+      }}>
         {this.renderContent()}
       </Host>
     );
