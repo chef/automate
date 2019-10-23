@@ -89,3 +89,43 @@ Hugo allows us to nest our data directory structure as much as necessary. You ca
 |   │   │   ├── command_one.yml
 |   │   │   └── command_two.yml
 ```
+
+## API Development
+
+To view the API documentation locally, enter the `/components/automate-chef-io` directory (where this README.md is located) and run:
+
+`make serve`
+
+In your browser, navigate to:
+
+`http://localhost:1313/docs/api/`
+
+To develop API documentation
+
+1. Run `make serve` from the automate-chef-io directory. When left running this command watches for changes to files it knows about and will rebuild the hugo site automatically.
+1. Open a second terminal window for the next commands
+1. Run compile_all_protobuf_components in a hab studio
+1. Run make sync_swagger_files generate_swaggerfrom the automate-chef-io directory
+1. visit http://localhost:1313/docs/api/
+
+Or to compile everything in one copy-pastable command:
+
+`hab studio run "source .studiorc && compile_all_protobuf_components" && pushd components/automate-chef-io/ && make sync_swagger_files generate_swagger && make serve || popd`
+
+* Building docs
+    * Installation of necessary things
+    * Commands to run
+    * TODO: is there a "getting started with automate" I can link to for this?
+    * Don't fix conflicts in generated files, regenerate
+* Docs Styleguide
+    * Service title and description
+    * Field description
+    * Mention object reference gotcha
+    * Grammar choices? ie, 1st vs 3rd person, etc
+    * Tabs prefered over spaces
+* Extra things?
+* References / relevant links
+    * https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#schemaObject
+    * https://github.com/grpc-ecosystem/grpc-gateway/blob/master/examples/proto/examplepb/a_bit_of_everything.proto
+    * https://github.com/Redocly/redoc/blob/master/docs/redoc-vendor-extensions.md#x-displayname
+    * https://swagger.io/docs/specification/2-0/basic-structure/
