@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
@@ -57,6 +58,68 @@ func TestIntegrationSystemPolicies(t *testing.T) {
 		t.Run(desc, test)
 		ts.TestDB.Flush(t)
 	}
+}
+
+func TestIntegrationValidateProjectAssignmentWithOverlappingProjects(t *testing.T) {
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	ts := setupWithOPAV2p1(t)
+	defer ts.Shutdown(t, ctx)
+	cl := ts.Authz
+
+	user := "user:local:dave"
+	authorizedProjectId := "authorized-project"
+
+	_, err := ts.Projects.CreateProject(ctx, &api_v2.CreateProjectReq{
+		Id:   authorizedProjectId,
+		Name: "Project Authorized",
+	})
+	require.NoError(t, err)
+
+	statement1 := api_v2.Statement{
+		Effect:    api_v2.Statement_ALLOW,
+		Resources: []string{"*"},
+		Actions:   []string{"*"},
+		Projects:  []string{authorizedProjectId},
+	}
+	req1 := api_v2.CreatePolicyReq{
+		Id:         "policy-1",
+		Name:       "my favorite policy",
+		Members:    []string{user},
+		Statements: []*api_v2.Statement{&statement1},
+	}
+	_, err = ts.Policy.CreatePolicy(ctx, &req1)
+	require.NoError(t, err)
+
+	statement2 := api_v2.Statement{
+		Effect:    api_v2.Statement_ALLOW,
+		Resources: []string{"*"},
+		// Project Owner contains iam:teams:list
+		Role:     constants_v2.ProjectOwnerRoleID,
+		Projects: []string{authorizedProjectId},
+	}
+	req2 := api_v2.CreatePolicyReq{
+		Id:         "policy-2",
+		Name:       "my second favorite policy",
+		Members:    []string{user},
+		Statements: []*api_v2.Statement{&statement2},
+	}
+	_, err = ts.Policy.CreatePolicy(ctx, &req2)
+	require.NoError(t, err)
+
+	// force sync refresh to load new policies
+	err = ts.PolicyRefresher.Refresh(ctx)
+	require.NoError(t, err)
+
+	t.Run("when there are policies granting overlapping permissions on the same project, only that project is returned", func(t *testing.T) {
+		resp, err := cl.ProjectsAuthorized(ctx, &api_v2.ProjectsAuthorizedReq{
+			Subjects: []string{user},
+			Resource: "iam:teams",
+			Action:   "iam:teams:list",
+		})
+		assert.NoError(t, err)
+		assert.ElementsMatch(t, []string{authorizedProjectId}, resp.Projects)
+	})
 }
 
 // bug: this test passes contingent on the above test being run.

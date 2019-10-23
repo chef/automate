@@ -5,6 +5,7 @@ package opa
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"os"
 	"strings"
@@ -286,7 +287,12 @@ func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
 		return err
 	}
 
-	l.Infof("data: %#v", data)
+	jsonData, err := json.Marshal(data)
+	if err != nil {
+		return err
+	}
+
+	l.Infof("data: %s", jsonData)
 	return store.Commit(ctx, txn)
 }
 
@@ -549,12 +555,17 @@ func (s *State) stringArrayFromResults(exps []*rego.ExpressionValue) ([]string, 
 }
 
 func (s *State) projectsFromPreparedEvalQuery(rs rego.ResultSet) ([]string, error) {
-	result := make([]string, len(rs))
+	projectsFound := make(map[string]bool, len(rs))
+	result := make([]string, 0, len(rs))
 	for i := range rs {
 		var ok bool
-		result[i], ok = rs[i].Bindings["project"].(string)
+		proj, ok := rs[i].Bindings["project"].(string)
 		if !ok {
 			return nil, &UnexpectedResultExpressionError{exps: rs[i].Expressions}
+		}
+		if !projectsFound[proj] {
+			result = append(result, proj)
+			projectsFound[proj] = true
 		}
 	}
 	return result, nil
