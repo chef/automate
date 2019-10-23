@@ -66,7 +66,7 @@ func TestNodeRunWithRuns(t *testing.T) {
 		func(t *testing.T) {
 			res, err := cfgmgmt.GetNodeRun(ctx, &req)
 			assert.Nil(t, err)
-			assert.Equal(t, ingestRunToMessage(run), res)
+			assert.Equal(t, ingestRunToMessage(run, nil), res)
 		})
 }
 
@@ -101,8 +101,7 @@ func TestNodeRunProjectFilter(t *testing.T) {
 		run    = newIngestRun(nodeID, "success",
 			time.Now().Format(time.RFC3339),
 			time.Now().Add(time.Minute).Format(time.RFC3339))
-		req                = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
-		successfulResponse = ingestRunToMessage(run)
+		req = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
 	)
 
 	cases := []struct {
@@ -216,8 +215,10 @@ func TestNodeRunProjectFilter(t *testing.T) {
 				assert.Nil(t, res, "response should be nil")
 				return
 			}
+			expectedResponse := ingestRunToMessage(run, test.nodeProjects)
+
 			assert.Nil(t, err)
-			assert.Equal(t, successfulResponse, res)
+			assert.Equal(t, expectedResponse, res)
 		})
 	}
 }
@@ -254,8 +255,71 @@ func TestNodeRunWithCookbookRunlist(t *testing.T) {
 		func(t *testing.T) {
 			res, err := cfgmgmt.GetNodeRun(ctx, &req)
 			assert.Nil(t, err)
-			assert.Equal(t, ingestRunToMessage(run), res)
+			assert.Equal(t, ingestRunToMessage(run, nil), res)
 		})
+}
+
+func TestNodeRunReturnsProjectList(t *testing.T) {
+	var (
+		nodeID = newUUID()
+		run    = iBackend.Run{
+			NodeInfo:  iBackend.NodeInfo{EntityUuid: nodeID, Status: "success"},
+			RunID:     newUUID(),
+			StartTime: time.Now().Add(time.Minute * -5),
+			EndTime:   time.Now(),
+		}
+		req  = request.NodeRun{NodeId: run.EntityUuid, RunId: run.RunID}
+		ctx  = context.Background()
+		node = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nodeID,
+			},
+			Projects: []string{"project9", "project7"},
+		}
+	)
+
+	suite.IngestNodes([]iBackend.Node{node})
+	suite.IngestRuns([]iBackend.Run{run})
+	defer suite.DeleteAllDocuments()
+
+	t.Run(fmt.Sprintf("node run requests return the associated projects %v", req),
+		func(t *testing.T) {
+			res, err := cfgmgmt.GetNodeRun(ctx, &req)
+			assert.Nil(t, err)
+
+			assert.Equal(t, node.Projects, res.Projects)
+		})
+}
+
+// Returns and error because the node ID used to request the run does not match the run's node ID.
+func TestNodeRunRequestedNodeIDNotMatchRunNodeID(t *testing.T) {
+	var (
+		runsNodeID        = newUUID()
+		nonAssociatedNode = newUUID()
+		run               = iBackend.Run{
+			NodeInfo:  iBackend.NodeInfo{EntityUuid: runsNodeID, Status: "success"},
+			RunID:     newUUID(),
+			StartTime: time.Now().Add(time.Minute * -5),
+			EndTime:   time.Now(),
+		}
+		ctx  = context.Background()
+		node = iBackend.Node{
+			Exists: true,
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid: nonAssociatedNode,
+			},
+		}
+	)
+
+	suite.IngestNodes([]iBackend.Node{node})
+	suite.IngestRuns([]iBackend.Run{run})
+	defer suite.DeleteAllDocuments()
+
+	_, err := cfgmgmt.GetNodeRun(ctx, &request.NodeRun{
+		NodeId: nonAssociatedNode,
+		RunId:  run.RunID})
+	assert.Error(t, err)
 }
 
 func TestNodeRunWithOneRoleRunlist(t *testing.T) {
@@ -307,7 +371,7 @@ func TestNodeRunWithOneRoleRunlist(t *testing.T) {
 		func(t *testing.T) {
 			res, err := cfgmgmt.GetNodeRun(ctx, &req)
 			assert.Nil(t, err)
-			assert.Equal(t, ingestRunToMessage(run), res)
+			assert.Equal(t, ingestRunToMessage(run, nil), res)
 		})
 }
 
@@ -372,7 +436,7 @@ func TestNodeRunWithTwoRolesInRunlist(t *testing.T) {
 		func(t *testing.T) {
 			res, err := cfgmgmt.GetNodeRun(ctx, &req)
 			assert.Nil(t, err)
-			assert.Equal(t, ingestRunToMessage(run), res)
+			assert.Equal(t, ingestRunToMessage(run, nil), res)
 		})
 }
 
@@ -454,11 +518,11 @@ func TestNodeRunWithLoopRolesInRunlist(t *testing.T) {
 		func(t *testing.T) {
 			res, err := cfgmgmt.GetNodeRun(ctx, &req)
 			assert.Nil(t, err)
-			assert.Equal(t, ingestRunToMessage(run), res)
+			assert.Equal(t, ingestRunToMessage(run, nil), res)
 		})
 }
 
-func ingestRunToMessage(run iBackend.Run) proto.Message {
+func ingestRunToMessage(run iBackend.Run, projects []string) proto.Message {
 	startTime, _ := ptypes.TimestampProto(run.StartTime)
 	endTime, _ := ptypes.TimestampProto(run.EndTime)
 	return &response.Run{
@@ -488,6 +552,7 @@ func ingestRunToMessage(run iBackend.Run) proto.Message {
 		Error:        &response.ChefError{},     // For now we initialize them but would be nice to cast them
 		Resources:    []*response.Resource{},    // For now we initialize them but would be nice to cast them
 		Deprecations: []*response.Deprecation{}, // For now we initialize them but would be nice to cast them
+		Projects:     projects,
 		// (@afiune) I have no idea what is this 'source'
 		//Source:      run.Source,
 	}

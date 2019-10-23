@@ -13,7 +13,7 @@ import (
 	google_protobuf "github.com/golang/protobuf/ptypes/struct"
 )
 
-func toResponseRun(run backend.Run) (*response.Run, error) {
+func toResponseRun(run backend.Run, associatedNode backend.Node) (*response.Run, error) {
 	chefError, err := toResponseError(run.Error)
 	startTime, _ := ptypes.TimestampProto(run.StartTime.UTC())
 	endTime, _ := ptypes.TimestampProto(run.EndTime.UTC())
@@ -51,6 +51,7 @@ func toResponseRun(run backend.Run) (*response.Run, error) {
 		Resources:            toResponseResources(run.Resources),
 		Deprecations:         toResponseDeprecations(run.Deprecations),
 		Error:                chefError,
+		Projects:             associatedNode.Projects,
 	}, err
 }
 

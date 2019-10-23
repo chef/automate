@@ -3,6 +3,7 @@ package grpcserver
 import (
 	"context"
 	"strings"
+	"time"
 
 	"github.com/golang/protobuf/proto"
 	gpStruct "github.com/golang/protobuf/ptypes/struct"
@@ -198,6 +199,14 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context,
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
+	projectFilters, err := filterByProjects(ctx, map[string][]string{})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	// Start the async request for the run's associated node
+	nodesAsync := s.getNodeAsync(ctx, request.NodeId, projectFilters)
+
 	run, err := s.client.GetRun(request.GetRunId(), endTime)
 	if err != nil {
 		if sErr, ok := err.(*errors.StandardError); ok && sErr.Type == errors.RunNotFound {
@@ -206,23 +215,23 @@ func (s *CfgMgmtServer) GetNodeRun(ctx context.Context,
 		return nil, status.Errorf(codes.Internal, err.Error())
 	}
 
-	projectFilters, err := filterByProjects(ctx, map[string][]string{})
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
-	}
-
-	// Check if the user has access to the node of the run requested
-	exists, err := s.client.NodeExists(run.EntityUuid, projectFilters)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, err.Error())
-	}
-
-	// Either the user does not have permissions or the node does not exist
-	if !exists {
+	// If the requested NodeID does not match the run's associated node's ID.
+	if run.EntityUuid != request.NodeId {
 		return nil, status.Errorf(codes.NotFound, "Invalid ID")
 	}
 
-	return toResponseRun(run)
+	// Wait for the request for the run's associated node
+	getNodes := <-nodesAsync
+	if getNodes.err != nil {
+		return nil, status.Errorf(codes.Internal, getNodes.err.Error())
+	}
+
+	// Either the user does not have permissions or the node does not exist
+	if len(getNodes.nodes) == 0 {
+		return nil, status.Errorf(codes.NotFound, "Invalid ID")
+	}
+
+	return toResponseRun(run, getNodes.nodes[0])
 }
 
 func (s *CfgMgmtServer) GetSuggestions(ctx context.Context,
@@ -351,4 +360,27 @@ func stringArrayToListValue(strings []string, list *gpStruct.ListValue) error {
 		list.Values[i] = v
 	}
 	return nil
+}
+
+// getNodeAsync - Getting a single node async to allow two requests to elasticsearch at the same time.
+func (s *CfgMgmtServer) getNodeAsync(ctx context.Context, nodeID string, projectFilters map[string][]string) chan struct {
+	nodes []backend.Node
+	err   error
+} {
+	nodesChan := make(chan struct {
+		nodes []backend.Node
+		err   error
+	})
+	go func() {
+		projectFilters["entity_uuid"] = []string{nodeID}
+		nodes, err := s.client.GetNodesPageByCurser(ctx, time.Time{}, time.Time{},
+			projectFilters, nil, "", 1, "", true)
+		nodesChan <- struct {
+			nodes []backend.Node
+			err   error
+		}{nodes, err}
+		close(nodesChan)
+	}()
+
+	return nodesChan
 }

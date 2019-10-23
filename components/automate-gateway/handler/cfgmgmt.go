@@ -299,6 +299,7 @@ func toResponseRun(run *cmsRes.Run) *cfgRes.Run {
 		Resources:            toResponseResources(run.Resources),
 		Deprecations:         toResponseDeprecations(run.Deprecations),
 		Error:                toResponseError(run.Error),
+		Projects:             run.Projects,
 	}
 }
 

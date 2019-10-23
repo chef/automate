@@ -738,6 +738,12 @@ func init() {
         },
         "expanded_run_list": {
           "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ExpandedRunList"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
