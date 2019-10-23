@@ -17,9 +17,9 @@ func NewProjectsMissingError(projectsMissing []string) error {
 func (e *ProjectsMissingError) Error() string {
 	var errorStr string
 	if len(e.projectsMissing) > 1 {
-		errorStr = fmt.Sprintf("You cannot modify projects for this object because these projects did not exist: %q", e.projectsMissing)
+		errorStr = fmt.Sprintf("Projects for this object cannot be modified because these projects did not exist: %q", e.projectsMissing)
 	} else {
-		errorStr = fmt.Sprintf("You cannot modify projects for this object because project %q does not exist", e.projectsMissing)
+		errorStr = fmt.Sprintf("Projects for this object cannot be modified because project %q does not exist", e.projectsMissing)
 	}
 	return errorStr
 }
