@@ -3,7 +3,7 @@ import { describeIfIAMV2p1 } from '../../constants';
 describeIfIAMV2p1('assigning projects', () => {
   let apiToken = '';
 
-  const modifyError = 'cannot modify projects for this object';
+  const modifyError = 'Projects for this object cannot be modified';
   const cypressPrefix = 'iam-integration';
   const resource = {
     id: `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`,
@@ -11,9 +11,9 @@ describeIfIAMV2p1('assigning projects', () => {
     projects: []
   };
   const notFoundProjectId = 'not-found-project';
-  const authorizedProject1 = `${cypressPrefix}-authorized-project-1`;
-  const authorizedProject2 = `${cypressPrefix}-authorized-project-2`;
-  const unauthorizedProjectId = `${cypressPrefix}-unauthorized-project`;
+  const authorizedProject1 = `${cypressPrefix}-auth-proj-1${Cypress.moment().format('MMDDYYhhmm')}`;
+  const authorizedProject2 = `${cypressPrefix}-auth-proj-2${Cypress.moment().format('MMDDYYhhmm')}`;
+  const unauthorizedProjectId = `${cypressPrefix}-unauth${Cypress.moment().format('MMDDYYhhmm')}`;
   const policyId = `${cypressPrefix}-policy`;
   const tokenId = `${cypressPrefix}-token`;
   const iamResourcesToTest = ['roles', 'tokens', 'teams'];
