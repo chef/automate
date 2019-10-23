@@ -145,16 +145,16 @@ describe('ReportingComponent', () => {
 
     it('specific string date', () => {
       spyOn(router, 'navigate');
-      const event = {detail: '2019-10-23'};
+      const event = {detail: '2017-10-23'};
       component.onEndDateChanged(event);
-      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { end_time: '2019-10-23'}});
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { end_time: '2017-10-23'}});
     });
 
     it('specific date object', () => {
       spyOn(router, 'navigate');
-      const event = {detail: new Date('2019-10-23')};
+      const event = {detail: new Date('2017-10-23')};
       component.onEndDateChanged(event);
-      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { end_time: '2019-10-23'}});
+      expect(router.navigate).toHaveBeenCalledWith([], {queryParams: { end_time: '2017-10-23'}});
     });
   });
 
