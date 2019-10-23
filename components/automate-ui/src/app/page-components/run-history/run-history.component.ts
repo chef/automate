@@ -26,6 +26,7 @@ import {
 })
 export class RunHistoryComponent implements OnInit, OnDestroy {
 
+  @Input() nodeName: string;
   @Input() nodeId: string;
   @Input() initialRunId: string;
   @Input() initialDate: Date;

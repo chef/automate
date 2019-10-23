@@ -98,7 +98,7 @@ function createTestFixture(
       MockComponent({ selector: 'app-resources', inputs: ['nodeRun'] }),
       MockComponent({
         selector: 'app-run-history',
-        inputs: ['nodeId', 'initialRunId', 'initialDate']
+        inputs: ['nodeId', 'nodeName', 'initialRunId', 'initialDate']
       }),
       MockComponent({ selector: 'app-run-list', inputs: ['nodeRun'] }),
       MockComponent({ selector: 'app-attributes', inputs: ['nodeId'] }),

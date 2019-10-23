@@ -1,23 +1,99 @@
 @import "~styles/variables";
 @import "~styles/mixins";
 
-.history-header {
+
+#run-history-panel {
+  chef-button {
+    margin: 0;
+  }
+
+  .side-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1em;
+    background: $chef-white;
+    border-bottom: 1px solid $chef-grey;
+
+    .header-icon {
+      font-size: 2em;
+      color: $chef-dark-grey;
+    }
+
+    .header-text {
+      margin: 0 1em;
+      flex-grow: 1;
+      word-break: break-all;
+
+      p {
+        margin: 0;
+        color: $chef-dark-grey;
+      }
+    }
+  }
+}
+
+.side-panel-body-header {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 19px 35px;
+  flex-direction: column;
+  padding: 1em;
   border-bottom: 1px solid $chef-grey;
-  background-color: $chef-white;
+
+  chef-button {
+    margin: 0 1em 0 0;
+  }
+
+  p {
+    margin: 0;
+  }
 }
 
-.history-heading {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.close-button {
+.run-history-list {
   margin: 0;
+  padding: 0;
+  list-style: none;
 }
+
+.run-history-list-item {
+  border-bottom: 1px solid $chef-grey;
+  border-left: 4px solid transparent;
+  background: $chef-white;
+
+  &.selected {
+    border-left: 4px solid $chef-primary-bright;
+  }
+}
+
+.list-item-summary {
+  display: flex;
+  align-items: center;
+  padding: 1em;
+
+  chef-icon {
+    &.failure {
+      color: $chef-critical;
+    }
+
+    &.success {
+      color: $chef-success;
+    }
+  }
+
+  .list-item-text {
+    margin: 0 1em;
+    flex-grow: 1;
+
+    chef-button,
+    p {
+      margin: 0;
+    }
+
+    p {
+      line-height: 1.5;
+    }
+  }
+}
+
 
 app-date-selector {
   .date-selector .selector {
@@ -27,9 +103,9 @@ app-date-selector {
 
 .filter-selectors {
   display: flex;
-  justify-content: space-evenly;
-  align-items: stretch;
-  padding: 15px 0 0 35px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding-top: 1em;
 
   .selector {
     display: flex;
@@ -40,7 +116,8 @@ app-date-selector {
     height: 60px;
     border-color: $chef-grey;
     border-radius: 4px;
-
+    margin-right: 20px;
+    cursor: pointer;
   }
 
   .all {
@@ -60,16 +137,20 @@ app-date-selector {
     &.active {
       color: $chef-white;
       background-color: $chef-critical;
+
+      chef-icon {
+        color: $chef-white;
+      }
     }
   }
 
   .successful, .passed {
-    color: $chef-primary-bright;
+    color: $chef-success;
     background-color: $chef-white;
 
     &.active {
       color: $chef-white;
-      background-color: $chef-primary-bright;
+      background-color: $chef-success;
     }
   }
 
@@ -79,67 +160,6 @@ app-date-selector {
     &:hover, &.active {
       background-color: lighten($gray, 10%);
     }
-  }
-}
-
-.history-item {
-  @include modal-box();
-  display: block;
-  margin-bottom: .25em;
-  margin-left: 1em;
-  padding: .5em;
-  position: relative;
-  border-radius: 0;
-  cursor: pointer;
-  transition: all .2s;
-
-  &:hover {
-    margin-left: .75em;
-    margin-right: .25em;
-    transition: all .2s;
-  }
-
-  .arrow {
-    display: inline-block;
-    font-size: 1.5em;
-    left: -0.5em;
-    position: absolute;
-  }
-
-  .status {
-    display: inline-block;
-    font-size: .875em;
-    margin-right: .5em;
-    position: relative;
-
-    & > chef-icon {
-      position: relative;
-      top: 2px;
-    }
-  }
-
-  .date-time {
-    display: inline-block;
-    margin-left: 2.5em;
-    position: relative;
-    width: 80%;
-    color: $gray;
-    font-size: .625em;
-  }
-
-  .duration {
-    display: inline-block;
-    position: relative;
-    width: 80%;
-
-    p {
-      margin-bottom: 0;
-    }
-  }
-
-  > div span {
-    position: absolute;
-    right: 0;
   }
 }
 
