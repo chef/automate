@@ -44,7 +44,7 @@ export class JobEffects {
     ofType<JobCreateSuccess>(JobActionTypes.JOB_CREATE_SUCCESS),
     map((payload) => new CreateNotification({
       type: Type.info,
-      message: `Created a scan job ${payload.payload.name}.`
+      message: `Created scan job ${payload.payload.name}.`
     })));
 
   @Effect()
