@@ -35,51 +35,98 @@ In the Chef Automate UI, create an API token as described in the Chef Automate d
 
 On the systems that runs Chef Habitat, you will need to launch the habitat supervisor with the following options:
 
+```
 HAB_FEAT_EVENT_STREAM=1 hab sup run \
 --event-stream-application=MY_APP \
 --event-stream-environment=MY_ENV \
 --event-stream-site=MY_SITE \
 --event-stream-url=AUTOMATE_HOSTNAME:4222 \
 --event-stream-token=API_TOKEN
+```
 
 Replace MY_APP, MY_ENV, MY_SITE, AUTOMATE_HOSTNAME, and API_TOKEN with the appropriate values. MY_APP, MY_ENV, MY_SITE are user-defined and can be set to any string. MY_APP, MY_ENV are used to group services in the Chef Automate interface and are intended to be used to describe your applications and application lifecycle, as explained in the concepts section of this document. MY_SITE is intended to describe the physical (i.e., datacenter) or cloud-specific (i.e., AWS region) location where your services are deployed. These values are search enabled, allowing for filtering of services.
 
 ## Lifecycle management
-### Listing and Removing Disconnected Services via CLI
-A future release will enable you to manage the lifecycle of disconnected services via the UI. Currently the functionality is available only via the command line.
+A future release will enable you to manage the lifecycle of disconnected services via the UI. Currently the functionality is available via the command line and using the API directly. Using the command line will kick off a one time job to assess disconnection status or delete disconnected services. The API is used to manage the activity of periodic jobs to assess disconnection status and deletion.
 
-Disconnected services are defined as services known to the EAS Applications backend storage that have not received a health check message for a user-defined period of time. The command line tools allow you to list these services and remove them if desired.
-Listing Disconnected Services
-Usage:
-chef-automate applications list-disconnected-services [flags]
-Flags:
-  -f, --format string           Format to display data. [ json | pretty ] (default "pretty")
-  -h, --help                    help for list-disconnected-services
-  -m, --threshold-minutes int   Number of minutes since last event received (default 10)
-Examples:
-Show all services that are considered disconnected with a threshold of 10 minutes (the default):
+Disconnected services are defined as services known to the EAS Applications backend storage that have not received a health check message for a user-defined period of time.
 
-chef-automate applications list-disconnected-services
+### Periodic disconnection checks
 
-Return the results as JSON, with a threshold of 5 minutes:
+Automate assesses the status of the habitat services based on the receipt of a health check message. If a health check message has not been recieved for a configurable amount of time the service is marked as disconnected. The default amount of time is 5 minutes and this check cannot be disabled. Habitat send the health check messages every 30 seconds by default, this is also configurable.
 
-chef-automate applications list-disconnected-services \
-  --format json \
-  --threshold-minutes 5
+To configure the threshold for marking a disconnected service, you can do this via the UI or the API directly. To access the configuration settings in the UI, go to the settings tab, then Data Lifecycle on the sidebar. Under service groups you will find settings for Marking and Deleting disconnected services.
 
-### Deleting Disconnected Services
-Usage:
-chef-automate applications delete-disconnected-services [flags]
-Flags:
-  -f, --format string           Format to display data. [ json | pretty ] (default "pretty")
-  -h, --help                    help for delete-disconnected-services
-  -m, --threshold-minutes int   Number of minutes since last event received (default 10)
-  -y, --yes                     Delete services without a confirmation prompt.
-Examples:
-Delete services that are considered disconnected with a threshold of 10 minutes (the default), with an interactive confirmation prompt:
+Below is an example of using the API directly:
 
-chef-automate applications delete-disconnected-services -m 5
+```bash
+curl -sSX POST "https://automate-url/apis/v0/retention/service_groups/disconnected_services/config" -d
+'{
+  "threshold": "15m"
+}'
+-H "api-token: $TOKEN"
+```
 
-Delete services that are considered disconnected with a threshold of 5 minutes with no confirmation prompt:
+### Periodic deletion
 
-chef-automate applications delete-disconnected-services --threshold-minutes 5 --yes
+In addition to the disconnection check, services that have been disconnected for a period of time are deleted. This helps to keep the dashboard populated with the most relevent information and saves on storage space over time. By default this deletion threshold is 7 days, but can be disabled if you wish to keep the record of services forever.
+
+To configure the threshold for deleting a disconnected service, you can do this via the UI or the API directly. The threshold is the time since it was marked for deletion. You can also disable deletion by setting running to false. To access the configuration settings in the UI, go to the settings tab, then Data Lifecycle on the sidebar. Under service groups you will find settings for Marking and Deleting disconnected services.
+
+Below is an example of using the API directly:
+
+```bash
+curl -sSX POST "https://automate-url/apis/v0/retention/service_groups/delete_disconnected_services/config" -d
+'{
+  "threshold": "1d",
+  "running":true
+}'
+-H "api-token: $TOKEN"
+```
+
+## Configure encrypted communication
+
+### Disable TLS For the Event Stream Protocol
+If you do not wish to configure encrypted communication between habitat and automate you can disable TLS.
+
+On the host where Chef Automate is deployed, create a file with the following content:
+```
+[event_gateway]
+  [event_gateway.v1]
+    [event_gateway.v1.sys]
+      [event_gateway.v1.sys.service]
+        disable_frontend_tls = true
+```
+
+Save the file with any name, then run chef-automate config patch FILENAME to apply the configuration change. You should see output similar to the following:
+
+Updating deployment configuration
+
+Applying deployment configuration
+  Started event-gateway
+
+### Configure automate for encrypted communication
+
+On the host where Chef Automate is deployed, create a file with the following content:
+```
+[event_gateway]
+  [event_gateway.v1]
+    [event_gateway.v1.sys]
+      [event_gateway.v1.sys.service]
+        disable_frontend_tls = false
+```
+
+Save the file with any name, then run chef-automate config patch FILENAME to apply the configuration change. You should see output similar to the following:
+
+Updating deployment configuration
+
+Applying deployment configuration
+  Started event-gateway
+
+Once you have done that retrieve the TLS key to use for configuring your habitat supervisor.
+
+You can cat the cert file that is located at `/hab/svc/automate-load-balancer/data/<servername>.crt` to retrieve the frontend tls certificates.
+
+### Configure habitat supervisor for encrypted communication
+
+<!-- TBD -->
