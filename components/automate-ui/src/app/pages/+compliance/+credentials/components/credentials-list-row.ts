@@ -22,7 +22,7 @@ export class CredentialsListRowComponent {
   }
 
   getLastModified(lastModifiedDate): string {
-    return moment(lastModifiedDate).format(DateTime.RFC2822);
+    return moment.utc(lastModifiedDate).format(DateTime.RFC2822);
   }
 
   public startCredentialDelete(): void {

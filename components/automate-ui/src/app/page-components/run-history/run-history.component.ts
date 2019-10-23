@@ -102,20 +102,20 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
 
   // returning US date format
   renderDate(datestamp) {
-    return moment(datestamp).format('MM/DD/YY');
+    return moment.utc(datestamp).format('MM/DD/YY');
   }
 
   renderTime(datestamp) {
-    return moment(datestamp).format('HH:mm:ss');
+    return moment.utc(datestamp).format('HH:mm:ss');
   }
 
   getDuration(start_time, end_time) {
-    return moment.duration(moment(end_time).diff(moment(start_time))).humanize();
+    return moment.duration(moment.utc(end_time).diff(moment.utc(start_time))).humanize();
   }
 
   onDownloadRunsReport() {
     const format = 'csv'; // or 'json'
-    const filename = `${moment().format('YYYY-M-D')}.${format}`;
+    const filename = `${moment.utc().format('YYYY-M-D')}.${format}`;
 
     const onComplete = () => console.warn('completed downloading report');
     const onError = _e => console.error('error downloading report');
@@ -176,7 +176,7 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
   }
 
   private formatDate(dateString: string): string {
-    return moment(dateString).format('YYYY-MM-DD');
+    return moment.utc(dateString).format('YYYY-MM-DD');
   }
 
   updatePageNumber(pageNumber) {
