@@ -11,9 +11,9 @@ describeIfIAMV2p1('assigning projects', () => {
     projects: []
   };
   const notFoundProjectId = 'not-found-project';
-  const authorizedProject1 = `${cypressPrefix}-auth-proj-1${Cypress.moment().format('MMDDYYhhmm')}`;
-  const authorizedProject2 = `${cypressPrefix}-auth-proj-2${Cypress.moment().format('MMDDYYhhmm')}`;
-  const unauthorizedProjectId = `${cypressPrefix}-unauth${Cypress.moment().format('MMDDYYhhmm')}`;
+  const authorizedProject1 = `${cypressPrefix}-auth-proj-1`;
+  const authorizedProject2 = `${cypressPrefix}-auth-proj-2`;
+  const unauthorizedProjectId = `${cypressPrefix}-unauth`;
   const policyId = `${cypressPrefix}-policy`;
   const tokenId = `${cypressPrefix}-token`;
   const iamResourcesToTest = ['roles', 'tokens', 'teams'];
@@ -21,8 +21,10 @@ describeIfIAMV2p1('assigning projects', () => {
 
   before(() => {
 
-    // TODO cleanup everything in resources + projects
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+    // TODO cleanup everything in resources
+    // TODO cleanup projects in before block (can't do now bc we have a project
+    // limit and cereal runs async to delete projects)
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, iamResourcesToTest);
 
     for (const id of [unauthorizedProjectId, authorizedProject1, authorizedProject2]) {
       cy.request({
