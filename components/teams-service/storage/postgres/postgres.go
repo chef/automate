@@ -100,8 +100,8 @@ func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 		// will only return an error if authz is in v2.1 mode
 		_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
 			Subjects:    auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-			NewProjects: []string{},
-			OldProjects: projects,
+			OldProjects: []string{},
+			NewProjects: projects,
 		})
 		if err != nil {
 			// return error unaltered because it's already a GRPC status code
