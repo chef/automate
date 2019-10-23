@@ -5,8 +5,13 @@ import (
 	"fmt"
 	"os"
 	"os/user"
+	"reflect"
 	"strings"
 
+	dc "github.com/chef/automate/api/config/deployment"
+	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
+	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
+	"github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 	"github.com/chef/automate/lib/proc"
 
 	"github.com/pkg/errors"
@@ -364,168 +369,69 @@ func ConnectivityCheck(urls []string) Check {
 	}
 }
 
-type PortToCheck struct {
-	Description string
-	Port        int
-	Shared      bool
+var a1MigratePorts = []uint16{80, 443, 2133, 2134, 5432}
+
+func skippablePort(port uint16) bool {
+	for _, p := range a1MigratePorts {
+		if p == port {
+			return true
+		}
+	}
+	return false
 }
 
-var defaultRequiredPorts = []PortToCheck{
-	{
-		Description: "automate-gateway HTTP",
-		Port:        2000,
-	},
-	{
-		Description: "automate-gateway GRPC",
-		Port:        2001,
-	},
-	{
-		Description: "ingest-service",
-		Port:        2192,
-	},
-	{
-		Description: "hab-sup HTTP",
-		Port:        9631,
-	},
-	{
-		Description: "hab-sup gossip",
-		Port:        9638,
-	},
-	{
-		Description: "pg-sidecar-service",
-		Port:        10100,
-	},
-	{
-		Description: "authn-service",
-		Port:        10113,
-	},
-	{
-		Description: "UNUSED",
-		Port:        10114,
-	},
-	{
-		Description: "session-service",
-		Port:        10115,
-	},
-	{
-		Description: "dex",
-		Port:        10116,
-	},
-	{
-		Description: "dex",
-		Port:        10117,
-	},
-	{
-		Description: "UNUSED",
-		Port:        10118,
-	},
-	{
-		Description: "config-mgmt-service",
-		Port:        10119,
-	},
-	{
-		Description: "nodemanager-service",
-		Port:        10120,
-	},
-	{
-		Description: "compliance-service",
-		Port:        10121,
-	},
-	{
-		Description: "ingest-service",
-		Port:        10122,
-	},
-	{
-		Description: "es-sidecar-service",
-		Port:        10123,
-	},
-	{
-		Description: "license-control-service",
-		Port:        10124,
-	},
-	{
-		Description: "notifications-service",
-		Port:        10125,
-	},
-	{
-		Description: "local-user-service",
-		Port:        10127,
-	},
-	{
-		Description: "teams-service",
-		Port:        10128,
-	},
-	{
-		Description: "secrets-service",
-		Port:        10131,
-	},
-	{
-		Description: "applications-service",
-		Port:        10133,
-	},
-	// TODO @afiune Uncomment once this is not a feature flag
-	//{
-	//Description: "event-service NATS",
-	//Port:        10140,
-	//},
-	// @afiune Why is the event-service not here?
-	// TODO: Add it to the checks!
-	{
-		Description: "elasticsearch",
-		Port:        10141,
-	},
-	{
-		Description: "elasticsearch",
-		Port:        10142,
-	},
-	{
-		Description: "UNUSED",
-		Port:        10159,
-	},
-	{
-		Description: "deployment-service",
-		Port:        10160,
-	},
-	{
-		Description: "automate-ui",
-		Port:        10161,
-	},
-	{
-		Description: "authn-service",
-		Port:        10162,
-	},
-	{
-		Description: "automate-load-balancer",
-		Port:        80,
-		Shared:      true,
-	},
-	{
-		Description: "automate-load-balancer",
-		Port:        443,
-		Shared:      true,
-	},
-	{
-		Description: "compliance-service",
-		Port:        2133,
-		Shared:      true,
-	},
-	{
-		Description: "compliance-service",
-		Port:        2134,
-		Shared:      true,
-	},
-	{
-		Description: "postgresql",
-		Port:        5432,
-		Shared:      true,
-	},
+func requiredPortsForConfig(skipShared bool, config *dc.AutomateConfig) ([]int, error) {
+	if config == nil {
+		config = dc.DefaultAutomateConfig()
+	}
+
+	servicesToCheck, err := deployment.ExpectedServiceIDsForConfig(config.GetDeployment())
+	if err != nil {
+		return nil, err
+	}
+	servicesToCheck = append(servicesToCheck, habpkg.New("chef", "deployment-service"))
+
+	portsToCheck := make([]int, 0, len(servicesToCheck)+8)
+	// Append habitat ports, currently hard coded nearly everywhere.
+	portsToCheck = append(portsToCheck, 9631, 9638)
+	acValue := reflect.ValueOf(*config)
+	for i := 0; i < acValue.NumField(); i++ {
+		if v, ok := acValue.Field(i).Interface().(a2conf.A2ServiceConfig); ok {
+			if hasServiceByName(servicesToCheck, v.ServiceName()) {
+				ports := v.ListPorts()
+				for _, p := range ports {
+					portVal, err := v.GetPort(p.Name)
+					if err != nil {
+						return nil, err
+					}
+					if portVal != 0 && !(skipShared && skippablePort(portVal)) {
+						portsToCheck = append(portsToCheck, int(portVal))
+					}
+				}
+			}
+		}
+	}
+	return portsToCheck, nil
 }
 
-func DefaultPortCheck(skipShared bool) Check {
-	return PortCheck(defaultRequiredPorts, skipShared)
+func hasServiceByName(c []habpkg.HabPkg, name string) bool {
+	for _, s := range c {
+		if s.Name() == name {
+			return true
+		}
+	}
+	return false
 }
 
-func PortCheck(portsToCheck []PortToCheck, skipShared bool) Check {
+func DefaultPortCheck(skipShared bool, config *dc.AutomateConfig) (Check, error) {
+	portsToCheck, err := requiredPortsForConfig(skipShared, config)
+	if err != nil {
+		return noopCheck, err
+	}
+	return PortCheck(portsToCheck), nil
+}
+
+func PortCheck(portsToCheck []int) Check {
 	return Check{
 		Name: "ports_free",
 		TestFunc: func(t TestProbe) error {
@@ -553,13 +459,9 @@ func PortCheck(portsToCheck []PortToCheck, skipShared bool) Check {
 
 			failed := false
 			for _, p := range portsToCheck {
-				if skipShared && p.Shared {
-					logrus.Debugf("skipping shared port check %s(%d)", p.Description, p.Port)
-					continue
-				}
-				if usedPorts[p.Port] {
+				if usedPorts[p] {
 					failed = true
-					t.ReportFailure(fmt.Sprintf("required port %d in use", p.Port))
+					t.ReportFailure(fmt.Sprintf("required port %d in use", p))
 				}
 			}
 

@@ -2,6 +2,9 @@ package preflight
 
 import (
 	"github.com/pkg/errors"
+
+	"github.com/chef/automate/api/config/deployment"
+	dc "github.com/chef/automate/api/config/deployment"
 )
 
 type Check struct {
@@ -18,12 +21,14 @@ type DeployPreflightCheckOptions struct {
 	SkipSharedPortCheck bool
 	SkipA2DeployedCheck bool
 	Airgap              bool
+	AutomateConfig      *dc.AutomateConfig
 }
 
 type DeployPreflightChecker struct {
 	skipSharedPorts     bool
 	skipA2DeployedCheck bool
 	airgap              bool
+	automateConfig      *deployment.AutomateConfig
 }
 
 func NewDeployPreflightChecker(opts DeployPreflightCheckOptions) *DeployPreflightChecker {
@@ -31,11 +36,15 @@ func NewDeployPreflightChecker(opts DeployPreflightCheckOptions) *DeployPrefligh
 		skipSharedPorts:     opts.SkipSharedPortCheck,
 		skipA2DeployedCheck: opts.SkipA2DeployedCheck,
 		airgap:              opts.Airgap,
+		automateConfig:      opts.AutomateConfig,
 	}
 }
 
 func (c *DeployPreflightChecker) Run(probe TestProbe) error {
-	portCheck := DefaultPortCheck(c.skipSharedPorts)
+	portCheck, err := DefaultPortCheck(c.skipSharedPorts, c.automateConfig)
+	if err != nil {
+		return errors.Wrap(err, "failed to configure preflight checks")
+	}
 	isA2DeployedCheck := IsA2DeployedCheck(&portCheck)
 	chefAutomateInBinCheck := CLIInBin()
 	connectivityCheck := DefaultConnectivityCheck()
