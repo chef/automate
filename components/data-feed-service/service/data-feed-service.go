@@ -5,11 +5,16 @@ import (
 	"compress/gzip"
 	"context"
 	"encoding/json"
+	"fmt"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+
+	cfgmgmtRequest "github.com/chef/automate/api/interservice/cfgmgmt/request"
+	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	rrule "github.com/teambition/rrule-go"
 
 	secrets "github.com/chef/automate/api/external/secrets"
@@ -69,6 +74,11 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		return err
 	}
 
+	dataFeedListReportsTask, err := NewDataFeedListReportsTask(dataFeedConfig, connFactory)
+	if err != nil {
+		return err
+	}
+
 	dataFeedClientTask, err := NewDataFeedClientTask(dataFeedConfig, connFactory)
 	if err != nil {
 		return err
@@ -93,6 +103,12 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 	if err != nil {
 		return err
 	}
+	err = manager.RegisterTaskExecutor(dataFeedListReportsTaskName, dataFeedListReportsTask, cereal.TaskExecutorOpts{
+		Workers: 1,
+	})
+	if err != nil {
+		return err
+	}
 	err = manager.RegisterTaskExecutor(dataFeedClientTaskName, dataFeedClientTask, cereal.TaskExecutorOpts{
 		Workers: 1,
 	})
@@ -102,6 +118,9 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 	err = manager.RegisterTaskExecutor(dataFeedComplianceTaskName, dataFeedComplianceTask, cereal.TaskExecutorOpts{
 		Workers: 1,
 	})
+	if err != nil {
+		return err
+	}
 	err = manager.RegisterTaskExecutor(dataFeedNotifierTaskName, dataFeedNotifierTask, cereal.TaskExecutorOpts{
 		Workers: 1,
 	})
@@ -126,16 +145,13 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		NextFeedStart:   zeroTime,
 		NextFeedEnd:     zeroTime,
 	}
-	dataFeedClientTaskParams := DataFeedClientTaskParams{NodeIDs: []string{}}
-	dataFeedComplianceTaskParams := DataFeedComplianceTaskParams{}
-	log.Infof("dataFeedComplianceTaskParams %v", dataFeedComplianceTaskParams)
-	dataFeedWorkflowParams := DataFeedWorkflowParams{PollTaskParams: dataFeedTaskParams, ClientTaskParams: dataFeedClientTaskParams, ComplianceTaskParams: dataFeedComplianceTaskParams}
+
+	dataFeedWorkflowParams := DataFeedWorkflowParams{PollTaskParams: dataFeedTaskParams}
 
 	err = manager.CreateWorkflowSchedule(context.Background(),
 		dataFeedScheduleName, dataFeedWorkflowName,
 		dataFeedWorkflowParams, true, r)
 	if err == cereal.ErrWorkflowScheduleExists {
-		// TODO(ssd) 2019-09-09: Right now this resets Dtstart on the recurrence, do we want that?
 		err = manager.UpdateWorkflowScheduleByName(context.Background(), dataFeedScheduleName, dataFeedWorkflowName,
 			cereal.UpdateParameters(dataFeedWorkflowParams),
 			cereal.UpdateEnabled(true),
@@ -225,4 +241,93 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 		log.Warnf("Error clsoing response body %v", err)
 	}
 	return nil
+}
+
+func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (datafeedMessage, error) {
+
+	nodeFilters := &cfgmgmtRequest.Nodes{Filter: filters}
+	nodes, err := client.GetNodes(ctx, nodeFilters)
+	if err != nil {
+		log.Errorf("Error getting cfgmgmt/nodes %v", err)
+		return datafeedMessage{}, err
+	}
+
+	nodeStruct := nodes.Values[0].GetStructValue()
+	id := nodeStruct.Fields["id"].GetStringValue()
+	lastRunId := nodeStruct.Fields["latest_run_id"].GetStringValue()
+	nodeAttributes, err := client.GetAttributes(ctx, &cfgmgmtRequest.Node{NodeId: id})
+	if err != nil {
+		log.Errorf("Error getting attributes %v", err)
+		return datafeedMessage{}, err
+	}
+	var automaticJson map[string]interface{}
+	err = json.Unmarshal([]byte(nodeAttributes.Automatic), &automaticJson)
+	if err != nil {
+		log.Errorf("Could not parse automatic attributes from json: %v", err)
+		return datafeedMessage{}, err
+	}
+	attributesJson := buildDynamicJson(automaticJson)
+
+	lastRun, err := client.GetNodeRun(ctx, &cfgmgmtRequest.NodeRun{NodeId: id, RunId: lastRunId})
+
+	if err != nil {
+		log.Errorf("Error getting node run %v", err)
+		return datafeedMessage{}, err
+	} else {
+		log.Debugf("Last run\n %v", lastRun)
+	}
+
+	return datafeedMessage{Automatic: attributesJson, LastRun: lastRun}, nil
+}
+
+func buildDynamicJson(automaticJson map[string]interface{}) map[string]interface{} {
+	// check what format he json is e.g. ubuntu/ windows
+	// remove specific sections
+	// insert normalised
+	var dynamicJson map[string]interface{}
+	if automaticJson["lsb"] != nil {
+		dynamicJson = buildUbuntuJson(automaticJson)
+	} else if automaticJson["os"] == "windows" {
+		dynamicJson = buildWindowsJson(automaticJson)
+	}
+
+	return dynamicJson
+}
+
+func buildUbuntuJson(ubuntuJson map[string]interface{}) map[string]interface{} {
+	// check what format he json is e.g. ubuntu/ windows
+	// remove specific sections
+	// insert normalised
+
+	lsb := ubuntuJson["lsb"].(map[string]interface{})
+	ubuntuJson["description"] = lsb["description"]
+
+	dmi := ubuntuJson["dmi"].(map[string]interface{})
+	system := dmi["system"].(map[string]interface{})
+	ubuntuJson["serial_number"] = system["serial_number"]
+
+	//delete(ubuntuJson, "lsb")
+	//delete(ubuntuJson, "system")
+
+	return ubuntuJson
+}
+
+func buildWindowsJson(windowsJson map[string]interface{}) map[string]interface{} {
+	// check what format he json is e.g. ubuntu/ windows
+	// remove specific sections
+	// insert normalised
+
+	kernel := windowsJson["kernel"].(map[string]interface{})
+	windowsJson["description"] = kernel["name"]
+	osInfo := kernel["os_info"].(map[string]interface{})
+	windowsJson["serial_number"] = osInfo["serial_number"]
+	servicePackMajorVersion := fmt.Sprintf("%g", osInfo["service_pack_major_version"].(float64))
+	servicePackMinorVersion := fmt.Sprintf("%g", osInfo["service_pack_minor_version"].(float64))
+	servicePack := strings.Join([]string{servicePackMajorVersion, servicePackMinorVersion}, ".")
+	windowsJson["os_service_pack"] = servicePack
+
+	//delete(windowsJson, "kernel")
+	// TODO we could get the chassis from the kernel attributes
+
+	return windowsJson
 }
