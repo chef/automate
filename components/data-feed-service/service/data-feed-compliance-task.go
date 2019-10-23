@@ -2,8 +2,6 @@ package service
 
 import (
 	"context"
-	"strings"
-	"time"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -22,12 +20,6 @@ var (
 type DataFeedComplianceTask struct {
 	cfgMgmt   cfgmgmt.CfgMgmtClient
 	reporting reporting.ReportingServiceClient
-}
-
-type DataFeedComplianceTaskParams struct {
-	DataFeedMessages map[string]datafeedMessage
-	FeedStart        time.Time
-	FeedEnd          time.Time
 }
 
 type DataFeedComplianceTaskResults struct {
@@ -59,83 +51,35 @@ func (d *DataFeedComplianceTask) Run(ctx context.Context, task cereal.Task) (int
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse task parameters")
 	}
-	log.Infof("DataFeedComplianceTask.Run %v", params.ComplianceTaskParams)
-	d.buildReportFeed(ctx, params.PollTaskParams.AssetPageSize, params.ComplianceTaskParams.FeedStart, params.ComplianceTaskParams.FeedEnd, params.ComplianceTaskParams.DataFeedMessages)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to build chef compliance data")
-	}
-	return &DataFeedComplianceTaskResults{DataFeedMessages: params.ComplianceTaskParams.DataFeedMessages}, nil
+	log.Debugf("DataFeedComplianceTask.Run %v", params)
+	dataFeedMessages := d.buildReportFeed(ctx, params.NodeIDs)
+
+	return &DataFeedComplianceTaskResults{DataFeedMessages: dataFeedMessages}, nil
 }
 
-func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, pageSize int32, feedStartTime time.Time, feedEndTime time.Time, datafeedMessages map[string]datafeedMessage) {
-	feedStartString := strings.SplitAfter(feedStartTime.Format(time.RFC3339), "Z")[0]
-	feedEndString := strings.SplitAfter(feedEndTime.Format(time.RFC3339), "Z")[0]
-	log.Infof("Building report feed... %v - %v", feedStartString, feedEndString)
+func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, nodeIDs map[string]NodeIDs) map[string]datafeedMessage {
+	dataFeedMessages := make(map[string]datafeedMessage)
+	for ipaddress, nodeID := range nodeIDs {
+		log.Debugf("nodeIDs has ipaddress %v", ipaddress)
 
-	startFilter := &reporting.ListFilter{Type: "start_time", Values: []string{feedStartString}}
-	endFilter := &reporting.ListFilter{Type: "end_time", Values: []string{feedEndString}}
+		// the node hasn't had a client run in last window, but has a report so we can add the report
+		id := &reporting.Query{Id: nodeID.ComplianceID}
 
-	filters := []*reporting.ListFilter{startFilter, endFilter}
-
-	// page is not something we can configure we should start with
-	// page at 1 and work out how many calls to make based on page
-	// size divide the total by page size and add 1 and we loop
-	// over that
-	page := int32(1)
-	query := &reporting.Query{
-		Page:    page,
-		PerPage: pageSize,
-		Filters: filters,
-		Sort:    "latest_report.end_time",
-		Order:   reporting.Query_DESC,
-	}
-	log.Debugf("report query %v", query)
-
-	reports, err := d.reporting.ListReports(ctx, query)
-	if err != nil {
-		log.Errorf("Error getting reporting/ListReports %v", err)
-	}
-
-	pages := (reports.Total / pageSize)
-	if (reports.Total % pageSize) != 0 {
-		pages++
-	}
-	log.Debugf("Total reports: %v, reports per page: %v, total pages %v: ",
-		reports.Total, pageSize, pages)
-
-	// get reports from the pages
-	for page <= pages {
-		log.Debugf("report query %v", query)
-		for report := range reports.Reports {
-			ipaddress := reports.Reports[report].Ipaddress
-			log.Debugf("report has ipaddress %v", ipaddress)
-			if _, ok := datafeedMessages[ipaddress]; ok {
-				log.Debugf("node data already exists for %v", ipaddress)
-			} else {
-				// the node hasn't had a client run in last window, but has a report so we can add the report
-				id := &reporting.Query{Id: reports.Reports[report].Id}
-
-				fullReport, err := d.reporting.ReadReport(ctx, id)
-				if err != nil {
-					log.Debugf("Error getting report by if %v", err)
-					//TODO
-				}
-				filters := []string{"ipaddress:" + ipaddress}
-				// node the latest node data associated with this report
-				message, err := getNodeData(ctx, d.cfgMgmt, filters)
-				message.Report = fullReport
-				datafeedMessages[ipaddress] = message
-			}
-
-		}
-		page++
-		query = &reporting.Query{
-			Page:    page,
-			PerPage: pageSize,
-			Filters: filters}
-		reports, err = d.reporting.ListReports(ctx, query)
+		fullReport, err := d.reporting.ReadReport(ctx, id)
 		if err != nil {
-			log.Errorf("Error getting reporting/ListReports %v", err)
+			log.Errorf("Error getting report by if %v", err)
+			//TODO
 		}
+		filters := []string{"ipaddress:" + ipaddress}
+		// node the latest node data associated with this report
+		message, err := getNodeData(ctx, d.cfgMgmt, filters)
+		if err != nil {
+			// TODO
+			log.Errorf("Error getting node data %v", err)
+		}
+		message.Report = fullReport
+		dataFeedMessages[ipaddress] = message
+
 	}
+	return dataFeedMessages
 }

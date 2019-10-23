@@ -22,4 +22,5 @@ message InventoryNode {
 	google.protobuf.Timestamp last_ccr_received = 10;
 	string name                                 = 11;
 	string fqdn                                 = 12;
+	string ipaddress                            = 13;
 }

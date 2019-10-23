@@ -22,6 +22,12 @@ test:
 	GOMAXPROCS=4 go test -v -covermode=atomic -coverprofile=.cover/cover.out ./...
 	go tool cover -html=.cover/cover.out -o .cover/coverage.html
 
+imports:
+	goimports -w -l ./
+
+vet:
+	go vet $(GOFILES)
+
 run:
 	go run cmd/data-feed-service/data-feed-service.go serve --config config.dev.toml
 

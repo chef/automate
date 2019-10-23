@@ -22,10 +22,6 @@ type DataFeedNotifierTask struct {
 	db      *dao.DB
 }
 
-type DataFeedNotifierTaskParams struct {
-	DataFeedMessages map[string]datafeedMessage
-}
-
 type DataFeedNotifierTaskResults struct {
 }
 
@@ -49,8 +45,8 @@ func (d *DataFeedNotifierTask) Run(ctx context.Context, task cereal.Task) (inter
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse task parameters")
 	}
-	log.Infof("DataFeedNotifierTask.Run %v", params)
-	datafeedMessages := params.NotifierTaskParams.DataFeedMessages
+	log.Debugf("DataFeedNotifierTask.Run %v", params)
+	datafeedMessages := params.DataFeedMessages
 	data := make([]datafeedMessage, 0, len(datafeedMessages))
 	for _, value := range datafeedMessages {
 		data = append(data, value)
@@ -61,6 +57,9 @@ func (d *DataFeedNotifierTask) Run(ctx context.Context, task cereal.Task) (inter
 	}
 
 	destinations, err := d.db.ListDBDestinations()
+	if err != nil {
+		return nil, err
+	}
 	for destination := range destinations {
 		log.Debugf("Destination name %v", destinations[destination].Name)
 		log.Debugf("Destination url %v", destinations[destination].URL)
@@ -78,7 +77,7 @@ func (d *DataFeedNotifierTask) Run(ctx context.Context, task cereal.Task) (inter
 			client := NewDataClient()
 			err = send(client, notification)
 			if err != nil {
-				handleSendErr(notification, params.ComplianceTaskParams.FeedStart, params.ComplianceTaskParams.FeedEnd, err)
+				handleSendErr(notification, params.FeedStart, params.FeedEnd, err)
 			}
 		}
 	}

@@ -18,25 +18,27 @@ type DataFeedWorkflowExecutor struct {
 }
 
 type DataFeedWorkflowParams struct {
-	PollTaskParams       DataFeedPollTaskParams
-	ClientTaskParams     DataFeedClientTaskParams
-	ComplianceTaskParams DataFeedComplianceTaskParams
-	NotifierTaskParams   DataFeedNotifierTaskParams
+	NodeIDs          map[string]NodeIDs
+	FeedStart        time.Time
+	FeedEnd          time.Time
+	PollTaskParams   DataFeedPollTaskParams
+	DataFeedMessages map[string]datafeedMessage
 }
 
 type DataFeedWorkflowPayload struct {
-	TasksComplete          bool
-	PollTaskComplete       bool
-	ClientTaskComplete     bool
-	ComplianceTaskComplete bool
-	NotifierTaskComplete   bool
-	NodeIDs                []string
-	ComplianceTaskParams   DataFeedComplianceTaskParams
+	TasksComplete           bool
+	PollTaskComplete        bool
+	ListReportsTaskComplete bool
+	ClientTaskComplete      bool
+	ComplianceTaskComplete  bool
+	NotifierTaskComplete    bool
+	NodeIDs                 map[string]NodeIDs
+	DataFeedMessages        map[string]datafeedMessage
 }
 
 func (e *DataFeedWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
 	params := DataFeedWorkflowParams{}
-	log.Infof("OnStart params %v", params)
+	log.Debugf("OnStart params %v", params)
 	err := w.GetParameters(&params)
 	if err != nil {
 		return w.Fail(err)
@@ -58,7 +60,7 @@ func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev 
 		return w.Fail(err)
 	}
 
-	log.Infof("OnTaskComplete params: %v", params)
+	log.Debugf("OnTaskComplete params: %v", params)
 	payload := DataFeedWorkflowPayload{}
 	err = w.GetPayload(&payload)
 	if err != nil {
@@ -73,58 +75,86 @@ func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev 
 		}
 		payload.NodeIDs = taskResults.NodeIDs
 		payload.PollTaskComplete = true
-		params.ClientTaskParams.NodeIDs = payload.NodeIDs
-		params.ComplianceTaskParams.FeedStart = taskResults.FeedStart
-		params.ComplianceTaskParams.FeedEnd = taskResults.FeedEnd
-		payload.ComplianceTaskParams = params.ComplianceTaskParams
-		err = w.EnqueueTask(dataFeedClientTaskName, params)
+		params.NodeIDs = payload.NodeIDs
+		params.FeedStart = taskResults.FeedStart
+		params.FeedEnd = taskResults.FeedEnd
+		err = w.EnqueueTask(dataFeedListReportsTaskName, params)
 		if err != nil {
 			return w.Fail(err)
 		}
-		log.Infof("PollTaskComplete %v, complete: %v, time: %v", dataFeedPollTaskName, payload.PollTaskComplete, time.Now())
-
-	case dataFeedClientTaskName.String():
-		if payload.PollTaskComplete == false {
-			log.Infof("data-feed-poll has not completed yet, are we called first? enqueue data-feed-client again")
+		log.Debugf("PollTaskComplete %v, complete: %v, time: %v", dataFeedPollTaskName, payload.PollTaskComplete, time.Now())
+	case dataFeedListReportsTaskName.String():
+		taskResults, err := getListReportsTaskResults(ev)
+		if err != nil {
+			return w.Fail(err)
+		}
+		payload.NodeIDs = taskResults.NodeIDs
+		params.NodeIDs = payload.NodeIDs
+		payload.PollTaskComplete = true
+		// should only enqueue if len nodes > 0
+		if len(payload.NodeIDs) > 0 {
 			err = w.EnqueueTask(dataFeedClientTaskName, params)
 			if err != nil {
 				return w.Fail(err)
 			}
 		} else {
-			log.Infof("data-feed-poll has completed get client results %v", params)
-			taskResults, err := getClientTaskResults(ev)
-			if err != nil {
-				return w.Fail(err)
-			}
-			payload.ComplianceTaskParams.DataFeedMessages = taskResults.DataFeedMessages
+			// no new data at all
+			payload.PollTaskComplete = true
+			payload.ListReportsTaskComplete = true
 			payload.ClientTaskComplete = true
-			params.ComplianceTaskParams = payload.ComplianceTaskParams
+			payload.ComplianceTaskComplete = true
+			payload.NotifierTaskComplete = true
+			log.Debugf("No new client data or reports found")
+		}
+		payload.ListReportsTaskComplete = true
+		log.Debugf("ListReportsTaskComplete %v, complete: %v, time: %v", dataFeedListReportsTaskName, payload.ListReportsTaskComplete, time.Now())
+	case dataFeedClientTaskName.String():
+		taskResults, err := getClientTaskResults(ev)
+		if err != nil {
+			return w.Fail(err)
+		}
+		payload.NodeIDs = taskResults.NodeIDs
+		params.NodeIDs = payload.NodeIDs
+		payload.DataFeedMessages = taskResults.DataFeedMessages
+		payload.ClientTaskComplete = true
+		if len(payload.NodeIDs) > 0 {
 			err = w.EnqueueTask(dataFeedComplianceTaskName, params)
 			if err != nil {
 				return w.Fail(err)
 			}
+		} else {
+			// no reports to aggregate from the interval send the feed
+			payload.ComplianceTaskComplete = true
+			params.DataFeedMessages = payload.DataFeedMessages
+			err = w.EnqueueTask(dataFeedNotifierTaskName, params)
+			if err != nil {
+				return w.Fail(err)
+			}
 		}
-		log.Infof("ClientTaskComplete %v, complete: %v, time: %v", dataFeedClientTaskName, payload.ClientTaskComplete, time.Now())
+		log.Debugf("ClientTaskComplete %v, complete: %v, time: %v", dataFeedClientTaskName, payload.ClientTaskComplete, time.Now())
 	case dataFeedComplianceTaskName.String():
-		log.Infof("data-feed-compliance task in OnTaskComplete")
+		log.Debugf("data-feed-compliance task in OnTaskComplete")
 		taskResults, err := getComplianceTaskResults(ev)
 		if err != nil {
 			return w.Fail(err)
 		}
 		payload.ComplianceTaskComplete = true
-		params.NotifierTaskParams.DataFeedMessages = taskResults.DataFeedMessages
+		for ip, dataFeedMessage := range taskResults.DataFeedMessages {
+			payload.DataFeedMessages[ip] = dataFeedMessage
+		}
+		params.DataFeedMessages = payload.DataFeedMessages
 		err = w.EnqueueTask(dataFeedNotifierTaskName, params)
 		if err != nil {
 			return w.Fail(err)
 		}
-		log.Infof("ComplianceTaskComplete %v, complete: %v, time: %v", dataFeedComplianceTaskName, payload.ComplianceTaskComplete, time.Now())
+		log.Debugf("ComplianceTaskComplete %v, complete: %v, time: %v", dataFeedComplianceTaskName, payload.ComplianceTaskComplete, time.Now())
 	case dataFeedNotifierTaskName.String():
 		payload.NotifierTaskComplete = true
-		log.Infof("NotifierTaskComplete %v, complete: %v, time: %v", dataFeedNotifierTaskName, payload.NotifierTaskComplete, time.Now())
+		log.Debugf("NotifierTaskComplete %v, complete: %v, time: %v", dataFeedNotifierTaskName, payload.NotifierTaskComplete, time.Now())
 	}
 
-	payload.TasksComplete = payload.PollTaskComplete && payload.ClientTaskComplete && payload.ComplianceTaskComplete && payload.NotifierTaskComplete
-	log.Infof("TasksComplete %v, complete: %v", ev.TaskName, payload.TasksComplete)
+	payload.TasksComplete = payload.PollTaskComplete && payload.ListReportsTaskComplete && payload.ClientTaskComplete && payload.ComplianceTaskComplete && payload.NotifierTaskComplete
+	log.Debugf("TasksComplete %v, complete: %v", ev.TaskName, payload.TasksComplete)
 	if payload.TasksComplete {
 		return w.Complete()
 	}
@@ -139,14 +169,21 @@ func (e *DataFeedWorkflowExecutor) OnCancel(w cereal.WorkflowInstance, ev cereal
 func getPollTaskResults(ev cereal.TaskCompleteEvent) (DataFeedPollTaskResults, error) {
 	taskResults := DataFeedPollTaskResults{}
 	err := ev.Result.Get(&taskResults)
-	log.Infof("Task results %v", taskResults)
+	log.Debugf("Poll task results %v", taskResults)
+	return taskResults, err
+}
+
+func getListReportsTaskResults(ev cereal.TaskCompleteEvent) (DataFeedListReportsTaskResults, error) {
+	taskResults := DataFeedListReportsTaskResults{}
+	err := ev.Result.Get(&taskResults)
+	log.Debugf("List Reports Task results %v", taskResults)
 	return taskResults, err
 }
 
 func getClientTaskResults(ev cereal.TaskCompleteEvent) (DataFeedClientTaskResults, error) {
 	taskResults := DataFeedClientTaskResults{}
 	err := ev.Result.Get(&taskResults)
-	log.Infof("Client task result %v", taskResults)
+	log.Debugf("Client task result %v", taskResults)
 	return taskResults, err
 
 }
@@ -154,6 +191,6 @@ func getClientTaskResults(ev cereal.TaskCompleteEvent) (DataFeedClientTaskResult
 func getComplianceTaskResults(ev cereal.TaskCompleteEvent) (DataFeedComplianceTaskResults, error) {
 	taskResults := DataFeedComplianceTaskResults{}
 	err := ev.Result.Get(&taskResults)
-	log.Infof("Compliance task result %v", taskResults)
+	log.Debugf("Compliance task result %v", taskResults)
 	return taskResults, err
 }
