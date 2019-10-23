@@ -165,7 +165,7 @@
     </main>
   </div>
 
-<chef-modal label="url-modal-label" [visible]="urlStatusModalVisible" (close)="closeModal('url')">
+<chef-modal label="url-modal-label" [visible]="urlStatusModalVisible" (closeModal)="closeModal('url')">
   <div class="status-modal">
     <ng-container *ngIf="hookStatus === urlState.Failure">
       <div class="status-icon failure">
@@ -190,7 +190,7 @@
   </div>
 </chef-modal>
 
-<chef-modal label="save-modal-label" [visible]="saveStatusModalVisible" (close)="closeModal('save')">
+<chef-modal label="save-modal-label" [visible]="saveStatusModalVisible" (closeModal)="closeModal('save')">
   <div class="status-modal">
     <ng-container *ngIf="saveStatus === saveState.Failure">
       <div class="status-icon failure">

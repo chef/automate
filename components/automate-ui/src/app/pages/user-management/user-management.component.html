@@ -16,7 +16,7 @@
       <chef-subheading>Chef Automate only displays local users.</chef-subheading>
     </chef-page-header>
 
-    <chef-modal label="create-user-label" class="user-modal" [visible]="createModalVisible" (close)="closeCreateModal()">
+    <chef-modal label="create-user-label" class="user-modal" [visible]="createModalVisible" (closeModal)="closeCreateModal()">
       <h2 id="create-user-label" class="title" slot="title">
         Create User
       </h2>

@@ -91,7 +91,7 @@ export class ChefModal {
   /**
    * Emitted when the modal closes.
    */
-  @Event() close: EventEmitter;
+  @Event() closeModal: EventEmitter;
 
   /**
    * The html element of the modal.
@@ -166,7 +166,7 @@ export class ChefModal {
 
   private handleClose() {
     if (!this.locked) {
-      this.close.emit();
+      this.closeModal.emit();
 
       // return focus to last focused element on page before modal opened
       if (this.prevFocusedElement) {

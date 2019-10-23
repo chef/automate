@@ -12,7 +12,7 @@
   (confirm)="addMembers()"
   (close)="closePage()">
     <div *ngIf="!loading">
-      <chef-modal label="member-expression-label" class="member-expression-modal" [visible]="modalVisible" (close)="closeModal()">
+      <chef-modal label="member-expression-label" class="member-expression-modal" [visible]="modalVisible" (closeModal)="closeModal()">
         <h2>Add Member Expression</h2>
         <div id="modal-content-container">
           <form [formGroup]="expressionForm">

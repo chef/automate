@@ -8,7 +8,7 @@
   <!-- {{nodesSelectedForDelete.size }} item{{ nodesSelectedForDelete.size | i18nPlural: pluralMapping }} selected -->
 </span>
 
-<chef-modal label="confirm-delete-modal-label" [visible]="deleteConfirmModalVisible" (close)="closeModal(false)">
+<chef-modal label="confirm-delete-modal-label" [visible]="deleteConfirmModalVisible" (closeModal)="closeModal(false)">
   <div class="status-modal">
     <h2 id="confirm-delete-modal-label" class="status-modal-heading">Warning</h2>
     <p>
