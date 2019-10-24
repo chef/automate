@@ -35,19 +35,25 @@
           <div class="name-container">
             <chef-form-field>
               <label for="firstName">First Name *</label>
-              <input chefInput name="firstName" id="firstName" formControlName="firstName" type="text" autofocus placeholder="First Name">
+              <div class="suggester-input-wrapper">
+                <input chefInput name="firstName" id="firstName" formControlName="firstName" type="text" autofocus placeholder="First Name">
+              </div>
               <chef-error *ngIf="trialForm.get('firstName').hasError('required') && trialForm.get('firstName').dirty">First name required.</chef-error>
             </chef-form-field>
             <chef-form-field>
               <label for="firstName">Last Name *</label>
-              <input chefInput name="lastName" id="lastName" formControlName="lastName" type="text" placeholder="Last Name">
-              <chef-error *ngIf="trialForm.get('lastName').hasError('required') && trialForm.get('lastName').dirty">Last name required.</chef-error>
+              <div class="suggester-input-wrapper">
+                <input chefInput name="lastName" id="lastName" formControlName="lastName" type="text" placeholder="Last Name">
+              </div>
+                <chef-error *ngIf="trialForm.get('lastName').hasError('required') && trialForm.get('lastName').dirty">Last name required.</chef-error>
             </chef-form-field>
           </div>
           <div class="email-container">
             <chef-form-field>
               <label for="email">Email *</label>
-              <input chefInput name="email" id="email" formControlName="email" type="text" placeholder="Email">
+              <div class="suggester-input-wrapper">
+                <input chefInput name="email" id="email" formControlName="email" type="text" placeholder="Email">
+              </div>
               <chef-error *ngIf="trialForm.get('email').hasError('email') && trialForm.get('email').dirty">Valid email required.</chef-error>
             </chef-form-field>
           </div>

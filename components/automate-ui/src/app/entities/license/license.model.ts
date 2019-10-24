@@ -1,3 +1,6 @@
+import { HttpErrorResponse } from '@angular/common/http';
+import { EntityStatus } from '../entities';
+import { LicenseStatus } from './license.model';
 import * as moment from 'moment';
 import { DateTime } from '../../helpers/datetime/datetime';
 
@@ -56,6 +59,27 @@ export interface RequestLicenseResponse {
   // NB: Keep in sync with automate-gateway/api/license/license.proto:RequestLicenseResp.
   license: string;
   status: LicenseStatus;
+}
+
+export interface FetchStatus {
+  license: LicenseStatus;
+  status: EntityStatus;
+  expiryMessage: string;
+  errorResp: HttpErrorResponse;
+}
+
+export interface ApplyStatus {
+  status: EntityStatus;
+  errorResp: HttpErrorResponse;
+}
+
+export interface RequestStatus {
+  status: EntityStatus;
+  errorResp: HttpErrorResponse;
+}
+
+export interface TriggerWelcomeStatus {
+  status: EntityStatus;
 }
 
 export function parsedExpirationDate(license: LicenseStatus): string {

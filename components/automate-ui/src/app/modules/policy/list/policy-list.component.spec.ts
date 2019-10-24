@@ -18,6 +18,7 @@ describe('PolicyListComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'app-settings-sidebar' }),
+        MockComponent({ selector: 'app-chef-notifications' }),
         MockComponent({ selector: 'app-authorized', inputs: ['allOf'] }),
         MockComponent({
           selector: 'app-delete-object-modal',

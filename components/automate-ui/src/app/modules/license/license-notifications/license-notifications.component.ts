@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { Observable } from 'rxjs';
 
-import { LicenseFacadeService } from 'app/entities/license/license.facade';
+import { LicenseFacadeService, LicenseApplyReason } from 'app/entities/license/license.facade';
 import { Notification } from 'app/entities/notifications/notification.model';
 
 @Component({
@@ -10,6 +10,8 @@ import { Notification } from 'app/entities/notifications/notification.model';
   styleUrls: ['./license-notifications.component.scss']
 })
 export class LicenseNotificationsComponent {
+  @Output() triggerApplyLicense = new EventEmitter<LicenseApplyReason>();
+
   notifications$: Observable<Notification[]>;
 
   constructor(
@@ -23,6 +25,7 @@ export class LicenseNotificationsComponent {
   }
 
   onTriggerBannerLicenseApply(): void {
-    this.licenseFacade.updateLicenseApplyReason();
+    this.licenseFacade.updateLicenseApplyReason(LicenseApplyReason.LICENSE_ABOUT_TO_EXPIRE);
+    this.triggerApplyLicense.emit();
   }
 }

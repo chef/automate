@@ -1,65 +1,68 @@
-<div *ngIf="permissionDenied" class="permission-denied-banner">
-  <p>You do not have permission to view everything on this page.</p>
-  <p>Please contact an administrator for permission.</p>
-</div>
+<div class="app-main-container">
+  <div *ngIf="permissionDenied" class="permission-denied-banner">
+    <p>You do not have permission to view everything on this page.</p>
+    <p>Please contact an administrator for permission.</p>
+  </div>
 
-<app-settings-sidebar></app-settings-sidebar>
-<div class="container">
-  <main>
-    <chef-page-header [contrasting-background]="false">
-      <chef-heading>Data Feed Destinations</chef-heading>
-      <chef-subheading>Data Feed Destinations for bulk client data and compliance reports.</chef-subheading>
-    </chef-page-header>
+  <app-settings-sidebar></app-settings-sidebar>
+  <div class="container">
+    <app-chef-notifications></app-chef-notifications>
+    <main>
+      <chef-page-header [contrasting-background]="false">
+        <chef-heading>Data Feed Destinations</chef-heading>
+        <chef-subheading>Data Feed Destinations for bulk client data and compliance reports.</chef-subheading>
+      </chef-page-header>
 
-    <div class="page-body">
-      <chef-alert type="error" *ngIf="errorLoading">There was an error loading destiantions.</chef-alert>
-     
-      <chef-toolbar>
+      <div class="page-body">
+        <chef-alert type="error" *ngIf="errorLoading">There was an error loading destiantions.</chef-alert>
       
-      <app-authorized [anyOf]="['/datafeed/destination', 'post']">
-        <div *ngIf="(destinations$ | async)?.length === 0" class="empty-state">
-          <p>Create the first datafeed endpoint to get started!</p>
-        </div>
-        <div [ngClass]="(destinations$ | async)?.length === 0 ? 'empty-state' : ''">
-          <chef-button primary [routerLink]="['/settings/data-feed/form']">Create Destination</chef-button>
-        </div>
-      </app-authorized>
-      
-      </chef-toolbar>
-      
-      <app-authorized [anyOf]="['/datafeed/destinations', 'post']">
-        <chef-table *ngIf="(destinations$ | async)?.length > 0" id="destinations-list">
-          <chef-tr>
-            <chef-th class="sort" (click)="toggleSort('name')">
-              <div class="text-and-sort-icons">
-                <span>Endpoint Name</span>
-                <chef-icon aria-hidden="true" id="{{sortIcon('name')}}" class="sort-icon">arrow_drop_up</chef-icon>
-              </div>
-            </chef-th>
-          </chef-tr>
-          <chef-tr tabindex="0" *ngFor="let destination of destinations$ | async |
-            slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
-            <chef-td>
-                <a [routerLink]="['/settings/data-feed/form', destination.id]">{{ destination.name }}</a>
+        <chef-toolbar>
+        
+        <app-authorized [anyOf]="['/datafeed/destination', 'post']">
+          <div *ngIf="(destinations$ | async)?.length === 0" class="empty-state">
+            <p>Create the first datafeed endpoint to get started!</p>
+          </div>
+          <div [ngClass]="(destinations$ | async)?.length === 0 ? 'empty-state' : ''">
+            <chef-button primary [routerLink]="['/settings/data-feed/form']">Create Destination</chef-button>
+          </div>
+        </app-authorized>
+        
+        </chef-toolbar>
+        
+        <app-authorized [anyOf]="['/datafeed/destinations', 'post']">
+          <chef-table *ngIf="(destinations$ | async)?.length > 0" id="destinations-list">
+            <chef-tr>
+              <chef-th class="sort" (click)="toggleSort('name')">
+                <div class="text-and-sort-icons">
+                  <span>Endpoint Name</span>
+                  <chef-icon aria-hidden="true" id="{{sortIcon('name')}}" class="sort-icon">arrow_drop_up</chef-icon>
+                </div>
+              </chef-th>
+            </chef-tr>
+            <chef-tr tabindex="0" *ngFor="let destination of destinations$ | async |
+              slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
+              <chef-td>
+                  <a [routerLink]="['/settings/data-feed/form', destination.id]">{{ destination.name }}</a>
+                </chef-td>
+              <chef-td class="actions">
+                <chef-control-menu>
+                  <chef-option (click)="deleteDestination(destination)">Delete Destination</chef-option>
+                </chef-control-menu>
               </chef-td>
-            <chef-td class="actions">
-              <chef-control-menu>
-                <chef-option (click)="deleteDestination(destination)">Delete Destination</chef-option>
-              </chef-control-menu>
-            </chef-td>
-          </chef-tr>
-        </chef-table>
-       
-      </app-authorized>
-    
-    
-      <app-page-picker
-        [total]="(destinations$ | async)?.length"
-        [perPage]="pageSize"
-        [page]="currentPage"
-        (pageChanged)="currentPage = $event">
-      </app-page-picker>
-    
-    </div><!--page-body-->
-  </main>
-</div><!--destinations-container-->
+            </chef-tr>
+          </chef-table>
+        
+        </app-authorized>
+      
+      
+        <app-page-picker
+          [total]="(destinations$ | async)?.length"
+          [perPage]="pageSize"
+          [page]="currentPage"
+          (pageChanged)="currentPage = $event">
+        </app-page-picker>
+      
+      </div><!--page-body-->
+    </main>
+  </div><!--destinations-container-->
+</div>

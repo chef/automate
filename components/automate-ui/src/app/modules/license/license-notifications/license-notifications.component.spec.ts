@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MockComponent } from 'ng2-mock-component';
 
 import { LicenseNotificationsComponent } from './license-notifications.component';
 
@@ -8,7 +9,9 @@ describe('NotificationsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ LicenseNotificationsComponent ]
+      declarations: [ 
+        MockComponent({ selector: 'chef-notification', inputs: ['type', 'timeout'] }),
+        LicenseNotificationsComponent ]
     })
     .compileComponents();
   }));

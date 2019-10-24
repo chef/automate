@@ -16,6 +16,7 @@ describe('UserManagementComponent', () => {
     TestBed.configureTestingModule({
       declarations: [
         MockComponent({ selector: 'app-settings-sidebar' }),
+        MockComponent({ selector: 'app-chef-notifications' }),
         MockComponent({ selector: 'app-user-form', inputs: ['createUserForm'] }),
         MockComponent({ selector: 'app-user-table',
             inputs: [

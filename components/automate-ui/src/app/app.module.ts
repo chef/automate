@@ -35,9 +35,9 @@ import { IntegrationsModule } from './pages/integrations/integrations.module';
 import { PolicyModule } from './modules/policy/policy.module';
 import { ProjectModule } from './pages/project/project.module';
 import { RoleModule } from './modules/roles/roles.module';
-import { ChefLicenseModule } from 'app/modules/license/license.module';
-import { ChefUserModule } from 'app/modules/user/user.module';
-import { ChefTeamModule } from 'app/modules/team/team.module';
+import { LicenseModule } from 'app/modules/license/license.module';
+import { UserModule } from 'app/modules/user/user.module';
+import { TeamModule } from 'app/modules/team/team.module';
 
 // Services
 import { AttributesService } from './services/attributes/attributes.service';
@@ -144,12 +144,6 @@ import {
   JobScheduleFormComponent
 } from './page-components/job-schedule-form/job-schedule-form.component';
 import { JsonTreeComponent } from './page-components/json-tree/json-tree.component';
-// import {
-//   LicenseApplyComponent
-// } from './page-components/license-apply/license-apply.component';
-// import {
-//   LicenseLockoutComponent
-// } from './page-components/license-lockout/license-lockout.component';
 import { LogsModalComponent } from './page-components/logs-modal/logs-modal.component';
 import { MiniTableComponent } from './page-components/mini-table/mini-table.component';
 import { NavbarComponent } from './page-components/navbar/navbar.component';
@@ -287,9 +281,9 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     NgrxEffectsModule,
     PolicyModule,
     ProjectModule,
-    ChefLicenseModule,
-    ChefUserModule,
-    ChefTeamModule,
+    LicenseModule,
+    UserModule,
+    TeamModule,
     ReactiveFormsModule,
     RoleModule,
     StoreModule.forRoot(ngrxReducers, { runtimeChecks }),

@@ -31,6 +31,7 @@ describe('ApiTokenListComponent', () => {
       declarations: [
         ApiTokenListComponent,
         MockComponent({ selector: 'app-settings-sidebar' }),
+        MockComponent({ selector: 'app-chef-notifications' }),
         MockComponent({
           selector: 'chef-toolbar',
           template: '<ng-content></ng-content>'

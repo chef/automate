@@ -35,4 +35,4 @@ import { UserRoutingModule } from './user-routing.module';
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
-export class ChefUserModule { }
+export class UserModule { }

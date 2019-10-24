@@ -1,6 +1,6 @@
 <div class="app-main-container">
-
   <div class="container">
+    <app-chef-notifications></app-chef-notifications>
     <main>
       <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
       <chef-page-header>
@@ -9,11 +9,11 @@
           Projects group resources together.
         </chef-subheading>
       </chef-page-header>
-      <section *ngIf="!(projectsEnabled$ | async)" class="page-body">
-        Currently, you are using IAM {{ iamMajorVersion$ | async }}. Projects are only available with IAM v2.1 or higher.
+      <section *ngIf="!(isIAMv2$ | async)" class="page-body">
+        Currently, you are using IAM v1. Projects are only available with IAM v2.
       </section>
   
-      <section *ngIf="projectsEnabled$ | async" class="page-body">
+      <section *ngIf="isIAMv2$ | async" class="page-body">
         <ng-container *ngIf="(sortedProjects$ | async)?.length > 0">
           <chef-toolbar>
             <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">

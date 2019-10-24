@@ -8,7 +8,7 @@ import { Notification } from 'app/entities/notifications/notification.model';
 import { DeleteNotification } from 'app/entities/notifications/notification.actions';
 
 @Component({
-  selector: 'chef-notifications',
+  selector: 'app-chef-notifications',
   templateUrl: './notifications.component.html',
   styleUrls: ['./notifications.component.scss']
 })

@@ -3,7 +3,7 @@
   <app-profile-sidebar sidebar *ngIf="!isAdminView"> </app-profile-sidebar>
 
   <div class="container">
-    <chef-notifications></chef-notifications>
+    <app-chef-notifications></app-chef-notifications>
 
     <main *ngIf="isAdminView || user.id">
       <app-delete-object-modal

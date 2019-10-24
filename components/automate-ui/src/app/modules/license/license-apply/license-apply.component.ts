@@ -6,8 +6,7 @@ import * as moment from 'moment';
 import { LicenseFacadeService, LicenseApplyReason } from 'app/entities/license/license.facade';
 import { HttpStatus } from 'app/types/types';
 import { EntityStatus, pendingState } from 'app/entities/entities';
-import { ApplyLicense } from 'app/entities/license/license.actions';
-import { ApplyStatus, FetchStatus } from 'app/entities/license/license.reducer';
+import { ApplyStatus, FetchStatus } from 'app/entities/license/license.model';
 import { LicenseStatus, parsedExpirationDate } from 'app/entities/license/license.model';
 
 @Component({
@@ -56,7 +55,9 @@ export class LicenseApplyComponent implements AfterViewInit, OnChanges {
   constructor(
     private licenseFacade: LicenseFacadeService,
     fb: FormBuilder) {
-      this.licenseApplyReason = this.licenseFacade.licenseApplyReason;
+      this.licenseFacade.licenseApplyReason$.subscribe((reason) => {
+        this.licenseApplyReason = reason;
+      });
       this.applyForm = fb.group({
         licenseKey: ['', [Validators.required]]
       });
@@ -77,7 +78,7 @@ export class LicenseApplyComponent implements AfterViewInit, OnChanges {
 
     this.clearErrors();
     this.applyingLicense = true; // round-trip initiating...
-    this.licenseFacade.dispatch(new ApplyLicense({ license: license.trim() }));
+    this.licenseFacade.applyLicense({ license: license.trim() });
   }
 
   public handleLicenseApply(state: ApplyStatus): void {

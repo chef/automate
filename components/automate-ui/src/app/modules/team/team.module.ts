@@ -32,4 +32,4 @@ import { TeamRoutingModule } from './team-routing.module';
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
-export class ChefTeamModule { }
+export class TeamModule { }

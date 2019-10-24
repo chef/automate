@@ -1,8 +1,3 @@
-<div *ngIf="permissionDenied$ | async" class="permission-denied-banner">
-  <p>You do not currently have permission to view this page.</p>
-  <p>Please contact your administrator for permission.</p>
-</div>
-
 <div class="app-main-container">
   <div *ngIf="permissionDenied$ | async" class="permission-denied-banner">
     <p>You do not currently have permission to view this page.</p>
@@ -10,6 +5,7 @@
   </div>
 
   <div class="container">
+    <app-chef-notifications></app-chef-notifications>
     <chef-notification
       *ngIf="notificationVisible"
       [type]="'error'"

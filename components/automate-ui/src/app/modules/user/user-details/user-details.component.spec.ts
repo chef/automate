@@ -62,6 +62,7 @@ describe('UserDetailsComponent', () => {
       ],
       declarations: [
         MockComponent({ selector: 'app-settings-sidebar' }),
+        MockComponent({ selector: 'app-chef-notifications' }),
         MockComponent({ selector: 'app-profile-sidebar' }),
         MockComponent({ selector: 'chef-breadcrumbs' }),
         MockComponent({ selector: 'chef-breadcrumb', inputs: ['link']}),

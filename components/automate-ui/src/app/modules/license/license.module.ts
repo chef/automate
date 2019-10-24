@@ -27,4 +27,4 @@ import { LicenseNotificationsComponent } from './license-notifications/license-n
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
-export class ChefLicenseModule { }
+export class LicenseModule { }

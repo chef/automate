@@ -44,35 +44,24 @@ chef-side-panel {
   }
 }
 
-// app-navbar {
-//   display: block;
-//   position: relative;
-// }
+.permission-denied-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba($chef-white, 0.85);
+  z-index: 190;
+  padding-top: 38vh;
+  text-align: center;
+  font-weight: bold;
 
-// .page-container,
-// .applications-container {
-//   display: flex;
-//   flex-flow: row nowrap;
-
-//   *[sidebar] {
-//     flex: 200px;
-
-//     & + .container {
-//       flex: auto;
-//       position: static;
-//       width: calc(100% - 200px);
-//       height: auto;
-//     }
-//   }
-// }
-
-// chef-side-panel {
-//   top: 106px;
-// }
-
-// app-services-sidebar {
-//   top: 109px;
-// }
+  & > p {
+    margin: 0;
+    line-height: 1.6;
+    color: $chef-dark-grey;
+  }
+}
 
 @media screen and (max-width: 769px) {
   .container {

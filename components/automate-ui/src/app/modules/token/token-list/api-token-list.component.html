@@ -1,9 +1,9 @@
 <div class="app-main-container">
-  <app-settings-sidebar ></app-settings-sidebar>
+  <app-settings-sidebar sidebar></app-settings-sidebar>
   <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
 
   <div class="container token-container">
-    <chef-notifications></chef-notifications>
+    <app-chef-notifications></app-chef-notifications>
 
     <main>
       <chef-page-header contrastingBackground>

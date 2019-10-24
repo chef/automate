@@ -39,7 +39,6 @@ import { Team } from 'app/entities/teams/team.model';
 import { TeamDetailsComponent } from './team-details.component';
 
 const declarations: any[] = [
-  MockComponent({ selector: 'app-settings-sidebar' }),
   MockComponent({ selector: 'app-user-table',
     inputs: [
       'baseUrl',

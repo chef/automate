@@ -25,6 +25,7 @@ describe('IntegrationsAddComponent', () => {
       ],
       declarations: [
         MockComponent({ selector: 'app-settings-sidebar' }),
+        MockComponent({ selector: 'app-chef-notifications' }),
         IntegrationsAddComponent
       ],
       schemas: [

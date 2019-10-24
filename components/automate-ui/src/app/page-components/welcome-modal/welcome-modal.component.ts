@@ -8,7 +8,7 @@ import { SessionStorageService } from 'app/services/storage/sessionstorage.servi
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { pendingState } from 'app/entities/entities';
-import { TriggerWelcomeStatus } from 'app/entities/license/license.reducer';
+import { TriggerWelcomeStatus } from 'app/entities/license/license.model';
 import { triggerWelcome } from 'app/entities/license/license.selectors';
 
 // Local storage keys

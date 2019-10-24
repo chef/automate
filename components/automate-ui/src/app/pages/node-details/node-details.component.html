@@ -1,5 +1,6 @@
 <div class="app-main-container">
   <div class="container">
+    <app-chef-notifications></app-chef-notifications>
     <main>
       <div class="node-details-container">
         <div class="run-container">
@@ -38,9 +39,9 @@
       </div>
       <app-logs-modal [isVisible]="modalIsVisible" [nodeRun]="nodeRun"></app-logs-modal>
       <app-run-history
+        *ngIf="runHistoryVisible"
         [visible]="runHistoryVisible"
         class="run-history-container"
-        [nodeName]="nodeRun.nodeName"
         [nodeId]="nodeId"
         (on_run_change)="updateRunId($event)"
         (closeRunHistoryEvent)="closeRunHistory()"

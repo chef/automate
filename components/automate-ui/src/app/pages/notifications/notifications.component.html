@@ -1,11 +1,12 @@
-<div *ngIf="permissionDenied" class="permission-denied-banner">
-  <p>You do not have permission to view everything on this page.</p>
-  <p>Please contact an administrator for permission.</p>
-</div>
-
 <div class="app-main-container">
+  <div *ngIf="permissionDenied" class="permission-denied-banner">
+    <p>You do not have permission to view everything on this page.</p>
+    <p>Please contact an administrator for permission.</p>
+  </div>
+
   <app-settings-sidebar sidebar></app-settings-sidebar>
   <div class="container">
+    <app-chef-notifications></app-chef-notifications>
     <main>
       <chef-page-header [contrasting-background]="false">
         <chef-heading>Notifications</chef-heading>

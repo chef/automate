@@ -4,11 +4,10 @@
     [type]="'error'"
     [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
     {{ notification.message }}
-    <!-- TODO (tc) This code is all temporary. The full experience will be implemented post ChefConf.-->
     <ng-container>
       <a href="https://www.chef.io/contact-us/" target="_blank">Get a license from Chef</a>
       or
-      <a href="#" (click)="onTriggerBannerLicenseApply(); licenseApplyModal.openModal(); false">apply a license</a>
+      <span class="link" (click)="onTriggerBannerLicenseApply()">apply a license</span>
       if you already have one.
     </ng-container>
   </chef-notification>

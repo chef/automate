@@ -9,12 +9,10 @@ import { environment } from 'environments/environment';
 import { HttpStatus } from 'app/types/types';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { EntityStatus, pendingState } from 'app/entities/entities';
-import {
-  GetLicenseStatus, RequestLicense, TriggerWelcome
-} from 'app/entities/license/license.actions';
+
 import {
   FetchStatus, RequestStatus
-} from 'app/entities/license/license.reducer';
+} from 'app/entities/license/license.model';
 import { LicenseStatus, parsedExpirationDate } from 'app/entities/license/license.model';
 import { SessionStorageService } from 'app/services/storage/sessionstorage.service';
 
@@ -61,7 +59,7 @@ export class LicenseLockoutComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     if (!this.DISABLE_LICENSE_CHECK) {
       this.clearErrors();
-      this.licenseFacade.dispatch(new GetLicenseStatus());
+      this.licenseFacade.getLicenseStatus();
     }
     // Set locale-aware date/time formats
     // Per https://stackoverflow.com/a/50460605, navigator.language
@@ -120,12 +118,12 @@ export class LicenseLockoutComponent implements AfterViewInit {
 
     this.clearErrors();
     this.requestingLicense = true; // round-trip initiating...
-    this.licenseFacade.dispatch(new RequestLicense(trialLicenseRequest));
+    this.licenseFacade.requestLicense(trialLicenseRequest);
   }
 
   public retryLicenseStatus() {
     this.closeModal();
-    this.licenseFacade.dispatch(new GetLicenseStatus());
+    this.licenseFacade.getLicenseStatus();
   }
 
   public logout() {
@@ -175,7 +173,7 @@ export class LicenseLockoutComponent implements AfterViewInit {
       // don't open, trigger event to apply license
       this.backToLicenseApply(LicenseApplyReason.LICENSE_EXPIRED);
     } else if (!this.firstTriggerCompleted) {
-      this.licenseFacade.dispatch(new TriggerWelcome());
+      this.licenseFacade.triggerWelcome();
     }
     // After this function has been run once, never want to trigger
     // the welcome modal again, so keep track of that here.

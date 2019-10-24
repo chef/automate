@@ -58,6 +58,7 @@ describe('ProjectListComponent', () => {
           template: '<ng-content></ng-content>'
         }),
         MockComponent({ selector: 'app-settings-sidebar' }),
+        MockComponent({ selector: 'app-chef-notifications' }),
         MockComponent({
           selector: 'app-delete-object-modal',
           inputs: ['visible', 'objectNoun', 'objectName', 'moreDetails'],

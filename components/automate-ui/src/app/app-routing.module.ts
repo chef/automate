@@ -73,7 +73,7 @@ const routes: Routes = [
         },
         {
           path: 'teams',
-          loadChildren: './modules/team/team.module#ChefTeamModule'
+          loadChildren: './modules/team/team.module#TeamModule'
         },
         {
           path: 'tokens',
@@ -85,7 +85,7 @@ const routes: Routes = [
         },
         {
           path: 'users',
-          loadChildren: './modules/user/user.module#ChefUserModule'
+          loadChildren: './modules/user/user.module#UserModule'
         },
         {
           path: 'policies',

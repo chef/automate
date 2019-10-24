@@ -2,14 +2,15 @@
   <app-settings-sidebar sidebar></app-settings-sidebar>
 
   <div class="container">
+    <app-chef-notifications></app-chef-notifications>
     <main>
-    <chef-notification
-      *ngIf="notificationVisible"
-      [type]="notificationType"
-      [timeout]="notificationTimeout()"
-      (dismissed)="hideNotification()">
-      {{ notificationMessage }}
-    </chef-notification>
+      <chef-notification
+        *ngIf="notificationVisible"
+        [type]="notificationType"
+        [timeout]="notificationTimeout()"
+        (dismissed)="hideNotification()">
+        {{ notificationMessage }}
+      </chef-notification>
 
       <chef-page-header>
         <chef-heading>Node Lifecycle</chef-heading>
