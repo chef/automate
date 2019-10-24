@@ -31,6 +31,12 @@ A new static website for Automate is based on [Hugo](https://gohugo.io), the Go-
     brew install jq
     ```
 
+1. [Install jq](https://stedolan.github.io/jq/)
+
+    ```shell
+    brew install jq
+    ```
+
 ### Development
 
 1. From the `components/automate-chef-io` directory, run the following command to start the development server.
@@ -102,20 +108,27 @@ In your browser, navigate to:
 
 `http://localhost:1313/docs/api/`
 
-To develop API documentation
+## Building API Docs
 
-1. Run `make serve` from the automate-chef-io directory. When left running this command watches for changes to files it knows about and will rebuild the hugo site automatically.
-1. Open a second terminal window.
-1. Start a hab studio session with `hab studio enter`.
-1. Run `compile_all_protobuf_components` in a hab studio.
-1. Navigate to the automate-chef-io directory and run `make sync_swagger_files generate_swagger`.
-1. Visit http://localhost:1313/docs/api/.
-
-Or, compile everything in one copy-pastable command:
+To develop API documentation, compile go components, sync the swagger files and serve the development environment from the  one copy-pastable command and run it from the top level `automate` director with this command (re-run this command to see re-build the documentation and see your changes):
 
 `hab studio run "source .studiorc && compile_all_protobuf_components" && pushd components/automate-chef-io/ && make sync_swagger_files generate_swagger && make serve || popd`
 
-* Building docs
+## Writing API Docs
+
+We use the [ReDoc](https://github.com/Redocly/redoc) in conjunction with the [grpc-gateway protoc-gen-swagger](https://github.com/grpc-ecosystem/grpc-gateway/tree/master/protoc-gen-swagger) and the [OpenAPI 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) to automatically generate API documentation from comments on automate protoc files.
+
+Find the proto files for APIs at
+
+```output
+automate/components/automate-gateway/api/
+```
+
+There are two types of comments on proto files, leading and following.
+
+Leading comments are placed before the start of an RPC service definition.
+Following comments happen within the service defintition.
+
 
     * Installation of necessary things
     * Commands to run
