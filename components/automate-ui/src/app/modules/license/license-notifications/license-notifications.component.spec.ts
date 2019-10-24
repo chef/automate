@@ -13,10 +13,10 @@ describe('LicenseNotificationsComponent', () => {
   let fixture: ComponentFixture<LicenseNotificationsComponent>;
   let store: Store<NgrxStateAtom>;
 
-  class MockLicenseFacadeService extends LicenseFacadeService{
+  class MockLicenseFacadeService extends LicenseFacadeService {
     notifications$: Observable<Notification[]> = new BehaviorSubject([]);
   }
-  
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
