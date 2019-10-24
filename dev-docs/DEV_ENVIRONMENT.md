@@ -85,20 +85,19 @@ following prerequisites:
 
    From a terminal: run `git clone https://github.com/chef/automate.git`
 
-1. Install `direnv` and integrate it into your shell
+2. Install `direnv` and integrate it into your shell
 
-   a. First, install the package. On Homebrew: run `brew install direnv`, on Ubuntu: run `apt-get install direnv`
-   b. Next, [hook direnv into your shell](https://github.com/direnv/direnv#setup)
-   c. Finally, run `direnv allow` from the A2 source directory.
+   1. First, install the package. On Homebrew: run `brew install direnv`, on Ubuntu: run `apt-get install direnv`
+   2. Next, [hook direnv into your shell](https://github.com/direnv/direnv#setup)
+   3. Finally, run `direnv allow` from the A2 source directory.
 
-1. Install and configure Habitat
+3. Install and configure Habitat
 
    From a terminal:
 
-   a. To install version `0.59.0` of Habitat:
+   1. To install version `0.59.0` of Habitat:
   `curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh | sudo bash -s -- -v 0.59.0`
-
-   b. To configure the Habitat cli run and follow the instructions:
+   2. To configure the Habitat cli run and follow the instructions:
   `hab cli setup`
 
 There are currently two supported ways of running the dev env: inside a vagrant VM or on docker.
