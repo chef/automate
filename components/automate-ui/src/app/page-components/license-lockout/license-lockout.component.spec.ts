@@ -65,7 +65,7 @@ describe('LicenseLockoutComponent', () => {
     });
 
     it('reflects current license', () => {
-      const futureDate = moment().add(2, 'months');
+      const futureDate = moment().utc().add(2, 'months');
       setup(genLicenseFetchReducer(futureDate));
 
       expect(component.licenseExpired).toBeFalsy();
