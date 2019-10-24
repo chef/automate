@@ -56,7 +56,7 @@ describe('LicenseApplyComponent', () => {
   describe('ApplyLicense Action', () => {
 
     it('reflects successfully applied license', () => {
-      const futureDate = moment().add(2, 'months');
+      const futureDate = moment().utc().add(2, 'months');
       const { state } = setup(genLicenseApplyReducer(futureDate));
       component.applyingLicense = true;
       component.handleLicenseApply(state.apply);
@@ -182,7 +182,7 @@ describe('LicenseApplyComponent', () => {
         errorResp: null
       },
       fetch: {
-        license: genLicenseResp(expiry || moment().add(2, 'months')),
+        license: genLicenseResp(expiry || moment().utc().add(2, 'months')),
         status: EntityStatus.loadingSuccess,
         expiryMessage: '',
         errorResp: null
