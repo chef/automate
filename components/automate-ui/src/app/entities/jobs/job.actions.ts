@@ -62,7 +62,7 @@ export class JobCreate implements Action {
 export class JobCreateSuccess implements Action {
   readonly type = JobActionTypes.JOB_CREATE_SUCCESS;
 
-  constructor(public payload: { id: string }) {}
+  constructor(public payload: { id: string, name: string }) {}
 }
 
 export class JobCreateFailure implements Action {

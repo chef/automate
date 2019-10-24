@@ -120,8 +120,7 @@ func (srv *Server) Create(ctx context.Context, in *jobs.Job) (*jobs.Id, error) {
 		user := getUserValFromCtx(ctx)
 		go srv.fireEvent(event.ScanJobCreatedEventName, in, nil, user)
 	}
-
-	return &jobs.Id{Id: sID}, nil
+	return &jobs.Id{Id: sID, Name: in.Name}, nil
 }
 
 // Read a job via ID

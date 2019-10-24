@@ -604,7 +604,6 @@ func (db *DB) AddJob(inJob *jobs.Job) (string, error) {
 
 		return nil
 	})
-
 	return job.ID, err
 }
 

@@ -102,6 +102,7 @@ message RerunResponse {}
 
 message Id {
 	string id = 1;
+	string name = 2;
 }
 
 message Query {

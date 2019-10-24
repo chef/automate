@@ -35,6 +35,8 @@ func init() {
 				switch want {
 				case "id":
 					return m.Id
+				case "name":
+					return m.Name
 				default:
 					return ""
 				}
@@ -71,6 +73,8 @@ func init() {
 				switch want {
 				case "id":
 					return m.Id
+				case "name":
+					return m.Name
 				default:
 					return ""
 				}
@@ -97,6 +101,8 @@ func init() {
 				switch want {
 				case "id":
 					return m.Id
+				case "name":
+					return m.Name
 				default:
 					return ""
 				}

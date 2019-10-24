@@ -9,6 +9,8 @@ import { environment as env } from '../../../../../environments/environment';
 import { ScannerState } from './scanner.state';
 import * as actions from './scanner.actions';
 import * as selectors from './scanner.selectors';
+import { CreateNotification } from 'app/entities/notifications/notification.actions';
+import { Type } from 'app/entities/notifications/notification.model';
 
 @Injectable()
 export class ScannerEffects {
@@ -187,7 +189,11 @@ export class ScannerEffects {
       return job.parent_id === '' ?
         actions.getJobs(jobsListParams) :
         actions.getJobScans(jobScansListParams);
-    }));
+    }),
+    map(() => new CreateNotification({
+      type: Type.info,
+      message: 'Deleted a scan job.'
+    })));
 
   @Effect()
   deleteNode$ = this.actions$.pipe(

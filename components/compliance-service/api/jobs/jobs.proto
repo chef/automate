@@ -27,6 +27,7 @@ message GetJobResultByNodeIdRequest{
 message RerunResponse {}
 message Id {
 	string id = 1;
+	string name = 2;
 }
 message Ids {
 	repeated string ids = 1;
