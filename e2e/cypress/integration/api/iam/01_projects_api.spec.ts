@@ -103,6 +103,8 @@ describeIfIAMV2p1('projects API', () => {
     const noRulesStr = 'NO_RULES';
     const editsPendingStr = 'EDITS_PENDING';
     const rulesAppliedStr = 'RULES_APPLIED';
+    // corresponds to the number of nodes ingested in this test via fixtures.
+    const numberOfNodesAdded = 4;
 
     before(() => {
       // Cypress recommends state cleanup in the before block to ensure
@@ -165,7 +167,7 @@ describeIfIAMV2p1('projects API', () => {
       });
 
       const maxRetries = 200;
-      waitForUnassignedNodes(totalNodes + 4, maxRetries);
+      waitForUnassignedNodes(totalNodes + numberOfNodesAdded, maxRetries);
 
       cy.request({
         headers: {
