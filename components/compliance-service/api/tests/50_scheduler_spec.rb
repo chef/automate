@@ -32,201 +32,216 @@ describe File.basename(__FILE__) do
     end
   end
 
+  PROFILE_URL = 'https://github.com/dev-sec/apache-baseline/archive/master.tar.gz'
+  NOW_UTC = Time.now().utc().strftime('%Y%m%dT%H%M%SZ')
+
   before(:all) { cleanup }
   after(:all) { cleanup }
 
-  it "works" do
-    profile_url = 'https://github.com/dev-sec/apache-baseline/archive/master.tar.gz'
-
-    now_time_utc = Time.now().utc()
-    formatted_now_time_utc = now_time_utc.strftime('%Y%m%dT%H%M%SZ')
-
-    secret_id1 = (SS_GRPC secrets, :create, Secrets::Secret.new(
-      name:"My SSH Login secrets",
-      type:"ssh",
+  before(:all) do
+    secret_id = (SS_GRPC secrets, :create, Secrets::Secret.new(
+      name: "My SSH Login secrets",
+      type: "ssh",
       data: [
-        Secrets::Kv.new( key:"username", value:"pwsudo" ),
-        Secrets::Kv.new( key:"password", value:"password" )
+        Secrets::Kv.new(key: "username", value: "pwsudo"),
+        Secrets::Kv.new(key: "password", value: "password")
       ],
-      tags:[]
+      tags: []
     )).id
 
     # Add an ssh node to be able to reference it in the job
-    node_id1 = (MANAGER_GRPC nodes, :create, Nodes::Node.new(
-      name:"My Working SSH Node",
-      manager:"automate",
+    @node_id = (MANAGER_GRPC nodes, :create, Nodes::Node.new(
+      name: "My Working SSH Node",
+      manager: "automate",
       target_config: Nodes::TargetConfig.new(
-        backend:"ssh",
-        sudo:true,
-        host:"localhost",
-        port:11030,
-        secrets:[secret_id1]
+        backend: "ssh",
+        sudo: true,
+        host: "localhost",
+        port: 11030,
+        secrets: [secret_id]
       ),
       tags: [
-        Common::Kv.new( key:"_no_auto_detect", value:"true" )
+        Common::Kv.new(key: "_no_auto_detect", value: "true")
       ]
     )).id
 
     # Run every minute, only five times, no explicit start date
-    job_id1 = (GRPC jobs, :create, Jobs::Job.new(
+    @job_id1 = (GRPC jobs, :create, Jobs::Job.new(
       name: "My exec job1",
       tags: [],
       type: "exec",
-      nodes: ["#{node_id1}"],
+      nodes: [@node_id],
       retries: 1,
       node_selectors: [],
-      profiles: [profile_url],
+      profiles: [PROFILE_URL],
       recurrence: "FREQ=MINUTELY;INTERVAL=1;COUNT=5"
     )).id
 
     # Run every minute, only ONE time, with explicit start date of now
-    test_count_max_job_id = (GRPC jobs, :create, Jobs::Job.new(
+    @test_count_max_job_id = (GRPC jobs, :create, Jobs::Job.new(
       name: "My exec job for count test",
       tags: [],
       type: "exec",
-      nodes: ["#{node_id1}"],
+      nodes: [@node_id],
       retries: 1,
       node_selectors: [],
-      profiles: [profile_url],
-      recurrence: "FREQ=MINUTELY;INTERVAL=1;COUNT=1;DTSTART=#{formatted_now_time_utc}"
+      profiles: [PROFILE_URL],
+      recurrence: "FREQ=MINUTELY;INTERVAL=1;COUNT=1;DTSTART=#{NOW_UTC}"
     )).id
 
-    # Invalid recurrence rule
+    # Run with only date of now
+    @date_only_job_id = (GRPC jobs, :create, Jobs::Job.new(
+      name: "My exec for date_only job",
+      tags: [],
+      type: "exec",
+      nodes: [@node_id],
+      retries: 1,
+      node_selectors: [],
+      profiles: [PROFILE_URL],
+      recurrence: "DTSTART=#{NOW_UTC}"
+    )).id
+  end
+
+  it "fails with invalid recurrence rule" do
     assert_grpc_error("Invalid job recurrence rule strconv.Atoi: parsing \"0.25\": invalid syntax", 3) do
       GRPC jobs, :create, Jobs::Job.new(
         name: "Invalid recurrence rule",
         tags: [],
         type: "exec",
-        nodes: ["#{node_id1}"],
+        nodes: [@node_id],
         retries: 1,
         node_selectors: [],
-        profiles: [profile_url],
-        recurrence: "DTSTART=#{formatted_now_time_utc};FREQ=HOURLY;INTERVAL=0.25"
+        profiles: [PROFILE_URL],
+        recurrence: "DTSTART=#{NOW_UTC};FREQ=HOURLY;INTERVAL=0.25"
       )
     end
+  end
 
-    # Run with only date of now
-    date_only_job_id = (GRPC jobs, :create, Jobs::Job.new(
-      name: "My exec for date_only job",
-      tags: [],
-      type: "exec",
-      nodes: ["#{node_id1}"],
-      retries: 1,
-      node_selectors: [],
-      profiles: [profile_url],
-      recurrence: "DTSTART=#{formatted_now_time_utc}"
-    )).id
+  it "created 3 jobs during setup" do
+    assert_equal(3, GRPC(jobs, :list, Jobs::Query.new()).total)
+  end
 
-    all_jobs = GRPC jobs, :list, Jobs::Query.new()
-    # we should have three jobs now
-    assert_equal(3, all_jobs.total)
+  it "gives the parent job scheduled status" do
+    first_job = GRPC jobs, :read, Jobs::Id.new(id: @job_id1)
 
-    first_job = GRPC jobs, :read, Jobs::Id.new(id: job_id1)
-    # the parent job should have status scheduled
     assert_equal("scheduled", first_job.status)
     assert_equal("", first_job.parent_id)
     assert_equal(0, first_job.job_count)
+  end
 
-    job_id2 = (GRPC jobs, :create, Jobs::Job.new(
+  it "gives new jobs scheduled in the future proper attributes" do
+    future_job_id = (GRPC jobs, :create, Jobs::Job.new(
       name: "My exec job2",
       tags: [],
       type: "exec",
-      nodes: ["#{node_id1}"],
+      nodes: [@node_id],
       retries: 1,
       node_selectors: [],
-      profiles: [profile_url],
+      profiles: [PROFILE_URL],
       recurrence: "FREQ=HOURLY;INTERVAL=1;COUNT=5;DTSTART=20290101T000000Z"
     )).id
 
     sleep 1
-    all_jobs = GRPC jobs, :list, Jobs::Query.new()
 
     # we should have four jobs now, the three from above and our new scheduled-for-the-future one
-    assert_equal(true, all_jobs.total >= 4)
+    all_jobs = GRPC jobs, :list, Jobs::Query.new()
+    assert(all_jobs.total >= 4)
 
-    job2 = GRPC jobs, :read, Jobs::Id.new(id: job_id2)
-    # since job is scheduled for future, it should have status scheduled
-    assert_equal("scheduled", job2.status)
-    assert_equal("FREQ=HOURLY;INTERVAL=1;COUNT=5;DTSTART=20290101T000000Z", job2.recurrence)
-
-    # and no parent_id
-    assert_equal("", job2.parent_id)
+    future_job = GRPC jobs, :read, Jobs::Id.new(id: future_job_id)
+    assert_equal("scheduled", future_job.status)
+    assert_equal("FREQ=HOURLY;INTERVAL=1;COUNT=5;DTSTART=20290101T000000Z", future_job.recurrence)
+    assert_equal("", future_job.parent_id)
     # scheduled datetime should be same as dtstart value
-    assert_equal(Google::Protobuf::Timestamp.new(seconds: 1861920000, nanos: 0), job2.scheduled_time)
+    assert_equal(Google::Protobuf::Timestamp.new(seconds: 1861920000, nanos: 0), future_job.scheduled_time)
+  end
 
+  it "creates new jobs as children of existing ones" do
     sleep 70
     all_jobs = GRPC jobs, :list, Jobs::Query.new()
     # we should have seven jobs now, the three from above, our scheduled-for-the-future one,
     # our child job from the first one, our child job from the test_count_max_job job
     # and our child job from the date_only job
-    assert_equal(true, all_jobs.total >= 7)
+    assert(all_jobs.total >= 7)
+  end
 
-    # ensure parent job 1 has a job_count of 1
-    first_job = GRPC jobs, :read, Jobs::Id.new(id: job_id1)
-    assert_equal(true, first_job.job_count >= 1)
+  it "properly updates parent jobs" do
+    first_job = GRPC jobs, :read, Jobs::Id.new(id: @job_id1)
+    assert(first_job.job_count >= 1)
+  end
 
-    # ensure test_count_max_job has a job_count of 1, status of completed
-    test_count_max_job = GRPC jobs, :read, Jobs::Id.new(id: test_count_max_job_id)
+  it "properly updates jobs that occur once" do
+    test_count_max_job = GRPC jobs, :read, Jobs::Id.new(id: @test_count_max_job_id)
     assert_equal(1, test_count_max_job.job_count)
     assert_equal("completed", test_count_max_job.status)
+  end
 
-    # ensure date_only_job has a job_count of 1, status of completed
-    date_only_job = GRPC jobs, :read, Jobs::Id.new(id: date_only_job_id)
+  it "properly updates non-recurring jobs" do
+    date_only_job = GRPC jobs, :read, Jobs::Id.new(id: @date_only_job_id)
     assert_equal(1, date_only_job.job_count)
     assert_equal("completed", date_only_job.status)
+  end
 
-    # ensure child job has job_count 0 and parent_id of job1
-    all_jobs.jobs.each { |job|
-      if job.parent_id != ""
-        assert_equal(0, job.job_count)
-        if job.parent_id == job_id1 || job.parent_id == test_count_max_job_id || job['parent_id'] == date_only_job_id
-          job.parent_id = "good"
-        end
-        assert_equal("good", job.parent_id)
-      end
-    }
+  it "properly sets the attributes of child jobs" do
+    parent_ids = [@job_id1, @test_count_max_job_id, @date_only_job_id]
 
-    # Testing jobs list with exec job_type and parent_job filter..
+    all_jobs = GRPC jobs, :list, Jobs::Query.new()
+
+    all_jobs.jobs.each do |job|
+      next if job.parent_id == ""
+
+      assert_equal(0, job.job_count)
+      assert_includes(parent_ids, job.parent_id)
+    end
+  end
+
+  it "fails when passed an invalid parent_job filter" do
     assert_grpc_error("Invalid parent_job uuid filter: bad-uuid", 3) do
       GRPC jobs, :list, Jobs::Query.new(
         filters: [
-          Common::Filter.new( key:  "job_type", values: ["exec"]),
-          Common::Filter.new( key:  "parent_job", values: ["bad-uuid"])
+          Common::Filter.new( key: "job_type", values: ["exec"]),
+          Common::Filter.new( key: "parent_job", values: ["bad-uuid"])
         ]
       )
     end
+  end
 
-    type_jobs_json = GRPC jobs, :list, Jobs::Query.new(
+  it "returns an empty jobs collection when passed an unused parent_job filter" do
+    job_list = GRPC jobs, :list, Jobs::Query.new(
       filters: [
-        Common::Filter.new( key:  "job_type", values: ["exec"]),
-        Common::Filter.new( key:  "parent_job", values: ["00000000-34fb-4022-72ae-8847b54d4ea0"])
+        Common::Filter.new( key: "job_type", values: ["exec"]),
+        Common::Filter.new( key: "parent_job", values: ["00000000-34fb-4022-72ae-8847b54d4ea0"])
       ]
     )
-    assert_equal(Jobs::Jobs.new(), type_jobs_json)
+    assert_equal(Jobs::Jobs.new(), job_list)
+  end
 
-    type_jobs_json = GRPC jobs, :list, Jobs::Query.new(
+  it "can filter on parent_job" do
+    job_list = GRPC jobs, :list, Jobs::Query.new(
       filters: [
-        Common::Filter.new( key:  "job_type", values: ["exec"]),
-        Common::Filter.new( key:  "parent_job", values: [job_id1])
+        Common::Filter.new( key: "job_type", values: ["exec"]),
+        Common::Filter.new( key: "parent_job", values: [@job_id1])
       ]
     )
-    assert_equal(Google::Protobuf::RepeatedField, type_jobs_json.jobs.class)
-    if type_jobs_json.jobs.class == Google::Protobuf::RepeatedField && type_jobs_json.jobs.length > 0
-      assert_equal(job_id1, type_jobs_json.jobs[0]['parent_id'])
-      assert_equal('My exec job1 - run 1', type_jobs_json.jobs[0]['name'])
-    end
+    assert_equal(1, job_list.total)
 
-    # Testing jobs list with parent_job filter == "" (when you want no child jobs in the list)
-    no_child_jobs = GRPC jobs, :list, Jobs::Query.new(
+    job = job_list.jobs.first
+
+    assert_equal(@job_id1, job.parent_id)
+    assert_equal('My exec job1 - run 1', job.name)
+  end
+
+  it "can filter out child jobs" do
+    job_list = GRPC jobs, :list, Jobs::Query.new(
       filters:[
         Common::Filter.new( key: "parent_job", values: [""])
       ]
     )
-    assert_equal(4, no_child_jobs['total'])
+    assert_equal(4, job_list.total)
+  end
 
-    # Test we cannot rerun a scheduled job
+  it "cannot rerun a scheduled job" do
     assert_grpc_error("Unable to rerun a scheduled job", 3) do
-      GRPC jobs, :rerun, Jobs::Id.new(id: date_only_job_id)
+      GRPC jobs, :rerun, Jobs::Id.new(id: @date_only_job_id)
     end
   end
 end
