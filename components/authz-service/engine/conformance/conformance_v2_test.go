@@ -99,7 +99,6 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 				require.NoError(t, err)
 				assert.Equal(t, []string{}, actual)
 			})
-
 			t.Run("policy with one of the requested projects returns matched project", func(t *testing.T) {
 				pol := map[string]interface{}{
 					"members": engine.Subject(sub),
@@ -135,6 +134,72 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 					"actions": []string{act},
 				}
 				setPoliciesV2p1(t, e, pol, role)
+				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
+				require.NoError(t, err)
+				assert.ElementsMatch(t, []string{proj1, proj2}, actual)
+			})
+
+			t.Run("policy with an allowed project that overlaps will return that project", func(t *testing.T) {
+				pol1 := map[string]interface{}{
+					"members": engine.Subject(sub),
+					"statements": map[string]interface{}{
+						"statement-id-0": map[string]interface{}{
+							"role":      "handyman",
+							"resources": []string{res},
+							"effect":    "allow",
+							"projects":  []string{proj1},
+						},
+					},
+				}
+				pol2 := map[string]interface{}{
+					"members": engine.Subject(sub),
+					"statements": map[string]interface{}{
+						"statement-id-0": map[string]interface{}{
+							"actions":   []string{act},
+							"resources": []string{res},
+							"effect":    "allow",
+							"projects":  []string{proj1},
+						},
+					},
+				}
+				role := map[string]interface{}{
+					"id":      "handyman",
+					"actions": []string{act},
+				}
+				setPoliciesV2p1(t, e, pol1, pol2, role)
+				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
+				require.NoError(t, err)
+				assert.ElementsMatch(t, []string{proj1}, actual)
+			})
+
+			t.Run("policies with some of the requested projects that contain duplicates returns matched projects without duplicates", func(t *testing.T) {
+				pol1 := map[string]interface{}{
+					"members": engine.Subject(sub),
+					"statements": map[string]interface{}{
+						"statement-id-0": map[string]interface{}{
+							"role":      "handyman",
+							"resources": []string{res},
+							"effect":    "allow",
+							"projects":  []string{proj1, "other-project", proj2},
+						},
+					},
+				}
+				pol2 := map[string]interface{}{
+					"members": engine.Subject(sub),
+					"statements": map[string]interface{}{
+						"statement-id-0": map[string]interface{}{
+							"actions":   []string{act},
+							"resources": []string{res},
+							"effect":    "allow",
+							"projects":  []string{"other-project", proj2},
+						},
+					},
+				}
+				role := map[string]interface{}{
+					"id":      "handyman",
+					"actions": []string{act},
+				}
+				setPoliciesV2p1(t, e, pol1, pol2, role)
 				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{proj1, proj2}, actual)
