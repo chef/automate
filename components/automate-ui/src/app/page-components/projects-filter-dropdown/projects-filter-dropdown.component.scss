@@ -121,3 +121,10 @@
     padding: 0 8px 8px 8px;
   }
 }
+
+chef-click-outside {
+  chef-dropdown{
+    overflow-y: auto;
+    max-height: 300px;
+  }
+}
