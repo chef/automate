@@ -9,7 +9,7 @@ describe('NotificationsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ 
+      declarations: [
         MockComponent({ selector: 'chef-notification', inputs: ['type', 'timeout'] }),
         LicenseNotificationsComponent ]
     })
