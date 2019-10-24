@@ -224,14 +224,13 @@ class ManifestGenerator
     manifest["hab_build"] = local_hab_version
     manifest["build"] = version
     manifest["hab"] = []
+
     ["hab", "hab-sup", "hab-launcher"].each do |p|
       pkg = package_querier.get_latest(hab_pkg_channel, "core", p)
       log.info "Adding package #{pkg.pretty}"
       manifest["hab"] << pkg
     end
 
-    manifest["hab"] << package_querier.get_latest(hab_pkg_channel, "core", "hab-sup")
-    manifest["hab"] << package_querier.get_latest(hab_pkg_channel, "core", "hab-launcher")
     manifest["git_sha"] = git_sha
     manifest["packages"] = []
 
