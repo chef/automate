@@ -17,7 +17,6 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 	"github.com/chef/automate/lib/proc"
-	"github.com/chef/automate/lib/stringutils"
 )
 
 func RootUserRequiredCheck() Check {
@@ -39,7 +38,7 @@ const GB = 1 << 30
 
 func minDiskBytesForConfig(c *dc.AutomateConfig) uint64 {
 	collections := deployment.CollectionsForConfig(c.GetDeployment())
-	if stringutils.SliceContains(collections, services.BuilderCollectionName) {
+	if services.ContainsCollection(services.BuilderCollectionName, collections) {
 		return 15 * GB
 	} else {
 		return 5 * GB
