@@ -952,7 +952,7 @@ func checkIfRoleIntersectsProjectsFilter(ctx context.Context, q Querier,
 	// Return true or false if there is intersection between iam_role_projects and projectsFilter,
 	// assuming '{(unassigned)}' in the case that iam_role_projects is empty. If a role of id
 	// doesn't exist, this will return a proper SQL "no rows" error when passed to processError.
-	row := q.QueryRowContext(ctx, "SELECT projects_match(role_projects($1), $2)", id, pq.Array(projectsFilter))
+	row := q.QueryRowContext(ctx, "SELECT COALESCE(projects_match(role_projects($1), $2), false)", id, pq.Array(projectsFilter))
 
 	var result bool
 	err := row.Scan(&result)
