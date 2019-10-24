@@ -68,50 +68,44 @@ describe('SettingsSidebarComponent', () => {
       component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
     });
 
-    using([
-      [false, 10, 'v2'],
-      [true, 11, 'v2.1']
-    ], function (projectsEnabled: boolean, linkCount: number, versionName: string) {
+    it('shows all links consistent with settings-landing', () => {
+      component.projectsEnabled$ = observableOf(true);
+      fixture.detectChanges();
+      const links = element.nativeElement
+        .querySelectorAll('div.nav-items chef-sidebar-entry');
+      expect(links.length).toBe(11);
+    });
 
-      it(`shows all links consistent with settings-landing for ${versionName}`, () => {
-        component.projectsEnabled$ = observableOf(projectsEnabled);
-        fixture.detectChanges();
-        const links = element.nativeElement
-          .querySelectorAll('div.nav-items chef-sidebar-entry');
-        expect(links.length).toBe(linkCount);
-      });
+    it('has route order consistent with settings-landing', () => {
+      component.projectsEnabled$ = observableOf(true);
+      fixture.detectChanges();
+      const links = element.nativeElement
+        .querySelectorAll('div.nav-items chef-sidebar-entry');
+      for (let i = 0; i < links.length; i++) {
+        expect(links[i].getAttribute('route'))
+          .toBe(settingsLandingComponent.routeList[i].route);
+      }
+    });
 
-      it(`has route order consistent with settings-landing for ${versionName}`, () => {
-        component.projectsEnabled$ = observableOf(projectsEnabled);
-        fixture.detectChanges();
-        const links = element.nativeElement
-          .querySelectorAll('div.nav-items chef-sidebar-entry');
-        for (let i = 0; i < links.length; i++) {
-          expect(links[i].getAttribute('route'))
-            .toBe(settingsLandingComponent.routeList[i].route);
-        }
-      });
+    it('has paths consistent with settings-landing', () => {
+      component.projectsEnabled$ = observableOf(true);
+      fixture.detectChanges();
+      const elements = Array
+        .from<HTMLElement>(
+          element.nativeElement.querySelectorAll('div.nav-items app-authorized'))
+        .filter(elem =>
+          elem.firstElementChild && elem.firstElementChild.tagName === 'CHEF-SIDEBAR-ENTRY');
 
-      it(`has paths consistent with settings-landing for ${versionName}`, () => {
-        component.projectsEnabled$ = observableOf(projectsEnabled);
-        fixture.detectChanges();
-        const elements = Array
-          .from<HTMLElement>(
-            element.nativeElement.querySelectorAll('div.nav-items app-authorized'))
-          .filter(elem =>
-            elem.firstElementChild && elem.firstElementChild.tagName === 'CHEF-SIDEBAR-ENTRY');
-
-        for (let i = 0; i < elements.length; i++) {
-          checkFirstPerm(
-            'anyOf',
-            elements[i].getAttribute('ng-reflect-any-of'),
-            settingsLandingComponent.routeList[i].anyOfCheck);
-          checkFirstPerm(
-            'allOf',
-            elements[i].getAttribute('ng-reflect-all-of'),
-            settingsLandingComponent.routeList[i].allOfCheck);
-        }
-      });
+      for (let i = 0; i < elements.length; i++) {
+        checkFirstPerm(
+          'anyOf',
+          elements[i].getAttribute('ng-reflect-any-of'),
+          settingsLandingComponent.routeList[i].anyOfCheck);
+        checkFirstPerm(
+          'allOf',
+          elements[i].getAttribute('ng-reflect-all-of'),
+          settingsLandingComponent.routeList[i].allOfCheck);
+      }
     });
   });
 
