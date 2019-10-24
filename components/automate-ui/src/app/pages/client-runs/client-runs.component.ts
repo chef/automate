@@ -19,6 +19,7 @@ import {
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { find, filter as fpFilter, pickBy, some, includes } from 'lodash/fp';
+import { DateTime } from 'app/helpers/datetime/datetime';
 import {
   clientRunsLoading,
   clientRunsNodes,
@@ -515,7 +516,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
   onDownloadOptPressed(format) {
     this.downloadOptsVisible = false;
 
-    const filename = `${moment().format('YYYY-M-D')}.${format}`;
+    const filename = `${moment().utc().format(DateTime.REPORT_DATE_TIME)}.${format}`;
 
     const onComplete = () => this.downloadInProgress = false;
     const onError = _e => this.downloadFailed = true;
