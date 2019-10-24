@@ -82,4 +82,8 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
       (element as HTMLElement).focus();
     }
   }
+
+  filterVisible() {
+    return this.selectionCount > 0;
+  }
 }

@@ -3,7 +3,8 @@
   aria-label="Projects filter"
   [attr.title]="selectionLabel"
   [disabled]="!dropdownCaretVisible"
-  (click)="handleLabelClick()">
+  (click)="handleLabelClick()"
+  *ngIf="filterVisible()">
   <span class="selection-label">{{ selectionLabel }}</span>
   <span class="selection-count"
     *ngIf="selectionCountVisible"
