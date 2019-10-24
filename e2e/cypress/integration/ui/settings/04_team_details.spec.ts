@@ -82,7 +82,7 @@ describe('team details', () => {
           }
         });
 
-        cy.visit(`/settings/teams/${teamUIRouteIdentifier}`);
+        cy.visit(`/settings/teams/${teamUIRouteIdentifier}#users`);
         cy.get('app-welcome-modal').invoke('hide');
       });
     });
