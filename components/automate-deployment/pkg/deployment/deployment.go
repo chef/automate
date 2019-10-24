@@ -155,32 +155,37 @@ func (d *Deployment) ReplaceUserOverrideConfig(config *dc.AutomateConfig) error 
 func ContainsAutomateCollection(c *dc.ConfigRequest) bool {
 	products := c.GetV1().GetSvc().GetProducts()
 	if len(products) > 0 {
-		return services.ContainsCollection("automate", products)
+		return services.ContainsCollection(services.AutomateCollectionName, products)
 	}
 	return true
 }
 
-func ExpectedServiceIDsForConfig(c *dc.ConfigRequest) ([]habpkg.HabPkg, error) {
+func CollectionsForConfig(c *dc.ConfigRequest) []string {
 	var collections []string
-
 	if len(c.GetV1().GetSvc().GetProducts()) > 0 {
-		collections = c.GetV1().GetSvc().GetProducts()
+		c := c.GetV1().GetSvc().GetProducts()
+		collections = make([]string, len(c))
+		copy(collections, c)
 	} else {
-		collections = []string{"automate"}
+		collections = []string{services.AutomateCollectionName}
 
 		if c.GetV1().GetSvc().GetEnableChefServer().GetValue() {
-			collections = append(collections, "chef-server")
+			collections = append(collections, services.ChefServerCollectionName)
 		}
 
 		if c.GetV1().GetSvc().GetEnableWorkflow().GetValue() {
-			collections = append(collections, "workflow")
+			collections = append(collections, services.WorkflowCollectionName)
 		}
 
 		if c.GetV1().GetSvc().GetEnableDevMonitoring().GetValue() {
-			collections = append(collections, "monitoring")
+			collections = append(collections, services.MonitoringCollectionName)
 		}
 	}
+	return collections
+}
 
+func ExpectedServiceIDsForConfig(c *dc.ConfigRequest) ([]habpkg.HabPkg, error) {
+	collections := CollectionsForConfig(c)
 	serviceIDs, err := services.ServicesInCollections(collections)
 	if err != nil {
 		collectionsList := strings.Join(collections, ", ")

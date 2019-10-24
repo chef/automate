@@ -121,6 +121,14 @@
       ]
     },
     {
+      "name": "builder",
+      "type": "product",
+      "aliases": ["depot"],
+      "hidden": true,
+      "dependencies": ["core", "postgresql", "auth"],
+      "services": []
+    },
+    {
       "name": "chef-server",
       "type": "product",
       "aliases": ["chef-infra-server"],

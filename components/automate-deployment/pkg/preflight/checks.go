@@ -8,14 +8,15 @@ import (
 	"reflect"
 	"strings"
 
+	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+
 	dc "github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
+	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config/api/a2conf"
 	"github.com/chef/automate/lib/proc"
-
-	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 )
 
 func RootUserRequiredCheck() Check {
@@ -33,8 +34,22 @@ func RootUserRequiredCheck() Check {
 	}
 }
 
-func DefaultMinimumDiskCheck() Check {
-	return MinimumDiskCheck(5 * (1 << 30))
+const GB = 1 << 30
+
+func minDiskBytesForConfig(c *dc.AutomateConfig) uint64 {
+	collections := deployment.CollectionsForConfig(c.GetDeployment())
+	minSize := uint64(0)
+	if services.ContainsCollection(services.BuilderCollectionName, collections) {
+		minSize += 15 * GB
+	}
+	if services.ContainsCollection(services.AutomateCollectionName, collections) {
+		minSize += 5 * GB
+	}
+	return minSize
+}
+
+func DefaultMinimumDiskCheck(c *dc.AutomateConfig) Check {
+	return MinimumDiskCheck(minDiskBytesForConfig(c))
 }
 
 func MinimumDiskCheck(minimumBytes uint64) Check {
@@ -381,10 +396,6 @@ func skippablePort(port uint16) bool {
 }
 
 func requiredPortsForConfig(skipShared bool, config *dc.AutomateConfig) ([]int, error) {
-	if config == nil {
-		config = dc.DefaultAutomateConfig()
-	}
-
 	servicesToCheck, err := deployment.ExpectedServiceIDsForConfig(config.GetDeployment())
 	if err != nil {
 		return nil, err

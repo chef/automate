@@ -41,6 +41,10 @@ func NewDeployPreflightChecker(opts DeployPreflightCheckOptions) *DeployPrefligh
 }
 
 func (c *DeployPreflightChecker) Run(probe TestProbe) error {
+	if c.automateConfig == nil {
+		c.automateConfig = dc.DefaultAutomateConfig()
+	}
+
 	portCheck, err := DefaultPortCheck(c.skipSharedPorts, c.automateConfig)
 	if err != nil {
 		return errors.Wrap(err, "failed to configure preflight checks")
@@ -60,7 +64,7 @@ func (c *DeployPreflightChecker) Run(probe TestProbe) error {
 
 	checks := []Check{
 		RootUserRequiredCheck(),
-		DefaultMinimumDiskCheck(),
+		DefaultMinimumDiskCheck(c.automateConfig),
 		chefAutomateInBinCheck,
 		isA2DeployedCheck,
 		IsSystemdCheck(),

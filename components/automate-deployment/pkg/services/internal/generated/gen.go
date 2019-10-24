@@ -462,6 +462,21 @@ var ProductMetadataJSON = `
       "hidden": false
     },
     {
+      "name": "builder",
+      "aliases": [
+        "depot"
+      ],
+      "type": "product",
+      "services": [],
+      "packages": null,
+      "dependencies": [
+        "core",
+        "postgresql",
+        "auth"
+      ],
+      "hidden": true
+    },
+    {
       "name": "chef-server",
       "aliases": [
         "chef-infra-server"
