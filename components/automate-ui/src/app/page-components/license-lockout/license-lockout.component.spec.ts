@@ -65,7 +65,7 @@ describe('LicenseLockoutComponent', () => {
     });
 
     it('reflects current license', () => {
-      const futureDate = moment().add(2, 'months');
+      const futureDate = moment().utc().add(2, 'months');
       setup(genLicenseFetchReducer(futureDate));
 
       expect(component.licenseExpired).toBeFalsy();
@@ -77,7 +77,7 @@ describe('LicenseLockoutComponent', () => {
 
     // this test is failing in wallaby with "Expression has changed after it was checked"
     xit('reflects expired license', () => {
-      const pastDate = moment().subtract(2, 'months');
+      const pastDate = moment().utc().subtract(2, 'months');
       setup(genLicenseFetchReducer(pastDate));
 
       expect(component.licenseExpired).toBeTruthy();
@@ -211,7 +211,7 @@ describe('LicenseLockoutComponent', () => {
   function genLicenseFetchReducer(licenseEndDate: moment.Moment): () => { fetch: FetchStatus } {
    return () => ({
       fetch: {
-        license: genLicenseResp(licenseEndDate || moment().add(2, 'months')),
+        license: genLicenseResp(licenseEndDate || moment().utc().add(2, 'months')),
         status: EntityStatus.loadingSuccess,
         expiryMessage: '',
         errorResp: null
