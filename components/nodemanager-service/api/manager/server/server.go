@@ -202,11 +202,9 @@ func (srv *Server) addNodes(ctx context.Context, id string, in *manager.NodeMana
 		deleteErr := srv.DB.DeleteNodeManager(id)
 		if deleteErr != nil {
 			deleteErr = errors.Wrapf(deleteErr, "failed to add nodes to db for created node manager %s", err.Error())
-			deleteErr = errorutils.FormatErrorMsg(deleteErr, id)
-			return deleteErr
+			return errorutils.FormatErrorMsg(deleteErr, id)
 		}
-		err = errorutils.FormatErrorMsg(err, in.Name)
-		return err
+		return errorutils.FormatErrorMsg(err, in.Name)
 	}
 	return nil
 }
@@ -216,8 +214,7 @@ func (srv *Server) Read(ctx context.Context, in *manager.Id) (*manager.NodeManag
 	logrus.Infof("read node manager with : %+v", in.Id)
 	mngr, err := srv.DB.GetNodeManager(in.Id)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, in.Id)
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return mngr, nil
 }
@@ -260,15 +257,13 @@ func (srv *Server) Update(ctx context.Context, in *manager.NodeManager) (*pb.Emp
 	// add node manager to db (table: node_managers)
 	id, err := srv.DB.UpdateNodeManager(in)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, id)
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, id)
 	}
 
 	// add nodes to db (table: nodes)
 	err = srv.addNodes(ctx, id, in, acctID)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, id)
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, id)
 	}
 	return &empty, nil
 }
@@ -278,8 +273,7 @@ func (srv *Server) Delete(ctx context.Context, in *manager.Id) (*pb.Empty, error
 	logrus.Infof("Deleting manager id: %+v", in.Id)
 	err := srv.DB.DeleteNodeManager(in.Id)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, in.Id)
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return &empty, nil
 }
@@ -289,8 +283,7 @@ func (srv *Server) DeleteWithNodes(ctx context.Context, in *manager.Id) (*manage
 	logrus.Infof("Deleting manager id with nodes: %+v", in.Id)
 	ids, err := srv.DB.DeleteNodeManagerWithNodes(in.Id)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, in.Id)
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	result := make([]*manager.Id, len(ids))
 	for i := range ids {
@@ -304,8 +297,7 @@ func (srv *Server) DeleteWithNodeStateStopped(ctx context.Context, in *manager.I
 	logrus.Infof("Deleting manager id with nodes: %+v", in.Id)
 	err := srv.DB.DeleteNodeManagerWithNodeStateUpdate(in.Id, "stopped")
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, in.Id)
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return &empty, nil
 }
@@ -315,8 +307,7 @@ func (srv *Server) DeleteWithNodeStateTerminated(ctx context.Context, in *manage
 	logrus.Infof("Deleting manager id with nodes: %+v", in.Id)
 	err := srv.DB.DeleteNodeManagerWithNodeStateUpdate(in.Id, "terminated")
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, in.Id)
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
 	return &empty, nil
 }
@@ -326,8 +317,7 @@ func (srv *Server) List(ctx context.Context, in *manager.Query) (*manager.NodeMa
 	logrus.Debugf("Getting Nodes with query: %+v", in)
 	nodeManagers, totalCount, err := srv.DB.GetNodeManagers(in.Sort, in.Order, in.Page, in.PerPage, in.FilterMap)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return &manager.NodeManagers{Managers: nodeManagers, Total: int32(totalCount)}, nil
 }
@@ -428,16 +418,14 @@ func (srv *Server) SearchNodeFields(ctx context.Context, in *manager.FieldQuery)
 func (srv *Server) searchAzureFields(ctx context.Context, in *manager.FieldQuery) (*manager.Fields, error) {
 	myazure, err := managers.GetAzureManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, in.NodeManagerId)
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, in.NodeManagerId)
 	}
 	if in.Query == nil {
 		return nil, &errorutils.InvalidError{Msg: "Please provide a query."}
 	}
 	results, err := myazure.QueryField(ctx, in.GetQuery().GetFilterMap(), in.Field)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return &manager.Fields{Fields: results}, nil
 }
@@ -450,8 +438,7 @@ func (srv *Server) searchGenericNodesFields(ctx context.Context, in *manager.Fie
 	filters = append(filters, &common.Filter{Key: "manager_id", Values: []string{managerId}})
 	results, err := srv.DB.QueryManualNodesFields(ctx, filters, in.Field)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return &manager.Fields{Fields: results}, nil
 }
@@ -459,16 +446,14 @@ func (srv *Server) searchGenericNodesFields(ctx context.Context, in *manager.Fie
 func (srv *Server) searchAwsFields(ctx context.Context, in *manager.FieldQuery) (*manager.Fields, error) {
 	myaws, _, err := managers.GetAWSManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, in.NodeManagerId)
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, in.NodeManagerId)
 	}
 	if in.Query == nil {
 		return nil, &errorutils.InvalidError{Msg: "Please provide a query."}
 	}
 	results, err := myaws.QueryField(ctx, in.GetQuery().GetFilterMap(), in.Field)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 	return &manager.Fields{Fields: results}, nil
 }
@@ -519,14 +504,12 @@ func (srv *Server) searchAzureSubscriptions(ctx context.Context, in *manager.Nod
 func (srv *Server) searchAzureNodes(ctx context.Context, in *manager.NodeQuery) (*manager.Nodes, error) {
 	myazure, err := managers.GetAzureManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, in.NodeManagerId)
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, in.NodeManagerId)
 	}
 
 	nodesRes, err := myazure.QueryVMs(ctx, in.GetQuery().GetFilterMap())
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	nodeIds := manager.Nodes{}
@@ -548,8 +531,7 @@ func (srv *Server) searchGenericNodes(ctx context.Context, filters []*common.Fil
 		logrus.Debugf("getting nodes with page %d for total %d, per_page %d", cnt, total, perPage)
 		pageNodes, totalCount, err := srv.DB.GetNodes("name", 0, cnt, perPage, filters)
 		if err != nil {
-			err = errorutils.FormatErrorMsg(err, "")
-			return nil, err
+			return nil, errorutils.FormatErrorMsg(err, "")
 		}
 		total = totalCount.Total
 		nodes = append(nodes, pageNodes...)
@@ -566,8 +548,7 @@ func (srv *Server) searchGenericNodes(ctx context.Context, filters []*common.Fil
 func (srv *Server) searchAwsNodes(ctx context.Context, in *manager.NodeQuery) (*manager.Nodes, error) {
 	myaws, _, err := managers.GetAWSManagerFromID(ctx, in.NodeManagerId, srv.DB, srv.secretsClient)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, "")
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, "")
 	}
 
 	nodesRes, err := myaws.QueryNodes(ctx, in.GetQuery().GetFilterMap(), false)
@@ -735,8 +716,7 @@ func (srv *Server) ProcessNode(ctx context.Context, in *manager.NodeMetadata) (*
 
 	err := srv.DB.ProcessIncomingNode(in)
 	if err != nil {
-		err = errorutils.FormatErrorMsg(err, in.Uuid)
-		return nil, err
+		return nil, errorutils.FormatErrorMsg(err, in.Uuid)
 	}
 
 	return &manager.ProcessNodeResponse{}, nil
