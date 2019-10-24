@@ -21,9 +21,9 @@ HAB_LAUNCH_IDENT_JSON=$(curl "https://bldr.habitat.sh/v1/depot/channels/core/sta
 HAB_LAUNCH_VERSION=$(echo "$HAB_LAUNCH_IDENT_JSON" | jq -r .version)
 HAB_LAUNCH_RELEASE=$(echo "$HAB_LAUNCH_IDENT_JSON" | jq -r .release)
 
-sed -i -r "s|\"hab\".*\"version\" =>.*|\"hab\"          => { \"origin\" => \"core\", \"name\" => \"hab\",          \"version\" => \"$HAB_VERSION\", \"release\" => \"$HAB_RELEASE\"},|" .expeditor/create-manifest.rb
-sed -i -r "s|\"hab-sup\".*\"version\" =>.*|\"hab-sup\"      => { \"origin\" => \"core\", \"name\" => \"hab-sup\",      \"version\" => \"$HAB_SUP_VERSION\", \"release\" => \"$HAB_SUP_RELEASE\"},|" .expeditor/create-manifest.rb
-sed -i -r "s|\"hab-launcher\".*\"version\" =>.*|\"hab-launcher\" => { \"origin\" => \"core\", \"name\" => \"hab-launcher\", \"version\" => \"$HAB_LAUNCH_VERSION\",   \"release\" => \"$HAB_LAUNCH_RELEASE\"}|" .expeditor/create-manifest.rb
+sed -i -r "s|pins\[\"hab\"\].*\"version\" =>.*|pins[\"hab\"]          = { \"origin\" => \"core\", \"name\" => \"hab\",          \"version\" => \"$HAB_VERSION\", \"release\" => \"$HAB_RELEASE\"},|" .expeditor/create-manifest.rb
+sed -i -r "s|pins\[\"hab-sup\"\].*\"version\" =>.*|pins[\"hab-sup\"]      = { \"origin\" => \"core\", \"name\" => \"hab-sup\",      \"version\" => \"$HAB_SUP_VERSION\", \"release\" => \"$HAB_SUP_RELEASE\"},|" .expeditor/create-manifest.rb
+sed -i -r "s|pins\[\"hab-launcher\"\].*\"version\" =>.*|pins[\"hab-launcher\"] = { \"origin\" => \"core\", \"name\" => \"hab-launcher\", \"version\" => \"$HAB_LAUNCH_VERSION\",   \"release\" => \"$HAB_LAUNCH_RELEASE\"}|" .expeditor/create-manifest.rb
 
 sed -i -r "s|core/hab/[0-9]+\\.[0-9]+\\.[0-9]+/[0-9]{14}|core/hab/$HAB_VERSION/$HAB_RELEASE|" components/automate-deployment/habitat/plan.sh
 sed -i -r "s|RECOMMENDED_HAB_VERSION=\".*\"|RECOMMENDED_HAB_VERSION=\"$HAB_VERSION\"|" .studiorc

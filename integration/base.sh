@@ -50,14 +50,17 @@ test_with_s3=false
 #
 # * Available Manifests
 #
-# build.json: manifest created during the build process. Includes
-#             packages from unstable AND any newly created packages.
+# build.json:        manifest created during the build process. Includes
+#                    packages from unstable AND any newly created packages.
 #
-# dev.json:        manifest for the dev channel
+# build-habdev.json: Like build.json but with habitat packages from
+#                    unstable as well.
+
+# dev.json:          manifest for the dev channel
 #
-# acceptance.json: manifest for the acceptance channel
+# acceptance.json:   manifest for the acceptance channel
 #
-# current.json:    manifest for the current channel
+# current.json:      manifest for the current channel
 #
 # test_manifest_path is the path that will be passed to `chef-automate
 # deploy`. Manifest content is copied to this path before the deploy
