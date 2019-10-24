@@ -124,7 +124,6 @@ export class LicenseStatusEffects {
     if (daysRemaining > this.LICENSE_WARNING_PERIOD || daysRemaining < 0) {
       return '';
     }
-    
     return `There are ${daysRemaining} days remaining on your license.`;
   }
 }
