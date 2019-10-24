@@ -44,8 +44,7 @@ do_strip() {
 }
 
 do_install() {
-  # Go scaffolding install callback
-  scaffolding_go_install
+  do_default_install
 
   build_line "Copying migration files"
   mkdir "${pkg_prefix}/migrations"
