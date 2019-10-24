@@ -721,6 +721,16 @@ steps:
         linux:
           privileged: true
 
+  - label: "upgrade current -> master (with latest hab)"
+    command:
+      - integration/run_test integration/tests/upgrade_current_master_habdev.sh
+    timeout_in_minutes: 25
+    soft_fail: true
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
   - label: "manual upgrade current -> master"
     command:
       - integration/run_test integration/tests/manual_upgrade.sh

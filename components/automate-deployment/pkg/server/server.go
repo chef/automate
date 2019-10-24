@@ -1009,6 +1009,8 @@ func StartServer(config *Config) error {
 		return errors.Wrap(err, "failed to initialize deployment")
 	}
 
+	maybeResetHabPath(server)
+
 	err = server.initSecretStore()
 	if err != nil {
 		return errors.Wrap(err, "failed to initialize secret store")

@@ -214,7 +214,7 @@ class PackageQuerier
 end
 
 class ManifestGenerator
-  def generate(package_querier, products_meta_file, version, skip_packages, log)
+  def generate(package_querier, products_meta_file, version, skip_packages, hab_pkg_channel, log)
     manifest = {}
     # The version of the manifest schema. WARNING: DO NOT CHANGE: Because
     # of an implementation mistake in deployment-service, changing this
@@ -224,9 +224,13 @@ class ManifestGenerator
     manifest["hab_build"] = local_hab_version
     manifest["build"] = version
     manifest["hab"] = []
-    manifest["hab"] << package_querier.get_latest("stable", "core", "hab")
-    manifest["hab"] << package_querier.get_latest("stable", "core", "hab-sup")
-    manifest["hab"] << package_querier.get_latest("stable", "core", "hab-launcher")
+
+    ["hab", "hab-sup", "hab-launcher"].each do |p|
+      pkg = package_querier.get_latest(hab_pkg_channel, "core", p)
+      log.info "Adding package #{pkg.pretty}"
+      manifest["hab"] << pkg
+    end
+
     manifest["git_sha"] = git_sha
     manifest["packages"] = []
 
@@ -296,6 +300,7 @@ class ManifestGenerator
   end
 end
 
+no_pin_hab = ENV["NO_PIN_HAB"] == "true"
 pins = {
   # -- FIXME: PINNED DATABASES - sdelano 2018/07/19 --
   #
@@ -310,15 +315,17 @@ pins = {
   # libraries if any fixes are shipped there.
   "automate-postgresql"    => {"origin" => "chef", "name" => "automate-postgresql",    "version" => "9.6.11", "release" => "20190409151101"},
   "automate-elasticsearch" => {"origin" => "chef", "name" => "automate-elasticsearch", "version" => "6.2.2",  "release" => "20190123133819"},
+}
 
+unless no_pin_hab
   # IF YOU UPDATE THESE PINS YOU MUST ALSO UPDATE THE core/hab PIN IN
   # components/automate-deployment/habitat/plan.sh
   #
   # WARNING: These pins are managed by .expeditor/update_habitat.sh.
-  "hab"          => { "origin" => "core", "name" => "hab",          "version" => "0.69.0", "release" => "20181127182011"},
-  "hab-sup"      => { "origin" => "core", "name" => "hab-sup",      "version" => "0.69.0", "release" => "20181127183841"},
-  "hab-launcher" => { "origin" => "core", "name" => "hab-launcher", "version" => "9106",   "release" => "20181126205526"}
-}
+  pins["hab"]          = { "origin" => "core", "name" => "hab",          "version" => "0.69.0", "release" => "20181127182011"}
+  pins["hab-sup"]      = { "origin" => "core", "name" => "hab-sup",      "version" => "0.69.0", "release" => "20181127183841"}
+  pins["hab-launcher"] = { "origin" => "core", "name" => "hab-launcher", "version" => "9106",   "release" => "20181126205526"}
+end
 
 # CONFIGURATION
 #
@@ -331,6 +338,7 @@ allow_local_packages=(ENV["ALLOW_LOCAL_PACKAGES"] == "true")
 local_package_origin = ENV["HAB_ORIGIN"] || "chef"
 # The directory that we will look for local packages in.
 local_package_directory = "results"
+hab_pkg_channel = ENV["HAB_PKG_CHANNEL"] || "stable"
 # Whether or not we should lookup package idents using the
 # EXPEDITOR_PKG_IDENT_ environment variables. Enabled only if it
 # appears we are running as an Expeditor job.
@@ -366,6 +374,7 @@ log.info "  allow_local_packages=#{allow_local_packages}"
 log.info "  use_environment_idents=#{use_environment_idents}"
 log.info "  local_package_origin=#{local_package_origin}"
 log.info "  local_package_directory=#{local_package_directory}"
+log.info "  hab_pkg_channel=#{hab_pkg_channel}"
 log.info "  filename=#{filename}"
 log.info "  version=#{version}"
 log.info "  skip_packages=#{skip_packages}"
@@ -381,5 +390,11 @@ if allow_local_packages
 end
 package_querier = PackageQuerier::MustExistQuerier.new(PackageQuerier::ChainQuerier.new(package_queriers))
 
-manifest = ManifestGenerator.new.generate(package_querier, "products.meta", version, skip_packages, log)
+manifest = ManifestGenerator.new.generate(
+  package_querier,
+  "products.meta",
+  version,
+  skip_packages,
+  hab_pkg_channel,
+  log)
 File.open("#{filename}", "w") { |file| file.write(JSON.pretty_generate(manifest)) }
