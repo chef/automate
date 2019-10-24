@@ -5,10 +5,9 @@
     [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
     {{ notification.message }}
     <ng-container>
-      <a href="https://www.chef.io/contact-us/" target="_blank">Get a license from Chef</a>
+      <button class="link" (click)="onTriggerBannerLicenseApply()">Apply a license</button>
       or
-      <span class="link" (click)="onTriggerBannerLicenseApply()">apply a license</span>
-      if you already have one.
+      <a href="https://www.chef.io/contact-us/" target="_blank">contact Chef</a> to continue to use Chef Automate.
     </ng-container>
   </chef-notification>
 </ng-container>

@@ -38,6 +38,8 @@ import { ProjectRulesComponent } from './pages/project/rules/project-rules.compo
 import { RolesListComponent } from './modules/roles/list/roles-list.component';
 import { RoleDetailsComponent } from './modules/roles/details/role-details.component';
 import { UIComponent } from 'app/ui.component';
+import { UserDetailsComponent } from './modules/user/user-details/user-details.component';
+import { UserDetailsNonAdminResolve } from './modules/user/user-details/user-details.resolver';
 
 // Services
 import { ChefSessionService } from './services/chef-session/chef-session.service';
@@ -187,6 +189,11 @@ const routes: Routes = [
           ]
         }
       ]
+    },
+    {
+      path: 'user-details/:id',
+      component: UserDetailsComponent,
+      resolve: { isNonAdmin: UserDetailsNonAdminResolve }
     },
     {
       path: 'compliance',
