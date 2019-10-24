@@ -6,13 +6,13 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/chef/automate/lib/product"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/assets"
 	"github.com/chef/automate/components/automate-deployment/pkg/bind"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/components/automate-deployment/pkg/services/internal/generated"
+	"github.com/chef/automate/lib/product"
 )
 
 //go:generate go run ../../tools/services-pkg-gen/main.go ../../../../ internal/generated/gen.go
@@ -24,6 +24,15 @@ var serviceList []habpkg.HabPkg
 var productList []string
 var packageMetadataMap map[string]*product.Package
 var collectionMap map[string]*product.Collection
+
+// well-known collections
+const (
+	AutomateCollectionName   = "automate"
+	BuilderCollectionName    = "builder"
+	ChefServerCollectionName = "chef-server"
+	WorkflowCollectionName   = "workflow"
+	MonitoringCollectionName = "monitoring"
+)
 
 func AllServices() ([]habpkg.HabPkg, error) {
 	return serviceList, nil
