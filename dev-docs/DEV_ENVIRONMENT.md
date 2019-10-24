@@ -1,4 +1,4 @@
-# A2 Development Environment
+# Automate Development Environment
 
 _Contents of ths file:_
 
@@ -7,7 +7,7 @@ _Contents of ths file:_
 
 <!-- TOC -->
 
-- [A2 Development Environment](#a2-development-environment)
+- [Automate Development Environment](#automate-development-environment)
   - [Quickstart](#quickstart)
   - [Setup](#setup)
     - [Docker Setup](#docker-setup)
@@ -38,16 +38,16 @@ _Contents of ths file:_
 
 <!-- /TOC -->
 
-The A2 Development Environment employs habitat and the chef-automate CLI to manage deploying an
-instance of A2 to develop against, allows quick iteration on Go binary changes, re-building and hot
-loading of habitat components, as well as other standard operations needed for working on A2.
+The Automate Development Environment employs habitat and the chef-automate CLI to manage deploying an
+instance of Automate to develop against, allows quick iteration on Go binary changes, re-building and hot
+loading of habitat components, as well as other standard operations needed for working on Automate.
 
 By leveraging habitat, we have a environment we can spin up quickly. Additionally, we have a
 common set of tools we can standardize on without worrying about version spread across developer
 environments and other related issues.
 
 Since the dev env is simply using the chef-automate CLI, it will be very similar to
-a real deploy of A2, meaning we are developing against real infrastructure that will
+a real deploy of Automate, meaning we are developing against real infrastructure that will
 be deployed in the wild. It also means we can leverage it in CI, so that testing
 and deploying there and on your laptop looks the same.
 
@@ -78,10 +78,10 @@ password, respectively.
 
 ## Setup
 
-To be able to build and run A2 on your workstation, you need the
+To be able to build and run Automate on your workstation, you need the
 following prerequisites:
 
-1. Clone A2 repo locally
+1. Clone Automate repo locally
 
    From a terminal: run `git clone https://github.com/chef/automate.git`
 
@@ -89,7 +89,7 @@ following prerequisites:
 
    1. First, install the package. On Homebrew: run `brew install direnv`, on Ubuntu: run `apt-get install direnv`
    2. Next, [hook direnv into your shell](https://github.com/direnv/direnv#setup)
-   3. Finally, run `direnv allow` from the A2 source directory.
+   3. Finally, run `direnv allow` from the Automate source directory.
 
 3. Install and configure Habitat
 
@@ -143,7 +143,7 @@ This will open the npm devserver port so you can develop the UI locally.
 ### Spin Everything Up
 
 To get started, run `start_all_services`. This will start the deploy service and use the chef-automate
-CLI to deploy a fully functional installation of A2 in your studio. This will deploy all of the dev
+CLI to deploy a fully functional installation of Automate in your studio. This will deploy all of the dev
 versions of the hart packages. Once deployed, you can override any component from source.
 
 When you are starting on a new piece of work, you might want to consider `rm -rf results/*` to get
@@ -325,7 +325,7 @@ be running the exact same tests we run locally in our CI System.
 
 #### Unit (Go)
 
-There are a number of A2 components that are written in Go, for those
+There are a number of Automate components that are written in Go, for those
 micro-services you can use the method `go_component_unit COMPONENT_NAME` within
 the hab-studio to execute its unit tests as the following example:
 
@@ -392,7 +392,7 @@ run the tests:
 
 ### Development Tools
 
-This is a very non-exhaustive list of tools useful while doing development against A2.
+This is a very non-exhaustive list of tools useful while doing development against Automate.
 
 #### grpcurl
 
@@ -569,7 +569,7 @@ of one of our components. This will involve the following process:
 #### Working with multiple components
 
 There are some tasks that require you to modify more than one single component
-at the same time. A very common pattern in A2 is the
+at the same time. A very common pattern in Automate is the
 creation of a new endpoint. In the following exercise we will create an endpoint
 called `/cfgmgmt/demo` that will be defined in the
 `automate-gateway` (our Open API), then the gateway will make an RPC call to the
