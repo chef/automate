@@ -84,6 +84,6 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   }
 
   filterVisible() {
-    return this.selectionCount === 0 ? false : true;
+    return this.selectionCount > 0;
   }
 }
