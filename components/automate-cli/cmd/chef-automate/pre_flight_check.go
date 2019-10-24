@@ -22,13 +22,19 @@ func init() {
 		"airgap",
 		false,
 		"Pass this flag when the environment is airgapped")
+	preflightCheckCmd.PersistentFlags().StringVar(
+		&preflightCmdFlags.configPath,
+		"config",
+		"",
+		"Optional config file to use")
 	RootCmd.AddCommand(preflightCheckCmd)
 
 	preflightCheckCmd.AddCommand(newMigratePreflightCmd())
 }
 
 var preflightCmdFlags = struct {
-	airgap bool
+	airgap     bool
+	configPath string
 }{}
 
 var preflightCheckCmd = &cobra.Command{
@@ -41,8 +47,20 @@ var preflightCheckCmd = &cobra.Command{
 	RunE: runPreflightCheckCmd,
 }
 
+func loadMergedConfigForPreflight() (*deployment.AutomateConfig, error) {
+	if preflightCmdFlags.configPath == "" {
+		return deployment.DefaultAutomateConfig(), nil
+	} else {
+		return deployment.LoadUserOverrideConfigFile(preflightCmdFlags.configPath)
+	}
+}
+
 func runPreflightCheckCmd(cmd *cobra.Command, args []string) error {
-	if err := client.Preflight(writer, deployment.DefaultAutomateConfig(), version.BuildTime, preflightCmdFlags.airgap); err != nil {
+	cfg, err := loadMergedConfigForPreflight()
+	if err != nil {
+		return err
+	}
+	if err := client.Preflight(writer, cfg, version.BuildTime, preflightCmdFlags.airgap); err != nil {
 		return err
 	}
 
@@ -173,7 +191,12 @@ func runMigratePreflight(cmd *cobra.Command, args []string) error {
 		return status.Wrap(err, status.PreflightError, "could not set SKIP_SHARED_PORTS environment variable")
 	}
 
-	if err := client.Preflight(writer, deployment.DefaultAutomateConfig(), version.BuildTime, migratePreflightCmdFlags.airgapPreflight); err != nil {
+	cfg, err := loadMergedConfigForPreflight()
+	if err != nil {
+		return err
+	}
+
+	if err := client.Preflight(writer, cfg, version.BuildTime, migratePreflightCmdFlags.airgapPreflight); err != nil {
 		return status.Annotate(err, status.PreflightError)
 	}
 
