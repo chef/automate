@@ -3,7 +3,6 @@ package relaxting
 import (
 	"time"
 
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting"
 )
 
@@ -104,6 +103,11 @@ type ESInSpecReportControlStringTags struct {
 	Values []string `json:"values"`
 }
 
+type ESInSpecReportControlRefs struct {
+	Ref string `json:"ref"`
+	Url string `json:"url"`
+}
+
 type ESInSpecReportControl struct {
 	ID         string                            `json:"id"`
 	Impact     float32                           `json:"impact"`
@@ -111,7 +115,7 @@ type ESInSpecReportControl struct {
 	Status     string                            `json:"status"`
 	Results    []*ESInSpecReportControlsResult   `json:"results"`
 	StringTags []ESInSpecReportControlStringTags `json:"string_tags"`
-	Refs       []*reportingapi.Ref               `json:"refs"`
+	Refs       []ESInSpecReportControlRefs       `json:"refs"`
 }
 
 type ESInSpecReportProfile struct {

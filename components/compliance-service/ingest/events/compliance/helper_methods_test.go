@@ -12,7 +12,6 @@ import (
 
 	"sort"
 
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/compliance-service/ingest/events/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -318,7 +317,7 @@ func parseProfilesMin(js *string) (profiles []relaxting.ESInSpecReportProfile) {
 		}
 		for ci := range profiles[i].Controls {
 			if profiles[i].Controls[ci].Refs == nil {
-				profiles[i].Controls[ci].Refs = []*reportingapi.Ref{}
+				profiles[i].Controls[ci].Refs = []relaxting.ESInSpecReportControlRefs{}
 			}
 		}
 	}
