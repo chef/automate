@@ -516,7 +516,7 @@ func (s *policyServer) UpdateRole(
 		case *projectassignment.ProjectsUnauthorizedForAssignmentErr:
 			return nil, status.Errorf(codes.PermissionDenied, err.Error())
 		}
-		return nil, status.Errorf(codes.Internal, "creating role %q: %s", req.Id, err.Error())
+		return nil, status.Errorf(codes.Internal, "updating role %q: %s, projects: %s", req.Id, req.Projects, err.Error())
 	}
 
 	return roleFromInternal(roleInternal)

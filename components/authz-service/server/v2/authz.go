@@ -348,6 +348,9 @@ func (v *VersionSwitch) Interceptor(ctx context.Context,
 	// definition:
 	fullMethod := info.FullMethod
 	if strings.HasSuffix(fullMethod, "GetVersion") ||
+		// ValidateProjectAssignment is called within CreateToken/UpdateToken
+		// Since our tokens server is not version-aware, we need to exempt this call
+		// ValidateProjectAssignment itself *will* respond correctly to IAM version
 		strings.HasSuffix(fullMethod, "ValidateProjectAssignment") {
 		return handler(ctx, req)
 	}

@@ -89,7 +89,7 @@ func calculateProjectsToAuthorize(oldProjects, newProjects []string, isUpdateReq
 		}
 	}
 
-	// if project goes from no projects to some or the reverse on update
+	// if project goes from no projects to some on update
 	// or has no projects on create
 	if (previouslyUnassigned && isUpdateRequest) || (newlyUnassigned && !isUpdateRequest) {
 		projectDiff = append(projectDiff, UnassignedProjectID)
