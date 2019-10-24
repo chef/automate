@@ -34,11 +34,13 @@ const v2PolicyCreateTemplateStr = `
   "statements": [
     {
       "effect": "DENY",
-      "role": "{{ .RoleID }}"
+      "role": "{{ .RoleID }}",
+      "projects": ["*"]
     },
     {
       "effect": "ALLOW",
-      "actions": ["test:svc:someaction", "test:svc:otheraction"]
+      "actions": ["test:svc:someaction", "test:svc:otheraction"],
+      "projects": ["*"]
     }
   ]
 }
