@@ -1,19 +1,8 @@
-cookie_domain             = ""
 docs_url                  = "https://www.habitat.sh/docs"
-environment               = "production"
 hosted                    = false
 source_code_url           = "https://github.com/habitat-sh/habitat"
 tutorials_url             = "https://www.habitat.sh/learn"
-use_gravatar              = false
 www_url                   = "https://www.habitat.sh"
-# How we connect to the proxied backend API service.
-#   When true, connect to all backend API services via their IPs provided
-#   via the bind
-#   By default (load_balanced=false) we connect to a single backend on the same `sys.ip` as this service
-load_balanced             = false
-
-[analytics]
-enabled                   = false
 
 [github]
 app_id                    = 5565
@@ -44,6 +33,11 @@ keepalive_timeout         = 180
 sendfile                  = "on"
 tcp_nopush                = "on"
 tcp_nodelay               = "on"
+
+[web]
+use_gravatar              = false
+cookie_domain             = ""
+environment               = "production"
 
 [service]
 host = "0.0.0.0"

@@ -43,6 +43,7 @@ import "api/config/data_feed/config_request.proto";
 import "api/config/event_feed/config_request.proto";
 import "api/config/cereal/config_request.proto";
 import "api/config/builder_api/config_request.proto";
+import "api/config/builder_api_proxy/config_request.proto";
 import "api/config/minio/config_request.proto";
 import "api/config/builder_memcached/config_request.proto";
 
@@ -93,6 +94,7 @@ message AutomateConfig {
 	chef.automate.domain.event_feed.ConfigRequest event_feed_service = 39;
 	chef.automate.infra.cereal.ConfigRequest cereal = 40;
 	chef.automate.domain.builder_api.ConfigRequest builder_api = 41;
-	chef.automate.infra.minio.ConfigRequest minio = 42;
-	chef.automate.infra.builder_memcached.ConfigRequest builder_memcached = 43;
+	chef.automate.domain.builder_api_proxy.ConfigRequest builder_api_proxy = 42;
+	chef.automate.infra.minio.ConfigRequest minio = 43;
+	chef.automate.infra.builder_memcached.ConfigRequest builder_memcached = 44;
 }

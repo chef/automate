@@ -11,6 +11,7 @@ import (
 	bifrost "github.com/chef/automate/api/config/bifrost"
 	bookshelf "github.com/chef/automate/api/config/bookshelf"
 	builderapi "github.com/chef/automate/api/config/builder_api"
+	builderapiproxy "github.com/chef/automate/api/config/builder_api_proxy"
 	buildermemcached "github.com/chef/automate/api/config/builder_memcached"
 	cereal "github.com/chef/automate/api/config/cereal"
 	cfgmgmt "github.com/chef/automate/api/config/cfgmgmt"
@@ -56,6 +57,7 @@ func NewAutomateConfig() *AutomateConfig {
 		Bifrost:          bifrost.NewConfigRequest(),
 		Bookshelf:        bookshelf.NewConfigRequest(),
 		BuilderApi:       builderapi.NewConfigRequest(),
+		BuilderApiProxy:  builderapiproxy.NewConfigRequest(),
 		BuilderMemcached: buildermemcached.NewConfigRequest(),
 		Cereal:           cereal.NewConfigRequest(),
 		Compliance:       compliance.NewConfigRequest(),
@@ -103,6 +105,7 @@ func DefaultAutomateConfig() *AutomateConfig {
 		Bifrost:          bifrost.DefaultConfigRequest(),
 		Bookshelf:        bookshelf.DefaultConfigRequest(),
 		BuilderApi:       builderapi.DefaultConfigRequest(),
+		BuilderApiProxy:  builderapiproxy.DefaultConfigRequest(),
 		BuilderMemcached: buildermemcached.DefaultConfigRequest(),
 		Cereal:           cereal.DefaultConfigRequest(),
 		Compliance:       compliance.DefaultConfigRequest(),
@@ -147,7 +150,7 @@ and enforces other invariants on configuration option values.
 If the configuration is valid, the returned error is nil.
 */
 func (c *AutomateConfig) Validate() error {
-	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate())
+	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate())
 	if err == nil {
 		return nil
 	}
@@ -200,6 +203,7 @@ func (c *AutomateConfig) SetGlobalConfig() {
 	c.EventFeedService.SetGlobalConfig(c.Global)
 	c.Cereal.SetGlobalConfig(c.Global)
 	c.BuilderApi.SetGlobalConfig(c.Global)
+	c.BuilderApiProxy.SetGlobalConfig(c.Global)
 	c.Minio.SetGlobalConfig(c.Global)
 	c.BuilderMemcached.SetGlobalConfig(c.Global)
 }
@@ -283,6 +287,8 @@ func (c *AutomateConfig) PlatformServiceConfigForService(serviceName string) (sh
 		return c.Cereal, true
 	case "automate-builder-api":
 		return c.BuilderApi, true
+	case "automate-builder-api-proxy":
+		return c.BuilderApiProxy, true
 	case "automate-minio":
 		return c.Minio, true
 	case "automate-builder-memcached":
