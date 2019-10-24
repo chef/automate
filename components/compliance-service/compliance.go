@@ -166,16 +166,20 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 
 	s := connFactory.NewServer(tracing.GlobalServerInterceptor())
 
-	cerealProjectUpdateManager, err := createProjectUpdateCerealManager(connFactory, conf.CerealConfig.Endpoint)
-	if err != nil {
-		logrus.WithError(err).Fatal("could not create cereal manager")
-	}
-	err = project_update_lib.RegisterTaskExecutors(cerealProjectUpdateManager, "compliance", ingesticESClient, authzProjectsClient)
-	if err != nil {
-		logrus.WithError(err).Fatal("could not register project update task executors")
-	}
-	if err := cerealProjectUpdateManager.Start(ctx); err != nil {
-		logrus.WithError(err).Fatal("could not start cereal manager")
+	if os.Getenv("RUN_MODE") == "test" {
+		logrus.Warn(`Skipping project-update manager setup due to RUN_MODE env var being set to "test"`)
+	} else {
+		cerealProjectUpdateManager, err := createProjectUpdateCerealManager(connFactory, conf.CerealConfig.Endpoint)
+		if err != nil {
+			logrus.WithError(err).Fatal("could not create cereal manager")
+		}
+		err = project_update_lib.RegisterTaskExecutors(cerealProjectUpdateManager, "compliance", ingesticESClient, authzProjectsClient)
+		if err != nil {
+			logrus.WithError(err).Fatal("could not register project update task executors")
+		}
+		if err := cerealProjectUpdateManager.Start(ctx); err != nil {
+			logrus.WithError(err).Fatal("could not start cereal manager")
+		}
 	}
 
 	// needs to be the first one, since it creates the es indices
@@ -195,11 +199,15 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 	version.RegisterVersionServiceServer(s, versionserver.New())
 	status.RegisterComplianceStatusServer(s, statusSrv)
 
-	purgeServer, err := setupDataLifecyclePurgeInterface(ctx, connFactory, conf, cerealManager)
-	if err != nil {
-		logrus.Fatalf("serveGrpc aborting, can't setup purge server: %s", err)
+	if os.Getenv("RUN_MODE") == "test" {
+		logrus.Warn(`Skipping data-lifecycle setup due to RUN_MODE env var being set to "test"`)
+	} else {
+		purgeServer, err := setupDataLifecyclePurgeInterface(ctx, connFactory, conf, cerealManager)
+		if err != nil {
+			logrus.Fatalf("serveGrpc aborting, can't setup purge server: %s", err)
+		}
+		data_lifecycle.RegisterPurgeServer(s, purgeServer)
 	}
-	data_lifecycle.RegisterPurgeServer(s, purgeServer)
 
 	// Register reflection service on gRPC server.
 	reflection.Register(s)
