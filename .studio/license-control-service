@@ -8,9 +8,11 @@ DOC
 function test_license_control_service {
   install_if_missing core/curl curl;
   install_if_missing core/go go;
-  setup_go_workspace
-  pushd /hab/cache/src/go/src/github.com/chef/automate/components/license-control-service >/dev/null;
-  make setup review test;
+
+  chef-automate dev deploy-some chef/license-control-service --with-deps
+  pushd components/license-control-service >/dev/null || return 1
+    PG_URL="postgresql://automate@127.0.0.1:5432/chef_license_control_service?sslmode=verify-ca&sslkey=/hab/svc/automate-postgresql/config/server.key&sslcert=/hab/svc/automate-postgresql/config/server.crt&sslrootcert=/hab/svc/automate-postgresql/config/root.crt" make review test
+  popd || return 1
 }
 
 document "telemetry_status" <<DOC

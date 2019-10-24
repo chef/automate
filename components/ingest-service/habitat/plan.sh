@@ -1,3 +1,6 @@
+#shellcheck disable=SC2034
+#shellcheck disable=SC2154
+
 pkg_name=ingest-service
 pkg_description="Ingestion service of Chef data"
 pkg_origin=chef
@@ -15,24 +18,18 @@ pkg_binds=(
   [pg-sidecar-service]="port"
   [cereal-service]="port"
 )
-
 pkg_binds_optional=(
-    [es-sidecar-service]="port"
+  [es-sidecar-service]="port"
 )
-
 pkg_exports=(
   [port]=service.port
 )
 pkg_exposes=(port)
 pkg_deps=(
-  core/glibc
   core/grpcurl
   core/jq-static
   chef/automate-platform-tools
   chef/mlsa
-)
-pkg_build_deps=(
-  core/gcc
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
@@ -43,17 +40,8 @@ scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/${pkg_name}"
 )
 
-do_prepare() {
-  GIT_SHA=$(git rev-parse HEAD)
-  GO_LDFLAGS=" -X ${scaffolding_go_base_path}/automate/lib/version.Version=${pkg_release}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.GitSHA=${GIT_SHA}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.BuildTime=${pkg_release}"
-  export GO_LDFLAGS
-  build_line "Setting GO_LDFLAGS=${GO_LDFLAGS}"
-}
-
 do_strip() {
   if [[ "${CHEF_DEV_ENVIRONMENT}" != "true" ]]; then
     do_default_strip
-  fi;
+  fi
 }

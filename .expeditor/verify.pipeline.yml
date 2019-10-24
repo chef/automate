@@ -11,13 +11,7 @@ steps:
   #
   - label: "[codegen] A2 protobufs"
     command:
-      - |
-        hab studio run "source .studiorc &&
-          compile_all_protobuf_components &&
-          git add . &&
-          git diff --staged --exit-code --ignore-submodules=all"
-        cd api
-        make lint unit
+      - hab studio run "source .studiorc && verify_all_protobuf_components"
     timeout_in_minutes: 10
     retry:
       automatic:
@@ -36,7 +30,7 @@ steps:
   #
   - label: repo health
     command:
-      - hab studio run "source .studiorc && enter_go_workspace && scripts/repo_health.sh"
+      - hab studio run "source .studiorc && scripts/repo_health.sh"
     timeout_in_minutes: 10
     retry:
       automatic:

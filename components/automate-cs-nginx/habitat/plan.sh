@@ -1,5 +1,4 @@
 #shellcheck disable=SC2034
-#shellcheck disable=SC2039
 #shellcheck disable=SC2154
 
 pkg_name=automate-cs-nginx
@@ -47,7 +46,7 @@ pkg_upstream_url="https://www.chef.io/automate"
 # the other nginx instances in A2 at the moment:
 pkg_svc_user="root"
 
-pkg_scaffolding=chef/scaffolding-go
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
 scaffolding_go_base_path=github.com/chef
 scaffolding_go_repo_name=automate
 scaffolding_go_import_path="${scaffolding_go_base_path}/${scaffolding_go_repo_name}/components/${pkg_name}"
@@ -58,17 +57,17 @@ scaffolding_go_binary_list=(
 chef_automate_hab_binding_mode="relaxed"
 
 do_prepare() {
-    GO_LDFLAGS="-X main.BundlePath=$(pkg_path_for core/bundler)"
-    GO_LDFLAGS="$GO_LDFLAGS -X main.RubyPath=$(pkg_path_for core/ruby)"
-    GO_LDFLAGS="$GO_LDFLAGS -X main.ChefServerCtlPath=$(pkg_path_for chef/chef-server-ctl)"
-    GO_LDFLAGS="$GO_LDFLAGS -X main.KnifePath=${pkg_prefix}/bin/knife"
-    GO_LDFLAGS="$GO_LDFLAGS -X main.Version=${pkg_version}/${pkg_release}"
-    export GO_LDFLAGS
+  GO_LDFLAGS="-X main.BundlePath=$(pkg_path_for core/bundler)"
+  GO_LDFLAGS="$GO_LDFLAGS -X main.RubyPath=$(pkg_path_for core/ruby)"
+  GO_LDFLAGS="$GO_LDFLAGS -X main.ChefServerCtlPath=$(pkg_path_for chef/chef-server-ctl)"
+  GO_LDFLAGS="$GO_LDFLAGS -X main.KnifePath=${pkg_prefix}/bin/knife"
+  GO_LDFLAGS="$GO_LDFLAGS -X main.Version=${pkg_version}/${pkg_release}"
+  export GO_LDFLAGS
 }
 
 do_install() {
   # Install chef-server-ctl shim
-  scaffolding_go_install
+  do_default_install
 
   # Install knife shim
   wrapper_bin_path="${pkg_prefix}/bin"

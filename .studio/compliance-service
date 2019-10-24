@@ -24,17 +24,8 @@ document "compliance_unit_tests" <<DOC
   'examples' folder.
 DOC
 function compliance_unit_tests() {
-  setup_go_workspace
-  # Run the tests
-  pushd $scaffolding_go_pkg_path >/dev/null
-    local GO_PACKAGES
-    GO_PACKAGES=$(go list ./components/compliance-service/... |  grep -v '/examples/')
-    log_line "Executing Go test"
-    eval go test -v $GO_PACKAGES -cover
-    local EXIT_CODE=$?
-  popd >/dev/null
-
-  return $EXIT_CODE
+  mapfile -t packages < <(go list -f '{{ .Dir }}' /src/components/compliance-service/... | grep -v examples)
+  go_test "${packages[@]}"
 }
 
 document "compliance_integration" <<DOC
@@ -64,8 +55,6 @@ document "auto_go_update_compliance_service" <<DOC
 DOC
 function auto_go_update_compliance_service() {
   local component="compliance-service"
-
-  setup_go_workspace
 
   install_if_missing core/inotify-tools inotifywait
   log_line "Starting file watch for $component"

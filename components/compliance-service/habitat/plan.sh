@@ -1,3 +1,6 @@
+#shellcheck disable=SC2034
+#shellcheck disable=SC2154
+
 pkg_name=compliance-service
 pkg_description="Compliance API service"
 pkg_origin=chef
@@ -5,11 +8,6 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Chef-MLSA')
 pkg_version="1.11.1"
 pkg_upstream_url="http://github.com/chef/automate/components/compliance-service"
-pkg_build_deps=(
-  core/curl
-  core/gcc
-  core/tar
-)
 pkg_bin_dirs=(bin)
 pkg_exports=(
   [port]=service.port
@@ -34,25 +32,24 @@ pkg_binds_optional=(
 inspec_release="chef/inspec/4.16.0/20190829191134"
 pkg_deps=(
   core/bash
-  core/glibc
   core/grpcurl              # Used in habitat/hooks/health_check
   core/jq-static            # Used in habitat/hooks/health_check
-  ${local_platform_tools_origin:-chef}/automate-platform-tools
+  "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # WARNING: Update with care. The chef/inspec is managed with Expeditor.
 
   # See .expeditor/update-inspec-version.sh for details
-  ${inspec_release}
+  "${inspec_release}"
   chef/mlsa
 )
 
 if [[ -n "$AUTOMATE_OSS_BUILD" ]]; then
-    echo "Not adding automate-compliance-profiles as AUTOMATE_OSS_BUILD is set!"
+  echo "Not adding automate-compliance-profiles as AUTOMATE_OSS_BUILD is set!"
 else
-    # WARNING: chef/automate-compliance-profiles is managed by Expeditor
-    # See .expeditor/update-compliance-profiles.sh for details
-    pkg_deps+=(
-        chef/automate-compliance-profiles/1.0.0/20191024163920
-    )
+  # WARNING: chef/automate-compliance-profiles is managed by Expeditor
+  # See .expeditor/update-compliance-profiles.sh for details
+  pkg_deps+=(
+      chef/automate-compliance-profiles/1.0.0/20191024163920
+  )
 fi
 
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
@@ -65,19 +62,14 @@ scaffolding_go_binary_list=(
 )
 
 do_prepare() {
-  # Injecting Version, SHA and Build Time to the go linker
-  GIT_SHA=$(git rev-parse HEAD)
-  GO_LDFLAGS=" -X ${scaffolding_go_base_path}/automate/lib/version.Version=${pkg_release}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.GitSHA=${GIT_SHA}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.BuildTime=${pkg_release}"
+  do_default_prepare
+
   GO_LDFLAGS="${GO_LDFLAGS} -X main.EXECUTABLE_PATH=$(pkg_path_for chef/inspec)/bin/inspec"
   export GO_LDFLAGS
-  build_line "Setting GO_LDFLAGS=${GO_LDFLAGS}"
 }
 
 do_install() {
-  # Scaffolding go install callback
-  scaffolding_go_install
+  do_default_install
 
   inspec_sem_version=$(awk -F  '/' '{print $3}' <<< ${inspec_release})
   build_line "Setting InSpec version ${inspec_sem_version}"
@@ -95,5 +87,5 @@ do_install() {
 do_strip() {
   if [[ "${CHEF_DEV_ENVIRONMENT}" != "true" ]]; then
     do_default_strip
-  fi;
+  fi
 }

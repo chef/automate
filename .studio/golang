@@ -30,6 +30,8 @@ document "go_component_unit" <<DOC
   Finally, invoke the command with no arguments to see a concise usage message.
 DOC
 function go_component_unit() {
+  install_if_missing core/go go
+
   VERBOSE_TESTS=
   if [[ "$1" == "-v" ]]; then
       VERBOSE_TESTS=$1
@@ -40,35 +42,28 @@ function go_component_unit() {
     return 1
   fi
 
-  local GO_PACKAGES
-  setup_go_workspace
+  local packages
+  local spec
   log_line "Running '${YELLOW}$1${NC}' unit tests"
-  pushd "$scaffolding_go_pkg_path" >/dev/null
-    if [[ "$1" == "api" ]]; then
-      SPEC=./api/...
-    else
-      SPEC=./components/$1/...
-    fi
-    GO_PACKAGES=$(go list $SPEC | grep -v integration)
-  popd >/dev/null
-  go_test $GO_PACKAGES
+  if [[ "$1" == "api" ]]; then
+    spec=./api/...
+  else
+    spec=./components/$1/...
+  fi
+  mapfile -t packages < <(go list -f '{{ .Dir }}' "${spec}" | grep -v integration)
+  go_test "${packages[@]}"
 }
 complete -F _component_auto_complete go_component_unit
 
 # TODO: (@afiune) Document the use of go_test and maybe put in ci-studio-common
 function go_test() {
-  setup_go_workspace
   install_if_missing core/go go
   install_if_missing core/git git
 
-  pushd "$scaffolding_go_pkg_path" >/dev/null
-    log_line "Executing Go test"
-    # The default behavior is to run the package at the root of the
-    # repository which is just as if we run: 'go test -cover'
-    go test "$@" -cover $VERBOSE_TESTS
-    local EXIT_CODE=$?
-  popd >/dev/null
-  return $EXIT_CODE
+  log_line "Executing Go test"
+  # The default behavior is to run the package at the root of the
+  # repository which is just as if we run: 'go test -cover'
+  go test "$@" -cover "${VERBOSE_TESTS}"
 }
 
 document "go_build_pkg" <<DOC
@@ -80,25 +75,26 @@ document "go_build_pkg" <<DOC
       go_build_pkg components/automate-deployment/pkg/server
 DOC
 function go_build_pkg() {
+  install_if_missing core/go go
+
   if [[ "$1" == "" ]]; then
       error "Missing package path; try 'describe ${FUNCNAME[0]}'"
       return 1
   fi
 
-  setup_go_workspace
-  [[ ! -d /src/bin ]] && mkdir /src/bin
-
   local pkg_path="github.com/chef/automate/$1"
+  log_line " go_build $pkg_path"
+  go_build "$pkg_path"
+}
 
-  pushd /src/bin >/dev/null
-    log_line " go build $pkg_path"
-    go build -i "$pkg_path"
-    # Save the exit code to return it later.
-    # This will make the function exit with
-    # a non-zero code and don't process from there.
-    EXIT_CODE=$?
-  popd >/dev/null
-  return $EXIT_CODE
+document "go_build" <<DOC
+  A go vendor aware wrapped for go build
+DOC
+function go_build() {
+  install_if_missing core/go go
+  mkdir -p "${GOBIN}"
+
+  go install "${1}"
 }
 
 document "go_build_component" <<DOC
@@ -106,13 +102,10 @@ document "go_build_component" <<DOC
 DOC
 function go_build_component() {
   [[ "$1" == "" ]] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
-  verify_component $1 || return $?
+  verify_component "$1" || return $?
   local component=$1
 
-  # Create bin folder if missing
-  [[ ! -d /src/bin ]] && mkdir /src/bin
-
-  go_build "components/${component}/cmd/${component}/*.go" "/src/bin/${component}"
+  go_build "./components/${component}/cmd/${component}/..."
 }
 # Adding auto tab complete
 complete -F _component_auto_complete go_build_component
@@ -163,9 +156,6 @@ complete -F _component_auto_complete reload_component_binary
 
 document "go_update_component" <<DOC
   Go update will generate a new binary (go_build) and force load it (reload_binary).
-
-  To just build the Go binary without running the dependency solver:
-  => GO_FAST=true go_update_component [COMPONENT_NAME]
 DOC
 function go_update_component() {
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
@@ -216,8 +206,6 @@ function auto_go_update_component() {
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
   verify_component $1 || return $?
   local component=$1
-
-  setup_go_workspace
 
   install_if_missing core/inotify-tools inotifywait
   log_line "Starting file watch for $component"
@@ -285,7 +273,6 @@ function install_golangci() {
         return 1
     fi
     (
-        enter_go_workspace
         local lint_bin="./cache/golangci-lint-${GOLANGCILINTVERSION}-linux-amd64/golangci-lint"
         local lint_tarball="./cache/golangci-lint-${GOLANGCILINTVERSION}-linux-amd64.tar.gz"
         if [[ ! -f  "$lint_bin" ]]; then
@@ -307,7 +294,6 @@ function run_golangci() {
     fi
 
     (
-        enter_go_workspace
         local pkg=$1
         log_line "Running golang-ci ${GOLANGCILINTVERSION} on $pkg"
         "./cache/golangci-lint-${GOLANGCILINTVERSION}-linux-amd64/golangci-lint" run "$pkg"
@@ -315,13 +301,15 @@ function run_golangci() {
 }
 
 document "go_component_make" <<DOC
-  Runs the given make target(s) for the given component inside the scaffolding_go_pkg_path
+  Runs the given make target(s) for the given component
 DOC
 function go_component_make() {
   [[ "$1" == "" ]] && error "Missing component name argument" && return 1
-  setup_go_workspace
+
+  install_if_missing core/go go
+
   local component_relpath=$1
-  local component_path="$GOPATH/src/github.com/chef/automate/$component_relpath"
+  local component_path="/src/$component_relpath"
   shift
   pushd "$component_path" > /dev/null || (echo "invalid component; cannot cd to $component_path" && return 1)
   echo "in $component_path"

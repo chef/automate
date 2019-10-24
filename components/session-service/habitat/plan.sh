@@ -1,3 +1,6 @@
+#shellcheck disable=SC2034
+#shellcheck disable=SC2154
+
 pkg_name=session-service
 pkg_description="A2 session service"
 pkg_origin=chef
@@ -8,13 +11,8 @@ pkg_upstream_url="http://github.com/chef/automate/components/session-service"
 pkg_deps=(
   core/bash
   core/curl # health_check hook
-  core/glibc
   chef/mlsa
-  ${local_platform_tools_origin:-chef}/automate-platform-tools
-)
-pkg_build_deps=(
-  core/gcc
-  core/git # for ref in version
+  "${local_platform_tools_origin:-chef}/automate-platform-tools"
 )
 pkg_exports=(
   [port]=service.port # default service is http
@@ -37,21 +35,11 @@ scaffolding_go_binary_list=(
 )
 
 do_strip() {
-    return 0;
-}
-
-do_prepare() {
-  GIT_SHA=$(git rev-parse HEAD)
-  GO_LDFLAGS=" -X ${scaffolding_go_base_path}/automate/lib/version.Version=${pkg_release}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.GitSHA=${GIT_SHA}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.BuildTime=${pkg_release}"
-  export GO_LDFLAGS
-  build_line "Setting GO_LDFLAGS=${GO_LDFLAGS}"
+  return 0
 }
 
 do_install() {
-  # Go scaffolding install callback
-  scaffolding_go_install
+  do_default_install
 
   build_line "Copying migration files"
   cp -r migration/sql "${pkg_prefix}/migrations"

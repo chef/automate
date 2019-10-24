@@ -33,16 +33,17 @@ function compile_go_protobuf_component() {
   # Note: the actual generation is triggered by a call to protoc with the
   # parameter '--policy_out=...'. Only if the service's methods has the proper
   # annotations will the generated code not be a NO-OP.
-  setup_go_workspace
-  ( cd "${scaffolding_go_pkg_path}" || return 1
-    local proto_go_tools=(
-      github.com/chef/automate/components/automate-grpc/protoc-gen-policy
-      github.com/chef/automate/components/automate-grpc/protoc-gen-grpc-mock # generate mock grpc server implementations
-      github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config
-    )
-    install_go_tool "${proto_go_tools[@]}"
-    GO_TOOL_VENDOR=true install_go_tool github.com/envoyproxy/protoc-gen-validate
+  local proto_go_tools=(
+    github.com/chef/automate/components/automate-grpc/protoc-gen-policy
+    github.com/chef/automate/components/automate-grpc/protoc-gen-grpc-mock # generate mock grpc server implementations
+    github.com/chef/automate/components/automate-grpc/protoc-gen-a2-config
+    github.com/envoyproxy/protoc-gen-validate
+    github.com/ckaznocha/protoc-gen-lint
   )
+  install_go_tool "${proto_go_tools[@]}"
+
+  # For handling faux GOPATH copying for non-module aware protoc extensions
+  install_if_missing core/rsync rsync
 
   # "api" doesn't compile the config directory so let's not delete the config directory in that case
   if [ "$path" == "api" ]; then
@@ -80,16 +81,16 @@ complete -F _component_auto_complete compile_go_protobuf_component
 
 function compile_client_mocks() {
   install_gomock
-  pushd "$scaffolding_go_pkg_path/api/interservice" >/dev/null
-    mockgen -source event/event.pb.go -destination event/event.pb.client_mock.go -package event
-    mockgen -source authz/v2/project.pb.go -destination authz/v2/project.pb.client_mock.go -package v2
-    mockgen -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz
-    mockgen -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn
-    mockgen -source cfgmgmt/service/cfgmgmt.pb.go -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service
-    mockgen -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest
-    mockgen -source event_feed/event_feed.pb.go -destination event_feed/event_feed.pb.client_mock.go -package event_feed
-    mockgen -source ../../components/nodemanager-service/api/manager/manager.pb.go -destination ../../components/nodemanager-service/api/manager/manager.pb.client_mock.go -package manager
-  popd >/dev/null
+  pushd "/src/api/interservice" > /dev/null || exit 1
+    mockgen -source event/event.pb.go -destination event/event.pb.client_mock.go -package event -self_package github.com/chef/automate/api/interservice/event
+    mockgen -source authz/v2/project.pb.go -destination authz/v2/project.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
+    mockgen -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
+    mockgen -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
+    mockgen -source cfgmgmt/service/cfgmgmt.pb.go -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service -self_package github.com/chef/automate/api/interservice/cfgmgmt/service
+    mockgen -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/ingest
+    mockgen -source event_feed/event_feed.pb.go -destination event_feed/event_feed.pb.client_mock.go -package event_feed -self_package github.com/chef/automate/api/interservice/event_feed
+    mockgen -source ../../components/nodemanager-service/api/manager/manager.pb.go -destination ../../components/nodemanager-service/api/manager/manager.pb.client_mock.go -package manager -self_package github.com/chef/automate/components/nodemanager-service/api/manager
+  popd > /dev/null || exit 1
 }
 
 
@@ -110,6 +111,24 @@ function compile_all_protobuf_components() {
       return 1
     fi
   done
+}
+
+document "verify_all_protobuf_components" <<DOC
+  Verify that all protobuf are up to date
+DOC
+function verify_all_protobuf_components() {
+  install_if_missing core/git git
+
+  if ! compile_all_protobuf_components; then
+    return $?
+  fi
+
+  git add .
+  if ! git diff --staged --exit-code --ignore-submodules=all; then
+    return $?
+  fi
+
+  go_component_make api lint unit
 }
 
 document "link_component_bin" <<DOC
@@ -264,10 +283,7 @@ the dev environment. Private keys are checked into git.
 DOC
 function generate_dev_root_ca() {
     install_if_missing core/certstrap certstrap
-    (
-        enter_go_workspace
-        go run ./tools/dev-cert-gen --regen-ca
-    )
+    go run /src/tools/dev-cert-gen/main.go --regen-ca
 }
 
 document "generate_dev_service_cert" <<DOC
@@ -285,10 +301,7 @@ generate_dev_service_cert foo-service
 DOC
 function generate_dev_service_cert() {
     install_if_missing core/certstrap certstrap
-    (
-        enter_go_workspace
-        go run ./tools/dev-cert-gen "$@"
-    )
+    go run /src/tools/dev-cert-gen/main.go "$@"
 }
 
 _component_auto_complete()

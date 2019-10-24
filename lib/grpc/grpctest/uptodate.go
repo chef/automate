@@ -3,11 +3,11 @@ package grpctest
 import (
 	"bytes"
 	"fmt"
-	"go/build"
 	"io/ioutil"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/golang/protobuf/protoc-gen-go/descriptor"
@@ -19,15 +19,40 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-const a2Root = "github.com/chef/automate"
+// Finds the project root by walking backwards from the current directory
+// until it finds the go.mod file.
+func rootDir() (string, error) {
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	dir = filepath.Clean(dir)
 
-// Note 2018/02/26 (sr): This is done to avoid having to know the level of
-// nesting for the code that calls this method, i.e., to avoid having to get
-// the number of "../" right.
-var (
-	goSrc    = filepath.Join(build.Default.GOPATH, "src")
-	topLevel = filepath.Join(goSrc, a2Root)
-)
+	for {
+		f, err := os.Stat(filepath.Join(dir, "go.mod"))
+		if err == nil && !f.IsDir() {
+			return dir, nil
+		}
+
+		d := filepath.Dir(dir)
+		if d == dir {
+			break
+		}
+
+		dir = d
+	}
+
+	return "", nil
+}
+
+// genSrcPathToRelPath takes an in memory protobuf path name and returns the
+// on disk location to the corresponding protobuf.
+func genSrcPathToRelPath(t *testing.T, path string) string {
+	topLevel, err := rootDir()
+	require.NoError(t, err)
+
+	return fmt.Sprintf("%s/%s", topLevel, strings.TrimPrefix(path, "github.com/chef/automate/"))
+}
 
 // AssertCompiledInUpToDate is an assertion that, given a set of directories
 // containing .proto files, such as components/teams-service/teams/, asserts
@@ -38,6 +63,8 @@ var (
 // Note that this way, whitespace- or comment-only changes do not matter.
 func AssertCompiledInUpToDate(t *testing.T, dirs ...string) {
 	t.Helper()
+	topLevel, err := rootDir()
+	require.NoError(t, err)
 	files := findAllProtoFiles(t, topLevel, dirs...)
 	assert.NotZero(t, len(files), "expected at least one *.proto file in %v", dirs)
 
@@ -133,7 +160,7 @@ func AssertGeneratedPolicyUpToDate(t *testing.T, file string) {
 	defer cleanup()
 
 	for _, generated := range resp.GetFile() {
-		onDisk, err := ioutil.ReadFile(filepath.Join(goSrc, generated.GetName()))
+		onDisk, err := ioutil.ReadFile(genSrcPathToRelPath(t, generated.GetName()))
 		require.NoError(t, err, "read generated file from disk")
 
 		assertEqualOrOutputDiff(t, generated.GetName(), string(onDisk), generated.GetContent())
@@ -166,6 +193,8 @@ func assertEqualOrOutputDiff(t *testing.T, filename, a, b string) {
 func FindServiceProtos(t *testing.T, dirs ...string) []string {
 	t.Helper()
 	returnedPaths := []string{}
+	topLevel, err := rootDir()
+	require.NoError(t, err)
 
 	files := findAllProtoFiles(t, topLevel, dirs...)
 	for _, file := range files {
@@ -227,6 +256,11 @@ func findAllProtoFiles(t *testing.T, base string, dirs ...string) []string {
 // attempts to parse them, and returns a slice of *desc.FileDescriptor on
 // success.
 func ParseProtoFiles(files []string) ([]*desc.FileDescriptor, error) {
+	topLevel, err := rootDir()
+	if err != nil {
+		return nil, err
+	}
+
 	parser := protoparse.Parser{
 		ImportPaths: []string{
 			// top-level, to reference protos using their component/xyz-service/api/... paths

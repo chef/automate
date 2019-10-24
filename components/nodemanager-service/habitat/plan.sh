@@ -1,3 +1,6 @@
+#shellcheck disable=SC2034
+#shellcheck disable=SC2154
+
 pkg_name=nodemanager-service
 pkg_description="Nodemanager Service"
 pkg_origin=chef
@@ -6,13 +9,9 @@ pkg_license=('Chef-MLSA')
 pkg_version="1.0.0"
 pkg_upstream_url="http://github.com/chef/automate/components/nodemanager"
 pkg_deps=(
-  core/glibc
   chef/mlsa
-  ${local_platform_tools_origin:-chef}/automate-platform-tools
+  "${local_platform_tools_origin:-chef}/automate-platform-tools"
   core/bash
-)
-pkg_build_deps=(
-  core/gcc
 )
 pkg_bin_dirs=(bin)
 pkg_exports=(
@@ -38,18 +37,8 @@ scaffolding_go_binary_list=(
   "${scaffolding_go_import_path}/cmd/${pkg_name}"
 )
 
-do_prepare() {
-  GIT_SHA=$(git rev-parse HEAD)
-  GO_LDFLAGS=" -X ${scaffolding_go_base_path}/automate/lib/version.Version=${pkg_release}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.GitSHA=${GIT_SHA}"
-  GO_LDFLAGS="${GO_LDFLAGS} -X ${scaffolding_go_base_path}/automate/lib/version.BuildTime=${pkg_release}"
-  export GO_LDFLAGS
-  build_line "Setting GO_LDFLAGS=${GO_LDFLAGS}"
-}
-
 do_install() {
-  # Scaffolding go install callback
-  scaffolding_go_install
+  do_default_install
 
   build_line "Copying migration files"
   mkdir "${pkg_prefix}/migrations"
@@ -59,5 +48,5 @@ do_install() {
 do_strip() {
   if [[ "${CHEF_DEV_ENVIRONMENT}" != "true" ]]; then
     do_default_strip
-  fi;
+  fi
 }

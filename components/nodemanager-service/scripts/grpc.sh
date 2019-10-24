@@ -1,13 +1,13 @@
 #!/bin/bash -e
 
-set -x
 for i in $(find components/nodemanager-service -name '*.proto') ; do
-  protoc -I. \
-    -I$PWD/components/nodemanager-service/api \
-    -I$GOPATH/src \
-    -I$PWD/vendor \
-    -I$PWD/vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
-    --go_out=plugins=grpc:$GOPATH/src \
-    --a2-config_out=$GOPATH/src \
-    $i
+  printf 'GEN: %s\n' "${i}"
+  protoc -I /src \
+    -I /src/components/nodemanager-service/api \
+    -I vendor \
+    -I vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+    --go_out=plugins=grpc,paths=source_relative:/src \
+    --a2-config_out=paths=source_relative:/src \
+    --a2-config_out=paths=source_relative:/src \
+    "${i}"
 done
