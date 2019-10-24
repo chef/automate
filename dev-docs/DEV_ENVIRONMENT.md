@@ -225,6 +225,15 @@ Anytime you edit a .proto file you need to recompile it.
 compile_go_protobuf_component <COMPONENT_NAME>
 ```
 
+Some proto files can not be recompiled individually. If you are seeing
+unexpected changes after recompiling a .proto file (such as `git status`
+reporting missing files) or just want to be on the safe side, you can
+recompile all .proto files at once:
+
+```
+compile_all_protobuf_components
+```
+
 ### Accessing the Logs
 
 You can run `sl` to see the supervisor logs. If you are running in docker, to access them on
