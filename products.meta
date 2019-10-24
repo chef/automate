@@ -124,6 +124,7 @@
       "name": "builder",
       "type": "product",
       "aliases": ["depot"],
+      "hidden": true,
       "dependencies": ["core", "postgresql", "auth"],
       "services": []
     },

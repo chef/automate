@@ -474,7 +474,7 @@ var ProductMetadataJSON = `
         "postgresql",
         "auth"
       ],
-      "hidden": false
+      "hidden": true
     },
     {
       "name": "chef-server",

@@ -38,11 +38,14 @@ const GB = 1 << 30
 
 func minDiskBytesForConfig(c *dc.AutomateConfig) uint64 {
 	collections := deployment.CollectionsForConfig(c.GetDeployment())
+	minSize := uint64(0)
 	if services.ContainsCollection(services.BuilderCollectionName, collections) {
-		return 15 * GB
-	} else {
-		return 5 * GB
+		minSize += 15 * GB
 	}
+	if services.ContainsCollection(services.AutomateCollectionName, collections) {
+		minSize += 5 * GB
+	}
+	return minSize
 }
 
 func DefaultMinimumDiskCheck(c *dc.AutomateConfig) Check {
