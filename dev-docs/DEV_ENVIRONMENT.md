@@ -97,7 +97,7 @@ following prerequisites:
 
    1. Determine the supported version of Habitat. It is 0.77.0 at the time of writing this, but the current version can be found in [studio-common's `.hab-version` file](https://github.com/chef/studio-common/blob/master/.hab-version).
    2. To install version `0.77.0` of Habitat:
-  `curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh | sudo bash -s -- -v 0.77.0`
+  `curl https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh | sudo bash -s -- -v 0.77.0` or refer to the [Habitat installation guide](https://www.habitat.sh/docs/install-habitat/).
    3. To configure the Habitat cli run and follow the instructions:
   `hab cli setup`
 
