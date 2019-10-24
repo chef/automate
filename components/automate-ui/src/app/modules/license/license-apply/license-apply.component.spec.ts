@@ -11,8 +11,7 @@ import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { EntityStatus } from 'app/entities/entities';
 import { runtimeChecks } from 'app/ngrx.reducers';
-import { ApplyStatus } from 'app/entities/license/license.reducer';
-import { LicenseStatus } from 'app/entities/license/license.model';
+import { ApplyStatus, LicenseStatus } from 'app/entities/license/license.model';
 import { LicenseApplyComponent } from './license-apply.component';
 
 function genErrorResp(status: number, msg: string): any /* HttpErrorResponse */ {

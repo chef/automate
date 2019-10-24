@@ -13,7 +13,7 @@ import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { EntityStatus } from 'app/entities/entities';
 import { HttpStatus } from 'app/types/types';
 import { runtimeChecks } from 'app/ngrx.reducers';
-import { FetchStatus, RequestStatus } from 'app/entities/license/license.reducer';
+import { FetchStatus, RequestStatus } from 'app/entities/license/license.model';
 import { LicenseLockoutComponent } from './license-lockout.component';
 import { using } from 'app/testing/spec-helpers';
 import { LicenseStatus } from 'app/entities/license/license.model';
