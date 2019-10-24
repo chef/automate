@@ -43,6 +43,8 @@ inherited_options:
 - name: airgap
   default_value: "false"
   usage: Pass this flag when the environment is airgapped
+- name: config
+  usage: Optional config file to use
 - name: debug
   shorthand: d
   default_value: "false"

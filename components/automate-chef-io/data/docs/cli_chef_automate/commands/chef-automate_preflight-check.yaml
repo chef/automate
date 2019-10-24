@@ -7,6 +7,8 @@ options:
 - name: airgap
   default_value: "false"
   usage: Pass this flag when the environment is airgapped
+- name: config
+  usage: Optional config file to use
 - name: help
   shorthand: h
   default_value: "false"
