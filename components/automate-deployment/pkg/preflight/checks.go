@@ -369,7 +369,7 @@ func ConnectivityCheck(urls []string) Check {
 	}
 }
 
-var a1MigratePorts = []uint16{80, 443, 2133, 2134, 5432}
+var a1MigratePorts = []uint16{80, 443, 2133, 2134, 5432, 8989, 9611}
 
 func skippablePort(port uint16) bool {
 	for _, p := range a1MigratePorts {
