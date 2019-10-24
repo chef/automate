@@ -139,7 +139,7 @@ func TestChefClientAuthn(t *testing.T) {
 			}
 
 			// Note: technically, we already have the token's value in this response. We are going to go grab
-			// it in the next step any, to ensure that flow works.
+			// it in the next step anyway, to ensure that flow works.
 			myTokenID = resp.GetId()
 
 			// read back token

@@ -123,7 +123,7 @@ func TestIntegrationValidateProjectAssignmentWithOverlappingProjects(t *testing.
 	})
 }
 
-// bug: this test passes contingent on the above test being run.
+// bug: this test passes contingent on the first test being run.
 // issue seems to be related to context metadata
 func TestIntegrationValidateProjectAssignment(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
@@ -337,6 +337,7 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 			assert.NoError(t, err)
 		},
 		"when assigning (unassigned) is not allowed, from authorized project to unassigned": func(t *testing.T) {
+			// We do allow users to remove their project, even if results in unassigned
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},
@@ -346,6 +347,7 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 			assert.NoError(t, err)
 		},
 		"on update, when assigning (unassigned) is not allowed, from authorized project to unassigned": func(t *testing.T) {
+			// We do allow users to remove their project, even if results in unassigned
 			_, err := cl.ValidateProjectAssignment(ctx, &api_v2.ValidateProjectAssignmentReq{
 				Subjects:        []string{onlyAssignsAuthorizedProjUser},
 				OldProjects:     []string{authorizedProjectId},

@@ -3,7 +3,7 @@ import { describeIfIAMV2p1 } from '../../constants';
 describeIfIAMV2p1('assigning projects', () => {
   let apiToken = '';
 
-  const modifyError = 'Projects for this object cannot be modified';
+  const modifyError = 'Projects cannot be modified';
   const cypressPrefix = 'iam-integration';
   const resource = {
     id: `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`,

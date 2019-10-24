@@ -86,6 +86,9 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 	}
 
 	projects := pol.Projects
+	if projects == nil {
+		projects = []string{}
+	}
 	// ensure initial chef-managed policies/roles created
 	if checkProjects && pol.Type == v2.Custom {
 		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projects)
