@@ -21,7 +21,8 @@ pg-helper fix-permissions "$DBNAME"
 
 if ! ls {{pkg.svc_data_path}}/keys/bldr-*; then
   echo "generating bldr key"
-  hab user key generate bldr --cache-key-path "{{pkg.svc_data_path}}/keys"
+  #hab user key generate bldr --cache-key-path "{{pkg.svc_data_path}}/keys"
+  HAB_CACHE_KEY_PATH="{{pkg.svc_data_path}}/keys" hab user key generate bldr
 fi
 
 exec bldr-api start -c "{{pkg.svc_var_path}}/etc/config.toml"
