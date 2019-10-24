@@ -118,8 +118,8 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 			}
 
 			refs := make([]relaxting.ESInSpecReportControlRefs, 0)
-			var refVal, urlVal string
 			for _, ref := range control.Refs {
+				var refVal, urlVal string
 				if len(ref.Fields) != 2 {
 					logrus.Warnf("ref object contains more than two fields: %v", ref)
 					continue
