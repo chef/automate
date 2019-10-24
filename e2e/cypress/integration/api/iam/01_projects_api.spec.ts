@@ -163,21 +163,9 @@ describeIfIAMV2p1('projects API', () => {
           });
         });
       });
-      // There's no waiting involved, it's sending request after request.
-      const maxRetries = 200;
-      waitForNodes(totalNodes, maxRetries);
 
-      // confirm nodes are unassigned
-      cy.request({
-        headers: {
-          'api-token': Cypress.env('ADMIN_TOKEN'),
-          projects: '(unassigned)'
-        },
-        method: 'GET',
-        url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
-      }).then((response) => {
-        expect(response.body).to.have.length(totalNodes + 4);
-      });
+      const maxRetries = 200;
+      waitForUnassignedNodes(totalNodes + 4, maxRetries);
 
       cy.request({
         headers: {
@@ -605,10 +593,13 @@ describeIfIAMV2p1('projects API', () => {
   });
 });
 
-function waitForNodes(totalNodes: number, maxRetries: number) {
+function waitForUnassignedNodes(totalNodes: number, maxRetries: number) {
   cy
     .request({
-      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+      headers: {
+        projects: '(unassigned)',
+        'api-token': Cypress.env('ADMIN_TOKEN')
+      },
       method: 'GET',
       url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
     })
@@ -621,7 +612,7 @@ function waitForNodes(totalNodes: number, maxRetries: number) {
         return;
       }
 
-      waitForNodes(totalNodes, maxRetries - 1);
+      waitForUnassignedNodes(totalNodes, maxRetries - 1);
     });
 }
 
