@@ -29,9 +29,10 @@ func NewDeploymentServerMockWithoutValidation() *DeploymentServerMock {
 // DeploymentServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
 type DeploymentServerMock struct {
-	validateRequests    bool
-	GetVersionFunc      func(context.Context, *empty.Empty) (*Version, error)
-	ServiceVersionsFunc func(context.Context, *ServiceVersionsRequest) (*ServiceVersionsResponse, error)
+	validateRequests        bool
+	GetVersionFunc          func(context.Context, *empty.Empty) (*Version, error)
+	ServiceVersionsFunc     func(context.Context, *ServiceVersionsRequest) (*ServiceVersionsResponse, error)
+	GetDeploymentStatusFunc func(context.Context, *DeploymentStatusRequest) (*DeploymentStatusResponse, error)
 }
 
 func (m *DeploymentServerMock) GetVersion(ctx context.Context, req *empty.Empty) (*Version, error) {
@@ -58,8 +59,21 @@ func (m *DeploymentServerMock) ServiceVersions(ctx context.Context, req *Service
 	return nil, status.Error(codes.Internal, "mock: 'ServiceVersions' not implemented")
 }
 
+func (m *DeploymentServerMock) GetDeploymentStatus(ctx context.Context, req *DeploymentStatusRequest) (*DeploymentStatusResponse, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.GetDeploymentStatusFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'GetDeploymentStatus' not implemented")
+}
+
 // Reset resets all overridden functions
 func (m *DeploymentServerMock) Reset() {
 	m.GetVersionFunc = nil
 	m.ServiceVersionsFunc = nil
+	m.GetDeploymentStatusFunc = nil
 }

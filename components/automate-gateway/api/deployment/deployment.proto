@@ -27,6 +27,14 @@ service Deployment {
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:list";
   };
+
+   rpc GetDeploymentStatus (DeploymentStatusRequest) returns (DeploymentStatusResponse) {
+    option (google.api.http).get = "/deployment/status";
+    option (chef.automate.api.policy).resource = "service_info:status";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "system:service:status";
+    option (chef.automate.api.iam.policy).action = "system:status:get";
+  };
 };
 
 // Version message
@@ -48,4 +56,16 @@ message ServiceVersion {
 	string origin = 2;
 	string version = 3;
 	string release = 4;
+}
+
+message DeploymentStatusRequest {}
+
+message DeploymentStatusResponse {
+  bool ok = 1; 
+  repeated ServiceStatus services = 2;
+}
+
+message ServiceStatus {
+  string name = 1;
+  string status = 2;
 }

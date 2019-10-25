@@ -30,6 +30,22 @@ func init() {
         ]
       }
     },
+    "/deployment/status": {
+      "get": {
+        "operationId": "GetDeploymentStatus",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.deployment.DeploymentStatusResponse"
+            }
+          }
+        },
+        "tags": [
+          "Deployment"
+        ]
+      }
+    },
     "/version": {
       "get": {
         "operationId": "GetVersion",
@@ -48,6 +64,32 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.deployment.DeploymentStatusResponse": {
+      "type": "object",
+      "properties": {
+        "ok": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.deployment.ServiceStatus"
+          }
+        }
+      }
+    },
+    "chef.automate.api.deployment.ServiceStatus": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        }
+      }
+    },
     "chef.automate.api.deployment.ServiceVersion": {
       "type": "object",
       "properties": {
