@@ -42,3 +42,5 @@ message GetTeamsForMemberResp {
 }
 
 message ApplyV2DataMigrationsResp { }
+
+message ResetAllTeamProjectsResp { }

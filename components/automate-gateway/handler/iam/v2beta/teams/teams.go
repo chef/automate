@@ -168,6 +168,17 @@ func (a *Server) ApplyV2DataMigrations(ctx context.Context,
 	return &gwres.ApplyV2DataMigrationsResp{}, nil
 }
 
+func (a *Server) ResetAllTeamProjects(ctx context.Context,
+	r *gwreq.ResetAllTeamProjectsReq) (*gwres.ResetAllTeamProjectsResp, error) {
+
+	_, err := a.client.ResetToV1(ctx, &teams.ResetToV1Req{})
+	if err != nil {
+		return nil, err
+	}
+
+	return &gwres.ResetAllTeamProjectsResp{}, nil
+}
+
 func fromUpstreamTeam(t *teams.Team) *gwcommon.Team {
 	return &gwcommon.Team{
 		Id:       t.GetId(),

@@ -375,6 +375,9 @@ func init() {
         }
       }
     },
+    "chef.automate.api.iam.v2beta.ResetAllTeamProjectsResp": {
+      "type": "object"
+    },
     "chef.automate.api.iam.v2beta.Team": {
       "type": "object",
       "properties": {

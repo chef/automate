@@ -70,4 +70,7 @@ func init() {
 	policyv2.MapMethodTo("/chef.automate.api.iam.v2beta.Tokens/ListTokens", "iam:tokens", "iam:tokens:list", "GET", "/iam/v2beta/tokens", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policyv2.MapMethodTo("/chef.automate.api.iam.v2beta.Tokens/ResetAllTokenProjects", "iam:tokens", "iam:tokens:update", "", "", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }

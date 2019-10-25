@@ -32,6 +32,7 @@ type Storage interface {
 	DeleteTeamByName(context.Context, string) (Team, error)
 	EditTeamByName(context.Context, string, string, []string) (Team, error)
 	UpgradeToV2(context.Context) error
+	ResetToV1(context.Context) error
 	PurgeProject(context.Context, string) error
 }
 

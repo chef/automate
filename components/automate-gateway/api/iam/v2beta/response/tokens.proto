@@ -22,3 +22,5 @@ message DeleteTokenResp {}
 message ListTokensResp {
   repeated Token tokens = 1;
 }
+
+message ResetAllTokenProjectsResp {}

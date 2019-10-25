@@ -19,6 +19,9 @@
     "chef.automate.domain.authn.DeleteTokenResp": {
       "type": "object"
     },
+    "chef.automate.domain.authn.ResetToV1Resp": {
+      "type": "object"
+    },
     "chef.automate.domain.authn.Token": {
       "type": "object",
       "properties": {
