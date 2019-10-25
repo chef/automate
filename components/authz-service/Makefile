@@ -34,14 +34,15 @@ test:
 	@go test $(verbose) -cover -count=1 -parallel=1 -p 1 $(packages)
 
 PG_URL ?= "postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable"
+DOCKER_CLEAN_MSG = "\nDocker container still up; run 'make kill_docker_pg' to clean it up when finished."
 
 test_with_db: db_container
 	@PGTZ=UTC PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 $(packages)
-	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
+	@echo $(DOCKER_CLEAN_MSG)
 
 test_properties_with_db: db_container
 	@PGTZ=UTC PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 $(packages) -run Properties
-	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
+	@echo $(DOCKER_CLEAN_MSG)
 
 .PHONY: db_container
 db_container:
