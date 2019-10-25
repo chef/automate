@@ -16,8 +16,8 @@ github.com/Jeffail/gabs v0.0.0-20180420203615-7a0fed31069a h1:BD6iHJ/zepd57shOTU
 github.com/Jeffail/gabs v0.0.0-20180420203615-7a0fed31069a/go.mod h1:6xMvQMK4k33lb7GUUpaAPh6nKMmemQeg5d4gn7/bOXc=
 github.com/Microsoft/go-winio v0.4.14 h1:+hMXMk01us9KgxGb7ftKQt2Xpf5hH/yky+TDA+qxleU=
 github.com/Microsoft/go-winio v0.4.14/go.mod h1:qXqCSQ3Xa7+6tgxaGTIe4Kpcdsi+P8jBhyzoq1bpyYA=
-github.com/OneOfOne/xxhash v1.2.2 h1:KMrpdQIwFcEqXDklaen+P1axHaj9BSKzvpUUfnHldSE=
-github.com/OneOfOne/xxhash v1.2.2/go.mod h1:HSdplMjZKSmBqAxg5vPj2TmRDmfkzw+cTzAElWljhcU=
+github.com/OneOfOne/xxhash v1.2.5 h1:zl/OfRA6nftbBK9qTohYBJ5xvw6C/oNKizR7cZGl3cI=
+github.com/OneOfOne/xxhash v1.2.5/go.mod h1:eZbhyaAYD41SGSSsnmcpxVoRiQ/MPUTjUdIIOT9Um7Q=
 github.com/aclements/go-gg v0.0.0-20170118225347-6dbb4e4fefb0/go.mod h1:55qNq4vcpkIuHowELi5C8e+1yUHtoLoOUR9QU5j7Tes=
 github.com/aclements/go-moremath v0.0.0-20161014184102-0ff62e0875ff/go.mod h1:idZL3yvz4kzx1dsBOAC+oYv6L92P1oFEhUXUB1A/lwQ=
 github.com/alexedwards/scs v1.4.1 h1:/5L5a07IlqApODcEfZyMsu8Smd1S7Q4nBjEyKxIRTp0=
@@ -51,8 +51,6 @@ github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44/go.mod h1:bbYlZJ7
 github.com/burntsushi/toml v0.3.1-0.20170626110600-a368813c5e64 h1:paN1gUsAZRXRQ3U1ukTxbTrm/rttYQtJMe6dkzrm9o4=
 github.com/burntsushi/toml v0.3.1-0.20170626110600-a368813c5e64/go.mod h1:tCq67G3LEDB9hykA6+KWl2FPEy0nPcvE8TTBhtOtdGs=
 github.com/census-ecosystem/opencensus-go-exporter-aws v0.0.0-20180411051634-41633bc1ff6b/go.mod h1:icwlHTP1AjScKRxD/s/Qinb7mpbcoUPpqaiBvrSS/QI=
-github.com/cespare/xxhash v1.1.0 h1:a6HrQnmkObjyL+Gs60czilIUGqrzKutQD6XZog3p+ko=
-github.com/cespare/xxhash v1.1.0/go.mod h1:XrSqR1VqqWfGrhpAt58auRo0WTKS1nRRg3ghfAqPWnc=
 github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816 h1:FA3vWzOqbxQIowYe4AbsdC18JCZzLQc7xQ86FrCxLmw=
 github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816/go.mod h1:WzupinluQEwU43AC1/UZItixzo5R849ewfPDB2ZMDDg=
 github.com/ckaznocha/protoc-gen-lint v0.2.1 h1:wP+SgbHat4ovpPQayCroxK/1pXtnBR4HIo9G+2gTnHU=
@@ -299,8 +297,6 @@ github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a h1:JSvGDIbm
 github.com/smartystreets/goconvey v0.0.0-20180222194500-ef6db91d284a/go.mod h1:XDJAKZRPZ1CvBcN2aX5YOUTYGHki24fSF0Iv48Ibg0s=
 github.com/smartystreets/gunit v0.0.0-20180314194857-6f0d6275bdcd h1:p5kvxG4NHogJX1brTLtvUSGdW0/aBvIyqDSW7tmnsmQ=
 github.com/smartystreets/gunit v0.0.0-20180314194857-6f0d6275bdcd/go.mod h1:XUKj4gbqj2QvJk/OdLWzyZ3FYli0f+MdpngyryX0gcw=
-github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72 h1:qLC7fQah7D6K1B0ujays3HV9gkFtllcxhzImRR7ArPQ=
-github.com/spaolacci/murmur3 v0.0.0-20180118202830-f09979ecbc72/go.mod h1:JwIasOWyU6f++ZhiEuf87xNszmSA2myDM2Kzu9HwQUA=
 github.com/spf13/afero v1.0.0 h1:Z005C09nPzwTTsDRJCQBVnpTU0bjTr/NhyWLj1nSPP4=
 github.com/spf13/afero v1.0.0/go.mod h1:j4pytiNVoe2o6bmDsKpLACNPDBIoEAkihy7loJ1B0CQ=
 github.com/spf13/cast v1.1.0 h1:0Rhw4d6C8J9VPu6cjZLIhZ8+aAOHcDvGeKn+cq5Aq3k=
