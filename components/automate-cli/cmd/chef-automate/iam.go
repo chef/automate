@@ -14,10 +14,11 @@ import (
 	authz_constants "github.com/chef/automate/components/authz-service/constants"
 	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/adminmgmt"
+	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	policies_common "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common"
-	policies_req "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request"
+	iam_common "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common"
+	iam_req "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request"
 )
 
 var iamCmdFlags = struct {
@@ -152,17 +153,19 @@ func init() {
 // Note: the indentation is to keep this in line with writer.Body()
 const alreadyMigratedMessage = "You are already on IAM version %s."
 
+const failedToResetDomainMessage = "PLEASE RUN THIS COMMAND AGAIN: There was an unexpected error resetting the projects for %s"
+
 type vsn struct {
-	Major policies_common.Version_VersionNumber
-	Minor policies_common.Version_VersionNumber
+	Major iam_common.Version_VersionNumber
+	Minor iam_common.Version_VersionNumber
 }
 
-func display(v *policies_common.Version) string {
+func display(v *iam_common.Version) string {
 	x := vsn{Minor: v.Minor, Major: v.Major}
 	switch x {
-	case vsn{Major: policies_common.Version_V2, Minor: policies_common.Version_V1}:
+	case vsn{Major: iam_common.Version_V2, Minor: iam_common.Version_V1}:
 		return "v2.1"
-	case vsn{Major: policies_common.Version_V2, Minor: policies_common.Version_V0}:
+	case vsn{Major: iam_common.Version_V2, Minor: iam_common.Version_V0}:
 		return "v2.0"
 	default:
 		return "v1.0"
@@ -174,14 +177,14 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 		true:  "v2.1",
 		false: "v2",
 	}
-	upgradeReq := &policies_req.UpgradeToV2Req{
-		Flag:           policies_common.Flag_VERSION_2_0,
+	upgradeReq := &iam_req.UpgradeToV2Req{
+		Flag:           iam_common.Flag_VERSION_2_0,
 		SkipV1Policies: iamCmdFlags.skipLegacyUpgrade,
 	}
 
 	isBetaVersion := iamCmdFlags.betaVersion
 	if isBetaVersion {
-		upgradeReq.Flag = policies_common.Flag_VERSION_2_1
+		upgradeReq.Flag = iam_common.Flag_VERSION_2_1
 		writer.Title("Enabling IAM v2.1")
 	} else {
 		writer.Title("Upgrading to IAM v2")
@@ -236,7 +239,7 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 
 	writer.Print("Migrating existing teams...\n\n")
 	_, err = apiClient.TeamsV2Client().ApplyV2DataMigrations(ctx,
-		&policies_req.ApplyV2DataMigrationsReq{})
+		&iam_req.ApplyV2DataMigrationsReq{})
 	if err != nil {
 		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
 			"Failed to migrate teams service")
@@ -264,18 +267,37 @@ func runIAMResetToV1Cmd(cmd *cobra.Command, args []string) error {
 			"Failed to create a connection to the API")
 	}
 
-	_, err = apiClient.PoliciesClient().ResetToV1(ctx, &policies_req.ResetToV1Req{})
+	_, err = apiClient.PoliciesClient().ResetToV1(ctx, &iam_req.ResetToV1Req{})
 	switch grpc_status.Convert(err).Code() {
-	case codes.OK: // nice!
+	case codes.OK:
+		return resetDomainsToV1(ctx, apiClient)
 	case codes.FailedPrecondition:
 		return status.Wrap(err, status.IAMResetV1DatabaseError,
 			"Migration to IAMv2 in progress")
 	case codes.AlreadyExists:
-		writer.Failf(alreadyMigratedMessage, "v1.0")
-		return nil
+		// Reset domain projects to be idempotent on crash of initial attempt
+		err := resetDomainsToV1(ctx, apiClient)
+		if err == nil {
+			writer.Failf(alreadyMigratedMessage, "v1.0")
+		}
+		return err
 	default: // something else: fail
 		return status.Wrap(err, status.IAMResetV1DatabaseError,
 			"Failed to reset IAM state to v1")
+	}
+}
+
+func resetDomainsToV1(ctx context.Context, apiClient client_type.APIClient) error {
+	_, err := apiClient.TeamsV2Client().ResetAllTeamProjects(ctx, &iam_req.ResetAllTeamProjectsReq{})
+	if err != nil {
+		writer.Failf(failedToResetDomainMessage, "teams")
+		return err
+	}
+
+	_, err = apiClient.TokensV2Client().ResetAllTokenProjects(ctx, &iam_req.ResetAllTokenProjectsReq{})
+	if err != nil {
+		writer.Failf(failedToResetDomainMessage, "tokens")
+		return err
 	}
 	return nil
 }
@@ -288,7 +310,7 @@ func runIAMVersionCmd(cmd *cobra.Command, args []string) error {
 			"Failed to create a connection to the API")
 	}
 
-	resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &policies_req.GetPolicyVersionReq{})
+	resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &iam_req.GetPolicyVersionReq{})
 	if err != nil {
 		return status.Wrap(err, status.APIError, "Failed to retrieve IAM version")
 	}
@@ -354,7 +376,7 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 	}
 
 	// grant access to admins team if needed
-	resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &policies_req.GetPolicyVersionReq{})
+	resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &iam_req.GetPolicyVersionReq{})
 	if err != nil {
 		return status.Wrap(err, status.APIError, "Failed to verify IAM version")
 	}
@@ -362,7 +384,7 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 	writer.Titlef("Checking IAM %s policies for admin policy with admins team.\n", display(resp.Version))
 
 	switch resp.Version.Major {
-	case policies_common.Version_V1:
+	case iam_common.Version_V1:
 		foundV1AdminPolicy, createdNewV1Policy, err := adminmgmt.UpdateV1AdminsPolicyIfNeeded(ctx,
 			apiClient, iamCmdFlags.dryRun)
 		if err != nil {
@@ -383,7 +405,7 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 		if createdNewV1Policy {
 			writer.Success("Created new admins policy")
 		}
-	case policies_common.Version_V2:
+	case iam_common.Version_V2:
 		foundAdminsTeaminV2AdminPolicy, err := adminmgmt.UpdateV2AdminsPolicyIfNeeded(ctx,
 			apiClient, iamCmdFlags.dryRun)
 		if err != nil {
@@ -428,7 +450,7 @@ func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
 		id = iamCmdFlags.tokenID
 	}
 
-	tokenResp, err := apiClient.TokensV2Client().CreateToken(ctx, &policies_req.CreateTokenReq{
+	tokenResp, err := apiClient.TokensV2Client().CreateToken(ctx, &iam_req.CreateTokenReq{
 		Id:     id,
 		Name:   name,
 		Active: &wrappers.BoolValue{Value: true},
@@ -440,16 +462,16 @@ func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if iamCmdFlags.adminToken {
-		resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &policies_req.GetPolicyVersionReq{})
+		resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &iam_req.GetPolicyVersionReq{})
 		if err != nil {
 			return status.Wrap(err, status.APIError, "Failed to retrieve IAM version")
 		}
-		if resp.Version.Major == policies_common.Version_V1 {
+		if resp.Version.Major == iam_common.Version_V1 {
 			return status.New(status.APIError, adminTokenIAMPreconditionError)
 		}
 
 		member := fmt.Sprintf("token:%s", tokenResp.Token.Id)
-		_, err = apiClient.PoliciesClient().AddPolicyMembers(ctx, &policies_req.AddPolicyMembersReq{
+		_, err = apiClient.PoliciesClient().AddPolicyMembers(ctx, &iam_req.AddPolicyMembersReq{
 			Id:      v2_constants.AdminPolicyID,
 			Members: []string{member},
 		})
