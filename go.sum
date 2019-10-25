@@ -48,8 +48,6 @@ github.com/buger/goterm v0.0.0-20180307092342-c9def0117b24 h1:rsJBUYr5ROLi7tgkB5
 github.com/buger/goterm v0.0.0-20180307092342-c9def0117b24/go.mod h1:u9UyCz2eTrSGy6fbupqJ54eY5c4IC8gREQ1053dK12U=
 github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44 h1:y853v6rXx+zefEcjET3JuKAqvhj+FKflQijjeaSv2iA=
 github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44/go.mod h1:bbYlZJ7hK1yFx9hf58LP0zeX7UjIGs20ufpu3evjr+s=
-github.com/burntsushi/toml v0.3.1-0.20170626110600-a368813c5e64 h1:paN1gUsAZRXRQ3U1ukTxbTrm/rttYQtJMe6dkzrm9o4=
-github.com/burntsushi/toml v0.3.1-0.20170626110600-a368813c5e64/go.mod h1:tCq67G3LEDB9hykA6+KWl2FPEy0nPcvE8TTBhtOtdGs=
 github.com/census-ecosystem/opencensus-go-exporter-aws v0.0.0-20180411051634-41633bc1ff6b/go.mod h1:icwlHTP1AjScKRxD/s/Qinb7mpbcoUPpqaiBvrSS/QI=
 github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816 h1:FA3vWzOqbxQIowYe4AbsdC18JCZzLQc7xQ86FrCxLmw=
 github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816/go.mod h1:WzupinluQEwU43AC1/UZItixzo5R849ewfPDB2ZMDDg=

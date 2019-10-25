@@ -16,6 +16,8 @@ github.com/Azure/go-autorest/autorest/to
 github.com/Azure/go-autorest/autorest/validation
 github.com/Azure/go-autorest/logger
 github.com/Azure/go-autorest/version
+# github.com/BurntSushi/toml v0.3.1
+github.com/BurntSushi/toml
 # github.com/OneOfOne/xxhash v1.2.5
 github.com/OneOfOne/xxhash
 # github.com/alexedwards/scs v1.4.1
@@ -77,8 +79,6 @@ github.com/briandowns/spinner
 github.com/buger/goterm
 # github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44
 github.com/buger/jsonparser
-# github.com/burntsushi/toml v0.3.1-0.20170626110600-a368813c5e64
-github.com/burntsushi/toml
 # github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816
 github.com/chef/toml
 # github.com/ckaznocha/protoc-gen-lint v0.2.1
