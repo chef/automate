@@ -13,14 +13,11 @@ pkg_deps=(
   core/curl
   core/erlang18
   core/gawk
-  core/gcc
   core/gcc-libs
   core/grep
   core/git
   core/glibc
   core/openssh
-  core/postgresql
-  core/sqitch_pg
   core/tzdata
   core/jq-static
   chef/mlsa
@@ -37,6 +34,7 @@ pkg_deps=(
 )
 
 pkg_build_deps=(
+  core/gcc
   core/make
   core/which
   core/cacerts
