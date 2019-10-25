@@ -437,16 +437,9 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 
 	addr := conf.ElasticSearchSidecar.Address
 	logrus.WithField("address", addr).Info("Connecting to Elasticsearch Sidecar")
-	dialOpts := []grpc.DialOption{}
-
-	if os.Getenv("RUN_MODE") == "test" {
-		logrus.Info(`RUN_MODE is set to "test", not requiring block dial to es-sidecar-service`)
-	} else {
-		dialOpts = append(dialOpts, grpc.WithBlock())
-	}
 
 	esSidecarConn, err = connFactory.DialContext(timeoutCtx, "es-sidecar-service",
-		addr, dialOpts...)
+		addr, grpc.WithBlock())
 	if err != nil || esSidecarConn == nil {
 		logrus.WithFields(logrus.Fields{"error": err}).Fatal("Failed to create ES Sidecar connection")
 		return nil, err
