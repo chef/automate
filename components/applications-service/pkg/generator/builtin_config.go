@@ -1,7 +1,7 @@
 package generator
 
 import (
-	"github.com/burntsushi/toml"
+	"github.com/BurntSushi/toml"
 	"github.com/pkg/errors"
 )
 
