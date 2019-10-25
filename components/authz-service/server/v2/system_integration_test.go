@@ -169,7 +169,6 @@ func TestIntegrationValidateProjectAssignment(t *testing.T) {
 		Name:       "my favorite policy",
 		Members:    []string{onlyAssignsAuthorizedProjUser},
 		Statements: []*api_v2.Statement{&statement},
-		Projects:   []string{authorizedProjectId},
 	}
 
 	statementUnassigned := api_v2.Statement{
