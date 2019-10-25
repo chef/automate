@@ -125,14 +125,6 @@
       ]
     },
     {
-      "name": "builder",
-      "type": "product",
-      "aliases": ["depot"],
-      "hidden": true,
-      "dependencies": ["core", "postgresql", "auth"],
-      "services": []
-    },
-    {
       "name": "chef-server",
       "type": "product",
       "aliases": ["chef-infra-server"],
@@ -154,8 +146,9 @@
       ]
     },
     {
-      "name": "depot",
+      "name": "builder",
       "type": "product",
+      "aliases": ["depot"],
       "dependencies": ["core", "postgresql", "elasticsearch", "auth"],
       "services": [
         "chef/automate-minio",
