@@ -467,7 +467,7 @@ test: generate-ruby-grpc wait-for-compliance-service
 	bundle exec ./run.rb $$TEST \
 	echo
 
-test-prep: $(MARKET_PATH) $(PROFILES_PATH) start-ssh-node download-sample-market-profiles install-inspec start-es-pg 
+test-prep: $(MARKET_PATH) $(PROFILES_PATH) start-ssh-node download-sample-market-profiles install-inspec start-es-pg
 
 install-inspec:
 	@inspec --version | grep -q $(shell cat ../../INSPEC_VERSION) || gem install inspec-bin --no-document --version $(shell cat ../../INSPEC_VERSION)
