@@ -6,6 +6,7 @@ require (
 	github.com/Azure/azure-sdk-for-go v19.1.0+incompatible
 	github.com/Azure/go-autorest v10.15.0+incompatible
 	github.com/Microsoft/go-winio v0.4.14 // indirect
+	github.com/OneOfOne/xxhash v1.2.5 // indirect
 	github.com/alexedwards/scs v1.4.1
 	github.com/apache/thrift v0.0.0-20161221203622-b2a4d4ae21c7 // indirect
 	github.com/apoydence/onpar v0.0.0-20190519213022-ee068f8ea4d1 // indirect
@@ -19,7 +20,6 @@ require (
 	github.com/buger/goterm v0.0.0-20180307092342-c9def0117b24
 	github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44
 	github.com/burntsushi/toml v0.3.1-0.20170626110600-a368813c5e64
-	github.com/cespare/xxhash v1.1.0 // indirect
 	github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816
 	github.com/ckaznocha/protoc-gen-lint v0.2.1
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
