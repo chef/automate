@@ -29,6 +29,12 @@ A new static website for Automate is based on [Hugo](https://gohugo.io), the Go-
     commit: 7c0fc3ee340f9d99d85573bc54a57e303a639692
     ```
 
+1. [Install jq](https://stedolan.github.io/jq/download/). If you're using homebrew:
+
+    ```
+    brew install jq
+    ```
+
 ### Development
 
 1. From the `components/automate-chef-io` directory, run the following command to start the development server.
