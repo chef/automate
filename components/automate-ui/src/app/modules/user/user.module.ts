@@ -9,6 +9,7 @@ import { UserManagementComponent } from './user-management/user-management.compo
 import { UserFormComponent } from './user-management/user-form/user-form.component';
 import { UserTableComponent } from './user-table/user-table.component';
 import { UserDetailsNonAdminResolve } from './user-details/user-details.resolver';
+import { UserProfileSidebarComponent } from './user-profile-sidebar/user-profile-sidebar.component';
 
 import { UserRoutingModule } from './user-routing.module';
 
@@ -22,13 +23,15 @@ import { UserRoutingModule } from './user-routing.module';
   ],
   exports: [
     UserDetailsComponent,
-    UserManagementComponent
+    UserManagementComponent,
+    UserTableComponent
   ],
   declarations: [
     UserDetailsComponent,
     UserManagementComponent,
     UserFormComponent,
-    UserTableComponent
+    UserTableComponent,
+    UserProfileSidebarComponent
   ],
   providers: [
     UserDetailsNonAdminResolve

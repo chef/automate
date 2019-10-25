@@ -2,9 +2,9 @@ import { TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
-import { ProfileSidebarComponent } from './profile-sidebar.component';
+import { UserProfileSidebarComponent } from './user-profile-sidebar.component';
 
-describe('ProfileSidebarComponent', () => {
+describe('UserProfileSidebarComponent', () => {
   let fixture, component, element, link;
 
   beforeEach(() => {
@@ -12,7 +12,7 @@ describe('ProfileSidebarComponent', () => {
       imports: [RouterTestingModule
       ],
       declarations: [
-        ProfileSidebarComponent,
+        UserProfileSidebarComponent,
         // Note: if we want to match contents, we cannot swallow them: thus we
         // need to provide a template here. <ng-content> mocks these as doing
         // nothing but a "pass-through" of what the components wrap.
@@ -24,13 +24,13 @@ describe('ProfileSidebarComponent', () => {
       ]
     });
 
-    fixture = TestBed.createComponent(ProfileSidebarComponent);
+    fixture = TestBed.createComponent(UserProfileSidebarComponent);
     element = fixture.debugElement;
     component = fixture.componentInstance;
   });
 
   it('should be created', () => {
-    fixture = TestBed.createComponent(ProfileSidebarComponent);
+    fixture = TestBed.createComponent(UserProfileSidebarComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
 

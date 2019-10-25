@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, Output, OnChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import * as moment from 'moment';
@@ -15,7 +15,7 @@ import { LicenseStatus, parsedExpirationDate } from 'app/entities/license/licens
   styleUrls: ['./license-apply.component.scss']
 })
 
-export class LicenseApplyComponent implements AfterViewInit, OnChanges {
+export class LicenseApplyComponent implements AfterViewInit {
   @Output() openLicenseLockout = new EventEmitter<null>();
 
   private subscriptions: Subscription[] = [];
@@ -46,17 +46,14 @@ export class LicenseApplyComponent implements AfterViewInit, OnChanges {
     moment.locale(window.navigator.language);
   }
 
-  ngOnChanges(): void {
-    if (this.licenseApplyReason === LicenseApplyReason.LICENSE_ABOUT_TO_EXPIRE) {
-      this.modalLocked = false;
-    }
-  }
-
   constructor(
     private licenseFacade: LicenseFacadeService,
     fb: FormBuilder) {
       this.licenseFacade.licenseApplyReason$.subscribe((reason) => {
         this.licenseApplyReason = reason;
+        if (this.licenseApplyReason === LicenseApplyReason.LICENSE_ABOUT_TO_EXPIRE) {
+          this.modalLocked = false;
+        }
       });
       this.applyForm = fb.group({
         licenseKey: ['', [Validators.required]]

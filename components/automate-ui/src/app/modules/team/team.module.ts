@@ -4,6 +4,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { ChefComponentsModule } from 'app/components/chef-components.module';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
+import { UserModule } from 'app/modules/user/user.module';
 
 import { TeamManagementComponent } from './team-management/team-management.component';
 import { TeamDetailsComponent } from './team-details/team-details.component';
@@ -18,7 +19,8 @@ import { TeamRoutingModule } from './team-routing.module';
     ReactiveFormsModule,
     ChefComponentsModule,
     ChefPipesModule,
-    TeamRoutingModule
+    TeamRoutingModule,
+    UserModule
   ],
   exports: [
     TeamManagementComponent,
