@@ -123,8 +123,6 @@ do_check() {
       check_static_binary "${tmp_bin}/${pkg_name}"
     fi
   fi
-
-  exit 0
 }
 
 do_default_after() {
