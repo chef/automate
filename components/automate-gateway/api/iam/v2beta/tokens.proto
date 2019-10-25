@@ -3,7 +3,7 @@ syntax = "proto3";
 package chef.automate.api.iam.v2beta;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta";
 
-import "google/api/annotations.proto"; 
+import "google/api/annotations.proto";
 import "components/automate-gateway/api/iam/v2beta/request/tokens.proto";
 import "components/automate-gateway/api/iam/v2beta/response/tokens.proto";
 
@@ -35,7 +35,7 @@ service Tokens {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:tokens:{id}";
     option (chef.automate.api.iam.policy).action = "iam:tokens:update";
-  }; 
+  };
   rpc DeleteToken (DeleteTokenReq) returns (DeleteTokenResp) {
     option (google.api.http).delete = "/iam/v2beta/tokens/{id}";
     option (chef.automate.api.policy).resource = "auth:tokens:{id}";
@@ -49,5 +49,13 @@ service Tokens {
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:tokens";
     option (chef.automate.api.iam.policy).action = "iam:tokens:list";
+  }
+  // Expose on GRPC API only so we don't expose this to the enduser.
+  // Just want to be able to trigger this via automate-cli.
+  rpc ResetAllTokenProjects (ResetAllTokenProjectsReq) returns (ResetAllTokenProjectsResp) {
+    option (chef.automate.api.policy).resource = "auth:tokens";
+    option (chef.automate.api.policy).action = "update";
+    option (chef.automate.api.iam.policy).resource = "iam:tokens";
+    option (chef.automate.api.iam.policy).action = "iam:tokens:update";
   }
 };

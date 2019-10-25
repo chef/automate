@@ -59,6 +59,7 @@ func TestStorage(t *testing.T) {
 		testPurgeProjectOtherProjectsExcludingOneToPurge,
 		testPurgeProjectOtherProjectsIncludingOneToPurge,
 		testPurgeProjectUniversal,
+		testResetToV1,
 	}
 
 	// lazy way to randomize tests
@@ -628,6 +629,30 @@ func testPurgeProjectUniversal(ctx context.Context, t *testing.T, s storage.Stor
 	purgeCheck4, err := s.GetTeamByName(ctx, name4)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, []string{}, purgeCheck4.Projects)
+}
+
+func testResetToV1(ctx context.Context, t *testing.T, s storage.Storage) {
+	resp1, err := s.StoreTeamWithProjects(ctx, "team1", "team1 desc", []string{})
+	assert.NoError(t, err, "failed to store team1")
+	assert.ElementsMatch(t, []string{}, resp1.Projects)
+
+	resp2, err := s.StoreTeamWithProjects(ctx, "team2", "team2 desc", []string{"otherproject"})
+	assert.NoError(t, err, "failed to store team2")
+	assert.ElementsMatch(t, []string{"otherproject"}, resp2.Projects)
+
+	resp3, err := s.StoreTeamWithProjects(ctx, "team3", "team13desc", []string{"otherproject", "otherproject2"})
+	assert.NoError(t, err, "failed to store team3")
+	assert.ElementsMatch(t, []string{"otherproject", "otherproject2"}, resp3.Projects)
+
+	err = s.ResetToV1(ctx)
+	assert.NoError(t, err, "failed to reset to v1")
+
+	teams, err := s.GetTeams(ctx)
+	assert.NoError(t, err, "failed to list teams")
+	assert.Equal(t, 3+len(storage.NonDeletableTeams), len(teams))
+	for _, team := range teams {
+		assert.ElementsMatch(t, []string{}, team.Projects)
+	}
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,

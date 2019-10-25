@@ -41,6 +41,7 @@ type TeamsServerMock struct {
 	RemoveTeamMembersFunc     func(context.Context, *request.RemoveTeamMembersReq) (*response.RemoveTeamMembersResp, error)
 	GetTeamsForMemberFunc     func(context.Context, *request.GetTeamsForMemberReq) (*response.GetTeamsForMemberResp, error)
 	ApplyV2DataMigrationsFunc func(context.Context, *request.ApplyV2DataMigrationsReq) (*response.ApplyV2DataMigrationsResp, error)
+	ResetAllTeamProjectsFunc  func(context.Context, *request.ResetAllTeamProjectsReq) (*response.ResetAllTeamProjectsResp, error)
 }
 
 func (m *TeamsServerMock) ListTeams(ctx context.Context, req *request.ListTeamsReq) (*response.ListTeamsResp, error) {
@@ -163,6 +164,18 @@ func (m *TeamsServerMock) ApplyV2DataMigrations(ctx context.Context, req *reques
 	return nil, status.Error(codes.Internal, "mock: 'ApplyV2DataMigrations' not implemented")
 }
 
+func (m *TeamsServerMock) ResetAllTeamProjects(ctx context.Context, req *request.ResetAllTeamProjectsReq) (*response.ResetAllTeamProjectsResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.ResetAllTeamProjectsFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'ResetAllTeamProjects' not implemented")
+}
+
 // Reset resets all overridden functions
 func (m *TeamsServerMock) Reset() {
 	m.ListTeamsFunc = nil
@@ -175,4 +188,5 @@ func (m *TeamsServerMock) Reset() {
 	m.RemoveTeamMembersFunc = nil
 	m.GetTeamsForMemberFunc = nil
 	m.ApplyV2DataMigrationsFunc = nil
+	m.ResetAllTeamProjectsFunc = nil
 }

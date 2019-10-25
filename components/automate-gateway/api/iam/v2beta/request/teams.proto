@@ -44,3 +44,5 @@ message GetTeamsForMemberReq {
 }
 
 message ApplyV2DataMigrationsReq { }
+
+message ResetAllTeamProjectsReq { }
