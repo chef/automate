@@ -25,9 +25,14 @@ A new static website for Automate is based on [Hugo](https://gohugo.io), the Go-
 
     ```
     $ swagger version
-    version: v0.20.1
-    commit: 9004771f77bedabb792a48dc846ba7fc800398a0
+    version: v0.21.0
+    commit: 7c0fc3ee340f9d99d85573bc54a57e303a639692
+    ```
 
+1. [Install jq](https://stedolan.github.io/jq/download/). If you're using homebrew:
+
+    ```
+    brew install jq
     ```
 
 ### Development
