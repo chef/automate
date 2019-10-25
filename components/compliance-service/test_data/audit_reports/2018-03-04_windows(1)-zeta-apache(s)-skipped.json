@@ -42,7 +42,7 @@
           },
           "refs": [],
           "tags": {
-            "web": null,
+            "web": "IIS",
             "scope": "Apache",
             "satisfies": ["apache-1", "apache-2"]
           },

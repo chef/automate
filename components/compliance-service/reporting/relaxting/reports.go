@@ -1054,11 +1054,14 @@ func newNestedTermQueryFromControlTagsFilter(tagKey string, tagValues []string) 
 	// Add ElasticSearch query filters for the control tag value(s)
 	insideBoolQuery := elastic.NewBoolQuery()
 	insideBool := false
+	emptyValuesRequested := false
 	for _, tagValue := range tagValues {
 		tagValue = strings.ToLower(tagValue)
 		if containsWildcardChar(tagValue) {
 			insideBoolQuery.Should(elastic.NewWildcardQuery(ESFieldTagValues, tagValue))
 			insideBool = true
+		} else if tagValue == "" {
+			emptyValuesRequested = true
 		} else {
 			refinedValues = append(refinedValues, tagValue)
 		}
@@ -1067,6 +1070,12 @@ func newNestedTermQueryFromControlTagsFilter(tagKey string, tagValues []string) 
 	if len(refinedValues) > 0 {
 		termQuery := elastic.NewTermsQuery(ESFieldTagValues, stringArrayToInterfaceArray(refinedValues)...)
 		insideBoolQuery.Should(termQuery)
+		insideBool = true
+	}
+	// Here we handle the case where we want a tag key with NO values
+	if emptyValuesRequested {
+		existsQuery := elastic.NewExistsQuery(ESFieldTagValues)
+		insideBoolQuery.Should(elastic.NewBoolQuery().MustNot(existsQuery))
 		insideBool = true
 	}
 	if insideBool {
