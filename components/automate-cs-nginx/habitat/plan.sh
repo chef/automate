@@ -11,8 +11,8 @@ pkg_version="13.0.47"
 pkg_deps=(
   chef/mlsa
   core/curl
-  core/bundler
-  core/ruby
+  core/bundler/1.17.3/20191007210608
+  core/ruby/2.5.7/20191007205439
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
   "${vendor_origin}/chef-server-nginx/13.0.47/20191009112851"
   "${vendor_origin}/chef-server-ctl/13.0.47/20191009112038"
