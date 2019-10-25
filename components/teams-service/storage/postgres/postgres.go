@@ -91,17 +91,16 @@ func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 	// ensure we do not pass null projects to db and break the "not null" constraint
 	if len(projects) == 0 {
 		projects = []string{}
-	} else {
-		// will only return an error if authz is in v2.1 mode
-		_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-			Subjects:    auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-			OldProjects: []string{},
-			NewProjects: projects,
-		})
-		if err != nil {
-			// return error unaltered because it's already a GRPC status code
-			return storage.Team{}, err
-		}
+	}
+	// will only return an error if authz is in v2.1 mode
+	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+		Subjects:    auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+		OldProjects: []string{},
+		NewProjects: projects,
+	})
+	if err != nil {
+		// return error unaltered because it's already a GRPC status code
+		return storage.Team{}, err
 	}
 
 	team, err := p.insertTeam(ctx, name, description, projects)
