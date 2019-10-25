@@ -1,7 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { EventFeedTableComponent } from './event-feed-table.component';
 import { MockComponent } from 'ng2-mock-component';
-import { CapitalizePipe } from '../../pipes/capitalize.pipe';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
 import { Observable, of as observableOf } from 'rxjs';
@@ -11,6 +10,7 @@ import {
   ChefEvent
 } from '../../types/types';
 import * as moment from 'moment';
+import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 
 class MockEventFeedService {
   lastRequestedGetEventFeedFilters: EventFeedFilter;
@@ -21,21 +21,23 @@ class MockEventFeedService {
   }
 }
 
-describe('SearchBarComponent', () => {
+describe('EventFeedTableComponent', () => {
   let component: EventFeedTableComponent;
   let fixture;
   const mockEventFeedService = new MockEventFeedService();
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        ChefPipesModule
+      ],
       declarations: [
         EventFeedTableComponent,
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-button' }),
         MockComponent({ selector: 'app-event-icon', inputs: ['group', 'type', 'task'] }),
         MockComponent({ selector: 'chef-click-outside'}),
-        MockComponent({ selector: 'chef-side-panel', inputs: ['visible']}),
-        CapitalizePipe
+        MockComponent({ selector: 'chef-side-panel', inputs: ['visible']})
       ],
       providers: [
         { provide: EventFeedService, useValue: mockEventFeedService }

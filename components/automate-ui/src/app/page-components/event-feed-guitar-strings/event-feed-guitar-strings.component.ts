@@ -21,7 +21,7 @@ import { initialState } from '../../services/event-feed/event-feed.reducer';
 import { Subject } from 'rxjs';
 import { reduce } from 'lodash/fp';
 import * as d3 from 'd3';
-
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 export class GuitarStringDataContainer {
   dynamicallyBucketedGuitarStrings: GuitarString[] = [];
@@ -279,6 +279,9 @@ export class EventFeedGuitarStringsComponent implements OnInit, OnDestroy, OnCha
   endSliderPosition = 100;
   sliderGrid = 100 / this.buttonDates.length;
   sliderWidth: number;
+
+  DateTime = DateTime;
+
   @ViewChild('startSlider', { static: true }) startSlider: ElementRef;
   @ViewChild('endSlider', { static: true }) endSlider: ElementRef;
 
