@@ -19,7 +19,7 @@ SELECT
   n.id,
   n.projects_data
 FROM nodes n 
-WHERE n.manager == '';
+WHERE n.manager = '';
 `
 
 type NodeProjectData struct {

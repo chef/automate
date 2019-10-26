@@ -7,6 +7,7 @@ import (
 	"time"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/config"
@@ -16,6 +17,84 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestProjectUpdateDoesNotUpdateManagedNodes(t *testing.T) {
+	ctx := context.Background()
+	db, err := createPGDB()
+	require.NoError(t, err)
+
+	timestamp, err := ptypes.TimestampProto(time.Now())
+	require.NoError(t, err)
+
+	projectsData := []*nodes.ProjectsData{
+		{Key: "environment", Values: []string{"env1"}},
+	}
+
+	projectRules := map[string]*iam_v2.ProjectRules{
+		"targetProject": {
+			Rules: []*iam_v2.ProjectRule{
+				{
+					Type: iam_v2.ProjectRuleTypes_NODE,
+					Conditions: []*iam_v2.Condition{
+						{
+							Attribute: iam_v2.ProjectRuleConditionAttributes_ENVIRONMENT,
+							Values:    []string{"env1"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	t.Run(fmt.Sprintf("project update: %s", "test that managed nodes do not get updated by project manager"),
+		func(t *testing.T) {
+			originalNode := &nodes.Node{
+				Name: "test-node",
+				Tags: []*common.Kv{
+					{Key: "environment", Value: "env1"},
+				},
+			}
+
+			// Create node, it will be automate managed node
+			nodeID, err := db.AddNode(originalNode)
+			require.NoError(t, err)
+			defer db.DeleteNode(nodeID)
+
+			// Update project
+			jobIDs, err := db.UpdateProjectTags(ctx, projectRules)
+			require.NoError(t, err)
+			require.Equal(t, 1, len(jobIDs))
+
+			waitForJobToComplete(ctx, t, db, jobIDs[0])
+
+			// Get node
+			processedNode, err := db.GetNode(ctx, nodeID)
+			require.NoError(t, err)
+
+			// ingest node scan now, still no change
+			nodeScan := &manager.NodeMetadata{
+				Uuid:        nodeID,
+				LastContact: timestamp,
+				RunData: &nodes.LastContactData{
+					Id:      nodeID,
+					EndTime: timestamp,
+					Status:  nodes.LastContactData_PASSED,
+				},
+				ProjectsData: projectsData, // this shouldn't actually happen, b/c the report to
+				// nodemanager function does not include projects data if the node has a job id (scan job)
+			}
+
+			// Ingest node
+			err = db.ProcessIncomingNode(nodeScan)
+
+			// get node again
+			processedNode, err = db.GetNode(ctx, nodeID)
+			require.NoError(t, err)
+
+			assert.ElementsMatch(t, []string{}, processedNode.Projects)
+		})
+
+}
 
 func TestProjectUpdate(t *testing.T) {
 	ctx := context.Background()
