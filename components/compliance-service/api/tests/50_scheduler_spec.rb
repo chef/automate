@@ -156,8 +156,15 @@ describe File.basename(__FILE__) do
   end
 
   it "creates new jobs as children of existing ones" do
-    sleep 70
-    all_jobs = GRPC jobs, :list, Jobs::Query.new()
+    counter = 0
+    while counter <= 10
+      sleep 10
+      all_jobs = GRPC jobs, :list, Jobs::Query.new()
+      if all_jobs.total >= 7 
+        break
+      end
+      counter += 1
+    end
     # we should have seven jobs now, the three from above, our scheduled-for-the-future one,
     # our child job from the first one, our child job from the test_count_max_job job
     # and our child job from the date_only job
