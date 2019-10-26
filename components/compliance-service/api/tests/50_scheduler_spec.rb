@@ -222,12 +222,23 @@ describe File.basename(__FILE__) do
         Common::Filter.new( key: "parent_job", values: [@job_id1])
       ]
     )
-    assert_equal(1, job_list.total)
+    # if we take a while to get here, we may have two jobs instead of just one
+    if job_list.total == 1 
+      puts "one child job found"
+      job = job_list.jobs.first
 
-    job = job_list.jobs.first
+      assert_equal(@job_id1, job.parent_id)
+      assert_equal('My exec job1 - run 1', job.name)
+    else 
+      # should never really be more than two...
+      assert_equal(2, job_list.total)
+      puts "two child jobs found"
 
-    assert_equal(@job_id1, job.parent_id)
-    assert_equal('My exec job1 - run 1', job.name)
+      job_list.jobs.each do |job|
+        assert_equal(@job_id1, job.parent_id)
+        assert_equal(true, job.name.start_with?('My exec job1 - run'))
+      end
+    end
   end
 
   it "can filter out child jobs" do
