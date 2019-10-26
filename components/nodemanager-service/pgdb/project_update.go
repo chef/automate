@@ -18,7 +18,8 @@ const selectNodesProjectData = `
 SELECT
   n.id,
   n.projects_data
-FROM nodes n
+FROM nodes n 
+WHERE n.manager == '';
 `
 
 type NodeProjectData struct {
