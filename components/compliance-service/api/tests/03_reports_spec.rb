@@ -736,6 +736,12 @@ describe File.basename(__FILE__) do
     assert_equal('centos-beta', res['node_name'])
     assert_equal('DevSec Prod beta', res['environment'])
     assert_equal('passed', res['status'])
+    assert_equal('localhost', res['chef_server'])
+    assert_equal('my-org', res['chef_organization'])
+    assert_equal(['fake-tag'], res['chef_tags'])
+    assert_equal(['base_linux', 'apache_linux', 'nginx-hardening-prod', 'dot.role'], res['roles'])
+    assert_equal([], res['projects'])
+
     assert_equal(Google::Protobuf::Timestamp.new(seconds: 1520155121, nanos: 0), res['end_time'])
     assert_equal(Reporting::Platform.new(name: "centos", release: "5.11", full: "centos 5.11"), res['platform'])
     assert_equal(Reporting::Statistics.new(duration: 3.309065103530884), res['statistics'])
