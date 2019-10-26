@@ -1011,6 +1011,35 @@ func init() {
         "fqdn": {
           "type": "string",
           "description": "The FQDN (fully qualified domain name) of the node making the report."
+        },
+        "chef_server": {
+          "type": "string",
+          "description": "The Chef Server that manages the node making the report."
+        },
+        "chef_organization": {
+          "type": "string",
+          "description": "The Organization the node belongs to."
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The Roles associated with the node."
+        },
+        "chef_tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The Chef Tags associated with the node."
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "The projects the node is assigned to. This is a resource-scoped access control feature of IAMv2."
         }
       }
     },
