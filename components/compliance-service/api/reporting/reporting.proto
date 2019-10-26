@@ -97,6 +97,11 @@ message Report {
 	string job_id = 12;
 	string ipaddress = 13;
 	string fqdn = 14;
+	string chef_server = 15;
+	string chef_organization = 16;
+	repeated string roles = 17;
+	repeated string chef_tags = 18;
+	repeated string projects = 20;
 }
 message Profile {
 	string name = 1;
