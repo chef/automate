@@ -85,16 +85,23 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 		return nil, p.processError(err)
 	}
 
-	if checkProjects {
-		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, pol.Projects)
+	projects := pol.Projects
+	if projects == nil {
+		projects = []string{}
+	}
+	// ensure initial chef-managed policies/roles created
+	if checkProjects && pol.Type == v2.Custom {
+		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projects)
 		if err != nil {
 			return nil, p.processError(err)
 		}
 
-		err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
+		err = projectassignment.AuthorizeProjectAssignment(ctx,
 			p.engine,
 			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-			pol.Projects)
+			[]string{},
+			projects,
+			false)
 		if err != nil {
 			return nil, p.processError(err)
 		}
@@ -105,7 +112,7 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 		return nil, p.processError(err)
 	}
 
-	err = p.associatePolicyWithProjects(ctx, pol.ID, pol.Projects, tx)
+	err = p.associatePolicyWithProjects(ctx, pol.ID, projects, tx)
 	if err != nil {
 		return nil, p.processError(err)
 	}
@@ -263,22 +270,21 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 		return nil, p.processError(err)
 	}
 
+	newProjects := pol.Projects
 	if checkProjects {
-		projectDiff := projectassignment.CalculateProjectDiff(oldPolicy.Projects, pol.Projects)
+		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, newProjects)
+		if err != nil {
+			return nil, p.processError(err)
+		}
 
-		if len(projectDiff) != 0 {
-			err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projectDiff)
-			if err != nil {
-				return nil, p.processError(err)
-			}
-
-			err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
-				p.engine,
-				auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-				projectDiff)
-			if err != nil {
-				return nil, p.processError(err)
-			}
+		err = projectassignment.AuthorizeProjectAssignment(ctx,
+			p.engine,
+			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			oldPolicy.Projects,
+			newProjects,
+			true)
+		if err != nil {
+			return nil, p.processError(err)
 		}
 	}
 
@@ -313,7 +319,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy, checkProjects boo
 	}
 
 	// Update policy's projects
-	if err := p.associatePolicyWithProjects(ctx, pol.ID, pol.Projects, tx); err != nil {
+	if err := p.associatePolicyWithProjects(ctx, pol.ID, newProjects, tx); err != nil {
 		return nil, p.processError(err)
 	}
 
@@ -700,16 +706,20 @@ func (p *pg) CreateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 		return nil, p.processError(err)
 	}
 
-	if checkProjects {
+	projects := role.Projects
+	// ensure initial chef-managed policies/roles created
+	if checkProjects && role.Type == v2.Custom {
 		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, role.Projects)
 		if err != nil {
 			return nil, p.processError(err)
 		}
 
-		err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
+		err = projectassignment.AuthorizeProjectAssignment(ctx,
 			p.engine,
 			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-			role.Projects)
+			[]string{},
+			projects,
+			false)
 		if err != nil {
 			return nil, p.processError(err)
 		}
@@ -868,6 +878,7 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 		return nil, storage_errors.ErrNotFound
 	}
 
+	newProjects := role.Projects
 	if checkProjects {
 		var oldRole v2.Role
 		// get the old role and lock the role for updates (still readable)
@@ -879,21 +890,19 @@ func (p *pg) UpdateRole(ctx context.Context, role *v2.Role, checkProjects bool) 
 			return nil, p.processError(err)
 		}
 
-		projectDiff := projectassignment.CalculateProjectDiff(oldRole.Projects, role.Projects)
+		err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, newProjects)
+		if err != nil {
+			return nil, p.processError(err)
+		}
 
-		if len(projectDiff) != 0 {
-			err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projectDiff)
-			if err != nil {
-				return nil, p.processError(err)
-			}
-
-			err = projectassignment.EnsureProjectAssignmentAuthorized(ctx,
-				p.engine,
-				auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-				projectDiff)
-			if err != nil {
-				return nil, p.processError(err)
-			}
+		err = projectassignment.AuthorizeProjectAssignment(ctx,
+			p.engine,
+			auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			oldRole.Projects,
+			newProjects,
+			true)
+		if err != nil {
+			return nil, p.processError(err)
 		}
 	}
 
@@ -946,7 +955,7 @@ func checkIfRoleIntersectsProjectsFilter(ctx context.Context, q Querier,
 	// Return true or false if there is intersection between iam_role_projects and projectsFilter,
 	// assuming '{(unassigned)}' in the case that iam_role_projects is empty. If a role of id
 	// doesn't exist, this will return a proper SQL "no rows" error when passed to processError.
-	row := q.QueryRowContext(ctx, "SELECT projects_match(role_projects($1), $2)", id, pq.Array(projectsFilter))
+	row := q.QueryRowContext(ctx, "SELECT COALESCE(projects_match(role_projects($1), $2), false)", id, pq.Array(projectsFilter))
 
 	var result bool
 	err := row.Scan(&result)
@@ -1617,6 +1626,9 @@ func (p *pg) EnsureNoProjectsMissing(ctx context.Context, projectIDs []string) e
 
 func (p *pg) ensureNoProjectsMissingWithQuerier(ctx context.Context, q Querier, projectIDs []string) error {
 	// Return any input ID that does not exist in the projects table.
+	if len(projectIDs) == 0 {
+		return nil
+	}
 	rows, err := p.db.QueryContext(ctx,
 		`SELECT id FROM unnest($1::text[]) AS input(id)
 			WHERE NOT EXISTS (SELECT * FROM iam_projects p WHERE input.id = p.id);`, pq.Array(projectIDs))
@@ -1640,7 +1652,7 @@ func (p *pg) ensureNoProjectsMissingWithQuerier(ctx context.Context, q Querier, 
 	}
 
 	if len(projectsNotFound) != 0 {
-		return projectassignment.NewProjectsMissingErroror(projectsNotFound)
+		return projectassignment.NewProjectsMissingError(projectsNotFound)
 	}
 
 	return nil

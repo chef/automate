@@ -211,18 +211,33 @@ func (s *authzServer) ValidateProjectAssignment(
 		return &api.ValidateProjectAssignmentResp{}, nil
 	}
 
-	err := s.store.EnsureNoProjectsMissing(ctx, req.ProjectIds)
-	if err != nil {
-		if _, ok := err.(*projectassignment.ProjectsMissingError); ok {
-			return nil, status.Error(codes.NotFound, err.Error())
-		}
-		return nil, status.Error(codes.Internal, err.Error())
+	newProjects := req.NewProjects
+	if len(newProjects) == 0 {
+		newProjects = []string{}
+	}
+	oldProjects := req.OldProjects
+	if len(oldProjects) == 0 {
+		oldProjects = []string{}
 	}
 
-	err = projectassignment.EnsureProjectAssignmentAuthorized(ctx, s.engine, req.Subjects, req.ProjectIds)
+	if len(newProjects) != 0 {
+		err := s.store.EnsureNoProjectsMissing(ctx, newProjects)
+		if err != nil {
+			if _, ok := err.(*projectassignment.ProjectsMissingError); ok {
+				return nil, status.Error(codes.NotFound, err.Error())
+			}
+			return nil, status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	err := projectassignment.AuthorizeProjectAssignment(ctx, s.engine, req.Subjects,
+		oldProjects, newProjects, req.IsUpdateRequest)
 	if err != nil {
 		if _, ok := err.(*projectassignment.ProjectsUnauthorizedForAssignmentErr); ok {
 			return nil, status.Error(codes.PermissionDenied, err.Error())
+		}
+		if _, ok := err.(*projectassignment.InvalidCreateRequest); ok {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -331,13 +346,17 @@ func (v *VersionSwitch) Interceptor(ctx context.Context,
 
 	// These methods skip the check, though they are in the relevant service
 	// definition:
-	switch info.FullMethod {
-	case "/chef.automate.domain.authz.Authorization/GetVersion":
+	fullMethod := info.FullMethod
+	if strings.HasSuffix(fullMethod, "GetVersion") ||
+		// ValidateProjectAssignment is called within CreateToken/UpdateToken
+		// Since our tokens server is not version-aware, we need to exempt this call
+		// ValidateProjectAssignment itself *will* respond correctly to IAM version
+		strings.HasSuffix(fullMethod, "ValidateProjectAssignment") {
 		return handler(ctx, req)
 	}
 
-	v1Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.Authorization/")
-	v2Req := strings.HasPrefix(info.FullMethod, "/chef.automate.domain.authz.v2.Authorization/")
+	v1Req := strings.HasPrefix(fullMethod, "/chef.automate.domain.authz.Authorization/")
+	v2Req := strings.HasPrefix(fullMethod, "/chef.automate.domain.authz.v2.Authorization/")
 
 	if v.Version.Major == api.Version_V2 && v1Req {
 		st := status.New(codes.FailedPrecondition, "authz-service set to v2")

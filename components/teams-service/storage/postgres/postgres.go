@@ -13,7 +13,6 @@ import (
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
-	"github.com/chef/automate/lib/projectassignment"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
@@ -87,7 +86,7 @@ func (p *postgres) ResetToV1(ctx context.Context) error {
 
 // StoreTeam saves a team to the DB. This is used by IAM v1 ONLY!
 func (p *postgres) StoreTeam(ctx context.Context, name string, description string) (storage.Team, error) {
-	return p.StoreTeamWithProjects(ctx, name, description, []string{})
+	return p.insertTeam(ctx, name, description, []string{})
 }
 
 // StoreTeam saves a team to the DB.
@@ -97,17 +96,29 @@ func (p *postgres) StoreTeamWithProjects(ctx context.Context,
 	// ensure we do not pass null projects to db and break the "not null" constraint
 	if len(projects) == 0 {
 		projects = []string{}
-	} else {
-		// will only return an error if authz is in v2.1 mode
-		_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-			ProjectIds: projects,
-		})
-		if err != nil {
-			// return error unaltered because it's already a GRPC status code
-			return storage.Team{}, err
-		}
 	}
+	// will only return an error if authz is in v2.1 mode
+	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+		Subjects:    auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+		OldProjects: []string{},
+		NewProjects: projects,
+	})
+	if err != nil {
+		// return error unaltered because it's already a GRPC status code
+		return storage.Team{}, err
+	}
+
+	team, err := p.insertTeam(ctx, name, description, projects)
+	if err != nil {
+		return storage.Team{}, err
+	}
+
+	return team, nil
+}
+
+func (p *postgres) insertTeam(ctx context.Context,
+	name string, description string, projects []string) (storage.Team, error) {
+
 	var team storage.Team
 	err := p.db.QueryRowContext(ctx,
 		`INSERT INTO teams (id, name, description, projects, created_at, updated_at)
@@ -228,17 +239,16 @@ func (p *postgres) EditTeamByName(ctx context.Context,
 		return storage.Team{}, p.processError(err)
 	}
 
-	projectDiff := projectassignment.CalculateProjectDiff(oldProjects, updatedProjects)
-	if len(projectDiff) != 0 {
-		// will only return an error if authz is in v2.1 mode
-		_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-			Subjects:   auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-			ProjectIds: projectDiff,
-		})
-		if err != nil {
-			// return error unaltered because it's already a GRPC status code
-			return storage.Team{}, err
-		}
+	// will only return an error if authz is in v2.1 mode
+	_, err = p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+		OldProjects:     oldProjects,
+		NewProjects:     updatedProjects,
+		IsUpdateRequest: true,
+	})
+	if err != nil {
+		// return error unaltered because it's already a GRPC status code
+		return storage.Team{}, err
 	}
 
 	var t storage.Team
