@@ -158,6 +158,7 @@ describe File.basename(__FILE__) do
   it "creates new jobs as children of existing ones" do
     counter = 0
     while counter <= 10
+      puts "sleeping 10sec, counter is: ", counter
       sleep 10
       all_jobs = GRPC jobs, :list, Jobs::Query.new()
       if all_jobs.total >= 7 
