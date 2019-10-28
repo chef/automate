@@ -18,6 +18,12 @@ describe File.basename(__FILE__) do
     # command. as part of the makefile task that runs this test, we send in three reports, two of which are for the
     # same node. so we expect the total here to be 9 nodes.
     nodes_list = MANAGER_GRPC nodes, :list, Nodes::Query.new()
+    counter = 0
+    while nodes_list.total < 9 do
+      puts "sleeping 5, counter: ", counter
+      counter +=1
+      nodes_list = MANAGER_GRPC nodes, :list, Nodes::Query.new()
+    end
     assert_equal(9, nodes_list.total)
 
     state_nodes = MANAGER_GRPC nodes, :list, Nodes::Query.new(filters:[Common::Filter.new(key: "state", values: ["RUNNING", "STOPPED", ""])])
