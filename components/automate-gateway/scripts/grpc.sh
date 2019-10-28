@@ -56,7 +56,7 @@ for i in components/automate-gateway/api/**/; do
     else
       # service, grpc-gateway, policy mapping
       protoc "${IMPORTS[@]}" \
-        --go_out=plugins=grpc,paths=source_relative:src \
+        --go_out=plugins=grpc,paths=source_relative:/src \
         --grpc-gateway_out=request_context=true,logtostderr=true:"${fauxpath}" \
         --policy_out=logtostderr=true:"${fauxpath}" \
         --grpc-mock_out="${fauxpath}" \
