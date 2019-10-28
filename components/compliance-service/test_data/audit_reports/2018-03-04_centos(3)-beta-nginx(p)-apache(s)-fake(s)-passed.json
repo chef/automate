@@ -19,9 +19,9 @@
   "other_checks": [],
   "policy_name": "",
   "policy_group": "",
-  "organization_name": "",
+  "organization_name": "my-org",
   "source_fqdn": "localhost",
-  "chef_tags": [],
+  "chef_tags": ["fake-tag"],
   "ipaddress": "10.3.4.5",
   "fqdn": "web-cent.example.com",
   "profiles": [

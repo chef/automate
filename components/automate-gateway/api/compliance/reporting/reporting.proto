@@ -425,6 +425,16 @@ message Report {
 	string ipaddress = 13;
 	// The FQDN (fully qualified domain name) of the node making the report.
 	string fqdn = 14;
+	// The Chef Server that manages the node making the report.
+	string chef_server = 15;
+	// The Organization the node belongs to.
+	string chef_organization = 16;
+	// The Roles associated with the node.
+	repeated string roles = 17;
+	// The Chef Tags associated with the node.
+	repeated string chef_tags = 18;
+	// The projects the node is assigned to. This is a resource-scoped access control feature of IAMv2.
+	repeated string projects = 20;
 }
 
 message Profile {
