@@ -3,6 +3,8 @@ package authz
 import (
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
+	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	"github.com/pkg/errors"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -27,6 +29,7 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Service.Host = w.String("0.0.0.0")
 	c.V1.Sys.Service.Port = w.Int32(10130)
+	c.V1.Sys.Service.ProjectLimit = w.Int32(constants_v2.MaxProjects)
 	c.V1.Sys.Logger.Level = w.String("info")
 	c.V1.Sys.Logger.Format = w.String("text")
 	c.V1.Sys.Storage.Database = w.String("chef_authz_service")
@@ -40,7 +43,18 @@ func DefaultConfigRequest() *ConfigRequest {
 // instance of config.InvalidConfigError that has the missing keys and invalid
 // fields populated.
 func (c *ConfigRequest) Validate() error {
-	return nil
+	cfgErr := config.NewInvalidConfigError()
+	projectLimit := c.GetV1().GetSys().GetService().GetProjectLimit().GetValue()
+
+	if projectLimit < constants_v2.MaxProjects {
+		e := errors.Errorf("invalid project limit of %v: must be minimum of %v", projectLimit, constants_v2.MaxProjects)
+		cfgErr.AddInvalidValue("authz.v1.sys.svc.project_limit", e.Error())
+	}
+
+	if cfgErr.IsEmpty() {
+		return nil
+	}
+	return cfgErr
 }
 
 // PrepareSystemConfig returns a system configuration that can be used
