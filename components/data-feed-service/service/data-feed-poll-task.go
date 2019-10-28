@@ -67,6 +67,10 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 		return nil, errors.Wrap(err, "failed to parse task parameters")
 	}
 	log.Infof("DataFeedPollTask.Run params %v", params)
+	log.Infof("DataFeedPollTask.Run FeedStart %v", params.FeedStart)
+	log.Infof("DataFeedPollTask.Run FeedEnd %v", params.FeedEnd)
+	log.Infof("DataFeedPollTask.Run NextStart %v", params.PollTaskParams.NextFeedStart)
+	log.Infof("DataFeedPollTask.Run NextEnd %v", params.PollTaskParams.NextFeedEnd)
 	now := time.Now()
 	params = d.getFeedTimes(params, now)
 	feedStartTime := params.PollTaskParams.NextFeedStart
@@ -112,13 +116,15 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 }
 
 func (d *DataFeedPollTask) getFeedTimes(params DataFeedWorkflowParams, now time.Time) DataFeedWorkflowParams {
-
-	if params.PollTaskParams.NextFeedStart.IsZero() {
+	lag := now.Sub(params.PollTaskParams.NextFeedEnd).Minutes()
+	log.Debugf("Feed lag is %v and interval is %v", lag, params.PollTaskParams.FeedInterval.Minutes())
+	if params.PollTaskParams.NextFeedStart.IsZero() || lag > params.PollTaskParams.FeedInterval.Minutes() {
 		params.PollTaskParams.NextFeedEnd = d.getFeedEndTime(params.PollTaskParams.FeedInterval, now)
 		params.PollTaskParams.NextFeedStart = params.PollTaskParams.NextFeedEnd.Add(-params.PollTaskParams.FeedInterval)
+		log.Debugf("Initialise Feed interval start, end: %s, %s", params.PollTaskParams.NextFeedStart.Format("15:04:05"), params.PollTaskParams.NextFeedEnd.Format("15:04:05"))
+	} else {
+		log.Debugf("Current Feed interval start, end: %s, %s", params.PollTaskParams.NextFeedStart.Format("15:04:05"), params.PollTaskParams.NextFeedEnd.Format("15:04:05"))
 	}
-
-	log.Debugf("Current Feed interval start, end: %s, %s", params.PollTaskParams.NextFeedStart.Format("15:04:05"), params.PollTaskParams.NextFeedEnd.Format("15:04:05"))
 	return params
 }
 
