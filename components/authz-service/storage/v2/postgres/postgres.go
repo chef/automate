@@ -1469,12 +1469,12 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 
 	if project.Type == v2.Custom {
 		row := tx.QueryRowContext(ctx, "SELECT count(*) FROM iam_projects WHERE type='custom'")
-		var numProjects int64
+		var numProjects int
 		if err := row.Scan(&numProjects); err != nil {
 			return nil, p.processError(err)
 		}
 
-		if numProjects >= constants_v2.MaxProjects {
+		if numProjects >= p.projectLimit {
 			return nil, storage_errors.ErrMaxProjectsExceeded
 		}
 	}
