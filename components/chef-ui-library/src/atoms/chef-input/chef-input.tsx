@@ -85,7 +85,7 @@ export class ChefInput {
     return (
       <Host class={{
         'focused': this.isFocused(),
-        'touched': this.isTouched()
+        'ng-touched': this.isTouched()
       }}>
         {this.renderContent()}
       </Host>

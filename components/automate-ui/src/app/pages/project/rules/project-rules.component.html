@@ -14,10 +14,10 @@
         <chef-form-field id="create-name">
           <label>
             <span class="label">Rule Name <span aria-hidden="true">*</span></span>
-            <chef-input ngDefaultControl formControlName="name" (keyup)="handleNameInput($event)"></chef-input>
+            <chef-input ngDefaultControl #test formControlName="name" (keyup)="handleNameInput($event)"></chef-input>
           </label>
           <chef-error
-            *ngIf="(ruleForm.get('name').hasError('required') || ruleForm.get('name').hasError('pattern')) && ruleForm.get('name').dirty"
+            *ngIf="(ruleForm.get('name').hasError('required') || ruleForm.get('name').hasError('pattern')) && test.classList.contains('ng-touched')"
           >Rule Name is required.</chef-error>
         </chef-form-field>
 
