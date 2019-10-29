@@ -14,9 +14,9 @@ export class JobScheduleFormComponent {
 
 
   public RRule = RRule;
-  private monthObject: {} = {};
 
   // public months = Array(12).fill(1).map((_, i) => i + 1);
+  public months = this.buildMonthsObject();
 
   public dates = Array(31).fill(1).map((_, i) => i + 1);
 
@@ -26,9 +26,14 @@ export class JobScheduleFormComponent {
 
   public minutes = Array(60).fill(1).map((_, i) => i);
 
-  public months = moment.monthsShort().forEach( (month, i) => {
-    console.log(month);
-    return this.monthObject[i] = month;
-  });
+
+  private buildMonthsObject() {
+    //need to be sorted?
+    const monthsObject = {};
+    moment.monthsShort().forEach((month, i) => {
+      monthsObject[i] = month;
+    });
+    return monthsObject;
+  }
 
 }

@@ -78,7 +78,7 @@
                 <option *ngFor="let n of dates" [value]="n">{{ n | number:'2.0-0' }}</option>
               </select>
               <select formControlName="month">
-                <option *ngFor="let n of months" [value]="n"></option>
+                <!-- <option *ngFor="let n of months | keyvalue" [value]="n.key">{{ n.value }}</option> -->
               </select>
               <select formControlName="year">
                 <option *ngFor="let n of years" [value]="n">{{ n }}</option>
