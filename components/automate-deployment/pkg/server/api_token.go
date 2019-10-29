@@ -13,11 +13,13 @@ import (
 	"github.com/chef/automate/api/interservice/authz/common"
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
 
 // GenerateAdminToken returns a new API token with admin-level
-// access (aka access to the entire API).
+// access (aka access to the entire API). This function should only be used internally
+// and should never be exposed to the external API.
 func (s *server) GenerateAdminToken(ctx context.Context,
 	req *api.GenerateAdminTokenRequest) (*api.GenerateAdminTokenResponse, error) {
 	if !s.HasConfiguredDeployment() {
@@ -33,6 +35,7 @@ func generateAdminToken(ctx context.Context,
 	req *api.GenerateAdminTokenRequest, connFactory *secureconn.Factory,
 	authNAddress, authZAddress string) (*api.GenerateAdminTokenResponse, error) {
 
+	ctx = auth_context.NewContext(ctx, []string{"tls:service:deployment-service:internal"}, []string{}, "", "", "v2.1")
 	authnConnection, err := connFactory.DialContext(
 		ctx,
 		"authn-service",
