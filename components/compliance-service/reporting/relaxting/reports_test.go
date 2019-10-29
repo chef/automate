@@ -36,6 +36,7 @@ func TestConvertControlProcessesTags(t *testing.T) {
 		Impact:     1,
 		Title:      "Running worker process as non-privileged user",
 		StringTags: stringTags,
+		Refs:       make([]*reportingapi.Ref, 0),
 		Results:    make([]*reportingapi.Result, 0),
 	}, convertedControl)
 }
@@ -104,6 +105,7 @@ func TestConvertControlFiltersByTagValMatch(t *testing.T) {
 		Impact:     1,
 		Title:      "Another Control",
 		StringTags: stringTags,
+		Refs:       make([]*reportingapi.Ref, 0),
 		Results:    make([]*reportingapi.Result, 0),
 	}, convertedControl)
 }
@@ -127,6 +129,7 @@ func TestConvertControlFiltersByTagOnlyMatch(t *testing.T) {
 		Impact:     1,
 		Title:      "Another Control",
 		StringTags: stringTags,
+		Refs:       make([]*reportingapi.Ref, 0),
 		Results:    make([]*reportingapi.Result, 0),
 	}, convertedControl)
 }
