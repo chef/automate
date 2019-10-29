@@ -48,7 +48,7 @@ func (c *ConfigRequest) Validate() error {
 
 	if projectLimit < constants_v2.MaxProjects {
 		e := errors.Errorf("invalid project limit of %v: must be minimum of %v", projectLimit, constants_v2.MaxProjects)
-		cfgErr.AddInvalidValue("authz.v1.sys.svc.project_limit", e.Error())
+		cfgErr.AddInvalidValue("auth_z.v1.sys.service.project_limit", e.Error())
 	}
 
 	if cfgErr.IsEmpty() {

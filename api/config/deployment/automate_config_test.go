@@ -29,6 +29,7 @@ func TestValidateInvalid(t *testing.T) {
 		"load_balancer.v1.sys.service.external_fqdn",
 		"load_balancer.v1.sys.frontend_tls",
 		"session.v1.sys.service.external_fqdn",
+		"auth_z.v1.sys.service.project_limit",
 	} {
 		expected.AddMissingKey(k)
 	}
