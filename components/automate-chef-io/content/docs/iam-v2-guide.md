@@ -57,7 +57,7 @@ To delete a legacy policy, open the menu on any custom policy, which is located 
 A warning appears if members are still attached to the policy because deleting that policy disrupts access for all of its members.
 However, you will still be able to delete the policy.
 
-Alternately, if you include the command `--skip-policy-migration` when upgrading, no existing v1 policies will be migrated.
+In the rare situation that you include the command `--skip-policy-migration` when upgrading, no existing v1 policies will be migrated.
 You will still need to create new v2 policies to preserve any IAM behavior from v1.
 
 {{% warning %}}

@@ -28,7 +28,7 @@ Keep in mind the following context when exploring this API reference:
 
 3. Attach the `?pretty` query string to an endpoint to get pretty-printed output.
 
-Putting it all together with the `/policies` endpoint as an example, this command fetches the list of policies with multi-line, formatted output:
+Putting all of the above information together with the `/policies` endpoint as an example, this command fetches the list of policies with multi-line, formatted output:
 
 ```bash
 curl -sH "api-token: $TOKEN" \
@@ -37,13 +37,13 @@ curl -sH "api-token: $TOKEN" \
 
 For those API methods that take JSON data, typically though the `create` and `update` methods,
 you can provide that data to the REST endpoint in a variety of ways.
-If it is a relatively small size payload, you can include it in a `curl` command inline. For example:
+If the data is a relatively small size payload, you can include it in a `curl` command inline. For example:
 
 ```bash
 curl -sH "api-token: $TOKEN" -d '<your JSON here>' ...
 ```
 
-If the payload is larger, it is often convenient to store it in a file, then pass that file. For example: 
+If the payload is larger, it is often convenient to store the data in a file, then pass that file. For example: 
 
 ```bash
 curl -sH "api-token: $TOKEN" -d @policy.json ...
@@ -132,7 +132,7 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}?pre
 
 Create a policy by composing JSON with all the necessary policy properties (see [Example Policy]({{< relref "iam-v2-api-reference.md#example-policy" >}})).
 
-Assuming you store it in the file "policy.json", pass it to `curl` to create the policy:
+Assuming you store the JSON content in the file "policy.json", pass the file to `curl` to create the policy:
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @policy.json -X POST \
@@ -291,7 +291,7 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/{role-id}?pretty
 
 Create a role by composing JSON with all the necessary role properties (see [Example Role]({{< relref "iam-v2-api-reference.md#example-role" >}})).
 
-Assuming you store it in the file "role.json", pass it to `curl` to create the role:
+Assuming you store the JSON content in the file "role.json", pass the file to `curl` to create the role:
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @role.json -X POST \
@@ -364,8 +364,8 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects?pretty
 ```
 
 ### Updating a Project
-- The project name is the only property of a project you can modify.
-- The ID is immutable; it can only be set at creation time.
+
+Remember when updating a project, the project name is the only property of a project you can modify. The ID is immutable and it can only be set at creation time.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X PUT \
@@ -476,7 +476,7 @@ curl -sH "api-token: $TOKEN" -X GET \
 
 Create a rule by composing JSON with all the necessary rule properties (see [Example Project Rule]({{< relref "iam-v2-api-reference.md#example-project-rule" >}})).
 
-Assuming you store it in the file "project-rule.json", pass it to `curl` to create the project rule:
+Assuming you store the JSON content in the file "project-rule.json", pass the file to `curl` to create the project rule:
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @project-rule.json -X POST \
@@ -541,7 +541,7 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/users/{user-id}?pretty
 
 Create a user by composing JSON with all the necessary user properties (see [Example User]({{< relref "iam-v2-api-reference.md#example-user" >}})).
 
-Assuming you store it in the file "user.json", pass it to `curl` to create the user:
+Assuming you store the JSON content in the file "user.json", pass the file to `curl` to create the user:
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @user.json -X POST \
@@ -550,9 +550,9 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/users?pretty
 
 ### Updating a User
 
-- Supply all of a user's properties, not just the ones you wish to update.
-  Properties that you do not include are reset to empty values.
-- The user ID is immutable; it can only be set at creation time.
+When updating a user, supply all of a user's properties, not just the ones you wish to update. 
+Properties that you do not include are reset to empty values.
+The user ID is immutable and it can only be set at creation time.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @user.json -X PUT \
@@ -568,12 +568,10 @@ curl -sSH "api-token: $TOKEN" -X DELETE \
 https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/users/{user-id}?pretty
 ```
 
-
-
 ### List Teams for a User
 
-The output lists all teams that contain the specified user.
-Note, it uses the `membership_id` property of the user instead of the user's `id`.
+The output for the command below lists all teams that contain the specified user.
+Note, the output uses the `membership_id` property of the user instead of the user's `id`.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
@@ -582,9 +580,9 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/users/{membership-id}/te
 
 ### Updating Your Own User
 
-- Supply all of your user properties, not just the ones you wish to update.
-  Properties that you do not include are reset to empty values.
-- Your user ID is immutable; it can only be set at creation time.
+When updating your own user, supply all of your user properties, not just the ones you wish to update.
+Properties that you do not include are reset to empty values.
+Your user ID is immutable and it can only be set at creation time.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @user.json -X PUT \
@@ -632,7 +630,7 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams/{team-id}?pretty
 
 Create a team by composing JSON with all the necessary team properties (see [Example Team]({{< relref "iam-v2-api-reference.md#example-team" >}})).
 
-Assuming you store it in the file "team.json", pass it to `curl` to create the team:
+Assuming you store the JSON content in the file "team.json", pass the file to `curl` to create the team:
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @team.json -X POST \
@@ -641,9 +639,9 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams?pretty
 
 ### Updating a Team
 
-- Supply all of a team's properties, not just the ones you wish to update.
-  Properties that you do not include are reset to empty values.
-- The team ID is immutable; it can only be set at creation time.
+When updating a team, supply all of a team's properties, not just the ones you wish to update.
+Properties that you do not include are reset to empty values.
+The team ID is immutable and it can only be set at creation time.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @team.json -X PUT \
@@ -754,7 +752,7 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/tokens/{token-id}?pretty
 
 Create a token by composing JSON with all the necessary token properties (see [Tokens]({{< relref "iam-v2-api-reference.md#tokens" >}})).
 
-Assuming you store it in the file "token.json", pass it to `curl` to create the token:
+Assuming you store the JSON content in the file "token.json", pass the file to `curl` to create the token:
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @token.json -X POST \
@@ -772,9 +770,9 @@ Admin tokens can only be created by specifying the `--admin` flag to this `chef-
 
 ### Updating a Token
 
-- Supply all of a token's properties, not just the ones you wish to update.
+When updating a token, supply all of a token's properties, not just the ones you wish to update.
 Properties that you do not include are reset to empty values.
-- The token ID is immutable; it can only be set at creation time.
+The token ID is immutable and it can only be set at creation time.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @token.json -X PUT \
