@@ -795,6 +795,7 @@ paths = [
   "api/interservice/license_control/*",
   "api/interservice/local_user/*",
   "api/interservice/teams/*",
+  "components/authz-service/*",
   "components/automate-cli/*",
   "components/automate-gateway/api/authz/*",
   "components/automate-gateway/authz/policy_v2/*",
