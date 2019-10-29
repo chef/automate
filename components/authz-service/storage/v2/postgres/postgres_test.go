@@ -4410,7 +4410,9 @@ func TestCreateProject(t *testing.T) {
 			}
 			resp, err := store.CreateProject(ctx, &oneProjectTooMany)
 			assert.Nil(t, resp)
-			assert.Equal(t, storage_errors.ErrMaxProjectsExceeded, err)
+			assert.Error(t, err)
+			_, correctError := err.(*storage_errors.MaxProjectsExceededError)
+			assert.True(t, correctError)
 		},
 		"does create chef-managed project if max number of custom projects allowed has been reached": func(t *testing.T) {
 			for i := 1; i <= v2.MaxProjects; i++ {

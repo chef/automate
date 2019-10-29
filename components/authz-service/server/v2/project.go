@@ -130,11 +130,10 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 		return nil, status.Errorf(codes.AlreadyExists, "project with ID %q already exists", req.Id)
 	case storage_errors.ErrProjectInGraveyard:
 		return nil, status.Errorf(codes.AlreadyExists, "project with ID %q is in the process of being deleted, try again later", req.Id)
-	case storage_errors.ErrMaxProjectsExceeded:
-		return nil, status.Errorf(codes.FailedPrecondition,
-			"max of %d projects allowed while IAM v2 Beta", constants_v2.MaxProjects)
 	default:
 		switch err.(type) {
+		case *storage_errors.MaxProjectsExceededError:
+			return nil, status.Error(codes.FailedPrecondition, err.Error())
 		case *storage_errors.ForeignKeyError:
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}

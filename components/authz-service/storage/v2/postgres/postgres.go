@@ -1475,7 +1475,7 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 		}
 
 		if numProjects >= p.projectLimit {
-			return nil, storage_errors.ErrMaxProjectsExceeded
+			return nil, storage_errors.NewMaxProjectsExceededError(p.projectLimit)
 		}
 	}
 
