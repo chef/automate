@@ -1525,20 +1525,6 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 			},
 			projectIDs: []string{},
 		},
-		{
-			description: "project update with no nodes",
-			node:        iBackend.Node{},
-			projects: map[string]*iam_v2.ProjectRules{
-				"project 9": {
-					Rules: []*iam_v2.ProjectRule{
-						{
-							Conditions: []*iam_v2.Condition{},
-						},
-					},
-				},
-			},
-			projectIDs: []string{},
-		},
 	}
 
 	for _, test := range cases {
@@ -1574,4 +1560,47 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				suite.DeleteAllDocuments()
 			})
 	}
+}
+
+func TestProjectUpdatePainlessElasticsearchScriptNoNodes(t *testing.T) {
+
+	ctx := context.Background()
+	projects := map[string]*iam_v2.ProjectRules{
+		"project 9": {
+			Rules: []*iam_v2.ProjectRule{
+				{
+					Conditions: []*iam_v2.Condition{
+						{
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_POLICY_NAME,
+							Values:    []string{"dev"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Send a project rules update event
+	esJobID, err := suite.ingest.UpdateNodeProjectTags(ctx, projects)
+	assert.Nil(t, err)
+
+	jobStatus, err := suite.ingest.JobStatus(ctx, esJobID)
+	assert.Nil(t, err)
+	for !jobStatus.Completed {
+		time.Sleep(time.Millisecond * 5)
+		jobStatus, err = suite.ingest.JobStatus(ctx, esJobID)
+		assert.Nil(t, err)
+		if err != nil {
+			assert.FailNow(t, "testing job status")
+		}
+	}
+
+	suite.RefreshIndices(mappings.NodeState.Index)
+
+	// assert the node's project IDs
+	actualNodes, err := suite.GetNodes(100)
+	assert.Nil(t, err)
+	assert.Equal(t, 0, len(actualNodes), "wrong number of nodes retrieved")
+
+	suite.DeleteAllDocuments()
 }

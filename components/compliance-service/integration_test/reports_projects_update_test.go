@@ -1374,3 +1374,44 @@ func TestProjectUpdate(t *testing.T) {
 			})
 	}
 }
+
+func TestProjectUpdateNoReports(t *testing.T) {
+	ctx := context.Background()
+	projects := map[string]*iam_v2.ProjectRules{
+		"project9": {
+			Rules: []*iam_v2.ProjectRule{
+				{
+					Conditions: []*iam_v2.Condition{
+						{
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Values:    []string{"area_54"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Send a project rules update event
+	esJobID, err := suite.ingesticESClient.UpdateReportProjectsTags(ctx, projects)
+	require.NoError(t, err)
+
+	suite.WaitForESJobToComplete(esJobID)
+
+	suite.RefreshComplianceReportIndex()
+
+	esJobID, err = suite.ingesticESClient.UpdateSummaryProjectsTags(ctx, projects)
+	require.NoError(t, err)
+
+	suite.WaitForESJobToComplete(esJobID)
+
+	suite.RefreshComplianceSummaryIndex()
+
+	reports, err := suite.GetAllReportsESInSpecReport()
+	require.NoError(t, err)
+	require.Equal(t, 0, len(reports))
+
+	summaries, err := suite.GetAllSummaryESInSpecSummary()
+	require.NoError(t, err)
+	require.Equal(t, 0, len(summaries))
+}
