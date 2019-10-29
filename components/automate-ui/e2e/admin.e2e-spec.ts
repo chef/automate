@@ -215,6 +215,7 @@ describe('Admin pages', () => {
         ['Copy Token', 'Toggle Status', 'Delete Token'].forEach((item, index) => {
           it(`when clicked, shows ${item}`, () => {
             controlButtonP.then((controlButton) => {
+              browser.wait(EC.elementToBeClickable(controlButton), 5000);
               controlButton.click().then(() => {
                 const dropDownOption = controlButton.$(`chef-option:nth-child(${index + 1}`);
                 const dropDownOpened = () => dropDownOption.getText().then(val => val === item);
@@ -250,6 +251,7 @@ describe('Admin pages', () => {
           const tokenToDelete = $('chef-table chef-tbody chef-tr:nth-child(2)');
           expect(tokenToDelete.isPresent()).toBeTruthy();
           controlButtonP.then((controlButton) => {
+            browser.wait(EC.elementToBeClickable(controlButton), 5000);
             controlButton = tokenToDelete.$('chef-control-menu');
             controlButton.click().then(() => {
               const deleteOption = controlButton.$('chef-option:nth-child(3)');
@@ -445,6 +447,7 @@ describe('Admin pages', () => {
         ['Copy Token', 'Toggle Status', 'Delete Token'].forEach((item, index) => {
           it(`when clicked, shows ${item}`, () => {
             controlButtonP.then((controlButton) => {
+              browser.wait(EC.elementToBeClickable(controlButton), 5000);
               controlButton.click().then(() => {
                 const dropDownOption = controlButton.$(`chef-option:nth-child(${index + 1}`);
                 const dropDownOpened = () => dropDownOption.getText()
@@ -484,6 +487,7 @@ describe('Admin pages', () => {
           expect(tokenToDelete.isPresent()).toBeTruthy();
 
           controlButtonP.then((controlButton) => {
+            browser.wait(EC.elementToBeClickable(controlButton), 5000);
             controlButton = tokenToDelete.$('chef-control-menu');
             controlButton.click().then(() => {
               const deleteOption = controlButton.$('chef-option:nth-child(3)');
