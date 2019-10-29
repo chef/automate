@@ -27,7 +27,7 @@ exports.config = {
     showColors: true,
     defaultTimeoutInterval: 30000,
     print: function() {},
-    random: true
+    random: false
   },
   onPrepare() {
     require('ts-node').register({
