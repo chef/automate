@@ -28,8 +28,6 @@ A new static website for Automate is based on [Hugo](https://gohugo.io), the Go-
     version: v0.20.1
     commit: 9004771f77bedabb792a48dc846ba7fc800398a0
     ```
-    brew install jq
-    ```
 
 1. [Install jq](https://stedolan.github.io/jq/)
 
