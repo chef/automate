@@ -284,6 +284,10 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
 						}
 					}
 					if (condition.roles.length > 0) {
+						if (ctx._source['roles'] == null) {
+							match = false;
+							break;
+						}
 						def found = false;
 						for (def ruleRole : condition.roles){
 							for (def ccrRole : ctx._source.roles){
@@ -300,6 +304,10 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
 						}
 					}
 					if (condition.chefTags.length > 0) {
+						if (ctx._source['chef_tags'] == null) {
+							match = false;
+							break;
+						}
 						def found = false;
 						for (def ruleChefTag : condition.chefTags) {
 							for (def ccrChefTag : ctx._source.chef_tags) {
@@ -416,6 +424,10 @@ func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectT
 						}
 					}
 					if (condition.roles.length > 0) {
+						if (ctx._source['roles'] == null) {
+							match = false;
+							break;
+						}
 						def found = false;
 						for (def ruleRole : condition.roles){
 							for (def ccrRole : ctx._source.roles){
@@ -432,6 +444,10 @@ func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectT
 						}
 					}
 					if (condition.chefTags.length > 0) {
+						if (ctx._source['chef_tags'] == null) {
+							match = false;
+							break;
+						}
 						def found = false;
 						for (def ruleChefTag : condition.chefTags) {
 							for (def ccrChefTag : ctx._source.chef_tags) {

@@ -410,6 +410,30 @@ func TestProjectUpdate(t *testing.T) {
 			},
 			projectIDs: []string{},
 		},
+		{
+			description: "roles: setting the project to unassigned when there are no roles",
+			report: &relaxting.ESInSpecReport{
+				Projects: []string{"old_tag"},
+			},
+			summary: &relaxting.ESInSpecSummary{
+				Projects: []string{"old_tag"},
+			},
+			projects: map[string]*iam_v2.ProjectRules{
+				"project9": {
+					Rules: []*iam_v2.ProjectRule{
+						{
+							Conditions: []*iam_v2.Condition{
+								{
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Values:    []string{"area_54"},
+								},
+							},
+						},
+					},
+				},
+			},
+			projectIDs: []string{},
+		},
 
 		// ChefServers
 		{
@@ -1265,6 +1289,30 @@ func TestProjectUpdate(t *testing.T) {
 			summary: &relaxting.ESInSpecSummary{
 				Projects: []string{"old_tag"},
 				ChefTags: []string{"area_51", "area_52", "area_53"},
+			},
+			projects: map[string]*iam_v2.ProjectRules{
+				"project9": {
+					Rules: []*iam_v2.ProjectRule{
+						{
+							Conditions: []*iam_v2.Condition{
+								{
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Values:    []string{"area_54"},
+								},
+							},
+						},
+					},
+				},
+			},
+			projectIDs: []string{},
+		},
+		{
+			description: "chefTags: setting the project to unassigned when there are no chef tags",
+			report: &relaxting.ESInSpecReport{
+				Projects: []string{"old_tag"},
+			},
+			summary: &relaxting.ESInSpecSummary{
+				Projects: []string{"old_tag"},
 			},
 			projects: map[string]*iam_v2.ProjectRules{
 				"project9": {
