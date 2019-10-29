@@ -110,7 +110,7 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
   }
 
   getDuration(start_time, end_time) {
-    return moment.duration(moment.utc(end_time).diff(moment.utc(start_time))).humanize();
+    return moment.duration(moment(end_time).diff(moment(start_time))).humanize();
   }
 
   onDownloadRunsReport() {
