@@ -44,11 +44,13 @@ func DefaultConfigRequest() *ConfigRequest {
 // fields populated.
 func (c *ConfigRequest) Validate() error {
 	cfgErr := config.NewInvalidConfigError()
-	projectLimit := c.GetV1().GetSys().GetService().GetProjectLimit().GetValue()
+	projectLimit := c.GetV1().GetSys().GetService().GetProjectLimit()
 
-	if projectLimit < constants_v2.MaxProjects {
-		e := errors.Errorf("invalid project limit of %v: must be minimum of %v", projectLimit, constants_v2.MaxProjects)
-		cfgErr.AddInvalidValue("auth_z.v1.sys.service.project_limit", e.Error())
+	if projectLimit != nil {
+		if limit := projectLimit.GetValue(); limit < constants_v2.MaxProjects {
+			e := errors.Errorf("invalid project limit of %v: must be minimum of %v", limit, constants_v2.MaxProjects)
+			cfgErr.AddInvalidValue("auth_z.v1.sys.service.project_limit", e.Error())
+		}
 	}
 
 	if cfgErr.IsEmpty() {

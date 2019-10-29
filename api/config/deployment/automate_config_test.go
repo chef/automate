@@ -29,7 +29,6 @@ func TestValidateInvalid(t *testing.T) {
 		"load_balancer.v1.sys.service.external_fqdn",
 		"load_balancer.v1.sys.frontend_tls",
 		"session.v1.sys.service.external_fqdn",
-		"auth_z.v1.sys.service.project_limit",
 	} {
 		expected.AddMissingKey(k)
 	}
@@ -107,7 +106,7 @@ func TestInitConfigRenderValid(t *testing.T) {
 	r, err := c.Render()
 	assert.Nil(t, err)
 
-	ac := DefaultAutomateConfig()
+	ac := NewAutomateConfig()
 	err = toml.Unmarshal([]byte(r), ac)
 	assert.Nil(t, err)
 

@@ -9,9 +9,9 @@ import (
 )
 
 func TestValidateConfigRequestValid(t *testing.T) {
-	c := NewConfigRequest()
+	c := DefaultConfigRequest()
 	err := c.Validate()
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 }
 
 func TestSetGlobalConfig(t *testing.T) {
