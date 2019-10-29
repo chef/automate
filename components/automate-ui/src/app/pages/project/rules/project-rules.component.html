@@ -14,10 +14,10 @@
         <chef-form-field id="create-name">
           <label>
             <span class="label">Rule Name <span aria-hidden="true">*</span></span>
-            <chef-input ngDefaultControl formControlName="name" (keyup)="handleNameInput($event)"></chef-input>
+            <input formControlName="name" (keyup)="handleNameInput($event)"/>
           </label>
           <chef-error
-            *ngIf="(ruleForm.get('name').hasError('required') || ruleForm.get('name').hasError('pattern')) && ruleForm.get('name').dirty"
+            *ngIf="(ruleForm.get('name').hasError('required') || ruleForm.get('name').hasError('pattern')) && ruleForm.get('name').touched"
           >Rule Name is required.</chef-error>
         </chef-form-field>
 
@@ -25,7 +25,7 @@
           <chef-form-field id="create-id">
             <label>
               <span class="label">Rule ID <span aria-hidden="true">*</span> </span>
-              <chef-input ngDefaultControl formControlName="id" (keyup)="handleIDInput($event)"></chef-input>
+              <input formControlName="id" (keyup)="handleIDInput($event)" />
             </label>
             <chef-error *ngIf="ruleForm.get('id').hasError('maxlength') && ruleForm.get('id').dirty">
               Rule ID must be 64 characters or less.
@@ -112,14 +112,14 @@
               <chef-form-field class="attribute-field">
                 <label>
                   <span class="label">Value</span>
-                  <chef-input ngDefaultControl
+                  <input
                     formControlName="values"
                     [value]="condition.controls.values.value"
                     data-cy="rule-value"
-                  ></chef-input>
+                  />
                 </label>
                 <chef-error
-                  *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').dirty"
+                  *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').touched"
                 >Value is required.</chef-error>
                 <small class="help"
                   *ngIf="condition.controls.operator.value === 'EQUALS'">
