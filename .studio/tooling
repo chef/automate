@@ -136,3 +136,15 @@ function install_go_tool() {
     fi
   done
 }
+
+document "revendor" <<DOC
+  Revendor the go modules vendor directory
+DOC
+function revendor() {
+  install_if_missing core/go go
+  install_if_missing core/make make
+
+  pushd /src || return 1
+    make revendor
+  popd || return 1
+}
