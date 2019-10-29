@@ -43,7 +43,7 @@ weight = 25
 
 [[menu.main]]
 name = "Downloads"
-url = "https://www.chef.io/chef/get-chef/"
+url = "https://downloads.chef.io/"
 weight = 30
 
 # Define the top level sidebar items so we can reference them explicitly
