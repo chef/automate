@@ -50,7 +50,7 @@ This policy display includes the following:
 ## Policy Conversion
 
 After upgrading, we recommend that you reconstitute your v1 policies as v2 policies.
-Once this policy conversation is done, delete the old legacy v1 policies and you will have an up-to-date system.
+Once this policy conversion is done, delete the old legacy v1 policies and you will have an up-to-date system.
 
 To delete a legacy policy, open the menu on any custom policy, which is located at the end of the policy row, and select **Delete Policy** from the menu. You will not have this option for Chef-managed policies.
 

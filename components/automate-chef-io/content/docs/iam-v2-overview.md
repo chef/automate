@@ -168,7 +168,7 @@ After upgrading and before creating projects, all of your resources are consider
 
 Assigning your set of ingested Client Run and Compliance Nodes to projects is done via the project ingest rules that you create for the project.
 An ingest rule specifies one or more conditions, and each condition specifies a set of attribute values that a node must satisfy to be assigned to the given project.
-Once you define your set of projects with their contained ingest rules and conditions, you can use the **Update Projects** button on the _Main Projects_ page to apply those definitions.
+Once you define your set of projects with their contained ingest rules and conditions, you can use the **Update Projects** button on the main _Projects_ page to apply those definitions.
 
 Teams and API tokens may be assigned to projects directly in the UI. Policies and roles can only be assigned through the command line.
 These resources created within Automate do not make use of, nor do they require, any project ingest rules.

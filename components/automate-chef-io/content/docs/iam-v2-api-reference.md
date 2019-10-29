@@ -228,7 +228,7 @@ curl -sSH "api-token: $TOKEN" -X POST \
 https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members:remove?pretty
 ```
 
-# Roles
+## Roles
 
 A role encapsulates a list of actions.
 IAM v2 provides several default *Chef-managed* roles, which are essential to the operation of Chef Automate and cannot be altered.
