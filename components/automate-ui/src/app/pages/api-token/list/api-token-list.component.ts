@@ -1,7 +1,7 @@
 import { Component, EventEmitter, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, combineLatest, BehaviorSubject } from 'rxjs';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
@@ -36,6 +36,7 @@ import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filt
 export class ApiTokenListComponent implements OnInit {
   public loading$: Observable<boolean>;
   public sortedApiTokens$: Observable<ApiToken[]>;
+  public currentPageOfApiTokens$: Observable<ApiToken[]>;
   public apiTokenCount$: Observable<number>;
   public deleteModalVisible = false;
   public tokenToDelete: ApiToken;
@@ -49,6 +50,8 @@ export class ApiTokenListComponent implements OnInit {
   public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public readonly RFC2822 = DateTime.RFC2822;
+  public pageSize = 100;
+  public pageNumber$ = new BehaviorSubject<number>(0);
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -61,6 +64,16 @@ export class ApiTokenListComponent implements OnInit {
     this.sortedApiTokens$ = store.pipe(
       select(allApiTokens),
       map(tokens => ChefSorters.naturalSort(tokens, 'name')));
+
+    this.sortedApiTokens$ = store.pipe(
+        select(allApiTokens),
+        map(tokens => ChefSorters.naturalSort(tokens, 'name')));
+
+    this.currentPageOfApiTokens$ = combineLatest([this.pageNumber$, this.sortedApiTokens$]).pipe(
+      map(([pageNumber, apiTokens]: [number, ApiToken[]]) =>
+      apiTokens.slice(pageNumber * this.pageSize,
+        pageNumber * this.pageSize + this.pageSize))
+    );
 
     this.createTokenForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
@@ -86,6 +99,10 @@ export class ApiTokenListComponent implements OnInit {
       });
   }
 
+  public onPageChange(pageNumber) {
+    this.pageNumber$.next(pageNumber - 1);
+  }
+
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
   }
@@ -97,6 +114,7 @@ export class ApiTokenListComponent implements OnInit {
 
   public deleteToken(): void {
     this.closeDeleteModal();
+    this.pageNumber$.next(0);
     this.store.dispatch(new DeleteToken(this.tokenToDelete));
   }
 
@@ -120,6 +138,7 @@ export class ApiTokenListComponent implements OnInit {
           pendingCreate.complete();
           this.creatingToken = false;
           if (state === EntityStatus.loadingSuccess) {
+            this.pageNumber$.next(0);
             this.closeCreateModal();
           }
           if (state === EntityStatus.loadingFailure) {
