@@ -410,6 +410,30 @@ func TestProjectUpdate(t *testing.T) {
 			},
 			projectIDs: []string{},
 		},
+		{
+			description: "roles: setting the project to unassigned when there are no roles",
+			report: &relaxting.ESInSpecReport{
+				Projects: []string{"old_tag"},
+			},
+			summary: &relaxting.ESInSpecSummary{
+				Projects: []string{"old_tag"},
+			},
+			projects: map[string]*iam_v2.ProjectRules{
+				"project9": {
+					Rules: []*iam_v2.ProjectRule{
+						{
+							Conditions: []*iam_v2.Condition{
+								{
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Values:    []string{"area_54"},
+								},
+							},
+						},
+					},
+				},
+			},
+			projectIDs: []string{},
+		},
 
 		// ChefServers
 		{
@@ -1282,6 +1306,30 @@ func TestProjectUpdate(t *testing.T) {
 			},
 			projectIDs: []string{},
 		},
+		{
+			description: "chefTags: setting the project to unassigned when there are no chef tags",
+			report: &relaxting.ESInSpecReport{
+				Projects: []string{"old_tag"},
+			},
+			summary: &relaxting.ESInSpecSummary{
+				Projects: []string{"old_tag"},
+			},
+			projects: map[string]*iam_v2.ProjectRules{
+				"project9": {
+					Rules: []*iam_v2.ProjectRule{
+						{
+							Conditions: []*iam_v2.Condition{
+								{
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Values:    []string{"area_54"},
+								},
+							},
+						},
+					},
+				},
+			},
+			projectIDs: []string{},
+		},
 	}
 
 	for _, test := range cases {
@@ -1325,4 +1373,45 @@ func TestProjectUpdate(t *testing.T) {
 				assert.ElementsMatch(t, test.projectIDs, updatedSummary.Projects)
 			})
 	}
+}
+
+func TestProjectUpdateNoReports(t *testing.T) {
+	ctx := context.Background()
+	projects := map[string]*iam_v2.ProjectRules{
+		"project9": {
+			Rules: []*iam_v2.ProjectRule{
+				{
+					Conditions: []*iam_v2.Condition{
+						{
+							Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+							Values:    []string{"area_54"},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	// Send a project rules update event
+	esJobID, err := suite.ingesticESClient.UpdateReportProjectsTags(ctx, projects)
+	require.NoError(t, err)
+
+	suite.WaitForESJobToComplete(esJobID)
+
+	suite.RefreshComplianceReportIndex()
+
+	esJobID, err = suite.ingesticESClient.UpdateSummaryProjectsTags(ctx, projects)
+	require.NoError(t, err)
+
+	suite.WaitForESJobToComplete(esJobID)
+
+	suite.RefreshComplianceSummaryIndex()
+
+	reports, err := suite.GetAllReportsESInSpecReport()
+	require.NoError(t, err)
+	require.Equal(t, 0, len(reports))
+
+	summaries, err := suite.GetAllSummaryESInSpecSummary()
+	require.NoError(t, err)
+	require.Equal(t, 0, len(summaries))
 }

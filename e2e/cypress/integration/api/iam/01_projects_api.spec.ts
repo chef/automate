@@ -270,7 +270,7 @@ describeIfIAMV2p1('projects API', () => {
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       });
-      waitUntilApplyRulesNotRunning(100);
+      waitUntilApplyRulesNotRunning(500);
 
       // confirm rules are applied
       for (const project of [avengersProject, xmenProject]) {

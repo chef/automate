@@ -1,6 +1,7 @@
 package elastic
 
 import (
+	"fmt"
 	"time"
 
 	"context"
@@ -11,7 +12,6 @@ import (
 	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -43,7 +43,7 @@ func (es *Backend) Initializing() bool {
 }
 
 func (es *Backend) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) ([]string, error) {
-	logrus.Debug("starting project updater")
+	log.Debug("starting project updater")
 
 	esNodeJobID, err := es.UpdateNodeProjectTags(ctx, projectTaggingRules)
 	if err != nil {
@@ -55,7 +55,7 @@ func (es *Backend) UpdateProjectTags(ctx context.Context, projectTaggingRules ma
 		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Action project tags update")
 	}
 
-	logrus.Debugf("Started Project rule updates with node job ID: %q action job ID %q", esNodeJobID, esActionJobID)
+	log.Debugf("Started Project rule updates with node job ID: %q action job ID %q", esNodeJobID, esActionJobID)
 
 	return []string{esNodeJobID, esActionJobID}, nil
 }
@@ -77,7 +77,22 @@ func (es *Backend) JobStatus(ctx context.Context, jobID string) (project_update_
 
 	var estimatedEndTimeInSec int64
 
-	percentageComplete := getPercentageComplete(tasksGetTaskResponse.Task.Status)
+	percentageComplete, ok := getPercentageComplete(tasksGetTaskResponse.Task.Status)
+	if !ok {
+		return project_update_lib.JobStatus{
+			Completed:             tasksGetTaskResponse.Completed,
+			PercentageComplete:    0,
+			EstimatedEndTimeInSec: estimatedEndTimeInSec,
+		}, nil
+	}
+
+	// If the task is marked complete but the percentage complete is not 1 then the task stopped unexpectedly
+	if tasksGetTaskResponse.Completed && percentageComplete != 1 {
+		log.Errorf("Task %s stopped unexpectedly. "+
+			"For more information go to http://localhost:10141/.tasks/task/%s", jobID, jobID)
+		return project_update_lib.JobStatus{}, fmt.Errorf("Task %s stopped unexpectedly. "+
+			"For more information go to http://localhost:10141/.tasks/task/%s", jobID, jobID)
+	}
 
 	if percentageComplete != 0 {
 		runningTimeNanos := float64(tasksGetTaskResponse.Task.RunningTimeInNanos)
@@ -352,24 +367,35 @@ func newBoolQueryFromFilters(filters map[string]string) *elastic.BoolQuery {
 	return boolQuery
 }
 
-func getPercentageComplete(status interface{}) float64 {
+func getPercentageComplete(status interface{}) (float64, bool) {
 	statusMap, ok := status.(map[string]interface{})
 	if !ok {
-		return 0
+		return 0, false
+	}
+
+	created, ok := statusMap["created"].(float64)
+	if !ok {
+		return 0, false
+	}
+
+	deleted, ok := statusMap["deleted"].(float64)
+	if !ok {
+		return 0, false
 	}
 
 	updated, ok := statusMap["updated"].(float64)
 	if !ok {
-		return 0
+		return 0, false
 	}
+
 	total, ok := statusMap["total"].(float64)
 	if !ok {
-		return 0
+		return 0, false
 	}
 
 	if total == 0 {
-		return 0
+		return 1, true
 	}
 
-	return updated / total
+	return (created + deleted + updated) / total, true
 }

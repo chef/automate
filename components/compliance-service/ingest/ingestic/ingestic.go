@@ -284,6 +284,10 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
 						}
 					}
 					if (condition.roles.length > 0) {
+						if (ctx._source['roles'] == null) {
+							match = false;
+							break;
+						}
 						def found = false;
 						for (def ruleRole : condition.roles){
 							for (def ccrRole : ctx._source.roles){
@@ -300,6 +304,10 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
 						}
 					}
 					if (condition.chefTags.length > 0) {
+						if (ctx._source['chef_tags'] == null) {
+							match = false;
+							break;
+						}
 						def found = false;
 						for (def ruleChefTag : condition.chefTags) {
 							for (def ccrChefTag : ctx._source.chef_tags) {
@@ -416,6 +424,10 @@ func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectT
 						}
 					}
 					if (condition.roles.length > 0) {
+						if (ctx._source['roles'] == null) {
+							match = false;
+							break;
+						}
 						def found = false;
 						for (def ruleRole : condition.roles){
 							for (def ccrRole : ctx._source.roles){
@@ -432,6 +444,10 @@ func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectT
 						}
 					}
 					if (condition.chefTags.length > 0) {
+						if (ctx._source['chef_tags'] == null) {
+							match = false;
+							break;
+						}
 						def found = false;
 						for (def ruleChefTag : condition.chefTags) {
 							for (def ccrChefTag : ctx._source.chef_tags) {
@@ -498,7 +514,24 @@ func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (project_u
 
 	var estimatedEndTimeInSec int64
 
-	percentageComplete := getPercentageComplete(tasksGetTaskResponse.Task.Status)
+	percentageComplete, ok := getPercentageComplete(tasksGetTaskResponse.Task.Status)
+
+	if !ok {
+		return project_update_lib.JobStatus{
+			Completed:             tasksGetTaskResponse.Completed,
+			PercentageComplete:    0,
+			EstimatedEndTimeInSec: estimatedEndTimeInSec,
+		}, nil
+	}
+
+	// If the task is marked complete but the percentage complete is not 1 then the task stopped unexpectedly
+	if tasksGetTaskResponse.Completed && percentageComplete != 1 {
+		logrus.Errorf("Task %s stopped unexpectedly. "+
+			"For more information go to http://localhost:10141/.tasks/task/%s", jobID, jobID)
+
+		return project_update_lib.JobStatus{}, fmt.Errorf("Task %s stopped unexpectedly. "+
+			"For more information go to http://localhost:10141/.tasks/task/%s", jobID, jobID)
+	}
 
 	if percentageComplete != 0 {
 		runningTimeNanos := float64(tasksGetTaskResponse.Task.RunningTimeInNanos)
@@ -513,26 +546,37 @@ func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (project_u
 	}, nil
 }
 
-func getPercentageComplete(status interface{}) float64 {
+func getPercentageComplete(status interface{}) (float64, bool) {
 	statusMap, ok := status.(map[string]interface{})
 	if !ok {
-		return 0
+		return 0, false
+	}
+
+	created, ok := statusMap["created"].(float64)
+	if !ok {
+		return 0, false
+	}
+
+	deleted, ok := statusMap["deleted"].(float64)
+	if !ok {
+		return 0, false
 	}
 
 	updated, ok := statusMap["updated"].(float64)
 	if !ok {
-		return 0
+		return 0, false
 	}
+
 	total, ok := statusMap["total"].(float64)
 	if !ok {
-		return 0
+		return 0, false
 	}
 
 	if total == 0 {
-		return 0
+		return 1, true
 	}
 
-	return updated / total
+	return (created + deleted + updated) / total, true
 }
 
 func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2.ProjectRules) map[string]interface{} {
