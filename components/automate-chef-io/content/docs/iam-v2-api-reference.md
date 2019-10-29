@@ -35,7 +35,7 @@ curl -sH "api-token: $TOKEN" \
   https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies?pretty
 ```
 
-For those API methods that take JSON data, typically though the `create` and `update` methods,
+For those API methods that take JSON data, typically through the `create` and `update` methods,
 you can provide that data to the REST endpoint in a variety of ways.
 If the data is a relatively small size payload, you can include it in a `curl` command inline. For example:
 
@@ -195,6 +195,7 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/mem
 ```
 
 ### Updating All Members on a Policy
+
 Note the `member-id` must be in the correct [Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
 
 Use this HTTP request to replace the policy's membership:
@@ -406,7 +407,7 @@ To match a single value, use `EQUALS` and include just a single value in the **v
 To match any one of a set of values, use `MEMBER_OF` and include the choices in the **values** array.
 
 All rule conditions must be true for a rule to apply.
-If, for example, you want to match when `chef_org` is either `project1` or `project2`, this will **not** work:
+If, for example, you want to match when `chef_organization` is either `project1` or `project2`, this will **not** work:
 
 ```json
 {

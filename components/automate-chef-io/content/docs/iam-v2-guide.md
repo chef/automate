@@ -240,7 +240,7 @@ To create a project, navigate to the Projects list under the **Settings** tab an
 
 #### Assigning Resources to Projects
 
-Projects can be assigned to Automate created resources on creation or update.
+Projects can be assigned to Automate-created resources on creation or update.
 
 To assign a team to projects, select a team from the _Teams_ list, then select **Details**.
 Likewise, to assign a token to projects, select a token from the API tokens list, then select **Details**.
