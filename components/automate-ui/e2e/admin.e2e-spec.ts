@@ -230,6 +230,7 @@ describe('Admin pages', () => {
           expect(notification.isPresent()).toBeFalsy();
 
           controlButtonP.then((controlButton) => {
+            browser.wait(EC.elementToBeClickable(controlButton), 5000);
             controlButton.click().then(() => {
               const copyOption = controlButton.$('chef-option:nth-child(2)');
               browser.wait(EC.visibilityOf(copyOption), 5000, 'Copy option should render');
@@ -463,6 +464,7 @@ describe('Admin pages', () => {
           expect(notification.isPresent()).toBeFalsy();
 
           controlButtonP.then((controlButton) => {
+            browser.wait(EC.elementToBeClickable(controlButton), 5000);
             controlButton.click().then(() => {
               const copyOption = controlButton.$('chef-option:nth-child(2)');
               browser.wait(EC.visibilityOf(copyOption), 5000,
@@ -1148,10 +1150,11 @@ describe('Admin pages', () => {
 
       it('second role', () => {
         const name = $('app-roles-list chef-table chef-tr:nth-child(2) chef-td:first-child a');
-        expect(name.getText()).toBe('Some role whose name does not start with A');
+        browser.wait(EC.textToBePresentInElement(name,
+          'Some role whose name does not start with A'));
 
         const policyType = $('chef-table chef-tr:nth-child(2) chef-td:nth-child(2)');
-        expect(policyType.getText()).toBe('Custom');
+        browser.wait(EC.textToBePresentInElement(policyType, 'Custom'));
       });
     });
   });
