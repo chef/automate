@@ -1,6 +1,7 @@
 package elastic
 
 import (
+	"fmt"
 	"time"
 
 	"context"
@@ -78,6 +79,12 @@ func (es *Backend) JobStatus(ctx context.Context, jobID string) (project_update_
 	var estimatedEndTimeInSec int64
 
 	percentageComplete := getPercentageComplete(tasksGetTaskResponse.Task.Status)
+
+	// If the task is marked complete but the percentage complete is not 1 then the task stopped unexpectedly
+	if tasksGetTaskResponse.Completed && percentageComplete != 1 {
+		return project_update_lib.JobStatus{}, fmt.Errorf("Task %s stopped unexpectedly. "+
+			"For more information go to http://localhost:10141/.tasks/task/%s", jobID, jobID)
+	}
 
 	if percentageComplete != 0 {
 		runningTimeNanos := float64(tasksGetTaskResponse.Task.RunningTimeInNanos)

@@ -797,6 +797,32 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 			},
 			projectIDs: []string{},
 		},
+		{
+			description: "roles: setting the project to unassigned when there are no roles",
+			node: iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					EntityUuid: newUUID(),
+					NodeName:   "node_1",
+				},
+				Projects: []string{"old_tag"},
+				Exists:   true,
+			},
+			projects: map[string]*iam_v2.ProjectRules{
+				"project9": {
+					Rules: []*iam_v2.ProjectRule{
+						{
+							Conditions: []*iam_v2.Condition{
+								{
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_ROLE,
+									Values:    []string{"area_54"},
+								},
+							},
+						},
+					},
+				},
+			},
+			projectIDs: []string{},
+		},
 
 		// chefTags
 		{
@@ -1045,6 +1071,32 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 					EntityUuid: newUUID(),
 					NodeName:   "node_1",
 					ChefTags:   []string{"area_51", "area_52", "area_53"},
+				},
+				Projects: []string{"old_tag"},
+				Exists:   true,
+			},
+			projects: map[string]*iam_v2.ProjectRules{
+				"project9": {
+					Rules: []*iam_v2.ProjectRule{
+						{
+							Conditions: []*iam_v2.Condition{
+								{
+									Attribute: iam_v2.ProjectRuleConditionAttributes_CHEF_TAG,
+									Values:    []string{"area_54"},
+								},
+							},
+						},
+					},
+				},
+			},
+			projectIDs: []string{},
+		},
+		{
+			description: "chefTags: setting the project to unassigned when there are no chef tags",
+			node: iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					EntityUuid: newUUID(),
+					NodeName:   "node_1",
 				},
 				Projects: []string{"old_tag"},
 				Exists:   true,
