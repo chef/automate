@@ -118,16 +118,28 @@ To develop API documentation, compile go components, sync the swagger files and 
 
 We use the [ReDoc](https://github.com/Redocly/redoc) in conjunction with the [grpc-gateway protoc-gen-swagger](https://github.com/grpc-ecosystem/grpc-gateway/tree/master/protoc-gen-swagger) and the [OpenAPI 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) to automatically generate API documentation from comments on automate protoc files.
 
-Find the proto files for APIs at
+The proto files for APIs are located at:
 
-```output
+```shell
 automate/components/automate-gateway/api/
 ```
 
-There are two types of comments on proto files, leading and following.
+You can find the examples from these instructions at:
 
-Leading comments are placed before the start of an RPC service definition.
-Following comments happen within the service defintition.
+```shell
+automate/components/automate-gateway/api/compliance/reporting/reporting.proto
+```
+
+Adding comments to a proto file uses Go inline and block comment syntax:
+
+```go
+/* This is a block comment */
+// This is an inline comment
+```
+
+Block comments are usually placed before the start of an RPC service definition. Block comments for API documentation are sometimes called "leading comments".
+
+Inline are usually placed within the message formats. Inline comments for API documentation are sometimes called "following comments".
 
 
     * Installation of necessary things
