@@ -1508,6 +1508,24 @@ describe File.basename(__FILE__) do
                  resp['nodes'].map {|x| x['name']},
     )
 
+    # List all nodes that have a control tagged `web` with no values
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+      Reporting::ListFilter.new(type: 'control_tag:web', values: [''])
+    ], sort: 'name')
+    assert_equal(['centos-beta', 'RedHat(2)-beta-nginx(f)-apache(s)-failed'],
+                 resp['nodes'].map {|x| x['name']},
+    )
+
+    # List all nodes that have a control tagged `web` with no values and `web:IIS`
+    resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+      Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+      Reporting::ListFilter.new(type: 'control_tag:web', values: ['', 'IIS'])
+    ], sort: 'name')
+    assert_equal(['centos-beta', 'RedHat(2)-beta-nginx(f)-apache(s)-failed', 'windows(1)-zeta-apache(s)-skipped'],
+                 resp['nodes'].map {|x| x['name']},
+    )
+
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
       Reporting::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
       Reporting::ListFilter.new(type: 'control_tag:web', values: []),
