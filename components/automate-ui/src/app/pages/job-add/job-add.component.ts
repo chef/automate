@@ -105,7 +105,7 @@ export class JobAddComponent implements OnDestroy {
       include: false,
       start: this.fb.group({
         datetime: this.fb.group({
-          month: defaultStart.format('MMM'),
+          month: defaultStart.month() + 1,
           date: defaultStart.date(),
           year: defaultStart.year(),
           hour: this.hours24to12(defaultStart.hour()),
@@ -114,7 +114,7 @@ export class JobAddComponent implements OnDestroy {
       }),
       end: this.fb.group({
         datetime: this.fb.group({
-          month: defaultEnd.add(1, 'months').format('MMM'),
+          month: defaultEnd.month() + 1,
           date: defaultEnd.date(),
           year: defaultEnd.year(),
           hour: this.hours24to12(defaultEnd.hour()),
