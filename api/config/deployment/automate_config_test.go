@@ -106,7 +106,7 @@ func TestInitConfigRenderValid(t *testing.T) {
 	r, err := c.Render()
 	assert.Nil(t, err)
 
-	ac := NewAutomateConfig()
+	ac := DefaultAutomateConfig()
 	err = toml.Unmarshal([]byte(r), ac)
 	assert.Nil(t, err)
 
