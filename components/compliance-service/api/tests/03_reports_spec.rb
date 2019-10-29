@@ -758,9 +758,14 @@ describe File.basename(__FILE__) do
 
       assert_equal(Reporting::Report, res.class)
 
-      assert_equal('nginx-01', res['profiles'][0]['controls'][0]['id'])
-      assert_equal(1, res['profiles'][0]['controls'][0]['impact'])
-      assert_equal(Google::Protobuf::Map, res['profiles'][0]['controls'][0]['tags'].class)
+      control = res['profiles'].first['controls'].first
+      assert_equal('nginx-01', control['id'])
+      assert_equal(1, control['impact'])
+      assert_equal(Google::Protobuf::Map, control['tags'].class)
+      ref = control['refs'].first
+      assert_equal("testing-ref", ref['ref'])
+      assert_equal("test-url", ref['url'])
+
       assert_equal('Running worker process as non-privileged user', res['profiles'][0]['controls'][0]['title'])
       assert_equal(1, res['profiles'][0]['controls'][0]['results'].length)
 

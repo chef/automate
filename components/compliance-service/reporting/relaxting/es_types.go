@@ -103,6 +103,11 @@ type ESInSpecReportControlStringTags struct {
 	Values []string `json:"values"`
 }
 
+type ESInSpecReportControlRefs struct {
+	Ref string `json:"ref"`
+	Url string `json:"url"`
+}
+
 type ESInSpecReportControl struct {
 	ID         string                            `json:"id"`
 	Impact     float32                           `json:"impact"`
@@ -110,6 +115,7 @@ type ESInSpecReportControl struct {
 	Status     string                            `json:"status"`
 	Results    []*ESInSpecReportControlsResult   `json:"results"`
 	StringTags []ESInSpecReportControlStringTags `json:"string_tags"`
+	Refs       []ESInSpecReportControlRefs       `json:"refs"`
 }
 
 type ESInSpecReportProfile struct {

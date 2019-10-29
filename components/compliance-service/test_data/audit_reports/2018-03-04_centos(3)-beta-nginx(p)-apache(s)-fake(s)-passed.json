@@ -66,7 +66,11 @@
           "title": "Running worker process as non-privileged user",
           "desc": "The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.",
           "impact": 1,
-          "refs": [],
+          "refs":[ 
+            { 
+               "ref":"testing-ref", "url": "test-url"
+            }
+          ],
           "tags": {
             "web": null,
             "scope": "NginX"

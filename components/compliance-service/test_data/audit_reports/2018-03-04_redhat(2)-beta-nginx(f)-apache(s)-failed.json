@@ -97,7 +97,11 @@
           "title": "Check NGINX config file owner, group and permissions.",
           "desc": "The NGINX config file should owned by root, only be writable by owner and not write- and readable by others.",
           "impact": 1,
-          "refs": [],
+          "refs":[ 
+            { 
+              "ref":"testing-ref", "url": "test-url"
+            }
+          ],
           "tags": {},
           "code": "control 'nginx-02' do\n  impact 1.0\n  title 'Check NGINX config file owner, group and permissions.'\n  desc 'The NGINX config file should owned by root, only be writable by owner and not write- and readable by others.'\n  describe file(nginx_conf) do\n    it { should be_owned_by 'root' }\n    it { should be_grouped_into 'root' }\n    it { should_not be_readable.by('others') }\n    it { should_not be_writable.by('others') }\n    it { should_not be_executable.by('others') }\n  end\nend\n",
           "source_location": {

@@ -228,6 +228,17 @@ var ComplianceRepDate = Mapping{
                     }
                   }
                 },
+                "refs": {
+                  "type": "nested",
+                  "properties": {
+                    "key": {
+                      "type": "keyword"
+                    },
+                    "values": {
+                      "type": "keyword"
+                    }
+                  }
+                },
                 "string_tags": {
                   "type": "nested",
                   "properties": {

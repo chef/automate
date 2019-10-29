@@ -557,10 +557,14 @@ func convertControl(profileControlsMap map[string]*reportingapi.Control, reportC
 	}
 
 	convertedControl.StringTags = jsonTags
-	var jsonRefs []*reportingapi.Ref
-	refs, _ := json.Marshal(profileControl.Refs)
-	json.Unmarshal(refs, &jsonRefs) // nolint: errcheck
-	convertedControl.Refs = jsonRefs
+
+	convertedControl.Refs = make([]*reportingapi.Ref, len(reportControlMin.Refs))
+	for i, ref := range reportControlMin.Refs {
+		convertedControl.Refs[i] = &reportingapi.Ref{
+			Ref: ref.Ref,
+			Url: ref.Url,
+		}
+	}
 	return &convertedControl
 
 }
