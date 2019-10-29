@@ -17,6 +17,7 @@ type DataFeedWorkflowExecutor struct {
 	workflowName cereal.WorkflowName
 }
 
+// DataFeedWorkflowParams the params for the workflow and all the tasks in the workflow
 type DataFeedWorkflowParams struct {
 	NodeIDs          map[string]NodeIDs
 	FeedStart        time.Time
@@ -44,6 +45,9 @@ func (e *DataFeedWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.
 		return w.Fail(err)
 	}
 
+	/*
+	 * Start the workflow with the poll task to get any nodes that have had client runs
+	 */
 	err = w.EnqueueTask(dataFeedPollTaskName, params)
 	if err != nil {
 		return w.Fail(err)
@@ -73,11 +77,17 @@ func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev 
 		if err != nil {
 			return w.Fail(err)
 		}
+		/*
+		 * Update the workflow params
+		 */
 		payload.NodeIDs = taskResults.NodeIDs
-		payload.PollTaskComplete = true
 		params.NodeIDs = payload.NodeIDs
 		params.FeedStart = taskResults.FeedStart
 		params.FeedEnd = taskResults.FeedEnd
+		payload.PollTaskComplete = true
+		/*
+		 * Next we get the report ID's of any node that has had a compliance report
+		 */
 		err = w.EnqueueTask(dataFeedListReportsTaskName, params)
 		if err != nil {
 			return w.Fail(err)
@@ -93,12 +103,15 @@ func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev 
 		payload.PollTaskComplete = true
 		// should only enqueue if len nodes > 0
 		if len(payload.NodeIDs) > 0 {
+			// the client task will get the data for nodes with a client run in the interval
 			err = w.EnqueueTask(dataFeedClientTaskName, params)
 			if err != nil {
 				return w.Fail(err)
 			}
 		} else {
-			// no new data at all
+			// no nodes have been updated by client run and
+			// no compliance reports have been run in the interval
+			// the workflow is therefore complete
 			payload.PollTaskComplete = true
 			payload.ListReportsTaskComplete = true
 			payload.ClientTaskComplete = true
@@ -117,6 +130,7 @@ func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev 
 		params.NodeIDs = payload.NodeIDs
 		payload.DataFeedMessages = taskResults.DataFeedMessages
 		payload.ClientTaskComplete = true
+		// if there are still node IDs in the map we must get the compliance reports for them
 		if len(payload.NodeIDs) > 0 {
 			err = w.EnqueueTask(dataFeedComplianceTaskName, params)
 			if err != nil {

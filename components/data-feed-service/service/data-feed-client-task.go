@@ -58,7 +58,8 @@ func (d *DataFeedClientTask) Run(ctx context.Context, task cereal.Task) (interfa
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build chef client data")
 	}
-	// return the data feed but also return nodeids, report ids not used argh
+	// return the data feed but also return nodeids, these will be the NodeIDs of reports not yet collected
+	// i.e. the reports on nodes whihc have not had a client run in the interval
 	return &DataFeedClientTaskResults{DataFeedMessages: datafeedMessages, NodeIDs: nodeIDs}, nil
 }
 
@@ -76,6 +77,7 @@ func (d *DataFeedClientTask) buildDatafeed(ctx context.Context, nodeIDs map[stri
 		log.Debugf("buildDataFeed key %s, value %v", key, nodeID)
 		filters := []string{"id:" + nodeID.ClientID}
 
+		// get the attributes and last client run data of each node
 		message, err := getNodeData(ctx, d.cfgMgmt, filters)
 		if err != nil {
 			log.Errorf("Error getting node data %v", err)
@@ -94,12 +96,14 @@ func (d *DataFeedClientTask) buildDatafeed(ctx context.Context, nodeIDs map[stri
 			Sort:    "latest_report.end_time",
 			Order:   reporting.Query_DESC,
 		}
+		// get the most recent compliance report summary for this node
 		reports, err := d.reporting.ListReports(ctx, ipaddressQuery)
 		if err != nil {
 			log.Errorf("Error listing reports %v", err)
 			continue
 		}
 
+		// get the full report
 		fullReport := new(reporting.Report)
 		if len(reports.Reports) != 0 {
 			reportID := &reporting.Query{Id: reports.Reports[0].Id}
@@ -109,9 +113,12 @@ func (d *DataFeedClientTask) buildDatafeed(ctx context.Context, nodeIDs map[stri
 				continue
 			}
 		}
-
+		// update the message with the full report
 		message.Report = fullReport
 		nodeMessages[ipaddress] = message
+		// We have all the data for this node - attributes, client run and compliance report
+		// delete from the node map so it only contains ID's for nodes that have not yet had
+		// data collected
 		delete(nodeIDs, ipaddress)
 	}
 	log.Debugf("%v node attribute messages retrieved in interval", len(nodeMessages))
