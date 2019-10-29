@@ -1,8 +1,8 @@
-import { describeIfIAMV2, describeIfIAMV2p1 } from '../../constants';
+import { describeIfIAMV2p1 } from '../../constants';
 
-describeIfIAMV2('policies API', () => {
+describeIfIAMV2p1('policies API', () => {
   const defaultAdminReq = {
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    headers: {}, // must fill in before use
     url: '/apis/iam/v2beta/policies'
   };
   const cypressPrefix = 'test-policies-api';
@@ -17,6 +17,7 @@ describeIfIAMV2('policies API', () => {
   };
 
   before(() => {
+    defaultAdminReq.headers = { 'api-token': Cypress.env('ADMIN_TOKEN') };
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies', 'projects']);
 
     for (const project of [project1, project2]) {
@@ -43,7 +44,8 @@ describeIfIAMV2('policies API', () => {
     });
 
     it('returns 400 when there are no statements',  () => {
-      cy.request({ ...defaultAdminReq,
+      cy.request({
+        ...defaultAdminReq,
         method: 'POST',
         failOnStatusCode: false,
         body: {
@@ -89,7 +91,8 @@ describeIfIAMV2('policies API', () => {
     });
 
     it('returns 400 when there are no statements',  () => {
-      cy.request({ ...defaultAdminReq,
+      cy.request({
+        ...defaultAdminReq,
         method: 'PUT',
         url: `/apis/iam/v2beta/policies/${policyID}`,
         failOnStatusCode: false,
@@ -104,60 +107,63 @@ describeIfIAMV2('policies API', () => {
     });
   });
 
-  describeIfIAMV2p1('project assignment enforcement', () => {
+  describe('project assignment enforcement', () => {
     let nonAdminToken = '';
     const nonAdminTokenID = `${cypressPrefix}-nonadmin-token-${now}`;
     const statementProjects = [project1.id];
     const policyID = `${cypressPrefix}-policy-${now}`;
     const defaultNonAdminReq = {
-      headers: {  }, // must fill in before use
+      headers: {}, // must fill in before use
       method: 'POST',
       url: '/apis/iam/v2beta/policies'
     };
 
     before(() => {
-      cy.request({ ...defaultAdminReq,
+      cy.request({
+        ...defaultAdminReq,
         method: 'POST',
         url: '/apis/iam/v2beta/tokens',
         body: {
-            id: nonAdminTokenID,
-            name: 'Nonadmin Token'
+          id: nonAdminTokenID,
+          name: 'Nonadmin Token'
         }
       }).then((response) => {
-          nonAdminToken = response.body.token.value;
-          defaultNonAdminReq.headers = { 'api-token': nonAdminToken };
+        nonAdminToken = response.body.token.value;
+        defaultNonAdminReq.headers = { 'api-token': nonAdminToken };
       });
 
-      cy.request({ ...defaultAdminReq,
+      cy.request({
+        ...defaultAdminReq,
         method: 'POST',
         body: {
-            name: 'token-access',
-            id: `${cypressPrefix}-token-access-policy-${now}`,
-            members: [ `token:${nonAdminTokenID}` ],
-            statements: [
-              {
-                effect: 'ALLOW',
-                actions: [ 'iam:policies:*' ],
-                projects: [ '*' ]
-              },
-              {
-                effect: 'ALLOW',
-                actions: [ 'iam:projects:assign' ],
-                projects: [ project1.id ]
-              }
-            ],
-            projects: []
+          name: 'token-access',
+          id: `${cypressPrefix}-token-access-policy-${now}`,
+          members: [`token:${nonAdminTokenID}`],
+          statements: [
+            {
+              effect: 'ALLOW',
+              actions: ['iam:policies:*'],
+              projects: ['*']
+            },
+            {
+              effect: 'ALLOW',
+              actions: ['iam:projects:assign'],
+              projects: [project1.id]
+            }
+          ],
+          projects: []
         }
       });
     });
 
     after(() => {
       cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix,
-          ['projects', 'policies', 'tokens']);
+        ['projects', 'policies', 'tokens']);
     });
 
     beforeEach(() => {
-      cy.request({ ...defaultAdminReq,
+      cy.request({
+        ...defaultAdminReq,
         method: 'DELETE',
         url: `/apis/iam/v2beta/policies/${policyID}`,
         failOnStatusCode: false
@@ -165,7 +171,8 @@ describeIfIAMV2('policies API', () => {
     });
 
     afterEach(() => {
-      cy.request({ ...defaultAdminReq,
+      cy.request({
+        ...defaultAdminReq,
         method: 'DELETE',
         url: `/apis/iam/v2beta/policies/${policyID}`,
         failOnStatusCode: false
@@ -174,225 +181,248 @@ describeIfIAMV2('policies API', () => {
 
     describe('POST /apis/iam/v2beta/policies', () => {
       it('admin can create a new policy with no projects', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: policyWithProjects(policyID, [], statementProjects)
+        cy.request({
+          ...defaultAdminReq,
+          method: 'POST',
+          body: policyWithProjects(policyID, [], statementProjects)
         }).then((response) => {
-            expect(response.body.policy.projects).to.have.length(0);
+          expect(response.body.policy.projects).to.have.length(0);
         });
       });
 
       it('admin can create a new policy with multiple projects', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: policyWithProjects(policyID, [project1.id, project2.id], statementProjects)
+        cy.request({
+          ...defaultAdminReq,
+          method: 'POST',
+          body: policyWithProjects(policyID, [project1.id, project2.id], statementProjects)
         }).then((response) => {
-            expect(response.body.policy.projects).to.have.length(2);
+          expect(response.body.policy.projects).to.have.length(2);
         });
       });
 
       it('admin gets a 404 when it attempts to create ' +
-         'a policy with a project that does not exist', () => {
-        cy.request({ ...defaultAdminReq,
+        'a policy with a project that does not exist', () => {
+          cy.request({
+            ...defaultAdminReq,
             method: 'POST',
             failOnStatusCode: false,
             body: policyWithProjects(policyID,
               [project1.id, project2.id, 'notfound'], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.status).to.equal(404);
+          });
         });
-      });
 
       it('non-admin with project1 assignment access but not (unassigned) access ' +
         'cannot create a new policy with no projects', () => {
-        cy.request({ ...defaultNonAdminReq,
+          cy.request({
+            ...defaultNonAdminReq,
             method: 'POST',
             failOnStatusCode: false,
             body: policyWithProjects(policyID, [], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.status).to.equal(403);
+          });
         });
-      });
 
       it('non-admin with project1 assignment access can create ' +
-      'a new policy with project1', () => {
-        cy.request({ ...defaultNonAdminReq,
+        'a new policy with project1', () => {
+          cy.request({
+            ...defaultNonAdminReq,
             method: 'POST',
             body: policyWithProjects(policyID, [project1.id], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.body.policy.projects).to.have.length(1);
+          });
         });
-      });
 
       it('non-admin with project1 assignment access gets a 404 when it attempts to create ' +
-      'a policy with a project that does not exist', () => {
-        cy.request({ ...defaultNonAdminReq,
+        'a policy with a project that does not exist', () => {
+          cy.request({
+            ...defaultNonAdminReq,
             method: 'POST',
             failOnStatusCode: false,
             body: policyWithProjects(policyID,
               [project1.id, project2.id, 'notfound'], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.status).to.equal(404);
+          });
         });
-      });
 
       it('non-admin with project1 assignment access cannot create ' +
-      'a new policy with other projects (403)', () => {
-        cy.request({ ...defaultNonAdminReq,
+        'a new policy with other projects (403)', () => {
+          cy.request({
+            ...defaultNonAdminReq,
             method: 'POST',
             failOnStatusCode: false,
             body: policyWithProjects(policyID, [project1.id, project2.id], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.status).to.equal(403);
+          });
         });
-      });
     });
 
     describe('PUT /apis/iam/v2beta/policies', () => {
       it('admin can update a policy with no projects to have projects', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: policyWithProjects(policyID, [], statementProjects)
+        cy.request({
+          ...defaultAdminReq,
+          method: 'POST',
+          body: policyWithProjects(policyID, [], statementProjects)
         }).then((response) => {
-            expect(response.body.policy.projects).to.have.length(0);
+          expect(response.body.policy.projects).to.have.length(0);
         });
 
-        cy.request({ ...defaultAdminReq,
-            method: 'PUT',
-            url: `/apis/iam/v2beta/policies/${policyID}`,
-            body: policyWithProjects(policyID, [project1.id, project2.id], statementProjects)
+        cy.request({
+          ...defaultAdminReq,
+          method: 'PUT',
+          url: `/apis/iam/v2beta/policies/${policyID}`,
+          body: policyWithProjects(policyID, [project1.id, project2.id], statementProjects)
         }).then((response) => {
-            expect(response.body.policy.projects).to.have.length(2);
+          expect(response.body.policy.projects).to.have.length(2);
         });
       });
 
       it('admin can update a policy with projects to have no projects', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: policyWithProjects(policyID, [project1.id, project2.id], statementProjects)
+        cy.request({
+          ...defaultAdminReq,
+          method: 'POST',
+          body: policyWithProjects(policyID, [project1.id, project2.id], statementProjects)
         }).then((response) => {
-            expect(response.body.policy.projects).to.have.length(2);
+          expect(response.body.policy.projects).to.have.length(2);
         });
 
-        cy.request({ ...defaultAdminReq,
-            method: 'PUT',
-            url: `/apis/iam/v2beta/policies/${policyID}`,
-            body: policyWithProjects(policyID, [], statementProjects)
+        cy.request({
+          ...defaultAdminReq,
+          method: 'PUT',
+          url: `/apis/iam/v2beta/policies/${policyID}`,
+          body: policyWithProjects(policyID, [], statementProjects)
         }).then((response) => {
-            expect(response.body.policy.projects).to.have.length(0);
+          expect(response.body.policy.projects).to.have.length(0);
         });
       });
 
       it('admin cannot update a policy to have projects that do not exist', () => {
-        cy.request({ ...defaultAdminReq,
-            method: 'POST',
-            body: policyWithProjects(policyID, [], statementProjects)
+        cy.request({
+          ...defaultAdminReq,
+          method: 'POST',
+          body: policyWithProjects(policyID, [], statementProjects)
         }).then((response) => {
-            expect(response.body.policy.projects).to.have.length(0);
+          expect(response.body.policy.projects).to.have.length(0);
         });
 
-        cy.request({ ...defaultAdminReq,
-            method: 'PUT',
-            url: `/apis/iam/v2beta/policies/${policyID}`,
-            failOnStatusCode: false,
-            body: policyWithProjects(policyID, [project1.id, 'notfound'], statementProjects)
+        cy.request({
+          ...defaultAdminReq,
+          method: 'PUT',
+          url: `/apis/iam/v2beta/policies/${policyID}`,
+          failOnStatusCode: false,
+          body: policyWithProjects(policyID, [project1.id, 'notfound'], statementProjects)
         }).then((response) => {
-            expect(response.status).to.equal(404);
+          expect(response.status).to.equal(404);
         });
       });
 
       it('non-admin with project1 assignment access can update ' +
-      'a policy to remove project1', () => {
-        cy.request({ ...defaultAdminReq,
+        'a policy to remove project1', () => {
+          cy.request({
+            ...defaultAdminReq,
             method: 'POST',
             body: policyWithProjects(policyID, [project1.id, project2.id], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.body.policy.projects).to.have.length(2);
-        });
+          });
 
-        cy.request({ ...defaultNonAdminReq,
+          cy.request({
+            ...defaultNonAdminReq,
             method: 'PUT',
             url: `/apis/iam/v2beta/policies/${policyID}`,
             body: policyWithProjects(policyID, [project2.id], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.body.policy.projects).to.have.length(1);
+          });
         });
-      });
 
       it('non-admin with project1 assignment access gets a 404 ' +
-      'when updating a policy to have non-existent policies', () => {
-        cy.request({ ...defaultAdminReq,
+        'when updating a policy to have non-existent policies', () => {
+          cy.request({
+            ...defaultAdminReq,
             method: 'POST',
             body: policyWithProjects(policyID, [], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.body.policy.projects).to.have.length(0);
-        });
+          });
 
-        cy.request({ ...defaultNonAdminReq,
+          cy.request({
+            ...defaultNonAdminReq,
             method: 'PUT',
             url: `/apis/iam/v2beta/policies/${policyID}`,
             failOnStatusCode: false,
             body: policyWithProjects(policyID, [project1.id, 'notfound'], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.status).to.equal(404);
+          });
         });
-      });
 
       it('non-admin with project1 assignment access cannot update ' +
-      'a policy with no projects to have project1', () => {
-        cy.request({ ...defaultAdminReq,
+        'a policy with no projects to have project1', () => {
+          cy.request({
+            ...defaultAdminReq,
             method: 'POST',
             body: policyWithProjects(policyID, [], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.body.policy.projects).to.have.length(0);
-        });
+          });
 
-        cy.request({ ...defaultNonAdminReq,
+          cy.request({
+            ...defaultNonAdminReq,
             method: 'PUT',
             url: `/apis/iam/v2beta/policies/${policyID}`,
             failOnStatusCode: false,
             body: policyWithProjects(policyID, [project1.id], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.status).to.equal(403);
+          });
         });
-      });
 
       it('non-admin with project1 assignment access can update ' +
-      'a policy with project1 to have no projects', () => {
-        cy.request({ ...defaultAdminReq,
+        'a policy with project1 to have no projects', () => {
+          cy.request({
+            ...defaultAdminReq,
             method: 'POST',
             body: policyWithProjects(policyID, [project1.id], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.body.policy.projects).to.have.length(1);
-        });
+          });
 
-        cy.request({ ...defaultNonAdminReq,
+          cy.request({
+            ...defaultNonAdminReq,
             method: 'PUT',
             url: `/apis/iam/v2beta/policies/${policyID}`,
             body: policyWithProjects(policyID, [], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.body.policy.projects).to.have.length(0);
+          });
         });
-      });
 
       it('non-admin with project1 assignment access cannot update ' +
-      'a policy to remove other projects', () => {
-        cy.request({ ...defaultAdminReq,
+        'a policy to remove other projects', () => {
+          cy.request({
+            ...defaultAdminReq,
             method: 'POST',
             body: policyWithProjects(policyID, [project1.id, project2.id], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.body.policy.projects).to.have.length(2);
-        });
+          });
 
-        cy.request({ ...defaultNonAdminReq,
+          cy.request({
+            ...defaultNonAdminReq,
             method: 'PUT',
             url: `/apis/iam/v2beta/policies/${policyID}`,
             failOnStatusCode: false,
             body: policyWithProjects(policyID, [project1.id], statementProjects)
-        }).then((response) => {
+          }).then((response) => {
             expect(response.status).to.equal(403);
+          });
         });
-      });
     });
   });
 });
