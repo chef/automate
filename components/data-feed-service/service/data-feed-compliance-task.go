@@ -64,7 +64,7 @@ func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, nodeIDs ma
 
 		// the node hasn't had a client run in last window, but has a report so we can add the report
 		id := &reporting.Query{Id: nodeID.ComplianceID}
-
+		// get the full report
 		fullReport, err := d.reporting.ReadReport(ctx, id)
 		if err != nil {
 			log.Errorf("Error getting report by if %v", err)
@@ -72,6 +72,7 @@ func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, nodeIDs ma
 		}
 		filters := []string{"ipaddress:" + ipaddress}
 		// node the latest node data associated with this report
+		// i.e. latest attribute and client data but won't have been in the interval
 		message, err := getNodeData(ctx, d.cfgMgmt, filters)
 		if err != nil {
 			// TODO

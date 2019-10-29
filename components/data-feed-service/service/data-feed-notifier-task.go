@@ -48,6 +48,7 @@ func (d *DataFeedNotifierTask) Run(ctx context.Context, task cereal.Task) (inter
 	log.Debugf("DataFeedNotifierTask.Run %v", params)
 	datafeedMessages := params.DataFeedMessages
 	data := make([]datafeedMessage, 0, len(datafeedMessages))
+	// build the payload
 	for _, value := range datafeedMessages {
 		data = append(data, value)
 	}

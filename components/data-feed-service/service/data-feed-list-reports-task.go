@@ -59,6 +59,7 @@ func (d *DataFeedListReportsTask) Run(ctx context.Context, task cereal.Task) (in
 	return &DataFeedListReportsTaskResults{NodeIDs: params.NodeIDs}, nil
 }
 
+// listReports update the ipaddress:NodeIDs map with the report ID of any compliance reports in the interval
 func (d *DataFeedListReportsTask) listReports(ctx context.Context, pageSize int32, feedStartTime time.Time, feedEndTime time.Time, nodeIDs map[string]NodeIDs) {
 	feedStartString := strings.SplitAfter(feedStartTime.Format(time.RFC3339), "Z")[0]
 	feedEndString := strings.SplitAfter(feedEndTime.Format(time.RFC3339), "Z")[0]
@@ -102,11 +103,14 @@ func (d *DataFeedListReportsTask) listReports(ctx context.Context, pageSize int3
 			ipaddress := reports.Reports[report].Ipaddress
 			log.Debugf("report has ipaddress %v", ipaddress)
 			if _, ok := nodeIDs[ipaddress]; ok {
+				// We must have a client run in the interval for the node with this ip
 				log.Debugf("node data already exists for %v", ipaddress)
 				nodeID := nodeIDs[ipaddress]
+				// set the NodeId.ComplianceID for this ip to the report ID
 				nodeID.ComplianceID = reports.Reports[report].Id
 				nodeIDs[ipaddress] = nodeID
 			} else {
+				// ipaddress not in the mao so we add a new map entry with the report ID as ComplianceID
 				nodeIDs[ipaddress] = NodeIDs{ComplianceID: reports.Reports[report].Id}
 				log.Debugf("nodeID added %v", nodeIDs[ipaddress])
 			}

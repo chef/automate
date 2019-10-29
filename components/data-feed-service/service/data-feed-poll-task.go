@@ -35,12 +35,13 @@ type DataFeedPollTaskParams struct {
 }
 
 type DataFeedPollTaskResults struct {
-	Destinations []dao.Destination
-	NodeIDs      map[string]NodeIDs
-	FeedStart    time.Time
-	FeedEnd      time.Time
+	NodeIDs   map[string]NodeIDs
+	FeedStart time.Time
+	FeedEnd   time.Time
 }
 
+// ClientID the node ID assigned by chef client
+// ComplianceID the node ID in a compliance report
 type NodeIDs struct {
 	ClientID     string
 	ComplianceID string
@@ -66,11 +67,11 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse task parameters")
 	}
-	log.Infof("DataFeedPollTask.Run params %v", params)
-	log.Infof("DataFeedPollTask.Run FeedStart %v", params.FeedStart)
-	log.Infof("DataFeedPollTask.Run FeedEnd %v", params.FeedEnd)
-	log.Infof("DataFeedPollTask.Run NextStart %v", params.PollTaskParams.NextFeedStart)
-	log.Infof("DataFeedPollTask.Run NextEnd %v", params.PollTaskParams.NextFeedEnd)
+	log.Debugf("DataFeedPollTask.Run params %v", params)
+	log.Debugf("DataFeedPollTask.Run FeedStart %v", params.FeedStart)
+	log.Debugf("DataFeedPollTask.Run FeedEnd %v", params.FeedEnd)
+	log.Debugf("DataFeedPollTask.Run NextStart %v", params.PollTaskParams.NextFeedStart)
+	log.Debugf("DataFeedPollTask.Run NextEnd %v", params.PollTaskParams.NextFeedEnd)
 	now := time.Now()
 	params = d.getFeedTimes(params, now)
 	feedStartTime := params.PollTaskParams.NextFeedStart
@@ -90,16 +91,17 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 	}
 
 	nodeIDs, err := d.GetChangedNodes(ctx, params.PollTaskParams.AssetPageSize, feedStartTime, feedEndTime)
-	log.Infof("DataFeedPollTask nodes %v", nodeIDs)
+	log.Debugf("DataFeedPollTask nodes %v", nodeIDs)
 	if err != nil {
 		return nil, err
 	}
 
 	params.NodeIDs = nodeIDs
-	log.Infof("THE PARAMS %v", params)
+
 	log.Debugf("Updated next feed interval start, end: %s, %s", params.PollTaskParams.NextFeedStart.Format("15:04:05"), params.PollTaskParams.NextFeedEnd.Format("15:04:05"))
 	log.Debugf("Updated feed interval start, end: %s, %s", params.FeedStart.Format("15:04:05"), params.FeedEnd.Format("15:04:05"))
 
+	// we must update the workflow params to ensure the nest schedule has the update interval times
 	err = d.manager.UpdateWorkflowScheduleByName(context.Background(), dataFeedScheduleName, dataFeedWorkflowName,
 		cereal.UpdateParameters(params),
 		cereal.UpdateEnabled(true))
@@ -108,14 +110,20 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 	}
 
 	return &DataFeedPollTaskResults{
-		Destinations: destinations,
-		NodeIDs:      nodeIDs,
-		FeedStart:    feedStartTime,
-		FeedEnd:      feedEndTime,
+		NodeIDs:   nodeIDs,
+		FeedStart: feedStartTime,
+		FeedEnd:   feedEndTime,
 	}, nil
 }
 
+// getFeedTimes determines the start and end times for the next interval to poll
+// It returns the updated DatafeedWorkflowParams
 func (d *DataFeedPollTask) getFeedTimes(params DataFeedWorkflowParams, now time.Time) DataFeedWorkflowParams {
+	/*
+	 * If automate has been down for a significant period of time a due schedule may already be enqueued
+	 * and not updated by the manager update call on data-feed-service startup.
+	 * In that case we need to determine if the next feed interval is stale and re-initialise it
+	 */
 	lag := now.Sub(params.PollTaskParams.NextFeedEnd).Minutes()
 	log.Debugf("Feed lag is %v and interval is %v", lag, params.PollTaskParams.FeedInterval.Minutes())
 	if params.PollTaskParams.NextFeedStart.IsZero() || lag > params.PollTaskParams.FeedInterval.Minutes() {
@@ -152,6 +160,8 @@ func (d *DataFeedPollTask) getFeedEndTime(feedInterval time.Duration, now time.T
 	return feedEndTime
 }
 
+// GetChangedNodes calls the nodes API to get any nodes whch have had a client run during the interval
+// Returns a map of ipaddress to NodeIDs struct
 func (d *DataFeedPollTask) GetChangedNodes(ctx context.Context, pageSize int32, feedStartTime time.Time, feedEndTime time.Time) (map[string]NodeIDs, error) {
 	log.Debug("Inventory nodes start")
 	feedStartString, err := ptypes.TimestampProto(feedStartTime)
