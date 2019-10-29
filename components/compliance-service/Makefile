@@ -91,15 +91,15 @@ EXTRA_PROTOS = '../../components/automate-grpc/protoc-gen-policy/iam/policy_pb.r
 
 generate-ruby-grpc:
 	@printf "\n===> ${blue}Generating ruby grpc files${reset}\n"
-	$(MAKE) ruby-grpc-tools $(EXTRA_PROTOS) $(RUBY_PROTOS)
-	$(MAKE) generate-ruby-grpc-nodemanager
-	$(MAKE) generate-ruby-grpc-secrets-service
+	$(MAKE) -d ruby-grpc-tools $(EXTRA_PROTOS) $(RUBY_PROTOS)
+	$(MAKE) -d generate-ruby-grpc-nodemanager
+	$(MAKE) -d generate-ruby-grpc-secrets-service
 
 generate-ruby-grpc-nodemanager:
-	cd ../nodemanager-service && make generate-ruby-grpc
+	cd ../nodemanager-service && make -d generate-ruby-grpc
 
 generate-ruby-grpc-secrets-service:
-	cd ../secrets-service && make generate-ruby-grpc
+	cd ../secrets-service && make -d generate-ruby-grpc
 
 %_pb.rb : %.proto
 	@printf " * ${blue}Compiling test proto${reset} for $<\n"
@@ -152,11 +152,11 @@ wait-for-compliance-service:
 
 ## RUN COMMANDS ##
 run-log-level-info: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
-	$(MAKE) run-nodemanager
+	$(MAKE) -d run-nodemanager
 	@printf "\n===> ${blue}Running compliance-service in background${reset} with logs redirected to ${yellow}$(COMPLIANCE_LOG_PATH)${reset}\n"
 	$(RUN_COMMAND_INFO) &> $(COMPLIANCE_LOG_PATH)&
 	# since we background the service, we need to give it some time to start
-	@$(MAKE) wait-for-compliance-service
+	@$(MAKE) -d wait-for-compliance-service
 
 run: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
 	@$(MAKE) check-go-version
@@ -383,7 +383,7 @@ test-integration: start-es start-pg
 test-integration-reporting: start-es start-pg download-sample-market-profiles clear-es run-log-level-info
 	@printf "\n===> ${blue}Running reporting integration tests with ES_VER=$(ES_VER)${reset}\n"
 	# we run the service locally so we can inspec detect and exec containers and ssh into containers
-	@if $(MAKE) test-reporting ; then \
+	@if $(MAKE) -d test-reporting ; then \
 	  printf "===> ${green}reporting integration tests passed!!!${reset}\n"; \
 	  $(MAKE) clean; \
 	else \
@@ -430,15 +430,15 @@ test-ingest-to-manager-conn:
 	go run examples/ingest/ingest_client.go --file ingest/examples/compliance-failure-big-report.json
 	# now send the first report in again, to ensure we get two, not three nodes
 	go run examples/ingest/ingest_client.go --file ingest/examples/compliance-success-tiny-report.json
-	$(MAKE) test TEST="test_ingest_to_mgr*"
+	$(MAKE) -d test TEST="test_ingest_to_mgr*"
 
 test-reporting: ingest-reports-into-es
 	@printf "\n===> ${blue}Running the reporting integration tests${reset}\n"
 	# the service sometimes isn't ready in travis if we don't sleep 15
 	sleep 15
-	TEST='[0-1]*_spec.rb' $(MAKE) test
+	TEST='[0-1]*_spec.rb' $(MAKE) -d test
 	cd api/tests && CGO_ENABLED=0 go test export_test.go -failfast
-	$(MAKE) test-ingest-to-manager-conn
+	$(MAKE) -d test-ingest-to-manager-conn
 
 test-scanner:
 	@printf "\n===> ${blue}Running the scanner integration tests${reset}\n"
@@ -529,7 +529,7 @@ ingest-reports-into-es:
 	    printf "\n * Ingesting report: ${blue}$$file${reset}\n"; \
 	    go run examples/ingest/ingest_client.go --file "$$file"; \
 	  done; \
-	  $(MAKE) wait-for-ingestion; \
+	  $(MAKE) -d wait-for-ingestion; \
 	fi;
 
 INSPEC_RUNNER_PATH = $(GOPATH)/bin/inspec_runner
