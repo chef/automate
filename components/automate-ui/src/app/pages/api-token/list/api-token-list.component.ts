@@ -50,7 +50,9 @@ export class ApiTokenListComponent implements OnInit {
   public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public readonly RFC2822 = DateTime.RFC2822;
-  public pageSize = 100;
+  public maxNumberOfPages = 25;
+  public minPageSize = 25;
+  public pageSize$ = new BehaviorSubject<number>(this.minPageSize);
   public pageNumber$ = new BehaviorSubject<number>(0);
 
   constructor(
@@ -65,14 +67,20 @@ export class ApiTokenListComponent implements OnInit {
       select(allApiTokens),
       map(tokens => ChefSorters.naturalSort(tokens, 'name')));
 
-    this.sortedApiTokens$ = store.pipe(
-        select(allApiTokens),
-        map(tokens => ChefSorters.naturalSort(tokens, 'name')));
+    this.sortedApiTokens$.subscribe(apiTokens => {
+      if ( Math.ceil(apiTokens.length / this.minPageSize) > this.maxNumberOfPages) {
+        this.pageSize$.next( Math.ceil(apiTokens.length / this.maxNumberOfPages) );
+      } else {
+        this.pageSize$.next( this.minPageSize );
+      }
+    });
 
-    this.currentPageOfApiTokens$ = combineLatest([this.pageNumber$, this.sortedApiTokens$]).pipe(
-      map(([pageNumber, apiTokens]: [number, ApiToken[]]) =>
-      apiTokens.slice(pageNumber * this.pageSize,
-        pageNumber * this.pageSize + this.pageSize))
+    this.currentPageOfApiTokens$ = combineLatest(
+      [this.pageNumber$, this.sortedApiTokens$, this.pageSize$]).pipe(
+      map(([pageNumber, apiTokens, pageSize]: [number, ApiToken[], number]) => {
+      return apiTokens.slice(pageNumber * pageSize,
+        pageNumber * pageSize + pageSize);
+      })
     );
 
     this.createTokenForm = fb.group({

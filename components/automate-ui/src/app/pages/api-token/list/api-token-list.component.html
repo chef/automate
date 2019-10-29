@@ -82,9 +82,9 @@
         </chef-table>
         <app-page-picker
           [total]="apiTokenCount$ | async"
-          [perPage]="pageSize"
+          [perPage]="pageSize$ | async"
           [page]="(pageNumber$ | async) + 1"
-          [maxPageItems]="100"
+          [maxPageItems]="maxNumberOfPages"
           (pageChanged)="onPageChange($event)">
         </app-page-picker>
       </app-authorized>
