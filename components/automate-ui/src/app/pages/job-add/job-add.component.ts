@@ -98,19 +98,17 @@ export class JobAddComponent implements OnDestroy {
     }, {
       validator: profileSelectionRequiredValidator
     });
-    const defaultStart = moment();
-    const defaultEnd = moment(defaultStart).add(1, 'days');
+    const defaultStart = moment.utc();
+    const defaultEnd = moment.utc(defaultStart).add(1, 'days');
     const scheduleGroup = this.fb.group({
       name: ['', Validators.required],
       include: false,
       start: this.fb.group({
         datetime: this.fb.group({
-          month: defaultStart.month() + 1,
+          month: defaultStart.format('MMM'),
           date: defaultStart.date(),
           year: defaultStart.year(),
-          hour: this.hours24to12(defaultStart.hour()),
-          minute: defaultStart.minute(),
-          meridiem: defaultStart.hour() - 12 > 0 ? 'PM' : 'AM'
+          hour: this.hours24to12(defaultStart.hour())
         })
       }),
       end: this.fb.group({

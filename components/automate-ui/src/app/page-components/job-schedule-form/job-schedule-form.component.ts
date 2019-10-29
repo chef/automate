@@ -1,4 +1,5 @@
 import { Component, Input } from '@angular/core';
+import * as moment from 'moment';
 import { FormGroup } from '@angular/forms';
 import { RRule } from 'rrule';
 
@@ -10,9 +11,12 @@ import { RRule } from 'rrule';
 export class JobScheduleFormComponent {
   @Input() form: FormGroup;
 
+
+
   public RRule = RRule;
 
-  public months = Array(12).fill(1).map((_, i) => i + 1);
+  // public months = Array(12).fill(1).map((_, i) => i + 1);
+  public months = moment.monthsShort();
 
   public dates = Array(31).fill(1).map((_, i) => i + 1);
 

@@ -38,11 +38,11 @@
         <div class="field">
           <chef-form-field formGroupName="datetime">
             <div class="datetime">
-              <select formControlName="month">
-                <option *ngFor="let n of months" [value]="n">{{ n | number:'2.0-0' }}</option>
-              </select>
               <select formControlName="date">
                 <option *ngFor="let n of dates" [value]="n">{{ n | number:'2.0-0' }}</option>
+              </select>
+              <select formControlName="month">
+                <option *ngFor="let n of months" [value]="n">{{ n }}</option>
               </select>
               <select formControlName="year">
                 <option *ngFor="let n of years" [value]="n">{{ n }}</option>
@@ -53,13 +53,14 @@
               <select formControlName="hour">
                 <option *ngFor="let n of hours" [value]="n">{{ n | number:'2.0-0' }}</option>
               </select>
+              <span>:</span>
               <select formControlName="minute">
                 <option *ngFor="let n of minutes" [value]="n">{{ n | number:'2.0-0' }}</option>
               </select>
-              <select formControlName="meridiem">
+              <!-- <select formControlName="meridiem">
                 <option value="AM">AM</option>
                 <option value="PM">PM</option>
-              </select>
+              </select> -->
             </div>
           </chef-form-field>
         </div>
@@ -73,7 +74,7 @@
           <chef-form-field formGroupName="datetime">
             <div class="datetime">
               <select formControlName="month">
-                <option *ngFor="let n of months" [value]="n">{{ n | number:'2.0-0' }}</option>
+                <option *ngFor="let n of months" [value]="n">{{ n }}</option>
               </select>
               <select formControlName="date">
                 <option *ngFor="let n of dates" [value]="n">{{ n | number:'2.0-0' }}</option>
