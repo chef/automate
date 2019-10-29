@@ -1525,6 +1525,20 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 			},
 			projectIDs: []string{},
 		},
+		{
+			description: "project update with no nodes",
+			node:        iBackend.Node{},
+			projects: map[string]*iam_v2.ProjectRules{
+				"project 9": {
+					Rules: []*iam_v2.ProjectRule{
+						{
+							Conditions: []*iam_v2.Condition{},
+						},
+					},
+				},
+			},
+			projectIDs: []string{},
+		},
 	}
 
 	for _, test := range cases {

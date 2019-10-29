@@ -514,7 +514,15 @@ func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (project_u
 
 	var estimatedEndTimeInSec int64
 
-	percentageComplete := getPercentageComplete(tasksGetTaskResponse.Task.Status)
+	percentageComplete, ok := getPercentageComplete(tasksGetTaskResponse.Task.Status)
+
+	if !ok {
+		return project_update_lib.JobStatus{
+			Completed:             tasksGetTaskResponse.Completed,
+			PercentageComplete:    0,
+			EstimatedEndTimeInSec: estimatedEndTimeInSec,
+		}, nil
+	}
 
 	// If the task is marked complete but the percentage complete is not 1 then the task stopped unexpectedly
 	if tasksGetTaskResponse.Completed && percentageComplete != 1 {
@@ -538,26 +546,37 @@ func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (project_u
 	}, nil
 }
 
-func getPercentageComplete(status interface{}) float64 {
+func getPercentageComplete(status interface{}) (float64, bool) {
 	statusMap, ok := status.(map[string]interface{})
 	if !ok {
-		return 0
+		return 0, false
+	}
+
+	created, ok := statusMap["created"].(float64)
+	if !ok {
+		return 0, false
+	}
+
+	deleted, ok := statusMap["deleted"].(float64)
+	if !ok {
+		return 0, false
 	}
 
 	updated, ok := statusMap["updated"].(float64)
 	if !ok {
-		return 0
+		return 0, false
 	}
+
 	total, ok := statusMap["total"].(float64)
 	if !ok {
-		return 0
+		return 0, false
 	}
 
 	if total == 0 {
-		return 0
+		return 1, true
 	}
 
-	return updated / total
+	return (created + deleted + updated) / total, true
 }
 
 func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2.ProjectRules) map[string]interface{} {
