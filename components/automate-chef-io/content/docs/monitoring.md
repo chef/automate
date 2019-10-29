@@ -12,7 +12,7 @@ toc = true
 +++
 
 ## Checking the status endpoint
-The authenticated endpoint `/deployment/status` provides status for the overall Chef
+The authenticated endpoint `/status` provides status for the overall Chef
 Automate installation as well as its component services. To set up a token that can be
 used with your monitoring system:
 
@@ -21,7 +21,7 @@ used with your monitoring system:
 chef-automate iam token create --id <token-id> <token-name>
 ```
 
-1. Create a policy that allows the token you created to access the `/deployment/status`
+1. Create a policy that allows the token you created to access the `/status`
    endpoint:
 ```bash
 curl -k -H "api-token: <admin-token>" -H "Content-Type: application/json" -d '{ "action": "read", "resource": "service_info:status", "subjects": [ "token:<token-id>" ] }' https://automate.example.com/api/v0/auth/policies?pretty
@@ -30,7 +30,7 @@ curl -k -H "api-token: <admin-token>" -H "Content-Type: application/json" -d '{ 
 1. Test that your token and policy give you access to the `/deployment/status` endpoint by
    running
 ```bash
-curl -k -H "api-token: <token-id>" https://automate.example.com/api/v0/deployment/status?pretty
+curl -k -H "api-token: <token-id>" https://automate.example.com/api/v0/status?pretty
 ```
 The output will look like this:
 ```

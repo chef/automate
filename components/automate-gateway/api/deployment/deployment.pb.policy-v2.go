@@ -12,7 +12,4 @@ func init() {
 	policyv2.MapMethodTo("/chef.automate.api.deployment.Deployment/ServiceVersions", "system:service:version", "system:serviceVersion:list", "GET", "/deployment/service_versions", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policyv2.MapMethodTo("/chef.automate.api.deployment.Deployment/GetDeploymentStatus", "system:service:status", "system:status:get", "GET", "/deployment/status", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
 }

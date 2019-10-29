@@ -25,6 +25,7 @@ import (
 	pb_secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
 	cfgmgmt_request "github.com/chef/automate/api/interservice/cfgmgmt/request"
+	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_teams "github.com/chef/automate/components/automate-gateway/api/auth/teams"
 	pb_tokens "github.com/chef/automate/components/automate-gateway/api/auth/tokens"
@@ -63,6 +64,16 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/service_authn"
 )
+
+type ServiceStatus struct {
+	Service string `json:"service"`
+	Status  string `json:"status"`
+}
+
+type DeploymentStatus struct {
+	Ok              bool            `json:"ok"`
+	ServiceStatuses []ServiceStatus `json:"service_status"`
+}
 
 // RegisterGRPCServices registers all grpc services in the passed *grpc.Server
 func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
@@ -671,6 +682,83 @@ func (s *Server) configMgmtReportExportHandler(w http.ResponseWriter, r *http.Re
 		}
 		w.Write(data.GetContent()) // nolint: errcheck
 	}
+}
+
+func (s *Server) DeploymentStatusHandler(w http.ResponseWriter, r *http.Request) {
+	const (
+		actionV1   = "read"
+		resourceV1 = "service_info:status"
+		actionV2   = "system:status:get"
+		resourceV2 = "system:service:status"
+	)
+
+	ctx, err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	deploymentClient, err := s.clientsFactory.DeploymentServiceClient()
+	if err != nil {
+		http.Error(w, "grpc service for deployment service unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
+	status, err := deploymentClient.Status(ctx, &deploy_api.StatusRequest{})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	serviceStatus := make([]ServiceStatus, len(status.ServiceStatus.Services))
+
+	var overallOks bool = true
+	for index, svc := range status.ServiceStatus.Services {
+		overallOks = overallOks && (svc.State == deploy_api.ServiceState_OK)
+
+		serviceStatus[index] = ServiceStatus{
+			Service: svc.Name,
+			Status:  svc.State.String(),
+		}
+	}
+
+	result := DeploymentStatus{
+		Ok:              overallOks,
+		ServiceStatuses: serviceStatus,
+	}
+
+	// Because this is a monitoring endpoint, we want to return 500 if services are down.
+	// This is consistent with Chef Infra Server's behavior and a nicer experience for users
+	// running monitoring software with built-in support for http checks. (e.g. nagios)
+	if overallOks {
+		w.WriteHeader(http.StatusOK)
+	} else {
+		w.WriteHeader(http.StatusInternalServerError)
+	}
+	w.Header().Set("Content-Type", "application/json")
+
+	// Provide prettyprinted output.
+	var jsonBody []byte
+	if _, ok := r.URL.Query()["pretty"]; ok {
+		jsonBody, err = json.MarshalIndent(&result, "", "  ")
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	} else {
+		jsonBody, err = json.Marshal(&result)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
+
+	_, err = w.Write(jsonBody)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	return
 }
 
 func init() {

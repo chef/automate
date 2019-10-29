@@ -48,34 +48,3 @@ func (s *DeploymentServer) ServiceVersions(ctx context.Context, _ *deployment.Se
 
 	return &deployment.ServiceVersionsResponse{Services: gatewayServices}, nil
 }
-
-func (s *DeploymentServer) GetDeploymentStatus(ctx context.Context, _ *deployment.DeploymentStatusRequest) (*deployment.DeploymentStatusResponse, error) {
-	status, err := s.deploymentClient.Status(ctx, &api.StatusRequest{})
-	if err != nil {
-		logrus.WithError(err).Error("failed to get deployment status")
-		return nil, err
-	}
-
-	serviceStatus := make([]*deployment.ServiceStatus, len(status.ServiceStatus.Services))
-	oks := 0
-
-	for index, svc := range status.ServiceStatus.Services {
-		if svc.State.String() == "OK" {
-			oks = oks + 1
-		}
-
-		serviceStatus[index] = &deployment.ServiceStatus{
-			Name:   svc.Name,
-			Status: svc.State.String(),
-		}
-	}
-
-	var overallState bool
-	if oks == len(status.ServiceStatus.Services) {
-		overallState = true
-	} else {
-		overallState = false
-	}
-
-	return &deployment.DeploymentStatusResponse{Ok: overallState, Services: serviceStatus}, nil
-}
