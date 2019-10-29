@@ -59,7 +59,7 @@ func (d *DataFeedClientTask) Run(ctx context.Context, task cereal.Task) (interfa
 		return nil, errors.Wrap(err, "failed to build chef client data")
 	}
 	// return the data feed but also return nodeids, these will be the NodeIDs of reports not yet collected
-	// i.e. the reports on nodes whihc have not had a client run in the interval
+	// i.e. the reports on nodes which have not had a client run in the interval
 	return &DataFeedClientTaskResults{DataFeedMessages: datafeedMessages, NodeIDs: nodeIDs}, nil
 }
 
