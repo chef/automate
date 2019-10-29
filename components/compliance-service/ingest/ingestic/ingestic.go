@@ -518,6 +518,9 @@ func (backend *ESClient) JobStatus(ctx context.Context, jobID string) (project_u
 
 	// If the task is marked complete but the percentage complete is not 1 then the task stopped unexpectedly
 	if tasksGetTaskResponse.Completed && percentageComplete != 1 {
+		logrus.Errorf("Task %s stopped unexpectedly. "+
+			"For more information go to http://localhost:10141/.tasks/task/%s", jobID, jobID)
+
 		return project_update_lib.JobStatus{}, fmt.Errorf("Task %s stopped unexpectedly. "+
 			"For more information go to http://localhost:10141/.tasks/task/%s", jobID, jobID)
 	}
