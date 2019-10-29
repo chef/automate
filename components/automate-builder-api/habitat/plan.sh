@@ -13,7 +13,8 @@ pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   core/bash
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
-  "jaym/builder-api"
+  # We need to pin here to get a build from unstable
+  "habitat/builder-api/8528/20191029043815"
 )
 
 pkg_binds=(
