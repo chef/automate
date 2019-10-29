@@ -25,13 +25,11 @@ import (
 type State struct {
 	log                    logger.Logger
 	store                  storage.Store
-	v2Store                storage.Store
 	v2p1Store              storage.Store
 	queries                map[string]ast.Body
 	compiler               *ast.Compiler
 	modules                map[string]*ast.Module
 	partialAuth            rego.PartialResult
-	v2PartialAuth          rego.PartialResult
 	v2PreparedEvalProjects rego.PreparedEvalQuery
 }
 
@@ -39,7 +37,6 @@ type State struct {
 const (
 	authzQuery              = "data.authz.authorized"
 	filteredPairsQuery      = "data.authz.introspection.authorized_pair[_]"
-	authzV2Query            = "data.authz_v2.authorized"
 	authzProjectsV2Query    = "data.authz_v2.authorized_project[project]"
 	filteredPairsV2Query    = "data.authz_v2.introspection.authorized_pair[_]"
 	filteredProjectsV2Query = "data.authz_v2.introspection.authorized_project"
@@ -59,10 +56,6 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 	if err != nil {
 		return nil, errors.Wrapf(err, "parse query %q", filteredPairsQuery)
 	}
-	authzV2QueryParsed, err := ast.ParseBody(authzV2Query)
-	if err != nil {
-		return nil, errors.Wrapf(err, "parse query %q", authzV2Query)
-	}
 	authzProjectsV2QueryParsed, err := ast.ParseBody(authzProjectsV2Query)
 	if err != nil {
 		return nil, errors.Wrapf(err, "parse query %q", authzProjectsV2Query)
@@ -78,12 +71,10 @@ func New(ctx context.Context, l logger.Logger, opts ...OptFunc) (*State, error) 
 	s := State{
 		log:       l,
 		store:     inmem.New(),
-		v2Store:   inmem.New(),
 		v2p1Store: inmem.New(),
 		queries: map[string]ast.Body{
 			authzQuery:              authzQueryParsed,
 			filteredPairsQuery:      filteredPairsQueryParsed,
-			authzV2Query:            authzV2QueryParsed,
 			authzProjectsV2Query:    authzProjectsV2QueryParsed,
 			filteredPairsV2Query:    filteredPairsV2QueryParsed,
 			filteredProjectsV2Query: filteredProjectsV2QueryParsed,
@@ -154,26 +145,6 @@ func (s *State) initPartialResult(ctx context.Context) error {
 		return errors.Wrap(err, "partial eval")
 	}
 	s.partialAuth = pr
-	return nil
-}
-
-func (s *State) initPartialResultV2(ctx context.Context) error {
-	// Reset compiler to avoid state issues
-	compiler, err := s.newCompiler()
-	if err != nil {
-		return err
-	}
-	r := rego.New(
-		rego.ParsedQuery(s.queries[authzV2Query]),
-		rego.Compiler(compiler),
-		rego.Store(s.v2Store),
-		rego.DisableInlining([]string{"data.authz_v2.deny"}),
-	)
-	v2Partial, err := r.PartialResult(ctx)
-	if err != nil {
-		return errors.Wrap(err, "partial eval (authorized)")
-	}
-	s.v2PartialAuth = v2Partial
 	return nil
 }
 
@@ -269,9 +240,6 @@ func (s *State) newCompiler() (*ast.Compiler, error) {
 func (s *State) DumpData(ctx context.Context) error {
 	return dumpData(ctx, s.store, s.log)
 }
-func (s *State) DumpDataV2(ctx context.Context) error {
-	return dumpData(ctx, s.v2Store, s.log)
-}
 
 func (s *State) DumpDataV2p1(ctx context.Context) error {
 	return dumpData(ctx, s.v2p1Store, s.log)
@@ -314,43 +282,6 @@ func (s *State) IsAuthorized(
 		[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
 	)
 	resultSet, err := s.partialAuth.Rego(rego.ParsedInput(input)).Eval(ctx)
-	if err != nil {
-		return false, &EvaluationError{e: err}
-	}
-
-	switch len(resultSet) {
-	case 0:
-		return false, nil
-	case 1:
-		exps := resultSet[0].Expressions
-		if len(exps) != 1 {
-			return false, &UnexpectedResultExpressionError{exps: exps}
-
-		}
-		return exps[0].Value == true, nil
-	default:
-		return false, &UnexpectedResultSetError{set: resultSet}
-	}
-}
-
-// V2IsAuthorized evaluates whether a given [subject, resource, action] tuple
-// is authorized given the service's state
-func (s *State) V2IsAuthorized(
-	ctx context.Context,
-	subjects engine.Subjects,
-	action engine.Action,
-	resource engine.Resource) (bool, error) {
-
-	subs := make(ast.Array, len(subjects))
-	for i, sub := range subjects {
-		subs[i] = ast.NewTerm(ast.String(sub))
-	}
-	input := ast.NewObject(
-		[2]*ast.Term{ast.NewTerm(ast.String("subjects")), ast.NewTerm(subs)},
-		[2]*ast.Term{ast.NewTerm(ast.String("resource")), ast.NewTerm(ast.String(resource))},
-		[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
-	)
-	resultSet, err := s.v2PartialAuth.Rego(rego.ParsedInput(input)).Eval(ctx)
 	if err != nil {
 		return false, &EvaluationError{e: err}
 	}
@@ -429,7 +360,6 @@ func (s *State) V2FilterAuthorizedPairs(
 	ctx context.Context,
 	subjects engine.Subjects,
 	pairs []engine.Pair,
-	isBeta2p1 bool,
 ) ([]engine.Pair, error) {
 
 	opaInput := map[string]interface{}{
@@ -437,13 +367,7 @@ func (s *State) V2FilterAuthorizedPairs(
 		"pairs":    pairs,
 	}
 
-	// NB: V2 --or-- V2.1 only, so need to version-adjust the store here
-	store := s.v2Store
-	if isBeta2p1 {
-		store = s.v2p1Store
-	}
-
-	rs, err := s.evalQuery(ctx, s.queries[filteredPairsV2Query], opaInput, store)
+	rs, err := s.evalQuery(ctx, s.queries[filteredPairsV2Query], opaInput, s.v2p1Store)
 	if err != nil {
 		return nil, &EvaluationError{e: err}
 	}
@@ -579,19 +503,6 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 	})
 
 	return s.initPartialResult(ctx)
-}
-
-// V2SetPolicies replaces OPA's data with a new set of policies and roles
-// and resets the partial evaluation cache for v2
-func (s *State) V2SetPolicies(
-	ctx context.Context, policyMap map[string]interface{},
-	roleMap map[string]interface{}) error {
-	s.v2Store = inmem.NewFromObject(map[string]interface{}{
-		"policies": policyMap,
-		"roles":    roleMap,
-	})
-
-	return s.initPartialResultV2(ctx)
 }
 
 // V2p1SetPolicies replaces OPA's data with a new set of policies and roles

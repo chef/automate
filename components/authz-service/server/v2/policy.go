@@ -28,7 +28,7 @@ import (
 type policyServer struct {
 	log             logger.Logger
 	store           storage.Storage
-	engine          engine.V2pXWriter
+	engine          engine.V2p1Writer
 	v1              storage_v1.PoliciesLister
 	vSwitch         *VersionSwitch
 	vChan           chan api.Version
@@ -48,7 +48,7 @@ func NewMemstorePolicyServer(
 	ctx context.Context,
 	l logger.Logger,
 	pr PolicyRefresher,
-	e engine.V2pXWriter,
+	e engine.V2p1Writer,
 	pl storage_v1.PoliciesLister,
 	vSwitch *VersionSwitch,
 	vChan chan api.Version) (PolicyServer, error) {
@@ -61,7 +61,7 @@ func NewPostgresPolicyServer(
 	ctx context.Context,
 	l logger.Logger,
 	pr PolicyRefresher,
-	e engine.V2pXWriter,
+	e engine.V2p1Writer,
 	pl storage_v1.PoliciesLister,
 	vSwitch *VersionSwitch,
 	vChan chan api.Version) (PolicyServer, error) {
@@ -79,7 +79,7 @@ func NewPoliciesServer(
 	l logger.Logger,
 	pr PolicyRefresher,
 	s storage.Storage,
-	e engine.V2pXWriter,
+	e engine.V2p1Writer,
 	pl storage_v1.PoliciesLister,
 	vSwitch *VersionSwitch,
 	vChan chan api.Version) (PolicyServer, error) {

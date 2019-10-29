@@ -27,9 +27,9 @@ func TestIntegrationSystemPolicies(t *testing.T) {
 
 	isAuthorized := func(subject, action, resource string) func(*testing.T) {
 		return func(t *testing.T) {
-			resp, err := cl.IsAuthorized(ctx, &api_v2.IsAuthorizedReq{Subjects: []string{subject}, Resource: resource, Action: action})
+			resp, err := cl.ProjectsAuthorized(ctx, &api_v2.ProjectsAuthorizedReq{Subjects: []string{subject}, Resource: resource, Action: action})
 			require.NoError(t, err)
-			assert.True(t, resp.Authorized)
+			assert.ElementsMatch(t, []string{"*"}, resp.Projects)
 		}
 	}
 

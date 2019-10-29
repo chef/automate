@@ -27,7 +27,7 @@ type PolicyRefresher interface {
 type policyRefresher struct {
 	log                      logger.Logger
 	store                    storage.Storage
-	engine                   engine.V2pXWriter
+	engine                   engine.V2p1Writer
 	refreshRequests          chan policyRefresherMessageRefresh
 	antiEntropyTimerDuration time.Duration
 	changeNotifier           storage.PolicyChangeNotifier
@@ -52,7 +52,7 @@ func (m *policyRefresherMessageRefresh) Err() error {
 	return <-m.status
 }
 
-func NewPostgresPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.V2pXWriter) (PolicyRefresher, error) {
+func NewPostgresPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.V2p1Writer) (PolicyRefresher, error) {
 	store := postgres.GetInstance()
 	if store == nil {
 		return nil, errors.New("postgres v2 singleton not yet initialized for policy refresher")
@@ -60,7 +60,7 @@ func NewPostgresPolicyRefresher(ctx context.Context, log logger.Logger, engine e
 	return NewPolicyRefresher(ctx, log, engine, store)
 }
 
-func NewPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.V2pXWriter, store storage.Storage) (PolicyRefresher, error) {
+func NewPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.V2p1Writer, store storage.Storage) (PolicyRefresher, error) {
 	changeNotifier, err := store.GetPolicyChangeNotifier(ctx)
 	if err != nil {
 		return nil, err
@@ -166,18 +166,7 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 	// Engine updates need unfiltered access to all data.
 	ctx = auth_context.ContextWithoutProjects(ctx)
 
-	// Retrieve the IAM version from the database: some other node could have
-	// done a migration (v2 <-> v2.1) and this one wouldn't know. However, on
-	// success, it's written to the database, and we can thus retrieve it from
-	// there. Also, these version changes are registered as "policy changes",
-	// so even if no v2[.1] policy has actually changed, we'll update the correct
-	// store (v2 or v2.1) here.
-	vsn, err := refresher.getIAMVersion(ctx)
-	if err != nil {
-		refresher.log.WithError(err).Warn("Failed to retrieve IAM version")
-	}
-	refresher.log.Infof("initializing OPA store (%s)", pretty(vsn))
-
+	refresher.log.Info("initializing OPA store for v2.1")
 	policyMap, err := refresher.getPolicyMap(ctx)
 	if err != nil {
 		return err
@@ -187,12 +176,8 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 		return err
 	}
 
-	switch {
-	case vsn.Minor == api.Version_V1: // v2.1
-		return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap)
-	default: // v2.0 OR v1.0
-		return refresher.engine.V2SetPolicies(ctx, policyMap, roleMap)
-	}
+	return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap)
+
 	// Note 2019/06/04 (sr): v1?! Yes, IAM v1. Our POC code depends on this query
 	// to be answered regardless of whether IAM is v1, v2 or v2.1.
 }

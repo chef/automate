@@ -671,22 +671,6 @@ func setupV1(t testing.TB) (context.Context, map[string]engine.Engine) {
 	return ctx, engines
 }
 
-func setupV2(t testing.TB) (context.Context, map[string]engine.Engine) {
-	ctx, engines := setup(t)
-	if o, ok := engines["opa"]; ok {
-		o.V2SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{})
-	}
-	return ctx, engines
-}
-
-func setupV2p1(t testing.TB) (context.Context, map[string]engine.Engine) {
-	ctx, engines := setup(t)
-	if o, ok := engines["opa"]; ok {
-		o.V2p1SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{})
-	}
-	return ctx, engines
-}
-
 func setup(t testing.TB) (context.Context, map[string]engine.Engine) {
 	t.Helper()
 	ctx := context.Background()

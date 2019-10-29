@@ -36,7 +36,7 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
-var dummyWriter engine.V2pXWriter = nil
+var dummyWriter engine.V2p1Writer = nil
 
 func TestCreatePolicy(t *testing.T) {
 	ctx := context.Background()
@@ -2881,22 +2881,22 @@ func TestV1AndV2Queries(t *testing.T) {
 		desc string
 		f    func(*testing.T)
 	}{
-		{"when set to v1, declines v2 IsAuthorized calls", func(t *testing.T) {
-			req := api_v2.IsAuthorizedReq{Subjects: []string{"user:local:alice"},
+		{"when set to v1, declines v2 ProjectsAuthorized calls", func(t *testing.T) {
+			req := api_v2.ProjectsAuthorizedReq{Subjects: []string{"user:local:alice"},
 				Resource: "iam:users:foobar",
 				Action:   "iam:users:get",
 			}
-			_, err := ts.authz.IsAuthorized(ctx, &req)
+			_, err := ts.authz.ProjectsAuthorized(ctx, &req)
 			grpctest.AssertCode(t, codes.FailedPrecondition, err)
 		}},
-		{"when upgraded to v2, accepts v2 IsAuthorized calls", func(t *testing.T) {
+		{"when upgraded to v2, accepts v2 ProjectsAuthorized calls", func(t *testing.T) {
 			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
 			require.NoError(t, err)
-			req := api_v2.IsAuthorizedReq{Subjects: []string{"user:local:alice"},
+			req := api_v2.ProjectsAuthorizedReq{Subjects: []string{"user:local:alice"},
 				Resource: "iam:users:foobar",
 				Action:   "iam:users:get",
 			}
-			_, err = ts.authz.IsAuthorized(ctx, &req)
+			_, err = ts.authz.ProjectsAuthorized(ctx, &req)
 			require.NoError(t, err)
 		}},
 		{"when upgraded to v2, accepts GetPolicyVersion calls", func(t *testing.T) {
@@ -3105,7 +3105,7 @@ type testSetup struct {
 }
 
 func setupV2p1WithWriter(t *testing.T,
-	writer engine.V2pXWriter) testSetup {
+	writer engine.V2p1Writer) testSetup {
 	return setupV2WithMigrationState(t, nil, writer, nil, make(chan api_v2.Version, 1),
 		// Returning MigrationStatus of "SuccessBeta2.1" means we've migrated successfully to IAM v2.1
 		func(s storage.MigrationStatusProvider) error { return s.SuccessBeta1(context.Background()) })
@@ -3113,7 +3113,7 @@ func setupV2p1WithWriter(t *testing.T,
 
 func setupV2(t *testing.T,
 	authorizer engine.V2Authorizer,
-	writer engine.V2pXWriter,
+	writer engine.V2p1Writer,
 	pl storage_v1.PoliciesLister,
 	vChan chan api_v2.Version) testSetup {
 	return setupV2WithMigrationState(t, authorizer, writer, pl, vChan, nil)
@@ -3121,7 +3121,7 @@ func setupV2(t *testing.T,
 
 func setupV2WithMigrationState(t *testing.T,
 	authorizer engine.V2Authorizer,
-	writer engine.V2pXWriter,
+	writer engine.V2p1Writer,
 	pl storage_v1.PoliciesLister,
 	vChan chan api_v2.Version,
 	migration func(storage.MigrationStatusProvider) error) testSetup {
@@ -3395,15 +3395,6 @@ type testEngine struct {
 	policyMap map[string]interface{}
 	roleMap   map[string]interface{}
 	ruleMap   map[string][]storage.Rule
-}
-
-func (te *testEngine) V2SetPolicies(
-	ctx context.Context, policies map[string]interface{},
-	roles map[string]interface{}) error {
-	te.policyMap = policies
-	// TODO: use this
-	te.roleMap = roles
-	return nil
 }
 
 func (te *testEngine) V2p1SetPolicies(
