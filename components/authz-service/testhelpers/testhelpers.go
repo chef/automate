@@ -173,6 +173,10 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 }
 
 func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng, *migration.Config) {
+	return SetupTestDBWithLimit(t, constants_v2.MaxProjects)
+}
+
+func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *TestDB, *opa.State, *prng.Prng, *migration.Config) {
 	t.Helper()
 
 	ctx := context.Background()
@@ -206,7 +210,7 @@ func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng
 	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 	require.NoError(t, err, "error creating extension")
 
-	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig), constants_v2.MaxProjects)
+	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig), projectLimit)
 	require.NoError(t, err)
 	return postgres.GetInstance(), &TestDB{
 			DB:      db,

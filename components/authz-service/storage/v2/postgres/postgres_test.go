@@ -4333,7 +4333,8 @@ func TestApplyStagedRules(t *testing.T) {
 }
 
 func TestCreateProject(t *testing.T) {
-	store, db, _, _, _ := testhelpers.SetupTestDB(t)
+	projectLimit := 7
+	store, db, _, _, _ := testhelpers.SetupTestDBWithLimit(t, projectLimit)
 	defer db.CloseDB(t)
 	defer store.Close()
 	ctx := context.Background()
@@ -4388,7 +4389,7 @@ func TestCreateProject(t *testing.T) {
 			assert.Nil(t, resp)
 		},
 		"does not create custom project if max number of custom projects allowed has been reached": func(t *testing.T) {
-			for i := 1; i <= v2.MaxProjects; i++ {
+			for i := 1; i <= projectLimit; i++ {
 				projectID := "my-id-" + strconv.Itoa(i)
 				project := storage.Project{
 					ID:     projectID,
@@ -4401,7 +4402,7 @@ func TestCreateProject(t *testing.T) {
 				require.Equal(t, &project, resp)
 			}
 
-			oneProjectTooManyID := "my-id-" + strconv.Itoa(v2.MaxProjects+1)
+			oneProjectTooManyID := "my-id-" + strconv.Itoa(projectLimit+1)
 			oneProjectTooMany := storage.Project{
 				ID:     oneProjectTooManyID,
 				Name:   "Something Else",
@@ -4415,7 +4416,7 @@ func TestCreateProject(t *testing.T) {
 			assert.True(t, correctError)
 		},
 		"does create chef-managed project if max number of custom projects allowed has been reached": func(t *testing.T) {
-			for i := 1; i <= v2.MaxProjects; i++ {
+			for i := 1; i <= projectLimit; i++ {
 				projectID := "my-id-" + strconv.Itoa(i)
 				project := storage.Project{
 					ID:     projectID,
@@ -4428,7 +4429,7 @@ func TestCreateProject(t *testing.T) {
 				require.Equal(t, &project, resp)
 			}
 
-			chefManagedProjectID := "my-id-" + strconv.Itoa(v2.MaxProjects+1)
+			chefManagedProjectID := "my-id-" + strconv.Itoa(projectLimit+1)
 			chefManagedProject := storage.Project{
 				ID:     chefManagedProjectID,
 				Name:   "Something Else",
