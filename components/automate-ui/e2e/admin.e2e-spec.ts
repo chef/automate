@@ -1140,10 +1140,10 @@ describe('Admin pages', () => {
     describe('displays the alphabetically sorted first role with name and type', () => {
       it('first role', () => {
         const name = $('app-roles-list chef-table chef-tr:nth-child(1) chef-td:first-child a');
-        expect(name.getText()).toBe('Owner');
+        browser.wait(EC.textToBePresentInElement(name, 'Owner'));
 
         const policyType = $('chef-table chef-tr:nth-child(1) chef-td:nth-child(2)');
-        expect(policyType.getText()).toBe('Chef-managed');
+        browser.wait(EC.textToBePresentInElement(policyType, 'Chef-managed'));
       });
 
       it('second role', () => {
