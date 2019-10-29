@@ -11,7 +11,7 @@ toc = true
 +++
 
 This guide shows you how to upgrade Chef Automate to IAM v2, perform important administrative operations, and revert back to IAM v1.
-After upgrading to IAM v2, you'll add members to Chef-managed v2 policies, delete a legacy policy, and write a Team Admin v2 policy that lets a Team Admin manage their users and teams.
+After upgrading to IAM v2, you will add members to Chef-managed v2 policies, delete a legacy policy, and write a Team Admin v2 policy that lets a Team Admin manage their users and teams.
 
 ## Upgrade to IAM v2
 
@@ -19,7 +19,7 @@ After upgrading to IAM v2, you'll add members to Chef-managed v2 policies, delet
 To get the best possible IAM v2 experience, Chef Automate should be running the latest version before upgrading to IAM v2.
 {{< /info >}}
 
-Perform the upgrade to IAM v2 with `chef-automate iam upgrade-to-v2`; the response should look something like:
+Perform the upgrade to IAM v2 with `chef-automate iam upgrade-to-v2`. The response from your terminal should look something like:
 
 ```terminal
 Upgrading to IAM v2.1
@@ -31,37 +31,37 @@ Migrating existing teams...
 Success: Enabled IAM v2.1
 ```
 
-To upgrade without porting existing policies, use: `chef-automate iam upgrade-to-v2 --skip-policy-migration`.
+To upgrade without porting existing policies, use the command: `chef-automate iam upgrade-to-v2 --skip-policy-migration`.
 
 ## View Policies
 
-After you've signed in to Chef Automate, select the **Settings** tab in the top navigation bar, then select and locate the `Policies` section in the left navigation.
+After you have signed in to Chef Automate, select the **Settings** tab in the top navigation bar, and then select and locate the `Policies` section in the left navigation.
 
 In this section, you can view all of your v2 policies. If you have upgraded without using the `--skip-policy-migration` flag, you will also see v1 policies.
 
-This includes the following:
+This policy display includes the following:
 
 * New default, *Chef-managed* policies: Administrator, Ingest, Editors, and Viewers.
 * Imported v1 default policies--now called *legacy policies*--in the new v2 policy format and marked with the `[Legacy]` prefix.
-* Imported v1 custom policies that you created; these are marked with the `[Legacy]` prefix and a `(custom)` suffix.
+* Imported v1 custom policies that you created, which are marked with the `[Legacy]` prefix and a `(custom)` suffix.
 
 ![](/images/docs/admin-policies-migrated.png)
 
 ## Policy Conversion
 
-After upgrading we recommend that you reconstitute your v1 policies as v2 policies.
-Once that is done, delete the old legacy v1 policies and you will have an up-to-date system.
+After upgrading, we recommend that you reconstitute your v1 policies as v2 policies.
+Once this policy conversation is done, delete the old legacy v1 policies and you will have an up-to-date system.
 
-To delete a legacy policy, open the menu on any custom policy, located at the end of the policy row, and select **Delete Policy** from the menu. You will not have this option for Chef-managed policies.
+To delete a legacy policy, open the menu on any custom policy, which is located at the end of the policy row, and select **Delete Policy** from the menu. You will not have this option for Chef-managed policies.
 
 A warning appears if members are still attached to the policy because deleting that policy disrupts access for all of its members.
-However, you can still delete the policy.
+However, you will still be able to delete the policy.
 
-Alternately, if you include `--skip-policy-migration` on upgrade, no existing v1 policies will be migrated.
+Alternately, if you include the command `--skip-policy-migration` when upgrading, no existing v1 policies will be migrated.
 You will still need to create new v2 policies to preserve any IAM behavior from v1.
 
 {{% warning %}}
-Note that several legacy policies, including *Compliance Profile Access* and *Ingest Access*,  have API tokens that will stop working if not ported.
+Note: Several legacy policies, including *Compliance Profile Access* and *Ingest Access*, have API tokens that will stop working if not ported.
 {{% /warning %}}
 
 The next few sections explain how to use Chef-managed policies and how to create custom policies.
@@ -73,7 +73,7 @@ Note that you could also add users directly to policies without the intermediate
 
 #### Create Users
 
-Follow [Creating Users]({{< relref "users.md#manage-local-users-from-the-ui" >}}) to:
+Follow the instructions on [Creating Users]({{< relref "users.md#manage-local-users-from-the-ui" >}}) to:
 
 * Create a local user with the username `test_viewer`.
 * Create a local user with the username `test_editor`.
@@ -83,15 +83,15 @@ Follow [Creating Users]({{< relref "users.md#manage-local-users-from-the-ui" >}}
 Select `Teams` from the left navigation of the **Settings** tab.
 Three teams are provided by default: `admins`, `viewers`, and `editors`.
 
-Follow [Adding Users to a Team]({{< relref "teams.md#adding-users-to-a-team" >}}) to:
+Follow the instructions for [Adding Users to a Team]({{< relref "teams.md#adding-users-to-a-team" >}}) to:
 
 * Add the user `test_viewer` to the Chef-managed `viewers` team.
 * Add the user `test_editor` to the Chef-managed `editors` team.
 
-After upgrading, those teams are part of the `Viewers` and `Editors` policies, respectively.
-The default `Viewers` policy is provided so you can quickly grant read-only access to everything in Chef Automate except for admin resources.
-Similarly, the default `Editors` policy is provided so you can quickly grant complete access to everything in Chef Automate except for admin resources.
-Once this step is done the `test_viewer` and `test_editor` users may log in with appropriate system access.
+After upgrading, those teams will be part of the `Viewers` and `Editors` policies, respectively.
+The default `Viewers` policy is provided, so you can quickly grant read-only access to everything in Chef Automate, except for admin resources.
+Similarly, the default `Editors` policy is provided, so you can quickly grant complete access to everything in Chef Automate, except for admin resources.
+Once this step is done, the `test_viewer` and `test_editor` users may log in with appropriate system access.
 
 ### Creating Custom Policies
 
@@ -99,33 +99,33 @@ The Chef-managed default policies give you a starting-point for permissions.
 You may want to write more fine-grained policies, tailored to the demands of your organization.
 Defining your own policies must be done from the command line.
 
-As an example, let's say you, the admin, want to delegate a portion of your tasks to a colleague, but without granting them full admin access.
+As an example, let us say that you, the admin, want to delegate a portion of your tasks to a colleague, but without granting them full admin access.
 In this case, you could create a policy called `Team Devops Managers`, which grants its members some--but not all--administrative privileges.
 Create a JSON file in the editor of your choice.
 Following JSON syntax, begin with the name property.
 
-See the end of this section for the [complete JSON policy example]({{< relref "iam-v2-guide.md#complete-json-policy-example" >}})
+See the end of this section for a [complete JSON policy example]({{< relref "iam-v2-guide.md#complete-json-policy-example" >}})
 
 ```json
   "name": "Team Devops Managers",
 ```
 
-That name is for human consumption; when you want to refer to the policy in commands you will need to know its ID.
-So let's give this policy the ID `team-managers-devops`.
+The `name` field is for human consumption. When you want to refer to the policy in commands, you will need to know the policy's ID.
+So let us give this policy the ID value: `team-managers-devops`.
 
 ```json
   "id": "team-managers-devops",
 ```
 
 Additionally, we can permission actions on this policy just like any other IAM resource by assigning it to one or more projects.
-If we leave the projects array empty, we indicate the policy is _unassigned_.
+If we leave the projects array empty, then we indicate the policy is _unassigned_.
 For example, anyone with permission to view _unassigned_ policies can view this policy.
 
 ```json
   "projects": [],
 ```
 
-Let's further assume you want user `Bob` as well as anyone on team `gamma` to be authorized by this policy; this comprises the `members` array.
+Let us further assume you want user `Bob` as well as anyone on team `gamma` to be authorized by this policy. This grouping comprises the `members` array, as seen below.
 
 ```json
   "members": [
@@ -134,12 +134,12 @@ Let's further assume you want user `Bob` as well as anyone on team `gamma` to be
   ],
 ```
 
-Next, you'll specify the permissions themselves--which in IAM v2 are the `statements`-- declared as an array.
-The statement allows us to specify the `actions` a user is permitted to take on resources that have been assigned to a `project`.
+Next, you will specify the permissions themselves--which in IAM v2 are the `statements`-- declared as an array.
+The statement allows us to specify the `actions` a user is permitted to take upon resources that have been assigned to a `project`.
 The `projects` field on a statement is an array that may contain more than one existing project, a wildcard `*` to indicate permission to resources in _any project_, or `(unassigned)` to indicate permission to resources that have not been assigned to a project.
 
 Note that the `projects` property in statements designates permission for the resources within the statement (here, that is `iam:users` and `iam:teams`), _not_ for the policy itself, and _cannot_ be left empty.
-For more about projects, please see [Projects]({{< relref "iam-v2-guide.md#projects" >}}) or [Projects Property]({{< relref "iam-v2-api-reference/#projects-property" >}}).
+For more about projects, please see [Projects]({{< relref "iam-v2-guide.md#projects" >}}) or [Projects Property]({{< relref "iam-v2-api-reference/#projects-property" >}}) documentation.
 
 In this case, we only need a single statement providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_ that have been assigned to the project `project-devops`.
 
@@ -186,11 +186,11 @@ In this case, we only need a single statement providing access to the _get_, _li
 }
 ```
 
-Save your JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to send that data to Chef Automate.
+Save your JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to send that policy data to Chef Automate.
 
 ### Policy Membership
 
-Users, teams, and api tokens can all be policy members, and both users and teams can be either locally or externally managed with LDAP or SAML.
+Users, teams, and API tokens can all be policy members. Both users and teams can be either locally or externally managed with LDAP or SAML.
 
 #### Local Users and Teams
 
@@ -207,15 +207,15 @@ This takes you back to the policy details, showing the revised membership list.
 
 #### Member Expressions
 
-Member expressions are required for externally managed users, and teams, as well as api tokens.
+Member expressions are required for externally managed users, and teams, as well as API tokens.
 
 LDAP and SAML users' information is saved outside of Chef Automate.
 You will need to manually enter the provider-qualified user or team.
 To do this, open any policy from the _Policies_ list, then select **Members**.
 Select **Add Members** to open the list of candidate local users and teams.
-Near the bottom of the page select the **Add Member Expression** button.
+Near the bottom of the page, select the **Add Member Expression** button.
 
-Enter a member expression using the format `team:<type>:<name>` or `user:<type>:<name>`; note these are case-sensitive.
+Enter a member expression using the format `team:<type>:<name>` or `user:<type>:<name>`. Note that these expressions are case-sensitive.
 
 * The `<type>` expression is either `ldap` or `saml`.
 * The `<name>` expression is the name of the user or team that the external identity provider knows. For example, this is a valid member expression `team:ldap:editors_team_1`, assuming the `editors_team_1` team is known by your identity provider.
@@ -230,7 +230,7 @@ In order to find a token's ID, visit the *API Tokens* page.
 
 Projects are used to group and permission Chef Automate resources as well as ingested data, specifically Compliance reports, Chef Server and Compliance events, and Infrastructure nodes.
 
-Projects can be managed via the Projects list under the *Settings* tab and consist of an ID, a name, and a collection of ingest rules. Project ingest rules are lists of conditions used only when
+Projects can be managed via the Projects list under the **Settings** tab and consist of an ID, a name, and a collection of ingest rules. Project ingest rules are lists of conditions used only when
 [assigning ingested resources to projects]({{< relref "iam-v2-guide#assigning-ingested-resources-to-projects" >}}),
 so they are not relevant when assigning IAM resources such as teams or roles.
 
@@ -269,12 +269,12 @@ First, determine which ingested resources should belong to the project. In this 
 * Infrastructure nodes with Environment `dev` and Chef Tag `devops-123`
 * actions on Chef Servers `devops.pizza` or `devops.dog`
 
-You may want to verify that those filters work as expected on the Event Feed, Client Runs, and
-Reports pages.
+You may want to verify that those filters work as expected on the _Event Feed_, _Client Runs_, and
+_Reports_ pages.
 
 Navigate to the project details page of `project-devops`, by selecting the project name on the project list page.
 
-Select the `Create Rule` button to create a new project rule. Choose resource type `Node` then fill in the first condition's fields.
+Select the `Create Rule` button to create a new project rule. Choose the resource type `Node`, then fill in the first condition's fields.
 Feel free to create fake ingest data that corresponds to the example json below, or come up with a condition that matches your existing data set.
 
 {{% warning %}}
@@ -313,22 +313,21 @@ Updating a project begins an operation that applies all pending rule edits and t
 In this example, upon successful update, all ingested resources whose Chef Organization matches `devops` will be considered a part of the project `project-devops`.
 Only these resources will appear in Automate's dashboards when the `project-devops` project has been selected in the global project filter.
 
-As the operation takes place, you should see a percentage count up within the `Update Projects` button. You may cancel the update at any time by selecting
-`Stop Updating Projects` and confirming the cancel in the modal that pops up.
+As the operation takes place, you should see a percentage count up within the `Update Projects` button. 
+You may cancel the update at any time by selecting `Stop Updating Projects` and confirming the cancel in the modal that pops up.
 
 {{% warning %}}
 Avoid stopping an update unless absolutely necessary. It will leave your system in an unknown state where only some resources have been moved into their projects while others still remain in old projects. Only another successful update will restore the system to an up-to-date state.
 {{% /warning %}}
 
-Once rules have been successfully applied, the update button will change to `Projects Up-to-Date` and be disabled until the next
-time there are *pending edits* to any project.
+Once rules have been successfully applied, the update button will change to `Projects Up-to-Date` and be disabled until the next time there are *pending edits* to any project.
 
 To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navigation. The data in Automate will now be filtered by the selected project.
 In this example, the effect is revealed by navigating to the Compliance Reports' Nodes tab, which only features nodes that belong to the `devops` Chef Organization.
 
 ![](/images/docs/global-projects-filter.png)
 
-Now that we have the first set of our ingested data associated with our new project, let's add another condition and a new rule to
+Now that we have the first set of our ingested data associated with our new project, let us add another condition and a new rule to
 add more data to `project-devops`.
 
 {{% info %}}
@@ -337,8 +336,7 @@ Separate conditions governing said resources *may* need to be used if their prop
 {{% /info %}}
 
 {{% info %}}
-Ingested events require conditions of `Event` type to be associated with the correct project. A condition of type `Node` will not match an event, even if the condition's
-operator, attribute, and value all match exactly (and vice versa with `Event` project rules and nodes).
+Ingested events require conditions of `Event` type to be associated with the correct project. A condition of type `Node` will not match an event, even if the condition's operator, attribute, and value all match exactly (and vice versa with `Event` project rules and nodes).
 {{% /info %}}
 
 Return again to the project detail page and create two new ingest rules by selecting `Create Rule`. Creating new rules will expand the data set under `project-devops`,
@@ -416,7 +414,7 @@ Save as a JSON file and follow the steps in [Creating a Policy]({{< relref "iam-
 You may additionally choose to create a `Project Devops Editors` policy and a `Project Devops Viewers`
 policy. Once those are in place, you or your `project-devops` Owner can add members to each policy
 to give them privileges to view or edit resources assigned to `Project Devops`. To create
-those policies, use the JSON below:
+those policies, use the JSON below for Project Viewers Policy and Project Editors Policy, respectively:
 
 ##### Project Viewers Policy
 
@@ -454,14 +452,11 @@ those policies, use the JSON below:
 }
 ```
 
-Now, if you would like Terry to be able to view `Project Devops` and Kelly to be able to edit `Project Devops`, you'll add them
-as members to the relevant policies. You can do that directly in the above JSON when creating the policy, or in the browser
-by selecting **Settings**, then **Policies**, then `Project Devops Policy`. Under the **Details** tab, you will find the
-option to select new policy members.
+Now, if you would like Terry, a user, to be able to view `Project Devops` and Kelly, another user, to be able to edit `Project Devops`, you will add them as members to the relevant policies. 
+You can do that directly in the above JSON when creating the policy, or in the browser by selecting **Settings**, then **Policies**, and lastly `Project Devops Policy`. Under the **Details** tab, you will find the option to select new policy members.
 
-Assuming Terry is not a member of any other policy, once you make Terry a member of the `Project Devops Viewers` policy,
-they will only be able to see resources assigned to `Project Devops`. They will not be able to update or delete them.
-Kelly, however, will be able to do both.
+Assuming Terry is not a member of any other policy, once you make Terry a member of the `Project Devops Viewers` policy, they will only be able to see resources assigned to `Project Devops`. 
+They will not be able to update or delete them. Kelly, however, will be able to do both.
 
 See [Policy Membership]({{< relref "iam-v2-api-reference.md#policy-membership" >}}) for more information on policy membership.
 
@@ -476,7 +471,7 @@ This command, which is also available on IAM v1, resets the local `admin` user's
   chef-automate iam admin-access restore <your new password here>
 ```
 
-Generate a new token and add that token as a new member of the Chef-managed `Administrator` policy. This is the equivalent of the v1 command `chef-automate admin-token`.
+Generate a new token and add that token as a new member of the Chef-managed `Administrator` policy. This command is the equivalent of the v1 command `chef-automate admin-token`.
 
 ```bash
   chef-automate iam token create <your token name here> --admin
