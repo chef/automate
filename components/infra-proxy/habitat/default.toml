@@ -1,0 +1,8 @@
+[service]
+host = "localhost"
+port = 10153
+external_fqdn = "localhost"
+
+[storage]
+database = "chef_infra_proxy"
+user = "chef_infra"

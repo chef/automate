@@ -1,0 +1,4 @@
+{
+  "name": "chef/infra-proxy",
+  "data_service": true
+}
