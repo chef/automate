@@ -83,5 +83,6 @@ func NewMaxProjectsExceededError(limit int) error {
 // MaxProjectsExceededError indicates that a new project cannot be created
 // since the max allowed are already created.
 func (e *MaxProjectsExceededError) Error() string {
-	return fmt.Sprintf("violates project limit of %v", e.projectLimit)
+	return fmt.Sprintf("cannot create project: limit of %v projects already reached",
+		e.projectLimit)
 }
