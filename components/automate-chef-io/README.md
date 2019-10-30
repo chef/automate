@@ -17,8 +17,7 @@ A new static website for Automate is based on [Hugo](https://gohugo.io), the Go-
 1. [Install go-swagger](https://goswagger.io/install.html). The currently supported version is 0.20.1. If you're using homebrew:
 
     ```shell
-    brew tap go-swagger/go-swagger
-    brew install go-swagger
+    brew tap go-swagger/go-swagger && brew install go-swagger
     ```
 
     If everything is up to date you should see output like this when running `swagger version`:
@@ -96,25 +95,39 @@ Hugo allows us to nest our data directory structure as much as necessary. You ca
 |   │   │   └── command_two.yml
 ```
 
-## API Development
+## API Documentation
 
-To view the API documentation locally, enter the `/components/automate-chef-io` directory (where this README.md is located) and run:
+To view the API documentation locally, 1. From the `components/automate-chef-io` directory, run the following command to start the development server.
 
-`make serve`
+    ```shell
+    $ make serve
+    ```
 
-In your browser, navigate to:
+    To view the API docs in your browser, navigate to:
 
-`http://localhost:1313/docs/api/`
+    ```shell
+    http://localhost:1313/docs/api
+    ```
 
-## Building API Docs
+## Developing API Docs
 
-To develop API documentation, compile go components, sync the swagger files and serve the development environment from the  one copy-pastable command and run it from the top level `automate` director with this command (re-run this command to see re-build the documentation and see your changes):
-
-`hab studio run "source .studiorc && compile_all_protobuf_components" && pushd components/automate-chef-io/ && make sync_swagger_files generate_swagger && make serve || popd`
+We use the [ReDoc](https://github.com/Redocly/redoc) in conjunction with the the Hab studio for Automate, [grpc-gateway protoc-gen-swagger](https://github.com/grpc-ecosystem/grpc-gateway/tree/master/protoc-gen-swagger) and the [OpenAPI 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) to automatically generate API documentation from comments on automate protoc files.
 
 ## Writing API Docs
 
-We use the [ReDoc](https://github.com/Redocly/redoc) in conjunction with the [grpc-gateway protoc-gen-swagger](https://github.com/grpc-ecosystem/grpc-gateway/tree/master/protoc-gen-swagger) and the [OpenAPI 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) to automatically generate API documentation from comments on automate protoc files.
+To develop API documentation, compile go components, sync the swagger, files and serve the development environment locally, run the following from the top level `automate` directory.
+
+To see your changes, you will need to re-run this command to re-build the documentation.
+
+    ```shell
+    hab studio run "source .studiorc && compile_all_protobuf_components" && pushd components/automate-chef-io/ && make sync_swagger_files generate_swagger && make serve || popd
+    ```
+
+    View the API docs in your browser:
+
+    ```shell
+    http://localhost:1313/docs/api
+    ```
 
 The proto files for APIs are located at:
 
