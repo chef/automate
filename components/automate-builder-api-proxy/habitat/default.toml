@@ -22,7 +22,7 @@ worker_rlimit_nofile      = 8192
 max_body_size             = 0
 proxy_send_timeout        = 300
 proxy_read_timeout        = 300
-proxy_connect_timeout     = 60
+proxy_connect_timeout     = 5
 enable_caching            = false
 enable_gzip               = false
 
