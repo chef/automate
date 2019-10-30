@@ -39,26 +39,6 @@ type Installable interface {
 	InstallIdent() string
 }
 
-// GreaterOrEqual returns true if VersionedArtifact fully qualified
-// version is greater or equal to b.  It assumes Version() and
-// Release() return lexically sortable strings.
-func GreaterOrEqual(a VersionedArtifact, b VersionedArtifact) bool {
-	if a.Version() > b.Version() {
-		return true
-	}
-
-	if b.Version() > a.Version() {
-		return false
-	}
-
-	// a.Version() and b.Version() are equal, check release
-	if a.Release() >= b.Release() {
-		return true
-	}
-
-	return false
-}
-
 // VersionString (ugh, bad name) returns a string representing the
 // version information available in the VersionedArtifact
 func VersionString(v VersionedArtifact) string {

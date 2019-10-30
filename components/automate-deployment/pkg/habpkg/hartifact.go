@@ -7,7 +7,6 @@ import (
 	"path/filepath"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -20,13 +19,13 @@ type SortableHarts []Hart
 
 // A Hart represents a hartifact archive on disk.
 type Hart struct {
-	origin    string
-	name      string
-	path      string
-	major     int
-	minor     int
-	patch     int
-	timestamp int
+	origin  string
+	name    string
+	version string
+	release string
+	path    string
+
+	parsedVersion SemverishVersion
 }
 
 // Path returns the on-disk path to the hart
@@ -34,13 +33,7 @@ func (h *Hart) Path() string {
 	return h.path
 }
 
-// Timestamp returns the Release as an integer
-func (h *Hart) Timestamp() int {
-	return h.timestamp
-}
-
 // VersionedPackage interface implementation
-
 // Origin returns the file-name-inferred origin for the hart.
 func (h *Hart) Origin() string {
 	return h.origin
@@ -53,12 +46,12 @@ func (h *Hart) Name() string {
 
 // Release returns the file-name-inferred release for the hart.
 func (h *Hart) Release() string {
-	return strconv.FormatInt(int64(h.timestamp), 10)
+	return h.release
 }
 
 // Version returns the file-name-inferred version for the hart.
 func (h *Hart) Version() string {
-	return fmt.Sprintf("%d.%d.%d", h.major, h.minor, h.patch)
+	return h.version
 }
 
 func (h *Hart) InstallIdent() string {
@@ -143,39 +136,16 @@ func (h SortableHarts) Swap(i int, j int) {
 
 func (h SortableHarts) Less(i int, j int) bool {
 	hartA, hartB := h[i], h[j]
-	if hartA.name < hartB.name {
+	cmp := CompareSemverish(hartA.parsedVersion, hartB.parsedVersion)
+	if cmp == -1 {
 		return true
 	}
 
-	if hartA.name > hartB.name {
+	if cmp == 1 {
 		return false
 	}
 
-	if hartA.major < hartB.major {
-		return true
-	}
-
-	if hartA.major > hartB.major {
-		return false
-	}
-
-	if hartA.minor < hartB.minor {
-		return true
-	}
-
-	if hartA.minor > hartB.minor {
-		return false
-	}
-
-	if hartA.patch < hartB.patch {
-		return true
-	}
-
-	if hartA.patch > hartB.patch {
-		return false
-	}
-
-	return hartA.timestamp < hartB.timestamp
+	return hartA.release < hartB.release
 }
 
 // MarshalText turns a HabPkg into text
@@ -209,10 +179,6 @@ func (h *Hart) UnmarshalText(text []byte) error {
 
 // HartFromPath parses a path into a Hart
 func HartFromPath(path string) (Hart, error) {
-	var err error
-
-	versionParts := make([]int, 4)
-
 	filename := filepath.Base(path)
 	// The hartifact filename is in the form of
 	//
@@ -236,26 +202,24 @@ func HartFromPath(path string) (Hart, error) {
 	// based on the non-arbitrary RELEASE and our standard VERSION
 	// scheme and rely on the fact that we won't name our services
 	// anything too absurd.
-	r := regexp.MustCompile(`.*-(\d+)\.(\d+)\.(\d+)-(\d{14})-.*\.hart$`)
+	r := regexp.MustCompile(`.*-(\d+\.\d+\.\d+)-(\d{14})-.*\.hart$`)
 	match := r.FindStringSubmatch(filename)
 	if match == nil {
 		return Hart{}, errors.Errorf("failed to parse version of hart %s", filename)
 	}
 
-	for i := 1; i < 5; i++ {
-		versionParts[i-1], err = strconv.Atoi(match[i])
-		if err != nil {
-			return Hart{}, errors.Errorf("failed to parse version of hart %s", filename)
-		}
+	parsedVersion, err := ParseSemverishVersion(match[1])
+	if err != nil {
+		return Hart{}, errors.Wrapf(err, "failed to parse version of hart %s", filename)
 	}
 
 	return Hart{
 		// origin and name are ambiguous in the path. We'll add them in later
-		path:      path,
-		major:     versionParts[0],
-		minor:     versionParts[1],
-		patch:     versionParts[2],
-		timestamp: versionParts[3]}, nil
+		path:          path,
+		version:       match[1],
+		release:       match[2],
+		parsedVersion: parsedVersion,
+	}, nil
 }
 
 // WithName sets the name of the hartifact
