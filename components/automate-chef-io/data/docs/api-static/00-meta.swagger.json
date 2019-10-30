@@ -32,7 +32,7 @@
   "x-tagGroups": [
     {
       "name": "Compliance",
-      "tags": ["Reporting"]
+      "tags": ["Reporting", "StatsService"]
     }
   ]
 }

@@ -1,0 +1,9 @@
+{
+    "tags": [
+      { "name": "Compliance Stats Summary", "x-displayName": "Summary" },
+      { "name": "Compliance Stats Trend", "x-displayName": "Trend" },
+      { "name": "Compliance Stats Profiles", "x-displayName": "Profiles" },
+      { "name": "Compliance Stats Failures", "x-displayName": "Failures" }
+    ]
+  }
+  
