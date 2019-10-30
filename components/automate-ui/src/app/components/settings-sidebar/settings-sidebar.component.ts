@@ -6,7 +6,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import {
   iamMajorVersion,
   iamMinorVersion,
-  atLeastV2p1
+  isIAMv2
 } from 'app/entities/policies/policy.selectors';
 import { GetIamVersion } from 'app/entities/policies/policy.actions';
 import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
@@ -30,7 +30,7 @@ export class SettingsSidebarComponent implements OnInit {
     ) {
     this.iamMajorVersion$ = store.select(iamMajorVersion);
     this.iamMinorVersion$ = store.select(iamMinorVersion);
-    this.projectsEnabled$ = store.select(atLeastV2p1);
+    this.projectsEnabled$ = store.select(isIAMv2);
     this.featureFlagOn = this.featureFlags.getFeatureStatus('servicenow_cmdb');
   }
 

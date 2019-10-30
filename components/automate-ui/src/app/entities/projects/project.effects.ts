@@ -9,7 +9,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
-import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
+import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectRequests } from './project.requests';
 
 import {
@@ -201,7 +201,7 @@ export class ProjectEffects {
 
   @Effect()
   getActiveApplyRulesStatus$ = observableInterval(1000 * ACTIVE_RULE_STATUS_INTERVAL).pipe(
-    withLatestFrom(this.store.select(atLeastV2p1)),
+    withLatestFrom(this.store.select(isIAMv2)),
     withLatestFrom(this.store.select(applyRulesStatus)),
     filter(([[_, projectsEnabled], { state }]) =>
       projectsEnabled && state === ApplyRulesStatusState.Running
@@ -210,7 +210,7 @@ export class ProjectEffects {
 
   @Effect()
   getDormantApplyRulesStatus$ = observableInterval(1000 * DORMANT_RULE_STATUS_INTERVAL).pipe(
-    withLatestFrom(this.store.select(atLeastV2p1)),
+    withLatestFrom(this.store.select(isIAMv2)),
     withLatestFrom(this.store.select(applyRulesStatus)),
     filter(([[_, projectsEnabled], { state }]) =>
       projectsEnabled && state === ApplyRulesStatusState.NotRunning
