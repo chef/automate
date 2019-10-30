@@ -46,7 +46,7 @@
               <p>
                 <strong>{{ history.startTime | datetime: RFC2822 }}</strong>
               </p>
-              <p>{{ getDuration(history.startTime, history.endTime) }} ago</p>
+              <p><span>Duration: </span>{{ getDuration(history.startTime, history.endTime) }}</p>
             </div>
             <chef-button secondary (click)="onSelect(history)">
               <chef-icon>chevron_right</chef-icon>
