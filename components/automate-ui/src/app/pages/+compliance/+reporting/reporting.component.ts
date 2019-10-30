@@ -408,7 +408,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   formatDate(timestamp) {
-    return moment(timestamp).format('MMMM Do[,] YYYY');
+    return moment.utc.utc(timestamp).format('MMMM Do[,] YYYY');
   }
 
   getSuggestions(type: string, text: string, reportQuery: ReportQuery) {
@@ -442,11 +442,11 @@ export class ReportingComponent implements OnInit, OnDestroy {
     return type.search('control_tag:') !== -1;
   }
 
-  getEndDate(urlFilters: Chicklet[]): moment.Moment {
+  getEndDate(urlFilters: Chicklet[]): moment.utc.Moment.utc {
     const foundFilter = urlFilters.find( (filter: Chicklet) => filter.type === 'end_time');
 
     if (foundFilter !== undefined) {
-      const endDate = moment(foundFilter.text + 'GMT+00:00', 'YYYY-MM-DDZ');
+      const endDate = moment.utc(foundFilter.text + 'GMT+00:00', 'YYYY-MM-DDZ');
       if (endDate.isValid()) {
         return endDate.utc().startOf('day').add(12, 'hours');
       } else {
