@@ -22,7 +22,7 @@ import {
 } from 'app/entities/api-tokens/api-token.actions';
 import { CreateToken } from 'app/entities/api-tokens/api-token.actions';
 import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selectors';
-import { iamMajorVersion, atLeastV2p1  } from 'app/entities/policies/policy.selectors';
+import { iamMajorVersion, isIAMv2  } from 'app/entities/policies/policy.selectors';
 import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
@@ -55,7 +55,7 @@ export class ApiTokenListComponent implements OnInit {
     fb: FormBuilder) {
     this.loading$ = store.pipe(select(apiTokenStatus), map(loading));
     this.iamMajorVersion$ = store.pipe(select(iamMajorVersion));
-    this.projectsEnabled$ = store.select(atLeastV2p1);
+    this.projectsEnabled$ = store.select(isIAMv2);
     this.apiTokenCount$ = store.select(totalApiTokens);
 
     this.sortedApiTokens$ = store.pipe(

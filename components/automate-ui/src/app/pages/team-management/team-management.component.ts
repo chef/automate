@@ -8,7 +8,7 @@ import { identity } from 'lodash/fp';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus } from 'app/entities/entities';
-import { iamMajorVersion, atLeastV2p1 } from 'app/entities/policies/policy.selectors';
+import { iamMajorVersion, isIAMv2 } from 'app/entities/policies/policy.selectors';
 import {
   createError,
   createStatus,
@@ -53,7 +53,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.sortedTeams$ = store.select(allTeams).pipe(
       map((teams: Team[]) => ChefSorters.naturalSort(teams, 'id')),
       takeUntil(this.isDestroyed));
-    this.projectsEnabled$ = store.select(atLeastV2p1);
+    this.projectsEnabled$ = store.select(isIAMv2);
     this.createTeamForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],

@@ -14,7 +14,7 @@ import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import { iamMajorVersion, atLeastV2p1 } from 'app/entities/policies/policy.selectors';
+import { iamMajorVersion, isIAMv2 } from 'app/entities/policies/policy.selectors';
 import {
   v1TeamFromRoute,
   v2TeamFromRoute,
@@ -96,7 +96,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       projects: [[]]
     });
     this.store.pipe(
-      select(atLeastV2p1),
+      select(isIAMv2),
       takeUntil(this.isDestroyed))
       .subscribe(projectsEnabled => {
         this.projectsEnabled = projectsEnabled;
