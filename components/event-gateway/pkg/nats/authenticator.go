@@ -283,19 +283,22 @@ func (a *automateAuthenticator) checkToken(token string) error {
 }
 
 func (a *automateAuthenticator) tryAuthzV2(ctx context.Context, subjects []string) (err error, shouldTryV1 bool) {
-	resp, err := a.authzClient.IsAuthorized(ctx, &authz.IsAuthorizedReq{
+	resp, err := a.authzClient.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
 		Subjects: subjects,
 		Resource: resourceV2,
 		Action:   actionV2,
+		// TODO (tc): This is broken. We need to populate this.
+		ProjectsFilter: []string{},
 	})
 	if err != nil {
-		// FailedPrecondition will happen for an IAM v2 request when IAM v2 is not enabled.
 		if status.Convert(err).Code() == codes.FailedPrecondition {
 			return err, true
 		}
 		return errors.Wrapf(err, "authorizing action %q on resource %q for subjects %q", actionV2, resourceV2, subjects), false
 	}
-	if !resp.GetAuthorized() {
+	projects := resp.Projects
+
+	if len(projects) == 0 {
 		return errors.Errorf("unauthorized action %q on resource %q for subjects %q", actionV2, resourceV2, subjects), false
 	}
 	return nil, false

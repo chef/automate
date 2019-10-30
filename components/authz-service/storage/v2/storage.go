@@ -40,7 +40,7 @@ type policyStorage interface {
 	CreatePolicy(context.Context, *Policy, bool) (*Policy, error)
 	ListPolicies(context.Context) ([]*Policy, error)
 	GetPolicy(context.Context, string) (*Policy, error)
-	UpdatePolicy(context.Context, *Policy, bool) (*Policy, error)
+	UpdatePolicy(context.Context, *Policy) (*Policy, error)
 	ListPolicyMembers(context.Context, string) ([]Member, error)
 	AddPolicyMembers(context.Context, string, []Member) ([]Member, error)
 	ApplyV2DataMigrations(context.Context) error
@@ -56,7 +56,7 @@ type policyStorage interface {
 type roleStorage interface {
 	CreateRole(context.Context, *Role, bool) (*Role, error)
 	DeleteRole(context.Context, string) error
-	UpdateRole(context.Context, *Role, bool) (*Role, error)
+	UpdateRole(context.Context, *Role) (*Role, error)
 	ListRoles(context.Context) ([]*Role, error)
 	GetRole(context.Context, string) (*Role, error)
 }

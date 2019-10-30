@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"fmt"
 	"strconv"
 	"time"
 
@@ -263,8 +262,4 @@ func (refresher *policyRefresher) getIAMVersion(ctx context.Context) (api.Versio
 		vsn = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
 	}
 	return vsn, nil
-}
-
-func pretty(vsn api.Version) string {
-	return fmt.Sprintf("IAM v%d.%d", int32(vsn.Major), int32(vsn.Minor))
 }

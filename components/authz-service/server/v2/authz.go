@@ -157,10 +157,9 @@ func (s *authzServer) ValidateProjectAssignment(
 	ctx context.Context,
 	req *api.ValidateProjectAssignmentReq) (*api.ValidateProjectAssignmentResp, error) {
 
-	// If we aren't on v2.1, just return success. Other services shouldn't
-	// have to know and we shouldn't return failure for v2.0. We need to reset
-	// all of their projects on upgrade to v2.1 to be safe anyway.
-	if !s.isBeta2p1() {
+	// If we are on V1 just return success. Other services are calling
+	// this function in version unaware ways.
+	if s.isV1() {
 		return &api.ValidateProjectAssignmentResp{}, nil
 	}
 
@@ -196,11 +195,6 @@ func (s *authzServer) ValidateProjectAssignment(
 	}
 
 	return &api.ValidateProjectAssignmentResp{}, nil
-}
-
-func (s *authzServer) isBeta2p1() bool {
-	version := s.vSwitch.Version
-	return version.Major == api.Version_V2 && version.Minor == api.Version_V1
 }
 
 func (s *authzServer) getAllProjects(ctx context.Context) ([]string, error) {
@@ -333,4 +327,9 @@ func NewSwitch(c chan api.Version) *VersionSwitch {
 		}
 	}()
 	return &x
+}
+
+func (s *authzServer) isV1() bool {
+	version := s.vSwitch.Version
+	return version.Major == api.Version_V1
 }

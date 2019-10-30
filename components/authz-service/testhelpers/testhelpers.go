@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"runtime"
+	"strconv"
 	"testing"
 	"time"
 
@@ -180,6 +181,42 @@ func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng
 
 	opaInstance, err := opa.New(ctx, l)
 	require.NoError(t, err, "init OPA")
+	sysPols := v2.SystemPolicies()
+
+	// OPA requires this format
+	data := make(map[string]interface{})
+	for _, p := range sysPols {
+		statements := make(map[string]interface{})
+		for i, st := range p.Statements {
+			stmt := map[string]interface{}{
+				"effect":   st.Effect.String(),
+				"projects": st.Projects,
+			}
+			// Only set these if provided
+			if st.Role != "" {
+				stmt["role"] = st.Role
+			}
+			if len(st.Actions) != 0 {
+				stmt["actions"] = st.Actions
+			}
+			if len(st.Resources) != 0 {
+				stmt["resources"] = st.Resources
+			}
+			statements[strconv.Itoa(i)] = stmt
+		}
+
+		members := make([]string, len(p.Members))
+		for i, member := range p.Members {
+			members[i] = member.Name
+		}
+
+		data[p.ID] = map[string]interface{}{
+			"type":       p.Type.String(),
+			"members":    members,
+			"statements": statements,
+		}
+	}
+	require.NoError(t, opaInstance.V2p1SetPolicies(ctx, data, make(map[string]interface{})))
 
 	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
 	if err != nil {

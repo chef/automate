@@ -15,6 +15,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/authn"
 	"github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -200,6 +201,8 @@ func getNewToken(t *testing.T, authorizedAction string) string {
 
 	authnClient := authn.NewTokensMgmtClient(authnConnection)
 
+	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx,
+		[]string{"tls:service:deployment-service:internal"}, []string{}, "res", "act", "v2.1"))
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
 		Description: "token for event-service integration test",
 		Active:      true,

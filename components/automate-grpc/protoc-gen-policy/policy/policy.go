@@ -15,7 +15,6 @@ import (
 	options "google.golang.org/genproto/googleapis/api/annotations"
 
 	"github.com/chef/automate/api/interservice/authz"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	policy "github.com/chef/automate/components/automate-grpc/protoc-gen-policy/api"
 	"github.com/chef/automate/components/automate-grpc/protoc-gen-policy/iam"
 )
@@ -66,6 +65,8 @@ var policyVersions = map[string]policyBundle{
 			if err != nil {
 				return err
 			}
+			// borrowing IsAuthorizedReq's protobuf validation to ensure
+			// our resource and action annotations are correct.
 			req := &authz.IsAuthorizedReq{
 				Subjects: []string{"user:local:albertine"}, // this won't fail validation
 				Resource: expanded,                         // resource and
@@ -88,12 +89,14 @@ var policyVersions = map[string]policyBundle{
 			if err != nil {
 				return err
 			}
-			req := &authz_v2.IsAuthorizedReq{
+			// using a preserved version of the protobuf validation for IAM V2 IsAuthorized
+			// which was removed (see below).
+			req := &ValidateV2ResourceAndActions{
 				Subjects: []string{"user:local:albertine"}, // this won't fail validation
 				Resource: expanded,                         // resource and
 				Action:   pi.action,                        // action could
 			}
-			return req.Validate()
+			return req.validateV2()
 		},
 	},
 }
@@ -389,4 +392,119 @@ func generateExtractionFunction(policyPkg string, fields []string) *jen.Statemen
 			),
 		),
 	)
+}
+
+type IsAuthorizedReq struct {
+	Subjects             []string `protobuf:"bytes,1,rep,name=subjects,proto3" json:"subjects,omitempty" toml:"subjects,omitempty" mapstructure:"subjects,omitempty"`
+	Resource             string   `protobuf:"bytes,2,opt,name=resource,proto3" json:"resource,omitempty" toml:"resource,omitempty" mapstructure:"resource,omitempty"`
+	Action               string   `protobuf:"bytes,3,opt,name=action,proto3" json:"action,omitempty" toml:"action,omitempty" mapstructure:"action,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+// We were re-using the IAM V2 IsAuthorizedReq's Validate function to
+// validate our V2 AuthZ annotations. Preserving that code here so we
+// can continue to validate.
+type ValidateV2ResourceAndActions struct {
+	Subjects             []string `protobuf:"bytes,1,rep,name=subjects,proto3" json:"subjects,omitempty" toml:"subjects,omitempty" mapstructure:"subjects,omitempty"`
+	Resource             string   `protobuf:"bytes,2,opt,name=resource,proto3" json:"resource,omitempty" toml:"resource,omitempty" mapstructure:"resource,omitempty"`
+	Action               string   `protobuf:"bytes,3,opt,name=action,proto3" json:"action,omitempty" toml:"action,omitempty" mapstructure:"action,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *ValidateV2ResourceAndActions) GetSubjects() []string {
+	if m != nil {
+		return m.Subjects
+	}
+	return nil
+}
+
+func (m *ValidateV2ResourceAndActions) GetResource() string {
+	if m != nil {
+		return m.Resource
+	}
+	return ""
+}
+
+func (m *ValidateV2ResourceAndActions) GetAction() string {
+	if m != nil {
+		return m.Action
+	}
+	return ""
+}
+
+var _IsAuthorizedReq_Subjects_Pattern = regexp.MustCompile("^(?:team|user):(?:local|ldap|saml):[^:*]+$|^token:[^:*]+$|^tls:service:[^:*]+:[^:*]+$")
+
+var _IsAuthorizedReq_Resource_Pattern = regexp.MustCompile("^[a-z][^:*]*(?::[^:*]+)*$")
+
+var _IsAuthorizedReq_Action_Pattern = regexp.MustCompile("^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$")
+
+type ValidateV2ResourceAndActionsValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+func (e ValidateV2ResourceAndActionsValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsAuthorizedReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+func (m *ValidateV2ResourceAndActions) validateV2() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetSubjects()) < 1 {
+		return ValidateV2ResourceAndActionsValidationError{
+			field:  "Subjects",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetSubjects() {
+		_, _ = idx, item
+
+		if !_IsAuthorizedReq_Subjects_Pattern.MatchString(item) {
+			return ValidateV2ResourceAndActionsValidationError{
+				field:  fmt.Sprintf("Subjects[%v]", idx),
+				reason: "value does not match regex pattern \"^(?:team|user):(?:local|ldap|saml):[^:*]+$|^token:[^:*]+$|^tls:service:[^:*]+:[^:*]+$\"",
+			}
+		}
+
+	}
+
+	if !_IsAuthorizedReq_Resource_Pattern.MatchString(m.GetResource()) {
+		return ValidateV2ResourceAndActionsValidationError{
+			field:  "Resource",
+			reason: "value does not match regex pattern \"^[a-z][^:*]*(?::[^:*]+)*$\"",
+		}
+	}
+
+	if !_IsAuthorizedReq_Action_Pattern.MatchString(m.GetAction()) {
+		return ValidateV2ResourceAndActionsValidationError{
+			field:  "Action",
+			reason: "value does not match regex pattern \"^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$\"",
+		}
+	}
+
+	return nil
 }
