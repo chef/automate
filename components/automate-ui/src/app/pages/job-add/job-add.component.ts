@@ -251,6 +251,7 @@ export class JobAddComponent implements OnDestroy {
     }
 
     const {start, end, repeat} = scheduleOpts;
+    console.log(scheduleOpts);
     const ruleOpts = {
       dtstart: new Date(
         parseInt(start.datetime.year, 10),

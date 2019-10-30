@@ -20,7 +20,7 @@ export class JobScheduleFormComponent {
 
   public years = Array(20).fill(1).map((_, i) => i + 2018);
 
-  public hours = Array(12).fill(1).map((_, i) => i + 1);
+  public hours = Array(24).fill(1).map((_, i) => i);
 
   public minutes = Array(60).fill(1).map((_, i) => i);
 
