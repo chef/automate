@@ -135,7 +135,7 @@ func (m *ListFilter) GetType() string {
 }
 
 type Query struct {
-	// Unique idenfifier, such as a profile id.
+	// Unique identifier, such as a profile id.
 	Id string `protobuf:"bytes,17,opt,name=id,proto3" json:"id,omitempty"`
 	// Type of data being requested, used for ReadTrend and ReadSummary.
 	Type string `protobuf:"bytes,19,opt,name=type,proto3" json:"type,omitempty"`

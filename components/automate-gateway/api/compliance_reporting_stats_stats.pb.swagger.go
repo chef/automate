@@ -462,7 +462,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique idenfifier, such as a profile id."
+          "description": "Unique identifier, such as a profile id."
         },
         "type": {
           "type": "string",

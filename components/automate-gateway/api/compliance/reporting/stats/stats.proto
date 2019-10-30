@@ -113,7 +113,7 @@ message ListFilter {
 }
 
 message Query {
-	// Unique idenfifier, such as a profile id.
+	// Unique identifier, such as a profile id.
 	string id = 17;
 	// Type of data being requested, used for ReadTrend and ReadSummary.
 	string type = 19;
