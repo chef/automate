@@ -1,3 +1,10 @@
+[mlsa]
+accept = false
+
+[logger]
+format = "text"
+level = "info"
+
 [service]
 host = "localhost"
 port = 10153
