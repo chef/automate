@@ -474,9 +474,8 @@ func (m *NodeSummary) GetLowRisk() int32 {
 }
 
 type Stats struct {
-	//int64 types render into string types when serialized to satisfy all browsers
-	//we don't really need for nodes counts to be int64 as int32 limits us to 2billion nodes which is plenty for now
-	//we are therefore deprecating nodes and favor nodesCnt
+	// Deprecated. int64 types render into string types when serialized to satisfy all browsers
+	// Replaced by the `nodes_cnt` field
 	Nodes int64 `protobuf:"varint,1,opt,name=nodes,proto3" json:"nodes,omitempty"` // Deprecated: Do not use.
 	// The number of unique node platforms in the reports.
 	Platforms int32 `protobuf:"varint,2,opt,name=platforms,proto3" json:"platforms,omitempty"`
@@ -1564,32 +1563,33 @@ type StatsServiceClient interface {
 	//Read Summary
 	//
 	//Returns summary statistics for compliance reports.
-	//General report summary information is the default. Adding a type value of nodes or controls will return summary statistics for that object.
+	//General report summary information is the default.
+	//Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
 	//Supports filtering.
 	ReadSummary(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Summary, error)
 	//
 	//Read Trend
 	//
 	//Returns trendgraph statistics for compliance reports.
-	//The type field is required for this api call. Options are nodes or controls.
-	//Requires minimum interval field of 3600 and defined start time and end time filters.
+	//The `type` field is required for this api call. Options are `nodes` or `controls`.
+	//Requires minimum `interval` field of 3600 and defined start time and end time filters.
 	//Supports filtering.
 	ReadTrend(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Trends, error)
 	//
 	//Read Profiles
 	//
 	//Returns statistics and summary information for profiles executed as part of the compliance reports.
-	//If called without specifying a profile id, the API will return stats on all the profiles.
-	//If an id (profile id) is included as part of the query object, the type field must also be specified. Options are controls or summary.
+	//If called without specifying a profile id (`id`), the API will return stats on all the profiles.
+	//If the `id` field is provided (profile id) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
 	//Supports filtering.
 	ReadProfiles(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Profile, error)
 	//
 	//Read Failures
 	//
 	//Returns the top failures for the specified object. A types filter is required for this api.
-	//Supported values are 'platform', 'environment', 'control', and 'profile'.
+	//Supported values are `platform`, `environment`, `control`, and `profile`.
 	//By default, the top ten failed objects for the specified type are returned.
-	//Supports filtering.
+	//Supports filtering and respects `size` parameter.
 	ReadFailures(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Failures, error)
 }
 
@@ -1643,32 +1643,33 @@ type StatsServiceServer interface {
 	//Read Summary
 	//
 	//Returns summary statistics for compliance reports.
-	//General report summary information is the default. Adding a type value of nodes or controls will return summary statistics for that object.
+	//General report summary information is the default.
+	//Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
 	//Supports filtering.
 	ReadSummary(context.Context, *Query) (*Summary, error)
 	//
 	//Read Trend
 	//
 	//Returns trendgraph statistics for compliance reports.
-	//The type field is required for this api call. Options are nodes or controls.
-	//Requires minimum interval field of 3600 and defined start time and end time filters.
+	//The `type` field is required for this api call. Options are `nodes` or `controls`.
+	//Requires minimum `interval` field of 3600 and defined start time and end time filters.
 	//Supports filtering.
 	ReadTrend(context.Context, *Query) (*Trends, error)
 	//
 	//Read Profiles
 	//
 	//Returns statistics and summary information for profiles executed as part of the compliance reports.
-	//If called without specifying a profile id, the API will return stats on all the profiles.
-	//If an id (profile id) is included as part of the query object, the type field must also be specified. Options are controls or summary.
+	//If called without specifying a profile id (`id`), the API will return stats on all the profiles.
+	//If the `id` field is provided (profile id) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
 	//Supports filtering.
 	ReadProfiles(context.Context, *Query) (*Profile, error)
 	//
 	//Read Failures
 	//
 	//Returns the top failures for the specified object. A types filter is required for this api.
-	//Supported values are 'platform', 'environment', 'control', and 'profile'.
+	//Supported values are `platform`, `environment`, `control`, and `profile`.
 	//By default, the top ten failed objects for the specified type are returned.
-	//Supports filtering.
+	//Supports filtering and respects `size` parameter.
 	ReadFailures(context.Context, *Query) (*Failures, error)
 }
 
