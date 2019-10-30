@@ -3,12 +3,11 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment as env } from 'environments/environment';
-import { Policy, IAMMajorVersion, IAMMinorVersion } from './policy.model';
+import { Policy, IAMMajorVersion } from './policy.model';
 
 export interface IamVersionResponse {
   version: {
     major: IAMMajorVersion;
-    minor: IAMMinorVersion;
   };
 }
 
