@@ -33,15 +33,26 @@ build: ${BINS}
 test:
 	@go test $(verbose) -cover -count=1 -parallel=1 -p 1 $(packages)
 
+# See https://github.com/chef/automate/pull/1996 for examples/details
+test/%:
+	go test -v -cover -count=1 -parallel=1 -p 1 $(PACKAGE_PATH)/$(subst test/,,$(@D))/... -run $(@F)
+
 PG_URL ?= "postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable"
+DOCKER_CLEAN_MSG = "\nDocker container still up; run 'make kill_docker_pg' to clean it up when finished."
 
 test_with_db: db_container
 	@PGTZ=UTC PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 $(packages)
-	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
+	@echo $(DOCKER_CLEAN_MSG)
 
 test_properties_with_db: db_container
 	@PGTZ=UTC PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 $(packages) -run Properties
-	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
+	@echo $(DOCKER_CLEAN_MSG)
+
+# Example: make test_with_db/server/v2/ValidateProjectAssignment
+# turns into: go test...$(PACKAGE_PATH)/server/v2 -run ValidateProjectAssignment
+test_with_db/%: db_container
+	@PGTZ=UTC PG_URL=$(PG_URL) go test -cover -count=1 -parallel=1 -p 1 -v $(PACKAGE_PATH)/$(subst test_with_db/,,$(@D))/... -run $(@F)
+	@echo $(DOCKER_CLEAN_MSG)
 
 .PHONY: db_container
 db_container:
