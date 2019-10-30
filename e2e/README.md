@@ -50,7 +50,7 @@ Most Cypress tests also expect the following IAM-related environment variables. 
 according to your targeted Automate instance's IAM version.
 
 ```bash
-export CYPRESS_IAM_VERSION=v1 || v2.1
+export CYPRESS_IAM_VERSION=v1 || v2 || v2.1
 export CYPRESS_ADMIN_TOKEN=<admin token value> # optional
 ```
 
@@ -106,7 +106,7 @@ To target those specific sets of tests set that environment variable when starti
 CYPRESS_IAM_VERSION="v2.1" npm run cypress:run
 ```
 
-The only possible values are `"v1"` and `"v2.1"`.
+Possible values are `"v1"`, `"v2"`, and `"v2.1"`.
 
 Your dev environment's IAM version MUST match the value of CYPRESS_IAM_VERSION for the tests to pass locally.
 
