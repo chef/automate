@@ -6,7 +6,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { interval as observableInterval, of as observableOf, Observable } from 'rxjs';
 import { catchError, mergeMap, map, tap, withLatestFrom, filter } from 'rxjs/operators';
 
-import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
+import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from './projects-filter.reducer';
 import { ProjectsFilterService } from './projects-filter.service';
@@ -33,7 +33,7 @@ export class ProjectsFilterEffects {
 
   @Effect()
   latestOptions$ = observableInterval(1000 * this.POLLING_INTERVAL_IN_SECONDS).pipe(
-    withLatestFrom(this.store.select(atLeastV2p1)),
+    withLatestFrom(this.store.select(isIAMv2)),
     filter(([_, projectsEnabled]) => projectsEnabled),
     mergeMap(this.loadOptionsAction$()));
 

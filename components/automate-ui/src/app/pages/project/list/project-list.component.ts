@@ -10,8 +10,7 @@ import { Regex } from 'app/helpers/auth/regex';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
-import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
-import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
+import { iamMajorVersion, isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
@@ -70,7 +69,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name')));
 
     this.iamMajorVersion$ = store.select(iamMajorVersion);
-    this.projectsEnabled$ = store.select(atLeastV2p1);
+    this.projectsEnabled$ = store.select(isIAMv2);
 
     this.projects.applyRulesStatus$
       .pipe(takeUntil(this.isDestroyed))

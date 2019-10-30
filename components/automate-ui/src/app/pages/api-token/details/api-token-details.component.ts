@@ -12,7 +12,7 @@ import { loading, EntityStatus } from 'app/entities/entities';
 import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions';
 import { apiTokenFromRoute, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
-import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
+import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { GetProjects } from 'app/entities/projects/project.actions';
 import {
@@ -57,7 +57,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       projects: [[]]
     });
     this.store.pipe(
-      select(atLeastV2p1),
+      select(isIAMv2),
       takeUntil(this.isDestroyed))
       .subscribe(projectsEnabled => {
         this.projectsEnabled = projectsEnabled;
