@@ -6,6 +6,7 @@ import * as moment from 'moment';
 import {
   ReportQueryService
 } from 'app/pages/+compliance/shared/reporting';
+import { DatetimePipe } from 'app/pipes/datetime.pipe';
 
 describe('ReportingSearchbarComponent', () => {
   let fixture: ComponentFixture<ReportingSearchbarComponent>,
@@ -16,7 +17,8 @@ describe('ReportingSearchbarComponent', () => {
       imports: [
       ],
       declarations: [
-        ReportingSearchbarComponent
+        ReportingSearchbarComponent,
+        DatetimePipe
       ],
       providers: [
         ReportQueryService
@@ -44,7 +46,7 @@ describe('ReportingSearchbarComponent', () => {
       ['beginning of the next month', '2019-11-01', 10]
     ], function (description: string, dateString: string, month) {
       it('selection of ' + description, () => {
-        component.visibleDate = moment('20191023', 'YYYYMMDD');
+        component.visibleDate = moment.utc('20191023', 'YYYYMMDD');
         component.onDaySelect(dateString);
 
         expect(component.visibleDate.month()).toEqual(month);

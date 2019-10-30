@@ -106,18 +106,18 @@ export class JobAddComponent implements OnDestroy {
       start: this.fb.group({
         datetime: this.fb.group({
           month: defaultStart.month(),
-          date: defaultStart.date() - 1,
+          date: defaultStart.date(),
           year: defaultStart.year(),
-          hour: this.hours24to12(defaultStart.hour()),
+          hour: defaultStart.hour(),
           minute: defaultStart.minute()
         })
       }),
       end: this.fb.group({
         datetime: this.fb.group({
           month: defaultEnd.month(),
-          date: defaultEnd.date() - 1,
+          date: defaultEnd.date(),
           year: defaultEnd.year(),
-          hour: this.hours24to12(defaultEnd.hour()),
+          hour: defaultEnd.hour(),
           minute: defaultEnd.minute()
         }),
         include: false
@@ -254,7 +254,7 @@ export class JobAddComponent implements OnDestroy {
     const ruleOpts = {
       dtstart: new Date(
         parseInt(start.datetime.year, 10),
-        parseInt(start.datetime.month, 10) - 1,
+        parseInt(start.datetime.month, 10),
         parseInt(start.datetime.date, 10),
         parseInt(start.datetime.hour, 10),
         parseInt(start.datetime.minute, 10)
@@ -264,12 +264,13 @@ export class JobAddComponent implements OnDestroy {
     if (end.include) {
       ruleOpts['until'] = new Date(
         parseInt(end.datetime.year, 10),
-        parseInt(end.datetime.month, 10) - 1,
+        parseInt(end.datetime.month, 10),
         parseInt(end.datetime.date, 10),
         parseInt(end.datetime.hour, 10),
         parseInt(end.datetime.minute, 10)
       );
     }
+
 
     if (repeat.include) {
       ruleOpts['freq'] = repeat.freq;
@@ -304,10 +305,6 @@ export class JobAddComponent implements OnDestroy {
         const {key, values, include} = tag;
         return {key, values, exclude: !include};
       });
-  }
-
-  public hours24to12(h) {
-    return (h + 11) % 12 + 1;
   }
 
   public nextStep(current: Step): Step {
