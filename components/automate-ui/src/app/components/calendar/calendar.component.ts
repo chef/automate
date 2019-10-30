@@ -17,8 +17,8 @@ import { concat,
 })
 export class CalendarComponent {
 
-  private _date: m.Moment = m();
-  private _selected: m.Moment = m();
+  private _date: m.Moment = m.utc();
+  private _selected: m.Moment = m.utc();
 
   private _month: string;
   private _year: number;
@@ -34,7 +34,7 @@ export class CalendarComponent {
 
   @Input()
   set date(input) {
-    const date = m.isMoment(input) ? input : m(input);
+    const date = m.isMoment(input) ? input : m.utc(input);
     this._date = date;
     this._month = m.months(date.month());
     this._year = date.year();
@@ -45,7 +45,7 @@ export class CalendarComponent {
 
   @Input()
   set selected(input) {
-    const date = m.isMoment(input) ? input : m(input);
+    const date = m.isMoment(input) ? input : m.utc(input);
     this._selected = date;
   }
   get selected() {
@@ -79,7 +79,7 @@ export class CalendarComponent {
     const vy = this.date.year();
     const sm = this.selected.month();
     const sy = this.selected.year();
-    const today = m().month() === this.date.month() ? m().date() : null;
+    const today = m.utc().month() === this.date.month() ? m.utc().date() : null;
     const selected = (vm === sm && vy === sy) ? this.selected.date() : null;
     const tag = (marker) => (d: m.Moment) => [marker, d];
     const tagActive = (d: m.Moment) => {
