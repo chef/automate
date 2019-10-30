@@ -6,7 +6,6 @@ import { routerReducer } from '@ngrx/router-store';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
-import { using } from 'app/testing/spec-helpers';
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import {
@@ -34,7 +33,6 @@ import { Project } from 'app/entities/projects/project.model';
 import { GetProjectsSuccess, GetProjects } from 'app/entities/projects/project.actions';
 import { IamVersionResponse } from 'app/entities/policies/policy.requests';
 import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 describe('ApiTokenDetailsComponent', () => {
   let component: ApiTokenDetailsComponent;
@@ -130,22 +128,17 @@ describe('ApiTokenDetailsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  using([
-    ['v2', 'v0'],
-    ['v1', 'v0']
-  ], function (major: IAMMajorVersion) {
-    it('does not fetch projects for unsupported IAM versions', () => {
-      spyOn(store, 'dispatch').and.callThrough();
-      const version: IamVersionResponse = { version: { major } };
-      store.dispatch(new GetIamVersionSuccess(version));
+  it('does not fetch projects for unsupported IAM versions', () => {
+    spyOn(store, 'dispatch').and.callThrough();
+    const version: IamVersionResponse = { version: { major: 'v1' } };
+    store.dispatch(new GetIamVersionSuccess(version));
 
-      const token = { ...someToken, projects: ['b-proj', 'd-proj'] };
-      store.dispatch(new GetTokenSuccess(token));
-      expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
-    });
+    const token = { ...someToken, projects: ['b-proj', 'd-proj'] };
+    store.dispatch(new GetTokenSuccess(token));
+    expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
   });
 
-  it('fills in token on load for v2p1', () => {
+  it('fills in token on load for v2', () => {
     spyOn(store, 'dispatch').and.callThrough();
     const version: IamVersionResponse = { version: { major: 'v2' } };
     store.dispatch(new GetIamVersionSuccess(version));
