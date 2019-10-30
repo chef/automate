@@ -11,9 +11,11 @@ tls:
 database: {{cfg.storage.database}}
 migrations-path: {{pkg.path}}/migrations
 data-migrations-path: {{pkg.path}}/data-migrations
+project-limit: {{cfg.service.project_limit}}
 
 {{~#eachAlive bind.cereal-service.members as |cereal-service|}}
   {{~#if @last}}
 cereal-address: {{cereal-service.sys.ip}}:{{cereal-service.cfg.port}}
   {{~/if}}
 {{~/eachAlive}}
+

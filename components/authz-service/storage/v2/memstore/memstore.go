@@ -20,6 +20,7 @@ type State struct {
 	projects       *cache.Cache
 	rules          *cache.Cache
 	ms             storage.MigrationStatus
+	projectLimit   int
 }
 
 var ErrTypeAssertionFailed = errors.New("type assertion failed: could not convert interface{} to *storage.Policy")
@@ -32,6 +33,7 @@ func New() *State {
 		rules:          cache.New(cache.NoExpiration, -1),
 		policyChangeID: 0,
 		changeManager:  newPolicyChangeNotifierManager(),
+		projectLimit:   constants_v2.MaxProjects,
 	}
 	return s
 }
@@ -390,8 +392,8 @@ func (s *State) CreateProject(_ context.Context, project *storage.Project) (*sto
 			}
 		}
 
-		if len(projects) >= constants_v2.MaxProjects {
-			return nil, storage_errors.ErrMaxProjectsExceeded
+		if len(projects) >= s.projectLimit {
+			return nil, storage_errors.NewMaxProjectsExceededError(s.projectLimit)
 		}
 	}
 

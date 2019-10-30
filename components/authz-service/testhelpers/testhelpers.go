@@ -16,6 +16,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
+	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/engine/opa"
 	"github.com/chef/automate/components/authz-service/prng"
@@ -172,6 +173,10 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 }
 
 func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng, *migration.Config) {
+	return SetupTestDBWithLimit(t, constants_v2.MaxProjects)
+}
+
+func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *TestDB, *opa.State, *prng.Prng, *migration.Config) {
 	t.Helper()
 
 	ctx := context.Background()
@@ -205,7 +210,7 @@ func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng
 	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 	require.NoError(t, err, "error creating extension")
 
-	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
+	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig), projectLimit)
 	require.NoError(t, err)
 	return postgres.GetInstance(), &TestDB{
 			DB:      db,

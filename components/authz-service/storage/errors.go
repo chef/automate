@@ -2,6 +2,7 @@ package storage
 
 import (
 	"errors"
+	"fmt"
 )
 
 // Error responses common to all storage adapters, be it v1, v2, memstore, postgres, etc.
@@ -18,10 +19,6 @@ var (
 
 	// ErrDatabase results from unexpected database errors.
 	ErrDatabase = errors.New("database internal")
-
-	// ErrMaxProjectsExceeded indicates that a new project cannot be created
-	// since the max allowed are already created.
-	ErrMaxProjectsExceeded = errors.New("max projects allowed")
 
 	// ErrChangeProjectForRule indicates that an update operation attempted to change
 	// the project for a rule, which is not allowed.
@@ -73,4 +70,19 @@ type ForeignKeyError struct {
 
 func (e *ForeignKeyError) Error() string {
 	return e.Msg
+}
+
+type MaxProjectsExceededError struct {
+	projectLimit int
+}
+
+func NewMaxProjectsExceededError(limit int) error {
+	return &MaxProjectsExceededError{projectLimit: limit}
+}
+
+// MaxProjectsExceededError indicates that a new project cannot be created
+// since the max allowed are already created.
+func (e *MaxProjectsExceededError) Error() string {
+	return fmt.Sprintf("cannot create project: limit of %v projects already reached",
+		e.projectLimit)
 }

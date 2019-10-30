@@ -9,7 +9,6 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
@@ -28,11 +27,12 @@ const (
 )
 
 type pg struct {
-	db          *sql.DB
-	engine      engine.Engine
-	logger      logger.Logger
-	dataMigConf datamigration.Config
-	conninfo    string
+	db           *sql.DB
+	engine       engine.Engine
+	logger       logger.Logger
+	dataMigConf  datamigration.Config
+	conninfo     string
+	projectLimit int
 }
 
 var singletonInstance *pg
@@ -46,14 +46,20 @@ func GetInstance() *pg {
 // New instantiates the singleton postgres storage backend.
 // Will only initialize once. Will simply return nil if already initialized.
 func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf migration.Config,
-	dataMigConf datamigration.Config) error {
+	dataMigConf datamigration.Config, projectLimit int) error {
 
 	var err error
 	once.Do(func() {
 		l.Infof("applying database migrations from %s", migConf.Path)
 		var db *sql.DB
 		db, err = postgres.New(ctx, migConf)
-		singletonInstance = &pg{db: db, engine: e, logger: l, dataMigConf: dataMigConf, conninfo: migConf.PGURL.String()}
+		singletonInstance = &pg{
+			db:           db,
+			engine:       e,
+			logger:       l,
+			dataMigConf:  dataMigConf,
+			conninfo:     migConf.PGURL.String(),
+			projectLimit: projectLimit}
 	})
 	return err
 }
@@ -1463,13 +1469,13 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 
 	if project.Type == v2.Custom {
 		row := tx.QueryRowContext(ctx, "SELECT count(*) FROM iam_projects WHERE type='custom'")
-		var numProjects int64
+		var numProjects int
 		if err := row.Scan(&numProjects); err != nil {
 			return nil, p.processError(err)
 		}
 
-		if numProjects >= constants_v2.MaxProjects {
-			return nil, storage_errors.ErrMaxProjectsExceeded
+		if numProjects >= p.projectLimit {
+			return nil, storage_errors.NewMaxProjectsExceededError(p.projectLimit)
 		}
 	}
 

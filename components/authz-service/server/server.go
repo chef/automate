@@ -36,7 +36,8 @@ import (
 func GRPC(ctx context.Context,
 	addr string, l logger.Logger, connFactory *secureconn.Factory,
 	e engine.Engine, migrationsConfig migration.Config,
-	dataMigrationsConfig datamigration.Config, cerealAddress string) error {
+	dataMigrationsConfig datamigration.Config, cerealAddress string,
+	projectLimit int) error {
 
 	grpclog.SetLoggerV2(l)
 	list, err := net.Listen("tcp", addr)
@@ -46,7 +47,7 @@ func GRPC(ctx context.Context,
 	l.Printf("Authz GRPC API listening on %s", addr)
 
 	server, err := NewGRPCServer(ctx, connFactory, l, e, migrationsConfig,
-		dataMigrationsConfig, cerealAddress)
+		dataMigrationsConfig, cerealAddress, projectLimit)
 	if err != nil {
 		return err
 	}
@@ -58,7 +59,8 @@ func GRPC(ctx context.Context,
 func NewGRPCServer(ctx context.Context,
 	connFactory *secureconn.Factory, l logger.Logger,
 	e engine.Engine, migrationsConfig migration.Config,
-	dataMigrationsConfig datamigration.Config, cerealAddress string) (*grpc.Server, error) {
+	dataMigrationsConfig datamigration.Config, cerealAddress string,
+	projectLimit int) (*grpc.Server, error) {
 
 	// Note(sr): we're buffering one version struct, as NewPostgresPolicyServer writes
 	// to this before we've got readers
@@ -70,7 +72,7 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v1 server")
 	}
 
-	err = v2_postgres.Initialize(ctx, e, l, migrationsConfig, dataMigrationsConfig)
+	err = v2_postgres.Initialize(ctx, e, l, migrationsConfig, dataMigrationsConfig, projectLimit)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 postgres singleton")
 	}
