@@ -17,7 +17,7 @@ import {
 } from 'app/entities/policies/policy.reducer';
 import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
 import { IamVersionResponse } from 'app/entities/policies/policy.requests';
-import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import {
   projectEntityReducer,
   ProjectEntityInitialState
@@ -172,7 +172,7 @@ describe('TeamDetailsComponent', () => {
       spyOn(store, 'dispatch').and.callThrough();
       const team: Team = { id, guid, name: 'any', projects: [] };
       store.dispatch(new GetTeamSuccess(team));
-      const version: IamVersionResponse = { version: { major: major, minor: 'v0' } };
+      const version: IamVersionResponse = { version: { major: major} };
       store.dispatch(new GetIamVersionSuccess(version));
 
       expect(store.dispatch).toHaveBeenCalledWith(new GetUsers());
@@ -183,12 +183,12 @@ describe('TeamDetailsComponent', () => {
   using([
     ['v2', 'v0'],
     ['v1', 'v0']
-  ], function (major: IAMMajorVersion, minor: IAMMinorVersion) {
+  ], function (major: IAMMajorVersion) {
     it('does not fetch projects for unsupported IAM versions', () => {
       spyOn(store, 'dispatch').and.callThrough();
       const team: Team = { id: 'any', guid: 'any', name: 'any', projects: [] };
       store.dispatch(new GetTeamSuccess(team));
-      const version: IamVersionResponse = { version: { major, minor } };
+      const version: IamVersionResponse = { version: { major } };
       store.dispatch(new GetIamVersionSuccess(version));
 
       expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
@@ -198,7 +198,7 @@ describe('TeamDetailsComponent', () => {
 
   it('initializes dropdown with those included on the team checked', () => {
     spyOn(store, 'dispatch').and.callThrough();
-    const version: IamVersionResponse = { version: { major: 'v2', minor: 'v1' } };
+    const version: IamVersionResponse = { version: { major: 'v2' } };
     store.dispatch(new GetIamVersionSuccess(version));
     const teamProjects = ['b-proj', 'd-proj'];
     const team: Team = { id: targetId, guid: 'any', name: 'any', projects: teamProjects };

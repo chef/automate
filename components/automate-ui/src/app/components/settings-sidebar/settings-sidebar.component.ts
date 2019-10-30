@@ -5,11 +5,10 @@ import { Observable } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import {
   iamMajorVersion,
-  iamMinorVersion,
   isIAMv2
 } from 'app/entities/policies/policy.selectors';
 import { GetIamVersion } from 'app/entities/policies/policy.actions';
-import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { FeatureFlagsService } from '../../services/feature-flags/feature-flags.service';
 
 @Component({
@@ -20,7 +19,6 @@ import { FeatureFlagsService } from '../../services/feature-flags/feature-flags.
 
 export class SettingsSidebarComponent implements OnInit {
   public iamMajorVersion$: Observable<IAMMajorVersion>;
-  public iamMinorVersion$: Observable<IAMMinorVersion>;
   public projectsEnabled$: Observable<boolean>;
   featureFlagOn: boolean;
 
@@ -29,7 +27,6 @@ export class SettingsSidebarComponent implements OnInit {
     private featureFlags: FeatureFlagsService
     ) {
     this.iamMajorVersion$ = store.select(iamMajorVersion);
-    this.iamMinorVersion$ = store.select(iamMinorVersion);
     this.projectsEnabled$ = store.select(isIAMv2);
     this.featureFlagOn = this.featureFlags.getFeatureStatus('servicenow_cmdb');
   }
