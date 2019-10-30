@@ -709,6 +709,7 @@ describe('Admin pages', () => {
         it(`when clicked, shows ${item}`, () => {
           waitForElement('chef-table chef-tbody chef-tr:nth-child(2) chef-control-menu')
             .then(controlButton => {
+              browser.wait(EC.elementToBeClickable(controlButton));
               controlButton.click().then(() => {
                 const dropDownOption = controlButton.$(`chef-option:nth-child(${index + 1}`);
                 const dropDownOpened = () => dropDownOption.getText()
@@ -728,6 +729,7 @@ describe('Admin pages', () => {
         waitForElement('chef-table chef-tbody chef-tr:nth-child(2)').then(somePolicy => {
           // open control menu
           const controlButton = somePolicy.$('chef-control-menu');
+          browser.wait(EC.elementToBeClickable(controlButton));
           controlButton.click().then(() => {
             // select Delete Policy
             const deleteOption = controlButton.$('chef-option:nth-child(1)');
@@ -1394,6 +1396,7 @@ describe('Admin pages', () => {
             .then(third => {
               browser.wait(EC.presenceOf(third.$('chef-control-menu'))).then(() => {
                 const controlButton = third.$('chef-control-menu');
+                browser.wait(EC.elementToBeClickable(controlButton));
                 controlButton.click().then(() => {
                   // select Delete Project
                   const deleteOption = controlButton.$('chef-option:nth-child(1)');
