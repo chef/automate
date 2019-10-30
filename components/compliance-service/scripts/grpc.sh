@@ -25,7 +25,7 @@ trap cleanup EXIT
 
 for i in $(find components/compliance-service -name '*.proto') ; do
   protoc -I /src \
-    -I src/components/compliance-service/api \
+    -I /src/components/compliance-service/api \
     -I vendor \
     -I vendor/github.com/grpc-ecosystem/grpc-gateway \
     -I vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
