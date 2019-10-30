@@ -251,13 +251,12 @@ export class JobAddComponent implements OnDestroy {
     }
 
     const {start, end, repeat} = scheduleOpts;
-    console.log(scheduleOpts);
     const ruleOpts = {
       dtstart: new Date(
         parseInt(start.datetime.year, 10),
         parseInt(start.datetime.month, 10) - 1,
         parseInt(start.datetime.date, 10),
-        this.hours12to24(parseInt(start.datetime.hour, 10), start.datetime.meridiem === 'PM'),
+        parseInt(start.datetime.hour, 10),
         parseInt(start.datetime.minute, 10)
       )
     };
@@ -267,7 +266,7 @@ export class JobAddComponent implements OnDestroy {
         parseInt(end.datetime.year, 10),
         parseInt(end.datetime.month, 10) - 1,
         parseInt(end.datetime.date, 10),
-        this.hours12to24(parseInt(end.datetime.hour, 10), end.datetime.meridiem === 'PM'),
+        parseInt(end.datetime.hour, 10),
         parseInt(end.datetime.minute, 10)
       );
     }
@@ -305,10 +304,6 @@ export class JobAddComponent implements OnDestroy {
         const {key, values, include} = tag;
         return {key, values, exclude: !include};
       });
-  }
-
-  public hours12to24(h, pm) {
-    return h === 12 ? pm ? 12 : 0 : pm ? h + 12 : h;
   }
 
   public hours24to12(h) {
