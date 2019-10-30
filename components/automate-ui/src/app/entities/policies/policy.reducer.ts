@@ -3,7 +3,7 @@ import { pipe, unset, set } from 'lodash/fp';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { EntityStatus } from 'app/entities/entities';
-import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { PolicyActionTypes, PolicyActions } from './policy.actions';
 import { Policy } from './policy.model';
 
@@ -16,7 +16,6 @@ export interface PolicyEntityState extends EntityState<Policy> {
   removePolicyMembersStatus: EntityStatus;
   removePolicyMembersHTTPError: HttpErrorResponse;
   iamMajorVersion: IAMMajorVersion;
-  iamMinorVersion: IAMMinorVersion;
 }
 
 export const policyEntityAdapter: EntityAdapter<Policy> = createEntityAdapter<Policy>();
@@ -29,8 +28,7 @@ export const PolicyEntityInitialState: PolicyEntityState = policyEntityAdapter.g
   addPolicyMembersHTTPError: null,
   removePolicyMembersStatus: EntityStatus.notLoaded,
   removePolicyMembersHTTPError: null,
-  iamMajorVersion: null,
-  iamMinorVersion: null
+  iamMajorVersion: null
 });
 
 export function policyEntityReducer(state: PolicyEntityState = PolicyEntityInitialState,
@@ -40,8 +38,7 @@ export function policyEntityReducer(state: PolicyEntityState = PolicyEntityIniti
 
     case PolicyActionTypes.GET_IAM_VERSION_SUCCESS:
     return pipe(
-      set('iamMajorVersion', action.payload.version.major.toLowerCase()),
-      set('iamMinorVersion', action.payload.version.minor.toLowerCase())
+      set('iamMajorVersion', action.payload.version.major.toLowerCase())
       )(state) as PolicyEntityState;
 
     case PolicyActionTypes.GET_ALL:
