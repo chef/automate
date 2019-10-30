@@ -87,7 +87,6 @@ describe('team management', () => {
           }
         });
     });
-    console.log(Cypress.env('IAM_VERSION'));
   });
 
   describeIfIAMV2p1('team create modal (IAM v2.1)', () => {
