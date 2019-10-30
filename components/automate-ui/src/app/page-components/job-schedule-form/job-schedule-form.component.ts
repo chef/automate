@@ -11,12 +11,10 @@ import * as moment from 'moment';
 export class JobScheduleFormComponent {
   @Input() form: FormGroup;
 
-
-
   public RRule = RRule;
 
-  // public months = Array(12).fill(1).map((_, i) => i + 1);
-  public months = this.buildMonthsObject();
+  public months = Array(12).fill(1).map((_, i) => i);
+  public monthsStringArray = moment.monthsShort();
 
   public dates = Array(31).fill(1).map((_, i) => i + 1);
 
@@ -25,15 +23,5 @@ export class JobScheduleFormComponent {
   public hours = Array(12).fill(1).map((_, i) => i + 1);
 
   public minutes = Array(60).fill(1).map((_, i) => i);
-
-
-  private buildMonthsObject() {
-    //need to be sorted?
-    const monthsObject = {};
-    moment.monthsShort().forEach((month, i) => {
-      monthsObject[i] = month;
-    });
-    return monthsObject;
-  }
 
 }
