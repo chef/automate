@@ -1,0 +1,6 @@
+This component has been removed. We create an empty build
+because deployment-service cannot continue if we remove a
+service from the manifest. The empty package is the least 
+bad of our options because it has no dependencies, so it
+wont cause us to install in data-lifecycle-service's old 
+deps.
