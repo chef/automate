@@ -5,7 +5,7 @@ import (
 	w "github.com/chef/automate/api/config/shared/wrappers"
 )
 
-// NewConfigRequest returns a new ConfigRequests instance with zero values.
+// NewConfigRequest returns a new ConfigRequest instance with zero values.
 func NewConfigRequest() *ConfigRequest {
 	return &ConfigRequest{
 		V1: &ConfigRequest_V1{
