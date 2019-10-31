@@ -1924,25 +1924,25 @@ paths = [
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
-[chef/automate-minio]
+[automate-minio]
 plan_path = "components/automate-minio"
 paths = [
   "components/automate-minio/*"
 ]
 
-[chef/automate-builder-memcached]
+[automate-builder-memcached]
 plan_path = "components/automate-builder-memcached"
 paths = [
   "components/automate-builder-memcached/*"
 ]
 
-[chef/automate-builder-api]
+[automate-builder-api]
 plan_path = "components/automate-builder-api"
 paths = [
   "components/automate-builder-api/*"
 ]
 
-[chef/automate-builder-api-proxy]
+[automate-builder-api-proxy]
 plan_path = "components/automate-builder-api-proxy"
 paths = [
   "components/automate-builder-api-proxy/*"
