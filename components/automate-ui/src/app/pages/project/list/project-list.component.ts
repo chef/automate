@@ -28,7 +28,6 @@ import { LoadOptions } from 'app/services/projects-filter/projects-filter.action
   styleUrls: ['./project-list.component.scss']
 })
 export class ProjectListComponent implements OnInit, OnDestroy {
-  public MAX_PROJECTS = 6;
   public loading$: Observable<boolean>;
   public iamMajorVersion$: Observable<IAMMajorVersion>;
   public projectsEnabled$: Observable<boolean>;
