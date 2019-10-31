@@ -12,7 +12,7 @@ var serveCmd = &cobra.Command{
 	Short: fmt.Sprintf("Launches the automate infra proxy service..."),
 	Run: func(cmd *cobra.Command, args []string) {
 		for {
-			time.Sleep(10 * time.Second);
+			time.Sleep(10 * time.Second)
 		}
 	},
 }

@@ -1,21 +1,15 @@
 package config
 
 import (
-	"fmt"
-	"net/url"
-	"path"
-	"time"
-
 	platform_config "github.com/chef/automate/lib/platform/config"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
 )
 
-
 // Configuration for the Infra Proxy Service
 type InfraProxyConfig struct {
-	LogConfig        LogConfig        `mapstructure:"log"`
-	PostgresConfig   PostgresConfig   `mapstructure:"postgres"`
+	LogConfig      LogConfig      `mapstructure:"log"`
+	PostgresConfig PostgresConfig `mapstructure:"postgres"`
 }
 
 type LogConfig struct {
