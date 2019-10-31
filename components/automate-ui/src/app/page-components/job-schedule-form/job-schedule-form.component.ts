@@ -14,6 +14,8 @@ export class JobScheduleFormComponent {
   public RRule = RRule;
 
   public months = Array(12).fill(1).map((_, i) => i);
+
+  // returns an Array of months in short form i.e. ['Jan', 'Feb', 'Mar', ...]
   public monthsStringArray = moment.monthsShort();
 
   public dates = Array(31).fill(1).map((_, i) => i + 1);
