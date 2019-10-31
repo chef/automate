@@ -14,7 +14,7 @@
           </chef-form-field>
           <span class="detail">Don't worry, {{ objectNoun }} names can be changed later.</span>
         </div>
-        <div *ngIf="modifyID" class="margin">
+        <div *ngIf="modifyID">
           <chef-form-field>
             <label>
               <span class="label">ID <span aria-hidden="true">*</span></span>
@@ -35,7 +35,7 @@
           </chef-form-field>
           <span class="detail">{{ objectNoun | titlecase }} IDs are unique, permanent, and cannot be changed later.</span>
         </div>
-        <div *ngIf="!modifyID" class="margin">
+        <div *ngIf="!modifyID">
           <div id="id-fields">
             <span class="key-label">ID:&nbsp;</span>
             <span data-cy="id-label">{{ this.createForm?.value.id }}</span>
@@ -43,6 +43,11 @@
           <chef-toolbar>
             <chef-button tertiary (click)="modifyID = true" id="edit-button-object-modal" data-cy="edit-button">Edit ID</chef-button>
           </chef-toolbar>
+        </div>
+        <div class="checkbox">
+          <chef-checkbox checked="true" disabled="true">
+            Also create owner, editor, and viewer policies for this project.
+          </chef-checkbox>
         </div>
         <div *ngIf="showProjectsDropdown">
           <app-projects-dropdown
