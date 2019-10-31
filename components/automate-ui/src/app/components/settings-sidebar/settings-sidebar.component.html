@@ -2,7 +2,7 @@
   <div class="nav-items">
     <div class="group" *ngIf="notifications.visible || integrations.visible || credentials.visible || lifecycle.visible">Data Lifecycle</div>
     <app-authorized #lifecycle [anyOf]="['/retention/nodes/status', 'get']">
-      <chef-sidebar-entry route="/settings/node-lifecycle" icon="storage">Node Lifecycle</chef-sidebar-entry>
+      <chef-sidebar-entry route="/settings/node-lifecycle" icon="storage">Data Lifecycle</chef-sidebar-entry>
     </app-authorized>
     <app-authorized #notifications [anyOf]="['/notifications/rules', 'get']">
       <chef-sidebar-entry route="/settings/notifications" icon="notifications">Notifications</chef-sidebar-entry>
