@@ -408,7 +408,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   formatDate(timestamp) {
-    return moment.utc.utc(timestamp).format('MMMM Do[,] YYYY');
+    return moment.utc(timestamp).format('MMMM Do[,] YYYY');
   }
 
   getSuggestions(type: string, text: string, reportQuery: ReportQuery) {
