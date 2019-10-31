@@ -14,7 +14,7 @@ ttl = 15
 
 [datastore]
 user = "automate-builder-api"
-database = "builder"
+database = "automate-builder-api"
 connection_retry_ms = 300
 connection_timeout_sec = 3600
 db_workers = 4
