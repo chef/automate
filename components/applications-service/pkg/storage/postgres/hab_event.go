@@ -235,19 +235,19 @@ func (db *Postgres) upsertServiceAndMetadata(
 	sgId := hex.EncodeToString(sgIdBytes[:])
 
 	_, err := db.DbMap.Exec(upsertServiceAndMetadata,
-		pkgIdent.Origin,             // origin,
-		pkgIdent.Name,               // name,
-		pkgIdent.Version,            // version,
-		pkgIdent.Release,            // release,
-		pkgIdent.FullPackageIdent(), // package_ident,
-		health,                                               // health,
-		"",                                                   // health_check_message, // TODO 13Aug2019 - hab isn't sending this yet
-		channel,                                              // channel,
-		updateStrategy,                                       // update_strategy,
-		eventMetadata.GetSupervisorId(),                      // supervisor_id,
-		eventMetadata.GetFqdn(),                              // fqdn,
-		eventMetadata.GetSite(),                              // site,
-		svcMetadata.GetServiceGroup(),                        // service_group_name,
+		pkgIdent.Origin,                 // origin,
+		pkgIdent.Name,                   // name,
+		pkgIdent.Version,                // version,
+		pkgIdent.Release,                // release,
+		pkgIdent.FullPackageIdent(),     // package_ident,
+		health,                          // health,
+		"",                              // health_check_message, // TODO 13Aug2019 - hab isn't sending this yet
+		channel,                         // channel,
+		updateStrategy,                  // update_strategy,
+		eventMetadata.GetSupervisorId(), // supervisor_id,
+		eventMetadata.GetFqdn(),         // fqdn,
+		eventMetadata.GetSite(),         // site,
+		svcMetadata.GetServiceGroup(),   // service_group_name,
 		trimSuffix(svcMetadata.GetServiceGroup()),            // service_group_name_suffix,
 		eventMetadata.GetApplication(),                       // application,
 		eventMetadata.GetEnvironment(),                       // environment
