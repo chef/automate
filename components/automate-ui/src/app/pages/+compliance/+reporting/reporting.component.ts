@@ -442,7 +442,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     return type.search('control_tag:') !== -1;
   }
 
-  getEndDate(urlFilters: Chicklet[]): moment.utc.Moment.utc {
+  getEndDate(urlFilters: Chicklet[]): moment.Moment {
     const foundFilter = urlFilters.find( (filter: Chicklet) => filter.type === 'end_time');
 
     if (foundFilter !== undefined) {
