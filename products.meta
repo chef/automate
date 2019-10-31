@@ -5,6 +5,7 @@
     "chef/automate-pg-gateway",
     "chef/automate-elasticsearch",
     "chef/automate-es-gateway",
+    "chef/automate-minio",
     "chef/automate-ui",
     "chef/pg-sidecar-service",
     "chef/cereal-service",
@@ -36,6 +37,9 @@
     "chef/automate-cs-nginx",
     "chef/automate-workflow-server",
     "chef/automate-workflow-nginx",
+    "chef/automate-builder-memcached",
+    "chef/automate-builder-api",
+    "chef/automate-builder-api-proxy",
     "chef/automate-prometheus",
     "chef/automate-cli",
     "core/rsync"
@@ -121,14 +125,6 @@
       ]
     },
     {
-      "name": "builder",
-      "type": "product",
-      "aliases": ["depot"],
-      "hidden": true,
-      "dependencies": ["core", "postgresql", "auth"],
-      "services": []
-    },
-    {
       "name": "chef-server",
       "type": "product",
       "aliases": ["chef-infra-server"],
@@ -147,6 +143,18 @@
       "services": [
         "chef/automate-workflow-server",
         "chef/automate-workflow-nginx"
+      ]
+    },
+    {
+      "name": "builder",
+      "type": "product",
+      "aliases": ["depot"],
+      "dependencies": ["core", "postgresql", "auth"],
+      "services": [
+        "chef/automate-minio",
+        "chef/automate-builder-memcached",
+        "chef/automate-builder-api",
+        "chef/automate-builder-api-proxy"
       ]
     },
     {

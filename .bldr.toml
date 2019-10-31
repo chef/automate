@@ -311,6 +311,9 @@ paths = [
   "api/config/backup_gateway/*",
   "api/config/bifrost/*",
   "api/config/bookshelf/*",
+  "api/config/builder_api/*",
+  "api/config/builder_api_proxy/*",
+  "api/config/builder_memcached/*",
   "api/config/cereal/*",
   "api/config/cfgmgmt/*",
   "api/config/compliance/*",
@@ -330,6 +333,7 @@ paths = [
   "api/config/license_control/*",
   "api/config/load_balancer/*",
   "api/config/local_user/*",
+  "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
   "api/config/pg_gateway/*",
@@ -626,6 +630,9 @@ paths = [
   "api/config/backup_gateway/*",
   "api/config/bifrost/*",
   "api/config/bookshelf/*",
+  "api/config/builder_api/*",
+  "api/config/builder_api_proxy/*",
+  "api/config/builder_memcached/*",
   "api/config/cereal/*",
   "api/config/cfgmgmt/*",
   "api/config/compliance/*",
@@ -645,6 +652,7 @@ paths = [
   "api/config/license_control/*",
   "api/config/load_balancer/*",
   "api/config/local_user/*",
+  "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
   "api/config/pg_gateway/*",
@@ -749,6 +757,9 @@ paths = [
   "api/config/backup_gateway/*",
   "api/config/bifrost/*",
   "api/config/bookshelf/*",
+  "api/config/builder_api/*",
+  "api/config/builder_api_proxy/*",
+  "api/config/builder_memcached/*",
   "api/config/cereal/*",
   "api/config/cfgmgmt/*",
   "api/config/compliance/*",
@@ -768,6 +779,7 @@ paths = [
   "api/config/license_control/*",
   "api/config/load_balancer/*",
   "api/config/local_user/*",
+  "api/config/minio/*",
   "api/config/nodemanager/*",
   "api/config/notifications/*",
   "api/config/pg_gateway/*",
@@ -1910,6 +1922,30 @@ paths = [
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
   "vendor/gopkg.in/yaml.v2/*"
+]
+
+[chef/automate-minio]
+plan_path = "components/automate-minio"
+paths = [
+  "components/automate-minio/*"
+]
+
+[chef/automate-builder-memcached]
+plan_path = "components/automate-builder-memcached"
+paths = [
+  "components/automate-builder-memcached/*"
+]
+
+[chef/automate-builder-api]
+plan_path = "components/automate-builder-api"
+paths = [
+  "components/automate-builder-api/*"
+]
+
+[chef/automate-builder-api-proxy]
+plan_path = "components/automate-builder-api-proxy"
+paths = [
+  "components/automate-builder-api-proxy/*"
 ]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 

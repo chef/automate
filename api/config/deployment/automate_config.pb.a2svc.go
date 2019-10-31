@@ -10,6 +10,9 @@ import (
 	backupgateway "github.com/chef/automate/api/config/backup_gateway"
 	bifrost "github.com/chef/automate/api/config/bifrost"
 	bookshelf "github.com/chef/automate/api/config/bookshelf"
+	builderapi "github.com/chef/automate/api/config/builder_api"
+	builderapiproxy "github.com/chef/automate/api/config/builder_api_proxy"
+	buildermemcached "github.com/chef/automate/api/config/builder_memcached"
 	cereal "github.com/chef/automate/api/config/cereal"
 	cfgmgmt "github.com/chef/automate/api/config/cfgmgmt"
 	compliance "github.com/chef/automate/api/config/compliance"
@@ -28,6 +31,7 @@ import (
 	licensecontrol "github.com/chef/automate/api/config/license_control"
 	loadbalancer "github.com/chef/automate/api/config/load_balancer"
 	localuser "github.com/chef/automate/api/config/local_user"
+	minio "github.com/chef/automate/api/config/minio"
 	nodemanager "github.com/chef/automate/api/config/nodemanager"
 	notifications "github.com/chef/automate/api/config/notifications"
 	pggateway "github.com/chef/automate/api/config/pg_gateway"
@@ -52,6 +56,9 @@ func NewAutomateConfig() *AutomateConfig {
 		BackupGateway:    backupgateway.NewConfigRequest(),
 		Bifrost:          bifrost.NewConfigRequest(),
 		Bookshelf:        bookshelf.NewConfigRequest(),
+		BuilderApi:       builderapi.NewConfigRequest(),
+		BuilderApiProxy:  builderapiproxy.NewConfigRequest(),
+		BuilderMemcached: buildermemcached.NewConfigRequest(),
 		Cereal:           cereal.NewConfigRequest(),
 		Compliance:       compliance.NewConfigRequest(),
 		ConfigMgmt:       cfgmgmt.NewConfigRequest(),
@@ -72,6 +79,7 @@ func NewAutomateConfig() *AutomateConfig {
 		LicenseControl:   licensecontrol.NewConfigRequest(),
 		LoadBalancer:     loadbalancer.NewConfigRequest(),
 		LocalUser:        localuser.NewConfigRequest(),
+		Minio:            minio.NewConfigRequest(),
 		Nodemanager:      nodemanager.NewConfigRequest(),
 		Notifications:    notifications.NewConfigRequest(),
 		PgGateway:        pggateway.NewConfigRequest(),
@@ -96,6 +104,9 @@ func DefaultAutomateConfig() *AutomateConfig {
 		BackupGateway:    backupgateway.DefaultConfigRequest(),
 		Bifrost:          bifrost.DefaultConfigRequest(),
 		Bookshelf:        bookshelf.DefaultConfigRequest(),
+		BuilderApi:       builderapi.DefaultConfigRequest(),
+		BuilderApiProxy:  builderapiproxy.DefaultConfigRequest(),
+		BuilderMemcached: buildermemcached.DefaultConfigRequest(),
 		Cereal:           cereal.DefaultConfigRequest(),
 		Compliance:       compliance.DefaultConfigRequest(),
 		ConfigMgmt:       cfgmgmt.DefaultConfigRequest(),
@@ -116,6 +127,7 @@ func DefaultAutomateConfig() *AutomateConfig {
 		LicenseControl:   licensecontrol.DefaultConfigRequest(),
 		LoadBalancer:     loadbalancer.DefaultConfigRequest(),
 		LocalUser:        localuser.DefaultConfigRequest(),
+		Minio:            minio.DefaultConfigRequest(),
 		Nodemanager:      nodemanager.DefaultConfigRequest(),
 		Notifications:    notifications.DefaultConfigRequest(),
 		PgGateway:        pggateway.DefaultConfigRequest(),
@@ -138,7 +150,7 @@ and enforces other invariants on configuration option values.
 If the configuration is valid, the returned error is nil.
 */
 func (c *AutomateConfig) Validate() error {
-	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate())
+	err := shared.Validate(c.Global.Validate(), c.AuthN.Validate(), c.AuthZ.Validate(), c.Compliance.Validate(), c.ConfigMgmt.Validate(), c.Deployment.Validate(), c.Dex.Validate(), c.Elasticsearch.Validate(), c.Esgateway.Validate(), c.EsSidecar.Validate(), c.Gateway.Validate(), c.Ingest.Validate(), c.LoadBalancer.Validate(), c.LocalUser.Validate(), c.LicenseControl.Validate(), c.Notifications.Validate(), c.Postgresql.Validate(), c.Session.Validate(), c.Teams.Validate(), c.UI.Validate(), c.Secrets.Validate(), c.BackupGateway.Validate(), c.PgSidecar.Validate(), c.PgGateway.Validate(), c.Applications.Validate(), c.Bookshelf.Validate(), c.Bifrost.Validate(), c.Erchef.Validate(), c.CsNginx.Validate(), c.Workflow.Validate(), c.WorkflowNginx.Validate(), c.EventService.Validate(), c.Nodemanager.Validate(), c.EventGateway.Validate(), c.Prometheus.Validate(), c.DataFeedService.Validate(), c.EventFeedService.Validate(), c.Cereal.Validate(), c.BuilderApi.Validate(), c.BuilderApiProxy.Validate(), c.Minio.Validate(), c.BuilderMemcached.Validate())
 	if err == nil {
 		return nil
 	}
@@ -190,6 +202,10 @@ func (c *AutomateConfig) SetGlobalConfig() {
 	c.DataFeedService.SetGlobalConfig(c.Global)
 	c.EventFeedService.SetGlobalConfig(c.Global)
 	c.Cereal.SetGlobalConfig(c.Global)
+	c.BuilderApi.SetGlobalConfig(c.Global)
+	c.BuilderApiProxy.SetGlobalConfig(c.Global)
+	c.Minio.SetGlobalConfig(c.Global)
+	c.BuilderMemcached.SetGlobalConfig(c.Global)
 }
 
 // PlatformServiceConfigForService gets the config for the service by name
@@ -269,6 +285,14 @@ func (c *AutomateConfig) PlatformServiceConfigForService(serviceName string) (sh
 		return c.EventFeedService, true
 	case "cereal-service":
 		return c.Cereal, true
+	case "automate-builder-api":
+		return c.BuilderApi, true
+	case "automate-builder-api-proxy":
+		return c.BuilderApiProxy, true
+	case "automate-minio":
+		return c.Minio, true
+	case "automate-builder-memcached":
+		return c.BuilderMemcached, true
 	default:
 		return nil, false
 	}

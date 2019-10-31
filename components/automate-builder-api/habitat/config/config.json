@@ -1,0 +1,9 @@
+{
+"conf": {{ toJson cfg }},
+"binds": {
+  "memcache": {{ toJson bind.automate-builder-memcached.first }},
+  "minio": {{ toJson bind.automate-minio.first }},
+  "session": {{ toJson bind.session-service.first }}
+},
+"__placeholder": {}
+}

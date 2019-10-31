@@ -78,6 +78,7 @@ var a2Config = config{
 		{regex: `components/automate-deployment/testdata/hab_responses/all_up.json`},
 		{regex: `components/automate-deployment/tools/upgrade-test-scaffold/upgrade-test-scaffold.go`},
 		{regex: `components/automate-ui/src/app/pages/\+compliance/\+credentials/components/credentials-form.html`},
+		{regex: `components/automate-minio/habitat/config/private.key`},
 		{regex: `components/backup-gateway/habitat/config/private.key`},
 		{regex: `components/compliance-service/api/tests/containers/key.pem`},
 		{regex: `components/compliance-service/docs/elastic/api_compliance.rst`},

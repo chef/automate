@@ -1,0 +1,50 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+chmod 0600 "{{pkg.svc_config_path}}/secrets"
+source "{{pkg.svc_config_path}}/secrets"
+
+mkdir -p "{{pkg.svc_data_path}}/depot"
+
+# Minio requires TLS certs to be in a 'certs' subdirectory of the config-dir.
+# hab doesn't render nested `config` templates so we need to leave them in
+# root config dir and link to them from the certs dir.
+mkdir -p "{{pkg.svc_var_path}}/config/certs/CAs"
+if ! [[ -L "{{pkg.svc_var_path}}/config/certs/private.key" ]]; then
+  ln -s "{{pkg.svc_config_path}}/private.key" "{{pkg.svc_var_path}}/config/certs/private.key"
+fi
+if ! [[ -L "{{pkg.svc_var_path}}/config/certs/public.crt" ]]; then
+  ln -s "{{pkg.svc_config_path}}/public.crt" "{{pkg.svc_var_path}}/config/certs/public.crt"
+fi
+if ! [[ -L "{{pkg.svc_var_path}}/config/certs/CAs/public.crt" ]]; then
+  ln -s "{{pkg.svc_config_path}}/public.crt" "{{pkg.svc_var_path}}/config/certs/CAs/public.crt"
+fi
+
+{{#if cfg.gateway.storage.s3.ssl.root_cert}}
+ln -fs "{{pkg.svc_config_path}}/custom_s3.crt" "{{pkg.svc_var_path}}/config/certs/CAs/custom_s3.crt"
+{{/if}}
+
+secrets-helper generate minio.access_key 64 --if-not-exists
+secrets-helper generate minio.secret_key 64 --if-not-exists
+
+MINIO_ACCESS_KEY="$(secrets-helper show minio.access_key)"
+export MINIO_ACCESS_KEY
+MINIO_SECRET_KEY="$(secrets-helper show minio.secret_key)"
+export MINIO_SECRET_KEY
+export MINIO_BROWSER=off
+export SSL_CERT_FILE={{pkgPathFor "core/cacerts"}}/ssl/cert.pem
+export SSL_CERT_DIR={{pkgPathFor "core/cacerts"}}/ssl/certs
+
+#{{#if cfg.gateway.storage.s3.bucket.name~}}
+#exec minio gateway s3 {{cfg.gateway.storage.s3.bucket.endpoint}} \
+  #--config-dir "{{pkg.svc_var_path}}/config" \
+  #--address "{{sys.ip}}:{{cfg.service.port}}" \
+  #--quiet
+#{{else}}
+exec minio server \
+  --config-dir "{{pkg.svc_var_path}}/config" \
+  --address "{{sys.ip}}:{{cfg.service.port}}" \
+  --quiet \
+  "{{pkg.svc_data_path}}"
+#{{/if ~}}

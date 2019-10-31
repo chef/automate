@@ -43,6 +43,16 @@ var ProductMetadataJSON = `
       "metadata": null
     },
     {
+      "name": "chef/automate-minio",
+      "metadata": {
+        "name": "chef/automate-minio",
+        "data_service": true,
+        "binlinks": null,
+        "uses_platform_scaffolding": false,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/automate-ui",
       "metadata": null
     },
@@ -234,6 +244,18 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/automate-gateway",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-builder-memcached",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-builder-api",
+      "metadata": null
+    },
+    {
+      "name": "chef/automate-builder-api-proxy",
       "metadata": null
     },
     {
@@ -462,21 +484,6 @@ var ProductMetadataJSON = `
       "hidden": false
     },
     {
-      "name": "builder",
-      "aliases": [
-        "depot"
-      ],
-      "type": "product",
-      "services": [],
-      "packages": null,
-      "dependencies": [
-        "core",
-        "postgresql",
-        "auth"
-      ],
-      "hidden": true
-    },
-    {
       "name": "chef-server",
       "aliases": [
         "chef-infra-server"
@@ -507,6 +514,26 @@ var ProductMetadataJSON = `
       "packages": null,
       "dependencies": [
         "automate"
+      ],
+      "hidden": false
+    },
+    {
+      "name": "builder",
+      "aliases": [
+        "depot"
+      ],
+      "type": "product",
+      "services": [
+        "chef/automate-minio",
+        "chef/automate-builder-memcached",
+        "chef/automate-builder-api",
+        "chef/automate-builder-api-proxy"
+      ],
+      "packages": null,
+      "dependencies": [
+        "core",
+        "postgresql",
+        "auth"
       ],
       "hidden": false
     },

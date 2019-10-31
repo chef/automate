@@ -1,0 +1,33 @@
+---
+issuer-url: https://{{cfg.conf.service.external_fqdn}}/dex
+dex-url: https://{{cfg.binds.dex.ip}}:{{cfg.binds.dex.cfg.port}}
+redirect-url: {{ cfg.conf.oidc.redirect_url }}
+client-id: {{ cfg.conf.oidc.client_id }}
+client-secret: {{ cfg.conf.oidc.client_secret }}
+http-port: {{ cfg.conf.service.port }}
+http-listen: {{ cfg.conf.service.host }}
+signin-url: {{ cfg.conf.service.signin_url }}
+{{- if cfg.conf.service.bldr_signin_url }}
+bldr-signin-url: {{ cfg.conf.service.bldr_signin_url }}
+{{- else }}
+bldr-signin-url: /bldr
+{{- end }}
+{{- if cfg.conf.service.bldr_client_id }}
+bldr-client-id: {{ cfg.conf.service.bldr_client_id }}
+{{- else }}
+bldr-client-id: automate-builder-api
+{{- end }}
+{{- if cfg.conf.service.bldr_client_secret }}
+bldr-client-secret: {{ cfg.conf.service.bldr_client_secret }}
+{{- else }}
+bldr-client-secret: {{ getSecret "bldr.auth_client_secret" }}
+{{- end }}
+log-level: {{ cfg.conf.logger.level }}
+log-format: {{ cfg.conf.logger.format }}
+database: {{ cfg.conf.storage.database }}
+migrations-path: {{ cfg.pkg_path }}/migrations
+
+tls:
+  cert_path: {{svc_config_path}}/service.crt
+  key_path: {{svc_config_path}}/service.key
+  root_ca_path: {{svc_config_path}}/root_ca.crt

@@ -1,0 +1,44 @@
+docs_url                  = "https://www.habitat.sh/docs"
+hosted                    = false
+source_code_url           = "https://github.com/habitat-sh/habitat"
+tutorials_url             = "https://www.habitat.sh/learn"
+www_url                   = "https://www.habitat.sh"
+
+[github]
+app_id                    = 5565
+app_url                   = "https://github.com/apps/habitat-builder"
+api_url                   = "https://api.github.com"
+
+[oauth]
+provider       = "chef-automate"
+redirect_url   = "/bldr"
+client_id      = "automate-builder-api"
+authorize_url  = "/session/new"
+
+[nginx]
+worker_connections        = 1024
+worker_processes          = "auto"
+worker_rlimit_nofile      = 8192
+max_body_size             = 0
+proxy_send_timeout        = 300
+proxy_read_timeout        = 300
+proxy_connect_timeout     = 5
+enable_caching            = false
+enable_gzip               = false
+
+[http]
+keepalive_connections     = 16
+keepalive_requests        = 128
+keepalive_timeout         = 180
+sendfile                  = "on"
+tcp_nopush                = "on"
+tcp_nodelay               = "on"
+
+[web]
+use_gravatar              = false
+cookie_domain             = ""
+environment               = "production"
+
+[service]
+host = "0.0.0.0"
+port = 10104

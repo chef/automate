@@ -1,0 +1,28 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
+
+exec 2>&1
+
+set -e
+
+export HOME="{{pkg.svc_data_path}}"
+export RUST_LOG="{{cfg.service.log_level}}"
+export RUST_BACKTRACE=1
+export SSL_CERT_FILE="{{pkg.svc_config_path}}/root_ca.crt"
+
+echo "builder-api starting"
+
+mkdir -p "{{pkg.svc_var_path}}/etc"
+render-template config.toml "{{pkg.svc_var_path}}/etc/config.toml" \
+  --conf "{{pkg.svc_config_path}}/config.json"
+
+export DBNAME="{{cfg.datastore.database}}"
+pg-helper ensure-service-database "$DBNAME"
+pg-helper fix-permissions "$DBNAME"
+
+if ! ls {{pkg.svc_data_path}}/keys/bldr-*; then
+  echo "generating bldr key"
+  #hab user key generate bldr --cache-key-path "{{pkg.svc_data_path}}/keys"
+  HAB_CACHE_KEY_PATH="{{pkg.svc_data_path}}/keys" hab user key generate bldr
+fi
+
+exec bldr-api start -c "{{pkg.svc_var_path}}/etc/config.toml"

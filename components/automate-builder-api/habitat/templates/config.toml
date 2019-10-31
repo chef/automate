@@ -1,0 +1,83 @@
+[api]
+data_path = "{{svc_path}}/data"
+log_path = "{{svc_var_path}}"
+key_path = "{{svc_path}}/data/keys"
+
+{{- if cfg.conf.artifactory.enabled }}
+features_enabled = "ARTIFACTORY"
+{{- else }}
+features_enabled = ""
+{{- end }}
+targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
+build_targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
+build_on_upload = true
+
+[http]
+listen = "{{cfg.conf.service.listen}}"
+port = {{cfg.conf.service.port}}
+
+[oauth]
+provider       = "chef-automate"
+token_url      = "https://{{cfg.binds.session.sys.ip}}:{{cfg.binds.session.cfg.port}}/token"
+userinfo_url   = "https://{{cfg.binds.session.sys.ip}}:{{cfg.binds.session.cfg.port}}/userinfo"
+redirect_url   = "/bldr"
+client_id      = "automate-builder-api"
+client_secret  = "{{getSecret "bldr.auth_client_secret"}}"
+
+[s3]
+endpoint = "https://{{cfg.binds.minio.sys.ip}}:{{cfg.binds.minio.cfg.port}}"
+backend = "minio"
+key_id = "{{getSecret "minio.access_key"}}"
+secret_key = "{{getSecret "minio.secret_key"}}"
+bucket_name = "depot"
+
+{{- if cfg.conf.artifactory.enabled }}
+[artifactory]
+api_url = "{{ cfg.conf.artifactory.api_url }}"
+api_key = "{{ cfg.conf.artifactory.api_key }}"
+repo = "{{ cfg.conf.artifactory.repo }}"
+{{- end }}
+
+[ui]
+root = "{{svc_static_path}}"
+
+[memcache]
+ttl = {{cfg.conf.memcache.ttl}}
+[[memcache.hosts]]
+{{- if cfg.binds.memcache.sys.ip }}
+host = "{{cfg.binds.memcache.sys.ip}}"
+{{- else }}
+{{ fail "missing memcache ip" }}
+{{- end }}
+{{- if cfg.binds.memcache.cfg.port }}
+port = {{cfg.binds.memcache.cfg.port}}
+{{- else }}
+{{ fail "missing memcache port" }}
+{{- end }}
+
+[datastore]
+host = "{{ pg_gateway_host }}"
+port = {{ pg_gateway_port }}
+database = "{{cfg.conf.datastore.database}}"
+{{- if is_external_pg }}
+  {{- if eq "password" .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetScheme.GetValue }}
+user = "{{ .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetPassword.GetDbuser.GetUsername.GetValue }}"
+password = "{{ .Platform.GetPlatform.GetExternalPostgresql.GetAuth.GetPassword.GetDbuser.GetPassword.GetValue }}"
+  {{- else }}
+    {{ fail "unsupported auth scheme" }}
+  {{- end }}
+  {{- if .Platform.GetPlatform.GetExternalPostgresql.GetSsl }}
+    {{- if .Platform.GetPlatform.GetExternalPostgresql.GetSsl.GetEnable.GetValue }}
+ssl_mode = "verify-ca"
+ssl_root_cert "{{pg_root_ca_cert_path}}"
+    {{- else }}
+ssl_mode = "disable"
+    {{- end }}
+  {{- end }}
+{{- else }}
+user = "{{cfg.conf.datastore.user}}"
+ssl_mode = "verify-ca"
+ssl_root_cert = "{{svc_root_ca_path}}"
+ssl_key = "{{svc_key_path}}"
+ssl_cert = "{{svc_cert_path}}"
+{{- end }}

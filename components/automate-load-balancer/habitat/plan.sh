@@ -29,6 +29,7 @@ pkg_binds_optional=(
   [session-service]="port"
   [automate-cs-nginx]="port"
   [automate-workflow-nginx]="port"
+  [automate-builder-api-proxy]="port"
 )
 
 do_download() {
