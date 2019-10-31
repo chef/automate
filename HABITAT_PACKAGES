@@ -69,7 +69,7 @@ automate-workflow-web components/automate-workflow-web
 data-feed-service components/data-feed-service
 event-feed-service components/event-feed-service
 cereal-service components/cereal-service
-chef/automate-minio components/automate-minio
-chef/automate-builder-memcached components/automate-builder-memcached
-chef/automate-builder-api components/automate-builder-api
-chef/automate-builder-api-proxy components/automate-builder-api-proxy
+automate-minio components/automate-minio
+automate-builder-memcached components/automate-builder-memcached
+automate-builder-api components/automate-builder-api
+automate-builder-api-proxy components/automate-builder-api-proxy
