@@ -33,4 +33,6 @@ chef-loading-spinner[fixed] {
   bottom: 0;
   background: var(--chef-loading-bg-color);
   z-index: 200;
+  backdrop-filter: blur(5px);
+  backdrop-filter: blur(10px);
 }

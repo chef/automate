@@ -15,3 +15,59 @@ chef-table {
     margin-top: 42px;
   }
 }
+
+.tably {
+  display: flex;
+  flex-flow: column nowrap;
+
+  tr {
+    display: flex;
+    width: 100%;
+    margin-bottom: 0.5em;
+    flex-flow: row nowrap;
+  }
+
+  th,
+  td {
+    display: flex;
+    padding: 1em;
+    min-width: 0;
+    border-top: 1px solid var(--chef-grey);
+    border-bottom: 1px solid var(--chef-grey);
+    flex-flow: row nowrap;
+    flex-basis: 0;
+    flex-grow: 1;
+    align-items: center;
+    justify-content: flex-start;
+    font-size: 14px;
+
+    &:first-child {
+      border-left: 1px solid var(--chef-grey);
+      border-top-left-radius: var(--chef-border-radius);
+      border-bottom-left-radius: var(--chef-border-radius);
+    }
+
+    &:last-child {
+      border-right: 1px solid var(--chef-grey);
+      border-top-right-radius: var(--chef-border-radius);
+      border-bottom-right-radius: var(--chef-border-radius);
+    }
+
+    chef-button {
+      margin: -0.5em 0;
+    }
+
+    chef-button + chef-button {
+      margin-left: 0.5em;
+    }
+  }
+
+  th {
+    background-color: var(--chef-lightest-grey);
+    font-weight: 700;
+  }
+
+  td{
+    background-color: var(--chef-white);
+  }
+}

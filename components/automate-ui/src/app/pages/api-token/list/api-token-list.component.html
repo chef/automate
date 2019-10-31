@@ -8,25 +8,14 @@
       <chef-subheading>API tokens grant authorized access to the Chef Automate API.</chef-subheading>
     </chef-page-header>
 
-    <app-create-object-modal
-      [visible]="createModalVisible"
-      [creating]="creatingToken"
-      [conflictErrorEvent]="conflictErrorEvent"
-      objectNoun="token"
-      [createForm]="createTokenForm"
-      [showProjectsDropdown]="projectsEnabled$ | async"
-      [assignableProjects]="dropdownProjects"
-      (close)="closeCreateModal()"
-      (createClicked)="createToken()">
+    <app-create-object-modal [visible]="createModalVisible" [creating]="creatingToken"
+      [conflictErrorEvent]="conflictErrorEvent" objectNoun="token" [createForm]="createTokenForm"
+      [showProjectsDropdown]="projectsEnabled$ | async" [assignableProjects]="dropdownProjects"
+      (close)="closeCreateModal()" (createClicked)="createToken()">
     </app-create-object-modal>
 
-    <app-delete-object-modal
-      [visible]="deleteModalVisible"
-      objectNoun="token"
-      [objectName]="tokenToDelete?.name"
-      (close)="closeDeleteModal()"
-      (deleteClicked)="deleteToken()"
-      objectAction="Delete">
+    <app-delete-object-modal [visible]="deleteModalVisible" objectNoun="token" [objectName]="tokenToDelete?.name"
+      (close)="closeDeleteModal()" (deleteClicked)="deleteToken()" objectAction="Delete">
     </app-delete-object-modal>
 
     <div class="page-body">
@@ -41,45 +30,33 @@
         </app-authorized>
       </chef-toolbar>
       <app-authorized [anyOf]="[['/iam/v2beta/tokens', 'get'], ['/auth/tokens', 'get']]">
-        <chef-table *ngIf="(apiTokenCount$ | async) > 0">
-          <chef-thead>
-            <chef-tr>
-              <chef-th>Name</chef-th>
-              <chef-th *ngIf="(iamMajorVersion$ | async) !== 'v1'">ID</chef-th>
-              <chef-th *ngIf="projectsEnabled$ | async">Projects</chef-th>
-              <chef-th>Created Date</chef-th>
-              <chef-th>Status</chef-th>
-              <chef-th class="controls"></chef-th>
-            </chef-tr>
-          </chef-thead>
-          <chef-tbody>
-            <chef-tr *ngFor="let token of sortedApiTokens$ | async">
-              <chef-td>
-                <a [routerLink]="['/settings/tokens', token.id]">{{ token.name }}</a>
-              </chef-td>
-              <chef-td *ngIf="(iamMajorVersion$ | async) !== 'v1'">{{ token.id }}</chef-td>
-              <chef-td *ngIf="projectsEnabled$ | async" class="projects-column">
-                <span *ngIf="token.projects.length === 0">{{ unassigned }}</span>
-                <span *ngIf="token.projects.length === 1">{{ token.projects[0] }}</span>
-                <span *ngIf="token.projects.length > 1">{{ token.projects.length }} projects</span>
-              </chef-td>
-              <chef-td>{{ token.created_at | datetime: RFC2822 }}</chef-td>
-              <chef-td>
-                <ng-container *ngIf="token.active">Active</ng-container>
-                <ng-container *ngIf="!token.active">Inactive</ng-container>
-              </chef-td>
-              <chef-td class="controls">
-                <chef-control-menu id="menu-{{token.id}}">
-                  <chef-option (click)="notifyCopy()">
-                    <chef-clipboard plain value={{token.value}} label="Copy Token" icon=""></chef-clipboard>
-                  </chef-option>
-                  <chef-option (click)="toggleActive(token)">Toggle Status</chef-option>
-                  <chef-option (click)="startTokenDelete(token)">Delete Token</chef-option>
-                </chef-control-menu>
-              </chef-td>
-           </chef-tr>
-          </chef-tbody>
-        </chef-table>
+        <table class="tably" style="width:100%" *ngIf="(apiTokenCount$ | async) > 0">
+          <tr *ngFor="let token of sortedApiTokens$ | async">
+            <td>
+              <a [routerLink]="['/settings/tokens', token.id]">{{ token.name }}</a>
+            </td>
+            <td *ngIf="(iamMajorVersion$ | async) !== 'v1'">{{ token.id }}</td>
+            <td *ngIf="projectsEnabled$ | async" class="projects-column">
+              <span *ngIf="token.projects.length === 0">{{ unassigned }}</span>
+              <span *ngIf="token.projects.length === 1">{{ token.projects[0] }}</span>
+              <span *ngIf="token.projects.length > 1">{{ token.projects.length }} projects</span>
+            </td>
+            <td>{{ token.created_at | datetime: RFC2822 }}</td>
+            <td>
+              <ng-container *ngIf="token.active">Active</ng-container>
+              <ng-container *ngIf="!token.active">Inactive</ng-container>
+            </td>
+            <td class="controls">
+              <ul id="menu-{{token.id}}">
+                <li (click)="notifyCopy()">
+                  <chef-clipboard plain value={{token.value}} label="Copy Token" icon=""></chef-clipboard>
+                </li>
+                <li (click)="toggleActive(token)">Toggle Status</li>
+                <li (click)="startTokenDelete(token)">Delete Token</li>
+              </ul>
+            </td>
+          </tr>
+        </table>
       </app-authorized>
     </div>
   </main>

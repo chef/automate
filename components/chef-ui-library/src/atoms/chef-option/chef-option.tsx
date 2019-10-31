@@ -131,9 +131,6 @@ export class ChefOption {
     return Promise.resolve(this.width);
   }
 
-  componentWillLoad() {
-    this.width = this.el.scrollWidth;
-  }
 
   render() {
     return (
