@@ -573,6 +573,7 @@ steps:
       - /tmp/secrets-service.log
       - /tmp/event-service.log
       - /tmp/compliance.log
+      - /tmp/nodemanager-service.log
     env:
       ES_VER: 6
       LANG: en_US.UTF-8
@@ -600,7 +601,7 @@ steps:
       - /tmp/secrets-service.log
       - /tmp/event-service.log
       - /tmp/compliance.log
-      - /tmp/nodemanager.log
+      - /tmp/nodemanager-service.log
     env:
       ES_VER: 6
     timeout_in_minutes: 30
