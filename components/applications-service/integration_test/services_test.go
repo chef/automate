@@ -195,7 +195,7 @@ func TestGetServicesWithDisconnectedServices(t *testing.T) {
 	// The services should not count as disconnected until we request to mark
 	// them disconnected
 	reqDisconnectedOnly := &applications.ServicesReq{
-		Filter: []string{"disconnectedStatus:disconnected"},
+		Filter: []string{"status:disconnected"},
 	}
 	res, err := suite.ApplicationsServer.GetServices(ctx, reqDisconnectedOnly)
 	assert.NoError(t, err)
@@ -455,7 +455,7 @@ func TestGetServicesMultiServiceWithHealthFilter(t *testing.T) {
 		var (
 			ctx     = context.Background()
 			request = &applications.ServicesReq{
-				Filter: []string{"health:WARNING"},
+				Filter: []string{"status:WARNING"},
 			}
 			expected = &applications.ServicesRes{
 				Services: []*applications.Service{
@@ -492,7 +492,7 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 			request = &applications.ServicesReq{
 				Filter: []string{
 					"service_group_id:" + sgID,
-					"health:UNKNOWN",
+					"status:UNKNOWN",
 				},
 			}
 			expected = &applications.ServicesRes{

@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
@@ -203,11 +202,6 @@ func (app *ApplicationsServer) GetServicesBySG(
 	if err != nil {
 		log.WithError(err).Error("Error retrieving services health counts by service_group(s)")
 		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	// Adds the health filter if any was specified and converts the string to be uppercases
-	if len(request.GetHealth()) != 0 {
-		filters["health"] = []string{strings.ToUpper(request.GetHealth())}
 	}
 
 	// Verify if the service group exists

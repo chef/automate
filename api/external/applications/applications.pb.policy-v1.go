@@ -36,8 +36,6 @@ func init() {
 				switch want {
 				case "service_group_id":
 					return m.ServiceGroupId
-				case "health":
-					return m.Health
 				default:
 					return ""
 				}

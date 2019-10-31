@@ -40,11 +40,12 @@ type Client interface {
 }
 
 const (
-	Critical = "CRITICAL"
-	Warning  = "WARNING"
-	Unknown  = "UNKNOWN"
-	Ok       = "OK"
-	None     = "NONE"
+	Critical     = "CRITICAL"
+	Warning      = "WARNING"
+	Unknown      = "UNKNOWN"
+	Ok           = "OK"
+	Disconnected = "DISCONNECTED"
+	None         = "NONE"
 )
 
 type UpdateStrategy int

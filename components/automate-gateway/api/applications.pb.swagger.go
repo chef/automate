@@ -178,12 +178,6 @@ func init() {
             "default": "ASC"
           },
           {
-            "name": "health",
-            "in": "query",
-            "required": false,
-            "type": "string"
-          },
-          {
             "name": "filter",
             "in": "query",
             "required": false,

@@ -170,6 +170,7 @@ var validFilterFields = []string{
 	"site",
 	"service_full",
 	"group_name",
+	"status",
 }
 
 // GetServicesHealthCounts retrieves the health counts from all services in the database.
@@ -178,14 +179,14 @@ var validFilterFields = []string{
 func (db *Postgres) GetServicesHealthCounts(filters map[string][]string) (*storage.HealthCounts, error) {
 	var (
 		sHealthCounts         storage.HealthCounts
-		WhereConstraints, err = buildWhereConstraintsFromFilters(filters, "WHERE")
+		whereConstraints, err = buildwhereConstraintsFromFilters(filters, "WHERE", false)
 	)
 	if err != nil {
 		return nil, err
 	}
 
 	// Formatting our Query with where constraints
-	formattedQuery := fmt.Sprintf(selectServicesHealthCounts, WhereConstraints)
+	formattedQuery := fmt.Sprintf(selectServicesHealthCounts, whereConstraints)
 
 	err = db.SelectOne(&sHealthCounts, formattedQuery)
 	if err != nil {
@@ -209,7 +210,7 @@ func (db *Postgres) GetServices(
 		services              []*composedService
 		offset                = pageSize * page
 		sortOrder             = "ASC"
-		WhereConstraints, err = buildWhereConstraintsFromFilters(filters, "WHERE")
+		whereConstraints, err = buildwhereConstraintsFromFilters(filters, "WHERE", true)
 	)
 
 	if err != nil {
@@ -222,7 +223,7 @@ func (db *Postgres) GetServices(
 
 	// Formatting our Query with where constraints, sort field and sort order
 	formattedQuery := fmt.Sprintf(selectServiceByServiceGroupID,
-		WhereConstraints,
+		whereConstraints,
 		orderByStatementFromSortField(sortField),
 		sortOrder,
 	)
@@ -235,7 +236,7 @@ func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string, f
 	// We do not want to filter on the fieldname we are looking up, because a user may want to use multiple values for searching
 	delete(filters, fieldName)
 	// Pass "AND" for firstKeyword because we build the WHERE with the query fragment
-	whereConstraints, err := buildWhereConstraintsFromFilters(filters, "AND")
+	whereConstraints, err := buildwhereConstraintsFromFilters(filters, "AND", false)
 	if err != nil {
 		return nil, err
 	}
@@ -358,7 +359,7 @@ func convertComposedServiceToStorage(svc *composedService) *storage.Service {
 	return (*storage.Service)(svc)
 }
 
-// buildWhereConstraintsFromFilters converts the provided filters into SQL 'WHERE' constraints
+// buildwhereConstraintsFromFilters converts the provided filters into SQL 'WHERE' constraints
 //
 // This function will be useful when we have the search bar and the user start building a set
 // of filters like the following one:
@@ -378,78 +379,71 @@ func convertComposedServiceToStorage(svc *composedService) *storage.Service {
 //
 // firstKeyword is added so you can build onto existing constraints that already have a 'WHERE' keyword declared
 // to build onto existing constraints pass in an 'AND' keyword or 'OR' depending on your use case.
-func buildWhereConstraintsFromFilters(filters map[string][]string, firstKeyword string) (string, error) {
+func buildwhereConstraintsFromFilters(filters map[string][]string, firstKeyword string, includeStatusFilter bool) (string, error) {
 	var (
 		firstStatement   = true
-		WhereConstraints = ""
+		whereConstraints = ""
 	)
 
 	for filter, values := range filters {
-		if len(values) == 0 || filter == "status" || filter == "STATUS" {
-			// We ignore the status field should it be passed since it is often lumped in with the other filters
-			// It does not apply to the services or the suggestions we want because it is a service-group level concept.
+		// We want to ignore the status filter when we are doing health counts, because we want the counts for all
+		// of the statuses.
+		if len(values) == 0 || (!includeStatusFilter && (filter == "status" || filter == "STATUS")) {
 			continue
 		}
 
 		if firstStatement { // Let the calling function determine if this starts with WHERE or AND
-			WhereConstraints = firstKeyword
+			whereConstraints = firstKeyword
 			firstStatement = false
 		} else {
-			WhereConstraints = WhereConstraints + " AND"
+			whereConstraints = whereConstraints + " AND"
 		}
 
 		switch filter {
 		case "service_group_id":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("service_group_id", values)
+			whereConstraints = whereConstraints + buildORStatementFromValues("service_group_id", values)
 
-		case "health":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("health", values)
+		case "status":
+			whereConstraints = whereConstraints + buildHealthStatementFromValues(values)
 
 		case "origin":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("origin", values)
+			whereConstraints = whereConstraints + buildORStatementFromValues("origin", values)
 
 		case "channel":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("channel", values)
+			whereConstraints = whereConstraints + buildORStatementFromValues("channel", values)
 
 		case "site":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("site", values)
+			whereConstraints = whereConstraints + buildORStatementFromValues("site", values)
 
 		case "version":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("version", values)
+			whereConstraints = whereConstraints + buildORStatementFromValues("version", values)
 
 		case "buildstamp":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("release", values)
+			whereConstraints = whereConstraints + buildORStatementFromValues("release", values)
 
 		case "application":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("application", values)
+			whereConstraints = whereConstraints + buildORStatementFromValues("application", values)
 
 		case "environment":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("environment", values)
+			whereConstraints = whereConstraints + buildORStatementFromValues("environment", values)
 
 		case "group":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("s.service_group_name_suffix", values)
+			whereConstraints = whereConstraints + buildORStatementFromValues("s.service_group_name_suffix", values)
 
 		case "service":
-			WhereConstraints = WhereConstraints + buildORStatementFromValues("name", values)
-
-		case "disconnectedStatus":
-			// FIXME: fail on other values?
-			if values[0] == "disconnected" {
-				WhereConstraints = WhereConstraints + " disconnected"
-			}
+			whereConstraints = whereConstraints + buildORStatementFromValues("name", values)
 
 		default:
 			return "", errors.Errorf("invalid filter. (%s:%s)", filter, values)
 		}
 	}
-
-	return WhereConstraints, nil
+	return whereConstraints, nil
 }
 
 // buildORStatementFromValues generates SQL 'OR' statement from the provided values of a single filter
 //
 // This function accepts an array of strings that are coming from a single filter (look at the
-// function 'buildWhereConstraintsFromFilters') and builds an SQL OR statement. In the case that
+// function 'buildwhereConstraintsFromFilters') and builds an SQL OR statement. In the case that
 // the array of values is size=1, it will only return a single constraint without any OR statement.
 //
 // Example 1: A filter with a single value.
@@ -482,6 +476,29 @@ func buildORStatementFromValues(field string, values []string) string {
 		} else {
 			ORConstraint = ORConstraint + fmt.Sprintf(" %s = '%s'", field, pgutils.EscapeLiteralForPG(value))
 		}
+		secondStatement = true
+	}
+
+	return ORConstraint
+}
+
+func buildHealthStatementFromValues(values []string) string {
+	var (
+		secondStatement = false
+		ORConstraint    = ""
+	)
+
+	for _, value := range values {
+		if secondStatement {
+			ORConstraint = ORConstraint + " OR"
+		}
+		if value == "disconnected" {
+			ORConstraint = " disconnected"
+		} else {
+			ORConstraint = ORConstraint + fmt.Sprintf(" %s = '%s'", "health",
+				pgutils.EscapeLiteralForPG(strings.ToUpper(value)))
+		}
+
 		secondStatement = true
 	}
 
