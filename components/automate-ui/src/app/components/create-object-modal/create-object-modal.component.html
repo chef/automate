@@ -44,7 +44,7 @@
             <chef-button tertiary (click)="modifyID = true" id="edit-button-object-modal" data-cy="edit-button">Edit ID</chef-button>
           </chef-toolbar>
         </div>
-        <div class="checkbox">
+        <div class="checkbox" *ngIf="projectNoteVisible">
           <chef-checkbox checked="true" disabled="true">
             Also create owner, editor, and viewer policies for this project.
           </chef-checkbox>
