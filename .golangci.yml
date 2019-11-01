@@ -1,0 +1,36 @@
+run:
+  deadline: 5m
+  tests: false
+  modules-download-mode: vendor
+
+issues:
+  exclude-use-default: false
+  max-same-issues: 0
+
+linters-settings:
+  godox:
+    keywords:
+      - NOCOMMIT
+
+linters:
+  enable-all: true
+  disable:
+    - dogsled
+    - dupl
+    - funlen
+    - gocognit
+    - goconst
+    - maligned
+    - megacheck
+    - interfacer
+    - golint
+    - gas
+    - gochecknoglobals
+    - gochecknoinits
+    - gocritic
+    - scopelint
+    - stylecheck
+    - unparam
+    - lll
+    - whitespace
+    - wsl

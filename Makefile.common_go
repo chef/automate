@@ -11,7 +11,7 @@ endif
 ifeq ($(UNAME_S),Darwin)
   PLATFORM:=darwin-amd64
 endif
-GOLANGCILINTVERSION?=1.18.0
+GOLANGCILINTVERSION?=1.21.0
 GOLANGCILINTTARBALL:=golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM).tar.gz
 
 LINTERARGS?=./...
@@ -26,7 +26,7 @@ $(REPOROOT)/cache/golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM)/golangci-lint
 	touch $(REPOROOT)/cache/golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM)/golangci-lint
 
 lint: $(REPOROOT)/cache/golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM)/golangci-lint
-	$(REPOROOT)/cache/golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM)/golangci-lint run -c $(REPOROOT)/.golangci.toml $(LINTERARGS)
+	$(REPOROOT)/cache/golangci-lint-$(GOLANGCILINTVERSION)-$(PLATFORM)/golangci-lint run -c $(REPOROOT)/.golangci.yml $(LINTERARGS)
 
 golang_version_check:
 	@$(REPOROOT)/scripts/golang_version_check.sh
