@@ -115,7 +115,7 @@ export class RunHistoryComponent implements OnInit, OnDestroy {
 
   onDownloadRunsReport() {
     const format = 'csv'; // or 'json'
-    const filename = `${moment.utc().format('YYYY-M-D')}.${format}`;
+    const filename = `${moment.utc().format(DateTime.REPORT_DATE_TIME)}.${format}`;
 
     const onComplete = () => console.warn('completed downloading report');
     const onError = _e => console.error('error downloading report');
