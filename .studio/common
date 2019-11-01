@@ -119,14 +119,10 @@ DOC
 function verify_all_protobuf_components() {
   install_if_missing core/git git
 
-  if ! compile_all_protobuf_components; then
-    return $?
-  fi
+  compile_all_protobuf_components || return $?
 
   git add .
-  if ! git diff --staged --exit-code --ignore-submodules=all; then
-    return $?
-  fi
+  git diff --staged --exit-code --ignore-submodules=all || return $?
 
   go_component_make api lint unit
 }
