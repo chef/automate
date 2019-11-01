@@ -17,7 +17,7 @@
             <input chefInput formControlName="name" (keyup)="handleNameInput($event)"/>
           </label>
           <chef-error
-            *ngIf="(ruleForm.get('name').hasError('required') || ruleForm.get('name').hasError('pattern')) && ruleForm.get('name').touched"
+            *ngIf="( ruleForm.get('name').hasError('required') && ruleForm.get('name').touched ) || ( ruleForm.get('name').hasError('pattern') && ruleForm.get('name').dirty )"
           >Rule Name is required.</chef-error>
         </chef-form-field>
 
