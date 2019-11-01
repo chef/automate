@@ -233,6 +233,9 @@ EOF
 [global.v1]
   fqdn = "${var.alb_fqdn == "" ? element(var.instance_fqdn, count.index) : var.alb_fqdn}"
 
+[auth_z.v1.sys.service]
+  project_limit = 50
+
 [deployment.v1.svc]
   channel = "${var.channel}"
   deployment_type = "${var.deployment_type}"
