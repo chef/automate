@@ -270,3 +270,87 @@ func TestDisconnectedServicesMultiServicesAllConnected(t *testing.T) {
 		assert.Equal(t, expectedStats, stats)
 	})
 }
+
+func TestDisconnectedServicesBasicSingleServiceMockedAsDisconnectedReconnects(t *testing.T) {
+	defer suite.DeleteDataFromStorage()
+
+	var (
+		err      error
+		ctx      = context.Background()
+		request  = &applications.DisconnectedServicesReq{ThresholdSeconds: 180}
+		expected = &applications.ServicesRes{
+			Services: []*applications.Service{
+				{
+					SupervisorId:        "abcd",
+					Group:               "postgres.default",
+					Release:             "core/postgres/0.1.0/20190101121212",
+					Status:              applications.ServiceStatus_RUNNING,
+					HealthCheck:         applications.HealthStatus_OK,
+					Fqdn:                "mytest.example.com",
+					Channel:             "testchannel",
+					Site:                "testsite",
+					PreviousHealthCheck: applications.HealthStatus_NONE,
+					Application:         a,
+					Environment:         e,
+					Disconnected:        true,
+				},
+			},
+		}
+		requestConnected  = &applications.ServicesReq{}
+		expectedConnected = &applications.ServicesRes{
+			Services: []*applications.Service{
+				{
+					SupervisorId:        "abcd",
+					Group:               "postgres.default",
+					Release:             "core/postgres/0.1.0/20190101121212",
+					Status:              applications.ServiceStatus_RUNNING,
+					HealthCheck:         applications.HealthStatus_OK,
+					Fqdn:                "mytest.example.com",
+					Channel:             "testchannel",
+					Site:                "testsite",
+					PreviousHealthCheck: applications.HealthStatus_NONE,
+					UpdateStrategy:      "AT-ONCE",
+					Application:         a,
+					Environment:         e,
+					Disconnected:        false,
+				},
+			},
+		}
+	)
+
+	event := NewHabitatEvent(
+		withSupervisorId("abcd"),
+		withServiceGroup("postgres.default"),
+		withPackageIdent("core/postgres/0.1.0/20190101121212"),
+		withStrategyAtOnce("testchannel"),
+		withFqdn("mytest.example.com"),
+		withSite("testsite"),
+	)
+
+	// Patch event timestamp to mock an old service message and mack it as disconnected
+	event.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now().Add(-time.Minute * 5))
+	require.NoError(t, err)
+	suite.IngestService(event)
+
+	t.Run("MarkDisconnectedServices with one disconnected service", func(t *testing.T) {
+		res, err := suite.ApplicationsServer.MarkDisconnectedServices(request.ThresholdSeconds)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.GetServices(), res)
+	})
+	t.Run("GetDisconnectedServices with one disconnected service", func(t *testing.T) {
+		response, err := suite.ApplicationsServer.GetDisconnectedServices(ctx, request)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+	})
+
+	//Send a new event for this service and it should reconnect
+	event.EventMetadata.OccurredAt, err = ptypes.TimestampProto(time.Now())
+	require.NoError(t, err)
+	suite.IngestService(event)
+
+	t.Run("GetServices with no disconnected service", func(t *testing.T) {
+		response, err := suite.ApplicationsServer.GetServices(ctx, requestConnected)
+		require.NoError(t, err)
+		assertServicesEqual(t, expectedConnected.GetServices(), response.GetServices())
+	})
+}

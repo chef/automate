@@ -43,10 +43,11 @@ INSERT INTO service_full (
 	application,
 	environment,
 	last_event_occurred_at,
-	service_group_id
+	service_group_id,
+	disconnected
 )
 VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
   )
 ON CONFLICT ON CONSTRAINT service_full_name_supervisor_id_key
 DO UPDATE SET (
@@ -65,7 +66,8 @@ DO UPDATE SET (
 	application,
 	environment,
 	last_event_occurred_at,
-	service_group_id
+	service_group_id,
+	disconnected
 ) = (
 	EXCLUDED.origin,
 	EXCLUDED.version,
@@ -82,7 +84,8 @@ DO UPDATE SET (
 	EXCLUDED.application,
 	EXCLUDED.environment,
 	EXCLUDED.last_event_occurred_at,
-	EXCLUDED.service_group_id
+	EXCLUDED.service_group_id,
+	EXCLUDED.disconnected
 )
 ;
 `
@@ -249,7 +252,8 @@ func (db *Postgres) upsertServiceAndMetadata(
 		eventMetadata.GetApplication(),                       // application,
 		eventMetadata.GetEnvironment(),                       // environment
 		convertOrCreateGoTime(eventMetadata.GetOccurredAt()), // last_event_occurred_at
-		sgId, // service_group_id
+		sgId,  // service_group_id
+		false, // Disconnected (it is not disconnected since we are getting an event right now)
 	)
 
 	return err
