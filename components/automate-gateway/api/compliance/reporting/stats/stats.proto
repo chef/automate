@@ -139,14 +139,15 @@ message Query {
 }
 
 message Summary {
-	// Statistics for the controls executed in the compliance reports.
+	// Intentionally blank.
 	ControlsSummary controls_summary = 1;
-	// Statistics about the nodes scanned in the compliance reports.
+	// Intentionally blank.
 	NodeSummary node_summary = 2;
-	// Statistics on the overall compliance reports.
+	// Intentionally blank.
 	ReportSummary report_summary = 3;
 }
 
+// Statistics for the controls executed in the compliance reports.
 message ControlsSummary {
 	// The total number of failed controls in the reports.
 	int32 failures = 1;
@@ -162,6 +163,7 @@ message ControlsSummary {
 	int32 skipped = 6;
 }
 
+// Statistics about the nodes scanned in the compliance reports.
 message NodeSummary {
 	// The total number of nodes that passed their compliance scans.
 	int32 compliant = 1;
@@ -177,6 +179,7 @@ message NodeSummary {
 	int32 low_risk = 6;
 }
 
+// General statistics about the reports.
 message Stats {
 	// Deprecated. int64 types render into string types when serialized to satisfy all browsers
 	// Replaced by the `nodes_cnt` field
@@ -193,8 +196,9 @@ message Stats {
 	int32 controls = 6;
 }
 
+// Statistics on the overall compliance reports.
 message ReportSummary {
-	// General statistics about the reports.
+	// Intentionally blank.
 	Stats stats = 4;
 	// Overall aggregated status for all the reports.
 	string status = 1;
@@ -223,7 +227,7 @@ message Trends {
 message Profile {
 	// Set of statistics about the profiles executed in the reports.
 	repeated ProfileList profile_list = 1;
-	// Summary information about a specific profile's execution across the reports.
+	// Intentionally blank.
 	ProfileSummary profile_summary = 2;
 	// Summary information about a specific profile's control results across the reports.
 	repeated ControlStats control_stats = 3;
@@ -249,6 +253,7 @@ message ProfileList {
 
 }
 
+// Summary information about a specific profile's execution across the reports.
 message ProfileSummary {
 	// Name of the profile.
 	string name = 1;
@@ -268,12 +273,13 @@ message ProfileSummary {
 	string summary = 8;
 	// Supports information for the profile (which os it can run on).
 	repeated Support supports = 9;
-	// Statistics about the nodes that executed the profile.
+	// Intentionally blank.
 	ProfileSummaryStats stats = 10;
 	// Dependency information about the profile (which profiles it inherits).
 	repeated chef.automate.api.compliance.reporting.v1.Dependency depends = 11;
 }
 
+// Statistics about the nodes that executed the profile.
 message ProfileSummaryStats {
 	// Total number of failed nodes that executed the profile.
 	int32 failed = 1;

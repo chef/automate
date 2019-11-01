@@ -198,7 +198,8 @@ func init() {
           "format": "int32",
           "description": "The total number of skipped controls in the reports."
         }
-      }
+      },
+      "description": "Statistics for the controls executed in the compliance reports."
     },
     "chef.automate.api.compliance.reporting.stats.v1.FailureSummary": {
       "type": "object",
@@ -304,7 +305,8 @@ func init() {
           "format": "int32",
           "description": "The total number of nodes that failed their compliance scan with one or more control of minor impact."
         }
-      }
+      },
+      "description": "Statistics about the nodes scanned in the compliance reports."
     },
     "chef.automate.api.compliance.reporting.stats.v1.Profile": {
       "type": "object",
@@ -318,7 +320,7 @@ func init() {
         },
         "profile_summary": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.ProfileSummary",
-          "description": "Summary information about a specific profile's execution across the reports."
+          "description": "Intentionally blank."
         },
         "control_stats": {
           "type": "array",
@@ -416,7 +418,7 @@ func init() {
         },
         "stats": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.ProfileSummaryStats",
-          "description": "Statistics about the nodes that executed the profile."
+          "description": "Intentionally blank."
         },
         "depends": {
           "type": "array",
@@ -425,7 +427,8 @@ func init() {
           },
           "description": "Dependency information about the profile (which profiles it inherits)."
         }
-      }
+      },
+      "description": "Summary information about a specific profile's execution across the reports."
     },
     "chef.automate.api.compliance.reporting.stats.v1.ProfileSummaryStats": {
       "type": "object",
@@ -455,7 +458,8 @@ func init() {
           "format": "int32",
           "description": "Not used."
         }
-      }
+      },
+      "description": "Statistics about the nodes that executed the profile."
     },
     "chef.automate.api.compliance.reporting.stats.v1.Query": {
       "type": "object",
@@ -518,7 +522,7 @@ func init() {
       "properties": {
         "stats": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.Stats",
-          "description": "General statistics about the reports."
+          "description": "Intentionally blank."
         },
         "status": {
           "type": "string",
@@ -533,7 +537,8 @@ func init() {
           "type": "string",
           "description": "Not used."
         }
-      }
+      },
+      "description": "Statistics on the overall compliance reports."
     },
     "chef.automate.api.compliance.reporting.stats.v1.Stats": {
       "type": "object",
@@ -568,22 +573,23 @@ func init() {
           "format": "int32",
           "description": "The number of unique controls scanned in the reports."
         }
-      }
+      },
+      "description": "General statistics about the reports."
     },
     "chef.automate.api.compliance.reporting.stats.v1.Summary": {
       "type": "object",
       "properties": {
         "controls_summary": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.ControlsSummary",
-          "description": "Statistics for the controls executed in the compliance reports."
+          "description": "Intentionally blank."
         },
         "node_summary": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.NodeSummary",
-          "description": "Statistics about the nodes scanned in the compliance reports."
+          "description": "Intentionally blank."
         },
         "report_summary": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.stats.v1.ReportSummary",
-          "description": "Statistics on the overall compliance reports."
+          "description": "Intentionally blank."
         }
       }
     },

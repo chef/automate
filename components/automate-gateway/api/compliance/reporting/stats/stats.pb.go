@@ -246,11 +246,11 @@ func (m *Query) GetPerPage() int32 {
 }
 
 type Summary struct {
-	// Statistics for the controls executed in the compliance reports.
+	// Intentionally blank.
 	ControlsSummary *ControlsSummary `protobuf:"bytes,1,opt,name=controls_summary,json=controlsSummary,proto3" json:"controls_summary,omitempty"`
-	// Statistics about the nodes scanned in the compliance reports.
+	// Intentionally blank.
 	NodeSummary *NodeSummary `protobuf:"bytes,2,opt,name=node_summary,json=nodeSummary,proto3" json:"node_summary,omitempty"`
-	// Statistics on the overall compliance reports.
+	// Intentionally blank.
 	ReportSummary        *ReportSummary `protobuf:"bytes,3,opt,name=report_summary,json=reportSummary,proto3" json:"report_summary,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
@@ -303,6 +303,7 @@ func (m *Summary) GetReportSummary() *ReportSummary {
 	return nil
 }
 
+// Statistics for the controls executed in the compliance reports.
 type ControlsSummary struct {
 	// The total number of failed controls in the reports.
 	Failures int32 `protobuf:"varint,1,opt,name=failures,proto3" json:"failures,omitempty"`
@@ -388,6 +389,7 @@ func (m *ControlsSummary) GetSkipped() int32 {
 	return 0
 }
 
+// Statistics about the nodes scanned in the compliance reports.
 type NodeSummary struct {
 	// The total number of nodes that passed their compliance scans.
 	Compliant int32 `protobuf:"varint,1,opt,name=compliant,proto3" json:"compliant,omitempty"`
@@ -473,6 +475,7 @@ func (m *NodeSummary) GetLowRisk() int32 {
 	return 0
 }
 
+// General statistics about the reports.
 type Stats struct {
 	// Deprecated. int64 types render into string types when serialized to satisfy all browsers
 	// Replaced by the `nodes_cnt` field
@@ -560,8 +563,9 @@ func (m *Stats) GetControls() int32 {
 	return 0
 }
 
+// Statistics on the overall compliance reports.
 type ReportSummary struct {
-	// General statistics about the reports.
+	// Intentionally blank.
 	Stats *Stats `protobuf:"bytes,4,opt,name=stats,proto3" json:"stats,omitempty"`
 	// Overall aggregated status for all the reports.
 	Status string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
@@ -737,7 +741,7 @@ func (m *Trends) GetTrends() []*Trend {
 type Profile struct {
 	// Set of statistics about the profiles executed in the reports.
 	ProfileList []*ProfileList `protobuf:"bytes,1,rep,name=profile_list,json=profileList,proto3" json:"profile_list,omitempty"`
-	// Summary information about a specific profile's execution across the reports.
+	// Intentionally blank.
 	ProfileSummary *ProfileSummary `protobuf:"bytes,2,opt,name=profile_summary,json=profileSummary,proto3" json:"profile_summary,omitempty"`
 	// Summary information about a specific profile's control results across the reports.
 	ControlStats         []*ControlStats `protobuf:"bytes,3,rep,name=control_stats,json=controlStats,proto3" json:"control_stats,omitempty"`
@@ -895,6 +899,7 @@ func (m *ProfileList) GetSkipped() int32 {
 	return 0
 }
 
+// Summary information about a specific profile's execution across the reports.
 type ProfileSummary struct {
 	// Name of the profile.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -914,7 +919,7 @@ type ProfileSummary struct {
 	Summary string `protobuf:"bytes,8,opt,name=summary,proto3" json:"summary,omitempty"`
 	// Supports information for the profile (which os it can run on).
 	Supports []*Support `protobuf:"bytes,9,rep,name=supports,proto3" json:"supports,omitempty"`
-	// Statistics about the nodes that executed the profile.
+	// Intentionally blank.
 	Stats *ProfileSummaryStats `protobuf:"bytes,10,opt,name=stats,proto3" json:"stats,omitempty"`
 	// Dependency information about the profile (which profiles it inherits).
 	Depends              []*reporting.Dependency `protobuf:"bytes,11,rep,name=depends,proto3" json:"depends,omitempty"`
@@ -1025,6 +1030,7 @@ func (m *ProfileSummary) GetDepends() []*reporting.Dependency {
 	return nil
 }
 
+// Statistics about the nodes that executed the profile.
 type ProfileSummaryStats struct {
 	// Total number of failed nodes that executed the profile.
 	Failed int32 `protobuf:"varint,1,opt,name=failed,proto3" json:"failed,omitempty"`
