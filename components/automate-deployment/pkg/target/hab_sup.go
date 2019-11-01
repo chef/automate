@@ -39,7 +39,12 @@ type HabSup interface {
 // SupportsSupHup returns true if the provided hab-sup version supports
 // restarting hab-sup via SIGHUP
 func SupportsSupHup(habSupP habpkg.HabPkg) bool {
-	return habpkg.GreaterOrEqual(&habSupP, &minimumHabSupSighupFeature)
+	ge, err := habpkg.SemverishGreaterOrEqual(&habSupP, &minimumHabSupSighupFeature)
+	if err != nil {
+		logrus.WithError(err).Warnf("Could not do semantic version comparison of hab-sup package")
+		return false
+	}
+	return ge
 }
 
 // SupportsCleanShutdown returns true if the provided hab-sup version supports customized service shutdown behavior.

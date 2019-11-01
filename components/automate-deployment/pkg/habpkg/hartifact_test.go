@@ -66,10 +66,8 @@ func TestFindHartReturnsErrorIfABadGlobIsGenerated(t *testing.T) {
 func TestHartFromPathSuccess(t *testing.T) {
 	h, err := HartFromPath("/some/path/ssd-deployment-service-0.1.0-20180119115432-x86_64-linux.hart")
 	assert.NoError(t, err)
-	assert.Equal(t, 0, h.major)
-	assert.Equal(t, 1, h.minor)
-	assert.Equal(t, 0, h.patch)
-	assert.Equal(t, 20180119115432, h.Timestamp())
+	assert.Equal(t, "0.1.0", h.version)
+	assert.Equal(t, "20180119115432", h.release)
 }
 
 func TestHartFromPathFailure(t *testing.T) {
@@ -102,10 +100,8 @@ func TestHartStringMarshalUnmarshal(t *testing.T) {
 
 	assert.Equal(t, "ssd", unmarshalled.origin)
 	assert.Equal(t, "deployment-service", unmarshalled.name)
-	assert.Equal(t, 0, unmarshalled.major)
-	assert.Equal(t, 1, unmarshalled.minor)
-	assert.Equal(t, 0, unmarshalled.patch)
-	assert.Equal(t, 20180119115432, unmarshalled.Timestamp())
+	assert.Equal(t, "0.1.0", unmarshalled.version)
+	assert.Equal(t, "20180119115432", unmarshalled.release)
 }
 
 func TestHartJsonMarshalUnmarshal(t *testing.T) {
@@ -123,10 +119,8 @@ func TestHartJsonMarshalUnmarshal(t *testing.T) {
 
 	assert.Equal(t, "ssd", unmarshalled.origin)
 	assert.Equal(t, "deployment-service", unmarshalled.name)
-	assert.Equal(t, 0, unmarshalled.major)
-	assert.Equal(t, 1, unmarshalled.minor)
-	assert.Equal(t, 0, unmarshalled.patch)
-	assert.Equal(t, 20180119115432, unmarshalled.Timestamp())
+	assert.Equal(t, "0.1.0", unmarshalled.version)
+	assert.Equal(t, "20180119115432", unmarshalled.release)
 }
 
 func TestSortableHartsFromPaths(t *testing.T) {

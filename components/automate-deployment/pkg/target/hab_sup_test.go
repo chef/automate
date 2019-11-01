@@ -49,3 +49,10 @@ func TestHabSupHappyPath(t *testing.T) {
 	require.NoError(t, err)
 	assert.Equal(t, habpkg.NewFQ("core", "hab-sup", "0.63.0", "20180914145954"), supPkg)
 }
+
+func TestSupportsSupHup(t *testing.T) {
+	assert.Equal(t, false, SupportsSupHup(habpkg.NewFQ("core", "hab-sup", "0.62.0", "")))
+	assert.Equal(t, true, SupportsSupHup(habpkg.NewFQ("core", "hab-sup", "0.63.0", "20180914030447")))
+	assert.Equal(t, true, SupportsSupHup(habpkg.NewFQ("core", "hab-sup", "0.65.0", "")))
+	assert.Equal(t, true, SupportsSupHup(habpkg.NewFQ("core", "hab-sup", "0.90.0-dev", "")))
+}
