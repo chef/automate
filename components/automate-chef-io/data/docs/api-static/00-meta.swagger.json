@@ -28,11 +28,5 @@
   ],
   "produces": [
     "application/json"
-  ],
-  "x-tagGroups": [
-    {
-      "name": "Compliance",
-      "tags": ["Reporting", "StatsService"]
-    }
   ]
 }

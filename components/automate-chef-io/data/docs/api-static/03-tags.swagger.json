@@ -1,0 +1,12 @@
+{
+  "x-tagGroups": [
+    {
+      "name": "Compliance",
+      "tags": ["ReportingService", "StatsService"]
+    }
+  ],
+  "tags": [
+    { "name": "ReportingService", "x-displayName": "Reporting" },
+    { "name": "StatsService", "x-displayName": "Stats" }
+  ]
+}

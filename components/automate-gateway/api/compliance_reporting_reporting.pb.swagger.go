@@ -42,7 +42,7 @@ func init() {
           }
         ],
         "tags": [
-          "Reporting"
+          "ReportingService"
         ]
       }
     },
@@ -69,7 +69,7 @@ func init() {
           }
         ],
         "tags": [
-          "Reporting"
+          "ReportingService"
         ]
       }
     },
@@ -97,7 +97,7 @@ func init() {
           }
         ],
         "tags": [
-          "Reporting"
+          "ReportingService"
         ]
       }
     },
@@ -125,7 +125,7 @@ func init() {
           }
         ],
         "tags": [
-          "Reporting"
+          "ReportingService"
         ]
       }
     },
@@ -153,7 +153,7 @@ func init() {
           }
         ],
         "tags": [
-          "Reports"
+          "ReportingService"
         ]
       }
     },
@@ -181,7 +181,7 @@ func init() {
           }
         ],
         "tags": [
-          "Reporting"
+          "ReportingService"
         ]
       }
     },
@@ -216,7 +216,7 @@ func init() {
           }
         ],
         "tags": [
-          "Reporting"
+          "ReportingService"
         ]
       }
     },
@@ -244,7 +244,7 @@ func init() {
           }
         ],
         "tags": [
-          "Reporting"
+          "ReportingService"
         ]
       }
     },
