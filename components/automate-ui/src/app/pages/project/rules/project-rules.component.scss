@@ -19,22 +19,7 @@ chef-page {
   input {
     height: 45px;
     width: 100%;
-    padding: 12px 16px 12px 12px;
-    border-radius: 6px;
-    border: solid 1px $chef-grey;
-    outline: none;
-    color: $chef-primary-dark;
-    text-indent: 0.01px;
-    text-overflow: '';
-    font-weight: 400;
-    font-stretch: normal;
-    font-style: normal;
-    line-height: 1.5;
-    letter-spacing: 0.2px;
-
-    &:focus {
-      border: solid 1px $chef-primary-bright;
-    }
+    outline: 0;
   }
 
   #create-name,
@@ -170,11 +155,6 @@ chef-page {
       padding-bottom: 0;
     }
 
-    input[disabled] {
-      background-color: $chef-light-grey;
-      opacity: 0.5;
-    }
-
     &.attribute-field {
       display: inline-block;
       position: relative;
@@ -189,8 +169,7 @@ chef-page {
         font-weight: 200;
       }
 
-      select,
-      input {
+      select {
         min-width: 0;
         width: 100%;
       }

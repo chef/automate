@@ -14,7 +14,7 @@
         <chef-form-field id="create-name">
           <label>
             <span class="label">Rule Name <span aria-hidden="true">*</span></span>
-            <input formControlName="name" (keyup)="handleNameInput($event)"/>
+            <input chefInput formControlName="name" (keyup)="handleNameInput($event)"/>
           </label>
           <chef-error
             *ngIf="(ruleForm.get('name').hasError('required') || ruleForm.get('name').hasError('pattern')) && ruleForm.get('name').touched"
@@ -25,7 +25,7 @@
           <chef-form-field id="create-id">
             <label>
               <span class="label">Rule ID <span aria-hidden="true">*</span> </span>
-              <input formControlName="id" (keyup)="handleIDInput($event)" />
+              <input chefInput formControlName="id" (keyup)="handleIDInput($event)" />
             </label>
             <chef-error *ngIf="ruleForm.get('id').hasError('maxlength') && ruleForm.get('id').dirty">
               Rule ID must be 64 characters or less.
@@ -113,6 +113,7 @@
                 <label>
                   <span class="label">Value</span>
                   <input
+                    chefInput
                     formControlName="values"
                     [value]="condition.controls.values.value"
                     data-cy="rule-value"
