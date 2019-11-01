@@ -28,7 +28,7 @@ pair_matches_action[[pol_id, statement_id, pair]] {
 
 # This causes the has_member set to be generated and memoized once instead of
 # for each policy. Moreover it prevents the backtracking from generating duplicate
-# answers which be evaluated by the resource and action matchers.
+# answers that have to be evaluated by the resource and action matchers.
 has_member = authz.has_member
 
 match_pair[[effect, pair, pol_id, statement_id]] {

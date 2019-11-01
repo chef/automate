@@ -350,3 +350,59 @@ test_authorized_project_matches_only_allowed_projects_when_some_projects_denied 
 
 	actual_projects == {"p2"}
 }
+
+test_authorized_project_returning_single_value_with_one_project {
+	actual_projects = authorized_project with data.roles.project.actions as ["iam:teams:list"]
+		 with data.policies.polid1 as {
+			"members": ["user:local:dave"],
+			"statements": {"sid1": {"effect": "allow", "actions": ["*"], "resources": ["*"], "projects": ["foo-project"]}},
+		}
+		 with data.policies.polid2 as {
+			"members": ["user:local:dave"],
+			"statements": {"sid2": {"effect": "allow", "role": "project", "resources": ["*"], "projects": ["foo-project"]}},
+		}
+		 with input as {"subjects": ["user:local:dave"], "action": "iam:teams:list", "resource": "iam:teams", "projects": ["foo-project", "(unassigned)"]}
+
+	actual_projects == {"foo-project"}
+}
+
+test_authorized_project_returning_single_value_with_two_projects {
+	actual_projects = authorized_project with data.roles.project.actions as ["iam:teams:list"]
+		 with data.policies.polid1 as {
+			"members": ["user:local:dave"],
+			"statements": {"sid1": {"effect": "allow", "actions": ["*"], "resources": ["*"], "projects": ["project-1"]}},
+		}
+		 with data.policies.polid2 as {
+			"members": ["user:local:dave"],
+			"statements": {"sid2": {"effect": "allow", "role": "project", "resources": ["*"], "projects": ["project-2"]}},
+		}
+		 with input as {"subjects": ["user:local:dave"], "action": "iam:teams:list", "resource": "iam:teams", "projects": ["project-2", "project-1", "(unassigned)"]}
+
+	actual_projects == {"project-1", "project-2"}
+}
+
+test_authorized_project_returning_set_value {
+	authorized_project["foo-project"] with data.roles.project.actions as ["iam:teams:list"]
+		 with data.policies.polid1 as {
+			"members": ["user:local:dave"],
+			"statements": {"sid1": {"effect": "allow", "actions": ["*"], "resources": ["*"], "projects": ["foo-project"]}},
+		}
+		 with input as {"subjects": ["user:local:dave"], "action": "iam:teams:list", "resource": "iam:teams", "projects": ["foo-project", "(unassigned)"]}
+}
+
+# Each element in the result set when using indexing is a map of variable bindings and
+# those are not de-duplicated at present (see https://github.com/open-policy-agent/opa/issues/429)
+# This unit test just shows that duplicates might occur so the Go code needs to de-duplicate.
+# The OPA folks are considering a change to remove duplicates in the future, though.
+test_authorized_project_returning_multiple_values {
+	count([p | authorized_project[p]; p == "foo-project"]) == 2 with data.roles.project.actions as ["iam:teams:list"]
+		 with data.policies.polid1 as {
+			"members": ["user:local:dave"],
+			"statements": {"sid1": {"effect": "allow", "actions": ["*"], "resources": ["*"], "projects": ["foo-project"]}},
+		}
+		 with data.policies.polid2 as {
+			"members": ["user:local:dave"],
+			"statements": {"sid2": {"effect": "allow", "role": "project", "resources": ["*"], "projects": ["foo-project"]}},
+		}
+		 with input as {"subjects": ["user:local:dave"], "action": "iam:teams:list", "resource": "iam:teams", "projects": ["foo-project", "(unassigned)"]}
+}
