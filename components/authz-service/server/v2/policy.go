@@ -28,7 +28,7 @@ import (
 type policyServer struct {
 	log             logger.Logger
 	store           storage.Storage
-	engine          engine.V2pXWriter
+	engine          engine.V2p1Writer
 	v1              storage_v1.PoliciesLister
 	vSwitch         *VersionSwitch
 	vChan           chan api.Version
@@ -48,7 +48,7 @@ func NewMemstorePolicyServer(
 	ctx context.Context,
 	l logger.Logger,
 	pr PolicyRefresher,
-	e engine.V2pXWriter,
+	e engine.V2p1Writer,
 	pl storage_v1.PoliciesLister,
 	vSwitch *VersionSwitch,
 	vChan chan api.Version) (PolicyServer, error) {
@@ -61,7 +61,7 @@ func NewPostgresPolicyServer(
 	ctx context.Context,
 	l logger.Logger,
 	pr PolicyRefresher,
-	e engine.V2pXWriter,
+	e engine.V2p1Writer,
 	pl storage_v1.PoliciesLister,
 	vSwitch *VersionSwitch,
 	vChan chan api.Version) (PolicyServer, error) {
@@ -79,7 +79,7 @@ func NewPoliciesServer(
 	l logger.Logger,
 	pr PolicyRefresher,
 	s storage.Storage,
-	e engine.V2pXWriter,
+	e engine.V2p1Writer,
 	pl storage_v1.PoliciesLister,
 	vSwitch *VersionSwitch,
 	vChan chan api.Version) (PolicyServer, error) {
@@ -159,7 +159,7 @@ func (s *policyServer) CreatePolicy(
 			"error parsing policy %q: %s", req.Id, err.Error())
 	}
 
-	returnPol, err := s.store.CreatePolicy(ctx, &pol, s.isBeta2p1())
+	returnPol, err := s.store.CreatePolicy(ctx, &pol, false)
 	switch err {
 	case nil: // continue
 	case storage_errors.ErrConflict:
@@ -272,7 +272,7 @@ func (s *policyServer) UpdatePolicy(
 		return nil, status.Errorf(codes.InvalidArgument, "parse policy with ID %q: %s", req.Id, err.Error())
 	}
 
-	polInternal, err := s.store.UpdatePolicy(ctx, &storagePolicy, s.isBeta2p1())
+	polInternal, err := s.store.UpdatePolicy(ctx, &storagePolicy)
 	if err != nil {
 		switch err {
 		case storage_errors.ErrConflict:
@@ -418,7 +418,7 @@ func (s *policyServer) CreateRole(
 		return nil, status.Errorf(codes.InvalidArgument, "error parsing role %q: %s", req.Id, err.Error())
 	}
 
-	returnRole, err := s.store.CreateRole(ctx, storageRole, s.isBeta2p1())
+	returnRole, err := s.store.CreateRole(ctx, storageRole, false)
 
 	switch err {
 	case nil:
@@ -508,7 +508,7 @@ func (s *policyServer) UpdateRole(
 		return nil, status.Errorf(codes.InvalidArgument, "parse policy with ID %q: %s", req.Id, err.Error())
 	}
 
-	roleInternal, err := s.store.UpdateRole(ctx, storageRole, s.isBeta2p1())
+	roleInternal, err := s.store.UpdateRole(ctx, storageRole)
 	switch err {
 	case nil:
 	case storage_errors.ErrConflict:
@@ -566,13 +566,13 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 	}
 
 	for _, role := range storage.DefaultRoles() {
-		if _, err := s.store.CreateRole(ctx, &role, false); err != nil {
+		if _, err := s.store.CreateRole(ctx, &role, true); err != nil {
 			return nil, status.Errorf(codes.Internal, "reset to default roles: %s", err.Error())
 		}
 	}
 
 	for _, pol := range defaultPolicies {
-		if _, err := s.store.CreatePolicy(ctx, &pol, false); err != nil {
+		if _, err := s.store.CreatePolicy(ctx, &pol, true); err != nil {
 			return nil, status.Errorf(codes.Internal, "reset to default policies: %s", err.Error())
 		}
 	}
@@ -899,12 +899,7 @@ func (s *policyServer) statementFromAPI(statement *api.Statement) (storage.State
 	projects := make([]string, len(statement.Projects))
 
 	if len(statement.Projects) == 0 {
-		if s.isBeta2p1() {
-			// no projects is an error for v2.1
-			return v2.Statement{}, errors.New("policy statements must include projects")
-		}
-		// no projects OK for v2.0 but set to "all" to allow 2.1 upgrade to work when needed
-		projects = append(projects, constants.AllProjectsID)
+		return v2.Statement{}, errors.New("policy statements must include projects")
 	}
 
 	// map external representation of "all projects" to actual ID for that meta-project
@@ -948,9 +943,4 @@ func (s *policyServer) setVersionForInterceptorSwitch(v api.Version) {
 	if s.vChan != nil {
 		s.vChan <- v
 	}
-}
-
-func (s *policyServer) isBeta2p1() bool {
-	version := s.vSwitch.Version
-	return version.Major == api.Version_V2 && version.Minor == api.Version_V1
 }

@@ -402,7 +402,7 @@ func BenchmarkV2FilterAuthorizedPairsRealWorldExample(b *testing.B) {
 			var resp []engine.Pair
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(count)...), pairs, true)
+				resp, err = s.V2FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(count)...), pairs)
 				if err != nil {
 					b.Error(err)
 				}
@@ -410,90 +410,6 @@ func BenchmarkV2FilterAuthorizedPairsRealWorldExample(b *testing.B) {
 			filteredPairsResp = resp
 		})
 	}
-}
-
-// BenchmarkInitPartialResultV2 is initializing a partial result object using
-// what currently (as of this commit) is a pretty default store content.
-// The JSON is taken from the store-pretty.json file in engine/opa/example_v2/.
-func BenchmarkInitPartialResultV2(b *testing.B) {
-	var r error
-	ctx := context.Background()
-
-	f, err := os.Open("example_v2/store-pretty.json")
-	require.NoError(b, err, "read example store JSON file")
-	defer f.Close()
-
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(b, err, "init logger")
-	store := inmem.NewFromReader(f)
-
-	b.Run("default policies", func(b *testing.B) {
-		s, err := New(ctx, l)
-		require.NoError(b, err, "init state")
-		s.v2Store = store
-
-		for n := 0; n < b.N; n++ {
-			r = s.initPartialResultV2(ctx)
-			if r != nil {
-				b.Error(r)
-			}
-		}
-		errResult = r
-	})
-
-	s, err := New(ctx, l)
-	require.NoError(b, err, "init state")
-	s.v2Store = store
-
-	r = s.initPartialResultV2(ctx)
-	if r != nil {
-		b.Error(r)
-	}
-
-	b.Run("IsAuthorized(allow) with the result of BenchmarkInitPartialResultV2", func(b *testing.B) {
-		var resp bool
-		var err error
-		for n := 0; n < b.N; n++ {
-			resp, err = s.V2IsAuthorized(ctx, []string{"user:local:test@example.com"}, "iam:policies:get", "iam:policyVersion")
-			if err != nil {
-				b.Error(err)
-			}
-			if !resp {
-				b.Error("expected authorized = true")
-			}
-		}
-		authzResponse = resp
-	})
-
-	b.Run("IsAuthorized(deny) with the result of BenchmarkInitPartialResultV2", func(b *testing.B) {
-		var resp bool
-		var err error
-		for n := 0; n < b.N; n++ {
-			resp, err = s.V2IsAuthorized(ctx, []string{"user:local:test@example.com"}, "iam:policies:delete", "iam:policies:administrator-access")
-			if err != nil {
-				b.Error(err)
-			}
-			if resp {
-				b.Error("expected authorized = false")
-			}
-		}
-		authzResponse = resp
-	})
-
-	b.Run("IsAuthorized(default deny) with the result of BenchmarkInitPartialResultV2", func(b *testing.B) {
-		var resp bool
-		var err error
-		for n := 0; n < b.N; n++ {
-			resp, err = s.V2IsAuthorized(ctx, []string{"user:local:test@example.com"}, "iam:policies:delete", "iam:policies:whatever-access")
-			if err != nil {
-				b.Error(err)
-			}
-			if resp {
-				b.Error("expected authorized = false")
-			}
-		}
-		authzResponse = resp
-	})
 }
 
 // helpers

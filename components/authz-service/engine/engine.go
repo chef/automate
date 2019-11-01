@@ -18,11 +18,6 @@ type Engine interface {
 	// service needs V2Authorizer, the policy section cares about V2Writer), so we
 	// collect them here instead of introducing a V2Engine interface.
 	V2Authorizer
-	V2pXWriter
-}
-
-type V2pXWriter interface {
-	V2Writer
 	V2p1Writer
 }
 
@@ -47,18 +42,13 @@ type Authorizer interface {
 }
 
 type V2Authorizer interface {
-
-	// V2IsAuthorized returns an allow/deny decision
-	// allowed by the subjects/action/resource tuple.
-	V2IsAuthorized(context.Context, Subjects, Action, Resource) (bool, error)
-
 	// V2ProjectsAuthorized returns a subset of the requested projects (Projects)
 	// allowed by the subjects/action/resource tuple.
 	V2ProjectsAuthorized(context.Context, Subjects, Action, Resource, Projects) ([]string, error)
 
 	// FilterAuthorizedProjects returns a sublist of the passed-in pairs
 	// allowed by the subjects.
-	V2FilterAuthorizedPairs(context.Context, Subjects, []Pair, bool) ([]Pair, error)
+	V2FilterAuthorizedPairs(context.Context, Subjects, []Pair) ([]Pair, error)
 
 	// V2FilterAuthorizedProjects returns a list of allowed projects
 	// for the given subjects
@@ -68,10 +58,6 @@ type V2Authorizer interface {
 // Writer is the interface for writing policies to a decision engine
 type Writer interface {
 	SetPolicies(context.Context, map[string]interface{}) error
-}
-
-type V2Writer interface {
-	V2SetPolicies(context.Context, map[string]interface{}, map[string]interface{}) error
 }
 
 type V2p1Writer interface {

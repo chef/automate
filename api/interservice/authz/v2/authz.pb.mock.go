@@ -29,23 +29,10 @@ func NewAuthorizationServerMockWithoutValidation() *AuthorizationServerMock {
 // methods with "not implemented" returns
 type AuthorizationServerMock struct {
 	validateRequests              bool
-	IsAuthorizedFunc              func(context.Context, *IsAuthorizedReq) (*IsAuthorizedResp, error)
 	FilterAuthorizedPairsFunc     func(context.Context, *FilterAuthorizedPairsReq) (*FilterAuthorizedPairsResp, error)
 	FilterAuthorizedProjectsFunc  func(context.Context, *FilterAuthorizedProjectsReq) (*FilterAuthorizedProjectsResp, error)
 	ProjectsAuthorizedFunc        func(context.Context, *ProjectsAuthorizedReq) (*ProjectsAuthorizedResp, error)
 	ValidateProjectAssignmentFunc func(context.Context, *ValidateProjectAssignmentReq) (*ValidateProjectAssignmentResp, error)
-}
-
-func (m *AuthorizationServerMock) IsAuthorized(ctx context.Context, req *IsAuthorizedReq) (*IsAuthorizedResp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.IsAuthorizedFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'IsAuthorized' not implemented")
 }
 
 func (m *AuthorizationServerMock) FilterAuthorizedPairs(ctx context.Context, req *FilterAuthorizedPairsReq) (*FilterAuthorizedPairsResp, error) {
@@ -98,7 +85,6 @@ func (m *AuthorizationServerMock) ValidateProjectAssignment(ctx context.Context,
 
 // Reset resets all overridden functions
 func (m *AuthorizationServerMock) Reset() {
-	m.IsAuthorizedFunc = nil
 	m.FilterAuthorizedPairsFunc = nil
 	m.FilterAuthorizedProjectsFunc = nil
 	m.ProjectsAuthorizedFunc = nil

@@ -21,65 +21,6 @@ import (
  * which mock the engine results.                                            *
  ************ ************ ************ ************ ************ ************/
 
-func TestV2IsAuthorized(t *testing.T) {
-	ctx, engines := setupV2(t)
-	sub, act, res := "user:local:admin", "iam:users:create", "iam:users"
-
-	// We're always passing the same arguments to IsAuthorized(). This allows for
-	// not having to wrap sub/act/res in _every call_; instead, we pass args().
-	args := func() (context.Context, engine.Subjects, engine.Action, engine.Resource) {
-		return ctx, engine.Subject(sub), engine.Action(act), engine.Resource(res)
-	}
-
-	for desc, e := range engines {
-		t.Run(desc, func(t *testing.T) {
-			t.Run("when the store is empty, returns false", func(t *testing.T) {
-				actual, err := e.V2IsAuthorized(args())
-				require.NoError(t, err)
-				assert.False(t, actual)
-			})
-
-			t.Run("when one policy with one allow statement (inline action) matches, returns true", func(t *testing.T) {
-				pol := map[string]interface{}{
-					"members": engine.Subject(sub),
-					"statements": map[string]interface{}{
-						"statement-id-0": map[string]interface{}{
-							"actions":   []string{act},
-							"resources": []string{res},
-							"effect":    "allow",
-						},
-					},
-				}
-				setPoliciesV2(t, e, pol)
-				actual, err := e.V2IsAuthorized(args())
-				require.NoError(t, err)
-				assert.True(t, actual)
-			})
-
-			t.Run("when one policy with one allow statement (via role) matches, returns true", func(t *testing.T) {
-				pol := map[string]interface{}{
-					"members": engine.Subject(sub),
-					"statements": map[string]interface{}{
-						"statement-id-0": map[string]interface{}{
-							"role":      "handyman",
-							"resources": []string{res},
-							"effect":    "allow",
-						},
-					},
-				}
-				role := map[string]interface{}{
-					"id":      "handyman",
-					"actions": []string{act},
-				}
-				setPoliciesV2(t, e, pol, role)
-				actual, err := e.V2IsAuthorized(args())
-				require.NoError(t, err)
-				assert.True(t, actual)
-			})
-		})
-	}
-}
-
 func TestV2p1ProjectsAuthorized(t *testing.T) {
 	ctx, engines := setupV2p1(t)
 	sub, act, res := "user:local:admin", "iam:users:create", "iam:users"
@@ -446,13 +387,13 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 }
 
 func TestV2FilterAuthorizedPairs(t *testing.T) {
-	ctx, engines := setupV2(t)
+	ctx, engines := setupV2p1(t)
 	sub, act0, res0, act1, res1 := "user:local:someid", "iam:users:create",
 		"nodes:someid", "compliance:profiles:delete", "compliance:profiles"
 	pair0 := engine.Pair{Resource: engine.Resource(res0), Action: engine.Action(act0)}
 	pair1 := engine.Pair{Resource: engine.Resource(res1), Action: engine.Action(act1)}
-	args := func() (context.Context, engine.Subjects, []engine.Pair, bool) {
-		return ctx, engine.Subject(sub), []engine.Pair{pair0, pair1}, false
+	args := func() (context.Context, engine.Subjects, []engine.Pair) {
+		return ctx, engine.Subject(sub), []engine.Pair{pair0, pair1}
 	}
 
 	for desc, e := range engines {
@@ -479,7 +420,7 @@ func TestV2FilterAuthorizedPairs(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, policy0, policy1)
+				setPoliciesV2p1(t, e, policy0, policy1)
 
 				filtered, err := e.V2FilterAuthorizedPairs(args())
 				require.NoError(t, err)
@@ -497,7 +438,7 @@ func TestV2FilterAuthorizedPairs(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, policy)
+				setPoliciesV2p1(t, e, policy)
 
 				filtered, err := e.V2FilterAuthorizedPairs(args())
 				require.NoError(t, err)
@@ -519,7 +460,7 @@ func TestV2FilterAuthorizedPairs(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act0},
 				}
-				setPoliciesV2(t, e, policy, role)
+				setPoliciesV2p1(t, e, policy, role)
 
 				filtered, err := e.V2FilterAuthorizedPairs(args())
 				require.NoError(t, err)
@@ -547,7 +488,7 @@ func TestV2FilterAuthorizedPairs(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, policy0, policy1)
+				setPoliciesV2p1(t, e, policy0, policy1)
 
 				filtered, err := e.V2FilterAuthorizedPairs(args())
 				require.NoError(t, err)
@@ -594,7 +535,7 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2(t, e, policy0, policy1)
+				setPoliciesV2p1(t, e, policy0, policy1)
 				expectedProjects := []string{}
 
 				filtered, err := e.V2FilterAuthorizedProjects(args())
@@ -743,15 +684,7 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 	}
 }
 
-func setPoliciesV2(t testing.TB, e engine.Engine, policiesAndRoles ...interface{}) {
-	setPoliciesV2pX(t, false, e, policiesAndRoles...)
-}
-
 func setPoliciesV2p1(t testing.TB, e engine.Engine, policiesAndRoles ...interface{}) {
-	setPoliciesV2pX(t, true, e, policiesAndRoles...)
-}
-
-func setPoliciesV2pX(t testing.TB, twoPointOne bool, e engine.Engine, policiesAndRoles ...interface{}) {
 	t.Helper()
 	ctx := context.Background()
 
@@ -777,9 +710,13 @@ func setPoliciesV2pX(t testing.TB, twoPointOne bool, e engine.Engine, policiesAn
 	for _, role := range roles {
 		roleMap[role["id"].(string)] = role
 	}
-	if twoPointOne {
-		require.NoError(t, e.V2p1SetPolicies(ctx, policyMap, roleMap), "V2p1SetPolicies() [v2.1]")
-	} else {
-		require.NoError(t, e.V2SetPolicies(ctx, policyMap, roleMap), "V1SetPolicies() [v2]")
+	require.NoError(t, e.V2p1SetPolicies(ctx, policyMap, roleMap), "V2p1SetPolicies() [v2.1]")
+}
+
+func setupV2p1(t testing.TB) (context.Context, map[string]engine.Engine) {
+	ctx, engines := setup(t)
+	if o, ok := engines["opa"]; ok {
+		o.V2p1SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{})
 	}
+	return ctx, engines
 }

@@ -23,8 +23,9 @@ import (
 )
 
 const (
-	Applied = "applied"
-	Staged  = "staged"
+	Applied          = "applied"
+	Staged           = "staged"
+	SuperuserSubject = "tls:service:deployment-service:internal"
 )
 
 const (
@@ -1039,7 +1040,7 @@ func TestCreatePolicy(t *testing.T) {
 	store, db, _, prngSeed, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
-	ctx := context.Background()
+	ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 
 	cases := map[string]func(*testing.T){
 		"unattached policy with no statement": func(t *testing.T) {
@@ -1141,7 +1142,7 @@ func TestCreatePolicy(t *testing.T) {
 			}
 
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.CreatePolicy(ctx, &pol, true)
+				resp, err := store.CreatePolicy(ctx, &pol, false)
 				assert.Error(t, err)
 				_, correctError := err.(*projectassignment.ProjectsMissingError)
 				assert.True(t, correctError)
@@ -1607,9 +1608,8 @@ func TestCreatePolicy(t *testing.T) {
 				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.Error(t, err)
 				assert.Nil(t, resp)
-				_, ok := err.(*storage_errors.ForeignKeyError)
-				require.True(t, ok, "expected foreign key error")
-				assert.Equal(t, "project not found: not-real-project", err.Error())
+				_, ok := err.(*projectassignment.ProjectsMissingError)
+				require.True(t, ok, "expected projectassignment.ProjectsMissingError")
 			})
 
 			assertEmpty(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
@@ -1638,9 +1638,8 @@ func TestCreatePolicy(t *testing.T) {
 				resp, err := store.CreatePolicy(ctx, &pol, false)
 				require.Error(t, err)
 				assert.Nil(t, resp)
-				_, ok := err.(*storage_errors.ForeignKeyError)
-				require.True(t, ok, "expected foreign key error")
-				assert.Equal(t, "project not found: not-real-project", err.Error())
+				_, ok := err.(*projectassignment.ProjectsMissingError)
+				require.True(t, ok, "expected projectassignment.ProjectsMissingError")
 			})
 
 			assertEmpty(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
@@ -2520,7 +2519,7 @@ func TestUpdatePolicy(t *testing.T) {
 
 	cases := map[string]func(*testing.T){
 		"policy not found": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			polID := genSimpleID(t, prngSeed)
 			name, typeVal := "somename", storage.Custom
 			member := genMember(t, "user:local:albertine")
@@ -2531,14 +2530,14 @@ func TestUpdatePolicy(t *testing.T) {
 				Members: []storage.Member{member},
 			}
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				assert.Error(t, err)
 				assert.Equal(t, storage_errors.ErrNotFound, err)
 				assert.Nil(t, resp)
 			})
 		},
 		"policy not found with existing policies in store": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			// Add a different policy
 			polID0 := insertTestPolicy(t, db, "testpolicy")
 			insertTestStatement(t, db,
@@ -2554,14 +2553,14 @@ func TestUpdatePolicy(t *testing.T) {
 				Members: []storage.Member{member},
 			}
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				assert.Error(t, err)
 				assert.Equal(t, storage_errors.ErrNotFound, err)
 				assert.Nil(t, resp)
 			})
 		},
 		"policy with no statements, updating fields": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
@@ -2575,7 +2574,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2586,7 +2585,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertOne(t, db.QueryRow(membersCount))
 		},
 		"policy that updates the project diff to contain a nonexisting project returns ProjectsMissingError": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			initPolName := "testpolicy"
 			polID := insertTestPolicy(t, db, initPolName)
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
@@ -2602,7 +2601,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, true)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				assert.Error(t, err)
 				assert.Empty(t, resp)
 				_, correctError := err.(*projectassignment.ProjectsMissingError)
@@ -2613,7 +2612,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(policyFull, polID, newPolName, typeVal.String()))
 		},
 		"policy with no statements, changing the type": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
@@ -2628,7 +2627,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2639,7 +2638,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member.Name))
 		},
 		"policy with no statements, adding two statements": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			polID := insertTestPolicy(t, db, "testpolicy")
 			insertTestPolicyMember(t, db, polID, "user:local:albertine")
 
@@ -2665,7 +2664,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2678,7 +2677,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member.Name))
 		},
 		"policy with two statements, removing one statement": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 
 			polID := insertTestPolicy(t, db, "testpolicy")
 			sID0 := insertTestStatement(t, db,
@@ -2704,7 +2703,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2723,7 +2722,7 @@ func TestUpdatePolicy(t *testing.T) {
 		},
 
 		"policy with one statement, adding existing project to statement": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 
 			polID := insertTestPolicy(t, db, "testpolicy")
 			sID := insertTestStatement(t, db,
@@ -2750,7 +2749,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
@@ -2767,7 +2766,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_members WHERE name=$1`, member.Name))
 		},
 		"policy with one statement, adding non-existent project to statement fails": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			resources, actions := []string{"compliance:profiles"}, []string{"compliance:profiles:download"}
 			assertEmpty(t, db.QueryRow("SELECT count(*) FROM iam_statements"))
 
@@ -2795,7 +2794,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1)`, projID))
 
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.Error(t, err)
 				assert.Nil(t, resp)
 			})
@@ -2812,7 +2811,7 @@ func TestUpdatePolicy(t *testing.T) {
 				sID, pq.Array(resources), pq.Array(actions), "allow", polID))
 		},
 		"policy with no projects to some projects": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			name := "testPolicy"
 			polID := insertTestPolicy(t, db, name)
 
@@ -2826,7 +2825,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{projID}, resp.Projects)
 			})
@@ -2837,7 +2836,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 		"policy with project to no projects": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			name := "testPolicy"
 			polID := insertTestPolicy(t, db, name)
 
@@ -2854,7 +2853,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.ElementsMatch(t, expProjs, resp.Projects)
 			})
@@ -2865,7 +2864,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 		"policy with projects to same projects": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			// TODO optimize/opt-out if they're the same?
 
 			name := "testPolicy"
@@ -2888,7 +2887,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.Equal(t, expProjs, resp.Projects)
 			})
@@ -2900,7 +2899,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertCount(t, 2, expPolProjCount)
 		},
 		"policy with single project to diff project": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			name := "testPolicy"
 			polID := insertTestPolicy(t, db, name)
 
@@ -2921,7 +2920,7 @@ func TestUpdatePolicy(t *testing.T) {
 
 			expProjs := []string{projID2}
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.ElementsMatch(t, expProjs, resp.Projects)
 			})
@@ -2933,7 +2932,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 		"policy with one project to additional project": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			name := "testPolicy"
 			polID := insertTestPolicy(t, db, name)
 			assertEmpty(t, db.QueryRow(policyProjectsByProjectID, polID))
@@ -2954,7 +2953,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.Equal(t, expProjs, resp.Projects)
 			})
@@ -2968,7 +2967,7 @@ func TestUpdatePolicy(t *testing.T) {
 			assertCount(t, 2, projCount)
 		},
 		"policy with project to add non-existent project fails": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			name := "testPolicy"
 			polID := insertTestPolicy(t, db, name)
 
@@ -2984,7 +2983,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				assert.Error(t, err)
 				assert.Nil(t, resp)
 			})
@@ -2996,7 +2995,6 @@ func TestUpdatePolicy(t *testing.T) {
 			assertOne(t, db.QueryRow(policyProjectsByProjectID, polID))
 		},
 		"when the policy's projects and the project filter intersect, update policy": func(t *testing.T) {
-			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
@@ -3009,20 +3007,20 @@ func TestUpdatePolicy(t *testing.T) {
 				Type:    typeVal,
 				Members: []storage.Member{},
 			}
-			ctx = insertProjectsIntoContext(ctx, []string{projID1})
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{projID1}, []string{SuperuserSubject})
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 		},
 		"when the * project filter is passed, update policy": func(t *testing.T) {
-			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
 			insertPolicyProject(t, db, polID, projID1)
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{v2.AllProjectsExternalID}, []string{SuperuserSubject})
 
 			name, typeVal := "new-name", storage.Custom
 			pol := storage.Policy{
@@ -3031,16 +3029,14 @@ func TestUpdatePolicy(t *testing.T) {
 				Type:    typeVal,
 				Members: []storage.Member{},
 			}
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 		},
 		"when the policy has no projects and (unassigned) is in the projects filter, update policy": func(t *testing.T) {
-			ctx := context.Background()
 			polID := insertTestPolicy(t, db, "testpolicy")
 
 			name, typeVal := "new-name", storage.Custom
@@ -3051,16 +3047,16 @@ func TestUpdatePolicy(t *testing.T) {
 				Members: []storage.Member{},
 			}
 			projID1 := "team-rocket"
-			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{projID1, v2.UnassignedProjectID}, []string{SuperuserSubject})
 			assertPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
 				assert.Equal(t, &pol, resp)
 			})
 			assertOne(t, db.QueryRow(policyFull, polID, name, typeVal.String()))
 		},
 		"when the policy's projects and projects filter do not intersect, return NotFound": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			originalName := "blasting off again"
 			polID := insertTestPolicy(t, db, originalName)
 			projID1 := "team-rocket"
@@ -3078,7 +3074,7 @@ func TestUpdatePolicy(t *testing.T) {
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
 			assertNoPolicyChange(t, store, func() {
-				resp, err := store.UpdatePolicy(ctx, &pol, false)
+				resp, err := store.UpdatePolicy(ctx, &pol)
 				assert.Nil(t, resp)
 				assert.Equal(t, storage_errors.ErrNotFound, err)
 			})
@@ -5096,7 +5092,7 @@ func TestCreateRole(t *testing.T) {
 	store, db, _, _, _ := testhelpers.SetupTestDB(t)
 	defer db.CloseDB(t)
 	defer store.Close()
-	ctx := context.Background()
+	ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 
 	cases := map[string]func(*testing.T){
 		"successfully creates role with NO actions": func(t *testing.T) {
@@ -6109,28 +6105,28 @@ func TestUpdateRole(t *testing.T) {
 
 	cases := map[string]func(*testing.T){
 		"returns role not found error with empty database": func(t *testing.T) {
-			ctx := context.Background()
-			role, err := store.UpdateRole(ctx, &nonexistingRole, false)
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
+			role, err := store.UpdateRole(ctx, &nonexistingRole)
 
 			assert.Nil(t, role)
 			assert.Error(t, err)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
 		"returns role not found with several roles in database": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{})
 			insertTestRole(t, db, "my-id-2", "name", []string{"action2"}, []string{})
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			role, err := store.UpdateRole(ctx, &nonexistingRole, false)
+			role, err := store.UpdateRole(ctx, &nonexistingRole)
 
 			assert.Nil(t, role)
 			assert.Error(t, err)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
 		"updates name of a role": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{})
 			r := storage.Role{
 				ID:       dbRole.ID,
@@ -6139,7 +6135,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r, false)
+			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6149,7 +6145,7 @@ func TestUpdateRole(t *testing.T) {
 			assert.ElementsMatch(t, []string{}, updatedRole.Projects)
 		},
 		"updates action of a role": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			project1 := storage.Project{
 				ID:   "project-1",
 				Name: "name1",
@@ -6166,7 +6162,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{project1.ID},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r, false)
+			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6176,7 +6172,7 @@ func TestUpdateRole(t *testing.T) {
 			assert.ElementsMatch(t, []string{project1.ID}, updatedRole.Projects)
 		},
 		"updates the projects of a role": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			project1 := storage.Project{
 				ID:   "project-1",
 				Name: "name1",
@@ -6217,7 +6213,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{project2.ID, project3.ID, project4.ID},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r, false)
+			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6227,7 +6223,7 @@ func TestUpdateRole(t *testing.T) {
 			assert.ElementsMatch(t, []string{project2.ID, project3.ID, project4.ID}, updatedRole.Projects)
 		},
 		"updates the projects of a role to be empty": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			project1 := storage.Project{
 				ID:   "project-1",
 				Name: "name1",
@@ -6252,7 +6248,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r, false)
+			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6262,7 +6258,7 @@ func TestUpdateRole(t *testing.T) {
 			assert.ElementsMatch(t, []string{}, updatedRole.Projects)
 		},
 		"fails to update when a project filter is specified with no intersection": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			project1 := storage.Project{
 				ID:   "project-1",
 				Name: "name1",
@@ -6288,13 +6284,13 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{project2.ID},
 			}
 			ctx = insertProjectsIntoContext(ctx, []string{project1.ID})
-			updatedRole, err := store.UpdateRole(ctx, &r, false)
+			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			assert.Nil(t, updatedRole)
 			assert.Equal(t, storage_errors.ErrNotFound, err)
 		},
 		"updates successfully when a project filter is specified with an intersection": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			project1 := storage.Project{
 				ID:   "project-1",
 				Name: "name1",
@@ -6327,8 +6323,8 @@ func TestUpdateRole(t *testing.T) {
 				Actions:  []string{"newaction"},
 				Projects: []string{project2.ID},
 			}
-			ctx = insertProjectsIntoContext(ctx, []string{project2.ID, project1.ID})
-			updatedRole, err := store.UpdateRole(ctx, &r, false)
+			ctx = insertProjectsAndSubjectsIntoContext(context.Background(), []string{project2.ID, project1.ID}, []string{SuperuserSubject})
+			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6338,7 +6334,7 @@ func TestUpdateRole(t *testing.T) {
 			assert.ElementsMatch(t, []string{project2.ID}, updatedRole.Projects)
 		},
 		"updates successfully when a project filter is *": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			project1 := storage.Project{
 				ID:   "project-1",
 				Name: "name1",
@@ -6355,8 +6351,8 @@ func TestUpdateRole(t *testing.T) {
 				Actions:  []string{"newaction"},
 				Projects: []string{project1.ID},
 			}
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
-			updatedRole, err := store.UpdateRole(ctx, &r, false)
+			ctx = insertProjectsAndSubjectsIntoContext(context.Background(), []string{v2.AllProjectsExternalID}, []string{SuperuserSubject})
+			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6366,8 +6362,6 @@ func TestUpdateRole(t *testing.T) {
 			assert.ElementsMatch(t, []string{project1.ID}, updatedRole.Projects)
 		},
 		"updates successfully when a role has no projects": func(t *testing.T) {
-			ctx := context.Background()
-
 			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{})
 
 			r := storage.Role{
@@ -6376,8 +6370,8 @@ func TestUpdateRole(t *testing.T) {
 				Actions:  []string{"newaction"},
 				Projects: []string{},
 			}
-			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
-			updatedRole, err := store.UpdateRole(ctx, &r, false)
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{v2.UnassignedProjectID}, []string{SuperuserSubject})
+			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6387,7 +6381,7 @@ func TestUpdateRole(t *testing.T) {
 			assert.ElementsMatch(t, []string{}, updatedRole.Projects)
 		},
 		"updates the projects of a role to contain projects from empty": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			project1 := storage.Project{
 				ID:   "project-1",
 				Name: "name1",
@@ -6412,7 +6406,7 @@ func TestUpdateRole(t *testing.T) {
 				Projects: []string{project1.ID, project2.ID},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r, false)
+			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6422,7 +6416,7 @@ func TestUpdateRole(t *testing.T) {
 			assert.ElementsMatch(t, []string{project1.ID, project2.ID}, updatedRole.Projects)
 		},
 		"successfully runs even if nothing is actually changed": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{})
 			r := storage.Role{
 				ID:      dbRole.ID,
@@ -6430,7 +6424,7 @@ func TestUpdateRole(t *testing.T) {
 				Actions: dbRole.Actions,
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r, false)
+			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -6440,7 +6434,7 @@ func TestUpdateRole(t *testing.T) {
 			assert.ElementsMatch(t, []string{}, updatedRole.Projects)
 		},
 		"successfully updates multiple properties at once": func(t *testing.T) {
-			ctx := context.Background()
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{}, []string{SuperuserSubject})
 			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{})
 			r := storage.Role{
 				ID:      dbRole.ID,
@@ -6448,7 +6442,7 @@ func TestUpdateRole(t *testing.T) {
 				Actions: []string{"newaction"},
 			}
 
-			updatedRole, err := store.UpdateRole(ctx, &r, false)
+			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
 			assert.Equal(t, dbRole.ID, updatedRole.ID)
@@ -7065,9 +7059,12 @@ func createRuleObjectWithMultipleConditions(t *testing.T, id, projID string, rul
 	return rule
 }
 
+func insertProjectsAndSubjectsIntoContext(ctx context.Context, projects []string, subjects []string) context.Context {
+	return auth_context.NewOutgoingContext(auth_context.NewContext(ctx, subjects, projects, "res", "act", "v2.1"))
+}
+
 func insertProjectsIntoContext(ctx context.Context, projects []string) context.Context {
-	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(ctx,
-		[]string{}, projects, "resource", "action", "pol"))
+	return insertProjectsAndSubjectsIntoContext(ctx, projects, []string{})
 }
 
 func assertPolicyChange(t *testing.T, store storage.Storage, f func()) {

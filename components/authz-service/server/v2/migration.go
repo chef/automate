@@ -64,7 +64,7 @@ func (s *policyServer) migrateV1Policies(ctx context.Context) ([]error, error) {
 		if storagePol == nil {
 			continue // nothing to create
 		}
-		_, err = s.store.CreatePolicy(ctx, storagePol, false)
+		_, err = s.store.CreatePolicy(ctx, storagePol, true)
 		switch err {
 		case nil, storage_errors.ErrConflict: // ignore, continue
 		default:

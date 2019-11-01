@@ -43,7 +43,7 @@ func (s *State) bumpPolicyVersion() {
 	s.changeManager.notifyChange()
 }
 
-func (s *State) CreatePolicy(_ context.Context, inputPol *storage.Policy, checkProjects bool) (*storage.Policy, error) {
+func (s *State) CreatePolicy(_ context.Context, inputPol *storage.Policy, skipProjectsCheckOnV1PolicyMigration bool) (*storage.Policy, error) {
 	for _, item := range s.policies.Items() {
 		if pol, ok := item.Object.(*storage.Policy); ok &&
 			(pol.ID == inputPol.ID) {
@@ -150,7 +150,7 @@ func (s *State) AddPolicyMembers(
 	return pol.Members, nil
 }
 
-func (s *State) UpdatePolicy(_ context.Context, p *storage.Policy, checkProjects bool) (*storage.Policy, error) {
+func (s *State) UpdatePolicy(_ context.Context, p *storage.Policy) (*storage.Policy, error) {
 	item, exists := s.policies.Get(p.ID)
 	if !exists {
 		return nil, storage_errors.ErrNotFound
@@ -466,7 +466,7 @@ func (s *State) ListProjects(context.Context) ([]*storage.Project, error) {
 	return projects, nil
 }
 
-func (s *State) CreateRole(_ context.Context, role *storage.Role, checkProjects bool) (*storage.Role, error) {
+func (s *State) CreateRole(_ context.Context, role *storage.Role, skipProjectsCheckOnV1PolicyMigration bool) (*storage.Role, error) {
 	if err := s.roles.Add(role.ID, role, cache.NoExpiration); err != nil {
 		return nil, storage_errors.ErrConflict
 	}
@@ -515,7 +515,7 @@ func (s *State) DeleteRole(ctx context.Context, roleID string) error {
 	return nil
 }
 
-func (s *State) UpdateRole(_ context.Context, r *storage.Role, checkProjects bool) (*storage.Role, error) {
+func (s *State) UpdateRole(_ context.Context, r *storage.Role) (*storage.Role, error) {
 	item, exists := s.roles.Get(r.ID)
 	if !exists {
 		return nil, storage_errors.ErrNotFound

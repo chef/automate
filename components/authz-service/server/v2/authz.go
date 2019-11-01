@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -52,55 +51,10 @@ func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch, p 
 	}, nil
 }
 
-func (s *authzServer) IsAuthorized(
-	ctx context.Context,
-	req *api.IsAuthorizedReq) (*api.IsAuthorizedResp, error) {
-
-	authorized, err := s.engine.V2IsAuthorized(ctx,
-		engine.Subjects(req.Subjects),
-		engine.Action(req.Action),
-		engine.Resource(req.Resource))
-	s.logQuery(req, authorized, err)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-
-	return &api.IsAuthorizedResp{
-		Authorized: authorized,
-	}, nil
-}
-
 func (s *authzServer) ProjectsAuthorized(
 	ctx context.Context,
 	req *api.ProjectsAuthorizedReq) (*api.ProjectsAuthorizedResp, error) {
 	var authorizedProjects []string
-	// we check the version set in the channel on policy server
-	// in order to determine whether or not projects should factor in the authorization decision
-	if !s.isBeta2p1() {
-		authorized, err := s.engine.V2IsAuthorized(ctx,
-			engine.Subjects(req.Subjects),
-			engine.Action(req.Action),
-			engine.Resource(req.Resource))
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-		s.logQuery(&api.IsAuthorizedReq{
-			Subjects: req.Subjects,
-			Resource: req.Resource,
-			Action:   req.Action,
-		}, authorized, err)
-
-		// we translate the IsAuthorized bool response into an all or no projects response
-		// to align with what the `V2ProjectsAuthorized` call returns from the engine.
-		if authorized {
-			authorizedProjects = []string{constants.AllProjectsExternalID}
-		} else {
-			authorizedProjects = []string{}
-		}
-		return &api.ProjectsAuthorizedResp{
-			Projects: authorizedProjects,
-		}, nil
-	}
 
 	requestedProjects := req.ProjectsFilter
 
@@ -140,8 +94,7 @@ func (s *authzServer) FilterAuthorizedPairs(
 	req *api.FilterAuthorizedPairsReq) (*api.FilterAuthorizedPairsResp, error) {
 	resp, err := s.engine.V2FilterAuthorizedPairs(ctx,
 		engine.Subjects(req.Subjects),
-		toEnginePairs(req.Pairs),
-		s.isBeta2p1())
+		toEnginePairs(req.Pairs))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -204,10 +157,9 @@ func (s *authzServer) ValidateProjectAssignment(
 	ctx context.Context,
 	req *api.ValidateProjectAssignmentReq) (*api.ValidateProjectAssignmentResp, error) {
 
-	// If we aren't on v2.1, just return success. Other services shouldn't
-	// have to know and we shouldn't return failure for v2.0. We need to reset
-	// all of their projects on upgrade to v2.1 to be safe anyway.
-	if !s.isBeta2p1() {
+	// If we are on V1 just return success. Other services are calling
+	// this function in version unaware ways.
+	if s.isV1() {
 		return &api.ValidateProjectAssignmentResp{}, nil
 	}
 
@@ -243,11 +195,6 @@ func (s *authzServer) ValidateProjectAssignment(
 	}
 
 	return &api.ValidateProjectAssignmentResp{}, nil
-}
-
-func (s *authzServer) isBeta2p1() bool {
-	version := s.vSwitch.Version
-	return version.Major == api.Version_V2 && version.Minor == api.Version_V1
 }
 
 func (s *authzServer) getAllProjects(ctx context.Context) ([]string, error) {
@@ -287,19 +234,6 @@ func handleAllProjectsResponse(authorizedProjects, allProjects []string) []strin
 		authorizedProjects = []string{constants.AllProjectsExternalID}
 	}
 	return authorizedProjects
-}
-
-func (s *authzServer) logQuery(req *api.IsAuthorizedReq, authorized bool, err error) {
-	result := fmt.Sprintf("%t", authorized)
-	if err != nil {
-		result = err.Error()
-	}
-	s.log.WithFields(logger.KV{
-		"result":   result,
-		"subject":  req.Subjects,
-		"action":   req.Action,
-		"resource": req.Resource,
-	}).Info("Authorization Query")
 }
 
 func (s *authzServer) logProjectQuery(req *api.ProjectsAuthorizedReq, authorizedProjects []string) {
@@ -393,4 +327,9 @@ func NewSwitch(c chan api.Version) *VersionSwitch {
 		}
 	}()
 	return &x
+}
+
+func (s *authzServer) isV1() bool {
+	version := s.vSwitch.Version
+	return version.Major == api.Version_V1
 }
