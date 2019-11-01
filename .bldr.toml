@@ -1947,12 +1947,6 @@ plan_path = "components/automate-builder-api-proxy"
 paths = [
   "components/automate-builder-api-proxy/*"
 ]
-
-[data-lifecycle-service]
-plan_path = "components/data-lifecycle-service"
-paths = [
-  "components/data-lifecycle-service/*"
-]
 # GENERATED_HAB_PACKAGE_CONFIG_END
 
 [automate-workflow-ctl]
