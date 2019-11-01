@@ -579,7 +579,7 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 
 	// Added for testing only; these are handled by data migrations.
 	for _, project := range storage.DefaultProjects() {
-		if _, err := s.store.CreateProject(ctx, &project); err != nil {
+		if _, err := s.store.CreateProject(ctx, &project, false); err != nil {
 			return nil, status.Errorf(codes.Internal, "reset to default project: %s", err.Error())
 		}
 	}
