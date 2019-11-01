@@ -398,7 +398,6 @@ func (p *pg) insertPolicyStatementsWithQuerier(ctx context.Context,
 			pq.Array(s.Resources), s.Role, pq.Array(s.Projects),
 		)
 		if err != nil {
-			p.logger.Warnf("ABCDE: %s", err.Error())
 			return p.processError(err)
 		}
 	}
@@ -1509,42 +1508,67 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 }
 
 func (p *pg) addSupportPolicies(ctx context.Context, project *v2.Project, q Querier) error {
-	pol := v2.Policy{
-		ID:      fmt.Sprintf("%s-project-owners", project.ID),
-		Name:    fmt.Sprintf("%s Project Owners", project.ID),
+	policyParams := []struct {
+		id   string
+		name string
+		role string
+	}{
+		{
+			id:   fmt.Sprintf("%s-%s", project.ID, "project-owners"),
+			name: fmt.Sprintf("%s %s", project.Name, "Project Owners"),
+			role: constants_v2.ProjectOwnerRoleID,
+		},
+		{
+			id:   fmt.Sprintf("%s-%s", project.ID, "project-editors"),
+			name: fmt.Sprintf("%s %s", project.Name, "Project Editors"),
+			role: constants_v2.EditorRoleID,
+		},
+		{
+			id:   fmt.Sprintf("%s-%s", project.ID, "project-viewers"),
+			name: fmt.Sprintf("%s %s", project.Name, "Project Viewers"),
+			role: constants_v2.ViewerRoleID,
+		},
+	}
+
+	for _, param := range policyParams {
+		pol := generatePolicy(project.ID, param.id, param.name, param.role)
+
+		if err := p.insertPolicyWithQuerier(ctx, &pol, q); err != nil {
+			return err
+		}
+
+		if err := p.associatePolicyWithProjects(ctx, pol.ID, pol.Projects, q); err != nil {
+			return err
+		}
+
+		if err := p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, q); err != nil {
+			return err
+		}
+	}
+
+	if err := p.notifyPolicyChange(ctx, q); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func generatePolicy(projectID string, id string, name string, role string) v2.Policy {
+	return v2.Policy{
+		ID:      id,
+		Name:    name,
 		Members: []v2.Member{},
 		Statements: []v2.Statement{
 			{
 				Effect:    v2.Allow,
 				Resources: []string{"*"},
-				Projects:  []string{project.ID},
+				Projects:  []string{projectID},
 				Actions:   []string{},
-				Role:      constants_v2.ProjectOwnerRoleID,
+				Role:      role,
 			},
 		},
+		Projects: []string{projectID},
 	}
-
-	if err := p.insertPolicyWithQuerier(ctx, &pol, q); err != nil {
-		p.logger.Warnf("ABCDE> insertPolicyWithQuerier failed")
-		return err
-	}
-
-	if err := p.associatePolicyWithProjects(ctx, pol.ID, []string{project.ID}, q); err != nil {
-		p.logger.Warnf("ABCDE> associatePolicyWithProjectsfailed")
-		return err
-	}
-
-	if err := p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, q); err != nil {
-		p.logger.Warnf("ABCDE> insertPolicyStatementsWithQuerier")
-		return err
-	}
-
-	if err := p.notifyPolicyChange(ctx, q); err != nil {
-		p.logger.Warnf("ABCDE> notifyPolicyChange")
-		return err
-	}
-
-	return nil
 }
 
 func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Project, error) {
