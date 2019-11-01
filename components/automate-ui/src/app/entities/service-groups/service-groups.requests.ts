@@ -68,7 +68,6 @@ export class ServiceGroupsRequests {
     const options = {
       params: this.buildServicesBySGFilterParams(filters)
     };
-    console.log("object: %O", options)
     return this.httpClient.get<GroupServicesPayload>(url, options);
   }
 
