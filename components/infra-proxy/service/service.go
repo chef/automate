@@ -16,14 +16,15 @@ type Service struct {
 }
 
 // NewPostgresService returns an instance of Service that connects to a postgres storage backend.
-func NewPostgresService(l logger.Logger, migrationsConfig migration.Config) (*Service, error) {
+func NewPostgresService(l logger.Logger, migrationsConfig migration.Config, connFactory *secureconn.Factory) (*Service, error) {
 	p, err := postgres.New(l, migrationsConfig)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Service{
-		Logger:  l,
-		Storage: p,
+		Logger:      l,
+		ConnFactory: connFactory,
+		Storage:     p,
 	}, nil
 }

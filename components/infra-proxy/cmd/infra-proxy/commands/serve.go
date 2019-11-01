@@ -5,17 +5,17 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/chef/automate/components/infra-proxy/server"
-	"github.com/chef/automate/components/infra-proxy/service"
-	"github.com/chef/automate/components/infra-proxy/storage/postgres/migration"
-
-	platform_config "github.com/chef/automate/lib/platform/config"
-
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	"github.com/chef/automate/components/infra-proxy/server"
+	"github.com/chef/automate/components/infra-proxy/service"
+	"github.com/chef/automate/components/infra-proxy/storage/postgres/migration"
+	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
+	platform_config "github.com/chef/automate/lib/platform/config"
+	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/tracing"
 )
 
@@ -27,16 +27,16 @@ var serveCmd = &cobra.Command{
 }
 
 type config struct {
-	GRPC           string `mapstructure:"grpc"`
-	LogFormat      string `mapstructure:"log-format"`
-	LogLevel       string `mapstructure:"log-level"`
-	PGURL          string `mapstructure:"pg_url"`
-	Database       string `mapstructure:"database"`
-	MigrationsPath string `mapstructure:"migrations-path"`
+	GRPC            string `mapstructure:"grpc"`
+	LogFormat       string `mapstructure:"log-format"`
+	LogLevel        string `mapstructure:"log-level"`
+	certs.TLSConfig `mapstructure:"tls"`
+	PGURL           string `mapstructure:"pg_url"`
+	Database        string `mapstructure:"database"`
+	MigrationsPath  string `mapstructure:"migrations-path"`
 }
 
 func serve(cmd *cobra.Command, args []string) {
-
 	cmd.PersistentFlags().StringP("log-level", "l", "info", "log level")
 	cmd.PersistentFlags().StringP("log-format", "f", "text", "log format")
 	cmd.PersistentFlags().String("grpc", "127.0.0.1:9093", "grpc host and port")
@@ -71,6 +71,13 @@ func serve(cmd *cobra.Command, args []string) {
 		fail(errors.Wrap(err, "couldn't initialize logger"))
 	}
 
+	cfg.FixupRelativeTLSPaths(args[0])
+	serviceCerts, err := cfg.ReadCerts()
+	if err != nil {
+		fail(errors.Wrap(err, "Could not read certs"))
+	}
+	connFactory := secureconn.NewFactory(*serviceCerts)
+
 	mustBeADirectory(cfg.MigrationsPath)
 	u, err := url.Parse(cfg.PGURL)
 	if err != nil {
@@ -83,7 +90,7 @@ func serve(cmd *cobra.Command, args []string) {
 		Logger: l,
 	}
 
-	service, err := service.NewPostgresService(l, migrationConfig)
+	service, err := service.NewPostgresService(l, migrationConfig, connFactory)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}
