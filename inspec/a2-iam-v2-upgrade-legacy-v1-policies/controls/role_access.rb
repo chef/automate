@@ -2,17 +2,19 @@
 # copyright: 2018, Chef Software, Inc.
 # license: All rights reserved
 
-title 'IAM v2 role access API integration tests'
+title 'IAM v2.1 role access API integration tests'
 
-control 'iam-v2-roles-1' do
-  title 'v2-only access'
+control 'iam-v2p1-roles-1' do
+  title 'v2p1-only access'
   desc 'role-based access for editor and viewer when v1 policies are purged'
 
   VIEWER_USERNAME = 'viewer'
   EDITOR_USERNAME = 'editor'
   PROJECT_OWNER_USERNAME = 'projectowner'
   PROJECT_OWNER_ROLE = 'project-owner'
-  POLICY_ID = 'inspec-role-access-test'
+  ROLE_ACCESS_POLICY_ID = 'inspec-role-access-test'
+  UNASSIGNED_PROJECT_ID = '(unassigned)'
+  UNASSIGNED_PROJECT_NAME = UNASSIGNED_PROJECT_ID
 
   describe 'migrated legacy v1 policies' do
     it 'legacy policies can be deleted' do
@@ -42,24 +44,22 @@ control 'iam-v2-roles-1' do
         }.to_json
       )
 
-      puts create_user_resp.parsed_response_body
       expect(create_user_resp.http_status).to eq 200
-
       create_policy_resp = automate_api_request("/apis/iam/v2beta/policies",
         http_method: 'POST',
         request_body: {
-          id: POLICY_ID,
+          id: ROLE_ACCESS_POLICY_ID,
           name: 'inspec-role-access-test',
           members: ["user:local:#{PROJECT_OWNER_USERNAME}"],
           statements: [
             {
               effect: "ALLOW",
-              role: PROJECT_OWNER_ROLE
+              role: PROJECT_OWNER_ROLE,
+              projects: [UNASSIGNED_PROJECT_ID],
             }
           ]
         }.to_json
       )
-      puts create_policy_resp.parsed_response_body
       expect(create_policy_resp.http_status).to eq 200
     end
 
@@ -69,7 +69,7 @@ control 'iam-v2-roles-1' do
       expect(delete_user_resp.http_status).to eq 200
 
       delete_policy_resp = automate_api_request(
-        "/apis/iam/v2beta/policies/#{POLICY_ID}", http_method: 'DELETE')
+        "/apis/iam/v2beta/policies/#{ROLE_ACCESS_POLICY_ID}", http_method: 'DELETE')
       expect(delete_policy_resp.http_status).to eq 200
     end
 
@@ -713,7 +713,7 @@ control 'iam-v2-roles-1' do
             ).not_to eq 403
           end
         end
-      end     
+      end
     end
 
     describe "reading and modifying scheduler settings" do

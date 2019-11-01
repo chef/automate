@@ -8,10 +8,6 @@ control 'iam-v2-global-projects-filter-1' do
   title 'getting all allowed projects for a user on v2.1'
 
  describe 'allowed projects' do
-
-    UNASSIGNED_PROJECT_ID = '(unassigned)'
-    UNASSIGNED_PROJECT_NAME = UNASSIGNED_PROJECT_ID
-
     PROJECT_ID_1 = "inspec-custom-project-1-#{Time.now.utc.to_i}"
     PROJECT_ID_2 = "inspec-custom-project-2-#{Time.now.utc.to_i}"
     PROJECT_ID_3 = "inspec-custom-project-3-#{Time.now.utc.to_i}"

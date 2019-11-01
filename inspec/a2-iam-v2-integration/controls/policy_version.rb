@@ -2,17 +2,18 @@
 # copyright: 2019, Chef Software, Inc.
 # license: All rights reserved
 
-title 'IAM v2 policy version access API integration tests'
+title 'IAM v2.1 policy version access API integration tests'
 
-control 'iam-v2-policy-version-1' do
+control 'iam-v2p1-policy-version-1' do
   title 'v2-only access for policy-version'
-  desc 'policy-version access for v2'
+  desc 'policy-version access for v2.1'
 
   describe 'policy-version access for admin user' do
     it 'retrieves value' do
       resp = automate_api_request("/apis/iam/v2beta/policy_version")
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:version][:major]).to eq "V2"
+      expect(resp.parsed_response_body[:version][:minor]).to eq "V1"
     end
   end
 
@@ -49,6 +50,7 @@ control 'iam-v2-policy-version-1' do
       )
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:version][:major]).to eq "V2"
+      expect(resp.parsed_response_body[:version][:minor]).to eq "V1"
     end
   end
 end

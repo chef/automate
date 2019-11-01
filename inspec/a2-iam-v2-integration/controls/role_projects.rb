@@ -7,20 +7,11 @@ title 'IAM v2.1 project filtering API integration tests'
 control 'iam-v2-projects-1' do
   title 'v2.1-only access for project filtering'
 
-  TIMESTAMP = Time.now.utc.to_i
   CUSTOM_PROJECT_ID_1 = "inspec-custom-project-role-test-1-#{TIMESTAMP}"
   CUSTOM_PROJECT_ID_2 = "inspec-custom-project-role-test-2-#{TIMESTAMP}"
   CUSTOM_ROLE_ID_1 = "inspec-custom-role-1-#{TIMESTAMP}"
   CUSTOM_ROLE_ID_2 = "inspec-custom-role-2-#{TIMESTAMP}"
   CUSTOM_ROLE_ID_3 = "inspec-custom-role-3-#{TIMESTAMP}"
-
-  DEFAULT_ROLE_IDS = [
-    "owner",
-    "editor",
-    "viewer",
-    "ingest",
-    "project-owner"
-  ]
 
   CUSTOM_ROLE_1 = {
           id: CUSTOM_ROLE_ID_1,

@@ -480,18 +480,18 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2.1 (migrated)"
+  - label: "iam v2.1 (migrated w/ v1 policies)"
     command:
-      - integration/run_test integration/tests/iam_v2p1.sh
+      - integration/run_test integration/tests/iam_v2p1_with_v1_policies.sh
     timeout_in_minutes: 20
     expeditor:
       executor:
         linux:
           privileged: true
 
-  - label: "iam v2.1 only"
+  - label: "iam v2.1 fresh install"
     command:
-      - integration/run_test integration/tests/iam_v2p1_only.sh
+      - integration/run_test integration/tests/iam_v2p1_fresh_install.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
