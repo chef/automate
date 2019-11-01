@@ -128,7 +128,7 @@ describe('ApiTokenDetailsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('does not fetch projects for unsupported IAM versions', () => {
+  it('does not fetch projects in v1', () => {
     spyOn(store, 'dispatch').and.callThrough();
     const version: IamVersionResponse = { version: { major: 'v1' } };
     store.dispatch(new GetIamVersionSuccess(version));

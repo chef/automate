@@ -180,19 +180,14 @@ describe('TeamDetailsComponent', () => {
     });
   });
 
-  using([
-    ['v2', 'v0'],
-    ['v1', 'v0']
-  ], function (major: IAMMajorVersion) {
-    it('does not fetch projects for unsupported IAM versions', () => {
-      spyOn(store, 'dispatch').and.callThrough();
-      const team: Team = { id: 'any', guid: 'any', name: 'any', projects: [] };
-      store.dispatch(new GetTeamSuccess(team));
-      const version: IamVersionResponse = { version: { major } };
-      store.dispatch(new GetIamVersionSuccess(version));
+  it('does not fetch projects in v1', () => {
+    spyOn(store, 'dispatch').and.callThrough();
+    const team: Team = { id: 'any', guid: 'any', name: 'any', projects: [] };
+    store.dispatch(new GetTeamSuccess(team));
+    const version: IamVersionResponse = { version: { major: 'v1' } };
+    store.dispatch(new GetIamVersionSuccess(version));
 
-      expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
-    });
+    expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
   });
 
 
