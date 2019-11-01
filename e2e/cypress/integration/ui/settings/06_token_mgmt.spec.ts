@@ -1,10 +1,13 @@
 describe('token management', () => {
+  const typeDelay = 50;
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'aaa-testing-tokens'; // ensure they load somewhere at the top of the list
   const tokenName1 = `${cypressPrefix} token 1 ${now}`;
   const tokenName2 = `${cypressPrefix} token 2 ${now}`;
+  const tokenName3 = `${cypressPrefix} token 3 ${now}`;
   const tokenID1 = `${cypressPrefix}-id-1-${now}`;
   const tokenID2 = `${cypressPrefix}-id-2-${now}`;
+  const tokenID3 = `${cypressPrefix}-token-3-${now}`;
   const tokensTable = 'app-api-tokens chef-table';
 
   before(() => {
@@ -20,6 +23,7 @@ describe('token management', () => {
           active: true
         }
       });
+
       cy.request({
         auth: { bearer: admin.id_token },
         method: 'POST',
@@ -66,47 +70,61 @@ describe('token management', () => {
   });
 
   it('control menu has all options', () => {
-    // ['Copy Token', 'Toggle Status', 'Delete Token'].forEach((item, index) => {
-
-    // cy.get('chef-table chef-td').contains(tokenName1).parent()
-    //   .find('chef-control-menu').as('controlMenu');
-    // // we throw in a should so cypress waits until introspection allows menu to be shown
-    // cy.get('@controlMenu').should('be.visible')
-    //   .click();
-    // assert: expect to see item in control menu
-    // });
+    ['Copy Token', 'Toggle Status', 'Delete Token'].forEach((item, _) => {
+      cy.get('chef-tbody').contains(tokenName1).parent().parent()
+        .find('[data-cy=token-control]').as('controlMenu');
+      cy.get('@controlMenu').should('be.visible').click({ force: true });
+      cy.get('@controlMenu').contains(item);
+    });
   });
 
   it('can copy token', () => {
-    // cy.get('chef-table chef-td').contains(tokenName1).parent()
-    //   .find('chef-control-menu').as('controlMenu');
-    // // we throw in a should so cypress waits until introspection allows menu to be shown
-    // cy.get('@controlMenu').should('be.visible')
-    //   .click();
-    // cy.get('@controlMenu').find('[data-cy=delete]').click({ force: true });
+    cy.get('chef-tbody').contains(tokenName1).parent().parent()
+    .find('[data-cy=token-control]').as('controlMenu');
+    cy.get('@controlMenu').should('be.visible')
+      .click({ force: true }).then(() =>
+        cy.get('@controlMenu').find('[data-cy=copy-token]').click({force: true})
+      );
+
+    cy.get('chef-notification').should('be.visible');
+    cy.get('chef-notification').should('contain', 'API Token copied to clipboard.');
   });
 
   it('can delete token', () => {
-    // cy.get('app-user-table chef-td').contains(tokenName1).parent()
-    //   .find('chef-control-menu').as('controlMenu');
-    // // we throw in a should so cypress waits until introspection allows menu to be shown
-    // cy.get('@controlMenu').should('be.visible')
-    //   .click();
-    // cy.get('@controlMenu').find('[data-cy=delete]').click({ force: true });
+    cy.get('chef-tbody').contains(tokenName1).parent().parent()
+      .find('[data-cy=token-control]').as('controlMenu');
+    cy.get('@controlMenu').should('be.visible').click();
+    cy.get('@controlMenu').find('[data-cy=delete]').click({ force: true });
+    cy.get('app-delete-object-modal').find('button').contains('Delete Token')
+      .click({force: true});
+    cy.get('chef-tbody').contains(tokenName1).should('not.exist');
   });
 
-  // TODO
   it('can create a new token', () => {
+    cy.get('#create-button').contains('Create Token').click();
+    cy.get('chef-modal').contains('Create Token').should('be.visible');
+
+    cy.get('[data-cy=create-name]').focus()
+      .type(tokenName3, { delay: typeDelay }).should('have.value', tokenName3);
+
+    cy.get('[data-cy=create-id]').should('not.be.visible');
+    cy.get('[data-cy=edit-button]').contains('Edit ID').click();
+    cy.get('[data-cy=id-label]').should('not.be.visible');
+    cy.get('#id-input').should('have.value', tokenID3);
+
+    cy.get('#create-button-object-modal').click();
+    cy.get('chef-modal').should('not.be.visible');
+    cy.get('chef-notification.info').should('be.visible');
+    cy.contains(tokenName3).should('exist');
   });
-});
 
-describe('token details', () => {
-  // cy.visit(`/settings/tokens/${tokenId2}`);
-
-  it('renders all token details', () => {
-    // displays the id in the header
-    // displays the date in the header
-    // displays the status in the header
-    // displays the ID in the details input
+  it('opens token details', () => {
+    cy.get('chef-tbody').contains(tokenName2).click();
+    cy.url().should('include', `/settings/tokens/${tokenID2}`);
+    cy.contains(tokenName2).should('exist');
+    cy.get('h1.page-title').contains(tokenName2);
+    cy.get('[data-cy=token-status]').contains('Inactive');
+    cy.get('[data-cy=token-id]').contains(tokenID2);
+    cy.get('[data-cy=name-input]').should('have.value', tokenName2);
   });
 });
