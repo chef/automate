@@ -9,6 +9,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
+	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
@@ -397,6 +398,7 @@ func (p *pg) insertPolicyStatementsWithQuerier(ctx context.Context,
 			pq.Array(s.Resources), s.Role, pq.Array(s.Projects),
 		)
 		if err != nil {
+			p.logger.Warnf("ABCDE: %s", err.Error())
 			return p.processError(err)
 		}
 	}
@@ -1493,6 +1495,10 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 		return nil, p.processError(err)
 	}
 
+	if err := p.addSupportPolicies(ctx, project, tx); err != nil {
+		return nil, p.processError(err)
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return nil, storage_errors.NewTxCommitError(err)
@@ -1500,6 +1506,45 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 
 	// Currently, we don't change anything from what is passed in.
 	return project, nil
+}
+
+func (p *pg) addSupportPolicies(ctx context.Context, project *v2.Project, q Querier) error {
+	pol := v2.Policy{
+		ID:      fmt.Sprintf("%s-project-owners", project.ID),
+		Name:    fmt.Sprintf("%s Project Owners", project.ID),
+		Members: []v2.Member{},
+		Statements: []v2.Statement{
+			{
+				Effect:    v2.Allow,
+				Resources: []string{"*"},
+				Projects:  []string{project.ID},
+				Actions:   []string{},
+				Role:      constants_v2.ProjectOwnerRoleID,
+			},
+		},
+	}
+
+	if err := p.insertPolicyWithQuerier(ctx, &pol, q); err != nil {
+		p.logger.Warnf("ABCDE> insertPolicyWithQuerier failed")
+		return err
+	}
+
+	if err := p.associatePolicyWithProjects(ctx, pol.ID, []string{project.ID}, q); err != nil {
+		p.logger.Warnf("ABCDE> associatePolicyWithProjectsfailed")
+		return err
+	}
+
+	if err := p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, q); err != nil {
+		p.logger.Warnf("ABCDE> insertPolicyStatementsWithQuerier")
+		return err
+	}
+
+	if err := p.notifyPolicyChange(ctx, q); err != nil {
+		p.logger.Warnf("ABCDE> notifyPolicyChange")
+		return err
+	}
+
+	return nil
 }
 
 func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Project, error) {
