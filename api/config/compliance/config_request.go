@@ -1,6 +1,8 @@
 package compliance
 
 import (
+	"runtime"
+
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 )
@@ -28,10 +30,22 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Logger.Level = w.String("info")
 	c.V1.Sys.Logger.Format = w.String("text")
 	c.V1.Sys.Agent.BufferSize = w.Int32(1000)
-	c.V1.Sys.Agent.Workers = w.Int32(10)
+	c.V1.Sys.Agent.Workers = w.Int32(defaultWorkerCount())
 	// Relying on default.toml to provide the value for RemoteInspecVersion
 	// c.V1.Sys.Agent.RemoteInspecVersion = w.String("3.9.0")
 	return c
+}
+
+func defaultWorkerCount() int32 {
+	n := int32(runtime.NumCPU())
+	if n < 2 {
+		return 2
+	}
+	if n > 8 {
+		return 10
+	}
+
+	return n + 2
 }
 
 // Validate validates that the config is sufficient to start the Service. If
