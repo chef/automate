@@ -7,6 +7,7 @@
   align-items: center;
   justify-content: space-between;
   flex-grow: 1;
+  background-color: $chef-white;
   border: 1px solid $chef-light-grey;
   border-radius: $global-radius;
 
@@ -14,8 +15,7 @@
     padding: 1.25em;
     width: 100%;
     border: none;
-    border-radius: $global-radius;
-    background-color: $chef-white;
+    background-color: transparent;
     font-family: inherit;
     font-size: 13px;
   }
