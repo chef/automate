@@ -27,13 +27,13 @@ type querier interface {
 // New instantiates and returns a postgres storage implementation
 func New(logger logger.Logger, migrationConfig migration.Config) (storage.Storage, error) {
 
-	if err := migrationConfig.Migrate(); err != nil {
-		return nil, errors.Wrap(err, "database migrations")
-	}
-
 	db, err := initPostgresDB(migrationConfig.PGURL.String())
 	if err != nil {
 		return nil, errors.Wrap(err, "initialize database")
+	}
+
+	if err := migrationConfig.Migrate(); err != nil {
+		return nil, errors.Wrap(err, "database migrations")
 	}
 
 	return &postgres{db, logger}, nil
