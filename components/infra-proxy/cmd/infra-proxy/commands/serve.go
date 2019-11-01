@@ -11,17 +11,19 @@ import (
 
 	platform_config "github.com/chef/automate/lib/platform/config"
 
-	"github.com/chef/automate/lib/logger"
-	"github.com/chef/automate/lib/tracing"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
+	"github.com/chef/automate/lib/logger"
+	"github.com/chef/automate/lib/tracing"
 )
 
 var serveCmd = &cobra.Command{
 	Use:   "serve",
-	Short: fmt.Sprintf("Launches the automate infra proxy service..."),
+	Short: fmt.Sprintf("Launches the automate infra proxy service."),
 	Run:   serve,
+	Args:  cobra.ExactArgs(1),
 }
 
 type config struct {

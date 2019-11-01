@@ -1,0 +1,13 @@
+---
+grpc: "127.0.0.1:9093"
+log-level: "info"
+log-format: "text"
+
+# tls:
+#   cert_path: /service.crt
+#   key_path: {{pkg.svc_config_path}}/service.key
+#   root_ca_path: {{pkg.svc_config_path}}/root_ca.crt
+
+pg_url: "postgresql://postgres@127.0.0.1:5432/infra_proxy_test?sslmode=disable"
+database: infra_proxy_test
+migrations-path: storage/postgres/migration/sql/
