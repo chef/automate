@@ -139,15 +139,28 @@ func (tf *TestFramework) Shutdown(t *testing.T, ctx context.Context) {
 // SetupProjectsAndRulesWithDB is a simplified test framework
 // useful for integration tests with just the DB.
 func SetupProjectsAndRulesWithDB(t *testing.T) (
-	api.ProjectsClient, *TestDB, storage.Storage, int64) {
+	api.ProjectsClient, api.PoliciesClient, *TestDB, storage.Storage, int64) {
 	t.Helper()
 	ctx := context.Background()
 	seed := prng.GenSeed(t)
 
-	pg, testDB, _, _, _ := SetupTestDB(t)
+	pg, testDB, opaInstance, _, migrationConfig := SetupTestDB(t)
 
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
+
+	pgV1, err := postgres_v1.New(ctx, l, *migrationConfig)
+	require.NoError(t, err)
+
+	vChan := make(chan api.Version, 1)
+	vSwitch := server.NewSwitch(vChan)
+
+	polRefresher, err := v2.NewPostgresPolicyRefresher(ctx, l, opaInstance)
+	require.NoError(t, err)
+
+	polSrv, err := server.NewPoliciesServer(ctx, l, polRefresher, pg, opaInstance, pgV1, vSwitch, vChan)
+	require.NoError(t, err)
+
 	projectUpdateManager := NewMockProjectUpdateManager()
 	projectsSrv, err := server.NewProjectsServer(
 		ctx, l, pg, projectUpdateManager, NewMockProjectPurger(true), NewMockPolicyRefresher())
@@ -162,6 +175,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 		grpc_server.InputValidationInterceptor(),
 	))
 	api.RegisterProjectsServer(serv, projectsSrv)
+	api.RegisterPoliciesServer(serv, polSrv)
 
 	grpcServ := grpctest.NewServer(serv)
 
@@ -170,7 +184,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
 
-	return api.NewProjectsClient(conn), testDB, pg, seed
+	return api.NewProjectsClient(conn), api.NewPoliciesClient(conn), testDB, pg, seed
 }
 
 func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng, *migration.Config) {
