@@ -10,19 +10,19 @@ import (
 )
 
 // StoreOrg saves a org to the DB.
-func (p *postgres) StoreOrg(ctx context.Context, name string, admin_user string, admin_key string) (storage.Org, error) {
-	return p.insertOrg(ctx, name, admin_user, admin_key)
+func (p *postgres) StoreOrg(ctx context.Context, name string, adminUser string, adminKey string) (storage.Org, error) {
+	return p.insertOrg(ctx, name, adminUser, adminKey)
 }
 
 func (p *postgres) insertOrg(ctx context.Context,
-	name string, admin_user string, admin_key string) (storage.Org, error) {
+	name string, adminUser string, adminKey string) (storage.Org, error) {
 
 	var org storage.Org
 	err := p.db.QueryRowContext(ctx,
 		`INSERT INTO orgs (id, name, admin_user, admin_key, created_at, updated_at)
 		VALUES (uuid_generate_v4(), $1, $2, $3, now(), now())
 		RETURNING id, name, fqdn, ip_address, created_at, updated_at`,
-		name, admin_user, admin_key).
+		name, adminUser, adminKey).
 		Scan(&org.ID, &org.Name, &org.AdminUser, &org.CreatedAt, &org.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
