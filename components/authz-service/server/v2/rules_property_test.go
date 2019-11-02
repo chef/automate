@@ -17,13 +17,15 @@ import (
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/testhelpers"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
 const (
-	idRegex        = "^[a-z0-9-_]{1,64}$"
-	conditionLimit = 10 // help avoid the grpc limit of 4194304
-	projectLimit   = 6  // system limitation
+	idRegex          = "^[a-z0-9-_]{1,64}$"
+	conditionLimit   = 10 // help avoid the grpc limit of 4194304
+	projectLimit     = 6  // system limitation
+	SuperuserSubject = "tls:service:deployment-service:internal"
 )
 
 type projectAndRuleReq struct {
@@ -34,7 +36,9 @@ type projectAndRuleReq struct {
 var createRuleReqGen, createProjectReqGen, createProjectAndRulesGen, createProjectsAndRulesGen = getGenerators()
 
 func TestCreateRuleProperties(t *testing.T) {
-	ctx := context.Background()
+	ctx := auth_context.NewOutgoingContext(auth_context.NewContext(context.Background(),
+		[]string{SuperuserSubject}, []string{}, "*", "*", "v2.1"))
+
 	projectClient, policyClient, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
 	defer testDB.CloseDB(t)
@@ -96,7 +100,8 @@ func TestCreateRuleProperties(t *testing.T) {
 }
 
 func TestGetRuleProperties(t *testing.T) {
-	ctx := context.Background()
+	ctx := auth_context.NewOutgoingContext(auth_context.NewContext(context.Background(),
+		[]string{SuperuserSubject}, []string{}, "*", "*", "v2.1"))
 	projectClient, policyClient, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	defer testDB.CloseDB(t)
 	defer store.Close()
