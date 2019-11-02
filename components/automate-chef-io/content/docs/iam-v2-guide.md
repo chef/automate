@@ -215,6 +215,11 @@ To do this, open any policy from the _Policies_ list, then select **Members**.
 Select **Add Members** to open the list of candidate local users and teams.
 Near the bottom of the page, select the **Add Member Expression** button.
 
+{{% info %}}
+The member expression dialog guides you through creating a member expression to alleviate the tedium of getting the syntax just right.
+But the next few paragraphs explain the syntax, should you prefer to add members via the API.
+{{% /info %}}
+
 Enter a member expression using the format `team:<type>:<name>` or `user:<type>:<name>`. Note that these expressions are case-sensitive.
 
 * The `<type>` expression is either `ldap` or `saml`.
@@ -237,6 +242,16 @@ so they are not relevant when assigning IAM resources such as teams or roles.
 #### Creating a Project
 
 To create a project, navigate to the Projects list under the **Settings** tab and select **Create Project**. You will need to provide a name and can optionally edit the ID. You must create a project before you can assign any resources to it.
+
+When you initiate the project creation, the system actually creates not just the project but also three supplemental policies for your convenience:
+
+Policy Name                      | Policy ID                        | Associated Role
+---------------------------------|----------------------------------|----------------
+`<project-name>` Project Owners  | `<project-name>`-project-owners  | Project Owner
+`<project-name>` Project Editors | `<project-name>`-project-editors | Editor
+`<project-name>` Project Viewers | `<project-name>`-project-viewers | Viewer
+
+These are discussed in more detail in [Project Policies]({{< relref "iam-v2-guide.md#project-policies" >}}).
 
 #### Assigning Resources to Projects
 
@@ -313,7 +328,7 @@ Updating a project begins an operation that applies all pending rule edits and t
 In this example, upon successful update, all ingested resources whose Chef Organization matches `devops` will be considered a part of the project `project-devops`.
 Only these resources will appear in Automate's dashboards when the `project-devops` project has been selected in the global project filter.
 
-As the operation takes place, you should see a percentage count up within the `Update Projects` button. 
+As the operation takes place, you should see a percentage count up within the `Update Projects` button.
 You may cancel the update at any time by selecting `Stop Updating Projects` and confirming the cancel in the modal that pops up.
 
 {{% warning %}}
@@ -360,102 +375,27 @@ Rules of type `Node` can have conditions with attributes `Chef Organization`, `C
 Navigate to the project list page once more. Select `Update Projects`. Upon completion of the update, you should be able to
 filter by `project-devops` across Automate's dashboards and see only the ingested data that you expect.
 
-#### Project Owners
+#### Project Policies
 
-The role Project Owner allows admin users to delegate management of project membership to another user without granting that user access to other admin actions in Chef Automate. Project Owners have the following permissions on resources assigned to their project:
+When you create a project, Chef Automate automatically creates three supplemental policies for you, as mentioned earlier.
+This next table further describes the roles associated with these policies.
 
-```text
-"infra:*",
-"compliance:*",
-"system:*",
-"event:*",
-"ingest:*",
-"secrets:*",
-"telemetry:*",
-"iam:projects:list",
-"iam:projects:get",
-"iam:projects:assign",
-"iam:policies:list",
-"iam:policies:get",
-"iam:policyMembers:*",
-"iam:teams:list",
-"iam:teams:get",
-"iam:teamUsers:*",
-"iam:users:get",
-"iam:users:list"
-```
+Policy Name                      | Role          | Description of role
+---------------------------------|---------------|--------------------
+`<project-name>` Project Viewers | Viewer        | **View** everything in the system *except* IAM
+`<project-name>` Project Editors | Editor        | **Do** everything in the system *except* IAM
+`<project-name>` Project Owners  | Project Owner | Editor + **view** and **assign** projects
 
-In order to create a Project Owner, you can use an existing user, or create a user with username `test_project_owner` by following [Creating Users]({{< relref "users.md#manage-local-users-from-the-ui" >}}).
+Consider the first row, for the **Project Viewers** policy.
+The same **Viewer** role shown here is also used in the **Viewer** system policy, which lets a user view everything unrelated to IAM.
+By using the **Viewer** role here and restricting it to the scope of your new project, then users attached to your Project Viewers policy will be able to view things only associated with your project.
 
-Next, you will create a policy that gives `test_project_owner` the role of `project-owner` for your new project. The policy will look like the JSON below:
+Assume you named your project `Devops`.
+If you would now like Terry, a user, to be able to *view* `Devops`-scoped resources and Kelly, another user, to be able to *edit* `Devops`-scoped resources, add them as members to the relevant policies.
+In the browser, select **Settings**, then **Policies**, and lastly `Devops Project Viewers` (or `Devops Project Editors` respectively).
+Under the **Details** tab, you will find the option to select new policy members.
 
-```json
-{
-  "name": "Project Devops Policy",
-  "id": "project-devops-policy",
-  "projects": ["project-devops"],
-  "members": [ "user:local:test_project_owner"],
-  "statements": [
-    {
-      "effect": "ALLOW",
-      "role": "project-owner",
-      "projects": ["project-devops"]
-    }
-  ]
-}
-```
-
-By adding `project-devops` to the policy's top-level `projects` field, we ensure that the Project Owner has access to this policy.
-
-Save as a JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to send that data to Chef Automate.
-
-#### Editor and Viewer Policies for Projects
-
-You may additionally choose to create a `Project Devops Editors` policy and a `Project Devops Viewers`
-policy. Once those are in place, you or your `project-devops` Owner can add members to each policy
-to give them privileges to view or edit resources assigned to `Project Devops`. To create
-those policies, use the JSON below for Project Viewers Policy and Project Editors Policy, respectively:
-
-##### Project Viewers Policy
-
-```json
-{
-  "name": "Project Devops Viewers",
-  "id": "project-devops-viewer-policy",
-  "projects": ["project-devops"],
-  "members": [],
-  "statements": [
-    {
-      "effect": "ALLOW",
-      "role": "viewer",
-      "projects": ["project-devops"]
-    }
-  ]
-}
-```
-
-##### Project Editors Policy
-
-```json
-{
-  "name": "Project Devops Editors",
-  "id": "project-devops-editor-policy",
-  "projects": ["project-devops"],
-  "members": [],
-  "statements": [
-    {
-      "effect": "ALLOW",
-      "role": "editor",
-      "projects": ["project-devops"]
-    }
-  ]
-}
-```
-
-Now, if you would like Terry, a user, to be able to view `Project Devops` and Kelly, another user, to be able to edit `Project Devops`, you will add them as members to the relevant policies. 
-You can do that directly in the above JSON when creating the policy, or in the browser by selecting **Settings**, then **Policies**, and lastly `Project Devops Policy`. Under the **Details** tab, you will find the option to select new policy members.
-
-Assuming Terry is not a member of any other policy, once you make Terry a member of the `Project Devops Viewers` policy, they will only be able to see resources assigned to `Project Devops`. 
+Assuming Terry is not a member of any other policy, once you make Terry a member of the `Devops Project Viewers` policy, they will only be able to see resources assigned to `Devops`.
 They will not be able to update or delete them. Kelly, however, will be able to do both.
 
 See [Policy Membership]({{< relref "iam-v2-api-reference.md#policy-membership" >}}) for more information on policy membership.
