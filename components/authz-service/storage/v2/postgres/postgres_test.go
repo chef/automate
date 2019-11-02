@@ -4336,19 +4336,6 @@ func TestCreateProject(t *testing.T) {
 	ctx := context.Background()
 
 	cases := map[string]func(*testing.T){
-		"successfully creates custom project": func(t *testing.T) {
-			project := storage.Project{
-				ID:     "my-id-1",
-				Name:   "name1",
-				Type:   storage.Custom,
-				Status: storage.NoRules.String(),
-			}
-			resp, err := store.CreateProject(ctx, &project, false)
-			require.NoError(t, err)
-			require.Equal(t, &project, resp)
-
-			assertProjectsMatch(t, db, project)
-		},
 		"successfully creates chef-managed project": func(t *testing.T) {
 			project := storage.Project{
 				ID:     "my-id-1",
@@ -4361,6 +4348,37 @@ func TestCreateProject(t *testing.T) {
 			require.Equal(t, &project, resp)
 
 			assertProjectsMatch(t, db, project)
+		},
+		"successfully creates custom project without supporting policies": func(t *testing.T) {
+			project := storage.Project{
+				ID:     "my-id-1",
+				Name:   "name1",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
+			}
+			resp, err := store.CreateProject(ctx, &project, false)
+			require.NoError(t, err)
+			require.Equal(t, &project, resp)
+
+			assertProjectsMatch(t, db, project)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies`))
+		},
+		"successfully creates custom project with supporting policies": func(t *testing.T) {
+			project := storage.Project{
+				ID:     "my-id-1",
+				Name:   "name1",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
+			}
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies`))
+			resp, err := store.CreateProject(ctx, &project, true)
+			require.NoError(t, err)
+			require.Equal(t, &project, resp)
+
+			assertProjectsMatch(t, db, project)
+			assertCount(t, 3, db.QueryRow(
+				`SELECT count(*) FROM iam_policies
+				 WHERE id IN ('my-id-1-project-owners','my-id-1-project-viewers','my-id-1-project-editors')`))
 		},
 		"does not create project with duplicate ID": func(t *testing.T) {
 			projectID := "my-id-1"
