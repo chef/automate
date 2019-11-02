@@ -22,6 +22,12 @@ chef-page {
     outline: 0;
   }
 
+  chef-error {
+    background-color: #DC267F;
+    color: #FFFFFF;
+    border-radius: 0 0 4px 4px;
+  }
+
   #create-name,
   #create-id,
   #create-type,

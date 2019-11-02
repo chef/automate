@@ -110,19 +110,19 @@
               </chef-form-field>
 
               <chef-form-field class="attribute-field">
+                <label>
+                  <span class="label">Value</span>
+                  <input
+                  chefInput
+                  formControlName="values"
+                  [value]="condition.controls.values.value"
+                  data-cy="rule-value"
+                  />
+                </label>
                 <div>
-                  <label>
-                    <span class="label">Value</span>
-                    <input
-                      chefInput
-                      formControlName="values"
-                      [value]="condition.controls.values.value"
-                      data-cy="rule-value"
-                    />
-                  </label>
                   <chef-error
-                    *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').touched"
-                  >Value is required.</chef-error>
+                      *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').touched"
+                    >Value is required.</chef-error>
                 </div>
                 <small class="help"
                   *ngIf="condition.controls.operator.value === 'EQUALS'">
