@@ -4772,7 +4772,7 @@ func TestDeleteProject(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID0Other))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID1Other))
 		}},
-		{"when a policy contains multiples statement and those statements contain a single project, on project deletion, the statement and policy are deleted", func(t *testing.T) {
+		{"when a policy contains multiple statements and those statements contain a single project, on project deletion, the statement and policy are deleted", func(t *testing.T) {
 			ctx := context.Background()
 			project1 := storage.Project{
 				ID:   "project-1",
@@ -4820,7 +4820,7 @@ func TestDeleteProject(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID0Other))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID1Other))
 		}},
-		{"when a policy contains multiples statement and those statements contain different projects, on one project deletion, one statement is deleted and the policy remains", func(t *testing.T) {
+		{"when a policy contains multiple statements and those statements contain different projects, on one project deletion, one statement is deleted and the policy remains", func(t *testing.T) {
 			ctx := context.Background()
 			project1 := storage.Project{
 				ID:   "project-1",
@@ -4935,7 +4935,7 @@ func TestDeleteProject(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, proj.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_projects`))
 		}},
-		{"returns not found when the project filter excludes the project in question", func(t *testing.T) {
+		{"returns 'not found' when the project filter excludes the project in question", func(t *testing.T) {
 			ctx := context.Background()
 			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
 			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
