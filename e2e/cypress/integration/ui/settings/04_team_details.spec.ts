@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, iamVersion, itFlaky } from '../../constants';
+import { describeIfIAMV2p1, isV1, itFlaky } from '../../constants';
 
 describe('team details', () => {
   let adminIdToken = '';
@@ -69,11 +69,7 @@ describe('team details', () => {
       }).then((resp) => {
         const guid = resp.body.team.id;
 
-        if (iamVersion.match(/v2/)) {
-          teamUIRouteIdentifier = teamID;
-        } else {
-          teamUIRouteIdentifier = guid;
-        }
+        teamUIRouteIdentifier = isV1() ? guid : teamID;
 
         cy.request({
           auth: { bearer: adminIdToken },
@@ -103,12 +99,7 @@ describe('team details', () => {
   });
 
   it('displays team details for admins team', () => {
-    let title = '';
-    if (iamVersion.match(/v2/)) {
-      title = teamName;
-    } else {
-      title = teamID;
-    }
+    const title = isV1() ? teamID : teamName ;
     cy.get('chef-breadcrumbs').contains('Teams');
     cy.get('chef-breadcrumbs').contains(title);
 

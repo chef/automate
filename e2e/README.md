@@ -32,7 +32,7 @@ source ../dev/secrets-env.sh
 ```
 
 If your secrets become out of date, you'll likely need to re-fetch
-`sercrets-env.sh` and re-source. You might get a strange error like
+`secrets-env.sh` and re-source. You might get a strange error like
 this if your secrets are out of date:
 
 ```bash

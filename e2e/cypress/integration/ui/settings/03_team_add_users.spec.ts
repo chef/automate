@@ -1,4 +1,4 @@
-import { iamVersion, itFlaky } from '../../constants';
+import { isV1, itFlaky } from '../../constants';
 
 describe('team add users', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -41,11 +41,7 @@ describe('team add users', () => {
         }
       }).then((resp) => {
         teamID = resp.body.team.id;
-        if (iamVersion.match(/v2/)) {
-          teamUIRouteIdentifier = nameForTeam;
-        } else {
-          teamUIRouteIdentifier = teamID;
-        }
+        teamUIRouteIdentifier = isV1() ? teamID : nameForTeam;
       });
 
     });
@@ -54,14 +50,14 @@ describe('team add users', () => {
   beforeEach(() => {
     cy.restoreStorage();
 
-    if (iamVersion.match(/v2/)) {
-      cy.route('GET', `/apis/iam/v2beta/teams/${nameForTeam}`).as('getTeam');
-      cy.route('GET', `/apis/iam/v2beta/teams/${nameForTeam}/users`).as('getTeamUsers');
-      cy.route('GET', '/apis/iam/v2beta/users').as('getUsers');
-    } else {
+    if (isV1()) {
       cy.route('GET', `/api/v0/auth/teams/${teamID}`).as('getTeam');
       cy.route('GET', `/api/v0/auth/teams/${teamID}/users`).as('getTeamUsers');
       cy.route('GET', '/api/v0/auth/users').as('getUsers');
+    } else {
+      cy.route('GET', `/apis/iam/v2beta/teams/${nameForTeam}`).as('getTeam');
+      cy.route('GET', `/apis/iam/v2beta/teams/${nameForTeam}/users`).as('getTeamUsers');
+      cy.route('GET', '/apis/iam/v2beta/users').as('getUsers');
     }
 
     // TODO move this to the before block so it only happens once
