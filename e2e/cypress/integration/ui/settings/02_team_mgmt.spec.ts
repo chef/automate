@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, itFlaky, iamVersion } from '../../constants';
+import { describeIfIAMV2p1, itFlaky, isV1 } from '../../constants';
 
 describe('team management', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -17,27 +17,29 @@ describe('team management', () => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
       cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
-      cy.request({
-        auth: { bearer: admin.id_token },
-        method: 'POST',
-        url: '/apis/iam/v2beta/projects',
-        body: {
-          id: project1ID,
-          name: project1Name
-        }
-      });
-      cy.request({
-        auth: { bearer: admin.id_token },
-        method: 'POST',
-        url: '/apis/iam/v2beta/projects',
-        body: {
-          id: project2ID,
-          name: project2Name
-        }
-      });
+      if (!isV1()) {
+        cy.request({
+          auth: { bearer: admin.id_token },
+          method: 'POST',
+          url: '/apis/iam/v2beta/projects',
+          body: {
+            id: project1ID,
+            name: project1Name
+          }
+        });
+        cy.request({
+          auth: { bearer: admin.id_token },
+          method: 'POST',
+          url: '/apis/iam/v2beta/projects',
+          body: {
+            id: project2ID,
+            name: project2Name
+          }
+        });
 
-      // reload so we get projects in project filter
-      cy.reload(true);
+        // reload so we get projects in project filter
+        cy.reload(true);
+      }
       cy.get('app-welcome-modal').invoke('hide');
     });
     cy.restoreStorage();
@@ -56,31 +58,27 @@ describe('team management', () => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
   });
 
-describe('no custom initial page state', () => {
-  it('lists system teams', () => {
-    cy.get('[data-cy=team-create-button]').contains('Create Team');
-      switch (iamVersion) {
-        case 'v2.1': {
-          cy.get('#table-container chef-th').contains('ID');
-          cy.get('#table-container chef-th').contains('Name');
+  describe('no custom initial page state', () => {
+    it('lists system teams', () => {
+      cy.get('[data-cy=team-create-button]').contains('Create Team');
+      if (!isV1()) {
+        cy.get('#table-container chef-th').contains('ID');
+        cy.get('#table-container chef-th').contains('Name');
 
-          const systemTeams = ['admins', 'editors', 'viewers'];
-          systemTeams.forEach(name => {
-            cy.get('#table-container chef-tr').contains(name)
-              .parent().parent().find('chef-control-menu').as('control-menu');
-          });
-          break;
-        }
-        default: {
-          cy.get('#table-container chef-th').contains('Name');
-          cy.get('#table-container chef-th').contains('Description');
+        const systemTeams = ['admins', 'editors', 'viewers'];
+        systemTeams.forEach(name => {
+          cy.get('#table-container chef-tr').contains(name)
+            .parent().parent().find('chef-control-menu').as('control-menu');
+        });
+      } else {
+        cy.get('#table-container chef-th').contains('Name');
+        cy.get('#table-container chef-th').contains('Description');
 
-          const systemTeams = ['admins'];
-          systemTeams.forEach(name => {
-            cy.get('#table-container chef-tr').contains(name)
-              .parent().parent().find('chef-control-menu').as('control-menu');
-          });
-        }
+        const systemTeams = ['admins'];
+        systemTeams.forEach(name => {
+          cy.get('#table-container chef-tr').contains(name)
+            .parent().parent().find('chef-control-menu').as('control-menu');
+        });
       }
     });
   });

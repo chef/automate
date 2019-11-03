@@ -38,25 +38,27 @@ describe('team details', () => {
         userMembershipID = resp.body.id;
       });
 
-      cy.request({
-        auth: { bearer: adminIdToken },
-        method: 'POST',
-        url: '/apis/iam/v2beta/projects',
-        body: {
-          id: project1ID,
-          name: project1Name
-        }
-      });
+      if (!isV1()) {
+        cy.request({
+          auth: { bearer: adminIdToken },
+          method: 'POST',
+          url: '/apis/iam/v2beta/projects',
+          body: {
+            id: project1ID,
+            name: project1Name
+          }
+        });
 
-      cy.request({
-        auth: { bearer: adminIdToken },
-        method: 'POST',
-        url: '/apis/iam/v2beta/projects',
-        body: {
-          id: project2ID,
-          name: project2Name
-        }
-      });
+        cy.request({
+          auth: { bearer: adminIdToken },
+          method: 'POST',
+          url: '/apis/iam/v2beta/projects',
+          body: {
+            id: project2ID,
+            name: project2Name
+          }
+        });
+      }
 
       cy.request({
         auth: { bearer: adminIdToken },
