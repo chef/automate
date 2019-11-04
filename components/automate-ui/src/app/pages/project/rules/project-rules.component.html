@@ -121,7 +121,8 @@
                 </label>
                 <div>
                   <chef-error
-                      *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').touched"
+                      *ngIf="( ruleForm.get('conditions').controls[i].get('values').hasError('required') && ruleForm.get('conditions').controls[i].get('values').touched )
+                              || ( ruleForm.get('conditions').controls[i].get('values').hasError('pattern') && ruleForm.get('conditions').controls[i].get('values').dirty )"
                     >Value is required.</chef-error>
                 </div>
                 <small class="help"
