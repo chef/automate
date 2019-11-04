@@ -179,7 +179,7 @@ var validFilterFields = []string{
 func (db *Postgres) GetServicesHealthCounts(filters map[string][]string) (*storage.HealthCounts, error) {
 	var (
 		sHealthCounts         storage.HealthCounts
-		whereConstraints, err = buildwhereConstraintsFromFilters(filters, "WHERE", false)
+		whereConstraints, err = buildWhereConstraintsFromFilters(filters, "WHERE", false)
 	)
 	if err != nil {
 		return nil, err
@@ -210,7 +210,7 @@ func (db *Postgres) GetServices(
 		services              []*composedService
 		offset                = pageSize * page
 		sortOrder             = "ASC"
-		whereConstraints, err = buildwhereConstraintsFromFilters(filters, "WHERE", true)
+		whereConstraints, err = buildWhereConstraintsFromFilters(filters, "WHERE", true)
 	)
 
 	if err != nil {
@@ -236,7 +236,7 @@ func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string, f
 	// We do not want to filter on the fieldname we are looking up, because a user may want to use multiple values for searching
 	delete(filters, fieldName)
 	// Pass "AND" for firstKeyword because we build the WHERE with the query fragment
-	whereConstraints, err := buildwhereConstraintsFromFilters(filters, "AND", false)
+	whereConstraints, err := buildWhereConstraintsFromFilters(filters, "AND", false)
 	if err != nil {
 		return nil, err
 	}
@@ -359,7 +359,7 @@ func convertComposedServiceToStorage(svc *composedService) *storage.Service {
 	return (*storage.Service)(svc)
 }
 
-// buildwhereConstraintsFromFilters converts the provided filters into SQL 'WHERE' constraints
+// buildWhereConstraintsFromFilters converts the provided filters into SQL 'WHERE' constraints
 //
 // This function will be useful when we have the search bar and the user start building a set
 // of filters like the following one:
@@ -379,7 +379,7 @@ func convertComposedServiceToStorage(svc *composedService) *storage.Service {
 //
 // firstKeyword is added so you can build onto existing constraints that already have a 'WHERE' keyword declared
 // to build onto existing constraints pass in an 'AND' keyword or 'OR' depending on your use case.
-func buildwhereConstraintsFromFilters(filters map[string][]string, firstKeyword string, includeStatusFilter bool) (string, error) {
+func buildWhereConstraintsFromFilters(filters map[string][]string, firstKeyword string, includeStatusFilter bool) (string, error) {
 	var (
 		firstStatement   = true
 		whereConstraints = ""
@@ -443,7 +443,7 @@ func buildwhereConstraintsFromFilters(filters map[string][]string, firstKeyword 
 // buildORStatementFromValues generates SQL 'OR' statement from the provided values of a single filter
 //
 // This function accepts an array of strings that are coming from a single filter (look at the
-// function 'buildwhereConstraintsFromFilters') and builds an SQL OR statement. In the case that
+// function 'buildWhereConstraintsFromFilters') and builds an SQL OR statement. In the case that
 // the array of values is size=1, it will only return a single constraint without any OR statement.
 //
 // Example 1: A filter with a single value.

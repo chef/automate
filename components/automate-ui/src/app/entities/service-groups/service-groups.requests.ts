@@ -75,7 +75,7 @@ export class ServiceGroupsRequests {
     let params = new HttpParams();
     if (filters) {
       if (filters.health && filters.health !== 'total') {
-       params = params.append(`filter`, `status:${filters.health}`)
+       params = params.append('filter', `status:${filters.health}`);
       }
       if (filters.page && filters.pageSize) {
         params = params.append('pagination.page', filters.page.toString());
