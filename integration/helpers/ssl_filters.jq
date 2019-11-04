@@ -24,6 +24,7 @@ map(select(
          # automate-lb is responsible for adding required headers for
          # now
          (.id != "HSTS" or .port != "2000") and                 # HSTS doesn't seem relevant for this API
+         (.id != "HSTS" or .port != "10106") and
          (.id != "HSTS" or .port != "10115") and
          (.id != "HSTS" or .port != "10117") and
          (.id != "HSTS" or .port != "10161") and
