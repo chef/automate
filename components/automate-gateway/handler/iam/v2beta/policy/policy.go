@@ -219,12 +219,10 @@ func (p *Server) RemovePolicyMembers(
 // migrates existing V1 policies
 func (p *Server) UpgradeToV2(
 	ctx context.Context, in *pb_req.UpgradeToV2Req) (*pb_resp.UpgradeToV2Resp, error) {
+	// as of release of beta2.1, must pass this flag every time
 	upgradeReq := &authz.MigrateToV2Req{
-		Flag:           authz.Flag_VERSION_2_0,
+		Flag:           authz.Flag_VERSION_2_1,
 		SkipV1Policies: in.SkipV1Policies,
-	}
-	if in.Flag == pb_common.Flag_VERSION_2_1 {
-		upgradeReq.Flag = authz.Flag_VERSION_2_1
 	}
 
 	resp, err := p.policies.MigrateToV2(ctx, upgradeReq)
