@@ -4,6 +4,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
+import { of as observableOf } from 'rxjs';
 
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
@@ -99,7 +100,7 @@ describe('TeamManagementComponent', () => {
 
     beforeEach(() => {
       store = TestBed.get(Store);
-      component.isMajorV1 = true;
+      component.isIAMv2$ = observableOf(false);
     });
 
     it('openCreateModal on v1 opens v1 modal', () => {
@@ -176,7 +177,7 @@ describe('TeamManagementComponent', () => {
 
     beforeEach(() => {
       store = TestBed.get(Store);
-      component.isMajorV1 = false;
+      component.isIAMv2$ = observableOf(true);
     });
 
     it('openCreateModal on v2 opens v2 modal', () => {

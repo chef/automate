@@ -60,6 +60,7 @@ describe('team management', () => {
     it('lists system teams', () => {
       cy.get('[data-cy=team-create-button]').contains('Create Team');
       cy.get('chef-sidebar')
+      // TODO make env var, shouldn't need html
         .invoke('attr', 'major-version')
         .then((obj: Cypress.ObjectLike) => {
           switch (<string><Object>obj) {
