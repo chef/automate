@@ -10,11 +10,11 @@ export class SettingsLandingComponent {
 
   // order determined by settings-sidebar template and is vetted by settings-sidebar unit tests
   public routeList: RoutePerms[] = [
+    { anyOfCheck: [['/retention/nodes/status', 'get', '']], route: '/settings/node-lifecycle' },
     { anyOfCheck: [['/notifications/rules', 'get', '']], route: '/settings/notifications' },
     { anyOfCheck: [['/datafeed/destinations', 'post', '']], route: '/settings/data-feed' },
     { anyOfCheck: [['/nodemanagers/search', 'post', '']], route: '/settings/node-integrations' },
     { anyOfCheck: [['/secrets/search', 'post', '']], route: '/settings/node-credentials' },
-    { anyOfCheck: [['/retention/nodes/status', 'get', '']], route: '/settings/node-lifecycle' },
     { allOfCheck: [['/auth/users', 'get', '']], route: '/settings/users' },
     { allOfCheck: [['/auth/teams', 'get', '']], route: '/settings/teams' },
     {

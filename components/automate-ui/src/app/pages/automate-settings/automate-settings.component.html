@@ -22,7 +22,7 @@
         (click)="applyChanges()">Save Changes</chef-button>
       </div>
       <h2 class="spaced-h2">Event Feed</h2>
-      <div [formGroup]="eventFeedForm">
+      <form [formGroup]="eventFeedForm">
         <div class="input">
           <chef-checkbox
             [checked]="eventFeedForm.value.disable"
@@ -41,9 +41,9 @@
             days
           </chef-checkbox>
         </div>
-      </div>
+      </form>
       <h2 *ngIf="applicationsFeatureFlagOn" class="spaced-h2">Service Groups</h2>
-      <div *ngIf="applicationsFeatureFlagOn" [formGroup]="missingNodesForm">
+      <form *ngIf="applicationsFeatureFlagOn" [formGroup]="missingNodesForm">
         <div class="input">
           <chef-checkbox
             [checked]="missingNodesForm.value.disable"
@@ -58,8 +58,8 @@
             , label the service as disconnected
           </chef-checkbox>
         </div>
-      </div>
-      <div [formGroup]="missingNodesForm">
+      </form>
+      <form [formGroup]="missingNodesForm">
         <div class="input indent">
           <chef-checkbox [checked]="missingNodesForm.value.disable"
             (change)="patchDisableValue(missingNodesForm, $event.detail)">
@@ -72,9 +72,9 @@
             </chef-select>
           </chef-checkbox>
         </div>
-      </div>
+      </form>
       <h2 class="spaced-h2">Client Runs</h2>
-      <div [formGroup]="clientRunsForm">
+      <form [formGroup]="clientRunsForm">
         <div class="input">
           <chef-checkbox
             [checked]="clientRunsForm.value.disable"
@@ -84,8 +84,8 @@
             days
           </chef-checkbox>
         </div>
-      </div>
-      <div [formGroup]="missingNodesForm">
+      </form>
+      <form [formGroup]="missingNodesForm">
         <div class="input">
           <chef-checkbox
             [checked]="missingNodesForm.value.disable"
@@ -99,8 +99,8 @@
             </chef-select>
           </chef-checkbox>
         </div>
-      </div>
-      <div [formGroup]="deleteMissingNodesForm">
+      </form>
+      <form [formGroup]="deleteMissingNodesForm">
         <div class="input indent">
           <chef-checkbox
             [checked]="deleteMissingNodesForm.value.disable"
@@ -115,9 +115,9 @@
             </chef-select>
           </chef-checkbox>
         </div>
-      </div>
+      </form>
       <h2 class="spaced-h2">Compliance</h2>
-      <div [formGroup]="complianceDataForm">
+      <form [formGroup]="complianceDataForm">
         <div class="input">
           <chef-checkbox
             [checked]="complianceDataForm.value.disable"
@@ -136,7 +136,7 @@
             days
           </chef-checkbox>
         </div>
-      </div>
+      </form>
     </div>
 
   </main>

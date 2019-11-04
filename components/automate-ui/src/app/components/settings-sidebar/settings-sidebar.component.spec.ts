@@ -113,11 +113,11 @@ describe('SettingsSidebarComponent', () => {
     });
 
     using([
-      ['Notifications', '/settings/notifications', 0],
-      ['Data Feeds', '/settings/data-feed', 1],
-      ['Node Integrations', '/settings/node-integrations', 2],
-      ['Node Credentials', '/settings/node-credentials', 3],
-      ['Node Lifecycle', '/settings/node-lifecycle', 4],
+      ['Data Lifecycle', '/settings/node-lifecycle', 0],
+      ['Notifications', '/settings/notifications', 1],
+      ['Data Feeds', '/settings/data-feed', 2],
+      ['Node Integrations', '/settings/node-integrations', 3],
+      ['Node Credentials', '/settings/node-credentials', 4],
       ['Users', '/settings/users', 5],
       ['Teams', '/settings/teams', 6],
       ['API Tokens', '/settings/tokens', 7]

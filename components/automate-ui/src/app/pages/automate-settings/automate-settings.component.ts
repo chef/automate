@@ -30,27 +30,27 @@ export class AutomateSettingsComponent implements OnInit {
   private defaultFormData = {
     eventFeed: {
       unit: 'd',
-      threshold: '30',
+      threshold: '',
       disable: false
     },
     clientRuns: {
       unit: 'd',
-      threshold: '30',
+      threshold: '',
       disable: false
     },
     complianceData: {
       unit: 'd',
-      threshold: '30',
+      threshold: '',
       disable: false
     },
     missingNodes: {
       unit: 'd',
-      threshold: '30',
+      threshold: '',
       disable: false
     },
     deleteMissingNodes: {
       unit: 'd',
-      threshold: '30',
+      threshold: '',
       disable: false
     }
   };

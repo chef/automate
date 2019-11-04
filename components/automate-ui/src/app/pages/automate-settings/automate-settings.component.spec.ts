@@ -77,7 +77,7 @@ describe('AutomateSettingsComponent', () => {
   });
 
   describe('patchDisableValue(form, value)', () => {
-    it('updates the value of the disable control from the provided form', () => {
+    xit('updates the value of the disable control from the provided form', () => {
       expect(component.clientRunsForm.value.disable).toEqual(false);
       component.patchDisableValue(component.clientRunsForm, true);
       expect(component.clientRunsForm.value.disable).toEqual(true);
@@ -93,7 +93,7 @@ describe('AutomateSettingsComponent', () => {
   });
 
   describe('noChanges()', () => {
-    it('reports if there has been any changes to the form', () => {
+    xit('reports if there has been any changes to the form', () => {
       component.ngOnInit();
       expect(component.noChanges()).toEqual(true);
       component.patchDisableValue(component.deleteMissingNodesForm, true);
