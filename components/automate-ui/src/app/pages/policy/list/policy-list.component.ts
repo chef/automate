@@ -7,9 +7,8 @@ import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading } from 'app/entities/entities';
 import { DeletePolicy, GetPolicies } from 'app/entities/policies/policy.actions';
-import { allPolicies, getAllStatus, iamMajorVersion } from 'app/entities/policies/policy.selectors';
+import { allPolicies, getAllStatus, isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { Policy } from 'app/entities/policies/policy.model';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 @Component({
   selector: 'app-policy-list',
@@ -19,7 +18,7 @@ import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 export class PolicyListComponent implements OnInit {
   public loading$: Observable<boolean>;
   public sortedPolicies$: Observable<Policy[]>;
-  public iamMajorVersion$: Observable<IAMMajorVersion>;
+  public isIAMv2$: Observable<boolean>;
   public policyToDelete: Policy;
   public deleteModalVisible = false;
 
@@ -31,7 +30,7 @@ export class PolicyListComponent implements OnInit {
       select(allPolicies),
       map(policies => ChefSorters.naturalSort(policies, 'name')));
 
-    this.iamMajorVersion$ = store.pipe(select(iamMajorVersion));
+    this.isIAMv2$ = store.pipe(select(isIAMv2));
   }
 
   ngOnInit(): void {

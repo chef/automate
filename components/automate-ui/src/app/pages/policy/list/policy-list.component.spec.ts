@@ -7,7 +7,6 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { PolicyListComponent } from './policy-list.component';
 
 describe('PolicyListComponent', () => {
@@ -67,13 +66,13 @@ describe('PolicyListComponent', () => {
   });
 
   it('displays policy data for v2', () => {
-    component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
+    component.isIAMv2$ = observableOf(true);
     fixture.detectChanges();
     expect(element).toContainPath('app-authorized');
   });
 
   it('does not display policy data for v1', () => {
-    component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v1');
+    component.isIAMv2$ = observableOf(false);
     fixture.detectChanges();
     expect(element).not.toContainPath('app-authorized');
   });
