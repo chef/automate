@@ -26,6 +26,10 @@ include_controls 'a2-api-integration' do
   skip_control 'authz-api-crud-1'
 end
 
+# these must be run after a2-api-integration because those
+# tests assume that the legacy policies exist
+include_controls 'remove-legacy-policies'
+
 title 'IAM v2.1 migration from v1 API integration tests'
 
 control 'upgrade-iam-v2-1' do
@@ -315,3 +319,4 @@ EOF
     end
   end
 end
+

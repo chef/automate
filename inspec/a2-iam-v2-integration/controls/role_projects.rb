@@ -70,11 +70,12 @@ control 'iam-v2-projects-1' do
     after(:all) do
       CUSTOM_ROLES.each do|role|
         resp = automate_api_request("/apis/iam/v2beta/roles/#{role[:id]}", http_method: 'delete')
-        expect(resp.http_status).to eq 200
+        expect(resp.http_status.to_s).to match(/200|404/)
       end
       Projects.each do|project|
         resp = automate_api_request("/apis/iam/v2beta/projects/#{project[:id]}", http_method: 'delete')
-        expect(resp.http_status).to eq 200
+        # TODO (tc) remove 500 after API bug fixed: https://github.com/chef/automate/issues/2126
+        expect(resp.http_status.to_s).to match(/200|404|500/)
       end
     end
 

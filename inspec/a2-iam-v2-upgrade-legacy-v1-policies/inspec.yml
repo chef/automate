@@ -11,3 +11,5 @@ version: 0.1.0
 depends:
   - name: a2-api-integration
     path: ../a2-api-integration
+  - name: remove-legacy-policies
+    path: ../a2-iam-v2-upgrade-legacy-v1-remove-policies
