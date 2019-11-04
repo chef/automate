@@ -79,17 +79,15 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeParams),
       this.store.select(routeURL)
     ]).pipe(
-      debounceTime(10),
-      map(([params, url]: [Params, string]) => [params.id, url])
-    ).subscribe(([id, url]: [string, string]) => {
-        // Only fetch if we are on the policy details route, otherwise
-        // we'll trigger GetPolicy with the wrong input on any route
-        // away to a page that also uses the :id param.
-        if (POLICY_DETAILS_ROUTE.test(url)) {
-          console.info('policy details');
-          this.store.dispatch(new GetPolicy({ id }));
-        }
-    });
+      takeUntil(this.isDestroyed),
+      map(([params, url]: [Params, string]) => [params.id, url]),
+      // This needs the debounce because both of the observers will be triggered off an URL change
+      debounceTime(5),
+      // Only fetch if we are on the policy details route, otherwise
+      // we'll trigger GetPolicy with the wrong input on any route
+      // away to a page that also uses the :id param.
+      filter(([_id, url]: [string, string]) => POLICY_DETAILS_ROUTE.test(url))
+    ).subscribe(([id, _url]: [string, string]) => this.store.dispatch(new GetPolicy({ id })));
   }
 
   ngOnDestroy() {
