@@ -39,7 +39,7 @@ type pg struct {
 var singletonInstance *pg
 var once sync.Once
 
-// GetInstance returns the signleton instance. Will be nil if not yet initialized.
+// GetInstance returns the singleton instance. Will be nil if not yet initialized.
 func GetInstance() *pg {
 	return singletonInstance
 }
@@ -115,23 +115,11 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy, skipProjectsCheck
 		}
 	}
 
-	err = p.insertPolicyWithQuerier(ctx, pol, tx)
-	if err != nil {
+	if err := p.insertCompletePolicy(ctx, pol, projects, tx); err != nil {
 		return nil, p.processError(err)
 	}
 
-	err = p.associatePolicyWithProjects(ctx, pol.ID, projects, tx)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
-	err = p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, tx)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
-	err = p.notifyPolicyChange(ctx, tx)
-	if err != nil {
+	if err := p.notifyPolicyChange(ctx, tx); err != nil {
 		return nil, p.processError(err)
 	}
 
@@ -368,6 +356,21 @@ func (p *pg) GetPolicyChangeID(ctx context.Context) (string, error) {
 
 func (p *pg) GetPolicyChangeNotifier(ctx context.Context) (v2.PolicyChangeNotifier, error) {
 	return newPolicyChangeNotifier(ctx, p.conninfo)
+}
+
+func (p *pg) insertCompletePolicy(ctx context.Context, pol *v2.Policy, projects []string, q Querier) error {
+	if err := p.insertPolicyWithQuerier(ctx, pol, q); err != nil {
+		return err
+	}
+
+	if err := p.associatePolicyWithProjects(ctx, pol.ID, projects, q); err != nil {
+		return err
+	}
+
+	if err := p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, q); err != nil {
+		return err
+	}
+	return nil
 }
 
 // insertPolicyWithQuerier inserts a new custom policy. It does not return the
@@ -1534,16 +1537,7 @@ func (p *pg) addSupportPolicies(ctx context.Context, project *v2.Project, q Quer
 
 	for _, param := range policyParams {
 		pol := generatePolicy(project.ID, param.id, param.name, param.role)
-
-		if err := p.insertPolicyWithQuerier(ctx, &pol, q); err != nil {
-			return err
-		}
-
-		if err := p.associatePolicyWithProjects(ctx, pol.ID, pol.Projects, q); err != nil {
-			return err
-		}
-
-		if err := p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, q); err != nil {
+		if err := p.insertCompletePolicy(ctx, &pol, pol.Projects, q); err != nil {
 			return err
 		}
 	}
