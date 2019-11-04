@@ -191,6 +191,7 @@ import {
 import { UIComponent } from 'app/ui.component';
 
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
+import { ChefServersComponent } from './pages/chef-servers/chef-servers.component';
 
 @NgModule({
   declarations: [
@@ -199,6 +200,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ApplicationsComponent,
     AttributesComponent,
     AutomateSettingsComponent,
+    ChefServersComponent,
     ClientRunsComponent,
     ClientRunsSidebarComponent,
     ClientRunsTableComponent,

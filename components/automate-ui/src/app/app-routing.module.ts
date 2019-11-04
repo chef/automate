@@ -17,6 +17,7 @@ import { IntegrationsListComponent } from './pages/integrations/list/integration
 import { JobAddComponent } from './pages/job-add/job-add.component';
 import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
+import { ChefServersComponent } from './pages/chef-servers/chef-servers.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { DatafeedComponent } from './pages/data-feed/data-feed.component';
@@ -201,25 +202,39 @@ const routes: Routes = [
         .then(m => m.ComplianceModule)
     },
     {
-      path: 'infrastructure/client-runs',
+      path: 'infrastructure',
       children: [
         {
           path: '',
-          component: ClientRunsComponent
+          redirectTo: '/infrastructure/client-runs',
+          pathMatch: 'full'
         },
         {
-          path: ':node-id/missing-runs',
-          component: NodeNoRunsDetailsComponent,
-          resolve: {
-            node: NodeNoRunsDetailsResolverService
-          }
+          path: 'client-runs',
+          children: [
+            {
+              path: '',
+              component: ClientRunsComponent
+            },
+            {
+              path: ':node-id/missing-runs',
+              component: NodeNoRunsDetailsComponent,
+              resolve: {
+                node: NodeNoRunsDetailsResolverService
+              }
+            },
+            {
+              path: ':node-id/runs/:run-id',
+              component: NodeDetailsComponent,
+              resolve: {
+                nodeRun: NodeDetailsResolverService
+              }
+            }
+          ]
         },
         {
-          path: ':node-id/runs/:run-id',
-          component: NodeDetailsComponent,
-          resolve: {
-            nodeRun: NodeDetailsResolverService
-          }
+          path: 'chef-servers',
+          component: ChefServersComponent
         }
       ]
     },
