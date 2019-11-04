@@ -187,7 +187,7 @@ steps:
   - label: "gateway-integration-tests"
     command:
       - . scripts/verify_setup.sh
-      - hab studio run "source scripts/verify_studio_init.sh && start_all_services && go_test components/automate-gateway/integration/license_usage_nodes_test.go && go_test components/automate-gateway/integration/nodes_test.go"
+      - hab studio run "source scripts/verify_studio_init.sh && start_all_services && go_test -tags=integration components/automate-gateway/integration/license_usage_nodes_test.go && go_test -tags=integration components/automate-gateway/integration/nodes_test.go"
     timeout_in_minutes: 20
     retry:
       automatic:

@@ -13,6 +13,5 @@ document "event_gateway_integration" <<DOC
   Run event gateway integration tests
 DOC
 function event_gateway_integration() {
-  go_test -v "github.com/chef/automate/components/event-gateway/integration_test"
+  go_test -tags=integration -v "github.com/chef/automate/components/event-gateway/integration_test"
 }
-

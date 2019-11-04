@@ -1,13 +1,10 @@
-GOFILES=$(shell go list ./... | grep -v '/vendor|asset\.go|proto/' | sed 's/^_//')
-GOPATH=$(shell go env GOPATH)
-
 include ../../Makefile.common_go
 
 default: ci
 
 ci: review build
 
-review: lint vet
+review: lint
 
 # Utilities
 build:
@@ -21,12 +18,9 @@ proto:
 	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component data-feed-service'
 
 test:
-	mkdir .cover
-	GOMAXPROCS=4 go test -v -covermode=atomic -coverprofile=.cover/cover.out $(GOFILES)
+	mkdir -p .cover
+	GOMAXPROCS=4 go test -v -covermode=atomic -coverprofile=.cover/cover.out ./...
 	go tool cover -html=.cover/cover.out -o .cover/coverage.html
-
-vet:
-	go vet $(GOFILES)
 
 run:
 	go run cmd/data-feed-service/data-feed-service.go serve --config config.dev.toml
