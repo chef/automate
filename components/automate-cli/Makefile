@@ -59,4 +59,4 @@ linux darwin windows:
 	@echo Done: ${CROSS_TARGET_DIR}/${BUILD_TARGET}
 
 unit:
-	@go test --count 1 $(shell go list ./cmd/... ./pkg/...)
+	@go test --count 1 ./...

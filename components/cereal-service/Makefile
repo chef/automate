@@ -16,7 +16,7 @@ echo-build-data:
 	@echo "version: ${VERSION}"
 
 unit:
-	@go test --count 1 -v $(shell go list ./... | grep -v '/vendor/' | grep -v 'integration') -cover
+	@go test --count 1 -v -cover ./...
 .PHONY: unit
 
 PG_URL ?= "postgresql://postgres@127.0.0.1:5432/cereal_test?sslmode=disable&timezone=UTC"

@@ -113,16 +113,6 @@ generate-ruby-grpc-secrets-service:
 		--grpc_out=. \
 		$<
 
-check-go-version:
-	@required_version=$(shell cat ../../GOLANG_VERSION); \
-	my_version=$(shell go version | sed 's/.* go\([^ ]*\).*/\1/'); \
-	if ! printf "$$required_version\n$$my_version\n" | sort -CV ; then \
-		printf "===> ${red}Go version "$$my_version" found; $$required_version required.${reset}\n" ; \
-		exit 1; \
-	else \
-		printf "===> ${green}Your go version "$$my_version" is good, moving on...${reset}\n" ; \
-	fi;
-
 proto:
 	@printf "\n===> ${blue}Generating compliance-service protos${reset}\n"
 	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component compliance-service'
@@ -159,7 +149,7 @@ run-log-level-info: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
 	@$(MAKE) wait-for-compliance-service
 
 run: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
-	@$(MAKE) check-go-version
+	@$(MAKE) golang_version_check
 	$(MAKE) run-nodemanager
 	@printf "\n===> ${blue}Running compliance-service in background${reset} with logs redirected to ${yellow}$(COMPLIANCE_LOG_PATH)${reset}\n"
 	$(RUN_COMMAND_DEBUG) &> $(COMPLIANCE_LOG_PATH)&
@@ -167,7 +157,7 @@ run: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
 	@$(MAKE) wait-for-compliance-service
 
 run-debug: clean build-inspec-runner $(MARKET_PATH) $(PROFILES_PATH)
-	@$(MAKE) check-go-version
+	@$(MAKE) golang_version_check
 	$(MAKE) run-nodemanager
 	@printf "\n===> ${blue}Running compliance-service${reset}\n"
 	$(DEBUG_COMMAND)
@@ -362,7 +352,7 @@ test-db: run-with-es-pg run-db-tests
 
 run-db-tests:
 	@POSTGRES_URI="$(POSTGRES_URI)" CGO_ENABLED=0 \
-		go test -v $(shell go list ./dao/... ./profiles/db ./scanner/ ./inspec-agent/scheduler) -cover -database -parallel=1 -p 1 -failfast
+		go test -v ./dao/... ./profiles/db ./scanner/... ./inspec-agent/scheduler -cover -database -parallel=1 -p 1 -failfast
 
 test-integration: start-es start-pg
 	printf "\n===> ${blue}Running integration tests with ES_VER=$(ES_VER)${reset}\n"
@@ -483,7 +473,7 @@ test-polling: start-ssh-node
 
 test-unit:
 	@printf "\n ===> ${blue}Running compliance-service go unit-tests...${reset}\n"
-	@go test $(shell go list ./... |  grep -v '^github.com/chef/automate/components/compliance-service/\(examples\|feed/\|api/automate-feed\|api/automate-event\|api/tests\|scanner\|integration_test\)') -cover
+	@go test $(shell GOFLAGS='$(GOFLAGS)' go list ./... |  grep -v '^github.com/chef/automate/components/compliance-service/\(examples\|feed/\|api/automate-feed\|api/automate-event\|api/tests\|scanner\|integration_test\)') -cover
 
 send-ingest-report:
 	go run examples/ingest/ingest_client.go --file ingest/examples/compliance-success-tiny-report.json --threads 1 --reports-per-thread 1

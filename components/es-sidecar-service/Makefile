@@ -12,8 +12,6 @@ GO_LDFLAGS = --ldflags "-X ${LIBRARY_PATH}/version.Version=${BUILD_TIME} -X ${LI
 ELASTICSEARCH_PORT   ?= 9200
 ELASTICSEARCH_URL     = http://127.0.0.1:$(ELASTICSEARCH_PORT)
 
-GOPATH = $(shell go env GOPATH)
-
 default: build
 
 ci: lint unit integration
@@ -33,13 +31,10 @@ habitat-build:
 	hab pkg build .
 
 unit:
-	go test -v $(shell go list ./... | grep -v '/vendor/' | grep -v '/integration_test') -cover
+	go test -v $(shell GOFLAGS='$(GOFLAGS)' go list ./... | grep -v '/integration_test') -cover
 
 integration:
 	cd ../..; hab studio -D $(STUDIO_OPTS) run "source .studiorc; es_sidecar_service_integration"
-
-vet:
-	@go vet $(shell go list ./... | grep -v '/vendor/')
 
 purge-es6:
 	rm -rf "$(PWD)/.tmp/es-sidecar-service-es6-data"

@@ -129,7 +129,7 @@ clear-pg:
 
 ##### TESTING
 test-unit:
-	@go test -v $(shell go list ./... |  grep -v '/tests') -cover
+	@go test -v $(shell GOFLAGS='$(GOFLAGS)' go list ./... |  grep -v '/tests') -cover
 
 ruby-grpc-tools:
 	@if ! gem list grpc -i; then gem install grpc; fi > /dev/null
@@ -180,11 +180,11 @@ test-integration:
 
 run-db-tests:
 	@POSTGRES_URI="$(POSTGRES_URI)" CGO_ENABLED=0 \
-		go test -v $(shell go list ./pgdb/...) -cover -database
+		go test -v -cover -database ./pgdb/...
 
 run-one-db-test:
 	@POSTGRES_URI="$(POSTGRES_URI)" \
-		go test -v $(shell go list ./pgdb/...) -run TestRunNodesIntegrationSuite/TestBulkAddNodesAndTagsUpdate -cover -database
+		go test -v ./pgdb/... -run TestRunNodesIntegrationSuite/TestBulkAddNodesAndTagsUpdate -cover -database
 
 
 test-compliance-ingestion-to-manager-conn: run-background

@@ -1,13 +1,12 @@
-GOFILES=$(shell go list ./... | grep -Ev '/vendor|asset\.go|proto|/integration_test' | sed 's/^_//')
-GOPATH=$(shell go env GOPATH)
-
 include ../../Makefile.common_go
+
+GOFILES=$(shell GOFLAGS='$(GOFLAGS)' go list ./... | grep -Ev '/vendor|asset\.go|proto|/integration_test' | sed 's/^_//')
 
 default: ci
 
-ci: build lint vet test
+ci: build lint test
 
-review: lint vet
+review: lint
 
 # Utilities
 build:
@@ -15,19 +14,13 @@ build:
 
 clean:
 	@echo "Removing artifacts..."
-	rm -f event-gateway
+	rm -f applications-service
 
 proto:
-	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component event-gateway'
+	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component applications-service'
 
 test:
 	GOMAXPROCS=4 go test -v -cover $(GOFILES)
-
-vet:
-	go vet $(GOFILES)
-
-run:
-	go run cmd/event-gateway/event-gateway.go serve --config config.dev.toml
 
 # Etc
 edit:
@@ -37,7 +30,7 @@ view:
 	$(PAGER) Makefile || cat Makefile
 
 .PHONY: ci review setup clean
-.PHONY: build clean fmt lint proto test vet
+.PHONY: build clean fmt lint proto test
 .PHONY: edit view
 .PHONY: run
 .PHONY: generate

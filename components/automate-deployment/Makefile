@@ -113,7 +113,7 @@ clean:
 	rm -f cover/cover.out
 
 unit: golang_version_check
-	@go test $(shell go list ./cmd/... ./pkg/...)
+	@go test ./...
 
 # https://stackoverflow.com/questions/4728810/makefile-variable-as-prerequisite
 guard-%:

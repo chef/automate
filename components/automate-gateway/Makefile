@@ -21,4 +21,4 @@ proto:
 	@echo "# compile_go_protobuf_component automate-gateway"
 
 unit:
-	@go test -v $(shell go list ./... | grep -v '/vendor/' | grep -v '/integration') -cover
+	@go test -v -cover ./...
