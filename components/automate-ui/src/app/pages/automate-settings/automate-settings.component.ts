@@ -18,6 +18,7 @@ import {
   IngestJobs
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
 @Component({
   templateUrl: './automate-settings.component.html',
@@ -25,30 +26,31 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 })
 
 export class AutomateSettingsComponent implements OnInit {
+  public applicationsFeatureFlagOn: boolean;
   private defaultFormData = {
     eventFeed: {
       unit: 'd',
-      threshold: '',
+      threshold: '30',
       disable: false
     },
     clientRuns: {
       unit: 'd',
-      threshold: '',
+      threshold: '30',
       disable: false
     },
     complianceData: {
       unit: 'd',
-      threshold: '',
+      threshold: '30',
       disable: false
     },
     missingNodes: {
       unit: 'd',
-      threshold: '',
+      threshold: '30',
       disable: false
     },
     deleteMissingNodes: {
       unit: 'd',
-      threshold: '',
+      threshold: '30',
       disable: false
     }
   };
@@ -59,6 +61,7 @@ export class AutomateSettingsComponent implements OnInit {
   deleteMissingNodesForm: FormGroup;
   automateSettingsForm: FormGroup;
   jobSchedulerStatus: JobSchedulerStatus;
+
 
   // Has the form changed?
   formChanged = false;
@@ -71,6 +74,7 @@ export class AutomateSettingsComponent implements OnInit {
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
+    private featureFlagsService: FeatureFlagsService,
     private formBuilder: FormBuilder,
     private telemetryService: TelemetryService
   ) {
@@ -91,6 +95,7 @@ export class AutomateSettingsComponent implements OnInit {
 
   ngOnInit() {
     this.layoutFacade.showSettingsSidebar();
+    this.applicationsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('applications');
     this.store.dispatch(new GetSettings({}));
     this.store.select(automateSettingsState)
       .subscribe((automateSettingsSelector) => {

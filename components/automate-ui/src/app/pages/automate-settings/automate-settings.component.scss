@@ -1,13 +1,25 @@
 @import "~styles/variables";
 
-chef-td {
-  &.description {
-    flex-basis: 45%;
-  }
+h2 {
+  font-size: 16px;
+  font-weight: 600;
 
-  &.input {
-    flex: none;
+  &.spaced-h2 {
+    margin-top: 28px;
   }
+}
+
+.indent {
+  margin-left: 37px;
+}
+
+.input {
+  margin-top: 12px;
+  margin-bottom: 12px;
+}
+
+.no-right-margin {
+  margin-left: -8px;
 }
 
 chef-input {
@@ -16,12 +28,6 @@ chef-input {
 
 chef-select {
   width: 120px;
-}
-
-.center {
-  margin: auto;
-  padding: 10px;
-  width: 10%;
 }
 
 chef-checkbox {
