@@ -13,7 +13,7 @@ import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 
 export class NavbarComponent implements OnInit {
   public applicationsFeatureFlagOn: boolean;
-  public projectsEnabled$: Observable<boolean>;
+  public isIAMv2$: Observable<boolean>;
 
   constructor(
     private featureFlagsService: FeatureFlagsService,
@@ -26,6 +26,6 @@ export class NavbarComponent implements OnInit {
 
   ngOnInit() {
     this.applicationsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('applications');
-    this.projectsEnabled$ = this.store.select(isIAMv2);
+    this.isIAMv2$ = this.store.select(isIAMv2);
   }
 }
