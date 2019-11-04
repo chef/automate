@@ -42,9 +42,6 @@ service ReportingService {
 			resource: "compliance:reporting:reports"
 			action: "compliance:reports:list"
 		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Reporting"
-		};
 	};
 
 	/*
@@ -67,9 +64,6 @@ service ReportingService {
 			resource: "compliance:reporting:report-ids"
 			action: "compliance:reportids:list"
 		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Reports";
-		};
 	};
 
 	/*
@@ -89,9 +83,6 @@ service ReportingService {
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:control"
 			action: "compliance:controlItems:list"
-		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Reporting";
 		};
 	};
 
@@ -113,9 +104,6 @@ service ReportingService {
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:reports:{id}"
 			action: "compliance:reports:get"
-		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Reporting";
 		};
 	};
 
@@ -159,9 +147,6 @@ service ReportingService {
 			resource: "compliance:reporting:suggestions"
 			action: "compliance:reportSuggestions:list"
 		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Reporting";
-		};
 	};
 
 	/*
@@ -187,9 +172,6 @@ service ReportingService {
 			resource: "compliance:reporting:profiles"
 			action: "compliance:reportProfiles:list"
 		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Reporting";
-		};
 	};
 
 	rpc Export(Query) returns (stream ExportData) {};
@@ -211,9 +193,6 @@ service ReportingService {
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:nodes:{id}"
 			action: "compliance:reportNodes:get"
-		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Reporting";
 		};
 	};
 
@@ -245,9 +224,6 @@ service ReportingService {
 		option (chef.automate.api.iam.policy) = {
 			resource: "compliance:reporting:nodes"
 			action: "compliance:reportNodes:list"
-		};
-		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "Reporting";
 		};
 	};
 
