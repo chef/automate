@@ -41,7 +41,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   public saveInProgress = false;
   public saveSuccessful = false;
 
-  public projectsEnabled: boolean;
+  public isIAMv2: boolean;
   public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -59,8 +59,8 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     this.store.pipe(
       select(isIAMv2),
       takeUntil(this.isDestroyed))
-      .subscribe(projectsEnabled => {
-        this.projectsEnabled = projectsEnabled;
+      .subscribe(latest => {
+        this.isIAMv2 = latest;
       });
   }
 
@@ -74,7 +74,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         this.updateForm.controls.name.setValue(this.token.name);
         this.status = this.token.active ? 'active' : 'inactive';
         this.updateForm.controls.status.setValue(this.status);
-        if (this.projectsEnabled) {
+        if (this.isIAMv2) {
           this.store.dispatch(new GetProjects());
         }
       });
