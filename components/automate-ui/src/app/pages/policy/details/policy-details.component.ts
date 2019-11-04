@@ -2,11 +2,12 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { identity } from 'lodash/fp';
-import { Observable, Subject } from 'rxjs';
-import { filter, map, pluck, takeUntil } from 'rxjs/operators';
+import { Observable, Subject, combineLatest } from 'rxjs';
+import { filter, map, takeUntil, debounceTime } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
+import { Params } from '@angular/router';
 import { routeURL } from 'app/route.selectors';
 import { GetPolicy } from 'app/entities/policies/policy.actions';
 import { policyFromRoute } from 'app/entities/policies/policy.selectors';
@@ -74,23 +75,21 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
       }));
     this.members$.subscribe();
 
-    this.store.select(routeParams).pipe(
-      pluck('id'),
-      filter(identity),
-      takeUntil(this.isDestroyed))
-      .subscribe((id: string) => {
-        this.store.select(routeURL).pipe(
-          filter(identity),
-          takeUntil(this.isDestroyed))
-          .subscribe((url: string) => {
-            // Only fetch if we are on the policy details route, otherwise
-            // we'll trigger GetPolicy with the wrong input on any route
-            // away to a page that also uses the :id param.
-            if (POLICY_DETAILS_ROUTE.test(url)) {
-              this.store.dispatch(new GetPolicy({ id }));
-            }
-        });
-      });
+    combineLatest([
+      this.store.select(routeParams),
+      this.store.select(routeURL)
+    ]).pipe(
+      debounceTime(10),
+      map(([params, url]: [Params, string]) => [params.id, url])
+    ).subscribe(([id, url]: [string, string]) => {
+        // Only fetch if we are on the policy details route, otherwise
+        // we'll trigger GetPolicy with the wrong input on any route
+        // away to a page that also uses the :id param.
+        if (POLICY_DETAILS_ROUTE.test(url)) {
+          console.info('policy details');
+          this.store.dispatch(new GetPolicy({ id }));
+        }
+    });
   }
 
   ngOnDestroy() {
