@@ -4,7 +4,8 @@ import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
-import { filter, map, pluck, takeUntil } from 'rxjs/operators';
+import { filter, map, pluck, takeUntil, debounceTime } from 'rxjs/operators';
+import { Params } from '@angular/router';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -202,23 +203,19 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     // TODO: This also fires when teamFromRoute fires; should inhibit that since
     // we already have the team details, as noted above.
     // Triggered every time the route changes (including on initial load).
-    this.store.select(routeParams).pipe(
-      pluck('id'),
-      filter(identity),
-      takeUntil(this.isDestroyed))
-      .subscribe((id: string) => {
-        this.store.select(routeURL).pipe(
-          filter(identity),
-          takeUntil(this.isDestroyed))
-          .subscribe((url: string) => {
-            // Only fetch if we are on the team details route, otherwise
-            // we'll trigger GetTeam with the wrong input on any route
-            // away to a page that also uses the :id param.
-            if (TEAM_DETAILS_ROUTE.test(url)) {
-              this.store.dispatch(new GetTeam({ id }));
-            }
-          });
-      });
+    combineLatest([
+      this.store.select(routeParams),
+      this.store.select(routeURL)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      map(([params, url]: [Params, string]) => [params.id, url]),
+      // This needs the debounce because both of the observers will be triggered off an URL change
+      debounceTime(5),
+      // Only fetch if we are on the team details route, otherwise
+      // we'll trigger GetTeam with the wrong input on any route
+      // away to a page that also uses the :id param.
+      filter(([_id, url]: [string, string]) => TEAM_DETAILS_ROUTE.test(url))
+    ).subscribe(([id, _url]: [string, string]) => this.store.dispatch(new GetTeam({ id })));
  }
 
   ngOnDestroy(): void {
