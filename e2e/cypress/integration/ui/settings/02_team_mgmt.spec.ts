@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, itFlaky } from '../../constants';
+import { describeIfIAMV2p1, itFlaky, iamVersion } from '../../constants';
 
 describe('team management', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -56,41 +56,36 @@ describe('team management', () => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
   });
 
-  describe('no custom initial page state', () => {
-    it('lists system teams', () => {
-      cy.get('[data-cy=team-create-button]').contains('Create Team');
-      cy.get('chef-sidebar')
-      // TODO make env var, shouldn't need html
-        .invoke('attr', 'major-version')
-        .then((obj: Cypress.ObjectLike) => {
-          switch (<string><Object>obj) {
-            case 'v2': {
-              cy.get('#table-container chef-th').contains('ID');
-              cy.get('#table-container chef-th').contains('Name');
+describe('no custom initial page state', () => {
+  it('lists system teams', () => {
+    cy.get('[data-cy=team-create-button]').contains('Create Team');
+      switch (iamVersion) {
+        case 'v2.1': {
+          cy.get('#table-container chef-th').contains('ID');
+          cy.get('#table-container chef-th').contains('Name');
 
-              const systemTeams = ['admins', 'editors', 'viewers'];
-              systemTeams.forEach(name => {
-                cy.get('#table-container chef-tr').contains(name)
-                  .parent().parent().find('chef-control-menu').as('control-menu');
-              });
-              break;
-            }
-            default: {
-              cy.get('#table-container chef-th').contains('Name');
-              cy.get('#table-container chef-th').contains('Description');
+          const systemTeams = ['admins', 'editors', 'viewers'];
+          systemTeams.forEach(name => {
+            cy.get('#table-container chef-tr').contains(name)
+              .parent().parent().find('chef-control-menu').as('control-menu');
+          });
+          break;
+        }
+        default: {
+          cy.get('#table-container chef-th').contains('Name');
+          cy.get('#table-container chef-th').contains('Description');
 
-              const systemTeams = ['admins'];
-              systemTeams.forEach(name => {
-                cy.get('#table-container chef-tr').contains(name)
-                  .parent().parent().find('chef-control-menu').as('control-menu');
-              });
-            }
-          }
-        });
+          const systemTeams = ['admins'];
+          systemTeams.forEach(name => {
+            cy.get('#table-container chef-tr').contains(name)
+              .parent().parent().find('chef-control-menu').as('control-menu');
+          });
+        }
+      }
     });
   });
 
-  describeIfIAMV2p1('team create modal (IAM v2.1)', () => {
+  describeIfIAMV2p1('teams list page', () => {
     const dropdownNameUntilEllipsisLen = 25;
     const projectDropdown = 'app-team-management app-projects-dropdown ';
 
