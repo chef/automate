@@ -203,8 +203,8 @@ export class ProjectEffects {
   getActiveApplyRulesStatus$ = observableInterval(1000 * ACTIVE_RULE_STATUS_INTERVAL).pipe(
     withLatestFrom(this.store.select(isIAMv2)),
     withLatestFrom(this.store.select(applyRulesStatus)),
-    filter(([[_, projectsEnabled], { state }]) =>
-      projectsEnabled && state === ApplyRulesStatusState.Running
+    filter(([[_, isV2], { state }]) =>
+      isV2 && state === ApplyRulesStatusState.Running
     ),
     switchMap(this.getRulesStatus$()));
 
@@ -212,8 +212,8 @@ export class ProjectEffects {
   getDormantApplyRulesStatus$ = observableInterval(1000 * DORMANT_RULE_STATUS_INTERVAL).pipe(
     withLatestFrom(this.store.select(isIAMv2)),
     withLatestFrom(this.store.select(applyRulesStatus)),
-    filter(([[_, projectsEnabled], { state }]) =>
-      projectsEnabled && state === ApplyRulesStatusState.NotRunning
+    filter(([[_, isV2], { state }]) =>
+      isV2 && state === ApplyRulesStatusState.NotRunning
     ),
     switchMap(this.getRulesStatus$()));
 

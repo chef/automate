@@ -30,22 +30,12 @@ describe('global projects filter', () => {
 
   it('shows all projects for admin', () => {
     cy.adminLogin('/settings');
-
     cy.get('chef-sidebar');
-    cy.get('chef-sidebar').invoke('attr', 'minor-version')
-      .then((obj: Cypress.ObjectLike) => {
-        // Cypress.ObjectLike can't be casted to a string directly,
-        // so must convert to Object type (common to all JS objects) first
-        if (<string><Object>obj === 'v1') {
-          cy.get('#projects-filter-button').click();
-
-          const allowedProjects = [proj1.name, proj2.name, proj3.name, '(unassigned)'];
-          // we don't check that projects in dropdown match *exactly* as
-          // we can't control creation of other projects in the test env
-          allowedProjects.forEach(project => {
-            cy.get('#projects-filter-dropdown').contains(project);
-          });
-        }
+      const allowedProjects = [proj1.name, proj2.name, proj3.name, '(unassigned)'];
+      // we don't check that projects in dropdown match *exactly* as
+      // we can't control creation of other projects in the test env
+      allowedProjects.forEach(project => {
+        cy.get('#projects-filter-dropdown').contains(project);
       });
     cy.logout();
   });
