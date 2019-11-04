@@ -506,7 +506,7 @@ func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}
 }
 
 // V2p1SetPolicies replaces OPA's data with a new set of policies and roles
-// and resets the partial evaluation cache for v2.l
+// and resets the partial evaluation cache for v2.1
 func (s *State) V2p1SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}) error {

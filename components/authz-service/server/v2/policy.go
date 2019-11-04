@@ -854,6 +854,8 @@ func roleFromInternal(role *storage.Role) (*api.Role, error) {
 
 func versionFromInternal(ms storage.MigrationStatus) *api.Version {
 	switch ms {
+	// the Successful status can only be directly set in the database
+	// the API can only revert to v1 or upgrade to v2.1
 	case storage.Successful:
 		return &api.Version{
 			Major: api.Version_V2,
@@ -938,7 +940,7 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 }
 
 // setVersionForInterceptorSwitch informs the interceptor piece of this server
-// to deny v1 requests if set to v2/v2.1 and vice-versa.
+// to deny v1 requests if set to v2.1 and vice-versa.
 func (s *policyServer) setVersionForInterceptorSwitch(v api.Version) {
 	if s.vChan != nil {
 		s.vChan <- v
