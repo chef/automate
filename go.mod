@@ -127,7 +127,7 @@ require (
 	gopkg.in/asn1-ber.v1 v1.0.0-20170511165959-379148ca0225 // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.20
 	gopkg.in/ldap.v2 v2.5.1 // indirect
-	gopkg.in/segmentio/analytics-go.v3 v3.0.1-0.20171207180711-1178b964a366
+	gopkg.in/segmentio/analytics-go.v3 v3.0.1
 	gopkg.in/square/go-jose.v2 v2.1.3
 	gopkg.in/yaml.v2 v2.2.1
 )
