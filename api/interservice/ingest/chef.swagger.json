@@ -4,10 +4,6 @@
     "title": "api/interservice/ingest/chef.proto",
     "version": "version not set"
   },
-  "schemes": [
-    "http",
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],

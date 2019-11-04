@@ -4,10 +4,6 @@
     "title": "api/interservice/ingest/job_scheduler.proto",
     "version": "version not set"
   },
-  "schemes": [
-    "http",
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],
