@@ -15,9 +15,6 @@ import {
 import {
   policyEntityReducer, PolicyEntityInitialState
 } from 'app/entities/policies/policy.reducer';
-import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
-import { IamVersionResponse } from 'app/entities/policies/policy.requests';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import {
   projectEntityReducer,
   ProjectEntityInitialState
@@ -167,13 +164,12 @@ describe('TeamDetailsComponent', () => {
   using([
     [targetId, 'other', 'v2'],
     ['other', targetId, 'v1']
-  ], function (id: string, guid: string, major: IAMMajorVersion) {
+  ], function (id: string, guid: string, major: string) {
     it(`handles team users for ${major}`, () => {
       spyOn(store, 'dispatch').and.callThrough();
       const team: Team = { id, guid, name: 'any', projects: [] };
       store.dispatch(new GetTeamSuccess(team));
-      const version: IamVersionResponse = { version: { major: major} };
-      store.dispatch(new GetIamVersionSuccess(version));
+      component.isIAMv2 = major === 'v2';
 
       expect(store.dispatch).toHaveBeenCalledWith(new GetUsers());
       expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
@@ -184,8 +180,7 @@ describe('TeamDetailsComponent', () => {
     spyOn(store, 'dispatch').and.callThrough();
     const team: Team = { id: 'any', guid: 'any', name: 'any', projects: [] };
     store.dispatch(new GetTeamSuccess(team));
-    const version: IamVersionResponse = { version: { major: 'v1' } };
-    store.dispatch(new GetIamVersionSuccess(version));
+    component.isIAMv2 = false;
 
     expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
   });
@@ -193,8 +188,7 @@ describe('TeamDetailsComponent', () => {
 
   it('initializes dropdown with those included on the team checked', () => {
     spyOn(store, 'dispatch').and.callThrough();
-    const version: IamVersionResponse = { version: { major: 'v2' } };
-    store.dispatch(new GetIamVersionSuccess(version));
+    component.isIAMv2 = true;
     const teamProjects = ['b-proj', 'd-proj'];
     const team: Team = { id: targetId, guid: 'any', name: 'any', projects: teamProjects };
     store.dispatch(new GetTeamSuccess(team));
