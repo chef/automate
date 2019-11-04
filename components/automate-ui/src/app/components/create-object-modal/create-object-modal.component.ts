@@ -17,7 +17,6 @@ import {
 })
 export class CreateObjectModalComponent implements OnInit, OnChanges {
   @Input() visible = false;
-  @Input() projectNoteVisible = false;
   @Input() creating = false;
   @Input() objectNoun: string;
   @Input() showProjectsDropdown = false;
