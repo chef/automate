@@ -12,8 +12,10 @@ do_deploy() {
         --override-origin "$HAB_ORIGIN" \
         --manifest-dir "$test_manifest_path" \
         --admin-password chefautomate \
-        --enable-chef-server \
-        --enable-workflow \
+        --product workflow \
+        --product automate \
+        --product chef-server \
+        --product builder \
         --accept-terms-and-mlsa \
         --debug
 }
