@@ -15,11 +15,12 @@
         <chef-subheading>Compliance profiles manage security and compliance scans.</chef-subheading>
 
         <div class="profiles-search">
-          <chef-input
+          <input
+            chefInput
             type="text"
             placeholder="Search profiles..."
             (input)="onSearchInput($event)">
-          </chef-input>
+          </input>
         </div>
 
         <chef-tab-selector class="profiles-tabs" [value]="selectedTab" (change)="onTabChange($event)">
