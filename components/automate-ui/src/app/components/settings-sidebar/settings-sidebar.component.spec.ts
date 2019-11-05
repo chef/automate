@@ -106,6 +106,7 @@ describe('SettingsSidebarComponent', () => {
 
   describe('IAM v1', () => {
     it('shows 8 links', () => {
+      component.isIAMv2$ = observableOf(false);
       fixture.detectChanges();
       const links = element.nativeElement
         .querySelectorAll('div.nav-items chef-sidebar-entry');
@@ -123,6 +124,7 @@ describe('SettingsSidebarComponent', () => {
       ['API Tokens', '/settings/tokens', 7]
     ], (label: string, path: string, position: number) => {
       it(`displays the ${label} navigation link`, () => {
+        component.isIAMv2$ = observableOf(false);
         fixture.detectChanges();
         const links = element.nativeElement
           .querySelectorAll('div.nav-items chef-sidebar-entry');

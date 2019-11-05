@@ -38,9 +38,9 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public createV1TeamModalVisible = false;
   public creatingTeam = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  public isIAMv2$: Observable<boolean>;
   public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
+  public isIAMv2: boolean;
 
   private isDestroyed = new Subject<boolean>();
 
@@ -52,7 +52,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.sortedTeams$ = store.select(allTeams).pipe(
       map((teams: Team[]) => ChefSorters.naturalSort(teams, 'id')),
       takeUntil(this.isDestroyed));
-    this.isIAMv2$ = store.select(isIAMv2);
     this.createTeamForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -74,7 +73,12 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.store.dispatch(new GetTeams());
-
+    this.store.pipe(
+      select(isIAMv2),
+      takeUntil(this.isDestroyed))
+      .subscribe(latest => {
+        this.isIAMv2 = latest;
+    });
     this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {
         this.dropdownProjects = assignable.map(p => {
@@ -162,9 +166,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   }
 
   public openCreateModal(): void {
-    let isV2 = true;
-    this.isIAMv2$.subscribe(latest => isV2 = latest);
-    if (isV2) {
+    if (this.isIAMv2) {
       this.createModalVisible = true;
     } else {
       this.createV1TeamModalVisible = true;

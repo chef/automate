@@ -4,7 +4,7 @@ import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { interval as observableInterval, of as observableOf, Observable } from 'rxjs';
-import { catchError, mergeMap, map, tap, withLatestFrom } from 'rxjs/operators';
+import { catchError, mergeMap, map, tap, withLatestFrom, filter } from 'rxjs/operators';
 
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { Project } from 'app/entities/projects/project.model';
@@ -34,6 +34,7 @@ export class ProjectsFilterEffects {
   @Effect()
   latestOptions$ = observableInterval(1000 * this.POLLING_INTERVAL_IN_SECONDS).pipe(
     withLatestFrom(this.store.select(isIAMv2)),
+    filter(([_, isV2]) => isV2),
     mergeMap(this.loadOptionsAction$()));
 
   @Effect()

@@ -92,7 +92,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]),
       projects: [[]]
     });
-    store.select(isIAMv2).subscribe(latest => this.isIAMv2 = latest);
   }
 
   private get teamId(): string {
@@ -111,7 +110,12 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         // goes to #users if (1) explicit #users, (2) no fragment, or (3) invalid fragment
         this.tabValue = (fragment === 'details') ? 'details' : 'users';
       });
-
+    this.store.pipe(
+      select(isIAMv2),
+      takeUntil(this.isDestroyed))
+      .subscribe(latest => {
+        this.isIAMv2 = latest;
+    });
     combineLatest([
       this.store.select(getStatus),
       this.store.select(updateStatus),
