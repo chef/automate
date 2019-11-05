@@ -29,6 +29,7 @@
   &:focus,
   &:active {
     border-color: $chef-primary-bright;
+    outline: none;
   }
 
   &[disabled] {
