@@ -53,7 +53,7 @@
           <label>
             <span class="label">Resource Type <span aria-hidden="true">*</span></span>
             <span class="custom-dropdown">
-              <select id="create-type-dropdown" ngDefaultControl formControlName="type">
+              <select id="create-type-dropdown" formControlName="type">
                 <option value='NODE'>Node</option>
                 <option value='EVENT'>Event</option>
               </select>
@@ -80,7 +80,7 @@
                 <label>
                   <span class="label">{{ getAttributeLabel() }}</span>
                   <span class="custom-dropdown">
-                    <select ngDefaultControl formControlName="attribute" data-cy="attribute-dropdown">
+                    <select formControlName="attribute" data-cy="attribute-dropdown">
                       <option
                         *ngFor="let option of attributeList"
                         [value]="option.key"
@@ -97,7 +97,7 @@
                 <label>
                   <span class="label">Operator</span>
                   <span class="custom-dropdown">
-                    <select class="operator-dropdown" ngDefaultControl formControlName="operator" data-cy="operator-dropdown">
+                    <select class="operator-dropdown" formControlName="operator" data-cy="operator-dropdown">
                       <option *ngFor="let operator of operators"
                         [value]="operator.key"
                       >{{ operator.value }}</option>
