@@ -13,6 +13,7 @@ func NewConfigRequest() *ConfigRequest {
 				Mlsa:    &config.Mlsa{},
 				Service: &ConfigRequest_V1_System_Service{},
 				Log:     &ConfigRequest_V1_System_Logger{},
+				Http:    &ConfigRequest_V1_System_HTTP{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -25,6 +26,9 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.Port = w.Int32(10104)
 	c.V1.Sys.Log.Level = w.String("error")
 
+	c.V1.Sys.Http.SslProtocols = w.String("TLSv1.2 TLSv1.3")
+	c.V1.Sys.Http.SslCiphers = w.String(config.InternalCipherSuite)
+	c.V1.Sys.Http.SslVerifyDepth = w.Int32(2)
 	return c
 }
 
