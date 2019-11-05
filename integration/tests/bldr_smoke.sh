@@ -28,7 +28,7 @@ do_deploy() {
 do_test_deploy() {
     log_info "running cypress in e2e"
 
-    pushd e2e
+    pushd e2e || return 1
 
     export CYPRESS_SKIP_SSO=true
     export CYPRESS_BASE_URL="https://$CONTAINER_HOSTNAME"
@@ -46,7 +46,7 @@ do_test_deploy() {
     export TEST_ORIGIN
     export TEST_TOKEN
 
-    popd
+    popd || return 1
 
     hab origin key generate "$TEST_ORIGIN"
     HAB_ORIGIN=$TEST_ORIGIN hab pkg build "integration/fixtures/test_plan/"
