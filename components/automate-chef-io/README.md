@@ -152,25 +152,80 @@ Block comments are usually placed before the start of an RPC service definition.
 
 Inline are usually placed within the message formats. Inline comments for API documentation are sometimes called "following comments".
 
+# API Documentation
 
-    * Installation of necessary things
-    * Commands to run
-    * TODO: is there a "getting started with automate" I can link to for this?
-    * Don't fix conflicts in generated files, regenerate
+To view the API documentation locally, 1. From the `components/automate-chef-io` directory, run the following command to start the development server.
 
-* Docs Styleguide
+    ```shell
+    $ make serve
+    ```
 
-    * Service title and description
-    * Field description
-    * Mention object reference gotcha
-    * Grammar choices? ie, 1st vs 3rd person, etc
-    * Tabs preferred over spaces
+    To view the API docs in your browser, navigate to:
 
-* Extra things
+    ```shell
+    http://localhost:1313/docs/api
+    ```
 
-* References / relevant links
+## Developing API Docs
 
-    * https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md#schemaObject
-    * https://github.com/grpc-ecosystem/grpc-gateway/blob/master/examples/proto/examplepb/a_bit_of_everything.proto
-    * https://github.com/Redocly/redoc/blob/master/docs/redoc-vendor-extensions.md#x-displayname
-    * https://swagger.io/docs/specification/2-0/basic-structure/
+We use the [ReDoc](https://github.com/Redocly/redoc) in conjunction with the the Hab studio for Automate, [grpc-gateway protoc-gen-swagger](https://github.com/grpc-ecosystem/grpc-gateway/tree/master/protoc-gen-swagger) and the [OpenAPI 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) to automatically generate API documentation from comments on automate protoc files.
+
+## Writing API Docs
+
+To develop API documentation, compile go components, sync the swagger, files and serve the development environment locally, run the following from the top level `automate` directory.
+
+To see your changes, you will need to re-run this command to re-build the documentation.
+
+    ```shell
+    hab studio run "source .studiorc && compile_all_protobuf_components" && pushd components/automate-chef-io/ && make sync_swagger_files generate_swagger && make serve || popd
+    ```
+
+    View the API docs in your browser:
+
+    ```shell
+    http://localhost:1313/docs/api
+    ```
+
+The proto files for APIs are located at:
+
+```shell
+automate/components/automate-gateway/api/
+```
+
+You can find the examples from these instructions at:
+
+```shell
+automate/components/automate-gateway/api/compliance/reporting/reporting.proto
+```
+
+Adding comments to a proto file uses Go inline and block comment syntax:
+
+```go
+/* This is a block comment */
+// This is an inline comment
+```
+
+Block comments are usually placed before the start of an RPC service definition. Block comments for API documentation are sometimes called "leading comments".
+
+Inline are usually placed within the message formats. Inline comments for API documentation are sometimes called "following comments".
+
+
+# Building the API docs
+
+Rebuilding the API docs is necessary when adding documentation content to Automate's .proto files. Making code changes in the .proto files does not require rebuilding, but any new or updated services, messages, or fields should be documented to keep the documentation up to date and accurate.
+
+## Build steps
+1. Make any edits to the .proto files necessary.
+2. Recompile the .proto files as described in the [Automate development guide](https://github.com/chef/automate/blob/master/dev-docs/DEV_ENVIRONMENT.md)
+3. Sync the .swagger files generated with those in the docs component: `make sync_swagger_files`
+4. Follow the instructions in the viewing the docs section.
+
+For convenience, an example of an all-in-one command to compile the .proto files and make the documentation viewable is:
+
+```
+hab studio run "source .studiorc && compile_all_protobuf_components" && pushd components/automate-chef-io/ && make sync_swagger_files serve || popd
+```
+
+## Notes on building the docs
+* If you end up with merge conflicts while writing API docs, don't attempt to resolve them in any generated files. It's better to resolve the conflicts in any human edited file and then regenerate the docs.
+* The all-in-one build command above can fail somewhere in the middle and leave things in an inconsistent state.  It is safe to run multiple times in a row while fixing syntax errors in .proto files or similar, but since it changes directories it can sometimes be necessary to change back to the root automate directory.
