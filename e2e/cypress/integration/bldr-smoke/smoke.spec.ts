@@ -16,7 +16,7 @@ if (Cypress.env('TEST_BUILDER')) {
             cy.get('#login').type('admin');
             cy.get('#password').type('chefautomate');
             cy.get('[type=submit]').click();
-
+            cy.location('hash').should('include', '#/origins');
             cy.log('Creating token');
             cy.visit('/bldr/#/profile');
             cy.get('.generate').contains('Generate Token').click();
