@@ -45,6 +45,7 @@ do_test_deploy() {
     export TEST_TOKEN
 
     hab origin key generate "$TEST_ORIGIN"
+    ls -lah "$A2_ROOT_DIR/integration/fixtures/test_plan/"
     HAB_ORIGIN=$TEST_ORIGIN hab pkg build "$A2_ROOT_DIR/integration/fixtures/test_plan/"
     SSL_CERT_FILE="/hab/svc/automate-load-balancer/data/$CONTAINER_HOSTNAME.cert" hab pkg upload -z "$TEST_TOKEN" -u "https://$CONTAINER_HOSTNAME/bldr/v1" "$A2_ROOT_DIR/$TEST_ORIGIN*".hart
 }
