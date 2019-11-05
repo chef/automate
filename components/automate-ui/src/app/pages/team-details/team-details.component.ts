@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
-import { filter, map, pluck, takeUntil, debounceTime } from 'rxjs/operators';
+import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { Params } from '@angular/router';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
@@ -209,13 +209,14 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     ]).pipe(
       takeUntil(this.isDestroyed),
       map(([params, url]: [Params, string]) => [params.id, url]),
-      // This needs the debounce because both of the observers will be triggered off an URL change
-      debounceTime(5),
       // Only fetch if we are on the team details route, otherwise
       // we'll trigger GetTeam with the wrong input on any route
       // away to a page that also uses the :id param.
-      filter(([_id, url]: [string, string]) => TEAM_DETAILS_ROUTE.test(url))
-    ).subscribe(([id, _url]: [string, string]) => this.store.dispatch(new GetTeam({ id })));
+      filter(([id, url]: [string, string]) => TEAM_DETAILS_ROUTE.test(url) && id !== undefined),
+      // Remove the url because we only need to check if the id has changed
+      map(([id, _url]: [string, string]) => id),
+      distinctUntilChanged()
+    ).subscribe((id: string) => this.store.dispatch(new GetTeam({ id })));
  }
 
   ngOnDestroy(): void {
