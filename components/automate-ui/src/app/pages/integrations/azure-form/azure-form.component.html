@@ -16,17 +16,17 @@
   <ng-container *ngIf="showInstanceCreds()" [formGroup]="formGroup.controls.credentials">
     <label class="form-field">
       <span class="label">Client ID</span>
-      <chef-input ngDefaultControl type="password" formControlName="azure_client_id"></chef-input>
+      <input chefInput type="password" formControlName="azure_client_id" />
     </label>
 
     <label class="form-field">
       <span class="label">Client Secret</span>
-      <chef-input ngDefaultControl type="password" formControlName="azure_client_secret"></chef-input>
+      <input chefInput type="password" formControlName="azure_client_secret" />
     </label>
 
     <label class="form-field">
       <span class="label">Tenant ID</span>
-      <chef-input ngDefaultControl type="password" formControlName="azure_tenant_id"></chef-input>
+      <input chefInput type="password" formControlName="azure_tenant_id" />
     </label>
   </ng-container>
 
