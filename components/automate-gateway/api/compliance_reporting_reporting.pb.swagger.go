@@ -920,6 +920,11 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "The number of results on each paginated request page."
+        },
+        "all_reports": {
+          "type": "boolean",
+          "format": "boolean",
+          "title": "For reporting/export. Specify if we want to see all reports or just the latest? true-\u003eexport all for given filter, false-\u003eexport only latest"
         }
       }
     },

@@ -358,6 +358,9 @@ message Query {
 	int32 page = 23;
 	// The number of results on each paginated request page.
 	int32 per_page = 24;
+
+    // For reporting/export. Specify if we want to see all reports or just the latest? true->export all for given filter, false->export only latest
+	bool all_reports = 25;
 }
 
 message ListFilter {

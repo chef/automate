@@ -35,6 +35,7 @@ message Query {
 	string sort = 22;
 	int32 page = 23;
 	int32 per_page = 24;
+	bool all_reports = 25;
 }
 message ListFilter {
 	repeated string values = 20;
