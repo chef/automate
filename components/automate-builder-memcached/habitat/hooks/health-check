@@ -1,0 +1,25 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+set -uo pipefail
+exec 2>&1
+
+rc=0
+response=$(echo "version" | nc 127.0.0.1 {{cfg.service.port}})
+case $? in
+    0)
+        case "$response" in
+            VERSION*)
+                rc=0
+                ;;
+            *)
+                echo "Unexpected memcached output: $response"
+                rc=2
+                ;;
+        esac
+        ;;
+    *)
+        rc=2
+        ;;
+esac
+
+exit $rc
