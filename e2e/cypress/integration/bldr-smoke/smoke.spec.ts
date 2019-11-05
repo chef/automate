@@ -2,7 +2,7 @@ if (Cypress.env('TEST_BUILDER')) {
     describe('builder smoke', () => {
         it('can login, create a token and an origin', () => {
             cy.visit('/bldr/');
-            cy.log("Logging in");
+            cy.log('Logging in');
             cy.get('.button').contains('Sign In').click();
             cy.location('hash').should('include', '#/sign-in');
             cy.get('.button').contains('Sign In with Chef Automate').click();
@@ -17,14 +17,14 @@ if (Cypress.env('TEST_BUILDER')) {
             cy.get('#password').type('chefautomate');
             cy.get('[type=submit]').click();
 
-            cy.log("Creating token");
+            cy.log('Creating token');
             cy.visit('/bldr/#/profile');
             cy.get('.generate').contains('Generate Token').click();
             cy.get('.copyable-component>span').first().then(el => {
                 return cy.writeFile('token', el.text());
             });
 
-            let origin = Math.random().toString(36).substring(7);
+            const origin = Math.random().toString(36).substring(7);
 
             cy.log(`Creating Origin "${origin}"`);
             cy.visit('/bldr/#/origins/create');
@@ -35,7 +35,7 @@ if (Cypress.env('TEST_BUILDER')) {
             // there.
             cy.get('button').contains('Save & Continue').wait(5000).click().then(() => {
                 return cy.writeFile('origin', origin);
-            })
+            });
             cy.location('hash').should('include', `#/origins/${origin}/packages`);
         });
     });
