@@ -23,7 +23,8 @@ map(select(
          #
          # automate-lb is responsible for adding required headers for
          # now
-         (.id != "HSTS" or .port != "2000") and                 # HSTS doesn't seem relevant for this API
+         (.id != "HSTS" or .port != "2000") and
+         (.id != "HSTS" or .port != "10104") and
          (.id != "HSTS" or .port != "10106") and
          (.id != "HSTS" or .port != "10115") and
          (.id != "HSTS" or .port != "10117") and
@@ -32,6 +33,7 @@ map(select(
          (.id != "HSTS" or .port != "10200") and
          (.id != "security_headers" or .port != "10161") and
          (.id != "security_headers" or .port != "10200") and
+         (.id != "security_headers" or .port != "10104") and
 
          # automate-cs erlang-services
          # TODO: erlang services use common prime
