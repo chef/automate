@@ -11,7 +11,7 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_svc_user="root"
 pkg_deps=(
-  core/runit
+  core/bash
   chef/mlsa
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # We need to pin here to get a build from unstable

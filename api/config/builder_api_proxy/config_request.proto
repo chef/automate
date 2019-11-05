@@ -29,7 +29,7 @@ message ConfigRequest {
 
 			message Service {
 				google.protobuf.StringValue host = 1;
-				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "http", default: 10104, protocol: "http" } ];
+				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "https", default: 10104, protocol: "https" } ];
 			}
 
 			message Logger {
@@ -52,6 +52,9 @@ message ConfigRequest {
 				google.protobuf.Int32Value keepalive_connections = 1;
 				google.protobuf.Int32Value keepalive_requests = 2;
 				google.protobuf.Int32Value keepalive_timeout = 3;
+				google.protobuf.StringValue ssl_ciphers = 4;
+				google.protobuf.StringValue ssl_protocols = 5;
+				google.protobuf.Int32Value ssl_verify_depth = 6;
 			}
 
 			message Web {

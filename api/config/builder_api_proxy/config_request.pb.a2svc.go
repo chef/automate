@@ -16,7 +16,7 @@ func (m *ConfigRequest) ServiceName() string {
 // BindPort sets the port tagged with the given name
 func (m *ConfigRequest) BindPort(name string, value uint16) error {
 	switch name {
-	case "http":
+	case "https":
 		v0 := &m.V1
 		if *v0 == nil {
 			*v0 = &ConfigRequest_V1{}
@@ -41,15 +41,15 @@ func (m *ConfigRequest) BindPort(name string, value uint16) error {
 func (m *ConfigRequest) ListPorts() []a2conf.PortInfo {
 	return []a2conf.PortInfo{a2conf.PortInfo{
 		Default:  uint16(int32(10104)),
-		Name:     "http",
-		Protocol: "http",
+		Name:     "https",
+		Protocol: "https",
 	}}
 }
 
 // GetPort gets the port tagged with the given name. If the value is not set, it returns 0.
 func (m *ConfigRequest) GetPort(name string) (uint16, error) {
 	switch name {
-	case "http":
+	case "https":
 		v0 := m.V1
 		if v0 == nil {
 			return 0, nil
