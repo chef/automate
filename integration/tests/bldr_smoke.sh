@@ -19,9 +19,7 @@ do_deploy() {
 
     log_info "applying dev license"
     chef-automate license apply "$A2_LICENSE"
-    timestamp=$(date +"%m-%d-%y-%H-%M")
 
-    log_info "fixing dns resolution for '${CONTAINER_HOSTNAME}'"
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
 }
 
@@ -35,9 +33,9 @@ do_test_deploy() {
     export CYPRESS_INTEGRATION_FOLDER=cypress/integration/bldr-smoke 
     export CYPRESS_SUPPORT_FILE='false'
     export CYPRESS_TEST_BUILDER='true'
-    npm install # get dependencies defined in e2e/package.json
+    npm install 
     if ! npm run cypress:run; then
-        buildkite-agent artifact upload "cypress/videos/*;cypress/videos/**/*;cypress/screenshots/*;cypress/screenshots/**/*"
+        buildkite-agent artifact upload "cypress/videos/**/*;cypress/screenshots/**/*"
         return 1
     fi
 
