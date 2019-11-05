@@ -1,0 +1,21 @@
+@import '../table.component';
+
+:host {
+  display: table-cell;
+  padding: $size_16;
+  vertical-align: middle;
+  text-align: left;
+  font-size: 14px;
+  border-bottom: 1px solid $chef-light-grey;
+  border-top: 1px solid $chef-light-grey;
+}
+
+:host:first-child {
+  border-left: 1px solid $chef-light-grey;
+  border-radius: $global-radius 0 0 $global-radius;
+}
+
+:host:last-child {
+  border-right: 1px solid $chef-light-grey;
+  border-radius: 0 $global-radius $global-radius 0;
+}

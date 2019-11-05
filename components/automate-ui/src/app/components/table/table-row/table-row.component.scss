@@ -1,0 +1,8 @@
+@import '../table.component';
+
+:host {
+  display: table-row;
+  padding: $size_16;
+  background-color: $white;
+  box-shadow: 0 0 $size_16 0 $chef-light-grey;
+}
