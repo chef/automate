@@ -728,15 +728,15 @@ func (client *Client) startPGRestoreStream(db string, r *io.PipeReader) (func() 
 }
 
 func (client *Client) grantAllOnSchema(role, schema string) error {
-	quotedRoleName := pg.QuoteIdentifier(role)
-	quotedSchemaName := pg.QuoteIdentifier(schema)
+	quotedRoleName := pq.QuoteIdentifier(role)
+	quotedSchemaName := pq.QuoteIdentifier(schema)
 	query := fmt.Sprintf(grantAllOnSchemaQuery, quotedSchemaName, quotedRoleName)
 	return client.DB.ExecStatement(query)
 }
 
 func renderChownAllInSchemaQuery(role, schema string) string {
-	quotedSchemaName := pg.QuoteLiteral(schema)
-	quotedOwner := pg.QuoteLiteral(role)
+	quotedSchemaName := pq.QuoteLiteral(schema)
+	quotedOwner := pq.QuoteLiteral(role)
 	return fmt.Sprintf(chownAllInSchemaQuery, quotedSchemaName, quotedOwner)
 }
 func (client *Client) chownAllInSchema(role, schema string) error {
@@ -745,7 +745,7 @@ func (client *Client) chownAllInSchema(role, schema string) error {
 }
 
 func (client *Client) schemaExists(schema string) (bool, error) {
-	quotedSchema := pg.QuoteLiteral(schema)
+	quotedSchema := pq.QuoteLiteral(schema)
 	query := fmt.Sprintf(schemaExistsQuery, quotedSchema)
 	return client.DB.BoolQuery(query)
 }

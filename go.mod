@@ -67,7 +67,7 @@ require (
 	github.com/konsorten/go-windows-terminal-sequences v1.0.2 // indirect
 	github.com/kylelemons/godebug v0.0.0-20170820004349-d65d576e9348
 	github.com/leanovate/gopter v0.2.4
-	github.com/lib/pq v0.0.0-20171126050459-83612a56d3dd
+	github.com/lib/pq v1.2.0
 	github.com/lyft/protoc-gen-star v0.4.11
 	github.com/magiconair/properties v1.7.4 // indirect
 	github.com/mattn/go-colorable v0.0.9 // indirect

@@ -309,9 +309,10 @@ github.com/leanovate/gopter
 github.com/leanovate/gopter/commands
 github.com/leanovate/gopter/gen
 github.com/leanovate/gopter/prop
-# github.com/lib/pq v0.0.0-20171126050459-83612a56d3dd
+# github.com/lib/pq v1.2.0
 github.com/lib/pq
 github.com/lib/pq/oid
+github.com/lib/pq/scram
 # github.com/lyft/protoc-gen-star v0.4.11
 github.com/lyft/protoc-gen-star
 github.com/lyft/protoc-gen-star/lang/go
