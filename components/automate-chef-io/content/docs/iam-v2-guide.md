@@ -243,7 +243,7 @@ so they are not relevant when assigning IAM resources such as teams or roles.
 
 To create a project, navigate to the Projects list under the **Settings** tab and select **Create Project**. You will need to provide a name and can optionally edit the ID. You must create a project before you can assign any resources to it.
 
-When you initiate the project creation, the system actually creates not just the project but also three supplemental policies for your convenience:
+When you initiate the project creation, the system creates not just the project but also three supplemental policies for your convenience:
 
 Policy Name                      | Policy ID                        | Associated Role
 ---------------------------------|----------------------------------|----------------
