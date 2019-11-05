@@ -6,12 +6,11 @@ import (
 	"strings"
 	"time"
 
-	_ "github.com/lib/pq"
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/applications-service/pkg/storage"
 	"github.com/chef/automate/lib/pgutils"
-	"github.com/chef/automate/lib/platform/pg"
 )
 
 // composedService is a more user friendly and clear representation of a service.
@@ -303,7 +302,7 @@ func (db *Postgres) GetServicesDistinctValues(fieldName, queryFragment string, f
 		return nil, errors.Errorf("field name %q is not valid for filtering, valid values are %v", fieldName, validFilterFields)
 	}
 
-	columnName := pg.QuoteIdentifier(columnNameForField(fieldName))
+	columnName := pq.QuoteIdentifier(columnNameForField(fieldName))
 	queryFirst := fmt.Sprintf("SELECT DISTINCT %[1]s from service_full AS t WHERE t.%[1]s ILIKE $1 ",
 		columnName,
 	)

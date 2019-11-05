@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chef/automate/lib/platform/pg"
+	"github.com/lib/pq"
 )
 
 // AlterRoleQuery represents the available options for an ALTER ROLE query
@@ -94,12 +94,12 @@ func (o *AlterRoleQuery) String() string {
 		if o.Password.Unencrypted {
 			options = append(options, "UNENCRYPTED")
 		}
-		options = append(options, fmt.Sprintf("PASSWORD %s", pg.QuoteLiteral(o.Password.Value)))
+		options = append(options, fmt.Sprintf("PASSWORD %s", pq.QuoteLiteral(o.Password.Value)))
 	}
 
 	if len(options) == 0 {
 		return ""
 	}
 
-	return fmt.Sprintf("ALTER ROLE %s WITH %s", pg.QuoteIdentifier(o.Role), strings.Join(options, " "))
+	return fmt.Sprintf("ALTER ROLE %s WITH %s", pq.QuoteIdentifier(o.Role), strings.Join(options, " "))
 }
