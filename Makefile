@@ -23,7 +23,7 @@ revendor: ## revendor dependencies in vendor/ and update .bldr.toml with deps
 
 	# Add files that go mod won't vendor that we need
 	@mkdir -p $(grpcGatewayVendorPath)
-	@cp -rf --no-preserve=mode $(grpcGatewayModPath)/* $(grpcGatewayVendorPath)
+	@cp -rf $(grpcGatewayModPath)/* $(grpcGatewayVendorPath)
 
 	# Update .bldr with new dep information
 	@go run tools/bldr-config-gen/main.go
