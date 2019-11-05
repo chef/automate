@@ -2,13 +2,14 @@
 
 #shellcheck disable=SC2034
 test_name="bldr_smoke"
-# Note: we only run cypress here, ignore diagnostics and inspec
+
 test_deploy_inspec_profiles=()
 test_skip_diagnostics=true
 
 do_deploy() {
     do_deploy_default
 
+    #shellcheck disable=SC2154
     chef-automate deploy config.toml \
         --product automate \
         --product builder \
@@ -40,9 +41,12 @@ do_test_deploy() {
         return 1
     fi
 
-    export TEST_ORIGIN="$(cat origin)"
-    export TEST_TOKEN="$(cat token)"
+    TEST_ORIGIN="$(cat origin)"
+    TEST_TOKEN="$(cat token)"
+    export TEST_ORIGIN
+    export TEST_TOKEN
+
     hab origin key generate "$TEST_ORIGIN"
     HAB_ORIGIN=$TEST_ORIGIN hab pkg build "$A2_ROOT_DIR/integration/fixtures/test_plan/"
-    SSL_CERT_FILE=/hab/svc/automate-load-balancer/data/$CONTAINER_HOSTNAME.cert hab pkg upload -z "$TEST_TOKEN" -u https://$CONTAINER_HOSTNAME/bldr/v1 $A2_ROOT_DIR/$TEST_ORIGIN*.hart
+    SSL_CERT_FILE="/hab/svc/automate-load-balancer/data/$CONTAINER_HOSTNAME.cert" hab pkg upload -z "$TEST_TOKEN" -u "https://$CONTAINER_HOSTNAME/bldr/v1" $A2_ROOT_DIR/$TEST_ORIGIN*.hart
 }
