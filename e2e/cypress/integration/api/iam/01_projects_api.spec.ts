@@ -11,7 +11,7 @@ describeIfIAMV2p1('projects API', () => {
   describe('project graveyarding and deletion', () => {
     const projectID = `${cypressPrefix}-to-delete-${Cypress.moment().format('MMDDYYhhmm')}`;
     before(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
     });
 
     it('gives a 404 when the project does not exist', () => {
@@ -111,7 +111,7 @@ describeIfIAMV2p1('projects API', () => {
       // it gets run every time:
       // tslint:disable-next-line:max-line-length
       // https://docs.cypress.io/guides/references/best-practices.html#Using-after-or-afterEach-hooks
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -193,7 +193,7 @@ describeIfIAMV2p1('projects API', () => {
     });
 
     after(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
     });
 
     it('new rules get applied to nodes', () => {

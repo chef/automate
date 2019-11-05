@@ -15,7 +15,7 @@ describe('team management', () => {
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
       cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
       if (!isV1()) {
         cy.request({
@@ -55,7 +55,7 @@ describe('team management', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
   });
 
   describe('no custom initial page state', () => {
@@ -156,7 +156,7 @@ describe('team management', () => {
       });
 
       after(() => {
-        cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+        cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
       });
 
       afterEach(() => {

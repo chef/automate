@@ -22,7 +22,7 @@ describe('team details', () => {
       adminIdToken = admin.id_token;
 
       cy.cleanupUsersByNamePrefix(cypressPrefix);
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
       cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
 
       cy.request({
@@ -97,7 +97,7 @@ describe('team details', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
   });
 
   it('displays team details for admins team', () => {

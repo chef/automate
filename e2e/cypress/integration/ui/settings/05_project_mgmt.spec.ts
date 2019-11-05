@@ -23,7 +23,7 @@ describeIfIAMV2p1('project management', () => {
     cy.adminLogin('/settings/projects').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminIdToken = admin.id_token;
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
         // Set the projects filter to all projects
         cy.applyProjectsFilter([]);
     });
@@ -38,7 +38,7 @@ describeIfIAMV2p1('project management', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
   });
 
   it('has a disabled button when there are no rules', () => {
@@ -246,7 +246,7 @@ describeIfIAMV2p1('project management', () => {
 
   // these tests are currently interdependent so mark as flaky until the above isn't
   itFlaky('can create a project with a custom ID', () => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
     cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');
