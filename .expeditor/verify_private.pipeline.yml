@@ -820,4 +820,7 @@ steps:
         A2_LICENSE:
           path: secret/a2/license
           field: license
+      executor:
+        linux:
+          privileged: true
 
