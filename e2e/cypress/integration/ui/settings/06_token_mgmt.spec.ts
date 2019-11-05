@@ -1,3 +1,5 @@
+import { iamVersion } from '../../constants';
+
 describe('token management', () => {
   const typeDelay = 50;
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -54,9 +56,15 @@ describe('token management', () => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['tokens']);
   });
 
-  it('displays heading and table', () => {
-    cy.get('chef-heading').contains('API Tokens');
+  it('displays token table', () => {
+    cy.get('#create-button').contains('Create Token');
     cy.get(tokensTable).should('exist');
+    cy.get(tokensTable).contains('Name');
+    cy.get(tokensTable).contains('Status');
+    if (iamVersion === 'v2.1') {
+        cy.get(tokensTable).contains('ID');
+        cy.get(tokensTable).contains('Projects');
+    }
   });
 
   it('displays the returned tokens info', () => {
