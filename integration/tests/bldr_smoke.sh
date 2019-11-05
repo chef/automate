@@ -7,8 +7,6 @@ test_deploy_inspec_profiles=()
 test_skip_diagnostics=true
 
 do_deploy() {
-    do_deploy_default
-
     #shellcheck disable=SC2154
     chef-automate deploy config.toml \
         --product automate \
