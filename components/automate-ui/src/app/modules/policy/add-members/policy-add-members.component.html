@@ -66,10 +66,7 @@
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 109.219 }}">
                 <label>
                   <span class="label">{{ nameOrId }} <span aria-hidden="true">*</span></span>
-                  <chef-input id="expression-name-dropdown" 
-                              ngDefaultControl 
-                              (keyup)="updateFormDisplay('name')"
-                              formControlName="name"></chef-input>
+                  <input chefInput id="expression-name-dropdown" formControlName="name" (keyup)="updateFormDisplay('name')" />
                 </label>
                 <p class="note">A single wildcard (*) is allowed.</p>
 
