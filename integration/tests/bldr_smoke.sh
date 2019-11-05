@@ -27,7 +27,9 @@ do_deploy() {
 
 do_test_deploy() {
     log_info "running cypress in e2e"
-    cd "${A2_ROOT_DIR}/e2e" || return 1
+
+    pushd e2e
+
     export CYPRESS_SKIP_SSO=true
     export CYPRESS_BASE_URL="https://$CONTAINER_HOSTNAME"
     export CYPRESS_INTEGRATION_FOLDER=cypress/integration/bldr-smoke 
@@ -44,8 +46,9 @@ do_test_deploy() {
     export TEST_ORIGIN
     export TEST_TOKEN
 
+    popd
+
     hab origin key generate "$TEST_ORIGIN"
-    ls -lah "$A2_ROOT_DIR/integration/fixtures/test_plan/"
-    HAB_ORIGIN=$TEST_ORIGIN hab pkg build "$A2_ROOT_DIR/integration/fixtures/test_plan/"
+    HAB_ORIGIN=$TEST_ORIGIN hab pkg build "integration/fixtures/test_plan/"
     SSL_CERT_FILE="/hab/svc/automate-load-balancer/data/$CONTAINER_HOSTNAME.cert" hab pkg upload -z "$TEST_TOKEN" -u "https://$CONTAINER_HOSTNAME/bldr/v1" "$A2_ROOT_DIR/$TEST_ORIGIN*".hart
 }
