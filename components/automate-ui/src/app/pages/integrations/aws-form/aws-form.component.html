@@ -16,12 +16,12 @@
   <ng-container *ngIf="showInstanceCreds()" [formGroup]="formGroup.controls.credentials">
     <label class="form-field">
       <span class="label">Enter your AWS access key ID</span>
-      <chef-input ngDefaultControl type="password" formControlName="aws_access_key_id"></chef-input>
+      <input chefInput type="password" formControlName="aws_access_key_id" />
     </label>
 
     <label class="form-field">
       <span class="label">Enter your AWS secret access key</span>
-      <chef-input ngDefaultControl type="password" formControlName="aws_secret_access_key"></chef-input>
+      <input chefInput type="password" formControlName="aws_secret_access_key" />
     </label>
   </ng-container>
 
