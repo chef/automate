@@ -12,15 +12,15 @@
         <thead>
           <tr class="detail-row">
             <th class="header-column">ID</th>
-            <th class="header-column" *ngIf="projectsEnabled">Projects</th>
+            <th class="header-column" *ngIf="isIAMv2">Projects</th>
             <th class="header-column">Date Created</th>
             <th class="header-column">Status</th>
           </tr>
         </thead>
         <tbody>
           <tr class="detail-row">
-            <td class="header-column">{{ token?.id }}</td>
-            <td class="header-column" *ngIf="projectsEnabled">
+            <td class="header-column" data-cy="token-id">{{ token?.id }}</td>
+            <td class="header-column" *ngIf="isIAMv2">
               <ng-container *ngIf="token?.projects.length === 0">
                 {{ unassigned }}
               </ng-container>
@@ -32,7 +32,7 @@
               </ng-container>
             </td>
             <td class="header-column">{{ token?.created_at | datetime:'ddd, MMMM D, YYYY [at] H:mm a' }}</td>
-            <td class="header-column">{{ status | capitalize }}</td>
+            <td class="header-column" data-cy="token-status">{{ status | capitalize }}</td>
           </tr>
         </tbody>
       </table>
@@ -44,12 +44,12 @@
       <form [formGroup]="updateForm">
         <chef-form-field>
           <label>Name <span aria-hidden="true">*</span></label>
-          <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"/>
+          <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="name-input"/>
           <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
             Name is required.
           </chef-error>
         </chef-form-field>
-        <div id='projects-container' *ngIf="projectsEnabled">
+        <div id='projects-container' *ngIf="isIAMv2">
           <app-projects-dropdown
             [projects]="projects"
             (onProjectChecked)="onProjectChecked($event)"

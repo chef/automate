@@ -1,9 +1,10 @@
+import { describeIfIAMV2p1, itFlaky } from '../../constants';
 interface CreateProject {
   id: string;
   name: string;
 }
 
-describe('global projects filter', () => {
+describeIfIAMV2p1('global projects filter', () => {
   const proj1 = <CreateProject>
     { id: 'cypress-project-1', name: 'Cypress Project 1 ' + Cypress.moment().format('MMDDYYhhmm') };
   const proj2 = <CreateProject>
@@ -30,22 +31,12 @@ describe('global projects filter', () => {
 
   it('shows all projects for admin', () => {
     cy.adminLogin('/settings');
-
     cy.get('chef-sidebar');
-    cy.get('chef-sidebar').invoke('attr', 'minor-version')
-      .then((obj: Cypress.ObjectLike) => {
-        // Cypress.ObjectLike can't be casted to a string directly,
-        // so must convert to Object type (common to all JS objects) first
-        if (<string><Object>obj === 'v1') {
-          cy.get('#projects-filter-button').click();
-
-          const allowedProjects = [proj1.name, proj2.name, proj3.name, '(unassigned)'];
-          // we don't check that projects in dropdown match *exactly* as
-          // we can't control creation of other projects in the test env
-          allowedProjects.forEach(project => {
-            cy.get('#projects-filter-dropdown').contains(project);
-          });
-        }
+      const allowedProjects = [proj1.name, proj2.name, proj3.name, '(unassigned)'];
+      // we don't check that projects in dropdown match *exactly* as
+      // we can't control creation of other projects in the test env
+      allowedProjects.forEach(project => {
+        cy.get('#projects-filter-dropdown').contains(project);
       });
     cy.logout();
   });

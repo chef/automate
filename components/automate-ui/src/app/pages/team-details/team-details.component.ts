@@ -14,7 +14,7 @@ import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import { iamMajorVersion, atLeastV2p1 } from 'app/entities/policies/policy.selectors';
+import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import {
   v1TeamFromRoute,
   v2TeamFromRoute,
@@ -42,7 +42,6 @@ import {
   getAllStatus as getAllProjectStatus
 } from 'app/entities/projects/project.selectors';
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -64,15 +63,13 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public teamMembershipView = false;
 
   public team: Team;
-  public isMajorV1 = true;
-
   public users: User[] = [];
   private isDestroyed = new Subject<boolean>();
 
   public addButtonText = 'Add User';
   public removeText = 'Remove User';
 
-  public projectsEnabled: boolean;
+  public isIAMv2: boolean;
   public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -95,20 +92,14 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]),
       projects: [[]]
     });
-    this.store.pipe(
-      select(atLeastV2p1),
-      takeUntil(this.isDestroyed))
-      .subscribe(projectsEnabled => {
-        this.projectsEnabled = projectsEnabled;
-      });
   }
 
   private get teamId(): string {
-    return this.isMajorV1 ? this.team.guid : this.team.id;
+    return this.isIAMv2 ? this.team.id : this.team.guid;
   }
 
   public get descriptionOrName(): string {
-    return this.isMajorV1 ? 'description' : 'name';
+    return this.isIAMv2 ? 'name' : 'description';
   }
 
   ngOnInit(): void {
@@ -119,7 +110,12 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         // goes to #users if (1) explicit #users, (2) no fragment, or (3) invalid fragment
         this.tabValue = (fragment === 'details') ? 'details' : 'users';
       });
-
+    this.store.pipe(
+      select(isIAMv2),
+      takeUntil(this.isDestroyed))
+      .subscribe(latest => {
+        this.isIAMv2 = latest;
+    });
     combineLatest([
       this.store.select(getStatus),
       this.store.select(updateStatus),
@@ -140,13 +136,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(v1TeamFromRoute),
-      this.store.select(v2TeamFromRoute),
-      this.store.select(iamMajorVersion)
+      this.store.select(v2TeamFromRoute)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      map(([v1Team, v2Team, major]: [Team, Team, IAMMajorVersion]) => {
-        this.isMajorV1 = major === 'v1';
-        return (this.isMajorV1 ? v1Team : v2Team);
+      map(([v1Team, v2Team]: [Team, Team]) => {
+        return this.isIAMv2 ? v2Team : v1Team;
       }),
       filter(identity)
     ).subscribe((team: Team) => {
@@ -154,7 +148,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         this.updateNameForm.controls.name.setValue(this.team.name);
         this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
         this.store.dispatch(new GetUsers());
-        if (this.projectsEnabled) {
+      if (this.isIAMv2) {
           this.store.dispatch(new GetProjects());
         }
       });

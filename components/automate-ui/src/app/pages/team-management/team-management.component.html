@@ -23,7 +23,7 @@
       [conflictErrorEvent]="conflictErrorEvent"
       objectNoun="team"
       [createForm]="createTeamForm"
-      [showProjectsDropdown]="projectsEnabled$ | async"
+      [showProjectsDropdown]="isIAMv2"
       [assignableProjects]="dropdownProjects"
       (close)="closeCreateModal()"
       (createClicked)="createV2Team()">
@@ -32,7 +32,7 @@
     <app-delete-object-modal
       [visible]="deleteModalVisible"
       objectNoun="team"
-      [objectName]="isMajorV1 ? teamToDelete?.id : teamToDelete?.name"
+      [objectName]="isIAMv2 ? teamToDelete?.name : teamToDelete?.id"
       (close)="closeDeleteModal()"
       (deleteClicked)="deleteTeam()"
       objectAction="Delete">
@@ -54,10 +54,10 @@
                     <span>Name</span>
                   </chef-th>
                   <chef-th class="name-column">
-                    <span *ngIf="isMajorV1">Description</span>
-                    <span *ngIf="!isMajorV1">ID</span>
+                    <span *ngIf="isIAMv2">ID</span>
+                    <span *ngIf="!isIAMv2">Description</span>
                   </chef-th>
-                  <chef-th *ngIf="projectsEnabled$ | async" class="projects-column">
+                  <chef-th *ngIf="isIAMv2" class="projects-column">
                     <span>Projects</span>
                   </chef-th>
                   <chef-th class="button-column"></chef-th>
@@ -67,14 +67,14 @@
                 <chef-tr *ngFor="let team of sortedTeams$ | async">
                   <chef-td class="id-column">
                     <!-- we must continue to use the guid as the identifier for teams while on v1 -->
-                    <a *ngIf="isMajorV1" [routerLink]="['/settings/teams', team.guid]">{{ team.id }}</a>
-                    <a *ngIf="!isMajorV1" [routerLink]="['/settings/teams', team.id]">{{ team.name }}</a>
+                    <a *ngIf="!isIAMv2" [routerLink]="['/settings/teams', team.guid]">{{ team.id }}</a>
+                    <a *ngIf="isIAMv2" [routerLink]="['/settings/teams', team.id]">{{ team.name }}</a>
                   </chef-td>
                   <chef-td class="name-column">
-                    <span *ngIf="isMajorV1">{{ team.name }}</span>
-                    <span *ngIf="!isMajorV1">{{ team.id }}</span>
+                    <span *ngIf="!isIAMv2">{{ team.name }}</span>
+                    <span *ngIf="isIAMv2">{{ team.id }}</span>
                   </chef-td>
-                  <chef-td *ngIf="projectsEnabled$ | async" class="projects-column">
+                  <chef-td *ngIf="isIAMv2" class="projects-column">
                     <span *ngIf="team.projects.length === 0">{{ unassigned }}</span>
                     <span *ngIf="team.projects.length === 1">{{ team.projects[0] }}</span>
                     <span *ngIf="team.projects.length > 1">{{ team.projects.length }} projects</span>

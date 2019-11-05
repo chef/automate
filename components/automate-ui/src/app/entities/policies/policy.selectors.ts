@@ -16,15 +16,9 @@ export const iamMajorVersion = createSelector(
   (state) => state.iamMajorVersion
 );
 
-export const iamMinorVersion = createSelector(
+export const isIAMv2 = createSelector(
   policyState,
-  (state) => state.iamMinorVersion
-);
-
-export const atLeastV2p1 = createSelector(
-  policyState,
-  (state) => state.iamMajorVersion > 'v2' || (
-  state.iamMajorVersion === 'v2' && state.iamMinorVersion >= 'v1')
+  (state) => (state.iamMajorVersion === 'v2')
 );
 
 export const getAllStatus = createSelector(

@@ -117,7 +117,7 @@ describe('ProjectListComponent', () => {
     element = fixture.debugElement.nativeElement;
     store = TestBed.get(Store);
 
-    component.projectsEnabled$ = observableOf(true);
+    component.isIAMv2$ = observableOf(true);
     fixture.detectChanges();
   });
 
@@ -131,7 +131,7 @@ describe('ProjectListComponent', () => {
 
   describe('when there are projects', () => {
 
-    it('displays project data for v2.1', () => {
+    it('displays project data for v2', () => {
       store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       fixture.detectChanges();
       expect(element).toContainPath('chef-table');
@@ -143,8 +143,8 @@ describe('ProjectListComponent', () => {
       });
     });
 
-    it('does not display project data for less than v2.1', () => {
-      component.projectsEnabled$ = observableOf(false);
+    it('does not display project data for v1', () => {
+      component.isIAMv2$ = observableOf(false);
       store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       expect(element).not.toContainPath('chef-table');
     });

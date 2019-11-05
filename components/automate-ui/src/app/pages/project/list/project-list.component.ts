@@ -10,9 +10,7 @@ import { Regex } from 'app/helpers/auth/regex';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
-import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
-import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
+import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
   allProjects, getAllStatus, createStatus, createError
@@ -29,8 +27,7 @@ import { LoadOptions } from 'app/services/projects-filter/projects-filter.action
 })
 export class ProjectListComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean>;
-  public iamMajorVersion$: Observable<IAMMajorVersion>;
-  public projectsEnabled$: Observable<boolean>;
+  public isIAMv2$: Observable<boolean>;
   public sortedProjects$: Observable<Project[]>;
   public projectToDelete: Project;
   public deleteModalVisible = false;
@@ -69,8 +66,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.sortedProjects$ = store.select(allProjects).pipe(
       map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name')));
 
-    this.iamMajorVersion$ = store.select(iamMajorVersion);
-    this.projectsEnabled$ = store.select(atLeastV2p1);
+    this.isIAMv2$ = store.select(isIAMv2);
 
     this.projects.applyRulesStatus$
       .pipe(takeUntil(this.isDestroyed))

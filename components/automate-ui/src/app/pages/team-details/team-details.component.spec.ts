@@ -7,7 +7,6 @@ import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
-import { using } from 'app/testing/spec-helpers';
 import {
   projectsFilterReducer,
   projectsFilterInitialState
@@ -15,9 +14,6 @@ import {
 import {
   policyEntityReducer, PolicyEntityInitialState
 } from 'app/entities/policies/policy.reducer';
-import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
-import { IamVersionResponse } from 'app/entities/policies/policy.requests';
-import { IAMMajorVersion, IAMMinorVersion } from 'app/entities/policies/policy.model';
 import {
   projectEntityReducer,
   ProjectEntityInitialState
@@ -164,42 +160,40 @@ describe('TeamDetailsComponent', () => {
     });
   });
 
-  using([
-    [targetId, 'other', 'v2'],
-    ['other', targetId, 'v1']
-  ], function (id: string, guid: string, major: IAMMajorVersion) {
-    it(`handles team users for ${major}`, () => {
+    it('handles team users for v2', () => {
       spyOn(store, 'dispatch').and.callThrough();
-      const team: Team = { id, guid, name: 'any', projects: [] };
+      component.isIAMv2 = true;
+      const team: Team = { id: targetId, guid: 'any', name: 'any', projects: [] };
       store.dispatch(new GetTeamSuccess(team));
-      const version: IamVersionResponse = { version: { major: major, minor: 'v0' } };
-      store.dispatch(new GetIamVersionSuccess(version));
 
       expect(store.dispatch).toHaveBeenCalledWith(new GetUsers());
       expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
     });
-  });
 
-  using([
-    ['v2', 'v0'],
-    ['v1', 'v0']
-  ], function (major: IAMMajorVersion, minor: IAMMinorVersion) {
-    it('does not fetch projects for unsupported IAM versions', () => {
+    it('handles team users for v1', () => {
       spyOn(store, 'dispatch').and.callThrough();
-      const team: Team = { id: 'any', guid: 'any', name: 'any', projects: [] };
+      component.isIAMv2 = false;
+      const team: Team = { id: 'any', guid: targetId, name: 'any', projects: [] };
       store.dispatch(new GetTeamSuccess(team));
-      const version: IamVersionResponse = { version: { major, minor } };
-      store.dispatch(new GetIamVersionSuccess(version));
+      component.isIAMv2 = false;
 
-      expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
+      expect(store.dispatch).toHaveBeenCalledWith(new GetUsers());
+      expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
     });
+
+  it('does not fetch projects in v1', () => {
+    spyOn(store, 'dispatch').and.callThrough();
+    const team: Team = { id: 'any', guid: 'any', name: 'any', projects: [] };
+    store.dispatch(new GetTeamSuccess(team));
+    component.isIAMv2 = false;
+
+    expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
   });
 
 
   it('initializes dropdown with those included on the team checked', () => {
     spyOn(store, 'dispatch').and.callThrough();
-    const version: IamVersionResponse = { version: { major: 'v2', minor: 'v1' } };
-    store.dispatch(new GetIamVersionSuccess(version));
+    component.isIAMv2 = true;
     const teamProjects = ['b-proj', 'd-proj'];
     const team: Team = { id: targetId, guid: 'any', name: 'any', projects: teamProjects };
     store.dispatch(new GetTeamSuccess(team));

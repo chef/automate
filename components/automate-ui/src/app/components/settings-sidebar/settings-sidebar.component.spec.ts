@@ -10,7 +10,6 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { SettingsLandingComponent } from 'app/pages/settings-landing/settings-landing.component';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import { checkFirstPerm } from 'app/testing/spec-helpers';
 import { SettingsSidebarComponent } from './settings-sidebar.component';
 
@@ -64,12 +63,8 @@ describe('SettingsSidebarComponent', () => {
   });
 
   describe('IAM v2', () => {
-    beforeEach(() => {
-      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v2');
-    });
-
     it('shows all links consistent with settings-landing', () => {
-      component.projectsEnabled$ = observableOf(true);
+      component.isIAMv2$ = observableOf(true);
       fixture.detectChanges();
       const links = element.nativeElement
         .querySelectorAll('div.nav-items chef-sidebar-entry');
@@ -77,7 +72,7 @@ describe('SettingsSidebarComponent', () => {
     });
 
     it('has route order consistent with settings-landing', () => {
-      component.projectsEnabled$ = observableOf(true);
+      component.isIAMv2$ = observableOf(true);
       fixture.detectChanges();
       const links = element.nativeElement
         .querySelectorAll('div.nav-items chef-sidebar-entry');
@@ -88,7 +83,7 @@ describe('SettingsSidebarComponent', () => {
     });
 
     it('has paths consistent with settings-landing', () => {
-      component.projectsEnabled$ = observableOf(true);
+      component.isIAMv2$ = observableOf(true);
       fixture.detectChanges();
       const elements = Array
         .from<HTMLElement>(
@@ -110,11 +105,8 @@ describe('SettingsSidebarComponent', () => {
   });
 
   describe('IAM v1', () => {
-    beforeEach(() => {
-      component.iamMajorVersion$ = observableOf(<IAMMajorVersion>'v1');
-    });
-
     it('shows 8 links', () => {
+      component.isIAMv2$ = observableOf(false);
       fixture.detectChanges();
       const links = element.nativeElement
         .querySelectorAll('div.nav-items chef-sidebar-entry');
@@ -132,6 +124,7 @@ describe('SettingsSidebarComponent', () => {
       ['API Tokens', '/settings/tokens', 7]
     ], (label: string, path: string, position: number) => {
       it(`displays the ${label} navigation link`, () => {
+        component.isIAMv2$ = observableOf(false);
         fixture.detectChanges();
         const links = element.nativeElement
           .querySelectorAll('div.nav-items chef-sidebar-entry');

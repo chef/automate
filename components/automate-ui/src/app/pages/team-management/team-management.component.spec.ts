@@ -99,7 +99,7 @@ describe('TeamManagementComponent', () => {
 
     beforeEach(() => {
       store = TestBed.get(Store);
-      component.isMajorV1 = true;
+      component.isIAMv2 = false;
     });
 
     it('openCreateModal on v1 opens v1 modal', () => {
@@ -176,7 +176,7 @@ describe('TeamManagementComponent', () => {
 
     beforeEach(() => {
       store = TestBed.get(Store);
-      component.isMajorV1 = false;
+      component.isIAMv2 = true;
     });
 
     it('openCreateModal on v2 opens v2 modal', () => {

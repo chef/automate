@@ -12,7 +12,7 @@ import { loading, EntityStatus } from 'app/entities/entities';
 import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions';
 import { apiTokenFromRoute, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
-import { atLeastV2p1 } from 'app/entities/policies/policy.selectors';
+import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { GetProjects } from 'app/entities/projects/project.actions';
 import {
@@ -41,7 +41,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   public saveInProgress = false;
   public saveSuccessful = false;
 
-  public projectsEnabled: boolean;
+  public isIAMv2: boolean;
   public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -57,10 +57,10 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       projects: [[]]
     });
     this.store.pipe(
-      select(atLeastV2p1),
+      select(isIAMv2),
       takeUntil(this.isDestroyed))
-      .subscribe(projectsEnabled => {
-        this.projectsEnabled = projectsEnabled;
+      .subscribe(latest => {
+        this.isIAMv2 = latest;
       });
   }
 
@@ -74,7 +74,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
         this.updateForm.controls.name.setValue(this.token.name);
         this.status = this.token.active ? 'active' : 'inactive';
         this.updateForm.controls.status.setValue(this.status);
-        if (this.projectsEnabled) {
+        if (this.isIAMv2) {
           this.store.dispatch(new GetProjects());
         }
       });

@@ -8,7 +8,7 @@ import { identity } from 'lodash/fp';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus } from 'app/entities/entities';
-import { iamMajorVersion, atLeastV2p1 } from 'app/entities/policies/policy.selectors';
+import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import {
   createError,
   createStatus,
@@ -38,10 +38,9 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public createV1TeamModalVisible = false;
   public creatingTeam = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  public projectsEnabled$: Observable<boolean>;
-  public isMajorV1 = true;
   public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
+  public isIAMv2: boolean;
 
   private isDestroyed = new Subject<boolean>();
 
@@ -53,7 +52,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.sortedTeams$ = store.select(allTeams).pipe(
       map((teams: Team[]) => ChefSorters.naturalSort(teams, 'id')),
       takeUntil(this.isDestroyed));
-    this.projectsEnabled$ = store.select(atLeastV2p1);
     this.createTeamForm = fb.group({
       // Must stay in sync with error checks in create-object-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -75,13 +73,12 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.store.dispatch(new GetTeams());
-
-    this.store.select(iamMajorVersion)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((majorVersion) => {
-        this.isMajorV1 = majorVersion === 'v1';
-      });
-
+    this.store.pipe(
+      select(isIAMv2),
+      takeUntil(this.isDestroyed))
+      .subscribe(latest => {
+        this.isIAMv2 = latest;
+    });
     this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {
         this.dropdownProjects = assignable.map(p => {
@@ -169,10 +166,10 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   }
 
   public openCreateModal(): void {
-    if (this.isMajorV1) {
-      this.createV1TeamModalVisible = true;
-    } else {
+    if (this.isIAMv2) {
       this.createModalVisible = true;
+    } else {
+      this.createV1TeamModalVisible = true;
     }
     this.resetCreateModal();
   }

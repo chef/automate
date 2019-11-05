@@ -9,10 +9,10 @@
         Policies manage the resources and actions used by identities.
       </chef-subheading>
     </chef-page-header>
-    <section *ngIf="(iamMajorVersion$ | async) === 'v1'" class="page-body">
+    <section *ngIf="!(isIAMv2$ | async)" class="page-body">
       Currently, you are using IAM v1 policies. Automate only shows IAM v2 policies.
     </section>
-    <section *ngIf="(iamMajorVersion$ | async) !== 'v1'" class="page-body">
+    <section *ngIf="isIAMv2$ | async" class="page-body">
       <app-authorized [allOf]="['/iam/v2beta/policies', 'get']">
         <chef-table>
           <chef-thead>

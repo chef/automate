@@ -74,7 +74,7 @@ describe('NavbarComponent', () => {
 
   describe('when IAM v2.1 is enabled', () => {
     beforeEach(() => {
-      component.projectsEnabled$ = observableOf(true);
+      component.isIAMv2$ = observableOf(true);
       fixture.detectChanges();
     });
 
