@@ -5,6 +5,8 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Apache-2.0')
 pkg_deps=(
   core/minio
+  core/bash
+  core/curl
   core/cacerts
   chef/automate-platform-tools
 )
