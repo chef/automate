@@ -5,72 +5,13 @@ set -Eeo pipefail
 CI=${CI:-false}
 HAB_ORIGIN=${HAB_ORIGIN:-chef}
 TIMEOUT=$((${BUILDKITE_TIMEOUT:-32} - 2))
+
 source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
 source "${source_dir}/helpers/log.sh"
 source "${source_dir}/base.sh"
 source "$1"
+BUILDKITE_JOB_ID="${BUILDKITE_JOB_ID:-"${test_build_slug}"}"
 complete_commandline="$0 $*"
-
-if [[ "$CI" = "true" ]]; then
-    echo "===== PRE-TEST HOST HEALTH REPORT ====="
-    echo "docker ps"
-    docker ps
-    echo "free -m"
-    free -m
-    echo "uptime"
-    uptime
-    echo "======================================="
-fi
-
-docker pull chefes/centos-systemd:latest
-workdir="/go/src/github.com/chef/automate"
-
-docker_run_args=(
-        "--detach"
-        "--env" "CI"
-        "--env" "HOST_PWD=$PWD"
-        "--env" "HAB_ORIGIN=$HAB_ORIGIN"
-        "--env" "HAB_STUDIO_SUP=false"
-        "--env" "HAB_NONINTERACTIVE=true"
-        "--env" "CONTAINER_HOSTNAME=${test_container_name}"
-        "--env" "test_notifications_endpoint=${test_notifications_endpoint}"
-        "--env" "IAM"
-        "--env" "A2_LICENSE"
-        "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST"
-        "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER"
-        "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY"
-        "--env" "test_container_name=${test_container_name}"
-        "--env" "test_build_slug=${test_build_slug}"
-        "--hostname" "$test_container_name"
-        "--interactive"
-        "--name" "$test_container_name"
-        "--privileged"
-        "--rm"
-        "--tmpfs=/tmp:rw,noexec,nosuid"
-        "--tmpfs=/var/tmp:rw,noexec,nosuid"
-        "--tmpfs=/dev/shm:rw,noexec,nosuid"
-        "--tty"
-        "--volume" "$PWD:$workdir"
-        # I have no idea why our container doesn't like it when
-        # we try to mount docker.sock in the default place. Removing
-        # the privileged flag makes it work.
-        "-v" "/var/run/docker.sock:/docker.sock"
-        "--env" "DOCKER_HOST=unix:///docker.sock"
-        "--workdir" "$workdir"
-)
-
-if [ $CI = "true" ]
-then
-    buildkite_agent=$(command -v buildkite-agent)
-    docker_run_args+=(
-        "--env" "BUILDKITE_JOB_ID"
-        "--env" "BUILDKITE_BUILD_ID"
-        "--env" "BUILDKITE_AGENT_ACCESS_TOKEN"
-        "--env" "BUILDKITE"
-        "--volume" "$buildkite_agent:/usr/bin/buildkite-agent"
-        "--label" "buildkitejob=$BUILDKITE_JOB_ID"
-    )
-fi
 
 test_commandline() {
     local env_vars
@@ -103,6 +44,12 @@ cleanup() {
     fi
     echo "Attempting to clean up docker container $test_container_name"
     docker stop "$test_container_name"
+    if [[ "${test_proxy}" = "true" ]]; then
+        echo "Attempting to clean up docker container $test_proxy_container_name"
+        docker stop "$test_proxy_container_name"
+        echo "Attempting to clean up docker network $test_proxy_internal_network_name"
+        docker network rm "$test_proxy_internal_network_name"
+    fi
     echo "------------------------------------------------------------"
     echo "To run this test locally:"
     echo ""
@@ -120,7 +67,98 @@ cleanup_ci() {
     fi
 }
 
+if [[ "$CI" = "true" ]]; then
+    echo "===== PRE-TEST HOST HEALTH REPORT ====="
+    echo "docker ps"
+    docker ps
+    echo "free -m"
+    free -m
+    echo "uptime"
+    uptime
+    echo "======================================="
+fi
+
+docker pull chefes/centos-systemd:latest
+workdir="/go/src/github.com/chef/automate"
+
+docker_run_args=(
+        "--detach"
+        "--env" "CI"
+        "--env" "HOST_PWD=$PWD"
+        "--env" "HAB_ORIGIN=$HAB_ORIGIN"
+        "--env" "HAB_STUDIO_SUP=false"
+        "--env" "HAB_NONINTERACTIVE=true"
+        "--env" "CONTAINER_HOSTNAME=${test_container_name}"
+        "--env" "test_notifications_endpoint=${test_notifications_endpoint}"
+        "--env" "IAM"
+        "--env" "A2_LICENSE"
+        "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST"
+        "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER"
+        "--env" "CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY"
+        "--env" "test_container_name=${test_container_name}"
+        "--env" "test_build_slug=${test_build_slug}"
+        "--env" "test_proxy_container_name=${test_proxy_container_name}"
+        "--env" "test_proxy_internal_network_name=${test_proxy_internal_network_name}"
+        "--hostname" "$test_container_name"
+        "--interactive"
+        "--name" "$test_container_name"
+        "--privileged"
+        "--rm"
+        "--tmpfs=/tmp:rw,noexec,nosuid"
+        "--tmpfs=/var/tmp:rw,noexec,nosuid"
+        "--tmpfs=/dev/shm:rw,noexec,nosuid"
+        "--tty"
+        "--volume" "$PWD:$workdir"
+        # I have no idea why our container doesn't like it when
+        # we try to mount docker.sock in the default place. Removing
+        # the privileged flag makes it work.
+        "-v" "/var/run/docker.sock:/docker.sock"
+        "--env" "DOCKER_HOST=unix:///docker.sock"
+        "--workdir" "$workdir"
+)
+
+if [ $CI = "true" ]
+then
+    buildkite_agent=$(command -v buildkite-agent)
+    docker_run_args+=(
+        "--env" "BUILDKITE_JOB_ID"
+        "--env" "BUILDKITE_BUILD_ID"
+        "--env" "BUILDKITE_AGENT_ACCESS_TOKEN"
+        "--env" "BUILDKITE"
+        "--volume" "$buildkite_agent:/usr/bin/buildkite-agent"
+        "--label" "buildkitejob=$BUILDKITE_JOB_ID"
+    )
+fi
+
+
 trap cleanup_ci EXIT
+
+
+if [[ "${test_proxy}" = "true" ]]; then
+    log_info "Creating proxy network"
+    # Create a network with no internet access.
+    # Automate will connect to this network
+    docker network create "$test_proxy_internal_network_name" \
+        --internal \
+        --label "buildkitejob=$BUILDKITE_JOB_ID"
+    docker_run_args+=(
+        "--network" "${test_proxy_internal_network_name}"
+    )
+
+    # Run squid and connect it to the network without internet
+    # access so that automate can access it.
+    docker run \
+        --detach --rm \
+        --name "${test_proxy_container_name}" \
+        --hostname "${test_proxy_container_name}" \
+        --label "buildkitejob=$BUILDKITE_JOB_ID" \
+        --network "${test_proxy_internal_network_name}" \
+        datadog/squid
+
+    # Connect the proxy container to the default bridge network
+    # which has access to the internet
+    docker network connect bridge "${test_proxy_container_name}"
+fi
 
 if [ ${#test_external_services[@]} -ne 0 ]; then
     log_info "Start External Services"

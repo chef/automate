@@ -13,3 +13,7 @@ if [ -n "$matching_containers" ]; then
     # shellcheck disable=SC2086
     docker kill $matching_containers
 fi
+
+
+echo "Attempting to clean up docker networks for buildkitejob=$BUILDKITE_JOB_ID"
+docker network prune --filter "label=buildkitejob=$BUILDKITE_JOB_ID" --force

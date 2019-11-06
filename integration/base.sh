@@ -23,6 +23,9 @@ test_diagnostics_filters=""
 test_diagnostics_pre_upgrade_filters=""
 test_diagnostics_opts=""
 test_external_services=()
+test_proxy=false
+test_proxy_container_name="automate-proxy-${test_build_slug}"
+test_proxy_internal_network_name="automate-network-${test_build_slug}"
 
 # test_detect_broken_cli detects if we broke the cli. There was a
 # bug in older CLIs where it was possible to download a partial
@@ -101,6 +104,18 @@ do_setup_default() {
     sysctl -w vm.max_map_count=262144
 
     start_requestbin
+
+    if [[ "${test_proxy}" = "true" ]]; then
+        log_info "Setting up proxy"
+        HTTP_PROXY="http://${test_proxy_container_name}:3128"
+        http_proxy="http://${test_proxy_container_name}:3128"
+        HTTPS_PROXY="http://${test_proxy_container_name}:3128"
+        https_proxy="http://${test_proxy_container_name}:3128"
+        export HTTP_PROXY
+        export http_proxy
+        export HTTPS_PROXY
+        export https_proxy
+    fi
 }
 
 do_build() {
