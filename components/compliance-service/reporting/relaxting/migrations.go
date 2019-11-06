@@ -424,16 +424,6 @@ func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (
 	return indexToMigrateExists, nil
 }
 
-func (backend ES2Backend) getLatestReportIds(sumDailyToday string) ([]string, error) {
-	myName := "getLatestReportIds"
-	reportIds, err := backend.getNodeReportIdsFromTimeseries(sumDailyToday, make(map[string][]string, 0), false)
-	if err != nil {
-		logrus.Errorf("%s no report ids for this day: %s. Will still reindex yesterday's latest though", myName, sumDailyToday)
-	}
-
-	return reportIds, nil
-}
-
 func (backend *ES2Backend) markTimeseriesDailyLatest(dateToMigrate time.Time) error {
 	myName := "markTimeseriesDailyLatest"
 	client, err := backend.ES2Client()
@@ -461,7 +451,7 @@ func (backend *ES2Backend) markTimeseriesDailyLatest(dateToMigrate time.Time) er
 		return errors.Wrap(err, fmt.Sprintf("markTimeseriesDailyLatest unable to refresh indices %s, %s", summaryIndexToUpdate, reportIndexToUpdate))
 	}
 
-	reportIds, err := backend.getLatestReportIds(summaryIndexToUpdate)
+	reportIds, err := backend.GetReportIds(summaryIndexToUpdate, make(map[string][]string, 0), false)
 	if err != nil {
 		return err
 	}

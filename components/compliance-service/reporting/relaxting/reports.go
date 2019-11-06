@@ -74,7 +74,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 
 	// aggs
 	aggs := elastic.NewTermsAggregation().Field("node_uuid").Size(reporting.ESize).
-		SubAggregation("distinct", elastic.NewTopHitsAggregation().Size(1).
+		SubAggregation("distinct", elastic.NewTopHitsAggregation().Size(2).
 			FetchSource(false).
 			Sort("end_time", false))
 
