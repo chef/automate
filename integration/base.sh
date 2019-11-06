@@ -115,6 +115,8 @@ do_setup_default() {
         export http_proxy
         export HTTPS_PROXY
         export https_proxy
+        npm config set proxy "http://${test_proxy_container_name}:3128"
+        npm config set https-proxy "http://${test_proxy_container_name}:3128"
     fi
 }
 
@@ -358,6 +360,11 @@ break_log() {
     else
         journalctl -u chef-automate -u requestbin -u elasticsearch -c "$cursor" --no-pager > "logs/$name"
     fi
+}
+
+inherit() {
+    local basepath="$(dirname ${BASH_SOURCE[1]})"
+    source "${basepath}/$1"
 }
 
 source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
