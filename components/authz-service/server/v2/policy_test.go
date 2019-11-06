@@ -2944,6 +2944,8 @@ func TestVersionChannel(t *testing.T) {
 	require := require.New(t)
 
 	iamV1 := api_v2.Version{Major: api_v2.Version_V1, Minor: api_v2.Version_V0}
+	// this version cannot be set via the API any longer
+	// upgrade-to-v2 automatically sets the IAM version to v2.1
 	iamV2 := api_v2.Version{Major: api_v2.Version_V2, Minor: api_v2.Version_V0}
 	iamV2Beta := api_v2.Version{Major: api_v2.Version_V2, Minor: api_v2.Version_V1}
 

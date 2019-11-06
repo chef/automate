@@ -178,7 +178,7 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 	return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap)
 
 	// Note 2019/06/04 (sr): v1?! Yes, IAM v1. Our POC code depends on this query
-	// to be answered regardless of whether IAM is v1, v2 or v2.1.
+	// to be answered regardless of whether IAM is v1 or v2.
 }
 
 func (refresher *policyRefresher) getPolicyMap(ctx context.Context) (map[string]interface{}, error) {
@@ -254,6 +254,8 @@ func (refresher *policyRefresher) getIAMVersion(ctx context.Context) (api.Versio
 		return vsn, err
 	}
 	switch ms {
+	// this case should no longer happen
+	// since the iam v2 upgrade command always upgrades to v2.1
 	case storage.Successful:
 		vsn = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
 	case storage.SuccessfulBeta1:

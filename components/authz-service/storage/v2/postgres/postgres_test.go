@@ -4987,30 +4987,6 @@ func TestListProjects(t *testing.T) {
 
 			assert.ElementsMatch(t, expectedProjects, ps)
 		}},
-		{"when multiple projects exist, returns everything when empty filter is specified (v2.0 case)", func(t *testing.T) {
-			ctx := context.Background()
-			ctx = insertProjectsIntoContext(ctx, []string{})
-			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			p2 := insertTestProject(t, db, "bar", "my bar project", storage.Custom)
-
-			ps, err := store.ListProjects(ctx)
-			require.NoError(t, err)
-			expectedProjects := []*storage.Project{&p1, &p2}
-
-			assert.ElementsMatch(t, expectedProjects, ps)
-		}},
-		{"when multiple projects exist, returns everything when no project filter is specified (v2.0 case)", func(t *testing.T) {
-			ctx := context.Background()
-			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
-			p2 := insertTestProject(t, db, "bar", "my bar project", storage.Custom)
-			p3 := insertTestProject(t, db, "baz", "my baz project", storage.Custom)
-
-			ps, err := store.ListProjects(ctx)
-			require.NoError(t, err)
-			expectedProjects := []*storage.Project{&p1, &p2, &p3}
-
-			assert.ElementsMatch(t, expectedProjects, ps)
-		}},
 		{"when multiple projects exist, returns all projects when * filter passed", func(t *testing.T) {
 			ctx := context.Background()
 			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
