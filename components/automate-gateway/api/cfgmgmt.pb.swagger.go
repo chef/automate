@@ -435,7 +435,7 @@ func init() {
           }
         },
         "tags": [
-          "ConfigMgmt"
+          "hidden"
         ]
       }
     }

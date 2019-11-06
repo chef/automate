@@ -18,6 +18,7 @@ import "api/external/common/version/version.proto";
 
 import "google/protobuf/struct.proto";
 import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 
 // for option (chef.automate.api.policy)
 import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
@@ -149,13 +150,18 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).resource = "infra:nodes:{node_id}";
     option (chef.automate.api.iam.policy).action = "infra:nodes:get";
   };
+
   rpc GetVersion(common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get =  "/cfgmgmt/version";
     option (chef.automate.api.policy).resource = "service_info:version";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "system:service:version";
     option (chef.automate.api.iam.policy).action = "system:serviceVersion:get";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "hidden";
+		};
   };
+
   /*
   GetPolicyCookbooks
 
