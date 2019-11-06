@@ -2,9 +2,4 @@
 
 :host {
   display: table-header-group;
-
-  & > tr {
-    background-color: $chef-lightest-grey;
-    box-shadow: 0 0 $size_16 0 $chef-light-grey;
-  }
 }
