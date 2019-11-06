@@ -7,7 +7,7 @@ toc = true
 [menu]
   [menu.docs]
     parent = "reference"
-    weight = 30
+    weight = 40
 +++
 
 ## Overview
