@@ -154,7 +154,8 @@ if [[ "${test_proxy}" = "true" ]]; then
         --hostname "${test_proxy_container_name}" \
         --label "buildkitejob=$BUILDKITE_JOB_ID" \
         --network "${test_proxy_internal_network_name}" \
-        --volume $PWD/logs:/var/log/squid \
+        --volume "$PWD/logs:/var/log/squid" \
+        --volume "$PWD/integration/squid.conf:/etc/squid/squid.conf" \
         datadog/squid
 
     # Connect the proxy container to the default bridge network
