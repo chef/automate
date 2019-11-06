@@ -432,6 +432,10 @@ func (s *Server) Serve() error {
 	// rpc ReportExport(ReportExport) returns (stream ReportExportData);
 	mux.HandleFunc("/cfgmgmt/reports/export", s.configMgmtReportExportHandler)
 
+	// "GET /status" is used for monitoring
+	// We made it a custom handler in order to be able to return 500 when some services are down.
+	mux.HandleFunc("/status", s.DeploymentStatusHandler)
+
 	// register open api endpoint definitions
 	mux.Handle("/openapi/", http.StripPrefix("/openapi", openAPIServicesHandler()))
 
