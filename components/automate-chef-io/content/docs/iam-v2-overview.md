@@ -80,8 +80,7 @@ A policy statement must include a `Role`, or a list of inline `Actions`.
 
 Property   | Description
 -----------|-----------------------------
-Role       | an alias for a list of actions
-Actions    | an inline list of actions
+Role       | a named list of actions
 Effect     | ALLOW or DENY
 Projects   | list of project IDs to constrain the role
 

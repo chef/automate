@@ -216,8 +216,8 @@ Select **Add Members** to open the list of candidate local users and teams.
 Near the bottom of the page, select the **Add Member Expression** button.
 
 {{% info %}}
-The member expression dialog guides you through creating a member expression to alleviate the tedium of getting the syntax just right.
-But the next few paragraphs explain the syntax, should you prefer to add members via the API.
+The member expression dialog box appears after selecting **Add Member Expression** and guides you through creating a member expression. This dialog box ensures correct syntax use in a user-friendly way.
+The next few paragraphs explain the syntax if you want to add members via the API.
 {{% /info %}}
 
 Enter a member expression using the format `team:<type>:<name>` or `user:<type>:<name>`. Note that these expressions are case-sensitive.
@@ -243,7 +243,7 @@ so they are not relevant when assigning IAM resources such as teams or roles.
 
 To create a project, navigate to the Projects list under the **Settings** tab and select **Create Project**. You will need to provide a name and can optionally edit the ID. You must create a project before you can assign any resources to it.
 
-When you initiate the project creation, the system creates not just the project but also three supplemental policies for your convenience:
+When you initiate the project creation, the system creates the project, but also three supplemental policies for your convenience:
 
 Policy Name                      | Policy ID                        | Associated Role
 ---------------------------------|----------------------------------|----------------
@@ -251,7 +251,7 @@ Policy Name                      | Policy ID                        | Associated
 `<project-name>` Project Editors | `<project-name>`-project-editors | Editor
 `<project-name>` Project Viewers | `<project-name>`-project-viewers | Viewer
 
-These are discussed in more detail in [Project Policies]({{< relref "iam-v2-guide.md#project-policies" >}}).
+These policies are discussed in more detail in [Project Policies]({{< relref "iam-v2-guide.md#project-policies" >}}).
 
 #### Assigning Resources to Projects
 
@@ -328,7 +328,7 @@ Updating a project begins an operation that applies all pending rule edits and t
 In this example, upon successful update, all ingested resources whose Chef Organization matches `devops` will be considered a part of the project `project-devops`.
 Only these resources will appear in Automate's dashboards when the `project-devops` project has been selected in the global project filter.
 
-As the operation takes place, you should see a percentage count up within the `Update Projects` button.
+A percentage count appears in the `Update Projects` button while the operation takes place.
 You may cancel the update at any time by selecting `Stop Updating Projects` and confirming the cancel in the modal that pops up.
 
 {{% warning %}}
@@ -377,28 +377,22 @@ filter by `project-devops` across Automate's dashboards and see only the ingeste
 
 #### Project Policies
 
-When you create a project, Chef Automate automatically creates three supplemental policies for you, as mentioned earlier.
+When you create a project, Chef Automate automatically creates three supplemental policies.
 This next table further describes the roles associated with these policies.
 
 Policy Name                      | Role          | Description of role
 ---------------------------------|---------------|--------------------
-`<project-name>` Project Viewers | Viewer        | **View** everything in the system *except* IAM
-`<project-name>` Project Editors | Editor        | **Do** everything in the system *except* IAM
+`<project-name>` Project Viewers | Viewer        | **View** everything in the project *except* IAM
+`<project-name>` Project Editors | Editor        | **Do** everything in the project *except* IAM
 `<project-name>` Project Owners  | Project Owner | Editor + **view** and **assign** projects
 
-Consider the first row, for the **Project Viewers** policy.
-The same **Viewer** role shown here is also used in the **Viewer** system policy, which lets a user view everything unrelated to IAM.
-By using the **Viewer** role here and restricting it to the scope of your new project, then users attached to your Project Viewers policy will be able to view things only associated with your project.
+Consider the **Project Viewers** policy, which uses the **Viewer** role. The same **Viewer** role is also used in the default **Viewer** policy, which lets a user view everything in the system except IAM. Using the **Viewer** role in **Project Viewers** policy restricts the scope to your new project, and users attached to your **Project Viewers** policy will be able to view objects only associated with your project.
 
-Assume you named your project `Devops`.
-If you would now like Terry, a user, to be able to *view* `Devops`-scoped resources and Kelly, another user, to be able to *edit* `Devops`-scoped resources, add them as members to the relevant policies.
-In the browser, select **Settings**, then **Policies**, and lastly `Devops Project Viewers` (or `Devops Project Editors` respectively).
-Under the **Details** tab, you will find the option to select new policy members.
+Assume you named your project `Devops`, and have two users: Terry and Kelly. If Terry needs to *view* `Devops`-scoped resources, then add Terry as a member to the `Devops` Project Viewers policy. If Kelly needs the ability to *edit* `Devops`-scoped resources, then add Kelly to the `Devops` Project Editor policy.
 
-Assuming Terry is not a member of any other policy, once you make Terry a member of the `Devops Project Viewers` policy, they will only be able to see resources assigned to `Devops`.
-They will not be able to update or delete them. Kelly, however, will be able to do both.
+When Terry is a member of the `Devops Project Viewers` policy and not a member of any other policy, they will only be able to see resources assigned to `Devops`. They will not be able to update or delete them. Kelly, however, will be able to update and delete.
 
-See [Policy Membership]({{< relref "iam-v2-api-reference.md#policy-membership" >}}) for more information on policy membership.
+See [Policy Membership]({{< relref "iam-v2-guide/#policy-membership" >}}) for more information on policy membership.
 
 ## Restoring Admin Access
 
