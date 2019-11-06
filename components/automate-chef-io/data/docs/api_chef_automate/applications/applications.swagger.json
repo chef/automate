@@ -109,7 +109,7 @@
           },
           {
             "name": "sorting.order",
-            "description": "Order the results should be returned in (ASC or DESC).",
+            "description": "Order the results should be returned in.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -168,7 +168,7 @@
           },
           {
             "name": "sorting.order",
-            "description": "Order the results should be returned in (ASC or DESC).",
+            "description": "Order the results should be returned in.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -269,7 +269,7 @@
           },
           {
             "name": "sorting.order",
-            "description": "Order the results should be returned in (ASC or DESC).",
+            "description": "Order the results should be returned in.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -733,7 +733,7 @@
         },
         "order": {
           "$ref": "#/definitions/chef.automate.api.common.query.SortOrder",
-          "description": "Order the results should be returned in (ASC or DESC)."
+          "description": "Order the results should be returned in."
         }
       }
     },

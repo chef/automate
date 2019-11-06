@@ -114,6 +114,7 @@ type ConfigMgmtClient interface {
 	//
 	//Returns a list of infra nodes that have checked in to Automate.
 	//Adding a filter makes a list of all nodes that meet the filter criteria.
+	//Filters for the same field are ORd together, while filters across different fields are ANDed together.
 	//Supports pagination, filtering, and sorting.
 	GetNodes(ctx context.Context, in *request.Nodes, opts ...grpc.CallOption) (*_struct.ListValue, error)
 	//
@@ -126,7 +127,7 @@ type ConfigMgmtClient interface {
 	//
 	//GetNodesCounts
 	//
-	//Returns totals for failed, success, and missing infra nodes that have reported into Automate.
+	//Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
 	GetNodesCounts(ctx context.Context, in *request.NodesCounts, opts ...grpc.CallOption) (*response.NodesCounts, error)
 	//
 	//GetRunsCounts
@@ -136,7 +137,7 @@ type ConfigMgmtClient interface {
 	//
 	//GetNodeRun
 	//
-	//Returns the infra run report for the provided node id.
+	//Returns the infra run report for the provided node id and run id.
 	GetNodeRun(ctx context.Context, in *request.NodeRun, opts ...grpc.CallOption) (*response.Run, error)
 	//
 	//GetSuggestions
@@ -164,8 +165,8 @@ type ConfigMgmtClient interface {
 	//
 	//GetPolicyCookbooks
 	//
-	//Returns the policy information for a node.
-	//The revision_id ??????
+	//Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.
+	//Policy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.
 	GetPolicyCookbooks(ctx context.Context, in *request.PolicyRevision, opts ...grpc.CallOption) (*response.PolicyCookbooks, error)
 }
 
@@ -283,6 +284,7 @@ type ConfigMgmtServer interface {
 	//
 	//Returns a list of infra nodes that have checked in to Automate.
 	//Adding a filter makes a list of all nodes that meet the filter criteria.
+	//Filters for the same field are ORd together, while filters across different fields are ANDed together.
 	//Supports pagination, filtering, and sorting.
 	GetNodes(context.Context, *request.Nodes) (*_struct.ListValue, error)
 	//
@@ -295,7 +297,7 @@ type ConfigMgmtServer interface {
 	//
 	//GetNodesCounts
 	//
-	//Returns totals for failed, success, and missing infra nodes that have reported into Automate.
+	//Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
 	GetNodesCounts(context.Context, *request.NodesCounts) (*response.NodesCounts, error)
 	//
 	//GetRunsCounts
@@ -305,7 +307,7 @@ type ConfigMgmtServer interface {
 	//
 	//GetNodeRun
 	//
-	//Returns the infra run report for the provided node id.
+	//Returns the infra run report for the provided node id and run id.
 	GetNodeRun(context.Context, *request.NodeRun) (*response.Run, error)
 	//
 	//GetSuggestions
@@ -333,8 +335,8 @@ type ConfigMgmtServer interface {
 	//
 	//GetPolicyCookbooks
 	//
-	//Returns the policy information for a node.
-	//The revision_id ??????
+	//Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID.
+	//Policy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.
 	GetPolicyCookbooks(context.Context, *request.PolicyRevision) (*response.PolicyCookbooks, error)
 }
 

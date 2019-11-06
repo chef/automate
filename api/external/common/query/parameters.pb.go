@@ -97,7 +97,7 @@ func (m *Pagination) GetSize() int32 {
 type Sorting struct {
 	// Field to sort the list results on.
 	Field string `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
-	// Order the results should be returned in (ASC or DESC).
+	// Order the results should be returned in.
 	Order                SortOrder `protobuf:"varint,2,opt,name=order,proto3,enum=chef.automate.api.common.query.SortOrder" json:"order,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`

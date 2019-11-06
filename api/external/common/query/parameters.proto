@@ -13,7 +13,7 @@ message Pagination {
 message Sorting {
   // Field to sort the list results on.
   string field = 1;
-  // Order the results should be returned in (ASC or DESC).
+  // Order the results should be returned in.
   SortOrder order = 2;
 }
 

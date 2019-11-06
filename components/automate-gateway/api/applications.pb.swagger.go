@@ -112,7 +112,7 @@ func init() {
           },
           {
             "name": "sorting.order",
-            "description": "Order the results should be returned in (ASC or DESC).",
+            "description": "Order the results should be returned in.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -171,7 +171,7 @@ func init() {
           },
           {
             "name": "sorting.order",
-            "description": "Order the results should be returned in (ASC or DESC).",
+            "description": "Order the results should be returned in.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -272,7 +272,7 @@ func init() {
           },
           {
             "name": "sorting.order",
-            "description": "Order the results should be returned in (ASC or DESC).",
+            "description": "Order the results should be returned in.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -736,7 +736,7 @@ func init() {
         },
         "order": {
           "$ref": "#/definitions/chef.automate.api.common.query.SortOrder",
-          "description": "Order the results should be returned in (ASC or DESC)."
+          "description": "Order the results should be returned in."
         }
       }
     },

@@ -17,7 +17,7 @@ func init() {
     "/cfgmgmt/nodes": {
       "get": {
         "summary": "GetNodes",
-        "description": "Returns a list of infra nodes that have checked in to Automate. \nAdding a filter makes a list of all nodes that meet the filter criteria. \nSupports pagination, filtering, and sorting.",
+        "description": "Returns a list of infra nodes that have checked in to Automate. \nAdding a filter makes a list of all nodes that meet the filter criteria. \nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering, and sorting.",
         "operationId": "GetNodes",
         "responses": {
           "200": {
@@ -67,7 +67,7 @@ func init() {
           },
           {
             "name": "sorting.order",
-            "description": "Order the results should be returned in (ASC or DESC).",
+            "description": "Order the results should be returned in.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -184,7 +184,7 @@ func init() {
     "/cfgmgmt/nodes/{node_id}/runs/{run_id}": {
       "get": {
         "summary": "GetNodeRun",
-        "description": "Returns the infra run report for the provided node id.",
+        "description": "Returns the infra run report for the provided node id and run id.",
         "operationId": "GetNodeRun",
         "responses": {
           "200": {
@@ -247,7 +247,7 @@ func init() {
     "/cfgmgmt/policy_revision/{revision_id}": {
       "get": {
         "summary": "GetPolicyCookbooks",
-        "description": "Returns the policy information for a node.\nThe revision_id ??????",
+        "description": "Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID. \nPolicy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.",
         "operationId": "GetPolicyCookbooks",
         "responses": {
           "200": {
@@ -295,7 +295,7 @@ func init() {
     "/cfgmgmt/stats/node_counts": {
       "get": {
         "summary": "GetNodesCounts",
-        "description": "Returns totals for failed, success, and missing infra nodes that have reported into Automate.",
+        "description": "Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.",
         "operationId": "GetNodesCounts",
         "responses": {
           "200": {
@@ -944,7 +944,7 @@ func init() {
         },
         "order": {
           "$ref": "#/definitions/chef.automate.api.common.query.SortOrder",
-          "description": "Order the results should be returned in (ASC or DESC)."
+          "description": "Order the results should be returned in."
         }
       }
     },
