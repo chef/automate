@@ -93,7 +93,7 @@
     {
       "name": "auth",
       "type": "base",
-      "dependencies": ["core", "postgresql"],
+      "dependencies": ["core", "postgresql", "cereal"],
       "services": [
         "chef/authz-service",
         "chef/authn-service",

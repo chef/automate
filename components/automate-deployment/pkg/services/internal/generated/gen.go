@@ -375,7 +375,7 @@ var ProductMetadataJSON = `
     }
   ],
   "deleted_packages": [
-    "chef/data-lifecycle-service/0.0.1/20190816162731"
+    "chef/data-lifecycle-service/0.0.1/20191101111721"
   ],
   "collections": [
     {
@@ -448,7 +448,8 @@ var ProductMetadataJSON = `
       "packages": null,
       "dependencies": [
         "core",
-        "postgresql"
+        "postgresql",
+        "cereal"
       ],
       "hidden": false
     },
