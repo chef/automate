@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { identity } from 'lodash/fp';
-import { Observable, Subject } from 'rxjs';
-import { filter, map, pluck, takeUntil } from 'rxjs/operators';
+import { Observable, Subject, combineLatest } from 'rxjs';
+import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
@@ -74,23 +74,20 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
       }));
     this.members$.subscribe();
 
-    this.store.select(routeParams).pipe(
-      pluck('id'),
-      filter(identity),
-      takeUntil(this.isDestroyed))
-      .subscribe((id: string) => {
-        this.store.select(routeURL).pipe(
-          filter(identity),
-          takeUntil(this.isDestroyed))
-          .subscribe((url: string) => {
-            // Only fetch if we are on the policy details route, otherwise
-            // we'll trigger GetPolicy with the wrong input on any route
-            // away to a page that also uses the :id param.
-            if (POLICY_DETAILS_ROUTE.test(url)) {
-              this.store.dispatch(new GetPolicy({ id }));
-            }
-        });
-      });
+    combineLatest([
+      this.store.select(routeParams),
+      this.store.select(routeURL)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      map(([params, url]) => [params.id as string, url]),
+      // Only fetch if we are on the policy details route, otherwise
+      // we'll trigger GetPolicy with the wrong input on any route
+      // away to a page that also uses the :id param.
+      filter(([id, url]) => POLICY_DETAILS_ROUTE.test(url) && id !== undefined),
+      // Remove the url because we only need to check if the id has changed
+      map(([id, _url]) => id),
+      distinctUntilChanged()
+    ).subscribe(id => this.store.dispatch(new GetPolicy({ id })));
   }
 
   ngOnDestroy() {

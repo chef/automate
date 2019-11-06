@@ -4,7 +4,7 @@ import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
-import { filter, map, pluck, takeUntil } from 'rxjs/operators';
+import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -196,23 +196,20 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     // TODO: This also fires when teamFromRoute fires; should inhibit that since
     // we already have the team details, as noted above.
     // Triggered every time the route changes (including on initial load).
-    this.store.select(routeParams).pipe(
-      pluck('id'),
-      filter(identity),
-      takeUntil(this.isDestroyed))
-      .subscribe((id: string) => {
-        this.store.select(routeURL).pipe(
-          filter(identity),
-          takeUntil(this.isDestroyed))
-          .subscribe((url: string) => {
-            // Only fetch if we are on the team details route, otherwise
-            // we'll trigger GetTeam with the wrong input on any route
-            // away to a page that also uses the :id param.
-            if (TEAM_DETAILS_ROUTE.test(url)) {
-              this.store.dispatch(new GetTeam({ id }));
-            }
-          });
-      });
+    combineLatest([
+      this.store.select(routeParams),
+      this.store.select(routeURL)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      map(([params, url]) => [params.id as string, url]),
+      // Only fetch if we are on the team details route, otherwise
+      // we'll trigger GetTeam with the wrong input on any route
+      // away to a page that also uses the :id param.
+      filter(([id, url]) => TEAM_DETAILS_ROUTE.test(url) && id !== undefined),
+      // Remove the url because we only need to check if the id has changed
+      map(([id, _url]) => id),
+      distinctUntilChanged()
+    ).subscribe(id => this.store.dispatch(new GetTeam({ id })));
  }
 
   ngOnDestroy(): void {
