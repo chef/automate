@@ -119,7 +119,7 @@ type ConfigMgmtClient interface {
 	//
 	//GetRuns
 	//
-	//Returns a list of run ids for the provided node id.
+	//Returns a list of run metadata (id, start and end time, and status) for the provided node id.
 	//Supports pagination.
 	//Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	GetRuns(ctx context.Context, in *request.Runs, opts ...grpc.CallOption) (*_struct.ListValue, error)
@@ -141,7 +141,8 @@ type ConfigMgmtClient interface {
 	//
 	//GetSuggestions
 	//
-	//Returns possible filter values given a valid `type` parameter and at least one character for the `text` parameter.
+	//Returns possible filter values given a valid `type` parameter. All values returned until two or more
+	//characters are provided for the `text` parameter.
 	//Supports wildcard (* and ?).
 	GetSuggestions(ctx context.Context, in *query.Suggestion, opts ...grpc.CallOption) (*_struct.ListValue, error)
 	//
@@ -287,7 +288,7 @@ type ConfigMgmtServer interface {
 	//
 	//GetRuns
 	//
-	//Returns a list of run ids for the provided node id.
+	//Returns a list of run metadata (id, start and end time, and status) for the provided node id.
 	//Supports pagination.
 	//Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	GetRuns(context.Context, *request.Runs) (*_struct.ListValue, error)
@@ -309,7 +310,8 @@ type ConfigMgmtServer interface {
 	//
 	//GetSuggestions
 	//
-	//Returns possible filter values given a valid `type` parameter and at least one character for the `text` parameter.
+	//Returns possible filter values given a valid `type` parameter. All values returned until two or more
+	//characters are provided for the `text` parameter.
 	//Supports wildcard (* and ?).
 	GetSuggestions(context.Context, *query.Suggestion) (*_struct.ListValue, error)
 	//

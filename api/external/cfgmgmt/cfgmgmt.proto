@@ -44,7 +44,7 @@ service ConfigMgmt {
   /*
   GetRuns
 
-  Returns a list of run ids for the provided node id. 
+  Returns a list of run metadata (id, start and end time, and status) for the provided node id. 
   Supports pagination.
   Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	*/
@@ -98,7 +98,8 @@ service ConfigMgmt {
   /*
   GetSuggestions
 
-  Returns possible filter values given a valid `type` parameter and at least one character for the `text` parameter.
+  Returns possible filter values given a valid `type` parameter. All values returned until two or more
+  characters are provided for the `text` parameter.
   Supports wildcard (* and ?).
 	*/
   rpc GetSuggestions (common.query.Suggestion) returns (google.protobuf.ListValue) {

@@ -110,7 +110,7 @@
     "/cfgmgmt/nodes/{node_id}/runs": {
       "get": {
         "summary": "GetRuns",
-        "description": "Returns a list of run ids for the provided node id. \nSupports pagination.\nAccepts a `start` parameter to denote start date for the list and a filter of type `status`.",
+        "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node id. \nSupports pagination.\nAccepts a `start` parameter to denote start date for the list and a filter of type `status`.",
         "operationId": "GetRuns",
         "responses": {
           "200": {
@@ -375,7 +375,7 @@
     "/cfgmgmt/suggestions": {
       "get": {
         "summary": "GetSuggestions",
-        "description": "Returns possible filter values given a valid `type` parameter and at least one character for the `text` parameter.\nSupports wildcard (* and ?).",
+        "description": "Returns possible filter values given a valid `type` parameter. All values returned until two or more\ncharacters are provided for the `text` parameter.\nSupports wildcard (* and ?).",
         "operationId": "GetSuggestions",
         "responses": {
           "200": {
