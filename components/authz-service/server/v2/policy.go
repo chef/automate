@@ -854,8 +854,8 @@ func roleFromInternal(role *storage.Role) (*api.Role, error) {
 
 func versionFromInternal(ms storage.MigrationStatus) *api.Version {
 	switch ms {
-	// the Successful status can only be directly set in the database
-	// the API can only revert to v1 or upgrade to v2.1
+	// the `Successful` status can only be directly set in the database
+	// since the API can only upgrade to v2.1 or revert to v1
 	case storage.Successful:
 		return &api.Version{
 			Major: api.Version_V2,

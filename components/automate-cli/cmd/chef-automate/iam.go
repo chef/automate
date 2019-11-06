@@ -165,6 +165,9 @@ func display(v *iam_common.Version) string {
 	switch x {
 	case vsn{Major: iam_common.Version_V2, Minor: iam_common.Version_V1}:
 		return "v2.1"
+	// this should not happen unless forced at the database level
+	case vsn{Major: iam_common.Version_V2, Minor: iam_common.Version_V0}:
+		return "v2.0"
 	default:
 		return "v1.0"
 	}

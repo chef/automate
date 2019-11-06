@@ -1576,7 +1576,8 @@ func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 		return nil, err
 	}
 
-	// Update project if ID found AND intersection between projects and projectsFilter
+	// Update project if ID found
+	// AND there is an intersection between projects and a non-empty projectsFilter
 	res, err := p.db.ExecContext(ctx,
 		`UPDATE iam_projects SET name=$2
 		WHERE id=$1 AND (array_length($3::TEXT[], 1) IS NULL OR id=ANY($3));`,
@@ -1601,7 +1602,8 @@ func (p *pg) GetProject(ctx context.Context, id string) (*v2.Project, error) {
 	}
 
 	var project v2.Project
-	// Retrieve project if ID found AND intersection between projects and projectsFilter
+	// Update project if ID found
+	// AND there is an intersection between projects and a non-empty projectsFilter
 	row := p.db.QueryRowContext(ctx, `SELECT query_project($1, $2)`, id, pq.Array(projectsFilter))
 	if err := row.Scan(&project); err != nil {
 		return nil, p.processError(err)

@@ -70,7 +70,7 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 		log.WithError(err).Error("error authorizing request")
 		return nil, status.Errorf(codes.PermissionDenied,
 			"error authorizing action %q on resource %q filtered by projects %q for subjects %q: %s",
-			action, resource, subjects, projectsToFilter, err.Error())
+			action, resource, projectsToFilter, subjects, err.Error())
 	}
 	if len(filteredResp.Projects) == 0 {
 		return nil, status.Errorf(codes.PermissionDenied,

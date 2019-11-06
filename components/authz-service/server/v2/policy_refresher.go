@@ -254,7 +254,7 @@ func (refresher *policyRefresher) getIAMVersion(ctx context.Context) (api.Versio
 		return vsn, err
 	}
 	switch ms {
-	// this case shouldn't happen
+	// this case should no longer happen
 	// since the iam v2 upgrade command always upgrades to v2.1
 	case storage.Successful:
 		vsn = api.Version{Major: api.Version_V2, Minor: api.Version_V0}

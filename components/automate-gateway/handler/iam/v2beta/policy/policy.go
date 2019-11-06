@@ -219,6 +219,9 @@ func (p *Server) RemovePolicyMembers(
 // migrates existing V1 policies
 func (p *Server) UpgradeToV2(
 	ctx context.Context, in *pb_req.UpgradeToV2Req) (*pb_resp.UpgradeToV2Resp, error) {
+	if in.Flag == pb_common.Flag_VERSION_2_0 {
+		return nil, errors.New("cannot upgrade to IAM v2.0, only v2.1")
+	}
 	// as of release of beta2.1, must pass this flag every time
 	upgradeReq := &authz.MigrateToV2Req{
 		Flag:           authz.Flag_VERSION_2_1,
