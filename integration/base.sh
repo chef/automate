@@ -360,6 +360,11 @@ break_log() {
     fi
 }
 
+inherit() {
+    local basepath="$(dirname ${BASH_SOURCE[1]})"
+    source "${basepath}/$1"
+}
+
 source_dir=$(cd "$(dirname "${BASH_SOURCE[0]}" )" && pwd)
 export A2_ROOT_DIR="$source_dir/../"
 
