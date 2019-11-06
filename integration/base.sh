@@ -115,6 +115,8 @@ do_setup_default() {
         export http_proxy
         export HTTPS_PROXY
         export https_proxy
+        npm config set proxy "http://${test_proxy_container_name}:3128"
+        npm config set https-proxy "http://${test_proxy_container_name}:3128"
     fi
 }
 
