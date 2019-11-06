@@ -7,7 +7,6 @@ import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
-import { Params } from '@angular/router';
 import { routeURL } from 'app/route.selectors';
 import { GetPolicy } from 'app/entities/policies/policy.actions';
 import { policyFromRoute } from 'app/entities/policies/policy.selectors';
@@ -80,15 +79,15 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
       this.store.select(routeURL)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      map(([params, url]: [Params, string]) => [params.id, url]),
+      map(([params, url]) => [params.id as string, url]),
       // Only fetch if we are on the policy details route, otherwise
       // we'll trigger GetPolicy with the wrong input on any route
       // away to a page that also uses the :id param.
-      filter(([id, url]: [string, string]) => POLICY_DETAILS_ROUTE.test(url) && id !== undefined),
+      filter(([id, url]) => POLICY_DETAILS_ROUTE.test(url) && id !== undefined),
       // Remove the url because we only need to check if the id has changed
-      map(([id, _url]: [string, string]) => id),
+      map(([id, _url]) => id),
       distinctUntilChanged()
-    ).subscribe((id: string) => this.store.dispatch(new GetPolicy({ id })));
+    ).subscribe(id => this.store.dispatch(new GetPolicy({ id })));
   }
 
   ngOnDestroy() {
