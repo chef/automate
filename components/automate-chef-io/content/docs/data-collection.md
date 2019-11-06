@@ -106,9 +106,9 @@ To apply the changes, run:
 sudo chef-server-ctl reconfigure
 ```
 
-### Setting Up Data Collection on Chef Server for Versions 12.8 through 12.13
+### Setting Up Data Collection on Chef Server for Versions 12.11 through 12.13
 
-For Chef Infra Server versions between 12.8 and 12.13, simply add the `root_url` and `token` values in
+For Chef Infra Server versions between 12.11 and 12.13, simply add the `root_url` and `token` values in
 `/etc/opscode/chef-server.rb`:
 
 ```ruby
