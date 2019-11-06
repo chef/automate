@@ -20,7 +20,7 @@ revendor: ## revendor dependencies in vendor/ and update .bldr.toml with deps
 
 	# Add files that go mod won't vendor that we need
 	@mkdir -p $(grpcGatewayVendorPath)
-	@cp -rf $(grpcGatewayModPath)/* $(grpcGatewayVendorPath)
+	@cp -rf --no-preserve=mode $(grpcGatewayModPath)/* $(grpcGatewayVendorPath)
 
 	# Clean up files that go mod will vendor that we don't need
 	@find ./vendor -type f \( -name .gitignore -o -name .travis.yml -o -name package.json -o -name Makefile -o -name Dockerfile -o -name MAINTAINERS -o -name \*.md -o -name \*.vim -o -name \*.yml \) -delete
