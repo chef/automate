@@ -379,7 +379,7 @@ func (*State) EnsureNoProjectsMissing(ctx context.Context, projectIDs []string) 
 	return nil
 }
 
-func (s *State) CreateProject(_ context.Context, project *storage.Project) (*storage.Project, error) {
+func (s *State) CreateProject(_ context.Context, project *storage.Project, addPolicies bool) (*storage.Project, error) {
 	if project.Type == storage.Custom {
 		items := s.projects.Items()
 		projects := make([]*storage.Project, 0, len(items))

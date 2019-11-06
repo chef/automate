@@ -57,9 +57,9 @@ IAM policy evaluation order is:
 
 ### Net Effect Examples
 
-The following examples illustrate the net effect of a policy and if access is granted to a user: 
+The following examples illustrate the net effect of a policy and if access is granted to a user:
 
-- Neither user1, nor any team that user1 belongs to, are included in any policy with the action `iam:users:list`. 
+- Neither user1, nor any team that user1 belongs to, are included in any policy with the action `iam:users:list`.
   _Net effect_: user1 is denied access to view the list of users.
   This example illustrates the global default DENY condition.
 - Bob is a member of team alpha and team omega.
@@ -86,7 +86,7 @@ Projects   | list of project IDs to constrain the role
 
 ### Properties of a Role
 
-An IAM v2 role consists of a list of **actions**. Some examples of those actions include reading IAM users, getting compliance profiles, or updating node status.
+An IAM v2 role consists of a list of **actions**. Some examples of those actions include listing IAM users, getting compliance profiles, or updating node status.
 Roles are discussed in detail in [Role-Based Access Control]({{< relref "iam-v2-overview.md#role-based-access-control" >}}).
 
 ## Members and Policies
@@ -142,7 +142,7 @@ Chef Automate is currently limited to six projects while we continue to refine t
 
 ### Setting Up Projects
 
-IAM v2 projects can be setup using the following steps: 
+IAM v2 projects can be setup using the following steps:
 
 1. Define each project via the UI.
    Start on the _Projects List_ page to create your projects.

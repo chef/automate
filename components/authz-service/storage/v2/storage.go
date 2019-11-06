@@ -63,7 +63,7 @@ type roleStorage interface {
 
 type projectStorage interface {
 	UpdateProject(context.Context, *Project) (*Project, error)
-	CreateProject(context.Context, *Project) (*Project, error)
+	CreateProject(context.Context, *Project, bool) (*Project, error)
 	GetProject(context.Context, string) (*Project, error)
 	DeleteProject(context.Context, string) error
 	ListProjects(context.Context) ([]*Project, error)

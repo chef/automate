@@ -107,7 +107,7 @@ export class ProjectEffects {
       ofType(ProjectActionTypes.CREATE_SUCCESS),
       map(({ payload: { project } }: CreateProjectSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Created project ${project.id}`
+        message: `Created project ${project.id} and associated policies.`
     })));
 
   @Effect()

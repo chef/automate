@@ -123,7 +123,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 		return nil, status.Errorf(codes.InvalidArgument,
 			"creating project with ID %q: %s", req.Id, err.Error())
 	}
-	resp, err := s.store.CreateProject(ctx, &p)
+	resp, err := s.store.CreateProject(ctx, &p, true)
 	switch err {
 	case nil: // continue
 	case storage_errors.ErrConflict:
@@ -138,7 +138,7 @@ func (s *ProjectState) CreateProject(ctx context.Context,
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
 		return nil, status.Errorf(codes.Internal,
-			"error retrieving project with ID %q: %s", req.Id, err.Error())
+			"error creating project with ID %q: %s", req.Id, err.Error())
 	}
 
 	apiProject, err := fromStorageProject(resp)
@@ -163,7 +163,7 @@ func (s *ProjectState) UpdateProject(ctx context.Context,
 			return nil, status.Errorf(codes.NotFound, "project with ID %q not found", req.Id)
 		}
 		return nil, status.Errorf(codes.Internal,
-			"error retrieving project with ID %q: %s", req.Id, err.Error())
+			"error updating project with ID %q: %s", req.Id, err.Error())
 	}
 
 	apiProject, err := fromStorageProject(resp)

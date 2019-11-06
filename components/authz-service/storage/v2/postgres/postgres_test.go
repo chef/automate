@@ -4336,19 +4336,6 @@ func TestCreateProject(t *testing.T) {
 	ctx := context.Background()
 
 	cases := map[string]func(*testing.T){
-		"successfully creates custom project": func(t *testing.T) {
-			project := storage.Project{
-				ID:     "my-id-1",
-				Name:   "name1",
-				Type:   storage.Custom,
-				Status: storage.NoRules.String(),
-			}
-			resp, err := store.CreateProject(ctx, &project)
-			require.NoError(t, err)
-			require.Equal(t, &project, resp)
-
-			assertProjectsMatch(t, db, project)
-		},
 		"successfully creates chef-managed project": func(t *testing.T) {
 			project := storage.Project{
 				ID:     "my-id-1",
@@ -4356,11 +4343,42 @@ func TestCreateProject(t *testing.T) {
 				Type:   storage.ChefManaged,
 				Status: storage.NoRules.String(),
 			}
-			resp, err := store.CreateProject(ctx, &project)
+			resp, err := store.CreateProject(ctx, &project, false)
 			require.NoError(t, err)
 			require.Equal(t, &project, resp)
 
 			assertProjectsMatch(t, db, project)
+		},
+		"successfully creates custom project without supporting policies": func(t *testing.T) {
+			project := storage.Project{
+				ID:     "my-id-1",
+				Name:   "name1",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
+			}
+			resp, err := store.CreateProject(ctx, &project, false)
+			require.NoError(t, err)
+			require.Equal(t, &project, resp)
+
+			assertProjectsMatch(t, db, project)
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies`))
+		},
+		"successfully creates custom project with supporting policies": func(t *testing.T) {
+			project := storage.Project{
+				ID:     "my-id-1",
+				Name:   "name1",
+				Type:   storage.Custom,
+				Status: storage.NoRules.String(),
+			}
+			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_policies`))
+			resp, err := store.CreateProject(ctx, &project, true)
+			require.NoError(t, err)
+			require.Equal(t, &project, resp)
+
+			assertProjectsMatch(t, db, project)
+			assertCount(t, 3, db.QueryRow(
+				`SELECT count(*) FROM iam_policies
+				 WHERE id IN ('my-id-1-project-owners','my-id-1-project-viewers','my-id-1-project-editors')`))
 		},
 		"does not create project with duplicate ID": func(t *testing.T) {
 			projectID := "my-id-1"
@@ -4370,7 +4388,7 @@ func TestCreateProject(t *testing.T) {
 				Type:   storage.Custom,
 				Status: storage.NoRules.String(),
 			}
-			resp, err := store.CreateProject(ctx, &projectOriginal)
+			resp, err := store.CreateProject(ctx, &projectOriginal, false)
 			require.NoError(t, err)
 			require.Equal(t, &projectOriginal, resp)
 
@@ -4379,7 +4397,7 @@ func TestCreateProject(t *testing.T) {
 				Name: "Something Else",
 				Type: storage.Custom,
 			}
-			resp, err = store.CreateProject(ctx, &projectConflict)
+			resp, err = store.CreateProject(ctx, &projectConflict, false)
 			assert.Error(t, err)
 			assert.Equal(t, storage_errors.ErrConflict, err)
 			assert.Nil(t, resp)
@@ -4393,7 +4411,7 @@ func TestCreateProject(t *testing.T) {
 					Type:   storage.Custom,
 					Status: storage.NoRules.String(),
 				}
-				resp, err := store.CreateProject(ctx, &project)
+				resp, err := store.CreateProject(ctx, &project, false)
 				require.NoError(t, err)
 				require.Equal(t, &project, resp)
 			}
@@ -4405,7 +4423,7 @@ func TestCreateProject(t *testing.T) {
 				Type:   storage.Custom,
 				Status: storage.NoRules.String(),
 			}
-			resp, err := store.CreateProject(ctx, &oneProjectTooMany)
+			resp, err := store.CreateProject(ctx, &oneProjectTooMany, false)
 			assert.Nil(t, resp)
 			assert.Error(t, err)
 			_, correctError := err.(*storage_errors.MaxProjectsExceededError)
@@ -4420,7 +4438,7 @@ func TestCreateProject(t *testing.T) {
 					Type:   storage.Custom,
 					Status: storage.NoRules.String(),
 				}
-				resp, err := store.CreateProject(ctx, &project)
+				resp, err := store.CreateProject(ctx, &project, false)
 				require.NoError(t, err)
 				require.Equal(t, &project, resp)
 			}
@@ -4432,13 +4450,16 @@ func TestCreateProject(t *testing.T) {
 				Type:   storage.ChefManaged,
 				Status: storage.NoRules.String(),
 			}
-			resp, err := store.CreateProject(ctx, &chefManagedProject)
+			resp, err := store.CreateProject(ctx, &chefManagedProject, false)
 			require.NoError(t, err)
 			require.Equal(t, &chefManagedProject, resp)
 		},
 	}
 
 	for name, test := range cases {
+		insertTestRole(t, db, v2.ViewerRoleID, "viewer", []string{"any"}, []string{})
+		insertTestRole(t, db, v2.EditorRoleID, "editor", []string{"any"}, []string{})
+		insertTestRole(t, db, v2.ProjectOwnerRoleID, "project owner", []string{"any"}, []string{})
 		t.Run(name, test)
 		db.Flush(t)
 	}
@@ -4714,13 +4735,13 @@ func TestDeleteProject(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			project2 := storage.Project{
 				ID:   "project-2",
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			polID := insertTestPolicy(t, db, "testpolicy")
@@ -4751,20 +4772,20 @@ func TestDeleteProject(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID0Other))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID1Other))
 		}},
-		{"when a policy contains multiples statement and those statements contain a single project, on project deletion, the statement and policy are deleted", func(t *testing.T) {
+		{"when a policy contains multiple statements and those statements contain a single project, on project deletion, the statement and policy are deleted", func(t *testing.T) {
 			ctx := context.Background()
 			project1 := storage.Project{
 				ID:   "project-1",
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			project2 := storage.Project{
 				ID:   "project-2",
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			polID := insertTestPolicy(t, db, "testpolicy")
@@ -4799,20 +4820,20 @@ func TestDeleteProject(t *testing.T) {
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID0Other))
 			assertOne(t, db.QueryRow(`SELECT count(*) FROM iam_statement_projects WHERE project_id=project_db_id($1) AND statement_id=$2`, project2.ID, sID1Other))
 		}},
-		{"when a policy contains multiples statement and those statements contain different projects, on one project deletion, one statement is deleted and the policy remains", func(t *testing.T) {
+		{"when a policy contains multiple statements and those statements contain different projects, on one project deletion, one statement is deleted and the policy remains", func(t *testing.T) {
 			ctx := context.Background()
 			project1 := storage.Project{
 				ID:   "project-1",
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			project2 := storage.Project{
 				ID:   "project-2",
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			polID := insertTestPolicy(t, db, "testpolicy")
@@ -4914,7 +4935,7 @@ func TestDeleteProject(t *testing.T) {
 			assertEmpty(t, db.QueryRow(`SELECT count(*) FROM iam_projects WHERE id=$1`, proj.ID))
 			assertCount(t, 3, db.QueryRow(`SELECT count(*) FROM iam_projects`))
 		}},
-		{"returns not found when the project filter excludes the project in question", func(t *testing.T) {
+		{"returns 'not found' when the project filter excludes the project in question", func(t *testing.T) {
 			ctx := context.Background()
 			proj := insertTestProject(t, db, "test-project", "name", storage.Custom)
 			insertTestProject(t, db, "my-id-1", "name", storage.Custom)
@@ -5135,7 +5156,7 @@ func TestCreateRole(t *testing.T) {
 				Type: storage.Custom,
 			}
 
-			_, err := store.CreateProject(ctx, &project)
+			_, err := store.CreateProject(ctx, &project, false)
 			require.NoError(t, err)
 
 			role := storage.Role{
@@ -5159,7 +5180,7 @@ func TestCreateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -5167,7 +5188,7 @@ func TestCreateRole(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			role := storage.Role{
@@ -5256,7 +5277,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -5264,7 +5285,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			roles := []*storage.Role{{
@@ -5302,7 +5323,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -5310,7 +5331,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			project3 := storage.Project{
@@ -5318,7 +5339,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name3",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project3)
+			_, err = store.CreateProject(ctx, &project3, false)
 			require.NoError(t, err)
 
 			roles := []*storage.Role{{
@@ -5374,7 +5395,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -5382,7 +5403,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			project3 := storage.Project{
@@ -5390,7 +5411,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name3",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project3)
+			_, err = store.CreateProject(ctx, &project3, false)
 			require.NoError(t, err)
 
 			roles := []*storage.Role{{
@@ -5441,7 +5462,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -5449,7 +5470,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			roles := []*storage.Role{{
@@ -5497,7 +5518,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -5505,7 +5526,7 @@ func TestListRoles(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			roles := []*storage.Role{{
@@ -5572,7 +5593,7 @@ func TestGetRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID})
@@ -5592,7 +5613,7 @@ func TestGetRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID})
@@ -5615,7 +5636,7 @@ func TestGetRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -5623,7 +5644,7 @@ func TestGetRole(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project2.ID})
@@ -5647,7 +5668,7 @@ func TestGetRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -5655,7 +5676,7 @@ func TestGetRole(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project2.ID})
@@ -5679,7 +5700,7 @@ func TestGetRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{})
@@ -5703,7 +5724,7 @@ func TestGetRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{})
@@ -5727,7 +5748,7 @@ func TestGetRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -5735,7 +5756,7 @@ func TestGetRole(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project2.ID})
@@ -5819,7 +5840,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID})
@@ -5847,7 +5868,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID})
@@ -5868,7 +5889,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			roleDeleted := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID})
@@ -5905,7 +5926,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			roleDeleted := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID})
@@ -5943,7 +5964,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -5951,7 +5972,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			project3 := storage.Project{
@@ -5959,7 +5980,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name3",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project3)
+			_, err = store.CreateProject(ctx, &project3, false)
 			require.NoError(t, err)
 
 			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID, project3.ID})
@@ -5981,7 +6002,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -5989,7 +6010,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			project3 := storage.Project{
@@ -5997,7 +6018,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name3",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project3)
+			_, err = store.CreateProject(ctx, &project3, false)
 			require.NoError(t, err)
 
 			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{})
@@ -6019,7 +6040,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -6027,7 +6048,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			project3 := storage.Project{
@@ -6035,7 +6056,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name3",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project3)
+			_, err = store.CreateProject(ctx, &project3, false)
 			require.NoError(t, err)
 
 			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID, project3.ID})
@@ -6057,7 +6078,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -6065,7 +6086,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			project3 := storage.Project{
@@ -6073,7 +6094,7 @@ func TestDeleteRole(t *testing.T) {
 				Name: "name3",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project3)
+			_, err = store.CreateProject(ctx, &project3, false)
 			require.NoError(t, err)
 
 			role := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID, project3.ID})
@@ -6151,7 +6172,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID})
@@ -6178,7 +6199,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -6186,7 +6207,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name2",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			project3 := storage.Project{
@@ -6194,7 +6215,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name3",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project3)
+			_, err = store.CreateProject(ctx, &project3, false)
 			require.NoError(t, err)
 
 			project4 := storage.Project{
@@ -6202,7 +6223,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name4",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project4)
+			_, err = store.CreateProject(ctx, &project4, false)
 			require.NoError(t, err)
 
 			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID, project4.ID})
@@ -6229,7 +6250,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -6237,7 +6258,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID, project2.ID})
@@ -6264,7 +6285,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -6272,7 +6293,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project2.ID})
@@ -6296,7 +6317,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -6304,7 +6325,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			project3 := storage.Project{
@@ -6312,7 +6333,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project3)
+			_, err = store.CreateProject(ctx, &project3, false)
 			require.NoError(t, err)
 
 			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project2.ID, project3.ID})
@@ -6340,7 +6361,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{project1.ID})
@@ -6387,7 +6408,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err := store.CreateProject(ctx, &project1)
+			_, err := store.CreateProject(ctx, &project1, false)
 			require.NoError(t, err)
 
 			project2 := storage.Project{
@@ -6395,7 +6416,7 @@ func TestUpdateRole(t *testing.T) {
 				Name: "name1",
 				Type: storage.Custom,
 			}
-			_, err = store.CreateProject(ctx, &project2)
+			_, err = store.CreateProject(ctx, &project2, false)
 			require.NoError(t, err)
 
 			dbRole := insertTestRole(t, db, "my-id-1", "name", []string{"action1"}, []string{})
@@ -6941,10 +6962,12 @@ func insertTestRole(t *testing.T,
 	var dbID string
 	require.NoError(t, row.Scan(&dbID))
 
-	_, err := db.Exec(`INSERT INTO iam_role_projects (role_id, project_id)
+	if len(projects) > 0 {
+		_, err := db.Exec(`INSERT INTO iam_role_projects (role_id, project_id)
 		SELECT $1, db_id FROM iam_projects WHERE id=ANY($2)`,
-		dbID, pq.Array(role.Projects))
-	require.NoError(t, err)
+			dbID, pq.Array(role.Projects))
+		require.NoError(t, err)
+	}
 
 	return role
 }

@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, iamVersion, itFlaky } from '../../constants';
+import { describeIfIAMV2p1, isV1, itFlaky } from '../../constants';
 
 describe('team details', () => {
   let adminIdToken = '';
@@ -22,7 +22,7 @@ describe('team details', () => {
       adminIdToken = admin.id_token;
 
       cy.cleanupUsersByNamePrefix(cypressPrefix);
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
       cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
 
       cy.request({
@@ -38,25 +38,27 @@ describe('team details', () => {
         userMembershipID = resp.body.id;
       });
 
-      cy.request({
-        auth: { bearer: adminIdToken },
-        method: 'POST',
-        url: '/apis/iam/v2beta/projects',
-        body: {
-          id: project1ID,
-          name: project1Name
-        }
-      });
+      if (!isV1()) {
+        cy.request({
+          auth: { bearer: adminIdToken },
+          method: 'POST',
+          url: '/apis/iam/v2beta/projects',
+          body: {
+            id: project1ID,
+            name: project1Name
+          }
+        });
 
-      cy.request({
-        auth: { bearer: adminIdToken },
-        method: 'POST',
-        url: '/apis/iam/v2beta/projects',
-        body: {
-          id: project2ID,
-          name: project2Name
-        }
-      });
+        cy.request({
+          auth: { bearer: adminIdToken },
+          method: 'POST',
+          url: '/apis/iam/v2beta/projects',
+          body: {
+            id: project2ID,
+            name: project2Name
+          }
+        });
+      }
 
       cy.request({
         auth: { bearer: adminIdToken },
@@ -69,11 +71,7 @@ describe('team details', () => {
       }).then((resp) => {
         const guid = resp.body.team.id;
 
-        if (iamVersion.match(/v2/)) {
-          teamUIRouteIdentifier = teamID;
-        } else {
-          teamUIRouteIdentifier = guid;
-        }
+        teamUIRouteIdentifier = isV1() ? guid : teamID;
 
         cy.request({
           auth: { bearer: adminIdToken },
@@ -99,16 +97,11 @@ describe('team details', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
   });
 
   it('displays team details for admins team', () => {
-    let title = '';
-    if (iamVersion.match(/v2/)) {
-      title = teamName;
-    } else {
-      title = teamID;
-    }
+    const title = isV1() ? teamID : teamName ;
     cy.get('chef-breadcrumbs').contains('Teams');
     cy.get('chef-breadcrumbs').contains(title);
 

@@ -9,6 +9,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
+	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
@@ -38,7 +39,7 @@ type pg struct {
 var singletonInstance *pg
 var once sync.Once
 
-// GetInstance returns the signleton instance. Will be nil if not yet initialized.
+// GetInstance returns the singleton instance. Will be nil if not yet initialized.
 func GetInstance() *pg {
 	return singletonInstance
 }
@@ -114,23 +115,11 @@ func (p *pg) CreatePolicy(ctx context.Context, pol *v2.Policy, skipProjectsCheck
 		}
 	}
 
-	err = p.insertPolicyWithQuerier(ctx, pol, tx)
-	if err != nil {
+	if err := p.insertCompletePolicy(ctx, pol, projects, tx); err != nil {
 		return nil, p.processError(err)
 	}
 
-	err = p.associatePolicyWithProjects(ctx, pol.ID, projects, tx)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
-	err = p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, tx)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
-	err = p.notifyPolicyChange(ctx, tx)
-	if err != nil {
+	if err := p.notifyPolicyChange(ctx, tx); err != nil {
 		return nil, p.processError(err)
 	}
 
@@ -367,6 +356,21 @@ func (p *pg) GetPolicyChangeID(ctx context.Context) (string, error) {
 
 func (p *pg) GetPolicyChangeNotifier(ctx context.Context) (v2.PolicyChangeNotifier, error) {
 	return newPolicyChangeNotifier(ctx, p.conninfo)
+}
+
+func (p *pg) insertCompletePolicy(ctx context.Context, pol *v2.Policy, projects []string, q Querier) error {
+	if err := p.insertPolicyWithQuerier(ctx, pol, q); err != nil {
+		return err
+	}
+
+	if err := p.associatePolicyWithProjects(ctx, pol.ID, projects, q); err != nil {
+		return err
+	}
+
+	if err := p.insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, q); err != nil {
+		return err
+	}
+	return nil
 }
 
 // insertPolicyWithQuerier inserts a new custom policy. It does not return the
@@ -1455,7 +1459,7 @@ func (p *pg) ApplyStagedRules(ctx context.Context) error {
 /* * * * * * * * * * * * * * * * * *   PROJECTS  * * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Project, error) {
+func (p *pg) CreateProject(ctx context.Context, project *v2.Project, addPolicies bool) (*v2.Project, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -1493,6 +1497,12 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 		return nil, p.processError(err)
 	}
 
+	if addPolicies {
+		if err := p.addSupportPolicies(ctx, project, tx); err != nil {
+			return nil, p.processError(err)
+		}
+	}
+
 	err = tx.Commit()
 	if err != nil {
 		return nil, storage_errors.NewTxCommitError(err)
@@ -1500,6 +1510,61 @@ func (p *pg) CreateProject(ctx context.Context, project *v2.Project) (*v2.Projec
 
 	// Currently, we don't change anything from what is passed in.
 	return project, nil
+}
+
+func (p *pg) addSupportPolicies(ctx context.Context, project *v2.Project, q Querier) error {
+	policyParams := []struct {
+		id   string
+		name string
+		role string
+	}{
+		{
+			id:   fmt.Sprintf("%s-%s", project.ID, "project-owners"),
+			name: fmt.Sprintf("%s %s", project.Name, "Project Owners"),
+			role: constants_v2.ProjectOwnerRoleID,
+		},
+		{
+			id:   fmt.Sprintf("%s-%s", project.ID, "project-editors"),
+			name: fmt.Sprintf("%s %s", project.Name, "Project Editors"),
+			role: constants_v2.EditorRoleID,
+		},
+		{
+			id:   fmt.Sprintf("%s-%s", project.ID, "project-viewers"),
+			name: fmt.Sprintf("%s %s", project.Name, "Project Viewers"),
+			role: constants_v2.ViewerRoleID,
+		},
+	}
+
+	for _, param := range policyParams {
+		pol := generatePolicy(project.ID, param.id, param.name, param.role)
+		if err := p.insertCompletePolicy(ctx, &pol, pol.Projects, q); err != nil {
+			return err
+		}
+	}
+
+	if err := p.notifyPolicyChange(ctx, q); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func generatePolicy(projectID string, id string, name string, role string) v2.Policy {
+	return v2.Policy{
+		ID:      id,
+		Name:    name,
+		Members: []v2.Member{},
+		Statements: []v2.Statement{
+			{
+				Effect:    v2.Allow,
+				Resources: []string{"*"},
+				Projects:  []string{projectID},
+				Actions:   []string{},
+				Role:      role,
+			},
+		},
+		Projects: []string{projectID},
+	}
 }
 
 func (p *pg) UpdateProject(ctx context.Context, project *v2.Project) (*v2.Project, error) {

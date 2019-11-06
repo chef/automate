@@ -15,14 +15,17 @@ import (
 	"google.golang.org/grpc/codes"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
+	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/testhelpers"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )
 
 const (
-	idRegex        = "^[a-z0-9-_]{1,64}$"
-	conditionLimit = 10 // help avoid the grpc limit of 4194304
-	projectLimit   = 6  // system limitation
+	idRegex          = "^[a-z0-9-_]{1,64}$"
+	conditionLimit   = 10 // help avoid the grpc limit of 4194304
+	projectLimit     = 6  // system limitation
+	SuperuserSubject = "tls:service:deployment-service:internal"
 )
 
 type projectAndRuleReq struct {
@@ -33,8 +36,10 @@ type projectAndRuleReq struct {
 var createRuleReqGen, createProjectReqGen, createProjectAndRulesGen, createProjectsAndRulesGen = getGenerators()
 
 func TestCreateRuleProperties(t *testing.T) {
-	ctx := context.Background()
-	cl, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	ctx := auth_context.NewOutgoingContext(auth_context.NewContext(context.Background(),
+		[]string{SuperuserSubject}, []string{}, "*", "*", "v2.1"))
+
+	projectClient, policyClient, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
 	defer testDB.CloseDB(t)
 	defer store.Close()
@@ -46,7 +51,7 @@ func TestCreateRuleProperties(t *testing.T) {
 
 				reportRules(t, reqs.rules)
 
-				respRule, err := createProjectAndRule(ctx, cl, reqs)
+				respRule, err := createProjectAndRule(ctx, projectClient, policyClient, reqs)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -61,17 +66,19 @@ func TestCreateRuleProperties(t *testing.T) {
 		prop.ForAll(
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
-
-				_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+				if err := createSystemRoles(ctx, policyClient); err != nil {
+					return reportErrorAndYieldFalse(t, err)
+				}
+				_, err := projectClient.CreateProject(ctx, &reqs.CreateProjectReq)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				if _, err := cl.CreateRule(ctx, &reqs.rules[0]); err != nil {
+				if _, err := projectClient.CreateRule(ctx, &reqs.rules[0]); err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				_, err = cl.CreateRule(ctx, &reqs.rules[1])
+				_, err = projectClient.CreateRule(ctx, &reqs.rules[1])
 				return grpctest.AssertCode(t, codes.AlreadyExists, err)
 			},
 			gopter.CombineGens(
@@ -93,8 +100,9 @@ func TestCreateRuleProperties(t *testing.T) {
 }
 
 func TestGetRuleProperties(t *testing.T) {
-	ctx := context.Background()
-	cl, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	ctx := auth_context.NewOutgoingContext(auth_context.NewContext(context.Background(),
+		[]string{SuperuserSubject}, []string{}, "*", "*", "v2.1"))
+	projectClient, policyClient, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	defer testDB.CloseDB(t)
 	defer store.Close()
 	properties := getGopterParams(seed)
@@ -106,12 +114,12 @@ func TestGetRuleProperties(t *testing.T) {
 
 				reportRules(t, reqs.rules)
 
-				_, err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, projectClient, policyClient, reqs)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				rStaged, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				rStaged, err := projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -128,11 +136,11 @@ func TestGetRuleProperties(t *testing.T) {
 	// 		func(reqs projectAndRuleReq) bool {
 	// 			defer testDB.Flush(t)
 
-	// 			_, err := createProjectAndRule(ctx, cl, reqs)
+	// 			_, err := createProjectAndRule(ctx, projectClient, policyClient, reqs)
 
-	// 			cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+	// 			projectClient.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-	// 			rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+	// 			rApplied, err := projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 	// 			if err != nil {
 	// 				return reportErrorAndYieldFalse(t, err)
 	// 			}
@@ -149,7 +157,7 @@ func TestGetRuleProperties(t *testing.T) {
 /*
 func TestListRuleProperties(t *testing.T) {
 	ctx := context.Background()
-	cl, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	cl, _, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
 
 	properties.Property("staged rules are reported as staged",
@@ -243,7 +251,7 @@ func TestListRuleProperties(t *testing.T) {
 
 func TestUpdateRuleProperties(t *testing.T) {
 	ctx := context.Background()
-	cl, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	projectClient, policyClient, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
 
 	properties.Property("updating newly created rules remain staged",
@@ -251,7 +259,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				_, err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, projectClient, policyClient, reqs)
 
 				updateReq := api.UpdateRuleReq{
 					Id:         reqs.rules[0].Id,
@@ -260,14 +268,14 @@ func TestUpdateRuleProperties(t *testing.T) {
 					Type:       reqs.rules[0].Type,
 					Conditions: reqs.rules[0].Conditions,
 				}
-				rStaged, err := cl.UpdateRule(ctx, &updateReq)
+				rStaged, err := projectClient.UpdateRule(ctx, &updateReq)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				projectClient.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				rApplied, err := projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -285,11 +293,11 @@ func TestUpdateRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				_, err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, projectClient, policyClient, reqs)
 
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				projectClient.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				rInitialApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				rInitialApplied, err := projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -301,14 +309,14 @@ func TestUpdateRuleProperties(t *testing.T) {
 					Type:       reqs.rules[0].Type,
 					Conditions: reqs.rules[0].Conditions,
 				}
-				rStaged, err := cl.UpdateRule(ctx, &updateReq)
+				rStaged, err := projectClient.UpdateRule(ctx, &updateReq)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				projectClient.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				rFinalApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				rFinalApplied, err := projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -327,9 +335,9 @@ func TestUpdateRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				_, err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, projectClient, policyClient, reqs)
 
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				projectClient.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
 				updateReq := api.UpdateRuleReq{
 					Id:         reqs.rules[0].Id,
@@ -338,7 +346,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 					Type:       reqs.rules[0].Type,
 					Conditions: reqs.rules[0].Conditions,
 				}
-				rInitialStaged, err := cl.UpdateRule(ctx, &updateReq)
+				rInitialStaged, err := projectClient.UpdateRule(ctx, &updateReq)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -350,14 +358,14 @@ func TestUpdateRuleProperties(t *testing.T) {
 					Type:       reqs.rules[0].Type,
 					Conditions: reqs.rules[0].Conditions,
 				}
-				rFinalStaged, err := cl.UpdateRule(ctx, &updateReq2)
+				rFinalStaged, err := projectClient.UpdateRule(ctx, &updateReq2)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				projectClient.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				rApplied, err := cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				rApplied, err := projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
@@ -376,7 +384,7 @@ func TestUpdateRuleProperties(t *testing.T) {
 
 func TestDeleteRuleProperties(t *testing.T) {
 	ctx := context.Background()
-	cl, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	projectClient, policyClient, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
 
 	properties.Property("deleting newly created rules deletes them immediately",
@@ -384,19 +392,19 @@ func TestDeleteRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				_, err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, projectClient, policyClient, reqs)
 
-				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				_, err = projectClient.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				_, err = projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				deletedWhenStaged := grpctest.AssertCode(t, codes.NotFound, err)
 
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				projectClient.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				_, err = projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				deletedWhenApplied := grpctest.AssertCode(t, codes.NotFound, err)
 
 				return deletedWhenStaged && deletedWhenApplied
@@ -409,21 +417,21 @@ func TestDeleteRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				_, err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, projectClient, policyClient, reqs)
 
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				projectClient.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				_, err = projectClient.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				_, err = projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				markedforDeletion := grpctest.AssertCode(t, codes.NotFound, err) && strings.Contains(err.Error(), "marked for deletion")
 
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				projectClient.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				_, err = projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				fullyDeleted := grpctest.AssertCode(t, codes.NotFound, err) && !strings.Contains(err.Error(), "marked for deletion")
 
 				return markedforDeletion && fullyDeleted
@@ -436,9 +444,9 @@ func TestDeleteRuleProperties(t *testing.T) {
 			func(reqs projectAndRuleReq) bool {
 				defer testDB.Flush(t)
 
-				_, err := createProjectAndRule(ctx, cl, reqs)
+				_, err := createProjectAndRule(ctx, projectClient, policyClient, reqs)
 
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				projectClient.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
 				updateReq := api.UpdateRuleReq{
 					Id:         reqs.rules[0].Id,
@@ -447,21 +455,21 @@ func TestDeleteRuleProperties(t *testing.T) {
 					Type:       reqs.rules[0].Type,
 					Conditions: reqs.rules[0].Conditions,
 				}
-				_, err = cl.UpdateRule(ctx, &updateReq)
+				_, err = projectClient.UpdateRule(ctx, &updateReq)
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				_, err = cl.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				_, err = projectClient.DeleteRule(ctx, &api.DeleteRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				if err != nil {
 					return reportErrorAndYieldFalse(t, err)
 				}
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				_, err = projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				markedforDeletion := grpctest.AssertCode(t, codes.NotFound, err) && strings.Contains(err.Error(), "marked for deletion")
-				cl.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
+				projectClient.ApplyRulesStart(ctx, &api.ApplyRulesStartReq{})
 
-				_, err = cl.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
+				_, err = projectClient.GetRule(ctx, &api.GetRuleReq{Id: reqs.rules[0].Id, ProjectId: reqs.rules[0].ProjectId})
 				fullyDeleted := grpctest.AssertCode(t, codes.NotFound, err) && !strings.Contains(err.Error(), "marked for deletion")
 
 				return markedforDeletion && fullyDeleted
@@ -474,7 +482,7 @@ func TestDeleteRuleProperties(t *testing.T) {
 
 func TestListProjectProperties(t *testing.T) {
 	ctx := context.Background()
-	cl, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	cl, _, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
 
 	properties.Property("all staged rules are reported as staged",
@@ -515,7 +523,7 @@ func TestListProjectProperties(t *testing.T) {
 
 func TestListProjectPropertiesMixingStagedAndApplied(t *testing.T) {
 	ctx := context.Background()
-	cl, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
+	cl, _, testDB, _, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
 
 	properties.Property("projects with staged, applied, or no rules are reported",
@@ -747,13 +755,39 @@ func rulesMatch(rules []api.CreateRuleReq, resp *api.ListRulesResp) bool {
 	return true
 }
 
-func createProjectAndRule(ctx context.Context, cl api.ProjectsClient, reqs projectAndRuleReq) (*api.ProjectRule, error) {
-	_, err := cl.CreateProject(ctx, &reqs.CreateProjectReq)
+func createSystemRoles(ctx context.Context, polClient api.PoliciesClient) error {
+	_, err := polClient.CreateRole(ctx,
+		&api.CreateRoleReq{Id: constants_v2.ProjectOwnerRoleID, Name: "any", Actions: []string{"*"}, Projects: []string{}})
+	if err != nil {
+		return err
+	}
+	_, err = polClient.CreateRole(ctx,
+		&api.CreateRoleReq{Id: constants_v2.EditorRoleID, Name: "any", Actions: []string{"*"}, Projects: []string{}})
+	if err != nil {
+		return err
+	}
+	_, err = polClient.CreateRole(ctx,
+		&api.CreateRoleReq{Id: constants_v2.ViewerRoleID, Name: "any", Actions: []string{"*"}, Projects: []string{}})
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func createProjectAndRule(
+	ctx context.Context,
+	projClient api.ProjectsClient,
+	polClient api.PoliciesClient,
+	reqs projectAndRuleReq) (*api.ProjectRule, error) {
+	if err := createSystemRoles(ctx, polClient); err != nil {
+		return nil, err
+	}
+	_, err := projClient.CreateProject(ctx, &reqs.CreateProjectReq)
 	if err != nil {
 		return nil, err
 	}
 
-	rule, err := cl.CreateRule(ctx, &reqs.rules[0])
+	rule, err := projClient.CreateRule(ctx, &reqs.rules[0])
 	if err != nil {
 		return nil, err
 	}

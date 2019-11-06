@@ -11,14 +11,28 @@ chef-modal {
 
   .flex-container {
     display: flex;
-    justify-content: center;
-
-    .margin {
-      margin-bottom: 30px;
-    }
+    align-items: center;
+    flex-direction: column;
 
     form {
-      flex-basis: 60%;
+      width: 66%;
+
+      .name-margin {
+        margin-bottom: 30px;
+      }
+
+      .id-margin {
+        margin-bottom: 30px;
+      }
+
+      .checkbox-margin {
+        margin-bottom: 30px;
+      }
+
+      .dropdown-margin {
+        margin-top: 30px;
+        margin-bottom: 16px;
+      }
 
       input {
         font-size: 1em;
@@ -35,7 +49,6 @@ chef-modal {
 
       #id-fields {
         font-size: 0.75em;
-        margin-bottom: 3px;
 
         .key-label {
           font-weight: bold;

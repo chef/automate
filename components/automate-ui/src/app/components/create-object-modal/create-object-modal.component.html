@@ -2,7 +2,7 @@
   <h2 slot="title">Create {{ objectNoun | titlecase }}</h2>
     <div class="flex-container">
       <form [formGroup]="createForm">
-        <div class="margin">
+        <div class="name-margin">
           <chef-form-field>
             <label>
               <span class="label">Name <span aria-hidden="true">*</span></span>
@@ -14,7 +14,7 @@
           </chef-form-field>
           <span class="detail">Don't worry, {{ objectNoun }} names can be changed later.</span>
         </div>
-        <div *ngIf="modifyID" class="margin">
+        <div *ngIf="modifyID" class="id-margin">
           <chef-form-field>
             <label>
               <span class="label">ID <span aria-hidden="true">*</span></span>
@@ -35,7 +35,7 @@
           </chef-form-field>
           <span class="detail">{{ objectNoun | titlecase }} IDs are unique, permanent, and cannot be changed later.</span>
         </div>
-        <div *ngIf="!modifyID" class="margin">
+        <div *ngIf="!modifyID" class="id-margin">
           <div id="id-fields">
             <span class="key-label">ID:&nbsp;</span>
             <span data-cy="id-label">{{ this.createForm?.value.id }}</span>
@@ -44,7 +44,12 @@
             <chef-button tertiary (click)="modifyID = true" id="edit-button-object-modal" data-cy="edit-button">Edit ID</chef-button>
           </chef-toolbar>
         </div>
-        <div *ngIf="showProjectsDropdown">
+        <div class="checkbox-margin" *ngIf="!showProjectsDropdown">
+          <chef-checkbox checked="true" disabled="true">
+            Also create owner, editor, and viewer policies for this project.
+          </chef-checkbox>
+        </div>
+        <div class="dropdown-margin" *ngIf="showProjectsDropdown">
           <app-projects-dropdown
             [projects]="projects"
             (onProjectChecked)="onProjectChecked($event)"
