@@ -570,7 +570,7 @@ func TestApplyTemplateInProcess(t *testing.T) {
 			}
 		}
 
-		if want := `func RegisterExampleServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ExampleServiceServer, opts []grpc.DialOption) error {`; !strings.Contains(got, want) {
+		if want := `func RegisterExampleServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server ExampleServiceServer) error {`; !strings.Contains(got, want) {
 			t.Errorf("applyTemplate(%#v) = %s; want to contain %s", file, got, want)
 		}
 	}
@@ -628,7 +628,10 @@ func TestAllowPatchFeature(t *testing.T) {
 						Bindings: []*descriptor.Binding{
 							{
 								HTTPMethod: "PATCH",
-								Body:       &descriptor.Body{FieldPath: nil},
+								Body: &descriptor.Body{FieldPath: descriptor.FieldPath{descriptor.FieldPathComponent{
+									Name:   "abe",
+									Target: msg.Fields[0],
+								}}},
 							},
 						},
 					},
@@ -636,7 +639,7 @@ func TestAllowPatchFeature(t *testing.T) {
 			},
 		},
 	}
-	want := "if protoReq.UpdateMask != nil && len(protoReq.UpdateMask.GetPaths()) > 0 {\n"
+	want := "if protoReq.UpdateMask == nil || len(protoReq.UpdateMask.GetPaths()) == 0 {\n"
 	for _, allowPatchFeature := range []bool{true, false} {
 		got, err := applyTemplate(param{File: crossLinkFixture(&file), RegisterFuncSuffix: "Handler", AllowPatchFeature: allowPatchFeature}, descriptor.NewRegistry())
 		if err != nil {

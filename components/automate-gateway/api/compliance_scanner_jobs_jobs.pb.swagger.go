@@ -7,10 +7,6 @@ func init() {
     "title": "components/automate-gateway/api/compliance/scanner/jobs/jobs.proto",
     "version": "version not set"
   },
-  "schemes": [
-    "http",
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],

@@ -52,7 +52,7 @@ require (
 	github.com/gorilla/mux v1.6.1
 	github.com/grpc-ecosystem/go-grpc-middleware v1.0.0
 	github.com/grpc-ecosystem/go-grpc-prometheus v1.2.0
-	github.com/grpc-ecosystem/grpc-gateway v1.10.0
+	github.com/grpc-ecosystem/grpc-gateway v1.12.0
 	github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20171214222146-0e7658f8ee99
 	github.com/hashicorp/go-immutable-radix v1.0.0 // indirect
 	github.com/hashicorp/go-msgpack v0.5.3 // indirect
@@ -122,14 +122,14 @@ require (
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
 	golang.org/x/text v0.3.1-0.20171218113626-eb22672bea55
 	google.golang.org/api v0.0.0-20180829000535-087779f1d2c9
-	google.golang.org/genproto v0.0.0-20181218023534-67d6565462c5
+	google.golang.org/genproto v0.0.0-20190927181202-20e1ac93f88c
 	google.golang.org/grpc v1.24.0
 	gopkg.in/asn1-ber.v1 v1.0.0-20170511165959-379148ca0225 // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.20
 	gopkg.in/ldap.v2 v2.5.1 // indirect
 	gopkg.in/segmentio/analytics-go.v3 v3.0.1
 	gopkg.in/square/go-jose.v2 v2.1.3
-	gopkg.in/yaml.v2 v2.2.1
+	gopkg.in/yaml.v2 v2.2.3
 )
 
 replace github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9 => github.com/danielsdeleo/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9
