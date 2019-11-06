@@ -28,7 +28,6 @@ export class ChefControlMenuComponent implements OnInit {
   }
 
   @HostListener('focusout', ['$event']) handleFocusOut(e) {
-    console.log(e);
     const relatedTarget = e.relatedTarget;
     e.stopPropagation();
     if (!relatedTarget || relatedTarget.nodeName !== 'CHEF-DROPDOWN') {
@@ -37,9 +36,42 @@ export class ChefControlMenuComponent implements OnInit {
     }
   }
 
+  @HostListener('keydown', ['$event']) handleKeydown(e: KeyboardEvent) {
+    switch (e.key) {
+      case (' '): //fallthrough
+      case ('Enter'):
+        return this.handleKeyActivation();
+        break;
+      case ('Escape'):
+        console.log('Escape');
+        // return this.handleEscape();
+        break;
+      case ('ArrowUp'):
+        console.log('ArrowUp');
+        // return this.handleUp(event);
+        break;
+      case ('ArrowDown'):
+        console.log('ArrowDown');
+        // return this.handleDown(event);
+        break;
+    }
+  }
+
   constructor() { }
 
   ngOnInit() {
+  }
+
+  handleKeyActivation() {
+    if (this.isDisabled) {
+      return;
+    } else if (this.isActive) {
+      // this.makeSelection(this.focusedIndex);
+      console.log('makeSelection()');
+    } else {
+      // this.activate(this.selectedIndex);
+      console.log('activate(selectedIndex)');
+    }
   }
 
   handleClickActivation(event) {
