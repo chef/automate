@@ -427,7 +427,7 @@ func (d *DeleteDisconnectedServicesExecutor) runWithoutStats(ctx context.Context
 		return err
 	}
 
-	logCtx.WithFields(log.Fields{"svcs_removed": len(svcRemovedRes.Services)}).Info("periodic task succeeded")
+	logCtx.WithFields(log.Fields{"svcs_removed": len(svcRemovedRes.Services)}).Debug("periodic task succeeded")
 	return nil
 }
 

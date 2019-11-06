@@ -526,12 +526,12 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 		for i, sg := range sgList {
 
 			// OK Health
-			t.Run(fmt.Sprintf("verifying service group %s with health:OK", sg.Name), func(t *testing.T) {
+			t.Run(fmt.Sprintf("verifying service group %s with status:OK", sg.Name), func(t *testing.T) {
 				var (
 					ctx     = context.Background()
 					request = &applications.ServicesBySGReq{
 						ServiceGroupId: sg.ID,
-						Health:         "OK", // This is the filter we are testing in this function
+						Filter:         []string{"status:OK"}, // This is the filter we are testing in this function
 					}
 				)
 
@@ -543,12 +543,12 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 			})
 
 			// CRITICAL Health
-			t.Run(fmt.Sprintf("verifying service group %s with health:CRITICAL", sg.Name), func(t *testing.T) {
+			t.Run(fmt.Sprintf("verifying service group %s with status:CRITICAL", sg.Name), func(t *testing.T) {
 				var (
 					ctx     = context.Background()
 					request = &applications.ServicesBySGReq{
 						ServiceGroupId: sg.ID,
-						Health:         "CRITICAL", // This is the filter we are testing in this function
+						Filter:         []string{"status:CRITICAL"}, // This is the filter we are testing in this function
 					}
 				)
 
@@ -560,12 +560,12 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 			})
 
 			// WARNING Health
-			t.Run(fmt.Sprintf("verifying service group %s with health:WARNING", sg.Name), func(t *testing.T) {
+			t.Run(fmt.Sprintf("verifying service group %s with status:WARNING", sg.Name), func(t *testing.T) {
 				var (
 					ctx     = context.Background()
 					request = &applications.ServicesBySGReq{
 						ServiceGroupId: sg.ID,
-						Health:         "WARNING", // This is the filter we are testing in this function
+						Filter:         []string{"status:WARNING"}, // This is the filter we are testing in this function
 					}
 				)
 
@@ -577,12 +577,12 @@ func TestGetServicesBySGMultiServiceWithHealthFilter(t *testing.T) {
 			})
 
 			// UNKNOWN Health
-			t.Run(fmt.Sprintf("verifying service group %s with health:UNKNOWN", sg.Name), func(t *testing.T) {
+			t.Run(fmt.Sprintf("verifying service group %s with status:UNKNOWN", sg.Name), func(t *testing.T) {
 				var (
 					ctx     = context.Background()
 					request = &applications.ServicesBySGReq{
 						ServiceGroupId: sg.ID,
-						Health:         "UNKNOWN", // This is the filter we are testing in this function
+						Filter:         []string{"status:UNKNOWN"}, // This is the filter we are testing in this function
 					}
 				)
 

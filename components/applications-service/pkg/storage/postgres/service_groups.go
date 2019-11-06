@@ -103,6 +103,9 @@ const (
    AND health_warning  = 0
    AND health_unknown  = 0
  `
+	selectServiceGroupFilterDisconnected = `
+   disconnected_count > 0
+ `
 	paginationSorting = `
   ORDER BY %s
   LIMIT $1
@@ -220,13 +223,6 @@ func formatQueryFilters(filters map[string][]string, includeStatusFilter bool) (
 					return "", err
 				}
 				statusFilters = append(statusFilters, filter)
-			}
-		case "connectedStatus", "CONNECTEDSTATUS":
-			if includeStatusFilter {
-				// query parameter `connectedStatus=disconnected` in the URL
-				if values[0] == "disconnected" {
-					statusFilters = append(statusFilters, "disconnected_count > 0")
-				}
 			}
 		case "environment", "ENVIRONMENT":
 			selectQuery, err = queryFromFieldFilter("s.environment", values, first)
@@ -429,6 +425,8 @@ func queryFromStatusFilter(text string) (string, error) {
 		return selectServiceGroupHealthFilterWARNING, nil
 	case storage.Unknown:
 		return selectServiceGroupHealthFilterUNKNOWN, nil
+	case storage.Disconnected:
+		return selectServiceGroupFilterDisconnected, nil
 	default:
 		return "", errors.Errorf("invalid status filter '%s'", text)
 	}

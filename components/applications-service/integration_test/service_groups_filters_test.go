@@ -164,7 +164,7 @@ func TestDisconnectedStatusFilter(t *testing.T) {
 		suite.IngestServices(habServicesMatrix())
 		defer suite.DeleteDataFromStorage()
 		req := &applications.ServiceGroupsReq{
-			Filter: []string{"connectedStatus:disconnected"},
+			Filter: []string{"status:disconnected"},
 		}
 		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, req)
 		assert.Nil(t, err)
@@ -183,7 +183,7 @@ func TestDisconnectedStatusFilter(t *testing.T) {
 		require.NoError(t, err)
 
 		req := &applications.ServiceGroupsReq{
-			Filter: []string{"connectedStatus:disconnected"},
+			Filter: []string{"status:disconnected"},
 		}
 		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, req)
 		assert.Nil(t, err)
@@ -203,7 +203,7 @@ func TestDisconnectedStatusFilter(t *testing.T) {
 		require.NoError(t, err)
 
 		req := &applications.ServiceGroupsReq{
-			Filter: []string{"connectedStatus:disconnected"},
+			Filter: []string{"status:disconnected"},
 		}
 		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, req)
 		assert.Nil(t, err)
@@ -223,32 +223,34 @@ func TestDisconnectedStatusFilter(t *testing.T) {
 		require.NoError(t, err)
 
 		req := &applications.ServiceGroupsReq{
-			Filter: []string{"connectedStatus:disconnected"},
+			Filter: []string{"status:disconnected"},
 		}
 		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, req)
 		assert.Nil(t, err)
 		assert.Len(t, response.ServiceGroups, 2)
 	})
-	t.Run("when a status filter and disconnected status filter are both applied and a service group meets both criteria", func(t *testing.T) {
-		servicesToIngest := habServicesMatrix()
-		require.NoError(t, err)
+	// TODO: Re-enable this test when we support multiple selected filters
+	//
+	// t.Run("when a status filter and disconnected status filter are both applied and a service group meets both criteria", func(t *testing.T) {
+	// 	servicesToIngest := habServicesMatrix()
+	// 	require.NoError(t, err)
 
-		for _, i := range []int{0, 4, 7, 9} {
-			s := servicesToIngest[i]
-			s.EventMetadata.OccurredAt = oldEventTime
-		}
-		suite.IngestServices(servicesToIngest)
-		defer suite.DeleteDataFromStorage()
-		_, err = suite.ApplicationsServer.MarkDisconnectedServices(300)
-		require.NoError(t, err)
+	// 	for _, i := range []int{0, 4, 7, 9} {
+	// 		s := servicesToIngest[i]
+	// 		s.EventMetadata.OccurredAt = oldEventTime
+	// 	}
+	// 	suite.IngestServices(servicesToIngest)
+	// 	defer suite.DeleteDataFromStorage()
+	// 	_, err = suite.ApplicationsServer.MarkDisconnectedServices(300)
+	// 	require.NoError(t, err)
 
-		req := &applications.ServiceGroupsReq{
-			Filter: []string{"connectedStatus:disconnected", "status:critical"},
-		}
-		response, err := suite.ApplicationsServer.GetServiceGroups(ctx, req)
-		assert.Nil(t, err)
-		assert.Len(t, response.ServiceGroups, 1)
-	})
+	// 	req := &applications.ServiceGroupsReq{
+	// 		Filter: []string{"status:disconnected", "status:critical"},
+	// 	}
+	// 	response, err := suite.ApplicationsServer.GetServiceGroups(ctx, req)
+	// 	assert.Nil(t, err)
+	// 	assert.Len(t, response.ServiceGroups, 1)
+	// })
 
 }
 

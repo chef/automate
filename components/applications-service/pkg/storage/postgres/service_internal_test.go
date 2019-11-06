@@ -39,7 +39,7 @@ func TestConvertComposedServicesToStorage(t *testing.T) {
 
 func TestBuildWhereConstraintsFromFiltersNoFilterReturnsEmptyString(t *testing.T) {
 	expected := ""
-	actual, err := buildWhereConstraintsFromFilters(nil, "WHERE")
+	actual, err := buildWhereConstraintsFromFilters(nil, "WHERE", true)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, actual)
 }
@@ -73,7 +73,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 		{
 			message: "with health filter with single value returns built WHERE statement",
 			filters: map[string][]string{
-				"health": {"UNKNOWN"},
+				"status": {"UNKNOWN"},
 			},
 			expected:          "WHERE health = 'UNKNOWN'",
 			shouldReturnError: false,
@@ -82,7 +82,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 			message: "with multiple valid filters and multiple values returns built WHERE statement",
 			filters: map[string][]string{
 				"service_group_id": {"123", "456"},
-				"health":           {"WARNING", "OK"},
+				"status":           {"WARNING", "OK"},
 			},
 			expected:          "WHERE service_group_id = '123' OR service_group_id = '456' AND health = 'WARNING' OR health = 'OK'",
 			shouldReturnError: false,
@@ -137,7 +137,7 @@ func TestBuildWhereConstraintsFromFiltersMatrix(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.message, func(t *testing.T) {
-			actual, err := buildWhereConstraintsFromFilters(test.filters, "WHERE")
+			actual, err := buildWhereConstraintsFromFilters(test.filters, "WHERE", true)
 
 			if test.shouldReturnError {
 				assert.NotNil(t, err)
