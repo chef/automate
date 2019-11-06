@@ -1,4 +1,4 @@
-import { Component, OnInit, HostBinding } from '@angular/core';
+import { Component, OnInit, HostBinding, HostListener } from '@angular/core';
 
 @Component({
   selector: 'app-chef-control-menu',
@@ -16,10 +16,26 @@ export class ChefControlMenuComponent implements OnInit {
 
   // can i use a ternarys here?
   @HostBinding('attr.role') comboBox = 'combobox';
-  @HostBinding('attr.tabindex') isTabable: string = this.isDisabled === true ? '-1' : '0';
-  @HostBinding('class.focused') focused: string = this.isFocused ? 'focused' : '';
-  @HostBinding('class.active') active: string = this.isActive ? 'active' : '';
-  @HostBinding('class.disabled') disabled: string = this.isDisabled ? 'disabled' : '';
+  @HostBinding('attr.tabindex') get isTabable(): string { return this.isDisabled === true ? '-1' : '0'; }
+  @HostBinding('class.focused') get focused(): string { return this.isFocused ? 'focused' : ''; }
+  @HostBinding('class.active') get active(): string { return this.isActive ? 'active' : ''; }
+  @HostBinding('class.disabled') get disabled(): string { return this.isDisabled ? 'disabled' : '';}
+
+  @HostListener('focus') handleFocus() {
+    if (!this.isDisabled) {
+      this.isFocused = true;
+    }
+  }
+
+  @HostListener('focusout', ['$event']) handleFocusOut(e) {
+    console.log(e);
+    const relatedTarget = e.relatedTarget;
+    e.stopPropagation();
+    if (!relatedTarget || relatedTarget.nodeName !== 'CHEF-DROPDOWN') {
+      this.isFocused = false;
+      this.isActive = false;
+    }
+  }
 
   constructor() { }
 

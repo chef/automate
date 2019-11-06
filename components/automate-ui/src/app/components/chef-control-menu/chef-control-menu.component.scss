@@ -9,6 +9,10 @@
   height: 32px;
   cursor: pointer;
 
+  &.focused {
+    box-shadow: 0px 0px 0px 1px var(--chef-primary-bright) inset;
+  }
+
   .control-menu {
     display: block;
     border-radius: inherit;
