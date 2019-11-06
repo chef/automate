@@ -12,6 +12,7 @@ import { AuthorizedComponent } from './authorized/authorized.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { CalendarComponent } from './calendar/calendar.component';
+import { ChefControlMenuComponent } from './chef-control-menu/chef-control-menu.component';
 import { CreateObjectModalComponent } from './create-object-modal/create-object-modal.component';
 import { DeleteObjectModalComponent } from './delete-object-modal/delete-object-modal.component';
 import { ErrorDirective } from './error/error.directive';
@@ -68,6 +69,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbsComponent,
     BreadcrumbComponent,
     CalendarComponent,
+    ChefControlMenuComponent,
     CreateObjectModalComponent,
     DeleteObjectModalComponent,
     FormFieldComponent,
@@ -120,12 +122,16 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     SidebarEntryComponent,
     TabComponent,
     TabsComponent,
+<<<<<<< HEAD
     TableBodyComponent,
     TableComponent,
     TableCellComponent,
     TableRowComponent,
     TableHeaderCellComponent,
     TableHeaderComponent
+=======
+    ChefControlMenuComponent
+>>>>>>> Generated new chef-control-menu component and dropped it into the chefComponentsModule, scss now connected.  Logic not yet built
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
