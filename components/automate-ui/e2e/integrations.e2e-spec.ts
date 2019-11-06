@@ -165,7 +165,7 @@ describe('Integrations', () => {
 
       it('has a name input', () => {
         const label = element(by.cssContainingText('.label', 'Name'));
-        const input = $('chef-input[formcontrolname="name"]');
+        const input = $('input[formcontrolname="name"]');
 
         expect(label.isDisplayed()).toEqual(true);
         expect(input.isDisplayed()).toEqual(true);
@@ -252,7 +252,7 @@ describe('Integrations', () => {
     describe('gcp form', () => {
       it('has a name input filled with correct value', () => {
         const label = element(by.cssContainingText('.label', 'Name'));
-        const input = $('chef-input[formcontrolname="name"]');
+        const input = $('input[formcontrolname="name"]');
 
         expect(label.isDisplayed()).toEqual(true);
         expect(input.isDisplayed()).toEqual(true);
