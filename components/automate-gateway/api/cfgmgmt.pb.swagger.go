@@ -16,6 +16,8 @@ func init() {
   "paths": {
     "/cfgmgmt/nodes": {
       "get": {
+        "summary": "GetNodes",
+        "description": "Returns a list of infra nodes that have checked in to Automate. \nAdding a filter makes a list of all nodes that meet the filter criteria. \nSupports pagination, filtering, and sorting.",
         "operationId": "GetNodes",
         "responses": {
           "200": {
@@ -31,6 +33,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
+            "description": "Filters to apply to the request for nodes list.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -41,6 +44,7 @@ func init() {
           },
           {
             "name": "pagination.page",
+            "description": "Page number of the results to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -48,6 +52,7 @@ func init() {
           },
           {
             "name": "pagination.size",
+            "description": "Amount of results to include per page.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -55,12 +60,14 @@ func init() {
           },
           {
             "name": "sorting.field",
+            "description": "Field to sort the list results on.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sorting.order",
+            "description": "Order the results should be returned in (ASC or DESC).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -78,6 +85,8 @@ func init() {
     },
     "/cfgmgmt/nodes/{node_id}/attribute": {
       "get": {
+        "summary": "GetAttributes",
+        "description": "Returns the latest reported attributes for the provided node id.",
         "operationId": "GetAttributes",
         "responses": {
           "200": {
@@ -90,6 +99,7 @@ func init() {
         "parameters": [
           {
             "name": "node_id",
+            "description": "Chef guid for the requested node.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -102,6 +112,8 @@ func init() {
     },
     "/cfgmgmt/nodes/{node_id}/runs": {
       "get": {
+        "summary": "GetRuns",
+        "description": "Returns a list of run ids for the provided node id. \nSupports pagination.\nAccepts a ` + "`" + `start` + "`" + ` parameter to denote start date for the list and a filter of type ` + "`" + `status` + "`" + `.",
         "operationId": "GetRuns",
         "responses": {
           "200": {
@@ -117,12 +129,14 @@ func init() {
         "parameters": [
           {
             "name": "node_id",
+            "description": "Chef guid for the node.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "filter",
+            "description": "Filters to apply to the request for runs list.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -133,6 +147,7 @@ func init() {
           },
           {
             "name": "pagination.page",
+            "description": "Page number of the results to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -140,6 +155,7 @@ func init() {
           },
           {
             "name": "pagination.size",
+            "description": "Amount of results to include per page.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -147,13 +163,14 @@ func init() {
           },
           {
             "name": "start",
-            "description": "TODO: (@afiune) Should we standardize these parameters as well?.",
+            "description": "Earliest (in history) run information to return for the runs list.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "end",
+            "description": "Latest (in history) run information to return for the runs list.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -166,6 +183,8 @@ func init() {
     },
     "/cfgmgmt/nodes/{node_id}/runs/{run_id}": {
       "get": {
+        "summary": "GetNodeRun",
+        "description": "Returns the infra run report for the provided node id.",
         "operationId": "GetNodeRun",
         "responses": {
           "200": {
@@ -178,18 +197,21 @@ func init() {
         "parameters": [
           {
             "name": "node_id",
+            "description": "Chef guid for the requested node.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "run_id",
+            "description": "Run id for the node.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "end_time",
+            "description": "End time on the node's run.",
             "in": "query",
             "required": false,
             "type": "string",
@@ -203,6 +225,8 @@ func init() {
     },
     "/cfgmgmt/organizations": {
       "get": {
+        "summary": "GetOrganizations",
+        "description": "Returns a list of all organizations associated with nodes that have checked in to Automate.",
         "operationId": "GetOrganizations",
         "responses": {
           "200": {
@@ -222,6 +246,8 @@ func init() {
     },
     "/cfgmgmt/policy_revision/{revision_id}": {
       "get": {
+        "summary": "GetPolicyCookbooks",
+        "description": "Returns the policy information for a node.\nThe revision_id ??????",
         "operationId": "GetPolicyCookbooks",
         "responses": {
           "200": {
@@ -234,6 +260,7 @@ func init() {
         "parameters": [
           {
             "name": "revision_id",
+            "description": "Revision id for the policy.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -246,6 +273,8 @@ func init() {
     },
     "/cfgmgmt/source_fqdns": {
       "get": {
+        "summary": "GetSourceFqdns",
+        "description": "Returns a list of all chef servers associated with nodes that have checked in to Automate.",
         "operationId": "GetSourceFqdns",
         "responses": {
           "200": {
@@ -265,6 +294,8 @@ func init() {
     },
     "/cfgmgmt/stats/node_counts": {
       "get": {
+        "summary": "GetNodesCounts",
+        "description": "Returns totals for failed, success, and missing infra nodes that have reported into Automate.",
         "operationId": "GetNodesCounts",
         "responses": {
           "200": {
@@ -277,6 +308,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
+            "description": "List of filters to be applied to the node count results.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -293,6 +325,8 @@ func init() {
     },
     "/cfgmgmt/stats/run_counts": {
       "get": {
+        "summary": "GetRunsCounts",
+        "description": "Returns totals for failed and successful runs given a ` + "`" + `node_id` + "`" + `.",
         "operationId": "GetRunsCounts",
         "responses": {
           "200": {
@@ -305,6 +339,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
+            "description": "List of filters to be applied to the run count results.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -315,18 +350,21 @@ func init() {
           },
           {
             "name": "start",
+            "description": "Earliest (in history) run information to return for the run counts.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "end",
+            "description": "Latest (in history) run information to return for the run counts.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "node_id",
+            "description": "Node id associated with the run.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -339,6 +377,8 @@ func init() {
     },
     "/cfgmgmt/suggestions": {
       "get": {
+        "summary": "GetSuggestions",
+        "description": "Returns possible filter values given a valid ` + "`" + `type` + "`" + ` parameter and at least one character for the ` + "`" + `text` + "`" + ` parameter.\nSupports wildcard (* and ?).",
         "operationId": "GetSuggestions",
         "responses": {
           "200": {
@@ -354,18 +394,21 @@ func init() {
         "parameters": [
           {
             "name": "type",
+            "description": "Field for which suggestions are being returned.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "text",
+            "description": "Text to search on for the type value.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "filter",
+            "description": "Filters to be applied to the results.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -402,19 +445,23 @@ func init() {
       "type": "object",
       "properties": {
         "class": {
-          "type": "string"
+          "type": "string",
+          "description": "Class for the error."
         },
         "message": {
-          "type": "string"
+          "type": "string",
+          "description": "Error message for the failed run."
         },
         "backtrace": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Stacktrace for the failure."
         },
         "description": {
-          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Description"
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Description",
+          "description": "Description for the error."
         }
       }
     },
@@ -422,10 +469,12 @@ func init() {
       "type": "object",
       "properties": {
         "cookbook": {
-          "type": "string"
+          "type": "string",
+          "description": "Cookbook name."
         },
         "policy_identifier": {
-          "type": "string"
+          "type": "string",
+          "description": "Policy identifier for the cookbook lock."
         }
       }
     },
@@ -433,13 +482,16 @@ func init() {
       "type": "object",
       "properties": {
         "message": {
-          "type": "string"
+          "type": "string",
+          "description": "Message for the deprecation."
         },
         "url": {
-          "type": "string"
+          "type": "string",
+          "description": "Url reference for the deprecation."
         },
         "location": {
-          "type": "string"
+          "type": "string",
+          "description": "Location of the deprecated code."
         }
       }
     },
@@ -447,13 +499,15 @@ func init() {
       "type": "object",
       "properties": {
         "title": {
-          "type": "string"
+          "type": "string",
+          "description": "Title for the error description."
         },
         "sections": {
           "type": "array",
           "items": {
             "type": "object"
-          }
+          },
+          "description": "More information about the error."
         }
       }
     },
@@ -461,13 +515,15 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Id of the run list collection."
         },
         "run_list": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunList"
-          }
+          },
+          "description": "Intentionally blank."
         }
       }
     },
@@ -475,51 +531,64 @@ func init() {
       "type": "object",
       "properties": {
         "node_id": {
-          "type": "string"
+          "type": "string",
+          "description": "The chef_guid associated with the node."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the node."
         },
         "run_list": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Run list for the node."
         },
         "chef_environment": {
-          "type": "string"
+          "type": "string",
+          "description": "The environment for the node."
         },
         "normal": {
-          "type": "string"
+          "type": "string",
+          "description": "Stringified json of the normal attributes for the node."
         },
         "default": {
-          "type": "string"
+          "type": "string",
+          "description": "Stringified json of the default attributes for the node."
         },
         "override": {
-          "type": "string"
+          "type": "string",
+          "description": "Stringified json of the override attributes for the node."
         },
         "automatic": {
-          "type": "string"
+          "type": "string",
+          "description": "Stringified json of the automatic attributes for the node."
         },
         "normal_value_count": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Count of normal attributes on the node."
         },
         "default_value_count": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Count of default attributes on the node."
         },
         "override_value_count": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Count of override attributes on the node."
         },
         "all_value_count": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Total count of attributes on the node."
         },
         "automatic_value_count": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Count of automatic attributes on the node."
         }
       }
     },
@@ -528,19 +597,23 @@ func init() {
       "properties": {
         "total": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Total count of nodes that have reported in to Automate."
         },
         "success": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Total count of nodes that have reported in to Automate whose last run was successful."
         },
         "failure": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Total count of nodes that have reported in to Automate whose last run was failed."
         },
         "missing": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Total count of nodes that have been labeled as 'missing' as determined by node lifecycle settings."
         }
       }
     },
@@ -548,13 +621,15 @@ func init() {
       "type": "object",
       "properties": {
         "policy_name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the policy."
         },
         "cookbook_locks": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CookbookLock"
-          }
+          },
+          "description": "Intentionally blank."
         }
       }
     },
@@ -562,42 +637,53 @@ func init() {
       "type": "object",
       "properties": {
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "Resource type."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the resource."
         },
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Id of the resource."
         },
         "duration": {
-          "type": "string"
+          "type": "string",
+          "description": "Duration of the resource processing."
         },
         "delta": {
-          "type": "string"
+          "type": "string",
+          "description": "Change diff for the resource (if it was changed during the run)."
         },
         "cookbook_name": {
-          "type": "string"
+          "type": "string",
+          "description": "Cookbook name associated with the resource."
         },
         "cookbook_version": {
-          "type": "string"
+          "type": "string",
+          "description": "Version of the cookbook associated with the resource."
         },
         "status": {
-          "type": "string"
+          "type": "string",
+          "description": "Status of the resource (e.g. 'up-to-date')."
         },
         "recipe_name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the recipe associated with the resource."
         },
         "result": {
-          "type": "string"
+          "type": "string",
+          "description": "String result of the resource."
         },
         "conditional": {
           "type": "string",
-          "title": "Fields that might be empty"
+          "description": "Conditional rule associated with the resource."
         },
         "ignore_failure": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Boolean that denotes whether or not the resource failure should be ignored."
         }
       }
     },
@@ -605,141 +691,175 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Id of the infra node run."
         },
         "node_id": {
-          "type": "string"
+          "type": "string",
+          "description": "The chef_guid associated with the node."
         },
         "node_name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the node."
         },
         "organization": {
-          "type": "string"
+          "type": "string",
+          "description": "The organization the node is associated with."
         },
         "start_time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Start time of the infra run."
         },
         "end_time": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "End time of the infra run."
         },
         "source": {
-          "type": "string"
+          "type": "string",
+          "description": "Source of the node run (e.g. chef-solo)."
         },
         "status": {
-          "type": "string"
+          "type": "string",
+          "description": "Status of the infra node run."
         },
         "total_resource_count": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Resource count reported on the infra node run."
         },
         "updated_resource_count": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Count of resources updated in the infra node run."
         },
         "chef_version": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef-client version on the node."
         },
         "uptime_seconds": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Count in seconds that the node has been active."
         },
         "environment": {
-          "type": "string"
+          "type": "string",
+          "description": "The environment for the node."
         },
         "fqdn": {
-          "type": "string"
+          "type": "string",
+          "description": "FQDN of the node."
         },
         "source_fqdn": {
-          "type": "string"
+          "type": "string",
+          "description": "Chef server associated with the node."
         },
         "ipaddress": {
-          "type": "string"
+          "type": "string",
+          "description": "IP Address for the node."
         },
         "resources": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Resource"
-          }
+          },
+          "description": "Intentionally blank."
         },
         "run_list": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Run list for the node."
         },
         "deprecations": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Deprecation"
-          }
+          },
+          "description": "Intentionally blank."
         },
         "error": {
-          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ChefError"
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ChefError",
+          "description": "Chef Error information, available on failed runs."
         },
         "tags": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "title": "?? should we delete this tags?  is it just extra?"
         },
         "resource_names": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of resource names for the node."
         },
         "recipes": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of recipes the node calls."
         },
         "chef_tags": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of tags associated with the node."
         },
         "cookbooks": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of cookbooks associated with the node."
         },
         "platform": {
-          "type": "string"
+          "type": "string",
+          "description": "Full platform string for the node (family + version)."
         },
         "platform_family": {
-          "type": "string"
+          "type": "string",
+          "description": "Platform family for the node."
         },
         "platform_version": {
-          "type": "string"
+          "type": "string",
+          "description": "Platform version for the node."
         },
         "roles": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of roles associated with the node."
         },
         "policy_name": {
-          "type": "string"
+          "type": "string",
+          "description": "Policy name associated with the node."
         },
         "policy_group": {
-          "type": "string"
+          "type": "string",
+          "description": "Policy group associated with the node."
         },
         "policy_revision": {
-          "type": "string"
+          "type": "string",
+          "description": "Policy revision associated with the node."
         },
         "expanded_run_list": {
-          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ExpandedRunList"
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ExpandedRunList",
+          "description": "Expanded run list for the node."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of projects the node belongs to. This is a concept introduced with IAMv2."
         }
       }
     },
@@ -747,23 +867,28 @@ func init() {
       "type": "object",
       "properties": {
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "Type of run list item (e.g. 'recipe')."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of run list item."
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "Version of run list item."
         },
         "skipped": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Boolean denoting whether or not the run list item was skipped."
         },
         "children": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunList"
-          }
+          },
+          "description": "Intentionally blank."
         }
       }
     },
@@ -772,15 +897,18 @@ func init() {
       "properties": {
         "total": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Total count of run reports that have landed in Automate for the node."
         },
         "success": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Total count of successful run reports that have landed in Automate for the node."
         },
         "failure": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Total count of failed run reports that have landed in Automate for the node."
         }
       }
     },
@@ -789,11 +917,13 @@ func init() {
       "properties": {
         "page": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Page number of the results to return."
         },
         "size": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Amount of results to include per page."
         }
       }
     },
@@ -809,10 +939,12 @@ func init() {
       "type": "object",
       "properties": {
         "field": {
-          "type": "string"
+          "type": "string",
+          "description": "Field to sort the list results on."
         },
         "order": {
-          "$ref": "#/definitions/chef.automate.api.common.query.SortOrder"
+          "$ref": "#/definitions/chef.automate.api.common.query.SortOrder",
+          "description": "Order the results should be returned in (ASC or DESC)."
         }
       }
     },

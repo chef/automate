@@ -106,16 +106,62 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ConfigMgmtClient interface {
+	//
+	//GetNodes
+	//
+	//Returns a list of infra nodes that have checked in to Automate.
+	//Adding a filter makes a list of all nodes that meet the filter criteria.
+	//Supports pagination, filtering, and sorting.
 	GetNodes(ctx context.Context, in *request.Nodes, opts ...grpc.CallOption) (*_struct.ListValue, error)
+	//
+	//GetRuns
+	//
+	//Returns a list of run ids for the provided node id.
+	//Supports pagination.
+	//Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	GetRuns(ctx context.Context, in *request.Runs, opts ...grpc.CallOption) (*_struct.ListValue, error)
+	//
+	//GetNodesCounts
+	//
+	//Returns totals for failed, success, and missing infra nodes that have reported into Automate.
 	GetNodesCounts(ctx context.Context, in *request.NodesCounts, opts ...grpc.CallOption) (*response.NodesCounts, error)
+	//
+	//GetRunsCounts
+	//
+	//Returns totals for failed and successful runs given a `node_id`.
 	GetRunsCounts(ctx context.Context, in *request.RunsCounts, opts ...grpc.CallOption) (*response.RunsCounts, error)
+	//
+	//GetNodeRun
+	//
+	//Returns the infra run report for the provided node id.
 	GetNodeRun(ctx context.Context, in *request.NodeRun, opts ...grpc.CallOption) (*response.Run, error)
+	//
+	//GetSuggestions
+	//
+	//Returns possible filter values given a valid `type` parameter and at least one character for the `text` parameter.
+	//Supports wildcard (* and ?).
 	GetSuggestions(ctx context.Context, in *query.Suggestion, opts ...grpc.CallOption) (*_struct.ListValue, error)
+	//
+	//GetOrganizations
+	//
+	//Returns a list of all organizations associated with nodes that have checked in to Automate.
 	GetOrganizations(ctx context.Context, in *request.Organizations, opts ...grpc.CallOption) (*_struct.ListValue, error)
+	//
+	//GetSourceFqdns
+	//
+	//Returns a list of all chef servers associated with nodes that have checked in to Automate.
 	GetSourceFqdns(ctx context.Context, in *request.SourceFqdns, opts ...grpc.CallOption) (*_struct.ListValue, error)
+	//
+	//GetAttributes
+	//
+	//Returns the latest reported attributes for the provided node id.
 	GetAttributes(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.NodeAttribute, error)
 	GetVersion(ctx context.Context, in *version.VersionInfoRequest, opts ...grpc.CallOption) (*version.VersionInfo, error)
+	//
+	//GetPolicyCookbooks
+	//
+	//Returns the policy information for a node.
+	//The revision_id ??????
 	GetPolicyCookbooks(ctx context.Context, in *request.PolicyRevision, opts ...grpc.CallOption) (*response.PolicyCookbooks, error)
 }
 
@@ -228,16 +274,62 @@ func (c *configMgmtClient) GetPolicyCookbooks(ctx context.Context, in *request.P
 
 // ConfigMgmtServer is the server API for ConfigMgmt service.
 type ConfigMgmtServer interface {
+	//
+	//GetNodes
+	//
+	//Returns a list of infra nodes that have checked in to Automate.
+	//Adding a filter makes a list of all nodes that meet the filter criteria.
+	//Supports pagination, filtering, and sorting.
 	GetNodes(context.Context, *request.Nodes) (*_struct.ListValue, error)
+	//
+	//GetRuns
+	//
+	//Returns a list of run ids for the provided node id.
+	//Supports pagination.
+	//Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	GetRuns(context.Context, *request.Runs) (*_struct.ListValue, error)
+	//
+	//GetNodesCounts
+	//
+	//Returns totals for failed, success, and missing infra nodes that have reported into Automate.
 	GetNodesCounts(context.Context, *request.NodesCounts) (*response.NodesCounts, error)
+	//
+	//GetRunsCounts
+	//
+	//Returns totals for failed and successful runs given a `node_id`.
 	GetRunsCounts(context.Context, *request.RunsCounts) (*response.RunsCounts, error)
+	//
+	//GetNodeRun
+	//
+	//Returns the infra run report for the provided node id.
 	GetNodeRun(context.Context, *request.NodeRun) (*response.Run, error)
+	//
+	//GetSuggestions
+	//
+	//Returns possible filter values given a valid `type` parameter and at least one character for the `text` parameter.
+	//Supports wildcard (* and ?).
 	GetSuggestions(context.Context, *query.Suggestion) (*_struct.ListValue, error)
+	//
+	//GetOrganizations
+	//
+	//Returns a list of all organizations associated with nodes that have checked in to Automate.
 	GetOrganizations(context.Context, *request.Organizations) (*_struct.ListValue, error)
+	//
+	//GetSourceFqdns
+	//
+	//Returns a list of all chef servers associated with nodes that have checked in to Automate.
 	GetSourceFqdns(context.Context, *request.SourceFqdns) (*_struct.ListValue, error)
+	//
+	//GetAttributes
+	//
+	//Returns the latest reported attributes for the provided node id.
 	GetAttributes(context.Context, *request.Node) (*response.NodeAttribute, error)
 	GetVersion(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
+	//
+	//GetPolicyCookbooks
+	//
+	//Returns the policy information for a node.
+	//The revision_id ??????
 	GetPolicyCookbooks(context.Context, *request.PolicyRevision) (*response.PolicyCookbooks, error)
 }
 

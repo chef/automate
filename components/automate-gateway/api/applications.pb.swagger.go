@@ -89,6 +89,7 @@ func init() {
           },
           {
             "name": "pagination.page",
+            "description": "Page number of the results to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -96,6 +97,7 @@ func init() {
           },
           {
             "name": "pagination.size",
+            "description": "Amount of results to include per page.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -103,12 +105,14 @@ func init() {
           },
           {
             "name": "sorting.field",
+            "description": "Field to sort the list results on.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sorting.order",
+            "description": "Order the results should be returned in (ASC or DESC).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -144,6 +148,7 @@ func init() {
           },
           {
             "name": "pagination.page",
+            "description": "Page number of the results to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -151,6 +156,7 @@ func init() {
           },
           {
             "name": "pagination.size",
+            "description": "Amount of results to include per page.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -158,12 +164,14 @@ func init() {
           },
           {
             "name": "sorting.field",
+            "description": "Field to sort the list results on.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sorting.order",
+            "description": "Order the results should be returned in (ASC or DESC).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -241,6 +249,7 @@ func init() {
           },
           {
             "name": "pagination.page",
+            "description": "Page number of the results to return.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -248,6 +257,7 @@ func init() {
           },
           {
             "name": "pagination.size",
+            "description": "Amount of results to include per page.",
             "in": "query",
             "required": false,
             "type": "integer",
@@ -255,12 +265,14 @@ func init() {
           },
           {
             "name": "sorting.field",
+            "description": "Field to sort the list results on.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
             "name": "sorting.order",
+            "description": "Order the results should be returned in (ASC or DESC).",
             "in": "query",
             "required": false,
             "type": "string",
@@ -697,11 +709,13 @@ func init() {
       "properties": {
         "page": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Page number of the results to return."
         },
         "size": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Amount of results to include per page."
         }
       }
     },
@@ -717,10 +731,12 @@ func init() {
       "type": "object",
       "properties": {
         "field": {
-          "type": "string"
+          "type": "string",
+          "description": "Field to sort the list results on."
         },
         "order": {
-          "$ref": "#/definitions/chef.automate.api.common.query.SortOrder"
+          "$ref": "#/definitions/chef.automate.api.common.query.SortOrder",
+          "description": "Order the results should be returned in (ASC or DESC)."
         }
       }
     },

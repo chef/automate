@@ -21,7 +21,9 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type PolicyCookbooks struct {
-	PolicyName           string          `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
+	// Name of the policy.
+	PolicyName string `protobuf:"bytes,1,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
+	// Intentionally blank.
 	CookbookLocks        []*CookbookLock `protobuf:"bytes,2,rep,name=cookbook_locks,json=cookbookLocks,proto3" json:"cookbook_locks,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
@@ -68,7 +70,9 @@ func (m *PolicyCookbooks) GetCookbookLocks() []*CookbookLock {
 }
 
 type CookbookLock struct {
-	Cookbook             string   `protobuf:"bytes,1,opt,name=cookbook,proto3" json:"cookbook,omitempty"`
+	// Cookbook name.
+	Cookbook string `protobuf:"bytes,1,opt,name=cookbook,proto3" json:"cookbook,omitempty"`
+	// Policy identifier for the cookbook lock.
 	PolicyIdentifier     string   `protobuf:"bytes,2,opt,name=policy_identifier,json=policyIdentifier,proto3" json:"policy_identifier,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

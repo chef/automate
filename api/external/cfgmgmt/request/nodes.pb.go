@@ -23,12 +23,15 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Nodes struct {
-	Filter               []string          `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
-	Pagination           *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
-	Sorting              *query.Sorting    `protobuf:"bytes,3,opt,name=sorting,proto3" json:"sorting,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	// Filters to apply to the request for nodes list.
+	Filter []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
+	// Pagination parameters to apply to the returned node list.
+	Pagination *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	// Sorting parameters to apply to the returned node list.
+	Sorting              *query.Sorting `protobuf:"bytes,3,opt,name=sorting,proto3" json:"sorting,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *Nodes) Reset()         { *m = Nodes{} }
@@ -78,6 +81,7 @@ func (m *Nodes) GetSorting() *query.Sorting {
 }
 
 type Node struct {
+	// Chef guid for the requested node.
 	NodeId               string   `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -117,8 +121,11 @@ func (m *Node) GetNodeId() string {
 }
 
 type NodeRun struct {
-	NodeId               string               `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	RunId                string               `protobuf:"bytes,2,opt,name=run_id,json=runId,proto3" json:"run_id,omitempty"`
+	// Chef guid for the requested node.
+	NodeId string `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	// Run id for the node.
+	RunId string `protobuf:"bytes,2,opt,name=run_id,json=runId,proto3" json:"run_id,omitempty"`
+	// End time on the node's run.
 	EndTime              *timestamp.Timestamp `protobuf:"bytes,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
@@ -172,11 +179,15 @@ func (m *NodeRun) GetEndTime() *timestamp.Timestamp {
 }
 
 type Runs struct {
-	NodeId     string            `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	Filter     []string          `protobuf:"bytes,2,rep,name=filter,proto3" json:"filter,omitempty"`
+	// Chef guid for the node.
+	NodeId string `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	// Filters to apply to the request for runs list.
+	Filter []string `protobuf:"bytes,2,rep,name=filter,proto3" json:"filter,omitempty"`
+	// Pagination parameters to apply to the returned runs list.
 	Pagination *query.Pagination `protobuf:"bytes,3,opt,name=pagination,proto3" json:"pagination,omitempty"`
-	// TODO: (@afiune) Should we standardize these parameters as well?
-	Start                string   `protobuf:"bytes,4,opt,name=start,proto3" json:"start,omitempty"`
+	// Earliest (in history) run information to return for the runs list.
+	Start string `protobuf:"bytes,4,opt,name=start,proto3" json:"start,omitempty"`
+	// Latest (in history) run information to return for the runs list.
 	End                  string   `protobuf:"bytes,5,opt,name=end,proto3" json:"end,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

@@ -4,6 +4,8 @@ package chef.automate.api.cfgmgmt.response;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/response";
 
 message Suggestion {
+  // Text to search on for the suggestions.
   string text = 1;
+  // Score of the result from ElasticSearch.
   float score = 2;
 }

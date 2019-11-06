@@ -21,8 +21,11 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type RunsCounts struct {
-	Total                int32    `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
-	Success              int32    `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	// Total count of run reports that have landed in Automate for the node.
+	Total int32 `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	// Total count of successful run reports that have landed in Automate for the node.
+	Success int32 `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	// Total count of failed run reports that have landed in Automate for the node.
 	Failure              int32    `protobuf:"varint,3,opt,name=failure,proto3" json:"failure,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -76,9 +79,13 @@ func (m *RunsCounts) GetFailure() int32 {
 }
 
 type NodesCounts struct {
-	Total                int32    `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
-	Success              int32    `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
-	Failure              int32    `protobuf:"varint,3,opt,name=failure,proto3" json:"failure,omitempty"`
+	// Total count of nodes that have reported in to Automate.
+	Total int32 `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
+	// Total count of nodes that have reported in to Automate whose last run was successful.
+	Success int32 `protobuf:"varint,2,opt,name=success,proto3" json:"success,omitempty"`
+	// Total count of nodes that have reported in to Automate whose last run was failed.
+	Failure int32 `protobuf:"varint,3,opt,name=failure,proto3" json:"failure,omitempty"`
+	// Total count of nodes that have been labeled as 'missing' as determined by node lifecycle settings.
 	Missing              int32    `protobuf:"varint,4,opt,name=missing,proto3" json:"missing,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
