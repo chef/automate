@@ -134,8 +134,8 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	return reportIds, nil
 }
 
-func (backend ES2Backend) GetReportIds(esIndex string, filters map[string][]string) ([]string, error) {
-	reportIds, err := backend.getNodeReportIdsFromTimeseries(esIndex, filters, true)
+func (backend ES2Backend) GetReportIds(esIndex string, filters map[string][]string, latestOnly bool) ([]string, error) {
+	reportIds, err := backend.getNodeReportIdsFromTimeseries(esIndex, filters, latestOnly)
 	if err != nil {
 		return []string{}, errors.Wrap(err, "GetReportIds unable to get node report ids")
 	}

@@ -370,7 +370,7 @@ message ListFilter {
 	string type = 21;
 }
 
-// A subtotal of controls.
+// A subtotal of controls
 message Total {
 	// The total number of controls.
 	int32 total = 1;
