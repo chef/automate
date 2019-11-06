@@ -45,6 +45,9 @@ cleanup() {
     echo "Attempting to clean up docker container $test_container_name"
     docker stop "$test_container_name"
     if [[ "${test_proxy}" = "true" ]]; then
+        echo "Attempting to clean up docker container $test_proxy_container_name"
+        docker stop "$test_proxy_container_name"
+        echo "Attempting to clean up docker network $test_proxy_internal_network_name"
         docker network rm "$test_proxy_internal_network_name"
     fi
     echo "------------------------------------------------------------"
