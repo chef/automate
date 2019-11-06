@@ -4,7 +4,7 @@ build_changed() {
     hab pkg install core/ruby
     PATH=$(hab pkg path core/ruby)/bin:$PATH
     export PATH
-    sudo "$(hab pkg path core/ruby)/bin/gem" install toml
+    sudo -E "$(hab pkg path core/ruby)/bin/gem" install toml
 
     build_commands=""
     for component in $("$(a2_root_dir)/scripts/changed_components.rb")
