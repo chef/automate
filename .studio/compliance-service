@@ -92,7 +92,7 @@ document "load_compliance_reports" <<DOC
   Loads compliance report.
 DOC
 function load_compliance_reports() {
-    cd components/compliance-service/test_data/audit_reports
+    pushd components/compliance-service/test_data/audit_reports &> /dev/null
     ./send_to_data_collector.sh https://a2-dev.test "$(get_admin_token)"
-    cd ../../../../
+    popd &> /dev/null
 }
