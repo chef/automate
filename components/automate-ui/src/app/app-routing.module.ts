@@ -17,7 +17,7 @@ import { IntegrationsListComponent } from './pages/integrations/list/integration
 import { JobAddComponent } from './pages/job-add/job-add.component';
 import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
-import { ChefServersComponent } from './pages/chef-servers/chef-servers.component';
+import { ChefServersListComponent } from './pages/infra-proxy/chef-servers-list/chef-servers-list.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { DatafeedComponent } from './pages/data-feed/data-feed.component';
@@ -234,7 +234,7 @@ const routes: Routes = [
         },
         {
           path: 'chef-servers',
-          component: ChefServersComponent
+          component: ChefServersListComponent
         }
       ]
     },

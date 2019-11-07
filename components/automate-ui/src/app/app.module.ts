@@ -31,6 +31,7 @@ import { ChefComponentsModule } from './components/chef-components.module';
 import { ChefPipesModule } from './pipes/chef-pipes.module';
 import { ComplianceModule } from './pages/+compliance/compliance.module';
 import { ComplianceSharedModule } from './pages/+compliance/shared/shared.module';
+import { InfraProxyModule } from './pages/infra-proxy/infra-proxy.module';
 import { IntegrationsModule } from './pages/integrations/integrations.module';
 import { PolicyModule } from './modules/policy/policy.module';
 import { ProjectModule } from './pages/project/project.module';
@@ -94,9 +95,6 @@ import { ApplicationsComponent } from './pages/applications/applications.compone
 import { AttributesComponent } from './page-components/attributes/attributes.component';
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
-import {
-  ClientRunsSidebarComponent
-} from './page-components/client-runs-sidebar/client-runs-sidebar.component';
 import {
   ClientRunsTableComponent
 } from './page-components/client-runs-table/client-runs-table.component';
@@ -191,7 +189,6 @@ import {
 import { UIComponent } from 'app/ui.component';
 
 import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-modal.component';
-import { ChefServersComponent } from './pages/chef-servers/chef-servers.component';
 
 @NgModule({
   declarations: [
@@ -200,9 +197,7 @@ import { ChefServersComponent } from './pages/chef-servers/chef-servers.componen
     ApplicationsComponent,
     AttributesComponent,
     AutomateSettingsComponent,
-    ChefServersComponent,
     ClientRunsComponent,
-    ClientRunsSidebarComponent,
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
     DatafeedComponent,
@@ -271,6 +266,7 @@ import { ChefServersComponent } from './pages/chef-servers/chef-servers.componen
     CookieModule.forRoot(),
     FormsModule,
     HttpClientModule,
+    InfraProxyModule,
     IntegrationsModule,
     NgrxEffectsModule,
     PolicyModule,

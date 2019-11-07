@@ -1,20 +1,20 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { ChefServersComponent } from './chef-servers.component';
+import { ChefServersListComponent } from './chef-servers-list.component';
 
-describe('ChefServersComponent', () => {
-  let component: ChefServersComponent;
-  let fixture: ComponentFixture<ChefServersComponent>;
+describe('ChefServersListComponent', () => {
+  let component: ChefServersListComponent;
+  let fixture: ComponentFixture<ChefServersListComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ChefServersComponent ]
+      declarations: [ ChefServersListComponent ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(ChefServersComponent);
+    fixture = TestBed.createComponent(ChefServersListComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });
