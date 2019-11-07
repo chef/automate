@@ -58,6 +58,9 @@
     z-index: 101;
     right: 0;
     text-align: left;
+    &.active {
+      display: block;
+    }
   }
 
   chef-option {
