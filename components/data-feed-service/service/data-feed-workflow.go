@@ -23,7 +23,7 @@ type DataFeedWorkflowParams struct {
 	FeedStart        time.Time
 	FeedEnd          time.Time
 	PollTaskParams   DataFeedPollTaskParams
-	DataFeedMessages map[string]datafeedMessage
+	DataFeedMessages map[string]map[string]interface{}
 }
 
 type DataFeedWorkflowPayload struct {
@@ -34,7 +34,7 @@ type DataFeedWorkflowPayload struct {
 	ComplianceTaskComplete  bool
 	NotifierTaskComplete    bool
 	NodeIDs                 map[string]NodeIDs
-	DataFeedMessages        map[string]datafeedMessage
+	DataFeedMessages        map[string]map[string]interface{}
 }
 
 func (e *DataFeedWorkflowExecutor) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {

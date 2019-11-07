@@ -1,0 +1,11 @@
+syntax="proto3";
+
+package service;
+
+import "api/interservice/cfgmgmt/response/nodes.proto";
+import "components/compliance-service/api/reporting/reporting.proto";
+
+message DataFeedMessage {
+	chef.automate.domain.cfgmgmt.response.Run last_run = 1;
+	chef.automate.domain.compliance.api.reporting.Report report = 2;
+}

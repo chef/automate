@@ -23,7 +23,8 @@ type DataFeedClientTask struct {
 }
 
 type DataFeedClientTaskResults struct {
-	DataFeedMessages map[string]datafeedMessage
+	//DataFeedMessages *json.RawMessage
+	DataFeedMessages map[string]map[string]interface{}
 	NodeIDs          map[string]NodeIDs
 }
 
@@ -58,16 +59,18 @@ func (d *DataFeedClientTask) Run(ctx context.Context, task cereal.Task) (interfa
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build chef client data")
 	}
+
 	// return the data feed but also return nodeids, these will be the NodeIDs of reports not yet collected
 	// i.e. the reports on nodes which have not had a client run in the interval
+	//return &DataFeedClientTaskResults{DataFeedMessages: &rawMessages, NodeIDs: nodeIDs}, nil
 	return &DataFeedClientTaskResults{DataFeedMessages: datafeedMessages, NodeIDs: nodeIDs}, nil
 }
 
-func (d *DataFeedClientTask) buildDatafeed(ctx context.Context, nodeIDs map[string]NodeIDs) (map[string]datafeedMessage, error) {
+func (d *DataFeedClientTask) buildDatafeed(ctx context.Context, nodeIDs map[string]NodeIDs) (map[string]map[string]interface{}, error) {
 
 	log.Info("Building data feed...")
 
-	nodeMessages := make(map[string]datafeedMessage)
+	nodeMessages := make(map[string]map[string]interface{})
 	log.Debugf("buildDatafeed nodeIDs %v", nodeIDs)
 	for key, nodeID := range nodeIDs {
 		if nodeID.ClientID == "" {
@@ -78,13 +81,13 @@ func (d *DataFeedClientTask) buildDatafeed(ctx context.Context, nodeIDs map[stri
 		filters := []string{"id:" + nodeID.ClientID}
 
 		// get the attributes and last client run data of each node
-		message, err := getNodeData(ctx, d.cfgMgmt, filters)
+		nodeData, err := getNodeData(ctx, d.cfgMgmt, filters)
 		if err != nil {
 			log.Errorf("Error getting node data %v", err)
 			continue
 		}
 
-		ipaddress := message.Automatic["ipaddress"].(string)
+		ipaddress := nodeData["attributes"].(map[string]interface{})["ipaddress"].(string)
 		log.Debugf("buildDataFeed key %s, node data ipaddress %v", key, ipaddress)
 		filter := &reporting.ListFilter{Type: "ipaddress", Values: []string{ipaddress}}
 		reportFilters := []*reporting.ListFilter{filter}
@@ -114,8 +117,10 @@ func (d *DataFeedClientTask) buildDatafeed(ctx context.Context, nodeIDs map[stri
 			}
 		}
 		// update the message with the full report
+		message := nodeData["node_data"].(DataFeedMessage)
 		message.Report = fullReport
-		nodeMessages[ipaddress] = message
+		nodeData["node_data"] = message
+		nodeMessages[ipaddress] = nodeData
 		// We have all the data for this node - attributes, client run and compliance report
 		// delete from the node map so it only contains ID's for nodes that have not yet had
 		// data collected
