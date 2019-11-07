@@ -78,6 +78,7 @@ type DeploymentStatus struct {
 }
 
 // RegisterGRPCServices registers all grpc services in the passed *grpc.Server
+// nolint: gocyclo
 func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	clients := s.clientsFactory
 
