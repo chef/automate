@@ -4,14 +4,14 @@
   [attr.secondary-btn-show]="sortedMembersAvailable && sortedMembersAvailable.length > 0"
   [attr.heading]="getHeading()"
   [attr.confirm-btn-text]="getMemberConfirmBtnText()"
-  [attr.page-loading]="loading"
+  [attr.page-loading]="loading$ | async"
   [attr.confirm-loading]="addingMembers"
   [attr.disable-confirm]="membersToAddValues().length === 0"
   [attr.error-message]="getErrorMessage()"
   (secondaryConfirm)="openModal()"
   (confirm)="addMembers()"
   (close)="closePage()">
-    <div *ngIf="!loading">
+    <div *ngIf="!(loading$ | async)">
       <chef-modal label="member-expression-label" class="member-expression-modal" [visible]="modalVisible" (closeModal)="closeModal()">
         <h2>Add Member Expression</h2>
         <div id="modal-content-container">

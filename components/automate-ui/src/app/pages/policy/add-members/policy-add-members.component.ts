@@ -5,8 +5,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { identity } from 'lodash/fp';
-import { filter, pluck, takeUntil } from 'rxjs/operators';
-import { combineLatest, Subject } from 'rxjs';
+import { filter, pluck, takeUntil, distinctUntilChanged, map } from 'rxjs/operators';
+import { combineLatest, Subject, Observable } from 'rxjs';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -71,7 +71,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   // Will not contain LDAP and SAML stuff.
   private memberURLs: { [id: string]: string[] } = {};
   // If all required data has loaded or not.
-  public loading = true;
+  public loading$: Observable<boolean>;
   // If the request to add members is in progress.
   public addingMembers = false;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
@@ -103,63 +103,57 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.store.select(routeParams).pipe(
+      takeUntil(this.isDestroyed),
       pluck('id'),
       filter(identity),
-      takeUntil(this.isDestroyed))
-      .subscribe((id: string) => {
-        this.store.dispatch(new GetPolicy({ id }));
-        combineLatest([
-          this.store.select(getAllTeamsStatus),
-          this.store.select(userStatus),
-          this.store.select(getPolicyStatus),
-          this.store.select(allTeams),
-          this.store.select(allUsers)
-        ]).pipe(takeUntil(this.isDestroyed))
-          .subscribe((values: any[]) => {
-            const [tStatus, uStatus, pStatus]: EntityStatus[] = values.slice(0, 3);
-            const teams: Team[] = values[3];
-            const users: User[] = values[4];
-            if (tStatus === EntityStatus.loadingSuccess &&
-                uStatus === EntityStatus.loadingSuccess &&
-                pStatus === EntityStatus.loadingSuccess) {
-
-              this.store.select(policyFromRoute).pipe(
-                filter(identity),
-                takeUntil(this.isDestroyed)).subscribe((policy: Policy) => {
-                  this.policy = <Policy>Object.assign({}, policy);
-
-                  teams.forEach((team: Team) => {
-                    const member = stringToMember(`team:local:${team.id}`);
-                    this.memberURLs[member.name] = ['/settings', 'teams', team.id];
-                    // We'll refresh the sorted map for the chef-table below.
-                    this.addAvailableMember(member, false);
-                  });
-
-                  users.forEach((user: User) => {
-                    const member = stringToMember(`user:local:${user.id}`);
-                    this.memberURLs[member.name] = ['/settings', 'users', user.id];
-                    // We'll refresh the sorted map for the chef-table below.
-                    this.addAvailableMember(member, false);
-                  });
-
-                  this.policy.members.forEach((memberName: string) => {
-                    if (memberName in this.membersAvailableMap) {
-                      this.removeAvailableMember(memberName, false);
-                    }
-                  });
-
-                  // Now that the membersAvailableMap is correct, refresh.
-                  this.refreshSortedMembersAvailable();
-                  this.loading = false;
-              });
-            } else {
-              this.loading = true;
-            }
-          });
-        });
+      distinctUntilChanged()
+    ).subscribe((id: string) => this.store.dispatch(new GetPolicy({ id })));
 
     this.store.dispatch(new GetTeams());
     this.store.dispatch(new GetUsers());
+
+    this.loading$ = combineLatest([
+        this.store.select(getAllTeamsStatus),
+        this.store.select(userStatus),
+        this.store.select(getPolicyStatus)
+      ]).pipe(
+        takeUntil(this.isDestroyed),
+        map((statuses: EntityStatus[]) => !statuses.every(status =>
+          status === EntityStatus.loadingSuccess)));
+
+    combineLatest([
+        this.store.select(allTeams),
+        this.store.select(allUsers),
+        this.store.select(policyFromRoute),
+        this.loading$
+      ]).pipe(
+        takeUntil(this.isDestroyed),
+        filter(([_teams, _users, _policy, loading]) => !loading)
+      ).subscribe(([teams, users, policy, _loading]) => {
+          this.policy = <Policy>Object.assign({}, policy);
+          teams.forEach((team: Team) => {
+            const member = stringToMember(`team:local:${team.id}`);
+            this.memberURLs[member.name] = ['/settings', 'teams', team.id];
+            // We'll refresh the sorted map for the chef-table below.
+            this.addAvailableMember(member, false);
+          });
+
+          users.forEach((user: User) => {
+            const member = stringToMember(`user:local:${user.id}`);
+            this.memberURLs[member.name] = ['/settings', 'users', user.id];
+            // We'll refresh the sorted map for the chef-table below.
+            this.addAvailableMember(member, false);
+          });
+
+          this.policy.members.forEach((memberName: string) => {
+            if (memberName in this.membersAvailableMap) {
+              this.removeAvailableMember(memberName, false);
+            }
+          });
+
+          // Now that the membersAvailableMap is correct, refresh.
+          this.refreshSortedMembersAvailable();
+      });
   }
 
   addAvailableMember(member: Member, refresh: boolean): void {
