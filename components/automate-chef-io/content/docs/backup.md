@@ -129,6 +129,10 @@ The command will show the backup progress for each service. If the backup is suc
 Success: Created backup 20180518010336
 ```
 
+## Storing Backups Offline for Airgapped Installations
+
+The backup directory (`/var/opt/chef-automate/backups` by default) contains both the timestamp-based directory (ie. `20180518010336`) for the configuration and the reporting data stored in the `automate-elasticsearch-data` directory. You will need to archive both of these in any offline backups you create.
+
 ## Listing Backups
 
 You can list existing backups with the `backup list` command:
@@ -183,10 +187,10 @@ If backups are stored in S3:
 chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID
 ```
 
-To restore a backup of an [airgapped installation]({{< relref "airgapped-installation.md" >}}), you must specify the [Airgap Installation Bundle]({{< relref "airgapped-installation.md#create-an-airgap-installation-bundle" >}}) the installation is using:
+To restore a backup of an [airgapped installation]({{< relref "airgapped-installation.md" >}}), you must extract your backup archive into the default backup directory (`/var/opt/chef-automate/backups`) and specify the [Airgap Installation Bundle]({{< relref "airgapped-installation.md#create-an-airgap-installation-bundle" >}}) the installation is using:
 
 ```shell
-chef-automate backup restore /path/to/backups/BACKUP_ID --airgap-bundle </path/to/bundle>
+chef-automate backup restore --airgap-bundle </path/to/bundle> /var/opt/chef-automate/backups/BACKUP_ID
 ```
 
 If the restore is successful, you will see the following message at the end of the status output:
