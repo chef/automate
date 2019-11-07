@@ -24,7 +24,6 @@ import {
   userEntityReducer,
   UserEntityInitialState
 } from 'app/entities/users/user.reducer';
-import { GetUsers } from 'app/entities/users/user.actions';
 import {
   teamEntityReducer,
   TeamEntityInitialState
@@ -37,13 +36,54 @@ import {
 import { Team } from 'app/entities/teams/team.model';
 import { TeamDetailsComponent } from './team-details.component';
 
-describe('TeamDetailsComponent', () => {
+const declarations: any[] = [
+  MockComponent({ selector: 'app-settings-sidebar' }),
+  MockComponent({ selector: 'app-user-table',
+    inputs: [
+      'baseUrl',
+      'users',
+      'removeText',
+      'addButtonText',
+      'addButtonEnabled',
+      'showEmptyMessage',
+      'showTable',
+      'overridePermissionsCheck']
+  }),
+  MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
+  MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
+  MockComponent({ selector: 'chef-breadcrumbs' }),
+  MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
+  MockComponent({ selector: 'chef-error' }),
+  MockComponent({ selector: 'chef-form-field' }),
+  MockComponent({ selector: 'chef-input' }),
+  MockComponent({ selector: 'chef-page-header' }),
+  MockComponent({ selector: 'chef-option' }),
+  MockComponent({ selector: 'chef-heading' }),
+  MockComponent({ selector: 'chef-subheading' }),
+  MockComponent({ selector: 'chef-loading-spinner' }),
+  MockComponent({ selector: 'app-projects-dropdown',
+    inputs: ['projects', 'disabled'], outputs: ['onProjectChecked'] }),
+  MockComponent({ selector: 'chef-tab-selector',
+    inputs: ['value', 'routerLink', 'fragment']
+  }),
+  TeamDetailsComponent
+];
+const targetId = 'a-team-uuid-01';
+const someTeam: Team = {
+  id: targetId,
+  name: 'some team',
+  guid: targetId,
+  projects: []
+};
+
+describe('TeamDetailsComponent v2', () => {
   let component: TeamDetailsComponent;
   let fixture: ComponentFixture<TeamDetailsComponent>;
   let router: Router;
   let store: Store<NgrxStateAtom>;
 
-  const targetId = 'a-team-uuid-01';
+  const v2PolicyEntityInitialState = Object.assign({}, PolicyEntityInitialState,
+    {iamMajorVersion: 'v2'});
   const initialState = {
     router: {
       state: {
@@ -56,45 +96,14 @@ describe('TeamDetailsComponent', () => {
     },
     users: UserEntityInitialState,
     teams: TeamEntityInitialState,
-    policies: PolicyEntityInitialState,
+    policies: v2PolicyEntityInitialState,
     projects: ProjectEntityInitialState,
     projectsFilter: projectsFilterInitialState
   };
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [
-        MockComponent({ selector: 'app-settings-sidebar' }),
-        MockComponent({ selector: 'app-user-table',
-          inputs: [
-            'baseUrl',
-            'users',
-            'removeText',
-            'addButtonText',
-            'addButtonEnabled',
-            'showEmptyMessage',
-            'showTable',
-            'overridePermissionsCheck']
-        }),
-        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
-        MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
-        MockComponent({ selector: 'chef-breadcrumbs' }),
-        MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
-        MockComponent({ selector: 'chef-error' }),
-        MockComponent({ selector: 'chef-form-field' }),
-        MockComponent({ selector: 'chef-input' }),
-        MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-option' }),
-        MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'app-projects-dropdown',
-          inputs: ['projects', 'disabled'], outputs: ['onProjectChecked'] }),
-        MockComponent({ selector: 'chef-tab-selector',
-          inputs: ['value', 'routerLink', 'fragment']
-        }),
-        TeamDetailsComponent
-      ],
+      declarations: declarations,
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,
@@ -109,13 +118,6 @@ describe('TeamDetailsComponent', () => {
       ]
     }).compileComponents();
   }));
-
-  const someTeam: Team = {
-    id: targetId,
-    name: 'some team',
-    guid: targetId,
-    projects: []
-  };
 
   beforeEach(() => {
     router = TestBed.get(Router);
@@ -160,40 +162,19 @@ describe('TeamDetailsComponent', () => {
     });
   });
 
-    it('handles team users for v2', () => {
-      spyOn(store, 'dispatch').and.callThrough();
-      component.isIAMv2 = true;
-      const team: Team = { id: targetId, guid: 'any', name: 'any', projects: [] };
-      store.dispatch(new GetTeamSuccess(team));
-
-      expect(store.dispatch).toHaveBeenCalledWith(new GetUsers());
-      expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
-    });
-
-    it('handles team users for v1', () => {
-      spyOn(store, 'dispatch').and.callThrough();
-      component.isIAMv2 = false;
-      const team: Team = { id: 'any', guid: targetId, name: 'any', projects: [] };
-      store.dispatch(new GetTeamSuccess(team));
-      component.isIAMv2 = false;
-
-      expect(store.dispatch).toHaveBeenCalledWith(new GetUsers());
-      expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
-    });
-
-  it('does not fetch projects in v1', () => {
+  it('handles team users for v2', () => {
     spyOn(store, 'dispatch').and.callThrough();
-    const team: Team = { id: 'any', guid: 'any', name: 'any', projects: [] };
+    component.isIAMv2$.subscribe(isV2 => expect(isV2).toBeTruthy());
+    const team: Team = { id: targetId, guid: 'any', name: 'any', projects: [] };
     store.dispatch(new GetTeamSuccess(team));
-    component.isIAMv2 = false;
 
-    expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
+    expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
+    expect(store.dispatch).toHaveBeenCalledWith(new GetProjects());
   });
-
 
   it('initializes dropdown with those included on the team checked', () => {
     spyOn(store, 'dispatch').and.callThrough();
-    component.isIAMv2 = true;
+    component.isIAMv2$.subscribe(isV2 => expect(isV2).toBeTruthy());
     const teamProjects = ['b-proj', 'd-proj'];
     const team: Team = { id: targetId, guid: 'any', name: 'any', projects: teamProjects };
     store.dispatch(new GetTeamSuccess(team));
@@ -220,4 +201,69 @@ describe('TeamDetailsComponent', () => {
       type: 'CUSTOM' // unused
     };
   }
+});
+
+describe('TeamDetailsComponent v1', () => {
+  let component: TeamDetailsComponent;
+  let fixture: ComponentFixture<TeamDetailsComponent>;
+  let router: Router;
+  let store: Store<NgrxStateAtom>;
+
+  const v1PolicyEntityInitialState = Object.assign({}, PolicyEntityInitialState,
+    {iamMajorVersion: 'v1'});
+  const initialState = {
+    router: {
+      state: {
+        url: `/settings/teams/${targetId}`,
+        params: { id: targetId },
+        queryParams: {},
+        fragment: ''
+      },
+      navigationId: 0 // what's that zero?
+    },
+    users: UserEntityInitialState,
+    teams: TeamEntityInitialState,
+    policies: v1PolicyEntityInitialState,
+    projects: ProjectEntityInitialState,
+    projectsFilter: projectsFilterInitialState
+  };
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: declarations,
+      imports: [
+        ReactiveFormsModule,
+        RouterTestingModule,
+        StoreModule.forRoot({
+          router: routerReducer,
+          teams: teamEntityReducer,
+          users: userEntityReducer,
+          policies: policyEntityReducer,
+          projects: projectEntityReducer,
+          projectsFilter: projectsFilterReducer
+        }, { initialState, runtimeChecks })
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    router = TestBed.get(Router);
+    spyOn(router, 'navigate').and.stub();
+    store = TestBed.get(Store);
+
+    fixture = TestBed.createComponent(TeamDetailsComponent);
+    component = fixture.componentInstance;
+    component.team = someTeam;
+    fixture.detectChanges();
+  });
+
+  it('handles team users for v1', () => {
+    spyOn(store, 'dispatch').and.callThrough();
+    const team: Team = { id: 'any', guid: targetId, name: 'any', projects: [] };
+    component.isIAMv2$.subscribe(isV2 => expect(isV2).toBeFalsy());
+    store.dispatch(new GetTeamSuccess(team));
+
+    expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
+    expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
+  });
 });
