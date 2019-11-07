@@ -824,9 +824,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "builder proxy smoke tests"
+  - label: "proxy"
     command:
-      - integration/run_test integration/tests/bldr_proxy_smoke.sh
+      - integration/run_test integration/tests/proxy.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
