@@ -23,7 +23,6 @@ type DataFeedClientTask struct {
 }
 
 type DataFeedClientTaskResults struct {
-	//DataFeedMessages *json.RawMessage
 	DataFeedMessages map[string]map[string]interface{}
 	NodeIDs          map[string]NodeIDs
 }
