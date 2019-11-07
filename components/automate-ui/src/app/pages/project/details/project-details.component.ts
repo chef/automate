@@ -4,12 +4,12 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
+import { identity, isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
-import { EntityStatus, loading } from 'app/entities/entities';
+import { EntityStatus, loading, allLoaded } from 'app/entities/entities';
 import {
   getStatus, updateStatus, projectFromRoute
 } from 'app/entities/projects/project.selectors';
@@ -19,7 +19,7 @@ import { GetRulesForProject, DeleteRule } from 'app/entities/rules/rule.actions'
 import { Rule } from 'app/entities/rules/rule.model';
 import {
   allRules,
-  getAllStatus,
+  getAllStatus as getAllRulesForProjectStatus,
   deleteStatus as deleteRuleStatus
 } from 'app/entities/rules/rule.selectors';
 
@@ -72,32 +72,6 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
 
-    combineLatest([
-      this.store.select(getStatus),
-      this.store.select(updateStatus),
-      this.store.select(getAllStatus)
-    ]).pipe(
-      takeUntil(this.isDestroyed)
-    ).subscribe(([getProjectSt, updateSt, getRulesSt]) => {
-        this.isLoading =
-          (getProjectSt !== EntityStatus.loadingSuccess) ||
-          (updateSt === EntityStatus.loading) ||
-          (getRulesSt !== EntityStatus.loadingSuccess);
-      });
-
-    this.store.select(projectFromRoute).pipe(
-      filter(identity),
-      takeUntil(this.isDestroyed)
-      ).subscribe((state) => {
-        this.project = { ...state };
-        this.store.dispatch(new GetRulesForProject({ project_id: this.project.id }));
-        this.store.select(allRules).subscribe((rules) => {
-          this.rules = rules;
-        });
-        this.isChefManaged = this.project.type === 'CHEF_MANAGED';
-        this.projectForm.controls['name'].setValue(this.project.name);
-      });
-
     this.store.select(routeParams).pipe(
       pluck('id'),
       filter(identity),
@@ -105,6 +79,37 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       .subscribe((id: string) => {
         this.id = id;
         this.store.dispatch(new GetProject({ id }));
+        this.store.dispatch(new GetRulesForProject({ project_id: id }));
+      });
+
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(updateStatus),
+      this.store.select(getAllRulesForProjectStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([getProjectSt, updateSt, getRulesSt]) => {
+        this.isLoading =
+          !allLoaded([getProjectSt, getRulesSt]) || updateSt === EntityStatus.loading;
+      });
+
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(getAllRulesForProjectStatus),
+      this.store.select(projectFromRoute),
+      this.store.select(allRules)
+    ]).pipe(
+        filter(([getProjectSt, getRulesSt, _projectState, _allRulesState]) =>
+          getProjectSt === EntityStatus.loadingSuccess &&
+          getRulesSt === EntityStatus.loadingSuccess),
+        filter(([_getProjectSt, _getRulesSt, projectState, allRulesState]) =>
+          !isNil(projectState) && !isNil(allRulesState)),
+        takeUntil(this.isDestroyed)
+      ).subscribe(([_getProjectSt, _getRulesSt, projectState, allRulesState]) => {
+        this.project = { ...projectState };
+        this.rules = allRulesState;
+        this.isChefManaged = this.project.type === 'CHEF_MANAGED';
+        this.projectForm.controls['name'].setValue(this.project.name);
       });
 
     // if a rule gets deleted, we need to refresh the project status

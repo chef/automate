@@ -22,8 +22,7 @@ export function roleEntityReducer(state: RoleEntityState = RoleEntityInitialStat
 
   switch (action.type) {
     case RoleActionTypes.GET_ALL:
-      return set('getAllStatus', EntityStatus.loading, state);
-
+      return set('getAllStatus', EntityStatus.loading, roleEntityAdapter.removeAll(state));
     case RoleActionTypes.GET_ALL_SUCCESS:
       return set('getAllStatus', EntityStatus.loadingSuccess,
         roleEntityAdapter.addAll(action.payload.roles, state));
@@ -32,7 +31,7 @@ export function roleEntityReducer(state: RoleEntityState = RoleEntityInitialStat
       return set('getAllStatus', EntityStatus.loadingFailure, state);
 
     case RoleActionTypes.GET:
-      return set('getStatus', EntityStatus.loading, state);
+      return set('getStatus', EntityStatus.loading, roleEntityAdapter.removeAll(state));
 
     case RoleActionTypes.GET_SUCCESS:
       return set('getStatus', EntityStatus.loadingSuccess,
