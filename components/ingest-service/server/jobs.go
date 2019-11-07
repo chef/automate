@@ -214,7 +214,7 @@ func JobSettingsToUpdateOpts(settings *ingest.JobSettings, oldSchedule *cereal.S
 	}
 
 	ret := make([]cereal.WorkflowScheduleUpdateOpt, 0)
-	newRRule := &rrule.RRule{}
+	var newRRule *rrule.RRule
 	if e := settings.GetEvery(); len(e) > 0 {
 		// Convert duration to an rrule
 		d, err := time.ParseDuration(e)
