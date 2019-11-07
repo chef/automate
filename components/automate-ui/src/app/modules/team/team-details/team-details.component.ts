@@ -82,30 +82,38 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.team = {
-      id: '',
-      name: '',
-      guid: null,
-      projects: []
-    };
     this.updateNameForm = fb.group({
       // Must stay in sync with error checks in team-details.component.html.
       // Also, initialize the form to disabled and enable after team load
       // to prevent people from typing before the team is fetched and have their
       // value overwritten.
-      name: new FormControl({value: 'Loading...', disabled: true},
+      name: new FormControl({value: '', disabled: true},
         [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]),
       projects: [[]]
     });
   }
 
   ngOnInit(): void {
-    this.store.dispatch(new GetUsers());
-    this.isIAMv2$ = this.store.select(isIAMv2);
     this.layoutFacade.showSettingsSidebar();
+
+    this.isIAMv2$ = this.store.select(isIAMv2);
 
     this.isIAMv2$.pipe(takeUntil(this.isDestroyed))
       .subscribe((isV2) => this.descriptionOrName = isV2 ? 'name' : 'description');
+
+    this.store.dispatch(new GetUsers());
+
+    this.store.select(routeState).pipe(
+      takeUntil(this.isDestroyed),
+      map((state) => [state.params.id as string, state.url]),
+      // Only fetch if we are on the team details route, otherwise
+      // we'll trigger GetTeam with the wrong input on any route
+      // away to a page that also uses the :id param.
+      filter(([id, url]) => TEAM_DETAILS_ROUTE.test(url) && id !== undefined),
+      // Remove the url because we only need to check if the id has changed
+      map(([id, _url]) => id),
+      distinctUntilChanged()
+    ).subscribe(id => this.store.dispatch(new GetTeam({ id })));
 
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
@@ -123,7 +131,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(([gStatus, uStatus, usersStatus]) => {
       this.isLoadingTeam =
-        (gStatus !== EntityStatus.loadingSuccess) ||
+        (gStatus === EntityStatus.loading) ||
         (uStatus === EntityStatus.loading) ||
         (usersStatus === EntityStatus.loading);
       if (this.isLoadingTeam) {
@@ -194,23 +202,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         // Sort naturally first by name, then by id
         this.users = ChefSorters.naturalSort(users, ['name', 'id']);
       });
-
-    // If, however, the user browses directly to /settings/teams/ID, the store
-    // will not contain the team data, so we fetch it.
-    // TODO: This also fires when teamFromRoute fires; should inhibit that since
-    // we already have the team details, as noted above.
-    // Triggered every time the route changes (including on initial load).
-    this.store.select(routeState).pipe(
-      takeUntil(this.isDestroyed),
-      map(state => [state.params.id as string, state.url]),
-      // Only fetch if we are on the team details route, otherwise
-      // we'll trigger GetTeam with the wrong input on any route
-      // away to a page that also uses the :id param.
-      filter(([id, url]) => TEAM_DETAILS_ROUTE.test(url) && id !== undefined),
-      // Remove the url because we only need to check if the id has changed
-      map(([id, _url]) => id),
-      distinctUntilChanged()
-    ).subscribe(id => this.store.dispatch(new GetTeam({ id })));
  }
 
   ngOnDestroy(): void {
