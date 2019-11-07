@@ -21,6 +21,7 @@ import (
 	pb_apps "github.com/chef/automate/api/external/applications"
 	pb_cfgmgmt "github.com/chef/automate/api/external/cfgmgmt"
 	pb_data_feed "github.com/chef/automate/api/external/data_feed"
+	pb_data_lifecycle "github.com/chef/automate/api/external/data_lifecycle"
 	pb_ingest "github.com/chef/automate/api/external/ingest"
 	pb_secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
@@ -53,6 +54,7 @@ import (
 	// handlers
 	"github.com/chef/automate/components/automate-gateway/handler"
 	handler_compliance "github.com/chef/automate/components/automate-gateway/handler/compliance"
+	handler_data_lifecycle "github.com/chef/automate/components/automate-gateway/handler/data_lifecycle"
 	handler_policies "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/policy"
 	handler_rules "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/rules"
 	handler_teams "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/teams"
@@ -279,6 +281,29 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	chefIngestJobSchedulerServer := handler.NewChefIngestJobSchedulerServer(chefIngesterJobSchedulerClient)
 	pb_ingest.RegisterJobSchedulerServer(grpcServer, chefIngestJobSchedulerServer)
 
+	ingestPurgeClient, err := clients.PurgeClient("ingest-service")
+	if err != nil {
+		return errors.Wrap(err, "create purge client for ingest-service")
+	}
+
+	compliancePurgeClient, err := clients.PurgeClient("compliance-service")
+	if err != nil {
+		return errors.Wrap(err, "create purge client for compliance-service")
+	}
+
+	eventFeedPurgeClient, err := clients.PurgeClient("event-feed-service")
+	if err != nil {
+		return errors.Wrap(err, "create purge client for event-feed-service")
+	}
+
+	dataLifecycleServer := handler_data_lifecycle.NewServer(
+		chefIngesterJobSchedulerClient,
+		ingestPurgeClient,
+		compliancePurgeClient,
+		eventFeedPurgeClient,
+	)
+	pb_data_lifecycle.RegisterDataLifecycleServer(grpcServer, dataLifecycleServer)
+
 	// Reflection to be able to make grpcurl calls
 	reflection.Register(grpcServer)
 
@@ -323,6 +348,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"node manager":         pb_nodes_manager.RegisterNodeManagerServiceHandlerFromEndpoint,
 		"telemetry":            pb_telemetry.RegisterTelemetryHandlerFromEndpoint,
 		"data-feed":            pb_data_feed.RegisterDatafeedServiceHandlerFromEndpoint,
+		"data-lifecycle":       pb_data_lifecycle.RegisterDataLifecycleHandlerFromEndpoint,
 	})
 }
 

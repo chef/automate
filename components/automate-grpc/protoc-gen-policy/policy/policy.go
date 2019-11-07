@@ -495,14 +495,14 @@ func (m *ValidateV2ResourceAndActions) validateV2() error {
 	if !_IsAuthorizedReq_Resource_Pattern.MatchString(m.GetResource()) {
 		return ValidateV2ResourceAndActionsValidationError{
 			field:  "Resource",
-			reason: "value does not match regex pattern \"^[a-z][^:*]*(?::[^:*]+)*$\"",
+			reason: fmt.Sprintf("'%s' does not match regex pattern \"^[a-z][^:*]*(?::[^:*]+)*$\"", m.GetResource()),
 		}
 	}
 
 	if !_IsAuthorizedReq_Action_Pattern.MatchString(m.GetAction()) {
 		return ValidateV2ResourceAndActionsValidationError{
 			field:  "Action",
-			reason: "value does not match regex pattern \"^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$\"",
+			reason: fmt.Sprintf("'%s' does not match regex pattern \"^[a-z][a-zA-Z]*(?::[a-z][a-zA-Z]*){2}$\"", m.GetAction()),
 		}
 	}
 

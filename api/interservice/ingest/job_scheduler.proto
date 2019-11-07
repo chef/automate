@@ -55,6 +55,16 @@ message JobSettings {
 	string every = 1;      // accepts '1h30m', '1m', '2h30m', ...
 	string threshold = 3;
 	bool running = 4;
+
+	// recurrence rules are how underlying cereal workflow schedules are stored
+	// and executed. 'every' and 'threshold' were used for the previous scheduler
+	// implementation and are still supported, though they are translated to
+	// and from recurrence rules.
+	// A user can still configure jobs with every and threshold, however only
+	// recurrence or every+threshold will be valid. When the UI is moved to the
+	// data_lifecycle top level api we can probably deprecate or remove every
+	// and threshold support.
+	string recurrence = 5;
 }
 
 message JobSchedulerStatus {
@@ -71,6 +81,7 @@ message Job {
 	string last_elapsed = 6;
 	string started_on = 7;
 	string threshold = 8;
+	string recurrence = 9;
 }
 
 message JobSchedulerStatusRequest { }
