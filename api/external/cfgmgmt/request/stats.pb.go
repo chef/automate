@@ -21,6 +21,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type NodesCounts struct {
+	// List of filters to be applied to the node count results.
 	Filter               []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -60,9 +61,13 @@ func (m *NodesCounts) GetFilter() []string {
 }
 
 type RunsCounts struct {
-	Filter               []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
-	Start                string   `protobuf:"bytes,2,opt,name=start,proto3" json:"start,omitempty"`
-	End                  string   `protobuf:"bytes,3,opt,name=end,proto3" json:"end,omitempty"`
+	// List of filters to be applied to the run count results.
+	Filter []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
+	// Earliest (in history) run information to return for the run counts.
+	Start string `protobuf:"bytes,2,opt,name=start,proto3" json:"start,omitempty"`
+	// Latest (in history) run information to return for the run counts.
+	End string `protobuf:"bytes,3,opt,name=end,proto3" json:"end,omitempty"`
+	// Node id associated with the run.
 	NodeId               string   `protobuf:"bytes,4,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

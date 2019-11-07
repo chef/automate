@@ -7,26 +7,37 @@ import "google/protobuf/timestamp.proto";
 import "api/external/common/query/parameters.proto";
 
 message Nodes {
+  // Filters to apply to the request for nodes list.
   repeated string filter = 1;
+  // Pagination parameters to apply to the returned node list.
   common.query.Pagination pagination = 2;
+  // Sorting parameters to apply to the returned node list.
   common.query.Sorting sorting = 3;
 }
 
 message Node {
+  // Chef guid for the requested node.
   string node_id = 1;
 }
 
 message NodeRun {
+  // Chef guid for the requested node.
   string node_id = 1;
+  // Run id for the node.
   string run_id = 2;
+  // End time on the node's run.
   google.protobuf.Timestamp end_time = 3;
 }
 
 message Runs {
+  // Chef guid for the node.
   string node_id = 1;
+  // Filters to apply to the request for runs list.
   repeated string filter = 2;
+  // Pagination parameters to apply to the returned runs list.
   common.query.Pagination pagination = 3;
-  // TODO: (@afiune) Should we standardize these parameters as well?
+  // Earliest (in history) run information to return for the runs list.
   string start = 4;
+  // Latest (in history) run information to return for the runs list.
   string end = 5;
 }

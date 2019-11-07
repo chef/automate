@@ -23,28 +23,49 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Node struct {
-	Id              string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name            string               `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Fqdn            string               `protobuf:"bytes,3,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
-	Checkin         *timestamp.Timestamp `protobuf:"bytes,4,opt,name=checkin,proto3" json:"checkin,omitempty"`
-	UptimeSeconds   int32                `protobuf:"varint,5,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
-	Organization    string               `protobuf:"bytes,6,opt,name=organization,proto3" json:"organization,omitempty"`
-	Environment     string               `protobuf:"bytes,7,opt,name=environment,proto3" json:"environment,omitempty"`
-	Platform        string               `protobuf:"bytes,8,opt,name=platform,proto3" json:"platform,omitempty"`
-	PlatformFamily  string               `protobuf:"bytes,9,opt,name=platform_family,json=platformFamily,proto3" json:"platform_family,omitempty"`
-	PlatformVersion string               `protobuf:"bytes,10,opt,name=platform_version,json=platformVersion,proto3" json:"platform_version,omitempty"`
-	Status          string               `protobuf:"bytes,11,opt,name=status,proto3" json:"status,omitempty"`
-	SourceFqdn      string               `protobuf:"bytes,12,opt,name=source_fqdn,json=sourceFqdn,proto3" json:"source_fqdn,omitempty"`
-	LatestRunId     string               `protobuf:"bytes,13,opt,name=latest_run_id,json=latestRunId,proto3" json:"latest_run_id,omitempty"`
-	HasRunsData     bool                 `protobuf:"varint,14,opt,name=has_runs_data,json=hasRunsData,proto3" json:"has_runs_data,omitempty"`
+	// The chef_guid associated with the node.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The name of the node.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// The FQDN of the node.
+	Fqdn string `protobuf:"bytes,3,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
+	// The time on the latest received infra node report. <-- ??
+	Checkin *timestamp.Timestamp `protobuf:"bytes,4,opt,name=checkin,proto3" json:"checkin,omitempty"`
+	// Count in seconds that the node has been active.
+	UptimeSeconds int32 `protobuf:"varint,5,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
+	// The organization the node is associated with.
+	Organization string `protobuf:"bytes,6,opt,name=organization,proto3" json:"organization,omitempty"`
+	// The environment the node is in.
+	Environment string `protobuf:"bytes,7,opt,name=environment,proto3" json:"environment,omitempty"`
+	// The full platform information for the node (platform + version).
+	Platform string `protobuf:"bytes,8,opt,name=platform,proto3" json:"platform,omitempty"`
+	// The platform family information for the node.
+	PlatformFamily string `protobuf:"bytes,9,opt,name=platform_family,json=platformFamily,proto3" json:"platform_family,omitempty"`
+	// The platform version information for the node.
+	PlatformVersion string `protobuf:"bytes,10,opt,name=platform_version,json=platformVersion,proto3" json:"platform_version,omitempty"`
+	// The status on the latest infra report for the node.
+	Status string `protobuf:"bytes,11,opt,name=status,proto3" json:"status,omitempty"`
+	// The chef server associated with the node.
+	SourceFqdn string `protobuf:"bytes,12,opt,name=source_fqdn,json=sourceFqdn,proto3" json:"source_fqdn,omitempty"`
+	// The latest infra run report id for the node.
+	LatestRunId string `protobuf:"bytes,13,opt,name=latest_run_id,json=latestRunId,proto3" json:"latest_run_id,omitempty"`
+	// Boolean used to denote whether or not the run data for the node is in Automate.
+	HasRunsData bool `protobuf:"varint,14,opt,name=has_runs_data,json=hasRunsData,proto3" json:"has_runs_data,omitempty"`
+	// Timestamp on most recently received infra run report for the node.
 	LastCcrReceived *timestamp.Timestamp `protobuf:"bytes,15,opt,name=last_ccr_received,json=lastCcrReceived,proto3" json:"last_ccr_received,omitempty"`
-	// Fields that might be empty
-	PolicyName           string   `protobuf:"bytes,16,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
-	PolicyGroup          string   `protobuf:"bytes,17,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty"`
-	PolicyRevision       string   `protobuf:"bytes,18,opt,name=policy_revision,json=policyRevision,proto3" json:"policy_revision,omitempty"`
-	HasDeprecations      bool     `protobuf:"varint,19,opt,name=has_deprecations,json=hasDeprecations,proto3" json:"has_deprecations,omitempty"`
-	ChefVersion          string   `protobuf:"bytes,20,opt,name=chef_version,json=chefVersion,proto3" json:"chef_version,omitempty"`
-	ChefTags             []string `protobuf:"bytes,21,rep,name=chef_tags,json=chefTags,proto3" json:"chef_tags,omitempty"`
+	// The policy name associated with the node.
+	PolicyName string `protobuf:"bytes,16,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
+	// The policy group associated with the node.
+	PolicyGroup string `protobuf:"bytes,17,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty"`
+	// The policy revision associated with the node.
+	PolicyRevision string `protobuf:"bytes,18,opt,name=policy_revision,json=policyRevision,proto3" json:"policy_revision,omitempty"`
+	// Boolean used to denote whether or not the node has been identfied to be running cookbooks with deprecations.
+	HasDeprecations bool `protobuf:"varint,19,opt,name=has_deprecations,json=hasDeprecations,proto3" json:"has_deprecations,omitempty"`
+	// Chef Infra version on the node.
+	ChefVersion string `protobuf:"bytes,20,opt,name=chef_version,json=chefVersion,proto3" json:"chef_version,omitempty"`
+	// Chef tags associated with the node.
+	ChefTags []string `protobuf:"bytes,21,rep,name=chef_tags,json=chefTags,proto3" json:"chef_tags,omitempty"`
+	// Count of cookbook deprectations on the node.
 	DeprecationsCount    int32    `protobuf:"varint,22,opt,name=deprecations_count,json=deprecationsCount,proto3" json:"deprecations_count,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -231,18 +252,31 @@ func (m *Node) GetDeprecationsCount() int32 {
 }
 
 type NodeAttribute struct {
-	NodeId               string   `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	RunList              []string `protobuf:"bytes,3,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`
-	ChefEnvironment      string   `protobuf:"bytes,4,opt,name=chef_environment,json=chefEnvironment,proto3" json:"chef_environment,omitempty"`
-	Normal               string   `protobuf:"bytes,5,opt,name=normal,proto3" json:"normal,omitempty"`
-	Default              string   `protobuf:"bytes,6,opt,name=default,proto3" json:"default,omitempty"`
-	Override             string   `protobuf:"bytes,7,opt,name=override,proto3" json:"override,omitempty"`
-	Automatic            string   `protobuf:"bytes,13,opt,name=automatic,proto3" json:"automatic,omitempty"`
-	NormalValueCount     int32    `protobuf:"varint,8,opt,name=normal_value_count,json=normalValueCount,proto3" json:"normal_value_count,omitempty"`
-	DefaultValueCount    int32    `protobuf:"varint,9,opt,name=default_value_count,json=defaultValueCount,proto3" json:"default_value_count,omitempty"`
-	OverrideValueCount   int32    `protobuf:"varint,10,opt,name=override_value_count,json=overrideValueCount,proto3" json:"override_value_count,omitempty"`
-	AllValueCount        int32    `protobuf:"varint,11,opt,name=all_value_count,json=allValueCount,proto3" json:"all_value_count,omitempty"`
+	// The chef_guid associated with the node.
+	NodeId string `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	// Name of the node.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Run list for the node.
+	RunList []string `protobuf:"bytes,3,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`
+	// The environment for the node.
+	ChefEnvironment string `protobuf:"bytes,4,opt,name=chef_environment,json=chefEnvironment,proto3" json:"chef_environment,omitempty"`
+	// Stringified json of the normal attributes for the node.
+	Normal string `protobuf:"bytes,5,opt,name=normal,proto3" json:"normal,omitempty"`
+	// Stringified json of the default attributes for the node.
+	Default string `protobuf:"bytes,6,opt,name=default,proto3" json:"default,omitempty"`
+	// Stringified json of the override attributes for the node.
+	Override string `protobuf:"bytes,7,opt,name=override,proto3" json:"override,omitempty"`
+	// Stringified json of the automatic attributes for the node.
+	Automatic string `protobuf:"bytes,13,opt,name=automatic,proto3" json:"automatic,omitempty"`
+	// Count of normal attributes on the node.
+	NormalValueCount int32 `protobuf:"varint,8,opt,name=normal_value_count,json=normalValueCount,proto3" json:"normal_value_count,omitempty"`
+	// Count of default attributes on the node.
+	DefaultValueCount int32 `protobuf:"varint,9,opt,name=default_value_count,json=defaultValueCount,proto3" json:"default_value_count,omitempty"`
+	// Count of override attributes on the node.
+	OverrideValueCount int32 `protobuf:"varint,10,opt,name=override_value_count,json=overrideValueCount,proto3" json:"override_value_count,omitempty"`
+	// Total count of attributes on the node.
+	AllValueCount int32 `protobuf:"varint,11,opt,name=all_value_count,json=allValueCount,proto3" json:"all_value_count,omitempty"`
+	// Count of automatic attributes on the node.
 	AutomaticValueCount  int32    `protobuf:"varint,12,opt,name=automatic_value_count,json=automaticValueCount,proto3" json:"automatic_value_count,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -366,43 +400,77 @@ func (m *NodeAttribute) GetAutomaticValueCount() int32 {
 }
 
 type Run struct {
-	Id                   string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	NodeId               string               `protobuf:"bytes,2,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	NodeName             string               `protobuf:"bytes,3,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
-	Organization         string               `protobuf:"bytes,4,opt,name=organization,proto3" json:"organization,omitempty"`
-	StartTime            *timestamp.Timestamp `protobuf:"bytes,5,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime              *timestamp.Timestamp `protobuf:"bytes,6,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Source               string               `protobuf:"bytes,7,opt,name=source,proto3" json:"source,omitempty"`
-	Status               string               `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
-	TotalResourceCount   int32                `protobuf:"varint,9,opt,name=total_resource_count,json=totalResourceCount,proto3" json:"total_resource_count,omitempty"`
-	UpdatedResourceCount int32                `protobuf:"varint,10,opt,name=updated_resource_count,json=updatedResourceCount,proto3" json:"updated_resource_count,omitempty"`
-	ChefVersion          string               `protobuf:"bytes,11,opt,name=chef_version,json=chefVersion,proto3" json:"chef_version,omitempty"`
-	UptimeSeconds        int32                `protobuf:"varint,12,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
-	Environment          string               `protobuf:"bytes,13,opt,name=environment,proto3" json:"environment,omitempty"`
-	Fqdn                 string               `protobuf:"bytes,14,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
-	SourceFqdn           string               `protobuf:"bytes,15,opt,name=source_fqdn,json=sourceFqdn,proto3" json:"source_fqdn,omitempty"`
-	Ipaddress            string               `protobuf:"bytes,16,opt,name=ipaddress,proto3" json:"ipaddress,omitempty"`
-	Resources            []*Resource          `protobuf:"bytes,17,rep,name=resources,proto3" json:"resources,omitempty"`
-	RunList              []string             `protobuf:"bytes,18,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`
-	Deprecations         []*Deprecation       `protobuf:"bytes,19,rep,name=deprecations,proto3" json:"deprecations,omitempty"`
-	Error                *ChefError           `protobuf:"bytes,20,opt,name=error,proto3" json:"error,omitempty"`
-	Tags                 []string             `protobuf:"bytes,21,rep,name=tags,proto3" json:"tags,omitempty"`
-	ResourceNames        []string             `protobuf:"bytes,22,rep,name=resource_names,json=resourceNames,proto3" json:"resource_names,omitempty"`
-	Recipes              []string             `protobuf:"bytes,23,rep,name=recipes,proto3" json:"recipes,omitempty"`
-	ChefTags             []string             `protobuf:"bytes,24,rep,name=chef_tags,json=chefTags,proto3" json:"chef_tags,omitempty"`
-	Cookbooks            []string             `protobuf:"bytes,25,rep,name=cookbooks,proto3" json:"cookbooks,omitempty"`
-	Platform             string               `protobuf:"bytes,26,opt,name=platform,proto3" json:"platform,omitempty"`
-	PlatformFamily       string               `protobuf:"bytes,27,opt,name=platform_family,json=platformFamily,proto3" json:"platform_family,omitempty"`
-	PlatformVersion      string               `protobuf:"bytes,28,opt,name=platform_version,json=platformVersion,proto3" json:"platform_version,omitempty"`
-	Roles                []string             `protobuf:"bytes,29,rep,name=roles,proto3" json:"roles,omitempty"`
-	PolicyName           string               `protobuf:"bytes,30,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
-	PolicyGroup          string               `protobuf:"bytes,31,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty"`
-	PolicyRevision       string               `protobuf:"bytes,32,opt,name=policy_revision,json=policyRevision,proto3" json:"policy_revision,omitempty"`
-	ExpandedRunList      *ExpandedRunList     `protobuf:"bytes,33,opt,name=expanded_run_list,json=expandedRunList,proto3" json:"expanded_run_list,omitempty"`
-	Projects             []string             `protobuf:"bytes,34,rep,name=projects,proto3" json:"projects,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	// Id of the infra node run.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The chef_guid associated with the node.
+	NodeId string `protobuf:"bytes,2,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	// Name of the node.
+	NodeName string `protobuf:"bytes,3,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
+	// The organization the node is associated with.
+	Organization string `protobuf:"bytes,4,opt,name=organization,proto3" json:"organization,omitempty"`
+	// Start time of the infra run.
+	StartTime *timestamp.Timestamp `protobuf:"bytes,5,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// End time of the infra run.
+	EndTime *timestamp.Timestamp `protobuf:"bytes,6,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	// Source of the node run (e.g. chef-solo).
+	Source string `protobuf:"bytes,7,opt,name=source,proto3" json:"source,omitempty"`
+	// Status of the infra node run.
+	Status string `protobuf:"bytes,8,opt,name=status,proto3" json:"status,omitempty"`
+	// Resource count reported on the infra node run.
+	TotalResourceCount int32 `protobuf:"varint,9,opt,name=total_resource_count,json=totalResourceCount,proto3" json:"total_resource_count,omitempty"`
+	// Count of resources updated in the infra node run.
+	UpdatedResourceCount int32 `protobuf:"varint,10,opt,name=updated_resource_count,json=updatedResourceCount,proto3" json:"updated_resource_count,omitempty"`
+	// Chef-client version on the node.
+	ChefVersion string `protobuf:"bytes,11,opt,name=chef_version,json=chefVersion,proto3" json:"chef_version,omitempty"`
+	// Count in seconds that the node has been active.
+	UptimeSeconds int32 `protobuf:"varint,12,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
+	// The environment for the node.
+	Environment string `protobuf:"bytes,13,opt,name=environment,proto3" json:"environment,omitempty"`
+	// FQDN of the node.
+	Fqdn string `protobuf:"bytes,14,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
+	// Chef server associated with the node.
+	SourceFqdn string `protobuf:"bytes,15,opt,name=source_fqdn,json=sourceFqdn,proto3" json:"source_fqdn,omitempty"`
+	// IP Address for the node.
+	Ipaddress string `protobuf:"bytes,16,opt,name=ipaddress,proto3" json:"ipaddress,omitempty"`
+	// Intentionally blank.
+	Resources []*Resource `protobuf:"bytes,17,rep,name=resources,proto3" json:"resources,omitempty"`
+	// Run list for the node.
+	RunList []string `protobuf:"bytes,18,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`
+	// Intentionally blank.
+	Deprecations []*Deprecation `protobuf:"bytes,19,rep,name=deprecations,proto3" json:"deprecations,omitempty"`
+	// Chef Error information, available on failed runs.
+	Error *ChefError `protobuf:"bytes,20,opt,name=error,proto3" json:"error,omitempty"`
+	// ?? should we delete this tags?  is it just extra?
+	Tags []string `protobuf:"bytes,21,rep,name=tags,proto3" json:"tags,omitempty"`
+	// List of resource names for the node.
+	ResourceNames []string `protobuf:"bytes,22,rep,name=resource_names,json=resourceNames,proto3" json:"resource_names,omitempty"`
+	// List of recipes the node calls.
+	Recipes []string `protobuf:"bytes,23,rep,name=recipes,proto3" json:"recipes,omitempty"`
+	// List of tags associated with the node.
+	ChefTags []string `protobuf:"bytes,24,rep,name=chef_tags,json=chefTags,proto3" json:"chef_tags,omitempty"`
+	// List of cookbooks associated with the node.
+	Cookbooks []string `protobuf:"bytes,25,rep,name=cookbooks,proto3" json:"cookbooks,omitempty"`
+	// Full platform string for the node (family + version).
+	Platform string `protobuf:"bytes,26,opt,name=platform,proto3" json:"platform,omitempty"`
+	// Platform family for the node.
+	PlatformFamily string `protobuf:"bytes,27,opt,name=platform_family,json=platformFamily,proto3" json:"platform_family,omitempty"`
+	// Platform version for the node.
+	PlatformVersion string `protobuf:"bytes,28,opt,name=platform_version,json=platformVersion,proto3" json:"platform_version,omitempty"`
+	// List of roles associated with the node.
+	Roles []string `protobuf:"bytes,29,rep,name=roles,proto3" json:"roles,omitempty"`
+	// Policy name associated with the node.
+	PolicyName string `protobuf:"bytes,30,opt,name=policy_name,json=policyName,proto3" json:"policy_name,omitempty"`
+	// Policy group associated with the node.
+	PolicyGroup string `protobuf:"bytes,31,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty"`
+	// Policy revision associated with the node.
+	PolicyRevision string `protobuf:"bytes,32,opt,name=policy_revision,json=policyRevision,proto3" json:"policy_revision,omitempty"`
+	// Expanded run list for the node.
+	ExpandedRunList *ExpandedRunList `protobuf:"bytes,33,opt,name=expanded_run_list,json=expandedRunList,proto3" json:"expanded_run_list,omitempty"`
+	// List of projects the node belongs to. This is a concept introduced with IAMv2.
+	Projects             []string `protobuf:"bytes,34,rep,name=projects,proto3" json:"projects,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Run) Reset()         { *m = Run{} }
@@ -669,7 +737,9 @@ func (m *Run) GetProjects() []string {
 }
 
 type ExpandedRunList struct {
-	Id                   string     `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Id of the run list collection.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Intentionally blank.
 	RunList              []*RunList `protobuf:"bytes,2,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_unrecognized     []byte     `json:"-"`
@@ -716,18 +786,29 @@ func (m *ExpandedRunList) GetRunList() []*RunList {
 }
 
 type Resource struct {
-	Type            string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	Name            string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Id              string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
-	Duration        string `protobuf:"bytes,4,opt,name=duration,proto3" json:"duration,omitempty"`
-	Delta           string `protobuf:"bytes,5,opt,name=delta,proto3" json:"delta,omitempty"`
-	CookbookName    string `protobuf:"bytes,6,opt,name=cookbook_name,json=cookbookName,proto3" json:"cookbook_name,omitempty"`
+	// Resource type.
+	Type string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	// Name for the resource.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Id of the resource.
+	Id string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
+	// Duration of the resource processing.
+	Duration string `protobuf:"bytes,4,opt,name=duration,proto3" json:"duration,omitempty"`
+	// Change diff for the resource (if it was changed during the run).
+	Delta string `protobuf:"bytes,5,opt,name=delta,proto3" json:"delta,omitempty"`
+	// Cookbook name associated with the resource.
+	CookbookName string `protobuf:"bytes,6,opt,name=cookbook_name,json=cookbookName,proto3" json:"cookbook_name,omitempty"`
+	// Version of the cookbook associated with the resource.
 	CookbookVersion string `protobuf:"bytes,7,opt,name=cookbook_version,json=cookbookVersion,proto3" json:"cookbook_version,omitempty"`
-	Status          string `protobuf:"bytes,9,opt,name=status,proto3" json:"status,omitempty"`
-	RecipeName      string `protobuf:"bytes,10,opt,name=recipe_name,json=recipeName,proto3" json:"recipe_name,omitempty"`
-	Result          string `protobuf:"bytes,11,opt,name=result,proto3" json:"result,omitempty"`
-	// Fields that might be empty
-	Conditional          string   `protobuf:"bytes,16,opt,name=conditional,proto3" json:"conditional,omitempty"`
+	// Status of the resource (e.g. 'up-to-date').
+	Status string `protobuf:"bytes,9,opt,name=status,proto3" json:"status,omitempty"`
+	// Name of the recipe associated with the resource.
+	RecipeName string `protobuf:"bytes,10,opt,name=recipe_name,json=recipeName,proto3" json:"recipe_name,omitempty"`
+	// String result of the resource.
+	Result string `protobuf:"bytes,11,opt,name=result,proto3" json:"result,omitempty"`
+	// Conditional rule associated with the resource.
+	Conditional string `protobuf:"bytes,16,opt,name=conditional,proto3" json:"conditional,omitempty"`
+	// Boolean that denotes whether or not the resource failure should be ignored.
 	IgnoreFailure        bool     `protobuf:"varint,17,opt,name=ignore_failure,json=ignoreFailure,proto3" json:"ignore_failure,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -844,9 +925,13 @@ func (m *Resource) GetIgnoreFailure() bool {
 }
 
 type ChefError struct {
-	Class                string       `protobuf:"bytes,1,opt,name=class,proto3" json:"class,omitempty"`
-	Message              string       `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
-	Backtrace            []string     `protobuf:"bytes,16,rep,name=backtrace,proto3" json:"backtrace,omitempty"`
+	// Class for the error.
+	Class string `protobuf:"bytes,1,opt,name=class,proto3" json:"class,omitempty"`
+	// Error message for the failed run.
+	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	// Stacktrace for the failure.
+	Backtrace []string `protobuf:"bytes,16,rep,name=backtrace,proto3" json:"backtrace,omitempty"`
+	// Description for the error.
 	Description          *Description `protobuf:"bytes,17,opt,name=description,proto3" json:"description,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_unrecognized     []byte       `json:"-"`
@@ -907,10 +992,15 @@ func (m *ChefError) GetDescription() *Description {
 }
 
 type RunList struct {
-	Type                 string     `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	Name                 string     `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string     `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
-	Skipped              bool       `protobuf:"varint,4,opt,name=skipped,proto3" json:"skipped,omitempty"`
+	// Type of run list item (e.g. 'recipe').
+	Type string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	// Name of run list item.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Version of run list item.
+	Version string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	// Boolean denoting whether or not the run list item was skipped.
+	Skipped bool `protobuf:"varint,4,opt,name=skipped,proto3" json:"skipped,omitempty"`
+	// Intentionally blank.
 	Children             []*RunList `protobuf:"bytes,5,rep,name=children,proto3" json:"children,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_unrecognized     []byte     `json:"-"`
@@ -978,7 +1068,9 @@ func (m *RunList) GetChildren() []*RunList {
 }
 
 type Description struct {
-	Title                string            `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	// Title for the error description.
+	Title string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	// More information about the error.
 	Sections             []*_struct.Struct `protobuf:"bytes,2,rep,name=sections,proto3" json:"sections,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
@@ -1025,8 +1117,11 @@ func (m *Description) GetSections() []*_struct.Struct {
 }
 
 type Deprecation struct {
-	Message              string   `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
-	Url                  string   `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	// Message for the deprecation.
+	Message string `protobuf:"bytes,1,opt,name=message,proto3" json:"message,omitempty"`
+	// Url reference for the deprecation.
+	Url string `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	// Location of the deprecated code.
 	Location             string   `protobuf:"bytes,3,opt,name=location,proto3" json:"location,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

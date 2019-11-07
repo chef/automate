@@ -4,22 +4,29 @@ package chef.automate.api.common.query;
 option go_package = "github.com/chef/automate/api/external/common/query";
 
 message Pagination {
+  // Page number of the results to return.
   int32 page = 1;
+  // Amount of results to include per page.
   int32 size = 2;
 }
 
 message Sorting {
+  // Field to sort the list results on.
   string field = 1;
+  // Order the results should be returned in.
   SortOrder order = 2;
 }
 
 message Suggestion {
+  // Field for which suggestions are being returned.
   string type = 1;
+  // Text to search on for the type value.
   string text = 2;
+  // Filters to be applied to the results.
   repeated string filter = 3;
 }
 
 enum SortOrder {
-  ASC = 0;   // By default we order ascending
+  ASC = 0;
   DESC = 1;
 }

@@ -46,7 +46,9 @@ func (SortOrder) EnumDescriptor() ([]byte, []int) {
 }
 
 type Pagination struct {
-	Page                 int32    `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	// Page number of the results to return.
+	Page int32 `protobuf:"varint,1,opt,name=page,proto3" json:"page,omitempty"`
+	// Amount of results to include per page.
 	Size                 int32    `protobuf:"varint,2,opt,name=size,proto3" json:"size,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -93,7 +95,9 @@ func (m *Pagination) GetSize() int32 {
 }
 
 type Sorting struct {
-	Field                string    `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
+	// Field to sort the list results on.
+	Field string `protobuf:"bytes,1,opt,name=field,proto3" json:"field,omitempty"`
+	// Order the results should be returned in.
 	Order                SortOrder `protobuf:"varint,2,opt,name=order,proto3,enum=chef.automate.api.common.query.SortOrder" json:"order,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
@@ -140,8 +144,11 @@ func (m *Sorting) GetOrder() SortOrder {
 }
 
 type Suggestion struct {
-	Type                 string   `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
-	Text                 string   `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
+	// Field for which suggestions are being returned.
+	Type string `protobuf:"bytes,1,opt,name=type,proto3" json:"type,omitempty"`
+	// Text to search on for the type value.
+	Text string `protobuf:"bytes,2,opt,name=text,proto3" json:"text,omitempty"`
+	// Filters to be applied to the results.
 	Filter               []string `protobuf:"bytes,3,rep,name=filter,proto3" json:"filter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

@@ -4,12 +4,17 @@ package chef.automate.api.cfgmgmt.request;
 option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
 
 message NodesCounts {
+  // List of filters to be applied to the node count results.
   repeated string filter = 1;
 }
 
 message RunsCounts {
+  // List of filters to be applied to the run count results.
   repeated string filter = 1;
+  // Earliest (in history) run information to return for the run counts.
   string start = 2;
+  // Latest (in history) run information to return for the run counts.
   string end = 3;
+  // Node id associated with the run.
   string node_id = 4;
 }
