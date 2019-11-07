@@ -6,5 +6,5 @@ import { Component, HostBinding } from '@angular/core';
   styleUrls: ['./table-header-cell.component.scss']
 })
 export class TableHeaderCellComponent {
-  @HostBinding('attr.role') role = 'rowheader';
+  @HostBinding('attr.role') role = 'columnheader';
 }

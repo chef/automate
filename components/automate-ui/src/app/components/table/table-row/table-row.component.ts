@@ -6,5 +6,5 @@ import { Component, HostBinding } from '@angular/core';
   styleUrls: ['./table-row.component.scss']
 })
 export class TableRowComponent {
-  @HostBinding('attr.role') role = 'rowgroup';
+  @HostBinding('attr.role') role = 'row';
 }
