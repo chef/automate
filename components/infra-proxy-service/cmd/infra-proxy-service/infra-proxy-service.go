@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/chef/automate/components/infra-proxy/cmd/infra-proxy/commands"
+	"github.com/chef/automate/components/infra-proxy-service/cmd/infra-proxy-service/commands"
 )
 
 func main() {

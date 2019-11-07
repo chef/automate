@@ -11,8 +11,8 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 
-	"github.com/chef/automate/components/infra-proxy/service"
-	"github.com/chef/automate/components/infra-proxy/storage"
+	"github.com/chef/automate/components/infra-proxy-service/service"
+	"github.com/chef/automate/components/infra-proxy-service/storage"
 )
 
 // CreateServer creates a new server

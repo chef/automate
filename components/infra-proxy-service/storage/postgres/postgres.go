@@ -7,8 +7,8 @@ import (
 	"github.com/lib/pq" // adapter for database/sql
 	"github.com/pkg/errors"
 
-	"github.com/chef/automate/components/infra-proxy/storage"
-	"github.com/chef/automate/components/infra-proxy/storage/postgres/migration"
+	"github.com/chef/automate/components/infra-proxy-service/storage"
+	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/logger"
 )
 

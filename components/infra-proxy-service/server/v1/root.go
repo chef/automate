@@ -4,7 +4,7 @@ import (
 	"context"
 
 	ver_api "github.com/chef/automate/api/external/common/version"
-	"github.com/chef/automate/components/infra-proxy/service"
+	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/lib/version"
 )
 

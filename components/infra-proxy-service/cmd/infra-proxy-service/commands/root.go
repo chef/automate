@@ -10,7 +10,7 @@ var cfgFile string
 
 // RootCmd is our application root command.
 var RootCmd = &cobra.Command{
-	Use:   "infra-proxy",
+	Use:   "infra-proxy-service",
 	Short: "Chef Automate infra proxy service",
 }
 

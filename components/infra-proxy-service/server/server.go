@@ -11,8 +11,8 @@ import (
 	"google.golang.org/grpc/status"
 
 	grpc_s "github.com/chef/automate/api/interservice/infra_proxy/service"
-	v1 "github.com/chef/automate/components/infra-proxy/server/v1"
-	"github.com/chef/automate/components/infra-proxy/service"
+	v1 "github.com/chef/automate/components/infra-proxy-service/server/v1"
+	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/tracing"
 )

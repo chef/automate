@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/chef/automate/components/infra-proxy/storage"
+	"github.com/chef/automate/components/infra-proxy-service/storage"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 

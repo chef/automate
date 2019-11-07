@@ -9,9 +9,9 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
-	"github.com/chef/automate/components/infra-proxy/server"
-	"github.com/chef/automate/components/infra-proxy/service"
-	"github.com/chef/automate/components/infra-proxy/storage/postgres/migration"
+	"github.com/chef/automate/components/infra-proxy-service/server"
+	"github.com/chef/automate/components/infra-proxy-service/service"
+	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
 	platform_config "github.com/chef/automate/lib/platform/config"

@@ -4,9 +4,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/chef/automate/components/infra-proxy/storage"
-	"github.com/chef/automate/components/infra-proxy/storage/postgres"
-	"github.com/chef/automate/components/infra-proxy/storage/postgres/migration"
+	"github.com/chef/automate/components/infra-proxy-service/storage"
+	"github.com/chef/automate/components/infra-proxy-service/storage/postgres"
+	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
 )

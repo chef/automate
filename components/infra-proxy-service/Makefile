@@ -1,8 +1,8 @@
 include ../../Makefile.common_go
 
-PACKAGE_PATH = github.com/chef/automate/components/infra-proxy
+PACKAGE_PATH = github.com/chef/automate/components/infra-proxy-service
 
-BINS = ${PACKAGE_PATH}/cmd/infra-proxy
+BINS = ${PACKAGE_PATH}/cmd/infra-proxy-service
 MIGRATION_READMES = storage/postgres/migration/sql/README.md
 
 packages:=${PACKAGE_PATH}/...
@@ -22,11 +22,11 @@ ${MIGRATION_READMES}:
 
 # Regenerate all *.pb.go files
 proto:
-	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component infra-proxy'
+	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component infra-proxy-service'
 
 build:
 	mkdir -p bin/
-	go build -mod=vendor -o bin/infra-proxy ./cmd/infra-proxy
+	go build -mod=vendor -o bin/infra-proxy-service ./cmd/infra-proxy-service
 
 setup_docker_pg:
 	docker run --name infra-proxy-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=infra_proxy_test -p 5432:5432 -d postgres:9
