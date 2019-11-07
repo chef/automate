@@ -217,11 +217,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
       }),
       takeUntil(this.isDestroyed)
     ).subscribe(suggestions => this.availableFilterValues = suggestions.filter(e => e.text));
+    // ).subscribe(suggestions => console.log(suggestions));
 
     this.filters$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
       reportQuery.filters.filter((filter) => filter.value.text !== undefined).map(filter => {
         filter.value.id = filter.value.text;
         if (['profile_id', 'node_id', 'control_id'].indexOf(filter.type.name) >= 0) {
+
           const name = this.reportQuery.getFilterTitle(filter.type.name, filter.value.id);
           if (name !== undefined) {
             filter.value.text = name;
@@ -414,6 +416,11 @@ export class ReportingComponent implements OnInit, OnDestroy {
   getSuggestions(type: string, text: string, reportQuery: ReportQuery) {
     return this.suggestionsService.getSuggestions(type.replace('_id', ''), text, reportQuery).pipe(
       map(data => {
+
+        if (type === 'control_tag_value') {
+          data.unshift({id: '', score: 1, text: 'no value', title: 'no value', version: ''});
+        }
+
         return data.map(item => Object.assign(item, { title: item.text }));
       }),
       takeUntil(this.isDestroyed)
