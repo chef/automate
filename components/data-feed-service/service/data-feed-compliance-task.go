@@ -23,7 +23,7 @@ type DataFeedComplianceTask struct {
 }
 
 type DataFeedComplianceTaskResults struct {
-	DataFeedMessages map[string]datafeedMessage
+	DataFeedMessages map[string]map[string]interface{}
 }
 
 func NewDataFeedComplianceTask(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory) (*DataFeedComplianceTask, error) {
@@ -57,8 +57,8 @@ func (d *DataFeedComplianceTask) Run(ctx context.Context, task cereal.Task) (int
 	return &DataFeedComplianceTaskResults{DataFeedMessages: dataFeedMessages}, nil
 }
 
-func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, nodeIDs map[string]NodeIDs) map[string]datafeedMessage {
-	dataFeedMessages := make(map[string]datafeedMessage)
+func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, nodeIDs map[string]NodeIDs) map[string]map[string]interface{} {
+	dataFeedMessages := make(map[string]map[string]interface{})
 	for ipaddress, nodeID := range nodeIDs {
 		log.Debugf("nodeIDs has ipaddress %v", ipaddress)
 
@@ -73,13 +73,15 @@ func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, nodeIDs ma
 		filters := []string{"ipaddress:" + ipaddress}
 		// node the latest node data associated with this report
 		// i.e. latest attribute and client data but won't have been in the interval
-		message, err := getNodeData(ctx, d.cfgMgmt, filters)
+		nodeData, err := getNodeData(ctx, d.cfgMgmt, filters)
 		if err != nil {
 			// TODO
 			log.Errorf("Error getting node data %v", err)
 		}
+		message := nodeData["node_data"].(DataFeedMessage)
 		message.Report = fullReport
-		dataFeedMessages[ipaddress] = message
+		nodeData["node_data"] = message
+		dataFeedMessages[ipaddress] = nodeData
 
 	}
 	return dataFeedMessages

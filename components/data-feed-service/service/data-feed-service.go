@@ -18,14 +18,11 @@ import (
 	rrule "github.com/teambition/rrule-go"
 
 	secrets "github.com/chef/automate/api/external/secrets"
-	cfgmgmtResponse "github.com/chef/automate/api/interservice/cfgmgmt/response"
-	"github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/data-feed-service/config"
 	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/lib/cereal"
 	grpccereal "github.com/chef/automate/lib/cereal/grpc"
 
-	//"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
 
@@ -33,13 +30,7 @@ type datafeedNotification struct {
 	username string
 	password string
 	url      string
-	data     []datafeedMessage
-}
-
-type datafeedMessage struct {
-	Automatic map[string]interface{} `json:"automatic"`
-	LastRun   *cfgmgmtResponse.Run   `json:"last_run"`
-	Report    *reporting.Report      `json:"report"`
+	data     []interface{}
 }
 
 type DataClient struct {
@@ -243,13 +234,14 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 	return nil
 }
 
-func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (datafeedMessage, error) {
+func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (map[string]interface{}, error) {
 
+	nodeData := make(map[string]interface{}, 0)
 	nodeFilters := &cfgmgmtRequest.Nodes{Filter: filters}
 	nodes, err := client.GetNodes(ctx, nodeFilters)
 	if err != nil {
 		log.Errorf("Error getting cfgmgmt/nodes %v", err)
-		return datafeedMessage{}, err
+		return nodeData, err
 	}
 
 	nodeStruct := nodes.Values[0].GetStructValue()
@@ -258,26 +250,27 @@ func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []st
 	nodeAttributes, err := client.GetAttributes(ctx, &cfgmgmtRequest.Node{NodeId: id})
 	if err != nil {
 		log.Errorf("Error getting attributes %v", err)
-		return datafeedMessage{}, err
+		return nodeData, err
 	}
 	var automaticJson map[string]interface{}
 	err = json.Unmarshal([]byte(nodeAttributes.Automatic), &automaticJson)
 	if err != nil {
 		log.Errorf("Could not parse automatic attributes from json: %v", err)
-		return datafeedMessage{}, err
+		return nodeData, err
 	}
 	attributesJson := buildDynamicJson(automaticJson)
+	nodeData["attributes"] = attributesJson
 
 	lastRun, err := client.GetNodeRun(ctx, &cfgmgmtRequest.NodeRun{NodeId: id, RunId: lastRunId})
 
 	if err != nil {
 		log.Errorf("Error getting node run %v", err)
-		return datafeedMessage{}, err
+		return nodeData, err
 	} else {
 		log.Debugf("Last run\n %v", lastRun)
 	}
-
-	return datafeedMessage{Automatic: attributesJson, LastRun: lastRun}, nil
+	nodeData["node_data"] = DataFeedMessage{LastRun: lastRun}
+	return nodeData, nil
 }
 
 func buildDynamicJson(automaticJson map[string]interface{}) map[string]interface{} {
