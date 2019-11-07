@@ -87,3 +87,12 @@ function compliance_configure_purge() {
     }
   }"
 }
+
+document "load_compliance_reports" <<DOC
+  Loads compliance report.
+DOC
+function load_compliance_reports() {
+    pushd components/compliance-service/test_data/audit_reports &> /dev/null
+    ./send_to_data_collector.sh https://a2-dev.test "$(get_admin_token)"
+    popd &> /dev/null
+}
