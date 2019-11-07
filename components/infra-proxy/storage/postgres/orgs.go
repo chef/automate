@@ -10,20 +10,20 @@ import (
 )
 
 // StoreOrg saves a org to the DB.
-func (p *postgres) StoreOrg(ctx context.Context, name string, adminUser string, adminKey string) (storage.Org, error) {
-	return p.insertOrg(ctx, name, adminUser, adminKey)
+func (p *postgres) StoreOrg(ctx context.Context, name string, adminUser string, adminKey string, serverID string) (storage.Org, error) {
+	return p.insertOrg(ctx, name, adminUser, adminKey, serverID)
 }
 
 func (p *postgres) insertOrg(ctx context.Context,
-	name string, adminUser string, adminKey string) (storage.Org, error) {
+	name string, adminUser string, adminKey string, serverID string) (storage.Org, error) {
 
 	var org storage.Org
 	err := p.db.QueryRowContext(ctx,
-		`INSERT INTO orgs (id, name, admin_user, admin_key, created_at, updated_at)
-		VALUES (uuid_generate_v4(), $1, $2, $3, now(), now())
-		RETURNING id, name, fqdn, ip_address, created_at, updated_at`,
-		name, adminUser, adminKey).
-		Scan(&org.ID, &org.Name, &org.AdminUser, &org.CreatedAt, &org.UpdatedAt)
+		`INSERT INTO orgs (id, name, admin_user, admin_key, server_id, created_at, updated_at)
+		VALUES (uuid_generate_v4(), $1, $2, $3, $4, now(), now())
+		RETURNING id, name, admin_user, admin_key, server_id, created_at, updated_at`,
+		name, adminUser, adminKey, serverID).
+		Scan(&org.ID, &org.Name, &org.AdminUser, &org.AdminKey, &org.ServerId, &org.CreatedAt, &org.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
 	}
@@ -39,10 +39,10 @@ func (p *postgres) GetOrg(ctx context.Context, orgID uuid.UUID) (storage.Org, er
 func (p *postgres) getOrg(ctx context.Context, q querier, orgID uuid.UUID) (storage.Org, error) {
 	var org storage.Org
 	err := q.QueryRowContext(ctx,
-		`SELECT o.id, o.name, o.admin_key, o.updated_at, o.created_at
+		`SELECT o.id, o.name, o.admin_user, o.admin_key, o.server_id, o.updated_at, o.created_at
 		FROM orgs o
 		WHERE o.id=$1`, orgID).
-		Scan(&org.ID, &org.Name, &org.AdminUser, &org.CreatedAt, &org.UpdatedAt)
+		Scan(&org.ID, &org.Name, &org.AdminUser, &org.AdminKey, &org.ServerId, &org.CreatedAt, &org.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
 	}
@@ -54,8 +54,8 @@ func (p *postgres) DeleteOrg(ctx context.Context, orgID uuid.UUID) (storage.Org,
 	var org storage.Org
 	err := p.db.QueryRowContext(ctx,
 		`DELETE FROM orgs WHERE id=$1
-		RETURNING id, name, admin_user, created_at, updated_at`, orgID).
-		Scan(&org.ID, &org.Name, &org.AdminUser, &org.CreatedAt, &org.UpdatedAt)
+		RETURNING id, name, admin_user, admin_key, server_id, created_at, updated_at`, orgID).
+		Scan(&org.ID, &org.Name, &org.AdminUser, &org.AdminKey, &org.ServerId, &org.CreatedAt, &org.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
 	}
@@ -69,11 +69,11 @@ func (p *postgres) EditOrg(ctx context.Context, org storage.Org) (storage.Org, e
 
 	err := p.db.QueryRowContext(ctx,
 		`UPDATE orgs
-		SET name = $2, fqdn = $3, ip_address = $4, updated_at = now()
+		SET name = $2, admin_user = $3, admin_key = $4, server_id = $5, updated_at = now()
 		WHERE id = $1
-		RETURNING id, name, admin_user, admin_key, created_at, updated_at`,
-		org.ID, org.Name, org.AdminUser, org.AdminKey).
-		Scan(&o.ID, &o.Name, &o.AdminUser, &o.AdminKey, &o.CreatedAt, &o.UpdatedAt)
+		RETURNING id, name, admin_user, admin_key, server_id, created_at, updated_at`,
+		org.ID, org.Name, org.AdminUser, org.AdminKey, org.ServerId).
+		Scan(&o.ID, &o.Name, &o.AdminUser, &o.AdminKey, &o.ServerId, &o.CreatedAt, &o.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
 	}
@@ -87,7 +87,7 @@ func (p *postgres) GetOrgs(ctx context.Context) ([]storage.Org, error) {
 	var orgs []storage.Org
 	// TODO eventually these should be ordered
 	rows, err := p.db.QueryContext(ctx,
-		`SELECT s.id, s.name, s.fqdn, s.ip_address, s.updated_at, s.created_at
+		`SELECT s.id, s.name, s.admin_user, s.admin_key, s.server_id, s.updated_at, s.created_at
 		FROM orgs s`)
 
 	if err != nil {
@@ -101,7 +101,7 @@ func (p *postgres) GetOrgs(ctx context.Context) ([]storage.Org, error) {
 
 	for rows.Next() {
 		org := storage.Org{}
-		if err := rows.Scan(&org.ID, &org.Name, &org.AdminUser, &org.AdminKey,
+		if err := rows.Scan(&org.ID, &org.Name, &org.AdminUser, &org.AdminKey, &org.ServerId,
 			&org.CreatedAt, &org.UpdatedAt); err != nil {
 			return nil, err // TODO: don't fail it all? handle this more gracefully?
 		}

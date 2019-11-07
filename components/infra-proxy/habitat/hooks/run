@@ -1,3 +1,18 @@
-#!/bin/bash
+#!{{pkgPathFor "core/bash"}}/bin/bash -e
 
 exec 2>&1
+
+# Call the script to block until user accepts the MLSA via the package's config
+{{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
+
+echo "Creating database"
+pg-helper ensure-service-database "{{cfg.storage.database}}"
+
+echo "Creating extension"
+pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
+pg-helper create-extension "{{cfg.storage.database}}" "uuid-ossp"
+
+# cleanup old migration files
+rm -rf {{pkg.svc_static_path}}/migrations
+
+exec infra-proxy {{pkg.svc_config_path}}/config.yml

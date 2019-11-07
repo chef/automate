@@ -10,6 +10,8 @@ import (
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
 
+	grpc_s "github.com/chef/automate/api/interservice/infra_proxy/service"
+	v1 "github.com/chef/automate/components/infra-proxy/server/v1"
 	"github.com/chef/automate/components/infra-proxy/service"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/tracing"
@@ -26,6 +28,7 @@ func NewGRPCServer(s *service.Service) *grpc.Server {
 		),
 	)
 	health.RegisterHealthServer(g, health.NewService())
+	grpc_s.RegisterInfraProxyServer(g, v1.NewServer(s))
 	reflection.Register(g)
 	return g
 }
@@ -37,7 +40,7 @@ func GRPC(addr string, s *service.Service) error {
 		return err
 	}
 	serv := NewGRPCServer(s).Serve(list)
-	s.Logger.Debugf("Teams GRPC API listening on %v", addr)
+	s.Logger.Debugf("Infra proxy GRPC API listening on %v", addr)
 	return serv
 }
 

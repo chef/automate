@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package chef.automate.domain.infra_proxy.response;
+option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
+
+message CreateServer {
+    Server server = 1;
+}
+
+message DeleteServer {
+    Server server = 1;
+}
+
+message UpdateServer {
+    Server server = 1;
+}
+
+message GetServers {
+    repeated Server servers = 1;
+}
+
+message GetServer {
+    Server server = 1;
+}
+
+message Server {
+    string id = 1;
+    string name = 2;
+    string fqdn = 3;
+    string ip_address = 4;
+}

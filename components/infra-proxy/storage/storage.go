@@ -12,13 +12,13 @@ import (
 type Storage interface {
 	GetServer(context.Context, uuid.UUID) (Server, error)
 	GetServers(context.Context) ([]Server, error)
-	StoreServer(ctx context.Context, name string, fqdn string, ip_address string) (Server, error)
+	StoreServer(ctx context.Context, name string, fqdn string, ipAddress string) (Server, error)
 	DeleteServer(context.Context, uuid.UUID) (Server, error)
 	EditServer(context.Context, Server) (Server, error)
 
 	GetOrg(context.Context, uuid.UUID) (Org, error)
 	GetOrgs(context.Context) ([]Org, error)
-	StoreOrg(ctx context.Context, name string, admin_user string, admin_key string) (Org, error)
+	StoreOrg(ctx context.Context, name string, adminUser string, adminKey string, serverId string) (Org, error)
 	DeleteOrg(context.Context, uuid.UUID) (Org, error)
 	EditOrg(context.Context, Org) (Org, error)
 }
@@ -45,6 +45,7 @@ type Org struct {
 	Name      string
 	AdminUser string
 	AdminKey  string
+	ServerId  string
 	CreatedAt time.Time
 	UpdatedAt time.Time
 }

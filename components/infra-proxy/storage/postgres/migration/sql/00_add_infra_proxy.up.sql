@@ -1,6 +1,8 @@
 CREATE TABLE IF NOT EXISTS servers (
   id          TEXT NOT NULL,
   name        TEXT NOT NULL DEFAULT '',
+  fqdn        TEXT NOT NULL DEFAULT '',
+  ip_address  TEXT NOT NULL DEFAULT '',
   created_at  TIMESTAMPTZ NOT NULL,
   updated_at  TIMESTAMPTZ NOT NULL,
   PRIMARY KEY(id)

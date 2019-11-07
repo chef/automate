@@ -1,6 +1,9 @@
 package service
 
 import (
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+
 	"github.com/chef/automate/components/infra-proxy/storage"
 	"github.com/chef/automate/components/infra-proxy/storage/postgres"
 	"github.com/chef/automate/components/infra-proxy/storage/postgres/migration"
@@ -27,4 +30,19 @@ func NewPostgresService(l logger.Logger, migrationsConfig migration.Config, conn
 		ConnFactory: connFactory,
 		Storage:     p,
 	}, nil
+}
+
+// ParseStorageError parses common storage errors into a user-readable format.
+func ParseStorageError(err error, id interface{}, noun string) error {
+	if err != nil {
+		switch err {
+		case storage.ErrNotFound:
+			return status.Errorf(codes.NotFound, "no %s found with id %q", noun, id)
+		case storage.ErrConflict:
+			return status.Errorf(codes.AlreadyExists, "%s with that name already exists", noun)
+		default:
+			return status.Error(codes.Internal, err.Error())
+		}
+	}
+	return nil
 }
