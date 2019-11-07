@@ -24,6 +24,8 @@ do_deploy() {
 }
 
 do_test_deploy() {
+    #shellcheck disable=SC2154
+    #shellcheck source=integration/helpers/bldr_tests.sh
     source "${source_dir}/helpers/bldr_tests.sh"
 
     bldr_smoke_test
