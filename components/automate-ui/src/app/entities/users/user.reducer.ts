@@ -8,13 +8,15 @@ import { User } from './user.model';
 export interface UserEntityState extends EntityState<User> {
   status: EntityStatus;
   updateStatus: EntityStatus;
+  deleteStatus: EntityStatus;
 }
 
 export const userEntityAdapter: EntityAdapter<User> = createEntityAdapter<User>();
 
 export const UserEntityInitialState: UserEntityState = userEntityAdapter.getInitialState({
   status: EntityStatus.notLoaded,
-  updateStatus: EntityStatus.notLoaded
+  updateStatus: EntityStatus.notLoaded,
+  deleteStatus: EntityStatus.notLoaded
 });
 
 export function userEntityReducer(state: UserEntityState = UserEntityInitialState,
@@ -23,7 +25,13 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
   switch (action.type) {
 
     case UserActionTypes.GET_ALL:
-      return set('status', EntityStatus.loading, state);
+      return set(
+        'status',
+        EntityStatus.loading,
+        // clear user state to prevent data leakage
+        // for example, if the user visited the list page first
+        userEntityAdapter.removeAll(state)
+      ) as UserEntityState;
 
     case UserActionTypes.GET_ALL_SUCCESS:
       return set('status', EntityStatus.loadingSuccess,
@@ -33,7 +41,13 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
       return set('status', EntityStatus.loadingFailure, state);
 
     case UserActionTypes.GET:
-      return set('status', EntityStatus.loading, state);
+      return set(
+        'status',
+        EntityStatus.loading,
+        // clear user state to prevent data leakage
+        // for example, if the user visited the list page first
+        userEntityAdapter.removeAll(state)
+      ) as UserEntityState;
 
     case UserActionTypes.GET_SUCCESS:
       return set('status', EntityStatus.loadingSuccess,
@@ -64,14 +78,14 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
           changes: action.payload}, state));
 
     case UserActionTypes.DELETE:
-      return set('status', EntityStatus.loading, state);
+      return set('deleteStatus', EntityStatus.loading, state);
 
     case UserActionTypes.DELETE_SUCCESS:
-      return set('status', EntityStatus.loadingSuccess,
+      return set('deleteStatus', EntityStatus.loadingSuccess,
         userEntityAdapter.removeOne(action.payload.id, state));
 
     case UserActionTypes.DELETE_FAILURE:
-      return set('status', EntityStatus.loadingFailure, state);
+      return set('deleteStatus', EntityStatus.loadingFailure, state);
 
     case UserActionTypes.CREATE:
       return set('status', EntityStatus.loading, state);

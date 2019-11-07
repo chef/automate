@@ -1,9 +1,10 @@
-import { catchError, mergeMap, map } from 'rxjs/operators';
+import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of, combineLatest } from 'rxjs';
+import { identity } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -43,7 +44,6 @@ export class UserEffects {
     private store$: Store<NgrxStateAtom>
   ) { }
 
-  // 7/6/18: TODO in follow-up PR: fetch teams for all users - bd
   @Effect()
   getUsers$ = combineLatest([
     this.actions$.pipe(ofType<GetUsers>(UserActionTypes.GET_ALL)),
@@ -65,11 +65,10 @@ export class UserEffects {
       });
     }));
 
-  // TODO rename
   @Effect()
   getUser$ = combineLatest([
     this.actions$.pipe(ofType<GetUser>(UserActionTypes.GET)),
-    this.store$.select(iamMajorVersion)])
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
       mergeMap(([action, version]: [GetUser, IAMMajorVersion]) =>
         this.requests.getUser(action.payload.id, version).pipe(

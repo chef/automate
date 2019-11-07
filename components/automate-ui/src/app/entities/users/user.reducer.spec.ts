@@ -169,9 +169,9 @@ describe('userStatusEntityReducer', () => {
 
 
       using([
-        [initialState, userState(true), 'initial state'],
-        [userState(true, user), userState(true, payload), 'one-user state'],
-        [userState(true, user, user2), userState(true, payload, user2), 'two-user state']
+        [initialState, userState('update'), 'initial state'],
+        [userState('update', user), userState('update', payload), 'one-user state'],
+        [userState('update', user, user2), userState('update', payload, user2), 'two-user state']
       ], (prevState, nextState: UserEntityState, descr: string) => {
         it(`with ${descr} updates the user if it's in the state`, () => {
           const actualNext = userEntityReducer(prevState, action);
@@ -196,8 +196,8 @@ describe('userStatusEntityReducer', () => {
       const action = new DeleteUser(payload);
 
       it('sets status to loading', () => {
-        const { status } = userEntityReducer(initialState, action);
-        expect(status).toEqual(EntityStatus.loading);
+        const { deleteStatus } = userEntityReducer(initialState, action);
+        expect(deleteStatus).toEqual(EntityStatus.loading);
       });
     });
 
@@ -205,16 +205,16 @@ describe('userStatusEntityReducer', () => {
       const payload = { ...user, name: 'test user 123'};
       const action = new DeleteUserSuccess(payload);
 
-      it('sets status to loadingSuccess', () => {
+      it('sets deleteStatus to loadingSuccess', () => {
         const prevState = { ...initialState, state: EntityStatus.loading };
-        const { status } = userEntityReducer(prevState, action);
-        expect(status).toEqual(EntityStatus.loadingSuccess);
+        const { deleteStatus } = userEntityReducer(prevState, action);
+        expect(deleteStatus).toEqual(EntityStatus.loadingSuccess);
       });
 
       using([
-        [initialState, userState(false), 'initial state'],
-        [userState(false, user), userState(false), 'one user state'],
-        [userState(false, user, user2), userState(false, user2), 'state with two users']
+        [initialState, userState('delete'), 'initial state'],
+        [userState('delete', user), userState('delete'), 'one user state'],
+        [userState('delete', user, user2), userState('delete', user2), 'state with two users']
       ], (prevState, nextState: UserEntityState, descr: string) => {
         it(`with ${descr} removes the one user if it's in the state`, () => {
           const actualNext = userEntityReducer(prevState, action);
@@ -227,28 +227,51 @@ describe('userStatusEntityReducer', () => {
       const payload = httpErrorResponse;
       const action = new DeleteUserFailure(payload);
 
-      it('sets status to loadingSuccess', () => {
+      it('sets deleteStatus to loadingSuccess', () => {
         const prevState = { ...initialState, state: EntityStatus.loading };
-        const { status } = userEntityReducer(prevState, action);
-        expect(status).toEqual(EntityStatus.loadingFailure);
+        const { deleteStatus } = userEntityReducer(prevState, action);
+        expect(deleteStatus).toEqual(EntityStatus.loadingFailure);
       });
     });
   });
 });
 
-function userState(isUpdate: boolean, ...us: User[]): UserEntityState {
+function userState(action: string, ...us: User[]): UserEntityState {
   const entities: { [id: string]: User } = {};
   const ids: string[] = [];
   for (const u of us) {
     entities[u.id] = u;
     ids.push(u.id);
   }
-  return {
-    updateStatus: isUpdate ? EntityStatus.loadingSuccess : EntityStatus.notLoaded,
-    status: isUpdate ? EntityStatus.notLoaded : EntityStatus.loadingSuccess,
-    entities,
-    ids
-  };
+  switch (action) {
+    case 'get': {
+      return {
+        updateStatus: EntityStatus.notLoaded,
+        status: EntityStatus.loadingSuccess,
+        deleteStatus: EntityStatus.notLoaded,
+        entities,
+        ids
+      };
+    }
+    case 'update': {
+      return {
+        updateStatus: EntityStatus.loadingSuccess,
+        status: EntityStatus.notLoaded,
+        deleteStatus: EntityStatus.notLoaded,
+        entities,
+        ids
+      };
+    }
+    case 'delete': {
+      return {
+        updateStatus: EntityStatus.notLoaded,
+        status: EntityStatus.notLoaded,
+        deleteStatus: EntityStatus.loadingSuccess,
+        entities,
+        ids
+      };
+    }
+  }
 }
 
 

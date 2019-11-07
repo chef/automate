@@ -21,6 +21,11 @@ export const updateStatus = createSelector(
   (state) => state.updateStatus
 );
 
+export const deleteStatus = createSelector(
+  userState,
+  (state) => state.deleteStatus
+);
+
 export const userFromRoute = createSelector(
   userEntities,
   routeParams,
