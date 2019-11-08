@@ -16,6 +16,8 @@ func init() {
   "paths": {
     "/nodemanagers": {
       "post": {
+        "summary": "Create a nodemanager",
+        "description": "Creates a nodemanager given a name, credential id or credential data, and type.",
         "operationId": "Create",
         "responses": {
           "200": {
@@ -42,6 +44,8 @@ func init() {
     },
     "/nodemanagers/id/{id}": {
       "get": {
+        "summary": "Read a nodemanager",
+        "description": "Read the details of a nodemanager given an id.",
         "operationId": "Read",
         "responses": {
           "200": {
@@ -54,6 +58,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "UUID for the nodemanager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -64,6 +69,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a nodemanager",
+        "description": "Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes\nassociated with the manager will be abandoned.",
         "operationId": "Delete",
         "responses": {
           "200": {
@@ -76,6 +83,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "UUID for the nodemanager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -86,6 +94,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update a nodemanager",
+        "description": "PUT operation to update the details for a nodemanager, such as the name or associated credential id or data.\nPlease note that this is a PUT operation, so all nodemanager details included in the create function\nshould be included in the PUT message to update.",
         "operationId": "Update",
         "responses": {
           "200": {
@@ -98,6 +108,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "UUID for the nodemanager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -118,6 +129,8 @@ func init() {
     },
     "/nodemanagers/id/{id}/with-node-state/stopped": {
       "delete": {
+        "summary": "Delete a nodemanager and set nodes to have a state of stopped",
+        "description": "Delete a nodemanager and update all associated nodes to have a state of stopped.",
         "operationId": "DeleteWithNodeStateStopped",
         "responses": {
           "200": {
@@ -130,6 +143,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "UUID for the nodemanager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -142,6 +156,8 @@ func init() {
     },
     "/nodemanagers/id/{id}/with-node-state/terminated": {
       "delete": {
+        "summary": "Delete a nodemanager and set nodes to have a state of terminated",
+        "description": "Delete a nodemanager and update all associated nodes to have a state of terminated.",
         "operationId": "DeleteWithNodeStateTerminated",
         "responses": {
           "200": {
@@ -154,6 +170,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "UUID for the nodemanager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -166,6 +183,8 @@ func init() {
     },
     "/nodemanagers/id/{id}/with-nodes": {
       "delete": {
+        "summary": "Delete a nodemanager and all of its nodes",
+        "description": "Delete a nodemanager and all associated nodes given a nodemanager id.",
         "operationId": "DeleteWithNodes",
         "responses": {
           "200": {
@@ -178,6 +197,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "UUID for the nodemanager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -190,6 +210,8 @@ func init() {
     },
     "/nodemanagers/id/{node_manager_id}/search-fields": {
       "post": {
+        "summary": "Search node fields",
+        "description": "Searches the available values for a given field and nodemanager id.\nPossible fields: regions, tags, name, subscription_id",
         "operationId": "SearchNodeFields",
         "responses": {
           "200": {
@@ -202,6 +224,7 @@ func init() {
         "parameters": [
           {
             "name": "node_manager_id",
+            "description": "Nodemanager id for which the search is being made.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -222,6 +245,8 @@ func init() {
     },
     "/nodemanagers/id/{node_manager_id}/search-nodes": {
       "post": {
+        "summary": "Search nodes",
+        "description": "Searches the available nodes for a given nodemanager id.",
         "operationId": "SearchNodes",
         "responses": {
           "200": {
@@ -234,6 +259,7 @@ func init() {
         "parameters": [
           {
             "name": "node_manager_id",
+            "description": "Nodemanager id for which the search is being made.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -254,6 +280,8 @@ func init() {
     },
     "/nodemanagers/rerun/id/{id}": {
       "post": {
+        "summary": "Connect",
+        "description": "Attempts to reach the API for the given nodemanager id to check validity of the \ncredentials associated with the nodemanager.",
         "operationId": "Connect",
         "responses": {
           "200": {
@@ -266,6 +294,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "UUID for the nodemanager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -286,6 +315,8 @@ func init() {
     },
     "/nodemanagers/search": {
       "post": {
+        "summary": "List of nodemanagers",
+        "description": "Returns a list of nodemanagers matching the query.\nSupports filtering, sorting, and pagination.\nValid filtering fields: 'manager_type'\nValid sorting fields: name, type, status, status_message, date_added",
         "operationId": "List",
         "responses": {
           "200": {
@@ -319,16 +350,19 @@ func init() {
       "type": "object",
       "properties": {
         "tag_key": {
-          "type": "string"
+          "type": "string",
+          "description": "Tag key to match on."
         },
         "tag_value": {
-          "type": "string"
+          "type": "string",
+          "description": "Tag value to match on."
         },
         "credential_ids": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of credential ids to associate with the key/value pair."
         }
       }
     },
@@ -336,13 +370,16 @@ func init() {
       "type": "object",
       "properties": {
         "query": {
-          "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Query"
+          "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Query",
+          "description": "Query details (filters) to be applied to the results."
         },
         "field": {
-          "type": "string"
+          "type": "string",
+          "description": "Field to search on."
         },
         "node_manager_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Nodemanager id for which the search is being made."
         }
       }
     },
@@ -353,7 +390,8 @@ func init() {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of available fields matching the requested criteria."
         }
       }
     },
@@ -361,7 +399,8 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "UUID for the nodemanager."
         }
       }
     },
@@ -372,7 +411,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Id"
-          }
+          },
+          "description": "List of nodemanager UUIDs."
         }
       }
     },
@@ -380,38 +420,47 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "UUID for the nodemanager."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "User defined name for the nodemanager."
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "Type of nodemanager (aws-ec2, azure-vm, aws-api, azure-api, gcp)."
         },
         "credential_id": {
-          "type": "string"
+          "type": "string",
+          "description": "UUID of credential containing the information to connect to aws, azure, or gcp."
         },
         "instance_credentials": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.CredentialsByTags"
-          }
+          },
+          "description": "List of tag and credential uuid associations to make. These are ssh, winrm, and sudo creds used to access instances."
         },
         "status": {
-          "type": "string"
+          "type": "string",
+          "description": "Status of the nodemanager (reachable, unreachable)."
         },
         "account_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Account id associated with the nodemanager."
         },
         "date_added": {
           "type": "string",
-          "format": "date-time"
+          "format": "date-time",
+          "description": "Date the nodemanager was created."
         },
         "credential_data": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Kv"
-          }
+          },
+          "description": "Credential data for the nodemanager. This field is used when a credential\nhas not yet been created, to be able to include credential data (such as AWS_ACCESS_KEY) inline."
         }
       }
     },
@@ -422,11 +471,13 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.NodeManager"
-          }
+          },
+          "description": "List of nodemanagers."
         },
         "total": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Total count of nodemanagers."
         }
       }
     },
@@ -434,10 +485,12 @@ func init() {
       "type": "object",
       "properties": {
         "query": {
-          "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Query"
+          "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Query",
+          "description": "Query details (filters) to be applied to the results."
         },
         "node_manager_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Nodemanager id for which the search is being made."
         }
       }
     },
@@ -448,11 +501,13 @@ func init() {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of node names matching the request."
         },
         "total": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Total count of node names matching the request."
         }
       }
     },
@@ -463,21 +518,25 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Filter"
-          }
+          },
+          "description": "Filters to be applied to the query."
         },
         "order": {
           "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Query.OrderType"
         },
         "sort": {
-          "type": "string"
+          "type": "string",
+          "description": "Field to sort on."
         },
         "page": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Page number of results to return."
         },
         "per_page": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Count of results that should be returned for each page."
         }
       }
     },
@@ -487,7 +546,8 @@ func init() {
         "ASC",
         "DESC"
       ],
-      "default": "ASC"
+      "default": "ASC",
+      "description": "Sort the results in ascending or descending order."
     },
     "chef.automate.domain.compliance.api.common.Filter": {
       "type": "object",
