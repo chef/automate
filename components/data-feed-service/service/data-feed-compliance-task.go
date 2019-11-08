@@ -78,9 +78,12 @@ func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, nodeIDs ma
 			// TODO
 			log.Errorf("Error getting node data %v", err)
 		}
-		message := nodeData["node_data"].(DataFeedMessage)
-		message.Report = fullReport
-		nodeData["node_data"] = message
+		if _, ok := nodeData["node_data"]; ok {
+			message := nodeData["node_data"].(DataFeedMessage)
+			message.Report = fullReport
+			nodeData["node_data"] = message
+		}
+
 		dataFeedMessages[ipaddress] = nodeData
 
 	}
