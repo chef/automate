@@ -181,7 +181,15 @@ export class ReportingComponent implements OnInit, OnDestroy {
     return this.route.queryParamMap.pipe(map((params: ParamMap) => {
       return params.keys.reduce((list, key) => {
         const paramValues = params.getAll(key);
-        return list.concat(paramValues.map(value => ({type: key, text: value})));
+
+        // Necessary check to remove text from api call for no values
+        const mappedParam = paramValues.map(value => {
+          console.log(value)
+          const _value = value === 'no value' ? 'no value' : value;
+          return { type: key, text: _value };
+        });
+
+        return list.concat(mappedParam);
       }, []);
     }));
   }
@@ -217,7 +225,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
       }),
       takeUntil(this.isDestroyed)
     ).subscribe(suggestions => this.availableFilterValues = suggestions.filter(e => e.text));
-    // ).subscribe(suggestions => console.log(suggestions));
 
     this.filters$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
       reportQuery.filters.filter((filter) => filter.value.text !== undefined).map(filter => {
@@ -229,6 +236,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
             filter.value.text = name;
           }
         }
+        console.log(filter)
         return filter;
       })));
   }
@@ -417,11 +425,13 @@ export class ReportingComponent implements OnInit, OnDestroy {
     return this.suggestionsService.getSuggestions(type.replace('_id', ''), text, reportQuery).pipe(
       map(data => {
 
+        data.map(item => Object.assign(item, { title: item.text }));
+
         if (type === 'control_tag_value') {
-          data.unshift({id: '', score: 1, text: 'no value', title: 'no value', version: ''});
+          data.unshift({id: '', score: 1, text: '', title: 'no value', version: ''});
         }
 
-        return data.map(item => Object.assign(item, { title: item.text }));
+        return data;
       }),
       takeUntil(this.isDestroyed)
     );
