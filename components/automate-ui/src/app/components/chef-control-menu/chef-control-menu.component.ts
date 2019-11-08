@@ -20,11 +20,11 @@ export class ChefControlMenuComponent implements OnInit {
   public value: string;
 
   // can i use a ternarys here?
-  @HostBinding('attr.role') comboBox = 'combobox';
+  @HostBinding('attr.role') role = 'combobox';
   @HostBinding('attr.tabindex') get isTabable(): string { return this.isDisabled === true ? '-1' : '0'; }
-  @HostBinding('class.focused') get focused(): string { return this.isFocused ? 'focused' : ''; }
-  @HostBinding('class.active') get active(): string { return this.isActive ? 'active' : ''; }
-  @HostBinding('class.disabled') get disabled(): string { return this.isDisabled ? 'disabled' : '';}
+  @HostBinding('class.focused') get focused(): boolean { return this.isFocused; }
+  @HostBinding('class.active') get active(): boolean { return this.isActive; }
+  @HostBinding('class.disabled') get disabled(): boolean { return this.isDisabled;}
 
   @HostListener('focus') handleFocus() {
     if (!this.isDisabled) {
