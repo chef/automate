@@ -258,34 +258,6 @@ a1-migration-create-minimal-artifact: a1-migration-hab-keys
 a1-migration-upload-artifact: hab-auth-token
 	cd a1-migration && docker-compose exec a1-migration bash -c 'HAB_ORIGIN=devchef HAB_AUTH_TOKEN=${HAB_AUTH_TOKEN} hab pkg upload /a1-migration/results/*.hart'
 
-proxy-host-setup:
-	sysctl -w vm.max_map_count=262144
-	sysctl -w vm.dirty_expire_centisecs=20000
-
-proxy-up:
-	cd proxy && docker-compose up -d
-
-proxy-down:
-	cd proxy && docker-compose down
-
-proxy-build:
-	docker build -m 4gb -t chef/a2-host proxy
-
-# Messier than a1-migration-migrate because `migrate-from-v1` accepts an empty string for
-# HAB_ORIGIN, but `deploy` does not.
-proxy-deploy:
-ifeq (${HAB_ORIGIN},"")
-	cd proxy && docker-compose exec a2-host /proxy/chef-automate deploy --channel dev --upgrade-strategy none --accept-terms-and-mlsa --override-origin ${HAB_ORIGIN} --hartifacts /a2/results
-else
-	cd proxy && docker-compose exec a2-host /proxy/chef-automate deploy --channel dev --upgrade-strategy none --accept-terms-and-mlsa
-endif
-
-proxy-diagnostics:
-	cd proxy && docker-compose exec a2-host /proxy/chef-automate diagnostics run
-
-proxy-gather-logs:
-	cd proxy && mkdir -p logs && docker-compose exec a2-host bash -c "journalctl -u chef-automate > /proxy/logs/journal"
-
 basic-a1-build: guard-HAB_ORIGIN
 	cp a1-migration/{delivery.license,internal_users.tsv,linux-patch-baseline-0.3.0.tar.gz} basic-a1/
 	docker build --build-arg AUTOMATE_CHANNEL=stable --build-arg AUTOMATE_VERSION=1.8.38 -m 4gb -t devchef/basic-a1 basic-a1
