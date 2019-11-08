@@ -1,0 +1,27 @@
+syntax = "proto3";
+
+package chef.automate.api.infra_proxy.request;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/infra_proxy/request";
+
+message CreateServer {
+    string name = 1;
+    string fqdn = 2;
+    string ip_address = 3;
+}
+
+message UpdateServer {
+    string id = 1;
+    string name = 2;
+    string fqdn = 3;
+    string ip_address = 4;
+}
+
+message DeleteServer {
+    string id = 1;
+}
+
+message GetServers {}
+
+message GetServer {
+    string id = 1;
+}

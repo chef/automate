@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package chef.automate.api.infra_proxy.request;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/infra_proxy/request";
+
+message CreateOrg {
+    string name = 1;
+    string admin_user = 2;
+    string admin_key = 3;
+    string server_id = 4;
+}
+
+message UpdateOrg {
+    string id = 1;
+    string name = 2;
+    string admin_user = 3;
+    string admin_key = 4;
+    string server_id = 5;
+}
+
+message DeleteOrg {
+    string id = 1;
+}
+
+message GetOrgs {}
+
+message GetOrg {
+    string id = 1;
+}

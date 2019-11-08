@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package chef.automate.api.infra_proxy.response;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/infra_proxy/response";
+
+message CreateOrg {
+    Org org = 1;
+}
+
+message DeleteOrg {
+    Org org = 1;
+}
+
+message UpdateOrg {
+    Org org = 1;
+}
+
+message GetOrgs {
+    repeated Org orgs = 1;
+}
+
+message GetOrg {
+    Org org = 1;
+}
+
+message Org {
+    string id = 1;
+    string name = 2;
+    string admin_user = 3;
+    string admin_key = 4;
+    string server_id = 5;
+}
