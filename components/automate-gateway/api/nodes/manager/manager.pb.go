@@ -30,6 +30,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// Sort the results in ascending or descending order.
 type Query_OrderType int32
 
 const (
@@ -87,6 +88,7 @@ func (m *ConnectResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_ConnectResponse proto.InternalMessageInfo
 
 type Id struct {
+	// UUID for the nodemanager.
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -126,6 +128,7 @@ func (m *Id) GetId() string {
 }
 
 type Ids struct {
+	// List of nodemanager UUIDs.
 	Ids                  []*Id    `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -165,14 +168,18 @@ func (m *Ids) GetIds() []*Id {
 }
 
 type Query struct {
-	FilterMap            []*common.Filter `protobuf:"bytes,25,rep,name=filter_map,json=filterMap,proto3" json:"filter_map,omitempty"`
-	Order                Query_OrderType  `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.nodes.manager.v1.Query_OrderType" json:"order,omitempty"`
-	Sort                 string           `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
-	Page                 int32            `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
-	PerPage              int32            `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
-	XXX_unrecognized     []byte           `json:"-"`
-	XXX_sizecache        int32            `json:"-"`
+	// Filters to be applied to the query.
+	FilterMap []*common.Filter `protobuf:"bytes,25,rep,name=filter_map,json=filterMap,proto3" json:"filter_map,omitempty"`
+	Order     Query_OrderType  `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.nodes.manager.v1.Query_OrderType" json:"order,omitempty"`
+	// Field to sort on.
+	Sort string `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
+	// Page number of results to return.
+	Page int32 `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
+	// Count of results that should be returned for each page.
+	PerPage              int32    `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Query) Reset()         { *m = Query{} }
@@ -236,6 +243,7 @@ func (m *Query) GetPerPage() int32 {
 }
 
 type Fields struct {
+	// List of available fields matching the requested criteria.
 	Fields               []string `protobuf:"bytes,1,rep,name=fields,proto3" json:"fields,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -275,8 +283,11 @@ func (m *Fields) GetFields() []string {
 }
 
 type FieldQuery struct {
-	Query                *Query   `protobuf:"bytes,20,opt,name=query,proto3" json:"query,omitempty"`
-	Field                string   `protobuf:"bytes,21,opt,name=field,proto3" json:"field,omitempty"`
+	// Query details (filters) to be applied to the results.
+	Query *Query `protobuf:"bytes,20,opt,name=query,proto3" json:"query,omitempty"`
+	// Field to search on.
+	Field string `protobuf:"bytes,21,opt,name=field,proto3" json:"field,omitempty"`
+	// Nodemanager id for which the search is being made.
 	NodeManagerId        string   `protobuf:"bytes,22,opt,name=node_manager_id,json=nodeManagerId,proto3" json:"node_manager_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -330,7 +341,9 @@ func (m *FieldQuery) GetNodeManagerId() string {
 }
 
 type Nodes struct {
-	Nodes                []string `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	// List of node names matching the request.
+	Nodes []string `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	// Total count of node names matching the request.
 	Total                int32    `protobuf:"varint,20,opt,name=total,proto3" json:"total,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -377,7 +390,9 @@ func (m *Nodes) GetTotal() int32 {
 }
 
 type NodeQuery struct {
-	Query                *Query   `protobuf:"bytes,20,opt,name=query,proto3" json:"query,omitempty"`
+	// Query details (filters) to be applied to the results.
+	Query *Query `protobuf:"bytes,20,opt,name=query,proto3" json:"query,omitempty"`
+	// Nodemanager id for which the search is being made.
 	NodeManagerId        string   `protobuf:"bytes,21,opt,name=node_manager_id,json=nodeManagerId,proto3" json:"node_manager_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -424,18 +439,28 @@ func (m *NodeQuery) GetNodeManagerId() string {
 }
 
 type NodeManager struct {
-	Id                   string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string               `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Type                 string               `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
-	CredentialId         string               `protobuf:"bytes,20,opt,name=credential_id,json=credentialId,proto3" json:"credential_id,omitempty"`
-	InstanceCredentials  []*CredentialsByTags `protobuf:"bytes,21,rep,name=instance_credentials,json=instanceCredentials,proto3" json:"instance_credentials,omitempty"`
-	Status               string               `protobuf:"bytes,22,opt,name=status,proto3" json:"status,omitempty"`
-	AccountId            string               `protobuf:"bytes,24,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
-	DateAdded            *timestamp.Timestamp `protobuf:"bytes,25,opt,name=date_added,json=dateAdded,proto3" json:"date_added,omitempty"`
-	CredentialData       []*common.Kv         `protobuf:"bytes,26,rep,name=credential_data,json=credentialData,proto3" json:"credential_data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	// UUID for the nodemanager.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// User defined name for the nodemanager.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Type of nodemanager (aws-ec2, azure-vm, aws-api, azure-api, gcp).
+	Type string `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
+	// UUID of credential containing the information to connect to aws, azure, or gcp.
+	CredentialId string `protobuf:"bytes,20,opt,name=credential_id,json=credentialId,proto3" json:"credential_id,omitempty"`
+	// List of tag and credential uuid associations to make. These are ssh, winrm, and sudo creds used to access instances.
+	InstanceCredentials []*CredentialsByTags `protobuf:"bytes,21,rep,name=instance_credentials,json=instanceCredentials,proto3" json:"instance_credentials,omitempty"`
+	// Status of the nodemanager (reachable, unreachable).
+	Status string `protobuf:"bytes,22,opt,name=status,proto3" json:"status,omitempty"`
+	// Account id associated with the nodemanager.
+	AccountId string `protobuf:"bytes,24,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
+	// Date the nodemanager was created.
+	DateAdded *timestamp.Timestamp `protobuf:"bytes,25,opt,name=date_added,json=dateAdded,proto3" json:"date_added,omitempty"`
+	// Credential data for the nodemanager. This field is used when a credential
+	// has not yet been created, to be able to include credential data (such as AWS_ACCESS_KEY) inline.
+	CredentialData       []*common.Kv `protobuf:"bytes,26,rep,name=credential_data,json=credentialData,proto3" json:"credential_data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
+	XXX_unrecognized     []byte       `json:"-"`
+	XXX_sizecache        int32        `json:"-"`
 }
 
 func (m *NodeManager) Reset()         { *m = NodeManager{} }
@@ -527,8 +552,11 @@ func (m *NodeManager) GetCredentialData() []*common.Kv {
 }
 
 type CredentialsByTags struct {
-	TagKey               string   `protobuf:"bytes,20,opt,name=tag_key,json=tagKey,proto3" json:"tag_key,omitempty"`
-	TagValue             string   `protobuf:"bytes,21,opt,name=tag_value,json=tagValue,proto3" json:"tag_value,omitempty"`
+	// Tag key to match on.
+	TagKey string `protobuf:"bytes,20,opt,name=tag_key,json=tagKey,proto3" json:"tag_key,omitempty"`
+	// Tag value to match on.
+	TagValue string `protobuf:"bytes,21,opt,name=tag_value,json=tagValue,proto3" json:"tag_value,omitempty"`
+	// List of credential ids to associate with the key/value pair.
 	CredentialIds        []string `protobuf:"bytes,22,rep,name=credential_ids,json=credentialIds,proto3" json:"credential_ids,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -582,11 +610,13 @@ func (m *CredentialsByTags) GetCredentialIds() []string {
 }
 
 type NodeManagers struct {
-	Managers             []*NodeManager `protobuf:"bytes,1,rep,name=managers,proto3" json:"managers,omitempty"`
-	Total                int32          `protobuf:"varint,20,opt,name=total,proto3" json:"total,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
-	XXX_unrecognized     []byte         `json:"-"`
-	XXX_sizecache        int32          `json:"-"`
+	// List of nodemanagers.
+	Managers []*NodeManager `protobuf:"bytes,1,rep,name=managers,proto3" json:"managers,omitempty"`
+	// Total count of nodemanagers.
+	Total                int32    `protobuf:"varint,20,opt,name=total,proto3" json:"total,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *NodeManagers) Reset()         { *m = NodeManagers{} }
@@ -748,16 +778,68 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type NodeManagerServiceClient interface {
+	//
+	//Create a nodemanager
+	//
+	//Creates a nodemanager given a name, credential id or credential data, and type.
 	Create(ctx context.Context, in *NodeManager, opts ...grpc.CallOption) (*Ids, error)
+	//
+	//Read a nodemanager
+	//
+	//Read the details of a nodemanager given an id.
 	Read(ctx context.Context, in *Id, opts ...grpc.CallOption) (*NodeManager, error)
+	//
+	//Update a nodemanager
+	//
+	//PUT operation to update the details for a nodemanager, such as the name or associated credential id or data.
+	//Please note that this is a PUT operation, so all nodemanager details included in the create function
+	//should be included in the PUT message to update.
 	Update(ctx context.Context, in *NodeManager, opts ...grpc.CallOption) (*empty.Empty, error)
+	//
+	//Delete a nodemanager
+	//
+	//Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes
+	//associated with the manager will be abandoned.
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
+	//
+	//Delete a nodemanager and all of its nodes
+	//
+	//Delete a nodemanager and all associated nodes given a nodemanager id.
 	DeleteWithNodes(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Ids, error)
+	//
+	//Delete a nodemanager and set nodes to have a state of stopped
+	//
+	//Delete a nodemanager and update all associated nodes to have a state of stopped.
 	DeleteWithNodeStateStopped(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
+	//
+	//Delete a nodemanager and set nodes to have a state of terminated
+	//
+	//Delete a nodemanager and update all associated nodes to have a state of terminated.
 	DeleteWithNodeStateTerminated(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
+	//
+	//List of nodemanagers
+	//
+	//Returns a list of nodemanagers matching the query.
+	//Supports filtering, sorting, and pagination.
+	//Valid filtering fields: 'manager_type'
+	//Valid sorting fields: name, type, status, status_message, date_added
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*NodeManagers, error)
+	//
+	//Search node fields
+	//
+	//Searches the available values for a given field and nodemanager id.
+	//Possible fields: regions, tags, name, subscription_id
 	SearchNodeFields(ctx context.Context, in *FieldQuery, opts ...grpc.CallOption) (*Fields, error)
+	//
+	//Search nodes
+	//
+	//Searches the available nodes for a given nodemanager id.
 	SearchNodes(ctx context.Context, in *NodeQuery, opts ...grpc.CallOption) (*Nodes, error)
+	//
+	//Connect
+	//
+	//Attempts to reach the API for the given nodemanager id to check validity of the
+	//credentials associated with the nodemanager.
 	Connect(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ConnectResponse, error)
 }
 
@@ -870,16 +952,68 @@ func (c *nodeManagerServiceClient) Connect(ctx context.Context, in *Id, opts ...
 
 // NodeManagerServiceServer is the server API for NodeManagerService service.
 type NodeManagerServiceServer interface {
+	//
+	//Create a nodemanager
+	//
+	//Creates a nodemanager given a name, credential id or credential data, and type.
 	Create(context.Context, *NodeManager) (*Ids, error)
+	//
+	//Read a nodemanager
+	//
+	//Read the details of a nodemanager given an id.
 	Read(context.Context, *Id) (*NodeManager, error)
+	//
+	//Update a nodemanager
+	//
+	//PUT operation to update the details for a nodemanager, such as the name or associated credential id or data.
+	//Please note that this is a PUT operation, so all nodemanager details included in the create function
+	//should be included in the PUT message to update.
 	Update(context.Context, *NodeManager) (*empty.Empty, error)
+	//
+	//Delete a nodemanager
+	//
+	//Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes
+	//associated with the manager will be abandoned.
 	Delete(context.Context, *Id) (*empty.Empty, error)
+	//
+	//Delete a nodemanager and all of its nodes
+	//
+	//Delete a nodemanager and all associated nodes given a nodemanager id.
 	DeleteWithNodes(context.Context, *Id) (*Ids, error)
+	//
+	//Delete a nodemanager and set nodes to have a state of stopped
+	//
+	//Delete a nodemanager and update all associated nodes to have a state of stopped.
 	DeleteWithNodeStateStopped(context.Context, *Id) (*empty.Empty, error)
+	//
+	//Delete a nodemanager and set nodes to have a state of terminated
+	//
+	//Delete a nodemanager and update all associated nodes to have a state of terminated.
 	DeleteWithNodeStateTerminated(context.Context, *Id) (*empty.Empty, error)
+	//
+	//List of nodemanagers
+	//
+	//Returns a list of nodemanagers matching the query.
+	//Supports filtering, sorting, and pagination.
+	//Valid filtering fields: 'manager_type'
+	//Valid sorting fields: name, type, status, status_message, date_added
 	List(context.Context, *Query) (*NodeManagers, error)
+	//
+	//Search node fields
+	//
+	//Searches the available values for a given field and nodemanager id.
+	//Possible fields: regions, tags, name, subscription_id
 	SearchNodeFields(context.Context, *FieldQuery) (*Fields, error)
+	//
+	//Search nodes
+	//
+	//Searches the available nodes for a given nodemanager id.
 	SearchNodes(context.Context, *NodeQuery) (*Nodes, error)
+	//
+	//Connect
+	//
+	//Attempts to reach the API for the given nodemanager id to check validity of the
+	//credentials associated with the nodemanager.
 	Connect(context.Context, *Id) (*ConnectResponse, error)
 }
 

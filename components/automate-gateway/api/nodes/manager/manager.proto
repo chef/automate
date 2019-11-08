@@ -15,6 +15,11 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 import "components/compliance-service/api/common/common.proto";
 
 service NodeManagerService {
+	/*
+	Create a nodemanager
+
+	Creates a nodemanager given a name, credential id or credential data, and type.
+	*/
 	rpc Create(NodeManager) returns (Ids) {
 		option (google.api.http) = {
 			post: "/nodemanagers"
@@ -29,6 +34,12 @@ service NodeManagerService {
 			action: "infra:nodeManagers:create"
 		};
 	};
+
+	/*
+	Read a nodemanager
+
+	Read the details of a nodemanager given an id.
+	*/
 	rpc Read(Id) returns (NodeManager) {
 		option (google.api.http) = {
 			get: "/nodemanagers/id/{id}"
@@ -42,6 +53,14 @@ service NodeManagerService {
 			action: "infra:nodeManagers:get"
 		};
 	};
+
+	/*
+	Update a nodemanager
+
+	PUT operation to update the details for a nodemanager, such as the name or associated credential id or data.
+	Please note that this is a PUT operation, so all nodemanager details included in the create function
+	should be included in the PUT message to update.	
+	*/	
 	rpc Update(NodeManager) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			put: "/nodemanagers/id/{id}"
@@ -56,6 +75,13 @@ service NodeManagerService {
 			action: "infra:nodeManagers:update"
 		};
 	};
+
+	/*
+	Delete a nodemanager
+
+	Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes
+	associated with the manager will be abandoned.	
+	*/	
 	rpc Delete(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			delete: "/nodemanagers/id/{id}"
@@ -69,6 +95,12 @@ service NodeManagerService {
 			action: "infra:nodeManagers:delete"
 		};
 	};
+
+	/*
+	Delete a nodemanager and all of its nodes
+
+	Delete a nodemanager and all associated nodes given a nodemanager id. 
+	*/	
 	rpc DeleteWithNodes(Id) returns (Ids) {
 		option (google.api.http) = {
 			delete: "/nodemanagers/id/{id}/with-nodes"
@@ -82,6 +114,12 @@ service NodeManagerService {
 			action: "infra:nodeManagers:delete"
 		};
 	};
+
+	/*
+	Delete a nodemanager and set nodes to have a state of stopped
+
+	Delete a nodemanager and update all associated nodes to have a state of stopped. 
+	*/
 	rpc DeleteWithNodeStateStopped(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			delete: "/nodemanagers/id/{id}/with-node-state/stopped"
@@ -95,6 +133,12 @@ service NodeManagerService {
 			action: "infra:nodeManagers:delete"
 		};
 	};
+
+	/*
+	Delete a nodemanager and set nodes to have a state of terminated
+
+	Delete a nodemanager and update all associated nodes to have a state of terminated. 
+	*/
 	rpc DeleteWithNodeStateTerminated(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			delete: "/nodemanagers/id/{id}/with-node-state/terminated"
@@ -108,6 +152,15 @@ service NodeManagerService {
 			action: "infra:nodeManagers:delete"
 		};
 	};
+
+	/*
+	List of nodemanagers
+
+	Returns a list of nodemanagers matching the query.
+	Supports filtering, sorting, and pagination.
+	Valid filtering fields: 'manager_type'
+	Valid sorting fields: name, type, status, status_message, date_added
+	*/
 	rpc List(Query) returns (NodeManagers) {
 		option (google.api.http) = {
 			post: "/nodemanagers/search"
@@ -122,6 +175,13 @@ service NodeManagerService {
 			action: "infra:nodeManagers:list"
 		};
 	};
+
+	/*
+	Search node fields
+
+	Searches the available values for a given field and nodemanager id.
+	Possible fields: regions, tags, name, subscription_id
+	*/
 	rpc SearchNodeFields(FieldQuery) returns (Fields) {
 		option (google.api.http) = {
 			post: "/nodemanagers/id/{node_manager_id}/search-fields"
@@ -136,6 +196,12 @@ service NodeManagerService {
 			action: "infra:nodeManagers:list"
 		};
 	};
+
+	/*
+	Search nodes
+
+	Searches the available nodes for a given nodemanager id.
+	*/
 	rpc SearchNodes(NodeQuery) returns (Nodes) {
 		option (google.api.http) = {
 			post: "/nodemanagers/id/{node_manager_id}/search-nodes"
@@ -150,6 +216,13 @@ service NodeManagerService {
 			action: "infra:nodeManagers:list"
 		};
 	};
+
+	/*
+	Connect
+
+	Attempts to reach the API for the given nodemanager id to check validity of the 
+	credentials associated with the nodemanager.
+	*/
 	rpc Connect(Id) returns (ConnectResponse) {
 		option (google.api.http) = {
 			post: "/nodemanagers/rerun/id/{id}"
@@ -169,62 +242,91 @@ service NodeManagerService {
 message ConnectResponse{}
 
 message Id {
+	// UUID for the nodemanager.
 	string id = 1;
 }
 message Ids {
+	// List of nodemanager UUIDs.
 	repeated Id ids = 1;
 }
 
 message Query {
+	// Filters to be applied to the query.
 	repeated chef.automate.domain.compliance.api.common.Filter filter_map = 25;
-
+	// Sort the results in ascending or descending order.
 	enum OrderType {
 		ASC = 0;
 		DESC = 1;
 	}
 	OrderType order = 21;
+	// Field to sort on.
 	string sort = 22;
+	// Page number of results to return.
 	int32 page = 23;
+	// Count of results that should be returned for each page.
 	int32 per_page = 24;
 }
 
 message Fields {
+	// List of available fields matching the requested criteria.
 	repeated string fields = 1;
 }
 
 message FieldQuery {
-		Query query = 20;
-		string field = 21;
-		string node_manager_id = 22;
+	// Query details (filters) to be applied to the results.
+	Query query = 20;
+	// Field to search on.
+	string field = 21;
+	// Nodemanager id for which the search is being made.
+	string node_manager_id = 22;
 }
 
 message Nodes {
-		repeated string nodes = 1;
-		int32 total = 20;
+	// List of node names matching the request.
+	repeated string nodes = 1;
+	// Total count of node names matching the request.
+	int32 total = 20;
 }
 
 message NodeQuery {
-		Query query = 20;
-		string node_manager_id = 21;
+	// Query details (filters) to be applied to the results.
+	Query query = 20;
+	// Nodemanager id for which the search is being made.
+	string node_manager_id = 21;
 }
 
 message NodeManager {
-		string id = 1;
-		string name = 2;
-		string type = 3;
-		string credential_id = 20; // aws or azure cred id
-		repeated CredentialsByTags instance_credentials = 21; // ssh, winrm creds
-		string status = 22;
-		string account_id = 24;
-		google.protobuf.Timestamp date_added = 25;
-		repeated chef.automate.domain.compliance.api.common.Kv credential_data = 26;
+	// UUID for the nodemanager.
+	string id = 1;
+	// User defined name for the nodemanager.
+	string name = 2;
+	// Type of nodemanager (aws-ec2, azure-vm, aws-api, azure-api, gcp).
+	string type = 3;
+	// UUID of credential containing the information to connect to aws, azure, or gcp.
+	string credential_id = 20;
+	// List of tag and credential uuid associations to make. These are ssh, winrm, and sudo creds used to access instances.
+	repeated CredentialsByTags instance_credentials = 21;
+	// Status of the nodemanager (reachable, unreachable).
+	string status = 22;
+	// Account id associated with the nodemanager.
+	string account_id = 24;
+	// Date the nodemanager was created.
+	google.protobuf.Timestamp date_added = 25;
+	// Credential data for the nodemanager. This field is used when a credential
+	// has not yet been created, to be able to include credential data (such as AWS_ACCESS_KEY) inline.
+	repeated chef.automate.domain.compliance.api.common.Kv credential_data = 26;
 }
 message CredentialsByTags {
+	// Tag key to match on.
 	string tag_key = 20;
+	// Tag value to match on.
 	string tag_value = 21;
+	// List of credential ids to associate with the key/value pair.
 	repeated string credential_ids = 22;
 }
 message NodeManagers {
-		repeated NodeManager managers = 1;
-		int32 total = 20;
+	// List of nodemanagers.
+	repeated NodeManager managers = 1;
+	// Total count of nodemanagers.
+	int32 total = 20;
 }
