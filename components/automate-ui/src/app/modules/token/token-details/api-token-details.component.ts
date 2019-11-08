@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
+import { isEmpty, identity, xor, isNil } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
-import { isEmpty, identity, xor } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -83,8 +83,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       this.store.select(getStatus),
       this.store.select(apiTokenFromRoute)
     ]).pipe(
-      filter(([gStatus, _]) => gStatus === EntityStatus.loadingSuccess),
-      filter(identity),
+      filter(([status, token]) => status === EntityStatus.loadingSuccess && !isNil(token)),
       takeUntil(this.isDestroyed))
       .subscribe(([_, token]) => {
         this.token = { ...token };

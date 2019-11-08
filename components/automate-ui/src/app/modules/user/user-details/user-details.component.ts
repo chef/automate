@@ -61,8 +61,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.store.select(userStatus),
       this.store.select(userFromRoute)
     ]).pipe(
-      filter(([status, _]) => status === EntityStatus.loadingSuccess),
-      filter(([_, user]) => !isNil(user)),
+      filter(([status, user]) => status === EntityStatus.loadingSuccess && !isNil(user)),
       takeUntil(this.isDestroyed))
       .subscribe(([_, user]) => {
         this.user = { ...user };
