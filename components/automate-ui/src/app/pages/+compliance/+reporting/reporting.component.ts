@@ -235,7 +235,6 @@ export class ReportingComponent implements OnInit, OnDestroy {
             filter.value.text = name;
           }
         }
-
         return filter;
       })));
   }
