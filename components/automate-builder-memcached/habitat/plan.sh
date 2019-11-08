@@ -5,13 +5,15 @@ pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_license=('Apache-2.0')
 pkg_deps=(
     core/bash
-    core/memcached
-    core/netcat-openbsd
+    ssd/memcached
+    core/socat
 )
 pkg_exports=(
   [port]=service.port
 )
 pkg_exposes=(port)
+
+pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 
 do_unpack() {
     return 0

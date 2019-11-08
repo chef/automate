@@ -1,10 +1,15 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
 set -uo pipefail
+
 exec 2>&1
 
 rc=0
-response=$(echo "version" | nc 127.0.0.1 {{cfg.service.port}})
+tls_opts="cert={{pkg.svc_config_path}}/service.crt"
+tls_opts="${tls_opts},key={{pkg.svc_config_path}}/service.key"
+tls_opts="${tls_opts},cafile={{pkg.svc_config_path}}/root_ca.crt"
+tls_opts="${tls_opts},commonname=automate-builder-memcached"
+response=$(echo "version" | socat "OPENSSL:127.0.0.1:{{cfg.service.port}},$tls_opts" STDIO)
 case $? in
     0)
         case "$response" in
