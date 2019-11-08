@@ -189,7 +189,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     return this.route.queryParamMap.pipe(map((params: ParamMap) => {
       return params.keys.reduce((list, key) => {
         const paramValues = params.getAll(key);
-        return list.concat(paramValues.map(value => ({ type: key, text: value })));
+        return list.concat(paramValues.map(value => ({type: key, text: value})));
       }, []);
     }));
   }
@@ -228,9 +228,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
     this.filters$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
       reportQuery.filters.filter((filter) => filter.value.text !== undefined).map(filter => {
-
         filter.value.id = filter.value.text;
-
         if (['profile_id', 'node_id', 'control_id'].indexOf(filter.type.name) >= 0) {
           const name = this.reportQuery.getFilterTitle(filter.type.name, filter.value.id);
           if (name !== undefined) {

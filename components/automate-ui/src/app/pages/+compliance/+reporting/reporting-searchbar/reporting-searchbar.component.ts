@@ -472,7 +472,7 @@ export class ReportingSearchbarComponent implements OnInit {
     return type.search('control_tag:') === 0 ? 'control_tag_value' : type;
   }
 
-  public displayText(text: string) {
+  public displayText(text: string): string {
     return text === '' ? 'no value' : text;
   }
 
