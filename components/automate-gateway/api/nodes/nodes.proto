@@ -18,9 +18,9 @@ service NodesService {
 	/*
 	Create a node
 
-	Creates a node given a FQDN or IP address, user-specified name, and an ssh or winrm credential reference.
-	Nodes created via this endpoint will be added to the "Automate" node manager.
-	These nodes are usually created for the purposes of running scan jobs.
+	Creates a node and adds it to the "Automate" node manager.
+	Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
+	Useful for creating nodes for the purpose of running compliance scan jobs.
 	*/
 	rpc Create(Node) returns (Id) {
 		option (google.api.http) = {
@@ -59,7 +59,7 @@ service NodesService {
 	/*
 	Update a node
 
-	PUT operation to update the details for a node, such as the name, fqdn, tags, or associated credentials.
+	Updates node information, such as the name, FQDN, tags, or associated credentials.
 	Please note that this is a PUT operation, so all node details included in the create function
 	should be included in the PUT message to update.
 	*/
@@ -81,7 +81,7 @@ service NodesService {
 	/*
 	Delete a node
 
-	Deletes a node given the node id.
+	Deletes the node with the node id.
 	*/
 	rpc Delete(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
@@ -100,7 +100,7 @@ service NodesService {
 	/*
 	Bulk delete by id
 
-	Deletes a set of nodes given a list of ids.
+	Deletes a set of nodes that match a list of ids.
 	*/
 	rpc BulkDeleteById(Ids) returns (BulkDeleteResponse) {
 		option (google.api.http) = {
@@ -167,8 +167,11 @@ service NodesService {
 	/*
 	Bulk delete
 
-	Deletes a set of nodes given a filter query to match. 
-	Query is the same one that is accepted by the list endpoint.
+	Deletes a set of nodes that match a filter. 
+		account_id, last_contact, manager_id, manager_type, name, platform_name,
+	platform_release, region, source_id, state, statechange_timerange, status,
+	last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
+	last_run_penultimate_status, last_scan_penultimate_status
 	*/
 	rpc BulkDelete(Query) returns (BulkDeleteResponse) {
 		option (google.api.http) = {
@@ -188,7 +191,7 @@ service NodesService {
 	/*
 	Bulk create nodes
 
-	Creates multiple nodes given node data.
+	Creates multiple nodes from a list of node data.
 	*/
 	rpc BulkCreate(Nodes) returns (Ids) {
 		option (google.api.http) = {
@@ -208,7 +211,7 @@ service NodesService {
 }
 
 message Id {
-	// UUID for the node.
+	// Unique node id (UUID)
 	string id = 1;
 }
 
@@ -226,9 +229,9 @@ message Query {
 		ASC = 0;
 		DESC = 1;
 	}
-	// Order in which the results should be returned.
+	// Return the results in ascending or descending order.
 	OrderType order = 21;
-	// Field on which to sort.
+	// Sort the results on a specific field.
 	string sort = 22;
 	// Page number of results to return.
 	int32 page = 23;
