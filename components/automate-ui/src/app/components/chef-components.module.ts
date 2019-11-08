@@ -1,4 +1,5 @@
 // Modules
+import { ChefPipesModule } from '../pipes/chef-pipes.module';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
@@ -7,7 +8,6 @@ import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 // Components
-import { SettingsSidebarComponent } from './settings-sidebar/settings-sidebar.component';
 import { AuthorizedComponent } from './authorized/authorized.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
@@ -33,20 +33,26 @@ import { InputDirective } from './input/input.directive';
 import { LandingComponent } from './landing/landing.component';
 import { PagePickerComponent } from './page-picker/page-picker.component';
 import { ProjectsDropdownComponent } from './projects-dropdown/projects-dropdown.component';
+import { SettingsSidebarComponent } from './settings-sidebar/settings-sidebar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
 import { SidebarNoShadeComponent } from './sidebar-no-shade/sidebar-no-shade.component';
 import { SidebarEntryComponent } from './sidebar-entry/sidebar-entry.component';
 import { TabComponent } from './tab/tab.component';
 import { TabsComponent } from './tabs/tabs.component';
-import { ChefPipesModule } from '../pipes/chef-pipes.module';
+import { TableBodyComponent } from './table/table-body/table-body.component';
+import { TableComponent } from './table/table.component';
+import { TableCellComponent } from './table/table-cell/table-cell.component';
+import { TableRowComponent } from './table/table-row/table-row.component';
+import { TableHeaderCellComponent } from './table/table-header-cell/table-header-cell.component';
+import { TableHeaderComponent } from './table/table-header/table-header.component';
 
 @NgModule({
   imports: [
+    ChefPipesModule,
     CommonModule,
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
-    ChefPipesModule,
 
     // Angular Material
     MatDialogModule,
@@ -58,7 +64,6 @@ import { ChefPipesModule } from '../pipes/chef-pipes.module';
     MatSnackBarModule,
 
     // Components
-    SettingsSidebarComponent,
     AuthorizedComponent,
     BreadcrumbsComponent,
     BreadcrumbComponent,
@@ -73,11 +78,18 @@ import { ChefPipesModule } from '../pipes/chef-pipes.module';
     LandingComponent,
     PagePickerComponent,
     ProjectsDropdownComponent,
+    SettingsSidebarComponent,
     SidebarComponent,
     SidebarNoShadeComponent,
     SidebarEntryComponent,
     TabComponent,
     TabsComponent,
+    TableBodyComponent,
+    TableComponent,
+    TableCellComponent,
+    TableRowComponent,
+    TableHeaderCellComponent,
+    TableHeaderComponent,
 
     // Directives
     ErrorDirective,
@@ -85,7 +97,6 @@ import { ChefPipesModule } from '../pipes/chef-pipes.module';
     InputDirective
   ],
   declarations: [
-    SettingsSidebarComponent,
     AuthorizedComponent,
     BreadcrumbsComponent,
     BreadcrumbComponent,
@@ -103,11 +114,18 @@ import { ChefPipesModule } from '../pipes/chef-pipes.module';
     LandingComponent,
     PagePickerComponent,
     ProjectsDropdownComponent,
+    SettingsSidebarComponent,
     SidebarComponent,
     SidebarNoShadeComponent,
     SidebarEntryComponent,
     TabComponent,
-    TabsComponent
+    TabsComponent,
+    TableBodyComponent,
+    TableComponent,
+    TableCellComponent,
+    TableRowComponent,
+    TableHeaderCellComponent,
+    TableHeaderComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

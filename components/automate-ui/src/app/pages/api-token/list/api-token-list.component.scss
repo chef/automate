@@ -1,9 +1,11 @@
 @import "~styles/variables";
 
-chef-table {
-  .controls {
-    justify-content: flex-end;
-  }
+.controls {
+  text-align: right;
+}
+
+#create-button {
+  margin: 0;
 }
 
 .empty-state {
