@@ -181,15 +181,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     return this.route.queryParamMap.pipe(map((params: ParamMap) => {
       return params.keys.reduce((list, key) => {
         const paramValues = params.getAll(key);
-
-        // Necessary check to remove text from api call for no values
-        const mappedParam = paramValues.map(value => {
-          console.log(value)
-          const _value = value === 'no value' ? 'no value' : value;
-          return { type: key, text: _value };
-        });
-
-        return list.concat(mappedParam);
+        return list.concat(paramValues.map(value => ({ type: key, text: value })));
       }, []);
     }));
   }
@@ -228,15 +220,15 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
     this.filters$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>
       reportQuery.filters.filter((filter) => filter.value.text !== undefined).map(filter => {
-        filter.value.id = filter.value.text;
-        if (['profile_id', 'node_id', 'control_id'].indexOf(filter.type.name) >= 0) {
 
+        filter.value.id = filter.value.text;
+
+        if (['profile_id', 'node_id', 'control_id'].indexOf(filter.type.name) >= 0) {
           const name = this.reportQuery.getFilterTitle(filter.type.name, filter.value.id);
           if (name !== undefined) {
             filter.value.text = name;
           }
         }
-        console.log(filter)
         return filter;
       })));
   }
@@ -321,6 +313,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
 
   onFilterAdded(event) {
     const {type, value} = event.detail;
+    console.log(event.detail);
 
     let filterValue = value.text;
     let typeName = type.name;
@@ -345,10 +338,15 @@ export class ReportingComponent implements OnInit, OnDestroy {
       if ( value.id ) {
         typeName = 'control_id';
         filterValue = value.id;
-        // console.log(filterValue);
         this.reportQuery.setFilterTitle(typeName, value.id, value.title);
       } else {
         typeName = 'control_name';
+      }
+    } else if (type.name.split(':')[0] === 'control_tag') {
+      if (value.title === 'no value') {
+        typeName = type.name;
+        filterValue = value.id;
+        this.reportQuery.setFilterTitle(typeName, value.id, value.title);
       }
     }
 
@@ -429,7 +427,12 @@ export class ReportingComponent implements OnInit, OnDestroy {
         data.map(item => Object.assign(item, { title: item.text }));
 
         if (type === 'control_tag_value') {
-          data.unshift({id: '', score: 1, text: '', title: 'no value', version: ''});
+          data.unshift({
+            id: '',
+            score: 1,
+            text: 'no value',
+            title: 'no value',
+            version: ''});
         }
 
         return data;
