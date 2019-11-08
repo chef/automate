@@ -46,6 +46,8 @@ import { TableCellComponent } from './table/table-cell/table-cell.component';
 import { TableRowComponent } from './table/table-row/table-row.component';
 import { TableHeaderCellComponent } from './table/table-header-cell/table-header-cell.component';
 import { TableHeaderComponent } from './table/table-header/table-header.component';
+import { ChefOptionComponent } from './chef-option/chef-option.component';
+import { ChefDropdownComponent } from './chef-dropdown/chef-dropdown.component';
 
 @NgModule({
   imports: [
@@ -70,6 +72,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbComponent,
     CalendarComponent,
     ChefControlMenuComponent,
+    ChefOptionComponent,
     CreateObjectModalComponent,
     DeleteObjectModalComponent,
     FormFieldComponent,
@@ -96,7 +99,8 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     // Directives
     ErrorDirective,
     FormControlDirective,
-    InputDirective
+    InputDirective,
+    ChefDropdownComponent
   ],
   declarations: [
     AuthorizedComponent,
@@ -123,6 +127,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     TabComponent,
     TabsComponent,
 <<<<<<< HEAD
+<<<<<<< HEAD
     TableBodyComponent,
     TableComponent,
     TableCellComponent,
@@ -132,6 +137,11 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
 =======
     ChefControlMenuComponent
 >>>>>>> Generated new chef-control-menu component and dropped it into the chefComponentsModule, scss now connected.  Logic not yet built
+=======
+    ChefControlMenuComponent,
+    ChefOptionComponent,
+    ChefDropdownComponent
+>>>>>>> WIP - added chef option and dropdown angular components
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
