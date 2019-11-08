@@ -101,8 +101,6 @@ export class StatsService {
 
     const formatted = this.formatFilters(reportQuery);
     let body = { filters: formatted };
-    console.log('stats service')
-    console.log(body);
 
     const {page, perPage} = listParams;
     if (page && perPage) {

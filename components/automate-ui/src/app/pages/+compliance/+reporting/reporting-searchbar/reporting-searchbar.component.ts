@@ -472,6 +472,10 @@ export class ReportingSearchbarComponent implements OnInit {
     return type.search('control_tag:') === 0 ? 'control_tag_value' : type;
   }
 
+  public displayText(text: string) {
+    return text === '' ? 'no value' : text;
+  }
+
   // When value is clicked for the control tag key
   onControlTagKeyValueClick(value: any) {
     const reportQuery = this.reportQuery.getReportQuery();
