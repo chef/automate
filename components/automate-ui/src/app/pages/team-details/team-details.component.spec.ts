@@ -4,8 +4,9 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { routerReducer } from '@ngrx/router-store';
 import { MockComponent } from 'ng2-mock-component';
-import { StoreModule, Store } from '@ngrx/store';
+import { StoreModule, Store, Action } from '@ngrx/store';
 
+import * as routerStore from '@ngrx/router-store';
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import {
   projectsFilterReducer,
@@ -31,7 +32,8 @@ import {
 import {
   GetTeamSuccess,
   GetTeamUsersSuccess,
-  GetTeamUsers
+  GetTeamUsers,
+  GetTeam
 } from 'app/entities/teams/team.actions';
 import { Team } from 'app/entities/teams/team.model';
 import { TeamDetailsComponent } from './team-details.component';
@@ -266,4 +268,42 @@ describe('TeamDetailsComponent v1', () => {
     expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
     expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
   });
+
+  it('GetTeam is not requested when switching to the users page', () => {
+    spyOn(store, 'dispatch').and.callThrough();
+    component.isIAMv2$.subscribe(isV2 => expect(isV2).toBeFalsy());
+    // This simulates updating the URL.
+    store.dispatch(new GetRoute({
+        'routerState': {
+          'url': '/settings/users/admin', // <- update of the url to switch to the user's page for admin
+          'params': {
+            'id': 'admin'
+          },
+          'queryParams': {},
+          'fragment': null,
+          'path': ['/', 'settings', 'users', 'admin']
+        }, 'event': {
+          'id': 2,
+          'url': '/settings/users/admin',
+          'urlAfterRedirects': '/settings/users/admin',
+          'state': {
+            'url': '/settings/users/admin',
+            'params': {
+              'id': 'admin'
+            },
+            'queryParams': {},
+            'fragment': null,
+            'path': ['/', 'settings', 'users', 'admin']}
+        }
+      }));
+
+    // GetTeam should not be called because we are not on the teams page any more.
+    expect(store.dispatch).not.toHaveBeenCalledWith(new GetTeam({id: 'admin'}));
+  });
 });
+
+export class GetRoute implements Action {
+  readonly type = routerStore.ROUTER_NAVIGATION;
+
+  constructor(public payload: any) { }
+}

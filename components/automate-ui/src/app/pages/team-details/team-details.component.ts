@@ -8,7 +8,7 @@ import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams, routeURL } from 'app/route.selectors';
+import { routeURL, routeState } from 'app/route.selectors';
 import { EntityStatus, loading } from 'app/entities/entities';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
@@ -199,12 +199,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     // TODO: This also fires when teamFromRoute fires; should inhibit that since
     // we already have the team details, as noted above.
     // Triggered every time the route changes (including on initial load).
-    combineLatest([
-      this.store.select(routeParams),
-      this.store.select(routeURL)
-    ]).pipe(
+    this.store.select(routeState).pipe(
       takeUntil(this.isDestroyed),
-      map(([params, url]) => [params.id as string, url]),
+      map(state => [state.params.id as string, state.url]),
       // Only fetch if we are on the team details route, otherwise
       // we'll trigger GetTeam with the wrong input on any route
       // away to a page that also uses the :id param.

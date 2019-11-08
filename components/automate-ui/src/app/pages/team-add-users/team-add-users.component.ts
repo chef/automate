@@ -9,7 +9,7 @@ import { filter as lodashFilter } from 'lodash/fp';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams, routeURL } from 'app/route.selectors';
+import { routeState } from 'app/route.selectors';
 import { EntityStatus, allLoadedSuccessfully } from 'app/entities/entities';
 import { User, HashMapOfUsers, userArrayToHash } from 'app/entities/users/user.model';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
@@ -76,12 +76,9 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
         this.store.dispatch(new GetTeamUsers({ id: teamId}));
       });
 
-    combineLatest([
-      this.store.select(routeParams),
-      this.store.select(routeURL)
-    ]).pipe(
+    this.store.select(routeState).pipe(
       takeUntil(this.isDestroyed),
-      map(([params, url]) => [params.id as string, url]),
+      map(state => [state.params.id as string, state.url]),
       // Only fetch if we are on the team details route, otherwise
       // we'll trigger GetTeam with the wrong input on any route
       // away to a page that also uses the :id param.

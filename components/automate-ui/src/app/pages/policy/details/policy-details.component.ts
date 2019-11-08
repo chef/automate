@@ -2,12 +2,11 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { identity } from 'lodash/fp';
-import { Observable, Subject, combineLatest } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams } from 'app/route.selectors';
-import { routeURL } from 'app/route.selectors';
+import { routeURL, routeState } from 'app/route.selectors';
 import { GetPolicy } from 'app/entities/policies/policy.actions';
 import { policyFromRoute } from 'app/entities/policies/policy.selectors';
 import {
@@ -74,12 +73,9 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
       }));
     this.members$.subscribe();
 
-    combineLatest([
-      this.store.select(routeParams),
-      this.store.select(routeURL)
-    ]).pipe(
+    this.store.select(routeState).pipe(
       takeUntil(this.isDestroyed),
-      map(([params, url]) => [params.id as string, url]),
+      map(state => [state.params.id as string, state.url]),
       // Only fetch if we are on the policy details route, otherwise
       // we'll trigger GetPolicy with the wrong input on any route
       // away to a page that also uses the :id param.
