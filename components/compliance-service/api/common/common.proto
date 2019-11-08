@@ -4,12 +4,17 @@ package chef.automate.domain.compliance.api.common;
 option go_package = "github.com/chef/automate/components/compliance-service/api/common";
 
 message Filter {
+	// Field to filter on.
 	string key = 20;
+	// Boolean to denote whether we should find nodes that match the filter or do not match the filter.
 	bool exclude = 22;
+	// Values to filter on for the key.
 	repeated string values = 23;
 }
 
 message Kv {
+	// Tag key.
 	string key = 1;
+	// Tag value.
 	string value = 2;
 }

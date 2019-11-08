@@ -13,7 +13,7 @@ message Node {
   string name                                 = 2;
   // The FQDN of the node.
   string fqdn                                 = 3;
-  // The time on the latest received infra node report. <-- ??
+  // The time on the latest received infra node report. 
   google.protobuf.Timestamp checkin           = 4;
   // Count in seconds that the node has been active.
   int32  uptime_seconds                       = 5;
@@ -123,8 +123,6 @@ message Run {
   repeated Deprecation      deprecations           = 19;
   // Chef Error information, available on failed runs.
   ChefError                 error                  = 20;
-  // ?? should we delete this tags?  is it just extra?
-  repeated string           tags                   = 21;
   // List of resource names for the node.
   repeated string           resource_names         = 22;
   // List of recipes the node calls.

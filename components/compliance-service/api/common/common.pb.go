@@ -21,8 +21,11 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type Filter struct {
-	Key                  string   `protobuf:"bytes,20,opt,name=key,proto3" json:"key,omitempty"`
-	Exclude              bool     `protobuf:"varint,22,opt,name=exclude,proto3" json:"exclude,omitempty"`
+	// Field to filter on.
+	Key string `protobuf:"bytes,20,opt,name=key,proto3" json:"key,omitempty"`
+	// Boolean to denote whether we should find nodes that match the filter or do not match the filter.
+	Exclude bool `protobuf:"varint,22,opt,name=exclude,proto3" json:"exclude,omitempty"`
+	// Values to filter on for the key.
 	Values               []string `protobuf:"bytes,23,rep,name=values,proto3" json:"values,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -76,7 +79,9 @@ func (m *Filter) GetValues() []string {
 }
 
 type Kv struct {
-	Key                  string   `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// Tag key.
+	Key string `protobuf:"bytes,1,opt,name=key,proto3" json:"key,omitempty"`
+	// Tag value.
 	Value                string   `protobuf:"bytes,2,opt,name=value,proto3" json:"value,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

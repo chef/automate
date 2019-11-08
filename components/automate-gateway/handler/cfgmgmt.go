@@ -283,7 +283,6 @@ func toResponseRun(run *cmsRes.Run) *cfgRes.Run {
 		SourceFqdn:           run.SourceFqdn,
 		Ipaddress:            run.Ipaddress,
 		RunList:              run.RunList,
-		Tags:                 run.Tags,
 		ResourceNames:        run.ResourceNames,
 		Recipes:              run.Recipes,
 		ChefTags:             run.ChefTags,

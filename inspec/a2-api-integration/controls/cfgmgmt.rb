@@ -434,8 +434,6 @@ control 'config-mgmt-ccr-2' do
         expect(run[:error][:backtrace]).to eq []
         expect(run[:error][:description]).to be nil
 
-        expect(run[:tags]).to eq []
-
         expected_resource_names = ['chef-sugar', 'chef-sugar', '/usr/local/bin', '/usr/local/bin/git', 'openjdk-r', 'update', 'wget', '/etc/profile.d/rbenv.sh', '/opt/rbenv', '/opt/rubies', '/home/jenkins/.bashrc.d/chruby-default.sh', 'omnibus-toolchain',
           '/export/home', 'create jenkins group', 'chsec_login_shell', 'jenkins', 'jenkins', '/home/jenkins', '/var/chef/cache', '/usr/local/bin', '/var/cache/omnibus', 'install_packages', '/home/jenkins/.gitconfig',
           '/opt/omnibus-toolchain/bin/git config --global http.sslCAinfo /opt/omnibus-toolchain/embedded/ssl/certs/cacert.pem', 'disable strict host key checking for github.com', 'make sudo honor ssh_auth_sock',
