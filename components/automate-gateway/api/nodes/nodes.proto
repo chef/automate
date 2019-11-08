@@ -233,77 +233,77 @@ message Query {
 	OrderType order = 21;
 	// Sort the results on a specific field.
 	string sort = 22;
-	// Page number of results to return.
+	// The number of result pages to return.
 	int32 page = 23;
-	// Count of results that should be returned for each page.
+	// The number of results on each page.
 	int32 per_page = 24;
 }
 
 // Details for ssh/winrm access of the node.
 message TargetConfig {
-	// List of credential ids to associate with the node.
+	// List of credential ids for a node.
 	repeated string secrets = 20;
-	// Details for the node backend (ssh, winrm, aws, ssm, azure, gcp).
+	// Node backend type (ssh, winrm, aws, ssm, azure, gcp).
 	string backend = 22;
-	// FQDN or IP address for the node.
+	// Node FQDN or IP address.
 	string host = 23;
-	// Port used to connect to the node via ssh/winrm.
+	// ssh or winrm connection port
 	int32 port = 24;
-	// Boolean to denote whether or not sudo should be used when accessing the node.
+	// Uses `sudo` (boolean).
 	bool sudo = 26;
-	// Boolean to denote whether or not ssl should be checked when accessing the node.
+	// Check ssl (boolean).
 	bool ssl = 27;
-	// Boolean to denote whether or not self signed certificate should be allowed when accessing the node.
+	// Allow self-signed certificate (boolean).
 	bool self_signed = 28;
-	// Username used to access the node (taken from credential id associated with node).
+	// Username from the credential id for this node.
 	string user = 29;
 	// Sudo options to use when accessing the node.
 	string sudo_options = 33;
-	// List of hostnames (fqdn or ip address) for nodes to be created with bulk create.
+	// List of hostnames (FQDN or IP address) for bulk creating nodes.
 	repeated string hosts = 40;
 }
 
 // Node information.
 message Node {
-	// UUID for the node.
+	// Unique node ID (UUID).
 	string id = 1;
-	// User-specified name for the node.
+	// User-specified node name.
 	string name = 2;
-	// Platform for the node.
+	// Node platform.
 	string platform = 3;
-	// Platform version for the node.
+	// Node platform version.
 	string platform_version = 4;
-	// Manager associated with the node (automate, aws-ec2, aws-api, azure-vm, azure-api, gcp).
+	// Node manager (automate, aws-ec2, aws-api, azure-vm, azure-api, gcp).
 	string manager = 5;
-	// Tags to be applied to the node.
+	// Node tags.
 	repeated chef.automate.domain.compliance.api.common.Kv tags = 20;
 	// End time from the most recent `detect` or `exec` job.
 	google.protobuf.Timestamp last_contact = 21;
-	// Status of the node (unreachable, reachable, unknown).
+	// Node status (unreachable, reachable, unknown).
 	string status = 22;
-	// Details from the most recent scan job that executed for the node.
+	// Results of the last compliance scan job for this node.
 	ResultsRow last_job = 23;
-	// Details for ssh/winrm access of the node.
+	// Node configuration for ssh or winrm.
 	TargetConfig target_config = 99;
-	// List of manager ids associated with the node.
+	// List of manager ids for the node.
 	repeated string manager_ids = 24;
-	// Most recent connection error received from attempting to contact the node.
+	// Last connection error received when trying to contact the node.
 	string connection_error = 25;
-	// Last known state of the node (running, stopped, terminated).
+	// Last known node state (running, stopped, terminated).
 	string state = 26;
-	// Name prefix to attach to the node. The full node name is constructed based off the prefix and the host.
+	// Prefix for node name. The full node name is the prefix + the host.
 	string name_prefix = 27;
 	// List of projects associated with the node. Projects are a concept introduced in IAMv2.
 	repeated string projects = 28;
-	// Most recent run data for the node, taken from the most recent infra run for the node. 
+	// Most recent node data from the last Chef Infra run results. 
 	LastContactData run_data = 29;
-	// Most recent scan data for the node, taken from the most recent InSpec scan executed on the node. 
+	// Most recent compliance scan data for the node from the last InSpec scan. 
 	LastContactData scan_data = 30;
 }
 
 // Most recent run or scan data for the node, taken from the most recent Infra run or InSpec scan executed on the node. 
 message LastContactData {
-	// Infra run report id or InSpec scan report id.
+	// Chef Infra run report id or InSpec scan report id.
 	string id = 1;
 	enum Status {
 		UNKNOWN = 0;
@@ -311,24 +311,24 @@ message LastContactData {
 		FAILED = 2;
 		SKIPPED = 3;
 	}
-	// Status on the last report for the node.
+	// Last node report status.
 	Status status = 2;
-	// Status on the next-to-last report for the node.
+	// Next-to-last node status report.
 	Status penultimate_status = 3;
-	// Endtime on the most recent report for the node.
+	// Last node report endtime.
 	google.protobuf.Timestamp end_time = 4;
 }
 
 message Nodes {
 	// List of node objects.
 	repeated Node nodes = 1;
-	// Total count of nodes in the system.
+	// Total number of nodes in the system.
 	int32 total = 20;
-	// Total count of unreachable nodes in the system.
+	// Total number of unreachable nodes in the system.
 	int32 total_unreachable = 21;
-	// Total count of reachable nodes in the system.
+	// Total number of reachable nodes in the system.
 	int32 total_reachable = 22;
-	// Total count of unknown nodes in the system.
+	// Total number of unknown nodes in the system.
 	int32 total_unknown = 23;
 }
 
@@ -351,6 +351,6 @@ message ResultsRow {
 }
 
 message BulkDeleteResponse {
-	// List of names of nodes created.
+	// List of deleted nodes, by name.
 	repeated string names = 1;
 }
