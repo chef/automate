@@ -62,7 +62,7 @@ describe('ReportingSearchbarComponent', () => {
     ], function(input: string, output: string) {
       it(`returns string reading '${output}' when passed ${input}`, () => {
         expect(component.displayText(input)).toEqual(output);
-      })
-    })
+      });
+    });
   });
 });
