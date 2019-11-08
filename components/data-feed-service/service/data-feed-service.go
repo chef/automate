@@ -244,6 +244,11 @@ func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []st
 		return nodeData, err
 	}
 
+	if len(nodes.Values) == 0 {
+		log.Debug("no client run data exists for this node")
+		nodeData["node_data"] = DataFeedMessage{}
+		return nodeData, nil
+	}
 	nodeStruct := nodes.Values[0].GetStructValue()
 	id := nodeStruct.Fields["id"].GetStringValue()
 	lastRunId := nodeStruct.Fields["latest_run_id"].GetStringValue()
