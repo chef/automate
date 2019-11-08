@@ -131,7 +131,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.store.select(v1TeamFromRoute),
       this.store.select(v2TeamFromRoute)
     ]).pipe(
-      takeUntil(this.isDestroyed),
       filter(([isV2, _v1TeamFromRoute, _v2TeamFromRoute]) => isV2 !== null),
       map(([isV2, v1Team, v2Team]) => {
         if (isV2) {

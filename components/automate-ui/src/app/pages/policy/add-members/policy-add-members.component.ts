@@ -11,7 +11,7 @@ import { combineLatest, Subject, Observable } from 'rxjs';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus, allLoadedSuccessfully } from 'app/entities/entities';
 import {
   GetPolicy, AddPolicyMembers, PolicyMembersMgmtPayload
 } from 'app/entities/policies/policy.actions';
@@ -117,9 +117,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         this.store.select(userStatus),
         this.store.select(getPolicyStatus)
       ]).pipe(
-        takeUntil(this.isDestroyed),
-        map((statuses: EntityStatus[]) => !statuses.every(status =>
-          status === EntityStatus.loadingSuccess)));
+        map((statuses: EntityStatus[]) => !allLoadedSuccessfully(statuses)));
 
     combineLatest([
         this.store.select(allTeams),

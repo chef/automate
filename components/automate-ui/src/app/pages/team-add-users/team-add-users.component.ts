@@ -10,7 +10,7 @@ import { filter as lodashFilter } from 'lodash/fp';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus, allLoadedSuccessfully } from 'app/entities/entities';
 import { User, HashMapOfUsers, userArrayToHash } from 'app/entities/users/user.model';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
@@ -66,22 +66,11 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
     ]).pipe(
         takeUntil(this.isDestroyed),
         filter(([isV2, _v2TeamFromRoute, _v1TeamFromRoute]) => isV2 !== null),
-        map(([isV2, v2Team, v1Team]) => {
-          let team: Team;
-          let teamId: string;
-          if (isV2) {
-            team = v2Team;
-            teamId = v2Team.id;
-          } else {
-            team = v1Team;
-            teamId = v2Team.guid;
-          }
-          return [team, teamId];
-        }),
+        map(([isV2, v2Team, v1Team]) => isV2 ? [v2Team, v2Team.id] : [v1Team, v1Team.guid]),
         distinctUntilChanged(
           ([_teamA, teamIdA]: [Team, string], [_teamB, teamIdB]: [Team, string]) =>
           teamIdA === teamIdB)
-      ).subscribe(([team, teamId]: [Team, string]) => {
+      ).subscribe(([team, teamId]) => {
         this.team = team;
         this.teamId = teamId;
         this.store.dispatch(new GetTeamUsers({ id: teamId}));
@@ -104,9 +93,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
     this.loading$ = combineLatest([
       this.store.select(userStatus),
       this.store.select(getTeamUsersStatus)]).pipe(
-        takeUntil(this.isDestroyed),
-        map((statuses: EntityStatus[]) => !statuses.every(status =>
-          status === EntityStatus.loadingSuccess)));
+        map((statuses: EntityStatus[]) => !allLoadedSuccessfully(statuses)));
 
     // select all local users, the users for this team, and the query status for both.
     // when both queries are finished we'll find all users that are not yet a member of the team.
