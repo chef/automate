@@ -14,10 +14,10 @@
         <chef-form-field id="create-name">
           <label>
             <span class="label">Rule Name <span aria-hidden="true">*</span></span>
-            <chef-input ngDefaultControl formControlName="name" (keyup)="handleNameInput($event)"></chef-input>
+            <input chefInput formControlName="name" (keyup)="handleNameInput($event)"/>
           </label>
           <chef-error
-            *ngIf="(ruleForm.get('name').hasError('required') || ruleForm.get('name').hasError('pattern')) && ruleForm.get('name').dirty"
+            *ngIf="( ruleForm.get('name').hasError('required') && ruleForm.get('name').touched ) || ( ruleForm.get('name').hasError('pattern') && ruleForm.get('name').dirty )"
           >Rule Name is required.</chef-error>
         </chef-form-field>
 
@@ -25,7 +25,7 @@
           <chef-form-field id="create-id">
             <label>
               <span class="label">Rule ID <span aria-hidden="true">*</span> </span>
-              <chef-input ngDefaultControl formControlName="id" (keyup)="handleIDInput($event)"></chef-input>
+              <input chefInput formControlName="id" (keyup)="handleIDInput($event)" />
             </label>
             <chef-error *ngIf="ruleForm.get('id').hasError('maxlength') && ruleForm.get('id').dirty">
               Rule ID must be 64 characters or less.
@@ -53,7 +53,7 @@
           <label>
             <span class="label">Resource Type <span aria-hidden="true">*</span></span>
             <span class="custom-dropdown">
-              <select id="create-type-dropdown" ngDefaultControl formControlName="type">
+              <select id="create-type-dropdown" formControlName="type">
                 <option value='NODE'>Node</option>
                 <option value='EVENT'>Event</option>
               </select>
@@ -80,7 +80,7 @@
                 <label>
                   <span class="label">{{ getAttributeLabel() }}</span>
                   <span class="custom-dropdown">
-                    <select ngDefaultControl formControlName="attribute" data-cy="attribute-dropdown">
+                    <select formControlName="attribute" data-cy="attribute-dropdown">
                       <option
                         *ngFor="let option of attributeList"
                         [value]="option.key"
@@ -97,7 +97,7 @@
                 <label>
                   <span class="label">Operator</span>
                   <span class="custom-dropdown">
-                    <select class="operator-dropdown" ngDefaultControl formControlName="operator" data-cy="operator-dropdown">
+                    <select class="operator-dropdown" formControlName="operator" data-cy="operator-dropdown">
                       <option *ngFor="let operator of operators"
                         [value]="operator.key"
                       >{{ operator.value }}</option>
@@ -112,15 +112,16 @@
               <chef-form-field class="attribute-field">
                 <label>
                   <span class="label">Value</span>
-                  <chef-input ngDefaultControl
-                    formControlName="values"
-                    [value]="condition.controls.values.value"
-                    data-cy="rule-value"
-                  ></chef-input>
+                  <input chefInput formControlName="values" 
+                        [value]="condition.controls.values.value" data-cy="rule-value"
+                  />
                 </label>
-                <chef-error
-                  *ngIf="(ruleForm.get('conditions').controls[i].get('values').hasError('required') || ruleForm.get('conditions').controls[i].get('values').hasError('pattern')) && ruleForm.get('conditions').controls[i].get('values').dirty"
-                >Value is required.</chef-error>
+                <div>
+                  <chef-error
+                      *ngIf="( ruleForm.get('conditions').controls[i].get('values').hasError('required') && ruleForm.get('conditions').controls[i].get('values').touched )
+                              || ( ruleForm.get('conditions').controls[i].get('values').hasError('pattern') && ruleForm.get('conditions').controls[i].get('values').dirty )"
+                    >Value is required.</chef-error>
+                </div>
                 <small class="help"
                   *ngIf="condition.controls.operator.value === 'EQUALS'">
                     Case sensitive, must match exactly.

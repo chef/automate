@@ -16,9 +16,16 @@ chef-page {
     overflow-y: scroll;
   }
 
-  chef-input {
+  input {
     height: 45px;
     width: 100%;
+    outline: 0;
+  }
+
+  chef-error {
+    background-color: #DC267F;
+    color: #FFFFFF;
+    border-radius: 0 0 4px 4px;
   }
 
   #create-name,
@@ -154,11 +161,6 @@ chef-page {
       padding-bottom: 0;
     }
 
-    chef-input[disabled] {
-      background-color: $chef-light-grey;
-      opacity: 0.5;
-    }
-
     &.attribute-field {
       display: inline-block;
       position: relative;
@@ -173,8 +175,7 @@ chef-page {
         font-weight: 200;
       }
 
-      select,
-      chef-input {
+      select {
         min-width: 0;
         width: 100%;
       }
