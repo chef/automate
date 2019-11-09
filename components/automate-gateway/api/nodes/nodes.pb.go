@@ -30,6 +30,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// Return the results in ascending or descending order.
 type Query_OrderType int32
 
 const (
@@ -87,7 +88,7 @@ func (LastContactData_Status) EnumDescriptor() ([]byte, []int) {
 }
 
 type Id struct {
-	// UUID for the node.
+	// Unique node id (UUID)
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -200,13 +201,12 @@ var xxx_messageInfo_RerunResponse proto.InternalMessageInfo
 type Query struct {
 	// Filters to be applied to the query.
 	Filters []*common.Filter `protobuf:"bytes,20,rep,name=filters,proto3" json:"filters,omitempty"`
-	// Order in which the results should be returned.
-	Order Query_OrderType `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.nodes.v1.Query_OrderType" json:"order,omitempty"`
-	// Field on which to sort.
+	Order   Query_OrderType  `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.nodes.v1.Query_OrderType" json:"order,omitempty"`
+	// Sort the results on a specific field.
 	Sort string `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
-	// Page number of results to return.
+	// The number of result pages to return.
 	Page int32 `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
-	// Count of results that should be returned for each page.
+	// The number of results on each page.
 	PerPage              int32    `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -275,25 +275,25 @@ func (m *Query) GetPerPage() int32 {
 
 // Details for ssh/winrm access of the node.
 type TargetConfig struct {
-	// List of credential ids to associate with the node.
+	// List of credential ids for a node.
 	Secrets []string `protobuf:"bytes,20,rep,name=secrets,proto3" json:"secrets,omitempty"`
-	// Details for the node backend (ssh, winrm, aws, ssm, azure, gcp).
+	// Node backend type (ssh, winrm, aws, ssm, azure, gcp).
 	Backend string `protobuf:"bytes,22,opt,name=backend,proto3" json:"backend,omitempty"`
-	// FQDN or IP address for the node.
+	// Node FQDN or IP address.
 	Host string `protobuf:"bytes,23,opt,name=host,proto3" json:"host,omitempty"`
-	// Port used to connect to the node via ssh/winrm.
+	// ssh or winrm connection port
 	Port int32 `protobuf:"varint,24,opt,name=port,proto3" json:"port,omitempty"`
-	// Boolean to denote whether or not sudo should be used when accessing the node.
+	// Uses `sudo` (boolean).
 	Sudo bool `protobuf:"varint,26,opt,name=sudo,proto3" json:"sudo,omitempty"`
-	// Boolean to denote whether or not ssl should be checked when accessing the node.
+	// Check ssl (boolean).
 	Ssl bool `protobuf:"varint,27,opt,name=ssl,proto3" json:"ssl,omitempty"`
-	// Boolean to denote whether or not self signed certificate should be allowed when accessing the node.
+	// Allow self-signed certificate (boolean).
 	SelfSigned bool `protobuf:"varint,28,opt,name=self_signed,json=selfSigned,proto3" json:"self_signed,omitempty"`
-	// Username used to access the node (taken from credential id associated with node).
+	// Username from the credential id for this node.
 	User string `protobuf:"bytes,29,opt,name=user,proto3" json:"user,omitempty"`
 	// Sudo options to use when accessing the node.
 	SudoOptions string `protobuf:"bytes,33,opt,name=sudo_options,json=sudoOptions,proto3" json:"sudo_options,omitempty"`
-	// List of hostnames (fqdn or ip address) for nodes to be created with bulk create.
+	// List of hostnames (FQDN or IP address) for bulk creating nodes.
 	Hosts                []string `protobuf:"bytes,40,rep,name=hosts,proto3" json:"hosts,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -397,39 +397,39 @@ func (m *TargetConfig) GetHosts() []string {
 
 // Node information.
 type Node struct {
-	// UUID for the node.
+	// Unique node ID (UUID).
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// User-specified name for the node.
+	// User-specified node name.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	// Platform for the node.
+	// Node platform.
 	Platform string `protobuf:"bytes,3,opt,name=platform,proto3" json:"platform,omitempty"`
-	// Platform version for the node.
+	// Node platform version.
 	PlatformVersion string `protobuf:"bytes,4,opt,name=platform_version,json=platformVersion,proto3" json:"platform_version,omitempty"`
-	// Manager associated with the node (automate, aws-ec2, aws-api, azure-vm, azure-api, gcp).
+	// Node manager (automate, aws-ec2, aws-api, azure-vm, azure-api, gcp).
 	Manager string `protobuf:"bytes,5,opt,name=manager,proto3" json:"manager,omitempty"`
-	// Tags to be applied to the node.
+	// Node tags.
 	Tags []*common.Kv `protobuf:"bytes,20,rep,name=tags,proto3" json:"tags,omitempty"`
-	// End time from the most recent `detect` or `exec` job.
+	// Timestamp of the last `detect` or `exec` job.
 	LastContact *timestamp.Timestamp `protobuf:"bytes,21,opt,name=last_contact,json=lastContact,proto3" json:"last_contact,omitempty"`
-	// Status of the node (unreachable, reachable, unknown).
+	// Node status (unreachable, reachable, unknown).
 	Status string `protobuf:"bytes,22,opt,name=status,proto3" json:"status,omitempty"`
-	// Details from the most recent scan job that executed for the node.
+	// Results of the last compliance scan job for this node.
 	LastJob *ResultsRow `protobuf:"bytes,23,opt,name=last_job,json=lastJob,proto3" json:"last_job,omitempty"`
-	// Details for ssh/winrm access of the node.
+	// Node configuration for ssh or winrm.
 	TargetConfig *TargetConfig `protobuf:"bytes,99,opt,name=target_config,json=targetConfig,proto3" json:"target_config,omitempty"`
-	// List of manager ids associated with the node.
+	// List of manager ids for the node.
 	ManagerIds []string `protobuf:"bytes,24,rep,name=manager_ids,json=managerIds,proto3" json:"manager_ids,omitempty"`
-	// Most recent connection error received from attempting to contact the node.
+	// Last connection error received when trying to contact the node.
 	ConnectionError string `protobuf:"bytes,25,opt,name=connection_error,json=connectionError,proto3" json:"connection_error,omitempty"`
-	// Last known state of the node (running, stopped, terminated).
+	// Last known node state (running, stopped, terminated).
 	State string `protobuf:"bytes,26,opt,name=state,proto3" json:"state,omitempty"`
-	// Name prefix to attach to the node. The full node name is constructed based off the prefix and the host.
+	// Prefix for node name. The full node name is the prefix + the host.
 	NamePrefix string `protobuf:"bytes,27,opt,name=name_prefix,json=namePrefix,proto3" json:"name_prefix,omitempty"`
 	// List of projects associated with the node. Projects are a concept introduced in IAMv2.
 	Projects []string `protobuf:"bytes,28,rep,name=projects,proto3" json:"projects,omitempty"`
-	// Most recent run data for the node, taken from the most recent infra run for the node.
+	// Most recent node data from the last Chef Infra run results.
 	RunData *LastContactData `protobuf:"bytes,29,opt,name=run_data,json=runData,proto3" json:"run_data,omitempty"`
-	// Most recent scan data for the node, taken from the most recent InSpec scan executed on the node.
+	// Most recent compliance scan data for the node from the last InSpec scan.
 	ScanData             *LastContactData `protobuf:"bytes,30,opt,name=scan_data,json=scanData,proto3" json:"scan_data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`
@@ -580,15 +580,15 @@ func (m *Node) GetScanData() *LastContactData {
 	return nil
 }
 
-// Most recent run or scan data for the node, taken from the most recent Infra run or InSpec scan executed on the node.
+// Most recent node data from the latest Chef Infra run and InSpec scan.
 type LastContactData struct {
-	// Infra run report id or InSpec scan report id.
+	// Chef Infra run report id or InSpec scan report id.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Status on the last report for the node.
+	// Last node report status.
 	Status LastContactData_Status `protobuf:"varint,2,opt,name=status,proto3,enum=chef.automate.api.nodes.v1.LastContactData_Status" json:"status,omitempty"`
-	// Status on the next-to-last report for the node.
+	// Next-to-last node status report.
 	PenultimateStatus LastContactData_Status `protobuf:"varint,3,opt,name=penultimate_status,json=penultimateStatus,proto3,enum=chef.automate.api.nodes.v1.LastContactData_Status" json:"penultimate_status,omitempty"`
-	// Endtime on the most recent report for the node.
+	// Last node report endtime.
 	EndTime              *timestamp.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
@@ -649,15 +649,15 @@ func (m *LastContactData) GetEndTime() *timestamp.Timestamp {
 }
 
 type Nodes struct {
-	// List of node objects.
+	// List of nodes.
 	Nodes []*Node `protobuf:"bytes,1,rep,name=nodes,proto3" json:"nodes,omitempty"`
-	// Total count of nodes in the system.
+	// Total number of nodes in the system.
 	Total int32 `protobuf:"varint,20,opt,name=total,proto3" json:"total,omitempty"`
-	// Total count of unreachable nodes in the system.
+	// Total number of unreachable nodes in the system.
 	TotalUnreachable int32 `protobuf:"varint,21,opt,name=total_unreachable,json=totalUnreachable,proto3" json:"total_unreachable,omitempty"`
-	// Total count of reachable nodes in the system.
+	// Total number of reachable nodes in the system.
 	TotalReachable int32 `protobuf:"varint,22,opt,name=total_reachable,json=totalReachable,proto3" json:"total_reachable,omitempty"`
-	// Total count of unknown nodes in the system.
+	// Total number of unknown nodes in the system.
 	TotalUnknown         int32    `protobuf:"varint,23,opt,name=total_unknown,json=totalUnknown,proto3" json:"total_unknown,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -724,7 +724,7 @@ func (m *Nodes) GetTotalUnknown() int32 {
 	return 0
 }
 
-// Details from the most recent scan job that executed for the node.
+// Summary details from the most recent scan job that executed for the node.
 type ResultsRow struct {
 	// Node id for the result.
 	NodeId string `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
@@ -820,7 +820,7 @@ func (m *ResultsRow) GetEndTime() *timestamp.Timestamp {
 }
 
 type BulkDeleteResponse struct {
-	// List of names of nodes created.
+	// List of deleted nodes, by name.
 	Names                []string `protobuf:"bytes,1,rep,name=names,proto3" json:"names,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -996,9 +996,26 @@ type NodesServiceClient interface {
 	//
 	//Create a node
 	//
-	//Creates a node given a FQDN or IP address, user-specified name, and an ssh or winrm credential reference.
-	//Nodes created via this endpoint will be added to the "Automate" node manager.
-	//These nodes are usually created for the purposes of running scan jobs.
+	//Creates a node and adds it to the "Automate" node manager.
+	//Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
+	//Useful for creating nodes for the purpose of running compliance scan jobs.
+	//
+	//Example:
+	//```
+	//{
+	//"name": "my-vagrant-node",
+	//"manager":"automate",
+	//"target_config": {
+	//"backend":"ssh",
+	//"host":"localhost",
+	//"secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
+	//"port": 22
+	//},
+	//"tags": [
+	//{ "key":"test-node", "value":"is amazing" }
+	//]
+	//}
+	//```
 	Create(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Id, error)
 	//
 	//Read a node
@@ -1008,19 +1025,20 @@ type NodesServiceClient interface {
 	//
 	//Update a node
 	//
-	//PUT operation to update the details for a node, such as the name, fqdn, tags, or associated credentials.
-	//Please note that this is a PUT operation, so all node details included in the create function
-	//should be included in the PUT message to update.
+	//This PUT operation overwrites ALL node details and requires the complete set of node details,
+	//consisting of a FQDN or IP address, a user-specified name, and the id for an ssh or winrm credential.
+	//Substitute the desired values for the existing node details in the PUT message.
 	Update(ctx context.Context, in *Node, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
 	//Delete a node
 	//
-	//Deletes a node given the node id.
+	//Deletes the node with the node id.
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
 	//Bulk delete by id
 	//
 	//Deletes a set of nodes given a list of ids.
+	//Invalid ids will be ignored.
 	BulkDeleteById(ctx context.Context, in *Ids, opts ...grpc.CallOption) (*BulkDeleteResponse, error)
 	//
 	//List nodes
@@ -1033,6 +1051,19 @@ type NodesServiceClient interface {
 	//platform_release, region, source_id, state, statechange_timerange, status,
 	//last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
 	//last_run_penultimate_status, last_scan_penultimate_status
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"key": "last_scan_status", "values": ["FAILED"]},
+	//{"key": "last_scan_penultimate_status", "values": ["PASSED"]},
+	//{"key": "name", "values": ["mynode*"]}
+	//],
+	//"page":1, "per_page":100,
+	//"sort":"status", "order":"ASC"
+	//}
+	//```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Nodes, error)
 	//
 	//Rerun a node
@@ -1043,13 +1074,39 @@ type NodesServiceClient interface {
 	//
 	//Bulk delete
 	//
-	//Deletes a set of nodes given a filter query to match.
-	//Query is the same one that is accepted by the list endpoint.
+	//Deletes a set of nodes that match a filter.
+	//Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
+	//platform_release, region, source_id, state, statechange_timerange, status,
+	//last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
+	//last_run_penultimate_status, last_scan_penultimate_status
+	//
+	//Example:
+	//```
+	//{"filters": [{"key": "name", "values": ["vj*"]}]}'
+	//```
 	BulkDelete(ctx context.Context, in *Query, opts ...grpc.CallOption) (*BulkDeleteResponse, error)
 	//
 	//Bulk create nodes
 	//
-	//Creates multiple nodes given node data.
+	//Creates multiple nodes from a list of node data.
+	//Hosts field is required. Multiple hosts may be defined in this field.
+	//
+	//Example:
+	//```
+	//{
+	//"name_prefix": "000-my-ssh-node",
+	//"manager":"automate",
+	//"target_config": {
+	//"backend":"ssh",
+	//"hosts":["localhost","127.0.0.1"],
+	//"secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
+	//"port": 22
+	//},
+	//"tags": [
+	//{ "key":"test-node", "value":"is-amazing" },
+	//]
+	//}
+	//```
 	BulkCreate(ctx context.Context, in *Nodes, opts ...grpc.CallOption) (*Ids, error)
 }
 
@@ -1147,9 +1204,26 @@ type NodesServiceServer interface {
 	//
 	//Create a node
 	//
-	//Creates a node given a FQDN or IP address, user-specified name, and an ssh or winrm credential reference.
-	//Nodes created via this endpoint will be added to the "Automate" node manager.
-	//These nodes are usually created for the purposes of running scan jobs.
+	//Creates a node and adds it to the "Automate" node manager.
+	//Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
+	//Useful for creating nodes for the purpose of running compliance scan jobs.
+	//
+	//Example:
+	//```
+	//{
+	//"name": "my-vagrant-node",
+	//"manager":"automate",
+	//"target_config": {
+	//"backend":"ssh",
+	//"host":"localhost",
+	//"secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
+	//"port": 22
+	//},
+	//"tags": [
+	//{ "key":"test-node", "value":"is amazing" }
+	//]
+	//}
+	//```
 	Create(context.Context, *Node) (*Id, error)
 	//
 	//Read a node
@@ -1159,19 +1233,20 @@ type NodesServiceServer interface {
 	//
 	//Update a node
 	//
-	//PUT operation to update the details for a node, such as the name, fqdn, tags, or associated credentials.
-	//Please note that this is a PUT operation, so all node details included in the create function
-	//should be included in the PUT message to update.
+	//This PUT operation overwrites ALL node details and requires the complete set of node details,
+	//consisting of a FQDN or IP address, a user-specified name, and the id for an ssh or winrm credential.
+	//Substitute the desired values for the existing node details in the PUT message.
 	Update(context.Context, *Node) (*empty.Empty, error)
 	//
 	//Delete a node
 	//
-	//Deletes a node given the node id.
+	//Deletes the node with the node id.
 	Delete(context.Context, *Id) (*empty.Empty, error)
 	//
 	//Bulk delete by id
 	//
 	//Deletes a set of nodes given a list of ids.
+	//Invalid ids will be ignored.
 	BulkDeleteById(context.Context, *Ids) (*BulkDeleteResponse, error)
 	//
 	//List nodes
@@ -1184,6 +1259,19 @@ type NodesServiceServer interface {
 	//platform_release, region, source_id, state, statechange_timerange, status,
 	//last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
 	//last_run_penultimate_status, last_scan_penultimate_status
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"key": "last_scan_status", "values": ["FAILED"]},
+	//{"key": "last_scan_penultimate_status", "values": ["PASSED"]},
+	//{"key": "name", "values": ["mynode*"]}
+	//],
+	//"page":1, "per_page":100,
+	//"sort":"status", "order":"ASC"
+	//}
+	//```
 	List(context.Context, *Query) (*Nodes, error)
 	//
 	//Rerun a node
@@ -1194,13 +1282,39 @@ type NodesServiceServer interface {
 	//
 	//Bulk delete
 	//
-	//Deletes a set of nodes given a filter query to match.
-	//Query is the same one that is accepted by the list endpoint.
+	//Deletes a set of nodes that match a filter.
+	//Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
+	//platform_release, region, source_id, state, statechange_timerange, status,
+	//last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
+	//last_run_penultimate_status, last_scan_penultimate_status
+	//
+	//Example:
+	//```
+	//{"filters": [{"key": "name", "values": ["vj*"]}]}'
+	//```
 	BulkDelete(context.Context, *Query) (*BulkDeleteResponse, error)
 	//
 	//Bulk create nodes
 	//
-	//Creates multiple nodes given node data.
+	//Creates multiple nodes from a list of node data.
+	//Hosts field is required. Multiple hosts may be defined in this field.
+	//
+	//Example:
+	//```
+	//{
+	//"name_prefix": "000-my-ssh-node",
+	//"manager":"automate",
+	//"target_config": {
+	//"backend":"ssh",
+	//"hosts":["localhost","127.0.0.1"],
+	//"secrets":["b75195e5-a173-4502-9f59-d949adfe2c38"],
+	//"port": 22
+	//},
+	//"tags": [
+	//{ "key":"test-node", "value":"is-amazing" },
+	//]
+	//}
+	//```
 	BulkCreate(context.Context, *Nodes) (*Ids, error)
 }
 

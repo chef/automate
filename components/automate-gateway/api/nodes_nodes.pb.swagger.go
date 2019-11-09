@@ -17,7 +17,7 @@ func init() {
     "/nodes": {
       "post": {
         "summary": "Create a node",
-        "description": "Creates a node given a FQDN or IP address, user-specified name, and an ssh or winrm credential reference.\nNodes created via this endpoint will be added to the \"Automate\" node manager.\nThese nodes are usually created for the purposes of running scan jobs.",
+        "description": "Creates a node and adds it to the \"Automate\" node manager.\nRequires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.\nUseful for creating nodes for the purpose of running compliance scan jobs.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"my-vagrant-node\",\n\"manager\":\"automate\",\n\"target_config\": {\n\"backend\":\"ssh\",\n\"host\":\"localhost\",\n\"secrets\":[\"b75195e5-a173-4502-9f59-d949adfe2c38\"],\n\"port\": 22\n},\n\"tags\": [\n{ \"key\":\"test-node\", \"value\":\"is amazing\" }\n]\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "Create",
         "responses": {
           "200": {
@@ -45,7 +45,7 @@ func init() {
     "/nodes/bulk-create": {
       "post": {
         "summary": "Bulk create nodes",
-        "description": "Creates multiple nodes given node data.",
+        "description": "Creates multiple nodes from a list of node data.\nHosts field is required. Multiple hosts may be defined in this field.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name_prefix\": \"000-my-ssh-node\",\n\"manager\":\"automate\",\n\"target_config\": {\n\"backend\":\"ssh\",\n\"hosts\":[\"localhost\",\"127.0.0.1\"],\n\"secrets\":[\"b75195e5-a173-4502-9f59-d949adfe2c38\"],\n\"port\": 22\n},\n\"tags\": [\n{ \"key\":\"test-node\", \"value\":\"is-amazing\" },\n]\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "BulkCreate",
         "responses": {
           "200": {
@@ -73,7 +73,7 @@ func init() {
     "/nodes/delete": {
       "post": {
         "summary": "Bulk delete",
-        "description": "Deletes a set of nodes given a filter query to match. \nQuery is the same one that is accepted by the list endpoint.",
+        "description": "Deletes a set of nodes that match a filter. \nAvailable filters: account_id, last_contact, manager_id, manager_type, name, platform_name,\nplatform_release, region, source_id, state, statechange_timerange, status,\nlast_run_timerange, last_scan_timerange, last_run_status, last_scan_status,\nlast_run_penultimate_status, last_scan_penultimate_status\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\"filters\": [{\"key\": \"name\", \"values\": [\"vj*\"]}]}'\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "BulkDelete",
         "responses": {
           "200": {
@@ -101,7 +101,7 @@ func init() {
     "/nodes/delete/ids": {
       "post": {
         "summary": "Bulk delete by id",
-        "description": "Deletes a set of nodes given a list of ids.",
+        "description": "Deletes a set of nodes given a list of ids.\nInvalid ids will be ignored.",
         "operationId": "BulkDeleteById",
         "responses": {
           "200": {
@@ -142,7 +142,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "UUID for the node.",
+            "description": "Unique node id (UUID)",
             "in": "path",
             "required": true,
             "type": "string"
@@ -154,7 +154,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a node",
-        "description": "Deletes a node given the node id.",
+        "description": "Deletes the node with the node id.",
         "operationId": "Delete",
         "responses": {
           "200": {
@@ -167,7 +167,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "UUID for the node.",
+            "description": "Unique node id (UUID)",
             "in": "path",
             "required": true,
             "type": "string"
@@ -179,7 +179,7 @@ func init() {
       },
       "put": {
         "summary": "Update a node",
-        "description": "PUT operation to update the details for a node, such as the name, fqdn, tags, or associated credentials.\nPlease note that this is a PUT operation, so all node details included in the create function\nshould be included in the PUT message to update.",
+        "description": "This PUT operation overwrites ALL node details and requires the complete set of node details, \nconsisting of a FQDN or IP address, a user-specified name, and the id for an ssh or winrm credential.\nSubstitute the desired values for the existing node details in the PUT message.",
         "operationId": "Update",
         "responses": {
           "200": {
@@ -192,7 +192,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "UUID for the node.",
+            "description": "Unique node ID (UUID).",
             "in": "path",
             "required": true,
             "type": "string"
@@ -227,7 +227,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "UUID for the node.",
+            "description": "Unique node id (UUID)",
             "in": "path",
             "required": true,
             "type": "string"
@@ -241,7 +241,7 @@ func init() {
     "/nodes/search": {
       "post": {
         "summary": "List nodes",
-        "description": "Makes a list of nodes. \nSupports filtering, pagination, and sorting.\nAdding a filter makes a list of nodes that meet the filter criteria.\nSupported filters are: \naccount_id, last_contact, manager_id, manager_type, name, platform_name,\nplatform_release, region, source_id, state, statechange_timerange, status,\nlast_run_timerange, last_scan_timerange, last_run_status, last_scan_status,\nlast_run_penultimate_status, last_scan_penultimate_status",
+        "description": "Makes a list of nodes. \nSupports filtering, pagination, and sorting.\nAdding a filter makes a list of nodes that meet the filter criteria.\nSupported filters are: \naccount_id, last_contact, manager_id, manager_type, name, platform_name,\nplatform_release, region, source_id, state, statechange_timerange, status,\nlast_run_timerange, last_scan_timerange, last_run_status, last_scan_status,\nlast_run_penultimate_status, last_scan_penultimate_status\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filters\":[\n{\"key\": \"last_scan_status\", \"values\": [\"FAILED\"]},\n{\"key\": \"last_scan_penultimate_status\", \"values\": [\"PASSED\"]},\n{\"key\": \"name\", \"values\": [\"mynode*\"]}\n],\n\"page\":1, \"per_page\":100,\n\"sort\":\"status\", \"order\":\"ASC\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "List",
         "responses": {
           "200": {
@@ -276,7 +276,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "List of names of nodes created."
+          "description": "List of deleted nodes, by name."
         }
       }
     },
@@ -285,7 +285,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "UUID for the node."
+          "title": "Unique node id (UUID)"
         }
       }
     },
@@ -306,23 +306,23 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Infra run report id or InSpec scan report id."
+          "description": "Chef Infra run report id or InSpec scan report id."
         },
         "status": {
           "$ref": "#/definitions/chef.automate.api.nodes.v1.LastContactData.Status",
-          "description": "Status on the last report for the node."
+          "description": "Last node report status."
         },
         "penultimate_status": {
           "$ref": "#/definitions/chef.automate.api.nodes.v1.LastContactData.Status",
-          "description": "Status on the next-to-last report for the node."
+          "description": "Next-to-last node status report."
         },
         "end_time": {
           "type": "string",
           "format": "date-time",
-          "description": "Endtime on the most recent report for the node."
+          "description": "Last node report endtime."
         }
       },
-      "description": "Most recent run or scan data for the node, taken from the most recent Infra run or InSpec scan executed on the node."
+      "description": "Most recent node data from the latest Chef Infra run and InSpec scan."
     },
     "chef.automate.api.nodes.v1.LastContactData.Status": {
       "type": "string",
@@ -339,66 +339,66 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "UUID for the node."
+          "description": "Unique node ID (UUID)."
         },
         "name": {
           "type": "string",
-          "description": "User-specified name for the node."
+          "description": "User-specified node name."
         },
         "platform": {
           "type": "string",
-          "description": "Platform for the node."
+          "description": "Node platform."
         },
         "platform_version": {
           "type": "string",
-          "description": "Platform version for the node."
+          "description": "Node platform version."
         },
         "manager": {
           "type": "string",
-          "description": "Manager associated with the node (automate, aws-ec2, aws-api, azure-vm, azure-api, gcp)."
+          "description": "Node manager (automate, aws-ec2, aws-api, azure-vm, azure-api, gcp)."
         },
         "tags": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Kv"
           },
-          "description": "Tags to be applied to the node."
+          "description": "Node tags."
         },
         "last_contact": {
           "type": "string",
           "format": "date-time",
-          "description": "End time from the most recent ` + "`" + `detect` + "`" + ` or ` + "`" + `exec` + "`" + ` job."
+          "description": "Timestamp of the last ` + "`" + `detect` + "`" + ` or ` + "`" + `exec` + "`" + ` job."
         },
         "status": {
           "type": "string",
-          "description": "Status of the node (unreachable, reachable, unknown)."
+          "description": "Node status (unreachable, reachable, unknown)."
         },
         "last_job": {
           "$ref": "#/definitions/chef.automate.api.nodes.v1.ResultsRow",
-          "description": "Details from the most recent scan job that executed for the node."
+          "description": "Results of the last compliance scan job for this node."
         },
         "target_config": {
           "$ref": "#/definitions/chef.automate.api.nodes.v1.TargetConfig",
-          "description": "Details for ssh/winrm access of the node."
+          "description": "Node configuration for ssh or winrm."
         },
         "manager_ids": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "List of manager ids associated with the node."
+          "description": "List of manager ids for the node."
         },
         "connection_error": {
           "type": "string",
-          "description": "Most recent connection error received from attempting to contact the node."
+          "description": "Last connection error received when trying to contact the node."
         },
         "state": {
           "type": "string",
-          "description": "Last known state of the node (running, stopped, terminated)."
+          "description": "Last known node state (running, stopped, terminated)."
         },
         "name_prefix": {
           "type": "string",
-          "description": "Name prefix to attach to the node. The full node name is constructed based off the prefix and the host."
+          "description": "Prefix for node name. The full node name is the prefix + the host."
         },
         "projects": {
           "type": "array",
@@ -409,11 +409,11 @@ func init() {
         },
         "run_data": {
           "$ref": "#/definitions/chef.automate.api.nodes.v1.LastContactData",
-          "description": "Most recent run data for the node, taken from the most recent infra run for the node."
+          "description": "Most recent node data from the last Chef Infra run results."
         },
         "scan_data": {
           "$ref": "#/definitions/chef.automate.api.nodes.v1.LastContactData",
-          "description": "Most recent scan data for the node, taken from the most recent InSpec scan executed on the node."
+          "description": "Most recent compliance scan data for the node from the last InSpec scan."
         }
       },
       "description": "Node information."
@@ -426,27 +426,27 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.nodes.v1.Node"
           },
-          "description": "List of node objects."
+          "description": "List of nodes."
         },
         "total": {
           "type": "integer",
           "format": "int32",
-          "description": "Total count of nodes in the system."
+          "description": "Total number of nodes in the system."
         },
         "total_unreachable": {
           "type": "integer",
           "format": "int32",
-          "description": "Total count of unreachable nodes in the system."
+          "description": "Total number of unreachable nodes in the system."
         },
         "total_reachable": {
           "type": "integer",
           "format": "int32",
-          "description": "Total count of reachable nodes in the system."
+          "description": "Total number of reachable nodes in the system."
         },
         "total_unknown": {
           "type": "integer",
           "format": "int32",
-          "description": "Total count of unknown nodes in the system."
+          "description": "Total number of unknown nodes in the system."
         }
       }
     },
@@ -461,22 +461,21 @@ func init() {
           "description": "Filters to be applied to the query."
         },
         "order": {
-          "$ref": "#/definitions/chef.automate.api.nodes.v1.Query.OrderType",
-          "description": "Order in which the results should be returned."
+          "$ref": "#/definitions/chef.automate.api.nodes.v1.Query.OrderType"
         },
         "sort": {
           "type": "string",
-          "description": "Field on which to sort."
+          "description": "Sort the results on a specific field."
         },
         "page": {
           "type": "integer",
           "format": "int32",
-          "description": "Page number of results to return."
+          "description": "The number of result pages to return."
         },
         "per_page": {
           "type": "integer",
           "format": "int32",
-          "description": "Count of results that should be returned for each page."
+          "description": "The number of results on each page."
         }
       }
     },
@@ -486,7 +485,8 @@ func init() {
         "ASC",
         "DESC"
       ],
-      "default": "ASC"
+      "default": "ASC",
+      "description": "Return the results in ascending or descending order."
     },
     "chef.automate.api.nodes.v1.RerunResponse": {
       "type": "object"
@@ -525,7 +525,7 @@ func init() {
           "description": "End time on the report."
         }
       },
-      "description": "Details from the most recent scan job that executed for the node."
+      "description": "Summary details from the most recent scan job that executed for the node."
     },
     "chef.automate.api.nodes.v1.TargetConfig": {
       "type": "object",
@@ -535,39 +535,39 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "List of credential ids to associate with the node."
+          "description": "List of credential ids for a node."
         },
         "backend": {
           "type": "string",
-          "description": "Details for the node backend (ssh, winrm, aws, ssm, azure, gcp)."
+          "description": "Node backend type (ssh, winrm, aws, ssm, azure, gcp)."
         },
         "host": {
           "type": "string",
-          "description": "FQDN or IP address for the node."
+          "description": "Node FQDN or IP address."
         },
         "port": {
           "type": "integer",
           "format": "int32",
-          "description": "Port used to connect to the node via ssh/winrm."
+          "title": "ssh or winrm connection port"
         },
         "sudo": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Boolean to denote whether or not sudo should be used when accessing the node."
+          "description": "Uses ` + "`" + `sudo` + "`" + ` (boolean)."
         },
         "ssl": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Boolean to denote whether or not ssl should be checked when accessing the node."
+          "description": "Check ssl (boolean)."
         },
         "self_signed": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Boolean to denote whether or not self signed certificate should be allowed when accessing the node."
+          "description": "Allow self-signed certificate (boolean)."
         },
         "user": {
           "type": "string",
-          "description": "Username used to access the node (taken from credential id associated with node)."
+          "description": "Username from the credential id for this node."
         },
         "sudo_options": {
           "type": "string",
@@ -578,7 +578,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "List of hostnames (fqdn or ip address) for nodes to be created with bulk create."
+          "description": "List of hostnames (FQDN or IP address) for bulk creating nodes."
         }
       },
       "description": "Details for ssh/winrm access of the node."
@@ -593,14 +593,14 @@ func init() {
         "exclude": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Boolean to denote whether we should find nodes that match the filter or do not match the filter."
+          "description": "Include matches for this filter. ` + "`" + `true` + "`" + ` (default) includes only nodes that match this filter. \n` + "`" + `false` + "`" + ` excludes any nodes that match this filter."
         },
         "values": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Values to filter on for the key."
+          "description": "Field values to filter on."
         }
       }
     },

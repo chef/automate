@@ -499,14 +499,14 @@ func init() {
         "exclude": {
           "type": "boolean",
           "format": "boolean",
-          "description": "Boolean to denote whether we should find nodes that match the filter or do not match the filter."
+          "description": "Include matches for this filter. ` + "`" + `true` + "`" + ` (default) includes only nodes that match this filter. \n` + "`" + `false` + "`" + ` excludes any nodes that match this filter."
         },
         "values": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "Values to filter on for the key."
+          "description": "Field values to filter on."
         }
       }
     },
