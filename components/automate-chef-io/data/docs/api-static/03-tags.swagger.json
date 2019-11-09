@@ -14,8 +14,8 @@
     }
   ],
   "tags": [
-    { "name": "ReportingService", "x-displayName": "Reporting" },
-    { "name": "StatsService", "x-displayName": "Stats" },
+    { "name": "ReportingService", "x-displayName": "Compliance Reporting" },
+    { "name": "StatsService", "x-displayName": "Compliance Stats" },
     { "name": "ConfigMgmt", "x-displayName": "Infra Nodes" },
     { "name": "NodesService", "x-displayName": "Nodes" }
   ]
