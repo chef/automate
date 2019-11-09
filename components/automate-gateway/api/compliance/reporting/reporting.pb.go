@@ -2921,27 +2921,40 @@ type ReportingServiceClient interface {
 	//
 	//List reports
 	//
-	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. Supports pagination, filtering, and sorting.
+	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
+	//Supports pagination, filtering, and sorting.
+	//Limited to 10k results.
 	//
-	//| Sort paramter | Sort value |
-	//| --- | --- |
-	//| latest_report.controls.failed.critical | controls_sums.failed.critical |
-	//| latest_report.controls.failed.total | controls_sums.failed.total |
-	//| latest_report.end_time (default) | end_time |
-	//| latest_report.status | status |
-	//| node_name | node_name.lower |
+	//Vaild sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
+	//latest_report.end_time, latest_report.status, node_name
+	//
+	//Example:
+	//```
+	//{"filters":
+	//[
+	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	//],
+	//"page":1, "per_page": 3,
+	//"sort": "latest_report.status", "order": "ASC"
+	//}
+	//```
 	ListReports(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Reports, error)
 	//
 	//List report IDs
 	//
-	//List all report IDs optionally using filters. Supports filtering, but not pagination or sorting.
+	//List all IDs for the latest report of each node optionally using filters.
+	//Supports filtering, but not pagination or sorting.
 	//Including more than one value for `control`, `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	//Not limited to 10k results.
 	ListReportIds(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ReportIds, error)
 	//
 	//List controls
 	//
-	//Lists controls from the last run, with the option of applying filters. Supports filtering, but not pagination or sorting.
+	//Lists controls from the last run, with the option of applying filters.
+	//Supports filtering, but not pagination or sorting.
+	//Limited to 100 results by default.
 	ListControlItems(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error)
 	//
 	//Fetch a report
@@ -2975,30 +2988,41 @@ type ReportingServiceClient interface {
 	//| profile_with_version | profiles.full |
 	//| recipe | recipes |
 	//| role | roles |
+	//
+	//Example:
+	//```
+	//{
+	//"type":"environment",
+	//"text":"aws*",
+	//"filters":[
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
 	ListSuggestions(ctx context.Context, in *SuggestionRequest, opts ...grpc.CallOption) (*Suggestions, error)
 	//
 	//List profiles
 	//
-	//List all profiles in use, with the option of applying filters. Adding a profile filter returns a list of all the nodes using that profile. Supports pagination, filtering, and sorting.
-	//
-	//| Sort paramter | Sort value |
-	//| --- | --- |
-	//| name | name.lower |
-	//| title (default) | title.lower |
+	//List all profiles in use, with the option of applying filters.
+	//Supports pagination, filtering, and sorting.
+	//Valid sort fields: name, title
 	ListProfiles(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ProfileMins, error)
 	Export(ctx context.Context, in *Query, opts ...grpc.CallOption) (ReportingService_ExportClient, error)
 	//
 	//Fetch a node
 	//
 	//Fetch a specific node by id.
-	//Does not support filtering, pagination or sorting.
+	//Supports filtering by profile or control.
+	//Does not support pagination or sorting.
 	ReadNode(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
 	//
 	//List nodes
 	//
 	//List all nodes optionally using filters. Supports pagination, filtering, and sorting.
+	//Limited to 10k results.
 	//
-	//| Sort paramter | Sort value |
+	//| Sort parameter | Sort value |
 	//| --- | --- |
 	//| environment | environment.lower |
 	//| latest_report.controls.failed.critical | controls_sums.failed.critical |
@@ -3008,6 +3032,19 @@ type ReportingServiceClient interface {
 	//| name | node_name.lower |
 	//| platform | platform.full |
 	//| status | status |
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//],
+	//"page":1,"per_page":100,
+	//"sort":"environment","order":"ASC"
+	//}
+	//```
 	ListNodes(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Nodes, error)
 	GetVersion(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*version.VersionInfo, error)
 	LicenseUsageNodes(ctx context.Context, in *TimeQuery, opts ...grpc.CallOption) (*Reports, error)
@@ -3148,27 +3185,40 @@ type ReportingServiceServer interface {
 	//
 	//List reports
 	//
-	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. Supports pagination, filtering, and sorting.
+	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
+	//Supports pagination, filtering, and sorting.
+	//Limited to 10k results.
 	//
-	//| Sort paramter | Sort value |
-	//| --- | --- |
-	//| latest_report.controls.failed.critical | controls_sums.failed.critical |
-	//| latest_report.controls.failed.total | controls_sums.failed.total |
-	//| latest_report.end_time (default) | end_time |
-	//| latest_report.status | status |
-	//| node_name | node_name.lower |
+	//Vaild sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
+	//latest_report.end_time, latest_report.status, node_name
+	//
+	//Example:
+	//```
+	//{"filters":
+	//[
+	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	//],
+	//"page":1, "per_page": 3,
+	//"sort": "latest_report.status", "order": "ASC"
+	//}
+	//```
 	ListReports(context.Context, *Query) (*Reports, error)
 	//
 	//List report IDs
 	//
-	//List all report IDs optionally using filters. Supports filtering, but not pagination or sorting.
+	//List all IDs for the latest report of each node optionally using filters.
+	//Supports filtering, but not pagination or sorting.
 	//Including more than one value for `control`, `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	//Not limited to 10k results.
 	ListReportIds(context.Context, *Query) (*ReportIds, error)
 	//
 	//List controls
 	//
-	//Lists controls from the last run, with the option of applying filters. Supports filtering, but not pagination or sorting.
+	//Lists controls from the last run, with the option of applying filters.
+	//Supports filtering, but not pagination or sorting.
+	//Limited to 100 results by default.
 	ListControlItems(context.Context, *ControlItemRequest) (*ControlItems, error)
 	//
 	//Fetch a report
@@ -3202,30 +3252,41 @@ type ReportingServiceServer interface {
 	//| profile_with_version | profiles.full |
 	//| recipe | recipes |
 	//| role | roles |
+	//
+	//Example:
+	//```
+	//{
+	//"type":"environment",
+	//"text":"aws*",
+	//"filters":[
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
 	ListSuggestions(context.Context, *SuggestionRequest) (*Suggestions, error)
 	//
 	//List profiles
 	//
-	//List all profiles in use, with the option of applying filters. Adding a profile filter returns a list of all the nodes using that profile. Supports pagination, filtering, and sorting.
-	//
-	//| Sort paramter | Sort value |
-	//| --- | --- |
-	//| name | name.lower |
-	//| title (default) | title.lower |
+	//List all profiles in use, with the option of applying filters.
+	//Supports pagination, filtering, and sorting.
+	//Valid sort fields: name, title
 	ListProfiles(context.Context, *Query) (*ProfileMins, error)
 	Export(*Query, ReportingService_ExportServer) error
 	//
 	//Fetch a node
 	//
 	//Fetch a specific node by id.
-	//Does not support filtering, pagination or sorting.
+	//Supports filtering by profile or control.
+	//Does not support pagination or sorting.
 	ReadNode(context.Context, *Id) (*Node, error)
 	//
 	//List nodes
 	//
 	//List all nodes optionally using filters. Supports pagination, filtering, and sorting.
+	//Limited to 10k results.
 	//
-	//| Sort paramter | Sort value |
+	//| Sort parameter | Sort value |
 	//| --- | --- |
 	//| environment | environment.lower |
 	//| latest_report.controls.failed.critical | controls_sums.failed.critical |
@@ -3235,6 +3296,19 @@ type ReportingServiceServer interface {
 	//| name | node_name.lower |
 	//| platform | platform.full |
 	//| status | status |
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//],
+	//"page":1,"per_page":100,
+	//"sort":"environment","order":"ASC"
+	//}
+	//```
 	ListNodes(context.Context, *Query) (*Nodes, error)
 	GetVersion(context.Context, *empty.Empty) (*version.VersionInfo, error)
 	LicenseUsageNodes(context.Context, *TimeQuery) (*Reports, error)

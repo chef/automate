@@ -115,7 +115,13 @@ type ConfigMgmtClient interface {
 	//Returns a list of infra nodes that have checked in to Automate.
 	//Adding a filter makes a list of all nodes that meet the filter criteria.
 	//Filters for the same field are ORd together, while filters across different fields are ANDed together.
-	//Supports pagination, filtering, and sorting.
+	//Supports pagination, filtering (with wildcard support), and sorting.
+	//Limited to 10k results.
+	//
+	//Example:
+	//```
+	//cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC&filter=name:mySO*&filter=platform:ubun*
+	//```
 	GetNodes(ctx context.Context, in *request.Nodes, opts ...grpc.CallOption) (*_struct.ListValue, error)
 	//
 	//GetRuns
@@ -128,11 +134,22 @@ type ConfigMgmtClient interface {
 	//GetNodesCounts
 	//
 	//Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
+	//Supports filtering.
+	//
+	//Example:
+	//```
+	//cfgmgmt/stats/node_counts?filter=name:mySO*&filter=platform:ubun*
+	//```
 	GetNodesCounts(ctx context.Context, in *request.NodesCounts, opts ...grpc.CallOption) (*response.NodesCounts, error)
 	//
 	//GetRunsCounts
 	//
 	//Returns totals for failed and successful runs given a `node_id`.
+	//
+	//Example:
+	//```
+	//cfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd&start=2019-11-02
+	//```
 	GetRunsCounts(ctx context.Context, in *request.RunsCounts, opts ...grpc.CallOption) (*response.RunsCounts, error)
 	//
 	//GetNodeRun
@@ -145,6 +162,11 @@ type ConfigMgmtClient interface {
 	//Returns possible filter values given a valid `type` parameter. All values returned until two or more
 	//characters are provided for the `text` parameter.
 	//Supports wildcard (* and ?).
+	//
+	//Example:
+	//```
+	//cfgmgmt/suggestions?type=environment&text=_d
+	//```
 	GetSuggestions(ctx context.Context, in *query.Suggestion, opts ...grpc.CallOption) (*_struct.ListValue, error)
 	//
 	//GetOrganizations
@@ -285,7 +307,13 @@ type ConfigMgmtServer interface {
 	//Returns a list of infra nodes that have checked in to Automate.
 	//Adding a filter makes a list of all nodes that meet the filter criteria.
 	//Filters for the same field are ORd together, while filters across different fields are ANDed together.
-	//Supports pagination, filtering, and sorting.
+	//Supports pagination, filtering (with wildcard support), and sorting.
+	//Limited to 10k results.
+	//
+	//Example:
+	//```
+	//cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC&filter=name:mySO*&filter=platform:ubun*
+	//```
 	GetNodes(context.Context, *request.Nodes) (*_struct.ListValue, error)
 	//
 	//GetRuns
@@ -298,11 +326,22 @@ type ConfigMgmtServer interface {
 	//GetNodesCounts
 	//
 	//Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
+	//Supports filtering.
+	//
+	//Example:
+	//```
+	//cfgmgmt/stats/node_counts?filter=name:mySO*&filter=platform:ubun*
+	//```
 	GetNodesCounts(context.Context, *request.NodesCounts) (*response.NodesCounts, error)
 	//
 	//GetRunsCounts
 	//
 	//Returns totals for failed and successful runs given a `node_id`.
+	//
+	//Example:
+	//```
+	//cfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd&start=2019-11-02
+	//```
 	GetRunsCounts(context.Context, *request.RunsCounts) (*response.RunsCounts, error)
 	//
 	//GetNodeRun
@@ -315,6 +354,11 @@ type ConfigMgmtServer interface {
 	//Returns possible filter values given a valid `type` parameter. All values returned until two or more
 	//characters are provided for the `text` parameter.
 	//Supports wildcard (* and ?).
+	//
+	//Example:
+	//```
+	//cfgmgmt/suggestions?type=environment&text=_d
+	//```
 	GetSuggestions(context.Context, *query.Suggestion) (*_struct.ListValue, error)
 	//
 	//GetOrganizations
