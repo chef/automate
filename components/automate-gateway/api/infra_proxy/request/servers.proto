@@ -5,15 +5,17 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/in
 
 message CreateServer {
     string name = 1;
-    string fqdn = 2;
-    string ip_address = 3;
+    string description = 2;
+    string fqdn = 3;
+    string ip_address = 4;
 }
 
 message UpdateServer {
     string id = 1;
     string name = 2;
-    string fqdn = 3;
-    string ip_address = 4;
+    string description = 3;
+    string fqdn = 4;
+    string ip_address = 5;
 }
 
 message DeleteServer {

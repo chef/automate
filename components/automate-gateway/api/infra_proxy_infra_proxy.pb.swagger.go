@@ -103,11 +103,18 @@ func init() {
         "name": {
           "type": "string"
         },
+        "description": {
+          "type": "string"
+        },
         "fqdn": {
           "type": "string"
         },
         "ip_address": {
           "type": "string"
+        },
+        "orgs_count": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     }

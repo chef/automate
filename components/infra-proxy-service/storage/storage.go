@@ -11,8 +11,9 @@ import (
 // Storage is the interface provided by our various storage backends.
 type Storage interface {
 	GetServer(context.Context, uuid.UUID) (Server, error)
+	GetServerByName(ctx context.Context, serverName string) (Server, error)
 	GetServers(context.Context) ([]Server, error)
-	StoreServer(ctx context.Context, name string, fqdn string, ipAddress string) (Server, error)
+	StoreServer(ctx context.Context, name string, description string, fqdn string, ipAddress string) (Server, error)
 	DeleteServer(context.Context, uuid.UUID) (Server, error)
 	EditServer(context.Context, Server) (Server, error)
 
@@ -31,12 +32,14 @@ type Resetter interface {
 
 // Server is the struct ingested and returned by our backend implementations.
 type Server struct {
-	ID        uuid.UUID
-	Name      string
-	Fqdn      string
-	IpAddress string
-	CreatedAt time.Time
-	UpdatedAt time.Time
+	ID          uuid.UUID
+	Name        string
+	Description string
+	Fqdn        string
+	IpAddress   string
+	OrgsCount   int32
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
 }
 
 // Org is the struct ingested and returned by our backend implementations.

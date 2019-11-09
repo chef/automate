@@ -26,6 +26,8 @@ message GetServer {
 message Server {
     string id = 1;
     string name = 2;
-    string fqdn = 3;
-    string ip_address = 4;
+    string description = 3;
+    string fqdn = 4;
+    string ip_address = 5;
+    int32 orgs_count = 6;
 }

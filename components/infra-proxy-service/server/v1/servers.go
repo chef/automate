@@ -25,6 +25,11 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		return nil, status.Error(codes.InvalidArgument, "must supply sever name")
 	}
 
+	if req.Description == "" {
+		s.service.Logger.Debug("incomplete create server request: missing server description")
+		return nil, status.Error(codes.InvalidArgument, "must supply sever description")
+	}
+
 	if req.Fqdn == "" {
 		s.service.Logger.Debug("incomplete create server request: missing server fqdn")
 		return nil, status.Error(codes.InvalidArgument, "must supply server fqdn")
@@ -32,7 +37,7 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 
 	var server storage.Server
 	var err error
-	if server, err = s.service.Storage.StoreServer(ctx, req.Name, req.Fqdn, req.IpAddress); err != nil {
+	if server, err = s.service.Storage.StoreServer(ctx, req.Name, req.Description, req.Fqdn, req.IpAddress); err != nil {
 		if err == storage.ErrConflict {
 			return nil, status.Errorf(codes.AlreadyExists, "server with name %q already exists", req.Name)
 		}
@@ -79,6 +84,30 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 	}, nil
 }
 
+// GetServerByName takes a server name and returns a server object
+func (s *Server) GetServerByName(ctx context.Context, req *request.GetServerByName) (*response.GetServer, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	if req.Name == "" {
+		s.service.Logger.Debug("incomplete server request: missing server name")
+		return nil, status.Error(codes.InvalidArgument, "must supply sever name")
+	}
+
+	server, err := s.service.Storage.GetServerByName(ctx, req.Name)
+	if err != nil {
+		if err == storage.ErrNotFound {
+			return nil, status.Errorf(codes.NotFound, "no server found with name %q", req.Name)
+		}
+		return nil, status.Errorf(codes.Internal,
+			"unexpected error for GetServerByName with server named %q", req.Name)
+	}
+
+	return &response.GetServer{
+		Server: fromStorageServer(server),
+	}, nil
+}
+
 // DeleteServer deletes a server from the db
 func (s *Server) DeleteServer(ctx context.Context, req *request.DeleteServer) (*response.DeleteServer, error) {
 	ctx, cancel := context.WithCancel(ctx)
@@ -117,6 +146,10 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 		s.service.Logger.Debug("incomplete update server request: missing server name")
 		return nil, status.Error(codes.InvalidArgument, "must supply server name")
 	}
+	if req.Description == "" {
+		s.service.Logger.Debug("incomplete update server request: missing server description")
+		return nil, status.Error(codes.InvalidArgument, "must supply server description")
+	}
 	if req.Fqdn == "" {
 		s.service.Logger.Debug("incomplete update server request: missing server fqdn")
 		return nil, status.Error(codes.InvalidArgument, "must supply server fqdn")
@@ -132,10 +165,11 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 	}
 
 	serverStruct := storage.Server{
-		ID:        id,
-		Name:      req.Name,
-		Fqdn:      req.Fqdn,
-		IpAddress: req.IpAddress,
+		ID:          id,
+		Name:        req.Name,
+		Description: req.Description,
+		Fqdn:        req.Fqdn,
+		IpAddress:   req.IpAddress,
 	}
 
 	server, err := s.service.Storage.EditServer(ctx, serverStruct)
@@ -151,10 +185,12 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 // Create a response.Server from a storage.Server
 func fromStorageServer(s storage.Server) *response.Server {
 	return &response.Server{
-		Id:        s.ID.String(),
-		Name:      s.Name,
-		Fqdn:      s.Fqdn,
-		IpAddress: s.IpAddress,
+		Id:          s.ID.String(),
+		Name:        s.Name,
+		Description: s.Description,
+		Fqdn:        s.Fqdn,
+		IpAddress:   s.IpAddress,
+		OrgsCount:   s.OrgsCount,
 	}
 }
 

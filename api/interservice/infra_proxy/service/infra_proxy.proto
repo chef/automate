@@ -3,6 +3,7 @@ syntax = "proto3";
 package chef.automate.domain.infra_proxy.service;
 option go_package = "github.com/chef/automate/api/interservice/infra_proxy/service";
 
+import "api/external/common/version/version.proto";
 import "api/interservice/infra_proxy/request/servers.proto";
 import "api/interservice/infra_proxy/request/orgs.proto";
 
@@ -10,11 +11,13 @@ import "api/interservice/infra_proxy/response/servers.proto";
 import "api/interservice/infra_proxy/response/orgs.proto";
 
 service InfraProxy {
-    rpc CreateServer (chef.automate.domain.infra_proxy.request.CreateServer) returns (chef.automate.domain.infra_proxy.response.CreateServer) {};
-    rpc DeleteServer (chef.automate.domain.infra_proxy.request.DeleteServer) returns (chef.automate.domain.infra_proxy.response.DeleteServer) {};
-    rpc UpdateServer (chef.automate.domain.infra_proxy.request.UpdateServer) returns (chef.automate.domain.infra_proxy.response.UpdateServer) {};
-    rpc GetServers   (chef.automate.domain.infra_proxy.request.GetServers) returns (chef.automate.domain.infra_proxy.response.GetServers) {};
-    rpc GetServer    (chef.automate.domain.infra_proxy.request.GetServer) returns (chef.automate.domain.infra_proxy.response.GetServer) {};
+    rpc GetVersion      (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
+    rpc CreateServer    (chef.automate.domain.infra_proxy.request.CreateServer) returns (chef.automate.domain.infra_proxy.response.CreateServer) {};
+    rpc DeleteServer    (chef.automate.domain.infra_proxy.request.DeleteServer) returns (chef.automate.domain.infra_proxy.response.DeleteServer) {};
+    rpc UpdateServer    (chef.automate.domain.infra_proxy.request.UpdateServer) returns (chef.automate.domain.infra_proxy.response.UpdateServer) {};
+    rpc GetServers      (chef.automate.domain.infra_proxy.request.GetServers) returns (chef.automate.domain.infra_proxy.response.GetServers) {};
+    rpc GetServer       (chef.automate.domain.infra_proxy.request.GetServer) returns (chef.automate.domain.infra_proxy.response.GetServer) {};
+    rpc GetServerByName (chef.automate.domain.infra_proxy.request.GetServerByName) returns (chef.automate.domain.infra_proxy.response.GetServer) {};
 
     rpc CreateOrg (chef.automate.domain.infra_proxy.request.CreateOrg) returns (chef.automate.domain.infra_proxy.response.CreateOrg) {};
     rpc DeleteOrg (chef.automate.domain.infra_proxy.request.DeleteOrg) returns (chef.automate.domain.infra_proxy.response.DeleteOrg) {};
