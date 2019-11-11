@@ -8,8 +8,6 @@ import * as moment from 'moment';
 
 import { EntityStatus } from '../../entities/entities';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
-import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { LayoutFacadeService } from '../layout/layout.facade';
 
 import * as fromServiceGroups from './service-groups.reducer';
 import {
@@ -53,12 +51,9 @@ export class ServiceGroupsFacadeService {
   constructor(
       private store: Store<fromServiceGroups.ServiceGroupsEntityState>,
       private router: Router,
-      private telemetryService: TelemetryService,
-      private featureFlagsService: FeatureFlagsService,
-      private layoutFacade: LayoutFacadeService
+      private telemetryService: TelemetryService
     ) {
     // this.allBooks$ = store.pipe(select(fromBooks.getAllBooks));
-    this.applicationsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('applications');
     this.services$ = store.select(selectedServiceGroupList);
     this.serviceGroupsStatus$ = store.select(serviceGroupsStatus);
     this.serviceGroupsError$ = store.select(serviceGroupsError);
@@ -142,20 +137,5 @@ export class ServiceGroupsFacadeService {
   public formatTimestamp(time: Date): string {
     // Forcing UTC with custom RFC format
     return moment.utc(time).format(this.RFC2822);
-  }
-
-  public showSidebar() {
-    this.layoutFacade.updateMenuGroups([{
-        name: 'Applications',
-        items: [
-            {
-                name: 'Service Groups',
-                icon: 'group_work',
-                route: '/applications',
-                visible: true
-            }
-        ],
-        visible: this.applicationsFeatureFlagOn
-    }]);
   }
 }

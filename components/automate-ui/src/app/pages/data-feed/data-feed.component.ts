@@ -4,6 +4,7 @@ import { map, filter } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { SortDirection } from '../../types/types';
 import { DatafeedService } from '../../services/data-feed/data-feed.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
@@ -32,6 +33,7 @@ export class DatafeedComponent implements OnInit {
   permissionDenied = false;
 
   constructor(
+    private layoutFacade: LayoutFacadeService,
     private service: DatafeedService,
     public dialog: MatDialog,
     public snackBar: MatSnackBar,
@@ -39,6 +41,7 @@ export class DatafeedComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.layoutFacade.showSettingsSidebar();
     this.destinations$ = this.service.fetchDestinations();
     this.destinations$.subscribe(destinations => {
         this.sendCountToTelemetry(destinations);

@@ -7,7 +7,7 @@
 export interface MenuItemGroup {
   name: string;
   items: MenuItem[];
-  visible: boolean;
+  visible: any; // boolean or observable
 }
 
 // MenuItem {
@@ -21,6 +21,7 @@ export interface MenuItemGroup {
 export interface MenuItem {
   name: string;
   icon: string;
+  iconRotation?: number;
   route: string;
   authorized?: Authorized;
   visible: boolean;

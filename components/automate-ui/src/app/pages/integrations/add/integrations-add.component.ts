@@ -12,6 +12,7 @@ import {
   toPairs,
   toUpper
 } from 'lodash/fp';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { CreateManager } from '../../../entities/managers/manager.actions';
 import { integrationsAddState } from './integrations-add.selectors';
@@ -28,10 +29,13 @@ export class IntegrationsAddComponent implements OnDestroy {
 
   private sub: Subscription;
 
-  constructor(private store: Store<NgrxStateAtom>,
-              location: Location,
-              fb: FormBuilder) {
-
+  constructor(
+    private store: Store<NgrxStateAtom>,
+    private layoutFacade: LayoutFacadeService,
+    location: Location,
+    fb: FormBuilder
+  ) {
+    this.layoutFacade.showSettingsSidebar();
     this.sub = store.select(integrationsAddState).subscribe(({status}) => {
       this.status = status;
       if (status === Status.success) {

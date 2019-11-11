@@ -5,6 +5,7 @@ import { Observable, Subject } from 'rxjs';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
@@ -50,7 +51,9 @@ export class ApiTokenListComponent implements OnInit {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    fb: FormBuilder) {
+    fb: FormBuilder,
+    private layoutFacade: LayoutFacadeService
+  ) {
     this.loading$ = store.pipe(select(apiTokenStatus), map(loading));
     this.isIAMv2$ = store.select(isIAMv2);
     this.apiTokenCount$ = store.select(totalApiTokens);
@@ -69,6 +72,7 @@ export class ApiTokenListComponent implements OnInit {
   }
 
   ngOnInit() {
+    this.layoutFacade.showSettingsSidebar();
     this.store.dispatch(new GetAllTokens());
 
     this.store.select(assignableProjects)

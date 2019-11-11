@@ -1,10 +1,7 @@
-<div class="app-main-container">
-  <app-settings-sidebar sidebar></app-settings-sidebar>
+<div class="content-container">
   <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
 
   <div class="container token-container">
-    <app-chef-notifications></app-chef-notifications>
-
     <main>
       <chef-page-header contrastingBackground>
         <chef-heading>API Tokens</chef-heading>

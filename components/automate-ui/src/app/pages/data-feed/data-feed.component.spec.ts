@@ -68,8 +68,7 @@ describe('DatafeedComponent', () => {
         RouterTestingModule
       ],
       declarations: [
-        DatafeedComponent,
-        MockComponent({ selector: 'app-settings-sidebar'})
+        DatafeedComponent
       ],
       providers: [
         { provide: MatDialog, useClass: MockMdDialog },

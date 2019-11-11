@@ -33,8 +33,6 @@ describe('IntegrationsComponent', () => {
         }, { runtimeChecks })
       ],
       declarations: [
-        MockComponent({ selector: 'app-settings-sidebar' }),
-        MockComponent({ selector: 'app-chef-notifications' }),
         IntegrationsListComponent
       ],
       schemas: [

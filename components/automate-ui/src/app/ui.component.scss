@@ -1,17 +1,8 @@
-@import "~styles/variables";
-
 #app-container {
   height: 100vh;
 }
 
 #app-header-wrapper {
-//   display: flex;
-//   flex-flow: column nowrap;
-
-//   & > * {
-//     flex: 1 100%;
-//   }
-
   app-navbar {
     display: block;
     height: 70px;
@@ -21,17 +12,19 @@
 #app-content-wrapper {
   display: flex;
   flex-flow: row nowrap;
-  height: calc(100vh - 110px);
+  height: calc(100vh - 70px);
   position: relative;
-  
-  & > .aside-1 { order: 1; }
-  & > .main { 
+
+  &.adjust-content-height {
+    height: calc(100vh - 110px);
+  }
+
+  & > #app-sidebar { order: 1; }
+
+  & > #main-content-wrapper {
     flex: 2 0px;
     order: 2;
     height: 100%;
     overflow-x: scroll;
   }
-  & > .aside-2 { order: 3; }
 }
-
-  

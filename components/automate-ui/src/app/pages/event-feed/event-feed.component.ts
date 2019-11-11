@@ -151,23 +151,11 @@ export class EventFeedComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private route: ActivatedRoute,
     private router: Router,
-    private layoutFacade: LayoutFacadeService,
-  ) {
-    this.layoutFacade.updateMenuGroups([{
-      name: 'Dashboards',
-      items: [
-        {
-          name: 'Event Feed',
-          icon: 'today',
-          route: '/dashboards/event-feed',
-          visible: true
-        }
-      ],
-      visible: true
-    }]);
-  }
+    private layoutFacade: LayoutFacadeService
+  ) {}
 
   ngOnInit() {
+    this.layoutFacade.showDashboardsSidebar();
     this.store.select(eventFeedSelectors.loadedEvents).pipe(
     takeUntil(this.isDestroyed))
     .subscribe((loadedEvents: ChefEvent[]) => {

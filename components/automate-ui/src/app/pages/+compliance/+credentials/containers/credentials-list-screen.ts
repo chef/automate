@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { Credential,
          CredentialsList,
          CredentialsActions,
@@ -11,8 +12,7 @@ import { NgrxStateAtom } from '../../../../ngrx.reducers';
 @Component({
   selector: 'app-credentials-list-screen',
   template: `
-    <div class="app-main-container">
-      <app-settings-sidebar sidebar></app-settings-sidebar>
+    <div class="content-container">
       <app-credentials-list
         class="container"
         [credentialsList]="credentialsList$ | async"
@@ -29,9 +29,11 @@ export class CredentialsListScreenComponent {
 
   constructor(
     private store: Store<NgrxStateAtom>,
+    private layoutFacade: LayoutFacadeService,
     private router: Router,
     private route: ActivatedRoute
   ) {
+    this.layoutFacade.showSettingsSidebar();
     this.credentialsList$ = store.select(selectors.credentialsList);
   }
 

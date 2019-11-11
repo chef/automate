@@ -6,6 +6,7 @@ import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
@@ -51,6 +52,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   private id: string;
 
   constructor(
+    private layoutFacade: LayoutFacadeService,
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
     private router: Router
@@ -58,6 +60,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    this.layoutFacade.showSettingsSidebar();
     // Populate our tabValue from the fragment.
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {

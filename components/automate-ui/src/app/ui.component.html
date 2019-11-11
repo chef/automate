@@ -18,17 +18,20 @@
   </app-feature-flags>
   
   <!-- App Header -->
-  <div id="app-header-wrapper" *ngIf="renderNavbar">
+  <div id="app-header-wrapper" *ngIf="layoutFacade.showHeader">
     <app-license-notifications (triggerApplyLicense)="licenseApplyModal.openModal();"></app-license-notifications>
     <app-navbar></app-navbar>
   </div>
 
   <!-- App Content -->
-  <div id="app-content-wrapper">
-    <div class="main">
+  <div id="app-content-wrapper" [ngStyle]="{'height' : layoutFacade.contentHeight}">
+    <div id="main-content-wrapper">
+      <div id="notifications-wrapper">
+        <app-chef-notifications></app-chef-notifications>
+      </div>
       <router-outlet></router-outlet>
     </div>
     <!-- App Sidebar -->
-    <chef-sidebar class="aside-1"></chef-sidebar>
+    <chef-sidebar id="app-sidebar" *ngIf="layoutFacade.showSidebar"></chef-sidebar>
   </div>
 </div>

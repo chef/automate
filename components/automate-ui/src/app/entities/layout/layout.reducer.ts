@@ -3,7 +3,7 @@ import { MenuItemGroup } from './layout.model';
 import { LayoutActions, LayoutActionTypes } from './layout.actions';
 
 export interface LayoutEntityState {
-  menuGroups: MenuItemGroup[],
+  menuGroups: MenuItemGroup[];
 }
 
 export const InitialState: LayoutEntityState = {

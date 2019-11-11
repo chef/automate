@@ -9,6 +9,7 @@ import { loading } from 'app/entities/entities';
 import { DeletePolicy, GetPolicies } from 'app/entities/policies/policy.actions';
 import { allPolicies, getAllStatus, isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { Policy } from 'app/entities/policies/policy.model';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 @Component({
   selector: 'app-policy-list',
@@ -23,7 +24,8 @@ export class PolicyListComponent implements OnInit {
   public deleteModalVisible = false;
 
   constructor(
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private layoutFacade: LayoutFacadeService
   ) {
     this.loading$ = store.pipe(select(getAllStatus), map(loading));
     this.sortedPolicies$ = store.pipe(
@@ -34,6 +36,7 @@ export class PolicyListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.layoutFacade.showSettingsSidebar();
     this.store.dispatch(new GetPolicies());
   }
 

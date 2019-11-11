@@ -4,6 +4,7 @@ import { Store } from '@ngrx/store';
 import { Observable ,  Subject, combineLatest } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
@@ -43,6 +44,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
+    private layoutFacade: LayoutFacadeService,
     fb: FormBuilder
   ) {
     this.userStatus$ = store.select(userStatus);
@@ -62,6 +64,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.layoutFacade.showSettingsSidebar();
     this.store.dispatch(new GetUsers());
     combineLatest([
       this.store.select(allUsers),

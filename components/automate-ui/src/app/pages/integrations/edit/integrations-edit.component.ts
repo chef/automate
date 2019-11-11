@@ -17,6 +17,7 @@ import {
   map
 } from 'lodash/fp';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { managerFromRoute } from '../../../entities/managers/manager.selectors';
 import { UpdateManager } from '../../../entities/managers/manager.actions';
@@ -36,10 +37,13 @@ export class IntegrationsEditComponent implements OnDestroy {
 
   private subs: Subscription[];
 
-  constructor(private store: Store<NgrxStateAtom>,
-              location: Location,
-              fb: FormBuilder) {
-
+  constructor(
+    private store: Store<NgrxStateAtom>,
+    location: Location,
+    fb: FormBuilder,
+    private layoutFacade: LayoutFacadeService
+  ) {
+    this.layoutFacade.showSettingsSidebar();
     this.createForm(fb);
 
     this.subs = [

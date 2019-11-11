@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading } from 'app/entities/entities';
@@ -22,7 +23,8 @@ export class RolesListComponent implements OnInit {
   public isIAMv2$: Observable<boolean>;
 
   constructor(
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private layoutFacade: LayoutFacadeService
   ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
     this.sortedRoles$ = store.select(allRoles).pipe(
@@ -32,6 +34,7 @@ export class RolesListComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.layoutFacade.showSettingsSidebar();
     this.store.dispatch(new GetRoles());
   }
 }

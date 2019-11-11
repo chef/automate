@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { Destination } from 'app/pages/data-feed/destination';
-import { DatafeedService } from 'app/services/data-feed/data-feed.service';
-
 import { ActivatedRoute } from '@angular/router';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { Destination } from 'app/pages/data-feed/destination';
+import { DatafeedService } from 'app/services/data-feed/data-feed.service';
 
 enum UrlTestState {
   Inactive,
@@ -49,9 +49,11 @@ export class DatafeedFormComponent {
 
 
   constructor(
+    private layoutFacade: LayoutFacadeService,
     private datafeedService: DatafeedService,
     private route: ActivatedRoute
   ) {
+    this.layoutFacade.showSettingsSidebar();
     this.model = new Model(new Destination(undefined, '', '', ''), '', '');
     this.id = this.route.snapshot.params['id'];
     this.isEditDestination = this.id ? true : false;

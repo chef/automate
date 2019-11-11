@@ -5,6 +5,7 @@ import { filter } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Feature } from 'app/services/feature-flags/types';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import { GetIamVersion } from 'app/entities/policies/policy.actions';
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
@@ -30,28 +31,33 @@ export class UIComponent implements OnInit {
   ];
 
   legacyFeatures: Array<Feature> = [];
-
-  renderNavbar = true;
+  hideFullPage = true;
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private router: Router
+    private router: Router,
+    public layoutFacade: LayoutFacadeService
   ) {
-
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
       filter(event => event instanceof ActivationEnd)
     ).subscribe((event: ActivationEnd) => {
-      this.renderNavbar = typeof event.snapshot.data.hideNavBar !== 'undefined'
+      this.hideFullPage = typeof event.snapshot.data.hideNavBar !== 'undefined'
         ? !event.snapshot.data.hideNavBar
-        : this.renderNavbar;
+        : this.hideFullPage;
+
+      if (this.hideFullPage) {
+        this.layoutFacade.hideFullPage();
+      } else {
+        this.layoutFacade.showFullPage();
+      }
     });
   }
 
   ngOnInit(): void {
     this.router.events.pipe(
         filter(event => event instanceof ActivationStart)
-    ).subscribe((event: ActivationStart) => this.renderNavbar = !event.snapshot.data.hideNavBar);
+    ).subscribe((event: ActivationStart) => this.hideFullPage = !event.snapshot.data.hideNavBar);
 
     this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)

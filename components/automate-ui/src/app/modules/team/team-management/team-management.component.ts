@@ -5,6 +5,7 @@ import { Observable, Subject } from 'rxjs';
 import { map, filter, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus } from 'app/entities/entities';
@@ -46,7 +47,8 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
 
  constructor(
     private store: Store<NgrxStateAtom>,
-    fb: FormBuilder
+    fb: FormBuilder,
+    private layoutFacade: LayoutFacadeService
     ) {
     this.loading$ = store.select(getAllStatus).pipe(map(loading));
     this.sortedTeams$ = store.select(allTeams).pipe(
@@ -72,6 +74,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.layoutFacade.showSettingsSidebar();
     this.store.dispatch(new GetTeams());
     this.store.pipe(
       select(isIAMv2),

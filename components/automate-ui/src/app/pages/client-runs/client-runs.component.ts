@@ -43,7 +43,7 @@ import {
   ClientRunsRequests
 } from '../../entities/client-runs/client-runs.requests';
 import { EntityStatus } from '../../entities/entities';
-import { ClientRunsFacadeService } from 'app/entities/client-runs/client-runs.facade';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 @Component({
   selector: 'app-client-runs',
@@ -248,11 +248,11 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private telemetryService: TelemetryService,
     private requests: ClientRunsRequests,
-    private facade: ClientRunsFacadeService
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   ngOnInit() {
-    this.facade.showSidebar();
+    this.layoutFacade.showInfastructureSidebar();
     // Only load when first opening the /chef-runs page
     this.store.dispatch(new GetWorkflowEnabled());
 

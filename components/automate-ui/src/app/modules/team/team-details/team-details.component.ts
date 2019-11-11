@@ -6,6 +6,7 @@ import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
 import { combineLatest, Subject, Observable } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeURL, routeState } from 'app/route.selectors';
@@ -75,9 +76,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
-  constructor(private store: Store<NgrxStateAtom>,
+  constructor(
+    private store: Store<NgrxStateAtom>,
     public fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private layoutFacade: LayoutFacadeService
   ) {
     this.team = {
       id: '',
@@ -98,8 +101,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.store.dispatch(new GetUsers());
-
     this.isIAMv2$ = this.store.select(isIAMv2);
+    this.layoutFacade.showSettingsSidebar();
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
         this.url = url;

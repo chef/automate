@@ -8,4 +8,3 @@ export const sidebarMenuGroups = createSelector(
     layoutState,
     (layout) => layout.menuGroups
   );
-  

@@ -1,10 +1,5 @@
-<div class="app-main-container">
-  <app-settings-sidebar sidebar *ngIf="isAdminView"> </app-settings-sidebar>
-  <app-user-profile-sidebar sidebar *ngIf="!isAdminView"> </app-user-profile-sidebar>
-
+<div class="content-container">
   <div class="container">
-    <app-chef-notifications></app-chef-notifications>
-
     <main *ngIf="isAdminView || user.id">
       <app-delete-object-modal
         [visible]="modalVisible"

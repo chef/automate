@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { DateTime } from '../../../helpers/datetime/datetime';
 import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { EntityStatus } from '../../../entities/entities';
@@ -29,8 +30,10 @@ export class IntegrationsListComponent {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private router: Router
+    private router: Router,
+    private layoutFacade: LayoutFacadeService
   ) {
+    this.layoutFacade.showSettingsSidebar();
     this.managers$ = store.select(cloudManagers);
     this.managerStatus$ = store.select(managerStatus);
     this.automateManager$ = store.select(automateManager);

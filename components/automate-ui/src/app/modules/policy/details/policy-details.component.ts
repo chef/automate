@@ -6,6 +6,7 @@ import { isNil } from 'lodash/fp';
 import { Subject, combineLatest } from 'rxjs';
 
 import { EntityStatus } from 'app/entities/entities';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeURL, routeState } from 'app/route.selectors';
 import { GetPolicy } from 'app/entities/policies/policy.actions';
@@ -38,10 +39,14 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
-  constructor(private store: Store<NgrxStateAtom>,
-              private router: Router) {  }
+  constructor(
+    private store: Store<NgrxStateAtom>,
+    private router: Router,
+    private layoutFacade: LayoutFacadeService
+  ) {  }
 
   ngOnInit(): void {
+    this.layoutFacade.showSettingsSidebar();
     // Populate our tabValue from the fragment.
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {

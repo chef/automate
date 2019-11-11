@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 <div class="app-main-container">
   <app-settings-sidebar sidebar></app-settings-sidebar>
 <<<<<<< HEAD:components/automate-ui/src/app/pages/policy/list/policy-list.component.html
@@ -46,20 +47,21 @@
     </section>
 =======
   
+=======
+<div class="content-container">
+>>>>>>> Remove fixed positioning, add dynamic UI layout with layout ngrx store consolidate sidebars and notifications in core ui.component Signed-Off-By: Tara Black <tblack@chef.io>
   <div class="container">
-    <app-chef-notifications></app-chef-notifications>
     <main>
-      <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
       <chef-page-header>
         <chef-heading>Policies</chef-heading>
         <chef-subheading>
           Policies manage the resources and actions used by identities.
         </chef-subheading>
       </chef-page-header>
-      <section *ngIf="(iamMajorVersion$ | async) === 'v1'" class="page-body">
+      <section *ngIf="!(isIAMv2$ | async)" class="page-body">
         Currently, you are using IAM v1 policies. Automate only shows IAM v2 policies.
       </section>
-      <section *ngIf="(iamMajorVersion$ | async) !== 'v1'" class="page-body">
+      <section *ngIf="isIAMv2$ | async" class="page-body">
         <app-authorized [allOf]="['/iam/v2beta/policies', 'get']">
           <chef-table>
             <chef-thead>
@@ -89,7 +91,6 @@
           </chef-table>
         </app-authorized>
       </section>
->>>>>>> Restructured page layouts  Signed-Off-By: Tara Black <tblack@chef.io>:components/automate-ui/src/app/modules/policy/list/policy-list.component.html
 
       <app-delete-object-modal
         [visible]="deleteModalVisible"

@@ -34,7 +34,6 @@ describe('DatafeedFormComponent', () => {
         DatafeedFormComponent,
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'app-settings-sidebar' }),
         MockComponent({ selector: 'chef-success-alert' }),
         MockComponent({ selector: 'chef-error-alert' }),
         MockComponent({ selector: 'chef-error' }),

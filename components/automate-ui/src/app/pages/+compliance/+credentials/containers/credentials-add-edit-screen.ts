@@ -6,6 +6,7 @@ import { HttpClient } from '@angular/common/http';
 import { Credential, CredentialTypes } from '../credentials.state';
 import { ActivatedRoute, Router } from '@angular/router';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { CredentialsLogic } from '../credentials.logic';
 import { environment } from '../../../../../environments/environment';
 const SECRETS_URL = environment.secrets_url;
@@ -24,14 +25,16 @@ export class CredentialsAddEditScreenComponent implements OnInit {
   credential$: Observable<Credential>;
 
   constructor(
-              private route: ActivatedRoute,
-              private router: Router,
-              private httpClient: HttpClient,
-              private ref: ChangeDetectorRef,
-              private credentialsLogic: CredentialsLogic) {
-  }
+    private route: ActivatedRoute,
+    private router: Router,
+    private httpClient: HttpClient,
+    private ref: ChangeDetectorRef,
+    private credentialsLogic: CredentialsLogic,
+    private layoutFacade: LayoutFacadeService
+  ) {}
 
   ngOnInit() {
+    this.layoutFacade.showSettingsSidebar();
     this.route.paramMap
       .subscribe(params => {
         this.credential$ = params.get('id') ?

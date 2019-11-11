@@ -7,7 +7,7 @@ import {
 export const clientRunsState =
   createFeatureSelector<ClientRunsEntityState>('clientRunsEntity');
 
-  export const clientRunsWorkflowEnabled= createSelector(
+  export const clientRunsWorkflowEnabled = createSelector(
     clientRunsState,
     (state) => state.workflowEnabled
   );

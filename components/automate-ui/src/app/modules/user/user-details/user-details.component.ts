@@ -7,6 +7,7 @@ import { Store } from '@ngrx/store';
 import { filter, pluck, map } from 'rxjs/operators';
 import { find, identity } from 'lodash/fp';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefValidators } from 'app/helpers/auth/validator';
 import { routeParams } from 'app/route.selectors';
@@ -42,7 +43,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private layoutFacade: LayoutFacadeService
   ) {
     this.createForms(this.fb);
     // TODO (tc) This needs to be refactored to resemble our other patterns
@@ -89,6 +91,11 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
 
   ngOnInit(): void {
+    if (this.isAdminView) {
+      this.layoutFacade.showSettingsSidebar();
+    } else {
+      this.layoutFacade.showUserProfileSidebar();
+    }
     this.route.data.subscribe((data: { isNonAdmin: boolean }) => {
       this.isAdminView = !data.isNonAdmin;
       // Update the forms once this info has come in

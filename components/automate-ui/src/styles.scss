@@ -4,31 +4,15 @@
 @import "assets/chef-ui-library/collection/styles/variables.example.css";
 @import "styles/chef-theme";
 
-// .app-main-container {
-//   display: flex;
-//   flex-flow: row;
-//   position: relative;
+.content-container {
+  height: 100%;
+  position: relative;
 
-//   *[sidebar] {
-//     min-height: 95vh;
-//   }
-
-//   .notifications {
-//     flex: 3 0 0;
-//     order: 2;
-//   }
-
-//   .container main {
-//     height: 100%;
-//     position: relative;
-
-//     chef-loading-spinner[fixed] {
-//       position: absolute;
-//       top: 0;
-//       left: 0;
-//     }
-//   }
-// }
+  .container {
+    height: inherit;
+    position: relative;
+  }
+}
 
 chef-side-panel {
   position: absolute;

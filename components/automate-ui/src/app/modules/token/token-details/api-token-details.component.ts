@@ -5,6 +5,7 @@ import { isEmpty, identity, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
@@ -47,7 +48,8 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    fb: FormBuilder
+    fb: FormBuilder,
+    private layoutFacade: LayoutFacadeService
   ) {
     const initialStatus: TokenStatus = 'active';
     this.updateForm = fb.group({
@@ -65,6 +67,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.layoutFacade.showSettingsSidebar();
     this.store.pipe(
       select(apiTokenFromRoute),
       filter(identity),

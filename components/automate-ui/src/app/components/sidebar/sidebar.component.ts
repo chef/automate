@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { MenuItemGroup } from 'app/entities/layout/layout.model';
@@ -16,5 +16,11 @@ export class SidebarComponent {
     @Inject(LayoutFacadeService) layoutFacade: LayoutFacadeService
   ) {
     this.menuGroups$ = layoutFacade.menuGroups$;
+  }
+
+  public isVisible(item: any) {
+    return item.subscribe
+      ? item
+      : new BehaviorSubject(item);
   }
 }

@@ -1,5 +1,4 @@
-<div class="app-main-container">
-  <app-settings-sidebar sidebar></app-settings-sidebar>
+<div class="content-container">
   <div class="container" *ngIf="(managerDetail$ | async) as managerDetail">
     <main *ngIf="managerDetail.manager">
       <chef-breadcrumbs>
