@@ -9,7 +9,7 @@ import "components/automate-grpc/protoc-gen-a2-config/api/a2conf/annotations.pro
 import "google/protobuf/wrappers.proto";
 
 message ConfigRequest {
-  option (chef.automate.api.service_config) = {name: "infra-proxy"};
+	option (chef.automate.api.service_config) = {name: "infra-proxy-service"};
 
 	reserved 1 to 2;
 	V1 v1 = 3;

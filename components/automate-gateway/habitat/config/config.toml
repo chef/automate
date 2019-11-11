@@ -82,6 +82,13 @@ open_api_ui_dir = "{{pkg.path}}/static/swagger-ui/"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
+{{~#eachAlive bind.infra-proxy-service.members as |infra|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.infra-proxy-service]
+    target = "{{infra.sys.ip}}:{{infra.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
 {{~#eachAlive bind.ingest-service.members as |ingest|}}
 {{~#if @last}}
   [grpc_clients.endpoints.ingest-service]

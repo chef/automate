@@ -71,6 +71,7 @@ automate-workflow-web components/automate-workflow-web
 data-feed-service components/data-feed-service
 event-feed-service components/event-feed-service
 cereal-service components/cereal-service
+infra-proxy-service components/infra-proxy-service
 automate-minio components/automate-minio
 automate-openssl11 components/automate-openssl11
 automate-builder-memcached components/automate-builder-memcached

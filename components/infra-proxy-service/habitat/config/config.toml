@@ -1,18 +1,8 @@
-[service]
-{{~#if cfg.service.host}}
-host = "{{cfg.service.host}}"
-{{~else}}
-host = "{{sys.ip}}"
-{{~/if}}
-port = {{cfg.service.port}}
-
-[postgres]
+grpc = "{{cfg.service.host}}:{{cfg.service.port}}"
+log-format = "{{cfg.log.format}}"
+log-level = "{{cfg.log.level}}"
 database = "{{cfg.storage.database}}"
-migrations_path = "{{pkg.path}}/migrations"
-
-[log]
-log_format = "{{cfg.log.format}}"
-log_level = "{{cfg.log.level}}"
+migrations-path = "{{pkg.path}}/migrations"
 
 [tls]
 cert_path = "{{pkg.svc_config_path}}/service.crt"

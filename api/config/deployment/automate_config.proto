@@ -23,6 +23,7 @@ import "api/config/esgateway/config_request.proto";
 import "api/config/es_sidecar/config_request.proto";
 import "api/config/gateway/config_request.proto";
 import "api/config/ingest/config_request.proto";
+import "api/config/infra_proxy/config_request.proto";
 import "api/config/license_control/config_request.proto";
 import "api/config/load_balancer/config_request.proto";
 import "api/config/local_user/config_request.proto";
@@ -50,7 +51,7 @@ import "api/config/builder_memcached/config_request.proto";
 message AutomateConfig {
 	reserved 26; // automate-blob-store
 	reserved 20; // data-lifecycle-service
-
+	// TODO(ssd) 2019-11-11:  WHHHHYYYYYY aren't these in order.
 	chef.automate.infra.config.GlobalConfig global = 19;
 	chef.automate.domain.authn.ConfigRequest auth_n = 1;
 	chef.automate.domain.authz.ConfigRequest auth_z = 2;
@@ -97,4 +98,5 @@ message AutomateConfig {
 	chef.automate.domain.builder_api_proxy.ConfigRequest builder_api_proxy = 42;
 	chef.automate.infra.minio.ConfigRequest minio = 43;
 	chef.automate.infra.builder_memcached.ConfigRequest builder_memcached = 44;
+	chef.automate.domain.infra_proxy.ConfigRequest infra_proxy = 45;
 }

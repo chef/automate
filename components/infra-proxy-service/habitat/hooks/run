@@ -12,7 +12,4 @@ echo "Creating extension"
 pg-helper create-extension "{{cfg.storage.database}}" "pgcrypto"
 pg-helper create-extension "{{cfg.storage.database}}" "uuid-ossp"
 
-# cleanup old migration files
-rm -rf {{pkg.svc_static_path}}/migrations
-
-exec infra-proxy {{pkg.svc_config_path}}/config.yml
+exec infra-proxy-service serve {{pkg.svc_config_path}}/config.toml

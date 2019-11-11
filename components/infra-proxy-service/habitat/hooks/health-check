@@ -1,12 +1,6 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
-if [[ -z "$no_proxy" ]]; then
-  export no_proxy="{{sys.ip}}"
-else
-  export no_proxy="$no_proxy,{{sys.ip}}"
-fi
-
-exec service-health {{sys.ip}} {{cfg.service.port}} "infra-proxy" \
+exec service-health {{sys.ip}} {{cfg.service.port}} "infra-proxy-service" \
  {{pkg.svc_config_path}}/service.crt \
  {{pkg.svc_config_path}}/service.key \
  {{pkg.svc_config_path}}/root_ca.crt
