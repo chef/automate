@@ -86,8 +86,8 @@ service StatsService {
 	Read Profiles
 
 	Returns statistics and summary information for profiles executed as part of the compliance reports. 
-	If called without specifying a profile id (`id`), the API will return stats on all the profiles.
-	If the `id` field is provided (profile id) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
+	If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
+	If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
 	Supports filtering.
 
 	```
@@ -162,7 +162,7 @@ message ListFilter {
 }
 
 message Query {
-	// Unique identifier, such as a profile id.
+	// Unique identifier, such as a profile ID.
 	string id = 17;
 	// Type of data being requested, used for ReadTrend and ReadSummary.
 	string type = 19;
@@ -284,7 +284,7 @@ message Profile {
 message ProfileList {
 	// Name of the profile.
 	string name = 1;
-	// SHA id of the profile.
+	// SHA ID of the profile.
 	string id = 2;
 	// Total number of failed nodes that executed the profile.
 	int32 failures = 3;
@@ -342,7 +342,7 @@ message ProfileSummaryStats {
 }
 
 message ControlStats {
-	// Control id.
+	// Control ID.
 	string control = 1;
 	// Control title.
 	string title = 2;

@@ -126,7 +126,7 @@ type ConfigMgmtClient interface {
 	//
 	//GetRuns
 	//
-	//Returns a list of run metadata (id, start and end time, and status) for the provided node id.
+	//Returns a list of run metadata (id, start and end time, and status) for the provided node ID.
 	//Supports pagination.
 	//Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	GetRuns(ctx context.Context, in *request.Runs, opts ...grpc.CallOption) (*_struct.ListValue, error)
@@ -154,7 +154,7 @@ type ConfigMgmtClient interface {
 	//
 	//GetNodeRun
 	//
-	//Returns the infra run report for the provided node id and run id.
+	//Returns the infra run report for the provided node ID and run ID.
 	GetNodeRun(ctx context.Context, in *request.NodeRun, opts ...grpc.CallOption) (*response.Run, error)
 	//
 	//GetSuggestions
@@ -181,7 +181,7 @@ type ConfigMgmtClient interface {
 	//
 	//GetAttributes
 	//
-	//Returns the latest reported attributes for the provided node id.
+	//Returns the latest reported attributes for the provided node ID.
 	GetAttributes(ctx context.Context, in *request.Node, opts ...grpc.CallOption) (*response.NodeAttribute, error)
 	GetVersion(ctx context.Context, in *version.VersionInfoRequest, opts ...grpc.CallOption) (*version.VersionInfo, error)
 	//
@@ -318,7 +318,7 @@ type ConfigMgmtServer interface {
 	//
 	//GetRuns
 	//
-	//Returns a list of run metadata (id, start and end time, and status) for the provided node id.
+	//Returns a list of run metadata (id, start and end time, and status) for the provided node ID.
 	//Supports pagination.
 	//Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	GetRuns(context.Context, *request.Runs) (*_struct.ListValue, error)
@@ -346,7 +346,7 @@ type ConfigMgmtServer interface {
 	//
 	//GetNodeRun
 	//
-	//Returns the infra run report for the provided node id and run id.
+	//Returns the infra run report for the provided node ID and run ID.
 	GetNodeRun(context.Context, *request.NodeRun) (*response.Run, error)
 	//
 	//GetSuggestions
@@ -373,7 +373,7 @@ type ConfigMgmtServer interface {
 	//
 	//GetAttributes
 	//
-	//Returns the latest reported attributes for the provided node id.
+	//Returns the latest reported attributes for the provided node ID.
 	GetAttributes(context.Context, *request.Node) (*response.NodeAttribute, error)
 	GetVersion(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
 	//

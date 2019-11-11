@@ -86,7 +86,7 @@ func init() {
     "/cfgmgmt/nodes/{node_id}/attribute": {
       "get": {
         "summary": "GetAttributes",
-        "description": "Returns the latest reported attributes for the provided node id.",
+        "description": "Returns the latest reported attributes for the provided node ID.",
         "operationId": "GetAttributes",
         "responses": {
           "200": {
@@ -113,7 +113,7 @@ func init() {
     "/cfgmgmt/nodes/{node_id}/runs": {
       "get": {
         "summary": "GetRuns",
-        "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node id. \nSupports pagination.\nAccepts a ` + "`" + `start` + "`" + ` parameter to denote start date for the list and a filter of type ` + "`" + `status` + "`" + `.",
+        "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node ID. \nSupports pagination.\nAccepts a ` + "`" + `start` + "`" + ` parameter to denote start date for the list and a filter of type ` + "`" + `status` + "`" + `.",
         "operationId": "GetRuns",
         "responses": {
           "200": {
@@ -184,7 +184,7 @@ func init() {
     "/cfgmgmt/nodes/{node_id}/runs/{run_id}": {
       "get": {
         "summary": "GetNodeRun",
-        "description": "Returns the infra run report for the provided node id and run id.",
+        "description": "Returns the infra run report for the provided node ID and run ID.",
         "operationId": "GetNodeRun",
         "responses": {
           "200": {

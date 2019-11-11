@@ -135,7 +135,7 @@ func (m *ListFilter) GetType() string {
 }
 
 type Query struct {
-	// Unique identifier, such as a profile id.
+	// Unique identifier, such as a profile ID.
 	Id string `protobuf:"bytes,17,opt,name=id,proto3" json:"id,omitempty"`
 	// Type of data being requested, used for ReadTrend and ReadSummary.
 	Type string `protobuf:"bytes,19,opt,name=type,proto3" json:"type,omitempty"`
@@ -799,7 +799,7 @@ func (m *Profile) GetControlStats() []*ControlStats {
 type ProfileList struct {
 	// Name of the profile.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// SHA id of the profile.
+	// SHA ID of the profile.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	// Total number of failed nodes that executed the profile.
 	Failures int32 `protobuf:"varint,3,opt,name=failures,proto3" json:"failures,omitempty"`
@@ -1108,7 +1108,7 @@ func (m *ProfileSummaryStats) GetTotalNodes() int32 {
 }
 
 type ControlStats struct {
-	// Control id.
+	// Control ID.
 	Control string `protobuf:"bytes,1,opt,name=control,proto3" json:"control,omitempty"`
 	// Control title.
 	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
@@ -1610,8 +1610,8 @@ type StatsServiceClient interface {
 	//Read Profiles
 	//
 	//Returns statistics and summary information for profiles executed as part of the compliance reports.
-	//If called without specifying a profile id (`id`), the API will return stats on all the profiles.
-	//If the `id` field is provided (profile id) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
+	//If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
+	//If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
 	//Supports filtering.
 	//
 	//```
@@ -1738,8 +1738,8 @@ type StatsServiceServer interface {
 	//Read Profiles
 	//
 	//Returns statistics and summary information for profiles executed as part of the compliance reports.
-	//If called without specifying a profile id (`id`), the API will return stats on all the profiles.
-	//If the `id` field is provided (profile id) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
+	//If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
+	//If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
 	//Supports filtering.
 	//
 	//```

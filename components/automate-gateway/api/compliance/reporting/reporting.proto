@@ -102,7 +102,7 @@ service ReportingService {
 	/*
 	Fetch a report
 
-	Fetch a specific report by id. Supports filtering, but not pagination or sorting.
+	Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id` is not allowed.
 	*/
 	rpc ReadReport(Query) returns (Report) {
@@ -201,7 +201,7 @@ service ReportingService {
 	/*
 	Fetch a node
 
-	Fetch a specific node by id.
+	Fetch a specific node by ID.
 	Supports filtering by profile or control. 
 	Does not support pagination or sorting.
 	*/
@@ -306,7 +306,7 @@ message ControlItemRequest {
 }
 
 message ControlItem {
-	// The unique id of this control.
+	// The unique ID of this control.
 	string id = 1;
 	// The compact description of the control.
 	string title= 2;
@@ -412,7 +412,7 @@ message ReportIds {
 message Report {
 	// A unique report identifier.
 	string id = 1;
-	// The id of the node making the report.
+	// The ID of the node making the report.
 	string node_id = 2;
 	// The name of the node making the report.
 	string node_name = 3;
@@ -432,7 +432,7 @@ message Report {
 	Statistics statistics = 10;
 	// The profiles run as part of this report.
 	repeated Profile profiles = 11;
-	// The id of the compliance scan job associated with the report.
+	// The ID of the compliance scan job associated with the report.
 	string job_id = 12;
 	// The IP address of the node making the report.
 	string ipaddress = 13;
@@ -579,7 +579,7 @@ message Group {
 }
 
 message Control {
-	// The unique id of this control.
+	// The unique ID of this control.
 	string id = 1;
 	// The full ruby code of the control defined in the profile.
 	string code = 2;
@@ -636,7 +636,7 @@ message SuggestionRequest {
 message Suggestion {
 	// The content that matched the search term.
 	string text = 1;
-	// The id of the resource that was suggested.
+	// The ID of the resource that was suggested.
 	string id = 2;
 	// The confidence in the match quality.
 	float score = 3;
@@ -674,7 +674,7 @@ message ProfileMin {
 	string name = 1;
 	// The title of the profile.
 	string title = 2;
-	// The id of the profile.
+	// The ID of the profile.
 	string id = 3;
 	// The version of the profile.
 	string version = 4;
@@ -683,7 +683,7 @@ message ProfileMin {
 }
 
 message Node {
-	// The id of this node.
+	// The ID of this node.
 	string id = 1;
 	// The name assigned to the node.
 	string name = 2;
@@ -721,7 +721,7 @@ message Kv {
 
 // A summary of the information contained in the latest report for this node.
 message LatestReportSummary {
-	// The id of the latest report.
+	// The ID of the latest report.
 	string id = 1;
 	// The time the report was submitted at.
 	google.protobuf.Timestamp end_time = 2;
@@ -736,7 +736,7 @@ message ProfileMeta {
 	string name = 1;
 	// The version of the profile.
 	string version = 2;
-	// The unique id of the profile.
+	// The unique ID of the profile.
 	string id = 3;
 	// The status of the profile run against the node.
 	string status = 4;

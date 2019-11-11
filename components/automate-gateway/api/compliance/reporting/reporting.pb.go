@@ -116,7 +116,7 @@ func (m *ControlItemRequest) GetFilters() []*ListFilter {
 }
 
 type ControlItem struct {
-	// The unique id of this control.
+	// The unique ID of this control.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// The compact description of the control.
 	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
@@ -770,7 +770,7 @@ func (m *ReportIds) GetIds() []string {
 type Report struct {
 	// A unique report identifier.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// The id of the node making the report.
+	// The ID of the node making the report.
 	NodeId string `protobuf:"bytes,2,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
 	// The name of the node making the report.
 	NodeName string `protobuf:"bytes,3,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
@@ -790,7 +790,7 @@ type Report struct {
 	Statistics *Statistics `protobuf:"bytes,10,opt,name=statistics,proto3" json:"statistics,omitempty"`
 	// The profiles run as part of this report.
 	Profiles []*Profile `protobuf:"bytes,11,rep,name=profiles,proto3" json:"profiles,omitempty"`
-	// The id of the compliance scan job associated with the report.
+	// The ID of the compliance scan job associated with the report.
 	JobId string `protobuf:"bytes,12,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
 	// The IP address of the node making the report.
 	Ipaddress string `protobuf:"bytes,13,opt,name=ipaddress,proto3" json:"ipaddress,omitempty"`
@@ -1686,7 +1686,7 @@ func (m *Group) GetControls() []string {
 }
 
 type Control struct {
-	// The unique id of this control.
+	// The unique ID of this control.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// The full ruby code of the control defined in the profile.
 	Code string `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
@@ -2016,7 +2016,7 @@ func (m *SuggestionRequest) GetFilters() []*ListFilter {
 type Suggestion struct {
 	// The content that matched the search term.
 	Text string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
-	// The id of the resource that was suggested.
+	// The ID of the resource that was suggested.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	// The confidence in the match quality.
 	Score float32 `protobuf:"fixed32,3,opt,name=score,proto3" json:"score,omitempty"`
@@ -2243,7 +2243,7 @@ type ProfileMin struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The title of the profile.
 	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	// The id of the profile.
+	// The ID of the profile.
 	Id string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
 	// The version of the profile.
 	Version string `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
@@ -2315,7 +2315,7 @@ func (m *ProfileMin) GetStatus() string {
 }
 
 type Node struct {
-	// The id of this node.
+	// The ID of this node.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// The name assigned to the node.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -2535,7 +2535,7 @@ func (m *Kv) GetValue() string {
 
 // A summary of the information contained in the latest report for this node.
 type LatestReportSummary struct {
-	// The id of the latest report.
+	// The ID of the latest report.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// The time the report was submitted at.
 	EndTime *timestamp.Timestamp `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
@@ -2606,7 +2606,7 @@ type ProfileMeta struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The version of the profile.
 	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	// The unique id of the profile.
+	// The unique ID of the profile.
 	Id string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
 	// The status of the profile run against the node.
 	Status string `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
@@ -2959,7 +2959,7 @@ type ReportingServiceClient interface {
 	//
 	//Fetch a report
 	//
-	//Fetch a specific report by id. Supports filtering, but not pagination or sorting.
+	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id` is not allowed.
 	ReadReport(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Report, error)
 	//
@@ -3012,7 +3012,7 @@ type ReportingServiceClient interface {
 	//
 	//Fetch a node
 	//
-	//Fetch a specific node by id.
+	//Fetch a specific node by ID.
 	//Supports filtering by profile or control.
 	//Does not support pagination or sorting.
 	ReadNode(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
@@ -3223,7 +3223,7 @@ type ReportingServiceServer interface {
 	//
 	//Fetch a report
 	//
-	//Fetch a specific report by id. Supports filtering, but not pagination or sorting.
+	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id` is not allowed.
 	ReadReport(context.Context, *Query) (*Report, error)
 	//
@@ -3276,7 +3276,7 @@ type ReportingServiceServer interface {
 	//
 	//Fetch a node
 	//
-	//Fetch a specific node by id.
+	//Fetch a specific node by ID.
 	//Supports filtering by profile or control.
 	//Does not support pagination or sorting.
 	ReadNode(context.Context, *Id) (*Node, error)

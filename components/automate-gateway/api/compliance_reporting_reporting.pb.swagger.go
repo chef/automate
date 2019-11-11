@@ -45,7 +45,7 @@ func init() {
     "/compliance/reporting/nodes/id/{id}": {
       "get": {
         "summary": "Fetch a node",
-        "description": "Fetch a specific node by id.\nSupports filtering by profile or control. \nDoes not support pagination or sorting.",
+        "description": "Fetch a specific node by ID.\nSupports filtering by profile or control. \nDoes not support pagination or sorting.",
         "operationId": "ReadNode",
         "responses": {
           "200": {
@@ -184,7 +184,7 @@ func init() {
     "/compliance/reporting/reports/id/{id}": {
       "post": {
         "summary": "Fetch a report",
-        "description": "Fetch a specific report by id. Supports filtering, but not pagination or sorting.\nIncluding more than one value for ` + "`" + `profile_id` + "`" + ` is not allowed.",
+        "description": "Fetch a specific report by ID. Supports filtering, but not pagination or sorting.\nIncluding more than one value for ` + "`" + `profile_id` + "`" + ` is not allowed.",
         "operationId": "ReadReport",
         "responses": {
           "200": {
@@ -297,7 +297,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "The unique id of this control."
+          "description": "The unique ID of this control."
         },
         "code": {
           "type": "string",
@@ -348,7 +348,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "The unique id of this control."
+          "description": "The unique ID of this control."
         },
         "title": {
           "type": "string",
@@ -561,7 +561,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id of the latest report."
+          "description": "The ID of the latest report."
         },
         "end_time": {
           "type": "string",
@@ -600,7 +600,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "The id of this node."
+          "description": "The ID of this node."
         },
         "name": {
           "type": "string",
@@ -832,7 +832,7 @@ func init() {
         },
         "id": {
           "type": "string",
-          "description": "The unique id of the profile."
+          "description": "The unique ID of the profile."
         },
         "status": {
           "type": "string",
@@ -857,7 +857,7 @@ func init() {
         },
         "id": {
           "type": "string",
-          "description": "The id of the profile."
+          "description": "The ID of the profile."
         },
         "version": {
           "type": "string",
@@ -954,7 +954,7 @@ func init() {
         },
         "node_id": {
           "type": "string",
-          "description": "The id of the node making the report."
+          "description": "The ID of the node making the report."
         },
         "node_name": {
           "type": "string",
@@ -998,7 +998,7 @@ func init() {
         },
         "job_id": {
           "type": "string",
-          "description": "The id of the compliance scan job associated with the report."
+          "description": "The ID of the compliance scan job associated with the report."
         },
         "ipaddress": {
           "type": "string",
@@ -1132,7 +1132,7 @@ func init() {
         },
         "id": {
           "type": "string",
-          "description": "The id of the resource that was suggested."
+          "description": "The ID of the resource that was suggested."
         },
         "score": {
           "type": "number",
