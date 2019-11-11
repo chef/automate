@@ -88,7 +88,7 @@ func (LastContactData_Status) EnumDescriptor() ([]byte, []int) {
 }
 
 type Id struct {
-	// Unique node id (UUID)
+	// Unique node ID (UUID)
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -275,7 +275,7 @@ func (m *Query) GetPerPage() int32 {
 
 // Details for ssh/winrm access of the node.
 type TargetConfig struct {
-	// List of credential ids for a node.
+	// List of credential IDs for a node.
 	Secrets []string `protobuf:"bytes,20,rep,name=secrets,proto3" json:"secrets,omitempty"`
 	// Node backend type (ssh, winrm, aws, ssm, azure, gcp).
 	Backend string `protobuf:"bytes,22,opt,name=backend,proto3" json:"backend,omitempty"`
@@ -289,7 +289,7 @@ type TargetConfig struct {
 	Ssl bool `protobuf:"varint,27,opt,name=ssl,proto3" json:"ssl,omitempty"`
 	// Allow self-signed certificate (boolean).
 	SelfSigned bool `protobuf:"varint,28,opt,name=self_signed,json=selfSigned,proto3" json:"self_signed,omitempty"`
-	// Username from the credential id for this node.
+	// Username from the credential ID for this node.
 	User string `protobuf:"bytes,29,opt,name=user,proto3" json:"user,omitempty"`
 	// Sudo options to use when accessing the node.
 	SudoOptions string `protobuf:"bytes,33,opt,name=sudo_options,json=sudoOptions,proto3" json:"sudo_options,omitempty"`
@@ -417,7 +417,7 @@ type Node struct {
 	LastJob *ResultsRow `protobuf:"bytes,23,opt,name=last_job,json=lastJob,proto3" json:"last_job,omitempty"`
 	// Node configuration for ssh or winrm.
 	TargetConfig *TargetConfig `protobuf:"bytes,99,opt,name=target_config,json=targetConfig,proto3" json:"target_config,omitempty"`
-	// List of manager ids for the node.
+	// List of manager IDs for the node.
 	ManagerIds []string `protobuf:"bytes,24,rep,name=manager_ids,json=managerIds,proto3" json:"manager_ids,omitempty"`
 	// Last connection error received when trying to contact the node.
 	ConnectionError string `protobuf:"bytes,25,opt,name=connection_error,json=connectionError,proto3" json:"connection_error,omitempty"`
@@ -582,7 +582,7 @@ func (m *Node) GetScanData() *LastContactData {
 
 // Most recent node data from the latest Chef Infra run and InSpec scan.
 type LastContactData struct {
-	// Chef Infra run report id or InSpec scan report id.
+	// Chef Infra run report ID or InSpec scan report ID.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Last node report status.
 	Status LastContactData_Status `protobuf:"varint,2,opt,name=status,proto3,enum=chef.automate.api.nodes.v1.LastContactData_Status" json:"status,omitempty"`
@@ -726,15 +726,15 @@ func (m *Nodes) GetTotalUnknown() int32 {
 
 // Summary details from the most recent scan job that executed for the node.
 type ResultsRow struct {
-	// Node id for the result.
+	// Node ID for the result.
 	NodeId string `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	// Report id for the result.
+	// Report ID for the result.
 	ReportId string `protobuf:"bytes,2,opt,name=report_id,json=reportId,proto3" json:"report_id,omitempty"`
 	// Status of the report.
 	Status string `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
 	// Error message on failed attempts to reach a node.
 	Result string `protobuf:"bytes,4,opt,name=result,proto3" json:"result,omitempty"`
-	// Job id from the report.
+	// Job ID from the report.
 	JobId string `protobuf:"bytes,5,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
 	// Start time on the report.
 	StartTime *timestamp.Timestamp `protobuf:"bytes,20,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
@@ -1020,25 +1020,25 @@ type NodesServiceClient interface {
 	//
 	//Read a node
 	//
-	//Returns the details for a node given the node id.
+	//Returns the details for a node given the node ID.
 	Read(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
 	//
 	//Update a node
 	//
 	//This PUT operation overwrites ALL node details and requires the complete set of node details,
-	//consisting of a FQDN or IP address, a user-specified name, and the id for an ssh or winrm credential.
+	//consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
 	//Substitute the desired values for the existing node details in the PUT message.
 	Update(ctx context.Context, in *Node, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
 	//Delete a node
 	//
-	//Deletes the node with the node id.
+	//Deletes the node with the node ID.
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
-	//Bulk delete by id
+	//Bulk delete by ID
 	//
-	//Deletes a set of nodes given a list of ids.
-	//Invalid ids will be ignored.
+	//Deletes a set of nodes given a list of IDs.
+	//Invalid IDs will be ignored.
 	BulkDeleteById(ctx context.Context, in *Ids, opts ...grpc.CallOption) (*BulkDeleteResponse, error)
 	//
 	//List nodes
@@ -1228,25 +1228,25 @@ type NodesServiceServer interface {
 	//
 	//Read a node
 	//
-	//Returns the details for a node given the node id.
+	//Returns the details for a node given the node ID.
 	Read(context.Context, *Id) (*Node, error)
 	//
 	//Update a node
 	//
 	//This PUT operation overwrites ALL node details and requires the complete set of node details,
-	//consisting of a FQDN or IP address, a user-specified name, and the id for an ssh or winrm credential.
+	//consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
 	//Substitute the desired values for the existing node details in the PUT message.
 	Update(context.Context, *Node) (*empty.Empty, error)
 	//
 	//Delete a node
 	//
-	//Deletes the node with the node id.
+	//Deletes the node with the node ID.
 	Delete(context.Context, *Id) (*empty.Empty, error)
 	//
-	//Bulk delete by id
+	//Bulk delete by ID
 	//
-	//Deletes a set of nodes given a list of ids.
-	//Invalid ids will be ignored.
+	//Deletes a set of nodes given a list of IDs.
+	//Invalid IDs will be ignored.
 	BulkDeleteById(context.Context, *Ids) (*BulkDeleteResponse, error)
 	//
 	//List nodes

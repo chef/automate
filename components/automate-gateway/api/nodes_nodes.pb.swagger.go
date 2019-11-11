@@ -100,8 +100,8 @@ func init() {
     },
     "/nodes/delete/ids": {
       "post": {
-        "summary": "Bulk delete by id",
-        "description": "Deletes a set of nodes given a list of ids.\nInvalid ids will be ignored.",
+        "summary": "Bulk delete by ID",
+        "description": "Deletes a set of nodes given a list of IDs.\nInvalid IDs will be ignored.",
         "operationId": "BulkDeleteById",
         "responses": {
           "200": {
@@ -129,7 +129,7 @@ func init() {
     "/nodes/id/{id}": {
       "get": {
         "summary": "Read a node",
-        "description": "Returns the details for a node given the node id.",
+        "description": "Returns the details for a node given the node ID.",
         "operationId": "Read",
         "responses": {
           "200": {
@@ -142,7 +142,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique node id (UUID)",
+            "description": "Unique node ID (UUID)",
             "in": "path",
             "required": true,
             "type": "string"
@@ -154,7 +154,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a node",
-        "description": "Deletes the node with the node id.",
+        "description": "Deletes the node with the node ID.",
         "operationId": "Delete",
         "responses": {
           "200": {
@@ -167,7 +167,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique node id (UUID)",
+            "description": "Unique node ID (UUID)",
             "in": "path",
             "required": true,
             "type": "string"
@@ -179,7 +179,7 @@ func init() {
       },
       "put": {
         "summary": "Update a node",
-        "description": "This PUT operation overwrites ALL node details and requires the complete set of node details, \nconsisting of a FQDN or IP address, a user-specified name, and the id for an ssh or winrm credential.\nSubstitute the desired values for the existing node details in the PUT message.",
+        "description": "This PUT operation overwrites ALL node details and requires the complete set of node details, \nconsisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.\nSubstitute the desired values for the existing node details in the PUT message.",
         "operationId": "Update",
         "responses": {
           "200": {
@@ -227,7 +227,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique node id (UUID)",
+            "description": "Unique node ID (UUID)",
             "in": "path",
             "required": true,
             "type": "string"
@@ -285,7 +285,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "title": "Unique node id (UUID)"
+          "title": "Unique node ID (UUID)"
         }
       }
     },
@@ -306,7 +306,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Chef Infra run report id or InSpec scan report id."
+          "description": "Chef Infra run report ID or InSpec scan report ID."
         },
         "status": {
           "$ref": "#/definitions/chef.automate.api.nodes.v1.LastContactData.Status",
@@ -386,7 +386,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "List of manager ids for the node."
+          "description": "List of manager IDs for the node."
         },
         "connection_error": {
           "type": "string",
@@ -496,11 +496,11 @@ func init() {
       "properties": {
         "node_id": {
           "type": "string",
-          "description": "Node id for the result."
+          "description": "Node ID for the result."
         },
         "report_id": {
           "type": "string",
-          "description": "Report id for the result."
+          "description": "Report ID for the result."
         },
         "status": {
           "type": "string",
@@ -512,7 +512,7 @@ func init() {
         },
         "job_id": {
           "type": "string",
-          "description": "Job id from the report."
+          "description": "Job ID from the report."
         },
         "start_time": {
           "type": "string",
@@ -535,7 +535,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "List of credential ids for a node."
+          "description": "List of credential IDs for a node."
         },
         "backend": {
           "type": "string",
@@ -567,7 +567,7 @@ func init() {
         },
         "user": {
           "type": "string",
-          "description": "Username from the credential id for this node."
+          "description": "Username from the credential ID for this node."
         },
         "sudo_options": {
           "type": "string",

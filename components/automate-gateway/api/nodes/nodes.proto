@@ -57,7 +57,7 @@ service NodesService {
 	/*
 	Read a node
 
-	Returns the details for a node given the node id.
+	Returns the details for a node given the node ID.
 	*/
 	rpc Read(Id) returns (Node) {
 		option (google.api.http) = {
@@ -77,7 +77,7 @@ service NodesService {
 	Update a node
 
 	This PUT operation overwrites ALL node details and requires the complete set of node details, 
-	consisting of a FQDN or IP address, a user-specified name, and the id for an ssh or winrm credential.
+	consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
 	Substitute the desired values for the existing node details in the PUT message.
 	*/
 	rpc Update(Node) returns (google.protobuf.Empty) {
@@ -98,7 +98,7 @@ service NodesService {
 	/*
 	Delete a node
 
-	Deletes the node with the node id.
+	Deletes the node with the node ID.
 	*/
 	rpc Delete(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
@@ -115,10 +115,10 @@ service NodesService {
 	};
 
 	/*
-	Bulk delete by id
+	Bulk delete by ID
 
-	Deletes a set of nodes given a list of ids.
-	Invalid ids will be ignored.
+	Deletes a set of nodes given a list of IDs.
+	Invalid IDs will be ignored.
 	*/
 	rpc BulkDeleteById(Ids) returns (BulkDeleteResponse) {
 		option (google.api.http) = {
@@ -265,7 +265,7 @@ service NodesService {
 }
 
 message Id {
-	// Unique node id (UUID)
+	// Unique node ID (UUID)
 	string id = 1;
 }
 
@@ -295,7 +295,7 @@ message Query {
 
 // Details for ssh/winrm access of the node.
 message TargetConfig {
-	// List of credential ids for a node.
+	// List of credential IDs for a node.
 	repeated string secrets = 20;
 	// Node backend type (ssh, winrm, aws, ssm, azure, gcp).
 	string backend = 22;
@@ -309,7 +309,7 @@ message TargetConfig {
 	bool ssl = 27;
 	// Allow self-signed certificate (boolean).
 	bool self_signed = 28;
-	// Username from the credential id for this node.
+	// Username from the credential ID for this node.
 	string user = 29;
 	// Sudo options to use when accessing the node.
 	string sudo_options = 33;
@@ -339,7 +339,7 @@ message Node {
 	ResultsRow last_job = 23;
 	// Node configuration for ssh or winrm.
 	TargetConfig target_config = 99;
-	// List of manager ids for the node.
+	// List of manager IDs for the node.
 	repeated string manager_ids = 24;
 	// Last connection error received when trying to contact the node.
 	string connection_error = 25;
@@ -357,7 +357,7 @@ message Node {
 
 // Most recent node data from the latest Chef Infra run and InSpec scan.
 message LastContactData {
-	// Chef Infra run report id or InSpec scan report id.
+	// Chef Infra run report ID or InSpec scan report ID.
 	string id = 1;
 	enum Status {
 		UNKNOWN = 0;
@@ -388,15 +388,15 @@ message Nodes {
 
 // Summary details from the most recent scan job that executed for the node.
 message ResultsRow {
-	// Node id for the result.
+	// Node ID for the result.
 	string node_id = 1;
-	// Report id for the result.
+	// Report ID for the result.
 	string report_id = 2;
 	// Status of the report.
 	string status = 3;
 	// Error message on failed attempts to reach a node.
 	string result = 4;
-	// Job id from the report.
+	// Job ID from the report.
 	string job_id = 5;
 	// Start time on the report.
 	google.protobuf.Timestamp start_time = 20;
