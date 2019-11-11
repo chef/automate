@@ -18,8 +18,9 @@ type Storage interface {
 	EditServer(context.Context, Server) (Server, error)
 
 	GetOrg(context.Context, uuid.UUID) (Org, error)
-	GetOrgs(context.Context) ([]Org, error)
-	StoreOrg(ctx context.Context, name string, adminUser string, adminKey string, serverId string) (Org, error)
+	GetOrgByName(ctx context.Context, orgName string, serverID uuid.UUID) (Org, error)
+	GetOrgs(context.Context, uuid.UUID) ([]Org, error)
+	StoreOrg(ctx context.Context, name string, adminUser string, adminKey string, serverID string) (Org, error)
 	DeleteOrg(context.Context, uuid.UUID) (Org, error)
 	EditOrg(context.Context, Org) (Org, error)
 }

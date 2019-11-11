@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package chef.automate.api.infra_proxy.response;
-option go_package = "github.com/chef/automate/components/automate-gateway/api/infra_proxy/response";
+option go_package = "github.com/chef/automate/api/external/infra_proxy/response";
 
 message CreateOrg {
     Org org = 1;

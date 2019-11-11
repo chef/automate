@@ -6,17 +6,19 @@ import (
 	"github.com/spf13/viper"
 )
 
-// Configuration for the Infra Proxy Service
+//InfraProxyConfig configuration for the Infra Proxy Service
 type InfraProxyConfig struct {
 	LogConfig      LogConfig      `mapstructure:"log"`
 	PostgresConfig PostgresConfig `mapstructure:"postgres"`
 }
 
+//LogConfig configuration for the Infra Proxy Service
 type LogConfig struct {
 	LogLevel  string `mapstructure:"log_level"`
 	LogFormat string `mapstructure:"log_format"`
 }
 
+//PostgresConfig configuration for the Infra Proxy Service
 type PostgresConfig struct {
 	ConnectionString string `mapstructure:"uri"`
 	Database         string `mapstructure:"database"`

@@ -22,7 +22,7 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 
 	if req.Name == "" {
 		s.service.Logger.Debug("incomplete create org request: missing org name")
-		return nil, status.Error(codes.InvalidArgument, "must supply sever name")
+		return nil, status.Error(codes.InvalidArgument, "must supply org name")
 	}
 
 	if req.AdminUser == "" {
@@ -59,7 +59,12 @@ func (s *Server) GetOrgs(ctx context.Context, req *request.GetOrgs) (*response.G
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	orgsList, err := s.service.Storage.GetOrgs(ctx)
+	serverID, err := uuid.FromString(req.ServerId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid org server_id")
+	}
+
+	orgsList, err := s.service.Storage.GetOrgs(ctx, serverID)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -82,6 +87,35 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 	org, err := s.service.Storage.GetOrg(ctx, UUID)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "org")
+	}
+
+	return &response.GetOrg{
+		Org: fromStorageOrg(org),
+	}, nil
+}
+
+// GetOrgByName takes a org name, server_id and returns a org object
+func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*response.GetOrg, error) {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	if req.Name == "" {
+		s.service.Logger.Debug("incomplete server request: missing org name")
+		return nil, status.Error(codes.InvalidArgument, "must supply org name")
+	}
+
+	serverID, err := uuid.FromString(req.ServerId)
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid org server_id")
+	}
+
+	org, err := s.service.Storage.GetOrgByName(ctx, req.Name, serverID)
+	if err != nil {
+		if err == storage.ErrNotFound {
+			return nil, status.Errorf(codes.NotFound, "no server found with name %q", req.Name)
+		}
+		return nil, status.Errorf(codes.Internal,
+			"unexpected error for GetOrgByName with org named %q", req.Name)
 	}
 
 	return &response.GetOrg{

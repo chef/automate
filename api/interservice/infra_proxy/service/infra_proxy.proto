@@ -12,6 +12,7 @@ import "api/interservice/infra_proxy/response/orgs.proto";
 
 service InfraProxy {
     rpc GetVersion      (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
+
     rpc CreateServer    (chef.automate.domain.infra_proxy.request.CreateServer) returns (chef.automate.domain.infra_proxy.response.CreateServer) {};
     rpc DeleteServer    (chef.automate.domain.infra_proxy.request.DeleteServer) returns (chef.automate.domain.infra_proxy.response.DeleteServer) {};
     rpc UpdateServer    (chef.automate.domain.infra_proxy.request.UpdateServer) returns (chef.automate.domain.infra_proxy.response.UpdateServer) {};
@@ -19,9 +20,10 @@ service InfraProxy {
     rpc GetServer       (chef.automate.domain.infra_proxy.request.GetServer) returns (chef.automate.domain.infra_proxy.response.GetServer) {};
     rpc GetServerByName (chef.automate.domain.infra_proxy.request.GetServerByName) returns (chef.automate.domain.infra_proxy.response.GetServer) {};
 
-    rpc CreateOrg (chef.automate.domain.infra_proxy.request.CreateOrg) returns (chef.automate.domain.infra_proxy.response.CreateOrg) {};
-    rpc DeleteOrg (chef.automate.domain.infra_proxy.request.DeleteOrg) returns (chef.automate.domain.infra_proxy.response.DeleteOrg) {};
-    rpc UpdateOrg (chef.automate.domain.infra_proxy.request.UpdateOrg) returns (chef.automate.domain.infra_proxy.response.UpdateOrg) {};
-    rpc GetOrgs   (chef.automate.domain.infra_proxy.request.GetOrgs) returns (chef.automate.domain.infra_proxy.response.GetOrgs) {};
-    rpc GetOrg    (chef.automate.domain.infra_proxy.request.GetOrg) returns (chef.automate.domain.infra_proxy.response.GetOrg) {};
+    rpc CreateOrg    (chef.automate.domain.infra_proxy.request.CreateOrg) returns (chef.automate.domain.infra_proxy.response.CreateOrg) {};
+    rpc DeleteOrg    (chef.automate.domain.infra_proxy.request.DeleteOrg) returns (chef.automate.domain.infra_proxy.response.DeleteOrg) {};
+    rpc UpdateOrg    (chef.automate.domain.infra_proxy.request.UpdateOrg) returns (chef.automate.domain.infra_proxy.response.UpdateOrg) {};
+    rpc GetOrgs      (chef.automate.domain.infra_proxy.request.GetOrgs) returns (chef.automate.domain.infra_proxy.response.GetOrgs) {};
+    rpc GetOrg       (chef.automate.domain.infra_proxy.request.GetOrg) returns (chef.automate.domain.infra_proxy.response.GetOrg) {};
+    rpc GetOrgByName (chef.automate.domain.infra_proxy.request.GetOrgByName) returns (chef.automate.domain.infra_proxy.response.GetOrg) {};
 }

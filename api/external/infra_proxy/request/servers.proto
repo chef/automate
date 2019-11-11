@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package chef.automate.api.infra_proxy.request;
-option go_package = "github.com/chef/automate/components/automate-gateway/api/infra_proxy/request";
+option go_package = "github.com/chef/automate/api/external/infra_proxy/request";
 
 message CreateServer {
     string name = 1;
@@ -26,4 +26,8 @@ message GetServers {}
 
 message GetServer {
     string id = 1;
+}
+
+message GetServerByName {
+    string name = 1;
 }

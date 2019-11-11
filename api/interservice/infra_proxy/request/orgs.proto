@@ -20,10 +20,20 @@ message UpdateOrg {
 
 message DeleteOrg {
     string id = 1;
+    string server_id = 2;
 }
 
-message GetOrgs {}
+message GetOrgs {
+    string server_id = 1;
+}
 
 message GetOrg {
     string id = 1;
+    string server_id = 2;
 }
+
+message GetOrgByName {
+    string name = 1;
+    string server_id = 2;
+}
+

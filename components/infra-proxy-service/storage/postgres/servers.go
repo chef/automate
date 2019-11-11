@@ -42,7 +42,7 @@ func (p *postgres) getServer(ctx context.Context, q querier, serverID uuid.UUID)
 		`SELECT s.id, s.name, s.description, s.fqdn, s.ip_address, s.updated_at, s.created_at,
 		COALESCE((SELECT count(*) FROM orgs o WHERE o.server_id = s.id), 0) AS orgs_count
 		FROM servers s
-		WHERE s.id=$1`, serverID).
+		WHERE s.id = $1`, serverID).
 		Scan(&s.ID, &s.Name, &s.Description, &s.Fqdn, &s.IpAddress, &s.CreatedAt, &s.UpdatedAt, &s.OrgsCount)
 	if err != nil {
 		return storage.Server{}, p.processError(err)
@@ -57,7 +57,7 @@ func (p *postgres) GetServerByName(ctx context.Context, serverName string) (stor
 		`SELECT s.id, s.name, s.description, s.fqdn, s.ip_address, s.updated_at, s.created_at,
 		COALESCE((SELECT count(*) FROM orgs o WHERE o.server_id = s.id), 0) AS orgs_count
 		FROM servers s
-		WHERE s.name = $1;`,
+		WHERE s.name = $1`,
 		serverName).
 		Scan(&s.ID, &s.Name, &s.Description, &s.Fqdn, &s.IpAddress, &s.CreatedAt, &s.UpdatedAt, &s.OrgsCount)
 	if err != nil {
@@ -70,7 +70,7 @@ func (p *postgres) GetServerByName(ctx context.Context, serverName string) (stor
 func (p *postgres) DeleteServer(ctx context.Context, serverID uuid.UUID) (storage.Server, error) {
 	var s storage.Server
 	err := p.db.QueryRowContext(ctx,
-		`DELETE FROM servers WHERE id=$1
+		`DELETE FROM servers WHERE id = $1
 		RETURNING id, name, description, fqdn, ip_address, created_at, updated_at`, serverID).
 		Scan(&s.ID, &s.Name, &s.Description, &s.Fqdn, &s.IpAddress, &s.CreatedAt, &s.UpdatedAt)
 	if err != nil {

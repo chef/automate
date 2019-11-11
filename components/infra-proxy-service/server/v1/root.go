@@ -23,7 +23,7 @@ func (s *Server) GetVersion(
 	ctx context.Context,
 	_ *ver_api.VersionInfoRequest) (*ver_api.VersionInfo, error) {
 	return &ver_api.VersionInfo{
-		Name:    "infra-proxy",
+		Name:    "infra-proxy-service",
 		Version: version.Version,
 		Sha:     version.GitSHA,
 		Built:   version.BuildTime,

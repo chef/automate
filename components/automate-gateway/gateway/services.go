@@ -23,6 +23,7 @@ import (
 	pb_cfgmgmt "github.com/chef/automate/api/external/cfgmgmt"
 	pb_data_feed "github.com/chef/automate/api/external/data_feed"
 	pb_data_lifecycle "github.com/chef/automate/api/external/data_lifecycle"
+	pb_infra_proxy "github.com/chef/automate/api/external/infra_proxy"
 	pb_ingest "github.com/chef/automate/api/external/ingest"
 	pb_nodes "github.com/chef/automate/api/external/nodes"
 	pb_nodes_manager "github.com/chef/automate/api/external/nodes/manager"
@@ -57,6 +58,7 @@ import (
 	"github.com/chef/automate/components/automate-gateway/handler"
 	handler_compliance "github.com/chef/automate/components/automate-gateway/handler/compliance"
 	handler_data_lifecycle "github.com/chef/automate/components/automate-gateway/handler/data_lifecycle"
+	handler_infra_proxy "github.com/chef/automate/components/automate-gateway/handler/infra_proxy"
 	handler_policies "github.com/chef/automate/components/automate-gateway/handler/iam/v2/policy"
 	handler_rules "github.com/chef/automate/components/automate-gateway/handler/iam/v2/rules"
 	handler_teams "github.com/chef/automate/components/automate-gateway/handler/iam/v2/teams"
@@ -327,9 +329,9 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 
 	infraProxyClient, err := clients.InfraProxyClient()
 	if err != nil {
-		return errors.Wrap(err, "create client for secret service")
+		return errors.Wrap(err, "create client for infra proxy service")
 	}
-	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler.NewInfraProxyHandler(infraProxyClient))
+	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient))
 
 	grpc_prometheus.Register(grpcServer)
 

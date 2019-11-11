@@ -41,7 +41,22 @@ func (p *postgres) getOrg(ctx context.Context, q querier, orgID uuid.UUID) (stor
 	err := q.QueryRowContext(ctx,
 		`SELECT o.id, o.name, o.admin_user, o.admin_key, o.server_id, o.updated_at, o.created_at
 		FROM orgs o
-		WHERE o.id=$1`, orgID).
+		WHERE o.id = $1`, orgID).
+		Scan(&org.ID, &org.Name, &org.AdminUser, &org.AdminKey, &org.ServerId, &org.CreatedAt, &org.UpdatedAt)
+	if err != nil {
+		return storage.Org{}, p.processError(err)
+	}
+	return org, nil
+}
+
+// GetOrgByName fetches a org by name.
+func (p *postgres) GetOrgByName(ctx context.Context, orgName string, serverID uuid.UUID) (storage.Org, error) {
+	var org storage.Org
+	err := p.db.QueryRowContext(ctx,
+		`SELECT o.id, o.name, o.admin_user, o.admin_key, o.server_id, o.updated_at, o.created_at,
+		FROM orgs o
+		WHERE o.name = $1 AND o.server_id = $2`,
+		orgName, serverID).
 		Scan(&org.ID, &org.Name, &org.AdminUser, &org.AdminKey, &org.ServerId, &org.CreatedAt, &org.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
@@ -53,7 +68,7 @@ func (p *postgres) getOrg(ctx context.Context, q querier, orgID uuid.UUID) (stor
 func (p *postgres) DeleteOrg(ctx context.Context, orgID uuid.UUID) (storage.Org, error) {
 	var org storage.Org
 	err := p.db.QueryRowContext(ctx,
-		`DELETE FROM orgs WHERE id=$1
+		`DELETE FROM orgs WHERE id = $1
 		RETURNING id, name, admin_user, admin_key, server_id, created_at, updated_at`, orgID).
 		Scan(&org.ID, &org.Name, &org.AdminUser, &org.AdminKey, &org.ServerId, &org.CreatedAt, &org.UpdatedAt)
 	if err != nil {
@@ -82,14 +97,14 @@ func (p *postgres) EditOrg(ctx context.Context, org storage.Org) (storage.Org, e
 }
 
 // GetOrgs fetches orgs from the DB as an array.
-func (p *postgres) GetOrgs(ctx context.Context) ([]storage.Org, error) {
+func (p *postgres) GetOrgs(ctx context.Context, serverID uuid.UUID) ([]storage.Org, error) {
 
 	var orgs []storage.Org
 	// TODO eventually these should be ordered
 	rows, err := p.db.QueryContext(ctx,
-		`SELECT s.id, s.name, s.admin_user, s.admin_key, s.server_id, s.updated_at, s.created_at
-		FROM orgs s`)
-
+		`SELECT o.id, o.name, o.admin_user, o.admin_key, o.server_id, o.updated_at, o.created_at
+		FROM orgs o
+		WHERE o.server_id = $1`, serverID)
 	if err != nil {
 		return []storage.Org{}, p.processError(err)
 	}

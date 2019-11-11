@@ -4,8 +4,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var cfgFile string
-
 // RootCmd is our application root command.
 var RootCmd = &cobra.Command{
 	Use:   "infra-proxy-service",
