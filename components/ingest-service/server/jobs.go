@@ -241,7 +241,9 @@ func JobSettingsToUpdateOpts(settings *ingest.JobSettings, oldSchedule *cereal.S
 			return nil, shouldRunNow, errors.Wrap(err, "invalid recurrence rule")
 		}
 	}
-	ret = append(ret, cereal.UpdateRecurrence(newRRule))
+	if newRRule != nil {
+		ret = append(ret, cereal.UpdateRecurrence(newRRule))
+	}
 
 	if t := settings.GetThreshold(); len(t) > 0 {
 		var oldThreshold string
