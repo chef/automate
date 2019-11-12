@@ -3,6 +3,7 @@ package backup
 import (
 	"io"
 	"path"
+	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -65,7 +66,7 @@ func (d *BuilderMinioDumpOperation) Restore(backupCtx Context, serviceName strin
 
 	objVerifier := &NoOpObjectVerifier{}
 	for _, obj := range objects {
-		if err := d.copyObjectFromBackup(backupCtx, obj, objVerifier); err != nil {
+		if err := d.copyObjectFromBackup(backupCtx, prefix, obj, objVerifier); err != nil {
 			return err
 		}
 	}
@@ -77,21 +78,22 @@ func (d *BuilderMinioDumpOperation) Restore(backupCtx Context, serviceName strin
 	return nil
 }
 
-func (d *BuilderMinioDumpOperation) copyObjectFromBackup(backupCtx Context, obj BucketObject, objVerifier ObjectVerifier) error {
+func (d *BuilderMinioDumpOperation) copyObjectFromBackup(backupCtx Context, prefix string, obj BucketObject, objVerifier ObjectVerifier) error {
 	ctx := backupCtx.ctx
-	backupObjName := path.Join(path.Join(d.ObjectName...), obj.Name)
-	builderObjName := obj.Name
-	logrus.Info("Copying from %s -> %s", backupObjName, builderObjName)
-	writer, err := backupCtx.builderBucket.NewWriter(ctx, obj.Name)
-	if err != nil {
-		return err
-	}
-	defer writer.Close()
+	backupObjName := obj.Name
+	builderObjName := strings.TrimPrefix(strings.TrimPrefix(obj.Name, prefix), "/")
+
+	logrus.Infof("Copying from %s -> %s", backupObjName, builderObjName)
+
 	reader, err := backupCtx.bucket.NewReader(ctx, backupObjName, objVerifier)
 	if err != nil {
 		return err
 	}
 	defer reader.Close()
+	writer, err := backupCtx.builderBucket.NewWriter(ctx, builderObjName)
+	if err != nil {
+		return err
+	}
 	if _, err := io.Copy(writer, reader); err != nil {
 		writer.Fail(err) // nolint: errcheck
 		return err
