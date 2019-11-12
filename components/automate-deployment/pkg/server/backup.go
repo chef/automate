@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"fmt"
 	"os"
 
 	"github.com/sirupsen/logrus"
@@ -269,6 +270,18 @@ func (s *server) backupGatewayLocationSpec() (backup.LocationSpecification, erro
 		s.deployment.BackupGatewayEndpoint(),
 		bucket,
 		basePath,
+		[]byte(s.deployment.CA().RootCert()),
+		s.secretStore,
+	)
+}
+
+func (s *server) builderMinioLocationSpec() (backup.LocationSpecification, error) {
+	port := s.deployment.Config.GetMinio().GetV1().GetSys().GetService().GetPort().GetValue()
+	return backup.NewMinioLocationSpec(
+		fmt.Sprintf("https://127.0.0.1:%d", port),
+		"depot",
+		"",
+		"minio",
 		[]byte(s.deployment.CA().RootCert()),
 		s.secretStore,
 	)

@@ -211,9 +211,19 @@ func NewBackupGatewayLocationSpec(endpoint,
 	basePath string,
 	rootCert []byte,
 	secretStore secrets.SecretStore) (LocationSpecification, error) {
+	return NewMinioLocationSpec(endpoint, bucketName, basePath, "backup-gateway",
+		rootCert, secretStore)
+}
 
-	accessKeyName := secrets.SecretName{Group: "backup-gateway", Name: "access_key"}
-	secretKeyName := secrets.SecretName{Group: "backup-gateway", Name: "secret_key"}
+func NewMinioLocationSpec(endpoint,
+	bucketName,
+	basePath string,
+	groupName string,
+	rootCert []byte,
+	secretStore secrets.SecretStore) (LocationSpecification, error) {
+
+	accessKeyName := secrets.SecretName{Group: groupName, Name: "access_key"}
+	secretKeyName := secrets.SecretName{Group: groupName, Name: "secret_key"}
 	accessKey, err := secretStore.GetSecret(accessKeyName)
 	if err != nil {
 		return nil, err
@@ -225,7 +235,7 @@ func NewBackupGatewayLocationSpec(endpoint,
 
 	certPool := x509.NewCertPool()
 	if !certPool.AppendCertsFromPEM(rootCert) {
-		return nil, errors.New("building backup gateway root ca cert pool")
+		return nil, errors.New("building root ca cert pool")
 	}
 
 	return GatewayLocationSpecification{

@@ -58,10 +58,11 @@ type Runner struct {
 	releaseManifest manifest.ReleaseManifest
 	configRenderer  func(*deployment.Service) (string, error)
 
-	locationSpec        LocationSpecification // backup-gateway
-	restoreLocationSpec LocationSpecification // filesystem or S3
-	backupTask          *api.BackupTask
-	restoreTask         *api.BackupRestoreTask
+	locationSpec             LocationSpecification // backup-gateway
+	restoreLocationSpec      LocationSpecification // filesystem or S3
+	builderMinioLocationSpec LocationSpecification // automate-minioew
+	backupTask               *api.BackupTask
+	restoreTask              *api.BackupRestoreTask
 }
 
 // RunnerOpt represents an optional configuration function for a Runner
@@ -118,7 +119,11 @@ func WithBackupLocationSpecification(locationSpec LocationSpecification) RunnerO
 	}
 }
 
-// WithPGConnInfo sets the pgsql info to use
+func WithBuilderMinioLocationSpec(locationSpec LocationSpecification) RunnerOpt {
+	return func(runner *Runner) {
+		runner.builderMinioLocationSpec = locationSpec
+	}
+}
 func WithPGConnInfo(pgConnInfo pg.ConnInfo) RunnerOpt {
 	return func(runner *Runner) {
 		runner.pgConnInfo = pgConnInfo
@@ -514,6 +519,7 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 		WithContextEsSidecarInfo(r.esSidecarInfo),
 		WithContextConnFactory(r.connFactory),
 		WithContextReleaseManifest(r.releaseManifest),
+		WithContextBuilderMinioLocationSpec(r.builderMinioLocationSpec),
 	)
 
 	// Build a slice of services that we wish to restore

@@ -153,9 +153,13 @@ func (d *Deployment) ReplaceUserOverrideConfig(config *dc.AutomateConfig) error 
 }
 
 func ContainsAutomateCollection(c *dc.ConfigRequest) bool {
+	return ContainsCollection(c, services.AutomateCollectionName)
+}
+
+func ContainsCollection(c *dc.ConfigRequest, collectionName string) bool {
 	products := c.GetV1().GetSvc().GetProducts()
 	if len(products) > 0 {
-		return services.ContainsCollection(services.AutomateCollectionName, products)
+		return services.ContainsCollection(collectionName, products)
 	}
 	return true
 }
