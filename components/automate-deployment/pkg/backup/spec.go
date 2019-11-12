@@ -542,6 +542,12 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{
 			Name:          "automate-builder-api",
 			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "automate-builder-api",
+					User: "automate-builder-api",
+				},
+			},
 			SyncBuilderMinio: []BuilderMinioDumpOperation{
 				{
 					Name: "thething",
