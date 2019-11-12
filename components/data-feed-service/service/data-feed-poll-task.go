@@ -163,7 +163,7 @@ func (d *DataFeedPollTask) getFeedEndTime(feedInterval time.Duration, now time.T
 // GetChangedNodes calls the nodes API to get any nodes whch have had a client run during the interval
 // Returns a map of ipaddress to NodeIDs struct
 func (d *DataFeedPollTask) GetChangedNodes(ctx context.Context, pageSize int32, feedStartTime time.Time, feedEndTime time.Time) (map[string]NodeIDs, error) {
-	log.Debug("Inventory nodes start")
+	log.Debugf("Inventory nodes start %v, %v, %v", pageSize, feedStartTime, feedEndTime)
 	feedStartString, err := ptypes.TimestampProto(feedStartTime)
 	if err != nil {
 		return nil, err

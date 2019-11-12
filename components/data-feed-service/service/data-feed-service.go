@@ -137,7 +137,7 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		NextFeedEnd:     zeroTime,
 	}
 
-	dataFeedWorkflowParams := DataFeedWorkflowParams{PollTaskParams: dataFeedTaskParams}
+	dataFeedWorkflowParams := DataFeedWorkflowParams{PollTaskParams: dataFeedTaskParams, NodeBatchSize: dataFeedConfig.ServiceConfig.NodeBatchSize}
 
 	err = manager.CreateWorkflowSchedule(context.Background(),
 		dataFeedScheduleName, dataFeedWorkflowName,
