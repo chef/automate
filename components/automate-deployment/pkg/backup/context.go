@@ -64,13 +64,13 @@ type MetadataChecksums struct {
 
 // NewContext returns a new backup context
 func NewContext(opts ...ContextOpt) Context {
-	ctx := &Context{
+	ctx := Context{
 		pgConnInfo: &pg.A2ConnInfo{},
 		backupTask: &api.BackupTask{},
 	}
 
 	for _, opt := range opts {
-		opt(ctx)
+		opt(&ctx)
 	}
 
 	if ctx.locationSpec != nil {
@@ -80,12 +80,15 @@ func NewContext(opts ...ContextOpt) Context {
 		ctx.restoreBucket = ctx.restoreLocationSpec.ToBucket(ctx.backupTask.TaskID())
 	}
 	if ctx.builderMinioLocationSpec != nil {
+		logrus.Info("Creating builder bucket")
 		ctx.builderBucket = ctx.builderMinioLocationSpec.ToBucket("")
+	} else {
+		logrus.Info("Not creating builder bucket")
 	}
 
 	ctx.metadataWritten = NewObjectManifest()
 
-	return *ctx
+	return ctx
 }
 
 // ContextOpt represents an optional configuration function for a Runner

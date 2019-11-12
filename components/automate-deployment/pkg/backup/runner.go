@@ -213,6 +213,7 @@ func (r *Runner) DeleteBackups(ctx context.Context, dep *deployment.Deployment, 
 			WithContextEsSidecarInfo(r.esSidecarInfo),
 			WithContextConnFactory(r.connFactory),
 			WithContextReleaseManifest(r.releaseManifest),
+			WithContextBuilderMinioLocationSpec(r.builderMinioLocationSpec),
 		)
 
 		// don't verify the contents of the backup we are just going to delete
@@ -917,6 +918,7 @@ func (r *Runner) startBackupOperations(ctx context.Context) {
 		WithContextEsSidecarInfo(r.esSidecarInfo),
 		WithContextConnFactory(r.connFactory),
 		WithContextReleaseManifest(r.releaseManifest),
+		WithContextBuilderMinioLocationSpec(r.builderMinioLocationSpec),
 	)
 
 	// Start the event publisher
