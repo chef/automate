@@ -126,22 +126,15 @@ import { ChefDropdownComponent } from './chef-dropdown/chef-dropdown.component';
     SidebarEntryComponent,
     TabComponent,
     TabsComponent,
-<<<<<<< HEAD
-<<<<<<< HEAD
     TableBodyComponent,
     TableComponent,
     TableCellComponent,
     TableRowComponent,
     TableHeaderCellComponent,
-    TableHeaderComponent
-=======
-    ChefControlMenuComponent
->>>>>>> Generated new chef-control-menu component and dropped it into the chefComponentsModule, scss now connected.  Logic not yet built
-=======
+    TableHeaderComponent,
     ChefControlMenuComponent,
     ChefOptionComponent,
     ChefDropdownComponent
->>>>>>> WIP - added chef option and dropdown angular components
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

@@ -1,10 +1,10 @@
-import { Component, OnInit, HostBinding, HostListener, ElementRef, Output } from '@angular/core';
+import { Component, OnInit, HostBinding, HostListener, ElementRef } from '@angular/core';
 
 import { clamp, findIndex, getOr, find, lte } from 'lodash/fp';
 
 
 @Component({
-  selector: 'app-chef-control-menu',
+  selector: 'chef-control-menu-new',
   templateUrl: './chef-control-menu.component.html',
   styleUrls: ['./chef-control-menu.component.scss']
 })
@@ -17,7 +17,7 @@ export class ChefControlMenuComponent implements OnInit {
   public options: HTMLChefOptionElement[] = [];
   public selectedIndex = 0;
   public focusedIndex = 0;
-  public value: string;
+  public value: any; // <-- needs to be a type but string and number don't work
 
   // can i use a ternarys here?
   @HostBinding('attr.role') role = 'combobox';
@@ -51,10 +51,8 @@ export class ChefControlMenuComponent implements OnInit {
         return;
       }
       const optionId = option.optionId;
-      console.log('option: ' + optionId)
       this.makeSelection(findIndex(['optionId', optionId], this.options));
     } else {
-      console.log('click activate: ' + this.selectedIndex)
       this.activate(this.selectedIndex);
     }
   }
@@ -138,7 +136,6 @@ export class ChefControlMenuComponent implements OnInit {
     // check that this is an OK use of nativeElement, depending on our use case
     // it may not work with webworkers https://alligator.io/angular/using-renderer2/
     const dropdown: HTMLElement = this.el.nativeElement.querySelector('chef-dropdown');
-    console.log('activate');
     this.isActive = true;
     this.focusedIndex = this.clamp(index);
     dropdown.focus();

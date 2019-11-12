@@ -15,7 +15,7 @@ export class ChefOptionComponent implements OnInit {
   @HostBinding('attr.id') get assignId() { return this.optionId; }
   @HostBinding('class.selected') get isSelected() { return this.selected; }
 
-  constructor() { 
+  constructor() {
     this.id = this.id + 1;
     this.optionId = this.optionId || `chef-option${this.id}`;
   }
