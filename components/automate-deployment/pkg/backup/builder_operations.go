@@ -1,9 +1,12 @@
 package backup
 
 import (
+	"bufio"
+	"fmt"
 	"io"
+	"io/ioutil"
+	"os"
 	"path"
-	"strings"
 
 	"github.com/sirupsen/logrus"
 )
@@ -15,19 +18,44 @@ type BuilderMinioDumpOperation struct {
 
 var _ Operation = &BuilderMinioDumpOperation{}
 
-func (d *BuilderMinioDumpOperation) Backup(backupCtx Context, _ ObjectManifest, progChan chan OperationProgress) error {
+func (d *BuilderMinioDumpOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
 	ctx := backupCtx.ctx
 	objects, _, err := backupCtx.builderBucket.List(ctx, "", false)
 	if err != nil {
 		return err
 	}
+	builderArtifacts, err := ioutil.TempFile("", "builderartifacts")
+	if err != nil {
+		return err
+	}
+	defer builderArtifacts.Close()
+	defer os.Remove(builderArtifacts.Name())
 
 	objVerifier := &NoOpObjectVerifier{}
 	for _, obj := range objects {
 		if err := d.copyObjectFromBuilder(backupCtx, obj, objVerifier); err != nil {
 			return err
 		}
+		if _, err := fmt.Fprintln(builderArtifacts, obj.Name); err != nil {
+			return err
+		}
 	}
+	// Write file with artifact list
+	if _, err := builderArtifacts.Seek(0, os.SEEK_SET); err != nil {
+		return err
+	}
+	objectName := path.Join(path.Join(d.ObjectName...), "builder-artifacts")
+	writer, err := backupCtx.bucket.NewWriter(ctx, objectName)
+	if _, err := io.Copy(writer, builderArtifacts); err != nil {
+		writer.Fail(err) // errcheck: nolint
+		return err
+	}
+	if err := writer.Close(); err != nil {
+		return err
+	}
+
+	om.WriteFinished(objectName, writer)
+
 	progChan <- OperationProgress{
 		Name:     d.String(),
 		Progress: float64(100),
@@ -57,9 +85,9 @@ func (d *BuilderMinioDumpOperation) copyObjectFromBuilder(backupCtx Context, obj
 }
 
 func (d *BuilderMinioDumpOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
-	ctx := backupCtx.ctx
 	prefix := path.Join(d.ObjectName...)
-	objects, _, err := backupCtx.bucket.List(ctx, prefix, false)
+
+	objects, err := d.readBuilderArtifactList(backupCtx, prefix, verifier)
 	if err != nil {
 		return err
 	}
@@ -78,10 +106,29 @@ func (d *BuilderMinioDumpOperation) Restore(backupCtx Context, serviceName strin
 	return nil
 }
 
-func (d *BuilderMinioDumpOperation) copyObjectFromBackup(backupCtx Context, prefix string, obj BucketObject, objVerifier ObjectVerifier) error {
+func (d *BuilderMinioDumpOperation) readBuilderArtifactList(backupCtx Context, prefix string, verifier ObjectVerifier) ([]string, error) {
 	ctx := backupCtx.ctx
-	backupObjName := obj.Name
-	builderObjName := strings.TrimPrefix(strings.TrimPrefix(obj.Name, prefix), "/")
+	objName := path.Join(prefix, "builder-artifacts")
+	reader, err := backupCtx.bucket.NewReader(ctx, objName, verifier)
+	if err != nil {
+		return nil, err
+	}
+	defer reader.Close()
+	artifacts := []string{}
+	scanner := bufio.NewScanner(reader)
+	for scanner.Scan() {
+		artifacts = append(artifacts, scanner.Text())
+	}
+	if err := scanner.Err(); err != nil {
+		return nil, err
+	}
+	return artifacts, nil
+}
+
+func (d *BuilderMinioDumpOperation) copyObjectFromBackup(backupCtx Context, prefix string, obj string, objVerifier ObjectVerifier) error {
+	ctx := backupCtx.ctx
+	backupObjName := path.Join(prefix, obj)
+	builderObjName := obj
 
 	logrus.Infof("Copying from %s -> %s", backupObjName, builderObjName)
 
