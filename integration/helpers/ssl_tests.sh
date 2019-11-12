@@ -80,6 +80,7 @@ run_testssl() {
     mypath=$(hab pkg path core/coreutils)/bin
     mypath="$mypath:$(hab pkg path core/procps-ng)/bin"
     mypath="$mypath:$(hab pkg path core/net-tools)/bin"
+    mypath="$mypath:$(hab pkg path core/bind)/bin"
     mypath="$mypath:$PATH"
     PATH="$mypath" ./testssl.sh --parallel --quiet -n none --color 0 --severity LOW --warnings off --jsonfile "$2" --fast --add-ca /hab/svc/deployment-service/data/root.crt --file "$1"
 }
@@ -92,6 +93,7 @@ install_testssl_prereqs() {
     hab pkg install core/jq-static
     hab pkg install core/net-tools
     hab pkg install core/curl
+    hab pkg install core/bind
 }
 
 fixup_testssl() {
