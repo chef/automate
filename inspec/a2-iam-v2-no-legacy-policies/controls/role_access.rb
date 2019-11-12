@@ -797,35 +797,6 @@ control 'iam-v2p1-roles-1' do
           end
         end
       end
-
-
-      # TODO (tc): After re-enabling these tests, they are getting 404s
-      # {
-      #   'GET': %w(
-      #     disconnected_services/config
-      #     delete_disconnected_services/config
-      #   ),
-      #   'POST': %w(
-      #     disconnected_services/config
-      #     delete_disconnected_services/config
-      #   ),
-      # }.each do |method, urls|
-      #   urls.each do |url|
-      #     [ EDITOR_USERNAME, VIEWER_USERNAME, PROJECT_OWNER_USERNAME ].each do |user|
-      #       path = "/apis/beta/retention/service_groups/#{url}"
-      #       it "#{method} #{path} returns 403 for #{user}" do
-      #         expect(
-      #           automate_api_request(
-      #             path,
-      #             http_method: method,
-      #             user: user,
-      #           ).http_status
-      #         ).to eq 403
-      #       end
-      #     end
-      #   end
-      # end
-
     end
 
     describe "reading and modifying notifications" do

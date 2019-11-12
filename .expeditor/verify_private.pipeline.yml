@@ -489,9 +489,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2 fresh install"
+  - label: "iam v2"
     command:
-      - integration/run_test integration/tests/iam_v2_fresh_install.sh
+      - integration/run_test integration/tests/iam_v2_no_legacy_policies.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:

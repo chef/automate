@@ -89,7 +89,7 @@ EOF
 
     # compliance:profiles for client calls should be permitted by default
     describe '/api/v0/compliance/profiles/search as client' do
-      it "api/v0/compliance/profiles/search returns the correct response code for client" do
+      it "api/v0/compliance/profiles/search returns 200 for client" do
         expect(
           automate_client_api_request(
             "/api/v0/compliance/profiles/search",
@@ -106,7 +106,7 @@ EOF
         /data-collector/v0
       ).each do |url|
         { 'GET': 200, 'POST': 400 }.each do |method, status|
-          it "#{method} #{url} returns the correct response code for client" do
+          it "#{method} #{url} returns #{status} for client" do
             expect(
               automate_client_api_request(
                 url,
@@ -125,7 +125,7 @@ EOF
         action: {},
         nodedelete: { node_id: 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
       }.each do |url, body|
-        it "#{url} returns the correct response code for client" do
+        it "#{url} returns 403 for client" do
           expect(
             automate_client_api_request(
               "/api/v0/ingest/events/chef/#{url}",
@@ -140,7 +140,7 @@ EOF
 
     # ingest multiple delete
     describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
-      it "returns the correct response code for client" do
+      it "returns 403 for client" do
         expect(
             automate_client_api_request(
               "/api/v0/ingest/events/chef/node-multiple-deletes",
@@ -160,7 +160,7 @@ EOF
           'action': {},
           'nodedelete': { 'node_id': 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
         }.each do |url, body|
-          it "#{url} returns the correct response code for user" do
+          it "#{url} returns 403 for user" do
               expect(
                 automate_api_request(
                   "/api/v0/ingest/events/chef/#{url}",
@@ -175,7 +175,7 @@ EOF
 
       # ingest multiple delete
       describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
-        it "returns the correct response code for user" do
+        it "returns 403 for user" do
             expect(
               automate_api_request(
                 "/api/v0/ingest/events/chef/node-multiple-deletes",
@@ -194,7 +194,7 @@ EOF
           /data-collector/v0
         ).each do |url|
           %w(GET POST).each do |method|
-            it "#{method} #{url} returns the correct response code for user" do
+            it "#{method} #{url} returns 403 for user" do
                 expect(
                   automate_api_request(
                     url,
