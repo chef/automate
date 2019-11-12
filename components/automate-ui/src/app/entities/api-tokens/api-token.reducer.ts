@@ -48,7 +48,7 @@ export function apiTokenEntityReducer(
       return set(
         STATUS,
         EntityStatus.loading,
-        // clear token state to prevent data leakage
+        // clear token state to avoid leaking potentially unauthorized data
         apiTokenEntityAdapter.removeAll(state)
       ) as ApiTokenEntityState;
     }
@@ -69,8 +69,7 @@ export function apiTokenEntityReducer(
       return set(
         GET_STATUS,
         EntityStatus.loading,
-        // clear token state to prevent data leakage
-        // for example, if the user visited the list page first
+        // clear token state to avoid leaking potentially unauthorized data
         apiTokenEntityAdapter.removeAll(state)
       ) as ApiTokenEntityState;
     }
