@@ -144,9 +144,9 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
 
   onDateChanged(endDate) {
     const queryParams = {...this.route.snapshot.queryParams};
-    const endDateMoment = moment(endDate);
+    const endDateMoment = moment.utc(endDate);
     if (endDate && endDateMoment.isValid()) {
-      if (moment().utc().format('YYYY-MM-DD') === endDateMoment.format('YYYY-MM-DD')) {
+      if (moment.utc().format('YYYY-MM-DD') === endDateMoment.format('YYYY-MM-DD')) {
         delete queryParams['end_time'];
       } else {
         queryParams['end_time'] = endDateMoment.format('YYYY-MM-DD');

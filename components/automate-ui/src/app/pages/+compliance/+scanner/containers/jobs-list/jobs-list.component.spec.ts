@@ -76,7 +76,7 @@ describe('JobsListComponent', () => {
       const time = '2018-01-01T00:00:00.000Z';
       component.viewReport('fake_id', time);
       expect(router.navigate).toHaveBeenCalledWith(['/compliance', 'reports', 'overview'],
-        {queryParams: {job_id: 'fake_id', end_time: moment(time).format('YYYY-MM-DD')}});
+        {queryParams: {job_id: 'fake_id', end_time: moment.utc(time).format('YYYY-MM-DD')}});
     });
 
     it('null end date', () => {

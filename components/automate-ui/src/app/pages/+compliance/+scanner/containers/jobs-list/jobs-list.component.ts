@@ -108,17 +108,17 @@ export class JobsListComponent implements OnInit, OnDestroy {
   // date formatting needs.
   timeFromNow(time) {
     // `null` dates from API are currently sent as "beginning of time"
-    if (moment(time).isBefore('2000-01-01T00:00:00.000Z')) { return '-'; }
-    return moment(time).fromNow();
+    if (moment.utc(time).isBefore('2000-01-01T00:00:00.000Z')) { return '-'; }
+    return moment.utc(time).fromNow();
   }
 
   viewReport(jobID: string, endDate) {
     // `null` dates from API are currently sent as "beginning of time"
-    if (!endDate || moment(endDate).isBefore('2000-01-01T00:00:00.000Z')) {
+    if (!endDate || moment.utc(endDate).isBefore('2000-01-01T00:00:00.000Z')) {
       this.router.navigate(['/compliance', 'reports', 'overview'],
         {queryParams: {job_id: jobID}});
     } else {
-      const endDateString = moment(endDate).format('YYYY-MM-DD');
+      const endDateString = moment.utc(endDate).format('YYYY-MM-DD');
 
       this.router.navigate(['/compliance', 'reports', 'overview'],
         {queryParams: {job_id: jobID, end_time: endDateString}});

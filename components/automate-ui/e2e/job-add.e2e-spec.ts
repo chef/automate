@@ -556,7 +556,7 @@ describe('Job Add', () => {
           scheduleToggle.click();
 
           expect(scheduleToggle.isSelected()).toEqual(true);
-          expect(startInputs.count()).toEqual(6);
+          expect(startInputs.count()).toEqual(5);
         });
 
         it('provides optional end datetime input', () => {
@@ -575,7 +575,7 @@ describe('Job Add', () => {
           endFormGroupToggle.click();
 
           expect(endFormGroupToggle.isSelected()).toEqual(true);
-          expect(endInputs.count()).toEqual(6);
+          expect(endInputs.count()).toEqual(5);
         });
 
         it('provides optional repeat interval input', () => {

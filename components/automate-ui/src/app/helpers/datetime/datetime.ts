@@ -16,4 +16,6 @@ export class DateTime {
   // Format for filenames of report downloads
   // 2019-09-24-09:59:59
   public static readonly REPORT_DATE_TIME: string = 'YYYY-MM-DD-HHmmss';
+  // 25 Oct 2019
+  public static readonly CHEF_SHORT_DATE: string = 'DD MMM YYYY';
 }

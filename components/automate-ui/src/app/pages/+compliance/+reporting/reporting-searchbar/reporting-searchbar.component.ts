@@ -19,6 +19,7 @@ import { Chicklet } from 'app/types/types';
 import {
   ReportQueryService
 } from 'app/pages/+compliance/shared/reporting';
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 @Component({
   selector: 'app-reporting-searchbar',
@@ -43,6 +44,7 @@ export class ReportingSearchbarComponent implements OnInit {
 
   private suggestionsVisibleStream = new Subject<boolean>();
   private suggestionSearchTermDebounce = new Subject<any>();
+  public CHEF_SHORT_DATE = DateTime.CHEF_SHORT_DATE;
 
   filterTypesCategories = [];
   calendarVisible = false;

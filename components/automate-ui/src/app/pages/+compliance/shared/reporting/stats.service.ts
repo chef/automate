@@ -187,7 +187,7 @@ export class StatsService {
 
     // for export, we want to send the start_time as the beg of day of end time
     // so we find the endtime in the filters, and then set start time to beg of that day
-    reportQuery.startDate = moment(reportQuery.endDate).startOf('day');
+    reportQuery.startDate = moment.utc(reportQuery.endDate).startOf('day');
 
     const body = { type: format, filters: this.formatFilters(reportQuery) };
     return this.httpClient.post(url, body, { responseType: 'text' });
@@ -224,8 +224,8 @@ export class StatsService {
   addDateRange(filters, dateRange) {
     if (filters) {
       filters.push(
-        {'end_time': moment(dateRange.end).format('YYYY-MM-DDTHH:mm:ssZ')},
-        {'start_time': moment(dateRange.start).format('YYYY-MM-DDTHH:mm:ssZ')}
+        {'end_time': moment.utc(dateRange.end).format('YYYY-MM-DDTHH:mm:ssZ')},
+        {'start_time': moment.utc(dateRange.start).format('YYYY-MM-DDTHH:mm:ssZ')}
       );
     }
     return filters;

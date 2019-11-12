@@ -111,29 +111,27 @@ export class JobEditComponent implements OnDestroy {
     }, {
       validator: profileSelectionRequiredValidator
     });
-    const defaultStart = moment();
-    const defaultEnd = moment(defaultStart).add(1, 'days');
+    const defaultStart = moment.utc();
+    const defaultEnd = moment.utc(defaultStart).add(1, 'days');
     const scheduleGroup = this.fb.group({
       name: ['', Validators.required],
       include: false,
       start: this.fb.group({
         datetime: this.fb.group({
-          month: defaultStart.month() + 1,
+          month: defaultStart.month(),
           date: defaultStart.date(),
           year: defaultStart.year(),
-          hour: this.hours24to12(defaultStart.hour()),
-          minute: defaultStart.minute(),
-          meridiem: defaultStart.hour() - 12 > 0 ? 'PM' : 'AM'
+          hour: defaultStart.hour(),
+          minute: defaultStart.minute()
         })
       }),
       end: this.fb.group({
         datetime: this.fb.group({
-          month: defaultEnd.month() + 1,
+          month: defaultEnd.month(),
           date: defaultEnd.date(),
           year: defaultEnd.year(),
-          hour: this.hours24to12(defaultEnd.hour()),
-          minute: defaultEnd.minute(),
-          meridiem: defaultEnd.hour() - 12 > 0 ? 'PM' : 'AM'
+          hour: defaultEnd.hour(),
+          minute: defaultEnd.minute()
         }),
         include: false
       }),
@@ -265,27 +263,25 @@ export class JobEditComponent implements OnDestroy {
           const rule = RRule.parseString(job.recurrence);
           const hasUntil = !!rule.until;
           const hasRepeat = !!rule.interval;
-          const start = moment(rule.dtstart);
+          const start = moment.utc(rule.dtstart);
 
           scheduleGroup.get('start.datetime').setValue({
-            month: start.month() + 1,
+            month: start.month(),
             date: start.date(),
             year: start.year(),
-            hour: this.hours24to12(start.hour()),
-            minute: start.minute(),
-            meridiem: start.hour() - 12 > 0 ? 'PM' : 'AM'
+            hour: start.hour(),
+            minute: start.minute()
           });
 
           if (hasUntil) {
-            const end = moment(rule.until);
+            const end = moment.utc(rule.until);
             scheduleGroup.get('end.include').setValue(hasUntil);
             scheduleGroup.get('end.datetime').setValue({
-              month: end.month() + 1,
+              month: end.month(),
               date: end.date(),
               year: end.year(),
-              hour: this.hours24to12(end.hour()),
-              minute: end.minute(),
-              meridiem: end.hour() - 12 > 0 ? 'PM' : 'AM'
+              hour: end.hour(),
+              minute: end.minute()
             });
           }
 
@@ -339,9 +335,9 @@ export class JobEditComponent implements OnDestroy {
     const ruleOpts = {
       dtstart: new Date(
         parseInt(start.datetime.year, 10),
-        parseInt(start.datetime.month, 10) - 1,
+        parseInt(start.datetime.month, 10),
         parseInt(start.datetime.date, 10),
-        this.hours12to24(parseInt(start.datetime.hour, 10), start.datetime.meridiem === 'PM'),
+        parseInt(start.datetime.hour, 10),
         parseInt(start.datetime.minute, 10)
       )
     };
@@ -349,9 +345,9 @@ export class JobEditComponent implements OnDestroy {
     if (end.include) {
       ruleOpts['until'] = new Date(
         parseInt(end.datetime.year, 10),
-        parseInt(end.datetime.month, 10) - 1,
+        parseInt(end.datetime.month, 10),
         parseInt(end.datetime.date, 10),
-        this.hours12to24(parseInt(end.datetime.hour, 10), end.datetime.meridiem === 'PM'),
+        parseInt(end.datetime.hour, 10),
         parseInt(end.datetime.minute, 10)
       );
     }
@@ -389,14 +385,6 @@ export class JobEditComponent implements OnDestroy {
         const {key, values, include} = tag;
         return {key, values, exclude: !include};
       });
-  }
-
-  public hours12to24(h, pm) {
-    return h === 12 ? pm ? 12 : 0 : pm ? h + 12 : h;
-  }
-
-  public hours24to12(h) {
-    return (h + 11) % 12 + 1;
   }
 
   public nextStep(current: Step): Step {
