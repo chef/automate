@@ -11,6 +11,8 @@
 # tests to give improve our confidence that we are permissioning our APIs correctly, we need
 # to make sure the routing is correct.
 
+require_relative '../../constants'
+
 title 'authorization access control integration tests'
 
 NON_ADMIN_USERNAME = 'inspec_test_non_admin'
@@ -626,7 +628,7 @@ control 'authz-access-control-1' do
       let(:expect_403_for_admin_only_apis) { false }
       let(:expect_403_for_all_apis) { false }
       let(:expect_403_for_client_only_endpoints) { false }
-      let(:user) { 'admin' }
+      let(:user) { ADMIN_USER_ID }
       let(:success_expected) { true }
 
       include_examples 'authz access control'
@@ -839,7 +841,7 @@ control 'authz-access-control-iam-v1' do
       let(:expect_403_for_admin_only_apis) { false }
       let(:expect_403_for_all_apis) { false }
       let(:expect_403_for_client_only_endpoints) { false }
-      let(:user) { 'admin' }
+      let(:user) { ADMIN_USER_ID }
       let(:success_expected) { true }
 
       include_examples 'authz access control (iam v1)'

@@ -2,20 +2,7 @@
 # copyright: 2018, Chef Software, Inc.
 # license: All rights reserved
 
-DEFAULT_POLICY_IDS = [
-    "administrator-access",
-    "editor-access",
-    "viewer-access",
-    "ingest-access"
-]
-
-DEFAULT_ROLE_IDS = [
-    "owner",
-    "editor",
-    "viewer",
-    "ingest",
-    "project-owner"
-]
+require_relative '../../constants'
 
 include_controls 'a2-api-integration' do
   # stuff that changed with the changes in default profiles
@@ -309,7 +296,7 @@ EOF
     end
 
     describe 'when making requests as an admin' do
-      let(:user) { 'admin' }
+      let(:user) { ADMIN_USER_ID }
       include_examples 'authz access control (iam v2)'
     end
 

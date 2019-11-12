@@ -2,6 +2,8 @@
 # copyright: 2018, Chef Software, Inc.
 # license: All rights reserved
 
+require_relative '../../constants'
+
 title 'IAM v2.1 role access API integration tests'
 
 control 'iam-v2p1-roles-1' do
@@ -19,9 +21,6 @@ control 'iam-v2p1-roles-1' do
   PROJECT_OWNER_USERNAME = 'projectowner'
   PROJECT_OWNER_ROLE = 'project-owner'
   PROJECT_OWNER_ROLE_ACCESS_POLICY_ID = 'project-owner-inspec-role-access-test'
-
-  UNASSIGNED_PROJECT_ID = '(unassigned)'
-  UNASSIGNED_PROJECT_NAME = UNASSIGNED_PROJECT_ID
 
   describe 'viewer, editor, project-owner access' do
     before(:all) do

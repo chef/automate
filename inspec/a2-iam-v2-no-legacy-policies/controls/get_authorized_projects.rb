@@ -2,6 +2,8 @@
 # copyright: 2019, Chef Software, Inc.
 # license: All rights reserved
 
+require_relative '../../constants'
+
 title 'IAM v2.1 get all allowed projects for global projects filter'
 
 control 'iam-v2-global-projects-filter-1' do
