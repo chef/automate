@@ -5,11 +5,10 @@ package service
 
 import (
 	fmt "fmt"
-	math "math"
-
 	response "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	reporting "github.com/chef/automate/components/compliance-service/api/reporting"
 	proto "github.com/golang/protobuf/proto"
+	math "math"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.

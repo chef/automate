@@ -15,7 +15,8 @@ fauxpath=$(mktemp -d)
 function sync_from_fauxpath() {
     base_dir=$(dirname "${1}")
     gen_dir="${fauxpath}/github.com/chef/automate/${base_dir}/"
-    [[ -d "${gen_dir}" ]] && rsync -r "${gen_dir}" "/src/${base_dir}/"
+    [[ -d "${gen_dir}" ]] || return 0
+    rsync -r "${gen_dir}" "/src/${base_dir}/"
 }
 
 function cleanup() {
@@ -23,16 +24,17 @@ function cleanup() {
 }
 trap cleanup EXIT
 
-for i in $(find components/data-feed-service/service -name '*.proto') ; do
+for i in $(find components/data-feed-service -name '*.proto') ; do
+  printf 'GEN: %s\n' "${i}"
   protoc -I /src \
-    -I /src/components/data-feed-service/service \
     -I vendor \
     -I vendor/github.com/grpc-ecosystem/grpc-gateway \
     -I vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
     --go_out=plugins=grpc,paths=source_relative:/src \
     --grpc-gateway_out=request_context=true,logtostderr=true:"${fauxpath}" \
-    "${i}"
-  printf 'GEN: %s\n' "${i}"
+    --a2-config_out=paths=source_relative:/src \
+    "${i}" \
+    || exit $?
 
   sync_from_fauxpath "${i}"
 done
