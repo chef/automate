@@ -95,13 +95,11 @@
           </span>
         </chef-td>
         <chef-td>
-          <chef-button secondary *ngIf="!hasFilter(node)" (click)="addFilter(node)">
-            <chef-icon>playlist_add</chef-icon>
-          </chef-button>
-          <chef-button secondary *ngIf="hasFilter(node)" (click)="removeFilter(node)">
-            <chef-icon>playlist_add_check</chef-icon>
-          </chef-button>
-          <chef-button secondary (click)="displayScanResults(node)">Scan Results</chef-button>
+          <chef-control-menu>
+            <chef-option *ngIf="!hasFilter(node)" (click)="addFilter(node)">Add Filter</chef-option>
+            <chef-option *ngIf="hasFilter(node)" (click)="removeFilter(node)">Remove Filter</chef-option>
+            <chef-option (click)="displayScanResults(node)">Scan Results</chef-option>
+          </chef-control-menu>
         </chef-td>
       </chef-tr>
     </chef-tbody>
