@@ -71,7 +71,7 @@ func TestJobSchedulerStatus(t *testing.T) {
 		res, err := suite.JobSchedulerServer.GetStatusJobScheduler(ctx, req)
 		require.NoError(t, err)
 		assert.Equal(t, expected.Running, res.Running, "job scheduler should be running by default")
-		assert.Equal(t, 5, len(res.Jobs), "there should be 5 jobs configured")
+		assert.Equal(t, 3, len(res.Jobs), "there should be 3 jobs configured")
 
 		verifyInspecJobs(t, res)
 		verifyPurgeJobs(t, res)

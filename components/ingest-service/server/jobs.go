@@ -235,8 +235,8 @@ func JobSettingsToUpdateOpts(settings *ingest.JobSettings, oldSchedule *cereal.S
 		if err != nil {
 			return nil, shouldRunNow, errors.Wrap(err, "could not construct new recurrence rule")
 		}
-	} else {
-		newRRule, err = rrule.StrToRRule(settings.GetRecurrence())
+	} else if recurrence := settings.GetRecurrence(); recurrence != "" {
+		newRRule, err = rrule.StrToRRule(recurrence)
 		if err != nil {
 			return nil, shouldRunNow, errors.Wrap(err, "invalid recurrence rule")
 		}
