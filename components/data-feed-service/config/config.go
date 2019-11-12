@@ -41,6 +41,7 @@ type ServiceConfig struct {
 	FeedInterval    time.Duration `mapstructure:"feed_interval"`
 	AssetPageSize   int32         `mapstructure:"asset_page_size"`
 	ReportsPageSize int32         `mapstructure:"reports_page_size"`
+	NodeBatchSize   int           `mapstructure:"node_batch_size"`
 }
 
 type PostgresConfig struct {
