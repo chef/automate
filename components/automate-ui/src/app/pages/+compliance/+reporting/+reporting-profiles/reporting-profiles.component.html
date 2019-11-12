@@ -30,13 +30,11 @@
         <chef-td class="version-cell">{{ profile.version }}</chef-td>
         <chef-td class="identifier-cell">{{ user }}/{{ profile.name }}</chef-td>
         <chef-td class="actions-cell">
-          <chef-button secondary *ngIf="!hasFilter(profile)" (click)="addFilter(profile)">
-            <chef-icon>playlist_add</chef-icon>
-          </chef-button>
-          <chef-button secondary *ngIf="hasFilter(profile)" (click)="removeFilter(profile)">
-            <chef-icon>playlist_add_check</chef-icon>
-          </chef-button>
-          <chef-button secondary (click)="displayScanResults(profile)">Scan Results</chef-button>
+          <chef-control-menu>
+            <chef-option *ngIf="!hasFilter(profile)" (click)="addFilter(profile)">Add Filter</chef-option>
+            <chef-option *ngIf="hasFilter(profile)" (click)="removeFilter(profile)">Remove Filter</chef-option>
+            <chef-option (click)="displayScanResults(profile)">Scan Results</chef-option>
+          </chef-control-menu>
         </chef-td>
       </chef-tr>
     </chef-tbody>
