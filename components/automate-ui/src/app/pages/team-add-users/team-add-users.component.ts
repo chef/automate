@@ -2,15 +2,15 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { combineLatest, Subject } from 'rxjs';
+import { combineLatest, Subject, Observable } from 'rxjs';
 import { identity, keyBy, at } from 'lodash/fp';
-import { filter, map, pluck, takeUntil } from 'rxjs/operators';
+import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { filter as lodashFilter } from 'lodash/fp';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams, routeURL } from 'app/route.selectors';
-import { EntityStatus } from 'app/entities/entities';
+import { routeState } from 'app/route.selectors';
+import { EntityStatus, allLoadedSuccessfully } from 'app/entities/entities';
 import { User, HashMapOfUsers, userArrayToHash } from 'app/entities/users/user.model';
 import { allUsers, userStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
@@ -41,86 +41,76 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   public team: Team;
   public users: User[] = [];
   private mapOfUsersToFilter: HashMapOfUsers = {};
-  public isIAMv2: boolean;
+  public isIAMv2$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
   public addingUsers = false;
   private usersToAdd: { [id: string]: User } = {};
   public showSecondary = false;
   public addUsersFailed = '';
-  public loading = true;
+  public loading$: Observable<boolean>;
+  public teamId = '';
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router) {
-      store.select(isIAMv2).subscribe(latest => this.isIAMv2 = latest);
   }
 
   ngOnInit(): void {
-    this.store.select(isIAMv2)
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe((version) => {
-        if (version === null) { return; }
+    this.store.dispatch(new GetUsers());
+    this.isIAMv2$ = this.store.select(isIAMv2);
 
-        if (this.isIAMv2) {
-          this.store.select(v2TeamFromRoute)
-            .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getUsersForTeam.bind(this));
-        } else {
-          this.store.select(v1TeamFromRoute)
-            .pipe(filter(identity), takeUntil(this.isDestroyed))
-            .subscribe(this.getUsersForTeam.bind(this));
-        }
+    combineLatest([
+      this.isIAMv2$,
+      this.store.select(v2TeamFromRoute),
+      this.store.select(v1TeamFromRoute)
+    ]).pipe(
+        takeUntil(this.isDestroyed),
+        filter(([isV2, _v2TeamFromRoute, _v1TeamFromRoute]) => isV2 !== null),
+        map(([isV2, v2Team, v1Team]) => isV2 ? [v2Team, v2Team.id] : [v1Team, v1Team.guid]),
+        distinctUntilChanged(
+          ([_teamA, teamIdA]: [Team, string], [_teamB, teamIdB]: [Team, string]) =>
+          teamIdA === teamIdB)
+      ).subscribe(([team, teamId]) => {
+        this.team = team;
+        this.teamId = teamId;
+        this.store.dispatch(new GetTeamUsers({ id: teamId}));
       });
 
-    this.store.select(routeParams).pipe(
-      pluck('id'),
-      filter(identity),
-      takeUntil(this.isDestroyed))
-      .subscribe((id: string) => {
-        this.store.select(routeURL).pipe(
-          filter(identity),
-          takeUntil(this.isDestroyed))
-          .subscribe((url: string) => {
-            // Only fetch if we are on the team details route, otherwise
-            // we'll trigger GetTeam with the wrong input on any route
-            // away to a page that also uses the :id param.
-            if (TEAM_ADD_USERS_ROUTE.test(url)) {
-              this.store.dispatch(new GetTeam({ id }));
-            }
-          });
-      });
+    this.store.select(routeState).pipe(
+      takeUntil(this.isDestroyed),
+      map(state => [state.params.id as string, state.url]),
+      // Only fetch if we are on the team details route, otherwise
+      // we'll trigger GetTeam with the wrong input on any route
+      // away to a page that also uses the :id param.
+      filter(([id, url]) => TEAM_ADD_USERS_ROUTE.test(url) && id !== undefined),
+      map(([id, _url]) => id),
+      distinctUntilChanged()
+    ).subscribe(id => this.store.dispatch(new GetTeam({ id })));
 
-      // select all local users, the users for this team, and the query status for both.
-      // when both queries are finished we'll find all users that are not yet a member of the team.
-      combineLatest([
-        this.store.select(allUsers),
-        this.store.select(userStatus),
-        this.store.select(teamUsers),
-        this.store.select(getTeamUsersStatus)])
-        .pipe(
-          map(([users, uStatus, tUsers, tStatus]:
-              [User[], EntityStatus, string[], EntityStatus]) => {
-            if (uStatus !== EntityStatus.loadingSuccess ||
-              tStatus !== EntityStatus.loadingSuccess) {
-              this.loading = true;
-              return [];
-            }
+    this.loading$ = combineLatest([
+      this.store.select(userStatus),
+      this.store.select(getTeamUsersStatus)]).pipe(
+        map((statuses: EntityStatus[]) => !allLoadedSuccessfully(statuses)));
 
-            // Sort users naturally first by name, then by id
-            this.users = ChefSorters.naturalSort(users, ['name', 'id']);
+    // select all local users, the users for this team, and the query status for both.
+    // when both queries are finished we'll find all users that are not yet a member of the team.
+    combineLatest([
+      this.loading$,
+      this.store.select(allUsers),
+      this.store.select(teamUsers)])
+    .pipe(
+      takeUntil(this.isDestroyed),
+      filter(([loading, _users, _tUsers]) => !loading)
+    ).subscribe(([_loading, users, tUsers]) => {
+      // Sort users naturally first by name, then by id
+      this.users = ChefSorters.naturalSort(users, ['name', 'id']);
 
-            // Map UUID membership to user records and remove any entries that don't
-            // map to user records.
-            return at(tUsers, keyBy('membership_id', users))
-              .filter(userRecord => userRecord !== undefined);
-          }),
-          map((users: User[]) => {
-            this.mapOfUsersToFilter = userArrayToHash(users);
-            this.loading = false;
-          }),
-          takeUntil(this.isDestroyed)
-        ).subscribe();
- }
+      const membershipUsers = at(tUsers, keyBy('membership_id', users))
+        .filter(userRecord => userRecord !== undefined);
+
+      this.mapOfUsersToFilter = userArrayToHash(membershipUsers);
+    });
+  }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);
@@ -206,21 +196,11 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getUsersForTeam(team: Team): void {
-    this.team = team;
-    this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
-    this.store.dispatch(new GetUsers());
-  }
-
   closePage(): void {
     this.router.navigate(['/settings', 'teams', this.teamId]);
   }
 
   getErrorMessage(): string {
     return this.addUsersFailed.length > 0 ? this.addUsersFailed : undefined;
-  }
-
-  private get teamId(): string {
-    return this.isIAMv2 ? this.team.id : this.team.guid;
   }
 }

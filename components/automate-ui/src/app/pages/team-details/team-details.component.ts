@@ -3,12 +3,12 @@ import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms'
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
 import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
-import { combineLatest, Subject } from 'rxjs';
+import { combineLatest, Subject, Observable } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeParams, routeURL } from 'app/route.selectors';
+import { routeURL, routeState } from 'app/route.selectors';
 import { EntityStatus, loading } from 'app/entities/entities';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
@@ -41,7 +41,7 @@ import {
   allProjects,
   getAllStatus as getAllProjectStatus
 } from 'app/entities/projects/project.selectors';
-import { ProjectConstants, Project } from 'app/entities/projects/project.model';
+import { ProjectConstants } from 'app/entities/projects/project.model';
 
 const TEAM_DETAILS_ROUTE = /^\/settings\/teams/;
 
@@ -69,7 +69,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public addButtonText = 'Add User';
   public removeText = 'Remove User';
 
-  public isIAMv2: boolean;
+  public isIAMv2$: Observable<boolean>;
+  public teamId = '';
+  public descriptionOrName = '';
   public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -94,15 +96,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private get teamId(): string {
-    return this.isIAMv2 ? this.team.id : this.team.guid;
-  }
-
-  public get descriptionOrName(): string {
-    return this.isIAMv2 ? 'name' : 'description';
-  }
-
   ngOnInit(): void {
+    this.store.dispatch(new GetUsers());
+
+    this.isIAMv2$ = this.store.select(isIAMv2);
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
         this.url = url;
@@ -110,12 +107,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         // goes to #users if (1) explicit #users, (2) no fragment, or (3) invalid fragment
         this.tabValue = (fragment === 'details') ? 'details' : 'users';
       });
-    this.store.pipe(
-      select(isIAMv2),
-      takeUntil(this.isDestroyed))
-      .subscribe(latest => {
-        this.isIAMv2 = latest;
-    });
+
     combineLatest([
       this.store.select(getStatus),
       this.store.select(updateStatus),
@@ -134,37 +126,51 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
-    combineLatest([
+    const team$ = combineLatest([
+      this.isIAMv2$,
       this.store.select(v1TeamFromRoute),
       this.store.select(v2TeamFromRoute)
     ]).pipe(
-      takeUntil(this.isDestroyed),
-      map(([v1Team, v2Team]: [Team, Team]) => {
-        return this.isIAMv2 ? v2Team : v1Team;
-      }),
-      filter(identity)
-    ).subscribe((team: Team) => {
-        this.team = team;
-        this.updateNameForm.controls.name.setValue(this.team.name);
-        this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
-        this.store.dispatch(new GetUsers());
-      if (this.isIAMv2) {
-          this.store.dispatch(new GetProjects());
+      filter(([isV2, _v1TeamFromRoute, _v2TeamFromRoute]) => isV2 !== null),
+      map(([isV2, v1Team, v2Team]) => {
+        if (isV2) {
+          return v2Team;
+        } else {
+          return v1Team;
         }
-      });
+      }));
+
+    combineLatest([this.isIAMv2$, team$]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([_isV2, team]) => team !== undefined),
+      distinctUntilChanged(([isV2, team]) => isV2 === isV2 && team === team)
+    ).subscribe(([isV2, team]) => {
+      if (isV2) {
+        this.teamId = team.id;
+      } else {
+        this.teamId = team.guid;
+      }
+      this.team = team;
+      this.updateNameForm.controls.name.setValue(this.team.name);
+      this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
+      if (isV2) {
+        this.store.dispatch(new GetProjects());
+      }
+    });
 
     combineLatest([
       this.store.select(allProjects),
-      this.store.select(getAllProjectStatus)
+      this.store.select(getAllProjectStatus),
+      team$
     ]).pipe(
       takeUntil(this.isDestroyed),
-      filter(([_, pStatus]: [Project[], EntityStatus]) => pStatus !== EntityStatus.loading),
-      filter(() => !!this.team)
-    ).subscribe(([allowedProjects, _]) => {
+      filter(([_, pStatus, _team]) =>
+      pStatus !== EntityStatus.loading)
+    ).subscribe(([allowedProjects, _, team]) => {
         this.projects = {};
         allowedProjects
           .forEach(p => {
-            this.projects[p.id] = { ...p, checked: this.team.projects.includes(p.id)
+            this.projects[p.id] = { ...p, checked: team.projects.includes(p.id)
             };
           });
       });
@@ -175,33 +181,27 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.store.select(teamUsers),
       this.store.select(getUsersStatus)]).pipe(
         takeUntil(this.isDestroyed),
-        filter(([_allUsers, uStatus, _teamUsers, tuStatus]:
-          [User[], EntityStatus, string[], EntityStatus]) =>
+        filter(([_allUsers, uStatus, _teamUsers, tuStatus]) =>
             uStatus === EntityStatus.loadingSuccess &&
             tuStatus === EntityStatus.loadingSuccess),
-        filter(() => !!this.team),
         // Map UUID membership to user records and remove any entries that don't
         // map to user records.
-        map(([users, _uStatus, teamUserIds, _tuStatus]:
-          [User[], EntityStatus, string[], EntityStatus]) => {
+        map(([users, _uStatus, teamUserIds, _tuStatus]) => {
             return at(teamUserIds, keyBy('membership_id', users))
               .filter(userRecord => userRecord !== undefined);
-        })).subscribe((users: User[]) => {
-          // Sort naturally first by name, then by id
-          this.users = ChefSorters.naturalSort(users, ['name', 'id']);
-        });
+      })).subscribe((users: User[]) => {
+        // Sort naturally first by name, then by id
+        this.users = ChefSorters.naturalSort(users, ['name', 'id']);
+      });
 
     // If, however, the user browses directly to /settings/teams/ID, the store
     // will not contain the team data, so we fetch it.
     // TODO: This also fires when teamFromRoute fires; should inhibit that since
     // we already have the team details, as noted above.
     // Triggered every time the route changes (including on initial load).
-    combineLatest([
-      this.store.select(routeParams),
-      this.store.select(routeURL)
-    ]).pipe(
+    this.store.select(routeState).pipe(
       takeUntil(this.isDestroyed),
-      map(([params, url]) => [params.id as string, url]),
+      map(state => [state.params.id as string, state.url]),
       // Only fetch if we are on the team details route, otherwise
       // we'll trigger GetTeam with the wrong input on any route
       // away to a page that also uses the :id param.

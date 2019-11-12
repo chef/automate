@@ -2,19 +2,24 @@ import { createSelector, createFeatureSelector } from '@ngrx/store';
 
 import { RouterReducerState } from './ngrx.reducers';
 
-export const routerState = createFeatureSelector<RouterReducerState>('router');
+export const routerReducerState = createFeatureSelector<RouterReducerState>('router');
 
 export const routeParams = createSelector(
-  routerState,
+  routerReducerState,
   ({state}) => state.params
 );
 
 export const previousRoute = createSelector(
-  routerState,
+  routerReducerState,
   (state) => state.previousRoute
 );
 
 export const routeURL = createSelector(
-  routerState,
+  routerReducerState,
   ({state}) => state.url
+);
+
+export const routeState = createSelector(
+  routerReducerState,
+  ({state}) => state
 );

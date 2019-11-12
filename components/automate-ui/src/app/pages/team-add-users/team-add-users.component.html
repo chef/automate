@@ -3,13 +3,13 @@
   [attr.secondary-btn-show]="showSecondary"
   [attr.heading]="getHeading()"
   [attr.confirm-btn-text]="getConfirmBtnText()"
-  [attr.page-loading]="loading"
+  [attr.page-loading]="loading$ | async"
   [attr.confirm-loading]="addingUsers"
   [attr.disable-confirm]="usersToAddValues().length === 0"
   [attr.error-message]="getErrorMessage()"
   (confirm)="addUsers()"
   (close)="closePage()">
-  <div *ngIf="!loading">
+  <div *ngIf="!(loading$ | async)">
     <div id="no-users-container" *ngIf="usersNotFiltered().length === 0">
       <p>There are no more local <a [routerLink]="['/settings', 'users']" target="_blank">users</a> to add; create some more!</p>
     </div>

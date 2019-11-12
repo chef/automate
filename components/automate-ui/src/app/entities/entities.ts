@@ -41,3 +41,7 @@ export function pendingState(state: StateWithStatus): boolean {
 export function loading(status: EntityStatus): boolean {
   return status === EntityStatus.loading;
 }
+
+export function allLoadedSuccessfully(statuses: EntityStatus[]): boolean {
+  return statuses.every(status => status === EntityStatus.loadingSuccess);
+}
