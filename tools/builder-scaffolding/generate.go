@@ -13,10 +13,12 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
 	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/chef/automate/lib/httputils"
 	"github.com/google/go-cloud/blob"
 	"github.com/google/go-cloud/blob/s3blob"
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
+
+	"github.com/chef/automate/lib/httputils"
 )
 
 type Generator interface {
@@ -82,7 +84,7 @@ func (g *TimestampGenerator) Generate() string {
 	return timestamp.Format("20060102150405")
 }
 
-func initS3Bucket() (*blob.Bucket, error) {
+func initS3Bucket(bucketName string) (*blob.Bucket, error) {
 	accessKey, err := ioutil.ReadFile(
 		"/hab/svc/deployment-service/data/shared/minio/access_key")
 	if err != nil {
@@ -114,7 +116,7 @@ func initS3Bucket() (*blob.Bucket, error) {
 		return nil, err
 	}
 
-	bucket, err := s3blob.OpenBucket(context.Background(), s, "depot-test")
+	bucket, err := s3blob.OpenBucket(context.Background(), s, bucketName)
 	if err != nil {
 		return nil, err
 	}
@@ -122,10 +124,15 @@ func initS3Bucket() (*blob.Bucket, error) {
 	return bucket, nil
 }
 
-func runGenerate(*cobra.Command, []string) error {
-	bucket, err := initS3Bucket()
+func runGenerate(c *cobra.Command, args []string) error {
+	bucketName := "depot-test"
+	if len(args) >= 1 {
+		bucketName = args[0]
+	}
+
+	bucket, err := initS3Bucket(bucketName)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "init s3 bucket")
 	}
 
 	originNameDistribution := NewRandomDistribution(10, 20)
