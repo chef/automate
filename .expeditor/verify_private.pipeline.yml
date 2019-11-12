@@ -244,7 +244,7 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "automate-gateway-iam-v2.1"
+  - label: "automate-gateway-iam-v2"
     command:
       - . scripts/verify_setup.sh
       - |
@@ -435,7 +435,7 @@ steps:
           environment:
             - CYPRESS_RUN_FLAKY=true
 
-  - label: ":cypress: (flaky included) IAMv2.1"
+  - label: ":cypress: (flaky included) IAMv2"
     command:
       - IAM=v2.1 integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 20
@@ -470,7 +470,7 @@ steps:
         linux:
           privileged: true
 
-  - label: ":cypress: IAMv2.1"
+  - label: ":cypress: IAMv2"
     command:
       - IAM=v2.1 integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 20
@@ -480,18 +480,18 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2.1 (migrated w/ v1 policies)"
+  - label: "iam v2 (migrated w/ v1 policies)"
     command:
-      - integration/run_test integration/tests/iam_v2p1_with_v1_policies.sh
+      - integration/run_test integration/tests/iam_v2_with_v1_policies.sh
     timeout_in_minutes: 20
     expeditor:
       executor:
         linux:
           privileged: true
 
-  - label: "iam v2.1 fresh install"
+  - label: "iam v2 fresh install"
     command:
-      - integration/run_test integration/tests/iam_v2p1_fresh_install.sh
+      - integration/run_test integration/tests/iam_v2_fresh_install.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
@@ -502,9 +502,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2.1 (v2.1 only, diagnostics)"
+  - label: "iam v2 (v2 only, diagnostics)"
     command:
-      - integration/run_test integration/tests/iam_v2p1_upgrade_diagnostics.sh
+      - integration/run_test integration/tests/iam_v2_upgrade_diagnostics.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
@@ -745,18 +745,18 @@ steps:
         linux:
           privileged: true
 
-  - label: "reset admin access v2.1"
+  - label: "reset admin access v2"
     command:
-      - integration/run_test integration/tests/reset_admin_access_v2p1.sh
+      - integration/run_test integration/tests/reset_admin_access_v2.sh
     timeout_in_minutes: 20
     expeditor:
       executor:
         linux:
           privileged: true
 
-  - label: "upgrade / reset IAM v2.1"
+  - label: "upgrade / reset IAM v2"
     command:
-      - integration/run_test integration/tests/upgrade_reset_iam_v2p1.sh
+      - integration/run_test integration/tests/upgrade_reset_iam_v2.sh
     timeout_in_minutes: 20
     expeditor:
       executor:
