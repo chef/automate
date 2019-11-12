@@ -44,7 +44,7 @@ export SSL_CERT_DIR={{pkgPathFor "core/cacerts"}}/ssl/certs
 #{{else}}
 exec minio server \
   --config-dir "{{pkg.svc_var_path}}/config" \
-  --address "{{sys.ip}}:{{cfg.service.port}}" \
+  --address "0.0.0.0:{{cfg.service.port}}" \
   --quiet \
   "{{pkg.svc_data_path}}"
 #{{/if ~}}
