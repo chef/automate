@@ -50,8 +50,8 @@ describe('userStatusEntityReducer', () => {
       const action = new GetUsers();
 
       it('sets status to loading', () => {
-        const { status } = userEntityReducer(initialState, action);
-        expect(status).toEqual(EntityStatus.loading);
+        const { getStatus } = userEntityReducer(initialState, action);
+        expect(getStatus).toEqual(EntityStatus.loading);
       });
     });
 
@@ -60,8 +60,18 @@ describe('userStatusEntityReducer', () => {
       const action = new GetUsersSuccess(payload);
 
       it('sets status to loadingSuccess', () => {
-        const { status } = userEntityReducer(initialState, action);
-        expect(status).toEqual(EntityStatus.loadingSuccess);
+        const { getStatus } = userEntityReducer(initialState, action);
+        expect(getStatus).toEqual(EntityStatus.loadingSuccess);
+      });
+
+      using([
+        [initialState, userState('get', user, user2), 'initial state'],
+        [userState('get', user), userState('get', user, user2), 'one-user state']
+      ], (prevState, nextState: UserEntityState, descr: string) => {
+        it(`with ${descr} fetches latest users`, () => {
+          const actualNext = userEntityReducer(prevState, action);
+          expect(actualNext).toEqual(nextState);
+        });
       });
     });
 
@@ -70,8 +80,8 @@ describe('userStatusEntityReducer', () => {
       const action = new GetUsersFailure(payload);
 
       it('sets status to loadingFailure', () => {
-        const { status } = userEntityReducer(initialState, action);
-        expect(status).toEqual(EntityStatus.loadingFailure);
+        const { getStatus } = userEntityReducer(initialState, action);
+        expect(getStatus).toEqual(EntityStatus.loadingFailure);
       });
     });
 
@@ -84,8 +94,8 @@ describe('userStatusEntityReducer', () => {
       const action = new CreateUser(payload);
 
       it('sets status to loading', () => {
-        const { status } = userEntityReducer(initialState, action);
-        expect(status).toEqual(EntityStatus.loading);
+        const { createStatus } = userEntityReducer(initialState, action);
+        expect(createStatus).toEqual(EntityStatus.loading);
       });
     });
 
@@ -94,8 +104,18 @@ describe('userStatusEntityReducer', () => {
       const action = new CreateUserSuccess(payload);
 
       it('sets status to loadingSuccess', () => {
-        const { status } = userEntityReducer(initialState, action);
-        expect(status).toEqual(EntityStatus.loadingSuccess);
+        const { createStatus } = userEntityReducer(initialState, action);
+        expect(createStatus).toEqual(EntityStatus.loadingSuccess);
+      });
+
+      using([
+        [initialState, userState('create', user), 'initial state'],
+        [userState('create', user2), userState('create', user2, user), 'one-user state']
+      ], (prevState, nextState: UserEntityState, descr: string) => {
+        it(`with ${descr} adds a new user to the state`, () => {
+          const actualNext = userEntityReducer(prevState, action);
+          expect(actualNext).toEqual(nextState);
+        });
       });
     });
 
@@ -104,8 +124,8 @@ describe('userStatusEntityReducer', () => {
       const action = new CreateUserFailure(payload);
 
       it('sets status to loadingFailure', () => {
-        const { status } = userEntityReducer(initialState, action);
-        expect(status).toEqual(EntityStatus.loadingFailure);
+        const { createStatus } = userEntityReducer(initialState, action);
+        expect(createStatus).toEqual(EntityStatus.loadingFailure);
       });
     });
 
@@ -114,8 +134,8 @@ describe('userStatusEntityReducer', () => {
       const action = new GetUser(payload);
 
       it('sets status to loading', () => {
-        const { status } = userEntityReducer(initialState, action);
-        expect(status).toEqual(EntityStatus.loading);
+        const { getStatus } = userEntityReducer(initialState, action);
+        expect(getStatus).toEqual(EntityStatus.loading);
       });
     });
 
@@ -125,8 +145,8 @@ describe('userStatusEntityReducer', () => {
 
       it('sets status to loadingSuccess', () => {
         const prevState = { ...initialState, state: EntityStatus.loading };
-        const { status } = userEntityReducer(prevState, action);
-        expect(status).toEqual(EntityStatus.loadingSuccess);
+        const { getStatus } = userEntityReducer(prevState, action);
+        expect(getStatus).toEqual(EntityStatus.loadingSuccess);
       });
 
       it('loads the one user into the users state', () => {
@@ -142,8 +162,8 @@ describe('userStatusEntityReducer', () => {
 
       it('sets status to loadingSuccess', () => {
         const prevState = { ...initialState, state: EntityStatus.loading };
-        const { status } = userEntityReducer(prevState, action);
-        expect(status).toEqual(EntityStatus.loadingFailure);
+        const { getStatus } = userEntityReducer(prevState, action);
+        expect(getStatus).toEqual(EntityStatus.loadingFailure);
       });
     });
 
@@ -243,35 +263,12 @@ function userState(action: string, ...us: User[]): UserEntityState {
     entities[u.id] = u;
     ids.push(u.id);
   }
-  switch (action) {
-    case 'get': {
-      return {
-        updateStatus: EntityStatus.notLoaded,
-        status: EntityStatus.loadingSuccess,
-        deleteStatus: EntityStatus.notLoaded,
-        entities,
-        ids
-      };
-    }
-    case 'update': {
-      return {
-        updateStatus: EntityStatus.loadingSuccess,
-        status: EntityStatus.notLoaded,
-        deleteStatus: EntityStatus.notLoaded,
-        entities,
-        ids
-      };
-    }
-    case 'delete': {
-      return {
-        updateStatus: EntityStatus.notLoaded,
-        status: EntityStatus.notLoaded,
-        deleteStatus: EntityStatus.loadingSuccess,
-        entities,
-        ids
-      };
-    }
-  }
+
+  return ['get', 'create', 'update', 'delete']
+    .reduce((state, a) => {
+      state[a + 'Status'] = a === action ? EntityStatus.loadingSuccess : EntityStatus.notLoaded;
+      return state;
+    }, { entities, ids }) as UserEntityState;
 }
 
 

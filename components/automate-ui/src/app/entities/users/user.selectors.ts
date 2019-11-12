@@ -11,9 +11,9 @@ export const {
   selectEntities: userEntities
 } = userEntityAdapter.getSelectors(userState);
 
-export const userStatus = createSelector(
+export const getStatus = createSelector(
   userState,
-  (state) => state.status
+  (state) => state.getStatus
 );
 
 export const updateStatus = createSelector(
@@ -24,6 +24,11 @@ export const updateStatus = createSelector(
 export const deleteStatus = createSelector(
   userState,
   (state) => state.deleteStatus
+);
+
+export const createStatus = createSelector(
+  userState,
+  (state) => state.createStatus
 );
 
 export const userFromRoute = createSelector(
