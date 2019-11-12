@@ -18,6 +18,7 @@ import { JobAddComponent } from './pages/job-add/job-add.component';
 import { JobEditComponent } from './pages/job-edit/job-edit.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
 import { ChefServersListComponent } from './pages/infra-proxy/chef-servers-list/chef-servers-list.component';
+import { ChefServersDetailsComponent } from './pages/infra-proxy/chef-servers-details/chef-servers-details.component';
 import { NotificationsComponent } from './pages/notifications/notifications.component';
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { DatafeedComponent } from './pages/data-feed/data-feed.component';
@@ -234,7 +235,16 @@ const routes: Routes = [
         },
         {
           path: 'chef-servers',
-          component: ChefServersListComponent
+          children: [
+            {
+              path: '',
+              component: ChefServersListComponent
+            },
+            {
+              path: ':name',
+              component: ChefServersDetailsComponent
+            }
+          ]
         }
       ]
     },

@@ -1,0 +1,107 @@
+<app-client-runs-sidebar></app-client-runs-sidebar>
+
+<div class="container">
+  <main>
+    <chef-breadcrumbs>
+      <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
+      Chef Server
+    </chef-breadcrumbs>
+    <chef-page-header>
+      <chef-heading>Chef Server</chef-heading>
+      <table>
+            <thead>
+              <tr class="detail-row">
+                <th class="id-column">FQDN</th>
+                <th class="id-column">IP Address</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="detail-row">
+                <td class="id-column">chef.io</td>
+                <td class="id-column">192.168.1.1</td>
+              </tr>
+            </tbody>
+          </table>
+      <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+        <chef-option value='orgs' data-cy="orgs-tab">Orgs</chef-option>
+        <chef-option value='details' data-cy="details-tab">Details</chef-option>
+      </chef-tab-selector>
+    </chef-page-header>
+    <section class="page-body" *ngIf="tabValue === 'details'">
+      <form [formGroup]="chefServerForm">
+        <chef-form-field id="update-name">
+            <label>
+                <span class="label">Disaplay Name <span aria-hidden="true">*</span></span>
+                <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful"
+                autocomplete="off"
+                data-cy="update-chefServer-name">
+            </label>
+            <chef-error
+                *ngIf="(chefServerForm.get('name').hasError('required') || chefServerForm.get('name').hasError('pattern')) && chefServerForm.get('name').dirty">
+                Display Name is required.
+            </chef-error>
+            <label>
+                <span class="label">FQDN <span aria-hidden="true">*</span></span>
+                <input chefInput formControlName="fqdn" type="text" [resetOrigin]="saveSuccessful"
+                    autocomplete="off"
+                    data-cy="update-chefServer-fqdn">
+            </label>
+            <chef-error 
+                *ngIf="(chefServerForm.get('fqdn').hasError('required') || chefServerForm.get('fqdn').hasError('pattern')) && chefServerForm.get('fqdn').dirty">
+                FQDN is required.
+            </chef-error>
+            <label>
+                <span class="label">IP Address <span aria-hidden="true">*</span></span>
+                <input chefInput formControlName="ip_address" type="text" [resetOrigin]="saveSuccessful"
+                    autocomplete="off"
+                    data-cy="update-chefServer-ip_address">
+            </label>
+            <chef-error 
+                *ngIf="(chefServerForm.get('ip_address').hasError('required') || chefServerForm.get('ip_address').hasError('pattern')) && chefServerForm.get('ip_address').dirty">
+                FQDN is required.
+            </chef-error>
+        <div id="button-bar">
+          <chef-button primary inline (click)="saveChefServer()">Save</chef-button>
+          <span id="saved-note" *ngIf="saveSuccessful && !chefServerForm.dirty">All changes saved.</span>
+        </div>
+        </chef-form-field>
+      </form>
+    </section>
+    <section class="page-body" *ngIf="tabValue === 'orgs'">
+      <ng-container>
+        <chef-toolbar>
+            <chef-button id="create-button" primary (click)="openCreateModal('create')">Create Org</chef-button>
+        </chef-toolbar>
+        <chef-table>
+            <chef-thead>
+              <chef-tr>
+                <chef-th>Org Name</chef-th>
+                <chef-th>Admin</chef-th>
+                <chef-th>Projects</chef-th>
+                <chef-th class="controls"></chef-th>
+              </chef-tr>
+            </chef-thead>
+            <chef-tbody>
+              <chef-tr>
+                <chef-td>
+                  <a (click)="openCreateModal('edit')">Automate Team</a>
+                </chef-td>
+                <chef-td>andhfngth</chef-td>
+                <chef-td>Inherited from chef server</chef-td>
+                <chef-td class="controls">
+                  <chef-control-menu>
+                      <chef-option  class="delete-rule" data-cy="delete-rule">Delete Orgs</chef-option>
+                  </chef-control-menu>
+                </chef-td>
+              </chef-tr>
+            </chef-tbody>
+        </chef-table>
+      </ng-container>
+    </section>
+    <app-org-create-edit-modal
+      [visible]="createModalVisible"
+      [type]="modalType"
+      (close)="closeCreateModal()">
+    </app-org-create-edit-modal>
+  </main>
+</div>

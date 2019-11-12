@@ -21,13 +21,13 @@
             </chef-tr>
           </chef-thead>
           <chef-tbody>
-              <chef-tr>
+              <chef-tr *ngFor= "let server of serverMockList">
                   <chef-td>
-                    <a [routerLink]="['/infrastructure/chef-servers']">Chef Server</a>
+                    <a [routerLink]="['/infrastructure/chef-servers', server.name]">{{ server.name }}</a>
                   </chef-td>
-                  <chef-td>chef.io</chef-td>
-                  <chef-td>27.0.0.5</chef-td>
-                  <chef-td>3</chef-td>
+                  <chef-td>{{ server.fqdn }}</chef-td>
+                  <chef-td>{{ server.ip_address }}</chef-td>
+                  <chef-td>{{ server.orgs }}</chef-td>
                   <chef-td class="controls">
                     <app-authorized>
                       <chef-control-menu>

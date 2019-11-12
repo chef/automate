@@ -1,0 +1,33 @@
+<chef-modal [visible]="visible" (closeModal)="closeEvent()">
+  <h2 *ngIf="type === 'create'" slot="title">Create New Org</h2>
+  <h2 *ngIf="type === 'edit'" slot="title">Create New Org</h2>
+  <div class="flex-container">
+    <form [formGroup]="orgForm">
+      <div class="name-margin">
+        <chef-form-field>
+          <label>
+            <span class="label">Full Name <span aria-hidden="true">*</span></span>
+            <input chefInput formControlName="name" type="text" id="name-input" data-cy="full-name" autocomplete="off">
+          </label>
+          <chef-error *ngIf="orgForm.get('name').dirty">
+            Name is required.
+          </chef-error>
+        </chef-form-field>
+        <chef-from-field>
+          <label>
+            <span class="label">Org Id <span aria-hidden="true">*</span></span>
+            <input chefInput formControlName="name" type="text" id="orgId-input" data-cy="full-name" autocomplete="off">
+          </label>
+          <chef-error *ngIf="orgForm.get('orgId').dirty">
+            Org Id is required.
+          </chef-error>
+        </chef-from-field>
+      </div>
+      <div id="button-bar">
+        <chef-button *ngIf="type === 'create'" primary id="create-org-modal-btn" data-cy="submit-button">Create Org</chef-button>
+        <chef-button *ngIf="type === 'edit'" primary id="edit-org-modal-btn" data-cy="submit-button">Save Org</chef-button>
+        <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
+      </div>
+    </form>
+  </div>
+</chef-modal>

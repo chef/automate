@@ -1,0 +1,39 @@
+@import "~styles/variables";
+
+chef-modal {
+
+  [slot=title] {
+    text-align: center;
+    font-weight: bold;
+    margin-top: 1em;
+    padding-bottom: 12px;
+  }
+
+  .flex-container {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+
+    form {
+      width: 66%;
+
+      chef-form-field {
+        padding-bottom: .5em;
+      }
+
+      input {
+        font-size: 1em;
+      }
+    }
+
+    #button-bar {
+      text-align: center;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+    }
+  }
+}
