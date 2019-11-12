@@ -18,7 +18,7 @@ import {
   UpdateSelf
  } from 'app/entities/users/user.actions';
 import {
-  userStatus, userFromRoute, updateStatus, deleteStatus
+  getStatus, userFromRoute, updateStatus, deleteStatus
 } from 'app/entities/users/user.selectors';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
@@ -58,7 +58,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       });
 
     combineLatest([
-      this.store.select(userStatus),
+      this.store.select(getStatus),
       this.store.select(userFromRoute)
     ]).pipe(
       filter(([status, user]) => status === EntityStatus.loadingSuccess && !isNil(user)),

@@ -13,7 +13,7 @@ import { routeURL, routeState } from 'app/route.selectors';
 import { EntityStatus, loading } from 'app/entities/entities';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
-import { allUsers, userStatus } from 'app/entities/users/user.selectors';
+import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import {
@@ -21,7 +21,7 @@ import {
   v2TeamFromRoute,
   teamUsers,
   getStatus,
-  getUsersStatus,
+  getUsersStatus as getTeamUsersStatus,
   updateStatus
 } from 'app/entities/teams/team.selectors';
 import { Team } from 'app/entities/teams/team.model';
@@ -126,7 +126,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     combineLatest([
       this.store.select(getStatus),
       this.store.select(updateStatus),
-      this.store.select(getUsersStatus)
+      this.store.select(getTeamUsersStatus)
     ]).pipe(
       takeUntil(this.isDestroyed)
     ).subscribe(([gStatus, uStatus, usersStatus]) => {
@@ -186,9 +186,9 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
     combineLatest([
       this.store.select(allUsers),
-      this.store.select(userStatus),
+      this.store.select(getAllUsersStatus),
       this.store.select(teamUsers),
-      this.store.select(getUsersStatus)]).pipe(
+      this.store.select(getTeamUsersStatus)]).pipe(
         takeUntil(this.isDestroyed),
         filter(([_allUsers, uStatus, _teamUsers, tuStatus]) =>
             uStatus === EntityStatus.loadingSuccess &&
