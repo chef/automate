@@ -384,6 +384,14 @@ We support these cases by adding static Swagger JSON or YAML files that combine 
 * Use [present tense](https://www.grammarly.com/blog/simple-present/)
 * Write [positively](https://www.plainlanguage.gov/guidelines/concise/use-positive-language/)
 
+### Specific Tips
+
+* Avoid "of the" for a [genitive case](https://www.learnenglish.de/grammar/casepossgen.html)
+    * Example: "The node name" instead of "Name of the node". (A simple genitive)
+    * Example: "The control's unique ID" instead of "The unique ID of the control".
+
+Note: We have not yet settled on conventions for using the grammatically questionable "simple genitive" instead of the categorically correct posessive. Try finding what sounds best to your ears.
+
 ## External references
 
 * [OpenAPI 2.0 (aka swagger) spec](https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md)
