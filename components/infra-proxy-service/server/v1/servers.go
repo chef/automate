@@ -71,7 +71,7 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 
 	UUID, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid server id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid server id: %s", err.Error())
 	}
 
 	server, err := s.service.Storage.GetServer(ctx, UUID)
@@ -115,17 +115,12 @@ func (s *Server) DeleteServer(ctx context.Context, req *request.DeleteServer) (*
 
 	UUID, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid server id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid server id: %s", err.Error())
 	}
 
 	server, err := s.service.Storage.DeleteServer(ctx, UUID)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "server")
-	}
-
-	if err != nil {
-		s.service.Logger.Warnf("failed to purge subjects on server delete: %s", err.Error())
-		return nil, status.Errorf(codes.Internal, "failed to purge server %q from policies: %s", server.ID, err.Error())
 	}
 
 	return &response.DeleteServer{
@@ -161,7 +156,7 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 
 	id, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid server id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid server id: %s", err.Error())
 	}
 
 	serverStruct := storage.Server{

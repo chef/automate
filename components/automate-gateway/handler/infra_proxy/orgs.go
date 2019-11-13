@@ -5,7 +5,6 @@ import (
 
 	gwreq "github.com/chef/automate/api/external/infra_proxy/request"
 	gwres "github.com/chef/automate/api/external/infra_proxy/response"
-
 	infra_req "github.com/chef/automate/api/interservice/infra_proxy/request"
 	infra_res "github.com/chef/automate/api/interservice/infra_proxy/response"
 )
@@ -114,9 +113,11 @@ func fromUpstreamOrg(t *infra_res.Org) *gwres.Org {
 }
 
 func fromUpstreamOrgs(orgs []*infra_res.Org) []*gwres.Org {
-	ts := []*gwres.Org{}
-	for _, t := range orgs {
-		ts = append(ts, fromUpstreamOrg(t))
+	ts := make([]*gwres.Org, len(orgs))
+
+	for i, org := range orgs {
+		ts[i] = fromUpstreamOrg(org)
 	}
+
 	return ts
 }

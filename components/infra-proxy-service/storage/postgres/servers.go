@@ -55,7 +55,7 @@ func (p *postgres) GetServerByName(ctx context.Context, serverName string) (stor
 	var s storage.Server
 	err := p.db.QueryRowContext(ctx,
 		`SELECT s.id, s.name, s.description, s.fqdn, s.ip_address, s.updated_at, s.created_at,
-		COALESCE((SELECT count(*) FROM orgs o WHERE o.server_id = s.id), 0) AS orgs_count
+		(SELECT count(*) FROM orgs o WHERE o.server_id = s.id) AS orgs_count
 		FROM servers s
 		WHERE s.name = $1`,
 		serverName).
@@ -105,7 +105,7 @@ func (p *postgres) GetServers(ctx context.Context) ([]storage.Server, error) {
 	// TODO eventually these should be ordered
 	rows, err := p.db.QueryContext(ctx,
 		`SELECT s.id, s.name, s.description, s.fqdn, s.ip_address, s.updated_at, s.created_at,
-		COALESCE((SELECT count(*) FROM orgs o WHERE o.server_id = s.id), 0) AS orgs_count
+		(SELECT count(*) FROM orgs o WHERE o.server_id = s.id) AS orgs_count
 		FROM servers s`)
 
 	if err != nil {

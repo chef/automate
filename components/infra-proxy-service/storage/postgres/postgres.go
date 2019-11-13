@@ -12,9 +12,6 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
-// TODOs
-// - CREATE EXTENSION "uuid-ossp"; (currently done via Makefile for tests)
-
 type postgres struct {
 	db     *sql.DB
 	logger logger.Logger

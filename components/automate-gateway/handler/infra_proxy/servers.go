@@ -5,7 +5,6 @@ import (
 
 	gwreq "github.com/chef/automate/api/external/infra_proxy/request"
 	gwres "github.com/chef/automate/api/external/infra_proxy/response"
-
 	infra_req "github.com/chef/automate/api/interservice/infra_proxy/request"
 	infra_res "github.com/chef/automate/api/interservice/infra_proxy/response"
 )
@@ -108,13 +107,16 @@ func fromUpstreamServer(t *infra_res.Server) *gwres.Server {
 		Description: t.GetDescription(),
 		Fqdn:        t.GetFqdn(),
 		IpAddress:   t.GetIpAddress(),
+		OrgsCount:   t.GetOrgsCount(),
 	}
 }
 
 func fromUpstreamServers(servers []*infra_res.Server) []*gwres.Server {
-	ts := []*gwres.Server{}
-	for _, t := range servers {
-		ts = append(ts, fromUpstreamServer(t))
+	ts := make([]*gwres.Server, len(servers))
+
+	for i, t := range servers {
+		ts[i] = fromUpstreamServer(t)
 	}
+
 	return ts
 }

@@ -3,16 +3,14 @@ package v1
 import (
 	"context"
 
-	uuid "github.com/chef/automate/lib/uuid4"
-
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
-
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
+	uuid "github.com/chef/automate/lib/uuid4"
 )
 
 // CreateOrg creates a new org
@@ -61,7 +59,7 @@ func (s *Server) GetOrgs(ctx context.Context, req *request.GetOrgs) (*response.G
 
 	serverID, err := uuid.FromString(req.ServerId)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid org server_id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org server_id: %s", err.Error())
 	}
 
 	orgsList, err := s.service.Storage.GetOrgs(ctx, serverID)
@@ -81,7 +79,7 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 
 	UUID, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid org id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
 	}
 
 	org, err := s.service.Storage.GetOrg(ctx, UUID)
@@ -106,7 +104,7 @@ func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*
 
 	serverID, err := uuid.FromString(req.ServerId)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid org server_id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org server_id: %s", err.Error())
 	}
 
 	org, err := s.service.Storage.GetOrgByName(ctx, req.Name, serverID)
@@ -130,17 +128,12 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 
 	UUID, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid org id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
 	}
 
 	org, err := s.service.Storage.DeleteOrg(ctx, UUID)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "org")
-	}
-
-	if err != nil {
-		s.service.Logger.Warnf("failed to purge subjects on org delete: %s", err.Error())
-		return nil, status.Errorf(codes.Internal, "failed to purge org %q from policies: %s", org.ID, err.Error())
 	}
 
 	return &response.DeleteOrg{
@@ -176,7 +169,7 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 
 	id, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid org id")
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
 	}
 
 	orgStruct := storage.Org{
