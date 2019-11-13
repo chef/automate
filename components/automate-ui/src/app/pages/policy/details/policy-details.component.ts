@@ -1,14 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { identity } from 'lodash/fp';
-import { Observable, Subject } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
+import { isNil } from 'lodash/fp';
+import { Subject, combineLatest } from 'rxjs';
 
+import { EntityStatus } from 'app/entities/entities';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeURL, routeState } from 'app/route.selectors';
 import { GetPolicy } from 'app/entities/policies/policy.actions';
-import { policyFromRoute } from 'app/entities/policies/policy.selectors';
+import { policyFromRoute, getStatus } from 'app/entities/policies/policy.selectors';
 import {
   Policy, Member, Type, stringToMember
 } from 'app/entities/policies/policy.model';
@@ -28,7 +29,7 @@ const POLICY_DETAILS_ROUTE = /^\/settings\/policies/;
 export class PolicyDetailsComponent implements OnInit, OnDestroy {
   public policy: Policy;
   public policyJSON: string;
-  public members$: Observable<Member[]>;
+  public members: Member[] = [];
   public tabValue: PolicyTabName = 'definition';
   private url: string;
   // Map of local user and team member IDs to URLs.
@@ -50,16 +51,20 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
         this.tabValue = (fragment === 'members') ? 'members' : 'definition';
      });
 
-    this.members$ = this.store.select(policyFromRoute).pipe(
-      filter(identity),
-      takeUntil(this.isDestroyed),
-      map((state) => {
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(policyFromRoute)
+    ]).pipe(
+      filter(([status, _]) => status === EntityStatus.loadingSuccess),
+      filter(([_, state]) => !isNil(state)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([_, state]) => {
         this.policy = <Policy>Object.assign({}, state);
         this.policyJSON = this.policyToString(this.policy);
-        const members = <Member[]>[];
+        this.members = [];
         this.policy.members.forEach(element => {
           const member = stringToMember(element);
-          members.push(member);
+          this.members.push(member);
           if (member.type === Type.LocalUser) {
             this.memberURLs[member.name] = ['/settings', 'users', member.displayName];
           } else if (member.type === Type.LocalTeam) {
@@ -69,9 +74,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
           }
         });
         delete this.policy.members;
-        return members;
-      }));
-    this.members$.subscribe();
+      });
 
     this.store.select(routeState).pipe(
       takeUntil(this.isDestroyed),

@@ -89,7 +89,7 @@ export function ruleEntityReducer(
 
   switch (action.type) {
     case RuleActionTypes.GET_ALL:
-      return set(GET_ALL_STATUS, EntityStatus.loading, state);
+      return set(GET_ALL_STATUS, EntityStatus.loading, ruleEntityAdapter.removeAll(state));
 
     case RuleActionTypes.GET_ALL_SUCCESS:
       return pipe(
@@ -101,7 +101,7 @@ export function ruleEntityReducer(
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
 
     case RuleActionTypes.GET:
-      return set(GET_STATUS, EntityStatus.loading, state);
+      return set(GET_STATUS, EntityStatus.loading, ruleEntityAdapter.removeAll(state));
 
     case RuleActionTypes.GET_SUCCESS:
       return set(GET_STATUS, EntityStatus.loadingSuccess,

@@ -1,13 +1,14 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { identity } from 'lodash/fp';
-import { Subject } from 'rxjs';
+import { identity, isNil } from 'lodash/fp';
+import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 
+import { EntityStatus } from 'app/entities/entities';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { GetRole } from 'app/entities/roles/role.actions';
-import { roleFromRoute } from 'app/entities/roles/role.selectors';
+import { roleFromRoute, getStatus } from 'app/entities/roles/role.selectors';
 import { Role } from 'app/entities/roles/role.model';
 
 @Component({
@@ -23,19 +24,23 @@ export class RoleDetailsComponent implements OnInit, OnDestroy {
   constructor(private store: Store<NgrxStateAtom>) {  }
 
   ngOnInit(): void {
-    this.store.select(roleFromRoute).pipe(
-      filter(identity),
-      takeUntil(this.isDestroyed))
-      .subscribe((state) => {
-        this.role = <Role>Object.assign({}, state);
-      });
-
     this.store.select(routeParams).pipe(
       pluck('id'),
       filter(identity),
       takeUntil(this.isDestroyed))
       .subscribe((id: string) => {
         this.store.dispatch(new GetRole({ id }));
+      });
+
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(roleFromRoute)
+    ]).pipe(
+      filter(([status, _]) => status === EntityStatus.loadingSuccess),
+      filter(([_, roleState]) => !isNil(roleState)),
+      takeUntil(this.isDestroyed))
+      .subscribe(([_, roleState]) => {
+        this.role = <Role>Object.assign({}, roleState);
       });
   }
 

@@ -45,3 +45,8 @@ export function loading(status: EntityStatus): boolean {
 export function allLoadedSuccessfully(statuses: EntityStatus[]): boolean {
   return statuses.every(status => status === EntityStatus.loadingSuccess);
 }
+
+export function allLoaded(statuses: EntityStatus[]): boolean {
+  return statuses.every(status =>
+    status === EntityStatus.loadingSuccess || status === EntityStatus.loadingFailure);
+}
