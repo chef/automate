@@ -23,7 +23,7 @@ A new static website for Automate is based on [Hugo](https://gohugo.io), the Go-
     If everything is up to date you should see output like this when running `swagger version`:
 
     ```shell
-    $ swagger version
+    $ Swagger version
     version: v0.20.1
     commit: 9004771f77bedabb792a48dc846ba7fc800398a0
     ```
@@ -52,7 +52,8 @@ A new static website for Automate is based on [Hugo](https://gohugo.io), the Go-
 
 ## Creating and Changing Docs
 
-The site is built with [Hugo](https://gohugo.io/), a Go-based static site generator, and uses [Stencil](https://stenciljs.com/) for web components and [Sass](http://sass-lang.com/) for CSS. You'll probably want to familiarize yourself with the Hugo documentation, which covers templating, layouts, functions, etc., but there are helpers to assist you with doing some common things, like creating a new blog post:
+The site is built with [Hugo](https://gohugo.io/), a Go-based static site generator, and uses [Stencil](https://stenciljs.com/) for web components and [Sass](http://sass-lang.com/) for CSS.
+You'll probably want to familiarize yourself with the Hugo documentation, which covers templating, layouts, functions, etc., but there are helpers to assist you with doing some common things, like creating a new blog post:
 
 ```shell
 hugo new docs/my-sweet-new-page.md
@@ -68,7 +69,8 @@ make sync
 make serve
 : Start the live-reload development environment
 
-> If you get a `git clone` related failure when running these commands, you may not have your HTTPS GitHub credentials setup. These commands will clone down the hugo theme via HTTPS. [Read these docs](https://help.github.com/articles/which-remote-url-should-i-use/#cloning-with-https-urls-recommended) to learn why we use HTTPS over SSH, and how to setup your GitHub credentials.
+> If you get a `git clone` related failure when running these commands, you may not have your HTTPS GitHub credentials setup. These commands will clone down the hugo theme via HTTPS.
+[Read these docs](https://help.github.com/articles/which-remote-url-should-i-use/#cloning-with-https-urls-recommended) to learn why we use HTTPS over SSH, and how to setup your GitHub credentials.
 
 ## Markdown Content
 
@@ -86,7 +88,7 @@ This will create the file and fill in the necessary frontmatter automatically.
 
 Hugo allows us to nest our data directory structure as much as necessary. You can add as many folders as necessary under `components/automate-chef-io/data/docs`.
 
-```
+```output
 .
 ├── data
 │   ├── docs
@@ -99,133 +101,293 @@ Hugo allows us to nest our data directory structure as much as necessary. You ca
 
 To view the API documentation locally, 1. From the `components/automate-chef-io` directory, run the following command to start the development server.
 
-    ```shell
-    $ make serve
-    ```
+```shell
+$ make serve
+```
 
-    To view the API docs in your browser, navigate to:
-
-    ```shell
-    http://localhost:1313/docs/api
-    ```
-
-## Developing API Docs
-
-We use the [ReDoc](https://github.com/Redocly/redoc) in conjunction with the the Hab studio for Automate, [grpc-gateway protoc-gen-swagger](https://github.com/grpc-ecosystem/grpc-gateway/tree/master/protoc-gen-swagger) and the [OpenAPI 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) to automatically generate API documentation from comments on automate protoc files.
-
-## Writing API Docs
-
-To develop API documentation, compile go components, sync the swagger, files and serve the development environment locally, run the following from the top level `automate` directory.
-
-To see your changes, you will need to re-run this command to re-build the documentation.
-
-    ```shell
-    hab studio run "source .studiorc && compile_all_protobuf_components" && pushd components/automate-chef-io/ && make sync_swagger_files generate_swagger && make serve || popd
-    ```
-
-    View the API docs in your browser:
-
-    ```shell
-    http://localhost:1313/docs/api
-    ```
-
-The proto files for APIs are located at:
+To view the API docs in your browser, navigate to:
 
 ```shell
-automate/components/automate-gateway/api/
+http://localhost:1313/docs/api
 ```
 
-You can find the examples from these instructions at:
+### Building API Docs
 
-```shell
-automate/components/automate-gateway/api/compliance/reporting/reporting.proto
-```
+Chef Automate  generates API documentation from protoc files comments using
 
-Adding comments to a proto file uses Go inline and block comment syntax:
+* [grpc-gateway protoc-gen-swagger](https://github.com/grpc-ecosystem/grpc-gateway/tree/master/protoc-gen-swagger) as the protoc compiler
+* [OpenAPI 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) as the API schema
+* [ReDoc](https://github.com/Redocly/redoc) as the front-end display
 
-```go
-/* This is a block comment */
-// This is an inline comment
-```
+To build the API documentation during development:
 
-Block comments are usually placed before the start of an RPC service definition. Block comments for API documentation are sometimes called "leading comments".
-
-Inline are usually placed within the message formats. Inline comments for API documentation are sometimes called "following comments".
-
-# API Documentation
-
-To view the API documentation locally, 1. From the `components/automate-chef-io` directory, run the following command to start the development server.
-
-    ```shell
-    $ make serve
-    ```
-
-    To view the API docs in your browser, navigate to:
-
-    ```shell
-    http://localhost:1313/docs/api
-    ```
-
-## Developing API Docs
-
-We use the [ReDoc](https://github.com/Redocly/redoc) in conjunction with the the Hab studio for Automate, [grpc-gateway protoc-gen-swagger](https://github.com/grpc-ecosystem/grpc-gateway/tree/master/protoc-gen-swagger) and the [OpenAPI 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) to automatically generate API documentation from comments on automate protoc files.
-
-## Writing API Docs
-
-To develop API documentation, compile go components, sync the swagger, files and serve the development environment locally, run the following from the top level `automate` directory.
-
-To see your changes, you will need to re-run this command to re-build the documentation.
-
-    ```shell
-    hab studio run "source .studiorc && compile_all_protobuf_components" && pushd components/automate-chef-io/ && make sync_swagger_files generate_swagger && make serve || popd
-    ```
-
-    View the API docs in your browser:
-
-    ```shell
-    http://localhost:1313/docs/api
-    ```
-
-The proto files for APIs are located at:
-
-```shell
-automate/components/automate-gateway/api/
-```
-
-You can find the examples from these instructions at:
-
-```shell
-automate/components/automate-gateway/api/compliance/reporting/reporting.proto
-```
-
-Adding comments to a proto file uses Go inline and block comment syntax:
-
-```go
-/* This is a block comment */
-// This is an inline comment
-```
-
-Block comments are usually placed before the start of an RPC service definition. Block comments for API documentation are sometimes called "leading comments".
-
-Inline are usually placed within the message formats. Inline comments for API documentation are sometimes called "following comments".
-
-
-# Building the API docs
-
-Rebuilding the API docs is necessary when adding documentation content to Automate's .proto files. Making code changes in the .proto files does not require rebuilding, but any new or updated services, messages, or fields should be documented to keep the documentation up to date and accurate.
-
-## Build steps
 1. Make any edits to the .proto files necessary.
 2. Recompile the .proto files as described in the [Automate development guide](https://github.com/chef/automate/blob/master/dev-docs/DEV_ENVIRONMENT.md)
 3. Sync the .swagger files generated with those in the docs component: `make sync_swagger_files`
-4. Follow the instructions in the viewing the docs section.
+4. Run the hugo server and view the documentation in your browser
 
-For convenience, an example of an all-in-one command to compile the .proto files and make the documentation viewable is:
+Rebuilding the API docs is necessary when adding documentation content to Automate's .proto files. Changing the code in the .proto files does not require rebuilding, but new or updated services, messages, or fields require documentation.
+Our goal is to provide timely and accurate documentation for Chef Automate users.
 
-```
-hab studio run "source .studiorc && compile_all_protobuf_components" && pushd components/automate-chef-io/ && make sync_swagger_files serve || popd
-```
+You can build the API docs by running the following all-in-one command from the top-level `automate` directory:
 
-## Notes on building the docs
+`hab studio run "source .studiorc && compile_all_protobuf_components" && pushd components/automate-chef-io/ && make sync_swagger_files generate_swagger && make serve || popd`
+
+Review the API docs in your browser:
+
+`http://localhost:1313/docs/api`
+
+#### Notes on building the docs
+
 * If you end up with merge conflicts while writing API docs, don't attempt to resolve them in any generated files. It's better to resolve the conflicts in any human edited file and then regenerate the docs.
-* The all-in-one build command above can fail somewhere in the middle and leave things in an inconsistent state.  It is safe to run multiple times in a row while fixing syntax errors in .proto files or similar, but since it changes directories it can sometimes be necessary to change back to the root automate directory.
+* The all-in-one build command above can fail somewhere in the middle and leave things in an inconsistent state.
+It is safe to run multiple times in a row while fixing syntax errors in .proto files or similar, but since it changes directories it can sometimes be necessary to change back to the root automate directory.
+
+### API File Index
+
+* **API Proto Files**: automate/components/automate-gateway/api/
+* **Example API Proto File**: automate/components/automate-gateway/api/compliance/reporting/
+* **Meta Swagger**: automate/components/automate-chef-io/data/docs/api-static/01-meta-swagger.json
+* **Reporting Export**: automate/components/automate-chef-io/data/docs/api-static/01-reporting-export.swagger.json
+* **Description**: automate/components/automate-chef-io/data/docs/api-static/02-meta-description.yaml
+* **Tags**: automate/components/automate-chef-io/data/docs/api-static/03-tags.swagger.json
+* **Compiled Swagger**: automate/static/api-docs/all-apis.swagger.json
+
+### Tags and Tag Groups
+
+* Endpoints need to appear in the rendered documentation human-readable groupings. We use group and endpoint tags to create an organized and meaningful presentation for the Chef Automate API.
+* Endpoints must have a tag that is a member of a tag group in order to appear in the rendered documentation. Endpoints without tags that are members of a tag group will not show up.
+* An endpoint's default tag is the parent service where it was defined.
+* Every service must have a unique tag name. For services without unique names, follow the explicit tagging process. Without unique service tag names, all endpoints for all of these services appear together in the rendered documentation.
+
+#### Automatic tagging
+
+Set up automatic tagging in the `components/automate-chef-io/data/docs/api-static/03-tags.swagger.json` file.
+
+* Add the service's name to the `tags` list in a `tagGroup` or create a new `tagGroup` with the service's name in the `tags` list.
+* Make the service name human-friendly by adding an entry to the `tags` in with a custom `x-displayName`.
+
+#### Explicit tagging
+
+* Each endpoint needs a tag specified in its definition, by adding a block like this to the endpoint definition in the proto file:
+
+    ```go
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "My Custom Tag"
+    };
+    ```
+
+* All of the tags for an individual service should be the same, unless multiple groupings are desired in which case multiple independent tags can be used.
+* After this the process described for automatic tagging can be used, substituting the custom tag defined in place of the service's name.
+
+## Notes
+
+* Proto files can use tabs and spaces. We have a defacto convention for using tabs since our protos are primarily used with Go code.
+* Endpoints will not show up in the UI unless one or more of their tags are assigned to a tag group, but they will still appear in the Swagger file accessible through the docs in the browser.
+  * To explicitly hide an endpoint and remove it from the Swagger file, assign it the tag of `hidden` and it will be filtered out in pre-processing.
+* multilinefields are not allowed in proto files. This the main reason we settled on using the comment style of endpoint documentation.
+
+### API Style Guide
+
+Add comments to protos file with standard Go block and inline comment syntax.
+
+Block comments are usually placed before the start of a gRPC service definition. Block comments for API documentation are sometimes called "leading comments".
+
+Inline are usually placed within the message formats. Inline comments for API documentation are sometimes called "following comments".
+
+```go
+/* This is a block comment.
+
+Block comments can span multiple lines.
+
+Block comments support Markdown */
+
+// This is an inline comment.
+```
+
+Block comments support multiple lines:
+
+```go
+	/*
+	Fetch a node
+
+	Fetch a specific node by id.
+	Does not support filtering, pagination or sorting.
+	*/
+	rpc ListReportIds(Query) returns (ReportIds) {
+```
+
+Block comments supports common markdown elements, such as:
+
+```go
+	/*
+  Code blocks support `highlighting`
+
+  It also supports
+
+  Using code blocks, if you need them.
+
+	*/
+```
+
+Block comments support markdown tables:
+
+```go
+	/*
+	List reports
+
+	Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. Supports pagination, filtering, and sorting.
+
+	| Sort parameter | Sort value |
+	| --- | --- |
+	| latest_report.controls.failed.critical | controls_sums.failed.critical |
+	| latest_report.controls.failed.total | controls_sums.failed.total |
+	| latest_report.end_time (default) | end_time |
+	| latest_report.status | status |
+	| node_name | node_name.lower |
+	*/
+	rpc ListReports(Query) returns (Reports) {
+```
+
+## Service Documentation
+
+Not in iteration #1.
+
+## Resource Documentation
+
+Given a GRPC endpoint defined like this in the proto files:
+
+```go
+>.rpc ListReports(Query) returns (Reports) {
+>.>.option (google.api.http) = {
+>.>.>.post: "/compliance/reporting/reports"
+>.>.>.body: "*"
+>.>.};
+>.};
+```
+
+* For the first iteration of the Chef Automate API docs, we need summaries and descriptions for all user-facing end points. This can be done two ways, in the comment style (preferred) or the attribute style.
+
+* Comment style of endpoint documentation supports multiline fields. Attribute style does not.
+
+* Descriptions support Github Flavored Markdown, which means that you can use lists, tables, code-blocks and more.
+
+### Comment Style Descriptions
+
+```go
+  /*
+  List reports
+  This is the description.
+  The description can span multiple lines and can contain `Github Flavored Markdown`
+  */
+  rpc ListReports(Query) returns (Reports) {
+    option (google.api.http) = {
+      post: "/compliance/reporting/reports"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "Reporting"
+    };
+  };
+```
+
+### Attribute Style Descriptions
+
+```go
+rpc ListReports(Query) returns (Reports) {
+    option (google.api.http) = {
+      post: "/compliance/reporting/reports"
+      body: "*"
+    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "Reporting"
+      summary: "List reports"
+      description: "This is the description.\nThe description can span multiple lines and can contain Github Flavored Markdown."
+    };
+  };
+```
+
+Resource documentation provides RPC-level description. It is sometimes also called "method description" because it documents the what you can do with a specific API HTTP Method.
+
+Use block/leading comments for RPC-level/method documentation.
+
+Compare the leading comments to the content of the API documentation for the `ReadNode(ID)` resource.
+
+```go
+	/*
+	Fetch a node #(summary)
+
+	Fetch a specific node by id. #(description)
+	Does not support filtering, pagination or sorting.
+	*/
+	rpc ReadNode(Id) returns (Node) {
+```
+
+The rendered documentation:
+
+![](./static/images/docs/api-resource-definition.png)
+
+### Message Level Descriptions
+
+Document fields and parameters directly above the relevant code line, using `//` inline comments
+
+## Message Documentation
+
+Given messages defined like this in the proto files:
+
+```go
+message Dog {
+  // The dog's name.
+  string name = 1;
+  // Intentionally blank.
+  Food favorite_food = 2;
+  // Types of food the dog is normally fed.
+  repeated Food typical_foods = 3;
+}
+// Stats on the statuses of nodes matching the filters.
+message ProfileCounts {
+  // The food's name.
+  string name = 1;
+  // Serving size in ounces.
+  int32 serving_size =3;
+}
+```
+
+* Use a period (`.`) at the end of the comment controls whether the field will get to set the `description` for message fields.
+* Swagger relies on inheritance to document nested references. A parent message referenced in a child message inherits its description from the parent, not where it is referenced by the child(see the example of `favorite_food` above). The Chef API style uses `// Intentionally blank.` in the child message.
+This convention makes the purpose of the comment clear, makes undocumented message code visible, and makes bad blank message comment lines stand out in the UI.
+
+## Non-Proto File Sources for API Documentation
+
+We use non-proto file sources to document API content in cases where proto file conversion to Swagger our the front-end ReDoc tools have pronounced limitations, as well as in cases where expressing the content in proto files is cumbersome.
+We support these cases by adding static Swagger JSON or YAML files that combine with the Swagger generated from the proto files.
+
+### When to use Non-Proto Files
+
+* Endpoints that do not automatically generate Swagger files during proto compilation. An example of this is the ReportingService's Export endpoint, which derives its endpoint from outside of the proto files, and is excluded in the proto to Swagger conversion process. See: `components/automate-chef-io/data/docs/api-static/01-reporting-export.swagger.json`.
+* Documentation data that extends the protobuf or Swagger specs, for example the ReDoc `X-tagGroup` that we use for tag groups and tag display names. See: `components/automate-chef-io/data/docs/api-static/03-tags.swagger.json`.
+* Metadata that is specific to the API documentation. For example, the support page URL, the logo image, etc. See: `components/automate-chef-io/data/docs/api-static/00-meta.swagger.json`.
+* Large sections of prose or formatted text. With a few exceptions, proto files do not support multiline strings, so it is simpler to write and edit long content outside of the proto files. See: `components/automate-chef-io/data/docs/api-static/02-meta-description.yaml`.
+
+### Creating Non-Proto File Documentation
+
+* Create a new JSON or YAML file in the `components/automate-chef-io/data/docs/api-static/` directory and its contents will be added to the final Swagger JSON  file used to render the documentation.
+* Files in this directory are sorted numerically so that the order in which things are applied is deterministic and predictable.
+* The Swagger files are combined in an additive way. The static user-edited Swagger files are applied first, follwed by all of the Swagger files generated from compiling the proto files.
+* The Chef API style prefers JSON files in nearly all cases, but uses YAML files to supply long text sections in the documentation.
+
+## Grammar and Style
+
+* Keep it short
+* Use [active voice](https://www.grammarly.com/blog/active-vs-passive-voice/)
+* Use [plain language](https://plainlanguage.gov/resources/checklists/checklist/)
+* Use [present tense](https://www.grammarly.com/blog/simple-present/)
+* Write [positively](https://www.plainlanguage.gov/guidelines/concise/use-positive-language/)
+
+## External references
+
+* [OpenAPI 2.0 (aka swagger) spec](https://github.com/OAI/OpenAPI-Specification/blob/3.0.0/versions/2.0.md)
+* [An example proto file in the protoc-gen-swagger repo demonstrating how to use most features of the proto-to-swagger conversion](https://github.com/grpc-ecosystem/grpc-gateway/blob/master/examples/proto/examplepb/a_bit_of_everything.proto)
+* [ReDoc extensions to the Swagger spec](https://github.com/Redocly/redoc/blob/master/docs/redoc-vendor-extensions.md)
+* [An alternate Swagger spec](https://swagger.io/docs/specification/2-0/basic-structure/)
+* [Documentation in a code comment of how protoc-gen-swagger converts comments in proto files to Swagger fields](https://github.com/grpc-ecosystem/grpc-gateway/blob/c3787b4d95d15f4c89484b44e108a6640c1943ca/protoc-gen-swagger/genswagger/template.go#L1294-L1305)
