@@ -69,13 +69,13 @@
                 <ng-container *ngIf="!token.active">Inactive</ng-container>
               </chef-table-cell>
               <chef-table-cell class="controls">
-                <chef-control-menu id="menu-{{token.id}}" data-cy="token-control">
-                  <chef-option (click)="notifyCopy()" data-cy="copy-token">
+                <chef-control-menu-new id="menu-{{token.id}}" data-cy="token-control">
+                  <chef-option-new (click)="notifyCopy()" data-cy="copy-token">
                     <chef-clipboard plain value={{token.value}} label="Copy Token" icon=""></chef-clipboard>
-                  </chef-option>
-                  <chef-option (click)="toggleActive(token)">Toggle Status</chef-option>
-                  <chef-option (click)="startTokenDelete(token)" data-cy="delete">Delete Token</chef-option>
-                </chef-control-menu>
+                  </chef-option-new>
+                  <chef-option-new (click)="toggleActive(token)">Toggle Status</chef-option-new>
+                  <chef-option-new (click)="startTokenDelete(token)" data-cy="delete">Delete Token</chef-option-new>
+                </chef-control-menu-new>
              </chef-table-cell>
             </chef-table-row>
           </chef-table-body>
