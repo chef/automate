@@ -550,7 +550,7 @@ func DefaultSpecs(serviceNames []string) []Spec {
 			},
 			SyncBuilderMinio: []BuilderMinioDumpOperation{
 				{
-					Name: "thething",
+					Name: "hartifacts",
 				},
 			},
 		},

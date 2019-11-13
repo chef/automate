@@ -9,6 +9,7 @@ import (
 	"path"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 type BuilderMinioDumpOperation struct {
@@ -19,7 +20,17 @@ type BuilderMinioDumpOperation struct {
 var _ Operation = &BuilderMinioDumpOperation{}
 
 func (d *BuilderMinioDumpOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
+	prefix := path.Join(d.ObjectName...)
 	ctx := backupCtx.ctx
+
+	logrus.WithFields(logrus.Fields{
+		"name":      d.Name,
+		"backup_id": backupCtx.backupTask.TaskID(),
+		"prefix":    prefix,
+		"operation": "builder_minio_dump",
+		"action":    "backup",
+	}).Info("Running backup operation")
+
 	objects, _, err := backupCtx.builderBucket.List(ctx, "", false)
 	if err != nil {
 		return err
@@ -44,7 +55,7 @@ func (d *BuilderMinioDumpOperation) Backup(backupCtx Context, om ObjectManifest,
 	if _, err := builderArtifacts.Seek(0, os.SEEK_SET); err != nil {
 		return err
 	}
-	objectName := path.Join(path.Join(d.ObjectName...), "builder-artifacts")
+	objectName := path.Join(prefix, "builder-artifacts")
 	writer, err := backupCtx.bucket.NewWriter(ctx, objectName)
 	if err != nil {
 		return err
@@ -90,6 +101,14 @@ func (d *BuilderMinioDumpOperation) copyObjectFromBuilder(backupCtx Context, obj
 
 func (d *BuilderMinioDumpOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
 	prefix := path.Join(d.ObjectName...)
+
+	logrus.WithFields(logrus.Fields{
+		"name":      d.Name,
+		"backup_id": backupCtx.backupTask.TaskID(),
+		"prefix":    prefix,
+		"operation": "builder_minio_dump",
+		"action":    "restore",
+	}).Info("Running backup operation")
 
 	objects, err := d.readBuilderArtifactList(backupCtx, prefix, verifier)
 	if err != nil {
@@ -157,6 +176,14 @@ func (d *BuilderMinioDumpOperation) copyObjectFromBackup(backupCtx Context, pref
 func (d *BuilderMinioDumpOperation) Delete(backupCtx Context) error {
 	objVerifier := &NoOpObjectVerifier{}
 	prefix := path.Join(d.ObjectName...)
+
+	logrus.WithFields(logrus.Fields{
+		"name":      d.Name,
+		"backup_id": backupCtx.backupTask.TaskID(),
+		"prefix":    prefix,
+		"operation": "builder_minio_dump",
+		"action":    "delete",
+	}).Info("Running backup operation")
 
 	objects, err := d.readBuilderArtifactList(backupCtx, prefix, objVerifier)
 	if err != nil {
