@@ -71,9 +71,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       this.store.select(getStatus)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      filter(([_, uStatus]: [User[], EntityStatus]) =>
-        this.isLoading = uStatus === EntityStatus.loading
-      )).subscribe(([users, _]: [User[], EntityStatus]) => {
+      filter(([_, uStatus]) => uStatus !== EntityStatus.loading)
+      ).subscribe(([users, _]: [User[], EntityStatus]) => {
+        this.isLoading = false;
         // Sort naturally first by name, then by id
         this.users = ChefSorters.naturalSort(users, ['name', 'id']);
       });
