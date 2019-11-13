@@ -481,7 +481,7 @@ func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error)
 }
 
 // Populate our endpoints with default targets
-func (c *ClientConfig) configureDefaultEndpoints() {
+func (c *ClientConfig) ConfigureDefaultEndpoints() {
 	if c.Endpoints == nil {
 		c.Endpoints = map[string]ConnectionOptions{}
 	}

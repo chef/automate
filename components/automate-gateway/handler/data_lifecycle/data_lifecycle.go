@@ -135,8 +135,8 @@ func jobSettingsToPurgeConfigure(setting *api.JobSettings) *data_lifecycle.Confi
 		Enabled:    !setting.Disabled,
 		Recurrence: setting.Recurrence,
 		PolicyUpdate: &data_lifecycle.PolicyUpdate{
-			Es: setting.PurgePolicies.Elasticsearch,
-			Pg: setting.PurgePolicies.Postgres,
+			Es: setting.GetPurgePolicies().GetElasticsearch(),
+			Pg: setting.GetPurgePolicies().GetPostgres(),
 		},
 	}
 }

@@ -1,207 +1,175 @@
-// +build integration
-
-package compliance
+package integration
 
 import (
-	"context"
-	"encoding/base64"
 	"fmt"
-	"os"
-	"testing"
 	"time"
-
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 
 	"github.com/chef/automate/api/external/secrets"
 	gwnodes "github.com/chef/automate/components/automate-gateway/api/nodes"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
-	"github.com/chef/automate/components/compliance-service/examples/helpers"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 )
 
-var host = os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_HOST")
-
-func TestGatewayNodesClient(t *testing.T) {
-	// decode our encoded key
-	decoded, err := base64.StdEncoding.DecodeString(os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_KEY"))
-	require.NoError(t, err)
-
-	complianceEndpoint := "127.0.0.1:10121"
-	secretsEndpoint := "127.0.0.1:10131"
-	gatewayEndpoint := "127.0.0.1:2001"
-	nodesEndpoint := "127.0.0.1:10120"
-	ctx := context.Background()
-	connFactory := helpers.SecureConnFactoryHabWithDeploymentServiceCerts()
-
+func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 	// get the gateway nodes client (this is where we trigger detect job)
-	gatewayConn, err := connFactory.Dial("automate-gateway", gatewayEndpoint)
-	require.NoError(t, err)
-	defer gatewayConn.Close()
-	gatewayNodesClient := gwnodes.NewNodesServiceClient(gatewayConn)
+	gatewayNodesClient := gwnodes.NewNodesServiceClient(suite.gwConn)
 
 	// setup secrets service for secret creation
-	secretsConn, err := connFactory.Dial("secrets-service", secretsEndpoint)
-	require.NoError(t, err)
-	defer secretsConn.Close()
-	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
+	secretsClient, err := suite.clients.SecretClient()
+	suite.Require().NoError(err)
 
 	// setup compliance-service clients for job creation
-	complianceConn, err := connFactory.Dial("compliance-service", complianceEndpoint)
-	require.NoError(t, err)
-	defer complianceConn.Close()
-	jobsClient := jobs.NewJobsServiceClient(complianceConn)
+	jobsClient, err := suite.clients.ComplianceJobsServiceClient()
+	suite.Require().NoError(err)
 
 	// setup nodemanager-service clients for node creation
-	nodesConn, err := connFactory.Dial("nodemanager-service", nodesEndpoint)
-	require.NoError(t, err)
-	defer nodesConn.Close()
-	nodesClient := nodes.NewNodesServiceClient(nodesConn)
+	nodesClient, err := suite.clients.NodesClient()
+	suite.Require().NoError(err)
 
 	// delete all jobs so we start with a clean slate
-	jobsList, err := jobsClient.List(ctx, &jobs.Query{})
-	require.NoError(t, err)
+	jobsList, err := jobsClient.List(suite.ctx, &jobs.Query{})
+	suite.Require().NoError(err)
 	for _, job := range jobsList.Jobs {
-		_, err := jobsClient.Delete(ctx, &jobs.Id{Id: job.Id})
-		require.NoError(t, err)
+		_, err := jobsClient.Delete(suite.ctx, &jobs.Id{Id: job.Id})
+		suite.Require().NoError(err)
 	}
 
 	fmt.Println("creating secrets for the nodes tests")
 	// create secret for node
-	secretId, err := secretsClient.Create(ctx, &secrets.Secret{
+	secretID, err := secretsClient.Create(suite.ctx, &secrets.Secret{
 		Name: "test secret",
 		Type: "ssh",
 		Data: []*secrets.Kv{
-			{Key: "username", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USER")},
-			{Key: "key", Value: string(decoded)},
+			{Key: "username", Value: suite.target.User},
+			{Key: "key", Value: suite.target.Key},
 		},
 	})
-	require.NoError(t, err)
+	suite.Require().NoError(err)
 
 	// create bad secret for testing
-	badSecretId, err := secretsClient.Create(ctx, &secrets.Secret{
+	badSecretID, err := secretsClient.Create(suite.ctx, &secrets.Secret{
 		Name: "test secret",
 		Type: "ssh",
 		Data: []*secrets.Kv{
-			{Key: "username", Value: os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USER")},
+			{Key: "username", Value: suite.target.User},
 			{Key: "password", Value: "definitely not the password"},
 		},
 	})
-	require.NoError(t, err)
+	suite.Require().NoError(err)
 
 	fmt.Println("creating node with no auto detect tag")
 	// create node
-	nodeId, err := gatewayNodesClient.Create(ctx, &gwnodes.Node{
+	nodeID, err := gatewayNodesClient.Create(suite.ctx, &gwnodes.Node{
 		Name: "test node",
 		Tags: []*common.Kv{
 			{Key: "_no_auto_detect", Value: "true"},
 		},
 		TargetConfig: &gwnodes.TargetConfig{
 			Backend: "ssh",
-			Host:    host,
+			Host:    suite.target.Host,
 			Port:    22,
-			Secrets: []string{badSecretId.GetId()},
+			Secrets: []string{badSecretID.GetId()},
 		},
 	})
-	require.NoError(t, err)
+	suite.Require().NoError(err)
 
 	fmt.Println("checking node status: expected unknown")
 	// no detect job should have been triggered, reading node should have status unknown
-	node, err := nodesClient.Read(ctx, &nodes.Id{Id: nodeId.Id})
-	require.NoError(t, err)
-	assert.Equal(t, "unknown", node.Status)
+	node, err := nodesClient.Read(suite.ctx, &nodes.Id{Id: nodeID.Id})
+	suite.Require().NoError(err)
+	suite.Equal("unknown", node.Status)
 
 	fmt.Println("update node to run detect job with bad secret")
 	// call update on the node id, ensure detect job was triggered
-	_, err = gatewayNodesClient.Update(ctx, &gwnodes.Node{
-		Id:   nodeId.Id,
+	_, err = gatewayNodesClient.Update(suite.ctx, &gwnodes.Node{
+		Id:   nodeID.Id,
 		Name: "test node",
 		Tags: []*common.Kv{
 			{Key: "_no_auto_detect", Value: "false"},
 		},
 		TargetConfig: &gwnodes.TargetConfig{
 			Backend: "ssh",
-			Host:    host,
+			Host:    suite.target.Host,
 			Port:    22,
-			Secrets: []string{badSecretId.GetId()},
+			Secrets: []string{badSecretID.GetId()},
 		},
 	})
-	require.NoError(t, err)
+	suite.Require().NoError(err)
 
 	fmt.Println("checking node status, expected unreachable")
 	nodeStatus := "unknown"
 	counter := 0
 	for nodeStatus == "unknown" {
 		// read gateway compliance nodes to ensure node was created, has a status of unreachable b/c we used bad secret
-		node, err = nodesClient.Read(ctx, &nodes.Id{Id: nodeId.GetId()})
-		require.NoError(t, err)
+		node, err = nodesClient.Read(suite.ctx, &nodes.Id{Id: nodeID.GetId()})
+		suite.Require().NoError(err)
 		nodeStatus = node.Status
 		counter++
 		time.Sleep(1 * time.Second)
 		if counter == 60 {
-			t.Log("timed out waiting for node at line 128")
-			t.Fail()
+			suite.T().Log("timed out waiting for node at line 112")
+			suite.T().Fail()
 		}
 	}
-	assert.Equal(t, "unreachable", node.Status)
+	suite.Equal("unreachable", node.Status)
 
 	fmt.Println("update node to run detect job with good secret")
 	// call update on the node id, ensure detect job was triggered
-	_, err = gatewayNodesClient.Update(ctx, &gwnodes.Node{
-		Id:   nodeId.Id,
+	_, err = gatewayNodesClient.Update(suite.ctx, &gwnodes.Node{
+		Id:   nodeID.Id,
 		Name: "test node",
 		TargetConfig: &gwnodes.TargetConfig{
 			Backend: "ssh",
-			Host:    host,
+			Host:    suite.target.Host,
 			Port:    22,
-			Secrets: []string{secretId.GetId()},
+			Secrets: []string{secretID.GetId()},
 		},
 	})
-	require.NoError(t, err)
+	suite.Require().NoError(err)
 
 	fmt.Println("checking node status, expected reachable, with completed job data")
 
 	nodeStatus = "unreachable"
 	counter = 0
 	for nodeStatus == "unreachable" {
-		node, err = nodesClient.Read(ctx, &nodes.Id{Id: nodeId.Id})
-		require.NoError(t, err)
+		node, err = nodesClient.Read(suite.ctx, &nodes.Id{Id: nodeID.Id})
+		suite.Require().NoError(err)
 		nodeStatus = node.Status
 		counter++
 		time.Sleep(1 * time.Second)
 		if counter == 120 {
-			t.Log("timed out waiting for node at line 159")
-			t.Fail()
+			suite.T().Log("timed out waiting for node at line 143")
+			suite.T().Fail()
 		}
 	}
 
 	node.LastJob.JobId = ""
 	node.LastJob.EndTime = nil
 	node.LastJob.StartTime = nil
-	assert.Equal(t, nodes.ResultsRow{
-		NodeId: nodeId.Id,
+	suite.Equal(nodes.ResultsRow{
+		NodeId: nodeID.Id,
 		Status: "completed",
 	}, *node.LastJob)
 
 	tc := *node.TargetConfig
-	assert.Equal(t, 1, len(tc.KeyFiles))
+	suite.Equal(1, len(tc.KeyFiles))
 	tc.KeyFiles = []string{}
-	assert.Equal(t, nodes.TargetConfig{
+	suite.Equal(nodes.TargetConfig{
 		Backend:  "ssh",
-		Host:     host,
+		Host:     suite.target.Host,
 		Port:     22,
-		Secrets:  []string{secretId.GetId()},
-		User:     os.Getenv("AUTOMATE_ACCEPTANCE_TARGET_USER"),
+		Secrets:  []string{secretID.GetId()},
+		User:     suite.target.User,
 		KeyFiles: []string{},
 	}, tc)
 
 	node.LastContact = nil
 	node.LastJob = nil
 	node.TargetConfig = nil
-	assert.Equal(t, &nodes.Node{
+	suite.Equal(&nodes.Node{
 		ConnectionError: "authentication failed",
-		Id:              nodeId.Id,
+		Id:              nodeID.Id,
 		Name:            "test node",
 		Manager:         "automate",
 		Platform:        "redhat",
@@ -213,22 +181,22 @@ func TestGatewayNodesClient(t *testing.T) {
 		RunData:         &nodes.LastContactData{},
 	}, node)
 
-	jobsList, err = jobsClient.List(ctx, &jobs.Query{})
-	require.NoError(t, err)
-	assert.Equal(t, int32(2), jobsList.Total)
+	jobsList, err = jobsClient.List(suite.ctx, &jobs.Query{})
+	suite.Require().NoError(err)
+	suite.Equal(int32(2), jobsList.Total)
 
 	fmt.Println("call rerun on the node to ensure detect job is created")
 	// call rerun on the node id, ensure another detect job was triggered
-	_, err = gatewayNodesClient.Rerun(ctx, &gwnodes.Id{Id: nodeId.Id})
-	require.NoError(t, err)
+	_, err = gatewayNodesClient.Rerun(suite.ctx, &gwnodes.Id{Id: nodeID.Id})
+	suite.Require().NoError(err)
 
-	jobsList, err = jobsClient.List(ctx, &jobs.Query{})
-	require.NoError(t, err)
-	assert.Equal(t, int32(3), jobsList.Total)
+	jobsList, err = jobsClient.List(suite.ctx, &jobs.Query{})
+	suite.Require().NoError(err)
+	suite.Equal(int32(3), jobsList.Total)
 
 	fmt.Println("create node with bulk create endpoint, no auto detect")
 	// test bulk create - no detect job
-	ids, err := gatewayNodesClient.BulkCreate(ctx, &gwnodes.Nodes{
+	ids, err := gatewayNodesClient.BulkCreate(suite.ctx, &gwnodes.Nodes{
 		Nodes: []*gwnodes.Node{{
 			Name: "test node",
 			Tags: []*common.Kv{
@@ -236,51 +204,51 @@ func TestGatewayNodesClient(t *testing.T) {
 			},
 			TargetConfig: &gwnodes.TargetConfig{
 				Backend: "ssh",
-				Hosts:   []string{host},
+				Hosts:   []string{suite.target.Host},
 				Port:    22,
-				Secrets: []string{secretId.GetId()},
+				Secrets: []string{secretID.GetId()},
 			},
 		}},
 	})
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(ids.GetIds()))
+	suite.Require().NoError(err)
+	suite.Equal(1, len(ids.GetIds()))
 
 	fmt.Println("checking node status, expected unknown")
-	node, err = nodesClient.Read(ctx, &nodes.Id{Id: ids.GetIds()[0]})
-	require.NoError(t, err)
-	assert.Equal(t, "unknown", node.Status)
+	node, err = nodesClient.Read(suite.ctx, &nodes.Id{Id: ids.GetIds()[0]})
+	suite.Require().NoError(err)
+	suite.Equal("unknown", node.Status)
 
 	fmt.Println("create node with bulk create endpoint, with auto detect")
 	// test bulk create - with detect job
-	ids, err = gatewayNodesClient.BulkCreate(ctx, &gwnodes.Nodes{
+	ids, err = gatewayNodesClient.BulkCreate(suite.ctx, &gwnodes.Nodes{
 		Nodes: []*gwnodes.Node{{
 			Name: "test node",
 			Tags: []*common.Kv{},
 			TargetConfig: &gwnodes.TargetConfig{
 				Backend: "ssh",
-				Hosts:   []string{host},
+				Hosts:   []string{suite.target.Host},
 				Port:    22,
-				Secrets: []string{secretId.GetId()},
+				Secrets: []string{secretID.GetId()},
 			},
 		}},
 	})
-	require.NoError(t, err)
-	assert.Equal(t, 1, len(ids.GetIds()))
+	suite.Require().NoError(err)
+	suite.Equal(1, len(ids.GetIds()))
 
 	fmt.Println("checking node status, expected reachable")
 	nodeStatus = "unknown"
 	counter = 0
 	for nodeStatus == "unknown" {
 		// read gateway compliance nodes to ensure node was created, has a status of unreachable b/c we used bad secret
-		node, err = nodesClient.Read(ctx, &nodes.Id{Id: ids.GetIds()[0]})
-		require.NoError(t, err)
+		node, err = nodesClient.Read(suite.ctx, &nodes.Id{Id: ids.GetIds()[0]})
+		suite.Require().NoError(err)
 		nodeStatus = node.Status
 		counter++
 		time.Sleep(1 * time.Second)
 		if counter == 120 {
-			t.Log("timed out waiting for node at line 260")
-			t.Fail()
+			suite.T().Log("timed out waiting for node at line 250")
+			suite.T().Fail()
 		}
 	}
-	assert.Equal(t, "reachable", node.Status)
+	suite.Equal("reachable", node.Status)
 }

@@ -101,7 +101,7 @@ func ConfigFromViper() (*Config, error) {
 	// the gateway to run without any hard binds. Here we take our configured
 	// gRPC client endpoints and add any missing defaults that we might need
 	// in order to initialize those clients.
-	config.GrpcClients.configureDefaultEndpoints()
+	config.GrpcClients.ConfigureDefaultEndpoints()
 
 	return config, nil
 }
