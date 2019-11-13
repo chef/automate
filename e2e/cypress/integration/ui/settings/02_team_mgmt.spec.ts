@@ -62,21 +62,21 @@ describe('team management', () => {
     it('lists system teams', () => {
       cy.get('[data-cy=team-create-button]').contains('Create Team');
       if (!isV1()) {
-        cy.get('#table-container chef-th').contains('ID');
-        cy.get('#table-container chef-th').contains('Name');
+        cy.get('#table-container chef-table-header-cell').contains('ID');
+        cy.get('#table-container chef-table-header-cell').contains('Name');
 
         const systemTeams = ['admins', 'editors', 'viewers'];
         systemTeams.forEach(name => {
-          cy.get('#table-container chef-tr').contains(name)
+          cy.get('#table-container chef-table-row').contains(name)
             .parent().parent().find('chef-control-menu').as('control-menu');
         });
       } else {
-        cy.get('#table-container chef-th').contains('Name');
-        cy.get('#table-container chef-th').contains('Description');
+        cy.get('#table-container chef-table-header-cell').contains('Name');
+        cy.get('#table-container chef-table-header-cell').contains('Description');
 
         const systemTeams = ['admins'];
         systemTeams.forEach(name => {
-          cy.get('#table-container chef-tr').contains(name)
+          cy.get('#table-container chef-table-row').contains(name)
             .parent().parent().find('chef-control-menu').as('control-menu');
         });
       }
