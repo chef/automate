@@ -87,6 +87,7 @@ describe('ProjectDetailsComponent', () => {
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-option-new' }),
+        MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-table' }),

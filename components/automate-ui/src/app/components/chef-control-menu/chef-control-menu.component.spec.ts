@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { MockComponent } from 'ng2-mock-component';
 
 import { ChefControlMenuComponent } from './chef-control-menu.component';
 
@@ -8,7 +9,11 @@ describe('ChefControlMenuComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ChefControlMenuComponent ]
+      declarations: [
+        MockComponent({'selector': 'chef-dropdown'}),
+        MockComponent({'selector': 'chef-icon'}),
+        ChefControlMenuComponent
+      ]
     })
     .compileComponents();
   }));
