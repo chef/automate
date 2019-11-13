@@ -22,7 +22,7 @@ describe('SidebarComponent', () => {
       ],
       imports: [
         StoreModule.forRoot({}, { runtimeChecks })
-      ],
+      ]
     })
     .compileComponents();
   }));

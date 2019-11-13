@@ -121,7 +121,7 @@ function createTestFixture(
       AttributesService,
       FeatureFlagsService
     ],
-    schemas: [ 
+    schemas: [
       NO_ERRORS_SCHEMA,
       CUSTOM_ELEMENTS_SCHEMA
     ]
