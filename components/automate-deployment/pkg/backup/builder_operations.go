@@ -46,8 +46,12 @@ func (d *BuilderMinioDumpOperation) Backup(backupCtx Context, om ObjectManifest,
 	}
 	objectName := path.Join(path.Join(d.ObjectName...), "builder-artifacts")
 	writer, err := backupCtx.bucket.NewWriter(ctx, objectName)
+	if err != nil {
+		return err
+	}
+
 	if _, err := io.Copy(writer, builderArtifacts); err != nil {
-		writer.Fail(err) // errcheck: nolint
+		writer.Fail(err) // nolint: errcheck
 		return err
 	}
 	if err := writer.Close(); err != nil {
