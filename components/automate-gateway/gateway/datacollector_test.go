@@ -1,3 +1,5 @@
+// +build !mockgen
+
 //
 //  Author:: Salim Afiune <afiune@chef.io>
 //  Copyright:: Copyright 2018, Chef Software Inc.
@@ -9,11 +11,12 @@ import (
 	"io/ioutil"
 	"testing"
 
+	structpb "github.com/golang/protobuf/ptypes/struct"
+	"github.com/stretchr/testify/assert"
+
 	ingestProto "github.com/chef/automate/api/external/ingest/request"
 	subject "github.com/chef/automate/components/automate-gateway/gateway"
 	inspecEvent "github.com/chef/automate/components/compliance-service/ingest/events/inspec"
-	structpb "github.com/golang/protobuf/ptypes/struct"
-	"github.com/stretchr/testify/assert"
 )
 
 func readExample(path string) []byte {
