@@ -388,90 +388,13 @@ func (s *Store) parseList(rows *sql.Rows) ([]inspec.Metadata, error) {
 	return entries, nil
 }
 
-func validateSortOrder(sort string, order string) error {
+func (s *Store) ListProfilesMetadata(namespace string, name string, sort string, order string) ([]inspec.Metadata, error) {
 	if order != "ASC" && order != "DESC" {
-		return status.Errorf(codes.InvalidArgument, "order field '%s' is invalid. Use either 'ASC' or 'DESC'", sort)
+		return status.Errorf(codes.InvalidArgument, "order field '%s' is invalid. Use either 'ASC' or 'DESC'", order)
 	}
 
 	if sort != "name" && sort != "title" && sort != "maintainer" {
 		return status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name', 'title' or 'maintainer'", sort)
-	}
-	return nil
-}
-
-func (s *Store) marketProfilesAll(sort string, order string) (*sql.Rows, error) {
-	selectMarketSQL := fmt.Sprintf(`
-		SELECT sha256, info
-		FROM store_profiles WHERE sha256 IN
-		(SELECT sha256 FROM store_market)
-		ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-	`, sort, order)
-
-	selectMarketStmt, err := s.DB.Prepare(selectMarketSQL)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-
-	return selectMarketStmt.Query()
-}
-
-func (s *Store) marketProfilesByName(name string, sort string, order string) (*sql.Rows, error) {
-	selectMarketSQL := fmt.Sprintf(`
-		SELECT sha256, info
-		FROM store_profiles WHERE sha256 IN
-		(SELECT sha256 FROM store_market)
-		AND info->>'name' = $1
-		ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-	`, sort, order)
-
-	selectMarketStmt, err := s.DB.Prepare(selectMarketSQL)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-
-	return selectMarketStmt.Query(name)
-}
-
-// returns array of profiles with info
-func (s *Store) namespaceProfilesAll(namespace string, sort string, order string) (*sql.Rows, error) {
-	selectProfilesSQL := fmt.Sprintf(`
-		SELECT sha256, info
-		FROM store_profiles WHERE
-		sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
-		ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-	`, sort, order)
-
-	selectProfilesStmt, err := s.DB.Prepare(selectProfilesSQL)
-	if err != nil {
-		return nil, err
-	}
-
-	return selectProfilesStmt.Query(namespace)
-}
-
-func (s *Store) namespaceProfilesByName(namespace string, name string, sort string, order string) (*sql.Rows, error) {
-	selectProfilesSQL := fmt.Sprintf(`
-		SELECT sha256, info
-		FROM store_profiles WHERE
-		sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
-		AND info->>'name' = $2
-		ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-	`, sort, order)
-
-	selectProfilesStmt, err := s.DB.Prepare(selectProfilesSQL)
-	if err != nil {
-		return nil, err
-	}
-
-	return selectProfilesStmt.Query(namespace, name)
-}
-
-func (s *Store) ListProfilesMetadata(namespace string, name string, sort string, order string) ([]inspec.Metadata, error) {
-	err := validateSortOrder(sort, order)
-	if err != nil {
-		return nil, err
 	}
 
 	var rows *sql.Rows
@@ -479,21 +402,51 @@ func (s *Store) ListProfilesMetadata(namespace string, name string, sort string,
 
 	switch {
 	case len(namespace) == 0 && len(name) == 0:
-		rows, err = s.marketProfilesAll(sort, order)
+		query := fmt.Sprintf(`
+			SELECT sha256, info
+			FROM store_profiles WHERE sha256 IN
+			(SELECT sha256 FROM store_market)
+			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
+		`, sort, order)
+
+		rows, err = s.DB.Query(query)
 	case len(namespace) == 0:
-		rows, err = s.marketProfilesByName(name, sort, order)
+		query := fmt.Sprintf(`
+			SELECT sha256, info
+			FROM store_profiles WHERE sha256 IN
+			(SELECT sha256 FROM store_market)
+			AND info->>'name' = $1
+			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
+		`, sort, order)
+
+		rows, err = s.DB.Query(query, name)
 	case len(name) == 0:
-		rows, err = s.namespaceProfilesAll(namespace, sort, order)
+		query := fmt.Sprintf(`
+			SELECT sha256, info
+			FROM store_profiles WHERE
+			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
+			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
+		`, sort, order)
+
+		rows, err = s.DB.Query(query, namespace)
 	default:
-		rows, err = s.namespaceProfilesByName(namespace, name, sort, order)
+		query := fmt.Sprintf(`
+			SELECT sha256, info
+			FROM store_profiles WHERE
+			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
+			AND info->>'name' = $2
+			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
+		`, sort, order)
+
+		rows, err = s.DB.Query(query, namespace, name)
 	}
+	defer rows.Close() // nolint: errcheck
 
 	if err != nil {
 		logrus.Error(err)
 		return nil, err
 	}
 
-	defer rows.Close() // nolint: errcheck
 	return s.parseList(rows)
 }
 
