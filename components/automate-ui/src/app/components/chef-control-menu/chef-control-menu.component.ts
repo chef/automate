@@ -35,7 +35,7 @@ export class ChefControlMenuComponent implements OnInit {
 
   @HostListener('focusout', ['$event']) handleFocusOut(e) {
     const relatedTarget = e.relatedTarget;
-    e.stopPropagation();
+    e.stopPropagation();  // <-- stop propagation is not a function?
     if (!relatedTarget || relatedTarget.nodeName !== 'CHEF-DROPDOWN') {
       this.isFocused = false;
       this.isActive = false;
