@@ -24,7 +24,7 @@ export class ChefControlMenuComponent implements OnInit {
   @HostBinding('attr.tabindex') get isTabable(): string { return this.isDisabled === true ? '-1' : '0'; }
   @HostBinding('class.focused') get focused(): boolean { return this.isFocused; }
   @HostBinding('class.active') get active(): boolean { return this.isActive; }
-  @HostBinding('class.disabled') get disabled(): boolean { return this.isDisabled;}
+  @HostBinding('class.disabled') get disabled(): boolean { return this.isDisabled; }
 
   @HostListener('focus') handleFocus() {
     if (!this.isDisabled) {
@@ -59,7 +59,7 @@ export class ChefControlMenuComponent implements OnInit {
 
   @HostListener('keydown', ['$event']) handleKeydown(e: KeyboardEvent) {
     switch (e.key) {
-      case (' '): //fallthrough
+      case (' '): // fallthrough
       case ('Enter'):
         return this.handleKeyActivation();
         break;
