@@ -2052,15 +2052,12 @@ func (s *server) reloadBackupRunner() error {
 	}
 
 	var builderMinioLocationSpec backup.LocationSpecification
-	if deployment.ContainsCollection(s.deployment.Config.GetDeployment(), "builder") {
-		logrus.Info("builder is deployed")
+	if deployment.ContainsCollection(s.deployment.Config.GetDeployment(), services.BuilderCollectionName) {
 		var err error
 		builderMinioLocationSpec, err = s.builderMinioLocationSpec()
 		if err != nil {
 			return err
 		}
-	} else {
-		logrus.Warn("builder is not deployed")
 	}
 
 	esSidecarInfo := backup.ESSidecarConnInfo{
