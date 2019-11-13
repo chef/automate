@@ -7,6 +7,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { CookieModule } from 'ngx-cookie';
 import { Observable, of as observableOf } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { ReportingComponent } from '../+reporting/reporting.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import {
@@ -17,6 +19,7 @@ import {
   ReportQuery
 } from '../shared/reporting';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import * as moment from 'moment';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
 import { using } from 'app/testing/spec-helpers';
@@ -39,7 +42,8 @@ describe('ReportingComponent', () => {
       imports: [
         RouterTestingModule,
         CookieModule.forRoot(),
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        StoreModule.forRoot({}, { runtimeChecks })
       ],
       declarations: [
         ReportingComponent,
@@ -51,7 +55,8 @@ describe('ReportingComponent', () => {
         StatsService,
         SuggestionsService,
         ReportQueryService,
-        ReportDataService
+        ReportDataService,
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

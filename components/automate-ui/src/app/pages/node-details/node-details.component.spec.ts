@@ -9,8 +9,9 @@ import { NodeDetailsService } from '../../services/node-details/node-details.ser
 import { MockComponent } from 'ng2-mock-component';
 import { AttributesService } from '../../services/attributes/attributes.service';
 import { NodeRun } from '../../types/types';
-import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { StoreModule } from '@ngrx/store';
 
 class MockTelemetryService {
@@ -117,9 +118,13 @@ function createTestFixture(
       { provide: TelemetryService, useClass: MockTelemetryService },
       { provide: ActivatedRoute, useValue: {snapshot: snapshot, data: nodeRunSource} },
       NodeDetailsService,
-      AttributesService
+      AttributesService,
+      FeatureFlagsService
     ],
-    schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
+    schemas: [ 
+      NO_ERRORS_SCHEMA,
+      CUSTOM_ELEMENTS_SCHEMA
+    ]
   });
 
   return TestBed.createComponent(NodeDetailsComponent);

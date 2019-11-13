@@ -4,7 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { MockComponent } from 'ng2-mock-component';
 
 import { Rule, ServiceActionType } from './rule';
@@ -13,9 +14,10 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { NotificationsComponent } from './notifications.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FeatureFlagsService } from '../../services/feature-flags/feature-flags.service';
+import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
 
 describe('NotificationsComponent', () => {
-
+  let store: Store<NgrxStateAtom>;
   const rules: Rule[] = [
     new Rule('id1', 'test rule1', 'ComplianceFailure',
       'http://foo.com', ServiceActionType.SLACK, '', false),
@@ -26,6 +28,18 @@ describe('NotificationsComponent', () => {
   // CSS identifiers
   const cardId = '#notifications-cards';
   const listId = '#notifications-list';
+
+  const initialState = {
+    router: {
+      state: {
+        url: '/',
+        params: {},
+        queryParams: {},
+        fragment: ''
+      }
+    },
+    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState
+  };
 
   class MockTelemetryService {
     track() { }
@@ -57,18 +71,16 @@ describe('NotificationsComponent', () => {
     open(_message, _m, _time) { }
   }
 
-  class MockStore {
-    dispatch() { }
-    select() { }
-  }
-
   let telemetryService: TelemetryService;
   let fixture, component;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        RouterTestingModule,
+        StoreModule.forRoot({
+          clientRunsEntity: fromClientRuns.clientRunsEntityReducer
+        }, { initialState, runtimeChecks })
       ],
       declarations: [
         NotificationsComponent,
@@ -79,12 +91,12 @@ describe('NotificationsComponent', () => {
         { provide: TelemetryService, useClass: MockTelemetryService },
         { provide: RulesService, useClass: MockRulesService },
         { provide: MatSnackBar, useClass: MockMdSnackBar},
-        { provide: Store, useClass: MockStore },
         FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();
-
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(NotificationsComponent);
     component = fixture.componentInstance;
     telemetryService = TestBed.get(TelemetryService);

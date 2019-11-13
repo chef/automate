@@ -3,6 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
+import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
 
 import { using } from 'app/testing/spec-helpers';
 import { RulesService } from 'app/services/rules/rules.service';
@@ -49,7 +51,8 @@ describe('NotificationFormComponent', () => {
         FeatureFlagsService
       ],
       imports: [
-        FormsModule
+        FormsModule,
+        StoreModule.forRoot({}, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })

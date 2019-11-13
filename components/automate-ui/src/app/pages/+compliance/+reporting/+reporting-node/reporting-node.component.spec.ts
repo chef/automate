@@ -2,10 +2,13 @@ import { CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { CookieModule } from 'ngx-cookie';
 import { ReportingNodeComponent } from './reporting-node.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { of as observableOf } from 'rxjs';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { StatsService, ReportQueryService, ScanResultsService } from '../../shared/reporting';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
 
@@ -20,7 +23,8 @@ describe('ReportingNodeComponent', () => {
       imports: [
         RouterTestingModule,
         CookieModule.forRoot(),
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        StoreModule.forRoot({}, { runtimeChecks })
       ],
       declarations: [
         ReportingNodeComponent,
@@ -30,7 +34,8 @@ describe('ReportingNodeComponent', () => {
         ChefSessionService,
         StatsService,
         ReportQueryService,
-        ScanResultsService
+        ScanResultsService,
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

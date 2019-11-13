@@ -3,16 +3,19 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 
 import { Destination } from './destination';
 import { DatafeedService } from '../../services/data-feed/data-feed.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { DatafeedComponent } from './data-feed.component';
 import { RouterTestingModule } from '@angular/router/testing';
+import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
 
 describe('DatafeedComponent', () => {
-
+  let store: Store<NgrxStateAtom>;
   const destinations: Destination[] = [
     new Destination(1, 'name1', 'http://foo.com', 'secret_id1'),
     new Destination(2, 'name2', 'http://bar.com', 'secret_id2'),
@@ -22,6 +25,18 @@ describe('DatafeedComponent', () => {
   // CSS identifiers
   const cardId = '#destinations-cards';
   const listId = '#destinations-list';
+
+  const initialState = {
+    router: {
+      state: {
+        url: '/',
+        params: {},
+        queryParams: {},
+        fragment: ''
+      }
+    },
+    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState
+  };
 
   class MockTelemetryService {
     track() { }
@@ -53,18 +68,16 @@ describe('DatafeedComponent', () => {
     open(_message, _m, _time) { }
   }
 
-  class MockStore {
-    dispatch() { }
-    select() { }
-  }
-
   let telemetryService: TelemetryService;
   let fixture, component;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        RouterTestingModule,
+        StoreModule.forRoot({
+          clientRunsEntity: fromClientRuns.clientRunsEntityReducer
+        }, { initialState, runtimeChecks })
       ],
       declarations: [
         DatafeedComponent
@@ -74,11 +87,12 @@ describe('DatafeedComponent', () => {
         { provide: TelemetryService, useClass: MockTelemetryService },
         { provide: DatafeedService, useClass: MockDatafeedService },
         { provide: MatSnackBar, useClass: MockMdSnackBar},
-        { provide: Store, useClass: MockStore }
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();
-
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(DatafeedComponent);
     component = fixture.componentInstance;
     telemetryService = TestBed.get(TelemetryService);

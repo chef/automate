@@ -18,6 +18,7 @@ import {
   DeleteTeamSuccess
 } from 'app/entities/teams/team.actions';
 import { TeamManagementComponent } from './team-management.component';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
 describe('TeamManagementComponent', () => {
   let component: TeamManagementComponent;
@@ -62,6 +63,9 @@ describe('TeamManagementComponent', () => {
         MockComponent({ selector: 'chef-table-cell' }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         TeamManagementComponent
+      ],
+      providers: [
+        FeatureFlagsService
       ],
       imports: [
         FormsModule,

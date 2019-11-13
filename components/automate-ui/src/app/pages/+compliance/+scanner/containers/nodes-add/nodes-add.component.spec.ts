@@ -2,8 +2,11 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CookieModule } from 'ngx-cookie';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { NodesAddComponent } from './nodes-add.component';
@@ -19,13 +22,15 @@ describe('NodesAddComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         CookieModule.forRoot(),
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        StoreModule.forRoot({}, { runtimeChecks })
       ],
       declarations: [
         NodesAddComponent
       ],
       providers: [
-        { provide: ChefSessionService, useClass: MockChefSessionService }
+        { provide: ChefSessionService, useClass: MockChefSessionService },
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

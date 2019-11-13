@@ -2,6 +2,8 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Observable, of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
+import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
 
 import { Destination } from 'app/pages/data-feed/destination';
 import { DatafeedFormComponent } from './data-feed-form.component';
@@ -46,7 +48,8 @@ describe('DatafeedFormComponent', () => {
         FeatureFlagsService
       ],
       imports: [
-        FormsModule
+        FormsModule,
+        StoreModule.forRoot({}, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })

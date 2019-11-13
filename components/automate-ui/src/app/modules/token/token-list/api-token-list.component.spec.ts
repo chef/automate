@@ -6,6 +6,7 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { apiTokenEntityReducer } from 'app/entities/api-tokens/api-token.reducer';
 import { ApiTokenListComponent } from './api-token-list.component';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
@@ -27,6 +28,9 @@ describe('ApiTokenListComponent', () => {
           policies: policyEntityReducer,
           projectsFilter: projectsFilterReducer
         }, { runtimeChecks })
+      ],
+      providers: [
+        FeatureFlagsService
       ],
       declarations: [
         ApiTokenListComponent,

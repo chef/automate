@@ -8,6 +8,7 @@ import { StoreModule, Store } from '@ngrx/store';
 
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import {
   ApiTokenEntityInitialState,
   apiTokenEntityReducer
@@ -80,6 +81,9 @@ describe('ApiTokenDetailsComponent', () => {
           inputs: ['value', 'routerLink', 'fragment']
         }),
         ApiTokenDetailsComponent
+      ],
+      providers: [
+        FeatureFlagsService
       ],
       imports: [
         ReactiveFormsModule,

@@ -13,6 +13,7 @@ import { JobEditComponent, Step } from './job-edit.component';
 import { Job } from '../../entities/jobs/job.model';
 import { JobGetSuccess } from '../../entities/jobs/job.actions';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
 const changeStep = fragment => {
   return {
@@ -66,7 +67,8 @@ describe('JobEditComponent', () => {
               ]
             }
           }
-        }
+        },
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

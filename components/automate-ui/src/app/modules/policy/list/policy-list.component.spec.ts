@@ -8,6 +8,7 @@ import { customMatchers } from 'app/testing/custom-matchers';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { PolicyListComponent } from './policy-list.component';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
 describe('PolicyListComponent', () => {
   let component: PolicyListComponent;
@@ -38,6 +39,9 @@ describe('PolicyListComponent', () => {
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         PolicyListComponent
       ],
+      providers: [
+        FeatureFlagsService
+      ],
       imports: [
         ChefPipesModule,
         StoreModule.forRoot({
@@ -60,7 +64,6 @@ describe('PolicyListComponent', () => {
   });
 
   it('contains key elements', () => {
-    expect(element).toContainPath('app-settings-sidebar');
     expect(element).toContainPath('chef-page-header');
   });
 

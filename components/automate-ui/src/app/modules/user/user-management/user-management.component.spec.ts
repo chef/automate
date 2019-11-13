@@ -5,6 +5,7 @@ import { StoreModule } from '@ngrx/store';
 
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { userEntityReducer } from 'app/entities/users/user.reducer';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { UserManagementComponent } from './user-management.component';
 
 describe('UserManagementComponent', () => {
@@ -38,6 +39,9 @@ describe('UserManagementComponent', () => {
                         outputs: ['close', 'deleteClicked'] }),
         MockComponent({ selector: 'a', inputs: ['routerLink'] }),
         UserManagementComponent
+      ],
+      providers: [
+        FeatureFlagsService
       ],
       imports: [
         ReactiveFormsModule,

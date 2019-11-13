@@ -37,6 +37,7 @@ import {
 } from 'app/entities/teams/team.actions';
 import { Team } from 'app/entities/teams/team.model';
 import { TeamDetailsComponent } from './team-details.component';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
 const declarations: any[] = [
   MockComponent({ selector: 'app-user-table',
@@ -105,6 +106,9 @@ describe('TeamDetailsComponent v2', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: declarations,
+      providers: [
+        FeatureFlagsService
+      ],
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,
@@ -232,6 +236,9 @@ describe('TeamDetailsComponent v1', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       declarations: declarations,
+      providers: [
+        FeatureFlagsService
+      ],
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,

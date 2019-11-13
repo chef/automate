@@ -1,3 +1,5 @@
+import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
@@ -5,6 +7,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ProfileOverviewComponent } from './profile-overview.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable, throwError, of as observableOf } from 'rxjs';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { UploadService } from 'app/services/profiles/upload.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
@@ -35,7 +38,8 @@ describe('ProfilesOverviewComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        StoreModule.forRoot({}, { runtimeChecks })
       ],
       declarations: [
         ProfileOverviewComponent
@@ -43,7 +47,8 @@ describe('ProfilesOverviewComponent', () => {
       providers: [
         {provide: ProfilesService, useClass: MockProfilesService},
         {provide: ChefSessionService, useValue: mockSession},
-        {provide: UploadService, useClass: MockUploadService}
+        {provide: UploadService, useClass: MockUploadService},
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

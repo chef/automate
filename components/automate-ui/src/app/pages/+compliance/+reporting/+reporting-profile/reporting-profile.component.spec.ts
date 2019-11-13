@@ -1,8 +1,11 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReportingProfileComponent } from '../+reporting-profile/reporting-profile.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { CookieModule } from 'ngx-cookie';
 import { StatsService, ReportQueryService,
@@ -19,7 +22,8 @@ describe('ReportingProfileComponent', () => {
       imports: [
         RouterTestingModule,
         CookieModule.forRoot(),
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        StoreModule.forRoot({}, { runtimeChecks })
       ],
       declarations: [
         ReportingProfileComponent
@@ -28,7 +32,8 @@ describe('ReportingProfileComponent', () => {
         { provide: ChefSessionService, useClass: MockChefSessionService },
         StatsService,
         ReportQueryService,
-        ScanResultsService
+        ScanResultsService,
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

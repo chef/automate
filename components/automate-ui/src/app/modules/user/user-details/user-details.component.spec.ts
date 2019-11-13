@@ -22,6 +22,8 @@ import {
 } from 'app/entities/users/user.actions';
 import { UserDetailsComponent } from './user-details.component';
 
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+
 describe('UserDetailsComponent', () => {
   let component: UserDetailsComponent;
   let fixture: ComponentFixture<UserDetailsComponent>;
@@ -61,7 +63,6 @@ describe('UserDetailsComponent', () => {
         }, { initialState, runtimeChecks })
       ],
       declarations: [
-        MockComponent({ selector: 'app-user-profile-sidebar' }),
         MockComponent({ selector: 'chef-breadcrumbs' }),
         MockComponent({ selector: 'chef-breadcrumb', inputs: ['link']}),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
@@ -83,6 +84,7 @@ describe('UserDetailsComponent', () => {
         UserDetailsComponent
       ],
       providers: [
+        FeatureFlagsService,
         { provide: ActivatedRoute, useValue: {data: isNonAdmin} }
       ]
     });
@@ -170,11 +172,6 @@ describe('UserDetailsComponent', () => {
       it('does not contain the password description', () => {
         expect(element).not.toContainPath('password-description');
       });
-
-      it('contains the admin sidebar instead of the profile sidebar', () => {
-        expect(element).toContainPath('app-settings-sidebar');
-        expect(element).not.toContainPath('app-user-profile-sidebar');
-      });
     });
 
     describe('when the user is not an admin', () => {
@@ -189,11 +186,6 @@ describe('UserDetailsComponent', () => {
 
       it('contains the password description', () => {
         expect(element).toContainPath('#password-description');
-      });
-
-      it('contains the profile sidebar instead of the settings sidebar', () => {
-        expect(element).not.toContainPath('app-settings-sidebar');
-        expect(element).toContainPath('app-user-profile-sidebar');
       });
     });
 

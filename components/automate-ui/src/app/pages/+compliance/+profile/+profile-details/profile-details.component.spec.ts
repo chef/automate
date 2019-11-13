@@ -1,6 +1,9 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
+import { StoreModule } from '@ngrx/store';
+import { runtimeChecks } from 'app/ngrx.reducers';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ProfileDetailsComponent } from './profile-details.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable, throwError, of as observableOf } from 'rxjs';
@@ -27,14 +30,16 @@ describe('ProfileDetailsComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        StoreModule.forRoot({}, { runtimeChecks })
       ],
       declarations: [
         ProfileDetailsComponent
       ],
       providers: [
         { provide: ChefSessionService, useValue: mockSession },
-        { provide: ProfilesService, useClass: MockProfilesService }
+        { provide: ProfilesService, useClass: MockProfilesService },
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });

@@ -14,6 +14,7 @@ import {
   JobSchedulerStatus
 } from 'app/entities/automate-settings/automate-settings.model';
 
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 let mockJobSchedulerStatus: JobSchedulerStatus = null;
@@ -39,6 +40,7 @@ describe('AutomateSettingsComponent', () => {
       ],
       providers: [
         FormBuilder,
+        FeatureFlagsService,
         { provide: TelemetryService, useClass: MockTelemetryService }
       ],
       schemas: [

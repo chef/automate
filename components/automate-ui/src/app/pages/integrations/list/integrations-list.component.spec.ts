@@ -6,8 +6,9 @@ import { IntegrationsListComponent } from './integrations-list.component';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { managerEntityReducer } from '../../../entities/managers/manager.reducer';
 import { ChefPipesModule } from '../../../pipes/chef-pipes.module';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
-describe('IntegrationsComponent', () => {
+describe('IntegrationsListComponent', () => {
   let component: IntegrationsListComponent;
   let fixture: ComponentFixture<IntegrationsListComponent>;
 
@@ -33,6 +34,9 @@ describe('IntegrationsComponent', () => {
       ],
       declarations: [
         IntegrationsListComponent
+      ],
+      providers: [
+        FeatureFlagsService
       ],
       schemas: [
         CUSTOM_ELEMENTS_SCHEMA
