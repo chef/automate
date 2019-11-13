@@ -53,7 +53,7 @@ func (p *postgres) getOrg(ctx context.Context, q querier, orgID uuid.UUID) (stor
 func (p *postgres) GetOrgByName(ctx context.Context, orgName string, serverID uuid.UUID) (storage.Org, error) {
 	var org storage.Org
 	err := p.db.QueryRowContext(ctx,
-		`SELECT o.id, o.name, o.admin_user, o.admin_key, o.server_id, o.updated_at, o.created_at,
+		`SELECT o.id, o.name, o.admin_user, o.admin_key, o.server_id, o.updated_at, o.created_at
 		FROM orgs o
 		WHERE o.name = $1 AND o.server_id = $2`,
 		orgName, serverID).
