@@ -1,16 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { Router } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
 import { combineLatest, Subject, Observable } from 'rxjs';
-import { identity, keyBy, at } from 'lodash/fp';
+import { keyBy, at, isNil } from 'lodash/fp';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { filter as lodashFilter } from 'lodash/fp';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeState } from 'app/route.selectors';
-import { EntityStatus, allLoadedSuccessfully } from 'app/entities/entities';
+import { EntityStatus, allLoadedSuccessfully, pending } from 'app/entities/entities';
 import { User, HashMapOfUsers, userArrayToHash } from 'app/entities/users/user.model';
 import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
@@ -44,6 +43,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   public isIAMv2$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
   public addingUsers = false;
+  public addUsersSuccessful = false;
   private usersToAdd: { [id: string]: User } = {};
   public showSecondary = false;
   public addUsersFailed = '';
@@ -110,6 +110,34 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
 
       this.mapOfUsersToFilter = userArrayToHash(membershipUsers);
     });
+
+    this.store.pipe(
+      select(addUsersStatus),
+      takeUntil(this.isDestroyed),
+      filter(state => this.addingUsers && !pending(state)))
+      .subscribe((state) => {
+        this.addingUsers = false;
+        this.addUsersSuccessful = (state === EntityStatus.loadingSuccess);
+        if (this.addUsersSuccessful) {
+          this.closePage();
+        }
+    });
+
+    combineLatest([
+      this.store.select(addUsersStatus),
+      this.store.select(addTeamUsersStatusError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.message === undefined) {
+          this.addUsersFailed = 'An error occurred while attempting ' +
+          'to add users. Please try again.';
+        } else {
+          this.addUsersFailed = `Failed to add users: ${error.message}`;
+        }
+        this.addingUsers = false;
+      });
   }
 
   ngOnDestroy() {
@@ -125,32 +153,6 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
       id: this.teamId,
       user_ids: userIDs
     }));
-
-    const pendingAdd = new Subject<boolean>();
-    this.store.select(addUsersStatus).pipe(
-      filter(identity),
-      takeUntil(pendingAdd))
-      .subscribe((state) => {
-        if (state === EntityStatus.loadingSuccess) {
-          pendingAdd.next(true);
-          pendingAdd.complete();
-          this.addingUsers = false;
-          this.closePage();
-        }
-        if (state === EntityStatus.loadingFailure) {
-          this.store.select(addTeamUsersStatusError).pipe(
-            filter(identity),
-            takeUntil(pendingAdd)).subscribe((error: HttpErrorResponse) => {
-              if (error.message === undefined) {
-                this.addUsersFailed = 'An error occurred while attempting ' +
-                'to add users. Please try again.';
-              } else {
-                this.addUsersFailed = `Failed to add users: ${error.message}`;
-              }
-              this.addingUsers = false;
-          });
-        }
-      });
   }
 
   getHeading(): string {
