@@ -6,7 +6,6 @@ import { IntegrationsListComponent } from './integrations-list.component';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { managerEntityReducer } from '../../../entities/managers/manager.reducer';
 import { ChefPipesModule } from '../../../pipes/chef-pipes.module';
-import { MockComponent } from 'ng2-mock-component';
 
 describe('IntegrationsComponent', () => {
   let component: IntegrationsListComponent;

@@ -7,7 +7,6 @@ import { IntegrationsAddComponent } from './integrations-add.component';
 import { runtimeChecks } from 'app/ngrx.reducers';
 import { managerEntityReducer } from '../../../entities/managers/manager.reducer';
 import { integrationsAddReducer } from './integration-add.reducer';
-import { MockComponent } from 'ng2-mock-component';
 
 describe('IntegrationsAddComponent', () => {
   let component: IntegrationsAddComponent;

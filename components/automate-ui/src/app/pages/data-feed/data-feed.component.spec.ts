@@ -4,7 +4,6 @@ import { MatDialog, MatSnackBar } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { Store } from '@ngrx/store';
-import { MockComponent } from 'ng2-mock-component';
 
 import { Destination } from './destination';
 import { DatafeedService } from '../../services/data-feed/data-feed.service';
