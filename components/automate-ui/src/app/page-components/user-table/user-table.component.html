@@ -36,9 +36,9 @@
             <!-- <app-authorized
               [allOf]="generateDeletePermissionsPath(user)"
               [overrideVisible]="overridePermissionsCheck"> -->
-            <chef-control-menu>
-              <chef-option data-cy="delete" (click)="removeClicked.emit(user)">{{ removeText }}</chef-option>
-            </chef-control-menu>
+            <chef-control-menu-new>
+              <chef-option-new data-cy="delete" (click)="removeClicked.emit(user)">{{ removeText }}</chef-option-new>
+            </chef-control-menu-new>
             <!-- </app-authorized> -->
           </chef-td>
         </chef-tr>
