@@ -78,16 +78,15 @@ export class ServiceGroupsFacadeService {
       return 'Since the service was loaded,';
     }
 
-    return 'Changed from ' + this.formatHealthStatusForTimewizard(previousHealth) +
-      ' to ' + this.formatHealthStatusForTimewizard(currentHealth);
-  }
-
-  // display all health check status in lower case, except for 'OK' (upper case)
-  private formatHealthStatusForTimewizard(health: string): string {
-    if (health !== 'OK') {
-      return health.toLowerCase();
+    if (currentHealth !== 'OK') {
+      currentHealth = currentHealth.toLowerCase();
     }
-    return health;
+
+    if (previousHealth !== 'OK') {
+      previousHealth = previousHealth.toLowerCase();
+    }
+
+    return 'Changed from ' + currentHealth + ' to ' + previousHealth;
   }
 
   public updatePageNumber(pageNumber: number, total: number, pageSize: number, trackEvent: string) {
