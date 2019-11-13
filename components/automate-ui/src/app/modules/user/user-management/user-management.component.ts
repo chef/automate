@@ -10,7 +10,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefValidators } from 'app/helpers/auth/validator';
 import { EntityStatus } from 'app/entities/entities';
-import { allUsers, userStatus } from 'app/entities/users/user.selectors';
+import { allUsers, getStatus } from 'app/entities/users/user.selectors';
 import {
   CreateUser, DeleteUser, GetUsers, CreateUserPayload
 } from 'app/entities/users/user.actions';
@@ -47,7 +47,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService,
     fb: FormBuilder
   ) {
-    this.userStatus$ = store.select(userStatus);
+    this.userStatus$ = store.select(getStatus);
 
     this.createUserForm = fb.group({
       // Must stay in sync with error checks in user-form.component.html
@@ -68,7 +68,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetUsers());
     combineLatest([
       this.store.select(allUsers),
-      this.store.select(userStatus)
+      this.store.select(getStatus)
     ]).pipe(
       takeUntil(this.isDestroyed),
       filter(([_, uStatus]: [User[], EntityStatus]) =>
