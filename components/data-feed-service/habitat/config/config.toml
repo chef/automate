@@ -9,6 +9,7 @@ feed_interval = "{{cfg.service.feed_interval}}"
 asset_page_size = {{cfg.service.asset_page_size}}
 reports_page_size = {{cfg.service.reports_page_size}}
 node_batch_size = {{cfg.service.node_batch_size}}
+updated_nodes_only = {{cfg.service.updated_nodes_only}}
 
 [postgres]
 database = "{{cfg.storage.database}}"

@@ -23,7 +23,7 @@ test:
 	go tool cover -html=.cover/cover.out -o .cover/coverage.html
 
 imports:
-	goimports -w -l ./
+	find . -type f \( -name "*.go" -and ! -name "*.pb.go" \) | xargs goimports -w -l
 
 vet:
 	go vet $(GOFILES)

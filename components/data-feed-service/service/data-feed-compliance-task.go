@@ -52,12 +52,12 @@ func (d *DataFeedComplianceTask) Run(ctx context.Context, task cereal.Task) (int
 		return nil, errors.Wrap(err, "failed to parse task parameters")
 	}
 	log.Debugf("DataFeedComplianceTask.Run %v", params)
-	dataFeedMessages := d.buildReportFeed(ctx, params.NodeIDs)
+	dataFeedMessages := d.buildReportFeed(ctx, params.NodeIDs, params.UpdatedNodesOnly)
 
 	return &DataFeedComplianceTaskResults{DataFeedMessages: dataFeedMessages}, nil
 }
 
-func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, nodeIDs map[string]NodeIDs) map[string]map[string]interface{} {
+func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, nodeIDs map[string]NodeIDs, updatedNodesOnly bool) map[string]map[string]interface{} {
 	dataFeedMessages := make(map[string]map[string]interface{})
 	for ipaddress, nodeID := range nodeIDs {
 		log.Debugf("nodeIDs has ipaddress %v", ipaddress)
@@ -70,18 +70,26 @@ func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, nodeIDs ma
 			log.Errorf("Error getting report by if %v", err)
 			//TODO
 		}
-		filters := []string{"ipaddress:" + ipaddress}
-		// node the latest node data associated with this report
-		// i.e. latest attribute and client data but won't have been in the interval
-		nodeData, err := getNodeData(ctx, d.cfgMgmt, filters)
-		if err != nil {
-			// TODO
-			log.Errorf("Error getting node data %v", err)
-		}
-		if _, ok := nodeData["node_data"]; ok {
-			message := nodeData["node_data"].(DataFeedMessage)
-			message.Report = fullReport
-			nodeData["node_data"] = message
+
+		var nodeData map[string]interface{}
+		if updatedNodesOnly {
+			// need to make the map
+			nodeData := make(map[string]interface{}, 0)
+			nodeData["node_data"] = DataFeedMessage{Report: fullReport}
+		} else {
+			filters := []string{"ipaddress:" + ipaddress}
+			// node the latest node data associated with this report
+			// i.e. latest attribute and client data but won't have been in the interval
+			nodeData, err = getNodeData(ctx, d.cfgMgmt, filters)
+			if err != nil {
+				// TODO
+				log.Errorf("Error getting node data %v", err)
+			}
+			if _, ok := nodeData["node_data"]; ok {
+				message := nodeData["node_data"].(DataFeedMessage)
+				message.Report = fullReport
+				nodeData["node_data"] = message
+			}
 		}
 
 		dataFeedMessages[ipaddress] = nodeData

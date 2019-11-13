@@ -4,6 +4,8 @@ port = 14001
 feed_interval = "5m"
 asset_page_size = 10
 reports_page_size = 10
+node_batch_size = 100
+updated_nodes_only = true
 
 [tls]
 cert_path = "../../dev/certs/data-feed-service.crt"
