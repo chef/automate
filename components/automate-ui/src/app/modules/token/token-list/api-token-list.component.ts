@@ -77,6 +77,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetAllTokens());
 
     this.store.select(assignableProjects)
+      .pipe(takeUntil(this.isDestroyed))
       .subscribe((assignable: ProjectsFilterOption[]) => {
         this.dropdownProjects = assignable.map(p => {
           return <Project>{
