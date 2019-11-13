@@ -8,7 +8,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/sirupsen/logrus"
+	"github.com/pkg/errors"
 )
 
 type BuilderMinioDumpOperation struct {
@@ -110,9 +110,13 @@ func (d *BuilderMinioDumpOperation) Restore(backupCtx Context, serviceName strin
 	return nil
 }
 
+func builderArtifactManifestPath(prefix string) string {
+	return path.Join(prefix, "builder-artifacts")
+}
+
 func (d *BuilderMinioDumpOperation) readBuilderArtifactList(backupCtx Context, prefix string, verifier ObjectVerifier) ([]string, error) {
 	ctx := backupCtx.ctx
-	objName := path.Join(prefix, "builder-artifacts")
+	objName := builderArtifactManifestPath(prefix)
 	reader, err := backupCtx.bucket.NewReader(ctx, objName, verifier)
 	if err != nil {
 		return nil, err
@@ -134,8 +138,6 @@ func (d *BuilderMinioDumpOperation) copyObjectFromBackup(backupCtx Context, pref
 	backupObjName := path.Join(prefix, obj)
 	builderObjName := obj
 
-	logrus.Infof("Copying from %s -> %s", backupObjName, builderObjName)
-
 	reader, err := backupCtx.bucket.NewReader(ctx, backupObjName, objVerifier)
 	if err != nil {
 		return err
@@ -153,10 +155,24 @@ func (d *BuilderMinioDumpOperation) copyObjectFromBackup(backupCtx Context, pref
 }
 
 func (d *BuilderMinioDumpOperation) Delete(backupCtx Context) error {
-	select {
-	case <-backupCtx.ctx.Done():
-		return backupCtx.ctx.Err()
-	default:
+	objVerifier := &NoOpObjectVerifier{}
+	prefix := path.Join(d.ObjectName...)
+
+	objects, err := d.readBuilderArtifactList(backupCtx, prefix, objVerifier)
+	if err != nil {
+		return err
+	}
+
+	for _, obj := range objects {
+		objPath := path.Join(prefix, obj)
+		if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{objPath}); err != nil {
+			return errors.Wrapf(err, "failed to delete object %s", objPath)
+		}
+	}
+
+	manifestPath := builderArtifactManifestPath(prefix)
+	if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{manifestPath}); err != nil {
+		return errors.Wrapf(err, "failed to delete object %s", manifestPath)
 	}
 
 	return nil
