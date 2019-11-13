@@ -86,9 +86,9 @@
                 <chef-td>{{ getEditStatus(rule) }}</chef-td>
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project?.id]">
-                    <chef-control-menu>
-                      <chef-option *ngIf="showDeleteRule()" class="delete-rule" (click)="startRuleDelete(rule)" data-cy="delete-rule">Delete Rule</chef-option>
-                    </chef-control-menu>
+                    <chef-control-menu-new>
+                      <chef-option-new *ngIf="showDeleteRule()" class="delete-rule" (click)="startRuleDelete(rule)" data-cy="delete-rule">Delete Rule</chef-option-new>
+                    </chef-control-menu-new>
                   </app-authorized>
                 </chef-td>
               </chef-tr>
