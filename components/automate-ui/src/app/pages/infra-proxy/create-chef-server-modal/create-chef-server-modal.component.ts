@@ -25,7 +25,7 @@ export class CreateChefServerModalComponent implements OnInit {
     this.createForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       server_id: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      fqdn: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]      
+      fqdn: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
   }
 
