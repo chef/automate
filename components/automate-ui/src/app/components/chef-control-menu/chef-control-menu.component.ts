@@ -1,6 +1,7 @@
 import { Component, OnInit, HostBinding, HostListener, ElementRef } from '@angular/core';
-
 import { clamp, findIndex, getOr, find, lte } from 'lodash/fp';
+
+import { HTMLChefOptionElement } from 'app/types/types';
 
 
 @Component({

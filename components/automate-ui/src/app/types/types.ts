@@ -817,3 +817,8 @@ export enum HttpStatus {
   INTERNAL_SERVER_ERROR = 500
 }
 
+export interface HTMLChefOptionElement {
+  'optionId'?: string;
+  'selected'?: boolean;
+  'value'?: string;
+}
