@@ -15,7 +15,7 @@ export function notificationEntityReducer(
   switch (action.type) {
 
     case NotificationActionTypes.CREATE:
-      const timeout = action.payload['type'] === Type.info ? 3 : 30;
+      const timeout = action.payload['type'] === Type.info ? 8 : 30;
 
       const notification = defaults({
         id: (uid++).toString(),
