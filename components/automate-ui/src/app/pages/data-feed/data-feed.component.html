@@ -43,9 +43,9 @@
                 <a [routerLink]="['/settings/data-feed/form', destination.id]">{{ destination.name }}</a>
               </chef-td>
             <chef-td class="actions">
-              <chef-control-menu>
-                <chef-option (click)="deleteDestination(destination)">Delete Destination</chef-option>
-              </chef-control-menu>
+              <chef-control-menu-new>
+                <chef-option-new (click)="deleteDestination(destination)">Delete Destination</chef-option-new>
+              </chef-control-menu-new>
             </chef-td>
           </chef-tr>
         </chef-table>

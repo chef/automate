@@ -32,9 +32,9 @@
                 <chef-td class="status-column">{{ status(policy) | capitalize }}</chef-td>
                 <chef-td class="button-column">
                 <!-- <app-authorized [allOf]="['/policies/{policy}', 'delete', policy]"> -->
-                  <chef-control-menu *ngIf="policy.type !== 'CHEF_MANAGED'">
-                    <chef-option (click)="startPolicyDelete(policy)">Delete Policy</chef-option>
-                  </chef-control-menu>
+                  <chef-control-menu-new *ngIf="policy.type !== 'CHEF_MANAGED'">
+                    <chef-option-new (click)="startPolicyDelete(policy)">Delete Policy</chef-option-new>
+                  </chef-control-menu-new>
                 <!-- </app-authorized> -->
                 </chef-td>
             </chef-tr>

@@ -54,10 +54,10 @@
             <chef-td class="column-date">{{ manager.date_added | datetime: RFC2822 }}</chef-td>
             <chef-td>{{ manager.status }}</chef-td>
             <chef-td class="controls">
-              <chef-control-menu>
-                <chef-option (click)="handleEdit(manager.id)">Edit Integration</chef-option>
-                <chef-option (click)="handleDelete(manager.id)">Delete Integration</chef-option>
-              </chef-control-menu>
+              <chef-control-menu-new>
+                <chef-option-new (click)="handleEdit(manager.id)">Edit Integration</chef-option-new>
+                <chef-option-new (click)="handleDelete(manager.id)">Delete Integration</chef-option-new>
+              </chef-control-menu-new>
             </chef-td>
           </chef-tr>
         </chef-tbody>
