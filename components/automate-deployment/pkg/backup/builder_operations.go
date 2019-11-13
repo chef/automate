@@ -109,6 +109,8 @@ func (d *BuilderMinioDumpOperation) Restore(backupCtx Context, serviceName strin
 	return nil
 }
 
+const MinioDeleteBatchSize = 512
+
 func (d *BuilderMinioDumpOperation) Delete(backupCtx Context) error {
 	objVerifier := &NoOpObjectVerifier{}
 	backupBucketPrefix := d.backupBucketPrefix()
@@ -125,12 +127,14 @@ func (d *BuilderMinioDumpOperation) Delete(backupCtx Context) error {
 	if err != nil {
 		return err
 	}
-
-	for _, obj := range objects {
-		objPath := path.Join(backupBucketPrefix, obj)
-		if err := backupCtx.bucket.Delete(backupCtx.ctx, []string{objPath}); err != nil {
-			return errors.Wrapf(err, "failed to delete object %s", objPath)
+	err = applyBatch(objects, MinioDeleteBatchSize, func(batch []string) error {
+		for i, o := range batch {
+			batch[i] = path.Join(backupBucketPrefix, o)
 		}
+		return backupCtx.bucket.Delete(backupCtx.ctx, batch)
+	})
+	if err != nil {
+		return errors.Wrapf(err, "failed to delete objects")
 	}
 
 	manifestPath := builderArtifactManifestPath(backupBucketPrefix)
@@ -143,6 +147,28 @@ func (d *BuilderMinioDumpOperation) Delete(backupCtx Context) error {
 
 func (d *BuilderMinioDumpOperation) String() string {
 	return d.Name
+}
+
+// applyBatch falls f with sub-slices of the src slice. The function f
+// should know what it's doing if it modifies the elements of the
+// passed slice.
+func applyBatch(src []string, batchSize int, f func([]string) error) error {
+	srcLen := len(src)
+	if srcLen < batchSize {
+		return f(src)
+	}
+
+	for i := 0; i < srcLen; i = i + batchSize {
+		end := i + batchSize
+		if end > srcLen {
+			end = srcLen
+		}
+		err := f(src[i:end])
+		if err != nil {
+			return err
+		}
+	}
+	return nil
 }
 
 // backupBucketPrefix returns the path prefix for all objects that we
