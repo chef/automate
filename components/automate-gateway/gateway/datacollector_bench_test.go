@@ -1,3 +1,5 @@
+// +build !mockgen
+
 package gateway
 
 import (

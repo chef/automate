@@ -1,3 +1,5 @@
+// +build !mockgen
+
 //
 //  Author:: Salim Afiune <afiune@chef.io>
 //  Copyright:: Copyright 2018, Chef Software Inc.

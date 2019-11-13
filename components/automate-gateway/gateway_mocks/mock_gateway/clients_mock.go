@@ -326,22 +326,6 @@ func (mr *MockClientsFactoryMockRecorder) SecretClient() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SecretClient", reflect.TypeOf((*MockClientsFactory)(nil).SecretClient))
 }
 
-// DatafeedClient mocks base method
-func (m *MockClientsFactory) DatafeedClient() (data_feed.DatafeedServiceClient, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DatafeedClient")
-	ret0, _ := ret[0].(data_feed.DatafeedServiceClient)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// DatafeedClient indicates an expected call of DatafeedClient
-func (mr *MockClientsFactoryMockRecorder) DatafeedClient() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DatafeedClient", reflect.TypeOf((*MockClientsFactory)(nil).DatafeedClient))
-}
-
-
 // NodesClient mocks base method
 func (m *MockClientsFactory) NodesClient() (nodes.NodesServiceClient, error) {
 	m.ctrl.T.Helper()
@@ -490,4 +474,19 @@ func (m *MockClientsFactory) DeploymentServiceClient() (deployment.DeploymentCli
 func (mr *MockClientsFactoryMockRecorder) DeploymentServiceClient() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeploymentServiceClient", reflect.TypeOf((*MockClientsFactory)(nil).DeploymentServiceClient))
+}
+
+// DatafeedClient mocks base method
+func (m *MockClientsFactory) DatafeedClient() (data_feed.DatafeedServiceClient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DatafeedClient")
+	ret0, _ := ret[0].(data_feed.DatafeedServiceClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DatafeedClient indicates an expected call of DatafeedClient
+func (mr *MockClientsFactoryMockRecorder) DatafeedClient() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DatafeedClient", reflect.TypeOf((*MockClientsFactory)(nil).DatafeedClient))
 }
