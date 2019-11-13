@@ -1,3 +1,5 @@
+require_relative '../../constants'
+
 # encoding: utf-8
 # copyright: 2018, Chef Software, Inc.
 # license: All rights reserved
@@ -17,8 +19,6 @@ control 'iam-v2-1' do
   CUSTOM_TOKEN_ID = 'inspec-token'
   CUSTOM_TEAM_ID = 'inspec-team'
   CUSTOM_USER_ID = 'inspec-user'
-  ADMIN_USER_ID = 'admin'
-  TIMESTAMP = Time.now.utc.to_i
 
   describe 'v2beta policy API' do
     before(:all) do

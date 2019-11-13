@@ -1,10 +1,10 @@
 #!/bin/bash
 
 #shellcheck disable=SC2034
-test_name="iam v2.1 only"
+test_name="iam v2.1 fresh install"
 # Note: the inspec profile takes care of deleting any migrated v1 legacy
 # policies
-test_deploy_inspec_profiles=(a2-iam-v2p1-only-integration)
+test_deploy_inspec_profiles=(a2-iam-v2-integration a2-iam-v2-no-legacy-policies)
 # Note: we can't run diagnostics AND inspec, so skip diagnostics
 test_skip_diagnostics=true
 

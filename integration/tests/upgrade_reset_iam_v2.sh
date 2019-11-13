@@ -2,7 +2,7 @@
 
 #shellcheck disable=SC2034
 test_name="upgrade / reset IAM v2.1"
-test_deploy_inspec_profiles=(a2-iam-v2p1-only-integration)
+test_deploy_inspec_profiles=(a2-iam-v2-integration a2-iam-v2-no-legacy-policies)
 # Note: we can't run diagnostics AND inspec, so skip diagnostics
 test_skip_diagnostics=true
 

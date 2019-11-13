@@ -1869,7 +1869,7 @@ func defaultGetPolicyVersionFunc(context.Context,
 	return &authz_v2.GetPolicyVersionResp{
 		Version: &authz_v2.Version{
 			Major: authz_v2.Version_V2,
-			Minor: authz_v2.Version_V0,
+			Minor: authz_v2.Version_V1,
 		},
 	}, nil
 }
