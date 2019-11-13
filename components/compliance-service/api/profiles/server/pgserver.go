@@ -282,21 +282,21 @@ func (srv *PGProfileServer) Delete(ctx context.Context, in *profiles.ProfileDeta
 }
 
 func (srv *PGProfileServer) List(ctx context.Context, in *profiles.Query) (*profiles.Profiles, error) {
-	var metadata []inspec.Metadata
-	var err error
 	sortOrder := in.Order.String()
-	if in.Sort == "" {
-		in.Sort = "title"
-	}
-	logrus.Infof("Listing profiles by %s %s", in.Sort, sortOrder)
-	if len(in.Owner) == 0 {
-		// list market profiles
-		metadata, err = srv.store.ListMarketProfilesMetadata(in.Name, in.Sort, sortOrder)
-	} else {
-		// list all profiles by owner
-		metadata, err = srv.store.ListProfilesMetadata(in.Owner, in.Name, in.Sort, sortOrder)
+
+	sortField := in.Sort
+	if sortField == "" {
+		sortField = "title"
 	}
 
+	logrus.WithFields(logrus.Fields{
+		"sortOrder": sortOrder,
+		"sortField": sortField,
+		"namespace": in.Owner,
+		"name":      in.Name,
+	}).Infof("Listing profiles")
+
+	metadata, err = srv.store.ListProfilesMetadata(in.Owner, in.Name, sortField, sortOrder)
 	if err != nil {
 		return nil, err
 	}
