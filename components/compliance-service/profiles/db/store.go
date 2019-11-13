@@ -400,10 +400,6 @@ func validateSortOrder(sort string, order string) error {
 }
 
 func (s *Store) marketProfilesAll(sort string, order string) (*sql.Rows, error) {
-	err := validateSortOrder(sort, order)
-	if err != nil {
-		return nil, err
-	}
 	selectMarketSQL := fmt.Sprintf(`
 		SELECT sha256, info
 		FROM store_profiles WHERE sha256 IN
@@ -421,10 +417,6 @@ func (s *Store) marketProfilesAll(sort string, order string) (*sql.Rows, error) 
 }
 
 func (s *Store) marketProfilesByName(name string, sort string, order string) (*sql.Rows, error) {
-	err := validateSortOrder(sort, order)
-	if err != nil {
-		return nil, err
-	}
 	selectMarketSQL := fmt.Sprintf(`
 		SELECT sha256, info
 		FROM store_profiles WHERE sha256 IN
@@ -443,33 +435,7 @@ func (s *Store) marketProfilesByName(name string, sort string, order string) (*s
 }
 
 // returns array of profiles with info
-func (s *Store) ListMarketProfilesMetadata(name string, sort string, order string) ([]inspec.Metadata, error) {
-	logrus.Debug("Listing market profiles")
-
-	var rows *sql.Rows
-	var err error
-	if name != "" {
-		rows, err = s.marketProfilesByName(name, sort, order)
-	} else {
-		rows, err = s.marketProfilesAll(sort, order)
-	}
-
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-
-	defer rows.Close() // nolint: errcheck
-	return s.parseList(rows)
-}
-
-// returns array of profiles with info
 func (s *Store) namespaceProfilesAll(namespace string, sort string, order string) (*sql.Rows, error) {
-	logrus.Debug("Listing profile per namespace")
-	err := validateSortOrder(sort, order)
-	if err != nil {
-		return nil, err
-	}
 	selectProfilesSQL := fmt.Sprintf(`
 		SELECT sha256, info
 		FROM store_profiles WHERE
@@ -486,10 +452,6 @@ func (s *Store) namespaceProfilesAll(namespace string, sort string, order string
 }
 
 func (s *Store) namespaceProfilesByName(namespace string, name string, sort string, order string) (*sql.Rows, error) {
-	err := validateSortOrder(sort, order)
-	if err != nil {
-		return nil, err
-	}
 	selectProfilesSQL := fmt.Sprintf(`
 		SELECT sha256, info
 		FROM store_profiles WHERE
@@ -506,16 +468,24 @@ func (s *Store) namespaceProfilesByName(namespace string, name string, sort stri
 	return selectProfilesStmt.Query(namespace, name)
 }
 
-// retruns an array of all versions for a specific profile
 func (s *Store) ListProfilesMetadata(namespace string, name string, sort string, order string) ([]inspec.Metadata, error) {
-	logrus.Debugf("Listing profiles for namespace %s and name %s", namespace, name)
+	err := validateSortOrder(sort, order)
+	if err != nil {
+		return nil, err
+	}
 
 	var rows *sql.Rows
 	var err error
-	if name != "" {
-		rows, err = s.namespaceProfilesByName(namespace, name, sort, order)
-	} else {
+
+	switch {
+	case len(namespace) == 0 && len(name) == 0:
+		rows, err = s.marketProfilesAll(sort, order)
+	case len(namespace) == 0:
+		rows, err = s.marketProfilesByName(name, sort, order)
+	case len(name) == 0:
 		rows, err = s.namespaceProfilesAll(namespace, sort, order)
+	default:
+		rows, err = s.namespaceProfilesByName(namespace, name, sort, order)
 	}
 
 	if err != nil {
