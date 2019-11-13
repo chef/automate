@@ -48,9 +48,9 @@
                 <chef-td>{{ getRulesStatus(project) }}</chef-td>
                 <chef-td class="controls">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
-                    <chef-control-menu>
-                      <chef-option (click)="startProjectDelete(project)" data-cy="delete-project">Delete Project</chef-option>
-                    </chef-control-menu>
+                    <chef-control-menu-new>
+                      <chef-option-new (click)="startProjectDelete(project)" data-cy="delete-project">Delete Project</chef-option-new>
+                    </chef-control-menu-new>
                   </app-authorized>
                 </chef-td>
               </chef-tr>
