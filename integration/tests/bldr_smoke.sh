@@ -5,7 +5,7 @@ test_name="bldr_smoke"
 
 test_deploy_inspec_profiles=()
 test_skip_diagnostics=true
-test_backup=true
+test_backup_restore=true
 
 do_deploy() {
     #shellcheck disable=SC2154
