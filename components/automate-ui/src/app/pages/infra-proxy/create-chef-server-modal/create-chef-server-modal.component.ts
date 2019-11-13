@@ -1,5 +1,6 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
   selector: 'app-create-chef-server-modal',
@@ -9,35 +10,32 @@ import { FormGroup } from '@angular/forms';
 export class CreateChefServerModalComponent implements OnInit {
   @Input() visible = false;
   @Input() creating = false;
-  @Input() createForm: FormGroup;
   @Input() conflictErrorEvent: EventEmitter<boolean>;
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter();
 
-  public conflictError = false;
+  public createForm: FormGroup;
 
-  ngOnInit(): void {
+  constructor(
+    private fb: FormBuilder
+
+  ) { }
+
+  ngOnInit() {
+    this.createForm = this.fb.group({
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      server_id: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      fqdn: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]      
+    });
   }
 
-  public handleNameInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
-      return;
-    }
-    this.conflictError = false;
+  public handleNameInput(): void {
   }
 
-  public handleServerIdInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
-      return;
-    }
-    this.conflictError = false;
+  public handleServerIdInput(): void {
   }
 
-  public handleFqdnInput(event: KeyboardEvent): void {
-    if (this.isNavigationKey(event)) {
-      return;
-    }
-    this.conflictError = false;
+  public handleFqdnInput(): void {
   }
 
   closeEvent(): void {
@@ -49,8 +47,6 @@ export class CreateChefServerModalComponent implements OnInit {
 
   createObject(): void {
   }
-  private isNavigationKey(event: KeyboardEvent): boolean {
-    return event.key === 'Shift' || event.key === 'Tab';
-  }
+
 }
 
