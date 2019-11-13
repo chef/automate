@@ -38,6 +38,10 @@ export function pendingState(state: StateWithStatus): boolean {
   );
 }
 
+export function pending(status: EntityStatus): boolean {
+  return status === EntityStatus.notLoaded || status === EntityStatus.loading;
+}
+
 export function loading(status: EntityStatus): boolean {
   return status === EntityStatus.loading;
 }
