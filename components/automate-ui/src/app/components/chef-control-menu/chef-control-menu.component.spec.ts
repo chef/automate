@@ -1,3 +1,4 @@
+import { CUSTOM_ELEMENTS_SCHEMA, DebugElement } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 
@@ -13,7 +14,8 @@ describe('ChefControlMenuComponent', () => {
         MockComponent({'selector': 'chef-dropdown'}),
         MockComponent({'selector': 'chef-icon'}),
         ChefControlMenuComponent
-      ]
+      ],
+      schemas: [CUSTOM_ELEMENTS_SCHEMA]
     })
     .compileComponents();
   }));
@@ -29,13 +31,12 @@ describe('ChefControlMenuComponent', () => {
   });
 
   describe('handleFocusOut', () => {
-    let select;
     let eventMock;
 
     beforeEach(() => {
       component.isFocused = true;
       component.isActive = true;
-      eventMock = fixture.nativeElement.dispatchEvent(new Event('focusout'));
+      eventMock = new Event('focusout');
     });
 
     it('sets focus to false', () => {
