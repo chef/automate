@@ -19,6 +19,7 @@ type DataFeedWorkflowExecutor struct {
 
 // DataFeedWorkflowParams the params for the workflow and all the tasks in the workflow
 type DataFeedWorkflowParams struct {
+	UpdatedNodesOnly bool
 	NodeBatchSize    int
 	NodeIDs          map[string]NodeIDs
 	FeedStart        time.Time
@@ -158,6 +159,7 @@ func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev 
 				return w.Fail(err)
 			}
 		} else {
+			payload.DataFeedMessages = make(map[string]map[string]interface{})
 			payload.TasksComplete = true
 		}
 		log.Debugf("NotifierTask %v, tasks complete: %v, time: %v", dataFeedNotifierTaskName, payload.TasksComplete, time.Now())

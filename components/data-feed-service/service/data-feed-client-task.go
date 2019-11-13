@@ -54,7 +54,7 @@ func (d *DataFeedClientTask) Run(ctx context.Context, task cereal.Task) (interfa
 	}
 	nodeIDs := params.NodeIDs
 	log.Debugf("DataFeedClientTask.Run %v", nodeIDs)
-	datafeedMessages, err := d.buildDatafeed(ctx, nodeIDs)
+	datafeedMessages, err := d.buildDatafeed(ctx, nodeIDs, params.UpdatedNodesOnly)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to build chef client data")
 	}
@@ -65,7 +65,7 @@ func (d *DataFeedClientTask) Run(ctx context.Context, task cereal.Task) (interfa
 	return &DataFeedClientTaskResults{DataFeedMessages: datafeedMessages, NodeIDs: nodeIDs}, nil
 }
 
-func (d *DataFeedClientTask) buildDatafeed(ctx context.Context, nodeIDs map[string]NodeIDs) (map[string]map[string]interface{}, error) {
+func (d *DataFeedClientTask) buildDatafeed(ctx context.Context, nodeIDs map[string]NodeIDs, updateNodesOnly bool) (map[string]map[string]interface{}, error) {
 
 	log.Info("Building data feed...")
 
@@ -87,38 +87,42 @@ func (d *DataFeedClientTask) buildDatafeed(ctx context.Context, nodeIDs map[stri
 		}
 
 		ipaddress := nodeData["attributes"].(map[string]interface{})["ipaddress"].(string)
-		log.Debugf("buildDataFeed key %s, node data ipaddress %v", key, ipaddress)
-		filter := &reporting.ListFilter{Type: "ipaddress", Values: []string{ipaddress}}
-		reportFilters := []*reporting.ListFilter{filter}
 
-		ipaddressQuery := &reporting.Query{
-			Page:    0,
-			PerPage: 1,
-			Filters: reportFilters,
-			Sort:    "latest_report.end_time",
-			Order:   reporting.Query_DESC,
-		}
-		// get the most recent compliance report summary for this node
-		reports, err := d.reporting.ListReports(ctx, ipaddressQuery)
-		if err != nil {
-			log.Errorf("Error listing reports %v", err)
-			continue
-		}
+		if updateNodesOnly == false {
 
-		// get the full report
-		fullReport := new(reporting.Report)
-		if len(reports.Reports) != 0 {
-			reportID := &reporting.Query{Id: reports.Reports[0].Id}
-			fullReport, err = d.reporting.ReadReport(ctx, reportID)
+			log.Debugf("buildDataFeed key %s, node data ipaddress %v", key, ipaddress)
+			filter := &reporting.ListFilter{Type: "ipaddress", Values: []string{ipaddress}}
+			reportFilters := []*reporting.ListFilter{filter}
+
+			ipaddressQuery := &reporting.Query{
+				Page:    0,
+				PerPage: 1,
+				Filters: reportFilters,
+				Sort:    "latest_report.end_time",
+				Order:   reporting.Query_DESC,
+			}
+			// get the most recent compliance report summary for this node
+			reports, err := d.reporting.ListReports(ctx, ipaddressQuery)
 			if err != nil {
-				log.Errorf("Error getting report by ip %v", err)
+				log.Errorf("Error listing reports %v", err)
 				continue
 			}
+
+			// get the full report
+			fullReport := new(reporting.Report)
+			if len(reports.Reports) != 0 {
+				reportID := &reporting.Query{Id: reports.Reports[0].Id}
+				fullReport, err = d.reporting.ReadReport(ctx, reportID)
+				if err != nil {
+					log.Errorf("Error getting report by ip %v", err)
+					continue
+				}
+			}
+			// update the message with the full report
+			message := nodeData["node_data"].(DataFeedMessage)
+			message.Report = fullReport
+			nodeData["node_data"] = message
 		}
-		// update the message with the full report
-		message := nodeData["node_data"].(DataFeedMessage)
-		message.Report = fullReport
-		nodeData["node_data"] = message
 		nodeMessages[ipaddress] = nodeData
 		// We have all the data for this node - attributes, client run and compliance report
 		// delete from the node map so it only contains ID's for nodes that have not yet had
