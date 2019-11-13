@@ -30,7 +30,7 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
       return set(
         'getStatus',
         EntityStatus.loading,
-        // clear user state to prevent leaking potentially unauthorized data
+        // clear user state to ensure we fetch the latest data
         userEntityAdapter.removeAll(state)
       ) as UserEntityState;
 
@@ -45,7 +45,7 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
       return set(
         'getStatus',
         EntityStatus.loading,
-        // clear user state to prevent leaking potentially unauthorized data
+        // clear user state to ensure we fetch the latest data
         userEntityAdapter.removeAll(state)
       ) as UserEntityState;
 

@@ -45,7 +45,7 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
       return set(
         'getAllStatus',
         EntityStatus.loading,
-        // clear team state to prevent leaking potentially unauthorized data
+        // clear team state to ensure we fetch the latest data
         teamEntityAdapter.removeAll(state)
       ) as TeamEntityState;
     }
@@ -81,7 +81,7 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
       return set(
         'getStatus',
         EntityStatus.loading,
-        // clear team state to prevent leaking potentially unauthorized data
+        // clear team state to ensure we fetch the latest data
         teamEntityAdapter.removeAll(state)
       ) as TeamEntityState;
     }

@@ -48,7 +48,7 @@ export function apiTokenEntityReducer(
       return set(
         STATUS,
         EntityStatus.loading,
-        // clear token state to avoid leaking potentially unauthorized data
+        // clear token state to ensure we fetch the latest data
         apiTokenEntityAdapter.removeAll(state)
       ) as ApiTokenEntityState;
     }
@@ -69,7 +69,7 @@ export function apiTokenEntityReducer(
       return set(
         GET_STATUS,
         EntityStatus.loading,
-        // clear token state to avoid leaking potentially unauthorized data
+        // clear token state to ensure we fetch the latest data
         apiTokenEntityAdapter.removeAll(state)
       ) as ApiTokenEntityState;
     }
