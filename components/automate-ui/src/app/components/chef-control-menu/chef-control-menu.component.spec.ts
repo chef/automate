@@ -27,4 +27,39 @@ describe('ChefControlMenuComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+
+  describe('handleFocusOut', () => {
+    let select;
+    let eventMock;
+
+    beforeEach(() => {
+      component.isFocused = true;
+      component.isActive = true;
+      eventMock = fixture.nativeElement.dispatchEvent(new Event('focusout'));
+    });
+
+    it('sets focus to false', () => {
+      component.handleFocusOut(eventMock);
+      expect(component.isFocused).toBe(false);
+    });
+
+    it('sets active to false', () => {
+      component.handleFocusOut(eventMock);
+      expect(component.isActive).toBe(false);
+    });
+
+    it('does not set focus to false when the relatedTarget is the dropdown', () => {
+      eventMock.relatedTarget = { nodeName: 'CHEF-DROPDOWN' };
+      component.handleFocusOut(eventMock);
+      expect(component.isFocused).toBe(true);
+    });
+
+    it('does not set isActive to false when the relatedTarget is the dropdown', () => {
+      eventMock.relatedTarget = { nodeName: 'CHEF-DROPDOWN' };
+      component.handleFocusOut(eventMock);
+      expect(component.isActive).toBe(true);
+    });
+
+  });
+
 });
