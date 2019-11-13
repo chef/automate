@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, EventEmitter } from '@angular/core';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-chef-servers-list',
@@ -6,6 +7,11 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./chef-servers-list.component.scss']
 })
 export class ChefServersListComponent implements OnInit {
+  public createModalVisible = false;
+  public createChefServerForm: FormGroup;
+  public creatingChefServer = false;
+  public conflictErrorEvent = new EventEmitter<boolean>();
+
   public serverMockList = [
     {
       id: '1',
@@ -27,4 +33,14 @@ export class ChefServersListComponent implements OnInit {
   ngOnInit() {
   }
 
+  public createChefServer(): void {
+  }
+
+  public openCreateModal(): void {
+    this.createModalVisible = true;
+  }
+
+  public closeCreateModal(): void {
+    this.createModalVisible = false;
+  }
 }

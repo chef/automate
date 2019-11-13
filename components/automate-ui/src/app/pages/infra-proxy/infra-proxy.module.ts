@@ -8,13 +8,14 @@ import { ChefComponentsModule } from 'app/components/chef-components.module';
 import { ChefServersListComponent } from './chef-servers-list/chef-servers-list.component';
 import { ChefServersDetailsComponent } from './chef-servers-details/chef-servers-details.component';
 import { OrgCreateEditModalComponent } from './org-create-edit-modal/org-create-edit-modal.component';
-
+import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 
 @NgModule({
   declarations: [
     ChefServersListComponent,
     ChefServersDetailsComponent,
-    OrgCreateEditModalComponent
+    OrgCreateEditModalComponent,
+    CreateChefServerModalComponent
   ],
   imports: [
     CommonModule,

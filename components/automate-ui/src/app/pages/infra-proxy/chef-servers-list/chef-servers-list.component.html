@@ -6,9 +6,18 @@
         <chef-heading>Chef Servers</chef-heading>
         <chef-subheading>Manage Chef Servers with Chef Automate</chef-subheading>
       </chef-page-header>
+
+      <app-create-chef-server-modal
+        [visible]="createModalVisible"
+        (close)="closeCreateModal()"
+        [conflictErrorEvent]="conflictErrorEvent"
+        [createForm]="createChefServerForm"
+        (createClicked)="createChefServer()">
+      </app-create-chef-server-modal>
+
       <div class="page-body">
         <chef-toolbar>
-          <chef-button primary>Add Chef Server</chef-button>
+          <chef-button primary (click)="openCreateModal()">Add Chef Server</chef-button>
         </chef-toolbar>
         <chef-table>
           <chef-thead>
