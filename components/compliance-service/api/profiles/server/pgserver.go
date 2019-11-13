@@ -294,9 +294,9 @@ func (srv *PGProfileServer) List(ctx context.Context, in *profiles.Query) (*prof
 		"sortField": sortField,
 		"namespace": in.Owner,
 		"name":      in.Name,
-	}).Infof("Listing profiles")
+	}).Info("Listing profiles")
 
-	metadata, err = srv.store.ListProfilesMetadata(in.Owner, in.Name, sortField, sortOrder)
+	metadata, err := srv.store.ListProfilesMetadata(in.Owner, in.Name, sortField, sortOrder)
 	if err != nil {
 		return nil, err
 	}
