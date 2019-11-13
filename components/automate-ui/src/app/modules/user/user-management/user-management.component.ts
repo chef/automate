@@ -33,7 +33,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public isLoading = true;
   public userToDelete: User;
 
-  public userStatus$: Observable<EntityStatus>;
+  private getStatus$: Observable<EntityStatus>;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   // Inputs to app-user-table
@@ -47,7 +47,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService,
     fb: FormBuilder
   ) {
-    this.userStatus$ = store.select(getStatus);
+    this.getStatus$ = store.select(getStatus);
 
     this.createUserForm = fb.group({
       // Must stay in sync with error checks in user-form.component.html
@@ -119,7 +119,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
     this.store.dispatch(new CreateUser(userCreateReq));
 
-    this.userStatus$.pipe(
+    this.getStatus$.pipe(
       takeUntil(this.isDestroyed))
       .subscribe((status) => {
         if (status !== EntityStatus.loading) {

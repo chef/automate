@@ -81,19 +81,16 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       this.resetForms();
     });
 
-    this.store.select(updateStatus).subscribe(this.handleUpdateStatus.bind(this));
+    this.store.select(updateStatus).pipe(
+      takeUntil(this.isDestroyed),
+      filter(status => status === EntityStatus.loadingSuccess))
+      // same status is used for updating password or full name, so we just reset both
+      .subscribe(() => this.resetForms());
   }
 
   ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
-  }
-
-  private handleUpdateStatus(state: EntityStatus): void {
-    // same status is used for updating password or full name, so we just reset both
-    if (state === EntityStatus.loadingSuccess) {
-      this.resetForms();
-    }
   }
 
   private createForms(fb: FormBuilder): void {
