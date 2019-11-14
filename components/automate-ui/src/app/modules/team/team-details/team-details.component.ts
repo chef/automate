@@ -103,6 +103,10 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetUsers());
     this.isIAMv2$ = this.store.select(isIAMv2);
     this.layoutFacade.showSettingsSidebar();
+
+    this.isIAMv2$.pipe(takeUntil(this.isDestroyed))
+      .subscribe((isV2) => this.descriptionOrName = isV2 ? 'name' : 'description');
+
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {
         this.url = url;
@@ -135,13 +139,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       this.store.select(v2TeamFromRoute)
     ]).pipe(
       filter(([isV2, _v1TeamFromRoute, _v2TeamFromRoute]) => isV2 !== null),
-      map(([isV2, v1Team, v2Team]) => {
-        if (isV2) {
-          return v2Team;
-        } else {
-          return v1Team;
-        }
-      }));
+      map(([isV2, v1Team, v2Team]) => isV2 ? v2Team : v1Team ));
 
     combineLatest([this.isIAMv2$, team$]).pipe(
       takeUntil(this.isDestroyed),
