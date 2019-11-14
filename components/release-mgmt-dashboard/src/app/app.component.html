@@ -9,7 +9,7 @@
 </header>
 <main>
   <div class="notification" *ngIf="deploy_in_progress">
-    <span class="deploy-in-progress">There is an automated deployment in progress. Some environments may be impacted as they are upgraded.  You can follow the logs <a href="{{deploy_logs_url}}" target="_blank">here</a>.</span>
+    <span class="deploy-in-progress">There is an automated deployment in progress. Some environments may be impacted as they are upgraded. You can follow the <a href="{{deploy_logs_url}}" target="_blank" rel="noopener">logs</a>.</span>
   </div>
   <div *ngFor="let server of servers" id="{{server.id}}" class="server">
     <div class="server-header">
