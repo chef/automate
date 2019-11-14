@@ -145,10 +145,11 @@ export class ReportingComponent implements OnInit, OnDestroy {
     }
   ];
 
+  private NO_VALUE = 'no value';
   private noValuesControlTagFilter = {
     id: '',
     score: 1,
-    text: 'no value',
+    text: this.NO_VALUE,
     title: 'no value',
     version: ''
   };
