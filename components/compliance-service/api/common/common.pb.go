@@ -23,8 +23,9 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 type Filter struct {
 	// Field to filter on.
 	Key string `protobuf:"bytes,20,opt,name=key,proto3" json:"key,omitempty"`
-	// Include matches for this filter. `true` (default) includes only nodes that match this filter.
-	// `false` excludes any nodes that match this filter.
+	// Include matches for this filter.(boolean)
+	// `true` (default) *includes* all nodes that match this filter.
+	// `false` *excludes* all nodes that match this filter.
 	Exclude bool `protobuf:"varint,22,opt,name=exclude,proto3" json:"exclude,omitempty"`
 	// Field values to filter on.
 	Values               []string `protobuf:"bytes,23,rep,name=values,proto3" json:"values,omitempty"`
