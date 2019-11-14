@@ -90,8 +90,7 @@ export class WelcomeModalComponent {
         break;
       case null:
         // If the user has not set a preference this is their first visit
-        // with this browser. So we show them the modal and store the default pref.
-        this.localStorage.putBoolean(SHOW_AT_START_PREF_KEY, this.showAtStartPref);
+        // with this browser. So we show them the modal.
         this.showModal();
         break;
     }
@@ -114,9 +113,10 @@ export class WelcomeModalComponent {
     }
   }
 
-  // Shows the modal and sets the has_been_seen flag to true.
+  // Shows the modal and sets the showAtStart and hasSeen flags.
   public showModal(): void {
     this.isVisible = true;
+    this.localStorage.putBoolean(SHOW_AT_START_PREF_KEY, this.showAtStartPref);
     this.sessionStorage.putBoolean(this.chefSessionService.userWelcomeModalSeenKey(), true);
   }
 
