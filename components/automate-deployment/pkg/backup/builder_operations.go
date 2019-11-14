@@ -149,7 +149,7 @@ func (d *BuilderMinioDumpOperation) String() string {
 	return d.Name
 }
 
-// applyBatch falls f with sub-slices of the src slice. The function f
+// applyBatch calls f with sub-slices of the src slice. The function f
 // should know what it's doing if it modifies the elements of the
 // passed slice.
 func applyBatch(src []string, batchSize int, f func([]string) error) error {
