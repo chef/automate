@@ -95,6 +95,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
         });
       });
 
+    // handle team creation success response
     this.store.pipe(
       select(createStatus),
       takeUntil(this.isDestroyed),
@@ -106,6 +107,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
         }
       });
 
+    // handle team creation failure response
     combineLatest([
       this.store.select(createStatus),
       this.store.select(createError)

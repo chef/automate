@@ -111,6 +111,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
       this.mapOfUsersToFilter = userArrayToHash(membershipUsers);
     });
 
+    // handle user addition success response
     this.store.pipe(
       select(addUsersStatus),
       takeUntil(this.isDestroyed),
@@ -123,6 +124,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
         }
     });
 
+    // handle user addition failure response
     combineLatest([
       this.store.select(addUsersStatus),
       this.store.select(addTeamUsersStatusError)

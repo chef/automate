@@ -203,6 +203,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         this.users = ChefSorters.naturalSort(users, ['name', 'id']);
       });
 
+    // handle team update response
     this.store.pipe(
       select(updateStatus),
       takeUntil(this.isDestroyed),
