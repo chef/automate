@@ -10,6 +10,7 @@ import (
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/components/event-feed-service/pkg/server"
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/teambition/rrule-go"
@@ -182,8 +183,27 @@ func TestPurgeServer(t *testing.T) {
 				})
 				require.NoError(t, err)
 
+				startTime := time.Now()
 				_, err = testSuite.purgeClient.Run(context.Background(), &data_lifecycle.RunRequest{})
 				require.NoError(t, err)
+
+				// wait until the purge job is done
+				ticker := time.Tick(1 * time.Second)
+				select {
+				case <-ticker:
+					status, err := testSuite.purgeClient.Show(context.Background(), &data_lifecycle.ShowRequest{})
+					if err == nil {
+						lastStart, err := ptypes.Timestamp(status.LastStart)
+						lastEnd, err2 := ptypes.Timestamp(status.LastEnd)
+
+						if err == nil && err2 == nil && lastStart.After(startTime) && lastEnd.After(startTime) {
+							break
+						}
+					}
+				case <-time.After(10 * time.Second):
+					t.Log("timed out waiting for purge to complete")
+					t.Fail()
+				}
 
 				testSuite.RefreshIndices(persistence.IndexNameFeeds)
 
