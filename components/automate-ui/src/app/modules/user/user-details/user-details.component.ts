@@ -30,12 +30,13 @@ import { Regex } from 'app/helpers/auth/regex';
 })
 export class UserDetailsComponent implements OnInit, OnDestroy {
   public isAdminView = false;
-  public editMode = false;
   public user: User;
   public modalVisible = false;
   public editForm: FormGroup;
   public passwordForm: FormGroup;
   private isDestroyed = new Subject<boolean>();
+  private deletingUser = false;
+  public updatingUser = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -67,25 +68,42 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         this.user = { ...user };
       });
 
-    this.route.data.subscribe((data: { isNonAdmin: boolean }) => {
-      this.isAdminView = !data.isNonAdmin;
+    this.route.data.pipe(
+      takeUntil(this.isDestroyed))
+      .subscribe((data: { isNonAdmin: boolean }) => {
+        this.isAdminView = !data.isNonAdmin;
 
-      if (this.isAdminView) {
-        this.layoutFacade.showSettingsSidebar();
-      } else {
-        this.layoutFacade.showUserProfileSidebar();
-      }
+        if (this.isAdminView) {
+          this.layoutFacade.showSettingsSidebar();
+        } else {
+          this.layoutFacade.showUserProfileSidebar();
+        }
 
-      // Update the forms once this info has come in
-      this.createForms(this.fb);
-      this.resetForms();
-    });
+        // Update the forms once this info has come in
+        this.createForms(this.fb);
+        this.resetForms();
+      });
 
     this.store.select(updateStatus).pipe(
       takeUntil(this.isDestroyed),
-      filter(status => status === EntityStatus.loadingSuccess))
-      // same status is used for updating password or full name, so we just reset both
-      .subscribe(() => this.resetForms());
+      filter(status => this.updatingUser && !loading(status)))
+      .subscribe(() => {
+        this.updatingUser = false;
+        // same status is used for updating password or full name, so we just reset both
+        this.resetForms();
+      });
+
+    this.store.pipe(
+      select(deleteStatus),
+      takeUntil(this.isDestroyed),
+      filter(status => this.deletingUser && !loading(status)))
+      .subscribe((status) => {
+        this.deletingUser = false;
+        this.closeDeleteConfirmationModal();
+        if (status === EntityStatus.loadingSuccess) {
+          this.router.navigate(['/settings', 'users']);
+        }
+    });
   }
 
   ngOnDestroy(): void {
@@ -111,7 +129,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   private resetForms(): void {
     this.editForm.reset();
-    this.editMode = false;
+    this.updatingUser = false;
     this.passwordForm.reset();
   }
 
@@ -161,25 +179,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   public deleteUser(): void {
+    this.deletingUser = true;
     this.store.dispatch(new DeleteUser(this.user));
-
-    const pendingDelete = new Subject<boolean>();
-    this.store.pipe(
-      select(deleteStatus),
-      filter(identity),
-      takeUntil(pendingDelete))
-      .subscribe((state) => {
-      if (!loading(state)) {
-          pendingDelete.next(true);
-          pendingDelete.complete();
-          this.closeDeleteConfirmationModal();
-          this.router.navigate(['/settings', 'users']);
-        }
-      });
   }
 
-  public setEditMode(status: boolean): void {
+  public setUpdatingUser(status: boolean): void {
     this.editForm.patchValue({fullName: this.user.name});
-    this.editMode = status;
+    this.updatingUser = status;
   }
 }
