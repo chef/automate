@@ -70,8 +70,7 @@ if (Cypress.env('SKIP_SSO')) {
           cy.get('[type=submit]').click().then(() => {
             cy.get('[data-cy=welcome-title]').should('exist');
             cy.url().should('include', '/event-feed'); // default landing page
-            cy.contains('Local Administrator'); // current user name
-            // cy.screenshot()
+            cy.contains('Local Administrator').should('exist'); // current user name
           });
         });
       });
@@ -102,20 +101,6 @@ if (Cypress.env('SKIP_SSO')) {
         });
       });
 
-      it('can reopen welcome modal from profile menu', () => {
-        cy.get('[data-cy=user-profile-button]').click().then(() => {
-          cy.get('[data-cy=welcome-modal-button]').click().then(() => {
-            cy.get('[data-cy=welcome-title]').should('exist');
-          });
-        });
-      });
-
-      it('can close welcome modal with "X" button', () => {
-        cy.get('[data-cy=close-x]').click().then(() => {
-          cy.get('[data-cy=welcome-title]').should('not.exist');
-        });
-      });
-
       it('can log out and return to SSO page', () => {
         cy.get('[data-cy=user-profile-button]').click().then(() => {
           cy.get('[data-cy=sign-out-button]').click().then(() => {
@@ -126,5 +111,195 @@ if (Cypress.env('SKIP_SSO')) {
         });
       });
     });
+
+    describe('welcome', () => {
+      it('displays welcome modal after first login', () => {
+        // ensure browser is logging in for the first time
+        clearAllStorage();
+
+        // log in
+        login();
+
+        // verify welcome modal is visible
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+      });
+
+      it('does not display welcome modal again after page refresh', () => {
+        // ensure browser is logging in for the first time and log in
+        clearAllStorage();
+        login();
+
+        // verify welcome modal is visible
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+
+        // close modal and refresh page
+        closeModal();
+        cy.reload();
+        cy.get('h1.page-title').should('be.visible');
+
+        // verify welcome modal is not visible
+        cy.get('[data-cy=welcome-title]').should('not.exist');
+      });
+
+      it('does not display welcome modal again after subsequent logins', () => {
+        // ensure browser is logging in for the first time and log in
+        clearAllStorage();
+        login();
+
+        // verify welcome modal is visible
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+
+        // close modal, logout, and log back in
+        closeModal();
+        logout();
+        login();
+
+        // verify welcome modal is not visible
+        cy.get('[data-cy=welcome-title]').should('not.exist');
+      });
+
+      it('provides option to always display welcome modal after login', () => {
+        // ensure logged in and welcome modal is visible
+        cy.clearLocalStorage();
+        login();
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+
+        // verify checkbox is visible and unchecked by default
+        cy.get('.show-again-checkbox').should('be.visible');
+        cy.get('.show-again-checkbox').should('have.attr', 'aria-checked', 'false');
+
+        // check the checkbox
+        cy.get('.show-again-checkbox').click();
+        cy.get('.show-again-checkbox').should('have.attr', 'aria-checked', 'true');
+
+        // close modal, logout, and log back in
+        closeModal();
+        logout();
+        login();
+
+        // verify welcome modal is always visible after login
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+        cy.get('.show-again-checkbox').should('have.attr', 'aria-checked', 'true');
+
+        // uncheck the checkbox
+        cy.get('.show-again-checkbox').click();
+        cy.get('.show-again-checkbox').should('have.attr', 'aria-checked', 'false');
+
+        // close modal, logout, and log back in
+        closeModal();
+        logout();
+        login();
+
+        // verify welcome modal is no longer always visible after login
+        cy.get('[data-cy=welcome-title]').should('not.be.visible');
+      });
+
+      it('provides option to toggle app telemetry', () => {
+        // ensure logged in and welcome modal is visible
+        clearAllStorage();
+        login();
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+
+        // verify checkbox is visible and checked by default
+        cy.get('app-telemetry-checkbox chef-checkbox').should('be.visible');
+        cy.get('app-telemetry-checkbox chef-checkbox').should('have.attr', 'aria-checked', 'true');
+      });
+
+      it('displays link to privacy policy', () => {
+        // ensure logged in and welcome modal is visible
+        clearAllStorage();
+        login();
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+
+        // verify link to privacy policy is visible
+        cy.contains('Privacy Policy').should('be.visible');
+        cy.contains('Privacy Policy').should('have.attr', 'href', 'https://www.chef.io/privacy-policy/');
+        cy.contains('Privacy Policy').should('have.attr', 'target', '_blank');
+      });
+
+      it('can be closed with "Close" button', () => {
+        // ensure logged in and welcome modal is visible
+        clearAllStorage();
+        login();
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+
+        // click button
+        cy.get('[data-cy=close-welcome]').click();
+
+        // verify welcome modal is not visible
+        cy.get('[data-cy=welcome-title]').should('not.be.visible');
+      });
+
+      it('can be closed with "X" button', () => {
+        // ensure logged in and welcome modal is visible
+        clearAllStorage()
+        login();
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+
+        // click button
+        cy.get('[data-cy=close-x]').click();
+
+        // verify welcome modal is not visible
+        cy.get('[data-cy=welcome-title]').should('not.be.visible');
+      });
+
+      it('can be closed by clicking outside the modal container', () => {
+        // ensure logged in and welcome modal is visible
+        clearAllStorage()
+        login();
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+
+        // click outside modal
+        cy.get('app-welcome-modal .modal-overlay').click({ force: true });
+
+        // verify welcome modal is not visible
+        cy.get('[data-cy=welcome-title]').should('not.be.visible');
+      });
+
+      it('can be reopened from profile menu', () => {
+        // ensure logged in and welcome modal is not visible
+        clearAllStorage();
+        login();
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+        closeModal();
+        cy.get('[data-cy=welcome-title]').should('not.be.visible');
+
+        // open profile menu and click welcome button
+        cy.get('[data-cy=user-profile-button]').click();
+        cy.get('[data-cy=welcome-modal-button]').click();
+
+        // verify welcome modal is visible
+        cy.get('[data-cy=welcome-title]').should('be.visible');
+      });
+    });
   });
+}
+
+function clearAllStorage() {
+  cy.clearCookies();
+  cy.clearLocalStorage();
+}
+
+function login() {
+  cy.visit('/event-feed');
+
+  cy.contains('Sign in as a local user').click({ force: true });
+
+  cy.get('#login').type('admin');
+  cy.get('#password').type('chefautomate');
+  cy.get('[type=submit]').click();
+
+  cy.url().should('include', '/event-feed');
+  cy.get('h1.page-title').should('be.visible');
+  cy.get('app-welcome-modal').should('exist');
+  cy.contains('Local Administrator').should('exist');
+}
+
+function logout() {
+  cy.get('[data-cy=user-profile-button]').click();
+  cy.get('[data-cy=sign-out-button]').click();
+}
+
+function closeModal() {
+  cy.get('[data-cy=close-welcome]').click();
 }
