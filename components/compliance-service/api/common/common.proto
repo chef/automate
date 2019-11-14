@@ -6,8 +6,9 @@ option go_package = "github.com/chef/automate/components/compliance-service/api/
 message Filter {
 	// Field to filter on.
 	string key = 20;
-	// Include matches for this filter. `true` (default) includes only nodes that match this filter. 
-	// `false` excludes any nodes that match this filter.
+	// Include matches for this filter.(boolean)
+	// `true` (default) *includes* all nodes that match this filter. 
+	// `false` *excludes* all nodes that match this filter.
 	bool exclude = 22;
 	// Field values to filter on.
 	repeated string values = 23;

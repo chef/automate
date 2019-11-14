@@ -136,12 +136,12 @@ service NodesService {
 	};
 
 	/*
-	List nodes
+	List and filter nodes
 
 	Makes a list of nodes. 
 	Supports filtering, pagination, and sorting.
-	Adding a filter makes a list of nodes that meet the filter criteria.
-	Supported filters are: 
+	Adding a filter narrows the list of nodes only those that match the filter or filters.
+	Supported filters: 
 	account_id, last_contact, manager_id, manager_type, name, platform_name,
 	platform_release, region, source_id, state, statechange_timerange, status,
 	last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
@@ -176,10 +176,10 @@ service NodesService {
 	};
 
 	/*
-	Rerun a node
+	Node status
 
-	Runs an `inspec detect` job on the node and updates the status to reflect
-	the status of the node accordingly (reachable or unreachable).
+	Use this to run an `inspec detect` job on the node, which updates the status to reflect
+	that the node is reachable or unreachable.
 	*/
 	rpc Rerun(Id) returns (RerunResponse) {
 		option (google.api.http) = {
@@ -196,7 +196,7 @@ service NodesService {
 	};
 
 	/*
-	Bulk delete
+	Bulk delete nodes
 
 	Deletes a set of nodes that match a filter. 
 	Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
@@ -277,7 +277,7 @@ message Ids {
 message RerunResponse {}
 
 message Query {
-	// Filters to be applied to the query.
+	// Use filters to limit the set of nodes to delete.
 	repeated chef.automate.domain.compliance.api.common.Filter filters = 20;
 	// Return the results in ascending or descending order.
 	enum OrderType {
@@ -388,13 +388,13 @@ message Nodes {
 
 // Summary details from the most recent scan job that executed for the node.
 message ResultsRow {
-	// Node ID for the result.
+	// Unique node ID.
 	string node_id = 1;
-	// Report ID for the result.
+	// Unique report ID.
 	string report_id = 2;
 	// Status of the report.
 	string status = 3;
-	// Error message on failed attempts to reach a node.
+	// Error message returned after several failed attempts to contact a node.
 	string result = 4;
 	// Job ID from the report.
 	string job_id = 5;
