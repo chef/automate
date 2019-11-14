@@ -9,6 +9,7 @@ import (
 	"os"
 
 	"github.com/blang/semver"
+	"github.com/buger/jsonparser"
 	"github.com/lib/pq"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/codes"
@@ -359,58 +360,78 @@ func (s *Store) Delete(namespace string, name string, version string) error {
 func (s *Store) parseList(rows *sql.Rows) ([]inspec.Metadata, error) {
 	logrus.Info("Parse profile list from database")
 	entries := make([]inspec.Metadata, 0)
-	var (
-		sha256          string
-		name            string
-		title           string
-		maintainer      string
-		copyright       string
-		copyright_email string
-		license         string
-		summary         string
-		version         string
-		supports        []byte
-		dependencies    []byte
-	)
+
+	paths := [][]string{
+		[]string{"name"},
+		[]string{"title"},
+		[]string{"maintainer"},
+		[]string{"copyright"},
+		[]string{"copyright_email"},
+		[]string{"license"},
+		[]string{"summary"},
+		[]string{"version"},
+		[]string{"depends"},
+		[]string{"supports"},
+	}
+
 	for rows.Next() {
-		logrus.Info("iterate over row")
-		err := rows.Scan(&sha256, &name, &title, &maintainer, &copyright, &copyright_email, &license, &summary, &version, &supports, &dependencies)
+		//logrus.Info("iterate over row")
+		var (
+			sha256       string
+			metadataBlob []byte
+		)
+		err := rows.Scan(&sha256, &metadataBlob)
 		if err != nil {
 			logrus.Error(err)
 			return nil, err
 		}
 
-		logrus.Info("parse metadata")
+		//logrus.Info("parse metadata")
 		metadata := inspec.Metadata{}
 		metadata.Sha256 = sha256
-		metadata.Name = name
-		metadata.Title = title
-		metadata.Maintainer = maintainer
-		metadata.Copyright = copyright
-		metadata.Copyright_Email = copyright_email
-		metadata.License = license
-		metadata.Summary = summary
-		metadata.Version = version
 
-		logrus.Infof("Dependencies: %d", len(dependencies))
-		if len(dependencies) > 0 {
-			deps := []inspec.Dependency{}
-			err = json.Unmarshal(dependencies, &deps)
-			if err != nil {
-				return nil, err
+		jsonparser.EachKey(metadataBlob, func(idx int, value []byte, vt jsonparser.ValueType, err error) {
+			switch idx {
+			case 0:
+				metadata.Name = string(value)
+			case 1:
+				metadata.Title = string(value)
+			case 2:
+				metadata.Maintainer = string(value)
+			case 3:
+				metadata.Copyright = string(value)
+			case 4:
+				metadata.Copyright_Email = string(value)
+			case 5:
+				metadata.License = string(value)
+			case 6:
+				metadata.Summary = string(value)
+			case 7:
+				metadata.Version = string(value)
+			case 8:
+				//logrus.Infof("Dependencies: %+v %d", string(value), len(value))
+				if len(value) > 0 {
+					deps := []inspec.Dependency{}
+					err = json.Unmarshal(value, &deps)
+					if err != nil {
+						//lol we're fucked I guess
+						//return nil, err
+					}
+					metadata.Dependencies = deps
+				}
+			case 9:
+				//logrus.Infof("Supports: %+v %d", string(value), len(value))
+				if len(value) > 2 {
+					sups := []map[string]string{}
+					err = json.Unmarshal(value, &sups)
+					if err != nil {
+						//lol we're fucked I guess
+						//return nil, err
+					}
+					metadata.Supports = sups
+				}
 			}
-			metadata.Dependencies = deps
-		}
-
-		logrus.Infof("Supports: %d", len(supports))
-		if len(supports) > 0 {
-			sups := []map[string]string{}
-			err = json.Unmarshal(supports, &sups)
-			if err != nil {
-				return nil, err
-			}
-			metadata.Supports = sups
-		}
+		}, paths...)
 
 		entries = append(entries, metadata)
 	}
@@ -434,12 +455,10 @@ func (s *Store) ListProfilesMetadata(namespace string, name string, sort string,
 	var rows *sql.Rows
 	var err error
 
-	logrus.Info("Before SQL query")
-
 	switch {
 	case len(namespace) == 0 && len(name) == 0:
 		query := fmt.Sprintf(`
-			SELECT sha256, info->>'name' as name, info->>'title' as title, info->>'maintainer' as maintainer, info->>'copyright' as copyright, info->>'copyright_email' as copyright_email, info->>'license' as license, info->>'summary' as summary, info->>'version' as version, info->>'supports' as supports, info->>'depends' as depends
+			SELECT sha256, info
 			FROM store_profiles WHERE sha256 IN
 			(SELECT sha256 FROM store_market)
 			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
@@ -448,7 +467,7 @@ func (s *Store) ListProfilesMetadata(namespace string, name string, sort string,
 		rows, err = s.DB.Query(query)
 	case len(namespace) == 0:
 		query := fmt.Sprintf(`
-			SELECT sha256, info->>'name' as name, info->>'title' as title, info->>'maintainer' as maintainer, info->>'copyright' as copyright, info->>'copyright_email' as copyright_email, info->>'license' as license, info->>'summary' as summary, info->>'version' as version, info->>'supports' as supports, info->>'depends' as depends
+			SELECT sha256, info
 			FROM store_profiles WHERE sha256 IN
 			(SELECT sha256 FROM store_market)
 			AND info->>'name' = $1
@@ -458,7 +477,7 @@ func (s *Store) ListProfilesMetadata(namespace string, name string, sort string,
 		rows, err = s.DB.Query(query, name)
 	case len(name) == 0:
 		query := fmt.Sprintf(`
-			SELECT sha256, info->>'name' as name, info->>'title' as title, info->>'maintainer' as maintainer, info->>'copyright' as copyright, info->>'copyright_email' as copyright_email, info->>'license' as license, info->>'summary' as summary, info->>'version' as version, info->>'supports' as supports, info->>'depends' as depends
+			SELECT sha256, info
 			FROM store_profiles WHERE
 			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
 			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
@@ -467,7 +486,7 @@ func (s *Store) ListProfilesMetadata(namespace string, name string, sort string,
 		rows, err = s.DB.Query(query, namespace)
 	default:
 		query := fmt.Sprintf(`
-			SELECT sha256, info->>'name' as name, info->>'title' as title, info->>'maintainer' as maintainer, info->>'copyright' as copyright, info->>'copyright_email' as copyright_email, info->>'license' as license, info->>'summary' as summary, info->>'version' as version, info->>'supports' as supports, info->>'depends' as depends
+			SELECT sha256, info
 			FROM store_profiles WHERE
 			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
 			AND info->>'name' = $2
@@ -483,7 +502,6 @@ func (s *Store) ListProfilesMetadata(namespace string, name string, sort string,
 		return nil, err
 	}
 
-	logrus.Info("After SQL query")
 	return s.parseList(rows)
 }
 
