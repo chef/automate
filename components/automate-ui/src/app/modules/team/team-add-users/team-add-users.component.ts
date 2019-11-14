@@ -43,7 +43,6 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   public isIAMv2$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
   public addingUsers = false;
-  public addUsersSuccessful = false;
   private usersToAdd: { [id: string]: User } = {};
   public showSecondary = false;
   public addUsersFailed = '';
@@ -118,8 +117,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
       filter(state => this.addingUsers && !pending(state)))
       .subscribe((state) => {
         this.addingUsers = false;
-        this.addUsersSuccessful = (state === EntityStatus.loadingSuccess);
-        if (this.addUsersSuccessful) {
+        if (state === EntityStatus.loadingSuccess) {
           this.closePage();
         }
     });
@@ -130,7 +128,9 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
       this.store.select(addTeamUsersStatusError)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      filter(([state, error]) => {
+        return this.addingUsers && state === EntityStatus.loadingFailure && !isNil(error);
+      }))
       .subscribe(([_, error]) => {
         if (error.message === undefined) {
           this.addUsersFailed = 'An error occurred while attempting ' +
