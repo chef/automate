@@ -797,11 +797,11 @@ func (m *Profile) GetControlStats() []*ControlStats {
 }
 
 type ProfileList struct {
-	// Name of the profile.
+	// The profile name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// SHA ID of the profile.
+	// The profile SHA ID.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	// Total number of failed nodes that executed the profile.
+	// Total number of times this profile failed.
 	Failures int32 `protobuf:"varint,3,opt,name=failures,proto3" json:"failures,omitempty"`
 	// Total number of failed nodes with major control failures that executed the profile.
 	Majors int32 `protobuf:"varint,4,opt,name=majors,proto3" json:"majors,omitempty"`

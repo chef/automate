@@ -286,7 +286,7 @@ message ProfileList {
 	string name = 1;
 	// The profile SHA ID.
 	string id = 2;
-	// Total number of failed nodes that executed the profile.
+	// Total number of times this profile failed.
 	int32 failures = 3;
 	// Total number of failed nodes with major control failures that executed the profile.
 	int32 majors = 4;

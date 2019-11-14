@@ -332,16 +332,16 @@ func init() {
       "properties": {
         "name": {
           "type": "string",
-          "description": "Name of the profile."
+          "description": "The profile name."
         },
         "id": {
           "type": "string",
-          "description": "SHA ID of the profile."
+          "description": "The profile SHA ID."
         },
         "failures": {
           "type": "integer",
           "format": "int32",
-          "description": "Total number of failed nodes that executed the profile."
+          "description": "Total number of times this profile failed."
         },
         "majors": {
           "type": "integer",

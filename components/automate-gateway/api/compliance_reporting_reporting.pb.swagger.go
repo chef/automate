@@ -17,7 +17,7 @@ func init() {
     "/compliance/reporting/controls": {
       "post": {
         "summary": "List controls",
-        "description": "Lists controls from the last run, with the option of applying filters. \nSupports filtering, but not pagination or sorting.\nLimited to 100 results by default.",
+        "description": "Lists controls from the last run, with optional filtering. \nSupports filtering, but not pagination or sorting.\nLimited to 100 results by default.",
         "operationId": "ListControlItems",
         "responses": {
           "200": {
@@ -72,7 +72,7 @@ func init() {
     "/compliance/reporting/nodes/search": {
       "post": {
         "summary": "List nodes",
-        "description": "List all nodes optionally using filters. Supports pagination, filtering, and sorting.\nLimited to 10k results.\n\n| Sort parameter | Sort value |\n| --- | --- |\n| environment | environment.lower |\n| latest_report.controls.failed.critical | controls_sums.failed.critical |\n| latest_report.controls.failed.total | controls_sums.failed.total |\n| latest_report.end_time (default) | end_time |\n| latest_report.status | status |\n| name | node_name.lower |\n| platform | platform.full |\n| status | status |\n\nExample: \n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n],\n\"page\":1,\"per_page\":100,\n\"sort\":\"environment\",\"order\":\"ASC\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "List all nodes, with optional filtering, pagination, and sorting.\nLimited to 10k results.\n\n| Sort parameter | Sort value |\n| --- | --- |\n| environment | environment.lower |\n| latest_report.controls.failed.critical | controls_sums.failed.critical |\n| latest_report.controls.failed.total | controls_sums.failed.total |\n| latest_report.end_time (default) | end_time |\n| latest_report.status | status |\n| name | node_name.lower |\n| platform | platform.full |\n| status | status |\n\nExample: \n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n],\n\"page\":1,\"per_page\":100,\n\"sort\":\"environment\",\"order\":\"ASC\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListNodes",
         "responses": {
           "200": {
@@ -100,7 +100,7 @@ func init() {
     "/compliance/reporting/profiles": {
       "post": {
         "summary": "List profiles",
-        "description": "List all profiles in use, with the option of applying filters. \nSupports pagination, filtering, and sorting.\nValid sort fields: name, title",
+        "description": "List all profiles in use, with optional filtering. \nSupports pagination, filtering, and sorting.\nValid sort fields: name, title",
         "operationId": "ListProfiles",
         "responses": {
           "200": {
@@ -128,7 +128,7 @@ func init() {
     "/compliance/reporting/report-ids": {
       "post": {
         "summary": "List report IDs",
-        "description": "List all IDs for the latest report of each node optionally using filters. \nSupports filtering, but not pagination or sorting.\nIncluding more than one value for ` + "`" + `control` + "`" + `, ` + "`" + `profile_id` + "`" + `, or ` + "`" + `profile_name` + "`" + ` is not allowed.\nIncluding values for both ` + "`" + `profile_id` + "`" + ` and ` + "`" + `profile_name` + "`" + ` in one request is not allowed.\nNot limited to 10k results.",
+        "description": "List all IDs for the latest report for each node, with optional filtering. \nSupports filtering, but not pagination or sorting.\nIncluding more than one value for ` + "`" + `control` + "`" + `, ` + "`" + `profile_id` + "`" + `, or ` + "`" + `profile_name` + "`" + ` is not allowed.\nIncluding values for both ` + "`" + `profile_id` + "`" + ` and ` + "`" + `profile_name` + "`" + ` in one request is not allowed.\nNot limited to 10k results.",
         "operationId": "ListReportIds",
         "responses": {
           "200": {
@@ -348,11 +348,11 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "The unique ID of this control."
+          "description": "The control's unique ID."
         },
         "title": {
           "type": "string",
-          "description": "The compact description of the control."
+          "description": "The control's compact description."
         },
         "profile": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMin",
@@ -561,7 +561,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "The ID of the latest report."
+          "description": "The latest report ID."
         },
         "end_time": {
           "type": "string",
@@ -577,7 +577,7 @@ func init() {
           "description": "Intentionally blank."
         }
       },
-      "description": "A summary of the information contained in the latest report for this node."
+      "description": "A summary of the latest report for this node."
     },
     "chef.automate.api.compliance.reporting.v1.ListFilter": {
       "type": "object",
@@ -600,7 +600,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "The ID of this node."
+          "description": "The node ID."
         },
         "name": {
           "type": "string",
@@ -828,11 +828,11 @@ func init() {
         },
         "version": {
           "type": "string",
-          "description": "The version of the profile."
+          "description": "The profile version."
         },
         "id": {
           "type": "string",
-          "description": "The unique ID of the profile."
+          "description": "The profile unique ID."
         },
         "status": {
           "type": "string",
@@ -853,15 +853,15 @@ func init() {
         },
         "title": {
           "type": "string",
-          "description": "The title of the profile."
+          "description": "The profile title."
         },
         "id": {
           "type": "string",
-          "description": "The ID of the profile."
+          "description": "The profile ID."
         },
         "version": {
           "type": "string",
-          "description": "The version of the profile."
+          "description": "The profile version."
         },
         "status": {
           "type": "string",
@@ -954,11 +954,11 @@ func init() {
         },
         "node_id": {
           "type": "string",
-          "description": "The ID of the node making the report."
+          "description": "The reporting node's unique ID."
         },
         "node_name": {
           "type": "string",
-          "description": "The name of the node making the report."
+          "description": "The reporting node name."
         },
         "end_time": {
           "type": "string",
@@ -998,11 +998,11 @@ func init() {
         },
         "job_id": {
           "type": "string",
-          "description": "The ID of the compliance scan job associated with the report."
+          "description": "The compliance scan job ID associated with the report."
         },
         "ipaddress": {
           "type": "string",
-          "description": "The IP address of the node making the report."
+          "description": "The reporting node IP address."
         },
         "fqdn": {
           "type": "string",
