@@ -1,16 +1,18 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
-
-	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/data-feed-service/config"
 	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/pkg/errors"
+
+	secrets "github.com/chef/automate/api/external/secrets"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -47,14 +49,15 @@ func (d *DataFeedNotifierTask) Run(ctx context.Context, task cereal.Task) (inter
 	}
 	log.Debugf("DataFeedNotifierTask.Run %v", params)
 	datafeedMessages := params.DataFeedMessages
-	data := make([]interface{}, 0, len(datafeedMessages))
-	// build the payload
-	for _, value := range datafeedMessages {
-		data = append(data, value)
-	}
-
 	if len(datafeedMessages) == 0 {
 		return nil, nil
+	}
+
+	var buffer bytes.Buffer
+	for _, message := range datafeedMessages {
+		data, _ := json.Marshal(message)
+		buffer.Write(data)
+		buffer.WriteString("\n")
 	}
 
 	destinations, err := d.db.ListDBDestinations()
@@ -73,7 +76,7 @@ func (d *DataFeedNotifierTask) Run(ctx context.Context, task cereal.Task) (inter
 			// TODO error handling - need some form of report in automate that indicates when data was sent and if it was successful
 		} else {
 			// build and send notification for this rule
-			notification := datafeedNotification{username: username, password: password, url: destinations[destination].URL, data: data}
+			notification := datafeedNotification{username: username, password: password, url: destinations[destination].URL, data: buffer}
 
 			client := NewDataClient()
 			err = send(client, notification)

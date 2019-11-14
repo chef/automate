@@ -30,7 +30,7 @@ type datafeedNotification struct {
 	username string
 	password string
 	url      string
-	data     []interface{}
+	data     bytes.Buffer
 }
 
 type DataClient struct {
@@ -191,16 +191,10 @@ func send(sender NotificationSender, notification datafeedNotification) error {
 
 func (client DataClient) sendNotification(notification datafeedNotification) error {
 
-	messageBytes, err := json.Marshal(notification.data)
-	if err != nil {
-		log.Errorf("Error creating json bytes %v", err)
-		return err
-	}
-	log.Debugf("sendNotification bytes length %v", len(messageBytes))
-
+	log.Debugf("sendNotification bytes length %v", notification.data.Len())
 	var contentBuffer bytes.Buffer
 	zip := gzip.NewWriter(&contentBuffer)
-	_, err = zip.Write(messageBytes)
+	_, err := zip.Write(notification.data.Bytes())
 	if err != nil {
 		return err
 	}
@@ -232,7 +226,7 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 	}
 	err = response.Body.Close()
 	if err != nil {
-		log.Warnf("Error clsoing response body %v", err)
+		log.Warnf("Error closing response body %v", err)
 	}
 	return nil
 }
