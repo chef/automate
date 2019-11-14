@@ -67,18 +67,19 @@
           </app-authorized>
           <app-authorized not [allOf]="['/iam/v2beta/projects', 'post']">
             <div class="empty-case-container">
-              <p>It looks like no one has created any projects yet and you<br/>
-                don't have permission to create them.<br/><br/>
+              <p>It looks like no one has created any projects yet or you<br/>
+                don't have permission to view them.<br/><br/>
                 If this is a mistake, then reach out to your administrator.
               </p>
             </div>
           </app-authorized>
         </ng-container>
       </section>
-  
+
       <app-create-object-modal
         [visible]="createModalVisible"
         [showProjectsDropdown]="false"
+        [createProjectModal]="true"
         [creating]="creatingProject"
         [conflictErrorEvent]="conflictErrorEvent"
         objectNoun="project"
@@ -86,7 +87,7 @@
         (close)="closeCreateModal()"
         (createClicked)="createProject()">
       </app-create-object-modal>
-  
+
       <app-delete-object-modal
         [visible]="deleteModalVisible"
         objectNoun="project"
@@ -96,13 +97,13 @@
         (deleteClicked)="deleteProject()"
         objectAction="Delete">
       </app-delete-object-modal>
-  
+
       <app-confirm-apply-start-modal
         [visible]="confirmApplyStartModalVisible"
         (confirm)="confirmApplyStart()"
         (cancel)="cancelApplyStart()">
       </app-confirm-apply-start-modal>
-  
+
       <app-confirm-apply-stop-modal
         [visible]="confirmApplyStopModalVisible"
         [applyRulesStatus]="projects.applyRulesStatus$ | async"
