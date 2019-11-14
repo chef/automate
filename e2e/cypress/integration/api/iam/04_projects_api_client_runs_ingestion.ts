@@ -2,101 +2,221 @@ import { describeIfIAMV2p1 } from '../../constants';
 
 describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
   const cypressPrefix = 'test-projects-api-client-runs';
-  const project9 = {
-    id: `${cypressPrefix}-project9-${Cypress.moment().format('MMDDYYhhmm')}`,
-    name: 'project 9'
-  };
+
+  const projectsWithRule = [
+    // This test is commented out because there is a current limit of 6 projects allowed
+    // {
+    //   project: {
+    //     id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
+    //     name: 'project org'
+    //   },
+    //   rule: {
+    //     id: 'rule-org',
+    //     name: 'rule CHEF_ORGANIZATION',
+    //     type: 'NODE',
+    //     project_id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
+    //     conditions: [
+    //       {
+    //         attribute: 'CHEF_ORGANIZATION',
+    //         operator: 'EQUALS',
+    //         values: ['75th Rangers']
+    //       }
+    //     ]
+    //   }
+    // },
+    {
+      project: {
+        id: `${cypressPrefix}-project-chef-server-${Cypress.moment().format('MMDDYYhhmm')}`,
+        name: 'project chef server'
+      },
+      rule: {
+        id: 'rule-chef-server',
+        name: 'rule CHEF_SERVER',
+        type: 'NODE',
+        project_id: `${cypressPrefix}-project-chef-server-${Cypress.moment().format('MMDDYYhhmm')}`,
+        conditions: [
+          {
+            attribute: 'CHEF_SERVER',
+            operator: 'EQUALS',
+            values: ['example.org']
+          }
+        ]
+      }
+    },
+    {
+      project: {
+        id: `${cypressPrefix}-project-environment-${Cypress.moment().format('MMDDYYhhmm')}`,
+        name: 'project environment'
+      },
+      rule: {
+        id: 'rule-environment',
+        name: 'rule ENVIRONMENT',
+        type: 'NODE',
+        project_id: `${cypressPrefix}-project-environment-${Cypress.moment().format('MMDDYYhhmm')}`,
+        conditions: [
+          {
+            attribute: 'ENVIRONMENT',
+            operator: 'EQUALS',
+            values: ['arctic']
+          }
+        ]
+      }
+    },
+    {
+      project: {
+        id: `${cypressPrefix}-project-policy-group-${Cypress.moment().format('MMDDYYhhmm')}`,
+        name: 'project policy group'
+      },
+      rule: {
+        id: 'rule-policy-group',
+        name: 'rule CHEF_POLICY_GROUP',
+        type: 'NODE',
+        project_id:
+        `${cypressPrefix}-project-policy-group-${Cypress.moment().format('MMDDYYhhmm')}`,
+        conditions: [
+          {
+            attribute: 'CHEF_POLICY_GROUP',
+            operator: 'EQUALS',
+            values: ['red_ring']
+          }
+        ]
+      }
+    },
+    {
+      project: {
+        id: `${cypressPrefix}-project-policy-name-${Cypress.moment().format('MMDDYYhhmm')}`,
+        name: 'project policy name'
+      },
+      rule: {
+        id: 'rule-policy-name',
+        name: 'rule CHEF_POLICY_NAME',
+        type: 'NODE',
+        project_id: `${cypressPrefix}-project-policy-name-${Cypress.moment().format('MMDDYYhhmm')}`,
+        conditions: [
+          {
+            attribute: 'CHEF_POLICY_NAME',
+            operator: 'EQUALS',
+            values: ['fire']
+          }
+        ]
+      }
+    },
+    {
+      project: {
+        id: `${cypressPrefix}-project-role-${Cypress.moment().format('MMDDYYhhmm')}`,
+        name: 'project role'
+      },
+      rule: {
+        id: 'rule-role',
+        name: 'rule CHEF_ROLE',
+        type: 'NODE',
+        project_id: `${cypressPrefix}-project-role-${Cypress.moment().format('MMDDYYhhmm')}`,
+        conditions: [
+          {
+            attribute: 'CHEF_ROLE',
+            operator: 'EQUALS',
+            values: ['backend']
+          }
+        ]
+      }
+    },
+    {
+      project: {
+        id: `${cypressPrefix}-project-tag-${Cypress.moment().format('MMDDYYhhmm')}`,
+        name: 'project tag'
+      },
+      rule: {
+        id: 'rule-tag',
+        name: 'rule CHEF_TAG',
+        type: 'NODE',
+        project_id: `${cypressPrefix}-project-tag-${Cypress.moment().format('MMDDYYhhmm')}`,
+        conditions: [
+          {
+            attribute: 'CHEF_TAG',
+            operator: 'EQUALS',
+            values: ['v3']
+          }
+        ]
+      }
+    }
+  ];
 
   before(() => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
-    // create the project
+    // create the projects with one rule
+    projectsWithRule.forEach(projectWithRule => {
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: '/apis/iam/v2beta/projects',
+        body: projectWithRule.project
+      });
+
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: `/apis/iam/v2beta/projects/${projectWithRule.rule.project_id}/rules`,
+        body: projectWithRule.rule
+      });
+    });
+
+    // apply rules
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
-      url: '/apis/iam/v2beta/projects',
-      body: project9
+      url: '/apis/iam/v2beta/apply-rules'
     });
+
+    waitUntilApplyRulesNotRunning(100);
   });
 
   after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
 
-  for (const [attribute, value] of [
-    ['CHEF_ORGANIZATION', '75th Rangers'],
-    ['CHEF_SERVER', 'example.org'],
-    ['ENVIRONMENT', 'arctic'],
-    ['CHEF_POLICY_GROUP', 'red_ring'],
-    ['CHEF_POLICY_NAME', 'fire'],
-    ['CHEF_ROLE', 'backend'],
-    ['CHEF_TAG', 'v3']
-  ]) {
-    it(`attribute ${attribute} gets tagged on node`, () => {
-      const nodeId = uuidv4();
+  it('tagging 7 projects with all the attributes on a client runs node', () => {
+    const nodeId = uuidv4();
 
-      // Create rule for attribute ${attribute}
-      const rule = {
-        id: 'rule-' + attribute.toLowerCase(),
-        name: 'rule ' + attribute,
-        type: 'NODE',
-        project_id: project9.id,
-        conditions: [
-          {
-            attribute: attribute,
-            operator: 'EQUALS',
-            values: [value]
-          }
-        ]
-      };
-
-      // create rule with attribute value
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: `/apis/iam/v2beta/projects/${rule.project_id}/rules`,
-        body: rule
-      });
-
-      // apply rules
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/apis/iam/v2beta/apply-rules'
-      });
-
-      waitUntilApplyRulesNotRunning(100);
-
-      // Ensure there are no nodes matching this project
+    // Ensure there are no nodes matching any of the projects
+    projectsWithRule.forEach(projectWithRule => {
       cy.request({
         headers: {
           'api-token': Cypress.env('ADMIN_TOKEN'),
-          projects: project9.id
+          projects: projectWithRule.project.id
         },
         method: 'GET',
         url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
       }).then((response) => {
         expect(response.body).to.have.length(0);
       });
+    });
 
-      // Ingest node with that same attribue
-      cy.fixture('converge/avengers1.json').then((node) => {
-        setAttributeValue(node, attribute, value);
-        node.entity_uuid = nodeId;
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/data-collector/v0',
-          body: node
-        });
+    // Ingest a node with attribues that match all the projects
+    cy.fixture('converge/avengers1.json').then((node) => {
+      node.organization_name = '75th Rangers';
+      node.chef_server_fqdn = 'example.org';
+      node.node.chef_environment = 'arctic';
+      node.policy_group = 'red_ring';
+      node.policy_name = 'fire';
+      node.node.automatic.roles = ['backend'];
+      node.node.normal.tags = ['v3'];
+      node.entity_uuid = nodeId;
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: '/data-collector/v0',
+        body: node
       });
+    });
 
-      // wait for the node to be ingested
-      waitForNodes(project9.id, 30);
+    // wait for the node to be ingested
+    waitForNodes(projectsWithRule[0].project.id, 30);
 
-      // Ensure the node is tagged with the correct project
+    // Ensure the node is tagged with the correct project
+    projectsWithRule.forEach(projectWithRule => {
       cy.request({
         headers: {
           'api-token': Cypress.env('ADMIN_TOKEN'),
-          projects: project9.id
+          projects: projectWithRule.project.id
         },
         method: 'GET',
         url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
@@ -104,76 +224,20 @@ describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
         expect(response.body).to.have.length(1);
         expect(response.body[0].id).to.equal(nodeId);
       });
-
-      // Delete node
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: 'api/v0/ingest/events/chef/node-multiple-deletes',
-        body: {
-          node_ids: [nodeId]
-        },
-        failOnStatusCode: false
-      });
-
-      // delete rule
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'DELETE',
-        url: `/apis/iam/v2beta/projects/${rule.project_id}/rules/${rule.id}`
-      }).then((response) => {
-        expect(response.status).to.equal(200);
-      });
-
-      // apply rules to reset node to unassigned
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/apis/iam/v2beta/apply-rules'
-      }).then((response) => {
-        expect(response.status).to.equal(200);
-      });
-      waitUntilApplyRulesNotRunning(100);
     });
-  }
-});
 
-function setAttributeValue(node: any, attributeType: string, value: string) {
-  switch (attributeType) {
-    case 'CHEF_ORGANIZATION': {
-      node.organization_name = value;
-      break;
-    }
-    case 'CHEF_SERVER': {
-      node.chef_server_fqdn = value;
-      break;
-    }
-    case 'ENVIRONMENT': {
-      node.node.chef_environment = value;
-      break;
-    }
-    case 'CHEF_POLICY_GROUP': {
-      node.policy_group = value;
-      break;
-    }
-    case 'CHEF_POLICY_NAME': {
-      node.policy_name = value;
-      break;
-    }
-    case 'CHEF_ROLE': {
-      node.node.automatic.roles = [value];
-      break;
-    }
-    case 'CHEF_TAG': {
-      node.node.normal.tags = [value];
-      break;
-    }
-    default: {
-      expect(0).to.equal(1);
-      break;
-    }
-  }
-}
+    // Delete node
+    cy.request({
+      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+      method: 'POST',
+      url: 'api/v0/ingest/events/chef/node-multiple-deletes',
+      body: {
+        node_ids: [nodeId]
+      },
+      failOnStatusCode: false
+    });
+  });
+});
 
 function waitUntilApplyRulesNotRunning(attempts: number): void {
   if (attempts === -1) {
