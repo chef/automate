@@ -36,7 +36,7 @@
                 <chef-table-header-cell>Name</chef-table-header-cell>
                 <chef-table-header-cell>ID</chef-table-header-cell>
                 <chef-table-header-cell>Ingest Rules</chef-table-header-cell>
-                <chef-table-header-cell class="controls"></chef-table-header-cell>
+                <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
               </chef-table-row>
             </chef-table-header>
             <chef-table-body>
@@ -46,7 +46,7 @@
                 </chef-table-cell>
                 <chef-table-cell>{{ project.id }}</chef-table-cell>
                 <chef-table-cell>{{ getRulesStatus(project) }}</chef-table-cell>
-                <chef-table-cell class="controls">
+                <chef-table-cell class="three-dot-column">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
                     <chef-control-menu>
                       <chef-option (click)="startProjectDelete(project)" data-cy="delete-project">Delete Project</chef-option>

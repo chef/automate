@@ -20,7 +20,7 @@
               <chef-table-header-cell class="name-column">Name</chef-table-header-cell>
               <chef-table-header-cell class="type-column">Type</chef-table-header-cell>
               <chef-table-header-cell class="status-column">Status</chef-table-header-cell>
-              <chef-table-header-cell class="button-column"></chef-table-header-cell>
+              <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
             </chef-table-row>
           </chef-table-header>
           <chef-table-body>
@@ -30,7 +30,7 @@
                 </chef-table-cell>
                 <chef-table-cell class="type-column">{{ policy.type | iamType }}</chef-table-cell>
                 <chef-table-cell class="status-column">{{ status(policy) | capitalize }}</chef-table-cell>
-                <chef-table-cell class="button-column">
+                <chef-table-cell class="three-dot-column">
                 <!-- <app-authorized [allOf]="['/policies/{policy}', 'delete', policy]"> -->
                   <chef-control-menu *ngIf="policy.type !== 'CHEF_MANAGED'">
                     <chef-option (click)="startPolicyDelete(policy)">Delete Policy</chef-option>

@@ -60,7 +60,7 @@
                   <chef-table-header-cell *ngIf="isIAMv2" class="projects-column">
                     <span>Projects</span>
                   </chef-table-header-cell>
-                  <chef-table-header-cell class="button-column"></chef-table-header-cell>
+                  <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
                 </chef-table-row>
               </chef-table-header>
               <chef-table-body>
@@ -79,7 +79,7 @@
                     <span *ngIf="team.projects.length === 1">{{ team.projects[0] }}</span>
                     <span *ngIf="team.projects.length > 1">{{ team.projects.length }} projects</span>
                   </chef-table-cell>
-                  <chef-table-cell class="button-column">
+                  <chef-table-cell class="three-dot-column">
                     <!-- <app-authorized [allOf]="[`/auth/teams/${team.id}`, 'delete']"> -->
                     <chef-control-menu>
                       <chef-option (click)="startTeamDelete(team)">Delete Team</chef-option>

@@ -72,7 +72,7 @@
                 <chef-table-header-cell>Resource Type</chef-table-header-cell>
                 <chef-table-header-cell>Conditions</chef-table-header-cell>
                 <chef-table-header-cell>Edits</chef-table-header-cell>
-                <chef-table-header-cell class="controls"></chef-table-header-cell>
+                <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
               </chef-table-row>
             </chef-table-header>
             <chef-table-body>
@@ -84,7 +84,7 @@
                 <chef-table-cell>{{ rule.type | titlecase }}</chef-table-cell>
                 <chef-table-cell>{{ rule.conditions.length | pluralize : 'condition' : 'conditions' }}</chef-table-cell>
                 <chef-table-cell>{{ getEditStatus(rule) }}</chef-table-cell>
-                <chef-table-cell class="controls">
+                <chef-table-cell class="three-dot-column">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project?.id]">
                     <chef-control-menu>
                       <chef-option *ngIf="showDeleteRule()" class="delete-rule" (click)="startRuleDelete(rule)" data-cy="delete-rule">Delete Rule</chef-option>
