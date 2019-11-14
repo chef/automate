@@ -44,6 +44,7 @@ import { UIComponent } from 'app/ui.component';
 
 // Services
 import { ChefSessionService } from './services/chef-session/chef-session.service';
+import { TelemetryService } from './services/telemetry/telemetry.service';
 import { NodeDetailsResolverService } from './services/node-details/node-details-resolver.service';
 import {
   NodeNoRunsDetailsResolverService
@@ -57,7 +58,7 @@ const routes: Routes = [
   {
     path: '',
     component: UIComponent,
-    canActivate: [ChefSessionService],
+    canActivate: [ChefSessionService, TelemetryService],
     children: [{
       path: '',
       redirectTo: 'dashboards/event-feed',

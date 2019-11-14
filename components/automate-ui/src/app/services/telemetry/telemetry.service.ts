@@ -1,8 +1,9 @@
-import { map, filter } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { Router, NavigationEnd } from '@angular/router';
-import { ReplaySubject, Observable, Subject } from 'rxjs';
+import { ReplaySubject, Observable, Subject, of } from 'rxjs';
 import * as Sniffr from 'sniffr';
 
 import { ChefSessionService } from '../chef-session/chef-session.service';
@@ -19,7 +20,7 @@ export interface TelemetryData {
 }
 
 @Injectable()
-export class TelemetryService {
+export class TelemetryService implements CanActivate  {
   // There is a diagram at /dev-docs/diagrams/telemetry-service-ui.png that describes
   // how and where telemetry settings are stored.
 
@@ -62,27 +63,35 @@ export class TelemetryService {
         this.page(this.currentUrl, {previousUrl: this.previousUrl});
       }
     });
+  }
 
-    this.configService.getConfig().pipe(
-      filter(config => config.telemetryEnabled),
-      map((config) => {
-        this.telemetryEnabled = config.telemetryEnabled;
-        this.telemetryEnabledObservable.next(config.telemetryEnabled);
-        this.hasTelemetryResponse = true;
-        this.telemetryUrl = config.telemetryUrl;
-        this.customerId = config.customerId;
-        this.customerName = config.customerName;
-        this.licenseId = config.licenseId || configService.defaultLicenseId;
-        this.maxNodes = config.maxNodes;
-        this.anonymousId = this.cookieService.getObject('ajs_anonymous_id');
-        this.instanceId = config.deploymentId || configService.defaultDeployId;
-        return this.trackingOperations;
-      }))
-      .subscribe((trackingOperations) => {
-        if (this.chefSessionService.telemetry_enabled) {
-          this.engageTelemetry(trackingOperations);
+  fetchConfig() {
+    return this.configService.getConfig().pipe(
+      tap((config) => {
+        if (config.telemetryEnabled) {
+          this.telemetryEnabled = config.telemetryEnabled;
+          this.telemetryEnabledObservable.next(config.telemetryEnabled);
+          this.hasTelemetryResponse = true;
+          this.telemetryUrl = config.telemetryUrl;
+          this.customerId = config.customerId;
+          this.customerName = config.customerName;
+          this.licenseId = config.licenseId || this.configService.defaultLicenseId;
+          this.maxNodes = config.maxNodes;
+          this.anonymousId = this.cookieService.getObject('ajs_anonymous_id');
+          this.instanceId = config.deploymentId || this.configService.defaultDeployId;
+          if (this.chefSessionService.telemetry_enabled) {
+            this.engageTelemetry(this.trackingOperations);
+          }
         }
-      });
+      }));
+  }
+
+  canActivate(_route: ActivatedRouteSnapshot, _state: RouterStateSnapshot): Observable<boolean> {
+    if (!this.chefSessionService.hasSession()) {
+      return of(false);
+    }
+
+    return this.fetchConfig().pipe(map((_config) => true));
   }
 
   get enabled(): Observable<boolean> {
