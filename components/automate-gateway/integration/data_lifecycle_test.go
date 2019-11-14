@@ -3,6 +3,7 @@ package integration
 import (
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
 	rrule "github.com/teambition/rrule-go"
 
 	"github.com/chef/automate/api/external/data_lifecycle"
@@ -198,10 +199,11 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 	suite.Require().NoError(err)
 }
 
-// TestDataLifecycleRun ensures that when run is called that we request a purge
-// TODO: Generating every data type, refreshing indices and ensuring that
-// data is deleted is a large scope. I feel it probably best to create a separate
-// library for creating data that we can eventually plug into this.
+// TestDataLifecycleRun ensures that when run is called that we actually run
+// operations. Each invidual service already has integrations tests for adding
+// data and ensuring that the purge Run actually does that. Therefore, we just
+// want to make sure that those endpoints are called. The Purge job statuses
+// will include a LastStartedAt that we can use to determine if the jobs ran.
 func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 	dlClient := data_lifecycle.NewDataLifecycleClient(suite.gwConn)
 
@@ -209,13 +211,13 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 	oldStatus, err := dlClient.GetStatus(suite.ctx, &data_lifecycle.GetStatusRequest{})
 	suite.Require().NoError(err)
 
-	// Enable everything but make the recurrence rule an hour from now to be
-	// sure that a scheduled purge doesn't run during our testing.
-	// that a schedule wont get triggered.
+	// Disable everyhing except for the purge jobs. Make sure each purge policy
+	// is disabled so we don't actually delete data but still run the job.
+	startTime := time.Now()
 	recurrence, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.HOURLY,
 		Interval: 1,
-		Dtstart:  time.Now(),
+		Dtstart:  startTime,
 	})
 	suite.Require().NoError(err)
 	r := recurrence.String()
@@ -225,8 +227,20 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 			JobSettings: []*data_lifecycle.JobSettings{
 				&data_lifecycle.JobSettings{
 					Name:       compliancePurgeJobName,
-					Recurrence: r,
 					Disabled:   false,
+					Recurrence: r,
+					PurgePolicies: &data_lifecycle.PurgePolicyUpdate{
+						Elasticsearch: []*datalifecycle.EsPolicyUpdate{
+							&datalifecycle.EsPolicyUpdate{
+								PolicyName: complianceReportsPolicyName,
+								Disabled:   true,
+							},
+							&datalifecycle.EsPolicyUpdate{
+								PolicyName: complianceScansPolicyName,
+								Disabled:   true,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -234,8 +248,16 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 			JobSettings: []*data_lifecycle.JobSettings{
 				&data_lifecycle.JobSettings{
 					Name:       eventFeedPurgeJobName,
-					Recurrence: r,
 					Disabled:   false,
+					Recurrence: r,
+					PurgePolicies: &data_lifecycle.PurgePolicyUpdate{
+						Elasticsearch: []*datalifecycle.EsPolicyUpdate{
+							&datalifecycle.EsPolicyUpdate{
+								PolicyName: eventFeedPurgePolicyName,
+								Disabled:   true,
+							},
+						},
+					},
 				},
 			},
 		},
@@ -243,47 +265,94 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 			JobSettings: []*data_lifecycle.JobSettings{
 				&data_lifecycle.JobSettings{
 					Name:       infraPurgeJobName,
-					Recurrence: r,
 					Disabled:   false,
+					Recurrence: r,
 					PurgePolicies: &data_lifecycle.PurgePolicyUpdate{
 						Elasticsearch: []*datalifecycle.EsPolicyUpdate{
 							&datalifecycle.EsPolicyUpdate{
-								PolicyName:    infraActionsPurgePolicyName,
-								OlderThanDays: 0,
-								Disabled:      false,
+								PolicyName: infraActionsPurgePolicyName,
+								Disabled:   true,
 							},
 							&datalifecycle.EsPolicyUpdate{
-								PolicyName:    infraConvergePurgePolicyName,
-								OlderThanDays: 0,
-								Disabled:      true,
+								PolicyName: infraConvergePurgePolicyName,
+								Disabled:   true,
 							},
 						},
 					},
 				},
 				&data_lifecycle.JobSettings{
 					Name:       infraDeleteNodesJobName,
+					Disabled:   true,
 					Recurrence: r,
-					Disabled:   false,
 				},
 				&data_lifecycle.JobSettings{
 					Name:       infraMissingNodesJobName,
+					Disabled:   true,
 					Recurrence: r,
-					Disabled:   false,
 				},
 				&data_lifecycle.JobSettings{
 					Name:       infraDeleteMissingNodesJobName,
+					Disabled:   true,
 					Recurrence: r,
-					Disabled:   false,
 				},
 			},
 		},
 	})
 
-	// TODO: create some data
+	// Config changes will kick off enabled jobs. Let's wait for them to quickly
+	// finish and then reset the start time for our next jobs.
+	time.Sleep(1 * time.Second)
+	startTime = time.Now()
 
-	// Run purge
+	// Run each individually and verify that the LastStartedAt is older than our
+	// startTime.
+	_, err = dlClient.RunCompliance(suite.ctx, &data_lifecycle.RunComplianceRequest{})
+	suite.Require().NoError(err)
+
+	_, err = dlClient.RunEventFeed(suite.ctx, &data_lifecycle.RunEventFeedRequest{})
+	suite.Require().NoError(err)
+
+	_, err = dlClient.RunInfra(suite.ctx, &data_lifecycle.RunInfraRequest{})
+	suite.Require().NoError(err)
+
+	// Give the jobs some time to run and then get their statuses
+	time.Sleep(1 * time.Second)
+	complianceStatus, err := dlClient.GetComplianceStatus(suite.ctx, &data_lifecycle.GetComplianceStatusRequest{})
+	suite.Require().NoError(err)
+
+	eventFeedStatus, err := dlClient.GetEventFeedStatus(suite.ctx, &data_lifecycle.GetEventFeedStatusRequest{})
+	suite.Require().NoError(err)
+
+	infraStatus, err := dlClient.GetInfraStatus(suite.ctx, &data_lifecycle.GetInfraStatusRequest{})
+	suite.Require().NoError(err)
+
+	suite.assertStartedAfter(complianceStatus.Jobs, startTime)
+	suite.assertStartedAfter(eventFeedStatus.Jobs, startTime)
+	for _, j := range infraStatus.Jobs {
+		if j.Name == infraPurgeJobName {
+			suite.assertStartedAfter([]*data_lifecycle.JobStatus{j}, startTime)
+		}
+	}
+
+	// Reset the startTime and run them from the global endpoint
+	startTime = time.Now()
 	_, err = dlClient.Run(suite.ctx, &data_lifecycle.RunRequest{})
 	suite.Require().NoError(err)
+
+	// Give the jobs some time to run and then get their statuses
+	time.Sleep(1 * time.Second)
+
+	status, err := dlClient.GetStatus(suite.ctx, &data_lifecycle.GetStatusRequest{})
+	suite.Require().NoError(err)
+
+	// Get all purge jobs and assert they ran after the start time
+	purgeJobs := append(status.Compliance.Jobs, status.EventFeed.Jobs...)
+	for _, j := range status.Infra.Jobs {
+		if j.Name == infraPurgeJobName {
+			purgeJobs = append(purgeJobs, j)
+		}
+	}
+	suite.assertStartedAfter(purgeJobs, startTime)
 
 	// Set the old config in place
 	oldComplianceSettings := jobStatusesToJobSettings(oldStatus.GetCompliance().GetJobs())
@@ -304,6 +373,27 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 		Infra:      oldInfraConfigRequest,
 	})
 	suite.Require().NoError(err)
+}
+
+func (suite *GatewayTestSuite) assertStartedAfter(jobs []*data_lifecycle.JobStatus, start time.Time) {
+	for _, job := range jobs {
+		ranAfter := job.GetLastStartedAt()
+		if ranAfter == nil {
+			suite.T().Logf("job %s has not ran yet", job.Name)
+			suite.T().Fail()
+		}
+
+		after, err := ptypes.Timestamp(ranAfter)
+		if ranAfter == nil {
+			suite.T().Logf("failed to parsed job %s timestamp: %s", job.Name, err.Error())
+			suite.T().Fail()
+		}
+
+		if after.Before(start) {
+			suite.T().Logf("job %s last run started (%d) before start time (%d)", job.Name, after.Unix(), start.Unix())
+			suite.T().Fail()
+		}
+	}
 }
 
 func (suite *GatewayTestSuite) assertJobSettingsMatchJobStatus(expected []*data_lifecycle.JobSettings, actual []*data_lifecycle.JobStatus) {

@@ -141,7 +141,7 @@ If you only wish to configure a specific endpoint you can send the `job_settings
 wish to configure. For example, if we only wished to configure compliance settings we could create a smaller JSON payload:
 
 ```json
-  "job_settings": [
+{ "job_settings": [
     {
       "name": "periodic_purge",
       "disabled": false,
@@ -162,6 +162,7 @@ wish to configure. For example, if we only wished to configure compliance settin
       }
     }
   ]
+}
 ```
 
 And update it using the `compliance` sub-resource
@@ -190,41 +191,42 @@ Purge jobs have the following options:
 There are three infra node lifecycle jobs and one purge job with two ElasticSearch purge policies.
 
 ```json
-"job_settings": [
-  { "name":"delete_nodes",
-	"disabled": true,
-	"recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
-	"threshold": "365d"
-  },
-  { "name":"missing_nodes",
-	"disabled": false,
-	"recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
-	"threshold": "1d"
-  },
-  { "name":"missing_nodes_for_deletion",
-	"disabled": false,
-	"recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
-	"threshold": "30d"
-  },
-  { "name":"periodic_purge_timeseries",
-	"disabled": false,
-	"recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
-	"purge_policies": {
-	  "elasticsearch": [
-		{
-		  "policy_name": "actions",
-		  "older_than_days": 30,
-		  "disabled": false
-		},
-		{
-		  "policy_name": "converge-history",
-		  "older_than_days": 30,
-		  "disabled": false
-		}
-	  ]
-	}
-  }
-]
+{ "job_settings": [
+    { "name":"delete_nodes",
+      "disabled": true,
+      "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+      "threshold": "365d"
+    },
+    { "name":"missing_nodes",
+      "disabled": false,
+      "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+      "threshold": "1d"
+    },
+    { "name":"missing_nodes_for_deletion",
+      "disabled": false,
+      "recurrence": "FREQ=MINUTELY;DTSTART=20191106T180240Z;INTERVAL=15",
+      "threshold": "30d"
+    },
+    { "name":"periodic_purge_timeseries",
+      "disabled": false,
+      "recurrence": "FREQ=DAILY;DTSTART=20191106T180240Z;INTERVAL=1",
+      "purge_policies": {
+        "elasticsearch": [
+        {
+          "policy_name": "actions",
+          "older_than_days": 30,
+          "disabled": false
+        },
+        {
+          "policy_name": "converge-history",
+          "older_than_days": 30,
+          "disabled": false
+        }
+        ]
+      }
+    }
+  ]
+}
 ```
 
 * `delete_nodes` how long a node can exist before it is deleted.
@@ -240,7 +242,7 @@ There are three infra node lifecycle jobs and one purge job with two ElasticSear
 There is one compliance purge job with two ElasticSearch purge policies
 
 ```json
-  "job_settings": [
+{ "job_settings": [
     {
       "name": "periodic_purge",
       "disabled": false,
@@ -261,6 +263,7 @@ There is one compliance purge job with two ElasticSearch purge policies
       }
     }
   ]
+}
 ```
 
 * `periodic_purge` how often to run the purge job
@@ -272,22 +275,22 @@ There is one compliance purge job with two ElasticSearch purge policies
 There is one event feed purge job with one ElasticSearch purge policies
 
 ```json
-"job_settings": [
-  {
-	"name": "periodic_purge",
-	"disabled": false,
-	"recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
-	"purge_policies": {
-	  "elasticsearch": [
-		{
-		  "policy_name": "feed",
-		  "older_than_days": 90,
-		  "disabled": false
-		}
-	  ]
-	}
-  }
-]
+{ "job_settings": [
+    { "name": "periodic_purge",
+      "disabled": false,
+      "recurrence": "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
+      "purge_policies": {
+        "elasticsearch": [
+        {
+          "policy_name": "feed",
+          "older_than_days": 90,
+          "disabled": false
+        }
+        ]
+      }
+    }
+  ]
+}
 ```
 
 * `periodic_purge` how often to run the purge job
