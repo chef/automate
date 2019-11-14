@@ -35,19 +35,20 @@ export class ChefControlMenuComponent implements OnInit {
 
   @HostListener('focusout', ['$event']) handleFocusOut(e) {
     const relatedTarget = e.relatedTarget;
-    e.stopPropagation();  // <-- stop propagation is not a function?
+    e.stopPropagation();
     if (!relatedTarget || relatedTarget.nodeName !== 'CHEF-DROPDOWN') {
       this.isFocused = false;
       this.isActive = false;
     }
   }
 
-  @HostListener('click', ['$event']) handleClickActivation(e) {
+  @HostListener('click', ['$event']) handleClickActivation(event: MouseEvent) {
     if (this.isDisabled) {
       return;
     } else if (this.isActive) {
-      const option = e.target.closest('chef-option');
-      if (!option || e.target.nodeName === 'CHEF-ICON') {
+      console.log(event)
+      const option = event.target.closest('chef-option-new');
+      if (!option || event.target.nodeName === 'CHEF-ICON') {
         this.isActive = false;
         return;
       }
@@ -79,7 +80,7 @@ export class ChefControlMenuComponent implements OnInit {
   constructor( private el: ElementRef) { }
 
   ngOnInit() {
-    this.options = Array.from(this.el.nativeElement.querySelectorAll('chef-option'));
+    this.options = Array.from(this.el.nativeElement.querySelectorAll('chef-option-new'));
     // The default option is determined by first checking the value property, then
     // looking for a selected attribute on the options list and finally defaulting
     // to the first option if all else fails.

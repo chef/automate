@@ -3,6 +3,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 
 import { ChefControlMenuComponent } from './chef-control-menu.component';
+import { ChefOptionComponent } from '../chef-option/chef-option.component';
 
 describe('ChefControlMenuComponent', () => {
   let component: ChefControlMenuComponent;
@@ -14,6 +15,7 @@ describe('ChefControlMenuComponent', () => {
         MockComponent({'selector': 'chef-dropdown'}),
         MockComponent({'selector': 'chef-icon'}),
         MockComponent({'selector': 'chef-option-new'}),
+        ChefOptionComponent,
         ChefControlMenuComponent
       ],
       schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -66,16 +68,22 @@ describe('ChefControlMenuComponent', () => {
 
 
   describe('handleClickActivation', () => {
+    let optionComponent: ChefOptionComponent;
+    let optionFixture: ComponentFixture<ChefOptionComponent>;
     let clickEventMock;
 
     beforeEach(() => {
-      fixture.detectChanges();
+      optionFixture = TestBed.createComponent(ChefOptionComponent);
+      optionComponent = fixture.nativeElement;
+      
       clickEventMock = new Event('click');
+      clickEventMock.target = { closest: () => optionComponent }
+      fixture.detectChanges();
     });
 
     it('sets active to true', () => {
       component.handleClickActivation(clickEventMock);
-      expect(component.active).toBe(true);
+      expect(component.isActive).toBe(true);
     });
 
     it('sets active to false when it is true', () => {
