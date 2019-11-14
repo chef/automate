@@ -74,10 +74,10 @@ describe('ChefControlMenuComponent', () => {
 
     beforeEach(() => {
       optionFixture = TestBed.createComponent(ChefOptionComponent);
-      optionComponent = fixture.nativeElement;
-      
+      optionComponent = optionFixture.nativeElement;
+
       clickEventMock = new Event('click');
-      clickEventMock.target = { closest: () => optionComponent }
+      clickEventMock.target = { closest: () => optionComponent };
       fixture.detectChanges();
     });
 
