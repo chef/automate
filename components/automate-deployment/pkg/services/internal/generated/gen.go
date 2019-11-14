@@ -228,7 +228,7 @@ var ProductMetadataJSON = `
       "name": "chef/infra-proxy-service",
       "metadata": {
         "name": "chef/infra-proxy-service",
-        "data_service": true,
+        "data_service": false,
         "binlinks": null,
         "uses_platform_scaffolding": false,
         "bootstrap": null
