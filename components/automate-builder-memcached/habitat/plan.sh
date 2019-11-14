@@ -11,7 +11,7 @@ pkg_deps=(
   core/bash
   core/glibc
   core/libevent
-  ssd/openssl11
+  chef/automate-openssl11
 )
 pkg_build_deps=(
   core/git
