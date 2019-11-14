@@ -282,9 +282,9 @@ message Profile {
 }
 
 message ProfileList {
-	// Name of the profile.
+	// The profile name.
 	string name = 1;
-	// SHA ID of the profile.
+	// The profile SHA ID.
 	string id = 2;
 	// Total number of failed nodes that executed the profile.
 	int32 failures = 3;

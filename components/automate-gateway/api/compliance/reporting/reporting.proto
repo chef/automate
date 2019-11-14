@@ -56,7 +56,7 @@ service ReportingService {
 	/*
 	List report IDs
 
-	List all IDs for the latest report of each node optionally using filters. 
+	List all IDs for the latest report for each node, with optional filtering. 
 	Supports filtering, but not pagination or sorting.
 	Including more than one value for `control`, `profile_id`, or `profile_name` is not allowed.
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.
@@ -80,7 +80,7 @@ service ReportingService {
 	/*
 	List controls
 
-	Lists controls from the last run, with the option of applying filters. 
+	Lists controls from the last run, with optional filtering. 
 	Supports filtering, but not pagination or sorting.
 	Limited to 100 results by default.
 	*/
@@ -177,7 +177,7 @@ service ReportingService {
 	/*
 	List profiles
 
-	List all profiles in use, with the option of applying filters. 
+	List all profiles in use, with optional filtering. 
 	Supports pagination, filtering, and sorting.
 	Valid sort fields: name, title
 	*/
@@ -222,7 +222,7 @@ service ReportingService {
 	/*
 	List nodes
 
-	List all nodes optionally using filters. Supports pagination, filtering, and sorting.
+	List all nodes, with optional filtering, pagination, and sorting.
 	Limited to 10k results.
 
 	| Sort parameter | Sort value |
@@ -306,9 +306,9 @@ message ControlItemRequest {
 }
 
 message ControlItem {
-	// The unique ID of this control.
+	// The control's unique ID.
 	string id = 1;
-	// The compact description of the control.
+	// The control's compact description.
 	string title= 2;
 	// Intentionally blank.
 	ProfileMin profile = 3;
@@ -412,9 +412,9 @@ message ReportIds {
 message Report {
 	// A unique report identifier.
 	string id = 1;
-	// The ID of the node making the report.
+	// The reporting node's unique ID.
 	string node_id = 2;
-	// The name of the node making the report.
+	// The reporting node name.
 	string node_name = 3;
 	// The time that the report was completed.
 	google.protobuf.Timestamp end_time = 4;
@@ -432,9 +432,9 @@ message Report {
 	Statistics statistics = 10;
 	// The profiles run as part of this report.
 	repeated Profile profiles = 11;
-	// The ID of the compliance scan job associated with the report.
+	// The compliance scan job ID associated with the report.
 	string job_id = 12;
-	// The IP address of the node making the report.
+	// The reporting node IP address.
 	string ipaddress = 13;
 	// The FQDN (fully qualified domain name) of the node making the report.
 	string fqdn = 14;
@@ -672,18 +672,18 @@ message ProfileCounts {
 message ProfileMin {
 	// The name of the profile.
 	string name = 1;
-	// The title of the profile.
+	// The profile title.
 	string title = 2;
-	// The ID of the profile.
+	// The profile ID.
 	string id = 3;
-	// The version of the profile.
+	// The profile version.
 	string version = 4;
 	// The aggregated status of the profile across the nodes it has been run on.
 	string status = 5;
 }
 
 message Node {
-	// The ID of this node.
+	// The node ID.
 	string id = 1;
 	// The name assigned to the node.
 	string name = 2;
@@ -719,9 +719,9 @@ message Kv {
 	string value = 2;
 }
 
-// A summary of the information contained in the latest report for this node.
+// A summary of the latest report for this node.
 message LatestReportSummary {
-	// The ID of the latest report.
+	// The latest report ID.
 	string id = 1;
 	// The time the report was submitted at.
 	google.protobuf.Timestamp end_time = 2;
@@ -734,9 +734,9 @@ message LatestReportSummary {
 message ProfileMeta {
 	// The name of the profile.
 	string name = 1;
-	// The version of the profile.
+	// The profile version.
 	string version = 2;
-	// The unique ID of the profile.
+	// The profile unique ID.
 	string id = 3;
 	// The status of the profile run against the node.
 	string status = 4;
