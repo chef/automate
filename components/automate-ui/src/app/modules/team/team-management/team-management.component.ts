@@ -99,7 +99,9 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.store.pipe(
       select(createStatus),
       takeUntil(this.isDestroyed),
-      filter(state => this.createModalVisible && !pending(state)))
+      filter(state => {
+        return (this.createModalVisible || this.createV1TeamModalVisible) && !pending(state);
+      }))
       .subscribe(state => {
         this.creatingTeam = false;
         if (state === EntityStatus.loadingSuccess) {
@@ -113,7 +115,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
       this.store.select(createError)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      filter(() => this.createModalVisible),
+      filter(() => (this.createModalVisible || this.createV1TeamModalVisible)),
       filter (([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
       .subscribe(([_, error]) => {
         if (error.status === HttpStatus.CONFLICT) {
@@ -186,5 +188,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.creatingTeam = false;
     this.createTeamForm.reset();
     this.createV1TeamForm.reset();
+    this.conflictErrorEvent.emit(false);
   }
 }

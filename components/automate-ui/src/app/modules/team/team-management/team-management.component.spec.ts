@@ -168,7 +168,7 @@ describe('TeamManagementComponent', () => {
       store.dispatch(new CreateTeamFailure(error));
 
       expect(component.createV1TeamModalVisible).toBe(false);
-      expect(component.conflictErrorEvent.emit).not.toHaveBeenCalled();
+      expect(component.conflictErrorEvent.emit).toHaveBeenCalledWith(false);
     });
   });
 
