@@ -230,7 +230,7 @@ var ProductMetadataJSON = `
         "name": "chef/infra-proxy-service",
         "data_service": false,
         "binlinks": null,
-        "uses_platform_scaffolding": false,
+        "uses_platform_scaffolding": true,
         "bootstrap": null
       }
     },
