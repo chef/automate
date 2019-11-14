@@ -47,8 +47,8 @@ describe('user management', () => {
     cy.get('app-user-management chef-modal').should('not.be.visible');
     cy.get('chef-notification.info').should('be.visible');
 
-    cy.get('app-user-table chef-td').contains(username).should('exist');
-    cy.get('app-user-table chef-td').contains(name).should('exist');
+    cy.get('app-user-table chef-table-cell').contains(username).should('exist');
+    cy.get('app-user-table chef-table-cell').contains(name).should('exist');
   });
 
   itFlaky('can view and edit user details', () => {
@@ -96,7 +96,7 @@ describe('user management', () => {
     cy.get('app-user-details .breadcrumb').contains('Users').click();
     cy.wait('@getUsers');
 
-    cy.get('app-user-table chef-td').contains(username).parent()
+    cy.get('app-user-table chef-table-cell').contains(username).parent()
         .find('chef-control-menu').as('controlMenu');
     // we throw in a should so cypress waits until introspection allows menu to be shown
     cy.get('@controlMenu').should('be.visible')
@@ -107,6 +107,7 @@ describe('user management', () => {
     cy.get('app-user-management chef-button').contains('Delete User').click();
 
     cy.wait('@deleteUser');
-    cy.get('app-user-management chef-tbody chef-td').contains(username).should('not.exist');
+    cy.get('app-user-management chef-table-body chef-table-cell')
+      .contains(username).should('not.exist');
   });
 });

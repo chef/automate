@@ -1,21 +1,7 @@
 @import "~styles/variables";
 
-chef-table {
-  .id-column {
-    flex-basis: 33%;
-  }
-
-  .name-column {
-    flex-basis: 33%;
-  }
-
-  .projects-column {
-    flex-basis: 33%;
-  }
-
-  .button-column {
-    justify-content: flex-end;
-  }
+.three-dot-column {
+  text-align: right;
 }
 
 .empty-case-container {

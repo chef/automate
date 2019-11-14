@@ -62,9 +62,9 @@ describe('Admin pages', () => {
     });
 
     it('displays users table', () => {
-      expectCountElements('chef-table chef-thead chef-tr', 1);
+      expectCountElements('chef-table-new chef-table-header chef-table-row', 1);
       // one row for the admin user in the table body
-      expectCountElements('chef-table chef-tbody chef-tr', 1);
+      expectCountElements('chef-table-new chef-table-body chef-table-row', 1);
     });
 
     it('displays create user button', () => {
@@ -73,23 +73,24 @@ describe('Admin pages', () => {
     });
 
     it('displays the returned user info', () => {
-      const fullname = $('chef-table chef-tbody chef-tr chef-td:first-child a');
+      const fullname = $('chef-table-new chef-table-body chef-table-row chef-table-cell:first-child a');
       browser.wait(EC.textToBePresentInElement(fullname, 'Local Administrator'), 5000);
 
-      const username = $('chef-table chef-tbody chef-tr chef-td:nth-child(2)');
+      const username = $('chef-table-new chef-table-body chef-table-row chef-table-cell:nth-child(2)');
       browser.wait(EC.textToBePresentInElement(username, 'admin'), 5000);
     });
 
     describe('control button', () => {
       it('is displayed', () => {
-        waitForElement('chef-table chef-tbody chef-tr chef-control-menu').then((e) => {
+        waitForElement('chef-table-new chef-table-body chef-table-row chef-control-menu')
+        .then((e) => {
           expect(e.isDisplayed()).toBeTruthy();
         });
       });
 
       ['Delete User'].forEach((item, index) => {
         it(`when clicked, shows ${item}`, () => {
-          const menu = $('chef-table chef-tbody chef-tr chef-control-menu');
+          const menu = $('chef-table-new chef-table-body chef-table-row chef-control-menu');
           browser.wait(EC.elementToBeClickable(menu), 5000).then(() => {
             menu.click().then(() => {
               const dropDownOption = menu.$(`chef-option:nth-child(${index + 1}`);
@@ -176,33 +177,34 @@ describe('Admin pages', () => {
 
     describe('displays the alphabetically sorted policies', () => {
       it('first policy', () => {
-        waitForElement('app-policy-list chef-table chef-tr:nth-child(1) chef-td:first-child a')
+        waitForElement('app-policy-list chef-table-new chef-table-row:nth-child(1) chef-table-cell:first-child a')
           .then((name) => {
             expect(name.getText()).toBe('Administrator All Access');
           });
 
-        waitForElement('chef-table chef-tr:nth-child(1) chef-td:nth-child(2)')
+        waitForElement('chef-table-new chef-table-row:nth-child(1) chef-table-cell:nth-child(2)')
           .then((policyType) => {
             expect(policyType.getText()).toBe('Chef-managed');
           });
 
-        waitForElement('app-policy-list chef-table chef-tr:nth-child(1) chef-td:nth-child(3)')
+        waitForElement('app-policy-list chef-table-new chef-table-row:nth-child(1) chef-table-cell:nth-child(3)')
           .then((members) => {
             expect(members.getText()).toBe('In use');
           });
       });
 
       it('second policy', () => {
-        waitForElement('app-policy-list chef-table chef-tr:nth-child(2) chef-td:first-child a')
+        waitForElement('app-policy-list chef-table-new chef-table-row:nth-child(2) chef-table-cell:first-child a')
           .then(name => {
             expect(name.getText()).toBe('Some policy whose name does not start with A');
           });
 
-        waitForElement('chef-table chef-tr:nth-child(2) chef-td:nth-child(2)').then(policyType => {
+        waitForElement('chef-table-new chef-table-row:nth-child(2) chef-table-cell:nth-child(2)')
+        .then(policyType => {
           expect(policyType.getText()).toBe('Custom');
         });
 
-        waitForElement('app-policy-list chef-table chef-tr:nth-child(2) chef-td:nth-child(3)')
+        waitForElement('app-policy-list chef-table-new chef-table-row:nth-child(2) chef-table-cell:nth-child(3)')
           .then(members => {
             expect(members.getText()).toBe('No members');
           });
@@ -213,13 +215,13 @@ describe('Admin pages', () => {
       it('is not displayed for chef-managed policies', () => {
         // admin policy row
         expect(
-          $('chef-table chef-tbody chef-tr:nth-child(1) chef-control-menu')
+          $('chef-table-new chef-table-body chef-table-row:nth-child(1) chef-control-menu')
             .isPresent()).toBeFalsy();
       });
 
       it('is displayed for custom policies', () => {
         // custom policy row
-        waitForElement('chef-table chef-tbody chef-tr:nth-child(2) chef-control-menu')
+        waitForElement('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-control-menu')
           .then(controlButton => {
             expect(controlButton.isPresent()).toBeTruthy();
           });
@@ -227,7 +229,7 @@ describe('Admin pages', () => {
 
       ['Delete Policy'].forEach((item, index) => {
         it(`when clicked, shows ${item}`, () => {
-          waitForElement('chef-table chef-tbody chef-tr:nth-child(2) chef-control-menu')
+          waitForElement('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-control-menu')
             .then(controlButton => {
               browser.wait(EC.elementToBeClickable(controlButton));
               controlButton.click().then(() => {
@@ -246,7 +248,8 @@ describe('Admin pages', () => {
           .many()
           .reply(200);
 
-        waitForElement('chef-table chef-tbody chef-tr:nth-child(2)').then(somePolicy => {
+        waitForElement('chef-table-new chef-table-body chef-table-row:nth-child(2)')
+        .then(somePolicy => {
           // open control menu
           const controlButton = somePolicy.$('chef-control-menu');
           browser.wait(EC.elementToBeClickable(controlButton));
@@ -407,19 +410,19 @@ describe('Admin pages', () => {
     it('displays the local teams and users that are not yet ' +
       'members in sorted order as links', () => {
 
-        expect($('chef-table chef-tbody chef-tr:nth-child(1) chef-td:nth-child(2) a')
+        expect($('chef-table-new chef-table-body chef-table-row:nth-child(1) chef-table-cell:nth-child(2) a')
           .getText()).toBe('admin');
-        expect($('chef-table chef-tr:nth-child(1) chef-td:nth-child(3)')
+        expect($('chef-table-new chef-table-row:nth-child(1) chef-table-cell:nth-child(3)')
           .getText()).toBe('Local user');
 
-        expect($('chef-table chef-tbody chef-tr:nth-child(2) chef-td:nth-child(2) a')
+        expect($('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(2) a')
           .getText()).toBe('admins');
-        expect($('chef-table chef-tbody chef-tr:nth-child(2) chef-td:nth-child(3)')
+        expect($('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(3)')
           .getText()).toBe('Local team');
 
-        expect($('chef-table chef-tbody chef-tr:nth-child(3) chef-td:nth-child(2) a')
+        expect($('chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(2) a')
           .getText()).toBe('otheruser');
-        expect($('chef-table chef-tbody chef-tr:nth-child(3) chef-td:nth-child(3)')
+        expect($('chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(3)')
           .getText()).toBe('Local user');
       });
 
@@ -447,7 +450,7 @@ describe('Admin pages', () => {
       it('it enables the add button, changes its text, and sends the request', () => {
         expect($('#right-buttons chef-button:first-child').getAttribute('disabled')).toBe('true');
 
-        $('chef-table chef-tbody chef-tr:nth-child(1) chef-td:nth-child(1) chef-checkbox').click();
+        $('chef-table-new chef-table-body chef-table-row:nth-child(1) chef-table-cell:nth-child(1) chef-checkbox').click();
         expect($('#right-buttons chef-button:first-child').getText()).toBe('Add Member');
         expect($('#right-buttons chef-button:first-child').getAttribute('disabled')).toBeNull();
 
@@ -481,9 +484,9 @@ describe('Admin pages', () => {
           expect($('#right-buttons chef-button:first-child').getAttribute('disabled'))
             .toBe('true');
 
-          $('chef-table chef-tbody chef-tr:nth-child(1) chef-td:nth-child(1) chef-checkbox')
+          $('chef-table-new chef-table-body chef-table-row:nth-child(1) chef-table-cell:nth-child(1) chef-checkbox')
             .click();
-          $('chef-table chef-tbody chef-tr:nth-child(2) chef-td:nth-child(1) chef-checkbox')
+          $('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(1) chef-checkbox')
             .click();
 
           expect($('#right-buttons chef-button:first-child').getAttribute('disabled')).toBeNull();
@@ -563,28 +566,29 @@ describe('Admin pages', () => {
             // Add members button should be enabled and should be added to table in sorted way
             expect($('#right-buttons chef-button:first-child').getText()).toBe('Add Member');
 
-            expect($('chef-table chef-tbody chef-tr:nth-child(1) chef-td:nth-child(2) a').getText())
+            expect($('chef-table-new chef-table-body chef-table-row:nth-child(1) chef-table-cell:nth-child(2) a').getText())
               .toBe('admin');
-            expect($('chef-table chef-tr:nth-child(1) chef-td:nth-child(3)').getText())
+            expect($('chef-table-new chef-table-row:nth-child(1) chef-table-cell:nth-child(3)')
+              .getText())
               .toBe('Local user');
 
-            expect($('chef-table chef-tbody chef-tr:nth-child(2) chef-td:nth-child(2) a').getText())
+            expect($('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(2) a').getText())
               .toBe('admins');
-            expect($('chef-table chef-tbody chef-tr:nth-child(2) chef-td:nth-child(3)').getText())
+            expect($('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(3)').getText())
               .toBe('Local team');
 
             // Non-local users / teams don't have a link and are pre-selected
             expect(
-              $('chef-table chef-tbody chef-tr:nth-child(3) chef-td:nth-child(1) chef-checkbox')
+              $('chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(1) chef-checkbox')
                 .getAttribute('ng-reflect-checked')).toBe('true');
-            expect($('chef-table chef-tbody chef-tr:nth-child(3) chef-td:nth-child(2)')
+            expect($('chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(2)')
               .getText()).toBe('All LDAP users');
-            expect($('chef-table chef-tbody chef-tr:nth-child(3) chef-td:nth-child(3)')
+            expect($('chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(3)')
               .getText()).toBe('All LDAP users');
 
-            expect($('chef-table chef-tbody chef-tr:nth-child(4) chef-td:nth-child(2) a').getText())
+            expect($('chef-table-new chef-table-body chef-table-row:nth-child(4) chef-table-cell:nth-child(2) a').getText())
               .toBe('otheruser');
-            expect($('chef-table chef-tbody chef-tr:nth-child(4) chef-td:nth-child(3)').getText())
+            expect($('chef-table-new chef-table-body chef-table-row:nth-child(4) chef-table-cell:nth-child(3)').getText())
               .toBe('Local user');
 
             expect($('#right-buttons chef-button:first-child').getAttribute('disabled')).toBeNull();
@@ -663,19 +667,19 @@ describe('Admin pages', () => {
 
     describe('displays the alphabetically sorted first role with name and type', () => {
       it('first role', () => {
-        const name = $('app-roles-list chef-table chef-tr:nth-child(1) chef-td:first-child a');
+        const name = $('app-roles-list chef-table-new chef-table-row:nth-child(1) chef-table-cell:first-child a');
         browser.wait(EC.textToBePresentInElement(name, 'Owner'));
 
-        const policyType = $('chef-table chef-tr:nth-child(1) chef-td:nth-child(2)');
+        const policyType = $('chef-table-new chef-table-row:nth-child(1) chef-table-cell:nth-child(2)');
         browser.wait(EC.textToBePresentInElement(policyType, 'Chef-managed'));
       });
 
       it('second role', () => {
-        const name = $('app-roles-list chef-table chef-tr:nth-child(2) chef-td:first-child a');
+        const name = $('app-roles-list chef-table-new chef-table-row:nth-child(2) chef-table-cell:first-child a');
         browser.wait(EC.textToBePresentInElement(name,
           'Some role whose name does not start with A'));
 
-        const policyType = $('chef-table chef-tr:nth-child(2) chef-td:nth-child(2)');
+        const policyType = $('chef-table-new chef-table-row:nth-child(2) chef-table-cell:nth-child(2)');
         browser.wait(EC.textToBePresentInElement(policyType, 'Custom'));
       });
     });
@@ -835,20 +839,20 @@ describe('Admin pages', () => {
     describe('displays the first project (cannot be deleted and is chef-managed)', () => {
       it('shows name and id', () => {
         const name = $(
-          'app-project-list chef-table chef-tbody chef-tr:nth-child(1) chef-td:nth-child(1) a');
+          'app-project-list chef-table-new chef-table-body chef-table-row:nth-child(1) chef-table-cell:nth-child(1) a');
         browser.wait(EC.visibilityOf(name), 5000, 'first project should render');
         expect(name.getText()).toBe('Default Project');
         expect(name.getAttribute('href')).toMatch(/\/settings\/projects\/default$/);
 
         const projectID = $(
-          'app-project-list chef-table chef-tbody chef-tr:nth-child(1) chef-td:nth-child(2)');
+          'app-project-list chef-table-new chef-table-body chef-table-row:nth-child(1) chef-table-cell:nth-child(2)');
         expect(projectID.getText()).toBe('default');
       });
 
       it('does not show the control button', () => {
         const controlButton = $(
-          'app-project-list chef-table chef-tbody chef-tr:nth-child(1) ' +
-          'chef-td:nth-child(5) chef-control-menu');
+          'app-project-list chef-table-new chef-table-body chef-table-row:nth-child(1) ' +
+          'chef-table-cell:nth-child(5) chef-control-menu');
         expect(controlButton.isPresent()).toEqual(false);
       });
     });
@@ -856,20 +860,20 @@ describe('Admin pages', () => {
     describe('displays the second project (cannot be deleted, custom)', () => {
       it('shows name and id', () => {
         const name = $(
-          'app-project-list chef-table chef-tbody chef-tr:nth-child(2) chef-td:nth-child(1) a');
+          'app-project-list chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(1) a');
         browser.wait(EC.visibilityOf(name), 5000, 'second project should render');
         expect(name.getText()).toBe('Some project whose name does not start with A');
         expect(name.getAttribute('href')).toMatch(/\/settings\/projects\/project-9$/);
 
         const projectID = $(
-          'app-project-list chef-table chef-tbody chef-tr:nth-child(2) chef-td:nth-child(2)');
+          'app-project-list chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(2)');
         expect(projectID.getText()).toBe('project-9');
       });
 
       it('does not show the control button', () => {
         const controlButton = $(
-          'app-project-list chef-table chef-tbody chef-tr:nth-child(2) ' +
-          'chef-td:nth-child(5) chef-control-menu');
+          'app-project-list chef-table-new chef-table-body chef-table-row:nth-child(2) ' +
+          'chef-table-cell:nth-child(5) chef-control-menu');
         expect(controlButton.isPresent()).toEqual(false);
       });
     });
@@ -877,27 +881,27 @@ describe('Admin pages', () => {
     describe('displays the third project (can be deleted, custom)', () => {
       it('shows name and id', () => {
         const name = $(
-          'app-project-list chef-table chef-tbody chef-tr:nth-child(3) chef-td:nth-child(1) a');
+          'app-project-list chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(1) a');
         browser.wait(EC.visibilityOf(name), 5000, 'third project should render');
         expect(name.getText()).toBe('This is custom, and authz allows deletion');
 
         const projectID = $(
-          'app-project-list chef-table chef-tbody chef-tr:nth-child(3) chef-td:nth-child(2)');
+          'app-project-list chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(2)');
         expect(projectID.getText()).toBe('project-19');
       });
 
       it('shows the control button', () => {
-        waitForElement('app-project-list chef-table chef-tbody chef-tr:nth-child(3) ' +
-          'chef-td:nth-child(4) chef-control-menu').then(controlButton => {
+        waitForElement('app-project-list chef-table-new chef-table-body chef-table-row:nth-child(3) ' +
+          'chef-table-cell:nth-child(4) chef-control-menu').then(controlButton => {
             expect(controlButton.isPresent()).toBeTruthy();
             ['Delete Project'].forEach((item, index) => {
               it(`when clicked, shows ${item}`, () => {
-                $('app-project-list chef-table chef-tbody chef-tr:nth-child(2) ' +
-                  'chef-td:nth-child(3) chef-control-menu').
+                $('app-project-list chef-table-new chef-table-body chef-table-row:nth-child(2) ' +
+                  'chef-table-cell:nth-child(3) chef-control-menu').
                   click();
                 const dropDownOption = $(
-                  `app-project-list chef-table chef-tbody chef-tr:nth-child(2)
-                  chef-td:nth-child(3) chef-control-menu chef-option:nth-child(${index + 1})`);
+                  `app-project-list chef-table-new chef-table-body chef-table-row:nth-child(2)
+                  chef-table-cell:nth-child(3) chef-control-menu chef-option:nth-child(${index + 1})`);
                 const dropDownOpened = () => dropDownOption.getText().then(val => val === item);
                 browser.wait(dropDownOpened, 5000, 'Control options should render.');
               });
@@ -912,7 +916,7 @@ describe('Admin pages', () => {
             .min(1).max(1)
             .reply(200);
 
-          waitForElement('app-project-list chef-table chef-tbody chef-tr:nth-child(3)')
+          waitForElement('app-project-list chef-table-new chef-table-body chef-table-row:nth-child(3)')
             .then(third => {
               browser.wait(EC.presenceOf(third.$('chef-control-menu'))).then(() => {
                 const controlButton = third.$('chef-control-menu');
