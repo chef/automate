@@ -135,7 +135,7 @@ func (m *ListFilter) GetType() string {
 }
 
 type Query struct {
-	// Unique identifier, such as a profile id.
+	// Unique identifier, such as a profile ID.
 	Id string `protobuf:"bytes,17,opt,name=id,proto3" json:"id,omitempty"`
 	// Type of data being requested, used for ReadTrend and ReadSummary.
 	Type string `protobuf:"bytes,19,opt,name=type,proto3" json:"type,omitempty"`
@@ -797,11 +797,11 @@ func (m *Profile) GetControlStats() []*ControlStats {
 }
 
 type ProfileList struct {
-	// Name of the profile.
+	// The profile name.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// SHA id of the profile.
+	// The profile SHA ID.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	// Total number of failed nodes that executed the profile.
+	// Total number of times this profile failed.
 	Failures int32 `protobuf:"varint,3,opt,name=failures,proto3" json:"failures,omitempty"`
 	// Total number of failed nodes with major control failures that executed the profile.
 	Majors int32 `protobuf:"varint,4,opt,name=majors,proto3" json:"majors,omitempty"`
@@ -1108,7 +1108,7 @@ func (m *ProfileSummaryStats) GetTotalNodes() int32 {
 }
 
 type ControlStats struct {
-	// Control id.
+	// Control ID.
 	Control string `protobuf:"bytes,1,opt,name=control,proto3" json:"control,omitempty"`
 	// Control title.
 	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
@@ -1572,6 +1572,18 @@ type StatsServiceClient interface {
 	//General report summary information is the default.
 	//Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
 	//Supports filtering.
+	//
+	//Example:
+	//```
+	//{
+	//"type":"nodes",
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
 	ReadSummary(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Summary, error)
 	//
 	//Read Trend
@@ -1580,14 +1592,39 @@ type StatsServiceClient interface {
 	//The `type` field is required for this api call. Options are `nodes` or `controls`.
 	//Requires minimum `interval` field of 3600 and defined start time and end time filters.
 	//Supports filtering.
+	//
+	//Example:
+	//```
+	//{
+	//"type":"nodes",
+	//"interval":86400,
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
 	ReadTrend(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Trends, error)
 	//
 	//Read Profiles
 	//
 	//Returns statistics and summary information for profiles executed as part of the compliance reports.
-	//If called without specifying a profile id (`id`), the API will return stats on all the profiles.
-	//If the `id` field is provided (profile id) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
+	//If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
+	//If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
 	//Supports filtering.
+	//
+	//```
+	//{
+	//"type":"controls",
+	//"id":"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
 	ReadProfiles(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Profile, error)
 	//
 	//Read Failures
@@ -1596,6 +1633,17 @@ type StatsServiceClient interface {
 	//Supported values are `platform`, `environment`, `control`, and `profile`.
 	//By default, the top ten failed objects for the specified type are returned.
 	//Supports filtering and respects `size` parameter.
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]},
+	//{"type":"types","values":["platform","environment"]}
+	//]
+	//}
+	//```
 	ReadFailures(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Failures, error)
 }
 
@@ -1652,6 +1700,18 @@ type StatsServiceServer interface {
 	//General report summary information is the default.
 	//Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
 	//Supports filtering.
+	//
+	//Example:
+	//```
+	//{
+	//"type":"nodes",
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
 	ReadSummary(context.Context, *Query) (*Summary, error)
 	//
 	//Read Trend
@@ -1660,14 +1720,39 @@ type StatsServiceServer interface {
 	//The `type` field is required for this api call. Options are `nodes` or `controls`.
 	//Requires minimum `interval` field of 3600 and defined start time and end time filters.
 	//Supports filtering.
+	//
+	//Example:
+	//```
+	//{
+	//"type":"nodes",
+	//"interval":86400,
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
 	ReadTrend(context.Context, *Query) (*Trends, error)
 	//
 	//Read Profiles
 	//
 	//Returns statistics and summary information for profiles executed as part of the compliance reports.
-	//If called without specifying a profile id (`id`), the API will return stats on all the profiles.
-	//If the `id` field is provided (profile id) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
+	//If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
+	//If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
 	//Supports filtering.
+	//
+	//```
+	//{
+	//"type":"controls",
+	//"id":"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
 	ReadProfiles(context.Context, *Query) (*Profile, error)
 	//
 	//Read Failures
@@ -1676,6 +1761,17 @@ type StatsServiceServer interface {
 	//Supported values are `platform`, `environment`, `control`, and `profile`.
 	//By default, the top ten failed objects for the specified type are returned.
 	//Supports filtering and respects `size` parameter.
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]},
+	//{"type":"types","values":["platform","environment"]}
+	//]
+	//}
+	//```
 	ReadFailures(context.Context, *Query) (*Failures, error)
 }
 

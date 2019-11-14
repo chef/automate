@@ -18,6 +18,18 @@ service StatsService {
 	General report summary information is the default. 
 	Adding a `type` value of `nodes` or `controls` will return summary statistics for that object.
 	Supports filtering.
+
+	Example:
+	```
+	{
+		"type":"nodes",
+		"filters":[
+			{"type":"environment","values":["dev*"]},
+			{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+			{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+		]
+	}
+	```
 	*/
 	rpc ReadSummary(Query) returns (Summary) {
 		option (google.api.http) = {
@@ -41,6 +53,19 @@ service StatsService {
 	The `type` field is required for this api call. Options are `nodes` or `controls`.
 	Requires minimum `interval` field of 3600 and defined start time and end time filters.
 	Supports filtering.
+
+	Example:
+	```
+	{
+		"type":"nodes",
+		"interval":86400,
+		"filters":[
+			{"type":"environment","values":["dev*"]},
+			{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+			{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+		]
+	}
+	```
 	*/
 	rpc ReadTrend(Query) returns (Trends) {
 		option (google.api.http) = {
@@ -61,9 +86,21 @@ service StatsService {
 	Read Profiles
 
 	Returns statistics and summary information for profiles executed as part of the compliance reports. 
-	If called without specifying a profile id (`id`), the API will return stats on all the profiles.
-	If the `id` field is provided (profile id) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
+	If called without specifying a profile ID (`id`), the API will return stats on all the profiles.
+	If the `id` field is provided (profile ID) as part of the query object, the `type` field must also be specified. Options are `controls` or `summary`.
 	Supports filtering.
+
+	```
+	{
+		"type":"controls",
+		"id":"09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+		"filters":[
+			{"type":"environment","values":["dev*"]},
+			{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+			{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+		]
+	}
+	```
 	*/
 	rpc ReadProfiles(Query) returns (Profile) {
 		option (google.api.http) = {
@@ -87,6 +124,17 @@ service StatsService {
 	Supported values are `platform`, `environment`, `control`, and `profile`.
 	By default, the top ten failed objects for the specified type are returned.
 	Supports filtering and respects `size` parameter.
+
+	Example:
+	```
+	{
+		"filters":[
+			{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+			{"type":"end_time","values":["2019-11-05T23:59:59Z"]},
+			{"type":"types","values":["platform","environment"]}
+		]
+	}
+	```
 	*/
 	rpc ReadFailures(Query) returns (Failures) {
 		option (google.api.http) = {
@@ -114,7 +162,7 @@ message ListFilter {
 }
 
 message Query {
-	// Unique identifier, such as a profile id.
+	// Unique identifier, such as a profile ID.
 	string id = 17;
 	// Type of data being requested, used for ReadTrend and ReadSummary.
 	string type = 19;
@@ -234,11 +282,11 @@ message Profile {
 }
 
 message ProfileList {
-	// Name of the profile.
+	// The profile name.
 	string name = 1;
-	// SHA id of the profile.
+	// The profile SHA ID.
 	string id = 2;
-	// Total number of failed nodes that executed the profile.
+	// Total number of times this profile failed.
 	int32 failures = 3;
 	// Total number of failed nodes with major control failures that executed the profile.
 	int32 majors = 4;
@@ -294,7 +342,7 @@ message ProfileSummaryStats {
 }
 
 message ControlStats {
-	// Control id.
+	// Control ID.
 	string control = 1;
 	// Control title.
 	string title = 2;

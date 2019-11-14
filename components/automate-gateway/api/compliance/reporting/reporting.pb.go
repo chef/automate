@@ -116,9 +116,9 @@ func (m *ControlItemRequest) GetFilters() []*ListFilter {
 }
 
 type ControlItem struct {
-	// The unique id of this control.
+	// The control's unique ID.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// The compact description of the control.
+	// The control's compact description.
 	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	// Intentionally blank.
 	Profile *ProfileMin `protobuf:"bytes,3,opt,name=profile,proto3" json:"profile,omitempty"`
@@ -770,9 +770,9 @@ func (m *ReportIds) GetIds() []string {
 type Report struct {
 	// A unique report identifier.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// The id of the node making the report.
+	// The reporting node's unique ID.
 	NodeId string `protobuf:"bytes,2,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	// The name of the node making the report.
+	// The reporting node name.
 	NodeName string `protobuf:"bytes,3,opt,name=node_name,json=nodeName,proto3" json:"node_name,omitempty"`
 	// The time that the report was completed.
 	EndTime *timestamp.Timestamp `protobuf:"bytes,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
@@ -790,9 +790,9 @@ type Report struct {
 	Statistics *Statistics `protobuf:"bytes,10,opt,name=statistics,proto3" json:"statistics,omitempty"`
 	// The profiles run as part of this report.
 	Profiles []*Profile `protobuf:"bytes,11,rep,name=profiles,proto3" json:"profiles,omitempty"`
-	// The id of the compliance scan job associated with the report.
+	// The compliance scan job ID associated with the report.
 	JobId string `protobuf:"bytes,12,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
-	// The IP address of the node making the report.
+	// The reporting node IP address.
 	Ipaddress string `protobuf:"bytes,13,opt,name=ipaddress,proto3" json:"ipaddress,omitempty"`
 	// The FQDN (fully qualified domain name) of the node making the report.
 	Fqdn string `protobuf:"bytes,14,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
@@ -1686,7 +1686,7 @@ func (m *Group) GetControls() []string {
 }
 
 type Control struct {
-	// The unique id of this control.
+	// The unique ID of this control.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// The full ruby code of the control defined in the profile.
 	Code string `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
@@ -2016,7 +2016,7 @@ func (m *SuggestionRequest) GetFilters() []*ListFilter {
 type Suggestion struct {
 	// The content that matched the search term.
 	Text string `protobuf:"bytes,1,opt,name=text,proto3" json:"text,omitempty"`
-	// The id of the resource that was suggested.
+	// The ID of the resource that was suggested.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	// The confidence in the match quality.
 	Score float32 `protobuf:"fixed32,3,opt,name=score,proto3" json:"score,omitempty"`
@@ -2241,11 +2241,11 @@ func (m *ProfileCounts) GetPassed() int32 {
 type ProfileMin struct {
 	// The name of the profile.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The title of the profile.
+	// The profile title.
 	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	// The id of the profile.
+	// The profile ID.
 	Id string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
-	// The version of the profile.
+	// The profile version.
 	Version string `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
 	// The aggregated status of the profile across the nodes it has been run on.
 	Status               string   `protobuf:"bytes,5,opt,name=status,proto3" json:"status,omitempty"`
@@ -2315,7 +2315,7 @@ func (m *ProfileMin) GetStatus() string {
 }
 
 type Node struct {
-	// The id of this node.
+	// The node ID.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// The name assigned to the node.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -2533,9 +2533,9 @@ func (m *Kv) GetValue() string {
 	return ""
 }
 
-// A summary of the information contained in the latest report for this node.
+// A summary of the latest report for this node.
 type LatestReportSummary struct {
-	// The id of the latest report.
+	// The latest report ID.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// The time the report was submitted at.
 	EndTime *timestamp.Timestamp `protobuf:"bytes,2,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
@@ -2604,9 +2604,9 @@ func (m *LatestReportSummary) GetControls() *ControlSummary {
 type ProfileMeta struct {
 	// The name of the profile.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// The version of the profile.
+	// The profile version.
 	Version string `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	// The unique id of the profile.
+	// The profile unique ID.
 	Id string `protobuf:"bytes,3,opt,name=id,proto3" json:"id,omitempty"`
 	// The status of the profile run against the node.
 	Status string `protobuf:"bytes,4,opt,name=status,proto3" json:"status,omitempty"`
@@ -2921,32 +2921,45 @@ type ReportingServiceClient interface {
 	//
 	//List reports
 	//
-	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. Supports pagination, filtering, and sorting.
+	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
+	//Supports pagination, filtering, and sorting.
+	//Limited to 10k results.
 	//
-	//| Sort paramter | Sort value |
-	//| --- | --- |
-	//| latest_report.controls.failed.critical | controls_sums.failed.critical |
-	//| latest_report.controls.failed.total | controls_sums.failed.total |
-	//| latest_report.end_time (default) | end_time |
-	//| latest_report.status | status |
-	//| node_name | node_name.lower |
+	//Vaild sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
+	//latest_report.end_time, latest_report.status, node_name
+	//
+	//Example:
+	//```
+	//{"filters":
+	//[
+	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	//],
+	//"page":1, "per_page": 3,
+	//"sort": "latest_report.status", "order": "ASC"
+	//}
+	//```
 	ListReports(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Reports, error)
 	//
 	//List report IDs
 	//
-	//List all report IDs optionally using filters. Supports filtering, but not pagination or sorting.
+	//List all IDs for the latest report for each node, with optional filtering.
+	//Supports filtering, but not pagination or sorting.
 	//Including more than one value for `control`, `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	//Not limited to 10k results.
 	ListReportIds(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ReportIds, error)
 	//
 	//List controls
 	//
-	//Lists controls from the last run, with the option of applying filters. Supports filtering, but not pagination or sorting.
+	//Lists controls from the last run, with optional filtering.
+	//Supports filtering, but not pagination or sorting.
+	//Limited to 100 results by default.
 	ListControlItems(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error)
 	//
 	//Fetch a report
 	//
-	//Fetch a specific report by id. Supports filtering, but not pagination or sorting.
+	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id` is not allowed.
 	ReadReport(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Report, error)
 	//
@@ -2975,30 +2988,41 @@ type ReportingServiceClient interface {
 	//| profile_with_version | profiles.full |
 	//| recipe | recipes |
 	//| role | roles |
+	//
+	//Example:
+	//```
+	//{
+	//"type":"environment",
+	//"text":"aws*",
+	//"filters":[
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
 	ListSuggestions(ctx context.Context, in *SuggestionRequest, opts ...grpc.CallOption) (*Suggestions, error)
 	//
 	//List profiles
 	//
-	//List all profiles in use, with the option of applying filters. Adding a profile filter returns a list of all the nodes using that profile. Supports pagination, filtering, and sorting.
-	//
-	//| Sort paramter | Sort value |
-	//| --- | --- |
-	//| name | name.lower |
-	//| title (default) | title.lower |
+	//List all profiles in use, with optional filtering.
+	//Supports pagination, filtering, and sorting.
+	//Valid sort fields: name, title
 	ListProfiles(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ProfileMins, error)
 	Export(ctx context.Context, in *Query, opts ...grpc.CallOption) (ReportingService_ExportClient, error)
 	//
 	//Fetch a node
 	//
-	//Fetch a specific node by id.
-	//Does not support filtering, pagination or sorting.
+	//Fetch a specific node by ID.
+	//Supports filtering by profile or control.
+	//Does not support pagination or sorting.
 	ReadNode(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
 	//
 	//List nodes
 	//
-	//List all nodes optionally using filters. Supports pagination, filtering, and sorting.
+	//List all nodes, with optional filtering, pagination, and sorting.
+	//Limited to 10k results.
 	//
-	//| Sort paramter | Sort value |
+	//| Sort parameter | Sort value |
 	//| --- | --- |
 	//| environment | environment.lower |
 	//| latest_report.controls.failed.critical | controls_sums.failed.critical |
@@ -3008,6 +3032,19 @@ type ReportingServiceClient interface {
 	//| name | node_name.lower |
 	//| platform | platform.full |
 	//| status | status |
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//],
+	//"page":1,"per_page":100,
+	//"sort":"environment","order":"ASC"
+	//}
+	//```
 	ListNodes(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Nodes, error)
 	GetVersion(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*version.VersionInfo, error)
 	LicenseUsageNodes(ctx context.Context, in *TimeQuery, opts ...grpc.CallOption) (*Reports, error)
@@ -3148,32 +3185,45 @@ type ReportingServiceServer interface {
 	//
 	//List reports
 	//
-	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. Supports pagination, filtering, and sorting.
+	//Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
+	//Supports pagination, filtering, and sorting.
+	//Limited to 10k results.
 	//
-	//| Sort paramter | Sort value |
-	//| --- | --- |
-	//| latest_report.controls.failed.critical | controls_sums.failed.critical |
-	//| latest_report.controls.failed.total | controls_sums.failed.total |
-	//| latest_report.end_time (default) | end_time |
-	//| latest_report.status | status |
-	//| node_name | node_name.lower |
+	//Vaild sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
+	//latest_report.end_time, latest_report.status, node_name
+	//
+	//Example:
+	//```
+	//{"filters":
+	//[
+	//{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
+	//],
+	//"page":1, "per_page": 3,
+	//"sort": "latest_report.status", "order": "ASC"
+	//}
+	//```
 	ListReports(context.Context, *Query) (*Reports, error)
 	//
 	//List report IDs
 	//
-	//List all report IDs optionally using filters. Supports filtering, but not pagination or sorting.
+	//List all IDs for the latest report for each node, with optional filtering.
+	//Supports filtering, but not pagination or sorting.
 	//Including more than one value for `control`, `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	//Not limited to 10k results.
 	ListReportIds(context.Context, *Query) (*ReportIds, error)
 	//
 	//List controls
 	//
-	//Lists controls from the last run, with the option of applying filters. Supports filtering, but not pagination or sorting.
+	//Lists controls from the last run, with optional filtering.
+	//Supports filtering, but not pagination or sorting.
+	//Limited to 100 results by default.
 	ListControlItems(context.Context, *ControlItemRequest) (*ControlItems, error)
 	//
 	//Fetch a report
 	//
-	//Fetch a specific report by id. Supports filtering, but not pagination or sorting.
+	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id` is not allowed.
 	ReadReport(context.Context, *Query) (*Report, error)
 	//
@@ -3202,30 +3252,41 @@ type ReportingServiceServer interface {
 	//| profile_with_version | profiles.full |
 	//| recipe | recipes |
 	//| role | roles |
+	//
+	//Example:
+	//```
+	//{
+	//"type":"environment",
+	//"text":"aws*",
+	//"filters":[
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//]
+	//}
+	//```
 	ListSuggestions(context.Context, *SuggestionRequest) (*Suggestions, error)
 	//
 	//List profiles
 	//
-	//List all profiles in use, with the option of applying filters. Adding a profile filter returns a list of all the nodes using that profile. Supports pagination, filtering, and sorting.
-	//
-	//| Sort paramter | Sort value |
-	//| --- | --- |
-	//| name | name.lower |
-	//| title (default) | title.lower |
+	//List all profiles in use, with optional filtering.
+	//Supports pagination, filtering, and sorting.
+	//Valid sort fields: name, title
 	ListProfiles(context.Context, *Query) (*ProfileMins, error)
 	Export(*Query, ReportingService_ExportServer) error
 	//
 	//Fetch a node
 	//
-	//Fetch a specific node by id.
-	//Does not support filtering, pagination or sorting.
+	//Fetch a specific node by ID.
+	//Supports filtering by profile or control.
+	//Does not support pagination or sorting.
 	ReadNode(context.Context, *Id) (*Node, error)
 	//
 	//List nodes
 	//
-	//List all nodes optionally using filters. Supports pagination, filtering, and sorting.
+	//List all nodes, with optional filtering, pagination, and sorting.
+	//Limited to 10k results.
 	//
-	//| Sort paramter | Sort value |
+	//| Sort parameter | Sort value |
 	//| --- | --- |
 	//| environment | environment.lower |
 	//| latest_report.controls.failed.critical | controls_sums.failed.critical |
@@ -3235,6 +3296,19 @@ type ReportingServiceServer interface {
 	//| name | node_name.lower |
 	//| platform | platform.full |
 	//| status | status |
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"type":"environment","values":["dev*"]},
+	//{"type":"start_time","values":["2019-10-26T00:00:00Z"]},
+	//{"type":"end_time","values":["2019-11-05T23:59:59Z"]}
+	//],
+	//"page":1,"per_page":100,
+	//"sort":"environment","order":"ASC"
+	//}
+	//```
 	ListNodes(context.Context, *Query) (*Nodes, error)
 	GetVersion(context.Context, *empty.Empty) (*version.VersionInfo, error)
 	LicenseUsageNodes(context.Context, *TimeQuery) (*Reports, error)

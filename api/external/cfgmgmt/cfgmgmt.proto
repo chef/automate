@@ -32,7 +32,13 @@ service ConfigMgmt {
   Returns a list of infra nodes that have checked in to Automate. 
   Adding a filter makes a list of all nodes that meet the filter criteria. 
   Filters for the same field are ORd together, while filters across different fields are ANDed together.
-  Supports pagination, filtering, and sorting.
+  Supports pagination, filtering (with wildcard support), and sorting.
+	Limited to 10k results.
+
+  Example:
+  ```
+  cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC&filter=name:mySO*&filter=platform:ubun*
+  ```
 	*/
   rpc GetNodes(cfgmgmt.request.Nodes) returns (google.protobuf.ListValue) {
     option (google.api.http).get = "/cfgmgmt/nodes";
@@ -45,7 +51,7 @@ service ConfigMgmt {
   /*
   GetRuns
 
-  Returns a list of run metadata (id, start and end time, and status) for the provided node id. 
+  Returns a list of run metadata (id, start and end time, and status) for the provided node ID. 
   Supports pagination.
   Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	*/
@@ -61,6 +67,12 @@ service ConfigMgmt {
   GetNodesCounts
 
   Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.
+  Supports filtering.
+
+  Example:
+  ```
+  cfgmgmt/stats/node_counts?filter=name:mySO*&filter=platform:ubun*
+  ```
 	*/
   rpc GetNodesCounts (cfgmgmt.request.NodesCounts) returns (cfgmgmt.response.NodesCounts) {
     option (google.api.http).get = "/cfgmgmt/stats/node_counts";
@@ -74,6 +86,11 @@ service ConfigMgmt {
   GetRunsCounts
 
   Returns totals for failed and successful runs given a `node_id`.
+
+  Example:
+  ```
+  cfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd&start=2019-11-02
+  ```
 	*/
   rpc GetRunsCounts (cfgmgmt.request.RunsCounts) returns (cfgmgmt.response.RunsCounts) {
     option (google.api.http).get = "/cfgmgmt/stats/run_counts";
@@ -86,7 +103,7 @@ service ConfigMgmt {
   /*
   GetNodeRun
 
-  Returns the infra run report for the provided node id and run id.
+  Returns the infra run report for the provided node ID and run ID.
 	*/
   rpc GetNodeRun (cfgmgmt.request.NodeRun) returns (cfgmgmt.response.Run) {
     option (google.api.http).get = "/cfgmgmt/nodes/{node_id}/runs/{run_id}";
@@ -102,6 +119,11 @@ service ConfigMgmt {
   Returns possible filter values given a valid `type` parameter. All values returned until two or more
   characters are provided for the `text` parameter.
   Supports wildcard (* and ?).
+
+  Example:
+  ```
+  cfgmgmt/suggestions?type=environment&text=_d
+  ```
 	*/
   rpc GetSuggestions (common.query.Suggestion) returns (google.protobuf.ListValue) {
     option (google.api.http).get = "/cfgmgmt/suggestions";
@@ -143,7 +165,7 @@ service ConfigMgmt {
   /*
   GetAttributes
 
-  Returns the latest reported attributes for the provided node id.
+  Returns the latest reported attributes for the provided node ID.
 	*/
   rpc GetAttributes (cfgmgmt.request.Node) returns (cfgmgmt.response.NodeAttribute) {
     option (google.api.http).get = "/cfgmgmt/nodes/{node_id}/attribute";
