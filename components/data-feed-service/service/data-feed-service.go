@@ -216,12 +216,12 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 
 	response, err := client.client.Do(request)
 	if err != nil {
-		log.Errorf("Error sending test message %v", err)
+		log.Errorf("Error sending message %v", err)
 		return err
 	} else {
 		log.Infof("Asset data posted to %v, Status %v", notification.url, response.Status)
 	}
-	if response.StatusCode != http.StatusCreated {
+	if response.StatusCode != http.StatusAccepted {
 		return errors.New(response.Status)
 	}
 	err = response.Body.Close()
