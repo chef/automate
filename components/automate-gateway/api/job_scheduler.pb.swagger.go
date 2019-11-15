@@ -162,10 +162,6 @@ func init() {
         },
         "threshold": {
           "type": "string"
-        },
-        "scheduler_enabled": {
-          "type": "boolean",
-          "format": "boolean"
         }
       }
     },

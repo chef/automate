@@ -17,7 +17,7 @@ func (s *Server) GetServicesStatus(ctx context.Context, req *api.GetServicesStat
 	return nil, status.Errorf(codes.Unimplemented, "method GetServicesStatus not implemented")
 }
 
-// RunServices runs the applications data life cycle operations
+// RunServices runs the applications data life cycle jobs
 func (s *Server) RunServices(ctx context.Context, req *api.RunServicesRequest) (*api.RunServicesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RunServices not implemented")
 }

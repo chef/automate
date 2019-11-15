@@ -31,13 +31,12 @@ type JobSettings struct {
 	Threshold string `protobuf:"bytes,3,opt,name=threshold,proto3" json:"threshold,omitempty" toml:"threshold,omitempty" mapstructure:"threshold,omitempty"`
 	Running   bool   `protobuf:"varint,4,opt,name=running,proto3" json:"running,omitempty" toml:"running,omitempty" mapstructure:"running,omitempty"`
 	// recurrence rules are how underlying cereal workflow schedules are stored
-	// and executed. 'every' and 'threshold' were used for the previous scheduler
-	// implementation and are still supported, though they are translated to
-	// and from recurrence rules.
-	// A user can still configure jobs with every and threshold, however only
-	// recurrence or every+threshold will be valid. When the UI is moved to the
-	// data_lifecycle top level api we can probably deprecate or remove every
-	// and threshold support.
+	// and executed. 'every' was the scheduler format that was used in the
+	// previous scheduler implementation and is still supported, though they
+	// are translated to and from recurrence rules when getting and setting
+	// the schedule recurrence.
+	// When the UI is moved to the data_lifecycle top level api, which uses
+	// recurrence, we can probably deprecate or remove every support.
 	Recurrence           string   `protobuf:"bytes,5,opt,name=recurrence,proto3" json:"recurrence,omitempty" toml:"recurrence,omitempty" mapstructure:"recurrence,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
 	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`

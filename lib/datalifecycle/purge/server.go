@@ -5,6 +5,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	log "github.com/sirupsen/logrus"
 	"github.com/teambition/rrule-go"
 	"google.golang.org/grpc/codes"
@@ -85,7 +86,12 @@ func (server *Server) Run(
 		policies Policies
 	)
 
-	log.Info("Purging")
+	logctx := log.WithFields(logrus.Fields{
+		"workflow": server.workflowName.String(),
+		"schedule": server.scheduleName,
+	})
+
+	logctx.Info("Purging")
 
 	sched, err = server.jobManager.GetWorkflowScheduleByName(
 		ctx, server.scheduleName, server.workflowName,
@@ -103,7 +109,7 @@ func (server *Server) Run(
 	)
 
 	if err == cereal.ErrWorkflowInstanceExists {
-		log.Warnf("workflow %q is already running, not running now", server.scheduleName)
+		log.Warn("purge job already running")
 		return res, nil
 	}
 

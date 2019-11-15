@@ -30,20 +30,17 @@ const (
 	infraMissingNodesThreshold       = "21d"
 	infraDeleteMissingNodesJobName   = "missing_nodes_for_deletion"
 	infraDeleteMissingNodesThreshold = "1m"
-
-	testRecurrence = "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=2"
+	testRecurrence                   = "FREQ=DAILY;DTSTART=20191106T180323Z;INTERVAL=2"
 )
 
-// TestDataLifecycleConfigure tests configuring the data lifecycle jobs. We'll
-// test updating and showing for individual data types and from the global
-// endpoints.
-// NOTE:
-// * services are in beta and have node been added to this endpoint
-// * postgres purge policies have not been implemented, as such they are not tested yet.
+// TestDataLifecycleConfigure tests configuring data lifecycle jobs in all
+// four possible ways: global, infra only, event-feed only, and compliance only.
+// services has not been implemented yet, nor have postgres purge policies.
 func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 	dlClient := data_lifecycle.NewDataLifecycleClient(suite.gwConn)
 
-	// Get the existing status/config
+	// Get the existing global status so we can set everything back to the
+	// way we found it later.
 	oldStatus, err := dlClient.GetStatus(suite.ctx, &data_lifecycle.GetStatusRequest{})
 	suite.Require().NoError(err)
 
@@ -183,14 +180,14 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 		Infra:      newInfraConfig,
 	})
 
-	// Ensure the config is set
+	// Get the status globally and ensure the config is set properly
 	status, err := dlClient.GetStatus(suite.ctx, &data_lifecycle.GetStatusRequest{})
 	suite.Require().NoError(err)
 	suite.assertJobSettingsMatchJobStatus(newComplianceConfig.JobSettings, status.Compliance.Jobs)
 	suite.assertJobSettingsMatchJobStatus(newEventFeedConfig.JobSettings, status.EventFeed.Jobs)
 	suite.assertJobSettingsMatchJobStatus(newInfraConfig.JobSettings, status.Infra.Jobs)
 
-	// Set it back to the original config globally
+	// Set it back to the original config
 	_, err = dlClient.SetConfig(suite.ctx, &data_lifecycle.SetConfigRequest{
 		Compliance: oldComplianceConfigRequest,
 		EventFeed:  oldEventFeedConfigRequest,
@@ -199,15 +196,15 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 	suite.Require().NoError(err)
 }
 
-// TestDataLifecycleRun ensures that when run is called that we actually run
-// operations. Each invidual service already has integrations tests for adding
-// data and ensuring that the purge Run actually does that. Therefore, we just
-// want to make sure that those endpoints are called. The Purge job statuses
-// will include a LastStartedAt that we can use to determine if the jobs ran.
+// TestDataLifecycleRun ensures that when "run" is called that we actually run
+// data lifecycle jobs on the backend. Each invidual service already has
+// integrations tests for their data lifecycle jobs so we only need to test
+// if the jobs are being triggered successfully. The purge jobs record their
+// start and end times in the database so we can use the timestamps to determine
+// if our job was successfully run.
 func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 	dlClient := data_lifecycle.NewDataLifecycleClient(suite.gwConn)
 
-	// Get the existing status/config
 	oldStatus, err := dlClient.GetStatus(suite.ctx, &data_lifecycle.GetStatusRequest{})
 	suite.Require().NoError(err)
 
@@ -304,8 +301,7 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 	time.Sleep(1 * time.Second)
 	startTime = time.Now()
 
-	// Run each individually and verify that the LastStartedAt is older than our
-	// startTime.
+	// Run each individually and verify that they were started after we began
 	_, err = dlClient.RunCompliance(suite.ctx, &data_lifecycle.RunComplianceRequest{})
 	suite.Require().NoError(err)
 
@@ -315,7 +311,7 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 	_, err = dlClient.RunInfra(suite.ctx, &data_lifecycle.RunInfraRequest{})
 	suite.Require().NoError(err)
 
-	// Give the jobs some time to run and then get their statuses
+	// Give the jobs some time to run and then get their updated status
 	time.Sleep(1 * time.Second)
 	complianceStatus, err := dlClient.GetComplianceStatus(suite.ctx, &data_lifecycle.GetComplianceStatusRequest{})
 	suite.Require().NoError(err)
@@ -326,6 +322,7 @@ func (suite *GatewayTestSuite) TestDataLifecycleRun() {
 	infraStatus, err := dlClient.GetInfraStatus(suite.ctx, &data_lifecycle.GetInfraStatusRequest{})
 	suite.Require().NoError(err)
 
+	// Assert that they ran successfully
 	suite.assertStartedAfter(complianceStatus.Jobs, startTime)
 	suite.assertStartedAfter(eventFeedStatus.Jobs, startTime)
 	for _, j := range infraStatus.Jobs {

@@ -17,7 +17,6 @@ message Job {
   string last_elapsed = 6;
   string started_on = 7;
   string threshold = 8;
-  bool scheduler_enabled = 9;
 }
 
 // DeleteNodesScheduler

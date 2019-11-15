@@ -11,8 +11,8 @@ import (
 	"github.com/chef/automate/api/interservice/ingest"
 )
 
-// GetInfraStatus returns the infra status by combining the the nodes missing,
-// nodes deleting, nodes missing deleting, and infra purge workflow schedules.
+// GetInfraStatus returns the infra job statuses by combining the nodes missing,
+// nodes deleting, nodes missing deleting, and infra purge workflows details.
 func (s *Server) GetInfraStatus(ctx context.Context, req *api.GetInfraStatusRequest) (*api.GetInfraStatusResponse, error) {
 	res := &api.GetInfraStatusResponse{}
 
@@ -38,7 +38,7 @@ func (s *Server) GetInfraStatus(ctx context.Context, req *api.GetInfraStatusRequ
 	return res, nil
 }
 
-// RunInfra runs all of the infra data lifecycle operations
+// RunInfra runs all of the infra data lifecycle jobs
 func (s *Server) RunInfra(ctx context.Context, req *api.RunInfraRequest) (*api.RunInfraResponse, error) {
 	res := &api.RunInfraResponse{}
 
@@ -65,7 +65,7 @@ func (s *Server) RunInfra(ctx context.Context, req *api.RunInfraRequest) (*api.R
 	return res, nil
 }
 
-// SetInfraConfig configures all data lifecycle operations
+// SetInfraConfig configures all data lifecycle jobs
 func (s *Server) SetInfraConfig(ctx context.Context, req *api.SetInfraConfigRequest) (*api.SetInfraConfigResponse, error) {
 	res := &api.SetInfraConfigResponse{}
 

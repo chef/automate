@@ -30,6 +30,8 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// JobStatus presents the current configuration of job, when it will be executed,
+// and details about it's most recent execution.
 type JobStatus struct {
 	Name                 string               `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Disabled             bool                 `protobuf:"varint,2,opt,name=disabled,proto3" json:"disabled,omitempty"`
@@ -141,6 +143,7 @@ func (m *JobStatus) GetLastEndedAt() *timestamp.Timestamp {
 	return nil
 }
 
+// PurgePolicies are data lifecycle purge policies
 type PurgePolicies struct {
 	Elasticsearch        []*data_lifecycle.EsPolicy `protobuf:"bytes,1,rep,name=elasticsearch,proto3" json:"elasticsearch,omitempty"`
 	Postgres             []*data_lifecycle.PgPolicy `protobuf:"bytes,2,rep,name=postgres,proto3" json:"postgres,omitempty"`
@@ -188,6 +191,7 @@ func (m *PurgePolicies) GetPostgres() []*data_lifecycle.PgPolicy {
 	return nil
 }
 
+// PurgePolicyUpdate is purge policy configuration update
 type PurgePolicyUpdate struct {
 	Elasticsearch        []*data_lifecycle.EsPolicyUpdate `protobuf:"bytes,1,rep,name=elasticsearch,proto3" json:"elasticsearch,omitempty"`
 	Postgres             []*data_lifecycle.PgPolicyUpdate `protobuf:"bytes,2,rep,name=postgres,proto3" json:"postgres,omitempty"`
@@ -235,6 +239,7 @@ func (m *PurgePolicyUpdate) GetPostgres() []*data_lifecycle.PgPolicyUpdate {
 	return nil
 }
 
+// JobSettings are a job configuration setting update
 type JobSettings struct {
 	Name                 string             `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Disabled             bool               `protobuf:"varint,2,opt,name=disabled,proto3" json:"disabled,omitempty"`
@@ -1532,17 +1537,17 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type DataLifecycleClient interface {
-	// GetStatus returns the aggregate status across all data lifecycle handlers.
+	// GetStatus returns the aggregate status across all data lifecycle jobs
 	GetStatus(ctx context.Context, in *GetStatusRequest, opts ...grpc.CallOption) (*GetStatusResponse, error)
-	// SetConfig provides a singular endpoint for confiuging all data lifecycle handlers
+	// SetConfig provides a singular endpoint for confiuging all data lifecycle jobs
 	SetConfig(ctx context.Context, in *SetConfigRequest, opts ...grpc.CallOption) (*SetConfigResponse, error)
-	// Run runs all data lifecycle actions across all data lifecycle handlers
+	// Run runs all data lifecycle actions across all data lifecycle jobs
 	Run(ctx context.Context, in *RunRequest, opts ...grpc.CallOption) (*RunResponse, error)
-	// GetInfraStatus returns the infra handler status
+	// GetInfraStatus returns the infra job scheduler status
 	GetInfraStatus(ctx context.Context, in *GetInfraStatusRequest, opts ...grpc.CallOption) (*GetInfraStatusResponse, error)
-	// RunInfra runs the infra data lifecycle operations
+	// RunInfra runs the infra data lifecycle jobs
 	RunInfra(ctx context.Context, in *RunInfraRequest, opts ...grpc.CallOption) (*RunInfraResponse, error)
-	// SetInfraConfig configures the infra data lifecycle handler
+	// SetInfraConfig configures the infra data lifecycle scheduler and jobs
 	SetInfraConfig(ctx context.Context, in *SetInfraConfigRequest, opts ...grpc.CallOption) (*SetInfraConfigResponse, error)
 	//
 	// Services
@@ -1550,17 +1555,17 @@ type DataLifecycleClient interface {
 	GetServicesStatus(ctx context.Context, in *GetServicesStatusRequest, opts ...grpc.CallOption) (*GetServicesStatusResponse, error)
 	RunServices(ctx context.Context, in *RunServicesRequest, opts ...grpc.CallOption) (*RunServicesResponse, error)
 	SetServicesConfig(ctx context.Context, in *SetServicesConfigRequest, opts ...grpc.CallOption) (*SetServicesConfigResponse, error)
-	//
-	// Event Feed
-	//
+	// GetEventFeedStatus returns the event feed job scheduler status
 	GetEventFeedStatus(ctx context.Context, in *GetEventFeedStatusRequest, opts ...grpc.CallOption) (*GetEventFeedStatusResponse, error)
+	// RunEventFeed runs the event feed data lifecycle jobs
 	RunEventFeed(ctx context.Context, in *RunEventFeedRequest, opts ...grpc.CallOption) (*RunEventFeedResponse, error)
+	// SetEventFeedConfig configures the event feed data lifecycle scheduler and jobs
 	SetEventFeedConfig(ctx context.Context, in *SetEventFeedConfigRequest, opts ...grpc.CallOption) (*SetEventFeedConfigResponse, error)
-	//
-	// Compliance
-	//
+	// GetComplianceStatus returns the compliance job scheduler status
 	GetComplianceStatus(ctx context.Context, in *GetComplianceStatusRequest, opts ...grpc.CallOption) (*GetComplianceStatusResponse, error)
+	// RunCompliance runs the compliance data lifecycle jobs
 	RunCompliance(ctx context.Context, in *RunComplianceRequest, opts ...grpc.CallOption) (*RunComplianceResponse, error)
+	// SetComplianceConfig configures the compliance data lifecycle scheduler and jobs
 	SetComplianceConfig(ctx context.Context, in *SetComplianceConfigRequest, opts ...grpc.CallOption) (*SetComplianceConfigResponse, error)
 }
 
@@ -1709,17 +1714,17 @@ func (c *dataLifecycleClient) SetComplianceConfig(ctx context.Context, in *SetCo
 
 // DataLifecycleServer is the server API for DataLifecycle service.
 type DataLifecycleServer interface {
-	// GetStatus returns the aggregate status across all data lifecycle handlers.
+	// GetStatus returns the aggregate status across all data lifecycle jobs
 	GetStatus(context.Context, *GetStatusRequest) (*GetStatusResponse, error)
-	// SetConfig provides a singular endpoint for confiuging all data lifecycle handlers
+	// SetConfig provides a singular endpoint for confiuging all data lifecycle jobs
 	SetConfig(context.Context, *SetConfigRequest) (*SetConfigResponse, error)
-	// Run runs all data lifecycle actions across all data lifecycle handlers
+	// Run runs all data lifecycle actions across all data lifecycle jobs
 	Run(context.Context, *RunRequest) (*RunResponse, error)
-	// GetInfraStatus returns the infra handler status
+	// GetInfraStatus returns the infra job scheduler status
 	GetInfraStatus(context.Context, *GetInfraStatusRequest) (*GetInfraStatusResponse, error)
-	// RunInfra runs the infra data lifecycle operations
+	// RunInfra runs the infra data lifecycle jobs
 	RunInfra(context.Context, *RunInfraRequest) (*RunInfraResponse, error)
-	// SetInfraConfig configures the infra data lifecycle handler
+	// SetInfraConfig configures the infra data lifecycle scheduler and jobs
 	SetInfraConfig(context.Context, *SetInfraConfigRequest) (*SetInfraConfigResponse, error)
 	//
 	// Services
@@ -1727,17 +1732,17 @@ type DataLifecycleServer interface {
 	GetServicesStatus(context.Context, *GetServicesStatusRequest) (*GetServicesStatusResponse, error)
 	RunServices(context.Context, *RunServicesRequest) (*RunServicesResponse, error)
 	SetServicesConfig(context.Context, *SetServicesConfigRequest) (*SetServicesConfigResponse, error)
-	//
-	// Event Feed
-	//
+	// GetEventFeedStatus returns the event feed job scheduler status
 	GetEventFeedStatus(context.Context, *GetEventFeedStatusRequest) (*GetEventFeedStatusResponse, error)
+	// RunEventFeed runs the event feed data lifecycle jobs
 	RunEventFeed(context.Context, *RunEventFeedRequest) (*RunEventFeedResponse, error)
+	// SetEventFeedConfig configures the event feed data lifecycle scheduler and jobs
 	SetEventFeedConfig(context.Context, *SetEventFeedConfigRequest) (*SetEventFeedConfigResponse, error)
-	//
-	// Compliance
-	//
+	// GetComplianceStatus returns the compliance job scheduler status
 	GetComplianceStatus(context.Context, *GetComplianceStatusRequest) (*GetComplianceStatusResponse, error)
+	// RunCompliance runs the compliance data lifecycle jobs
 	RunCompliance(context.Context, *RunComplianceRequest) (*RunComplianceResponse, error)
+	// SetComplianceConfig configures the compliance data lifecycle scheduler and jobs
 	SetComplianceConfig(context.Context, *SetComplianceConfigRequest) (*SetComplianceConfigResponse, error)
 }
 

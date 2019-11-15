@@ -13,10 +13,10 @@ toc = true
 
 # Overview
 
-The bulk of Chef Automate's data is manipulated by the `ingest-service`, `event-feed-service`,
-`compliance-services` and `applications-service` and stored in ElasticSearch
-or PostgreSQL. Over time users may wish to prune data from Chef Automate by
-creating data lifecycle policies.
+Chef Automate stores data from the `ingest-service`, `event-feed-service`,
+`compliance-service` and `applications-service` in ElasticSearch or PostgreSQL.
+Over time users may wish to prune data from Chef Automate by creating data
+lifecycle policies.
 
 The `data-lifecycle` API allows configuring and running lifecycle jobs by data type:
 
@@ -26,13 +26,13 @@ The `data-lifecycle` API allows configuring and running lifecycle jobs by data t
 
 Different jobs are available depending on the data type you wish to configure or run.
 
-In order to see the status, configure data lifecycle jobs, or run data lifecycle jobs, you will need
+In order to see the data lifecycle job statuses, configure jobs, or run jobs, you will need
 an [admin token]({{< relref "api-tokens.md#creating-an-admin-api-token" >}}) or a token
-for a user with `dataLifecycle:*` or equivalent IAM access.
+for a user with `dataLifecycle:*` IAM access.
 
 ## Status
 
-To see the status and configuration for all data lifecycle jobs you can use the global status endpoint
+To see the combined status and configuration for all data lifecycle jobs you can use the global status endpoint
 ```bash
 curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/status
 ```
@@ -44,6 +44,9 @@ curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/da
 ```
 
 Swap `event-feed` for `infra` or `compliance` to see their corresponding jobs.
+
+The status in an aggregate of the job configuration, details about it's next scheduled run, and details about
+any previous runs.
 
 ## Configuration
 
@@ -131,14 +134,15 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
 }
 ```
 
-Configure the jobs by sending the payload to the `configure` endpoint, where the configuration file is saved as `config.json
+Configure the jobs by sending the JSON payload to the `configure` endpoint. Save the JSON file as `config.json`
 in the current working directory.
 ```bash
 curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/config
 ```
 
-If you only wish to configure a specific endpoint you can send the `job_settings` for that endpoint to the sub-resource you
-wish to configure. For example, if we only wished to configure compliance settings we could create a smaller JSON payload:
+If you wish to configure a specific endpoint only, you can specify the `job_settings` for that
+data type and configure it using data types sub-resource. For example, if you want to configure
+compliance settings create a smaller JSON payload:
 
 ```json
 { "job_settings": [
@@ -184,11 +188,15 @@ Infra node lifecycle jobs have the following options:
 
 Purge jobs have the following options:
 
-* `purge_polices` (json) configures how old the corresponding data must be in the configured storage backend before it is purged.
+* `purge_polices` (map) configures how old the corresponding data must be in the configured storage backend before it is purged.
+  * `elasticsearch` (array) an array of ElasticSearch purge policies
+    * `disabled` (bool) Whether or not this job should be enabled
+    * `policy_name` (string) The name of the purge policy you wish to update
+    * `older_than_days` (int) The name of the purge policy you wish to update
 
 #### Infra Job Settings
 
-There are three infra node lifecycle jobs and one purge job with two ElasticSearch purge policies.
+The `infra` data type has four data lifecycle jobs, three are for node lifecycle and one is purge job with two ElasticSearch purge policies.
 
 ```json
 { "job_settings": [
@@ -239,7 +247,7 @@ There are three infra node lifecycle jobs and one purge job with two ElasticSear
  
 #### Compliance Job Settings
 
-There is one compliance purge job with two ElasticSearch purge policies
+The `compliance` data type has one compliance purge job with two ElasticSearch purge policies.
 
 ```json
 { "job_settings": [
@@ -272,7 +280,7 @@ There is one compliance purge job with two ElasticSearch purge policies
 
 #### Event Feed Job Settings
 
-There is one event feed purge job with one ElasticSearch purge policies
+The `event_feed` data type has one event feed purge job with one ElasticSearch purge policy.
 
 ```json
 { "job_settings": [
@@ -298,18 +306,18 @@ There is one event feed purge job with one ElasticSearch purge policies
 
 ## Run
 
-As with `status` and `configure`, you can run data lifecycle operations globally across all data or by using the sub-resource.
+As with `status` and `configure`, you can run data lifecycle jobs globally across all data or by using the data type sub-resource.
 
-To run all data lifecycle operations immediately run the following command:
+To run all data lifecycle jobs immediately run the following command:
 
 ```bash
 curl -s -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/run
 ```
 
-To only run operations for a specific data type you can make the request to the sub-resource:
+To only run jobs for a specific data type you can make the request to the sub-resource:
 
 ```bash
 curl -s -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/infra/run
 ```
 
-Swap `infra` for `event-feed` or `compliance` to see their corresponding jobs.
+Swap `infra` for `event-feed` or `compliance` to run their corresponding jobs.

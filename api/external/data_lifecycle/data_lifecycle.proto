@@ -11,13 +11,14 @@ import "google/protobuf/timestamp.proto";
 import "google/protobuf/duration.proto";
 import "api/interservice/data_lifecycle/purge.proto";
 
-// DataLifecycle allows configuring and running data lifecycle operations
+// DataLifecycle allows accessing the status of the data lifecycle job scheduler,
+// and configuring and running jobs.
 service DataLifecycle {
 	//
-	// Global actions
+	// Global
 	//
 
-	// GetStatus returns the aggregate status across all data lifecycle handlers.
+	// GetStatus returns the aggregate status across all data lifecycle jobs
 	rpc GetStatus(GetStatusRequest) returns (GetStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/status";
 		option (chef.automate.api.policy).resource = "dataLifecycle:status";
@@ -26,7 +27,7 @@ service DataLifecycle {
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:status:get";
 	};
 
-	// SetConfig provides a singular endpoint for confiuging all data lifecycle handlers
+	// SetConfig provides a singular endpoint for confiuging all data lifecycle jobs
 	rpc SetConfig(SetConfigRequest) returns (SetConfigResponse) {
 		option (google.api.http) = {
 			put: "/data-lifecycle/config";
@@ -38,7 +39,7 @@ service DataLifecycle {
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:config:update";
 	};
 
-	// Run runs all data lifecycle actions across all data lifecycle handlers
+	// Run runs all data lifecycle actions across all data lifecycle jobs
 	rpc Run(RunRequest) returns (RunResponse) {
 		option (google.api.http) = {
 			post: "/data-lifecycle/run";
@@ -54,7 +55,7 @@ service DataLifecycle {
 	// Infra
 	//
 
-	// GetInfraStatus returns the infra handler status
+	// GetInfraStatus returns the infra job scheduler status
 	rpc GetInfraStatus(GetInfraStatusRequest) returns (GetInfraStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/infra/status";
 		option (chef.automate.api.policy).resource = "datalifecyle:infra:status";
@@ -63,7 +64,7 @@ service DataLifecycle {
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:infra:get";
 	};
 
-	// RunInfra runs the infra data lifecycle operations
+	// RunInfra runs the infra data lifecycle jobs
 	rpc RunInfra(RunInfraRequest) returns (RunInfraResponse) {
 		option (google.api.http) = {
 			post: "/data-lifecycle/infra/run";
@@ -75,7 +76,7 @@ service DataLifecycle {
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:infra:create";
 	};
 
-	// SetInfraConfig configures the infra data lifecycle handler
+	// SetInfraConfig configures the infra data lifecycle scheduler and jobs
 	rpc SetInfraConfig(SetInfraConfigRequest) returns (SetInfraConfigResponse) {
 		option (google.api.http) = {
 			put: "/data-lifecycle/infra/config";
@@ -123,6 +124,8 @@ service DataLifecycle {
 	//
 	// Event Feed
 	//
+
+	// GetEventFeedStatus returns the event feed job scheduler status
 	rpc GetEventFeedStatus(GetEventFeedStatusRequest) returns (GetEventFeedStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/event-feed/status";
 		option (chef.automate.api.policy).resource = "datalifecyle:eventFeed:status";
@@ -131,6 +134,7 @@ service DataLifecycle {
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:eventFeed:get";
 	};
 
+	// RunEventFeed runs the event feed data lifecycle jobs
 	rpc RunEventFeed(RunEventFeedRequest) returns (RunEventFeedResponse) {
 		option (google.api.http) = {
 			post: "/data-lifecycle/event-feed/run";
@@ -142,6 +146,7 @@ service DataLifecycle {
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:eventFeed:create";
 	};
 
+	// SetEventFeedConfig configures the event feed data lifecycle scheduler and jobs
 	rpc SetEventFeedConfig(SetEventFeedConfigRequest) returns (SetEventFeedConfigResponse) {
 		option (google.api.http) = {
 			put: "/data-lifecycle/event-feed/config";
@@ -156,6 +161,8 @@ service DataLifecycle {
 	//
 	// Compliance
 	//
+
+	// GetComplianceStatus returns the compliance job scheduler status
 	rpc GetComplianceStatus(GetComplianceStatusRequest) returns (GetComplianceStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/compliance/status";
 		option (chef.automate.api.policy).resource = "datalifecyle:compliance:status";
@@ -164,6 +171,7 @@ service DataLifecycle {
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:compliance:get";
 	};
 
+	// RunCompliance runs the compliance data lifecycle jobs
 	rpc RunCompliance(RunComplianceRequest) returns (RunComplianceResponse) {
 		option (google.api.http) = {
 			post: "/data-lifecycle/compliance/run";
@@ -175,6 +183,7 @@ service DataLifecycle {
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:compliance:create";
 	};
 
+	// SetComplianceConfig configures the compliance data lifecycle scheduler and jobs
 	rpc SetComplianceConfig(SetComplianceConfigRequest) returns (SetComplianceConfigResponse) {
 		option (google.api.http) = {
 			put: "/data-lifecycle/compliance/config";
@@ -187,6 +196,8 @@ service DataLifecycle {
 	};
 }
 
+// JobStatus presents the current configuration of job, when it will be executed,
+// and details about it's most recent execution.
 message JobStatus {
 	string name = 1;
 	bool disabled = 2;
@@ -200,16 +211,19 @@ message JobStatus {
 	google.protobuf.Timestamp last_ended_at = 10;
 }
 
+// PurgePolicies are data lifecycle purge policies
 message PurgePolicies {
 	repeated chef.automate.infra.data_lifecycle.api.EsPolicy elasticsearch = 1;
 	repeated chef.automate.infra.data_lifecycle.api.PgPolicy postgres = 2;
 }
 
+// PurgePolicyUpdate is purge policy configuration update
 message PurgePolicyUpdate {
 	repeated chef.automate.infra.data_lifecycle.api.EsPolicyUpdate elasticsearch = 1;
 	repeated chef.automate.infra.data_lifecycle.api.PgPolicyUpdate postgres = 2;
 }
 
+// JobSettings are a job configuration setting update
 message JobSettings {
 	string name =1;
 	bool disabled = 2;

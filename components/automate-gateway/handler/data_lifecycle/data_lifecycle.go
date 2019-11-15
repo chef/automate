@@ -26,7 +26,7 @@ func NewServer(ingestJobClient ingest.JobSchedulerClient,
 	}
 }
 
-// Server can be embedded to have forward compatible implementations.
+// Server is the data lifecycle server handler implementation
 type Server struct {
 	ingestJobClient       ingest.JobSchedulerClient
 	ingestPurgeClient     data_lifecycle.PurgeClient
@@ -34,9 +34,10 @@ type Server struct {
 	eventFeedPurgeClient  data_lifecycle.PurgeClient
 }
 
+// NOTE: services is currently unimplemented as the API's are not stable
+
 // GetStatus returns the aggregate status across all data lifecycle schedules
 // and configuration.
-// NOTE: services is currently unimplemented as the API's are not stable
 func (s *Server) GetStatus(ctx context.Context, req *api.GetStatusRequest) (*api.GetStatusResponse, error) {
 	res := &api.GetStatusResponse{}
 	var err error
@@ -59,8 +60,7 @@ func (s *Server) GetStatus(ctx context.Context, req *api.GetStatusRequest) (*api
 	return res, nil
 }
 
-// SetConfig configures all data lifecycle operations
-// NOTE: services is currently unimplemented as the API's are not stable
+// SetConfig configures all data lifecycle jobs
 func (s *Server) SetConfig(ctx context.Context, req *api.SetConfigRequest) (*api.SetConfigResponse, error) {
 	res := &api.SetConfigResponse{}
 	var err error
@@ -89,8 +89,7 @@ func (s *Server) SetConfig(ctx context.Context, req *api.SetConfigRequest) (*api
 	return res, nil
 }
 
-// Run runs all data lifecycle operations
-// NOTE: services is currently unimplemented as the API's are not stable
+// Run runs all data lifecycle jobs
 func (s *Server) Run(ctx context.Context, req *api.RunRequest) (*api.RunResponse, error) {
 	res := &api.RunResponse{}
 	var err error

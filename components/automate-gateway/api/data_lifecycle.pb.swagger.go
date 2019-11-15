@@ -16,6 +16,7 @@ func init() {
   "paths": {
     "/data-lifecycle/compliance/config": {
       "put": {
+        "summary": "SetComplianceConfig configures the compliance data lifecycle scheduler and jobs",
         "operationId": "SetComplianceConfig",
         "responses": {
           "200": {
@@ -42,6 +43,7 @@ func init() {
     },
     "/data-lifecycle/compliance/run": {
       "post": {
+        "summary": "RunCompliance runs the compliance data lifecycle jobs",
         "operationId": "RunCompliance",
         "responses": {
           "200": {
@@ -68,7 +70,7 @@ func init() {
     },
     "/data-lifecycle/compliance/status": {
       "get": {
-        "summary": "Compliance",
+        "summary": "GetComplianceStatus returns the compliance job scheduler status",
         "operationId": "GetComplianceStatus",
         "responses": {
           "200": {
@@ -85,7 +87,7 @@ func init() {
     },
     "/data-lifecycle/config": {
       "put": {
-        "summary": "SetConfig provides a singular endpoint for confiuging all data lifecycle handlers",
+        "summary": "SetConfig provides a singular endpoint for confiuging all data lifecycle jobs",
         "operationId": "SetConfig",
         "responses": {
           "200": {
@@ -112,6 +114,7 @@ func init() {
     },
     "/data-lifecycle/event-feed/config": {
       "put": {
+        "summary": "SetEventFeedConfig configures the event feed data lifecycle scheduler and jobs",
         "operationId": "SetEventFeedConfig",
         "responses": {
           "200": {
@@ -138,6 +141,7 @@ func init() {
     },
     "/data-lifecycle/event-feed/run": {
       "post": {
+        "summary": "RunEventFeed runs the event feed data lifecycle jobs",
         "operationId": "RunEventFeed",
         "responses": {
           "200": {
@@ -164,7 +168,7 @@ func init() {
     },
     "/data-lifecycle/event-feed/status": {
       "get": {
-        "summary": "Event Feed",
+        "summary": "GetEventFeedStatus returns the event feed job scheduler status",
         "operationId": "GetEventFeedStatus",
         "responses": {
           "200": {
@@ -181,7 +185,7 @@ func init() {
     },
     "/data-lifecycle/infra/config": {
       "put": {
-        "summary": "SetInfraConfig configures the infra data lifecycle handler",
+        "summary": "SetInfraConfig configures the infra data lifecycle scheduler and jobs",
         "operationId": "SetInfraConfig",
         "responses": {
           "200": {
@@ -208,7 +212,7 @@ func init() {
     },
     "/data-lifecycle/infra/run": {
       "post": {
-        "summary": "RunInfra runs the infra data lifecycle operations",
+        "summary": "RunInfra runs the infra data lifecycle jobs",
         "operationId": "RunInfra",
         "responses": {
           "200": {
@@ -235,7 +239,7 @@ func init() {
     },
     "/data-lifecycle/infra/status": {
       "get": {
-        "summary": "GetInfraStatus returns the infra handler status",
+        "summary": "GetInfraStatus returns the infra job scheduler status",
         "operationId": "GetInfraStatus",
         "responses": {
           "200": {
@@ -252,7 +256,7 @@ func init() {
     },
     "/data-lifecycle/run": {
       "post": {
-        "summary": "Run runs all data lifecycle actions across all data lifecycle handlers",
+        "summary": "Run runs all data lifecycle actions across all data lifecycle jobs",
         "operationId": "Run",
         "responses": {
           "200": {
@@ -348,7 +352,7 @@ func init() {
     },
     "/data-lifecycle/status": {
       "get": {
-        "summary": "GetStatus returns the aggregate status across all data lifecycle handlers.",
+        "summary": "GetStatus returns the aggregate status across all data lifecycle jobs",
         "operationId": "GetStatus",
         "responses": {
           "200": {
@@ -445,7 +449,8 @@ func init() {
         "purge_policies": {
           "$ref": "#/definitions/chef.automate.api.data_lifecycle.PurgePolicyUpdate"
         }
-      }
+      },
+      "title": "JobSettings are a job configuration setting update"
     },
     "chef.automate.api.data_lifecycle.JobStatus": {
       "type": "object",
@@ -485,7 +490,8 @@ func init() {
           "type": "string",
           "format": "date-time"
         }
-      }
+      },
+      "description": "JobStatus presents the current configuration of job, when it will be executed,\nand details about it's most recent execution."
     },
     "chef.automate.api.data_lifecycle.PurgePolicies": {
       "type": "object",
@@ -502,7 +508,8 @@ func init() {
             "$ref": "#/definitions/chef.automate.infra.data_lifecycle.api.PgPolicy"
           }
         }
-      }
+      },
+      "title": "PurgePolicies are data lifecycle purge policies"
     },
     "chef.automate.api.data_lifecycle.PurgePolicyUpdate": {
       "type": "object",
@@ -519,7 +526,8 @@ func init() {
             "$ref": "#/definitions/chef.automate.infra.data_lifecycle.api.PgPolicyUpdate"
           }
         }
-      }
+      },
+      "title": "PurgePolicyUpdate is purge policy configuration update"
     },
     "chef.automate.api.data_lifecycle.RunComplianceRequest": {
       "type": "object"
