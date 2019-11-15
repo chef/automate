@@ -74,7 +74,7 @@ func (d *DataFeedComplianceTask) buildReportFeed(ctx context.Context, nodeIDs ma
 		var nodeData map[string]interface{}
 		if updatedNodesOnly {
 			// need to make the map
-			nodeData := make(map[string]interface{}, 0)
+			nodeData = make(map[string]interface{})
 			nodeData["node_data"] = DataFeedMessage{Report: fullReport}
 		} else {
 			filters := []string{"ipaddress:" + ipaddress}

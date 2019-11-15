@@ -56,6 +56,7 @@ func (d *DataFeedNotifierTask) Run(ctx context.Context, task cereal.Task) (inter
 	var buffer bytes.Buffer
 	for _, message := range datafeedMessages {
 		data, _ := json.Marshal(message)
+		data = bytes.ReplaceAll(data, []byte("\n"), []byte("\f"))
 		buffer.Write(data)
 		buffer.WriteString("\n")
 	}
