@@ -54,16 +54,5 @@ describe File.basename(__FILE__) do
 
     assert_equal(true, res['summary']['valid'])
     assert_equal([Profiles::CheckMessage.new(file: "controls/files_spec.rb", line: 9, control_id: "apache-08", msg: "Control apache-08 has no tests defined")], res['warnings'])
-
-    profile_path = File.expand_path('./wonky-profiles/baddescription-0.2.0.tar.gz', File.dirname(__FILE__))
-    profile_content = File.open(profile_path, 'rb').read
-    req = Profiles::ProfilePostRequest.new(
-      owner: 'chris',
-      meta: Profiles::Metadata.new(contentType: 'application/x-gtar'),
-      chunk: Profiles::Chunk.new(data: profile_content)
-    )
-    assert_grpc_error(/Could not gather profile json for /, 13) do
-      GRPC profiles, :create, [req]
-    end
   end
 end
