@@ -15,7 +15,12 @@ export class Regex {
     // Only allows wildcard alone or words and numbers, but not combined
     // Legal Values: *, chef, _state, etc.
     // Illegal Values: abc*, *chef, c*h*e*f, **
-    NO_MIXED_WILDCARD: '^(\\*|[-!\\[\\]@#$%^&()+=/?><.,~\\w]+)$'
+
+    // Allows no special characters except hyphen
+    NO_MIXED_WILDCARD_ALLOW_HYPHEN: '^(\\*|[-\\w]+)$',
+
+    // Allows all special characters except colon :
+    NO_MIXED_WILDCARD_ALLOW_SPECIAL: '^(\\*|[^:*]+)$'
   };
 
 }

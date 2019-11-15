@@ -334,15 +334,14 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         if (formValues.type === 'user' || formValues.type === 'team') {
           this.addIdentityControl();
         } else if (formValues.type === 'token') {
-          this.addNameControl();
+          this.addNameControl(formValues.identityProvider);
         }
         break;
       case 'identityProvider':
         this.resetErrors();
+        this.expressionForm.removeControl('name');
         if (formValues.identityProvider !== matchAllWildCard) {
-          this.addNameControl();
-        } else {
-          this.expressionForm.removeControl('name');
+          this.addNameControl(formValues.identityProvider);
         }
         break;
       case 'name': // fallthrough
@@ -376,15 +375,28 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
     this.expressionForm.addControl('identityProvider', new FormControl('', Validators.required));
   }
 
-  private addNameControl(): void {
-    this.expressionForm.addControl('name', new FormControl('',
-      [
-        Validators.required,
-        Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD)
-      ]
-    )
-    );
+  private addNameControl(identityProvider): void {
+    if (identityProvider === 'ldap' || identityProvider === 'saml' ) {
+      console.log('set name to all')
+        this.expressionForm.addControl('name', new FormControl('',
+          [
+            Validators.required,
+            Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD_ALLOW_SPECIAL)
+          ]
+        )
+      );
+    } else {
+      console.log('set name to hyphen only')
+        this.expressionForm.addControl('name', new FormControl('',
+          [
+            Validators.required,
+            Validators.pattern(Regex.patterns.NO_MIXED_WILDCARD_ALLOW_HYPHEN)
+          ]
+        )
+      );
+    }
   }
+
 
   private setExpressionOutput(): void {
     this.expressionOutput =
