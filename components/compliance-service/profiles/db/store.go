@@ -437,11 +437,10 @@ func (s *Store) ListProfilesMetadata(namespace string, name string, sort string,
 
 		rows, err = s.DB.Query(query, namespace, name)
 	}
-	defer rows.Close() // nolint: errcheck
-
 	if err != nil {
 		return nil, err
 	}
+	defer rows.Close() // nolint: errcheck
 
 	return s.parseList(rows)
 }
