@@ -258,7 +258,13 @@ var ProductMetadataJSON = `
     },
     {
       "name": "chef/automate-builder-api",
-      "metadata": null
+      "metadata": {
+        "name": "chef/automate-builder-api",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
     },
     {
       "name": "chef/automate-builder-api-proxy",
