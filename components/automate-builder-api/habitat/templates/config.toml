@@ -16,6 +16,11 @@ build_on_upload = true
 listen = "{{cfg.conf.service.listen}}"
 port = {{cfg.conf.service.port}}
 
+[http.tls]
+cert_path = "{{svc_cert_path}}"
+key_path = "{{svc_key_path}}"
+ca_cert_path = "{{svc_root_ca_path}}"
+
 [oauth]
 provider       = "chef-automate"
 token_url      = "https://{{cfg.binds.session.sys.ip}}:{{cfg.binds.session.cfg.port}}/token"
@@ -54,6 +59,7 @@ port = {{cfg.binds.memcache.cfg.port}}
 {{- else }}
 {{ fail "missing memcache port" }}
 {{- end }}
+tls = { cert_path = "{{svc_cert_path}}", key_path = "{{svc_key_path}}", ca_cert_path = "{{svc_root_ca_path}}" }
 
 [datastore]
 host = "{{ pg_gateway_host }}"

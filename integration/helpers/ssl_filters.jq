@@ -19,6 +19,9 @@ map(select(
          (.id != "cert_chain_of_trust" or .port != "443") and   # Test uses self-signed cert
          (.id != "cert_validityPeriod" or .port != "443") and   # Test uses self-signed cert
 
+         # automate-builder-memcache doesn't allow us to set server cipher order
+         (.id != "cipher_order" or .port != "10102") and
+
          # security headers
          #
          # automate-lb is responsible for adding required headers for
