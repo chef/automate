@@ -116,8 +116,8 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed),
       filter(state => this.addingUsers && !pending(state)))
       .subscribe((state) => {
-        this.addingUsers = false;
         if (state === EntityStatus.loadingSuccess) {
+          this.addingUsers = false;
           this.closePage();
         }
     });
@@ -128,17 +128,16 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
       this.store.select(addTeamUsersStatusError)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      filter(([state, error]) => {
-        return this.addingUsers && state === EntityStatus.loadingFailure && !isNil(error);
-      }))
-      .subscribe(([_, error]) => {
-        if (error.message === undefined) {
+      filter(() => this.addingUsers),
+      filter(([state, resp]) => state === EntityStatus.loadingFailure && !isNil(resp)))
+      .subscribe(([_, resp]) => {
+        this.addingUsers = false;
+        if (resp.error.message === undefined) {
           this.addUsersFailed = 'An error occurred while attempting ' +
           'to add users. Please try again.';
         } else {
-          this.addUsersFailed = `Failed to add users: ${error.message}`;
+          this.addUsersFailed = `Failed to add users: ${resp.error.message}`;
         }
-        this.addingUsers = false;
       });
   }
 
