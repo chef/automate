@@ -18,18 +18,9 @@ chef-page {
 
   input {
     height: 45px;
-<<<<<<< HEAD
     width: 100%;
     outline: 0;
     font-size: 1em;
-  }
-
-  chef-error {
-    background-color: #DC267F;
-    color: #FFFFFF;
-    border-radius: 0 0 4px 4px;
-=======
->>>>>>> Remove chef-input from project-rules-component, update CSS note: these inputs have an explicit 45px height to them where as none other others do and they all come out to about 42px
   }
 
   chef-error {
