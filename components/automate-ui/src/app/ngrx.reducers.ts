@@ -143,7 +143,7 @@ export const defaultInitialState = {
   projectsFilter: projectsFilter.projectsFilterInitialState,
 
   // UI State
-  integrations_add: integationsAdd.IntegrationsAddInitialState, 
+  integrations_add: integationsAdd.IntegrationsAddInitialState,
   integrations_detail: integrationsDetail.IntegrationsDetailInitialState,
   integrations_edit: integrationsEdit.IntegrationsEditInitialState,
   job_add: jobAdd.JobAddInitialState,

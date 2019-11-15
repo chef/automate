@@ -1,10 +1,9 @@
 <div class="content-container">
   <div class="container">
     <main>
-      <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
       <chef-page-header>
         <chef-heading>Projects</chef-heading>
-      <chef-subheading>
+        <chef-subheading>
           Projects group resources together.
         </chef-subheading>
       </chef-page-header>
@@ -57,8 +56,26 @@
             </chef-table-new>
           </app-authorized>
         </ng-container>
+        <ng-container *ngIf="(sortedProjects$ | async)?.length === 0">
+          <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
+            <div class="empty-case-container">
+              <p>Create the first project to get started!</p>
+            </div>
+            <div class="empty-case-container">
+                <chef-button primary data-cy="create-project" (click)="openCreateModal()">Create Project</chef-button>
+            </div>
+          </app-authorized>
+          <app-authorized not [allOf]="['/iam/v2beta/projects', 'post']">
+            <div class="empty-case-container">
+              <p>It looks like no one has created any projects yet and you<br/>
+                don't have permission to create them.<br/><br/>
+                If this is a mistake, then reach out to your administrator.
+              </p>
+            </div>
+          </app-authorized>
+        </ng-container>
       </section>
-
+  
       <app-create-object-modal
         [visible]="createModalVisible"
         [showProjectsDropdown]="false"
@@ -69,7 +86,7 @@
         (close)="closeCreateModal()"
         (createClicked)="createProject()">
       </app-create-object-modal>
-
+  
       <app-delete-object-modal
         [visible]="deleteModalVisible"
         objectNoun="project"
@@ -79,13 +96,13 @@
         (deleteClicked)="deleteProject()"
         objectAction="Delete">
       </app-delete-object-modal>
-
+  
       <app-confirm-apply-start-modal
         [visible]="confirmApplyStartModalVisible"
         (confirm)="confirmApplyStart()"
         (cancel)="cancelApplyStart()">
       </app-confirm-apply-start-modal>
-
+  
       <app-confirm-apply-stop-modal
         [visible]="confirmApplyStopModalVisible"
         [applyRulesStatus]="projects.applyRulesStatus$ | async"
