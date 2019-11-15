@@ -165,7 +165,7 @@ subscriptions:
       - bash:.expeditor/update-inspec-version.sh:
           post_commit: false
   # Update Habitat when it is released
-  - workload: artifact_published:stable:habitat:*
+  - workload: habitat-sh/habitat:master_completed:project_promoted:habitat-sh/habitat:master:current:*
     actions:
       - bash:.expeditor/update_habitat.sh:
           post_commit: false
