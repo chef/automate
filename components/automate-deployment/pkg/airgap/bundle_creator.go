@@ -47,21 +47,53 @@ type HabBinaryDownloader interface {
 	DownloadHabBinary(version string, release string, w io.Writer) error
 }
 
-type bintrayHabDownloader struct{}
+const (
+	// Last version for which hab tars lived on bintray
+	lastBintrayVersion = "0.89.0"
 
-// NewBintrayHabDownloader returns a new HabBinaryDownloader that pulls from bintray
-func NewBintrayHabDownloader() HabBinaryDownloader {
-	return &bintrayHabDownloader{}
+	pcioBaseURLFmt    = "https://packages.chef.io/files/habitat/%s/hab-x86_64-linux.tar.gz"
+	bintrayBaseURLFmt = "https://habitat.bintray.com/stable/linux/x86_64/hab-%s-%s-x86_64-linux.tar.gz"
+)
+
+// netHabDownloader downloads the habitat binary from either
+// habitat.bintray.com or packages.chef.io.
+type netHabDownloader struct{}
+
+// NewNetHabDownloader returns a new HabBinaryDownloader that pulls
+// from bintray or packages.chef.io based on the version being
+// requested.
+func NewNetHabDownloader() HabBinaryDownloader {
+	return &netHabDownloader{}
 }
 
-func (dl *bintrayHabDownloader) DownloadHabBinary(version string, release string, w io.Writer) error {
-	resp, err := http.Get(fmt.Sprintf("https://habitat.bintray.com/stable/linux/x86_64/hab-%s-%s-x86_64-linux.tar.gz",
-		version, release))
+func urlForVersion(version string, release string) (string, error) {
+	targetVersion, err := habpkg.ParseSemverishVersion(version)
+	if err != nil {
+		return "", err
+	}
 
+	switchoverVersion, err := habpkg.ParseSemverishVersion(lastBintrayVersion)
+	if err != nil {
+		return "", err
+	}
+
+	if habpkg.CompareSemverish(targetVersion, switchoverVersion) == habpkg.SemverishGreater {
+		return fmt.Sprintf(pcioBaseURLFmt, version), nil
+	} else {
+		return fmt.Sprintf(bintrayBaseURLFmt, version, release), nil
+	}
+}
+
+func (dl *netHabDownloader) DownloadHabBinary(version string, release string, w io.Writer) error {
+	url, err := urlForVersion(version, release)
+	if err != nil {
+		return errors.Wrap(err, "Could not determine hab binary download URL")
+	}
+
+	resp, err := http.Get(url)
 	if err != nil {
 		return errors.Wrap(err, "Could not download hab binary")
 	}
-
 	defer resp.Body.Close() // nolint errcheck
 
 	if resp.StatusCode != 200 {
@@ -194,7 +226,7 @@ func NewInstallBundleCreator(opts ...InstallBundleCreatorOpt) *InstallBundleCrea
 	creator := &InstallBundleCreator{
 		channel:             "current",
 		depotClient:         depot.NewClient(),
-		habBinaryDownloader: &bintrayHabDownloader{},
+		habBinaryDownloader: &netHabDownloader{},
 		retryDelay:          -1, // auto-calculate by default
 	}
 
