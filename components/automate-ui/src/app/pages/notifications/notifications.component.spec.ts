@@ -4,7 +4,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
-import { Store } from '@ngrx/store';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
 import { MockComponent } from 'ng2-mock-component';
 
 import { Rule, ServiceActionType } from './rule';
@@ -15,7 +16,7 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { FeatureFlagsService } from '../../services/feature-flags/feature-flags.service';
 
 describe('NotificationsComponent', () => {
-
+  let store: Store<NgrxStateAtom>;
   const rules: Rule[] = [
     new Rule('id1', 'test rule1', 'ComplianceFailure',
       'http://foo.com', ServiceActionType.SLACK, '', false),
@@ -57,34 +58,30 @@ describe('NotificationsComponent', () => {
     open(_message, _m, _time) { }
   }
 
-  class MockStore {
-    dispatch() { }
-    select() { }
-  }
-
   let telemetryService: TelemetryService;
   let fixture, component;
 
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
-        RouterTestingModule
+        RouterTestingModule,
+        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
       ],
       declarations: [
         NotificationsComponent,
-        MockComponent({ selector: 'app-settings-sidebar'})
+        MockComponent({ selector: 'chef-notification'})
       ],
       providers: [
         { provide: MatDialog, useClass: MockMdDialog },
         { provide: TelemetryService, useClass: MockTelemetryService },
         { provide: RulesService, useClass: MockRulesService },
         { provide: MatSnackBar, useClass: MockMdSnackBar},
-        { provide: Store, useClass: MockStore },
         FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();
-
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(NotificationsComponent);
     component = fixture.componentInstance;
     telemetryService = TestBed.get(TelemetryService);

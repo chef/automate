@@ -22,6 +22,7 @@ import {
   ReportQueryService,
   ReportQuery
 } from '../shared/reporting';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { saveAs } from 'file-saver';
 import {
   Chicklet
@@ -174,7 +175,8 @@ export class ReportingComponent implements OnInit, OnDestroy {
     private suggestionsService: SuggestionsService,
     public reportQuery: ReportQueryService,
     public reportData: ReportDataService,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private layoutFacade: LayoutFacadeService
   ) { }
 
   private getAllUrlParameters(): Observable<Chicklet[]> {
@@ -187,6 +189,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
+    this.layoutFacade.showComplianceSidebar();
     const allUrlParameters$ = this.getAllUrlParameters();
 
     this.endDate$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>

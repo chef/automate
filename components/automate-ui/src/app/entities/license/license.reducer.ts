@@ -1,8 +1,6 @@
-import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe } from 'lodash/fp';
-
 import { EntityStatus } from '../entities';
-import { LicenseStatus } from './license.model';
+import { FetchStatus, ApplyStatus, RequestStatus, TriggerWelcomeStatus } from './license.model';
 import { LicenseStatusActionTypes, LicenseStatusAction } from './license.actions';
 
 export interface LicenseStatusEntityState {
@@ -10,27 +8,6 @@ export interface LicenseStatusEntityState {
   apply: ApplyStatus;
   request: RequestStatus;
   triggerWelcome: TriggerWelcomeStatus;
-}
-
-export interface FetchStatus {
-  license: LicenseStatus;
-  status: EntityStatus;
-  expiryMessage: string;
-  errorResp: HttpErrorResponse;
-}
-
-export interface ApplyStatus {
-  status: EntityStatus;
-  errorResp: HttpErrorResponse;
-}
-
-export interface RequestStatus {
-  status: EntityStatus;
-  errorResp: HttpErrorResponse;
-}
-
-export interface TriggerWelcomeStatus {
-  status: EntityStatus;
 }
 
 export const LicenseStatusEntityInitialState: LicenseStatusEntityState = {

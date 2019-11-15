@@ -7,6 +7,7 @@ import { NodeDetailsService } from '../../services/node-details/node-details.ser
 import { NodeRun, RunInfo } from '../../types/types';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { previousRoute } from '../../route.selectors';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 @Component({
   selector: 'app-node-details',
@@ -30,12 +31,14 @@ export class NodeDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private eventService: NodeDetailsService,
     private telemetryService: TelemetryService,
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private layoutFacade: LayoutFacadeService
   ) {
     this.previousRoute$ = this.store.select(previousRoute);
   }
 
   ngOnInit() {
+    this.layoutFacade.showInfastructureSidebar();
     // Scroll to the top of the view
     window.scrollTo(0, 0);
     this.nodeId = this.getRouteParam('node-id');

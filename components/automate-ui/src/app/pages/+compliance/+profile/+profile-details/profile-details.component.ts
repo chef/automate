@@ -5,6 +5,7 @@ import { Subject } from 'rxjs';
 import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { AvailableProfilesService } from 'app/services/profiles/available-profiles.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import { saveAs } from 'file-saver';
 
@@ -36,10 +37,12 @@ export class ProfileDetailsComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private profilesService: ProfilesService,
     private availableProfilesService: AvailableProfilesService,
-    private chefSessionService: ChefSessionService
+    private chefSessionService: ChefSessionService,
+    private layoutFacade: LayoutFacadeService
   ) {}
 
   ngOnInit() {
+    this.layoutFacade.showComplianceSidebar();
     this.route.queryParams.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(({owner, name, version}) => {

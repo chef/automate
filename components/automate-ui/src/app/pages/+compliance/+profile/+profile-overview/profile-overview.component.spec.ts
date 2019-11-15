@@ -1,3 +1,5 @@
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
@@ -5,9 +7,13 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { ProfileOverviewComponent } from './profile-overview.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable, throwError, of as observableOf } from 'rxjs';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { UploadService } from 'app/services/profiles/upload.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
+import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
+import * as fromNotifications from 'app/entities/notifications/notification.reducer';
+import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 class MockProfilesService {
   getAllProfiles(): Observable<Array<Object>> {
@@ -23,6 +29,7 @@ class MockUploadService {
 }
 
 describe('ProfilesOverviewComponent', () => {
+  let store: Store<NgrxStateAtom>;
   let fixture, component, element;
 
   const mockSession: any = {
@@ -31,11 +38,30 @@ describe('ProfilesOverviewComponent', () => {
     token: 'TestToken'
   };
 
+  const initialState = {
+    router: {
+      state: {
+        url: '/',
+        params: {},
+        queryParams: {},
+        fragment: ''
+      }
+    },
+    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
+    notifications: fromNotifications.InitialState,
+    layout: fromLayout.InitialState
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        StoreModule.forRoot({
+          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
+          notifications: fromNotifications.notificationEntityReducer,
+          layout: fromLayout.layoutEntityReducer
+        }, { initialState, runtimeChecks })
       ],
       declarations: [
         ProfileOverviewComponent
@@ -43,11 +69,13 @@ describe('ProfilesOverviewComponent', () => {
       providers: [
         {provide: ProfilesService, useClass: MockProfilesService},
         {provide: ChefSessionService, useValue: mockSession},
-        {provide: UploadService, useClass: MockUploadService}
+        {provide: UploadService, useClass: MockUploadService},
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(ProfileOverviewComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement;

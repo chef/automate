@@ -7,6 +7,8 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { CookieModule } from 'ngx-cookie';
 import { Observable, of as observableOf } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { ReportingComponent } from '../+reporting/reporting.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import {
@@ -17,14 +19,19 @@ import {
   ReportQuery
 } from '../shared/reporting';
 import { TelemetryService } from '../../../services/telemetry/telemetry.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import * as moment from 'moment';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
 import { using } from 'app/testing/spec-helpers';
+import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
+import * as fromNotifications from 'app/entities/notifications/notification.reducer';
+import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 class MockTelemetryService {
   track() { }
 }
 describe('ReportingComponent', () => {
+  let store: Store<NgrxStateAtom>;
   let fixture: ComponentFixture<ReportingComponent>,
     component: ReportingComponent,
     element: DebugElement;
@@ -34,12 +41,31 @@ describe('ReportingComponent', () => {
   let router: Router;
   let route: ActivatedRoute;
 
+  const initialState = {
+    router: {
+      state: {
+        url: '/',
+        params: {},
+        queryParams: {},
+        fragment: ''
+      }
+    },
+    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
+    notifications: fromNotifications.InitialState,
+    layout: fromLayout.InitialState
+  };
+
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
         CookieModule.forRoot(),
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        StoreModule.forRoot({
+          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
+          notifications: fromNotifications.notificationEntityReducer,
+          layout: fromLayout.layoutEntityReducer
+        }, { initialState, runtimeChecks })
       ],
       declarations: [
         ReportingComponent,
@@ -51,11 +77,13 @@ describe('ReportingComponent', () => {
         StatsService,
         SuggestionsService,
         ReportQueryService,
-        ReportDataService
+        ReportDataService,
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(ReportingComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement;

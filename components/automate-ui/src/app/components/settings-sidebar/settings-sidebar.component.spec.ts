@@ -2,18 +2,18 @@ import { of as observableOf } from 'rxjs';
 import { DebugElement } from '@angular/core';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { StoreModule } from '@ngrx/store';
+import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
 import { using } from 'app/testing/spec-helpers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { SettingsLandingComponent } from 'app/pages/settings-landing/settings-landing.component';
-import { runtimeChecks } from 'app/ngrx.reducers';
-import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
 import { checkFirstPerm } from 'app/testing/spec-helpers';
 import { SettingsSidebarComponent } from './settings-sidebar.component';
 
 describe('SettingsSidebarComponent', () => {
+  let store: Store<NgrxStateAtom>;
   let fixture: ComponentFixture<SettingsSidebarComponent>;
   let component: SettingsSidebarComponent;
   let settingsLandingComponent: SettingsLandingComponent;
@@ -22,9 +22,7 @@ describe('SettingsSidebarComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule,
-        StoreModule.forRoot({
-          policies: policyEntityReducer
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
       ],
       declarations: [
         SettingsSidebarComponent,
@@ -47,7 +45,8 @@ describe('SettingsSidebarComponent', () => {
         FeatureFlagsService
       ]
     });
-
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(SettingsSidebarComponent);
     component = fixture.componentInstance;
     component.featureFlagOn = true;

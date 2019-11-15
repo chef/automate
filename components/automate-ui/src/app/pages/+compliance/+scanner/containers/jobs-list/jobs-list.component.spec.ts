@@ -3,14 +3,15 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
-import { StoreModule } from '@ngrx/store';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
 import * as moment from 'moment';
-import { runtimeChecks } from 'app/ngrx.reducers';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { JobsListComponent } from './jobs-list.component';
 
 describe('JobsListComponent', () => {
+  let store: Store<NgrxStateAtom>;
   let fixture: ComponentFixture<JobsListComponent>;
   let component: JobsListComponent;
   let router: Router;
@@ -19,8 +20,8 @@ describe('JobsListComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        StoreModule.forRoot({}, { runtimeChecks }),
-        HttpClientTestingModule
+        HttpClientTestingModule,
+        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
       ],
       declarations: [
         JobsListComponent
@@ -30,7 +31,8 @@ describe('JobsListComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(JobsListComponent);
     component = fixture.componentInstance;
     router = TestBed.get(Router);

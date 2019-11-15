@@ -1,10 +1,4 @@
-<div *ngIf="applicationsFeatureFlagOn">
-  <chef-sidebar-no-shade>
-    <div class="nav-items">
-      <div class="group">Applications</div>
-      <chef-sidebar-entry icon="group_work">Service Groups</chef-sidebar-entry>
-    </div>
-  </chef-sidebar-no-shade>
+<div class="content-container applications-container" *ngIf="applicationsFeatureFlagOn">
   <div class="container">
       <main>
         <app-service-groups></app-service-groups>

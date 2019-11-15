@@ -2,6 +2,8 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { Observable, of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 
 import { Destination } from 'app/pages/data-feed/destination';
 import { DatafeedFormComponent } from './data-feed-form.component';
@@ -9,12 +11,30 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FeatureFlagsService } from '../../services/feature-flags/feature-flags.service';
 import { DatafeedService } from '../../services/data-feed/data-feed.service';
+import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
+import * as fromNotifications from 'app/entities/notifications/notification.reducer';
+import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 describe('DatafeedFormComponent', () => {
+  let store: Store<NgrxStateAtom>;
   let component: DatafeedFormComponent;
   let fixture: ComponentFixture<DatafeedFormComponent>;
   let datafeedService: DatafeedService;
   const snapshot = { params: { name: 'name' }};
+
+  const initialState = {
+    router: {
+      state: {
+        url: '/',
+        params: {},
+        queryParams: {},
+        fragment: ''
+      }
+    },
+    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
+    notifications: fromNotifications.InitialState,
+    layout: fromLayout.InitialState
+  };
 
   class MockDatafeedService {
     fetchDestinations(): Observable<Destination[]> { return observableOf([]); }
@@ -34,7 +54,6 @@ describe('DatafeedFormComponent', () => {
         DatafeedFormComponent,
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-icon' }),
-        MockComponent({ selector: 'app-settings-sidebar' }),
         MockComponent({ selector: 'chef-success-alert' }),
         MockComponent({ selector: 'chef-error-alert' }),
         MockComponent({ selector: 'chef-error' }),
@@ -47,11 +66,17 @@ describe('DatafeedFormComponent', () => {
         FeatureFlagsService
       ],
       imports: [
-        FormsModule
+        FormsModule,
+        StoreModule.forRoot({
+          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
+          notifications: fromNotifications.notificationEntityReducer,
+          layout: fromLayout.layoutEntityReducer
+        }, { initialState, runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
-    })
-      .compileComponents();
+    }).compileComponents();
+      store = TestBed.get(Store);
+      spyOn(store, 'dispatch').and.callThrough();
   }));
 
   beforeEach(() => {

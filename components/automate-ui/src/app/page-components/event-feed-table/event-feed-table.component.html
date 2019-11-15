@@ -34,7 +34,7 @@
 </ul>
 
 <chef-click-outside omit="event-group-button" (clickOutside)="clickedOutsidePanel()">
-  <chef-side-panel #groupSidePanel [visible]="showEventGroupPanel" tabindex="0" role="dialog">
+  <chef-side-panel *ngIf="showEventGroupPanel" #groupSidePanel [visible]="showEventGroupPanel" tabindex="0" role="dialog">
     <chef-button secondary label="close" (click)="hideGroupedEvents()"><chef-icon>close</chef-icon></chef-button>
 
     <ul class="event-group-list" *ngIf="groupedEvent">

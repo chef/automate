@@ -12,7 +12,7 @@ import { ChefSessionService } from '../../services/chef-session/chef-session.ser
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { runtimeChecks } from 'app/ngrx.reducers';
-import { TriggerWelcomeStatus } from 'app/entities/license/license.reducer';
+import { TriggerWelcomeStatus } from 'app/entities/license/license.model';
 import { EntityStatus } from 'app/entities/entities';
 
 class MockTelemetryService {

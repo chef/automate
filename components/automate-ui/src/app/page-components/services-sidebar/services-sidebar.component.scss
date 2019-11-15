@@ -3,9 +3,9 @@
 
 :host {
   display: block;
-  position: fixed;
+  position: absolute;
   width: 450px;
-  top: 70px;
+  top: 0;
   right: 0;
   bottom: 0;
   background: $chef-white;

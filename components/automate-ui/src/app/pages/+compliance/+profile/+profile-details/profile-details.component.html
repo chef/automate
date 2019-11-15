@@ -1,136 +1,135 @@
-<app-compliance-reporting-sidebar></app-compliance-reporting-sidebar>
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/compliance/compliance-profiles']">Profiles</chef-breadcrumb>
+        {{ profile?.title }}
+      </chef-breadcrumbs>
 
-<div class="container">
-  <main>
-    <chef-breadcrumbs>
-      <chef-breadcrumb [link]="['/compliance/compliance-profiles']">Profiles</chef-breadcrumb>
-      {{ profile?.title }}
-    </chef-breadcrumbs>
+      <chef-notification
+        *ngIf="downloadErrorVisible"
+        type="error"
+        timeout="5"
+        (dismissed)="hideDownloadError()">
+        Failed to download profile. Please try again later.
+      </chef-notification>
 
-    <chef-notification
-      *ngIf="downloadErrorVisible"
-      type="error"
-      timeout="5"
-      (dismissed)="hideDownloadError()">
-      Failed to download profile. Please try again later.
-    </chef-notification>
+      <chef-notification
+        *ngIf="deleteErrorVisible"
+        type="error"
+        timeout="5"
+        (dismissed)="hideDeleteError()">
+        Failed to delete profile. Please try again later.
+      </chef-notification>
 
-    <chef-notification
-      *ngIf="deleteErrorVisible"
-      type="error"
-      timeout="5"
-      (dismissed)="hideDeleteError()">
-      Failed to delete profile. Please try again later.
-    </chef-notification>
+      <chef-notification
+        *ngIf="installErrorVisible"
+        type="error"
+        timeout="5"
+        (dismissed)="hideInstallError()">
+        Failed to install profile. Please try again later.
+      </chef-notification>
 
-    <chef-notification
-      *ngIf="installErrorVisible"
-      type="error"
-      timeout="5"
-      (dismissed)="hideInstallError()">
-      Failed to install profile. Please try again later.
-    </chef-notification>
-
-    <ng-container *ngIf="!showLoadingIcon">
-      <chef-page-header>
-        <chef-heading>{{ profile.title }}</chef-heading>
-        <chef-subheading>{{ profile.summary }}</chef-subheading>
-        <div class="header-buttons-container">
-          <div slot="header-buttons">
-            <ng-container *ngIf="!isInstalled">
-              <chef-button secondary caution id="install-btn" (click)="installProfile(profile)">
-                <chef-icon>get_app</chef-icon>
-                <span>Get</span>
-              </chef-button>
-            </ng-container>
-            <ng-container *ngIf="isInstalled">
-              <chef-button secondary caution id="uninstall-btn" (click)="showDeleteModal()">
-                <chef-icon>delete</chef-icon>
-                <span>Remove</span>
-              </chef-button>
-            </ng-container>
-            <chef-button secondary id="download-btn" (click)="downloadProfile(profile)">
-              <chef-icon>cloud_download</chef-icon>
-              <span>Download</span>
-            </chef-button>
-          </div>
-        </div>
-      </chef-page-header>
-
-      <div class="metadata">
-        <chef-card>
-          <chef-table>
-            <chef-tr>
-              <chef-th>
-                Status
-              </chef-th>
-              <chef-td *ngIf="isAvailable">Available</chef-td>
-              <chef-td *ngIf="isInstalled">Installed</chef-td>
-            </chef-tr>
-            <chef-tr>
-              <chef-th>
-                Version
-              </chef-th>
-              <chef-td>{{ profile.version }}</chef-td>
-            </chef-tr>
-            <chef-tr>
-              <chef-th>
-                Maintainer
-              </chef-th>
-              <chef-td>{{ profile.maintainer }}</chef-td>
-            </chef-tr>
-            <chef-tr>
-              <chef-th>
-                License
-              </chef-th>
-              <chef-td>{{ profile.license }}</chef-td>
-            </chef-tr>
-            <chef-tr>
-              <chef-th>
-                Platform
-              </chef-th>
-              <chef-td>{{ displaySupports(profile.supports) }}</chef-td>
-            </chef-tr>
-          </chef-table>
-        </chef-card>
-      </div>
-
-      <chef-table class="controls-table">
-        <chef-thead>
-          <chef-tr>
-            <chef-th>{{ profile.controls.length }} Controls</chef-th>
-            <chef-th>Impact</chef-th>
-            <chef-th>Total Tests</chef-th>
-            <chef-th></chef-th>
-          </chef-tr>
-        </chef-thead>
-        <chef-tbody>
-          <ng-container *ngFor="let control of profile.controls">
-            <chef-tr>
-              <chef-td>
-                <span><strong>{{ control.id }}:</strong> {{ control.title }}</span>
-              </chef-td>
-              <chef-td [ngClass]="impactStatus(control)">
-                {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
-              </chef-td>
-              <chef-td>{{ testCount(control) }}</chef-td>
-              <chef-td>
-                <chef-button secondary (click)="toggleControl(control)">
-                  <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
-                  <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>
+      <ng-container class="applications-container" *ngIf="!showLoadingIcon">
+        <chef-page-header>
+          <chef-heading>{{ profile.title }}</chef-heading>
+          <chef-subheading>{{ profile.summary }}</chef-subheading>
+          <div class="header-buttons-container">
+            <div slot="header-buttons">
+              <ng-container *ngIf="!isInstalled">
+                <chef-button secondary caution id="install-btn" (click)="installProfile(profile)">
+                  <chef-icon>get_app</chef-icon>
+                  <span>Get</span>
                 </chef-button>
-              </chef-td>
-            </chef-tr>
-            <div class="control-detail" *ngIf="isOpenControl(control)">
-              <p *ngIf="control.desc.length">{{ control.desc }}</p>
-              <chef-snippet [code]="control.code" lang="ruby"></chef-snippet>
+              </ng-container>
+              <ng-container *ngIf="isInstalled">
+                <chef-button secondary caution id="uninstall-btn" (click)="showDeleteModal()">
+                  <chef-icon>delete</chef-icon>
+                  <span>Remove</span>
+                </chef-button>
+              </ng-container>
+              <chef-button secondary id="download-btn" (click)="downloadProfile(profile)">
+                <chef-icon>cloud_download</chef-icon>
+                <span>Download</span>
+              </chef-button>
             </div>
-          </ng-container>
-        </chef-tbody>
-      </chef-table>
+          </div>
+        </chef-page-header>
 
-      <chef-scroll-top></chef-scroll-top>
-    </ng-container>
+        <div class="metadata">
+          <chef-card>
+            <chef-table>
+              <chef-tr>
+                <chef-th>
+                  Status
+                </chef-th>
+                <chef-td *ngIf="isAvailable">Available</chef-td>
+                <chef-td *ngIf="isInstalled">Installed</chef-td>
+              </chef-tr>
+              <chef-tr>
+                <chef-th>
+                  Version
+                </chef-th>
+                <chef-td>{{ profile.version }}</chef-td>
+              </chef-tr>
+              <chef-tr>
+                <chef-th>
+                  Maintainer
+                </chef-th>
+                <chef-td>{{ profile.maintainer }}</chef-td>
+              </chef-tr>
+              <chef-tr>
+                <chef-th>
+                  License
+                </chef-th>
+                <chef-td>{{ profile.license }}</chef-td>
+              </chef-tr>
+              <chef-tr>
+                <chef-th>
+                  Platform
+                </chef-th>
+                <chef-td>{{ displaySupports(profile.supports) }}</chef-td>
+              </chef-tr>
+            </chef-table>
+          </chef-card>
+        </div>
+
+        <chef-table class="controls-table">
+          <chef-thead>
+            <chef-tr>
+              <chef-th>{{ profile.controls.length }} Controls</chef-th>
+              <chef-th>Impact</chef-th>
+              <chef-th>Total Tests</chef-th>
+              <chef-th></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <ng-container *ngFor="let control of profile.controls">
+              <chef-tr>
+                <chef-td>
+                  <span><strong>{{ control.id }}:</strong> {{ control.title }}</span>
+                </chef-td>
+                <chef-td [ngClass]="impactStatus(control)">
+                  {{ impactStatus(control) | uppercase }} ({{ control.impact | number: '1.1' }})
+                </chef-td>
+                <chef-td>{{ testCount(control) }}</chef-td>
+                <chef-td>
+                  <chef-button secondary (click)="toggleControl(control)">
+                    <chef-icon *ngIf="!isOpenControl(control)">add</chef-icon>
+                    <chef-icon *ngIf="isOpenControl(control)">remove</chef-icon>
+                  </chef-button>
+                </chef-td>
+              </chef-tr>
+              <div class="control-detail" *ngIf="isOpenControl(control)">
+                <p *ngIf="control.desc.length">{{ control.desc }}</p>
+                <chef-snippet [code]="control.code" lang="ruby"></chef-snippet>
+              </div>
+            </ng-container>
+          </chef-tbody>
+        </chef-table>
+
+        <chef-scroll-top></chef-scroll-top>
+      </ng-container>
 
     <chef-modal
       id="delete-modal"
@@ -144,6 +143,7 @@
       </div>
     </chef-modal>
 
-    <chef-loading-spinner *ngIf="showLoadingIcon" size="100"></chef-loading-spinner>
-  </main>
+      <chef-loading-spinner *ngIf="showLoadingIcon" size="100"></chef-loading-spinner>
+    </main>
+  </div>
 </div>

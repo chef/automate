@@ -55,6 +55,7 @@ a, button:not(.dropdown-toggle) {
   right: 16px;
   width: $dropdown-width;
   border: 1px solid $chef-grey;
+  z-index: 1;
 
   &::before {
     display: block;

@@ -5,6 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { environment as env } from '../../../../../../environments/environment';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 @Component({
   templateUrl: './nodes-add.component.html',
@@ -14,7 +15,8 @@ export class NodesAddComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private httpClient: HttpClient
+    private httpClient: HttpClient,
+    private layoutFacade: LayoutFacadeService
   ) {}
 
   form: FormGroup;
@@ -35,6 +37,7 @@ export class NodesAddComponent implements OnInit {
   nodesToAdd$: BehaviorSubject<any[]> = new BehaviorSubject([]);
 
   ngOnInit() {
+    this.layoutFacade.showComplianceSidebar();
     this.form = this.createForm();
 
     // Populate nodesToAdd$ with serialized form body

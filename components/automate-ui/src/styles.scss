@@ -4,13 +4,46 @@
 @import "assets/chef-ui-library/collection/styles/variables.example.css";
 @import "styles/chef-theme";
 
+.content-container {
+  height: 100%;
+  position: relative;
+
+  .container {
+    height: inherit;
+    position: relative;
+  }
+}
+
+chef-side-panel {
+  position: absolute;
+  top: 0;
+}
+
 .container {
-  margin-left: $sidebar-width;
   position: relative;
 
   main {
     padding-left: 0;
     padding-right: 0;
+  }
+}
+
+.permission-denied-banner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba($chef-white, 0.85);
+  z-index: 190;
+  padding-top: 38vh;
+  text-align: center;
+  font-weight: bold;
+
+  & > p {
+    margin: 0;
+    line-height: 1.6;
+    color: $chef-dark-grey;
   }
 }
 
@@ -53,7 +86,6 @@ button.create {
   height: 33px;
   width: 171px;
 }
-
 
 // a11y helpers
 .visually-hidden { /* https://snook.ca/archives/html_and_css/hiding-content-for-accessibility */
@@ -155,10 +187,10 @@ html.no-smil {
   }
 }
 
-// Global loading modifier class to accomodate for our navigation
 chef-loading-spinner[fixed] {
-  top: $navigation-height;
-  left: $sidebar-width;
+  position: absolute;
+  top: 0;
+  left: 0;
 }
 
 input {

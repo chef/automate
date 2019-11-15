@@ -1,10 +1,30 @@
-@import "~styles/variables";
+#app-container {
+  height: 100vh;
+}
 
-.notifications {
-  margin-top: $navigation-height;
-  margin-left: $sidebar-width;
+#app-header-wrapper {
+  app-navbar {
+    display: block;
+    height: 70px;
+  }
+}
 
-  a {
-    color: $chef-white;
+#app-content-wrapper {
+  display: flex;
+  flex-flow: row nowrap;
+  height: calc(100vh - 70px);
+  position: relative;
+
+  &.adjust-content-height {
+    height: calc(100vh - 110px);
+  }
+
+  & > #app-sidebar { order: 1; }
+
+  & > #main-content-wrapper {
+    flex: 2 0px;
+    order: 2;
+    height: 100%;
+    overflow-x: scroll;
   }
 }

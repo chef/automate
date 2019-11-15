@@ -7,12 +7,13 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { ROUTER_NAVIGATION } from '@ngrx/router-store';
-import { NgrxStateAtom, ngrxReducers, runtimeChecks } from '../../ngrx.reducers';
+import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { JobEditComponent, Step } from './job-edit.component';
 import { Job } from '../../entities/jobs/job.model';
 import { JobGetSuccess } from '../../entities/jobs/job.actions';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
 const changeStep = fragment => {
   return {
@@ -47,7 +48,7 @@ describe('JobEditComponent', () => {
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
       ],
       declarations: [
         JobEditComponent
@@ -66,16 +67,16 @@ describe('JobEditComponent', () => {
               ]
             }
           }
-        }
+        },
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(JobEditComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement;
-    store = TestBed.get(Store);
-
     store.dispatch(new JobGetSuccess(job));
   });
 

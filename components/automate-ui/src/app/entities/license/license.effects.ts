@@ -124,8 +124,6 @@ export class LicenseStatusEffects {
     if (daysRemaining > this.LICENSE_WARNING_PERIOD || daysRemaining < 0) {
       return '';
     }
-    const fragment = (daysRemaining === 0) ?
-      'in less than a day' : `in ${daysRemaining} days`;
-    return `Your Chef Automate license will expire ${fragment}.`;
+    return `There are ${daysRemaining} days remaining on your license.`;
   }
 }

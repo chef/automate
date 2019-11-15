@@ -1,0 +1,17 @@
+@import "~styles/variables";
+
+.notifications,
+.license-banner {
+  a {
+    color: $chef-white;
+  }
+
+  button.link {
+    background: none;
+    border: 0;
+    color: #FFF;
+    cursor: pointer;
+    padding: 0;
+    text-decoration: underline;
+  }
+}

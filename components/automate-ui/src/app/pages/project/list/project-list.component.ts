@@ -5,6 +5,7 @@ import { interval as observableInterval,  Observable, Subject } from 'rxjs';
 import { map, takeUntil, filter, take } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefSorters } from 'app/helpers/auth/sorter';
@@ -58,6 +59,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
 
   constructor(
+    private layoutFacade: LayoutFacadeService,
     private store: Store<NgrxStateAtom>,
     public projects: ProjectService,
     fb: FormBuilder
@@ -98,6 +100,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.layoutFacade.showSettingsSidebar();
     this.projects.getApplyRulesStatus();
     this.store.dispatch(new GetProjects());
   }

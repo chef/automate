@@ -10,6 +10,7 @@ import { runtimeChecks } from 'app/ngrx.reducers';
 import * as sidebar from '../../services/sidebar/sidebar.reducer';
 import { UpdateNodeFilters } from '../../entities/client-runs/client-runs.actions';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { EntityStatus } from '../../entities/entities';
 import { ClientRunsComponent } from './client-runs.component';
 
@@ -39,7 +40,8 @@ describe('ClientRunsComponent', () => {
       ],
       providers: [
         { provide: TelemetryService, useClass: MockTelemetryService },
-        ClientRunsRequests
+        ClientRunsRequests,
+        FeatureFlagsService
       ],
       imports: [
         RouterTestingModule,

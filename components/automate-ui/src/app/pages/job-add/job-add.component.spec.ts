@@ -5,9 +5,10 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { ROUTER_NAVIGATION } from '@ngrx/router-store';
-import { NgrxStateAtom, ngrxReducers, runtimeChecks } from '../../ngrx.reducers';
+import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { JobAddComponent, Step } from './job-add.component';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 
 const changeStep = fragment => {
@@ -36,21 +37,22 @@ describe('JobAddComponent', () => {
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
       ],
       declarations: [
         JobAddComponent
       ],
       providers: [
-        { provide: ChefSessionService, useClass: MockChefSessionService }
+        { provide: ChefSessionService, useClass: MockChefSessionService },
+        FeatureFlagsService
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(JobAddComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement;
-    store = TestBed.get(Store);
   });
 
   describe('nextStep', () => {

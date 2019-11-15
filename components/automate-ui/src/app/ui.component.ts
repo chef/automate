@@ -1,17 +1,13 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivationStart, ActivationEnd, Router, NavigationEnd } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Feature } from 'app/services/feature-flags/types';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
 import { GetIamVersion } from 'app/entities/policies/policy.actions';
-import { notificationState } from 'app/entities/notifications/notification.selectors';
-import { Notification } from 'app/entities/notifications/notification.model';
-import { DeleteNotification } from 'app/entities/notifications/notification.actions';
-import { LicenseApplyReason } from 'app/page-components/license-apply/license-apply.component';
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
 
 @Component({
@@ -23,9 +19,6 @@ export class UIComponent implements OnInit {
   // Feature Flags
   // TODO:eng-ex This static data seems out of place. Should it go in InitialState?
   experimentalFeatures: Array<Feature> = [];
-
-  notifications$: Observable<Notification[]>;
-
   betaFeatures: Array<Feature> = [
     {
       key: 'applications',
@@ -38,31 +31,33 @@ export class UIComponent implements OnInit {
   ];
 
   legacyFeatures: Array<Feature> = [];
-
-  licenseApplyReason: LicenseApplyReason;
-
-  renderNavbar = true;
+  hideFullPage = true;
 
   constructor(
     private store: Store<NgrxStateAtom>,
-    private router: Router
+    private router: Router,
+    public layoutFacade: LayoutFacadeService
   ) {
-    this.notifications$ = store.select(notificationState);
-
     // ActivationEnd specifically needs to be here in the constructor to catch early events.
     this.router.events.pipe(
       filter(event => event instanceof ActivationEnd)
     ).subscribe((event: ActivationEnd) => {
-      this.renderNavbar = typeof event.snapshot.data.hideNavBar !== 'undefined'
+      this.hideFullPage = typeof event.snapshot.data.hideNavBar !== 'undefined'
         ? !event.snapshot.data.hideNavBar
-        : this.renderNavbar;
+        : this.hideFullPage;
+
+      if (this.hideFullPage) {
+        this.layoutFacade.hideFullPage();
+      } else {
+        this.layoutFacade.showFullPage();
+      }
     });
   }
 
   ngOnInit(): void {
     this.router.events.pipe(
         filter(event => event instanceof ActivationStart)
-    ).subscribe((event: ActivationStart) => this.renderNavbar = !event.snapshot.data.hideNavBar);
+    ).subscribe((event: ActivationStart) => this.hideFullPage = !event.snapshot.data.hideNavBar);
 
     this.router.events.pipe(
         filter(event => event instanceof NavigationEnd)
@@ -73,17 +68,5 @@ export class UIComponent implements OnInit {
 
     // Initial calls for polled events
     this.store.dispatch(new GetIamVersion());
-  }
-
-  onTriggerApplyLicense(reason: LicenseApplyReason): void {
-    this.licenseApplyReason = reason;
-  }
-
-  onTriggerBannerLicenseApply(): void {
-    this.licenseApplyReason = LicenseApplyReason.LICENSE_ABOUT_TO_EXPIRE;
-  }
-
-  handleNotificationDismissal(id: string): void {
-    this.store.dispatch(new DeleteNotification({ id }));
   }
 }

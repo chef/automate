@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from '../../../ngrx.reducers';
 import { IntegrationsDetailState } from './integrations-detail.reducer';
 import { integrationsDetail } from './integrations-detail.selectors';
@@ -21,8 +22,10 @@ export class IntegrationsDetailComponent {
 
   constructor(
     private router: Router,
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    private layoutFacade: LayoutFacadeService
   ) {
+    this.layoutFacade.showSettingsSidebar();
     this.managerDetail$ = this.store.select(integrationsDetail);
   }
 
