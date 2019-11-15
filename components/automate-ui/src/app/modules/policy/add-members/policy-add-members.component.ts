@@ -377,7 +377,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
   private addNameControl(identityProvider): void {
     if (identityProvider === 'ldap' || identityProvider === 'saml' ) {
-      console.log('set name to all')
         this.expressionForm.addControl('name', new FormControl('',
           [
             Validators.required,
@@ -386,7 +385,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         )
       );
     } else {
-      console.log('set name to hyphen only')
         this.expressionForm.addControl('name', new FormControl('',
           [
             Validators.required,
