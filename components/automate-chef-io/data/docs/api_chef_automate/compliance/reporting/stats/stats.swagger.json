@@ -338,7 +338,7 @@
         "failures": {
           "type": "integer",
           "format": "int32",
-          "description": "Total number of times this profile failed."
+          "description": "Total number of nodes that failed this profile."
         },
         "majors": {
           "type": "integer",

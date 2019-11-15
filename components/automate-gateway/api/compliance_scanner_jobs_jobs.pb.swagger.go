@@ -387,17 +387,20 @@ func init() {
       "type": "object",
       "properties": {
         "key": {
-          "type": "string"
+          "type": "string",
+          "description": "Field to filter on."
         },
         "exclude": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Include matches for this filter.(boolean)\n` + "`" + `true` + "`" + ` (default) *includes* all nodes that match this filter. \n` + "`" + `false` + "`" + ` *excludes* all nodes that match this filter."
         },
         "values": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Field values to filter on."
         }
       }
     },
@@ -405,10 +408,12 @@ func init() {
       "type": "object",
       "properties": {
         "key": {
-          "type": "string"
+          "type": "string",
+          "description": "Tag key."
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "description": "Tag value."
         }
       }
     }

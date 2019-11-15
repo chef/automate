@@ -801,7 +801,7 @@ type ProfileList struct {
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// The profile SHA ID.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	// Total number of times this profile failed.
+	// Total number of nodes that failed this profile.
 	Failures int32 `protobuf:"varint,3,opt,name=failures,proto3" json:"failures,omitempty"`
 	// Total number of failed nodes with major control failures that executed the profile.
 	Majors int32 `protobuf:"varint,4,opt,name=majors,proto3" json:"majors,omitempty"`
