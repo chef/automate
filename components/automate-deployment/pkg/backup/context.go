@@ -51,6 +51,11 @@ type Context struct {
 	restoreLocationSpec LocationSpecification
 	metadataWritten     ObjectManifest
 	isExternalPG        bool
+
+	// Builder Minio -- only used if builder is enabled
+	// We may move this to an internal command
+	builderMinioLocationSpec LocationSpecification
+	builderBucket            Bucket
 }
 
 type MetadataChecksums struct {
@@ -59,13 +64,13 @@ type MetadataChecksums struct {
 
 // NewContext returns a new backup context
 func NewContext(opts ...ContextOpt) Context {
-	ctx := &Context{
+	ctx := Context{
 		pgConnInfo: &pg.A2ConnInfo{},
 		backupTask: &api.BackupTask{},
 	}
 
 	for _, opt := range opts {
-		opt(ctx)
+		opt(&ctx)
 	}
 
 	if ctx.locationSpec != nil {
@@ -74,10 +79,16 @@ func NewContext(opts ...ContextOpt) Context {
 	if ctx.restoreLocationSpec != nil {
 		ctx.restoreBucket = ctx.restoreLocationSpec.ToBucket(ctx.backupTask.TaskID())
 	}
+	if ctx.builderMinioLocationSpec != nil {
+		logrus.Info("Creating builder bucket")
+		ctx.builderBucket = ctx.builderMinioLocationSpec.ToBucket("")
+	} else {
+		logrus.Info("Not creating builder bucket")
+	}
 
 	ctx.metadataWritten = NewObjectManifest()
 
-	return *ctx
+	return ctx
 }
 
 // ContextOpt represents an optional configuration function for a Runner
@@ -94,6 +105,13 @@ func WithContextBackupLocationSpecification(locationSpec LocationSpecification) 
 func WithContextBackupRestoreLocationSpecification(locationSpec LocationSpecification) ContextOpt {
 	return func(ctx *Context) {
 		ctx.restoreLocationSpec = locationSpec
+	}
+}
+
+// WithContextBuilderMinioLocationSpec configures the builder minio remote location
+func WithContextBuilderMinioLocationSpec(locationSpec LocationSpecification) ContextOpt {
+	return func(ctx *Context) {
+		ctx.builderMinioLocationSpec = locationSpec
 	}
 }
 

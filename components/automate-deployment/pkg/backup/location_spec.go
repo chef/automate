@@ -40,9 +40,10 @@ type GatewayLocationSpecification struct {
 	BucketName string
 	Endpoint   string
 	BasePath   string
-	AccessKey  string
-	SecretKey  string
 	CertPool   *x509.CertPool
+
+	secretStore     secrets.SecretStore
+	secretGroupName string
 }
 
 // ToBucket returns a backup bucket that can be used to communicate with the
@@ -50,10 +51,22 @@ type GatewayLocationSpecification struct {
 func (gws GatewayLocationSpecification) ToBucket(key string) Bucket {
 	tr := httputils.NewDefaultTransport()
 	tr.TLSClientConfig = &tls.Config{RootCAs: gws.CertPool}
+
+	accessKeyName := secrets.SecretName{Group: gws.secretGroupName, Name: "access_key"}
+	secretKeyName := secrets.SecretName{Group: gws.secretGroupName, Name: "secret_key"}
+	accessKey, err := gws.secretStore.GetSecret(accessKeyName)
+	if err != nil {
+		return errBucket{err: err}
+	}
+	secretKey, err := gws.secretStore.GetSecret(secretKeyName)
+	if err != nil {
+		return errBucket{err: err}
+	}
+
 	c := &aws.Config{
 		Region:           aws.String("us-east-1"),
 		Endpoint:         aws.String(gws.Endpoint),
-		Credentials:      credentials.NewStaticCredentials(gws.AccessKey, gws.SecretKey, ""),
+		Credentials:      credentials.NewStaticCredentials(string(accessKey), string(secretKey), ""),
 		S3ForcePathStyle: aws.Bool(true),
 		HTTPClient:       &http.Client{Transport: tr},
 	}
@@ -211,29 +224,28 @@ func NewBackupGatewayLocationSpec(endpoint,
 	basePath string,
 	rootCert []byte,
 	secretStore secrets.SecretStore) (LocationSpecification, error) {
+	return NewMinioLocationSpec(endpoint, bucketName, basePath, "backup-gateway",
+		rootCert, secretStore)
+}
 
-	accessKeyName := secrets.SecretName{Group: "backup-gateway", Name: "access_key"}
-	secretKeyName := secrets.SecretName{Group: "backup-gateway", Name: "secret_key"}
-	accessKey, err := secretStore.GetSecret(accessKeyName)
-	if err != nil {
-		return nil, err
-	}
-	secretKey, err := secretStore.GetSecret(secretKeyName)
-	if err != nil {
-		return nil, err
-	}
+func NewMinioLocationSpec(endpoint,
+	bucketName,
+	basePath string,
+	groupName string,
+	rootCert []byte,
+	secretStore secrets.SecretStore) (LocationSpecification, error) {
 
 	certPool := x509.NewCertPool()
 	if !certPool.AppendCertsFromPEM(rootCert) {
-		return nil, errors.New("building backup gateway root ca cert pool")
+		return nil, errors.New("building root ca cert pool")
 	}
 
 	return GatewayLocationSpecification{
-		Endpoint:   endpoint,
-		BucketName: bucketName,
-		BasePath:   basePath,
-		AccessKey:  string(accessKey),
-		SecretKey:  string(secretKey),
-		CertPool:   certPool,
+		Endpoint:        endpoint,
+		BucketName:      bucketName,
+		BasePath:        basePath,
+		CertPool:        certPool,
+		secretGroupName: groupName,
+		secretStore:     secretStore,
 	}, nil
 }
