@@ -170,5 +170,6 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   private resetCreateModal(): void {
     this.creatingToken = false;
     this.createTokenForm.reset();
+    this.conflictErrorEvent.emit(false);
   }
 }

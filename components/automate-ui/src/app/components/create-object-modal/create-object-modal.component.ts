@@ -36,7 +36,7 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
       this.conflictError = isConflict;
       // Open the ID input on conflict so user can resolve it.
-      this.modifyID = true;
+      this.modifyID = isConflict;
     });
   }
 
