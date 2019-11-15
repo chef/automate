@@ -404,32 +404,13 @@ func setupDataLifecyclePurgeInterface(ctx context.Context, connFactory *secureco
 	// only persisted the first time the workflow is created, after which only
 	// new default policies are added and/or existing policies indicies are
 	// updated in case they have been migrated.
-	//
-	// Compliance defaults to -1 when run outside of the deployment-service, which
-	// signaled that it should be disabled. When run with deployment-service it
-	// had a default retention period of 60 days. The configuration has been
-	// deprecated and is no longer valid and the default of 60 has been removed,
-	// making the default value 0. If we have -1 it should be disabled,
-	// if it's set to 0 it should be set at 60, otherwise it should be set at
-	// the user defined value at the time of the initial migration.
 
-	days := conf.ComplianceReportDays
-	switch {
-	case days < 0:
-		for i, p := range defaultPurgePolicies.Es {
+	for i, p := range defaultPurgePolicies.Es {
+		if conf.ComplianceReportDays < 0 {
 			p.Disabled = true
-			defaultPurgePolicies.Es[i] = p
 		}
-	case days == 0:
-		for i, p := range defaultPurgePolicies.Es {
-			p.OlderThanDays = 60
-			defaultPurgePolicies.Es[i] = p
-		}
-	default:
-		for i, p := range defaultPurgePolicies.Es {
-			p.OlderThanDays = conf.ComplianceReportDays
-			defaultPurgePolicies.Es[i] = p
-		}
+		p.OlderThanDays = conf.ComplianceReportDays
+		defaultPurgePolicies.Es[i] = p
 	}
 
 	timeoutCtx, cancel := context.WithTimeout(ctx, 60*time.Second)

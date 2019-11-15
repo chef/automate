@@ -47,34 +47,18 @@ func ConfigurePurge(man *cereal.Manager, opts *serveropts.Opts) error {
 	// only persisted the first time the workflow is created, after which only
 	// new default policies are added and/or existing policies indicies are
 	// updated in case they have been migrated.
-	//
-	// Ingest defaults to -1 when run outside of the deployment-service, which
-	// signaled that it should be disabled. When run with deployment-service it
-	// had a default retention periods of 30 days. The configuration has been
-	// deprecated and is no longer valid and the default of 30 has been removed,
-	// making the default value 0. If we have -1 it should be disabled,
-	// if it's set to 0 it should be set at 30, otherwise it should be set at
-	// the user defined value at the time of the initial migration.
 
 	cp := DefaultPurgePolicies.Es[PurgeConvergeHistoryName]
-	switch opts.PurgeConvergeHistoryAfterDays {
-	case -1:
+	cp.OlderThanDays = opts.PurgeConvergeHistoryAfterDays
+	if opts.PurgeConvergeHistoryAfterDays < 0 {
 		cp.Disabled = true
-	case 0:
-		cp.OlderThanDays = 30
-	default:
-		cp.OlderThanDays = opts.PurgeConvergeHistoryAfterDays
 	}
 	DefaultPurgePolicies.Es[PurgeConvergeHistoryName] = cp
 
 	ap := DefaultPurgePolicies.Es[PurgeActionsName]
-	switch opts.PurgeActionsAfterDays {
-	case -1:
+	ap.OlderThanDays = opts.PurgeActionsAfterDays
+	if opts.PurgeActionsAfterDays < 0 {
 		ap.Disabled = true
-	case 0:
-		ap.OlderThanDays = 30
-	default:
-		ap.OlderThanDays = opts.PurgeActionsAfterDays
 	}
 	DefaultPurgePolicies.Es[PurgeActionsName] = ap
 
