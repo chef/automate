@@ -1,16 +1,16 @@
 import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { interval as observableInterval,  Observable, Subject } from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { interval as observableInterval,  Observable, Subject, combineLatest } from 'rxjs';
 import { map, takeUntil, filter, take } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
+import { isNil } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { HttpStatus } from 'app/types/types';
-import { loading, EntityStatus } from 'app/entities/entities';
+import { loading, EntityStatus, pending } from 'app/entities/entities';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
@@ -103,6 +103,42 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.layoutFacade.showSettingsSidebar();
     this.projects.getApplyRulesStatus();
     this.store.dispatch(new GetProjects());
+
+    // handle project creation success response
+    this.store.pipe(
+      select(createStatus),
+      takeUntil(this.isDestroyed),
+      filter(state => {
+        return this.creatingProject && !pending(state);
+      }))
+      .subscribe(state => {
+        if (state === EntityStatus.loadingSuccess) {
+          this.creatingProject = false;
+          this.closeCreateModal();
+
+          // This is issued periodically from projects-filter.effects.ts; we do it now
+          // so the user doesn't have to wait.
+          this.store.dispatch(new LoadOptions());
+        }
+      });
+
+    // handle project creation failure response
+    combineLatest([
+      this.store.select(createStatus),
+      this.store.select(createError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(() => this.createModalVisible),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictErrorEvent.emit(true);
+          this.creatingProject = false;
+        } else {
+          // close modal on any error other than conflict and display in banner
+          this.closeCreateModal();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -136,39 +172,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       name: this.createProjectForm.controls['name'].value.trim()
     };
     this.store.dispatch(new CreateProject(project));
-
-    const pendingCreate = new Subject<boolean>();
-    this.store.select(createStatus).pipe(
-      filter(identity),
-      takeUntil(pendingCreate))
-      .subscribe((state) => {
-        if (!loading(state)) {
-          pendingCreate.next(true);
-          pendingCreate.complete();
-          this.creatingProject = false;
-          if (state === EntityStatus.loadingSuccess) {
-            // This is issued periodically from projects-filter.effects.ts; we do it now
-            // so the user doesn't have to wait.
-            this.store.dispatch(new LoadOptions());
-            this.closeCreateModal();
-          }
-          if (state === EntityStatus.loadingFailure) {
-            const pendingCreateError = new Subject<boolean>();
-            this.store.select(createError).pipe(
-              filter(identity),
-              takeUntil(pendingCreateError))
-              .subscribe((error) => {
-                pendingCreateError.next(true);
-                pendingCreateError.complete();
-                if (error.status === HttpStatus.CONFLICT) {
-                  this.conflictErrorEvent.emit(true);
-                } else { // Close the modal on any error other than conflict and display in banner.
-                  this.closeCreateModal();
-                }
-            });
-          }
-        }
-      });
   }
 
   public openCreateModal(): void {
