@@ -367,163 +367,81 @@ func (s *Store) parseList(rows *sql.Rows) ([]inspec.Metadata, error) {
 		logrus.Debug("iterate over row")
 		err := rows.Scan(&sha256, &metadataBlob)
 		if err != nil {
-			logrus.Error(err)
-			return entries, err
+			return nil, err
 		}
 		logrus.Debug("parse metadata")
 		metadata := inspec.Metadata{}
 		err = metadata.ParseJSON(metadataBlob)
 		if err != nil {
-			logrus.Error(err)
-			return entries, err
+			return nil, err
 		}
 		metadata.Sha256 = sha256
 		entries = append(entries, metadata)
 	}
 	err := rows.Err()
 	if err != nil {
-		logrus.Error(err)
-		return entries, err
+		return nil, err
 	}
 	return entries, nil
 }
 
-func validateSortOrder(sort string, order string) error {
+func (s *Store) ListProfilesMetadata(namespace string, name string, sort string, order string) ([]inspec.Metadata, error) {
 	if order != "ASC" && order != "DESC" {
-		return status.Errorf(codes.InvalidArgument, "order field '%s' is invalid. Use either 'ASC' or 'DESC'", sort)
+		return nil, status.Errorf(codes.InvalidArgument, "order field '%s' is invalid. Use either 'ASC' or 'DESC'", order)
 	}
 
 	if sort != "name" && sort != "title" && sort != "maintainer" {
-		return status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name', 'title' or 'maintainer'", sort)
+		return nil, status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name', 'title' or 'maintainer'", sort)
 	}
-	return nil
-}
-
-func (s *Store) marketProfilesAll(sort string, order string) (*sql.Rows, error) {
-	err := validateSortOrder(sort, order)
-	if err != nil {
-		return nil, err
-	}
-	selectMarketSQL := fmt.Sprintf(`
-		SELECT sha256, info
-		FROM store_profiles WHERE sha256 IN
-		(SELECT sha256 FROM store_market)
-		ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-	`, sort, order)
-
-	selectMarketStmt, err := s.DB.Prepare(selectMarketSQL)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-
-	return selectMarketStmt.Query()
-}
-
-func (s *Store) marketProfilesByName(name string, sort string, order string) (*sql.Rows, error) {
-	err := validateSortOrder(sort, order)
-	if err != nil {
-		return nil, err
-	}
-	selectMarketSQL := fmt.Sprintf(`
-		SELECT sha256, info
-		FROM store_profiles WHERE sha256 IN
-		(SELECT sha256 FROM store_market)
-		AND info->>'name' = $1
-		ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-	`, sort, order)
-
-	selectMarketStmt, err := s.DB.Prepare(selectMarketSQL)
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-
-	return selectMarketStmt.Query(name)
-}
-
-// returns array of profiles with info
-func (s *Store) ListMarketProfilesMetadata(name string, sort string, order string) ([]inspec.Metadata, error) {
-	logrus.Debug("Listing market profiles")
 
 	var rows *sql.Rows
 	var err error
-	if name != "" {
-		rows, err = s.marketProfilesByName(name, sort, order)
-	} else {
-		rows, err = s.marketProfilesAll(sort, order)
-	}
 
+	switch {
+	case len(namespace) == 0 && len(name) == 0:
+		query := fmt.Sprintf(`
+			SELECT sha256, info
+			FROM store_profiles WHERE sha256 IN
+			(SELECT sha256 FROM store_market)
+			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
+		`, sort, order)
+
+		rows, err = s.DB.Query(query)
+	case len(namespace) == 0:
+		query := fmt.Sprintf(`
+			SELECT sha256, info
+			FROM store_profiles WHERE sha256 IN
+			(SELECT sha256 FROM store_market)
+			AND info->>'name' = $1
+			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
+		`, sort, order)
+
+		rows, err = s.DB.Query(query, name)
+	case len(name) == 0:
+		query := fmt.Sprintf(`
+			SELECT sha256, info
+			FROM store_profiles WHERE
+			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
+			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
+		`, sort, order)
+
+		rows, err = s.DB.Query(query, namespace)
+	default:
+		query := fmt.Sprintf(`
+			SELECT sha256, info
+			FROM store_profiles WHERE
+			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
+			AND info->>'name' = $2
+			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
+		`, sort, order)
+
+		rows, err = s.DB.Query(query, namespace, name)
+	}
 	if err != nil {
-		logrus.Error(err)
 		return nil, err
 	}
-
 	defer rows.Close() // nolint: errcheck
-	return s.parseList(rows)
-}
 
-// returns array of profiles with info
-func (s *Store) namespaceProfilesAll(namespace string, sort string, order string) (*sql.Rows, error) {
-	logrus.Debug("Listing profile per namespace")
-	err := validateSortOrder(sort, order)
-	if err != nil {
-		return nil, err
-	}
-	selectProfilesSQL := fmt.Sprintf(`
-		SELECT sha256, info
-		FROM store_profiles WHERE
-		sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
-		ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-	`, sort, order)
-
-	selectProfilesStmt, err := s.DB.Prepare(selectProfilesSQL)
-	if err != nil {
-		return nil, err
-	}
-
-	return selectProfilesStmt.Query(namespace)
-}
-
-func (s *Store) namespaceProfilesByName(namespace string, name string, sort string, order string) (*sql.Rows, error) {
-	err := validateSortOrder(sort, order)
-	if err != nil {
-		return nil, err
-	}
-	selectProfilesSQL := fmt.Sprintf(`
-		SELECT sha256, info
-		FROM store_profiles WHERE
-		sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
-		AND info->>'name' = $2
-		ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-	`, sort, order)
-
-	selectProfilesStmt, err := s.DB.Prepare(selectProfilesSQL)
-	if err != nil {
-		return nil, err
-	}
-
-	return selectProfilesStmt.Query(namespace, name)
-}
-
-// retruns an array of all versions for a specific profile
-func (s *Store) ListProfilesMetadata(namespace string, name string, sort string, order string) ([]inspec.Metadata, error) {
-	logrus.Debugf("Listing profiles for namespace %s and name %s", namespace, name)
-
-	var rows *sql.Rows
-	var err error
-	if name != "" {
-		rows, err = s.namespaceProfilesByName(namespace, name, sort, order)
-	} else {
-		rows, err = s.namespaceProfilesAll(namespace, sort, order)
-	}
-
-	if err != nil {
-		logrus.Error(err)
-		return nil, err
-	}
-
-	defer rows.Close() // nolint: errcheck
 	return s.parseList(rows)
 }
 
