@@ -37,6 +37,8 @@ type Spec struct {
 	SyncEsIndices  []ElasticsearchOperation `json:"sync_es"`
 	AsyncEsIndices []ElasticsearchOperation `json:"async_es"`
 
+	SyncBuilderMinio []BuilderMinioDumpOperation `json:"sync_builder_minio"`
+
 	// Test operations
 	testSyncOps  []testOperation
 	testAsyncOps []testOperation
@@ -66,6 +68,11 @@ func (s *Spec) SyncOps() []Operation {
 	}
 
 	for _, sc := range s.SyncDbsV2 {
+		c := sc
+		ops = append(ops, &c)
+	}
+
+	for _, sc := range s.SyncBuilderMinio {
 		c := sc
 		ops = append(ops, &c)
 	}
@@ -532,6 +539,21 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{
 			Name: "automate-workflow-nginx", WriteMetadata: false,
 		},
+		{
+			Name:          "automate-builder-api",
+			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "automate-builder-api",
+					User: "automate-builder-api",
+				},
+			},
+			SyncBuilderMinio: []BuilderMinioDumpOperation{
+				{
+					Name: "hartifacts",
+				},
+			},
+		},
 	}
 
 	for _, spec := range specs {
@@ -585,6 +607,10 @@ func setDefaults(spec Spec) {
 
 	for i := range spec.AsyncDbsV2 {
 		spec.AsyncDbsV2[i].ObjectName = []string{spec.Name, "pg_data"}
+	}
+
+	for i := range spec.SyncBuilderMinio {
+		spec.SyncBuilderMinio[i].ObjectName = []string{spec.Name, "artifacts"}
 	}
 }
 

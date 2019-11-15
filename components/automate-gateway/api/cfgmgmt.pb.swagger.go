@@ -789,7 +789,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "title": "?? should we delete this tags?  is it just extra?"
+          "description": "Unused field."
         },
         "resource_names": {
           "type": "array",

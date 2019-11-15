@@ -1,21 +1,5 @@
 @import "~styles/variables";
 
-chef-table {
-
-  .name-column {
-    flex-basis: 40%;
-  }
-
-  .type-column {
-    flex-basis: 15%;
-  }
-
-  .status-column {
-    flex-basis: 15%;
-  }
-
-  .button-column {
-    justify-content: flex-end;
-  }
-
+.three-dot-column {
+  text-align: right;
 }

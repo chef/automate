@@ -70,6 +70,7 @@ data-feed-service components/data-feed-service
 event-feed-service components/event-feed-service
 cereal-service components/cereal-service
 automate-minio components/automate-minio
+automate-openssl11 components/automate-openssl11
 automate-builder-memcached components/automate-builder-memcached
 automate-builder-api components/automate-builder-api
 automate-builder-api-proxy components/automate-builder-api-proxy

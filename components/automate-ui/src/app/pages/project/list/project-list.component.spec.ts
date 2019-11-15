@@ -85,12 +85,12 @@ describe('ProjectListComponent', () => {
         MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
-        MockComponent({ selector: 'chef-table' }),
-        MockComponent({ selector: 'chef-thead' }),
-        MockComponent({ selector: 'chef-tbody' }),
-        MockComponent({ selector: 'chef-tr' }),
-        MockComponent({ selector: 'chef-th' }),
-        MockComponent({ selector: 'chef-td' }),
+        MockComponent({ selector: 'chef-table-new' }),
+        MockComponent({ selector: 'chef-table-header' }),
+        MockComponent({ selector: 'chef-table-body' }),
+        MockComponent({ selector: 'chef-table-row' }),
+        MockComponent({ selector: 'chef-table-header-cell' }),
+        MockComponent({ selector: 'chef-table-cell' }),
         ProjectListComponent
       ],
       imports: [
@@ -134,7 +134,7 @@ describe('ProjectListComponent', () => {
     it('displays project data for v2', () => {
       store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       fixture.detectChanges();
-      expect(element).toContainPath('chef-table');
+      expect(element).toContainPath('chef-table-new');
       component.sortedProjects$.subscribe(results => {
         expect(results.length).toBe(projectList.length);
         projectList.forEach(p => {
@@ -146,7 +146,7 @@ describe('ProjectListComponent', () => {
     it('does not display project data for v1', () => {
       component.isIAMv2$ = observableOf(false);
       store.dispatch(new GetProjectsSuccess({ projects: projectList }));
-      expect(element).not.toContainPath('chef-table');
+      expect(element).not.toContainPath('chef-table-new');
     });
 
     describe('create modal', () => {

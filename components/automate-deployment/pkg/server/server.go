@@ -2051,6 +2051,15 @@ func (s *server) reloadBackupRunner() error {
 		return err
 	}
 
+	var builderMinioLocationSpec backup.LocationSpecification
+	if deployment.ContainsCollection(s.deployment.Config.GetDeployment(), services.BuilderCollectionName) {
+		var err error
+		builderMinioLocationSpec, err = s.builderMinioLocationSpec()
+		if err != nil {
+			return err
+		}
+	}
+
 	esSidecarInfo := backup.ESSidecarConnInfo{
 		Host: s.deployment.Config.GetEsSidecar().GetV1().GetSys().GetService().GetHost().GetValue(),
 		Port: s.deployment.Config.GetEsSidecar().GetV1().GetSys().GetService().GetPort().GetValue(),
@@ -2073,6 +2082,7 @@ func (s *server) reloadBackupRunner() error {
 		backup.WithTarget(target),
 		backup.WithReleaseManifest(s.deployment.CurrentReleaseManifest),
 		backup.WithDeploymentStore(s.deploymentStore),
+		backup.WithBuilderMinioLocationSpec(builderMinioLocationSpec),
 	)
 
 	return nil

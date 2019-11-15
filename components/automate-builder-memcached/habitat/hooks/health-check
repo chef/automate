@@ -1,10 +1,18 @@
 #!{{pkgPathFor "core/bash"}}/bin/bash
 
 set -uo pipefail
+
 exec 2>&1
 
 rc=0
-response=$(echo "version" | nc 127.0.0.1 {{cfg.service.port}})
+opts="s_client -connect 127.0.0.1:{{cfg.service.port}}"
+opts="${opts} -cert {{pkg.svc_config_path}}/service.crt"
+opts="${opts} -key {{pkg.svc_config_path}}/service.key"
+opts="${opts} -CAfile {{pkg.svc_config_path}}/root_ca.crt"
+opts="${opts} -verify_hostname automate-builder-memcached"
+opts="${opts} -verify_return_error -quiet -verify_quiet"
+# shellcheck disable=SC2086
+response=$(echo -e "version\nquit" | openssl $opts)
 case $? in
     0)
         case "$response" in

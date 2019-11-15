@@ -29,7 +29,7 @@ type Node struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// The FQDN of the node.
 	Fqdn string `protobuf:"bytes,3,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
-	// The time on the latest received infra node report. <-- ??
+	// The time on the latest received infra node report.
 	Checkin *timestamp.Timestamp `protobuf:"bytes,4,opt,name=checkin,proto3" json:"checkin,omitempty"`
 	// Count in seconds that the node has been active.
 	UptimeSeconds int32 `protobuf:"varint,5,opt,name=uptime_seconds,json=uptimeSeconds,proto3" json:"uptime_seconds,omitempty"`
@@ -440,7 +440,7 @@ type Run struct {
 	Deprecations []*Deprecation `protobuf:"bytes,19,rep,name=deprecations,proto3" json:"deprecations,omitempty"`
 	// Chef Error information, available on failed runs.
 	Error *ChefError `protobuf:"bytes,20,opt,name=error,proto3" json:"error,omitempty"`
-	// ?? should we delete this tags?  is it just extra?
+	// Unused field.
 	Tags []string `protobuf:"bytes,21,rep,name=tags,proto3" json:"tags,omitempty"`
 	// List of resource names for the node.
 	ResourceNames []string `protobuf:"bytes,22,rep,name=resource_names,json=resourceNames,proto3" json:"resource_names,omitempty"`

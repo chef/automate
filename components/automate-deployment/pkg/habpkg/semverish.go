@@ -79,38 +79,44 @@ func getInt(s string) (int, string, error) {
 	return ret, s[end:], err
 }
 
+const (
+	SemverishGreater = 1
+	SemverishEqual   = 0
+	SemverishLess    = -1
+)
+
 func CompareSemverish(a SemverishVersion, b SemverishVersion) int {
 	for i := 0; i < len(a.parts); i++ {
 		if len(b.parts) > i {
 			if a.parts[i] < b.parts[i] {
-				return -1
+				return SemverishLess
 			} else if a.parts[i] > b.parts[i] {
-				return 1
+				return SemverishGreater
 			}
 		} else {
-			return 1
+			return SemverishGreater
 		}
 	}
 	if len(b.parts) > len(a.parts) {
-		return -1
+		return SemverishLess
 	}
 
 	// No-prerelease always wins
 	if a.prerelease == "" && b.prerelease != "" {
-		return 1
+		return SemverishGreater
 	} else if a.prerelease != "" && b.prerelease == "" {
-		return -1
+		return SemverishLess
 	}
 
 	// Otherwise, just lexigraphically sort the pre-release, this
 	// is not what the spec says to do.
 	if a.prerelease < b.prerelease {
-		return -1
+		return SemverishLess
 	} else if a.prerelease > b.prerelease {
-		return 1
+		return SemverishGreater
 	}
 
-	return 0
+	return SemverishEqual
 }
 
 // GreaterOrEqual returns true if a is greater or equal to b, assuming
@@ -127,11 +133,11 @@ func SemverishGreaterOrEqual(a VersionedArtifact, b VersionedArtifact) (bool, er
 	}
 
 	switch CompareSemverish(semverA, semverB) {
-	case 1: // greater
+	case SemverishGreater:
 		return true, nil
-	case -1: // less than
+	case SemverishLess:
 		return false, nil
-	case 0: // equal
+	case SemverishEqual:
 		return a.Release() >= b.Release(), nil
 	default:
 		return false, nil

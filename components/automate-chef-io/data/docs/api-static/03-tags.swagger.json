@@ -7,11 +7,16 @@
     {
       "name": "Infra",
       "tags": ["ConfigMgmt"]
+    },
+    {
+      "name": "Nodes",
+      "tags": ["NodesService"]
     }
   ],
   "tags": [
     { "name": "ReportingService", "x-displayName": "Reporting" },
     { "name": "StatsService", "x-displayName": "Stats" },
-    { "name": "ConfigMgmt", "x-displayName": "Infra Nodes" }
+    { "name": "ConfigMgmt", "x-displayName": "Nodes" },
+    { "name": "NodesService", "x-displayName": "Nodes" }
   ]
 }

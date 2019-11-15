@@ -16,8 +16,10 @@ bldr_smoke_test() {
 
     TEST_ORIGIN="$(cat origin)"
     TEST_TOKEN="$(cat token)"
+    TEST_PKG="builder-test-plan"
     export TEST_ORIGIN
     export TEST_TOKEN
+    export TEST_PKG
 
     popd || return 1
 
