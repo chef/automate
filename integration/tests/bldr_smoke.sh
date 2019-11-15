@@ -10,7 +10,6 @@ test_backup_restore=true
 do_deploy() {
     #shellcheck disable=SC2154
     chef-automate deploy config.toml \
-        --product automate \
         --product builder \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
