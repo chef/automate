@@ -784,6 +784,13 @@ func init() {
           "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ChefError",
           "description": "Chef Error information, available on failed runs."
         },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Unused field."
+        },
         "resource_names": {
           "type": "array",
           "items": {

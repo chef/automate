@@ -123,6 +123,8 @@ message Run {
   repeated Deprecation      deprecations           = 19;
   // Chef Error information, available on failed runs.
   ChefError                 error                  = 20;
+  // Unused field.
+  repeated string           tags                   = 21;
   // List of resource names for the node.
   repeated string           resource_names         = 22;
   // List of recipes the node calls.

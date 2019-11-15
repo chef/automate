@@ -212,7 +212,7 @@ control 'config-mgmt-ccr-2' do
         expect(run[:id]).to eq 'ba6acb91-1eaa-4c84-8d68-f19ee641e606'
 
         expect(run[:error][:class]).to eq 'Chef::Exceptions::EnclosingDirectoryDoesNotExist'
-        # this is being real flakey. the msg is the same one when it fails :/ expect(run[:error][:message]).to eq "file[/failed/file/resource] (insights-test::default line 26) had an error: Chef::Exceptions::EnclosingDirectoryDoesNotExist: Parent directory /failed/file does not exist."
+        expect(run[:error][:message]).to eq "file[/failed/file/resource] (insights-test::default line 26) had an error: Chef::Exceptions::EnclosingDirectoryDoesNotExist: Parent directory /failed/file does not exist."
         expect(run[:error][:backtrace].length).to eq 53
         expect(run[:error][:backtrace]).to eq [
           "/Users/bob/projects/chef/lib/chef/mixin/why_run.rb:240:in `run'",
@@ -433,6 +433,8 @@ control 'config-mgmt-ccr-2' do
         expect(run[:error][:message]).to eq ''
         expect(run[:error][:backtrace]).to eq []
         expect(run[:error][:description]).to be nil
+
+        expect(run[:tags]).to eq []
 
         expected_resource_names = ['chef-sugar', 'chef-sugar', '/usr/local/bin', '/usr/local/bin/git', 'openjdk-r', 'update', 'wget', '/etc/profile.d/rbenv.sh', '/opt/rbenv', '/opt/rubies', '/home/jenkins/.bashrc.d/chruby-default.sh', 'omnibus-toolchain',
           '/export/home', 'create jenkins group', 'chsec_login_shell', 'jenkins', 'jenkins', '/home/jenkins', '/var/chef/cache', '/usr/local/bin', '/var/cache/omnibus', 'install_packages', '/home/jenkins/.gitconfig',
