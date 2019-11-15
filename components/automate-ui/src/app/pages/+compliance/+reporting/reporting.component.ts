@@ -146,6 +146,15 @@ export class ReportingComponent implements OnInit, OnDestroy {
     }
   ];
 
+  private NO_VALUE = 'no value';
+  private noValuesControlTagFilter = {
+    id: '',
+    score: 1,
+    text: this.NO_VALUE,
+    title: 'no value',
+    version: ''
+  };
+
   availableFilterValues = [];
   defaultFilterInputPlaceholder = 'Filter by...';
   inputSelectedFilter: {};
@@ -342,6 +351,12 @@ export class ReportingComponent implements OnInit, OnDestroy {
       } else {
         typeName = 'control_name';
       }
+    } else if (this.isTypeControlTag(type.name)) {
+      if (value.title === 'no value') {
+        typeName = type.name;
+        filterValue = value.id;
+        this.reportQuery.setFilterTitle(typeName, value.id, value.title);
+      }
     }
 
     const {queryParamMap} = this.route.snapshot;
@@ -417,6 +432,12 @@ export class ReportingComponent implements OnInit, OnDestroy {
   getSuggestions(type: string, text: string, reportQuery: ReportQuery) {
     return this.suggestionsService.getSuggestions(type.replace('_id', ''), text, reportQuery).pipe(
       map(data => {
+
+        // Adding the option of 'no value' only to the control tag third level suggestions
+        if (type === 'control_tag_value') {
+          data.unshift(this.noValuesControlTagFilter);
+        }
+
         return data.map(item => Object.assign(item, { title: item.text }));
       }),
       takeUntil(this.isDestroyed)

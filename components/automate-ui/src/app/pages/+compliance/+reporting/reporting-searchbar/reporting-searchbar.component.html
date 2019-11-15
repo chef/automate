@@ -88,7 +88,7 @@
     primary
     *ngFor="let filter of filters"
     (click)="onRemoveFilterClick(filter)">
-    <span>{{ filter.type.name }}: {{ filter.value.text }}</span>
+    <span>{{ filter.type.name }}: {{ displayText(filter.value.text) }}</span>
     <chef-icon>close</chef-icon>
   </chef-button>
 </div>

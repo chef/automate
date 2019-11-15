@@ -53,4 +53,18 @@ describe('ReportingSearchbarComponent', () => {
       });
     });
   });
+
+  describe('displayText()', () => {
+    using([
+      ['', 'no value'],
+      ['scoop', 'scoop'],
+      ['something', 'something'],
+      ['9684', '9684'],
+      ['TEST-123', 'TEST-123']
+    ], function(input: string, output: string) {
+      it(`returns string reading '${output}' when passed ${input}`, () => {
+        expect(component.displayText(input)).toEqual(output);
+      });
+    });
+  });
 });
