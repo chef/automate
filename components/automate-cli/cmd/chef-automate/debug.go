@@ -40,7 +40,7 @@ var versionCmdFlags = struct {
 func newDebugCmd() *cobra.Command {
 	debugCmd := &cobra.Command{
 		Use:    "debug",
-		Short:  "Enable profiling for services",
+		Short:  "Enable profiling, tracing, and other debugging functionality for services",
 		Hidden: true,
 	}
 
@@ -51,14 +51,14 @@ func newDebugCmd() *cobra.Command {
 	profileCmd := &cobra.Command{
 		Use:   "profile service-name",
 		RunE:  runProfile,
-		Short: "Run the CPU profiler for the service for the given service",
+		Short: "Run the CPU profiler for the given service",
 		Args:  cobra.ExactArgs(1),
 	}
 
 	traceCmd := &cobra.Command{
 		Use:   "trace service-name",
 		RunE:  runTrace,
-		Short: "Run the execution tracer for the service for the given service",
+		Short: "Run the execution tracer for the given service",
 		Args:  cobra.ExactArgs(1),
 	}
 
