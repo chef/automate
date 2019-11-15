@@ -6,62 +6,30 @@ import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
 import * as sidebar from './services/sidebar/sidebar.reducer';
 import * as projectsFilter from './services/projects-filter/projects-filter.reducer';
-
-import {
-  ApiTokenEntityState,
-  apiTokenEntityReducer
-} from './entities/api-tokens/api-token.reducer';
-import {
-  AutomateSettingsEntityState,
-  automateSettingsEntityReducer
-} from './entities/automate-settings/automate-settings.reducer';
-import {
-  ClientRunsEntityState,
-  clientRunsEntityReducer
-} from './entities/client-runs/client-runs.reducer';
-import {
-  IntegrationsAddState,
-  integrationsAddReducer
-} from './pages/integrations/add/integration-add.reducer';
-import {
-  IntegrationsDetailState,
-  integrationsDetailReducer
-} from './pages/integrations/detail/integrations-detail.reducer';
-import {
-  IntegrationsEditState,
-  integrationsEditReducer
-} from './pages/integrations/edit/integrations-edit.reducer';
-import {
-  LicenseStatusEntityState,
-  licenseStatusEntityReducer
-} from './entities/license/license.reducer';
-import {
-  LayoutEntityState,
-  layoutEntityReducer
-} from './entities/layout/layout.reducer';
-import {
-  NotificationEntityState,
-  notificationEntityReducer
-} from './entities/notifications/notification.reducer';
-
-import { CredentialState, credentialReducer } from './entities/credentials/credential.reducer';
-import { JobAddState, jobAddReducer } from './pages/job-add/job-add.reducer';
-import { JobEditState, jobEditReducer } from './pages/job-edit/job-edit.reducer';
-import { JobEntityState, jobEntityReducer } from './entities/jobs/job.reducer';
-import { JobListState, jobListReducer } from './pages/job-list/job-list.reducer';
-import { ManagerEntityState, managerEntityReducer } from './entities/managers/manager.reducer';
-import { PermEntityState, permEntityReducer } from './entities/userperms/userperms.reducer';
-import { PolicyEntityState, policyEntityReducer } from './entities/policies/policy.reducer';
-import { ProfileEntityState, profileEntityReducer } from './entities/profiles/profile.reducer';
-import { ProjectEntityState, projectEntityReducer } from './entities/projects/project.reducer';
-import { RoleEntityState, roleEntityReducer } from './entities/roles/role.reducer';
-import { RuleEntityState, ruleEntityReducer } from './entities/rules/rule.reducer';
-import {
-  ServiceGroupsEntityState,
-  serviceGroupsEntityReducer
-} from './entities/service-groups/service-groups.reducer';
-import { TeamEntityState, teamEntityReducer } from './entities/teams/team.reducer';
-import { UserEntityState, userEntityReducer } from './entities/users/user.reducer';
+import * as apiToken from './entities/api-tokens/api-token.reducer';
+import * as automateSettings from './entities/automate-settings/automate-settings.reducer';
+import * as clientRuns from './entities/client-runs/client-runs.reducer';
+import * as integationsAdd from './pages/integrations/add/integration-add.reducer';
+import * as integrationsDetail from './pages/integrations/detail/integrations-detail.reducer';
+import * as integrationsEdit from './pages/integrations/edit/integrations-edit.reducer';
+import * as license from './entities/license/license.reducer';
+import * as layout from './entities/layout/layout.reducer';
+import * as notificationEntity from './entities/notifications/notification.reducer';
+import * as credential from './entities/credentials/credential.reducer';
+import * as jobAdd from './pages/job-add/job-add.reducer';
+import * as jobEdit from './pages/job-edit/job-edit.reducer';
+import * as jobEntity from './entities/jobs/job.reducer';
+import * as jobList from './pages/job-list/job-list.reducer';
+import * as manager from './entities/managers/manager.reducer';
+import * as permEntity from './entities/userperms/userperms.reducer';
+import * as policyEntity from './entities/policies/policy.reducer';
+import * as profileEntity from './entities/profiles/profile.reducer';
+import * as projectEntity from './entities/projects/project.reducer';
+import * as roleEntity from './entities/roles/role.reducer';
+import * as ruleEntity from './entities/rules/rule.reducer';
+import * as serviceGroups from './entities/service-groups/service-groups.reducer';
+import * as teamEntity from './entities/teams/team.reducer';
+import * as userEntity from './entities/users/user.reducer';
 
 // AOT likely won't allow dynamic object property names here even when the underlying
 // typescript bug preventing it is fixed
@@ -71,36 +39,36 @@ export interface NgrxStateAtom {
   router: RouterReducerState;
   scanner: scanner.ScannerState;
   sidebar: sidebar.SidebarState;
-  layout: LayoutEntityState;
+  layout: layout.LayoutEntityState;
   projectsFilter: projectsFilter.ProjectsFilterState;
 
   // UI State
-  integrations_add: IntegrationsAddState;
-  integrations_detail: IntegrationsDetailState;
-  integrations_edit: IntegrationsEditState;
-  job_add: JobAddState;
-  job_edit: JobEditState;
-  job_list: JobListState;
+  integrations_add: integationsAdd.IntegrationsAddState;
+  integrations_detail: integrationsDetail.IntegrationsDetailState;
+  integrations_edit: integrationsEdit.IntegrationsEditState;
+  job_add: jobAdd.JobAddState;
+  job_edit: jobEdit.JobEditState;
+  job_list: jobList.JobListState;
 
   // Entities
-  apiTokens: ApiTokenEntityState;
-  automateSettings: AutomateSettingsEntityState;
-  clientRunsEntity: ClientRunsEntityState;
-  jobs: JobEntityState;
-  licenseStatus: LicenseStatusEntityState;
-  managers: ManagerEntityState;
-  notifications: NotificationEntityState;
-  policies: PolicyEntityState;
-  profiles: ProfileEntityState;
-  projects: ProjectEntityState;
-  roles: RoleEntityState;
-  rules: RuleEntityState;
-  serviceGroups: ServiceGroupsEntityState;
-  teams: TeamEntityState;
-  userperms: PermEntityState;
-  users: UserEntityState;
+  apiTokens: apiToken.ApiTokenEntityState;
+  automateSettings: automateSettings.AutomateSettingsEntityState;
+  clientRunsEntity: clientRuns.ClientRunsEntityState;
+  jobs: jobEntity.JobEntityState;
+  licenseStatus: license.LicenseStatusEntityState;
+  managers: manager.ManagerEntityState;
+  notifications: notificationEntity.NotificationEntityState;
+  policies: policyEntity.PolicyEntityState;
+  profiles: profileEntity.ProfileEntityState;
+  projects: projectEntity.ProjectEntityState;
+  roles: roleEntity.RoleEntityState;
+  rules: ruleEntity.RuleEntityState;
+  serviceGroups: serviceGroups.ServiceGroupsEntityState;
+  teams: teamEntity.TeamEntityState;
+  userperms: permEntity.PermEntityState;
+  users: userEntity.UserEntityState;
   // Named credentialEntity until we refactor the credentials page
-  credentialEntity: CredentialState;
+  credentialEntity: credential.CredentialState;
 }
 
 export interface RouterReducerState {
@@ -142,7 +110,7 @@ export const runtimeChecks = {
   strictActionSerializability: false
 };
 
-const defaultRouterState = {
+export const defaultRouterState = {
   state: {
     url: '/',
     queryParams: {},
@@ -165,6 +133,42 @@ export function routerReducer(state = defaultRouterState, action) {
   }
 }
 
+export const defaultInitialState = {
+  ...defaultRouterState,
+  credentials: credentials.initialState,
+  event_feed: eventFeed.initialState,
+  scanner: scanner.initialState,
+  sidebar: sidebar.initialState,
+  layout: layout.InitialState,
+  projectsFilter: projectsFilter.projectsFilterInitialState,
+
+  // UI State
+  integrations_add: integationsAdd.IntegrationsAddInitialState, 
+  integrations_detail: integrationsDetail.IntegrationsDetailInitialState,
+  integrations_edit: integrationsEdit.IntegrationsEditInitialState,
+  job_add: jobAdd.JobAddInitialState,
+  job_edit: jobEdit.JobEditInitialState,
+  job_list: jobList.JobListInitialState,
+
+  // Entities
+  apiTokens: apiToken.ApiTokenEntityInitialState,
+  automateSettings: automateSettings.AutomateSettingsEntityInitialState,
+  clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
+  jobs: jobEntity.JobEntityInitialState,
+  licenseStatus: license.LicenseStatusEntityInitialState,
+  managers: manager.ManagerEntityInitialState,
+  notifications: notificationEntity.InitialState,
+  policies: policyEntity.PolicyEntityInitialState,
+  profiles: profileEntity.ProfileEntityInitialState,
+  projects: projectEntity.ProjectEntityInitialState,
+  roles: roleEntity.RoleEntityInitialState,
+  rules: ruleEntity.RuleEntityInitialState,
+  serviceGroups: serviceGroups.ServiceGroupEntityInitialState,
+  teams: teamEntity.TeamEntityInitialState,
+  userperms: permEntity.initialState,
+  users: userEntity.userEntityAdapter.getInitialState
+};
+
 export const ngrxReducers = {
   // AOT doesn't like dynamic object property names here
   credentials: credentials.credentialsReducer,
@@ -173,32 +177,32 @@ export const ngrxReducers = {
   event_feed: eventFeed.eventFeedReducer,
   projectsFilter: projectsFilter.projectsFilterReducer,
   sidebar: sidebar.sidebarReducer,
-  layout: layoutEntityReducer,
+  layout: layout.layoutEntityReducer,
 
   // UI State
-  job_add: jobAddReducer,
-  job_edit: jobEditReducer,
-  job_list: jobListReducer,
-  integrations_add: integrationsAddReducer,
-  integrations_detail: integrationsDetailReducer,
-  integrations_edit: integrationsEditReducer,
+  job_add: jobAdd.jobAddReducer,
+  job_edit: jobEdit.jobEditReducer,
+  job_list: jobList.jobListReducer,
+  integrations_add: integationsAdd.integrationsAddReducer,
+  integrations_detail: integrationsDetail.integrationsDetailReducer,
+  integrations_edit: integrationsEdit.integrationsEditReducer,
 
   // Entities
-  apiTokens: apiTokenEntityReducer,
-  automateSettings: automateSettingsEntityReducer,
-  clientRunsEntity: clientRunsEntityReducer,
-  credentialEntity: credentialReducer,
-  jobs: jobEntityReducer,
-  managers: managerEntityReducer,
-  licenseStatus: licenseStatusEntityReducer,
-  notifications: notificationEntityReducer,
-  policies: policyEntityReducer,
-  profiles: profileEntityReducer,
-  projects: projectEntityReducer,
-  roles: roleEntityReducer,
-  rules: ruleEntityReducer,
-  serviceGroups: serviceGroupsEntityReducer,
-  teams: teamEntityReducer,
-  userperms: permEntityReducer,
-  users: userEntityReducer
+  apiTokens: apiToken.apiTokenEntityReducer,
+  automateSettings: automateSettings.automateSettingsEntityReducer,
+  clientRunsEntity: clientRuns.clientRunsEntityReducer,
+  credentialEntity: credential.credentialReducer,
+  jobs: jobEntity.jobEntityReducer,
+  managers: manager.managerEntityReducer,
+  licenseStatus: license.licenseStatusEntityReducer,
+  notifications: notificationEntity.notificationEntityReducer,
+  policies: policyEntity.policyEntityReducer,
+  profiles: profileEntity.profileEntityReducer,
+  projects: projectEntity.projectEntityReducer,
+  roles: roleEntity.roleEntityReducer,
+  rules: ruleEntity.ruleEntityReducer,
+  serviceGroups: serviceGroups.serviceGroupsEntityReducer,
+  teams: teamEntity.teamEntityReducer,
+  userperms: permEntity.permEntityReducer,
+  users: userEntity.userEntityReducer
 };

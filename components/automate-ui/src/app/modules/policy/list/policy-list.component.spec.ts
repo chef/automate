@@ -1,16 +1,16 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { StoreModule } from '@ngrx/store';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
 import { of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
-import { runtimeChecks } from 'app/ngrx.reducers';
-import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { PolicyListComponent } from './policy-list.component';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
 describe('PolicyListComponent', () => {
+  let store: Store<NgrxStateAtom>;
   let component: PolicyListComponent;
   let fixture: ComponentFixture<PolicyListComponent>;
   let element: HTMLElement;
@@ -44,11 +44,11 @@ describe('PolicyListComponent', () => {
       ],
       imports: [
         ChefPipesModule,
-        StoreModule.forRoot({
-          policies: policyEntityReducer
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
       ]
     }).compileComponents();
+      store = TestBed.get(Store);
+      spyOn(store, 'dispatch').and.callThrough();
   }));
 
   beforeEach(() => {

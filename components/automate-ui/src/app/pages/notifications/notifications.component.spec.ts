@@ -5,7 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { Store, StoreModule } from '@ngrx/store';
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
 import { MockComponent } from 'ng2-mock-component';
 
 import { Rule, ServiceActionType } from './rule';
@@ -14,7 +14,6 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { NotificationsComponent } from './notifications.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FeatureFlagsService } from '../../services/feature-flags/feature-flags.service';
-import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
 
 describe('NotificationsComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -28,18 +27,6 @@ describe('NotificationsComponent', () => {
   // CSS identifiers
   const cardId = '#notifications-cards';
   const listId = '#notifications-list';
-
-  const initialState = {
-    router: {
-      state: {
-        url: '/',
-        params: {},
-        queryParams: {},
-        fragment: ''
-      }
-    },
-    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState
-  };
 
   class MockTelemetryService {
     track() { }
@@ -78,9 +65,7 @@ describe('NotificationsComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        StoreModule.forRoot({
-          clientRunsEntity: fromClientRuns.clientRunsEntityReducer
-        }, { initialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
       ],
       declarations: [
         NotificationsComponent,

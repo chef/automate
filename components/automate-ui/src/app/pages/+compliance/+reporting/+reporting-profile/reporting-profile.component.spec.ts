@@ -1,7 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { StoreModule } from '@ngrx/store';
-import { runtimeChecks } from 'app/ngrx.reducers';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReportingProfileComponent } from '../+reporting-profile/reporting-profile.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
@@ -13,9 +13,27 @@ import { StatsService, ReportQueryService,
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { of as observableOf } from 'rxjs';
 import * as moment from 'moment';
+import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
+import * as fromNotifications from 'app/entities/notifications/notification.reducer';
+import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 describe('ReportingProfileComponent', () => {
+  let store: Store<NgrxStateAtom>;
   let fixture, component, element, statsService;
+
+  const initialState = {
+    router: {
+      state: {
+        url: '/',
+        params: {},
+        queryParams: {},
+        fragment: ''
+      }
+    },
+    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
+    notifications: fromNotifications.InitialState,
+    layout: fromLayout.InitialState
+  };
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -23,7 +41,11 @@ describe('ReportingProfileComponent', () => {
         RouterTestingModule,
         CookieModule.forRoot(),
         HttpClientTestingModule,
-        StoreModule.forRoot({}, { runtimeChecks })
+        StoreModule.forRoot({
+          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
+          notifications: fromNotifications.notificationEntityReducer,
+          layout: fromLayout.layoutEntityReducer
+        }, { initialState, runtimeChecks })
       ],
       declarations: [
         ReportingProfileComponent
@@ -37,7 +59,8 @@ describe('ReportingProfileComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(ReportingProfileComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement;

@@ -3,8 +3,8 @@ import { FormsModule } from '@angular/forms';
 import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
-import { StoreModule } from '@ngrx/store';
-import { runtimeChecks } from 'app/ngrx.reducers';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 
 import { using } from 'app/testing/spec-helpers';
 import { RulesService } from 'app/services/rules/rules.service';
@@ -14,12 +14,30 @@ import { NotificationFormComponent } from './notification-form.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FeatureFlagsService } from '../../services/feature-flags/feature-flags.service';
+import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
+import * as fromNotifications from 'app/entities/notifications/notification.reducer';
+import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 describe('NotificationFormComponent', () => {
+  let store: Store<NgrxStateAtom>;
   let component: NotificationFormComponent;
   let fixture: ComponentFixture<NotificationFormComponent>;
   let ruleService: RulesService;
   const snapshot = { params: { id: 'id' }};
+
+  const initialState = {
+    router: {
+      state: {
+        url: '/',
+        params: {},
+        queryParams: {},
+        fragment: ''
+      }
+    },
+    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
+    notifications: fromNotifications.InitialState,
+    layout: fromLayout.InitialState
+  };
 
   class MockRulesService {
     fetchRules(): Observable<Rule[]> { return observableOf([]); }
@@ -52,11 +70,16 @@ describe('NotificationFormComponent', () => {
       ],
       imports: [
         FormsModule,
-        StoreModule.forRoot({}, { runtimeChecks })
+        StoreModule.forRoot({
+          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
+          notifications: fromNotifications.notificationEntityReducer,
+          layout: fromLayout.layoutEntityReducer
+        }, { initialState, runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
-    })
-      .compileComponents();
+    }).compileComponents();
+      store = TestBed.get(Store);
+      spyOn(store, 'dispatch').and.callThrough();
   }));
 
   beforeEach(() => {

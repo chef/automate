@@ -1,14 +1,17 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { StoreModule } from '@ngrx/store';
-import { runtimeChecks } from 'app/ngrx.reducers';
+import { Store, StoreModule } from '@ngrx/store';
+import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ProfileDetailsComponent } from './profile-details.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable, throwError, of as observableOf } from 'rxjs';
 import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
+import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
+import * as fromNotifications from 'app/entities/notifications/notification.reducer';
+import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 class MockProfilesService {
   getProfile(_owner: string, _name: string): Observable<Object> {
@@ -20,10 +23,25 @@ class MockProfilesService {
 }
 
 describe('ProfileDetailsComponent', () => {
+  let store: Store<NgrxStateAtom>;
   let fixture, component;
 
   const mockSession: any = {
     username: 'TestUser'
+  };
+
+  const initialState = {
+    router: {
+      state: {
+        url: '/',
+        params: {},
+        queryParams: {},
+        fragment: ''
+      }
+    },
+    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
+    notifications: fromNotifications.InitialState,
+    layout: fromLayout.InitialState
   };
 
   beforeEach(() => {
@@ -31,7 +49,11 @@ describe('ProfileDetailsComponent', () => {
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
-        StoreModule.forRoot({}, { runtimeChecks })
+        StoreModule.forRoot({
+          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
+          notifications: fromNotifications.notificationEntityReducer,
+          layout: fromLayout.layoutEntityReducer
+        }, { initialState, runtimeChecks })
       ],
       declarations: [
         ProfileDetailsComponent
@@ -43,7 +65,8 @@ describe('ProfileDetailsComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-
+    store = TestBed.get(Store);
+    spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(ProfileDetailsComponent);
     component = fixture.componentInstance;
     spyOn(component.router, 'navigate');

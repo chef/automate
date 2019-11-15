@@ -26,7 +26,7 @@ export interface PermEntityState {
   readonly lastTimeFetchAll: Date;
 }
 
-const initialState: PermEntityState = {
+export const initialState: PermEntityState = {
   byId: {},
   allIds: [],
   status: Status.notLoaded,

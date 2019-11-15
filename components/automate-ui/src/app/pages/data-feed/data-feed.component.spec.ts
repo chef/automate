@@ -13,6 +13,8 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { DatafeedComponent } from './data-feed.component';
 import { RouterTestingModule } from '@angular/router/testing';
 import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
+import * as fromNotifications from 'app/entities/notifications/notification.reducer';
+import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 describe('DatafeedComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -35,7 +37,9 @@ describe('DatafeedComponent', () => {
         fragment: ''
       }
     },
-    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState
+    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
+    notifications: fromNotifications.InitialState,
+    layout: fromLayout.InitialState
   };
 
   class MockTelemetryService {
@@ -76,7 +80,9 @@ describe('DatafeedComponent', () => {
       imports: [
         RouterTestingModule,
         StoreModule.forRoot({
-          clientRunsEntity: fromClientRuns.clientRunsEntityReducer
+          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
+          notifications: fromNotifications.notificationEntityReducer,
+          layout: fromLayout.layoutEntityReducer
         }, { initialState, runtimeChecks })
       ],
       declarations: [

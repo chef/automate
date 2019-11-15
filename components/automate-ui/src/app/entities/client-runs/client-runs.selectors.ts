@@ -9,7 +9,7 @@ export const clientRunsState =
 
   export const clientRunsWorkflowEnabled = createSelector(
     clientRunsState,
-    (state) => state.workflowEnabled
+    (state) => state && state.workflowEnabled
   );
 
   export const clientRunsNodes = createSelector(
