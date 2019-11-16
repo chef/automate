@@ -152,7 +152,8 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
     combineLatest([this.isIAMv2$, team$]).pipe(
       takeUntil(this.isDestroyed),
       filter(([_isV2, team]) => team !== undefined),
-      distinctUntilChanged(([isV2, team]) => isV2 === isV2 && team === team)
+      distinctUntilChanged(([isV2A, teamA], [isV2B, teamB]) =>
+        isV2A === isV2B && teamA === teamB)
     ).subscribe(([isV2, team]) => {
       if (isV2) {
         this.teamId = team.id;
