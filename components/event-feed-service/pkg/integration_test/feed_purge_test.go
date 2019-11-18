@@ -189,11 +189,13 @@ func TestPurgeServer(t *testing.T) {
 				require.NoError(t, err)
 
 				// wait until the purge job is done or we time out waiting for it
-				ticker := time.Tick(1 * time.Second)
 				func() {
 					for {
 						select {
-						case <-ticker:
+						case <-time.After(10 * time.Second):
+							t.Log("timed out waiting for purge to complete")
+							t.Fail()
+						case <-time.Tick(1 * time.Second):
 							status, err := testSuite.purgeClient.Show(context.Background(), &data_lifecycle.ShowRequest{})
 							if err == nil {
 								lastStart, err := ptypes.Timestamp(status.LastStart)
@@ -203,9 +205,6 @@ func TestPurgeServer(t *testing.T) {
 									return
 								}
 							}
-						case <-time.After(10 * time.Second):
-							t.Log("timed out waiting for purge to complete")
-							t.Fail()
 						}
 					}
 				}()
