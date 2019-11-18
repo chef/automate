@@ -164,3 +164,43 @@ chef-loading-spinner[fixed] {
 input {
   line-height: normal;
 }
+
+// Global Angular Material Styles
+.chef-control-menu-x {
+  margin-top: 35px;
+}
+
+.mat-select-trigger {
+  outline: none;
+  border-radius: var(--chef-border-radius);
+  border-color: var(--chef-primary-dark);
+  box-shadow: 0px 0px 0px 1px var(--chef-primary-dark) inset;
+  display: inline-block;
+  background-color: var(--chef-white);
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+
+  &:after {
+    content: '...';
+    position: absolute;
+    color: black;
+    bottom: 33%;
+    left: 30%;
+  }
+
+  &:hover {
+  background-color: var(--chef-primary-bright);
+  box-shadow: 0px 0px 0px 1px var(--chef-primary-bright) inset;
+
+    &:after {
+        color: var(--chef-white);
+    }
+  }
+}
+
+.mat-select-placeholder,
+.mat-select-arrow-wrapper,
+.mat-select-arrow {
+  display: none;
+}
