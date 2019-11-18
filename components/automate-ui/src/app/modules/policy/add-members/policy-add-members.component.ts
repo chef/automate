@@ -169,13 +169,13 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed),
       filter(() => this.addingMembers),
       filter(([addState, error]) => addState === EntityStatus.loadingFailure && !isNil(error)))
-      .subscribe(([_, error]) => {
+      .subscribe(([_, resp]) => {
         this.addingMembers = false;
-        if (error.message === undefined) {
+        if (resp.error.message === undefined) {
           this.addMembersFailed = 'An error occurred while attempting ' +
             'to add members. Please try again.';
         } else {
-          this.addMembersFailed = `Failed to add members: ${error.message}`;
+          this.addMembersFailed = `Failed to add members: ${resp.error.message}`;
         }
       });
   }
