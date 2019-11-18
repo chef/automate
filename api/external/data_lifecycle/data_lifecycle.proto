@@ -58,7 +58,7 @@ service DataLifecycle {
 	// GetInfraStatus returns the infra job scheduler status
 	rpc GetInfraStatus(GetInfraStatusRequest) returns (GetInfraStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/infra/status";
-		option (chef.automate.api.policy).resource = "datalifecyle:infra:status";
+		option (chef.automate.api.policy).resource = "dataLifecyle:infra:status";
 		option (chef.automate.api.policy).action = "read";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:infra:status";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:infra:get";
@@ -93,7 +93,7 @@ service DataLifecycle {
 	//
 	rpc GetServicesStatus(GetServicesStatusRequest) returns (GetServicesStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/services/status";
-		option (chef.automate.api.policy).resource = "datalifecyle:services:status";
+		option (chef.automate.api.policy).resource = "dataLifecyle:services:status";
 		option (chef.automate.api.policy).action = "read";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:services:status";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:services:get";
@@ -128,7 +128,7 @@ service DataLifecycle {
 	// GetEventFeedStatus returns the event feed job scheduler status
 	rpc GetEventFeedStatus(GetEventFeedStatusRequest) returns (GetEventFeedStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/event-feed/status";
-		option (chef.automate.api.policy).resource = "datalifecyle:eventFeed:status";
+		option (chef.automate.api.policy).resource = "dataLifecyle:eventFeed:status";
 		option (chef.automate.api.policy).action = "read";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:eventFeed:status";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:eventFeed:get";
@@ -165,7 +165,7 @@ service DataLifecycle {
 	// GetComplianceStatus returns the compliance job scheduler status
 	rpc GetComplianceStatus(GetComplianceStatusRequest) returns (GetComplianceStatusResponse) {
 		option (google.api.http).get = "/data-lifecycle/compliance/status";
-		option (chef.automate.api.policy).resource = "datalifecyle:compliance:status";
+		option (chef.automate.api.policy).resource = "dataLifecyle:compliance:status";
 		option (chef.automate.api.policy).action = "read";
 		option (chef.automate.api.iam.policy).resource = "dataLifecycle:compliance:status";
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:compliance:get";
@@ -225,7 +225,7 @@ message PurgePolicyUpdate {
 
 // JobSettings are a job configuration setting update
 message JobSettings {
-	string name =1;
+	string name = 1;
 	bool disabled = 2;
 	string recurrence = 3;
 	string threshold = 4;
