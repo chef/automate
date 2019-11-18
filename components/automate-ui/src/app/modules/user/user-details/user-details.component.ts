@@ -1,17 +1,16 @@
-import { combineLatest, Observable, Subscription } from 'rxjs';
-
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { filter, pluck, map } from 'rxjs/operators';
-import { find, identity } from 'lodash/fp';
+import { Store, select } from '@ngrx/store';
+import { combineLatest, Subject } from 'rxjs';
+import { filter, pluck, takeUntil } from 'rxjs/operators';
+import { identity, isNil } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefValidators } from 'app/helpers/auth/validator';
 import { routeParams } from 'app/route.selectors';
-import { EntityStatus } from 'app/entities/entities';
+import { EntityStatus, loading } from 'app/entities/entities';
 import {
   DeleteUser,
   GetUser,
@@ -19,7 +18,7 @@ import {
   UpdateSelf
  } from 'app/entities/users/user.actions';
 import {
-  allUsers, userStatus, userFromRoute, updateStatus
+  getStatus, userFromRoute, updateStatus, deleteStatus
 } from 'app/entities/users/user.selectors';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
@@ -36,8 +35,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   public modalVisible = false;
   public editForm: FormGroup;
   public passwordForm: FormGroup;
-  private subscriptions: Subscription[];
-  private done$: Observable<boolean>;
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -47,68 +45,52 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService
   ) {
     this.createForms(this.fb);
-    // TODO (tc) This needs to be refactored to resemble our other patterns
-    // for specific object pages.
-    // combineLatest depends on the user object existing already.
-    this.user = {
-      id: '',
-      name: '',
-      membership_id: ''
-    };
-
-    this.done$ = <Observable<boolean>>combineLatest([
-      store.select(allUsers),
-      store.select(userStatus)])
-      .pipe(
-        map(([state, status]: [User[], EntityStatus]) => {
-          const id = this.user.id;
-          return status === EntityStatus.loadingSuccess && !find({ id }, state);
-        }));
-
-    this.subscriptions = [
-      store.select(userFromRoute).pipe(
-        filter(identity))
-        .subscribe((state) => {
-          this.user = <User>state;
-        }),
-      // Note: if the user browses directly to /settings/users/USERNAME, the state
-      // will not contain any user data -- so we need to fetch it.
-      store.select(routeParams).pipe(
-        pluck('id'),
-        filter(identity))
-        .subscribe((id: string) => {
-          store.dispatch(new GetUser({id}));
-        }),
-
-      // if the user is gone, go back to list
-      // note: we filter(identity) here -- so this will effectively only
-      // trigger when done$ is `true`
-      this.done$.pipe(filter(identity)).subscribe(
-        () => this.router.navigate(['/settings', 'users'])),
-
-      store.select(updateStatus).subscribe(this.handleUpdateStatus.bind(this))
-      ];
     }
 
   ngOnInit(): void {
-    if (this.isAdminView) {
-      this.layoutFacade.showSettingsSidebar();
-    } else {
-      this.layoutFacade.showUserProfileSidebar();
-    }
+    this.store.pipe(
+      select(routeParams),
+      pluck('id'),
+      filter(identity),
+      takeUntil(this.isDestroyed))
+      .subscribe((id: string) => {
+        this.store.dispatch(new GetUser({ id }));
+      });
+
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(userFromRoute)
+    ]).pipe(
+      filter(([status, user]) => status === EntityStatus.loadingSuccess && !isNil(user)),
+      takeUntil(this.isDestroyed))
+      .subscribe(([_, user]) => {
+        this.user = { ...user };
+      });
+
     this.route.data.subscribe((data: { isNonAdmin: boolean }) => {
       this.isAdminView = !data.isNonAdmin;
+
+      if (this.isAdminView) {
+        this.layoutFacade.showSettingsSidebar();
+      } else {
+        this.layoutFacade.showUserProfileSidebar();
+      }
+
       // Update the forms once this info has come in
       this.createForms(this.fb);
       this.resetForms();
     });
+
+    this.store.select(updateStatus).pipe(
+      takeUntil(this.isDestroyed),
+      filter(status => status === EntityStatus.loadingSuccess))
+      // same status is used for updating password or full name, so we just reset both
+      .subscribe(() => this.resetForms());
   }
 
-  private handleUpdateStatus(state: EntityStatus): void {
-    // same status is used for updating password or full name, so we just reset both
-    if (state === EntityStatus.loadingSuccess) {
-      this.resetForms();
-    }
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   private createForms(fb: FormBuilder): void {
@@ -125,10 +107,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       confirmPassword: ['',
         [Validators.required, ChefValidators.matchFieldValidator('newPassword')]]
     });
-  }
-
-  ngOnDestroy() {
-    this.subscriptions.forEach((sub: Subscription) => sub.unsubscribe());
   }
 
   private resetForms(): void {
@@ -184,7 +162,20 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   public deleteUser(): void {
     this.store.dispatch(new DeleteUser(this.user));
-    this.closeDeleteConfirmationModal();
+
+    const pendingDelete = new Subject<boolean>();
+    this.store.pipe(
+      select(deleteStatus),
+      filter(identity),
+      takeUntil(pendingDelete))
+      .subscribe((state) => {
+      if (!loading(state)) {
+          pendingDelete.next(true);
+          pendingDelete.complete();
+          this.closeDeleteConfirmationModal();
+          this.router.navigate(['/settings', 'users']);
+        }
+      });
   }
 
   public setEditMode(status: boolean): void {

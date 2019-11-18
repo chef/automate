@@ -1,17 +1,16 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { trigger, transition, style, animate, state, keyframes } from '@angular/animations';
-import { HttpErrorResponse } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { identity } from 'lodash/fp';
+import { identity, isNil } from 'lodash/fp';
 import { filter, pluck, takeUntil, distinctUntilChanged, map } from 'rxjs/operators';
 import { combineLatest, Subject, Observable } from 'rxjs';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
-import { EntityStatus, allLoadedSuccessfully } from 'app/entities/entities';
+import { EntityStatus, allLoadedSuccessfully, pending } from 'app/entities/entities';
 import {
   GetPolicy, AddPolicyMembers, PolicyMembersMgmtPayload
 } from 'app/entities/policies/policy.actions';
@@ -25,7 +24,7 @@ import { Policy, Member, Type, stringToMember } from 'app/entities/policies/poli
 import { allTeams, getAllStatus as getAllTeamsStatus } from 'app/entities/teams/team.selectors';
 import { Team } from 'app/entities/teams/team.model';
 import { GetTeams } from 'app/entities/teams/team.actions';
-import { allUsers, userStatus } from 'app/entities/users/user.selectors';
+import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import {
   GetUsers
 } from 'app/entities/users/user.actions';
@@ -114,7 +113,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     this.loading$ = combineLatest([
         this.store.select(getAllTeamsStatus),
-        this.store.select(userStatus),
+        this.store.select(getAllUsersStatus),
         this.store.select(getPolicyStatus)
       ]).pipe(
         map((statuses: EntityStatus[]) => !allLoadedSuccessfully(statuses)));
@@ -152,6 +151,33 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
           // Now that the membersAvailableMap is correct, refresh.
           this.refreshSortedMembersAvailable();
       });
+
+    this.store.select(addPolicyMembersStatus).pipe(
+      takeUntil(this.isDestroyed),
+      filter(addState => this.addingMembers && !pending(addState)))
+      .subscribe((addPolicyState) => {
+        if (addPolicyState === EntityStatus.loadingSuccess) {
+          this.addingMembers = false;
+          this.router.navigate(this.backRoute(), { fragment: 'members' });
+        }
+      });
+
+    combineLatest([
+      this.store.select(addPolicyMembersStatus),
+      this.store.select(addPolicyMembersHTTPError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(() => this.addingMembers),
+      filter(([addState, error]) => addState === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, resp]) => {
+        this.addingMembers = false;
+        if (resp.error.message === undefined) {
+          this.addMembersFailed = 'An error occurred while attempting ' +
+            'to add members. Please try again.';
+        } else {
+          this.addMembersFailed = `Failed to add members: ${resp.error.message}`;
+        }
+      });
   }
 
   addAvailableMember(member: Member, refresh: boolean): void {
@@ -179,32 +205,6 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
       id: this.policy.id,
       members: this.membersToAddValues()
     }));
-
-    const pendingAdd = new Subject<boolean>();
-    this.store.select(addPolicyMembersStatus).pipe(
-      filter(identity),
-      takeUntil(pendingAdd))
-      .subscribe((addPolicyState) => {
-        if (addPolicyState === EntityStatus.loadingSuccess) {
-          pendingAdd.next(true);
-          pendingAdd.complete();
-          this.addingMembers = false;
-          this.router.navigate(this.backRoute(), { fragment: 'members' });
-        }
-        if (addPolicyState === EntityStatus.loadingFailure) {
-          this.store.select(addPolicyMembersHTTPError).pipe(
-            filter(identity),
-            takeUntil(pendingAdd)).subscribe((error: HttpErrorResponse) => {
-              if (error.message === undefined) {
-                this.addMembersFailed = 'An error occurred while attempting ' +
-                'to add members. Please try again.';
-              } else {
-                this.addMembersFailed = `Failed to add members: ${error.message}`;
-              }
-              this.addingMembers = false;
-          });
-        }
-      });
   }
 
   ngOnDestroy() {

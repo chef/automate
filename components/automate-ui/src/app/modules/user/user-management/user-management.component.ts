@@ -10,7 +10,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefValidators } from 'app/helpers/auth/validator';
 import { EntityStatus } from 'app/entities/entities';
-import { allUsers, userStatus } from 'app/entities/users/user.selectors';
+import { allUsers, getStatus } from 'app/entities/users/user.selectors';
 import {
   CreateUser, DeleteUser, GetUsers, CreateUserPayload
 } from 'app/entities/users/user.actions';
@@ -33,7 +33,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public isLoading = true;
   public userToDelete: User;
 
-  public userStatus$: Observable<EntityStatus>;
+  private getStatus$: Observable<EntityStatus>;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   // Inputs to app-user-table
@@ -47,7 +47,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService,
     fb: FormBuilder
   ) {
-    this.userStatus$ = store.select(userStatus);
+    this.getStatus$ = store.select(getStatus);
 
     this.createUserForm = fb.group({
       // Must stay in sync with error checks in user-form.component.html
@@ -68,12 +68,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetUsers());
     combineLatest([
       this.store.select(allUsers),
-      this.store.select(userStatus)
+      this.store.select(getStatus)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      filter(([_, uStatus]: [User[], EntityStatus]) =>
-        this.isLoading = uStatus === EntityStatus.loading
-      )).subscribe(([users, _]: [User[], EntityStatus]) => {
+      filter(([_, uStatus]) => uStatus !== EntityStatus.loading)
+      ).subscribe(([users, _]: [User[], EntityStatus]) => {
+        this.isLoading = false;
         // Sort naturally first by name, then by id
         this.users = ChefSorters.naturalSort(users, ['name', 'id']);
       });
@@ -119,7 +119,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
     this.store.dispatch(new CreateUser(userCreateReq));
 
-    this.userStatus$.pipe(
+    this.getStatus$.pipe(
       takeUntil(this.isDestroyed))
       .subscribe((status) => {
         if (status !== EntityStatus.loading) {

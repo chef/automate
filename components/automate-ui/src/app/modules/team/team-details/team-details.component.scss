@@ -19,6 +19,10 @@ chef-page-header {
     padding: 0px;
   }
 
+  td {
+    min-height: 36px;
+  }
+
   tbody > .detail-row {
     padding-top: 0px;
     padding-bottom: 15px;
@@ -55,6 +59,7 @@ section {
 
   #projects-container {
     display: flex;
+    margin-top: 30px;
     margin-bottom: 38px;
 
     chef-loading-spinner {

@@ -6,15 +6,19 @@ import { UserActionTypes, UserActions } from './user.actions';
 import { User } from './user.model';
 
 export interface UserEntityState extends EntityState<User> {
-  status: EntityStatus;
+  getStatus: EntityStatus;
   updateStatus: EntityStatus;
+  deleteStatus: EntityStatus;
+  createStatus: EntityStatus;
 }
 
 export const userEntityAdapter: EntityAdapter<User> = createEntityAdapter<User>();
 
 export const UserEntityInitialState: UserEntityState = userEntityAdapter.getInitialState({
-  status: EntityStatus.notLoaded,
-  updateStatus: EntityStatus.notLoaded
+  getStatus: EntityStatus.notLoaded,
+  updateStatus: EntityStatus.notLoaded,
+  deleteStatus: EntityStatus.notLoaded,
+  createStatus: EntityStatus.notLoaded
 });
 
 export function userEntityReducer(state: UserEntityState = UserEntityInitialState,
@@ -23,24 +27,34 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
   switch (action.type) {
 
     case UserActionTypes.GET_ALL:
-      return set('status', EntityStatus.loading, state);
+      return set(
+        'getStatus',
+        EntityStatus.loading,
+        // clear user state to ensure we fetch the latest data
+        userEntityAdapter.removeAll(state)
+      ) as UserEntityState;
 
     case UserActionTypes.GET_ALL_SUCCESS:
-      return set('status', EntityStatus.loadingSuccess,
+      return set('getStatus', EntityStatus.loadingSuccess,
         userEntityAdapter.addAll(action.payload.users, state));
 
     case UserActionTypes.GET_ALL_FAILURE:
-      return set('status', EntityStatus.loadingFailure, state);
+      return set('getStatus', EntityStatus.loadingFailure, state);
 
     case UserActionTypes.GET:
-      return set('status', EntityStatus.loading, state);
+      return set(
+        'getStatus',
+        EntityStatus.loading,
+        // clear user state to ensure we fetch the latest data
+        userEntityAdapter.removeAll(state)
+      ) as UserEntityState;
 
     case UserActionTypes.GET_SUCCESS:
-      return set('status', EntityStatus.loadingSuccess,
+      return set('getStatus', EntityStatus.loadingSuccess,
         userEntityAdapter.addOne(action.payload, state));
 
     case UserActionTypes.GET_FAILURE:
-      return set('status', EntityStatus.loadingFailure, state);
+      return set('getStatus', EntityStatus.loadingFailure, state);
 
     case UserActionTypes.UPDATE:
       return set('updateStatus', EntityStatus.loading, state);
@@ -64,24 +78,24 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
           changes: action.payload}, state));
 
     case UserActionTypes.DELETE:
-      return set('status', EntityStatus.loading, state);
+      return set('deleteStatus', EntityStatus.loading, state);
 
     case UserActionTypes.DELETE_SUCCESS:
-      return set('status', EntityStatus.loadingSuccess,
+      return set('deleteStatus', EntityStatus.loadingSuccess,
         userEntityAdapter.removeOne(action.payload.id, state));
 
     case UserActionTypes.DELETE_FAILURE:
-      return set('status', EntityStatus.loadingFailure, state);
+      return set('deleteStatus', EntityStatus.loadingFailure, state);
 
     case UserActionTypes.CREATE:
-      return set('status', EntityStatus.loading, state);
+      return set('createStatus', EntityStatus.loading, state);
 
     case UserActionTypes.CREATE_SUCCESS:
-      return set('status', EntityStatus.loadingSuccess,
+      return set('createStatus', EntityStatus.loadingSuccess,
                   userEntityAdapter.addOne(action.payload, state));
 
     case UserActionTypes.CREATE_FAILURE:
-      return set('status', EntityStatus.loadingFailure, state);
+      return set('createStatus', EntityStatus.loadingFailure, state);
 
     default:
       return state;
