@@ -1,9 +1,9 @@
 {
   "paths": {
     "/compliance/reporting/export": {
-      "get": {
+      "post": {
         "summary": "Export reports",
-        "description": "Stream reports in JSON (default) or CSV format.\nSupports filtering, but not pagination or sorting.\nInclude the value `csv` for the `type` parameter in the request to receive CSV formatted data.\nIncluding more than one value for `control`, `profile_id`, or `profile_name` is not allowed.\nIncluding values for both `profile_id` and `profile_name` in one request is not allowed.",
+        "description": "Stream reports in JSON (default) or CSV format.\n\nSupports filtering, but not pagination or sorting.\n\nInclude the value `csv` for the `type` parameter in the request to receive CSV formatted data.\nIncluding more than one value for `control`, `profile_id`, or `profile_name` is not allowed.\nIncluding values for both `profile_id` and `profile_name` in one request is not allowed.\n\n Example: \n\n ```'{'type':'csv','filters':[{'type':'start_time','values':['2019-09-16T00:00:00Z']},{'type':'end_time','values':['2019-09-18T23:59:59Z']}, {'type':'environment','values':['_default']}]}'```",
         "tags": [
           "ReportingService"
         ],
