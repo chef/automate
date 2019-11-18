@@ -66,9 +66,9 @@
               {{ member.displayType }}
             </chef-table-cell>
             <chef-table-cell class="three-dot-column">
-              <chef-control-menu>
-                <chef-option (click)="removeMember(member)">Remove Member</chef-option>
-              </chef-control-menu>
+              <mat-select>
+                <mat-option (click)="removeMember(member)">Remove Member</mat-option>
+              </mat-select>
             </chef-table-cell>
           </chef-table-row>
         </chef-table-body>

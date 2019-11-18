@@ -46,7 +46,6 @@ import { TableCellComponent } from './table/table-cell/table-cell.component';
 import { TableRowComponent } from './table/table-row/table-row.component';
 import { TableHeaderCellComponent } from './table/table-header-cell/table-header-cell.component';
 import { TableHeaderComponent } from './table/table-header/table-header.component';
-import { ControlMenuComponent } from './control-menu/control-menu.component';
 
 @NgModule({
   imports: [
@@ -98,8 +97,7 @@ import { ControlMenuComponent } from './control-menu/control-menu.component';
     // Directives
     ErrorDirective,
     FormControlDirective,
-    InputDirective,
-    ControlMenuComponent
+    InputDirective
   ],
   declarations: [
     AuthorizedComponent,
@@ -130,8 +128,7 @@ import { ControlMenuComponent } from './control-menu/control-menu.component';
     TableCellComponent,
     TableRowComponent,
     TableHeaderCellComponent,
-    TableHeaderComponent,
-    ControlMenuComponent
+    TableHeaderComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

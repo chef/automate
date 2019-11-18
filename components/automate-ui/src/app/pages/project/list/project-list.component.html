@@ -48,9 +48,9 @@
                 <chef-table-cell>{{ getRulesStatus(project) }}</chef-table-cell>
                 <chef-table-cell class="three-dot-column">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
-                    <chef-control-menu>
-                      <chef-option (click)="startProjectDelete(project)" data-cy="delete-project">Delete Project</chef-option>
-                    </chef-control-menu>
+                    <mat-select>
+                      <mat-option (click)="startProjectDelete(project)" data-cy="delete-project">Delete Project</mat-option>
+                    </mat-select>
                   </app-authorized>
                 </chef-table-cell>
               </chef-table-row>

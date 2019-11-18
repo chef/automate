@@ -36,7 +36,7 @@
       </span>
     </chef-option>
   </chef-phat-radio>
-  
+
   <chef-table class="reporting-nodes-table" (sort-toggled)="onNodesListSortToggled($event)">
     <chef-thead>
       <chef-tr>
@@ -95,11 +95,11 @@
           </span>
         </chef-td>
         <chef-td>
-          <chef-control-menu>
-            <chef-option *ngIf="!hasFilter(node)" (click)="addFilter(node)">Add Filter</chef-option>
-            <chef-option *ngIf="hasFilter(node)" (click)="removeFilter(node)">Remove Filter</chef-option>
-            <chef-option (click)="displayScanResults(node)">Scan Results</chef-option>
-          </chef-control-menu>
+          <mat-select>
+            <mat-option *ngIf="!hasFilter(node)" (click)="addFilter(node)">Add Filter</mat-option>
+            <mat-option *ngIf="hasFilter(node)" (click)="removeFilter(node)">Remove Filter</mat-option>
+            <mat-option (click)="displayScanResults(node)">Scan Results</mat-option>
+          </mat-select>
         </chef-td>
       </chef-tr>
     </chef-tbody>

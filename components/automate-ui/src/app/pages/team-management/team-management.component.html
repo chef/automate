@@ -81,9 +81,9 @@
                   </chef-table-cell>
                   <chef-table-cell class="three-dot-column">
                     <!-- <app-authorized [allOf]="[`/auth/teams/${team.id}`, 'delete']"> -->
-                    <chef-control-menu>
-                      <chef-option (click)="startTeamDelete(team)">Delete Team</chef-option>
-                    </chef-control-menu>
+                    <mat-select>
+                      <mat-option (click)="startTeamDelete(team)">Delete Team</mat-option>
+                    </mat-select>
                     <!-- <app-authorized -->
                   </chef-table-cell>
                 </chef-table-row>
