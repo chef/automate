@@ -34,8 +34,8 @@ do_test_deploy() {
     # ensure service startup works with IAM v2.1:
     # - kill authz-service to force startup,
     # - wait for service status to be healthy again
-    log_info "restarting authz-service, waiting 5s for it to come up again"
-    pkill -f authz-service && sleep 5 && chef-automate status -w || return 1
+    log_info "restarting authz-service, waiting 10s for it to come up again"
+    pkill -f authz-service && sleep 10 && chef-automate status -w || return 1
 
     verify_legacy_policies_not_migrated
 
