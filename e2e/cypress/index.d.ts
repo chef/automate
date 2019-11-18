@@ -11,5 +11,7 @@ declare namespace Cypress {
     cleanupV2IAMObjectsByIDPrefixes(idPrefix: string, objectPlurals: string[]): void
     cleanupUsersByNamePrefix(namePrefix: string): void
     cleanupTeamsByDescriptionPrefix(namePrefix: string): void
+    waitUntilApplyRulesNotRunning(attempts: number): void
+    uuidv4(): string
   }
 }

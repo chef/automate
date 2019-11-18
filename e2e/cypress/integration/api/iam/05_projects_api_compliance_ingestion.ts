@@ -168,14 +168,14 @@ describeIfIAMV2p1('Compliance Ingestion project tagging', () => {
       url: '/apis/iam/v2beta/apply-rules'
     });
 
-    waitUntilApplyRulesNotRunning(100);
+    cy.waitUntilApplyRulesNotRunning(100);
   });
 
   after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
 
   it('tagging 7 projects with all the attributes on a compliance node', () => {
-    const nodeId = uuidv4();
-    const reportId = uuidv4();
+    const nodeId = cy.uuidv4();
+    const reportId = cy.uuidv4();
 
     const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
     const end = Cypress.moment().utc().endOf('day').format();
@@ -255,24 +255,6 @@ describeIfIAMV2p1('Compliance Ingestion project tagging', () => {
   });
 });
 
-function waitUntilApplyRulesNotRunning(attempts: number): void {
-  if (attempts === -1) {
-    throw new Error('apply-rules never finished');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: '/apis/iam/v2beta/apply-rules'
-  }).then((response) => {
-    if (response.body.state === 'not_running') {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for apply-rules to be not_running`);
-      cy.wait(1000);
-      waitUntilApplyRulesNotRunning(--attempts);
-    }
-  });
-}
-
 function waitForNodes(project: string, start: string, end: string, maxRetries: number) {
   cy
     .request({
@@ -304,14 +286,4 @@ function waitForNodes(project: string, start: string, end: string, maxRetries: n
       cy.wait(1000);
       waitForNodes(project, start, end, maxRetries - 1);
     });
-}
-
-function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    // tslint:disable 
-    const r = Math.random() * 16 | 0;
-    // tslint:disable 
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
 }

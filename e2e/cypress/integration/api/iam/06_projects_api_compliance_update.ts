@@ -1,7 +1,8 @@
 import { describeIfIAMV2p1 } from '../../constants';
 
-describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
-  const cypressPrefix = 'test-projects-api-client-runs';
+describeIfIAMV2p1('projects API', () => {
+  const cypressPrefix = 'test-projects-api-compliance-update';
+
 
   const projectsWithRule = [
     // This test is commented out because there is a current limit of 6 projects allowed
@@ -173,8 +174,12 @@ describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
 
   after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
 
-  it('tagging 7 projects with all the attributes on a client runs node', () => {
+  it('tagging 7 projects with all the attributes on a compliance node', () => {
     const nodeId = cy.uuidv4();
+    const reportId = cy.uuidv4();
+
+    const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
+    const end = Cypress.moment().utc().endOf('day').format();
 
     // Ensure there are no nodes matching any of the projects
     projectsWithRule.forEach(projectWithRule => {
@@ -183,33 +188,46 @@ describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
           'api-token': Cypress.env('ADMIN_TOKEN'),
           projects: projectWithRule.project.id
         },
-        method: 'GET',
-        url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+        method: 'POST',
+        url: '/api/v0/compliance/reporting/nodes/search',
+        body: {
+          filters: [
+            { type: 'start_time', values: [start]},
+            { type: 'end_time', values: [end]}
+          ],
+          order: 'DESC',
+          page: 1,
+          per_page: 100,
+          sort: 'latest_report.end_time'
+        }
       }).then((response) => {
-        expect(response.body).to.have.length(0);
+        expect(response.body.nodes).to.have.length(0);
       });
     });
 
-    // Ingest a node with attribues that match all the projects
-    cy.fixture('converge/avengers1.json').then((node) => {
-      node.organization_name = '75th Rangers';
-      node.chef_server_fqdn = 'example.org';
-      node.node.chef_environment = 'arctic';
-      node.policy_group = 'red_ring';
-      node.policy_name = 'fire';
-      node.node.automatic.roles = ['backend'];
-      node.node.normal.tags = ['v3'];
-      node.entity_uuid = nodeId;
+    // Ingest a InSpec report with attribues that match all the projects
+    cy.fixture('compliance/inspec-report.json').then((report) => {
+      report.organization_name = '75th Rangers';
+      report.source_fqdn = 'example.org';
+      report.environment = 'arctic';
+      report.policy_group = 'red_ring';
+      report.policy_name = 'fire';
+      report.roles = ['backend'];
+      report.chef_tags = ['v3'];
+      report.node_uuid = nodeId;
+      report.node_name = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`;
+      report.end_time = Cypress.moment().utc().format();
+      report.report_uuid = reportId;
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
         url: '/data-collector/v0',
-        body: node
+        body: report
       });
     });
 
-    // wait for the node to be ingested
-    waitForNodes(projectsWithRule[0].project.id, 30);
+    // wait for the report to be ingested
+    waitForNodes(projectsWithRule[0].project.id, start, end, 30);
 
     // Ensure the node is tagged with the correct project
     projectsWithRule.forEach(projectWithRule => {
@@ -218,46 +236,55 @@ describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
           'api-token': Cypress.env('ADMIN_TOKEN'),
           projects: projectWithRule.project.id
         },
-        method: 'GET',
-        url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+        method: 'POST',
+        url: '/api/v0/compliance/reporting/nodes/search',
+        body: {
+          filters: [
+            { type: 'start_time', values: [start]},
+            { type: 'end_time', values: [end]}
+          ],
+          order: 'DESC',
+          page: 1,
+          per_page: 100,
+          sort: 'latest_report.end_time'
+        }
       }).then((response) => {
-        expect(response.body).to.have.length(1);
-        expect(response.body[0].id).to.equal(nodeId);
+        expect(response.body.nodes).to.have.length(1);
+        expect(response.body.nodes[0].id).to.equal(nodeId);
       });
-    });
-
-    // Delete node
-    cy.request({
-      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-      method: 'POST',
-      url: 'api/v0/ingest/events/chef/node-multiple-deletes',
-      body: {
-        node_ids: [nodeId]
-      },
-      failOnStatusCode: false
     });
   });
 });
 
-function waitForNodes(project: string, maxRetries: number) {
+function waitForNodes(project: string, start: string, end: string, maxRetries: number) {
   cy
     .request({
       headers: {
         projects: project,
         'api-token': Cypress.env('ADMIN_TOKEN')
       },
-      method: 'GET',
-      url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+      method: 'POST',
+      url: '/api/v0/compliance/reporting/nodes/search',
+      body: {
+        filters: [
+          { type: 'start_time', values: [start]},
+          { type: 'end_time', values: [end]}
+        ],
+        order: 'DESC',
+        page: 1,
+        per_page: 100,
+        sort: 'latest_report.end_time'
+      }
     })
     .then((resp: Cypress.ObjectLike) => {
       // to avoid getting stuck in an infinite loop
       if (maxRetries === 0) {
         return;
       }
-      if (resp.body.length > 0 ) {
+      if (resp.body.nodes && resp.body.nodes.length > 0 ) {
         return;
       }
       cy.wait(1000);
-      waitForNodes(project, maxRetries - 1);
+      waitForNodes(project, start, end, maxRetries - 1);
     });
 }
