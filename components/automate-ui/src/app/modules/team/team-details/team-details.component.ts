@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { isEmpty, identity, keyBy, at, xor } from 'lodash/fp';
+import { isEmpty, keyBy, at, xor } from 'lodash/fp';
 import { combineLatest, Subject, Observable } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
@@ -10,7 +10,7 @@ import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeURL, routeState } from 'app/route.selectors';
-import { EntityStatus, loading } from 'app/entities/entities';
+import { EntityStatus, pending } from 'app/entities/entities';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
@@ -57,7 +57,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public updateNameForm: FormGroup;
   // isLoadingTeam represents the initial team load as well as subsequent updates in progress.
   public isLoadingTeam = true;
-  public saving = false;
+  public saveInProgress = false;
   public saveSuccessful = false;
   public tabValue: TeamTabName = 'users';
   private url: string;
@@ -202,6 +202,19 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
         // Sort naturally first by name, then by id
         this.users = ChefSorters.naturalSort(users, ['name', 'id']);
       });
+
+    // handle team update response
+    this.store.pipe(
+      select(updateStatus),
+      takeUntil(this.isDestroyed),
+      filter(state => this.saveInProgress && !pending(state)))
+      .subscribe((state) => {
+        this.saveInProgress = false;
+        this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+        if (this.saveSuccessful) {
+          this.updateNameForm.markAsPristine();
+        }
+      });
  }
 
   ngOnDestroy(): void {
@@ -230,29 +243,11 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   saveTeam(): void {
     this.saveSuccessful = false;
-    this.saving = true;
+    this.saveInProgress = true;
     this.updateNameForm.controls['name'].disable();
     const name: string = this.updateNameForm.controls.name.value.trim();
     const projects = Object.keys(this.projects).filter(id => this.projects[id].checked);
     this.store.dispatch(new UpdateTeam({ ...this.team, name, projects }));
-
-    const pendingSave = new Subject<boolean>();
-    this.store.pipe(
-      select(updateStatus),
-      filter(identity),
-      takeUntil(pendingSave))
-      .subscribe((state) => {
-        if (!loading(state)) {
-          pendingSave.next(true);
-          pendingSave.complete();
-          this.saving = false;
-          this.updateNameForm.controls['name'].enable();
-          this.saveSuccessful = (state === EntityStatus.loadingSuccess);
-          if (this.saveSuccessful) {
-            this.updateNameForm.markAsPristine();
-          }
-        }
-      });
   }
 
   onSelectedTab(event: { target: { value: TeamTabName } }): void {
@@ -283,6 +278,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   dropdownDisabled(): boolean {
-    return isEmpty(this.projects) || this.saving;
+    return isEmpty(this.projects) || this.saveInProgress;
   }
 }

@@ -1,14 +1,14 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { Validators, FormGroup, FormBuilder } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, combineLatest } from 'rxjs';
 import { map, filter, takeUntil } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
+import { isNil } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { loading, EntityStatus } from 'app/entities/entities';
+import { loading, EntityStatus, pending } from 'app/entities/entities';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import {
   createError,
@@ -76,12 +76,14 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSettingsSidebar();
     this.store.dispatch(new GetTeams());
+
     this.store.pipe(
       select(isIAMv2),
       takeUntil(this.isDestroyed))
       .subscribe(latest => {
         this.isIAMv2 = latest;
     });
+
     this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {
         this.dropdownProjects = assignable.map(p => {
@@ -91,6 +93,37 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
             type: p.type
           };
         });
+      });
+
+    // handle team creation success response
+    this.store.pipe(
+      select(createStatus),
+      takeUntil(this.isDestroyed),
+      filter(state => {
+        return (this.createModalVisible || this.createV1TeamModalVisible) && !pending(state);
+      }))
+      .subscribe(state => {
+        this.creatingTeam = false;
+        if (state === EntityStatus.loadingSuccess) {
+          this.closeCreateModal();
+        }
+      });
+
+    // handle team creation failure response
+    combineLatest([
+      this.store.select(createStatus),
+      this.store.select(createError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(() => (this.createModalVisible || this.createV1TeamModalVisible)),
+      filter (([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictErrorEvent.emit(true);
+        } else {
+          // close modal on any error other than conflict and display in banner
+          this.closeCreateModal();
+        }
       });
   }
 
@@ -134,38 +167,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public createTeamCommon(team: Team): void {
     this.creatingTeam = true;
     this.store.dispatch(new CreateTeam(team));
-
-    const pendingCreate = new Subject<boolean>();
-    this.store.pipe(
-      select(createStatus),
-      filter(identity),
-      takeUntil(pendingCreate))
-      .subscribe((state) => {
-        if (!loading(state)) {
-          pendingCreate.next(true);
-          pendingCreate.complete();
-          this.creatingTeam = false;
-          if (state === EntityStatus.loadingSuccess) {
-            this.closeCreateModal();
-          }
-          if (state === EntityStatus.loadingFailure) {
-            const pendingCreateError = new Subject<boolean>();
-            this.store.pipe(
-              select(createError),
-              filter(identity),
-              takeUntil(pendingCreateError))
-              .subscribe((error) => {
-                pendingCreateError.next(true);
-                pendingCreateError.complete();
-                if (error.status === HttpStatus.CONFLICT) {
-                  this.conflictErrorEvent.emit(true);
-                } else { // Close the modal on any error other than conflict and display in banner.
-                  this.closeCreateModal();
-                }
-            });
-          }
-        }
-      });
   }
 
   public openCreateModal(): void {
@@ -187,5 +188,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.creatingTeam = false;
     this.createTeamForm.reset();
     this.createV1TeamForm.reset();
+    this.conflictErrorEvent.emit(false);
   }
 }

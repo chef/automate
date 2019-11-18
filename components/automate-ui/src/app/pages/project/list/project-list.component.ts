@@ -184,6 +184,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   resetCreateModal(): void {
     this.creatingProject = false;
     this.createProjectForm.reset();
+    this.conflictErrorEvent.emit(false);
   }
 
   public openConfirmUpdateStartModal(): void {
