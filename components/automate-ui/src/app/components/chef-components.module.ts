@@ -6,6 +6,7 @@ import { RouterModule } from '@angular/router';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSelectModule } from '@angular/material';
 
 // Components
 import { AuthorizedComponent } from './authorized/authorized.component';
@@ -45,6 +46,7 @@ import { TableCellComponent } from './table/table-cell/table-cell.component';
 import { TableRowComponent } from './table/table-row/table-row.component';
 import { TableHeaderCellComponent } from './table/table-header-cell/table-header-cell.component';
 import { TableHeaderComponent } from './table/table-header/table-header.component';
+import { ControlMenuComponent } from './control-menu/control-menu.component';
 
 @NgModule({
   imports: [
@@ -56,11 +58,13 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
 
     // Angular Material
     MatDialogModule,
+    MatSelectModule,
     MatSnackBarModule
   ],
   exports: [
     // Angular Material
     MatDialogModule,
+    MatSelectModule,
     MatSnackBarModule,
 
     // Components
@@ -94,7 +98,8 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     // Directives
     ErrorDirective,
     FormControlDirective,
-    InputDirective
+    InputDirective,
+    ControlMenuComponent
   ],
   declarations: [
     AuthorizedComponent,
@@ -125,7 +130,8 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     TableCellComponent,
     TableRowComponent,
     TableHeaderCellComponent,
-    TableHeaderComponent
+    TableHeaderComponent,
+    ControlMenuComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

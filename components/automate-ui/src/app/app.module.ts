@@ -23,6 +23,7 @@ import { ngrxReducers, RouterSerializer, runtimeChecks } from './ngrx.reducers';
 import {
   BrowserAnimationsModule
 } from '@angular/platform-browser/animations';
+import { MatSelectModule } from '@angular/material';
 
 // Modules
 import { ApiTokenModule } from './pages/api-token/api-token.module';
@@ -295,6 +296,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     FormsModule,
     HttpClientModule,
     IntegrationsModule,
+    MatSelectModule,
     NgrxEffectsModule,
     PolicyModule,
     ProjectModule,
