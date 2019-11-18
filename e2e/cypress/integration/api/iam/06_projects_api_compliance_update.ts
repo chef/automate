@@ -1,7 +1,8 @@
 import { describeIfIAMV2p1 } from '../../constants';
+import { uuidv4 } from '../../helpers';
 
 describeIfIAMV2p1('projects API', () => {
-  const cypressPrefix = 'test-projects-api-compliance-update';
+  const cypressPrefix = 'test-compliance-update';
 
 
   const projectsWithRule = [
@@ -144,6 +145,42 @@ describeIfIAMV2p1('projects API', () => {
 
   before(() => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupV2IAMObjectsByIDPrefixes('test-projects-api-compliance-update',
+    ['projects', 'policies']);
+  });
+
+  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
+
+  it('tagging 7 projects with all the attributes on a compliance node', () => {
+    const nodeId = uuidv4();
+    const reportId = uuidv4();
+
+    const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
+    const end = Cypress.moment().utc().endOf('day').format();
+
+    // Ingest a InSpec report with attribues that match all the projects
+    cy.fixture('compliance/inspec-report.json').then((report) => {
+      report.organization_name = '75th Rangers';
+      report.source_fqdn = 'example.org';
+      report.environment = 'arctic';
+      report.policy_group = 'red_ring';
+      report.policy_name = 'fire';
+      report.roles = ['backend'];
+      report.chef_tags = ['v3'];
+      report.node_uuid = nodeId;
+      report.node_name = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`;
+      report.end_time = Cypress.moment().utc().format();
+      report.report_uuid = reportId;
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: '/data-collector/v0',
+        body: report
+      });
+    });
+
+    // wait for the report to be ingested
+    waitForUnassignedNodes(nodeId, start, end, 30);
 
     // create the projects with one rule
     projectsWithRule.forEach(projectWithRule => {
@@ -170,71 +207,13 @@ describeIfIAMV2p1('projects API', () => {
     });
 
     cy.waitUntilApplyRulesNotRunning(100);
-  });
-
-  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
-
-  it('tagging 7 projects with all the attributes on a compliance node', () => {
-    const nodeId = cy.uuidv4();
-    const reportId = cy.uuidv4();
-
-    const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
-    const end = Cypress.moment().utc().endOf('day').format();
-
-    // Ensure there are no nodes matching any of the projects
-    projectsWithRule.forEach(projectWithRule => {
-      cy.request({
-        headers: {
-          'api-token': Cypress.env('ADMIN_TOKEN'),
-          projects: projectWithRule.project.id
-        },
-        method: 'POST',
-        url: '/api/v0/compliance/reporting/nodes/search',
-        body: {
-          filters: [
-            { type: 'start_time', values: [start]},
-            { type: 'end_time', values: [end]}
-          ],
-          order: 'DESC',
-          page: 1,
-          per_page: 100,
-          sort: 'latest_report.end_time'
-        }
-      }).then((response) => {
-        expect(response.body.nodes).to.have.length(0);
-      });
-    });
-
-    // Ingest a InSpec report with attribues that match all the projects
-    cy.fixture('compliance/inspec-report.json').then((report) => {
-      report.organization_name = '75th Rangers';
-      report.source_fqdn = 'example.org';
-      report.environment = 'arctic';
-      report.policy_group = 'red_ring';
-      report.policy_name = 'fire';
-      report.roles = ['backend'];
-      report.chef_tags = ['v3'];
-      report.node_uuid = nodeId;
-      report.node_name = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`;
-      report.end_time = Cypress.moment().utc().format();
-      report.report_uuid = reportId;
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/data-collector/v0',
-        body: report
-      });
-    });
-
-    // wait for the report to be ingested
-    waitForNodes(projectsWithRule[0].project.id, start, end, 30);
 
     // Ensure the node is tagged with the correct project
     projectsWithRule.forEach(projectWithRule => {
       cy.request({
         headers: {
           'api-token': Cypress.env('ADMIN_TOKEN'),
-          projects: projectWithRule.project.id
+          projects: [projectWithRule.project.id]
         },
         method: 'POST',
         url: '/api/v0/compliance/reporting/nodes/search',
@@ -256,11 +235,10 @@ describeIfIAMV2p1('projects API', () => {
   });
 });
 
-function waitForNodes(project: string, start: string, end: string, maxRetries: number) {
-  cy
-    .request({
+function waitForUnassignedNodes(nodeId: string, start: string, end: string, maxRetries: number) {
+  cy.request({
       headers: {
-        projects: project,
+        projects: ['(unassigned)'],
         'api-token': Cypress.env('ADMIN_TOKEN')
       },
       method: 'POST',
@@ -281,10 +259,10 @@ function waitForNodes(project: string, start: string, end: string, maxRetries: n
       if (maxRetries === 0) {
         return;
       }
-      if (resp.body.nodes && resp.body.nodes.length > 0 ) {
+      if (resp.body.nodes && resp.body.nodes.length > 0 && resp.body.nodes[0].id === nodeId ) {
         return;
       }
       cy.wait(1000);
-      waitForNodes(project, start, end, maxRetries - 1);
+      waitForUnassignedNodes(nodeId, start, end, maxRetries - 1);
     });
 }

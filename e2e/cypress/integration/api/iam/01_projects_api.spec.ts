@@ -272,7 +272,7 @@ describeIfIAMV2p1('projects API', () => {
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       });
-      waitUntilApplyRulesNotRunning(500);
+      cy.waitUntilApplyRulesNotRunning(500);
 
       // confirm rules are applied
       for (const project of [avengersProject, xmenProject]) {
@@ -391,7 +391,7 @@ describeIfIAMV2p1('projects API', () => {
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       });
-      waitUntilApplyRulesNotRunning(100);
+      cy.waitUntilApplyRulesNotRunning(100);
 
       cy.request({
         headers: {
@@ -472,7 +472,7 @@ describeIfIAMV2p1('projects API', () => {
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       });
-      waitUntilApplyRulesNotRunning(100);
+      cy.waitUntilApplyRulesNotRunning(100);
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -514,84 +514,6 @@ describeIfIAMV2p1('projects API', () => {
         expect(response.body).to.have.length(2);
       });
     });
-
-    // must correspond to enum type in automate-gateway/.../common/rules.proto
-    const attributeValuesMap = new Map([
-      ['CHEF_SERVER', 'chef-server-dev.test'],
-      ['ENVIRONMENT', '_default'],
-      ['CHEF_ROLE', 'web'],
-      ['CHEF_TAG', 'test_tag'],
-      ['CHEF_POLICY_GROUP', 'test_group'],
-      ['CHEF_POLICY_NAME', 'test_name']
-      // leave out CHEF_ORGANIZATION since it's tested above
-    ]);
-
-    for (const [attribute, value] of attributeValuesMap) {
-      const targetNodeId = 'f6a5c33f-bef5-433b-815e-a8f6e69e6b1b';
-
-      it(`ingest rule with attribute ${attribute} gets applied to node`, () => {
-        const rule = {
-          id: 'rule-2',
-          name: 'rule 2',
-          type: 'NODE',
-          project_id: avengersProject.id,
-          conditions: [
-            {
-              attribute: attribute,
-              operator: 'EQUALS',
-              values: [value]
-            }
-          ]
-        };
-        // create rule with attribute value
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: `/apis/iam/v2beta/projects/${rule.project_id}/rules`,
-          body: rule
-        });
-
-        // apply rules
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/apis/iam/v2beta/apply-rules'
-        });
-        waitUntilApplyRulesNotRunning(100);
-
-        // see filter works
-        cy.request({
-          headers: {
-            'api-token': Cypress.env('ADMIN_TOKEN'),
-            projects: avengersProject.id
-          },
-          method: 'GET',
-          url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
-        }).then((response) => {
-          expect(response.body).to.have.length(1);
-          expect(response.body[0].id).to.equal(targetNodeId);
-        });
-
-        // delete rule
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'DELETE',
-          url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${rule.id}`
-        }).then((response) => {
-          expect(response.status).to.equal(200);
-        });
-
-        // apply rules to reset node to unassigned
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'POST',
-          url: '/apis/iam/v2beta/apply-rules'
-        }).then((response) => {
-          expect(response.status).to.equal(200);
-        });
-        waitUntilApplyRulesNotRunning(100);
-      });
-    }
   });
 });
 
@@ -616,24 +538,6 @@ function waitForUnassignedNodes(totalNodes: number, maxRetries: number) {
 
       waitForUnassignedNodes(totalNodes, maxRetries - 1);
     });
-}
-
-function waitUntilApplyRulesNotRunning(attempts: number): void {
-  if (attempts === -1) {
-    throw new Error('apply-rules never finished');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: '/apis/iam/v2beta/apply-rules'
-  }).then((response) => {
-    if (response.body.state === 'not_running') {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for apply-rules to be not_running`);
-      cy.wait(1000);
-      waitUntilApplyRulesNotRunning(--attempts);
-    }
-  });
 }
 
 function waitUntilProjectNotInGraveyard(projectID: string, attempts: number): void {

@@ -1,4 +1,5 @@
 import { describeIfIAMV2p1 } from '../../constants';
+import { uuidv4 } from '../../helpers';
 
 describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
   const cypressPrefix = 'test-projects-api-client-runs';
@@ -174,7 +175,7 @@ describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
   after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
 
   it('tagging 7 projects with all the attributes on a client runs node', () => {
-    const nodeId = cy.uuidv4();
+    const nodeId = uuidv4();
 
     // Ensure there are no nodes matching any of the projects
     projectsWithRule.forEach(projectWithRule => {
