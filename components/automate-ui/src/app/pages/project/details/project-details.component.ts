@@ -10,7 +10,7 @@ import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
-import { EntityStatus, loading, allLoaded } from 'app/entities/entities';
+import { EntityStatus, allLoaded, pending } from 'app/entities/entities';
 import {
   getStatus, updateStatus, projectFromRoute
 } from 'app/entities/projects/project.selectors';
@@ -42,9 +42,7 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
   public url: string;
   public ruleToDelete: Rule;
   public deleteModalVisible = false;
-  public createModalVisible = false;
-  public createProjectForm: FormGroup;
-  public creatingProject = false;
+  public updatingProject = false;
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
   public saving = false;
@@ -115,6 +113,18 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
         this.projectForm.controls['name'].setValue(this.project.name);
       });
 
+    // handle project update response
+    this.store.select(updateStatus).pipe(
+      takeUntil(this.isDestroyed),
+      filter(state => this.saving && !pending(state)))
+      .subscribe((state) => {
+        this.saving = false;
+        this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+        if (this.saveSuccessful) {
+          this.projectForm.markAsPristine();
+        }
+      });
+
     // if a rule gets deleted, we need to refresh the project status
     this.store.select(deleteRuleStatus).pipe(
       filter(status => this.id !== undefined && status === EntityStatus.loadingSuccess),
@@ -175,21 +185,5 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       id: this.project.id,
       name: this.projectForm.controls['name'].value.trim()
     }));
-
-    const pendingSave = new Subject<boolean>();
-    this.store.select(updateStatus).pipe(
-      filter(identity),
-      takeUntil(pendingSave))
-      .subscribe((state) => {
-        if (!loading(state)) {
-          pendingSave.next(true);
-          pendingSave.complete();
-          this.saving = false;
-          this.saveSuccessful = (state === EntityStatus.loadingSuccess);
-          if (this.saveSuccessful) {
-            this.projectForm.markAsPristine();
-          }
-        }
-      });
   }
 }
