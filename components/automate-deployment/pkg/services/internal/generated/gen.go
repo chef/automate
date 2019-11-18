@@ -497,6 +497,17 @@ var ProductMetadataJSON = `
       "hidden": false
     },
     {
+      "name": "automate-dev",
+      "aliases": null,
+      "type": "product",
+      "services": [],
+      "packages": null,
+      "dependencies": [
+        "automate"
+      ],
+      "hidden": true
+    },
+    {
       "name": "chef-server",
       "aliases": [
         "chef-infra-server"

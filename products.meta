@@ -125,6 +125,13 @@
       ]
     },
     {
+      "name": "automate-dev",
+      "type": "product",
+      "hidden": true,
+      "dependencies": ["automate"],
+      "services": []
+    },
+    {
       "name": "chef-server",
       "type": "product",
       "aliases": ["chef-infra-server"],
