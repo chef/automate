@@ -15,10 +15,6 @@ do_deploy() {
         --override-origin "$HAB_ORIGIN" \
         --manifest-dir "$test_manifest_path" \
         --admin-password chefautomate \
-        --accept-terms-and-mlsa
-
-    log_info "applying dev license"
-    chef-automate license apply "$A2_LICENSE"
-
-    echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts
+        --accept-terms-and-mlsa \
+        --debug
 }
