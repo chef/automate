@@ -122,6 +122,7 @@ describe('token management', () => {
 
     cy.get('#create-button-object-modal').click();
     cy.get('chef-modal').should('not.be.visible');
+    cy.get('#main-content-wrapper').scrollTo('top');
     cy.get('chef-notification.info').should('be.visible');
     cy.contains(tokenName3).should('exist');
   });
