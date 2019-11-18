@@ -7,6 +7,7 @@ import (
 	"context"
 
 	"github.com/golang/protobuf/ptypes"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/teambition/rrule-go"
@@ -189,21 +190,40 @@ func TestPurgeServer(t *testing.T) {
 				require.NoError(t, err)
 
 				// wait until the purge job is done or we time out waiting for it
+				checkPurgeStartEnd := func() error {
+					status, err := testSuite.purgeClient.Show(context.Background(), &data_lifecycle.ShowRequest{})
+					if err != nil {
+						return errors.Wrap(err, "failed to get purge show")
+					}
+
+					lastEnd, err := ptypes.Timestamp(status.LastEnd)
+					if err != nil {
+						return errors.Wrapf(err, "failed to parse last end: '%v'", status.LastEnd)
+					}
+
+					if lastEnd.After(startTime) {
+						return nil
+					}
+
+					return errors.Errorf("last end '%v' not after start time '%v'", lastEnd, startTime)
+				}
+
 				func() {
+					timeout := time.After(15 * time.Second)
 					for {
 						select {
-						case <-time.After(10 * time.Second):
-							t.Log("timed out waiting for purge to complete")
+						case <-timeout:
+							err := checkPurgeStartEnd()
+							if err != nil {
+								t.Log(err.Error())
+							} else {
+								return
+							}
 							t.Fail()
+							return
 						case <-time.Tick(1 * time.Second):
-							status, err := testSuite.purgeClient.Show(context.Background(), &data_lifecycle.ShowRequest{})
-							if err == nil {
-								lastStart, err := ptypes.Timestamp(status.LastStart)
-								lastEnd, err2 := ptypes.Timestamp(status.LastEnd)
-
-								if err == nil && err2 == nil && lastStart.After(startTime) && lastEnd.After(startTime) {
-									return
-								}
+							if err := checkPurgeStartEnd(); err == nil {
+								return
 							}
 						}
 					}
