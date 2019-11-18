@@ -149,7 +149,7 @@
       "name": "builder",
       "type": "product",
       "aliases": ["depot"],
-      "dependencies": ["core", "postgresql", "auth"],
+      "dependencies": ["core", "postgresql", "auth", "automate"],
       "services": [
         "chef/automate-minio",
         "chef/automate-builder-memcached",
