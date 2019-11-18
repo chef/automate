@@ -25,7 +25,7 @@ import { Policy, Member, Type, stringToMember } from 'app/entities/policies/poli
 import { allTeams, getAllStatus as getAllTeamsStatus } from 'app/entities/teams/team.selectors';
 import { Team } from 'app/entities/teams/team.model';
 import { GetTeams } from 'app/entities/teams/team.actions';
-import { allUsers, userStatus } from 'app/entities/users/user.selectors';
+import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import {
   GetUsers
 } from 'app/entities/users/user.actions';
@@ -114,7 +114,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
     this.loading$ = combineLatest([
         this.store.select(getAllTeamsStatus),
-        this.store.select(userStatus),
+        this.store.select(getAllUsersStatus),
         this.store.select(getPolicyStatus)
       ]).pipe(
         map((statuses: EntityStatus[]) => !allLoadedSuccessfully(statuses)));

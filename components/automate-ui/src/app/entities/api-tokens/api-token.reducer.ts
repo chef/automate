@@ -45,7 +45,12 @@ export function apiTokenEntityReducer(
   switch (action.type) {
 
     case ApiTokenActionTypes.GET_ALL: {
-      return set(STATUS, EntityStatus.loading, state) as ApiTokenEntityState;
+      return set(
+        STATUS,
+        EntityStatus.loading,
+        // clear token state to ensure we fetch the latest data
+        apiTokenEntityAdapter.removeAll(state)
+      ) as ApiTokenEntityState;
     }
 
     case ApiTokenActionTypes.GET_ALL_SUCCESS: {
@@ -61,7 +66,12 @@ export function apiTokenEntityReducer(
     }
 
     case ApiTokenActionTypes.GET: {
-      return set(GET_STATUS, EntityStatus.loading, state) as ApiTokenEntityState;
+      return set(
+        GET_STATUS,
+        EntityStatus.loading,
+        // clear token state to ensure we fetch the latest data
+        apiTokenEntityAdapter.removeAll(state)
+      ) as ApiTokenEntityState;
     }
 
     case ApiTokenActionTypes.GET_SUCCESS: {

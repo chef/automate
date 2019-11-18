@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
+import { isEmpty, identity, xor, isNil } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
-import { filter, map, pluck, takeUntil } from 'rxjs/operators';
-import { isEmpty, identity, xor } from 'lodash/fp';
+import { filter, pluck, takeUntil } from 'rxjs/operators';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -11,7 +11,7 @@ import { routeParams } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { pending, EntityStatus } from 'app/entities/entities';
 import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions';
-import { apiTokenFromRoute, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
+import { apiTokenFromRoute, getStatus, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
@@ -58,28 +58,16 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       status: [initialStatus],
       projects: [[]]
     });
+  }
+
+  ngOnInit(): void {
+    this.layoutFacade.showSettingsSidebar();
+
     this.store.pipe(
       select(isIAMv2),
       takeUntil(this.isDestroyed))
       .subscribe(latest => {
         this.isIAMv2 = latest;
-      });
-  }
-
-  ngOnInit(): void {
-    this.layoutFacade.showSettingsSidebar();
-    this.store.pipe(
-      select(apiTokenFromRoute),
-      filter(identity),
-      takeUntil(this.isDestroyed))
-      .subscribe((token) => {
-        this.token = { ...token };
-        this.updateForm.controls.name.setValue(this.token.name);
-        this.status = this.token.active ? 'active' : 'inactive';
-        this.updateForm.controls.status.setValue(this.status);
-        if (this.isIAMv2) {
-          this.store.dispatch(new GetProjects());
-        }
       });
 
     this.store.pipe(
@@ -92,21 +80,35 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
       });
 
     combineLatest([
+      this.store.select(getStatus),
+      this.store.select(apiTokenFromRoute)
+    ]).pipe(
+      filter(([status, token]) => status === EntityStatus.loadingSuccess && !isNil(token)),
+      takeUntil(this.isDestroyed))
+      .subscribe(([_, token]) => {
+        this.token = { ...token };
+        this.updateForm.controls.name.setValue(this.token.name);
+        this.status = this.token.active ? 'active' : 'inactive';
+        this.updateForm.controls.status.setValue(this.status);
+        if (this.isIAMv2) {
+          this.store.dispatch(new GetProjects());
+        }
+      });
+
+    combineLatest([
       this.store.select(allProjects),
       this.store.select(getAllProjectStatus)
     ]).pipe(
-      takeUntil(this.isDestroyed),
       filter(([_, pStatus]: [Project[], EntityStatus]) => pStatus !== EntityStatus.loading),
       filter(() => !!this.token),
-      map(([allowedProjects, _]) => {
+      takeUntil(this.isDestroyed))
+      .subscribe(([allowedProjects, _]) => {
         this.projects = {};
-        allowedProjects
-          .forEach(p => {
+        allowedProjects.forEach(p => {
             this.projects[p.id] = { ...p, checked: this.token.projects.includes(p.id)
             };
           });
-      }))
-      .subscribe();
+      });
 
     this.store.pipe(
       select(updateStatus),

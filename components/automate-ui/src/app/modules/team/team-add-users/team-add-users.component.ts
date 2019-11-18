@@ -12,7 +12,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeState } from 'app/route.selectors';
 import { EntityStatus, allLoadedSuccessfully } from 'app/entities/entities';
 import { User, HashMapOfUsers, userArrayToHash } from 'app/entities/users/user.model';
-import { allUsers, userStatus } from 'app/entities/users/user.selectors';
+import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import {
@@ -88,7 +88,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
     ).subscribe(id => this.store.dispatch(new GetTeam({ id })));
 
     this.loading$ = combineLatest([
-      this.store.select(userStatus),
+      this.store.select(getAllUsersStatus),
       this.store.select(getTeamUsersStatus)]).pipe(
         map((statuses: EntityStatus[]) => !allLoadedSuccessfully(statuses)));
 
