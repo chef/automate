@@ -1,15 +1,15 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators, FormControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { isEmpty, identity, xor } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, map, pluck, takeUntil } from 'rxjs/operators';
+import { isEmpty, identity, xor } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
-import { loading, EntityStatus } from 'app/entities/entities';
+import { pending, EntityStatus } from 'app/entities/entities';
 import { GetToken, UpdateToken } from 'app/entities/api-tokens/api-token.actions';
 import { apiTokenFromRoute, updateStatus } from 'app/entities/api-tokens/api-token.selectors';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
@@ -107,6 +107,18 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
           });
       }))
       .subscribe();
+
+    this.store.pipe(
+      select(updateStatus),
+      takeUntil(this.isDestroyed),
+      filter(state => this.saveInProgress && !pending(state)))
+      .subscribe((state) => {
+        this.saveInProgress = false;
+        this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+        if (this.saveSuccessful) {
+          this.updateForm.markAsPristine();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -121,23 +133,6 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
     const active = <TokenStatus>this.updateForm.controls.status.value === 'active';
     const projects = Object.keys(this.projects).filter(id => this.projects[id].checked);
     this.store.dispatch(new UpdateToken({...this.token, name, active, projects }));
-
-    const pendingSave = new Subject<boolean>();
-    this.store.pipe(
-      select(updateStatus),
-      filter(identity),
-      takeUntil(pendingSave))
-      .subscribe((state) => {
-        if (!loading(state)) {
-          pendingSave.next(true);
-          pendingSave.complete();
-          this.saveInProgress = false;
-          this.saveSuccessful = (state === EntityStatus.loadingSuccess);
-          if (this.saveSuccessful) {
-            this.updateForm.markAsPristine();
-          }
-        }
-      });
   }
 
   public get nameCtrl(): FormControl {

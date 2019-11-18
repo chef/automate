@@ -1,16 +1,16 @@
-import { Component, EventEmitter, OnInit } from '@angular/core';
+import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, combineLatest } from 'rxjs';
 import { filter, takeUntil, map } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
+import { isNil } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
-import { loading, EntityStatus } from 'app/entities/entities';
+import { loading, EntityStatus, pending } from 'app/entities/entities';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { Type } from 'app/entities/notifications/notification.model';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -33,7 +33,7 @@ import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filt
   templateUrl: './api-token-list.component.html',
   styleUrls: ['./api-token-list.component.scss']
 })
-export class ApiTokenListComponent implements OnInit {
+export class ApiTokenListComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean>;
   public sortedApiTokens$: Observable<ApiToken[]>;
   public apiTokenCount$: Observable<number>;
@@ -43,6 +43,7 @@ export class ApiTokenListComponent implements OnInit {
   public createTokenForm: FormGroup;
   public creatingToken = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
+  private isDestroyed = new Subject<boolean>();
 
   public isIAMv2$: Observable<boolean>;
   public dropdownProjects: Project[] = [];
@@ -76,6 +77,7 @@ export class ApiTokenListComponent implements OnInit {
     this.store.dispatch(new GetAllTokens());
 
     this.store.select(assignableProjects)
+      .pipe(takeUntil(this.isDestroyed))
       .subscribe((assignable: ProjectsFilterOption[]) => {
         this.dropdownProjects = assignable.map(p => {
           return <Project>{
@@ -85,6 +87,38 @@ export class ApiTokenListComponent implements OnInit {
           };
         });
       });
+
+    this.store.pipe(
+      select(saveStatus),
+      takeUntil(this.isDestroyed),
+      filter(state => this.createModalVisible && !pending(state)))
+      .subscribe(state => {
+        this.creatingToken = false;
+        if (state === EntityStatus.loadingSuccess) {
+          this.closeCreateModal();
+        }
+      });
+
+    combineLatest([
+      this.store.select(saveStatus),
+      this.store.select(saveError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(() => this.createModalVisible),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictErrorEvent.emit(true);
+        } else {
+          // Close the modal on any error other than conflict and display in banner.
+          this.closeCreateModal();
+        }
+      });
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   public closeDeleteModal(): void {
@@ -110,38 +144,6 @@ export class ApiTokenListComponent implements OnInit {
     };
     this.store.dispatch(new CreateToken(tok));
 
-    const pendingCreate = new Subject<boolean>();
-    this.store.pipe(
-      select(saveStatus),
-      filter(identity),
-      takeUntil(pendingCreate))
-      .subscribe((state) => {
-        if (!loading(state)) {
-          pendingCreate.next(true);
-          pendingCreate.complete();
-          this.creatingToken = false;
-          if (state === EntityStatus.loadingSuccess) {
-            this.closeCreateModal();
-          }
-          if (state === EntityStatus.loadingFailure) {
-            const pendingCreateError = new Subject<boolean>();
-            this.store.pipe(
-              select(saveError),
-              filter(identity),
-              takeUntil(pendingCreateError))
-              .subscribe((error) => {
-                pendingCreateError.next(true);
-                pendingCreateError.complete();
-                if (error.status === HttpStatus.CONFLICT) {
-                  this.conflictErrorEvent.emit(true);
-                // Close the modal on any error other than conflict and display in banner.
-                } else {
-                  this.closeCreateModal();
-                }
-            });
-          }
-        }
-      });
   }
 
   public toggleActive(token: ApiToken): void {
@@ -165,7 +167,7 @@ export class ApiTokenListComponent implements OnInit {
     }));
   }
 
-  resetCreateModal(): void {
+  private resetCreateModal(): void {
     this.creatingToken = false;
     this.createTokenForm.reset();
   }
