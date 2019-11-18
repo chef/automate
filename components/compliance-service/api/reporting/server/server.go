@@ -95,7 +95,7 @@ func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*rep
 		return nil, status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
 	}
 
-	reportIDs, err := srv.es.GetReportIds(esIndex, formattedFilters, true)
+	reportIDs, err := srv.es.GetReportIds(esIndex, formattedFilters, !in.AllReports)
 	if err != nil {
 		return nil, status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
 	}
