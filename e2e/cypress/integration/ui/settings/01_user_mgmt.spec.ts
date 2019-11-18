@@ -45,6 +45,7 @@ describe('user management', () => {
     // save new user
     cy.get('[data-cy=save-user]').click();
     cy.get('app-user-management chef-modal').should('not.be.visible');
+    cy.get('#main-content-wrapper').scrollTo('top');
     cy.get('chef-notification.info').should('be.visible');
 
     cy.get('app-user-table chef-table-cell').contains(username).should('exist');
@@ -84,6 +85,7 @@ describe('user management', () => {
     cy.get('app-user-details chef-button').contains('Update Password').click({ force: true} );
 
     // success alert displays
+    cy.get('#main-content-wrapper').scrollTo('top');
     cy.get('chef-notification.info').should('be.visible');
   });
 
