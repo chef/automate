@@ -66,7 +66,7 @@ func (backend ES2Backend) getDocIdHits(esIndex string,
 	}
 }
 
-func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
+func (backend ES2Backend) getLatestNodeReportIdsFromTimeseries(esIndex string,
 	filters map[string][]string,
 	latestOnly bool) ([]string, error) {
 	nodeReport := make(map[string]string, 0)
@@ -134,7 +134,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	return reportIds, nil
 }
 
-func (backend ES2Backend) getNodeReportIdsFromTimeseriesAll(esIndex string,
+func (backend ES2Backend) getAllNodeReportIdsFromTimeseries(esIndex string,
 	filters map[string][]string,
 	latestOnly bool) ([]string, error) {
 	boolQuery := backend.getFiltersQuery(filters, latestOnly)
@@ -154,7 +154,8 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseriesAll(esIndex string,
 		FetchSourceContext(fsc).
 		Query(boolQuery).
 		Sort("node_uuid", true).
-		Sort("end_time", false)
+		Sort("end_time", false).
+		Size(reporting.ESize)
 
 	source, err := searchSource.Source()
 	if err != nil {
@@ -177,30 +178,14 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseriesAll(esIndex string,
 	if err != nil {
 		return []string{}, errors.Wrapf(err, "%s unable to complete search", myName)
 	}
-	logrus.Debugf("GetReports got %d reports in %d milliseconds\n", searchResult.TotalHits(),
+	logrus.Debugf("%s  got %d reports in %d milliseconds\n", myName,
+		searchResult.TotalHits(),
 		searchResult.TookInMillis)
+
 	reports := make([]string, 0)
 	if searchResult.TotalHits() > 0 && searchResult.Hits.TotalHits > 0 {
 		for _, hit := range searchResult.Hits.Hits {
-			item := ESInSpecSummary{}
-			if hit.Source != nil {
-				err := json.Unmarshal(*hit.Source, &item)
-				if err == nil {
-					t := item.EndTime.Round(1 * time.Second)
-					timestamp, _ := ptypes.TimestampProto(t)
-					report := reportingapi.Report{
-						Id:        hit.Id,
-						NodeId:    item.NodeID,
-						NodeName:  item.NodeName,
-						EndTime:   timestamp,
-						Ipaddress: item.IPAddress,
-					}
-
-					reports = append(reports, report.Id)
-				} else {
-					logrus.Errorf("GetReports unmarshal error: %s", err.Error())
-				}
-			}
+			reports = append(reports, hit.Id)
 		}
 		return reports, nil
 	}
@@ -210,7 +195,14 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseriesAll(esIndex string,
 }
 
 func (backend ES2Backend) GetReportIds(esIndex string, filters map[string][]string, latestOnly bool) ([]string, error) {
-	reportIds, err := backend.getNodeReportIdsFromTimeseries(esIndex, filters, latestOnly)
+	var reportIds []string
+	var err error
+	if (latestOnly) {
+		reportIds, err = backend.getLatestNodeReportIdsFromTimeseries(esIndex, filters, latestOnly)
+	} else {
+		reportIds, err = backend.getAllNodeReportIdsFromTimeseries(esIndex, filters, latestOnly)
+	}
+
 	if err != nil {
 		return []string{}, errors.Wrap(err, "GetReportIds unable to get node report ids")
 	}
