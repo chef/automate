@@ -23,6 +23,8 @@ copy_logs() {
     else
         log_warning "NO SUP LOG FOUND"
     fi
+    # call our standard cleanup function
+    cleanup
 }
 
 trap copy_logs EXIT
