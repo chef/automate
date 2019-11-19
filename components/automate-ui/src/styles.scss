@@ -235,3 +235,47 @@ input {
   }
 }
 // Angular Material Overrides
+.chef-control-menu-x {
+  position: absolute;
+  margin-top: 35px;
+  right: -48px;
+  margin-right: 35px;
+}
+
+[panelclass="chef-control-menu-x"] {
+
+  .mat-select-trigger {
+    display: inline-block;
+    border-radius: var(--chef-border-radius);
+    border-color: var(--chef-primary-dark);
+    box-shadow: 0px 0px 0px 1px var(--chef-primary-dark) inset;
+    background-color: var(--chef-white);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+    outline: none;
+
+    &:after {
+      content: '...';
+      position: absolute;
+      color: black;
+      bottom: 33%;
+      left: 30%;
+    }
+
+    &:hover {
+      background-color: var(--chef-primary-bright);
+      box-shadow: 0px 0px 0px 1px var(--chef-primary-bright) inset;
+
+      &:after {
+        color: var(--chef-white);
+      }
+    }
+  }
+
+  .mat-select-placeholder,
+  .mat-select-arrow-wrapper,
+  .mat-select-arrow {
+    display: none;
+  }
+}
