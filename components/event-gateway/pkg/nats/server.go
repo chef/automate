@@ -8,7 +8,7 @@ import (
 	"github.com/chef/automate/components/event-gateway/pkg/config"
 	"github.com/chef/automate/lib/grpc/secureconn"
 
-	natsd "github.com/nats-io/gnatsd/server"
+	natsd "github.com/nats-io/nats-server/v2/server"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"time"
 
-	natsc "github.com/nats-io/go-nats"
+	natsc "github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 

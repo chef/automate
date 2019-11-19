@@ -27,7 +27,7 @@ github.com/alexedwards/scs/stores/memstore
 github.com/alexedwards/scs/stores/pgstore
 # github.com/apache/thrift v0.0.0-20161221203622-b2a4d4ae21c7
 github.com/apache/thrift/lib/go/thrift
-# github.com/armon/go-metrics v0.0.0-20180917152333-f0300d1749da
+# github.com/armon/go-metrics v0.0.0-20190430140413-ec5e00d3c878
 github.com/armon/go-metrics
 # github.com/aws/aws-sdk-go v1.13.42
 github.com/aws/aws-sdk-go/aws
@@ -252,9 +252,11 @@ github.com/grpc-ecosystem/grpc-gateway/runtime
 github.com/grpc-ecosystem/grpc-gateway/utilities
 # github.com/grpc-ecosystem/grpc-opentracing v0.0.0-20171214222146-0e7658f8ee99
 github.com/grpc-ecosystem/grpc-opentracing/go/otgrpc
+# github.com/hashicorp/go-hclog v0.9.1
+github.com/hashicorp/go-hclog
 # github.com/hashicorp/go-immutable-radix v1.0.0
 github.com/hashicorp/go-immutable-radix
-# github.com/hashicorp/go-msgpack v0.5.3
+# github.com/hashicorp/go-msgpack v0.5.5
 github.com/hashicorp/go-msgpack/codec
 # github.com/hashicorp/golang-lru v0.5.0
 github.com/hashicorp/golang-lru/simplelru
@@ -269,7 +271,7 @@ github.com/hashicorp/hcl/hcl/token
 github.com/hashicorp/hcl/json/parser
 github.com/hashicorp/hcl/json/scanner
 github.com/hashicorp/hcl/json/token
-# github.com/hashicorp/raft v1.0.0
+# github.com/hashicorp/raft v1.1.1
 github.com/hashicorp/raft
 # github.com/iancoleman/strcase v0.0.0-20190422225806-e506e3ef7365
 github.com/iancoleman/strcase
@@ -299,9 +301,10 @@ github.com/kylelemons/godebug/pretty
 github.com/leanovate/gopter
 github.com/leanovate/gopter/gen
 github.com/leanovate/gopter/prop
-# github.com/lib/pq v0.0.0-20171126050459-83612a56d3dd
+# github.com/lib/pq v1.2.0
 github.com/lib/pq
 github.com/lib/pq/oid
+github.com/lib/pq/scram
 # github.com/lyft/protoc-gen-star v0.4.11
 github.com/lyft/protoc-gen-star
 github.com/lyft/protoc-gen-star/lang/go
@@ -324,30 +327,30 @@ github.com/matttproud/golang_protobuf_extensions/pbutil
 github.com/mitchellh/mapstructure
 # github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
 github.com/muesli/crunchy
-# github.com/nats-io/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9 => github.com/danielsdeleo/gnatsd v1.3.1-0.20190311222832-8ba3abef6ac9
-github.com/nats-io/gnatsd/conf
-github.com/nats-io/gnatsd/logger
-github.com/nats-io/gnatsd/server
-github.com/nats-io/gnatsd/server/pse
-# github.com/nats-io/go-nats v1.7.2
-github.com/nats-io/go-nats
-github.com/nats-io/go-nats/encoders/builtin
-github.com/nats-io/go-nats/util
-# github.com/nats-io/go-nats-streaming v0.4.1-0.20190109212805-a0e3aee6fce1
-github.com/nats-io/go-nats-streaming
-github.com/nats-io/go-nats-streaming/pb
-# github.com/nats-io/jwt v0.0.8
+# github.com/nats-io/jwt v0.2.14
 github.com/nats-io/jwt
-# github.com/nats-io/nats-streaming-server v0.12.3-0.20190325171832-766681da5d26
+# github.com/nats-io/nats-server/v2 v2.0.4
+github.com/nats-io/nats-server/v2/conf
+github.com/nats-io/nats-server/v2/logger
+github.com/nats-io/nats-server/v2/server
+github.com/nats-io/nats-server/v2/server/pse
+# github.com/nats-io/nats-streaming-server v0.16.2
 github.com/nats-io/nats-streaming-server/logger
 github.com/nats-io/nats-streaming-server/server
 github.com/nats-io/nats-streaming-server/spb
 github.com/nats-io/nats-streaming-server/stores
 github.com/nats-io/nats-streaming-server/util
-# github.com/nats-io/nkeys v0.0.2
+# github.com/nats-io/nats.go v1.8.1
+github.com/nats-io/nats.go
+github.com/nats-io/nats.go/encoders/builtin
+github.com/nats-io/nats.go/util
+# github.com/nats-io/nkeys v0.1.0
 github.com/nats-io/nkeys
-# github.com/nats-io/nuid v1.0.0
+# github.com/nats-io/nuid v1.0.1
 github.com/nats-io/nuid
+# github.com/nats-io/stan.go v0.5.0
+github.com/nats-io/stan.go
+github.com/nats-io/stan.go/pb
 # github.com/olivere/elastic v6.2.16+incompatible
 github.com/olivere/elastic
 github.com/olivere/elastic/config
@@ -417,11 +420,9 @@ github.com/prometheus/client_model/go
 github.com/prometheus/common/expfmt
 github.com/prometheus/common/internal/bitbucket.org/ww/goautoneg
 github.com/prometheus/common/model
-# github.com/prometheus/procfs v0.0.0-20181204211112-1dc9a6cbc91a
+# github.com/prometheus/procfs v0.0.3
 github.com/prometheus/procfs
-github.com/prometheus/procfs/internal/util
-github.com/prometheus/procfs/nfs
-github.com/prometheus/procfs/xfs
+github.com/prometheus/procfs/internal/fs
 # github.com/rcrowley/go-metrics v0.0.0-20180125231941-8732c616f529
 github.com/rcrowley/go-metrics
 # github.com/russellhaering/goxmldsig v0.0.0-20170911191014-b7efc6231e45
@@ -478,7 +479,7 @@ github.com/xrash/smetrics
 github.com/xtgo/uuid
 # github.com/yashtewari/glob-intersection v0.0.0-20180206001645-7af743e8ec84
 github.com/yashtewari/glob-intersection
-# go.etcd.io/bbolt v1.3.2
+# go.etcd.io/bbolt v1.3.3
 go.etcd.io/bbolt
 # go.starlark.net v0.0.0-20190702223751-32f345186213
 go.starlark.net/internal/compile
@@ -499,7 +500,7 @@ go.uber.org/zap/internal/exit
 go.uber.org/zap/zapcore
 # golang.org/x/arch v0.0.0-20171004143515-077ac972c2e4
 golang.org/x/arch/x86/x86asm
-# golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
+# golang.org/x/crypto v0.0.0-20190701094942-4def268fd1a4
 golang.org/x/crypto/bcrypt
 golang.org/x/crypto/blake2b
 golang.org/x/crypto/blowfish
@@ -543,7 +544,7 @@ golang.org/x/perf/benchstat
 golang.org/x/perf/cmd/benchstat
 golang.org/x/perf/internal/stats
 golang.org/x/perf/storage/benchfmt
-# golang.org/x/sys v0.0.0-20190626221950-04f50cda93cb
+# golang.org/x/sys v0.0.0-20190826190057-c7b8b68b1456
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
 golang.org/x/sys/windows
@@ -552,13 +553,13 @@ golang.org/x/sys/windows/svc
 golang.org/x/sys/windows/svc/debug
 golang.org/x/sys/windows/svc/eventlog
 golang.org/x/sys/windows/svc/mgr
-# golang.org/x/text v0.3.1-0.20171218113626-eb22672bea55
+# golang.org/x/text v0.3.2
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/unicode/rangetable
-# golang.org/x/tools v0.0.0-20190524140312-2c0ae7006135
+# golang.org/x/tools v0.0.0-20190606124116-d0a3d012864b
 golang.org/x/tools/go/gcexportdata
 golang.org/x/tools/go/internal/gcimporter
 golang.org/x/tools/go/internal/packagesdriver
@@ -571,7 +572,7 @@ google.golang.org/api/compute/v1
 google.golang.org/api/gensupport
 google.golang.org/api/googleapi
 google.golang.org/api/googleapi/internal/uritemplates
-# google.golang.org/appengine v1.4.0
+# google.golang.org/appengine v1.6.1
 google.golang.org/appengine
 google.golang.org/appengine/internal
 google.golang.org/appengine/internal/app_identity
