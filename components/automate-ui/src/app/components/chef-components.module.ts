@@ -5,7 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSnackBarModule, MatSelectModule  } from '@angular/material';
 
 // Components
 import { AuthorizedComponent } from './authorized/authorized.component';
@@ -59,11 +59,13 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
 
     // Angular Material
     MatDialogModule,
+    MatSelectModule,
     MatSnackBarModule
   ],
   exports: [
     // Angular Material
     MatDialogModule,
+    MatSelectModule,
     MatSnackBarModule,
 
     // Components
