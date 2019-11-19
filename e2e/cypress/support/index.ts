@@ -26,26 +26,26 @@ const IAMV1 = 'v1';
 before(function () {
   if (!Cypress.env('IAM_VERSION')) {
     // tslint:disable-next-line:no-string-throw
-    throw('MISSING ENVIRONMENT VARIABLE: ' +
+    throw new Error('MISSING ENVIRONMENT VARIABLE: ' +
       `You must pass CYPRESS_IAM_VERSION. Must be one of: "${IAMV2}", "${IAMV1}".`);
   }
 
   if (Cypress.env('IAM_VERSION') !== IAMV2 && Cypress.env('IAM_VERSION') !== IAMV1) {
     // tslint:disable-next-line:no-string-throw
-    throw('INCORRECT ENVIRONMENT VARIABLE: ' +
+    throw new Error('INCORRECT ENVIRONMENT VARIABLE: ' +
       `You must pass CYPRESS_IAM_VERSION. Must be one of: "${IAMV2}", "${IAMV1}". ` +
       `You passed: ${Cypress.env('IAM_VERSION')}`);
   }
 
   if (!Cypress.env('RUN_FLAKY')) {
     // tslint:disable-next-line:no-string-throw
-    throw('MISSING ENVIRONMENT VARIABLE: You must pass CYPRESS_RUN_FLAKY.' +
+    throw new Error('MISSING ENVIRONMENT VARIABLE: You must pass CYPRESS_RUN_FLAKY.' +
       'Must be one of: "yes", "no".');
   }
 
   if (Cypress.env('RUN_FLAKY') !== 'yes' && Cypress.env('RUN_FLAKY') !== 'no') {
     // tslint:disable-next-line:no-string-throw
-    throw('INCORRECT ENVIRONMENT VARIABLE: You must pass CYPRESS_RUN_FLAKY. ' +
+    throw new Error('INCORRECT ENVIRONMENT VARIABLE: You must pass CYPRESS_RUN_FLAKY. ' +
       'Must be one of: "yes", "no".' +
       `You passed: ${Cypress.env('RUN_FLAKY')}`);
   }
