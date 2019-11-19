@@ -130,3 +130,8 @@ variable "workflow_enterprise" {
   default     = "demo"
   description = "A2 Workflow enterprise name."
 }
+
+variable "enable_builder" {
+  default     = "false"
+  description = "Enables A2 Builder feature."
+}

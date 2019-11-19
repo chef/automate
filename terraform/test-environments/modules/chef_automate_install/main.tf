@@ -241,8 +241,11 @@ EOF
   deployment_type = "${var.deployment_type}"
   upgrade_strategy = "${var.upgrade == "true" ? "at-once" : "none"}"
   manifest_cache_expiry = "0s"
-  enable_chef_server = ${var.enable_chef_server}
-  enable_workflow = ${var.enable_workflow}
+  products = ${jsonencode(compact(list(
+      "automate",
+      var.enable_chef_server ? "chef-server" : "",
+      var.enable_workflow_server ? "workflow" : "",
+      var.enable_builder ? "builder" : "")))}
 
 [gateway.v1.sys.service]
   trial_license_url = "https://licensing-${var.channel}.chef.io/create-trial"
