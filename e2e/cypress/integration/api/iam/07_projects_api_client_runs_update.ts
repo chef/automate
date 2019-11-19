@@ -173,7 +173,7 @@ describeIfIAMV2p1('Client Runs project update tagging', () => {
     });
 
     // wait for the CCR to be ingested
-    waitForUnassignedNodes(nodeId, 30);
+    cy.waitForClientRunsNode(nodeId, 30);
 
     // create the projects with one rule
     projectsWithRule.forEach(projectWithRule => {
@@ -209,35 +209,22 @@ describeIfIAMV2p1('Client Runs project update tagging', () => {
           projects: projectWithRule.project.id
         },
         method: 'GET',
-        url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+        url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${nodeId}`
       }).then((response) => {
         expect(response.body).to.have.length(1);
         expect(response.body[0].id).to.equal(nodeId);
       });
     });
+
+    // Delete node
+    cy.request({
+      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+      method: 'POST',
+      url: 'api/v0/ingest/events/chef/node-multiple-deletes',
+      body: {
+        node_ids: [nodeId]
+      },
+      failOnStatusCode: false
+    });
   });
 });
-
-function waitForUnassignedNodes(nodeId: string, maxRetries: number) {
-  cy
-    .request({
-      headers: {
-        projects: ['(unassigned)'],
-        'api-token': Cypress.env('ADMIN_TOKEN')
-      },
-      method: 'GET',
-      url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
-    })
-    .then((resp: Cypress.ObjectLike) => {
-      // to avoid getting stuck in an infinite loop
-      if (maxRetries === 0) {
-        return;
-      }
-      if (resp.body.nodes && resp.body.length > 0 && resp.body[0].id === nodeId ) {
-        return;
-      }
-      cy.wait(1000);
-      waitForUnassignedNodes(nodeId, maxRetries - 1);
-    });
-}
-

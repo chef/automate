@@ -2,7 +2,7 @@ import { describeIfIAMV2p1 } from '../../constants';
 import { uuidv4 } from '../../helpers';
 
 describeIfIAMV2p1('Compliance Ingestion project tagging', () => {
-  const cypressPrefix = 'test-projects-api-compliance';
+  const cypressPrefix = 'test-compliance-ingestion';
 
   const projectsWithRule = [
     // This test is commented out because there is a current limit of 6 projects allowed
@@ -181,30 +181,6 @@ describeIfIAMV2p1('Compliance Ingestion project tagging', () => {
     const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
     const end = Cypress.moment().utc().endOf('day').format();
 
-    // Ensure there are no nodes matching any of the projects
-    projectsWithRule.forEach(projectWithRule => {
-      cy.request({
-        headers: {
-          'api-token': Cypress.env('ADMIN_TOKEN'),
-          projects: projectWithRule.project.id
-        },
-        method: 'POST',
-        url: '/api/v0/compliance/reporting/nodes/search',
-        body: {
-          filters: [
-            { type: 'start_time', values: [start]},
-            { type: 'end_time', values: [end]}
-          ],
-          order: 'DESC',
-          page: 1,
-          per_page: 100,
-          sort: 'latest_report.end_time'
-        }
-      }).then((response) => {
-        expect(response.body.nodes).to.have.length(0);
-      });
-    });
-
     // Ingest a InSpec report with attribues that match all the projects
     cy.fixture('compliance/inspec-report.json').then((report) => {
       report.organization_name = '75th Rangers';
@@ -227,7 +203,7 @@ describeIfIAMV2p1('Compliance Ingestion project tagging', () => {
     });
 
     // wait for the report to be ingested
-    waitForNodes(projectsWithRule[0].project.id, start, end, 30);
+    cy.waitForComplianceNode(nodeId, start, end, 30);
 
     // Ensure the node is tagged with the correct project
     projectsWithRule.forEach(projectWithRule => {
@@ -241,7 +217,8 @@ describeIfIAMV2p1('Compliance Ingestion project tagging', () => {
         body: {
           filters: [
             { type: 'start_time', values: [start]},
-            { type: 'end_time', values: [end]}
+            { type: 'end_time', values: [end]},
+            { type: 'node_id', values: [nodeId]}
           ],
           order: 'DESC',
           page: 1,
@@ -250,41 +227,7 @@ describeIfIAMV2p1('Compliance Ingestion project tagging', () => {
         }
       }).then((response) => {
         expect(response.body.nodes).to.have.length(1);
-        expect(response.body.nodes[0].id).to.equal(nodeId);
       });
     });
   });
 });
-
-function waitForNodes(project: string, start: string, end: string, maxRetries: number) {
-  cy
-    .request({
-      headers: {
-        projects: project,
-        'api-token': Cypress.env('ADMIN_TOKEN')
-      },
-      method: 'POST',
-      url: '/api/v0/compliance/reporting/nodes/search',
-      body: {
-        filters: [
-          { type: 'start_time', values: [start]},
-          { type: 'end_time', values: [end]}
-        ],
-        order: 'DESC',
-        page: 1,
-        per_page: 100,
-        sort: 'latest_report.end_time'
-      }
-    })
-    .then((resp: Cypress.ObjectLike) => {
-      // to avoid getting stuck in an infinite loop
-      if (maxRetries === 0) {
-        return;
-      }
-      if (resp.body.nodes && resp.body.nodes.length > 0 ) {
-        return;
-      }
-      cy.wait(1000);
-      waitForNodes(project, start, end, maxRetries - 1);
-    });
-}

@@ -1,7 +1,7 @@
 import { describeIfIAMV2p1 } from '../../constants';
 import { uuidv4 } from '../../helpers';
 
-describeIfIAMV2p1('projects API', () => {
+describeIfIAMV2p1('Compliance report project update tagging', () => {
   const cypressPrefix = 'test-compliance-update';
 
 
@@ -180,7 +180,7 @@ describeIfIAMV2p1('projects API', () => {
     });
 
     // wait for the report to be ingested
-    waitForUnassignedNodes(nodeId, start, end, 30);
+    cy.waitForComplianceNode(nodeId, start, end, 30);
 
     // create the projects with one rule
     projectsWithRule.forEach(projectWithRule => {
@@ -220,7 +220,8 @@ describeIfIAMV2p1('projects API', () => {
         body: {
           filters: [
             { type: 'start_time', values: [start]},
-            { type: 'end_time', values: [end]}
+            { type: 'end_time', values: [end]},
+            { type: 'node_id', values: [nodeId]}
           ],
           order: 'DESC',
           page: 1,
@@ -229,40 +230,7 @@ describeIfIAMV2p1('projects API', () => {
         }
       }).then((response) => {
         expect(response.body.nodes).to.have.length(1);
-        expect(response.body.nodes[0].id).to.equal(nodeId);
       });
     });
   });
 });
-
-function waitForUnassignedNodes(nodeId: string, start: string, end: string, maxRetries: number) {
-  cy.request({
-      headers: {
-        projects: ['(unassigned)'],
-        'api-token': Cypress.env('ADMIN_TOKEN')
-      },
-      method: 'POST',
-      url: '/api/v0/compliance/reporting/nodes/search',
-      body: {
-        filters: [
-          { type: 'start_time', values: [start]},
-          { type: 'end_time', values: [end]}
-        ],
-        order: 'DESC',
-        page: 1,
-        per_page: 100,
-        sort: 'latest_report.end_time'
-      }
-    })
-    .then((resp: Cypress.ObjectLike) => {
-      // to avoid getting stuck in an infinite loop
-      if (maxRetries === 0) {
-        return;
-      }
-      if (resp.body.nodes && resp.body.nodes.length > 0 && resp.body.nodes[0].id === nodeId ) {
-        return;
-      }
-      cy.wait(1000);
-      waitForUnassignedNodes(nodeId, start, end, maxRetries - 1);
-    });
-}

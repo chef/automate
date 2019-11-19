@@ -247,6 +247,63 @@ Cypress.Commands.add('waitUntilApplyRulesNotRunning', (attempts: number) => {
   });
 });
 
+Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, end: string,
+  maxRetries: number) => {
+  cy.request({
+    headers: {
+      projects: ['*'],
+      'api-token': Cypress.env('ADMIN_TOKEN')
+    },
+    method: 'POST',
+    url: '/api/v0/compliance/reporting/nodes/search',
+    body: {
+      filters: [
+        { type: 'start_time', values: [start]},
+        { type: 'end_time', values: [end]},
+        { type: 'node_id', values: [nodeId]}
+      ],
+      order: 'DESC',
+      page: 1,
+      per_page: 100,
+      sort: 'latest_report.end_time'
+    }
+  })
+  .then((resp: Cypress.ObjectLike) => {
+    // to avoid getting stuck in an infinite loop
+    if (maxRetries === 0) {
+      return;
+    }
+    if (resp.body.nodes && resp.body.nodes.length > 0 && resp.body.nodes[0].id === nodeId ) {
+      return;
+    }
+    cy.wait(1000);
+    cy.waitForComplianceNode(nodeId, start, end, maxRetries - 1);
+  });
+});
+
+Cypress.Commands.add('waitForClientRunsNode', (nodeId: string, maxRetries: number) => {
+    cy
+    .request({
+      headers: {
+        projects: ['*'],
+        'api-token': Cypress.env('ADMIN_TOKEN')
+      },
+      method: 'GET',
+      url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${nodeId}`
+    })
+    .then((resp: Cypress.ObjectLike) => {
+      // to avoid getting stuck in an infinite loop
+      if (maxRetries === 0) {
+        return;
+      }
+      if (resp.body && resp.body.length > 0 ) {
+        return;
+      }
+      cy.wait(1000);
+      cy.waitForClientRunsNode(nodeId, maxRetries - 1);
+    });
+});
+
 // helpers
 
 function LoginHelper(username: string) {
