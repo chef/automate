@@ -5,6 +5,7 @@ import { map } from 'rxjs/operators';
 import { ChefEvent, ChefEventCollection, EventFeedFilter, Chicklet } from '../../types/types';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
 import * as moment from 'moment';
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 const ENTITY_TYPE_TAG = 'event-type';
 @Component({
@@ -21,6 +22,9 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
   groupedEvent: ChefEvent;
   groupedEvents: ChefEvent[];
   groupedEventsButton;
+
+  DateTime = DateTime;
+
   @ViewChild('groupSidePanel', { static: true }) sidepanel: ElementRef;
   private subscription: Subscription;
   private isDestroyed = new Subject<boolean>();

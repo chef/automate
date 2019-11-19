@@ -2,9 +2,9 @@
   <caption class="visually-hidden">Event Feed Table</caption>
   <li *ngFor="let event of events; index as i" class="event-row">
     <div class="event-date-time">
-      <div class="event-time">{{event.startTime | date:'h:mm a' }}</div>
-      <div class="event-day">{{event.startTime | date:'EEEE' }},</div>
-      <div class="event-date">{{event.startTime | date:'LLLL d' }}</div>
+      <div class="event-time">{{ event.startTime | datetime: DateTime.EVENT_TABLE_TIME_LABEL }}</div>
+      <div class="event-day">{{ event.startTime | datetime: DateTime.EVENT_TABLE_DAY_LABEL }},</div>
+      <div class="event-date">{{ event.startTime | datetime: DateTime.EVENT_TABLE_DATE_LABEL }}</div>
     </div>
     <div class="event-info">
       <div class="event-chat-bubble">
@@ -62,7 +62,7 @@
         </div>
         <p class="event-group-text">
           <strong>{{getEventGroupText(event)}}</strong>
-          {{event.startTime | date:'EE' }}, {{event.startTime | date:'MMM d yyyy' }} at {{event.startTime | date:'h:mm a' }}
+          {{ event.startTime | datetime: DateTime.RFC2822 }}
         </p>
       </li>
     </ul>

@@ -16,6 +16,24 @@ export class DateTime {
   // Format for filenames of report downloads
   // 2019-09-24-09:59:59
   public static readonly REPORT_DATE_TIME: string = 'YYYY-MM-DD-HHmmss';
+
+  // Format for short date display
   // 25 Oct 2019
   public static readonly CHEF_SHORT_DATE: string = 'DD MMM YYYY';
+
+  // Format for date labels in event feed graph
+  // Tue, 24 Sept
+  public static readonly EVENT_GRAPH_DATE_LABEL: string = 'ddd, DD MMM';
+
+  // Format for time labels in event feed table
+  // 09:59
+  public static readonly EVENT_TABLE_TIME_LABEL: string = 'HH:mm';
+
+  // Format for day labels in event feed table
+  // Tuesday
+  public static readonly EVENT_TABLE_DAY_LABEL: string = 'dddd';
+
+  // Format for date labels in event feed table
+  // 24 September
+  public static readonly EVENT_TABLE_DATE_LABEL: string = 'D MMMM';
 }
