@@ -1,4 +1,5 @@
 import { describeIfIAMV2p1 } from '../../constants';
+import { uuidv4 } from '../../helpers';
 
 describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
   const cypressPrefix = 'test-projects-api-client-runs';
@@ -168,27 +169,13 @@ describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
       url: '/apis/iam/v2beta/apply-rules'
     });
 
-    waitUntilApplyRulesNotRunning(100);
+    cy.waitUntilApplyRulesNotRunning(100);
   });
 
   after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
 
   it('tagging 7 projects with all the attributes on a client runs node', () => {
     const nodeId = uuidv4();
-
-    // Ensure there are no nodes matching any of the projects
-    projectsWithRule.forEach(projectWithRule => {
-      cy.request({
-        headers: {
-          'api-token': Cypress.env('ADMIN_TOKEN'),
-          projects: projectWithRule.project.id
-        },
-        method: 'GET',
-        url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
-      }).then((response) => {
-        expect(response.body).to.have.length(0);
-      });
-    });
 
     // Ingest a node with attribues that match all the projects
     cy.fixture('converge/avengers1.json').then((node) => {
@@ -209,7 +196,7 @@ describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
     });
 
     // wait for the node to be ingested
-    waitForNodes(projectsWithRule[0].project.id, 30);
+    cy.waitForClientRunsNode(nodeId, 30);
 
     // Ensure the node is tagged with the correct project
     projectsWithRule.forEach(projectWithRule => {
@@ -219,7 +206,7 @@ describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
           projects: projectWithRule.project.id
         },
         method: 'GET',
-        url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+        url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${nodeId}`
       }).then((response) => {
         expect(response.body).to.have.length(1);
         expect(response.body[0].id).to.equal(nodeId);
@@ -238,54 +225,3 @@ describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
     });
   });
 });
-
-function waitUntilApplyRulesNotRunning(attempts: number): void {
-  if (attempts === -1) {
-    throw new Error('apply-rules never finished');
-  }
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: '/apis/iam/v2beta/apply-rules'
-  }).then((response) => {
-    if (response.body.state === 'not_running') {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for apply-rules to be not_running`);
-      cy.wait(1000);
-      waitUntilApplyRulesNotRunning(--attempts);
-    }
-  });
-}
-
-function waitForNodes(project: string, maxRetries: number) {
-  cy
-    .request({
-      headers: {
-        projects: project,
-        'api-token': Cypress.env('ADMIN_TOKEN')
-      },
-      method: 'GET',
-      url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
-    })
-    .then((resp: Cypress.ObjectLike) => {
-      // to avoid getting stuck in an infinite loop
-      if (maxRetries === 0) {
-        return;
-      }
-      if (resp.body.length > 0 ) {
-        return;
-      }
-      cy.wait(1000);
-      waitForNodes(project, maxRetries - 1);
-    });
-}
-
-function uuidv4() {
-  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-    // tslint:disable 
-    const r = Math.random() * 16 | 0;
-    // tslint:disable 
-    const v = c === 'x' ? r : (r & 0x3 | 0x8);
-    return v.toString(16);
-  });
-}

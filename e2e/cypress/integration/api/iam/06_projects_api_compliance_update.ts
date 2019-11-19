@@ -1,8 +1,9 @@
 import { describeIfIAMV2p1 } from '../../constants';
 import { uuidv4 } from '../../helpers';
 
-describeIfIAMV2p1('Compliance Ingestion project tagging', () => {
-  const cypressPrefix = 'test-compliance-ingestion';
+describeIfIAMV2p1('Compliance report project update tagging', () => {
+  const cypressPrefix = 'test-compliance-update';
+
 
   const projectsWithRule = [
     // This test is commented out because there is a current limit of 6 projects allowed
@@ -144,32 +145,8 @@ describeIfIAMV2p1('Compliance Ingestion project tagging', () => {
 
   before(() => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-
-    // create the projects with one rule
-    projectsWithRule.forEach(projectWithRule => {
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/apis/iam/v2beta/projects',
-        body: projectWithRule.project
-      });
-
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: `/apis/iam/v2beta/projects/${projectWithRule.rule.project_id}/rules`,
-        body: projectWithRule.rule
-      });
-    });
-
-    // apply rules
-    cy.request({
-      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-      method: 'POST',
-      url: '/apis/iam/v2beta/apply-rules'
-    });
-
-    cy.waitUntilApplyRulesNotRunning(100);
+    cy.cleanupV2IAMObjectsByIDPrefixes('test-projects-api-compliance-update',
+    ['projects', 'policies']);
   });
 
   after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
@@ -205,12 +182,38 @@ describeIfIAMV2p1('Compliance Ingestion project tagging', () => {
     // wait for the report to be ingested
     cy.waitForComplianceNode(nodeId, start, end, 30);
 
+    // create the projects with one rule
+    projectsWithRule.forEach(projectWithRule => {
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: '/apis/iam/v2beta/projects',
+        body: projectWithRule.project
+      });
+
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: `/apis/iam/v2beta/projects/${projectWithRule.rule.project_id}/rules`,
+        body: projectWithRule.rule
+      });
+    });
+
+    // apply rules
+    cy.request({
+      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+      method: 'POST',
+      url: '/apis/iam/v2beta/apply-rules'
+    });
+
+    cy.waitUntilApplyRulesNotRunning(100);
+
     // Ensure the node is tagged with the correct project
     projectsWithRule.forEach(projectWithRule => {
       cy.request({
         headers: {
           'api-token': Cypress.env('ADMIN_TOKEN'),
-          projects: projectWithRule.project.id
+          projects: [projectWithRule.project.id]
         },
         method: 'POST',
         url: '/api/v0/compliance/reporting/nodes/search',
