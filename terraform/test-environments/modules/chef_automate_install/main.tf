@@ -40,6 +40,7 @@ data "template_file" "install_chef_automate_cli" {
     retention_older_than_days = "${var.enable_cloudwatch_metrics == "true" ? 60 : 10}"
     upgrade                   = "${var.upgrade}"
     workflow_enterprise       = "${var.workflow_enterprise}"
+    enable_builder            = "${var.enable_builder}"
   }
 }
 
@@ -244,7 +245,7 @@ EOF
   products = ${jsonencode(compact(list(
       "automate",
       var.enable_chef_server ? "chef-server" : "",
-      var.enable_workflow_server ? "workflow" : "",
+      var.enable_workflow ? "workflow" : "",
       var.enable_builder ? "builder" : "")))}
 
 [gateway.v1.sys.service]

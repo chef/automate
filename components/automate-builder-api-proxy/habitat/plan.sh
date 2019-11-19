@@ -39,9 +39,11 @@ pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding"
 do_unpack() {
     return 0
 }
+
 do_build(){
     return 0
 }
+
 do_install() {
     mkdir -p "${pkg_prefix}/config/"
     proxypath="$(pkg_path_for habitat/builder-api-proxy)"
@@ -50,6 +52,7 @@ do_install() {
 
     return 0
 }
+
 do_strip() {
     return 0
 }
