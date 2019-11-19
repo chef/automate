@@ -177,15 +177,15 @@ input {
 [panelclass="chef-control-menu-x"] {
 
   .mat-select-trigger {
-    outline: none;
+    display: inline-block;
     border-radius: var(--chef-border-radius);
     border-color: var(--chef-primary-dark);
     box-shadow: 0px 0px 0px 1px var(--chef-primary-dark) inset;
-    display: inline-block;
     background-color: var(--chef-white);
     width: 32px;
     height: 32px;
     cursor: pointer;
+    outline: none;
 
     &:after {
       content: '...';
@@ -204,7 +204,7 @@ input {
       }
     }
   }
-  
+
   .mat-select-placeholder,
   .mat-select-arrow-wrapper,
   .mat-select-arrow {
