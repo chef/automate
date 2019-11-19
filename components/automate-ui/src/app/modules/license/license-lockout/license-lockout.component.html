@@ -4,7 +4,7 @@
     <ng-container *ngIf="!fetchStatusInternalError">
       <ng-container *ngIf="!trialLicenseApplied">
         <h2 id="license-lockout-label" class="title">Welcome to Chef Automate!</h2>
-        <div class="subtitle">Register to get started with a 60-day trial or <a href="https://www.chef.io/contact-us/" target="_blank">contact us</a></div>
+        <div class="subtitle">Register to get started with a 60-day trial or <a href="https://www.chef.io/contact-us/" target="_blank" rel="noopener">contact Chef</a>.</div>
         <div class="error-container">
           <chef-alert type="error" *ngIf="fetchStatusInternalError">
             <span>
@@ -71,8 +71,8 @@
           <chef-loading-spinner *ngIf="requestingLicense" size="30"></chef-loading-spinner>
         </div>
         <div class="footer">
-          <a (click)="backToLicenseApply(); false" class="active">Apply Non-Trial License</a>
-          <a (click)="logout()" class="active">Sign Out</a>
+          <chef-button tertiary (click)="backToLicenseApply(); false">Apply Non-Trial License</chef-button>
+          <chef-button tertiary (click)="logout()">Sign Out</chef-button>
         </div>
       </ng-container>
 

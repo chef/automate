@@ -143,11 +143,7 @@
     text-align: center;
     width: 100%;
 
-    .active {
-      cursor: pointer;
-    }
-
-    a:first-of-type {
+    button:first-of-type {
       margin-right: 60px;
     }
   }
