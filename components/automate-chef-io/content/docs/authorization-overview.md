@@ -1,6 +1,6 @@
 +++
-title = "Authorization Overview"
-description = "Set up authorization on Chef Automate"
+title = "IAM v1 Overview"
+description = "IAM v1 Overview"
 draft = false
 bref = ""
 toc = true
@@ -10,7 +10,7 @@ toc = true
     weight = 10
 +++
 
-This guide helps you understand and use Chef Automate's authorization system.
+This guide helps you understand and use Chef Automate's IAM v1 authorization system.
 
 ## Overview
 
