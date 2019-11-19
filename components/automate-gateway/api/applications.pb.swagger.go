@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/beta/applications/delete_disconnected_services": {
+    "/applications/delete_disconnected_services": {
       "post": {
         "operationId": "DeleteDisconnectedServices",
         "responses": {
@@ -40,7 +40,7 @@ func init() {
         ]
       }
     },
-    "/beta/applications/disconnected_services": {
+    "/applications/disconnected_services": {
       "get": {
         "operationId": "GetDisconnectedServices",
         "responses": {
@@ -65,7 +65,7 @@ func init() {
         ]
       }
     },
-    "/beta/applications/service-groups": {
+    "/applications/service-groups": {
       "get": {
         "operationId": "GetServiceGroups",
         "responses": {
@@ -128,7 +128,7 @@ func init() {
         ]
       }
     },
-    "/beta/applications/service-groups/{service_group_id}": {
+    "/applications/service-groups/{service_group_id}": {
       "get": {
         "operationId": "GetServicesBySG",
         "responses": {
@@ -197,7 +197,7 @@ func init() {
         ]
       }
     },
-    "/beta/applications/service_groups_health_counts": {
+    "/applications/service_groups_health_counts": {
       "get": {
         "operationId": "GetServiceGroupsHealthCounts",
         "responses": {
@@ -225,7 +225,7 @@ func init() {
         ]
       }
     },
-    "/beta/applications/services": {
+    "/applications/services": {
       "get": {
         "operationId": "GetServices",
         "responses": {
@@ -288,7 +288,7 @@ func init() {
         ]
       }
     },
-    "/beta/applications/services-distinct-values": {
+    "/applications/services-distinct-values": {
       "get": {
         "operationId": "GetServicesDistinctValues",
         "responses": {
@@ -328,7 +328,7 @@ func init() {
         ]
       }
     },
-    "/beta/applications/stats": {
+    "/applications/stats": {
       "get": {
         "operationId": "GetServicesStats",
         "responses": {
@@ -344,7 +344,7 @@ func init() {
         ]
       }
     },
-    "/beta/applications/version": {
+    "/applications/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {
@@ -360,7 +360,7 @@ func init() {
         ]
       }
     },
-    "/beta/retention/service_groups/delete_disconnected_services/config": {
+    "/retention/service_groups/delete_disconnected_services/config": {
       "get": {
         "operationId": "GetDeleteDisconnectedServicesConfig",
         "responses": {
@@ -400,7 +400,7 @@ func init() {
         ]
       }
     },
-    "/beta/retention/service_groups/disconnected_services/config": {
+    "/retention/service_groups/disconnected_services/config": {
       "get": {
         "operationId": "GetDisconnectedServicesConfig",
         "responses": {
