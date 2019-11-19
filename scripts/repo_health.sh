@@ -2,7 +2,7 @@
 
 set -e
 
-hab pkg install -b core/go core/git core/ruby core/jq-static core/shellcheck
+hab pkg install -b core/go core/git core/ruby core/jq-static core/shellcheck core/cacerts
 
 echo "Checking Go Dependencies"
 go mod verify
