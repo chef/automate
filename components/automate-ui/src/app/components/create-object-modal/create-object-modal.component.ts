@@ -20,6 +20,7 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
   @Input() creating = false;
   @Input() objectNoun: string;
   @Input() showProjectsDropdown = false;
+  @Input() createProjectModal = false;
   @Input() assignableProjects: Project[] = [];
   @Input() createForm: FormGroup; // NB: The form must contain 'name' and 'id' fields
   @Input() conflictErrorEvent: EventEmitter<boolean>; // TC: This element assumes 'id' is the
