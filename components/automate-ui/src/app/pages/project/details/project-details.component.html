@@ -86,7 +86,7 @@
                 <chef-table-cell>{{ getEditStatus(rule) }}</chef-table-cell>
                 <chef-table-cell class="three-dot-column">
                   <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project?.id]">
-                    <mat-select>
+                    <mat-select panelClass="chef-control-menu-x">
                       <mat-option *ngIf="showDeleteRule()" class="delete-rule" (click)="startRuleDelete(rule)" data-cy="delete-rule">Delete Rule</mat-option>
                     </mat-select>
                   </app-authorized>

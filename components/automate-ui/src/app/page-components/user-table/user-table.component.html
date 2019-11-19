@@ -36,7 +36,7 @@
             <!-- <app-authorized
               [allOf]="generateDeletePermissionsPath(user)"
               [overrideVisible]="overridePermissionsCheck"> -->
-            <mat-select>
+            <mat-select panelClass="chef-control-menu-x">
               <mat-option data-cy="delete" (click)="removeClicked.emit(user)">{{ removeText }}</mat-option>
             </mat-select>
             <!-- </app-authorized> -->
