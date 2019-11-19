@@ -44,7 +44,7 @@ describe('ProjectRulesComponent', () => {
           inputs: ['visible', 'objectNoun', 'objectName'],
           outputs: ['close', 'deleteClicked']
         }),
-        MockComponent({ selector: 'chef-control-menu' }),
+        MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'chef-form-field'}),
         MockComponent({ selector: 'chef-breadcrumbs'}),
         MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),

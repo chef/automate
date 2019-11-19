@@ -24,7 +24,7 @@ describe('PolicyListComponent', () => {
           inputs: ['visible', 'objectNoun', 'objectName', 'moreDetails'],
           outputs: ['close', 'deleteClicked']
         }),
-        MockComponent({ selector: 'chef-control-menu' }),
+        MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-page-header' }),

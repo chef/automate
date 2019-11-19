@@ -100,7 +100,7 @@ describe('Integrations', () => {
             return text !== 'Automate';
           });
         }).first();
-        const controlMenu = listItem.element(by.tagName('chef-control-menu'));
+        const controlMenu = listItem.element(by.tagName('mat-select'));
 
         expect(controlMenu.isDisplayed()).toBe(true);
       });

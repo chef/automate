@@ -43,7 +43,7 @@ describe('TeamManagementComponent', () => {
         }),
         MockComponent({ selector: 'chef-button',
                         inputs: ['disabled', 'routerLink'] }),
-        MockComponent({ selector: 'chef-control-menu' }),
+        MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),

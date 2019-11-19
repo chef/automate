@@ -87,7 +87,7 @@ describe('ProjectListComponent', () => {
           inputs: ['visible', 'applyRulesStatus', 'stopRulesInProgress'],
           outputs: ['confirm', 'cancel']
         }),
-        MockComponent({ selector: 'chef-control-menu' }),
+        MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-loading-spinner' }),

@@ -82,7 +82,7 @@ describe('Admin pages', () => {
 
     describe('control button', () => {
       it('is displayed', () => {
-        waitForElement('chef-table-new chef-table-body chef-table-row chef-control-menu')
+        waitForElement('chef-table-new chef-table-body chef-table-row mat-select')
         .then((e) => {
           expect(e.isDisplayed()).toBeTruthy();
         });
@@ -90,7 +90,7 @@ describe('Admin pages', () => {
 
       ['Delete User'].forEach((item, index) => {
         it(`when clicked, shows ${item}`, () => {
-          const menu = $('chef-table-new chef-table-body chef-table-row chef-control-menu');
+          const menu = $('chef-table-new chef-table-body chef-table-row mat-select');
           browser.wait(EC.elementToBeClickable(menu), 5000).then(() => {
             menu.click().then(() => {
               const dropDownOption = menu.$(`chef-option:nth-child(${index + 1}`);
@@ -215,13 +215,13 @@ describe('Admin pages', () => {
       it('is not displayed for chef-managed policies', () => {
         // admin policy row
         expect(
-          $('chef-table-new chef-table-body chef-table-row:nth-child(1) chef-control-menu')
+          $('chef-table-new chef-table-body chef-table-row:nth-child(1) mat-select')
             .isPresent()).toBeFalsy();
       });
 
       it('is displayed for custom policies', () => {
         // custom policy row
-        waitForElement('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-control-menu')
+        waitForElement('chef-table-new chef-table-body chef-table-row:nth-child(2) mat-select')
           .then(controlButton => {
             expect(controlButton.isPresent()).toBeTruthy();
           });
@@ -229,7 +229,7 @@ describe('Admin pages', () => {
 
       ['Delete Policy'].forEach((item, index) => {
         it(`when clicked, shows ${item}`, () => {
-          waitForElement('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-control-menu')
+          waitForElement('chef-table-new chef-table-body chef-table-row:nth-child(2) mat-select')
             .then(controlButton => {
               browser.wait(EC.elementToBeClickable(controlButton));
               controlButton.click().then(() => {
@@ -251,7 +251,7 @@ describe('Admin pages', () => {
         waitForElement('chef-table-new chef-table-body chef-table-row:nth-child(2)')
         .then(somePolicy => {
           // open control menu
-          const controlButton = somePolicy.$('chef-control-menu');
+          const controlButton = somePolicy.$('mat-select');
           browser.wait(EC.elementToBeClickable(controlButton));
           controlButton.click().then(() => {
             // select Delete Policy
@@ -852,7 +852,7 @@ describe('Admin pages', () => {
       it('does not show the control button', () => {
         const controlButton = $(
           'app-project-list chef-table-new chef-table-body chef-table-row:nth-child(1) ' +
-          'chef-table-cell:nth-child(5) chef-control-menu');
+          'chef-table-cell:nth-child(5) mat-select');
         expect(controlButton.isPresent()).toEqual(false);
       });
     });
@@ -873,7 +873,7 @@ describe('Admin pages', () => {
       it('does not show the control button', () => {
         const controlButton = $(
           'app-project-list chef-table-new chef-table-body chef-table-row:nth-child(2) ' +
-          'chef-table-cell:nth-child(5) chef-control-menu');
+          'chef-table-cell:nth-child(5) mat-select');
         expect(controlButton.isPresent()).toEqual(false);
       });
     });
@@ -892,16 +892,16 @@ describe('Admin pages', () => {
 
       it('shows the control button', () => {
         waitForElement('app-project-list chef-table-new chef-table-body chef-table-row:nth-child(3) ' +
-          'chef-table-cell:nth-child(4) chef-control-menu').then(controlButton => {
+          'chef-table-cell:nth-child(4) mat-select').then(controlButton => {
             expect(controlButton.isPresent()).toBeTruthy();
             ['Delete Project'].forEach((item, index) => {
               it(`when clicked, shows ${item}`, () => {
                 $('app-project-list chef-table-new chef-table-body chef-table-row:nth-child(2) ' +
-                  'chef-table-cell:nth-child(3) chef-control-menu').
+                  'chef-table-cell:nth-child(3) mat-select').
                   click();
                 const dropDownOption = $(
                   `app-project-list chef-table-new chef-table-body chef-table-row:nth-child(2)
-                  chef-table-cell:nth-child(3) chef-control-menu chef-option:nth-child(${index + 1})`);
+                  chef-table-cell:nth-child(3) mat-select chef-option:nth-child(${index + 1})`);
                 const dropDownOpened = () => dropDownOption.getText().then(val => val === item);
                 browser.wait(dropDownOpened, 5000, 'Control options should render.');
               });
@@ -918,8 +918,8 @@ describe('Admin pages', () => {
 
           waitForElement('app-project-list chef-table-new chef-table-body chef-table-row:nth-child(3)')
             .then(third => {
-              browser.wait(EC.presenceOf(third.$('chef-control-menu'))).then(() => {
-                const controlButton = third.$('chef-control-menu');
+              browser.wait(EC.presenceOf(third.$('mat-select'))).then(() => {
+                const controlButton = third.$('mat-select');
                 browser.wait(EC.elementToBeClickable(controlButton));
                 controlButton.click().then(() => {
                   // select Delete Project

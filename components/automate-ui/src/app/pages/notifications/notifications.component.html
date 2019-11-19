@@ -46,9 +46,9 @@
                 {{rule.AlertTypeLabels[rule.ruleType]}}
               </chef-td>
               <chef-td class="actions">
-                <chef-control-menu>
-                  <chef-option (click)="deleteRule(rule)">Delete Notification</chef-option>
-                </chef-control-menu>
+                <mat-select>
+                  <mat-option (click)="deleteRule(rule)">Delete Notification</mat-option>
+                </mat-select>
               </chef-td>
             </chef-tr>
           </chef-table>

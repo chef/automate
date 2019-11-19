@@ -66,18 +66,18 @@
                 <ng-container *ngIf="token.active">Active</ng-container>
                 <ng-container *ngIf="!token.active">Inactive</ng-container>
               </chef-table-cell>
-              <chef-table-cell class="three-dot-column">
-                <chef-control-menu id="menu-{{token.id}}" data-cy="token-control">
-                  <chef-option (click)="notifyCopy()" data-cy="copy-token">
+              <chef-table-cell class="controls">
+                <mat-select id="menu-{{token.id}}" data-cy="token-control">
+                  <mat-option (click)="notifyCopy()" data-cy="copy-token">
                     <chef-clipboard plain value={{token.value}} label="Copy Token" icon=""></chef-clipboard>
-                  </chef-option>
-                  <!-- <app-authorized [allOf]="[`/iam/v2/tokens/{id}`, 'put', token.id]"> -->
-                  <chef-option (click)="toggleActive(token)">Toggle Status</chef-option>
+                  </mat-option>
+                  <!-- <app-authorized [allOf]="[`/iam/v2beta/tokens/{id}`, 'put', token.id]"> -->
+                  <mat-option (click)="toggleActive(token)">Toggle Status</mat-option>
                   <!-- </app-authorized> -->
-                  <!-- <app-authorized [allOf]="[`/iam/v2/tokens/{id}`, 'delete', token.id]"> -->
-                  <chef-option (click)="startTokenDelete(token)" data-cy="delete">Delete Token</chef-option>
+                  <!-- <app-authorized [allOf]="[`/iam/v2beta/tokens/{id}`, 'delete', token.id]"> -->
+                  <mat-option (click)="startTokenDelete(token)" data-cy="delete">Delete Token</mat-option>
                   <!-- </app-authorized> -->
-                </chef-control-menu>
+                </mat-select>
              </chef-table-cell>
             </chef-table-row>
           </chef-table-body>
