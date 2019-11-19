@@ -6,8 +6,8 @@ bref = ""
 toc = true
 [menu]
   [menu.docs]
-    parent = "beta"
-    weight = 10
+    parent = "authorization"
+    weight = 30
 +++
 <!-- Goal
 Show the simplest possible experience that most users will experience. We are assuming that experience will be UI only, so present the UI information first followed by CLI information presented in reference format.

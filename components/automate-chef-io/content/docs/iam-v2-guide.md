@@ -6,8 +6,8 @@ bref = ""
 toc = true
 [menu]
   [menu.docs]
-    parent = "beta"
-    weight = 20
+    parent = "authorization"
+    weight = 40
 +++
 
 This guide shows you how to upgrade Chef Automate to IAM v2, perform important administrative operations, and revert back to IAM v1.
