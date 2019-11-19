@@ -4,7 +4,7 @@
     <ng-container *ngIf="!fetchStatusInternalError">
       <ng-container *ngIf="!trialLicenseApplied">
         <h2 id="license-lockout-label" class="title">Welcome to Chef Automate!</h2>
-        <div class="subtitle">Sign up to get started with a 60-day trial.</div>
+        <div class="subtitle">Register to get started with a 60-day trial or <a href="https://www.chef.io/contact-us/" target="_blank" rel="noopener">contact Chef</a>.</div>
         <div class="error-container">
           <chef-alert type="error" *ngIf="fetchStatusInternalError">
             <span>
@@ -30,20 +30,19 @@
           </chef-alert>
         </div>
 
-        <div class="note">Required fields are marked with an asterisk (*).</div>
         <form class="trial" [formGroup]="trialForm" (ngSubmit)="onTrialLicenseFormSubmit()" novalidate>
           <div class="name-container">
             <chef-form-field>
               <label for="firstName">First Name *</label>
               <div class="suggester-input-wrapper">
-                <input chefInput name="firstName" id="firstName" formControlName="firstName" type="text" autofocus placeholder="First Name">
+                <input chefInput name="firstName" id="firstName" formControlName="firstName" type="text" autofocus>
               </div>
               <chef-error *ngIf="trialForm.get('firstName').hasError('required') && trialForm.get('firstName').dirty">First name required.</chef-error>
             </chef-form-field>
             <chef-form-field>
               <label for="firstName">Last Name *</label>
               <div class="suggester-input-wrapper">
-                <input chefInput name="lastName" id="lastName" formControlName="lastName" type="text" placeholder="Last Name">
+                <input chefInput name="lastName" id="lastName" formControlName="lastName" type="text">
               </div>
                 <chef-error *ngIf="trialForm.get('lastName').hasError('required') && trialForm.get('lastName').dirty">Last name required.</chef-error>
             </chef-form-field>
@@ -52,7 +51,7 @@
             <chef-form-field>
               <label for="email">Email *</label>
               <div class="suggester-input-wrapper">
-                <input chefInput name="email" id="email" formControlName="email" type="text" placeholder="Email">
+                <input chefInput name="email" id="email" formControlName="email" type="text">
               </div>
               <chef-error *ngIf="trialForm.get('email').hasError('email') && trialForm.get('email').dirty">Valid email required.</chef-error>
             </chef-form-field>
@@ -65,16 +64,15 @@
             <a href="https://www.chef.io/online-master-agreement" target="_blank">Master License and Services Agreement</a>
           </chef-checkbox>
           <div class="button">
-            <chef-button primary type="submit" [disabled]="!(trialForm.valid && mlsaAgree) || requestingLicense">Sign Up</chef-button>
+            <chef-button primary type="submit" [disabled]="!(trialForm.valid && mlsaAgree) || requestingLicense">Register</chef-button>
           </div>
         </form>
         <div class="spinner-container">
           <chef-loading-spinner *ngIf="requestingLicense" size="30"></chef-loading-spinner>
         </div>
         <div class="footer">
-          <a href="" (click)="backToLicenseApply(); false" class="active">Already have a license?</a>
-          Or
-          <a href="https://www.chef.io/contact-us/" target="_blank">contact us</a> to get a license.
+          <chef-button tertiary (click)="backToLicenseApply(); false">Apply Non-Trial License</chef-button>
+          <chef-button tertiary (click)="logout()">Sign Out</chef-button>
         </div>
       </ng-container>
 

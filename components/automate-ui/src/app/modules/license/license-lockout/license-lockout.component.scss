@@ -34,7 +34,6 @@
   .title {
     font-size: 24px;
     font-weight: bold;
-    color: $chef-primary-bright;
     margin-bottom: 1em;
     margin-top: 20px;
 
@@ -142,17 +141,10 @@
     margin-top: 10px;
     font-size: 14px;
     text-align: center;
+    width: 100%;
 
-    .active {
-      cursor: pointer;
-    }
-
-    a:first-of-type {
-      display: block;
-      font-size: 18px;
-      font-weight: 600;
-      text-decoration: underline;
-      padding-bottom: 20px;
+    button:first-of-type {
+      margin-right: 60px;
     }
   }
 
