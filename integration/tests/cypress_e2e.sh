@@ -44,6 +44,7 @@ do_deploy() {
 
     export CYPRESS_IAM_VERSION=$IAM
     export CYPRESS_ADMIN_TOKEN=$token
+    export CYPRESS_RUN_FLAKY=$FLAKY
 
     log_info "fixing dns resolution for '${CONTAINER_HOSTNAME}'"
     echo "127.0.0.1 ${CONTAINER_HOSTNAME}" >> /etc/hosts

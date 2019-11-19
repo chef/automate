@@ -21,6 +21,19 @@ cd automate/e2e
 npm install
 ```
 
+There are four different helpers you can run, depending on what version of IAM you are on
+and whether or not you want to run the tests marked as flaky:
+
+```
+npm run cypress:local:v1
+npm run cypress:local:v1:flaky
+npm run cypress:local:v2
+npm run cypress:local:v2:flaky
+```
+
+These commands are simply setting the correct environment variables to run cypress locally.
+See below for more details.
+
 ### Environment Variables
 
 Next set your environment variables. See "Working with Secrets" in
@@ -46,11 +59,11 @@ dev or acceptance; typically start with your local box with this:
 export CYPRESS_BASE_URL=https://a2-dev.test
 ```
 
-Most Cypress tests also expect the following IAM-related environment variables. Set them
-according to your targeted Automate instance's IAM version.
+You must also set the IAM version, whether or not to run the flaky tests, and optionally the admin token:
 
 ```bash
 export CYPRESS_IAM_VERSION=v1 || v2.1
+export CYPRESS_RUN_FLAKY=yes || no
 export CYPRESS_ADMIN_TOKEN=<admin token value> # optional
 ```
 
@@ -112,10 +125,10 @@ Your dev environment's IAM version MUST match the value of CYPRESS_IAM_VERSION f
 
 ### Running Flaky Tests
 
-There are some known flaky tests we are trying to debug. By default, they do not run. If you wish to run them:
+There are some known flaky tests we are trying to debug. You must set whether or not you wish for them to run:
 
 ```bash
-CYPRESS_RUN_FLAKY=true npm run cypress:run
+CYPRESS_RUN_FLAKY=yes npm run cypress:run
 ```
 
 The tests are marked as flaky by the `itFlaky` descriptor instead of the `it` descriptor.
