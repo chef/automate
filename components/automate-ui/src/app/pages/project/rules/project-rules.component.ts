@@ -4,14 +4,14 @@ import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, pluck, filter } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
+import { identity, isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { HttpStatus } from 'app/types/types';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
-import { EntityStatus, loading } from 'app/entities/entities';
+import { EntityStatus, pending } from 'app/entities/entities';
 import {
   Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator, KVPair
 } from 'app/entities/rules/rule.model';
@@ -76,55 +76,87 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private fb: FormBuilder) {
 
-      combineLatest([
-        this.store.select(getStatus),
-        this.store.select(updateStatus),
-        this.store.select(getProjectStatus)
-      ]).pipe(
-        takeUntil(this.isDestroyed)
-      ).subscribe(([gStatus, uStatus, gpStatus]) => {
-        const routeId = this.route.snapshot.paramMap.get('ruleid');
-        this.isLoading = routeId &&
-          (gStatus !== EntityStatus.loadingSuccess) ||
-          (uStatus === EntityStatus.loading) ||
-          (gpStatus !== EntityStatus.loadingSuccess);
-        });
-
-      combineLatest([
-        this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
-        this.store.select(routeParams).pipe(pluck('ruleid'), filter(identity))
-      ]).pipe(
-        takeUntil(this.isDestroyed)
-      ).subscribe(([project_id, rule_id]: string[]) => {
-        this.store.dispatch(new GetProject({ id: project_id }));
-        this.store.dispatch(new GetRule({
-          id: rule_id,
-          project_id
-        }));
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(updateStatus),
+      this.store.select(getProjectStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([gStatus, uStatus, gpStatus]) => {
+      const routeId = this.route.snapshot.paramMap.get('ruleid');
+      this.isLoading = routeId &&
+        (gStatus !== EntityStatus.loadingSuccess) ||
+        (uStatus === EntityStatus.loading) ||
+        (gpStatus !== EntityStatus.loadingSuccess);
       });
 
-      this.store.select(projectFromRoute).pipe(
-        filter(identity),
-        takeUntil(this.isDestroyed)
-      ).subscribe(project => {
-          this.project = project;
-      });
+    combineLatest([
+      this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
+      this.store.select(routeParams).pipe(pluck('ruleid'), filter(identity))
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([project_id, rule_id]: string[]) => {
+      this.store.dispatch(new GetProject({ id: project_id }));
+      this.store.dispatch(new GetRule({
+        id: rule_id,
+        project_id
+      }));
+    });
 
-      this.store.select(ruleFromRoute).pipe(
-        filter(identity),
-        takeUntil(this.isDestroyed)
-      ).subscribe(rule => {
-          this.rule = rule;
-          this.editingRule = true;
-      });
+    this.store.select(projectFromRoute).pipe(
+      filter(identity),
+      takeUntil(this.isDestroyed)
+    ).subscribe(project => {
+        this.project = project;
+    });
 
-      this.store.select(getRuleAttributes).subscribe(attributes => {
+    this.store.select(ruleFromRoute).pipe(
+      filter(identity),
+      takeUntil(this.isDestroyed)
+    ).subscribe(rule => {
+        this.rule = rule;
+        this.editingRule = true;
+    });
+
+    this.store.select(getRuleAttributes).pipe(takeUntil(this.isDestroyed))
+    .subscribe(attributes => {
         this.attributes = attributes;
+      });
+
+    // handle rule creation/update success
+    combineLatest([
+      this.store.select(createStatus),
+      this.store.select(updateStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([cStatus, uStatus]) => this.saving && (!pending(cStatus) || !pending(uStatus))))
+      .subscribe(([cStatus, uStatus]) => {
+        this.saving = false;
+        if (cStatus === EntityStatus.loadingSuccess || uStatus === EntityStatus.loadingSuccess) {
+          this.closePage();
+        }
+      });
+
+    // handle rule creation failure
+    combineLatest([
+      this.store.select(createStatus),
+      this.store.select(createError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictErrorEvent.emit(true);
+        } else {
+          // close modal on any error other than conflict and display in banner
+          this.closePage();
+        }
       });
   }
 
   ngOnInit(): void {
-    this.conflictErrorEvent.subscribe((isConflict: boolean) => {
+    this.conflictErrorEvent.pipe(takeUntil(this.isDestroyed))
+    .subscribe((isConflict: boolean) => {
       this.conflictError = isConflict;
       // Open the ID input on conflict so user can resolve it.
       this.modifyID = true;
@@ -268,36 +300,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     if (this.ruleForm.valid) {
       this.saving = true;
       this.rule.id ? this.updateRule() : this.createRule();
-      const selector = this.rule.id ? updateStatus : createStatus;
-      const pendingSave = new Subject<boolean>();
-      this.store.select(selector).pipe(
-        filter(identity),
-        takeUntil(pendingSave))
-        .subscribe((state) => {
-          if (!loading(state)) {
-            pendingSave.next(true);
-            pendingSave.complete();
-            this.saving = false;
-            if (state === EntityStatus.loadingSuccess) {
-              this.closePage();
-            } else if (state === EntityStatus.loadingFailure) {
-              const pendingCreateError = new Subject<boolean>();
-              this.store.select(createError).pipe(
-                filter(identity),
-                takeUntil(pendingCreateError))
-                .subscribe((error) => {
-                  pendingCreateError.next(true);
-                  pendingCreateError.complete();
-                  if (error.status === HttpStatus.CONFLICT) {
-                    this.conflictErrorEvent.emit(true);
-                  } else {
-                    // Close on any error other than conflict and display in banner.
-                    this.closePage();
-                  }
-              });
-            }
-          }
-        });
     }
   }
 
