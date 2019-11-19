@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { Observable ,  Subject, combineLatest } from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
@@ -9,8 +9,8 @@ import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefValidators } from 'app/helpers/auth/validator';
-import { EntityStatus } from 'app/entities/entities';
-import { allUsers, getStatus } from 'app/entities/users/user.selectors';
+import { EntityStatus, pending } from 'app/entities/entities';
+import { allUsers, getStatus, createStatus } from 'app/entities/users/user.selectors';
 import {
   CreateUser, DeleteUser, GetUsers, CreateUserPayload
 } from 'app/entities/users/user.actions';
@@ -32,8 +32,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public createModalVisible = false;
   public isLoading = true;
   public userToDelete: User;
+  public creatingUser = false;
 
-  private getStatus$: Observable<EntityStatus>;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   // Inputs to app-user-table
@@ -47,8 +47,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     private layoutFacade: LayoutFacadeService,
     fb: FormBuilder
   ) {
-    this.getStatus$ = store.select(getStatus);
-
     this.createUserForm = fb.group({
       // Must stay in sync with error checks in user-form.component.html
       fullname: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
@@ -76,6 +74,17 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         // Sort naturally first by name, then by id
         this.users = ChefSorters.naturalSort(users, ['name', 'id']);
+      });
+
+    this.store.pipe(
+      select(createStatus),
+      takeUntil(this.isDestroyed),
+      filter(state => this.createModalVisible && !pending(state)))
+      .subscribe(state => {
+        this.creatingUser = false;
+        if (state === EntityStatus.loadingSuccess) {
+          this.closeCreateModal();
+        }
       });
   }
 
@@ -109,6 +118,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   }
 
   public handleCreateUser(): void {
+    this.creatingUser = true;
     const formValues = this.createUserForm.value;
 
     const userCreateReq = <CreateUserPayload>{
@@ -118,14 +128,6 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     };
 
     this.store.dispatch(new CreateUser(userCreateReq));
-
-    this.getStatus$.pipe(
-      takeUntil(this.isDestroyed))
-      .subscribe((status) => {
-        if (status !== EntityStatus.loading) {
-          this.closeCreateModal();
-        }
-    });
   }
 
   public showEmptyStateMessage(): boolean {
