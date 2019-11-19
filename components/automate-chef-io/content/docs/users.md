@@ -11,6 +11,10 @@ toc = true
     weight = 50
 +++
 
+{{< info >}}
+This content is specific to IAM v1, see [IAM v2 Overview]({{< ref "iam-v2-overview.md#" >}}) for IAM v2 specific information.
+{{< /info >}}
+
 This guide will show you how to manage Chef Automate users. Import existing users into Chef Automate with [Microsoft AD (LDAP)]({{< ref "configuration.md#microsoft-active-directory" >}}), [generic LDAP]({{< ref "configuration.md#ldap" >}}) or [SAML]({{< ref "configuration.md#saml" >}}).
 
 You can create local Chef Automate users that can log in and interact with the system independent of LDAP or SAML.
