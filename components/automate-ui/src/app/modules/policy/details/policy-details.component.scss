@@ -20,35 +20,35 @@ chef-tab-selector {
 
 thead {
   font-size: 14px;
-  letter-spacing: 0.2px;	
-  color: $chef-primary-dark;	
-}	
+  letter-spacing: 0.2px;
+  color: $chef-primary-dark;
+}
 
-th {	
-  text-align: left;	
-  padding: 0px;	
-}	
+th {
+  text-align: left;
+  padding: 0px;
+}
 
-tbody > .detail-row {	
-  padding-top: 0px;	
-  padding-bottom: 15px;	
-}	
+tbody > .detail-row {
+  padding-top: 0px;
+  padding-bottom: 15px;
+}
 
-.detail-row {	
-  display: flex;	
-  color: $chef-primary-dark;	
-}	
+.detail-row {
+  display: flex;
+  color: $chef-primary-dark;
+}
 
-.id-column {	
-  width: 33%;	
-  padding-top: 0px;	
-  padding-left: 0px;	
-}	
+.id-column {
+  width: 33%;
+  padding-top: 0px;
+  padding-left: 0px;
+}
 
-.type-column {	
-  width: 66%;	
-  padding-top: 0px;	
-  padding-left: 0px;	
+.type-column {
+  width: 66%;
+  padding-top: 0px;
+  padding-left: 0px;
 }
 
 .three-dot-column {
