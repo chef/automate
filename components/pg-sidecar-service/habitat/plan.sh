@@ -16,10 +16,13 @@ pkg_exports=(
 )
 pkg_exposes=(port)
 pkg_deps=(
-  core/sqitch_pg
   chef/mlsa
   chef/automate-platform-tools
-  chef/automate-postgresql # for psql and pg_dump
+  # Pin postgresql, sqitch_pg, and postgresql client until automate-postgresql
+  # is updated.
+  core/postgresql/9.6.11/20190305213451 # for psql and pg_dump
+  core/postgresql-client/9.6.11/20190305213520
+  core/sqitch_pg/3.7.4/20190305225225
 )
 pkg_bin_dirs=(bin)
 pkg_scaffolding="${local_scaffolding_origin:-chef}/automate-scaffolding-go"
