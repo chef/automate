@@ -171,7 +171,7 @@ where `bucket_name` is the name of the S3 bucket `base_path` an optional path wi
 
 Restore Chef Automate to an instance on which Automate is not already installed. The directory used for restoring Chef Automate must have access to the filesystem used for the backup. If you used a network-attached filesystem backup, mount the shared backup directory to the same mount point that was configured when the backup was created. If the backup directory is not a network-attached filesystem, copy the backup directory to the location that was configured when the backup was created.
 
-If you have configured the backup directory to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory:
+If you have configured the backup directory to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate will use the most recent backup in the backup directory:
 
 ```shell
 chef-automate backup restore /path/to/backups/BACKUP_ID
