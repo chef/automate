@@ -227,7 +227,7 @@ describeIfIAMV2p1('Nodemanager project update tagging', () => {
 
     cy.waitUntilApplyRulesNotRunning(100);
 
-    // Ensure the both the compliance and client run nodes' tags are updated
+    // Ensure that both the compliance and client run nodes' tags are updated
     projectsWithRule.forEach(projectWithRule => {
       cy.request({
         headers: {
@@ -243,14 +243,14 @@ describeIfIAMV2p1('Nodemanager project update tagging', () => {
         }
       }).then((response) => {
         expect(response.body.nodes.length).to.greaterThan(0);
-        expect(nodeExist(complianceNodeId, response.body.nodes)).to.equal(true);
-        expect(nodeExist(clientRunsNodeId, response.body.nodes)).to.equal(true);
+        expect(nodeExists(complianceNodeId, response.body.nodes)).to.equal(true);
+        expect(nodeExists(clientRunsNodeId, response.body.nodes)).to.equal(true);
       });
     });
   });
 });
 
-function nodeExist(nodeId: string, nodes: any[]): boolean {
+function nodeExists(nodeId: string, nodes: any[]): boolean {
   for (const node of nodes ) {
     if (node.id === nodeId) {
       return true;
@@ -279,7 +279,7 @@ function waitForNodemanagerNode(nodeId: string, maxRetries: number) {
     if (maxRetries === 0) {
       return;
     }
-    if (resp.body.nodes && resp.body.nodes.length > 0 && nodeExist(nodeId, resp.body.nodes)) {
+    if (resp.body.nodes && resp.body.nodes.length > 0 && nodeExists(nodeId, resp.body.nodes)) {
       return;
     }
     cy.wait(1000);
