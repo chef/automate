@@ -31,7 +31,6 @@ export class ServiceGroupsFacadeService {
   // RFC2822 format like: Wed, 03 Jul 2019 17:08:53 UTC
   // TODO @afiune we should move this to a common place where other
   // components can use this time format
-  public applicationsFeatureFlagOn: boolean;
   readonly RFC2822 = 'ddd, DD MMM YYYY, HH:mm:ss [UTC]';
 
   public serviceGroups$: Observable<ServiceGroup>;

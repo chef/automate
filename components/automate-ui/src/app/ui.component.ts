@@ -21,10 +21,6 @@ export class UIComponent implements OnInit {
   experimentalFeatures: Array<Feature> = [];
   betaFeatures: Array<Feature> = [
     {
-      key: 'applications',
-      name: 'EAS Applications'
-    },
-    {
       key: 'servicenow_cmdb',
       name: 'ServiceNow CMDB Integration'
     }
