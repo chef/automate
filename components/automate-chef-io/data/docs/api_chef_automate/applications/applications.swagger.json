@@ -11,7 +11,7 @@
     "application/json"
   ],
   "paths": {
-    "/beta/applications/delete_disconnected_services": {
+    "/applications/delete_disconnected_services": {
       "post": {
         "operationId": "DeleteDisconnectedServices",
         "responses": {
@@ -37,7 +37,7 @@
         ]
       }
     },
-    "/beta/applications/disconnected_services": {
+    "/applications/disconnected_services": {
       "get": {
         "operationId": "GetDisconnectedServices",
         "responses": {
@@ -62,7 +62,7 @@
         ]
       }
     },
-    "/beta/applications/service-groups": {
+    "/applications/service-groups": {
       "get": {
         "operationId": "GetServiceGroups",
         "responses": {
@@ -125,7 +125,7 @@
         ]
       }
     },
-    "/beta/applications/service-groups/{service_group_id}": {
+    "/applications/service-groups/{service_group_id}": {
       "get": {
         "operationId": "GetServicesBySG",
         "responses": {
@@ -194,7 +194,7 @@
         ]
       }
     },
-    "/beta/applications/service_groups_health_counts": {
+    "/applications/service_groups_health_counts": {
       "get": {
         "operationId": "GetServiceGroupsHealthCounts",
         "responses": {
@@ -222,7 +222,7 @@
         ]
       }
     },
-    "/beta/applications/services": {
+    "/applications/services": {
       "get": {
         "operationId": "GetServices",
         "responses": {
@@ -285,7 +285,7 @@
         ]
       }
     },
-    "/beta/applications/services-distinct-values": {
+    "/applications/services-distinct-values": {
       "get": {
         "operationId": "GetServicesDistinctValues",
         "responses": {
@@ -325,7 +325,7 @@
         ]
       }
     },
-    "/beta/applications/stats": {
+    "/applications/stats": {
       "get": {
         "operationId": "GetServicesStats",
         "responses": {
@@ -341,7 +341,7 @@
         ]
       }
     },
-    "/beta/applications/version": {
+    "/applications/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {
@@ -357,7 +357,7 @@
         ]
       }
     },
-    "/beta/retention/service_groups/delete_disconnected_services/config": {
+    "/retention/service_groups/delete_disconnected_services/config": {
       "get": {
         "operationId": "GetDeleteDisconnectedServicesConfig",
         "responses": {
@@ -397,7 +397,7 @@
         ]
       }
     },
-    "/beta/retention/service_groups/disconnected_services/config": {
+    "/retention/service_groups/disconnected_services/config": {
       "get": {
         "operationId": "GetDisconnectedServicesConfig",
         "responses": {

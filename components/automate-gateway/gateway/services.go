@@ -350,6 +350,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"telemetry":            pb_telemetry.RegisterTelemetryHandlerFromEndpoint,
 		"data-feed":            pb_data_feed.RegisterDatafeedServiceHandlerFromEndpoint,
 		"data-lifecycle":       pb_data_lifecycle.RegisterDataLifecycleHandlerFromEndpoint,
+		"applications":         pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
 	})
 }
 
@@ -360,9 +361,6 @@ func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFe
 		"tokens v2beta":   pb_iam_v2beta.RegisterTokensHandlerFromEndpoint,
 		"teams v2beta":    pb_iam_v2beta.RegisterTeamsHandlerFromEndpoint,
 		"rules v2beta":    pb_iam_v2beta.RegisterRulesHandlerFromEndpoint,
-	}
-	if toggles["applications"] {
-		endpointMap["apps beta"] = pb_apps.RegisterApplicationsServiceHandlerFromEndpoint
 	}
 	return muxFromRegisterMap(grpcURI, dopts, endpointMap)
 }

@@ -180,15 +180,15 @@ EventFeed | GetEventStringBuckets | /eventstrings | GET | events:strings | read
 {{% responsive-table %}}
 Service | Method | HTTP Endpoint | HTTP Method | Resource | Action
 ---|---|---|---|---|---
-Applications | GetServiceGroups | /beta/applications/service-groups | GET | service_groups | list
-Applications | GetServiceGroupsHealthCounts | /beta/applications/service_groups_health_counts | GET | service_groups | list
-Applications | GetServices | /beta/applications/services | GET | service_groups| list
-Applications | GetServicesBySG | /beta/applications/service-groups/{service_group_id} | GET | service_groups | list
+Applications | GetServiceGroups | /applications/service-groups | GET | service_groups | list
+Applications | GetServiceGroupsHealthCounts | /applications/service_groups_health_counts | GET | service_groups | list
+Applications | GetServices | /applications/services | GET | service_groups| list
+Applications | GetServicesBySG | /applications/service-groups/{service_group_id} | GET | service_groups | list
  |  |  |  |  |
-JobScheduler | GetDisconnectedServicesConfig          | /beta/retention/service_groups/disconnected_services/config        | GET  | service_groups:scheduler:disconnected_services        | read
-JobScheduler | UpdateDisconnectedServicesConfig       | /beta/retention/service_groups/disconnected_services/config        | POST | service_groups:scheduler:disconnected_services        | configure
-JobScheduler | GetDeleteDisconnectedServicesConfig    | /beta/retention/service_groups/delete_disconnected_services/config | GET  | service_groups:scheduler:delete_disconnected_services | read
-JobScheduler | UpdateDeleteDisconnectedServicesConfig | /beta/retention/service_groups/delete_disconnected_services/config | POST | service_groups:scheduler:delete_disconnected_services | configure
+JobScheduler | GetDisconnectedServicesConfig          | /retention/service_groups/disconnected_services/config        | GET  | service_groups:scheduler:disconnected_services        | read
+JobScheduler | UpdateDisconnectedServicesConfig       | /retention/service_groups/disconnected_services/config        | POST | service_groups:scheduler:disconnected_services        | configure
+JobScheduler | GetDeleteDisconnectedServicesConfig    | /retention/service_groups/delete_disconnected_services/config | GET  | service_groups:scheduler:delete_disconnected_services | read
+JobScheduler | UpdateDeleteDisconnectedServicesConfig | /retention/service_groups/delete_disconnected_services/config | POST | service_groups:scheduler:delete_disconnected_services | configure
 {{% /responsive-table %}}
 
 ## Telemetry
