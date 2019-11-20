@@ -70,15 +70,11 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		return err
 	}
 
-	dataFeedClientTask, err := NewDataFeedClientTask(dataFeedConfig, connFactory)
+	dataFeedAggregateTask, err := NewDataFeedAggregateTask(dataFeedConfig, connFactory)
 	if err != nil {
 		return err
 	}
 
-	dataFeedComplianceTask, err := NewDataFeedComplianceTask(dataFeedConfig, connFactory)
-	if err != nil {
-		return err
-	}
 	dataFeedNotifierTask, err := NewDataFeedNotifierTask(dataFeedConfig, connFactory, db)
 	if err != nil {
 		return err
@@ -100,13 +96,7 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 	if err != nil {
 		return err
 	}
-	err = manager.RegisterTaskExecutor(dataFeedClientTaskName, dataFeedClientTask, cereal.TaskExecutorOpts{
-		Workers: 1,
-	})
-	if err != nil {
-		return err
-	}
-	err = manager.RegisterTaskExecutor(dataFeedComplianceTaskName, dataFeedComplianceTask, cereal.TaskExecutorOpts{
+	err = manager.RegisterTaskExecutor(dataFeedAggregateTaskName, dataFeedAggregateTask, cereal.TaskExecutorOpts{
 		Workers: 1,
 	})
 	if err != nil {
@@ -233,37 +223,20 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 
 func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (map[string]interface{}, error) {
 
-	nodeData := make(map[string]interface{}, 0)
-	nodeFilters := &cfgmgmtRequest.Nodes{Filter: filters}
-	nodes, err := client.GetNodes(ctx, nodeFilters)
+	nodeData := make(map[string]interface{})
+	nodeId, lastRunId, err := getNodeFields(ctx, client, filters)
 	if err != nil {
-		log.Errorf("Error getting cfgmgmt/nodes %v", err)
 		return nodeData, err
 	}
 
-	if len(nodes.Values) == 0 {
-		log.Debug("no client run data exists for this node")
-		nodeData["node_data"] = DataFeedMessage{}
-		return nodeData, nil
-	}
-	nodeStruct := nodes.Values[0].GetStructValue()
-	id := nodeStruct.Fields["id"].GetStringValue()
-	lastRunId := nodeStruct.Fields["latest_run_id"].GetStringValue()
-	nodeAttributes, err := client.GetAttributes(ctx, &cfgmgmtRequest.Node{NodeId: id})
+	attributesJson, err := getNodeAttributes(ctx, client, nodeId)
 	if err != nil {
-		log.Errorf("Error getting attributes %v", err)
 		return nodeData, err
 	}
-	var automaticJson map[string]interface{}
-	err = json.Unmarshal([]byte(nodeAttributes.Automatic), &automaticJson)
-	if err != nil {
-		log.Errorf("Could not parse automatic attributes from json: %v", err)
-		return nodeData, err
-	}
-	attributesJson := buildDynamicJson(automaticJson)
+
 	nodeData["attributes"] = attributesJson
 
-	lastRun, err := client.GetNodeRun(ctx, &cfgmgmtRequest.NodeRun{NodeId: id, RunId: lastRunId})
+	lastRun, err := client.GetNodeRun(ctx, &cfgmgmtRequest.NodeRun{NodeId: nodeId, RunId: lastRunId})
 
 	if err != nil {
 		log.Errorf("Error getting node run %v", err)
@@ -271,8 +244,66 @@ func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []st
 	} else {
 		log.Debugf("Last run\n %v", lastRun)
 	}
-	nodeData["node_data"] = DataFeedMessage{LastRun: lastRun}
+	macAddress, hostname := getHostAttributes(attributesJson)
+	nodeData["node_data"] = DataFeedMessage{LastRun: lastRun, Macaddress: macAddress, Hostname: hostname}
 	return nodeData, nil
+}
+
+func getNodeFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, error) {
+
+	nodeFilters := &cfgmgmtRequest.Nodes{Filter: filters}
+	nodes, err := client.GetNodes(ctx, nodeFilters)
+	if err != nil {
+		log.Errorf("Error getting cfgmgmt/nodes %v", err)
+		return "", "", err
+	}
+
+	if len(nodes.Values) == 0 {
+		log.Debug("no node data exists for this node")
+		return "", "", nil
+	}
+	node := nodes.Values[0].GetStructValue()
+	id := node.Fields["id"].GetStringValue()
+	lastRunId := node.Fields["latest_run_id"].GetStringValue()
+
+	return id, lastRunId, nil
+
+}
+
+func getNodeAttributes(ctx context.Context, client cfgmgmt.CfgMgmtClient, nodeId string) (map[string]interface{}, error) {
+
+	attributesJson := make(map[string]interface{})
+
+	nodeAttributes, err := client.GetAttributes(ctx, &cfgmgmtRequest.Node{NodeId: nodeId})
+	if err != nil {
+		log.Errorf("Error getting attributes %v", err)
+		return attributesJson, err
+	}
+
+	err = json.Unmarshal([]byte(nodeAttributes.Automatic), &attributesJson)
+	if err != nil {
+		log.Errorf("Could not parse automatic attributes from json: %v", err)
+		return attributesJson, err
+	}
+	attributesJson = buildDynamicJson(attributesJson)
+	return attributesJson, nil
+}
+
+func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, error) {
+	nodeId, _, err := getNodeFields(ctx, client, filters)
+	if err != nil {
+		return "", "", err
+	}
+	attributesJson, err := getNodeAttributes(ctx, client, nodeId)
+	if err != nil {
+		return "", "", err
+	}
+	macAddress, hostname := getHostAttributes(attributesJson)
+	return macAddress, hostname, nil
+}
+
+func getHostAttributes(attributesJson map[string]interface{}) (string, string) {
+	return attributesJson["macaddress"].(string), attributesJson["hostname"].(string)
 }
 
 func buildDynamicJson(automaticJson map[string]interface{}) map[string]interface{} {
