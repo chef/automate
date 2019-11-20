@@ -10,7 +10,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { HttpStatus } from 'app/types/types';
-import { loading, EntityStatus, pending } from 'app/entities/entities';
+import { loading, EntityStatus } from 'app/entities/entities';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
@@ -64,11 +64,24 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     public projects: ProjectService,
     fb: FormBuilder
   ) {
-    this.loading$ = store.select(getAllStatus).pipe(map(loading));
-    this.sortedProjects$ = store.select(allProjects).pipe(
+    this.createProjectForm = fb.group({
+      // Must stay in sync with error checks in create-object-modal.component.html
+      name: ['', Validators.required],
+      id: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
+    });
+  }
+
+  ngOnInit(): void {
+    this.layoutFacade.showSettingsSidebar();
+    this.projects.getApplyRulesStatus();
+    this.store.dispatch(new GetProjects());
+
+    this.loading$ = this.store.select(getAllStatus).pipe(map(loading));
+    this.sortedProjects$ = this.store.select(allProjects).pipe(
       map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name')));
 
-    this.isIAMv2$ = store.select(isIAMv2);
+    this.isIAMv2$ = this.store.select(isIAMv2);
 
     this.projects.applyRulesStatus$
       .pipe(takeUntil(this.isDestroyed))
@@ -85,41 +98,26 @@ export class ProjectListComponent implements OnInit, OnDestroy {
         }
       });
 
-    store.select(allProjects).pipe(
+    this.store.select(allProjects).pipe(
       takeUntil(this.isDestroyed)
     ).subscribe((projectList: Project[]) => {
       this.projectsHaveStagedChanges = projectList.some(p => p.status === 'EDITS_PENDING');
     });
-
-    this.createProjectForm = fb.group({
-      // Must stay in sync with error checks in create-object-modal.component.html
-      name: ['', Validators.required],
-      id: ['',
-        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
-    });
-  }
-
-  ngOnInit(): void {
-    this.layoutFacade.showSettingsSidebar();
-    this.projects.getApplyRulesStatus();
-    this.store.dispatch(new GetProjects());
 
     // handle project creation success response
     this.store.pipe(
       select(createStatus),
       takeUntil(this.isDestroyed),
       filter(state => {
-        return this.creatingProject && !pending(state);
+        return this.creatingProject && state === EntityStatus.loadingSuccess;
       }))
-      .subscribe(state => {
-        if (state === EntityStatus.loadingSuccess) {
-          this.creatingProject = false;
-          this.closeCreateModal();
+      .subscribe(() => {
+        this.creatingProject = false;
+        this.closeCreateModal();
 
-          // This is issued periodically from projects-filter.effects.ts; we do it now
-          // so the user doesn't have to wait.
-          this.store.dispatch(new LoadOptions());
-        }
+        // This is issued periodically from projects-filter.effects.ts; we do it now
+        // so the user doesn't have to wait.
+        this.store.dispatch(new LoadOptions());
       });
 
     // handle project creation failure response

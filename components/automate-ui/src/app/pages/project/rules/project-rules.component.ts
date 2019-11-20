@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject, combineLatest } from 'rxjs';
-import { takeUntil, pluck, filter } from 'rxjs/operators';
+import { Subject, combineLatest, Observable } from 'rxjs';
+import { takeUntil, pluck, filter, map } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -46,7 +46,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   public project: Project = <Project>{};
   public rule: Rule = <Rule>{};
 
-  public isLoading = true;
+  public isLoading$: Observable<boolean>;
   public saving = false;
   public attributeList: KVPair;
   public attributes: RuleTypeMappedObject;
@@ -74,21 +74,39 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder) {
+    private fb: FormBuilder
+  ) {
+      this.ruleForm = this.fb.group({
+        // Must stay in sync with error checks in project-rules.component.html
+        name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+        id: ['', [Validators.required, Validators.pattern(Regex.patterns.ID),
+        Validators.maxLength(64)]],
+        type: ['', Validators.required],
+        conditions: this.fb.array(this.populateConditions())
+      });
+    }
 
-    combineLatest([
+  ngOnInit(): void {
+    this.conflictErrorEvent.pipe(takeUntil(this.isDestroyed))
+    .subscribe((isConflict: boolean) => {
+      this.conflictError = isConflict;
+      // Open the ID input on conflict so user can resolve it.
+      this.modifyID = true;
+    });
+
+    this.isLoading$ = combineLatest([
       this.store.select(getStatus),
       this.store.select(updateStatus),
       this.store.select(getProjectStatus)
     ]).pipe(
-      takeUntil(this.isDestroyed)
-    ).subscribe(([gStatus, uStatus, gpStatus]) => {
-      const routeId = this.route.snapshot.paramMap.get('ruleid');
-      this.isLoading = routeId &&
-        (gStatus !== EntityStatus.loadingSuccess) ||
-        (uStatus === EntityStatus.loading) ||
-        (gpStatus !== EntityStatus.loadingSuccess);
-      });
+      map(([gStatus, uStatus, gpStatus]) => {
+        const routeId = this.route.snapshot.paramMap.get('ruleid');
+        return routeId &&
+          (gStatus !== EntityStatus.loadingSuccess) ||
+          (uStatus === EntityStatus.loading) ||
+          (gpStatus !== EntityStatus.loadingSuccess);
+      })
+    );
 
     combineLatest([
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
@@ -107,19 +125,27 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(project => {
-        this.project = project;
+      this.project = project;
     });
 
     this.store.select(ruleFromRoute).pipe(
       filter(identity),
       takeUntil(this.isDestroyed)
     ).subscribe(rule => {
-        this.rule = rule;
-        this.editingRule = true;
+      this.rule = rule;
+      this.editingRule = true;
+
+      this.ruleForm = this.fb.group({
+        name: [this.rule.name, [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+        id: [{ value: this.rule.id, disabled: true }], // always disabled, no validation needed
+        type: [{ value: this.rule.type, disabled: true }], // always disabled, no validation needed
+        conditions: this.fb.array(this.populateConditions())
+      });
+      this.attributeList = this.attributes[this.rule.type.toLowerCase()];
     });
 
     this.store.select(getRuleAttributes).pipe(takeUntil(this.isDestroyed))
-    .subscribe(attributes => {
+      .subscribe(attributes => {
         this.attributes = attributes;
       });
 
@@ -152,34 +178,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
           this.closePage();
         }
       });
-  }
-
-  ngOnInit(): void {
-    this.conflictErrorEvent.pipe(takeUntil(this.isDestroyed))
-    .subscribe((isConflict: boolean) => {
-      this.conflictError = isConflict;
-      // Open the ID input on conflict so user can resolve it.
-      this.modifyID = true;
-    });
-
-    if (this.editingRule) {
-      this.ruleForm = this.fb.group({
-        name: [this.rule.name, [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-        id: [{ value: this.rule.id, disabled: true }], // always disabled, no validation needed
-        type: [{ value: this.rule.type, disabled: true }], // always disabled, no validation needed
-        conditions: this.fb.array(this.populateConditions())
-      });
-      this.attributeList = this.attributes[this.rule.type.toLowerCase()];
-    } else {
-      this.ruleForm = this.fb.group({
-        // Must stay in sync with error checks in project-rules.component.html
-        name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-        id: ['', [Validators.required, Validators.pattern(Regex.patterns.ID),
-          Validators.maxLength(64)]],
-        type: ['', Validators.required],
-        conditions: this.fb.array(this.populateConditions())
-      });
-    }
 
     this.checkTypeChange();
   }

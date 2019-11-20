@@ -3,11 +3,11 @@
   [attr.confirm-btn-text]=" saving ? 'Saving Rule...' : 'Save Rule' "
   [attr.heading]="getHeading()"
   [attr.disable-confirm]="!ruleForm.valid || !ruleForm.dirty"
-  [attr.page-loading]="isLoading"
+  [attr.page-loading]="(isLoading$ | async)"
   [attr.confirm-loading]="saving"
   (confirm)="saveRule()"
   (close)="closePage()">
-  <div *ngIf="!isLoading">
+  <div *ngIf="!(isLoading$ | async)">
     <ng-container>
       <form id="ruleForm" [formGroup]="ruleForm" (ngSubmit)="saveRule()">
 
