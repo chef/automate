@@ -83,7 +83,7 @@ module VulcanoTest
     assert_match(UUID_REGEXP, actual)
   end
 
-  def assert_grpc_error(details, code)
+  def assert_grpc_error(details, code=nil)
     begin
       yield
     rescue GRPC::BadStatus => error
@@ -98,7 +98,9 @@ module VulcanoTest
       assert_equal(details, error.details)
     end
 
-    assert_equal(code, error.code)
+    if code
+      assert_equal(code, error.code)
+    end
   end
 
   def assert_equal_json_content(expected, actual)
