@@ -241,7 +241,7 @@ so they are not relevant when assigning IAM resources such as teams or roles.
 
 #### Configuring Project Limit
 
-By default, Chef Automate is currently limited to six projects. If you would like to increase that limit, you will need to do so using the Chef Automate cli:
+By default, Chef Automate is currently limited to six projects. If you would like to increase that limit, you will need to do so using the Chef Automate CLI:
 
 ```
 cat << EOF > autht.toml
