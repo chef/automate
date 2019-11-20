@@ -5,26 +5,25 @@ describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
   const cypressPrefix = 'test-projects-api-client-runs';
 
   const projectsWithRule = [
-    // This test is commented out because there is a current limit of 6 projects allowed
-    // {
-    //   project: {
-    //     id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
-    //     name: 'project org'
-    //   },
-    //   rule: {
-    //     id: 'rule-org',
-    //     name: 'rule CHEF_ORGANIZATION',
-    //     type: 'NODE',
-    //     project_id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
-    //     conditions: [
-    //       {
-    //         attribute: 'CHEF_ORGANIZATION',
-    //         operator: 'EQUALS',
-    //         values: ['75th Rangers']
-    //       }
-    //     ]
-    //   }
-    // },
+    {
+      project: {
+        id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
+        name: 'project org'
+      },
+      rule: {
+        id: 'rule-org',
+        name: 'rule CHEF_ORGANIZATION',
+        type: 'NODE',
+        project_id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
+        conditions: [
+          {
+            attribute: 'CHEF_ORGANIZATION',
+            operator: 'EQUALS',
+            values: ['75th Rangers']
+          }
+        ]
+      }
+    },
     {
       project: {
         id: `${cypressPrefix}-project-chef-server-${Cypress.moment().format('MMDDYYhhmm')}`,
