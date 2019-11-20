@@ -138,6 +138,7 @@ Projects are used in a policy to reduce the scope of that policy's permissions t
 
 {{< info >}}
 Chef Automate is currently limited to six projects while we continue to refine the user experience during this beta period.
+See [Configuring Project Limit]({{< relref "iam-v2-guide.md#configuring-project-limit" >}}) for configuration instructions.
 {{< /info >}}
 
 ### Setting Up Projects

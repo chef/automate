@@ -239,6 +239,25 @@ Projects can be managed via the Projects list under the **Settings** tab and con
 [assigning ingested resources to projects]({{< relref "iam-v2-guide#assigning-ingested-resources-to-projects" >}}),
 so they are not relevant when assigning IAM resources such as teams or roles.
 
+#### Configuring Project Limit
+
+By default, Chef Automate is currently limited to six projects. If you would like to increase that limit, you will need to do so using the Chef Automate CLI:
+
+First, write the file with your new project limit:
+
+```
+cat << EOF > authz.toml
+[auth_z.v1.sys.service]
+project_limit = <desired-max-projects>
+EOF
+```
+
+Then, update the existing Chef Automate configuration:
+
+`chef-automate config patch authz.toml`
+
+Note: As a consequence of increasing the project limit, you may see slower loading times in the UI.
+
 #### Creating a Project
 
 To create a project, navigate to the Projects list under the **Settings** tab and select **Create Project**. You will need to provide a name and can optionally edit the ID. You must create a project before you can assign any resources to it.
