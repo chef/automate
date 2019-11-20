@@ -27,7 +27,7 @@ Before you follow these instructions, we recommend you install the JSON processo
 
 From the **Settings** tab, navigate to the _API Tokens_ page. Admin users and non-admin users with admin-like authorization defined in policies, will see all of the tokens registered in Chef Automate.
 
-For more information on defining policies, see [default policies]({{< relref "default-policies.md" >}}).
+For more information on defining policies, see [IAM v1 policies]({{< relref "iam-v1-policies.md" >}}).
 
 ## Managing API Tokens
 
