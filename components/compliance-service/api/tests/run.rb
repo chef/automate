@@ -83,8 +83,6 @@ module VulcanoTest
     assert_match(UUID_REGEXP, actual)
   end
 
-  #todo - replace all calls to this with the one listed above.. funcs that start with 'assert' will provide line numbers when they fail!
-  # once all calls have been replaced, remove this useless func.. in fact, do the same for all funcs like this.
   def assert_grpc_error(details, code)
     begin
       yield
