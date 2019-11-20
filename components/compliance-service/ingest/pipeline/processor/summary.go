@@ -53,7 +53,6 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 					Version:      profile.Version,
 					Full:         fmt.Sprintf("%s, v%s", profile.Title, profile.Version),
 					Status:       profileStatus,
-					Waived:       compliance.WaivedStatus(&sum),
 					ControlsSums: sum,
 				})
 
@@ -62,7 +61,6 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 			msg.Shared.PerProfileSums = perProfileSums
 			msg.Shared.AllProfileSums = totalSum
 			msg.Shared.Status = compliance.ReportComplianceStatus(totalSum)
-			msg.Shared.Waived = compliance.WaivedStatus(totalSum)
 			msg.Shared.EndTime, err = time.Parse(time.RFC3339, msg.Report.EndTime)
 			if err != nil {
 				grpcErr := status.Errorf(codes.Internal, "Unable to Parse end_time: %s", err)
@@ -94,7 +92,6 @@ func ComplianceSummary(in <-chan message.Compliance) <-chan message.Compliance {
 				ControlsSums:     *msg.Shared.AllProfileSums,
 				Profiles:         msg.Shared.PerProfileSums,
 				Status:           msg.Shared.Status,
-				Waived:           msg.Shared.Waived,
 				DocVersion:       compliance.DocVersion,
 				ESTimestamp:      compliance.CurrentTime(),
 				PolicyName:       msg.Report.PolicyName,
