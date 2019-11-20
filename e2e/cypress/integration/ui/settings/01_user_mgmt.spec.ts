@@ -82,7 +82,7 @@ describe('user management', () => {
       .focus().type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
     cy.get('[formcontrolname=confirmPassword]').find('input')
       .focus().type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
-    cy.get('app-user-details chef-button').contains('Update Password').click({ force: true} );
+    cy.get('app-user-details chef-button').contains('Update Password').click({ force: true });
 
     // success alert displays
     cy.get('#main-content-wrapper').scrollTo('top');
@@ -99,7 +99,7 @@ describe('user management', () => {
     cy.wait('@getUsers');
 
     cy.get('app-user-table chef-table-cell').contains(username).parent()
-        .find('chef-control-menu').as('controlMenu');
+      .find('mat-select').as('controlMenu');
     // we throw in a should so cypress waits until introspection allows menu to be shown
     cy.get('@controlMenu').should('be.visible')
       .click();

@@ -88,13 +88,13 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     // save the node
     cy.get('chef-button').contains('Add 1 Node(s)').click();
 
-      cy.url().should('include', '/compliance/scan-jobs/nodes');
+    cy.url().should('include', '/compliance/scan-jobs/nodes');
 
-      // wait for data to return
-      cy.wait('@createNode');
+    // wait for data to return
+    cy.wait('@createNode');
 
-      // assert table has node
-      cy.contains(nodePrefix).should('exist');
+    // assert table has node
+    cy.contains(nodePrefix).should('exist');
   });
 
   itFlaky('can install a profile', () => {
@@ -187,9 +187,9 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     cy.wait('@getSecrets');
 
     // delete the credential
-    cy.contains(credName).parent().parent().find('chef-control-menu').as('row-menu');
+    cy.contains(credName).parent().parent().find('mat-select').as('row-menu');
     cy.get('@row-menu').click().then(() => {
-      cy.get('@row-menu').find('[data-cy=delete]').click({force: true});
+      cy.get('@row-menu').find('[data-cy=delete]').click({ force: true });
     });
   });
 
@@ -248,7 +248,7 @@ describe('create a manual node ssh scan job and cleanup after', () => {
     // delete scan job
     cy.contains(jobName)
       .parent().parent().find('chef-button[label="delete"]').click();
-        cy.get('chef-modal').find('chef-button').contains('Delete').click();
+    cy.get('chef-modal').find('chef-button').contains('Delete').click();
 
     // wait for the delete to finish:
 
