@@ -6,6 +6,15 @@ describe File.basename(__FILE__) do
 
   def profiles ; Profiles::ProfilesService ; end
 
+  it "errors out when an invalid order field is specified" do
+    assert_grpc_error(/some error message/) do
+      GRPC profiles, :list, Profiles::Query.new(
+        sort: 'name',
+        order: 1337
+      )
+    end
+  end
+
   it "errors out when an invalid sort field is specified" do
     assert_grpc_error(/sort field 'bogus' is invalid. Use either 'name', 'title' or 'maintainer'/, 3) do
       GRPC profiles, :list, Profiles::Query.new(
