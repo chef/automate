@@ -15,7 +15,7 @@ This content is specific to IAM v1, see [IAM v2 Overview]({{< ref "iam-v2-overvi
 {{< /info >}}
 
 Chef Automate has two different types of API tokens: administrative and standard.
-With an administrative token you can access the entire Chef Automate API--including administrative tasks such as [managing local users]({{< relref "users.md" >}}) and [managing local teams]({{< relref "teams.md" >}}) and [IAM v1 overview]({{< relref "iam-v1-overview.md" >}}).
+With an administrative token you can access the entire Chef Automate API--including administrative tasks such as [managing local users]({{< relref "users.md" >}}), managing local teams]({{< relref "teams.md" >}}), and [refining IAM permissions]({{< relref "iam-v1-overview.md" >}}).
 Standard tokens have much more limited permissions; they are designed for Chef Clients and InSpec Agents to send data to Chef Automate.
 You can also use a standard token to access any part of the Chef Automate API if you write a policy granting it specific access. However, granting a user access to the ``auth:tokens`` resource also gives that user access to the administrative token.
 
