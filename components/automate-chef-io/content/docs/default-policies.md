@@ -11,8 +11,6 @@ toc = true
     weight = 20
 +++
 
-# Default Policies in Chef Automate
-
 This page provides an in-depth look at each of Chef Automate's IAM v1 default policies and
 the specific endpoints they protect.
 
