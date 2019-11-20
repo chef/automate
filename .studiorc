@@ -7,9 +7,7 @@ RECOMMENDED_HAB_VERSION="0.77.0"
 
 GOLANGCILINTVERSION=1.21.0
 
-# TODO(ssd) 2019-11-19: We are still investigating the behavior change
-# here, but newly created non-docker studios on 0.90.6 are getting
-# this set to a non-existent file, leading to failures.
+# TODO(ssd) 2019-11-19: https://github.com/habitat-sh/habitat/issues/7219
 unset SSL_CERT_FILE
 
 # shellcheck disable=1090
