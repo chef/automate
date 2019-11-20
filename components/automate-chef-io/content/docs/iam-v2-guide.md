@@ -324,7 +324,7 @@ On the project list page, the button `Update Projects` should be enabled since a
 
 ![](/images/docs/update-projects-button.png)
 
-[Updating a project] ({{< ref "iam-v2-api-reference.md#applying-rules" >}}) begins an operation that applies all pending rule edits and then moves ingested resources into the correct projects according to those latest changes. An ingested resource is moved into a project if it matches at least one of the project's rules.
+Updating a project begins an operation that applies all pending rule edits and then moves ingested resources into the correct projects according to those latest changes. An ingested resource is moved into a project if it matches at least one of the project's rules.
 In this example, upon successful update, all ingested resources whose Chef Organization matches `devops` will be considered a part of the project `project-devops`.
 Only these resources will appear in Automate's dashboards when the `project-devops` project has been selected in the global project filter.
 

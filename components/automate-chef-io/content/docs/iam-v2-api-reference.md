@@ -502,7 +502,7 @@ curl -sSH "api-token: $TOKEN" -X DELETE \
 https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}/rules/{rule-id}?pretty
 ```
 
-#### Applying Rules
+## Applying Rules
 
 HTTP request                                          | Description
 ------------------------------------------------------|------------
