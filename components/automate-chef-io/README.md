@@ -155,7 +155,7 @@ It is safe to run this command multiple times in a row while fixing syntax error
 
 ### Tags and Tag Groups
 
-* Endpoints need to appear in the rendered documentation human-readable groupings. We use group and endpoint tags to create an organized and meaningful presentation for the Chef Automate API.
+* Endpoints need to appear in the rendered documentation as human-readable groupings. We use group and endpoint tags to create an organized and meaningful presentation for the Chef Automate API.
 * Endpoints must have a tag that is a member of a tag group in order to appear in the rendered documentation. Endpoints without tags that are members of a tag group will not show up.
 * An endpoint's default tag is the parent service where it was defined.
 * Every service must have a unique tag name. For services without unique names, follow the explicit tagging process. Without unique service tag names, all endpoints for all of these services appear together in the rendered documentation.
@@ -178,13 +178,13 @@ Set up automatic tagging in the `components/automate-chef-io/data/docs/api-stati
     ```
 
 * All of the tags for an individual service should be the same, unless multiple groupings are desired in which case multiple independent tags can be used.
-* After this the process described for automatic tagging can be used, substituting the custom tag defined in place of the service's name.
+* After this, the process described for automatic tagging can be used, substituting the custom tag defined in place of the service's name.
 
 ## Notes
 
 * Proto files can use tabs and spaces. We have a defacto convention for using tabs since our protos are primarily used with Go code.
 * Endpoints will not show up in the UI unless one or more of their tags are assigned to a tag group, but they will still appear in the Swagger file accessible through the docs in the browser.
-  * To explicitly hide an endpoint and remove it from the Swagger file, assign it the tag of `hidden` and it will be filtered out in pre-processing.
+* To explicitly hide an endpoint and remove it from the Swagger file, assign it the tag of `hidden` and it will be filtered out in pre-processing.
 * multiline fields are not allowed in proto files. This the main reason we settled on using the comment style of endpoint documentation.
 
 ### API Style Guide
@@ -354,12 +354,12 @@ message ProfileCounts {
 ```
 
 * Use a period (`.`) at the end of the comment controls whether the field will get to set the `description` for message fields.
-* Swagger relies on inheritance to document nested references. A parent message referenced in a child message inherits its description from the parent, not where it is referenced by the child(see the example of `favorite_food` above). The Chef API style uses `// Intentionally blank.` in the child message.
+* Swagger relies on inheritance to document nested references. A parent message referenced in a child message inherits its description from the parent, not where it is referenced by the child (see the example of `favorite_food` above). The Chef API style uses `// Intentionally blank.` in the child message.
 This convention makes the purpose of the comment clear, makes undocumented message code visible, and makes bad blank message comment lines stand out in the UI.
 
 ## Non-Proto File Sources for API Documentation
 
-We use non-proto file sources to document API content in cases where proto file conversion to Swagger our the front-end ReDoc tools have pronounced limitations, as well as in cases where expressing the content in proto files is cumbersome.
+We use non-proto file sources to document API content in cases where proto files run up against the limitations of tool we use for the Swagger conversion and also in cases where expressing the content in proto files is cumbersome.
 We support these cases by adding static Swagger JSON or YAML files that combine with the Swagger generated from the proto files.
 
 ### When to use Non-Proto Files
