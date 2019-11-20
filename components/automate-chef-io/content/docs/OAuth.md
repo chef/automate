@@ -11,11 +11,12 @@ toc = true
     weight = 40
 +++
 
-## Alpha: Setting up Automate as an OAuth Provider for Habitat Builder
+{{< warning >}}
+These instructions have been deprecated in favor of using [Automate to deploy Habitat
+Builder]({{<relref "on-prem-builder.md">}}).
+{{< /warning >}}
 
-{{% warning %}}
-Authentication via Automate for Habitat Builder is still in Alpha.
-{{% /warning %}}
+## Alpha: Setting up Automate as an OAuth Provider for Habitat Builder
 
 To configure Chef Automate as an OAuth Provider for Habitat Builder, create a TOML file
 that contains the partial configuration below.
