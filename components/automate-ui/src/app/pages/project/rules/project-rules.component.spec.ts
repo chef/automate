@@ -13,6 +13,7 @@ import { Rule, Condition, ConditionOperator, RuleType } from 'app/entities/rules
 import { ruleEntityReducer } from 'app/entities/rules/rule.reducer';
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectRulesComponent } from './project-rules.component';
+import { of as observableOf } from 'rxjs';
 
 describe('ProjectRulesComponent', () => {
   let component: ProjectRulesComponent;
@@ -113,7 +114,7 @@ describe('ProjectRulesComponent', () => {
     beforeEach(() => {
       component.project = project;
       component.rule = <Rule>{};
-      component.isLoading = false;
+      component.isLoading$ = observableOf(false);
       fixture.detectChanges();
     });
 

@@ -2,16 +2,16 @@ import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject, combineLatest } from 'rxjs';
-import { takeUntil, pluck, filter } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
+import { Subject, combineLatest, Observable } from 'rxjs';
+import { takeUntil, pluck, filter, map } from 'rxjs/operators';
+import { identity, isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { HttpStatus } from 'app/types/types';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
-import { EntityStatus, loading } from 'app/entities/entities';
+import { EntityStatus, pending } from 'app/entities/entities';
 import {
   Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator, KVPair
 } from 'app/entities/rules/rule.model';
@@ -46,7 +46,7 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
   public project: Project = <Project>{};
   public rule: Rule = <Rule>{};
 
-  public isLoading = true;
+  public isLoading$: Observable<boolean>;
   public saving = false;
   public attributeList: KVPair;
   public attributes: RuleTypeMappedObject;
@@ -74,63 +74,67 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder) {
-
-      combineLatest([
-        this.store.select(getStatus),
-        this.store.select(updateStatus),
-        this.store.select(getProjectStatus)
-      ]).pipe(
-        takeUntil(this.isDestroyed)
-      ).subscribe(([gStatus, uStatus, gpStatus]) => {
-        const routeId = this.route.snapshot.paramMap.get('ruleid');
-        this.isLoading = routeId &&
-          (gStatus !== EntityStatus.loadingSuccess) ||
-          (uStatus === EntityStatus.loading) ||
-          (gpStatus !== EntityStatus.loadingSuccess);
-        });
-
-      combineLatest([
-        this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
-        this.store.select(routeParams).pipe(pluck('ruleid'), filter(identity))
-      ]).pipe(
-        takeUntil(this.isDestroyed)
-      ).subscribe(([project_id, rule_id]: string[]) => {
-        this.store.dispatch(new GetProject({ id: project_id }));
-        this.store.dispatch(new GetRule({
-          id: rule_id,
-          project_id
-        }));
+    private fb: FormBuilder
+  ) {
+      this.ruleForm = this.fb.group({
+        // Must stay in sync with error checks in project-rules.component.html
+        name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+        id: ['', [Validators.required, Validators.pattern(Regex.patterns.ID),
+        Validators.maxLength(64)]],
+        type: ['', Validators.required],
+        conditions: this.fb.array(this.populateConditions())
       });
-
-      this.store.select(projectFromRoute).pipe(
-        filter(identity),
-        takeUntil(this.isDestroyed)
-      ).subscribe(project => {
-          this.project = project;
-      });
-
-      this.store.select(ruleFromRoute).pipe(
-        filter(identity),
-        takeUntil(this.isDestroyed)
-      ).subscribe(rule => {
-          this.rule = rule;
-          this.editingRule = true;
-      });
-
-      this.store.select(getRuleAttributes).subscribe(attributes => {
-        this.attributes = attributes;
-      });
-  }
+    }
 
   ngOnInit(): void {
-    this.conflictErrorEvent.subscribe((isConflict: boolean) => {
+    this.conflictErrorEvent.pipe(takeUntil(this.isDestroyed))
+    .subscribe((isConflict: boolean) => {
       this.conflictError = isConflict;
       // Open the ID input on conflict so user can resolve it.
       this.modifyID = true;
     });
 
-    if (this.editingRule) {
+    this.isLoading$ = combineLatest([
+      this.store.select(getStatus),
+      this.store.select(updateStatus),
+      this.store.select(getProjectStatus)
+    ]).pipe(
+      map(([gStatus, uStatus, gpStatus]) => {
+        const routeId = this.route.snapshot.paramMap.get('ruleid');
+        return routeId &&
+          (gStatus !== EntityStatus.loadingSuccess) ||
+          (uStatus === EntityStatus.loading) ||
+          (gpStatus !== EntityStatus.loadingSuccess);
+      })
+    );
+
+    combineLatest([
+      this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
+      this.store.select(routeParams).pipe(pluck('ruleid'), filter(identity))
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([project_id, rule_id]: string[]) => {
+      this.store.dispatch(new GetProject({ id: project_id }));
+      this.store.dispatch(new GetRule({
+        id: rule_id,
+        project_id
+      }));
+    });
+
+    this.store.select(projectFromRoute).pipe(
+      filter(identity),
+      takeUntil(this.isDestroyed)
+    ).subscribe(project => {
+      this.project = project;
+    });
+
+    this.store.select(ruleFromRoute).pipe(
+      filter(identity),
+      takeUntil(this.isDestroyed)
+    ).subscribe(rule => {
+      this.rule = rule;
+      this.editingRule = true;
+
       this.ruleForm = this.fb.group({
         name: [this.rule.name, [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
         id: [{ value: this.rule.id, disabled: true }], // always disabled, no validation needed
@@ -138,16 +142,42 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         conditions: this.fb.array(this.populateConditions())
       });
       this.attributeList = this.attributes[this.rule.type.toLowerCase()];
-    } else {
-      this.ruleForm = this.fb.group({
-        // Must stay in sync with error checks in project-rules.component.html
-        name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-        id: ['', [Validators.required, Validators.pattern(Regex.patterns.ID),
-          Validators.maxLength(64)]],
-        type: ['', Validators.required],
-        conditions: this.fb.array(this.populateConditions())
+    });
+
+    this.store.select(getRuleAttributes).pipe(takeUntil(this.isDestroyed))
+      .subscribe(attributes => {
+        this.attributes = attributes;
       });
-    }
+
+    // handle rule creation/update success
+    combineLatest([
+      this.store.select(createStatus),
+      this.store.select(updateStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([cStatus, uStatus]) => this.saving && (!pending(cStatus) || !pending(uStatus))))
+      .subscribe(([cStatus, uStatus]) => {
+        this.saving = false;
+        if (cStatus === EntityStatus.loadingSuccess || uStatus === EntityStatus.loadingSuccess) {
+          this.closePage();
+        }
+      });
+
+    // handle rule creation failure
+    combineLatest([
+      this.store.select(createStatus),
+      this.store.select(createError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictErrorEvent.emit(true);
+        } else {
+          // close modal on any error other than conflict and display in banner
+          this.closePage();
+        }
+      });
 
     this.checkTypeChange();
   }
@@ -268,36 +298,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     if (this.ruleForm.valid) {
       this.saving = true;
       this.rule.id ? this.updateRule() : this.createRule();
-      const selector = this.rule.id ? updateStatus : createStatus;
-      const pendingSave = new Subject<boolean>();
-      this.store.select(selector).pipe(
-        filter(identity),
-        takeUntil(pendingSave))
-        .subscribe((state) => {
-          if (!loading(state)) {
-            pendingSave.next(true);
-            pendingSave.complete();
-            this.saving = false;
-            if (state === EntityStatus.loadingSuccess) {
-              this.closePage();
-            } else if (state === EntityStatus.loadingFailure) {
-              const pendingCreateError = new Subject<boolean>();
-              this.store.select(createError).pipe(
-                filter(identity),
-                takeUntil(pendingCreateError))
-                .subscribe((error) => {
-                  pendingCreateError.next(true);
-                  pendingCreateError.complete();
-                  if (error.status === HttpStatus.CONFLICT) {
-                    this.conflictErrorEvent.emit(true);
-                  } else {
-                    // Close on any error other than conflict and display in banner.
-                    this.closePage();
-                  }
-              });
-            }
-          }
-        });
     }
   }
 

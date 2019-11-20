@@ -2,7 +2,6 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
-import { of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
@@ -18,6 +17,9 @@ import { projectEntityReducer, ApplyRulesStatusState } from 'app/entities/projec
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { ProjectListComponent } from './project-list.component';
+import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
+import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
+import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
 
 describe('ProjectListComponent', () => {
   let component: ProjectListComponent;
@@ -96,9 +98,13 @@ describe('ProjectListComponent', () => {
         ReactiveFormsModule,
         RouterTestingModule,
         ChefPipesModule,
-        StoreModule.forRoot({
+        StoreModule.forRoot(
+          {
           policies: policyEntityReducer,
-          projects: projectEntityReducer
+          projects: projectEntityReducer,
+          // not used directly in this component, needed to suppress unit test warnings
+          notifications: notificationEntityReducer,
+          clientRunsEntity: clientRunsEntityReducer
         }, { runtimeChecks })
       ],
       providers: [
@@ -116,7 +122,7 @@ describe('ProjectListComponent', () => {
     element = fixture.debugElement.nativeElement;
     store = TestBed.get(Store);
 
-    component.isIAMv2$ = observableOf(true);
+    store.dispatch(new GetIamVersionSuccess({ version: { major: 'v2' } }));
     fixture.detectChanges();
   });
 
@@ -143,7 +149,7 @@ describe('ProjectListComponent', () => {
     });
 
     it('does not display project data for v1', () => {
-      component.isIAMv2$ = observableOf(false);
+      store.dispatch(new GetIamVersionSuccess({ version: { major: 'v1' } }));
       store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       expect(element).not.toContainPath('chef-table-new');
     });

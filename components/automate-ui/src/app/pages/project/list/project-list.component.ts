@@ -1,9 +1,9 @@
 import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
-import { Store } from '@ngrx/store';
-import { interval as observableInterval,  Observable, Subject } from 'rxjs';
+import { Store, select } from '@ngrx/store';
+import { interval as observableInterval,  Observable, Subject, combineLatest } from 'rxjs';
 import { map, takeUntil, filter, take } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
+import { isNil } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -64,11 +64,24 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     public projects: ProjectService,
     fb: FormBuilder
   ) {
-    this.loading$ = store.select(getAllStatus).pipe(map(loading));
-    this.sortedProjects$ = store.select(allProjects).pipe(
+    this.createProjectForm = fb.group({
+      // Must stay in sync with error checks in create-object-modal.component.html
+      name: ['', Validators.required],
+      id: ['',
+        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
+    });
+  }
+
+  ngOnInit(): void {
+    this.layoutFacade.showSettingsSidebar();
+    this.projects.getApplyRulesStatus();
+    this.store.dispatch(new GetProjects());
+
+    this.loading$ = this.store.select(getAllStatus).pipe(map(loading));
+    this.sortedProjects$ = this.store.select(allProjects).pipe(
       map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name')));
 
-    this.isIAMv2$ = store.select(isIAMv2);
+    this.isIAMv2$ = this.store.select(isIAMv2);
 
     this.projects.applyRulesStatus$
       .pipe(takeUntil(this.isDestroyed))
@@ -85,24 +98,45 @@ export class ProjectListComponent implements OnInit, OnDestroy {
         }
       });
 
-    store.select(allProjects).pipe(
+    this.store.select(allProjects).pipe(
       takeUntil(this.isDestroyed)
     ).subscribe((projectList: Project[]) => {
       this.projectsHaveStagedChanges = projectList.some(p => p.status === 'EDITS_PENDING');
     });
 
-    this.createProjectForm = fb.group({
-      // Must stay in sync with error checks in create-object-modal.component.html
-      name: ['', Validators.required],
-      id: ['',
-        [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]]
-    });
-  }
+    // handle project creation success response
+    this.store.pipe(
+      select(createStatus),
+      takeUntil(this.isDestroyed),
+      filter(state => {
+        return this.creatingProject && state === EntityStatus.loadingSuccess;
+      }))
+      .subscribe(() => {
+        this.creatingProject = false;
+        this.closeCreateModal();
 
-  ngOnInit(): void {
-    this.layoutFacade.showSettingsSidebar();
-    this.projects.getApplyRulesStatus();
-    this.store.dispatch(new GetProjects());
+        // This is issued periodically from projects-filter.effects.ts; we do it now
+        // so the user doesn't have to wait.
+        this.store.dispatch(new LoadOptions());
+      });
+
+    // handle project creation failure response
+    combineLatest([
+      this.store.select(createStatus),
+      this.store.select(createError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(() => this.createModalVisible),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictErrorEvent.emit(true);
+          this.creatingProject = false;
+        } else {
+          // close modal on any error other than conflict and display in banner
+          this.closeCreateModal();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -136,39 +170,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       name: this.createProjectForm.controls['name'].value.trim()
     };
     this.store.dispatch(new CreateProject(project));
-
-    const pendingCreate = new Subject<boolean>();
-    this.store.select(createStatus).pipe(
-      filter(identity),
-      takeUntil(pendingCreate))
-      .subscribe((state) => {
-        if (!loading(state)) {
-          pendingCreate.next(true);
-          pendingCreate.complete();
-          this.creatingProject = false;
-          if (state === EntityStatus.loadingSuccess) {
-            // This is issued periodically from projects-filter.effects.ts; we do it now
-            // so the user doesn't have to wait.
-            this.store.dispatch(new LoadOptions());
-            this.closeCreateModal();
-          }
-          if (state === EntityStatus.loadingFailure) {
-            const pendingCreateError = new Subject<boolean>();
-            this.store.select(createError).pipe(
-              filter(identity),
-              takeUntil(pendingCreateError))
-              .subscribe((error) => {
-                pendingCreateError.next(true);
-                pendingCreateError.complete();
-                if (error.status === HttpStatus.CONFLICT) {
-                  this.conflictErrorEvent.emit(true);
-                } else { // Close the modal on any error other than conflict and display in banner.
-                  this.closeCreateModal();
-                }
-            });
-          }
-        }
-      });
   }
 
   public openCreateModal(): void {
