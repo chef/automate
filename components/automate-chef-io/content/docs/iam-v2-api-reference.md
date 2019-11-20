@@ -502,6 +502,18 @@ curl -sSH "api-token: $TOKEN" -X DELETE \
 https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}/rules/{rule-id}?pretty
 ```
 
+#### Applying Rules
+
+HTTP request                                          | Description
+------------------------------------------------------|------------
+GET    /apply-rules                                   | get status of a rule application
+POST   /apply-rules                                   | start applying pending rule or project edits
+DELETE /apply-rules                                   | stop applying pending rule or project edits
+
+**NOTE**: With a large ammount of historical compliance data, rule application
+can take a considerable amount of time. If making a large number of rule
+changes, it's best to batch them up and apply them all at once.
+
 ## Users
 
 HTTP request              | Description
