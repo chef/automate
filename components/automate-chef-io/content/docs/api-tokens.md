@@ -11,7 +11,7 @@ toc = true
 +++
 
 {{< info >}}
-This content is specific to IAM v1, see [IAM v2 Overview]({{< ref "iam-v2-overview.md#" >}}) for IAM v2 specific information.
+This content is specific to IAM v1. See [IAM v2 Overview]({{< ref "iam-v2-overview.md#" >}}) for IAM v2 specific information.
 {{< /info >}}
 
 Chef Automate has two different types of API tokens: administrative and standard.
