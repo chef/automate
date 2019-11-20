@@ -31,7 +31,7 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // The ServiceStatus enum describes the status of the service
-// @afiune have we defined these states somewhere?
+// Currently unimplemented
 type ServiceStatus int32
 
 const (
@@ -102,13 +102,17 @@ func (HealthStatus) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_6daf34f0710a8049, []int{1}
 }
 
+// Request message for GetServices.
 type ServicesReq struct {
-	Filter               []string          `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
-	Pagination           *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
-	Sorting              *query.Sorting    `protobuf:"bytes,3,opt,name=sorting,proto3" json:"sorting,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	// Search bar filters to apply to services, in the format of fieldname:value.
+	Filter []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
+	// Pagination parameters to apply to the returns services list.
+	Pagination *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	// Sorting parameters to apply to the returns services list.
+	Sorting              *query.Sorting `protobuf:"bytes,3,opt,name=sorting,proto3" json:"sorting,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *ServicesReq) Reset()         { *m = ServicesReq{} }
@@ -157,9 +161,13 @@ func (m *ServicesReq) GetSorting() *query.Sorting {
 	return nil
 }
 
+// Request message for GetServicesDistinctValues.
 type ServicesDistinctValuesReq struct {
-	FieldName            string   `protobuf:"bytes,1,opt,name=field_name,json=fieldName,proto3" json:"field_name,omitempty"`
-	QueryFragment        string   `protobuf:"bytes,2,opt,name=query_fragment,json=queryFragment,proto3" json:"query_fragment,omitempty"`
+	// Field name of service values to retrieve.
+	FieldName string `protobuf:"bytes,1,opt,name=field_name,json=fieldName,proto3" json:"field_name,omitempty"`
+	// Text of value to query, supports wildcards (* and ?).
+	QueryFragment string `protobuf:"bytes,2,opt,name=query_fragment,json=queryFragment,proto3" json:"query_fragment,omitempty"`
+	// Filters to apply to values, in the format of fieldname:value.
 	Filter               []string `protobuf:"bytes,3,rep,name=filter,proto3" json:"filter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -212,14 +220,19 @@ func (m *ServicesDistinctValuesReq) GetFilter() []string {
 	return nil
 }
 
+// Request message for GetServicesBySG.
 type ServicesBySGReq struct {
-	ServiceGroupId       string            `protobuf:"bytes,1,opt,name=service_group_id,json=serviceGroupId,proto3" json:"service_group_id,omitempty"`
-	Pagination           *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
-	Sorting              *query.Sorting    `protobuf:"bytes,3,opt,name=sorting,proto3" json:"sorting,omitempty"`
-	Filter               []string          `protobuf:"bytes,5,rep,name=filter,proto3" json:"filter,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	// Service group ID of the services.
+	ServiceGroupId string `protobuf:"bytes,1,opt,name=service_group_id,json=serviceGroupId,proto3" json:"service_group_id,omitempty"`
+	// Pagination parameters to apply to the returned list of services.
+	Pagination *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	// Sorting paramters to apply to the returned list of services.
+	Sorting *query.Sorting `protobuf:"bytes,3,opt,name=sorting,proto3" json:"sorting,omitempty"`
+	// Filters to apply to services, in the format of fieldname:value.
+	Filter               []string `protobuf:"bytes,5,rep,name=filter,proto3" json:"filter,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *ServicesBySGReq) Reset()         { *m = ServicesBySGReq{} }
@@ -275,9 +288,13 @@ func (m *ServicesBySGReq) GetFilter() []string {
 	return nil
 }
 
+// Response message for GetServicesBySG.
 type ServicesBySGRes struct {
-	Group                string        `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
-	Services             []*Service    `protobuf:"bytes,2,rep,name=services,proto3" json:"services,omitempty"`
+	// Service group name.
+	Group string `protobuf:"bytes,1,opt,name=group,proto3" json:"group,omitempty"`
+	// List of services.
+	Services []*Service `protobuf:"bytes,2,rep,name=services,proto3" json:"services,omitempty"`
+	// Health counts for services in the service group.
 	ServicesHealthCounts *HealthCounts `protobuf:"bytes,3,opt,name=services_health_counts,json=servicesHealthCounts,proto3" json:"services_health_counts,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
@@ -330,7 +347,9 @@ func (m *ServicesBySGRes) GetServicesHealthCounts() *HealthCounts {
 	return nil
 }
 
+// Response message for GetServices.
 type ServicesRes struct {
+	// List of services.
 	Services             []*Service `protobuf:"bytes,1,rep,name=services,proto3" json:"services,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
 	XXX_unrecognized     []byte     `json:"-"`
@@ -369,7 +388,9 @@ func (m *ServicesRes) GetServices() []*Service {
 	return nil
 }
 
+// Response message for GetServicesDistinctValues.
 type ServicesDistinctValuesRes struct {
+	// List of distinct values fitting query_fragment and filters.
 	Values               []string `protobuf:"bytes,1,rep,name=values,proto3" json:"values,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -408,7 +429,9 @@ func (m *ServicesDistinctValuesRes) GetValues() []string {
 	return nil
 }
 
+// Request message for GetDisconnectedServices.
 type DisconnectedServicesReq struct {
+	// Threshold for marking services disconnected in seconds.
 	ThresholdSeconds     int32    `protobuf:"varint,2,opt,name=threshold_seconds,json=thresholdSeconds,proto3" json:"threshold_seconds,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -447,6 +470,7 @@ func (m *DisconnectedServicesReq) GetThresholdSeconds() int32 {
 	return 0
 }
 
+// Request message for ServicesStats.
 type ServicesStatsReq struct {
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -478,10 +502,15 @@ func (m *ServicesStatsReq) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ServicesStatsReq proto.InternalMessageInfo
 
+// Response message for ServicesStats.
 type ServicesStatsRes struct {
-	TotalServiceGroups   int32    `protobuf:"varint,1,opt,name=total_service_groups,json=totalServiceGroups,proto3" json:"total_service_groups,omitempty"`
-	TotalServices        int32    `protobuf:"varint,2,opt,name=total_services,json=totalServices,proto3" json:"total_services,omitempty"`
-	TotalSupervisors     int32    `protobuf:"varint,3,opt,name=total_supervisors,json=totalSupervisors,proto3" json:"total_supervisors,omitempty"`
+	// Total service groups reporting to automate.
+	TotalServiceGroups int32 `protobuf:"varint,1,opt,name=total_service_groups,json=totalServiceGroups,proto3" json:"total_service_groups,omitempty"`
+	// Total services reporting to automate (connected and disconnected).
+	TotalServices int32 `protobuf:"varint,2,opt,name=total_services,json=totalServices,proto3" json:"total_services,omitempty"`
+	// Total supervisors reporting to automate.
+	TotalSupervisors int32 `protobuf:"varint,3,opt,name=total_supervisors,json=totalSupervisors,proto3" json:"total_supervisors,omitempty"`
+	// Total deployments reporting to automate.
 	TotalDeployments     int32    `protobuf:"varint,4,opt,name=total_deployments,json=totalDeployments,proto3" json:"total_deployments,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -541,8 +570,11 @@ func (m *ServicesStatsRes) GetTotalDeployments() int32 {
 	return 0
 }
 
+// Configuration information for periodic jobs.
 type PeriodicJobConfig struct {
+	// Is the job running? false is disabled, true is enabled.
 	Running bool `protobuf:"varint,1,opt,name=running,proto3" json:"running,omitempty"`
+	// Time based threshold for the periodic job to use in evaluating services.
 	// To match the ingest API at /retention/nodes/missing-nodes/config, we use a
 	// string format that is a subset of elasticsearch's date math. See the
 	// simpledatemath package under lib/ for more details
@@ -591,9 +623,11 @@ func (m *PeriodicJobConfig) GetThreshold() string {
 	return ""
 }
 
+// Configuration information for a mandatory periodic job.
 // it's like a PeriodicJobConfig but the user isn't allowed to change whether
 // or not the job runs
 type PeriodicMandatoryJobConfig struct {
+	// Time based threshold for the periodic job to use in evaluating services.
 	// To match the ingest API at /retention/nodes/missing-nodes/config, we use a
 	// string format that is a subset of elasticsearch's date math. See the
 	// simpledatemath package under lib/ for more details
@@ -764,27 +798,45 @@ func (m *UpdateDeleteDisconnectedServicesConfigRes) XXX_DiscardUnknown() {
 var xxx_messageInfo_UpdateDeleteDisconnectedServicesConfigRes proto.InternalMessageInfo
 
 type Service struct {
-	SupervisorId         string               `protobuf:"bytes,1,opt,name=supervisor_id,json=supervisorId,proto3" json:"supervisor_id,omitempty"`
-	Release              string               `protobuf:"bytes,2,opt,name=release,proto3" json:"release,omitempty"`
-	Group                string               `protobuf:"bytes,3,opt,name=group,proto3" json:"group,omitempty"`
-	HealthCheck          HealthStatus         `protobuf:"varint,4,opt,name=health_check,json=healthCheck,proto3,enum=chef.automate.api.applications.HealthStatus" json:"health_check,omitempty"`
-	Status               ServiceStatus        `protobuf:"varint,5,opt,name=status,proto3,enum=chef.automate.api.applications.ServiceStatus" json:"status,omitempty"`
-	Application          string               `protobuf:"bytes,6,opt,name=application,proto3" json:"application,omitempty"`
-	Environment          string               `protobuf:"bytes,7,opt,name=environment,proto3" json:"environment,omitempty"`
-	Fqdn                 string               `protobuf:"bytes,8,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
-	Channel              string               `protobuf:"bytes,9,opt,name=channel,proto3" json:"channel,omitempty"`
-	UpdateStrategy       string               `protobuf:"bytes,10,opt,name=update_strategy,json=updateStrategy,proto3" json:"update_strategy,omitempty"`
-	Site                 string               `protobuf:"bytes,17,opt,name=site,proto3" json:"site,omitempty"`
-	PreviousHealthCheck  HealthStatus         `protobuf:"varint,18,opt,name=previous_health_check,json=previousHealthCheck,proto3,enum=chef.automate.api.applications.HealthStatus" json:"previous_health_check,omitempty"`
-	CurrentHealthSince   string               `protobuf:"bytes,19,opt,name=current_health_since,json=currentHealthSince,proto3" json:"current_health_since,omitempty"`
-	HealthUpdatedAt      *timestamp.Timestamp `protobuf:"bytes,20,opt,name=health_updated_at,json=healthUpdatedAt,proto3" json:"health_updated_at,omitempty"`
-	Disconnected         bool                 `protobuf:"varint,21,opt,name=disconnected,proto3" json:"disconnected,omitempty"`
-	LastEventOccurredAt  *timestamp.Timestamp `protobuf:"bytes,22,opt,name=last_event_occurred_at,json=lastEventOccurredAt,proto3" json:"last_event_occurred_at,omitempty"`
-	LastEventSince       string               `protobuf:"bytes,23,opt,name=last_event_since,json=lastEventSince,proto3" json:"last_event_since,omitempty"`
-	HealthCheckResult    *HealthCheckResult   `protobuf:"bytes,24,opt,name=health_check_result,json=healthCheckResult,proto3" json:"health_check_result,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	// The habitat supervisor ID.
+	SupervisorId string `protobuf:"bytes,1,opt,name=supervisor_id,json=supervisorId,proto3" json:"supervisor_id,omitempty"`
+	// Combination of the service version and release in a single string like:
+	// Example: 0.1.0/8743278934278923.
+	Release string `protobuf:"bytes,2,opt,name=release,proto3" json:"release,omitempty"`
+	// Service group name
+	Group string `protobuf:"bytes,3,opt,name=group,proto3" json:"group,omitempty"`
+	// Enumerated value for health status.
+	HealthCheck HealthStatus `protobuf:"varint,4,opt,name=health_check,json=healthCheck,proto3,enum=chef.automate.api.applications.HealthStatus" json:"health_check,omitempty"`
+	// The ServiceStatus enum describes the status of the service (Currently Unimplemented).
+	Status ServiceStatus `protobuf:"varint,5,opt,name=status,proto3,enum=chef.automate.api.applications.ServiceStatus" json:"status,omitempty"`
+	// Application name.
+	Application string `protobuf:"bytes,6,opt,name=application,proto3" json:"application,omitempty"`
+	// Environment name.
+	Environment string `protobuf:"bytes,7,opt,name=environment,proto3" json:"environment,omitempty"`
+	// FQDN reported by habitat supervisor.
+	Fqdn string `protobuf:"bytes,8,opt,name=fqdn,proto3" json:"fqdn,omitempty"`
+	// Habitat channel that the service is subscribed to.
+	Channel string `protobuf:"bytes,9,opt,name=channel,proto3" json:"channel,omitempty"`
+	// Update strategy that the service employs.
+	UpdateStrategy string `protobuf:"bytes,10,opt,name=update_strategy,json=updateStrategy,proto3" json:"update_strategy,omitempty"`
+	// Site reported by habitat service, a user defined flag.
+	Site string `protobuf:"bytes,17,opt,name=site,proto3" json:"site,omitempty"`
+	// Last reported health status before currently health status.
+	PreviousHealthCheck HealthStatus `protobuf:"varint,18,opt,name=previous_health_check,json=previousHealthCheck,proto3,enum=chef.automate.api.applications.HealthStatus" json:"previous_health_check,omitempty"`
+	// Time interval of current health status from last status change until now.
+	CurrentHealthSince string `protobuf:"bytes,19,opt,name=current_health_since,json=currentHealthSince,proto3" json:"current_health_since,omitempty"`
+	// Timestamp since health status change.
+	HealthUpdatedAt *timestamp.Timestamp `protobuf:"bytes,20,opt,name=health_updated_at,json=healthUpdatedAt,proto3" json:"health_updated_at,omitempty"`
+	// Service connection information.
+	// based on time since last healthcheck received and disconnected service configuration
+	Disconnected bool `protobuf:"varint,21,opt,name=disconnected,proto3" json:"disconnected,omitempty"`
+	// Timestamp of last received health check message.
+	LastEventOccurredAt *timestamp.Timestamp `protobuf:"bytes,22,opt,name=last_event_occurred_at,json=lastEventOccurredAt,proto3" json:"last_event_occurred_at,omitempty"`
+	// Interval since last event received until now.
+	LastEventSince       string   `protobuf:"bytes,23,opt,name=last_event_since,json=lastEventSince,proto3" json:"last_event_since,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Service) Reset()         { *m = Service{} }
@@ -931,14 +983,9 @@ func (m *Service) GetLastEventSince() string {
 	return ""
 }
 
-func (m *Service) GetHealthCheckResult() *HealthCheckResult {
-	if m != nil {
-		return m.HealthCheckResult
-	}
-	return nil
-}
-
+// Request message for GetServiceGroupsHealthCounts
 type ServiceGroupsHealthCountsReq struct {
+	// Applicable search bar filters to apply to counts, in the format of fieldname:value.
 	Filter               []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -977,13 +1024,17 @@ func (m *ServiceGroupsHealthCountsReq) GetFilter() []string {
 	return nil
 }
 
+// Request message for GetServiceGroups
 type ServiceGroupsReq struct {
-	Filter               []string          `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
-	Pagination           *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
-	Sorting              *query.Sorting    `protobuf:"bytes,3,opt,name=sorting,proto3" json:"sorting,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
-	XXX_unrecognized     []byte            `json:"-"`
-	XXX_sizecache        int32             `json:"-"`
+	// Search bar and status filters, in the format of fieldname:value or status:value.
+	Filter []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
+	// Pagination parameters for service groups list.
+	Pagination *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
+	// Sorting parameters for service groups list.
+	Sorting              *query.Sorting `protobuf:"bytes,3,opt,name=sorting,proto3" json:"sorting,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
+	XXX_unrecognized     []byte         `json:"-"`
+	XXX_sizecache        int32          `json:"-"`
 }
 
 func (m *ServiceGroupsReq) Reset()         { *m = ServiceGroupsReq{} }
@@ -1035,20 +1086,31 @@ func (m *ServiceGroupsReq) GetSorting() *query.Sorting {
 // A service group message is the representation of one single service group that
 // is internally generated by aggregating all the services
 type ServiceGroup struct {
+	// Name of service group.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Combination of the version and release in a single string like:
-	// Example: 0.1.0/8743278934278923
-	Release string       `protobuf:"bytes,2,opt,name=release,proto3" json:"release,omitempty"`
-	Status  HealthStatus `protobuf:"varint,3,opt,name=status,proto3,enum=chef.automate.api.applications.HealthStatus" json:"status,omitempty"`
+	// Example: 0.1.0/8743278934278923.
+	Release string `protobuf:"bytes,2,opt,name=release,proto3" json:"release,omitempty"`
+	// Status of the service group. If any services are critical it is critical.
+	// If any of the services are warning with no critical services then the status is warning.
+	// If any of the services are unknown with no warning or critical services then the status if unknown.
+	// If all of the services are ok then the status is ok.
+	Status HealthStatus `protobuf:"varint,3,opt,name=status,proto3,enum=chef.automate.api.applications.HealthStatus" json:"status,omitempty"`
+	// Percentage of services reporting OK status.
 	// The health_percentage can be a number between 0-100
-	HealthPercentage     int32         `protobuf:"varint,4,opt,name=health_percentage,json=healthPercentage,proto3" json:"health_percentage,omitempty"`
+	HealthPercentage int32 `protobuf:"varint,4,opt,name=health_percentage,json=healthPercentage,proto3" json:"health_percentage,omitempty"`
+	// Health status counts for services within this service group.
 	ServicesHealthCounts *HealthCounts `protobuf:"bytes,5,opt,name=services_health_counts,json=servicesHealthCounts,proto3" json:"services_health_counts,omitempty"`
-	Id                   string        `protobuf:"bytes,6,opt,name=id,proto3" json:"id,omitempty"`
-	Application          string        `protobuf:"bytes,7,opt,name=application,proto3" json:"application,omitempty"`
-	Environment          string        `protobuf:"bytes,8,opt,name=environment,proto3" json:"environment,omitempty"`
+	// Service group ID. This is a value constructed by automate and is not reported by habitat.
+	Id string `protobuf:"bytes,6,opt,name=id,proto3" json:"id,omitempty"`
+	// Application name for the service group.
+	Application string `protobuf:"bytes,7,opt,name=application,proto3" json:"application,omitempty"`
+	// Environment name for the service group.
+	Environment string `protobuf:"bytes,8,opt,name=environment,proto3" json:"environment,omitempty"`
 	// Combination of the origin and package name in a single string like:
-	// Example: core/redis
-	Package              string   `protobuf:"bytes,9,opt,name=package,proto3" json:"package,omitempty"`
+	// Example: core/redis.
+	Package string `protobuf:"bytes,9,opt,name=package,proto3" json:"package,omitempty"`
+	// Count of disconnected services within this service group.
 	DisconnectedCount    int32    `protobuf:"varint,10,opt,name=disconnected_count,json=disconnectedCount,proto3" json:"disconnected_count,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1150,6 +1212,7 @@ func (m *ServiceGroup) GetDisconnectedCount() int32 {
 	return 0
 }
 
+// Count values for health statuses and disconnected status
 type HealthCounts struct {
 	Total                int32    `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
 	Ok                   int32    `protobuf:"varint,2,opt,name=ok,proto3" json:"ok,omitempty"`
@@ -1234,9 +1297,13 @@ func (m *HealthCounts) GetDisconnected() int32 {
 //
 // Example: core/redis/0.1.0/8743278934278923
 type PackageIdent struct {
-	Origin               string   `protobuf:"bytes,1,opt,name=origin,proto3" json:"origin,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string   `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	// Habitat origin.
+	Origin string `protobuf:"bytes,1,opt,name=origin,proto3" json:"origin,omitempty"`
+	// Habitat package name.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Habitat release version number.
+	Version string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	// Habitat release buildstamp.
 	Release              string   `protobuf:"bytes,4,opt,name=release,proto3" json:"release,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1297,6 +1364,7 @@ func (m *PackageIdent) GetRelease() string {
 }
 
 type ServiceGroups struct {
+	// List of service groups.
 	ServiceGroups        []*ServiceGroup `protobuf:"bytes,1,rep,name=service_groups,json=serviceGroups,proto3" json:"service_groups,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
@@ -1571,18 +1639,120 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type ApplicationsServiceClient interface {
+	//
+	//GetServiceGroups
+	//
+	//Returns a list of service groups with name, health information, and app, env, package, release metadata.
+	//Accepts pagination, sorting, search bar and status filters.
+	//
+	//Example:
+	//```
+	//applications/service-groups?sorting.field=percent_ok&sorting.order=ASC&pagination.page=1&pagination.size=25
+	//```
 	GetServiceGroups(ctx context.Context, in *ServiceGroupsReq, opts ...grpc.CallOption) (*ServiceGroups, error)
+	//
+	//GetServiceGroupsHealthCounts
+	//
+	//Returns totals for critical, warning, ok and unknown service groups.
+	//Supports search bar filtering.
 	GetServiceGroupsHealthCounts(ctx context.Context, in *ServiceGroupsHealthCountsReq, opts ...grpc.CallOption) (*HealthCounts, error)
+	//
+	//GetServices
+	//
+	//Returns a list of services with service health and service metadata.
+	//Accepts pagination and filters. To get services for a specific service-group use GetServicesBySG.
 	GetServices(ctx context.Context, in *ServicesReq, opts ...grpc.CallOption) (*ServicesRes, error)
+	//
+	//GetServicesDistinctValues
+	//
+	//Returns possible distinct filter values for a given valid field name. All values returned until one or more
+	//characters are provided for the `query_fragment` parameter.
+	//Supports wildcard (* and ?)
+	//
 	GetServicesDistinctValues(ctx context.Context, in *ServicesDistinctValuesReq, opts ...grpc.CallOption) (*ServicesDistinctValuesRes, error)
+	//
+	//GetServicesBySG
+	//
+	//Returns a list of services for a service group ID with health status and service metadata.
+	//The service group ID is a value generated by automate based on unique identifiers, and is not reported by habitat.
+	//Accepts status filters, search bar filters and sidebar pagination parameters
+	//
+	//Example:
+	//```
+	//applications/service-groups/1dfff679054c60a10c51d059b6dbf81a765c46f8d3e8ce0752b22ffe8d4d9716?pagination.page=1&pagination.size=25
+	//```
 	GetServicesBySG(ctx context.Context, in *ServicesBySGReq, opts ...grpc.CallOption) (*ServicesBySGRes, error)
+	//
+	//GetServicesStats
+	//
+	//Returns the total service-groups, services, deployments and supervisors. Used for telemetry purposes.
+	//Accepts to filters as the intent is to get an overall snapshot.
 	GetServicesStats(ctx context.Context, in *ServicesStatsReq, opts ...grpc.CallOption) (*ServicesStatsRes, error)
+	//
+	//GetDisconnectedServices
+	//
+	//Marks services as disconnected based on 'threshold_seconds'.
+	//This function is not used by the API or CLI and is here for testing purposes.
+	//The functionality is currently covered by a periodicly runnig job that can be configured
+	//by utilizing UpdateDisconnectedServicesConfig.
 	GetDisconnectedServices(ctx context.Context, in *DisconnectedServicesReq, opts ...grpc.CallOption) (*ServicesRes, error)
+	//
+	//DeleteDisconnectedServices
+	//
+	//Deletes services that have been marked as disconnected after 'threshold_seconds'.
+	//This function is not used by the API or CLI and is here for testing purposes.
+	//The functionality is currently covered by a periodicly runnig job that can be configured
+	//by utilizing UpdateDeleteDisconnectedServicesConfig.
 	DeleteDisconnectedServices(ctx context.Context, in *DisconnectedServicesReq, opts ...grpc.CallOption) (*ServicesRes, error)
+	//
+	//GetDisconnectedServicesConfig
+	//
+	//Returns config information for the periodicly running task that marks services as disconnected after
+	//'threshold'. Threshold is a string that follows elasticsearch's date math expressions.
+	//This job cannot be disabled, and therefor no information about running or not is provided.
 	GetDisconnectedServicesConfig(ctx context.Context, in *GetDisconnectedServicesConfigReq, opts ...grpc.CallOption) (*PeriodicMandatoryJobConfig, error)
+	//
+	//UpdateDisconnectedServicesConfig
+	//
+	//Updates config information for the periodicly running task that marks services as disconnected after
+	//'threshold'. Threshold is a string that follows elasticsearch's date math expressions.
+	//This job cannot be disabled, and therefor no information about running is accepted.
+	//
+	//Example:
+	//```
+	///retention/service_groups/disconnected_services/config
+	//'{
+	//"threshold": "15m"
+	//}'
+	//```
 	UpdateDisconnectedServicesConfig(ctx context.Context, in *PeriodicMandatoryJobConfig, opts ...grpc.CallOption) (*UpdateDisconnectedServicesConfigRes, error)
+	//
+	//GetDeleteDisconnectedServicesConfig
+	//
+	//Returns config information for the periodicly running task that deletes services already marked as disconnected
+	//after 'threshold'. Threshold is a string that follows elasticsearch's date math expressions.
+	//This job is disabled if running is set to false.
 	GetDeleteDisconnectedServicesConfig(ctx context.Context, in *GetDeleteDisconnectedServicesConfigReq, opts ...grpc.CallOption) (*PeriodicJobConfig, error)
+	//
+	//UpdateDeleteDisconnectedServicesConfig
+	//
+	//Updates config information for the periodicly running task that deletes services already marked as disconnected
+	//after 'threshold'. Threshold is a string that follows elasticsearch's date math expressions.
+	//This job can be disabled/enabled by setting running to false.
+	//
+	//Example:
+	//```
+	//service_groups/delete_disconnected_services/config" -d
+	//'{
+	//"threshold": "1d",
+	//"running":true
+	//}'
+	//```
 	UpdateDeleteDisconnectedServicesConfig(ctx context.Context, in *PeriodicJobConfig, opts ...grpc.CallOption) (*UpdateDeleteDisconnectedServicesConfigRes, error)
+	//
+	//GetVersion
+	//
+	//Returns the current version of the applications-service
 	GetVersion(ctx context.Context, in *version.VersionInfoRequest, opts ...grpc.CallOption) (*version.VersionInfo, error)
 }
 
@@ -1713,18 +1883,120 @@ func (c *applicationsServiceClient) GetVersion(ctx context.Context, in *version.
 
 // ApplicationsServiceServer is the server API for ApplicationsService service.
 type ApplicationsServiceServer interface {
+	//
+	//GetServiceGroups
+	//
+	//Returns a list of service groups with name, health information, and app, env, package, release metadata.
+	//Accepts pagination, sorting, search bar and status filters.
+	//
+	//Example:
+	//```
+	//applications/service-groups?sorting.field=percent_ok&sorting.order=ASC&pagination.page=1&pagination.size=25
+	//```
 	GetServiceGroups(context.Context, *ServiceGroupsReq) (*ServiceGroups, error)
+	//
+	//GetServiceGroupsHealthCounts
+	//
+	//Returns totals for critical, warning, ok and unknown service groups.
+	//Supports search bar filtering.
 	GetServiceGroupsHealthCounts(context.Context, *ServiceGroupsHealthCountsReq) (*HealthCounts, error)
+	//
+	//GetServices
+	//
+	//Returns a list of services with service health and service metadata.
+	//Accepts pagination and filters. To get services for a specific service-group use GetServicesBySG.
 	GetServices(context.Context, *ServicesReq) (*ServicesRes, error)
+	//
+	//GetServicesDistinctValues
+	//
+	//Returns possible distinct filter values for a given valid field name. All values returned until one or more
+	//characters are provided for the `query_fragment` parameter.
+	//Supports wildcard (* and ?)
+	//
 	GetServicesDistinctValues(context.Context, *ServicesDistinctValuesReq) (*ServicesDistinctValuesRes, error)
+	//
+	//GetServicesBySG
+	//
+	//Returns a list of services for a service group ID with health status and service metadata.
+	//The service group ID is a value generated by automate based on unique identifiers, and is not reported by habitat.
+	//Accepts status filters, search bar filters and sidebar pagination parameters
+	//
+	//Example:
+	//```
+	//applications/service-groups/1dfff679054c60a10c51d059b6dbf81a765c46f8d3e8ce0752b22ffe8d4d9716?pagination.page=1&pagination.size=25
+	//```
 	GetServicesBySG(context.Context, *ServicesBySGReq) (*ServicesBySGRes, error)
+	//
+	//GetServicesStats
+	//
+	//Returns the total service-groups, services, deployments and supervisors. Used for telemetry purposes.
+	//Accepts to filters as the intent is to get an overall snapshot.
 	GetServicesStats(context.Context, *ServicesStatsReq) (*ServicesStatsRes, error)
+	//
+	//GetDisconnectedServices
+	//
+	//Marks services as disconnected based on 'threshold_seconds'.
+	//This function is not used by the API or CLI and is here for testing purposes.
+	//The functionality is currently covered by a periodicly runnig job that can be configured
+	//by utilizing UpdateDisconnectedServicesConfig.
 	GetDisconnectedServices(context.Context, *DisconnectedServicesReq) (*ServicesRes, error)
+	//
+	//DeleteDisconnectedServices
+	//
+	//Deletes services that have been marked as disconnected after 'threshold_seconds'.
+	//This function is not used by the API or CLI and is here for testing purposes.
+	//The functionality is currently covered by a periodicly runnig job that can be configured
+	//by utilizing UpdateDeleteDisconnectedServicesConfig.
 	DeleteDisconnectedServices(context.Context, *DisconnectedServicesReq) (*ServicesRes, error)
+	//
+	//GetDisconnectedServicesConfig
+	//
+	//Returns config information for the periodicly running task that marks services as disconnected after
+	//'threshold'. Threshold is a string that follows elasticsearch's date math expressions.
+	//This job cannot be disabled, and therefor no information about running or not is provided.
 	GetDisconnectedServicesConfig(context.Context, *GetDisconnectedServicesConfigReq) (*PeriodicMandatoryJobConfig, error)
+	//
+	//UpdateDisconnectedServicesConfig
+	//
+	//Updates config information for the periodicly running task that marks services as disconnected after
+	//'threshold'. Threshold is a string that follows elasticsearch's date math expressions.
+	//This job cannot be disabled, and therefor no information about running is accepted.
+	//
+	//Example:
+	//```
+	///retention/service_groups/disconnected_services/config
+	//'{
+	//"threshold": "15m"
+	//}'
+	//```
 	UpdateDisconnectedServicesConfig(context.Context, *PeriodicMandatoryJobConfig) (*UpdateDisconnectedServicesConfigRes, error)
+	//
+	//GetDeleteDisconnectedServicesConfig
+	//
+	//Returns config information for the periodicly running task that deletes services already marked as disconnected
+	//after 'threshold'. Threshold is a string that follows elasticsearch's date math expressions.
+	//This job is disabled if running is set to false.
 	GetDeleteDisconnectedServicesConfig(context.Context, *GetDeleteDisconnectedServicesConfigReq) (*PeriodicJobConfig, error)
+	//
+	//UpdateDeleteDisconnectedServicesConfig
+	//
+	//Updates config information for the periodicly running task that deletes services already marked as disconnected
+	//after 'threshold'. Threshold is a string that follows elasticsearch's date math expressions.
+	//This job can be disabled/enabled by setting running to false.
+	//
+	//Example:
+	//```
+	//service_groups/delete_disconnected_services/config" -d
+	//'{
+	//"threshold": "1d",
+	//"running":true
+	//}'
+	//```
 	UpdateDeleteDisconnectedServicesConfig(context.Context, *PeriodicJobConfig) (*UpdateDeleteDisconnectedServicesConfigRes, error)
+	//
+	//GetVersion
+	//
+	//Returns the current version of the applications-service
 	GetVersion(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
 }
 

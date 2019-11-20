@@ -249,85 +249,85 @@ service ApplicationsService {
   };
 }
 
-// Request message for GetServices
+// Request message for GetServices.
 message ServicesReq {
-  // Search bar filters to apply to services, in the format of fieldname:value
+  // Search bar filters to apply to services, in the format of fieldname:value.
   repeated string filter = 1;
-  // Pagination parameters to apply to the returns services list
+  // Pagination parameters to apply to the returns services list.
   common.query.Pagination pagination = 2;
-  // Sorting parameters to apply to the returns services list
+  // Sorting parameters to apply to the returns services list.
   common.query.Sorting sorting = 3;
 }
 
-// Request message for GetServicesDistinctValues
+// Request message for GetServicesDistinctValues.
 message ServicesDistinctValuesReq {
-  // Field name of service values to retrieve
+  // Field name of service values to retrieve.
   string field_name = 1;
-  // Text of value to query, supports wildcards (* and ?)
+  // Text of value to query, supports wildcards (* and ?).
   string query_fragment = 2;
-  // Filters to apply to values, in the format of fieldname:value
+  // Filters to apply to values, in the format of fieldname:value.
   repeated string filter = 3;
 }
 
-// Request message for GetServicesBySG
+// Request message for GetServicesBySG.
 message ServicesBySGReq {
-  // Service group ID of the services
+  // Service group ID of the services.
   string service_group_id = 1;
-  // Pagination parameters to apply to the returned list of services
+  // Pagination parameters to apply to the returned list of services.
   common.query.Pagination pagination = 2;
-  // Sorting paramters to apply to the returned list of services
+  // Sorting paramters to apply to the returned list of services.
   common.query.Sorting sorting = 3;
-  // Filters to apply to services, in the format of fieldname:value
+  // Filters to apply to services, in the format of fieldname:value.
   repeated string filter = 5;
 }
 
-// Response message for GetServicesBySG
+// Response message for GetServicesBySG.
 message ServicesBySGRes {
-  // Service group name
+  // Service group name.
   string group = 1;
-  // List of services
+  // List of services.
   repeated Service services = 2;
-  // Health counts for services in the service group
+  // Health counts for services in the service group.
   HealthCounts services_health_counts = 3;
 }
 
-// Response message for GetServices
+// Response message for GetServices.
 message ServicesRes {
-  // List of services
+  // List of services.
   repeated Service services = 1;
 }
 
-// Response message for GetServicesDistinctValues
+// Response message for GetServicesDistinctValues.
 message ServicesDistinctValuesRes {
-  // List of distinct values fitting query_fragment and filters
+  // List of distinct values fitting query_fragment and filters.
   repeated string values = 1;
 }
 
-// Request message for GetDisconnectedServices
+// Request message for GetDisconnectedServices.
 message DisconnectedServicesReq {
-  // Unused
+  // Unused.
   reserved 1;
-  // Threshold for marking services disconnected in seconds
+  // Threshold for marking services disconnected in seconds.
   int32 threshold_seconds = 2;
 }
 
-// Request message for ServicesStats
+// Request message for ServicesStats.
 message ServicesStatsReq {
 }
 
-// Response message for ServicesStats
+// Response message for ServicesStats.
 message ServicesStatsRes {
-  // Total service groups reporting to automate
+  // Total service groups reporting to automate.
   int32 total_service_groups = 1;
-  // Total services reporting to automate (connected and disconnected)
+  // Total services reporting to automate (connected and disconnected).
   int32 total_services = 2;
-  // Total supervisors reporting to automate
+  // Total supervisors reporting to automate.
   int32 total_supervisors = 3;
-  // Total deployments reporting to automate
+  // Total deployments reporting to automate.
   int32 total_deployments = 4;
 }
 
-// Configuration information for periodic jobs
+// Configuration information for periodic jobs.
 message PeriodicJobConfig {
   // Is the job running? false is disabled, true is enabled.
   bool running = 1;
@@ -338,7 +338,7 @@ message PeriodicJobConfig {
   string threshold = 2;
 }
 
-// Configuration information for a mandatory periodic job
+// Configuration information for a mandatory periodic job.
 // it's like a PeriodicJobConfig but the user isn't allowed to change whether
 // or not the job runs
 message PeriodicMandatoryJobConfig {
@@ -356,87 +356,87 @@ message GetDeleteDisconnectedServicesConfigReq{}
 message UpdateDeleteDisconnectedServicesConfigRes {}
 
 message Service {
-  // The habitat supervisor ID
+  // The habitat supervisor ID.
   string supervisor_id = 1;
   // Combination of the service version and release in a single string like:
-  // Example: 0.1.0/8743278934278923
+  // Example: 0.1.0/8743278934278923.
   string release = 2;
   // Service group name
   string group = 3;
-  // Enumerated value for health status
+  // Enumerated value for health status.
   HealthStatus health_check = 4;
-  // The ServiceStatus enum describes the status of the service (Currently Unimplemented)
+  // The ServiceStatus enum describes the status of the service (Currently Unimplemented).
   ServiceStatus status = 5;
-  // Application name
+  // Application name.
   string application = 6;
-  // Environment name
+  // Environment name.
   string environment = 7;
-  // FQDN reported by habitat supervisor
+  // FQDN reported by habitat supervisor.
   string fqdn = 8;
-  // Habitat channel that the service is subscribed to
+  // Habitat channel that the service is subscribed to.
   string channel = 9;
-  // Update strategy that the service employs
+  // Update strategy that the service employs.
   string update_strategy = 10;
-  // Site reported by habitat service, a user defined flag
+  // Site reported by habitat service, a user defined flag.
   string site = 17;
-  // Last reported health status before currently health status
+  // Last reported health status before currently health status.
   HealthStatus previous_health_check = 18;
-  // Time interval of current health status from last status change until now
+  // Time interval of current health status from last status change until now.
   string current_health_since = 19;
-  // Timestamp since health status change
+  // Timestamp since health status change.
   google.protobuf.Timestamp health_updated_at = 20;
-  // Service connection information
+  // Service connection information.
   // based on time since last healthcheck received and disconnected service configuration
   bool disconnected = 21;
-  // Timestamp of last received health check message
+  // Timestamp of last received health check message.
   google.protobuf.Timestamp last_event_occurred_at = 22;
-  // Interval since last event received until now
+  // Interval since last event received until now.
   string last_event_since = 23;
   HealthCheckResult health_check_result = 24;
 }
 
 // Request message for GetServiceGroupsHealthCounts
 message ServiceGroupsHealthCountsReq {
-  // Applicable search bar filters to apply to counts, in the format of fieldname:value
+  // Applicable search bar filters to apply to counts, in the format of fieldname:value.
   repeated string filter = 1;
 }
 
 // Request message for GetServiceGroups
 message ServiceGroupsReq {
-  // Search bar and status filters, in the format of fieldname:value or status:value
+  // Search bar and status filters, in the format of fieldname:value or status:value.
   repeated string filter = 1;
-  // Pagination parameters for service groups list
+  // Pagination parameters for service groups list.
   common.query.Pagination pagination = 2;
-  // Sorting parameters for service groups list
+  // Sorting parameters for service groups list.
   common.query.Sorting sorting = 3;
 }
 
 // A service group message is the representation of one single service group that
 // is internally generated by aggregating all the services
 message ServiceGroup {
-  // Name of service group
+  // Name of service group.
   string name = 1;
   // Combination of the version and release in a single string like:
-  // Example: 0.1.0/8743278934278923
+  // Example: 0.1.0/8743278934278923.
   string release = 2;
   // Status of the service group. If any services are critical it is critical.
   // If any of the services are warning with no critical services then the status is warning.
   // If any of the services are unknown with no warning or critical services then the status if unknown.
   // If all of the services are ok then the status is ok.
   HealthStatus status = 3;
-  // Percentage of services reporting OK status
+  // Percentage of services reporting OK status.
   // The health_percentage can be a number between 0-100
   int32 health_percentage = 4;
   // Health status counts for services within this service group.
   HealthCounts services_health_counts = 5;
-  // Service group ID. This is a value constructed by automate and is not reported by habitat
+  // Service group ID. This is a value constructed by automate and is not reported by habitat.
   string id = 6;
-  // Application name for the service group
+  // Application name for the service group.
   string application = 7;
-  // Environment name for the service group
+  // Environment name for the service group.
   string environment = 8;
   // Combination of the origin and package name in a single string like:
-  // Example: core/redis
+  // Example: core/redis.
   string package = 9;
   // Count of disconnected services within this service group.
   int32 disconnected_count = 10;
@@ -457,18 +457,18 @@ message HealthCounts {
 //
 // Example: core/redis/0.1.0/8743278934278923
 message PackageIdent {
-  // Habitat origin
+  // Habitat origin.
   string origin = 1;
-  // Habitat package name
+  // Habitat package name.
   string name = 2;
-  // Habitat release version number
+  // Habitat release version number.
   string version = 3;
-  // Habitat release buildstamp
+  // Habitat release buildstamp.
   string release = 4;
 }
 
 message ServiceGroups  {
-  // List of service groups
+  // List of service groups.
   repeated ServiceGroup service_groups = 1;
 }
 

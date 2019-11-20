@@ -11,12 +11,17 @@
     {
       "name": "Nodes",
       "tags": ["NodesService"]
+    },
+    {
+      "name": "Applications",
+      "tags": ["ApplicationsService"]
     }
   ],
   "tags": [
     { "name": "ReportingService", "x-displayName": "Reporting" },
     { "name": "StatsService", "x-displayName": "Stats" },
     { "name": "ConfigMgmt", "x-displayName": "Nodes" },
-    { "name": "NodesService", "x-displayName": "Nodes" }
+    { "name": "NodesService", "x-displayName": "Nodes" },
+    { "name": "ApplicationsService", "x-displayName": "Applications" }
   ]
 }
