@@ -109,6 +109,7 @@ A2V1_DATA=true TEST="61_A2V1_migration_spec.rb" make test-automate-upgrade
 A2V2_DATA=true TEST="62_A2V2_migration_spec.rb" make test-automate-upgrade
 A2V3_DATA=true TEST="63_A2V3_migration_spec.rb" make test-automate-upgrade
 A2V4_DATA=true TEST="64_A2V4_migration_spec.rb" make test-automate-upgrade
+A2V5_DATA=true TEST="65_A2V5_migration_spec.rb" make test-automate-upgrade
 
 _When in doubt, run the same commands we run in CI_
 

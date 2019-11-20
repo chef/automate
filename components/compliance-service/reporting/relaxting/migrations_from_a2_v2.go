@@ -323,6 +323,7 @@ func convertA2v2ReportDocToLatest(src *ESInSpecReportA2v2, dstSum *ESInSpecSumma
 				Impact:     profilesMetaMap[srcProfileMin.SHA256].Controls[srcProfileMinControl.ID].Impact,
 				Status:     srcProfileMinControl.Status,
 				StringTags: stringTags,
+				WaivedStr:  "no",
 			}
 
 			// Convert the results within a control

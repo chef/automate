@@ -20,6 +20,13 @@ const (
 					} else if (ctx._source.profiles[i]['title'] != null && ctx._source.profiles[i]['title'] != '') {
 						ctx._source.profiles[i].full = ctx._source.profiles[i].title;
 					}
+					if (ctx._source.profiles[i].controls != null ) {
+						for (int j = 0; j < ctx._source.profiles[i].controls.length; ++j) {
+							if (ctx._source.profiles[i].controls[j] != null ) {
+								ctx._source.profiles[i].controls[j].waived_str = "no"
+							}
+						}
+					}
 				}
 			}
 		}

@@ -6,6 +6,7 @@ import (
 
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -15,10 +16,10 @@ const (
 		if (ctx._source['profiles'] != null) {
 			for (int i = 0; i < ctx._source.profiles.length; ++i) {
 				if (ctx._source.profiles[i] != null) {
-					if (ctx._source.profiles[i]['controls'] != null ) {
+					if (ctx._source.profiles[i].controls != null ) {
 						for (int j = 0; j < ctx._source.profiles[i].controls.length; ++j) {
 							if (ctx._source.profiles[i].controls[j] != null ) {
-								ctx._source.profiles[i].controls[j].
+								ctx._source.profiles[i].controls[j].waived_str = "no"
 							}
 						}
 					}
@@ -59,7 +60,8 @@ func (migratable A2V5ElasticSearchIndices) migrateTimeSeries(dateToMigrate time.
 
 	src = fmt.Sprintf("%sr-%s", a2V5IndexPrefix, dateToMigrateAsString)
 	dest = fmt.Sprintf("%s%s", CompDailyRepIndexPrefix, dateToMigrateAsString)
-	_, err = migratable.backend.reindex(src, dest, noScript, "_doc")
+	logrus.Debugf("!!!!!!! reindexing %s with waiversFullScript", src)
+	_, err = migratable.backend.reindex(src, dest, waiversFullScript, "_doc")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
 	}
