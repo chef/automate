@@ -17,7 +17,7 @@ This content is specific to IAM v1, see [IAM v2 Overview]({{< ref "iam-v2-overvi
 
 This guide will show you how to manage Chef Automate teams. Import existing teams into Chef Automate with [Microsoft AD (LDAP)]({{< ref "configuration.md#microsoft-active-directory" >}}), [generic LDAP]({{< ref "configuration.md#ldap" >}}) or [SAML]({{< ref "configuration.md#saml" >}}).
 
-You can create local Chef Automate teams that are independent of LDAP or SAML.Teams can be used for policy-based [authorization]({{< ref "authorization-overview.md" >}}).
+You can create local Chef Automate teams that are independent of LDAP or SAML.Teams can be used for policy-based authorization, see [IAM v1 overview]({{< ref "iam-v1-overview.md" >}}).
 
 ## Prerequisites
 
@@ -57,7 +57,7 @@ Edit the team name:
 
 ![Edit Team](/images/docs/admin-tab-team-edit.png)
 
-Now, you can [create a new policy]({{< ref "authorization-overview.md#common-use-cases" >}}) for your team. All members will now have additional access based on that new policy.
+Now, you can [create a new policy]({{< ref "iam-v1-overview.md#common-use-cases" >}}) for your team. All members will now have additional access based on that new policy.
 
 #### Create a Team using the Command Line with cURL
 
