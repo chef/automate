@@ -1,18 +1,18 @@
 #
-# A simple local install of A2 with Workflow enabled using the chef-automate CLI. It is rebuilt everytime we run `terraform apply`.
+# A simple local install of A2 with all supported products enabled using the chef-automate CLI. 
+# It is rebuilt everytime we run `terraform apply`.
 #
-# TODO: DELETE ME. Replaced by the `all` scenario
 
-module "single_local_workflow_fresh_install" {
+module "single_local_all_fresh_install" {
   source = "github.com/chef/es-terraform//modules/cd_instance_v2"
 
-  # DNS components ( a2-workflow-local-fresh-install-{{channel}}.cd.chef.co )
-  subdomain        = "a2-workflow-local-fresh-install"
+  # DNS components ( a2-all-local-fresh-install-{{channel}}.cd.chef.co )
+  subdomain        = "a2-all-local-fresh-install"
   subdomain_suffix = "-${var.dns_suffix}"
 
   # Metadata
-  meta_title       = "Single Local (Fresh Install) with Workflow"
-  meta_description = "A2 stack with Workflow deployed locally as Habitat packages on a single host using the chef-automate CLI."
+  meta_title       = "Single Local (Fresh Install) with all products"
+  meta_description = "A2 stack with all supported products deployed locally as Habitat packages on a single host using the chef-automate CLI."
   meta_type        = "habitat"
 
   # AWS Instance Configuration
@@ -38,12 +38,12 @@ module "single_local_workflow_fresh_install" {
   }
 }
 
-module "single_local_workflow_fresh_install_deploy" {
+module "single_local_all_fresh_install_deploy" {
   source = "../modules/chef_automate_install"
 
-  instance_id   = "${module.single_local_workflow_fresh_install.instance_id}"
-  instance_fqdn = "${module.single_local_workflow_fresh_install.fqdn}"
-  ssh_username  = "${module.single_local_workflow_fresh_install.ssh_username}"
+  instance_id   = "${module.single_local_all_fresh_install.instance_id}"
+  instance_fqdn = "${module.single_local_all_fresh_install.fqdn}"
+  ssh_username  = "${module.single_local_all_fresh_install.ssh_username}"
 
   journald_system_max_use = "${var.channel == "acceptance" ? "20G" : "6G"}"
 
@@ -54,6 +54,7 @@ module "single_local_workflow_fresh_install_deploy" {
   # Automate Install
   channel             = "${var.channel}"
   deployment_type     = "local"
+  enable_builder      = "true"
   enable_chef_server  = "true"
   enable_workflow     = "true"
   workflow_enterprise = "demo"
