@@ -346,7 +346,9 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
 		DoAsync(ctx)
-
+	if err != nil {
+		return "", err
+	}
 	return startTaskResult.TaskId, err
 }
 
