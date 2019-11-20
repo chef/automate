@@ -21,7 +21,6 @@ func TestNATSWithSNI(t *testing.T) {
 			// running
 			Port:                       24222,
 			GatewayPort:                0, // not used
-			Enabled:                    true,
 			HealthCheckCredentialsFile: "/NOT_USED",
 		},
 		LogConfig: config.LogConfig{
@@ -110,7 +109,6 @@ func TestNATSWithTLSDisabled(t *testing.T) {
 			// running
 			Port:                       24222,
 			GatewayPort:                0, // not used
-			Enabled:                    true,
 			HealthCheckCredentialsFile: "/NOT_USED",
 			DisableFrontendTLS:         true,
 		},

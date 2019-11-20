@@ -2,9 +2,6 @@ package commands
 
 import (
 	"fmt"
-	"os"
-	"os/signal"
-	"syscall"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -41,15 +38,6 @@ func newServeCmd() *cobra.Command {
 			}
 			if closer != nil {
 				defer tracing.CloseQuietly(closer)
-			}
-
-			// Start a NATs Server only if the feature was enabled through the config
-			if !cfg.Service.Enabled {
-				ch := make(chan os.Signal, 1)
-				signal.Notify(ch, syscall.SIGTERM, syscall.SIGINT)
-				sig := <-ch
-				logctx.WithField("signal", sig).Info("Exiting")
-				return nil
 			}
 
 			err = nats.GenerateHealthCheckCredentials(cfg)

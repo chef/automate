@@ -102,13 +102,6 @@ shared_buffers = "1GB"
     [event_service.v1.sys.service]
       enable_nats_feature = true
 
-# event-gateway
-[event_gateway]
-  [event_gateway.v1]
-    [event_gateway.v1.sys]
-      [event_gateway.v1.sys.service]
-        enable_nats_feature = true
-
 # applications-service
 [applications]
   [applications.v1]

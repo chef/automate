@@ -6,7 +6,6 @@ import (
 	apps "github.com/chef/automate/api/config/applications"
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/event"
-	eventgw "github.com/chef/automate/api/config/event_gateway"
 	"github.com/chef/automate/api/config/gateway"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
@@ -103,15 +102,6 @@ func newApplicationsToggleConfig(enable bool) *deployment.AutomateConfig {
 			V1: &event.ConfigRequest_V1{
 				Sys: &event.ConfigRequest_V1_System{
 					Service: &event.ConfigRequest_V1_System_Service{
-						EnableNatsFeature: w.Bool(enable),
-					},
-				},
-			},
-		},
-		EventGateway: &eventgw.ConfigRequest{
-			V1: &eventgw.ConfigRequest_V1{
-				Sys: &eventgw.ConfigRequest_V1_System{
-					Service: &eventgw.ConfigRequest_V1_System_Service{
 						EnableNatsFeature: w.Bool(enable),
 					},
 				},
