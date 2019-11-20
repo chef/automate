@@ -560,6 +560,15 @@ steps:
         linux:
           privileged: true
 
+  - label: "product dev"
+    command:
+      - integration/run_test integration/tests/product_dev.sh
+    timeout_in_minutes: 20
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
   - label: "airgap upgrade"
     command:
       - integration/run_test integration/tests/airgap_upgrade.sh
