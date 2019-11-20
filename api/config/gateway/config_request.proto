@@ -35,7 +35,7 @@ message ConfigRequest {
 				google.protobuf.StringValue trial_license_url = 5;
 				Log log = 6; // backwards compat with old log level config
 				google.protobuf.StringValue auth_middleware = 7 [deprecated=true];
-				google.protobuf.BoolValue enable_apps_feature = 9;
+				reserved 9;
 			}
 
 			message Log {

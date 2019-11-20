@@ -5,7 +5,6 @@ import (
 
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/gateway"
-	w "github.com/chef/automate/api/config/shared/wrappers"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
 
@@ -85,14 +84,13 @@ func runApplicationsDisableCmd(*cobra.Command, []string) error {
 //     [applications.v1.sys]
 //       [applications.v1.sys.service]
 //         enable_nats_feature = $ENABLE
+// FIXME: remove
 func newApplicationsToggleConfig(enable bool) *deployment.AutomateConfig {
 	return &deployment.AutomateConfig{
 		Gateway: &gateway.ConfigRequest{
 			V1: &gateway.ConfigRequest_V1{
 				Sys: &gateway.ConfigRequest_V1_System{
-					Service: &gateway.ConfigRequest_V1_System_Service{
-						EnableAppsFeature: w.Bool(enable),
-					},
+					Service: &gateway.ConfigRequest_V1_System_Service{},
 				},
 			},
 		},

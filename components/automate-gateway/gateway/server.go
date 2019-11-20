@@ -37,12 +37,11 @@ type Config struct {
 	Log          struct {
 		Level string `mapstructure:"level" toml:"level"`
 	} `mapstructure:"log" toml:"log"`
-	OpenAPIUIDir      string `mapstructure:"open_api_ui_dir" toml:"open_api_ui_dir"`
-	Port              int    `mapstructure:"port" toml:"port"`
-	ServiceCerts      *certs.ServiceCerts
-	TLSConfig         certs.TLSConfig `mapstructure:"tls" toml:"tls"`
-	TrialLicenseURL   string          `mapstructure:"trial_license_url" toml:"trial_license_url"`
-	EnableAppsFeature bool            `mapstructure:"enable_apps_feature" toml:"enable_apps_feature"`
+	OpenAPIUIDir    string `mapstructure:"open_api_ui_dir" toml:"open_api_ui_dir"`
+	Port            int    `mapstructure:"port" toml:"port"`
+	ServiceCerts    *certs.ServiceCerts
+	TLSConfig       certs.TLSConfig `mapstructure:"tls" toml:"tls"`
+	TrialLicenseURL string          `mapstructure:"trial_license_url" toml:"trial_license_url"`
 }
 
 type gwRouteFeatureFlags map[string]bool
@@ -68,7 +67,6 @@ type Server struct {
 
 func (c *Config) gwRouteFeatureFlags() gwRouteFeatureFlags {
 	g := make(gwRouteFeatureFlags)
-	g["applications"] = c.EnableAppsFeature
 	return g
 }
 

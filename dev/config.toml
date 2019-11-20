@@ -94,7 +94,6 @@ shared_buffers = "1GB"
   [gateway.v1.sys]
     [gateway.v1.sys.service]
       trial_license_url = "https://licensing-dev.chef.io/create-trial"
-      enable_apps_feature = true
 
 [license_control.v1.sys.telemetry]
 url = "https://telemetry-acceptance.chef.io"
