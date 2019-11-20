@@ -43,16 +43,13 @@ func newServeCmd() *cobra.Command {
 				defer tracing.CloseQuietly(closer)
 			}
 
-			// Start a NATs Server only if the feature was enabled through the config
-			// @afiune should this replace the event-service?
-			if cfg.StreamService.Enabled {
-				go func() {
-					err := nats.Spawn(cfg)
-					if err != nil {
-						logrus.WithError(err).Error("starting NATS")
-					}
-				}()
-			}
+			// Start NATs Server
+			go func() {
+				err := nats.Spawn(cfg)
+				if err != nil {
+					logrus.WithError(err).Error("starting NATS")
+				}
+			}()
 
 			return server.StartGRPC(context.Background(), cfg)
 		},

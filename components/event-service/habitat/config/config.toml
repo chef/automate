@@ -9,7 +9,6 @@ event_limit = "{{cfg.service.event_limit}}"
 listener_limit = "{{cfg.service.listener_limit}}"
 
 [stream_service]
-enabled = {{cfg.service.enable_nats_feature}}
 cluster_id = "{{cfg.stream_service.cluster_id}}"
 store = "{{pkg.svc_data_path}}/datastore"
 

@@ -96,12 +96,6 @@ shared_buffers = "1GB"
       trial_license_url = "https://licensing-dev.chef.io/create-trial"
       enable_apps_feature = true
 
-# event-service configuration.
-[event_service.v1]
-  [event_service.v1.sys]
-    [event_service.v1.sys.service]
-      enable_nats_feature = true
-
 # applications-service
 [applications]
   [applications.v1]

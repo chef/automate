@@ -43,7 +43,6 @@ type Nats struct {
 }
 
 type StreamService struct {
-	Enabled   bool   `mapstructure:"enabled"`
 	ClusterID string `mapstructure:"cluster_id"`
 	Store     string `mapstructure:"store"`
 }

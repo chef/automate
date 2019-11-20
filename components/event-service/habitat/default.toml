@@ -3,7 +3,6 @@ host = "localhost"
 port = 10132
 event_limit = 100000
 listener_limit = 10000
-enable_nats_feature = false
 
 [internal_messaging]
 port = 10140
