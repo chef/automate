@@ -3,7 +3,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map } from 'rxjs/operators';
-
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 
@@ -14,7 +13,10 @@ import {
   RoleActionTypes,
   GetRole,
   GetRoleSuccess,
-  GetRoleFailure
+  GetRoleFailure,
+  DeleteRole,
+  DeleteRoleSuccess,
+  DeleteRoleFailure
 } from './role.actions';
 
 import {
@@ -66,4 +68,34 @@ export class RoleEffects {
           message: `Could not get role ${id}: ${msg || payload.error}`
         });
       }));
+  
+  @Effect()
+  deleteRole$ = this.actions$.pipe(
+    ofType(RoleActionTypes.DELETE),
+    mergeMap(({ payload: { id} }: DeleteRole) =>
+      this.requests.deleteRole(id).pipe(
+        map(() => new DeleteRoleSuccess({id})),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new DeleteRoleFailure(error))))));
+
+  @Effect()
+  deleteProjectSuccess$ = this.actions$.pipe(
+      ofType(RoleActionTypes.DELETE_SUCCESS),
+      map(({ payload: { id } }: DeleteRoleSuccess) => {
+        return new CreateNotification({
+          type: Type.info,
+          message: `Successfully deleted role ${id}.`
+        });
+      }));
+
+  @Effect()
+  deleteRoleFailure$ = this.actions$.pipe(
+    ofType(RoleActionTypes.DELETE_FAILURE),
+    map(({ payload: { error } }: DeleteRoleFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not delete role: ${msg || error}`
+      });
+    }));
 }

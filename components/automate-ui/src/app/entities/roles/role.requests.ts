@@ -25,4 +25,8 @@ export class RoleRequests {
   public getRole(id: string): Observable<RoleResponse> {
     return this.http.get<RoleResponse>(`${env.auth_v2_url}/roles/${id}`);
   }
+
+  public deleteRole(id: string): Observable<RoleResponse> {
+    return this.http.delete<RoleResponse>(`${env.auth_v2_url}/roles/${id}`);
+  }
 }
