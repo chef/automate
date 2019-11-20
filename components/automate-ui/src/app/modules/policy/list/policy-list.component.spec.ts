@@ -25,8 +25,8 @@ describe('PolicyListComponent', () => {
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'chef-heading' }),
-        MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-loading-spinner' }),

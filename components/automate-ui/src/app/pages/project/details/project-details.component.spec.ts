@@ -79,6 +79,7 @@ describe('ProjectDetailsComponent', () => {
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'chef-form-field' }),
         MockComponent({ selector: 'chef-breadcrumbs' }),
         MockComponent({ selector: 'chef-error' }),

@@ -45,6 +45,7 @@ describe('ProjectRulesComponent', () => {
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'chef-form-field'}),
         MockComponent({ selector: 'chef-breadcrumbs'}),
         MockComponent({ selector: 'chef-breadcrumb', inputs: ['link'] }),
@@ -55,7 +56,6 @@ describe('ProjectRulesComponent', () => {
         MockComponent({ selector: 'chef-input', inputs: ['value'] }),
         MockComponent({ selector: 'chef-error'}),
         MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-page',
           inputs: [
             'subheading',

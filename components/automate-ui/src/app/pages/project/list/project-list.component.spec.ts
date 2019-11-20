@@ -88,6 +88,7 @@ describe('ProjectListComponent', () => {
           outputs: ['confirm', 'cancel']
         }),
         MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
