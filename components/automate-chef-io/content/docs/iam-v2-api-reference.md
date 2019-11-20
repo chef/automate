@@ -510,7 +510,7 @@ GET    /apply-rules                                   | get status of a rule app
 POST   /apply-rules                                   | start applying pending rule or project edits
 DELETE /apply-rules                                   | stop applying pending rule or project edits
 
-**NOTE**: With a large ammount of historical compliance data, rule application
+**NOTE**: With a large amount of historical compliance data, rule application
 can take a considerable amount of time. If making a large number of rule
 changes, it's best to batch them up and apply them all at once.
 
