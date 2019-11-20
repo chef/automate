@@ -39,20 +39,9 @@ func ConfigureJobManager(man *cereal.Manager, config *config.EventFeed) error {
 	// only persisted the first time the workflow is created, after which only
 	// new default policies are added and/or existing policies indicies are
 	// updated in case they have been migrated.
-	//
-	// When run with deployment-service it had a default retention periods of 7
-	// days. The configuration has been deprecated and is no longer valid and
-	// the default of 30 has been removed, making the default value 0. If it's
-	// set to 0 it should be set at 7, otherwise it should be set at the user
-	// defined value at the time of the initial migration.
 
 	p := DefaultPurgePolicies.Es[PurgeFeedPolicyName]
-	switch config.DefaultPurgeAfterDays {
-	case 0:
-		p.OlderThanDays = 30
-	default:
-		p.OlderThanDays = int32(config.DefaultPurgeAfterDays)
-	}
+	p.OlderThanDays = int32(config.DefaultPurgeAfterDays)
 	DefaultPurgePolicies.Es[PurgeFeedPolicyName] = p
 
 	r, err := rrule.NewRRule(rrule.ROption{

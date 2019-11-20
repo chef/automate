@@ -55,7 +55,7 @@ var conf = config.Compliance{
 	},
 	EventConfig: config.EventConfig{},
 	DataRetention: config.DataRetention{
-		ComplianceReportDays: -1,
+		ComplianceReportDays: 60,
 	},
 }
 
@@ -95,7 +95,7 @@ func init() {
 	runCmd.Flags().StringVar(&conf.Service.TLSConfig.CertPath, "cert", "", "Service certificate")
 	runCmd.Flags().StringVar(&conf.Service.TLSConfig.KeyPath, "key", "", "Service certificate key")
 	runCmd.Flags().StringVar(&conf.Service.TLSConfig.RootCACertPath, "root-cert", "", "Root CA Cert to use to verify clients")
-	runCmd.Flags().Int32Var(&conf.DataRetention.ComplianceReportDays, "reports-retention-days", -1, "Number of days to keep compliance reports")
+	runCmd.Flags().Int32Var(&conf.DataRetention.ComplianceReportDays, "reports-retention-days", 60, "Number of days to keep compliance reports")
 	runCmd.Flags().StringVar(&conf.Service.ConfigFilePath, "config", "", "config file")
 
 	// Postgres Config Flags
