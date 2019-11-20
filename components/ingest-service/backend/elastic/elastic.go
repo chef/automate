@@ -1,18 +1,18 @@
 package elastic
 
 import (
+	"context"
 	"fmt"
 	"time"
 
-	"context"
+	"github.com/olivere/elastic"
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 	project_update_lib "github.com/chef/automate/lib/authz"
-	"github.com/olivere/elastic"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 )
 
 const (
@@ -343,7 +343,10 @@ func (es *Backend) ReindexNodeStateToLatest(ctx context.Context, previousIndex s
 	src := elastic.NewReindexSource().Index(previousIndex)
 	dst := elastic.NewReindexDestination().Index(mappings.NodeState.Index)
 	startTaskResult, err := es.client.Reindex().Source(src).Destination(dst).DoAsync(ctx)
-	return startTaskResult.TaskId, err
+	if err != nil {
+		return "", err
+	}
+	return startTaskResult.TaskId, nil
 }
 
 func (es *Backend) storeExists(ctx context.Context, indexName string) bool {

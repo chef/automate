@@ -226,8 +226,10 @@ func (es *Backend) UpdateNodeProjectTags(ctx context.Context, projectTaggingRule
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
 		DoAsync(ctx)
-
-	return startTaskResult.TaskId, err
+	if err != nil {
+		return "", err
+	}
+	return startTaskResult.TaskId, nil
 }
 
 // DeleteNodeByFields deletes a node from node state but it's org name, node name and source_fqdn
