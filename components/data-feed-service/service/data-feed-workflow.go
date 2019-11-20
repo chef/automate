@@ -99,8 +99,7 @@ func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev 
 			payload.NodeIDs = batchNodeIDs(params.NodeBatchSize, taskResults.NodeIDs)
 			log.Debugf("payload.NodeIDs %v payload.NodeIDsIndex %v", payload.NodeIDs, payload.NodeIDsIndex)
 			params.NodeIDs = payload.NodeIDs[payload.NodeIDsIndex]
-			// the client task will get the data for nodes with a client run in the interval
-			err = w.EnqueueTask(dataFeedClientTaskName, params)
+			err = w.EnqueueTask(dataFeedAggregateTaskName, params)
 			if err != nil {
 				return w.Fail(err)
 			}
@@ -112,49 +111,28 @@ func (e *DataFeedWorkflowExecutor) OnTaskComplete(w cereal.WorkflowInstance, ev 
 			log.Debugf("No new client data or reports found")
 		}
 		log.Debugf("ListReports %v, tasks complete: %v, time: %v", dataFeedListReportsTaskName, payload.TasksComplete, time.Now())
-	case dataFeedClientTaskName.String():
-		taskResults, err := getClientTaskResults(ev)
+	case dataFeedAggregateTaskName.String():
+		taskResults, err := getAggregateTaskResults(ev)
 		if err != nil {
 			return w.Fail(err)
 		}
 		payload.NodeIDs[payload.NodeIDsIndex] = taskResults.NodeIDs
 		params.NodeIDs = payload.NodeIDs[payload.NodeIDsIndex]
 		payload.DataFeedMessages = taskResults.DataFeedMessages
-		// if there are still node IDs in the map we must get the compliance reports for them
-		if len(payload.NodeIDs[payload.NodeIDsIndex]) > 0 {
-			err = w.EnqueueTask(dataFeedComplianceTaskName, params)
-			if err != nil {
-				return w.Fail(err)
-			}
-		} else {
-			// no reports to aggregate from the interval send the feed
-			params.DataFeedMessages = payload.DataFeedMessages
-			err = w.EnqueueTask(dataFeedNotifierTaskName, params)
-			if err != nil {
-				return w.Fail(err)
-			}
-		}
-		log.Debugf("ClientTask %v, tasks complete: %v, time: %v", dataFeedClientTaskName, payload.TasksComplete, time.Now())
-	case dataFeedComplianceTaskName.String():
-		log.Debugf("data-feed-compliance task in OnTaskComplete")
-		taskResults, err := getComplianceTaskResults(ev)
-		if err != nil {
-			return w.Fail(err)
-		}
-		for ip, dataFeedMessage := range taskResults.DataFeedMessages {
-			payload.DataFeedMessages[ip] = dataFeedMessage
-		}
+
+		// no reports to aggregate from the interval send the feed
 		params.DataFeedMessages = payload.DataFeedMessages
 		err = w.EnqueueTask(dataFeedNotifierTaskName, params)
 		if err != nil {
 			return w.Fail(err)
 		}
-		log.Debugf("ComplianceTask %v, tasks complete: %v, time: %v", dataFeedComplianceTaskName, payload.TasksComplete, time.Now())
+
+		log.Debugf("AggregateTask %v, tasks complete: %v, time: %v", dataFeedAggregateTaskName, payload.TasksComplete, time.Now())
 	case dataFeedNotifierTaskName.String():
 		payload.NodeIDsIndex++
 		if payload.NodeIDsIndex != len(payload.NodeIDs) {
 			params.NodeIDs = payload.NodeIDs[payload.NodeIDsIndex]
-			err = w.EnqueueTask(dataFeedClientTaskName, params)
+			err = w.EnqueueTask(dataFeedAggregateTaskName, params)
 			if err != nil {
 				return w.Fail(err)
 			}
@@ -221,17 +199,9 @@ func getListReportsTaskResults(ev cereal.TaskCompleteEvent) (DataFeedListReports
 	return taskResults, err
 }
 
-func getClientTaskResults(ev cereal.TaskCompleteEvent) (DataFeedClientTaskResults, error) {
-	taskResults := DataFeedClientTaskResults{}
+func getAggregateTaskResults(ev cereal.TaskCompleteEvent) (DataFeedAggregateTaskResults, error) {
+	taskResults := DataFeedAggregateTaskResults{}
 	err := ev.Result.Get(&taskResults)
 	log.Debugf("Client task result %v", taskResults)
-	return taskResults, err
-
-}
-
-func getComplianceTaskResults(ev cereal.TaskCompleteEvent) (DataFeedComplianceTaskResults, error) {
-	taskResults := DataFeedComplianceTaskResults{}
-	err := ev.Result.Get(&taskResults)
-	log.Debugf("Compliance task result %v", taskResults)
 	return taskResults, err
 }

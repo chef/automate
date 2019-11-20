@@ -8,7 +8,7 @@ import (
 
 func TestAssetCreated(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusCreated)
+		w.WriteHeader(http.StatusAccepted)
 	}))
 	defer ts.Close()
 
