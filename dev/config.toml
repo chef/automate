@@ -96,13 +96,6 @@ shared_buffers = "1GB"
       trial_license_url = "https://licensing-dev.chef.io/create-trial"
       enable_apps_feature = true
 
-# applications-service
-[applications]
-  [applications.v1]
-    [applications.v1.sys]
-      [applications.v1.sys.service]
-        enable_nats_feature = true
-
 [license_control.v1.sys.telemetry]
 url = "https://telemetry-acceptance.chef.io"
 

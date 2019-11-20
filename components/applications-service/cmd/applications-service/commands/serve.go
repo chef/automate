@@ -49,16 +49,14 @@ var serveCmd = &cobra.Command{
 		}
 		conf.SetStorage(dbClient)
 
-		if conf.Service.Enabled {
-			ingester := ingest.New(conf, conf.GetStorage())
-			err = ingester.Connect()
-			if err != nil {
-				return err
-			}
-			conf.SetIngester(ingester)
-
-			go ingester.Run()
+		ingester := ingest.New(conf, conf.GetStorage())
+		err = ingester.Connect()
+		if err != nil {
+			return err
 		}
+		conf.SetIngester(ingester)
+
+		go ingester.Run()
 
 		// Metrics Server
 		go StartMetricsServer(conf, svcCerts)

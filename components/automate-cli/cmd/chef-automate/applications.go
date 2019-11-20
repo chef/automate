@@ -3,7 +3,6 @@ package main
 import (
 	"github.com/spf13/cobra"
 
-	apps "github.com/chef/automate/api/config/applications"
 	"github.com/chef/automate/api/config/deployment"
 	"github.com/chef/automate/api/config/gateway"
 	w "github.com/chef/automate/api/config/shared/wrappers"
@@ -93,15 +92,6 @@ func newApplicationsToggleConfig(enable bool) *deployment.AutomateConfig {
 				Sys: &gateway.ConfigRequest_V1_System{
 					Service: &gateway.ConfigRequest_V1_System_Service{
 						EnableAppsFeature: w.Bool(enable),
-					},
-				},
-			},
-		},
-		Applications: &apps.ConfigRequest{
-			V1: &apps.ConfigRequest_V1{
-				Sys: &apps.ConfigRequest_V1_System{
-					Service: &apps.ConfigRequest_V1_System_Service{
-						EnableNatsFeature: w.Bool(enable),
 					},
 				},
 			},
