@@ -349,7 +349,7 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
 	if err != nil {
 		return "", err
 	}
-	return startTaskResult.TaskId, err
+	return startTaskResult.TaskId, nil
 }
 
 func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
@@ -488,8 +488,10 @@ func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectT
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
 		DoAsync(ctx)
-
-	return startTaskResult.TaskId, err
+	if err != nil {
+		return "", err
+	}
+	return startTaskResult.TaskId, nil
 }
 
 func (backend *ESClient) JobCancel(ctx context.Context, jobID string) error {

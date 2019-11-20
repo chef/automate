@@ -57,7 +57,10 @@ func (efs ElasticFeedStore) ReindexFeedsToLatest(ctx context.Context, previousIn
 	src := olivere.NewReindexSource().Index(previousIndex)
 	dst := olivere.NewReindexDestination().Index(IndexNameFeeds)
 	startTaskResult, err := efs.client.Reindex().Source(src).Destination(dst).DoAsync(ctx)
-	return startTaskResult.TaskId, err
+	if err != nil {
+		return "", err
+	}
+	return startTaskResult.TaskId, nil
 }
 
 // DeleteIndex - delete index with name 'index'

@@ -9,10 +9,11 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/olivere/elastic"
+
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
-	"github.com/olivere/elastic"
 )
 
 // InsertAction inserts a Chef Client Action into action-YYYY.MM.DD index
@@ -84,6 +85,9 @@ func (es *Backend) UpdateActionProjectTags(ctx context.Context,
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
 		DoAsync(ctx)
+	if err != nil {
+		return "", err
+	}
 
-	return startTaskResult.TaskId, err
+	return startTaskResult.TaskId, nil
 }
