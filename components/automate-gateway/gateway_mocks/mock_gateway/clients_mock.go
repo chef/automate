@@ -5,6 +5,8 @@
 package mock_gateway
 
 import (
+	reflect "reflect"
+
 	applications "github.com/chef/automate/api/external/applications"
 	data_feed "github.com/chef/automate/api/external/data_feed"
 	secrets "github.com/chef/automate/api/external/secrets"
@@ -12,6 +14,7 @@ import (
 	authz "github.com/chef/automate/api/interservice/authz"
 	v2 "github.com/chef/automate/api/interservice/authz/v2"
 	service "github.com/chef/automate/api/interservice/cfgmgmt/service"
+	"github.com/chef/automate/api/interservice/data_lifecycle"
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	event_feed "github.com/chef/automate/api/interservice/event_feed"
 	ingest "github.com/chef/automate/api/interservice/ingest"
@@ -30,7 +33,6 @@ import (
 	api "github.com/chef/automate/components/notifications-client/api"
 	notifier "github.com/chef/automate/components/notifications-client/notifier"
 	gomock "github.com/golang/mock/gomock"
-	reflect "reflect"
 )
 
 // MockClientsFactory is a mock of ClientsFactory interface
@@ -326,6 +328,21 @@ func (mr *MockClientsFactoryMockRecorder) SecretClient() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SecretClient", reflect.TypeOf((*MockClientsFactory)(nil).SecretClient))
 }
 
+// DatafeedClient mocks base method
+func (m *MockClientsFactory) DatafeedClient() (data_feed.DatafeedServiceClient, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "DatafeedClient")
+	ret0, _ := ret[0].(data_feed.DatafeedServiceClient)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// DatafeedClient indicates an expected call of DatafeedClient
+func (mr *MockClientsFactoryMockRecorder) DatafeedClient() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DatafeedClient", reflect.TypeOf((*MockClientsFactory)(nil).DatafeedClient))
+}
+
 // NodesClient mocks base method
 func (m *MockClientsFactory) NodesClient() (nodes.NodesServiceClient, error) {
 	m.ctrl.T.Helper()
@@ -476,17 +493,17 @@ func (mr *MockClientsFactoryMockRecorder) DeploymentServiceClient() *gomock.Call
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DeploymentServiceClient", reflect.TypeOf((*MockClientsFactory)(nil).DeploymentServiceClient))
 }
 
-// DatafeedClient mocks base method
-func (m *MockClientsFactory) DatafeedClient() (data_feed.DatafeedServiceClient, error) {
+// PurgeClient mocks base method
+func (m *MockClientsFactory) PurgeClient(service string) (data_lifecycle.PurgeClient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "DatafeedClient")
-	ret0, _ := ret[0].(data_feed.DatafeedServiceClient)
+	ret := m.ctrl.Call(m, "PurgeClient")
+	ret0, _ := ret[0].(data_lifecycle.PurgeClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// DatafeedClient indicates an expected call of DatafeedClient
-func (mr *MockClientsFactoryMockRecorder) DatafeedClient() *gomock.Call {
+// PurgeClient indicates an expected call of PurgeClient
+func (mr *MockClientsFactoryMockRecorder) PurgeClient(string) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "DatafeedClient", reflect.TypeOf((*MockClientsFactory)(nil).DatafeedClient))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PurgeClient", reflect.TypeOf((*MockClientsFactory)(nil).PurgeClient))
 }

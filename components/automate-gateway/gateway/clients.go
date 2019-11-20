@@ -15,6 +15,7 @@ import (
 	authz "github.com/chef/automate/api/interservice/authz"
 	iam_v2beta "github.com/chef/automate/api/interservice/authz/v2"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
+	"github.com/chef/automate/api/interservice/data_lifecycle"
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
 	chef_ingest "github.com/chef/automate/api/interservice/ingest"
@@ -110,6 +111,7 @@ type ClientsFactory interface {
 	LicenseControlClient() (license_control.LicenseControlClient, error)
 	DeploymentServiceClient() (deployment.DeploymentClient, error)
 	DatafeedClient() (data_feed.DatafeedServiceClient, error)
+	PurgeClient(service string) (data_lifecycle.PurgeClient, error)
 }
 
 // clientsFactory caches grpc client connections and returns clients
@@ -460,6 +462,15 @@ func (c *clientsFactory) DatafeedClient() (data_feed.DatafeedServiceClient, erro
 	return data_feed.NewDatafeedServiceClient(conn), nil
 }
 
+// PurgeClient takes a service name and returns a Purge client for the service
+func (c *clientsFactory) PurgeClient(service string) (data_lifecycle.PurgeClient, error) {
+	conn, err := c.connectionByName(service)
+	if err != nil {
+		return nil, err
+	}
+	return data_lifecycle.NewPurgeClient(conn), nil
+}
+
 func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error) {
 	conn, exists := c.connections[name]
 	if !exists {
@@ -470,7 +481,7 @@ func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error)
 }
 
 // Populate our endpoints with default targets
-func (c *ClientConfig) configureDefaultEndpoints() {
+func (c *ClientConfig) ConfigureDefaultEndpoints() {
 	if c.Endpoints == nil {
 		c.Endpoints = map[string]ConnectionOptions{}
 	}

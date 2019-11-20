@@ -75,8 +75,11 @@ func (server *JobSchedulerServer) StopNodesMissingScheduler(ctx context.Context,
 func (server *JobSchedulerServer) ConfigureNodesMissingScheduler(ctx context.Context,
 	settings *ingest.JobSettings) (*ingest.ConfigureNodesMissingSchedulerResponse, error) {
 	log.WithFields(log.Fields{
-		"settings": settings.String(),
-	}).Info("Incoming job")
+		"Freq":       settings.Every,
+		"Running":    settings.Running,
+		"Threshold":  settings.Threshold,
+		"Recurrence": settings.Recurrence,
+	}).Info("ConfigureNodesMissingScheduler")
 
 	oldSchedule, err := server.jobManager.GetWorkflowScheduleByName(
 		ctx, MissingNodesScheduleName, MissingNodesWorkflowName)

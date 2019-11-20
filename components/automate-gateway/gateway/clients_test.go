@@ -17,7 +17,7 @@ func TestConfigureDefaultEndpoints(t *testing.T) {
 		},
 	}
 
-	cc.configureDefaultEndpoints()
+	cc.ConfigureDefaultEndpoints()
 
 	// Make sure it doesn't overwrite our configured endpoints
 	assert.Equal("192.168.0.123:9966", cc.Endpoints["teams-service"].Target)

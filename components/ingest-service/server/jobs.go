@@ -214,6 +214,7 @@ func JobSettingsToUpdateOpts(settings *ingest.JobSettings, oldSchedule *cereal.S
 	}
 
 	ret := make([]cereal.WorkflowScheduleUpdateOpt, 0)
+	var newRRule *rrule.RRule
 	if e := settings.GetEvery(); len(e) > 0 {
 		// Convert duration to an rrule
 		d, err := time.ParseDuration(e)
@@ -226,7 +227,7 @@ func JobSettingsToUpdateOpts(settings *ingest.JobSettings, oldSchedule *cereal.S
 			return nil, shouldRunNow, errors.Wrap(err, "could not parse existing recurrence rule")
 		}
 
-		r, err := rrule.NewRRule(rrule.ROption{
+		newRRule, err = rrule.NewRRule(rrule.ROption{
 			Freq:     rrule.SECONDLY,
 			Interval: int(d.Seconds()),
 			Dtstart:  oldRecurrence.OrigOptions.Dtstart,
@@ -234,7 +235,14 @@ func JobSettingsToUpdateOpts(settings *ingest.JobSettings, oldSchedule *cereal.S
 		if err != nil {
 			return nil, shouldRunNow, errors.Wrap(err, "could not construct new recurrence rule")
 		}
-		ret = append(ret, cereal.UpdateRecurrence(r))
+	} else if recurrence := settings.GetRecurrence(); recurrence != "" {
+		newRRule, err = rrule.StrToRRule(recurrence)
+		if err != nil {
+			return nil, shouldRunNow, errors.Wrap(err, "invalid recurrence rule")
+		}
+	}
+	if newRRule != nil {
+		ret = append(ret, cereal.UpdateRecurrence(newRRule))
 	}
 
 	if t := settings.GetThreshold(); len(t) > 0 {

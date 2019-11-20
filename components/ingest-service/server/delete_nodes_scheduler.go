@@ -68,9 +68,10 @@ func (server *JobSchedulerServer) StopDeleteNodesScheduler(ctx context.Context,
 func (server *JobSchedulerServer) ConfigureDeleteNodesScheduler(ctx context.Context,
 	settings *ingest.JobSettings) (*ingest.ConfigureDeleteNodesSchedulerResponse, error) {
 	log.WithFields(log.Fields{
-		"Freq":      settings.Every,
-		"Running":   settings.Running,
-		"Threshold": settings.Threshold,
+		"Freq":       settings.Every,
+		"Running":    settings.Running,
+		"Threshold":  settings.Threshold,
+		"Recurrence": settings.Recurrence,
 	}).Info("ConfigureDeleteNodesScheduler")
 
 	oldSchedule, err := server.jobManager.GetWorkflowScheduleByName(

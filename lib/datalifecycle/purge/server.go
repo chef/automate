@@ -85,7 +85,12 @@ func (server *Server) Run(
 		policies Policies
 	)
 
-	log.Info("Purging")
+	logctx := log.WithFields(log.Fields{
+		"workflow": server.workflowName.String(),
+		"schedule": server.scheduleName,
+	})
+
+	logctx.Info("Purging")
 
 	sched, err = server.jobManager.GetWorkflowScheduleByName(
 		ctx, server.scheduleName, server.workflowName,
@@ -98,17 +103,17 @@ func (server *Server) Run(
 		return res, status.Error(codes.Internal, err.Error())
 	}
 
-	for _, policy := range policies.Pg {
-		// NOTE: this is a noop until pg policies are finished
-		if err = policy.Purge(ctx); err != nil {
-			return res, status.Error(codes.Internal, err.Error())
-		}
+	err = server.jobManager.EnqueueWorkflow(
+		ctx, server.workflowName, server.scheduleName, policies,
+	)
+
+	if err == cereal.ErrWorkflowInstanceExists {
+		logctx.Warn("purge job already running")
+		return res, nil
 	}
 
-	for _, policy := range policies.Es {
-		if err = policy.Purge(ctx, server.esSidecarClient); err != nil {
-			return res, status.Error(codes.Internal, err.Error())
-		}
+	if err != nil {
+		return res, status.Error(codes.Internal, err.Error())
 	}
 
 	return res, nil

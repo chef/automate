@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/pkg/errors"
@@ -15,7 +14,6 @@ import (
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/datalifecycle/purge"
 )
 
 type JobSchedulerServer struct {
@@ -46,59 +44,27 @@ func (server *JobSchedulerServer) GetStatusJobScheduler(ctx context.Context,
 		jobStatus = &ingest.JobSchedulerStatus{}
 	)
 	for _, sched := range schedules {
-		switch sched.WorkflowName {
-		case PurgeWorkflowName.String():
-			var (
-				purgePolicies purge.Policies
-				job           *ingest.Job
-			)
-
-			if err = sched.GetParameters(&purgePolicies); err != nil {
-				return jobStatus, status.Error(codes.Internal, err.Error())
-			}
-
-			if !sched.Enabled {
-				continue
-			}
-
-			toJobName := func(index string) string {
-				index = strings.ReplaceAll(index, "-", "_")
-				return fmt.Sprintf("%s_%s", PurgeWorkflowName, index)
-			}
-
-			for _, policy := range purgePolicies.Es {
-				if policy.Disabled {
-					continue
-				}
-
-				job, err = workflowToIngestJob(
-					sched,
-					toJobName(policy.Name),
-					fmt.Sprintf("%dd", policy.OlderThanDays),
-				)
-
-				if err != nil {
-					return jobStatus, status.Error(codes.Internal, err.Error())
-				}
-				jobs = append(jobs, job)
-			}
-		// SingleJobWorkflow's
-		default:
-			var (
-				threshold string
-				job       *ingest.Job
-			)
-
-			if err = sched.GetParameters(&threshold); err != nil {
-				return jobStatus, status.Error(codes.Internal, err.Error())
-			}
-
-			job, err = workflowToIngestJob(sched, sched.WorkflowName, threshold)
-			if err != nil {
-				return jobStatus, status.Error(codes.Internal, err.Error())
-			}
-			jobs = append(jobs, job)
+		// Skip the purge workflow because it has it's own gRPC interface for
+		// management
+		if sched.WorkflowName == PurgeWorkflowName.String() {
+			continue
 		}
+
+		// SingleJobWorkflow's
+		var (
+			threshold string
+			job       *ingest.Job
+		)
+
+		if err = sched.GetParameters(&threshold); err != nil {
+			return jobStatus, status.Error(codes.Internal, err.Error())
+		}
+
+		job, err = workflowToIngestJob(sched, sched.WorkflowName, threshold)
+		if err != nil {
+			return jobStatus, status.Error(codes.Internal, err.Error())
+		}
+		jobs = append(jobs, job)
 	}
 
 	jobStatus.Running = true
@@ -139,11 +105,12 @@ func workflowToIngestJob(sched *cereal.Schedule, name string, threshold string) 
 	}
 
 	j := ingest.Job{
-		Running:   sched.Enabled,
-		Name:      name,
-		Every:     every,
-		Threshold: threshold,
-		NextRun:   getTimeString(sched.NextDueAt),
+		Running:    sched.Enabled,
+		Name:       name,
+		Every:      every,
+		Threshold:  threshold,
+		Recurrence: sched.Recurrence,
+		NextRun:    getTimeString(sched.NextDueAt),
 	}
 
 	if sched.LastStart != nil && sched.LastEnd != nil {

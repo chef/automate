@@ -197,6 +197,9 @@
         },
         "threshold": {
           "type": "string"
+        },
+        "recurrence": {
+          "type": "string"
         }
       }
     },
