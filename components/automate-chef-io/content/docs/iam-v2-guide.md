@@ -243,12 +243,16 @@ so they are not relevant when assigning IAM resources such as teams or roles.
 
 By default, Chef Automate is currently limited to six projects. If you would like to increase that limit, you will need to do so using the Chef Automate CLI:
 
+First, write the file with your new project limit:
+
 ```
 cat << EOF > authz.toml
 [auth_z.v1.sys.service]
 project_limit = <desired-max-projects>
 EOF
 ```
+
+Then, update the existing Chef Automate configuration:
 
 `chef-automate config patch authz.toml`
 
