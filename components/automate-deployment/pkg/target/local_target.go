@@ -81,6 +81,7 @@ Restart = on-failure
 LimitNOFILE = 65536
 LimitMEMLOCK=infinity
 UMask = 0022
+TasksMax = infinity
 Environment = "HAB_LICENSE=accept-no-persist"
 Environment = "HAB_SUP_BINARY=%s"
 Environment = "HAB_LAUNCH_BINARY=%s"
