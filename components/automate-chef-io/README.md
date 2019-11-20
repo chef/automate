@@ -141,7 +141,7 @@ Review the API docs in your browser:
 
 * If you end up with merge conflicts while writing API docs, don't attempt to resolve them in any generated files. It's better to resolve the conflicts in any human edited file and then regenerate the docs.
 * The all-in-one build command above can fail somewhere in the middle and leave things in an inconsistent state.
-It is safe to run multiple times in a row while fixing syntax errors in .proto files or similar, but since it changes directories it can sometimes be necessary to change back to the root automate directory.
+It is safe to run this command multiple times in a row while fixing syntax errors in .proto files or similar, but since it changes directories, it can sometimes be necessary to change back to the root automate directory.
 
 ### API File Index
 
