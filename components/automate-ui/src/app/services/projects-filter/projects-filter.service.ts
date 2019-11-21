@@ -24,6 +24,8 @@ export class ProjectsFilterService {
 
   dropdownCaretVisible$ = <Observable<boolean>>this.store.select(selectors.dropdownCaretVisible);
 
+  filterVisible$ = <Observable<boolean>>this.store.select(selectors.filterVisible);
+
   constructor(private store: Store<NgrxStateAtom>, private router: Router) { }
 
   loadOptions() {

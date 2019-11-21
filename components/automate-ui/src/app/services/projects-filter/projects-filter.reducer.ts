@@ -34,6 +34,7 @@ export interface ProjectsFilterState {
   selectionCountVisible: boolean;
   selectionCountActive: boolean;
   dropdownCaretVisible: boolean;
+  filterVisible: boolean;
 }
 
 export const projectsFilterInitialState: ProjectsFilterState = {
@@ -43,7 +44,8 @@ export const projectsFilterInitialState: ProjectsFilterState = {
   selectionCount: 0,
   selectionCountVisible: false,
   selectionCountActive: false,
-  dropdownCaretVisible: false
+  dropdownCaretVisible: false,
+  filterVisible: false
 };
 
 export function projectsFilterReducer(
@@ -66,7 +68,8 @@ export function projectsFilterReducer(
         set('selectionCount', selectionCount(sortedOptions)),
         set('selectionCountVisible', selectionCountVisible(sortedOptions)),
         set('selectionCountActive', selectionCountActive(sortedOptions)),
-        set('dropdownCaretVisible', dropdownCaretVisible(sortedOptions))
+        set('dropdownCaretVisible', dropdownCaretVisible(sortedOptions)),
+        set('filterVisible', filterVisible(sortedOptions))
       )(state) as ProjectsFilterState;
     }
 
@@ -158,6 +161,13 @@ function selectionCountActive(options: ProjectsFilterOption[]): boolean {
 function dropdownCaretVisible(options: ProjectsFilterOption[]): boolean {
   const hasOnlyOneOption = options.length === 1;
   return !hasOnlyOneOption;
+}
+
+function filterVisible(options: ProjectsFilterOption[]): boolean {
+  const hasSomePermissions = options.length > 0;
+  const hasOnlyUnassignedPermission = options.length === 1 &&
+    options[0].value === UNASSIGNED_PROJECT_ID;
+  return hasSomePermissions && !hasOnlyUnassignedPermission;
 }
 
 function mergeOptions(
