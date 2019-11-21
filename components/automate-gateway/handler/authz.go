@@ -142,25 +142,56 @@ func (a *AuthzServer) IntrospectSome(
 	methodsInfoV1 := policy.GetInfoMap()
 	methodsInfoV2 := policy_v2.GetInfoMap()
 
-	querySetV1 := getSelectedSubset(log, gwReq.Paths, methodsInfoV1)
-	querySetV2 := getSelectedSubset(log, gwReq.Paths, methodsInfoV2)
+	querySetV1, _ := getNonParameterizedMap(log, gwReq.Paths, methodsInfoV1)
+	querySetV2, paramPaths := getNonParameterizedMap(log, gwReq.Paths, methodsInfoV2)
 	logEndpoints(log, querySetV1)
 	logEndpoints(log, querySetV2)
 
-	// Filter out parameterized API methods; can only evaluate concrete methods.
-	mapByResourceAndActionV1 := pairs.InvertMapNonParameterized(querySetV1)
-	mapByResourceAndActionV2 := pairs.InvertMapNonParameterized(querySetV2)
-
-	endpointMap, err := a.getAllowedMap(ctx,
-		mapByResourceAndActionV1, mapByResourceAndActionV2,
+	// Get NonParameterized Map
+	nonParamMapByResourceAndActionV1 := pairs.InvertMapNonParameterized(querySetV1)
+	nonParamMapByResourceAndActionV2 := pairs.InvertMapNonParameterized(querySetV2)
+	totalEndpointMap, err := a.getAllowedMap(ctx,
+		nonParamMapByResourceAndActionV1, nonParamMapByResourceAndActionV2,
 		methodsInfoV1, methodsInfoV2)
 	if err != nil {
 		return nil, err
 	}
 
-	logResult(log, endpointMap)
+	for _, realizedPath := range paramPaths {
+		mapByResourceAndActionV1, err := pairs.InvertMapParameterized(methodsInfoV1, realizedPath, []string{})
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+		logIntrospectionDetails(log, mapByResourceAndActionV1)
+
+		mapByResourceAndActionV2, err := pairs.InvertMapParameterized(methodsInfoV2, realizedPath, []string{})
+		if err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+		logIntrospectionDetails(log, mapByResourceAndActionV2)
+
+		// TODO (tc): Is there a way to only make one call to getAllowedMap? Currently this returns
+		// the param paths with the generic version of the param.
+		paramEndpointMap, err := a.getAllowedMap(ctx,
+			mapByResourceAndActionV1, mapByResourceAndActionV2,
+			methodsInfoV1, methodsInfoV2)
+
+		// Replace the generic version of the path with one with the params filled in
+		var m *gwAuthzRes.MethodsAllowed
+		for _, v := range paramEndpointMap {
+			m = v
+		}
+		paramEndpointMap = map[string]*gwAuthzRes.MethodsAllowed{
+			realizedPath: m,
+		}
+
+		// Add to the total map
+		totalEndpointMap = combineEndpointMaps(totalEndpointMap, paramEndpointMap)
+	}
+
+	logResult(log, totalEndpointMap)
 	return &gwAuthzRes.IntrospectResp{
-		Endpoints: endpointMap,
+		Endpoints: totalEndpointMap,
 	}, nil
 }
 
@@ -261,7 +292,7 @@ func logEndpoints(log *logrus.Entry, querySet map[string]pairs.Info) {
 	log.Debugf("Endpoints to process: " + strings.Join(endpoints, ", "))
 }
 
-func getSelectedSubset(log *logrus.Entry, paths []string, methodsInfo map[string]pairs.Info) map[string]pairs.Info {
+func getNonParameterizedMap(log *logrus.Entry, paths []string, methodsInfo map[string]pairs.Info) (map[string]pairs.Info, []string) {
 	// to make the main loop more efficient, build a hash first
 	lookupHash := make(map[string]bool, len(paths))
 	for _, path := range paths {
@@ -275,20 +306,16 @@ func getSelectedSubset(log *logrus.Entry, paths []string, methodsInfo map[string
 			subset[key] = meth
 		}
 	}
-	reportBadPaths(log, lookupHash)
-	return subset
-}
 
-func reportBadPaths(log *logrus.Entry, lookupHash map[string]bool) {
-	var badPaths []string
+	// find all unknown paths. those might be parameterized. return them.
+	var unknownPaths []string
 	for path, value := range lookupHash {
 		if !value { // have not touched it
-			badPaths = append(badPaths, path)
+			unknownPaths = append(unknownPaths, path)
 		}
 	}
-	if len(badPaths) > 0 {
-		log.Warn("Unrecognized endpoint paths: " + strings.Join(badPaths, ", "))
-	}
+
+	return subset, unknownPaths
 }
 
 func (a *AuthzServer) getAllowedMap(
@@ -304,17 +331,26 @@ func (a *AuthzServer) getAllowedMap(
 	resp, err := a.filterHandler.FilterAuthorizedPairs(ctx, subjects,
 		mapByResourceAndActionV1, mapByResourceAndActionV2,
 		methodsInfoV1, methodsInfoV2)
+	log.Warnf("WHAT1WHAT1WHAT1WHAT1WHAT1WHAT1WHAT1WHAT1WHAT1 %v", resp)
 	if err != nil {
 		log.WithError(err).Debug("Error on client.FilterAuthorizedPairs")
 		return nil, err
 	}
 	endpointMap, err := pairs.GetEndpointMapFromResponse(
 		resp.Pairs, resp.MethodsInfo, resp.MapByResourceAndAction, true)
+	log.Warnf("WHAT2WHAT2WHAT2WHAT2WHAT2WHAT2WHAT2WHAT2WHAT2WHAT2WHAT2WHAT2WHAT2  %v", endpointMap)
 	if err != nil {
 		log.WithError(err).Debug("Error on pairs.GetEndpointMapFromResponse")
 		return nil, err
 	}
 	return endpointMap, nil
+}
+
+func combineEndpointMaps(nonParamMap, paramMap map[string]*gwAuthzRes.MethodsAllowed) map[string]*gwAuthzRes.MethodsAllowed {
+	for k, v := range paramMap {
+		nonParamMap[k] = v
+	}
+	return nonParamMap
 }
 
 func domainPolicyToGatewayPolicy(pol *authz.Policy) *gwAuthzRes.Policy {
