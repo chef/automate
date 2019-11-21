@@ -21,6 +21,11 @@ export const getStatus = createSelector(
   (state) => state.getStatus
 );
 
+export const deleteStatus = createSelector(
+  roleState,
+  (state) => state.deleteStatus
+);
+
 export const roleFromRoute = createSelector(
   roleEntities,
   routeParams,
