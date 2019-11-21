@@ -7,7 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="/workflow/images/favicon.ico?v=2" rel="shortcut icon">
     <link href="/workflow/images/favicon.png?v=2" rel="icon" type="image/png">
-    <base href="/workflow/e/{{ session.enterprise }}/">
+    <base href="{{enterpriseHref(session.enterprise)}}">
   </head>
   <body ng-class="app_state" cd-flash cd-modal>
     <div class="ng-hide" ng-include="'/workflow/images/icons.svg'"></div>

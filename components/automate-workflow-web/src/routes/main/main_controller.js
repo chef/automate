@@ -12,6 +12,9 @@ function mainController(
   $rootScope, $scope, Store) {
   $rootScope.app_state = "main";
   $rootScope.session = Store.get('session');
+  $rootScope.enterpriseHref = function (enterprise) {
+    return "/workflow/e/" + enterprise + "/"
+  };
 
   $scope.nav_state = Store.get('nav_state') || "";
 }
