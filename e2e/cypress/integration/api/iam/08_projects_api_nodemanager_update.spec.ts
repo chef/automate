@@ -142,19 +142,15 @@ describeIfIAMV2p1('Nodemanager project update tagging', () => {
     }
   ];
 
+  const complianceNodeId = uuidv4();
+  const clientRunsNodeId = uuidv4();
+  const reportId = uuidv4();
+  const nodeName = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`;
+  const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
+  const end = Cypress.moment().utc().endOf('day').format();
+
   before(() => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-  });
-
-  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
-
-  it('tagging 7 projects with all the attributes on a compliance and client runs node', () => {
-    const complianceNodeId = uuidv4();
-    const clientRunsNodeId = uuidv4();
-    const reportId = uuidv4();
-    const nodeName = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`;
-    const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
-    const end = Cypress.moment().utc().endOf('day').format();
 
     // Ingest a InSpec report with attribues that match all the projects
     cy.fixture('compliance/inspec-report.json').then((report) => {
@@ -225,9 +221,15 @@ describeIfIAMV2p1('Nodemanager project update tagging', () => {
     });
 
     cy.waitUntilApplyRulesNotRunning(100);
+  });
 
-    // Ensure that both the compliance and client run nodes' tags are updated
-    projectsWithRule.forEach(projectWithRule => {
+  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
+
+  for ( const projectWithRule of projectsWithRule ) {
+    it(`when a project has a rule that matches a node's ${projectWithRule.rule.type},
+    successfully associates that node with the project`, () => {
+
+      // Ensure that both the compliance and client run nodes' tags are updated
       cy.request({
         headers: {
           projects: [projectWithRule.project.id],
@@ -241,12 +243,12 @@ describeIfIAMV2p1('Nodemanager project update tagging', () => {
           per_page: 100
         }
       }).then((response) => {
-        expect(response.body.nodes.length).to.greaterThan(0);
+        expect(response.body.nodes.length).to.be.greaterThan(0);
         expect(nodeExists(complianceNodeId, response.body.nodes)).to.equal(true);
         expect(nodeExists(clientRunsNodeId, response.body.nodes)).to.equal(true);
       });
     });
-  });
+  }
 });
 
 function nodeExists(nodeId: string, nodes: any[]): boolean {
