@@ -285,6 +285,10 @@ func (s *Store) latestVersion(namespace string, name string) (string, error) {
 		return "", err
 	}
 
+	if len(versions) == 0 {
+		return "", nil
+	}
+
 	semver.Sort(versions)
 	latest := versions[len(versions)-1]
 
