@@ -1,51 +1,51 @@
-<app-client-runs-sidebar></app-client-runs-sidebar>
+<div class="content-container">
+  <div class="container">
+      <main>
+        <chef-page-header>
+          <chef-heading>Chef Servers</chef-heading>
+          <chef-subheading>Manage Chef Servers with Chef Automate.</chef-subheading>
+        </chef-page-header>
 
-<div class="container">
-    <main>
-      <chef-page-header>
-        <chef-heading>Chef Servers</chef-heading>
-        <chef-subheading>Manage Chef Servers with Chef Automate</chef-subheading>
-      </chef-page-header>
+        <app-create-chef-server-modal
+          [visible]="createModalVisible"
+          (close)="closeCreateModal()"
+          [conflictErrorEvent]="conflictErrorEvent"
+          (createClicked)="createChefServer()">
+        </app-create-chef-server-modal>
 
-      <app-create-chef-server-modal
-        [visible]="createModalVisible"
-        (close)="closeCreateModal()"
-        [conflictErrorEvent]="conflictErrorEvent"
-        (createClicked)="createChefServer()">
-      </app-create-chef-server-modal>
-
-      <div class="page-body">
-        <chef-toolbar>
-          <chef-button primary (click)="openCreateModal()">Add Chef Server</chef-button>
-        </chef-toolbar>
-        <chef-table>
-          <chef-thead>
-            <chef-tr>
-              <chef-th>Chef Server Name</chef-th>
-              <chef-th>FQDN</chef-th>
-              <chef-th>IP Address</chef-th>
-              <chef-th># of Orgs</chef-th>
-              <chef-th class="controls"></chef-th>
-            </chef-tr>
-          </chef-thead>
-          <chef-tbody>
-              <chef-tr *ngFor= "let server of serverMockList">
-                  <chef-td>
-                    <a [routerLink]="['/infrastructure/chef-servers', server.name]">{{ server.name }}</a>
-                  </chef-td>
-                  <chef-td>{{ server.fqdn }}</chef-td>
-                  <chef-td>{{ server.ip_address }}</chef-td>
-                  <chef-td>{{ server.orgs }}</chef-td>
-                  <chef-td class="controls">
-                    <app-authorized>
-                      <chef-control-menu>
-                        <chef-option>Remove Server</chef-option>
-                      </chef-control-menu>
-                    </app-authorized>
-                  </chef-td>
-              </chef-tr>
-          </chef-tbody>
-        </chef-table>
-      </div>
-    </main>
-</div>  
+        <div class="page-body">
+          <chef-toolbar>
+            <chef-button primary (click)="openCreateModal()">Add Chef Server</chef-button>
+          </chef-toolbar>
+          <chef-table-new>
+            <chef-table-header>
+              <chef-table-row>
+                <chef-table-header-cell>Chef Server Name</chef-table-header-cell>
+                <chef-table-header-cell>FQDN</chef-table-header-cell>
+                <chef-table-header-cell>IP Address</chef-table-header-cell>
+                <chef-table-header-cell># of Orgs</chef-table-header-cell>
+                <chef-table-header-cell class="controls"></chef-table-header-cell>
+              </chef-table-row>
+            </chef-table-header>
+            <chef-table-body>
+                <chef-table-row *ngFor= "let server of serverMockList">
+                    <chef-table-cell>
+                      <a [routerLink]="['/infrastructure/chef-servers', server.name]">{{ server.name }}</a>
+                    </chef-table-cell>
+                    <chef-table-cell>{{ server.fqdn }}</chef-table-cell>
+                    <chef-table-cell>{{ server.ip_address }}</chef-table-cell>
+                    <chef-table-cell>{{ server.orgs }}</chef-table-cell>
+                    <chef-table-cell class="controls">
+                      <app-authorized>
+                        <chef-control-menu>
+                          <chef-option>Remove Chef Server</chef-option>
+                        </chef-control-menu>
+                      </app-authorized>
+                    </chef-table-cell>
+                </chef-table-row>
+            </chef-table-body>
+          </chef-table-new>
+        </div>
+      </main>
+  </div>
+</div>

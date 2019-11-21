@@ -82,6 +82,12 @@ export class LayoutSidebarService {
                     visible: true
                 },
                 {
+                    name: 'Chef Servers',
+                    icon: 'storage',
+                    route: '/infrastructure/chef-servers',
+                    visible: true
+                },
+                {
                     name: 'Workflow',
                     icon: 'local_shipping',
                     route: '/workflow',

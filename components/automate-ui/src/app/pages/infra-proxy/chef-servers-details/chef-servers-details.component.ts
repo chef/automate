@@ -8,6 +8,7 @@ import { takeUntil } from 'rxjs/operators';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 export type ChefServerTabName = 'orgs' | 'details';
 
 @Component({
@@ -30,11 +31,13 @@ export class ChefServersDetailsComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
-    private router: Router
+    private router: Router,
+    private layoutFacade: LayoutFacadeService
 
   ) { }
 
   ngOnInit() {
+    this.layoutFacade.showInfastructureSidebar();
     // Populate our tabValue from the fragment.
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
     .subscribe((url: string) => {

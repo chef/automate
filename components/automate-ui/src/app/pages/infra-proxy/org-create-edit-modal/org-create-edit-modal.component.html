@@ -6,7 +6,7 @@
       <div class="name-margin">
         <chef-form-field>
           <label>
-            <span class="label">Full Name <span aria-hidden="true">*</span></span>
+            <span class="label">Org Name <span aria-hidden="true">*</span></span>
             <input chefInput formControlName="name" type="text" id="name-input" data-cy="full-name" autocomplete="off">
           </label>
           <chef-error *ngIf="orgForm.get('name').dirty">
@@ -15,7 +15,7 @@
         </chef-form-field>
         <chef-from-field>
           <label>
-            <span class="label">Org Id <span aria-hidden="true">*</span></span>
+            <span class="label">Org ID <span aria-hidden="true">*</span></span>
             <input chefInput formControlName="name" type="text" id="orgId-input" data-cy="full-name" autocomplete="off">
           </label>
           <chef-error *ngIf="orgForm.get('orgId').dirty">

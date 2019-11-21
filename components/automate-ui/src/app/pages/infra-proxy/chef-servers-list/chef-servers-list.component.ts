@@ -1,5 +1,7 @@
 import { Component, OnInit, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+
 
 @Component({
   selector: 'app-chef-servers-list',
@@ -28,9 +30,12 @@ export class ChefServersListComponent implements OnInit {
       orgs: '1'
     }
   ];
-  constructor() { }
+  constructor(
+    private layoutFacade: LayoutFacadeService
+  ) { }
 
   ngOnInit() {
+    this.layoutFacade.showInfastructureSidebar();
   }
 
   public createChefServer(): void {
