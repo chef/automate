@@ -226,7 +226,7 @@ describeIfIAMV2p1('Nodemanager project update tagging', () => {
   after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
 
   for ( const projectWithRule of projectsWithRule ) {
-    it(`when a project has a rule that matches a node's ${projectWithRule.rule.type},
+    it(`when a project has a rule that matches a node's ${projectWithRule.rule.name},
     successfully associates that node with the project`, () => {
 
       // Ensure that both the compliance and client run nodes' tags are updated
