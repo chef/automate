@@ -1,6 +1,11 @@
 @import "~styles/variables";
 @import "~styles/mixins";
 
+#resource-item-list {
+  height: 20vh;
+  overflow-y: scroll;
+}
+
 .rollup-item {
   display: inline-block;
   width: 15%;
