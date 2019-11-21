@@ -68,7 +68,7 @@ export class RoleEffects {
           message: `Could not get role ${id}: ${msg || payload.error}`
         });
       }));
-  
+
   @Effect()
   deleteRole$ = this.actions$.pipe(
     ofType(RoleActionTypes.DELETE),
