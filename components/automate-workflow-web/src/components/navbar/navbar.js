@@ -9,10 +9,6 @@ navbarComponent.$inject = ['$state', '$http', 'featureFlags'];
 function navbarComponent($state, $http, featureFlags) {
   function link(scope) {
     scope.isOn = featureFlags.isOn;
-    // check if there's a "back to console" link we need to display
-    $http.get('/workflow/status/console')
-      .then((resp) => scope.console = resp.data);
-
     scope.isParentActive = (parent) => $state.includes(parent);
   }
 

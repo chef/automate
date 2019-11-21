@@ -30,13 +30,6 @@ describe('navbarComponent', () => {
   }
 
   describe('isParentActive()', () => {
-
-    // we're not interested in the back-to-console link here
-    beforeEach(inject(($httpBackend) => {
-      $httpBackend.when('GET', '/workflow/status/console').respond(404);
-      $httpBackend.when('GET', '/workflow/status/version').respond('delivery 0.6.47\n');
-    }));
-
     beforeEach(() => {
       inject(createDirective());
       $httpBackend.flush();
