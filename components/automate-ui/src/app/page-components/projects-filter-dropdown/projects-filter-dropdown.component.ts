@@ -23,6 +23,8 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
 
   @Input() dropdownCaretVisible = false;
 
+  @Input() filterVisible = false;
+
   @Output() onSelection = new EventEmitter<ProjectsFilterOption[]>();
 
   editableOptions: ProjectsFilterOption[] = [];
@@ -81,9 +83,5 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
     if (element) {
       (element as HTMLElement).focus();
     }
-  }
-
-  filterVisible() {
-    return this.selectionCount > 0;
   }
 }
