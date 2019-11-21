@@ -6,26 +6,25 @@ describeIfIAMV2p1('Nodemanager ingestion project tagging', () => {
 
 
   const projectsWithRule = [
-    // This test is commented out because there is a current limit of 6 projects allowed
-    // {
-    //   project: {
-    //     id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
-    //     name: 'project org'
-    //   },
-    //   rule: {
-    //     id: 'rule-org',
-    //     name: 'rule CHEF_ORGANIZATION',
-    //     type: 'NODE',
-    //     project_id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
-    //     conditions: [
-    //       {
-    //         attribute: 'CHEF_ORGANIZATION',
-    //         operator: 'EQUALS',
-    //         values: ['75th Rangers']
-    //       }
-    //     ]
-    //   }
-    // },
+    {
+      project: {
+        id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
+        name: 'project org'
+      },
+      rule: {
+        id: 'rule-org',
+        name: 'rule CHEF_ORGANIZATION',
+        type: 'NODE',
+        project_id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
+        conditions: [
+          {
+            attribute: 'CHEF_ORGANIZATION',
+            operator: 'EQUALS',
+            values: ['75th Rangers']
+          }
+        ]
+      }
+    },
     {
       project: {
         id: `${cypressPrefix}-project-chef-server-${Cypress.moment().format('MMDDYYhhmm')}`,
@@ -183,7 +182,7 @@ describeIfIAMV2p1('Nodemanager ingestion project tagging', () => {
     const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
     const end = Cypress.moment().utc().endOf('day').format();
 
-    // Ingest a InSpec report with attribues that match all the projects
+    // Ingest a InSpec report with attributes that match all the projects
     cy.fixture('compliance/inspec-report.json').then((report) => {
       report.organization_name = '75th Rangers';
       report.source_fqdn = 'example.org';
@@ -204,7 +203,7 @@ describeIfIAMV2p1('Nodemanager ingestion project tagging', () => {
       });
     });
 
-    // Ingest a node with attribues that match all the projects
+    // Ingest a node with attributes that match all the projects
     cy.fixture('converge/avengers1.json').then((node) => {
       node.organization_name = '75th Rangers';
       node.chef_server_fqdn = 'example.org';
@@ -242,7 +241,7 @@ describeIfIAMV2p1('Nodemanager ingestion project tagging', () => {
           per_page: 100
         }
       }).then((response) => {
-        expect(response.body.nodes.length).to.greaterThan(0);
+        expect(response.body.nodes.length).to.be.greaterThan(0);
         expect(nodeExist(complianceNodeId, response.body.nodes)).to.equal(true);
         expect(nodeExist(clientRunsNodeId, response.body.nodes)).to.equal(true);
       });
