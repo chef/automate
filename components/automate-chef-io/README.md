@@ -25,7 +25,7 @@ A new static website for Automate is based on [Hugo](https://gohugo.io), the Go-
     ```shell
     $ Swagger version
     version: v0.20.1
-    commit: 9004771f77bedabb792a48dc846ba7fc800398a0
+    commit: (SHA)
     ```
 
 1. [Install jq](https://stedolan.github.io/jq/)
@@ -99,7 +99,7 @@ Hugo allows us to nest our data directory structure as much as necessary. You ca
 
 ## API Documentation
 
-To view the API documentation locally, 1. From the `components/automate-chef-io` directory, run the following command to start the development server.
+To view the API documentation locally, navigate to the `components/automate-chef-io` directory, run the following command to start the development server:
 
 ```shell
 $ make serve
@@ -123,7 +123,7 @@ To build the API documentation during development:
 
 1. Make any edits to the .proto files necessary.
 2. Recompile the .proto files as described in the [Automate development guide](https://github.com/chef/automate/blob/master/dev-docs/DEV_ENVIRONMENT.md)
-3. Sync the .swagger files generated with those in the docs component: `make sync_swagger_files`
+3. From the top of the `components/automate-chef-io` directory, sync the .swagger files generated with those in the docs component by running `make sync_swagger_files`
 4. Run the hugo server and view the documentation in your browser
 
 Rebuilding the API docs is necessary when adding documentation content to Automate's .proto files. Changing the code in the .proto files does not require rebuilding, but new or updated services, messages, or fields require documentation.
@@ -344,8 +344,8 @@ message Dog {
   // Types of food the dog is normally fed.
   repeated Food typical_foods = 3;
 }
-// Stats on the statuses of nodes matching the filters.
-message ProfileCounts {
+// A type of food eaten by a Dog
+message Food {
   // The food's name.
   string name = 1;
   // Serving size in ounces.
