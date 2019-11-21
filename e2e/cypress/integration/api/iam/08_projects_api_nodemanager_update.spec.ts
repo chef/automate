@@ -244,22 +244,14 @@ describeIfIAMV2p1('Nodemanager project update tagging', () => {
         }
       }).then((response) => {
         expect(response.body.nodes.length).to.be.greaterThan(0);
-        expect(nodeExists(complianceNodeId, response.body.nodes)).to.equal(true);
-        expect(nodeExists(clientRunsNodeId, response.body.nodes)).to.equal(true);
+        expect(response.body.nodes.some((node: any) =>
+          node.id === complianceNodeId)).to.equal(true);
+        expect(response.body.nodes.some((node: any) =>
+          node.id === clientRunsNodeId)).to.equal(true);
       });
     });
   }
 });
-
-function nodeExists(nodeId: string, nodes: any[]): boolean {
-  for (const node of nodes ) {
-    if (node.id === nodeId) {
-      return true;
-    }
-  }
-
-  return false;
-}
 
 function waitForNodemanagerNode(nodeId: string, maxRetries: number) {
   cy.request({
@@ -277,10 +269,9 @@ function waitForNodemanagerNode(nodeId: string, maxRetries: number) {
   })
   .then((resp: Cypress.ObjectLike) => {
     // to avoid getting stuck in an infinite loop
-    if (maxRetries === 0) {
-      return;
-    }
-    if (resp.body.nodes && resp.body.nodes.length > 0 && nodeExists(nodeId, resp.body.nodes)) {
+    expect(maxRetries).to.not.be.equal(0);
+    if (resp.body.nodes && resp.body.nodes.length > 0 &&
+      resp.body.nodes.some((node: any) => node.id === nodeId)) {
       return;
     }
     cy.wait(1000);
