@@ -26,7 +26,7 @@ steps:
       executor:
         docker:
 
-  - label: "builder"
+  - label: ":habicat: builder tests"
     command: .expeditor/buildkite/builder_test.sh
     concurrency: 1
     concurrency_group: chef-automate-master/deploy/$CHANNEL
