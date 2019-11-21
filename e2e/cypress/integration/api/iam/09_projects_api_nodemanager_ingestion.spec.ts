@@ -141,6 +141,12 @@ describeIfIAMV2p1('Nodemanager ingestion project tagging', () => {
       }
     }
   ];
+  const complianceNodeId = uuidv4();
+  const clientRunsNodeId = uuidv4();
+  const reportId = uuidv4();
+  const nodeName = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`;
+  const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
+  const end = Cypress.moment().utc().endOf('day').format();
 
   before(() => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
@@ -170,17 +176,6 @@ describeIfIAMV2p1('Nodemanager ingestion project tagging', () => {
     });
 
     cy.waitUntilApplyRulesNotRunning(100);
-  });
-
-  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
-
-  it('tagging 7 projects with all the attributes on a compliance and client runs node', () => {
-    const complianceNodeId = uuidv4();
-    const clientRunsNodeId = uuidv4();
-    const reportId = uuidv4();
-    const nodeName = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`;
-    const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
-    const end = Cypress.moment().utc().endOf('day').format();
 
     // Ingest a InSpec report with attributes that match all the projects
     cy.fixture('compliance/inspec-report.json').then((report) => {
@@ -225,9 +220,14 @@ describeIfIAMV2p1('Nodemanager ingestion project tagging', () => {
     waitForNodemanagerNode(complianceNodeId, 30);
     // wait for the client run report to be ingested
     waitForNodemanagerNode(clientRunsNodeId, 30);
+  });
 
-    // Ensure the both the compliance and client run nodes' tags are updated
-    projectsWithRule.forEach(projectWithRule => {
+  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
+
+  // Ensure the both the compliance and client run nodes' tags are updated
+  for ( const projectWithRule of projectsWithRule ) {
+    it(`when a project has a rule that matches a node's ${projectWithRule.rule.name},
+    successfully associates that node with the project`, () => {
       cy.request({
         headers: {
           projects: [projectWithRule.project.id],
@@ -246,7 +246,7 @@ describeIfIAMV2p1('Nodemanager ingestion project tagging', () => {
         expect(nodeExist(clientRunsNodeId, response.body.nodes)).to.equal(true);
       });
     });
-  });
+  }
 });
 
 function nodeExist(nodeId: string, nodes: any[]): boolean {
@@ -275,9 +275,8 @@ function waitForNodemanagerNode(nodeId: string, maxRetries: number) {
   })
   .then((resp: Cypress.ObjectLike) => {
     // to avoid getting stuck in an infinite loop
-    if (maxRetries === 0) {
-      return;
-    }
+    expect(maxRetries).to.be.greaterThan(0);
+
     if (resp.body.nodes && resp.body.nodes.length > 0 && nodeExist(nodeId, resp.body.nodes)) {
       return;
     }
