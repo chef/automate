@@ -256,33 +256,49 @@ func (s *Store) ReadMarketTar(name string, version string) ([]byte, error) {
 	return tarBlob, nil
 }
 
-func (s *Store) latestVersion(namespace string, name string) (*inspec.Metadata, error) {
-	sort := "name"
-	order := "ASC"
-	metadataList, err := s.ListProfilesMetadata(namespace, name, sort, order)
+func (s *Store) latestVersion(namespace string, name string) (string, error) {
+	query := `
+		SELECT info->>'version'
+		FROM store_profiles WHERE
+		sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
+		AND info->>'name' = $2
+	`
+
+	rows, err := s.DB.Query(query, namespace, name)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
-	var latest inspec.Metadata
-	for _, metadata := range metadataList {
-		v1, _ := semver.Make(latest.Version)
-		v2, _ := semver.Make(metadata.Version)
-		if metadata.Name == name && v2.GT(v1) {
-			latest = metadata
+	defer rows.Close() // nolint: errcheck
+
+	versions := make([]semver.Version, 0)
+
+	for rows.Next() {
+		var version semver.Version
+		err := rows.Scan(&version)
+		if err != nil {
+			return "", err
 		}
+		versions = append(versions, version)
+	}
+	err = rows.Err()
+	if err != nil {
+		return "", err
 	}
 
-	return &latest, nil
+	semver.Sort(versions)
+	latest := versions[len(versions)-1]
+
+	return latest.String(), nil
 }
 
 // returns data about an individual profile
 func (s *Store) Read(namespace string, name string, version string) (*inspec.Profile, error) {
 	if len(version) == 0 {
-		metadata, err := s.latestVersion(namespace, name)
+		v, err := s.latestVersion(namespace, name)
 		if err != nil {
 			return nil, err
 		}
-		version = metadata.Version
+		version = v
 	}
 
 	selectProfileSQL := `
@@ -310,11 +326,11 @@ func (s *Store) Read(namespace string, name string, version string) (*inspec.Pro
 // returns the tar for a specific profile
 func (s *Store) ReadTar(namespace string, name string, version string) ([]byte, error) {
 	if len(version) == 0 {
-		metadata, err := s.latestVersion(namespace, name)
+		v, err := s.latestVersion(namespace, name)
 		if err != nil {
 			return nil, err
 		}
-		version = metadata.Version
+		version = v
 	}
 
 	selectProfileSQL := `
