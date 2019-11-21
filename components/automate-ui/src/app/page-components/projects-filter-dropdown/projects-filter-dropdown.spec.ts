@@ -30,6 +30,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       component.selectionCount = 3;
       component.selectionCountVisible = true;
       component.selectionCountActive = true;
+      component.filterVisible = true;
       fixture.detectChanges();
     });
 

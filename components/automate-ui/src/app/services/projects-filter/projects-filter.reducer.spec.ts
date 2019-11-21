@@ -218,6 +218,11 @@ describe('projectsFilterReducer', () => {
         genProject('zz-proj')
       );
 
+      it('displays filter', () => {
+        const { filterVisible } = projectsFilterReducer(initialState, action);
+        expect(filterVisible).toEqual(true);
+      });
+
       it('displays project name', () => {
         const { selectionLabel } = projectsFilterReducer(initialState, action);
         expect(selectionLabel).toEqual('zz-proj');
@@ -239,9 +244,9 @@ describe('projectsFilterReducer', () => {
         genUnassignedProject()
       );
 
-      it('displays "(unassigned)"', () => {
-        const { selectionLabel } = projectsFilterReducer(initialState, action);
-        expect(selectionLabel).toEqual(UNASSIGNED_PROJECT_LABEL);
+      it('does not display filter', () => {
+        const { filterVisible } = projectsFilterReducer(initialState, action);
+        expect(filterVisible).toEqual(false);
       });
 
       it('displays no count badge', () => {
@@ -262,6 +267,11 @@ describe('projectsFilterReducer', () => {
           genUnassignedProject(),
           genProject('zz-proj')
         );
+
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
 
         it('displays "All projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
@@ -285,6 +295,11 @@ describe('projectsFilterReducer', () => {
           genProject('zz-proj', true)
         );
 
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
+
         it('displays that project', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual('zz-proj');
@@ -307,6 +322,11 @@ describe('projectsFilterReducer', () => {
           genProject('zz-proj')
         );
 
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
+
         it('displays "(unassigned)"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual(UNASSIGNED_PROJECT_LABEL);
@@ -327,6 +347,11 @@ describe('projectsFilterReducer', () => {
           genUnassignedProject(true),
           genProject('zz-proj', true)
         );
+
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
 
         it('displays "All projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
@@ -357,6 +382,11 @@ describe('projectsFilterReducer', () => {
           genProject('b-proj')
         );
 
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
+
         it('displays "All projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual(ALL_PROJECTS_LABEL);
@@ -381,6 +411,11 @@ describe('projectsFilterReducer', () => {
           genProject('a-proj', true),
           genProject('b-proj')
         );
+
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
 
         it('displays that project', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
@@ -407,6 +442,11 @@ describe('projectsFilterReducer', () => {
           genProject('b-proj')
         );
 
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
+
         it('displays "(unassigned)"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual(UNASSIGNED_PROJECT_LABEL);
@@ -430,6 +470,11 @@ describe('projectsFilterReducer', () => {
           genProject('a-proj'),
           genProject('b-proj')
         );
+
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
 
         it('displays selected project', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
@@ -455,10 +500,16 @@ describe('projectsFilterReducer', () => {
           genProject('b-proj')
         );
 
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
+
         it('displays "Multiple projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual(MULTIPLE_PROJECTS_LABEL);
         });
+
         it('displays blue count badge with count of checked projects', () => {
           const { selectionCount, selectionCountActive, selectionCountVisible }
             = projectsFilterReducer(initialState, action);
@@ -481,6 +532,11 @@ describe('projectsFilterReducer', () => {
           genProject('a-proj', true),
           genProject('b-proj')
         );
+
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
 
         it('displays "Multiple projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
@@ -509,10 +565,16 @@ describe('projectsFilterReducer', () => {
           genProject('b-proj', true)
         );
 
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
+
         it('displays "All projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual(ALL_PROJECTS_LABEL);
         });
+
         it('displays blue count badge with count of checked projects', () => {
           const { selectionCount, selectionCountActive, selectionCountVisible }
             = projectsFilterReducer(initialState, action);
@@ -536,6 +598,11 @@ describe('projectsFilterReducer', () => {
           genProject('b-proj', true)
         );
 
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
+
         it('displays "All projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual(ALL_PROJECTS_LABEL);
@@ -553,9 +620,7 @@ describe('projectsFilterReducer', () => {
     });
 
     describe('with at least 2 projects allowed but not unassigned', () => {
-
       // Also check that every case displays the caret to open dropdown
-
       describe('when nothing is selected', () => {
         const action = genAction(
           genProject('zz-proj'),
@@ -563,6 +628,11 @@ describe('projectsFilterReducer', () => {
           genProject('a-proj'),
           genProject('b-proj')
         );
+
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
 
         it('displays "All projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
@@ -591,6 +661,11 @@ describe('projectsFilterReducer', () => {
           genProject('b-proj')
         );
 
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
+
         it('displays that project', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual('a-proj');
@@ -615,10 +690,16 @@ describe('projectsFilterReducer', () => {
           genProject('b-proj')
         );
 
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
+
         it('displays "Multiple projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual(MULTIPLE_PROJECTS_LABEL);
         });
+
         it('displays blue count badge with count of checked projects', () => {
           const { selectionCount, selectionCountActive, selectionCountVisible }
             = projectsFilterReducer(initialState, action);
@@ -641,10 +722,16 @@ describe('projectsFilterReducer', () => {
           genProject('b-proj', true)
         );
 
+        it('displays filter', () => {
+          const { filterVisible } = projectsFilterReducer(initialState, action);
+          expect(filterVisible).toEqual(true);
+        });
+
         it('displays "All projects"', () => {
           const { selectionLabel } = projectsFilterReducer(initialState, action);
           expect(selectionLabel).toEqual(ALL_PROJECTS_LABEL);
         });
+
         it('displays blue count badge with count of checked projects', () => {
           const { selectionCount, selectionCountActive, selectionCountVisible }
             = projectsFilterReducer(initialState, action);
