@@ -26,6 +26,15 @@ steps:
       executor:
         docker:
 
+  - label: ":habicat: builder tests"
+    command: .expeditor/buildkite/builder_test.sh
+    concurrency: 1
+    concurrency_group: chef-automate-master/deploy/$CHANNEL
+    timeout_in_minutes: 30
+    expeditor:
+      executor:
+          docker:
+
   - label: ":cypress:"
     command: .expeditor/buildkite/cypress.sh
     soft_fail: true
