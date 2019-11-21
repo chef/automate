@@ -224,7 +224,7 @@ describeIfIAMV2p1('Nodemanager ingestion project tagging', () => {
 
   after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
 
-  // Ensure the both the compliance and client run nodes' tags are updated
+  // Ensure that both the compliance and client run nodes' tags are updated
   for ( const projectWithRule of projectsWithRule ) {
     it(`when a project has a rule that matches a node's ${projectWithRule.rule.name},
     successfully associates that node with the project`, () => {
@@ -242,21 +242,17 @@ describeIfIAMV2p1('Nodemanager ingestion project tagging', () => {
         }
       }).then((response) => {
         expect(response.body.nodes.length).to.be.greaterThan(0);
-        expect(nodeExist(complianceNodeId, response.body.nodes)).to.equal(true);
-        expect(nodeExist(clientRunsNodeId, response.body.nodes)).to.equal(true);
+        expect(response.body.nodes.some((node: any) =>
+          node.id === complianceNodeId)).to.equal(true);
+        expect(response.body.nodes.some((node: any) =>
+          node.id === clientRunsNodeId)).to.equal(true);
       });
     });
   }
 });
 
 function nodeExist(nodeId: string, nodes: any[]): boolean {
-  for (const node of nodes ) {
-    if (node.id === nodeId) {
-      return true;
-    }
-  }
-
-  return false;
+  return nodes.some(node => node.id === nodeId);
 }
 
 function waitForNodemanagerNode(nodeId: string, maxRetries: number) {
@@ -277,7 +273,8 @@ function waitForNodemanagerNode(nodeId: string, maxRetries: number) {
     // to avoid getting stuck in an infinite loop
     expect(maxRetries).to.be.greaterThan(0);
 
-    if (resp.body.nodes && resp.body.nodes.length > 0 && nodeExist(nodeId, resp.body.nodes)) {
+    if (resp.body.nodes && resp.body.nodes.length > 0 &&
+      resp.body.nodes.some((node: any) => node.id === nodeId)) {
       return;
     }
     cy.wait(1000);
