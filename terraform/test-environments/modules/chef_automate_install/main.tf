@@ -250,16 +250,6 @@ EOF
 
 [gateway.v1.sys.service]
   trial_license_url = "https://licensing-${var.channel}.chef.io/create-trial"
-  enable_apps_feature = ${var.enable_eas_dashboard}
-
-[event_gateway.v1.sys.service]
-  enable_nats_feature = ${var.enable_eas_dashboard}
-
-[event_service.v1.sys.service]
-  enable_nats_feature = ${var.enable_eas_dashboard}
-
-[applications.v1.sys.service]
-  enable_nats_feature = ${var.enable_eas_dashboard}
 
 [[load_balancer.v1.sys.frontend_tls]]
   cert = """${join("\n", formatlist("%s", split("\n", data.aws_s3_bucket_object.wilcard_chef_co_crt.body)))}"""
