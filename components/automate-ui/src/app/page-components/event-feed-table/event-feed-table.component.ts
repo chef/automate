@@ -1,6 +1,6 @@
 import { Component, Input, ViewChild, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { capitalize, getOr, endsWith, replace, concat } from 'lodash/fp';
-import { Subject, Subscription, Observable } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ChefEvent, ChefEventCollection, EventFeedFilter, Chicklet } from '../../types/types';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
@@ -26,7 +26,6 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
   DateTime = DateTime;
 
   @ViewChild('groupSidePanel', { static: true }) sidepanel: ElementRef;
-  private subscription: Subscription;
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -80,7 +79,6 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
 
   hideGroupedEvents() {
     this.showEventGroupPanel = false;
-    this.subscription.unsubscribe();
     this.groupedEventsButton.focus();
   }
 
