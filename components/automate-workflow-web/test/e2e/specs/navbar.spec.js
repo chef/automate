@@ -48,15 +48,6 @@ describe('navbar', () => {
             }
           }
         },
-        {
-          request: {
-            url: '/workflow/status/console',
-            method: 'GET'
-          },
-          response: {
-            status: 404
-          }
-        }
       ]);
     });
 
@@ -118,72 +109,6 @@ describe('navbar', () => {
 
     it('does not show any link next to Admin', () => {
       expect(navbar.consoleLink).not.toBePresent();
-    });
-  });
-
-  describe('navigation with a console link', () => {
-
-    beforeEach(() => {
-      navbar = new Navbar();
-
-      mockApi([
-        authorizedLogin,
-        {
-          request: {
-            url: '/api/v0/e/Chef/users$',
-            method: 'GET'
-          },
-          response: {
-            status: 200,
-            body: {
-              users: []
-            }
-          }
-        },
-        {
-          request: {
-            url: '/api/v0/e/Chef/orgs$',
-            method: 'GET'
-          },
-          response: {
-            status: 200,
-            body: {
-              orgs: []
-            }
-          }
-        },
-        {
-          request: {
-            url: '/workflow/status/console',
-            method: 'GET'
-          },
-          response: {
-            status: 200,
-            body: {
-              name: 'chefworks console',
-              url: 'https://chef.io'
-            }
-          }
-        }
-      ]);
-    });
-
-    // See comment above
-    beforeEach(() => {
-      browser.ignoreSynchronization = true;
-      browser.get('#/dashboard');
-      browser.wait(presenceOf('.navbar'));
-    });
-
-    it('shows the console link next to Admin', () => {
-      expect(navbar.consoleLink).toBePresent();
-      navbar.consoleLink.getAttribute('target').then((attr) => {
-        expect(attr).toBe('_blank');
-      });
-      navbar.consoleLink.getAttribute('href').then((attr) => {
-        expect(attr).toBe('https://chef.io/')
-      });
-      expect(navbar.consoleLink.getText()).toBe('chefworks console');
     });
   });
 });
