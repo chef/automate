@@ -7,6 +7,10 @@ func init() {
     "title": "api/external/ingest/chef.proto",
     "version": "version not set"
   },
+  "schemes": [
+    "http",
+    "https"
+  ],
   "consumes": [
     "application/json"
   ],

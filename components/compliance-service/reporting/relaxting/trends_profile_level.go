@@ -17,10 +17,12 @@ func (depth *ProfileDepth) getTrendAggs(trendType string,
 		aggs["passed"] = elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.status", "passed"))
 		aggs["failed"] = elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.status", "failed"))
 		aggs["skipped"] = elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.status", "skipped"))
+		aggs["waived"] = elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.status", "waived"))
 	} else if trendType == "controls" {
 		aggs["passed"] = elastic.NewSumAggregation().Field("profiles.controls_sums.passed.total")
 		aggs["failed"] = elastic.NewSumAggregation().Field("profiles.controls_sums.failed.total")
 		aggs["skipped"] = elastic.NewSumAggregation().Field("profiles.controls_sums.skipped.total")
+		aggs["waived"] = elastic.NewSumAggregation().Field("profiles.controls_sums.waived")
 	}
 	return depth.wrap(aggs)
 }
@@ -50,6 +52,7 @@ func (depth *ProfileDepth) getTrendResults(trendType string,
 				Passed:     0,
 				Failed:     0,
 				Skipped:    0,
+				Waived:     0,
 			}
 
 			if trendBucket, found := depth.unwrap(&wrappedTrendBucket.Aggregations); found {
@@ -63,6 +66,9 @@ func (depth *ProfileDepth) getTrendResults(trendType string,
 					if skippedResult, found := trendBucket.Aggregations.Filter("skipped"); found {
 						zaStatsBucket.Skipped = int32(skippedResult.DocCount)
 					}
+					if waivedResult, found := trendBucket.Aggregations.Filter("waived"); found {
+						zaStatsBucket.Waived = int32(waivedResult.DocCount)
+					}
 				} else if trendType == "controls" {
 					if passedResult, found := trendBucket.Aggregations.Sum("passed"); found {
 						zaStatsBucket.Passed = int32(*passedResult.Value)
@@ -72,6 +78,9 @@ func (depth *ProfileDepth) getTrendResults(trendType string,
 					}
 					if skippedResult, found := trendBucket.Aggregations.Sum("skipped"); found {
 						zaStatsBucket.Skipped = int32(*skippedResult.Value)
+					}
+					if waivedResult, found := trendBucket.Aggregations.Sum("waived"); found {
+						zaStatsBucket.Waived = int32(*waivedResult.Value)
 					}
 				}
 				mapOfTrends[trendIndexDateAsString] = zaStatsBucket
