@@ -4,7 +4,6 @@ import { uuidv4 } from '../../helpers';
 describeIfIAMV2p1('Action project update tagging', () => {
   const cypressPrefix = 'test-client-runs-update';
 
-
   const projectsWithRule = [
     {
       project: {
@@ -45,18 +44,15 @@ describeIfIAMV2p1('Action project update tagging', () => {
       }
     }
   ];
+  const actionId = uuidv4();
+  const entityName = `entity_name-${Cypress.moment().format('MMDDYYhhmmss')}`;
+  const end = Cypress.moment().utc().endOf('day').valueOf().toString();
+  const start = Cypress.moment().utc().subtract(3, 'day').valueOf().toString();
 
   before(() => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-  });
 
-  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
-
-  it('tagging 2 projects with all the attributes on a client runs action', () => {
-    const actionId = uuidv4();
-    const entityName = `entity_name-${Cypress.moment().format('MMDDYYhhmmss')}`;
-
-    // Ingest an action with attribues that match all the projects
+    // Ingest an action with attributes that match all the projects
     cy.fixture('action/environment_create.json').then((action) => {
       action.organization_name = '75th Rangers';
       action.remote_hostname = 'example.org';
@@ -99,11 +95,14 @@ describeIfIAMV2p1('Action project update tagging', () => {
     });
 
     cy.waitUntilApplyRulesNotRunning(100);
+  });
 
-    const end = Cypress.moment().utc().endOf('day').valueOf().toString();
-    const start = Cypress.moment().utc().subtract(3, 'day').valueOf().toString();
-    // Ensure the event is tagged with the correct project
-    projectsWithRule.forEach(projectWithRule => {
+  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
+
+  for (const projectWithRule of projectsWithRule) {
+    it(`when a project has a rule that matches an action's ${projectWithRule.rule.name},
+      successfully associates that action with the project`, () => {
+      // Ensure the event is tagged with the correct project
       cy.request({
         headers: {
           'api-token': Cypress.env('ADMIN_TOKEN'),
@@ -116,7 +115,7 @@ describeIfIAMV2p1('Action project update tagging', () => {
         expect(eventExist(entityName, response.body.events)).to.equal(true);
       });
     });
-  });
+  }
 });
 
 function waitForAction(entityName: string, maxRetries: number) {
