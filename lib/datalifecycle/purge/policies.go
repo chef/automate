@@ -43,6 +43,7 @@ func (p EsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarClient)
 		res    *es.PurgeResponse
 		req    = &es.PurgeRequest{}
 		logctx = log.WithFields(log.Fields{
+			"policy_type":     "elasticsearch",
 			"id":              id,
 			"older_than_days": p.OlderThanDays,
 			"index_name":      p.IndexName,
@@ -50,7 +51,7 @@ func (p EsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarClient)
 	)
 
 	if p.Disabled {
-		logctx.Debug("Skipping purge because policy is disabled")
+		logctx.Info("Skipping purge because policy is disabled")
 		return nil
 	}
 
@@ -63,7 +64,7 @@ func (p EsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarClient)
 		req.CustomPurgeField = p.CustomPurgeField
 	}
 
-	logctx.Debug("Purging")
+	logctx.Info("Purging")
 	if req.CustomPurgeField == "" {
 		// We add 1 one here because otherwise we would delete an
 		// index that included documents newer than olderThanDays.
