@@ -28,5 +28,5 @@ appendToStringIfMissing() {
 # addNoProxy adds the given argument to
 # the no_proxy environment variable.
 addNoProxy() {
-    export no_proxy="$(appendToStringIfMissing "$no_proxy" "$1" ",")"
+    export no_proxy="$(appendToStringIfMissing "${no_proxy:-}" "$1" ",")"
 }
