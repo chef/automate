@@ -4,7 +4,7 @@
   [attr.title]="selectionLabel"
   [disabled]="!dropdownCaretVisible"
   (click)="handleLabelClick()"
-  *ngIf="filterVisible()">
+  *ngIf="filterVisible">
   <span class="selection-label">{{ selectionLabel }}</span>
   <span class="selection-count"
     *ngIf="selectionCountVisible"

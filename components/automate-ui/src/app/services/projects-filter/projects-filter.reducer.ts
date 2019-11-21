@@ -164,9 +164,10 @@ function dropdownCaretVisible(options: ProjectsFilterOption[]): boolean {
 }
 
 function filterVisible(options: ProjectsFilterOption[]): boolean {
+  const hasSomePermissions = options.length > 0;
   const hasOnlyUnassignedPermission = options.length === 1 &&
     options[0].value === UNASSIGNED_PROJECT_ID;
-  return !hasOnlyUnassignedPermission;
+  return hasSomePermissions && !hasOnlyUnassignedPermission;
 }
 
 function mergeOptions(
