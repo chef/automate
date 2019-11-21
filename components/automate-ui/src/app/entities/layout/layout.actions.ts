@@ -2,8 +2,14 @@ import { Action } from '@ngrx/store';
 import { MenuItemGroup } from './layout.model';
 
 export enum LayoutActionTypes {
+  SHOW_PAGE_LOADING = 'Layout::SHOW_PAGE_LOADING',
   GET_SIDEBAR_MENU_GROUPS = 'LAYOUT::GET',
   UPDATE_SIDEBAR_MENU_GROUPS = 'LAYOUT::UPDATE'
+}
+
+export class ShowPageLoading implements Action {
+  readonly type = LayoutActionTypes.SHOW_PAGE_LOADING;
+  constructor(public payload: boolean) {}
 }
 
 export class GetSidebarMenuGroups implements Action {
@@ -18,5 +24,6 @@ export class UpdateSidebarMenuGroups implements Action {
 }
 
 export type LayoutActions =
+  | ShowPageLoading
   | GetSidebarMenuGroups
   | UpdateSidebarMenuGroups;

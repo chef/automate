@@ -3,10 +3,12 @@ import { MenuItemGroup } from './layout.model';
 import { LayoutActions, LayoutActionTypes } from './layout.actions';
 
 export interface LayoutEntityState {
+  showPageLoading: boolean;
   menuGroups: MenuItemGroup[];
 }
 
 export const InitialState: LayoutEntityState = {
+  showPageLoading: false,
   menuGroups: []
 };
 
@@ -15,6 +17,10 @@ export function layoutEntityReducer(
   action: LayoutActions): LayoutEntityState {
 
   switch (action.type) {
+
+    case LayoutActionTypes.SHOW_PAGE_LOADING: {
+      return set('showPageLoading', action.payload)(state);
+    }
 
     case LayoutActionTypes.GET_SIDEBAR_MENU_GROUPS:
       return state;

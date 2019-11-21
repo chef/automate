@@ -43,6 +43,7 @@ export class ProfileDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.ShowPageLoading(false);
     this.route.queryParams.pipe(
       takeUntil(this.isDestroyed))
       .subscribe(({owner, name, version}) => {
@@ -110,6 +111,7 @@ export class ProfileDetailsComponent implements OnInit, OnDestroy {
 
   fetchProfile(owner, name, version) {
     this.showLoadingIcon = true;
+    this.layoutFacade.ShowPageLoading(true);
     if (!owner || !owner.length) {
     // if we receive undefined for owner, we know this
     // profile is a 'premium' (available) profile
@@ -120,6 +122,7 @@ export class ProfileDetailsComponent implements OnInit, OnDestroy {
             this.profile = availProfile;
             this.isAvailable = true;
             this.showLoadingIcon = false;
+            this.layoutFacade.ShowPageLoading(false);
           });
     } else {
       this.profilesService.getProfile(owner, name, version).pipe(
@@ -128,6 +131,7 @@ export class ProfileDetailsComponent implements OnInit, OnDestroy {
           (installedProfile) => {
             this.profile = installedProfile;
             this.showLoadingIcon = false;
+            this.layoutFacade.ShowPageLoading(false);
           });
     }
   }

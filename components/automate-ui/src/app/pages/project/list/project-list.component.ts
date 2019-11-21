@@ -27,7 +27,6 @@ import { LoadOptions } from 'app/services/projects-filter/projects-filter.action
   styleUrls: ['./project-list.component.scss']
 })
 export class ProjectListComponent implements OnInit, OnDestroy {
-  public loading$: Observable<boolean>;
   public isIAMv2$: Observable<boolean>;
   public sortedProjects$: Observable<Project[]>;
   public projectToDelete: Project;
@@ -76,8 +75,8 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.layoutFacade.showSettingsSidebar();
     this.projects.getApplyRulesStatus();
     this.store.dispatch(new GetProjects());
-
-    this.loading$ = this.store.select(getAllStatus).pipe(map(loading));
+    this.store.select(getAllStatus).pipe(map(loading)).subscribe((isloading) =>
+      this.layoutFacade.ShowPageLoading(isloading));
     this.sortedProjects$ = this.store.select(allProjects).pipe(
       map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name')));
 

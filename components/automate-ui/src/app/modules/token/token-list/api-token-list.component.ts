@@ -34,7 +34,6 @@ import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filt
   styleUrls: ['./api-token-list.component.scss']
 })
 export class ApiTokenListComponent implements OnInit, OnDestroy {
-  public loading$: Observable<boolean>;
   public sortedApiTokens$: Observable<ApiToken[]>;
   public apiTokenCount$: Observable<number>;
   public deleteModalVisible = false;
@@ -55,7 +54,8 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.loading$ = store.pipe(select(apiTokenStatus), map(loading));
+    store.select(apiTokenStatus).pipe(map(loading)).subscribe((isloading) =>
+      this.layoutFacade.ShowPageLoading(isloading));
     this.isIAMv2$ = store.select(isIAMv2);
     this.apiTokenCount$ = store.select(totalApiTokens);
 

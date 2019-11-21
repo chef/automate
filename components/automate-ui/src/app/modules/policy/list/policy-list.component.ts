@@ -17,7 +17,6 @@ import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
   styleUrls: ['./policy-list.component.scss']
 })
 export class PolicyListComponent implements OnInit {
-  public loading$: Observable<boolean>;
   public sortedPolicies$: Observable<Policy[]>;
   public isIAMv2$: Observable<boolean>;
   public policyToDelete: Policy;
@@ -27,7 +26,9 @@ export class PolicyListComponent implements OnInit {
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.loading$ = store.pipe(select(getAllStatus), map(loading));
+    store.pipe(select(getAllStatus), map(loading)).subscribe((isloading) =>
+      this.layoutFacade.ShowPageLoading(isloading));
+
     this.sortedPolicies$ = store.pipe(
       select(allPolicies),
       map(policies => ChefSorters.naturalSort(policies, 'name')));

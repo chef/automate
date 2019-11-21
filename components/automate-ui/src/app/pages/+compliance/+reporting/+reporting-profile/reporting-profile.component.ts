@@ -41,6 +41,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showComplianceSidebar();
     this.showLoadingIcon = true;
+    this.layoutFacade.ShowPageLoading(true);
 
     const id = this.route.snapshot.params['id'];
     this.fetchProfile(id, this.reportQuery.getReportQuery()).pipe(
@@ -77,6 +78,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
     this.controls = controls;
     this.scanResults.profile = profile;
     this.showLoadingIcon = false;
+    this.layoutFacade.ShowPageLoading(false);
   }
 
   onFilterParamsChange(reportQuery: ReportQuery, params: any) {

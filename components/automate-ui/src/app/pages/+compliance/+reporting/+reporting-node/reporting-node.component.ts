@@ -37,6 +37,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showComplianceSidebar();
     this.reportLoading = true;
+    this.layoutFacade.ShowPageLoading(true);
     const id: string = this.route.snapshot.params['id'];
     const reportQuery = this.reportQuery.getReportQuery();
     reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
@@ -47,6 +48,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
         this.statsService.getSingleReport(reports[0].id, reportQuery)
           .subscribe(data => {
             this.reportLoading = false;
+            this.layoutFacade.ShowPageLoading(false);
             this.activeReport = Object.assign(reports[0], data);
           });
       });
@@ -59,9 +61,11 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
 
   onReportItemClick(_event, report) {
     this.reportLoading = true;
+    this.layoutFacade.ShowPageLoading(true);
     this.statsService.getSingleReport(report.id, this.reportQuery.getReportQuery())
       .subscribe(data => {
         this.reportLoading = false;
+        this.layoutFacade.ShowPageLoading(false);
         this.activeReport = Object.assign(report, data);
       });
   }
