@@ -394,4 +394,63 @@ BEGIN
 END
 $$;`,
 	},
+	{
+		desc: "Add enqueued_at to cereal_dequeue_* functions",
+		upSQL: `
+CREATE OR REPLACE FUNCTION cereal_dequeue_task_v2(_task_name TEXT)
+RETURNS TABLE(id BIGINT, parameters BYTEA, enqueued_at TIMESTAMPTZ)
+AS $$
+DECLARE
+    r cereal_tasks%rowtype;
+BEGIN
+    FOR r IN
+        SELECT * FROM cereal_tasks
+        WHERE task_name = _task_name AND task_state = 'queued' AND start_after < NOW()
+        ORDER BY enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
+    LOOP
+        UPDATE cereal_tasks SET task_state = 'running', updated_at = NOW() WHERE cereal_tasks.id = r.id;
+
+        id := r.id;
+        parameters := r.parameters;
+        enqueued_at := r.enqueued_at;
+        RETURN NEXT;
+    END LOOP;
+END
+$$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION cereal_dequeue_workflow_v2(VARIADIC _workflow_names TEXT[])
+RETURNS TABLE(workflow_instance_id BIGINT, instance_name TEXT, workflow_name TEXT,
+    status cereal_workflow_instance_status, parameters BYTEA, payload BYTEA, event_id BIGINT,
+    event_type cereal_workflow_event_type, task_result_id BIGINT, enqueued_tasks INTEGER,
+    completed_tasks INTEGER, enqueued_at TIMESTAMPTZ)
+AS $$
+    WITH nextwinst AS (
+        SELECT
+            a.id id,
+            a.instance_name instance_name,
+            a.workflow_name workflow_name,
+            a.status status,
+            a.parameters parameters,
+            a.payload payload,
+            b.id event_id,
+            b.event_type event_type,
+            b.task_result_id task_result_id,
+            a.enqueued_tasks,
+            a.completed_tasks,
+            b.enqueued_at
+        FROM cereal_workflow_instances a
+        INNER JOIN cereal_workflow_events b ON a.id = b.workflow_instance_id
+        WHERE a.workflow_name = ANY(_workflow_names)
+        ORDER BY b.enqueued_at FOR UPDATE SKIP LOCKED LIMIT 1
+    ),
+    updated AS (
+        UPDATE cereal_workflow_instances w1 SET updated_at = NOW()
+        WHERE w1.id = (
+            SELECT id FROM nextwinst
+        )
+    )
+    SELECT * from nextwinst
+$$ LANGUAGE SQL;
+`,
+	},
 }

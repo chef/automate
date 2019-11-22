@@ -135,6 +135,7 @@ type WorkflowEvent struct {
 	Type               WorkflowEventType
 	EnqueuedTaskCount  int
 	CompletedTaskCount int
+	EnqueuedAt         time.Time
 
 	TaskResult *TaskResultData
 }
@@ -145,19 +146,33 @@ type Task interface {
 	// GetParameters unmarshals the parameters the task was started with into
 	// the value pointed at by obj.
 	GetParameters(obj interface{}) error
+
+	// GetMetadata returns metadata about the task, that the task
+	// might use to make decisons about whether to continue
+	// running this task.
+	GetMetadata() TaskMetadata
 }
 
 // TODO(ssd) 2019-10-04: Probably remove this?
 type TaskData struct {
 	Name       string
 	Parameters []byte
+	Metadata   TaskMetadata
 }
 
-func (r *TaskData) GetParameters(obj interface{}) error {
-	if r.Parameters != nil {
-		return json.Unmarshal(r.Parameters, obj)
+func (t *TaskData) GetParameters(obj interface{}) error {
+	if t.Parameters != nil {
+		return json.Unmarshal(t.Parameters, obj)
 	}
 	return nil
+}
+
+func (t *TaskData) GetMetadata() TaskMetadata {
+	return t.Metadata
+}
+
+type TaskMetadata struct {
+	EnqueuedAt time.Time
 }
 
 // TaskResult is an interface to an object representing a completed Task. This
@@ -501,7 +516,11 @@ func (d *Decision) Err() error {
 
 // StartEvent is passed to the OnStart callback of the WorkflowExecutor when
 // a workflow instance is signaled to be started.
-type StartEvent struct{}
+type StartEvent struct {
+	// The time this start event was added to the workflow event
+	// queue.
+	EnqueuedAt time.Time
+}
 
 // TaskCompleteEvent is passed to the OnTaskComplete callback of the
 // WorkflowExecutor when a task for a workflow instance completes.
@@ -512,11 +531,19 @@ type TaskCompleteEvent struct {
 	// Result contains information representing the completion of the
 	// task such as if it errored or returned a value.
 	Result TaskResult
+
+	// The time this time complete event was added to the workflow
+	// event queue.
+	EnqueuedAt time.Time
 }
 
 // CancelEvent is passed to the OnCancel callback of the WorkflowExecutor
 // when the workflow is signaled for cancellation.
-type CancelEvent struct{}
+type CancelEvent struct {
+	// The time this time complete event was added to the workflow
+	// event queue.
+	EnqueuedAt time.Time
+}
 
 // WorkflowExecutor is the interface implemented by objects that can process
 // a workflow of a certain type.
@@ -1248,14 +1275,19 @@ func (m *Manager) processWorkflow(ctx context.Context, workflowNames []string) b
 	decision := Decision{}
 	switch wevt.Type {
 	case WorkflowStart:
-		decision = executor.OnStart(w, StartEvent{})
+		decision = executor.OnStart(w, StartEvent{
+			EnqueuedAt: wevt.EnqueuedAt,
+		})
 	case TaskComplete:
 		decision = executor.OnTaskComplete(w, TaskCompleteEvent{
-			TaskName: NewTaskName(wevt.TaskResult.TaskName),
-			Result:   wevt.TaskResult,
+			TaskName:   NewTaskName(wevt.TaskResult.TaskName),
+			Result:     wevt.TaskResult,
+			EnqueuedAt: wevt.EnqueuedAt,
 		})
 	case WorkflowCancel:
-		decision = executor.OnCancel(w, CancelEvent{})
+		decision = executor.OnCancel(w, CancelEvent{
+			EnqueuedAt: wevt.EnqueuedAt,
+		})
 	default:
 		logrus.Warnf("Unknown workflow event %q for workflow %q", wevt.Type, wevt.Instance.WorkflowName)
 		m.waywardWorkflows.Add(wevt.Instance.WorkflowName)

@@ -81,7 +81,8 @@ complete -F _component_auto_complete compile_go_protobuf_component
 
 function compile_client_mocks() {
   install_gomock
-  pushd "/src/api/interservice" > /dev/null || exit 1
+  (
+    cd "/src/api/interservice" || exit 1
     mockgen -source event/event.pb.go -destination event/event.pb.client_mock.go -package event -self_package github.com/chef/automate/api/interservice/event
     mockgen -source authz/v2/project.pb.go -destination authz/v2/project.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
     mockgen -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
@@ -90,7 +91,7 @@ function compile_client_mocks() {
     mockgen -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/ingest
     mockgen -source event_feed/event_feed.pb.go -destination event_feed/event_feed.pb.client_mock.go -package event_feed -self_package github.com/chef/automate/api/interservice/event_feed
     mockgen -source ../../components/nodemanager-service/api/manager/manager.pb.go -destination ../../components/nodemanager-service/api/manager/manager.pb.client_mock.go -package manager -self_package github.com/chef/automate/components/nodemanager-service/api/manager
-  popd > /dev/null || exit 1
+  )
 }
 
 

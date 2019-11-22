@@ -29,12 +29,12 @@ const (
 	defaultMaxIdleConnections = 4
 
 	enqueueTaskQuery       = `SELECT cereal_enqueue_task($1, $2, $3, $4)`
-	dequeueTaskQuery       = `SELECT * FROM cereal_dequeue_task($1)`
+	dequeueTaskQuery       = `SELECT * FROM cereal_dequeue_task_v2($1)`
 	completeTaskQuery      = `SELECT cereal_complete_task($1, $2, $3, $4)`
 	consumeTaskResultQuery = `DELETE FROM cereal_task_results WHERE id = $1 RETURNING task_name, parameters, status, error, result`
 
 	enqueueWorkflowQuery  = `SELECT cereal_enqueue_workflow($1, $2, $3)`
-	dequeueWorkflowQuery  = `SELECT * FROM cereal_dequeue_workflow(VARIADIC $1)`
+	dequeueWorkflowQuery  = `SELECT * FROM cereal_dequeue_workflow_v2(VARIADIC $1)`
 	cancelWorkflowQuery   = `SELECT cereal_cancel_workflow($1, $2)`
 	killWorkflowQuery     = `SELECT cereal_kill_workflow($1, $2, $3)`
 	completeWorkflowQuery = `SELECT cereal_complete_workflow($1, $2)`
@@ -703,6 +703,7 @@ func (pg *PostgresBackend) DequeueWorkflow(ctx context.Context, workflowNames []
 		&taskResultID,
 		&event.EnqueuedTaskCount,
 		&event.CompletedTaskCount,
+		&event.EnqueuedAt,
 	)
 	if err == sql.ErrNoRows {
 		tx.Commit() // nolint: errcheck
@@ -834,9 +835,8 @@ func (pg *PostgresBackend) dequeueTask(tx *sql.Tx, taskName string) (int64, *cer
 	task := &cereal.TaskData{
 		Name: taskName,
 	}
-
 	var tid int64
-	err := row.Scan(&tid, &task.Parameters)
+	err := row.Scan(&tid, &task.Parameters, &task.Metadata.EnqueuedAt)
 	if err == sql.ErrNoRows {
 		return 0, nil, cereal.ErrNoTasks
 	} else if err != nil {

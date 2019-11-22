@@ -2,12 +2,12 @@ package grpc
 
 import (
 	"context"
-	"errors"
 	"io"
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/wrappers"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
@@ -180,6 +180,22 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 		return nil, nil, errors.New("unexpected")
 	}
 
+	tsProto := deq.GetEvent().GetEnqueuedAt()
+	ts := time.Time{}
+	if tsProto == nil {
+		// TODO(ssd) 2019-11-22: Determine what we want to do
+		// here. The cereal-service we are talking to might
+		// not yet know how to send us EnqueuedAt.
+		//
+		// Right now we do nothing, meaning ts is the zero
+		// value.
+	} else {
+		ts, err = ptypes.Timestamp(tsProto)
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "invalid enqueued_at")
+		}
+	}
+
 	var taskResult *cereal.TaskResultData
 	if tr := deq.GetEvent().GetTaskResult(); tr != nil {
 		taskResult = &cereal.TaskResultData{
@@ -197,6 +213,7 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 		EnqueuedTaskCount:  int(deq.GetEvent().GetEnqueuedTaskCount()),
 		CompletedTaskCount: int(deq.GetEvent().GetCompletedTaskCount()),
 		TaskResult:         taskResult,
+		EnqueuedAt:         ts,
 	}
 
 	return wevt, &workflowCompleter{
@@ -365,6 +382,23 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal
 		return nil, nil, errors.New("invalid msg")
 	}
 
+	tsProto := deq.GetTask().GetMetadata().GetEnqueuedAt()
+
+	ts := time.Time{}
+	if tsProto == nil {
+		// TODO(ssd) 2019-11-22: Determine what we want to do
+		// here. The cereal-service we are talking to might
+		// not yet know how to send us EnqueuedAt.
+		//
+		// Right now we do nothing, meaning ts is the zero
+		// value.
+	} else {
+		ts, err = ptypes.Timestamp(tsProto)
+		if err != nil {
+			return nil, nil, errors.Wrap(err, "invalid enqueued_at")
+		}
+	}
+
 	taskCtx, cancel := context.WithCancel(ctx)
 	doneChan := make(chan error, 1)
 	go func() {
@@ -387,9 +421,13 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal
 		cancel()
 		doneChan <- errOut
 	}()
+
 	return &cereal.TaskData{
 			Name:       deq.GetTask().GetName(),
 			Parameters: deq.GetTask().GetParameters(),
+			Metadata: cereal.TaskMetadata{
+				EnqueuedAt: ts,
+			},
 		}, &taskCompleter{
 			s:        s,
 			ctx:      taskCtx,

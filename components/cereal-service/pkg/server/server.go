@@ -441,6 +441,11 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 		return err
 	}
 
+	tsProto, err := ptypes.TimestampProto(task.Metadata.EnqueuedAt)
+	if err != nil {
+		return err
+	}
+
 	logctx.Debug("dequeued task")
 	_, task.Name = unnamespace(task.Name)
 	err = writeDeqTaskRespMsg(ctx, req, &cereal.DequeueTaskResponse{
@@ -449,6 +454,9 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 				Task: &cereal.Task{
 					Name:       task.Name,
 					Parameters: task.Parameters,
+					Metadata: &cereal.TaskMetadata{
+						EnqueuedAt: tsProto,
+					},
 				},
 			},
 		},
