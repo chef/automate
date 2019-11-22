@@ -25,8 +25,8 @@ type Ingester struct {
 	storageClient         storage.Client
 	natsClient            *nats.NatsClient
 	eventsCh              chan []byte
-	workerInputQueue      chan<- *habitat.HealthCheckEvent
-	workerTaskQueue       <-chan *habitat.HealthCheckEvent
+	workerInputQueue      chan<- []byte
+	workerTaskQueue       <-chan []byte
 	workerOutputQueue     chan error
 	totalEventsFailed     int64
 	totalEventsSuccessful int64
@@ -36,7 +36,7 @@ type Ingester struct {
 func New(c *config.Applications, client storage.Client) *Ingester {
 	var (
 		events = make(chan []byte, eventsBufferSize)
-		queue  = make(chan *habitat.HealthCheckEvent)
+		queue  = make(chan []byte)
 		out    = make(chan error, eventsBufferSize)
 	)
 
@@ -84,17 +84,7 @@ func (i *Ingester) Run() {
 		select {
 		// TODO: @afiune We should have a way to have multi-message-type ingestion
 		case eventBytes := <-i.eventsCh:
-			// Unmarshal the data and send the message to the channel
-			var habMsg habitat.HealthCheckEvent
-			err := proto.Unmarshal(eventBytes, &habMsg)
-			if err != nil {
-				log.WithFields(log.Fields{
-					"data": string(eventBytes),
-				}).Error("Unknown message, dropping")
-				continue
-			}
-
-			i.workerInputQueue <- &habMsg
+			i.workerInputQueue <- eventBytes
 		}
 	}
 }
@@ -102,9 +92,18 @@ func (i *Ingester) Run() {
 func (i *Ingester) runWorkerLoop() {
 	for {
 		select {
-		case event := <-i.workerTaskQueue:
-			err := i.storageClient.IngestHealthCheckEvent(event)
+		case eventBytes := <-i.workerTaskQueue:
+
+			var habMsg habitat.HealthCheckEvent
+			err := proto.Unmarshal(eventBytes, &habMsg)
+			if err != nil {
+				i.workerOutputQueue <- err
+				continue
+			}
+
+			err = i.storageClient.IngestHealthCheckEvent(&habMsg)
 			i.workerOutputQueue <- err
+
 		case err := <-i.workerOutputQueue:
 			atomic.AddInt64(&i.totalEventsProcessed, 1)
 
