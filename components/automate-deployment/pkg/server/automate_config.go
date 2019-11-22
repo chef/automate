@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 
-	"github.com/chef/automate/api/config/deployment"
+	"github.com/pkg/errors"
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/converge"
@@ -212,37 +212,24 @@ func (s *server) updateUserOverrideConfigFromRestoreBackupRequest(req *api.Resto
 	// update them before we bootstrap backup-gateway. If we don't do that the
 	// bgw may be configured to use the wrong bucket or credentials.
 
-	var reqCfg *deployment.AutomateConfig
-	var curCfg *deployment.AutomateConfig
-	if req.GetRestore().GetSetConfig() != nil {
-		curCfg = req.GetRestore().GetSetConfig()
-	} else {
-		var err error
-		curCfg, err = s.deployment.GetUserOverrideConfigForPersistence().NewDeepCopy()
-		if err != nil {
-			return status.Error(codes.FailedPrecondition, "Failed to load configuration")
-		}
+	cfg, err := s.deployment.GetUserOverrideConfigForPersistence().NewDeepCopy()
+	if err != nil {
+		return status.Error(codes.FailedPrecondition, errors.Wrap(err, "copying existing config").Error())
 	}
 
-	reqCfg = api.NewUserOverrideConfigFromBackupRestoreTask(req.GetRestore())
-
-	if err := curCfg.OverrideConfigValues(reqCfg); err != nil {
-		return status.Error(codes.Internal, "Failed to set backup configuration")
+	if err = api.MergeAndValidateNewUserOverrideConfig(cfg, req.GetRestore()); err != nil {
+		return status.Error(codes.InvalidArgument, errors.Wrap(err, "updating config").Error())
 	}
 
-	if err := curCfg.ValidateWithGlobalAndDefaults(); err != nil {
-		return status.Error(codes.InvalidArgument, err.Error())
+	if err = s.deployment.ReplaceUserOverrideConfig(cfg); err != nil {
+		return status.Error(codes.Internal, errors.Wrap(err, "replacing config").Error())
 	}
 
-	if err := s.deployment.ReplaceUserOverrideConfig(curCfg); err != nil {
+	if err = s.updateExpectedServices(); err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}
 
-	if err := s.updateExpectedServices(); err != nil {
-		return status.Error(codes.Internal, err.Error())
-	}
-
-	if err := s.persistDeployment(); err != nil {
+	if err = s.persistDeployment(); err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}
 
