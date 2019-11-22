@@ -49,8 +49,13 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
     ) {
-    store.select(getAllStatus).pipe(map(loading)).subscribe((isloading) =>
-      this.layoutFacade.ShowPageLoading(isloading));
+      store.pipe(
+        select(getAllStatus),
+        takeUntil(this.isDestroyed),
+        map(loading)
+      ).subscribe((isLoading) =>
+        this.layoutFacade.ShowPageLoading(isLoading)
+      );
 
     this.sortedTeams$ = store.select(allTeams).pipe(
       map((teams: Team[]) => ChefSorters.naturalSort(teams, 'id')),

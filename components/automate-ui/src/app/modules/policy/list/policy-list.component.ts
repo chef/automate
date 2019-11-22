@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Observable, Subject } from 'rxjs';
+import { map, takeUntil } from 'rxjs/operators';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -16,18 +16,24 @@ import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
   templateUrl: './policy-list.component.html',
   styleUrls: ['./policy-list.component.scss']
 })
-export class PolicyListComponent implements OnInit {
+export class PolicyListComponent implements OnInit, OnDestroy {
   public sortedPolicies$: Observable<Policy[]>;
   public isIAMv2$: Observable<boolean>;
   public policyToDelete: Policy;
   public deleteModalVisible = false;
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) {
-    store.pipe(select(getAllStatus), map(loading)).subscribe((isloading) =>
-      this.layoutFacade.ShowPageLoading(isloading));
+    store.pipe(
+      select(getAllStatus),
+      takeUntil(this.isDestroyed),
+      map(loading)
+    ).subscribe((isLoading) =>
+      this.layoutFacade.ShowPageLoading(isLoading)
+    );
 
     this.sortedPolicies$ = store.pipe(
       select(allPolicies),
@@ -39,6 +45,11 @@ export class PolicyListComponent implements OnInit {
   ngOnInit(): void {
     this.layoutFacade.showSettingsSidebar();
     this.store.dispatch(new GetPolicies());
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   public status({ members }: Policy): string {

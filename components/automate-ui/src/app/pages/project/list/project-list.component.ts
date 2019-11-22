@@ -75,8 +75,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.layoutFacade.showSettingsSidebar();
     this.projects.getApplyRulesStatus();
     this.store.dispatch(new GetProjects());
-    this.store.select(getAllStatus).pipe(map(loading)).subscribe((isloading) =>
-      this.layoutFacade.ShowPageLoading(isloading));
+    this.store.pipe(
+      select(getAllStatus),
+      takeUntil(this.isDestroyed),
+      map(loading)
+    ).subscribe((isLoading) =>
+      this.layoutFacade.ShowPageLoading(isLoading)
+    );
     this.sortedProjects$ = this.store.select(allProjects).pipe(
       map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name')));
 

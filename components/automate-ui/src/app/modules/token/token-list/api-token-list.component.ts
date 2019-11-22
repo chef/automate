@@ -54,8 +54,14 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
   ) {
-    store.select(apiTokenStatus).pipe(map(loading)).subscribe((isloading) =>
-      this.layoutFacade.ShowPageLoading(isloading));
+    store.pipe(
+      select(apiTokenStatus),
+      takeUntil(this.isDestroyed),
+      map(loading)
+    ).subscribe((isLoading) =>
+      this.layoutFacade.ShowPageLoading(isLoading)
+    );
+
     this.isIAMv2$ = store.select(isIAMv2);
     this.apiTokenCount$ = store.select(totalApiTokens);
 
