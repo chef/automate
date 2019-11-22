@@ -405,47 +405,54 @@ func (s *Store) parseList(rows *sql.Rows) ([]inspec.Metadata, error) {
 	return entries, nil
 }
 
-func (s *Store) ListProfilesMetadata(namespace string, name string, sort string, order string) ([]inspec.Metadata, error) {
-	if order != "ASC" && order != "DESC" {
-		return nil, status.Errorf(codes.InvalidArgument, "order field '%s' is invalid. Use either 'ASC' or 'DESC'", order)
+type ProfilesListRequest struct {
+	Name      string
+	Namespace string
+	Order     string
+	Sort      string
+}
+
+func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata, error) {
+	if req.Order != "ASC" && req.Order != "DESC" {
+		return nil, status.Errorf(codes.InvalidArgument, "order field '%s' is invalid. Use either 'ASC' or 'DESC'", req.Order)
 	}
 
-	if sort != "name" && sort != "title" && sort != "maintainer" {
-		return nil, status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name', 'title' or 'maintainer'", sort)
+	if req.Sort != "name" && req.Sort != "title" && req.Sort != "maintainer" {
+		return nil, status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name', 'title' or 'maintainer'", req.Sort)
 	}
 
 	var rows *sql.Rows
 	var err error
 
 	switch {
-	case len(namespace) == 0 && len(name) == 0:
+	case len(req.Namespace) == 0 && len(req.Name) == 0:
 		query := fmt.Sprintf(`
 			SELECT sha256, info
 			FROM store_profiles WHERE sha256 IN
 			(SELECT sha256 FROM store_market)
 			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, sort, order)
+		`, req.Sort, req.Order)
 
 		rows, err = s.DB.Query(query)
-	case len(namespace) == 0:
+	case len(req.Namespace) == 0:
 		query := fmt.Sprintf(`
 			SELECT sha256, info
 			FROM store_profiles WHERE sha256 IN
 			(SELECT sha256 FROM store_market)
 			AND info->>'name' = $1
 			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, sort, order)
+		`, req.Sort, req.Order)
 
-		rows, err = s.DB.Query(query, name)
-	case len(name) == 0:
+		rows, err = s.DB.Query(query, req.Name)
+	case len(req.Name) == 0:
 		query := fmt.Sprintf(`
 			SELECT sha256, info
 			FROM store_profiles WHERE
 			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
 			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, sort, order)
+		`, req.Sort, req.Order)
 
-		rows, err = s.DB.Query(query, namespace)
+		rows, err = s.DB.Query(query, req.Namespace)
 	default:
 		query := fmt.Sprintf(`
 			SELECT sha256, info
@@ -453,9 +460,9 @@ func (s *Store) ListProfilesMetadata(namespace string, name string, sort string,
 			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
 			AND info->>'name' = $2
 			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, sort, order)
+		`, req.Sort, req.Order)
 
-		rows, err = s.DB.Query(query, namespace, name)
+		rows, err = s.DB.Query(query, req.Namespace, req.Name)
 	}
 	if err != nil {
 		return nil, err
