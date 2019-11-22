@@ -79,12 +79,12 @@ export class RoleEffects {
           observableOf(new DeleteRoleFailure(error))))));
 
   @Effect()
-  deleteProjectSuccess$ = this.actions$.pipe(
+  deleteRoleSuccess$ = this.actions$.pipe(
       ofType(RoleActionTypes.DELETE_SUCCESS),
       map(({ payload: { id } }: DeleteRoleSuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Successfully deleted role ${id}.`
+          message: `Deleted role ${id}.`
         });
       }));
 
