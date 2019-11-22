@@ -2,9 +2,10 @@ import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { interval as observableInterval,  Observable, Subject, combineLatest } from 'rxjs';
-import { map, takeUntil, filter, take } from 'rxjs/operators';
+import { map, takeUntil, filter, take, distinctUntilChanged } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
+import { environment as env } from 'environments/environment';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
@@ -20,6 +21,7 @@ import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/project
 import { Project } from 'app/entities/projects/project.model';
 import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
+import { GetUserParamPerms } from 'app/entities/userperms/userperms.actions';
 
 @Component({
   selector: 'app-project-list',
@@ -79,7 +81,33 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
     this.loading$ = this.store.select(getAllStatus).pipe(map(loading));
     this.sortedProjects$ = this.store.select(allProjects).pipe(
-      map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name')));
+      map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name'))
+    );
+
+    combineLatest([
+      this.store.select(getAllStatus),
+      this.sortedProjects$]
+    ).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([status, projects]) =>
+        (status === EntityStatus.loadingSuccess && projects.length > 0)),
+      distinctUntilChanged(([_previousStatus, previousProjects],
+        [_currentStatus, currentProjects]) => previousProjects === currentProjects))
+      .subscribe(([_, projects]) => {
+        this.store.dispatch(new GetUserParamPerms({
+          path: `${env.auth_url}/projects`,
+          parameters: projects.map((project) => project.id)
+        })
+      );
+    });
+
+    // selector that does userPerms[projects][project-id][delete]
+
+    // future:
+    // what if introspection just returns what is possible for all projects,
+    // what is possible for individual projects
+
+    // select each project ID from store, get permissions...?
 
     this.isIAMv2$ = this.store.select(isIAMv2);
 
