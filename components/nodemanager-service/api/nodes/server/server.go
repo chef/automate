@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/external/secrets"
+	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/secretsint"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
@@ -19,6 +20,9 @@ import (
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	"github.com/chef/automate/lib/stringutils"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 // Server implementation for nodes
@@ -109,14 +113,23 @@ func (srv *Server) BulkCreate(ctx context.Context, in *nodes.Nodes) (*nodes.Ids,
 
 // Read a node via ID
 func (srv *Server) Read(ctx context.Context, in *nodes.Id) (*nodes.Node, error) {
-	logrus.Infof("read node with : %+v", in)
+	logrus.Debugf("read node with : %+v", in)
 	return GetNode(ctx, in, srv.db, srv.secretsClient)
 }
 
 func GetNode(ctx context.Context, in *nodes.Id, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) (*nodes.Node, error) {
+	projectsAllowed, err := filterByProjects(ctx)
+	if err != nil {
+		return nil, errorutils.FormatErrorMsg(err, in.Id)
+	}
+
 	node, err := db.GetNode(ctx, in.Id)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.Id)
+	}
+
+	if !isRequestAllowedForProjects(node, projectsAllowed) {
+		return nil, status.Error(codes.NotFound, "Not found for id: "+in.Id)
 	}
 
 	secretIds, err := db.GetNodeSecretIds(ctx, in.Id)
@@ -135,6 +148,31 @@ func GetNode(ctx context.Context, in *nodes.Id, db *pgdb.DB, secretsClient secre
 	}
 
 	return node, nil
+}
+
+func isRequestAllowedForProjects(node *nodes.Node, projectsAllowed []string) bool {
+	// If Manager is empty then it is a manually added node with we do not filter
+	if node.Manager != "" {
+		return true
+	}
+
+	// All projects
+	if len(projectsAllowed) == 0 {
+		return true
+	}
+
+	if len(node.Projects) == 0 &&
+		stringutils.SliceContains(projectsAllowed, authzConstants.UnassignedProjectID) {
+		return true
+	}
+
+	for _, nodeProject := range node.Projects {
+		if stringutils.SliceContains(projectsAllowed, nodeProject) {
+			return true
+		}
+	}
+
+	return false
 }
 
 func resolveInspecConfigWithSecrets(tc *nodes.TargetConfig, secretsMaps []map[string]string) error {
