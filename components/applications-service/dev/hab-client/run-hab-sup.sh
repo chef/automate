@@ -83,6 +83,7 @@ run_hab_in_container() {
     
     hab svc load core/redis
     hab svc load core/nginx
+    hab svc load core/postgresql94
 
     # wait for things to come up and send some messages
     sleep 60
