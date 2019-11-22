@@ -26,6 +26,8 @@ import (
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
 
+const version = "1"
+
 type datafeedNotification struct {
 	username string
 	password string
@@ -112,7 +114,7 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 	r, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.SECONDLY,
 		Interval: int(dataFeedConfig.ServiceConfig.FeedInterval.Seconds()),
-		Dtstart:  time.Now().Round(dataFeedConfig.ServiceConfig.FeedInterval),
+		Dtstart:  time.Now().Round(dataFeedConfig.ServiceConfig.FeedInterval).Add(30 * time.Second),
 	})
 	if err != nil {
 		return err
@@ -202,6 +204,7 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 	request.Header.Add("Content-Type", "application/json")
 	request.Header.Add("Content-Encoding", "gzip")
 	request.Header.Add("Accept", "application/json")
+	request.Header.Add("Chef-Data-Feed-Message-Version", version)
 	log.Debugf("request %v", request)
 
 	response, err := client.client.Do(request)
