@@ -47,106 +47,137 @@ func TestReadProjectFilteringIngestedNodes(t *testing.T) {
 	manualNodeID := manualNodeIds[0]
 
 	cases := []struct {
-		description  string
-		ctx          context.Context
-		ingestedNode *manager.NodeMetadata
-		isError      bool
+		description     string
+		requestProjects []string
+		nodeProjects    []string
+		isError         bool
 	}{
 		{
-			description: "Allowed project is requested with matching node project",
-			ctx:         contextWithProjects([]string{"target_project"}),
-			ingestedNode: &manager.NodeMetadata{
-				Uuid:     "node1",
-				Projects: []string{"target_project"},
-			},
-			isError: false,
+			description:     "Node project matching request's projects",
+			requestProjects: []string{"target_project"},
+			nodeProjects:    []string{"target_project"},
+			isError:         false,
 		},
 		{
-			description: "Not allowed project is requested with node with different project",
-			ctx:         contextWithProjects([]string{"missed_target_project"}),
-			ingestedNode: &manager.NodeMetadata{
-				Uuid:     "node1",
-				Projects: []string{"target_project"},
-			},
-			isError: true,
+			description:     "Node project not matching request's projects",
+			requestProjects: []string{"missed_target_project"},
+			nodeProjects:    []string{"target_project"},
+			isError:         true,
 		},
 		{
-			description: "Allowed unassigned project is requested with node unassigned",
-			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
-			ingestedNode: &manager.NodeMetadata{
-				Uuid:     "node1",
-				Projects: []string{},
-			},
-			isError: false,
+			description:     "Node has no projects; request's project has unassigned project",
+			requestProjects: []string{authzConstants.UnassignedProjectID},
+			nodeProjects:    []string{},
+			isError:         false,
 		},
 		{
-			description: "Allowed unassigned and target project is requested with matching node project",
-			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID, "target_project"}),
-			ingestedNode: &manager.NodeMetadata{
-				Uuid:     "node1",
-				Projects: []string{"target_project"},
-			},
-			isError: false,
+			description:     "Node has a project assigned; request's project has unassigned and the matching project",
+			requestProjects: []string{authzConstants.UnassignedProjectID, "target_project"},
+			nodeProjects:    []string{"target_project"},
+			isError:         false,
 		},
 		{
-			description: "Not allowed unassigned project is requested with node with project tagged",
-			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
-			ingestedNode: &manager.NodeMetadata{
-				Uuid:     "node1",
-				Projects: []string{"target_project"},
-			},
-			isError: true,
+			description:     "Node has a project assigned; request's projects has only the unassigned project",
+			requestProjects: []string{authzConstants.UnassignedProjectID},
+			nodeProjects:    []string{"target_project"},
+			isError:         true,
 		},
 		{
-			description: "Allowed all project is requested with node with target_project",
-			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
-			ingestedNode: &manager.NodeMetadata{
-				Uuid:     "node1",
-				Projects: []string{"target_project"},
-			},
-			isError: false,
+			description:     "Node is assigned a project; request for all projects",
+			requestProjects: []string{authzConstants.AllProjectsExternalID},
+			nodeProjects:    []string{"target_project"},
+			isError:         false,
 		},
 		{
-			description: "Allowed all project is requested with node unassigned",
-			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
-			ingestedNode: &manager.NodeMetadata{
-				Uuid:     "node1",
-				Projects: []string{},
-			},
-			isError: false,
+			description:     "Node has no projects; requested for all projects",
+			requestProjects: []string{authzConstants.AllProjectsExternalID},
+			nodeProjects:    []string{},
+			isError:         false,
+		},
+		{
+			description:     "Node has no projects; requested projects is empty",
+			requestProjects: []string{},
+			nodeProjects:    []string{},
+			isError:         false,
+		},
+		{
+			description:     "Node has one project not matching any of several requested projects",
+			requestProjects: []string{"project3", "project4", "project7", "project6"},
+			nodeProjects:    []string{"project9"},
+			isError:         true,
+		},
+		{
+			description:     "Node has one project matching one of several requested projects",
+			requestProjects: []string{"project3", "project4", "project7", "project6"},
+			nodeProjects:    []string{"project7"},
+			isError:         false,
+		},
+		{
+			description:     "Node with several projects where one matches a single requested project",
+			requestProjects: []string{"project3"},
+			nodeProjects:    []string{"project3", "project4", "project7", "project6"},
+			isError:         false,
+		},
+		{
+			description:     "Node with several projects where one matches one of several requested projects",
+			requestProjects: []string{"project3", "project10", "project12", "project13"},
+			nodeProjects:    []string{"project3", "project4", "project7", "project6"},
+			isError:         false,
+		},
+		{
+			description:     "Node with several projects that do not matche several requested projects",
+			requestProjects: []string{"project14", "project10", "project12", "project13"},
+			nodeProjects:    []string{"project3", "project4", "project7", "project6"},
+			isError:         true,
+		},
+		{
+			description:     "Node with several projects where two match two of several requested projects",
+			requestProjects: []string{"project3", "project10", "project12", "project13"},
+			nodeProjects:    []string{"project3", "project10", "project7", "project6"},
+			isError:         false,
 		},
 	}
 
 	for _, test := range cases {
 		t.Run(fmt.Sprintf("Project filter: %s", test.description),
 			func(t *testing.T) {
-				// Ingest node
-				test.ingestedNode.LastContact = timestamp
-				test.ingestedNode.RunData = &nodes.LastContactData{
-					Id:      createUUID(),
-					EndTime: timestamp,
-					Status:  nodes.LastContactData_PASSED,
+
+				// Create the context with projects added
+				ctx := contextWithProjects(test.requestProjects)
+
+				// Create Ingest node
+				node := &manager.NodeMetadata{
+					Uuid:        "node1",
+					Projects:    test.nodeProjects,
+					LastContact: timestamp,
+					RunData: &nodes.LastContactData{
+						Id:      createUUID(),
+						EndTime: timestamp,
+						Status:  nodes.LastContactData_PASSED,
+					},
 				}
 
-				err = db.ProcessIncomingNode(test.ingestedNode)
+				// ingest node
+				err = db.ProcessIncomingNode(node)
 				require.NoError(t, err)
 
 				// Delete created node after the test is complete
-				defer db.DeleteNode(test.ingestedNode.Uuid)
+				defer db.DeleteNode(node.Uuid)
 
 				// Call Read to get the ingested node with project filtering context.
-				nodeResponse, err := nodeManager.Read(test.ctx, &nodes.Id{
-					Id: test.ingestedNode.Uuid,
+				nodeResponse, err := nodeManager.Read(ctx, &nodes.Id{
+					Id: node.Uuid,
 				})
 
 				if test.isError {
 					assert.Error(t, err)
 				} else {
 					require.NoError(t, err)
-					assert.Equal(t, test.ingestedNode.Uuid, nodeResponse.Id)
+					assert.Equal(t, node.Uuid, nodeResponse.Id)
 				}
 
-				manualNodeResponse, err := nodeManager.Read(test.ctx, &nodes.Id{Id: manualNodeID})
+				// Test that we can read the manually added node for all cases.
+				manualNodeResponse, err := nodeManager.Read(ctx, &nodes.Id{Id: manualNodeID})
 				require.NoError(t, err)
 				assert.Equal(t, manualNodeID, manualNodeResponse.Id)
 			})

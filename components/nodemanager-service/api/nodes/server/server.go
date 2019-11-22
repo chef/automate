@@ -150,31 +150,6 @@ func GetNode(ctx context.Context, in *nodes.Id, db *pgdb.DB, secretsClient secre
 	return node, nil
 }
 
-func isRequestAllowedForProjects(node *nodes.Node, projectsAllowed []string) bool {
-	// If Manager is empty then it is a manually added node with we do not filter
-	if node.Manager != "" {
-		return true
-	}
-
-	// All projects
-	if len(projectsAllowed) == 0 {
-		return true
-	}
-
-	if len(node.Projects) == 0 &&
-		stringutils.SliceContains(projectsAllowed, authzConstants.UnassignedProjectID) {
-		return true
-	}
-
-	for _, nodeProject := range node.Projects {
-		if stringutils.SliceContains(projectsAllowed, nodeProject) {
-			return true
-		}
-	}
-
-	return false
-}
-
 func resolveInspecConfigWithSecrets(tc *nodes.TargetConfig, secretsMaps []map[string]string) error {
 	if tc == nil {
 		return nil
@@ -405,4 +380,31 @@ func addProjectFilters(ctx context.Context, filters []*common.Filter) ([]*common
 		Key:    "project",
 		Values: projectFilters,
 	}), nil
+}
+
+func isRequestAllowedForProjects(node *nodes.Node, requestAllowedProjects []string) bool {
+	// If the node's Manager is not empty then it is a manually added node, which we do not filter.
+	if node.Manager != "" {
+		return true
+	}
+
+	// If there are no requestAllowedProjects then all nodes are allowed
+	if len(requestAllowedProjects) == 0 {
+		return true
+	}
+
+	// If the node has no projects and the requestAllowedProjects contains the unassigned tag
+	if len(node.Projects) == 0 &&
+		stringutils.SliceContains(requestAllowedProjects, authzConstants.UnassignedProjectID) {
+		return true
+	}
+
+	// If one of the node's projects is in the requestAllowedProjects list
+	for _, nodeProject := range node.Projects {
+		if stringutils.SliceContains(requestAllowedProjects, nodeProject) {
+			return true
+		}
+	}
+
+	return false
 }
