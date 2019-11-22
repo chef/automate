@@ -1,15 +1,15 @@
+// Local Copy of github.com/habitat-sh/habitat/master/components/sup/protocols/event.proto
+// to update, use update-event-proto.sh
+// DO NOT EDIT
+// local modification: must specify proto version at the very top
 syntax = "proto3";
-
-// This file is a copy/paste from the Habitat PR #6344 Initial protobufs for events
-
-package chef.habitat.supervisor.event;
-
-// This option does NOT exist in the original file, we could add it in its origin,
-// that is, in the habitat repo, or we could add it inside a file sync automation.
+// local modification: set go package to something we can using in automate
 option go_package = "github.com/chef/automate/api/external/habitat";
 
-import "google/protobuf/timestamp.proto";
+package chef.habitat.supervisor.event;
 import "google/protobuf/duration.proto";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 
 message EventMetadata {
   // The unique ID of this Supervisor.
@@ -79,6 +79,18 @@ message ServiceStoppedEvent {
   ServiceMetadata service_metadata = 2;
 }
 
+message ServiceUpdateStartedEvent {
+  EventMetadata event_metadata = 1;
+  ServiceMetadata service_metadata = 2;
+  // Details of the service pkg to which 
+  // we're attempting to update.This is
+  // implemented as a string for now,
+  // but at some point we'll may want
+  // to create a type for this set of
+  // attributes (FullyQualifiedPackageIdent)
+  string update_package_ident = 3;
+}
+
 message HealthCheckEvent {
   EventMetadata event_metadata = 1;
   ServiceMetadata service_metadata = 2;
@@ -86,4 +98,10 @@ message HealthCheckEvent {
   // If the service has a health check hook script, how long it took
   // to execute.
   google.protobuf.Duration execution = 4;
+  // The health check hook exit status
+  google.protobuf.Int32Value exit_status = 5;
+  // The health check hook stdout output
+  google.protobuf.StringValue stdout = 6;
+  // The health check hook stderr output
+  google.protobuf.StringValue stderr = 7;
 }
