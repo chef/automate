@@ -17,6 +17,142 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
+func TestReadProjectFilteringIngestedNodes(t *testing.T) {
+	timestamp, err := ptypes.TimestampProto(time.Now())
+	require.NoError(t, err)
+
+	db, err := createPGDB()
+	require.NoError(t, err)
+
+	nodeManager := nodesserver.New(db, nil, "")
+
+	// Adding a manual node
+	mgr1 := manager.NodeManager{Name: "mgr1", Type: "aws-ec2"}
+	mgrID1, err := db.AddNodeManager(&mgr1, "11111111")
+	require.NoError(t, err)
+	defer db.DeleteNodeManager(mgrID1)
+
+	node1 := manager.ManagerNode{Id: "i-1111111", Region: "us-west-2", Host: "Node1"}
+
+	instances := []*manager.ManagerNode{&node1}
+	manualNodeIds := db.AddManagerNodesToDB(instances, mgrID1, "242403433", []*manager.CredentialsByTags{}, "aws-ec2")
+	require.NoError(t, err)
+	defer func() {
+		for _, node := range manualNodeIds {
+			db.DeleteNode(node)
+		}
+	}()
+
+	assert.Equal(t, 1, len(manualNodeIds))
+	manualNodeID := manualNodeIds[0]
+
+	cases := []struct {
+		description  string
+		ctx          context.Context
+		ingestedNode *manager.NodeMetadata
+		isError      bool
+	}{
+		{
+			description: "Allowed project is requested with matching node project",
+			ctx:         contextWithProjects([]string{"target_project"}),
+			ingestedNode: &manager.NodeMetadata{
+				Uuid:     "node1",
+				Projects: []string{"target_project"},
+			},
+			isError: false,
+		},
+		{
+			description: "Not allowed project is requested with node with different project",
+			ctx:         contextWithProjects([]string{"missed_target_project"}),
+			ingestedNode: &manager.NodeMetadata{
+				Uuid:     "node1",
+				Projects: []string{"target_project"},
+			},
+			isError: true,
+		},
+		{
+			description: "Allowed unassigned project is requested with node unassigned",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			ingestedNode: &manager.NodeMetadata{
+				Uuid:     "node1",
+				Projects: []string{},
+			},
+			isError: false,
+		},
+		{
+			description: "Allowed unassigned and target project is requested with matching node project",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID, "target_project"}),
+			ingestedNode: &manager.NodeMetadata{
+				Uuid:     "node1",
+				Projects: []string{"target_project"},
+			},
+			isError: false,
+		},
+		{
+			description: "Not allowed unassigned project is requested with node with project tagged",
+			ctx:         contextWithProjects([]string{authzConstants.UnassignedProjectID}),
+			ingestedNode: &manager.NodeMetadata{
+				Uuid:     "node1",
+				Projects: []string{"target_project"},
+			},
+			isError: true,
+		},
+		{
+			description: "Allowed all project is requested with node with target_project",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			ingestedNode: &manager.NodeMetadata{
+				Uuid:     "node1",
+				Projects: []string{"target_project"},
+			},
+			isError: false,
+		},
+		{
+			description: "Allowed all project is requested with node unassigned",
+			ctx:         contextWithProjects([]string{authzConstants.AllProjectsExternalID}),
+			ingestedNode: &manager.NodeMetadata{
+				Uuid:     "node1",
+				Projects: []string{},
+			},
+			isError: false,
+		},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("Project filter: %s", test.description),
+			func(t *testing.T) {
+				// Ingest node
+				test.ingestedNode.LastContact = timestamp
+				test.ingestedNode.RunData = &nodes.LastContactData{
+					Id:      createUUID(),
+					EndTime: timestamp,
+					Status:  nodes.LastContactData_PASSED,
+				}
+
+				err = db.ProcessIncomingNode(test.ingestedNode)
+				require.NoError(t, err)
+
+				// Delete created node after the test is complete
+				defer db.DeleteNode(test.ingestedNode.Uuid)
+
+				// Call Read to get the ingested node with project filtering context.
+				nodeResponse, err := nodeManager.Read(test.ctx, &nodes.Id{
+					Id: test.ingestedNode.Uuid,
+				})
+
+				if test.isError {
+					assert.Error(t, err)
+				} else {
+					require.NoError(t, err)
+					assert.Equal(t, test.ingestedNode.Uuid, nodeResponse.Id)
+				}
+
+				manualNodeResponse, err := nodeManager.Read(test.ctx, &nodes.Id{Id: manualNodeID})
+				require.NoError(t, err)
+				assert.Equal(t, manualNodeID, manualNodeResponse.Id)
+			})
+	}
+}
+
 // All manually added nodes should be returned because they are not included in project filtering.
 func TestListProjectFilteringIngestedNodes(t *testing.T) {
 	db, err := createPGDB()
