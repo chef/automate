@@ -208,45 +208,45 @@ Block comments support Markdown */
 Block comments support multiple lines:
 
 ```go
-	/*
-	Fetch a node
+  /*
+  Fetch a node
 
-	Fetch a specific node by id.
-	Does not support filtering, pagination or sorting.
-	*/
-	rpc ListReportIds(Query) returns (ReportIds) {
+  Fetch a specific node by id.
+  Does not support filtering, pagination or sorting.
+  */
+  rpc ListReportIds(Query) returns (ReportIds) {
 ```
 
 Block comments supports common markdown elements, such as:
 
 ```go
-	/*
+  /*
   Code blocks support `highlighting`
 
   It also supports
 
   Using code blocks, if you need them.
 
-	*/
+  */
 ```
 
 Block comments support markdown tables:
 
 ```go
-	/*
-	List reports
+  /*
+  List reports
 
-	Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. Supports pagination, filtering, and sorting.
+  Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. Supports pagination, filtering, and sorting.
 
-	| Sort parameter | Sort value |
-	| --- | --- |
-	| latest_report.controls.failed.critical | controls_sums.failed.critical |
-	| latest_report.controls.failed.total | controls_sums.failed.total |
-	| latest_report.end_time (default) | end_time |
-	| latest_report.status | status |
-	| node_name | node_name.lower |
-	*/
-	rpc ListReports(Query) returns (Reports) {
+  | Sort parameter | Sort value |
+  | --- | --- |
+  | latest_report.controls.failed.critical | controls_sums.failed.critical |
+  | latest_report.controls.failed.total | controls_sums.failed.total |
+  | latest_report.end_time (default) | end_time |
+  | latest_report.status | status |
+  | node_name | node_name.lower |
+  */
+  rpc ListReports(Query) returns (Reports) {
 ```
 
 ## Service Documentation
@@ -314,18 +314,18 @@ Use block/leading comments for RPC-level/method documentation.
 Compare the leading comments to the content of the API documentation for the `ReadNode(ID)` resource.
 
 ```go
-	/*
-	Fetch a node #(summary)
+  /*
+  Fetch a node #(summary)
 
-	Fetch a specific node by id. #(description)
-	Does not support filtering, pagination or sorting.
-	*/
-	rpc ReadNode(Id) returns (Node) {
+  Fetch a specific node by id. #(description)
+  Does not support filtering, pagination or sorting.
+  */
+  rpc ReadNode(Id) returns (Node) {
 ```
 
 The rendered documentation:
 
-![](./static/images/docs/api-resource-definition.png)
+![View of rendered API docs](./static/images/docs/api-resource-definition.png)
 
 ### Message Level Descriptions
 
