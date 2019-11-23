@@ -23,6 +23,11 @@
       <span class="label">Enter your AWS secret access key</span>
       <chef-input ngDefaultControl type="password" formControlName="aws_secret_access_key"></chef-input>
     </label>
+
+    <label class="form-field">
+      <span class="label">Specify a default region to target</span>
+      <chef-input ngDefaultControl type="text" placeholder="us-east-1" formControlName="aws_region"></chef-input>
+    </label>
   </ng-container>
 
 </ng-container>

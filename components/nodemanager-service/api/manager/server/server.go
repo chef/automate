@@ -645,7 +645,6 @@ func (srv *Server) addNodeForEachEc2Instance(ctx context.Context, managerId stri
 }
 
 func (srv *Server) addNodeForAccount(ctx context.Context, managerId string, managerName string, managerAcctId string, credential string) ([]string, error) {
-	logrus.Infof("Getting regions for node manager: %+v", managerId)
 	myaws, _, err := managers.GetAWSManagerFromID(ctx, managerId, srv.DB, srv.secretsClient)
 	if err != nil {
 		return nil, fmt.Errorf("addNodeForAccount; error getting connection %s %s", managerName, err.Error())

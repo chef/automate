@@ -63,12 +63,15 @@ The service makes calls to these API:
 * `STS-GetCallerIdentity`
 * `SEC2-DescribeRegions`
 * `IAM-ListAccountAliases`
+* `IAM-GetAccountSummary`
+* `IAM-ListUsers`
 
 Permissions: You'll need at least a global read permission; `arn:aws:iam::aws:policy/ReadOnlyAccess`
 
 ## AWS Credential-less Scanning with Chef Automate
 
 For users running Chef Automate 2 in EC2, we invite you to try out our "AWS-EC2 Credential-less Scanning"!
+Please note that credential-less scanning is not supported for AWS govcloud.
 
 ### Ensure Minimum Permissions
 
@@ -86,7 +89,9 @@ Ensure the policy attached to the role used by the instance you have Chef Automa
                 "ec2:DescribeRegions",
                 "sts:GetCallerIdentity",
                 "ec2:DescribeInstanceStatus",
-                "iam:ListAccountAliases"
+                "iam:ListAccountAliases",
+                "iam:GetAccountSummary",
+                "iam:ListUsers",
             ],
             "Resource": "*"
         }
@@ -138,6 +143,7 @@ The service makes these API calls:
 ## Azure VM Scanning with Chef Automate
 
 Set up Chef Automate to detect and scan the nodes in your Azure account by providing your Azure Credentials and creating an _Azure VM Node Manager_. To add an Azure VM Node Manager, navigate to the [_Node Integrations_]({{< relref "node-integrations.md" >}}) page in the Settings tab, select `Create Integration`, and you should see _Azure_ as one of your node management service options.
+Please note we do not support Azure govcloud.
 
 ### Adding an Azure VM Node Manager
 

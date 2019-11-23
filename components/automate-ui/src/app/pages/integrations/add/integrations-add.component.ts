@@ -51,7 +51,8 @@ export class IntegrationsAddComponent implements OnDestroy {
         no_creds: false,
         credentials: fb.group({
           aws_access_key_id: '',
-          aws_secret_access_key: ''
+          aws_secret_access_key: '',
+          aws_region: ''
         })
       }),
       azure: fb.group({

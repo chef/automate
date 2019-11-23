@@ -17,6 +17,7 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/managers"
+	"github.com/chef/automate/components/nodemanager-service/managers/awsec2"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
@@ -284,13 +285,13 @@ func (r *Resolver) handleAwsApiNodes(ctx context.Context, m *manager.NodeManager
 func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.NodeManager, job *jobs.Job, node *nodes.Node) ([]*types.InspecJob, error) {
 	var err error
 	var secret *secrets.Secret
-	var accessKeyID, secretKey, sessionToken string
+	var awsCreds awsec2.AwsCreds
 	if len(m.CredentialId) > 0 {
 		secret, err = r.secretsClient.Read(ctx, &secrets.Id{Id: m.CredentialId})
 		if err != nil {
 			return nil, fmt.Errorf("unable to fetch credential id:%s %s", m.CredentialId, err.Error())
 		}
-		accessKeyID, secretKey, _, sessionToken = managers.GetAWSCreds(secret)
+		awsCreds = managers.GetAWSCreds(secret)
 	}
 
 	return []*types.InspecJob{{
@@ -308,12 +309,12 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		TargetConfig: inspec.TargetConfig{
 			TargetBaseConfig: inspec.TargetBaseConfig{
 				Backend: "aws",
-				Region:  "us-east-1",
+				Region:  awsCreds.Region,
 			},
 			Secrets: inspec.Secrets{
-				AwsUser:         accessKeyID,
-				AwsPassword:     secretKey,
-				AwsSessionToken: sessionToken,
+				AwsUser:         awsCreds.AccessKeyId,
+				AwsPassword:     awsCreds.SecretAccessKey,
+				AwsSessionToken: awsCreds.SessionToken,
 			},
 		},
 		Profiles:        job.Profiles,
@@ -340,13 +341,14 @@ func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.No
 	}
 
 	var secret *secrets.Secret
-	var accessKeyID, secretKey, name, sessionToken string
+	var name string
+	var awsCreds awsec2.AwsCreds
 	if len(m.CredentialId) > 0 {
 		secret, err = r.secretsClient.Read(ctx, &secrets.Id{Id: m.CredentialId})
 		if err != nil {
 			return nil, fmt.Errorf("unable to fetch credential id:%s %s", m.CredentialId, err.Error())
 		}
-		accessKeyID, secretKey, _, sessionToken = managers.GetAWSCreds(secret)
+		awsCreds = managers.GetAWSCreds(secret)
 	}
 
 	jobArray := []*types.InspecJob{}
@@ -388,9 +390,9 @@ func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.No
 						Region:  node,
 					},
 					Secrets: inspec.Secrets{
-						AwsUser:         accessKeyID,
-						AwsPassword:     secretKey,
-						AwsSessionToken: sessionToken,
+						AwsUser:         awsCreds.AccessKeyId,
+						AwsPassword:     awsCreds.SecretAccessKey,
+						AwsSessionToken: awsCreds.SessionToken,
 					},
 				},
 				Profiles:        job.Profiles,
