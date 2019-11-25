@@ -22,7 +22,7 @@ func (depth *ReportDepth) getTrendAggs(trendType string,
 		aggs["passed"] = elastic.NewSumAggregation().Field("controls_sums.passed.total")
 		aggs["failed"] = elastic.NewSumAggregation().Field("controls_sums.failed.total")
 		aggs["skipped"] = elastic.NewSumAggregation().Field("controls_sums.skipped.total")
-		aggs["waived"] = elastic.NewSumAggregation().Field("controls_sums.waived")
+		aggs["waived"] = elastic.NewSumAggregation().Field("controls_sums.waived.total")
 	}
 	return aggs
 }
