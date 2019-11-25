@@ -182,14 +182,7 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 
 	tsProto := deq.GetEvent().GetEnqueuedAt()
 	ts := time.Time{}
-	if tsProto == nil {
-		// TODO(ssd) 2019-11-22: Determine what we want to do
-		// here. The cereal-service we are talking to might
-		// not yet know how to send us EnqueuedAt.
-		//
-		// Right now we do nothing, meaning ts is the zero
-		// value.
-	} else {
+	if tsProto != nil {
 		ts, err = ptypes.Timestamp(tsProto)
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "invalid enqueued_at")
@@ -385,14 +378,7 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal
 	tsProto := deq.GetTask().GetMetadata().GetEnqueuedAt()
 
 	ts := time.Time{}
-	if tsProto == nil {
-		// TODO(ssd) 2019-11-22: Determine what we want to do
-		// here. The cereal-service we are talking to might
-		// not yet know how to send us EnqueuedAt.
-		//
-		// Right now we do nothing, meaning ts is the zero
-		// value.
-	} else {
+	if tsProto != nil {
 		ts, err = ptypes.Timestamp(tsProto)
 		if err != nil {
 			return nil, nil, errors.Wrap(err, "invalid enqueued_at")

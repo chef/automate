@@ -443,6 +443,7 @@ func (s *CerealService) DequeueTask(req cereal.Cereal_DequeueTaskServer) error {
 
 	tsProto, err := ptypes.TimestampProto(task.Metadata.EnqueuedAt)
 	if err != nil {
+		logctx.WithError(err).Error("could not parse EnqueuedAt from backend")
 		return err
 	}
 
