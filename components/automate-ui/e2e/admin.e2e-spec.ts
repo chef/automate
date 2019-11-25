@@ -93,7 +93,7 @@ describe('Admin pages', () => {
           const menu = $('chef-table-new chef-table-body chef-table-row mat-select');
           browser.wait(EC.elementToBeClickable(menu), 5000).then(() => {
             menu.click().then(() => {
-              const dropDownOption = menu.$(`chef-option:nth-child(${index + 1}`);
+              const dropDownOption = menu.$(`mat-option:nth-child(${index + 1}`);
               const dropDownOpened = () => dropDownOption.getText().then(val => val === item);
               browser.wait(dropDownOpened, 100, 'Control options should render.');
             });
@@ -233,7 +233,7 @@ describe('Admin pages', () => {
             .then(controlButton => {
               browser.wait(EC.elementToBeClickable(controlButton));
               controlButton.click().then(() => {
-                const dropDownOption = controlButton.$(`chef-option:nth-child(${index + 1}`);
+                const dropDownOption = controlButton.$(`mat-option:nth-child(${index + 1}`);
                 const dropDownOpened = () => dropDownOption.getText()
                   .then(val => val === item);
                 browser.wait(dropDownOpened, 100, 'Control options should render.');
@@ -255,7 +255,7 @@ describe('Admin pages', () => {
           browser.wait(EC.elementToBeClickable(controlButton));
           controlButton.click().then(() => {
             // select Delete Policy
-            const deleteOption = controlButton.$('chef-option:nth-child(1)');
+            const deleteOption = controlButton.$('mat-option:nth-child(1)');
             browser.wait(EC.visibilityOf(deleteOption), 5000, 'Delete option should render');
             deleteOption.click();
 
@@ -901,7 +901,7 @@ describe('Admin pages', () => {
                   click();
                 const dropDownOption = $(
                   `app-project-list chef-table-new chef-table-body chef-table-row:nth-child(2)
-                  chef-table-cell:nth-child(3) mat-select chef-option:nth-child(${index + 1})`);
+                  chef-table-cell:nth-child(3) mat-select mat-option:nth-child(${index + 1})`);
                 const dropDownOpened = () => dropDownOption.getText().then(val => val === item);
                 browser.wait(dropDownOpened, 5000, 'Control options should render.');
               });
@@ -923,7 +923,7 @@ describe('Admin pages', () => {
                 browser.wait(EC.elementToBeClickable(controlButton));
                 controlButton.click().then(() => {
                   // select Delete Project
-                  const deleteOption = controlButton.$('chef-option:nth-child(1)');
+                  const deleteOption = controlButton.$('mat-option:nth-child(1)');
                   browser.wait(EC.visibilityOf(deleteOption), 5000,
                     'Delete option should render');
                   deleteOption.click();
@@ -989,7 +989,7 @@ describe('Admin pages', () => {
       describe('before any typing occurs', () => {
         it('displays the project name in the input and the save button is disabled', () => {
           waitForSpinners().then(() => {
-            const detailsLink = $('#chef-option2');
+            const detailsLink = $('#mat-option2');
             detailsLink.click().then(() => {
               const projectNameInput = $('app-project-details section form chef-form-field input');
               expect(projectNameInput.getAttribute('value')).toBe('My Project');
@@ -1023,7 +1023,7 @@ describe('Admin pages', () => {
         it('enables the save button, updates the project, and notes the save, ' +
           'and then removes note once more typing occurs', () => {
             waitForSpinners().then(() => {
-              const detailsLink = $('#chef-option2');
+              const detailsLink = $('#mat-option2');
               detailsLink.click().then(() => {
                 const projectSaveButton = $('app-project-details section #button-bar button');
                 const projectNameInput = $(
