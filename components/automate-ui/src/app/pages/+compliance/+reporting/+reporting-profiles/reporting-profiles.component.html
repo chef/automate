@@ -52,7 +52,7 @@
   <chef-scroll-top></chef-scroll-top>
 </ng-container>
 
-<chef-side-panel class="reporting-profiles-side-panel" [visible]="displayScanResultsSidebar">
+<chef-side-panel class="reporting-profiles-side-panel" [hidden]="!displayScanResultsSidebar" [visible]="displayScanResultsSidebar">
   <div class="side-panel-header">
     <chef-icon class="header-icon">equalizer</chef-icon>
     <div class="header-text">

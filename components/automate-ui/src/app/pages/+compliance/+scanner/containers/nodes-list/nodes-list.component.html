@@ -102,7 +102,7 @@
 
 <chef-scroll-top></chef-scroll-top>
 
-<chef-side-panel class="side-panel" [visible]="showNodeResults">
+<chef-side-panel class="side-panel" [hidden]="!showNodeResults" [visible]="showNodeResults">
   <div class="side-panel-header">
     <chef-icon class="header-icon">equalizer</chef-icon>
     <div class="header-text">
