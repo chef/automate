@@ -38,13 +38,9 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 		return nil, status.Error(codes.InvalidArgument, "must supply org server id")
 	}
 
-	var org storage.Org
-	var err error
-	if org, err = s.service.Storage.StoreOrg(ctx, req.Name, req.AdminUser, req.AdminKey, req.ServerId); err != nil {
-		if err == storage.ErrConflict {
-			return nil, status.Errorf(codes.AlreadyExists, "org with name %q already exists", req.Name)
-		}
-		return nil, status.Error(codes.Internal, err.Error())
+	org, err := s.service.Storage.StoreOrg(ctx, req.Name, req.AdminUser, req.AdminKey, req.ServerId)
+	if err != nil {
+		return nil, service.ParseStorageError(err, req.Name, "org")
 	}
 
 	return &response.CreateOrg{
@@ -64,7 +60,7 @@ func (s *Server) GetOrgs(ctx context.Context, req *request.GetOrgs) (*response.G
 
 	orgsList, err := s.service.Storage.GetOrgs(ctx, serverID)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, service.ParseStorageError(err, "", "org")
 	}
 
 	return &response.GetOrgs{
@@ -109,11 +105,7 @@ func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*
 
 	org, err := s.service.Storage.GetOrgByName(ctx, req.Name, serverID)
 	if err != nil {
-		if err == storage.ErrNotFound {
-			return nil, status.Errorf(codes.NotFound, "no server found with name %q", req.Name)
-		}
-		return nil, status.Errorf(codes.Internal,
-			"unexpected error for GetOrgByName with org named %q", req.Name)
+		return nil, service.ParseStorageError(err, req.Name, "org")
 	}
 
 	return &response.GetOrg{

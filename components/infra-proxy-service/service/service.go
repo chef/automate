@@ -39,7 +39,7 @@ func ParseStorageError(err error, id interface{}, noun string) error {
 		case storage.ErrNotFound:
 			return status.Errorf(codes.NotFound, "no %s found with id %q", noun, id)
 		case storage.ErrConflict:
-			return status.Errorf(codes.AlreadyExists, "%s with that name already exists", noun)
+			return status.Errorf(codes.AlreadyExists, "%s with that name %q already exists", noun, id)
 		default:
 			return status.Error(codes.Internal, err.Error())
 		}

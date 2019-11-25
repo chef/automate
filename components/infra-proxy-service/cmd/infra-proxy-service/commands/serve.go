@@ -16,7 +16,6 @@ import (
 	"github.com/chef/automate/lib/logger"
 	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
-	"github.com/chef/automate/lib/tracing"
 )
 
 var serveCmd = &cobra.Command{
@@ -59,11 +58,6 @@ func serve(cmd *cobra.Command, args []string) {
 		if err != nil {
 			fail(errors.Wrap(err, "Failed to get pg uri"))
 		}
-	}
-
-	closer, err := tracing.NewGlobalTracer("infra-proxy")
-	if err == nil {
-		defer tracing.CloseQuietly(closer)
 	}
 
 	l, err := logger.NewLogger(cfg.LogFormat, cfg.LogLevel)

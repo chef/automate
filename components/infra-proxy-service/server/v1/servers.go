@@ -35,13 +35,9 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		return nil, status.Error(codes.InvalidArgument, "must supply server fqdn")
 	}
 
-	var server storage.Server
-	var err error
-	if server, err = s.service.Storage.StoreServer(ctx, req.Name, req.Description, req.Fqdn, req.IpAddress); err != nil {
-		if err == storage.ErrConflict {
-			return nil, status.Errorf(codes.AlreadyExists, "server with name %q already exists", req.Name)
-		}
-		return nil, status.Error(codes.Internal, err.Error())
+	server, err := s.service.Storage.StoreServer(ctx, req.Name, req.Description, req.Fqdn, req.IpAddress)
+	if err == storage.ErrConflict {
+		return nil, service.ParseStorageError(err, req.Name, "server")
 	}
 
 	return &response.CreateServer{
@@ -56,7 +52,7 @@ func (s *Server) GetServers(ctx context.Context, req *request.GetServers) (*resp
 
 	serversList, err := s.service.Storage.GetServers(ctx)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, service.ParseStorageError(err, "", "server")
 	}
 
 	return &response.GetServers{
@@ -96,11 +92,7 @@ func (s *Server) GetServerByName(ctx context.Context, req *request.GetServerByNa
 
 	server, err := s.service.Storage.GetServerByName(ctx, req.Name)
 	if err != nil {
-		if err == storage.ErrNotFound {
-			return nil, status.Errorf(codes.NotFound, "no server found with name %q", req.Name)
-		}
-		return nil, status.Errorf(codes.Internal,
-			"unexpected error for GetServerByName with server named %q", req.Name)
+		return nil, service.ParseStorageError(err, req.Name, "server")
 	}
 
 	return &response.GetServer{
