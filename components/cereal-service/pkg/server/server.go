@@ -197,6 +197,12 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 	}
 	defer completer.Close() // nolint: errcheck
 
+	tsProto, err := ptypes.TimestampProto(evt.EnqueuedAt)
+	if err != nil {
+		logctx.WithError(err).Error("could not parse EnqueuedAt from backend")
+		return err
+	}
+
 	domain, workflowName := unnamespace(evt.Instance.WorkflowName)
 	evt.Instance.WorkflowName = workflowName
 	logctx = logctx.WithFields(logrus.Fields{
@@ -228,6 +234,7 @@ func (s *CerealService) DequeueWorkflow(req cereal.Cereal_DequeueWorkflowServer)
 					Type:               string(evt.Type),
 					EnqueuedTaskCount:  int64(evt.EnqueuedTaskCount),
 					CompletedTaskCount: int64(evt.CompletedTaskCount),
+					EnqueuedAt:         tsProto,
 					TaskResult:         taskResult,
 				},
 			},
