@@ -89,7 +89,7 @@
         <chef-scroll-top></chef-scroll-top>
       </ng-container>
 
-      <chef-side-panel class="reporting-profile-side-panel" [visible]="scanResults.opened">
+      <chef-side-panel class="reporting-profile-side-panel" [hidden]="!scanResults.opened" [visible]="scanResults.opened">
         <div class="side-panel-header">
           <chef-icon class="header-icon">equalizer</chef-icon>
           <div class="header-text">
