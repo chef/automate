@@ -141,6 +141,8 @@ github.com/felixge/httpsnoop
 github.com/fsnotify/fsnotify
 # github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39
 github.com/ghodss/yaml
+# github.com/go-chef/chef v0.4.0
+github.com/go-chef/chef
 # github.com/go-delve/delve v1.3.1
 github.com/go-delve/delve/cmd/dlv
 github.com/go-delve/delve/cmd/dlv/cmds
@@ -459,7 +461,7 @@ github.com/spf13/pflag
 github.com/spf13/viper
 # github.com/stretchr/objx v0.1.1
 github.com/stretchr/objx
-# github.com/stretchr/testify v1.3.0
+# github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require

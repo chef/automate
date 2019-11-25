@@ -39,6 +39,7 @@ require (
 	github.com/felixge/httpsnoop v1.0.0 // indirect
 	github.com/fortytw2/leaktest v1.3.0 // indirect
 	github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39
+	github.com/go-chef/chef v0.4.0
 	github.com/go-delve/delve v1.3.1
 	github.com/go-gorp/gorp v2.0.1-0.20180410155428-6032c66e0f5f+incompatible
 	github.com/gobwas/glob v0.2.3 // indirect
@@ -106,7 +107,7 @@ require (
 	github.com/spf13/jwalterweatherman v0.0.0-20170901151539-12bd96e66386 // indirect
 	github.com/spf13/pflag v1.0.1
 	github.com/spf13/viper v1.0.1-0.20171207042631-1a0c4a370c3e
-	github.com/stretchr/testify v1.3.0
+	github.com/stretchr/testify v1.4.0
 	github.com/teambition/rrule-go v0.0.0-20170616063102-9d6a7aa3e9f9
 	github.com/uber-go/atomic v1.4.0 // indirect
 	github.com/uber/jaeger-client-go v2.11.2+incompatible

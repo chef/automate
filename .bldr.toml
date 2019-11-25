@@ -1998,6 +1998,7 @@ paths = [
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/codahale/hdrhistogram/*",
   "vendor/github.com/fsnotify/fsnotify/*",
+  "vendor/github.com/go-chef/chef/*",
   "vendor/github.com/gofrs/uuid/*",
   "vendor/github.com/golang-migrate/migrate/*",
   "vendor/github.com/golang/protobuf/*",
