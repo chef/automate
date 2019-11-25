@@ -1,5 +1,5 @@
 import { Base64 } from 'js-base64';
-import { itFlaky } from '../../constants';
+import { itFlaky } from '../../../support/constants';
 
 describe('create a manual node ssh scan job and cleanup after', () => {
   before(() => {

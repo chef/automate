@@ -1,4 +1,4 @@
-import { iamVersion } from '../../constants';
+import { iamVersion } from '../../../support/constants';
 
 describe('token management', () => {
   const typeDelay = 50;

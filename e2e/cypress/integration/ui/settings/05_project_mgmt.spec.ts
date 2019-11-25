@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, itFlaky } from '../../constants';
+import { describeIfIAMV2p1, itFlaky } from '../../../support/constants';
 interface Project {
   id: string;
   name: string;

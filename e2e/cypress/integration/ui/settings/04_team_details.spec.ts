@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, isV1, itFlaky } from '../../constants';
+import { describeIfIAMV2p1, isV1, itFlaky } from '../../../support/constants';
 
 describe('team details', () => {
   let adminIdToken = '';

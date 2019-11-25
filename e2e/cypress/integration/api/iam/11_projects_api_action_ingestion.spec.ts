@@ -1,5 +1,5 @@
-import { describeIfIAMV2p1 } from '../../constants';
-import { uuidv4 } from '../../helpers';
+import { describeIfIAMV2p1 } from '../../../support/constants';
+import { uuidv4 } from '../../../support/helpers';
 
 describeIfIAMV2p1('Action project tagging on ingestion', () => {
   const cypressPrefix = 'test-client-runs-update';

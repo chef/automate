@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1 } from '../../constants';
+import { describeIfIAMV2p1 } from '../../../support/constants';
 
 describeIfIAMV2p1('assigning projects', () => {
   let twoAllowedProjectsTok = '';
