@@ -95,6 +95,14 @@ var ComplianceSumDate = Mapping{
               },
               "type": "object"
             },
+            "waived": {
+              "properties": {
+                "total": {
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
             "total": {
               "type": "integer"
             }
@@ -218,6 +226,14 @@ var ComplianceSumDate = Mapping{
                   "type": "object"
                 },
                 "skipped": {
+                  "properties": {
+                    "total": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "waived": {
                   "properties": {
                     "total": {
                       "type": "integer"

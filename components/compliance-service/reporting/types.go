@@ -14,7 +14,9 @@ type NodeControlSummary struct {
 		Major    int `json:"major"`
 		Critical int `json:"critical"`
 	} `json:"failed"`
-	Waived int `json:"waived"`
+	Waived struct {
+		Total int `json:"total"`
+	} `json:"waived"`
 }
 
 type ProfileMin struct {

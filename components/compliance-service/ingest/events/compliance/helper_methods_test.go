@@ -160,7 +160,7 @@ func TestSummary(t *testing.T) {
 	assert.Equal(t, 0, summary_waivers.Skipped.Total, "0 skipped controls in profile")
 	assert.Equal(t, 1, summary_waivers.Failed.Total, "1 failed controls in profile")
 	assert.Equal(t, 0, summary_waivers.Passed.Total, "0 passed controls in profile")
-	assert.Equal(t, 3, summary_waivers.Waived, "3 waived controls in profile")
+	assert.Equal(t, 3, summary_waivers.Waived.Total, "3 waived controls in profile")
 
 	// ------------------------------- ReportComplianceStatus tests --------------------------------- //
 
@@ -212,7 +212,7 @@ func TestSummary(t *testing.T) {
 	assert.Equal(t, 2, summary2.Skipped.Total, "2 skipped control in profile")
 	assert.Equal(t, 1, summary2.Failed.Total, "1 failed control in profile")
 	assert.Equal(t, 3, summary2.Passed.Total, "3 passed control in profile")
-	assert.Equal(t, 3, summary2.Waived, "3 waived control in profile")
+	assert.Equal(t, 3, summary2.Waived.Total, "3 waived control in profile")
 
 	// ------------------------------- Control Status and ImpactName tests --------------------------------- //
 

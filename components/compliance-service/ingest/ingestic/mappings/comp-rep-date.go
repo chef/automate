@@ -95,6 +95,14 @@ var ComplianceRepDate = Mapping{
               },
               "type": "object"
             },
+            "waived": {
+              "properties": {
+                "total": {
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
             "total": {
               "type": "integer"
             }
@@ -340,6 +348,14 @@ var ComplianceRepDate = Mapping{
 									"type": "object"
 								},
 								"skipped": {
+									"properties": {
+										"total": {
+											"type": "integer"
+										}
+									},
+									"type": "object"
+								},
+								"waived": {
 									"properties": {
 										"total": {
 											"type": "integer"

@@ -46,7 +46,7 @@ func ProfileControlSummary(profile *inspec.Profile) *reportingTypes.NodeControlS
 		summary.Total++
 		if control.WaiverData != nil && !strings.HasPrefix(control.WaiverData.Message, "Waiver expired") {
 			// Expired waived controls are not waived. This way, we can use the actual status of the executed control
-			summary.Waived++
+			summary.Waived.Total++
 		} else {
 			switch control.Status() {
 			case inspec.ResultStatusPassed:
@@ -78,7 +78,7 @@ func AddControlSummary(total *reportingTypes.NodeControlSummary, sum reportingTy
 	total.Failed.Minor += sum.Failed.Minor
 	total.Failed.Major += sum.Failed.Major
 	total.Failed.Critical += sum.Failed.Critical
-	total.Waived += sum.Waived
+	total.Waived.Total += sum.Waived.Total
 }
 
 // ReportComplianceStatus returns the overall compliance status of a report based on the passed/failed/skipped/waived control counts
@@ -87,7 +87,7 @@ func ReportComplianceStatus(summary *reportingTypes.NodeControlSummary) (status 
 		status = inspec.ResultStatusFailed
 	} else if summary.Total == summary.Skipped.Total {
 		status = inspec.ResultStatusSkipped
-	} else if summary.Total == summary.Waived {
+	} else if summary.Total == summary.Waived.Total {
 		status = inspec.ResultStatusWaived
 	} else {
 		status = inspec.ResultStatusPassed
