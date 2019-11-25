@@ -1,88 +1,129 @@
-
-<div class="node-run-message">
-  <chef-alert type="error" *ngIf="nodeRun.status === 'failure'">
-    This run failed on {{ nodeRun.endTime | datetime: RFC2822 }} &nbsp;
-    <span *ngIf="nodeRun.error?.description?.title">
-      because there was a {{nodeRun.error?.description?.title}} &nbsp;
-    </span>
-    <chef-button secondary (click)="activateModal()">View error log</chef-button>
-  </chef-alert>
-  <chef-alert type="success" *ngIf="nodeRun.status === 'success'">
-    This run succeeded on {{ nodeRun.endTime | datetime: RFC2822 }}.
-    All resources ran successfully!
-  </chef-alert>
-</div>
-<div class="node-run-summary">
-  <div class="radial-column flex-block">
-    <chef-radial-chart>
-      <span slot="innerText">
-        <span class="chart-label-number">{{chartSucceeded}}%</span>
-        Run Progress
+<div class="metadata-container">
+  <div class="metadata" [ngClass]="nodeRun.status">
+    <div class="metadata-header" (click)="metadatabody.toggle()">
+      <span class="metadata-title">
+        <ng-container *ngIf="nodeRun.status === 'failure'">
+          <chef-icon>report_problem</chef-icon>
+          Run failed {{ nodeRun.endTime | datetime: RFC2822 }}<ng-container
+          *ngIf="nodeRun.error?.description?.title">: {{ nodeRun.error?.description?.title }}</ng-container>
+          <chef-button primary caution (click)="activateModal($event)">Error Log</chef-button>
+        </ng-container>
+        <ng-container *ngIf="nodeRun.status === 'success'">
+          <chef-icon>check_circle</chef-icon>
+          Run succeeded {{ nodeRun.endTime | datetime: RFC2822 }}
+        </ng-container>
       </span>
-      <chef-data-point [value]="chartOther" class="other">Other {{chartFailed}}</chef-data-point>
-      <chef-data-point [value]="chartFailed" class="failure">Failed {{chartFailed}}</chef-data-point>
-      <chef-data-point [value]="chartSucceeded" class="success">Succeeded {{chartSucceeded}}</chef-data-point>
-    </chef-radial-chart>
-  </div>
-  <div class="run-detail-labels flex-block">
-    <div class="run-metadata">
-      <div class="label">Run Duration</div>
-      <div class="value">{{ nodeRun.startTime | datetime: ChefHoursMins }} - {{ nodeRun.endTime | datetime: ChefHoursMins }} UTC</div>
+      <span class="metadata-toggle">
+        <ng-container *ngIf="!metadatabody.opened">View more +</ng-container>
+        <ng-container *ngIf="metadatabody.opened">View less -</ng-container>
+      </span>
     </div>
-    <div class="run-metadata">
-      <div class="label">Node ID</div>
-      <div class="value">{{ nodeRun.nodeId }}</div>
-    </div>
-    <div class="run-metadata">
-      <div class="label">Run ID</div>
-      <div class="value">{{ nodeRun.runId }}</div>
-    </div>
-    <div class="run-metadata">
-      <div class="label">Deprecations</div>
-      <div class="value">{{ nodeRunDeprecations(nodeRun.deprecations) }}</div>
-    </div>
-  </div>
-  <div class="node-info-column flex-block">
-    <div class="run-metadata">
-      <div class="label">Uptime</div>
-      <div class="value">{{renderDuration(nodeRun.uptimeSeconds)}}</div>
-    </div>
-    <ng-container *ngIf="nodeRun.policyName">
-      <div class="run-metadata">
-        <div class="label">Policy Group</div>
-        <div class="value">{{nodeRun.policyGroup}}</div>
+    <chef-expander opened class="metadata-body" #metadatabody>
+      <div class="metadata-group">
+        <h4 class="metadata-group-heading">Run Information</h4>
+        <table>
+          <tr>
+            <th>Run Duration</th>
+            <td>{{ nodeRun.startTime | datetime: ChefHoursMins }} - {{ nodeRun.endTime | datetime: ChefHoursMins }} UTC</td>
+          </tr>
+          <tr>
+            <th>Run ID</th>
+            <td>{{ nodeRun.runId }}</td>
+          </tr>
+        </table>
+        <chef-radial-chart>
+          <span slot="innerText">
+            <span class="chart-label-number">{{chartSucceeded}}%</span>
+            Run Progress
+          </span>
+          <chef-data-point [value]="chartOther" class="other">Other {{chartFailed}}</chef-data-point>
+          <chef-data-point [value]="chartFailed" class="failure">Failed {{chartFailed}}</chef-data-point>
+          <chef-data-point [value]="chartSucceeded" class="success">Succeeded {{chartSucceeded}}</chef-data-point>
+        </chef-radial-chart>
       </div>
-      <div class="run-metadata">
-        <div class="label">Policy Name</div>
-        <div class="value">{{nodeRun.policyName}}</div>
+      <div class="metadata-group">
+        <h4 class="metadata-group-heading">Node Information</h4>
+        <table>
+          <tr *ngIf="nodeRun.chefVersion?.length">
+            <th>Chef Client Version</th>
+            <td>{{ nodeRun.chefVersion }}</td>
+          </tr>
+          <tr *ngIf="nodeRun.fqdn?.length">
+            <th>FQDN</th>
+            <td>{{ nodeRun.fqdn }}</td>
+          </tr>
+          <tr *ngIf="nodeRun.ipaddress?.length">
+            <th>IP Address</th>
+            <td>{{ nodeRun.ipaddress }}</td>
+          </tr>
+          <tr>
+            <th>Node ID</th>
+            <td>{{ nodeRun.nodeId }}</td>
+          </tr>
+          <tr>
+            <th>Node Up Time</th>
+            <td>{{ renderDuration(nodeRun.uptimeSeconds) }}</td>
+          </tr>
+          <tr>
+            <th>Platform</th>
+            <td>{{ nodeRun.platform }}</td>
+          </tr>
+        </table>
       </div>
-      <div class="run-metadata">
-        <div class="label">Policy Revision</div>
-        <div class="value">{{nodeRun.policyRevision}}</div>
+      <div class="metadata-group">
+        <h4 class="metadata-group-heading">Metadata</h4>
+        <table>
+          <tr>
+            <th>Chef Organization</th>
+            <td>{{ nodeRun.organization }}</td>
+          </tr>
+          <tr *ngIf="nodeRun.roles?.length">
+            <th>Chef Roles</th>
+            <td>
+              <ng-container *ngIf="nodeRun.roles.length === 1">{{ nodeRun.roles[0] }}</ng-container>
+              <ng-container *ngIf="nodeRun.roles.length > 1">{{ nodeRun.roles.length | number }} roles</ng-container>
+            </td>
+          </tr>
+          <tr *ngIf="nodeRun.sourceFqdn?.length">
+            <th>Chef Server</th>
+            <td>{{ nodeRun.sourceFqdn }}</td>
+          </tr>
+          <tr *ngIf="nodeRun.chefTags?.length > 0">
+            <th>Chef Tags</th>
+            <td>
+              <ng-container *ngIf="nodeRun.chefTags.length === 1">{{ nodeRun.chefTags[0] }}</ng-container>
+              <ng-container *ngIf="nodeRun.chefTags.length > 1">{{ nodeRun.chefTags.length | number }} tags</ng-container>
+            </td>
+          </tr>
+          <tr>
+            <th>Cookbook Deprecations</th>
+            <td>{{ nodeRunDeprecations(nodeRun.deprecations) }}</td>
+          </tr>
+          <tr>
+            <th>Environment</th>
+            <td>{{ nodeRun.environment }}</td>
+          </tr>
+          <tr *ngIf="nodeRun.policyGroup?.length">
+            <th>Policy Group</th>
+            <td>{{ nodeRun.policyGroup }}</td>
+          </tr>
+          <tr *ngIf="nodeRun.policyName?.length">
+            <th>Policy Name</th>
+            <td>{{ nodeRun.policyName }}</td>
+          </tr>
+          <tr *ngIf="nodeRun.policyRevision?.length">
+            <th>Policy Revision</th>
+            <td>{{ nodeRun.policyRevision }}</td>
+          </tr>
+          <tr *ngIf="nodeRun.projects?.length">
+            <th>Projects</th>
+            <td>
+              <ng-container *ngIf="nodeRun.projects.length === 1">{{ nodeRun.projects[0] }}</ng-container>
+              <ng-container *ngIf="nodeRun.projects.length > 1">{{ nodeRun.projects.length | number }} projects</ng-container>
+            </td>
+          </tr>
+        </table>
       </div>
-    </ng-container>
-    <ng-container *ngIf="!nodeRun.policyName">
-      <div class="run-metadata">
-        <div class="label">Environment</div>
-        <div class="value">{{nodeRun.environment}}</div>
-      </div>
-    </ng-container>
-    <div class="run-metadata">
-      <div class="label">Platform(s)</div>
-      <div class="value">{{nodeRun.platform}}</div>
-    </div>
-    <div class="run-metadata">
-      <div class="label">IP Address</div>
-      <div class="value">{{nodeRun.ipaddress}}</div>
-    </div>
-    <div class="run-metadata">
-      <div class="label">FQDN</div>
-      <div class="value">{{nodeRun.fqdn || 'Not Available'}}</div>
-    </div>
-    <div class="run-metadata">
-      <div class="label">Chef Client Version</div>
-      <div class="value">{{nodeRun.chefVersion || 'Not Available'}}</div>
-    </div>
+    </chef-expander>
   </div>
 </div>
-

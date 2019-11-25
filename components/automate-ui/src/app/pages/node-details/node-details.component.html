@@ -5,17 +5,17 @@
         <div class="run-container">
           <chef-breadcrumbs>
             <chef-breadcrumb [link]="['/infrastructure/client-runs']">Client runs</chef-breadcrumb>
-            Node {{nodeRun.nodeName}}
+            {{nodeRun.nodeName}}
           </chef-breadcrumbs>
 
           <chef-page-header>
-            <chef-heading>Node {{nodeRun.nodeName}}</chef-heading>
-            <chef-subheading>Use the run history list to examine recent Chef client runs for this node.</chef-subheading>
+            <chef-heading>{{nodeRun.nodeName}}</chef-heading>
             <div slot="header-buttons">
               <chef-button class="run-history-button" id="run-history-button" primary (click)="openRunHistory()">Run history</chef-button>
             </div>
-            <app-run-summary [nodeRun]="nodeRun"> </app-run-summary>
           </chef-page-header>
+
+          <app-run-summary [nodeRun]="nodeRun"> </app-run-summary>
 
           <div class="main page-body">
             <app-tabs class="tabs-row" (tabChange)="tabChange($event)">
