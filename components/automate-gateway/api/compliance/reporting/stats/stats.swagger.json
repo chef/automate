@@ -644,6 +644,11 @@
           "type": "integer",
           "format": "int32",
           "description": "Total skipped objects (nodes or controls) on the reports at the given report time."
+        },
+        "waived": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total waived objects (nodes or controls) on the reports at the given report time."
         }
       }
     },
