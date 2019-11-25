@@ -17,7 +17,7 @@ func TestConvertComposedServiceToStorage(t *testing.T) {
 
 	expected = &storage.Service{Application: "abcd", PreviousHealth: "MORE-OR-LESS-OK"}
 	assert.Equal(t, expected, convertComposedServiceToStorage(&composedService{
-		Application: "abcd", PreviousHealth: "MORE-OR-LESS-OK", Status: "",
+		Application: "abcd", PreviousHealth: "MORE-OR-LESS-OK",
 	}))
 }
 
@@ -30,7 +30,7 @@ func TestConvertComposedServicesToStorage(t *testing.T) {
 	subject := convertComposedServicesToStorage([]*composedService{
 		&composedService{},
 		&composedService{ID: 1, SupMemberID: "foo"},
-		&composedService{Application: "abcd", PreviousHealth: "MORE-OR-LESS-OK", Status: ""},
+		&composedService{Application: "abcd", PreviousHealth: "MORE-OR-LESS-OK"},
 	})
 	for _, e := range expected {
 		assert.Contains(t, subject, e)

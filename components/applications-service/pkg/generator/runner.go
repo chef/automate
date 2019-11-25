@@ -13,6 +13,7 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/nats"
 	uuid "github.com/chef/automate/lib/uuid4"
 
+	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -291,8 +292,11 @@ func (m *MessagePrototype) CreateMessage(uuid string) *habitat.HealthCheckEvent 
 			Fqdn:         fmt.Sprintf("%s.example", uuid),
 			Site:         "test",
 		},
-		Result:    habitat.HealthCheckResult_Warning,
-		Execution: &duration.Duration{},
+		Result:     habitat.HealthCheckResult_Warning,
+		Execution:  &duration.Duration{},
+		Stdout:     &wrappers.StringValue{Value: ""},
+		Stderr:     &wrappers.StringValue{Value: ""},
+		ExitStatus: &wrappers.Int32Value{Value: int32(0)},
 	}
 }
 

@@ -431,11 +431,14 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 	services := make([]*applications.Service, len(svcs))
 	for i, svc := range svcs {
 		services[i] = &applications.Service{
-			SupervisorId:        svc.SupMemberID,
-			Release:             svc.FullReleaseString(),
-			Group:               svc.Group,
-			HealthCheck:         convertHealthStatusToProto(svc.Health),
-			Status:              applications.ServiceStatus(applications.ServiceStatus_value[svc.Status]),
+			SupervisorId: svc.SupMemberID,
+			Release:      svc.FullReleaseString(),
+			Group:        svc.Group,
+			HealthCheck:  convertHealthStatusToProto(svc.Health),
+			// Status represents whether the service is running, down, deploying,
+			// etc. We don't collect this information currently so it's hardcoded to
+			// "RUNNING"
+			Status:              applications.ServiceStatus(0),
 			Application:         svc.Application,
 			Environment:         svc.Environment,
 			Fqdn:                svc.Fqdn,

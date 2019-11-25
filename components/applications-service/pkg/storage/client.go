@@ -91,7 +91,9 @@ type Service struct {
 	Name                string
 	Version             string
 	Release             string
-	Status              string
+	HCStdout            string
+	HCStderr            string
+	HCExitStatus        int32
 	Health              string
 	Group               string
 	Fqdn                string

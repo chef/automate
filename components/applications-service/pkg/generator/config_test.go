@@ -9,6 +9,7 @@ import (
 
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/golang/protobuf/ptypes/duration"
+	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -61,8 +62,11 @@ func TestDefaultProfileIsViable(t *testing.T) {
 				Channel:  "stable",
 			},
 		},
-		Result:    habitat.HealthCheckResult_Warning,
-		Execution: &duration.Duration{},
+		Result:     habitat.HealthCheckResult_Warning,
+		Execution:  &duration.Duration{},
+		Stdout:     &wrappers.StringValue{Value: ""},
+		Stderr:     &wrappers.StringValue{Value: ""},
+		ExitStatus: &wrappers.Int32Value{Value: int32(0)},
 	}
 
 	assert.EqualValues(t, expected, msg)

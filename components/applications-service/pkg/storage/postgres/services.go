@@ -22,7 +22,9 @@ type composedService struct {
 	Name                string    `db:"name"`
 	Version             string    `db:"version"`
 	Release             string    `db:"release"`
-	Status              string    `db:"status"`
+	HCStdout            string    `db:"health_check_stdout"`
+	HCStderr            string    `db:"health_check_stderr"`
+	HCExitStatus        int32     `db:"health_check_exit_status"`
 	Health              string    `db:"health"`
 	Group               string    `db:"group"`
 	Fqdn                string    `db:"fqdn"`
@@ -44,7 +46,9 @@ SELECT s.id
   , s.name AS name
   , s.version AS version
   , s.release AS release
-  , s.health_check_message AS status
+  , s.health_check_stdout AS health_check_stdout
+  , s.health_check_stderr AS health_check_stderr
+  , s.health_check_exit_status AS health_check_exit_status
   , s.health AS health
   , s.service_group_name AS group
   , s.application AS application
@@ -68,7 +72,9 @@ SELECT s.id
   , s.name AS name
   , s.version AS version
   , s.release AS release
-  , s.health_check_message AS status
+  , s.health_check_stdout AS health_check_stdout
+  , s.health_check_stderr AS health_check_stderr
+  , s.health_check_exit_status AS health_check_exit_status
   , s.health AS health
   , s.service_group_name AS group
   , s.application AS application
@@ -94,7 +100,9 @@ SELECT s.id
   , s.name AS name
   , s.version AS version
   , s.release AS release
-  , s.health_check_message AS status
+  , s.health_check_stdout AS health_check_stdout
+  , s.health_check_stderr AS health_check_stderr
+  , s.health_check_exit_status AS health_check_exit_status
   , s.health AS health
   , s.service_group_name AS group
   , s.application AS application
@@ -127,7 +135,9 @@ RETURNING s.id
   , s.name AS name
   , s.version AS version
   , s.release AS release
-  , s.health_check_message AS status
+  , s.health_check_stdout AS health_check_stdout
+  , s.health_check_stderr AS health_check_stderr
+  , s.health_check_exit_status AS health_check_exit_status
   , s.health AS health
   , s.service_group_name AS group
   , s.application AS application

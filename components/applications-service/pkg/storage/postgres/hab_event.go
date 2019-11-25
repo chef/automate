@@ -32,7 +32,6 @@ INSERT INTO service_full (
 	release,
 	package_ident,
 	health,
-	health_check_message,
 	channel,
 	update_strategy,
 	supervisor_id,
@@ -44,10 +43,13 @@ INSERT INTO service_full (
 	environment,
 	last_event_occurred_at,
 	service_group_id,
-	disconnected
+	disconnected,
+	health_check_stdout,
+	health_check_stderr,
+	health_check_exit_status
 )
 VALUES (
-  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19
+  $1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, $20, $21
   )
 ON CONFLICT ON CONSTRAINT service_full_name_supervisor_id_key
 DO UPDATE SET (
@@ -56,7 +58,6 @@ DO UPDATE SET (
 	release,
 	package_ident,
 	health,
-	health_check_message,
 	channel,
 	update_strategy,
 	fqdn,
@@ -67,14 +68,16 @@ DO UPDATE SET (
 	environment,
 	last_event_occurred_at,
 	service_group_id,
-	disconnected
+	disconnected,
+	health_check_stdout,
+	health_check_stderr,
+	health_check_exit_status
 ) = (
 	EXCLUDED.origin,
 	EXCLUDED.version,
 	EXCLUDED.release,
 	EXCLUDED.package_ident,
 	EXCLUDED.health,
-	EXCLUDED.health_check_message,
 	EXCLUDED.channel,
 	EXCLUDED.update_strategy,
 	EXCLUDED.fqdn,
@@ -85,7 +88,10 @@ DO UPDATE SET (
 	EXCLUDED.environment,
 	EXCLUDED.last_event_occurred_at,
 	EXCLUDED.service_group_id,
-	EXCLUDED.disconnected
+	EXCLUDED.disconnected,
+	EXCLUDED.health_check_stdout,
+	EXCLUDED.health_check_stderr,
+	EXCLUDED.health_check_exit_status
 )
 ;
 `
@@ -241,7 +247,6 @@ func (db *Postgres) upsertServiceAndMetadata(
 		pkgIdent.Release,                // release,
 		pkgIdent.FullPackageIdent(),     // package_ident,
 		health,                          // health,
-		"",                              // health_check_message, // TODO 13Aug2019 - hab isn't sending this yet
 		channel,                         // channel,
 		updateStrategy,                  // update_strategy,
 		eventMetadata.GetSupervisorId(), // supervisor_id,
@@ -254,6 +259,9 @@ func (db *Postgres) upsertServiceAndMetadata(
 		convertOrCreateGoTime(eventMetadata.GetOccurredAt()), // last_event_occurred_at
 		sgId,  // service_group_id
 		false, // Disconnected (it is not disconnected since we are getting an event right now)
+		"",    // health_check_stdout TODO
+		"",    // health_check_stderr TODO
+		0,     //health_check_exit_status TODO
 	)
 
 	return err
