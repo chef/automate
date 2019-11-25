@@ -1,8 +1,8 @@
 import { describeIfIAMV2p1 } from '../../constants';
 import { uuidv4 } from '../../helpers';
 
-describeIfIAMV2p1('Compliance report project update tagging', () => {
-  const cypressPrefix = 'test-compliance-update';
+describeIfIAMV2p1('Nodemanager project update tagging', () => {
+  const cypressPrefix = 'test-nodemanager-update';
 
 
   const projectsWithRule = [
@@ -142,20 +142,15 @@ describeIfIAMV2p1('Compliance report project update tagging', () => {
     }
   ];
 
+  const complianceNodeId = uuidv4();
+  const clientRunsNodeId = uuidv4();
+  const reportId = uuidv4();
+  const nodeName = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`;
+  const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
+  const end = Cypress.moment().utc().endOf('day').format();
+
   before(() => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-    cy.cleanupV2IAMObjectsByIDPrefixes('test-projects-api-compliance-update',
-    ['projects', 'policies']);
-  });
-
-  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
-
-  it('tagging 7 projects with all the attributes on a compliance node', () => {
-    const nodeId = uuidv4();
-    const reportId = uuidv4();
-
-    const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
-    const end = Cypress.moment().utc().endOf('day').format();
 
     // Ingest a InSpec report with attribues that match all the projects
     cy.fixture('compliance/inspec-report.json').then((report) => {
@@ -166,8 +161,8 @@ describeIfIAMV2p1('Compliance report project update tagging', () => {
       report.policy_name = 'fire';
       report.roles = ['backend'];
       report.chef_tags = ['v3'];
-      report.node_uuid = nodeId;
-      report.node_name = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`;
+      report.node_uuid = complianceNodeId;
+      report.node_name = nodeName;
       report.end_time = Cypress.moment().utc().format();
       report.report_uuid = reportId;
       cy.request({
@@ -178,8 +173,28 @@ describeIfIAMV2p1('Compliance report project update tagging', () => {
       });
     });
 
+    // Ingest a node with attribues that match all the projects
+    cy.fixture('converge/avengers1.json').then((node) => {
+      node.organization_name = '75th Rangers';
+      node.chef_server_fqdn = 'example.org';
+      node.node.chef_environment = 'arctic';
+      node.policy_group = 'red_ring';
+      node.policy_name = 'fire';
+      node.node.automatic.roles = ['backend'];
+      node.node.normal.tags = ['v3'];
+      node.entity_uuid = clientRunsNodeId;
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: '/data-collector/v0',
+        body: node
+      });
+    });
+
     // wait for the report to be ingested
-    cy.waitForComplianceNode(nodeId, start, end, 30);
+    waitForNodemanagerNode(complianceNodeId, 30);
+    // wait for the client run report to be ingested
+    waitForNodemanagerNode(clientRunsNodeId, 30);
 
     // create the projects with one rule
     projectsWithRule.forEach(projectWithRule => {
@@ -206,30 +221,60 @@ describeIfIAMV2p1('Compliance report project update tagging', () => {
     });
 
     cy.waitUntilApplyRulesNotRunning(100);
+  });
 
-    // Ensure the node is tagged with the correct project
-    projectsWithRule.forEach(projectWithRule => {
+  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
+
+  for ( const projectWithRule of projectsWithRule ) {
+    it(`when a project has a rule that matches a node's ${projectWithRule.rule.name},
+    successfully associates that node with the project`, () => {
+
+      // Ensure that both the compliance and client run nodes' tags are updated
       cy.request({
         headers: {
-          'api-token': Cypress.env('ADMIN_TOKEN'),
-          projects: [projectWithRule.project.id]
+          projects: [projectWithRule.project.id],
+          'api-token': Cypress.env('ADMIN_TOKEN')
         },
         method: 'POST',
-        url: '/api/v0/compliance/reporting/nodes/search',
+        url: '/api/v0/nodes/search',
         body: {
-          filters: [
-            { type: 'start_time', values: [start]},
-            { type: 'end_time', values: [end]},
-            { type: 'node_id', values: [nodeId]}
-          ],
           order: 'DESC',
           page: 1,
-          per_page: 100,
-          sort: 'latest_report.end_time'
+          per_page: 100
         }
       }).then((response) => {
-        expect(response.body.nodes).to.have.length(1);
+        expect(response.body.nodes.length).to.be.greaterThan(0);
+        expect(response.body.nodes.some((node: any) =>
+          node.id === complianceNodeId)).to.equal(true);
+        expect(response.body.nodes.some((node: any) =>
+          node.id === clientRunsNodeId)).to.equal(true);
       });
     });
-  });
+  }
 });
+
+function waitForNodemanagerNode(nodeId: string, maxRetries: number) {
+  cy.request({
+    headers: {
+      projects: ['*'],
+      'api-token': Cypress.env('ADMIN_TOKEN')
+    },
+    method: 'POST',
+    url: '/api/v0/nodes/search',
+    body: {
+      order: 'DESC',
+      page: 1,
+      per_page: 100
+    }
+  })
+  .then((resp: Cypress.ObjectLike) => {
+    // to avoid getting stuck in an infinite loop
+    expect(maxRetries).to.not.be.equal(0);
+    if (resp.body.nodes && resp.body.nodes.length > 0 &&
+      resp.body.nodes.some((node: any) => node.id === nodeId)) {
+      return;
+    }
+    cy.wait(1000);
+    waitForNodemanagerNode(nodeId, maxRetries - 1);
+  });
+}
