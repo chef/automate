@@ -7,9 +7,11 @@ import "google/api/annotations.proto";
 
 import "api/external/infra_proxy/request/orgs.proto";
 import "api/external/infra_proxy/request/servers.proto";
+import "api/external/infra_proxy/request/cookbooks.proto";
 
 import "api/external/infra_proxy/response/orgs.proto";
 import "api/external/infra_proxy/response/servers.proto";
+import "api/external/infra_proxy/response/cookbooks.proto";
 
 import "api/external/common/version/version.proto";
 
@@ -115,5 +117,21 @@ service InfraProxy {
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{id}";
     option (chef.automate.api.iam.policy).action = "infra:serverOrgs:delete";
+  };
+
+  rpc GetCookbooks (infra_proxy.request.Cookbooks) returns (infra_proxy.response.Cookbooks) {
+    option (google.api.http).get = "/infra_proxy/servers/{server_id}/orgs/{org_id}/cookbooks";
+    option (chef.automate.api.policy).resource = "infra_proxy:servers:{server_id}:orgs:{org_id}/cookbooks";
+    option (chef.automate.api.policy).action = "get";
+    option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:cookbooks";
+    option (chef.automate.api.iam.policy).action = "infra:serverOrgCookbooks:get";
+  };
+
+  rpc GetCookbooksAvailableVersions (infra_proxy.request.CookbooksAvailableVersions) returns (infra_proxy.response.CookbooksAvailableVersions) {
+    option (google.api.http).get = "/infra_proxy/servers/{server_id}/orgs/{org_id}/cookbooks/num_versions";
+    option (chef.automate.api.policy).resource = "infra_proxy:servers:{server_id}:orgs:{org_id}/cookbooks";
+    option (chef.automate.api.policy).action = "get";
+    option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:cookbooks";
+    option (chef.automate.api.iam.policy).action = "infra:serverOrgCookbooks:get";
   };
 }

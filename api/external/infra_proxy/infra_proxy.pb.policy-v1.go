@@ -192,4 +192,36 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetCookbooks", "infra_proxy:servers:{server_id}:orgs:{org_id}/cookbooks", "get", "GET", "/infra_proxy/servers/{server_id}/orgs/{org_id}/cookbooks", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.Cookbooks); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetCookbooksAvailableVersions", "infra_proxy:servers:{server_id}:orgs:{org_id}/cookbooks", "get", "GET", "/infra_proxy/servers/{server_id}/orgs/{org_id}/cookbooks/num_versions", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.CookbooksAvailableVersions); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "num_versions":
+					return m.NumVersions
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }

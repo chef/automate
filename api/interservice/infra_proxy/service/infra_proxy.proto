@@ -6,9 +6,11 @@ option go_package = "github.com/chef/automate/api/interservice/infra_proxy/servi
 import "api/external/common/version/version.proto";
 import "api/interservice/infra_proxy/request/servers.proto";
 import "api/interservice/infra_proxy/request/orgs.proto";
+import "api/interservice/infra_proxy/request/cookbooks.proto";
 
 import "api/interservice/infra_proxy/response/servers.proto";
 import "api/interservice/infra_proxy/response/orgs.proto";
+import "api/interservice/infra_proxy/response/cookbooks.proto";
 
 service InfraProxy {
     rpc GetVersion      (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
@@ -26,4 +28,8 @@ service InfraProxy {
     rpc GetOrgs      (chef.automate.domain.infra_proxy.request.GetOrgs) returns (chef.automate.domain.infra_proxy.response.GetOrgs) {};
     rpc GetOrg       (chef.automate.domain.infra_proxy.request.GetOrg) returns (chef.automate.domain.infra_proxy.response.GetOrg) {};
     rpc GetOrgByName (chef.automate.domain.infra_proxy.request.GetOrgByName) returns (chef.automate.domain.infra_proxy.response.GetOrg) {};
+
+    rpc GetCookbooks (chef.automate.domain.infra_proxy.request.Cookbooks) returns (chef.automate.domain.infra_proxy.response.Cookbooks) {};
+    rpc GetCookbooksAvailableVersions (chef.automate.domain.infra_proxy.request.CookbooksAvailableVersions) returns (chef.automate.domain.infra_proxy.response.CookbooksAvailableVersions) {};
+    rpc GetCookbook  (chef.automate.domain.infra_proxy.request.Cookbook) returns (chef.automate.domain.infra_proxy.response.Cookbook) {};
 }

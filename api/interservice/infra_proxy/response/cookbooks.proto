@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+package chef.automate.domain.infra_proxy.response;
+option go_package = "github.com/chef/automate/api/interservice/infra_proxy/response";
+
+message Cookbooks {
+    repeated CookbookVersion cookbooks = 1;
+}
+
+message CookbooksAvailableVersions {
+    repeated CookbookAllVersion cookbooks = 1;
+}
+
+message CookbookVersion {
+    string name = 1;
+    string version  = 2;
+}
+
+message Cookbook {
+    string name = 1;
+    string version = 2;
+}
+
+message CookbookAllVersion {
+    string name = 1;
+    string current_version  = 2;
+    repeated string versions = 3;
+}
