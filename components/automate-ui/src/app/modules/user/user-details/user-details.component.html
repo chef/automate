@@ -25,7 +25,7 @@
                 <chef-form-field class="display3">
                   <label>
                     <span class="label">Full Name <span aria-hidden="true">*</span></span>
-                    <chef chefInput formControlName="fullName"/>
+                    <input chefInput formControlName="fullName"/>
                   </label>
                   <chef-error
                     *ngIf="(editForm.get('fullName').hasError('required') || editForm.get('fullName').hasError('pattern')) && editForm.get('fullName').dirty">
