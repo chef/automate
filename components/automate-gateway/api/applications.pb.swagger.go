@@ -451,6 +451,22 @@ func init() {
         }
       }
     },
+    "chef.automate.api.applications.HealthCheckResult": {
+      "type": "object",
+      "properties": {
+        "stdout": {
+          "type": "string"
+        },
+        "stderr": {
+          "type": "string"
+        },
+        "exit_status": {
+          "type": "integer",
+          "format": "int32"
+        }
+      },
+      "title": "HealthCheckResult aggregates the stdout output, stderr output and process\nexit status of a habitat health check"
+    },
     "chef.automate.api.applications.HealthCounts": {
       "type": "object",
       "properties": {
@@ -572,6 +588,9 @@ func init() {
         },
         "last_event_since": {
           "type": "string"
+        },
+        "health_check_result": {
+          "$ref": "#/definitions/chef.automate.api.applications.HealthCheckResult"
         }
       }
     },
