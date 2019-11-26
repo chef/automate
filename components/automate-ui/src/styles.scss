@@ -247,8 +247,6 @@ input {
   .mat-select-trigger {
     display: inline-block;
     border-radius: var(--chef-border-radius);
-    border-color: var(--chef-primary-dark);
-    box-shadow: 0px 0px 0px 1px var(--chef-primary-dark) inset;
     background-color: var(--chef-white);
     width: 32px;
     height: 32px;
@@ -264,11 +262,32 @@ input {
     }
 
     &:hover {
-      background-color: var(--chef-primary-bright);
-      box-shadow: 0px 0px 0px 1px var(--chef-primary-bright) inset;
+      background-color: #dee5fd;
 
       &:after {
-        color: var(--chef-white);
+        color: #174af0;
+      }
+    }
+  }
+
+  &[aria-owns] {  // hacky alternative to active
+
+    .mat-select-trigger {
+      background-color: #bdcbfb;
+
+      &:after {
+        color: #0e3dd5;
+      }
+    }
+  }
+
+  &:disabled {
+
+    .mat-select-trigger {
+      background-color: #ffffff;
+
+      &:after {
+        color: #212334;
       }
     }
   }
