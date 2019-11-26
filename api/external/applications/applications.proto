@@ -287,7 +287,7 @@ message ServicesBySGRes {
   string group = 1;
   // List of services.
   repeated Service services = 2;
-  // Health counts for services in the service group.
+  // Intentionally blank.
   HealthCounts services_health_counts = 3;
 }
 
@@ -363,7 +363,7 @@ message Service {
   string release = 2;
   // Service group name
   string group = 3;
-  // Enumerated value for health status.
+  // Intentionally blank.
   HealthStatus health_check = 4;
   // The ServiceStatus enum describes the status of the service (Currently Unimplemented).
   ServiceStatus status = 5;
@@ -379,7 +379,7 @@ message Service {
   string update_strategy = 10;
   // Site reported by habitat service, a user defined flag.
   string site = 17;
-  // Last reported health status before currently health status.
+  // Intentionally blank.
   HealthStatus previous_health_check = 18;
   // Time interval of current health status from last status change until now.
   string current_health_since = 19;
@@ -419,15 +419,12 @@ message ServiceGroup {
   // Combination of the version and release in a single string like:
   // Example: 0.1.0/8743278934278923.
   string release = 2;
-  // Status of the service group. If any services are critical it is critical.
-  // If any of the services are warning with no critical services then the status is warning.
-  // If any of the services are unknown with no warning or critical services then the status if unknown.
-  // If all of the services are ok then the status is ok.
+  // Intentionally blank.
   HealthStatus status = 3;
   // Percentage of services reporting OK status.
   // The health_percentage can be a number between 0-100
   int32 health_percentage = 4;
-  // Health status counts for services within this service group.
+  // Intentionally blank.
   HealthCounts services_health_counts = 5;
   // Service group ID. This is a value constructed by automate and is not reported by habitat.
   string id = 6;
@@ -467,6 +464,7 @@ message PackageIdent {
   string release = 4;
 }
 
+// List of service groups.
 message ServiceGroups  {
   // List of service groups.
   repeated ServiceGroup service_groups = 1;
@@ -483,6 +481,10 @@ enum ServiceStatus {
 
 // The HealthStatus enum matches the habitat implementation for health-check status:
 // => https://www.habitat.sh/docs/reference/#health-check
+// For a health status within a service group. If any services are critical it is critical
+// If any of the services are warning with no critical services then the status is warning
+// If any of the services are unknown with no warning or critical services then the status if unknown
+// If all of the services are ok then the status is ok
 enum HealthStatus {
   OK = 0;
   WARNING = 1;
@@ -490,8 +492,6 @@ enum HealthStatus {
   UNKNOWN = 3;
 
   // The representation of NO health check status
-  // TODO @afiune how much effort would be to change
-  // the OK enum to be NONE
   NONE = 17;
 }
 
