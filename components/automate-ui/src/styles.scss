@@ -262,10 +262,10 @@ input {
     }
 
     &:hover {
-      background-color: #dee5fd;
+      background-color: #DEE5FD;
 
       &:after {
-        color: #174af0;
+        color: #174AF0;
       }
     }
   }
@@ -273,10 +273,10 @@ input {
   &[aria-owns] {  // hacky alternative to active
 
     .mat-select-trigger {
-      background-color: #bdcbfb;
+      background-color: #BDCBFB;
 
       &:after {
-        color: #0e3dd5;
+        color: #0E3DD5;
       }
     }
   }
@@ -284,7 +284,7 @@ input {
   &:disabled {
 
     .mat-select-trigger {
-      background-color: #ffffff;
+      background-color: var(--chef-white);
 
       &:after {
         color: #212334;
