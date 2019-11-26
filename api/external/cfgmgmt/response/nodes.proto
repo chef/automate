@@ -151,6 +151,8 @@ message Run {
   ExpandedRunList           expanded_run_list      = 33;
   // List of projects the node belongs to. This is a concept introduced with IAMv2.
   repeated string           projects               = 34;
+  // List of versioned cookbooks associated with the node
+  repeated VersionedCookbook versioned_cookbooks   = 35;
 }
 
 message ExpandedRunList {
@@ -225,4 +227,11 @@ message Deprecation {
   string url      = 2;
   // Location of the deprecated code.
   string location = 3;
+}
+
+message VersionedCookbook {
+  // Name of the cookbook.
+	string name = 1;
+  // Version of the cookbook.
+	string version = 2;
 }

@@ -857,6 +857,13 @@
             "type": "string"
           },
           "description": "List of projects the node belongs to. This is a concept introduced with IAMv2."
+        },
+        "versioned_cookbooks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.VersionedCookbook"
+          },
+          "title": "List of versioned cookbooks associated with the node"
         }
       }
     },
@@ -906,6 +913,19 @@
           "type": "integer",
           "format": "int32",
           "description": "Total count of failed run reports that have landed in Automate for the node."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.VersionedCookbook": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the cookbook."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the cookbook."
         }
       }
     },

@@ -52,6 +52,7 @@ func toResponseRun(run backend.Run, associatedNode backend.Node) (*response.Run,
 		Deprecations:         toResponseDeprecations(run.Deprecations),
 		Error:                chefError,
 		Projects:             associatedNode.Projects,
+		VersionedCookbooks:   toVersionsCookbooks(run.VersionedCookbooks),
 	}, err
 }
 
@@ -185,4 +186,17 @@ func toResponseResources(resources []ingestBackend.Resource) []*response.Resourc
 	}
 
 	return responseResources
+}
+
+func toVersionsCookbooks(versionedCookbooks []ingestBackend.VersionedCookbook) []*response.VersionedCookbook {
+	responseExpandedCookbooks := make([]*response.VersionedCookbook, len(versionedCookbooks))
+
+	for index, cookbook := range versionedCookbooks {
+		responseExpandedCookbooks[index] = &response.VersionedCookbook{
+			Name:    cookbook.Name,
+			Version: cookbook.Version,
+		}
+	}
+
+	return responseExpandedCookbooks
 }

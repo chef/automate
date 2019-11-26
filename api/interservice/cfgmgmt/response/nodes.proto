@@ -65,6 +65,7 @@ message Run {
   string                    policy_revision        = 32;
   ExpandedRunList           expanded_run_list      = 33;
   repeated string           projects               = 34;
+  repeated VersionedCookbook versioned_cookbooks   = 35;
 }
 
 message ExpandedRunList {
@@ -112,4 +113,9 @@ message Deprecation {
   string message  = 1;
   string url      = 2;
   string location = 3;
+}
+
+message VersionedCookbook {
+	string name = 1;
+	string version = 2;
 }
