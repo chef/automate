@@ -248,10 +248,14 @@ function applications_populate_database() {
   install_if_missing core/util-linux uuidgen
 
   for _ in $(seq 1 12); do
+    # maximum health check output to show how the UI handles edge case.
     applications_publish_supervisor_message --name nginx --group "default"\
       --origin custom --version "1.0.1" --release "20190115184823" --health 2\
       --sup-id "$(uuidgen)" --site "testsite" --channel "stable" \
-      --application "bldr-cache" --environment "qa"
+      --application "bldr-cache" --environment "qa" \
+      --hc-stderr "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" \
+      --hc-stdout "FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF" \
+      --hc-exit 2
   done
 
   for _ in $(seq 1 11); do
@@ -263,25 +267,32 @@ function applications_populate_database() {
 
   # 40 Critical
   for _ in $(seq 1 40); do
+    # health check output simulates services with health check implemented.
     applications_publish_supervisor_message --name nginx --group default \
       --origin custom --version "2.0.0" --release "20190115189976" --health 2\
-      --sup-id "$(uuidgen)" --site "testsite" --channel "unstable"
+      --sup-id "$(uuidgen)" --site "testsite" --channel "unstable" \
+      --hc-stderr "curl: (7) Failed to connect to localhost port 443: Connection refused" \
+      --hc-stdout "" --hc-exit 2
   done
   # 10 OK
   for _ in $(seq 41 50); do
+    # health check output simulates services with health check implemented.
     applications_publish_supervisor_message --name nginx --group dev\
       --origin custom --version "2.0.0" --release "20190115189976" --health 0\
-      --sup-id "$(uuidgen)" --site "testsite" --channel "unstable"
+      --sup-id "$(uuidgen)" --site "testsite" --channel "unstable" \
+      --hc-stderr "" --hc-stdout "" --hc-exit 0
   done
 
   # 40 Critical
   for _ in $(seq 1 40); do
+    # health check output simulates services with NO health check implemented.
     applications_publish_supervisor_message --name redis --group default\
       --origin custom --version "1.0.1" --release "20190115189830" --health 2\
       --sup-id "$(uuidgen)" --site "default" --channel "stable"
   done
   # 10 OK
   for _ in $(seq 41 50); do
+    # health check output simulates services with NO health check implemented.
     applications_publish_supervisor_message --name redis --group default \
       --origin custom --version "1.0.1" --release "20190115189830" --health 0\
       --sup-id "$(uuidgen)" --site "default" --channel "stable"
