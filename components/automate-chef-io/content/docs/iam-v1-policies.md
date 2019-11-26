@@ -1,5 +1,8 @@
 +++
 title = "IAM v1 Policies"
+aliases = [
+    "docs/default-policies/"
+]
 description = "IAM v1 Policies"
 weight = 23
 draft = false
