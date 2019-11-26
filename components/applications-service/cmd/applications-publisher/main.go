@@ -16,9 +16,10 @@ import (
 )
 
 // Wraps a wrappers.StringValue and implements the interface for flags.Value so
-// we can parse command line options into string wrappers. This makes a better
-// mapping between CLI arguments and message elements that are implemented with
-// wrappers (avoid treating zero values as special, etc.)
+// we can parse command line options directly into string wrappers. This makes
+// a better mapping between CLI arguments and message elements that are
+// implemented with wrappers--we can have nil/null values without treating zero
+// values as special.
 type optionalString struct {
 	StringValue *wrappers.StringValue
 }
@@ -140,6 +141,12 @@ func main() {
 			ServiceMetadata: &habitat.ServiceMetadata{},
 		}
 	)
+
+	// In habitat, the wrappers.StringValue for stdout and stderr will be nil
+	// pointers when there's no content (e.g., a package without a healhcheck
+	// command/script). To mimic that behavior we need to initialize the
+	// optionalString variables here with nil pointers for their StringValue
+	// elements.
 	hCStdout := &optionalString{}
 	hCStderr := &optionalString{}
 	hCExitCode := &optionalInt32{}
