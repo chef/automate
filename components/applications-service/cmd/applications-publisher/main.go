@@ -12,7 +12,49 @@ import (
 	"github.com/chef/automate/components/applications-service/pkg/nats"
 	"github.com/chef/automate/lib/tls/certs"
 	"github.com/golang/protobuf/ptypes"
+	wrappers "github.com/golang/protobuf/ptypes/wrappers"
 )
+
+// Wraps a wrappers.StringValue and implements the interface for flags.Value so
+// we can parse command line options into string wrappers. This makes a better
+// mapping between CLI arguments and message elements that are implemented with
+// wrappers (avoid treating zero values as special, etc.)
+type optionalString struct {
+	StringValue *wrappers.StringValue
+}
+
+func (o *optionalString) String() string {
+	if o.StringValue != nil {
+		return o.StringValue.GetValue()
+	}
+	return ""
+}
+
+func (o *optionalString) Set(s string) error {
+	o.StringValue = &wrappers.StringValue{Value: s}
+	return nil
+}
+
+type optionalInt32 struct {
+	Int32Value *wrappers.Int32Value
+}
+
+func (o *optionalInt32) String() string {
+	if o.Int32Value != nil {
+		return o.Int32Value.String()
+	}
+	return "0"
+}
+
+func (o *optionalInt32) Set(s string) error {
+	i64, err := strconv.ParseInt(s, 10, 32)
+	if err != nil {
+		return err
+	}
+	i32 := int32(i64)
+	o.Int32Value = &wrappers.Int32Value{Value: i32}
+	return nil
+}
 
 var usageStr = `
 Usage: applications-publisher
@@ -31,15 +73,18 @@ NATS Options:
 	--raw-message <message> Sends a raw message to the NATS Server instead of the Habitat Event message
 
 Options to build a Habitat Event message:
-	--sup-id      <id>       The Supervisor ID
-	--group       <group>    The group name of a service (part of the service_group)
-	--fqdn        <fqdn>     The fqdn of the server where the service is running
-	--application <name>     The application name that this service is part of
-	--environment <name>     The environment name of the current deployment
-	--health      <code>     The health check code of a service
-	--site        <site>     The site of the server where the service is running
-	--channel     <channel>  The habitat channel name that the service is subscribed to
-	--strategy    <strategy> The habitat update strategy for the service. [ at-once | rolling ]
+	--sup-id      <id>        The Supervisor ID
+	--group       <group>     The group name of a service (part of the service_group)
+	--fqdn        <fqdn>      The fqdn of the server where the service is running
+	--application <name>      The application name that this service is part of
+	--environment <name>      The environment name of the current deployment
+	--health      <code>      The health check code of a service
+	--site        <site>      The site of the server where the service is running
+	--channel     <channel>   The habitat channel name that the service is subscribed to
+	--strategy    <strategy>  The habitat update strategy for the service. [ at-once | rolling ]
+	--hc-stdout   <message>   The stdout output of the health check script
+	--hc-stderr   <message>   The stderr output of the health check script
+	--hc-exit     <exit code> The exit code of the health check script
 
 	Package Identifier
 	--origin   <origin>  The origin of a package
@@ -82,8 +127,9 @@ func main() {
 		name         string
 		version      string
 		release      string
-		t            = time.Now()
-		clientID     = "applications-publisher"
+
+		t        = time.Now()
+		clientID = "applications-publisher"
 		// TODO @afiune in the future we will have multiple events, we could make the
 		// applications-publisher binary to have multiple commands/sub-commands to send
 		// and do multiple things/messages
@@ -94,6 +140,9 @@ func main() {
 			ServiceMetadata: &habitat.ServiceMetadata{},
 		}
 	)
+	hCStdout := &optionalString{}
+	hCStderr := &optionalString{}
+	hCExitCode := &optionalInt32{}
 
 	flag.StringVar(&rawMessage, "raw-message", "", "Sends a raw message to the NATS Server instead of the Habitat Event message")
 	flag.StringVar(&port, "port", "4222", "NATS port to connect (default:4222)")
@@ -116,6 +165,14 @@ func main() {
 	flag.StringVar(&channel, "channel", "", "The habitat channel name that the service is subscribed to")
 	flag.StringVar(&strategy, "strategy", "at-once", "The habitat update strategy for the service. [ at-once | rolling | unrecognized ]")
 	flag.IntVar(&health, "health", 0, "The health check code of a service")
+
+	// stdout
+	flag.Var(hCStdout, "hc-stdout", "the stdout output of the package's health check script")
+	// stderr
+	flag.Var(hCStderr, "hc-stderr", "the stderr output of the package's health check script")
+	// health_check_exit_status
+	flag.Var(hCExitCode, "hc-exit", "the numeric exit code of the package's health check script")
+
 	flag.BoolVar(&uniqID, "uniq-client-id", false, "Generate a unique client-id to connect to server")
 	flag.BoolVar(&infiniteLoop, "infinite-stream", false, "Publish message every second infinitely")
 	flag.BoolVar(&internalNats, "internal-nats", false, "Connect to the Automate Internal NATS Server")
@@ -186,6 +243,10 @@ func main() {
 	event.Result = habitat.HealthCheckResult(health)
 	event.ServiceMetadata.ServiceGroup = fmt.Sprintf("%s.%s", name, group)
 	event.ServiceMetadata.PackageIdent = fmt.Sprintf("%s/%s/%s/%s", origin, name, version, release)
+
+	event.Stdout = hCStdout.StringValue
+	event.Stderr = hCStderr.StringValue
+	event.ExitStatus = hCExitCode.Int32Value
 
 	// Publish a single raw message
 	if len(rawMessage) > 0 {
