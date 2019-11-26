@@ -1,6 +1,9 @@
 +++
-title = "Authorization Overview"
-description = "Set up authorization on Chef Automate"
+title = "IAM v1 Overview"
+aliases = [
+    "docs/authorization-overview/"
+]
+description = "IAM v1 Overview"
 draft = false
 bref = ""
 toc = true
@@ -10,7 +13,7 @@ toc = true
     weight = 10
 +++
 
-This guide helps you understand and use Chef Automate's authorization system.
+This guide helps you understand and use Chef Automate's IAM v1 authorization system.
 
 ## Overview
 
@@ -334,7 +337,7 @@ By default, Chef Automate is initialized with policies that allow the following:
   with the exception of actions on resources related to authorization (`auth`) or other system level resources.
   Only Admins can modify teams, API tokens, other users, policies, notifications, and node lifecycle settings.
 
-See the [Default Policies]({{< relref "default-policies.md" >}}) documentation for more information
+See the [IAM v1 Policies]({{< relref "iam-v1-policies.md" >}}) documentation for more information
 on how Chef Automate's default policies map to different functions.
 
 ## Viewing Policies
@@ -410,7 +413,7 @@ application except for administrative features (creating teams, users, api keys,
 policies).
 
 With a standard installation of Chef Automate, this is automatically true thanks to
-Chef Automate's [default policies]({{< relref "default-policies.md" >}}).
+Chef Automate's [IAM v1 policies]({{< relref "iam-v1-policies.md" >}}).
 
 If you would like to allow another team to access administrative features without
 adding team members to the local `admins` team, you can create a policy allowing
@@ -457,7 +460,7 @@ have access to Configuration Management due to two default policies:
 ```
 
 If you're wondering what API endpoints those default policies apply to specifically,
-see the [Default Policy]({{< relref "default-policies.md" >}}) documentation for details.
+see the [IAM v1 policies]({{< relref "iam-v1-policies.md" >}}) documentation for details.
 
 To remove that access, delete policies permitting all users to access `cfgmgmt` or `cfgmgmt:*`:
 

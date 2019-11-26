@@ -1,6 +1,9 @@
 +++
-title = "Default Policies"
-description = "Chef Automate's default policies and the specific endpoints they protect"
+title = "IAM v1 Policies"
+aliases = [
+    "docs/default-policies/"
+]
+description = "IAM v1 Policies"
 weight = 23
 draft = false
 bref = ""
@@ -11,9 +14,7 @@ toc = true
     weight = 20
 +++
 
-# Default Policies in Chef Automate
-
-This page provides an in-depth look at each of Chef Automate's default policies and
+This page provides an in-depth look at each of Chef Automate's IAM v1 default policies and
 the specific endpoints they protect.
 
 ## Configuration Management

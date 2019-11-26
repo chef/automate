@@ -6,8 +6,8 @@ bref = ""
 toc = true
 [menu]
   [menu.docs]
-    parent = "beta"
-    weight = 30
+    parent = "authorization"
+    weight = 50
 +++
 
 This API reference details Chef Automate IAM v2 features from the command line.

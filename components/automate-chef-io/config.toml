@@ -101,8 +101,3 @@ url = "/docs/troubleshooting"
 name = "Workflow (Deprecated)"
 weight = 140
 identifier = "workflow"
-
-[[menu.docs]]
-name = "IAM v2 Beta"
-weight = 150
-identifier = "beta"
