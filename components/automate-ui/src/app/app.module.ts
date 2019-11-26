@@ -103,9 +103,6 @@ import {
 import {
   ConvergeRadialGraphComponent
 } from './page-components/converge-radial-graph/converge-radial-graph.component';
-import {
-  CreateV1TeamModalComponent
-} from './page-components/create-v1-team-modal/create-v1-team-modal.component';
 import { DatafeedFormComponent } from './pages/data-feed-form/data-feed-form.component';
 import { DatafeedComponent } from './pages/data-feed/data-feed.component';
 import { DateSelectorComponent } from './page-components/date-selector/date-selector.component';
@@ -206,7 +203,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ClientRunsSidebarComponent,
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
-    CreateV1TeamModalComponent,
     DatafeedComponent,
     DatafeedFormComponent,
     DateSelectorComponent,

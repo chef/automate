@@ -174,7 +174,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
       this.createModalVisible = true;
     } else {
       this.createV1TeamModalVisible = true;
-      console.log(this.createV1TeamModalVisible);
     }
     this.resetCreateModal();
   }
