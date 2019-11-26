@@ -243,6 +243,10 @@ input {
 }
 
 [panelclass="chef-control-menu-x"] {
+  
+  &:focus .mat-select-trigger {
+    outline: -webkit-focus-ring-color auto 5px;
+  }
 
   .mat-select-trigger {
     display: inline-block;
@@ -251,14 +255,14 @@ input {
     width: 32px;
     height: 32px;
     cursor: pointer;
-    outline: none;
 
     &:after {
       content: '...';
       position: absolute;
       color: black;
-      bottom: 33%;
-      left: 30%;
+      bottom: 35%;
+      left: 23%;
+      font-size: 20px;
     }
 
     &:hover {
