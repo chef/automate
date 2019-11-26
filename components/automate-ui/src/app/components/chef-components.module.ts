@@ -12,6 +12,7 @@ import { AuthorizedComponent } from './authorized/authorized.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { CalendarComponent } from './calendar/calendar.component';
+import { CreateV1TeamModalComponent } from '../page-components/create-v1-team-modal/create-v1-team-modal.component';
 import { CreateObjectModalComponent } from './create-object-modal/create-object-modal.component';
 import { DeleteObjectModalComponent } from './delete-object-modal/delete-object-modal.component';
 import { ErrorDirective } from './error/error.directive';
@@ -69,6 +70,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbsComponent,
     BreadcrumbComponent,
     CalendarComponent,
+    CreateV1TeamModalComponent,
     CreateObjectModalComponent,
     DeleteObjectModalComponent,
     FormFieldComponent,
@@ -103,6 +105,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbsComponent,
     BreadcrumbComponent,
     CalendarComponent,
+    CreateV1TeamModalComponent,
     CreateObjectModalComponent,
     DeleteObjectModalComponent,
     ErrorDirective,
