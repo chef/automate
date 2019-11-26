@@ -202,7 +202,7 @@ describeIfIAMV2p1('Compliance Ingestion project tagging', () => {
     });
 
     // wait for the report to be ingested
-    cy.waitForComplianceNode(nodeId, start, end, 30);
+    cy.waitForNodemanagerNode(nodeId, 30);
 
     // Ensure the node is tagged with the correct project
     projectsWithRule.forEach(projectWithRule => {

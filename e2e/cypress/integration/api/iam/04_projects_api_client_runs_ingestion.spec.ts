@@ -195,7 +195,7 @@ describeIfIAMV2p1('Client Runs Ingestion project tagging', () => {
     });
 
     // wait for the node to be ingested
-    cy.waitForClientRunsNode(nodeId, 30);
+    cy.waitForNodemanagerNode(nodeId, 30);
 
     // Ensure the node is tagged with the correct project
     projectsWithRule.forEach(projectWithRule => {

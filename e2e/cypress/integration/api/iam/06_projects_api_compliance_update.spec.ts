@@ -177,7 +177,7 @@ describeIfIAMV2p1('Compliance report project update tagging', () => {
     });
 
     // wait for the report to be ingested
-    cy.waitForComplianceNode(nodeId, start, end, 30);
+    cy.waitForNodemanagerNode(nodeId, 30);
 
     // create the projects with one rule
     projectsWithRule.forEach(projectWithRule => {

@@ -172,7 +172,7 @@ describeIfIAMV2p1('Client Runs project update tagging', () => {
     });
 
     // wait for the CCR to be ingested
-    cy.waitForClientRunsNode(nodeId, 30);
+    cy.waitForNodemanagerNode(nodeId, 30);
 
     // create the projects with one rule
     projectsWithRule.forEach(projectWithRule => {
