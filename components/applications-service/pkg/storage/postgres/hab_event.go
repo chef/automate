@@ -97,6 +97,13 @@ DO UPDATE SET (
 `
 )
 
+type healthCheckResult struct {
+	Health     string
+	Stdout     string
+	Stderr     string
+	ExitStatus int32
+}
+
 type packageIdent struct {
 	Origin  string
 	Name    string
@@ -200,7 +207,12 @@ func (db *Postgres) IngestHealthCheckEventWithoutMetrics(event *habitat.HealthCh
 
 	// @afiune all our backend was designed for the health check to be all
 	// uppercases but habitat is actually sending case sensitive strings
-	eventHealth := strings.ToUpper(event.GetResult().String())
+	eventHealth := &healthCheckResult{
+		Health:     strings.ToUpper(event.GetResult().String()),
+		Stdout:     event.Stdout.GetValue(),
+		Stderr:     event.Stderr.GetValue(),
+		ExitStatus: event.ExitStatus.GetValue(),
+	}
 
 	err = db.upsertServiceAndMetadata(
 		eventMetadata,
@@ -221,7 +233,7 @@ func (db *Postgres) upsertServiceAndMetadata(
 	eventMetadata *habitat.EventMetadata,
 	svcMetadata *habitat.ServiceMetadata,
 	pkgIdent *packageIdent,
-	health string) error {
+	hc *healthCheckResult) error {
 
 	var (
 		channel        string
@@ -241,27 +253,27 @@ func (db *Postgres) upsertServiceAndMetadata(
 	sgId := hex.EncodeToString(sgIdBytes[:])
 
 	_, err := db.DbMap.Exec(upsertServiceAndMetadata,
-		pkgIdent.Origin,                 // origin,
-		pkgIdent.Name,                   // name,
-		pkgIdent.Version,                // version,
-		pkgIdent.Release,                // release,
-		pkgIdent.FullPackageIdent(),     // package_ident,
-		health,                          // health,
-		channel,                         // channel,
-		updateStrategy,                  // update_strategy,
-		eventMetadata.GetSupervisorId(), // supervisor_id,
-		eventMetadata.GetFqdn(),         // fqdn,
-		eventMetadata.GetSite(),         // site,
-		svcMetadata.GetServiceGroup(),   // service_group_name,
-		trimSuffix(svcMetadata.GetServiceGroup()),            // service_group_name_suffix,
-		eventMetadata.GetApplication(),                       // application,
-		eventMetadata.GetEnvironment(),                       // environment
+		pkgIdent.Origin,                           // origin,
+		pkgIdent.Name,                             // name,
+		pkgIdent.Version,                          // version,
+		pkgIdent.Release,                          // release,
+		pkgIdent.FullPackageIdent(),               // package_ident,
+		hc.Health,                                 // health,
+		channel,                                   // channel,
+		updateStrategy,                            // update_strategy,
+		eventMetadata.GetSupervisorId(),           // supervisor_id,
+		eventMetadata.GetFqdn(),                   // fqdn,
+		eventMetadata.GetSite(),                   // site,
+		svcMetadata.GetServiceGroup(),             // service_group_name,
+		trimSuffix(svcMetadata.GetServiceGroup()), // service_group_name_suffix,
+		eventMetadata.GetApplication(),            // application,
+		eventMetadata.GetEnvironment(),            // environment
 		convertOrCreateGoTime(eventMetadata.GetOccurredAt()), // last_event_occurred_at
-		sgId,  // service_group_id
-		false, // Disconnected (it is not disconnected since we are getting an event right now)
-		"",    // health_check_stdout TODO
-		"",    // health_check_stderr TODO
-		0,     //health_check_exit_status TODO
+		sgId,          // service_group_id
+		false,         // Disconnected (it is not disconnected since we are getting an event right now)
+		hc.Stdout,     // health_check_stdout
+		hc.Stderr,     // health_check_stderr
+		hc.ExitStatus, //health_check_exit_status
 	)
 
 	return err
