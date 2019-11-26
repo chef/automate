@@ -19,6 +19,7 @@ import (
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/io/chunks"
+	"github.com/sirupsen/logrus"
 )
 
 // Chosen somewhat arbitrarily to be a "good enough" value.
@@ -203,20 +204,9 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 		return err
 	}
 
-	if len(formattedFilters["profile_name"]) > 0 && len(formattedFilters["profile_id"]) > 0 {
-		return status.Error(codes.InvalidArgument, "Invalid: Cannot specify both 'profile_name' and 'profile_id' filters")
-	}
-
-	if len(formattedFilters["profile_name"]) > 1 {
-		return status.Error(codes.InvalidArgument, "Invalid: Only one 'profile_name' filter is allowed")
-	}
-
-	if len(formattedFilters["profile_id"]) > 1 {
-		return status.Error(codes.InvalidArgument, "Invalid: Only one 'profile_id' filter is allowed")
-	}
-
-	if len(formattedFilters["control"]) > 1 {
-		return status.Error(codes.InvalidArgument, "Invalid: Only one 'control' filter is allowed")
+	err = validateExportQueryParams(formattedFilters)
+	if err != nil {
+		return err
 	}
 
 	exporter, err := getExportHandler(in.Type, stream)
@@ -245,6 +235,70 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 		err = exporter(cur)
 		if err != nil {
 			return status.Error(codes.Internal, fmt.Sprintf("Failed to stream report %d/%d with ID %s . Error: %s", idx, total, reportIDs[idx], err))
+		}
+	}
+
+	return nil
+}
+
+func validateExportQueryParams(formattedFilters map[string][]string) error {
+	if len(formattedFilters["profile_name"]) > 0 && len(formattedFilters["profile_id"]) > 0 {
+		return status.Error(codes.InvalidArgument, "Invalid: Cannot specify both 'profile_name' and 'profile_id' filters")
+	}
+
+	if len(formattedFilters["profile_name"]) > 1 {
+		return status.Error(codes.InvalidArgument, "Invalid: Only one 'profile_name' filter is allowed")
+	}
+
+	if len(formattedFilters["profile_id"]) > 1 {
+		return status.Error(codes.InvalidArgument, "Invalid: Only one 'profile_id' filter is allowed")
+	}
+
+	if len(formattedFilters["control"]) > 1 {
+		return status.Error(codes.InvalidArgument, "Invalid: Only one 'control' filter is allowed")
+	}
+	return nil
+}
+
+func (srv *Server) ExportNode(in *reporting.Query, stream reporting.ReportingService_ExportNodeServer) error {
+	formattedFilters := formatFilters(in.Filters)
+	formattedFilters, err := filterByProjects(stream.Context(), formattedFilters)
+	if err != nil {
+		return err
+	}
+
+	err = validateExportQueryParams(formattedFilters)
+	if err != nil {
+		return err
+	}
+
+	if len(formattedFilters["node_id"]) != 1 {
+		return status.Error(codes.InvalidArgument, "Invalid: Must provide only one 'node_id' filter")
+	}
+
+	exporter, err := getExportHandler(in.Type, stream)
+	if err != nil {
+		return err
+	}
+	logrus.Debugf("getting the report ids for node %s", formattedFilters["node_id"])
+
+	// Step 1: Retrieving all report IDs for the node, based on time filters. Only ask for 9999 results b/c es will choke if we ask for 10k
+	reportsList, _, err := srv.es.GetReports(0, 9999, formattedFilters, "end_time", false)
+	if err != nil {
+		return errorutils.FormatErrorMsg(err, "")
+	}
+
+	logrus.Debugf("found %d reports for node %s", len(reportsList), formattedFilters["node_id"])
+
+	// Step 2: get all reports one by one
+	for _, report := range reportsList {
+		cur, err := srv.es.GetReport("", report.GetId(), formattedFilters)
+		if err != nil {
+			return status.Error(codes.NotFound, fmt.Sprintf("Failed to retrieve report with ID %s. Error: %s", report.GetId(), err))
+		}
+		err = exporter(cur)
+		if err != nil {
+			return status.Error(codes.Internal, fmt.Sprintf("Failed to stream report with ID %s. Error: %s", report.GetId(), err))
 		}
 	}
 

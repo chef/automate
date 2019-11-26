@@ -198,6 +198,8 @@ service ReportingService {
 
 	rpc Export(Query) returns (stream ExportData) {};
 
+	rpc ExportNode(Query) returns (stream ExportData) {};
+
 	/*
 	Fetch a node
 

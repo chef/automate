@@ -13,6 +13,7 @@ service ReportingService {
 	rpc ListSuggestions(SuggestionRequest) returns (Suggestions) {};
 	rpc ListProfiles(Query) returns (ProfileMins) {};
 	rpc Export(Query) returns (stream ExportData) {};
+	rpc ExportNode(Query) returns (stream ExportData) {};
 	rpc ReadNode(Id) returns (Node) {};
 	rpc ListNodes(Query) returns (Nodes) {};
 	rpc ListControlItems(ControlItemRequest) returns (ControlItems) {};
