@@ -43,7 +43,7 @@ func storeCompliance(in <-chan message.Compliance, out chan<- message.Compliance
 			}
 
 			var megaErr error
-			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Info("Publishing Compliance Report")
+			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Publishing Compliance Report")
 
 			errChannels := make([]<-chan error, 0)
 			errChannels = append(errChannels, insertInspecSummary(msg, client))
@@ -119,12 +119,12 @@ func insertInspecProfile(msg message.Compliance, profile *relaxting.ESInspecProf
 		profileExists, err := client.ProfileExists(profile.Sha256)
 		if err == nil {
 			if !profileExists {
-				logrus.Infof("Profile %s does not yet exist, will push this one into ES", profile.Sha256)
+				logrus.Debugf("Profile %s does not yet exist, will push this one into ES", profile.Sha256)
 
 				// Ingest Profile
 				err = client.InsertInspecProfile(msg.Ctx, profile)
 			} else {
-				logrus.Infof("Profile %s exists therefore will not be posted to ES", profile.Sha256)
+				logrus.Debugf("Profile %s exists therefore will not be posted to ES", profile.Sha256)
 			}
 		}
 

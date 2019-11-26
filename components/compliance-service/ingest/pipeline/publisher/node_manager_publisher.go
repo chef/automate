@@ -26,7 +26,7 @@ func nodeManagerPublisher(in <-chan message.Compliance, nodeManagerClient manage
 	go func() {
 		for msg := range in {
 			// send to node manager from here.
-			log.Infof("send info about node %s to node manager", msg.Report.NodeName)
+			log.Debugf("send info about node %s to node manager", msg.Report.NodeName)
 
 			nodeMetadata, err := gatherInfoForNode(msg)
 			if err != nil {

@@ -45,7 +45,7 @@ func (s *Compliance) Run(report *compliance.Report) error {
 		Done:      done,
 	}
 	var err error
-	logrus.WithFields(logrus.Fields{"report_id": report.ReportUuid}).Info("Running Compliance pipeline")
+	logrus.WithFields(logrus.Fields{"report_id": report.ReportUuid}).Debug("Running Compliance pipeline")
 
 	s.in <- msg
 	err = <-done
