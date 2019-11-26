@@ -1,4 +1,4 @@
-import { isV1, itFlaky } from '../../constants';
+import { isV1, itFlaky } from '../../../support/constants';
 
 describe('team add users', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');

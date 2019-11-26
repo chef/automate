@@ -1,4 +1,4 @@
-import { itFlaky } from '../../constants';
+import { itFlaky } from '../../../support/constants';
 
 describe('user management', () => {
   before(() => {

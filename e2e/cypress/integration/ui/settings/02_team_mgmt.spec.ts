@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, itFlaky, isV1 } from '../../constants';
+import { describeIfIAMV2p1, itFlaky, isV1 } from '../../../support/constants';
 
 describe('team management', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
