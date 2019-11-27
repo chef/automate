@@ -51,10 +51,11 @@ message Failed {
 	int32 critical = 4;
 }
 message ControlSummary {
-	int32 total = 1;
-	Total passed = 2;
-	Total skipped = 3;
+	int32  total = 1;
+	Total  passed = 2;
+	Total  skipped = 3;
 	Failed failed = 4;
+	Total  waived = 5;
 }
 
 message ControlItemRequest {
@@ -223,6 +224,7 @@ message ProfileCounts {
 	int32 failed = 2;
 	int32 skipped = 3;
 	int32 passed = 4;
+	int32 waived = 5;
 }
 message ProfileMin {
 	string name = 1;

@@ -360,5 +360,48 @@ describe File.basename(__FILE__) do
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
 
+    # Filter by a waived profile_id, making it deep
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
+        filters: [
+          Reporting::ListFilter.new(type: 'environment', values: ['DevSec Prod Omega']),
+          Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5']),
+          Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+        ],
+        page: 1, per_page: 2)
+    expected_data = {
+      "counts" => { "waived" => 1 },
+      "profiles" => [
+          {
+            "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
+            "name" => "myprofile2",
+            "status" => "waived",
+            "title" => "My Profile 2 title",
+            "version" => "1.0.5"
+          }
+        ]
+    }.to_json
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
+
+    # Filter by a failed profile and a waived control, making it deep
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
+        filters: [
+          Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4']),
+          Reporting::ListFilter.new(type: "control", values: ["pro1-con2"]),
+          Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+        ],
+        page: 1, per_page: 2)
+    expected_data = {
+      "counts" => { "total" => 1, "waived" => 1 },
+      "profiles" => [
+        {
+          "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+          "name" => "myprofile1",
+          "status" => "waived",
+          "title" => "My Profile 1 title",
+          "version" => "1.0.1"
+        }
+      ]
+    }.to_json
+    assert_equal_json_sorted(expected_data, actual_data.to_json)
   end
 end
