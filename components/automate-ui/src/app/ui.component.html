@@ -24,7 +24,7 @@
   </div>
 
   <!-- App Content -->
-  <div id="app-content-wrapper" [ngStyle]="{'height' : layoutFacade.contentHeight}">
+  <div id="app-content-wrapper" [attr.hasNotifications]="layoutFacade.hasGlobalNotifications() ? true : null" [ngStyle]="{'height' : layoutFacade.contentHeight}">
     <div id="main-content-wrapper">
       <div id="notifications-wrapper">
         <app-chef-notifications></app-chef-notifications>

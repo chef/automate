@@ -4,6 +4,19 @@
 @import "assets/chef-ui-library/collection/styles/variables.example.css";
 @import "styles/chef-theme";
 
+
+#app-content-wrapper {
+  chef-side-panel {
+    top: 68px;
+  }
+
+  &[hasNotifications] {
+    chef-side-panel {
+      top: 107px;
+    }
+  }
+}
+
 .content-container {
   height: 100%;
   position: relative;
@@ -12,11 +25,6 @@
     height: inherit;
     position: relative;
   }
-}
-
-chef-side-panel {
-  position: absolute;
-  top: 0;
 }
 
 .container {

@@ -44,6 +44,10 @@ export class LayoutFacadeService {
         });
     }
 
+    hasGlobalNotifications(): boolean {
+        return this.headerHeight === '110px';
+    }
+
     ShowPageLoading(showLoading: boolean) {
         this.store.dispatch( new ShowPageLoading(showLoading));
     }
