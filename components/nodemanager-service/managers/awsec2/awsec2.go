@@ -49,20 +49,25 @@ type AwsCreds struct {
 }
 
 // New instantiates a new AWS session and returns the API client
-func New(AwsAccessKeyId string, AwsSecretAccessKey string, arnRole string, sessionToken string) (*AwsCreds, error) {
-	logrus.Infof("Credential len: access key %d and secret %d", len(AwsAccessKeyId), len(AwsSecretAccessKey))
+func New(awsCreds AwsCreds) *AwsCreds {
+	logrus.Debugf("Credential len: access key %d and secret %d", len(awsCreds.AccessKeyId), len(awsCreds.SecretAccessKey))
 	// Create new AwsCreds client
-	region := os.Getenv("AWS_REGION")
-	if region == "" {
+	var region string
+	if awsCreds.Region != "" {
+		region = awsCreds.Region
+	} else if os.Getenv("AWS_REGION") != "" {
+		region = os.Getenv("AWS_REGION")
+	} else {
 		region = DefaultRegion
 	}
+	logrus.Debugf("Using AWS region %s", region)
 	return &AwsCreds{
-		AccessKeyId:     AwsAccessKeyId,
-		SecretAccessKey: AwsSecretAccessKey,
-		ArnRole:         arnRole,
-		SessionToken:    sessionToken,
+		AccessKeyId:     awsCreds.AccessKeyId,
+		SecretAccessKey: awsCreds.SecretAccessKey,
+		ArnRole:         awsCreds.ArnRole,
+		SessionToken:    awsCreds.SessionToken,
 		Region:          region,
-	}, nil
+	}
 }
 
 // newClient instantiates a new AWS session and returns the API client
@@ -114,8 +119,7 @@ func (creds *AwsCreds) newIAM() (*iam.IAM, error) {
 		return iam.New(sess), nil
 	}
 	cred := creds.getCredsForAwsConfig(sess)
-
-	return iam.New(sess, &aws.Config{Credentials: cred}), nil
+	return iam.New(sess, &aws.Config{Credentials: cred, Region: &creds.Region}), nil
 }
 
 func (creds *AwsCreds) GetAccountAlias(ctx context.Context) (string, error) {

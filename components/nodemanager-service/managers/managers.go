@@ -20,8 +20,8 @@ import (
 	"github.com/pkg/errors"
 )
 
-func GetAWSCreds(secret *secrets.Secret) (string, string, string, string) {
-	var accessKeyID, secretKey, role, sessionToken string
+func GetAWSCreds(secret *secrets.Secret) awsec2.AwsCreds {
+	var accessKeyID, secretKey, role, sessionToken, region string
 	for _, item := range secret.Data {
 		if item.Key == "AWS_ACCESS_KEY_ID" {
 			accessKeyID = item.Value
@@ -35,13 +35,22 @@ func GetAWSCreds(secret *secrets.Secret) (string, string, string, string) {
 		if item.Key == "AWS_SESSION_TOKEN" {
 			sessionToken = item.Value
 		}
+		if item.Key == "AWS_REGION" {
+			region = item.Value
+		}
 	}
 	if len(role) == 0 {
 		if len(accessKeyID) == 0 || len(secretKey) == 0 {
 			logrus.Errorf("GetAwsCreds insufficient creds available; len(accessKeyID) %d len(secretKey) %d", len(accessKeyID), len(secretKey))
 		}
 	}
-	return accessKeyID, secretKey, role, sessionToken
+	return awsec2.AwsCreds{
+		AccessKeyId:     accessKeyID,
+		SecretAccessKey: secretKey,
+		ArnRole:         role,
+		SessionToken:    sessionToken,
+		Region:          region,
+	}
 }
 
 // GetAzureCreds returns clientID, clientSecret, tenantID
@@ -67,19 +76,16 @@ func GetAzureCreds(secret *secrets.Secret) (string, string, string) {
 }
 
 func GetAWSManagerFromCredential(ctx context.Context, credential string, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) (myaws *awsec2.AwsCreds, err error) {
-	var accessKeyID, secretKey, role, sessionToken string
+	var awsCreds awsec2.AwsCreds
 	if len(credential) > 0 { // for users running in ec2, can add mgr with no credential
 		secret, err := secretsClient.Read(ctx, &secrets.Id{Id: credential})
 		if err != nil {
 			return nil, errors.Wrapf(err, "Could not find secret with id %s", credential)
 		}
 
-		accessKeyID, secretKey, role, sessionToken = GetAWSCreds(secret)
+		awsCreds = GetAWSCreds(secret)
 	}
-	myaws, err = awsec2.New(accessKeyID, secretKey, role, sessionToken)
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to create a new awsman instance")
-	}
+	myaws = awsec2.New(awsCreds)
 	return myaws, nil
 }
 
@@ -113,7 +119,7 @@ func GetGCPManagerFromCredential(ctx context.Context, credential string, db *pgd
 }
 
 func GetAWSManagerFromID(ctx context.Context, id string, db *pgdb.DB, secretsClient secrets.SecretsServiceClient) (myaws *awsec2.AwsCreds, ssm bool, err error) {
-	var accessKeyID, secretKey, role, sessionToken string
+	var awsCreds awsec2.AwsCreds
 	awsSecret, err := db.GetCredentialFromNodeManager(ctx, id, secretsClient)
 	if err != nil {
 		return nil, ssm, errors.Wrapf(err, "Could not find secret with manager id %s", id)
@@ -121,16 +127,13 @@ func GetAWSManagerFromID(ctx context.Context, id string, db *pgdb.DB, secretsCli
 	if awsSecret != nil {
 		// if the user is running in ec2, and has added the node manager with no credential reference,
 		// then the secret is nil. if it's not nil, we should get the info
-		accessKeyID, secretKey, role, sessionToken = GetAWSCreds(awsSecret)
+		awsCreds = GetAWSCreds(awsSecret)
 	}
-	if len(accessKeyID) == 0 && len(secretKey) == 0 {
+	if len(awsCreds.AccessKeyId) == 0 && len(awsCreds.SecretAccessKey) == 0 {
 		ssm = true
 	}
 
-	myaws, err = awsec2.New(accessKeyID, secretKey, role, sessionToken)
-	if err != nil {
-		return nil, ssm, errors.Wrap(err, "Failed to create a new awsman instance")
-	}
+	myaws = awsec2.New(awsCreds)
 	return myaws, ssm, nil
 }
 

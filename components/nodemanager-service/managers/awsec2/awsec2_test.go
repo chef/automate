@@ -1,6 +1,7 @@
 package awsec2
 
 import (
+	"os"
 	"testing"
 
 	"github.com/chef/automate/components/compliance-service/api/common"
@@ -10,6 +11,24 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func TestNewSetsRegionCorrectly(t *testing.T) {
+	creds := New(AwsCreds{
+		Region: "us-gov-west-1",
+	})
+	assert.Equal(t, "us-gov-west-1", creds.Region)
+
+	creds = New(AwsCreds{
+		Region: "",
+	})
+	assert.Equal(t, "us-east-1", creds.Region)
+
+	os.Setenv("AWS_REGION", "test-env")
+	creds = New(AwsCreds{
+		Region: "",
+	})
+	assert.Equal(t, "test-env", creds.Region)
+}
 
 func TestFormatRegionFilters(t *testing.T) {
 	region := "*us-west*"
