@@ -44,11 +44,13 @@
     <div class="cookbook">Cookbook</div>
     <div class="view-action">View</div>
   </div>
-  <app-resource-item
-    [resource]="resourcesData"
-    *ngFor="let resourcesData of (resourcesDataCollection | selectedStatus:active) |
-      slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
-  </app-resource-item>
+  <div id="resource-item-list">
+    <app-resource-item
+      [resource]="resourcesData"
+      *ngFor="let resourcesData of (resourcesDataCollection | selectedStatus:active) |
+        slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
+    </app-resource-item>
+  </div>
 </div>
 <div class="no-resources" *ngIf="resourcesTotal === 0">
   <span>No resources ran.</span>

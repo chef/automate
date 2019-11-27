@@ -38,7 +38,6 @@
       </div>
       <app-logs-modal [isVisible]="modalIsVisible" [nodeRun]="nodeRun"></app-logs-modal>
       <app-run-history
-        *ngIf="runHistoryVisible"
         [visible]="runHistoryVisible"
         class="run-history-container"
         [nodeId]="nodeId"
