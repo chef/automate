@@ -21,7 +21,7 @@ func ComplianceShared(in <-chan message.Compliance) <-chan message.Compliance {
 	go func() {
 		for msg := range in {
 			dl, _ := msg.Ctx.Deadline()
-			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "ctx_dealine": dl.UTC().Format(time.RFC3339)}).Info("Processing ComplianceShared")
+			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid, "ctx_dealine": dl.UTC().Format(time.RFC3339)}).Debug("Processing ComplianceShared")
 
 			if msg.Report.Platform == nil {
 				msg.Report.Platform = &inspec.Platform{}

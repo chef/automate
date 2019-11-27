@@ -41,7 +41,7 @@ func (msg Compliance) FinishProcessingCompliance(err error) {
 		"ms":      msg.ClockProcessingTime(),
 	}
 	if err != nil {
-		logrus.WithFields(fields).Info("Unable to ingest message")
+		logrus.WithFields(fields).Error("Unable to ingest message")
 	} else {
 		logrus.WithFields(fields).Info("Compliance ingested successfully")
 	}

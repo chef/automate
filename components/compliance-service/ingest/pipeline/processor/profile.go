@@ -12,7 +12,7 @@ func ComplianceProfile(in <-chan message.Compliance) <-chan message.Compliance {
 	out := make(chan message.Compliance, 100)
 	go func() {
 		for msg := range in {
-			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Info("Processing Compliance Profile")
+			logrus.WithFields(logrus.Fields{"report_id": msg.Report.ReportUuid}).Debug("Processing Compliance Profile")
 			var err error
 			msg.InspecProfiles, err = compliance.ProfilesFromReport(msg.Report.Profiles)
 
