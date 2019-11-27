@@ -341,17 +341,14 @@ func TestJSONNodeExportReturnsAllExpectedReportsForNode(t *testing.T) {
 
 	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc07", reports[0].GetId())
 	endTime := ptypes.TimestampString(reports[0].GetEndTime())
-	require.NoError(t, err)
 	assert.Equal(t, "2018-03-05T07:02:02Z", endTime)
 
 	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc05", reports[1].GetId())
 	endTime = ptypes.TimestampString(reports[1].GetEndTime())
-	require.NoError(t, err)
 	assert.Equal(t, "2018-03-05T02:02:02Z", endTime)
 
 	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc04", reports[2].GetId())
 	endTime = ptypes.TimestampString(reports[2].GetEndTime())
-	require.NoError(t, err)
 	assert.Equal(t, "2018-03-04T09:18:41Z", endTime)
 }
 
@@ -384,12 +381,10 @@ func TestJSONNodeExportRespectsTimeFilters(t *testing.T) {
 
 	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc05", reports[0].GetId())
 	endTime := ptypes.TimestampString(reports[0].GetEndTime())
-	require.NoError(t, err)
 	assert.Equal(t, "2018-03-05T02:02:02Z", endTime)
 
 	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc04", reports[1].GetId())
 	endTime = ptypes.TimestampString(reports[1].GetEndTime())
-	require.NoError(t, err)
 	assert.Equal(t, "2018-03-04T09:18:41Z", endTime)
 }
 
