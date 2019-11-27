@@ -410,6 +410,8 @@ type ProfilesListRequest struct {
 	Name      string
 	Namespace string
 	Order     string
+	Page      int
+	PerPage   int
 	Sort      string
 }
 
@@ -436,6 +438,16 @@ func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata
 
 	if len(req.Name) != 0 {
 		sql = sql.Where("info->>'name' = ?", req.Name)
+	}
+
+	// For backwards compatibility, pagination needs to be optional. Including a value for PerPage is how a caller can opt-in to pagination.
+	if req.PerPage > 0 {
+		perPage := uint64(req.PerPage)
+		page := uint64(req.Page)
+
+		sql = sql.
+			Limit(perPage).
+			Offset(perPage * page)
 	}
 
 	sql = sql.OrderBy(fmt.Sprintf("info->>'%s' %s", req.Sort, req.Order), "info->>'version' DESC")

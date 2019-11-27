@@ -290,16 +290,20 @@ func (srv *PGProfileServer) List(ctx context.Context, in *profiles.Query) (*prof
 	}
 
 	logrus.WithFields(logrus.Fields{
-		"sortOrder": sortOrder,
-		"sortField": sortField,
-		"namespace": in.Owner,
 		"name":      in.Name,
+		"namespace": in.Owner,
+		"page":      in.Page,
+		"per_page":  in.PerPage,
+		"sortField": sortField,
+		"sortOrder": sortOrder,
 	}).Infof("Listing profiles")
 
 	metadata, err := srv.store.ListProfilesMetadata(dbstore.ProfilesListRequest{
 		Name:      in.Name,
 		Namespace: in.Owner,
 		Order:     sortOrder,
+		Page:      int(in.Page),
+		PerPage:   int(in.PerPage),
 		Sort:      sortField,
 	})
 	if err != nil {

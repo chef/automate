@@ -190,7 +190,7 @@ describe File.basename(__FILE__) do
     end
   end
 
-  it "limits list results when page parameter is present" do
+  it "limits list results when per_page parameter is present" do
     actual_data = GRPC profiles, :list, Profiles::Query.new(
       page: 0,
       per_page: 1
