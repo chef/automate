@@ -88,6 +88,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public expressionOutput: string;
   public allIdentity: string;
   public nameOrId: string;
+  public ldapOrSaml = false;
 
 
   constructor(
@@ -334,7 +335,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         if (formValues.type === 'user' || formValues.type === 'team') {
           this.addIdentityControl();
         } else if (formValues.type === 'token') {
-          this.addNameControl(formValues.identityProvider);
+          this.addNameControl(null);
         }
         break;
       case 'identityProvider':
@@ -377,6 +378,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
 
   private addNameControl(identityProvider): void {
     if (identityProvider === 'ldap' || identityProvider === 'saml' ) {
+        this.ldapOrSaml = true;
         this.expressionForm.addControl('name', new FormControl('',
           [
             Validators.required,
@@ -385,6 +387,7 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
         )
       );
     } else {
+        this.ldapOrSaml = false;
         this.expressionForm.addControl('name', new FormControl('',
           [
             Validators.required,

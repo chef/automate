@@ -76,8 +76,11 @@
                 <chef-error *ngIf="expressionForm.get('name').hasError('required') && expressionForm.get('name').touched">
                   {{ nameOrId }} is a required field.
                 </chef-error>
-                <chef-error *ngIf="expressionForm.get('name').hasError('pattern') && expressionForm.get('name').dirty">
-                  {{ nameOrId }} must be text or a wildcard but not both.
+                <chef-error *ngIf="ldapOrSaml && expressionForm.get('name').hasError('pattern') && expressionForm.get('name').dirty">
+                  {{ nameOrId }} may contain a single wildcard or a {{ nameOrId }} without colons or wildcards.
+                </chef-error>
+                <chef-error *ngIf="!ldapOrSaml && expressionForm.get('name').hasError('pattern') && expressionForm.get('name').dirty">
+                  {{ nameOrId }} may contain text and hyphens or a wildcard but not both.
                 </chef-error>
               </chef-form-field>
 
