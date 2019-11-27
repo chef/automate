@@ -5,7 +5,7 @@ chef-page {
   min-height: 450px;
   overflow: hidden;
   padding: 64px;
-  position: relative;
+  position: fixed;
   width: 100vw;
 
   &.example-page-width {
