@@ -86,8 +86,9 @@ func ReportToCSV(report *reportingapi.Report) (string, error) {
 
 func maxCharLimit(item string) string {
 	if utf8.RuneCountInString(item) > 32000 {
-		countToReturn := 32000 - 52
-		return fmt.Sprintf("character limit exceeds 32,000. truncating message: %s", string([]rune(item)[0:countToReturn]))
+		msg := "character limit exceeds 32,000. truncating message: "
+		countToReturn := 32000 - utf8.RuneCountInString(msg)
+		return fmt.Sprintf("%s%s", msg, string([]rune(item)[0:countToReturn]))
 	}
 	return item
 }
