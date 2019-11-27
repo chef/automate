@@ -549,10 +549,11 @@ func ingestRunToMessage(run iBackend.Run, projects []string) proto.Message {
 			Id:      run.ExpandedRunList.ID,
 			RunList: toResponseExpandedRunList(run.ExpandedRunList.RunList),
 		},
-		Error:        &response.ChefError{},     // For now we initialize them but would be nice to cast them
-		Resources:    []*response.Resource{},    // For now we initialize them but would be nice to cast them
-		Deprecations: []*response.Deprecation{}, // For now we initialize them but would be nice to cast them
-		Projects:     projects,
+		Error:              &response.ChefError{},     // For now we initialize them but would be nice to cast them
+		Resources:          []*response.Resource{},    // For now we initialize them but would be nice to cast them
+		Deprecations:       []*response.Deprecation{}, // For now we initialize them but would be nice to cast them
+		Projects:           projects,
+		VersionedCookbooks: []*response.VersionedCookbook{},
 		// (@afiune) I have no idea what is this 'source'
 		//Source:      run.Source,
 	}
