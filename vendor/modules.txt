@@ -18,6 +18,8 @@ github.com/Azure/go-autorest/logger
 github.com/Azure/go-autorest/version
 # github.com/BurntSushi/toml v0.3.1
 github.com/BurntSushi/toml
+# github.com/Masterminds/squirrel v1.1.0
+github.com/Masterminds/squirrel
 # github.com/OneOfOne/xxhash v1.2.5
 github.com/OneOfOne/xxhash
 # github.com/alexedwards/scs v1.4.1
@@ -295,6 +297,10 @@ github.com/konsorten/go-windows-terminal-sequences
 # github.com/kylelemons/godebug v0.0.0-20170820004349-d65d576e9348
 github.com/kylelemons/godebug/diff
 github.com/kylelemons/godebug/pretty
+# github.com/lann/builder v0.0.0-20180802200727-47ae307949d0
+github.com/lann/builder
+# github.com/lann/ps v0.0.0-20150810152359-62de8c46ede0
+github.com/lann/ps
 # github.com/leanovate/gopter v0.2.4
 github.com/leanovate/gopter
 github.com/leanovate/gopter/gen
