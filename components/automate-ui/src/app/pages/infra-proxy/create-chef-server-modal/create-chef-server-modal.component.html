@@ -13,21 +13,29 @@
         <div class="margin">
           <chef-form-field>
             <label>
-              <span class="label">Chef Server ID <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="server_id" type="text" autocomplete="off"/>
+              <span class="label">Description<span aria-hidden="true">*</span></span>
+              <input chefInput formControlName="description" type="text" autocomplete="off"/>
             </label>
           </chef-form-field>
         </div>
         <div class="margin">
           <chef-form-field>
             <label>
-              <span class="label">FQDN / IP Address <span aria-hidden="true">*</span></span>
+              <span class="label">FQDN <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="fqdn" type="text" id="fqdn-input" autocomplete="off"/>
             </label>
           </chef-form-field>
         </div>
+        <div class="margin">
+          <chef-form-field>
+            <label>
+              <span class="label">IP Address <span aria-hidden="true">*</span></span>
+              <input chefInput formControlName="ip_address" type="text" id="ip-address-input" autocomplete="off"/>
+            </label>
+          </chef-form-field>
+        </div>
         <div id="button-bar">
-          <chef-button primary id="create-button-object-modal" (click)="createObject()">
+          <chef-button primary id="create-button-object-modal" (click)="createChefServer()">
             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
             <span *ngIf="!creating">Add Chef Server</span>
             <span *ngIf="creating">Adding Chef Server ...</span>

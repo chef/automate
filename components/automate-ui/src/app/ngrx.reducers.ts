@@ -27,6 +27,7 @@ import * as profileEntity from './entities/profiles/profile.reducer';
 import * as projectEntity from './entities/projects/project.reducer';
 import * as roleEntity from './entities/roles/role.reducer';
 import * as ruleEntity from './entities/rules/rule.reducer';
+import * as serverEntity from './entities/servers/server.reducer';
 import * as serviceGroups from './entities/service-groups/service-groups.reducer';
 import * as teamEntity from './entities/teams/team.reducer';
 import * as userEntity from './entities/users/user.reducer';
@@ -67,6 +68,7 @@ export interface NgrxStateAtom {
   teams: teamEntity.TeamEntityState;
   userperms: permEntity.PermEntityState;
   users: userEntity.UserEntityState;
+  servers: serverEntity.ServerEntityState;
   // Named credentialEntity until we refactor the credentials page
   credentialEntity: credential.CredentialState;
 }
@@ -166,7 +168,8 @@ export const defaultInitialState = {
   serviceGroups: serviceGroups.ServiceGroupEntityInitialState,
   teams: teamEntity.TeamEntityInitialState,
   userperms: permEntity.initialState,
-  users: userEntity.userEntityAdapter.getInitialState
+  users: userEntity.userEntityAdapter.getInitialState,
+  servers: serverEntity.serverEntityAdapter.getInitialState
 };
 
 export const ngrxReducers = {
@@ -204,5 +207,6 @@ export const ngrxReducers = {
   serviceGroups: serviceGroups.serviceGroupsEntityReducer,
   teams: teamEntity.teamEntityReducer,
   userperms: permEntity.permEntityReducer,
-  users: userEntity.userEntityReducer
+  users: userEntity.userEntityReducer,
+  servers: serverEntity.serverEntityReducer
 };

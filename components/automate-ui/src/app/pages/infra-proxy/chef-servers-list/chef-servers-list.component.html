@@ -8,6 +8,8 @@
 
         <app-create-chef-server-modal
           [visible]="createModalVisible"
+          [creating]="creatingChefServer"
+          [createForm]="createChefServerForm"
           (close)="closeCreateModal()"
           [conflictErrorEvent]="conflictErrorEvent"
           (createClicked)="createChefServer()">
@@ -23,18 +25,18 @@
                 <chef-table-header-cell>Chef Server Name</chef-table-header-cell>
                 <chef-table-header-cell>FQDN</chef-table-header-cell>
                 <chef-table-header-cell>IP Address</chef-table-header-cell>
-                <chef-table-header-cell># of Orgs</chef-table-header-cell>
+                <chef-table-header-cell>Description</chef-table-header-cell>
                 <chef-table-header-cell class="controls"></chef-table-header-cell>
               </chef-table-row>
             </chef-table-header>
             <chef-table-body>
-                <chef-table-row *ngFor= "let server of serverMockList">
+                <chef-table-row *ngFor= "let server of sortedChefServers$ | async">
                     <chef-table-cell>
                       <a [routerLink]="['/infrastructure/chef-servers', server.name]">{{ server.name }}</a>
                     </chef-table-cell>
                     <chef-table-cell>{{ server.fqdn }}</chef-table-cell>
                     <chef-table-cell>{{ server.ip_address }}</chef-table-cell>
-                    <chef-table-cell>{{ server.orgs }}</chef-table-cell>
+                    <chef-table-cell>{{ server.description }}</chef-table-cell>
                     <chef-table-cell class="controls">
                       <app-authorized>
                         <chef-control-menu>

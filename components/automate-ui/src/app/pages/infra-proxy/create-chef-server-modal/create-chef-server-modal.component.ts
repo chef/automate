@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Regex } from 'app/helpers/auth/regex';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-create-chef-server-modal',
@@ -13,39 +12,35 @@ export class CreateChefServerModalComponent implements OnInit {
   @Input() conflictErrorEvent: EventEmitter<boolean>;
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter();
+  @Input() createForm: FormGroup;
 
-  public createForm: FormGroup;
-
-  constructor(
-    private fb: FormBuilder
-
-  ) { }
+  public conflictError = false;
 
   ngOnInit() {
-    this.createForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      server_id: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      fqdn: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+    this.conflictErrorEvent.subscribe((isConflict: boolean) => {
+      this.conflictError = isConflict;
     });
   }
 
-  public handleNameInput(): void {
-  }
+  // WIP for handle input
+  // public handleNameInput(): void {
+  // }
 
-  public handleServerIdInput(): void {
-  }
+  // public handleDescriptionInput(): void {
+  // }
 
-  public handleFqdnInput(): void {
-  }
+  // public handleFqdnInput(): void {
+  // }
+
+  // public handleIpAddressInput(): void {
+  // }
 
   closeEvent(): void {
     this.close.emit();
   }
 
   createChefServer(): void {
-  }
-
-  createObject(): void {
+    this.createClicked.emit();
   }
 
 }

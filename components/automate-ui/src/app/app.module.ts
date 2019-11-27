@@ -80,6 +80,7 @@ import { ServiceGroupsRequests } from './entities/service-groups/service-groups.
 import { RoleRequests } from './entities/roles/role.requests';
 import { RuleRequests } from './entities/rules/rule.requests';
 import { TeamRequests } from './entities/teams/team.requests';
+import { ServerRequests } from './entities/servers/server.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
 import { UserRequests } from './entities/users/user.requests';
 import { ProjectsFilterRequests } from './services/projects-filter/projects-filter.requests';
@@ -323,6 +324,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     SessionStorageService,
     SidebarService,
     TeamRequests,
+    ServerRequests,
     TelemetryService,
     UserPermsRequests,
     UserRequests

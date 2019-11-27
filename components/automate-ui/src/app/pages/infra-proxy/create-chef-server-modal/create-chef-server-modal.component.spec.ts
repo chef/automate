@@ -36,9 +36,11 @@ describe('CreateChefServerModalComponent', () => {
     fixture = TestBed.createComponent(CreateChefServerModalComponent);
     component = fixture.componentInstance;
     component.createForm = new FormBuilder().group({
+      id: ['', null],
       name: ['', null],
-      server_id: ['', null],
-      fqdn: ['', null]
+      description: ['', null],
+      fqdn: ['', null],
+      ip_address: ['', null]
     });
     component.conflictErrorEvent = new EventEmitter();
     fixture.detectChanges();
