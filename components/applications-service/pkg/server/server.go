@@ -451,6 +451,7 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 			Disconnected:        svc.Disconnected,
 			LastEventOccurredAt: convertOrCreateProtoTimestamp(svc.LastEventOccurredAt),
 			LastEventSince:      timef.IntervalUntilNow(svc.LastEventOccurredAt),
+			HealthCheckResult:   convertHealthCheckResult(svc),
 		}
 	}
 	return services
@@ -465,4 +466,12 @@ func convertOrCreateProtoTimestamp(t time.Time) *timestamp.Timestamp {
 		return ptypes.TimestampNow()
 	}
 	return protoTime
+}
+
+func convertHealthCheckResult(svc *storage.Service) *applications.HealthCheckResult {
+	return &applications.HealthCheckResult{
+		Stdout:     svc.HCStdout,
+		Stderr:     svc.HCStderr,
+		ExitStatus: svc.HCExitStatus,
+	}
 }

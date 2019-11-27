@@ -62,6 +62,9 @@ SELECT s.id
   , s.update_strategy as update_strategy
   , s.health_updated_at as health_updated_at
 	, s.disconnected as disconnected
+	, s.health_check_stdout as health_check_stdout
+	, s.health_check_stderr as health_check_stderr
+	, s.health_check_exit_status as health_check_exit_status
 FROM service_full AS s
 WHERE s.name = $1
   AND s.supervisor_id = $2
@@ -88,6 +91,9 @@ SELECT s.id
   , s.update_strategy as update_strategy
   , s.health_updated_at as health_updated_at
 	, s.disconnected as disconnected
+	, s.health_check_stdout as health_check_stdout
+	, s.health_check_stderr as health_check_stderr
+	, s.health_check_exit_status as health_check_exit_status
 FROM service_full AS s
  %s
 ORDER BY %s %s, sup_member_id ASC
@@ -115,6 +121,9 @@ SELECT s.id
   , s.previous_health as previous_health
   , s.health_updated_at as health_updated_at
 	, s.disconnected as disconnected
+	, s.health_check_stdout as health_check_stdout
+	, s.health_check_stderr as health_check_stderr
+	, s.health_check_exit_status as health_check_exit_status
 FROM service_full AS s
 WHERE last_event_occurred_at < now() - ($1 || ' seconds')::interval
 `
@@ -150,6 +159,9 @@ RETURNING s.id
   , s.previous_health as previous_health
   , s.health_updated_at as health_updated_at
   , s.disconnected as disconnected
+	, s.health_check_stdout as health_check_stdout
+	, s.health_check_stderr as health_check_stderr
+	, s.health_check_exit_status as health_check_exit_status
 `
 
 	selectServicesHealthCounts = `
