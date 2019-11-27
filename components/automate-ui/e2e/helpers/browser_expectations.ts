@@ -20,6 +20,6 @@ export function waitForElement(selector) {
 
 export function waitForSpinners() {
   return browser.wait(() => {
-    return $$('chef-loading-spinner').count().then(c => c === 0);
+    return $$('chef-loading-spinner').filter(s => s.hidden === false).count().then(c => c === 0);
   }, 5000);
 }
