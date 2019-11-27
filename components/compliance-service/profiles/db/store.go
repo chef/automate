@@ -8,6 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/blang/semver"
 	"github.com/lib/pq"
 	"github.com/sirupsen/logrus"
@@ -421,50 +422,38 @@ func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata
 		return nil, status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name', 'title' or 'maintainer'", req.Sort)
 	}
 
-	var rows *sql.Rows
-	var err error
+	sql := squirrel.
+		Select("sha256, info").
+		From("store_profiles")
 
-	switch {
-	case len(req.Namespace) == 0 && len(req.Name) == 0:
-		query := fmt.Sprintf(`
-			SELECT sha256, info
-			FROM store_profiles WHERE sha256 IN
-			(SELECT sha256 FROM store_market)
-			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, req.Sort, req.Order)
-
-		rows, err = s.DB.Query(query)
-	case len(req.Namespace) == 0:
-		query := fmt.Sprintf(`
-			SELECT sha256, info
-			FROM store_profiles WHERE sha256 IN
-			(SELECT sha256 FROM store_market)
-			AND info->>'name' = $1
-			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, req.Sort, req.Order)
-
-		rows, err = s.DB.Query(query, req.Name)
-	case len(req.Name) == 0:
-		query := fmt.Sprintf(`
-			SELECT sha256, info
-			FROM store_profiles WHERE
-			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
-			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, req.Sort, req.Order)
-
-		rows, err = s.DB.Query(query, req.Namespace)
-	default:
-		query := fmt.Sprintf(`
-			SELECT sha256, info
-			FROM store_profiles WHERE
-			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
-			AND info->>'name' = $2
-			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, req.Sort, req.Order)
-
-		rows, err = s.DB.Query(query, req.Namespace, req.Name)
+	if len(req.Namespace) == 0 {
+		sql = sql.
+			Where("exists(select 1 from store_market where store_profiles.sha256 = store_market.sha256)")
+	} else {
+		sql = sql.
+			Where("exists(select 1 from store_namespace where store_profiles.sha256 = store_namespace.sha256 and store_namespace.owner = ?)", req.Namespace)
 	}
+
+	if len(req.Name) != 0 {
+		sql = sql.Where("info->>'name' = ?", req.Name)
+	}
+
+	sql = sql.OrderBy(fmt.Sprintf("info->>'%s' %s", req.Sort, req.Order), "info->>'version' DESC")
+
+	query, args, err := sql.PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
+		return nil, err
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"query": query,
+		"args":  args,
+		"err":   err,
+	}).Infof("Querying profiles")
+
+	rows, err := s.DB.Query(query, args...)
+	if err != nil {
+		logrus.Error(err)
 		return nil, err
 	}
 	defer rows.Close() // nolint: errcheck
