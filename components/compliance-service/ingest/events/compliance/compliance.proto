@@ -35,4 +35,5 @@ message Report {
 	string ipaddress = 37;
 	string fqdn = 38;
 	repeated chef.automate.domain.compliance.api.common.Kv tags = 39;
+	string automate_manager_id = 40;
 }

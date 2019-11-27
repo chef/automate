@@ -122,10 +122,14 @@ const sqlNodeState = `
 SELECT source_state FROM nodes WHERE id=$1;
 `
 
-const sqlUpdateNodeDetectFailed = `
-UPDATE nodes
-SET status = $1, last_job = $2, last_connection_attempt = $4
-WHERE id=$3;
+const sqlUpdateOrAddNodeDetectFailed = `
+INSERT INTO nodes
+	(id, name, status, last_job, last_connection_attempt)
+VALUES ($1, $2, $3, $4, $5)
+ON CONFLICT (id)
+DO UPDATE
+SET status = $3, last_job = $4, last_connection_attempt = $5
+WHERE nodes.id=$1
 `
 const sqlUpdateNodeDetectCompleted = `
 UPDATE nodes
@@ -947,7 +951,7 @@ func (db *DB) UpdateNodeDetectInfo(ctx context.Context, nodeDetectInfo *nodes.No
 			return errors.Errorf("UpdateNodeDetectInfo unknown node JobType %s", nodeDetectInfo.JobType)
 		}
 	case types.StatusFailed:
-		updated, err = db.Exec(sqlUpdateNodeDetectFailed, nodeStatus(nodeDetectInfo.NodeStatus), nodeDetectInfo.JobId, nodeDetectInfo.NodeId, now)
+		updated, err = db.Exec(sqlUpdateOrAddNodeDetectFailed, nodeDetectInfo.NodeId, nodeDetectInfo.NodeName, nodeStatus(nodeDetectInfo.NodeStatus), nodeDetectInfo.JobId, now)
 	default:
 		return errors.Errorf("UpdateNodeDetectInfo unknown NodeStatus %s", nodeDetectInfo.NodeStatus)
 	}
@@ -958,10 +962,12 @@ func (db *DB) UpdateNodeDetectInfo(ctx context.Context, nodeDetectInfo *nodes.No
 	if err != nil {
 		return errors.Wrap(err, "UpdateNodeDetectInfo unable to read rows affected")
 	}
-	if rows == 1 {
-		logrus.Debugf("updated node %s", nodeDetectInfo.NodeId)
+	if rows == 0 {
+		logrus.Warnf("sent detect job information for node %s but no nodes updated", nodeDetectInfo.NodeId)
+	} else if rows == 1 {
+		logrus.Debugf("updated node %s with detect job information", nodeDetectInfo.NodeId)
 	} else {
-		logrus.Error("unexpected results. more than one node was updated. something isn't right")
+		logrus.Error("unexpected results. more than one node was updated with detect job information. something isn't right")
 	}
 	return nil
 }

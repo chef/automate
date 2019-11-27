@@ -91,6 +91,7 @@ func gatherInfoForNode(in message.Compliance) (*manager.NodeMetadata, error) {
 			EndTime: endTimeTimestamp,
 			Status:  status,
 		},
+		ManagerId: in.Report.GetAutomateManagerId(),
 	}, nil
 }
 

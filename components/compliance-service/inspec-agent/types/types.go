@@ -71,6 +71,7 @@ type InspecJob struct {
 	MachineIdentifier   string              `json:"machine_identifier,omitempty"`
 	Tags                []*common.Kv        `json:"kv,omitempty"`
 	ParentJobID         string              `json:"parent_job_id,omitempty"`
+	ManagerID           string              `json:"manager_id,omitempty"`
 }
 
 // WorkerStats describe the state of all inspec job workers to be used for analysis purposes

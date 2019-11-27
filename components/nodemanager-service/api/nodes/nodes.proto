@@ -34,6 +34,8 @@ message NodeDetectJobInfo {
 	string job_id = 6;
 	string node_state = 7;
 	string job_type = 8;
+	string node_name = 9;
+	string manager_id = 10;
 }
 message RerunResponse {}
 
