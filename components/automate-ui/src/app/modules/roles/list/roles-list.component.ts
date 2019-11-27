@@ -18,7 +18,6 @@ import { Role } from 'app/entities/roles/role.model';
   styleUrls: ['./roles-list.component.scss']
 })
 export class RolesListComponent implements OnInit {
-  public loading$: Observable<boolean>;
   public sortedRoles$: Observable<Role[]>;
   public isIAMv2$: Observable<boolean>;
 
@@ -26,7 +25,9 @@ export class RolesListComponent implements OnInit {
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.loading$ = store.select(getAllStatus).pipe(map(loading));
+    store.select(getAllStatus).pipe(map(loading)).subscribe((isloading) =>
+      this.layoutFacade.ShowPageLoading(isloading));
+
     this.sortedRoles$ = store.select(allRoles).pipe(
       map((roles: Role[]) => ChefSorters.naturalSort(roles, 'name')));
 

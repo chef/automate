@@ -26,5 +26,10 @@
     order: 2;
     height: 100%;
     overflow-x: scroll;
+    position: relative;
   }
+}
+
+[hidden] {
+  display: none !important; // sass-lint:disable-line no-important
 }

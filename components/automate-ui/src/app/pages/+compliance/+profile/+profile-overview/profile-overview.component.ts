@@ -61,8 +61,6 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   // notification data
   downloadErrorVisible = false;
 
-  // show spinner before loading data
-  ProfilesDataLoading = true;
   userProfilesDataLoaded = false;
   availableProfilesDataLoaded = false;
 
@@ -86,6 +84,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.ShowPageLoading(true);
     this.user = this.chefSessionService.username;
 
     observableForkJoin([
@@ -158,7 +157,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
 
   stopSpinnerAfterDataLoad() {
     if (this.userProfilesDataLoaded && this.availableProfilesDataLoaded) {
-      this.ProfilesDataLoading = false;
+      this.layoutFacade.ShowPageLoading(false);
     }
   }
 

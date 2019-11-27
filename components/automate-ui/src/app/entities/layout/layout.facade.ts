@@ -8,8 +8,9 @@ import { notificationState } from 'app/entities/notifications/notification.selec
 
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';
-import { sidebarMenuGroups } from './layout.selectors';
+import { sidebarMenuGroups, showPageLoading } from './layout.selectors';
 import {
+    ShowPageLoading,
     GetSidebarMenuGroups,
     UpdateSidebarMenuGroups
 } from './layout.actions';
@@ -21,6 +22,7 @@ export class LayoutFacadeService {
     headerHeight = '70px';
     contentHeight = `calc(100% - ${this.headerHeight})`;
     menuGroups$: Observable<MenuItemGroup[]>;
+    showPageLoading$: Observable<boolean>;
     showLicenseNotification = false;
     showHeader = true;
     showSidebar = true;
@@ -30,6 +32,7 @@ export class LayoutFacadeService {
         private layoutSidebarService: LayoutSidebarService
     ) {
         this.menuGroups$ = store.select(sidebarMenuGroups);
+        this.showPageLoading$ = store.select(showPageLoading);
         store.select(notificationState).subscribe((notifications) => {
             this.showLicenseNotification = filter((n) =>
                 n.type === 'license', notifications).length > 0;
@@ -39,6 +42,10 @@ export class LayoutFacadeService {
                 this.updateContentHeight('70px');
             }
         });
+    }
+
+    ShowPageLoading(showLoading: boolean) {
+        this.store.dispatch( new ShowPageLoading(showLoading));
     }
 
     showFullPage() {

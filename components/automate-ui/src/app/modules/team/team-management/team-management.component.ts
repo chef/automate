@@ -30,7 +30,6 @@ import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 })
 export class TeamManagementComponent implements OnInit, OnDestroy {
   public sortedTeams$: Observable<Team[]>;
-  public loading$: Observable<boolean>;
   public teamToDelete: Team;
   public deleteModalVisible = false;
   public createModalVisible = false;
@@ -50,7 +49,14 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
     ) {
-    this.loading$ = store.select(getAllStatus).pipe(map(loading));
+      store.pipe(
+        select(getAllStatus),
+        takeUntil(this.isDestroyed),
+        map(loading)
+      ).subscribe((isLoading) =>
+        this.layoutFacade.ShowPageLoading(isLoading)
+      );
+
     this.sortedTeams$ = store.select(allTeams).pipe(
       map((teams: Team[]) => ChefSorters.naturalSort(teams, 'id')),
       takeUntil(this.isDestroyed));

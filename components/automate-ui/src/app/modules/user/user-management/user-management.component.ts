@@ -64,6 +64,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.layoutFacade.showSettingsSidebar();
     this.store.dispatch(new GetUsers());
+    this.layoutFacade.ShowPageLoading(true);
     combineLatest([
       this.store.select(allUsers),
       this.store.select(getStatus)
@@ -72,6 +73,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       filter(([_, uStatus]) => uStatus !== EntityStatus.loading)
       ).subscribe(([users, _]: [User[], EntityStatus]) => {
         this.isLoading = false;
+        this.layoutFacade.ShowPageLoading(false);
         // Sort naturally first by name, then by id
         this.users = ChefSorters.naturalSort(users, ['name', 'id']);
       });

@@ -8,3 +8,8 @@ export const sidebarMenuGroups = createSelector(
     layoutState,
     (layout) => layout.menuGroups
   );
+
+  export const showPageLoading = createSelector(
+    layoutState,
+    (layout) => layout.showPageLoading
+  );
