@@ -389,8 +389,15 @@ export class ReportingComponent implements OnInit, OnDestroy {
     const queryParams = {...this.route.snapshot.queryParams};
 
     const filteredParams = pickBy((_value, key) => {
+
+      // Only handles control_tag filters
+      if (key.includes('control_tag')) {
+        return false;
+      }
+
         return this.allowedURLFilterTypes.indexOf(key) < 0;
       }, queryParams);
+
 
     this.router.navigate([], {queryParams: filteredParams});
   }
