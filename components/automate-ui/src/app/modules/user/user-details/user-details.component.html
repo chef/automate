@@ -25,7 +25,7 @@
                 <chef-form-field class="display3">
                   <label>
                     <span class="label">Full Name <span aria-hidden="true">*</span></span>
-                    <chef-input ngDefaultControl formControlName="fullName"></chef-input>
+                    <input chefInput formControlName="fullName"/>
                   </label>
                   <chef-error
                     *ngIf="(editForm.get('fullName').hasError('required') || editForm.get('fullName').hasError('pattern')) && editForm.get('fullName').dirty">
@@ -77,7 +77,7 @@
           <chef-form-field *ngIf="!isAdminView" class="password">
             <label>
               <span class="label">Old Password <span aria-hidden="true">*</span></span>
-              <chef-input ngDefaultControl formControlName="oldPassword" type="password"></chef-input>
+              <input chefInput formControlName="oldPassword" type="password"/>
             </label>
             <chef-error
               *ngIf="passwordForm.get('oldPassword').hasError('required') && passwordForm.get('oldPassword').dirty">
@@ -91,7 +91,7 @@
           <chef-form-field class="password">
             <label>
               <span class="label">New Password <span aria-hidden="true">*</span></span>
-              <chef-input ngDefaultControl formControlName="newPassword" type="password"></chef-input>
+              <input chefInput formControlName="newPassword" type="password"/>
             </label>
             <chef-error
               *ngIf="(passwordForm.get('newPassword').hasError('required') || passwordForm.get('newPassword').hasError('pattern')) && passwordForm.get('newPassword').dirty">
@@ -105,7 +105,7 @@
           <chef-form-field class="password">
             <label>
               <span class="label">Confirm New Password <span aria-hidden="true">*</span></span>
-              <chef-input ngDefaultControl formControlName="confirmPassword" type="password"></chef-input>
+              <input chefInput formControlName="confirmPassword" type="password"/>
             </label>
             <chef-error
               *ngIf="passwordForm.get('confirmPassword').hasError('noMatch') && passwordForm.get('confirmPassword').dirty">

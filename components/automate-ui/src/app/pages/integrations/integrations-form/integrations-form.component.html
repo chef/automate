@@ -15,7 +15,7 @@
 
     <label class="form-field">
       <span class="label">Name</span>
-      <chef-input ngDefaultControl formControlName="name"></chef-input>
+      <input chefInput formControlName="name" />
     </label>
 
     <ng-container [ngSwitch]="integrationsForm.controls.type.value">
@@ -38,8 +38,8 @@
 
     <div *ngFor="let cred of instance_credentials.controls; let i=index" [formGroupName]="i" class="cred">
       <span>Where</span>
-      <chef-input placeholder="Tag Key" ngDefaultControl formControlName="tag_key"></chef-input>
-      <chef-input placeholder="Value" ngDefaultControl formControlName="tag_value"></chef-input>
+      <input chefInput placeholder="Tag Key" formControlName="tag_key" />
+      <input chefInput placeholder="Value" formControlName="tag_value" />
       <span>use</span>
 
       <select multiple formControlName="credential_ids" class="credential-ids">

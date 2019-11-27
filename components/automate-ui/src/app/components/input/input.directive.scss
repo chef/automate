@@ -12,14 +12,14 @@
   color: $chef-primary-dark;
   font-size: 0.75em;
   font-weight: bold;
-  padding-bottom: 0.5em;
 }
 
 ::ng-deep .chef-input, ::ng-deep [compound-input] {
   width: 100%;
+  height: 45px;
   background-color: $white;
   padding: 1em;
-  font-size: 0.75em;
+  font-size: 14px;
   border: 1px solid $chef-light-grey;
   border-radius: $global-radius;
   box-sizing: border-box;
@@ -29,6 +29,7 @@
   &:focus,
   &:active {
     border-color: $chef-primary-bright;
+    outline: none;
   }
 
   &[disabled] {
