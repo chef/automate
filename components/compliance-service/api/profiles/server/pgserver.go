@@ -298,7 +298,7 @@ func (srv *PGProfileServer) List(ctx context.Context, in *profiles.Query) (*prof
 		"sortOrder": sortOrder,
 	}).Infof("Listing profiles")
 
-	metadata, err := srv.store.ListProfilesMetadata(dbstore.ProfilesListRequest{
+	metadata, total, err := srv.store.ListProfilesMetadata(dbstore.ProfilesListRequest{
 		Name:      in.Name,
 		Namespace: in.Owner,
 		Order:     sortOrder,
@@ -312,6 +312,7 @@ func (srv *PGProfileServer) List(ctx context.Context, in *profiles.Query) (*prof
 
 	// convert metadata to profile
 	profiles := conversion.ConvertInspecMetadatasToProfiles(metadata, in.Owner)
+	profiles.Total = int32(total)
 
 	return profiles, nil
 }

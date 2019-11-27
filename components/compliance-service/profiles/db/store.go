@@ -377,33 +377,34 @@ func (s *Store) Delete(namespace string, name string, version string) error {
 	return nil
 }
 
-func (s *Store) parseList(rows *sql.Rows) ([]inspec.Metadata, error) {
+func (s *Store) parseList(rows *sql.Rows) ([]inspec.Metadata, int, error) {
 	logrus.Debug("Parse profile list from database")
 	entries := make([]inspec.Metadata, 0)
 	var (
 		sha256       string
 		metadataBlob []byte
+		total        int
 	)
 	for rows.Next() {
 		logrus.Debug("iterate over row")
-		err := rows.Scan(&sha256, &metadataBlob)
+		err := rows.Scan(&sha256, &metadataBlob, &total)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		logrus.Debug("parse metadata")
 		metadata := inspec.Metadata{}
 		err = metadata.ParseJSON(metadataBlob)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		metadata.Sha256 = sha256
 		entries = append(entries, metadata)
 	}
 	err := rows.Err()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return entries, nil
+	return entries, total, nil
 }
 
 type ProfilesListRequest struct {
@@ -415,17 +416,17 @@ type ProfilesListRequest struct {
 	Sort      string
 }
 
-func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata, error) {
+func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata, int, error) {
 	if req.Order != "ASC" && req.Order != "DESC" {
-		return nil, status.Errorf(codes.InvalidArgument, "order field '%s' is invalid. Use either 'ASC' or 'DESC'", req.Order)
+		return nil, 0, status.Errorf(codes.InvalidArgument, "order field '%s' is invalid. Use either 'ASC' or 'DESC'", req.Order)
 	}
 
 	if req.Sort != "name" && req.Sort != "title" && req.Sort != "maintainer" {
-		return nil, status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name', 'title' or 'maintainer'", req.Sort)
+		return nil, 0, status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name', 'title' or 'maintainer'", req.Sort)
 	}
 
 	sql := squirrel.
-		Select("sha256, info").
+		Select("sha256, info, count(*) OVER() AS total").
 		From("store_profiles")
 
 	if len(req.Namespace) == 0 {
@@ -454,7 +455,7 @@ func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata
 
 	query, args, err := sql.PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	logrus.WithFields(logrus.Fields{
@@ -466,7 +467,7 @@ func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata
 	rows, err := s.DB.Query(query, args...)
 	if err != nil {
 		logrus.Error(err)
-		return nil, err
+		return nil, 0, err
 	}
 	defer rows.Close() // nolint: errcheck
 
