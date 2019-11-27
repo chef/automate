@@ -7,7 +7,7 @@ describe File.basename(__FILE__) do
   def profiles ; Profiles::ProfilesService ; end
 
   it "errors out when an invalid order field is specified" do
-    assert_grpc_error(/some error message/) do
+    assert_grpc_error(/order field '1337' is invalid. Use either 'ASC' or 'DESC'/) do
       GRPC profiles, :list, Profiles::Query.new(
         sort: 'name',
         order: 1337
@@ -353,18 +353,6 @@ describe File.basename(__FILE__) do
     expected_data = {
       "profiles": [
         {
-          "name": "windows-baseline",
-          "title": "DevSec Windows Security Baseline",
-          "maintainer": "DevSec Hardening Framework Team",
-          "copyright": "DevSec Hardening Framework Team",
-          "copyrightEmail": "hello@dev-sec.io",
-          "license": "Apache 2 license",
-          "summary": "Baselin for best-preactice Windows OS hardening",
-          "version": "1.1.0",
-          "supports"=>[{}],
-          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
-        },
-        {
           "name": "linux-patch-baseline",
           "title": "DevSec Linux Patch Benchmark",
           "maintainer": "Christoph Hartmann",
@@ -375,6 +363,18 @@ describe File.basename(__FILE__) do
           "version": "0.3.0",
           "supports"=>[{}],
           "sha256": "c774e15f448a22f37fc798d36c0fdb9a8bdbb4c45ba86025c2833ed3ba6b0324"
+        },
+        {
+          "name": "windows-baseline",
+          "title": "DevSec Windows Security Baseline",
+          "maintainer": "DevSec Hardening Framework Team",
+          "copyright": "DevSec Hardening Framework Team",
+          "copyrightEmail": "hello@dev-sec.io",
+          "license": "Apache 2 license",
+          "summary": "Baselin for best-preactice Windows OS hardening",
+          "version": "1.1.0",
+          "supports"=>[{}],
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
         }
       ],
       "total": 2
