@@ -5,7 +5,7 @@ chef-page {
   min-height: 450px;
   overflow: hidden;
   padding: 64px;
-  position: relative;
+  position: fixed;
   width: 100vw;
 
   &.example-page-width {
@@ -29,7 +29,7 @@ chef-page {
   }
 
   #page-footer {
-    position: absolute;
+    position: fixed;
     left: 0;
     bottom: 0;
     margin: 64px;
