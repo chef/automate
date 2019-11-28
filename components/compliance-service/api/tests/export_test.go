@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -49,26 +50,7 @@ func TestJSONExportWithEndTime(t *testing.T) {
 	stream, err := reporting.Export(context.Background(), &query)
 	require.NoError(t, err)
 
-	data := make([]byte, 0)
-	//the gateway wraps the response in [] because it's a json array
-	//since we are not using the gateway in this test, we need to do that wrapping
-	//here's the '[' (open wrapper)
-	data = append([]byte("["), data...)
-	for {
-		tdata, err := stream.Recv()
-		if err != nil && err == io.EOF {
-			data = append(data, tdata.GetContent()...)
-			break
-		}
-
-		require.NoError(t, err)
-		data = append(data, tdata.GetContent()...)
-	}
-	//and here's the ']' (close wrapper)
-	data = append(data, []byte("]")...)
-
-	var reports []rs.Report
-	err = json.Unmarshal(data, &reports)
+	reports, err := getJSONReportsFromStream(stream)
 	require.NoError(t, err)
 
 	report := reports[0]
@@ -101,26 +83,7 @@ func TestJSONExportWithProfileFilter(t *testing.T) {
 	stream, err := reporting.Export(context.Background(), &profileFilterQuery)
 	require.NoError(t, err)
 
-	data := make([]byte, 0)
-	//the gateway wraps the response in [] because it's a json array
-	//since we are not using the gateway in this test, we need to do that wrapping
-	//here's the '[' (open wrapper)
-	data = append([]byte("["), data...)
-	for {
-		tdata, err := stream.Recv()
-		if err != nil && err == io.EOF {
-			data = append(data, tdata.GetContent()...)
-			break
-		}
-
-		require.NoError(t, err)
-		data = append(data, tdata.GetContent()...)
-	}
-	//and here's the ']' (close wrapper)
-	data = append(data, []byte("]")...)
-
-	var reports []rs.Report
-	err = json.Unmarshal(data, &reports)
+	reports, err := getJSONReportsFromStream(stream)
 	require.NoError(t, err)
 
 	report := reports[0]
@@ -307,26 +270,7 @@ func TestJSONExportWithControlFilter(t *testing.T) {
 	stream, err := reporting.Export(context.Background(), &profileFilterQuery)
 	require.NoError(t, err)
 
-	data := make([]byte, 0)
-	//the gateway wraps the response in [] because it's a json array
-	//since we are not using the gateway in this test, we need to do that wrapping
-	//here's the '[' (open wrapper)
-	data = append([]byte("["), data...)
-	for {
-		tdata, err := stream.Recv()
-		if err != nil && err == io.EOF {
-			data = append(data, tdata.GetContent()...)
-			break
-		}
-
-		require.NoError(t, err)
-		data = append(data, tdata.GetContent()...)
-	}
-	//and here's the ']' (close wrapper)
-	data = append(data, []byte("]")...)
-
-	var reports []rs.Report
-	err = json.Unmarshal(data, &reports)
+	reports, err := getJSONReportsFromStream(stream)
 	require.NoError(t, err)
 
 	report := reports[0]
@@ -366,4 +310,143 @@ func TestJSONExportWithTwoControlFiltersReturnsError(t *testing.T) {
 
 	grpctest.AssertCode(t, codes.InvalidArgument, err)
 	assert.Equal(t, "rpc error: code = InvalidArgument desc = Invalid: Only one 'control' filter is allowed", err.Error())
+}
+
+func TestJSONNodeExportReturnsAllExpectedReportsForNode(t *testing.T) {
+	// get reporting client
+	conn, err := getClientConn()
+	require.NoError(t, err)
+
+	defer conn.Close()
+
+	reporting := rs.NewReportingServiceClient(conn)
+	require.NoError(t, err)
+
+	filterQuery := rs.Query{
+		Type: "json",
+		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-02-08T00:00:00Z"}},
+			{Type: "end_time", Values: []string{"2018-04-08T09:18:41Z"}},
+			{Type: "node_id", Values: []string{"9b9f4e51-b049-4b10-9555-10578916e149"}},
+		},
+	}
+
+	stream, err := reporting.ExportNode(context.Background(), &filterQuery)
+	require.NoError(t, err)
+
+	reports, err := getJSONReportsFromStream(stream)
+	require.NoError(t, err)
+
+	assert.Equal(t, 3, len(reports))
+
+	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc07", reports[0].GetId())
+	endTime := ptypes.TimestampString(reports[0].GetEndTime())
+	assert.Equal(t, "2018-03-05T07:02:02Z", endTime)
+
+	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc05", reports[1].GetId())
+	endTime = ptypes.TimestampString(reports[1].GetEndTime())
+	assert.Equal(t, "2018-03-05T02:02:02Z", endTime)
+
+	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc04", reports[2].GetId())
+	endTime = ptypes.TimestampString(reports[2].GetEndTime())
+	assert.Equal(t, "2018-03-04T09:18:41Z", endTime)
+}
+
+func TestJSONNodeExportRespectsTimeFilters(t *testing.T) {
+	// get reporting client
+	conn, err := getClientConn()
+	require.NoError(t, err)
+
+	defer conn.Close()
+
+	reporting := rs.NewReportingServiceClient(conn)
+	require.NoError(t, err)
+
+	filterQuery := rs.Query{
+		Type: "json",
+		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
+			{Type: "end_time", Values: []string{"2018-03-05T03:18:41Z"}},
+			{Type: "node_id", Values: []string{"9b9f4e51-b049-4b10-9555-10578916e149"}},
+		},
+	}
+
+	stream, err := reporting.ExportNode(context.Background(), &filterQuery)
+	require.NoError(t, err)
+
+	reports, err := getJSONReportsFromStream(stream)
+	require.NoError(t, err)
+
+	assert.Equal(t, 2, len(reports))
+
+	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc05", reports[0].GetId())
+	endTime := ptypes.TimestampString(reports[0].GetEndTime())
+	assert.Equal(t, "2018-03-05T02:02:02Z", endTime)
+
+	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc04", reports[1].GetId())
+	endTime = ptypes.TimestampString(reports[1].GetEndTime())
+	assert.Equal(t, "2018-03-04T09:18:41Z", endTime)
+}
+
+func TestJSONNodeExportRequiresOneNodeFilter(t *testing.T) {
+	// get reporting client
+	conn, err := getClientConn()
+	require.NoError(t, err)
+
+	defer conn.Close()
+
+	reporting := rs.NewReportingServiceClient(conn)
+	require.NoError(t, err)
+
+	filterQuery := rs.Query{
+		Type: "json",
+		Filters: []*rs.ListFilter{
+			{Type: "start_time", Values: []string{"2018-03-04T00:00:00Z"}},
+			{Type: "end_time", Values: []string{"2018-03-05T03:18:41Z"}},
+		},
+	}
+
+	stream, err := reporting.ExportNode(context.Background(), &filterQuery)
+	require.NoError(t, err)
+
+	_, err = stream.Recv()
+
+	grpctest.AssertCode(t, codes.InvalidArgument, err)
+	assert.Equal(t, "rpc error: code = InvalidArgument desc = Invalid: Must provide only one 'node_id' filter", err.Error())
+
+	filterQuery.Filters = append(filterQuery.Filters, &rs.ListFilter{Type: "node_id", Values: []string{"9b9f4e51-b049-4b10-9555-10578916e149"}})
+	filterQuery.Filters = append(filterQuery.Filters, &rs.ListFilter{Type: "node_id", Values: []string{"9b9f4e51-b049-4b10-9555-10578916e222"}})
+
+	stream, err = reporting.ExportNode(context.Background(), &filterQuery)
+	require.NoError(t, err)
+
+	_, err = stream.Recv()
+
+	grpctest.AssertCode(t, codes.InvalidArgument, err)
+	assert.Equal(t, "rpc error: code = InvalidArgument desc = Invalid: Must provide only one 'node_id' filter", err.Error())
+}
+
+func getJSONReportsFromStream(stream rs.ReportingService_ExportClient) ([]rs.Report, error) {
+	data := make([]byte, 0)
+	//the gateway wraps the response in [] because it's a json array
+	//since we are not using the gateway in this test, we need to do that wrapping
+	//here's the '[' (open wrapper)
+	data = append([]byte("["), data...)
+	for {
+		tdata, err := stream.Recv()
+		if err != nil && err == io.EOF {
+			data = append(data, tdata.GetContent()...)
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		data = append(data, tdata.GetContent()...)
+	}
+	//and here's the ']' (close wrapper)
+	data = append(data, []byte("]")...)
+
+	var reports []rs.Report
+	err := json.Unmarshal(data, &reports)
+	return reports, err
 }

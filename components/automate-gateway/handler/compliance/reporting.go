@@ -117,7 +117,12 @@ func (a *Reporting) ListProfiles(ctx context.Context, in *reporting.Query) (*rep
 }
 
 func (a *Reporting) Export(*reporting.Query, reporting.ReportingService_ExportServer) error {
-	// TODO: needs to be implemented with special care
+	// Please see components/automate-gateway/services/services.go for implementation
+	return nil
+}
+
+func (a *Reporting) ExportNode(*reporting.Query, reporting.ReportingService_ExportNodeServer) error {
+	// Please see components/automate-gateway/services/services.go for implementation
 	return nil
 }
 

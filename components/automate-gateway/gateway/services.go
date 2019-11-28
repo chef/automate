@@ -585,24 +585,28 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	//when the type is json, we will be retrieving a json array of objects and since we will be getting them one at a
-	// time, we need to provide the '[' to open and the ']' to close (the close will happen on EOF, below)
-	if query.Type == "json" {
-		_, err = w.Write([]byte("["))
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	}
 	stream, err := reportingClient.Export(ctx, &query)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	writeContent(w, stream, query.Type)
+}
+
+func writeContent(w http.ResponseWriter, stream reporting.ReportingService_ExportClient, queryType string) {
+	//when the type is json, we will be retrieving a json array of objects and since we will be getting them one at a
+	// time, we need to provide the '[' to open and the ']' to close (the close will happen on EOF, below)
+	if queryType == "json" {
+		_, err := w.Write([]byte("["))
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+	}
 	for {
 		data, err := stream.Recv()
 		if err == io.EOF {
-			if query.Type == "json" {
+			if queryType == "json" {
 				_, err = w.Write([]byte("]"))
 				if err != nil {
 					http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -617,6 +621,41 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		w.Write(data.GetContent()) // nolint: errcheck
 	}
+}
+
+func (s *Server) NodeExportHandler(w http.ResponseWriter, r *http.Request) {
+	const (
+		resource = "compliance:reporting:nodes:{id}"
+		actionV1 = "export"
+		actionV2 = "compliance:reportNodes:export"
+	)
+
+	ctx, err := s.authRequest(r, resource, actionV1, resource, actionV2)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
+		return
+	}
+
+	decoder := json.NewDecoder(r.Body)
+	var query reporting.Query
+	if err := decoder.Decode(&query); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	reportingClient, err := s.clientsFactory.ComplianceReportingServiceClient()
+	if err != nil {
+		http.Error(w, "grpc service for compliance unavailable", http.StatusServiceUnavailable)
+		return
+	}
+
+	stream, err := reportingClient.ExportNode(ctx, &query)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	writeContent(w, stream, query.Type)
 }
 
 func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Request) {
