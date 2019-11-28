@@ -1,18 +1,41 @@
 package util
 
 import (
+	"strings"
 	"testing"
+	"unicode/utf8"
 
 	"time"
 
 	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
 const (
 	csvHeader = "Node Name,End Time,Platform Name,Platform Release,Environment,IPAddress,FQDN,Profile Name,Profile Title,Profile Version,Profile Summary,Control ID,Control Title,Control Impact,Result Status,Result Run Time,Result Code Description,Result Message,Result Skip Message\n"
 )
+
+func TestMaxCharLimit(t *testing.T) {
+	var testString string
+	my1kstring := "m3dVoHqxd5CTZFdCfjstCuKaiwAaXVgvSqYvJI4nkI5vBQUyzr2EJXyPOVzezT4Bb8T9CpyeoRknGLpvdKt2iKCtBDzyiH6Oys8sqzCCPoHAReOiZxfCqT9k9JcgEy4tudvIHNfEuqbkC1wmcxqANjlEwZi8rlWn1GR22d03rhvsYM8IbwHVtCMXbZ2vIrz0fYA4VAatq6RyQRyJlt1kSAnFSiWaNfz3ECwY7QcQ6rbFunKi4EMwttGl8nTlpEuDrNt0IMCEuUFIlpb0muR64nXa4komXz6iySpf7O4YjpFBOfw2YSGae98Np0vHy0s8XqUaGQD3gunU15lFK0e9AoOnTP3yU6yDXy93DK80HYbDWEu1kuq6YOHBunpfFfEgzRRD2wi5qcg61IYsAKNJHe2nUlxyVFiUKYE5d8jCFA2CtdP4BVT80cI4e747BwT1CqnqJD55Ps1IfMvKmNwENzve9JMSwT8g855zGT7r6q6E1FPl0NoBr0CVNGxJOBByRFBV2LO33gTtIoRwJ8JgCDAFsYDeKVJvK6JZLRscTCwAnHeMeAKUoBn4izxuGl2PeansTVJzDPznzTAbSmFiWFlsx8JlgPYYwoK5RuY1w2VMYPLRDgHlbLX4utOcyRnAjRTQQ0dJ5zRuKMOwSx729lag5PgQljGNabVg6BnkECVSvTdcKsxUQ2IIED281TuzQzoA9T5xQ3QExBi5icfxFxGCtMJKDSKo0YRqQAaciZCXpDIaVv3YRtMTi1WwmzDEDhnid8w4V9gZAo0wBqPLGROxMR6UPe7eFjP3RqoczeAe7xHRIK6rX3bXM1ZoT3iGjjkmalgfrQYjuyKhBS0HBp5RutYqVz6oeeH1eBpBnqLkagDlduJdT8QDgn58oLyqYoC5FBcNdTs4ciimJGZanN3lq5DpIwIp5XgQQHmYUxujq9ufjsdZyLnNEjHHGUkVw8Q8rvEnXktTwunXqJURfRHMBIHpAFNB3ItwyLpv"
+	for i := 1; i <= 32; i++ {
+		testString = testString + my1kstring
+	}
+
+	// testString should be 32k chars
+	logrus.Infof("char count in string: %d", utf8.RuneCountInString(testString))
+	returnedString := maxCharLimit(testString)
+	assert.Equal(t, testString, returnedString)
+
+	testString = testString + "a"
+	// testString should be 32,001 chars
+	logrus.Infof("char count in string: %d", utf8.RuneCountInString(testString))
+	returnedString = maxCharLimit(testString)
+	assert.Equal(t, strings.HasPrefix(returnedString, "character limit exceeds 32,000. truncating message"), true)
+	assert.Equal(t, utf8.RuneCountInString(returnedString) <= 32000, true)
+}
 
 func TestEmptyExport(t *testing.T) {
 	data, err := ReportToCSV(&reportingapi.Report{})

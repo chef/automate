@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"time"
+	"unicode/utf8"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/sirupsen/logrus"
@@ -67,8 +68,8 @@ func ReportToCSV(report *reportingapi.Report) (string, error) {
 					ControlImpact:         strconv.FormatFloat(float64(control.Impact), 'f', 2, 32),
 					ResultStatus:          result.Status,
 					ResultRunTime:         strconv.FormatFloat(float64(result.RunTime), 'f', 3, 32),
-					ResultCodeDescription: result.CodeDesc,
-					ResultMessage:         result.Message,
+					ResultCodeDescription: maxCharLimit(result.CodeDesc),
+					ResultMessage:         maxCharLimit(result.Message),
 					ResultSkipMessage:     result.SkipMessage,
 				})
 			}
@@ -81,4 +82,13 @@ func ReportToCSV(report *reportingapi.Report) (string, error) {
 		return "", fmt.Errorf("Failed to marshal CSV report: %+v", err)
 	}
 	return content, nil
+}
+
+func maxCharLimit(item string) string {
+	if utf8.RuneCountInString(item) > 32000 {
+		msg := "character limit exceeds 32,000. truncating message: "
+		countToReturn := 32000 - utf8.RuneCountInString(msg)
+		return fmt.Sprintf("%s%s", msg, string([]rune(item)[0:countToReturn]))
+	}
+	return item
 }
