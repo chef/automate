@@ -44,7 +44,7 @@ func ProfileControlSummary(profile *inspec.Profile) *reportingTypes.NodeControlS
 	summary := reportingTypes.NodeControlSummary{}
 	for _, control := range profile.Controls {
 		summary.Total++
-		if control.WaiverData != nil && !strings.HasPrefix(control.WaiverData.Message, "Waiver expired") {
+		if control.WaiverData != nil && !reflect.DeepEqual(*control.WaiverData, inspec.WaiverData{}) && !strings.HasPrefix(control.WaiverData.Message, "Waiver expired") {
 			// Expired waived controls are not waived. This way, we can use the actual status of the executed control
 			summary.Waived.Total++
 		} else {
@@ -168,6 +168,7 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 				})
 			}
 
+			controlWaivedStr := WaivedStr(control.WaiverData)
 			minControls[i] = relaxting.ESInSpecReportControl{
 				ID:         control.Id,
 				Title:      control.Title,
@@ -176,11 +177,11 @@ func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums [
 				Results:    minResults,
 				StringTags: stringTags,
 				Refs:       refs,
-				WaivedStr:  WaivedStr(control.WaiverData),
+				WaivedStr:  controlWaivedStr,
 			}
 
 			// In ingestion old inspec reports can come without control `waiver_data` and new ones can have `waiver_data: {}`
-			if control.WaiverData != nil && !reflect.DeepEqual(*control.WaiverData, inspec.WaiverData{}) {
+			if controlWaivedStr != inspec.ControlWaivedStrNo {
 				minControls[i].WaiverData = &relaxting.ESInSpecReportControlsWaiverData{
 					ExpirationDate:     control.WaiverData.ExpirationDate,
 					Justification:      control.WaiverData.Justification,

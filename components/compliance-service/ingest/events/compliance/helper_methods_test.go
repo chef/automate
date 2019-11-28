@@ -33,6 +33,7 @@ func TestSummary(t *testing.T) {
         "impact": 0,
         "title": "Checking for something1",
         "refs": [],
+        "waiver_data": null,
         "tags": {
           "firewall": null,
           "gtitle": "SRG-OS-000023-GPOS-00006",
@@ -50,6 +51,7 @@ func TestSummary(t *testing.T) {
           "documentable": false
         },
         "code": "control 'ctrl-01' do ...",
+        "waiver_data": {},
         "results":[
           {
             "status": "passed",
@@ -184,10 +186,13 @@ func TestSummary(t *testing.T) {
 
 	// ------------------------------- WaivedStr tests --------------------------------- //
 
-	assert.Equal(t, inspec.ControlWaivedStrYesRun, WaivedStr(profile_waivers.Controls[0].WaiverData), "Waived status is false")
-	assert.Equal(t, inspec.ControlWaivedStrYesRun, WaivedStr(profile_waivers.Controls[1].WaiverData), "Waived status is false")
-	assert.Equal(t, inspec.ControlWaivedStrNoExpired, WaivedStr(profile_waivers.Controls[2].WaiverData), "Waived status is false")
-	assert.Equal(t, inspec.ControlWaivedStrYes, WaivedStr(profile_waivers.Controls[3].WaiverData), "Waived status is false")
+	assert.Equal(t, inspec.ControlWaivedStrYesRun, WaivedStr(profile_waivers.Controls[0].WaiverData), "WaivedStr is yes_run")
+	assert.Equal(t, inspec.ControlWaivedStrYesRun, WaivedStr(profile_waivers.Controls[1].WaiverData), "WaivedStr is yes_run")
+	assert.Equal(t, inspec.ControlWaivedStrNoExpired, WaivedStr(profile_waivers.Controls[2].WaiverData), "WaivedStr is no_expired")
+	assert.Equal(t, inspec.ControlWaivedStrYes, WaivedStr(profile_waivers.Controls[3].WaiverData), "WaivedStr is yes")
+	assert.Equal(t, inspec.ControlWaivedStrNo, WaivedStr(profile1.Controls[0].WaiverData), "WaivedStr is no")
+	assert.Equal(t, inspec.ControlWaivedStrNo, WaivedStr(profile1.Controls[1].WaiverData), "WaivedStr is no no")
+	assert.Equal(t, inspec.ControlWaivedStrNo, WaivedStr(profile1.Controls[2].WaiverData), "WaivedStr is no no no")
 
 	// ------------------------------- AddControlSummary test --------------------------------- //
 
