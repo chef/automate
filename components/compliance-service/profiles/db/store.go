@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
 	"github.com/Masterminds/squirrel"
 	"github.com/blang/semver"
@@ -18,6 +19,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/profiles/market"
+	"github.com/chef/automate/lib/pgutils"
 )
 
 type Store struct {
@@ -408,6 +410,7 @@ func (s *Store) parseList(rows *sql.Rows) ([]inspec.Metadata, int, error) {
 }
 
 type ProfilesListRequest struct {
+	Filters   map[string][]string
 	Name      string
 	Namespace string
 	Order     string
@@ -439,6 +442,17 @@ func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata
 
 	if len(req.Name) != 0 {
 		sql = sql.Where("info->>'name' = ?", req.Name)
+	}
+
+	for key, values := range req.Filters {
+		terms := squirrel.Or{}
+		for _, value := range values {
+			term := fmt.Sprintf("info->>'%s' like ?", key)
+			v := pgutils.EscapeLiteralForPGPatternMatch(value)
+			v = strings.ReplaceAll(v, "*", "%")
+			terms = append(terms, squirrel.Expr(term, v))
+		}
+		sql = sql.Where(terms)
 	}
 
 	// For backwards compatibility, pagination needs to be optional. Including a value for PerPage is how a caller can opt-in to pagination.

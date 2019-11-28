@@ -289,7 +289,13 @@ func (srv *PGProfileServer) List(ctx context.Context, in *profiles.Query) (*prof
 		sortField = "title"
 	}
 
+	filters := make(map[string][]string)
+	for _, filter := range in.Filters {
+		filters[filter.Type] = filter.Values
+	}
+
 	logrus.WithFields(logrus.Fields{
+		"filters":   filters,
 		"name":      in.Name,
 		"namespace": in.Owner,
 		"page":      in.Page,
@@ -299,6 +305,7 @@ func (srv *PGProfileServer) List(ctx context.Context, in *profiles.Query) (*prof
 	}).Infof("Listing profiles")
 
 	metadata, total, err := srv.store.ListProfilesMetadata(dbstore.ProfilesListRequest{
+		Filters:   filters,
 		Name:      in.Name,
 		Namespace: in.Owner,
 		Order:     sortOrder,
