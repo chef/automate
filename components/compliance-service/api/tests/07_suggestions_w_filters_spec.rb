@@ -26,10 +26,10 @@ describe File.basename(__FILE__) do
       "Disable insecure HTTP-methods--apache-10--",
       "Disable TRACE-methods--apache-09--",
       "Enable Apache Logging--apache-14--",
-      "Set the apache server token--apache-07--",
-      "Should not load certain modules--apache-08--",
-      "SSL honor cipher order--apache-13--",
-      "User and group should be set properly--apache-06--" ]
+      "Profile 1 - Control 1--pro1-con1--",
+      "Profile 1 - Control 2--pro1-con2--",
+      "Profile 1 - Control 3--pro1-con3--",
+      "Profile 1 - Control 4--pro1-con4--" ]
     assert_suggestions_text_id_version(expected, actual_data)
 
 
@@ -148,7 +148,7 @@ describe File.basename(__FILE__) do
         Reporting::ListFilter.new(type: 'environment', values: ['DevSec Prod beta'])  # ignored when suggesting envs
       ]
     )
-    assert_suggestions_text(["DevSec Prod Alpha", "DevSec Prod beta", "DevSec Prod Zeta"], actual_data)
+    assert_suggestions_text(["DevSec Prod Alpha", "DevSec Prod beta", "DevSec Prod Omega", "DevSec Prod Zeta"], actual_data)
 
     # suggest nodes, when we have control_tag and time filters
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
@@ -172,7 +172,7 @@ describe File.basename(__FILE__) do
        Reporting::ListFilter.new(type: 'role', values: ['base_deb', 'missing-role'])
       ]
     )
-    assert_suggestions_text(["apache_deb", "apache_linux", "apache_windows"], actual_data)
+    assert_suggestions_text(["apache_deb", "apache_osx", "apache_linux", "apache_windows"], actual_data)
 
 
     # suggest recipes with valid filters
