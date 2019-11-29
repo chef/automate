@@ -670,7 +670,7 @@ describe('Admin pages', () => {
         const name = $('app-roles-list chef-table-new chef-table-row:nth-child(1) chef-table-cell:first-child a');
         browser.wait(EC.textToBePresentInElement(name, 'Owner'));
 
-        const policyType = $('chef-table-new chef-table-row:nth-child(1) chef-table-cell:nth-child(2)');
+        const policyType = $('chef-table-new chef-table-row:nth-child(1) chef-table-cell:nth-child(3)');
         browser.wait(EC.textToBePresentInElement(policyType, 'Chef-managed'));
       });
 
@@ -679,7 +679,7 @@ describe('Admin pages', () => {
         browser.wait(EC.textToBePresentInElement(name,
           'Some role whose name does not start with A'));
 
-        const policyType = $('chef-table-new chef-table-row:nth-child(2) chef-table-cell:nth-child(2)');
+        const policyType = $('chef-table-new chef-table-row:nth-child(2) chef-table-cell:nth-child(3)');
         browser.wait(EC.textToBePresentInElement(policyType, 'Custom'));
       });
     });

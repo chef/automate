@@ -1,6 +1,15 @@
 <div class="content-container">
   <div class="container">
     <main>
+      <chef-loading-spinner *ngIf="loading$ | async" size='50' fixed></chef-loading-spinner>
+      <app-delete-object-modal
+        [visible]="deleteModalVisible"
+        objectNoun="role"
+        [objectName]="roleToDelete?.name"
+        (close)="closeDeleteModal()"
+        (deleteClicked)="deleteRole()"
+        objectAction="Delete">
+      </app-delete-object-modal>
       <chef-page-header>
         <chef-heading>Roles</chef-heading>
         <chef-subheading>
@@ -16,7 +25,9 @@
             <chef-table-header>
               <chef-table-row>
                 <chef-table-header-cell>Name</chef-table-header-cell>
+                <chef-table-header-cell></chef-table-header-cell>
                 <chef-table-header-cell>Type</chef-table-header-cell>
+                <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
               </chef-table-row>
             </chef-table-header>
             <chef-table-body>
@@ -24,7 +35,13 @@
                   <chef-table-cell>
                     <a [routerLink]="['/settings/roles', role.id]">{{ role.name }}</a>
                   </chef-table-cell>
+                  <chef-table-cell></chef-table-cell>
                   <chef-table-cell>{{ role.type | iamType }}</chef-table-cell>
+                  <chef-table-cell class="three-dot-column">
+                    <chef-control-menu *ngIf="(role.type | iamType).toLowerCase() === 'custom'">
+                      <chef-option data-cy="delete" (click)="startRoleDelete(role)">Delete Role</chef-option>
+                    </chef-control-menu>
+                  </chef-table-cell>
               </chef-table-row>
             </chef-table-body>
           </chef-table-new>

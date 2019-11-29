@@ -20,6 +20,9 @@ describe('RolesListComponent', () => {
         MockComponent({ selector: 'app-authorized',
                         inputs: ['allOf'],
                         template: '<ng-content></ng-content>' }),
+        MockComponent({ selector: 'app-delete-object-modal',
+                        inputs: ['visible', 'objectNoun', 'objectName'],
+                        outputs: ['close', 'deleteClicked']}),
         MockComponent({ selector: 'chef-loading-spinner' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-heading' }),
@@ -30,6 +33,8 @@ describe('RolesListComponent', () => {
         MockComponent({ selector: 'chef-table-header-cell' }),
         MockComponent({ selector: 'chef-table-header' }),
         MockComponent({ selector: 'chef-table-row' }),
+        MockComponent({ selector: 'chef-option' }),
+        MockComponent({ selector: 'chef-control-menu' }),
         MockComponent({ selector: 'a', inputs: ['routerLink']}),
         RolesListComponent
       ],

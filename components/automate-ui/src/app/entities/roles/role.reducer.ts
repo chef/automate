@@ -8,13 +8,15 @@ import { Role } from './role.model';
 export interface RoleEntityState extends EntityState<Role> {
   getAllStatus: EntityStatus;
   getStatus: EntityStatus;
+  deleteStatus: EntityStatus;
 }
 
 export const roleEntityAdapter: EntityAdapter<Role> = createEntityAdapter<Role>();
 
 export const RoleEntityInitialState: RoleEntityState = roleEntityAdapter.getInitialState({
   getAllStatus: EntityStatus.notLoaded,
-  getStatus: EntityStatus.notLoaded
+  getStatus: EntityStatus.notLoaded,
+  deleteStatus: EntityStatus.notLoaded
 });
 
 export function roleEntityReducer(state: RoleEntityState = RoleEntityInitialState,
@@ -23,6 +25,7 @@ export function roleEntityReducer(state: RoleEntityState = RoleEntityInitialStat
   switch (action.type) {
     case RoleActionTypes.GET_ALL:
       return set('getAllStatus', EntityStatus.loading, roleEntityAdapter.removeAll(state));
+
     case RoleActionTypes.GET_ALL_SUCCESS:
       return set('getAllStatus', EntityStatus.loadingSuccess,
         roleEntityAdapter.addAll(action.payload.roles, state));
@@ -37,8 +40,18 @@ export function roleEntityReducer(state: RoleEntityState = RoleEntityInitialStat
       return set('getStatus', EntityStatus.loadingSuccess,
         roleEntityAdapter.addOne(action.payload, state));
 
-    case RoleActionTypes.GET_ALL_FAILURE:
+    case RoleActionTypes.GET_FAILURE:
       return set('getStatus', EntityStatus.loadingFailure, state);
+
+    case RoleActionTypes.DELETE:
+      return set('deleteStatus', EntityStatus.loading, state);
+
+    case RoleActionTypes.DELETE_SUCCESS:
+      return set('deleteStatus', EntityStatus.loadingSuccess,
+        roleEntityAdapter.removeOne(action.payload.id, state));
+
+    case RoleActionTypes.DELETE_FAILURE:
+      return set('deleteStatus', EntityStatus.loadingFailure, state);
 
     default:
       return state;
