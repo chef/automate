@@ -398,6 +398,48 @@ func init() {
         ]
       }
     },
+    "/infra_proxy/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
+      "get": {
+        "operationId": "GetCookbook",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Cookbook"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/infra_proxy/version": {
       "get": {
         "operationId": "GetVersion",
@@ -507,6 +549,115 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.Cookbook": {
+      "type": "object",
+      "properties": {
+        "cookbook_name": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "chef_type": {
+          "type": "string"
+        },
+        "frozen": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "json_class": {
+          "type": "string"
+        },
+        "files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookItem"
+          }
+        },
+        "templates": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookItem"
+          }
+        },
+        "attributes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookItem"
+          }
+        },
+        "recipes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookItem"
+          }
+        },
+        "definitions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookItem"
+          }
+        },
+        "libraries": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookItem"
+          }
+        },
+        "providers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookItem"
+          }
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookItem"
+          }
+        },
+        "root_files": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookItem"
+          }
+        },
+        "metadata": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookMeta"
+        },
+        "access": {
+          "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookAccess"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.CookbookAccess": {
+      "type": "object",
+      "properties": {
+        "read": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "create": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "grant": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "update": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "delete": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.CookbookAllVersion": {
       "type": "object",
       "properties": {
@@ -521,6 +672,52 @@ func init() {
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.CookbookItem": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "checksum": {
+          "type": "string"
+        },
+        "specificity": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.CookbookMeta": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "long_description": {
+          "type": "string"
+        },
+        "maintainer": {
+          "type": "string"
+        },
+        "maintainer_email": {
+          "type": "string"
+        },
+        "license": {
+          "type": "string"
         }
       }
     },

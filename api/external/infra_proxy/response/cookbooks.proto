@@ -7,6 +7,52 @@ message Cookbooks {
     repeated CookbookVersion cookbooks = 1;
 }
 
+message Cookbook {
+    string cookbook_name = 1;
+    string name          = 2;
+    string version       = 3;
+    string chef_type     = 4;
+    bool frozen          = 5;
+    string json_class    = 6;
+    repeated CookbookItem  files       = 7;
+    repeated CookbookItem  templates   = 8;
+    repeated CookbookItem  attributes  = 9;
+    repeated CookbookItem  recipes     = 10;
+    repeated CookbookItem  definitions = 11;
+    repeated CookbookItem  libraries   = 12;
+    repeated CookbookItem  providers   = 13;
+    repeated CookbookItem  resources   = 14;
+    repeated CookbookItem  root_files  = 15;
+    CookbookMeta  metadata = 16;
+    CookbookAccess  access = 17;
+}
+
+message CookbookItem {
+	string url         = 1;  
+	string path        = 2;    
+	string name        = 3;   
+	string checksum    = 4;   
+	string specificity = 5;
+}
+
+message CookbookMeta  {
+	string name             = 1;         
+	string version          = 2;       
+	string description      = 3;    
+	string long_description = 4;
+	string maintainer       = 5;
+	string maintainer_email = 6; 
+	string license          = 7;
+}
+
+message CookbookAccess {
+	bool read   = 1; 
+	bool create = 2;
+	bool grant  = 3;
+	bool update = 4;
+	bool delete = 5;
+}
+
 message CookbooksAvailableVersions {
     repeated CookbookAllVersion cookbooks = 1;
 }
@@ -14,11 +60,6 @@ message CookbooksAvailableVersions {
 message CookbookVersion {
     string name = 1;
     string version  = 2;
-}
-
-message Cookbook {
-    string name = 1;
-    string version = 2;
 }
 
 message CookbookAllVersion {

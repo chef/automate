@@ -27,9 +27,9 @@ func (c *ChefClient) GetCookbooksAvailableVersions(numVersions string) (chef.Coo
 	return cookList, nil
 }
 
-// GetCookbook get cookbooks list
-func (c *ChefClient) GetCookbook(name string, version string) (chef.CookbookVersion, error) {
-	cookbook, err := c.client.Cookbooks.Get(name)
+// GetCookbook get cookbook from name and version
+func (c *ChefClient) GetCookbook(name string, version string) (chef.Cookbook, error) {
+	cookbook, err := c.client.Cookbooks.GetVersion(name, version)
 	if err != nil {
 		return cookbook, status.Error(codes.InvalidArgument, err.Error())
 	}

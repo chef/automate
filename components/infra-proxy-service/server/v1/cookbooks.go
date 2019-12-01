@@ -25,7 +25,7 @@ func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*res
 
 	cookbookList, err := client.GetCookbooks()
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
 	return &response.Cookbooks{
@@ -49,7 +49,7 @@ func (s *Server) GetCookbooksAvailableVersions(ctx context.Context, req *request
 
 	cookbookList, err := client.GetCookbooksAvailableVersions(numVersions)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
 	return &response.CookbooksAvailableVersions{
@@ -57,20 +57,85 @@ func (s *Server) GetCookbooksAvailableVersions(ctx context.Context, req *request
 	}, nil
 }
 
-// GetCookbook get cookbooks list
+// GetCookbook get cookbook detail
 func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*response.Cookbook, error) {
 
-	// client, err := s.createClient(ctx, req)
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
-	// }
+	client, err := s.createClient(ctx, req.OrgId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+	}
 
-	// cookbook, err := client.GetCookbook("learn_chef_apache2", "latest")
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
-	// }
+	if req.Name == "" {
+		s.service.Logger.Debug("Cookbook Fetch: missing cookbook name")
+		return nil, status.Error(codes.InvalidArgument, "must supply cookbook name")
+	}
 
-	return nil, nil
+	version := req.Version
+
+	if version == "" {
+		version = "_latest"
+	}
+
+	cookbook, err := client.GetCookbook(req.Name, version)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	return &response.Cookbook{
+		CookbookName: cookbook.CookbookName,
+		Name:         cookbook.Name,
+		Version:      cookbook.Version,
+		ChefType:     cookbook.ChefType,
+		Frozen:       cookbook.Frozen,
+		JsonClass:    cookbook.JsonClass,
+		Files:        parseCookbookItems(cookbook.Files),
+		Templates:    parseCookbookItems(cookbook.Templates),
+		Attributes:   parseCookbookItems(cookbook.Attributes),
+		Recipes:      parseCookbookItems(cookbook.Recipes),
+		Definitions:  parseCookbookItems(cookbook.Definitions),
+		Libraries:    parseCookbookItems(cookbook.Libraries),
+		Providers:    parseCookbookItems(cookbook.Providers),
+		Resources:    parseCookbookItems(cookbook.Resources),
+		RootFiles:    parseCookbookItems(cookbook.RootFiles),
+		Metadata:     parseCookbookMetadata(cookbook.Metadata),
+		Access:       parseCookbookAccess(cookbook.Access),
+	}, nil
+}
+
+func parseCookbookItems(items []chef.CookbookItem) []*response.CookbookItem {
+	cl := make([]*response.CookbookItem, len(items))
+	for i, c := range items {
+		cl[i] = &response.CookbookItem{
+			Url:         c.Url,
+			Path:        c.Path,
+			Specificity: c.Specificity,
+			Name:        c.Name,
+			Checksum:    c.Checksum,
+		}
+	}
+	return cl
+}
+
+func parseCookbookMetadata(md chef.CookbookMeta) *response.CookbookMeta {
+	return &response.CookbookMeta{
+		Name:            md.Name,
+		Version:         md.Version,
+		Description:     md.Description,
+		LongDescription: md.LongDescription,
+		Maintainer:      md.Maintainer,
+		MaintainerEmail: md.MaintainerEmail,
+		License:         md.License,
+	}
+}
+
+func parseCookbookAccess(cc chef.CookbookAccess) *response.CookbookAccess {
+	return &response.CookbookAccess{
+		Read:   cc.Read,
+		Create: cc.Create,
+		Grant:  cc.Grant,
+		Update: cc.Grant,
+		Delete: cc.Delete,
+	}
 }
 
 // fromAPIToListCookbooks a response.Cookbooks from a struct of CookbookListResult
@@ -137,7 +202,7 @@ func (s *Server) createClient(ctx context.Context, orgID string) (*proxy.ChefCli
 
 	ServerID, err := uuid.FromString(org.ServerId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid server: %s", err.Error())
 	}
 
 	server, err := s.service.Storage.GetServer(ctx, ServerID)
