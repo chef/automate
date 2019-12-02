@@ -74,6 +74,8 @@ type Client interface {
 	JobCancel(context.Context, string) error
 
 	UpdateProjectTags(context.Context, map[string]*iam_v2.ProjectRules) ([]string, error)
+	// @param (context, projectTagToDelete)
+	DeleteProjectTag(context.Context, string) ([]string, error)
 
 	// Migration contracts
 	ReindexInsightstoConvergeHistory(context.Context, string, string) error

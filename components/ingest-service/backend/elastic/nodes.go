@@ -88,6 +88,30 @@ func (es *Backend) DeleteNodeByID(ctx context.Context, nodeID string) (int, erro
 	return es.deleteNodeByDocID(ctx, docIDs)
 }
 
+func (es *Backend) DeleteNodeProjectTag(ctx context.Context, projectTagToBeDelete string) (string, error) {
+	script := `
+		if (ctx._source['projects'] != null) {
+			ctx._source.projects.remove(params.project);
+		}
+	`
+
+	params := map[string]interface{}{"project": projectTagToBeDelete}
+
+	startTaskResult, err := elastic.NewUpdateByQueryService(es.client).
+		Index(mappings.NodeState.Alias).
+		Type(mappings.NodeState.Type).
+		Script(elastic.NewScript(script).Params(params)).
+		WaitForCompletion(false).
+		ProceedOnVersionConflict().
+		DoAsync(ctx)
+
+	if err != nil {
+		return "", err
+	}
+
+	return startTaskResult.TaskId, nil
+}
+
 // UpdateNodeProjectTags - update project tagging with all the rules
 //
 // All the conditions must be true for a rule to be true (ANDed together).
