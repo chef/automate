@@ -642,7 +642,10 @@ steps:
         linux:
           single-use: true
           privileged: true
-
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
   - label: "ontop backup "
     command:
       - integration/run_test integration/tests/backup_ontop.sh

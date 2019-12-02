@@ -36,6 +36,31 @@ do_create_config() {
 EOF
 }
 
+do_deploy() {
+    #shellcheck disable=SC2154
+    chef-automate deploy config.toml \
+        --product automate \
+        --product builder \
+        --hartifacts "$test_hartifacts_path" \
+        --override-origin "$HAB_ORIGIN" \
+        --manifest-dir "$test_manifest_path" \
+        --admin-password chefautomate \
+        --accept-terms-and-mlsa
+
+    log_info "applying dev license"
+    chef-automate license apply "$A2_LICENSE"
+}
+
+
+do_test_deploy() {
+    #shellcheck disable=SC2154
+    #shellcheck source=integration/helpers/bldr_tests.sh
+    source "${source_dir}/helpers/bldr_tests.sh"
+
+    do_test_deploy_default
+    bldr_smoke_test
+}
+
 do_prepare_restore() {
     do_prepare_restore_default
 
@@ -62,4 +87,18 @@ do_test_restore() {
     do_test_restore_default || return 1
     delete_backup_and_assert_idempotent
     verify_packages
+
+    hab pkg install core/hab
+    artifacts_dir=$(mktemp -d --suffix="bldr_smoke")
+    # TODO(jaym): remove when we upgrade hab to a version
+    # that supports hab pkg download
+    SSL_CERT_FILE="/hab/svc/automate-load-balancer/data/$CONTAINER_HOSTNAME.cert" \
+        hab pkg exec core/hab \
+        hab pkg download \
+        -u "https://$CONTAINER_HOSTNAME/bldr/v1" \
+        -c "unstable" \
+        --download-directory "$artifacts_dir" \
+        "${TEST_ORIGIN}/${TEST_PKG}"
+
+    rm -r "$artifacts_dir"
 }
