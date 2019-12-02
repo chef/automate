@@ -206,7 +206,7 @@
           "tags": {
             "scoop": "icecream"
           },
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -230,7 +230,7 @@
           "tags": {
             "Scoops": "ices gelato"
           },
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -254,7 +254,7 @@
           "tags": {
             "scoop": "italian gelato"
           },
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -276,7 +276,7 @@
           },
           "refs": [],
           "tags": {},
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -298,7 +298,7 @@
           },
           "refs": [],
           "tags": {},
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -320,7 +320,7 @@
           },
           "refs": [],
           "tags": {},
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -342,7 +342,7 @@
           },
           "refs": [],
           "tags": {},
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -364,7 +364,7 @@
           },
           "refs": [],
           "tags": {},
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -386,7 +386,7 @@
           },
           "refs": [],
           "tags": {},
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -408,7 +408,7 @@
           },
           "refs": [],
           "tags": {},
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -430,7 +430,7 @@
           },
           "refs": [],
           "tags": {},
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -452,7 +452,7 @@
           },
           "refs": [],
           "tags": {},
-          "waiver_data": null,
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
