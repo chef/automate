@@ -34,8 +34,12 @@ func TestIngestSingleService(t *testing.T) {
 			withApplication("test-app"),
 			withEnvironment("development"),
 			withFqdn("db.example.com"),
-			withHealth(HealthCheckIntToString(0)), // -> OK
+			withHealth(HealthCheckIntToString(2)), // -> Critical
 			withSite("us"),
+			withStdout("healthcheck output"),
+			withStderr("healthcheck error"),
+			// any exit status other than 0, 1, or 3 corresponds to critical status
+			withExitStatus(23),
 		)
 	)
 
@@ -61,7 +65,7 @@ func TestIngestSingleService(t *testing.T) {
 		"the service version is not the expected one")
 	assert.Equal(t, "20200101121212", svcList[0].Release,
 		"the service release is not the expected one")
-	assert.Equal(t, "OK", svcList[0].Health,
+	assert.Equal(t, "CRITICAL", svcList[0].Health,
 		"the service health is not the expected one")
 	assert.Equal(t, "db.default", svcList[0].Group,
 		"the service service group name is not the expected one")
@@ -79,6 +83,9 @@ func TestIngestSingleService(t *testing.T) {
 		"the service site name is not the expected one")
 	assert.Equal(t, "NONE", svcList[0].PreviousHealth,
 		"the previous service health is not the expected one")
+	assert.Equal(t, "healthcheck output", svcList[0].HCStdout)
+	assert.Equal(t, "healthcheck error", svcList[0].HCStderr)
+	assert.Equal(t, int32(23), svcList[0].HCExitStatus)
 
 	assert.Truef(t, svcList[0].LastEventOccurredAt.Before(time.Now()),
 		"the time of the last event should be before the current time")
@@ -346,6 +353,9 @@ func TestIngestSingleServiceInsertAndUpdate(t *testing.T) {
 			"the time of the last event should be after the beginning of the test")
 		assert.Truef(t, svcList[0].HealthUpdatedAt.After(timeBeforeTest),
 			"the time of the last health update should be after the beginning of the test")
+		assert.Equal(t, "", svcList[0].HCStdout)
+		assert.Equal(t, "", svcList[0].HCStderr)
+		assert.Equal(t, int32(0), svcList[0].HCExitStatus)
 
 		// store previous timestamps for next tests
 		previousLastEventOccurredAt = svcList[0].LastEventOccurredAt
@@ -383,6 +393,9 @@ func TestIngestSingleServiceInsertAndUpdate(t *testing.T) {
 			withApplication("db-unstable-test"),
 			withEnvironment("testing"),
 			withFqdn("db.unstable.example.com"),
+			withStdout("healthcheck output"),
+			withStderr("healthcheck error"),
+			withExitStatus(5),
 		)
 
 		bytes, err := proto.Marshal(event)
@@ -423,6 +436,9 @@ func TestIngestSingleServiceInsertAndUpdate(t *testing.T) {
 			"the service site name is not the expected one")
 		assert.Equal(t, "OK", svcList[0].PreviousHealth,
 			"the previous service health is not the expected one")
+		assert.Equal(t, "healthcheck output", svcList[0].HCStdout)
+		assert.Equal(t, "healthcheck error", svcList[0].HCStderr)
+		assert.Equal(t, int32(5), svcList[0].HCExitStatus)
 
 		// Both times should be updated
 		assert.Truef(t, svcList[0].LastEventOccurredAt.After(previousLastEventOccurredAt),

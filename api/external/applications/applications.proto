@@ -228,6 +228,7 @@ message Service {
   bool disconnected = 21;
   google.protobuf.Timestamp last_event_occurred_at = 22;
   string last_event_since = 23;
+  HealthCheckResult health_check_result = 24;
 }
 
 message ServiceGroupsHealthCountsReq {
@@ -308,4 +309,12 @@ enum HealthStatus {
   // TODO @afiune how much effort would be to change
   // the OK enum to be NONE
   NONE = 17;
+}
+
+// HealthCheckResult aggregates the stdout output, stderr output and process
+// exit status of a habitat health check
+message HealthCheckResult {
+  string stdout = 1;
+  string stderr = 2;
+  int32 exit_status = 3;
 }
