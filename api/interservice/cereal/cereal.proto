@@ -10,6 +10,11 @@ message Task {
   string name = 1;
   bytes parameters = 2;
   google.protobuf.Timestamp start_after = 3;
+  TaskMetadata metadata = 4;
+}
+
+message TaskMetadata {
+  google.protobuf.Timestamp enqueued_at = 1;
 }
 
 message WorkflowInstance {
@@ -36,6 +41,7 @@ message WorkflowEvent {
   int64 enqueued_task_count = 2;
   int64 completed_task_count = 3;
   TaskResult task_result = 4;
+  google.protobuf.Timestamp enqueued_at = 5;
 }
 
 message DequeueWorkflowRequest {
