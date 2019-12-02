@@ -13,5 +13,8 @@ declare namespace Cypress {
     cleanupTeamsByDescriptionPrefix(namePrefix: string): void
     waitUntilApplyRulesNotRunning(attempts: number): void
     waitForNodemanagerNode(nodeId: string, maxRetries: number): void
+    waitForClientRunsNode(nodeId: string, maxRetries: number): void
+    waitForComplianceNode(nodeId: string, start: string, end: string,
+      maxRetries: number): void
   }
 }
