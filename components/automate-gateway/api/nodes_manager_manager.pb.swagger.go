@@ -7,10 +7,6 @@ func init() {
     "title": "components/automate-gateway/api/nodes/manager/manager.proto",
     "version": "version not set"
   },
-  "schemes": [
-    "http",
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],

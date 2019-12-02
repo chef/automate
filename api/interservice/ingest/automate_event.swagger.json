@@ -4,10 +4,6 @@
     "title": "api/interservice/ingest/automate_event.proto",
     "version": "version not set"
   },
-  "schemes": [
-    "http",
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],

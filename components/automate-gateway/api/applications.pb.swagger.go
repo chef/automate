@@ -7,10 +7,6 @@ func init() {
     "title": "api/external/applications/applications.proto",
     "version": "version not set"
   },
-  "schemes": [
-    "http",
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],

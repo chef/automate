@@ -7,10 +7,6 @@ func init() {
     "title": "components/automate-gateway/api/auth/users/response/users.proto",
     "version": "version not set"
   },
-  "schemes": [
-    "http",
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],

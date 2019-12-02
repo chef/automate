@@ -7,10 +7,6 @@ func init() {
     "title": "components/automate-gateway/api/iam/v2beta/response/policy.proto",
     "version": "version not set"
   },
-  "schemes": [
-    "http",
-    "https"
-  ],
   "consumes": [
     "application/json"
   ],
