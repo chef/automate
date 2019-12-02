@@ -14,6 +14,7 @@ import (
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/golang/protobuf/ptypes"
+	w "github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/stretchr/testify/assert"
 
 	uuid "github.com/chef/automate/lib/uuid4"
@@ -207,6 +208,48 @@ func withEnvironment(environment string) MessageOverrides {
 	return func(msg *habitat.HealthCheckEvent) error {
 		msg.EventMetadata.Environment = environment
 		return nil
+	}
+}
+
+func withStdout(s string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		unNilHcResults(msg)
+		msg.Stdout = &w.StringValue{Value: s}
+		return nil
+	}
+}
+
+func withStderr(s string) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		unNilHcResults(msg)
+		msg.Stderr = &w.StringValue{Value: s}
+		return nil
+	}
+}
+
+func withExitStatus(s int32) MessageOverrides {
+	return func(msg *habitat.HealthCheckEvent) error {
+		unNilHcResults(msg)
+		msg.ExitStatus = &w.Int32Value{Value: s}
+		return nil
+	}
+}
+
+// unNilHcResults sets all health check result elements that are nil pointers
+// to zero values. This helps us match the behavior of habitat, where services
+// that do not have a health check command will send messages with nil pointers
+// for the health check result elements, but when a command is defined then all
+// of the elements are real--there's no mix and match of nil pointers and real
+// values.
+func unNilHcResults(msg *habitat.HealthCheckEvent) {
+	if msg.Stdout == nil {
+		msg.Stdout = &w.StringValue{Value: ""}
+	}
+	if msg.Stderr == nil {
+		msg.Stderr = &w.StringValue{Value: ""}
+	}
+	if msg.ExitStatus == nil {
+		msg.ExitStatus = &w.Int32Value{Value: 0}
 	}
 }
 
