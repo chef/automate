@@ -38,9 +38,11 @@
                   <chef-table-cell></chef-table-cell>
                   <chef-table-cell>{{ role.type | iamType }}</chef-table-cell>
                   <chef-table-cell class="three-dot-column">
+                    <!-- <app-authorized [allOf]="[`/iam/v2beta/roles/{id}`, 'delete', role.id]"> -->
                     <chef-control-menu *ngIf="(role.type | iamType).toLowerCase() === 'custom'">
                       <chef-option data-cy="delete" (click)="startRoleDelete(role)">Delete Role</chef-option>
                     </chef-control-menu>
+                    <!-- </app-authorized> -->
                   </chef-table-cell>
               </chef-table-row>
             </chef-table-body>

@@ -30,12 +30,8 @@
             {{ user.id }}
           </chef-table-cell>
           <chef-table-cell class="three-dot-column">
-            <!-- TODO (tc) We do not yet have a way of checking permissions on a specific object.
-            Also the shape of the team membership API isn't restful so we'll have to figure
-            out something else here anyway -->
-            <!-- <app-authorized
-              [allOf]="generateDeletePermissionsPath(user)"
-              [overrideVisible]="overridePermissionsCheck"> -->
+            <!-- TODO: Need to account for v1 / v2 in the app-authorized path -->
+            <!-- <app-authorized [allOf]="['/iam/v2beta/users/{id}', 'delete', user.id]"> -->
             <chef-control-menu>
               <chef-option data-cy="delete" (click)="removeClicked.emit(user)">{{ removeText }}</chef-option>
             </chef-control-menu>

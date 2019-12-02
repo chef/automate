@@ -71,8 +71,12 @@
                   <chef-option (click)="notifyCopy()" data-cy="copy-token">
                     <chef-clipboard plain value={{token.value}} label="Copy Token" icon=""></chef-clipboard>
                   </chef-option>
+                  <!-- <app-authorized [allOf]="[`/iam/v2beta/tokens/{id}`, 'put', token.id]"> -->
                   <chef-option (click)="toggleActive(token)">Toggle Status</chef-option>
+                  <!-- </app-authorized> -->
+                  <!-- <app-authorized [allOf]="[`/iam/v2beta/tokens/{id}`, 'delete', token.id]"> -->
                   <chef-option (click)="startTokenDelete(token)" data-cy="delete">Delete Token</chef-option>
+                  <!-- </app-authorized> -->
                 </chef-control-menu>
              </chef-table-cell>
             </chef-table-row>
