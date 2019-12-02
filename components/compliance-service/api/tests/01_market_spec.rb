@@ -179,17 +179,6 @@ describe File.basename(__FILE__) do
     assert_equal("windows", patch_baseline['supports'][0]['os_family'])
   end
 
-  it "retuns an error with both name and filters" do
-    assert_grpc_error(/some error message/) do
-      GRPC profiles, :list, Profiles::Query.new(
-        name: "windows-baseline",
-        filters: [
-          Profiles::ListFilter.new(type: 'version', values: ['1.1.0'])
-        ]
-      )
-    end
-  end
-
   it "limits list results when per_page parameter is present" do
     actual_data = GRPC profiles, :list, Profiles::Query.new(
       page: 0,
