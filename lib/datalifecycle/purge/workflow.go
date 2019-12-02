@@ -2,14 +2,22 @@ package purge
 
 import (
 	"context"
+	"time"
 
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 	"github.com/teambition/rrule-go"
 
 	es "github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/lib/cereal"
 )
 
+// There's no reason a purge should take longer than 10 mins to start
+// Even if it does, we'll try again later
+const failPurgeIfExecutedAfter = 10 * time.Minute
+
+var errEnqueuedAtZero = errors.New("EnqueuedAt is zero")
+var errExpired = errors.New("Purge did not start in time")
 var taskName = cereal.NewTaskName("purge")
 
 // ConfigureManager registers the purge workflow executor and task
@@ -116,7 +124,38 @@ func WithTaskEsSidecarClient(client es.EsSidecarClient) TaskOpt {
 
 type Workflow struct{}
 
-func (s *Workflow) OnStart(w cereal.WorkflowInstance, _ cereal.StartEvent) cereal.Decision {
+// There was a bug in a release of automate where purge workflows
+// would be queued up, but would not run because nothing was listening for
+// them. When we fixed this, people were confused by why automate was
+// deleting data. More confusingly, the policy that would be used was the
+// old one and not the current one as a workflow had been queued but not
+// executed. We don't want these to run, so if each step of the purge does
+// not happen within failPurgeIfExecutedAfter mins of when it was requested
+// to happen, we fail.
+func guardRun(enqueuedAt time.Time) error {
+	if enqueuedAt.IsZero() {
+		logrus.Errorf("Not purging because EnqueuedAt is zero. Will try again later")
+		return errEnqueuedAtZero
+	}
+	now := time.Now()
+	elapsed := now.Sub(enqueuedAt)
+	logctx := logrus.WithFields(logrus.Fields{
+		"enqueuedAt": enqueuedAt,
+		"now":        now,
+		"elapsed":    elapsed,
+	})
+	if elapsed > failPurgeIfExecutedAfter {
+		logctx.Error("Not purging because task did not execute in time. Will try again later")
+		return errExpired
+	}
+	return nil
+}
+
+func (s *Workflow) OnStart(w cereal.WorkflowInstance, ev cereal.StartEvent) cereal.Decision {
+	if err := guardRun(ev.EnqueuedAt); err != nil {
+		return w.Fail(err)
+	}
+
 	policies := Policies{}
 	err := w.GetParameters(&policies)
 	if err != nil {
@@ -145,6 +184,10 @@ type Task struct {
 }
 
 func (t *Task) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
+	if err := guardRun(task.GetMetadata().EnqueuedAt); err != nil {
+		return nil, err
+	}
+
 	policies := Policies{}
 	err := task.GetParameters(&policies)
 	if err != nil {
