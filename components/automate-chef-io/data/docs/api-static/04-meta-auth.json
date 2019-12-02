@@ -1,0 +1,10 @@
+{
+  "securityDefinitions": {
+    "APIToken": {
+      "description": "The Automate API can most easily be authenticated using an API Token.",
+      "type": "apiKey",
+      "name": "api-token",
+      "in": "header"
+    }
+  }
+}

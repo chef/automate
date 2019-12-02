@@ -3,12 +3,46 @@ info:
     # Authentication
     The standard way of authenticating for the Automate API is to generate an
     API token and pass that with your API requests with the `api-token` header.
-    An example request using curl looks like this:
+
+    An administrative token can be created and set to a variable using the following CLI helper:
+
+    ```
+    export TOKEN=`chef-automate admin-token`
+    ```
+
+    With an administrative token you can access the entire Chef Automate API – including administrative 
+    tasks such as managing local users and managing local teams and managing authorization policies.
+    Using the token above, an example request using curl looks like this:
 
     ```
     curl -s -H "api-token: $TOKEN" https://automate.example.com/api/v0/auth/policies -v
     ```
+    
+    With the administrative token, it is possible to create standard tokens with more limited permissions.
+    The following curl returns a new token object whose value can be set to a new variable:
+
+    ```
+    curl -s -H "api-token: $TOKEN" -d '{"description":"New Token"}' https://automate.example.com/api/v0/auth/tokens
+    {
+      "id": "9d7ae605-5b6a-4850-a12f-b5cb7fa732f5",
+      "description": "New Token",
+      "value": "bww8EEpr39_eYMnQ2zybtrP9uzk=",
+      "active": false,
+      "created": "2019-12-03T00:15:10Z",
+      "updated": "2019-12-03T00:15:10Z"
+    }
+
+    export TOKEN2=bww8EEpr39_eYMnQ2zybtrP9uzk=
+    ```
+
+    You can grant a standard token access to specific parts of the Chef Automate API 
+    if you write a policy. 
+    The [Permission for An API Client](https://automate.chef.io/docs/authorization-overview/#permission-for-an-api-client)
+    section of the Automate documentation walks through how to grant a token access to all Compliance API endpoints.
 
     For more information about authentication, refer to the
     [API Tokens](https://automate.chef.io/docs/api-tokens/)
+    section of the Automate documentation. 
+    For more information about authorization, refer to the 
+    [Authorization Overview](https://automate.chef.io/docs/authorization-overview/#overview) 
     section of the Automate documentation.
