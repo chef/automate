@@ -5,7 +5,7 @@
 # we don't need to depend on ALSA or FreeType, which have non-comaptible licenses.
 
 pkg_origin=chef
-pkg_maintainer="The Habitat Maintainers <humans@habitat.sh>"
+pkg_maintainer="Chef Software Inc. <support@chef.io>"
 pkg_name=automate-openjdk
 # Release archive https://jdk.java.net/archive/
 pkg_version=11.0.2
