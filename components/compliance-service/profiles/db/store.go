@@ -7,7 +7,9 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
+	"github.com/Masterminds/squirrel"
 	"github.com/blang/semver"
 	"github.com/lib/pq"
 	"github.com/sirupsen/logrus"
@@ -17,6 +19,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/profiles/market"
+	"github.com/chef/automate/lib/pgutils"
 )
 
 type Store struct {
@@ -376,89 +379,108 @@ func (s *Store) Delete(namespace string, name string, version string) error {
 	return nil
 }
 
-func (s *Store) parseList(rows *sql.Rows) ([]inspec.Metadata, error) {
+func (s *Store) parseList(rows *sql.Rows) ([]inspec.Metadata, int, error) {
 	logrus.Debug("Parse profile list from database")
 	entries := make([]inspec.Metadata, 0)
 	var (
 		sha256       string
 		metadataBlob []byte
+		total        int
 	)
 	for rows.Next() {
 		logrus.Debug("iterate over row")
-		err := rows.Scan(&sha256, &metadataBlob)
+		err := rows.Scan(&sha256, &metadataBlob, &total)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		logrus.Debug("parse metadata")
 		metadata := inspec.Metadata{}
 		err = metadata.ParseJSON(metadataBlob)
 		if err != nil {
-			return nil, err
+			return nil, 0, err
 		}
 		metadata.Sha256 = sha256
 		entries = append(entries, metadata)
 	}
 	err := rows.Err()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
-	return entries, nil
+	return entries, total, nil
 }
 
-func (s *Store) ListProfilesMetadata(namespace string, name string, sort string, order string) ([]inspec.Metadata, error) {
-	if order != "ASC" && order != "DESC" {
-		return nil, status.Errorf(codes.InvalidArgument, "order field '%s' is invalid. Use either 'ASC' or 'DESC'", order)
+type ProfilesListRequest struct {
+	Filters   map[string][]string
+	Name      string
+	Namespace string
+	Order     string
+	Page      int
+	PerPage   int
+	Sort      string
+}
+
+func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata, int, error) {
+	if req.Order != "ASC" && req.Order != "DESC" {
+		return nil, 0, status.Errorf(codes.InvalidArgument, "order field '%s' is invalid. Use either 'ASC' or 'DESC'", req.Order)
 	}
 
-	if sort != "name" && sort != "title" && sort != "maintainer" {
-		return nil, status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name', 'title' or 'maintainer'", sort)
+	if req.Sort != "name" && req.Sort != "title" && req.Sort != "maintainer" {
+		return nil, 0, status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name', 'title' or 'maintainer'", req.Sort)
 	}
 
-	var rows *sql.Rows
-	var err error
+	sql := squirrel.
+		Select("sha256, info, count(*) OVER() AS total").
+		From("store_profiles")
 
-	switch {
-	case len(namespace) == 0 && len(name) == 0:
-		query := fmt.Sprintf(`
-			SELECT sha256, info
-			FROM store_profiles WHERE sha256 IN
-			(SELECT sha256 FROM store_market)
-			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, sort, order)
-
-		rows, err = s.DB.Query(query)
-	case len(namespace) == 0:
-		query := fmt.Sprintf(`
-			SELECT sha256, info
-			FROM store_profiles WHERE sha256 IN
-			(SELECT sha256 FROM store_market)
-			AND info->>'name' = $1
-			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, sort, order)
-
-		rows, err = s.DB.Query(query, name)
-	case len(name) == 0:
-		query := fmt.Sprintf(`
-			SELECT sha256, info
-			FROM store_profiles WHERE
-			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
-			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, sort, order)
-
-		rows, err = s.DB.Query(query, namespace)
-	default:
-		query := fmt.Sprintf(`
-			SELECT sha256, info
-			FROM store_profiles WHERE
-			sha256 IN (SELECT sha256 FROM store_namespace WHERE owner=$1)
-			AND info->>'name' = $2
-			ORDER BY store_profiles.info #>> '{%s}' %s, store_profiles.info #>> '{version}' DESC;
-		`, sort, order)
-
-		rows, err = s.DB.Query(query, namespace, name)
+	if len(req.Namespace) == 0 {
+		sql = sql.
+			Where("exists(select 1 from store_market where store_profiles.sha256 = store_market.sha256)")
+	} else {
+		sql = sql.
+			Where("exists(select 1 from store_namespace where store_profiles.sha256 = store_namespace.sha256 and store_namespace.owner = ?)", req.Namespace)
 	}
+
+	if len(req.Name) != 0 {
+		sql = sql.Where("info->>'name' = ?", req.Name)
+	}
+
+	for key, values := range req.Filters {
+		terms := squirrel.Or{}
+		for _, value := range values {
+			field := fmt.Sprintf("info->>'%s'", key)
+			v := pgutils.EscapeLiteralForPGPatternMatch(value)
+			v = strings.ReplaceAll(v, "*", "%")
+			terms = append(terms, squirrel.Like{field: v})
+		}
+		sql = sql.Where(terms)
+	}
+
+	// For backwards compatibility, pagination needs to be optional. Including a value for PerPage is how a caller can opt-in to pagination.
+	if req.PerPage > 0 {
+		perPage := uint64(req.PerPage)
+		page := uint64(req.Page)
+
+		sql = sql.
+			Limit(perPage).
+			Offset(perPage * page)
+	}
+
+	sql = sql.OrderBy(fmt.Sprintf("info->>'%s' %s", req.Sort, req.Order), "info->>'version' DESC")
+
+	query, args, err := sql.PlaceholderFormat(squirrel.Dollar).ToSql()
 	if err != nil {
-		return nil, err
+		return nil, 0, err
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"query": query,
+		"args":  args,
+		"err":   err,
+	}).Debugf("Querying profiles")
+
+	rows, err := s.DB.Query(query, args...)
+	if err != nil {
+		return nil, 0, err
 	}
 	defer rows.Close() // nolint: errcheck
 

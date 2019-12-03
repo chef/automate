@@ -141,7 +141,6 @@ func ConvertInspecMetadatasToProfiles(inspecMetadata []inspec.Metadata, owner st
 	for _, metadata := range inspecMetadata {
 		profs.Profiles = append(profs.Profiles, InspectMetadataToProfile(metadata, owner))
 	}
-	profs.Total = int32(len(profs.Profiles))
 	return profs
 }
 

@@ -6,6 +6,15 @@ describe File.basename(__FILE__) do
 
   def profiles ; Profiles::ProfilesService ; end
 
+  it "errors out when an invalid order field is specified" do
+    assert_grpc_error(/order field '1337' is invalid. Use either 'ASC' or 'DESC'/) do
+      GRPC profiles, :list, Profiles::Query.new(
+        sort: 'name',
+        order: 1337
+      )
+    end
+  end
+
   it "errors out when an invalid sort field is specified" do
     assert_grpc_error(/sort field 'bogus' is invalid. Use either 'name', 'title' or 'maintainer'/, 3) do
       GRPC profiles, :list, Profiles::Query.new(
@@ -168,5 +177,224 @@ describe File.basename(__FILE__) do
       "cis-minimum-password-age-1.1.3",
       "cis-minimum-password-length-1.1.4"], control_ids.slice(0,10))
     assert_equal("windows", patch_baseline['supports'][0]['os_family'])
+  end
+
+  it "limits list results when per_page parameter is present" do
+    actual_data = GRPC profiles, :list, Profiles::Query.new(
+      page: 0,
+      per_page: 1
+    )
+    expected_data = {
+      "profiles": [
+        {
+          "name": "linux-patch-baseline",
+          "title": "DevSec Linux Patch Benchmark",
+          "maintainer": "Christoph Hartmann",
+          "copyright": "Christoph Hartmann",
+          "copyrightEmail": "chris@lollyrock.com",
+          "license": "MPLv2",
+          "summary": "Verifies that all patches have been applied",
+          "version": "0.3.0",
+          "supports"=>[{}],
+          "sha256": "c774e15f448a22f37fc798d36c0fdb9a8bdbb4c45ba86025c2833ed3ba6b0324"
+        }
+      ],
+      "total": 2
+    }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
+  it "limits list results when requesting a higher page number" do
+    actual_data = GRPC profiles, :list, Profiles::Query.new(
+      page: 1,
+      per_page: 1
+    )
+    expected_data = {
+      "profiles": [
+        {
+          "name": "windows-baseline",
+          "title": "DevSec Windows Security Baseline",
+          "maintainer": "DevSec Hardening Framework Team",
+          "copyright": "DevSec Hardening Framework Team",
+          "copyrightEmail": "hello@dev-sec.io",
+          "license": "Apache 2 license",
+          "summary": "Baselin for best-preactice Windows OS hardening",
+          "version": "1.1.0",
+          "supports"=>[{}],
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
+        },
+      ],
+      "total": 2
+    }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
+  it "does exact string matches on filters" do
+    actual_data = GRPC profiles, :list, Profiles::Query.new(
+      filters: [
+        Profiles::ListFilter.new(type: 'name', values: ['windows-baseline'])
+      ]
+    )
+    expected_data = {
+      "profiles": [
+        {
+          "name": "windows-baseline",
+          "title": "DevSec Windows Security Baseline",
+          "maintainer": "DevSec Hardening Framework Team",
+          "copyright": "DevSec Hardening Framework Team",
+          "copyrightEmail": "hello@dev-sec.io",
+          "license": "Apache 2 license",
+          "summary": "Baselin for best-preactice Windows OS hardening",
+          "version": "1.1.0",
+          "supports"=>[{}],
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
+        },
+      ],
+      "total": 1
+    }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
+  it "does prefix string matches on filters" do
+    actual_data = GRPC profiles, :list, Profiles::Query.new(
+      filters: [
+        Profiles::ListFilter.new(type: 'name', values: ['windows-*'])
+      ]
+    )
+    expected_data = {
+      "profiles": [
+        {
+          "name": "windows-baseline",
+          "title": "DevSec Windows Security Baseline",
+          "maintainer": "DevSec Hardening Framework Team",
+          "copyright": "DevSec Hardening Framework Team",
+          "copyrightEmail": "hello@dev-sec.io",
+          "license": "Apache 2 license",
+          "summary": "Baselin for best-preactice Windows OS hardening",
+          "version": "1.1.0",
+          "supports"=>[{}],
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
+        },
+      ],
+      "total": 1
+    }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
+  it "does suffix string matches on filters" do
+    actual_data = GRPC profiles, :list, Profiles::Query.new(
+      filters: [
+        Profiles::ListFilter.new(type: 'version', values: ['*.1.0'])
+      ]
+    )
+    expected_data = {
+      "profiles": [
+        {
+          "name": "windows-baseline",
+          "title": "DevSec Windows Security Baseline",
+          "maintainer": "DevSec Hardening Framework Team",
+          "copyright": "DevSec Hardening Framework Team",
+          "copyrightEmail": "hello@dev-sec.io",
+          "license": "Apache 2 license",
+          "summary": "Baselin for best-preactice Windows OS hardening",
+          "version": "1.1.0",
+          "supports"=>[{}],
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
+        },
+      ],
+      "total": 1
+    }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
+  it "does substring string matches on filters" do
+    actual_data = GRPC profiles, :list, Profiles::Query.new(
+      filters: [
+        Profiles::ListFilter.new(type: 'title', values: ['*Windows*'])
+      ]
+    )
+    expected_data = {
+      "profiles": [
+        {
+          "name": "windows-baseline",
+          "title": "DevSec Windows Security Baseline",
+          "maintainer": "DevSec Hardening Framework Team",
+          "copyright": "DevSec Hardening Framework Team",
+          "copyrightEmail": "hello@dev-sec.io",
+          "license": "Apache 2 license",
+          "summary": "Baselin for best-preactice Windows OS hardening",
+          "version": "1.1.0",
+          "supports"=>[{}],
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
+        },
+      ],
+      "total": 1
+    }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
+  it "combines multiple values for the same filter properly" do
+    actual_data = GRPC profiles, :list, Profiles::Query.new(
+      filters: [
+        Profiles::ListFilter.new(type: 'title', values: ['*Windows*', '*Linux*'])
+      ]
+    )
+    expected_data = {
+      "profiles": [
+        {
+          "name": "linux-patch-baseline",
+          "title": "DevSec Linux Patch Benchmark",
+          "maintainer": "Christoph Hartmann",
+          "copyright": "Christoph Hartmann",
+          "copyrightEmail": "chris@lollyrock.com",
+          "license": "MPLv2",
+          "summary": "Verifies that all patches have been applied",
+          "version": "0.3.0",
+          "supports"=>[{}],
+          "sha256": "c774e15f448a22f37fc798d36c0fdb9a8bdbb4c45ba86025c2833ed3ba6b0324"
+        },
+        {
+          "name": "windows-baseline",
+          "title": "DevSec Windows Security Baseline",
+          "maintainer": "DevSec Hardening Framework Team",
+          "copyright": "DevSec Hardening Framework Team",
+          "copyrightEmail": "hello@dev-sec.io",
+          "license": "Apache 2 license",
+          "summary": "Baselin for best-preactice Windows OS hardening",
+          "version": "1.1.0",
+          "supports"=>[{}],
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
+        }
+      ],
+      "total": 2
+    }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
+  it "combines multiple filters properly" do
+    actual_data = GRPC profiles, :list, Profiles::Query.new(
+      filters: [
+        Profiles::ListFilter.new(type: 'title', values: ['*Windows*', '*Linux*']),
+        Profiles::ListFilter.new(type: 'name', values: ['*windows*'])
+      ]
+    )
+    expected_data = {
+      "profiles": [
+        {
+          "name": "windows-baseline",
+          "title": "DevSec Windows Security Baseline",
+          "maintainer": "DevSec Hardening Framework Team",
+          "copyright": "DevSec Hardening Framework Team",
+          "copyrightEmail": "hello@dev-sec.io",
+          "license": "Apache 2 license",
+          "summary": "Baselin for best-preactice Windows OS hardening",
+          "version": "1.1.0",
+          "supports"=>[{}],
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
+        }
+      ],
+      "total": 1
+    }
+    assert_equal_json_content(expected_data, actual_data)
   end
 end

@@ -6,6 +6,7 @@ require (
 	github.com/Azure/azure-sdk-for-go v19.1.0+incompatible
 	github.com/Azure/go-autorest v10.15.0+incompatible
 	github.com/BurntSushi/toml v0.3.1
+	github.com/Masterminds/squirrel v1.1.0
 	github.com/Microsoft/go-winio v0.4.14 // indirect
 	github.com/OneOfOne/xxhash v1.2.5 // indirect
 	github.com/alexedwards/scs v1.4.1

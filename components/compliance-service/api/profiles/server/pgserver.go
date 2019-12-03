@@ -289,20 +289,37 @@ func (srv *PGProfileServer) List(ctx context.Context, in *profiles.Query) (*prof
 		sortField = "title"
 	}
 
+	filters := make(map[string][]string)
+	for _, filter := range in.Filters {
+		filters[filter.Type] = filter.Values
+	}
+
 	logrus.WithFields(logrus.Fields{
-		"sortOrder": sortOrder,
-		"sortField": sortField,
-		"namespace": in.Owner,
+		"filters":   filters,
 		"name":      in.Name,
+		"namespace": in.Owner,
+		"page":      in.Page,
+		"per_page":  in.PerPage,
+		"sortField": sortField,
+		"sortOrder": sortOrder,
 	}).Infof("Listing profiles")
 
-	metadata, err := srv.store.ListProfilesMetadata(in.Owner, in.Name, sortField, sortOrder)
+	metadata, total, err := srv.store.ListProfilesMetadata(dbstore.ProfilesListRequest{
+		Filters:   filters,
+		Name:      in.Name,
+		Namespace: in.Owner,
+		Order:     sortOrder,
+		Page:      int(in.Page),
+		PerPage:   int(in.PerPage),
+		Sort:      sortField,
+	})
 	if err != nil {
 		return nil, err
 	}
 
 	// convert metadata to profile
 	profiles := conversion.ConvertInspecMetadatasToProfiles(metadata, in.Owner)
+	profiles.Total = int32(total)
 
 	return profiles, nil
 }
