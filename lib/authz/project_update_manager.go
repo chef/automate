@@ -19,7 +19,7 @@ type ProjectTaggedDomainService interface {
 	JobCancel(context.Context, string) error
 	UpdateProjectTags(context.Context, map[string]*iam_v2.ProjectRules) ([]string, error)
 	JobStatus(context.Context, string) (JobStatus, error)
-	DeleteProjectTag(context.Context, string) ([]string, error)
+	PurgeProject(context.Context, string) error
 }
 
 // ProjectUpdateBackend takes a connection to cereal-service and returns a cereal backend

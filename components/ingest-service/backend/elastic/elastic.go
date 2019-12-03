@@ -42,22 +42,22 @@ func (es *Backend) Initializing() bool {
 	return !es.initialized
 }
 
-func (es *Backend) DeleteProjectTag(ctx context.Context, projectTagToBeDeleted string) ([]string, error) {
+func (es *Backend) PurgeProject(ctx context.Context, projectTagToBeDeleted string) error {
 	log.Debugf("starting project delete project %q", projectTagToBeDeleted)
 
 	esNodeJobID, err := es.DeleteNodeProjectTag(ctx, projectTagToBeDeleted)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Node project tags delete")
+		return errors.Wrap(err, "Failed to start Elasticsearch Node project tags delete")
 	}
 
 	esActionJobID, err := es.DeleteActionProjectTag(ctx, projectTagToBeDeleted)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Action project tags delete")
+		return errors.Wrap(err, "Failed to start Elasticsearch Action project tags delete")
 	}
 
 	log.Debugf("Started Project delete with node job ID: %q action job ID %q", esNodeJobID, esActionJobID)
 
-	return []string{esNodeJobID, esActionJobID}, nil
+	return nil
 }
 
 func (es *Backend) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) ([]string, error) {

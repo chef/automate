@@ -81,7 +81,7 @@ type Client interface {
 	// @param (context, projectRules)
 	UpdateProjectTags(context.Context, map[string]*iam_v2.ProjectRules) ([]string, error)
 	// @param (context, projectTagToDelete)
-	DeleteProjectTag(context.Context, string) ([]string, error)
+	PurgeProject(context.Context, string) error
 
 	// Migration contracts
 	ReindexInsightstoConvergeHistory(context.Context, string, string) error

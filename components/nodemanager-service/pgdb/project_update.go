@@ -95,10 +95,9 @@ func (projectUpdate *ProjectUpdate) updateFail(err error) {
 	projectUpdate.running = false
 }
 
-func (db *DB) DeleteProjectTag(ctx context.Context,
-	projectTagToBeDelete string) ([]string, error) {
+func (db *DB) PurgeProject(ctx context.Context, projectTagToBeDelete string) error {
 	// TODO implement
-	return []string{}, nil
+	return nil
 }
 
 // JobCancel - cancel the a currently running project update
