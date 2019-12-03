@@ -4,6 +4,8 @@ set -euo pipefail
 
 echo -e "$CHEF_CI_SSH_PRIVATE_KEY" > chef-ci-ad-ssh
 
+export HAB_LICENSE=accept-no-persist
+
 instances_to_test=$(curl --silent "https://a2-${CHANNEL}.cd.chef.co/assets/data.json" |\
   jq --raw-output '.[] | select(.tags | any(. == "chef-automate-cli")) | .fqdn')
 
