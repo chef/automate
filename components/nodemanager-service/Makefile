@@ -180,7 +180,7 @@ test-integration:
 
 run-db-tests:
 	@POSTGRES_URI="$(POSTGRES_URI)" CGO_ENABLED=0 \
-		go test -v -cover -database ./pgdb/...
+		go test -v ./pgdb/... -cover -database -parallel=1 -p 1 -failfast
 
 run-one-db-test:
 	@POSTGRES_URI="$(POSTGRES_URI)" \
