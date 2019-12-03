@@ -5,6 +5,7 @@ set -e
 # are not shell variables.
 export HAB_NONINTERACTIVE="true"
 export HAB_NOCOLORING="true"
+export HAB_LICENSE=accept-no-persist
 
 automate_deployed() {
     [[ -f /hab/user/deployment-service/config/user.toml ]]
