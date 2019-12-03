@@ -3,11 +3,7 @@ data_path = "{{svc_path}}/data"
 log_path = "{{svc_var_path}}"
 key_path = "{{svc_path}}/data/keys"
 
-{{- if cfg.conf.artifactory.enabled }}
-features_enabled = "ARTIFACTORY"
-{{- else }}
 features_enabled = ""
-{{- end }}
 targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
 build_targets = ["x86_64-linux", "x86_64-linux-kernel2", "x86_64-windows"]
 build_on_upload = true
@@ -35,13 +31,6 @@ backend = "minio"
 key_id = "{{getSecret "minio.access_key"}}"
 secret_key = "{{getSecret "minio.secret_key"}}"
 bucket_name = "depot"
-
-{{- if cfg.conf.artifactory.enabled }}
-[artifactory]
-api_url = "{{ cfg.conf.artifactory.api_url }}"
-api_key = "{{ cfg.conf.artifactory.api_key }}"
-repo = "{{ cfg.conf.artifactory.repo }}"
-{{- end }}
 
 [ui]
 root = "{{svc_static_path}}"
