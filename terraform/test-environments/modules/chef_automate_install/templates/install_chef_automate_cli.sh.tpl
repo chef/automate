@@ -162,6 +162,8 @@ else
     fi
 fi
 
+hab license accept
+
 # Update to whatever the latest version of hab that got installed is
 hab pkg binlink core/hab --force
 
