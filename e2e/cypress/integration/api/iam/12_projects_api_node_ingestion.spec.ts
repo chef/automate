@@ -227,10 +227,12 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
   after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
 
   describe('Node Manager', () => {
-    // Ensure that both the compliance and client run nodes' tags are updated
+
     for ( const projectWithRule of projectsWithRule ) {
       it(`when a project has a rule that matches a node's ${projectWithRule.rule.name},
       successfully associates that node with the project`, () => {
+        // Ensure that both the compliance and client run nodes' tags are updated
+        // by fetching the nodes with the expected project filter
         cy.request({
           headers: {
             projects: [projectWithRule.project.id],
@@ -259,7 +261,8 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
       it(`when a project has a rule that matches a node's ${projectWithRule.rule.name},
       successfully associates that node with the project`, () => {
 
-        // Ensure that both the compliance and client run nodes' tags are updated
+        // Ensure that the cclient run nodes' tags are updated
+        // by fetching the node with the expected project filter
         cy.request({
           headers: {
             'api-token': Cypress.env('ADMIN_TOKEN'),
@@ -280,7 +283,8 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
       it(`when a project has a rule that matches a node's ${projectWithRule.rule.name},
       successfully associates that node with the project`, () => {
 
-        // Ensure the node is tagged with the correct project
+        // Ensure the compliance node is tagged with the correct project
+        // by fetching the node with the expected project filter
         cy.request({
           headers: {
             'api-token': Cypress.env('ADMIN_TOKEN'),

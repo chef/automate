@@ -273,50 +273,6 @@ Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string, maxRetries: numb
   });
 });
 
-// helpers
-
-function LoginHelper(username: string) {
-  cy.url().should('include', '/dex/auth/local');
-  cy.server();
-  // the gloabl permissions for the user that populates the initial permissions cache
-  cy.route('GET', '/api/v0/auth/introspect').as('getAuthPopulateCache');
-  // the parameterized permissions, called for the specific page loaded
-  cy.route('POST', '/api/v0/auth/introspect').as('getAuthParameterized');
-
-  // login
-  cy.get('#login').type(username);
-  cy.get('#password').type('chefautomate');
-
-  cy.get('[type=submit]').click().then(() => {
-    expect(localStorage.getItem('chef-automate-user')).to.contain(username);
-
-    // close welcome modal if present
-    cy.get('app-welcome-modal').invoke('hide');
-    cy.saveStorage();
-
-    cy.wait(['@getAuthPopulateCache', '@getAuthParameterized']);
-  });
-}
-
-function waitUntilAdminTokenPermissioned(attempts: number): void {
-  for (let i = 0; i > attempts; i++) {
-    cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: '/apis/iam/v2beta/projects',
-    method: 'GET',
-    failOnStatusCode: false
-  }).then((response) => {
-    if (response.status === 200) {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for admin token to be permissioned`);
-      cy.wait(1000);
-      ++attempts;
-    }
-  });
-  }
-}
-
 Cypress.Commands.add('waitForClientRunsNode', (nodeId: string, maxRetries: number) => {
   cy
   .request({
@@ -373,3 +329,47 @@ Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, en
     cy.waitForComplianceNode(nodeId, start, end, maxRetries - 1);
   });
 });
+
+// helpers
+
+function LoginHelper(username: string) {
+  cy.url().should('include', '/dex/auth/local');
+  cy.server();
+  // the gloabl permissions for the user that populates the initial permissions cache
+  cy.route('GET', '/api/v0/auth/introspect').as('getAuthPopulateCache');
+  // the parameterized permissions, called for the specific page loaded
+  cy.route('POST', '/api/v0/auth/introspect').as('getAuthParameterized');
+
+  // login
+  cy.get('#login').type(username);
+  cy.get('#password').type('chefautomate');
+
+  cy.get('[type=submit]').click().then(() => {
+    expect(localStorage.getItem('chef-automate-user')).to.contain(username);
+
+    // close welcome modal if present
+    cy.get('app-welcome-modal').invoke('hide');
+    cy.saveStorage();
+
+    cy.wait(['@getAuthPopulateCache', '@getAuthParameterized']);
+  });
+}
+
+function waitUntilAdminTokenPermissioned(attempts: number): void {
+  for (let i = 0; i > attempts; i++) {
+    cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: '/apis/iam/v2beta/projects',
+    method: 'GET',
+    failOnStatusCode: false
+  }).then((response) => {
+    if (response.status === 200) {
+      return;
+    } else {
+      cy.log(`${attempts} attempts remaining: waiting for admin token to be permissioned`);
+      cy.wait(1000);
+      ++attempts;
+    }
+  });
+  }
+}
