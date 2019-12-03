@@ -29,7 +29,10 @@ node.master: {{cfg.node.master}}
 node.data: {{cfg.node.data}}
 
 path.logs: {{pkg.svc_var_path}}/{{cfg.path.logs}}
-path.data: {{pkg.svc_data_path}}/{{cfg.path.data}}
+path.data:
+  - {{pkg.svc_data_path}}/{{cfg.path.data}}
+  - {{pkg.svc_var_path}}
+
 {{#if cfg.path.repo ~}}
 path.repo: {{cfg.path.repo}}
 {{/if ~}}
@@ -72,6 +75,8 @@ gateway.recover_after_time: {{cfg.gateway.recover_after_time}}
 {{/if ~}}
 
 action.destructive_requires_name: {{cfg.action.destructive_requires_name}}
+
+xpack.ml.enabled: false
 
 {{#if cfg.plugins.cloud_aws_signer ~}}
 cloud.aws.signer: {{cfg.plugins.cloud_aws_signer}}

@@ -73,6 +73,12 @@ paths = [
   "components/backup-gateway/*"
 ]
 
+[automate-openjdk]
+plan_path = "components/automate-openjdk"
+paths = [
+  "components/automate-openjdk/*"
+]
+
 [automate-elasticsearch]
 plan_path = "components/automate-elasticsearch"
 paths = [

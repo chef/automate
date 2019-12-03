@@ -56,4 +56,4 @@
 # https://automate.chef.io/docs/configuration/
 #
 [elasticsearch.v1.sys.runtime]
-heapsize = "{{ .ESHeapSize }}"
+  heapsize = "{{ .ESHeapSize }}"

@@ -39,6 +39,11 @@ Environment=CHEF_AUTOMATE_SKIP_MANIFEST_VERIFICATION=true
 EOF
 }
 
+do_upgrade() {
+  test_detect_broken_packages=false
+  do_upgrade_default
+}
+
 do_deploy() {
     #shellcheck disable=SC2154
     cp "$DEEP_UPGRADE_PATH" "$test_manifest_path"

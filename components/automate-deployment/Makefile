@@ -158,15 +158,9 @@ linux darwin windows:
 tools:
 	mkdir -p bin/linux && cd bin/linux && GOOS=linux GOARCH=amd64 go build ../../tools/upgrade-test-scaffold/upgrade-test-scaffold.go
 
-HAVE_GO_BINDATA := $(shell command -v go-bindata 2> /dev/null)
-gobindata:
-ifndef HAVE_GO_BINDATA
-	go get -u github.com/kevinburke/go-bindata/go-bindata
-endif
-
 generate: do_generate fmt
 
-do_generate: gobindata
+do_generate:
 	go generate ./...
 
 automate-ctl:
@@ -174,7 +168,7 @@ automate-ctl:
 	cd bin/automate-ctl; \
 	go build -o automate-ctl -i ../../cmd/automate-ctl
 
-update-bindings: gobindata
+update-bindings:
 	@bash ./scripts/agg_bindings.sh
 	@go generate ./...
 
