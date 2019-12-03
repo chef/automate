@@ -385,7 +385,6 @@ func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.No
 				nodeUUID = id.String()
 			}
 			baseJob.NodeID = nodeUUID
-
 			jobArray = append(jobArray, &types.InspecJob{
 				InspecBaseJob: baseJob,
 				Timeout:       job.Timeout,

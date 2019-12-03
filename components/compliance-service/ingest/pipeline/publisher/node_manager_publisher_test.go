@@ -28,17 +28,18 @@ func TestGatherInfoForNode(t *testing.T) {
 
 	nodeReport := message.Compliance{
 		Report: compliance.Report{
-			NodeUuid:         "8dcca219-a730-3985-907b-e6b22f9f848d",
-			NodeName:         "chef-load-44",
-			Platform:         &inspec.Platform{Name: "ubuntu", Release: "16.04"},
-			ChefTags:         []string{"application", "database"},
-			OrganizationName: "test-org",
-			SourceFqdn:       "chef-server-2",
-			Roles:            []string{"my-cool-role"},
-			EndTime:          nowTimeString,
-			SourceId:         "i-0aee75f0b4b0d9f22",
-			SourceRegion:     "us-west-2a",
-			ReportUuid:       "123353254545425",
+			NodeUuid:          "8dcca219-a730-3985-907b-e6b22f9f848d",
+			NodeName:          "chef-load-44",
+			Platform:          &inspec.Platform{Name: "ubuntu", Release: "16.04"},
+			ChefTags:          []string{"application", "database"},
+			OrganizationName:  "test-org",
+			SourceFqdn:        "chef-server-2",
+			Roles:             []string{"my-cool-role"},
+			EndTime:           nowTimeString,
+			SourceId:          "i-0aee75f0b4b0d9f22",
+			SourceRegion:      "us-west-2a",
+			ReportUuid:        "123353254545425",
+			AutomateManagerId: "12345",
 		},
 		InspecReport: &relaxting.ESInSpecReport{
 			Projects: []string{"tomato", "cucumber"},
@@ -68,6 +69,7 @@ func TestGatherInfoForNode(t *testing.T) {
 			{Key: "chef_tags", Values: []string{"application", "database"}},
 			{Key: "chef_server", Values: []string{"chef-server-2"}},
 		},
+		ManagerId: "12345",
 	}, nodeMetadata)
 }
 

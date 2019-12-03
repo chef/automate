@@ -6,6 +6,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/golang/protobuf/ptypes"
 )
 
@@ -798,4 +799,74 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithProjectsDat
 	}, readNode.ProjectsData)
 
 	_, err = suite.Database.DeleteNode(listNodes[0].Id)
+}
+
+func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeCorrectlyAssociatesNodeWithManager() {
+	// send node in with NO manager id, ensure it is not associated with any managers
+	nowTime := ptypes.TimestampNow()
+	node := &manager.NodeMetadata{
+		Uuid:            "1223-4254-2424-1322",
+		Name:            "my node",
+		PlatformName:    "debian",
+		PlatformRelease: "8.6",
+		LastContact:     nowTime,
+		SourceId:        "",
+		SourceRegion:    "",
+		SourceAccountId: "",
+		ScanData: &nodes.LastContactData{
+			Id: "12345-9999-002323",
+		},
+	}
+	err := suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	readNode, err := suite.Database.GetNode(ctx, "1223-4254-2424-1322")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal("my node", readNode.Name)
+	suite.Equal("", readNode.Manager)
+	suite.Equal([]string{}, readNode.ManagerIds)
+
+	// create Automate manager, send node in with automate manager id, ensure it is correctly attributed
+	mgr := manager.NodeManager{
+		Id:   mgrtypes.AutomateManagerID,
+		Name: "Automate",
+		Type: "automate",
+	}
+	_, err = suite.Database.AddNodeManager(&mgr, "")
+	node.Uuid = "1223-4254-2424-1345"
+	node.ManagerId = mgrtypes.AutomateManagerID
+	err = suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	readNode, err = suite.Database.GetNode(ctx, "1223-4254-2424-1345")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal("my node", readNode.Name)
+	suite.Equal("automate", readNode.Manager)
+	suite.Equal([]string{mgrtypes.AutomateManagerID}, readNode.ManagerIds)
+
+	// create AWS manager, send node in with AWS manager id, ensure it is correctly attributed
+	mgr = manager.NodeManager{Name: "test", Type: "aws-ec2"}
+	mgrID, err := suite.Database.AddNodeManager(&mgr, "12345678")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	node.Uuid = "1223-4254-2424-1115"
+	node.ManagerId = mgrID
+	err = suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	readNode, err = suite.Database.GetNode(ctx, "1223-4254-2424-1115")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal("my node", readNode.Name)
+	suite.Equal("aws-ec2", readNode.Manager)
+	suite.Equal([]string{mgrID}, readNode.ManagerIds)
 }

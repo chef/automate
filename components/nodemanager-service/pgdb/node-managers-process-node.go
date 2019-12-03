@@ -170,9 +170,11 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 		if err != nil {
 			return errors.Wrap(err, "ProcessIncomingNode unable to process node")
 		}
-		_, err = tx.Exec(sqlInsertNodeManagerNode, node.ManagerId, node.Uuid)
-		if err != nil {
-			return errors.Wrap(err, "ProcessIncomingNode unable to create manager-node association")
+		if node.ManagerId != "" {
+			_, err = tx.Exec(sqlInsertNodeManagerNode, node.ManagerId, node.Uuid)
+			if err != nil {
+				return errors.Wrap(err, "ProcessIncomingNode unable to create manager-node association")
+			}
 		}
 		tags, err := tx.addTags(node.GetTags())
 		if err != nil {
