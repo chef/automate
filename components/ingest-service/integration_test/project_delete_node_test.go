@@ -95,8 +95,6 @@ func TestNodeProjectDeleteNoNodes(t *testing.T) {
 	actualNodes, err := suite.GetNodes(100)
 	assert.Nil(t, err)
 	assert.Equal(t, 0, len(actualNodes), "wrong number of nodes retrieved")
-
-	suite.DeleteAllDocuments()
 }
 
 func waitForJobToComplete(t *testing.T, esJobID string) {
