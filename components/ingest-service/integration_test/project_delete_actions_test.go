@@ -21,25 +21,25 @@ func TestProjectDeleteActions(t *testing.T) {
 	cases := []struct {
 		description         string
 		existingProjectIDs  []string
-		projectIDToBeDelete string
+		projectIDToBeDeleted string
 		expectedProjectIDs  []string
 	}{
 		{
 			description:         "Deleting the last project tag",
 			existingProjectIDs:  []string{"target_project"},
-			projectIDToBeDelete: "target_project",
+			projectIDToBeDeleted: "target_project",
 			expectedProjectIDs:  []string{},
 		},
 		{
 			description:         "Deleting a project that does not exist",
 			existingProjectIDs:  []string{},
-			projectIDToBeDelete: "target_project",
+			projectIDToBeDeleted: "target_project",
 			expectedProjectIDs:  []string{},
 		},
 		{
 			description:         "Deleting a project on a node with multiple projects",
 			existingProjectIDs:  []string{"project3", "target_project", "project9"},
-			projectIDToBeDelete: "target_project",
+			projectIDToBeDeleted: "target_project",
 			expectedProjectIDs:  []string{"project3", "project9"},
 		},
 	}
@@ -55,8 +55,8 @@ func TestProjectDeleteActions(t *testing.T) {
 				defer suite.DeleteAllDocuments()
 
 				// Send a project rules update event
-				esJobID, err := suite.ingest.DeleteActionProjectTag(ctx, test.projectIDToBeDelete)
-				require.Nil(t, err)
+				esJobID, err := suite.ingest.DeleteActionProjectTag(ctx, test.projectIDToBeDeleted)
+				require.NoError(t, err)
 
 				waitForJobToComplete(t, esJobID)
 
@@ -64,7 +64,7 @@ func TestProjectDeleteActions(t *testing.T) {
 
 				// assert the node's project IDs
 				actualActions, err := suite.GetActions(100)
-				require.Nil(t, err)
+				require.NoError(t, err)
 				require.Equal(t, 1, len(actualActions), "wrong number of actions retrieved")
 
 				actualAction := actualActions[0]
@@ -80,7 +80,7 @@ func TestProjectDeleteNoActions(t *testing.T) {
 
 	// Send a project rules update event
 	esJobID, err := suite.ingest.DeleteActionProjectTag(ctx, "project9")
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 
 	waitForJobToComplete(t, esJobID)
 
@@ -88,6 +88,6 @@ func TestProjectDeleteNoActions(t *testing.T) {
 
 	// assert the node's project IDs
 	actualNodes, err := suite.GetNodes(100)
-	assert.Nil(t, err)
+	assert.NoError(t, err)
 	assert.Equal(t, 0, len(actualNodes), "wrong number of actions retrieved")
 }

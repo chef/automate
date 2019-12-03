@@ -193,6 +193,7 @@ func (m *ESCancelUpdateProjectTagsTask) Run(
 }
 
 type ESStartProjectTagUpdaterTask struct {
+	// nodemanager-service, ingest-service, or compliance-service
 	domainService       ProjectTaggedDomainService
 	authzProjectsClient iam_v2.ProjectsClient
 }
