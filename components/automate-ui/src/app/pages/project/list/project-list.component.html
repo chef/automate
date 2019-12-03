@@ -10,7 +10,7 @@
       <section *ngIf="!(isIAMv2$ | async)" class="page-body">
         Currently, you are using IAM v1. Projects are only available with IAM v2.
       </section>
-  
+
       <section *ngIf="isIAMv2$ | async" class="page-body">
         <ng-container *ngIf="(sortedProjects$ | async)?.length > 0">
           <chef-toolbar>
@@ -45,11 +45,11 @@
                   <chef-table-cell>{{ project.id }}</chef-table-cell>
                   <chef-table-cell>{{ getRulesStatus(project) }}</chef-table-cell>
                   <chef-table-cell class="three-dot-column">
-                    <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]">
+                    <!-- <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]"> -->
                       <chef-control-menu>
                         <chef-option (click)="startProjectDelete(project)" data-cy="delete-project">Delete Project</chef-option>
                       </chef-control-menu>
-                    </app-authorized>
+                    <!-- </app-authorized> -->
                   </chef-table-cell>
                 </chef-table-row>
               </chef-table-body>

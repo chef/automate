@@ -29,7 +29,7 @@
                       <chef-table-cell class="type-column">{{ policy.type | iamType }}</chef-table-cell>
                       <chef-table-cell class="status-column">{{ status(policy) | capitalize }}</chef-table-cell>
                       <chef-table-cell class="three-dot-column">
-                      <!-- <app-authorized [allOf]="['/policies/{policy}', 'delete', policy]"> -->
+                      <!-- <app-authorized [allOf]="[`/iam/v2beta/policies/{id}`, 'delete', policy.id]"> -->
                         <chef-control-menu *ngIf="policy.type !== 'CHEF_MANAGED'">
                           <chef-option (click)="startPolicyDelete(policy)">Delete Policy</chef-option>
                         </chef-control-menu>
@@ -40,7 +40,7 @@
               </chef-table-new>
             </app-authorized>
           </section>
-      
+
           <app-delete-object-modal
             [visible]="deleteModalVisible"
             objectNoun="policy"
