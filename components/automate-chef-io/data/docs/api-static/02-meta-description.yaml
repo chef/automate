@@ -4,21 +4,21 @@ info:
     The standard way of authenticating for the Automate API is to generate an
     API token and pass that with your API requests with the `api-token` header.
 
-    An administrative token can be created and set to a variable using the following CLI helper:
+    An admin token can be created and set to a variable using the following CLI helper:
 
     ```
     export TOKEN=`chef-automate admin-token`
     ```
 
-    With an administrative token you can access the entire Chef Automate API – including administrative 
-    tasks such as managing local users and managing local teams and managing authorization policies.
-    Using the token above, an example request using curl looks like this:
+    With an admin token you can access the entire Chef Automate API – including administrative
+    tasks such as managing local users, managing local teams, and managing authorization policies.
+    Using the token, an example curl request looks like this:
 
     ```
     curl -s -H "api-token: $TOKEN" https://automate.example.com/api/v0/auth/policies -v
     ```
     
-    With the administrative token, it is possible to create standard tokens with more limited permissions.
+    With the admin token, it is possible to create standard tokens with more limited permissions.
     The following curl returns a new token object whose value can be set to a new variable:
 
     ```
