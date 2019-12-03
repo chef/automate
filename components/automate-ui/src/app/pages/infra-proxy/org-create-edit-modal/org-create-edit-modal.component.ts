@@ -1,6 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Regex } from 'app/helpers/auth/regex';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-org-create-edit-modal',
@@ -8,25 +7,31 @@ import { Regex } from 'app/helpers/auth/regex';
   styleUrls: ['./org-create-edit-modal.component.scss']
 })
 export class OrgCreateEditModalComponent implements OnInit {
+  // @Input() type: string;
   @Input() visible = false;
-  @Input() type = 'create';
+  @Input() creating = false;
+  @Input() conflictErrorEvent: EventEmitter<boolean>;
   @Output() close = new EventEmitter();
+  @Output() createClicked = new EventEmitter();
+  @Input() createForm: FormGroup;
 
-  public orgForm: FormGroup;
+  public conflictError = false;
 
   constructor(
-    private fb: FormBuilder
 
   ) { }
 
   ngOnInit() {
-    this.orgForm = this.fb.group({
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      orgId: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+    this.conflictErrorEvent.subscribe((isConflict: boolean) => {
+      this.conflictError = isConflict;
     });
   }
 
   closeEvent(): void {
     this.close.emit();
+  }
+
+  createServerOrg(): void {
+    this.createClicked.emit();
   }
 }

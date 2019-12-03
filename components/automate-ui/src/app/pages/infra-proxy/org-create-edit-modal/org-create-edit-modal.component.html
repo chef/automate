@@ -1,31 +1,30 @@
 <chef-modal [visible]="visible" (closeModal)="closeEvent()">
-  <h2 *ngIf="type === 'create'" slot="title">Create New Org</h2>
-  <h2 *ngIf="type === 'edit'" slot="title">Create New Org</h2>
+  <h2 slot="title">Create New Org</h2>
   <div class="flex-container">
-    <form [formGroup]="orgForm">
+    <form [formGroup]="createForm">
       <div class="name-margin">
         <chef-form-field>
           <label>
             <span class="label">Org Name <span aria-hidden="true">*</span></span>
             <input chefInput formControlName="name" type="text" id="name-input" data-cy="full-name" autocomplete="off">
           </label>
-          <chef-error *ngIf="orgForm.get('name').dirty">
-            Name is required.
-          </chef-error>
         </chef-form-field>
-        <chef-from-field>
+        <chef-form-field>
           <label>
-            <span class="label">Org ID <span aria-hidden="true">*</span></span>
-            <input chefInput formControlName="name" type="text" id="orgId-input" data-cy="full-name" autocomplete="off">
+            <span class="label">Admin User <span aria-hidden="true">*</span></span>
+            <input chefInput formControlName="admin_user" type="text" id="admin-input" data-cy="admin-user" autocomplete="off">
           </label>
-          <chef-error *ngIf="orgForm.get('orgId').dirty">
-            Org Id is required.
-          </chef-error>
-        </chef-from-field>
+        </chef-form-field>
+        <chef-form-field>
+          <label>
+            <span class="label">Admin Key <span aria-hidden="true">*</span></span>
+            <input chefInput formControlName="admin_key" type="text" id="admin-key" data-cy="admin-key" autocomplete="off">
+          </label>
+        </chef-form-field>
       </div>
       <div id="button-bar">
-        <chef-button *ngIf="type === 'create'" primary id="create-org-modal-btn" data-cy="submit-button">Create Org</chef-button>
-        <chef-button *ngIf="type === 'edit'" primary id="edit-org-modal-btn" data-cy="submit-button">Save Org</chef-button>
+        <chef-button primary id="create-org-modal-btn" (click)="createServerOrg()">Create Org</chef-button>
+        <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
         <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
       </div>
     </form>

@@ -1,0 +1,26 @@
+<div class="content-container">
+  <div class="container">
+      <main>
+        <chef-page-header>
+          <chef-heading>Org Cookbooks</chef-heading>
+        </chef-page-header>
+
+        <div class="page-body">
+          <chef-table-new>
+            <chef-table-header>
+              <chef-table-row>
+                <chef-table-header-cell>Cookbook Name</chef-table-header-cell>
+                <chef-table-header-cell>Cookbook Version</chef-table-header-cell>
+              </chef-table-row>
+            </chef-table-header>
+            <chef-table-body>
+                <chef-table-row *ngFor= "let cookbook of sortedCookbooks$ | async">
+                    <chef-table-cell>{{ cookbook.name }}</chef-table-cell>
+                    <chef-table-cell>{{ cookbook.version }}</chef-table-cell>
+                </chef-table-row>
+            </chef-table-body>
+          </chef-table-new>
+        </div>
+      </main>
+  </div>
+</div>

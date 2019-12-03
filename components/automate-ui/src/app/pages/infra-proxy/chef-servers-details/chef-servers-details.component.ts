@@ -1,15 +1,34 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, combineLatest } from 'rxjs';
+import { filter, pluck, takeUntil } from 'rxjs/operators';
+import { identity, isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { routeURL } from 'app/route.selectors';
+import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+
+import { EntityStatus, allLoaded } from 'app/entities/entities';
+import {
+  getStatus, serverFromRoute
+} from 'app/entities/servers/server.selectors';
+
+import { Server } from 'app/entities/servers/server.model';
+import { GetServer } from 'app/entities/servers/server.actions';
+import { GetOrgsForServer, CreateOrg } from 'app/entities/orgs/org.actions';
+import { Org } from 'app/entities/orgs/org.model';
+import {
+  allOrgs,
+  getAllStatus as getAllOrgsForServerStatus,
+  deleteStatus as deleteOrgStatus
+} from 'app/entities/orgs/org.selectors';
+
 export type ChefServerTabName = 'orgs' | 'details';
+
+
 
 @Component({
   selector: 'app-chef-servers-details',
@@ -17,11 +36,17 @@ export type ChefServerTabName = 'orgs' | 'details';
   styleUrls: ['./chef-servers-details.component.scss']
 })
 export class ChefServersDetailsComponent implements OnInit, OnDestroy {
+  public server: Server;
+  public orgs: Org[] = [];
   public tabValue: ChefServerTabName = 'orgs';
   public url: string;
-  public chefServerForm: FormGroup;
+  public updateServerForm: FormGroup;
+  public orgForm: FormGroup;
   public createModalVisible = false;
+  public creatingServerOrg = false;
+  public conflictErrorEvent = new EventEmitter<boolean>();
   public modalType: string;
+  private id: string;
 
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
@@ -46,12 +71,63 @@ export class ChefServersDetailsComponent implements OnInit, OnDestroy {
       this.tabValue = (fragment === 'details') ? 'details' : 'orgs';
     });
 
-    this.chefServerForm = this.fb.group({
+    this.orgForm = this.fb.group({
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      admin_user: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      admin_key: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+    });
+
+    this.updateServerForm = this.fb.group({
       name: ['chef-server', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       fqdn: ['chef.io', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       ip_address: ['198.162.0', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
 
+    this.store.select(routeParams).pipe(
+      pluck('id'),
+      filter(identity),
+      takeUntil(this.isDestroyed))
+      .subscribe((id: string) => {
+        this.id = id;
+        this.store.dispatch(new GetServer({ id }));
+        this.store.dispatch(new GetOrgsForServer({ server_id: id }));
+      });
+
+      combineLatest([
+        this.store.select(getStatus),
+        this.store.select(getAllOrgsForServerStatus)
+      ]).pipe(
+        takeUntil(this.isDestroyed)
+      ).subscribe(([getServerSt, getOrgsSt]) => {
+          this.isLoading =
+            !allLoaded([getServerSt, getOrgsSt]);
+        });
+
+      combineLatest([
+        this.store.select(getStatus),
+        this.store.select(getAllOrgsForServerStatus),
+        this.store.select(serverFromRoute),
+        this.store.select(allOrgs)
+      ]).pipe(
+          filter(([getServerSt, getOrgsSt, _serverState, _allOrgsState]) =>
+            getServerSt === EntityStatus.loadingSuccess &&
+            getOrgsSt === EntityStatus.loadingSuccess),
+          filter(([_getServerSt, _getOrgsSt, serverState, allOrgsState]) =>
+            !isNil(serverState) && !isNil(allOrgsState)),
+          takeUntil(this.isDestroyed)
+        ).subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
+          this.server = { ...ServerState };
+          this.orgs = allOrgsState;
+          this.creatingServerOrg = false;
+          this.closeCreateModal();
+        });
+
+        this.store.select(deleteOrgStatus).pipe(
+          filter(status => this.id !== undefined && status === EntityStatus.loadingSuccess),
+          takeUntil(this.isDestroyed))
+          .subscribe(() => {
+            this.store.dispatch(new GetServer({ id: this.id }));
+          });
   }
 
   ngOnDestroy(): void {
@@ -71,6 +147,24 @@ export class ChefServersDetailsComponent implements OnInit, OnDestroy {
 
   public closeCreateModal(): void {
     this.createModalVisible = false;
+    this.resetCreateModal();
+  }
+
+  public createServerOrg(): void {
+    this.creatingServerOrg = true;
+    const serverOrg = {
+      server_id: this.id,
+      name: this.orgForm.controls['name'].value.trim(),
+      admin_user: this.orgForm.controls['admin_user'].value.trim(),
+      admin_key: this.orgForm.controls['admin_key'].value.trim()
+    };
+    this.store.dispatch(new CreateOrg( serverOrg ));
+  }
+
+  private resetCreateModal(): void {
+    this.creatingServerOrg = false;
+    this.orgForm.reset();
+    this.conflictErrorEvent.emit(false);
   }
 
 }

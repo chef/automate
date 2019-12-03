@@ -69,10 +69,12 @@ import { TelemetryService } from './services/telemetry/telemetry.service';
 import { ApiTokenRequests } from './entities/api-tokens/api-token.requests';
 import { AutomateSettingsRequests } from './entities/automate-settings/automate-settings.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
+import { CookbookRequests } from './entities/cookbooks/cookbook.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
 import { JobRequests } from './entities/jobs/job.requests';
 import { LicenseStatusRequests } from './entities/license/license.requests';
 import { ManagerRequests } from './entities/managers/manager.requests';
+import { OrgRequests } from './entities/orgs/org.requests';
 import { PolicyRequests } from './entities/policies/policy.requests';
 import { ProfileRequests } from './entities/profiles/profile.requests';
 import { ProjectRequests } from './entities/projects/project.requests';
@@ -289,6 +291,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     AutomateSettingsRequests,
     ChefSessionService,
     ConfigService,
+    CookbookRequests,
     ClientRunsRequests,
     CredentialRequests,
     DatafeedService,
@@ -310,6 +313,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     NodeNoRunsDetailsResolverService,
     NodeDetailsService,
     NodeRunsService,
+    OrgRequests,
     PolicyRequests,
     ProfileRequests,
     ProjectRequests,

@@ -4,6 +4,7 @@ import { EffectsModule } from '@ngrx/effects';
 import { ApiTokenEffects } from './entities/api-tokens/api-token.effects';
 import { AutomateSettingsEffects } from './entities/automate-settings/automate-settings.effects';
 import { ClientRunsEffects } from './entities/client-runs/client-runs.effects';
+import { CookbookEffects } from './entities/cookbooks/cookbook.effects';
 import { CredentialsEffects } from './pages/+compliance/+credentials/credentials.state';
 // CredentialEffect is for the credential entities. Don't confuse it with CredentialsEffects.
 // CredentialsEffects will be removed when the credentials page is refactored.
@@ -25,6 +26,7 @@ import { SidebarEffects } from './services/sidebar/sidebar.effects';
 import { TeamEffects } from './entities/teams/team.effects';
 import { UserEffects } from './entities/users/user.effects';
 import { UserPermEffects } from './entities/userperms/userperms.effects';
+import { OrgEffects } from './entities/orgs/org.effects';
 
 @NgModule({
   imports: [
@@ -32,12 +34,14 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       ApiTokenEffects,
       AutomateSettingsEffects,
       ClientRunsEffects,
+      CookbookEffects,
       CredentialsEffects,
       CredentialEffects,
       EventFeedEffects,
       JobEffects,
       LicenseStatusEffects,
       ManagerEffects,
+      OrgEffects,
       PolicyEffects,
       ProfileEffects,
       ProjectEffects,
