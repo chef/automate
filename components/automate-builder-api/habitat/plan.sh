@@ -12,9 +12,9 @@ pkg_license=("Chef-MLSA")
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_deps=(
   core/bash
-  core/curl
   "${local_platform_tools_origin:-chef}/automate-platform-tools"
   # We need to pin here to get a build from unstable
+  "core/curl/7.65.3/20190826035620"
   "habitat/builder-api/8559/20191114222102"
 )
 
