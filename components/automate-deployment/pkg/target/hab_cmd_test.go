@@ -21,7 +21,7 @@ func TestInstallPackage(t *testing.T) {
 
 	t.Run("it runs hab pkg install with the NOCOLORING and NONINTERACTIVE environment variables", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
-		installer := target.NewHabCmd(mockExecutor, false)
+		installer := target.NewHabCmd(mockExecutor, target.DefaultHabCmdOptions())
 
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd: "hab",
@@ -39,7 +39,9 @@ func TestInstallPackage(t *testing.T) {
 	})
 	t.Run("it uses OFFLINE_INSTALL if the installer is initialized in offline mode", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
-		installer := target.NewHabCmd(mockExecutor, true)
+		opts := target.DefaultHabCmdOptions()
+		opts.OfflineMode = true
+		installer := target.NewHabCmd(mockExecutor, opts)
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd: "hab",
 			Env: []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist", "HAB_FEAT_OFFLINE_INSTALL=true"},
@@ -58,7 +60,7 @@ func TestInstallPackage(t *testing.T) {
 	})
 	t.Run("it ignores the channel argument if the channel is the empty string", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
-		installer := target.NewHabCmd(mockExecutor, false)
+		installer := target.NewHabCmd(mockExecutor, target.DefaultHabCmdOptions())
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd: "hab",
 			Env: []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist"},
@@ -76,7 +78,7 @@ func TestInstallPackage(t *testing.T) {
 
 	t.Run("it returns an error if the underlying Habitat command fails", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
-		installer := target.NewHabCmd(mockExecutor, false)
+		installer := target.NewHabCmd(mockExecutor, target.DefaultHabCmdOptions())
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd: "hab",
 			Env: []string{"HAB_NOCOLORING=true", "HAB_NONINTERACTIVE=true", "HAB_LICENSE=accept-no-persist"},
@@ -102,7 +104,7 @@ func TestIsInstalled(t *testing.T) {
 
 	t.Run("it runs hab pkg path with the NOCOLORING and NONINTERACTIVE environment variables", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
-		installer := target.NewHabCmd(mockExecutor, false)
+		installer := target.NewHabCmd(mockExecutor, target.DefaultHabCmdOptions())
 
 		mockExecutor.Expect("Run", command.ExpectedCommand{
 			Cmd:  "hab",
@@ -117,7 +119,7 @@ func TestIsInstalled(t *testing.T) {
 
 	t.Run("returns true if the command was successful", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
-		installer := target.NewHabCmd(mockExecutor, false)
+		installer := target.NewHabCmd(mockExecutor, target.DefaultHabCmdOptions())
 
 		mockExecutor.Expect("Run", command.ExpectedCommand{
 			Cmd:  "hab",
@@ -133,7 +135,7 @@ func TestIsInstalled(t *testing.T) {
 
 	t.Run("returns false with no error if the commad failed", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
-		installer := target.NewHabCmd(mockExecutor, false)
+		installer := target.NewHabCmd(mockExecutor, target.DefaultHabCmdOptions())
 
 		mockExecutor.Expect("Run", command.ExpectedCommand{
 			Cmd:  "hab",
@@ -156,7 +158,7 @@ func TestBinlinkPackage(t *testing.T) {
 
 	t.Run("it runs hab pkg binlink with the NOCOLORING and NONINTERACTIVE environment variables", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
-		installer := target.NewHabCmd(mockExecutor, false)
+		installer := target.NewHabCmd(mockExecutor, target.DefaultHabCmdOptions())
 
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd:  "hab",
@@ -171,7 +173,7 @@ func TestBinlinkPackage(t *testing.T) {
 
 	t.Run("returns errors and output from the underlying command", func(t *testing.T) {
 		mockExecutor := command.NewMockExecutor(t)
-		installer := target.NewHabCmd(mockExecutor, false)
+		installer := target.NewHabCmd(mockExecutor, target.DefaultHabCmdOptions())
 
 		mockExecutor.Expect("CombinedOutput", command.ExpectedCommand{
 			Cmd:  "hab",

@@ -34,6 +34,10 @@ const (
 	// HabTimeoutDefault is the timeout for hab commands that
 	// don't have other timeouts.
 	HabTimeoutDefault = 5 * time.Minute
+
+	// DefaultHabBinary is the hab command we will use if none is
+	// provided by the user.
+	DefaultHabBinary = "hab"
 )
 
 // A HabCmd runs the `hab` command-line tool with a standard set of
@@ -94,17 +98,31 @@ func BindMode(mode string) LoadOption {
 }
 
 type habCmd struct {
-	offlineMode bool
-	executor    command.Executor
+	opts     HabCmdOptions
+	executor command.Executor
+}
+
+type HabCmdOptions struct {
+	// Command to call when executing `hab`. Defaults to "hab".
+	HabBinary string
+	// If offlineMode is true then any InstallPackage() calls will
+	// use Habitat's OFFLINE_INSTALL feature.
+	OfflineMode bool
+}
+
+func DefaultHabCmdOptions() HabCmdOptions {
+	return HabCmdOptions{
+		HabBinary:   DefaultHabBinary,
+		OfflineMode: false,
+	}
 }
 
 // NewHabCmd returns an habCmd that uses the given
-// command.Executor. If offlineMode is true then any InstallPackage()
-// calls will use Habitat's OFFLINE_INSTALL feature.
-func NewHabCmd(c command.Executor, offlineMode bool) HabCmd {
+// command.Executor.
+func NewHabCmd(c command.Executor, opts HabCmdOptions) HabCmd {
 	return &habCmd{
-		executor:    c,
-		offlineMode: offlineMode,
+		executor: c,
+		opts:     opts,
 	}
 }
 
@@ -166,7 +184,7 @@ func (c *habCmd) InstallPackage(ctx context.Context, pkg habpkg.Installable, cha
 	defer cancel()
 	devDebugOutputOnTimeout(ctx)
 
-	if c.offlineMode {
+	if c.opts.OfflineMode {
 		args = append(args, "--offline")
 		opts = append(opts, command.Envvar("HAB_FEAT_OFFLINE_INSTALL", "true"))
 	}
@@ -176,7 +194,7 @@ func (c *habCmd) InstallPackage(ctx context.Context, pkg habpkg.Installable, cha
 	}
 
 	opts = append(opts, command.Context(ctx), command.Args(args...))
-	return c.executor.CombinedOutput("hab", opts...)
+	return c.executor.CombinedOutput(c.opts.HabBinary, opts...)
 }
 
 // IsInstalled checks if a package is already installed
@@ -188,7 +206,7 @@ func (c *habCmd) IsInstalled(ctx context.Context, pkg habpkg.VersionedPackage) (
 
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
 
-	err := c.executor.Run("hab", cmdOpts...)
+	err := c.executor.Run(c.opts.HabBinary, cmdOpts...)
 	if err != nil {
 		return false, nil
 	}
@@ -205,7 +223,7 @@ func (c *habCmd) BinlinkPackage(ctx context.Context, pkg habpkg.VersionedPackage
 
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
 
-	return c.executor.CombinedOutput("hab", cmdOpts...)
+	return c.executor.CombinedOutput(c.opts.HabBinary, cmdOpts...)
 }
 
 func (c *habCmd) LoadService(ctx context.Context, svc habpkg.VersionedPackage, opts ...LoadOption) (string, error) {
@@ -220,7 +238,7 @@ func (c *habCmd) LoadService(ctx context.Context, svc habpkg.VersionedPackage, o
 
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), command.Args(args...))
 
-	return c.executor.CombinedOutput("hab", cmdOpts...)
+	return c.executor.CombinedOutput(c.opts.HabBinary, cmdOpts...)
 }
 
 func (c *habCmd) UnloadService(ctx context.Context, svc habpkg.VersionedPackage) (string, error) {
@@ -230,7 +248,7 @@ func (c *habCmd) UnloadService(ctx context.Context, svc habpkg.VersionedPackage)
 	devDebugOutputOnTimeout(ctx)
 
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
-	output, err := c.executor.CombinedOutput("hab", cmdOpts...)
+	output, err := c.executor.CombinedOutput(c.opts.HabBinary, cmdOpts...)
 
 	// NOTE: hab <= 0.79 returned 0 if the service was already unloaded.
 	// Beginning with 0.80, hab will exit 1 if the service was already unloaded.
@@ -253,7 +271,7 @@ func (c *habCmd) StartService(ctx context.Context, svc habpkg.VersionedPackage) 
 
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), args)
 
-	return c.executor.CombinedOutput("hab", cmdOpts...)
+	return c.executor.CombinedOutput(c.opts.HabBinary, cmdOpts...)
 }
 
 func (c *habCmd) StopService(ctx context.Context, svc habpkg.VersionedPackage) (string, error) {
@@ -270,7 +288,7 @@ func (c *habCmd) StopService(ctx context.Context, svc habpkg.VersionedPackage) (
 func (c *habCmd) SupTerm(ctx context.Context) error {
 	cmdOpts := append(standardHabOptions(), command.Context(ctx), command.Args("sup", "term"))
 
-	_, err := c.executor.Start("hab", cmdOpts...)
+	_, err := c.executor.Start(c.opts.HabBinary, cmdOpts...)
 	return err
 }
 
