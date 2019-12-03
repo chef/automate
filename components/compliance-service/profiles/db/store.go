@@ -447,10 +447,10 @@ func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata
 	for key, values := range req.Filters {
 		terms := squirrel.Or{}
 		for _, value := range values {
-			term := fmt.Sprintf("info->>'%s' like ?", key)
+			field := fmt.Sprintf("info->>'%s'", key)
 			v := pgutils.EscapeLiteralForPGPatternMatch(value)
 			v = strings.ReplaceAll(v, "*", "%")
-			terms = append(terms, squirrel.Expr(term, v))
+			terms = append(terms, squirrel.Like{field: v})
 		}
 		sql = sql.Where(terms)
 	}
