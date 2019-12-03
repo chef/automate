@@ -657,7 +657,9 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 	var location string
 
 	if len(args) > 0 {
-		uri = args[0]
+		// We trim off / incase the user provided something like
+		// /path/to/20180901000000/
+		uri = strings.TrimRight(args[0], "/")
 
 		// Get the backup id: from the example above,
 		// all will be 20180901000000
@@ -670,6 +672,7 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 		// or
 		// /path/to/20180901000000 => /path/to
 		location = strings.TrimSuffix(uri, backupId)
+		logrus.Debugf("BackupID=%s;Location=%s", backupId, location)
 	}
 
 	// In the case only the backup id was provided, default the path to
