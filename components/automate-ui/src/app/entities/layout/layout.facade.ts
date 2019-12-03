@@ -78,9 +78,9 @@ export class LayoutFacadeService {
             ));
     }
 
-    showInfastructureSidebar() {
+    showInfrastructureSidebar() {
         this.store.dispatch(new UpdateSidebarMenuGroups(
-            this.layoutSidebarService.getInfastructureSidebar()
+            this.layoutSidebarService.getInfrastructureSidebar()
             ));
     }
 

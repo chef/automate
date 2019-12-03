@@ -1,5 +1,9 @@
 @import "~styles/variables";
 
+.page-body {
+  background: $white;
+}
+
 h2 {
   font-size: 16px;
   font-weight: 600;
@@ -20,14 +24,17 @@ h2 {
 
 .no-right-margin {
   margin-left: -8px;
+  margin-top: -32px;
 }
 
 chef-input {
-  width: 60px;
+  height: 45px;
+  width: 70px;
 }
 
 chef-select {
-  width: 120px;
+  height: 45px;
+  width: 130px;
 }
 
 chef-checkbox {
