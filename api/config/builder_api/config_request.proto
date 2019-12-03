@@ -18,23 +18,17 @@ message ConfigRequest {
 		Service svc = 2;
 
 		message System {
+			reserved 4;
+
 			chef.automate.infra.config.Mlsa mlsa = 1;
 			chef.automate.infra.config.TLSCredentials tls = 2;
 
 			Service service = 3;
-			Artifactory artifactory = 4;
 			Memcache memcache = 5;
 
 			message Service {
 				google.protobuf.StringValue host = 1;
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10103, protocol: "http" } ];
-			}
-
-			message Artifactory {
-				google.protobuf.BoolValue enabled = 1;
-				google.protobuf.StringValue api_url = 2;
-				google.protobuf.StringValue api_key = 3;
-				google.protobuf.StringValue repo = 4;
 			}
 
 			message Memcache {
