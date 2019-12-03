@@ -10,6 +10,7 @@ export interface ServerEntityState extends EntityState<Server> {
   saveStatus: EntityStatus;
   saveError: HttpErrorResponse;
   getStatus: EntityStatus;
+  deleteStatus: EntityStatus;
 }
 
 // reusable names of the above properties:
@@ -26,7 +27,8 @@ export const ServerEntityInitialState: ServerEntityState =
     status: EntityStatus.notLoaded,
     saveStatus: EntityStatus.notLoaded,
     saveError: null,
-    getStatus: EntityStatus.notLoaded
+    getStatus: EntityStatus.notLoaded,
+    deleteStatus: EntityStatus.notLoaded
   });
 
 export function serverEntityReducer(
@@ -92,6 +94,20 @@ export function serverEntityReducer(
         set(SAVE_STATUS, EntityStatus.loadingFailure)
       )(state) as ServerEntityState;
     }
+
+    case ServerActionTypes.DELETE: {
+      return set('deleteStatus', EntityStatus.loading, state);
+    }
+
+    case ServerActionTypes.DELETE_SUCCESS: {
+      return set('deleteStatus', EntityStatus.loadingSuccess,
+        serverEntityAdapter.removeOne(action.payload.id, state));
+    }
+
+    case ServerActionTypes.DELETE_FAILURE: {
+      return set('deleteStatus', EntityStatus.loadingFailure, state);
+    }
+
   }
 
   return state;

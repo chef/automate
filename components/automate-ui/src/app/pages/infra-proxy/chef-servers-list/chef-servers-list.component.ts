@@ -1,4 +1,4 @@
-import { Component, OnInit, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { filter, takeUntil, map } from 'rxjs/operators';
@@ -12,7 +12,7 @@ import { loading, EntityStatus, pending } from 'app/entities/entities';
 import { Server } from 'app/entities/servers/server.model';
 import {
   allServers, getStatus, saveStatus, saveError } from 'app/entities/servers/server.selectors';
-import { CreateServer, GetServers } from 'app/entities/servers/server.actions';
+import { CreateServer, GetServers, DeleteServer } from 'app/entities/servers/server.actions';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
@@ -20,7 +20,7 @@ import { ChefSorters } from 'app/helpers/auth/sorter';
   templateUrl: './chef-servers-list.component.html',
   styleUrls: ['./chef-servers-list.component.scss']
 })
-export class ChefServersListComponent implements OnInit {
+export class ChefServersListComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean>;
   public sortedChefServers$: Observable<Server[]>;
   public createModalVisible = false;
@@ -28,6 +28,8 @@ export class ChefServersListComponent implements OnInit {
   public creatingChefServer = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
   private isDestroyed = new Subject<boolean>();
+  public serverToDelete: Server;
+  public deleteModalVisible = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -79,6 +81,11 @@ export class ChefServersListComponent implements OnInit {
       });
   }
 
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
+  }
+
   public openCreateModal(): void {
     this.createModalVisible = true;
     this.resetCreateModal();
@@ -104,5 +111,19 @@ export class ChefServersListComponent implements OnInit {
     this.creatingChefServer = false;
     this.createChefServerForm.reset();
     this.conflictErrorEvent.emit(false);
+  }
+
+  public startServerDelete(server: Server): void {
+    this.serverToDelete = server;
+    this.deleteModalVisible = true;
+  }
+
+  public deleteServer(): void {
+    this.closeDeleteModal();
+    this.store.dispatch(new DeleteServer(this.serverToDelete));
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
   }
 }

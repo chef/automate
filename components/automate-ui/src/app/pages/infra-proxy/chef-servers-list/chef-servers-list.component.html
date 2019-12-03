@@ -14,7 +14,14 @@
           [conflictErrorEvent]="conflictErrorEvent"
           (createClicked)="createChefServer()">
         </app-create-chef-server-modal>
-
+        <app-delete-object-modal
+          [visible]="deleteModalVisible"
+          objectNoun="server"
+          [objectName]="serverToDelete?.name"
+          (close)="closeDeleteModal()"
+          (deleteClicked)="deleteServer()"
+          objectAction="Delete">
+        </app-delete-object-modal>
         <div class="page-body">
           <chef-toolbar>
             <chef-button primary (click)="openCreateModal()">Add Chef Server</chef-button>
@@ -37,12 +44,10 @@
                     <chef-table-cell>{{ server.fqdn }}</chef-table-cell>
                     <chef-table-cell>{{ server.ip_address }}</chef-table-cell>
                     <chef-table-cell>{{ server.description }}</chef-table-cell>
-                    <chef-table-cell class="controls">
-                      <app-authorized>
-                        <chef-control-menu>
-                          <chef-option>Remove Chef Server</chef-option>
-                        </chef-control-menu>
-                      </app-authorized>
+                    <chef-table-cell class="three-dot-column">
+                      <chef-control-menu>
+                        <chef-option data-cy="delete" (click)="startServerDelete(server)">Remove Chef Server</chef-option>
+                      </chef-control-menu>
                     </chef-table-cell>
                 </chef-table-row>
             </chef-table-body>

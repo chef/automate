@@ -12,7 +12,10 @@ export enum ServerActionTypes {
   GET_FAILURE                    = 'SERVER::GET::FAILURE',
   CREATE                         = 'SERVER::CREATE',
   CREATE_SUCCESS                 = 'SERVER::CREATE::SUCCESS',
-  CREATE_FAILURE                 = 'SERVER::CREATE::FAILURE'
+  CREATE_FAILURE                 = 'SERVER::CREATE::FAILURE',
+  DELETE                         = 'SERVER::CREATE::DELETE',
+  DELETE_SUCCESS                 = 'SERVER::CREATE::DELETE::SUCCESS',
+  DELETE_FAILURE                 = 'SERVER::CREATE::DELETE::FAILURE'
 }
 
 
@@ -79,6 +82,21 @@ export class CreateServerFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class DeleteServer implements Action {
+  readonly type = ServerActionTypes.DELETE;
+  constructor(public payload: { id: string, name: string }) { }
+}
+
+export class DeleteServerSuccess implements Action {
+  readonly type = ServerActionTypes.DELETE_SUCCESS;
+  constructor(public payload: { id: string, name: string }) { }
+}
+
+export class DeleteServerFailure implements Action {
+  readonly type = ServerActionTypes.DELETE_FAILURE;
+  constructor(public payload: HttpErrorResponse) { }
+}
+
 export type ServerActions =
   | GetServers
   | GetServersSuccess
@@ -88,4 +106,7 @@ export type ServerActions =
   | GetServerFailure
   | CreateServer
   | CreateServerSuccess
-  | CreateServerFailure;
+  | CreateServerFailure
+  | DeleteServer
+  | DeleteServerSuccess
+  | DeleteServerFailure;

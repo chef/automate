@@ -32,4 +32,8 @@ export class ServerRequests {
     return this.http.post<ServerResponse>(
       `${env.gateway_url}/infra_proxy/servers`, mapKeys(snakeCase, serverData));
   }
+
+  public deleteServer(id: string): Observable<ServerResponse> {
+    return this.http.delete<ServerResponse>(`${env.gateway_url}/infra_proxy/servers/${id}`);
+  }
 }

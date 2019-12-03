@@ -19,7 +19,10 @@ import {
   GetServerFailure,
   CreateServer,
   CreateServerSuccess,
-  CreateServerFailure
+  CreateServerFailure,
+  DeleteServer,
+  DeleteServerSuccess,
+  DeleteServerFailure
 } from './server.actions';
 
 import {
@@ -97,4 +100,34 @@ export class ServerEffects {
         type: Type.error,
         message: `Could not create server: ${payload.error.error || payload}`
       })));
+
+  @Effect()
+  deleteServer$ = this.actions$.pipe(
+    ofType(ServerActionTypes.DELETE),
+    mergeMap(({ payload: { id, name } }: DeleteServer) =>
+      this.requests.deleteServer(id).pipe(
+        map(() => new DeleteServerSuccess({id, name})),
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new DeleteServerFailure(error))))));
+
+  @Effect()
+  deleteServerSuccess$ = this.actions$.pipe(
+      ofType(ServerActionTypes.DELETE_SUCCESS),
+      map(({ payload: { name } }: DeleteServerSuccess) => {
+        return new CreateNotification({
+          type: Type.info,
+          message: `Deleted server ${name}.`
+        });
+      }));
+
+  @Effect()
+  deleteServerFailure$ = this.actions$.pipe(
+    ofType(ServerActionTypes.DELETE_FAILURE),
+    map(({ payload: { error } }: DeleteServerFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not delete server: ${msg || error}`
+      });
+    }));
 }
