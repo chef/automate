@@ -412,9 +412,6 @@ var ComplianceRepDate = Mapping{
                 }
               },
               "type": "keyword"
-            },
-            "waived": {
-              "type": "boolean"
             }
           },
           "type": "nested"
@@ -546,9 +543,6 @@ var ComplianceRepDate = Mapping{
 					"type": "keyword",
 					"doc_values": false,
 					"ignore_above": 256
-				},
-				"waived": {
-					"type": "boolean"
 				}
       }
     }

@@ -76,7 +76,6 @@ type ESInSpecReport struct {
 	// as pointer so we can assign null to it when we get a report without an IP
 	IPAddress *string `json:"ipaddress"`
 	FQDN      string  `json:"fqdn"`
-	Waived    bool    `json:"waived"`
 }
 
 type ESInSpecSummaryProfile struct {
