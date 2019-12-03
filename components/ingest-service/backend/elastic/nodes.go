@@ -91,13 +91,7 @@ func (es *Backend) DeleteNodeByID(ctx context.Context, nodeID string) (int, erro
 func (es *Backend) DeleteNodeProjectTag(ctx context.Context, projectTagToBeDelete string) (string, error) {
 	script := `
 		if (ctx._source['projects'] != null) {
-			def foundIndex = -1;
-			for (def index = 0; index < ctx._source.projects.size(); index++) {
-				if (ctx._source.projects[index] == params.project) {
-					foundIndex = index;
-					break;
-				}
-			}
+			def foundIndex = ctx._source.projects.indexOf(params.project);
 
 			if (foundIndex != -1) {
 				ctx._source.projects.remove(foundIndex);

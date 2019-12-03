@@ -35,13 +35,7 @@ func (es *Backend) DeleteActionProjectTag(ctx context.Context,
 	projectTagToBeDelete string) (string, error) {
 	script := `
 		if (ctx._source['projects'] != null) {
-			def foundIndex = -1;
-			for (def index = 0; index < ctx._source.projects.size(); index++) {
-				if (ctx._source.projects[index] == params.project) {
-					foundIndex = index;
-					break;
-				}
-			}
+			def foundIndex = ctx._source.projects.indexOf(params.project);
 
 			if (foundIndex != -1) {
 				ctx._source.projects.remove(foundIndex);
