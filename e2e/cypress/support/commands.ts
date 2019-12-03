@@ -247,6 +247,55 @@ Cypress.Commands.add('waitUntilApplyRulesNotRunning', (attempts: number) => {
   });
 });
 
+Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string, maxRetries: number) => {
+  cy.request({
+    headers: {
+      projects: ['*'],
+      'api-token': Cypress.env('ADMIN_TOKEN')
+    },
+    method: 'POST',
+    url: '/api/v0/nodes/search',
+    body: {
+      order: 'DESC',
+      page: 1,
+      per_page: 100
+    }
+  })
+  .then((resp: Cypress.ObjectLike) => {
+    // to avoid getting stuck in an infinite loop
+    expect(maxRetries).to.not.be.equal(0);
+    if (resp.body.nodes && resp.body.nodes.length > 0 &&
+      resp.body.nodes.some((node: any) => node.id === nodeId)) {
+      return;
+    }
+    cy.wait(1000);
+    cy.waitForNodemanagerNode(nodeId, maxRetries - 1);
+  });
+});
+
+Cypress.Commands.add('waitForClientRunsNode', (nodeId: string, maxRetries: number) => {
+  cy
+  .request({
+    headers: {
+      projects: ['*'],
+      'api-token': Cypress.env('ADMIN_TOKEN')
+    },
+    method: 'GET',
+    url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${nodeId}`
+  })
+  .then((resp: Cypress.ObjectLike) => {
+    // to avoid getting stuck in an infinite loop
+    if (maxRetries === 0) {
+      return;
+    }
+    if (resp.body && resp.body.length > 0 ) {
+      return;
+    }
+    cy.wait(1000);
+    cy.waitForClientRunsNode(nodeId, maxRetries - 1);
+  });
+});
+
 Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, end: string,
   maxRetries: number) => {
   cy.request({
@@ -279,29 +328,6 @@ Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, en
     cy.wait(1000);
     cy.waitForComplianceNode(nodeId, start, end, maxRetries - 1);
   });
-});
-
-Cypress.Commands.add('waitForClientRunsNode', (nodeId: string, maxRetries: number) => {
-    cy
-    .request({
-      headers: {
-        projects: ['*'],
-        'api-token': Cypress.env('ADMIN_TOKEN')
-      },
-      method: 'GET',
-      url: `/api/v0/cfgmgmt/nodes?pagination.size=10&filter=node_id:${nodeId}`
-    })
-    .then((resp: Cypress.ObjectLike) => {
-      // to avoid getting stuck in an infinite loop
-      if (maxRetries === 0) {
-        return;
-      }
-      if (resp.body && resp.body.length > 0 ) {
-        return;
-      }
-      cy.wait(1000);
-      cy.waitForClientRunsNode(nodeId, maxRetries - 1);
-    });
 });
 
 // helpers
