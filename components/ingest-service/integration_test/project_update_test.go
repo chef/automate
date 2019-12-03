@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"testing"
-	"time"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
