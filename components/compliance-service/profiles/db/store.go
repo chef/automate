@@ -476,11 +476,10 @@ func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata
 		"query": query,
 		"args":  args,
 		"err":   err,
-	}).Infof("Querying profiles")
+	}).Debugf("Querying profiles")
 
 	rows, err := s.DB.Query(query, args...)
 	if err != nil {
-		logrus.Error(err)
 		return nil, 0, err
 	}
 	defer rows.Close() // nolint: errcheck
