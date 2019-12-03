@@ -17,7 +17,11 @@ test_detect_broken_cli=true
 # leaving the packages in a corrupt state. We can't go back in time
 # and fix it, but we try to identify common cases and fix them in the
 # tests.
-test_detect_broken_packages=true
+# NOTE (jaym): turning this on is causing the tests to fail in other ways
+# We'll turn it off for now so that we can see it fail and come up with a 
+# more targeted fix
+#test_detect_broken_packages=true
+
 
 CURRENT_OLDEST_VERSION=20180629132035
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
