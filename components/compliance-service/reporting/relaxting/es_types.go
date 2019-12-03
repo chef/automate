@@ -87,7 +87,6 @@ type ESInSpecSummaryProfile struct {
 	Full         string                       `json:"full"`
 	SHA256       string                       `json:"sha256"`
 	ControlsSums reporting.NodeControlSummary `json:"controls_sums"`
-	Waived       bool                         `json:"waived"`
 }
 
 type ESInSpecReportControlsResult struct {

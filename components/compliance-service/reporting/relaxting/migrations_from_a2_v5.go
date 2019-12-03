@@ -13,6 +13,7 @@ const (
 	a2V5IndexPrefix    = "comp-5-"
 	a2V5SumIndexPrefix = a2V5IndexPrefix + "s-"
 	waiversFullScript  = `
+		def waived_total_zero = ['total': 0];
 		if (ctx._source['profiles'] != null) {
 			for (int i = 0; i < ctx._source.profiles.length; ++i) {
 				if (ctx._source.profiles[i] != null) {
@@ -23,8 +24,14 @@ const (
 							}
 						}
 					}
+					if (ctx._source.profiles[i].controls_sums != null) {
+							ctx._source.profiles[i].controls_sums.waived = waived_total_zero;
+					}
 				}
 			}
+		}
+		if (ctx._source.controls_sums != null) {
+				ctx._source.controls_sums.waived = waived_total_zero;
 		}
 	`
 )
@@ -53,14 +60,15 @@ func (migratable A2V5ElasticSearchIndices) migrateTimeSeries(dateToMigrate time.
 
 	src := fmt.Sprintf("%ss-%s", a2V5IndexPrefix, dateToMigrateAsString)
 	dest := fmt.Sprintf("%s%s", CompDailySumIndexPrefix, dateToMigrateAsString)
-	_, err := migratable.backend.reindex(src, dest, noScript, "_doc")
+	logrus.Debugf("Reindexing %s with waiversFullScript", src)
+	_, err := migratable.backend.reindex(src, dest, waiversFullScript, "_doc")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
 	}
 
 	src = fmt.Sprintf("%sr-%s", a2V5IndexPrefix, dateToMigrateAsString)
 	dest = fmt.Sprintf("%s%s", CompDailyRepIndexPrefix, dateToMigrateAsString)
-	logrus.Debugf("!!!!!!! reindexing %s with waiversFullScript", src)
+	logrus.Debugf("Reindexing %s with waiversFullScript", src)
 	_, err = migratable.backend.reindex(src, dest, waiversFullScript, "_doc")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))

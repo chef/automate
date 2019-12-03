@@ -6,6 +6,7 @@ import (
 
 	"github.com/chef/automate/components/compliance-service/reporting/util"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
 )
 
 const (
@@ -33,6 +34,7 @@ func (migratable A2V3ElasticSearchIndices) migrateTimeSeries(dateToMigrate time.
 
 	src := fmt.Sprintf("%ss-%s", a2V3IndexPrefix, dateToMigrateAsString)
 	dest := fmt.Sprintf("%s%s", CompDailySumIndexPrefix, dateToMigrateAsString)
+	logrus.Debugf("Reindexing %s with profileFullScript", src)
 	_, err := migratable.backend.reindex(src, dest, profileFullScript, "_doc")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
@@ -40,6 +42,7 @@ func (migratable A2V3ElasticSearchIndices) migrateTimeSeries(dateToMigrate time.
 
 	src = fmt.Sprintf("%sr-%s", a2V3IndexPrefix, dateToMigrateAsString)
 	dest = fmt.Sprintf("%s%s", CompDailyRepIndexPrefix, dateToMigrateAsString)
+	logrus.Debugf("Reindexing %s with profileFullScript", src)
 	_, err = migratable.backend.reindex(src, dest, profileFullScript, "_doc")
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to reindex %s", src, myName))
