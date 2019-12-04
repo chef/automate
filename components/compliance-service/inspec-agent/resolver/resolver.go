@@ -21,6 +21,7 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/gofrs/uuid"
 
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
@@ -125,10 +126,11 @@ func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManag
 				logrus.Debugf("handleManagerNodes unable to get node id: %s", err.Error())
 			}
 			if len(nodeUUID) == 0 {
-				nodeUUID, err = r.scannerServer.AddNodeToDB(ctx, &inspec.OSInfo{}, &baseJob, scanner.SourceInfo{SourceAccountID: m.AccountId, SourceRegion: node.ID, SourceID: node.ID}, time.Time{})
+				id, err := uuid.NewV4()
 				if err != nil {
-					logrus.Errorf("resolver unable to add node: %s", err.Error())
+					logrus.Warnf("unable to generate uuid for node")
 				}
+				nodeUUID = id.String()
 			}
 			baseJob.NodeID = nodeUUID
 			jobArray = append(jobArray, &types.InspecJob{
@@ -149,6 +151,7 @@ func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManag
 				Profiles:        job.Profiles,
 				SourceID:        node.ID,
 				SourceAccountID: m.AccountId,
+				ManagerID:       m.Id,
 			})
 		}
 	}
@@ -211,6 +214,7 @@ func (r *Resolver) handleGcpApiNodes(ctx context.Context, m *manager.NodeManager
 			Profiles:        job.Profiles,
 			SourceID:        node.Name,
 			SourceAccountID: m.AccountId,
+			ManagerID:       m.Id,
 		})
 	}
 	return jobArray, nil
@@ -320,6 +324,7 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		Profiles:        job.Profiles,
 		SourceID:        m.AccountId,
 		SourceAccountID: m.AccountId,
+		ManagerID:       m.Id,
 	}}, nil
 }
 
@@ -373,13 +378,13 @@ func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.No
 				logrus.Errorf("handleManagerNodes unable to get node id: %s", err.Error())
 			}
 			if len(nodeUUID) == 0 {
-				nodeUUID, err = r.scannerServer.AddNodeToDB(ctx, &inspec.OSInfo{}, &baseJob, scanner.SourceInfo{SourceAccountID: m.AccountId, SourceRegion: node, SourceID: node}, time.Time{})
+				id, err := uuid.NewV4()
 				if err != nil {
-					logrus.Errorf("resolver unable to add node: %s", err.Error())
+					logrus.Warnf("unable to generate uuid for node")
 				}
+				nodeUUID = id.String()
 			}
 			baseJob.NodeID = nodeUUID
-
 			jobArray = append(jobArray, &types.InspecJob{
 				InspecBaseJob: baseJob,
 				Timeout:       job.Timeout,
@@ -398,6 +403,7 @@ func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.No
 				Profiles:        job.Profiles,
 				SourceID:        node,
 				SourceAccountID: m.AccountId,
+				ManagerID:       m.Id,
 			})
 		}
 	}
@@ -539,10 +545,11 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 					logrus.Debugf("handleManagerNodes unable to get node id: %s", err.Error())
 				}
 				if len(nodeUUID) == 0 {
-					nodeUUID, err = r.scannerServer.AddNodeToDB(ctx, &inspec.OSInfo{}, &baseJob, scanner.SourceInfo{SourceAccountID: m.AccountId, SourceRegion: node.Region, SourceID: node.Id}, time.Time{})
+					id, err := uuid.NewV4()
 					if err != nil {
-						logrus.Errorf("resolver unable to add node: %s", err.Error())
+						logrus.Warnf("unable to generate uuid for node")
 					}
+					nodeUUID = id.String()
 				}
 				baseJob.NodeID = nodeUUID
 				fullJob := types.InspecJob{
@@ -570,6 +577,7 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 					SourceAccountID:   m.AccountId,
 					MachineIdentifier: node.MachineIdentifier,
 					Tags:              node.Tags,
+					ManagerID:         m.Id,
 				}
 				jobArray = append(jobArray, &fullJob)
 			}
@@ -744,6 +752,7 @@ func (r *Resolver) resolveStaticJobInfo(job *jobs.Job, node *nodes.Node, tc insp
 		TargetConfig: tc,
 		Profiles:     job.Profiles,
 		Tags:         node.Tags,
+		ManagerID:    mgrtypes.AutomateManagerID,
 	}
 	return agentJob
 }

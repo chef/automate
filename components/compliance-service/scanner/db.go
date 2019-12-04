@@ -14,7 +14,6 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	_ "github.com/lib/pq"
-	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 
@@ -25,7 +24,6 @@ import (
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
-	uuid "github.com/chef/automate/lib/uuid4"
 )
 
 type Scanner struct {
@@ -176,6 +174,10 @@ func (s *Scanner) GetDueJobs(nowTime time.Time) []*jobs.Job {
 }
 
 func (s *Scanner) UpdateNode(ctx context.Context, job *types.InspecJob, detectInfo *inspec.OSInfo) {
+	if job.NodeID == "" {
+		logrus.Warnf("no node id included in node update for node %s", job.NodeName)
+		return
+	}
 	var err error
 	if detectInfo == nil {
 		detectInfo = &inspec.OSInfo{}
@@ -194,43 +196,12 @@ func (s *Scanner) UpdateNode(ctx context.Context, job *types.InspecJob, detectIn
 		JobEndTime:      endTimeTimestamp,
 		JobId:           job.JobID,
 		JobType:         job.JobType,
+		NodeName:        job.NodeName,
 	})
 	if err != nil {
 		logrus.Error(err)
 		return
 	}
-}
-
-type SourceInfo struct {
-	SourceID        string
-	SourceRegion    string
-	SourceAccountID string
-}
-
-func (s *Scanner) AddNodeToDB(ctx context.Context, detectInfo *inspec.OSInfo, job *types.InspecBaseJob, sourceInfo SourceInfo, endTime time.Time) (string, error) {
-	nodeUuid := job.NodeID
-	if job.NodeID == "" {
-		nodeUuid = uuid.Must(uuid.NewV4()).String()
-	}
-	timestamp, err := ptypes.TimestampProto(endTime)
-	if err != nil {
-		logrus.Errorf("unable to parse job end time %v", endTime)
-	}
-	_, err = s.managerClient.ProcessNode(ctx, &manager.NodeMetadata{
-		Uuid:            nodeUuid,
-		Name:            job.NodeName,
-		PlatformName:    detectInfo.OSName,
-		PlatformRelease: detectInfo.OSRelease,
-		JobUuid:         job.JobID,
-		LastContact:     timestamp,
-		SourceId:        sourceInfo.SourceID,
-		SourceRegion:    sourceInfo.SourceRegion,
-		SourceAccountId: sourceInfo.SourceAccountID,
-	})
-	if err != nil {
-		return nodeUuid, errors.Wrapf(err, "addNodeToDB unable to create node %s", job.NodeID)
-	}
-	return nodeUuid, nil
 }
 
 func (s *Scanner) UpdateResult(ctx context.Context, job *types.InspecJob, output []byte, inspecErr *inspec.Error, reportID string) {

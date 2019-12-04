@@ -17,8 +17,8 @@ import (
 const sqlUpsertByIDRunData = `
 INSERT INTO nodes
 	(id, name, platform, platform_version, source_state, 
-		last_contact, source_region, source_account_id, last_run, projects_data)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+		last_contact, source_region, source_account_id, last_run, projects_data, manager)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
 ON CONFLICT (id)
 DO UPDATE
 SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
@@ -29,8 +29,8 @@ WHERE nodes.source_state != 'TERMINATED';
 const sqlUpsertByIDScanData = `
 INSERT INTO nodes
 	(id, name, platform, platform_version, source_state, 
-		last_contact, source_region, source_account_id, last_job, last_scan, projects_data)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		last_contact, source_region, source_account_id, last_job, last_scan, projects_data, manager)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 ON CONFLICT (id)
 DO UPDATE
 SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
@@ -41,8 +41,8 @@ WHERE nodes.source_state != 'TERMINATED';
 const sqlUpsertBySourceIDRunData = `
 INSERT INTO nodes
 	(id, name, platform, platform_version, source_state, 
-		last_contact, source_id, source_region, source_account_id, last_run, projects_data)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+		last_contact, source_id, source_region, source_account_id, last_run, projects_data, manager)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 ON CONFLICT (source_id, source_region, source_account_id)
 DO UPDATE
 SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
@@ -53,8 +53,8 @@ WHERE nodes.source_state != 'TERMINATED' RETURNING id;
 const sqlUpsertBySourceIDScanData = `
 INSERT INTO nodes
 	(id, name, platform, platform_version, source_state, 
-		last_contact, source_id, source_region, source_account_id, last_job, last_scan, projects_data)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+		last_contact, source_id, source_region, source_account_id, last_job, last_scan, projects_data, manager)
+VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 ON CONFLICT (source_id, source_region, source_account_id)
 DO UPDATE
 SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
@@ -72,6 +72,12 @@ const sqlGetCurrentScanStatus = `
 SELECT coalesce(last_scan ->> 'Status', '') AS status
 FROM nodes
 WHERE id = $1 OR source_id = $2 AND source_region = $3 AND source_account_id = $4;
+`
+
+const sqlGetManagerTypeFromId = `
+SELECT type
+FROM node_managers
+WHERE id = $1;
 `
 
 type lastContactData struct {
@@ -123,18 +129,26 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 		return errors.Wrap(err, "ProcessIncomingNode unable to marshal projects data")
 	}
 
+	var mgrType string
+	if node.ManagerId != "" {
+		mgrType, err = db.SelectStr(sqlGetManagerTypeFromId, node.ManagerId)
+		if err != nil {
+			logrus.Warnf("unable to find manager for node")
+		}
+	}
+
 	err = Transact(db, func(tx *DBTrans) error {
 		if len(node.GetSourceId()) == 0 || len(node.GetSourceAccountId()) == 0 || len(node.GetSourceRegion()) == 0 {
 			if node.GetScanData() != nil {
 				_, err = db.Exec(sqlUpsertByIDScanData, node.GetUuid(),
 					node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
 					nodeState, lastContact, node.GetSourceRegion(), node.GetSourceAccountId(),
-					node.GetJobUuid(), lastContactDataByte, projectsDataByte)
+					node.GetJobUuid(), lastContactDataByte, projectsDataByte, mgrType)
 			} else if node.GetRunData() != nil {
 				_, err = db.Exec(sqlUpsertByIDRunData, node.GetUuid(),
 					node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
 					nodeState, lastContact, node.GetSourceRegion(), node.GetSourceAccountId(),
-					lastContactDataByte, projectsDataByte)
+					lastContactDataByte, projectsDataByte, mgrType)
 			}
 		} else {
 			var id string
@@ -142,12 +156,12 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 				id, err = db.SelectStr(sqlUpsertBySourceIDScanData, node.GetUuid(),
 					node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
 					nodeState, lastContact, node.GetSourceId(), node.GetSourceRegion(),
-					node.GetSourceAccountId(), node.GetJobUuid(), lastContactDataByte, projectsDataByte)
+					node.GetSourceAccountId(), node.GetJobUuid(), lastContactDataByte, projectsDataByte, mgrType)
 			} else if node.GetRunData() != nil {
 				id, err = db.SelectStr(sqlUpsertBySourceIDRunData, node.GetUuid(),
 					node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
 					nodeState, lastContact, node.GetSourceId(), node.GetSourceRegion(),
-					node.GetSourceAccountId(), lastContactDataByte, projectsDataByte)
+					node.GetSourceAccountId(), lastContactDataByte, projectsDataByte, mgrType)
 			}
 			if len(id) > 0 {
 				node.Uuid = id
@@ -155,6 +169,12 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 		}
 		if err != nil {
 			return errors.Wrap(err, "ProcessIncomingNode unable to process node")
+		}
+		if node.ManagerId != "" {
+			_, err = tx.Exec(sqlInsertNodeManagerNode, node.ManagerId, node.Uuid)
+			if err != nil {
+				return errors.Wrap(err, "ProcessIncomingNode unable to create manager-node association")
+			}
 		}
 		tags, err := tx.addTags(node.GetTags())
 		if err != nil {

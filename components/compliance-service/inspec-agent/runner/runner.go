@@ -478,6 +478,7 @@ func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, cont
 	report.SourceId = job.SourceID
 	report.SourceRegion = job.TargetConfig.TargetBaseConfig.Region
 	report.SourceAccountId = job.SourceAccountID
+	report.AutomateManagerId = job.ManagerID
 	ipAddress := net.ParseIP(job.TargetConfig.TargetBaseConfig.Hostname)
 	if ipAddress != nil {
 		report.Ipaddress = ipAddress.String()
