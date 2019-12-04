@@ -138,6 +138,7 @@ func (backend ES2Backend) GetTrend(filters map[string][]string, interval int, tr
 				Passed:     0,
 				Failed:     0,
 				Skipped:    0,
+				Waived:     0,
 			}
 		}
 		trendStatsBuckets = append(trendStatsBuckets, zaStatsBucket)

@@ -12,12 +12,21 @@ import (
 func (depth *ControlDepth) getTrendAggs(trendType string, filters map[string][]string) map[string]elastic.Aggregation {
 	aggs := make(map[string]elastic.Aggregation)
 
+	waivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
 	aggs["passed"] = elastic.NewFilterAggregation().
-		Filter(elastic.NewTermQuery("profiles.controls.status", "passed"))
+		Filter(elastic.NewBoolQuery().
+			Must(elastic.NewTermsQuery("profiles.controls.status", "passed")).
+			MustNot(waivedQuery))
 	aggs["failed"] = elastic.NewFilterAggregation().
-		Filter(elastic.NewTermQuery("profiles.controls.status", "failed"))
+		Filter(elastic.NewBoolQuery().
+			Must(elastic.NewTermsQuery("profiles.controls.status", "failed")).
+			MustNot(waivedQuery))
 	aggs["skipped"] = elastic.NewFilterAggregation().
-		Filter(elastic.NewTermQuery("profiles.controls.status", "skipped"))
+		Filter(elastic.NewBoolQuery().
+			Must(elastic.NewTermsQuery("profiles.controls.status", "skipped")).
+			MustNot(waivedQuery))
+	aggs["waived"] = elastic.NewFilterAggregation().
+		Filter(waivedQuery)
 
 	return depth.wrap(aggs)
 }
@@ -47,6 +56,7 @@ func (depth *ControlDepth) getTrendResults(trendType string,
 				Passed:     0,
 				Failed:     0,
 				Skipped:    0,
+				Waived:     0,
 			}
 
 			if trendBucket, found := depth.unwrap(&wrappedTrendBucket.Aggregations); found {
@@ -58,6 +68,9 @@ func (depth *ControlDepth) getTrendResults(trendType string,
 				}
 				if skippedResult, found := trendBucket.Aggregations.Filter("skipped"); found {
 					zaStatsBucket.Skipped = int32(skippedResult.DocCount)
+				}
+				if waivedResult, found := trendBucket.Aggregations.Filter("waived"); found {
+					zaStatsBucket.Waived = int32(waivedResult.DocCount)
 				}
 				mapOfTrends[trendIndexDateAsString] = zaStatsBucket
 			}

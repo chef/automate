@@ -80,6 +80,7 @@ message Trend {
 	int32 passed = 2;
 	int32 failed = 3;
 	int32 skipped = 4;
+	int32 waived = 5;
 }
 message Trends {
 	repeated Trend trends = 1;

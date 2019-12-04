@@ -73,7 +73,7 @@ if !ENV['NO_STATS_TREND_TESTS']
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
-              {"reportTime" => "2018-02-09T23:59:59Z", "passed" => 23, "failed" => 21, "skipped" => 12},
+              {"reportTime" => "2018-02-09T23:59:59Z", "passed" => 23, "failed" => 21, "skipped" => 12, "waived" => 3},
               {"reportTime" => "2018-02-10T23:59:59Z"}, {"reportTime" => "2018-02-11T23:59:59Z"}, {"reportTime" => "2018-02-12T23:59:59Z"},
               {"reportTime" => "2018-02-13T23:59:59Z"}, {"reportTime" => "2018-02-14T23:59:59Z"}, {"reportTime" => "2018-02-15T23:59:59Z"},
               {"reportTime" => "2018-02-16T23:59:59Z"}, {"reportTime" => "2018-02-17T23:59:59Z"}, {"reportTime" => "2018-02-18T23:59:59Z"},
@@ -182,7 +182,7 @@ if !ENV['NO_STATS_TREND_TESTS']
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
-              {"reportTime" => "2018-02-09T23:59:59Z", "passed" => 23, "failed" => 21, "skipped" => 12},
+              {"reportTime" => "2018-02-09T23:59:59Z", "passed" => 23, "failed" => 21, "skipped" => 12, "waived" => 3},
               {"reportTime" => "2018-02-10T23:59:59Z"},{"reportTime" => "2018-02-11T23:59:59Z"},{"reportTime" => "2018-02-12T23:59:59Z"},
               {"reportTime" => "2018-02-13T23:59:59Z"},{"reportTime" => "2018-02-14T23:59:59Z"},{"reportTime" => "2018-02-15T23:59:59Z"},
               {"reportTime" => "2018-02-16T23:59:59Z"},{"reportTime" => "2018-02-17T23:59:59Z"},{"reportTime" => "2018-02-18T23:59:59Z"},
@@ -367,7 +367,7 @@ if !ENV['NO_STATS_TREND_TESTS']
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
-              {"reportTime" => "2018-02-09T23:59:59Z","passed" => 1, "skipped" => 12},
+              {"reportTime" => "2018-02-09T23:59:59Z", "passed" => 1, "skipped" => 12, "waived" => 1},
               {"reportTime" => "2018-02-10T23:59:59Z"},{"reportTime" => "2018-02-11T23:59:59Z"},{"reportTime" => "2018-02-12T23:59:59Z"},
               {"reportTime" => "2018-02-13T23:59:59Z"},{"reportTime" => "2018-02-14T23:59:59Z"},{"reportTime" => "2018-02-15T23:59:59Z"},
               {"reportTime" => "2018-02-16T23:59:59Z"},{"reportTime" => "2018-02-17T23:59:59Z"},{"reportTime" => "2018-02-18T23:59:59Z"},
@@ -427,7 +427,7 @@ if !ENV['NO_STATS_TREND_TESTS']
       expected_data = {
           "trends" => [
               {"reportTime" => "2018-02-08T23:59:59Z"},
-              {"reportTime" => "2018-02-09T23:59:59Z","skipped" => 1},
+              {"reportTime" => "2018-02-09T23:59:59Z","waived" => 1},
               {"reportTime" => "2018-02-10T23:59:59Z"},{"reportTime" => "2018-02-11T23:59:59Z"},{"reportTime" => "2018-02-12T23:59:59Z"},
               {"reportTime" => "2018-02-13T23:59:59Z"},{"reportTime" => "2018-02-14T23:59:59Z"},{"reportTime" => "2018-02-15T23:59:59Z"},
               {"reportTime" => "2018-02-16T23:59:59Z"},{"reportTime" => "2018-02-17T23:59:59Z"},{"reportTime" => "2018-02-18T23:59:59Z"},
