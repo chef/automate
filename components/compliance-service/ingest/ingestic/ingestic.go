@@ -233,6 +233,7 @@ func (backend *ESClient) DeleteReportProjectTag(ctx context.Context, projectTagT
 		Index(index).
 		Type(docType).
 		Script(elastic.NewScript(deleteProjectTagScript).Params(params)).
+		Refresh("true").
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
 		DoAsync(ctx)
@@ -255,6 +256,7 @@ func (backend *ESClient) DeleteSummaryProjectTag(ctx context.Context, projectTag
 		Index(index).
 		Type(docType).
 		Script(elastic.NewScript(deleteProjectTagScript).Params(params)).
+		Refresh("true").
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
 		DoAsync(ctx)
