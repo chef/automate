@@ -30,6 +30,126 @@ var (
 			}
 		}
 	`
+
+	matchingProjectTagsScript = `ArrayList matchingProjects = new ArrayList();
+		for (def project : params.projects) {
+			for (def rule : project.rules) {
+				def match = rule.conditions.length != 0;
+				for (def condition : rule.conditions) {
+					if (condition.chefServers.length > 0) {
+						def found = false;
+						for (def chefServer : condition.chefServers){
+							if (ctx._source.source_fqdn == chefServer ) {
+								found = true;
+								break;
+							}
+						}
+						if ( !found ) {
+							match = false;
+							break;
+						}
+					}
+					if (condition.environments.length > 0) {
+						def found = false;
+						for (def environment : condition.environments){
+							if (ctx._source.environment == environment ) {
+								found = true;
+								break;
+							}
+						}
+						if ( !found ) {
+							match = false;
+							break;
+						}
+					}
+					if (condition.organizations.length > 0) {
+						def found = false;
+						for (def organization : condition.organizations){
+							if (ctx._source.organization_name == organization ) {
+								found = true;
+								break;
+							}
+						}
+						if ( !found ) {
+							match = false;
+							break;
+						}
+					}
+					if (condition.policyNames.length > 0) {
+						def found = false;
+						for (def policyName : condition.policyNames){
+							if (ctx._source.policy_name == policyName ) {
+								found = true;
+								break;
+							}
+						}
+						if ( !found ) {
+							match = false;
+							break;
+						}
+					}
+					if (condition.policyGroups.length > 0) {
+						def found = false;
+						for (def policyGroup : condition.policyGroups){
+							if (ctx._source.policy_group == policyGroup ) {
+								found = true;
+								break;
+							}
+						}
+						if ( !found ) {
+							match = false;
+							break;
+						}
+					}
+					if (condition.roles.length > 0) {
+						if (ctx._source['roles'] == null) {
+							match = false;
+							break;
+						}
+						def found = false;
+						for (def ruleRole : condition.roles){
+							for (def ccrRole : ctx._source.roles){
+								if (ccrRole == ruleRole ) {
+									found = true;
+									break;
+								}
+							}
+							if (found) { break; }
+						}
+						if ( !found ) {
+							match = false;
+							break;
+						}
+					}
+					if (condition.chefTags.length > 0) {
+						if (ctx._source['chef_tags'] == null) {
+							match = false;
+							break;
+						}
+						def found = false;
+						for (def ruleChefTag : condition.chefTags) {
+							for (def ccrChefTag : ctx._source.chef_tags) {
+								if (ccrChefTag == ruleChefTag ) {
+									found = true;
+									break;
+								}
+							}
+							if (found) { break; }
+						}
+						if ( !found ) {
+							match = false;
+							break;
+						}
+					}
+				}
+				if ( match ) {
+					matchingProjects.add(project.name);
+					break;
+				}
+			}
+		}
+
+		ctx._source.projects = matchingProjects.toArray();`
 )
 
 func NewESClient(client *elastic.Client) *ESClient {
@@ -288,128 +408,6 @@ func (backend *ESClient) UpdateProjectTags(ctx context.Context, projectTaggingRu
 
 func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
 
-	script := `
-		ArrayList matchingProjects = new ArrayList();
-		for (def project : params.projects) {
-			for (def rule : project.rules) {
-				def match = rule.conditions.length != 0;
-				for (def condition : rule.conditions) {
-					if (condition.chefServers.length > 0) {
-						def found = false;
-						for (def chefServer : condition.chefServers){
-							if (ctx._source.source_fqdn == chefServer ) {
-								found = true;
-								break;
-							}
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.environments.length > 0) {
-						def found = false;
-						for (def environment : condition.environments){
-							if (ctx._source.environment == environment ) {
-								found = true;
-								break;
-							}
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.organizations.length > 0) {
-						def found = false;
-						for (def organization : condition.organizations){
-							if (ctx._source.organization_name == organization ) {
-								found = true;
-								break;
-							}
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.policyNames.length > 0) {
-						def found = false;
-						for (def policyName : condition.policyNames){
-							if (ctx._source.policy_name == policyName ) {
-								found = true;
-								break;
-							}
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.policyGroups.length > 0) {
-						def found = false;
-						for (def policyGroup : condition.policyGroups){
-							if (ctx._source.policy_group == policyGroup ) {
-								found = true;
-								break;
-							}
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.roles.length > 0) {
-						if (ctx._source['roles'] == null) {
-							match = false;
-							break;
-						}
-						def found = false;
-						for (def ruleRole : condition.roles){
-							for (def ccrRole : ctx._source.roles){
-								if (ccrRole == ruleRole ) {
-									found = true;
-									break;
-								}
-							}
-							if (found) { break; }
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.chefTags.length > 0) {
-						if (ctx._source['chef_tags'] == null) {
-							match = false;
-							break;
-						}
-						def found = false;
-						for (def ruleChefTag : condition.chefTags) {
-							for (def ccrChefTag : ctx._source.chef_tags) {
-								if (ccrChefTag == ruleChefTag ) {
-									found = true;
-									break;
-								}
-							}
-							if (found) { break; }
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-				}
-				if ( match ) {
-					matchingProjects.add(project.name);
-					break;
-				}
-			}
-		}
-
-		ctx._source.projects = matchingProjects.toArray();
- `
-
 	docType := mappings.DocType
 	mapping := mappings.ComplianceRepDate
 	index := fmt.Sprintf("%s-%s", mapping.Index, "*")
@@ -417,7 +415,7 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
 	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
 		Type(docType).
-		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
+		Script(elastic.NewScript(matchingProjectTagsScript).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		Refresh("true").
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
@@ -430,128 +428,6 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
 
 func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
 
-	script := `
-		ArrayList matchingProjects = new ArrayList();
-		for (def project : params.projects) {
-			for (def rule : project.rules) {
-				def match = rule.conditions.length != 0;
-				for (def condition : rule.conditions) {
-					if (condition.chefServers.length > 0) {
-						def found = false;
-						for (def chefServer : condition.chefServers){
-							if (ctx._source.source_fqdn == chefServer ) {
-								found = true;
-								break;
-							}
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.environments.length > 0) {
-						def found = false;
-						for (def environment : condition.environments){
-							if (ctx._source.environment == environment ) {
-								found = true;
-								break;
-							}
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.organizations.length > 0) {
-						def found = false;
-						for (def organization : condition.organizations){
-							if (ctx._source.organization_name == organization ) {
-								found = true;
-								break;
-							}
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.policyNames.length > 0) {
-						def found = false;
-						for (def policyName : condition.policyNames){
-							if (ctx._source.policy_name == policyName ) {
-								found = true;
-								break;
-							}
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.policyGroups.length > 0) {
-						def found = false;
-						for (def policyGroup : condition.policyGroups){
-							if (ctx._source.policy_group == policyGroup ) {
-								found = true;
-								break;
-							}
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.roles.length > 0) {
-						if (ctx._source['roles'] == null) {
-							match = false;
-							break;
-						}
-						def found = false;
-						for (def ruleRole : condition.roles){
-							for (def ccrRole : ctx._source.roles){
-								if (ccrRole == ruleRole ) {
-									found = true;
-									break;
-								}
-							}
-							if (found) { break; }
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-					if (condition.chefTags.length > 0) {
-						if (ctx._source['chef_tags'] == null) {
-							match = false;
-							break;
-						}
-						def found = false;
-						for (def ruleChefTag : condition.chefTags) {
-							for (def ccrChefTag : ctx._source.chef_tags) {
-								if (ccrChefTag == ruleChefTag ) {
-									found = true;
-									break;
-								}
-							}
-							if (found) { break; }
-						}
-						if ( !found ) {
-							match = false;
-							break;
-						}
-					}
-				}
-				if ( match ) {
-					matchingProjects.add(project.name);
-					break;
-				}
-			}
-		}
-
-		ctx._source.projects = matchingProjects.toArray();
- `
-
 	docType := mappings.DocType
 	mapping := mappings.ComplianceSumDate
 	index := fmt.Sprintf("%s-%s", mapping.Index, "*")
@@ -559,7 +435,7 @@ func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectT
 	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
 		Type(docType).
-		Script(elastic.NewScript(script).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
+		Script(elastic.NewScript(matchingProjectTagsScript).Params(convertProjectTaggingRulesToEsParams(projectTaggingRules))).
 		Refresh("true").
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
