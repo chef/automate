@@ -64,6 +64,12 @@ type Client interface {
 	CreateBulkActionRequest(InternalChefAction) elastic.BulkableRequest
 	// @param (context, bulkableRequests)
 	SendBulkRequest(context.Context, []elastic.BulkableRequest) error
+
+	// IAM Projects contracts
+	// @param (context, projectTagToDelete)
+	DeleteActionProjectTag(context.Context, string) (string, error)
+	// @param (context, projectTagToDelete)
+	DeleteNodeProjectTag(context.Context, string) (string, error)
 	// @param (context, projectRules)
 	UpdateNodeProjectTags(context.Context, map[string]*iam_v2.ProjectRules) (string, error)
 	// @param (context, projectRules)
@@ -72,8 +78,10 @@ type Client interface {
 	JobStatus(context.Context, string) (project_update_lib.JobStatus, error)
 	// @param (context, jobID)
 	JobCancel(context.Context, string) error
-
+	// @param (context, projectRules)
 	UpdateProjectTags(context.Context, map[string]*iam_v2.ProjectRules) ([]string, error)
+	// @param (context, projectTagToDelete)
+	DeleteProjectTag(context.Context, string) ([]string, error)
 
 	// Migration contracts
 	ReindexInsightstoConvergeHistory(context.Context, string, string) error
