@@ -394,6 +394,14 @@ Rules of type `Node` can have conditions with attributes `Chef Organization`, `C
 Navigate to the project list page once more. Select `Update Projects`. Upon completion of the update, you should be able to
 filter by `project-devops` across Automate's dashboards and see only the ingested data that you expect.
 
+#### Deleting Projects
+
+To delete a project, navigate to the Projects list under the **Settings** tab. Find the project you wish to delete in the list, click the menu on the
+right side of the column, and click `Delete Project`.
+
+When a project is deleted, it is removed from any resource assigned to the project. For ingested resources, it could take several hours
+for the project to be removed from every resource. If the project delete was the only project assigned to a resource, they become unassigned.
+
 #### Project Policies
 
 When you create a project, Chef Automate automatically creates three supplemental policies.
