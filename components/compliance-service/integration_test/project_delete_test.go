@@ -10,11 +10,12 @@ import (
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )
 
+var (
+	ctx               = context.Background()
+	projectIDToDelete = "target_project"
+)
+
 func TestReportProjectDelete(t *testing.T) {
-	var (
-		ctx               = context.Background()
-		projectIDToDelete = "target_project"
-	)
 
 	cases := []struct {
 		description        string
@@ -72,11 +73,16 @@ func TestReportProjectDelete(t *testing.T) {
 
 func TestReportProjectDeleteNoReports(t *testing.T) {
 	t.Run("Deleting a project when there are no reports", func(t *testing.T) {
-		// Send a project rules update event
+		esJobID, err := suite.ingesticESClient.DeleteReportProjectTag(ctx, projectIDToDelete)
+		assert.NoError(t, err)
 
-		// wait
+		suite.WaitForESJobToComplete(esJobID)
 
-		// refresh
+		suite.RefreshComplianceReportIndex()
+
+		reports, err := suite.GetAllReportsESInSpecReport()
+		require.NoError(t, err)
+		require.Equal(t, 0, len(reports))
 	})
 }
 
