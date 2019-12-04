@@ -95,12 +95,6 @@ func (projectUpdate *ProjectUpdate) updateFail(err error) {
 	projectUpdate.running = false
 }
 
-func (db *DB) DeleteProjectTag(ctx context.Context,
-	projectTagToBeDelete string) ([]string, error) {
-	// TODO implement
-	return []string{}, nil
-}
-
 // JobCancel - cancel the a currently running project update
 func (db *DB) JobCancel(ctx context.Context, jobID string) error {
 	log.Debugf("Node manager project update JobCancel %s", jobID)
@@ -123,7 +117,20 @@ func (db *DB) UpdateProjectTags(ctx context.Context,
 
 // JobStatus - get the job status of the project update
 func (db *DB) JobStatus(ctx context.Context, jobID string) (project_update_lib.JobStatus, error) {
-	return db.ProjectUpdate.getJobStatus(jobID)
+	if db.ProjectUpdate.ID == jobID {
+		return db.ProjectUpdate.getJobStatus(jobID)
+	}
+
+	if db.ProjectDelete.ID == jobID {
+		return db.ProjectDelete.getJobStatus(jobID)
+	}
+
+	// If the jobID does not match the currently running job then it must have completed before.
+	return project_update_lib.JobStatus{
+		Completed:             true,
+		PercentageComplete:    1,
+		EstimatedEndTimeInSec: 0,
+	}, nil
 }
 
 func (db *DB) updateNodes(projectRules map[string]*iam_v2.ProjectRules) {
