@@ -16,7 +16,6 @@ var (
 )
 
 func TestReportProjectDelete(t *testing.T) {
-
 	cases := []struct {
 		description        string
 		existingProjectIDs []string
@@ -25,7 +24,7 @@ func TestReportProjectDelete(t *testing.T) {
 	}{
 		{
 			description:        "Deleting the last project tag",
-			existingProjectIDs: []string{"target_project"},
+			existingProjectIDs: []string{projectIDToDelete},
 			expectedProjectIDs: []string{},
 		},
 		{
@@ -35,7 +34,7 @@ func TestReportProjectDelete(t *testing.T) {
 		},
 		{
 			description:        "Deleting a project on a report with multiple projects",
-			existingProjectIDs: []string{"project3", "target_project", "project9"},
+			existingProjectIDs: []string{"project3", projectIDToDelete, "project9"},
 			expectedProjectIDs: []string{"project3", "project9"},
 		},
 	}
@@ -50,13 +49,10 @@ func TestReportProjectDelete(t *testing.T) {
 			_, err := suite.InsertInspecReports([]*relaxting.ESInSpecReport{report})
 			require.NoError(t, err)
 
-			defer suite.DeleteAllDocuments()
-
 			esJobID, err := suite.ingesticESClient.DeleteReportProjectTag(ctx, projectIDToDelete)
 			require.NoError(t, err)
 
 			suite.WaitForESJobToComplete(esJobID)
-
 			suite.RefreshComplianceReportIndex()
 
 			// get the reports
@@ -65,9 +61,9 @@ func TestReportProjectDelete(t *testing.T) {
 			require.Equal(t, 1, len(reports))
 
 			updatedReport := reports[0]
-
 			assert.ElementsMatch(t, test.expectedProjectIDs, updatedReport.Projects)
 		})
+		suite.DeleteAllDocuments()
 	}
 }
 
@@ -77,7 +73,6 @@ func TestReportProjectDeleteNoReports(t *testing.T) {
 		assert.NoError(t, err)
 
 		suite.WaitForESJobToComplete(esJobID)
-
 		suite.RefreshComplianceReportIndex()
 
 		reports, err := suite.GetAllReportsESInSpecReport()
@@ -95,7 +90,7 @@ func TestSummaryProjectDelete(t *testing.T) {
 	}{
 		{
 			description:        "Deleting the last project tag",
-			existingProjectIDs: []string{"target_project"},
+			existingProjectIDs: []string{projectIDToDelete},
 			expectedProjectIDs: []string{},
 		},
 		{
@@ -105,14 +100,13 @@ func TestSummaryProjectDelete(t *testing.T) {
 		},
 		{
 			description:        "Deleting a project on a summary with multiple projects",
-			existingProjectIDs: []string{"project3", "target_project", "project9"},
+			existingProjectIDs: []string{"project3", projectIDToDelete, "project9"},
 			expectedProjectIDs: []string{"project3", "project9"},
 		},
 	}
 
 	for _, test := range cases {
 		t.Run(test.description, func(t *testing.T) {
-
 			summary := &relaxting.ESInSpecSummary{
 				Projects: test.existingProjectIDs,
 			}
@@ -120,13 +114,10 @@ func TestSummaryProjectDelete(t *testing.T) {
 			_, err := suite.InsertInspecSummaries([]*relaxting.ESInSpecSummary{summary})
 			require.NoError(t, err)
 
-			defer suite.DeleteAllDocuments()
-
 			esJobID, err := suite.ingesticESClient.DeleteSummaryProjectTag(ctx, projectIDToDelete)
 			require.NoError(t, err)
 
 			suite.WaitForESJobToComplete(esJobID)
-
 			suite.RefreshComplianceSummaryIndex()
 
 			// get the summaries
@@ -135,9 +126,9 @@ func TestSummaryProjectDelete(t *testing.T) {
 			require.Equal(t, 1, len(summaries))
 
 			updatedSummary := summaries[0]
-
 			assert.ElementsMatch(t, test.expectedProjectIDs, updatedSummary.Projects)
 		})
+		suite.DeleteAllDocuments()
 	}
 }
 
@@ -147,7 +138,6 @@ func TestSummaryProjectDeleteNoSummaries(t *testing.T) {
 		assert.NoError(t, err)
 
 		suite.WaitForESJobToComplete(esJobID)
-
 		suite.RefreshComplianceSummaryIndex()
 
 		summaries, err := suite.GetAllSummaryESInSpecSummary()
