@@ -22,19 +22,19 @@ type ProjectDelete struct {
 }
 
 func (db *DB) DeleteProjectTag(ctx context.Context,
-	projectTagToBeDelete string) ([]string, error) {
+	projectTagToBeDeleted string) ([]string, error) {
 	jobUUID := uuid.Must(uuid.NewV4()).String()
-	log.Debugf("Running node manager DeleteProjectTag %v ID: %s", projectTagToBeDelete, jobUUID)
+	log.Debugf("Running node manager DeleteProjectTag %v ID: %s", projectTagToBeDeleted, jobUUID)
 
 	db.ProjectDelete.start(jobUUID)
 
-	go db.deleteProject(projectTagToBeDelete)
+	go db.deleteProject(projectTagToBeDeleted)
 
 	return []string{jobUUID}, nil
 }
 
-func (db *DB) deleteProject(projectTagToBeDelete string) {
-	_, err := db.Exec(deleteProjectNodeAssociation, projectTagToBeDelete)
+func (db *DB) deleteProject(projectTagToBeDeleted string) {
+	_, err := db.Exec(deleteProjectNodeAssociation, projectTagToBeDeleted)
 	if err != nil {
 		db.ProjectDelete.updateFail(err)
 	}
