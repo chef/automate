@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/compliance-service/api/common"
@@ -91,6 +90,60 @@ func (r *Resolver) ResolveJob(ctx context.Context, job *jobs.Job) ([]*types.Insp
 	r.scannerServer.UpdateJobNodeCount(job.Id, len(nodeJobs))
 	return nodeJobs, nil
 }
+
+type nodeInfo struct {
+	UUID              string
+	CloudID           string
+	Name              string
+	Environment       string
+	CloudAccountID    string
+	ManagerID         string
+	SSM               bool
+	MachineIdentifier string
+	Tags              []*common.Kv
+}
+
+func assembleJob(job *jobs.Job, node nodeInfo, secrets []*inspec.Secrets, tc inspec.TargetBaseConfig) *types.InspecJob {
+	if len(node.UUID) == 0 {
+		id, err := uuid.NewV4()
+		if err != nil {
+			logrus.Warnf("unable to generate uuid for node")
+		}
+		node.UUID = id.String()
+	}
+
+	fullTc := inspec.TargetConfig{
+		TargetBaseConfig: tc,
+	}
+	if len(secrets) == 1 {
+		fullTc.Secrets = *secrets[0]
+	} else {
+		fullTc.SecretsArr = secrets
+	}
+
+	return &types.InspecJob{
+		InspecBaseJob: types.InspecBaseJob{
+			JobID:    job.Id,
+			JobName:  job.Name,
+			NodeEnv:  node.Environment,
+			NodeName: node.Name,
+			JobType:  job.Type,
+			Status:   job.Status,
+			NodeID:   node.UUID,
+		},
+		SSM:               node.SSM,
+		Timeout:           job.Timeout,
+		Retries:           job.Retries,
+		TargetConfig:      fullTc,
+		Profiles:          job.Profiles,
+		SourceID:          node.CloudID,
+		SourceAccountID:   node.CloudAccountID,
+		ManagerID:         node.ManagerID,
+		MachineIdentifier: node.MachineIdentifier,
+		Tags:              node.Tags,
+	}
+}
+
 func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManager, filters []*common.Filter, job *jobs.Job) ([]*types.InspecJob, error) {
 	nodeCollections := make(map[string]managerSubs)
 
@@ -112,47 +165,28 @@ func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManag
 	jobArray := []*types.InspecJob{}
 	for _, group := range nodeCollections {
 		for _, node := range group.nodes {
-			baseJob := types.InspecBaseJob{
-				JobID:    job.Id,
-				JobName:  job.Name,
-				NodeEnv:  "azure-api",
-				NodeName: node.Name,
-				JobType:  job.Type,
-				Status:   job.Status,
-			}
 			nodeUUID, err := r.scannerServer.GetNodeUUID(ctx, node.ID, "", m.AccountId)
 			if err != nil {
 				// don't need to fail here, just log and continue
 				logrus.Debugf("handleManagerNodes unable to get node id: %s", err.Error())
 			}
-			if len(nodeUUID) == 0 {
-				id, err := uuid.NewV4()
-				if err != nil {
-					logrus.Warnf("unable to generate uuid for node")
-				}
-				nodeUUID = id.String()
+			nodeInfo := nodeInfo{
+				UUID:        nodeUUID,
+				CloudID:     node.ID,
+				Name:        node.Name,
+				Environment: "azure-api",
+				ManagerID:   m.Id,
 			}
-			baseJob.NodeID = nodeUUID
-			jobArray = append(jobArray, &types.InspecJob{
-				InspecBaseJob: baseJob,
-				Timeout:       job.Timeout,
-				Retries:       job.Retries,
-				TargetConfig: inspec.TargetConfig{
-					TargetBaseConfig: inspec.TargetBaseConfig{
-						Backend:        "azure",
-						SubscriptionId: node.ID,
-					},
-					Secrets: inspec.Secrets{
-						AzureClientID:     clientID,
-						AzureClientSecret: clientSecret,
-						AzureTenantID:     tenantID,
-					},
-				},
-				Profiles:        job.Profiles,
-				SourceID:        node.ID,
-				SourceAccountID: m.AccountId,
-				ManagerID:       m.Id,
-			})
+			tc := inspec.TargetBaseConfig{
+				Backend:        "azure",
+				SubscriptionId: node.ID,
+			}
+			secrets := inspec.Secrets{
+				AzureClientID:     clientID,
+				AzureClientSecret: clientSecret,
+				AzureTenantID:     tenantID,
+			}
+			jobArray = append(jobArray, assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc))
 		}
 	}
 	return jobArray, nil
@@ -165,7 +199,7 @@ func (r *Resolver) handleGcpApiNodes(ctx context.Context, m *manager.NodeManager
 	}
 
 	var nmFilter = []*common.Filter{
-		{Key: "manager_id", Exclude: false, Values: []string{job.NodeSelectors[0].ManagerId}},
+		{Key: "manager_id", Exclude: false, Values: []string{m.Id}},
 	}
 
 	dbNodes, err := r.nodesClient.List(ctx, &nodes.Query{PerPage: 1000000, Filters: nmFilter})
@@ -190,32 +224,21 @@ func (r *Resolver) handleGcpApiNodes(ctx context.Context, m *manager.NodeManager
 
 	jobArray := []*types.InspecJob{}
 	for _, node := range dbNodes.Nodes {
-		jobArray = append(jobArray, &types.InspecJob{
-			InspecBaseJob: types.InspecBaseJob{
-				JobID:    job.Id,
-				JobName:  job.Name,
-				NodeEnv:  "gcp-api",
-				NodeName: node.Name,
-				JobType:  job.Type,
-				Status:   job.Status,
-				NodeID:   node.Id,
-			},
-			Timeout: job.Timeout,
-			Retries: job.Retries,
-			TargetConfig: inspec.TargetConfig{
-				TargetBaseConfig: inspec.TargetBaseConfig{
-					Backend:        "gcp",
-					SubscriptionId: m.AccountId,
-				},
-				Secrets: inspec.Secrets{
-					GcpCredsJson: gcpCred,
-				},
-			},
-			Profiles:        job.Profiles,
-			SourceID:        node.Name,
-			SourceAccountID: m.AccountId,
-			ManagerID:       m.Id,
-		})
+		nodeInfo := nodeInfo{
+			UUID:        node.Id,
+			CloudID:     node.Name,
+			Name:        node.Name,
+			Environment: "gcp-api",
+			ManagerID:   m.Id,
+		}
+		tc := inspec.TargetBaseConfig{
+			Backend:        "gcp",
+			SubscriptionId: m.AccountId,
+		}
+		secrets := inspec.Secrets{
+			GcpCredsJson: gcpCred,
+		}
+		jobArray = append(jobArray, assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc))
 	}
 	return jobArray, nil
 }
@@ -298,34 +321,23 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		awsCreds = managers.GetAWSCreds(secret)
 	}
 
-	return []*types.InspecJob{{
-		InspecBaseJob: types.InspecBaseJob{
-			JobID:    job.Id,
-			JobName:  job.Name,
-			NodeEnv:  "aws-api",
-			NodeName: node.Name,
-			JobType:  job.Type,
-			Status:   job.Status,
-			NodeID:   node.Id,
-		},
-		Timeout: job.Timeout,
-		Retries: job.Retries,
-		TargetConfig: inspec.TargetConfig{
-			TargetBaseConfig: inspec.TargetBaseConfig{
-				Backend: "aws",
-				Region:  awsCreds.Region,
-			},
-			Secrets: inspec.Secrets{
-				AwsUser:         awsCreds.AccessKeyId,
-				AwsPassword:     awsCreds.SecretAccessKey,
-				AwsSessionToken: awsCreds.SessionToken,
-			},
-		},
-		Profiles:        job.Profiles,
-		SourceID:        m.AccountId,
-		SourceAccountID: m.AccountId,
-		ManagerID:       m.Id,
-	}}, nil
+	nodeInfo := nodeInfo{
+		UUID:        node.Id,
+		CloudID:     m.AccountId,
+		Name:        node.Name,
+		Environment: "gcp-api",
+		ManagerID:   m.Id,
+	}
+	tc := inspec.TargetBaseConfig{
+		Backend: "aws",
+		Region:  awsCreds.Region,
+	}
+	secrets := inspec.Secrets{
+		AwsUser:         awsCreds.AccessKeyId,
+		AwsPassword:     awsCreds.SecretAccessKey,
+		AwsSessionToken: awsCreds.SessionToken,
+	}
+	return []*types.InspecJob{assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc)}, nil
 }
 
 func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.NodeManager, filters []*common.Filter, job *jobs.Job) ([]*types.InspecJob, error) {
@@ -364,47 +376,28 @@ func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.No
 			} else {
 				name = node
 			}
-			baseJob := types.InspecBaseJob{
-				JobID:    job.Id,
-				JobName:  job.Name,
-				NodeEnv:  "aws-api",
-				NodeName: name,
-				JobType:  job.Type,
-				Status:   job.Status,
-			}
 			nodeUUID, err := r.scannerServer.GetNodeUUID(ctx, node, node, m.AccountId)
 			if err != nil {
 				// don't need to fail here, just log and continue
 				logrus.Errorf("handleManagerNodes unable to get node id: %s", err.Error())
 			}
-			if len(nodeUUID) == 0 {
-				id, err := uuid.NewV4()
-				if err != nil {
-					logrus.Warnf("unable to generate uuid for node")
-				}
-				nodeUUID = id.String()
+			nodeInfo := nodeInfo{
+				UUID:        nodeUUID,
+				CloudID:     node,
+				Name:        name,
+				Environment: "aws-api",
+				ManagerID:   m.Id,
 			}
-			baseJob.NodeID = nodeUUID
-			jobArray = append(jobArray, &types.InspecJob{
-				InspecBaseJob: baseJob,
-				Timeout:       job.Timeout,
-				Retries:       job.Retries,
-				TargetConfig: inspec.TargetConfig{
-					TargetBaseConfig: inspec.TargetBaseConfig{
-						Backend: "aws",
-						Region:  node,
-					},
-					Secrets: inspec.Secrets{
-						AwsUser:         awsCreds.AccessKeyId,
-						AwsPassword:     awsCreds.SecretAccessKey,
-						AwsSessionToken: awsCreds.SessionToken,
-					},
-				},
-				Profiles:        job.Profiles,
-				SourceID:        node,
-				SourceAccountID: m.AccountId,
-				ManagerID:       m.Id,
-			})
+			tc := inspec.TargetBaseConfig{
+				Backend: "aws",
+				Region:  node,
+			}
+			secrets := inspec.Secrets{
+				AwsUser:         awsCreds.AccessKeyId,
+				AwsPassword:     awsCreds.SecretAccessKey,
+				AwsSessionToken: awsCreds.SessionToken,
+			}
+			jobArray = append(jobArray, assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc))
 		}
 	}
 	return jobArray, nil
@@ -465,7 +458,6 @@ func (r *Resolver) handleAzureVmNodes(ctx context.Context, m *manager.NodeManage
 
 func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManager, nodeCollections map[string]managerNodes, job *jobs.Job) ([]*types.InspecJob, error) {
 	jobArray := []*types.InspecJob{}
-	var baseJob types.InspecBaseJob
 	var creds *inspec.Secrets
 	var clientID, clientSecret, tenantID string
 	if len(m.CredentialId) == 0 && m.Type == "azure-vm" {
@@ -531,55 +523,34 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 						continue
 					}
 				}
-				baseJob = types.InspecBaseJob{
-					JobID:    job.Id,
-					JobName:  job.Name,
-					NodeEnv:  nodeEnv,
-					NodeName: nodeName,
-					JobType:  job.Type,
-					Status:   job.Status,
-				}
 				nodeUUID, err := r.scannerServer.GetNodeUUID(ctx, node.Id, node.Region, m.AccountId)
 				if err != nil {
 					// don't need to fail here, just log and continue
 					logrus.Debugf("handleManagerNodes unable to get node id: %s", err.Error())
 				}
-				if len(nodeUUID) == 0 {
-					id, err := uuid.NewV4()
-					if err != nil {
-						logrus.Warnf("unable to generate uuid for node")
-					}
-					nodeUUID = id.String()
+
+				nodeInfo := nodeInfo{
+					UUID:        nodeUUID,
+					CloudID:     node.Id,
+					Name:        nodeName,
+					Environment: nodeEnv,
+					ManagerID:   m.Id,
+					SSM:         ssmJob,
 				}
-				baseJob.NodeID = nodeUUID
-				fullJob := types.InspecJob{
-					EndTime:       &time.Time{},
-					InspecBaseJob: baseJob,
-					SSM:           ssmJob,
-					Timeout:       job.Timeout,
-					Retries:       job.Retries,
-					TargetConfig: inspec.TargetConfig{
-						TargetBaseConfig: inspec.TargetBaseConfig{
-							Hostname:       node.PublicIp,
-							Backend:        backend,
-							Region:         node.Region,
-							SubscriptionId: node.Group,
-						},
-						SecretsArr: credsArr,
-						Secrets: inspec.Secrets{
-							AzureClientID:     clientID,
-							AzureClientSecret: clientSecret,
-							AzureTenantID:     tenantID,
-						},
-					},
-					Profiles:          job.Profiles,
-					SourceID:          node.Id,
-					SourceAccountID:   m.AccountId,
-					MachineIdentifier: node.MachineIdentifier,
-					Tags:              node.Tags,
-					ManagerID:         m.Id,
+				tc := inspec.TargetBaseConfig{
+					Hostname:       node.PublicIp,
+					Backend:        backend,
+					Region:         node.Region,
+					SubscriptionId: node.Group,
 				}
-				jobArray = append(jobArray, &fullJob)
+				if m.Type == "azure-vm" {
+					credsArr = append(credsArr, &inspec.Secrets{
+						AzureClientID:     clientID,
+						AzureClientSecret: clientSecret,
+						AzureTenantID:     tenantID,
+					})
+				}
+				jobArray = append(jobArray, assembleJob(job, nodeInfo, credsArr, tc))
 			}
 		}
 	}
