@@ -110,7 +110,10 @@ export function projectEntityReducer(
       return set(DELETE_STATUS, EntityStatus.loadingFailure, state);
 
     case ProjectActionTypes.UPDATE:
-      return set(UPDATE_STATUS, EntityStatus.loading, state);
+      return pipe(
+          set(UPDATE_STATUS, EntityStatus.loading),
+          set(APPLY_RULES_STATUS, initialApplyRulesStatus)
+        )(state) as ProjectEntityState;
 
     case ProjectActionTypes.UPDATE_SUCCESS:
       return set(UPDATE_STATUS, EntityStatus.loadingSuccess,

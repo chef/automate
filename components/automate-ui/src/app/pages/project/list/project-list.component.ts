@@ -92,12 +92,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       .subscribe(({ state, failed, cancelled, percentageComplete }: ApplyRulesStatus) => {
         if (this.applyRulesInProgress && state === ApplyRulesStatusState.NotRunning) {
           this.cancelRulesInProgress = false;
+          this.percentageComplete = 0;
           this.closeConfirmApplyStopModal();
         }
         this.applyRulesInProgress = state === ApplyRulesStatusState.Running;
         this.updateProjectsFailed = failed;
         this.updateProjectsCancelled = cancelled;
-        if (!this.cancelRulesInProgress) {
+        if (!this.cancelRulesInProgress && state === ApplyRulesStatusState.Running) {
           this.percentageComplete = percentageComplete;
         }
       });
