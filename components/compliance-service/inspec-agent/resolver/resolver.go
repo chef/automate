@@ -488,7 +488,7 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 				if node.Platform == "windows" {
 					backend = inspec.BackendWinRm
 				}
-				logrus.Infof("inspec agent resolver handling node with backend: %s -- ssm ping status: %s", backend, node.Ssm)
+				logrus.Debugf("inspec agent resolver handling node with backend: %s -- ssm ping status: %s", backend, node.Ssm)
 				nodeName = node.Name
 				var credsArr []*inspec.Secrets
 				for _, credTagGroup := range group.manager.InstanceCredentials {

@@ -93,7 +93,11 @@ func (a *Scheduler) PollForJobs(ctx context.Context) {
 // recurring jobs that are due to be run. For every due recurrent job,
 // we push that job onto the workflow queue.
 func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
-	dueJobs := a.scanner.GetDueJobs(nowTime)
+	dueJobs, err := a.scanner.GetDueJobs(nowTime)
+	if err != nil {
+		logrus.Errorf("unable to retrieve due jobs: %s", err.Error())
+		return
+	}
 	if len(dueJobs) > 0 {
 		logrus.Debugf("processDueJobs, %d recurring jobs are due for running...", len(dueJobs))
 	}
@@ -101,7 +105,7 @@ func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
 		err := a.pushWorkflow(job, false)
 		if err != nil {
 			if err == cereal.ErrWorkflowInstanceExists {
-				logrus.Infof("Job %q is still/already running", job.Id)
+				logrus.Debugf("Job %q is still/already running", job.Id)
 			} else {
 				logrus.Errorf("Error handling job %q: %v", job.Id, err)
 			}
