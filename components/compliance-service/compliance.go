@@ -56,6 +56,7 @@ import (
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/notifier"
 	project_update_lib "github.com/chef/automate/lib/authz"
+	"github.com/chef/automate/lib/authz/project_purge"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/datalifecycle/purge"
@@ -176,6 +177,10 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		err = project_update_lib.RegisterTaskExecutors(cerealProjectUpdateManager, "compliance", ingesticESClient, authzProjectsClient)
 		if err != nil {
 			logrus.WithError(err).Fatal("could not register project update task executors")
+		}
+		err = project_purge.RegisterTaskExecutors(cerealProjectUpdateManager, "compliance", ingesticESClient)
+		if err != nil {
+			logrus.WithError(err).Fatal("could not register project purge task executors")
 		}
 		if err := cerealProjectUpdateManager.Start(ctx); err != nil {
 			logrus.WithError(err).Fatal("could not start cereal manager")

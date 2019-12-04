@@ -192,6 +192,7 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 }
 
 func (backend *ESClient) PurgeProject(ctx context.Context, projectTagToBeDelete string) error {
+	logrus.Infof("starting project delete for id %q", projectTagToBeDelete)
 	// TODO implement
 	return nil
 }

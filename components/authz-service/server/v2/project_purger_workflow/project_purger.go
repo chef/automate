@@ -37,6 +37,7 @@ var projectPurgeDomainServices = []string{
 	"teams",
 	"authn",
 	"ingest",
+	"compliance",
 }
 
 type cerealProjectPurger struct {
