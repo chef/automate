@@ -192,9 +192,30 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 }
 
 func (backend *ESClient) DeleteProjectTag(ctx context.Context,
-	projectTagToBeDelete string) ([]string, error) {
-	// TODO implement
-	return []string{}, nil
+	projectTagToDelete string) ([]string, error) {
+	logrus.Debugf("starting project delete project %q", projectTagToDelete)
+
+	esReportJobID, err := backend.DeleteReportProjectTag(ctx, projectTagToDelete)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Node project tags delete")
+	}
+
+	esSummaryJobID, err := backend.DeleteSummaryProjectTag(ctx, projectTagToDelete)
+	if err != nil {
+		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Action project tags delete")
+	}
+
+	logrus.Debugf("Started Project delete with report job ID: %q, summary job ID %q", esReportJobID, esSummaryJobID)
+
+	return []string{esReportJobID, esSummaryJobID}, nil
+}
+
+func (backend *ESClient) DeleteReportProjectTag(ctx context.Context, projectTagToDelete string) (string, error) {
+	return "", nil
+}
+
+func (backend *ESClient) DeleteSummaryProjectTag(ctx context.Context, projectTagToDelete string) (string, error) {
+	return "", nil
 }
 
 func (backend *ESClient) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) ([]string, error) {
