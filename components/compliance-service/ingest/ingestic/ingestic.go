@@ -20,6 +20,18 @@ type ESClient struct {
 	initialized bool
 }
 
+var (
+	deleteProjectTagScript = `
+		if (ctx._source['projects'] != null) {
+			def foundIndex = ctx._source.projects.indexOf(params.project);
+
+			if (foundIndex != -1) {
+				ctx._source.projects.remove(foundIndex);
+			}
+		}
+	`
+)
+
 func NewESClient(client *elastic.Client) *ESClient {
 	return &ESClient{client: client, initialized: false}
 }
@@ -211,15 +223,6 @@ func (backend *ESClient) DeleteProjectTag(ctx context.Context,
 }
 
 func (backend *ESClient) DeleteReportProjectTag(ctx context.Context, projectTagToDelete string) (string, error) {
-	script := `
-		if (ctx._source['projects'] != null) {
-			def foundIndex = ctx._source.projects.indexOf(params.project);
-
-			if (foundIndex != -1) {
-				ctx._source.projects.remove(foundIndex);
-			}
-		}
-	`
 
 	params := map[string]interface{}{"project": projectTagToDelete}
 	docType := mappings.DocType
@@ -229,7 +232,7 @@ func (backend *ESClient) DeleteReportProjectTag(ctx context.Context, projectTagT
 	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
 		Type(docType).
-		Script(elastic.NewScript(script).Params(params)).
+		Script(elastic.NewScript(deleteProjectTagScript).Params(params)).
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
 		DoAsync(ctx)
@@ -242,15 +245,7 @@ func (backend *ESClient) DeleteReportProjectTag(ctx context.Context, projectTagT
 }
 
 func (backend *ESClient) DeleteSummaryProjectTag(ctx context.Context, projectTagToDelete string) (string, error) {
-	script := `
-	if (ctx._source['projects'] != null) {
-		def foundIndex = ctx._source.projects.indexOf(params.project);
 
-		if (foundIndex != -1) {
-			ctx._source.projects.remove(foundIndex);
-		}
-	}
-`
 	params := map[string]interface{}{"project": projectTagToDelete}
 	docType := mappings.DocType
 	mapping := mappings.ComplianceSumDate
@@ -259,7 +254,7 @@ func (backend *ESClient) DeleteSummaryProjectTag(ctx context.Context, projectTag
 	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
 		Type(docType).
-		Script(elastic.NewScript(script).Params(params)).
+		Script(elastic.NewScript(deleteProjectTagScript).Params(params)).
 		WaitForCompletion(false).
 		ProceedOnVersionConflict().
 		DoAsync(ctx)
