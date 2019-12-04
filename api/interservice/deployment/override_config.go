@@ -8,13 +8,16 @@ import (
 	w "github.com/chef/automate/api/config/shared/wrappers"
 )
 
-// MergeAndValidateNewUserOverrideConfig takes an existing override config
-// and the BackupRestoreTask and builds/merges a new user override config.
+// MergeAndValidateNewUserOverrideConfig is responsible for taking an existing
+// user override AutomateConfig (from a backup), building a new user override
+// config from a BackupRestoreTask (args for the backup restore), and validating
+// the resulting user override config.
 //
-// Validation of the configuration is a bit tricky. We still want to prevent
-// people from _adding_ deprecated values if the pass in set or patch config,
-// but we still want them to be able to restore if their config already has
-// deprecated values.
+// Validation of the config is a bit tricky as there are a few corner cases we
+// need to worry about. It's possible that the user wants to pass in config set
+// or patch that includes deprecated values since it's possible that the version
+// of the software they are restoring could use those values. We'll handle this
+// case by validating the with a redacted copy of the config.
 func MergeAndValidateNewUserOverrideConfig(existing *api.AutomateConfig, req *BackupRestoreTask) error {
 	var err error
 	cfg := &api.AutomateConfig{}
@@ -24,28 +27,45 @@ func MergeAndValidateNewUserOverrideConfig(existing *api.AutomateConfig, req *Ba
 		return nil
 	}
 
-	// If they passed a config set we'll only use that
-	if req.GetSetConfig() != nil {
-		*existing = *req.SetConfig
-		return existing.ValidateWithGlobalAndDefaults()
+	// If they passed a config set we'll only use it as that is their desired
+	// config.
+	if setConfig := req.GetSetConfig(); setConfig != nil {
+		redactedCopy, err := setConfig.RedactedCopy()
+		if err != nil {
+			return err
+		}
+
+		err = redactedCopy.ValidateWithGlobalAndDefaults()
+		if err != nil {
+			return err
+		}
+
+		*existing = *setConfig
+		return nil
 	}
 
-	// If they passed a patch we'll validate it against a redacted copy. If
-	// it doesn't pass then they've passed in an invalid patch. Later we'll
+	// If they passed a patch we'll validate a redacted version. If it doesn't
+	// pass then they've passed in an invalid patch. Later we'll
 	// merge the patch config into the config that we'll generate from the
 	// restore task.
-	if req.GetPatchConfig() != nil {
-		existingCopy, err := existing.RedactedCopy()
+	patchConfig := req.GetPatchConfig()
+	if patchConfig != nil {
+		existingRedactedCopy, err := existing.RedactedCopy()
 		if err != nil {
 			return err
 		}
 
-		err = existingCopy.OverrideConfigValues(req.PatchConfig)
+		redactedPatch, err := patchConfig.RedactedCopy()
 		if err != nil {
 			return err
 		}
 
-		err = existingCopy.ValidateWithGlobalAndDefaults()
+		err = existingRedactedCopy.OverrideConfigValues(redactedPatch)
+		if err != nil {
+			return err
+		}
+
+		err = existingRedactedCopy.ValidateWithGlobalAndDefaults()
 		if err != nil {
 			return err
 		}
@@ -110,8 +130,8 @@ func MergeAndValidateNewUserOverrideConfig(existing *api.AutomateConfig, req *Ba
 		creds.SessionToken = w.String(sessionToken)
 	}
 
-	if req.GetPatchConfig() != nil {
-		err = cfg.OverrideConfigValues(req.PatchConfig)
+	if patchConfig != nil {
+		err = cfg.OverrideConfigValues(patchConfig)
 		if err != nil {
 			return err
 		}

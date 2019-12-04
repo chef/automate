@@ -235,7 +235,7 @@ func TestMergeAndValidateNewUserOverrideConfig(t *testing.T) {
 
 		rt.SetConfig = cfg
 		err = MergeAndValidateNewUserOverrideConfig(cfg, rt)
-		require.Error(t, err)
+		require.NoError(t, err)
 	})
 
 	t.Run("config patch with deprecated config", func(t *testing.T) {
@@ -243,7 +243,7 @@ func TestMergeAndValidateNewUserOverrideConfig(t *testing.T) {
 		cfg := newValidOverrideConfig()
 		rt.PatchConfig = newDeprecatedConfig()
 		err := MergeAndValidateNewUserOverrideConfig(cfg, rt)
-		require.Error(t, err)
+		require.NoError(t, err)
 	})
 
 	t.Run("config patch valid patch with existing deprecated config", func(t *testing.T) {
@@ -283,6 +283,6 @@ func TestMergeAndValidateNewUserOverrideConfig(t *testing.T) {
 		rt.PatchConfig.Ingest.V1.Sys.Service.PurgeConvergeHistoryAfterDays = w.Int32(60)
 
 		err = MergeAndValidateNewUserOverrideConfig(cfg, rt)
-		require.Error(t, err)
+		require.NoError(t, err)
 	})
 }
