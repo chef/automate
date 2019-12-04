@@ -209,12 +209,12 @@ func (backend *ESClient) DeleteProjectTag(ctx context.Context,
 
 	esReportJobID, err := backend.DeleteReportProjectTag(ctx, projectTagToDelete)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Node project tags delete")
+		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Report project tags delete")
 	}
 
 	esSummaryJobID, err := backend.DeleteSummaryProjectTag(ctx, projectTagToDelete)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Action project tags delete")
+		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Summary project tags delete")
 	}
 
 	logrus.Debugf("Started Project delete with report job ID: %q, summary job ID %q", esReportJobID, esSummaryJobID)
