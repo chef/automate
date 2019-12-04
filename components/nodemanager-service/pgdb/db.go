@@ -20,6 +20,7 @@ import (
 type DB struct {
 	*gorp.DbMap
 	ProjectUpdate *ProjectUpdate
+	ProjectDelete *ProjectDelete
 }
 
 type DBTrans struct {
@@ -43,6 +44,17 @@ func New(conf *config.Postgres) (*DB, error) {
 	}
 
 	db.ProjectUpdate = &ProjectUpdate{
+		jobStatus: project_update_lib.JobStatus{
+			Completed:             true,
+			PercentageComplete:    1.0,
+			EstimatedEndTimeInSec: 0,
+		},
+		jobStatusError: nil,
+		running:        false,
+		ID:             "",
+	}
+
+	db.ProjectDelete = &ProjectDelete{
 		jobStatus: project_update_lib.JobStatus{
 			Completed:             true,
 			PercentageComplete:    1.0,
