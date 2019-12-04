@@ -265,6 +265,8 @@ message Trend {
 	int32 failed = 3;
 	// Total skipped objects (nodes or controls) on the reports at the given report time.
 	int32 skipped = 4;
+	// Total waived objects (nodes or controls) on the reports at the given report time.
+	int32 waived = 5;
 }
 
 message Trends {
