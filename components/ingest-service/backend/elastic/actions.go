@@ -31,6 +31,37 @@ func (es *Backend) CreateBulkActionRequest(action backend.InternalChefAction) el
 	return es.createBulkUpdateRequestToTimeseriesIndex(mapping, time, action)
 }
 
+func (es *Backend) DeleteActionProjectTag(ctx context.Context,
+	projectTagToBeDelete string) (string, error) {
+	script := `
+		if (ctx._source['projects'] != null) {
+			def foundIndex = ctx._source.projects.indexOf(params.project);
+
+			if (foundIndex != -1) {
+				ctx._source.projects.remove(foundIndex);
+			}
+		}
+	`
+
+	params := map[string]interface{}{"project": projectTagToBeDelete}
+
+	index := fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
+
+	startTaskResult, err := elastic.NewUpdateByQueryService(es.client).
+		Index(index).
+		Type(mappings.Actions.Type).
+		Script(elastic.NewScript(script).Params(params)).
+		WaitForCompletion(false).
+		ProceedOnVersionConflict().
+		DoAsync(ctx)
+
+	if err != nil {
+		return "", err
+	}
+
+	return startTaskResult.TaskId, nil
+}
+
 func (es *Backend) UpdateActionProjectTags(ctx context.Context,
 	projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
 	script := `

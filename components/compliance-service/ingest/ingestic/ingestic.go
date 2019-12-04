@@ -191,6 +191,12 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 	return errors.Wrap(err, "setDailyLatestToFalse")
 }
 
+func (backend *ESClient) DeleteProjectTag(ctx context.Context,
+	projectTagToBeDelete string) ([]string, error) {
+	// TODO implement
+	return []string{}, nil
+}
+
 func (backend *ESClient) UpdateProjectTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) ([]string, error) {
 	logrus.Debug("starting project updater")
 

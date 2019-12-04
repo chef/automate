@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"testing"
-	"time"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
@@ -1531,20 +1530,13 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 		t.Run(fmt.Sprintf("node match: %s", test.description),
 			func(t *testing.T) {
 				suite.IngestNodes([]iBackend.Node{test.node})
+				defer suite.DeleteAllDocuments()
+
 				// Send a project rules update event
 				esJobID, err := suite.ingest.UpdateNodeProjectTags(ctx, test.projects)
 				assert.Nil(t, err)
 
-				jobStatus, err := suite.ingest.JobStatus(ctx, esJobID)
-				assert.Nil(t, err)
-				for !jobStatus.Completed {
-					time.Sleep(time.Millisecond * 5)
-					jobStatus, err = suite.ingest.JobStatus(ctx, esJobID)
-					assert.Nil(t, err)
-					if err != nil {
-						assert.FailNow(t, "testing job status")
-					}
-				}
+				waitForJobToComplete(t, esJobID)
 
 				suite.RefreshIndices(mappings.NodeState.Index)
 
@@ -1556,8 +1548,6 @@ func TestProjectUpdatePainlessElasticsearchScript(t *testing.T) {
 				actualNode := actualNodes[0]
 
 				assert.ElementsMatch(t, test.projectIDs, actualNode.Projects)
-
-				suite.DeleteAllDocuments()
 			})
 	}
 }
@@ -1584,16 +1574,7 @@ func TestProjectUpdatePainlessElasticsearchScriptNoNodes(t *testing.T) {
 	esJobID, err := suite.ingest.UpdateNodeProjectTags(ctx, projects)
 	assert.Nil(t, err)
 
-	jobStatus, err := suite.ingest.JobStatus(ctx, esJobID)
-	assert.Nil(t, err)
-	for !jobStatus.Completed {
-		time.Sleep(time.Millisecond * 5)
-		jobStatus, err = suite.ingest.JobStatus(ctx, esJobID)
-		assert.Nil(t, err)
-		if err != nil {
-			assert.FailNow(t, "testing job status")
-		}
-	}
+	waitForJobToComplete(t, esJobID)
 
 	suite.RefreshIndices(mappings.NodeState.Index)
 
