@@ -78,13 +78,16 @@ export function projectsFilterReducer(
     }
 
     case ProjectsFilterActionTypes.SAVE_OPTIONS: {
+      // merge any added or removed options with the newly saved values
+      const mergedOptions = mergeOptions(state.options, action.payload);
+      const sortedOptions = sortOptions(mergedOptions);
       return pipe(
-        set('options', action.payload),
-        set('selectionLabel', selectionLabel(action.payload)),
-        set('selectionCount', selectionCount(action.payload)),
-        set('selectionCountVisible', selectionCountVisible(action.payload)),
-        set('selectionCountActive', selectionCountActive(action.payload)),
-        set('dropdownCaretVisible', dropdownCaretVisible(action.payload))
+        set('options', sortedOptions),
+        set('selectionLabel', selectionLabel(sortedOptions)),
+        set('selectionCount', selectionCount(sortedOptions)),
+        set('selectionCountVisible', selectionCountVisible(sortedOptions)),
+        set('selectionCountActive', selectionCountActive(sortedOptions)),
+        set('dropdownCaretVisible', dropdownCaretVisible(sortedOptions))
       )(state) as ProjectsFilterState;
     }
   }
