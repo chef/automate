@@ -374,9 +374,11 @@ if !ENV['NO_STATS_TESTS']
               {
                   "name" => "linux-baseline",
                   "id" => "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015",
-                  "failures" => 22,
-                  "criticals" => 22,
-                  "passed" => 23
+                  "failures" => 21,
+                  "criticals" => 21,
+                  "passed" => 22,
+                  # COMMENT THIS OUT WHEN WAIVERS API SUPPORT IS ADDED FOR THIS API CALL
+                  # "waived" => 3
               }
           ]
       }

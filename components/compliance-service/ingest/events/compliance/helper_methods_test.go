@@ -33,6 +33,7 @@ func TestSummary(t *testing.T) {
         "impact": 0,
         "title": "Checking for something1",
         "refs": [],
+        "waiver_data": null,
         "tags": {
           "firewall": null,
           "gtitle": "SRG-OS-000023-GPOS-00006",
@@ -50,6 +51,7 @@ func TestSummary(t *testing.T) {
           "documentable": false
         },
         "code": "control 'ctrl-01' do ...",
+        "waiver_data": {},
         "results":[
           {
             "status": "passed",
@@ -119,6 +121,49 @@ func TestSummary(t *testing.T) {
 	assert.Equal(t, 0, summary2.Failed.Total, "0 failed control in profile")
 	assert.Equal(t, 2, summary2.Passed.Total, "2 passed control in profile")
 
+	// ------------------------------- ProfileControlSummary test --------------------------------- //
+
+	waivers_json := `{
+	  "name":"myprofile1",
+    "version":"1.0.1",
+    "sha256":"447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+    "controls":[
+      {
+        "id":"pro1-con1",
+        "refs": [],
+        "tags": {},
+        "results":[ {"status":"failed"}, {"status":"passed"} ],
+				"waiver_data": { "run": true, "skipped_due_to_waiver": false, "message": "" }
+      },{
+        "refs": [],
+        "tags": {},
+        "id":"sysctl-02",
+        "results":[ {"status":"skipped"} ],
+				"waiver_data": { "run": true, "skipped_due_to_waiver": false, "message": "", "justification": "Sound reasoning" }
+      },{
+        "refs": [],
+        "tags": {},
+        "id":"pro1-con3",
+        "results":[ {"status":"failed"} ],
+				"waiver_data": { "expiration_date": "1977-06-01", "run": false, "skipped_due_to_waiver": false, "message": "Waiver expired on 1977-06-01, evaluating control normally" }
+      },{
+        "refs": [],
+        "tags": {},
+        "id":"pro1-con4",
+        "results":[ {"status":"skipped"} ],
+				"waiver_data": { "expiration_date": "2025-06-01", "run": false, "skipped_due_to_waiver": true, "message": "" }
+      }
+    ],
+    "status": "loaded"
+  }`
+	profile_waivers := parseProfile(&waivers_json)
+	summary_waivers := ProfileControlSummary(profile_waivers)
+	assert.Equal(t, 4, summary_waivers.Total, "4 total controls in profile")
+	assert.Equal(t, 0, summary_waivers.Skipped.Total, "0 skipped controls in profile")
+	assert.Equal(t, 1, summary_waivers.Failed.Total, "1 failed controls in profile")
+	assert.Equal(t, 0, summary_waivers.Passed.Total, "0 passed controls in profile")
+	assert.Equal(t, 3, summary_waivers.Waived.Total, "3 waived controls in profile")
+
 	// ------------------------------- ReportComplianceStatus tests --------------------------------- //
 
 	assert.Equal(t, inspec.ResultStatusFailed, ReportComplianceStatus(summary1), "Report status is failed")
@@ -128,6 +173,26 @@ func TestSummary(t *testing.T) {
 	summary3.Total = 3
 	summary3.Skipped.Total = 3
 	assert.Equal(t, inspec.ResultStatusSkipped, ReportComplianceStatus(&summary3), "Report status is skipped")
+
+	// For summary with waivers
+	assert.Equal(t, inspec.ResultStatusFailed, ReportComplianceStatus(summary_waivers), "Report status is failed")
+
+	// ------------------------------- WaivedStatus tests --------------------------------- //
+
+	assert.Equal(t, inspec.ResultStatusFailed, ReportComplianceStatus(summary_waivers), "Report status is waived")
+	summary_waivers.Total = 3
+	summary_waivers.Failed.Total = 0
+	assert.Equal(t, inspec.ResultStatusWaived, ReportComplianceStatus(summary_waivers), "Report status is waived")
+
+	// ------------------------------- WaivedStr tests --------------------------------- //
+
+	assert.Equal(t, inspec.ControlWaivedStrYesRun, WaivedStr(profile_waivers.Controls[0].WaiverData), "WaivedStr is yes_run")
+	assert.Equal(t, inspec.ControlWaivedStrYesRun, WaivedStr(profile_waivers.Controls[1].WaiverData), "WaivedStr is yes_run")
+	assert.Equal(t, inspec.ControlWaivedStrNoExpired, WaivedStr(profile_waivers.Controls[2].WaiverData), "WaivedStr is no_expired")
+	assert.Equal(t, inspec.ControlWaivedStrYes, WaivedStr(profile_waivers.Controls[3].WaiverData), "WaivedStr is yes")
+	assert.Equal(t, inspec.ControlWaivedStrNo, WaivedStr(profile1.Controls[0].WaiverData), "WaivedStr is no")
+	assert.Equal(t, inspec.ControlWaivedStrNo, WaivedStr(profile1.Controls[1].WaiverData), "WaivedStr is no no")
+	assert.Equal(t, inspec.ControlWaivedStrNo, WaivedStr(profile1.Controls[2].WaiverData), "WaivedStr is no no no")
 
 	// ------------------------------- AddControlSummary test --------------------------------- //
 
@@ -146,6 +211,13 @@ func TestSummary(t *testing.T) {
 	assert.Equal(t, 2, summary2.Skipped.Total, "2 skipped control in profile")
 	assert.Equal(t, 1, summary2.Failed.Total, "1 failed control in profile")
 	assert.Equal(t, 3, summary2.Passed.Total, "3 passed control in profile")
+
+	AddControlSummary(summary2, *summary_waivers)
+	assert.Equal(t, 9, summary2.Total, "9 total controls in profile")
+	assert.Equal(t, 2, summary2.Skipped.Total, "2 skipped control in profile")
+	assert.Equal(t, 1, summary2.Failed.Total, "1 failed control in profile")
+	assert.Equal(t, 3, summary2.Passed.Total, "3 passed control in profile")
+	assert.Equal(t, 3, summary2.Waived.Total, "3 waived control in profile")
 
 	// ------------------------------- Control Status and ImpactName tests --------------------------------- //
 
@@ -311,6 +383,7 @@ func parseProfilesMin(js *string) (profiles []relaxting.ESInSpecReportProfile) {
 	if err != nil {
 		panic(fmt.Sprintf("Error unmarshalling profiles min: %s", err))
 	}
+
 	for i := range profiles {
 		if profiles[i].Depends == nil {
 			profiles[i].Depends = []relaxting.ESInSpecReportDepends{}

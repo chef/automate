@@ -98,6 +98,14 @@ type ESInSpecReportControlsResult struct {
 	SkipMessage string  `json:"skip_message,omitempty"`
 }
 
+type ESInSpecReportControlsWaiverData struct {
+	ExpirationDate     string `json:"expiration_date"`
+	Justification      string `json:"justification"`
+	Run                bool   `json:"run"`
+	SkippedDueToWaiver bool   `json:"skipped_due_to_waiver"`
+	Message            string `json:"message"`
+}
+
 type ESInSpecReportControlStringTags struct {
 	Key    string   `json:"key"`
 	Values []string `json:"values"`
@@ -114,6 +122,8 @@ type ESInSpecReportControl struct {
 	Title      string                            `json:"title"`
 	Status     string                            `json:"status"`
 	Results    []*ESInSpecReportControlsResult   `json:"results"`
+	WaiverData *ESInSpecReportControlsWaiverData `json:"waiver_data"`
+	WaivedStr  string                            `json:"waived_str"`
 	StringTags []ESInSpecReportControlStringTags `json:"string_tags"`
 	Refs       []ESInSpecReportControlRefs       `json:"refs"`
 }

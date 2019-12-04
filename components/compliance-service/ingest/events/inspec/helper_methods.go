@@ -1,14 +1,21 @@
 package inspec
 
 const (
-	ResultStatusPassed    string = "passed"
-	ResultStatusSkipped   string = "skipped"
-	ResultStatusFailed    string = "failed"
-	ResultStatusLoaded    string = "loaded"
-	ControlImpactMinor    string = "minor"
-	ControlImpactMajor    string = "major"
-	ControlImpactCritical string = "critical"
+	ResultStatusPassed        string = "passed"
+	ResultStatusSkipped       string = "skipped"
+	ResultStatusFailed        string = "failed"
+	ResultStatusLoaded        string = "loaded"
+	ResultStatusWaived        string = "waived"
+	ControlImpactMinor        string = "minor"
+	ControlImpactMajor        string = "major"
+	ControlImpactCritical     string = "critical"
+	ControlWaivedStrNo        string = "no"
+	ControlWaivedStrNoExpired string = "no_expired"
+	ControlWaivedStrYes       string = "yes"
+	ControlWaivedStrYesRun    string = "yes_run"
 )
+
+// "waived": "no" / "no_expired" / "yes" / "yes_run"
 
 // Status calculates the overall status of all controls based on all results
 func (control *Control) Status() (status string) {

@@ -95,6 +95,14 @@ var ComplianceRepDate = Mapping{
               },
               "type": "object"
             },
+            "waived": {
+              "properties": {
+                "total": {
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
             "total": {
               "type": "integer"
             }
@@ -270,6 +278,29 @@ var ComplianceRepDate = Mapping{
                     }
                   }
                 },
+                "waiver_data": {
+                  "type": "object",
+                  "properties": {
+                    "expiration_date": {
+                      "type": "text"
+                    },
+                    "justification": {
+                      "type": "keyword"
+                    },
+                    "run": {
+                      "type": "boolean"
+                    },
+                    "skipped_due_to_waiver": {
+                      "type": "boolean"
+                    },
+                    "message": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "waived_str": {
+                  "type": "keyword"
+                },
                 "results": {
                   "properties": {
                     "code_desc": {
@@ -317,6 +348,14 @@ var ComplianceRepDate = Mapping{
 									"type": "object"
 								},
 								"skipped": {
+									"properties": {
+										"total": {
+											"type": "integer"
+										}
+									},
+									"type": "object"
+								},
+								"waived": {
 									"properties": {
 										"total": {
 											"type": "integer"

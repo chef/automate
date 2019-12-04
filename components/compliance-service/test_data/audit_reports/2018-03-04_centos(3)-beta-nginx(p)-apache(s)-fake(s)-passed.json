@@ -66,8 +66,8 @@
           "title": "Running worker process as non-privileged user",
           "desc": "The NGINX worker processes should run as non-privileged user. In case of compromise of the process, an attacker has full access to the system.",
           "impact": 1,
-          "refs":[ 
-            { 
+          "refs":[
+            {
                "ref":"testing-ref", "url": "test-url"
             }
           ],
@@ -206,6 +206,7 @@
           "tags": {
             "scoop": "icecream"
           },
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -229,6 +230,7 @@
           "tags": {
             "Scoops": "ices gelato"
           },
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -252,6 +254,7 @@
           "tags": {
             "scoop": "italian gelato"
           },
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -273,6 +276,7 @@
           },
           "refs": [],
           "tags": {},
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -294,6 +298,7 @@
           },
           "refs": [],
           "tags": {},
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -315,6 +320,7 @@
           },
           "refs": [],
           "tags": {},
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -336,6 +342,7 @@
           },
           "refs": [],
           "tags": {},
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -357,6 +364,7 @@
           },
           "refs": [],
           "tags": {},
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -378,6 +386,7 @@
           },
           "refs": [],
           "tags": {},
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -399,6 +408,7 @@
           },
           "refs": [],
           "tags": {},
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -420,6 +430,7 @@
           },
           "refs": [],
           "tags": {},
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -441,6 +452,7 @@
           },
           "refs": [],
           "tags": {},
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
@@ -462,6 +474,7 @@
           },
           "refs": [],
           "tags": {},
+          "waiver_data": {},
           "results": [
             {
               "status": "skipped",
