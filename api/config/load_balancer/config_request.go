@@ -23,7 +23,8 @@ func NewConfigRequest() *ConfigRequest {
 				Ngx:     NewNginxConfig(),
 				Proxy:   &config.Proxy{},
 				// TODO: do we need to reintroduce the empty ssl cert here?
-				FrontendTls: []*config.FrontendTLSCredential{},
+				FrontendTls:  []*config.FrontendTLSCredential{},
+				StaticConfig: &ConfigRequest_V1_System_StaticConfig{},
 			},
 			Svc: &ConfigRequest_V1_Service{},
 		},
@@ -64,7 +65,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.TcpNodelay = w.String("on")
 	c.V1.Sys.Ngx.Http.TcpNopush = w.String("on")
 	c.V1.Sys.Ngx.Http.Ipv6Supported = w.Bool(ipV6Supported())
-
+	c.V1.Sys.StaticConfig.Products = []string{"automate"}
 	return c
 }
 
@@ -155,6 +156,13 @@ func (c *ConfigRequest) SetGlobalConfig(g *config.GlobalConfig) {
 func (c *ConfigRequest) PrepareSystemConfig(certificate *config.TLSCredentials) (config.PreparedSystemConfig, error) {
 	c.V1.Sys.Tls = certificate
 	return c.V1.Sys, nil
+}
+
+func (c *ConfigRequest) ConfigureProduct(productConfig *config.ProductConfig) {
+	if len(productConfig.Products) > 0 {
+		c.V1.Sys.StaticConfig.Products = make([]string, len(productConfig.Products))
+		copy(c.V1.Sys.StaticConfig.Products, productConfig.Products)
+	}
 }
 
 var (

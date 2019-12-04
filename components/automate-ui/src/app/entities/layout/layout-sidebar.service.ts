@@ -3,6 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { isProductDeployed } from 'app/staticConfig';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { clientRunsWorkflowEnabled } from 'app/entities/client-runs/client-runs.selectors';
@@ -37,15 +38,15 @@ export class LayoutSidebarService {
         return [{
             name: 'Dashboards',
             items: [
-              {
-                name: 'Event Feed',
-                icon: 'today',
-                route: '/dashboards/event-feed',
-                visible: true
-              }
+                {
+                    name: 'Event Feed',
+                    icon: 'today',
+                    route: '/dashboards/event-feed',
+                    visible: true
+                }
             ],
             visible: true
-          }];
+        }];
     }
 
     public getApplicationsSidebar(): MenuItemGroup[] {
@@ -57,6 +58,13 @@ export class LayoutSidebarService {
                     icon: 'group_work',
                     route: '/applications',
                     visible: true
+                },
+                {
+                    name: 'Habitat Builder',
+                    icon: 'build',
+                    route: isProductDeployed('builder') ? '/bldr' : 'https://bldr.habitat.sh',
+                    visible: true,
+                    openInNewPage: true
                 }
             ],
             visible: this.applicationsFeatureFlagOn
@@ -215,7 +223,7 @@ export class LayoutSidebarService {
                         authorized: {
                             name: 'tokens',
                             anyOf: [['/auth/tokens', 'get'],
-                                ['/iam/v2beta/tokens', 'get']]
+                            ['/iam/v2beta/tokens', 'get']]
                         },
                         visible: true
                     }
@@ -265,14 +273,14 @@ export class LayoutSidebarService {
         return [{
             name: '',
             items: [
-              {
-                name: 'Your Profile',
-                icon: 'person',
-                route: '',
-                visible: true
-              }
+                {
+                    name: 'Your Profile',
+                    icon: 'person',
+                    route: '',
+                    visible: true
+                }
             ],
             visible: true
-          }];
+        }];
     }
 }

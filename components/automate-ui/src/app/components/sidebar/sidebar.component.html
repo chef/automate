@@ -15,6 +15,7 @@
               <chef-sidebar-entry
                 [route]="menuItem.route"
                 [icon]="menuItem.icon"
+                [openInNewPage]="menuItem.openInNewPage"
               >{{ menuItem.name }}</chef-sidebar-entry>
             </span>
             <span *ngIf="(isVisible(menuItem.visible) | async) && menuItem.authorized && menuItem.authorized.anyOf">
@@ -25,6 +26,7 @@
                 <chef-sidebar-entry
                   [route]="menuItem.route"
                   [icon]="menuItem.icon"
+                  [openInNewPage]="menuItem.openInNewPage"
                 >{{ menuItem.name }}</chef-sidebar-entry>
               </app-authorized>
             </span>
@@ -36,6 +38,7 @@
                   <chef-sidebar-entry
                     [route]="menuItem.route"
                     [icon]="menuItem.icon"
+                    [openInNewPage]="menuItem.openInNewPage"
                   >{{ menuItem.name }}</chef-sidebar-entry>
                 </app-authorized>
               </span>

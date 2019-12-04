@@ -21,6 +21,15 @@ type PlatformServiceConfigurable interface {
 	Validate() error
 }
 
+type ProductConfig struct {
+	Products []string
+}
+
+type PlatformServiceConfigurableV2 interface {
+	PlatformServiceConfigurable
+	ConfigureProduct(*ProductConfig)
+}
+
 // InvalidConfigError is an aggregate error containing missing keys in service
 // ConfigRequest or AutomateConfig's.
 type InvalidConfigError struct {
