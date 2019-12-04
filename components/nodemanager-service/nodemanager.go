@@ -34,6 +34,7 @@ import (
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	project_update_lib "github.com/chef/automate/lib/authz"
+	"github.com/chef/automate/lib/authz/project_purge"
 	"github.com/chef/automate/lib/tracing"
 )
 
@@ -254,6 +255,10 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 
 		err = project_update_lib.RegisterTaskExecutors(projectUpdateManager, "nodemanager",
 			db, authzProjectsClient)
+		if err != nil {
+			return err
+		}
+		err = project_purge.RegisterTaskExecutors(projectUpdateManager, "nodemanager", db)
 		if err != nil {
 			return err
 		}

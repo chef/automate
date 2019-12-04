@@ -96,6 +96,7 @@ func (projectUpdate *ProjectUpdate) updateFail(err error) {
 }
 
 func (db *DB) PurgeProject(ctx context.Context, projectTagToBeDelete string) error {
+	log.Infof("starting project delete for id %q", projectTagToBeDelete)
 	// TODO implement
 	return nil
 }
