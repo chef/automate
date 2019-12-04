@@ -680,9 +680,11 @@ func (backend ES2Backend) getProfileMinsFromNodes(
 	return depth.getProfileMinsFromNodesResults(filters, searchResult, statusFilters)
 }
 
-func computeStatus(failed int32, passed int32, skipped int32) string {
+func computeStatus(failed int32, passed int32, skipped int32, waived int32) string {
 	if failed > 0 {
 		return "failed"
+	} else if passed == 0 && skipped == 0 && waived > 0 {
+		return "waived"
 	} else if passed > 0 || skipped == 0 {
 		return "passed"
 	} else if passed == 0 && skipped > 0 {

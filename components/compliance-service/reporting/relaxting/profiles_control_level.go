@@ -12,9 +12,22 @@ import (
 func (depth *ControlDepth) getProfileMinsFromNodesAggs(filters map[string][]string) map[string]elastic.Aggregation {
 	aggs := make(map[string]elastic.Aggregation)
 
-	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "passed"))
-	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "failed"))
-	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "skipped"))
+	// create the waived query first as we are going to use it in the next filters
+	waivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
+
+	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermsQuery("profiles.controls.status", "passed")).
+		MustNot(waivedQuery))
+
+	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermsQuery("profiles.controls.status", "failed")).
+		MustNot(waivedQuery))
+
+	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermsQuery("profiles.controls.status", "skipped")).
+		MustNot(waivedQuery))
+
+	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
 	profileSha := elastic.NewTermsAggregation().Field("profiles.sha256").Size(int(1))
 	profileAgg := elastic.NewReverseNestedAggregation().Path("profiles").
@@ -27,6 +40,7 @@ func (depth *ControlDepth) getProfileMinsFromNodesAggs(filters map[string][]stri
 		SubAggregation("compliant", passedFilter).
 		SubAggregation("noncompliant", failedFilter).
 		SubAggregation("skipped", skippedFilter).
+		SubAggregation("waived", waivedFilter).
 		SubAggregation("profile", profileAgg)
 
 	aggs["impact"] = impactTerms
@@ -71,6 +85,9 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 			if skippedResult, found := impact.Aggregations.Filter("skipped"); found {
 				summary.Skipped = int32(skippedResult.DocCount)
 			}
+			if waivedResult, found := impact.Aggregations.Filter("waived"); found {
+				summary.Waived = int32(waivedResult.DocCount)
+			}
 			if profileResult, found := impact.Aggregations.ReverseNested("profile"); found {
 				if profileInfoResult, found := profileResult.Terms("profile-info"); found &&
 					len(profileInfoResult.Buckets) > 0 {
@@ -86,7 +103,7 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 					}
 				}
 			}
-			profileStatus := computeStatus(summary.Failures, summary.Passed, summary.Skipped)
+			profileStatus := computeStatus(summary.Failures, summary.Passed, summary.Skipped, summary.Waived)
 			summaryRep := reporting.ProfileMin{
 				Name:   summary.Name,
 				ID:     summary.Id,
@@ -94,10 +111,11 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 			}
 			profileMins[summary.Id] = summaryRep
 			counts = &reportingapi.ProfileCounts{
-				Total:   summary.Failures + summary.Passed + summary.Skipped,
+				Total:   summary.Failures + summary.Passed + summary.Skipped + summary.Waived,
 				Failed:  summary.Failures,
 				Passed:  summary.Passed,
 				Skipped: summary.Skipped,
+				Waived:  summary.Waived,
 			}
 		}
 	}

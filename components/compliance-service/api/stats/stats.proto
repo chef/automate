@@ -99,6 +99,7 @@ message ProfileList {
 	int32 criticals = 6;
 	int32 passed = 7;
 	int32 skipped = 8;
+	int32 waived = 9;
 }
 
 message ProfileSummary {

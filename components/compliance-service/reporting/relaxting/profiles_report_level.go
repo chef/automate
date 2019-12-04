@@ -20,6 +20,8 @@ func (depth *ReportDepth) getProfileMinsFromNodesAggs(filters map[string][]strin
 		Field("profiles.controls_sums.passed.total"))
 	termsQuery.SubAggregation("skipped", elastic.NewSumAggregation().
 		Field("profiles.controls_sums.skipped.total"))
+	termsQuery.SubAggregation("waived", elastic.NewSumAggregation().
+		Field("profiles.controls_sums.waived.total"))
 	termsQuery.SubAggregation("status", elastic.NewTermsAggregation().
 		Field("profiles.status"))
 
@@ -36,7 +38,7 @@ func (depth *ReportDepth) getProfileMinsFromNodesResults(
 	statusFilters []string) (map[string]reporting.ProfileMin, *reportingapi.ProfileCounts, error) {
 
 	profileMins := make(map[string]reporting.ProfileMin)
-	statusMap := make(map[string]int, 3)
+	statusMap := make(map[string]int, 4)
 
 	outermostAgg, _ := searchResult.Aggregations.Nested("profiles")
 	if outermostAgg != nil {
@@ -69,8 +71,9 @@ func (depth *ReportDepth) getProfileMinsFromNodesResults(
 					sumFailures, _ := bucket.Aggregations.Sum("failures")
 					sumPassed, _ := bucket.Aggregations.Sum("passed")
 					sumSkipped, _ := bucket.Aggregations.Sum("skipped")
-					profileStatus = computeStatus(int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value))
-					logrus.Debugf("getProfileMinsFromNodesResults profile_name=%s, status=%s (sumFailures=%d, sumPassed=%d, sumSkipped=%d)", profileName, profileStatus, int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value))
+					sumWaived, _ := bucket.Aggregations.Sum("waived")
+					profileStatus = computeStatus(int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value), int32(*sumWaived.Value))
+					logrus.Debugf("getProfileMinsFromNodesResults profile_name=%s, status=%s (sumFailures=%d, sumPassed=%d, sumSkipped=%d, sumWaived=%d)", profileName, profileStatus, int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value), int32(*sumWaived.Value))
 				}
 
 				if len(statusFilters) > 0 && !stringutils.SliceContains(statusFilters, profileStatus) {
@@ -91,10 +94,11 @@ func (depth *ReportDepth) getProfileMinsFromNodesResults(
 	logrus.Debugf("Done with statusMap=%+v", statusMap)
 	logrus.Debugf("Done with statusMap['something']=%+v", statusMap["passed"])
 	counts := &reportingapi.ProfileCounts{
-		Total:   int32(statusMap["failed"] + statusMap["passed"] + statusMap["skipped"]),
+		Total:   int32(statusMap["failed"]+statusMap["passed"]+statusMap["skipped"]) + int32(statusMap["waived"]),
 		Failed:  int32(statusMap["failed"]),
 		Passed:  int32(statusMap["passed"]),
 		Skipped: int32(statusMap["skipped"]),
+		Waived:  int32(statusMap["waived"]),
 	}
 	return profileMins, counts, nil
 }

@@ -649,6 +649,35 @@ describe File.basename(__FILE__) do
     }.to_json
     assert_equal(expected_data, actual_data.to_json)
 
+    # Get profiles used by nodes. Sorted by name desc
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: "end_time", values: ["2018-04-01T#{END_OF_DAY}"])
+    ], sort: 'name', order: 1)
+    expected_data = {
+      "profiles" => [
+        {
+          "name" => "myprofile2",
+          "title" => "My Profile 2 title",
+          "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
+          "version" => "1.0.5",
+          "status" => "waived"
+        },
+        {
+          "name" => "myprofile1",
+          "title" => "My Profile 1 title",
+          "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+          "version" => "1.0.1",
+          "status" => "failed"
+        }
+      ],
+      "counts" => {
+        "total" => 2,
+        "failed" => 1,
+        "waived" => 1
+      }
+    }.to_json
+    assert_equal(expected_data, actual_data.to_json)
+
     # Cover the other sort fields:
     resp = actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(sort: 'name', order: 1)
     assert_equal(Reporting::ProfileMins, resp.class)

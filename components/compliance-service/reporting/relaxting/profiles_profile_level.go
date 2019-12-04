@@ -20,6 +20,8 @@ func (depth *ProfileDepth) getProfileMinsFromNodesAggs(filters map[string][]stri
 		Field("profiles.controls_sums.passed.total"))
 	termsQuery.SubAggregation("skipped", elastic.NewSumAggregation().
 		Field("profiles.controls_sums.skipped.total"))
+	termsQuery.SubAggregation("waived", elastic.NewSumAggregation().
+		Field("profiles.controls_sums.waived.total"))
 	termsQuery.SubAggregation("status", elastic.NewTermsAggregation().
 		Field("profiles.status"))
 
@@ -36,7 +38,7 @@ func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 	myName := "ProfileDepth::getProfileMinsFromNodesResults"
 
 	profileMins := make(map[string]reporting.ProfileMin)
-	statusMap := make(map[string]int, 3)
+	statusMap := make(map[string]int, 4)
 
 	if aggRoot, found := depth.unwrap(&searchResult.Aggregations); found {
 		totalsAgg, _ := aggRoot.Terms("totals")
@@ -68,12 +70,13 @@ func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 					sumFailures, _ := bucket.Aggregations.Sum("failures")
 					sumPassed, _ := bucket.Aggregations.Sum("passed")
 					sumSkipped, _ := bucket.Aggregations.Sum("skipped")
-					profileStatus = computeStatus(int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value))
+					sumWaived, _ := bucket.Aggregations.Sum("waived")
+					profileStatus = computeStatus(int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value), int32(*sumWaived.Value))
 
 					logrus.Debugf(
-						"%s profile_name=%s, status=%s (sumFailures=%d, sumPassed=%d, sumSkipped=%d)",
+						"%s profile_name=%s, status=%s (sumFailures=%d, sumPassed=%d, sumSkipped=%d, sumWaived=%d)",
 						myName, profileName, profileStatus, int32(*sumFailures.Value), int32(*sumPassed.Value),
-						int32(*sumSkipped.Value))
+						int32(*sumSkipped.Value), int32(*sumWaived.Value))
 				}
 
 				if len(statusFilters) > 0 && !stringutils.SliceContains(statusFilters, profileStatus) {
@@ -98,6 +101,7 @@ func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 		Failed:  int32(statusMap["failed"]),
 		Passed:  int32(statusMap["passed"]),
 		Skipped: int32(statusMap["skipped"]),
+		Waived:  int32(statusMap["waived"]),
 	}
 	return profileMins, counts, nil
 }
