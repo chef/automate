@@ -55,6 +55,7 @@ func (a *adapter) CreateLegacyTokenWithValue(ctx context.Context, value string) 
 
 // PurgeProject removes a project from every token it exists in
 func (a *adapter) PurgeProject(ctx context.Context, projectID string) error {
+	a.logger.Info("starting project delete for id " + projectID)
 	_, err := a.db.ExecContext(ctx, "UPDATE chef_authn_tokens SET project_ids=array_remove(project_ids, $1)", projectID)
 	if err != nil {
 		return err
