@@ -84,7 +84,7 @@
                 <chef-table-cell>{{ org.admin_user }}</chef-table-cell>
                 <chef-table-cell class="controls">
                   <chef-control-menu>
-                    <chef-option class="delete-rule" data-cy="delete-rule">Delete Org</chef-option>
+                    <chef-option data-cy="delete" (click)="startOrgDelete(org)">Delete Org</chef-option>
                   </chef-control-menu>
                 </chef-table-cell>
               </chef-table-row>
@@ -101,7 +101,14 @@
         [conflictErrorEvent]="conflictErrorEvent"
         (createClicked)="createServerOrg()">
       </app-org-create-edit-modal>
-
+      <app-delete-object-modal
+        [visible]="deleteModalVisible"
+        objectNoun="org"
+        [objectName]="orgToDelete?.name"
+        (close)="closeDeleteModal()"
+        (deleteClicked)="deleteOrg()"
+        objectAction="Delete">
+      </app-delete-object-modal>
     </main>
   </div>
 </div>

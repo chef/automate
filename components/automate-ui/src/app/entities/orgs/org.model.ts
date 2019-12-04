@@ -1,5 +1,5 @@
 export interface Org {
-  id?: string;
+  id: string;
   server_id: string;
   name: string;
   admin_user: string;

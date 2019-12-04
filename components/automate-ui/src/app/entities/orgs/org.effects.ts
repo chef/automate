@@ -91,7 +91,7 @@ export class OrgEffects {
       ofType(OrgActionTypes.CREATE_SUCCESS),
       map(({ payload: { org } }: CreateOrgSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Created org ${org.id}`
+      message: `Created org ${org.name}.`
     })));
 
   @Effect()
@@ -106,19 +106,19 @@ export class OrgEffects {
   @Effect()
   deleteOrg$ = this.actions$.pipe(
       ofType(OrgActionTypes.DELETE),
-      mergeMap(({ payload: { server_id, id } }: DeleteOrg) =>
+      mergeMap(({ payload: { server_id, id, name } }: DeleteOrg) =>
         this.requests.deleteOrg(server_id, id).pipe(
-          map(() => new DeleteOrgSuccess({id})),
+          map(() => new DeleteOrgSuccess({id, name})),
           catchError((error: HttpErrorResponse) =>
             observableOf(new DeleteOrgFailure(error))))));
 
   @Effect()
   deleteOrgSuccess$ = this.actions$.pipe(
       ofType(OrgActionTypes.DELETE_SUCCESS),
-      map(({ payload: { id } }: DeleteOrgSuccess) => {
+      map(({ payload: { name } }: DeleteOrgSuccess) => {
         return new CreateNotification({
           type: Type.info,
-          message: `Deleted org ${id}.`
+          message: `Deleted org ${name}.`
         });
       }));
 

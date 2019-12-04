@@ -18,7 +18,7 @@ import {
 
 import { Server } from 'app/entities/servers/server.model';
 import { GetServer } from 'app/entities/servers/server.actions';
-import { GetOrgsForServer, CreateOrg } from 'app/entities/orgs/org.actions';
+import { GetOrgsForServer, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
   allOrgs,
@@ -45,6 +45,8 @@ export class ChefServersDetailsComponent implements OnInit, OnDestroy {
   public createModalVisible = false;
   public creatingServerOrg = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
+  public orgToDelete: Org;
+  public deleteModalVisible = false;
   public modalType: string;
   private id: string;
 
@@ -167,4 +169,17 @@ export class ChefServersDetailsComponent implements OnInit, OnDestroy {
     this.conflictErrorEvent.emit(false);
   }
 
+  public startOrgDelete(org: Org): void {
+    this.orgToDelete = org;
+    this.deleteModalVisible = true;
+  }
+
+  public deleteOrg(): void {
+    this.closeDeleteModal();
+    this.store.dispatch(new DeleteOrg(this.orgToDelete));
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
+  }
 }

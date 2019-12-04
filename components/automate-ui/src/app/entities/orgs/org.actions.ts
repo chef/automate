@@ -90,13 +90,13 @@ export class CreateOrgFailure implements Action {
 export class DeleteOrg implements Action {
   readonly type = OrgActionTypes.DELETE;
 
-  constructor(public payload: { server_id: string, id: string }) { }
+  constructor(public payload: { server_id: string, id: string, name: string }) { }
 }
 
 export class DeleteOrgSuccess implements Action {
   readonly type = OrgActionTypes.DELETE_SUCCESS;
 
-  constructor(public payload: { id: string }) { }
+  constructor(public payload: { id: string, name: string }) { }
 }
 
 export class DeleteOrgFailure implements Action {
