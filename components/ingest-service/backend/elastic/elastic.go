@@ -43,7 +43,7 @@ func (es *Backend) Initializing() bool {
 }
 
 func (es *Backend) PurgeProject(ctx context.Context, projectTagToBeDeleted string) error {
-	log.Debugf("starting project delete project %q", projectTagToBeDeleted)
+	log.Infof("starting project delete for id %q", projectTagToBeDeleted)
 
 	esNodeJobID, err := es.DeleteNodeProjectTag(ctx, projectTagToBeDeleted)
 	if err != nil {
@@ -55,8 +55,24 @@ func (es *Backend) PurgeProject(ctx context.Context, projectTagToBeDeleted strin
 		return errors.Wrap(err, "Failed to start Elasticsearch Action project tags delete")
 	}
 
-	log.Debugf("Started Project delete with node job ID: %q action job ID %q", esNodeJobID, esActionJobID)
+	log.Debugf("Started Project delete with [node job ID: %q, action job ID: %q]", esNodeJobID, esActionJobID)
 
+	for {
+		time.Sleep(time.Second * 1)
+
+		nodeJobStatus, err := es.JobStatus(ctx, esNodeJobID)
+		if err != nil {
+			return err
+		}
+		actionJobStatus, err := es.JobStatus(ctx, esActionJobID)
+		if err != nil {
+			return err
+		}
+
+		if nodeJobStatus.Completed && actionJobStatus.Completed {
+			break
+		}
+	}
 	return nil
 }
 

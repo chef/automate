@@ -23,6 +23,7 @@ import (
 	"github.com/chef/automate/components/ingest-service/serveropts"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	project_update_lib "github.com/chef/automate/lib/authz"
+	"github.com/chef/automate/lib/authz/project_purge"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"
 	"github.com/chef/automate/lib/datalifecycle/purge"
@@ -206,6 +207,11 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 
 	err = project_update_lib.RegisterTaskExecutors(projectUpdateManager, "ingest", client, authzProjectsClient)
+	if err != nil {
+		return err
+	}
+
+	err = project_purge.RegisterTaskExecutors(projectUpdateManager, "ingest", client)
 	if err != nil {
 		return err
 	}

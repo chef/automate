@@ -32,10 +32,11 @@ type ProjectPurger interface {
 
 // Map of every domain service that performs project purging.
 // Any future domain that has non-rule based project data
-// needs to be added here and RegisterTaskExecutors with the same string.
+// needs to be added here and RegisterTaskExecutor *in the domain* with the same string.
 var projectPurgeDomainServices = []string{
 	"teams",
 	"authn",
+	"ingest",
 }
 
 type cerealProjectPurger struct {
