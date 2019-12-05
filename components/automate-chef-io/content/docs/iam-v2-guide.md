@@ -400,7 +400,7 @@ To delete a project, navigate to the Projects list under the **Settings** tab. F
 right side of the column, and click `Delete Project`.
 
 When a project is deleted, it is removed from any resource assigned to the project. For ingested resources, it could take several hours
-for the project to be removed from every resource. If the project delete was the only project assigned to a resource, they become unassigned.
+for every resource to be removed from the project. If the resource was only in the deleted project then that resource will become unassigned.
 
 #### Project Policies
 
