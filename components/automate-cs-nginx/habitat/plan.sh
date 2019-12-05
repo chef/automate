@@ -10,7 +10,10 @@ pkg_license=('Chef-MLSA')
 pkg_version="13.0.47"
 pkg_deps=(
   chef/mlsa
-  core/curl
+  # TODO: REMOVE PINS
+  # The following pins match those in the chef-server-* packages below
+  # and can be removed once we unblock upgrades of chef-server.
+  core/curl/7.65.3/20190826035620
   core/bundler/1.17.3/20191007210608
   core/ruby/2.5.7/20191007205439
   # WARNING: Version pin managed by .expeditor/update_chef_server.sh
