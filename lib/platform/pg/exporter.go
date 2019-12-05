@@ -135,6 +135,7 @@ func (db DatabaseExporter) Export() error {
 	err := db.CmdExecutor.Run(
 		cmd[0],
 		append(db.ConnInfo.PsqlCmdOptions(),
+			command.Envvar("HAB_LICENSE", "accept-no-persist"),
 			command.Args(cmd[1:]...),
 			command.Timeout(db.Timeout),
 			command.Stdout(db.Stdout))...)
@@ -222,6 +223,7 @@ func (db DatabaseExporter) restoreSQLFile(exitOnError bool) error {
 	err := db.CmdExecutor.Run(
 		psqlCmd[0],
 		append(db.ConnInfo.PsqlCmdOptions(),
+			command.Envvar("HAB_LICENSE", "accept-no-persist"),
 			command.Args(psqlCmd[1:]...),
 			command.Stderr(stderrBuff),
 			command.Timeout(db.Timeout),
@@ -276,6 +278,7 @@ func (db DatabaseExporter) buildSQLTOC(pgBackupFile string, filters []string) (f
 	defer cancel()
 	waitFunc, err := db.CmdExecutor.Start(
 		pgListCmd[0],
+		command.Envvar("HAB_LICENSE", "accept-no-persist"),
 		command.Args(pgListCmd[1:]...),
 		command.Stderr(stderrListBuff),
 		command.Stdout(writer),
@@ -366,6 +369,7 @@ func (db DatabaseExporter) restoreCustomFile(exitOnError bool) error {
 	err = db.CmdExecutor.Run(
 		pgRestoreCmd[0],
 		append(db.ConnInfo.PsqlCmdOptions(),
+			command.Envvar("HAB_LICENSE", "accept-no-persist"),
 			command.Args(pgRestoreCmd[1:]...),
 			command.Stderr(stderrBuff),
 			command.Timeout(db.Timeout))...)
