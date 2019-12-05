@@ -34,7 +34,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   dropdownActive = false;
 
   ngOnChanges(changes) {
-    if (changes.options) {
+    if (changes.options && !this.optionsEdited) {
       this.resetOptions();
     }
   }
