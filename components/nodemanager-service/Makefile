@@ -175,8 +175,8 @@ test-integration-db: start-pg run
 
 test-integration:
 	go clean -testcache
-	RUN_MODE='local' go test github.com/chef/automate/components/nodemanager-service/tests
-	RUN_MODE='local' go test github.com/chef/automate/components/nodemanager-service/tests/scanjobtests
+	RUN_MODE='local' go test github.com/chef/automate/components/nodemanager-service/tests -cover -parallel=1 -p 1 -failfast
+	RUN_MODE='local' go test github.com/chef/automate/components/nodemanager-service/tests/scanjobtests -cover -parallel=1 -p 1 -failfast
 
 run-db-tests:
 	@POSTGRES_URI="$(POSTGRES_URI)" CGO_ENABLED=0 \
