@@ -712,7 +712,7 @@ func doDetect(job *types.InspecJob) (osInfo *inspec.OSInfo, err *inspec.Error) {
 		if err == nil {
 			break
 		}
-		logrus.Errorf("%s(%s) connection attempt # %d failed for node(%s) with error: %s", job.JobType, job.JobID, i+1, job.NodeID, err.Message)
+		logrus.Errorf("%s(%s) connection attempt # %d failed for node %s(%s) with error: %s", job.JobType, job.JobID, i+1, job.NodeName, job.NodeID, err.Message)
 	}
 	if err != nil {
 		return nil, err

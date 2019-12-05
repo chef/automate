@@ -174,7 +174,7 @@ func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManag
 			nodeUUID, err := r.scannerServer.GetNodeUUID(ctx, node.ID, "", m.AccountId)
 			if err != nil {
 				// don't need to fail here, just log and continue
-				logrus.Debugf("handleAzureApiNodes unable to get node id: %s", err.Error())
+				logrus.Warnf("handleAzureApiNodes unable to get db node id for subscription %s in azure acct %s : %s", node.ID, m.AccountId, err.Error())
 			}
 			nodeInfo := nodeInfo{
 				UUID:           nodeUUID,
@@ -388,7 +388,7 @@ func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.No
 			nodeUUID, err := r.scannerServer.GetNodeUUID(ctx, node, node, m.AccountId)
 			if err != nil {
 				// don't need to fail here, just log and continue
-				logrus.Errorf("handleAwsApiNodesMultiNode unable to get node id: %s", err.Error())
+				logrus.Warnf("handleAwsApiNodesMultiNode unable to get db node id for region %s in aws acct %s : %s", node, m.AccountId, err.Error())
 			}
 			nodeInfo := nodeInfo{
 				UUID:           nodeUUID,
@@ -541,7 +541,7 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 				nodeUUID, err := r.scannerServer.GetNodeUUID(ctx, node.Id, node.Region, m.AccountId)
 				if err != nil {
 					// don't need to fail here, just log and continue
-					logrus.Debugf("handleManagerNodes unable to get node id: %s", err.Error())
+					logrus.Warnf("handleManagerNodes unable to get db node id for %s in %s region and %s aws acct : %s", node.Id, node.Region, m.AccountId, err.Error())
 				}
 
 				nodeDetails = nodeInfo{

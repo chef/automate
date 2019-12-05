@@ -250,6 +250,11 @@ func getInspecError(serr string, err error, target *TargetConfig, timeout time.D
 		return NewInspecError(UNREACHABLE_HOST,
 			"Failed to connect to "+target.Hostname+", host is unreachable.")
 	}
+	connTimeoutErr := "Net::SSH::ConnectionTimeout"
+	if strings.Index(serr, connTimeoutErr) >= 0 {
+		return NewInspecError(CONN_TIMEOUT,
+			"Failed to connect to "+target.Hostname+", connection timeout.")
+	}
 	authErr := "Net::SSH::AuthenticationFailed"
 	if strings.Index(serr, authErr) >= 0 {
 		return NewInspecError(AUTH_FAILED,
