@@ -28,8 +28,8 @@ import {
   serviceGroupsState,
   serviceGroupsHealth,
   serviceGroupsError,
-  selectedServiceGroupList,
-  selectedServiceGroupStatus
+  selectedServiceGroupStatus,
+  selectedServiceGroupHealth
 } from '../../entities/service-groups/service-groups.selector';
 import { find, filter as fpFilter, pickBy, some, includes, get } from 'lodash/fp';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
@@ -233,17 +233,23 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       }
     });
 
-    // If selected service group sidebar is null when
-    // filter is applied, select the first service group
-    // This is temp, file will be refactored in story PR 1292
+
+    // If the user applies a filter via the filter bar or the *service group*
+    // status filters that filters out all of the services in the
+    // selected service group, then we want to pick a new service to become the
+    // selected service group. However, this logic does not apply to the
+    // *service* status filters (in the services sidebar); when all services
+    // are filtered out via those status filters we have a special state that
+    // says, e.g., "none of the services reuturned warning" that we want to
+    // show.
     this.store.select(serviceGroupsStatus).subscribe((sgStatus) => {
       if (sgStatus === 'loadingSuccess') {
         this.store.select(selectedServiceGroupStatus).subscribe((sSgStatus) => {
           if (sSgStatus === 'loadingSuccess') {
             this.serviceGroupsList$.subscribe((serviceGroups) => {
               if (serviceGroups.length > 0) {
-                this.store.select(selectedServiceGroupList).subscribe((list) => {
-                  if (list.length === 0) {
+                this.store.select(selectedServiceGroupHealth).subscribe((sgHealth) => {
+                  if (sgHealth.total === 0) {
                     this.onServiceGroupSelect(null, serviceGroups[0].id);
                   }
                 });
