@@ -123,6 +123,13 @@ func newRootCmd() *cobra.Command {
 				}
 			}
 
+			// Set HAB_LICENSE to ensure any hab commands
+			// we call get this variable by default.
+			err := os.Setenv("HAB_LICENSE", "accept-no-persist")
+			if err != nil {
+				logrus.WithError(err).Warn("Could not set HAB_LICENSE=accept-no-persist")
+			}
+
 			if _, found := cmd.Annotations[NoCheckVersionAnnotation]; found || globalOpts.noCheckVersion || disableAutoUpdate() {
 				logrus.Debug("Not checking version")
 			} else {
