@@ -45,7 +45,8 @@ describe File.basename(__FILE__) do
                 "total": 2
               },
               "skipped": {},
-              "failed": {}
+              "failed": {},
+              "waived": {}
             }
           },
           "profiles": [
@@ -85,7 +86,8 @@ describe File.basename(__FILE__) do
             "total": 2
           },
           "skipped": {},
-          "failed": {}
+          "failed": {},
+          "waived": {}
         }
       },
       "profiles": [
