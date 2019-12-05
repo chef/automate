@@ -29,7 +29,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             },
             {
@@ -48,7 +49,8 @@ describe File.basename(__FILE__) do
                     "failed" => {
                         "total" => 1,
                         "critical" => 1
-                    }
+                    },
+                    "waived"=>{}
                 }
             },
             {
@@ -64,7 +66,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             },
             {
@@ -80,7 +83,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             },
             {
@@ -95,7 +99,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             },
             {
@@ -111,7 +116,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             },
             {
@@ -132,7 +138,8 @@ describe File.basename(__FILE__) do
                     "failed" => {
                         "total" => 1,
                         "major" => 1
-                    }
+                    },
+                    "waived"=>{}
                 }
             }
         ],
@@ -159,7 +166,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             },
             {
@@ -178,7 +186,8 @@ describe File.basename(__FILE__) do
                     "failed" => {
                         "total" => 1,
                         "critical" => 1
-                    }
+                    },
+                    "waived"=>{}
                 }
             }
         ],
@@ -205,7 +214,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             },
             {
@@ -221,7 +231,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             }
         ],
@@ -250,7 +261,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             },
             {
@@ -266,7 +278,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             }
         ],
@@ -296,7 +309,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 15
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             },
             {
@@ -314,7 +328,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 15
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived"=>{}
                 }
             },
             {
@@ -335,7 +350,8 @@ describe File.basename(__FILE__) do
                     "failed" => {
                         "total" => 2,
                         "major" => 2
-                    }
+                    },
+                    "waived"=>{}
                 }
             }
         ],
@@ -367,7 +383,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 },
                 {
@@ -383,7 +400,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 },
                 {
@@ -399,7 +417,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 },
                 {
@@ -415,7 +434,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 },
                 {
@@ -430,7 +450,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 },
                 {
@@ -446,7 +467,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 },
                 {
@@ -462,7 +484,8 @@ describe File.basename(__FILE__) do
                             "total" => 1
                         },
                         "skipped" => {},
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 }
             ],
@@ -491,7 +514,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 },
                 {
@@ -508,7 +532,8 @@ describe File.basename(__FILE__) do
                         "failed" => {
                             "total" => 1,
                             "critical" => 1
-                        }
+                        },
+                        "waived"=>{}
                     }
                 },
                 {
@@ -524,7 +549,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 },
                 {
@@ -540,7 +566,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 },
                 {
@@ -555,7 +582,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 },
                 {
@@ -571,7 +599,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 },
                 {
@@ -587,7 +616,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived"=>{}
                     }
                 }
             ],
