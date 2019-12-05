@@ -16,7 +16,7 @@ describe File.basename(__FILE__) do
   end
 
   it "errors out when an invalid sort field is specified" do
-    assert_grpc_error(/sort field 'bogus' is invalid. Use either 'name', 'title' or 'maintainer'/, 3) do
+    assert_grpc_error(/sort field 'bogus' is invalid. Use either 'name' or 'title'/, 3) do
       GRPC profiles, :list, Profiles::Query.new(
         sort: 'bogus',
         order: 1

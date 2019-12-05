@@ -424,8 +424,8 @@ func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata
 		return nil, 0, status.Errorf(codes.InvalidArgument, "order field '%s' is invalid. Use either 'ASC' or 'DESC'", req.Order)
 	}
 
-	if req.Sort != "name" && req.Sort != "title" && req.Sort != "maintainer" {
-		return nil, 0, status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name', 'title' or 'maintainer'", req.Sort)
+	if req.Sort != "name" && req.Sort != "title" {
+		return nil, 0, status.Errorf(codes.InvalidArgument, "sort field '%s' is invalid. Use either 'name' or 'title'", req.Sort)
 	}
 
 	sql := squirrel.
