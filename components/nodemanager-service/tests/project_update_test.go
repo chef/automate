@@ -2290,7 +2290,7 @@ func TestProjectUpdate(t *testing.T) {
 				processedNode, err := db.GetNode(ctx, nodeID)
 				require.NoError(t, err)
 
-				assert.ElementsMatch(t, test.expectedProjectIDs, processedNode.Projects)
+				require.ElementsMatch(t, test.expectedProjectIDs, processedNode.Projects)
 			})
 	}
 }

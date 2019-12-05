@@ -379,7 +379,7 @@ func TestListProjectFilteringIngestedNodes(t *testing.T) {
 					actualNodeIDs = append(actualNodeIDs, node.Id)
 				}
 
-				assert.ElementsMatch(t, append(test.expectedIngestedNodeIDs, manualNodeIds...), actualNodeIDs)
+				require.ElementsMatch(t, append(test.expectedIngestedNodeIDs, manualNodeIds...), actualNodeIDs)
 			})
 	}
 }
