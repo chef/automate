@@ -293,6 +293,27 @@ type ResolveTask struct {
 	resolver            *resolver.Resolver
 }
 
+func (t *ResolveTask) handleEmptyNodeJobs(job *jobs.Job) error {
+	now := time.Now()
+	nodeJob := &types.InspecJob{
+		InspecBaseJob: types.InspecBaseJob{
+			JobID: job.Id,
+		},
+		StartTime:  &now,
+		EndTime:    &now,
+		NodeStatus: types.StatusAborted,
+	}
+	err := t.scanner.UpdateJobStatus(nodeJob.JobID, "failed", nodeJob.StartTime, nodeJob.EndTime)
+	if err != nil {
+		logrus.Errorf("error updating job status for job %s (%s): %s", job.Name, job.Id, err.Error())
+	}
+	err = t.scanner.UpdateResult(context.TODO(), nodeJob, nil, &inspec.Error{Message: "no nodes found"}, "")
+	if err != nil {
+		logrus.Errorf("error updating job results for job %s (%s): %s", job.Name, job.Id, err.Error())
+	}
+	return errors.New("No nodes found for job")
+}
+
 func (t *ResolveTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 	var job jobs.Job
 	if err := task.GetParameters(&job); err != nil {
@@ -309,18 +330,7 @@ func (t *ResolveTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 	}
 
 	if len(nodeJobs) == 0 {
-		now := time.Now()
-		nodeJob := &types.InspecJob{
-			InspecBaseJob: types.InspecBaseJob{
-				JobID: job.Id,
-			},
-			StartTime:  &now,
-			EndTime:    &now,
-			NodeStatus: types.StatusAborted,
-		}
-		t.scanner.UpdateJobStatus(nodeJob.JobID, "failed", nodeJob.StartTime, nodeJob.EndTime)
-		t.scanner.UpdateResult(context.TODO(), nodeJob, nil, &inspec.Error{Message: "no nodes found"}, "")
-		return nil, errors.New("No nodes found for job")
+		return nil, t.handleEmptyNodeJobs(&job)
 	}
 
 	for _, job := range nodeJobs {
@@ -334,11 +344,21 @@ func (t *ResolveTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 			job.RemoteInspecVersion = t.remoteInspecVersion
 		}
 
-		t.scanner.UpdateJobStatus(job.JobID, job.Status, nil, nil)
+		err := t.scanner.UpdateJobStatus(job.JobID, job.Status, nil, nil)
+		if err != nil {
+			logrus.Errorf("error updating status for job %s (%s): %s", job.JobName, job.JobID, err.Error())
+		}
 		job.InternalProfiles, job.ProfilesOwner = updateComplianceURLs(job.Profiles)
 	}
 
 	return nodeJobs, nil
+}
+
+type jobCompletionInfo struct {
+	InspecErr  *inspec.Error
+	ExecInfo   []byte
+	DetectInfo *inspec.OSInfo
+	ReportID   string
 }
 
 func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
@@ -371,10 +391,7 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 		return types.StatusFailed, errors.Errorf("Invalid job type %q", job.JobType)
 	}
 
-	var inspecErr *inspec.Error
-	var execInfo []byte
-	var detectInfo *inspec.OSInfo
-	var reportID string
+	var jobInfo jobCompletionInfo
 	// retrying for certain error types
 	job.RetriesLeft++ // adding the implicit try
 	for job.RetriesLeft > 0 && job.NodeStatus == types.StatusRunning {
@@ -387,22 +404,22 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 				job.NodeStatus = types.StatusCompleted
 			case types.JobTypeExec:
 				// call out to do the ssm job
-				inspecErr = remote.RunSSMJob(ctx, &job)
+				jobInfo.InspecErr = remote.RunSSMJob(ctx, &job)
 			}
 		} else if nodeHasSecrets(&job.TargetConfig) {
 			switch job.JobType {
 			case types.JobTypeDetect:
-				detectInfo, inspecErr = doDetect(&job)
+				jobInfo.DetectInfo, jobInfo.InspecErr = doDetect(&job)
 			case types.JobTypeExec:
-				execInfo, inspecErr = doExec(&job)
+				jobInfo.ExecInfo, jobInfo.InspecErr = doExec(&job)
 			}
 		} else {
 			job.NodeStatus = types.StatusFailed
-			inspecErr = inspec.NewInspecError(inspec.NO_CREDS_PROVIDED, "insufficient information for ssh or winrm scan")
+			jobInfo.InspecErr = inspec.NewInspecError(inspec.NO_CREDS_PROVIDED, "insufficient information for ssh or winrm scan")
 		}
 		job.RetriesLeft--
 		if job.NodeStatus == types.StatusRunning &&
-			(inspecErr.Type == inspec.CONN_TIMEOUT || inspecErr.Type == inspec.UNREACHABLE_HOST) &&
+			(jobInfo.InspecErr.Type == inspec.CONN_TIMEOUT || jobInfo.InspecErr.Type == inspec.UNREACHABLE_HOST) &&
 			job.RetriesLeft > 0 {
 			logrus.Debugf("retrying(%d) job %s(%s) for node %s", job.RetriesLeft, job.JobID, currentJobSummary, job.NodeID)
 		}
@@ -417,17 +434,21 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 
 	job.EndTime = timeNowRef()
 
+	return t.handleCompletedJob(ctx, job, jobInfo)
+}
+
+func (t *InspecJobTask) handleCompletedJob(ctx context.Context, job types.InspecJob, jobInfo jobCompletionInfo) (string, error) {
 	if job.SSM {
 		switch job.JobType {
 		case types.JobTypeDetect:
 			// ssm ping is online, so we set node to reachable up above by setting node status to completed
 			// but we don't actually run an inspec detect, b/c ssm jobs need to report back to automate, and
 			// detect doesn't do this. so here we do nothing. we'll update the node further down.
-			detectInfo = &inspec.OSInfo{}
+			jobInfo.DetectInfo = &inspec.OSInfo{}
 		case types.JobTypeExec:
 			// ssm jobs report directly to automate, so we attached a report id to the
 			// reporter config when we assembled the script
-			err := t.scannerServer.UpdateResult(ctx, &job, nil, inspecErr, job.Reporter.ReportUUID)
+			err := t.scannerServer.UpdateResult(ctx, &job, nil, jobInfo.InspecErr, job.Reporter.ReportUUID)
 			if err != nil {
 				logrus.Errorf("error trying to update node %s (%s) during scan job %s with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
 			}
@@ -437,27 +458,27 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 	} else {
 		switch job.JobType {
 		case types.JobTypeDetect:
-			detectInfoByte, err := json.Marshal(detectInfo)
+			detectInfoByte, err := json.Marshal(jobInfo.DetectInfo)
 			if err != nil {
 				logrus.Errorf("error trying to marshal detectInfo for job %s", job.JobID)
 				job.NodeStatus = types.StatusFailed
-				inspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
+				jobInfo.InspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
 			}
-			err = t.scannerServer.UpdateResult(ctx, &job, detectInfoByte, inspecErr, "")
+			err = t.scannerServer.UpdateResult(ctx, &job, detectInfoByte, jobInfo.InspecErr, "")
 			if err != nil {
 				logrus.Errorf("error trying to update node %s (%s) during scan job %s with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
 			}
 		case types.JobTypeExec:
 			if job.NodeStatus == types.StatusCompleted {
-				reportID = uuid.Must(uuid.NewV4()).String()
-				err := t.reportIt(ctx, &job, execInfo, reportID)
+				jobInfo.ReportID = uuid.Must(uuid.NewV4()).String()
+				err := t.reportIt(ctx, &job, jobInfo.ExecInfo, jobInfo.ReportID)
 				if err != nil {
 					logrus.Errorf("worker error reporting on node %s (%s) during scan job %s: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
 					job.NodeStatus = types.StatusFailed
-					inspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
+					jobInfo.InspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
 				}
 			}
-			err := t.scannerServer.UpdateResult(ctx, &job, nil, inspecErr, reportID)
+			err := t.scannerServer.UpdateResult(ctx, &job, nil, jobInfo.InspecErr, jobInfo.ReportID)
 			if err != nil {
 				logrus.Errorf("error trying to update node %s (%s) during scan job %s with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
 			}
@@ -465,11 +486,11 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 			return types.StatusFailed, errors.Errorf("unknown job type: %+v", job.JobType)
 		}
 	}
-	err = t.scannerServer.UpdateNode(ctx, &job, detectInfo)
+	err := t.scannerServer.UpdateNode(ctx, &job, jobInfo.DetectInfo)
 	if err != nil {
 		logrus.Errorf("error trying to update node %s (%s) during scan job %s: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
 	}
-	logrus.Debugf("finished job %s with status %s", job.JobID, job.NodeStatus)
+	logrus.Debugf("finished job %s (%s) with status %s", job.JobName, job.JobID, job.NodeStatus)
 	return job.NodeStatus, nil
 }
 
@@ -559,10 +580,16 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task cereal.Task) (inter
 	// ChildJobID and that is the one we want to update.
 	if jobsPayload.ChildJobID != "" {
 		logrus.Debugf("Updating job %s with overall status of %s", jobsPayload.ChildJobID, jobsPayload.OverallJobStatus)
-		t.scannerServer.UpdateJobStatus(jobsPayload.ChildJobID, jobsPayload.OverallJobStatus, nil, timeNowRef())
+		err := t.scannerServer.UpdateJobStatus(jobsPayload.ChildJobID, jobsPayload.OverallJobStatus, nil, timeNowRef())
+		if err != nil {
+			logrus.Errorf("error updating status for job %s : %s", jobsPayload.ChildJobID, err.Error())
+		}
 	} else {
 		logrus.Debugf("Updating job %s with overall status of %s", jobsPayload.ParentJobID, jobsPayload.OverallJobStatus)
-		t.scannerServer.UpdateJobStatus(jobsPayload.ParentJobID, jobsPayload.OverallJobStatus, nil, timeNowRef())
+		err := t.scannerServer.UpdateJobStatus(jobsPayload.ParentJobID, jobsPayload.OverallJobStatus, nil, timeNowRef())
+		if err != nil {
+			logrus.Errorf("error updating status for job %s : %s", jobsPayload.ChildJobID, err.Error())
+		}
 	}
 
 	return nil, nil
@@ -575,7 +602,10 @@ func (t *CreateChildTask) Run(ctx context.Context, task cereal.Task) (interface{
 	}
 
 	job.JobCount++
-	t.scanner.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
+	err := t.scanner.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
+	if err != nil {
+		logrus.Errorf("error updating parent job schedule for job %s (%s) : %s", job.Name, job.Id, err.Error())
+	}
 
 	childJob, err := t.scanner.CreateChildJob(&job)
 	if err != nil {

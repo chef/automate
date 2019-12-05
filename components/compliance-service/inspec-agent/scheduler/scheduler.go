@@ -47,7 +47,10 @@ func (a *Scheduler) Run(job *jobs.Job) error {
 			return &errorutils.InvalidError{Msg: fmt.Sprintf("failed to schedule job %q (%q) invalid job recurrence rule: %v",
 				job.Id, job.Name, err)}
 		}
-		a.scanner.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
+		err = a.scanner.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
+		if err != nil {
+			logrus.Errorf("error updating status for job %s (%s) : %s", job.Name, job.Id, err.Error())
+		}
 		return nil
 	}
 

@@ -87,7 +87,10 @@ func (r *Resolver) ResolveJob(ctx context.Context, job *jobs.Job) ([]*types.Insp
 		logrus.Warnf("Nothing to do for job %s, empty list of nodes/selectors", job.Id)
 		return []*types.InspecJob{}, fmt.Errorf("cannot process this job, nodes and selectors are both nil")
 	}
-	r.scannerServer.UpdateJobNodeCount(job.Id, len(nodeJobs))
+	err = r.scannerServer.UpdateJobNodeCount(job.Id, len(nodeJobs))
+	if err != nil {
+		logrus.Errorf("error trying to job node count for job %s (%s): %s", job.Name, job.Id, err.Error())
+	}
 	return nodeJobs, nil
 }
 
