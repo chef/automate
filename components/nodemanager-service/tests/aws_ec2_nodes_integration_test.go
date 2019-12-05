@@ -70,7 +70,7 @@ func TestAWSEC2Nodes(t *testing.T) {
 	readNode, err := nodesClient.Read(ctx, &nodes.Id{Id: list.GetNodes()[0].GetId()})
 	require.NoError(t, err)
 	readNode.Name = "new name"
-	readNode.TargetConfig.Host = "localhost"
+	readNode.TargetConfig.Host = "THIS IS WRONG"
 	readNode.TargetConfig.Port = 22
 	_, err = nodesClient.Update(ctx, readNode)
 	require.NoError(t, err)
