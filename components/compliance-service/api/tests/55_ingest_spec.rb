@@ -59,7 +59,7 @@ describe File.basename(__FILE__) do
       )
       @job_id = job['id']
     end
- 
+
     i = 0
     job_status = 'new'
     report_id = 'unknown'
@@ -99,7 +99,8 @@ describe File.basename(__FILE__) do
               "skipped": {
                 "total": 32
               },
-              "failed": {}
+              "failed": {},
+              "waived": {}
             }
           },
           "profiles": [
