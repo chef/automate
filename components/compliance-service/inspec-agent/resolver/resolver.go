@@ -95,14 +95,17 @@ func (r *Resolver) ResolveJob(ctx context.Context, job *jobs.Job) ([]*types.Insp
 }
 
 type nodeInfo struct {
-	UUID              string
-	CloudID           string
+	UUID    string
+	CloudID string
+	// this is the aws instance id or azure vm id for traditional nodes.
+	// for azure api, it's a subscription id. for aws-api (new) it's an account id. for the old multinode path of aws
+	// api it's region. for gcp it's the project name.
 	Name              string
 	Environment       string
-	CloudAccountID    string
-	ManagerID         string
-	SSM               bool
-	MachineIdentifier string
+	CloudAccountID    string // this is the account id on the manager object associated with the node
+	ManagerID         string // the id of the manager associated with the node
+	SSM               bool   // true means we should treat this as a ssm job (remote scan job)
+	MachineIdentifier string // special identifier used when querying azure api, the resource group name
 	Tags              []*common.Kv
 }
 
@@ -171,14 +174,15 @@ func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManag
 			nodeUUID, err := r.scannerServer.GetNodeUUID(ctx, node.ID, "", m.AccountId)
 			if err != nil {
 				// don't need to fail here, just log and continue
-				logrus.Debugf("handleManagerNodes unable to get node id: %s", err.Error())
+				logrus.Debugf("handleAzureApiNodes unable to get node id: %s", err.Error())
 			}
 			nodeInfo := nodeInfo{
-				UUID:        nodeUUID,
-				CloudID:     node.ID,
-				Name:        node.Name,
-				Environment: "azure-api",
-				ManagerID:   m.Id,
+				UUID:           nodeUUID,
+				CloudID:        node.ID,
+				Name:           node.Name,
+				Environment:    "azure-api",
+				ManagerID:      m.Id,
+				CloudAccountID: m.AccountId,
 			}
 			tc := inspec.TargetBaseConfig{
 				Backend:        "azure",
@@ -228,11 +232,12 @@ func (r *Resolver) handleGcpApiNodes(ctx context.Context, m *manager.NodeManager
 	jobArray := []*types.InspecJob{}
 	for _, node := range dbNodes.Nodes {
 		nodeInfo := nodeInfo{
-			UUID:        node.Id,
-			CloudID:     node.Name,
-			Name:        node.Name,
-			Environment: "gcp-api",
-			ManagerID:   m.Id,
+			UUID:           node.Id,
+			CloudID:        node.Name,
+			Name:           node.Name,
+			Environment:    "gcp-api",
+			ManagerID:      m.Id,
+			CloudAccountID: m.AccountId,
 		}
 		tc := inspec.TargetBaseConfig{
 			Backend:        "gcp",
@@ -325,11 +330,12 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 	}
 
 	nodeInfo := nodeInfo{
-		UUID:        node.Id,
-		CloudID:     m.AccountId,
-		Name:        node.Name,
-		Environment: "gcp-api",
-		ManagerID:   m.Id,
+		UUID:           node.Id,
+		CloudID:        m.AccountId,
+		Name:           node.Name,
+		Environment:    "gcp-api",
+		ManagerID:      m.Id,
+		CloudAccountID: m.AccountId,
 	}
 	tc := inspec.TargetBaseConfig{
 		Backend: "aws",
@@ -382,14 +388,15 @@ func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.No
 			nodeUUID, err := r.scannerServer.GetNodeUUID(ctx, node, node, m.AccountId)
 			if err != nil {
 				// don't need to fail here, just log and continue
-				logrus.Errorf("handleManagerNodes unable to get node id: %s", err.Error())
+				logrus.Errorf("handleAwsApiNodesMultiNode unable to get node id: %s", err.Error())
 			}
 			nodeInfo := nodeInfo{
-				UUID:        nodeUUID,
-				CloudID:     node,
-				Name:        name,
-				Environment: "aws-api",
-				ManagerID:   m.Id,
+				UUID:           nodeUUID,
+				CloudID:        node,
+				Name:           name,
+				Environment:    "aws-api",
+				ManagerID:      m.Id,
+				CloudAccountID: m.AccountId,
 			}
 			tc := inspec.TargetBaseConfig{
 				Backend: "aws",
@@ -459,61 +466,66 @@ func (r *Resolver) handleAzureVmNodes(ctx context.Context, m *manager.NodeManage
 	return r.handleManagerNodes(ctx, m, nodeCollections, job)
 }
 
+func (r *Resolver) handleInstanceCredentials(ctx context.Context, instanceCreds []*manager.CredentialsByTags, node *manager.ManagerNode) ([]*inspec.Secrets, nodeInfo) {
+	var nodeInfo nodeInfo
+	credsArr := make([]*inspec.Secrets, 0)
+	for _, credTagGroup := range instanceCreds {
+		for _, kv := range node.Tags {
+			if kv.Key == "Name" {
+				nodeInfo.Name = kv.Value
+			}
+			if kv.Key == "Environment" {
+				nodeInfo.Environment = kv.Value
+			}
+			isMatch := utils.KvMatches(credTagGroup.TagKey, credTagGroup.TagValue, kv)
+			if isMatch {
+				for _, cred := range credTagGroup.CredentialIds {
+					secret, err := r.secretsClient.Read(ctx, &secrets.Id{Id: cred})
+					if err != nil {
+						logrus.Errorf("Failed to get node credentials for node %s(%s): %s", node.Name, node.Id, err.Error())
+						continue
+					}
+					creds, err := getNodeCredentials(secret)
+					if err != nil {
+						logrus.Errorf("Failed to get node credentials for node %s(%s): %s", node.Name, node.Id, err.Error())
+						continue
+					}
+					credsArr = append(credsArr, creds)
+				}
+			}
+		}
+	}
+	return credsArr, nodeInfo
+}
+
 func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManager, nodeCollections map[string]managerNodes, job *jobs.Job) ([]*types.InspecJob, error) {
 	jobArray := []*types.InspecJob{}
-	var creds *inspec.Secrets
 	var clientID, clientSecret, tenantID string
-	if len(m.CredentialId) == 0 && m.Type == "azure-vm" {
-		logrus.Infof("GetAzureCreds attempting to use environment credentials")
-	} else {
-		mgrCreds, err := r.secretsClient.Read(ctx, &secrets.Id{Id: m.CredentialId})
-		if err != nil {
-			logrus.Errorf("Failed to get manager credentials for node manager %s: %s", m.Id, err.Error())
-		}
-		if m.Type == "azure-vm" {
-			clientID, clientSecret, tenantID = managers.GetAzureCreds(mgrCreds)
+	if m.Type == "azure-vm" {
+		if len(m.CredentialId) == 0 {
+			logrus.Infof("GetAzureCreds attempting to use environment credentials")
+		} else {
+			mgrCreds, err := r.secretsClient.Read(ctx, &secrets.Id{Id: m.CredentialId})
+			if err != nil {
+				logrus.Errorf("Failed to get manager credentials for node manager %s: %s", m.Id, err.Error())
+			}
+			if m.Type == "azure-vm" {
+				clientID, clientSecret, tenantID = managers.GetAzureCreds(mgrCreds)
+			}
 		}
 	}
 
 	for _, group := range nodeCollections {
 		for _, nodesArr := range group.nodes {
 			for _, node := range nodesArr {
-				var backend, nodeEnv, nodeName string
-				backend = inspec.BackendSSH
+				backend := inspec.BackendSSH
 				if node.Platform == "windows" {
 					backend = inspec.BackendWinRm
 				}
 				logrus.Debugf("inspec agent resolver handling node with backend: %s -- ssm ping status: %s", backend, node.Ssm)
-				nodeName = node.Name
-				var credsArr []*inspec.Secrets
-				for _, credTagGroup := range group.manager.InstanceCredentials {
-					for _, kv := range node.Tags {
-						if kv.Key == "Name" {
-							nodeName = kv.Value
-						}
-						if kv.Key == "Environment" {
-							nodeEnv = kv.Value
-						}
-						isMatch := utils.KvMatches(credTagGroup.TagKey, credTagGroup.TagValue, kv)
-						if isMatch {
-							for _, cred := range credTagGroup.CredentialIds {
-								secret, err := r.secretsClient.Read(ctx, &secrets.Id{Id: cred})
-								if err != nil {
-									logrus.Errorf("Failed to get node credentials for node manager %s node %s: %s", group.manager.Id, node.Id, err.Error())
-									continue
-								}
-								creds, err = getNodeCredentials(secret)
-								if err != nil {
-									logrus.Errorf("Failed to get node credentials for node manager %s node %s: %s", group.manager.Id, node.Id, err.Error())
-									continue
-								}
-								credsArr = append(credsArr, creds)
-							}
-						}
-					}
-				}
-				if len(nodeName) == 0 {
-					nodeName = node.Host
+				credsArr, nodeDetails := r.handleInstanceCredentials(ctx, group.manager.InstanceCredentials, node)
+				if len(nodeDetails.Name) == 0 {
+					nodeDetails.Name = node.Host
 				}
 				ssmJob := false
 				// if the user has specified ssh/winrm secrets to be associated with the node
@@ -532,13 +544,16 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 					logrus.Debugf("handleManagerNodes unable to get node id: %s", err.Error())
 				}
 
-				nodeInfo := nodeInfo{
-					UUID:        nodeUUID,
-					CloudID:     node.Id,
-					Name:        nodeName,
-					Environment: nodeEnv,
-					ManagerID:   m.Id,
-					SSM:         ssmJob,
+				nodeDetails = nodeInfo{
+					UUID:              nodeUUID,
+					CloudID:           node.Id,
+					Name:              nodeDetails.Name,
+					Environment:       nodeDetails.Environment,
+					ManagerID:         m.Id,
+					SSM:               ssmJob,
+					CloudAccountID:    m.AccountId,
+					Tags:              node.Tags,
+					MachineIdentifier: node.MachineIdentifier,
 				}
 				tc := inspec.TargetBaseConfig{
 					Hostname:       node.PublicIp,
@@ -553,7 +568,7 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 						AzureTenantID:     tenantID,
 					})
 				}
-				jobArray = append(jobArray, assembleJob(job, nodeInfo, credsArr, tc))
+				jobArray = append(jobArray, assembleJob(job, nodeDetails, credsArr, tc))
 			}
 		}
 	}
