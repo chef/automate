@@ -379,6 +379,8 @@ func TestListProjectFilteringIngestedNodes(t *testing.T) {
 					actualNodeIDs = append(actualNodeIDs, node.Id)
 				}
 
+				actualNodeIDs = append(actualNodeIDs, "tacoslol")
+
 				assert.ElementsMatch(t, append(test.expectedIngestedNodeIDs, manualNodeIds...), actualNodeIDs)
 			})
 	}
