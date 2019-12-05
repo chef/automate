@@ -1,32 +1,83 @@
 package deployment
 
 import (
+	"github.com/sirupsen/logrus"
+
 	api "github.com/chef/automate/api/config/deployment"
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
-	"github.com/sirupsen/logrus"
 )
 
-// NewUserOverrideConfigFromBackupRestoreTask takes a BackupRestoreTask and
-// converts the restoration configuration contained within into a new user
-// override AutomateConfig.
-func NewUserOverrideConfigFromBackupRestoreTask(req *BackupRestoreTask) *api.AutomateConfig {
-	// Convert a BackupRestoreTask into a sparse AutomateConfig that is suitable
-	// to be merged into the UserOverrideConfig
+// MergeAndValidateNewUserOverrideConfig is responsible for taking an existing
+// user override AutomateConfig (from a backup), building a new user override
+// config from a BackupRestoreTask (args for the backup restore), and validating
+// the resulting user override config.
+//
+// Validation of the config is a bit tricky as there are a few corner cases we
+// need to worry about. It's possible that the user wants to pass in config set
+// or patch that includes deprecated values since it's possible that the version
+// of the software they are restoring could use those values. We'll handle this
+// case by validating the with a redacted copy of the config.
+func MergeAndValidateNewUserOverrideConfig(existing *api.AutomateConfig, req *BackupRestoreTask) error {
+	var err error
 	cfg := &api.AutomateConfig{}
+
+	// They gave us nothing, return the existing config.
 	if req == nil {
-		return cfg
-	}
-	if req.PatchConfig != nil {
-		cfg = req.PatchConfig
+		return nil
 	}
 
+	// If they passed a config set we'll only use it as that is their desired
+	// config.
+	if setConfig := req.GetSetConfig(); setConfig != nil {
+		redactedCopy, err := setConfig.RedactedCopy()
+		if err != nil {
+			return err
+		}
+
+		err = redactedCopy.ValidateWithGlobalAndDefaults()
+		if err != nil {
+			return err
+		}
+
+		*existing = *setConfig
+		return nil
+	}
+
+	// If they passed a patch we'll validate a redacted version. If it doesn't
+	// pass then they've passed in an invalid patch. Later we'll
+	// merge the patch config into the config that we'll generate from the
+	// restore task.
+	patchConfig := req.GetPatchConfig()
+	if patchConfig != nil {
+		existingRedactedCopy, err := existing.RedactedCopy()
+		if err != nil {
+			return err
+		}
+
+		redactedPatch, err := patchConfig.RedactedCopy()
+		if err != nil {
+			return err
+		}
+
+		err = existingRedactedCopy.OverrideConfigValues(redactedPatch)
+		if err != nil {
+			return err
+		}
+
+		err = existingRedactedCopy.ValidateWithGlobalAndDefaults()
+		if err != nil {
+			return err
+		}
+	}
+
+	// Merge the restore task options into the config
 	reqS3 := req.GetS3BackupLocation()
 	if reqS3.GetBucketName() == "" {
 		// Return the defaults because we're in filesystem mode and the request
 		// caries no meaningful backup info in that mode.
 		// NOTE: It would be nice to carry the endpoint type in the backup req
-		return cfg
+		return nil
 	}
 
 	// We're in S3 mode so we need to populate the config with any options
@@ -79,5 +130,17 @@ func NewUserOverrideConfigFromBackupRestoreTask(req *BackupRestoreTask) *api.Aut
 		creds.SessionToken = w.String(sessionToken)
 	}
 
-	return cfg
+	if patchConfig != nil {
+		err = cfg.OverrideConfigValues(patchConfig)
+		if err != nil {
+			return err
+		}
+	}
+
+	err = existing.OverrideConfigValues(cfg)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

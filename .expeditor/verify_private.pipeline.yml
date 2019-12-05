@@ -731,6 +731,15 @@ steps:
           single-use: true
           privileged: true
 
+  - label: "deep upgrade backup restore"
+    command:
+      - integration/run_test integration/tests/deep_upgrade_backup_restore.sh
+    timeout_in_minutes: 25
+    expeditor:
+      executor:
+        linux:
+          privileged: true
+
   - label: "backups"
     command:
       - integration/run_test integration/tests/backup.sh
