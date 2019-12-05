@@ -216,28 +216,30 @@ func (s *Scanner) UpdateResult(ctx context.Context, job *types.InspecJob, output
 	if job.NodeStatus == types.StatusFailed || job.NodeStatus == types.StatusAborted {
 		if inspecErr != nil {
 			result.Result = inspecErr.Message
+		} else {
+			result.Result = fmt.Sprintf("unable to complete scan on node. please check the logs for more information. node id ref: %s", job.NodeID)
+		}
+		connectionErr := ""
+		if inspecErr != nil {
+			connectionErr = inspecErr.Type
+		}
+		if connectionErr != "" {
+			_, err := s.nodesClient.UpdateNodeConnectionError(ctx, &nodes.NodeError{
+				NodeId:          job.NodeID,
+				ConnectionError: connectionErr,
+			})
+			if err != nil {
+				return errors.Wrapf(err, "UpdateResult encountered an error updating node connection error")
+			}
 		}
 	} else {
 		result.Result = string(output)
 	}
-
 	err := s.DB.Insert(&result)
 	if err != nil {
-		logrus.Errorf("UpdateResult encountered an error inserting into the database: %s", err.Error())
+		return errors.Wrap(err, "UpdateResult encountered an error inserting into the database")
 	}
-	connectionErr := ""
-	if inspecErr != nil {
-		connectionErr = inspecErr.Type
-	}
-	if connectionErr != "" {
-		_, err := s.nodesClient.UpdateNodeConnectionError(ctx, &nodes.NodeError{
-			NodeId:          job.NodeID,
-			ConnectionError: connectionErr,
-		})
-		if err != nil {
-			errors.Wrapf(err, "UpdateResult encountered an error updating node connection error")
-		}
-	}
+
 	return nil
 }
 

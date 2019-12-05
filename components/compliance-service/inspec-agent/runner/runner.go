@@ -347,7 +347,7 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 		return nil, errors.Wrap(err, "could not unmarshal inspec job")
 	}
 
-	logrus.Debugf("working on job %s for node %s", job.JobID, job.NodeID)
+	logrus.Debugf("working on job %s (%s) for node %s (%s)", job.JobName, job.JobID, job.NodeName, job.NodeID)
 
 	if !t.validateJob(&job) {
 		return types.StatusAborted, nil
@@ -360,7 +360,10 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 	job.StartTime = timeNowRef()
 	job.NodeStatus = types.StatusRunning
 
-	t.scannerServer.UpdateJobStatus(job.JobID, job.NodeStatus, job.StartTime, nil)
+	err := t.scannerServer.UpdateJobStatus(job.JobID, job.NodeStatus, job.StartTime, nil)
+	if err != nil {
+		logrus.Errorf("error trying to update job status during scan job %s: %s", job.JobName, err.Error())
+	}
 
 	currentJobSummary := job.JobType + " " + job.TargetConfig.Backend + " " + job.TargetConfig.Hostname
 
@@ -424,7 +427,10 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 		case types.JobTypeExec:
 			// ssm jobs report directly to automate, so we attached a report id to the
 			// reporter config when we assembled the script
-			t.scannerServer.UpdateResult(ctx, &job, nil, inspecErr, job.Reporter.ReportUUID)
+			err := t.scannerServer.UpdateResult(ctx, &job, nil, inspecErr, job.Reporter.ReportUUID)
+			if err != nil {
+				logrus.Errorf("error trying to update node %s (%s) during scan job %s with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
+			}
 		default:
 			return types.StatusFailed, errors.Errorf("unknown job type: %s", job.JobType)
 		}
@@ -437,23 +443,32 @@ func (t *InspecJobTask) Run(ctx context.Context, task cereal.Task) (interface{},
 				job.NodeStatus = types.StatusFailed
 				inspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
 			}
-			t.scannerServer.UpdateResult(ctx, &job, detectInfoByte, inspecErr, "")
+			err = t.scannerServer.UpdateResult(ctx, &job, detectInfoByte, inspecErr, "")
+			if err != nil {
+				logrus.Errorf("error trying to update node %s (%s) during scan job %s with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
+			}
 		case types.JobTypeExec:
 			if job.NodeStatus == types.StatusCompleted {
 				reportID = uuid.Must(uuid.NewV4()).String()
 				err := t.reportIt(ctx, &job, execInfo, reportID)
 				if err != nil {
-					logrus.Errorf("worker error: %s", err)
+					logrus.Errorf("worker error reporting on node %s (%s) during scan job %s: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
 					job.NodeStatus = types.StatusFailed
 					inspecErr = inspec.NewInspecError(inspec.INVALID_OUTPUT, err.Error())
 				}
 			}
-			t.scannerServer.UpdateResult(ctx, &job, nil, inspecErr, reportID)
+			err := t.scannerServer.UpdateResult(ctx, &job, nil, inspecErr, reportID)
+			if err != nil {
+				logrus.Errorf("error trying to update node %s (%s) during scan job %s with job results: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
+			}
 		default:
 			return types.StatusFailed, errors.Errorf("unknown job type: %+v", job.JobType)
 		}
 	}
-	t.scannerServer.UpdateNode(ctx, &job, detectInfo)
+	err = t.scannerServer.UpdateNode(ctx, &job, detectInfo)
+	if err != nil {
+		logrus.Errorf("error trying to update node %s (%s) during scan job %s: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
+	}
 	logrus.Debugf("finished job %s with status %s", job.JobID, job.NodeStatus)
 	return job.NodeStatus, nil
 }
@@ -534,7 +549,10 @@ func (t *InspecJobSummaryTask) Run(ctx context.Context, task cereal.Task) (inter
 			EndTime:    &endTime,
 			NodeStatus: types.StatusFailed,
 		}
-		t.scannerServer.UpdateResult(context.TODO(), job, nil, &inspec.Error{Message: "job lost likely due to process restart"}, "")
+		err := t.scannerServer.UpdateResult(context.TODO(), job, nil, &inspec.Error{Message: "job lost likely due to process restart"}, "")
+		if err != nil {
+			logrus.Errorf("error trying to update node %s (%s) during scan job %s: %s", job.NodeName, job.NodeID, job.JobName, err.Error())
+		}
 	}
 
 	// If this is a /recurring/ job, then we will have a
