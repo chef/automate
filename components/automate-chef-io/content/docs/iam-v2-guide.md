@@ -397,7 +397,7 @@ filter by `project-devops` across Automate's dashboards and see only the ingeste
 #### Deleting Projects
 
 To delete a project, navigate to the Projects list under the **Settings** tab. Find the project you wish to delete in the list, select the menu at the
-right side of the column, and click `Delete Project`.
+end of the row, and select `Delete Project`.
 
 When a project is deleted, it is removed from any resource assigned to the project. For ingested resources, it could take several hours
 for every resource to be removed from the project. If the resource was only in the deleted project then that resource will become unassigned.
