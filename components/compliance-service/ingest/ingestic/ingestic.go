@@ -323,23 +323,38 @@ func (backend *ESClient) setDailyLatestToFalse(ctx context.Context, nodeId strin
 	return errors.Wrap(err, "setDailyLatestToFalse")
 }
 
-func (backend *ESClient) DeleteProjectTag(ctx context.Context,
-	projectTagToDelete string) ([]string, error) {
+func (backend *ESClient) DeleteProjectTag(ctx context.Context, projectTagToDelete string) ([error) {
 	logrus.Debugf("starting project delete project %q", projectTagToDelete)
 
 	esReportJobID, err := backend.DeleteReportProjectTag(ctx, projectTagToDelete)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Report project tags delete")
+		return errors.Wrap(err, "failed to start elasticsearch report project tags delete")
 	}
 
 	esSummaryJobID, err := backend.DeleteSummaryProjectTag(ctx, projectTagToDelete)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Summary project tags delete")
+		return errors.Wrap(err, "failed to start elasticsearch summary project tags delete")
 	}
 
-	logrus.Debugf("Started Project delete with report job ID: %q, summary job ID %q", esReportJobID, esSummaryJobID)
+	logrus.Debugf("started project delete with [report job ID: %q, summary job ID %q]", esReportJobID, esSummaryJobID)
 
-	return []string{esReportJobID, esSummaryJobID}, nil
+	for {
+		time.Sleep(time.Second * 1)
+
+		esReportJobStatus, err := backend.JobStatus(ctx, esReportJobID)
+		if err != nil {
+			return err
+		}
+		esSummaryJobStatus, err := backend.JobStatus(ctx, esSummaryJobID)
+		if err != nil {
+			return err
+		}
+
+		if esReportJobStatus.Completed && esSummaryJobStatus.Completed {
+			break
+		}
+	}
+	return nil
 }
 
 func (backend *ESClient) DeleteReportProjectTag(ctx context.Context, projectTagToDelete string) (string, error) {
