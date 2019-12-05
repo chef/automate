@@ -1,7 +1,10 @@
 <chef-modal id="confirm-apply-start-modal" [visible]="visible" (closeModal)="cancel.emit()">
   <h2 id="title" slot="title">Update Projects?</h2>
   <div class="modal-content">
-    <p>Updating projects will apply all pending edits and move ingested resources into the correct projects. This background process can take up to <strong>12 hours</strong> to complete.</p>
+    <p>
+      Updating projects will apply all pending edits by moving ingested resources into the correct projects.
+      During this background process you will be unable to delete projects and it can take up to
+      <strong>12 hours</strong> to complete.</p>
     <div class="options">
       <chef-button id="confirm-button" primary (click)="confirm.emit()">
         Update Projects

@@ -331,7 +331,16 @@ func (s *ProjectState) ListProjectsForIntrospection(
 func (s *ProjectState) DeleteProject(ctx context.Context,
 	req *api.DeleteProjectReq) (*api.DeleteProjectResp, error) {
 
-	err := s.ProjectPurger.Start(req.Id)
+	projStatus, err := s.ProjectUpdateManager.Status()
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "could not get the project update status: %s", err.Error())
+	}
+
+	if projStatus.State() == ProjectUpdateRunningState {
+		return nil, status.Errorf(codes.FailedPrecondition, "cannot delete project with id %q while projects update is in progress", req.Id)
+	}
+
+	err = s.ProjectPurger.Start(req.Id)
 	if err != nil {
 		if err == cereal.ErrWorkflowInstanceExists {
 			return nil, status.Errorf(codes.FailedPrecondition,

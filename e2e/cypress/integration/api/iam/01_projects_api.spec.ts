@@ -272,6 +272,20 @@ describeIfIAMV2p1('projects API', () => {
         method: 'POST',
         url: '/apis/iam/v2beta/apply-rules'
       });
+
+      // Project cannot be deleted while apply-rules is in flight
+      for (const project of [avengersProject, xmenProject]) {
+        cy.request({
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+          method: 'DELETE',
+          url: `/apis/iam/v2beta/projects/${project.id}`,
+          failOnStatusCode: false
+        }).then((response) => {
+          expect(response.status).to.equal(400);
+          expect(response.body.error).to.contain('while projects update is in progress');
+        });
+      }
+
       cy.waitUntilApplyRulesNotRunning(500);
 
       // confirm rules are applied
