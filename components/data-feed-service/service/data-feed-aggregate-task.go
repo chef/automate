@@ -1,16 +1,20 @@
 package service
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
+	secrets "github.com/chef/automate/api/external/secrets"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/data-feed-service/config"
+	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/lib/cereal"
-	"github.com/chef/automate/lib/grpc/secureconn"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -20,29 +24,17 @@ var (
 type DataFeedAggregateTask struct {
 	cfgMgmt   cfgmgmt.CfgMgmtClient
 	reporting reporting.ReportingServiceClient
+	secrets   secrets.SecretsServiceClient
+	db        *dao.DB
 }
 
-type DataFeedAggregateTaskResults struct {
-	DataFeedMessages map[string]map[string]interface{}
-	NodeIDs          map[string]NodeIDs
-}
-
-func NewDataFeedAggregateTask(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory) (*DataFeedAggregateTask, error) {
-
-	cfgMgmtConn, err := connFactory.Dial("config-mgmt-service", dataFeedConfig.CfgmgmtConfig.Target)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not connect to config-mgmt-service")
-	}
-
-	complianceConn, err := connFactory.Dial("compliance-service", dataFeedConfig.ComplianceConfig.Target)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not connect to compliance-service")
-	}
-
+func NewDataFeedAggregateTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grpc.ClientConn, complianceConn *grpc.ClientConn, secretsConn *grpc.ClientConn, db *dao.DB) *DataFeedAggregateTask {
 	return &DataFeedAggregateTask{
 		reporting: reporting.NewReportingServiceClient(complianceConn),
 		cfgMgmt:   cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
-	}, nil
+		secrets:   secrets.NewSecretsServiceClient(secretsConn),
+		db:        db,
+	}
 }
 
 func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
@@ -59,10 +51,45 @@ func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (inte
 		return nil, errors.Wrap(err, "failed to build chef client data")
 	}
 
-	// return the data feed but also return nodeids, these will be the NodeIDs of reports not yet collected
-	// i.e. the reports on nodes which have not had a client run in the interval
-	//return &DataFeedAggregateTaskResults{DataFeedMessages: &rawMessages, NodeIDs: nodeIDs}, nil
-	return &DataFeedAggregateTaskResults{DataFeedMessages: datafeedMessages, NodeIDs: nodeIDs}, nil
+	if len(datafeedMessages) == 0 {
+		return nil, nil
+	}
+
+	var buffer bytes.Buffer
+	for _, message := range datafeedMessages {
+		data, _ := json.Marshal(message)
+		data = bytes.ReplaceAll(data, []byte("\n"), []byte("\f"))
+		buffer.Write(data)
+		buffer.WriteString("\n")
+	}
+
+	destinations, err := d.db.ListDBDestinations()
+	if err != nil {
+		return nil, err
+	}
+	for destination := range destinations {
+		log.Debugf("Destination name %v", destinations[destination].Name)
+		log.Debugf("Destination url %v", destinations[destination].URL)
+		log.Debugf("Destination secret %v", destinations[destination].Secret)
+
+		username, password, err := GetCredentials(ctx, d.secrets, destinations[destination].Secret)
+
+		if err != nil {
+			log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
+			// TODO error handling - need some form of report in automate that indicates when data was sent and if it was successful
+		} else {
+			// build and send notification for this rule
+			notification := datafeedNotification{username: username, password: password, url: destinations[destination].URL, data: buffer}
+
+			client := NewDataClient()
+			err = send(client, notification)
+			if err != nil {
+				handleSendErr(notification, params.FeedStart, params.FeedEnd, err)
+			}
+		}
+	}
+
+	return nil, nil
 }
 
 func (d *DataFeedAggregateTask) buildDatafeed(ctx context.Context, nodeIDs map[string]NodeIDs, updatedNodesOnly bool) (map[string]map[string]interface{}, error) {

@@ -62,25 +62,23 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		return err
 	}
 
-	dataFeedPollTask, err := NewDataFeedPollTask(dataFeedConfig, connFactory, db, manager)
+	cfgMgmtConn, err := connFactory.Dial("config-mgmt-service", dataFeedConfig.CfgmgmtConfig.Target)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "could not connect to config-mgmt-service")
 	}
 
-	dataFeedListReportsTask, err := NewDataFeedListReportsTask(dataFeedConfig, connFactory)
+	complianceConn, err := connFactory.Dial("compliance-service", dataFeedConfig.ComplianceConfig.Target)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "could not connect to compliance-service")
 	}
 
-	dataFeedAggregateTask, err := NewDataFeedAggregateTask(dataFeedConfig, connFactory)
+	secretsConn, err := connFactory.Dial("secrets-service", dataFeedConfig.SecretsConfig.Target)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "could not connect to secrets-service")
 	}
 
-	dataFeedNotifierTask, err := NewDataFeedNotifierTask(dataFeedConfig, connFactory, db)
-	if err != nil {
-		return err
-	}
+	dataFeedPollTask := NewDataFeedPollTask(dataFeedConfig, cfgMgmtConn, complianceConn, db, manager)
+	dataFeedAggregateTask := NewDataFeedAggregateTask(dataFeedConfig, cfgMgmtConn, complianceConn, secretsConn, db)
 
 	err = manager.RegisterWorkflowExecutor(dataFeedWorkflowName, &DataFeedWorkflowExecutor{workflowName: dataFeedWorkflowName})
 	if err != nil {
@@ -92,19 +90,7 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 	if err != nil {
 		return err
 	}
-	err = manager.RegisterTaskExecutor(dataFeedListReportsTaskName, dataFeedListReportsTask, cereal.TaskExecutorOpts{
-		Workers: 1,
-	})
-	if err != nil {
-		return err
-	}
 	err = manager.RegisterTaskExecutor(dataFeedAggregateTaskName, dataFeedAggregateTask, cereal.TaskExecutorOpts{
-		Workers: 1,
-	})
-	if err != nil {
-		return err
-	}
-	err = manager.RegisterTaskExecutor(dataFeedNotifierTaskName, dataFeedNotifierTask, cereal.TaskExecutorOpts{
 		Workers: 1,
 	})
 	if err != nil {
@@ -205,7 +191,6 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 	request.Header.Add("Content-Encoding", "gzip")
 	request.Header.Add("Accept", "application/json")
 	request.Header.Add("Chef-Data-Feed-Message-Version", version)
-	log.Debugf("request %v", request)
 
 	response, err := client.client.Do(request)
 	if err != nil {
@@ -244,8 +229,6 @@ func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []st
 	if err != nil {
 		log.Errorf("Error getting node run %v", err)
 		return nodeData, err
-	} else {
-		log.Debugf("Last run\n %v", lastRun)
 	}
 	macAddress, hostname := getHostAttributes(attributesJson)
 	nodeData["node_data"] = DataFeedMessage{LastRun: lastRun, Macaddress: macAddress, Hostname: hostname}
