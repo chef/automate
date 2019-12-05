@@ -79,7 +79,7 @@
             <chef-table-body>
               <chef-table-row *ngFor="let org of orgs">
                 <chef-table-cell>
-                  <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'orgs', org.id]">{{ org.name }}</a>
+                  <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'orgs', org.id, 'cookbooks']">{{ org.name }}</a>
                 </chef-table-cell>
                 <chef-table-cell>{{ org.admin_user }}</chef-table-cell>
                 <chef-table-cell class="controls">

@@ -24,6 +24,12 @@ chef-modal {
       input {
         font-size: 1em;
       }
+
+      textarea {
+        padding: 1em;
+        margin-top: 1px;
+        border-color: $chef-light-grey;
+      }
     }
 
     #button-bar {

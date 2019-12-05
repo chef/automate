@@ -6,10 +6,7 @@ import { Cookbook } from './cookbook.model';
 export enum CookbookActionTypes {
   GET_ALL = 'COOKBOOKS::GET_ALL',
   GET_ALL_SUCCESS = 'COOKBOOKS::GET_ALL::SUCCESS',
-  GET_ALL_FAILURE = 'COOKBOOKS::GET_ALL::FAILURE',
-  GET = 'COOKBOOKS::GET',
-  GET_SUCCESS = 'COOKBOOKS::GET::SUCCESS',
-  GET_FAILURE = 'COOKBOOKS::GET::FAILURE'
+  GET_ALL_FAILURE = 'COOKBOOKS::GET_ALL::FAILURE'
 }
 
 export interface CookbookSuccessPayload {
@@ -38,28 +35,7 @@ export class GetCookbooksFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export class GetCookbook implements Action {
-  readonly type = CookbookActionTypes.GET;
-
-  constructor(public payload: { server_id: string, org_id: string, id: string }) { }
-}
-
-export class GetCookbookSuccess implements Action {
-  readonly type = CookbookActionTypes.GET_SUCCESS;
-
-  constructor(public payload: CookbookSuccessPayload) { }
-}
-
-export class GetCookbookFailure implements Action {
-  readonly type = CookbookActionTypes.GET_FAILURE;
-
-  constructor(public payload: HttpErrorResponse) { }
-}
-
 export type CookbookActions =
   | GetCookbooksForOrg
   | GetCookbooksSuccess
-  | GetCookbooksFailure
-  | GetCookbook
-  | GetCookbookSuccess
-  | GetCookbookFailure;
+  | GetCookbooksFailure;

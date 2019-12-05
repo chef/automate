@@ -246,9 +246,8 @@ const routes: Routes = [
               component: ChefServersDetailsComponent
             },
             {
-              path: ':id/orgs/:orgid',
-              component: CookbooksListComponent,
-              data: { hideNavBar: true }
+              path: ':id/orgs/:orgid/cookbooks',
+              component: CookbooksListComponent
             }
           ]
         }

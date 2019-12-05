@@ -200,7 +200,7 @@ export const ngrxReducers = {
   apiTokens: apiToken.apiTokenEntityReducer,
   automateSettings: automateSettings.automateSettingsEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
-  cookbooks: cookbookEntity.orgEntityReducer,
+  cookbooks: cookbookEntity.cookbookEntityReducer,
   credentialEntity: credential.credentialReducer,
   jobs: jobEntity.jobEntityReducer,
   managers: manager.managerEntityReducer,

@@ -41,7 +41,6 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
     this.sortedChefServers$ = store.pipe(
       select(allServers),
       map(servers => ChefSorters.naturalSort(servers, 'name')));
-
     this.createChefServerForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
