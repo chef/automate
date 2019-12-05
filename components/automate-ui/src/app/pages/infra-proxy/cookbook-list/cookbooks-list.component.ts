@@ -29,7 +29,7 @@ export class CookbooksListComponent implements OnInit {
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.sortedCookbooks$ = store.pipe(select(allCookbooks));
+    this.sortedCookbooks$ = this.store.pipe(select(allCookbooks));
     combineLatest([
       this.store.select(allCookbooks),
       this.store.select(getAllStatus)
