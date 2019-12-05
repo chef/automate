@@ -273,7 +273,10 @@ func (f *FileMover) doRsyncMove() error {
 		args = append([]string{"pkg", "exec", "core/rsync", "rsync"}, args...)
 	}
 
-	_, err = f.c.Output(f.RsyncCmd, command.Args(args...), command.Timeout(f.Timeout))
+	_, err = f.c.Output(f.RsyncCmd,
+		command.Args(args...),
+		command.Envvar("HAB_LICENSE", "accept-no-persist"),
+		command.Timeout(f.Timeout))
 	if err != nil {
 		return errors.Wrapf(err, "rsync failed: %s", command.StderrFromError(err))
 	}
