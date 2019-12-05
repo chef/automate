@@ -31,7 +31,7 @@ type ControlSource struct {
 }
 
 type TotalNodeCounts struct {
-	Total, Passed, Failed, Skipped int32
+	Total, Passed, Failed, Skipped, Waived int32
 }
 
 // TODO: header with amount of results
@@ -41,7 +41,7 @@ type TotalNodeCounts struct {
 //GetNodes - list all of the nodes or all nodes for a profile-id
 func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][]string,
 	sortField string, sortAsc bool) ([]*reportingapi.Node, TotalNodeCounts, error) {
-	emptyTotals := TotalNodeCounts{Total: 0, Passed: 0, Skipped: 0, Failed: 0}
+	emptyTotals := TotalNodeCounts{Total: 0, Passed: 0, Skipped: 0, Failed: 0, Waived: 0}
 	myName := "GetNodes"
 
 	depth, err := backend.NewDepth(filters, false, true)
@@ -179,7 +179,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 		if err != nil {
 			return nil, emptyTotals, errors.Wrapf(err, "%s error retrieving node count totals: ", myName)
 		}
-		return nodes, TotalNodeCounts{Total: int32(searchResult.TotalHits()), Passed: nodeSummary.Compliant, Failed: nodeSummary.Noncompliant, Skipped: nodeSummary.Skipped}, nil
+		return nodes, TotalNodeCounts{Total: int32(searchResult.TotalHits()), Passed: nodeSummary.Compliant, Failed: nodeSummary.Noncompliant, Skipped: nodeSummary.Skipped, Waived: nodeSummary.Waived}, nil
 	}
 
 	logrus.Debugf("%s Found no nodes\n", myName)
@@ -201,6 +201,9 @@ func convertToRSControlSummary(summ reporting.NodeControlSummary) *reportingapi.
 	controlSummary.Skipped = &skippedSum
 	controlSummary.Failed = &failedSums
 	controlSummary.Total = int32(summ.Total)
+	var waivedSums reportingapi.Total
+	waivedSums.Total = int32(summ.Waived.Total)
+	controlSummary.Waived = &waivedSums
 	return &controlSummary
 }
 

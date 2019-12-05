@@ -1,0 +1,82 @@
+{
+  "platform": {
+    "name": "mac_os_x",
+    "release": "17.7.0"
+  },
+  "profiles": [
+    {
+      "name": "myprofile2",
+      "version": "1.0.5",
+      "sha256": "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
+      "title": "My Profile 2 title",
+      "maintainer": "Demo, Inc.",
+      "summary": "My Profile 2 summary",
+      "license": "Apache-2.0",
+      "copyright": "Demo, Inc.",
+      "copyright_email": "support@example.com",
+      "supports": [],
+      "attributes": [],
+      "groups": [
+        {
+          "id": "controls/profile1.rb",
+          "controls": [
+            "pro2-con1"
+          ]
+        }
+      ],
+      "controls": [
+        {
+          "id": "pro2-con1",
+          "title": "Profile 2 - Control 1",
+          "desc": null,
+          "descriptions": [],
+          "impact": 0.8,
+          "refs": [],
+          "tags": {},
+          "code": "control 'pro2-con1' do\n  impact 0.8\n  title 'Profile 2 - Control 1'\n  describe file('/etc/hosts11111') do\n    its('mode') { should eq 0644 }\n  end\nend\n",
+          "source_location": {
+            "line": 1,
+            "ref": "/Users/apop/git/mycompliance-profile/myprofile1/controls/profile1.rb"
+          },
+          "waiver_data": {
+            "justification": "Sound reasoning",
+            "run": true,
+            "skipped_due_to_waiver": false,
+            "message": ""
+          },
+          "results": [
+            {
+              "status": "failed",
+              "code_desc": "File /etc/hosts11111 mode should eq 420",
+              "run_time": 0.064682,
+              "start_time": "2019-10-18T17:44:39+01:00",
+              "message": "\nexpected: 420\n     got: nil\n\n(compared using ==)\n"
+            }
+          ]
+        }
+      ],
+      "status": "loaded"
+    }
+  ],
+  "statistics": {
+    "duration": 0.074509
+  },
+  "version": "4.18.5",
+  "type": "inspec_report",
+  "node_uuid": "34cbbb55-c502-4971-2222-999999999999",
+  "report_uuid": "44024b50-2e0d-42fa-dddd-wwwwwwwwwwww",
+  "job_uuid": "12345678-1234-123e-dddd-999999999999",
+  "node_name": "osx(1)-omega-pro2(w)-waived",
+  "environment": "DevSec Prod Omega",
+  "roles": [ "base_osx", "apache_osx" ],
+  "recipes": [],
+  "end_time": "2018-04-01T10:18:41Z",
+  "other_checks": [],
+  "policy_name": "",
+  "policy_group": "",
+  "organization_name": "",
+  "source_fqdn": "localhost",
+  "chef_tags": [],
+  "ipaddress": "192.168.56.66",
+  "fqdn": "osx-workstation.example.com"
+}

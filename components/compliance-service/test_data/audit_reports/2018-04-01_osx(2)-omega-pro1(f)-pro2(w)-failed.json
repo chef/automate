@@ -247,7 +247,7 @@
   "node_uuid": "34cbbb4c-c502-4971-1111-888888888888",
   "report_uuid": "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy",
   "job_uuid": "12345678-1234-123e-bbbb-888888888888",
-  "node_name": "osx(1)-omega-pro2(w)-waived",
+  "node_name": "osx(2)-omega-pro1(f)-pro2(w)-failed",
   "environment": "DevSec Prod Omega",
   "roles": [ "base_osx", "apache_osx" ],
   "recipes": [],

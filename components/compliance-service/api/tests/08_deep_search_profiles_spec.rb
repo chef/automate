@@ -49,6 +49,7 @@ describe File.basename(__FILE__) do
                             },
                             "skipped" => {},
                             "failed" => {},
+                            "waived" => {},
                             "total" => 1
                         }
                     },
@@ -97,6 +98,7 @@ describe File.basename(__FILE__) do
                                 "total" => 1,
                                 "major" => 1
                             },
+                            "waived" => {},
                             "total" => 1
                         }
                     },
@@ -138,6 +140,7 @@ describe File.basename(__FILE__) do
                                 "total" => 1,
                                 "major" => 1
                             },
+                            "waived" => {},
                             "total" => 1
                         }
                     },
@@ -179,6 +182,7 @@ describe File.basename(__FILE__) do
                                 "total" => 1,
                                 "major" => 1
                             },
+                            "waived" => {},
                             "total" => 1
                         }
                     },

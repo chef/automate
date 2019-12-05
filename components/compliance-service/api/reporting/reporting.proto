@@ -248,6 +248,7 @@ message Nodes {
 	int32 total_passed = 21;
 	int32 total_failed = 22;
 	int32 total_skipped = 23;
+	int32 total_waived = 24;
 }
 message Kv {
 	string key = 1;
