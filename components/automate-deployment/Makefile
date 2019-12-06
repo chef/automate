@@ -230,7 +230,7 @@ AUTOMATE_API_DEFAULT_PASSWORD?=$(shell awk '/Admin password:/{print $$3}' a1-mig
 A1_BUILDER_PASSWORD?=$(shell awk '/Builder Password:/{print $$3}' a1-migration/keys/enterprise-test-admin-login-creds)
 a1-migration-test:
 	cd a1-migration && docker-compose exec a1-migration \
-	  env AUTOMATE_API_DEFAULT_PASSWORD=${AUTOMATE_API_DEFAULT_PASSWORD} \
+	  env HAB_LICENSE=accept-no-persist AUTOMATE_API_DEFAULT_PASSWORD=${AUTOMATE_API_DEFAULT_PASSWORD} \
 	    A1_BUILDER_PASSWORD=${A1_BUILDER_PASSWORD} \
 		inspec exec /a2/inspec/a2-migrate-from-v1-integration/
 
@@ -283,7 +283,7 @@ basic_a1_automate_api_password?=$(shell awk '/Admin password:/{print $$3}' ./bas
 basic_a1_builder_password?=$(shell awk '/Builder Password:/{print $$3}' ./basic-a1/enterprise-test-admin-login-creds)
 basic-a1-test:
 	cd basic-a1 && docker-compose exec basic-a1 \
-          env AUTOMATE_API_DEFAULT_PASSWORD=${basic_a1_automate_api_password} \
+          env HAB_LICENSE=accept-no-persist AUTOMATE_API_DEFAULT_PASSWORD=${basic_a1_automate_api_password} \
             A1_BUILDER_PASSWORD=${basic_a1_builder_password} \
             NO_WORKFLOW_TEST=true \
                 inspec exec /a2/inspec/a2-migrate-from-v1-integration/

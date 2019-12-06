@@ -36,6 +36,7 @@ log_section_start() {
     echo "--- [$(date -u)] $*"
 }
 
+export HAB_LICENSE=accept-no-persist
 log_section_start "Installing automate-cli"
 cd components/automate-deployment
 trap dump_logs EXIT

@@ -37,6 +37,7 @@ fi
 cd components/automate-deployment
 trap dump_logs EXIT
 
+export HAB_LICENSE=accept-no-persist
 log_section_start "Setting up A1 migration host"
 sudo make a1-migration-host-setup
 log_section_start "Building Docker containers"
