@@ -19,7 +19,7 @@ es_ebs_snapshot = ''
 
 def extract_from_manifest(manifest, build)
   manifest_json = JSON.parse(open(manifest).read)
-  hab_version = manifest_json["hab"].find {|x| x.start_with?("core/hab/") }.gsub("core/hab/", "")
+  hab_version = manifest_json["hab"].find {|x| x.start_with?("core/hab/") }.split("/")[2]
   git_sha = 'HEAD'
   git_sha = manifest_json["git_sha"] if build != 'latest'
   return hab_version, git_sha
