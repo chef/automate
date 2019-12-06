@@ -108,7 +108,7 @@ func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
 		err := a.pushWorkflow(job, false)
 		if err != nil {
 			if err == cereal.ErrWorkflowInstanceExists {
-				logrus.Debugf("Job %q is still/already running", job.Id)
+				logrus.Infof("Job %q is still/already running", job.Id)
 			} else {
 				logrus.Errorf("Error handling job %q: %v", job.Id, err)
 			}

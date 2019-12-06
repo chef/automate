@@ -293,7 +293,7 @@ type ResolveTask struct {
 	resolver            *resolver.Resolver
 }
 
-func (t *ResolveTask) handleEmptyNodeJobs(job *jobs.Job) error {
+func (t *ResolveTask) handleEmptyNodeJobs(ctx context.Context, job *jobs.Job) error {
 	now := time.Now()
 	nodeJob := &types.InspecJob{
 		InspecBaseJob: types.InspecBaseJob{
@@ -307,7 +307,7 @@ func (t *ResolveTask) handleEmptyNodeJobs(job *jobs.Job) error {
 	if err != nil {
 		logrus.Errorf("error updating job status for job %s (%s): %s", job.Name, job.Id, err.Error())
 	}
-	err = t.scanner.UpdateResult(context.TODO(), nodeJob, nil, &inspec.Error{Message: "no nodes found"}, "")
+	err = t.scanner.UpdateResult(ctx, nodeJob, nil, &inspec.Error{Message: "no nodes found"}, "")
 	if err != nil {
 		logrus.Errorf("error updating job results for job %s (%s): %s", job.Name, job.Id, err.Error())
 	}
@@ -330,7 +330,7 @@ func (t *ResolveTask) Run(ctx context.Context, task cereal.Task) (interface{}, e
 	}
 
 	if len(nodeJobs) == 0 {
-		return nil, t.handleEmptyNodeJobs(&job)
+		return nil, t.handleEmptyNodeJobs(ctx, &job)
 	}
 
 	for _, job := range nodeJobs {
