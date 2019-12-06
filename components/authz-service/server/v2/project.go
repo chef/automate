@@ -331,7 +331,13 @@ func (s *ProjectState) ListProjectsForIntrospection(
 func (s *ProjectState) DeleteProject(ctx context.Context,
 	req *api.DeleteProjectReq) (*api.DeleteProjectResp, error) {
 
-	err := s.ProjectPurger.Start(req.Id)
+	resp, err := s.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: req.Id})
+	if len(resp.Rules) > 0 {
+		return nil, status.Errorf(codes.FailedPrecondition, 
+			"Project %q can not be deleted because it has %d rule(s)", req.Id, len(resp.Rules))
+	}
+
+	err = s.ProjectPurger.Start(req.Id)
 	if err != nil {
 		if err == cereal.ErrWorkflowInstanceExists {
 			return nil, status.Errorf(codes.FailedPrecondition,
