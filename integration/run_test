@@ -199,4 +199,4 @@ if [ $CI != "true" ]; then
 fi
 
 echo "Running the docker. Will timeout after $TIMEOUT mins"
-docker exec -e TEST_PATH=$1 "$test_container_name" timeout "${TIMEOUT}m" bash -c 'source ./integration/base.sh; __run_test $TEST_PATH'
+docker exec -e TEST_PATH=$1 "$test_container_name" timeout -v "${TIMEOUT}m" bash -c 'source ./integration/base.sh; __run_test $TEST_PATH'
