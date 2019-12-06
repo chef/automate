@@ -168,7 +168,7 @@ func (m *DomainProjectUpdateWorkflowExecutor) nextCheck() time.Time {
 }
 
 type ESCancelUpdateProjectTagsTask struct {
-	domainService ProjectTaggedDomainService
+	esClient EsClient
 }
 
 func (m *ESCancelUpdateProjectTagsTask) Run(
@@ -183,7 +183,7 @@ func (m *ESCancelUpdateProjectTagsTask) Run(
 
 	for _, jobID := range params.JobIDs {
 		logrus.Infof("Canceling ES Job %s", jobID)
-		if err := m.domainService.JobCancel(ctx, jobID); err != nil {
+		if err := m.esClient.JobCancel(ctx, jobID); err != nil {
 			logrus.WithError(err).Errorf("Failed to cancel ES Job %s", jobID)
 			return nil, err
 		}
@@ -193,8 +193,7 @@ func (m *ESCancelUpdateProjectTagsTask) Run(
 }
 
 type ESStartProjectTagUpdaterTask struct {
-	// nodemanager-service, ingest-service, or compliance-service
-	domainService       ProjectTaggedDomainService
+	esClient            EsClient
 	authzProjectsClient iam_v2.ProjectsClient
 }
 
@@ -219,7 +218,7 @@ func (m *ESStartProjectTagUpdaterTask) startProjectTagUpdater(ctx context.Contex
 		return []string{}, errors.Wrap(err, "Failed to get authz project rules")
 	}
 
-	esJobIDs, err := m.domainService.UpdateProjectTags(ctx, projectCollectionRulesResp.ProjectRules)
+	esJobIDs, err := m.esClient.UpdateProjectTags(ctx, projectCollectionRulesResp.ProjectRules)
 	if err != nil {
 		return []string{}, errors.Wrap(err, "Failed to start Elasticsearch Node project tags update")
 	}
@@ -230,7 +229,7 @@ func (m *ESStartProjectTagUpdaterTask) startProjectTagUpdater(ctx context.Contex
 }
 
 type ESProjectTagUpdaterStatusTask struct {
-	domainService ProjectTaggedDomainService
+	esClient EsClient
 }
 
 func (m *ESProjectTagUpdaterStatusTask) Run(
@@ -254,7 +253,7 @@ func (m *ESProjectTagUpdaterStatusTask) Run(
 func (m *ESProjectTagUpdaterStatusTask) collectJobStatus(ctx context.Context, esJobIDs []string) ([]JobStatus, error) {
 	jobStatuses := make([]JobStatus, len(esJobIDs))
 	for index, esJobID := range esJobIDs {
-		jobStatus, err := m.domainService.JobStatus(ctx, esJobID)
+		jobStatus, err := m.esClient.JobStatus(ctx, esJobID)
 		if err != nil {
 			return jobStatuses, err
 		}
@@ -287,18 +286,17 @@ func NewWorkflowExecutorForDomainService(domainService string) *DomainProjectUpd
 	}
 }
 
-func RegisterTaskExecutors(manager *cereal.Manager, svcName string,
-	domainService ProjectTaggedDomainService, authzProjectsClient iam_v2.ProjectsClient) error {
-	cancelUpdateProjectTagsTaskName := CancelUpdateProjectTagsTaskName(svcName)
-	startProjectTagUpdaterTaskName := StartProjectTagUpdaterTaskName(svcName)
-	projectTagUpdaterStatusTaskName := ProjectTagUpdaterStatusTaskName(svcName)
+func RegisterTaskExecutors(manager *cereal.Manager, domainService string, esClient EsClient, authzProjectsClient iam_v2.ProjectsClient) error {
+	cancelUpdateProjectTagsTaskName := CancelUpdateProjectTagsTaskName(domainService)
+	startProjectTagUpdaterTaskName := StartProjectTagUpdaterTaskName(domainService)
+	projectTagUpdaterStatusTaskName := ProjectTagUpdaterStatusTaskName(domainService)
 
 	taskExecutorOpts := cereal.TaskExecutorOpts{
 		Workers: 1,
 	}
 
 	cancelTaskExecutor := &ESCancelUpdateProjectTagsTask{
-		domainService: domainService,
+		esClient: esClient,
 	}
 	if err := manager.RegisterTaskExecutor(cancelUpdateProjectTagsTaskName, cancelTaskExecutor,
 		taskExecutorOpts); err != nil {
@@ -306,7 +304,7 @@ func RegisterTaskExecutors(manager *cereal.Manager, svcName string,
 	}
 
 	startTagsUpdaterTask := &ESStartProjectTagUpdaterTask{
-		domainService:       domainService,
+		esClient:            esClient,
 		authzProjectsClient: authzProjectsClient,
 	}
 	if err := manager.RegisterTaskExecutor(startProjectTagUpdaterTaskName, startTagsUpdaterTask,
@@ -315,7 +313,7 @@ func RegisterTaskExecutors(manager *cereal.Manager, svcName string,
 	}
 
 	statusTask := &ESProjectTagUpdaterStatusTask{
-		domainService: domainService,
+		esClient: esClient,
 	}
 	if err := manager.RegisterTaskExecutor(projectTagUpdaterStatusTaskName, statusTask,
 		taskExecutorOpts); err != nil {

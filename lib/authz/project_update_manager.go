@@ -14,12 +14,10 @@ const (
 	maxNumberOfConsecutiveFails = 10
 )
 
-// ProjectTaggedDomainService - Each domain service with tagged resources needs to provide these functions
-type ProjectTaggedDomainService interface {
+type EsClient interface {
 	JobCancel(context.Context, string) error
 	UpdateProjectTags(context.Context, map[string]*iam_v2.ProjectRules) ([]string, error)
 	JobStatus(context.Context, string) (JobStatus, error)
-	DeleteProjectTag(context.Context, string) ([]string, error)
 }
 
 // ProjectUpdateBackend takes a connection to cereal-service and returns a cereal backend
