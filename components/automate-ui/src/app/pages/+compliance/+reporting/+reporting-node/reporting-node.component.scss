@@ -6,36 +6,105 @@ chef-loading-spinner {
   width: 100px;
 }
 
-.metadata {
-  display: flex;
-  padding: 1em 35px 2em;
+.metadata-container {
   background: $chef-white;
-  justify-content: space-between;
+  padding: 1em 35px;
+}
 
-  chef-card {
-    width: 75%;
+.metadata {
+  border: 1px solid $chef-dark-grey;
+  border-radius: $global-radius;
+
+  .metadata-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background: $chef-dark-grey;
+    color: $chef-white;
+    cursor: pointer;
+    font-size: 14px;
   }
 
-  chef-table {
-    chef-tr {
-      margin: 2px 15px;
+  .metadata-title {
+    display: flex;
+    align-items: center;
 
-      chef-th,
-      chef-td {
-        padding: 0.25em 0;
-        border: none;
-        background-color: transparent;
-        flex-grow: 1;
-      }
+    chef-icon {
+      margin-right: 10px;
+      color: $chef-white;
+    }
+  }
 
-      chef-td {
-        flex-grow: 2;
-      }
+  .metadata-body[opened] {
+    display: flex;
+    padding: 1em;
+    flex-flow: wrap;
+  }
 
-      chef-icon {
-        margin-right: 10px;
-        color: $chef-grey;
-      }
+  .metadata-group {
+    flex-basis: 33.33%;
+    flex-flow: column nowrap;
+
+    .metadata-group-heading {
+      margin: 1em 0;
+      text-transform: uppercase;
+      font-size: 15px;
+    }
+
+    th {
+      text-align: left;
+    }
+
+    th, td {
+      font-size: 14px;
+      padding: 2px 10px 2px 0;
+    }
+  }
+
+  &.failed {
+    border-color: $chef-critical;
+
+    .metadata-header {
+      background: $chef-critical;
+    }
+  }
+
+  &.passed {
+    border-color: $chef-success;
+
+    .metadata-header {
+      background: $chef-success;
+    }
+  }
+
+  &.skipped {
+    border-color: $chef-dark-grey;
+
+    .metadata-header {
+      background: $chef-dark-grey;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .metadata-group {
+      flex-basis: 100%;
+    }
+
+    .metadata-toggle {
+      display: none;
+    }
+  }
+
+  @media (min-width: 960px) {
+    .metadata-group {
+      flex-basis: 50%;
+    }
+  }
+
+  @media (min-width: 1260px) {
+    .metadata-group {
+      flex-basis: 33.33%;
     }
   }
 }
