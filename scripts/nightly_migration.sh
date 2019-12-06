@@ -30,6 +30,7 @@ log_section_start() {
     echo "--- [$(date -u)] $*"
 }
 
+# shellcheck disable=2153
 if [[ -n "$A1_LICENSE" ]]; then
     echo -e "$A1_LICENSE" | base64 --decode > components/automate-deployment/a1-migration/delivery.license
 fi
