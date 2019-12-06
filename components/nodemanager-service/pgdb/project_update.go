@@ -95,12 +95,6 @@ func (projectUpdate *ProjectUpdate) updateFail(err error) {
 	projectUpdate.running = false
 }
 
-func (db *DB) DeleteProjectTag(ctx context.Context,
-	projectTagToBeDelete string) ([]string, error) {
-	// TODO implement
-	return []string{}, nil
-}
-
 // JobCancel - cancel the a currently running project update
 func (db *DB) JobCancel(ctx context.Context, jobID string) error {
 	log.Debugf("Node manager project update JobCancel %s", jobID)
