@@ -14,6 +14,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
 	_ "github.com/lib/pq"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 
@@ -104,45 +105,44 @@ func isStatusUpdateValid(oldStatus, newStatus string) bool {
 	return true
 }
 
-func (s *Scanner) UpdateJobStatus(job_id string, newStatus string, startTime *time.Time, endTime *time.Time) {
+func (s *Scanner) UpdateJobStatus(job_id string, newStatus string, startTime *time.Time, endTime *time.Time) error {
 	// get current status of job
 	var status string
 	err := s.DB.QueryRow(sqlGetNodeStatus, job_id).Scan(&status)
 	if err != nil {
-		logrus.Errorf("UpdateJobStatus unable to get current job status: %s", err.Error())
-		return
+		return errors.Wrapf(err, "UpdateJobStatus unable to get current job status")
 	}
 
 	// prevent the inspec-agent from updating a job status "backwards"
 	// a job may go new -> scheduled -> running -> completed/failed. it may never go backwards.
 	if !isStatusUpdateValid(status, newStatus) {
-		logrus.Errorf("attempt to update job with current status %s to status %s has been blocked", status, newStatus)
-		return
+		return errors.Wrapf(err, "attempt to update job with current status %s to status %s has been blocked", status, newStatus)
 	}
 
 	logrus.Debugf("UpdateJobStatus job %s with status %s, start_time %v, end_time %v", job_id, newStatus, startTime, endTime)
 	_, err = s.DB.Exec(sqlUpdateJobStatus, newStatus, startTime, endTime, job_id)
 	if err != nil {
-		logrus.Errorf("UpdateJobStatus DB error: %s", err.Error())
+		return errors.Wrapf(err, "UpdateJobStatus DB error")
 	}
+	return nil
 }
 
-func (s *Scanner) UpdateJobNodeCount(jobID string, nodeCount int) {
+func (s *Scanner) UpdateJobNodeCount(jobID string, nodeCount int) error {
 	logrus.Debugf("Update job %s with node count %d", jobID, nodeCount)
 	_, err := s.DB.Exec(sqlUpdateJobNodeCount, nodeCount, jobID)
 	if err != nil {
-		logrus.Errorf("UpdateJobNodeCount DB error: %s", err.Error())
+		return errors.Wrapf(err, "UpdateJobNodeCount DB error")
 	}
+	return nil
 }
 
-func (s *Scanner) GetDueJobs(nowTime time.Time) []*jobs.Job {
+func (s *Scanner) GetDueJobs(nowTime time.Time) ([]*jobs.Job, error) {
 	dueJobs := make([]*jobs.Job, 0)
 	var id string
 	var sqlIds []string
 	rows, err := s.DB.Query(sqlGetReadyJobsIds, "scheduled", nowTime)
 	if err != nil {
-		logrus.Error(err)
-		return dueJobs
+		return dueJobs, errors.Wrapf(err, "GetDueJobs unable to query for job ids")
 	}
 	defer rows.Close() // nolint: errcheck
 	for rows.Next() {
@@ -155,7 +155,7 @@ func (s *Scanner) GetDueJobs(nowTime time.Time) []*jobs.Job {
 	}
 	err = rows.Err()
 	if err != nil {
-		logrus.Error(err)
+		return dueJobs, errors.Wrapf(err, "GetDueJobs db error")
 	}
 
 	if len(sqlIds) > 0 {
@@ -170,13 +170,12 @@ func (s *Scanner) GetDueJobs(nowTime time.Time) []*jobs.Job {
 		}
 		dueJobs = append(dueJobs, job)
 	}
-	return dueJobs
+	return dueJobs, nil
 }
 
-func (s *Scanner) UpdateNode(ctx context.Context, job *types.InspecJob, detectInfo *inspec.OSInfo) {
+func (s *Scanner) UpdateNode(ctx context.Context, job *types.InspecJob, detectInfo *inspec.OSInfo) error {
 	if job.NodeID == "" {
-		logrus.Warnf("no node id included in node update for node %s", job.NodeName)
-		return
+		return fmt.Errorf("no node id included in node update for node %s ", job.NodeName)
 	}
 	var err error
 	if detectInfo == nil {
@@ -199,12 +198,12 @@ func (s *Scanner) UpdateNode(ctx context.Context, job *types.InspecJob, detectIn
 		NodeName:        job.NodeName,
 	})
 	if err != nil {
-		logrus.Error(err)
-		return
+		return errors.Wrapf(err, "UpdateNode unable to update detect info for node %s", job.NodeName)
 	}
+	return nil
 }
 
-func (s *Scanner) UpdateResult(ctx context.Context, job *types.InspecJob, output []byte, inspecErr *inspec.Error, reportID string) {
+func (s *Scanner) UpdateResult(ctx context.Context, job *types.InspecJob, output []byte, inspecErr *inspec.Error, reportID string) error {
 	result := pgdb.ResultsRow{
 		JobID:     job.JobID,
 		NodeID:    job.NodeID,
@@ -217,28 +216,31 @@ func (s *Scanner) UpdateResult(ctx context.Context, job *types.InspecJob, output
 	if job.NodeStatus == types.StatusFailed || job.NodeStatus == types.StatusAborted {
 		if inspecErr != nil {
 			result.Result = inspecErr.Message
+		} else {
+			result.Result = fmt.Sprintf("unable to complete scan on node. please check the logs for more information. node id ref: %s", job.NodeID)
+		}
+		connectionErr := ""
+		if inspecErr != nil {
+			connectionErr = inspecErr.Type
+		}
+		if connectionErr != "" {
+			_, err := s.nodesClient.UpdateNodeConnectionError(ctx, &nodes.NodeError{
+				NodeId:          job.NodeID,
+				ConnectionError: connectionErr,
+			})
+			if err != nil {
+				return errors.Wrapf(err, "UpdateResult encountered an error updating node connection error")
+			}
 		}
 	} else {
 		result.Result = string(output)
 	}
-
 	err := s.DB.Insert(&result)
 	if err != nil {
-		logrus.Errorf("UpdateResult encountered an error inserting into the database: %s", err.Error())
+		return errors.Wrap(err, "UpdateResult encountered an error inserting into the database")
 	}
-	connectionErr := ""
-	if inspecErr != nil {
-		connectionErr = inspecErr.Type
-	}
-	if connectionErr != "" {
-		_, err := s.nodesClient.UpdateNodeConnectionError(ctx, &nodes.NodeError{
-			NodeId:          job.NodeID,
-			ConnectionError: connectionErr,
-		})
-		if err != nil {
-			logrus.Errorf("UpdateResult encountered an error updating node connection error: %s", err.Error())
-		}
-	}
+
+	return nil
 }
 
 func (s *Scanner) GetNodeUUID(ctx context.Context, sourceID string, region string, acctID string) (string, error) {
@@ -271,21 +273,19 @@ func (s *Scanner) createDbJob(inJob *jobs.Job) (string, error) {
 // status: "new" -> "scheduled" -> "completed" if no more runs are required based on the recurrent fields and job count
 // job_count: how many child jobs have been created for this recurrent job
 // scheduled_time: when is the next run due
-func (s *Scanner) UpdateParentJobSchedule(jobId string, jobCount int32, recurrence string, lastScheduledTime *timestamp.Timestamp) {
+func (s *Scanner) UpdateParentJobSchedule(jobId string, jobCount int32, recurrence string, lastScheduledTime *timestamp.Timestamp) error {
 	logrus.Debugf("UpdateParentJobSchedule started for jobId=%s, jobCount=%d, recurrence=%s, lastScheduledTime=%s", jobId, jobCount, recurrence, lastScheduledTime)
 	// let's open up a DB transaction
 	trans := &pgdb.DBTrans{}
 	transaction, err := s.DB.Begin()
 	if err != nil {
-		logrus.Error(err)
-		return
+		return errors.Wrapf(err, "UpdateParentJobSchedule db error")
 	}
 	trans.Transaction = transaction
 	// Parsing the recurrence RRULE
 	r, err := rrule.StrToRRule(recurrence)
 	if err != nil {
-		logrus.Error(err)
-		return
+		return errors.Wrapf(err, "UpdateParentJobSchedule unablee to parse recurrence string")
 	}
 
 	nowTimeUtc := time.Now().UTC()
@@ -318,23 +318,21 @@ func (s *Scanner) UpdateParentJobSchedule(jobId string, jobCount int32, recurren
 		// update the status to completed, b/c we have reached the count limit for jobs
 		_, err = trans.Exec(sqlUpdateJobStatusAndCount, "completed", jobCount, jobId)
 		if err != nil {
-			logrus.Error(err)
-			return
+			return errors.Wrapf(err, "UpdateParentJobSchedule unable to update job status and count")
 		}
 	} else {
 		logrus.Debugf("jobCount for jobId=%s, else jobCount=%d", jobId, jobCount)
 		// update the status to scheduled, update scheduled_time, update jobCount
 		_, err = trans.Exec(sqlUpdateJobScheduledDatetimeAndIncreaseCount, utcScheduledTime, "scheduled", jobCount, recurrence, jobId)
 		if err != nil {
-			logrus.Error(err)
-			return
+			return errors.Wrapf(err, "UpdateParentJobSchedule unable to update job schedule")
 		}
 	}
 	err = trans.Commit()
 	if err != nil {
-		logrus.Error(err)
-		return
+		return errors.Wrapf(err, "UpdateParentJobSchedule db error")
 	}
+	return nil
 }
 
 func (s *Scanner) CreateChildJob(job *jobs.Job) (*jobs.Job, error) {
@@ -351,7 +349,7 @@ func (s *Scanner) CreateChildJob(job *jobs.Job) (*jobs.Job, error) {
 	}
 	_, err = s.DB.Exec(sqlUpdateJobStatusOnly, "scheduled", id)
 	if err != nil {
-		return nil, fmt.Errorf("CreateChildJob, unable to set job status to scheduled, %s", job.Id)
+		return nil, errors.Wrapf(err, "CreateChildJob, unable to set job status to scheduled, %s", job.Id)
 	}
 	childJob.Id = id
 

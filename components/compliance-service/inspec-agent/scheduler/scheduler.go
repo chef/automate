@@ -47,7 +47,10 @@ func (a *Scheduler) Run(job *jobs.Job) error {
 			return &errorutils.InvalidError{Msg: fmt.Sprintf("failed to schedule job %q (%q) invalid job recurrence rule: %v",
 				job.Id, job.Name, err)}
 		}
-		a.scanner.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
+		err = a.scanner.UpdateParentJobSchedule(job.Id, job.JobCount, job.Recurrence, job.ScheduledTime)
+		if err != nil {
+			logrus.Errorf("error updating status for job %s (%s) : %s", job.Name, job.Id, err.Error())
+		}
 		return nil
 	}
 
@@ -93,7 +96,11 @@ func (a *Scheduler) PollForJobs(ctx context.Context) {
 // recurring jobs that are due to be run. For every due recurrent job,
 // we push that job onto the workflow queue.
 func (a *Scheduler) processDueJobs(ctx context.Context, nowTime time.Time) {
-	dueJobs := a.scanner.GetDueJobs(nowTime)
+	dueJobs, err := a.scanner.GetDueJobs(nowTime)
+	if err != nil {
+		logrus.Errorf("unable to retrieve due jobs: %s", err.Error())
+		return
+	}
 	if len(dueJobs) > 0 {
 		logrus.Debugf("processDueJobs, %d recurring jobs are due for running...", len(dueJobs))
 	}
