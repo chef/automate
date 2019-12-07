@@ -51,7 +51,7 @@ func TestAWSEC2Nodes(t *testing.T) {
 	}
 	list, err := nodesClient.List(ctx, &query)
 	require.NoError(t, err)
-	assert.Equal(t, true, list.GetTotal() > 0)
+	require.NotZero(t, list.GetTotal())
 
 	t.Log("ensure the manager id on the nodes is correct")
 	assert.Equal(t, []string{AwsEC2ManagerID}, list.GetNodes()[0].GetManagerIds())
