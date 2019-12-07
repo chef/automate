@@ -109,11 +109,11 @@ type nodeInfo struct {
 	Tags              []*common.Kv
 }
 
-func assembleJob(job *jobs.Job, node nodeInfo, secrets []*inspec.Secrets, tc inspec.TargetBaseConfig) *types.InspecJob {
+func assembleJob(job *jobs.Job, node nodeInfo, secrets []*inspec.Secrets, tc inspec.TargetBaseConfig) (*types.InspecJob, error) {
 	if len(node.UUID) == 0 {
 		id, err := uuid.NewV4()
 		if err != nil {
-			logrus.Warnf("unable to generate uuid for node")
+			return nil, errors.Wrapf(err, "no uuid found for node. unable to generate uuid for node with name %s", node.Name)
 		}
 		node.UUID = id.String()
 	}
@@ -147,7 +147,7 @@ func assembleJob(job *jobs.Job, node nodeInfo, secrets []*inspec.Secrets, tc ins
 		ManagerID:         node.ManagerID,
 		MachineIdentifier: node.MachineIdentifier,
 		Tags:              node.Tags,
-	}
+	}, nil
 }
 
 func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManager, filters []*common.Filter, job *jobs.Job) ([]*types.InspecJob, error) {
@@ -193,7 +193,12 @@ func (r *Resolver) handleAzureApiNodes(ctx context.Context, m *manager.NodeManag
 				AzureClientSecret: clientSecret,
 				AzureTenantID:     tenantID,
 			}
-			jobArray = append(jobArray, assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc))
+			inspecJob, err := assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc)
+			if err != nil {
+				logrus.Errorf("error assembling job. aborting scan for node %s", node.Name)
+				continue
+			}
+			jobArray = append(jobArray, inspecJob)
 		}
 	}
 	return jobArray, nil
@@ -246,7 +251,12 @@ func (r *Resolver) handleGcpApiNodes(ctx context.Context, m *manager.NodeManager
 		secrets := inspec.Secrets{
 			GcpCredsJson: gcpCred,
 		}
-		jobArray = append(jobArray, assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc))
+		inspecJob, err := assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc)
+		if err != nil {
+			logrus.Errorf("error assembling job. aborting scan for node %s", node.Name)
+			continue
+		}
+		jobArray = append(jobArray, inspecJob)
 	}
 	return jobArray, nil
 }
@@ -346,7 +356,11 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		AwsPassword:     awsCreds.SecretAccessKey,
 		AwsSessionToken: awsCreds.SessionToken,
 	}
-	return []*types.InspecJob{assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc)}, nil
+	inspecJob, err := assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error assembling job. aborting scan for node %s", node.Name)
+	}
+	return []*types.InspecJob{inspecJob}, nil
 }
 
 func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.NodeManager, filters []*common.Filter, job *jobs.Job) ([]*types.InspecJob, error) {
@@ -407,7 +421,12 @@ func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.No
 				AwsPassword:     awsCreds.SecretAccessKey,
 				AwsSessionToken: awsCreds.SessionToken,
 			}
-			jobArray = append(jobArray, assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc))
+			inspecJob, err := assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc)
+			if err != nil {
+				logrus.Errorf("error assembling job. aborting scan for node %s", nodeInfo.Name)
+				continue
+			}
+			jobArray = append(jobArray, inspecJob)
 		}
 	}
 	return jobArray, nil
@@ -568,7 +587,12 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 						AzureTenantID:     tenantID,
 					})
 				}
-				jobArray = append(jobArray, assembleJob(job, nodeDetails, credsArr, tc))
+				inspecJob, err := assembleJob(job, nodeDetails, credsArr, tc)
+				if err != nil {
+					logrus.Errorf("error assembling job. aborting scan for node %s", node.Name)
+					continue
+				}
+				jobArray = append(jobArray, inspecJob)
 			}
 		}
 	}
