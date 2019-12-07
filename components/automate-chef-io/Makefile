@@ -38,9 +38,11 @@ sync_swagger_files: clean_swagger_files
 
 $(SWAGGER_RESULT_FILE): $(SWAGGER_FILES)
 
+# This jq script is more complicated than it needs to be to workaround an issue where jq treats empty input as valid input:
+# https://github.com/stedolan/jq/issues/1142
 generate_swagger: $(SWAGGER_RESULT_FILE)
 	swagger mixin -c=0 $(STATIC_SWAGGER_FILES) $(SWAGGER_FILES) | \
-		jq '.paths = (.paths | with_entries( select( all( .value[].tags[]; . != "hidden") ) ) )' \
+		jq -es 'if . == [] then null else .[] | .paths = (.paths | with_entries( select( all( .value[].tags[]; . != "hidden") ) ) ) end' \
 		> $(SWAGGER_RESULT_FILE)
 
 serve: sync generate_swagger
