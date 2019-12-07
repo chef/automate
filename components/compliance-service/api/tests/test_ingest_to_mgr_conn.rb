@@ -48,4 +48,27 @@ describe File.basename(__FILE__) do
         node["scan_data"].end_time != nil
     }, "Nodes did not have necessary scan_data: #{nodes_list["nodes"]}"
   end
+
+  it "not allowed to update name or tags of ingested node" do
+    nodes = Nodes::NodesService
+    nodes_list = MANAGER_GRPC nodes, :list, Nodes::Query.new()
+
+    assert_grpc_error("invalid option. unable to update name of ingested node", 3) do
+      MANAGER_GRPC nodes, :update, Nodes::Node.new(
+        id: nodes_list['nodes'][0].id,
+        name: "new name"
+      )
+    end
+
+    assert_grpc_error("invalid option. unable to update tags of ingested node", 3) do
+      node = nodes_list['nodes'][0]
+      MANAGER_GRPC nodes, :update, Nodes::Node.new(
+        id: node.id,
+        name: node.name,
+        tags: [
+          Common::Kv.new(key: "blablabla", value: "hahaha")
+        ]
+      )
+    end
+  end
 end

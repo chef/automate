@@ -308,30 +308,45 @@ func (srv *Server) BulkDelete(ctx context.Context, in *nodes.Query) (*nodes.Bulk
 }
 
 func (srv *Server) validateNodeUpdate(ctx context.Context, in *nodes.Node) (*nodes.Node, error) {
-	fullNode := in
 	node, err := GetNode(ctx, &nodes.Id{Id: in.Id}, srv.db, srv.secretsClient)
 	if err != nil {
-		return fullNode, errors.Wrapf(err, "unable to retrieve node from db %s", in.Id)
+		return in, errors.Wrapf(err, "unable to retrieve node from db %s", in.Id)
 	}
 	switch node.Manager {
 	case "aws-api", "azure-api", "gcp-api":
-		return fullNode, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update %s node", in.Manager)}
-	case "aws-ec2", "azure-vm":
-		// the name, host, and tags of these nodes is retrieved from the provider, so let's not let the user update it
-		fullNode.Name = node.Name
-		fullNode.TargetConfig.Host = node.GetTargetConfig().GetHost()
-		fullNode.Tags = node.Tags
-		if node.GetTargetConfig().GetBackend() == "ssm" && len(in.GetTargetConfig().GetSecrets()) == 0 {
-			logrus.Infof("backend for node %s is ssm; no secrets assigned to node", node.Name)
-			fullNode.TargetConfig.Backend = node.GetTargetConfig().GetBackend()
-		}
+		return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update %s node", in.Manager)}
+	case "":
 		if in.Name != "" && in.Name != node.Name {
-			logrus.Warnf("invalid option. unable to update name of %s node", in.Manager)
+			return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update name of ingested node")}
+		} else if in.Tags != nil {
+			if !equal(in.Tags, node.Tags) {
+				return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update tags of ingested node")}
+			}
+		}
+	case "aws-ec2", "azure-vm":
+		// the name, host, and tags of these nodes is retrieved from the cloud provider, so let's not let the user update it.
+		// users may update other target config information, such as "backend" (ssh/winrm) or the credential id for the node.
+		if in.Name != "" && in.Name != node.Name {
+			return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update name of %s node", in.Manager)}
 		} else if in.GetTargetConfig().GetHost() != "" && in.GetTargetConfig().GetHost() != node.GetTargetConfig().GetHost() {
-			logrus.Warnf("invalid option. unable to update host of %s node", in.Manager)
+			return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update host of %s node", in.Manager)}
+		} else if !equal(in.Tags, node.Tags) {
+			return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update tags of %s node", in.Manager)}
 		}
 	}
-	return fullNode, nil
+	return in, nil
+}
+
+func equal(a, b []*common.Kv) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, v := range a {
+		if v != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // UpdateNodeDetectInfo updates the detect info for a node. used by the inspec-agent runner
