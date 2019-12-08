@@ -7,8 +7,8 @@ bref = ""
 toc = true
 [menu]
   [menu.docs]
-    parent = "configuring_automate"
-    weight = 30
+    parent = "authentication"
+    weight = 10
 +++
 
 ## Authentication via Existing Identity Management Systems

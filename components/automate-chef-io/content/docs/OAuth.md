@@ -7,8 +7,8 @@ bref = ""
 toc = true
 [menu]
   [menu.docs]
-    parent = "configuring_automate"
-    weight = 40
+    parent = "authentication"
+    weight = 20
 +++
 
 ## Alpha: Setting up Automate as an OAuth Provider for Habitat Builder

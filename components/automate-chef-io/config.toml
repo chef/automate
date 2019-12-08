@@ -58,6 +58,11 @@ weight = 20
 identifier = "configuring_automate"
 
 [[menu.docs]]
+name = "Authentication"
+weight = 30
+identifier = "authentication"
+
+[[menu.docs]]
 name = "Event Feed"
 weight = 40
 identifier = "event_feed"
