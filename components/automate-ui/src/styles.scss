@@ -204,3 +204,33 @@ chef-loading-spinner[fixed] {
 input {
   line-height: normal;
 }
+
+// chef-input directive styles here when NOT wrapped in chef-form-field
+.chef-input {
+  width: 100%;
+  height: 45px;
+  background-color: $white;
+  padding: 1em;
+  font-size: 14px;
+  border: 1px solid $chef-light-grey;
+  border-radius: $global-radius;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border 0.4s ease;
+
+  &:focus,
+  &:active {
+    border-color: $chef-primary-bright;
+    outline: none;
+  }
+
+  &[disabled] {
+    background-color: $chef-light-grey;
+    opacity: 0.5;
+  }
+
+  .error & {
+    border-color: $chef-critical;
+    border-radius: $global-radius $global-radius 0 0;
+  }
+}
