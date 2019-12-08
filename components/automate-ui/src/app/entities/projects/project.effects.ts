@@ -6,7 +6,7 @@ import { interval as observableInterval, of as observableOf, Observable } from '
 import { catchError, mergeMap, map, filter, switchMap, withLatestFrom } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { HttpStatus } from 'app/types/types';
+import { HttpStatus, GrpcErrorResponse, GrpcStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
@@ -138,90 +138,93 @@ export class ProjectEffects {
         });
       }));
 
-  @Effect()
-  deleteProjectFailure$ = this.actions$.pipe(
-      ofType(ProjectActionTypes.DELETE_FAILURE),
-      map(({ payload }: DeleteProjectFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not delete project: ${msg || payload.error}`
-        });
-      }));
+@Effect()
+deleteProjectFailure$ = this.actions$.pipe(
+    ofType(ProjectActionTypes.DELETE_FAILURE),
+    filter(({ payload }: DeleteProjectFailure) =>
+      payload.status !== HttpStatus.BAD_REQUEST
+    || (<GrpcErrorResponse>payload.error).code !== GrpcStatus.PRECONDITION_FAILED),
+    map(({ payload }: DeleteProjectFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not delete project: ${msg || payload.error}`
+      });
+    }));
 
-  @Effect()
-  updateProject$ = this.actions$.pipe(
-      ofType(ProjectActionTypes.UPDATE),
-      mergeMap(({ payload: { id, name } }: UpdateProject) =>
-        this.requests.updateProject(id, name).pipe(
-          map((resp: ProjectSuccessPayload) => new UpdateProjectSuccess(resp)),
-          catchError((error: HttpErrorResponse) =>
-            observableOf(new UpdateProjectFailure(error))))));
-
-  @Effect()
-  updateProjectFailure$ = this.actions$.pipe(
-      ofType(ProjectActionTypes.UPDATE_FAILURE),
-      map(({ payload }: UpdateProjectFailure) => {
-        const msg = payload.error.error;
-        return new CreateNotification({
-          type: Type.error,
-          message: `Could not update project: ${msg || payload.error}`
-        });
-      }));
-
-  @Effect()
-  applyRulesStart$ = this.actions$.pipe(
-    ofType<ApplyRulesStart>(ProjectActionTypes.APPLY_RULES_START),
-    mergeMap(() =>
-      this.requests.applyRulesStart().pipe(
-        switchMap(() => [
-          new ApplyRulesStartSuccess(),
-          new GetProjects(),
-          new GetApplyRulesStatus()
-        ]),
+@Effect()
+updateProject$ = this.actions$.pipe(
+    ofType(ProjectActionTypes.UPDATE),
+    mergeMap(({ payload: { id, name } }: UpdateProject) =>
+      this.requests.updateProject(id, name).pipe(
+        map((resp: ProjectSuccessPayload) => new UpdateProjectSuccess(resp)),
         catchError((error: HttpErrorResponse) =>
-          observableOf(new ApplyRulesStartFailure(error))))));
+          observableOf(new UpdateProjectFailure(error))))));
 
-  @Effect()
-  applyRulesStop$ = this.actions$.pipe(
-    ofType<ApplyRulesStop>(ProjectActionTypes.APPLY_RULES_STOP),
-    mergeMap(() =>
-      this.requests.applyRulesStop().pipe(
-        switchMap(() => [
-          new ApplyRulesStopSuccess(),
-          new GetProjects(),
-          new GetApplyRulesStatus()
-        ]),
-        catchError((error: HttpErrorResponse) => observableOf(new ApplyRulesStopFailure(error))))));
+@Effect()
+updateProjectFailure$ = this.actions$.pipe(
+    ofType(ProjectActionTypes.UPDATE_FAILURE),
+    map(({ payload }: UpdateProjectFailure) => {
+      const msg = payload.error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not update project: ${msg || payload.error}`
+      });
+    }));
 
-  @Effect()
-  getApplyRulesStatus$ = this.actions$.pipe(
-    ofType<GetApplyRulesStatus>(ProjectActionTypes.GET_APPLY_RULES_STATUS),
-    switchMap(this.getRulesStatus$()));
-
-  @Effect()
-  getActiveApplyRulesStatus$ = observableInterval(1000 * ACTIVE_RULE_STATUS_INTERVAL).pipe(
-    withLatestFrom(this.store.select(isIAMv2)),
-    withLatestFrom(this.store.select(applyRulesStatus)),
-    filter(([[_, isV2], { state }]) =>
-      isV2 && state === ApplyRulesStatusState.Running
-    ),
-    switchMap(this.getRulesStatus$()));
-
-  @Effect()
-  getDormantApplyRulesStatus$ = observableInterval(1000 * DORMANT_RULE_STATUS_INTERVAL).pipe(
-    withLatestFrom(this.store.select(isIAMv2)),
-    withLatestFrom(this.store.select(applyRulesStatus)),
-    filter(([[_, isV2], { state }]) =>
-      isV2 && state === ApplyRulesStatusState.NotRunning
-    ),
-    switchMap(this.getRulesStatus$()));
-
-  private getRulesStatus$(): () => Observable<ProjectActions> {
-    return () => this.requests.getApplyRulesStatus().pipe(
-      map((resp) => new GetApplyRulesStatusSuccess(resp)),
+@Effect()
+applyRulesStart$ = this.actions$.pipe(
+  ofType<ApplyRulesStart>(ProjectActionTypes.APPLY_RULES_START),
+  mergeMap(() =>
+    this.requests.applyRulesStart().pipe(
+      switchMap(() => [
+        new ApplyRulesStartSuccess(),
+        new GetProjects(),
+        new GetApplyRulesStatus()
+      ]),
       catchError((error: HttpErrorResponse) =>
-        observableOf(new GetApplyRulesStatusFailure(error))));
-  }
+        observableOf(new ApplyRulesStartFailure(error))))));
+
+@Effect()
+applyRulesStop$ = this.actions$.pipe(
+  ofType<ApplyRulesStop>(ProjectActionTypes.APPLY_RULES_STOP),
+  mergeMap(() =>
+    this.requests.applyRulesStop().pipe(
+      switchMap(() => [
+        new ApplyRulesStopSuccess(),
+        new GetProjects(),
+        new GetApplyRulesStatus()
+      ]),
+      catchError((error: HttpErrorResponse) => observableOf(new ApplyRulesStopFailure(error))))));
+
+@Effect()
+getApplyRulesStatus$ = this.actions$.pipe(
+  ofType<GetApplyRulesStatus>(ProjectActionTypes.GET_APPLY_RULES_STATUS),
+  switchMap(this.getRulesStatus$()));
+
+@Effect()
+getActiveApplyRulesStatus$ = observableInterval(1000 * ACTIVE_RULE_STATUS_INTERVAL).pipe(
+  withLatestFrom(this.store.select(isIAMv2)),
+  withLatestFrom(this.store.select(applyRulesStatus)),
+  filter(([[_, isV2], { state }]) =>
+    isV2 && state === ApplyRulesStatusState.Running
+  ),
+  switchMap(this.getRulesStatus$()));
+
+@Effect()
+getDormantApplyRulesStatus$ = observableInterval(1000 * DORMANT_RULE_STATUS_INTERVAL).pipe(
+  withLatestFrom(this.store.select(isIAMv2)),
+  withLatestFrom(this.store.select(applyRulesStatus)),
+  filter(([[_, isV2], { state }]) =>
+    isV2 && state === ApplyRulesStatusState.NotRunning
+  ),
+  switchMap(this.getRulesStatus$()));
+
+private getRulesStatus$(): () => Observable<ProjectActions> {
+  return () => this.requests.getApplyRulesStatus().pipe(
+    map((resp) => new GetApplyRulesStatusSuccess(resp)),
+    catchError((error: HttpErrorResponse) =>
+      observableOf(new GetApplyRulesStatusFailure(error))));
+}
 
 }

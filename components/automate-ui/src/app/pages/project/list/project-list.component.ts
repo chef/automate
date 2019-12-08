@@ -9,12 +9,12 @@ import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefSorters } from 'app/helpers/auth/sorter';
-import { HttpStatus } from 'app/types/types';
+import { HttpStatus, GrpcErrorResponse, GrpcStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
-  allProjects, getAllStatus, createStatus, createError
+  allProjects, getAllStatus, createStatus, createError, deleteStatus, deleteError
 } from 'app/entities/projects/project.selectors';
 import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
@@ -37,6 +37,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   public confirmApplyStartModalVisible = false;
   public confirmApplyStopModalVisible = false;
+  private deleteMessage = '';
 
   // This flag governs filling the above cache.
   // The state returned by this.projects.applyRulesStatus$ (Running, NotRunning)
@@ -125,7 +126,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
         this.store.dispatch(new LoadOptions());
       });
 
-    // handle project creation failure response
     combineLatest([
       this.store.select(createStatus),
       this.store.select(createError)
@@ -142,6 +142,24 @@ export class ProjectListComponent implements OnInit, OnDestroy {
           this.closeCreateModal();
         }
       });
+
+    combineLatest([
+      this.store.select(deleteStatus),
+      this.store.select(deleteError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(() => this.deleteModalVisible),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        const grpcError = error.error as GrpcErrorResponse;
+        if (error.status === HttpStatus.BAD_REQUEST
+          && grpcError.code === GrpcStatus.PRECONDITION_FAILED) {
+          this.deleteMessage = error.error.message;
+        } else {
+          // close modal on any other error and display in banner
+          this.closeDeleteModal();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -150,6 +168,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   public closeDeleteModal(): void {
+    this.deleteMessage = '';
     this.deleteModalVisible = false;
   }
 
@@ -159,13 +178,12 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   public deleteProject(): void {
-    this.closeDeleteModal();
+    this.deleteMessage = '';
     this.store.dispatch(new DeleteProject({id: this.projectToDelete.id}));
   }
 
-  // Note: This will be dealt with later, right now, we don't check if it's used
   public inUseMessage(): string {
-    return '';
+    return this.deleteMessage;
   }
 
   public createProject(): void {

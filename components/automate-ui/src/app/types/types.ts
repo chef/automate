@@ -833,7 +833,20 @@ export enum HttpStatus {
   FORBIDDEN = 403,
   NOT_FOUND = 404,
   CONFLICT = 409,
-  PRECONDITION_FAILED = 412,
+  PRECONDITION_FAILED = 412, // Warning! Grpc.FailedPrecondition maps to 400, not 412!
   INTERNAL_SERVER_ERROR = 500
 }
 
+// Map of gRPC codes to HTTP codes is available at:
+// vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis/google/rpc/code.proto
+
+export interface GrpcErrorResponse {
+  code: number; // as defined in vendor/google.golang.org/grpc/codes/codes.go
+  details: any[];
+  error: string;
+  message: string;
+}
+
+export enum GrpcStatus {
+  PRECONDITION_FAILED = 9
+}
