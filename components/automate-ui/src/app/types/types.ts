@@ -848,5 +848,6 @@ export interface GrpcErrorResponse {
 }
 
 export enum GrpcStatus {
-  PRECONDITION_FAILED = 9
+  PRECONDITION_FAILED = 9,
+  INTERNAL = 13
 }

@@ -5,12 +5,12 @@ import { interval as observableInterval,  Observable, Subject, combineLatest } f
 import { map, takeUntil, filter, take } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { HttpStatus, GrpcErrorResponse, GrpcStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
@@ -168,17 +168,16 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   public closeDeleteModal(): void {
-    this.deleteErrorMessage = '';
     this.deleteModalVisible = false;
   }
 
   public startProjectDelete(p: Project): void {
+    this.deleteErrorMessage = '';
     this.deleteModalVisible = true;
     this.projectToDelete = p;
   }
 
   public deleteProject(): void {
-    this.deleteErrorMessage = '';
     this.store.dispatch(new DeleteProject({id: this.projectToDelete.id}));
   }
 
