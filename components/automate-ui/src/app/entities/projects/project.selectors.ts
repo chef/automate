@@ -36,6 +36,16 @@ export const updateStatus = createSelector(
   (state) => state.updateStatus
 );
 
+export const deleteStatus = createSelector(
+  projectState,
+  (state) => state.deleteStatus
+);
+
+export const deleteError = createSelector(
+  projectState,
+  (state) => state.deleteError
+);
+
 export const projectFromRoute = createSelector(
   projectEntities,
   routeParams,

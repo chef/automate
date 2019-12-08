@@ -27,6 +27,7 @@ export interface ProjectEntityState extends EntityState<Project> {
   createError: HttpErrorResponse;
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
+  deleteError: HttpErrorResponse;
   applyRulesStatus: ApplyRulesStatus;
 }
 
@@ -35,6 +36,7 @@ const GET_STATUS = 'getStatus';
 const CREATE_STATUS = 'createStatus';
 const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
+const DELETE_ERROR = 'deleteError';
 const UPDATE_STATUS = 'updateStatus';
 const APPLY_RULES_STATUS = 'applyRulesStatus';
 
@@ -55,6 +57,7 @@ export const ProjectEntityInitialState: ProjectEntityState = projectEntityAdapte
   createStatus: EntityStatus.notLoaded,
   createError: null,
   deleteStatus: EntityStatus.notLoaded,
+  deleteError: null,
   updateStatus: EntityStatus.notLoaded,
   applyRulesStatus: initialApplyRulesStatus
 });
@@ -100,14 +103,21 @@ export function projectEntityReducer(
       )(state) as ProjectEntityState;
 
     case ProjectActionTypes.DELETE:
-      return set(DELETE_STATUS, EntityStatus.loading, state);
+      return pipe(
+        set(DELETE_STATUS, EntityStatus.loading),
+        set(DELETE_ERROR, null)
+      )(state) as ProjectEntityState;
 
     case ProjectActionTypes.DELETE_SUCCESS:
       return set(DELETE_STATUS, EntityStatus.loadingSuccess,
         projectEntityAdapter.removeOne(action.payload.id, state));
 
     case ProjectActionTypes.DELETE_FAILURE:
-      return set(DELETE_STATUS, EntityStatus.loadingFailure, state);
+      const foo = pipe(
+        set(DELETE_STATUS, EntityStatus.loadingFailure),
+        set(DELETE_ERROR, action.payload)
+      )(state) as ProjectEntityState;
+      return foo;
 
     case ProjectActionTypes.UPDATE:
       return pipe(
