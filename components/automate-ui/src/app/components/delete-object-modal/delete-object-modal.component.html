@@ -4,6 +4,7 @@
     {{ objectAction | continuous }} {{objectNoun}} {{objectName}}
     <strong>cannot be undone</strong><span *ngIf="moreDetails"><br>{{moreDetails}}</span>.
   </div>
+  <div *ngIf="errorText" class="error">{{ errorText }}</div>
 
   <div class="options">
     <chef-button primary caution (click)="deleteObject()">

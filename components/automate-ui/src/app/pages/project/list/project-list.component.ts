@@ -37,7 +37,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   public confirmApplyStartModalVisible = false;
   public confirmApplyStopModalVisible = false;
-  private deleteMessage = '';
+  public deleteErrorMessage = '';
 
   // This flag governs filling the above cache.
   // The state returned by this.projects.applyRulesStatus$ (Running, NotRunning)
@@ -154,7 +154,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
         const grpcError = error.error as GrpcErrorResponse;
         if (error.status === HttpStatus.BAD_REQUEST
           && grpcError.code === GrpcStatus.PRECONDITION_FAILED) {
-          this.deleteMessage = error.error.message;
+          this.deleteErrorMessage = error.error.message;
         } else {
           // close modal on any other error and display in banner
           this.closeDeleteModal();
@@ -168,7 +168,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   public closeDeleteModal(): void {
-    this.deleteMessage = '';
+    this.deleteErrorMessage = '';
     this.deleteModalVisible = false;
   }
 
@@ -178,12 +178,8 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   public deleteProject(): void {
-    this.deleteMessage = '';
+    this.deleteErrorMessage = '';
     this.store.dispatch(new DeleteProject({id: this.projectToDelete.id}));
-  }
-
-  public inUseMessage(): string {
-    return this.deleteMessage;
   }
 
   public createProject(): void {

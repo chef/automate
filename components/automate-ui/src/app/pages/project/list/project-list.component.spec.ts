@@ -61,7 +61,7 @@ describe('ProjectListComponent', () => {
         }),
         MockComponent({
           selector: 'app-delete-object-modal',
-          inputs: ['visible', 'objectNoun', 'objectName', 'moreDetails'],
+          inputs: ['visible', 'objectNoun', 'objectName', 'moreDetails', 'errorText'],
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({
