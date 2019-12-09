@@ -453,7 +453,7 @@ func (depth *ProfileDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggrega
 	// TODO: This needs some other query type that takes two paths
 	// basically if total waived controls == total controls, we have a waived node
 	aggWaived := elastic.NewFilterAggregation().
-		Filter(elastic.NewTermQuery("profiles.controls_sums.total", "profiles.controls_sums.waived.total")
+		Filter(elastic.NewTermQuery("profiles.controls_sums.total", "profiles.controls_sums.waived.total"))
 
 	aggMediumRisk := elastic.NewFilterAggregation().
 		Filter(elastic.NewBoolQuery().
