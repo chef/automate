@@ -244,6 +244,9 @@ var ConvergeHistory = Mapping{
 							},
 							"public_ipv4": {
 								"type": "ip"
+							},
+							"account_id": {
+								"type": "text"
 							}
 						}
 					},

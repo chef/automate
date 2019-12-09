@@ -79,6 +79,7 @@ func gatherInfoForNode(node backend.Node) (*manager.NodeMetadata, error) {
 		LastContact:     timestamp,
 		SourceId:        node.Ec2.InstanceId,
 		SourceRegion:    node.Ec2.PlacementAvailabilityZone,
+		SourceAccountId: node.Ec2.AccountID,
 		Tags:            tags,
 		ProjectsData:    gatherProjectsData(node),
 		Projects:        node.Projects,

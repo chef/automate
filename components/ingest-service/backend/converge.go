@@ -93,6 +93,7 @@ type Ec2 struct {
 	InstanceType              string      `json:"instance_type"`
 	PublicIpv4                interface{} `json:"public_ipv4"` // An interface bc ES type is `ip`
 	PlacementAvailabilityZone string      `json:"placement_availability_zone"`
+	AccountID                 string      `json:"account_id"`
 }
 
 // Resource is the representation of a Chef Resource
