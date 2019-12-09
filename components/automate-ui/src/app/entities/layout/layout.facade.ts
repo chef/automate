@@ -1,15 +1,21 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { filter } from 'lodash/fp';
 
 import { LayoutSidebarService } from './layout-sidebar.service';
 import { notificationState } from 'app/entities/notifications/notification.selectors';
+import { Notification, Type } from 'app/entities/notifications/notification.model';
 
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';
 import { sidebarMenuGroups, showPageLoading } from './layout.selectors';
 import { ShowPageLoading, UpdateSidebarMenuGroups } from './layout.actions';
+
+// Important! These must match components/automate-ui/src/styles/_variables.scss
+enum Height {
+  Navigation = '70px',
+  Banner = '110px'
+}
 
 @Injectable({
     providedIn: 'root'
@@ -29,19 +35,18 @@ export class LayoutFacadeService {
     ) {
         this.menuGroups$ = store.select(sidebarMenuGroups);
         this.showPageLoading$ = store.select(showPageLoading);
-        store.select(notificationState).subscribe((notifications) => {
-            this.showLicenseNotification = filter((n) =>
-                n.type === 'license', notifications).length > 0;
-            if (this.showLicenseNotification) {
-                this.updateContentHeight('110px');
-            } else {
-                this.updateContentHeight('70px');
-            }
+
+    store.select(notificationState).subscribe(
+      (notifications: Notification[]) => {
+        this.showLicenseNotification =
+          notifications &&  notifications.some(n => n.type === Type.license);
+        this.updateContentHeight(
+          this.showLicenseNotification ? Height.Banner : Height.Navigation);
         });
     }
 
     hasGlobalNotifications(): boolean {
-        return this.headerHeight === '110px';
+    return this.headerHeight === Height.Banner;
     }
 
     ShowPageLoading(showLoading: boolean) {
