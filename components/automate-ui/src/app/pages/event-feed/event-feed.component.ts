@@ -155,7 +155,7 @@ export class EventFeedComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.layoutFacade.showDashboardsSidebar();
+    this.layoutFacade.showSidebar('dashboards');
     this.store.select(eventFeedSelectors.loadedEvents).pipe(
     takeUntil(this.isDestroyed))
     .subscribe((loadedEvents: ChefEvent[]) => {

@@ -61,7 +61,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.projects.getApplyRulesStatus();
     this.store.dispatch(new GetProjects());
     this.store.pipe(

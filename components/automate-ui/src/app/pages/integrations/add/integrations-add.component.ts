@@ -35,7 +35,7 @@ export class IntegrationsAddComponent implements OnDestroy {
     location: Location,
     fb: FormBuilder
   ) {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.sub = store.select(integrationsAddState).subscribe(({status}) => {
       this.status = status;
       if (status === Status.success) {

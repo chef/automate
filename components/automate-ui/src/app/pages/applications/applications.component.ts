@@ -14,6 +14,7 @@ export class ApplicationsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.layoutFacade.showApplicationsSidebar();
+    this.layoutFacade.showSidebar('applications');
+    this.applicationsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('applications');
   }
 }

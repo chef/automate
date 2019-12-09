@@ -90,7 +90,7 @@ export class AutomateSettingsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.store.dispatch(new GetSettings({}));
     this.store.select(automateSettingsState)
       .subscribe((automateSettingsSelector) => {

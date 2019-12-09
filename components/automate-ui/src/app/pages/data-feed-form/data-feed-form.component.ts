@@ -53,7 +53,7 @@ export class DatafeedFormComponent {
     private datafeedService: DatafeedService,
     private route: ActivatedRoute
   ) {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.model = new Model(new Destination(undefined, '', '', ''), '', '');
     this.id = this.route.snapshot.params['id'];
     this.isEditDestination = this.id ? true : false;

@@ -33,7 +33,7 @@ export class CredentialsListScreenComponent {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.credentialsList$ = store.select(selectors.credentialsList);
   }
 

@@ -81,7 +81,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.store.dispatch(new GetTeams());
 
     this.store.pipe(

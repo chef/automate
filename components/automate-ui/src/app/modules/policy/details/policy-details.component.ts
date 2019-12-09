@@ -45,7 +45,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
   ) {  }
 
   ngOnInit(): void {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     // Populate our tabValue from the fragment.
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
       .subscribe((url: string) => {

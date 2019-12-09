@@ -37,7 +37,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
  }
 
   ngOnInit() {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.store.dispatch(new GetUsers());
     this.layoutFacade.ShowPageLoading(true);
     combineLatest([

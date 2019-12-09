@@ -39,7 +39,7 @@ export class ReportingProfileComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.showSidebar('compliance');
     this.showLoadingIcon = true;
     this.layoutFacade.ShowPageLoading(true);
 

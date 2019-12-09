@@ -34,7 +34,7 @@ export class CredentialsAddEditScreenComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.route.paramMap
       .subscribe(params => {
         this.credential$ = params.get('id') ?

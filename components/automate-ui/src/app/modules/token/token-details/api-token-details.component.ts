@@ -61,7 +61,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
 
     this.store.pipe(
       select(isIAMv2),

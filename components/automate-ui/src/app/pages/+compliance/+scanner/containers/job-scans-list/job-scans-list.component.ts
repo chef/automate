@@ -33,7 +33,7 @@ export class JobScansListComponent implements OnInit, OnDestroy {
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   ngOnInit(): void {
-    this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.showSidebar('compliance');
     this.store.select(selectors.jobScansList).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(jobScansList => this.jobScansList = jobScansList);

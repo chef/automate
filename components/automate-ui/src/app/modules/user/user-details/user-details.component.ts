@@ -62,10 +62,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       // undefined for admin view
       // true for profile view
       if (data.isNonAdmin) {
+        this.layoutFacade.showSidebar('settings');
         this.userDetails = new UserProfileDetails(
           this.store, this.layoutFacade, this.isDestroyed, this.fb);
         this.loading = false;
       } else {
+        this.layoutFacade.showSidebar('profile');
         // Is this user the logged-in user?
         combineLatest([
           // Get the user ID from the URL

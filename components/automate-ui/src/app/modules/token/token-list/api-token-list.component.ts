@@ -80,7 +80,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.store.dispatch(new GetAllTokens());
 
     this.store.select(assignableProjects)

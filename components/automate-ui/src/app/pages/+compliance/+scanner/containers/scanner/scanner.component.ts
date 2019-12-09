@@ -23,7 +23,7 @@ export class ScannerComponent implements OnInit {
 
   ngOnInit() {
     this.layoutFacade.ShowPageLoading(true);
-    this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.showSidebar('compliance');
     this.jobsCount$ = this.store.select(selectors.jobsList)
       .pipe(map(jobsList => jobsList.total));
     this.jobsCountLoaded = true;

@@ -35,7 +35,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.showSidebar('compliance');
     this.reportLoading = true;
     this.layoutFacade.ShowPageLoading(true);
     const id: string = this.route.snapshot.params['id'];

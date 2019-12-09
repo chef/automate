@@ -63,7 +63,7 @@ export class JobAddComponent implements OnDestroy {
     private chefSession: ChefSessionService,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.showSidebar('compliance');
     this.managers$ = this.store.select(allManagers);
     this.profiles$ = this.store.select(allProfiles);
     this.status$ = this.store.select(jobAddStatus);

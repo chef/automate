@@ -41,7 +41,7 @@ export class DatafeedComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.destinations$ = this.service.fetchDestinations();
     this.destinations$.subscribe(destinations => {
         this.sendCountToTelemetry(destinations);

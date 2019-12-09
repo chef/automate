@@ -25,7 +25,7 @@ export class IntegrationsDetailComponent {
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.managerDetail$ = this.store.select(integrationsDetail);
   }
 

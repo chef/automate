@@ -37,7 +37,7 @@ export class NodesAddComponent implements OnInit {
   nodesToAdd$: BehaviorSubject<any[]> = new BehaviorSubject([]);
 
   ngOnInit() {
-    this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.showSidebar('compliance');
     this.form = this.createForm();
 
     // Populate nodesToAdd$ with serialized form body

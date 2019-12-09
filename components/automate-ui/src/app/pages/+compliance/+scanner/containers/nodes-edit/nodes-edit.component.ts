@@ -30,7 +30,7 @@ export class NodesEditComponent implements OnInit {
   secrets$: Observable<any[]>;
 
   ngOnInit() {
-    this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.showSidebar('compliance');
     this.route.paramMap.pipe(
       switchMap(params => this.fetchNode(params.get('id'))))
       .subscribe(node => {

@@ -42,7 +42,7 @@ export class ProfileDetailsComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.showSidebar('compliance');
     this.layoutFacade.ShowPageLoading(false);
     this.route.queryParams.pipe(
       takeUntil(this.isDestroyed))

@@ -33,7 +33,7 @@ import {
   ColumnsPreference
 } from '../../entities/client-runs/client-runs.model';
 import {
-  UpdateNodeFilters, GetWorkflowEnabled, GetNodeSuggestions, DeleteNodes, UpdateColumns
+  UpdateNodeFilters, GetNodeSuggestions, DeleteNodes, UpdateColumns
 } from '../../entities/client-runs/client-runs.actions';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import * as moment from 'moment';
@@ -252,10 +252,9 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.layoutFacade.showInfrastructureSidebar();
     // Only load when first opening the /chef-runs page
     this.store.dispatch(new GetWorkflowEnabled());
-
+    this.layoutFacade.showSidebar('infrastructure');
     const allUrlParameters$ = this.getAllUrlParameters();
 
     this.searchBarFilters$ = allUrlParameters$.pipe(map((chicklets: Chicklet[]) =>

@@ -44,7 +44,7 @@ export class NotificationsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.rules$ = this.service.fetchRules();
     this.rules$.subscribe(rules => {
         this.sendCountToTelemetry(rules);

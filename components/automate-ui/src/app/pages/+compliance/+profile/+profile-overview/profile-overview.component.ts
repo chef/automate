@@ -83,7 +83,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.showSidebar('compliance');
     this.layoutFacade.ShowPageLoading(true);
     this.user = this.chefSessionService.username;
 

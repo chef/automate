@@ -28,7 +28,7 @@ export class RoleDetailsComponent implements OnInit, OnDestroy {
   ) {  }
 
   ngOnInit(): void {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.store.select(roleFromRoute).pipe(
       filter(identity),
       takeUntil(this.isDestroyed))

@@ -94,7 +94,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
 
     this.isIAMv2$ = this.store.select(isIAMv2);
 

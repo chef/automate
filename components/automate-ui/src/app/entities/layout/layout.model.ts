@@ -1,3 +1,18 @@
+// Sidebar {
+//   active: "dashboards",
+//   dashboards: []
+// }
+
+export interface Sidebars {
+  active?: string;
+  dashboards?: MenuItemGroup[];
+  applications?: MenuItemGroup[];
+  infrastructure?: MenuItemGroup[];
+  compliance?: MenuItemGroup[];
+  settings?: MenuItemGroup[];
+  profile?: MenuItemGroup[];
+}
+
 // MenuItemGroup {
 //   name: "Node Management",
 //   items: [],

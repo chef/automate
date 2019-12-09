@@ -38,7 +38,7 @@ export class NodeDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showInfrastructureSidebar();
+    this.layoutFacade.showSidebar('infrastructure');
     // Scroll to the top of the view
     window.scrollTo(0, 0);
     this.nodeId = this.getRouteParam('node-id');

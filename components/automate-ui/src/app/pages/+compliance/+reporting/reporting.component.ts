@@ -199,7 +199,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showComplianceSidebar();
+    this.layoutFacade.showSidebar('compliance');
     const allUrlParameters$ = this.getAllUrlParameters();
 
     this.endDate$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>

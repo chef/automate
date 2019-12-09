@@ -34,7 +34,7 @@ export class IntegrationsListComponent {
     private router: Router,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.managers$ = store.select(cloudManagers);
     this.managerStatus$ = store.select(managerStatus);
     this.automateManager$ = store.select(automateManager);

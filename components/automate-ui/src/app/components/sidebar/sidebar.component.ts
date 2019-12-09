@@ -15,7 +15,7 @@ export class SidebarComponent {
   constructor(
     @Inject(LayoutFacadeService) public layoutFacade: LayoutFacadeService
   ) {
-    this.menuGroups$ = layoutFacade.menuGroups$;
+    this.menuGroups$ = layoutFacade.sidebar$;
   }
 
   public isVisible(item: any) {

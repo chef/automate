@@ -43,7 +43,7 @@ export class IntegrationsEditComponent implements OnDestroy {
     fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
   ) {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     this.createForm(fb);
 
     this.subs = [

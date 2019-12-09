@@ -76,7 +76,7 @@ export class NotificationFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar('settings');
     const alertKeys = this.getAlertTypeKeys();
     this.alertOptions = alertKeys.map(key => {
       const opt = { value: key, viewValue: key };
