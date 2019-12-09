@@ -226,8 +226,24 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     )
     .subscribe(([serviceGroups, queryParams]) => {
       if (serviceGroups.length > 0) {
-        const sgId = queryParams.get('sgId') || serviceGroups[0]['id'];
-        this.router.navigate([], { queryParams: { sgId }, queryParamsHandling: 'merge' });
+        // if we do not have an sgId parameter, pick the first sgId from the
+        // service group list and load it:
+        const sgId = queryParams.get('sgId');
+        if ( !sgId ) {
+          this.router.navigate(
+            [],
+            { queryParams: { sgId: serviceGroups[0]['id'] }, queryParamsHandling: 'merge' }
+          );
+        }
+
+        // if the selected service group is not visible on the page, then pick
+        // the first service group from the list and navigate to it. this lets
+        // us maintain a service group selection regardless of other navigation
+        // as long as the service group is still in the list.
+        const selectedSGVisibleOnPage = serviceGroups.find(sg => sg.id === sgId);
+        if ( !selectedSGVisibleOnPage ) {
+          this.onServiceGroupSelect(null, serviceGroups[0].id);
+        }
       } else {
         this.selectedServiceGroupId = null;
       }
@@ -439,9 +455,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     }
 
     delete queryParams['page'];
-    delete queryParams['sgId'];
-    delete queryParams['sgPage'];
-    delete queryParams['sgStatus'];
 
     this.router.navigate([], {queryParams});
   }
