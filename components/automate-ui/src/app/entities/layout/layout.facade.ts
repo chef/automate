@@ -70,10 +70,6 @@ export class LayoutFacadeService {
     this.contentHeight = `calc(100% - ${this.headerHeight})`;
   }
 
-    updateMenuGroups(menuGroups) {
-        this.store.dispatch(new UpdateSidebarMenuGroups(menuGroups));
-    }
-
   showDashboardsSidebar(): void {
     this.store.dispatch(new UpdateSidebarMenuGroups(
       this.layoutSidebarService.getDashboardsSidebar()
