@@ -185,6 +185,7 @@ func CollectionsForConfig(c *dc.ConfigRequest) []string {
 			collections = append(collections, services.MonitoringCollectionName)
 		}
 	}
+	services.NormalizeNames(collections)
 	return collections
 }
 

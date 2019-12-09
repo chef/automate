@@ -25,6 +25,7 @@ message Config {
 
 	message Platform {
 		chef.automate.infra.config.External.Postgresql external_postgresql = 1;
+		repeated string products = 2;
 	}
 
 	message Postgresql {

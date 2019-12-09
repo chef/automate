@@ -30,6 +30,7 @@ message ConfigRequest {
 			Nginx ngx = 5;
 			chef.automate.infra.config.Proxy proxy = 6;
 			repeated chef.automate.infra.config.FrontendTLSCredential frontend_tls = 7;
+			StaticConfig static_config = 8;
 
 			message Service {
 				google.protobuf.StringValue host = 1;
@@ -37,6 +38,10 @@ message ConfigRequest {
 				google.protobuf.Int32Value http_port = 3 [ (chef.automate.api.port) = { name: "http", default: 80, protocol: "http" } ];
 				google.protobuf.StringValue external_fqdn = 4;
 				google.protobuf.BoolValue maintenance_mode = 5;
+			}
+
+			message StaticConfig {
+				repeated string products = 1;
 			}
 
 			message Logger {

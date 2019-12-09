@@ -25,6 +25,7 @@ export interface MenuItem {
   route: string;
   authorized?: Authorized;
   visible: boolean;
+  openInNewPage?: boolean;
 }
 
 // Authorized {
