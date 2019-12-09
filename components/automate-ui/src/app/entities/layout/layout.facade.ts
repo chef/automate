@@ -18,23 +18,23 @@ enum Height {
 }
 
 @Injectable({
-    providedIn: 'root'
+  providedIn: 'root'
 })
 export class LayoutFacadeService {
-    headerHeight = '70px';
-    contentHeight = `calc(100% - ${this.headerHeight})`;
-    menuGroups$: Observable<MenuItemGroup[]>;
-    showPageLoading$: Observable<boolean>;
-    showLicenseNotification = false;
-    showHeader = true;
-    showSidebar = true;
+  headerHeight = '70px';
+  contentHeight = `calc(100% - ${this.headerHeight})`;
+  menuGroups$: Observable<MenuItemGroup[]>;
+  showPageLoading$: Observable<boolean>;
+  showLicenseNotification = false;
+  showHeader = true;
+  showSidebar = true;
 
-    constructor(
-        private store: Store<fromLayout.LayoutEntityState>,
-        private layoutSidebarService: LayoutSidebarService
-    ) {
-        this.menuGroups$ = store.select(sidebarMenuGroups);
-        this.showPageLoading$ = store.select(showPageLoading);
+  constructor(
+    private store: Store<fromLayout.LayoutEntityState>,
+    private layoutSidebarService: LayoutSidebarService
+  ) {
+    this.menuGroups$ = store.select(sidebarMenuGroups);
+    this.showPageLoading$ = store.select(showPageLoading);
 
     store.select(notificationState).subscribe(
       (notifications: Notification[]) => {
@@ -42,71 +42,71 @@ export class LayoutFacadeService {
           notifications &&  notifications.some(n => n.type === Type.license);
         this.updateContentHeight(
           this.showLicenseNotification ? Height.Banner : Height.Navigation);
-        });
-    }
+      });
+  }
 
-    hasGlobalNotifications(): boolean {
+  hasGlobalNotifications(): boolean {
     return this.headerHeight === Height.Banner;
-    }
+  }
 
-    ShowPageLoading(showLoading: boolean) {
-        this.store.dispatch( new ShowPageLoading(showLoading));
-    }
+  ShowPageLoading(showLoading: boolean): void {
+    this.store.dispatch(new ShowPageLoading(showLoading));
+  }
 
-    showFullPage() {
-        this.contentHeight = '100%';
-        this.showSidebar = false;
-        this.showHeader = false;
-    }
+  showFullPage(): void {
+    this.contentHeight = '100%';
+    this.showSidebar = false;
+    this.showHeader = false;
+  }
 
-    hideFullPage() {
-        this.updateContentHeight(this.headerHeight);
-        this.showSidebar = true;
-        this.showHeader = true;
-    }
+  hideFullPage(): void {
+    this.updateContentHeight(this.headerHeight);
+    this.showSidebar = true;
+    this.showHeader = true;
+  }
 
     updateContentHeight(height: string): void {
-        this.headerHeight = height;
-        this.contentHeight = `calc(100% - ${this.headerHeight})`;
-    }
+    this.headerHeight = height;
+    this.contentHeight = `calc(100% - ${this.headerHeight})`;
+  }
 
     updateMenuGroups(menuGroups) {
         this.store.dispatch(new UpdateSidebarMenuGroups(menuGroups));
     }
 
-    showDashboardsSidebar() {
-        this.store.dispatch(new UpdateSidebarMenuGroups(
-            this.layoutSidebarService.getDashboardsSidebar()
-            ));
-    }
+  showDashboardsSidebar(): void {
+    this.store.dispatch(new UpdateSidebarMenuGroups(
+      this.layoutSidebarService.getDashboardsSidebar()
+    ));
+  }
 
-    showApplicationsSidebar() {
-        this.store.dispatch(new UpdateSidebarMenuGroups(
-            this.layoutSidebarService.getApplicationsSidebar()
-            ));
-    }
+  showApplicationsSidebar(): void {
+    this.store.dispatch(new UpdateSidebarMenuGroups(
+      this.layoutSidebarService.getApplicationsSidebar()
+    ));
+  }
 
-    showInfastructureSidebar() {
-        this.store.dispatch(new UpdateSidebarMenuGroups(
-            this.layoutSidebarService.getInfastructureSidebar()
-            ));
-    }
+  showInfastructureSidebar(): void {
+    this.store.dispatch(new UpdateSidebarMenuGroups(
+      this.layoutSidebarService.getInfastructureSidebar()
+    ));
+  }
 
-    showComplianceSidebar() {
-        this.store.dispatch(new UpdateSidebarMenuGroups(
-            this.layoutSidebarService.getComplianceSidebar()
-            ));
-    }
+  showComplianceSidebar(): void {
+    this.store.dispatch(new UpdateSidebarMenuGroups(
+      this.layoutSidebarService.getComplianceSidebar()
+    ));
+  }
 
-    showSettingsSidebar() {
-        this.store.dispatch(new UpdateSidebarMenuGroups(
-            this.layoutSidebarService.getSettingsSidebar()
-            ));
-    }
+  showSettingsSidebar(): void {
+    this.store.dispatch(new UpdateSidebarMenuGroups(
+      this.layoutSidebarService.getSettingsSidebar()
+    ));
+  }
 
-    showUserProfileSidebar() {
-        this.store.dispatch(new UpdateSidebarMenuGroups(
-            this.layoutSidebarService.getUserProfileSidebar()
-            ));
-    }
+  showUserProfileSidebar(): void {
+    this.store.dispatch(new UpdateSidebarMenuGroups(
+      this.layoutSidebarService.getUserProfileSidebar()
+    ));
+  }
 }
