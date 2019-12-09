@@ -1,11 +1,13 @@
 package fileutils
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"path"
 	"path/filepath"
+	"syscall"
 
 	"go.uber.org/multierr"
 )
@@ -190,8 +192,13 @@ func syncDir(dirname string) error {
 	}
 
 	if err := dir.Sync(); err != nil {
-		return err
+		// Some filesystems (vboxfs) return EINVAL when trying
+		// to call sync on a directory. We ignore the error in
+		// this case since the directory sync doesn't impact
+		// atomicity (only durability).
+		if !errors.Is(err, syscall.EINVAL) {
+			return err
+		}
 	}
-
 	return dir.Close()
 }
