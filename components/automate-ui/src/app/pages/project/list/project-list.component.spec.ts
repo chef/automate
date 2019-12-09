@@ -14,7 +14,6 @@ import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
 import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
 import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
-import { notificationState } from 'app/entities/notifications/notification.selectors';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
@@ -204,6 +203,19 @@ describe('ProjectListComponent', () => {
         expect(component.deleteErrorMessage).toBe(expectedMsg);
       });
 
+      it('keeps modal open upon failed precondition', () => {
+        const expectedMsg = 'delete failed';
+        const httpErrorResponse = new HttpErrorResponse(
+          {
+            status: HttpStatus.BAD_REQUEST,
+            error: { message: expectedMsg, code: GrpcStatus.PRECONDITION_FAILED }
+          });
+        component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
+        expect(component.deleteModalVisible).toBe(true);
+        store.dispatch(new DeleteProjectFailure(httpErrorResponse));
+        expect(component.deleteModalVisible).toBe(true);
+      });
+
       it('does not set error message upon failed precondition if modal is closed', () => {
         const expectedMsg = 'delete failed';
         const httpErrorResponse = new HttpErrorResponse(
@@ -263,8 +275,9 @@ describe('ProjectListComponent', () => {
 
       it('closes upon success', () => {
         component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
+        expect(component.deleteModalVisible).toBe(true);
         store.dispatch(new DeleteProjectSuccess({id: 'uuid-111'}));
-        expect(component.deleteErrorMessage).toBe('');
+        expect(component.deleteModalVisible).toBe(false);
       });
     });
   });

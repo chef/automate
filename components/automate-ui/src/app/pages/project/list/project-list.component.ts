@@ -148,15 +148,17 @@ export class ProjectListComponent implements OnInit, OnDestroy {
       this.store.select(deleteError)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      filter(() => this.deleteModalVisible),
-      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
-      .subscribe(([_, error]) => {
-        const grpcError = error.error as GrpcErrorResponse;
-        if (error.status === HttpStatus.BAD_REQUEST
-          && grpcError.code === GrpcStatus.PRECONDITION_FAILED) {
-          this.deleteErrorMessage = error.error.message;
-        } else {
-          // close modal on any other error and display in banner
+      filter(() => this.deleteModalVisible))
+      .subscribe(([state, error]) => {
+        if (state === EntityStatus.loadingFailure && !isNil(error)) {
+          if (error.status === HttpStatus.BAD_REQUEST
+            && (error.error as GrpcErrorResponse).code === GrpcStatus.PRECONDITION_FAILED) {
+            this.deleteErrorMessage = error.error.message;
+          } else {
+            // close modal on any other error and display in banner
+            this.closeDeleteModal();
+          }
+        } else if (state === EntityStatus.loadingSuccess) {
           this.closeDeleteModal();
         }
       });
