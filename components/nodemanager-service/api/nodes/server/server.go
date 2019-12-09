@@ -246,7 +246,7 @@ func (srv *Server) Update(ctx context.Context, in *nodes.Node) (*pb.Empty, error
 	logrus.Infof("update node with : %+v", in)
 
 	// validate the node can be updated
-	in, err := srv.validateNodeUpdate(ctx, in)
+	err := srv.validateNodeUpdate(ctx, in)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
@@ -307,34 +307,34 @@ func (srv *Server) BulkDelete(ctx context.Context, in *nodes.Query) (*nodes.Bulk
 	return &nodes.BulkDeleteResponse{Names: names}, nil
 }
 
-func (srv *Server) validateNodeUpdate(ctx context.Context, in *nodes.Node) (*nodes.Node, error) {
+func (srv *Server) validateNodeUpdate(ctx context.Context, in *nodes.Node) error {
 	node, err := GetNode(ctx, &nodes.Id{Id: in.Id}, srv.db, srv.secretsClient)
 	if err != nil {
-		return in, errors.Wrapf(err, "unable to retrieve node from db %s", in.Id)
+		return errors.Wrapf(err, "unable to retrieve node from db %s", in.Id)
 	}
 	switch node.Manager {
 	case "aws-api", "azure-api", "gcp-api":
-		return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update %s node", in.Manager)}
+		return &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update %s node", in.Manager)}
 	case "":
 		if in.Name != "" && in.Name != node.Name {
-			return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update name of ingested node")}
+			return &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update name of ingested node")}
 		} else if in.Tags != nil {
 			if !equal(in.Tags, node.Tags) {
-				return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update tags of ingested node")}
+				return &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update tags of ingested node")}
 			}
 		}
 	case "aws-ec2", "azure-vm":
 		// the name, host, and tags of these nodes is retrieved from the cloud provider, so let's not let the user update it.
 		// users may update other target config information, such as "backend" (ssh/winrm) or the credential id for the node.
 		if in.Name != "" && in.Name != node.Name {
-			return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update name of %s node", in.Manager)}
+			return &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update name of %s node", in.Manager)}
 		} else if in.GetTargetConfig().GetHost() != "" && in.GetTargetConfig().GetHost() != node.GetTargetConfig().GetHost() {
-			return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update host of %s node", in.Manager)}
+			return &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update host of %s node", in.Manager)}
 		} else if !equal(in.Tags, node.Tags) {
-			return in, &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update tags of %s node", in.Manager)}
+			return &errorutils.InvalidError{Msg: fmt.Sprintf("invalid option. unable to update tags of %s node", in.Manager)}
 		}
 	}
-	return in, nil
+	return nil
 }
 
 func equal(a, b []*common.Kv) bool {
