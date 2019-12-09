@@ -65,7 +65,7 @@ export class LayoutFacadeService {
     this.showHeader = true;
   }
 
-    updateContentHeight(height: string): void {
+  private updateContentHeight(height: string): void {
     this.headerHeight = height;
     this.contentHeight = `calc(100% - ${this.headerHeight})`;
   }
