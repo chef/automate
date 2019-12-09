@@ -231,7 +231,11 @@ func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []st
 		return nodeData, err
 	}
 	macAddress, hostname := getHostAttributes(attributesJson)
-	nodeData["node_data"] = DataFeedMessage{LastRun: lastRun, Macaddress: macAddress, Hostname: hostname}
+	nodeDataContent := make(map[string]interface{})
+	nodeDataContent["last_run"] = lastRun
+	nodeDataContent["macaddress"] = macAddress
+	nodeDataContent["hostname"] = hostname
+	nodeData["node_data"] = nodeDataContent
 	return nodeData, nil
 }
 

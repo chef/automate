@@ -126,10 +126,11 @@ func (d *DataFeedAggregateTask) buildDatafeed(ctx context.Context, nodeIDs map[s
 			continue
 		}
 		// update the message with the full report
-		message := nodeData["node_data"].(DataFeedMessage)
-		message.Report = report
-		nodeData["node_data"] = message
-
+		if report != nil {
+			message := nodeData["node_data"].(map[string]interface{})
+			message["report"] = report
+			nodeData["node_data"] = message
+		}
 		nodeMessages[ip] = nodeData
 	}
 	log.Debugf("%v node attribute messages retrieved in interval", len(nodeMessages))
@@ -159,7 +160,10 @@ func (d *DataFeedAggregateTask) getNodeClientData(ctx context.Context, ipaddress
 		if err != nil {
 			log.Errorf("Error getting node macaddress and hostname %v", err)
 		}
-		nodeData["node_data"] = DataFeedMessage{Macaddress: macAddress, Hostname: hostname}
+		nodeDataContent := make(map[string]interface{})
+		nodeDataContent["macaddress"] = macAddress
+		nodeDataContent["hostname"] = hostname
+		nodeData["node_data"] = nodeDataContent
 	}
 	if err != nil {
 		return nodeData, err
