@@ -89,11 +89,6 @@ func RegisterCerealProjectPurgerWithDomainServices(manager *cereal.Manager, log 
 func (m *cerealProjectPurger) Start(projectID string) error {
 	params := map[string]interface{}{}
 
-	if m.ProjectHasIngestRules(projectID) {
-		return errors.Errorf(
-			"project ID %s can not be deleted until all ingest rules are removed and applied", projectID)
-	}
-
 	for _, svc := range m.domainServices {
 		params[svc] = project_purge.DomainProjectPurgeWorkflowParameters{
 			ProjectID: projectID,
@@ -117,11 +112,6 @@ func (m *cerealProjectPurger) Start(projectID string) error {
 	}
 
 	return nil
-}
-
-func (m *cerealProjectPurger) ProjectHasIngestRules(projectID string) bool {
-
-	return false
 }
 
 // GraveyardingCompleted returns whether the project has successfully been moved to the graveyard.
