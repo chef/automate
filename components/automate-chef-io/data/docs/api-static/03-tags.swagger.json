@@ -14,7 +14,7 @@
     },
     {
       "name": "Applications",
-      "tags": ["ApplicationsService"]
+      "tags": ["service_groups", "retention"]
     }
   ],
   "tags": [
@@ -22,6 +22,7 @@
     { "name": "StatsService", "x-displayName": "Stats" },
     { "name": "ConfigMgmt", "x-displayName": "Nodes" },
     { "name": "NodesService", "x-displayName": "Nodes" },
-    { "name": "ApplicationsService", "x-displayName": "Applications" }
-  ]
+    { "name": "service_groups", "x-displayName": "Service Groups and Services" },
+    { "name": "retention", "x-displayName": "Service Management" }
+    ]
 }
