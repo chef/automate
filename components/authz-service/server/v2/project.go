@@ -332,8 +332,11 @@ func (s *ProjectState) DeleteProject(ctx context.Context,
 	req *api.DeleteProjectReq) (*api.DeleteProjectResp, error) {
 
 	resp, err := s.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: req.Id})
+	if err != nil {
+		return nil, err
+	}
 	if len(resp.Rules) > 0 {
-		return nil, status.Errorf(codes.FailedPrecondition, 
+		return nil, status.Errorf(codes.FailedPrecondition,
 			"Project %q can not be deleted because it has %d rule(s)", req.Id, len(resp.Rules))
 	}
 
