@@ -247,6 +247,15 @@ DOC
 function applications_populate_database() {
   install_if_missing core/util-linux uuidgen
 
+  # publish a message with a critical healthcheck at the beginning of the data
+  # population; later we'll change it to OK to trigger the timewizard in the
+  # UI.
+  applications_publish_supervisor_message --name "wizrd" --group "default"\
+    --origin custom --version "2.0.5" --release "20190115181118" --health 2\
+    --sup-id "c95fe9ce-5f9e-4983-8ac8-fae4b9ce3933" \
+    --site "us-west-1" --application "tw-critical-to-ok" --environment "production"
+
+
   for _ in $(seq 1 12); do
     # maximum health check output to show how the UI handles edge case.
     applications_publish_supervisor_message --name nginx --group "default"\
@@ -374,6 +383,30 @@ function applications_populate_database() {
     --site "us-west-1" --application "mobile-app-api" --environment "qa"
 
   ##
+  # A service group row may contain data from services at different sites. When
+  # this happens, if users filter by site then the service group's row should
+  # be updated to show only the matching data. The services sidebar also should update
+  applications_publish_supervisor_message --name "multisite" --group "default"\
+    --origin custom --version "7.8.9" --release "20190115181192" --health 0\
+    --sup-id "$(uuidgen)" \
+    --site "aaa" --application "multisite-demo" --environment "demo"
+
+  applications_publish_supervisor_message --name "multisite" --group "default"\
+    --origin custom --version "7.8.9" --release "20190115181192" --health 2\
+    --sup-id "$(uuidgen)" \
+    --site "aaa" --application "multisite-demo" --environment "demo"
+
+  applications_publish_supervisor_message --name "multisite" --group "default"\
+    --origin custom --version "7.8.9" --release "20190115181192" --health 0\
+    --sup-id "$(uuidgen)" \
+    --site "bbb" --application "multisite-demo" --environment "demo"
+
+  applications_publish_supervisor_message --name "multisite" --group "default"\
+    --origin custom --version "7.8.9" --release "20190115181192" --health 0\
+    --sup-id "$(uuidgen)" \
+    --site "bbb" --application "multisite-demo" --environment "demo"
+
+  ##
   # Service groups with a larger set of health statuses. This excercises some
   # filtering cases, such as whether a service group with 1 service in critical
   # and 1 warning shows up when filtering for warning.
@@ -417,6 +450,22 @@ function applications_populate_database() {
       --origin mycorp --version "0.0.1" --health 0 --sup-id "$(uuidgen)" \
       --application "microservice-app" --environment "qa" --site "cloud-oregon"
   done
+
+  # This is the same service from the beginning, we now give it an OK
+  # healthcheck to trigger the timewizard
+  applications_publish_supervisor_message --name "wizrd" --group "default"\
+    --origin custom --version "2.0.5" --release "20190115181118" --health 0\
+    --sup-id "c95fe9ce-5f9e-4983-8ac8-fae4b9ce3933" \
+    --site "us-west-1" --application "tw-critical-to-ok" --environment "production"
+
+}
+
+function applications_psql() {
+  chef-automate dev psql chef_applications_service "$@"
+}
+
+function applications_clear_database() {
+  applications_psql -- -c "DELETE FROM service_full;"
 }
 
 function app_service_origin() {
@@ -426,3 +475,4 @@ function app_service_origin() {
     echo "chef"
   fi
 }
+
