@@ -33,7 +33,7 @@ import {
   ColumnsPreference
 } from '../../entities/client-runs/client-runs.model';
 import {
-  UpdateNodeFilters, GetNodeSuggestions, DeleteNodes, UpdateColumns
+  UpdateNodeFilters, GetWorkflowEnabled, GetNodeSuggestions, DeleteNodes, UpdateColumns
 } from '../../entities/client-runs/client-runs.actions';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import * as moment from 'moment';
@@ -255,6 +255,9 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
     // Only load when first opening the /chef-runs page
     this.store.dispatch(new GetWorkflowEnabled());
     this.layoutFacade.showSidebar('infrastructure');
+    // Only load when first opening the /chef-runs page
+    this.store.dispatch(new GetWorkflowEnabled());
+
     const allUrlParameters$ = this.getAllUrlParameters();
 
     this.searchBarFilters$ = allUrlParameters$.pipe(map((chicklets: Chicklet[]) =>
