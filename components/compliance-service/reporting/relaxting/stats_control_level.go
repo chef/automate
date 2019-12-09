@@ -431,14 +431,25 @@ func (depth *ControlDepth) getStatsSummaryResult(searchResult *elastic.SearchRes
 }
 
 func (depth *ControlDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggregation {
-	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "passed"))
-	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "failed"))
-	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "skipped"))
+	waivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
+
+	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
+		MustNot(waivedQuery))
+
+	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
+		MustNot(waivedQuery))
+
+	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "skipped")).
+		MustNot(waivedQuery))
 
 	impactTerms := elastic.NewTermsAggregation().Field("profiles.controls.impact").Size(1).
 		SubAggregation("compliant", passedFilter).
 		SubAggregation("noncompliant", failedFilter).
-		SubAggregation("skipped", skippedFilter)
+		SubAggregation("skipped", skippedFilter).
+		SubAggregation("waived", waivedQuery)
 
 	aggs := make(map[string]elastic.Aggregation)
 	aggs["impact"] = impactTerms
@@ -476,6 +487,9 @@ func (depth *ControlDepth) getStatsSummaryNodesResult(searchResult *elastic.Sear
 			if skippedResult, found := impact.Aggregations.Filter("skipped"); found {
 				summary.Skipped = int32(skippedResult.DocCount)
 			}
+			if waivedResult, found := impact.Aggregations.Filter("waived"); found {
+				summary.Waived = int32(waivedResult.DocCount)
+			}
 		}
 	}
 	return summary
@@ -501,6 +515,7 @@ func (depth *ControlDepth) getStatsSummaryControlsResult(searchResult *elastic.S
 	summary.Criticals = nodesSummary.HighRisk
 	summary.Majors = nodesSummary.MediumRisk
 	summary.Minors = nodesSummary.LowRisk
+	summary.Waived = nodesSummary.Waived
 
 	return summary
 }
