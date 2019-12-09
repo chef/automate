@@ -9,11 +9,7 @@ import { notificationState } from 'app/entities/notifications/notification.selec
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';
 import { sidebarMenuGroups, showPageLoading } from './layout.selectors';
-import {
-    ShowPageLoading,
-    GetSidebarMenuGroups,
-    UpdateSidebarMenuGroups
-} from './layout.actions';
+import { ShowPageLoading, UpdateSidebarMenuGroups } from './layout.actions';
 
 @Injectable({
     providedIn: 'root'
@@ -67,10 +63,6 @@ export class LayoutFacadeService {
     updateContentHeight(height: string): void {
         this.headerHeight = height;
         this.contentHeight = `calc(100% - ${this.headerHeight})`;
-    }
-
-    getMenuGroups() {
-        this.store.dispatch(new GetSidebarMenuGroups());
     }
 
     updateMenuGroups(menuGroups) {
