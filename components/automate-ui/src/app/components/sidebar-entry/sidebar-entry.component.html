@@ -14,5 +14,5 @@
     [style.transform]="'rotate(' + (iconRotation ? iconRotation : 0) + 'deg)'">{{icon}}</chef-icon>
   <ng-content></ng-content>
   <chef-icon *ngIf="!openInNewPage" class="arrow">play_arrow</chef-icon>
-  <chef-icon *ngIf="openInNewPage" class="open-in-new">launch</chef-icon>
+  <chef-icon *ngIf="openInNewPage" class="open-in-new sidebar-icon">launch</chef-icon>
 </ng-template>
