@@ -5,6 +5,7 @@
 #
 grpcGatewayVendorPath=./vendor/github.com/grpc-ecosystem/grpc-gateway/
 
+echo "Vendoring dependencies in vendor/"
 go mod tidy
 go mod vendor
 go mod verify
@@ -26,6 +27,7 @@ else
     exit 1
 fi
 
+echo "Cleaning up unnecessary files from vendor/"
 # Clean up files that go mod will vendor that we don't need
 find ./vendor -type f \( -name .gitignore -o -name .travis.yml -o -name package.json -o -name Makefile -o -name Dockerfile -o -name MAINTAINERS -o -name \*.md -o -name \*.vim -o -name \*.yml \) -delete
 
@@ -33,4 +35,5 @@ find ./vendor -type f \( -name .gitignore -o -name .travis.yml -o -name package.
 rm -rf ./vendor/github.com/grpc-ecosystem/grpc-gateway/examples/
 
 # Update .bldr with new dep information
+echo "Regenerating .bldr configuration file"
 go run tools/bldr-config-gen/main.go
