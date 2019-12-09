@@ -22,9 +22,6 @@ export function layoutEntityReducer(
       return set('showPageLoading', action.payload)(state);
     }
 
-    case LayoutActionTypes.GET_SIDEBAR_MENU_GROUPS:
-      return state;
-
     case LayoutActionTypes.UPDATE_SIDEBAR_MENU_GROUPS: {
       return set('menuGroups', action.payload)(state);
     }
