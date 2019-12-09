@@ -331,10 +331,9 @@ func (s *ProjectState) ListProjectsForIntrospection(
 func (s *ProjectState) DeleteProject(ctx context.Context,
 	req *api.DeleteProjectReq) (*api.DeleteProjectResp, error) {
 
-	resp, err := s.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: req.Id})
-	if len(resp.Rules) > 0 {
-		return nil, status.Errorf(codes.FailedPrecondition, 
-			"Project %q can not be deleted because it has %d rule(s)", req.Id, len(resp.Rules))
+	err := s.validateProjectDelete(ctx, req.Id)
+	if err != nil {
+		return nil, err
 	}
 
 	err = s.ProjectPurger.Start(req.Id)
@@ -352,38 +351,6 @@ func (s *ProjectState) DeleteProject(ctx context.Context,
 	}
 
 	return &api.DeleteProjectResp{}, nil
-}
-
-func (s *ProjectState) waitForProjectToBeGraveyarded(ctx context.Context, maxWaitTime time.Duration, projectID string) error {
-	ctx, cancel := context.WithTimeout(ctx, maxWaitTime)
-	defer cancel()
-	s.log.Info("Waiting for GraveyardingCompleted status")
-	tries := 0
-	startTime := time.Now()
-	for {
-		logctx := s.log.WithField("tries", tries+1).WithField("duration", time.Since(startTime))
-		completed, err := s.ProjectPurger.GraveyardingCompleted(projectID)
-		// if completed we return the final error
-		if completed {
-			return err
-		}
-
-		// if not completed and we get an error, it's unexpected, try again
-		if err != nil {
-			s.log.WithError(err).Warn("failed to get GraveyardingCompleted status")
-		}
-		sleepTime := time.Duration((5 * (1 << uint(tries)))) * time.Millisecond
-		if sleepTime > time.Second {
-			sleepTime = time.Second
-		}
-		select {
-		case <-ctx.Done():
-			logctx.Error("Timed out waiting for GraveyardingCompleted")
-			return status.Error(codes.DeadlineExceeded, "Timed out waiting for GraveyardingCompleted")
-		case <-time.After(sleepTime):
-		}
-		tries++
-	}
 }
 
 func (s *ProjectState) ListRulesForAllProjects(ctx context.Context,
@@ -571,6 +538,65 @@ func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (
 		}
 		return nil, status.Errorf(codes.Internal,
 			"error deleting rule with ID %q: %s", req.Id, err.Error())
+	}
+}
+
+const ruleSetEditsPendingStatus = "edits-pending"
+
+func (s *ProjectState) validateProjectDelete(ctx context.Context, projectID string) error {
+	projectResponse, err := s.GetProject(ctx, &api.GetProjectReq{Id: projectID})
+	if err != nil {
+		return err
+	}
+
+	if projectResponse.Project.Status == ruleSetEditsPendingStatus {
+		return status.Errorf(codes.FailedPrecondition,
+			"Project %q can not be deleted because it has edits pending", projectResponse.Project.Name)
+	}
+
+	rulesResponse, err := s.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: projectID})
+	if err != nil {
+		return err
+	}
+
+	if len(rulesResponse.Rules) > 0 {
+		return status.Errorf(codes.FailedPrecondition,
+			"Project %q can not be deleted because it has %d rule(s)",
+			projectResponse.Project.Name, len(rulesResponse.Rules))
+	}
+
+	return nil
+}
+
+func (s *ProjectState) waitForProjectToBeGraveyarded(ctx context.Context, maxWaitTime time.Duration, projectID string) error {
+	ctx, cancel := context.WithTimeout(ctx, maxWaitTime)
+	defer cancel()
+	s.log.Info("Waiting for GraveyardingCompleted status")
+	tries := 0
+	startTime := time.Now()
+	for {
+		logctx := s.log.WithField("tries", tries+1).WithField("duration", time.Since(startTime))
+		completed, err := s.ProjectPurger.GraveyardingCompleted(projectID)
+		// if completed we return the final error
+		if completed {
+			return err
+		}
+
+		// if not completed and we get an error, it's unexpected, try again
+		if err != nil {
+			s.log.WithError(err).Warn("failed to get GraveyardingCompleted status")
+		}
+		sleepTime := time.Duration((5 * (1 << uint(tries)))) * time.Millisecond
+		if sleepTime > time.Second {
+			sleepTime = time.Second
+		}
+		select {
+		case <-ctx.Done():
+			logctx.Error("Timed out waiting for GraveyardingCompleted")
+			return status.Error(codes.DeadlineExceeded, "Timed out waiting for GraveyardingCompleted")
+		case <-time.After(sleepTime):
+		}
+		tries++
 	}
 }
 
