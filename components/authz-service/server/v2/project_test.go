@@ -277,6 +277,19 @@ func TestDeleteProject(t *testing.T) {
 			_, found := store.Get(id)
 			assert.False(t, found)
 		}},
+		{"if the project has rules, returns 'failed precondition'", func(t *testing.T) {
+			require.Zero(t, store.ItemCount())
+			assert.Equal(t, 0, 1)
+			id := fmt.Sprintf("test-project-%d", time.Now().UnixNano())
+			addProjectToStore(t, store, id, "my foo", storage.Custom)
+
+			_, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: id})
+			require.NoError(t, err)
+			assert.Equal(t, 1, store.ItemCount())
+
+			_, found := store.Get(id)
+			assert.False(t, found)
+		}},
 	}
 
 	rand.Shuffle(len(cases), func(i, j int) {
