@@ -445,11 +445,13 @@ func (depth *ControlDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggrega
 		Must(elastic.NewTermQuery("profiles.controls.status", "skipped")).
 		MustNot(waivedQuery))
 
+	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
+
 	impactTerms := elastic.NewTermsAggregation().Field("profiles.controls.impact").Size(1).
 		SubAggregation("compliant", passedFilter).
 		SubAggregation("noncompliant", failedFilter).
 		SubAggregation("skipped", skippedFilter).
-		SubAggregation("waived", waivedQuery)
+		SubAggregation("waived", waivedFilter)
 
 	aggs := make(map[string]elastic.Aggregation)
 	aggs["impact"] = impactTerms
