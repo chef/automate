@@ -157,6 +157,14 @@ export class PolicyEffects {
     }));
 
   @Effect()
+  addPolicyMembersFailure$ = this.actions$.pipe(
+    ofType<AddPolicyMembersFailure>(PolicyActionTypes.ADD_MEMBERS_FAILURE),
+    map(({ payload: { error } }) => new CreateNotification({
+      type: Type.error,
+      message: `Could not add members to policy: ${error.error || error}`
+    })));
+
+  @Effect()
   deletePolicy$ = this.actions$.pipe(
     ofType<DeletePolicy>(PolicyActionTypes.DELETE),
     mergeMap(({ payload: { id } }) =>
