@@ -10,14 +10,12 @@ import (
 	"sync"
 	"time"
 
-	"github.com/pkg/errors"
-
-	"github.com/chef/automate/lib/grpc/secureconn"
-
 	"github.com/golang/protobuf/ptypes"
+	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
@@ -25,6 +23,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	es "github.com/chef/automate/components/es-sidecar-service/pkg/elastic"
+	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/platform/pg"
 )
@@ -37,6 +36,7 @@ type Runner struct {
 	eventTerm        chan struct{}
 	errChan          chan error
 	lockedDeployment *deployment.Deployment
+	converger        converge.Converger
 	target           target.Target
 	failed           bool
 
@@ -166,12 +166,13 @@ func WithDeploymentStore(deploymentStore persistence.DeploymentStore) RunnerOpt 
 }
 
 // CreateBackup creates an Automate Backup
-func (r *Runner) CreateBackup(ctx context.Context, dep *deployment.Deployment, sender events.EventSender) (*api.BackupTask, error) {
+func (r *Runner) CreateBackup(ctx context.Context, dep *deployment.Deployment, sender events.EventSender, converger converge.Converger) (*api.BackupTask, error) {
 	r.backupTask = &api.BackupTask{Id: ptypes.TimestampNow()}
 
 	r.infof("Backup running")
 	r.eventSender = sender
 	r.lockedDeployment = dep
+	r.converger = converger
 	r.publishBackupEvent(r.backupTask.TaskID(), api.DeployEvent_RUNNING)
 
 	go r.startBackupOperations(ctx)
@@ -1001,6 +1002,12 @@ func (r *Runner) startBackupOperations(ctx context.Context) {
 	}
 	ctx, cancel := context.WithDeadline(context.Background(), deadline)
 	defer cancel()
+
+	if r.converger != nil {
+		defer func() {
+			r.converger.BackupComplete(nil)
+		}()
+	}
 
 	r.eventChan = make(chan api.DeployEvent_Backup_Operation)
 	r.eventTerm = make(chan struct{})

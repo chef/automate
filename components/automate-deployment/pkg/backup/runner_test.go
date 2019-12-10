@@ -15,16 +15,17 @@ import (
 	"github.com/stretchr/testify/require"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/events"
 )
 
 func TestRunnerCreate(t *testing.T) {
 	t.Run("Creates a backup", func(t *testing.T) {
-		r, ctx, dep, sender, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
+		r, ctx, dep, sender, converger, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
 		defer cleanup()
 		r.specs = []Spec{}
-		task, err := r.CreateBackup(ctx, dep, sender)
+		task, err := r.CreateBackup(ctx, dep, sender, converger)
 
 		require.NoError(t, err)
 		require.NotNil(t, task)
@@ -34,12 +35,12 @@ func TestRunnerCreate(t *testing.T) {
 	})
 
 	t.Run("Creates backup fails when the timeout is exceeded", func(t *testing.T) {
-		r, ctx, dep, sender, cleanup := testBackupRunner(testDefaultSpecs(), 0)
+		r, ctx, dep, sender, converger, cleanup := testBackupRunner(testDefaultSpecs(), 0)
 		defer cleanup()
 
 		r.specs = []Spec{}
 
-		task, err := r.CreateBackup(ctx, dep, sender)
+		task, err := r.CreateBackup(ctx, dep, sender, converger)
 
 		require.NoError(t, err)
 		require.NotNil(t, task)
@@ -51,7 +52,7 @@ func TestRunnerCreate(t *testing.T) {
 
 func TestCreateBackupEvent(t *testing.T) {
 	t.Run("builds an aggregate event", func(t *testing.T) {
-		r, _, _, _, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Millisecond)
+		r, _, _, _, _, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Millisecond)
 		defer cleanup()
 
 		task := &api.BackupTask{Id: ptypes.TimestampNow()}
@@ -102,11 +103,11 @@ func TestListBackups(t *testing.T) {
 		require.NoError(t, err, "test backup directory")
 		defer os.RemoveAll(dir)
 
-		r, ctx, dep, sender, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
+		r, ctx, dep, sender, converger, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
 		defer cleanup()
 
 		r.locationSpec = testLocationSpec(dir)
-		task, err := r.CreateBackup(ctx, dep, sender)
+		task, err := r.CreateBackup(ctx, dep, sender, converger)
 		require.NoError(t, err)
 		require.NotNil(t, task)
 
@@ -141,11 +142,11 @@ func TestBackupDelete(t *testing.T) {
 		require.NoError(t, err, "test backup directory")
 		defer os.RemoveAll(dir)
 
-		r, ctx, dep, sender, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
+		r, ctx, dep, sender, converger, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
 		defer cleanup()
 
 		r.locationSpec = testLocationSpec(dir)
-		task, err := r.CreateBackup(ctx, dep, sender)
+		task, err := r.CreateBackup(ctx, dep, sender, converger)
 		require.NoError(t, err)
 		require.NotNil(t, task)
 
@@ -163,7 +164,7 @@ func TestBackupDelete(t *testing.T) {
 
 func TestCancelBackup(t *testing.T) {
 	t.Run("when default/idle cancel fails", func(t *testing.T) {
-		r, ctx, _, _, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
+		r, ctx, _, _, _, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
 		defer cleanup()
 
 		require.Equal(t, api.BackupStatusResponse_IDLE, r.RunningTask(ctx).Status.OpType)
@@ -178,7 +179,7 @@ func TestCancelBackup(t *testing.T) {
 		"restore": api.BackupStatusResponse_RESTORE,
 	} {
 		t.Run(fmt.Sprintf("%s cancel succeeds", oname), func(t *testing.T) {
-			r, ctx, _, _, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
+			r, ctx, _, _, _, cleanup := testBackupRunner(testDefaultSpecs(), 5*time.Second)
 			defer cleanup()
 			success := false
 			cancelFunc := func() {
@@ -212,18 +213,19 @@ func waitForBackup(e events.EventSender) error {
 	return err
 }
 
-func testBackupRunner(specs []Spec, timeout time.Duration) (*Runner, context.Context, *deployment.Deployment, events.EventSender, func()) {
+func testBackupRunner(specs []Spec, timeout time.Duration) (*Runner, context.Context, *deployment.Deployment, events.EventSender, converge.Converger, func()) {
 	tmpDir, _ := ioutil.TempDir("", "runner-test")
 
 	sender := events.NewMemoryEventSender("test-backup")
 	ctx, _ := context.WithTimeout(context.Background(), timeout)
 	dep, _ := deployment.CreateDeployment()
 	dep.Lock()
+	converger := converge.StartConverger() // leaks a goroutine
 
 	return NewRunner(
 		WithSpecs(specs),
 		WithBackupLocationSpecification(testLocationSpec("/tmp")),
-	), ctx, dep, sender, func() { os.RemoveAll(tmpDir) }
+	), ctx, dep, sender, converger, func() { os.RemoveAll(tmpDir) }
 }
 
 func testDefaultSpecs() []Spec {

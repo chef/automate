@@ -14,7 +14,7 @@ import (
 // CreateBackup makes a gRPC request to the deployment service to start a
 // new backup create routine. The server returns a backup ID which can be used
 // to stream backup events.
-func CreateBackup(conTimeout, reqTimeout time.Duration, _ cli.FormatWriter) (*api.CreateBackupResponse, error) {
+func CreateBackup(conTimeout, reqTimeout time.Duration, writer cli.FormatWriter) (*api.CreateBackupResponse, error) {
 	con, ctx, cancel, err := newCon(conTimeout, reqTimeout)
 	defer cancel()
 
@@ -26,16 +26,21 @@ func CreateBackup(conTimeout, reqTimeout time.Duration, _ cli.FormatWriter) (*ap
 		)
 	}
 
-	res, err := con.CreateBackup(ctx, &api.CreateBackupRequest{})
-	if err != nil {
-		err = status.Wrap(
-			err,
-			status.DeploymentServiceCallError,
-			"Request to create a backup failed",
-		)
+	for {
+		res, err := con.CreateBackup(ctx, &api.CreateBackupRequest{})
+		if err == nil {
+			return res, nil
+		} else if !api.IsRetriableGRPCStatus(err) {
+			return nil, status.Wrap(
+				err,
+				status.DeploymentServiceCallError,
+				"Request to create a backup failed",
+			)
+		} else {
+			writer.Printf("Deployment service currently unavailable (%s) retrying in 30 seconds\n", err)
+			time.Sleep(30 * time.Second)
+		}
 	}
-
-	return res, err
 }
 
 // StreamBackupStatus makes a gRPC request to the deployment service and

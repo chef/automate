@@ -33,6 +33,8 @@ type Converger interface {
 	Converge(*Task, DesiredState, EventSink) error
 	StopServices(*Task, target.Target, EventSink) error
 	PrepareForShutdown(*Task, target.Target, EventSink) error
+	StartBackup(*Task) error
+	BackupComplete(*Task) error
 
 	// Stop() stops the Converger, not the deployment-service or
 	// any other Automate services.
@@ -267,6 +269,34 @@ func (s *prepareForShutdownRequest) SendResponse(err error) {
 
 func (s *prepareForShutdownRequest) String() string { return "prepareForShutdown" }
 
+// startBackup is a user-sendable message that instructs the converger
+// that a backup is about to start.
+type startBackup struct {
+	doneChan chan error
+}
+
+func (s *startBackup) SendResponse(err error) {
+	s.doneChan <- err
+	close(s.doneChan)
+}
+
+func (s *startBackup) String() string { return "startBackup" }
+
+// backupComplete is a user-sendable message that instructs the converger
+// that a backup is done.
+type backupComplete struct {
+	doneChan chan error
+}
+
+func (s *backupComplete) SendResponse(err error) {
+	if s.doneChan != nil {
+		s.doneChan <- err
+		close(s.doneChan)
+	}
+}
+
+func (s *backupComplete) String() string { return "backupComplete" }
+
 // States
 //
 // We use the following state machine to handle the two "waiting"
@@ -320,8 +350,10 @@ func (i *idle) ProcessMessage(c *converger, msg message) (state, bool, error) {
 			return i.handleError(err)
 		}
 		return newWaitingForRestart(), false, nil
-	case *timeout:
-		logrus.Warn("received timeout when in idle state.")
+	case *startBackup:
+		return &backupRunning{}, false, nil
+	case *timeout, *backupComplete:
+		logrus.Warnf("received %s when in idle state", msg)
 		return i, false, nil
 	default:
 		return i, false, UnknownMessageError(msg, i)
@@ -373,7 +405,7 @@ func (w *waitingForRestart) ProcessMessage(_ *converger, msg message) (state, bo
 	case *timeout:
 		logrus.Info("timed out waiting for restart, re-entering idle state")
 		return &idle{}, true, nil
-	case *stopServicesRequest, *prepareForShutdownRequest, *convergeRequest:
+	case *stopServicesRequest, *prepareForShutdownRequest, *convergeRequest, *startBackup, *backupComplete:
 		logrus.Infof("ignoring message %v because we are waiting to be restarted", msg)
 		return w, false, api.ErrRestartPending
 	default:
@@ -402,7 +434,7 @@ func (w *waitingForReconfigure) ProcessMessage(c *converger, msg message) (state
 	case *timeout:
 		logrus.Warnf("No restart occurred from reconfigure after %s, giving up", waitingForReconfigureTimeout)
 		return &idle{}, true, nil
-	case *stopServicesRequest, *prepareForShutdownRequest, *convergeRequest:
+	case *stopServicesRequest, *prepareForShutdownRequest, *convergeRequest, *backupComplete, *startBackup:
 		logrus.Infof("ignoring message %v because we are waiting to be reconfigured", msg)
 		return w, false, api.ErrSelfReconfigurePending
 	default:
@@ -411,6 +443,27 @@ func (w *waitingForReconfigure) ProcessMessage(c *converger, msg message) (state
 }
 
 func (w *waitingForReconfigure) String() string { return "waiting for reconfigure" }
+
+type backupRunning struct{}
+
+func (b *backupRunning) ProcessMessage(c *converger, msg message) (state, bool, error) {
+	switch msg.(type) {
+	case *timeout:
+		logrus.Warn("Unexpected timeout when in backupRunning state")
+		return b, true, nil
+	case *stopServicesRequest, *prepareForShutdownRequest, *convergeRequest, *startBackup:
+		return b, false, api.ErrBackupInProgress
+	case *backupComplete:
+		return &idle{}, true, nil
+	default:
+		return b, false, UnknownMessageError(msg, b)
+	}
+}
+
+func (i *backupRunning) TimeoutChan() <-chan time.Time { return nil }
+func (i *backupRunning) StopTimer()                    {}
+
+func (b *backupRunning) String() string { return "a backup is in progress" }
 
 // timeoutable is can be embedded in state's that want to time out
 // after a duration.
@@ -466,6 +519,20 @@ func (converger *converger) PrepareForShutdown(t *Task, tgt target.Target, event
 		desiredState: makeStoppedDesiredState(tgt), //TODO(jaym) make a copy
 		doneChan:     t.C,
 	})
+}
+
+func (converger *converger) StartBackup(t *Task) error {
+	return converger.sendMessage(t, &startBackup{
+		doneChan: t.C,
+	})
+}
+
+func (converger *converger) BackupComplete(t *Task) error {
+	msg := &backupComplete{}
+	if t != nil {
+		msg.doneChan = t.C
+	}
+	return converger.sendMessage(t, msg)
 }
 
 func makeStoppedDesiredState(tgt target.Target) DesiredState {

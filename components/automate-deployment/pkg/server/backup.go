@@ -11,6 +11,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/backup"
+	"github.com/chef/automate/components/automate-deployment/pkg/converge"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest/client"
 )
@@ -38,9 +39,30 @@ func (s *server) CreateBackup(ctx context.Context, req *api.CreateBackupRequest)
 		return nil, err
 	}
 
-	sender := s.newEventSender()
+	// Tell the converger we are going to start a backup
+	t, err := converge.NewTask()
+	if err != nil {
+		s.deployment.Unlock()
+		logrus.WithError(err).Error("Failed to create task")
+		return nil, err
+	}
 
-	task, err := s.backupRunner.CreateBackup(ctx, s.deployment, sender)
+	err = s.converger.StartBackup(t)
+	if err != nil {
+		s.deployment.Unlock()
+		logrus.WithError(err).Error("Failed to start backup")
+		return nil, err
+	}
+
+	err = <-t.C
+	if err != nil {
+		s.deployment.Unlock()
+		logrus.WithError(err).Error("Failed to start backup")
+		return nil, err
+	}
+
+	sender := s.newEventSender()
+	task, err := s.backupRunner.CreateBackup(ctx, s.deployment, sender, s.converger)
 	if err != nil {
 		// CreateBackup doesn't look like it can return an error. But if it did,
 		// the mutex needs to be unlocked?

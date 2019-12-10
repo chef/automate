@@ -20,8 +20,6 @@ import (
 	"time"
 
 	"github.com/sirupsen/logrus"
-	"google.golang.org/grpc/codes"
-	gstatus "google.golang.org/grpc/status"
 
 	dc "github.com/chef/automate/api/config/deployment"
 	api "github.com/chef/automate/api/interservice/deployment"
@@ -779,22 +777,7 @@ func (d *deployer) configureDeployment() {
 		}
 		errResponse = status.Wrap(err, status.DeploymentServiceCallError, "Request to configure deployment failed")
 
-		retry := false
-		if grpcStatus, ok := gstatus.FromError(err); ok {
-			// first test for grpc codes:
-			// codes.Unavailable means that we can retry
-			if grpcStatus.Code() == codes.Unavailable {
-				retry = true
-			}
-
-			// back-compat: old versions of the server don't return a code so we
-			// should check the message
-			if grpcStatus.Code() == codes.Unknown {
-				retry = api.IsDeploymentServicePendingMessage(grpcStatus.Message())
-			}
-		}
-
-		if retry {
+		if api.IsRetriableGRPCStatus(err) {
 			d.writer.Bodyf(
 				"deployment-service pending updates: retry %d/%d",
 				retries, maxRetries,
