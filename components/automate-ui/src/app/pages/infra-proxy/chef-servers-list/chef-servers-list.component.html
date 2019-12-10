@@ -44,7 +44,7 @@
                     <chef-table-cell>{{ server.fqdn }}</chef-table-cell>
                     <chef-table-cell>{{ server.ip_address }}</chef-table-cell>
                     <chef-table-cell>{{ server.description }}</chef-table-cell>
-                    <chef-table-cell class="three-dot-column">
+                    <chef-table-cell class="controls">
                       <chef-control-menu>
                         <chef-option data-cy="delete" (click)="startServerDelete(server)">Remove Chef Server</chef-option>
                       </chef-control-menu>

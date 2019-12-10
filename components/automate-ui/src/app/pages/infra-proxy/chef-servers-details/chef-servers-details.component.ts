@@ -11,13 +11,13 @@ import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
-import { EntityStatus, allLoaded } from 'app/entities/entities';
+import { EntityStatus, allLoaded, loading } from 'app/entities/entities';
 import {
-  getStatus, serverFromRoute
+  getStatus, serverFromRoute, updateStatus
 } from 'app/entities/servers/server.selectors';
 
 import { Server } from 'app/entities/servers/server.model';
-import { GetServer } from 'app/entities/servers/server.actions';
+import { GetServer, UpdateServer } from 'app/entities/servers/server.actions';
 import { GetOrgsForServer, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
@@ -49,6 +49,7 @@ export class ChefServersDetailsComponent implements OnInit, OnDestroy {
   public deleteModalVisible = false;
   public modalType: string;
   private id: string;
+  public saveSuccessful = false;
 
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
@@ -80,9 +81,10 @@ export class ChefServersDetailsComponent implements OnInit, OnDestroy {
     });
 
     this.updateServerForm = this.fb.group({
-      name: ['chef-server', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      fqdn: ['chef.io', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      ip_address: ['198.162.0', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      fqdn: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      ip_address: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
 
     this.store.select(routeParams).pipe(
@@ -120,6 +122,10 @@ export class ChefServersDetailsComponent implements OnInit, OnDestroy {
         ).subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
           this.server = { ...ServerState };
           this.orgs = allOrgsState;
+          this.updateServerForm.controls['name'].setValue(this.server.name);
+          this.updateServerForm.controls['description'].setValue(this.server.description);
+          this.updateServerForm.controls['fqdn'].setValue(this.server.fqdn);
+          this.updateServerForm.controls['ip_address'].setValue(this.server.ip_address);
           this.creatingServerOrg = false;
           this.closeCreateModal();
         });
@@ -182,4 +188,33 @@ export class ChefServersDetailsComponent implements OnInit, OnDestroy {
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
   }
+
+  saveServer(): void {
+    this.saveSuccessful = false;
+    this.saving = true;
+    const updatedServer = {
+      id: this.server.id,
+      name: this.updateServerForm.controls.name.value.trim(),
+      description: this.updateServerForm.controls.description.value.trim(),
+      fqdn: this.updateServerForm.controls.fqdn.value.trim(),
+      ip_address: this.updateServerForm.controls.ip_address.value.trim()
+    };
+    this.store.dispatch(new UpdateServer({server: updatedServer}));
+    const pendingSave = new Subject<boolean>();
+    this.store.select(updateStatus).pipe(
+      filter(identity),
+      takeUntil(pendingSave))
+      .subscribe((state) => {
+        if (!loading(state)) {
+          pendingSave.next(true);
+          pendingSave.complete();
+          this.saving = false;
+          this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+          if (this.saveSuccessful) {
+            this.updateServerForm.markAsPristine();
+          }
+        }
+      });
+  }
+
 }

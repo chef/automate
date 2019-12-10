@@ -13,7 +13,7 @@ export interface CookbookEntityState extends EntityState<Cookbook> {
 const GET_ALL_STATUS = 'getAllStatus';
 
 export const cookbookEntityAdapter: EntityAdapter<Cookbook> = createEntityAdapter<Cookbook>({
-  selectId: (cookbook: Cookbook) => cookbook.name,
+  selectId: (cookbook: Cookbook) => cookbook.name
 });
 
 export const CookbookEntityInitialState: CookbookEntityState =

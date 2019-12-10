@@ -10,6 +10,7 @@ export interface ServerEntityState extends EntityState<Server> {
   saveStatus: EntityStatus;
   saveError: HttpErrorResponse;
   getStatus: EntityStatus;
+  updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
 }
 
@@ -18,6 +19,7 @@ export interface ServerEntityState extends EntityState<Server> {
 const STATUS = 'status';
 const SAVE_STATUS = 'saveStatus';
 const SAVE_ERROR = 'saveError';
+const UPDATE_STATUS = 'updateStatus';
 const GET_STATUS = 'getStatus';
 
 export const serverEntityAdapter: EntityAdapter<Server> = createEntityAdapter<Server>();
@@ -27,6 +29,7 @@ export const ServerEntityInitialState: ServerEntityState =
     status: EntityStatus.notLoaded,
     saveStatus: EntityStatus.notLoaded,
     saveError: null,
+    updateStatus: EntityStatus.notLoaded,
     getStatus: EntityStatus.notLoaded,
     deleteStatus: EntityStatus.notLoaded
   });
@@ -107,6 +110,19 @@ export function serverEntityReducer(
     case ServerActionTypes.DELETE_FAILURE: {
       return set('deleteStatus', EntityStatus.loadingFailure, state);
     }
+
+    case ServerActionTypes.UPDATE:
+      return set(UPDATE_STATUS, EntityStatus.loading, state);
+
+    case ServerActionTypes.UPDATE_SUCCESS:
+      return set(UPDATE_STATUS, EntityStatus.loadingSuccess,
+        serverEntityAdapter.updateOne({
+          id: action.payload.server.id,
+          changes: action.payload.server
+        }, state));
+
+    case ServerActionTypes.UPDATE_FAILURE:
+      return set(UPDATE_STATUS, EntityStatus.loadingFailure, state);
 
   }
 

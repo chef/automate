@@ -20,6 +20,9 @@ import {
   CreateServer,
   CreateServerSuccess,
   CreateServerFailure,
+  UpdateServer,
+  UpdateServerSuccess,
+  UpdateServerFailure,
   DeleteServer,
   DeleteServerSuccess,
   DeleteServerFailure
@@ -100,6 +103,26 @@ export class ServerEffects {
         type: Type.error,
         message: `Could not create server: ${payload.error.error || payload}`
       })));
+
+      @Effect()
+      updateServer$ = this.actions$.pipe(
+          ofType(ServerActionTypes.UPDATE),
+          mergeMap(({ payload: { server } }: UpdateServer) =>
+            this.requests.updateServer(server).pipe(
+              map((resp: ServerSuccessPayload) => new UpdateServerSuccess(resp)),
+              catchError((error: HttpErrorResponse) =>
+                observableOf(new UpdateServerFailure(error))))));
+
+      @Effect()
+      updateProjectFailure$ = this.actions$.pipe(
+          ofType(ServerActionTypes.UPDATE_FAILURE),
+          map(({ payload }: UpdateServerFailure) => {
+            const msg = payload.error.error;
+            return new CreateNotification({
+              type: Type.error,
+              message: `Could not update server: ${msg || payload.error}`
+            });
+          }));
 
   @Effect()
   deleteServer$ = this.actions$.pipe(

@@ -37,6 +37,11 @@ export const serverFromRoute = createSelector(
   (state, { id }) => find({ id }, state)
 );
 
+export const updateStatus = createSelector(
+  serverState,
+  (state) => state.updateStatus
+);
+
 export const deleteStatus = createSelector(
   serverState,
   (state) => state.deleteStatus

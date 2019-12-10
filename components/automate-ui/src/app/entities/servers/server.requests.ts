@@ -5,7 +5,7 @@ import { mapKeys, snakeCase } from 'lodash/fp';
 
 import { environment as env } from 'environments/environment';
 import { Server } from './server.model';
-import { CreateServerPayload } from './server.actions';
+import { CreateServerPayload, ServerSuccessPayload } from './server.actions';
 
 export interface ServersResponse {
   servers: Server[];
@@ -31,6 +31,11 @@ export class ServerRequests {
   public createServer(serverData: CreateServerPayload): Observable<ServerResponse> {
     return this.http.post<ServerResponse>(
       `${env.gateway_url}/infra_proxy/servers`, mapKeys(snakeCase, serverData));
+  }
+
+  public updateServer(server: Server): Observable<ServerSuccessPayload> {
+    return this.http.put<ServerSuccessPayload>(
+      `${env.gateway_url}/infra_proxy/servers/${server.id}`, server);
   }
 
   public deleteServer(id: string): Observable<ServerResponse> {
