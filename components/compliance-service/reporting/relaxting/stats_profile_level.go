@@ -450,9 +450,6 @@ func (depth *ProfileDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggrega
 	aggHighRisk := elastic.NewFilterAggregation().
 		Filter(elastic.NewRangeQuery("profiles.controls_sums.failed.critical").Gt(0))
 
-	// TODO: This needs some other query type that takes two paths
-	// RDM- I think that this term query fixes this TODO
-	// basically if total waived controls == total controls, we have a waived node
 	aggWaived := elastic.NewFilterAggregation().
 		Filter(elastic.NewTermQuery("profiles.status", "waived"))
 
