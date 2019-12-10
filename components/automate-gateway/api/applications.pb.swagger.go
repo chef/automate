@@ -568,7 +568,7 @@ func init() {
           "description": "The ` + "`" + `threshold` + "`" + ` setting used by periodic jobs for evaluating services.\nThreshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under ` + "`" + `lib/` + "`" + `."
         }
       },
-      "description": "Configuration for the mandatory periodic job.\nRequired and cannot be modified."
+      "description": "Configuration for the mandatory periodic job.\nRequired and cannot be disabled."
     },
     "chef.automate.api.applications.Service": {
       "type": "object",

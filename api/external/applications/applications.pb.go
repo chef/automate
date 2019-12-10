@@ -624,7 +624,7 @@ func (m *PeriodicJobConfig) GetThreshold() string {
 }
 
 // Configuration for the mandatory periodic job.
-// Required and cannot be modified.
+// Required and cannot be disabled.
 type PeriodicMandatoryJobConfig struct {
 	// The `threshold` setting used by periodic jobs for evaluating services.
 	// Threshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under `lib/`.
