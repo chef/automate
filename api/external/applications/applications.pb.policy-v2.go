@@ -52,6 +52,9 @@ func init() {
 	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/DeleteDisconnectedServices", "applications:serviceGroups", "applications:serviceGroups:delete", "POST", "/applications/delete_disconnected_services", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetVersion", "system:service:version", "system:serviceVersion:get", "GET", "/applications/version", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetDisconnectedServicesConfig", "retention:serviceGroups", "retention:serviceGroups:get", "GET", "/retention/service_groups/disconnected_services/config", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
@@ -83,8 +86,5 @@ func init() {
 			})
 		}
 		return ""
-	})
-	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetVersion", "system:service:version", "system:serviceVersion:get", "GET", "/applications/version", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
 	})
 }
