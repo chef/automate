@@ -17,7 +17,7 @@ info:
     ```
     curl -s -H "api-token: $TOKEN" https://automate.example.com/api/v0/auth/policies -v
     ```
-    
+
     With the admin token, it is possible to create standard tokens with more limited permissions.
     The following curl returns a new token object whose value can be set to a new variable:
 
@@ -35,14 +35,7 @@ info:
     export TOKEN2=bww8EEpr39_eYMnQ2zybtrP9uzk=
     ```
 
-    You can grant a standard token access to specific parts of the Chef Automate API 
-    if you write a policy. 
-    The [Permission for An API Client](https://automate.chef.io/docs/authorization-overview/#permission-for-an-api-client)
-    section of the Automate documentation walks through how to grant a token access to all Compliance API endpoints.
-
-    For more information about authentication, refer to the
-    [API Tokens](https://automate.chef.io/docs/api-tokens/)
-    section of the Automate documentation. 
-    For more information about authorization, refer to the 
-    [Authorization Overview](https://automate.chef.io/docs/authorization-overview/#overview) 
-    section of the Automate documentation.
+    The Chef Automate documentation covers policies, authentication, and authorization in greater detail.
+    * **[Permission for An API Client](https://automate.chef.io/docs/authorization-overview/#permission-for-an-api-client)** walks through how to limit access to the Chef Automate API by writing a policy for a standard token.
+    * **[API Tokens](https://automate.chef.io/docs/api-tokens/)** explains authentication in Chef Automate.
+    * **[Authorization Overview](https://automate.chef.io/docs/authorization-overview/#overview)** explains authorization in Chef Automate.
