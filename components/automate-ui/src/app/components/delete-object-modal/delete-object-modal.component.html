@@ -7,7 +7,7 @@
   <div *ngIf="errorText" class="error">{{ errorText }}</div>
 
   <div class="options">
-    <chef-button primary caution (click)="deleteObject()">
+    <chef-button primary caution [disabled]="!!errorText" (click)="deleteObject()">
       {{objectAction}} {{objectNoun | titlecase}}
     </chef-button>
     <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>

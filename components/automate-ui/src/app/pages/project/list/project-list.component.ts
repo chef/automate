@@ -182,9 +182,12 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   public startProjectDelete(p: Project): void {
-    this.deleteErrorMessage = '';
-    this.deleteModalVisible = true;
+    this.deleteErrorMessage =
+      ['EDITS_PENDING', 'RULES_APPLIED'].includes(p.status)
+        ? `oops ${p.id} has rules--dump them`
+        : '';
     this.projectToDelete = p;
+    this.deleteModalVisible = true;
   }
 
   public deleteProject(): void {

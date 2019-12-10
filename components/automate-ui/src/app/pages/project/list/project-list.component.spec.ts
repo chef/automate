@@ -5,6 +5,7 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
+import { using } from 'app/testing/spec-helpers';
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { GrpcStatus, HttpStatus } from 'app/types/types';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
@@ -180,9 +181,24 @@ describe('ProjectListComponent', () => {
 
     describe('delete modal', () => {
 
-      it('has empty error message upon opening', () => {
-        component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
-        expect(component.deleteErrorMessage).toBe('');
+      using([
+        ['RULES_APPLIED'],
+        ['EDITS_PENDING']
+      ], function (status: ProjectStatus) {
+        it(`shows error message for ${status}`, () => {
+          component.startProjectDelete(genProject('uuid-111', status));
+          expect(component.deleteErrorMessage).not.toBe('');
+        });
+      });
+
+      using([
+        ['NO_RULES'],
+        ['PROJECT_RULES_STATUS_UNSET']
+      ], function (status: ProjectStatus) {
+        it(`does not show error message for ${status}`, () => {
+          component.startProjectDelete(genProject('uuid-111', status));
+          expect(component.deleteErrorMessage).toBe('');
+        });
       });
 
       it('opens upon selecting delete from control menu', () => {
