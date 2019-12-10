@@ -71,8 +71,8 @@ sudo chef-automate deploy --product builder --product automate
 ### Sign in to Habitat Builder
 1. Sign in to Chef Automate using the [credentials provided during deployment]({{<relref
    "install.md#open-chef-automate">}}).
-1. Go to `https://<your_automate_fqdn>/bldr`.
-1. Select the Sign In button in the upper right corner.
+1. Select Applications in the top navigation bar.
+1. Select Habitat Builder button in the left sidebar.
 1. Select Sign In With Chef Automate.
 1. Use the same credentials as in Step 1 to sign in to Habitat Builder.
 
@@ -131,16 +131,8 @@ The `--auto-create-origins` flag will create each origin listed in the
 use the Habitat Builder UI to create the necessary origins before running the
 `bulkupload` command.
 
-### Backup Habitat Builder
-Builder backups are performed as part of the [Chef Automate backup process]({{<relref "backup.md">}}).
-
-### Log management for Habitat Builder
-See the [documentation]({{<relref "log-management.md">}}) on how to view logs, configure
-log level, and configure log rotation and retention.
-
-### Removing Habitat Builder
-See the [documentation]({{<relref "troubleshooting.md#uninstalling-chef-automate">}}) on
-uninstalling Chef Automate.
+### Operating Habitat Builder
+Habitat Builder uses the same mechanisms that Chef Automate does for [backups]({{<relref "backup.md">}}), [log management]({{<relref "log-management.md">}}), and [uninstallation]({{<relref "troubleshooting.md#uninstalling-chef-automate">}}).
 
 ### Not currently supported
 * high-availability/DR/multinode Builder
