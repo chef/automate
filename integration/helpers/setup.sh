@@ -9,7 +9,7 @@ install_chefdk() {
 
 start_requestbin() {
     export GOBIN="/go/bin"
-    go install integration/helpers/requestbin/requestbin.go
+    go install -mod=vendor integration/helpers/requestbin/requestbin.go
     cat > /etc/systemd/system/requestbin.service <<EOF
 [Unit]
 Description=Requestbin
