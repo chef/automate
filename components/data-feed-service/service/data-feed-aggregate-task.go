@@ -68,9 +68,10 @@ func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (inte
 		return nil, err
 	}
 	for destination := range destinations {
-		log.Debugf("Destination name %v", destinations[destination].Name)
-		log.Debugf("Destination url %v", destinations[destination].URL)
-		log.Debugf("Destination secret %v", destinations[destination].Secret)
+		log.WithFields(log.Fields{
+			"name": destinations[destination].Name,
+			"url": destinations[destination].URL,
+		}).Debug("Destination")
 
 		username, password, err := GetCredentials(ctx, d.secrets, destinations[destination].Secret)
 
