@@ -103,14 +103,14 @@ Use the `hab pkg download` command with a seed list `</path/to/seed_list>` to do
 your desired architecture `<arch>` from a channel `<channel>` to a directory `<artifact-dir>`:
 
 ```shell
-HAB_AUTH_TOKEN=<your_public_Builder_instance_token> hab pkg download --target <arch> --channel <channel> --file </path/to/seed_list> --artifact-directory <artifact-dir>
+HAB_AUTH_TOKEN=<your_public_Builder_instance_token> hab pkg download --target <arch> --channel <channel> --file </path/to/seed_list> --download-directory <artifact-dir>
 ```
 
 For example, to use the Effortless seed list to download `x86_64-linux` packages from the
 `stable` channel to the `builder_bootstrap` directory:
 
 ```shell
-HAB_AUTH_TOKEN=<your_public_Builder_instance_token> hab pkg download --target x86_64-linux --channel stable --file package_seed_lists/effortless_x86_64-linux_stable --artifact-directory builder_bootstrap
+HAB_AUTH_TOKEN=<your_public_Builder_instance_token> hab pkg download --target x86_64-linux --channel stable --file package_seed_lists/effortless_x86_64-linux_stable --download-directory builder_bootstrap
 ```
 
 #### Bulk-upload packages to on-premises Habitat Builder
@@ -120,16 +120,16 @@ access your on-premises Habitat Builder at `https://<your_automate_fqdn>/bldr`.
 1. If your on-premises Habitat Builder is using a self-signed certificate, copy the SSL
    public key certificate chain into `/hab/cache/ssl` on the host from which you will
    perform the bulk upload to Habitat Builder.
-1. Inspect the contents of your `<artifact-dir>/artifacts` directory. For each origin
-   listed in that directory, make sure that origin exists in your on-premises Habitat
-   Builder. If that origin does not exist in your on-premises Habitat Builder, create it
-   in the Habitat Builder UI.
 1. Run the `bulkupload` command to upload artifacts from `<artifact-dir>` to the
    `<channel>` channel in on-premises Habitat Builder:
 
    ```shell
-   HAB_AUTH_TOKEN=<your_on-prem_Builder_instance_token> hab pkg bulkupload --url https://<your_automate_fqdn>/bldr/v1 --channel <channel> <artifact-dir>
+   HAB_AUTH_TOKEN=<your_on-prem_Builder_instance_token> hab pkg bulkupload --url https://<your_automate_fqdn>/bldr/v1 --channel <channel> <artifact-dir> --auto-create-origins
    ```
+   The `--auto-create-origins` flag will create each origin listed in the
+   `<artifact-dir>/artifacts` directory. If you omit the `--auto-create-origins` flag,
+   use the Habitat Builder UI to create the necessary origins before running the
+   `bulkupload` command.
 
 ### Backup Habitat Builder
 Builder backups are performed as part of the [Chef Automate backup process]({{<relref "backup.md">}}).
