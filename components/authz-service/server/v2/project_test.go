@@ -252,7 +252,7 @@ func TestDeleteProject(t *testing.T) {
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, resp)
 		}},
-		{"deletes custom project when one project is in database", func(t *testing.T) {
+		{"deletes custom project with no rules when one project is in database", func(t *testing.T) {
 			require.Zero(t, projects.ItemCount())
 			id := fmt.Sprintf("test-project-%d", time.Now().UnixNano())
 			addProjectToStore(t, projects, id, "my foo", storage.Custom)
@@ -261,7 +261,7 @@ func TestDeleteProject(t *testing.T) {
 			require.NoError(t, err)
 			assert.Zero(t, projects.ItemCount())
 		}},
-		{"deletes custom project when several are in database", func(t *testing.T) {
+		{"deletes custom project with no rules when several projects are in database", func(t *testing.T) {
 			require.Zero(t, projects.ItemCount())
 			id := fmt.Sprintf("test-project-%d", time.Now().UnixNano())
 			addProjectToStore(t, projects, id, "my foo", storage.Custom)

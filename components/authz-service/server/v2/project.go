@@ -541,15 +541,13 @@ func (s *ProjectState) DeleteRule(ctx context.Context, req *api.DeleteRuleReq) (
 	}
 }
 
-const ruleSetEditsPendingStatus = "edits-pending"
-
 func (s *ProjectState) validateProjectDelete(ctx context.Context, projectID string) error {
 	projectResponse, err := s.GetProject(ctx, &api.GetProjectReq{Id: projectID})
 	if err != nil {
 		return err
 	}
 
-	if projectResponse.Project.Status == ruleSetEditsPendingStatus {
+	if projectResponse.Project.Status == storage.EditsPending.String() {
 		return status.Errorf(codes.FailedPrecondition,
 			"Project %q can not be deleted because it has edits pending", projectResponse.Project.Name)
 	}
