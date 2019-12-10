@@ -62,7 +62,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 15
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -115,7 +116,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 15
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -167,7 +169,8 @@ describe File.basename(__FILE__) do
                             "total" => 2,
                             "major" => 1,
                             "critical" => 1
-                        }
+                        },
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -212,7 +215,8 @@ describe File.basename(__FILE__) do
                             "total" => 2,
                             "major" => 1,
                             "critical" => 1
-                        }
+                        },
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -257,7 +261,8 @@ describe File.basename(__FILE__) do
                             "total" => 2,
                             "major" => 1,
                             "critical" => 1
-                        }
+                        },
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -296,7 +301,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 14
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -345,7 +351,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 14
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -390,7 +397,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 14
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -442,7 +450,8 @@ describe File.basename(__FILE__) do
                             "total" => 2,
                             "major" => 1,
                             "critical" => 1
-                        }
+                        },
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -495,7 +504,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 14
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -542,7 +552,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 15
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -612,7 +623,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 15
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -674,7 +686,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 15
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -735,7 +748,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 15
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -803,7 +817,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 15
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -849,7 +864,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 14
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 "profiles" => [
@@ -906,7 +922,8 @@ describe File.basename(__FILE__) do
                             "skipped" => {
                                 "total" => 14
                             },
-                            "failed" => {}
+                            "failed" => {},
+                            "waived" => {}
                         }
                     },
                     "profiles" => [
@@ -940,7 +957,8 @@ describe File.basename(__FILE__) do
                             "skipped" => {
                                 "total" => 15
                             },
-                            "failed" => {}
+                            "failed" => {},
+                            "waived" => {}
                         }
                     },
                     "profiles" => [
@@ -992,7 +1010,8 @@ describe File.basename(__FILE__) do
                                 "total" => 2,
                                 "major" => 1,
                                 "critical" => 1
-                            }
+                            },
+                            "waived" => {}
                         }
                     },
                     "profiles" => [
@@ -1037,7 +1056,8 @@ describe File.basename(__FILE__) do
                                 "total" => 2,
                                 "major" => 1,
                                 "critical" => 1
-                            }
+                            },
+                            "waived" => {}
                         }
                     },
                     "profiles" => [
@@ -1082,7 +1102,8 @@ describe File.basename(__FILE__) do
                                 "total" => 2,
                                 "major" => 1,
                                 "critical" => 1
-                            }
+                            },
+                            "waived" => {}
                         }
                     },
                     "profiles" => [
@@ -1137,7 +1158,8 @@ describe File.basename(__FILE__) do
                             "skipped" => {
                                 "total" => 15
                             },
-                            "failed" => {}
+                            "failed" => {},
+                            "waived" => {}
                         }
                     },
                     "profiles" => [
@@ -1189,7 +1211,8 @@ describe File.basename(__FILE__) do
                                 "total" => 2,
                                 "major" => 1,
                                 "critical" => 1
-                            }
+                            },
+                            "waived" => {}
                         }
                     },
                     "profiles" => [
@@ -1234,7 +1257,8 @@ describe File.basename(__FILE__) do
                                 "total" => 2,
                                 "major" => 1,
                                 "critical" => 1
-                            }
+                            },
+                            "waived" => {}
                         }
                     },
                     "profiles" => [
@@ -1279,7 +1303,8 @@ describe File.basename(__FILE__) do
                                 "total" => 2,
                                 "major" => 1,
                                 "critical" => 1
-                            }
+                            },
+                            "waived" => {}
                         }
                     },
                     "profiles" => [
@@ -1318,7 +1343,8 @@ describe File.basename(__FILE__) do
                             "skipped" => {
                                 "total" => 14
                             },
-                            "failed" => {}
+                            "failed" => {},
+                            "waived" => {}
                         }
                     },
                     "profiles" => [
@@ -1338,6 +1364,83 @@ describe File.basename(__FILE__) do
             "totalSkipped" => 1
         }.to_json
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+
+    # Get nodes from 2018-04-01
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+    ])
+    expected_nodes =
+        {
+          "nodes"=>
+            [
+              {
+                "environment"=>"DevSec Prod Omega",
+                "id"=>"34cbbb4c-c502-4971-1111-888888888888",
+                "latestReport"=>{
+                  "controls"=>{
+                    "failed"=>{"critical"=>2, "total"=>2},
+                    "passed"=>{},
+                    "skipped"=>{},
+                    "total"=>6,
+                    "waived"=>{"total"=>4}
+                  },
+                  "endTime"=>"2018-04-01T10:18:41Z",
+                  "id"=>"44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy",
+                  "status"=>"failed"
+                },
+                "name"=>"osx(2)-omega-pro1(f)-pro2(w)-failed",
+                "platform"=>{"full"=>"mac_os_x 17.7.0", "name"=>"mac_os_x", "release"=>"17.7.0"},
+                "profiles"=>[
+                  {
+                    "full"=>"My Profile 1 title, v1.0.1",
+                    "id"=>"447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                    "name"=>"myprofile1",
+                    "status"=>"failed",
+                    "version"=>"1.0.1"
+                  },
+                  {
+                    "full"=>"My Profile 2 title, v1.0.5",
+                    "id"=>"447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
+                    "name"=>"myprofile2",
+                    "status"=>"waived",
+                    "version"=>"1.0.5"
+                  }
+                ]
+              },
+              {
+                "environment"=>"DevSec Prod Omega",
+                "id"=>"34cbbb55-c502-4971-2222-999999999999",
+                "latestReport"=>{
+                  "controls"=>{
+                    "failed"=>{},
+                    "passed"=>{},
+                    "skipped"=>{},
+                    "total"=>1,
+                    "waived"=>{"total"=>1}
+                  },
+                  "endTime"=>"2018-04-01T10:18:41Z",
+                  "id"=>"44024b50-2e0d-42fa-dddd-wwwwwwwwwwww",
+                  "status"=>"waived"
+                },
+                "name"=>"osx(1)-omega-pro2(w)-waived",
+                "platform"=>{"full"=>"mac_os_x 17.7.0", "name"=>"mac_os_x", "release"=>"17.7.0"},
+                "profiles"=>[
+                  {
+                    "full"=>"My Profile 2 title, v1.0.5",
+                    "id"=>"447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
+                    "name"=>"myprofile2",
+                    "status"=>"waived",
+                    "version"=>"1.0.5"
+                  }
+                ]
+              }
+            ],
+            "total"=>2,
+            "totalFailed"=>1,
+            "totalWaived"=>1,
+        }.to_json
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+
 
     # Cover the other sort fields:
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(
@@ -1382,7 +1485,8 @@ describe File.basename(__FILE__) do
                 "failed" => {
                     "total" => 2,
                     "major" => 2
-                }
+                },
+                "waived" => {}
             }
         },
         "profiles" => [
@@ -1403,6 +1507,45 @@ describe File.basename(__FILE__) do
         ]
     }
     assert_equal_json_sorted( expected_node.to_json, actual_node.to_json)
+
+    # Node details API
+    actual_node = GRPC reporting, :read_node, Reporting::Id.new(id: '34cbbb4c-c502-4971-1111-888888888888')
+    expected_node = {
+      "environment"=>"DevSec Prod Omega",
+      "id"=>"34cbbb4c-c502-4971-1111-888888888888",
+      "latestReport"=>{
+        "controls"=>{
+          "failed"=>{"critical"=>2, "total"=>2},
+          "passed"=>{},
+          "skipped"=>{},
+          "total"=>6,
+          "waived"=>{"total"=>4}
+        },
+        "endTime"=>"2018-04-01T10:18:41Z",
+        "id"=>"44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy",
+        "status"=>"failed"
+      },
+      "name"=>"osx(2)-omega-pro1(f)-pro2(w)-failed",
+      "platform"=>{"full"=>"mac_os_x 17.7.0", "name"=>"mac_os_x", "release"=>"17.7.0"},
+      "profiles"=>[
+        {
+          "full"=>"My Profile 1 title, v1.0.1",
+          "id"=>"447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+          "name"=>"myprofile1",
+          "status"=>"failed",
+          "version"=>"1.0.1"
+        },
+        {
+          "full"=>"My Profile 2 title, v1.0.5",
+          "id"=>"447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
+          "name"=>"myprofile2",
+          "status"=>"waived",
+          "version"=>"1.0.5"
+        }
+      ]
+    }
+    assert_equal_json_sorted( expected_node.to_json, actual_node.to_json)
+
 
     # sort by node name ASC when a profile filter is used
     resp = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [

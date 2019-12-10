@@ -46,6 +46,7 @@ describe File.basename(__FILE__) do
         {
             "ids" => ["3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
                       "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy",
+                      "44024b50-2e0d-42fa-dddd-wwwwwwwwwwww",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc05",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc08",
@@ -104,6 +105,7 @@ describe File.basename(__FILE__) do
             "ids" => ["3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
                       "44024b50-2e0d-42fa-a57c-dddddddddddd",
                       "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy",
+                      "44024b50-2e0d-42fa-dddd-wwwwwwwwwwww",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc05",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc06",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc08",
@@ -116,21 +118,37 @@ describe File.basename(__FILE__) do
 
     ##### Success tests #####
     # Get all reports
-    actual_data = GRPC reporting, :list_reports, Reporting::Query.new()
+    actual_data = GRPC reporting, :list_reports, Reporting::Query.new(per_page: 20)
     expected_json =
         {
             "reports" => [
+                {
+                  "controls"=>{
+                    "failed"=>{},
+                    "passed"=>{},
+                    "skipped"=>{},
+                    "total"=>1,
+                    "waived"=>{"total"=>1}
+                  },
+                  "endTime"=>"2018-04-01T10:18:41Z",
+                  "id"=>"44024b50-2e0d-42fa-dddd-wwwwwwwwwwww",
+                  "ipaddress"=>"192.168.56.66",
+                  "nodeId"=>"34cbbb55-c502-4971-2222-999999999999",
+                  "nodeName"=>"osx(1)-omega-pro2(w)-waived",
+                  "status"=>"waived"
+                },
                 {
                   "endTime" => "2018-04-01T10:18:41Z",
                   "id" => "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy",
                   "ipaddress" => "192.168.56.66",
                   "nodeId" => "34cbbb4c-c502-4971-1111-888888888888",
-                  "nodeName" => "osx(1)-omega-pro2(w)-waived",
+                  "nodeName" => "osx(2)-omega-pro1(f)-pro2(w)-failed",
                   "status" => "failed",
                   "controls" => {
                     "failed" => {"critical" => 2, "total" => 2},
                     "passed" => {},
                     "skipped" => {},
+                    "waived" => {"total":4},
                     "total" => 6
                   }
                 },
@@ -153,10 +171,9 @@ describe File.basename(__FILE__) do
                             "total" => 21,
                             "critical" => 21
                         },
-                        # COMMENT THIS OUT WHEN WAIVERS API SUPPORT IS ADDED FOR THIS API CALL
-                        # "waived" => {
-                        #     "total" => 3
-                        # }
+                        "waived" => {
+                            "total" => 3
+                        }
                     }
                 },
                 {
@@ -174,7 +191,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 15
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 {
@@ -196,7 +214,8 @@ describe File.basename(__FILE__) do
                             "total" => 2,
                             "major" => 1,
                             "critical" => 1
-                        }
+                        },
+                        "waived" => {}
                     }
                 },
                 {
@@ -218,7 +237,8 @@ describe File.basename(__FILE__) do
                             "total" => 2,
                             "major" => 1,
                             "critical" => 1
-                        }
+                        },
+                        "waived" => {}
                     }
                 },
                 {
@@ -240,7 +260,8 @@ describe File.basename(__FILE__) do
                             "total" => 2,
                             "major" => 1,
                             "critical" => 1
-                        }
+                        },
+                        "waived" => {}
                     }
                 },
                 {
@@ -255,7 +276,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 14
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 {
@@ -273,7 +295,8 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 15
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 },
                 {
@@ -294,7 +317,8 @@ describe File.basename(__FILE__) do
                         "failed" => {
                             "total" => 2,
                             "major" => 2
-                        }
+                        },
+                        "waived" => {}
                     }
                 },
                 {
@@ -307,11 +331,12 @@ describe File.basename(__FILE__) do
                     "controls" => {
                         "passed" => {},
                         "skipped" => {},
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 }
             ],
-            "total" => 10
+            "total" => 11
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
@@ -339,10 +364,9 @@ describe File.basename(__FILE__) do
                         "total" => 21,
                         "critical" => 21
                     },
-                    # COMMENT THIS OUT WHEN WAIVERS API SUPPORT IS ADDED FOR THIS API CALL
-                    # "waived" => {
-                    #     "total" => 3
-                    # }
+                    "waived" => {
+                        "total" => 3
+                    }
                 }
             },
             {
@@ -360,11 +384,12 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 15
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived" => {}
                 }
             }
         ],
-        "total" => 10
+        "total" => 11
     }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
@@ -393,7 +418,8 @@ describe File.basename(__FILE__) do
                             "total" => 2,
                             "major" => 1,
                             "critical" => 1
-                        }
+                        },
+                        "waived" => {}
                     }
                 },
                 {
@@ -415,7 +441,8 @@ describe File.basename(__FILE__) do
                             "total" => 2,
                             "major" => 1,
                             "critical" => 1
-                        }
+                        },
+                        "waived" => {}
                     }
                 },
                 {
@@ -430,11 +457,12 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 14
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 }
             ],
-            "total" => 10
+            "total" => 11
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
@@ -457,7 +485,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived" => {}
                 }
             }
         ],
@@ -486,7 +515,8 @@ describe File.basename(__FILE__) do
                   "skipped" => {
                       "total" => 15
                   },
-                  "failed" => {}
+                  "failed" => {},
+                  "waived" => {}
               }
           },
           {
@@ -508,6 +538,7 @@ describe File.basename(__FILE__) do
               "skipped" => {
                 "total" => 15
               },
+              "waived" => {},
               "total" => 18
             }
           }
@@ -548,10 +579,9 @@ describe File.basename(__FILE__) do
                         "total" => 21,
                         "critical" => 21
                     },
-                    # COMMENT THIS OUT WHEN WAIVERS API SUPPORT IS ADDED FOR THIS API CALL
-                    # "waived" => {
-                    #     "total" => 3
-                    # }
+                    "waived" => {
+                        "total" => 3
+                    }
                 }
             }
         ],
@@ -588,10 +618,9 @@ describe File.basename(__FILE__) do
                         "total" => 21,
                         "critical" => 21
                     },
-                    # COMMENT THIS OUT WHEN WAIVERS API SUPPORT IS ADDED FOR THIS API CALL
-                    # "waived" => {
-                    #     "total" => 3
-                    # }
+                    "waived" => {
+                        "total" => 3
+                    }
                 }
             }
         ],
@@ -628,7 +657,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 15
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived" => {}
                 }
             },
             {
@@ -646,7 +676,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 15
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived" => {}
                 }
             },
             {
@@ -667,7 +698,8 @@ describe File.basename(__FILE__) do
                     "failed" => {
                         "total" => 2,
                         "major" => 2
-                    }
+                    },
+                    "waived" => {}
                 }
             }
         ],
@@ -692,7 +724,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 14
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived" => {}
                 }
             }
         ],
@@ -710,9 +743,9 @@ describe File.basename(__FILE__) do
         "RedHat(2)-beta-nginx(f)-apache(s)-failed",
         "redhat(2)-alpha-nginx(f)-apache(s)-failed",
         "redhat(2)-alpha-nginx(f)-apache(f)-failed",
+        "osx(2)-omega-pro1(f)-pro2(w)-failed",
         "osx(1)-omega-pro2(w)-waived",
         "debian(2)-zeta-linux(f)-apache(p)-failed",
-        "centos-beta",
         "centos-beta",
         "centos-beta"
     ]
@@ -726,11 +759,11 @@ describe File.basename(__FILE__) do
         "centos-beta",
         "debian(2)-zeta-linux(f)-apache(p)-failed",
         "osx(1)-omega-pro2(w)-waived",
+        "osx(2)-omega-pro1(f)-pro2(w)-failed",
         "redhat(2)-alpha-nginx(f)-apache(f)-failed",
         "redhat(2)-alpha-nginx(f)-apache(s)-failed",
         "RedHat(2)-beta-nginx(f)-apache(s)-failed",
-        "ubuntu(1)-alpha-myprofile(s)-skipped",
-        "windows(1)-zeta-apache(s)-skipped"
+        "ubuntu(1)-alpha-myprofile(s)-skipped"
     ]
     assert_equal(expected, resp['reports'].map {|x| x['node_name']})
 
@@ -738,9 +771,9 @@ describe File.basename(__FILE__) do
     assert_equal(Reporting::Reports, resp.class)
     assert_equal(["failed", "failed", "failed", "failed", "failed", "failed", "passed", "passed", "skipped", "skipped"], resp['reports'].map {|x| x['status']})
 
-    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.controls.failed.total')
+    resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.controls.failed.total', per_page: 20)
     assert_equal(Reporting::Reports, resp.class)
-    assert_equal([0, 0, 0, 0, 2, 2, 2, 2, 2, 21], resp['reports'].map {|x| x['controls']['failed']['total']})
+    assert_equal([0, 0, 0, 0, 0, 2, 2, 2, 2, 2, 21], resp['reports'].map {|x| x['controls']['failed']['total']})
 
     resp = GRPC reporting, :list_reports, Reporting::Query.new(sort: 'latest_report.controls.failed.critical', order: 1)
     assert_equal(Reporting::Reports, resp.class)

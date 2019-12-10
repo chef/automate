@@ -148,7 +148,7 @@ describe File.basename(__FILE__) do
         Reporting::ListFilter.new(type: 'environment', values: ['DevSec Prod beta'])  # ignored when suggesting envs
       ]
     )
-    assert_suggestions_text(["DevSec Prod Alpha", "DevSec Prod beta", "DevSec Prod Omega", "DevSec Prod Zeta"], actual_data)
+    assert_suggestions_text(["DevSec Prod Alpha", "DevSec Prod beta", "DevSec Prod Zeta", "DevSec Prod Omega"], actual_data)
 
     # suggest nodes, when we have control_tag and time filters
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(

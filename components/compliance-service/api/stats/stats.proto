@@ -46,6 +46,7 @@ message ControlsSummary {
 	int32 criticals = 4;
 	int32 passed = 5;
 	int32 skipped = 6;
+	int32 waived = 7;
 }
 
 message NodeSummary {
@@ -55,6 +56,7 @@ message NodeSummary {
 	int32 high_risk = 4;
 	int32 medium_risk = 5;
 	int32 low_risk = 6;
+	int32 waived = 7;
 }
 
 message Stats {
