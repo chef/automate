@@ -126,13 +126,21 @@ access your on-premises Habitat Builder at `https://<your_automate_fqdn>/bldr`.
    ```shell
    HAB_AUTH_TOKEN=<your_on-prem_Builder_instance_token> hab pkg bulkupload --url https://<your_automate_fqdn>/bldr/v1 --channel <channel> <artifact-dir> --auto-create-origins
    ```
-   The `--auto-create-origins` flag will create each origin listed in the
-   `<artifact-dir>/artifacts` directory. If you omit the `--auto-create-origins` flag,
-   use the Habitat Builder UI to create the necessary origins before running the
-   `bulkupload` command.
+The `--auto-create-origins` flag will create each origin listed in the
+`<artifact-dir>/artifacts` directory. If you omit the `--auto-create-origins` flag,
+use the Habitat Builder UI to create the necessary origins before running the
+`bulkupload` command.
 
 ### Backup Habitat Builder
 Builder backups are performed as part of the [Chef Automate backup process]({{<relref "backup.md">}}).
+
+### Log management for Habitat Builder
+See the [documentation]({{<relref "log-management.md">}}) on how to view logs, configure
+log level, and configure log rotation and retention.
+
+### Removing Habitat Builder
+See the [documentation]({{<relref "troubleshooting.md#uninstalling-chef-automate">}}) on
+uninstalling Chef Automate.
 
 ### Not currently supported
 * high-availability/DR/multinode Builder
