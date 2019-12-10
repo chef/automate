@@ -113,11 +113,10 @@ export function projectEntityReducer(
         projectEntityAdapter.removeOne(action.payload.id, state));
 
     case ProjectActionTypes.DELETE_FAILURE:
-      const foo = pipe(
+      return pipe(
         set(DELETE_STATUS, EntityStatus.loadingFailure),
         set(DELETE_ERROR, action.payload)
       )(state) as ProjectEntityState;
-      return foo;
 
     case ProjectActionTypes.UPDATE:
       return pipe(
