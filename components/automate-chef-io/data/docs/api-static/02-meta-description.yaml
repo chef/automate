@@ -36,6 +36,6 @@ info:
     ```
 
     The Chef Automate documentation covers policies, authentication, and authorization in greater detail.
-    * **[Permission for An API Client](https://automate.chef.io/docs/authorization-overview/#permission-for-an-api-client)** walks through how to limit access to the Chef Automate API by writing a policy for a standard token.
+    * **[Permission for An API Client](https://automate.chef.io/docs/iam-v1-overview/#permission-for-an-api-client)** walks through how to limit access to the Chef Automate API by writing a policy for a standard token.
     * **[API Tokens](https://automate.chef.io/docs/api-tokens/)** explains authentication in Chef Automate.
-    * **[Authorization Overview](https://automate.chef.io/docs/authorization-overview/#overview)** explains authorization in Chef Automate.
+    * **[Authorization Overview](https://automate.chef.io/docs/iam-v1-overview/#overview)** explains authorization in Chef Automate.
