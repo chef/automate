@@ -88,7 +88,7 @@ export class ServiceGroupsFacadeService {
       previousHealth = previousHealth.toLowerCase();
     }
 
-    return 'Changed from ' + currentHealth + ' to ' + previousHealth;
+    return 'Changed from ' + previousHealth + ' to ' + currentHealth;
   }
 
   public updatePageNumber(pageNumber: number, total: number, pageSize: number, trackEvent: string) {

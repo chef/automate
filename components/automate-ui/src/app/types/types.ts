@@ -263,9 +263,10 @@ export interface RespNodeRun {
     }
   };
   tags: string[];
+  projects: string[];
   resource_names: string[];
   recipes: string[];
-  chef_tags: string;
+  chef_tags: string[];
   cookbooks: string[];
   platform: string;
   platform_family: string;
@@ -273,7 +274,7 @@ export interface RespNodeRun {
   chef_version: string;
   uptime_seconds: number;
   environment: string;
-  roles: string;
+  roles: string[];
   policy_name: string;
   policy_group: string;
   policy_revision: string;
@@ -316,7 +317,7 @@ export class NodeRun {
     node_name: '',
     organization: '',
     resources: [],
-    chef_tags: '',
+    chef_tags: [],
     id: '',
     run_list: [],
     start_time: new Date(0),
@@ -336,7 +337,8 @@ export class NodeRun {
     chef_version: '',
     uptime_seconds: 0,
     environment: '',
-    roles: '',
+    roles: [],
+    projects: [],
     policy_group: '',
     policy_name: '',
     policy_revision: '',
@@ -371,6 +373,7 @@ export class NodeRun {
   source: string;
   status: string;
   tags: string[];
+  chefTags: string[];
   resourceNames: string[];
   recipes: string[];
   cookbooks: string[];
@@ -378,8 +381,9 @@ export class NodeRun {
   platformFamily: string;
   platformVersion: string;
   chefVersion: string;
+  projects: string[];
   environment: string;
-  roles: string;
+  roles: string[];
   policyGroup: string;
   policyName: string;
   policyRevision: string;
@@ -415,7 +419,8 @@ export class NodeRun {
     this.source = respNodeRun.source;
     this.status = respNodeRun.status;
     this.tags = respNodeRun.tags;
-
+    this.chefTags = respNodeRun.chef_tags;
+    this.projects = respNodeRun.projects;
     this.resourceNames = respNodeRun.resource_names;
     this.recipes = respNodeRun.recipes;
     this.cookbooks = respNodeRun.cookbooks;

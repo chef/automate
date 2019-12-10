@@ -588,7 +588,7 @@ steps:
   - label: "airgap backup"
     command:
       - integration/run_test integration/tests/airgap_backup.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
@@ -649,7 +649,7 @@ steps:
   - label: "ontop backup "
     command:
       - integration/run_test integration/tests/backup_ontop.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 25
     expeditor:
       executor:
         linux:
@@ -743,7 +743,7 @@ steps:
   - label: "backups"
     command:
       - integration/run_test integration/tests/backup.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 30
     expeditor:
       secrets:
         A2_LICENSE:

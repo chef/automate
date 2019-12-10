@@ -1,8 +1,18 @@
 
-<a [routerLink]="route"
-  routerLinkActive="active" [routerLinkActiveOptions]="{exact: isExactPresent()}">
+<a [href]="route" *ngIf="isExternal()"
+  [target]="openInNewPage ? '_blank' : '_self'">
+  <ng-container *ngTemplateOutlet="sidebarEntryTemplate"></ng-container>
+</a>
+<a [routerLink]="route" *ngIf="!isExternal()"
+  routerLinkActive="active" [routerLinkActiveOptions]="{exact: isExactPresent()}"
+  [target]="openInNewPage ? '_blank' : '_self'">
+  <ng-container *ngTemplateOutlet="sidebarEntryTemplate"></ng-container>
+</a>
+
+<ng-template #sidebarEntryTemplate>
   <chef-icon class="sidebar-icon" *ngIf="icon"
     [style.transform]="'rotate(' + (iconRotation ? iconRotation : 0) + 'deg)'">{{icon}}</chef-icon>
   <ng-content></ng-content>
-  <chef-icon class="arrow">play_arrow</chef-icon>
-</a>
+  <chef-icon *ngIf="!openInNewPage" class="arrow">play_arrow</chef-icon>
+  <chef-icon *ngIf="openInNewPage" class="open-in-new sidebar-icon">launch</chef-icon>
+</ng-template>

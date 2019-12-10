@@ -51,7 +51,7 @@ func TestAWSEC2Nodes(t *testing.T) {
 	}
 	list, err := nodesClient.List(ctx, &query)
 	require.NoError(t, err)
-	assert.Equal(t, true, list.GetTotal() > 0)
+	require.NotZero(t, list.GetTotal())
 
 	t.Log("ensure the manager id on the nodes is correct")
 	assert.Equal(t, []string{AwsEC2ManagerID}, list.GetNodes()[0].GetManagerIds())
@@ -73,11 +73,7 @@ func TestAWSEC2Nodes(t *testing.T) {
 	readNode.TargetConfig.Host = "localhost"
 	readNode.TargetConfig.Port = 22
 	_, err = nodesClient.Update(ctx, readNode)
-	require.NoError(t, err)
-	readNodeAfterUpdate, err := nodesClient.Read(ctx, &nodes.Id{Id: readNode.GetId()})
-	require.NoError(t, err)
-	assert.NotEqual(t, "new name", readNodeAfterUpdate.GetName())
-	assert.NotEqual(t, "localhost", readNodeAfterUpdate.GetTargetConfig().GetHost())
+	assert.EqualError(t, err, "rpc error: code = InvalidArgument desc = invalid option. unable to update name of aws-ec2 node")
 }
 
 func TestAWSEC2SearchNodeFields(t *testing.T) {

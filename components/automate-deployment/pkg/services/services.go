@@ -70,6 +70,18 @@ func ContainsCollection(needle string, haystack []string) bool {
 	return false
 }
 
+func NormalizeNames(products []string) {
+	for i, p := range products {
+		collection := collectionMap[p]
+		if collection == nil {
+			continue
+		}
+		if collection.Name != p {
+			products[i] = collection.Name
+		}
+	}
+}
+
 func ListProducts() []string {
 	return productList
 }

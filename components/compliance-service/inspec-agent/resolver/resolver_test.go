@@ -112,3 +112,28 @@ func TestHandleRegionFilters(t *testing.T) {
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, expected, incRegions)
 }
+
+func TestAssembleJob(t *testing.T) {
+	t.Log("test assembleJob when no node id included generates a node uuid and assigns it to the node")
+	job, err := assembleJob(&jobs.Job{}, nodeInfo{Name: "test"}, []*inspec.Secrets{}, inspec.TargetBaseConfig{})
+	assert.NoError(t, err)
+
+	assert.NotZero(t, job.NodeID)
+
+	t.Log("test assembleJob when only one secret is included assigns it to secrets")
+	job, err = assembleJob(&jobs.Job{}, nodeInfo{Name: "test"}, []*inspec.Secrets{
+		&inspec.Secrets{User: "test", Password: "test"},
+	}, inspec.TargetBaseConfig{})
+	assert.NoError(t, err)
+	assert.NotZero(t, job.TargetConfig.Secrets)
+	assert.Zero(t, job.TargetConfig.SecretsArr)
+
+	t.Log("test assembleJob when more than one secret is included assigns it to secretsArr")
+	job, err = assembleJob(&jobs.Job{}, nodeInfo{Name: "test"}, []*inspec.Secrets{
+		&inspec.Secrets{User: "test", Password: "test"},
+		&inspec.Secrets{User: "test2", Password: "test2"},
+	}, inspec.TargetBaseConfig{})
+	assert.NoError(t, err)
+	assert.Zero(t, job.TargetConfig.Secrets)
+	assert.NotZero(t, job.TargetConfig.SecretsArr)
+}

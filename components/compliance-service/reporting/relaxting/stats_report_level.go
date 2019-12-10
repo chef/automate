@@ -401,6 +401,9 @@ func (depth *ReportDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggregat
 	aggNoncompliant := elastic.NewFilterAggregation().
 		Filter(elastic.NewTermQuery("status", "failed"))
 
+	aggWaived := elastic.NewFilterAggregation().
+		Filter(elastic.NewTermQuery("status", "waived"))
+
 	aggHighRisk := elastic.NewFilterAggregation().
 		Filter(elastic.NewRangeQuery("controls_sums.failed.critical").Gt(0))
 
@@ -419,6 +422,7 @@ func (depth *ReportDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggregat
 	aggs["compliant"] = aggCompliant
 	aggs["skipped"] = aggSkipped
 	aggs["noncompliant"] = aggNoncompliant
+	aggs["waived"] = aggWaived
 	aggs["high_risk"] = aggHighRisk
 	aggs["medium_risk"] = aggMediumRisk
 	aggs["low_risk"] = aggLowRisk
@@ -457,6 +461,11 @@ func (depth *ReportDepth) getStatsSummaryNodesResult(aggRoot *elastic.SearchResu
 	singleBucket, found = aggRoot.Aggregations.Filter("low_risk")
 	if found {
 		summary.LowRisk = int32(singleBucket.DocCount)
+	}
+
+	singleBucket, found = aggRoot.Aggregations.Filter("waived")
+	if found {
+		summary.Waived = int32(singleBucket.DocCount)
 	}
 	return summary
 }

@@ -33,7 +33,6 @@ describe File.basename(__FILE__) do
     )
     assert_suggestions_text(["DevSec Prod Zeta", "DevSec Prod Alpha", "DevSec Prod beta", "DevSec Prod Omega"], actual_data)
 
-
     # suggest environment, text with space and size limit
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'environment', text: 'devsec ze', size: 1

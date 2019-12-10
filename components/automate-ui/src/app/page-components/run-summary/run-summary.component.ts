@@ -53,14 +53,15 @@ export class RunSummaryComponent implements OnChanges, AfterContentInit {
   }
 
   nodeRunDeprecations(deprecations) {
-    if (deprecations) {
+    if (deprecations && deprecations.length > 0) {
       return deprecations.length;
     } else {
-      return 0;
+      return 'None';
     }
   }
 
-  activateModal() {
+  activateModal(event) {
+    event.stopPropagation();
     this.eventService.showModal(true);
   }
 

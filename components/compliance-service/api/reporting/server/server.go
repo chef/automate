@@ -408,6 +408,7 @@ func (srv *Server) ListNodes(ctx context.Context, in *reporting.Query) (*reporti
 	nodes.TotalPassed = totalCounts.Passed
 	nodes.TotalSkipped = totalCounts.Skipped
 	nodes.TotalFailed = totalCounts.Failed
+	nodes.TotalWaived = totalCounts.Waived
 	nodes.Nodes = nodesList
 	return &nodes, nil
 }

@@ -432,7 +432,10 @@ func (depth *ProfileDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggrega
 	aggCompliant := elastic.NewFilterAggregation().
 		Filter(elastic.NewBoolQuery().
 			Must(elastic.NewTermQuery("profiles.controls_sums.failed.total", 0)).
-			Should(elastic.NewTermQuery("profiles.controls_sums.skipped.total", 0),
+			Should(
+				elastic.NewBoolQuery().Must(
+					elastic.NewTermQuery("profiles.controls_sums.skipped.total", 0),
+					elastic.NewTermQuery("profiles.controls_sums.waived.total", 0)),
 				elastic.NewRangeQuery("profiles.controls_sums.passed.total").Gt(0)))
 
 	aggSkipped := elastic.NewFilterAggregation().
@@ -446,6 +449,9 @@ func (depth *ProfileDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggrega
 
 	aggHighRisk := elastic.NewFilterAggregation().
 		Filter(elastic.NewRangeQuery("profiles.controls_sums.failed.critical").Gt(0))
+
+	aggWaived := elastic.NewFilterAggregation().
+		Filter(elastic.NewTermQuery("profiles.status", "waived"))
 
 	aggMediumRisk := elastic.NewFilterAggregation().
 		Filter(elastic.NewBoolQuery().
@@ -462,6 +468,7 @@ func (depth *ProfileDepth) getStatsSummaryNodesAggs() map[string]elastic.Aggrega
 	aggs["compliant"] = aggCompliant
 	aggs["skipped"] = aggSkipped
 	aggs["noncompliant"] = aggNoncompliant
+	aggs["waived"] = aggWaived
 	aggs["high_risk"] = aggHighRisk
 	aggs["medium_risk"] = aggMediumRisk
 	aggs["low_risk"] = aggLowRisk
@@ -502,6 +509,11 @@ func (depth *ProfileDepth) getStatsSummaryNodesResult(searchResult *elastic.Sear
 		if found {
 			summary.LowRisk = int32(singleBucket.DocCount)
 		}
+
+		singleBucket, found = aggRoot.Aggregations.Filter("waived")
+		if found {
+			summary.Waived = int32(singleBucket.DocCount)
+		}
 	}
 	return summary
 }
@@ -514,6 +526,7 @@ func (depth *ProfileDepth) getStatsSummaryControlsAggs() map[string]elastic.Aggr
 	aggs["major"] = elastic.NewSumAggregation().Field("profiles.controls_sums.failed.major")
 	aggs["minor"] = elastic.NewSumAggregation().Field("profiles.controls_sums.failed.minor")
 	aggs["critical"] = elastic.NewSumAggregation().Field("profiles.controls_sums.failed.critical")
+	aggs["waived"] = elastic.NewSumAggregation().Field("profiles.controls_sums.waived.total")
 
 	return depth.wrap(aggs)
 }
@@ -530,6 +543,9 @@ func (depth *ProfileDepth) getStatsSummaryControlsResult(searchResult *elastic.S
 
 			critical, _ := aggRoot.Aggregations.Sum("critical")
 			summary.Criticals = int32(*critical.Value)
+
+			waived, _ := aggRoot.Aggregations.Sum("waived")
+			summary.Waived = int32(*waived.Value)
 
 			major, _ := aggRoot.Aggregations.Sum("major")
 			summary.Majors = int32(*major.Value)

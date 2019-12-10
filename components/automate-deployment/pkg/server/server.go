@@ -413,6 +413,9 @@ func (s *server) configRenderer() (ConfigRenderer, error) {
 		return nil, errors.Wrap(err, "Could not render platform config")
 	}
 
+	productConfig := &config.ProductConfig{
+		Products: deployment.CollectionsForConfig(s.deployment.Config.GetDeployment()),
+	}
 	return func(service *deployment.Service) (string, error) {
 		rootCert := s.deployment.CA().RootCert()
 		creds := &config.TLSCredentials{
@@ -425,6 +428,10 @@ func (s *server) configRenderer() (ConfigRenderer, error) {
 		if !found {
 			logrus.WithField("service", service.Name()).WithError(err).Warnf("unable to render configuration for unknown service %q", service.Name())
 			return "", nil
+		}
+
+		if cfgv2, ok := preparableCfg.(config.PlatformServiceConfigurableV2); ok {
+			cfgv2.ConfigureProduct(productConfig)
 		}
 
 		preparedCfg, err := preparableCfg.PrepareSystemConfig(creds)

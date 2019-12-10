@@ -896,7 +896,7 @@ func (backend ES2Backend) getFiltersQuery(filters map[string][]string, latestOnl
 		profileBaseFscIncludes := []string{"profiles.name", "profiles.sha256", "profiles.version"}
 		profileLevelFscIncludes := []string{"profiles.controls_sums", "profiles.status"}
 		controlLevelFscIncludes := []string{"profiles.controls.id", "profiles.controls.status",
-			"profiles.controls.impact"}
+			"profiles.controls.impact", "profiles.controls.waived_str"}
 
 		profileAndControlQuery := getProfileAndControlQuery(filters, profileBaseFscIncludes,
 			profileLevelFscIncludes, controlLevelFscIncludes)
