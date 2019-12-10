@@ -22,7 +22,7 @@ const (
 )
 
 var (
-	waitingForReconfigureTimeout = 30 * time.Second
+	waitingForReconfigureTimeout = 300 * time.Second
 	waitingForRestartTimeout     = 600 * time.Second
 )
 
@@ -34,11 +34,6 @@ type Converger interface {
 	StopServices(*Task, target.Target, EventSink) error
 	PrepareForShutdown(*Task, target.Target, EventSink) error
 
-	// TODO(ssd) 2019-04-21: This is a bit odd. It is necessary
-	// for the moment because the actual deployment-service
-	// "Reconfigure" happens outside of the Converger.
-	ReconfigureDone(*Task) error
-
 	// Stop() stops the Converger, not the deployment-service or
 	// any other Automate services.
 	Stop()
@@ -47,11 +42,10 @@ type Converger interface {
 // Converger is a server that handles converge requests. It will take each request,
 // compile it into a plan, and execute that plan.
 type converger struct {
-	stop      chan struct{}
-	inbox     chan message
-	debug     chan debugReq
-	compiler  Compiler
-	selfHuper SelfHuper
+	stop     chan struct{}
+	inbox    chan message
+	debug    chan debugReq
+	compiler Compiler
 
 	currentState state
 }
@@ -91,15 +85,6 @@ func WithCompiler(compiler Compiler) ConvergerOpt {
 	}
 }
 
-// WithSelfHuper sets the compiler to use when fulfilling a converge request.
-// By default, we will use the PhaseOrderedCompiler. Specifying a compiler
-// is useful in unit testing
-func WithSelfHuper(s SelfHuper) ConvergerOpt {
-	return func(converger *converger) {
-		converger.selfHuper = s
-	}
-}
-
 // WithDebugChannel enables the debug channel used in testing to poll
 // the state of the converger. By default this is a nil channel.
 //
@@ -127,7 +112,6 @@ func StartConverger(opts ...ConvergerOpt) Converger {
 		inbox:        make(chan message, 5),
 		stop:         make(chan struct{}, 1),
 		currentState: &idle{},
-		selfHuper:    &selfHuper{},
 		compiler:     NewPhaseOrderedCompiler(),
 	}
 	for _, opt := range opts {
@@ -283,21 +267,6 @@ func (s *prepareForShutdownRequest) SendResponse(err error) {
 
 func (s *prepareForShutdownRequest) String() string { return "prepareForShutdown" }
 
-// reconfigureDone is a user-sendable message that instructs the
-// converger that we've completed a reconfiguration request.
-type reconfigureDone struct {
-	doneChan chan error
-}
-
-func (r *reconfigureDone) SendResponse(err error) {
-	if r.doneChan != nil {
-		r.doneChan <- err
-		close(r.doneChan)
-	}
-}
-
-func (r *reconfigureDone) String() string { return "reconfigureDone" }
-
 // States
 //
 // We use the following state machine to handle the two "waiting"
@@ -312,14 +281,14 @@ func (r *reconfigureDone) String() string { return "reconfigureDone" }
 //        +-------+---+                                       +-------------------+
 //            ^   |
 //            |   | convergeRequest
-//   timeout 2|   | err = ErrSelfReconfigurePending
+//     timeout|   | err = ErrSelfReconfigurePending
 //            |   |
 //            |   v
 //         +--+--------------------+
-//         |                       | timeout 1
-//         |                       +---------+
-//         | waitingForReconfigure |         |
-//         |                       |<--------+
+//         |                       |
+//         |                       |
+//         | waitingForReconfigure |
+//         |                       |
 //         |                       |
 //         +-----------------------+
 //
@@ -351,9 +320,6 @@ func (i *idle) ProcessMessage(c *converger, msg message) (state, bool, error) {
 			return i.handleError(err)
 		}
 		return newWaitingForRestart(), false, nil
-	case *reconfigureDone:
-		logrus.Warn("received reconfigureDone when in idle state. We should have been in waitingForReconfigure")
-		return i, false, nil
 	case *timeout:
 		logrus.Warn("received timeout when in idle state.")
 		return i, false, nil
@@ -376,7 +342,7 @@ func (i *idle) handleError(err error) (state, bool, error) {
 	case api.ErrRestartPending:
 		return newWaitingForRestart(), false, err
 	case api.ErrSelfReconfigurePending:
-		return newWaitingForReconfigure(false), false, err
+		return newWaitingForReconfigure(), false, err
 	case api.ErrSelfUpgradePending:
 		// NOTE(ssd) 2019-04-19: A self-upgrade is
 		// essentially just a restart from hab-sup.
@@ -410,9 +376,6 @@ func (w *waitingForRestart) ProcessMessage(_ *converger, msg message) (state, bo
 	case *stopServicesRequest, *prepareForShutdownRequest, *convergeRequest:
 		logrus.Infof("ignoring message %v because we are waiting to be restarted", msg)
 		return w, false, api.ErrRestartPending
-	case *reconfigureDone:
-		logrus.Warn("reconfigureDone received when waiting for restart!")
-		return w, false, api.ErrRestartPending
 	default:
 		logrus.Infof("ignoring message %v because we are waiting to be restarted", msg)
 		return w, false, UnknownMessageError(msg, w)
@@ -426,29 +389,18 @@ func (w *waitingForRestart) String() string { return "waiting for restart" }
 // supervisor.
 type waitingForReconfigure struct {
 	timeoutable
-	sentSelfHup bool
 }
 
-func newWaitingForReconfigure(sentSelfHup bool) *waitingForReconfigure {
+func newWaitingForReconfigure() *waitingForReconfigure {
 	return &waitingForReconfigure{
 		timeoutable: timeoutable{timeout: waitingForReconfigureTimeout},
-		sentSelfHup: sentSelfHup,
 	}
 }
 
 func (w *waitingForReconfigure) ProcessMessage(c *converger, msg message) (state, bool, error) {
 	switch msg.(type) {
 	case *timeout:
-		if !w.sentSelfHup {
-			logrus.Warnf("Expected HUP from habitat but none received after %s, sending HUP to self",
-				waitingForReconfigureTimeout)
-			c.selfHuper.Hup()
-			return newWaitingForReconfigure(true), true, nil
-		}
-		logrus.Warnf("Attempt to self-HUP also failed to result in a reconfigure after %s, giving up",
-			waitingForReconfigureTimeout)
-		return &idle{}, true, nil
-	case *reconfigureDone:
+		logrus.Warnf("No restart occurred from reconfigure after %s, giving up", waitingForReconfigureTimeout)
 		return &idle{}, true, nil
 	case *stopServicesRequest, *prepareForShutdownRequest, *convergeRequest:
 		logrus.Infof("ignoring message %v because we are waiting to be reconfigured", msg)
@@ -484,16 +436,6 @@ func (t *timeoutable) StopTimer() {
 }
 
 // Converger Message API Functions
-
-// ReconfigureDone instructs the converger that another part of the
-// system has finished a a reconfiguration request.
-func (converger *converger) ReconfigureDone(t *Task) error {
-	msg := &reconfigureDone{}
-	if t != nil {
-		msg.doneChan = t.C
-	}
-	return converger.sendMessage(t, msg)
-}
 
 // Converge requests the converger try to reach the specified desired state.
 // This function returns an error if the backlog is full. Otherwise, a Task with
