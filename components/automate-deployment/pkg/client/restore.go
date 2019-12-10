@@ -498,7 +498,7 @@ func (r *DeploymentRestore) Restore(ctx context.Context) error {
 
 	restoreCtx := backup.NewContext(
 		backup.WithContextCtx(ctx),
-		backup.WithContextBackupRestoreTask(r.restoreTask),
+		backup.WithContextBackupID(r.restoreTask.GetBackup().TaskID()),
 		backup.WithContextBackupLocationSpecification(locationSpec),
 		backup.WithContextReleaseManifest(r.a2Manifest),
 	)

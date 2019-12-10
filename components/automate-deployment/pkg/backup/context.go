@@ -12,7 +12,6 @@ import (
 
 	"github.com/chef/automate/lib/grpc/secureconn"
 
-	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/lib/platform/pg"
 )
@@ -39,8 +38,7 @@ const (
 // Context is stuff
 type Context struct {
 	pgConnInfo          pg.ConnInfo
-	backupTask          *api.BackupTask
-	restoreTask         *api.BackupRestoreTask
+	backupID            string
 	ctx                 context.Context
 	connFactory         *secureconn.Factory
 	esSidecarInfo       ESSidecarConnInfo
@@ -66,7 +64,7 @@ type MetadataChecksums struct {
 func NewContext(opts ...ContextOpt) Context {
 	ctx := Context{
 		pgConnInfo: &pg.A2ConnInfo{},
-		backupTask: &api.BackupTask{},
+		//backupTask: &api.BackupTask{},
 	}
 
 	for _, opt := range opts {
@@ -74,10 +72,10 @@ func NewContext(opts ...ContextOpt) Context {
 	}
 
 	if ctx.locationSpec != nil {
-		ctx.bucket = ctx.locationSpec.ToBucket(ctx.backupTask.TaskID())
+		ctx.bucket = ctx.locationSpec.ToBucket(ctx.backupID)
 	}
 	if ctx.restoreLocationSpec != nil {
-		ctx.restoreBucket = ctx.restoreLocationSpec.ToBucket(ctx.backupTask.TaskID())
+		ctx.restoreBucket = ctx.restoreLocationSpec.ToBucket(ctx.backupID)
 	}
 	if ctx.builderMinioLocationSpec != nil {
 		logrus.Info("Creating builder bucket")
@@ -93,6 +91,12 @@ func NewContext(opts ...ContextOpt) Context {
 
 // ContextOpt represents an optional configuration function for a Runner
 type ContextOpt func(*Context)
+
+func WithContextBackupID(backupID string) ContextOpt {
+	return func(ctx *Context) {
+		ctx.backupID = backupID
+	}
+}
 
 // WithContextBackupLocationSpecification configures the backup-gateway location
 func WithContextBackupLocationSpecification(locationSpec LocationSpecification) ContextOpt {
@@ -119,21 +123,6 @@ func WithContextBuilderMinioLocationSpec(locationSpec LocationSpecification) Con
 func WithContextPgConnInfo(info pg.ConnInfo) ContextOpt {
 	return func(ctx *Context) {
 		ctx.pgConnInfo = info
-	}
-}
-
-// WithContextBackupTask configures the context backup task
-func WithContextBackupTask(task *api.BackupTask) ContextOpt {
-	return func(ctx *Context) {
-		ctx.backupTask = task
-	}
-}
-
-// WithContextBackupRestoreTask configures the context backup task
-func WithContextBackupRestoreTask(task *api.BackupRestoreTask) ContextOpt {
-	return func(ctx *Context) {
-		ctx.restoreTask = task
-		ctx.backupTask = task.Backup
 	}
 }
 
@@ -249,7 +238,7 @@ func (ctx Context) writeStatus(status BackupStatus) error {
 	logrus.WithFields(
 		logrus.Fields{
 			"status":    status,
-			"backup_id": ctx.backupTask.TaskID(),
+			"backup_id": ctx.backupID,
 		},
 	).Info("Writing backup status")
 	return ctx.writeStringToBlob(statusObjectName, string(status))

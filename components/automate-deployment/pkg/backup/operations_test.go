@@ -51,7 +51,7 @@ func newBackupContext(backupDir string) Context {
 	return Context{
 		locationSpec:    testLocationSpec(backupDir),
 		bucket:          NewFilesystemBucket(path.Join(backupDir, backupTask.TaskID())),
-		backupTask:      backupTask,
+		backupID:        backupTask.TaskID(),
 		ctx:             context.Background(),
 		metadataWritten: NewObjectManifest(),
 	}

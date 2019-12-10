@@ -19,6 +19,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/lib/platform/command"
@@ -29,10 +30,39 @@ const (
 	defaultDirPerms = 0755
 )
 
+type OperationProgressReporter interface {
+	Report(OperationProgress)
+}
+
+type chanOperationProgressReporter struct {
+	prog chan OperationProgress
+}
+
+func NewChanOperationProgressReporter(prog chan OperationProgress) OperationProgressReporter {
+	return &chanOperationProgressReporter{
+		prog: prog,
+	}
+}
+
+func (r *chanOperationProgressReporter) Report(p OperationProgress) {
+	r.prog <- p
+}
+
+type noopOperationProgressReporter struct {
+}
+
+func NewNoopOperationProgressReporter() OperationProgressReporter {
+	return &noopOperationProgressReporter{}
+}
+
+func (r *noopOperationProgressReporter) Report(p OperationProgress) {
+
+}
+
 // Operation is an interface for a backup operation.
 type Operation interface {
-	Backup(ctx Context, om ObjectManifest, prog chan OperationProgress) error
-	Restore(ctx Context, serviceName string, verifier ObjectVerifier, prog chan OperationProgress) error
+	Backup(ctx Context, om ObjectManifest, prog OperationProgressReporter) error
+	Restore(ctx Context, serviceName string, verifier ObjectVerifier, prog OperationProgressReporter) error
 	Delete(ctx Context) error
 	String() string
 }
@@ -49,7 +79,7 @@ type testOperation struct {
 var _ Operation = &testOperation{}
 
 // Backup executes a backup specification.
-func (t *testOperation) Backup(backupCtx Context, _ ObjectManifest, progChan chan OperationProgress) error {
+func (t *testOperation) Backup(backupCtx Context, _ ObjectManifest, prog OperationProgressReporter) error {
 	// Make the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
@@ -58,10 +88,10 @@ func (t *testOperation) Backup(backupCtx Context, _ ObjectManifest, progChan cha
 	}
 
 	if !t.noProgress {
-		progChan <- OperationProgress{
+		prog.Report(OperationProgress{
 			Name:     t.name,
 			Progress: float64(0),
-		}
+		})
 	}
 
 	if t.fail {
@@ -69,22 +99,22 @@ func (t *testOperation) Backup(backupCtx Context, _ ObjectManifest, progChan cha
 	}
 
 	if !t.noProgress {
-		progChan <- OperationProgress{
+		prog.Report(OperationProgress{
 			Name:     t.name,
 			Progress: float64(50),
-		}
+		})
 
-		progChan <- OperationProgress{
+		prog.Report(OperationProgress{
 			Name:     t.name,
 			Progress: float64(100),
-		}
+		})
 	}
 
 	return nil
 }
 
 // Restore executes a backup specification.
-func (t *testOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
+func (t *testOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, prog OperationProgressReporter) error {
 	return nil
 }
 
@@ -150,7 +180,7 @@ func (r *RsyncExclude) RsyncArgs() (flag, matcher string) {
 
 // Backup backs up a path using the defined fields on the struct and publishes
 // progress events to the progress channel.
-func (p *PathCopyOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
+func (p *PathCopyOperation) Backup(backupCtx Context, om ObjectManifest, prog OperationProgressReporter) error {
 	// Make the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
@@ -158,16 +188,16 @@ func (p *PathCopyOperation) Backup(backupCtx Context, om ObjectManifest, progCha
 	default:
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     p.String(),
 		Progress: float64(0),
-	}
+	})
 
 	src := fmt.Sprintf("%s/", p.SrcPath)
 
 	log := logrus.WithFields(logrus.Fields{
 		"name":      p.Name,
-		"backup_id": backupCtx.backupTask.TaskID(),
+		"backup_id": backupCtx.backupID,
 		"src_path":  p.SrcPath,
 		"operation": "path_copy",
 		"action":    "backup",
@@ -250,10 +280,10 @@ func (p *PathCopyOperation) Backup(backupCtx Context, om ObjectManifest, progCha
 		}
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     p.String(),
 		Progress: float64(100),
-	}
+	})
 
 	return nil
 }
@@ -373,7 +403,7 @@ func (p *PathCopyOperation) Delete(backupCtx Context) error {
 
 	logrus.WithFields(logrus.Fields{
 		"name":      p.Name,
-		"backup_id": backupCtx.backupTask.TaskID(),
+		"backup_id": backupCtx.backupID,
 		"base_path": basePath,
 		"operation": "path_copy",
 		"action":    "delete",
@@ -398,7 +428,7 @@ func (p *PathCopyOperation) Delete(backupCtx Context) error {
 
 // Restore restores a path using the defined fields on the struct and publishes
 // progress events to the progress channel.
-func (p *PathCopyOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
+func (p *PathCopyOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, prog OperationProgressReporter) error {
 	// Make the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
@@ -406,10 +436,10 @@ func (p *PathCopyOperation) Restore(backupCtx Context, serviceName string, verif
 	default:
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     p.String(),
 		Progress: float64(0),
-	}
+	})
 
 	// reverse the source and destination paths because we're restoring
 	basePath := path.Join(path.Join(p.ObjectName...), "/")
@@ -418,8 +448,8 @@ func (p *PathCopyOperation) Restore(backupCtx Context, serviceName string, verif
 
 	log := logrus.WithFields(logrus.Fields{
 		"name":       p.Name,
-		"backup_id":  backupCtx.backupTask.TaskID(),
-		"restore_id": backupCtx.restoreTask.TaskID(),
+		"backup_id":  backupCtx.backupID,
+		"restore_id": backupCtx.backupID,
 		"base_path":  basePath,
 		"operation":  "path_copy",
 		"action":     "restore",
@@ -460,10 +490,10 @@ func (p *PathCopyOperation) Restore(backupCtx Context, serviceName string, verif
 		}
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     p.String(),
 		Progress: float64(100),
-	}
+	})
 
 	return nil
 }
@@ -482,7 +512,7 @@ type MetadataWriterOperation struct {
 var _ Operation = &MetadataWriterOperation{}
 
 // Backup executes a backup specification.
-func (m *MetadataWriterOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
+func (m *MetadataWriterOperation) Backup(backupCtx Context, om ObjectManifest, prog OperationProgressReporter) error {
 	// Make the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
@@ -490,14 +520,15 @@ func (m *MetadataWriterOperation) Backup(backupCtx Context, om ObjectManifest, p
 	default:
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     m.String(),
 		Progress: float64(0),
-	}
+	})
 
+	taskID, _ := api.NewBackupTaskFromID(backupCtx.backupID)
 	md := &Metadata{
 		Spec:                     m.Spec,
-		Task:                     backupCtx.backupTask,
+		Task:                     taskID,
 		DeploymentServiceVersion: "foo", // wat?
 		ContentsSHA256:           om.ObjectSHA256s(),
 	}
@@ -512,7 +543,7 @@ func (m *MetadataWriterOperation) Backup(backupCtx Context, om ObjectManifest, p
 
 	logrus.WithFields(logrus.Fields{
 		"name":      m.Spec.Name,
-		"backup_id": backupCtx.backupTask.TaskID(),
+		"backup_id": backupCtx.backupID,
 		"operation": "metadata_writer",
 		"action":    "backup",
 	}).Info("Running backup operation")
@@ -537,16 +568,16 @@ func (m *MetadataWriterOperation) Backup(backupCtx Context, om ObjectManifest, p
 
 	backupCtx.MetadataWritten(objectName, data)
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     m.String(),
 		Progress: float64(100),
-	}
+	})
 
 	return nil
 }
 
 // Restore executes a backup specification.
-func (m *MetadataWriterOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
+func (m *MetadataWriterOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, prog OperationProgressReporter) error {
 	return nil
 }
 
@@ -560,7 +591,7 @@ func (m *MetadataWriterOperation) Delete(backupCtx Context) error {
 	objectPath := path.Join(path.Join(m.ObjectName...), metadataFileBaseName)
 	logrus.WithFields(logrus.Fields{
 		"name":        m.Spec.Name,
-		"backup_id":   backupCtx.backupTask.TaskID(),
+		"backup_id":   backupCtx.backupID,
 		"object_path": objectPath,
 		"operation":   "metadata_writer",
 		"action":      "delete",
@@ -600,7 +631,7 @@ type Cmd struct {
 }
 
 // Backup executes a backup specification.
-func (c *CommandExecuteOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
+func (c *CommandExecuteOperation) Backup(backupCtx Context, om ObjectManifest, prog OperationProgressReporter) error {
 	// Make the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
@@ -608,10 +639,10 @@ func (c *CommandExecuteOperation) Backup(backupCtx Context, om ObjectManifest, p
 	default:
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     c.String(),
 		Progress: float64(0),
-	}
+	})
 
 	objectName := path.Join(path.Join(c.ObjectName...), c.Cmd.Name)
 
@@ -637,7 +668,7 @@ func (c *CommandExecuteOperation) Backup(backupCtx Context, om ObjectManifest, p
 
 	logrus.WithFields(logrus.Fields{
 		"name":        c.Name,
-		"backup_id":   backupCtx.backupTask.TaskID(),
+		"backup_id":   backupCtx.backupID,
 		"cmd":         strings.Join(cmdToExec, " "),
 		"object_name": objectName,
 		"operation":   "command_execute",
@@ -666,16 +697,16 @@ func (c *CommandExecuteOperation) Backup(backupCtx Context, om ObjectManifest, p
 
 	om.WriteFinished(objectName, writer)
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     c.String(),
 		Progress: float64(100),
-	}
+	})
 
 	return nil
 }
 
 // Restore executes a backup specification.
-func (c *CommandExecuteOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
+func (c *CommandExecuteOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, prog OperationProgressReporter) error {
 	// Make the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
@@ -683,17 +714,17 @@ func (c *CommandExecuteOperation) Restore(backupCtx Context, serviceName string,
 	default:
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     c.String(),
 		Progress: float64(0),
-	}
+	})
 
 	// Exit early if a restore command is not set
 	if c.Cmd.Restore == nil {
-		progChan <- OperationProgress{
+		prog.Report(OperationProgress{
 			Name:     c.String(),
 			Progress: float64(100),
-		}
+		})
 
 		return nil
 	}
@@ -730,10 +761,10 @@ func (c *CommandExecuteOperation) Restore(backupCtx Context, serviceName string,
 		return errors.Wrapf(err, "command %s failed with error '%s'", strings.Join(cmd, " "), command.StderrFromError(err))
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     c.String(),
 		Progress: float64(100),
-	}
+	})
 
 	return nil
 }
@@ -749,7 +780,7 @@ func (c *CommandExecuteOperation) Delete(backupCtx Context) error {
 
 	logrus.WithFields(logrus.Fields{
 		"name":        c.Name,
-		"backup_id":   backupCtx.backupTask.TaskID(),
+		"backup_id":   backupCtx.backupID,
 		"object_path": objectPath,
 		"operation":   "command_execute",
 		"action":      "delete",
@@ -778,7 +809,7 @@ type DatabaseDumpOperation struct {
 var _ Operation = &DatabaseDumpOperation{}
 
 // Backup executes a backup operation.
-func (d *DatabaseDumpOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
+func (d *DatabaseDumpOperation) Backup(backupCtx Context, om ObjectManifest, prog OperationProgressReporter) error {
 	// DatabaseDumpOperation should no longer be used for backing up.
 	// Use DatabaseDumpOperationV2. DatabaseDumpOperation dumped the
 	// roles in the db dump, which was problematic for external pg.
@@ -786,7 +817,7 @@ func (d *DatabaseDumpOperation) Backup(backupCtx Context, om ObjectManifest, pro
 }
 
 // Restore executes a backup operation.
-func (d *DatabaseDumpOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
+func (d *DatabaseDumpOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, prog OperationProgressReporter) error {
 	// Make the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
@@ -794,17 +825,16 @@ func (d *DatabaseDumpOperation) Restore(backupCtx Context, serviceName string, v
 	default:
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     d.String(),
 		Progress: float64(0),
-	}
+	})
 
 	objectName := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.sql", d.Name))
 
 	logrus.WithFields(logrus.Fields{
 		"name":        d.Name,
-		"backup_id":   backupCtx.backupTask.TaskID(),
-		"restore_id":  backupCtx.restoreTask.TaskID(),
+		"backup_id":   backupCtx.backupID,
 		"user":        d.User,
 		"object_name": objectName,
 		"operation":   "database_dump",
@@ -834,10 +864,10 @@ func (d *DatabaseDumpOperation) Restore(backupCtx Context, serviceName string, v
 		return errors.Wrapf(err, "failed to import database dump from %s", objectName)
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     d.String(),
 		Progress: float64(100),
-	}
+	})
 
 	return nil
 }
@@ -853,7 +883,7 @@ func (d *DatabaseDumpOperation) Delete(backupCtx Context) error {
 
 	logrus.WithFields(logrus.Fields{
 		"name":        d.Name,
-		"backup_id":   backupCtx.backupTask.TaskID(),
+		"backup_id":   backupCtx.backupID,
 		"object_path": objectPath,
 		"operation":   "database_dump",
 		"action":      "delete",
@@ -880,8 +910,8 @@ type ElasticsearchOperation struct {
 var _ Operation = &ElasticsearchOperation{}
 
 // Backup backs up indices in ES
-func (esop *ElasticsearchOperation) Backup(backupCtx Context, _ ObjectManifest, progChan chan OperationProgress) error {
-	backupID := backupCtx.backupTask.TaskID()
+func (esop *ElasticsearchOperation) Backup(backupCtx Context, _ ObjectManifest, prog OperationProgressReporter) error {
+	backupID := backupCtx.backupID
 
 	log := logrus.WithFields(logrus.Fields{
 		"backup_id":        backupID,
@@ -910,7 +940,7 @@ func (esop *ElasticsearchOperation) Backup(backupCtx Context, _ ObjectManifest, 
 		return errors.Wrap(err, "es-sidecar-service failed to create snapshot")
 	}
 
-	return monitorEsProgress(backupCtx.ctx, esop.String(), log, progChan, func() (esProgress, error) {
+	return monitorEsProgress(backupCtx.ctx, esop.String(), log, prog, func() (esProgress, error) {
 		return client.CreateSnapshotStatus(backupCtx.ctx, &es_sidecar.CreateSnapshotStatusRequest{
 			ServiceName: esop.ServiceName,
 			BackupId:    backupID,
@@ -919,12 +949,12 @@ func (esop *ElasticsearchOperation) Backup(backupCtx Context, _ ObjectManifest, 
 }
 
 // Restore executes a backup operation.
-func (esop *ElasticsearchOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
-	backupID := backupCtx.restoreTask.Backup.TaskID()
+func (esop *ElasticsearchOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, prog OperationProgressReporter) error {
+	backupID := backupCtx.backupID
 
 	log := logrus.WithFields(logrus.Fields{
 		"backup_id":    backupID,
-		"restore_id":   backupCtx.restoreTask.TaskID(),
+		"restore_id":   backupCtx.backupID,
 		"service_name": esop.ServiceName,
 		"operation":    "elasticsearch_snapshot",
 		"action":       "restore",
@@ -948,7 +978,7 @@ func (esop *ElasticsearchOperation) Restore(backupCtx Context, serviceName strin
 		return errors.Wrap(err, "es-sidecar-service failed to restore snapshot")
 	}
 
-	return monitorEsProgress(backupCtx.ctx, esop.String(), log, progChan, func() (esProgress, error) {
+	return monitorEsProgress(backupCtx.ctx, esop.String(), log, prog, func() (esProgress, error) {
 		return client.RestoreSnapshotStatus(backupCtx.ctx, &es_sidecar.RestoreSnapshotStatusRequest{
 			ServiceName: esop.ServiceName,
 			BackupId:    backupID,
@@ -963,7 +993,7 @@ func (esop *ElasticsearchOperation) Delete(backupCtx Context) error {
 	default:
 	}
 
-	backupID := backupCtx.backupTask.TaskID()
+	backupID := backupCtx.backupID
 
 	logrus.WithFields(logrus.Fields{
 		"backup_id":    backupID,
@@ -999,7 +1029,7 @@ type esStatusFunc func() (esProgress, error)
 func monitorEsProgress(ctx context.Context,
 	name string,
 	log *logrus.Entry,
-	progChan chan OperationProgress,
+	prog OperationProgressReporter,
 	f esStatusFunc) error {
 
 	select {
@@ -1008,10 +1038,10 @@ func monitorEsProgress(ctx context.Context,
 	default:
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     name,
 		Progress: float64(0),
-	}
+	})
 
 	retries := 0
 Progress:
@@ -1034,10 +1064,10 @@ Progress:
 
 			switch resp.GetSnapshotState() {
 			case es_sidecar.SnapshotState_IN_PROGRESS:
-				progChan <- OperationProgress{
+				prog.Report(OperationProgress{
 					Name:     name,
 					Progress: resp.GetProgressPercentage(),
-				}
+				})
 			case es_sidecar.SnapshotState_SUCCESS:
 				break Progress
 			default:
@@ -1052,10 +1082,10 @@ Progress:
 		}
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     name,
 		Progress: float64(100),
-	}
+	})
 
 	return nil
 }
@@ -1090,7 +1120,7 @@ type DatabaseDumpOperationV2 struct {
 var _ Operation = &DatabaseDumpOperation{}
 
 // Backup executes a backup operation.
-func (d *DatabaseDumpOperationV2) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
+func (d *DatabaseDumpOperationV2) Backup(backupCtx Context, om ObjectManifest, prog OperationProgressReporter) error {
 	// Make the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
@@ -1098,10 +1128,10 @@ func (d *DatabaseDumpOperationV2) Backup(backupCtx Context, om ObjectManifest, p
 	default:
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     d.String(),
 		Progress: float64(0),
-	}
+	})
 
 	objectName := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.fc", d.Name))
 	writer, err := backupCtx.bucket.NewWriter(backupCtx.ctx, objectName)
@@ -1120,7 +1150,7 @@ func (d *DatabaseDumpOperationV2) Backup(backupCtx Context, om ObjectManifest, p
 
 	logrus.WithFields(logrus.Fields{
 		"name":        d.Name,
-		"backup_id":   backupCtx.backupTask.TaskID(),
+		"backup_id":   backupCtx.backupID,
 		"object_name": objectName,
 		"operation":   "database_dump_v2",
 		"action":      "backup",
@@ -1142,16 +1172,16 @@ func (d *DatabaseDumpOperationV2) Backup(backupCtx Context, om ObjectManifest, p
 
 	om.WriteFinished(objectName, writer)
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     d.String(),
 		Progress: float64(100),
-	}
+	})
 
 	return nil
 }
 
 // Restore executes a backup operation.
-func (d *DatabaseDumpOperationV2) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
+func (d *DatabaseDumpOperationV2) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, prog OperationProgressReporter) error {
 	// Make the context isn't dead before we start the operation
 	select {
 	case <-backupCtx.ctx.Done():
@@ -1159,17 +1189,16 @@ func (d *DatabaseDumpOperationV2) Restore(backupCtx Context, serviceName string,
 	default:
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     d.String(),
 		Progress: float64(0),
-	}
+	})
 
 	objectName := path.Join(path.Join(d.ObjectName...), fmt.Sprintf("%s.fc", d.Name))
 
 	logrus.WithFields(logrus.Fields{
 		"name":        d.Name,
-		"backup_id":   backupCtx.backupTask.TaskID(),
-		"restore_id":  backupCtx.restoreTask.TaskID(),
+		"backup_id":   backupCtx.backupID,
 		"object_name": objectName,
 		"operation":   "database_dump_v2",
 		"action":      "restore",
@@ -1198,10 +1227,10 @@ func (d *DatabaseDumpOperationV2) Restore(backupCtx Context, serviceName string,
 		return errors.Wrapf(err, "failed to import database dump from %s", objectName)
 	}
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     d.String(),
 		Progress: float64(100),
-	}
+	})
 
 	return nil
 }
@@ -1217,7 +1246,7 @@ func (d *DatabaseDumpOperationV2) Delete(backupCtx Context) error {
 
 	logrus.WithFields(logrus.Fields{
 		"name":        d.Name,
-		"backup_id":   backupCtx.backupTask.TaskID(),
+		"backup_id":   backupCtx.backupID,
 		"object_path": objectPath,
 		"operation":   "database_dump_v2",
 		"action":      "delete",

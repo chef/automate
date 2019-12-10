@@ -8,10 +8,13 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	dc "github.com/chef/automate/api/config/deployment"
+	platformconf "github.com/chef/automate/api/config/platform"
+	"github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/certauthority"
 	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
@@ -498,4 +501,57 @@ func deploymentID() (string, error) {
 		return "", err
 	}
 	return id.String(), nil
+}
+
+func UserTomlForService(d *Deployment, serviceName string) (string, error) {
+	svc, found := d.ServiceByName(serviceName)
+	if !found {
+		return "", errors.New("Not found")
+	}
+
+	rootCert := d.CA().RootCert()
+	creds := &shared.TLSCredentials{
+		RootCertContents: rootCert,
+		KeyContents:      svc.SSLKey,
+		CertContents:     svc.SSLCert,
+	}
+
+	preparableCfg, found := d.Config.PlatformServiceConfigForService(svc.Name())
+	if !found {
+		logrus.WithField("service", svc.Name()).Warnf("unable to render configuration for unknown service %q", svc.Name())
+		return "", nil
+	}
+
+	preparedCfg, err := preparableCfg.PrepareSystemConfig(creds)
+	if err != nil {
+		logrus.WithField("service", svc.Name()).WithError(err).Error("unable to prepare configuration for rendering")
+		return "", err
+	}
+
+	bytes, err := toml.Marshal(preparedCfg)
+	if err != nil {
+		return "", errors.Wrapf(err, "could not converge %s configuration to TOML", svc.Name())
+	}
+
+	if UsesPlatformScaffolding(svc) {
+		platformConfig := struct {
+			Platform *platformconf.Config_Platform `toml:"_a2_platform"`
+		}{
+			Platform: &platformconf.Config_Platform{},
+		}
+		platformConfig.Platform.ExternalPostgresql = d.Config.GetGlobal().GetV1().GetExternal().GetPostgresql()
+		platformConfigToml, err := toml.Marshal(platformConfig)
+		if err != nil {
+			return "", errors.Wrap(err, "Could not render platform config")
+		}
+
+		return fmt.Sprintf("%s\n%s", string(bytes), platformConfigToml), nil
+	} else {
+		return string(bytes), nil
+	}
+}
+
+func UsesPlatformScaffolding(service *Service) bool {
+	metadata := services.MetadataForPackage(service.Name())
+	return metadata != nil && metadata.UsesPlatformScaffolding
 }

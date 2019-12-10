@@ -207,7 +207,7 @@ func (r *Runner) DeleteBackups(ctx context.Context, dep *deployment.Deployment, 
 
 		deleteCtx := NewContext(
 			WithContextCtx(ctx),
-			WithContextBackupTask(backupTask),
+			WithContextBackupID(backupTask.TaskID()),
 			WithContextBackupLocationSpecification(r.locationSpec),
 			WithContextPgConnInfo(r.pgConnInfo),
 			WithContextEsSidecarInfo(r.esSidecarInfo),
@@ -513,7 +513,7 @@ func (r *Runner) startRestoreOperations(ctx context.Context) {
 	// Build a context that we can pass to each operation
 	restoreCtx := NewContext(
 		WithContextCtx(ctx),
-		WithContextBackupRestoreTask(r.restoreTask),
+		WithContextBackupID(r.restoreTask.GetBackup().TaskID()),
 		WithContextBackupLocationSpecification(r.locationSpec),
 		WithContextBackupRestoreLocationSpecification(r.restoreLocationSpec),
 		WithContextPgConnInfo(r.pgConnInfo),
@@ -914,7 +914,7 @@ func (r *Runner) startBackupOperations(ctx context.Context) {
 		WithContextCtx(ctx),
 		WithContextBackupLocationSpecification(r.locationSpec),
 		WithContextPgConnInfo(r.pgConnInfo),
-		WithContextBackupTask(r.backupTask),
+		WithContextBackupID(r.backupTask.TaskID()),
 		WithContextEsSidecarInfo(r.esSidecarInfo),
 		WithContextConnFactory(r.connFactory),
 		WithContextReleaseManifest(r.releaseManifest),

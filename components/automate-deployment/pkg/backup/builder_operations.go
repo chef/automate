@@ -19,13 +19,13 @@ type BuilderMinioDumpOperation struct {
 
 var _ Operation = &BuilderMinioDumpOperation{}
 
-func (d *BuilderMinioDumpOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
+func (d *BuilderMinioDumpOperation) Backup(backupCtx Context, om ObjectManifest, prog OperationProgressReporter) error {
 	backupBucketPrefix := d.backupBucketPrefix()
 	ctx := backupCtx.ctx
 
 	logrus.WithFields(logrus.Fields{
 		"name":      d.Name,
-		"backup_id": backupCtx.backupTask.TaskID(),
+		"backup_id": backupCtx.backupID,
 		"prefix":    backupBucketPrefix,
 		"operation": "builder_minio_dump",
 		"action":    "backup",
@@ -71,20 +71,20 @@ func (d *BuilderMinioDumpOperation) Backup(backupCtx Context, om ObjectManifest,
 
 	om.WriteFinished(objectName, writer)
 
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     d.String(),
 		Progress: float64(100),
-	}
+	})
 
 	return nil
 }
 
-func (d *BuilderMinioDumpOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
+func (d *BuilderMinioDumpOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, prog OperationProgressReporter) error {
 	backupBucketPrefix := d.backupBucketPrefix()
 
 	logrus.WithFields(logrus.Fields{
 		"name":      d.Name,
-		"backup_id": backupCtx.backupTask.TaskID(),
+		"backup_id": backupCtx.backupID,
 		"prefix":    backupBucketPrefix,
 		"operation": "builder_minio_dump",
 		"action":    "restore",
@@ -101,10 +101,10 @@ func (d *BuilderMinioDumpOperation) Restore(backupCtx Context, serviceName strin
 			return err
 		}
 	}
-	progChan <- OperationProgress{
+	prog.Report(OperationProgress{
 		Name:     d.String(),
 		Progress: float64(100),
-	}
+	})
 
 	return nil
 }
@@ -117,7 +117,7 @@ func (d *BuilderMinioDumpOperation) Delete(backupCtx Context) error {
 
 	logrus.WithFields(logrus.Fields{
 		"name":      d.Name,
-		"backup_id": backupCtx.backupTask.TaskID(),
+		"backup_id": backupCtx.backupID,
 		"prefix":    backupBucketPrefix,
 		"operation": "builder_minio_dump",
 		"action":    "delete",

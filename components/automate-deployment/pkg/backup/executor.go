@@ -243,8 +243,9 @@ func (b *Executor) runRestoreSync(backupCtx Context, metadata *Metadata, ops []O
 		}
 
 		verifier := metadata.Verifier()
+		opProgressReporter := NewChanOperationProgressReporter(b.syncProgressChan)
 
-		if err := op.Restore(backupCtx, b.spec.Name, verifier, b.syncProgressChan); err != nil {
+		if err := op.Restore(backupCtx, b.spec.Name, verifier, opProgressReporter); err != nil {
 			b.opEventChan <- api.DeployEvent_Backup_Operation{
 				Status:        api.DeployEvent_COMPLETE_FAIL,
 				Type:          b.execType,
@@ -368,12 +369,14 @@ func (b *Executor) runSyncBackupOperations(backupCtx Context) error {
 		}
 
 		logrus.WithFields(logrus.Fields{
-			"task_id": backupCtx.backupTask.TaskID(),
+			"task_id": backupCtx.backupID,
 			"mode":    "sync",
 			"op_name": op.String(),
 		}).Debug("Starting backup operation")
 
-		if err := op.Backup(backupCtx, b.objectManifest, b.syncProgressChan); err != nil {
+		opProgressReporter := NewChanOperationProgressReporter(b.syncProgressChan)
+
+		if err := op.Backup(backupCtx, b.objectManifest, opProgressReporter); err != nil {
 			b.opEventChan <- api.DeployEvent_Backup_Operation{
 				Status:        api.DeployEvent_COMPLETE_FAIL,
 				Type:          b.execType,
@@ -423,12 +426,13 @@ func (b *Executor) runAsyncBackupOperations(backupCtx Context) error {
 			defer wg.Done()
 
 			logrus.WithFields(logrus.Fields{
-				"task_id": backupCtx.backupTask.TaskID(),
+				"task_id": backupCtx.backupID,
 				"mode":    "async",
 				"op_name": op.String(),
 			}).Debug("Starting backup operation")
 
-			if err := op.Backup(backupCtx, b.objectManifest, b.asyncProgressChan); err != nil {
+			opProgressReporter := NewChanOperationProgressReporter(b.asyncProgressChan)
+			if err := op.Backup(backupCtx, b.objectManifest, opProgressReporter); err != nil {
 				b.opEventChan <- api.DeployEvent_Backup_Operation{
 					Status:        api.DeployEvent_COMPLETE_FAIL,
 					Type:          b.execType,
@@ -497,12 +501,14 @@ func (b *Executor) runFinalizingOperations(backupCtx Context) error {
 		}
 
 		logrus.WithFields(logrus.Fields{
-			"task_id": backupCtx.backupTask.TaskID(),
+			"task_id": backupCtx.backupID,
 			"mode":    "sync",
 			"op_name": op.String(),
 		}).Debug("Starting backup operation")
 
-		if err := op.Backup(backupCtx, b.objectManifest, b.syncProgressChan); err != nil {
+		opProgressReporter := NewChanOperationProgressReporter(b.syncProgressChan)
+
+		if err := op.Backup(backupCtx, b.objectManifest, opProgressReporter); err != nil {
 			b.opEventChan <- api.DeployEvent_Backup_Operation{
 				Status:        api.DeployEvent_COMPLETE_FAIL,
 				Type:          b.execType,
