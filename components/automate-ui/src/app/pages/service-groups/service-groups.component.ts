@@ -1,6 +1,6 @@
 import { map, takeUntil, withLatestFrom, distinctUntilChanged } from 'rxjs/operators';
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { Subject, Observable, combineLatest } from 'rxjs';
+import { Subject, Observable } from 'rxjs';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Store, createSelector } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -204,19 +204,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         totalDeployments: resp.totalDeployments
       }));
 
-    combineLatest([
-      this.route.queryParamMap.pipe(
-        distinctUntilChanged((a, b) => {
-          return a.get('sgId') === b.get('sgId') &&
-                 a.get('sgStatus') === b.get('sgStatus') &&
-                 a.get('sgPage') === b.get('sgPage');
-        })
-      ),
-      this.store.select(serviceGroupsList)
-    ])
-    .pipe(takeUntil(this.isDestroyed))
-    .subscribe(([queryParams]) => this.detailParamsChange(queryParams));
-
     this.serviceGroupsStatus$ = this.store.select(serviceGroupsStatus);
     this.serviceGroupsError$ = this.store.select(serviceGroupsError);
     this.serviceGroupsList$ = this.store.select(serviceGroupsList);
@@ -244,6 +231,14 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         if ( !selectedSGVisibleOnPage ) {
           this.onServiceGroupSelect(null, serviceGroups[0].id);
         }
+
+        // Times when we should render the content in the sidebar:
+        // * when the page is first loaded and we have sgId in the original URL
+        // * when the sgId changes (including from null->some-value)
+        // * when a filter is applied that changes the content
+        // This subscribe will fire for all of those cases so we can render the
+        // sidebar here.
+        this.detailParamsChange(queryParams);
       } else {
         this.selectedServiceGroupId = null;
       }
