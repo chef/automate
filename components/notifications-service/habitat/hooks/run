@@ -7,6 +7,10 @@ exec 2>&1
 
 source "{{pkg.svc_config_path}}/env"
 
+# Recent versions of systemd propagate PIDFILE. This PIDFILE points at hab-sup,
+# which confuses distillery
+unset PIDFILE
+
 mkdir -p "{{pkg.svc_var_path}}/etc"
 render-template pg-env "{{pkg.svc_var_path}}/etc/pg-env"
 source "{{pkg.svc_var_path}}/etc/pg-env"
