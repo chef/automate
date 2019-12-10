@@ -25,9 +25,10 @@ type ProfileSource struct {
 }
 
 type ControlSource struct {
-	ID     string  `json:"id"`
-	Impact float32 `json:"impact"`
-	Status string  `json:"status"`
+	ID        string  `json:"id"`
+	Impact    float32 `json:"impact"`
+	Status    string  `json:"status"`
+	WaivedStr string  `json:"waived_str"`
 }
 
 type TotalNodeCounts struct {
@@ -174,7 +175,7 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 			}
 
 		}
-		// get node counts of passed/failed/skipped nodes to append to totals response
+		// get node counts of passed/failed/skipped/waived nodes to append to totals response
 		nodeSummary, err := backend.GetStatsSummaryNodes(filters)
 		if err != nil {
 			return nil, emptyTotals, errors.Wrapf(err, "%s error retrieving node count totals: ", myName)
