@@ -6,7 +6,7 @@ import { interval as observableInterval, of as observableOf, Observable } from '
 import { catchError, mergeMap, map, filter, switchMap, withLatestFrom } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { HttpStatus, GrpcErrorResponse, GrpcStatus } from 'app/types/types';
+import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
@@ -141,9 +141,6 @@ export class ProjectEffects {
 @Effect()
 deleteProjectFailure$ = this.actions$.pipe(
     ofType(ProjectActionTypes.DELETE_FAILURE),
-    filter(({ payload }: DeleteProjectFailure) =>
-      payload.status !== HttpStatus.BAD_REQUEST
-    || (<GrpcErrorResponse>payload.error).code !== GrpcStatus.PRECONDITION_FAILED),
     map(({ payload }: DeleteProjectFailure) => {
       const msg = payload.error.error;
       return new CreateNotification({

@@ -1,5 +1,4 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { HttpErrorResponse } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
@@ -7,7 +6,6 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { using } from 'app/testing/spec-helpers';
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
-import { GrpcStatus, HttpStatus } from 'app/types/types';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
@@ -20,9 +18,7 @@ import { ProjectService } from 'app/entities/projects/project.service';
 import {
   GetProjectsSuccess,
   GetApplyRulesStatusSuccess,
-  GetApplyRulesStatusSuccessPayload,
-  DeleteProjectFailure,
-  DeleteProjectSuccess
+  GetApplyRulesStatusSuccessPayload
 } from 'app/entities/projects/project.actions';
 import { projectEntityReducer, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import { Project } from 'app/entities/projects/project.model';
@@ -207,94 +203,13 @@ describe('ProjectListComponent', () => {
         expect(component.deleteModalVisible).toBe(true);
       });
 
-      it('sets error message upon failed precondition when modal is open', () => {
-        const expectedMsg = 'delete failed';
-        const httpErrorResponse = new HttpErrorResponse(
-          {
-            status: HttpStatus.BAD_REQUEST,
-            error: { message: expectedMsg, code: GrpcStatus.PRECONDITION_FAILED }
-          });
-        component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
-        store.dispatch(new DeleteProjectFailure(httpErrorResponse));
-        expect(component.deleteErrorMessage).toBe(expectedMsg);
-      });
-
-      it('keeps modal open upon failed precondition', () => {
-        const expectedMsg = 'delete failed';
-        const httpErrorResponse = new HttpErrorResponse(
-          {
-            status: HttpStatus.BAD_REQUEST,
-            error: { message: expectedMsg, code: GrpcStatus.PRECONDITION_FAILED }
-          });
+     it('closes upon sending request to back-end', () => {
         component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
         expect(component.deleteModalVisible).toBe(true);
-        store.dispatch(new DeleteProjectFailure(httpErrorResponse));
-        expect(component.deleteModalVisible).toBe(true);
-      });
-
-      it('does not set error message upon failed precondition if modal is closed', () => {
-        const expectedMsg = 'delete failed';
-        const httpErrorResponse = new HttpErrorResponse(
-          {
-            status: HttpStatus.BAD_REQUEST,
-            error: { message: expectedMsg, code: GrpcStatus.PRECONDITION_FAILED }
-          });
-        store.dispatch(new DeleteProjectFailure(httpErrorResponse));
-        expect(component.deleteErrorMessage).toBe('');
-      });
-
-      it('resets error message after failure when re-opened later', () => {
-        const expectedMsg = 'delete failed';
-        const httpErrorResponse = new HttpErrorResponse(
-          {
-            status: HttpStatus.BAD_REQUEST,
-            error: { message: expectedMsg, code: GrpcStatus.PRECONDITION_FAILED }
-          });
-        component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
-        store.dispatch(new DeleteProjectFailure(httpErrorResponse));
-        expect(component.deleteErrorMessage).toBe(expectedMsg);
-        component.closeDeleteModal();
-        component.startProjectDelete(genProject('uuid-222', 'RULES_APPLIED'));
-        expect(component.deleteErrorMessage).toBe('');
-      });
-
-      it('does not set error upon failure other than precondition failed', () => {
-        const expectedMsg = 'delete failed';
-        const httpErrorResponse = new HttpErrorResponse(
-          {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: { message: expectedMsg, code: GrpcStatus.INTERNAL }
-          });
-        component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
-        store.dispatch(new DeleteProjectFailure(httpErrorResponse));
-        expect(component.deleteErrorMessage).toBe('');
-      });
-
-      it('closes upon failure other than precondition failed', () => {
-        const expectedMsg = 'delete failed';
-        const httpErrorResponse = new HttpErrorResponse(
-          {
-            status: HttpStatus.INTERNAL_SERVER_ERROR,
-            error: { message: expectedMsg, code: GrpcStatus.INTERNAL }
-          });
-        component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
-        expect(component.deleteModalVisible).toBe(true);
-        store.dispatch(new DeleteProjectFailure(httpErrorResponse));
+        component.deleteProject();
         expect(component.deleteModalVisible).toBe(false);
       });
 
-      it('does not set error message upon success', () => {
-        component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
-        store.dispatch(new DeleteProjectSuccess({id: 'uuid-111'}));
-        expect(component.deleteErrorMessage).toBe('');
-      });
-
-      it('closes upon success', () => {
-        component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
-        expect(component.deleteModalVisible).toBe(true);
-        store.dispatch(new DeleteProjectSuccess({id: 'uuid-111'}));
-        expect(component.deleteModalVisible).toBe(false);
-      });
     });
   });
 

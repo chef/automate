@@ -8,14 +8,14 @@ import { isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefSorters } from 'app/helpers/auth/sorter';
-import { HttpStatus, GrpcErrorResponse, GrpcStatus } from 'app/types/types';
+import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
-  allProjects, getAllStatus, createStatus, createError, deleteStatus, deleteError
+  allProjects, getAllStatus, createStatus, createError
 } from 'app/entities/projects/project.selectors';
 import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
@@ -150,26 +150,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
           this.closeCreateModal();
         }
       });
-
-    combineLatest([
-      this.store.select(deleteStatus),
-      this.store.select(deleteError)
-    ]).pipe(
-      takeUntil(this.isDestroyed),
-      filter(() => this.deleteModalVisible))
-      .subscribe(([state, error]) => {
-        if (state === EntityStatus.loadingFailure && !isNil(error)) {
-          if (error.status === HttpStatus.BAD_REQUEST
-            && (error.error as GrpcErrorResponse).code === GrpcStatus.PRECONDITION_FAILED) {
-            this.deleteErrorMessage = error.error.message;
-          } else {
-            // close modal on any other error and display in banner
-            this.closeDeleteModal();
-          }
-        } else if (state === EntityStatus.loadingSuccess) {
-          this.closeDeleteModal();
-        }
-      });
   }
 
   ngOnDestroy(): void {
@@ -191,6 +171,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   public deleteProject(): void {
+    this.closeDeleteModal();
     this.store.dispatch(new DeleteProject({id: this.projectToDelete.id}));
   }
 
