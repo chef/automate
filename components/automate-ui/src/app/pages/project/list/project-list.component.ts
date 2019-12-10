@@ -11,6 +11,7 @@ import { ChefSorters } from 'app/helpers/auth/sorter';
 import { HttpStatus, GrpcErrorResponse, GrpcStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
@@ -57,6 +58,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public ApplyRulesStatusState = ApplyRulesStatusState;
 
   private isDestroyed = new Subject<boolean>();
+
+  public statusLabel: Record<ProjectStatus, string> = {
+      'PROJECT_RULES_STATUS_UNSET': '',
+      'NO_RULES': 'No rules',
+      'EDITS_PENDING': 'Edits pending',
+      'RULES_APPLIED': 'Applied'
+  };
 
   constructor(
     private layoutFacade: LayoutFacadeService,
@@ -252,15 +260,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
   public cancelApplyStop(): void {
     this.closeConfirmApplyStopModal();
-  }
-
-  public getRulesStatus(project: Project): string {
-    switch (project.status) {
-      case 'NO_RULES': return 'No rules';
-      case 'EDITS_PENDING': return 'Edits pending';
-      case 'RULES_APPLIED': return 'Applied';
-      default: return '';
-    }
   }
 
   public getButtonText(): string {
