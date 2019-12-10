@@ -9,6 +9,7 @@ import (
 
 	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/compliance-service/api/stats"
+	"github.com/chef/automate/components/compliance-service/ingest/events/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
 )
 
@@ -140,7 +141,10 @@ func getControlLevelControlSums(hit *elastic.SearchHit) (nodeControlSummary repo
 						if err == nil {
 							// this is for one node and since this control should only be in this profile once, it's
 							// reasonable to list it with a cardinality of 1
-							if control.Status == "failed" {
+							if control.WaivedStr == inspec.ControlWaivedStrYes || control.WaivedStr == inspec.ControlWaivedStrYesRun {
+								nodeControlSummary.Waived.Total = 1
+								control.Status = "waived"
+							} else if control.Status == "failed" {
 								nodeControlSummary.Failed.Total = 1
 								if control.Impact < 0.4 {
 									nodeControlSummary.Failed.Minor = 1

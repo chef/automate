@@ -257,51 +257,52 @@ describe File.basename(__FILE__) do
     assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     # Test filter by profile_id and waived control
-    # actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
-    #     Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4']),
-    #     Reporting::ListFilter.new(type: "control", values: ["pro1-con1"]),
-    #     Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
-    # ])
-    # expected_nodes = {"nodes" => [
-    #           {
-    #             "environment"=>"DevSec Prod Omega",
-    #             "id"=>"34cbbb4c-c502-4971-1111-888888888888",
-    #             "latestReport"=>{
-    #               "controls"=>{
-    #                 "failed"=>{},
-    #                 "passed"=>{},
-    #                 "skipped"=>{},
-    #                 "total"=>1,
-    #                 "waived"=>{"total"=>1}
-    #               },
-    #               "endTime"=>"2018-04-01T10:18:41Z",
-    #               "id"=>"44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy",
-    #               "status"=>"waived"
-    #             },
-    #             "name"=>"osx(2)-omega-pro1(f)-pro2(w)-failed",
-    #             "platform"=>{"full"=>"mac_os_x 17.7.0", "name"=>"mac_os_x", "release"=>"17.7.0"},
-    #             "profiles"=>[
-    #               {
-    #                 "full"=>"My Profile 1 title, v1.0.1",
-    #                 "id"=>"447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
-    #                 "name"=>"myprofile1",
-    #                 "status"=>"failed",
-    #                 "version"=>"1.0.1"
-    #               },
-    #               {
-    #                 "full"=>"My Profile 2 title, v1.0.5",
-    #                 "id"=>"447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
-    #                 "name"=>"myprofile2",
-    #                 "status"=>"waived",
-    #                 "version"=>"1.0.5"
-    #               }
-    #             ]
-    #           }
-    #         ],
-    #         "total"=>1,
-    #         "totalWaived"=>1
-    #       }.to_json
-    # assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
+    # TODO: CONFIRM WITH THE TEAM BECAUSE AT THE MOMENT latestReport and node status is deep, where profiles array(inc status) is shallow
+    actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: 'profile_id', values: ['447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4']),
+        Reporting::ListFilter.new(type: "control", values: ["pro1-con1"]),
+        Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+    ])
+    expected_nodes = {"nodes" => [
+              {
+                "environment"=>"DevSec Prod Omega",
+                "id"=>"34cbbb4c-c502-4971-1111-888888888888",
+                "latestReport"=>{
+                  "controls"=>{
+                    "failed"=>{},
+                    "passed"=>{},
+                    "skipped"=>{},
+                    "total"=>1,
+                    "waived"=>{"total"=>1}
+                  },
+                  "endTime"=>"2018-04-01T10:18:41Z",
+                  "id"=>"44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy",
+                  "status"=>"waived"
+                },
+                "name"=>"osx(2)-omega-pro1(f)-pro2(w)-failed",
+                "platform"=>{"full"=>"mac_os_x 17.7.0", "name"=>"mac_os_x", "release"=>"17.7.0"},
+                "profiles"=>[
+                  {
+                    "full"=>"My Profile 1 title, v1.0.1",
+                    "id"=>"447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                    "name"=>"myprofile1",
+                    "status"=>"failed",
+                    "version"=>"1.0.1"
+                  },
+                  {
+                    "full"=>"My Profile 2 title, v1.0.5",
+                    "id"=>"447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
+                    "name"=>"myprofile2",
+                    "status"=>"waived",
+                    "version"=>"1.0.5"
+                  }
+                ]
+              }
+            ],
+            "total"=>1,
+            "totalWaived"=>1
+          }.to_json
+    assert_equal_json_sorted(expected_nodes, actual_nodes.to_json)
 
     actual = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
         Reporting::ListFilter.new(type: 'profile_id', values: ['non-existent'])
