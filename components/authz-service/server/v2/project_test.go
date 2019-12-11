@@ -433,7 +433,7 @@ func TestListProjectsForIntrospection(t *testing.T) {
 	}
 }
 
-func addProjectToStoreWithStatus(t *testing.T, store *cache.Cache, id, 
+func addProjectToStoreWithStatus(t *testing.T, store *cache.Cache, id,
 	name string, projType storage.Type, status string) api.Project {
 	t.Helper()
 
@@ -457,9 +457,9 @@ func addProjectToStoreWithStatus(t *testing.T, store *cache.Cache, id,
 	}
 }
 
-func addProjectToStore(t *testing.T, store *cache.Cache, id, 
+func addProjectToStore(t *testing.T, store *cache.Cache, id,
 	name string, projType storage.Type) api.Project {
-	addProjectToStoreWithStatus(t, store, id, name, projType, storage.NoRules.String())
+	return addProjectToStoreWithStatus(t, store, id, name, projType, storage.NoRules.String())
 }
 
 func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, cleanupFunc) {
