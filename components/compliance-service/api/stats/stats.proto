@@ -133,6 +133,7 @@ message ControlStats {
 	int32 failed = 4;
 	int32 skipped = 5;
 	float impact = 6;
+	int32 waived = 7;
 }
 message Support {
 	string os_name = 1 [json_name = "os-name"];

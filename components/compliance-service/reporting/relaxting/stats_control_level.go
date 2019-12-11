@@ -22,11 +22,13 @@ func (depth *ControlDepth) getControlListStatsByProfileIdAggs(
 	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "passed"))
 	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "failed"))
 	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "skipped"))
+	waivedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run"))
 
 	impactTerms := elastic.NewTermsAggregation().Field("profiles.controls.impact").Size(1).
 		SubAggregation("passed", passedFilter).
 		SubAggregation("failed", failedFilter).
-		SubAggregation("skipped", skippedFilter)
+		SubAggregation("skipped", skippedFilter).
+		SubAggregation("waived", waivedFilter)
 
 	titleTerms := elastic.NewTermsAggregation().Field("profiles.controls.title").Size(1).
 		SubAggregation("impact", impactTerms)
@@ -66,6 +68,7 @@ func (depth *ControlDepth) getControlListStatsByProfileIdResults(
 					passedCount, _ := impactBucket.Filter("passed")
 					failedCount, _ := impactBucket.Filter("failed")
 					skippedCount, _ := impactBucket.Filter("skipped")
+					waivedCount, _ := impactBucket.Filter("waived")
 					statSummary := stats.ControlStats{
 						Control: controlId,
 						Passed:  int32(passedCount.DocCount),
@@ -73,6 +76,7 @@ func (depth *ControlDepth) getControlListStatsByProfileIdResults(
 						Skipped: int32(skippedCount.DocCount),
 						Impact:  float32(impactAsNumber),
 						Title:   title,
+						Waived:  int32(waivedCount.DocCount),
 					}
 					controlStats = append(controlStats, &statSummary)
 				}
