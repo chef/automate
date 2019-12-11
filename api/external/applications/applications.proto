@@ -370,7 +370,6 @@ message PeriodicJobConfig {
   bool running = 1;
   // The `threshold` setting used by periodic jobs for evaluating services.
   // Threshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under `lib/`.
-
   string threshold = 2;
 }
 
