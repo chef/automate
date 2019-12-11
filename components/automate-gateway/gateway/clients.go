@@ -2,6 +2,7 @@ package gateway
 
 import (
 	"fmt"
+	"time"
 
 	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
@@ -12,47 +13,48 @@ import (
 	"github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
-	authz "github.com/chef/automate/api/interservice/authz"
+	"github.com/chef/automate/api/interservice/authz"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
-	deployment "github.com/chef/automate/api/interservice/deployment"
-	event_feed_api "github.com/chef/automate/api/interservice/event_feed"
+	"github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/api/interservice/event_feed"
 	chef_ingest "github.com/chef/automate/api/interservice/ingest"
-	license_control "github.com/chef/automate/api/interservice/license_control"
+	"github.com/chef/automate/api/interservice/license_control"
 	"github.com/chef/automate/api/interservice/local_user"
 	teams_v1 "github.com/chef/automate/api/interservice/teams/v1"
 	teams_v2 "github.com/chef/automate/api/interservice/teams/v2"
-	jobs "github.com/chef/automate/components/compliance-service/api/jobs"
+	"github.com/chef/automate/components/compliance-service/api/jobs"
 	profiles "github.com/chef/automate/components/compliance-service/api/profiles"
 	cc_reporting "github.com/chef/automate/components/compliance-service/api/reporting"
 	cc_stats "github.com/chef/automate/components/compliance-service/api/stats"
 	cc_version "github.com/chef/automate/components/compliance-service/api/version"
 	cc_ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
-	manager "github.com/chef/automate/components/nodemanager-service/api/manager"
-	nodes "github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/notifier"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tracing"
 )
 
-var defaultEndpoints = map[string]string{
-	"authn-service":           "0.0.0.0:9091",
-	"authz-service":           "0.0.0.0:10130",
-	"config-mgmt-service":     "0.0.0.0:10119",
-	"compliance-service":      "0.0.0.0:10121",
-	"data-feed-service":       "0.0.0.0:14001",
-	"deployment-service":      "0.0.0.0:10161",
-	"ingest-service":          "0.0.0.0:10122",
-	"license-control-service": "0.0.0.0:10124",
-	"local-user-service":      "0.0.0.0:9092",
-	"notifications-service":   "0.0.0.0:4001",
-	"teams-service":           "0.0.0.0:9093",
-	"secrets-service":         "0.0.0.0:10131",
-	"applications-service":    "0.0.0.0:10133",
-	"nodemanager-service":     "0.0.0.0:10120",
-	"event-feed-service":      "0.0.0.0:10134",
+// grpcServices are gRPC backend services that we'll connect to to build clients
+var grpcServices = []string{
+	"applications-service",
+	"authn-service",
+	"authz-service",
+	"compliance-service",
+	"config-mgmt-service",
+	"data-feed-service",
+	"deployment-service",
+	"event-feed-service",
+	"ingest-service",
+	"license-control-service",
+	"local-user-service",
+	"nodemanager-service",
+	"notifications-service",
+	"teams-service",
+	"secrets-service",
 }
 
 // clientMetrics holds the clients (identified by service) for which we'll
@@ -68,9 +70,12 @@ var clientMetrics = map[string]bool{
 
 // ClientConfig describes the endpoints we wish to connect to
 type ClientConfig struct {
-	Endpoints map[string]ConnectionOptions `mapstructure:"endpoints" toml:"endpoints"`
-	Notifier  NotifierOptions              `mapstructure:"notifier" toml:"notifier"`
+	Endpoints       map[string]ConnectionOptions `mapstructure:"endpoints" toml:"endpoints"`
+	Notifier        NotifierOptions              `mapstructure:"notifier" toml:"notifier"`
+	NullBackendSock string                       `mapstructure:"null_backend_sock" toml:"null_backend_sock"`
 }
+
+type ClientConnections map[string]*grpc.ClientConn
 
 // ConnectionOptions describes how we wish to connect to a certain
 // endpoint.
@@ -101,7 +106,7 @@ type ClientsFactory interface {
 	ApplicationsClient() (applications.ApplicationsServiceClient, error)
 	SecretClient() (secrets.SecretsServiceClient, error)
 	NodesClient() (nodes.NodesServiceClient, error)
-	FeedClient() (event_feed_api.EventFeedServiceClient, error)
+	FeedClient() (event_feed.EventFeedServiceClient, error)
 	ComplianceReportingServiceClient() (cc_reporting.ReportingServiceClient, error)
 	ComplianceProfilesServiceClient() (profiles.ProfilesServiceClient, error)
 	ComplianceJobsServiceClient() (jobs.JobsServiceClient, error)
@@ -112,12 +117,13 @@ type ClientsFactory interface {
 	DeploymentServiceClient() (deployment.DeploymentClient, error)
 	DatafeedClient() (data_feed.DatafeedServiceClient, error)
 	PurgeClient(service string) (data_lifecycle.PurgeClient, error)
+	Close() error
 }
 
 // clientsFactory caches grpc client connections and returns clients
 type clientsFactory struct {
 	config      ClientConfig
-	connections map[string]*grpc.ClientConn
+	connections ClientConnections
 
 	// Notifications has a very heavy cost for us, therefore we
 	// are going to have a unique client that we will initialize
@@ -135,58 +141,28 @@ type NotifierOptions struct {
 // never change. The underlying ClientConn will be responsible for maintaining
 // the connection, where maintaining includes dealing with disconnects, service
 // processes entering and leaving the pool, ip addresses changing, etc.
-func NewClientsFactory(config ClientConfig, connFactory *secureconn.Factory) ClientsFactory {
-	clients := clientsFactory{
-		connections: map[string]*grpc.ClientConn{},
-		config:      config,
-	}
+//
+// In cases where our configuration is missing known endpoints and a null backend
+// socket location has been set in the ClientConfig, we'll connect all missing
+// clients to the null backend via the socket. The null backend is an aggregate server
+// backend that implements failures for all backend gRPC's that the gateway needs.
+// This is useful because depending on the products that are deployed, not all backend
+// services will be guaranteed to running and therefore the target bind information
+// for those services won't be present. Yet we still want to the gateway to
+// start up up successfully, to initialize clients, and to properly
+// return errors when backend services are not up. Without this, gRPC will
+// continue to dial non-existent service targets and spam the logs endlessly.
+func NewClientsFactory(config ClientConfig, connFactory *secureconn.Factory) (ClientsFactory, error) {
+	var err error
 
 	// Note: this only affects selected clients, which receive the metrics
 	// interceptor options -- see below.
 	grpc_prometheus.EnableClientHandlingTimeHistogram()
 
-	for service, endpoint := range config.Endpoints {
-		if endpoint.Target != "" {
-			metricsEnabled := clientMetrics[service]
-			log.WithFields(log.Fields{
-				"service":         service,
-				"endpoint":        endpoint.Target,
-				"metrics_enabled": metricsEnabled,
-			}).Info("Dialing")
-
-			var conn *grpc.ClientConn
-			var err error
-
-			opts := []grpc.DialOption{}
-			if metricsEnabled {
-				opts = append(opts,
-					grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
-					grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor))
-			}
-
-			if endpoint.Secure {
-				conn, err = connFactory.Dial(service, endpoint.Target, opts...)
-			} else {
-				// Q: do we (still) have non-tls endpoints?
-				conn, err = grpc.Dial(
-					endpoint.Target,
-					append(opts, grpc.WithInsecure(), tracing.GlobalClientInterceptor())...,
-				)
-			}
-
-			if err != nil {
-				// This case should never happen (unless you tell Dial to block)
-				log.WithFields(log.Fields{
-					"service": service,
-					"error":   err,
-				}).Fatal("Could not create connection")
-			}
-			clients.connections[service] = conn
-		} else {
-			log.WithFields(log.Fields{
-				"service": service,
-			}).Warn("Missing target")
-		}
+	clients := &clientsFactory{config: config}
+	clients.connections, err = config.DialEndpoints(connFactory)
+	if err != nil {
+		return clients, err
 	}
 
 	// Initialize the notifications client if exists
@@ -195,7 +171,7 @@ func NewClientsFactory(config ClientConfig, connFactory *secureconn.Factory) Cli
 		clients.notifierClient = notifier.New(n)
 	}
 
-	return &clients
+	return clients, nil
 }
 
 // CfgMgmtClient returns a client for the CfgMgmt service.
@@ -382,12 +358,12 @@ func (c *clientsFactory) NodesClient() (nodes.NodesServiceClient, error) {
 	return nodes.NewNodesServiceClient(conn), nil
 }
 
-func (c *clientsFactory) FeedClient() (event_feed_api.EventFeedServiceClient, error) {
+func (c *clientsFactory) FeedClient() (event_feed.EventFeedServiceClient, error) {
 	conn, err := c.connectionByName("event-feed-service")
 	if err != nil {
 		return nil, err
 	}
-	return event_feed_api.NewEventFeedServiceClient(conn), nil
+	return event_feed.NewEventFeedServiceClient(conn), nil
 }
 
 func (c *clientsFactory) ComplianceReportingServiceClient() (cc_reporting.ReportingServiceClient, error) {
@@ -480,21 +456,98 @@ func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error)
 	return conn, nil
 }
 
-// Populate our endpoints with default targets
-func (c *ClientConfig) ConfigureDefaultEndpoints() {
+func (c *clientsFactory) Close() error {
+	var err error
+
+	for _, con := range c.connections {
+		err = con.Close()
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+// DialEndpoints dials the configured endpoints. If the configuration is missing
+// a known gRPC service target and the null backend socket has been configured,
+// it will attempt to dial the null backend.
+func (c *ClientConfig) DialEndpoints(connFactory *secureconn.Factory) (ClientConnections, error) {
+	connections := ClientConnections{}
+	c.expandEndpoints()
+
+	for service, endpoint := range c.Endpoints {
+		metricsEnabled := clientMetrics[service]
+		logctx := log.WithFields(log.Fields{
+			"service": service,
+			"target":  endpoint.Target,
+			"secure":  endpoint.Secure,
+			"metrics": metricsEnabled,
+		})
+		logctx.Info("Dialing")
+
+		var conn *grpc.ClientConn
+		var err error
+
+		opts := []grpc.DialOption{}
+		if metricsEnabled {
+			opts = append(opts,
+				grpc.WithUnaryInterceptor(grpc_prometheus.UnaryClientInterceptor),
+				grpc.WithStreamInterceptor(grpc_prometheus.StreamClientInterceptor))
+		}
+
+		if endpoint.Target == c.socketPath() {
+			opts = append(opts, grpc.WithBlock(), grpc.WithTimeout(1*time.Second))
+		}
+
+		if endpoint.Secure {
+			conn, err = connFactory.Dial(service, endpoint.Target, opts...)
+		} else {
+			conn, err = grpc.Dial(
+				endpoint.Target,
+				append(opts, grpc.WithInsecure(), tracing.GlobalClientInterceptor())...,
+			)
+		}
+
+		if err != nil {
+			return connections, err
+		}
+
+		connections[service] = conn
+	}
+
+	return connections, nil
+}
+
+func (c *ClientConfig) expandEndpoints() {
 	if c.Endpoints == nil {
 		c.Endpoints = map[string]ConnectionOptions{}
 	}
 
-	for service, target := range defaultEndpoints {
-		// If the endpoint already exists don't overwrite it with a default
-		if _, ok := c.Endpoints[service]; ok {
-			continue
-		}
+	// If we've been given a null backend socket and we're missing and enpoint
+	// target for a service then we'll configure it to use the null backend.
+	if c.NullBackendSock != "" {
+		for _, service := range grpcServices {
+			// If the endpoint already exists with a target don't override it
+			// with a the null backend
+			if endpoint, ok := c.Endpoints[service]; ok {
+				if endpoint.Target != "" {
+					continue
+				}
+			}
 
-		c.Endpoints[service] = ConnectionOptions{
-			Target: target,
-			Secure: true,
+			c.Endpoints[service] = ConnectionOptions{
+				Target: c.socketPath(),
+				Secure: false,
+			}
 		}
 	}
+}
+
+func (c *ClientConfig) socketPath() string {
+	if c.NullBackendSock == "" {
+		return ""
+	}
+
+	return fmt.Sprintf("unix:%s", c.NullBackendSock)
 }

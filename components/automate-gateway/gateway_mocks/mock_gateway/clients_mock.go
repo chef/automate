@@ -7,6 +7,8 @@ package mock_gateway
 import (
 	reflect "reflect"
 
+	gomock "github.com/golang/mock/gomock"
+
 	applications "github.com/chef/automate/api/external/applications"
 	data_feed "github.com/chef/automate/api/external/data_feed"
 	secrets "github.com/chef/automate/api/external/secrets"
@@ -32,7 +34,6 @@ import (
 	nodes "github.com/chef/automate/components/nodemanager-service/api/nodes"
 	api "github.com/chef/automate/components/notifications-client/api"
 	notifier "github.com/chef/automate/components/notifications-client/notifier"
-	gomock "github.com/golang/mock/gomock"
 )
 
 // MockClientsFactory is a mock of ClientsFactory interface
@@ -506,4 +507,17 @@ func (m *MockClientsFactory) PurgeClient(service string) (data_lifecycle.PurgeCl
 func (mr *MockClientsFactoryMockRecorder) PurgeClient(string) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PurgeClient", reflect.TypeOf((*MockClientsFactory)(nil).PurgeClient))
+}
+
+// Close mocks base method
+func (m *MockClientsFactory) Close() error {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Close")
+	return ret[0].(error)
+}
+
+// Close indicates an expected call of Close
+func (mr *MockClientsFactoryMockRecorder) Close() *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Close", reflect.TypeOf((*MockClientsFactory)(nil).Close))
 }

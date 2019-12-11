@@ -86,5 +86,14 @@ addNoProxy {{datafeed.sys.ip}}
  {{~/if}}
  {{~/eachAlive}}
 
+
+# If the gateway was shut down cleanly the socket should be cleaned up. We'll
+# make sure it's gone before we start.
+{{~#if cfg.service.null_backend_sock}}
+[ -e "{{cfg.service.null_backend_sock}}" ] && rm -f "{{cfg.service.null_backend_sock}}"
+{{~ else}}
+[ -e "{{pkg.svc_var_path}}/null_backend.sock" ] && rm -f "{{pkg.svc_var_path}}/null_backend.sock"
+{{~/if}}
+
 # Start our service
 exec automate-gateway serve --config {{pkg.svc_config_path}}/config.toml

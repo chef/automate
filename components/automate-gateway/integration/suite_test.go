@@ -6,11 +6,13 @@ import (
 	"os"
 	"testing"
 
-	"github.com/chef/automate/components/automate-gateway/gateway"
-	"github.com/chef/automate/components/compliance-service/examples/helpers"
+	"github.com/spf13/viper"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 	"google.golang.org/grpc"
+
+	"github.com/chef/automate/components/automate-gateway/gateway"
+	"github.com/chef/automate/components/compliance-service/examples/helpers"
 )
 
 const (
@@ -40,9 +42,16 @@ func TestGateway(t *testing.T) {
 
 func NewGatewayTestSuite(ctx context.Context, t *testing.T, target *acceptanceTarget) (*GatewayTestSuite, error) {
 	connFactory := helpers.SecureConnFactoryHabWithDeploymentServiceCerts()
-	cfg := gateway.ClientConfig{}
-	cfg.ConfigureDefaultEndpoints()
-	clients := gateway.NewClientsFactory(cfg, connFactory)
+	viper.SetConfigFile("/hab/svc/automate-gateway/config/config.toml")
+	err := viper.ReadInConfig()
+	if err != nil {
+		return nil, err
+	}
+	cfg, err := gateway.ConfigFromViper()
+	clients, err := gateway.NewClientsFactory(cfg.GrpcClients, connFactory)
+	if err != nil {
+		return nil, err
+	}
 	gwConn, err := connFactory.Dial("automate-gateway", gatewayBindAddress)
 	if err != nil {
 		return nil, err

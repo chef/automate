@@ -19,20 +19,21 @@ pkg_exports=(
   [host]=service.host
 )
 pkg_binds_optional=(
+  [applications-service]="port"
   [authn-service]="port"
   [authz-service]="port"
-  [config-mgmt-service]="port"
   [compliance-service]="port"
+  [config-mgmt-service]="port"
+  [data-feed-service]="port"
   [deployment-service]="port"
+  [event-feed-service]="port"
   [ingest-service]="port"
+  [license-control-service]="port"
   [local-user-service]="port"
+  [nodemanager-service]="port"
   [notifications-service]="port"
   [teams-service]="port"
-  [license-control-service]="port"
   [secrets-service]="port"
-  [event-service]="port"
-  [nodemanager-service]="port"
-  [data-feed-service]="port"
 )
 pkg_exposes=(port)
 pkg_bin_dirs=(bin)

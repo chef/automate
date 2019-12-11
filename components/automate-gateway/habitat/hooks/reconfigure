@@ -1,0 +1,3 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+kill -HUP "$(cat {{pkg.svc_pid_file}})"

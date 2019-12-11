@@ -9,9 +9,9 @@ open_api_ui_dir = "{{pkg.path}}/static/swagger-ui/"
 
 [log]
 {{~#if cfg.log.level}}
-level = "{{cfg.log.level}}"
+  level = "{{cfg.log.level}}"
 {{~ else}}
-level = "{{cfg.service.log.level}}"
+  level = "{{cfg.service.log.level}}"
 {{~/if}}
 
 [tls]
@@ -19,7 +19,20 @@ level = "{{cfg.service.log.level}}"
   key_path = "{{pkg.svc_config_path}}/service.key"
   root_ca_path ="{{pkg.svc_config_path}}/root_ca.crt"
 
+[grpc_clients]
+{{~#if cfg.service.null_backend_sock}}
+  null_backend_sock = "{{cfg.service.null_backend_sock}}"
+{{~ else}}
+  null_backend_sock = "{{pkg.svc_var_path}}/null_backend.sock"
+{{~/if}}
 [grpc_clients.endpoints]
+{{~#eachAlive bind.applications-service.members as |apps|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.applications-service]
+    target = "{{apps.sys.ip}}:{{apps.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
 {{~#eachAlive bind.authz-service.members as |authz|}}
 {{~#if @last}}
   [grpc_clients.endpoints.authz-service]
@@ -48,10 +61,24 @@ level = "{{cfg.service.log.level}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
+{{~#eachAlive bind.data-feed-service.members as |datafeed|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.data-feed-service]
+    target = "{{datafeed.sys.ip}}:{{datafeed.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
 {{~#eachAlive bind.deployment-service.members as |deployment|}}
 {{~#if @last}}
   [grpc_clients.endpoints.deployment-service]
     target = "{{deployment.sys.ip}}:{{deployment.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.event-feed-service.members as |event|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.event-feed-service]
+    target = "{{event.sys.ip}}:{{event.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
@@ -76,6 +103,13 @@ level = "{{cfg.service.log.level}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}
+{{~#eachAlive bind.nodemanager-service.members as |manager|}}
+{{~#if @last}}
+  [grpc_clients.endpoints.nodemanager-service]
+    target = "{{manager.sys.ip}}:{{manager.cfg.port}}"
+    secure = true
+{{~/if}}
+{{~/eachAlive}}
 {{~#eachAlive bind.notifications-service.members as |notifications|}}
 {{~#if @last}}
   [grpc_clients.endpoints.notifications-service]
@@ -94,20 +128,6 @@ level = "{{cfg.service.log.level}}"
 {{~#if @last}}
   [grpc_clients.endpoints.secrets-service]
     target = "{{secrets.sys.ip}}:{{secrets.cfg.port}}"
-    secure = true
-{{~/if}}
-{{~/eachAlive}}
-{{~#eachAlive bind.nodemanager-service.members as |manager|}}
-{{~#if @last}}
-  [grpc_clients.endpoints.nodemanager-service]
-    target = "{{manager.sys.ip}}:{{manager.cfg.port}}"
-    secure = true
-{{~/if}}
-{{~/eachAlive}}
-{{~#eachAlive bind.data-feed-service.members as |datafeed|}}
-{{~#if @last}}
-  [grpc_clients.endpoints.data-feed-service]
-    target = "{{datafeed.sys.ip}}:{{datafeed.cfg.port}}"
     secure = true
 {{~/if}}
 {{~/eachAlive}}

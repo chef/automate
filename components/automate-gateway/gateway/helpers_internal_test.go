@@ -11,7 +11,6 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
-	"net/url"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -64,6 +63,7 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 		mockClientsFactory        = mock_gateway.NewMockClientsFactory(ctrl)
 		mockAuthorizationClientV1 authz.AuthorizationClient
 		// mockAuthorizationClientV2 authz_v2.AuthorizationClient
+		cfg = Config{}
 	)
 
 	// Add the provided mocked services
@@ -116,19 +116,16 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 	}
 
 	// Mock the AutomateURL
-	externalURL, err := url.Parse(mockURL)
-	if err != nil {
-		panic(err)
-	}
+	cfg.ExternalFqdn = mockURL
 
-	return *New(
-		WithClientsFactory(mockClientsFactory),
-		WithAuthorizer(authorizer.NewAuthorizer(
-			authv1.AuthorizationHandler(mockAuthorizationClientV1),
-			authv2.AuthorizationHandler(nil),
-		)),
-		WithAutomateURL(externalURL),
+	gw := New(cfg)
+	gw.clientsFactory = mockClientsFactory
+	gw.authorizer = authorizer.NewAuthorizer(
+		authv1.AuthorizationHandler(mockAuthorizationClientV1),
+		authv2.AuthorizationHandler(nil),
 	)
+
+	return *gw
 }
 
 // newAuthorizationMocks generates new mocks for AuthN and AuthZ to authorize
