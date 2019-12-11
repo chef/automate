@@ -92,6 +92,23 @@ func TestTransition(t *testing.T) {
 			assert.True(t, ok, "is in waitingForRestart")
 			c.Stop()
 		})
+	t.Run("idle moves to backupRunning if startBackup message is processed",
+		func(t *testing.T) {
+			c := StartConverger(
+				testCompiler(api.ErrSelfUpgradePending),
+				WithDebugChannel(),
+			)
+			task, err := NewTask()
+			require.NoError(t, err)
+
+			c.StartBackup(task)
+			<-task.C
+
+			s := c.(*converger).debugGetState()
+			_, ok := s.(*backupRunning)
+			assert.True(t, ok, "is in backupRunning")
+			c.Stop()
+		})
 	t.Run("waitingForRestart ignores stopRequest",
 		func(t *testing.T) {
 			c := StartConverger(
@@ -122,6 +139,44 @@ func TestTransition(t *testing.T) {
 			task, err := NewTask()
 			require.NoError(t, err)
 			c.Converge(task, desiredState, nil)
+			err = <-task.C
+			assert.Equal(t, api.ErrRestartPending, err)
+
+			s := c.(*converger).debugGetState()
+			_, ok := s.(*waitingForRestart)
+			assert.True(t, ok, "is in waitingForRestart")
+			c.Stop()
+		})
+	t.Run("waitingForRestart ignores startBackup",
+		func(t *testing.T) {
+			c := StartConverger(
+				testCompiler(nil),
+				WithDebugChannel(),
+			)
+			c.(*converger).debugSetState(newWaitingForRestart())
+
+			task, err := NewTask()
+			require.NoError(t, err)
+			c.StartBackup(task)
+			err = <-task.C
+			assert.Equal(t, api.ErrRestartPending, err)
+
+			s := c.(*converger).debugGetState()
+			_, ok := s.(*waitingForRestart)
+			assert.True(t, ok, "is in waitingForRestart")
+			c.Stop()
+		})
+	t.Run("waitingForRestart ignores backupComplete",
+		func(t *testing.T) {
+			c := StartConverger(
+				testCompiler(nil),
+				WithDebugChannel(),
+			)
+			c.(*converger).debugSetState(newWaitingForRestart())
+
+			task, err := NewTask()
+			require.NoError(t, err)
+			c.BackupComplete(task)
 			err = <-task.C
 			assert.Equal(t, api.ErrRestartPending, err)
 
@@ -184,6 +239,42 @@ func TestTransition(t *testing.T) {
 			assert.True(t, ok, "is in waitingForReconfigure")
 			c.Stop()
 		})
+	t.Run("waitingForReconfigure ignores backupStart",
+		func(t *testing.T) {
+			c := StartConverger(
+				testCompiler(nil),
+				WithDebugChannel(),
+			)
+			c.(*converger).debugSetState(newWaitingForReconfigure())
+			task, err := NewTask()
+			require.NoError(t, err)
+			c.StartBackup(task)
+			err = <-task.C
+			assert.Equal(t, api.ErrSelfReconfigurePending, err)
+
+			s := c.(*converger).debugGetState()
+			_, ok := s.(*waitingForReconfigure)
+			assert.True(t, ok, "is in waitingForReconfigure")
+			c.Stop()
+		})
+	t.Run("waitingForReconfigure ignores backupComplete",
+		func(t *testing.T) {
+			c := StartConverger(
+				testCompiler(nil),
+				WithDebugChannel(),
+			)
+			c.(*converger).debugSetState(newWaitingForReconfigure())
+			task, err := NewTask()
+			require.NoError(t, err)
+			c.BackupComplete(task)
+			err = <-task.C
+			assert.Equal(t, api.ErrSelfReconfigurePending, err)
+
+			s := c.(*converger).debugGetState()
+			_, ok := s.(*waitingForReconfigure)
+			assert.True(t, ok, "is in waitingForReconfigure")
+			c.Stop()
+		})
 	t.Run("waitingForReconfig returns to idle after timeout",
 		func(t *testing.T) {
 			logrus.SetLevel(logrus.DebugLevel)
@@ -201,6 +292,60 @@ func TestTransition(t *testing.T) {
 			s := c.(*converger).debugGetState()
 			_, ok := s.(*idle)
 			assert.True(t, ok, "is in idle")
+			c.Stop()
+		})
+	t.Run("backupRunning moves to idle on backupComplete",
+		func(t *testing.T) {
+			c := StartConverger(
+				testCompiler(nil),
+				WithDebugChannel(),
+			)
+			c.(*converger).debugSetState(&backupRunning{})
+			task, err := NewTask()
+			require.NoError(t, err)
+			c.BackupComplete(task)
+			err = <-task.C
+			assert.NoError(t, err)
+
+			s := c.(*converger).debugGetState()
+			_, ok := s.(*idle)
+			assert.True(t, ok, "is in idle")
+			c.Stop()
+		})
+	t.Run("backupRunning ignores stopRequest",
+		func(t *testing.T) {
+			c := StartConverger(
+				testCompiler(nil),
+				WithDebugChannel(),
+			)
+			c.(*converger).debugSetState(&backupRunning{})
+			task, err := NewTask()
+			require.NoError(t, err)
+			c.StopServices(task, localhost, nil)
+			err = <-task.C
+			assert.Equal(t, api.ErrBackupInProgress, err)
+
+			s := c.(*converger).debugGetState()
+			_, ok := s.(*backupRunning)
+			assert.True(t, ok, "is in backupRunning")
+			c.Stop()
+		})
+	t.Run("backupRunning ignores convergeRequest",
+		func(t *testing.T) {
+			c := StartConverger(
+				testCompiler(nil),
+				WithDebugChannel(),
+			)
+			c.(*converger).debugSetState(&backupRunning{})
+			task, err := NewTask()
+			require.NoError(t, err)
+			c.Converge(task, desiredState, nil)
+			err = <-task.C
+			assert.Equal(t, api.ErrBackupInProgress, err)
+
+			s := c.(*converger).debugGetState()
+			_, ok := s.(*backupRunning)
+			assert.True(t, ok, "is in backupRunning")
 			c.Stop()
 		})
 }
