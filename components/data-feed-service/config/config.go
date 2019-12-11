@@ -36,11 +36,13 @@ type LogConfig struct {
 }
 
 type ServiceConfig struct {
-	Host            string        `mapstructure:"host"`
-	Port            uint16        `mapstructure:"port"`
-	FeedInterval    time.Duration `mapstructure:"feed_interval"`
-	AssetPageSize   int32         `mapstructure:"asset_page_size"`
-	ReportsPageSize int32         `mapstructure:"reports_page_size"`
+	Host             string        `mapstructure:"host"`
+	Port             uint16        `mapstructure:"port"`
+	FeedInterval     time.Duration `mapstructure:"feed_interval"`
+	AssetPageSize    int32         `mapstructure:"asset_page_size"`
+	ReportsPageSize  int32         `mapstructure:"reports_page_size"`
+	NodeBatchSize    int           `mapstructure:"node_batch_size"`
+	UpdatedNodesOnly bool          `mapstructure:"updated_nodes_only"`
 }
 
 type PostgresConfig struct {

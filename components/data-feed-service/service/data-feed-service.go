@@ -10,41 +10,29 @@ import (
 	"strings"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+
+	cfgmgmtRequest "github.com/chef/automate/api/interservice/cfgmgmt/request"
+	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	rrule "github.com/teambition/rrule-go"
 
 	secrets "github.com/chef/automate/api/external/secrets"
-	cfgmgmtRequest "github.com/chef/automate/api/interservice/cfgmgmt/request"
-	cfgmgmtResponse "github.com/chef/automate/api/interservice/cfgmgmt/response"
-	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
-	"github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/data-feed-service/config"
 	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/lib/cereal"
 	grpccereal "github.com/chef/automate/lib/cereal/grpc"
-	"github.com/chef/automate/lib/cereal/patterns"
+
 	"github.com/chef/automate/lib/grpc/secureconn"
 )
 
-var (
-	dataFeedTaskName     = cereal.NewTaskName("data-feed-poll")
-	dataFeedWorkflowName = cereal.NewWorkflowName("data-feed-workflow")
-	dataFeedScheduleName = "periodic-data-feed-workflow"
-)
+const version = "1"
 
 type datafeedNotification struct {
 	username string
 	password string
 	url      string
-	data     []datafeedMessage
-}
-
-type datafeedMessage struct {
-	Automatic map[string]interface{} `json:"automatic"`
-	LastRun   *cfgmgmtResponse.Run   `json:"last_run"`
-	Report    *reporting.Report      `json:"report"`
+	data     bytes.Buffer
 }
 
 type DataClient struct {
@@ -74,16 +62,35 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		return err
 	}
 
-	dataFeedPollTask, err := NewDataFeedPollTask(dataFeedConfig, connFactory, db)
+	cfgMgmtConn, err := connFactory.Dial("config-mgmt-service", dataFeedConfig.CfgmgmtConfig.Target)
 	if err != nil {
-		return err
+		return errors.Wrap(err, "could not connect to config-mgmt-service")
 	}
 
-	err = manager.RegisterWorkflowExecutor(dataFeedWorkflowName, patterns.NewSingleTaskWorkflowExecutor(dataFeedTaskName, false))
+	complianceConn, err := connFactory.Dial("compliance-service", dataFeedConfig.ComplianceConfig.Target)
+	if err != nil {
+		return errors.Wrap(err, "could not connect to compliance-service")
+	}
+
+	secretsConn, err := connFactory.Dial("secrets-service", dataFeedConfig.SecretsConfig.Target)
+	if err != nil {
+		return errors.Wrap(err, "could not connect to secrets-service")
+	}
+
+	dataFeedPollTask := NewDataFeedPollTask(dataFeedConfig, cfgMgmtConn, complianceConn, db, manager)
+	dataFeedAggregateTask := NewDataFeedAggregateTask(dataFeedConfig, cfgMgmtConn, complianceConn, secretsConn, db)
+
+	err = manager.RegisterWorkflowExecutor(dataFeedWorkflowName, &DataFeedWorkflowExecutor{workflowName: dataFeedWorkflowName})
 	if err != nil {
 		return err
 	}
-	err = manager.RegisterTaskExecutor(dataFeedTaskName, dataFeedPollTask, cereal.TaskExecutorOpts{
+	err = manager.RegisterTaskExecutor(dataFeedPollTaskName, dataFeedPollTask, cereal.TaskExecutorOpts{
+		Workers: 1,
+	})
+	if err != nil {
+		return err
+	}
+	err = manager.RegisterTaskExecutor(dataFeedAggregateTaskName, dataFeedAggregateTask, cereal.TaskExecutorOpts{
 		Workers: 1,
 	})
 	if err != nil {
@@ -93,25 +100,32 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 	r, err := rrule.NewRRule(rrule.ROption{
 		Freq:     rrule.SECONDLY,
 		Interval: int(dataFeedConfig.ServiceConfig.FeedInterval.Seconds()),
-		Dtstart:  time.Now().Round(dataFeedConfig.ServiceConfig.FeedInterval),
+		Dtstart:  time.Now().Round(dataFeedConfig.ServiceConfig.FeedInterval).Add(30 * time.Second),
 	})
 	if err != nil {
 		return err
 	}
 
+	var zeroTime time.Time
 	dataFeedTaskParams := DataFeedPollTaskParams{
 		FeedInterval:    dataFeedConfig.ServiceConfig.FeedInterval,
 		AssetPageSize:   dataFeedConfig.ServiceConfig.AssetPageSize,
 		ReportsPageSize: dataFeedConfig.ServiceConfig.ReportsPageSize,
+		NextFeedStart:   zeroTime,
+		NextFeedEnd:     zeroTime,
+	}
+
+	dataFeedWorkflowParams := DataFeedWorkflowParams{PollTaskParams: dataFeedTaskParams,
+		NodeBatchSize:    dataFeedConfig.ServiceConfig.NodeBatchSize,
+		UpdatedNodesOnly: dataFeedConfig.ServiceConfig.UpdatedNodesOnly,
 	}
 
 	err = manager.CreateWorkflowSchedule(context.Background(),
 		dataFeedScheduleName, dataFeedWorkflowName,
-		dataFeedTaskParams, true, r)
+		dataFeedWorkflowParams, true, r)
 	if err == cereal.ErrWorkflowScheduleExists {
-		// TODO(ssd) 2019-09-09: Right now this resets Dtstart on the recurrence, do we want that?
 		err = manager.UpdateWorkflowScheduleByName(context.Background(), dataFeedScheduleName, dataFeedWorkflowName,
-			cereal.UpdateParameters(dataFeedTaskParams),
+			cereal.UpdateParameters(dataFeedWorkflowParams),
 			cereal.UpdateEnabled(true),
 			cereal.UpdateRecurrence(r))
 		if err != nil {
@@ -124,141 +138,9 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 	return manager.Start(context.Background())
 }
 
-type DataFeedPollTask struct {
-	cfgMgmt   cfgmgmt.CfgMgmtClient
-	secrets   secrets.SecretsServiceClient
-	reporting reporting.ReportingServiceClient
-	db        *dao.DB
-}
-
-type DataFeedPollTaskParams struct {
-	AssetPageSize   int32
-	ReportsPageSize int32
-	FeedInterval    time.Duration
-}
-
-func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factory, db *dao.DB) (*DataFeedPollTask, error) {
-
-	cfgMgmtConn, err := connFactory.Dial("config-mgmt-service", dataFeedConfig.CfgmgmtConfig.Target)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not connect to config-mgmt-service")
-	}
-
-	secretsConn, err := connFactory.Dial("secrets-service", dataFeedConfig.SecretsConfig.Target)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not connect to secrets-service")
-	}
-
-	complianceConn, err := connFactory.Dial("compliance-service", dataFeedConfig.ComplianceConfig.Target)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not connect to compliance-service")
-	}
-
-	return &DataFeedPollTask{
-		secrets:   secrets.NewSecretsServiceClient(secretsConn),
-		reporting: reporting.NewReportingServiceClient(complianceConn),
-		cfgMgmt:   cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
-		db:        db,
-	}, nil
-}
-
-func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
-	params := DataFeedPollTaskParams{}
-	err := task.GetParameters(&params)
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to parse task parameters")
-	}
-
-	now := time.Now()
-	feedStartTime, feedEndTime := getFeedTimes(params.FeedInterval, now)
-	destinations, err := d.getDestinations()
-
-	if err != nil {
-		return nil, errors.Wrap(err, "failed to get destinations from db")
-	}
-	if len(destinations) == 0 {
-		return nil, nil
-	}
-	// build messages for any nodes which have had a CCR in last window, include last compliance report
-	datafeedMessages := d.buildDatafeed(ctx, params.AssetPageSize, feedStartTime, feedEndTime)
-	// build messages for any reports in last window include last CCR and OHAI
-	d.buildReportFeed(ctx, params.ReportsPageSize, feedStartTime, feedEndTime, datafeedMessages)
-	// get the valus from this ipaddress:datafeedMessage map
-	data := make([]datafeedMessage, 0, len(datafeedMessages))
-	for _, value := range datafeedMessages {
-		data = append(data, value)
-	}
-
-	if len(datafeedMessages) == 0 {
-		return nil, nil
-	}
-	for destination := range destinations {
-		log.Debugf("Destination name %v", destinations[destination].Name)
-		log.Debugf("Destination url %v", destinations[destination].URL)
-		log.Debugf("Destination secret %v", destinations[destination].Secret)
-
-		username, password, err := GetCredentials(ctx, d.secrets, destinations[destination].Secret)
-
-		if err != nil {
-			log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
-			// TODO error handling - need some form of report in automate that indicates when data was sent and if it was successful
-		} else {
-			// build and send notification for this rule
-			notification := datafeedNotification{username: username, password: password, url: destinations[destination].URL, data: data}
-
-			client := NewDataClient()
-			err = send(client, notification)
-			if err != nil {
-				handleSendErr(notification, feedStartTime, feedEndTime, err)
-			}
-		}
-	}
-
-	return nil, nil
-}
-
-func (d *DataFeedPollTask) getDestinations() ([]dao.Destination, error) {
-	return d.db.ListDBDestinations()
-}
-
 func handleSendErr(notification datafeedNotification, startTime time.Time, endTime time.Time, err error) {
 	log.Errorf("Failed to send notification to %v. Start: %v, End: %v. %v", notification.url, startTime, endTime, err)
 	// TODO report this failure to the UI with the time window and notification details
-}
-
-func getFeedTimes(feedInterval time.Duration, now time.Time) (time.Time, time.Time) {
-	var feedEndTime time.Time
-	var feedStartTime time.Time
-
-	feedEndTime = getFeedEndTime(feedInterval, now)
-	feedStartTime = feedEndTime.Add(-feedInterval)
-
-	log.Debugf("Feed interval start, end: %s, %s", feedStartTime.Format("15:04:05"), feedEndTime.Format("15:04:05"))
-	return feedStartTime, feedEndTime
-}
-
-func getFeedEndTime(feedInterval time.Duration, now time.Time) time.Time {
-	log.Debugf("Time Now: %s", now.Format("15:04:05"))
-	/*
-	 * We round the current time down based on the interval duration to get the end of the last interval.
-	 *
-	 * Round will round either up or down to the nearest value of the inteval duration.
-	 * e.g 1:20pm rounds to 1pm, 1:40pm rounds to 2pm
-	 *
-	 * If we have rounded down that will be our feed end time. The end of a clock interval
-	 * rather than current time e.g. 1pm
-	 */
-	feedEndTime := now.Round(feedInterval)
-	log.Debugf("FeedInterval/Units: %s", feedInterval)
-	/*
-	 * If we have rounded up we subtract the interval to effectively round down
-	 */
-	if feedEndTime.After(now) {
-		feedEndTime = feedEndTime.Add(-feedInterval)
-		log.Debugf("feedEndTime after: %s", feedEndTime.Format("15:04:05"))
-	}
-	log.Debugf("feedEndTime: %s", feedEndTime.Format("15:04:05"))
-	return feedEndTime
 }
 
 func GetCredentials(ctx context.Context, client secrets.SecretsServiceClient, secretID string) (string, string, error) {
@@ -287,16 +169,10 @@ func send(sender NotificationSender, notification datafeedNotification) error {
 
 func (client DataClient) sendNotification(notification datafeedNotification) error {
 
-	messageBytes, err := json.Marshal(notification.data)
-	if err != nil {
-		log.Errorf("Error creating json bytes %v", err)
-		return err
-	}
-	log.Debugf("sendNotification bytes length %v", len(messageBytes))
-
+	log.Debugf("sendNotification bytes length %v", notification.data.Len())
 	var contentBuffer bytes.Buffer
 	zip := gzip.NewWriter(&contentBuffer)
-	_, err = zip.Write(messageBytes)
+	_, err := zip.Write(notification.data.Bytes())
 	if err != nil {
 		return err
 	}
@@ -314,150 +190,110 @@ func (client DataClient) sendNotification(notification datafeedNotification) err
 	request.Header.Add("Content-Type", "application/json")
 	request.Header.Add("Content-Encoding", "gzip")
 	request.Header.Add("Accept", "application/json")
-	log.Debugf("request %v", request)
+	request.Header.Add("Chef-Data-Feed-Message-Version", version)
 
 	response, err := client.client.Do(request)
 	if err != nil {
-		log.Errorf("Error sending test message %v", err)
+		log.Errorf("Error sending message %v", err)
 		return err
 	} else {
 		log.Infof("Asset data posted to %v, Status %v", notification.url, response.Status)
 	}
-	if response.StatusCode != http.StatusCreated {
+	if response.StatusCode != http.StatusAccepted {
 		return errors.New(response.Status)
 	}
 	err = response.Body.Close()
 	if err != nil {
-		log.Warnf("Error clsoing response body %v", err)
+		log.Warnf("Error closing response body %v", err)
 	}
 	return nil
 }
 
-func (d *DataFeedPollTask) buildDatafeed(ctx context.Context, pageSize int32, feedStartTime time.Time, feedEndTime time.Time) map[string]datafeedMessage {
-	log.Debug("Inventory nodes start")
-	feedStartString, err := ptypes.TimestampProto(feedStartTime)
+func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (map[string]interface{}, error) {
+
+	nodeData := make(map[string]interface{})
+	nodeId, lastRunId, err := getNodeFields(ctx, client, filters)
 	if err != nil {
-		return nil
+		return nodeData, err
 	}
-	feedEndString, err := ptypes.TimestampProto(feedEndTime)
+
+	attributesJson, err := getNodeAttributes(ctx, client, nodeId)
 	if err != nil {
-		return nil
+		return nodeData, err
 	}
 
-	nodesRequest := &cfgmgmtRequest.InventoryNodes{
-		PageSize: pageSize,
-		Start:    feedStartString,
-		End:      feedEndString,
-		Sorting: &cfgmgmtRequest.Sorting{
-			Order: cfgmgmtRequest.Order_desc,
-		},
-	}
+	nodeData["attributes"] = attributesJson
 
-	inventoryNodes, err := d.cfgMgmt.GetInventoryNodes(ctx, nodesRequest)
+	lastRun, err := client.GetNodeRun(ctx, &cfgmgmtRequest.NodeRun{NodeId: nodeId, RunId: lastRunId})
+
 	if err != nil {
-		return nil
+		log.Errorf("Error getting node run %v", err)
+		return nodeData, err
 	}
-
-	nodeIDs := make([]string, 0)
-	log.Debugf("No of inventory nodes %v", len(inventoryNodes.Nodes))
-	for len(inventoryNodes.Nodes) > 0 {
-		for _, node := range inventoryNodes.Nodes {
-			log.Debugf("Inventory node #%v", node)
-			nodeIDs = append(nodeIDs, node.Id)
-		}
-		lastNode := inventoryNodes.Nodes[len(inventoryNodes.Nodes)-1]
-		nodesRequest.CursorId = lastNode.Id
-		nodesRequest.CursorDate = lastNode.Checkin
-
-		inventoryNodes, err = d.cfgMgmt.GetInventoryNodes(ctx, nodesRequest)
-		log.Debugf("inventory nodes %v, cursor %v", len(inventoryNodes.Nodes), lastNode.Id)
-		if err != nil {
-			return nil
-		}
-	}
-	log.Info("Building data feed...")
-
-	nodeMessages := make(map[string]datafeedMessage)
-
-	for _, nodeID := range nodeIDs {
-		filters := []string{"id:" + nodeID}
-
-		message := getNodeData(ctx, d.cfgMgmt, filters)
-
-		ipaddress := message.Automatic["ipaddress"].(string)
-
-		filter := &reporting.ListFilter{Type: "ipaddress", Values: []string{ipaddress}}
-		reportFilters := []*reporting.ListFilter{filter}
-
-		ipaddressQuery := &reporting.Query{
-			Page:    0,
-			PerPage: 1,
-			Filters: reportFilters,
-			Sort:    "latest_report.end_time",
-			Order:   reporting.Query_DESC,
-		}
-		reports, err := d.reporting.ListReports(ctx, ipaddressQuery)
-		if err != nil {
-			log.Errorf("Error getting report by ip %v", err)
-			//TODO
-		}
-		// might not be a report!
-
-		//var fullReport *reporting.
-		fullReport := new(reporting.Report)
-		if len(reports.Reports) != 0 {
-			reportID := &reporting.Query{Id: reports.Reports[0].Id}
-			fullReport, err = d.reporting.ReadReport(ctx, reportID)
-			// TODO err handling
-			if err != nil {
-				log.Errorf("Error getting report by ip %v", err)
-				//TODO
-			}
-		}
-
-		message.Report = fullReport
-		nodeMessages[ipaddress] = message
-
-	}
-	log.Debugf("%v node attribute messages retrieved in interval", len(nodeMessages))
-	return nodeMessages
+	macAddress, hostname := getHostAttributes(attributesJson)
+	nodeDataContent := make(map[string]interface{})
+	nodeDataContent["last_run"] = lastRun
+	nodeDataContent["macaddress"] = macAddress
+	nodeDataContent["hostname"] = hostname
+	nodeData["node_data"] = nodeDataContent
+	return nodeData, nil
 }
 
-func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) datafeedMessage {
+func getNodeFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, error) {
 
 	nodeFilters := &cfgmgmtRequest.Nodes{Filter: filters}
 	nodes, err := client.GetNodes(ctx, nodeFilters)
 	if err != nil {
 		log.Errorf("Error getting cfgmgmt/nodes %v", err)
-		//TODO
+		return "", "", err
 	}
 
-	nodeStruct := nodes.Values[0].GetStructValue()
-	id := nodeStruct.Fields["id"].GetStringValue()
-	lastRunId := nodeStruct.Fields["latest_run_id"].GetStringValue()
-	nodeAttributes, err := client.GetAttributes(ctx, &cfgmgmtRequest.Node{NodeId: id})
+	if len(nodes.Values) == 0 {
+		log.Debug("no node data exists for this node")
+		return "", "", nil
+	}
+	node := nodes.Values[0].GetStructValue()
+	id := node.Fields["id"].GetStringValue()
+	lastRunId := node.Fields["latest_run_id"].GetStringValue()
+
+	return id, lastRunId, nil
+
+}
+
+func getNodeAttributes(ctx context.Context, client cfgmgmt.CfgMgmtClient, nodeId string) (map[string]interface{}, error) {
+
+	attributesJson := make(map[string]interface{})
+
+	nodeAttributes, err := client.GetAttributes(ctx, &cfgmgmtRequest.Node{NodeId: nodeId})
 	if err != nil {
 		log.Errorf("Error getting attributes %v", err)
-		//TODO
+		return attributesJson, err
 	}
-	var automaticJson map[string]interface{}
-	err = json.Unmarshal([]byte(nodeAttributes.Automatic), &automaticJson)
+
+	err = json.Unmarshal([]byte(nodeAttributes.Automatic), &attributesJson)
 	if err != nil {
 		log.Errorf("Could not parse automatic attributes from json: %v", err)
-		// continue to the next node
-		// TODO
+		return attributesJson, err
 	}
-	attributesJson := buildDynamicJson(automaticJson)
+	attributesJson = buildDynamicJson(attributesJson)
+	return attributesJson, nil
+}
 
-	lastRun, error := client.GetNodeRun(ctx, &cfgmgmtRequest.NodeRun{NodeId: id, RunId: lastRunId})
-
-	if error != nil {
-		log.Errorf("Error getting node run %v", error)
-	} else {
-		log.Debugf("Last run\n %v", lastRun)
+func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, error) {
+	nodeId, _, err := getNodeFields(ctx, client, filters)
+	if err != nil {
+		return "", "", err
 	}
+	attributesJson, err := getNodeAttributes(ctx, client, nodeId)
+	if err != nil {
+		return "", "", err
+	}
+	macAddress, hostname := getHostAttributes(attributesJson)
+	return macAddress, hostname, nil
+}
 
-	return datafeedMessage{Automatic: attributesJson, LastRun: lastRun}
+func getHostAttributes(attributesJson map[string]interface{}) (string, string) {
+	return attributesJson["macaddress"].(string), attributesJson["hostname"].(string)
 }
 
 func buildDynamicJson(automaticJson map[string]interface{}) map[string]interface{} {
@@ -510,77 +346,4 @@ func buildWindowsJson(windowsJson map[string]interface{}) map[string]interface{}
 	// TODO we could get the chassis from the kernel attributes
 
 	return windowsJson
-}
-
-func (d *DataFeedPollTask) buildReportFeed(ctx context.Context, pageSize int32, feedStartTime time.Time, feedEndTime time.Time, datafeedMessages map[string]datafeedMessage) {
-	feedStartString := strings.SplitAfter(feedStartTime.Format(time.RFC3339), "Z")[0]
-	feedEndString := strings.SplitAfter(feedEndTime.Format(time.RFC3339), "Z")[0]
-	log.Infof("Building report feed... %v - %v", feedStartString, feedEndString)
-
-	startFilter := &reporting.ListFilter{Type: "start_time", Values: []string{feedStartString}}
-	endFilter := &reporting.ListFilter{Type: "end_time", Values: []string{feedEndString}}
-
-	filters := []*reporting.ListFilter{startFilter, endFilter}
-
-	// page is not something we can configure we should start with
-	// page at 1 and work out how many calls to make based on page
-	// size divide the total by page size and add 1 and we loop
-	// over that
-	page := int32(1)
-	query := &reporting.Query{
-		Page:    page,
-		PerPage: pageSize,
-		Filters: filters,
-		Sort:    "latest_report.end_time",
-		Order:   reporting.Query_DESC,
-	}
-	log.Debugf("report query %v", query)
-
-	reports, err := d.reporting.ListReports(ctx, query)
-	if err != nil {
-		log.Errorf("Error getting reporting/ListReports %v", err)
-	}
-
-	pages := (reports.Total / pageSize)
-	if (reports.Total % pageSize) != 0 {
-		pages++
-	}
-	log.Debugf("Total reports: %v, reports per page: %v, total pages %v: ",
-		reports.Total, pageSize, pages)
-
-	// get reports from the pages
-	for page <= pages {
-		log.Debugf("report query %v", query)
-		for report := range reports.Reports {
-			ipaddress := reports.Reports[report].Ipaddress
-			log.Debugf("report has ipaddress %v", ipaddress)
-			if _, ok := datafeedMessages[ipaddress]; ok {
-				log.Debugf("node data already exists for %v", ipaddress)
-			} else {
-				// the node hasn't had a client run in last window, but has a report so we can add the report
-				id := &reporting.Query{Id: reports.Reports[report].Id}
-
-				fullReport, err := d.reporting.ReadReport(ctx, id)
-				if err != nil {
-					log.Debugf("Error getting report by if %v", err)
-					//TODO
-				}
-				filters := []string{"ipaddress:" + ipaddress}
-				// node the latest node data associated with this report
-				message := getNodeData(ctx, d.cfgMgmt, filters)
-				message.Report = fullReport
-				datafeedMessages[ipaddress] = message
-			}
-
-		}
-		page++
-		query = &reporting.Query{
-			Page:    page,
-			PerPage: pageSize,
-			Filters: filters}
-		reports, err = d.reporting.ListReports(ctx, query)
-		if err != nil {
-			log.Errorf("Error getting reporting/ListReports %v", err)
-		}
-	}
 }

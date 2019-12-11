@@ -359,6 +359,7 @@ func backendNodeArrayToInventoryNodeArray(nodes []backend.InventoryNode) []*inte
 			LastCcrReceived: lastCCRTimestamp,
 			Name:            node.NodeName,
 			Fqdn:            node.Fqdn,
+			Ipaddress:       node.IPAddress,
 		}
 
 	}
