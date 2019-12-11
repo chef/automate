@@ -17,7 +17,7 @@ func init() {
     "/applications/delete_disconnected_services": {
       "post": {
         "summary": "Remove Disconnected Services",
-        "description": "Removes services marked as disconnected based on the ` + "`" + `threshold_seconds` + "`" + ` setting.\nThis function is not used by the API or CLI and is here for testing purposes.\nThe functionality is currently covered by a periodically runnig job that can be configured using ` + "`" + `UpdateDeleteDisconnectedServicesConfig` + "`" + `.",
+        "description": "Removes services marked as disconnected based on the ` + "`" + `threshold_seconds` + "`" + ` setting.\nThis function is not used by the API or CLI and is here for testing purposes.\nThe functionality is currently covered by a periodically running job that can be configured using ` + "`" + `UpdateDeleteDisconnectedServicesConfig` + "`" + `.",
         "operationId": "DeleteDisconnectedServices",
         "responses": {
           "200": {
@@ -45,7 +45,7 @@ func init() {
     "/applications/disconnected_services": {
       "get": {
         "summary": "Mark Services as Disconnected",
-        "description": "Marks services as disconnected based on the ` + "`" + `threshold_seconds` + "`" + ` setting.\nThis function is not used by the API or CLI and is here for testing purposes.\nThe functionality is currently covered by a periodically runnig job that can be configured\nby utilizing the ` + "`" + `UpdateDisconnectedServicesConfig` + "`" + ` endpoint.",
+        "description": "Marks services as disconnected based on the ` + "`" + `threshold_seconds` + "`" + ` setting.\nThis function is not used by the API or CLI and is here for testing purposes.\nThe functionality is currently covered by a periodically running job that can be configured\nby utilizing the ` + "`" + `UpdateDisconnectedServicesConfig` + "`" + ` endpoint.",
         "operationId": "GetDisconnectedServices",
         "responses": {
           "200": {
@@ -450,7 +450,7 @@ func init() {
       },
       "post": {
         "summary": "Change 'Disconnected Services' Configuration",
-        "description": "Changes the configuration for the task that marks services as disconnected after\n'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.\nThis job cannot be disabled, and therefor no information about running is accepted.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n/retention/service_groups/disconnected_services/config\n'{\n\"threshold\": \"15m\"\n}'\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Changes the configuration for the task that marks services as disconnected after\n'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.\nThis job cannot be disabled, and therefore no information about running is accepted.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n/retention/service_groups/disconnected_services/config\n'{\n\"threshold\": \"15m\"\n}'\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateDisconnectedServicesConfig",
         "responses": {
           "200": {
@@ -555,7 +555,8 @@ func init() {
           "description": "The job status? ` + "`" + `false` + "`" + ` is disabled, ` + "`" + `true` + "`" + ` is enabled."
         },
         "threshold": {
-          "type": "string"
+          "type": "string",
+          "description": "The ` + "`" + `threshold` + "`" + ` setting used by periodic jobs for evaluating services.\nThreshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under ` + "`" + `lib/` + "`" + `."
         }
       },
       "description": "Periodic job configuration."
@@ -579,11 +580,11 @@ func init() {
         },
         "release": {
           "type": "string",
-          "description": "Combination of the service version and release in a single string like:\nExample: 0.1.0/8743278934278923."
+          "description": "Combination of the service version and release in a single string.\nExample: 0.1.0/8743278934278923."
         },
         "group": {
           "type": "string",
-          "title": "Service group name"
+          "description": "Service group name."
         },
         "health_check": {
           "$ref": "#/definitions/chef.automate.api.applications.HealthStatus",
@@ -591,7 +592,7 @@ func init() {
         },
         "status": {
           "$ref": "#/definitions/chef.automate.api.applications.ServiceStatus",
-          "description": "The ServiceStatus enum describes the status of the service (Currently Unimplemented)."
+          "description": "Intentionally blank."
         },
         "application": {
           "type": "string",
@@ -633,7 +634,7 @@ func init() {
         "disconnected": {
           "type": "boolean",
           "format": "boolean",
-          "title": "Service connection information.\nbased on time since last healthcheck received and disconnected service configuration"
+          "description": "Service connection information.\nBased on time since last healthcheck received and disconnected service configuration."
         },
         "last_event_occurred_at": {
           "type": "string",
@@ -645,7 +646,8 @@ func init() {
           "description": "Interval since last event received until now."
         },
         "health_check_result": {
-          "$ref": "#/definitions/chef.automate.api.applications.HealthCheckResult"
+          "$ref": "#/definitions/chef.automate.api.applications.HealthCheckResult",
+          "description": "Intentionally blank."
         }
       }
     },
@@ -658,7 +660,7 @@ func init() {
         },
         "release": {
           "type": "string",
-          "description": "Combination of the version and release in a single string like:\nExample: 0.1.0/8743278934278923."
+          "description": "Combination of the version and release in a single string.\nExample: 0.1.0/8743278934278923."
         },
         "status": {
           "$ref": "#/definitions/chef.automate.api.applications.HealthStatus",
@@ -687,7 +689,7 @@ func init() {
         },
         "package": {
           "type": "string",
-          "description": "Combination of the origin and package name in a single string like:\nExample: core/redis."
+          "description": "Combination of the origin and package name in a single string.\nExample: core/redis."
         },
         "disconnected_count": {
           "type": "integer",
@@ -719,7 +721,7 @@ func init() {
         "DOWN"
       ],
       "default": "RUNNING",
-      "title": "The ServiceStatus enum describes the status of the service\nCurrently unimplemented"
+      "description": "The ServiceStatus enum describes the status of the service.\nCurrently unimplemented."
     },
     "chef.automate.api.applications.ServicesBySGRes": {
       "type": "object",
