@@ -547,20 +547,9 @@ func (s *ProjectState) validateProjectDelete(ctx context.Context, projectID stri
 		return err
 	}
 
-	if projectResponse.Project.Status == storage.EditsPending.String() {
+	if projectResponse.Project.Status != storage.NoRules.String() {
 		return status.Errorf(codes.FailedPrecondition,
-			"Project %q can not be deleted because it has edits pending", projectResponse.Project.Name)
-	}
-
-	rulesResponse, err := s.ListRulesForProject(ctx, &api.ListRulesForProjectReq{Id: projectID})
-	if err != nil {
-		return err
-	}
-
-	if len(rulesResponse.Rules) > 0 {
-		return status.Errorf(codes.FailedPrecondition,
-			"Project %q can not be deleted because it has %d rule(s)",
-			projectResponse.Project.Name, len(rulesResponse.Rules))
+			"Project %q can not be deleted because it has rules", projectResponse.Project.Name)
 	}
 
 	return nil
