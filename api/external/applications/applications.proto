@@ -157,7 +157,7 @@ service ApplicationsService {
 
   Removes services marked as disconnected based on the `threshold_seconds` setting.
   This function is not used by the API or CLI and is here for testing purposes.
-  The functionality is currently covered by a periodically runnig job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
+  The functionality is currently covered by a periodically running job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
   */
   rpc DeleteDisconnectedServices(DisconnectedServicesReq) returns (ServicesRes ) {
     option (google.api.http) = {
