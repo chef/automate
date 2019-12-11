@@ -72,6 +72,8 @@ func BenchmarkV1SpecificInput(b *testing.B) {
 	result = r
 }
 
+var errResult error
+
 func BenchmarkV1InitPartialResult(b *testing.B) {
 	var r error
 	ctx := context.Background()
@@ -492,7 +494,7 @@ func BenchmarkV2SpecificInput(b *testing.B) {
 // BenchmarkV2GenericInput-8   	    328531	      4034 ns/op	     1664 B/op	    50 allocs/op
 // BenchmarkV2SpecificInput-8   	  572641	      2073 ns/op	     976 B/op	      30 allocs/op
 
-func BenchmarkV2InitPartialResult(b *testing.B) {
+func BenchmarkV2AuthorizedProjectPreparedQuery(b *testing.B) {
 	var r error
 	ctx := context.Background()
 
@@ -501,26 +503,23 @@ func BenchmarkV2InitPartialResult(b *testing.B) {
 	s, err := New(ctx, l)
 	require.NoError(b, err, "init state")
 
-	initStore := func(s *State, i int) {
-		policies := make([]map[string]interface{}, i)
-		for j := 0; j < i; j++ {
-			policies[j] = map[string]interface{}{
-				"subjects": engine.Subject("token:any"),
-				"action":   "read",
-				"resource": "cfgmgmt:nodes",
-				"effect":   "allow",
-			}
-		}
-		s.store = inmem.NewFromObject(map[string]interface{}{
-			"policies": policies,
-		})
-	}
+	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
+	roleCount := 10 // keep this constant while increasing policyCount
 
-	for i := 0; i < 5; i++ {
-		b.Run(fmt.Sprintf("store with %d items", i), func(b *testing.B) {
+	chefPolicies := chefManagedPolicies()
+
+	for _, count := range policyCount {
+		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
+		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+			"policies": policies,
+			"roles":    roles,
+		})
+
+		totalCount := count + len(chefPolicies)
+
+		b.Run(fmt.Sprintf("store with %d policies", totalCount), func(b *testing.B) {
 			for n := 0; n < b.N; n++ {
-				initStore(s, i)
-				r = s.initPartialResult(ctx)
+				r = s.makeAuthorizedProjectPreparedQuery(ctx)
 				if r != nil {
 					b.Error(r)
 				}
@@ -530,88 +529,97 @@ func BenchmarkV2InitPartialResult(b *testing.B) {
 	}
 }
 
-// Q: What takes longer: parsing the module or compiling it?
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_policies-8      25	  49970477 ns/op	  8509747 B/op	  216866 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_9_policies-8      21	  53370041 ns/op	  9404406 B/op	  235432 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_14_policies-8     15	  70109340 ns/op	  11779022 B/op	  285514 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_24_policies-8     16	  78363613 ns/op	  12651642 B/op	  304112 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_54_policies-8     8	    159008227 ns/op	  24972671 B/op	  560378 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_104_policies-8    5	    211184597 ns/op	  34625374 B/op	  761267 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_204_policies-8    3	    367088709 ns/op	  68543746 B/op	  1472562 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_1004_policies-8   1	    1664903435 ns/op	285167952 B/op	6018447 allocs/op
+
+// // Q: What takes longer: parsing the module or compiling it?
 
 var parsedResult *ast.Module
 
-func BenchmarkV2CompareParseCompile(b *testing.B) {
-	policy := MustAsset("policy/authz.rego")
-	compiler := ast.NewCompiler()
-	parsed, err := ast.ParseModule("authz.rego", string(policy))
-	if err != nil {
-		b.Fatal(err)
-	}
+// func BenchmarkV2CompareParseCompile(b *testing.B) {
+// 	policy := MustAsset("policy/authz.rego")
+// 	compiler := ast.NewCompiler()
+// 	parsed, err := ast.ParseModule("authz.rego", string(policy))
+// 	if err != nil {
+// 		b.Fatal(err)
+// 	}
 
-	b.Run("parsing", func(b *testing.B) {
-		for n := 0; n < b.N; n++ {
-			parsed, err = ast.ParseModule("authz.rego", string(policy))
-			if err != nil {
-				b.Error(err)
-			}
-		}
-		parsedResult = parsed
-	})
+// 	b.Run("parsing", func(b *testing.B) {
+// 		for n := 0; n < b.N; n++ {
+// 			parsed, err = ast.ParseModule("authz.rego", string(policy))
+// 			if err != nil {
+// 				b.Error(err)
+// 			}
+// 		}
+// 		parsedResult = parsed
+// 	})
 
-	b.Run("compiling", func(b *testing.B) {
-		for n := 0; n < b.N; n++ {
-			compiler.Compile(map[string]*ast.Module{"authz.rego": parsed})
-			if compiler.Failed() {
-				b.Error(compiler.Errors)
-			}
-		}
-	})
+// 	b.Run("compiling", func(b *testing.B) {
+// 		for n := 0; n < b.N; n++ {
+// 			compiler.Compile(map[string]*ast.Module{"authz.rego": parsed})
+// 			if compiler.Failed() {
+// 				b.Error(compiler.Errors)
+// 			}
+// 		}
+// 	})
 
-	// consistency check
-	b.Run("parse and compile", func(b *testing.B) {
-		for n := 0; n < b.N; n++ {
-			parsed, err = ast.ParseModule("authz.rego", string(policy))
-			if err != nil {
-				b.Error(err)
-			}
-			compiler.Compile(map[string]*ast.Module{"authz.rego": parsed})
-			if compiler.Failed() {
-				b.Error(compiler.Errors)
-			}
-		}
-		parsedResult = parsed
-	})
-}
+// 	// consistency check
+// 	b.Run("parse and compile", func(b *testing.B) {
+// 		for n := 0; n < b.N; n++ {
+// 			parsed, err = ast.ParseModule("authz.rego", string(policy))
+// 			if err != nil {
+// 				b.Error(err)
+// 			}
+// 			compiler.Compile(map[string]*ast.Module{"authz.rego": parsed})
+// 			if compiler.Failed() {
+// 				b.Error(compiler.Errors)
+// 			}
+// 		}
+// 		parsedResult = parsed
+// 	})
+// }
 
-// A: parsing is worse:
-// BenchmarkCompareParseCompile/parsing-8           100	  14742148 ns/op	 4060407 B/op	  119417 allocs/op
-// BenchmarkCompareParseCompile/compiling-8         200	  12774183 ns/op	 2148726 B/op	  112140 allocs/op
-// BenchmarkCompareParseCompile/parse_and_compile-8  50	  34038622 ns/op	 6883385 B/op	  272642 allocs/op
+// // A: parsing is worse:
+// // BenchmarkCompareParseCompile/parsing-8           100	  14742148 ns/op	 4060407 B/op	  119417 allocs/op
+// // BenchmarkCompareParseCompile/compiling-8         200	  12774183 ns/op	 2148726 B/op	  112140 allocs/op
+// // BenchmarkCompareParseCompile/parse_and_compile-8  50	  34038622 ns/op	 6883385 B/op	  272642 allocs/op
 
-func BenchmarkV2InitPartialResultWithPolicies(b *testing.B) {
-	ctx := context.Background()
+// func BenchmarkV2InitPartialResultWithPolicies(b *testing.B) {
+// 	ctx := context.Background()
 
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(b, err, "init logger")
-	s, err := New(ctx, l)
-	require.NoError(b, err, "init state")
+// 	l, err := logger.NewLogger("text", "debug")
+// 	require.NoError(b, err, "init logger")
+// 	s, err := New(ctx, l)
+// 	require.NoError(b, err, "init state")
 
-	policyCount := []int{0, 5, 10, 20, 50, 100, 200}
+// 	policyCount := []int{0, 5, 10, 20, 50, 100, 200}
 
-	for _, count := range policyCount {
-		policies := testPolicies(count)
-		s.store = inmem.NewFromObject(map[string]interface{}{
-			"policies": policies,
-		})
+// 	for _, count := range policyCount {
+// 		policies := testPolicies(count)
+// 		s.store = inmem.NewFromObject(map[string]interface{}{
+// 			"policies": policies,
+// 		})
 
-		b.Run(fmt.Sprintf("store with default policies and %d random policies", count), func(b *testing.B) {
-			var r error
+// 		b.Run(fmt.Sprintf("store with default policies and %d random policies", count), func(b *testing.B) {
+// 			var r error
 
-			for n := 0; n < b.N; n++ {
-				r = s.initPartialResult(ctx)
-				if r != nil {
-					b.Error(r)
-				}
-			}
-			errResult = r
-		})
+// 			for n := 0; n < b.N; n++ {
+// 				r = s.initPartialResult(ctx)
+// 				if r != nil {
+// 					b.Error(r)
+// 				}
+// 			}
+// 			errResult = r
+// 		})
 
-	}
-}
+// 	}
+// }
 
 func BenchmarkV2ProjectsAuthorizedWithAuthorizedProjectPreparedQuery(b *testing.B) {
 	ctx := context.Background()
@@ -621,11 +629,11 @@ func BenchmarkV2ProjectsAuthorizedWithAuthorizedProjectPreparedQuery(b *testing.
 	s, err := New(ctx, l)
 	require.NoError(b, err, "init state")
 
-	policyCount := []int{0, 5, 10, 20, 50, 100, 200}
+	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
 	roleCount := 10 // keep this constant while increasing policyCount
 
 	for _, count := range policyCount {
-		policies, roles := v2p1RandomPoliciesAndRoles(count, roleCount)
+		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
@@ -1053,7 +1061,7 @@ func chefManagedPolicies() map[string]interface{} {
 
 // TODO factory for projectPolicies (project-owner, editor, viewer)
 
-func v2p1RandomPoliciesAndRoles(customPolicyCount int, customRoleCount int) (policyMap map[string]interface{}, roleMap map[string]interface{}) {
+func v2RandomPoliciesAndRoles(customPolicyCount int, customRoleCount int) (policyMap map[string]interface{}, roleMap map[string]interface{}) {
 	rand.Seed(time.Now().UnixNano())
 
 	// 1. set lists of potential members and actions to be used to randomly generate custom policy contents
