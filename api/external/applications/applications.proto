@@ -210,7 +210,7 @@ service ApplicationsService {
 
   Changes the configuration for the task that marks services as disconnected after
   'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
-  This job cannot be disabled, and therefor no information about running is accepted.
+  This job cannot be disabled, and therefore no information about running is accepted.
 
   Example:
   ```
