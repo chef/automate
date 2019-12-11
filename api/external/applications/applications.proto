@@ -419,7 +419,7 @@ message Service {
   // Timestamp since health status change.
   google.protobuf.Timestamp health_updated_at = 20;
   // Service connection information.
-  // based on time since last healthcheck received and disconnected service configuration
+  // Based on time since last healthcheck received and disconnected service configuration.
   bool disconnected = 21;
   // Timestamp of last received health check message.
   google.protobuf.Timestamp last_event_occurred_at = 22;
