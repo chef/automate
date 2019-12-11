@@ -134,6 +134,13 @@ use the Habitat Builder UI to create the necessary origins before running the
 ### Operating Habitat Builder
 Habitat Builder uses the same mechanisms that Chef Automate does for [backups]({{<relref "backup.md">}}), [log management]({{<relref "log-management.md">}}), and [uninstallation]({{<relref "troubleshooting.md#uninstalling-chef-automate">}}).
 
+To change the log level for Habitat Builder only, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+
+```toml
+[builder_api.v1.sys.log]
+level = "debug"
+scoped_levels = ["tokio_core=error", "tokio_reactor=error", "zmq=error", "hyper=error" ]
+```
+
 ### Not currently supported
 * high-availability/DR/multinode Builder
-
