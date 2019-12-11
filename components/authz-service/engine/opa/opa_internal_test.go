@@ -532,14 +532,15 @@ func BenchmarkV2AuthorizedProjectPreparedQuery(b *testing.B) {
 	}
 }
 
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_0_custom_policies-8     30	  41025372 ns/op	  8509971 B/op	  216893 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_5_custom_policies-8     26	  43907128 ns/op	  9121904 B/op	  229910 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_10_custom_policies-8    21	  53302663 ns/op	  11247030 B/op	  274257 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_20_custom_policies-8    15	  77136735 ns/op	  16418420 B/op	  382565 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_50_custom_policies-8    10	  117808140 ns/op	  23411056 B/op	  528983 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_100_custom_policies-8   6	    189886261 ns/op	  38358808 B/op	  844680 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_200_custom_policies-8   4	    323203192 ns/op	  66842966 B/op	  1436078 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_1000_custom_policies-8  1	    1310272730 ns/op	269942528 B/op	5714943 allocs/op
+// 12/10/2019
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_0_custom_policies-8     30	  	41025372 ns/op	  	8509971 B/op	  216893 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_5_custom_policies-8     26	  	43907128 ns/op	  	9121904 B/op	  229910 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_10_custom_policies-8    21	  	53302663 ns/op	  	11247030 B/op	  274257 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_20_custom_policies-8    15	  	77136735 ns/op	  	16418420 B/op	  382565 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_50_custom_policies-8    10	  	117808140 ns/op	 	23411056 B/op	  528983 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_100_custom_policies-8   6	    189886261 ns/op	  	38358808 B/op	  844680 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_200_custom_policies-8   4	    323203192 ns/op	  	66842966 B/op	  1436078 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_1000_custom_policies-8  1	    1310272730 ns/op	269942528 B/op	  5714943 allocs/op
 
 func BenchmarkV2ProjectsAuthorizedWithAuthorizedProjectPreparedQuery(b *testing.B) {
 	ctx := context.Background()
@@ -576,17 +577,46 @@ func BenchmarkV2ProjectsAuthorizedWithAuthorizedProjectPreparedQuery(b *testing.
 	}
 }
 
-// v1 helpers
+// Remaining v2 tests
 
-// randomTeams is shared
-func randomTeams(c int) []string {
-	ret := make([]string, c)
-	for i := 0; i < c; i++ {
-		ret[i] = fmt.Sprintf("team:local:team%d", i)
+func BenchmarkFilterAuthorizedProjects(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
+	roleCount := 10 // keep this constant while increasing policyCount
+
+	for _, count := range policyCount {
+		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
+		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+			"policies": policies,
+			"roles":    roles,
+		})
+
+		err = s.makeAuthorizedProjectPreparedQuery(ctx)
+		require.NoError(b, err, "init partial result")
+
+		b.Run(fmt.Sprintf("store with %d random policies and %d random roles", count, roleCount), func(b *testing.B) {
+			var resp []string
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.FilterAuthorizedProjects(ctx, []string{"user:local:test@example.com"}, "compliance:profiles:list", "compliance:profiles", allProjects)
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			projectsResponse = resp
+		})
 	}
-	return ret
-}
 
+}
+// BenchmarkProjectsAuthorized
+
+// v1 helpers
 func testPairs(c int) []engine.Pair {
 	ret := make([]engine.Pair, c)
 	for i := 0; i < c; i++ {
@@ -715,76 +745,19 @@ func randomPolicies(i int) []map[string]interface{} {
 	return newPolicies
 }
 
+// shared (v1/v2) helpers
+func randomTeams(c int) []string {
+	ret := make([]string, c)
+	for i := 0; i < c; i++ {
+		ret[i] = fmt.Sprintf("team:local:team%d", i)
+	}
+	return ret
+}
+
 // v2 helpers
 
-// TODO maybe don't need?
-// func migratedV1defaultPolicies() []map[string]interface{} {
-// 	allUsers := []string{"user:*"}
-// 	allTokens := []string{"token:*"}
-// 	admins := []string{"team:local:admins"}
-// 	anyAction := "*"
-// 	defaultEffect := "allow"
-
-// 	defPolicyResources := []string{
-// 		"compliance:*",
-// 		"cfgmgmt:*",
-// 		"cfgmgmt",
-// 		"auth_introspection:*",
-// 		"events",
-// 		"events:*",
-// 		"nodemanagers",
-// 		"nodemanagers:*",
-// 		"nodes",
-// 		"nodes:*",
-// 		"secrets",
-// 		"secrets:*",
-// 		"service_info:*",
-// 	}
-// 	defPolicyCount := len(defPolicyResources) + 5
-
-// 	defPolicies := make([]map[string]interface{}, defPolicyCount)
-// 	defPolicies[0] = map[string]interface{}{
-// 		"subjects": admins,
-// 		"resource": "*",
-// 		"action":   anyAction,
-// 		"effect":   defaultEffect,
-// 	}
-// 	defPolicies[1] = map[string]interface{}{
-// 		"subjects": allTokens,
-// 		"resource": "ingest:*",
-// 		"action":   anyAction,
-// 		"effect":   defaultEffect,
-// 	}
-// 	defPolicies[2] = map[string]interface{}{
-// 		"subjects": allTokens,
-// 		"resource": "compliance:profiles",
-// 		"action":   "search",
-// 		"effect":   defaultEffect,
-// 	}
-// 	defPolicies[3] = map[string]interface{}{
-// 		"subjects": allTokens,
-// 		"resource": "compliance:profiles:storage:*",
-// 		"action":   "read",
-// 		"effect":   defaultEffect,
-// 	}
-// 	defPolicies[4] = map[string]interface{}{
-// 		"subjects": allTokens,
-// 		"resource": "compliance:profiles:storage:*",
-// 		"action":   "upload",
-// 		"effect":   defaultEffect,
-// 	}
-
-// 	for j := 5; j < defPolicyCount; j++ {
-// 		defPolicies[j] = map[string]interface{}{
-// 			"subjects": allUsers,
-// 			"action":   anyAction,
-// 			"resource": defPolicyResources[j-5],
-// 			"effect":   "allow",
-// 		}
-// 	}
-
-// 	return defPolicies
-// }
+// TODO?
+// func migratedV1defaultPolicies() []map[string]interface{} {}
 
 func chefManagedRoles() map[string]interface{} {
 	chefRoles := make(map[string]interface{}, 5)
@@ -905,7 +878,7 @@ func chefManagedPolicies() map[string]interface{} {
 	return chefPolicies
 }
 
-// TODO factory for projectPolicies (project-owner, editor, viewer)
+// TODO? factory for projectPolicies (project-owner, editor, viewer)
 
 func v2RandomPoliciesAndRoles(customPolicyCount int, customRoleCount int) (policyMap map[string]interface{}, roleMap map[string]interface{}) {
 	rand.Seed(time.Now().UnixNano())
