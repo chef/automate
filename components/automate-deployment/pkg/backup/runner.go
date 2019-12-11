@@ -1005,7 +1005,25 @@ func (r *Runner) startBackupOperations(ctx context.Context) {
 
 	if r.converger != nil {
 		defer func() {
-			r.converger.BackupComplete(nil)
+			// TODO(ssd) 2019-12-11: This is why it would
+			// be better to move this _completely_ into
+			// the converger as then we wouldn't have to
+			// worry about mutating the converger state
+			// machine and dealing with possible
+			// errors. This only fails if our converger
+			// queue is full. We give up after 10 tries,
+			// which likely means something is otherwise
+			// very wrong with the deployment-service.
+			for i := 0; i < 10; i++ {
+				err := r.converger.BackupComplete(nil)
+				if err != nil {
+					r.warnf(err, "attempt to signal converger failed (retrying in 5ms)")
+					time.Sleep(5 * time.Millisecond)
+				} else {
+					return
+				}
+			}
+			logrus.WithFields(r.defaultFields()).Warn("giving up sending BackupComplete to converger after 10 retries")
 		}()
 	}
 
