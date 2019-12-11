@@ -121,21 +121,19 @@ func (e *DataFeedWorkflowExecutor) OnCancel(w cereal.WorkflowInstance, ev cereal
 
 func batchNodeIDs(batchSize int, nodeIDs map[string]NodeIDs) []map[string]NodeIDs {
 	numNodes := len(nodeIDs)
-	log.Debugf("number of nodes %v", numNodes)
-	var numBatches int
-	if numNodes < batchSize {
-		numBatches = 1
-	} else {
-		numBatches = numNodes / batchSize
-	}
-	if numNodes%1 > 0 {
+	numBatches := numNodes / batchSize
+	if numNodes%batchSize > 0 {
 		numBatches++
 	}
-	log.Debugf("number of node batches required %v", numBatches)
+	log.WithFields(log.Fields{
+		"number of nodes":            numNodes,
+		"batch size":                 batchSize,
+		"number of batches required": numBatches,
+	}).Debug("batchNodeIDs()")
 	nodeBatches := make([]map[string]NodeIDs, numBatches)
 	batch := 0
 	count := 0
-	// split the nodeIDs map into a batches of smaller maps of size limit
+	// split the nodeIDs map into a batches of smaller maps of batchSize
 	for k, v := range nodeIDs {
 		if count%batchSize == 0 {
 			if count != 0 {
