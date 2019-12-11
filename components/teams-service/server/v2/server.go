@@ -124,8 +124,6 @@ func (s *Server) UpdateTeam(ctx context.Context, req *teams.UpdateTeamReq) (*tea
 	}, nil
 }
 
-var trialCount = 0
-
 // AddTeamMembers associates an array of members with an existing team
 func (s *Server) AddTeamMembers(ctx context.Context,
 	req *teams.AddTeamMembersReq) (*teams.AddTeamMembersResp, error) {
@@ -133,11 +131,6 @@ func (s *Server) AddTeamMembers(ctx context.Context,
 	if len(req.UserIds) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "missing user IDs")
 	}
-	trialCount = (trialCount + 1) % 2
-	if trialCount == 0 {
-		return nil, status.Error(codes.InvalidArgument, "some error here")
-	}
-
 	// TODO (tc): The storage interface is still using V1 verbiage, so
 	// name is really the ID in V2 terms. We'll refactor at GA when V1 is removed.
 	//

@@ -414,11 +414,6 @@ func (s *ProjectState) CreateRule(ctx context.Context, req *api.CreateRuleReq) (
 		return nil, status.Errorf(codes.InvalidArgument, "error processing request: %s", err.Error())
 	}
 
-	trialCount = (trialCount + 1) % 2
-	if trialCount == 0 {
-		return nil, status.Errorf(codes.InvalidArgument, "some error here")
-	}
-
 	resp, err := s.store.CreateRule(ctx, r)
 	switch err {
 	case nil: // continue

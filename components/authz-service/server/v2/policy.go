@@ -320,8 +320,6 @@ func (s *policyServer) ListPolicyMembers(
 	}, nil
 }
 
-var trialCount = 0
-
 // AddPolicyMembers takes in a list of members and adds them to the specified policy.
 func (s *policyServer) AddPolicyMembers(
 	ctx context.Context,
@@ -330,10 +328,6 @@ func (s *policyServer) AddPolicyMembers(
 	members, err := membersFromAPI(req.Members)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "parse member: %s", err.Error())
-	}
-	trialCount = (trialCount + 1) % 2
-	if trialCount == 0 {
-		return nil, status.Error(codes.InvalidArgument, "some error here")
 	}
 
 	resp, err := s.store.AddPolicyMembers(ctx, req.Id, members)
