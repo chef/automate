@@ -1,7 +1,7 @@
 info:
   description: |
     # Authentication
-    The Chef Automate API typically uses am API token and passed in the header of  your API request.
+    The Chef Automate API typically uses an API token passed in the header of your API request.
 
     To create admin token can and set it as an environment variable use the following command:
 
