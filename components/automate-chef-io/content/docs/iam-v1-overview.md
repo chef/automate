@@ -1,7 +1,7 @@
 +++
 title = "IAM v1 Overview"
 aliases = [
-    "docs/authorization-overview/"
+    "/docs/authorization-overview/"
 ]
 description = "IAM v1 Overview"
 draft = false
