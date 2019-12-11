@@ -460,7 +460,7 @@ func (w *waitingForReconfigure) ProcessMessage(c *converger, msg message) (state
 func (w *waitingForReconfigure) String() string { return "waiting for reconfigure" }
 
 // backupRunning running is a converger state that we enter when we've
-// recieved a user-signal indicating that a backup is about to begin.
+// received a user-signal indicating that a backup is about to begin.
 //
 // This state can be removed when the converger itself handles taking
 // a backup.
