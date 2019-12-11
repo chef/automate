@@ -138,7 +138,7 @@ service ApplicationsService {
 
   Marks services as disconnected based on the `threshold_seconds` setting.
   This function is not used by the API or CLI and is here for testing purposes.
-  The functionality is currently covered by a periodically runnig job that can be configured
+  The functionality is currently covered by a periodically running job that can be configured
   by utilizing the `UpdateDisconnectedServicesConfig` endpoint.
   */
   rpc GetDisconnectedServices(DisconnectedServicesReq) returns (ServicesRes ) {
