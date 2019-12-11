@@ -78,6 +78,15 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   // Sort field by default
   readonly defaultSortField = 'percent_ok';
 
+  // Services sidebar page
+  public sgPage = 1;
+
+  // Services sidebar pagination sizing
+  public sgPageSize = 25;
+
+  // Services sidebar status filter
+  public selectedSgStatus = 'total';
+
   // Should the URL share dropdown be displayed
   shareDropdownVisible = false;
 
@@ -211,39 +220,33 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       withLatestFrom(this.route.queryParamMap),
       takeUntil(this.isDestroyed)
     )
-    .subscribe(([serviceGroups, queryParams]) => {
+    .subscribe(([serviceGroups]) => {
       if (serviceGroups.length > 0) {
         // if we do not have an sgId parameter, pick the first sgId from the
-        // service group list and load it:
-        const sgId = queryParams.get('sgId');
-        if ( !sgId ) {
-          this.router.navigate(
-            [],
-            { queryParams: { sgId: serviceGroups[0]['id'] }, queryParamsHandling: 'merge' }
-          );
+        // service group list
+        if ( !this.selectedServiceGroupId ) {
+          this.selectedServiceGroupId = serviceGroups[0]['id'];
         }
 
         // if the selected service group is not visible on the page, then pick
         // the first service group from the list and navigate to it. this lets
         // us maintain a service group selection regardless of other navigation
         // as long as the service group is still in the list.
-        const selectedSGVisibleOnPage = serviceGroups.find(sg => sg.id === sgId);
+        const selectedSGVisibleOnPage = serviceGroups.find(sg => sg.id === this.selectedServiceGroupId);
         if ( !selectedSGVisibleOnPage ) {
-          this.onServiceGroupSelect(null, serviceGroups[0].id);
+          this.selectedServiceGroupId = serviceGroups[0]['id'];
         }
 
-        // Times when we should render the content in the sidebar:
-        // * when the page is first loaded and we have sgId in the original URL
-        // * when the sgId changes (including from null->some-value)
-        // * when a filter is applied that changes the content
-        // This subscribe will fire for all of those cases so we can render the
-        // sidebar here.
-        this.detailParamsChange(queryParams);
+        // The sidebar content needs to be rendered on the initial page load
+        // and also when filters are applied that change the service groups
+        // content.
+        this.refreshServicesSidebar(this.currentSidebarParams());
       } else {
         this.selectedServiceGroupId = null;
       }
     });
 
+    // TODO: status filters and pagination in the services sidebar are broken :(
 
     // If the user applies a filter via the filter bar or the *service group*
     // status filters that filters out all of the services in the
@@ -346,18 +349,28 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     }, []);
   }
 
-  detailParamsChange(queryParams) {
-    const sgId = queryParams.get('sgId');
-    if (sgId) {
+  refreshServicesSidebar(queryParams) {
+    if (this.selectedServiceGroupId) {
       const servicesFilters: GroupServicesFilters = {
-        service_group_id: sgId,
-        page: parseInt(queryParams.get('sgPage'), 10) || 1,
-        pageSize: parseInt(queryParams.get('sgPageSize'), 10) || 25,
-        health: queryParams.get('sgStatus') || 'total',
-        searchBar: this.selectedSearchBarFilters
+        service_group_id: this.selectedServiceGroupId,
+        page: queryParams['sgPage'],
+        pageSize: queryParams['sgPageSize'],
+        health: queryParams['sgStatus'],
+        searchBar: queryParams['searchBar']
       };
 
-      this.updateServicesSidebar(servicesFilters);
+      this.store.dispatch(new UpdateSelectedSG(servicesFilters));
+      document.querySelector<HTMLElement>('app-services-sidebar').focus();
+    }
+  }
+
+  currentSidebarParams() {
+    const params = this.route.snapshot.queryParamMap;
+    return {
+        page: this.sgPage,
+        pageSize: this.sgPageSize,
+        health: params.get('sgStatus') || 'total',
+        searchBar: this.selectedSearchBarFilters
     }
   }
 
@@ -457,17 +470,13 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public onServiceGroupSelect(event: Event, id: string): void {
     if (event) { event.preventDefault(); }
 
-    const queryParams = { ...this.route.snapshot.queryParams };
-    queryParams['sgId'] = id;
+    this.selectedServiceGroupId = id;
+
+    const queryParams = this.currentSidebarParams();
     delete queryParams['sgPage'];
     delete queryParams['sgStatus'];
-    this.router.navigate([], { queryParams });
-  }
 
-  public updateServicesSidebar(servicesFilters: GroupServicesFilters): void {
-    this.selectedServiceGroupId = servicesFilters.service_group_id;
-    this.store.dispatch(new UpdateSelectedSG(servicesFilters));
-    document.querySelector<HTMLElement>('app-services-sidebar').focus();
+    this.refreshServicesSidebar(queryParams)
   }
 
   // TODO @afiune: Add links when they work
