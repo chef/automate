@@ -450,7 +450,7 @@ message ServiceGroupsReq {
 message ServiceGroup {
   // Name of service group.
   string name = 1;
-  // Combination of the version and release in a single string like:
+  // Combination of the version and release in a single string.
   // Example: 0.1.0/8743278934278923.
   string release = 2;
   // Intentionally blank.
