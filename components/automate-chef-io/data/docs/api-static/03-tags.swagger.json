@@ -24,5 +24,5 @@
     { "name": "NodesService", "x-displayName": "Nodes" },
     { "name": "service_groups", "x-displayName": "Service Groups and Services" },
     { "name": "retention", "x-displayName": "Service Management" }
-    ]
+  ]
 }
