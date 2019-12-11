@@ -224,7 +224,7 @@ const routes: Routes = [
       ]
     },
     {
-      path: 'applications',
+      path: 'applications/service-groups',
       children: [
         {
           path: '',
