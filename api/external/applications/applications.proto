@@ -466,7 +466,7 @@ message ServiceGroup {
   string application = 7;
   // Environment name for the service group.
   string environment = 8;
-  // Combination of the origin and package name in a single string like:
+  // Combination of the origin and package name in a single string.
   // Example: core/redis.
   string package = 9;
   // Count of disconnected services within this service group.
