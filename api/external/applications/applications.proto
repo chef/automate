@@ -398,7 +398,7 @@ message Service {
   string group = 3;
   // Intentionally blank.
   HealthStatus health_check = 4;
-  // The ServiceStatus enum describes the status of the service (Currently Unimplemented).
+  // Intentionally blank.
   ServiceStatus status = 5;
   // Application name.
   string application = 6;
