@@ -425,6 +425,7 @@ message Service {
   google.protobuf.Timestamp last_event_occurred_at = 22;
   // Interval since last event received until now.
   string last_event_since = 23;
+  // Intentionally blank.
   HealthCheckResult health_check_result = 24;
 }
 
