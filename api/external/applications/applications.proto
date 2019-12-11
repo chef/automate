@@ -504,7 +504,7 @@ message ServiceGroups  {
 }
 
 // The ServiceStatus enum describes the status of the service
-// Currently unimplemented
+// Currently unimplemented.
 enum ServiceStatus {
   RUNNING = 0;
   INITIALIZING = 1;
