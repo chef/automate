@@ -394,7 +394,7 @@ message Service {
   // Combination of the service version and release in a single string.
   // Example: 0.1.0/8743278934278923.
   string release = 2;
-  // Service group name
+  // Service group name.
   string group = 3;
   // Intentionally blank.
   HealthStatus health_check = 4;
