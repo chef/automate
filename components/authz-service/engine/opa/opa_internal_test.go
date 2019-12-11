@@ -112,9 +112,11 @@ func BenchmarkV1InitPartialResult(b *testing.B) {
 	}
 }
 
+var parsedResult *ast.Module
+
 // Q: What takes longer: parsing the module or compiling it?
 
-func BenchmarkV1CompareParseCompile(b *testing.B) {
+func BenchmarkCompareParseCompile(b *testing.B) {
 	policy := MustAsset("policy/authz.rego")
 	compiler := ast.NewCompiler()
 	parsed, err := ast.ParseModule("authz.rego", string(policy))
@@ -224,6 +226,8 @@ func BenchmarkV1IsAuthorizedWithInitPartialResult(b *testing.B) {
 		})
 	}
 }
+
+var filteredPairsResp []engine.Pair
 
 func BenchmarkV1FilterAuthorizedPairsWithPolicies(b *testing.B) {
 	ctx := context.Background()
@@ -446,7 +450,7 @@ func genericV2Input(subjects []string, resource string, action string, projects 
 	return ast.InterfaceToValue(input)
 }
 
-// Q: Which is faster, generic (go interface) or specific (opa term) input?
+// Q: Which type of input is computed faster, generic Go interface or specific OPA Term?
 func BenchmarkV2GenericInput(b *testing.B) {
 	var r ast.Value
 	var err error
@@ -515,111 +519,27 @@ func BenchmarkV2AuthorizedProjectPreparedQuery(b *testing.B) {
 			"roles":    roles,
 		})
 
-		totalCount := count + len(chefPolicies)
-
-		b.Run(fmt.Sprintf("store with %d policies", totalCount), func(b *testing.B) {
-			for n := 0; n < b.N; n++ {
-				r = s.makeAuthorizedProjectPreparedQuery(ctx)
-				if r != nil {
-					b.Error(r)
+		b.Run(fmt.Sprintf("store with %d chef-managed policies and %d custom policies", len(chefPolicies), count),
+			func(b *testing.B) {
+				for n := 0; n < b.N; n++ {
+					r = s.makeAuthorizedProjectPreparedQuery(ctx)
+					if r != nil {
+						b.Error(r)
+					}
 				}
-			}
-			errResult = r
-		})
+				errResult = r
+			})
 	}
 }
 
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_policies-8      25	  49970477 ns/op	  8509747 B/op	  216866 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_9_policies-8      21	  53370041 ns/op	  9404406 B/op	  235432 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_14_policies-8     15	  70109340 ns/op	  11779022 B/op	  285514 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_24_policies-8     16	  78363613 ns/op	  12651642 B/op	  304112 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_54_policies-8     8	    159008227 ns/op	  24972671 B/op	  560378 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_104_policies-8    5	    211184597 ns/op	  34625374 B/op	  761267 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_204_policies-8    3	    367088709 ns/op	  68543746 B/op	  1472562 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_1004_policies-8   1	    1664903435 ns/op	285167952 B/op	6018447 allocs/op
-
-// // Q: What takes longer: parsing the module or compiling it?
-
-var parsedResult *ast.Module
-
-// func BenchmarkV2CompareParseCompile(b *testing.B) {
-// 	policy := MustAsset("policy/authz.rego")
-// 	compiler := ast.NewCompiler()
-// 	parsed, err := ast.ParseModule("authz.rego", string(policy))
-// 	if err != nil {
-// 		b.Fatal(err)
-// 	}
-
-// 	b.Run("parsing", func(b *testing.B) {
-// 		for n := 0; n < b.N; n++ {
-// 			parsed, err = ast.ParseModule("authz.rego", string(policy))
-// 			if err != nil {
-// 				b.Error(err)
-// 			}
-// 		}
-// 		parsedResult = parsed
-// 	})
-
-// 	b.Run("compiling", func(b *testing.B) {
-// 		for n := 0; n < b.N; n++ {
-// 			compiler.Compile(map[string]*ast.Module{"authz.rego": parsed})
-// 			if compiler.Failed() {
-// 				b.Error(compiler.Errors)
-// 			}
-// 		}
-// 	})
-
-// 	// consistency check
-// 	b.Run("parse and compile", func(b *testing.B) {
-// 		for n := 0; n < b.N; n++ {
-// 			parsed, err = ast.ParseModule("authz.rego", string(policy))
-// 			if err != nil {
-// 				b.Error(err)
-// 			}
-// 			compiler.Compile(map[string]*ast.Module{"authz.rego": parsed})
-// 			if compiler.Failed() {
-// 				b.Error(compiler.Errors)
-// 			}
-// 		}
-// 		parsedResult = parsed
-// 	})
-// }
-
-// // A: parsing is worse:
-// // BenchmarkCompareParseCompile/parsing-8           100	  14742148 ns/op	 4060407 B/op	  119417 allocs/op
-// // BenchmarkCompareParseCompile/compiling-8         200	  12774183 ns/op	 2148726 B/op	  112140 allocs/op
-// // BenchmarkCompareParseCompile/parse_and_compile-8  50	  34038622 ns/op	 6883385 B/op	  272642 allocs/op
-
-// func BenchmarkV2InitPartialResultWithPolicies(b *testing.B) {
-// 	ctx := context.Background()
-
-// 	l, err := logger.NewLogger("text", "debug")
-// 	require.NoError(b, err, "init logger")
-// 	s, err := New(ctx, l)
-// 	require.NoError(b, err, "init state")
-
-// 	policyCount := []int{0, 5, 10, 20, 50, 100, 200}
-
-// 	for _, count := range policyCount {
-// 		policies := testPolicies(count)
-// 		s.store = inmem.NewFromObject(map[string]interface{}{
-// 			"policies": policies,
-// 		})
-
-// 		b.Run(fmt.Sprintf("store with default policies and %d random policies", count), func(b *testing.B) {
-// 			var r error
-
-// 			for n := 0; n < b.N; n++ {
-// 				r = s.initPartialResult(ctx)
-// 				if r != nil {
-// 					b.Error(r)
-// 				}
-// 			}
-// 			errResult = r
-// 		})
-
-// 	}
-// }
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_0_custom_policies-8     30	  41025372 ns/op	  8509971 B/op	  216893 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_5_custom_policies-8     26	  43907128 ns/op	  9121904 B/op	  229910 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_10_custom_policies-8    21	  53302663 ns/op	  11247030 B/op	  274257 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_20_custom_policies-8    15	  77136735 ns/op	  16418420 B/op	  382565 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_50_custom_policies-8    10	  117808140 ns/op	  23411056 B/op	  528983 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_100_custom_policies-8   6	    189886261 ns/op	  38358808 B/op	  844680 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_200_custom_policies-8   4	    323203192 ns/op	  66842966 B/op	  1436078 allocs/op
+// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_1000_custom_policies-8  1	    1310272730 ns/op	269942528 B/op	5714943 allocs/op
 
 func BenchmarkV2ProjectsAuthorizedWithAuthorizedProjectPreparedQuery(b *testing.B) {
 	ctx := context.Background()
@@ -652,80 +572,6 @@ func BenchmarkV2ProjectsAuthorizedWithAuthorizedProjectPreparedQuery(b *testing.
 				}
 			}
 			projectsResponse = resp
-		})
-	}
-}
-
-var filteredPairsResp []engine.Pair
-
-func BenchmarkV2FilterAuthorizedPairsWithPolicies(b *testing.B) {
-	ctx := context.Background()
-
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(b, err, "init logger")
-	s, err := New(ctx, l)
-	require.NoError(b, err, "init state")
-
-	policyCount := []int{0, 1, 5, 10, 20, 50, 100}
-
-	for _, count := range policyCount {
-		policies := testPolicies(count)
-		s.store = inmem.NewFromObject(map[string]interface{}{
-			"policies": policies,
-		})
-
-		b.Run(fmt.Sprintf("store with default policies and %d random policies", count), func(b *testing.B) {
-			var resp []engine.Pair
-			var err error
-			for n := 0; n < b.N; n++ {
-				resp, err = s.FilterAuthorizedPairs(ctx, []string{"user:local:test@example.com"},
-					[]engine.Pair{{Action: "read", Resource: "cfgmgmt:nodes"}})
-				if err != nil {
-					b.Error(err)
-				}
-			}
-			filteredPairsResp = resp
-		})
-	}
-
-	pairCount := []int{0, 1, 5, 10, 20, 50, 100}
-	for _, count := range pairCount {
-		s.store = inmem.NewFromObject(map[string]interface{}{
-			"policies": testPolicies(0),
-		})
-		pairs := testPairs(count)
-
-		b.Run(fmt.Sprintf("store with default policies and %d random pairs", count), func(b *testing.B) {
-			var resp []engine.Pair
-			var err error
-			for n := 0; n < b.N; n++ {
-				resp, err = s.FilterAuthorizedPairs(ctx, []string{"user:local:test@example.com"}, pairs)
-				if err != nil {
-					b.Error(err)
-				}
-			}
-			filteredPairsResp = resp
-		})
-	}
-
-	teamCount := []int{0, 1, 5, 10, 20, 50, 100}
-	for _, count := range teamCount {
-		policies := testPolicies(0)
-		s.store = inmem.NewFromObject(map[string]interface{}{
-			"policies": policies,
-		})
-
-		b.Run(fmt.Sprintf("store with default policies and %d random teams", count), func(b *testing.B) {
-			var resp []engine.Pair
-			var err error
-			for n := 0; n < b.N; n++ {
-				resp, err = s.FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(count)...),
-					[]engine.Pair{{Action: "read", Resource: "cfgmgmt:nodes"}})
-				if err != nil {
-					b.Error(err)
-				}
-			}
-			filteredPairsResp = resp
 		})
 	}
 }
