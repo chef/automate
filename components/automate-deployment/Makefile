@@ -115,6 +115,14 @@ clean:
 unit: golang_version_check
 	@go test ./...
 
+cover: golang_version_check
+	@mkdir -p cover
+	@go test -coverprofile=cover/cover.out ./...
+	@echo "Coverage report written to cover/cover.out"
+	@echo "To view:"
+	@echo ""
+	@echo "    go tool cover -html=cover/cover.out"
+
 # https://stackoverflow.com/questions/4728810/makefile-variable-as-prerequisite
 guard-%:
 	@ if [ "${${*}}" = "" ]; then \
@@ -287,9 +295,6 @@ basic-a1-test:
             A1_BUILDER_PASSWORD=${basic_a1_builder_password} \
             NO_WORKFLOW_TEST=true \
                 inspec exec /a2/inspec/a2-migrate-from-v1-integration/
-
-cover:
-	./scripts/coverage.sh
 
 .DEFAULT_GOAL := build
 .PHONY: ${BINS} build proto clean cover tools
