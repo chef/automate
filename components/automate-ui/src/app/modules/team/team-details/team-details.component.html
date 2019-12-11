@@ -22,7 +22,7 @@
           </thead>
           <tbody>
             <tr class="detail-row">
-              <td *ngIf="!(isIAMv2$ | async)" class="id-column">{{ team.name }}</td>
+              <td *ngIf="!(isIAMv2$ | async)" class="id-column">{{ team?.name }}</td>
               <ng-container *ngIf="isIAMv2$ | async">
                 <td class="id-column">{{ team?.id }}</td>
                 <td class="projects-column" data-cy="team-details-projects">
