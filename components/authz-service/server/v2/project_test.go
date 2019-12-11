@@ -288,7 +288,7 @@ func TestDeleteProject(t *testing.T) {
 			}
 			projectID := fmt.Sprintf("test-project-%d", time.Now().UnixNano())
 			ruleID := "foo-applied-rule"
-			addProjectToStore(t, projects, projectID, "my foo", storage.Custom)
+			addProjectToStoreWithStatus(t, projects, projectID, "my foo", storage.Custom, storage.Applied.String())
 			addRuleToStore(t, rules, ruleID, "my applied foo rule", applied, storage.Node, projectID, storageConditions)
 
 			_, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: projectID})
@@ -309,7 +309,7 @@ func TestDeleteProject(t *testing.T) {
 			}
 			projectID := fmt.Sprintf("test-project-%d", time.Now().UnixNano())
 			ruleID := "foo-staged-rule"
-			addProjectToStore(t, projects, projectID, "my foo", storage.Custom)
+			addProjectToStoreWithStatus(t, projects, projectID, "my foo", storage.Custom, storage.EditsPending.String())
 			addRuleToStore(t, rules, ruleID, "my staged foo rule", staged, storage.Node, projectID, storageConditions)
 
 			_, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: projectID})
@@ -433,14 +433,15 @@ func TestListProjectsForIntrospection(t *testing.T) {
 	}
 }
 
-func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projType storage.Type) api.Project {
+func addProjectToStoreWithStatus(t *testing.T, store *cache.Cache, id, 
+	name string, projType storage.Type, status string) api.Project {
 	t.Helper()
 
 	proj := &storage.Project{
 		ID:     id,
 		Name:   name,
 		Type:   projType,
-		Status: storage.NoRules.String(),
+		Status: status,
 	}
 	store.Add(id, proj, 0)
 
@@ -452,8 +453,13 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projTy
 		Id:     id,
 		Name:   name,
 		Type:   returnType,
-		Status: storage.NoRules.String(),
+		Status: status,
 	}
+}
+
+func addProjectToStore(t *testing.T, store *cache.Cache, id, 
+	name string, projType storage.Type) api.Project {
+	addProjectToStoreWithStatus(t, store, id, name, projType, storage.NoRules.String())
 }
 
 func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, cleanupFunc) {
