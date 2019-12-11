@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import {
   Node
 } from '../../entities/client-runs/client-runs.model';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 
 @Component({
   selector: 'app-node-noruns-details',
@@ -20,7 +20,7 @@ export class NodeNoRunsDetailsComponent implements OnInit {
   ) {}
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('infrastructure');
+    this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     this.nodeId = this.getRouteParam('node-id');
     this.route.data.subscribe((data: { node: Node }) => {
         this.node = data.node;

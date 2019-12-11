@@ -3,10 +3,10 @@ import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { EntityStatus } from 'app/entities/entities';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { allUsers, getStatus } from 'app/entities/users/user.selectors';
 import { DeleteUser, GetUsers } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
@@ -37,7 +37,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
  }
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetUsers());
     this.layoutFacade.ShowPageLoading(true);
     combineLatest([

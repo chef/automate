@@ -9,7 +9,7 @@ import { loading } from 'app/entities/entities';
 import { DeletePolicy, GetPolicies } from 'app/entities/policies/policy.actions';
 import { allPolicies, getAllStatus, isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { Policy } from 'app/entities/policies/policy.model';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
@@ -44,7 +44,7 @@ export class PolicyListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetPolicies());
   }
 

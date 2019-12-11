@@ -5,7 +5,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { Rule, ServiceActionType } from './rule';
 import { SortDirection } from '../../types/types';
 import { RulesService } from '../../services/rules/rules.service';
@@ -44,7 +44,7 @@ export class NotificationsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.rules$ = this.service.fetchRules();
     this.rules$.subscribe(rules => {
         this.sendCountToTelemetry(rules);

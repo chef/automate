@@ -12,7 +12,7 @@ import {
   ElementRef,
   ViewChild
 } from '@angular/core';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { UploadService } from 'app/services/profiles/upload.service';
 import { AvailableProfilesService } from 'app/services/profiles/available-profiles.service';
@@ -83,7 +83,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('compliance');
+    this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.layoutFacade.ShowPageLoading(true);
     this.user = this.chefSessionService.username;
 

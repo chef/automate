@@ -1,10 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { Rule, ServiceActionType } from 'app/pages/notifications/rule';
-import { RulesService } from 'app/services/rules/rules.service';
-
 import { ActivatedRoute } from '@angular/router';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { Rule, ServiceActionType } from 'app/pages/notifications/rule';
+import { RulesService } from 'app/services/rules/rules.service';
 
 enum UrlTestState {
   Inactive,
@@ -76,7 +75,7 @@ export class NotificationFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     const alertKeys = this.getAlertTypeKeys();
     this.alertOptions = alertKeys.map(key => {
       const opt = { value: key, viewValue: key };

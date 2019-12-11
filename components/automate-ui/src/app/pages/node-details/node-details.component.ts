@@ -7,7 +7,7 @@ import { NodeDetailsService } from '../../services/node-details/node-details.ser
 import { NodeRun, RunInfo } from '../../types/types';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { previousRoute } from '../../route.selectors';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 
 @Component({
   selector: 'app-node-details',
@@ -38,7 +38,7 @@ export class NodeDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('infrastructure');
+    this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     // Scroll to the top of the view
     window.scrollTo(0, 0);
     this.nodeId = this.getRouteParam('node-id');

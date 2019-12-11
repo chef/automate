@@ -5,7 +5,7 @@ import { Observable, Subject, combineLatest } from 'rxjs';
 import { filter, takeUntil, map } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
@@ -80,7 +80,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetAllTokens());
 
     this.store.select(assignableProjects)

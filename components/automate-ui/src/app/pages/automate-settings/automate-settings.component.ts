@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import {
   automateSettingsState,
   changeConfiguration
@@ -90,7 +90,7 @@ export class AutomateSettingsComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetSettings({}));
     this.store.select(automateSettingsState)
       .subscribe((automateSettingsSelector) => {

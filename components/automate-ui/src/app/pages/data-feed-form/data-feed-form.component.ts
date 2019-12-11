@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { Destination } from 'app/pages/data-feed/destination';
 import { DatafeedService } from 'app/services/data-feed/data-feed.service';
 
@@ -53,7 +53,7 @@ export class DatafeedFormComponent {
     private datafeedService: DatafeedService,
     private route: ActivatedRoute
   ) {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.model = new Model(new Destination(undefined, '', '', ''), '', '');
     this.id = this.route.snapshot.params['id'];
     this.isEditDestination = this.id ? true : false;

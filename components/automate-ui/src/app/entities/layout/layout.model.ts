@@ -22,7 +22,7 @@ export interface Sidebars {
 export interface MenuItemGroup {
   name: string;
   items: MenuItem[];
-  visible: any; // boolean or observable
+  visible: boolean;
 }
 
 // MenuItem {

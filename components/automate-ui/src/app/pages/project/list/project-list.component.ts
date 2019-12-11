@@ -10,7 +10,7 @@ import { Regex } from 'app/helpers/auth/regex';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectService } from 'app/entities/projects/project.service';
@@ -61,7 +61,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.projects.getApplyRulesStatus();
     this.store.dispatch(new GetProjects());
     this.store.pipe(

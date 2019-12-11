@@ -1,5 +1,6 @@
 import { Component, Inject } from '@angular/core';
-import { Observable, BehaviorSubject } from 'rxjs';
+import { Observable } from 'rxjs';
+import { find } from 'lodash';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { MenuItemGroup } from 'app/entities/layout/layout.model';
@@ -18,9 +19,7 @@ export class SidebarComponent {
     this.menuGroups$ = layoutFacade.sidebar$;
   }
 
-  public isVisible(item: any) {
-    return item.subscribe
-      ? item
-      : new BehaviorSubject(item);
+  public isGroupVisible(menuGroup: MenuItemGroup) {
+    return menuGroup.visible && menuGroup.items && find(menuGroup.items, ['visible', true]);
   }
 }

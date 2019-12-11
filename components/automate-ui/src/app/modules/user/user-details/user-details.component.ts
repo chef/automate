@@ -8,7 +8,7 @@ import { filter, pluck, takeUntil, first, map } from 'rxjs/operators';
 
 import { identity, isNil } from 'lodash/fp';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefValidators } from 'app/helpers/auth/validator';
 import { routeURL, routeParams } from 'app/route.selectors';
@@ -62,12 +62,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       // undefined for admin view
       // true for profile view
       if (data.isNonAdmin) {
-        this.layoutFacade.showSidebar('settings');
+        this.layoutFacade.showSidebar(Sidebar.Settings);
         this.userDetails = new UserProfileDetails(
           this.store, this.layoutFacade, this.isDestroyed, this.fb);
         this.loading = false;
       } else {
-        this.layoutFacade.showSidebar('profile');
+        this.layoutFacade.showSidebar(Sidebar.Profile);
         // Is this user the logged-in user?
         combineLatest([
           // Get the user ID from the URL
@@ -178,8 +178,7 @@ class UserAdminDetails extends UserDetails {
       super(store);
 
       store.dispatch(new GetUser({ id: userId }));
-
-      layoutFacade.showSettingsSidebar();
+      layoutFacade.showSidebar(Sidebar.Settings);
       this.createForms(fb);
       this.resetForms();
 
@@ -247,8 +246,7 @@ class UserAdminSelfDetails extends UserDetails {
       super(store);
 
       store.dispatch(new GetUserSelf());
-
-      layoutFacade.showSettingsSidebar();
+      layoutFacade.showSidebar(Sidebar.Settings);
 
       this.createForms(fb);
       this.resetForms();
@@ -327,8 +325,7 @@ class UserProfileDetails extends UserDetails {
       super(store);
 
       store.dispatch(new GetUserSelf());
-
-      layoutFacade.showUserProfileSidebar();
+      layoutFacade.showSidebar(Sidebar.Profile);
 
       this.createForms(fb);
       this.resetForms();

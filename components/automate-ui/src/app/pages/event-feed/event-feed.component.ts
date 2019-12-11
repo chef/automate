@@ -23,7 +23,7 @@ import { some, pickBy } from 'lodash/fp';
 import {
   eventFeedState
 } from '../../services/event-feed/event-feed.selectors';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 
 @Component({
   selector: 'app-event-feed',
@@ -155,7 +155,7 @@ export class EventFeedComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('dashboards');
+    this.layoutFacade.showSidebar(Sidebar.Dashboards);
     this.store.select(eventFeedSelectors.loadedEvents).pipe(
     takeUntil(this.isDestroyed))
     .subscribe((loadedEvents: ChefEvent[]) => {

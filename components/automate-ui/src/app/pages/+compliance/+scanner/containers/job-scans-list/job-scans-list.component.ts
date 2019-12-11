@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../../../../ngrx.reducers';
 import * as moment from 'moment';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import * as selectors from '../../state/scanner.selectors';
 import * as actions from '../../state/scanner.actions';
 
@@ -33,7 +33,7 @@ export class JobScansListComponent implements OnInit, OnDestroy {
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   ngOnInit(): void {
-    this.layoutFacade.showSidebar('compliance');
+    this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.store.select(selectors.jobScansList).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(jobScansList => this.jobScansList = jobScansList);

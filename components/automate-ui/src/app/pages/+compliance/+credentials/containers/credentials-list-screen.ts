@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { Credential,
          CredentialsList,
          CredentialsActions,
@@ -33,7 +33,7 @@ export class CredentialsListScreenComponent {
     private router: Router,
     private route: ActivatedRoute
   ) {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.credentialsList$ = store.select(selectors.credentialsList);
   }
 

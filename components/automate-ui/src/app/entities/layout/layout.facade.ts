@@ -21,6 +21,15 @@ enum Height {
   PendingEditsBar = 52
 }
 
+export enum Sidebar {
+  Dashboards = 'dashboards',
+  Applications = 'applications',
+  Infrastructure = 'infrastructure',
+  Compliance = 'compliance',
+  Settings = 'settings',
+  Profile = 'profile'
+}
+
 @Injectable({
   providedIn: 'root'
 })

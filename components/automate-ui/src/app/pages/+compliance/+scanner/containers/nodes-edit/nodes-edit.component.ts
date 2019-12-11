@@ -5,7 +5,7 @@ import { FormArray, FormBuilder, FormGroup, FormControl, Validators } from '@ang
 import { Observable, combineLatest  } from 'rxjs';
 import { startWith, switchMap, map } from 'rxjs/operators';
 import { environment as env } from 'environments/environment';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 
 @Component({
   templateUrl: './nodes-edit.component.html',
@@ -30,7 +30,7 @@ export class NodesEditComponent implements OnInit {
   secrets$: Observable<any[]>;
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('compliance');
+    this.layoutFacade.showSidebar(Sidebar.Compliance);
     this.route.paramMap.pipe(
       switchMap(params => this.fetchNode(params.get('id'))))
       .subscribe(node => {

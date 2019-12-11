@@ -5,7 +5,7 @@ import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 
 import { EntityStatus } from 'app/entities/entities';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { GetRole } from 'app/entities/roles/role.actions';
@@ -28,7 +28,7 @@ export class RoleDetailsComponent implements OnInit, OnDestroy {
   ) {  }
 
   ngOnInit(): void {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.select(roleFromRoute).pipe(
       filter(identity),
       takeUntil(this.isDestroyed))

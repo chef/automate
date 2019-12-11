@@ -4,7 +4,7 @@ import { map, filter } from 'rxjs/operators';
 import { Component, OnInit } from '@angular/core';
 import { MatDialog, MatSnackBar } from '@angular/material';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { SortDirection } from '../../types/types';
 import { DatafeedService } from '../../services/data-feed/data-feed.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
@@ -41,7 +41,7 @@ export class DatafeedComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.destinations$ = this.service.fetchDestinations();
     this.destinations$.subscribe(destinations => {
         this.sendCountToTelemetry(destinations);

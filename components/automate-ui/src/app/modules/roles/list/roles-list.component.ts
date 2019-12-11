@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading } from 'app/entities/entities';
@@ -40,7 +40,7 @@ export class RolesListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetRoles());
   }
 

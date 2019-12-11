@@ -22,7 +22,7 @@ import {
   ReportQueryService,
   ReportQuery
 } from '../shared/reporting';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { saveAs } from 'file-saver';
 import {
   Chicklet
@@ -199,7 +199,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showSidebar('compliance');
+    this.layoutFacade.showSidebar(Sidebar.Compliance);
     const allUrlParameters$ = this.getAllUrlParameters();
 
     this.endDate$ = this.reportQuery.state.pipe(map((reportQuery: ReportQuery) =>

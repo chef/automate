@@ -5,7 +5,7 @@ import { isEmpty, identity, xor, isNil } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
@@ -61,7 +61,7 @@ export class ApiTokenDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.layoutFacade.showSidebar('settings');
+    this.layoutFacade.showSidebar(Sidebar.Settings);
 
     this.store.pipe(
       select(isIAMv2),
