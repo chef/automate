@@ -8,7 +8,7 @@ import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { LayoutSidebarService } from './layout-sidebar.service';
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';
-import { sidebar, showPageLoading } from './layout.selectors';
+import { sidebar,  showPageLoading } from './layout.selectors';
 import { ShowPageLoading } from './layout.actions';
 
 import { GetProjects } from 'app/entities/projects/project.actions';
