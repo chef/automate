@@ -299,28 +299,43 @@ func (s *backupComplete) String() string { return "backupComplete" }
 
 // States
 //
-// We use the following state machine to handle the two "waiting"
-// states that we need to track inside the converger.
+// We use the following state machine to help ensure we don't attempt
+// to make further system modifications when we are expecting various
+// external events to complete.
 //
-//        +-----------+  convergeRequest| prepareForShutdown  +-------------------+
-//        |           |  err = ErrRestartPending              |                   |
-//        |           +-------------------------------------->|                   |
-//        |    idle   |                                       | waitingForRestart |
-//        |           |<--------------------------------------+                   |
-//        |           |       timeout                         |                   |
-//        +-------+---+                                       +-------------------+
-//            ^   |
-//            |   | convergeRequest
-//     timeout|   | err = ErrSelfReconfigurePending
-//            |   |
-//            |   v
-//         +--+--------------------+
-//         |                       |
-//         |                       |
-//         | waitingForReconfigure |
-//         |                       |
-//         |                       |
-//         +-----------------------+
+// Attempts to make invalid state transitions should result in an
+// error sent to the caller.
+//
+//
+//            +---------------+
+//            |               |
+//            |               |
+//            | backupRunning |
+//            |               |
+//            |               |
+//            +-------+-------+
+//                ^   |
+//     startBackup|   |backupComplete
+//                |   V
+//            +---+---+---+  convergeRequest| prepareForShutdown  +-------------------+
+//            |           |  err = ErrRestartPending              |                   |
+//      start |           +-------------------------------------->|                   |
+//      ----->|   idle    |                                       | waitingForRestart |
+//            |           |<--------------------------------------+                   |
+//            |           |       timeout                         |                   |
+//            +-------+---+                                       +-------------------+
+//                ^   |
+//                |   | convergeRequest
+//         timeout|   | err = ErrSelfReconfigurePending
+//                |   |
+//                |   v
+//            +---+-------------------+
+//            |                       |
+//            |                       |
+//            | waitingForReconfigure |
+//            |                       |
+//            |                       |
+//            +-----------------------+
 //
 
 // idle is the default state of the converger. In this state we
@@ -444,6 +459,11 @@ func (w *waitingForReconfigure) ProcessMessage(c *converger, msg message) (state
 
 func (w *waitingForReconfigure) String() string { return "waiting for reconfigure" }
 
+// backupRunning running is a converger state that we enter when we've
+// recieved a user-signal indicating that a backup is about to begin.
+//
+// This state can be removed when the converger itself handles taking
+// a backup.
 type backupRunning struct{}
 
 func (b *backupRunning) ProcessMessage(c *converger, msg message) (state, bool, error) {
