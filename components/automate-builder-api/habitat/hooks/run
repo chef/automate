@@ -5,7 +5,8 @@ exec 2>&1
 set -e
 
 export HOME="{{pkg.svc_data_path}}"
-export RUST_LOG="{{cfg.service.log_level}}"
+
+export RUST_LOG="{{cfg.log.level}},{{strJoin cfg.log.scoped_levels ","}}"
 export RUST_BACKTRACE=1
 export SSL_CERT_FILE="{{pkg.svc_config_path}}/root_ca.crt"
 
