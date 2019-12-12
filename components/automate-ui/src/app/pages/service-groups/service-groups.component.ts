@@ -340,7 +340,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   refreshServicesSidebar() {
     if (this.selectedServiceGroupId) {
       this.store.dispatch(new UpdateSelectedSG({
-        service_group_id: this.selectedServiceGroupId
+        service_group_id: this.selectedServiceGroupId,
+        searchBar: this.selectedSearchBarFilters
       }));
       document.querySelector<HTMLElement>('app-services-sidebar').focus();
     }
