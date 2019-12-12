@@ -229,7 +229,7 @@ func TestGetProject(t *testing.T) {
 
 func TestDeleteProject(t *testing.T) {
 	ctx := context.Background()
-	cl, store, cleanup := setupProjects(t)
+	cl, projects, rules, _, cleanup := setupProjectsAndRules(t)
 	defer cleanup()
 
 	cases := []struct {
@@ -247,35 +247,77 @@ func TestDeleteProject(t *testing.T) {
 			assert.Nil(t, resp)
 		}},
 		{"fails with NotFound when deleting from empty store", func(t *testing.T) {
-			require.Zero(t, store.ItemCount())
+			require.Zero(t, projects.ItemCount())
 			resp, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: "test"})
 			grpctest.AssertCode(t, codes.NotFound, err)
 			assert.Nil(t, resp)
 		}},
-		{"deletes custom project when one project is in database", func(t *testing.T) {
-			require.Zero(t, store.ItemCount())
+		{"deletes custom project with no rules when one project is in database", func(t *testing.T) {
+			require.Zero(t, projects.ItemCount())
 			id := fmt.Sprintf("test-project-%d", time.Now().UnixNano())
-			addProjectToStore(t, store, id, "my foo", storage.Custom)
+			addProjectToStore(t, projects, id, "my foo", storage.Custom)
 
 			_, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: id})
 			require.NoError(t, err)
-			assert.Zero(t, store.ItemCount())
+			assert.Zero(t, projects.ItemCount())
 		}},
-		{"deletes custom project when several are in database", func(t *testing.T) {
-			require.Zero(t, store.ItemCount())
+		{"deletes custom project with no rules when several projects are in database", func(t *testing.T) {
+			require.Zero(t, projects.ItemCount())
 			id := fmt.Sprintf("test-project-%d", time.Now().UnixNano())
-			addProjectToStore(t, store, id, "my foo", storage.Custom)
+			addProjectToStore(t, projects, id, "my foo", storage.Custom)
 
 			id2 := fmt.Sprintf("test-project-2-%d", time.Now().UnixNano())
-			addProjectToStore(t, store, id2, "my bar", storage.Custom)
-			require.Equal(t, 2, store.ItemCount())
+			addProjectToStore(t, projects, id2, "my bar", storage.Custom)
+			require.Equal(t, 2, projects.ItemCount())
 
 			_, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: id})
 			require.NoError(t, err)
-			assert.Equal(t, 1, store.ItemCount())
+			assert.Equal(t, 1, projects.ItemCount())
 
-			_, found := store.Get(id)
+			_, found := projects.Get(id)
 			assert.False(t, found)
+		}},
+		{"if the project has applied rules, returns 'failed precondition'", func(t *testing.T) {
+			require.Zero(t, projects.ItemCount())
+			storageConditions := []storage.Condition{
+				{
+					Attribute: storage.Organization,
+					Operator:  storage.MemberOf,
+					Value:     []string{"opscode"},
+				},
+			}
+			projectID := fmt.Sprintf("test-project-%d", time.Now().UnixNano())
+			ruleID := "foo-applied-rule"
+			addProjectToStoreWithStatus(t, projects, projectID, "my foo", storage.Custom, storage.Applied.String())
+			addRuleToStore(t, rules, ruleID, "my applied foo rule", applied, storage.Node, projectID, storageConditions)
+
+			_, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: projectID})
+			grpctest.AssertCode(t, codes.FailedPrecondition, err)
+			assert.Equal(t, 1, projects.ItemCount())
+
+			_, found := projects.Get(projectID)
+			assert.True(t, found)
+		}},
+		{"if the project has staged rules, returns 'failed precondition'", func(t *testing.T) {
+			require.Zero(t, projects.ItemCount())
+			storageConditions := []storage.Condition{
+				{
+					Attribute: storage.Organization,
+					Operator:  storage.MemberOf,
+					Value:     []string{"opscode"},
+				},
+			}
+			projectID := fmt.Sprintf("test-project-%d", time.Now().UnixNano())
+			ruleID := "foo-staged-rule"
+			addProjectToStoreWithStatus(t, projects, projectID, "my foo", storage.Custom, storage.EditsPending.String())
+			addRuleToStore(t, rules, ruleID, "my staged foo rule", staged, storage.Node, projectID, storageConditions)
+
+			_, err := cl.DeleteProject(ctx, &api.DeleteProjectReq{Id: projectID})
+			grpctest.AssertCode(t, codes.FailedPrecondition, err)
+			assert.Equal(t, 1, projects.ItemCount())
+
+			_, found := projects.Get(projectID)
+			assert.True(t, found)
 		}},
 	}
 
@@ -285,7 +327,8 @@ func TestDeleteProject(t *testing.T) {
 
 	for _, test := range cases {
 		t.Run(test.desc, test.f)
-		store.Flush()
+		projects.Flush()
+		rules.Flush()
 	}
 }
 
@@ -390,14 +433,15 @@ func TestListProjectsForIntrospection(t *testing.T) {
 	}
 }
 
-func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projType storage.Type) api.Project {
+func addProjectToStoreWithStatus(t *testing.T, store *cache.Cache, id,
+	name string, projType storage.Type, status string) api.Project {
 	t.Helper()
 
 	proj := &storage.Project{
 		ID:     id,
 		Name:   name,
 		Type:   projType,
-		Status: storage.NoRules.String(),
+		Status: status,
 	}
 	store.Add(id, proj, 0)
 
@@ -409,8 +453,13 @@ func addProjectToStore(t *testing.T, store *cache.Cache, id, name string, projTy
 		Id:     id,
 		Name:   name,
 		Type:   returnType,
-		Status: storage.NoRules.String(),
+		Status: status,
 	}
+}
+
+func addProjectToStore(t *testing.T, store *cache.Cache, id,
+	name string, projType storage.Type) api.Project {
+	return addProjectToStoreWithStatus(t, store, id, name, projType, storage.NoRules.String())
 }
 
 func setupProjects(t *testing.T) (api.ProjectsClient, *cache.Cache, cleanupFunc) {
