@@ -13,7 +13,7 @@ import {
 } from 'app/types/types';
 import { EntityStatus } from 'app/entities/entities';
 import {
-  GetServiceGroupsSuggestions, UpdateServiceGroupsFilters
+  GetServiceGroupsSuggestions, UpdateServiceGroupsFilters, UpdateSelectedSG
 } from 'app/entities/service-groups/service-groups.actions';
 import {
   ServiceGroup,
@@ -340,7 +340,12 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   }
 
   refreshServicesSidebar() {
-    // TODO!!
+    if (this.selectedServiceGroupId) {
+      this.store.dispatch(new UpdateSelectedSG({
+        service_group_id: this.selectedServiceGroupId
+      }));
+      document.querySelector<HTMLElement>('app-services-sidebar').focus();
+    }
   }
 
   public updateAllFilters(allParameters: Chicklet[]): void {

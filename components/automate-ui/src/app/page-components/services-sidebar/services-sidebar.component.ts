@@ -87,11 +87,9 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
       console.log(servicesFilters)
 
 
-      // not working, it's always _undefined_
-      // this.selectedHealth = getOr('total', 'health', servicesFilters);
-      //this.currentPage    = getOr(1, 'page', servicesFilters);
-      // not working, it's always _undefined_
-      //this.totalServices  = getOr(0, this.selectedHealth, this.serviceGroupsHealthSummary);
+      this.selectedHealth = getOr('total', 'health', servicesFilters);
+      this.currentPage    = getOr(1, 'page', servicesFilters);
+      this.totalServices  = getOr(0, this.selectedHealth, this.serviceGroupsHealthSummary);
       this.selectedSearchBarFilters = getOr([], 'searchBar', servicesFilters);
       this.telemetryService.track('applicationsServiceCount', {
          serviceGroupsId: this.serviceGroupsId,

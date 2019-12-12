@@ -37,6 +37,7 @@ export const ServiceGroupEntityInitialState: ServiceGroupsEntityState = {
     services: {
       error: null,
       filters: {
+        service_group_id: undefined,
         page: 1,
         health: 'total'
       },
@@ -96,6 +97,8 @@ export function serviceGroupsEntityReducer(
         set('error', action.payload))(state);
 
     case ServiceGroupsActionTypes.UPDATE_SELECTED_SERVICE_GROUP:
+      console.log(`reducin' UPDATE_SELECTED_SERVICE_GROUP`);
+      console.log(action.payload);
       return set('selectedGroup.services.filters', action.payload, state);
 
     case ServiceGroupsActionTypes.GET_SERVICES_BY_SERVICE_GROUP:
