@@ -19,10 +19,20 @@ func (depth *ControlDepth) getControlListStatsByProfileIdAggs(
 
 	aggs := make(map[string]elastic.Aggregation)
 
-	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "passed"))
-	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "failed"))
-	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "skipped"))
-	waivedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run"))
+	waivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
+	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
+		MustNot(waivedQuery))
+
+	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
+		MustNot(waivedQuery))
+
+	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "skipped")).
+		MustNot(waivedQuery))
+
+	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
 	impactTerms := elastic.NewTermsAggregation().Field("profiles.controls.impact").Size(1).
 		SubAggregation("passed", passedFilter).
@@ -49,36 +59,38 @@ func (depth *ControlDepth) getControlListStatsByProfileIdResults(
 
 	if aggRoot, found := depth.unwrap(&searchResult.Aggregations); found {
 		if controlAggResult, found := aggRoot.Aggregations.Terms("control"); found {
-			//there can only be one
-			controlBucket := controlAggResult.Buckets[0]
-			controlId := controlBucket.Key.(string)
-			if titlesAggResult, found := controlBucket.Aggregations.Terms("title"); found {
+			if len(controlAggResult.Buckets) > 0 {
 				//there can only be one
-				titleBucket := titlesAggResult.Buckets[0]
-				title := titleBucket.Key.(string)
-				if impactAggResult, found := titleBucket.Aggregations.Terms("impact"); found {
+				controlBucket := controlAggResult.Buckets[0]
+				controlId := controlBucket.Key.(string)
+				if titlesAggResult, found := controlBucket.Aggregations.Terms("title"); found {
 					//there can only be one
-					impactBucket := impactAggResult.Buckets[0]
-					impactAsNumber, ok := impactBucket.Key.(float64)
-					if !ok {
-						//todo - what should we do in this case? as it is now, we will just move forward and set it to low risk
-						logrus.Errorf("could not convert the value of impact: %v, to a float!", impactBucket)
-					}
+					titleBucket := titlesAggResult.Buckets[0]
+					title := titleBucket.Key.(string)
+					if impactAggResult, found := titleBucket.Aggregations.Terms("impact"); found {
+						//there can only be one
+						impactBucket := impactAggResult.Buckets[0]
+						impactAsNumber, ok := impactBucket.Key.(float64)
+						if !ok {
+							//todo - what should we do in this case? as it is now, we will just move forward and set it to low risk
+							logrus.Errorf("could not convert the value of impact: %v, to a float!", impactBucket)
+						}
 
-					passedCount, _ := impactBucket.Filter("passed")
-					failedCount, _ := impactBucket.Filter("failed")
-					skippedCount, _ := impactBucket.Filter("skipped")
-					waivedCount, _ := impactBucket.Filter("waived")
-					statSummary := stats.ControlStats{
-						Control: controlId,
-						Passed:  int32(passedCount.DocCount),
-						Failed:  int32(failedCount.DocCount),
-						Skipped: int32(skippedCount.DocCount),
-						Impact:  float32(impactAsNumber),
-						Title:   title,
-						Waived:  int32(waivedCount.DocCount),
+						passedCount, _ := impactBucket.Filter("passed")
+						failedCount, _ := impactBucket.Filter("failed")
+						skippedCount, _ := impactBucket.Filter("skipped")
+						waivedCount, _ := impactBucket.Filter("waived")
+						statSummary := stats.ControlStats{
+							Control: controlId,
+							Passed:  int32(passedCount.DocCount),
+							Failed:  int32(failedCount.DocCount),
+							Skipped: int32(skippedCount.DocCount),
+							Impact:  float32(impactAsNumber),
+							Title:   title,
+							Waived:  int32(waivedCount.DocCount),
+						}
+						controlStats = append(controlStats, &statSummary)
 					}
-					controlStats = append(controlStats, &statSummary)
 				}
 			}
 		}

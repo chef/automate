@@ -427,6 +427,28 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
+      # profile deep with profile_id specified as a filter with waivers
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "environment", values: ["DevSec Prod Zeta"]),
+          Stats::ListFilter.new(type: "profile_id", values: ["b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"]),
+          Stats::ListFilter.new(type: "control", values: ["os-03"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
+      ], type: "controls", id: "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"
+      )
+      expected_data = {
+          "controlStats" => [
+              {
+
+                  "control" => "nginx-03",
+                  "title" => "Check NGINX three.",
+                  "skipped" => 1,
+                  "impact" => 1
+
+              }
+          ]
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
       #Profile stats for nodes that are using one profile one control.
       #todo - get this one working
       actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
