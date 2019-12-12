@@ -739,7 +739,42 @@ func BenchmarkV2FilterAuthorizedProjectsIncreasingProjectsPolicies(b *testing.B)
 	}
 }
 
-// increasing Subjects
+func BenchmarkV2FilterAuthorizedProjectsWithIncreasingSubjects(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	// keep these values constant as we increase the number of subjects
+	policyCount := 20
+	roleCount := 10
+
+	policies, roles := v2RandomPoliciesAndRoles(policyCount, roleCount)
+	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		"policies": policies,
+		"roles":    roles,
+	})
+
+	err = s.makeAuthorizedProjectPreparedQuery(ctx)
+	require.NoError(b, err, "prepared authorized project query")
+
+	subjectCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
+	for _, count := range subjectCount {
+		b.Run(fmt.Sprintf("input with %d subjects", count), func(b *testing.B) {
+			var resp []string
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2FilterAuthorizedProjects(ctx, append([]string{"user:local:test"}, randomTeams(count)...))
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			projectsResponse = resp
+		})
+	}
+}
 
 func BenchmarkV2FilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
 	ctx := context.Background()
