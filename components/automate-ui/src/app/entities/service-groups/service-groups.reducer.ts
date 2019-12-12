@@ -38,6 +38,7 @@ export const ServiceGroupEntityInitialState: ServiceGroupsEntityState = {
       error: null,
       filters: {
         service_group_id: undefined,
+        searchBar: [],
         page: 1,
         health: 'total'
       },
