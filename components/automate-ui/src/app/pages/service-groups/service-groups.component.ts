@@ -222,7 +222,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         // the first service group from the list. this lets us maintain a
         // service group selection regardless of other navigation as long as
         // the service group is still in the list.
-        const selectedSGVisibleOnPage = serviceGroups.find(sg => sg.id === this.selectedServiceGroupId);
+        const selectedSGVisibleOnPage = serviceGroups.find(sg => {
+          return sg.id === this.selectedServiceGroupId;
+        });
         if ( !selectedSGVisibleOnPage ) {
           this.selectedServiceGroupId = serviceGroups[0]['id'];
         }
@@ -445,7 +447,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     this.selectedServiceGroupId = id;
 
-    this.refreshServicesSidebar()
+    this.refreshServicesSidebar();
   }
 
   // TODO @afiune: Add links when they work
