@@ -13,14 +13,13 @@ import {
 } from 'app/types/types';
 import { EntityStatus } from 'app/entities/entities';
 import {
-  GetServiceGroupsSuggestions, UpdateServiceGroupsFilters, UpdateSelectedSG
+  GetServiceGroupsSuggestions, UpdateServiceGroupsFilters
 } from 'app/entities/service-groups/service-groups.actions';
 import {
   ServiceGroup,
   ServiceGroupsFilters,
   FieldDirection,
-  ServiceGroupsHealthSummary,
-  GroupServicesFilters
+  ServiceGroupsHealthSummary
 } from '../../entities/service-groups/service-groups.model';
 import {
   serviceGroupsStatus,
@@ -77,15 +76,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
   // Sort field by default
   readonly defaultSortField = 'percent_ok';
-
-  // Services sidebar page
-  public sgPage = 1;
-
-  // Services sidebar pagination sizing
-  public sgPageSize = 25;
-
-  // Services sidebar status filter
-  public selectedSgStatus = 'total';
 
   // Should the URL share dropdown be displayed
   shareDropdownVisible = false;
@@ -240,7 +230,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         // The sidebar content needs to be rendered on the initial page load
         // and also when filters are applied that change the service groups
         // content.
-        this.refreshServicesSidebar(this.currentSidebarParams());
+        this.refreshServicesSidebar();
       } else {
         this.selectedServiceGroupId = null;
       }
@@ -349,29 +339,8 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     }, []);
   }
 
-  refreshServicesSidebar(queryParams) {
-    if (this.selectedServiceGroupId) {
-      const servicesFilters: GroupServicesFilters = {
-        service_group_id: this.selectedServiceGroupId,
-        page: queryParams['sgPage'],
-        pageSize: queryParams['sgPageSize'],
-        health: queryParams['sgStatus'],
-        searchBar: queryParams['searchBar']
-      };
-
-      this.store.dispatch(new UpdateSelectedSG(servicesFilters));
-      document.querySelector<HTMLElement>('app-services-sidebar').focus();
-    }
-  }
-
-  currentSidebarParams() {
-    const params = this.route.snapshot.queryParamMap;
-    return {
-        page: this.sgPage,
-        pageSize: this.sgPageSize,
-        health: params.get('sgStatus') || 'total',
-        searchBar: this.selectedSearchBarFilters
-    }
+  refreshServicesSidebar() {
+    // TODO!!
   }
 
   public updateAllFilters(allParameters: Chicklet[]): void {
@@ -472,11 +441,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
     this.selectedServiceGroupId = id;
 
-    const queryParams = this.currentSidebarParams();
-    delete queryParams['sgPage'];
-    delete queryParams['sgStatus'];
-
-    this.refreshServicesSidebar(queryParams)
+    this.refreshServicesSidebar()
   }
 
   // TODO @afiune: Add links when they work
@@ -511,10 +476,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       delete queryParams['page'];
     }
 
-    delete queryParams['sgId'];
-    delete queryParams['sgPage'];
-    delete queryParams['sgStatus'];
-
     this.router.navigate([], { queryParams });
   }
 
@@ -537,10 +498,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         sortField: [field], sortDirection: [fieldDirection]};
 
       delete queryParams['page'];
-      delete queryParams['sgId'];
-      delete queryParams['sgPage'];
-      delete queryParams['sgStatus'];
-
       this.router.navigate([], {queryParams});
     }
   }
