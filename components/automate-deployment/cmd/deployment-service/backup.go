@@ -4,9 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/backup"
+	"github.com/chef/automate/components/automate-deployment/pkg/target"
 	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 )
 
@@ -51,5 +53,14 @@ func runRestore(cmd *cobra.Command, args []string) error {
 	}
 	fmt.Println("=================")
 	fmt.Println(string(mfst))
+
+	t := target.NewLocalTarget(false)
+	restorer, err := backup.NewRestorer(b, t, &backup.CLIReporter{}, backup.RestorerOpts{})
+	if err != nil {
+		panic(err)
+	}
+	if err := restorer.Restore(context.Background()); err != nil {
+		panic(err)
+	}
 	return nil
 }

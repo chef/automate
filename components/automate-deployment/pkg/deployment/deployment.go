@@ -8,7 +8,6 @@ import (
 
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/pelletier/go-toml"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -21,6 +20,7 @@ import (
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
 	"github.com/chef/automate/components/automate-deployment/pkg/target"
+	"github.com/chef/automate/components/automate-deployment/pkg/toml"
 )
 
 // Deployment represents a given deployment of Chef Automate.
@@ -503,12 +503,7 @@ func deploymentID() (string, error) {
 	return id.String(), nil
 }
 
-func UserTomlForService(d *Deployment, serviceName string) (string, error) {
-	svc, found := d.ServiceByName(serviceName)
-	if !found {
-		return "", errors.New("Not found")
-	}
-
+func UserTomlForService(d *Deployment, svc *Service) (string, error) {
 	rootCert := d.CA().RootCert()
 	creds := &shared.TLSCredentials{
 		RootCertContents: rootCert,

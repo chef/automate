@@ -32,11 +32,10 @@ import (
 var ErrServiceMissingFromManifest error = errors.New("Service not found in manifest")
 
 type Restorer struct {
-	//backupID     string
-	//locationSpec LocationSpecification
-	target target.Target
-	//deployment *deployment.Deployment
-	backup *Backup
+	target   target.Target
+	backup   *Backup
+	reporter RestoreReporter
+	opts     RestorerOpts
 }
 
 type RestorerOpts struct {
@@ -156,13 +155,34 @@ func LoadBackup(
 	return b, nil
 }
 
+type RestoreReporter interface {
+	Info(message string)
+	StartTask(name string, message string)
+	TaskSuccess(name string, message string)
+	TaskFail(name string, message string, err error)
+}
+
+type CLIReporter struct {
+}
+
+func (*CLIReporter) Info(message string) {
+	fmt.Println(message)
+}
+func (*CLIReporter) StartTask(name string, message string)           {}
+func (*CLIReporter) TaskSuccess(name string, message string)         {}
+func (*CLIReporter) TaskFail(name string, message string, err error) {}
+
 func NewRestorer(
-	target target.Target,
 	b *Backup,
+	target target.Target,
+	reporter RestoreReporter,
+	opts RestorerOpts,
 ) (*Restorer, error) {
 	return &Restorer{
-		target: target,
-		backup: b,
+		target:   target,
+		backup:   b,
+		reporter: reporter,
+		opts:     opts,
 	}, nil
 }
 
@@ -171,20 +191,30 @@ func (r *Restorer) initializeDeployment() (*deployment.Deployment, error) {
 	if err != nil {
 		return nil, err
 	}
+	d.SetTarget(r.target)
 	d.CurrentReleaseManifest = r.backup.GetManifest()
+	d.Deployed = true
+	for _, svc := range d.ExpectedServices {
+		svc.DeploymentState = deployment.Running
+	}
 	return d, nil
 }
 
 func (r *Restorer) Restore(ctx context.Context) error {
+	r.reporter.Info("initializing deployment")
 	d, err := r.initializeDeployment()
 	if err != nil {
 		return err
 	}
 
-	if err := r.bootstrapHabitat(); err != nil {
+	versioned := serviceToVersioned(d.ExpectedServices)
+
+	r.reporter.Info("unloading services")
+	if err := r.unloadServices(ctx, versioned); err != nil {
 		return err
 	}
 
+	r.reporter.Info("bootstrapping deployment service")
 	if err := r.bootstrapDeploymentService(d); err != nil {
 		return err
 	}
@@ -194,11 +224,11 @@ func (r *Restorer) Restore(ctx context.Context) error {
 		return err
 	}
 
-	versioned := serviceToVersioned(d.ExpectedServices)
-
 	errors := []error{}
-	for _, svc := range versioned {
-		if err := r.restoreService(restoreCtx, d, svc.Name(), &NoOpObjectVerifier{}); err != nil {
+	r.reporter.Info("restoring services")
+	for _, svc := range d.ExpectedServices {
+		r.reporter.Info(fmt.Sprintf("restoring %s", svc.Name()))
+		if err := r.restoreService(restoreCtx, d, svc, &NoOpObjectVerifier{}); err != nil {
 			errors = append(errors, err)
 			if !canContinueRestore(svc.Name(), err) {
 				break
@@ -250,15 +280,16 @@ func canContinueRestore(serviceName string, err error) bool {
 	return true
 }
 
-func (r *Restorer) restoreService(ctx *Context, d *deployment.Deployment, serviceName string, verifier ObjectVerifier) error {
+func (r *Restorer) restoreService(ctx *Context, d *deployment.Deployment, svc *deployment.Service,
+	verifier ObjectVerifier) error {
 	bucket := ctx.restoreBucket
 
-	svc := deployment.ServiceFromManifest(r.backup.GetManifest(), serviceName)
-	if svc == nil {
+	installable := manifest.InstallableFromManifest(r.backup.GetManifest(), svc.Name())
+	if installable == nil {
 		return ErrServiceMissingFromManifest
 	}
 
-	if err := r.installService(svc); err != nil {
+	if err := r.installService(installable); err != nil {
 		return err
 	}
 
@@ -281,7 +312,7 @@ func (r *Restorer) restoreService(ctx *Context, d *deployment.Deployment, servic
 		spec := *metadata.Spec
 		SetCommandExecutor(spec, command.NewExecExecutor())
 		for _, o := range spec.SyncOps() {
-			err := o.Restore(*ctx, serviceName, metadata.Verifier(), NewNoopOperationProgressReporter())
+			err := o.Restore(*ctx, svc.Name(), metadata.Verifier(), NewNoopOperationProgressReporter())
 			if err != nil {
 				return err
 			}
@@ -294,7 +325,7 @@ func (r *Restorer) restoreService(ctx *Context, d *deployment.Deployment, servic
 	return nil
 }
 
-func (r *Restorer) installService(svc *deployment.Service) error {
+func (r *Restorer) installService(svc habpkg.Installable) error {
 	if err := r.target.InstallService(context.TODO(), svc, ""); err != nil {
 		return err
 	}
@@ -310,7 +341,7 @@ func (r *Restorer) installService(svc *deployment.Service) error {
 }
 
 func (r *Restorer) startService(d *deployment.Deployment, svc *deployment.Service) error {
-	userToml, err := deployment.UserTomlForService(d, svc.Name())
+	userToml, err := deployment.UserTomlForService(d, svc)
 	if err != nil {
 		return err
 	}
@@ -349,14 +380,17 @@ func (r *Restorer) bootstrapDeploymentService(d *deployment.Deployment) error {
 		return err
 	}
 
+	r.reporter.Info("creating deployment database")
 	if err := r.initializeDeploymentServiceData(d); err != nil {
 		return err
 	}
 
+	r.reporter.Info("installing deployment service")
 	if err := r.installService(svc); err != nil {
 		return err
 	}
 
+	r.reporter.Info("starting deployment service")
 	if err := r.startService(d, svc); err != nil {
 		return err
 	}
@@ -384,6 +418,7 @@ func (r *Restorer) initializeDeploymentServiceData(d *deployment.Deployment) err
 func (r *Restorer) unloadServices(ctx context.Context, versioned []habpkg.VersionedPackage) error {
 	// Unload the services
 	for _, svc := range versioned {
+		r.reporter.Info(fmt.Sprintf("unloading %s", svc.Name()))
 		if err := r.target.UnloadService(ctx, svc); err != nil {
 			return err
 		}
@@ -393,7 +428,7 @@ func (r *Restorer) unloadServices(ctx context.Context, versioned []habpkg.Versio
 }
 
 func serviceToVersioned(svcs []*deployment.Service) []habpkg.VersionedPackage {
-	versioned := make([]habpkg.VersionedPackage, 0, len(svcs))
+	versioned := make([]habpkg.VersionedPackage, len(svcs))
 	for i := range svcs {
 		versioned[i] = svcs[i]
 	}
