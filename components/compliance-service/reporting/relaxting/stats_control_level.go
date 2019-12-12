@@ -103,9 +103,20 @@ func (depth *ControlDepth) getControlListStatsByProfileIdResults(
 func (depth *ControlDepth) getProfileListWithAggregatedComplianceSummariesAggs(filters map[string][]string, size int32) map[string]elastic.Aggregation {
 	aggs := make(map[string]elastic.Aggregation)
 
-	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "passed"))
-	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "failed"))
-	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "skipped"))
+	waivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
+	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
+		MustNot(waivedQuery))
+
+	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
+		MustNot(waivedQuery))
+
+	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "skipped")).
+		MustNot(waivedQuery))
+
+	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
 	profileSha := elastic.NewTermsAggregation().Field("profiles.sha256").Size(int(size))
 	profileAgg := elastic.NewReverseNestedAggregation().Path("profiles").
@@ -118,6 +129,7 @@ func (depth *ControlDepth) getProfileListWithAggregatedComplianceSummariesAggs(f
 		SubAggregation("compliant", passedFilter).
 		SubAggregation("noncompliant", failedFilter).
 		SubAggregation("skipped", skippedFilter).
+		SubAggregation("waived", waivedFilter).
 		SubAggregation("profile", profileAgg)
 
 	aggs["impact"] = impactTerms
@@ -160,6 +172,9 @@ func (depth *ControlDepth) getProfileListWithAggregatedComplianceSummariesResult
 			}
 			if skippedResult, found := impact.Aggregations.Filter("skipped"); found {
 				summary.Skipped = int32(skippedResult.DocCount)
+			}
+			if waivedResult, found := impact.Aggregations.Filter("waived"); found {
+				summary.Waived = int32(waivedResult.DocCount)
 			}
 			if profileResult, found := impact.Aggregations.ReverseNested("profile"); found {
 				if profileInfoResult, found := profileResult.Terms("profile-info"); found {
@@ -358,6 +373,7 @@ func (depth *ControlDepth) getStatsSummaryAggs() map[string]elastic.Aggregation 
 	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "passed"))
 	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "failed"))
 	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "skipped"))
+
 	controlsCard := elastic.NewCardinalityAggregation().Field("profiles.controls.id")
 
 	//we have nodeUUIDTermsQSize set to 1 because we don't need to return the actual values.

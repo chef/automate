@@ -20,12 +20,20 @@ func (depth *ProfileDepth) getControlListStatsByProfileIdAggs(
 
 	aggs := make(map[string]elastic.Aggregation)
 
-	passedFilterAgg := elastic.NewFilterAggregation().Filter(
-		elastic.NewTermQuery("profiles.controls.status", "passed"))
-	failedFilterAgg := elastic.NewFilterAggregation().Filter(
-		elastic.NewTermQuery("profiles.controls.status", "failed"))
-	skippedFilterAgg := elastic.NewFilterAggregation().Filter(
-		elastic.NewTermQuery("profiles.controls.status", "skipped"))
+	waivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
+	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
+		MustNot(waivedQuery))
+
+	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
+		MustNot(waivedQuery))
+
+	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "skipped")).
+		MustNot(waivedQuery))
+
+	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
 	//controls
 	totals := elastic.NewTermsAggregation().Field("profiles.controls.id")
@@ -36,15 +44,16 @@ func (depth *ProfileDepth) getControlListStatsByProfileIdAggs(
 	}
 	totals.Size(size)
 
-	totals.SubAggregation("passed", passedFilterAgg)
-	totals.SubAggregation("failed", failedFilterAgg)
-	totals.SubAggregation("skipped", skippedFilterAgg)
+	totals.SubAggregation("passed", passedFilter)
+	totals.SubAggregation("failed", failedFilter)
+	totals.SubAggregation("skipped", skippedFilter)
+	totals.SubAggregation("waived", waivedFilter)
 
 	controls := elastic.NewNestedAggregation().Path("profiles.controls")
 	controls.SubAggregation("totals", totals)
-	controls.SubAggregation("passed", passedFilterAgg)
-	controls.SubAggregation("failed", failedFilterAgg)
-	controls.SubAggregation("skipped", skippedFilterAgg)
+	controls.SubAggregation("passed", passedFilter)
+	controls.SubAggregation("failed", failedFilter)
+	controls.SubAggregation("waived", waivedFilter)
 
 	aggs["controls"] = controls
 
@@ -73,11 +82,13 @@ func (depth *ProfileDepth) getControlListStatsByProfileIdResults(
 					passedCount, _ := bucket.Filter("passed")
 					failedCount, _ := bucket.Filter("failed")
 					skippedCount, _ := bucket.Filter("skipped")
+					waivedCount, _ := bucket.Filter("waived")
 					statSummary := stats.ControlStats{
 						Control: controlID,
 						Passed:  int32(passedCount.DocCount),
 						Failed:  int32(failedCount.DocCount),
 						Skipped: int32(skippedCount.DocCount),
+						Waived:  int32(waivedCount.DocCount),
 						Impact:  controlMeta.Impact,
 						Title:   controlMeta.Title,
 					}
@@ -90,6 +101,7 @@ func (depth *ProfileDepth) getControlListStatsByProfileIdResults(
 	return controlStats, nil
 }
 
+//todo - how should we handle waivers here?
 //todo - this is almost identical to ReportDepth::getProfileListWithAggregatedComplianceSummariesAggs - harmonize
 func (depth *ProfileDepth) getProfileListWithAggregatedComplianceSummariesAggs(
 	filters map[string][]string,
@@ -118,6 +130,7 @@ func (depth *ProfileDepth) getProfileListWithAggregatedComplianceSummariesAggs(
 	return depth.wrap(aggs)
 }
 
+//todo - how should we handle waivers here?
 //todo - this is almost identical to ReportDepth::getProfileListWithAggregatedComplianceSummariesResults - harmonize
 func (depth *ProfileDepth) getProfileListWithAggregatedComplianceSummariesResults(
 	searchResult *elastic.SearchResult,
