@@ -18,6 +18,7 @@ pkg_exports=(
   [port]=service.port
   [host]=service.host
 )
+chef_automate_hab_binding_mode="relaxed"
 pkg_binds_optional=(
   [applications-service]="port"
   [authn-service]="port"
