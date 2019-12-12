@@ -22,10 +22,9 @@ func TestBackupHandler(t *testing.T) {
 			api.DeployEvent_COMPLETE_OK,
 			[]*api.DeployEvent_Backup_Operation{
 				{
-					Status:        api.DeployEvent_COMPLETE_OK,
-					Name:          "service-a",
-					SyncProgress:  100,
-					AsyncProgress: 100,
+					Status:       api.DeployEvent_COMPLETE_OK,
+					Name:         "service-a",
+					SyncProgress: 100,
 				},
 			},
 		)
@@ -43,17 +42,15 @@ func TestBackupHandler(t *testing.T) {
 			api.DeployEvent_COMPLETE_FAIL,
 			[]*api.DeployEvent_Backup_Operation{
 				{
-					Status:        api.DeployEvent_COMPLETE_OK,
-					Name:          "service-a",
-					SyncProgress:  100,
-					AsyncProgress: 100,
+					Status:       api.DeployEvent_COMPLETE_OK,
+					Name:         "service-a",
+					SyncProgress: 100,
 				},
 				{
-					Status:        api.DeployEvent_COMPLETE_FAIL,
-					Name:          "service-b",
-					SyncProgress:  100,
-					AsyncProgress: 51,
-					Error:         "sub-operation failed",
+					Status:       api.DeployEvent_COMPLETE_FAIL,
+					Name:         "service-b",
+					SyncProgress: 100,
+					Error:        "sub-operation failed",
 				},
 			},
 		)
@@ -71,16 +68,14 @@ func TestBackupHandler(t *testing.T) {
 			api.DeployEvent_COMPLETE_FAIL,
 			[]*api.DeployEvent_Backup_Operation{
 				{
-					Status:        api.DeployEvent_COMPLETE_OK,
-					Name:          "service-a",
-					SyncProgress:  100,
-					AsyncProgress: 100,
+					Status:       api.DeployEvent_COMPLETE_OK,
+					Name:         "service-a",
+					SyncProgress: 100,
 				},
 				{
-					Status:        api.DeployEvent_COMPLETE_FAIL,
-					Name:          "service-b",
-					SyncProgress:  100,
-					AsyncProgress: 51,
+					Status:       api.DeployEvent_COMPLETE_FAIL,
+					Name:         "service-b",
+					SyncProgress: 100,
 				},
 			},
 		)
@@ -98,16 +93,14 @@ func TestBackupHandler(t *testing.T) {
 			api.DeployEvent_RUNNING,
 			[]*api.DeployEvent_Backup_Operation{
 				{
-					Status:        api.DeployEvent_COMPLETE_OK,
-					Name:          "service-a",
-					SyncProgress:  100,
-					AsyncProgress: 100,
+					Status:       api.DeployEvent_COMPLETE_OK,
+					Name:         "service-a",
+					SyncProgress: 100,
 				},
 				{
-					Status:        api.DeployEvent_RUNNING,
-					Name:          "service-b",
-					SyncProgress:  66,
-					AsyncProgress: 0,
+					Status:       api.DeployEvent_RUNNING,
+					Name:         "service-b",
+					SyncProgress: 66,
 				},
 			},
 		)

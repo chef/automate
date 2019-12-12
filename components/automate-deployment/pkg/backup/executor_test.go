@@ -4,7 +4,6 @@ import (
 	"context"
 	"io/ioutil"
 	"os"
-	"sync"
 	"testing"
 	"time"
 
@@ -17,18 +16,8 @@ import (
 
 // TestBackup tests the backup execution
 func TestBackup(t *testing.T) {
-	t.Run("with sync failure", func(t *testing.T) {
+	t.Run("with failing operations", func(t *testing.T) {
 		exec, bctx, _, cleanup := testBackupExecutor(testFailSyncSpec)
-		defer cleanup()
-
-		err := exec.Backup(bctx)
-
-		require.Error(t, err, "returns an error of a sync operation fails")
-		assert.Contains(t, "test operation failed", err.Error())
-	})
-
-	t.Run("with async failure", func(t *testing.T) {
-		exec, bctx, _, cleanup := testBackupExecutor(testFailAsyncSpec)
 		defer cleanup()
 
 		err := exec.Backup(bctx)
@@ -56,34 +45,15 @@ func TestBackup(t *testing.T) {
 
 func TestProgressCalculator(t *testing.T) {
 	syncCal := NewProgressCalculator()
-	asyncCal := NewProgressCalculator()
 	svcs := []string{"service-a", "service-b", "service-c"}
-	wg := sync.WaitGroup{}
 
 	for _, s := range svcs {
 		syncCal.Update(OperationProgress{Name: s, Progress: 0})
-		asyncCal.Update(OperationProgress{Name: s, Progress: 0})
 	}
 
 	syncCal.Update(OperationProgress{Name: "service-a", Progress: 80})
 	syncCal.Update(OperationProgress{Name: "service-b", Progress: 40})
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		asyncCal.Update(OperationProgress{Name: "service-a", Progress: 100})
-	}()
-
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		asyncCal.Update(OperationProgress{Name: "service-c", Progress: 20})
-	}()
-
-	wg.Wait()
-
 	assert.Equal(t, float64(40), syncCal.Percent())
-	assert.Equal(t, float64(40), asyncCal.Percent())
 }
 
 func testLocationSpec(tmpdir string) LocationSpecification {
@@ -125,28 +95,6 @@ var testSuccessSpec = Spec{
 		{name: "sync-op-2"},
 		{name: "sync-op-3"},
 	},
-	testAsyncOps: []testOperation{
-		{name: "async-op-1"},
-		{name: "async-op-2"},
-		{name: "async-op-3"},
-	},
-}
-
-var testFailAsyncSpec = Spec{
-	Name: "service-a",
-	testSyncOps: []testOperation{
-		{name: "sync-op-1"},
-		{name: "sync-op-2"},
-		{name: "sync-op-3"},
-	},
-	testAsyncOps: []testOperation{
-		{name: "async-op-1"},
-		{
-			name: "async-op-2-fail",
-			fail: true,
-		},
-		{name: "async-op-3"},
-	},
 }
 
 var testFailSyncSpec = Spec{
@@ -158,10 +106,5 @@ var testFailSyncSpec = Spec{
 			fail: true,
 		},
 		{name: "sync-op-3"},
-	},
-	testAsyncOps: []testOperation{
-		{name: "async-op-1"},
-		{name: "async-op-2"},
-		{name: "async-op-3"},
 	},
 }
