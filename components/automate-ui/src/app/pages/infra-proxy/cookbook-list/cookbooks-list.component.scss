@@ -38,6 +38,10 @@ form {
     font-size: 1.02em;
   }
 
+  .errors {
+    width: 530px;
+  }
+
   input[type="text"]:disabled {
     opacity: 0.5;
     background-color: $chef-grey;
