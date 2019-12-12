@@ -303,8 +303,6 @@ func BenchmarkV1FilterAuthorizedPairsWithPolicies(b *testing.B) {
 
 // v2 benchmarks
 
-// TODO make project count configurable
-// there should be three policies per created project (viewer, editor, owner)
 var (
 	allProjects = []string{
 		"(unassigned)",
@@ -662,7 +660,7 @@ func BenchmarkV2FilterAuthorizedProjectsIncreasingMembership(b *testing.B) {
 	}
 }
 
-func BenchmarkV2FilterAuthorizedProjectsIncreasingProjectsPolicies(b *testing.B) {
+func BenchmarkV2FilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
 	ctx := context.Background()
 
 	l, err := logger.NewLogger("text", "debug")
@@ -674,6 +672,7 @@ func BenchmarkV2FilterAuthorizedProjectsIncreasingProjectsPolicies(b *testing.B)
 	projectCounts := []int{5, 20, 100, 200, 300}
 	member := "user:local:test"
 
+	// TODO replace with projectPolicies factory helper
 	for projCount := range projectCounts {
 		policyCount := projCount * 3
 		// create a list of project ids, each of which will have 3 corresponding policies
@@ -811,8 +810,11 @@ func BenchmarkV2FilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
 	}
 }
 
-// BenchmarkProjectsAuthorized
+// TODO
+// func BenchmarkV2FilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
+// BenchmarkProjectsAuthorized (add to the above tests) (same with makePreparedQuery)
 
+// TODO move with v1 tests
 // v1 helpers
 func testPairs(c int) []engine.Pair {
 	ret := make([]engine.Pair, c)
@@ -953,8 +955,10 @@ func randomTeams(c int) []string {
 
 // v2 helpers
 
-// TODO?
-// func migratedV1defaultPolicies() []map[string]interface{} {}
+// TODO
+// add chef-managed/v1 migrated policies/system stuff to real-world json file
+// (maybe one file with migrated policies, one without),
+// extract into map, then add custom policies and roles with factory function
 
 func chefManagedRoles() map[string]interface{} {
 	chefRoles := make(map[string]interface{}, 5)
@@ -1075,7 +1079,7 @@ func chefManagedPolicies() map[string]interface{} {
 	return chefPolicies
 }
 
-// TODO? factory for projectPolicies (project-owner, editor, viewer)
+// TODO factory for projectPolicies (project-owner, editor, viewer)
 
 func v2RandomPoliciesAndRoles(customPolicyCount int, customRoleCount int) (policyMap map[string]interface{}, roleMap map[string]interface{}) {
 	rand.Seed(time.Now().UnixNano())
