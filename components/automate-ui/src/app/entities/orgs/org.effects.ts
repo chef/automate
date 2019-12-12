@@ -141,6 +141,13 @@ export class OrgEffects {
           map((resp: OrgSuccessPayload) => new UpdateOrgSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new UpdateOrgFailure(error))))));
+  @Effect()
+  updateOrgSuccess$ = this.actions$.pipe(
+      ofType(OrgActionTypes.UPDATE_SUCCESS),
+      map(({ payload: { org } }: UpdateOrgSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Updated org ${org.name}.`
+    })));
 
   @Effect()
   updateOrgFailure$ = this.actions$.pipe(
