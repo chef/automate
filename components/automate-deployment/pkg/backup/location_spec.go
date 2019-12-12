@@ -12,10 +12,12 @@ import (
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"
+	gw "github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
 	config "github.com/chef/automate/api/config/shared"
+	w "github.com/chef/automate/api/config/shared/wrappers"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/lib/httputils"
 	"github.com/chef/automate/lib/secrets"
@@ -29,7 +31,10 @@ type LocationSpecification interface {
 
 	// ConfigureBackupRestoreTask configures the task so that its backup location is
 	// consistent with self
+	// TODO (jaym): remove
 	ConfigureBackupRestoreTask(*api.BackupRestoreTask) error
+
+	SetGlobalConfig(globalConfig *config.GlobalConfig) error
 
 	// String returns a string representation
 	String() string
@@ -86,6 +91,10 @@ func (gws GatewayLocationSpecification) ConfigureBackupRestoreTask(req *api.Back
 	return nil
 }
 
+func (gws GatewayLocationSpecification) SetGlobalConfig(globalConfig *config.GlobalConfig) error {
+	return errors.New("unimplemented")
+}
+
 // String is the backup gateway identified as a string
 func (gws GatewayLocationSpecification) String() string {
 	return fmt.Sprintf("<backup-gateway s3://%s/%s/%s>", gws.Endpoint, gws.BucketName, gws.BasePath)
@@ -101,6 +110,21 @@ func (fsspec FilesystemLocationSpecification) ToBucket(baseKey string) Bucket {
 
 func (fsspec FilesystemLocationSpecification) ConfigureBackupRestoreTask(req *api.BackupRestoreTask) error {
 	req.BackupDir = fsspec.Path
+	return nil
+}
+
+func (fsspec FilesystemLocationSpecification) SetGlobalConfig(globalConfig *config.GlobalConfig) error {
+	if globalConfig.V1 == nil {
+		globalConfig.V1 = &config.V1{}
+	}
+	globalConfig.V1.Backups = &config.Backups{
+		Location: w.String("filesystem"),
+		Filesystem: &config.Backups_Filesystem{
+			Path:                     w.String(fsspec.Path),
+			EsMaxSnapshotBytesPerSec: globalConfig.GetV1().GetBackups().GetFilesystem().GetEsMaxSnapshotBytesPerSec(),
+			EsMaxRestoreBytesPerSec:  globalConfig.GetV1().GetBackups().GetFilesystem().GetEsMaxRestoreBytesPerSec(),
+		},
+	}
 	return nil
 }
 
@@ -171,6 +195,39 @@ func (s3spec S3LocationSpecification) ConfigureBackupRestoreTask(req *api.Backup
 		AccessKey:    s3spec.AccessKey,
 		SecretKey:    s3spec.SecretKey,
 		SessionToken: s3spec.SessionToken,
+	}
+	return nil
+}
+
+func (s3spec S3LocationSpecification) SetGlobalConfig(globalConfig *config.GlobalConfig) error {
+	if globalConfig.V1 == nil {
+		globalConfig.V1 = &config.V1{}
+	}
+	var credentials *config.Backups_S3_AWSCredentials
+	if s3spec.AccessKey != "" && s3spec.SecretKey != "" {
+		var sessionToken *gw.StringValue
+		if s3spec.SessionToken != "" {
+			sessionToken = w.String(s3spec.SessionToken)
+		}
+		credentials = &config.Backups_S3_AWSCredentials{
+			AccessKey:    w.String(s3spec.AccessKey),
+			SecretKey:    w.String(s3spec.SecretKey),
+			SessionToken: sessionToken,
+		}
+	}
+
+	globalConfig.V1.Backups = &config.Backups{
+		Location: w.String("s3"),
+		S3: &config.Backups_S3{
+			Bucket: &config.Backups_S3_Bucket{
+				Endpoint: w.String(s3spec.Endpoint),
+				Name:     w.String(s3spec.BucketName),
+				BasePath: w.String(s3spec.BasePath),
+			},
+			Es:          globalConfig.GetV1().GetBackups().GetS3().GetEs(),
+			Ssl:         globalConfig.GetV1().GetBackups().GetS3().GetSsl(),
+			Credentials: credentials,
+		},
 	}
 	return nil
 }

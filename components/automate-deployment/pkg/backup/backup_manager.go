@@ -5,13 +5,17 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/boltdb/bolt"
 	dc "github.com/chef/automate/api/config/deployment"
 	papi "github.com/chef/automate/api/config/platform"
+	gc "github.com/chef/automate/api/config/shared"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
+	"github.com/chef/automate/components/automate-deployment/pkg/habapi"
+	"github.com/chef/automate/components/automate-deployment/pkg/habpkg"
 	"github.com/chef/automate/components/automate-deployment/pkg/manifest"
 	"github.com/chef/automate/components/automate-deployment/pkg/persistence/boltdb"
 	"github.com/chef/automate/components/automate-deployment/pkg/services"
@@ -28,11 +32,11 @@ import (
 var ErrServiceMissingFromManifest error = errors.New("Service not found in manifest")
 
 type Restorer struct {
-	backupID     string
-	locationSpec LocationSpecification
-	target       target.Target
-	deployment   *deployment.Deployment
-	manifest     manifest.ReleaseManifest
+	//backupID     string
+	//locationSpec LocationSpecification
+	target target.Target
+	//deployment *deployment.Deployment
+	backup *Backup
 }
 
 type RestorerOpts struct {
@@ -41,20 +45,76 @@ type RestorerOpts struct {
 	SHA256Checksum       string
 }
 
+type Backup struct {
+	manifest                  *manifest.A2
+	config                    *dc.AutomateConfig
+	backupsRepositoryLocation LocationSpecification
+	backupID                  string
+}
+
+func (b *Backup) SetConfig(cfg *dc.AutomateConfig) error {
+	b.config = cfg
+	b.hydrateGlobalConfig()
+	return b.backupsRepositoryLocation.SetGlobalConfig(b.config.Global)
+}
+
+func (b *Backup) PatchConfig(cfg *dc.AutomateConfig) error {
+	if err := b.config.OverrideConfigValues(cfg); err != nil {
+		return err
+	}
+	b.hydrateGlobalConfig()
+	return b.backupsRepositoryLocation.SetGlobalConfig(b.config.Global)
+}
+
+func (b *Backup) GetID() string {
+	return b.backupID
+}
+
+func (b *Backup) GetLocationSpec() LocationSpecification {
+	return b.backupsRepositoryLocation
+}
+
+func (b *Backup) GetConfig() *dc.AutomateConfig {
+	return b.config
+}
+
+func (b *Backup) GetManifest() *manifest.A2 {
+	return b.manifest
+}
+
+func (b *Backup) Validate() error {
+	return b.config.Validate()
+}
+
+func (b *Backup) BackupBucket() Bucket {
+	return b.backupsRepositoryLocation.ToBucket(b.backupID)
+}
+
+func (b *Backup) hydrateGlobalConfig() {
+	if b.config.Global == nil {
+		b.config.Global = &gc.GlobalConfig{}
+	}
+	if b.config.Global.V1 == nil {
+		b.config.Global.V1 = &gc.V1{}
+	}
+}
+
 func LoadBackup(
 	ctx context.Context,
 	backupID string,
-	backupLocation LocationSpecification,
-) (manifest.ReleaseManifest, *dc.AutomateConfig, error) {
+	backupsRepositoryLocation LocationSpecification,
+) (*Backup, error) {
 	// TODO: validate backupID
 	// (we want to make sure its at least no automate-elasticsearch-data)
-	bucket := backupLocation.ToBucket("")
-	_, backups, err := bucket.List(ctx, "", true)
+	backupsRepositoryBucket := backupsRepositoryLocation.ToBucket("")
+	_, backups, err := backupsRepositoryBucket.List(ctx, "", true)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	found := false
 	for _, b := range backups {
+		b := strings.Trim(string(b), "/")
+		fmt.Printf("Found backup %s\n", b)
 		if string(b) == backupID {
 			found = true
 			break
@@ -62,66 +122,95 @@ func LoadBackup(
 	}
 
 	if !found {
-		return nil, nil, errors.New("Not found")
+		return nil, errors.New("Not found")
 	}
 
-	return nil, nil, nil
-}
-
-func NewRestorer(
-	target target.Target,
-	backupID string,
-	manifest manifest.ReleaseManifest,
-	config *dc.AutomateConfig,
-) (*Restorer, error) {
-
-	d, err := deployment.CreateDeploymentWithUserOverrideConfig(config)
+	backupBucket := backupsRepositoryLocation.ToBucket(backupID)
+	manifestProvider, err := NewBucketManifestLocation(ctx, backupBucket)
 	if err != nil {
 		return nil, err
 	}
 
-	// Update the config in the deployment along with expected services
-	d.MergeIntoUserOverrideConfig(config)
+	m, err := manifestProvider.Provider().GetCurrentManifest(ctx, "")
+	if err != nil {
+		return nil, err
+	}
 
-	locationSpec := NewRemoteLocationSpecificationFromGlobalConfig(d.Config.GetGlobal())
+	b := &Backup{
+		backupID:                  backupID,
+		manifest:                  m,
+		backupsRepositoryLocation: backupsRepositoryLocation,
+	}
 
+	oldDeployment, err := LoadDeployment(ctx, backupBucket, &NoOpObjectVerifier{})
+	if err != nil {
+		return nil, err
+	}
+
+	cfg := oldDeployment.GetUserOverrideConfigForPersistence()
+
+	if err := b.SetConfig(cfg); err != nil {
+		return nil, err
+	}
+
+	return b, nil
+}
+
+func NewRestorer(
+	target target.Target,
+	b *Backup,
+) (*Restorer, error) {
 	return &Restorer{
-		backupID:     backupID,
-		locationSpec: locationSpec,
-		target:       target,
-		deployment:   d,
-		manifest:     manifest,
+		target: target,
+		backup: b,
 	}, nil
 }
 
+func (r *Restorer) initializeDeployment() (*deployment.Deployment, error) {
+	d, err := deployment.CreateDeploymentWithUserOverrideConfig(r.backup.GetConfig())
+	if err != nil {
+		return nil, err
+	}
+	d.CurrentReleaseManifest = r.backup.GetManifest()
+	return d, nil
+}
+
 func (r *Restorer) Restore(ctx context.Context) error {
-	if err := r.bootstrapHabitat(); err != nil {
-		return err
-	}
-
-	if err := r.bootstrapDeploymentService(); err != nil {
-		return err
-	}
-
-	restoreCtx, err := r.newRestoreContext(ctx)
+	d, err := r.initializeDeployment()
 	if err != nil {
 		return err
 	}
 
+	if err := r.bootstrapHabitat(); err != nil {
+		return err
+	}
+
+	if err := r.bootstrapDeploymentService(d); err != nil {
+		return err
+	}
+
+	restoreCtx, err := r.newRestoreContext(ctx, d)
+	if err != nil {
+		return err
+	}
+
+	versioned := serviceToVersioned(d.ExpectedServices)
+
 	errors := []error{}
-	for _, svc := range r.deployment.ExpectedServices {
-		if err := r.restoreService(restoreCtx, svc.Name(), nil); err != nil {
+	for _, svc := range versioned {
+		if err := r.restoreService(restoreCtx, d, svc.Name(), &NoOpObjectVerifier{}); err != nil {
 			errors = append(errors, err)
 			if !canContinueRestore(svc.Name(), err) {
 				break
 			}
 		}
 	}
+
 	return nil
 }
 
-func (r *Restorer) newRestoreContext(ctx context.Context) (*Context, error) {
-	connInfo, err := pgConnInfoFromConfig(r.deployment.Config)
+func (r *Restorer) newRestoreContext(ctx context.Context, d *deployment.Deployment) (*Context, error) {
+	connInfo, err := pgConnInfoFromConfig(d.Config)
 	if err != nil {
 		return nil, err
 	}
@@ -137,21 +226,21 @@ func (r *Restorer) newRestoreContext(ctx context.Context) (*Context, error) {
 	}
 
 	builderMinioLocationSpec, err := builderMinioLocationSpecFromConfigFromConfig(
-		r.deployment.Config,
+		d.Config,
 		r.target,
-		r.deployment.CA().RootCert(),
+		d.CA().RootCert(),
 		secretStore,
 	)
 
 	restoreCtx := NewContext(
 		WithContextCtx(ctx),
-		WithContextBackupID(r.backupID),
-		WithContextBackupLocationSpecification(r.locationSpec),
-		WithContextBackupRestoreLocationSpecification(r.locationSpec),
+		WithContextBackupID(r.backup.GetID()),
+		WithContextBackupLocationSpecification(r.backup.GetLocationSpec()),
+		WithContextBackupRestoreLocationSpecification(r.backup.GetLocationSpec()),
 		WithContextPgConnInfo(connInfo),
-		WithContextEsSidecarInfo(esSidecarInfoFromConfig(r.deployment.Config)),
+		WithContextEsSidecarInfo(esSidecarInfoFromConfig(d.Config)),
 		WithContextConnFactory(cf),
-		WithContextReleaseManifest(r.manifest),
+		WithContextReleaseManifest(d.CurrentReleaseManifest),
 		WithContextBuilderMinioLocationSpec(builderMinioLocationSpec),
 	)
 	return &restoreCtx, nil
@@ -161,10 +250,10 @@ func canContinueRestore(serviceName string, err error) bool {
 	return true
 }
 
-func (r *Restorer) restoreService(ctx *Context, serviceName string, verifier ObjectVerifier) error {
+func (r *Restorer) restoreService(ctx *Context, d *deployment.Deployment, serviceName string, verifier ObjectVerifier) error {
 	bucket := ctx.restoreBucket
 
-	svc := deployment.ServiceFromManifest(r.manifest, serviceName)
+	svc := deployment.ServiceFromManifest(r.backup.GetManifest(), serviceName)
 	if svc == nil {
 		return ErrServiceMissingFromManifest
 	}
@@ -199,7 +288,7 @@ func (r *Restorer) restoreService(ctx *Context, serviceName string, verifier Obj
 		}
 	}
 
-	if err := r.startService(svc); err != nil {
+	if err := r.startService(d, svc); err != nil {
 		return err
 	}
 	return nil
@@ -220,8 +309,8 @@ func (r *Restorer) installService(svc *deployment.Service) error {
 	return nil
 }
 
-func (r *Restorer) startService(svc *deployment.Service) error {
-	userToml, err := deployment.UserTomlForService(r.deployment, svc.Name())
+func (r *Restorer) startService(d *deployment.Deployment, svc *deployment.Service) error {
+	userToml, err := deployment.UserTomlForService(d, svc.Name())
 	if err != nil {
 		return err
 	}
@@ -250,28 +339,32 @@ func (r *Restorer) bootstrapHabitat() error {
 	return nil
 }
 
-func (r *Restorer) bootstrapDeploymentService() error {
-	if err := r.initializeDeploymentServiceData(); err != nil {
+func (r *Restorer) bootstrapDeploymentService(d *deployment.Deployment) error {
+	svc := deployment.ServiceFromManifest(r.backup.GetManifest(), "deployment-service")
+	if svc == nil {
+		return ErrServiceMissingFromManifest
+	}
+
+	if err := r.unloadServices(context.TODO(), []habpkg.VersionedPackage{svc}); err != nil {
 		return err
 	}
 
-	svc := deployment.ServiceFromManifest(r.manifest, "deployment-service")
-	if svc == nil {
-		return ErrServiceMissingFromManifest
+	if err := r.initializeDeploymentServiceData(d); err != nil {
+		return err
 	}
 
 	if err := r.installService(svc); err != nil {
 		return err
 	}
 
-	if err := r.startService(svc); err != nil {
+	if err := r.startService(d, svc); err != nil {
 		return err
 	}
 
 	return nil
 }
 
-func (r *Restorer) initializeDeploymentServiceData() error {
+func (r *Restorer) initializeDeploymentServiceData(d *deployment.Deployment) error {
 	if err := os.MkdirAll("/hab/svc/deployment-service/data", 0755); err != nil {
 		return err
 	}
@@ -280,11 +373,31 @@ func (r *Restorer) initializeDeploymentServiceData() error {
 		return err
 	}
 
-	if err := initializeDeploymentDatabase(r.deployment); err != nil {
+	if err := initializeDeploymentDatabase(d); err != nil {
 		return err
 	}
 
 	return nil
+}
+
+// unloadServices unloads the services and waits for them to be down
+func (r *Restorer) unloadServices(ctx context.Context, versioned []habpkg.VersionedPackage) error {
+	// Unload the services
+	for _, svc := range versioned {
+		if err := r.target.UnloadService(ctx, svc); err != nil {
+			return err
+		}
+	}
+
+	return habapi.WaitForUnload(r.target.HabAPIClient(), versioned, 5*time.Minute)
+}
+
+func serviceToVersioned(svcs []*deployment.Service) []habpkg.VersionedPackage {
+	versioned := make([]habpkg.VersionedPackage, 0, len(svcs))
+	for i := range svcs {
+		versioned[i] = svcs[i]
+	}
+	return versioned
 }
 
 func writeConvergeDisableFile() error {

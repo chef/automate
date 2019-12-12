@@ -8,13 +8,26 @@ import (
 	"github.com/boltdb/bolt"
 	"github.com/pkg/errors"
 
-	"github.com/chef/automate/api/config/deployment"
+	dc "github.com/chef/automate/api/config/deployment"
+
+	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
 	"github.com/chef/automate/components/automate-deployment/pkg/persistence/boltdb"
 )
 
 // LoadDeploymentConfig loads the automate configuration directly from
 // the bolt database contained in the given backup.
-func LoadDeploymentConfig(ctx context.Context, bucket Bucket, verifier ObjectVerifier) (*deployment.AutomateConfig, error) {
+func LoadDeploymentConfig(ctx context.Context, bucket Bucket, verifier ObjectVerifier) (*dc.AutomateConfig, error) {
+	d, err := LoadDeployment(ctx, bucket, verifier)
+	if err != nil {
+		return nil, err
+	}
+
+	return d.Config, nil
+}
+
+// LoadDeploymentConfig loads the automate configuration directly from
+// the bolt database contained in the given backup.
+func LoadDeployment(ctx context.Context, bucket Bucket, verifier ObjectVerifier) (*deployment.Deployment, error) {
 	// This is a roundabout way for creating a random temporary file. ioutil.WriteFile lets
 	// us rewrite the file at that path with the right permissions
 	tmpfile, err := ioutil.TempFile("", "chef-automate-restore-bolt")
@@ -60,5 +73,5 @@ func LoadDeploymentConfig(ctx context.Context, bucket Bucket, verifier ObjectVer
 		return nil, errors.Wrap(err, "failed to get deployment from backed up deployment store")
 	}
 
-	return existingDeployment.Config, nil
+	return existingDeployment, nil
 }
