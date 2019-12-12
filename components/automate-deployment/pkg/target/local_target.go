@@ -1512,9 +1512,28 @@ func (t *LocalTarget) IPs() []net.IP {
 	if ip != nil {
 		return []net.IP{ip}
 	}
-	return []net.IP{}
+	ip, err := outgoingIPWithUDP()
+	if err != nil {
+		logrus.WithError(err).Warn("Could not determine system ip address")
+		return []net.IP{}
+	}
+	return []net.IP{ip}
 }
 
 func (t *LocalTarget) HabCache() depot.HabCache {
 	return depot.FromLocalCache()
+}
+
+// http://www.masterraghu.com/subjects/np/introduction/unix_network_programming_v1.3/ch08lev1sec14.html
+// Uses the same logic as hab to get the outgoing ip address
+func outgoingIPWithUDP() (net.IP, error) {
+	c, err := net.Dial("udp", "8.8.8.8:53")
+	if err != nil {
+		return nil, err
+	}
+	defer c.Close()
+
+	addr := c.LocalAddr().(*net.UDPAddr)
+
+	return addr.IP, nil
 }
