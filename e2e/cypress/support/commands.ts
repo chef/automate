@@ -206,8 +206,11 @@ function deleteProjects(projectIdsToDelete: string[], index: number,
       url: `/apis/iam/v2beta/projects/${projectId}/rules`
     }).then((rulesResp) => {
       if (rulesResp.body.rules && rulesResp.body.rules.length > 0) {
-        deleteProjectRules(projectId, rulesResp.body.rules);
-        deleteProjects(projectIdsToDelete, index + 1, true);
+        const finish = (): void => {
+          deleteProjects(projectIdsToDelete, index + 1, true);
+        };
+        // Delete all the rules then call the deleteProjects with the next project
+        deleteProjectRules(projectId, rulesResp.body.rules, finish);
       } else {
         deleteProjects(projectIdsToDelete, index + 1, rulesWereDeleted);
       }
@@ -215,14 +218,20 @@ function deleteProjects(projectIdsToDelete: string[], index: number,
   }
 }
 
-function deleteProjectRules(projectId: string, rules: any[]) {
-  for (const rule of rules) {
+// Delete one rule at a time and then when there are no rules left to delete
+// call the finish function
+function deleteProjectRules(projectId: string, rules: any[], finish: () => void) {
+  if (rules.length === 0 ) {
+    finish();
+  } else {
+    const [rule, ...rest] = rules;
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
       url: `/apis/iam/v2beta/projects/${projectId}/rules/${rule.id}`
     }).then((deleteResp) => {
       expect(deleteResp.status).to.be.oneOf([200, 404]);
+      deleteProjectRules(projectId, rest, finish);
     });
   }
 }
