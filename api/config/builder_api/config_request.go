@@ -10,6 +10,7 @@ func NewConfigRequest() *ConfigRequest {
 		V1: &ConfigRequest_V1{
 			Sys: &ConfigRequest_V1_System{
 				Service: &ConfigRequest_V1_System_Service{},
+				Log:     &ConfigRequest_V1_System_Log{},
 			},
 		},
 	}
@@ -33,4 +34,27 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 }
 
 // SetGlobalConfig imports settings from the global configuration
-func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {}
+func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
+	var level string
+	if c.GetV1().GetSys().GetLog().GetLevel().GetValue() != "" {
+		level = c.GetV1().GetSys().GetLog().GetLevel().GetValue()
+	} else {
+		level = g.GetV1().GetLog().GetLevel().GetValue()
+	}
+	switch level {
+	case "debug":
+		level = "debug"
+	case "", "info", "warn", "warning", "panic", "fatal":
+		level = "error"
+	default:
+		// We'll allow it (this will cover trace)
+	}
+	if level == "" {
+		c.GetV1().GetSys().GetLog().Level = nil
+	} else {
+		c.GetV1().GetSys().GetLog().Level = w.String(level)
+	}
+	if len(c.GetV1().GetSys().GetLog().GetScopedLevels()) == 0 {
+		c.GetV1().GetSys().GetLog().ScopedLevels = nil
+	}
+}

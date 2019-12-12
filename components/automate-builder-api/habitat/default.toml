@@ -1,10 +1,13 @@
 [service]
-log_level = "debug,tokio_core=error,tokio_reactor=error,zmq=error,hyper=error"
 listen = "0.0.0.0"
 port   = 10103
 
 [memcache]
 ttl = 15
+
+[log]
+level = "debug"
+scoped_levels = ["tokio_core=error","tokio_reactor=error","zmq=error","hyper=error"]
 
 [datastore]
 user = "automate-builder-api"

@@ -25,6 +25,7 @@ message ConfigRequest {
 
 			Service service = 3;
 			Memcache memcache = 5;
+			Log log = 6;
 
 			message Service {
 				google.protobuf.StringValue host = 1;
@@ -33,6 +34,12 @@ message ConfigRequest {
 
 			message Memcache {
 				google.protobuf.Int32Value ttl = 1;
+			}
+
+			message Log {
+				google.protobuf.StringValue level = 1;
+				// scoped_levels are of the format foo=warn,bar=debug
+				repeated string scoped_levels = 2;
 			}
 
 		} // System
