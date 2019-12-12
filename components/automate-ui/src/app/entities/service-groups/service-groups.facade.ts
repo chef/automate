@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Router } from '@angular/router';
-import { Action, Store } from '@ngrx/store';
+import { Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { includes } from 'lodash/fp';
@@ -50,7 +49,6 @@ export class ServiceGroupsFacadeService {
 
   constructor(
       private store: Store<fromServiceGroups.ServiceGroupsEntityState>,
-      private router: Router,
       private telemetryService: TelemetryService
     ) {
     // this.allBooks$ = store.pipe(select(fromBooks.getAllBooks));
@@ -60,18 +58,6 @@ export class ServiceGroupsFacadeService {
     this.serviceGroupsName$ = store.select(selectedServiceGroupName);
     this.svcHealthSummary$ = this.store.select(selectedServiceGroupHealth);
     this.currentServicesFilters$ = this.store.select(selectedServiceGroupFilters);
-  }
-
-  dispatch(action: Action) {
-    this.store.dispatch(action);
-  }
-
-  public updateServicesFilters(selectedHealth, currentPage): void {
-    const queryParams = {
-      'sgStatus': selectedHealth,
-      'sgPage': currentPage
-    };
-    this.router.navigate([], { queryParams, queryParamsHandling: 'merge' });
   }
 
   // returns a timewizard message for the provided current and previous health checks
