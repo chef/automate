@@ -63,30 +63,13 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public timewizardMessage = this.serviceGroupsFacade.timewizardMessage;
 
   ngOnInit() {
-    console.log('oninit for a new ServicesSidebarComponent')
-
-    // FIXME: need to reset status filter and pagination state when the service group id changes
-    // FIXME: pagination controls borked, probably need to fix app-page-picker 
-
-    // this.services$.pipe(takeUntil(this.isDestroyed))
-    //   .subscribe( () => {
-    //   });
-
     this.svcHealthSummary$.pipe(takeUntil(this.isDestroyed))
         .subscribe((serviceGroupsHealthSummary) => {
-          // this.selectedHealth = 'total';
-          // this.currentPage = 1;
-          // this.pageSize = 25;
-
           this.serviceGroupsHealthSummary = serviceGroupsHealthSummary;
           this.totalServices = getOr(0, this.selectedHealth, this.serviceGroupsHealthSummary);
         });
 
     this.currentServicesFilters$.pipe(takeUntil(this.isDestroyed)).subscribe((servicesFilters) => {
-      console.log(`currentServicesFilters$ servicesFilters:`)
-      console.log(servicesFilters)
-
-
       this.selectedHealth = getOr('total', 'health', servicesFilters);
       this.currentPage    = getOr(1, 'page', servicesFilters);
       this.totalServices  = getOr(0, this.selectedHealth, this.serviceGroupsHealthSummary);
@@ -96,9 +79,6 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
          totalServices: this.totalServices,
          statusFilter: this.selectedHealth
       });
-
-      console.log(`currentServicesFilters$ this:`)
-      console.log(this);
     });
   }
 
@@ -108,7 +88,6 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   }
 
   public updateHealthFilter(health: string) {
-    console.log(`updateHealthFilter to ${health}`)
     this.currentPage = 1;
     this.selectedHealth = this.serviceGroupsFacade
       .updateHealthFilter(health, 'applicationsStatusFilter');
@@ -124,7 +103,6 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
 
   refresh() {
     if (this.serviceGroupsId) {
-      console.log(`doing dat refresh>>>`)
 
       const paramsForDispatch = {
           service_group_id: this.serviceGroupsId,

@@ -212,16 +212,16 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     )
     .subscribe(([serviceGroups]) => {
       if (serviceGroups.length > 0) {
-        // if we do not have an sgId parameter, pick the first sgId from the
-        // service group list
+        // if we do not have a selected service group, pick the first sgId from
+        // the service group list
         if ( !this.selectedServiceGroupId ) {
           this.selectedServiceGroupId = serviceGroups[0]['id'];
         }
 
         // if the selected service group is not visible on the page, then pick
-        // the first service group from the list and navigate to it. this lets
-        // us maintain a service group selection regardless of other navigation
-        // as long as the service group is still in the list.
+        // the first service group from the list. this lets us maintain a
+        // service group selection regardless of other navigation as long as
+        // the service group is still in the list.
         const selectedSGVisibleOnPage = serviceGroups.find(sg => sg.id === this.selectedServiceGroupId);
         if ( !selectedSGVisibleOnPage ) {
           this.selectedServiceGroupId = serviceGroups[0]['id'];
@@ -235,8 +235,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         this.selectedServiceGroupId = null;
       }
     });
-
-    // TODO: status filters and pagination in the services sidebar are broken :(
 
     // If the user applies a filter via the filter bar or the *service group*
     // status filters that filters out all of the services in the
