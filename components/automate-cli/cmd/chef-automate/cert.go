@@ -6,6 +6,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"github.com/chef/automate/api/config/shared"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
 )
@@ -74,36 +75,38 @@ func runCertShowCmd(*cobra.Command, []string) error {
 				return writeToFile(tlsCred.GetCert())
 			}
 		}
+
+		hostnames := gatherHostnames(tlsCreds)
 		// Error no matching hostname found in the automate frontend_tls cert configuration
 		return status.Wrap(
 			err,
 			status.CommandExecutionError,
-			fmt.Sprintf("Unable to find matching certificate configuration for hostname %s", certCmdFlags.filepath),
+			fmt.Sprintf("Unable to find matching certificate configuration for hostname %s. Available Hostnames: %q", certCmdFlags.filepath, hostnames),
 		)
 	} else if certCmdFlags.hostname != "" {
-		found := false
 		for _, tlsCred := range tlsCreds {
 			if tlsCred.GetServerName() == certCmdFlags.hostname {
-				found = true
-				writer.Printf("Hostname: %s\nCert: %s\n", tlsCred.GetServerName(), tlsCred.GetCert())
+				// Print hostname on stderr so that we can pipe the cert with other cmds
+				writer.Errorf("Hostname: %s\n", tlsCred.GetServerName())
+				writer.Printf(tlsCred.GetCert())
 				return nil
 			}
 		}
-		if !found {
-			// Error no matching hostname found in the automate frontend_tls cert configuration
-			return status.Wrap(
-				err,
-				status.CommandExecutionError,
-				fmt.Sprintf("Unable to find matching certificate configuration for hostname %s", certCmdFlags.filepath),
-			)
-		}
+		// Error no matching hostname found in the automate frontend_tls cert configuration
+		hostnames := gatherHostnames(tlsCreds)
+		return status.Wrap(
+			err,
+			status.CommandExecutionError,
+			fmt.Sprintf("Unable to find matching certificate configuration for hostname %s. Available hostnames: %q", certCmdFlags.filepath, hostnames),
+		)
 	} else if certCmdFlags.filepath != "" {
 		if len(tlsCreds) > 1 {
 			// There is more than one cert and it is unclear which one to save to the cert file
+			hostnames := gatherHostnames(tlsCreds)
 			return status.Wrap(
 				err,
 				status.CommandExecutionError,
-				fmt.Sprintf("Found more than one host certificate configured, please specify a hostname using the -hostname flag"),
+				fmt.Sprintf("Found more than one host certificate configured, please specify a hostname using the -hostname flag. Available Hostnames: %q", hostnames),
 			)
 		}
 		return writeToFile(tlsCreds[0].GetCert())
@@ -111,11 +114,13 @@ func runCertShowCmd(*cobra.Command, []string) error {
 	} // Print all certs to stdout
 	for _, tlsCred := range tlsCreds {
 		if tlsCred.GetServerName() != "" {
-			writer.Printf("Hostname: %s\nCertificate:\n %s\n", tlsCred.GetServerName(), tlsCred.GetCert())
+			// Print hostname on stderr so that we can pipe the cert with other cmds
+			writer.Errorf("Hostname: %s\n", tlsCred.GetServerName())
+			writer.Println(tlsCred.GetCert())
 		} else {
 			// Don't print the hostname if it isn't there
 			// It is most likely not set, so let's keep it simple
-			writer.Printf("Certificate:\n %s\n", tlsCred.GetCert())
+			writer.Println(tlsCred.GetCert())
 		}
 	}
 	return nil
@@ -131,4 +136,13 @@ func writeToFile(cert string) error {
 		)
 	}
 	return nil
+}
+
+func gatherHostnames(tlsCreds []*shared.FrontendTLSCredential) []string {
+	// Gather certificate server names (hostnames)
+	hostnames := make([]string, len(tlsCreds))
+	for i, tlsCred := range tlsCreds {
+		hostnames[i] = tlsCred.GetServerName()
+	}
+	return hostnames
 }
