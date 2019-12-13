@@ -6,7 +6,7 @@ port   = 10103
 ttl = 15
 
 [log]
-level = "debug"
+level = "error"
 scoped_levels = ["tokio_core=error","tokio_reactor=error","zmq=error","hyper=error"]
 
 [datastore]
