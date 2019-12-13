@@ -221,13 +221,11 @@ func init() {
 		"airgap-bundle",
 		"",
 		"Path to an airgap install bundle")
-	// upgradeRunCmd.PersistentFlags().StringVar(
-	// 	&upgradeRunCmdFlags.version,
-	// 	"version",
-	// 	"",
-	// 	"The exact Chef Automate version to install")
-
-	// upgradeRunCmd.PersistentFlags().MarkHidden("version") // nolint: errcheck
+	upgradeRunCmd.PersistentFlags().StringVar(
+		&upgradeRunCmdFlags.version,
+		"version",
+		"",
+		"The exact Chef Automate version to install")
 	upgradeCmd.AddCommand(upgradeRunCmd)
 	upgradeCmd.AddCommand(upgradeStatusCmd)
 	RootCmd.AddCommand(upgradeCmd)
