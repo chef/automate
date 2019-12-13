@@ -65,7 +65,9 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
     ]).pipe(
         takeUntil(this.isDestroyed),
         filter(([isV2, _v2TeamFromRoute, _v1TeamFromRoute]) => isV2 !== null),
-        map(([isV2, v2Team, v1Team]) => isV2 ? [v2Team, v2Team.id] : [v1Team, v1Team.guid]),
+        map(([isV2, v2Team, v1Team]) =>
+          isV2 ? [v2Team, v2Team ? v2Team.id : null] : [v1Team, v1Team ? v1Team.guid : null]),
+        filter(([team, _teamId]) => team != null),
         distinctUntilChanged(
           ([_teamA, teamIdA]: [Team, string], [_teamB, teamIdB]: [Team, string]) =>
           teamIdA === teamIdB)

@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { isEmpty, keyBy, at, xor } from 'lodash/fp';
+import { isEmpty, keyBy, at, xor, isNil } from 'lodash/fp';
 import { combineLatest, Subject, Observable } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
@@ -174,8 +174,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       team$
     ]).pipe(
       takeUntil(this.isDestroyed),
-      filter(([_, pStatus, _team]) =>
-      pStatus !== EntityStatus.loading)
+      filter(([_, pStatus, team]) => !pending(pStatus) && !isNil(team))
     ).subscribe(([allowedProjects, _, team]) => {
         this.projects = {};
         allowedProjects
