@@ -55,7 +55,7 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 
 	mainQuery := newBoolQueryFromFilters(filters)
 
-	rangeQuery, ok := newRangeQueryTime(start, end, CheckinTimestamp)
+	rangeQuery, ok := newRangeQueryTime(start, end, backend.CheckIn)
 
 	if ok {
 		mainQuery = mainQuery.Must(rangeQuery)
@@ -67,7 +67,7 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 		Query(mainQuery).
 		Index(IndexNodeState).
 		Size(pageSize).
-		Sort(CheckinTimestamp, ascending).
+		Sort(backend.CheckIn, ascending).
 		Sort(NodeFieldID, ascending).
 		FetchSourceContext(fetchSource)
 
@@ -108,10 +108,10 @@ func (es Backend) GetNodesPageByCursor(ctx context.Context, start time.Time,
 	mainQuery := newBoolQueryFromFilters(filters)
 
 	if sortField == "" {
-		sortField = CheckinTimestamp
+		sortField = backend.CheckIn
 	}
 
-	rangeQuery, ok := newRangeQueryTime(start, end, CheckinTimestamp)
+	rangeQuery, ok := newRangeQueryTime(start, end, backend.CheckIn)
 
 	if ok {
 		mainQuery = mainQuery.Must(rangeQuery)
