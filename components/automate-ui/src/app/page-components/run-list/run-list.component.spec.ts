@@ -125,6 +125,12 @@ describe('RunListComponent', () => {
           }
         ]
       };
+      nodeRun.versionedCookbooks = [
+        {
+          name: 'test',
+          version: '1.0.2'
+        }
+      ];
 
       component.ngOnChanges(create_changes(createNodeRun(), nodeRun));
 
@@ -557,5 +563,12 @@ function createNodeRun(): NodeRun {
     expanded_run_list: {
       id: 'acceptance-chef-products-automate-master',
       run_list: []
-   }});
+   },
+   versioned_cookbooks: [
+     {
+       name: '',
+       version: ''
+     }
+   ]
+  });
 }

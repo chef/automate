@@ -7,7 +7,7 @@ import {
   ChangeDetectorRef
 } from '@angular/core';
 import { NodeRunsService } from '../../services/node-details/node-runs.service';
-import { NodeRun, PolicyCookbooks, ExpandedRunListItem, Resource } from '../../types/types';
+import { NodeRun, PolicyCookbooks, ExpandedRunListItem, Resource, VersionedCookbook } from '../../types/types';
 
 export class Item {
   type: string;
@@ -78,8 +78,10 @@ export class RunListComponent implements OnChanges {
     let runList: Item[] = [];
     const expandedRunList = newNodeRun.expandedRunList;
     const resources = newNodeRun.resources || [];
+    const versionedCookbooks = newNodeRun.versionedCookbooks || [];
     if (expandedRunList) {
-      runList = expandedRunList.run_list.map((item) => this.createItem(item, resources));
+      runList = expandedRunList.run_list.map((item) =>
+        this.createItem(item, resources, versionedCookbooks));
       this.maybeFetchPolicy(runList, newNodeRun.policyRevision);
     }
 
@@ -95,7 +97,8 @@ export class RunListComponent implements OnChanges {
     }
   }
 
-  private createItem(originalItem: ExpandedRunListItem, resources: Resource[]): Item {
+  private createItem(originalItem: ExpandedRunListItem, resources: Resource[],
+    versionedCookbooks: VersionedCookbook[]): Item {
     const item = new Item(originalItem);
 
     if (item.isRole()) {
@@ -106,16 +109,15 @@ export class RunListComponent implements OnChanges {
         }
       });
       item.children = originalItem.children.map((childItem) =>
-        this.createItem(childItem, resources));
+        this.createItem(childItem, resources, versionedCookbooks));
     } else {
-      const cookbook = item.cookbookName();
+      const cookbookName = item.cookbookName();
       item.status = 'success';
+      item.version = this.extractVersionFromCookbook(cookbookName, versionedCookbooks);
+
       resources.forEach(resource => {
-        if (resource.cookbook_name === cookbook) {
-          item.version = resource.cookbook_version;
-          if (resource.status === 'failed') {
+        if (resource.cookbook_name === cookbookName && resource.status === 'failed') {
             item.status = 'failed';
-          }
         }
       });
     }
@@ -132,6 +134,18 @@ export class RunListComponent implements OnChanges {
         item.policy_identifier = cookbookLocks[cookbook];
       }
     });
+  }
+
+  private extractVersionFromCookbook(name: string,
+    versionedCookbooks: VersionedCookbook[]): string {
+    const cookbook = versionedCookbooks.find(c => c.name === name);
+    let version = '';
+
+    if (cookbook) {
+      version = cookbook.version;
+    }
+
+    return version;
   }
 
   private collectRunListRollupStatus(items: Item[]): RunListRollupStatus {

@@ -240,6 +240,11 @@ export interface ExpandedRunListItem {
   children: ExpandedRunListItem[];
 }
 
+export interface VersionedCookbook {
+  name: string;
+  version: string;
+}
+
 export interface RespNodeRun {
   node_id: string;
   id: string;
@@ -288,6 +293,7 @@ export interface RespNodeRun {
     id: string;
     run_list: ExpandedRunListItem[];
   };
+  versioned_cookbooks: VersionedCookbook[];
 }
 
 export interface Deprecation {
@@ -359,7 +365,14 @@ export class NodeRun {
     expanded_run_list: {
       id: '',
       run_list: []
-   }});
+   },
+   versioned_cookbooks: [
+     {
+       name: '',
+       version: ''
+     }
+   ]
+  });
 
   nodeId: string;
   nodeName: string;
@@ -406,6 +419,7 @@ export class NodeRun {
     id: string;
     run_list: ExpandedRunListItem[];
   };
+  versionedCookbooks: VersionedCookbook[];
 
   constructor(respNodeRun: RespNodeRun) {
     this.nodeId = respNodeRun.node_id;
@@ -442,6 +456,7 @@ export class NodeRun {
     this.expandedRunList = respNodeRun.expanded_run_list;
     this.uptimeSeconds = respNodeRun.uptime_seconds;
     this.deprecations = respNodeRun.deprecations;
+    this.versionedCookbooks = respNodeRun.versioned_cookbooks;
   }
 
   isPolicyFile(): boolean {

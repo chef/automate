@@ -178,5 +178,12 @@ function createNodeRun(): NodeRun {
     expanded_run_list: {
       id: 'acceptance-chef-products-automate-master',
       run_list: []
-   }});
+   },
+   versioned_cookbooks: [
+     {
+       name: '',
+       version: ''
+     }
+   ]
+  });
 }

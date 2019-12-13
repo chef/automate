@@ -300,6 +300,7 @@ func toResponseRun(run *cmsRes.Run) *cfgRes.Run {
 		Deprecations:         toResponseDeprecations(run.Deprecations),
 		Error:                toResponseError(run.Error),
 		Projects:             run.Projects,
+		VersionedCookbooks:   toVersionsCookbooks(run.VersionedCookbooks),
 	}
 }
 
@@ -387,6 +388,19 @@ func toResponseResources(resources []*cmsRes.Resource) []*cfgRes.Resource {
 	}
 
 	return responseResources
+}
+
+func toVersionsCookbooks(versionedCookbooks []*cmsRes.VersionedCookbook) []*cfgRes.VersionedCookbook {
+	responseExpandedCookbooks := make([]*cfgRes.VersionedCookbook, len(versionedCookbooks))
+
+	for index, cookbook := range versionedCookbooks {
+		responseExpandedCookbooks[index] = &cfgRes.VersionedCookbook{
+			Name:    cookbook.Name,
+			Version: cookbook.Version,
+		}
+	}
+
+	return responseExpandedCookbooks
 }
 
 //GetOrganizations returns the names of every organization for the configuration management service
