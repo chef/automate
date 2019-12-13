@@ -117,11 +117,6 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 	// even after the node no longer exists
 	nodeFilters["exists"] = []string{"true"}
 
-	if sortField == "" {
-		sortField = backend.CheckIn
-	} else {
-		sortField = params.ConvertParamToNodeRunBackend(sortField)
-
 	nodes, err := s.client.GetNodesPageByCursor(ctx, start, end,
 		nodeFilters, cursorField, cursorID, pageSize, sortField, sortAsc)
 	if err != nil {
