@@ -64,7 +64,7 @@ describeIfIAMV2p1('Project delete', () => {
       url: '/apis/iam/v2beta/projects'
     }).then((resp: Cypress.ObjectLike) => {
       expect(resp.body.projects && resp.body.projects.length > 0 &&
-        resp.body.projects.some((p: any) => p.id === project.id)).to.be.true;
+        resp.body.projects.some((p: any) => p.id === project.id)).to.be.equal(true);
     });
 
     // Apply the rules to make the rule applied
@@ -88,7 +88,7 @@ describeIfIAMV2p1('Project delete', () => {
       url: '/apis/iam/v2beta/projects'
     }).then((resp: Cypress.ObjectLike) => {
       expect(resp.body.projects && resp.body.projects.length > 0 &&
-        resp.body.projects.some((p: any) => p.id === project.id)).to.be.true;
+        resp.body.projects.some((p: any) => p.id === project.id)).to.be.equal(true);
     });
 
     // Delete the rule
@@ -118,7 +118,7 @@ describeIfIAMV2p1('Project delete', () => {
       url: '/apis/iam/v2beta/projects'
     }).then((resp: Cypress.ObjectLike) => {
       expect(resp.body.projects && resp.body.projects.length > 0 &&
-        resp.body.projects.some((p: any) => p.id === project.id)).to.be.true;
+        resp.body.projects.some((p: any) => p.id === project.id)).to.be.equal(true);
     });
 
     // Apply the rules to remove the rule
@@ -140,7 +140,7 @@ describeIfIAMV2p1('Project delete', () => {
       url: '/apis/iam/v2beta/projects'
     }).then((resp: Cypress.ObjectLike) => {
       expect(resp.body.projects && (resp.body.projects.length === 0 ||
-        !resp.body.projects.some((p: any) => p.id === project.id))).to.be.true;
+        !resp.body.projects.some((p: any) => p.id === project.id))).to.be.equal(true);
     });
   });
 });
