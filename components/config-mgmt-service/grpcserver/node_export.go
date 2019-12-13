@@ -121,9 +121,8 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 		sortField = backend.CheckIn
 	} else {
 		sortField = params.ConvertParamToNodeRunBackend(sortField)
-	}
 
-	nodes, err := s.client.GetNodesPageByCurser(ctx, start, end,
+	nodes, err := s.client.GetNodesPageByCursor(ctx, start, end,
 		nodeFilters, cursorField, cursorID, pageSize, sortField, sortAsc)
 	if err != nil {
 		return status.Errorf(codes.Internal, err.Error())
@@ -142,7 +141,7 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 			return err
 		}
 
-		nodes, err = s.client.GetNodesPageByCurser(ctx, start, end,
+		nodes, err = s.client.GetNodesPageByCursor(ctx, start, end,
 			nodeFilters, cursorField, cursorID, pageSize, sortField, sortAsc)
 		if err != nil {
 			return status.Errorf(codes.Internal, err.Error())

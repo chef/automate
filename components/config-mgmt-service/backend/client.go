@@ -55,12 +55,12 @@ type Client interface {
 		string, int, string, bool) ([]InventoryNode, error)
 	// @params (ctx, start, end, filters, cursorField, cursorID, pageSize, sortField, ascending)
 	// returns (Node, error)
-	GetNodesPageByCurser(context.Context, time.Time,
+	GetNodesPageByCursor(context.Context, time.Time,
 		time.Time, map[string][]string, interface{},
 		string, int, string, bool) ([]Node, error)
 	// @params (ctx, nodeID, start, end, filters, cursorEndTime, cursorID, pageSize, ascending)
 	// returns (Runs, error)
-	GetRunsPageByCurser(context.Context, string, time.Time, time.Time, map[string][]string, time.Time,
+	GetRunsPageByCursor(context.Context, string, time.Time, time.Time, map[string][]string, time.Time,
 		string, int, bool) ([]Run, error)
 }
 

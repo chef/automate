@@ -100,7 +100,7 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 	return nodes, nil
 }
 
-func (es Backend) GetNodesPageByCurser(ctx context.Context, start time.Time,
+func (es Backend) GetNodesPageByCursor(ctx context.Context, start time.Time,
 	end time.Time, filters map[string][]string, cursorField interface{},
 	cursorID string, pageSize int, sortField string,
 	ascending bool) ([]backend.Node, error) {

@@ -373,7 +373,7 @@ func (s *CfgMgmtServer) getNodeAsync(ctx context.Context, nodeID string, project
 	})
 	go func() {
 		projectFilters["entity_uuid"] = []string{nodeID}
-		nodes, err := s.client.GetNodesPageByCurser(ctx, time.Time{}, time.Time{},
+		nodes, err := s.client.GetNodesPageByCursor(ctx, time.Time{}, time.Time{},
 			projectFilters, nil, "", 1, "", true)
 		nodesChan <- struct {
 			nodes []backend.Node

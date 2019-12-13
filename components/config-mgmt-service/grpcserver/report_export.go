@@ -115,7 +115,7 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 		return status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
-	runs, err := s.client.GetRunsPageByCurser(ctx, request.NodeId, start, end,
+	runs, err := s.client.GetRunsPageByCursor(ctx, request.NodeId, start, end,
 		runFilters, cursorEndTime, cursorID, pageSize, sortAsc)
 	if err != nil {
 		return status.Errorf(codes.Internal, err.Error())
@@ -142,7 +142,7 @@ func (s *CfgMgmtServer) exportReports(ctx context.Context, request *pRequest.Rep
 		cursorID = lastRun.RunID
 		cursorEndTime = lastRun.EndTime
 
-		runs, err = s.client.GetRunsPageByCurser(ctx, request.NodeId, start, end,
+		runs, err = s.client.GetRunsPageByCursor(ctx, request.NodeId, start, end,
 			runFilters, cursorEndTime, cursorID, pageSize, sortAsc)
 		if err != nil {
 			return status.Errorf(codes.Internal, err.Error())
