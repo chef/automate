@@ -171,111 +171,6 @@ Cypress.Commands.add('cleanupV2IAMObjectsByIDPrefixes',
   });
 });
 
-function cleanupProjectsByIDPrefixes(idPrefix: string): void {
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'GET',
-    url: '/apis/iam/v2beta/projects'
-  }).then((resp) => {
-    const projectIds: string[] = resp.body.projects
-      .filter((project: any) => project.id.startsWith(idPrefix))
-      .map((project: any) => project.id);
-
-    deleteProjects(projectIds, 0, false);
-  });
-}
-
-function deleteProjects(projectIdsToDelete: string[], index: number,
-  rulesWereDeleted: boolean): void {
-  if (projectIdsToDelete.length === index) {
-    if (rulesWereDeleted) {
-      // Because rules were deleted we must first apply rules to be able to delete the project
-      applyRules();
-    }
-
-    // Delete all the projects after all their rules are deleted
-    for (const projectId of projectIdsToDelete) {
-      deleteProject(projectId);
-    }
-  } else {
-    // Delete all the projects rules
-    const projectId = projectIdsToDelete[index];
-    cy.request({
-      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-      method: 'GET',
-      url: `/apis/iam/v2beta/projects/${projectId}/rules`
-    }).then((rulesResp) => {
-      if (rulesResp.body.rules && rulesResp.body.rules.length > 0) {
-        const finish = (): void => {
-          deleteProjects(projectIdsToDelete, index + 1, true);
-        };
-        // Delete all the rules then call the deleteProjects with the next project
-        deleteProjectRules(projectId, rulesResp.body.rules, finish);
-      } else {
-        deleteProjects(projectIdsToDelete, index + 1, rulesWereDeleted);
-      }
-    });
-  }
-}
-
-// Delete one rule at a time and then when there are no rules left to delete
-// call the finish function
-function deleteProjectRules(projectId: string, rules: any[], finish: () => void) {
-  if (rules.length === 0 ) {
-    finish();
-  } else {
-    const [rule, ...rest] = rules;
-    cy.request({
-      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-      method: 'DELETE',
-      url: `/apis/iam/v2beta/projects/${projectId}/rules/${rule.id}`
-    }).then((deleteResp) => {
-      expect(deleteResp.status).to.be.oneOf([200, 404]);
-      deleteProjectRules(projectId, rest, finish);
-    });
-  }
-}
-
-function deleteProject(projectId: string) {
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'DELETE',
-    url: `/apis/iam/v2beta/projects/${projectId}`
-  }).then((deleteResp) => {
-    expect(deleteResp.status).to.be.oneOf([200, 404]);
-  });
-}
-
-function applyRules(): void {
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'POST',
-    url: '/apis/iam/v2beta/apply-rules'
-  });
-
-  cy.waitUntilApplyRulesNotRunning(100);
-}
-
-function cleanupV2IAMObjectByIDPrefix(idPrefix: string, iamObject: string): void {
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'GET',
-    url: `/apis/iam/v2beta/${iamObject}`
-  }).then((resp) => {
-    for (const object of resp.body[iamObject]) {
-      if (object.id.startsWith(idPrefix)) {
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'DELETE',
-          url: `/apis/iam/v2beta/${iamObject}/${object.id}`
-        }).then((deleteResp) => {
-          expect(deleteResp.status).to.be.oneOf([200, 404]);
-        });
-      }
-    }
-  });
-}
-
 Cypress.Commands.add('cleanupUsersByNamePrefix', (namePrefix: string) => {
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -318,22 +213,14 @@ Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (namePrefix: string) => 
   });
 });
 
-Cypress.Commands.add('waitUntilApplyRulesNotRunning', (attempts: number) => {
-  if (attempts === -1) {
-    throw new Error('apply-rules never finished');
-  }
+Cypress.Commands.add('applyRulesAndWait', (attempts: number) => {
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    method: 'POST',
     url: '/apis/iam/v2beta/apply-rules'
-  }).then((response) => {
-    if (response.body.state === 'not_running') {
-      return;
-    } else {
-      cy.log(`${attempts} attempts remaining: waiting for apply-rules to be not_running`);
-      cy.wait(1000);
-      cy.waitUntilApplyRulesNotRunning(--attempts);
-    }
   });
+
+  waitUntilApplyRulesNotRunning(attempts);
 });
 
 Cypress.Commands.add('waitForNodemanagerNode', (nodeId: string, maxRetries: number) => {
@@ -421,6 +308,24 @@ Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, en
 
 // helpers
 
+function waitUntilApplyRulesNotRunning(attempts: number): void {
+  if (attempts === -1) {
+    throw new Error('apply-rules never finished');
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: '/apis/iam/v2beta/apply-rules'
+  }).then((response) => {
+    if (response.body.state === 'not_running') {
+      return;
+    } else {
+      cy.log(`${attempts} attempts remaining: waiting for apply-rules to be not_running`);
+      cy.wait(1000);
+      waitUntilApplyRulesNotRunning(--attempts);
+    }
+  });
+}
+
 function LoginHelper(username: string) {
   cy.url().should('include', '/dex/auth/local');
   cy.server();
@@ -461,4 +366,99 @@ function waitUntilAdminTokenPermissioned(attempts: number): void {
     }
   });
   }
+}
+
+function cleanupProjectsByIDPrefixes(idPrefix: string): void {
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    method: 'GET',
+    url: '/apis/iam/v2beta/projects'
+  }).then((resp) => {
+    const projectIds: string[] = resp.body.projects
+      .filter((project: any) => project.id.startsWith(idPrefix))
+      .map((project: any) => project.id);
+
+    deleteProjects(projectIds, 0, false);
+  });
+}
+
+function deleteProjects(projectIdsToDelete: string[], index: number,
+  rulesWereDeleted: boolean): void {
+  if (projectIdsToDelete.length === index) {
+    if (rulesWereDeleted) {
+      // Because rules were deleted we must first apply rules to be able to delete the project
+      cy.applyRulesAndWait(100);
+    }
+
+    // Delete all the projects after all their rules are deleted
+    for (const projectId of projectIdsToDelete) {
+      deleteProject(projectId);
+    }
+  } else {
+    // Delete all the projects rules
+    const projectId = projectIdsToDelete[index];
+    cy.request({
+      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+      method: 'GET',
+      url: `/apis/iam/v2beta/projects/${projectId}/rules`
+    }).then((rulesResp) => {
+      if (rulesResp.body.rules && rulesResp.body.rules.length > 0) {
+        const finish = (): void => {
+          deleteProjects(projectIdsToDelete, index + 1, true);
+        };
+        // Delete all the rules then call the deleteProjects with the next project
+        deleteProjectRules(projectId, rulesResp.body.rules, finish);
+      } else {
+        deleteProjects(projectIdsToDelete, index + 1, rulesWereDeleted);
+      }
+    });
+  }
+}
+
+// Delete one rule at a time and then when there are no rules left to delete
+// call the finish function
+function deleteProjectRules(projectId: string, rules: any[], finish: () => void) {
+  if (rules.length === 0 ) {
+    finish();
+  } else {
+    const [rule, ...rest] = rules;
+    cy.request({
+      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+      method: 'DELETE',
+      url: `/apis/iam/v2beta/projects/${projectId}/rules/${rule.id}`
+    }).then((deleteResp) => {
+      expect(deleteResp.status).to.be.oneOf([200, 404]);
+      deleteProjectRules(projectId, rest, finish);
+    });
+  }
+}
+
+function deleteProject(projectId: string) {
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    method: 'DELETE',
+    url: `/apis/iam/v2beta/projects/${projectId}`
+  }).then((deleteResp) => {
+    expect(deleteResp.status).to.be.oneOf([200, 404]);
+  });
+}
+
+function cleanupV2IAMObjectByIDPrefix(idPrefix: string, iamObject: string): void {
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    method: 'GET',
+    url: `/apis/iam/v2beta/${iamObject}`
+  }).then((resp) => {
+    for (const object of resp.body[iamObject]) {
+      if (object.id.startsWith(idPrefix)) {
+        cy.request({
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+          method: 'DELETE',
+          url: `/apis/iam/v2beta/${iamObject}/${object.id}`
+        }).then((deleteResp) => {
+          expect(deleteResp.status).to.be.oneOf([200, 404]);
+        });
+      }
+    }
+  });
 }

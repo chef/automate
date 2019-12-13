@@ -214,14 +214,7 @@ describeIfIAMV2p1('project update re-tagging', () => {
       });
     });
 
-    // apply rules
-    cy.request({
-      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-      method: 'POST',
-      url: '/apis/iam/v2beta/apply-rules'
-    });
-
-    cy.waitUntilApplyRulesNotRunning(100);
+    cy.applyRulesAndWait(100);
   });
 
   after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));

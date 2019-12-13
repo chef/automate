@@ -46,7 +46,7 @@ describeIfIAMV2p1('Project delete', () => {
       body: rule
     });
 
-    // Try to delete the project
+    // Try to delete the project with a stagged rule
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
@@ -57,7 +57,7 @@ describeIfIAMV2p1('Project delete', () => {
         'Did not fail deleting a project with a stagged rule').to.be.oneOf([400]);
     });
 
-    // Ensure the project exists
+    // Ensure the project was not deleted
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'GET',
@@ -67,9 +67,10 @@ describeIfIAMV2p1('Project delete', () => {
         resp.body.projects.some((p: any) => p.id === project.id)).to.be.true;
     });
 
-    applyRules();
+    // Apply the rules to make the rule applied
+    cy.applyRulesAndWait(100);
 
-    // Try to delete the project
+    // Try to delete the project with the applied rule
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
@@ -80,7 +81,7 @@ describeIfIAMV2p1('Project delete', () => {
         'Did not fail deleting a project with a applied rule').to.be.oneOf([400]);
     });
 
-    // Ensure the project exists
+    // Ensure the project was not removed
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'GET',
@@ -99,7 +100,7 @@ describeIfIAMV2p1('Project delete', () => {
       expect(deleteResp.status).to.be.oneOf([200]);
     });
 
-    // Try to delete the project
+    // Try to delete the project with a non applied deleted rule
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
@@ -110,7 +111,7 @@ describeIfIAMV2p1('Project delete', () => {
         'Did not fail deleting a project with a deleted applied rule').to.be.oneOf([400]);
     });
 
-    // Ensure the project exists
+    // Ensure the project was not removed
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'GET',
@@ -120,9 +121,10 @@ describeIfIAMV2p1('Project delete', () => {
         resp.body.projects.some((p: any) => p.id === project.id)).to.be.true;
     });
 
-    applyRules();
+    // Apply the rules to remove the rule
+    cy.applyRulesAndWait(100);
 
-    // Delete the project
+    // Now deleting the project should work
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
@@ -142,13 +144,3 @@ describeIfIAMV2p1('Project delete', () => {
     });
   });
 });
-
-function applyRules() {
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'POST',
-    url: '/apis/iam/v2beta/apply-rules'
-  });
-
-  cy.waitUntilApplyRulesNotRunning(100);
-}
