@@ -26,19 +26,6 @@ import (
 var result ast.Value
 var authzResponse bool
 
-func genericV1Input(subjects []string, resource string, action string) (ast.Value, error) {
-	subs := make([]interface{}, len(subjects))
-	for i, sub := range subjects {
-		subs[i] = sub
-	}
-	input := map[string]interface{}{
-		"subjects": subs,
-		"resource": resource,
-		"action":   action,
-	}
-	return ast.InterfaceToValue(input)
-}
-
 func BenchmarkV1GenericInput(b *testing.B) {
 	var r ast.Value
 	var err error
@@ -301,521 +288,20 @@ func BenchmarkV1FilterAuthorizedPairsWithPolicies(b *testing.B) {
 	}
 }
 
-// v2 benchmarks
-
-var (
-	allProjects = []string{
-		"(unassigned)",
-		"project1",
-		"project2",
-		"project3",
-		"project4",
-		"project5",
-		"project6",
-	}
-	projectsResponse []string
-)
-
-// At time of benchmarking, this is around half a second for 1000 teams
-func BenchmarkV2FilterAuthorizedPairsRealWorldExample(b *testing.B) {
-	ctx := context.Background()
-
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(b, err, "init logger")
-	s, err := New(ctx, l)
-	require.NoError(b, err, "init state")
-
-	pairs := []engine.Pair{
-		engine.Pair{Resource: "compliance:reporting:nodes", Action: "compliance:reportNodes:list"},
-		engine.Pair{Resource: "iam:policies", Action: "iam:policies:list"},
-		engine.Pair{Resource: "iam:teams", Action: "iam:teams:create"},
-		engine.Pair{Resource: "system:config", Action: "system:telemetryConfig:get"},
-		engine.Pair{Resource: "compliance:profiles:market", Action: "compliance:marketProfiles:get"},
-		engine.Pair{Resource: "retention:nodes", Action: "retention:nodes:update"},
-		engine.Pair{Resource: "compliance:reporting:reports", Action: "compliance:reports:list"},
-		engine.Pair{Resource: "infra:actions", Action: "infra:ingest:create"},
-		engine.Pair{Resource: "system:service:logLevel", Action: "system:serviceLogLevel:set"},
-		engine.Pair{Resource: "iam:rules", Action: "iam:rules:apply"},
-		engine.Pair{Resource: "secrets:secrets", Action: "secrets:secrets:create"},
-		engine.Pair{Resource: "system:iam:upgradeToV2", Action: "system:iam:upgrade"},
-		engine.Pair{Resource: "iam:teams", Action: "iam:teams:update"},
-		engine.Pair{Resource: "system:service:version", Action: "system:serviceVersion:get"},
-		engine.Pair{Resource: "iam:policies", Action: "iam:policies:create"},
-		engine.Pair{Resource: "compliance:reporting:stats:trend", Action: "compliance:reportTrend:get"},
-		engine.Pair{Resource: "compliance:profiles", Action: "compliance:profiles:list"},
-		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:delete"},
-		engine.Pair{Resource: "compliance:reporting:stats:failures", Action: "compliance:reportFailures:get"},
-		engine.Pair{Resource: "system:health", Action: "system:health:get"},
-		engine.Pair{Resource: "compliance:scanner:jobs", Action: "compliance:scannerJobs:create"},
-		engine.Pair{Resource: "compliance:profiles", Action: "compliance:profiles:create"},
-		engine.Pair{Resource: "secrets:secrets", Action: "secrets:secrets:list"},
-		engine.Pair{Resource: "applications:serviceGroups", Action: "applications:serviceGroups:list"},
-		engine.Pair{Resource: "event:events", Action: "event:events:list"},
-		engine.Pair{Resource: "iam:projects", Action: "iam:projects:create"},
-		engine.Pair{Resource: "system:iam:resetToV1", Action: "system:iam:reset"},
-		engine.Pair{Resource: "compliance:reporting:stats:profiles", Action: "compliance:reportProfiles:get"},
-		engine.Pair{Resource: "infra:status", Action: "infra:ingest:get"},
-		engine.Pair{Resource: "compliance:reporting:licenseusage", Action: "compliance:reportingLicenseUsage:list"},
-		engine.Pair{Resource: "iam:policyVersion", Action: "iam:policies:get"},
-		engine.Pair{Resource: "iam:projects", Action: "iam:projects:list"},
-		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:get"},
-		engine.Pair{Resource: "system:status", Action: "system:license:get"},
-		engine.Pair{Resource: "iam:teams", Action: "iam:teams:list"},
-		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:list"},
-		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getAllProjects"},
-		engine.Pair{Resource: "retention:nodes", Action: "retention:nodes:get"},
-		engine.Pair{Resource: "retention:serviceGroups", Action: "retention:serviceGroups:update"},
-		engine.Pair{Resource: "compliance:scanner:jobs", Action: "compliance:scannerJobs:list"},
-		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:create"},
-		engine.Pair{Resource: "iam:tokens", Action: "iam:tokens:create"},
-		engine.Pair{Resource: "iam:rules", Action: "iam:rules:cancel"},
-		engine.Pair{Resource: "iam:tokens", Action: "iam:tokens:list"},
-		engine.Pair{Resource: "infra:nodeManagers", Action: "infra:nodeManagers:create"},
-		engine.Pair{Resource: "compliance:reporting:profiles", Action: "compliance:reportProfiles:list"},
-		engine.Pair{Resource: "system:license", Action: "system:license:apply"},
-		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
-		engine.Pair{Resource: "infra:nodes", Action: "infra:ingestNodes:delete"},
-		engine.Pair{Resource: "iam:roles", Action: "iam:roles:list"},
-		engine.Pair{Resource: "retention:serviceGroups", Action: "retention:serviceGroups:get"},
-		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:validate"},
-		engine.Pair{Resource: "compliance:reporting:suggestions", Action: "compliance:reportSuggestions:list"},
-		engine.Pair{Resource: "system:service:version", Action: "system:serviceVersion:list"},
-		engine.Pair{Resource: "iam:users", Action: "iam:users:list"},
-		engine.Pair{Resource: "infra:nodes", Action: "infra:ingest:delete"},
-		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:create"},
-		engine.Pair{Resource: "iam:rules", Action: "iam:rules:status"},
-		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getSome"},
-		engine.Pair{Resource: "infra:nodeManagers", Action: "infra:nodeManagers:list"},
-		engine.Pair{Resource: "applications:serviceGroups", Action: "applications:serviceGroups:delete"},
-		engine.Pair{Resource: "compliance:reporting:control", Action: "compliance:controlItems:list"},
-		engine.Pair{Resource: "compliance:reporting:report-ids", Action: "compliance:reportids:list"},
-		engine.Pair{Resource: "compliance:reporting:stats:summary", Action: "compliance:reportSummary:get"},
-		engine.Pair{Resource: "iam:users", Action: "iam:users:create"},
-		engine.Pair{Resource: "system:license", Action: "system:license:request"},
-		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:list"},
-		engine.Pair{Resource: "iam:roles", Action: "iam:roles:create"},
-	}
-
-	jsonFile, err := os.Open("example_v2/real_world_2p1_store.json")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer jsonFile.Close()
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var pr struct {
-		Policies map[string]interface{} `json:policies`
-		Roles    map[string]interface{} `json:roles`
-	}
-	json.Unmarshal(byteValue, &pr)
-
-	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
-		"policies": pr.Policies,
-		"roles":    pr.Roles,
-	})
-
-	teamCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
-	for _, count := range teamCount {
-		b.Run(fmt.Sprintf("V2FilterAuthorizedPairs with real life input and %d teams", count), func(b *testing.B) {
-			var resp []engine.Pair
-			var err error
-			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(count)...), pairs)
-				if err != nil {
-					b.Error(err)
-				}
-			}
-			filteredPairsResp = resp
-		})
-	}
-}
-
-func genericV2Input(subjects []string, resource string, action string, projects []string) (ast.Value, error) {
+// v1 helpers
+func genericV1Input(subjects []string, resource string, action string) (ast.Value, error) {
 	subs := make([]interface{}, len(subjects))
 	for i, sub := range subjects {
 		subs[i] = sub
-	}
-
-	projs := make([]interface{}, len(projects))
-	for i, proj := range projects {
-		projs[i] = proj
 	}
 	input := map[string]interface{}{
 		"subjects": subs,
 		"resource": resource,
 		"action":   action,
-		"projects": projs,
 	}
 	return ast.InterfaceToValue(input)
 }
 
-// Q: Which type of input is computed faster, generic Go interface or specific OPA Term?
-func BenchmarkV2GenericInput(b *testing.B) {
-	var r ast.Value
-	var err error
-	for n := 0; n < b.N; n++ {
-		// always record the result to prevent the compiler eliminating the function
-		// call.
-		r, err = genericV2Input(
-			[]string{"user:local:alice@example.com", "team:local:admins"},
-			"some:resource",
-			"some:resource:action",
-			[]string{"project-1", "project-2"})
-		if err != nil {
-			b.Fatal(err)
-		}
-	}
-	// always store the result to a package level variable
-	// so the compiler cannot eliminate the Benchmark itself.
-	result = r
-}
-
-func BenchmarkV2SpecificInput(b *testing.B) {
-	var r ast.Value
-	subjects, projects := []string{"user:local:alice@example.com", "team:local:admins"}, []string{"project-1", "project-2"}
-	resource, action := "some:resource", "some:resource:action"
-	for n := 0; n < b.N; n++ {
-		subs := make(ast.Array, len(subjects))
-		for i, sub := range subjects {
-			subs[i] = ast.NewTerm(ast.String(sub))
-		}
-		projs := make(ast.Array, len(projects))
-		for j, proj := range projects {
-			projs[j] = ast.NewTerm(ast.String(proj))
-		}
-		r = ast.NewObject(
-			[2]*ast.Term{ast.NewTerm(ast.String("subjects")), ast.NewTerm(subs)},
-			[2]*ast.Term{ast.NewTerm(ast.String("resource")), ast.NewTerm(ast.String(resource))},
-			[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
-			[2]*ast.Term{ast.NewTerm(ast.String("projects")), ast.NewTerm(projs)},
-		)
-	}
-	result = r
-}
-
-// A: Specific input is faster!
-// BenchmarkV2GenericInput-8   	    328531	      4034 ns/op	     1664 B/op	    50 allocs/op
-// BenchmarkV2SpecificInput-8   	  572641	      2073 ns/op	     976 B/op	      30 allocs/op
-
-func BenchmarkV2AuthorizedProjectPreparedQuery(b *testing.B) {
-	var r error
-	ctx := context.Background()
-
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(b, err, "init logger")
-	s, err := New(ctx, l)
-	require.NoError(b, err, "init state")
-
-	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
-	roleCount := 10 // keep this constant while increasing policyCount
-
-	chefPolicies := chefManagedPolicies()
-
-	for _, count := range policyCount {
-		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
-			"policies": policies,
-			"roles":    roles,
-		})
-
-		b.Run(fmt.Sprintf("store with %d chef-managed policies and %d custom policies", len(chefPolicies), count),
-			func(b *testing.B) {
-				for n := 0; n < b.N; n++ {
-					r = s.makeAuthorizedProjectPreparedQuery(ctx)
-					if r != nil {
-						b.Error(r)
-					}
-				}
-				errResult = r
-			})
-	}
-}
-
-// 12/10/2019
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_0_custom_policies-8     30	  	41025372 ns/op	  	8509971 B/op	  216893 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_5_custom_policies-8     26	  	43907128 ns/op	  	9121904 B/op	  229910 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_10_custom_policies-8    21	  	53302663 ns/op	  	11247030 B/op	  274257 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_20_custom_policies-8    15	  	77136735 ns/op	  	16418420 B/op	  382565 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_50_custom_policies-8    10	  	117808140 ns/op	 	23411056 B/op	  528983 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_100_custom_policies-8   6	    189886261 ns/op	  	38358808 B/op	  844680 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_200_custom_policies-8   4	    323203192 ns/op	  	66842966 B/op	  1436078 allocs/op
-// BenchmarkV2AuthorizedProjectPreparedQuery/store_with_4_chef-managed_policies_and_1000_custom_policies-8  1	    1310272730 ns/op	269942528 B/op	  5714943 allocs/op
-
-func BenchmarkV2ProjectsAuthorizedWithAuthorizedProjectPreparedQuery(b *testing.B) {
-	ctx := context.Background()
-
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(b, err, "init logger")
-	s, err := New(ctx, l)
-	require.NoError(b, err, "init state")
-
-	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
-	roleCount := 10 // keep this constant while increasing policyCount
-
-	for _, count := range policyCount {
-		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
-
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
-			"policies": policies,
-			"roles":    roles,
-		})
-		err = s.makeAuthorizedProjectPreparedQuery(ctx)
-		require.NoError(b, err, "update OPA store and prepare projects query")
-
-		b.Run(fmt.Sprintf("store with %d random policies and %d random roles", count, roleCount), func(b *testing.B) {
-			var resp []string
-			var err error
-			for n := 0; n < b.N; n++ {
-				resp, err = s.V2ProjectsAuthorized(ctx, []string{"user:local:test@example.com"}, "compliance:profiles:list", "compliance:profiles", allProjects)
-				if err != nil {
-					b.Error(err)
-				}
-			}
-			projectsResponse = resp
-		})
-	}
-}
-
-// Remaining v2 tests
-
-// Q: What happens if the subject appears more often as a member of different policies?
-func BenchmarkV2FilterAuthorizedProjectsIncreasingMembership(b *testing.B) {
-	ctx := context.Background()
-
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(b, err, "init logger")
-	s, err := New(ctx, l)
-	require.NoError(b, err, "init state")
-
-	policyCount := 10
-	roleCount := 5
-	member := "user:local:test"
-
-	// generate some simple, slightly differentiated policies
-	policies := make(map[string]interface{}, policyCount)
-	for i := 0; i < policyCount; i++ {
-		pid := fmt.Sprintf("pol-%v", i)
-
-		statement := map[string]interface{}{
-			"resources": []string{"*"},
-			"role":      []string{fmt.Sprintf("role-%v", i)},
-			"effect":    "allow",
-			"projects":  []string{fmt.Sprintf("proj-%v", i)},
-		}
-		statements := make(map[string]interface{}, 1)
-		statements["s-1"] = statement
-
-		policies[pid] = map[string]interface{}{
-			"members":    []string{},
-			"statements": statements,
-		}
-	}
-
-	roles := make(map[string]interface{}, roleCount)
-	for j := 0; j < roleCount; j++ {
-		id := fmt.Sprintf("role-%v", j)
-		roles[id] = map[string]interface{}{
-			"actions": []string{fmt.Sprintf("some:automate:action%v", j)},
-		}
-	}
-
-	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
-		"policies": policies,
-		"roles":    roles,
-	})
-
-	b.Run("store with 0 policies that include the subject as a member", func(b *testing.B) {
-		var resp []string
-		var err error
-		for n := 0; n < b.N; n++ {
-			resp, err = s.V2FilterAuthorizedProjects(ctx, []string{member})
-			if err != nil {
-				b.Error(err)
-			}
-		}
-		projectsResponse = resp
-	})
-
-	for k := 0; k < policyCount; k++ {
-		// add member to each policy as we iterate
-		pol := policies[fmt.Sprintf("pol-%v", k)].(map[string]interface{})
-		pol["members"] = []string{member}
-
-		// refresh store to reflect policies with the subject as a member
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
-			"policies": policies,
-			"roles":    roles,
-		})
-
-		b.Run(fmt.Sprintf("store with %d out of 10 policies that include the subject as a member", k+1), func(b *testing.B) {
-			var resp []string
-			var err error
-			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedProjects(ctx, []string{member})
-				if err != nil {
-					b.Error(err)
-				}
-			}
-			projectsResponse = resp
-		})
-	}
-}
-
-func BenchmarkV2FilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
-	ctx := context.Background()
-
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(b, err, "init logger")
-	s, err := New(ctx, l)
-	require.NoError(b, err, "init state")
-
-	roleCount := 5
-	projectCounts := []int{5, 20, 100, 200, 300}
-	member := "user:local:test"
-
-	// TODO replace with projectPolicies factory helper
-	for projCount := range projectCounts {
-		policyCount := projCount * 3
-		// create a list of project ids, each of which will have 3 corresponding policies
-		projectIds := make([]string, projCount)
-		for x := 0; x < projCount; x++ {
-			projectIds = append(projectIds, fmt.Sprintf("proj-%v", x))
-		}
-
-		policies := make([]map[string]interface{}, policyCount)
-		for _, proj := range projectIds {
-			for y := 0; y < 3; y++ {
-				pid := fmt.Sprintf("pol-%s-%v", proj, y)
-
-				statement := map[string]interface{}{
-					"resources": []string{"*"},
-					"role":      []string{fmt.Sprintf("role-%v", proj)},
-					"effect":    "allow",
-					"projects":  []string{proj},
-				}
-				statements := make(map[string]interface{}, 1)
-				statements["s-1"] = statement
-
-				policy := map[string]interface{}{
-					"id":         pid,
-					"members":    []string{"user:local:test", "token:fake"},
-					"statements": statements,
-				}
-				policies = append(policies, policy)
-
-			}
-		}
-
-		policyMap := make(map[string]interface{}, policyCount)
-		for _, pol := range policies {
-			id := pol["id"].(string)
-			policyMap[id] = pol
-		}
-
-		roles := make(map[string]interface{}, roleCount)
-		for j := 0; j < roleCount; j++ {
-			id := fmt.Sprintf("role-%v", j)
-			roles[id] = map[string]interface{}{
-				"actions": []string{fmt.Sprintf("some:automate:action%v", j)},
-			}
-		}
-
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
-			"policies": policies,
-			"roles":    roles,
-		})
-
-		b.Run(fmt.Sprintf("store with %d policies and %d projects that include the subject as a member", policyCount, projCount), func(b *testing.B) {
-			var resp []string
-			var err error
-			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedProjects(ctx, []string{member})
-				if err != nil {
-					b.Error(err)
-				}
-			}
-			projectsResponse = resp
-		})
-	}
-}
-
-func BenchmarkV2FilterAuthorizedProjectsWithIncreasingSubjects(b *testing.B) {
-	ctx := context.Background()
-
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(b, err, "init logger")
-	s, err := New(ctx, l)
-	require.NoError(b, err, "init state")
-
-	// keep these values constant as we increase the number of subjects
-	policyCount := 20
-	roleCount := 10
-
-	policies, roles := v2RandomPoliciesAndRoles(policyCount, roleCount)
-	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
-		"policies": policies,
-		"roles":    roles,
-	})
-
-	err = s.makeAuthorizedProjectPreparedQuery(ctx)
-	require.NoError(b, err, "prepared authorized project query")
-
-	subjectCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
-	for _, count := range subjectCount {
-		b.Run(fmt.Sprintf("input with %d subjects", count), func(b *testing.B) {
-			var resp []string
-			var err error
-			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedProjects(ctx, append([]string{"user:local:test"}, randomTeams(count)...))
-				if err != nil {
-					b.Error(err)
-				}
-			}
-			projectsResponse = resp
-		})
-	}
-}
-
-func BenchmarkV2FilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
-	ctx := context.Background()
-
-	l, err := logger.NewLogger("text", "debug")
-	require.NoError(b, err, "init logger")
-	s, err := New(ctx, l)
-	require.NoError(b, err, "init state")
-
-	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
-	roleCount := 10 // keep this constant while increasing policyCount
-
-	for _, count := range policyCount {
-		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
-		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
-			"policies": policies,
-			"roles":    roles,
-		})
-
-		err = s.makeAuthorizedProjectPreparedQuery(ctx)
-		require.NoError(b, err, "prepared authorized project query")
-
-		b.Run(fmt.Sprintf("store with %d random policies and %d random roles with existing member", count, roleCount), func(b *testing.B) {
-			var resp []string
-			var err error
-			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedProjects(ctx, []string{"user:local:test"})
-				if err != nil {
-					b.Error(err)
-				}
-			}
-			projectsResponse = resp
-		})
-	}
-}
-
-// TODO
-// func BenchmarkV2FilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
-// BenchmarkProjectsAuthorized (add to the above tests) (same with makePreparedQuery)
-
-// TODO move with v1 tests
-// v1 helpers
 func testPairs(c int) []engine.Pair {
 	ret := make([]engine.Pair, c)
 	for i := 0; i < c; i++ {
@@ -944,6 +430,709 @@ func randomPolicies(i int) []map[string]interface{} {
 	return newPolicies
 }
 
+// v2 benchmarks
+
+var (
+	allProjects = []string{
+		"(unassigned)",
+		"project1",
+		"project2",
+		"project3",
+		"project4",
+		"project5",
+		"project6",
+	}
+	projectsResponse []string
+)
+
+// At time of benchmarking, this is around half a second for 1000 teams
+func BenchmarkV2FilterAuthorizedPairsRealWorldExample(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	pairs := []engine.Pair{
+		engine.Pair{Resource: "compliance:reporting:nodes", Action: "compliance:reportNodes:list"},
+		engine.Pair{Resource: "iam:policies", Action: "iam:policies:list"},
+		engine.Pair{Resource: "iam:teams", Action: "iam:teams:create"},
+		engine.Pair{Resource: "system:config", Action: "system:telemetryConfig:get"},
+		engine.Pair{Resource: "compliance:profiles:market", Action: "compliance:marketProfiles:get"},
+		engine.Pair{Resource: "retention:nodes", Action: "retention:nodes:update"},
+		engine.Pair{Resource: "compliance:reporting:reports", Action: "compliance:reports:list"},
+		engine.Pair{Resource: "infra:actions", Action: "infra:ingest:create"},
+		engine.Pair{Resource: "system:service:logLevel", Action: "system:serviceLogLevel:set"},
+		engine.Pair{Resource: "iam:rules", Action: "iam:rules:apply"},
+		engine.Pair{Resource: "secrets:secrets", Action: "secrets:secrets:create"},
+		engine.Pair{Resource: "system:iam:upgradeToV2", Action: "system:iam:upgrade"},
+		engine.Pair{Resource: "iam:teams", Action: "iam:teams:update"},
+		engine.Pair{Resource: "system:service:version", Action: "system:serviceVersion:get"},
+		engine.Pair{Resource: "iam:policies", Action: "iam:policies:create"},
+		engine.Pair{Resource: "compliance:reporting:stats:trend", Action: "compliance:reportTrend:get"},
+		engine.Pair{Resource: "compliance:profiles", Action: "compliance:profiles:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:delete"},
+		engine.Pair{Resource: "compliance:reporting:stats:failures", Action: "compliance:reportFailures:get"},
+		engine.Pair{Resource: "system:health", Action: "system:health:get"},
+		engine.Pair{Resource: "compliance:scanner:jobs", Action: "compliance:scannerJobs:create"},
+		engine.Pair{Resource: "compliance:profiles", Action: "compliance:profiles:create"},
+		engine.Pair{Resource: "secrets:secrets", Action: "secrets:secrets:list"},
+		engine.Pair{Resource: "applications:serviceGroups", Action: "applications:serviceGroups:list"},
+		engine.Pair{Resource: "event:events", Action: "event:events:list"},
+		engine.Pair{Resource: "iam:projects", Action: "iam:projects:create"},
+		engine.Pair{Resource: "system:iam:resetToV1", Action: "system:iam:reset"},
+		engine.Pair{Resource: "compliance:reporting:stats:profiles", Action: "compliance:reportProfiles:get"},
+		engine.Pair{Resource: "infra:status", Action: "infra:ingest:get"},
+		engine.Pair{Resource: "compliance:reporting:licenseusage", Action: "compliance:reportingLicenseUsage:list"},
+		engine.Pair{Resource: "iam:policyVersion", Action: "iam:policies:get"},
+		engine.Pair{Resource: "iam:projects", Action: "iam:projects:list"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:get"},
+		engine.Pair{Resource: "system:status", Action: "system:license:get"},
+		engine.Pair{Resource: "iam:teams", Action: "iam:teams:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:list"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getAllProjects"},
+		engine.Pair{Resource: "retention:nodes", Action: "retention:nodes:get"},
+		engine.Pair{Resource: "retention:serviceGroups", Action: "retention:serviceGroups:update"},
+		engine.Pair{Resource: "compliance:scanner:jobs", Action: "compliance:scannerJobs:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:nodes:create"},
+		engine.Pair{Resource: "iam:tokens", Action: "iam:tokens:create"},
+		engine.Pair{Resource: "iam:rules", Action: "iam:rules:cancel"},
+		engine.Pair{Resource: "iam:tokens", Action: "iam:tokens:list"},
+		engine.Pair{Resource: "infra:nodeManagers", Action: "infra:nodeManagers:create"},
+		engine.Pair{Resource: "compliance:reporting:profiles", Action: "compliance:reportProfiles:list"},
+		engine.Pair{Resource: "system:license", Action: "system:license:apply"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:ingestNodes:delete"},
+		engine.Pair{Resource: "iam:roles", Action: "iam:roles:list"},
+		engine.Pair{Resource: "retention:serviceGroups", Action: "retention:serviceGroups:get"},
+		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:validate"},
+		engine.Pair{Resource: "compliance:reporting:suggestions", Action: "compliance:reportSuggestions:list"},
+		engine.Pair{Resource: "system:service:version", Action: "system:serviceVersion:list"},
+		engine.Pair{Resource: "iam:users", Action: "iam:users:list"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:ingest:delete"},
+		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:create"},
+		engine.Pair{Resource: "iam:rules", Action: "iam:rules:status"},
+		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getSome"},
+		engine.Pair{Resource: "infra:nodeManagers", Action: "infra:nodeManagers:list"},
+		engine.Pair{Resource: "applications:serviceGroups", Action: "applications:serviceGroups:delete"},
+		engine.Pair{Resource: "compliance:reporting:control", Action: "compliance:controlItems:list"},
+		engine.Pair{Resource: "compliance:reporting:report-ids", Action: "compliance:reportids:list"},
+		engine.Pair{Resource: "compliance:reporting:stats:summary", Action: "compliance:reportSummary:get"},
+		engine.Pair{Resource: "iam:users", Action: "iam:users:create"},
+		engine.Pair{Resource: "system:license", Action: "system:license:request"},
+		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:list"},
+		engine.Pair{Resource: "iam:roles", Action: "iam:roles:create"},
+	}
+
+	jsonFile, err := os.Open("example_v2/real_world_2p1_store.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	var pr struct {
+		Policies map[string]interface{} `json:policies`
+		Roles    map[string]interface{} `json:roles`
+	}
+	json.Unmarshal(byteValue, &pr)
+
+	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		"policies": pr.Policies,
+		"roles":    pr.Roles,
+	})
+
+	teamCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
+	for _, count := range teamCount {
+		b.Run(fmt.Sprintf("V2FilterAuthorizedPairs with real life input and %d teams", count), func(b *testing.B) {
+			var resp []engine.Pair
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(count)...), pairs)
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			filteredPairsResp = resp
+		})
+	}
+}
+
+// Q: Which type of input is computed faster, generic Go interface or specific OPA Term?
+func BenchmarkV2GenericInput(b *testing.B) {
+	var r ast.Value
+	var err error
+	for n := 0; n < b.N; n++ {
+		// always record the result to prevent the compiler eliminating the function
+		// call.
+		r, err = genericV2Input(
+			[]string{"user:local:alice@example.com", "team:local:admins"},
+			"some:resource",
+			"some:resource:action",
+			[]string{"project-1", "project-2"})
+		if err != nil {
+			b.Fatal(err)
+		}
+	}
+	// always store the result to a package level variable
+	// so the compiler cannot eliminate the Benchmark itself.
+	result = r
+}
+
+func BenchmarkV2SpecificInput(b *testing.B) {
+	var r ast.Value
+	subjects, projects := []string{"user:local:alice@example.com", "team:local:admins"}, []string{"project-1", "project-2"}
+	resource, action := "some:resource", "some:resource:action"
+	for n := 0; n < b.N; n++ {
+		subs := make(ast.Array, len(subjects))
+		for i, sub := range subjects {
+			subs[i] = ast.NewTerm(ast.String(sub))
+		}
+		projs := make(ast.Array, len(projects))
+		for j, proj := range projects {
+			projs[j] = ast.NewTerm(ast.String(proj))
+		}
+		r = ast.NewObject(
+			[2]*ast.Term{ast.NewTerm(ast.String("subjects")), ast.NewTerm(subs)},
+			[2]*ast.Term{ast.NewTerm(ast.String("resource")), ast.NewTerm(ast.String(resource))},
+			[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
+			[2]*ast.Term{ast.NewTerm(ast.String("projects")), ast.NewTerm(projs)},
+		)
+	}
+	result = r
+}
+
+// A: Specific input is faster!
+// BenchmarkV2GenericInput-8   	    328531	      4034 ns/op	     1664 B/op	    50 allocs/op
+// BenchmarkV2SpecificInput-8   	  572641	      2073 ns/op	     976 B/op	      30 allocs/op
+
+func BenchmarkV2AuthorizedProjectPreparedQueryWithIncreasingPolicies(b *testing.B) {
+	var r error
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
+	roleCount := 10 // keep this constant while increasing policyCount
+
+	chefPolicies := chefManagedPolicies()
+
+	for _, count := range policyCount {
+		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
+		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+			"policies": policies,
+			"roles":    roles,
+		})
+
+		b.Run(fmt.Sprintf("store with %d chef-managed policies and %d custom policies", len(chefPolicies), count),
+			func(b *testing.B) {
+				for n := 0; n < b.N; n++ {
+					r = s.makeAuthorizedProjectPreparedQuery(ctx)
+					if r != nil {
+						b.Error(r)
+					}
+				}
+				errResult = r
+			})
+	}
+}
+
+func BenchmarkV2ProjectsAuthorizedWithIncreasingPolicies(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
+	roleCount := 10 // keep this constant while increasing policyCount
+
+	for _, count := range policyCount {
+		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
+
+		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+			"policies": policies,
+			"roles":    roles,
+		})
+		err = s.makeAuthorizedProjectPreparedQuery(ctx)
+		require.NoError(b, err, "update OPA store and prepare projects query")
+
+		b.Run(fmt.Sprintf("store with %d custom policies and %d custom roles", count, roleCount), func(b *testing.B) {
+			var resp []string
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2ProjectsAuthorized(ctx, []string{"user:local:test"}, "compliance:profiles:list", "compliance:profiles", allProjects)
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			projectsResponse = resp
+		})
+	}
+}
+
+func BenchmarkV2FilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
+	roleCount := 10 // keep this constant while increasing policyCount
+
+	for _, count := range policyCount {
+		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
+
+		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+			"policies": policies,
+			"roles":    roles,
+		})
+		err = s.makeAuthorizedProjectPreparedQuery(ctx)
+		require.NoError(b, err, "update OPA store and prepare projects query")
+
+		b.Run(fmt.Sprintf("store with %d custom policies and %d custom roles", count, roleCount), func(b *testing.B) {
+			var resp []string
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2FilterAuthorizedProjects(ctx, []string{"user:local:test"})
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			projectsResponse = resp
+		})
+	}
+}
+
+func BenchmarkV2AuthorizedProjectPreparedQueryWithIncreasingRoles(b *testing.B) {
+	var r error
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	policyCount := 20 // keep this constant while increasing roleCount
+	roleCount := []int{0, 5, 10, 20, 50, 100}
+
+	chefPolicies := chefManagedPolicies()
+
+	for _, count := range roleCount {
+		policies, roles := v2RandomPoliciesAndRoles(policyCount, count)
+		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+			"policies": policies,
+			"roles":    roles,
+		})
+
+		b.Run(fmt.Sprintf("store with %d chef-managed policies and %d custom policies", len(chefPolicies), count),
+			func(b *testing.B) {
+				for n := 0; n < b.N; n++ {
+					r = s.makeAuthorizedProjectPreparedQuery(ctx)
+					if r != nil {
+						b.Error(r)
+					}
+				}
+				errResult = r
+			})
+	}
+}
+
+func BenchmarkV2ProjectsAuthorizedWithIncreasingRoles(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	policyCount := 20 // keep this constant while increasing roleCount
+	roleCount := []int{0, 5, 10, 20, 50, 100}
+
+	for _, count := range roleCount {
+		policies, roles := v2RandomPoliciesAndRoles(policyCount, count)
+		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+			"policies": policies,
+			"roles":    roles,
+		})
+
+		err = s.makeAuthorizedProjectPreparedQuery(ctx)
+		require.NoError(b, err, "prepared authorized project query")
+
+		b.Run(fmt.Sprintf("store with %d custom policies and %d custom roles", policyCount, count), func(b *testing.B) {
+			var resp []string
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2ProjectsAuthorized(ctx, []string{"user:local:test"}, "compliance:profiles:list", "compliance:profiles", allProjects)
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			projectsResponse = resp
+		})
+	}
+}
+
+func BenchmarkV2FilterAuthorizedProjectsWithIncreasingRoles(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	policyCount := 20 // keep this constant while increasing roleCount
+	roleCount := []int{0, 5, 10, 20, 50, 100}
+
+	for _, count := range roleCount {
+		policies, roles := v2RandomPoliciesAndRoles(policyCount, count)
+		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+			"policies": policies,
+			"roles":    roles,
+		})
+
+		err = s.makeAuthorizedProjectPreparedQuery(ctx)
+		require.NoError(b, err, "prepared authorized project query")
+
+		b.Run(fmt.Sprintf("store with %d custom policies and %d custom roles", policyCount, count), func(b *testing.B) {
+			var resp []string
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2FilterAuthorizedProjects(ctx, []string{"user:local:test"})
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			projectsResponse = resp
+		})
+	}
+}
+
+func BenchmarkV2ProjectsAuthorizedWithIncreasingProjects(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	roleCount := 5
+	projectCounts := []int{5, 20, 100, 200, 300}
+	member := "user:local:test"
+
+	for _, projCount := range projectCounts {
+		// TODO replace with projectPolicies factory helper
+		policyCount := projCount * 3
+		// create a list of project ids, each of which will have 3 corresponding policies
+		projectIDs := make([]string, projCount)
+		for x := 0; x < projCount; x++ {
+			projectIDs[x] = fmt.Sprintf("proj-%v", x)
+		}
+
+		var policies []map[string]interface{}
+		for _, proj := range projectIDs {
+			projectRoles := []string{"editor", "project-owner", "viewer"}
+			for _, role := range projectRoles {
+				pid := fmt.Sprintf("%s-%s", proj, role)
+
+				statement := map[string]interface{}{
+					"resources": []string{"*"},
+					"role":      role,
+					"effect":    "allow",
+					"projects":  []string{proj},
+				}
+				statements := make(map[string]interface{}, 1)
+				statements["s-1"] = statement
+
+				policy := map[string]interface{}{
+					"id":         pid,
+					"members":    []string{"user:local:test", "token:fake"},
+					"statements": statements,
+				}
+				policies = append(policies, policy)
+			}
+		}
+
+		policyMap := make(map[string]interface{}, policyCount)
+		for _, pol := range policies {
+			id := pol["id"].(string)
+			policyMap[id] = pol
+		}
+
+		roleMap := make(map[string]interface{}, roleCount)
+		for j := 0; j < roleCount; j++ {
+			id := fmt.Sprintf("role-%v", j)
+			roleMap[id] = map[string]interface{}{
+				"actions": []string{fmt.Sprintf("some:automate:action%v", j)},
+			}
+		}
+
+		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+			"policies": policyMap,
+			"roles":    roleMap,
+		})
+
+		err = s.makeAuthorizedProjectPreparedQuery(ctx)
+		require.NoError(b, err, "prepared authorized project query")
+
+		b.Run(fmt.Sprintf("store with %d projects %d policies, and %d roles", projCount, policyCount, roleCount), func(b *testing.B) {
+			var resp []string
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2ProjectsAuthorized(ctx, []string{member}, "secrets:secrets:create", "secrets:secrets", projectIDs)
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			projectsResponse = resp
+		})
+	}
+}
+
+func BenchmarkV2FilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	roleCount := 5
+	projectCounts := []int{5, 20, 100, 200, 300}
+	member := "user:local:test"
+
+	for _, projCount := range projectCounts {
+		// TODO replace with projectPolicies factory helper
+		policyCount := projCount * 3
+		// create a list of project ids, each of which will have 3 corresponding policies
+		projectIDs := make([]string, projCount)
+		for x := 0; x < projCount; x++ {
+			projectIDs[x] = fmt.Sprintf("proj-%v", x)
+		}
+
+		var policies []map[string]interface{}
+		for _, proj := range projectIDs {
+			projectRoles := []string{"editor", "project-owner", "viewer"}
+			for _, role := range projectRoles {
+				pid := fmt.Sprintf("%s-%s", proj, role)
+
+				statement := map[string]interface{}{
+					"resources": []string{"*"},
+					"role":      role,
+					"effect":    "allow",
+					"projects":  []string{proj},
+				}
+				statements := make(map[string]interface{}, 1)
+				statements["s-1"] = statement
+
+				policy := map[string]interface{}{
+					"id":         pid,
+					"members":    []string{"user:local:test", "token:fake"},
+					"statements": statements,
+				}
+				policies = append(policies, policy)
+			}
+		}
+
+		policyMap := make(map[string]interface{}, policyCount)
+		for _, pol := range policies {
+			id := pol["id"].(string)
+			policyMap[id] = pol
+		}
+
+		roleMap := make(map[string]interface{}, roleCount)
+		for j := 0; j < roleCount; j++ {
+			id := fmt.Sprintf("role-%v", j)
+			roleMap[id] = map[string]interface{}{
+				"actions": []string{fmt.Sprintf("some:automate:action%v", j)},
+			}
+		}
+
+		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+			"policies": policyMap,
+			"roles":    roleMap,
+		})
+
+		err = s.makeAuthorizedProjectPreparedQuery(ctx)
+		require.NoError(b, err, "prepared authorized project query")
+
+		b.Run(fmt.Sprintf("store with %d projects %d policies, and %d roles", projCount, policyCount, roleCount), func(b *testing.B) {
+			var resp []string
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2FilterAuthorizedProjects(ctx, []string{member})
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			projectsResponse = resp
+		})
+	}
+}
+
+func BenchmarkV2ProjectsAuthorizedWithIncreasingSubjects(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	// keep these values constant as we increase the number of subjects
+	policyCount := 20
+	roleCount := 10
+
+	policies, roles := v2RandomPoliciesAndRoles(policyCount, roleCount)
+	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		"policies": policies,
+		"roles":    roles,
+	})
+
+	err = s.makeAuthorizedProjectPreparedQuery(ctx)
+	require.NoError(b, err, "prepared authorized project query")
+
+	subjectCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
+	for _, count := range subjectCount {
+		b.Run(fmt.Sprintf("input with %d subjects", count), func(b *testing.B) {
+			var resp []string
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2ProjectsAuthorized(ctx, []string{"user:local:test"}, "iam:projects:delete", "iam:projects", allProjects)
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			projectsResponse = resp
+		})
+	}
+}
+
+func BenchmarkV2FilterAuthorizedProjectsWithIncreasingSubjects(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	// keep these values constant as we increase the number of subjects
+	policyCount := 20
+	roleCount := 10
+
+	policies, roles := v2RandomPoliciesAndRoles(policyCount, roleCount)
+	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		"policies": policies,
+		"roles":    roles,
+	})
+
+	err = s.makeAuthorizedProjectPreparedQuery(ctx)
+	require.NoError(b, err, "prepared authorized project query")
+
+	subjectCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
+	for _, count := range subjectCount {
+		b.Run(fmt.Sprintf("input with %d subjects", count), func(b *testing.B) {
+			var resp []string
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2FilterAuthorizedProjects(ctx, append([]string{"user:local:test"}, randomTeams(count)...))
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			projectsResponse = resp
+		})
+	}
+}
+
+// Q: What happens if the subject appears more often as a member of different policies?
+func BenchmarkV2AuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(b, err, "init logger")
+	s, err := New(ctx, l)
+	require.NoError(b, err, "init state")
+
+	policyCount := 10
+	roleCount := 5
+	member := "user:local:test"
+
+	// generate some simple, slightly differentiated policies
+	policies := make(map[string]interface{}, policyCount)
+	for i := 0; i < policyCount; i++ {
+		pid := fmt.Sprintf("pol-%v", i)
+
+		statement := map[string]interface{}{
+			"resources": []string{"*"},
+			"role":      []string{fmt.Sprintf("role-%v", i)},
+			"effect":    "allow",
+			"projects":  []string{fmt.Sprintf("proj-%v", i)},
+		}
+		statements := make(map[string]interface{}, 1)
+		statements["s-1"] = statement
+
+		policies[pid] = map[string]interface{}{
+			"members":    []string{},
+			"statements": statements,
+		}
+	}
+
+	roles := make(map[string]interface{}, roleCount)
+	for j := 0; j < roleCount; j++ {
+		id := fmt.Sprintf("role-%v", j)
+		roles[id] = map[string]interface{}{
+			"actions": []string{fmt.Sprintf("some:automate:action%v", j)},
+		}
+	}
+
+	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+		"policies": policies,
+		"roles":    roles,
+	})
+
+	b.Run("store with 0 policies that include the subject as a member", func(b *testing.B) {
+		var resp []string
+		var err error
+		for n := 0; n < b.N; n++ {
+			resp, err = s.V2ProjectsAuthorized(ctx, []string{"user:local:test"}, "iam:projects:delete", "iam:projects", allProjects)
+			if err != nil {
+				b.Error(err)
+			}
+		}
+		projectsResponse = resp
+	})
+
+	for k := 0; k < policyCount; k++ {
+		// add member to each policy as we iterate
+		pol := policies[fmt.Sprintf("pol-%v", k)].(map[string]interface{})
+		pol["members"] = []string{member}
+
+		// refresh store to reflect policies with the subject as a member
+		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
+			"policies": policies,
+			"roles":    roles,
+		})
+
+		b.Run(fmt.Sprintf("store with %d out of 10 policies that include the subject as a member", k+1), func(b *testing.B) {
+			var resp []string
+			var err error
+			for n := 0; n < b.N; n++ {
+				resp, err = s.V2ProjectsAuthorized(ctx, []string{"user:local:test"}, "iam:projects:delete", "iam:projects", allProjects)
+				if err != nil {
+					b.Error(err)
+				}
+			}
+			projectsResponse = resp
+		})
+	}
+}
+
 // shared (v1/v2) helpers
 func randomTeams(c int) []string {
 	ret := make([]string, c)
@@ -959,6 +1148,25 @@ func randomTeams(c int) []string {
 // add chef-managed/v1 migrated policies/system stuff to real-world json file
 // (maybe one file with migrated policies, one without),
 // extract into map, then add custom policies and roles with factory function
+
+func genericV2Input(subjects []string, resource string, action string, projects []string) (ast.Value, error) {
+	subs := make([]interface{}, len(subjects))
+	for i, sub := range subjects {
+		subs[i] = sub
+	}
+
+	projs := make([]interface{}, len(projects))
+	for i, proj := range projects {
+		projs[i] = proj
+	}
+	input := map[string]interface{}{
+		"subjects": subs,
+		"resource": resource,
+		"action":   action,
+		"projects": projs,
+	}
+	return ast.InterfaceToValue(input)
+}
 
 func chefManagedRoles() map[string]interface{} {
 	chefRoles := make(map[string]interface{}, 5)
