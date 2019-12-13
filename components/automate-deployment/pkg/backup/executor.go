@@ -25,7 +25,7 @@ type Executor struct {
 	// an operation failure.
 	cancel func()
 
-	// Operation progress calculator. Thit is used to aggregate
+	// Operation progress calculator. This is used to aggregate
 	// the overall progress of all operation that are to be
 	// executed.
 	progress *ProgressCalculator
