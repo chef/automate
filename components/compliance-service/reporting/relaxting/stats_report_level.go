@@ -259,6 +259,7 @@ func (depth *ReportDepth) getStatsSummaryAggs() map[string]elastic.Aggregation {
 	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("status", "passed"))
 	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("status", "failed"))
 	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("status", "skipped"))
+	waivedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("status", "waived"))
 
 	//We have nodeUUIDTermsQSize set to 1 because we don't need to return the actual values.
 	// This works for node_uuid because it's unique to the report_id.
@@ -280,6 +281,7 @@ func (depth *ReportDepth) getStatsSummaryAggs() map[string]elastic.Aggregation {
 	aggs["passed"] = passedFilter
 	aggs["failed"] = failedFilter
 	aggs["skipped"] = skippedFilter
+	aggs["waived"] = waivedFilter
 	aggs["nodes"] = nodeUUIDTerms
 	aggs["platforms"] = platformTerms
 	aggs["environment"] = environmentTerms
@@ -362,6 +364,9 @@ func (depth *ReportDepth) getStatsSummaryResult(aggRoot *elastic.SearchResult) *
 	} else if skippedResult, found := aggRoot.Aggregations.Filter("skipped"); found &&
 		(skippedResult.DocCount > 0) {
 		summary.Status = "skipped"
+	} else if waivedResult, found := aggRoot.Aggregations.Filter("waived"); found &&
+		(waivedResult.DocCount > 0) {
+		summary.Status = "waived"
 	} else {
 		summary.Status = "unknown"
 	}

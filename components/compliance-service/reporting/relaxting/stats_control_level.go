@@ -370,9 +370,21 @@ func (depth *ControlDepth) topFailuresResultControl(aggRoot *elastic.Aggregation
 
 //GetStatsSummary - Report #16 - profile level
 func (depth *ControlDepth) getStatsSummaryAggs() map[string]elastic.Aggregation {
-	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "passed"))
-	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "failed"))
-	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "skipped"))
+	waivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
+
+	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
+		MustNot(waivedQuery))
+
+	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
+		MustNot(waivedQuery))
+
+	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "skipped")).
+		MustNot(waivedQuery))
+
+	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
 	controlsCard := elastic.NewCardinalityAggregation().Field("profiles.controls.id")
 
@@ -389,6 +401,7 @@ func (depth *ControlDepth) getStatsSummaryAggs() map[string]elastic.Aggregation 
 	aggs["passed"] = passedFilter
 	aggs["failed"] = failedFilter
 	aggs["skipped"] = skippedFilter
+	aggs["waived"] = waivedFilter
 	aggs["nodes"] = elastic.NewReverseNestedAggregation().SubAggregation("nodes", nodeUUIDTerms)
 	aggs["platforms"] = elastic.NewReverseNestedAggregation().SubAggregation("platforms", platformTerms)
 	aggs["environment"] = elastic.NewReverseNestedAggregation().SubAggregation("environment", environmentTerms)
@@ -434,6 +447,8 @@ func (depth *ControlDepth) getStatsSummaryResult(searchResult *elastic.SearchRes
 			summary.Status = "passed"
 		} else if skippedResult, found := aggRoot.Aggregations.Filter("skipped"); found && (skippedResult.DocCount > 0) {
 			summary.Status = "skipped"
+		} else if waivedResult, found := aggRoot.Aggregations.Filter("waived"); found && (waivedResult.DocCount > 0) {
+			summary.Status = "waived"
 		} else {
 			summary.Status = "unknown"
 		}

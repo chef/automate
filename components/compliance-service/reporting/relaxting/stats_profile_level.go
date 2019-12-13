@@ -349,6 +349,7 @@ func (depth *ProfileDepth) getStatsSummaryAggs() map[string]elastic.Aggregation 
 	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.status", "passed"))
 	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.status", "failed"))
 	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.status", "skipped"))
+	waivedFilter := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.status", "waived"))
 
 	//we have nodeUUIDTermsQSize set to 1 because we don't need to return the actual values.
 	//this works for node_uuid because it's unique to the report_id. we will use when we compute reportMeta.Stats.Nodes (below)
@@ -367,6 +368,7 @@ func (depth *ProfileDepth) getStatsSummaryAggs() map[string]elastic.Aggregation 
 	aggs["passed"] = passedFilter
 	aggs["failed"] = failedFilter
 	aggs["skipped"] = skippedFilter
+	aggs["waived"] = waivedFilter
 	aggs["nodes"] = elastic.NewReverseNestedAggregation().SubAggregation("nodes", nodeUUIDTerms)
 	aggs["platforms"] = elastic.NewReverseNestedAggregation().SubAggregation("platforms", platformTerms)
 	aggs["environment"] = elastic.NewReverseNestedAggregation().SubAggregation("environment", environmentTerms)
@@ -412,6 +414,8 @@ func (depth *ProfileDepth) getStatsSummaryResult(searchResult *elastic.SearchRes
 			reportSummary.Status = "passed"
 		} else if skippedResult, found := aggRoot.Aggregations.Filter("skipped"); found && (skippedResult.DocCount > 0) {
 			reportSummary.Status = "skipped"
+		} else if waivedResult, found := aggRoot.Aggregations.Filter("waived"); found && (waivedResult.DocCount > 0) {
+			reportSummary.Status = "waived"
 		} else {
 			reportSummary.Status = "unknown"
 		}

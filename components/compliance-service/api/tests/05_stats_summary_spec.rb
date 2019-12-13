@@ -78,6 +78,46 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
 
+      # Filter by a waived profile
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "profile_id", values: ["447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+      ])
+      expected_data = {
+          "reportSummary" => {
+              "status" => "waived",
+              "stats" => {
+                  "nodes" => 2,
+                  "platforms" => 1,
+                  "environments" => 1,
+                  "profiles" => 1,
+                  "nodesCnt" => 2,
+                  "controls" => 1
+              }
+          }
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
+
+      # Filter by a failed profile with a few waived controls, but not all of them
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "profile_id", values: ["447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+      ])
+      expected_data = {
+          "reportSummary" => {
+              "status" => "failed",
+              "stats" => {
+                  "nodes" => 1,
+                  "platforms" => 1,
+                  "environments" => 1,
+                  "profiles" => 1,
+                  "nodesCnt" => 1,
+                  "controls" => 5
+              }
+          }
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
+
       # Filter by control tag
       actual_data = GRPC stats, :read_summary, Stats::Query.new(filters: [
           Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
@@ -162,6 +202,26 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
 
+
+      # Filter by a waived node
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "node_id", values: ["34cbbb55-c502-4971-2222-999999999999"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+      ])
+      expected_data = {
+          "reportSummary" => {
+              "status" => "waived",
+              "stats" => {
+                  "nodes" => 1,
+                  "platforms" => 1,
+                  "environments" => 1,
+                  "profiles" => 1,
+                  "nodesCnt" => 1,
+                  "controls" => 1
+              }
+          }
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
 
       # Filter by node_id and profile_id where profile ran on node
       actual_data = GRPC stats, :read_summary, Stats::Query.new(filters: [
@@ -410,7 +470,48 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
               }
           }
       }.to_json
+      assert_equal(expected_data, actual_data.to_json)
 
+      # Filter by a waived control
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "profile_id", values: ["447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z']),
+          Stats::ListFilter.new(type: 'control', values: ['pro1-con4'])
+      ])
+      expected_data = {
+          "reportSummary" => {
+              "status" => "waived",
+              "stats" => {
+                  "nodes" => 1,
+                  "platforms" => 1,
+                  "environments" => 1,
+                  "profiles" => 1,
+                  "nodesCnt" => 1,
+                  "controls" => 1
+              }
+          }
+      }.to_json
+      assert_equal(expected_data, actual_data.to_json)
+
+      # Filter by an expired waived control that failed in a profile that has mostly waived controls
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "profile_id", values: ["447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z']),
+          Stats::ListFilter.new(type: 'control', values: ['pro1-con3'])
+      ])
+      expected_data = {
+          "reportSummary" => {
+              "status" => "failed",
+              "stats" => {
+                  "nodes" => 1,
+                  "platforms" => 1,
+                  "environments" => 1,
+                  "profiles" => 1,
+                  "nodesCnt" => 1,
+                  "controls" => 1
+              }
+          }
+      }.to_json
       assert_equal(expected_data, actual_data.to_json)
     end
   end
