@@ -525,21 +525,11 @@ func BenchmarkV2FilterAuthorizedPairsRealWorldExample(b *testing.B) {
 		engine.Pair{Resource: "iam:roles", Action: "iam:roles:create"},
 	}
 
-	jsonFile, err := os.Open("example_v2/real_world_2p1_store.json")
-	if err != nil {
-		fmt.Println(err)
-	}
-	defer jsonFile.Close()
-	byteValue, _ := ioutil.ReadAll(jsonFile)
-	var pr struct {
-		Policies map[string]interface{} `json:policies`
-		Roles    map[string]interface{} `json:roles`
-	}
-	json.Unmarshal(byteValue, &pr)
+	policies, roles := v2BaselinePoliciesAndRoles()
 
 	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
-		"policies": pr.Policies,
-		"roles":    pr.Roles,
+		"policies": policies,
+		"roles":    roles,
 	})
 
 	teamCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
@@ -618,10 +608,10 @@ func BenchmarkV2AuthorizedProjectPreparedQueryWithIncreasingPolicies(b *testing.
 	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
 	roleCount := 10 // keep this constant while increasing policyCount
 
-	chefPolicies := chefManagedPolicies()
+	chefPolicies, _ := v2BaselinePoliciesAndRoles()
 
 	for _, count := range policyCount {
-		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(count, roleCount)
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
@@ -652,7 +642,7 @@ func BenchmarkV2ProjectsAuthorizedWithIncreasingPolicies(b *testing.B) {
 	roleCount := 10 // keep this constant while increasing policyCount
 
 	for _, count := range policyCount {
-		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(count, roleCount)
 
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
@@ -687,7 +677,7 @@ func BenchmarkV2FilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
 	roleCount := 10 // keep this constant while increasing policyCount
 
 	for _, count := range policyCount {
-		policies, roles := v2RandomPoliciesAndRoles(count, roleCount)
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(count, roleCount)
 
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
@@ -722,10 +712,10 @@ func BenchmarkV2AuthorizedProjectPreparedQueryWithIncreasingRoles(b *testing.B) 
 	policyCount := 20 // keep this constant while increasing roleCount
 	roleCount := []int{0, 5, 10, 20, 50, 100}
 
-	chefPolicies := chefManagedPolicies()
+	chefPolicies, _ := v2BaselinePoliciesAndRoles()
 
 	for _, count := range roleCount {
-		policies, roles := v2RandomPoliciesAndRoles(policyCount, count)
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, count)
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
@@ -756,7 +746,7 @@ func BenchmarkV2ProjectsAuthorizedWithIncreasingRoles(b *testing.B) {
 	roleCount := []int{0, 5, 10, 20, 50, 100}
 
 	for _, count := range roleCount {
-		policies, roles := v2RandomPoliciesAndRoles(policyCount, count)
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, count)
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
@@ -791,7 +781,7 @@ func BenchmarkV2FilterAuthorizedProjectsWithIncreasingRoles(b *testing.B) {
 	roleCount := []int{0, 5, 10, 20, 50, 100}
 
 	for _, count := range roleCount {
-		policies, roles := v2RandomPoliciesAndRoles(policyCount, count)
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, count)
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
@@ -822,56 +812,13 @@ func BenchmarkV2ProjectsAuthorizedWithIncreasingProjects(b *testing.B) {
 	s, err := New(ctx, l)
 	require.NoError(b, err, "init state")
 
-	roleCount := 5
 	projectCounts := []int{5, 20, 100, 200, 300}
 	member := "user:local:test"
 
 	for _, projCount := range projectCounts {
-		// TODO replace with projectPolicies factory helper
-		policyCount := projCount * 3
-		// create a list of project ids, each of which will have 3 corresponding policies
-		projectIDs := make([]string, projCount)
-		for x := 0; x < projCount; x++ {
-			projectIDs[x] = fmt.Sprintf("proj-%v", x)
-		}
+		policyMap, projectIDs := v2BaselineAndProjectPolicies(projCount)
 
-		var policies []map[string]interface{}
-		for _, proj := range projectIDs {
-			projectRoles := []string{"editor", "project-owner", "viewer"}
-			for _, role := range projectRoles {
-				pid := fmt.Sprintf("%s-%s", proj, role)
-
-				statement := map[string]interface{}{
-					"resources": []string{"*"},
-					"role":      role,
-					"effect":    "allow",
-					"projects":  []string{proj},
-				}
-				statements := make(map[string]interface{}, 1)
-				statements["s-1"] = statement
-
-				policy := map[string]interface{}{
-					"id":         pid,
-					"members":    []string{"user:local:test", "token:fake"},
-					"statements": statements,
-				}
-				policies = append(policies, policy)
-			}
-		}
-
-		policyMap := make(map[string]interface{}, policyCount)
-		for _, pol := range policies {
-			id := pol["id"].(string)
-			policyMap[id] = pol
-		}
-
-		roleMap := make(map[string]interface{}, roleCount)
-		for j := 0; j < roleCount; j++ {
-			id := fmt.Sprintf("role-%v", j)
-			roleMap[id] = map[string]interface{}{
-				"actions": []string{fmt.Sprintf("some:automate:action%v", j)},
-			}
-		}
+		_, roleMap := v2BaselinePoliciesAndRoles()
 
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policyMap,
@@ -881,10 +828,11 @@ func BenchmarkV2ProjectsAuthorizedWithIncreasingProjects(b *testing.B) {
 		err = s.makeAuthorizedProjectPreparedQuery(ctx)
 		require.NoError(b, err, "prepared authorized project query")
 
-		b.Run(fmt.Sprintf("store with %d projects %d policies, and %d roles", projCount, policyCount, roleCount), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with %d projects %d policies, and %d roles", projCount, len(policyMap), len(roleMap)), func(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
+				// include all projects in the filter to test the most amount of work the function might have to undertake
 				resp, err = s.V2ProjectsAuthorized(ctx, []string{member}, "secrets:secrets:create", "secrets:secrets", projectIDs)
 				if err != nil {
 					b.Error(err)
@@ -908,51 +856,9 @@ func BenchmarkV2FilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
 	member := "user:local:test"
 
 	for _, projCount := range projectCounts {
-		// TODO replace with projectPolicies factory helper
-		policyCount := projCount * 3
-		// create a list of project ids, each of which will have 3 corresponding policies
-		projectIDs := make([]string, projCount)
-		for x := 0; x < projCount; x++ {
-			projectIDs[x] = fmt.Sprintf("proj-%v", x)
-		}
+		policyMap, _ := v2BaselineAndProjectPolicies(projCount)
 
-		var policies []map[string]interface{}
-		for _, proj := range projectIDs {
-			projectRoles := []string{"editor", "project-owner", "viewer"}
-			for _, role := range projectRoles {
-				pid := fmt.Sprintf("%s-%s", proj, role)
-
-				statement := map[string]interface{}{
-					"resources": []string{"*"},
-					"role":      role,
-					"effect":    "allow",
-					"projects":  []string{proj},
-				}
-				statements := make(map[string]interface{}, 1)
-				statements["s-1"] = statement
-
-				policy := map[string]interface{}{
-					"id":         pid,
-					"members":    []string{"user:local:test", "token:fake"},
-					"statements": statements,
-				}
-				policies = append(policies, policy)
-			}
-		}
-
-		policyMap := make(map[string]interface{}, policyCount)
-		for _, pol := range policies {
-			id := pol["id"].(string)
-			policyMap[id] = pol
-		}
-
-		roleMap := make(map[string]interface{}, roleCount)
-		for j := 0; j < roleCount; j++ {
-			id := fmt.Sprintf("role-%v", j)
-			roleMap[id] = map[string]interface{}{
-				"actions": []string{fmt.Sprintf("some:automate:action%v", j)},
-			}
-		}
+		_, roleMap := v2BaselinePoliciesAndRoles()
 
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policyMap,
@@ -962,7 +868,7 @@ func BenchmarkV2FilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
 		err = s.makeAuthorizedProjectPreparedQuery(ctx)
 		require.NoError(b, err, "prepared authorized project query")
 
-		b.Run(fmt.Sprintf("store with %d projects %d policies, and %d roles", projCount, policyCount, roleCount), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with %d projects %d policies, and %d roles", projCount, len(policyMap), roleCount), func(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -988,7 +894,7 @@ func BenchmarkV2ProjectsAuthorizedWithIncreasingSubjects(b *testing.B) {
 	policyCount := 20
 	roleCount := 10
 
-	policies, roles := v2RandomPoliciesAndRoles(policyCount, roleCount)
+	policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
 	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policies,
 		"roles":    roles,
@@ -1025,7 +931,7 @@ func BenchmarkV2FilterAuthorizedProjectsWithIncreasingSubjects(b *testing.B) {
 	policyCount := 20
 	roleCount := 10
 
-	policies, roles := v2RandomPoliciesAndRoles(policyCount, roleCount)
+	policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
 	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 		"policies": policies,
 		"roles":    roles,
@@ -1144,11 +1050,6 @@ func randomTeams(c int) []string {
 
 // v2 helpers
 
-// TODO
-// add chef-managed/v1 migrated policies/system stuff to real-world json file
-// (maybe one file with migrated policies, one without),
-// extract into map, then add custom policies and roles with factory function
-
 func genericV2Input(subjects []string, resource string, action string, projects []string) (ast.Value, error) {
 	subs := make([]interface{}, len(subjects))
 	for i, sub := range subjects {
@@ -1168,131 +1069,10 @@ func genericV2Input(subjects []string, resource string, action string, projects 
 	return ast.InterfaceToValue(input)
 }
 
-func chefManagedRoles() map[string]interface{} {
-	chefRoles := make(map[string]interface{}, 5)
-	chefRoles["editor"] = map[string]interface{}{
-		"actions": []string{
-			"infra:*",
-			"compliance:*",
-			"system:*",
-			"event:*",
-			"ingest:*",
-			"secrets:*",
-			"telemetry:*",
-			"iam:projects:list",
-			"iam:projects:get",
-			"iam:projects:assign",
-			"applications:*",
-		},
-	}
-	chefRoles["ingest"] = map[string]interface{}{
-		"actions": []string{"infra:ingest:*", "compliance:profiles:get", "compliance:profiles:list"},
-	}
-	chefRoles["owner"] = map[string]interface{}{
-		"actions": []string{"*"},
-	}
-	chefRoles["viewer"] = map[string]interface{}{
-		"actions": []string{
-			"secrets:*:get",
-			"secrets:*:list",
-			"infra:*:get",
-			"infra:*:list",
-			"compliance:*:get",
-			"compliance:*:list",
-			"system:*:get",
-			"system:*:list",
-			"event:*:get",
-			"event:*:list",
-			"ingest:*:get",
-			"ingest:*:list",
-			"iam:projects:list",
-			"iam:projects:get",
-			"applications:*:list",
-			"applications:*:get",
-		},
-	}
-	chefRoles["project-owner"] = map[string]interface{}{
-		"actions": []string{
-			"infra:*",
-			"compliance:*",
-			"system:*",
-			"event:*",
-			"ingest:*",
-			"secrets:*",
-			"telemetry:*",
-			"iam:projects:list",
-			"iam:projects:get",
-			"iam:projects:assign",
-			"iam:policies:list",
-			"iam:policies:get",
-			"iam:policyMembers:*",
-			"iam:teams:list",
-			"iam:teams:get",
-			"iam:teamUsers:*",
-			"iam:users:get",
-			"iam:users:list",
-		},
-	}
-
-	return chefRoles
-}
-
-func chefManagedPolicies() map[string]interface{} {
-	chefPolicies := make(map[string]interface{}, 4)
-	chefPolicies["editor"] = map[string]interface{}{
-		"members": []string{"team:local:editors"},
-		"statements": map[string]interface{}{
-			"edit-s0": map[string]interface{}{
-				"effect":    "allow",
-				"role":      "editor",
-				"resources": []string{"*"},
-				"projects":  []string{"*"},
-			},
-		},
-	}
-	chefPolicies["ingest"] = map[string]interface{}{
-		"members": []string{"token:data_collector"},
-		"statements": map[string]interface{}{
-			"ing-s0": map[string]interface{}{
-				"effect":    "allow",
-				"role":      "ingest",
-				"resources": []string{"*"},
-				"projects":  []string{"*"},
-			},
-		},
-	}
-	chefPolicies["owner"] = map[string]interface{}{
-		"members": []string{"user:local:admin"},
-		"statements": map[string]interface{}{
-			"adm-s0": map[string]interface{}{
-				"effect":    "allow",
-				"role":      "owner",
-				"resources": []string{"*"},
-				"projects":  []string{"*"},
-			},
-		},
-	}
-	chefPolicies["viewer"] = map[string]interface{}{
-		"members": []string{"team:local:viewers"},
-		"statements": map[string]interface{}{
-			"adm-s0": map[string]interface{}{
-				"effect":    "allow",
-				"role":      "viewer",
-				"resources": []string{"*"},
-				"projects":  []string{"*"},
-			},
-		},
-	}
-
-	return chefPolicies
-}
-
-// TODO factory for projectPolicies (project-owner, editor, viewer)
-
-func v2RandomPoliciesAndRoles(customPolicyCount int, customRoleCount int) (policyMap map[string]interface{}, roleMap map[string]interface{}) {
+func v2BaselineAndRandomPoliciesAndRoles(customPolicyCount int, customRoleCount int) (policies map[string]interface{}, roles map[string]interface{}) {
 	rand.Seed(time.Now().UnixNano())
 
-	// 1. set lists of potential members and actions to be used to randomly generate custom policy contents
+	// set lists of potential members and actions to be used to randomly generate custom policy contents
 	members := []string{"user:local:admin", "team:*", "team:local:sec", "team:local:admin", "user:ldap:*", "token:*", "user:local:test"}
 	actions := []string{
 		"iam:teams:get",
@@ -1310,62 +1090,17 @@ func v2RandomPoliciesAndRoles(customPolicyCount int, customRoleCount int) (polic
 		"applications:serviceGroups:list",
 		"applications:serviceGroups:delete"}
 
-	// TODO move role code into helper: roles := allRoles()
-	// extract Chef-managed role IDs from map
-	chefRoles := chefManagedRoles()
-	chefRoleIDs := make([]string, len(chefRoles))
-	for id := range chefRoles {
-		chefRoleIDs = append(chefRoleIDs, id)
-	}
-	// create a list of all possible roles, chef-managed and custom
-	// we use this later to add random roles to statements
-	allRoleCount := len(chefRoleIDs) + customRoleCount
-	allRoles := make([]string, allRoleCount)
-	allRoles = append(allRoles, chefRoleIDs...)
+	chefPolicies, chefRoles := v2BaselinePoliciesAndRoles()
 
-	// 3. create role map to be passed to OPA
-	newRoles := make(map[string]interface{}, allRoleCount)
-	// first we add chef-managed roles to the map
-	for id, role := range chefRoles {
-		newRoles[id] = role
-	}
+	roleMap := allRoles(customRoleCount, actions, chefRoles)
 
-	// next we add custom roles with randomized actions to the list of all roles and the role map
-	if customRoleCount > 0 {
-		// generate custom role IDs
-		customRoleIDs := make([]string, customRoleCount)
-		for b := 0; b < customRoleCount; b++ {
-			customRoleIDs[b] = fmt.Sprintf("role-%v", b)
-		}
-
-		allRoles = append(allRoles, customRoleIDs...)
-
-		for _, id := range customRoleIDs {
-			roleActionCount := rand.Intn(len(actions))
-			// there can never be 0 actions in a role
-			if roleActionCount == 0 {
-				// so we use the 0 case as All Actions
-				newRoles[id] = map[string]interface{}{
-					"actions": []string{"*"},
-				}
-			} else {
-				rand.Shuffle(len(actions), func(x, y int) { actions[x], actions[y] = actions[y], actions[x] })
-
-				newRoles[id] = map[string]interface{}{
-					"actions": actions[:roleActionCount],
-				}
-			}
-		}
-	}
-
-	chefPolicies := chefManagedPolicies()
-	// 4. create a policy map to pass to OPA
-	newPolicies := make(map[string]interface{}, customPolicyCount+len(chefPolicies))
+	policyMap := make(map[string]interface{}, customPolicyCount+len(chefPolicies))
 	// first we add chef-managed policies to the map
 	for id, pol := range chefPolicies {
-		newPolicies[id] = pol
+		policyMap[id] = pol
 	}
 
+	// next we add custom policies with randomized members and statements
 	if customPolicyCount > 0 {
 		// generate custom policy IDs
 		customPolicyIDs := make([]string, customPolicyCount)
@@ -1373,14 +1108,7 @@ func v2RandomPoliciesAndRoles(customPolicyCount int, customRoleCount int) (polic
 			customPolicyIDs[e] = fmt.Sprintf("pol-%v", e)
 		}
 
-		// next we add custom policies with randomized members and statements
-		for _, pid := range customPolicyIDs {
-			// generate btwn range 1..total number of members
-			memberCount := rand.Intn((len(members) - 1) + 1)
-			// shuffle the array of possible members,
-			// then we take a slice from 0 to the random memberCount to get a randomized member list for the policy
-			rand.Shuffle(len(members), func(m, n int) { members[m], members[n] = members[n], members[m] })
-
+		for _, id := range customPolicyIDs {
 			// generate btwn range 1..10 statements
 			// 10 is an arbitrary max
 			statementCount := rand.Intn(10-1) + 1
@@ -1393,13 +1121,12 @@ func v2RandomPoliciesAndRoles(customPolicyCount int, customRoleCount int) (polic
 				var statementRole string
 
 				// determine if the statement has actions or a role based on a coin toss
-				coinToss := rand.Intn(1)
+				coinToss := rand.Intn(2)
 				if coinToss == 1 {
 					// no actions, just a role
 					statementActions = nil
 
-					roleIndex := rand.Intn(allRoleCount)
-					statementRole = allRoles[roleIndex]
+					statementRole = getRandomRole(roleMap)
 				} else {
 					// no role, just a list of actions
 					statementRole = ""
@@ -1430,17 +1157,136 @@ func v2RandomPoliciesAndRoles(customPolicyCount int, customRoleCount int) (polic
 					"actions":   statementActions,
 					"role":      statementRole,
 					"resources": "*",     // v2.1 custom policies can only have "*" resources
-					"effect":    "allow", // TODO write a separate test with deny cases
+					"effect":    "allow", // TODO write separate test setup with deny cases
 					"projects":  statementProjects,
 				}
 			}
 
-			newPolicies[pid] = map[string]interface{}{
+			// generate btwn range 1..total number of members
+			memberCount := rand.Intn((len(members) - 1) + 1)
+
+			// shuffle the array of possible members,
+			// then we take a slice from 0 to the random memberCount to get a randomized member list for the policy
+			rand.Shuffle(len(members), func(m, n int) { members[m], members[n] = members[n], members[m] })
+
+			policyMap[id] = map[string]interface{}{
 				"members":    members[:memberCount],
 				"statements": statements,
 			}
 		}
 	}
 
-	return newPolicies, newRoles
+	return policyMap, roleMap
+}
+
+func v2BaselinePoliciesAndRoles() (policies map[string]interface{}, roles map[string]interface{}) {
+	// this file includes system, migrated legacy, and chef-managed policies
+	// and chef-managed roles
+	jsonFile, err := os.Open("example_v2/real_world_2p1_store.json")
+	if err != nil {
+		fmt.Println(err)
+	}
+	defer jsonFile.Close()
+	byteValue, _ := ioutil.ReadAll(jsonFile)
+	var pr struct {
+		Policies map[string]interface{} `json:"policies"`
+		Roles    map[string]interface{} `json:"roles"`
+	}
+	json.Unmarshal(byteValue, &pr)
+
+	return pr.Policies, pr.Roles
+}
+
+func v2BaselineAndProjectPolicies(count int) (policies map[string]interface{}, projects []string) {
+	policyCount := count * 3
+
+	chefPolicies, _ := v2BaselinePoliciesAndRoles()
+
+	policyMap := make(map[string]interface{}, policyCount+len(chefPolicies))
+	// first we add chef-managed policies to the map
+	for id, pol := range chefPolicies {
+		policyMap[id] = pol
+	}
+
+	// create a list of project ids, each of which will have 3 corresponding policies
+	projectIDs := make([]string, count)
+	for x := 0; x < count; x++ {
+		projectIDs[x] = fmt.Sprintf("proj-%v", x)
+	}
+
+	for _, proj := range projectIDs {
+		projectRoles := []string{"editor", "project-owner", "viewer"}
+		for _, role := range projectRoles {
+			pid := fmt.Sprintf("%s-%s", proj, role)
+
+			statement := map[string]interface{}{
+				"resources": []string{"*"},
+				"role":      role,
+				"effect":    "allow",
+				"projects":  []string{proj},
+			}
+			statements := make(map[string]interface{}, 1)
+			statements["s-1"] = statement
+
+			policy := map[string]interface{}{
+				"id":         pid,
+				"members":    []string{"user:local:test", "token:fake"},
+				"statements": statements,
+			}
+
+			policyMap[pid] = policy
+		}
+	}
+	return policyMap, projectIDs
+}
+
+func allRoles(count int, actions []string, chefRoles map[string]interface{}) map[string]interface{} {
+	rand.Seed(time.Now().UnixNano())
+
+	// first we add chef-managed roles to the map
+	allRoleCount := len(chefRoles) + count
+	allRoles := make(map[string]interface{}, allRoleCount)
+	for id, role := range chefRoles {
+		allRoles[id] = role
+	}
+
+	// next we add custom roles with randomized actions to the role map
+	if count > 0 {
+		// generate custom role IDs
+		customRoleIDs := make([]string, count)
+		for b := 0; b < count; b++ {
+			customRoleIDs[b] = fmt.Sprintf("role-%v", b)
+		}
+
+		for _, id := range customRoleIDs {
+			// we'll add 1-roleActionCount actions to this role
+			roleActionCount := rand.Intn(len(actions))
+
+			// there can never be 0 actions in a role
+			if roleActionCount == 0 {
+				// so we use the 0 case as All Actions
+				allRoles[id] = map[string]interface{}{
+					"actions": []string{"*"},
+				}
+			} else {
+				rand.Shuffle(len(actions), func(x, y int) { actions[x], actions[y] = actions[y], actions[x] })
+
+				allRoles[id] = map[string]interface{}{
+					"actions": actions[:roleActionCount],
+				}
+			}
+		}
+	}
+	return allRoles
+}
+
+func getRandomRole(roleMap map[string]interface{}) string {
+	var roleIDs []string
+	for id := range roleMap {
+		roleIDs = append(roleIDs, id)
+	}
+
+	randomIndex := rand.Intn(len(roleIDs))
+	roleID := roleIDs[randomIndex]
+	return roleID
 }
