@@ -68,39 +68,39 @@ func ConvertParamToNodeRunBackend(parameter string) string {
 // This is using the ".lower" values to match on fields case-insensitively
 func ConvertParamToNodeStateBackendLowerFilter(parameter string) string {
 	switch parameter {
-	case "id", "node_id":
+	case "id", "node_id", backend.Id:
 		return backend.Id
-	case "name":
+	case "name", backend.Name:
 		return backend.Name + ".lower"
-	case "cookbook":
+	case "cookbook", backend.Cookbook:
 		return backend.Cookbook + ".lower"
-	case "attribute":
+	case "attribute", backend.Attribute:
 		return backend.Attribute + ".lower"
-	case "resource_name", "resource_names":
+	case "resource_name", "resource_names", backend.ResourceName:
 		return backend.ResourceName + ".lower"
-	case "recipe":
+	case "recipe", backend.Recipe:
 		return backend.Recipe + ".lower"
-	case "organization":
+	case "organization", backend.Organization:
 		return backend.Organization + ".lower"
-	case "role":
+	case "role", backend.Role:
 		return backend.Role + ".lower"
-	case "chef_version":
+	case "chef_version", backend.ChefVersion:
 		return backend.ChefVersion + ".lower"
-	case "chef_tags":
+	case "chef_tags", backend.ChefTags:
 		return backend.ChefTags + ".lower"
-	case "error":
+	case "error", backend.ErrorMessage:
 		return backend.ErrorMessage + ".lower"
-	case "chef_server", "source_fqdn":
+	case "chef_server", "source_fqdn", backend.ChefServer:
 		return backend.ChefServer + ".lower"
-	case "environment":
+	case "environment", backend.Environment:
 		return backend.Environment + ".lower"
-	case "platform":
+	case "platform", backend.Platform:
 		return backend.Platform + ".lower"
-	case "policy_group":
+	case "policy_group", backend.PolicyGroup:
 		return backend.PolicyGroup + ".lower"
-	case "policy_name":
+	case "policy_name", backend.PolicyName:
 		return backend.PolicyName + ".lower"
-	case "policy_revision":
+	case "policy_revision", backend.PolicyRevision:
 		return backend.PolicyRevision + ".lower"
 	default:
 		return parameter

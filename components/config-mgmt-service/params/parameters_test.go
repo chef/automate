@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/chef/automate/components/config-mgmt-service/backend"
 	subject "github.com/chef/automate/components/config-mgmt-service/params"
 	"github.com/stretchr/testify/assert"
 )
@@ -86,6 +87,32 @@ func TestValidateDateRangeWithInvalidDatesReturnFalse(t *testing.T) {
 			} else {
 				assert.False(t, subject.ValidateDateRange(test.start, test.end))
 			}
+		})
+	}
+}
+
+func TestConverParamToNodeStateBackendLowerFilter(t *testing.T) {
+	cases := []struct {
+		input    string
+		expected string
+	}{
+		// Does this function add `.lower` to string field values?
+		{input: "name", expected: "node_name.lower"},
+		{input: backend.Name, expected: "node_name.lower"},
+
+		// Does this function leave the odd one out?
+		{input: "id", expected: backend.Id},
+		{input: "node_id", expected: backend.Id},
+		{input: backend.Id, expected: backend.Id},
+
+		// Does this function transform unexpected values?
+		{input: "watlololol", expected: "watlololol"},
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("with input \"%s\" it should return \"%s\"", test.input, test.expected), func(t *testing.T) {
+			actual := subject.ConvertParamToNodeStateBackendLowerFilter(test.input)
+			assert.Equal(t, actual, test.expected)
 		})
 	}
 }

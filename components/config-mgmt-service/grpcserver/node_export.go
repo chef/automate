@@ -117,8 +117,10 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 	// even after the node no longer exists
 	nodeFilters["exists"] = []string{"true"}
 
+	actualSortField := params.ConvertParamToNodeStateBackendLowerFilter(sortField)
+
 	nodes, err := s.client.GetNodesPageByCursor(ctx, start, end,
-		nodeFilters, cursorValue, cursorID, pageSize, sortField, sortAsc)
+		nodeFilters, cursorValue, cursorID, pageSize, actualSortField, sortAsc)
 	if err != nil {
 		return status.Errorf(codes.Internal, err.Error())
 	}
@@ -137,7 +139,7 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 		}
 
 		nodes, err = s.client.GetNodesPageByCursor(ctx, start, end,
-			nodeFilters, cursorValue, cursorID, pageSize, sortField, sortAsc)
+			nodeFilters, cursorValue, cursorID, pageSize, actualSortField, sortAsc)
 		if err != nil {
 			return status.Errorf(codes.Internal, err.Error())
 		}
