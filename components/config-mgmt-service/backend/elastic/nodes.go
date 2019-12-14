@@ -101,7 +101,7 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 }
 
 func (es Backend) GetNodesPageByCursor(ctx context.Context, start time.Time,
-	end time.Time, filters map[string][]string, cursorField interface{},
+	end time.Time, filters map[string][]string, cursorValue interface{},
 	cursorID string, pageSize int, sortField string,
 	ascending bool) ([]backend.Node, error) {
 
@@ -124,8 +124,8 @@ func (es Backend) GetNodesPageByCursor(ctx context.Context, start time.Time,
 		Sort(sortField, ascending).
 		Sort(NodeFieldID, ascending)
 
-	if cursorField != nil && cursorID != "" {
-		switch v := cursorField.(type) {
+	if cursorValue != nil && cursorID != "" {
+		switch v := cursorValue.(type) {
 		case time.Time:
 			// the date has to be in milliseconds
 			milliseconds := v.UnixNano() / int64(time.Millisecond)
@@ -135,7 +135,7 @@ func (es Backend) GetNodesPageByCursor(ctx context.Context, start time.Time,
 			lower := strings.ToLower(v)
 			searchService = searchService.SearchAfter(lower, cursorID)
 		default:
-			searchService = searchService.SearchAfter(cursorField, cursorID)
+			searchService = searchService.SearchAfter(cursorValue, cursorID)
 		}
 	}
 
