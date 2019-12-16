@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package chef.automate.api.iam.v2beta;
-option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request";
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/request";
 
 // Statement, Policy definitions
-import "components/automate-gateway/api/iam/v2beta/common/policy.proto";
+import "components/automate-gateway/api/iam/v2/common/policy.proto";
 
 // Does not contain type as the enduser can only create 'custom' policies.
 message CreatePolicyReq {

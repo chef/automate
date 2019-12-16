@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package chef.automate.api.iam.v2beta;
-option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/response";
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/response";
 
 // Statement, Policy definitions
-import "components/automate-gateway/api/iam/v2beta/common/policy.proto";
+import "components/automate-gateway/api/iam/v2/common/policy.proto";
 
 message CreatePolicyResp {
   Policy policy = 1;

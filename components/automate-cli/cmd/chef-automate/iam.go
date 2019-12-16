@@ -17,8 +17,8 @@ import (
 	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	iam_common "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common"
-	iam_req "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request"
+	iam_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
+	iam_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 )
 
 var iamCmdFlags = struct {

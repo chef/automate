@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package chef.automate.api.iam.v2beta;
-option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common";
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/common";
 
 message Team {
   string id = 1;
