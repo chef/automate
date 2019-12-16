@@ -28,7 +28,14 @@ pushd ./automate.wiki
 -
 
 ## Backward Incompatibilities
+
+## Beta Features
+### Applications
 -
+
+### Identity and Access Management v2
+-
+
 EOH
 
   # Push changes back up to GitHub
