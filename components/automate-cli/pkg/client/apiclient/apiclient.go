@@ -14,7 +14,7 @@ import (
 	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
 	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2beta"
+	v2 "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
 )
@@ -24,11 +24,11 @@ type client struct {
 	// TODO (tc): Add other service clients here as needed.
 	authzClient        authz.AuthorizationClient
 	teamsClient        teams.TeamsClient
-	teamsV2Client      v2beta.TeamsClient
+	teamsV2Client      v2.TeamsClient
 	tokensClient       tokens.TokensMgmtClient
-	tokensV2Client     v2beta.TokensClient
+	tokensV2Client     v2.TokensClient
 	usersClient        users.UsersMgmtClient
-	policiesClient     v2beta.PoliciesClient
+	policiesClient     v2.PoliciesClient
 	reportingClient    reporting.ReportingServiceClient
 	applicationsClient applications.ApplicationsServiceClient
 }
@@ -58,11 +58,11 @@ func OpenConnection(ctx context.Context) (client_type.APIClient, error) {
 		// TODO (tc): Add other service clients here as needed.
 		authzClient:        authz.NewAuthorizationClient(apiClientConn),
 		teamsClient:        teams.NewTeamsClient(apiClientConn),
-		teamsV2Client:      v2beta.NewTeamsClient(apiClientConn),
+		teamsV2Client:      v2.NewTeamsClient(apiClientConn),
 		tokensClient:       tokens.NewTokensMgmtClient(apiClientConn),
-		tokensV2Client:     v2beta.NewTokensClient(apiClientConn),
+		tokensV2Client:     v2.NewTokensClient(apiClientConn),
 		usersClient:        users.NewUsersMgmtClient(apiClientConn),
-		policiesClient:     v2beta.NewPoliciesClient(apiClientConn),
+		policiesClient:     v2.NewPoliciesClient(apiClientConn),
 		reportingClient:    reporting.NewReportingServiceClient(apiClientConn),
 		applicationsClient: applications.NewApplicationsServiceClient(apiClientConn),
 	}, nil
@@ -76,7 +76,7 @@ func (c client) TeamsClient() teams.TeamsClient {
 	return c.teamsClient
 }
 
-func (c client) TeamsV2Client() v2beta.TeamsClient {
+func (c client) TeamsV2Client() v2.TeamsClient {
 	return c.teamsV2Client
 }
 
@@ -84,7 +84,7 @@ func (c client) TokensClient() tokens.TokensMgmtClient {
 	return c.tokensClient
 }
 
-func (c client) TokensV2Client() v2beta.TokensClient {
+func (c client) TokensV2Client() v2.TokensClient {
 	return c.tokensV2Client
 }
 
@@ -92,7 +92,7 @@ func (c client) UsersClient() users.UsersMgmtClient {
 	return c.usersClient
 }
 
-func (c client) PoliciesClient() v2beta.PoliciesClient {
+func (c client) PoliciesClient() v2.PoliciesClient {
 	return c.policiesClient
 }
 

@@ -1,4 +1,4 @@
-// Must be kept in sync with automate-gateway/api/iam/v2beta/common/policy.proto
+// Must be kept in sync with automate-gateway/api/iam/v2/common/policy.proto
 export interface Policy {
   id: string;
   name: string;

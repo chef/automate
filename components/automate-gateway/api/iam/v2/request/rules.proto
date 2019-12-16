@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-package chef.automate.api.iam.v2beta;
-option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request";
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/request";
 
-import "components/automate-gateway/api/iam/v2beta/common/rules.proto";
+import "components/automate-gateway/api/iam/v2/common/rules.proto";
 
 message CreateRuleReq {
     string id = 1;

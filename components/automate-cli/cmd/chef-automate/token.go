@@ -9,8 +9,8 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
-	policies_common "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/common"
-	policies_req "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request"
+	policies_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
+	policies_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 )
 
 func init() {

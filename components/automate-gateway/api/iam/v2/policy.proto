@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package chef.automate.api.iam.v2beta; // discuss
-option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2beta";
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2";
 
 import "google/api/annotations.proto";
 
-import "components/automate-gateway/api/iam/v2beta/request/policy.proto";
-import "components/automate-gateway/api/iam/v2beta/response/policy.proto";
+import "components/automate-gateway/api/iam/v2/request/policy.proto";
+import "components/automate-gateway/api/iam/v2/response/policy.proto";
 
 // for option (chef.automate.api.policy)
 import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
