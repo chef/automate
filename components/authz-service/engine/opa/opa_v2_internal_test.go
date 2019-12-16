@@ -35,7 +35,6 @@ var (
 	projectsResponse []string
 )
 
-// At time of benchmarking, this is around half a second for 1000 teams
 func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 	ctx := context.Background()
 
@@ -124,7 +123,7 @@ func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 
 	teamCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
 	for _, count := range teamCount {
-		b.Run(fmt.Sprintf("V2FilterAuthorizedPairs with real life input and %d teams", count), func(b *testing.B) {
+		b.Run(fmt.Sprintf("with %d teams in input", count), func(b *testing.B) {
 			var resp []engine.Pair
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -137,6 +136,19 @@ func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 		})
 	}
 }
+
+// BenchmarkFilterAuthorizedPairsRealWorldExample/with_0_teams_in_input-8       18	   71469413 ns/op	   27715819 B/op	  416006 allocs/op
+// BenchmarkFilterAuthorizedPairsRealWorldExample/with_1_teams_in_input-8       15	   70341373 ns/op	   28104209 B/op	  423505 allocs/op
+// BenchmarkFilterAuthorizedPairsRealWorldExample/with_10_teams_in_input-8      14	   79268379 ns/op	   31604062 B/op	  490993 allocs/op
+// BenchmarkFilterAuthorizedPairsRealWorldExample/with_30_teams_in_input-8      13	  115535168 ns/op	   39381388 B/op	  640964 allocs/op
+// BenchmarkFilterAuthorizedPairsRealWorldExample/with_50_teams_in_input-8       9	  126016309 ns/op	   47169624 B/op	  790930 allocs/op
+// BenchmarkFilterAuthorizedPairsRealWorldExample/with_100_teams_in_input-8      7	  178359130 ns/op	   66610725 B/op	 1166059 allocs/op
+// BenchmarkFilterAuthorizedPairsRealWorldExample/with_150_teams_in_input-8      4	  290961881 ns/op	   86099896 B/op	 1552118 allocs/op
+// BenchmarkFilterAuthorizedPairsRealWorldExample/with_300_teams_in_input-8      3	  410043023 ns/op	  144511557 B/op	 2710281 allocs/op
+// BenchmarkFilterAuthorizedPairsRealWorldExample/with_500_teams_in_input-8      2	  623028756 ns/op	  222406888 B/op	 4254489 allocs/op
+// BenchmarkFilterAuthorizedPairsRealWorldExample/with_1000_teams_in_input-8     1	 1253675227 ns/op	  417184776 B/op	 8115021 allocs/op
+// BenchmarkFilterAuthorizedPairsRealWorldExample/with_10000_teams_in_input-8    1	19126847294 ns/op	 3931882536 B/op	77604823 allocs/op
+// 12/16/19 summary: up to 1-2 seconds with 1000 teams
 
 // Q: Which type of input is computed faster, generic Go interface or specific OPA Term?
 func BenchmarkV2GenericInput(b *testing.B) {
@@ -183,8 +195,8 @@ func BenchmarkV2SpecificInput(b *testing.B) {
 }
 
 // A: Specific input is faster!
-// BenchmarkGenericInput-8   	    328531	      4034 ns/op	     1664 B/op	    50 allocs/op
-// BenchmarkSpecificInput-8   	  572641	      2073 ns/op	     976 B/op	      30 allocs/op
+// BenchmarkV2GenericInput-8   	    377655	      4978 ns/op	    1664 B/op	      50 allocs/op
+// BenchmarkV2SpecificInput-8   	  540812	      2392 ns/op	     976 B/op	      30 allocs/op
 
 func BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies(b *testing.B) {
 	var r error
@@ -219,6 +231,16 @@ func BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies(b *testing.B)
 			})
 	}
 }
+
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies/store_with_18_chef-managed_policies_and_0_custom_policies-8       12	  84996295 ns/op	 14671988 B/op	  373316 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies/store_with_18_chef-managed_policies_and_5_custom_policies-8       12	 101366184 ns/op	 15695630 B/op	  394906 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies/store_with_18_chef-managed_policies_and_10_custom_policies-8      13	 119584001 ns/op	 17528115 B/op	  433279 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies/store_with_18_chef-managed_policies_and_20_custom_policies-8      10	 134156734 ns/op	 20404048 B/op	  493707 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies/store_with_18_chef-managed_policies_and_50_custom_policies-8       8	 169178163 ns/op	 30520222 B/op	  704484 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies/store_with_18_chef-managed_policies_and_100_custom_policies-8      4	 372269868 ns/op	 43306724 B/op	  975824 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies/store_with_18_chef-managed_policies_and_200_custom_policies-8      2	 511771048 ns/op	 69466028 B/op	 1524912 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies/store_with_18_chef-managed_policies_and_1000_custom_policies-8     1	1359604423 ns/op	257229008 B/op	 5492555 allocs/op
+// 12/16/19 summary: up to 1-2 seconds with over 1000 policies
 
 func BenchmarkProjectsAuthorizedWithIncreasingPolicies(b *testing.B) {
 	ctx := context.Background()
@@ -255,6 +277,16 @@ func BenchmarkProjectsAuthorizedWithIncreasingPolicies(b *testing.B) {
 	}
 }
 
+// BenchmarkProjectsAuthorizedWithIncreasingPolicies/store_with_0_custom_policies_and_10_custom_roles-8         	    8162	    148936 ns/op	   49535 B/op	     541 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingPolicies/store_with_5_custom_policies_and_10_custom_roles-8         	   10000	    149835 ns/op	   49566 B/op	     543 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingPolicies/store_with_10_custom_policies_and_10_custom_roles-8        	    5775	    176088 ns/op	   49566 B/op	     543 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingPolicies/store_with_20_custom_policies_and_10_custom_roles-8        	    7954	    247887 ns/op	   49522 B/op	     541 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingPolicies/store_with_50_custom_policies_and_10_custom_roles-8        	    8079	    352043 ns/op	   49563 B/op	     543 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingPolicies/store_with_100_custom_policies_and_10_custom_roles-8       	    5569	    293344 ns/op	   49563 B/op	     543 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingPolicies/store_with_200_custom_policies_and_10_custom_roles-8       	    4040	    342521 ns/op	   49559 B/op	     543 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingPolicies/store_with_1000_custom_policies_and_10_custom_roles-8      	    6307	    377988 ns/op	   49558 B/op	     543 allocs/op
+// 12/16/19 summary: less than half a millisecond with over 1000 policies
+
 func BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
 	ctx := context.Background()
 
@@ -290,6 +322,16 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
 	}
 }
 
+// BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies/store_with_0_custom_policies_and_10_custom_roles-8       1108	   1107602 ns/op	   275539 B/op	    5656 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies/store_with_5_custom_policies_and_10_custom_roles-8         69	  18851156 ns/op	  6038974 B/op	   92694 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies/store_with_10_custom_policies_and_10_custom_roles-8        72	  18495157 ns/op	  5203787 B/op	   81788 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies/store_with_20_custom_policies_and_10_custom_roles-8        37	  34467119 ns/op	  9826932 B/op	  154555 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies/store_with_50_custom_policies_and_10_custom_roles-8        12	 112702166 ns/op	 30529685 B/op	  477700 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies/store_with_100_custom_policies_and_10_custom_roles-8        5	 229425400 ns/op	 61646865 B/op	  949819 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies/store_with_200_custom_policies_and_10_custom_roles-8        2	 566905075 ns/op	102334816 B/op	 1599472 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies/store_with_1000_custom_policies_and_10_custom_roles-8       1	8002475951 ns/op	550344056 B/op	 8512827 allocs/op
+// 12/16/19 summary: up to 5 seconds with over 1000 policies
+
 func BenchmarkAuthorizedProjectPreparedQueryWithIncreasingRoles(b *testing.B) {
 	var r error
 	ctx := context.Background()
@@ -321,6 +363,14 @@ func BenchmarkAuthorizedProjectPreparedQueryWithIncreasingRoles(b *testing.B) {
 			})
 	}
 }
+
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingRoles/store_with_0_custom_roles_and_20_custom_policies-8      10	 177838629 ns/op	19926572 B/op	  483156 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingRoles/store_with_5_custom_roles_and_20_custom_policies-8       6	 174438303 ns/op	19061697 B/op	  466096 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingRoles/store_with_10_custom_roles_and_20_custom_policies-8      6	 191945097 ns/op	19702312 B/op	  478546 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingRoles/store_with_20_custom_roles_and_20_custom_policies-8      5	 290461488 ns/op	20393857 B/op	  493008 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingRoles/store_with_50_custom_roles_and_20_custom_policies-8      3	 384545383 ns/op	18926930 B/op	  462799 allocs/op
+// BenchmarkAuthorizedProjectPreparedQueryWithIncreasingRoles/store_with_100_custom_roles_and_20_custom_policies-8     2	 761480943 ns/op	18748932 B/op	  459208 allocs/op
+// 12/16/19 summary: up to 1 second with over 100 roles
 
 func BenchmarkProjectsAuthorizedWithIncreasingRoles(b *testing.B) {
 	ctx := context.Background()
@@ -357,6 +407,14 @@ func BenchmarkProjectsAuthorizedWithIncreasingRoles(b *testing.B) {
 	}
 }
 
+// BenchmarkProjectsAuthorizedWithIncreasingRoles/store_with_0_custom_roles_and_20_custom_policies-8      8073	    141641 ns/op	   49583 B/op	     543 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingRoles/store_with_5_custom_roles_and_20_custom_policies-8     10000	    129528 ns/op	   49523 B/op	     541 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingRoles/store_with_10_custom_roles_and_20_custom_policies-8     8367	    152109 ns/op	   49567 B/op	     543 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingRoles/store_with_20_custom_roles_and_20_custom_policies-8    10000	    140887 ns/op	   49516 B/op	     541 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingRoles/store_with_50_custom_roles_and_20_custom_policies-8     8964	    152607 ns/op	   49522 B/op	     541 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingRoles/store_with_100_custom_roles_and_20_custom_policies-8    8270	    149753 ns/op	   49564 B/op	     543 allocs/op
+// 12/16/19 summary: less than half a millisecond with over 100 roles
+
 func BenchmarkFilterAuthorizedProjectsWithIncreasingRoles(b *testing.B) {
 	ctx := context.Background()
 
@@ -391,6 +449,14 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingRoles(b *testing.B) {
 		})
 	}
 }
+
+// BenchmarkFilterAuthorizedProjectsWithIncreasingRoles/store_with_0_custom_roles_and_20_custom_policies-8       24	  44586494 ns/op	12848894 B/op	  199904 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingRoles/store_with_5_custom_roles_and_20_custom_policies-8       28	  62857583 ns/op	10947845 B/op	  171561 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingRoles/store_with_10_custom_roles_and_20_custom_policies-8      39	  50451429 ns/op	 8080393 B/op	  129856 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingRoles/store_with_20_custom_roles_and_20_custom_policies-8      18	  57813417 ns/op	12546945 B/op	  197058 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingRoles/store_with_50_custom_roles_and_20_custom_policies-8      33	  39547176 ns/op	 8922209 B/op	  143759 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingRoles/store_with_100_custom_roles_and_20_custom_policies-8     19	  67250666 ns/op	11250568 B/op	  174188 allocs/op
+// 12/16/19 summary: less than 5 hundredths of a second with over 100 roles
 
 func BenchmarkProjectsAuthorizedWithIncreasingProjects(b *testing.B) {
 	ctx := context.Background()
@@ -431,6 +497,13 @@ func BenchmarkProjectsAuthorizedWithIncreasingProjects(b *testing.B) {
 	}
 }
 
+// BenchmarkProjectsAuthorizedWithIncreasingProjects/store_with_5_projects,_33_policies,_and_5_roles-8         	     519	   2623504 ns/op	  676939 B/op	    9317 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingProjects/store_with_20_projects,_78_policies,_and_5_roles-8        	      99	  12418626 ns/op	 2676439 B/op	   37550 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingProjects/store_with_100_projects,_318_policies,_and_5_roles-8      	      12	  99153320 ns/op	15689900 B/op	  233776 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingProjects/store_with_200_projects,_618_policies,_and_5_roles-8      	       6	 188506243 ns/op	37933061 B/op	  627093 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingProjects/store_with_300_projects,_918_policies,_and_5_roles-8      	       4	 324684845 ns/op	67148484 B/op	 1180311 allocs/op
+// 12/16/19 summary: less than 5 tenths of a second with 300 projects and 900 corresponding policies
+
 func BenchmarkFilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
 	ctx := context.Background()
 
@@ -468,6 +541,13 @@ func BenchmarkFilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
 		})
 	}
 }
+
+// BenchmarkFilterAuthorizedProjectsIncreasingProjects/store_with_5_projects,_33_policies,_and_5_roles-8         	   481	   2673394 ns/op	  661999 B/op	   12346 allocs/op
+// BenchmarkFilterAuthorizedProjectsIncreasingProjects/store_with_20_projects,_78_policies,_and_5_roles-8        	   188	   7190143 ns/op	 1821465 B/op	   32369 allocs/op
+// BenchmarkFilterAuthorizedProjectsIncreasingProjects/store_with_100_projects,_318_policies,_and_5_roles-8      	    46	  30991366 ns/op	 8001491 B/op	  139110 allocs/op
+// BenchmarkFilterAuthorizedProjectsIncreasingProjects/store_with_200_projects,_618_policies,_and_5_roles-8      	    18	  74279446 ns/op	15727943 B/op	  272518 allocs/op
+// BenchmarkFilterAuthorizedProjectsIncreasingProjects/store_with_300_projects,_918_policies,_and_5_roles-8      	    18	  91202140 ns/op	23486797 B/op	  405924 allocs/op
+// 12/16/19 summary: less than 1 tenth of a second with 300 projects and 900 corresponding policies
 
 func BenchmarkProjectsAuthorizedWithIncreasingSubjects(b *testing.B) {
 	ctx := context.Background()
@@ -507,6 +587,19 @@ func BenchmarkProjectsAuthorizedWithIncreasingSubjects(b *testing.B) {
 	}
 }
 
+// BenchmarkProjectsAuthorizedWithIncreasingSubjects/input_with_0_subjects-8         	   10000	    134722 ns/op	   46185 B/op	     499 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingSubjects/input_with_1_subjects-8         	    6447	    164869 ns/op	   51547 B/op	     606 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingSubjects/input_with_10_subjects-8        	    3540	    351820 ns/op	   99702 B/op	    1560 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingSubjects/input_with_30_subjects-8        	    1128	    928421 ns/op	  207047 B/op	    3680 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingSubjects/input_with_50_subjects-8        	     741	   1383707 ns/op	  314539 B/op	    5800 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingSubjects/input_with_100_subjects-8       	     480	   2387500 ns/op	  583147 B/op	   11127 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingSubjects/input_with_150_subjects-8       	     322	   4052937 ns/op	  855935 B/op	   17778 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingSubjects/input_with_300_subjects-8       	     145	   7813388 ns/op	 1673432 B/op	   37729 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingSubjects/input_with_500_subjects-8       	     100	  13112543 ns/op	 2763625 B/op	   64331 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingSubjects/input_with_1000_subjects-8      	      50	  25798461 ns/op	 5488807 B/op	  130833 allocs/op
+// BenchmarkProjectsAuthorizedWithIncreasingSubjects/input_with_10000_subjects-8     	       4	 279753601 ns/op	54817776 B/op	 1327834 allocs/op
+// 12/16/19 summary: less than a second with 10,000 subjects
+
 func BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects(b *testing.B) {
 	ctx := context.Background()
 
@@ -544,6 +637,19 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects(b *testing.B) {
 	}
 }
 
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_0_subjects-8        51	  29663189 ns/op	   10341998 B/op	   165317 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_1_subjects-8        24	  56318332 ns/op	   18816861 B/op	   285219 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_10_subjects-8        4	 345199718 ns/op	   95090762 B/op	  1364324 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_30_subjects-8        2	 860959738 ns/op	  264586580 B/op	  3762274 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_50_subjects-8        1	1246990637 ns/op	  434087808 B/op	  6160325 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_100_subjects-8       1	2947810981 ns/op	  857795248 B/op	 12156064 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_150_subjects-8       1	5289022070 ns/op	 1281407944 B/op	 18192712 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_300_subjects-8       1	9734097492 ns/op	 2552158136 B/op	 36301970 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_500_subjects-8       1	18539466325 ns/op	 4246419792 B/op	 60447316 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_1000_subjects-8      1	28284630027 ns/op	 8482076096 B/op	120810333 allocs/op
+// Note: 10,000 subjects took several minutes to run and never completed
+// 12/16/19 summary: up to 30 seconds with 1,000 subjects
+
 // Q: What happens if the subject appears more often as a member of different policies?
 func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
 	ctx := context.Background()
@@ -564,7 +670,7 @@ func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
 
 		statement := map[string]interface{}{
 			"resources": []string{"*"},
-			"role":      []string{fmt.Sprintf("role-%v", i)},
+			"role":      fmt.Sprintf("role-%v", i),
 			"effect":    "allow",
 			"projects":  []string{fmt.Sprintf("proj-%v", i)},
 		}
@@ -626,6 +732,8 @@ func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
 		})
 	}
 }
+
+// A: ? TODO
 
 // shared (v1/v2) helpers
 func randomTeams(c int) []string {
