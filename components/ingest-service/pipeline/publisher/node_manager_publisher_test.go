@@ -37,6 +37,7 @@ func TestGatherInfoForNode(t *testing.T) {
 		Ec2: backend.Ec2{
 			InstanceId:                "i-0aee75f0b4b0d9f22",
 			PlacementAvailabilityZone: "us-west-2a",
+			AccountID:                 "123456789",
 		},
 		LatestRunID: "123353254545425",
 		Projects:    []string{"tomato", "cucumber"},
@@ -53,9 +54,10 @@ func TestGatherInfoForNode(t *testing.T) {
 			{Key: "chef-tag", Value: "application"},
 			{Key: "chef-tag", Value: "database"},
 		},
-		LastContact:  timestampNow,
-		SourceId:     "i-0aee75f0b4b0d9f22",
-		SourceRegion: "us-west-2a",
+		LastContact:     timestampNow,
+		SourceId:        "i-0aee75f0b4b0d9f22",
+		SourceRegion:    "us-west-2a",
+		SourceAccountId: "123456789",
 		RunData: &nodes.LastContactData{
 			Id:      "123353254545425",
 			EndTime: timestampNow,
