@@ -115,6 +115,13 @@ message Node {
 	LastContactData run_data = 29;
 	LastContactData scan_data = 30;
 	repeated ProjectsData projects_data = 31;
+	CloudInfo cloud_info = 32;
+}
+
+message CloudInfo {
+	string source_id = 1;
+	string source_region = 2;
+	string source_account_id = 3;
 }
 
 message ProjectsData {
