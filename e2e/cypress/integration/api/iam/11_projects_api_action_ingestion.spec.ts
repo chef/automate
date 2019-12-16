@@ -69,14 +69,7 @@ describeIfIAMV2p1('Action project tagging on ingestion', () => {
       });
     });
 
-    // apply rules
-    cy.request({
-      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-      method: 'POST',
-      url: '/apis/iam/v2beta/apply-rules'
-    });
-
-    cy.waitUntilApplyRulesNotRunning(100);
+    cy.applyRulesAndWait(100);
 
     // Ingest an action with attributes that match all the projects
     cy.fixture('action/environment_create.json').then((action) => {

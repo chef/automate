@@ -168,14 +168,7 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
       });
     });
 
-    // apply rules
-    cy.request({
-      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-      method: 'POST',
-      url: '/apis/iam/v2beta/apply-rules'
-    });
-
-    cy.waitUntilApplyRulesNotRunning(100);
+    cy.applyRulesAndWait(100);
 
     // Ingest a InSpec report with attributes that match all the projects
     cy.fixture('compliance/inspec-report.json').then((report) => {

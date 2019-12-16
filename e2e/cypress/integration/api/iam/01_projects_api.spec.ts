@@ -267,12 +267,7 @@ describeIfIAMV2p1('projects API', () => {
           .forEach(({ status }) => expect(status).to.equal(editsPendingStr));
       });
 
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/apis/iam/v2beta/apply-rules'
-      });
-      cy.waitUntilApplyRulesNotRunning(500);
+      cy.applyRulesAndWait(500);
 
       // confirm rules are applied
       for (const project of [avengersProject, xmenProject]) {
@@ -386,12 +381,7 @@ describeIfIAMV2p1('projects API', () => {
           .forEach(({ status }) => expect(status).to.equal(editsPendingStr));
       });
 
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/apis/iam/v2beta/apply-rules'
-      });
-      cy.waitUntilApplyRulesNotRunning(100);
+      cy.applyRulesAndWait(100);
 
       cy.request({
         headers: {
@@ -467,12 +457,7 @@ describeIfIAMV2p1('projects API', () => {
           .forEach(({ status }) => expect(status).to.equal(editsPendingStr));
       });
 
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: '/apis/iam/v2beta/apply-rules'
-      });
-      cy.waitUntilApplyRulesNotRunning(100);
+      cy.applyRulesAndWait(100);
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
