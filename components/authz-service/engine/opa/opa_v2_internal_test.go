@@ -195,19 +195,19 @@ func BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies(b *testing.B)
 	s, err := New(ctx, l)
 	require.NoError(b, err, "init state")
 
-	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
+	policyCounts := []int{0, 5, 10, 20, 50, 100, 200, 1000}
 	roleCount := 10 // keep this constant while increasing policyCount
 
 	chefPolicies, _ := v2BaselinePoliciesAndRoles()
 
-	for _, count := range policyCount {
-		policies, roles := v2BaselineAndRandomPoliciesAndRoles(count, roleCount)
+	for _, policyCount := range policyCounts {
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
 		})
 
-		b.Run(fmt.Sprintf("store with %d chef-managed policies and %d custom policies", len(chefPolicies), count),
+		b.Run(fmt.Sprintf("store with %d chef-managed policies and %d custom policies", len(chefPolicies), policyCount),
 			func(b *testing.B) {
 				for n := 0; n < b.N; n++ {
 					r = s.makeAuthorizedProjectPreparedQuery(ctx)
@@ -228,11 +228,11 @@ func BenchmarkProjectsAuthorizedWithIncreasingPolicies(b *testing.B) {
 	s, err := New(ctx, l)
 	require.NoError(b, err, "init state")
 
-	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
+	policyCounts := []int{0, 5, 10, 20, 50, 100, 200, 1000}
 	roleCount := 10 // keep this constant while increasing policyCount
 
-	for _, count := range policyCount {
-		policies, roles := v2BaselineAndRandomPoliciesAndRoles(count, roleCount)
+	for _, policyCount := range policyCounts {
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
 
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
@@ -241,7 +241,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingPolicies(b *testing.B) {
 		err = s.makeAuthorizedProjectPreparedQuery(ctx)
 		require.NoError(b, err, "update OPA store and prepare projects query")
 
-		b.Run(fmt.Sprintf("store with %d custom policies and %d custom roles", count, roleCount), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with %d custom policies and %d custom roles", policyCount, roleCount), func(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -263,11 +263,11 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
 	s, err := New(ctx, l)
 	require.NoError(b, err, "init state")
 
-	policyCount := []int{0, 5, 10, 20, 50, 100, 200, 1000}
+	policyCounts := []int{0, 5, 10, 20, 50, 100, 200, 1000}
 	roleCount := 10 // keep this constant while increasing policyCount
 
-	for _, count := range policyCount {
-		policies, roles := v2BaselineAndRandomPoliciesAndRoles(count, roleCount)
+	for _, policyCount := range policyCounts {
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
 
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
@@ -276,7 +276,7 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
 		err = s.makeAuthorizedProjectPreparedQuery(ctx)
 		require.NoError(b, err, "update OPA store and prepare projects query")
 
-		b.Run(fmt.Sprintf("store with %d custom policies and %d custom roles", count, roleCount), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with %d custom policies and %d custom roles", policyCount, roleCount), func(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -300,18 +300,16 @@ func BenchmarkAuthorizedProjectPreparedQueryWithIncreasingRoles(b *testing.B) {
 	require.NoError(b, err, "init state")
 
 	policyCount := 20 // keep this constant while increasing roleCount
-	roleCount := []int{0, 5, 10, 20, 50, 100}
+	roleCounts := []int{0, 5, 10, 20, 50, 100}
 
-	chefPolicies, _ := v2BaselinePoliciesAndRoles()
-
-	for _, count := range roleCount {
-		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, count)
+	for _, roleCount := range roleCounts {
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
 		})
 
-		b.Run(fmt.Sprintf("store with %d chef-managed policies and %d custom policies", len(chefPolicies), count),
+		b.Run(fmt.Sprintf("store with %d custom roles and %d custom policies", roleCount, policyCount),
 			func(b *testing.B) {
 				for n := 0; n < b.N; n++ {
 					r = s.makeAuthorizedProjectPreparedQuery(ctx)
@@ -333,10 +331,10 @@ func BenchmarkProjectsAuthorizedWithIncreasingRoles(b *testing.B) {
 	require.NoError(b, err, "init state")
 
 	policyCount := 20 // keep this constant while increasing roleCount
-	roleCount := []int{0, 5, 10, 20, 50, 100}
+	roleCounts := []int{0, 5, 10, 20, 50, 100}
 
-	for _, count := range roleCount {
-		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, count)
+	for _, roleCount := range roleCounts {
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
@@ -345,7 +343,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingRoles(b *testing.B) {
 		err = s.makeAuthorizedProjectPreparedQuery(ctx)
 		require.NoError(b, err, "prepared authorized project query")
 
-		b.Run(fmt.Sprintf("store with %d custom policies and %d custom roles", policyCount, count), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with %d custom roles and %d custom policies", roleCount, policyCount), func(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -368,10 +366,10 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingRoles(b *testing.B) {
 	require.NoError(b, err, "init state")
 
 	policyCount := 20 // keep this constant while increasing roleCount
-	roleCount := []int{0, 5, 10, 20, 50, 100}
+	roleCounts := []int{0, 5, 10, 20, 50, 100}
 
-	for _, count := range roleCount {
-		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, count)
+	for _, roleCount := range roleCounts {
+		policies, roles := v2BaselineAndRandomPoliciesAndRoles(policyCount, roleCount)
 		s.v2p1Store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 			"roles":    roles,
@@ -380,7 +378,7 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingRoles(b *testing.B) {
 		err = s.makeAuthorizedProjectPreparedQuery(ctx)
 		require.NoError(b, err, "prepared authorized project query")
 
-		b.Run(fmt.Sprintf("store with %d custom policies and %d custom roles", policyCount, count), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with %d custom roles and %d custom policies", roleCount, policyCount), func(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -418,7 +416,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingProjects(b *testing.B) {
 		err = s.makeAuthorizedProjectPreparedQuery(ctx)
 		require.NoError(b, err, "prepared authorized project query")
 
-		b.Run(fmt.Sprintf("store with %d projects %d policies, and %d roles", projCount, len(policyMap), len(roleMap)), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with %d projects, %d policies, and %d roles", projCount, len(policyMap), len(roleMap)), func(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -441,12 +439,11 @@ func BenchmarkFilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
 	s, err := New(ctx, l)
 	require.NoError(b, err, "init state")
 
-	roleCount := 5
 	projectCounts := []int{5, 20, 100, 200, 300}
 	member := "user:local:test"
 
-	for _, projCount := range projectCounts {
-		policyMap, _ := v2BaselineAndProjectPolicies(projCount)
+	for _, projectCount := range projectCounts {
+		policyMap, _ := v2BaselineAndProjectPolicies(projectCount)
 
 		_, roleMap := v2BaselinePoliciesAndRoles()
 
@@ -458,7 +455,7 @@ func BenchmarkFilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
 		err = s.makeAuthorizedProjectPreparedQuery(ctx)
 		require.NoError(b, err, "prepared authorized project query")
 
-		b.Run(fmt.Sprintf("store with %d projects %d policies, and %d roles", projCount, len(policyMap), roleCount), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with %d projects, %d policies, and %d roles", projectCount, len(policyMap), len(roleMap)), func(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -493,13 +490,14 @@ func BenchmarkProjectsAuthorizedWithIncreasingSubjects(b *testing.B) {
 	err = s.makeAuthorizedProjectPreparedQuery(ctx)
 	require.NoError(b, err, "prepared authorized project query")
 
-	subjectCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
-	for _, count := range subjectCount {
-		b.Run(fmt.Sprintf("input with %d subjects", count), func(b *testing.B) {
+	subjectCounts := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
+	for _, subjectCount := range subjectCounts {
+		b.Run(fmt.Sprintf("input with %d subjects", subjectCount), func(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2ProjectsAuthorized(ctx, []string{"user:local:test"}, "iam:projects:delete", "iam:projects", allProjects)
+				resp, err = s.V2ProjectsAuthorized(ctx, append([]string{"user:local:test"}, randomTeams(subjectCount)...),
+					"iam:projects:delete", "iam:projects", allProjects)
 				if err != nil {
 					b.Error(err)
 				}
@@ -530,13 +528,13 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects(b *testing.B) {
 	err = s.makeAuthorizedProjectPreparedQuery(ctx)
 	require.NoError(b, err, "prepared authorized project query")
 
-	subjectCount := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
-	for _, count := range subjectCount {
-		b.Run(fmt.Sprintf("input with %d subjects", count), func(b *testing.B) {
+	subjectCounts := []int{0, 1, 10, 30, 50, 100, 150, 300, 500, 1000, 10000}
+	for _, subjectCount := range subjectCounts {
+		b.Run(fmt.Sprintf("input with %d subjects", subjectCount), func(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedProjects(ctx, append([]string{"user:local:test"}, randomTeams(count)...))
+				resp, err = s.V2FilterAuthorizedProjects(ctx, append([]string{"user:local:test"}, randomTeams(subjectCount)...))
 				if err != nil {
 					b.Error(err)
 				}

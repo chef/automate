@@ -156,15 +156,15 @@ func BenchmarkInitPartialResultWithPolicies(b *testing.B) {
 	s, err := New(ctx, l)
 	require.NoError(b, err, "init state")
 
-	policyCount := []int{0, 5, 10, 20, 50, 100, 200}
+	policyCounts := []int{0, 5, 10, 20, 50, 100, 200}
 
-	for _, count := range policyCount {
-		policies := testPolicies(count)
+	for _, policyCount := range policyCounts {
+		policies := testPolicies(policyCount)
 		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 		})
 
-		b.Run(fmt.Sprintf("store with default policies and %d random policies", count), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with default policies and %d random policies", policyCount), func(b *testing.B) {
 			var r error
 
 			for n := 0; n < b.N; n++ {
@@ -187,17 +187,17 @@ func BenchmarkIsAuthorizedWithInitPartialResult(b *testing.B) {
 	s, err := New(ctx, l)
 	require.NoError(b, err, "init state")
 
-	policyCount := []int{0, 5, 10, 20, 50, 100, 200}
+	policyCounts := []int{0, 5, 10, 20, 50, 100, 200}
 
-	for _, count := range policyCount {
-		policies := testPolicies(count)
+	for _, policyCount := range policyCounts {
+		policies := testPolicies(policyCount)
 		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 		})
 		err = s.initPartialResult(ctx)
 		require.NoError(b, err, "init partial result")
 
-		b.Run(fmt.Sprintf("store with default policies and %d random policies", count), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with default policies and %d random policies", policyCount), func(b *testing.B) {
 			var resp bool
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -221,15 +221,15 @@ func BenchmarkFilterAuthorizedPairsWithPolicies(b *testing.B) {
 	s, err := New(ctx, l)
 	require.NoError(b, err, "init state")
 
-	policyCount := []int{0, 1, 5, 10, 20, 50, 100}
+	policyCounts := []int{0, 1, 5, 10, 20, 50, 100}
 
-	for _, count := range policyCount {
-		policies := testPolicies(count)
+	for _, policyCount := range policyCounts {
+		policies := testPolicies(policyCount)
 		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 		})
 
-		b.Run(fmt.Sprintf("store with default policies and %d random policies", count), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with default policies and %d random policies", policyCount), func(b *testing.B) {
 			var resp []engine.Pair
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -243,14 +243,14 @@ func BenchmarkFilterAuthorizedPairsWithPolicies(b *testing.B) {
 		})
 	}
 
-	pairCount := []int{0, 1, 5, 10, 20, 50, 100}
-	for _, count := range pairCount {
+	pairCounts := []int{0, 1, 5, 10, 20, 50, 100}
+	for _, pairCount := range pairCounts {
 		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": testPolicies(0),
 		})
-		pairs := testPairs(count)
+		pairs := testPairs(pairCount)
 
-		b.Run(fmt.Sprintf("store with default policies and %d random pairs", count), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with default policies and %d random pairs", pairCount), func(b *testing.B) {
 			var resp []engine.Pair
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -263,18 +263,18 @@ func BenchmarkFilterAuthorizedPairsWithPolicies(b *testing.B) {
 		})
 	}
 
-	teamCount := []int{0, 1, 5, 10, 20, 50, 100}
-	for _, count := range teamCount {
+	teamCounts := []int{0, 1, 5, 10, 20, 50, 100}
+	for _, teamCount := range teamCounts {
 		policies := testPolicies(0)
 		s.store = inmem.NewFromObject(map[string]interface{}{
 			"policies": policies,
 		})
 
-		b.Run(fmt.Sprintf("store with default policies and %d random teams", count), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with default policies and %d random teams", teamCount), func(b *testing.B) {
 			var resp []engine.Pair
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(count)...),
+				resp, err = s.FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(teamCount)...),
 					[]engine.Pair{{Action: "read", Resource: "cfgmgmt:nodes"}})
 				if err != nil {
 					b.Error(err)
