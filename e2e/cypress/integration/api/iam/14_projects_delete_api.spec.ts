@@ -46,7 +46,7 @@ describeIfIAMV2p1('Project delete', () => {
       body: rule
     });
 
-    // Try to delete the project with a stagged rule
+    // Try to delete the project with a staged rule
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
@@ -54,7 +54,7 @@ describeIfIAMV2p1('Project delete', () => {
       failOnStatusCode: false
     }).then((deleteResp) => {
       expect(deleteResp.status,
-        'Did not fail deleting a project with a stagged rule').to.be.oneOf([400]);
+        'Did not fail deleting a project with a staged rule').to.equal(400);
     });
 
     // Ensure the project was not deleted
@@ -63,8 +63,7 @@ describeIfIAMV2p1('Project delete', () => {
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((resp: Cypress.ObjectLike) => {
-      expect(resp.body.projects && resp.body.projects.length > 0 &&
-        resp.body.projects.some((p: any) => p.id === project.id)).to.be.equal(true);
+      expect(responseContainsProject(resp.body.projects, project.id)).to.be.equal(true);
     });
 
     // Apply the rules to make the rule applied
@@ -78,7 +77,7 @@ describeIfIAMV2p1('Project delete', () => {
       failOnStatusCode: false
     }).then((deleteResp) => {
       expect(deleteResp.status,
-        'Did not fail deleting a project with a applied rule').to.be.oneOf([400]);
+        'Did not fail deleting a project with a applied rule').to.be.equal(400);
     });
 
     // Ensure the project was not removed
@@ -87,8 +86,7 @@ describeIfIAMV2p1('Project delete', () => {
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((resp: Cypress.ObjectLike) => {
-      expect(resp.body.projects && resp.body.projects.length > 0 &&
-        resp.body.projects.some((p: any) => p.id === project.id)).to.be.equal(true);
+      expect(responseContainsProject(resp.body.projects, project.id)).to.be.equal(true);
     });
 
     // Delete the rule
@@ -97,7 +95,7 @@ describeIfIAMV2p1('Project delete', () => {
       method: 'DELETE',
       url: `/apis/iam/v2beta/projects/${project.id}/rules/${rule.id}`
     }).then((deleteResp) => {
-      expect(deleteResp.status).to.be.oneOf([200]);
+      expect(deleteResp.status).to.be.equal(200);
     });
 
     // Try to delete the project with a non applied deleted rule
@@ -108,7 +106,7 @@ describeIfIAMV2p1('Project delete', () => {
       failOnStatusCode: false
     }).then((deleteResp) => {
       expect(deleteResp.status,
-        'Did not fail deleting a project with a deleted applied rule').to.be.oneOf([400]);
+        'Did not fail deleting a project with a deleted applied rule').to.be.equal(400);
     });
 
     // Ensure the project was not removed
@@ -117,8 +115,7 @@ describeIfIAMV2p1('Project delete', () => {
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((resp: Cypress.ObjectLike) => {
-      expect(resp.body.projects && resp.body.projects.length > 0 &&
-        resp.body.projects.some((p: any) => p.id === project.id)).to.be.equal(true);
+      expect(responseContainsProject(resp.body.projects, project.id)).to.be.equal(true);
     });
 
     // Apply the rules to remove the rule
@@ -130,7 +127,7 @@ describeIfIAMV2p1('Project delete', () => {
       method: 'DELETE',
       url: `/apis/iam/v2beta/projects/${project.id}`
     }).then((deleteResp) => {
-      expect(deleteResp.status).to.be.oneOf([200]);
+      expect(deleteResp.status).to.be.equal(200);
     });
 
     // Ensure the project is removed
@@ -139,8 +136,13 @@ describeIfIAMV2p1('Project delete', () => {
       method: 'GET',
       url: '/apis/iam/v2beta/projects'
     }).then((resp: Cypress.ObjectLike) => {
-      expect(resp.body.projects && (resp.body.projects.length === 0 ||
-        !resp.body.projects.some((p: any) => p.id === project.id))).to.be.equal(true);
+      expect(responseContainsProject(resp.body.projects, project.id)).to.be.equal(false);
     });
   });
 });
+
+function responseContainsProject(projectsResponse: any, projectId: string): boolean {
+  return projectsResponse &&
+    projectsResponse.length > 0 &&
+    projectsResponse.some((p: any) => p.id === projectId);
+}
