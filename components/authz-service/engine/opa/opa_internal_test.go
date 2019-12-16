@@ -99,18 +99,19 @@ func BenchmarkInitPartialResult(b *testing.B) {
 var parsedResult *ast.Module
 
 // Q: What takes longer: parsing the module or compiling it?
-
 func BenchmarkCompareParseCompile(b *testing.B) {
-	policy := MustAsset("policy/authz.rego")
+	// use common.rego since it has no dependencies on other policies
+	// that could cause errors when parsed individually
+	policy := MustAsset("policy/common.rego")
 	compiler := ast.NewCompiler()
-	parsed, err := ast.ParseModule("authz.rego", string(policy))
+	parsed, err := ast.ParseModule("common.rego", string(policy))
 	if err != nil {
 		b.Fatal(err)
 	}
 
 	b.Run("parsing", func(b *testing.B) {
 		for n := 0; n < b.N; n++ {
-			parsed, err = ast.ParseModule("authz.rego", string(policy))
+			parsed, err = ast.ParseModule("common.rego", string(policy))
 			if err != nil {
 				b.Error(err)
 			}
@@ -120,7 +121,7 @@ func BenchmarkCompareParseCompile(b *testing.B) {
 
 	b.Run("compiling", func(b *testing.B) {
 		for n := 0; n < b.N; n++ {
-			compiler.Compile(map[string]*ast.Module{"authz.rego": parsed})
+			compiler.Compile(map[string]*ast.Module{"common.rego": parsed})
 			if compiler.Failed() {
 				b.Error(compiler.Errors)
 			}
@@ -130,11 +131,11 @@ func BenchmarkCompareParseCompile(b *testing.B) {
 	// consistency check
 	b.Run("parse and compile", func(b *testing.B) {
 		for n := 0; n < b.N; n++ {
-			parsed, err = ast.ParseModule("authz.rego", string(policy))
+			parsed, err = ast.ParseModule("common.rego", string(policy))
 			if err != nil {
 				b.Error(err)
 			}
-			compiler.Compile(map[string]*ast.Module{"authz.rego": parsed})
+			compiler.Compile(map[string]*ast.Module{"common.rego": parsed})
 			if compiler.Failed() {
 				b.Error(compiler.Errors)
 			}
@@ -143,10 +144,11 @@ func BenchmarkCompareParseCompile(b *testing.B) {
 	})
 }
 
+// 12/16/19
 // A: parsing is worse:
-// BenchmarkCompareParseCompile/parsing-8           100	  14742148 ns/op	 4060407 B/op	  119417 allocs/op
-// BenchmarkCompareParseCompile/compiling-8         200	  12774183 ns/op	 2148726 B/op	  112140 allocs/op
-// BenchmarkCompareParseCompile/parse_and_compile-8  50	  34038622 ns/op	 6883385 B/op	  272642 allocs/op
+// BenchmarkCompareParseCompile/parsing-8         	      81	 12621483 ns/op	  3337407 B/op	   89061 allocs/op
+// BenchmarkCompareParseCompile/compiling-8       	     100	 72790901 ns/op	 16207173 B/op	  492357 allocs/op
+// BenchmarkCompareParseCompile/parse_and_compile-8        7	202261213 ns/op	 42453570 B/op	 1342861 allocs/op
 
 func BenchmarkInitPartialResultWithPolicies(b *testing.B) {
 	ctx := context.Background()
