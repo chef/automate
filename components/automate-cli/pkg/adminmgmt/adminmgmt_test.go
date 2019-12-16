@@ -20,8 +20,8 @@ import (
 	users_resp "github.com/chef/automate/components/automate-gateway/api/auth/users/response"
 	authz_req "github.com/chef/automate/components/automate-gateway/api/authz/request"
 	authz_resp "github.com/chef/automate/components/automate-gateway/api/authz/response"
-	policies_req "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request"
-	policies_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/response"
+	policies_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
+	policies_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 )
 
 func TestCreateAdminUserOrUpdatePassword(t *testing.T) {
