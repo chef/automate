@@ -66,7 +66,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   private selectedStatus$: Observable<string>;
 
   // The collection of allowable status
-  private allowedStatus = ['ok', 'critical', 'warning', 'unknown'];
+  private allowedStatus = ['ok', 'critical', 'warning', 'unknown', 'disconnected'];
 
   // Has this component been destroyed
   private isDestroyed: Subject<boolean> = new Subject();
@@ -429,15 +429,15 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
   public statusFilter(status: string): void {
     const queryParams = {...this.route.snapshot.queryParams};
+
+    delete queryParams['status'];
+    delete queryParams['page'];
+
     if ( includes(status, this.allowedStatus) ) {
       queryParams['status'] = [status];
       this.telemetryService.track('applicationsStatusFilter',
         { entity: 'serviceGroup', statusFilter: status});
-    } else {
-      delete queryParams['status'];
     }
-
-    delete queryParams['page'];
 
     this.router.navigate([], {queryParams});
   }
