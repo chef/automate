@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -11,7 +11,7 @@ import { routeParams } from 'app/route.selectors';
 import { HttpStatus } from 'app/types/types';
 import { IdMapper } from 'app/helpers/auth/id-mapper';
 import { Regex } from 'app/helpers/auth/regex';
-import { EntityStatus, pending } from 'app/entities/entities';
+import { EntityStatus } from 'app/entities/entities';
 import {
   Rule, RuleTypeMappedObject, Condition, ConditionOperator, isConditionOperator, KVPair
 } from 'app/entities/rules/rule.model';
@@ -55,9 +55,8 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   // Whether the edit ID form is open or not.
   public modifyID = false;
-  public conflictError = false;
   // This element assumes 'id' is the only create field that can conflict.
-  private conflictErrorEvent = new EventEmitter<boolean>();
+  public conflictError = false;
 
   public operators: KVCondition[] = [
     {
@@ -87,13 +86,6 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
     }
 
   ngOnInit(): void {
-    this.conflictErrorEvent.pipe(takeUntil(this.isDestroyed))
-    .subscribe((isConflict: boolean) => {
-      this.conflictError = isConflict;
-      // Open the ID input on conflict so user can resolve it.
-      this.modifyID = true;
-    });
-
     this.isLoading$ = combineLatest([
       this.store.select(getStatus),
       this.store.select(updateStatus),
@@ -149,33 +141,30 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
         this.attributes = attributes;
       });
 
-    // handle rule creation/update success
-    combineLatest([
-      this.store.select(createStatus),
-      this.store.select(updateStatus)
-    ]).pipe(
+    this.store.select(createStatus).pipe(
       takeUntil(this.isDestroyed),
-      filter(([cStatus, uStatus]) => this.saving && (!pending(cStatus) || !pending(uStatus))))
-      .subscribe(([cStatus, uStatus]) => {
-        this.saving = false;
-        if (cStatus === EntityStatus.loadingSuccess || uStatus === EntityStatus.loadingSuccess) {
-          this.closePage();
-        }
-      });
+      filter(status => this.saving && status === EntityStatus.loadingSuccess))
+      .subscribe(() => this.closePage());
 
-    // handle rule creation failure
+    this.store.select(updateStatus).pipe(
+      takeUntil(this.isDestroyed),
+      filter(status => this.saving && status === EntityStatus.loadingSuccess))
+      .subscribe(() => this.closePage());
+
     combineLatest([
       this.store.select(createStatus),
       this.store.select(createError)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      filter(([state, error]) =>
+        this.saving && state === EntityStatus.loadingFailure && !isNil(error)))
       .subscribe(([_, error]) => {
         if (error.status === HttpStatus.CONFLICT) {
-          this.conflictErrorEvent.emit(true);
+          this.conflictError = true; // show error
+          this.modifyID = true; // Open the ID input so user can resolve it.
+          this.saving = false; // reset button
         } else {
-          // close modal on any error other than conflict and display in banner
-          this.closePage();
+          this.closePage(); // close on any other error and display in banner
         }
       });
 

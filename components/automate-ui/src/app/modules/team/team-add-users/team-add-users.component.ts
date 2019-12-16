@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { combineLatest, Subject, Observable } from 'rxjs';
-import { keyBy, at, isNil } from 'lodash/fp';
+import { keyBy, at } from 'lodash/fp';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { filter as lodashFilter } from 'lodash/fp';
 
@@ -19,8 +19,7 @@ import {
   v2TeamFromRoute,
   teamUsers,
   addUsersStatus,
-  getUsersStatus as getTeamUsersStatus,
-  addUsersStatusError as addTeamUsersStatusError
+  getUsersStatus as getTeamUsersStatus
 } from 'app/entities/teams/team.selectors';
 import { Team } from 'app/entities/teams/team.model';
 import {
@@ -112,36 +111,15 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
       this.mapOfUsersToFilter = userArrayToHash(membershipUsers);
     });
 
-    // handle user addition success response
     this.store.pipe(
       select(addUsersStatus),
       takeUntil(this.isDestroyed),
       filter(state => this.addingUsers && !pending(state)))
-      .subscribe((state) => {
-        if (state === EntityStatus.loadingSuccess) {
+      .subscribe(() => {
           this.addingUsers = false;
           this.closePage();
-        }
     });
-
-    // handle user addition failure response
-    combineLatest([
-      this.store.select(addUsersStatus),
-      this.store.select(addTeamUsersStatusError)
-    ]).pipe(
-      takeUntil(this.isDestroyed),
-      filter(() => this.addingUsers),
-      filter(([state, resp]) => state === EntityStatus.loadingFailure && !isNil(resp)))
-      .subscribe(([_, resp]) => {
-        this.addingUsers = false;
-        if (resp.error.message === undefined) {
-          this.addUsersFailed = 'An error occurred while attempting ' +
-          'to add users. Please try again.';
-        } else {
-          this.addUsersFailed = `Failed to add users: ${resp.error.message}`;
-        }
-      });
-  }
+ }
 
   ngOnDestroy() {
     this.isDestroyed.next(true);

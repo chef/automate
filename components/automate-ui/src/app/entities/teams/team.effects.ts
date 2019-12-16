@@ -230,6 +230,15 @@ export class TeamEffects {
     }));
 
   @Effect()
+  addTeamUsersFailure$ = this.actions$.pipe(
+    ofType(TeamActionTypes.ADD_USERS_FAILURE),
+    map(({ payload: { error } }: AddTeamUsersFailure) =>
+      new CreateNotification({
+        type: Type.error,
+        message: `Could not add users to team: ${error.error || error}.`
+      })));
+
+  @Effect()
   removeTeamUsers$ = combineLatest([
     this.actions$.pipe(ofType<RemoveTeamUsers>(TeamActionTypes.REMOVE_USERS)),
     this.store$.select(iamMajorVersion).pipe(filter(identity))])
