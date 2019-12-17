@@ -14,20 +14,20 @@
       <section *ngIf="isIAMv2$ | async" class="page-body">
         <ng-container *ngIf="(sortedProjects$ | async)?.length > 0">
           <chef-toolbar>
-            <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
+            <app-authorized [allOf]="['/iam/v2/projects', 'post']">
               <chef-button data-cy="create-project" primary (click)="openCreateModal()">Create Project</chef-button>
             </app-authorized>
-            <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'post']">
+            <app-authorized [allOf]="['/iam/v2/apply-rules', 'post']">
               <chef-button secondary [disabled]="isDisabled()"
                 id="update-start-button" (click)="openConfirmUpdateStartModal()">{{ getButtonText() }}</chef-button>
             </app-authorized>
-            <app-authorized [allOf]="['/iam/v2beta/apply-rules', 'delete']">
+            <app-authorized [allOf]="['/iam/v2/apply-rules', 'delete']">
               <chef-button *ngIf="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running"
                 [disabled]="cancelRulesInProgress"
                 tertiary id="update-stop-button" (click)="openConfirmUpdateStopModal()">Stop Updating Projects</chef-button>
             </app-authorized>
           </chef-toolbar>
-          <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
+          <app-authorized [allOf]="['/iam/v2/projects', 'get']">
             <chef-table-new>
               <chef-table-header>
                 <chef-table-row>
@@ -45,7 +45,7 @@
                   <chef-table-cell>{{ project.id }}</chef-table-cell>
                   <chef-table-cell>{{ statusLabel[project.status] }}</chef-table-cell>
                   <chef-table-cell class="three-dot-column">
-                    <!-- <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]"> -->
+                    <!-- <app-authorized [allOf]="['/iam/v2/projects/{id}', 'delete', project.id]"> -->
                       <chef-control-menu>
                         <chef-option (click)="startProjectDelete(project)" data-cy="delete-project">Delete Project</chef-option>
                       </chef-control-menu>
@@ -57,7 +57,7 @@
           </app-authorized>
         </ng-container>
         <ng-container *ngIf="(sortedProjects$ | async)?.length === 0">
-          <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
+          <app-authorized [allOf]="['/iam/v2/projects', 'post']">
             <div class="empty-case-container">
               <p>Create the first project to get started!</p>
             </div>
@@ -65,7 +65,7 @@
                 <chef-button primary data-cy="create-project" (click)="openCreateModal()">Create Project</chef-button>
             </div>
           </app-authorized>
-          <app-authorized not [allOf]="['/iam/v2beta/projects', 'post']">
+          <app-authorized not [allOf]="['/iam/v2/projects', 'post']">
             <div class="empty-case-container">
               <p>It looks like no one has created any projects yet or you<br/>
                 don't have permission to view them.<br/><br/>
