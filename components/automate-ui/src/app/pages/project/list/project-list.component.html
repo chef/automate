@@ -92,7 +92,6 @@
         [visible]="deleteModalVisible"
         objectNoun="project"
         [objectName]="projectToDelete?.id"
-        [errorText]="deleteErrorMessage"
         (close)="closeDeleteModal()"
         (deleteClicked)="deleteProject()"
         objectAction="Delete">
