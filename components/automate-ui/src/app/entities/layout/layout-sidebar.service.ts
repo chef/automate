@@ -56,7 +56,7 @@ export class LayoutSidebarService {
                 {
                     name: 'Service Groups',
                     icon: 'group_work',
-                    route: '/applications',
+                    route: '/applications/service-groups',
                     visible: true
                 },
                 {

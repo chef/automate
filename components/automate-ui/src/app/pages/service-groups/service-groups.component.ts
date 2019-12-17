@@ -19,8 +19,7 @@ import {
   ServiceGroup,
   ServiceGroupsFilters,
   FieldDirection,
-  ServiceGroupsHealthSummary,
-  GroupServicesFilters
+  ServiceGroupsHealthSummary
 } from '../../entities/service-groups/service-groups.model';
 import {
   serviceGroupsStatus,
@@ -211,39 +210,33 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       withLatestFrom(this.route.queryParamMap),
       takeUntil(this.isDestroyed)
     )
-    .subscribe(([serviceGroups, queryParams]) => {
+    .subscribe(([serviceGroups, _]) => {
       if (serviceGroups.length > 0) {
-        // if we do not have an sgId parameter, pick the first sgId from the
-        // service group list and load it:
-        const sgId = queryParams.get('sgId');
-        if ( !sgId ) {
-          this.router.navigate(
-            [],
-            { queryParams: { sgId: serviceGroups[0]['id'] }, queryParamsHandling: 'merge' }
-          );
+        // if we do not have a selected service group, pick the first sgId from
+        // the service group list
+        if ( !this.selectedServiceGroupId ) {
+          this.selectedServiceGroupId = serviceGroups[0].id;
         }
 
         // if the selected service group is not visible on the page, then pick
-        // the first service group from the list and navigate to it. this lets
-        // us maintain a service group selection regardless of other navigation
-        // as long as the service group is still in the list.
-        const selectedSGVisibleOnPage = serviceGroups.find(sg => sg.id === sgId);
+        // the first service group from the list. this lets us maintain a
+        // service group selection regardless of other navigation as long as
+        // the service group is still in the list.
+        const selectedSGVisibleOnPage = serviceGroups.find(sg => {
+          return sg.id === this.selectedServiceGroupId;
+        });
         if ( !selectedSGVisibleOnPage ) {
-          this.onServiceGroupSelect(null, serviceGroups[0].id);
+          this.selectedServiceGroupId = serviceGroups[0].id;
         }
 
-        // Times when we should render the content in the sidebar:
-        // * when the page is first loaded and we have sgId in the original URL
-        // * when the sgId changes (including from null->some-value)
-        // * when a filter is applied that changes the content
-        // This subscribe will fire for all of those cases so we can render the
-        // sidebar here.
-        this.detailParamsChange(queryParams);
+        // The sidebar content needs to be rendered on the initial page load
+        // and also when filters are applied that change the service groups
+        // content.
+        this.refreshServicesSidebar();
       } else {
         this.selectedServiceGroupId = null;
       }
     });
-
 
     // If the user applies a filter via the filter bar or the *service group*
     // status filters that filters out all of the services in the
@@ -346,18 +339,13 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     }, []);
   }
 
-  detailParamsChange(queryParams) {
-    const sgId = queryParams.get('sgId');
-    if (sgId) {
-      const servicesFilters: GroupServicesFilters = {
-        service_group_id: sgId,
-        page: parseInt(queryParams.get('sgPage'), 10) || 1,
-        pageSize: parseInt(queryParams.get('sgPageSize'), 10) || 25,
-        health: queryParams.get('sgStatus') || 'total',
+  refreshServicesSidebar() {
+    if (this.selectedServiceGroupId) {
+      this.store.dispatch(new UpdateSelectedSG({
+        service_group_id: this.selectedServiceGroupId,
         searchBar: this.selectedSearchBarFilters
-      };
-
-      this.updateServicesSidebar(servicesFilters);
+      }));
+      document.querySelector<HTMLElement>('app-services-sidebar').focus();
     }
   }
 
@@ -457,17 +445,9 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public onServiceGroupSelect(event: Event, id: string): void {
     if (event) { event.preventDefault(); }
 
-    const queryParams = { ...this.route.snapshot.queryParams };
-    queryParams['sgId'] = id;
-    delete queryParams['sgPage'];
-    delete queryParams['sgStatus'];
-    this.router.navigate([], { queryParams });
-  }
+    this.selectedServiceGroupId = id;
 
-  public updateServicesSidebar(servicesFilters: GroupServicesFilters): void {
-    this.selectedServiceGroupId = servicesFilters.service_group_id;
-    this.store.dispatch(new UpdateSelectedSG(servicesFilters));
-    document.querySelector<HTMLElement>('app-services-sidebar').focus();
+    this.refreshServicesSidebar();
   }
 
   // TODO @afiune: Add links when they work
@@ -502,10 +482,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       delete queryParams['page'];
     }
 
-    delete queryParams['sgId'];
-    delete queryParams['sgPage'];
-    delete queryParams['sgStatus'];
-
     this.router.navigate([], { queryParams });
   }
 
@@ -528,10 +504,6 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
         sortField: [field], sortDirection: [fieldDirection]};
 
       delete queryParams['page'];
-      delete queryParams['sgId'];
-      delete queryParams['sgPage'];
-      delete queryParams['sgStatus'];
-
       this.router.navigate([], {queryParams});
     }
   }

@@ -75,11 +75,11 @@ export interface GroupService {
 }
 
 export interface GroupServicesFilters {
-  service_group_id?: string;
+  service_group_id: string;
   health?: string;
   page?: number;
   pageSize?: number;
-  searchBar?: Array<Chicklet>;
+  searchBar: Array<Chicklet>;
 }
 
 export interface GroupServicesPayload {

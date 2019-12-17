@@ -1,6 +1,8 @@
 import { Component, OnDestroy, OnInit, Input } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Observable, Subject } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { takeUntil } from 'rxjs/operators';
 import { getOr } from 'lodash/fp';
 
@@ -11,6 +13,7 @@ import {
   GroupService,
   GroupServicesFilters
 } from '../../entities/service-groups/service-groups.model';
+import { UpdateSelectedSG } from 'app/entities/service-groups/service-groups.actions';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { DateTime } from 'app/helpers/datetime/datetime';
 
@@ -29,6 +32,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public pageSize = 25;
   public totalServices = 0;
   public RFC2822 = DateTime.RFC2822;
+  public selectedSearchBarFilters = [];
 
   public services$: Observable<GroupService[]>;
   public serviceGroupsStatus$: Observable<EntityStatus>;
@@ -42,7 +46,8 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
 
   constructor(
     private serviceGroupsFacade: ServiceGroupsFacadeService,
-    private telemetryService: TelemetryService
+    private telemetryService: TelemetryService,
+    public store: Store<NgrxStateAtom>
   ) {
     this.services$ = this.serviceGroupsFacade.services$;
     this.serviceGroupsStatus$ = this.serviceGroupsFacade.serviceGroupsStatus$;
@@ -68,6 +73,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
       this.selectedHealth = getOr('total', 'health', servicesFilters);
       this.currentPage    = getOr(1, 'page', servicesFilters);
       this.totalServices  = getOr(0, this.selectedHealth, this.serviceGroupsHealthSummary);
+      this.selectedSearchBarFilters = getOr([], 'searchBar', servicesFilters);
       this.telemetryService.track('applicationsServiceCount', {
          serviceGroupsId: this.serviceGroupsId,
          totalServices: this.totalServices,
@@ -85,15 +91,30 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     this.currentPage = 1;
     this.selectedHealth = this.serviceGroupsFacade
       .updateHealthFilter(health, 'applicationsStatusFilter');
-    this.serviceGroupsFacade
-      .updateServicesFilters(health, this.currentPage);
+    this.refresh();
   }
 
   public updatePageNumber(pageNumber: number) {
     this.currentPage = pageNumber;
     this.serviceGroupsFacade
       .updatePageNumber(pageNumber, this.totalServices, this.currentPage, 'applicationsPageChange');
-    this.serviceGroupsFacade
-      .updateServicesFilters(this.selectedHealth, this.currentPage);
+    this.refresh();
   }
+
+  refresh() {
+    if (this.serviceGroupsId) {
+
+      const paramsForDispatch: GroupServicesFilters = {
+          service_group_id: this.serviceGroupsId,
+          page: this.currentPage,
+          pageSize: this.pageSize,
+          health: this.selectedHealth,
+          searchBar: this.selectedSearchBarFilters
+      };
+
+      this.store.dispatch(new UpdateSelectedSG(paramsForDispatch));
+      document.querySelector<HTMLElement>('app-services-sidebar').focus();
+    }
+  }
+
 }
