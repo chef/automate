@@ -300,6 +300,8 @@ message ProfileList {
 	int32 passed = 7;
 	// Total number of skipped nodes that executed the profile.
 	int32 skipped = 8;
+	// Total number of waived nodes that executed the profile.
+	int32 waived = 9;
 
 }
 
