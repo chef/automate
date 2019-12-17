@@ -209,6 +209,8 @@ message ControlsSummary {
 	int32 passed = 5;
 	// The total number of skipped controls in the reports.
 	int32 skipped = 6;
+	// The total number of waived controls in the reports.
+	int32 waived = 7;
 }
 
 // Statistics about the nodes scanned in the compliance reports.
@@ -225,6 +227,8 @@ message NodeSummary {
 	int32 medium_risk = 5;
 	// The total number of nodes that failed their compliance scan with one or more control of minor impact.
 	int32 low_risk = 6;
+	// The total number of nodes with a waived compliance scan.
+	int32 waived = 7;
 }
 
 // General statistics about the reports.
