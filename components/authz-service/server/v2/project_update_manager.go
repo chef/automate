@@ -284,20 +284,28 @@ func (w *workflowInstance) PercentageComplete() float64 {
 		return 1.0
 	}
 
-	domainEstimates := w.collectAllDomainServiceEstimates()
-	if len(domainEstimates) == 0 {
+	domainJobStatuses := w.collectAllDomainServiceJobStatuses()
+	if len(domainJobStatuses) == 0 {
 		return 1.0
 	}
 
-	longestDomainEstimate := findLongestEstimate(domainEstimates)
+	longestDomainJobStatus := project_update_tags.FindSlowestJobStatus(domainJobStatuses)
 
-	return float64(longestDomainEstimate.percentage)
+	return float64(longestDomainJobStatus.PercentageComplete)
 }
 
 func (w *workflowInstance) EstimatedTimeComplete() time.Time {
-	longestDomainEstimate := findLongestEstimate(w.collectAllDomainServiceEstimates())
+	longestDomainJobStatus := project_update_tags.FindSlowestJobStatus(
+		w.collectAllDomainServiceJobStatuses())
 
-	return longestDomainEstimate.time
+	longestDomainTimeEstimate := time.Unix(longestDomainJobStatus.EstimatedEndTimeInSec, 0)
+
+	// If the estimated time is before now return the null time. 
+	if longestDomainTimeEstimate.Before(time.Now()) {
+		return time.Time{}
+	}
+
+	return longestDomainTimeEstimate
 }
 
 func (w *workflowInstance) State() ProjectUpdateState {
@@ -382,32 +390,14 @@ func (m *CerealProjectUpdateManager) Status() (ProjectUpdateStatus, error) {
 	return projectUpdateInstance, nil
 }
 
-// Find the longest in the future estimate
-func findLongestEstimate(estimates []domainEstimate) domainEstimate {
-	now := time.Now()
-	longestEstimatedEstimate := domainEstimate{}
-	for _, estimate := range estimates {
-		if estimate.time.After(now) && estimate.time.After(longestEstimatedEstimate.time) {
-			longestEstimatedEstimate = estimate
-		}
-	}
-
-	return longestEstimatedEstimate
-}
-
-type domainEstimate struct {
-	time time.Time
-	percentage float32
-}
-
-func (w *workflowInstance) collectAllDomainServiceEstimates() []domainEstimate {
-	estimates := make([]domainEstimate, 0)
+func (w *workflowInstance) collectAllDomainServiceJobStatuses() []project_update_tags.JobStatus {
+	jobStatuses := make([]project_update_tags.JobStatus, 0)
 	if !w.IsRunning() {
-		return estimates
+		return jobStatuses
 	}
 	domainServicesUpdateInstance, err := w.GetUpdateDomainServicesInstance()
 	if err != nil {
-		return estimates
+		return jobStatuses
 	}
 
 	for _, d := range domainServicesUpdateInstance.ListSubWorkflows() {
@@ -422,13 +412,9 @@ func (w *workflowInstance) collectAllDomainServiceEstimates() []domainEstimate {
 				logrus.WithError(err).Errorf("failed to get payload for %q", d)
 				continue
 			}
-			estimate:= domainEstimate{
-				time: time.Unix(payload.MergedJobStatus.EstimatedEndTimeInSec, 0),
-				percentage: payload.MergedJobStatus.PercentageComplete,
-			}
-			estimates = append(estimates, estimate)
+			jobStatuses = append(jobStatuses, payload.MergedJobStatus)
 		}
 	}
 
-	return estimates
+	return jobStatuses
 }
