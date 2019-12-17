@@ -1,6 +1,7 @@
 chef-status-filter-group {
   --active-color: var(--toggle-active-color, var(--chef-primary-bright));
   display: flex;
+  flex-wrap: wrap;
 
   .filter {
     padding: 8px 12px;
@@ -10,10 +11,10 @@ chef-status-filter-group {
     border-radius: 4px;
     font-size: 14px;
     display: inline-flex;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
 
     &:not(:last-child) {
-      margin-right: 16px;
+      margin-right: 10px;
     }
 
     .option-content {
@@ -78,7 +79,6 @@ chef-status-filter-group {
         display: block;
         width: 14px;
         height: 14px;
-        //margin-right: 1em;
         background: url(/assets/icon-disconnected.svg);
         background-size: contain;
       }
