@@ -51,6 +51,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     'organization',
     'platform_with_version',
     'policy_group',
+    'policy_name',
     'profile_id',
     'profile_with_version',
     'profile_name',
