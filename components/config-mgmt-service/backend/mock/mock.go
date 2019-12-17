@@ -155,7 +155,7 @@ func (m Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 	return nodes, nil
 }
 
-func (m Backend) GetNodesPageByCurser(context.Context, time.Time,
+func (m Backend) GetNodesPageByCursor(context.Context, time.Time,
 	time.Time, map[string][]string, interface{},
 	string, int, string, bool) ([]backend.Node, error) {
 	var nodes []backend.Node
@@ -165,7 +165,7 @@ func (m Backend) GetNodesPageByCurser(context.Context, time.Time,
 	return nodes, nil
 }
 
-func (m Backend) GetRunsPageByCurser(context.Context, string, time.Time,
+func (m Backend) GetRunsPageByCursor(context.Context, string, time.Time,
 	time.Time, map[string][]string, time.Time,
 	string, int, bool) ([]backend.Run, error) {
 	var runs []backend.Run

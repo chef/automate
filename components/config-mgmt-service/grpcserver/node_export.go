@@ -98,7 +98,7 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 	pageSize := 100
 	start := time.Time{}
 	end := time.Time{}
-	var cursorField interface{}
+	var cursorValue interface{}
 	cursorID := ""
 	sortField, sortAsc := request.Sorting.GetParameters()
 	nodeFilters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
@@ -117,14 +117,10 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 	// even after the node no longer exists
 	nodeFilters["exists"] = []string{"true"}
 
-	if sortField == "" {
-		sortField = backend.CheckIn
-	} else {
-		sortField = params.ConvertParamToNodeRunBackend(sortField)
-	}
+	actualSortField := params.ConvertParamToNodeStateBackendLowerFilter(sortField)
 
-	nodes, err := s.client.GetNodesPageByCurser(ctx, start, end,
-		nodeFilters, cursorField, cursorID, pageSize, sortField, sortAsc)
+	nodes, err := s.client.GetNodesPageByCursor(ctx, start, end,
+		nodeFilters, cursorValue, cursorID, pageSize, actualSortField, sortAsc)
 	if err != nil {
 		return status.Errorf(codes.Internal, err.Error())
 	}
@@ -137,13 +133,13 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 
 		lastNode := nodes[len(nodes)-1]
 		cursorID = lastNode.EntityUuid
-		cursorField, err = backend.GetSortableFieldValue(sortField, lastNode)
+		cursorValue, err = backend.GetSortableFieldValue(sortField, lastNode)
 		if err != nil {
 			return err
 		}
 
-		nodes, err = s.client.GetNodesPageByCurser(ctx, start, end,
-			nodeFilters, cursorField, cursorID, pageSize, sortField, sortAsc)
+		nodes, err = s.client.GetNodesPageByCursor(ctx, start, end,
+			nodeFilters, cursorValue, cursorID, pageSize, actualSortField, sortAsc)
 		if err != nil {
 			return status.Errorf(codes.Internal, err.Error())
 		}

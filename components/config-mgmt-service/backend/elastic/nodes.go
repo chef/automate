@@ -55,7 +55,7 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 
 	mainQuery := newBoolQueryFromFilters(filters)
 
-	rangeQuery, ok := newRangeQueryTime(start, end, CheckinTimestamp)
+	rangeQuery, ok := newRangeQueryTime(start, end, backend.CheckIn)
 
 	if ok {
 		mainQuery = mainQuery.Must(rangeQuery)
@@ -67,7 +67,7 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 		Query(mainQuery).
 		Index(IndexNodeState).
 		Size(pageSize).
-		Sort(CheckinTimestamp, ascending).
+		Sort(backend.CheckIn, ascending).
 		Sort(NodeFieldID, ascending).
 		FetchSourceContext(fetchSource)
 
@@ -100,18 +100,18 @@ func (es Backend) GetInventoryNodes(ctx context.Context, start time.Time,
 	return nodes, nil
 }
 
-func (es Backend) GetNodesPageByCurser(ctx context.Context, start time.Time,
-	end time.Time, filters map[string][]string, cursorField interface{},
+func (es Backend) GetNodesPageByCursor(ctx context.Context, start time.Time,
+	end time.Time, filters map[string][]string, cursorValue interface{},
 	cursorID string, pageSize int, sortField string,
 	ascending bool) ([]backend.Node, error) {
 
 	mainQuery := newBoolQueryFromFilters(filters)
 
 	if sortField == "" {
-		sortField = CheckinTimestamp
+		sortField = backend.CheckIn
 	}
 
-	rangeQuery, ok := newRangeQueryTime(start, end, CheckinTimestamp)
+	rangeQuery, ok := newRangeQueryTime(start, end, backend.CheckIn)
 
 	if ok {
 		mainQuery = mainQuery.Must(rangeQuery)
@@ -124,8 +124,8 @@ func (es Backend) GetNodesPageByCurser(ctx context.Context, start time.Time,
 		Sort(sortField, ascending).
 		Sort(NodeFieldID, ascending)
 
-	if cursorField != nil && cursorID != "" {
-		switch v := cursorField.(type) {
+	if cursorValue != nil && cursorID != "" {
+		switch v := cursorValue.(type) {
 		case time.Time:
 			// the date has to be in milliseconds
 			milliseconds := v.UnixNano() / int64(time.Millisecond)
@@ -135,7 +135,7 @@ func (es Backend) GetNodesPageByCurser(ctx context.Context, start time.Time,
 			lower := strings.ToLower(v)
 			searchService = searchService.SearchAfter(lower, cursorID)
 		default:
-			searchService = searchService.SearchAfter(cursorField, cursorID)
+			searchService = searchService.SearchAfter(cursorValue, cursorID)
 		}
 	}
 

@@ -158,7 +158,7 @@ func (es Backend) GetRuns(nodeID string, page int, perPage int, filters map[stri
 	return runs, nil
 }
 
-func (es Backend) GetRunsPageByCurser(ctx context.Context, nodeID string, start time.Time,
+func (es Backend) GetRunsPageByCursor(ctx context.Context, nodeID string, start time.Time,
 	end time.Time, filters map[string][]string, cursorEndTime time.Time,
 	cursorID string, pageSize int, ascending bool) ([]backend.Run, error) {
 
