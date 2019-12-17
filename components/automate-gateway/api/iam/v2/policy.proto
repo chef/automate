@@ -73,7 +73,6 @@ service Policies {
         body: "*"
       }
     };
-    option (google.api.http).body = "*";
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
@@ -92,7 +91,6 @@ service Policies {
     option (chef.automate.api.iam.policy).action = "iam:policies:get";
     };
   rpc ListPolicyMembers (ListPolicyMembersReq) returns (ListPolicyMembersResp) {
-    option (google.api.http).get = "/iam/v2beta/policies/{id}/members";
     option (google.api.http) = {
       get: "/iam/v2/policies/{id}/members"
       additional_bindings {
