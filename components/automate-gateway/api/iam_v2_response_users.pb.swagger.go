@@ -1,10 +1,10 @@
 package api
 
 func init() {
-	Swagger.Add("iam_v2beta_request_teams", `{
+	Swagger.Add("iam_v2_response_users", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/iam/v2beta/request/teams.proto",
+    "title": "components/automate-gateway/api/iam/v2/response/users.proto",
     "version": "version not set"
   },
   "consumes": [

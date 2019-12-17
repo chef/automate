@@ -1,10 +1,10 @@
 package api
 
 func init() {
-	Swagger.Add("iam_v2beta_response_policy", `{
+	Swagger.Add("iam_v2_response_rules", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/iam/v2beta/response/policy.proto",
+    "title": "components/automate-gateway/api/iam/v2/response/rules.proto",
     "version": "version not set"
   },
   "consumes": [

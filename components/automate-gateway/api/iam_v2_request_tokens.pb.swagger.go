@@ -1,10 +1,10 @@
 package api
 
 func init() {
-	Swagger.Add("iam_v2beta_common_policy", `{
+	Swagger.Add("iam_v2_request_tokens", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/iam/v2beta/common/policy.proto",
+    "title": "components/automate-gateway/api/iam/v2/request/tokens.proto",
     "version": "version not set"
   },
   "consumes": [

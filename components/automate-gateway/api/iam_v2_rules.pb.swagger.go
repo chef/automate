@@ -1,4 +1,7 @@
-{
+package api
+
+func init() {
+	Swagger.Add("iam_v2_rules", `{
   "swagger": "2.0",
   "info": {
     "title": "components/automate-gateway/api/iam/v2/rules.proto",
@@ -616,4 +619,6 @@
       }
     }
   }
+}
+`)
 }
