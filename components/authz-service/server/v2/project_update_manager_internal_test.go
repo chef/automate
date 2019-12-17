@@ -8,44 +8,44 @@ import (
 )
 
 func TestFindLongestEstimatedTimeEmpty(t *testing.T) {
-	estimateFound := findLongestEstimatedTime([]time.Time{})
+	estimateFound := findLongestEstimate([]domainEstimate{})
 
-	assert.True(t, estimateFound.IsZero())
+	assert.True(t, estimateFound.time.IsZero())
 }
 
 func TestFindLongestEstimatedTimeEstimatesInFuture(t *testing.T) {
-	estimates := make([]time.Time, 5)
+	estimates := make([]domainEstimate, 5)
 	for i := 0; i < 5; i++ {
-		estimates[i] = time.Now().Add(time.Hour * time.Duration(i))
+		estimates[i].time = time.Now().Add(time.Hour * time.Duration(i))
 	}
 
-	estimateFound := findLongestEstimatedTime(estimates)
+	estimateFound := findLongestEstimate(estimates)
 
 	assert.Equal(t, estimates[4], estimateFound)
 }
 
 func TestFindLongestEstimatedTimeEstimatesInPast(t *testing.T) {
-	estimates := make([]time.Time, 5)
+	estimates := make([]domainEstimate, 5)
 	for i := 0; i < 5; i++ {
-		estimates[i] = time.Now().Add(time.Hour * time.Duration(-1*i))
+		estimates[i].time = time.Now().Add(time.Hour * time.Duration(-1*i))
 	}
 
-	estimateFound := findLongestEstimatedTime(estimates)
+	estimateFound := findLongestEstimate(estimates)
 
-	assert.True(t, estimateFound.IsZero())
+	assert.True(t, estimateFound.time.IsZero())
 }
 
 func TestFindLongestEstimatedTimeEstimatesInPastAndFuture(t *testing.T) {
-	estimates := make([]time.Time, 10)
+	estimates := make([]domainEstimate, 10)
 	for i := 0; i < 5; i++ {
-		estimates[i] = time.Now().Add(time.Hour * time.Duration(-1*i))
+		estimates[i].time = time.Now().Add(time.Hour * time.Duration(-1*i))
 	}
 
 	for i := 5; i < 10; i++ {
-		estimates[i] = time.Now().Add(time.Hour * time.Duration(1*i))
+		estimates[i].time = time.Now().Add(time.Hour * time.Duration(1*i))
 	}
 
-	estimateFound := findLongestEstimatedTime(estimates)
+	estimateFound := findLongestEstimate(estimates)
 
 	assert.Equal(t, estimates[9], estimateFound)
 }
