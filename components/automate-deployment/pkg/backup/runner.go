@@ -712,8 +712,6 @@ func (r *Runner) restoreServices(ctx context.Context, desiredServices []*deploym
 			r.failf(err, "Timed out waiting for service %s to start", svc.Name())
 			return err
 		}
-
-		// TODO: Restore async operations
 	}
 
 	return nil

@@ -113,16 +113,12 @@ func (eh *EventHandler) formatMessage(ops []*api.DeployEvent_Backup_Operation) s
 		}
 	}
 	padding := maxOpLen + maxOpTypeLen
-	fmtStr := fmt.Sprintf("%%-%ds %%s %%-%ds \n", padding, padding+16)
+	fmtStr := fmt.Sprintf("%%-%ds %%%d.2f%%%%\n", padding, 6)
 
 	m := strings.Builder{}
 	m.WriteString(fmt.Sprintf("%s in progress\n\n", strings.Title(eh.opTypeToString(ops[0].Type))))
 	for _, o := range eh.sortOps(ops) {
-		m.WriteString(fmt.Sprintf(fmtStr,
-			o.Name,
-			fmt.Sprintf("(sync %.2f%%)", o.SyncProgress),
-			fmt.Sprintf("(async %.2f%%)", o.AsyncProgress),
-		))
+		m.WriteString(fmt.Sprintf(fmtStr, o.Name, o.SyncProgress))
 	}
 
 	return m.String()
