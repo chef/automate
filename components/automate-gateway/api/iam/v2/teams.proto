@@ -12,67 +12,116 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Teams {
   rpc ListTeams (ListTeamsReq) returns (ListTeamsResp) {
-    option (google.api.http).get = "/iam/v2beta/teams";
+    option (google.api.http) = {
+      get: "/iam/v2/teams"
+      additional_bindings {
+        get: "/iam/v2beta/teams"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:teams";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:teams";
     option (chef.automate.api.iam.policy).action = "iam:teams:list";
   };
   rpc GetTeam (GetTeamReq) returns (GetTeamResp) {
-    option (google.api.http).get = "/iam/v2beta/teams/{id}";
+    option (google.api.http) = {
+      get: "/iam/v2/teams/{id}"
+      additional_bindings {
+        get: "/iam/v2beta/teams/{id}"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
     option (chef.automate.api.iam.policy).action = "iam:teams:get";
   };
   rpc CreateTeam (CreateTeamReq) returns (CreateTeamResp) {
-    option (google.api.http).post = "/iam/v2beta/teams";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      post: "/iam/v2/teams"
+      body: "*"
+      additional_bindings {
+        post: "/iam/v2beta/teams",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:teams";
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:teams";
     option (chef.automate.api.iam.policy).action = "iam:teams:create";
   };
   rpc UpdateTeam (UpdateTeamReq) returns (UpdateTeamResp) {
-    option (google.api.http).put = "/iam/v2beta/teams/{id}";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      put: "/iam/v2/teams/{id}"
+      body: "*"
+      additional_bindings {
+        put: "/iam/v2beta/teams/{id}",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
     option (chef.automate.api.iam.policy).action = "iam:teams:update";
   };
   rpc DeleteTeam (DeleteTeamReq) returns (DeleteTeamResp) {
-    option (google.api.http).delete = "/iam/v2beta/teams/{id}";
+    option (google.api.http) = {
+      delete: "/iam/v2/teams/{id}"
+      additional_bindings {
+        delete: "/iam/v2beta/teams/{id}"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
     option (chef.automate.api.iam.policy).action = "iam:teams:delete";
   };
   rpc GetTeamMembership (GetTeamMembershipReq) returns (GetTeamMembershipResp) {
-    option (google.api.http).get = "/iam/v2beta/teams/{id}/users";
+    option (google.api.http) = {
+      get: "/iam/v2/teams/{id}/users"
+      additional_bindings {
+        get: "/iam/v2beta/teams/{id}/users"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:teams:{id}:users";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}:users";
     option (chef.automate.api.iam.policy).action = "iam:teamUsers:list";
   }
   rpc AddTeamMembers (AddTeamMembersReq) returns (AddTeamMembersResp) {
-    option (google.api.http).post = "/iam/v2beta/teams/{id}/users:add";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      post: "/iam/v2/teams/{id}/users:add"
+      body: "*"
+      additional_bindings {
+        post: "/iam/v2beta/teams/{id}/users:add",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
     option (chef.automate.api.iam.policy).action = "iam:teamUsers:create";
   };
   rpc RemoveTeamMembers (RemoveTeamMembersReq) returns (RemoveTeamMembersResp) {
-    option (google.api.http).post = "/iam/v2beta/teams/{id}/users:remove";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      post: "/iam/v2/teams/{id}/users:remove"
+      body: "*"
+      additional_bindings {
+        post: "/iam/v2beta/teams/{id}/users:remove",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:teams:{id}";
     option (chef.automate.api.iam.policy).action = "iam:teamUsers:delete";
   };
   rpc GetTeamsForMember (GetTeamsForMemberReq) returns (GetTeamsForMemberResp) {
-    option (google.api.http).get = "/iam/v2beta/users/{id}/teams";
+    option (google.api.http) = {
+      post: "/iam/v2/users/{id}/teams"
+      additional_bindings {
+        post: "/iam/v2beta/users/{id}/teams"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:users:{id}:teams";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}:teams";
@@ -81,7 +130,6 @@ service Teams {
   // Expose on GRPC API only so we don't expose this to the enduser.
   // Just want to be able to trigger this via automate-cli.
   rpc ApplyV2DataMigrations (ApplyV2DataMigrationsReq) returns (ApplyV2DataMigrationsResp) {
-    // TODO (tc): Are these correct? What do we wanna use here?
     option (chef.automate.api.policy).resource = "auth:teams";
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:teams";
