@@ -117,9 +117,9 @@ service Teams {
   };
   rpc GetTeamsForMember (GetTeamsForMemberReq) returns (GetTeamsForMemberResp) {
     option (google.api.http) = {
-      post: "/iam/v2/users/{id}/teams"
+      get: "/iam/v2/users/{id}/teams"
       additional_bindings {
-        post: "/iam/v2beta/users/{id}/teams"
+        get: "/iam/v2beta/users/{id}/teams"
       }
     };
     option (chef.automate.api.policy).resource = "auth:users:{id}:teams";

@@ -219,7 +219,7 @@ func init() {
       }
     },
     "/iam/v2/users/{id}/teams": {
-      "post": {
+      "get": {
         "operationId": "GetTeamsForMember",
         "responses": {
           "200": {
@@ -447,7 +447,7 @@ func init() {
       }
     },
     "/iam/v2beta/users/{id}/teams": {
-      "post": {
+      "get": {
         "operationId": "GetTeamsForMember2",
         "responses": {
           "200": {

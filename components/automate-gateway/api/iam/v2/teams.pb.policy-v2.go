@@ -107,7 +107,7 @@ func init() {
 		}
 		return ""
 	})
-	policyv2.MapMethodTo("/chef.automate.api.iam.v2.Teams/GetTeamsForMember", "iam:users:{id}:teams", "iam:userTeams:get", "POST", "/iam/v2/users/{id}/teams", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.iam.v2.Teams/GetTeamsForMember", "iam:users:{id}:teams", "iam:userTeams:get", "GET", "/iam/v2/users/{id}/teams", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.GetTeamsForMemberReq); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
