@@ -397,6 +397,8 @@ message ControlSummary {
 	Total skipped = 3;
 	// Intentionally blank.
 	Failed failed = 4;
+	// Intentionally blank.
+	Total  waived = 5;
 }
 
 message Reports {
@@ -668,6 +670,8 @@ message ProfileCounts {
 	int32 skipped = 3;
 	// The total number of passing nodes matching the filters.
 	int32 passed = 4;
+	// The total number of waived nodes matching the filters.
+	int32 waived = 5;
 }
 
 // Minimal representation of a profile.
