@@ -80,7 +80,7 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 	dataFeedPollTask := NewDataFeedPollTask(dataFeedConfig, cfgMgmtConn, complianceConn, db, manager)
 	dataFeedAggregateTask := NewDataFeedAggregateTask(dataFeedConfig, cfgMgmtConn, complianceConn, secretsConn, db)
 
-	err = manager.RegisterWorkflowExecutor(dataFeedWorkflowName, &DataFeedWorkflowExecutor{workflowName: dataFeedWorkflowName})
+	err = manager.RegisterWorkflowExecutor(dataFeedWorkflowName, &DataFeedWorkflowExecutor{workflowName: dataFeedWorkflowName, dataFeedConfig: dataFeedConfig, manager: manager})
 	if err != nil {
 		return err
 	}
@@ -106,19 +106,7 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		return err
 	}
 
-	var zeroTime time.Time
-	dataFeedTaskParams := DataFeedPollTaskParams{
-		FeedInterval:    dataFeedConfig.ServiceConfig.FeedInterval,
-		AssetPageSize:   dataFeedConfig.ServiceConfig.AssetPageSize,
-		ReportsPageSize: dataFeedConfig.ServiceConfig.ReportsPageSize,
-		NextFeedStart:   zeroTime,
-		NextFeedEnd:     zeroTime,
-	}
-
-	dataFeedWorkflowParams := DataFeedWorkflowParams{PollTaskParams: dataFeedTaskParams,
-		NodeBatchSize:    dataFeedConfig.ServiceConfig.NodeBatchSize,
-		UpdatedNodesOnly: dataFeedConfig.ServiceConfig.UpdatedNodesOnly,
-	}
+	dataFeedWorkflowParams := DataFeedWorkflowParams{}
 
 	err = manager.CreateWorkflowSchedule(context.Background(),
 		dataFeedScheduleName, dataFeedWorkflowName,

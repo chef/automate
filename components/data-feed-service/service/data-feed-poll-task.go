@@ -26,15 +26,14 @@ type DataFeedPollTask struct {
 	cfgMgmt   cfgmgmt.CfgMgmtClient
 	reporting reporting.ReportingServiceClient
 	db        *dao.DB
-	manager   *cereal.Manager
 }
 
 type DataFeedPollTaskParams struct {
 	AssetPageSize   int32
 	ReportsPageSize int32
 	FeedInterval    time.Duration
-	NextFeedStart   time.Time
-	NextFeedEnd     time.Time
+	FeedStart       time.Time
+	FeedEnd         time.Time
 }
 
 type DataFeedPollTaskResults struct {
@@ -55,12 +54,11 @@ func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grp
 		cfgMgmt:   cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
 		reporting: reporting.NewReportingServiceClient(complianceConn),
 		db:        db,
-		manager:   manager,
 	}
 }
 
 func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
-	params := DataFeedWorkflowParams{}
+	params := DataFeedPollTaskParams{}
 	err := task.GetParameters(&params)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse task parameters")
@@ -69,25 +67,11 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 		"params":    params,
 		"FeedStart": params.FeedStart,
 		"FeedEnd":   params.FeedEnd,
-		"NextStart": params.PollTaskParams.NextFeedStart,
-		"NextEnd":   params.PollTaskParams.NextFeedEnd,
 	}).Debug("DataFeedPollTask.Run()")
 
-	params.FeedStart, params.FeedEnd = d.getFeedTimes(params, time.Now())
-	params.PollTaskParams.NextFeedStart = params.FeedEnd
-	params.PollTaskParams.NextFeedEnd = params.FeedEnd.Add(params.PollTaskParams.FeedInterval)
-	taskResults := &DataFeedPollTaskResults{
-		FeedStart: params.FeedStart,
-		FeedEnd:   params.FeedEnd,
-	}
+	taskResults := &DataFeedPollTaskResults{}
 
-	// we must update the workflow params to ensure the nest schedule has the update interval times
-	err = d.manager.UpdateWorkflowScheduleByName(ctx, dataFeedScheduleName, dataFeedWorkflowName,
-		cereal.UpdateParameters(params),
-		cereal.UpdateEnabled(true))
-	if err != nil {
-		return taskResults, err
-	}
+	taskResults.FeedStart, taskResults.FeedEnd = d.getFeedTimes(params, time.Now())
 
 	destinations, err := d.db.ListDBDestinations()
 	if err != nil {
@@ -99,48 +83,47 @@ func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface
 		return taskResults, nil
 	}
 
-	nodeIDs, err := d.GetChangedNodes(ctx, params.PollTaskParams.AssetPageSize, params.FeedStart, params.FeedEnd)
+	nodeIDs, err := d.GetChangedNodes(ctx, params.AssetPageSize, taskResults.FeedStart, taskResults.FeedEnd)
 	log.Debugf("DataFeedPollTask found %v nodes", len(nodeIDs))
 	if err != nil {
 		return taskResults, err
 	}
-	params.NodeIDs = nodeIDs
 
-	d.listReports(ctx, params.PollTaskParams.AssetPageSize, params.FeedStart, params.FeedEnd, params.NodeIDs)
-	taskResults.NodeIDs = params.NodeIDs
+	d.listReports(ctx, params.ReportsPageSize, taskResults.FeedStart, taskResults.FeedEnd, nodeIDs)
+	taskResults.NodeIDs = nodeIDs
 
 	return taskResults, nil
 }
 
 // getFeedTimes determines the start and end times for the next interval to poll
 // It returns the updated feed start time and feed end time
-func (d *DataFeedPollTask) getFeedTimes(params DataFeedWorkflowParams, now time.Time) (time.Time, time.Time) {
+func (d *DataFeedPollTask) getFeedTimes(params DataFeedPollTaskParams, now time.Time) (time.Time, time.Time) {
 	/*
 	 * If automate has been down for a significant period of time a due schedule may already be enqueued
 	 * and not updated by the manager update call on data-feed-service startup.
 	 * In that case we need to determine if the next feed interval is stale and re-initialise it
 	 */
-	nextFeedStart := params.PollTaskParams.NextFeedStart
-	nextFeedEnd := params.PollTaskParams.NextFeedEnd
-	lag := now.Sub(params.PollTaskParams.NextFeedEnd).Minutes()
+	feedStart := params.FeedStart
+	feedEnd := params.FeedEnd
+	lag := now.Sub(params.FeedEnd).Minutes()
 	log.WithFields(log.Fields{
 		"lag":      lag,
-		"interval": params.PollTaskParams.FeedInterval.Minutes(),
+		"interval": params.FeedInterval.Minutes(),
 	}).Debug("Feed lag and interval")
-	if params.PollTaskParams.NextFeedStart.IsZero() || lag > params.PollTaskParams.FeedInterval.Minutes() {
-		nextFeedEnd = d.getFeedEndTime(params.PollTaskParams.FeedInterval, now)
-		nextFeedStart = nextFeedEnd.Add(-params.PollTaskParams.FeedInterval)
+	if params.FeedStart.IsZero() || lag > params.FeedInterval.Minutes() {
+		feedEnd = d.getFeedEndTime(params.FeedInterval, now)
+		feedStart = feedEnd.Add(-params.FeedInterval)
 		log.WithFields(log.Fields{
-			"start": nextFeedStart.Format("15:04:05"),
-			"end":   nextFeedEnd.Format("15:04:05"),
+			"start": feedStart.Format("15:04:05"),
+			"end":   feedEnd.Format("15:04:05"),
 		}).Debug("Initialise Feed interval")
 	} else {
 		log.WithFields(log.Fields{
-			"start": nextFeedStart.Format("15:04:05"),
-			"end":   nextFeedEnd.Format("15:04:05"),
+			"start": feedStart.Format("15:04:05"),
+			"end":   feedEnd.Format("15:04:05"),
 		}).Debug("Current Feed interval")
 	}
-	return nextFeedStart, nextFeedEnd
+	return feedStart, feedEnd
 }
 
 func (d *DataFeedPollTask) getFeedEndTime(feedInterval time.Duration, now time.Time) time.Time {

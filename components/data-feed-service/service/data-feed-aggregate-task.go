@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"time"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -20,6 +21,13 @@ import (
 var (
 	dataFeedAggregateTaskName = cereal.NewTaskName("data-feed-aggregate")
 )
+
+type DataFeedAggregateTaskParams struct {
+	NodeIDs          map[string]NodeIDs
+	UpdatedNodesOnly bool
+	FeedStart        time.Time
+	FeedEnd          time.Time
+}
 
 type DataFeedAggregateTask struct {
 	cfgMgmt   cfgmgmt.CfgMgmtClient
@@ -39,7 +47,7 @@ func NewDataFeedAggregateTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn
 
 func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
 
-	params := DataFeedWorkflowParams{}
+	params := DataFeedAggregateTaskParams{}
 	err := task.GetParameters(&params)
 	if err != nil {
 		return nil, errors.Wrap(err, "failed to parse task parameters")
