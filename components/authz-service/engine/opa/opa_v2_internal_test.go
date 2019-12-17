@@ -152,16 +152,18 @@ func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 
 // Q: Which type of input is computed faster, generic Go interface or specific OPA Term?
 func BenchmarkV2GenericInput(b *testing.B) {
+	subjects, projects := []string{"user:local:alice@example.com", "team:local:admins"}, []string{"project-1", "project-2"}
+	resource, action := "some:resource", "some:resource:action"
 	var r ast.Value
 	var err error
 	for n := 0; n < b.N; n++ {
 		// always record the result to prevent the compiler eliminating the function
 		// call.
 		r, err = genericV2Input(
-			[]string{"user:local:alice@example.com", "team:local:admins"},
-			"some:resource",
-			"some:resource:action",
-			[]string{"project-1", "project-2"})
+			subjects,
+			resource,
+			action,
+			projects)
 		if err != nil {
 			b.Fatal(err)
 		}
@@ -172,31 +174,22 @@ func BenchmarkV2GenericInput(b *testing.B) {
 }
 
 func BenchmarkV2SpecificInput(b *testing.B) {
-	var r ast.Value
 	subjects, projects := []string{"user:local:alice@example.com", "team:local:admins"}, []string{"project-1", "project-2"}
 	resource, action := "some:resource", "some:resource:action"
+	var r ast.Value
 	for n := 0; n < b.N; n++ {
-		subs := make(ast.Array, len(subjects))
-		for i, sub := range subjects {
-			subs[i] = ast.NewTerm(ast.String(sub))
-		}
-		projs := make(ast.Array, len(projects))
-		for j, proj := range projects {
-			projs[j] = ast.NewTerm(ast.String(proj))
-		}
-		r = ast.NewObject(
-			[2]*ast.Term{ast.NewTerm(ast.String("subjects")), ast.NewTerm(subs)},
-			[2]*ast.Term{ast.NewTerm(ast.String("resource")), ast.NewTerm(ast.String(resource))},
-			[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
-			[2]*ast.Term{ast.NewTerm(ast.String("projects")), ast.NewTerm(projs)},
-		)
+		r = specificV2Input(
+			subjects,
+			resource,
+			action,
+			projects)
 	}
 	result = r
 }
 
 // A: Specific input is faster!
-// BenchmarkV2GenericInput-8   	    377655	      4978 ns/op	    1664 B/op	      50 allocs/op
-// BenchmarkV2SpecificInput-8   	  540812	      2392 ns/op	     976 B/op	      30 allocs/op
+// BenchmarkV2GenericInput-8   	    338047	      3727 ns/op	    1664 B/op	      50 allocs/op
+// BenchmarkV2SpecificInput-8   	  713064	      1931 ns/op	     976 B/op	      30 allocs/op
 
 func BenchmarkAuthorizedProjectPreparedQueryWithIncreasingPolicies(b *testing.B) {
 	var r error
@@ -330,7 +323,7 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
 // BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies/store_with_100_custom_policies_and_10_custom_roles-8        5	 229425400 ns/op	 61646865 B/op	  949819 allocs/op
 // BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies/store_with_200_custom_policies_and_10_custom_roles-8        2	 566905075 ns/op	102334816 B/op	 1599472 allocs/op
 // BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies/store_with_1000_custom_policies_and_10_custom_roles-8       1	8002475951 ns/op	550344056 B/op	 8512827 allocs/op
-// 12/16/19 summary: up to 5 seconds with over 1000 policies
+// 12/16/19 summary: up to 8 seconds with over 1000 policies
 
 func BenchmarkAuthorizedProjectPreparedQueryWithIncreasingRoles(b *testing.B) {
 	var r error
@@ -456,7 +449,7 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingRoles(b *testing.B) {
 // BenchmarkFilterAuthorizedProjectsWithIncreasingRoles/store_with_20_custom_roles_and_20_custom_policies-8      18	  57813417 ns/op	12546945 B/op	  197058 allocs/op
 // BenchmarkFilterAuthorizedProjectsWithIncreasingRoles/store_with_50_custom_roles_and_20_custom_policies-8      33	  39547176 ns/op	 8922209 B/op	  143759 allocs/op
 // BenchmarkFilterAuthorizedProjectsWithIncreasingRoles/store_with_100_custom_roles_and_20_custom_policies-8     19	  67250666 ns/op	11250568 B/op	  174188 allocs/op
-// 12/16/19 summary: less than 5 hundredths of a second with over 100 roles
+// 12/16/19 summary: less than 7 hundredths of a second with over 100 roles
 
 func BenchmarkProjectsAuthorizedWithIncreasingProjects(b *testing.B) {
 	ctx := context.Background()
@@ -502,7 +495,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingProjects(b *testing.B) {
 // BenchmarkProjectsAuthorizedWithIncreasingProjects/store_with_100_projects,_318_policies,_and_5_roles-8      	      12	  99153320 ns/op	15689900 B/op	  233776 allocs/op
 // BenchmarkProjectsAuthorizedWithIncreasingProjects/store_with_200_projects,_618_policies,_and_5_roles-8      	       6	 188506243 ns/op	37933061 B/op	  627093 allocs/op
 // BenchmarkProjectsAuthorizedWithIncreasingProjects/store_with_300_projects,_918_policies,_and_5_roles-8      	       4	 324684845 ns/op	67148484 B/op	 1180311 allocs/op
-// 12/16/19 summary: less than 5 tenths of a second with 300 projects and 900 corresponding policies
+// 12/16/19 summary: less than half a second with 300 projects and 900 corresponding policies
 
 func BenchmarkFilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
 	ctx := context.Background()
@@ -547,7 +540,7 @@ func BenchmarkFilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
 // BenchmarkFilterAuthorizedProjectsIncreasingProjects/store_with_100_projects,_318_policies,_and_5_roles-8      	    46	  30991366 ns/op	 8001491 B/op	  139110 allocs/op
 // BenchmarkFilterAuthorizedProjectsIncreasingProjects/store_with_200_projects,_618_policies,_and_5_roles-8      	    18	  74279446 ns/op	15727943 B/op	  272518 allocs/op
 // BenchmarkFilterAuthorizedProjectsIncreasingProjects/store_with_300_projects,_918_policies,_and_5_roles-8      	    18	  91202140 ns/op	23486797 B/op	  405924 allocs/op
-// 12/16/19 summary: less than 1 tenth of a second with 300 projects and 900 corresponding policies
+// 12/16/19 summary: less than a tenth of a second with 300 projects and 900 corresponding policies
 
 func BenchmarkProjectsAuthorizedWithIncreasingSubjects(b *testing.B) {
 	ctx := context.Background()
@@ -637,18 +630,19 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects(b *testing.B) {
 	}
 }
 
-// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_0_subjects-8        51	  29663189 ns/op	   10341998 B/op	   165317 allocs/op
-// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_1_subjects-8        24	  56318332 ns/op	   18816861 B/op	   285219 allocs/op
-// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_10_subjects-8        4	 345199718 ns/op	   95090762 B/op	  1364324 allocs/op
-// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_30_subjects-8        2	 860959738 ns/op	  264586580 B/op	  3762274 allocs/op
-// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_50_subjects-8        1	1246990637 ns/op	  434087808 B/op	  6160325 allocs/op
-// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_100_subjects-8       1	2947810981 ns/op	  857795248 B/op	 12156064 allocs/op
-// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_150_subjects-8       1	5289022070 ns/op	 1281407944 B/op	 18192712 allocs/op
-// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_300_subjects-8       1	9734097492 ns/op	 2552158136 B/op	 36301970 allocs/op
-// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_500_subjects-8       1	18539466325 ns/op	 4246419792 B/op	 60447316 allocs/op
-// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_1000_subjects-8      1	28284630027 ns/op	 8482076096 B/op	120810333 allocs/op
-// Note: 10,000 subjects took several minutes to run and never completed
-// 12/16/19 summary: up to 30 seconds with 1,000 subjects
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_0_subjects-8         	      40	    39874538 ns/op	    13800522 B/op	    214424 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_1_subjects-8         	      19	    74988428 ns/op	    25656845 B/op	    380876 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_10_subjects-8        	       3	   470849861 ns/op	   132350672 B/op	   1878625 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_30_subjects-8        	       2	  1003187020 ns/op	   369447356 B/op	   5206905 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_50_subjects-8        	       1	  1663301441 ns/op	   606530488 B/op	   8535180 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_100_subjects-8       	       1	  4055170687 ns/op	  1199097344 B/op	  16856685 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_150_subjects-8       	       1	  5521300056 ns/op	  1791588352 B/op	  25234372 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_300_subjects-8       	       1	 12194054286 ns/op	  3568958664 B/op	  50366775 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_500_subjects-8       	       1	 19000828806 ns/op	  5938771280 B/op	  83876611 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_1000_subjects-8      	       1	 38236004231 ns/op	 11863293192 B/op	 167651037 allocs/op
+// BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects/input_with_10000_subjects-8     	       1	374165499542 ns/op	118586373552 B/op	1675582505 allocs/op
+// 12/16/19 summary: up to 30 seconds with 1,000 subjects,
+// 6 minutes with 10,000 subjects
 
 // Q: What happens if the subject appears more often as a member of different policies?
 func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
@@ -695,6 +689,8 @@ func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
 		"policies": policies,
 		"roles":    roles,
 	})
+	err = s.makeAuthorizedProjectPreparedQuery(ctx)
+	require.NoError(b, err, "update OPA store and prepare projects query")
 
 	b.Run("store with 0 policies that include the subject as a member", func(b *testing.B) {
 		var resp []string
@@ -718,8 +714,10 @@ func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
 			"policies": policies,
 			"roles":    roles,
 		})
+		err = s.makeAuthorizedProjectPreparedQuery(ctx)
+		require.NoError(b, err, "update OPA store and prepare projects query")
 
-		b.Run(fmt.Sprintf("store with %d out of 10 policies that include the subject as a member", k+1), func(b *testing.B) {
+		b.Run(fmt.Sprintf("store with %d out of %d policies that include the subject as a member", k+1, policyCount), func(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
@@ -733,7 +731,18 @@ func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
 	}
 }
 
-// A: ? TODO
+// A: more frequest membership means slower authorization times (but not by much)
+// BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_0_policies_that_include_the_subject_as_a_member-8         	   179049	      8298 ns/op	    3193 B/op	      83 allocs/op
+// BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_1_out_of_10_policies_that_include_the_subject_as_a_member-8   140113	     10122 ns/op	    3304 B/op	      86 allocs/op
+// BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_2_out_of_10_policies_that_include_the_subject_as_a_member-8   135043	     11135 ns/op	    3304 B/op	      86 allocs/op
+// BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_3_out_of_10_policies_that_include_the_subject_as_a_member-8   116342	     11588 ns/op	    3304 B/op	      86 allocs/op
+// BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_4_out_of_10_policies_that_include_the_subject_as_a_member-8   	85137	     13811 ns/op	    3304 B/op	      86 allocs/op
+// BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_5_out_of_10_policies_that_include_the_subject_as_a_member-8    73464	     16099 ns/op	    3352 B/op	      88 allocs/op
+// BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_6_out_of_10_policies_that_include_the_subject_as_a_member-8    74788	     14378 ns/op	    3304 B/op	      86 allocs/op
+// BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_7_out_of_10_policies_that_include_the_subject_as_a_member-8    92748	     15486 ns/op	    3304 B/op	      86 allocs/op
+// BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_8_out_of_10_policies_that_include_the_subject_as_a_member-8    55911	     17941 ns/op	    3304 B/op	      86 allocs/op
+// BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_9_out_of_10_policies_that_include_the_subject_as_a_member-8    95604	     13995 ns/op	    3304 B/op	      86 allocs/op
+// BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_10_out_of_10_policies_that_include_the_subject_as_a_member-8  109905	     12629 ns/op	    3304 B/op	      86 allocs/op
 
 // shared (v1/v2) helpers
 func randomTeams(c int) []string {
@@ -763,6 +772,23 @@ func genericV2Input(subjects []string, resource string, action string, projects 
 		"projects": projs,
 	}
 	return ast.InterfaceToValue(input)
+}
+
+func specificV2Input(subjects []string, resource string, action string, projects []string) ast.Value {
+	subs := make(ast.Array, len(subjects))
+	for i, sub := range subjects {
+		subs[i] = ast.NewTerm(ast.String(sub))
+	}
+	projs := make(ast.Array, len(projects))
+	for j, proj := range projects {
+		projs[j] = ast.NewTerm(ast.String(proj))
+	}
+	return ast.NewObject(
+		[2]*ast.Term{ast.NewTerm(ast.String("subjects")), ast.NewTerm(subs)},
+		[2]*ast.Term{ast.NewTerm(ast.String("resource")), ast.NewTerm(ast.String(resource))},
+		[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
+		[2]*ast.Term{ast.NewTerm(ast.String("projects")), ast.NewTerm(projs)},
+	)
 }
 
 func v2BaselineAndRandomPoliciesAndRoles(customPolicyCount int, customRoleCount int) (policies map[string]interface{}, roles map[string]interface{}) {
