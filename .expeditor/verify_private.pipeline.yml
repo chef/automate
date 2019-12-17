@@ -734,7 +734,7 @@ steps:
   - label: "deep upgrade backup restore"
     command:
       - integration/run_test integration/tests/deep_upgrade_backup_restore.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 35
     expeditor:
       executor:
         linux:
