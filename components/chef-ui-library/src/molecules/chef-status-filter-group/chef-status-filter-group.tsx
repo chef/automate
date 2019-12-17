@@ -27,6 +27,11 @@ import find from 'lodash/fp/find';
  *     <div class="filter-label">OK</div>
  *     <div class="filter-total">5</div>
  *   </chef-option>
+ *   <chef-option class="filter disconnected" value='disconnected'>
+ *     <chef-icon class="filter-icon"></chef-icon>
+ *     <div class="filter-label">Disconnected</div>
+ *     <div class="filter-total">8</div>
+ *   </chef-option>
  *   <chef-option class="filter unknown" value='unknown'>
  *     <chef-icon class="filter-icon">help</chef-icon>
  *     <div class="filter-label">Unknown</div>
