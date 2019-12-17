@@ -32,14 +32,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public sortedProjects$: Observable<Project[]>;
   public projectToDelete: Project;
   public deleteModalVisible = false;
-  public messageModalVisible = true;
+  public messageModalVisible = false;
   public createModalVisible = false;
   public createProjectForm: FormGroup;
   public creatingProject = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
   public confirmApplyStartModalVisible = false;
   public confirmApplyStopModalVisible = false;
-  public deleteErrorMessage = '';
 
   // This flag governs filling the above cache.
   // The state returned by this.projects.applyRulesStatus$ (Running, NotRunning)
@@ -167,12 +166,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   }
 
   public startProjectDelete(p: Project): void {
-    this.deleteErrorMessage =
-      ['EDITS_PENDING', 'RULES_APPLIED'].includes(p.status)
-        ? `oops ${p.id} has rules--dump them`
-        : '';
-    this.projectToDelete = p;
-    this.deleteModalVisible = true;
+    const deletableStates: ProjectStatus[] = ['EDITS_PENDING', 'RULES_APPLIED'];
+    if (deletableStates.includes(p.status)) {
+      this.messageModalVisible = true;
+    } else {
+      this.projectToDelete = p;
+      this.deleteModalVisible = true;
+    }
   }
 
   public deleteProject(): void {

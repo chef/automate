@@ -183,12 +183,46 @@ describe('ProjectListComponent', () => {
     describe('delete modal', () => {
 
       using([
+        ['NO_RULES'],
+        ['PROJECT_RULES_STATUS_UNSET']
+      ], function (status: ProjectStatus) {
+        it(`upon selecting delete from control menu, opens with ${status}`, () => {
+          expect(component.deleteModalVisible).toBe(false);
+          component.startProjectDelete(genProject('uuid-111', status));
+          expect(component.deleteModalVisible).toBe(true);
+        });
+      });
+
+      using([
         ['RULES_APPLIED'],
         ['EDITS_PENDING']
       ], function (status: ProjectStatus) {
-        it(`shows error message for ${status}`, () => {
+        it(`upon selecting delete from control menu, does not open with ${status}`, () => {
+          expect(component.deleteModalVisible).toBe(false);
           component.startProjectDelete(genProject('uuid-111', status));
-          expect(component.deleteErrorMessage).not.toBe('');
+          expect(component.deleteModalVisible).toBe(false);
+        });
+      });
+
+     it('closes upon sending request to back-end', () => {
+        component.startProjectDelete(genProject('uuid-111', 'NO_RULES'));
+        expect(component.deleteModalVisible).toBe(true);
+        component.deleteProject();
+        expect(component.deleteModalVisible).toBe(false);
+      });
+
+    });
+
+    describe('message modal', () => {
+
+      using([
+        ['RULES_APPLIED'],
+        ['EDITS_PENDING']
+      ], function (status: ProjectStatus) {
+        it(`upon selecting delete from control menu, opens with ${status}`, () => {
+          expect(component.messageModalVisible).toBe(false);
+          component.startProjectDelete(genProject('uuid-111', status));
+          expect(component.messageModalVisible).toBe(true);
         });
       });
 
@@ -196,23 +230,18 @@ describe('ProjectListComponent', () => {
         ['NO_RULES'],
         ['PROJECT_RULES_STATUS_UNSET']
       ], function (status: ProjectStatus) {
-        it(`does not show error message for ${status}`, () => {
+        it(`upon selecting delete from control menu, does not open with ${status}`, () => {
+          expect(component.messageModalVisible).toBe(false);
           component.startProjectDelete(genProject('uuid-111', status));
-          expect(component.deleteErrorMessage).toBe('');
+          expect(component.messageModalVisible).toBe(false);
         });
       });
 
-      it('opens upon selecting delete from control menu', () => {
-        expect(component.deleteModalVisible).toBe(false);
-        component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
-        expect(component.deleteModalVisible).toBe(true);
-      });
-
-     it('closes upon sending request to back-end', () => {
-        component.startProjectDelete(genProject('uuid-111', 'RULES_APPLIED'));
-        expect(component.deleteModalVisible).toBe(true);
-        component.deleteProject();
-        expect(component.deleteModalVisible).toBe(false);
+      it('closes upon request', () => {
+        component.startProjectDelete(genProject('uuid-111', 'EDITS_PENDING'));
+        expect(component.messageModalVisible).toBe(true);
+        component.closeMessageModal();
+        expect(component.messageModalVisible).toBe(false);
       });
 
     });
