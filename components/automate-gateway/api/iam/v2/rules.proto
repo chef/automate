@@ -59,9 +59,9 @@ service Rules {
 
   rpc ListRulesForProject (ListRulesForProjectReq) returns (ListRulesForProjectResp) {
     option (google.api.http) = {
-      get: "/iam/v2/projects/{project_id}/rules"
+      get: "/iam/v2/projects/{id}/rules"
       additional_bindings {
-        get: "/iam/v2beta/projects/{project_id}/rules"
+        get: "/iam/v2beta/projects/{id}/rules"
       }
     };
     option (chef.automate.api.policy).resource = "auth:projects:{id}";
