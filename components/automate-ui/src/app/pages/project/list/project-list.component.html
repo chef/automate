@@ -110,6 +110,13 @@
         (confirm)="confirmApplyStop()"
         (cancel)="cancelApplyStop()">
       </app-confirm-apply-stop-modal>
+
+      <app-message-modal
+        [title]="'Could Not Delete Project'"
+        [visible]="messageModalVisible"
+        (close)="closeMessageModal()">
+        Before you can delete this project, delete all ingest rules, and then update projects.
+      </app-message-modal>
     </main>
   </div>
 </div>

@@ -73,6 +73,11 @@ describe('ProjectListComponent', () => {
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({
+          selector: 'app-message-modal',
+          inputs: ['visible' ],
+          outputs: ['close' ]
+        }),
+         MockComponent({
           selector: 'app-confirm-apply-start-modal',
           inputs: ['visible'],
           outputs: ['confirm', 'cancel']

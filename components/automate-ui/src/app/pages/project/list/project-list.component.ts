@@ -32,6 +32,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public sortedProjects$: Observable<Project[]>;
   public projectToDelete: Project;
   public deleteModalVisible = false;
+  public messageModalVisible = true;
   public createModalVisible = false;
   public createProjectForm: FormGroup;
   public creatingProject = false;
@@ -159,6 +160,10 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
   public closeDeleteModal(): void {
     this.deleteModalVisible = false;
+  }
+
+  public closeMessageModal(): void {
+    this.messageModalVisible = false;
   }
 
   public startProjectDelete(p: Project): void {
