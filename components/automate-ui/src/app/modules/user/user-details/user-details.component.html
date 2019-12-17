@@ -40,15 +40,15 @@
           </div>
           <div class="button-column">
             <ng-container *ngIf="!updatingUser">
-              <app-authorized [allOf]="[['/auth/users/{username}', 'put', user?.id], ['/iam/v2beta/users/{username}', 'put', user?.id],
-                ['/auth/users/{username}', 'get', user?.id], ['/iam/v2beta/users/{username}', 'get', user?.id]]">
+              <app-authorized [allOf]="[['/auth/users/{username}', 'put', user?.id], ['/iam/v2/users/{username}', 'put', user?.id],
+                ['/auth/users/{username}', 'get', user?.id], ['/iam/v2/users/{username}', 'get', user?.id]]">
                 <chef-button secondary class="edit-button" (click)="setUpdatingUser(true)">
                   <chef-icon>mode_edit</chef-icon>
                   <span>Edit</span>
                 </chef-button>
               </app-authorized>
-              <app-authorized [allOf]="[['/auth/users/{username}', 'delete', user?.id], ['/iam/v2beta/users/{username}', 'delete', user?.id],
-                ['/auth/users/{username}', 'get', user?.id], ['/iam/v2beta/users/{username}', 'get', user?.id]]">
+              <app-authorized [allOf]="[['/auth/users/{username}', 'delete', user?.id], ['/iam/v2/users/{username}', 'delete', user?.id],
+                ['/auth/users/{username}', 'get', user?.id], ['/iam/v2/users/{username}', 'get', user?.id]]">
                 <chef-button *ngIf="isAdminView" secondary caution class="delete-button"
                   (click)="openDeleteConfirmationModal()">
                   <chef-icon>delete</chef-icon>
