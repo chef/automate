@@ -300,7 +300,7 @@ func (w *workflowInstance) EstimatedTimeComplete() time.Time {
 
 	longestDomainTimeEstimate := time.Unix(longestDomainJobStatus.EstimatedEndTimeInSec, 0)
 
-	// If the estimated time is before now return the null time. 
+	// If the estimated time is before now return the null time.
 	if longestDomainTimeEstimate.Before(time.Now()) {
 		return time.Time{}
 	}

@@ -157,6 +157,26 @@ func TestManagerMergeJobStatus(t *testing.T) {
 				EstimatedEndTimeInSec: 1555520534 + 20,
 			},
 		},
+		{
+			description: "All job statuses have not started yet",
+			jobStatuses: []JobStatus{
+				{
+					Completed:             false,
+					PercentageComplete:    0,
+					EstimatedEndTimeInSec: 0,
+				},
+				{
+					Completed:             false,
+					PercentageComplete:    0,
+					EstimatedEndTimeInSec: 0,
+				},
+			},
+			expectedJobStatus: JobStatus{
+				Completed:             false,
+				PercentageComplete:    0,
+				EstimatedEndTimeInSec: 0,
+			},
+		},
 	}
 
 	for _, test := range cases {

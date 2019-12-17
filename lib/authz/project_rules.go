@@ -22,7 +22,7 @@ func FindSlowestJobStatus(jobStatuses []JobStatus) JobStatus {
 	for _, jobStatus := range jobStatuses {
 		if !jobStatus.Completed {
 			combinedJobStatus.Completed = false
-			if jobStatus.EstimatedEndTimeInSec > combinedJobStatus.EstimatedEndTimeInSec {
+			if jobStatus.EstimatedEndTimeInSec >= combinedJobStatus.EstimatedEndTimeInSec {
 				combinedJobStatus.EstimatedEndTimeInSec = jobStatus.EstimatedEndTimeInSec
 				combinedJobStatus.PercentageComplete = jobStatus.PercentageComplete
 			}
