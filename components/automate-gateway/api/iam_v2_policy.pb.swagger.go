@@ -1,4 +1,7 @@
-{
+package api
+
+func init() {
+	Swagger.Add("iam_v2_policy", `{
   "swagger": "2.0",
   "info": {
     "title": "components/automate-gateway/api/iam/v2/policy.proto",
@@ -1524,4 +1527,6 @@
       "default": "V0"
     }
   }
+}
+`)
 }
