@@ -1,0 +1,13 @@
+<chef-modal [visible]="visible" (closeModal)="closeEvent()">
+  <h2 slot="title">{{ title }}</h2>
+  <div>
+    <ng-content></ng-content>
+  </div>
+
+  <div class="options">
+    <div class="options">
+      <chef-button primary (click)="closeEvent()">Close</chef-button>
+    </div>
+  </div>
+</chef-modal>
+
