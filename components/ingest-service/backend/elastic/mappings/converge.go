@@ -246,7 +246,10 @@ var ConvergeHistory = Mapping{
 								"type": "ip"
 							},
 							"account_id": {
-								"type": "text"
+								"type": "keyword"
+							}
+							"region": {
+								"type": "keyword"
 							}
 						}
 					},

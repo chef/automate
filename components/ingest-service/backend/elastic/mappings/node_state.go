@@ -300,12 +300,29 @@ var nodeProps = `
 			},
 			"public_ipv4": {
 				"type": "ip"
+			},
+		  "account_id": {
+				"type": "keyword",
+				"index": false,
+				"doc_values": false
 			}
+			"region": {
+				"type": "keyword",
+				"index": false,
+				"doc_values": false
+			}
+
 		}
 	},
 	"cloud_id":{
 		"type": "keyword"
 	},
+	"cloud_region": {
+		"type": "keyword"
+	},
+	"cloud_account_id":{
+		"type": "keyword"
+	}
 	"fqdn": {
 		"type": "keyword",
 		"index": false,
@@ -399,7 +416,7 @@ var nodeProps = `
 
 // NodeState is the representation of our `node-state` Mapping
 var NodeState = Mapping{
-	Index:      "node-state-7",
+	Index:      "node-state-8",
 	Alias:      "node-state",
 	Type:       "node-state",
 	Timeseries: false,

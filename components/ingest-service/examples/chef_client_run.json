@@ -1689,7 +1689,8 @@
       "security_groups": [
         "default"
       ],
-      "userdata": null
+      "userdata": null,
+      "account_id": "999999999999"
     },
     "cloud": {
       "public_ips": [

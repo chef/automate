@@ -125,8 +125,7 @@ func (ccr *ChefClientRun) ToNode() (nodeState Node, err error) {
 		if ccr.NodePayload.Automatic["ec2"] != nil {
 			chefRunEc2 := ccr.NodePayload.Automatic["ec2"].(map[string]interface{})
 			nodeState.Ec2.InstanceId = EmptyStringIfNil(chefRunEc2["instance_id"])
-			//In the future we can use cloud ID for azure or whatever IDs
-			nodeState.CloudID = nodeState.Ec2.InstanceId
+
 			nodeState.Ec2.InstanceType = EmptyStringIfNil(chefRunEc2["instance_type"])
 
 			if ccr.NodePayload.Automatic["cloud"] != nil {
@@ -137,7 +136,20 @@ func (ccr *ChefClientRun) ToNode() (nodeState Node, err error) {
 			}
 			nodeState.Ec2.PlacementAvailabilityZone =
 				EmptyStringIfNil(chefRunEc2["placement_availability_zone"])
+			nodeState.Ec2.Region =
+				EmptyStringIfNil(chefRunEc2["region"])
 			nodeState.Ec2.AccountID = EmptyStringIfNil(chefRunEc2["account_id"])
+			//In the future we can use cloud ID for azure or whatever IDs
+			nodeState.CloudID = nodeState.Ec2.InstanceId
+			nodeState.CloudAccountID = nodeState.Ec2.AccountID
+			if nodeState.Ec2.Region == "" && nodeState.Ec2.PlacementAvailabilityZone != "" {
+				paz := nodeState.Ec2.PlacementAvailabilityZone
+				// If region isn't available for whatever reason trim the placement availability zone to get region
+				nodeState.CloudRegion = paz[0 : len(paz)-1]
+			} else {
+				nodeState.CloudRegion = nodeState.Ec2.Region
+			}
+
 		}
 
 		if ccr.Status == "failure" {

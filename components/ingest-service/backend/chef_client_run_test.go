@@ -168,6 +168,9 @@ func TestCCRToNode(t *testing.T) {
 	assert.Equal(t, "i-9ab3dd6d", translatedNode.CloudID)
 	assert.Equal(t, "m3.medium", translatedNode.Ec2.InstanceType)
 	assert.Equal(t, "us-west-2a", translatedNode.Ec2.PlacementAvailabilityZone)
+	assert.Equal(t, "us-west-2", translatedNode.CloudRegion)
+	assert.Equal(t, "999999999999", translatedNode.Ec2.AccountID)
+	assert.Equal(t, "999999999999", translatedNode.CloudAccountID)
 	// We need this to be nil if the attribute is not set
 	assert.Nil(t, translatedNode.Ec2.PublicIpv4)
 	assert.Equal(t, run.RunList, translatedNode.RunList)

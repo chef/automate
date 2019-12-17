@@ -3,7 +3,6 @@ package pgdb
 import (
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"time"
 
 	uuid "github.com/gofrs/uuid"
@@ -18,48 +17,48 @@ import (
 
 const sqlUpsertByIDRunData = `
 INSERT INTO nodes
-	(id, name, platform, platform_version, source_state, 
+	(id, name, platform, platform_version, source_state,
 		last_contact, source_id, source_region, source_account_id, last_run, projects_data, manager)
 VALUES ($1, $2, $3, $4, $5, $6, NULLIF($7,''), NULLIF($8,''), NULLIF($9,''), $10, $11, $12)
 ON CONFLICT (id)
 DO UPDATE
-SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
+SET name = $2, platform = $3, platform_version = $4, source_state = $5,
 	last_contact = $6, source_id = NULLIF($7,''), source_region = NULLIF($8,''), source_account_id = NULLIF($9,''), last_run = $10, projects_data = $11
 WHERE nodes.source_state != 'TERMINATED';
 `
 
 const sqlUpsertByIDScanData = `
 INSERT INTO nodes
-	(id, name, platform, platform_version, source_state, 
+	(id, name, platform, platform_version, source_state,
 		last_contact, source_id, source_region, source_account_id, last_job, last_scan, projects_data, manager)
 VALUES ($1, $2, $3, $4, $5, $6, NULLIF($7,''), NULLIF($8,''), NULLIF($9,''), $10, $11, $12, $13)
 ON CONFLICT (id)
 DO UPDATE
-SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
+SET name = $2, platform = $3, platform_version = $4, source_state = $5,
 	last_contact = $6, source_id = NULLIF($7,''), source_region = NULLIF($8,''), source_account_id = NULLIF($9,''), last_job = $10, last_scan = $11, projects_data = $12
 WHERE nodes.source_state != 'TERMINATED';
 `
 
 const sqlUpsertBySourceIDRunData = `
 INSERT INTO nodes
-	(id, name, platform, platform_version, source_state, 
+	(id, name, platform, platform_version, source_state,
 		last_contact, source_id, source_region, source_account_id, last_run, projects_data, manager)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 ON CONFLICT (source_id, source_region, source_account_id)
 DO UPDATE
-SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
+SET name = $2, platform = $3, platform_version = $4, source_state = $5,
 	last_contact = $6,  source_id = $7, source_region = $8, source_account_id = $9, last_run = $10, projects_data = $11
 WHERE nodes.source_state != 'TERMINATED' RETURNING id;
 `
 
 const sqlUpsertBySourceIDScanData = `
 INSERT INTO nodes
-	(id, name, platform, platform_version, source_state, 
+	(id, name, platform, platform_version, source_state,
 		last_contact, source_id, source_region, source_account_id, last_job, last_scan, projects_data, manager)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 ON CONFLICT (source_id, source_region, source_account_id)
 DO UPDATE
-SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
+SET name = $2, platform = $3, platform_version = $4, source_state = $5,
 	last_contact = $6, source_id = $7, source_region = $8, source_account_id = $9, last_job = $10, last_scan = $11, projects_data = $12
 WHERE nodes.source_state != 'TERMINATED' RETURNING id;
 `
@@ -113,16 +112,6 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 			return err
 		}
 		node.Uuid = id.String()
-	}
-
-	// trim the region field, b/c we want to just use "us-east-1", not more specific regions like "us-east-1a"
-	// this is to ensure that we don't create duplicate nodes
-	if match, err := regexp.MatchString(`^.*-.*-\d\D`, node.GetSourceRegion()); match {
-		last := len(node.SourceRegion) - 1
-		node.SourceRegion = node.SourceRegion[:last]
-		logrus.Debugf("new source region value %s", node.SourceRegion)
-	} else if err != nil {
-		logrus.Warnf("unable to parse region value for node %s %s", node.GetName(), node.GetSourceRegion())
 	}
 
 	// the incoming node may hit any of these cases:

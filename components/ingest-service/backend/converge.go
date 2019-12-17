@@ -28,6 +28,8 @@ type Node struct {
 	LastCCRReceived   time.Time `json:"lastCCRReceived,omitempty"`
 	LivenessManaged   bool      `json:"liveness_managed,omitempty"`
 	CloudID           string    `json:"cloud_id,omitempty"`
+	CloudAccountID    string    `json:"cloud_account_id,omitempty"`
+	CloudRegion       string    `json:"cloud_region,omitempty"`
 	HasDeprecations   bool      `json:"has_deprecations"`
 	DeprecationsCount int       `json:"deprecations_count"`
 	Projects          []string  `json:"projects"`
@@ -93,6 +95,7 @@ type Ec2 struct {
 	InstanceType              string      `json:"instance_type"`
 	PublicIpv4                interface{} `json:"public_ipv4"` // An interface bc ES type is `ip`
 	PlacementAvailabilityZone string      `json:"placement_availability_zone"`
+	Region                    string      `json:"region"`
 	AccountID                 string      `json:"account_id"`
 }
 
