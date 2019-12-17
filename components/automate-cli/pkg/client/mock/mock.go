@@ -12,7 +12,7 @@ import (
 	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
 	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
-	"github.com/chef/automate/components/automate-gateway/api/iam/v2"
+	v2 "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/test/helpers"
@@ -22,11 +22,11 @@ import (
 type Mock struct {
 	authzClient        authz.AuthorizationClient
 	teamsClient        teams.TeamsClient
-	teamsV2Client      v2beta.TeamsClient
+	teamsV2Client      v2.TeamsClient
 	tokensClient       tokens.TokensMgmtClient
-	tokensV2Client     v2beta.TokensClient
+	tokensV2Client     v2.TokensClient
 	usersClient        users.UsersMgmtClient
-	policiesClient     v2beta.PoliciesClient
+	policiesClient     v2.PoliciesClient
 	reportingClient    reporting.ReportingServiceClient
 	applicationsClient applications.ApplicationsServiceClient
 	close              func()
@@ -35,11 +35,11 @@ type Mock struct {
 // ServerMocks are mocked out API servers
 type ServerMocks struct {
 	AuthzMock    *authz.AuthorizationServerMock
-	PoliciesMock *v2beta.PoliciesServerMock
+	PoliciesMock *v2.PoliciesServerMock
 	TeamsMock    *teams.TeamsServerMock
-	TeamsV2Mock  *v2beta.TeamsServerMock
+	TeamsV2Mock  *v2.TeamsServerMock
 	TokensMock   *tokens.TokensMgmtServerMock
-	TokensV2Mock *v2beta.TokensServerMock
+	TokensV2Mock *v2.TokensServerMock
 	UsersMock    *users.UsersMgmtServerMock
 }
 
@@ -54,17 +54,17 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 	mockAuthz := authz.NewAuthorizationServerMock()
 	authz.RegisterAuthorizationServer(grpcGateway, mockAuthz)
 
-	mockV2Tokens := v2beta.NewTokensServerMock()
-	v2beta.RegisterTokensServer(grpcGateway, mockV2Tokens)
+	mockV2Tokens := v2.NewTokensServerMock()
+	v2.RegisterTokensServer(grpcGateway, mockV2Tokens)
 
-	mockPolicies := v2beta.NewPoliciesServerMock()
-	v2beta.RegisterPoliciesServer(grpcGateway, mockPolicies)
+	mockPolicies := v2.NewPoliciesServerMock()
+	v2.RegisterPoliciesServer(grpcGateway, mockPolicies)
 
 	mockTeams := teams.NewTeamsServerMock()
 	teams.RegisterTeamsServer(grpcGateway, mockTeams)
 
-	mockV2Teams := v2beta.NewTeamsServerMock()
-	v2beta.RegisterTeamsServer(grpcGateway, mockV2Teams)
+	mockV2Teams := v2.NewTeamsServerMock()
+	v2.RegisterTeamsServer(grpcGateway, mockV2Teams)
 
 	mockTokens := tokens.NewTokensMgmtServerMock()
 	tokens.RegisterTokensMgmtServer(grpcGateway, mockTokens)
@@ -79,11 +79,11 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 	return Mock{
 			authzClient:        authz.NewAuthorizationClient(gatewayConn),
 			teamsClient:        teams.NewTeamsClient(gatewayConn),
-			teamsV2Client:      v2beta.NewTeamsClient(gatewayConn),
+			teamsV2Client:      v2.NewTeamsClient(gatewayConn),
 			tokensClient:       tokens.NewTokensMgmtClient(gatewayConn),
-			tokensV2Client:     v2beta.NewTokensClient(gatewayConn),
+			tokensV2Client:     v2.NewTokensClient(gatewayConn),
 			usersClient:        users.NewUsersMgmtClient(gatewayConn),
-			policiesClient:     v2beta.NewPoliciesClient(gatewayConn),
+			policiesClient:     v2.NewPoliciesClient(gatewayConn),
 			reportingClient:    reporting.NewReportingServiceClient(gatewayConn),
 			applicationsClient: applications.NewApplicationsServiceClient(gatewayConn),
 			close:              grpcServer.Close,
@@ -110,7 +110,7 @@ func (c Mock) TeamsClient() teams.TeamsClient {
 }
 
 // TeamsClient returns mock TeamsClient
-func (c Mock) TeamsV2Client() v2beta.TeamsClient {
+func (c Mock) TeamsV2Client() v2.TeamsClient {
 	return c.teamsV2Client
 }
 
@@ -120,7 +120,7 @@ func (c Mock) TokensClient() tokens.TokensMgmtClient {
 }
 
 // TokensV2Client returns mock TokensV2Client
-func (c Mock) TokensV2Client() v2beta.TokensClient {
+func (c Mock) TokensV2Client() v2.TokensClient {
 	return c.tokensV2Client
 }
 
@@ -130,7 +130,7 @@ func (c Mock) UsersClient() users.UsersMgmtClient {
 }
 
 // PoliciesClient returns mock PoliciesClient
-func (c Mock) PoliciesClient() v2beta.PoliciesClient {
+func (c Mock) PoliciesClient() v2.PoliciesClient {
 	return c.policiesClient
 }
 
