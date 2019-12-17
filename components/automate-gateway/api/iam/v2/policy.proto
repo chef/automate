@@ -15,36 +15,64 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Policies {
   rpc CreatePolicy (CreatePolicyReq) returns (CreatePolicyResp) {
-    option (google.api.http).post = "/iam/v2beta/policies";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      post: "/iam/v2/policies"
+      body: "*"
+      additional_bindings {
+        post: "/iam/v2beta/policies",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:policies";
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:policies";
     option (chef.automate.api.iam.policy).action = "iam:policies:create";
     };
   rpc GetPolicy (GetPolicyReq) returns (GetPolicyResp) {
-    option (google.api.http).get = "/iam/v2beta/policies/{id}";
+    option (google.api.http) = {
+      get: "/iam/v2/policies/{id}"
+      additional_bindings {
+        get: "/iam/v2beta/policies/{id}",
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "get";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
     option (chef.automate.api.iam.policy).action = "iam:policies:get"; // TODO: check
     };
   rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {
-    option (google.api.http).get = "/iam/v2beta/policies";
+    option (google.api.http) = {
+      get: "/iam/v2/policies"
+      additional_bindings {
+        get: "/iam/v2beta/policies"      
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:policies";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:policies";
     option (chef.automate.api.iam.policy).action = "iam:policies:list";
     };
   rpc DeletePolicy (DeletePolicyReq) returns (DeletePolicyResp) {
-    option (google.api.http).delete = "/iam/v2beta/policies/{id}";
+    option (google.api.http) = {
+      delete: "/iam/v2/policies/{id}"
+      additional_bindings {
+        delete: "/iam/v2beta/policies/{id}",
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
     option (chef.automate.api.iam.policy).action = "iam:policies:delete";
     };
   rpc UpdatePolicy (UpdatePolicyReq) returns (UpdatePolicyResp) {
-    option (google.api.http).put = "/iam/v2beta/policies/{id}";
+    option (google.api.http) = {
+      put: "/iam/v2/policies/{id}"
+      body: "*"
+      additional_bindings {
+        put: "/iam/v2beta/policies/{id}",
+        body: "*"
+      }
+    };
     option (google.api.http).body = "*";
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "update";
@@ -52,7 +80,12 @@ service Policies {
     option (chef.automate.api.iam.policy).action = "iam:policies:update";
     };
   rpc GetPolicyVersion (GetPolicyVersionReq) returns (GetPolicyVersionResp) {
-    option (google.api.http).get = "/iam/v2beta/policy_version";
+    option (google.api.http) = {
+      get: "/iam/v2/policy_version"
+      additional_bindings {
+        get: "/iam/v2beta/policy_version"     
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:policies";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:policyVersion";
@@ -60,104 +93,182 @@ service Policies {
     };
   rpc ListPolicyMembers (ListPolicyMembersReq) returns (ListPolicyMembersResp) {
     option (google.api.http).get = "/iam/v2beta/policies/{id}/members";
+    option (google.api.http) = {
+      get: "/iam/v2/policies/{id}/members"
+      additional_bindings {
+        get: "/iam/v2beta/policies/{id}/members"    
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:get";
     };
   rpc ReplacePolicyMembers (ReplacePolicyMembersReq) returns (ReplacePolicyMembersResp) {
-    option (google.api.http).put = "/iam/v2beta/policies/{id}/members";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      put: "/iam/v2/policies/{id}/members"
+      body: "*"
+      additional_bindings {
+        put: "/iam/v2beta/policies/{id}/members",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:update";
     };
   rpc RemovePolicyMembers (RemovePolicyMembersReq) returns (RemovePolicyMembersResp) {
-    option (google.api.http).post = "/iam/v2beta/policies/{id}/members:remove";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      post: "/iam/v2/policies/{id}/members:remove"
+      body: "*"
+      additional_bindings {
+        post: "/iam/v2beta/policies/{id}/members:remove",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:delete";
     };
   rpc AddPolicyMembers (AddPolicyMembersReq) returns (AddPolicyMembersResp) {
-    option (google.api.http).post = "/iam/v2beta/policies/{id}/members:add";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      post: "/iam/v2/policies/{id}/members:add"
+      body: "*"
+      additional_bindings {
+        post: "/iam/v2beta/policies/{id}/members:add",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:create";
     };
   rpc CreateRole (CreateRoleReq) returns (CreateRoleResp) {
-    option (google.api.http).post = "/iam/v2beta/roles";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      post: "/iam/v2/roles"
+      body: "*"
+      additional_bindings {
+        post: "/iam/v2beta/roles",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:roles";
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:roles";
     option (chef.automate.api.iam.policy).action = "iam:roles:create";
     };
   rpc ListRoles (ListRolesReq) returns (ListRolesResp) {
-    option (google.api.http).get = "/iam/v2beta/roles";
+    option (google.api.http) = {
+      get: "/iam/v2/roles"
+      additional_bindings {
+        get: "/iam/v2beta/roles"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:roles";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:roles";
     option (chef.automate.api.iam.policy).action = "iam:roles:list";
     };
   rpc GetRole (GetRoleReq) returns (GetRoleResp) {
-    option (google.api.http).get = "/iam/v2beta/roles/{id}";
+    option (google.api.http) = {
+      get: "/iam/v2/roles/{id}"
+      additional_bindings {
+        get: "/iam/v2beta/roles/{id}"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:roles:{id}";
     option (chef.automate.api.policy).action = "get";
     option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
     option (chef.automate.api.iam.policy).action = "iam:roles:get";
   };
   rpc DeleteRole (DeleteRoleReq) returns (DeleteRoleResp) {
-    option (google.api.http).delete = "/iam/v2beta/roles/{id}";
+    option (google.api.http) = {
+      delete: "/iam/v2/roles/{id}"
+      additional_bindings {
+        delete: "/iam/v2beta/roles/{id}"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:roles:{id}";
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
     option (chef.automate.api.iam.policy).action = "iam:roles:delete";
     };
   rpc UpdateRole (UpdateRoleReq) returns (UpdateRoleResp) {
-    option (google.api.http).put = "/iam/v2beta/roles/{id}";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      put: "/iam/v2/roles/{id}"
+      body: "*"
+      additional_bindings {
+        put: "/iam/v2beta/roles/{id}",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:roles:{id}";
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
     option (chef.automate.api.iam.policy).action = "iam:roles:update";
   };
   rpc CreateProject (CreateProjectReq) returns (CreateProjectResp) {
-    option (google.api.http).post= "/iam/v2beta/projects";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      post: "/iam/v2/projects"
+      body: "*"
+      additional_bindings {
+        post: "/iam/v2beta/projects",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:projects";
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:projects";
     option (chef.automate.api.iam.policy).action = "iam:projects:create";
   };
   rpc UpdateProject (UpdateProjectReq) returns (UpdateProjectResp) {
-    option (google.api.http).put= "/iam/v2beta/projects/{id}";
-    option (google.api.http).body = "*";
+    option (google.api.http) = {
+      put: "/iam/v2/projects/{id}"
+      body: "*"
+      additional_bindings {
+        put: "/iam/v2beta/projects/{id}",
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:projects:{id}";
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
     option (chef.automate.api.iam.policy).action = "iam:projects:update";
   };
   rpc GetProject (GetProjectReq) returns (GetProjectResp) {
-    option (google.api.http).get = "/iam/v2beta/projects/{id}";
+    option (google.api.http) = {
+      get: "/iam/v2/projects/{id}"
+      additional_bindings {
+        get: "/iam/v2beta/projects/{id}"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:projects:{id}";
     option (chef.automate.api.policy).action = "get";
     option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
     option (chef.automate.api.iam.policy).action = "iam:projects:get";
   };
   rpc ListProjects (ListProjectsReq) returns (ListProjectsResp) {
-    option (google.api.http).get = "/iam/v2beta/projects";
+    option (google.api.http) = {
+      get: "/iam/v2/projects"
+      additional_bindings {
+        get: "/iam/v2beta/projects"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:projects";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:projects";
     option (chef.automate.api.iam.policy).action = "iam:projects:list";
   };
   rpc DeleteProject (DeleteProjectReq) returns (DeleteProjectResp) {
-    option (google.api.http).delete= "/iam/v2beta/projects/{id}";
+    option (google.api.http) = {
+      delete: "/iam/v2/projects/{id}"
+      additional_bindings {
+        delete: "/iam/v2beta/projects/{id}"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:projects:{id}";
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
@@ -178,7 +289,12 @@ service Policies {
     option (chef.automate.api.iam.policy).action = "system:iam:reset";
   };
   rpc IntrospectAllProjects (ListProjectsReq) returns (ListProjectsResp) {
-    option (google.api.http).get = "/iam/v2beta/introspect_projects";
+    option (google.api.http) = {
+      get: "/iam/v2/introspect_projects"
+      additional_bindings {
+        get: "/iam/v2beta/introspect_projects"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth_introspection:introspect_all_projects";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:introspect";
