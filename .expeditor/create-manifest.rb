@@ -314,7 +314,7 @@ pins = {
   # while still allowing the clients of these databases to upgrade their client
   # libraries if any fixes are shipped there.
   "automate-postgresql"    => {"origin" => "chef", "name" => "automate-postgresql",    "version" => "9.6.11", "release" => "20190409151101"},
-  "automate-elasticsearch" => {"origin" => "chef", "name" => "automate-elasticsearch", "version" => "6.8.3",  "release" => "20191204000618"},
+  "automate-elasticsearch" => {"origin" => "chef", "name" => "automate-elasticsearch", "version" => "6.8.3",  "release" => "20191217225932"},
 }
 
 unless no_pin_hab
