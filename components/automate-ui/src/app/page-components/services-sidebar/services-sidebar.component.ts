@@ -104,7 +104,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   refresh() {
     if (this.serviceGroupsId) {
 
-      const paramsForDispatch = {
+      const paramsForDispatch: GroupServicesFilters = {
           service_group_id: this.serviceGroupsId,
           page: this.currentPage,
           pageSize: this.pageSize,

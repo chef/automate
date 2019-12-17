@@ -210,12 +210,12 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
       withLatestFrom(this.route.queryParamMap),
       takeUntil(this.isDestroyed)
     )
-    .subscribe(([serviceGroups]) => {
+    .subscribe(([serviceGroups, _]) => {
       if (serviceGroups.length > 0) {
         // if we do not have a selected service group, pick the first sgId from
         // the service group list
         if ( !this.selectedServiceGroupId ) {
-          this.selectedServiceGroupId = serviceGroups[0]['id'];
+          this.selectedServiceGroupId = serviceGroups[0].id;
         }
 
         // if the selected service group is not visible on the page, then pick
@@ -226,7 +226,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
           return sg.id === this.selectedServiceGroupId;
         });
         if ( !selectedSGVisibleOnPage ) {
-          this.selectedServiceGroupId = serviceGroups[0]['id'];
+          this.selectedServiceGroupId = serviceGroups[0].id;
         }
 
         // The sidebar content needs to be rendered on the initial page load
