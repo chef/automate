@@ -716,6 +716,8 @@ message Nodes {
 	int32 total_failed = 22;
 	// The total number of skipped nodes matching the filters.
 	int32 total_skipped = 23;
+	// The total number of waived nodes matching the filters.
+	int32 total_waived = 24;
 }
 
 message Kv {
