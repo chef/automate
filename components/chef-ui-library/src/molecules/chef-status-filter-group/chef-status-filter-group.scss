@@ -21,7 +21,7 @@ chef-status-filter-group {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      min-width: 100px;
+      width: 100px;
     }
 
     .filter-icon {
@@ -166,6 +166,7 @@ chef-status-filter-group {
 
       .option-content {
         flex-wrap: nowrap;
+        width: initial;
         min-width: auto;
       }
 
