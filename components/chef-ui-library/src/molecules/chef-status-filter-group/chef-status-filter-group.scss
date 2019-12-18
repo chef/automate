@@ -120,8 +120,8 @@ chef-status-filter-group {
       }
 
       &.disconnected {
-        background: #FADAFA;
-        box-shadow: 0px 0px 0px 1px #A424B4 inset;
+        background: var(--chef-info-alert-light);
+        box-shadow: 0px 0px 0px 1px var(--chef-info-alert) inset;
       }
     }
 
@@ -149,7 +149,7 @@ chef-status-filter-group {
       }
 
       &.disconnected {
-        background: #FADAFA;
+        background: var(--chef-info-alert-light);
       }
     }
   }
