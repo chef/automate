@@ -10,7 +10,7 @@ describe('Admin pages', () => {
   describe('User Management', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/apis/iam/v2beta/policy_version')
+        .get('/apis/iam/v2/policy_version')
         .many()
         .reply(200, JSON.stringify({
           'version': {
@@ -111,7 +111,7 @@ describe('Admin pages', () => {
         .reply(200, JSON.stringify(
           {
             endpoints: {
-              '/iam/v2beta/policies': {
+              '/iam/v2/policies': {
                 get: true,
                 put: false,
                 post: true,
@@ -123,7 +123,7 @@ describe('Admin pages', () => {
         ));
 
       fakeServer()
-        .get('/apis/iam/v2beta/policies')
+        .get('/apis/iam/v2/policies')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -150,7 +150,7 @@ describe('Admin pages', () => {
       // is unequal "v1". But this is more correct, and less dependant on that
       // specific detail.
       fakeServer()
-        .get('/apis/iam/v2beta/policy_version')
+        .get('/apis/iam/v2/policy_version')
         .many()
         .reply(200, JSON.stringify({
           'version': {
@@ -244,7 +244,7 @@ describe('Admin pages', () => {
 
       it('after delete clicked, policy removed from list once', () => {
         fakeServer()
-          .delete('/apis/iam/v2beta/policies/some-policy-id')
+          .delete('/apis/iam/v2/policies/some-policy-id')
           .many()
           .reply(200);
 
@@ -274,7 +274,7 @@ describe('Admin pages', () => {
   describe('Policy details', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/apis/iam/v2beta/policies/some-test-policy')
+        .get('/apis/iam/v2/policies/some-test-policy')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -289,7 +289,7 @@ describe('Admin pages', () => {
         ));
 
       fakeServer()
-        .get('/apis/iam/v2beta/policy_version')
+        .get('/apis/iam/v2/policy_version')
         .many()
         .reply(200, JSON.stringify({
           'version': {
@@ -336,7 +336,7 @@ describe('Admin pages', () => {
     beforeEach(() => {
 
       fakeServer()
-        .get('/apis/iam/v2beta/policies/some-test-policy')
+        .get('/apis/iam/v2/policies/some-test-policy')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -429,7 +429,7 @@ describe('Admin pages', () => {
     describe('when a single member is added and submitted', () => {
       beforeEach(() => {
         fakeServer()
-          .post('/apis/iam/v2beta/policies/some-test-policy/members:add',
+          .post('/apis/iam/v2/policies/some-test-policy/members:add',
             {
               'members': ['user:local:admin']
             })
@@ -461,7 +461,7 @@ describe('Admin pages', () => {
     describe('when multiple members are selected and added', () => {
       beforeEach(() => {
         fakeServer()
-          .post('/apis/iam/v2beta/policies/some-test-policy/members:add',
+          .post('/apis/iam/v2/policies/some-test-policy/members:add',
             {
               'members': ['user:local:admin', 'team:local:admins']
             })
@@ -501,7 +501,7 @@ describe('Admin pages', () => {
 
         beforeEach(() => {
           fakeServer()
-            .post('/apis/iam/v2beta/policies/some-test-policy/members:add',
+            .post('/apis/iam/v2/policies/some-test-policy/members:add',
               {
                 'members': ['user:ldap:*']
               })
@@ -608,7 +608,7 @@ describe('Admin pages', () => {
         .reply(200, JSON.stringify(
           {
             endpoints: {
-              '/iam/v2beta/roles': {
+              '/iam/v2/roles': {
                 get: true,
                 put: false,
                 post: true,
@@ -620,7 +620,7 @@ describe('Admin pages', () => {
         ));
 
       fakeServer()
-        .get('/apis/iam/v2beta/roles')
+        .get('/apis/iam/v2/roles')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -642,7 +642,7 @@ describe('Admin pages', () => {
         ));
 
       fakeServer()
-        .get('/apis/iam/v2beta/policy_version')
+        .get('/apis/iam/v2/policy_version')
         .many()
         .reply(200, JSON.stringify({
           'version': {
@@ -688,7 +688,7 @@ describe('Admin pages', () => {
   describe('Role details', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/apis/iam/v2beta/roles/some-test-role')
+        .get('/apis/iam/v2/roles/some-test-role')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -702,7 +702,7 @@ describe('Admin pages', () => {
         ));
 
       fakeServer()
-        .get('/apis/iam/v2beta/policy_version')
+        .get('/apis/iam/v2/policy_version')
         .many()
         .reply(200, JSON.stringify({
           'version': {
@@ -747,7 +747,7 @@ describe('Admin pages', () => {
         .reply(200, JSON.stringify(
           {
             endpoints: {
-              '/iam/v2beta/projects': {
+              '/iam/v2/projects': {
                 get: true,
                 put: false,
                 post: true,
@@ -759,7 +759,7 @@ describe('Admin pages', () => {
         ));
 
       fakeServer()
-        .get('/apis/iam/v2beta/projects')
+        .get('/apis/iam/v2/projects')
         .any()
         .reply(200, JSON.stringify(
           {
@@ -789,7 +789,7 @@ describe('Admin pages', () => {
         ['default', false],
         ['project-19', true]
       ].forEach(([id, deletable]) => {
-        const path = `/iam/v2beta/projects/${id}`;
+        const path = `/iam/v2/projects/${id}`;
         const endpoints = {
           [path]: {
             get: true,
@@ -811,7 +811,7 @@ describe('Admin pages', () => {
       });
 
       fakeServer()
-        .get('/apis/iam/v2beta/policy_version')
+        .get('/apis/iam/v2/policy_version')
         .any()
         .reply(200, JSON.stringify({
           'version': {
@@ -912,7 +912,7 @@ describe('Admin pages', () => {
       it('after delete is clicked and if the backend call succeeds, ' +
         'project is removed from list', () => {
           fakeServer()
-            .delete('/apis/iam/v2beta/projects/project-19')
+            .delete('/apis/iam/v2/projects/project-19')
             .min(1).max(1)
             .reply(200);
 
@@ -947,7 +947,7 @@ describe('Admin pages', () => {
   describe('Project details (custom)', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/apis/iam/v2beta/projects/my-project')
+        .get('/apis/iam/v2/projects/my-project')
         .any()
         .reply(200, JSON.stringify(
           {
@@ -960,7 +960,7 @@ describe('Admin pages', () => {
         ));
 
       fakeServer()
-        .get('/apis/iam/v2beta/projects/my-project/rules')
+        .get('/apis/iam/v2/projects/my-project/rules')
         .any()
         .reply(200, JSON.stringify(
           {
@@ -1004,7 +1004,7 @@ describe('Admin pages', () => {
       describe('when the input value is changed to something new and saved', () => {
         beforeEach(() => {
           fakeServer()
-            .put('/apis/iam/v2beta/projects/my-project',
+            .put('/apis/iam/v2/projects/my-project',
               JSON.stringify({ name: 'My Project Changed' }))
             .many()
             .reply(200, JSON.stringify(
