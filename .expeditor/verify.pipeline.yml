@@ -3,3 +3,5 @@ steps:
     command:
       - sleep 36000
     timeout_in_minutes: 600
+    agents:
+      azure: "true"
