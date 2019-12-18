@@ -72,6 +72,13 @@ export interface GroupService {
   previous_health_check: string;
   current_health_since: string;
   health_updated_at: Date;
+  health_check_result: HealthCheckResult;
+}
+
+export interface HealthCheckResult {
+  stdout: string;
+  stderr: string;
+  exit_status: number;
 }
 
 export interface GroupServicesFilters {

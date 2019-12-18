@@ -106,24 +106,100 @@ chef-alert {
     font-size: 14px;
   }
 
+  .health-info-panel {
+    border-radius: $global-radius;
+    align-items: center;
+    padding: 8px;
+    font-size: 12px;
+
+    &.CRITICAL {
+      background-color: #F9DBEA; // TODO: variables (piggy pink lol)
+      color: #BA1E6A; // TODO: variables (maroon)
+    }
+
+    &.WARNING {
+      // TODO variables
+      background-color: #FFE5D4;
+      color: #B74500;
+    }
+
+    &.UNKNOWN {
+      // TODO variables
+      background-color: #F3F6F8;
+      color: #222435;
+    }
+
+    &.OK {
+      background-color: #CFE8FF;
+      color: #005BAB;
+    }
+
+  }
+
+  .disconnect-notice {
+    display: flex;
+    align-items: flex-start;
+    background: $chef-info-alert-light;
+    color: $chef-info-alert;
+    border-radius: $global-radius;
+    padding: 8px;
+    margin-bottom: 8px;
+    font-size: 12px;
+
+    .disconnect-icon {
+      display: block;
+      margin-right: 6px;
+      height: 16px;
+      width: 16px;
+      transform: translateY(2px);
+      flex: none;
+    }
+
+    .disconnect-time:hover {
+      color: $chef-info-alert-dark;
+    }
+
+  }
+
+  .healthcheck-message {
+    padding: 2px;
+  }
+
+  .healthcheck-header {
+    border-radius: $global-radius $global-radius 0 0;
+    padding: 3px 8px 3px 8px;
+
+    &.CRITICAL {
+      // TODO: variables!
+      background-color: #961856;
+      color: #FFFFFF;
+    }
+
+    &.WARNING {
+      background-color: #B74500;
+      color: #FFFFFF;
+    }
+
+    &.UNKNOWN {
+      background-color: #424848;
+      color: #FFFFFF;
+    }
+
+
+  }
+
+  .healthcheck-content {
+    border-radius: 0 0 $global-radius $global-radius;
+    background-color: #222435;
+    color: #FFFFFF;
+    padding: 8px;
+  }
+
   .health-line {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     font-size: 12px;
     margin-bottom: 6px;
-  }
-
-  .channel-line {
-    padding-left: 18px;
-    margin-bottom: 8px;
-  }
-
-  .timewizard-line {
-    padding-left: 24px;
-    font-size: 12px;
-    color: $chef-dark-grey;
-    letter-spacing: 0.1px;
-    line-height: 18px;
 
     a {
       color: inherit;
@@ -132,6 +208,18 @@ chef-alert {
     a:hover {
       color: $chef-primary-dark;
     }
+
+    .health-icon {
+      display: block;
+      margin-right: 6px;
+      height: 16px;
+      width: 16px;
+    }
+  }
+
+  .channel-line {
+    padding-left: 18px;
+    margin-bottom: 8px;
   }
 
   chef-icon {
@@ -168,28 +256,3 @@ chef-alert {
   padding-right: 35px;
 }
 
-.disconnect-notice {
-  display: flex;
-  align-items: flex-start;
-  background: $chef-info-alert-light;
-  color: $chef-info-alert;
-  border-radius: $global-radius;
-  padding: 8px;
-  margin-bottom: 8px;
-
-  .disconnect-icon {
-    display: block;
-    margin-right: 6px;
-    height: 14px;
-    width: 14px;
-    transform: translateY(5px);
-  }
-
-  .disconnect-time:hover {
-    color: $chef-info-alert-dark;
-  }
-
-  span:first-child {
-    display: block;
-  }
-}
