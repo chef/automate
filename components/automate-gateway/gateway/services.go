@@ -40,7 +40,7 @@ import (
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_eventfeed "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
-	pb_iam_v2beta "github.com/chef/automate/components/automate-gateway/api/iam/v2"
+	pb_iam_v2 "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	pb_legacy "github.com/chef/automate/components/automate-gateway/api/legacy"
 	pb_license "github.com/chef/automate/components/automate-gateway/api/license"
 	pb_nodes "github.com/chef/automate/components/automate-gateway/api/nodes"
@@ -55,11 +55,11 @@ import (
 	"github.com/chef/automate/components/automate-gateway/handler"
 	handler_compliance "github.com/chef/automate/components/automate-gateway/handler/compliance"
 	handler_data_lifecycle "github.com/chef/automate/components/automate-gateway/handler/data_lifecycle"
-	handler_policies "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/policy"
-	handler_rules "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/rules"
-	handler_teams "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/teams"
-	handler_tokens "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/tokens"
-	handler_users "github.com/chef/automate/components/automate-gateway/handler/iam/v2beta/users"
+	handler_policies "github.com/chef/automate/components/automate-gateway/handler/iam/v2/policy"
+	handler_rules "github.com/chef/automate/components/automate-gateway/handler/iam/v2/rules"
+	handler_teams "github.com/chef/automate/components/automate-gateway/handler/iam/v2/teams"
+	handler_tokens "github.com/chef/automate/components/automate-gateway/handler/iam/v2/tokens"
+	handler_users "github.com/chef/automate/components/automate-gateway/handler/iam/v2/users"
 
 	// anything else
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
@@ -180,9 +180,9 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create projects client for authz-service")
 	}
-	pb_iam_v2beta.RegisterPoliciesServer(grpcServer,
+	pb_iam_v2.RegisterPoliciesServer(grpcServer,
 		handler_policies.NewServer(policiesClient, projectsClient, authzV2Client))
-	pb_iam_v2beta.RegisterRulesServer(grpcServer, handler_rules.NewServer(projectsClient))
+	pb_iam_v2.RegisterRulesServer(grpcServer, handler_rules.NewServer(projectsClient))
 
 	tokensMgmtClient, err := clients.TokensMgmtClient()
 	if err != nil {
@@ -190,7 +190,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_tokens.RegisterTokensMgmtServer(grpcServer, handler.NewTokensMgmtServer(tokensMgmtClient))
 	// IAM v2 uses the same client
-	pb_iam_v2beta.RegisterTokensServer(grpcServer, handler_tokens.NewServer(tokensMgmtClient))
+	pb_iam_v2.RegisterTokensServer(grpcServer, handler_tokens.NewServer(tokensMgmtClient))
 
 	usersMgmtClient, err := clients.UsersMgmtClient()
 	if err != nil {
@@ -198,7 +198,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_users.RegisterUsersMgmtServer(grpcServer, handler.NewUsersMgmtServer(usersMgmtClient))
 	// IAM v2 uses the same client
-	pb_iam_v2beta.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
+	pb_iam_v2.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
 
 	teamsV1Client, err := clients.TeamsV1Client()
 	if err != nil {
@@ -210,7 +210,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create V2 client for teams service")
 	}
-	pb_iam_v2beta.RegisterTeamsServer(grpcServer, handler_teams.NewServer(teamsV2Client))
+	pb_iam_v2.RegisterTeamsServer(grpcServer, handler_teams.NewServer(teamsV2Client))
 
 	secretsClient, err := clients.SecretClient()
 	if err != nil {
@@ -356,11 +356,11 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 
 func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFeatureFlags) (http.Handler, error) {
 	endpointMap := map[string]registerFunc{
-		"policies v2beta": pb_iam_v2beta.RegisterPoliciesHandlerFromEndpoint,
-		"users v2beta":    pb_iam_v2beta.RegisterUsersHandlerFromEndpoint,
-		"tokens v2beta":   pb_iam_v2beta.RegisterTokensHandlerFromEndpoint,
-		"teams v2beta":    pb_iam_v2beta.RegisterTeamsHandlerFromEndpoint,
-		"rules v2beta":    pb_iam_v2beta.RegisterRulesHandlerFromEndpoint,
+		"policies v2": pb_iam_v2.RegisterPoliciesHandlerFromEndpoint,
+		"users v2":    pb_iam_v2.RegisterUsersHandlerFromEndpoint,
+		"tokens v2":   pb_iam_v2.RegisterTokensHandlerFromEndpoint,
+		"teams v2":    pb_iam_v2.RegisterTeamsHandlerFromEndpoint,
+		"rules v2":    pb_iam_v2.RegisterRulesHandlerFromEndpoint,
 	}
 	return muxFromRegisterMap(grpcURI, dopts, endpointMap)
 }
