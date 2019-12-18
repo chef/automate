@@ -202,14 +202,14 @@ describeIfIAMV2p1('project update re-tagging', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
-        url: '/apis/iam/v2beta/projects',
+        url: '/apis/iam/v2/projects',
         body: projectWithRule.project
       });
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
-        url: `/apis/iam/v2beta/projects/${projectWithRule.rule.project_id}/rules`,
+        url: `/apis/iam/v2/projects/${projectWithRule.rule.project_id}/rules`,
         body: projectWithRule.rule
       });
     });

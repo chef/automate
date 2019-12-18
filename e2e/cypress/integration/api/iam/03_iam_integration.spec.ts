@@ -40,7 +40,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
-        url: '/apis/iam/v2beta/projects',
+        url: '/apis/iam/v2/projects',
         failOnStatusCode: false,
         body: {
           id: id,
@@ -54,7 +54,7 @@ describeIfIAMV2p1('assigning projects', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
-      url: '/apis/iam/v2beta/tokens',
+      url: '/apis/iam/v2/tokens',
       body: {
         id: tokenId1,
         name: tokenId1
@@ -66,7 +66,7 @@ describeIfIAMV2p1('assigning projects', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
-      url: '/apis/iam/v2beta/policies',
+      url: '/apis/iam/v2/policies',
       failOnStatusCode: false,
       body: {
         id: policyId1,
@@ -90,7 +90,7 @@ describeIfIAMV2p1('assigning projects', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
-      url: '/apis/iam/v2beta/tokens',
+      url: '/apis/iam/v2/tokens',
       body: {
         id: tokenId2,
         name: tokenId2
@@ -102,7 +102,7 @@ describeIfIAMV2p1('assigning projects', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
-      url: '/apis/iam/v2beta/policies',
+      url: '/apis/iam/v2/policies',
       body: {
         id: policyId2,
         name: policyId2,
@@ -136,7 +136,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'POST',
-        url: `/apis/iam/v2beta/${iamResources}`,
+        url: `/apis/iam/v2/${iamResources}`,
         body: {
           ...resource,
           projects: [authorizedProject1]
@@ -152,7 +152,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}`,
         body: {
           ...resource,
           projects: [authorizedProject1, authorizedProject2]
@@ -170,7 +170,7 @@ describeIfIAMV2p1('assigning projects', () => {
         cy.request({
           headers: { 'api-token': twoAllowedProjectsTok },
           method: 'POST',
-          url: `/apis/iam/v2beta/${iamResources}`,
+          url: `/apis/iam/v2/${iamResources}`,
           failOnStatusCode: false,
           body: {
             ...resource,
@@ -186,7 +186,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -202,7 +202,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'POST',
-        url: `/apis/iam/v2beta/${iamResources}`,
+        url: `/apis/iam/v2/${iamResources}`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -218,7 +218,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -234,7 +234,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}`,
         body: {
           ...resource,
           // existing projects (no change)
@@ -254,7 +254,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': unassignedAndProjectAllowedTok },
         method: 'POST',
-        url: `/apis/iam/v2beta/${iamResources}`,
+        url: `/apis/iam/v2/${iamResources}`,
         body: {
           ...resource,
           id: `${resource.id}-2`,
@@ -274,7 +274,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': unassignedAndProjectAllowedTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-2`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-2`,
         body: {
           ...resource,
           id: `${resource.id}-2`,
@@ -293,7 +293,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': unassignedAndProjectAllowedTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-2`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-2`,
         body: {
           ...resource,
           id: `${resource.id}-2`,
@@ -311,7 +311,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': unassignedAndProjectAllowedTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-2`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-2`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -329,7 +329,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-2`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-2`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -349,7 +349,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'POST',
-        url: `/apis/iam/v2beta/${iamResources}`,
+        url: `/apis/iam/v2/${iamResources}`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -367,7 +367,7 @@ describeIfIAMV2p1('assigning projects', () => {
         cy.request({
           headers: { 'api-token': unassignedAndProjectAllowedTok },
           method: 'POST',
-          url: `/apis/iam/v2beta/${iamResources}`,
+          url: `/apis/iam/v2/${iamResources}`,
           body: {
             ...resource,
             id: `${resource.id}-4a`,
@@ -378,7 +378,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': unassignedAndProjectAllowedTok},
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-4a`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-4a`,
         body: {
           ...resource,
           id: `${resource.id}-4a`,
@@ -398,7 +398,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'POST',
-        url: `/apis/iam/v2beta/${iamResources}`,
+        url: `/apis/iam/v2/${iamResources}`,
         body: {
           ...resource,
           id: `${resource.id}-4b`,
@@ -409,7 +409,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-4b`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-4b`,
         body: {
           ...resource,
           id: `${resource.id}-4b`,
@@ -427,7 +427,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'POST',
-        url: `/apis/iam/v2beta/${iamResources}`,
+        url: `/apis/iam/v2/${iamResources}`,
         body: {
           ...resource,
           id: `${resource.id}-5`,
@@ -438,7 +438,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-5`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-5`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -456,7 +456,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-5`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-5`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -475,7 +475,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-5`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-5`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -494,7 +494,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-5`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-5`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -513,7 +513,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-5`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-5`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -532,7 +532,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'POST',
-        url: `/apis/iam/v2beta/${iamResources}`,
+        url: `/apis/iam/v2/${iamResources}`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -550,7 +550,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'POST',
-        url: `/apis/iam/v2beta/${iamResources}`,
+        url: `/apis/iam/v2/${iamResources}`,
         body: {
           ...resource,
           id: `${resource.id}-7`,
@@ -561,7 +561,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': unassignedAndProjectAllowedTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-7`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-7`,
         failOnStatusCode: false,
         body: {
           ...resource,
@@ -581,7 +581,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'PUT',
-        url: `/apis/iam/v2beta/policies/${policyId1}`,
+        url: `/apis/iam/v2/policies/${policyId1}`,
         failOnStatusCode: false,
         body: {
           id: policyId1,
@@ -610,7 +610,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
-        url: `/apis/iam/v2beta/${iamResources}`,
+        url: `/apis/iam/v2/${iamResources}`,
         body: {
           ...resource,
           id: `${resource.id}-8`,
@@ -621,7 +621,7 @@ describeIfIAMV2p1('assigning projects', () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'PUT',
-        url: `/apis/iam/v2beta/${iamResources}/${resource.id}-8`,
+        url: `/apis/iam/v2/${iamResources}/${resource.id}-8`,
         body: {
           ...resource,
           id: `${resource.id}-8`,

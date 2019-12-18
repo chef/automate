@@ -34,7 +34,7 @@ describeIfIAMV2p1('Project delete', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
-      url: '/apis/iam/v2beta/projects',
+      url: '/apis/iam/v2/projects',
       body: project
     });
 
@@ -42,7 +42,7 @@ describeIfIAMV2p1('Project delete', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',
-      url: `/apis/iam/v2beta/projects/${project.id}/rules`,
+      url: `/apis/iam/v2/projects/${project.id}/rules`,
       body: rule
     });
 
@@ -50,7 +50,7 @@ describeIfIAMV2p1('Project delete', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
-      url: `/apis/iam/v2beta/projects/${project.id}`,
+      url: `/apis/iam/v2/projects/${project.id}`,
       failOnStatusCode: false
     }).then((deleteResp) => {
       expect(deleteResp.status,
@@ -61,7 +61,7 @@ describeIfIAMV2p1('Project delete', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'GET',
-      url: '/apis/iam/v2beta/projects'
+      url: '/apis/iam/v2/projects'
     }).then((resp: Cypress.ObjectLike) => {
       expect(responseContainsProject(resp.body.projects, project.id)).to.be.equal(true);
     });
@@ -73,7 +73,7 @@ describeIfIAMV2p1('Project delete', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
-      url: `/apis/iam/v2beta/projects/${project.id}`,
+      url: `/apis/iam/v2/projects/${project.id}`,
       failOnStatusCode: false
     }).then((deleteResp) => {
       expect(deleteResp.status,
@@ -84,7 +84,7 @@ describeIfIAMV2p1('Project delete', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'GET',
-      url: '/apis/iam/v2beta/projects'
+      url: '/apis/iam/v2/projects'
     }).then((resp: Cypress.ObjectLike) => {
       expect(responseContainsProject(resp.body.projects, project.id)).to.be.equal(true);
     });
@@ -93,7 +93,7 @@ describeIfIAMV2p1('Project delete', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
-      url: `/apis/iam/v2beta/projects/${project.id}/rules/${rule.id}`
+      url: `/apis/iam/v2/projects/${project.id}/rules/${rule.id}`
     }).then((deleteResp) => {
       expect(deleteResp.status).to.be.equal(200);
     });
@@ -102,7 +102,7 @@ describeIfIAMV2p1('Project delete', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
-      url: `/apis/iam/v2beta/projects/${project.id}`,
+      url: `/apis/iam/v2/projects/${project.id}`,
       failOnStatusCode: false
     }).then((deleteResp) => {
       expect(deleteResp.status,
@@ -113,7 +113,7 @@ describeIfIAMV2p1('Project delete', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'GET',
-      url: '/apis/iam/v2beta/projects'
+      url: '/apis/iam/v2/projects'
     }).then((resp: Cypress.ObjectLike) => {
       expect(responseContainsProject(resp.body.projects, project.id)).to.be.equal(true);
     });
@@ -125,7 +125,7 @@ describeIfIAMV2p1('Project delete', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
-      url: `/apis/iam/v2beta/projects/${project.id}`
+      url: `/apis/iam/v2/projects/${project.id}`
     }).then((deleteResp) => {
       expect(deleteResp.status).to.be.equal(200);
     });
@@ -134,7 +134,7 @@ describeIfIAMV2p1('Project delete', () => {
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'GET',
-      url: '/apis/iam/v2beta/projects'
+      url: '/apis/iam/v2/projects'
     }).then((resp: Cypress.ObjectLike) => {
       expect(responseContainsProject(resp.body.projects, project.id)).to.be.equal(false);
     });
