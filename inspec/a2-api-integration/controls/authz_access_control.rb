@@ -278,7 +278,7 @@ control 'authz-access-control-1' do
 
       it "gateway/policy_version returns the correct response code" do
           policy_version_request = automate_api_request(
-            "/apis/iam/v2beta/policy_version", # V2 endpoint also used for v1
+            "/apis/iam/v2/policy_version", # V2 endpoint also used for v1
             http_method: 'GET',
             user: user,
           )

@@ -25,7 +25,7 @@ control 'upgrade-iam-v2-1' do
 
   describe 'list policies' do
     it 'includes the legacy policies we expect' do
-      resp = automate_api_request('/apis/iam/v2beta/policies')
+      resp = automate_api_request('/apis/iam/v2/policies')
       expect(resp.http_status).to eq 200
 
       all_policies = resp.parsed_response_body[:policies]
@@ -210,7 +210,7 @@ EOF
       describe 'chef-managed policies' do
         it 'update returns 403' do
           DEFAULT_POLICY_IDS.each do |id|
-            resp = automate_api_request("/apis/iam/v2beta/policies/#{id}",
+            resp = automate_api_request("/apis/iam/v2/policies/#{id}",
               http_method: 'PUT',
               user: user,
               request_body: {
@@ -225,7 +225,7 @@ EOF
 
         it 'delete returns 403' do
           DEFAULT_POLICY_IDS.each do |id|
-            resp = automate_api_request("/apis/iam/v2beta/policies/#{id}",
+            resp = automate_api_request("/apis/iam/v2/policies/#{id}",
               http_method: 'DELETE',
               user: user
             )
@@ -235,7 +235,7 @@ EOF
 
         it 'adding members returns 200' do
           DEFAULT_POLICY_IDS.each do |id|
-            resp = automate_api_request("/apis/iam/v2beta/policies/#{id}/members:add",
+            resp = automate_api_request("/apis/iam/v2/policies/#{id}/members:add",
               http_method: 'POST',
               request_body: {
                 members: ["user:local:newmember1", "team:local:newmember2"],
@@ -247,7 +247,7 @@ EOF
 
         it 'removing members returns 200' do
           DEFAULT_POLICY_IDS.each do |id|
-            resp = automate_api_request("/apis/iam/v2beta/policies/#{id}/members:remove",
+            resp = automate_api_request("/apis/iam/v2/policies/#{id}/members:remove",
               http_method: 'POST',
               request_body: {
                 members: ["user:local:newmember1", "team:local:newmember2"],
@@ -261,7 +261,7 @@ EOF
       describe 'chef-managed roles' do
         it 'update returns 403' do
           DEFAULT_ROLE_IDS.each do |id|
-            resp = automate_api_request("/apis/iam/v2beta/roles/#{id}",
+            resp = automate_api_request("/apis/iam/v2/roles/#{id}",
               http_method: 'PUT',
               user: user,
               request_body: {
@@ -276,7 +276,7 @@ EOF
 
         it 'delete returns 403' do
           DEFAULT_ROLE_IDS.each do |id|
-            resp = automate_api_request("/apis/iam/v2beta/roles/#{id}",
+            resp = automate_api_request("/apis/iam/v2/roles/#{id}",
               http_method: 'DELETE',
               user: user
             )

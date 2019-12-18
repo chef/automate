@@ -60,7 +60,7 @@ verify_legacy_policies_not_migrated() {
         echo "checking legacy policy $id..."
 	# only capture the response code
         code="$(hab_curl -s -o /dev/null -k -w '%{http_code}' -H "api-token: $token" \
-          "https://localhost/apis/iam/v2beta/policies/$id")"
+          "https://localhost/apis/iam/v2/policies/$id")"
 	[[ $code -eq 404 ]] || return 1
     done
 }
