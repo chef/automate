@@ -8,3 +8,6 @@ steps:
     timeout_in_minutes: 600
     agents:
       azure: "true"
+    retry:
+      automatic:
+        limit: 300
