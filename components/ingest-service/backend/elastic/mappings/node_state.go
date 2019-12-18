@@ -305,13 +305,12 @@ var nodeProps = `
 				"type": "keyword",
 				"index": false,
 				"doc_values": false
-			}
+			},
 			"region": {
 				"type": "keyword",
 				"index": false,
 				"doc_values": false
 			}
-
 		}
 	},
 	"cloud_id":{
@@ -322,7 +321,7 @@ var nodeProps = `
 	},
 	"cloud_account_id":{
 		"type": "keyword"
-	}
+	},
 	"fqdn": {
 		"type": "keyword",
 		"index": false,
