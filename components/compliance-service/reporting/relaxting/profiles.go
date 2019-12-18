@@ -315,6 +315,7 @@ func (backend *ES2Backend) GetProfile(hash string) (reportingapi.Profile, error)
 //this is the summary that appears at the top of the page when you select a profile from profiles list at the moment
 // this one does not immediately need to be deep aware as the only things that are used from it in a2 api are version, maintainer and license
 // todo - deep filtering - this should be made depth aware as this still needs to be consumed by api users
+// todo - do we need to handle waiver info in here too?
 func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters map[string][]string) (*stats.ProfileSummary, error) {
 	esIndex, err := GetEsIndex(filters, false, false)
 	if err != nil {

@@ -513,6 +513,167 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           }
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+
+
+      # Compliance Summary with role filters
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          filters: [
+              Stats::ListFilter.new(type: "role", values: ["apache_deb", "missing"]),
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
+          ]
+      )
+      expected_data = {
+          "reportSummary" => {
+              "status" => "failed",
+              "stats" => {
+                  "nodesCnt" => 1,
+                  "nodes" => 1,
+                  "platforms" => 1,
+                  "environments" => 1,
+                  "profiles" => 2,
+                  "controls" => 59
+              }
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      #### nodes summary
+
+      # Compliance Summary without filters
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "nodes",
+          filters: [
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+          ])
+      expected_data = {
+          "nodeSummary" => {
+              "compliant" => 1,
+              "skipped" => 1,
+              "noncompliant" => 3,
+              "highRisk" => 3
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      # Compliance Summary without filters for a node skipped due to unsupported os
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "nodes",
+          filters: [
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-03-07T23:59:59Z'])
+          ])
+      expected_data = {
+          "nodeSummary" => {
+              "skipped" => 1
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      # Compliance Summary Nodes with filters
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "nodes",
+          filters: [
+              Stats::ListFilter.new(type: "platform", values: ["centos"]),
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+          ]
+      )
+      expected_data = {
+          "nodeSummary" => {
+              "compliant" => 1
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "nodes",
+          filters: [
+              Stats::ListFilter.new(type: "platform", values: ["windows"]),
+              Stats::ListFilter.new(type: "status", values: ["skipped"]),
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+          ]
+      )
+      expected_data = {
+          "nodeSummary" => {
+              "skipped" => 1
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "nodes",
+          filters: [
+              Stats::ListFilter.new(type: "platform", values: ["debian"]),
+              Stats::ListFilter.new(type: 'start_time', values: ['2018-02-04T23:59:59Z']),
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
+          ]
+      )
+      expected_data = {
+          "nodeSummary" => {
+              "noncompliant" => 1,
+              "highRisk" => 1
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      # Compliance Summary Nodes with recipe filter
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "nodes",
+          filters: [
+              Stats::ListFilter.new(type: "recipe", values: ["apache_extras::windows_harden", "missing.in.action"]),
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+          ]
+      )
+      expected_data = {
+          "nodeSummary" => {
+              "skipped" => 1
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      #### control summary
+
+      # Global Compliancy across all controls
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "controls",
+          filters: [
+              Stats::ListFilter.new(type: 'start_time', values: ['2018-03-02T23:59:59Z']),
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-03-05T23:59:59Z'])
+          ]
+      )
+      expected_data = {
+          "controlsSummary" => {
+              "passed" => 3,
+              "skipped" => 15
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      #description: Control stats list for nodes.
+      #calls: stats::ReadSummary::GetStatsSummaryControls
+      #depth: Report
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "controls",
+          filters: [
+              Stats::ListFilter.new(type: "role", values: ["dot.role", "debian-hardening-prod"]),
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z']),
+              Stats::ListFilter.new(type: "status", values: ["failed"])
+          ]
+      )
+      expected_data = {
+          "controlsSummary" => {
+              "failures" => 21,
+              "criticals" => 21,
+              "passed" => 23,
+              "skipped" => 12,
+              "waived" => 3
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
     end
   end
 end

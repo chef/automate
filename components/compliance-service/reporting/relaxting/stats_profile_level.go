@@ -114,6 +114,8 @@ func (depth *ProfileDepth) getProfileListWithAggregatedComplianceSummariesAggs(
 		Size(int(size))
 	termsQuery.SubAggregation("failures", elastic.NewSumAggregation().
 		Field("profiles.controls_sums.failed.total"))
+	termsQuery.SubAggregation("waived", elastic.NewSumAggregation().
+		Field("profiles.controls_sums.waived.total"))
 	termsQuery.SubAggregation("passed", elastic.NewSumAggregation().
 		Field("profiles.controls_sums.passed.total"))
 	termsQuery.SubAggregation("skipped", elastic.NewSumAggregation().
@@ -154,6 +156,7 @@ func (depth *ProfileDepth) getProfileListWithAggregatedComplianceSummariesResult
 				sumFailures, _ := bucket.Aggregations.Sum("failures")
 				sumPassed, _ := bucket.Aggregations.Sum("passed")
 				sumSkipped, _ := bucket.Aggregations.Sum("skipped")
+				sumWaived, _ := bucket.Aggregations.Sum("waived")
 				sumMajors, _ := bucket.Aggregations.Sum("major")
 				sumMinors, _ := bucket.Aggregations.Sum("minor")
 				sumCriticals, _ := bucket.Aggregations.Sum("critical")
@@ -164,6 +167,7 @@ func (depth *ProfileDepth) getProfileListWithAggregatedComplianceSummariesResult
 					Failures:  int32(*sumFailures.Value),
 					Passed:    int32(*sumPassed.Value),
 					Skipped:   int32(*sumSkipped.Value),
+					Waived:    int32(*sumWaived.Value),
 					Majors:    int32(*sumMajors.Value),
 					Minors:    int32(*sumMinors.Value),
 					Criticals: int32(*sumCriticals.Value),
