@@ -6,7 +6,7 @@ Below is the steps to run the tests:
 ```
 $ hab studio enter
 [1][default:/src:0]# start_deployment_service
-[2][default:/src:0]# chef-automate dev deploy-some chef/automate-elasticsearch
+[2][default:/src:0]# chef-automate dev deploy-some chef/automate-elasticsearch --with-deps
 [3][default:/src:0]# config_mgmt_integration
 ```
 
@@ -14,7 +14,7 @@ This will run the integration tests by leveraging the helper `go_test`
 
 # How do I run a single test
 
-Before running any test manually, make sure you bring up elasticsearch by running `start_deployment_service` then `chef-automate dev deploy-some chef/automate-elasticsearch`,
+Before running any test manually, make sure you bring up elasticsearch by running `start_deployment_service` then `chef-automate dev deploy-some chef/automate-elasticsearch --with-deps`,
 otherwise you will see the following error when running any of them:
 ```
 Could not create elasticsearch client from 'http://elasticsearch:9200': health check timeout: no Elasticsearch node available
