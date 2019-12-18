@@ -12,6 +12,7 @@ import { AuthorizedComponent } from './authorized/authorized.component';
 import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { CalendarComponent } from './calendar/calendar.component';
+import { ChefNotificationsComponent } from './notifications/notifications.component';
 import { CreateV1TeamModalComponent } from '../page-components/create-v1-team-modal/create-v1-team-modal.component';
 import { CreateObjectModalComponent } from './create-object-modal/create-object-modal.component';
 import { DeleteObjectModalComponent } from './delete-object-modal/delete-object-modal.component';
@@ -32,7 +33,7 @@ import {
 } from './guitar-string-collection/guitar-string-section/guitar-string-section.component';
 import { InputDirective } from './input/input.directive';
 import { LandingComponent } from './landing/landing.component';
-import { ChefNotificationsComponent } from './notifications/notifications.component';
+import { MessageModalComponent } from './message-modal/message-modal.component';
 import { PagePickerComponent } from './page-picker/page-picker.component';
 import { ProjectsDropdownComponent } from './projects-dropdown/projects-dropdown.component';
 import { SettingsSidebarComponent } from './settings-sidebar/settings-sidebar.component';
@@ -70,6 +71,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbsComponent,
     BreadcrumbComponent,
     CalendarComponent,
+    ChefNotificationsComponent,
     CreateV1TeamModalComponent,
     CreateObjectModalComponent,
     DeleteObjectModalComponent,
@@ -79,7 +81,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     GuitarStringItemComponent,
     GuitarStringSectionComponent,
     LandingComponent,
-    ChefNotificationsComponent,
+    MessageModalComponent,
     PagePickerComponent,
     ProjectsDropdownComponent,
     SettingsSidebarComponent,
@@ -105,6 +107,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbsComponent,
     BreadcrumbComponent,
     CalendarComponent,
+    ChefNotificationsComponent,
     CreateV1TeamModalComponent,
     CreateObjectModalComponent,
     DeleteObjectModalComponent,
@@ -117,7 +120,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     GuitarStringSectionComponent,
     InputDirective,
     LandingComponent,
-    ChefNotificationsComponent,
+    MessageModalComponent,
     PagePickerComponent,
     ProjectsDropdownComponent,
     SettingsSidebarComponent,

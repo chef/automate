@@ -43,7 +43,7 @@
                     <a [routerLink]="['/settings/projects', project.id]" data-cy="project-details">{{ project.name }}</a>
                   </chef-table-cell>
                   <chef-table-cell>{{ project.id }}</chef-table-cell>
-                  <chef-table-cell>{{ getRulesStatus(project) }}</chef-table-cell>
+                  <chef-table-cell>{{ statusLabel[project.status] }}</chef-table-cell>
                   <chef-table-cell class="three-dot-column">
                     <!-- <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project.id]"> -->
                       <chef-control-menu>
@@ -92,7 +92,6 @@
         [visible]="deleteModalVisible"
         objectNoun="project"
         [objectName]="projectToDelete?.id"
-        [moreDetails]="inUseMessage()"
         (close)="closeDeleteModal()"
         (deleteClicked)="deleteProject()"
         objectAction="Delete">
@@ -111,6 +110,13 @@
         (confirm)="confirmApplyStop()"
         (cancel)="cancelApplyStop()">
       </app-confirm-apply-stop-modal>
+
+      <app-message-modal
+        [title]="'Could Not Delete Project'"
+        [visible]="messageModalVisible"
+        (close)="closeMessageModal()">
+        Before you can delete this project, delete all ingest rules, and then update projects.
+      </app-message-modal>
     </main>
   </div>
 </div>

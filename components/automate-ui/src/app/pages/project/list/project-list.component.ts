@@ -5,12 +5,13 @@ import { interval as observableInterval,  Observable, Subject, combineLatest } f
 import { map, takeUntil, filter, take } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
@@ -31,6 +32,7 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public sortedProjects$: Observable<Project[]>;
   public projectToDelete: Project;
   public deleteModalVisible = false;
+  public messageModalVisible = false;
   public createModalVisible = false;
   public createProjectForm: FormGroup;
   public creatingProject = false;
@@ -56,6 +58,13 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public ApplyRulesStatusState = ApplyRulesStatusState;
 
   private isDestroyed = new Subject<boolean>();
+
+  public statusLabel: Record<ProjectStatus, string> = {
+      'PROJECT_RULES_STATUS_UNSET': '',
+      'NO_RULES': 'No rules',
+      'EDITS_PENDING': 'Edits pending',
+      'RULES_APPLIED': 'Applied'
+  };
 
   constructor(
     private layoutFacade: LayoutFacadeService,
@@ -125,7 +134,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
         this.store.dispatch(new LoadOptions());
       });
 
-    // handle project creation failure response
     combineLatest([
       this.store.select(createStatus),
       this.store.select(createError)
@@ -153,19 +161,23 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
+  public closeMessageModal(): void {
+    this.messageModalVisible = false;
+  }
+
   public startProjectDelete(p: Project): void {
-    this.deleteModalVisible = true;
-    this.projectToDelete = p;
+    const deletableStates: ProjectStatus[] = ['EDITS_PENDING', 'RULES_APPLIED'];
+    if (deletableStates.includes(p.status)) {
+      this.messageModalVisible = true;
+    } else {
+      this.projectToDelete = p;
+      this.deleteModalVisible = true;
+    }
   }
 
   public deleteProject(): void {
     this.closeDeleteModal();
     this.store.dispatch(new DeleteProject({id: this.projectToDelete.id}));
-  }
-
-  // Note: This will be dealt with later, right now, we don't check if it's used
-  public inUseMessage(): string {
-    return '';
   }
 
   public createProject(): void {
@@ -237,15 +249,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
 
   public cancelApplyStop(): void {
     this.closeConfirmApplyStopModal();
-  }
-
-  public getRulesStatus(project: Project): string {
-    switch (project.status) {
-      case 'NO_RULES': return 'No rules';
-      case 'EDITS_PENDING': return 'Edits pending';
-      case 'RULES_APPLIED': return 'Applied';
-      default: return '';
-    }
   }
 
   public getButtonText(): string {

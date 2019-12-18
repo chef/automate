@@ -4,22 +4,25 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
+import { using } from 'app/testing/spec-helpers';
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
-import { ProjectService } from 'app/entities/projects/project.service';
-import {
-  GetProjectsSuccess, GetApplyRulesStatusSuccess, GetApplyRulesStatusSuccessPayload
-} from 'app/entities/projects/project.actions';
-import { projectEntityReducer, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
-import { Project } from 'app/entities/projects/project.model';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
-import { ProjectListComponent } from './project-list.component';
 import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
 import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
 import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
+import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import { ProjectService } from 'app/entities/projects/project.service';
+import {
+  GetProjectsSuccess,
+  GetApplyRulesStatusSuccess,
+  GetApplyRulesStatusSuccessPayload
+} from 'app/entities/projects/project.actions';
+import { projectEntityReducer, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
+import { Project } from 'app/entities/projects/project.model';
+import { ProjectListComponent } from './project-list.component';
 
 describe('ProjectListComponent', () => {
   let component: ProjectListComponent;
@@ -61,7 +64,7 @@ describe('ProjectListComponent', () => {
         }),
         MockComponent({
           selector: 'app-delete-object-modal',
-          inputs: ['visible', 'objectNoun', 'objectName', 'moreDetails'],
+          inputs: ['visible', 'objectNoun', 'objectName' ],
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({
@@ -70,6 +73,11 @@ describe('ProjectListComponent', () => {
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({
+          selector: 'app-message-modal',
+          inputs: ['visible' ],
+          outputs: ['close' ]
+        }),
+         MockComponent({
           selector: 'app-confirm-apply-start-modal',
           inputs: ['visible'],
           outputs: ['confirm', 'cancel']
@@ -170,6 +178,72 @@ describe('ProjectListComponent', () => {
         (<HTMLButtonElement>(element.querySelector('[data-cy=create-project]'))).click();
         expect(component.createProjectForm.controls['name'].value).toBe(null);
       });
+    });
+
+    describe('delete modal', () => {
+
+      using([
+        ['NO_RULES'],
+        ['PROJECT_RULES_STATUS_UNSET']
+      ], function (status: ProjectStatus) {
+        it(`upon selecting delete from control menu, opens with ${status}`, () => {
+          expect(component.deleteModalVisible).toBe(false);
+          component.startProjectDelete(genProject('uuid-111', status));
+          expect(component.deleteModalVisible).toBe(true);
+        });
+      });
+
+      using([
+        ['RULES_APPLIED'],
+        ['EDITS_PENDING']
+      ], function (status: ProjectStatus) {
+        it(`upon selecting delete from control menu, does not open with ${status}`, () => {
+          expect(component.deleteModalVisible).toBe(false);
+          component.startProjectDelete(genProject('uuid-111', status));
+          expect(component.deleteModalVisible).toBe(false);
+        });
+      });
+
+     it('closes upon sending request to back-end', () => {
+        component.startProjectDelete(genProject('uuid-111', 'NO_RULES'));
+        expect(component.deleteModalVisible).toBe(true);
+        component.deleteProject();
+        expect(component.deleteModalVisible).toBe(false);
+      });
+
+    });
+
+    describe('message modal', () => {
+
+      using([
+        ['RULES_APPLIED'],
+        ['EDITS_PENDING']
+      ], function (status: ProjectStatus) {
+        it(`upon selecting delete from control menu, opens with ${status}`, () => {
+          expect(component.messageModalVisible).toBe(false);
+          component.startProjectDelete(genProject('uuid-111', status));
+          expect(component.messageModalVisible).toBe(true);
+        });
+      });
+
+      using([
+        ['NO_RULES'],
+        ['PROJECT_RULES_STATUS_UNSET']
+      ], function (status: ProjectStatus) {
+        it(`upon selecting delete from control menu, does not open with ${status}`, () => {
+          expect(component.messageModalVisible).toBe(false);
+          component.startProjectDelete(genProject('uuid-111', status));
+          expect(component.messageModalVisible).toBe(false);
+        });
+      });
+
+      it('closes upon request', () => {
+        component.startProjectDelete(genProject('uuid-111', 'EDITS_PENDING'));
+        expect(component.messageModalVisible).toBe(true);
+        component.closeMessageModal();
+        expect(component.messageModalVisible).toBe(false);
+      });
+
     });
   });
 
