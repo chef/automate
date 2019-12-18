@@ -10,4 +10,4 @@ steps:
       azure: "true"
     retry:
       automatic:
-        limit: 300
+        limit: 10
