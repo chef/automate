@@ -40,7 +40,7 @@ service Teams {
       post: "/iam/v2/teams"
       body: "*"
       additional_bindings {
-        post: "/iam/v2beta/teams",
+        post: "/iam/v2beta/teams"
         body: "*"
       }
     };
@@ -54,7 +54,7 @@ service Teams {
       put: "/iam/v2/teams/{id}"
       body: "*"
       additional_bindings {
-        put: "/iam/v2beta/teams/{id}",
+        put: "/iam/v2beta/teams/{id}"
         body: "*"
       }
     };
@@ -92,7 +92,7 @@ service Teams {
       post: "/iam/v2/teams/{id}/users:add"
       body: "*"
       additional_bindings {
-        post: "/iam/v2beta/teams/{id}/users:add",
+        post: "/iam/v2beta/teams/{id}/users:add"
         body: "*"
       }
     };
@@ -106,7 +106,7 @@ service Teams {
       post: "/iam/v2/teams/{id}/users:remove"
       body: "*"
       additional_bindings {
-        post: "/iam/v2beta/teams/{id}/users:remove",
+        post: "/iam/v2beta/teams/{id}/users:remove"
         body: "*"
       }
     };

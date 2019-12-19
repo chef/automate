@@ -18,7 +18,7 @@ service Tokens {
       post: "/iam/v2/tokens"
       body: "*"
       additional_bindings {
-        post: "/iam/v2beta/tokens",
+        post: "/iam/v2beta/tokens"
         body: "*"
       }
     };
@@ -44,7 +44,7 @@ service Tokens {
       put: "/iam/v2/tokens/{id}"
       body: "*"
       additional_bindings {
-        put: "/iam/v2beta/tokens/{id}",
+        put: "/iam/v2beta/tokens/{id}"
         body: "*"
       }
     };

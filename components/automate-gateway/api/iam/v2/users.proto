@@ -19,7 +19,7 @@ service Users {
       post: "/iam/v2/users"
       body: "*"
       additional_bindings {
-        post: "/iam/v2beta/users",
+        post: "/iam/v2beta/users"
         body: "*"
       }
     };
@@ -69,7 +69,7 @@ service Users {
       put: "/iam/v2/users/{id}"
       body: "*"
       additional_bindings {
-        put: "/iam/v2beta/users/{id}",
+        put: "/iam/v2beta/users/{id}"
         body: "*"
       }
     };
@@ -83,7 +83,7 @@ service Users {
       put: "/iam/v2/self/{id}"
       body: "*"
       additional_bindings {
-        put: "/iam/v2beta/self/{id}",
+        put: "/iam/v2beta/self/{id}"
         body: "*"
       }
     };

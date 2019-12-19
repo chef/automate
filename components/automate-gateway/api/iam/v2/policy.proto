@@ -19,7 +19,7 @@ service Policies {
       post: "/iam/v2/policies"
       body: "*"
       additional_bindings {
-        post: "/iam/v2beta/policies",
+        post: "/iam/v2beta/policies"
         body: "*"
       }
     };
@@ -32,7 +32,7 @@ service Policies {
     option (google.api.http) = {
       get: "/iam/v2/policies/{id}"
       additional_bindings {
-        get: "/iam/v2beta/policies/{id}",
+        get: "/iam/v2beta/policies/{id}"
       }
     };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
@@ -56,7 +56,7 @@ service Policies {
     option (google.api.http) = {
       delete: "/iam/v2/policies/{id}"
       additional_bindings {
-        delete: "/iam/v2beta/policies/{id}",
+        delete: "/iam/v2beta/policies/{id}"
       }
     };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
@@ -69,7 +69,7 @@ service Policies {
       put: "/iam/v2/policies/{id}"
       body: "*"
       additional_bindings {
-        put: "/iam/v2beta/policies/{id}",
+        put: "/iam/v2beta/policies/{id}"
         body: "*"
       }
     };
@@ -107,7 +107,7 @@ service Policies {
       put: "/iam/v2/policies/{id}/members"
       body: "*"
       additional_bindings {
-        put: "/iam/v2beta/policies/{id}/members",
+        put: "/iam/v2beta/policies/{id}/members"
         body: "*"
       }
     };
@@ -121,7 +121,7 @@ service Policies {
       post: "/iam/v2/policies/{id}/members:remove"
       body: "*"
       additional_bindings {
-        post: "/iam/v2beta/policies/{id}/members:remove",
+        post: "/iam/v2beta/policies/{id}/members:remove"
         body: "*"
       }
     };
@@ -135,7 +135,7 @@ service Policies {
       post: "/iam/v2/policies/{id}/members:add"
       body: "*"
       additional_bindings {
-        post: "/iam/v2beta/policies/{id}/members:add",
+        post: "/iam/v2beta/policies/{id}/members:add"
         body: "*"
       }
     };
@@ -149,7 +149,7 @@ service Policies {
       post: "/iam/v2/roles"
       body: "*"
       additional_bindings {
-        post: "/iam/v2beta/roles",
+        post: "/iam/v2beta/roles"
         body: "*"
       }
     };
@@ -199,7 +199,7 @@ service Policies {
       put: "/iam/v2/roles/{id}"
       body: "*"
       additional_bindings {
-        put: "/iam/v2beta/roles/{id}",
+        put: "/iam/v2beta/roles/{id}"
         body: "*"
       }
     };
@@ -213,7 +213,7 @@ service Policies {
       post: "/iam/v2/projects"
       body: "*"
       additional_bindings {
-        post: "/iam/v2beta/projects",
+        post: "/iam/v2beta/projects"
         body: "*"
       }
     };
@@ -227,7 +227,7 @@ service Policies {
       put: "/iam/v2/projects/{id}"
       body: "*"
       additional_bindings {
-        put: "/iam/v2beta/projects/{id}",
+        put: "/iam/v2beta/projects/{id}"
         body: "*"
       }
     };

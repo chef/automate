@@ -19,7 +19,7 @@ service Rules {
       post: "/iam/v2/projects/{project_id}/rules"
       body: "*"
       additional_bindings {
-        post: "/iam/v2beta/projects/{project_id}/rules",
+        post: "/iam/v2beta/projects/{project_id}/rules"
         body: "*"
       }
     };
@@ -34,7 +34,7 @@ service Rules {
       put: "/iam/v2/projects/{project_id}/rules/{id}"
       body: "*"
       additional_bindings {
-        put: "/iam/v2beta/projects/{project_id}/rules/{id}",
+        put: "/iam/v2beta/projects/{project_id}/rules/{id}"
         body: "*"
       }
     };
