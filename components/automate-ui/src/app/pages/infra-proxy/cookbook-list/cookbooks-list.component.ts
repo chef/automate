@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -18,7 +18,7 @@ import { GetCookbooksForOrg } from 'app/entities/cookbooks/cookbook.actions';
 import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
 import {
   allCookbooks,
-  getAllStatus as getAllCookbooksForOrgStatus,
+  getAllStatus as getAllCookbooksForOrgStatus
 } from 'app/entities/cookbooks/cookbook.selectors';
 
 export type OrgTabName = 'cookbooks' | 'details';
@@ -27,7 +27,7 @@ export type OrgTabName = 'cookbooks' | 'details';
   templateUrl: './cookbooks-list.component.html',
   styleUrls: ['./cookbooks-list.component.scss']
 })
-export class CookbooksListComponent implements OnInit {
+export class CookbooksListComponent implements OnInit, OnDestroy {
   public org: Org;
   public cookbooks: Cookbook[] = [];
   public loading$: Observable<boolean>;
@@ -45,7 +45,7 @@ export class CookbooksListComponent implements OnInit {
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
-    private router: Router,
+    private router: Router
   ) { }
 
   ngOnInit() {
@@ -72,7 +72,7 @@ export class CookbooksListComponent implements OnInit {
     ).subscribe(([server_id, org_id]: string[]) => {
       this.serverId = server_id;
         this.OrgId = org_id;
-      this.store.dispatch(new GetOrg({ server_id: server_id, id: org_id }))
+      this.store.dispatch(new GetOrg({ server_id: server_id, id: org_id }));
       this.store.dispatch(new GetCookbooksForOrg({
         server_id: server_id, org_id: org_id
       }));

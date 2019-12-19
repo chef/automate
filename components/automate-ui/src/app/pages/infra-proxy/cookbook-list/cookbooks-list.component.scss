@@ -27,18 +27,18 @@ chef-tab-selector {
 form {
   input {
     font-size: 1.02em;
-    width: 520px !important;
-    margin-bottom: -6px !important;
+    width: 520px;
+    margin-bottom: -6px;
   }
 
   textarea {
     font-size: 1.02em;
-    width: 520px !important;
+    width: 520px;
   }
 
-  .errors {    
-    width: 520px !important;
-    margin-top: -6px !important;
+  .errors {
+    width: 520px;
+    margin-top: -6px;
   }
 
   input[type="text"]:disabled {
