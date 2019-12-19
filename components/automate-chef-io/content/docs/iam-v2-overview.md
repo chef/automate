@@ -279,14 +279,14 @@ This API request returns a list of teams that belong to `test-project-1`.
 
 ```bash
 curl -sH "api-token: $TOKEN" -H "projects: test-project-1" \
-  https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams?pretty
+  https://{{< example_fqdn "automate" >}}/apis/iam/v2/teams?pretty
 ```
 
 This API request returns a list of tokens that belong to `test-project-2`.
 
 ```bash
 curl -sH "api-token: $TOKEN" -H "projects: test-project-2" \
-  https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/tokens?pretty
+  https://{{< example_fqdn "automate" >}}/apis/iam/v2/tokens?pretty
 ```
 
 This API request returns a list of Infrastructure nodes that do not belong to any project.
