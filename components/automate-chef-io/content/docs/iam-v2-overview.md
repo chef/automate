@@ -263,6 +263,12 @@ From there, you can select any individual rule to view its list of conditions, a
 
 ![](/images/docs/admin-projects.png)
 
+One example of a project that can be created is one that matches all Effortless Infra nodes. To create this project, add one rule (see below).
+
+![](/images/docs/effortless-project-rule.png)
+
+The above rule is matching on a node's Chef Server field, which is set to "localhost". This works because all Effortless Infra nodes do not have a Chef Server. Then, by adding a second condition that matches a specific Chef Policy Name, subgroups of Effortless Infra nodes can be created. 
+
 ## Projects in the API
 
 It is also possible to filter APIs by project from the Chef Automate CLI. The following API requests are examples of fetching data using project headers as filters.
