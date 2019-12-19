@@ -20,7 +20,7 @@
         Currently, you are using IAM v1. Roles are only available when using IAM v2.
       </section>
       <section *ngIf="isIAMv2$ | async" class="page-body">
-        <app-authorized [allOf]="['/iam/v2beta/roles', 'get']">
+        <app-authorized [allOf]="['/iam/v2/roles', 'get']">
           <chef-table-new>
             <chef-table-header>
               <chef-table-row>
@@ -38,7 +38,7 @@
                   <chef-table-cell></chef-table-cell>
                   <chef-table-cell>{{ role.type | iamType }}</chef-table-cell>
                   <chef-table-cell class="three-dot-column">
-                    <!-- <app-authorized [allOf]="[`/iam/v2beta/roles/{id}`, 'delete', role.id]"> -->
+                    <!-- <app-authorized [allOf]="[`/iam/v2/roles/{id}`, 'delete', role.id]"> -->
                     <chef-control-menu *ngIf="(role.type | iamType).toLowerCase() === 'custom'">
                       <chef-option data-cy="delete" (click)="startRoleDelete(role)">Delete Role</chef-option>
                     </chef-control-menu>

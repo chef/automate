@@ -25,7 +25,7 @@ describe('LandingComponent', () => {
     },
     { allOfCheck: [['/auth/users', 'get', '']], route: '/settings/users' },
     {
-      anyOfCheck: [['/auth/tokens', 'get', ''], ['/iam/v2beta/tokens', 'get', '']],
+      anyOfCheck: [['/auth/tokens', 'get', ''], ['/iam/v2/tokens', 'get', '']],
       route: '/settings/tokens'
     }
   ];
