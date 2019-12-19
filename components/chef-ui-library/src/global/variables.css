@@ -39,6 +39,9 @@
   --medium-teal-blue: #005BAB;
   --columbia-blue: #9ED2FF;
   --glitter: #CFE8FF;
+  --fuchsia: #A424B4;
+  --fuchsia-light: #FADAFA;
+  --fuchsia-dark: #440F4B;
 
 
   /* ** THESE SEMANTIC COLOR VARIABLES ARE FREE TO BE USED WITHIN AUTOMATE ** */
@@ -53,6 +56,10 @@
   --chef-major: var(--violet);
   --chef-minor: var(--indigo);
   --chef-success: var(--science-blue);
+  /* tertiary */
+  --chef-info-alert: var(--fuchsia);
+  --chef-info-alert-light: var(--fuchsia-light);
+  --chef-info-alert-dark: var(--fuchsia-dark);
   /* greyscale */
   --chef-dark-grey: var(--sirocco);
   --chef-grey: var(--iron);

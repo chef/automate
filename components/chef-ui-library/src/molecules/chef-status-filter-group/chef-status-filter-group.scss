@@ -1,6 +1,7 @@
 chef-status-filter-group {
   --active-color: var(--toggle-active-color, var(--chef-primary-bright));
   display: flex;
+  flex-wrap: wrap;
 
   .filter {
     padding: 8px 12px;
@@ -10,17 +11,17 @@ chef-status-filter-group {
     border-radius: 4px;
     font-size: 14px;
     display: inline-flex;
-    margin-bottom: 16px;
+    margin-bottom: 10px;
 
     &:not(:last-child) {
-      margin-right: 16px;
+      margin-right: 10px;
     }
 
     .option-content {
       display: flex;
       align-items: center;
       flex-wrap: wrap;
-      min-width: 100px;
+      width: 100px;
     }
 
     .filter-icon {
@@ -71,6 +72,19 @@ chef-status-filter-group {
       }
     }
 
+    &.disconnected {
+      chef-icon {
+        color: var(--chef-dark-grey);
+        content: '';
+        display: block;
+        width: 14px;
+        height: 14px;
+        background: url(/assets/icon-disconnected.svg);
+        background-size: contain;
+      }
+    }
+
+
     &.selected {
       background: var(--chef-white);
 
@@ -104,6 +118,11 @@ chef-status-filter-group {
         background: #E7E9E9;
         box-shadow: 0px 0px 0px 1px var(--chef-dark-grey) inset;
       }
+
+      &.disconnected {
+        background: var(--chef-info-alert-light);
+        box-shadow: 0px 0px 0px 1px var(--chef-info-alert) inset;
+      }
     }
 
     &:hover {
@@ -128,6 +147,10 @@ chef-status-filter-group {
       &.unknown {
         background: #E7E9E9;
       }
+
+      &.disconnected {
+        background: var(--chef-info-alert-light);
+      }
     }
   }
 
@@ -143,6 +166,7 @@ chef-status-filter-group {
 
       .option-content {
         flex-wrap: nowrap;
+        width: initial;
         min-width: auto;
       }
 

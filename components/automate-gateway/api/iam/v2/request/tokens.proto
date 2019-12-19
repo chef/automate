@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/request";
+
+import "google/protobuf/wrappers.proto";
+
+message CreateTokenReq {
+    string id = 1;
+    string name = 2;
+    google.protobuf.BoolValue active = 3;
+    string value = 4;
+    repeated string projects = 5;
+}
+
+message GetTokenReq {
+    string id = 1;
+}
+
+message UpdateTokenReq {
+    // ID can't be changed; ID used to discover token
+    string id = 1;
+    string name = 2;
+    google.protobuf.BoolValue active = 3;
+    repeated string projects = 5;
+}
+
+message DeleteTokenReq {
+    string id = 1;
+}
+
+message ListTokensReq {}
+
+message ResetAllTokenProjectsReq {}

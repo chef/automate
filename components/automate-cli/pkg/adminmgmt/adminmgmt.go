@@ -17,7 +17,7 @@ import (
 	users_req "github.com/chef/automate/components/automate-gateway/api/auth/users/request"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
 	authz_req "github.com/chef/automate/components/automate-gateway/api/authz/request"
-	authz_v2_req "github.com/chef/automate/components/automate-gateway/api/iam/v2beta/request"
+	authz_v2_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 	"github.com/chef/automate/lib/stringutils"
 )
 

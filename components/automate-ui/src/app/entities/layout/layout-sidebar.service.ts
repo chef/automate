@@ -223,7 +223,7 @@ export class LayoutSidebarService {
                         authorized: {
                             name: 'tokens',
                             anyOf: [['/auth/tokens', 'get'],
-                            ['/iam/v2beta/tokens', 'get']]
+                            ['/iam/v2/tokens', 'get']]
                         },
                         visible: true
                     }
@@ -239,7 +239,7 @@ export class LayoutSidebarService {
                         route: '/settings/policies',
                         authorized: {
                             name: 'policies',
-                            allOf: ['/iam/v2beta/policies', 'get']
+                            allOf: ['/iam/v2/policies', 'get']
                         },
                         visible: true
                     },
@@ -249,7 +249,7 @@ export class LayoutSidebarService {
                         route: '/settings/roles',
                         authorized: {
                             name: 'roles',
-                            allOf: ['/iam/v2beta/roles', 'get']
+                            allOf: ['/iam/v2/roles', 'get']
                         },
                         visible: true
                     },
@@ -259,7 +259,7 @@ export class LayoutSidebarService {
                         route: '/settings/projects',
                         authorized: {
                             name: 'projects',
-                            allOf: ['/iam/v2beta/projects', 'get']
+                            allOf: ['/iam/v2/projects', 'get']
                         },
                         visible: true
                     }

@@ -11,7 +11,10 @@ test_upgrades=true
 # IAMv2 enabled_, and the diagnostics are run twice: before and after upgrade.
 do_test_deploy() {
     log_info "run chef-automate iam upgrade-to-v2 --skip-policy-migration"
-    chef-automate iam upgrade-to-v2 --skip-policy-migration || return 1
+    # Use the installed version of chef/automate-cli to ensure we upgrade with
+    # the current version of chef-automate, not the next version we're upgrading
+    # to.
+    hab pkg exec chef/automate-cli chef-automate iam upgrade-to-v2 --skip-policy-migration || return 1
 
     # ensure service startup works with IAM v2:
     # - kill authz-service to force startup,

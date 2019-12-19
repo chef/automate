@@ -56,12 +56,12 @@
       <section class="page-body" *ngIf="tabValue === 'rules'">
         <ng-container *ngIf="showRulesTable()">
           <chef-toolbar>
-            <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
+            <app-authorized [allOf]="['/iam/v2/projects', 'post']">
               <chef-button [routerLink]="['/settings', 'projects', project?.id, 'rules']" id="create-button" primary>Create Rule</chef-button>
             </app-authorized>
             <small *ngIf="project?.status === 'EDITS_PENDING'">Edits are pending: update <a [routerLink]="['/settings/projects']">projects</a> to apply edits.</small>
           </chef-toolbar>
-          <app-authorized [allOf]="['/iam/v2beta/projects', 'get']">
+          <app-authorized [allOf]="['/iam/v2/projects', 'get']">
             <chef-table-new id="project-rules-table">
               <chef-table-header>
                 <chef-table-row>
@@ -83,7 +83,7 @@
                   <chef-table-cell>{{ rule.conditions.length | pluralize : 'condition' : 'conditions' }}</chef-table-cell>
                   <chef-table-cell>{{ getEditStatus(rule) }}</chef-table-cell>
                   <chef-table-cell class="three-dot-column">
-                    <app-authorized [allOf]="['/iam/v2beta/projects/{id}', 'delete', project?.id]">
+                    <app-authorized [allOf]="['/iam/v2/projects/{id}', 'delete', project?.id]">
                       <chef-control-menu>
                         <chef-option *ngIf="showDeleteRule()" class="delete-rule" (click)="startRuleDelete(rule)" data-cy="delete-rule">Delete Rule</chef-option>
                       </chef-control-menu>
@@ -95,7 +95,7 @@
           </app-authorized>
         </ng-container>
         <ng-container *ngIf="showNoRulesMessage()">
-          <app-authorized [allOf]="['/iam/v2beta/projects', 'post']">
+          <app-authorized [allOf]="['/iam/v2/projects', 'post']">
             <div class="empty-case-container">
               <small class="empty-case-entry" *ngIf="project?.status === 'EDITS_PENDING'">
                 Edits are pending: update <a [routerLink]="['/settings/projects']">projects</a> to apply edits.
