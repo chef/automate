@@ -39,8 +39,11 @@ func TestGatherInfoForNode(t *testing.T) {
 			PlacementAvailabilityZone: "us-west-2a",
 			AccountID:                 "123456789",
 		},
-		LatestRunID: "123353254545425",
-		Projects:    []string{"tomato", "cucumber"},
+		LatestRunID:    "123353254545425",
+		Projects:       []string{"tomato", "cucumber"},
+		CloudID:        "i-0aee75f0b4b0d9f22",
+		CloudAccountID: "123456789",
+		CloudRegion:    "us-west-2",
 	}
 
 	nodeMetadata, err := gatherInfoForNode(backendNode)
