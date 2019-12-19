@@ -263,7 +263,7 @@ From there, you can select any individual rule to view its list of conditions, a
 
 ![](/images/docs/admin-projects.png)
 
-One example of a project that can be created is one that matches all Effortless Infra nodes. To create this project, add one rule (see below).
+To create a project that contains all Effortless Infra nodes add a Node ingest rule with a condition that uses an attribute of Chef Server and a value of "localhost".
 
 ![](/images/docs/effortless-project-rule.png)
 
