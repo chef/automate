@@ -6,6 +6,7 @@ test_name="iam v2 (upgrade, diagnostics)"
 #shellcheck disable=SC2034
 test_diagnostics_filters="~iam-v1"
 test_upgrades=true
+test_diagnostics_pre_upgrade_filters="~remove-this-tag-after-merge"
 
 # do_test_deploy runs _before_ the upgrade, so we upgrade _from a state with
 # IAMv2 enabled_, and the diagnostics are run twice: before and after upgrade.

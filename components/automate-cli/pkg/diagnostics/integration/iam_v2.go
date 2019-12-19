@@ -56,7 +56,7 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 
 	return diagnostics.Diagnostic{
 		Name: "iam-v2",
-		Tags: diagnostics.Tags{"auth", "iam-v2", "skip-for-deep-upgrade"},
+		Tags: diagnostics.Tags{"auth", "iam-v2", "skip-for-deep-upgrade", "remove-this-tag-after-merge"},
 		Skip: func(tstCtx diagnostics.TestContext) (bool, string, error) {
 			vsn := struct {
 				Version struct{ Major, Minor string }
