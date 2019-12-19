@@ -415,7 +415,7 @@ var nodeProps = `
 
 // NodeState is the representation of our `node-state` Mapping
 var NodeState = Mapping{
-	Index:      "node-state-8",
+	Index:      "node-state-7",
 	Alias:      "node-state",
 	Type:       "node-state",
 	Timeseries: false,
