@@ -85,8 +85,11 @@
                 <a [id]="'health-timestamp-' + i"> {{ service.current_health_since }} ago</a>
               </span>
             </div>
-            <div class="healthcheck-message-collection"  *ngIf="service.health_check !== 'OK'">
-              <div class="healthcheck-message">
+            <div class="healthcheck-message-collection" *ngIf="service.health_check !== 'OK'">
+              <div class="no-healthcheck-messages {{ service.health_check }}" *ngIf="service.health_check_result.stderr === '' && service.health_check_result.stdout === ''" >
+                Health check messages not available. When services specify a health-check hook, the hook's output will be shown here. <a href="https://www.habitat.sh/docs/reference/#sts=health-check">Learn more about writing health-check hooks.</a>
+              </div>
+              <div class="healthcheck-message" *ngIf="service.health_check_result.stderr !== ''">
                 <div class="healthcheck-header {{service.health_check}}">
                   Health Check Error Message
                 </div>
@@ -94,7 +97,7 @@
                   {{service.health_check_result.stderr}}
                 </div>
               </div>
-              <div class="healthcheck-message">
+              <div class="healthcheck-message" *ngIf="service.health_check_result.stdout !== ''">
                 <div class="healthcheck-header {{service.health_check}}">
                   Health Check Output Message
                 </div>

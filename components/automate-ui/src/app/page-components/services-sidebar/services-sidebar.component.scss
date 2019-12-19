@@ -161,6 +161,19 @@ chef-alert {
 
   }
 
+  .no-healthcheck-messages {
+    // TODO variables
+    border: 1px solid;
+    margin: 1px;
+    border-radius: $global-radius;
+    padding: 3px 8px 3px 8px;
+
+    a {
+      color: inherit;
+    }
+
+  }
+
   .healthcheck-message {
     padding: 2px;
   }
@@ -193,6 +206,7 @@ chef-alert {
     background-color: #222435;
     color: #FFFFFF;
     padding: 8px;
+    overflow-wrap: break-word;
   }
 
   .health-line {
