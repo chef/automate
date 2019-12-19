@@ -4,7 +4,7 @@
 test_name="iam v2 (upgrade, diagnostics)"
 # Note: we can't run diagnostics AND inspec, so no inspec here
 #shellcheck disable=SC2034
-test_diagnostics_filters="~iam-v1,~remove-this-tag-after-merge"
+test_diagnostics_filters="~remove-this-tag-after-merge"
 test_diagnostics_pre_upgrade_filters="~remove-this-tag-after-merge"
 test_upgrades=true
 
