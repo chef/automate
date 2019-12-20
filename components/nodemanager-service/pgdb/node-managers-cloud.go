@@ -232,9 +232,9 @@ func (db *DB) AddManagerNodesToDB(nodesArr []*manager.ManagerNode, managerId str
 		var dbNodeID string
 		err = Transact(db, func(tx *DBTrans) error {
 			logctx := logrus.WithFields(logrus.Fields{
-				"name": item.Name,
-				"id": item.Id,
-				"region": item.Region,
+				"name":       item.Name,
+				"id":         item.Id,
+				"region":     item.Region,
 				"account_id": managerAcctId,
 			})
 			logctx.Debug("adding manager node")
@@ -245,7 +245,7 @@ func (db *DB) AddManagerNodesToDB(nodesArr []*manager.ManagerNode, managerId str
 			if dbNodeID == "" {
 				dbNodeID = uuid
 			} else {
-				logrus.Debugf("found a match in the db for node %s with cloud details: %s %s %s", item.Name, item.Id, item.Region, managerAcctId)
+				logctx.Debug("found a match in the db for node")
 			}
 			// add instancecredentials to nodes_secrets table
 			err = tx.nodeSecret(dbNodeID, credsForInstance)
