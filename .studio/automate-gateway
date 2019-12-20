@@ -575,7 +575,7 @@ function get_api_token_with_policy() {
       # and add it to policy
       curl -fsS --insecure -H "api-token: $(get_admin_token)" \
         --data "$(jq -nc --arg token "$token_id"  '{ members: [ "token:\($token)" ]}')" \
-       "${GATEWAY_URL}/apis/iam/v2beta/policies/${policy}/members:add" >/dev/null
+       "${GATEWAY_URL}/apis/iam/v2/policies/${policy}/members:add" >/dev/null
     fi
     cat "$token_file"
   fi
@@ -587,9 +587,9 @@ DOC
 function remove_legacy_v1_policies() {
   install_if_missing core/jq-static jq
 
-  for id in $(gateway_get /apis/iam/v2beta/policies |\
+  for id in $(gateway_get /apis/iam/v2/policies |\
                 jq -rc '.policies[] | select(.name | startswith("[Legacy]")) | .id'); do
     echo "Deleting legacy policy $id..."
-    curl -fsS --insecure -H "api-token: $(get_admin_token)" -XDELETE "${GATEWAY_URL}/apis/iam/v2beta/policies/$id"
+    curl -fsS --insecure -H "api-token: $(get_admin_token)" -XDELETE "${GATEWAY_URL}/apis/iam/v2/policies/$id"
   done
 }
