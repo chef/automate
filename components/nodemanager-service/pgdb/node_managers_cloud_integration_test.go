@@ -295,7 +295,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodesToDBDoesNotAddNodeW
 		Name:            "my-test",
 		PlatformName:    "windows",
 		SourceId:        "i-93433000",
-		SourceRegion:    "us-west-2a",
+		SourceRegion:    "us-west-2",
 		SourceAccountId: "999999999999",
 		LastContact:     ptypes.TimestampNow(),
 		RunData: &nodes.LastContactData{
