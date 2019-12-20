@@ -81,15 +81,24 @@ describe('token management', () => {
     ['Copy Token', 'Toggle Status', 'Delete Token'].forEach((item, _) => {
       cy.get('chef-table-body').contains(tokenName1).parent().parent()
         .find('[data-cy=token-control]').as('controlMenu');
-      cy.get('@controlMenu').should('be.visible').click({ force: true });
-      cy.get('@controlMenu').contains(item);
+      cy.get('chef-table-body').contains(tokenName1).parent().parent()
+        .find('[data-cy=token-control] .mat-select-trigger').as('dropdownTrigger');
+
+      cy.get('@dropdownTrigger').click({ force: true }).then( () => {
+        cy.get('.chef-control-menu-x').contains(item);
+      });
+
     });
   });
 
   it('can copy token', () => {
     cy.get('chef-table-body').contains(tokenName1).parent().parent()
     .find('[data-cy=token-control]').as('controlMenu');
-    cy.get('@controlMenu').should('be.visible')
+
+    cy.get('chef-table-body').contains(tokenName1).parent().parent()
+      .find('[data-cy=token-control] .mat-select-trigger').as('dropdownTrigger');
+
+    cy.get('@dropdownTrigger').should('be.visible')
       .click({ force: true }).then(() =>
         cy.get('@controlMenu').find('[data-cy=copy-token]').click({force: true})
       );
