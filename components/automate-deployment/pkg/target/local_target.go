@@ -1316,11 +1316,12 @@ func (t *LocalTarget) installHabViaBin(ctx context.Context, requiredVersion habp
 
 	dler := airgap.NewNetHabDownloader()
 	binPath := path.Join(t.habTmpDir(), "hab")
-	f, err := os.OpenFile(binPath, os.O_RDWR|os.O_CREATE, 0700)
+	f, err := fileutils.NewAtomicWriter(binPath, fileutils.WithAtomicWriteFileMode(0700))
 	if err != nil {
 		return err
 	}
 	defer f.Close() // nolint: errcheck
+
 	if err := dler.DownloadHabBinary(requiredVersion.Version(), requiredVersion.Release(), f); err != nil {
 		return err
 	}
