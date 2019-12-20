@@ -34,6 +34,12 @@ chef-alert {
   justify-content: left;
 }
 
+.filter.disconnected chef-icon {
+  // This is set in chef-ui-library but automate-ui's copy is in a slightly
+  // different path:
+  background: url(/assets/img/icon-disconnected.svg);
+}
+
 .service-item {
   @include modal-box();
   display: block;
