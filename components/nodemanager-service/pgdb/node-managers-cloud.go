@@ -231,7 +231,13 @@ func (db *DB) AddManagerNodesToDB(nodesArr []*manager.ManagerNode, managerId str
 
 		var dbNodeID string
 		err = Transact(db, func(tx *DBTrans) error {
-			logrus.Debugf("adding manager node %s with cloud details: %s %s %s ", item.Name, item.Id, item.Region, managerAcctId)
+			logctx := logrus.WithFields(logrus.Fields{
+				"name": item.Name,
+				"id": item.Id,
+				"region": item.Region,
+				"account_id": managerAcctId,
+			})
+			logctx.Debug("adding manager node")
 			dbNodeID, err = tx.SelectStr(sqlInsertManagerNode, uuid, mgrType, item.Id, jsonTc, item.Name, item.Region, managerAcctId)
 			if err != nil {
 				return errors.Wrapf(err, "AddManagerNodesToDB unable to insert node with source id %s", item.Id)
