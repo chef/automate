@@ -17,7 +17,7 @@ import (
 	rules "github.com/chef/automate/components/automate-gateway/handler/iam/v2/rules"
 )
 
-// Server is the server interface
+// Server is the server interface.
 type Server struct {
 	policies authz.PoliciesClient
 	projects authz.ProjectsClient
