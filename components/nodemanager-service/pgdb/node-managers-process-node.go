@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"time"
 
-	uuid "github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
@@ -107,11 +106,7 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	// note: we shouldn't be able to ever get here without a node id, because this function is called from the
 	// ingestion process, and the ingestion process will reject a report with no node uuid
 	if len(node.GetUuid()) == 0 {
-		id, err := uuid.NewV4()
-		if err != nil {
-			return err
-		}
-		node.Uuid = id.String()
+		return fmt.Errorf("no uuid included in message. aborting.")
 	}
 
 	// the incoming node may hit any of these cases:
@@ -151,14 +146,14 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 		}
 
 		if len(node.GetSourceId()) == 0 || len(node.GetSourceAccountId()) == 0 || len(node.GetSourceRegion()) == 0 {
-			err = db.upsertByID(node, nodeDetails)
+			err = tx.upsertByID(node, nodeDetails)
 		} else {
-			node.Uuid, err = db.upsertByCloudDetails(node, nodeDetails)
+			node.Uuid, err = tx.upsertByCloudDetails(node, nodeDetails)
 			if err != nil {
 				if pgerr, ok := err.(*pq.Error); ok {
 					if pgerr.Code == pq.ErrorCode("23505") {
 						logrus.Debugf("got duplicate uuid error when attempting upsert. updating by id")
-						err = db.upsertByID(node, nodeDetails)
+						err = tx.upsertByID(node, nodeDetails)
 					}
 				}
 			}
@@ -194,15 +189,15 @@ type nodeDetails struct {
 	projectsDataByte    []byte
 }
 
-func (db *DB) upsertByID(node *manager.NodeMetadata, details nodeDetails) error {
+func (tx *DBTrans) upsertByID(node *manager.NodeMetadata, details nodeDetails) error {
 	var err error
 	if node.GetScanData() != nil {
-		_, err = db.Exec(sqlUpsertByIDScanData, node.GetUuid(),
+		_, err = tx.Exec(sqlUpsertByIDScanData, node.GetUuid(),
 			node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
 			details.nodeState, details.lastContact, node.GetSourceId(), node.GetSourceRegion(), node.GetSourceAccountId(),
 			node.GetJobUuid(), details.lastContactDataByte, details.projectsDataByte, details.mgrType)
 	} else if node.GetRunData() != nil {
-		_, err = db.Exec(sqlUpsertByIDRunData, node.GetUuid(),
+		_, err = tx.Exec(sqlUpsertByIDRunData, node.GetUuid(),
 			node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
 			details.nodeState, details.lastContact, node.GetSourceId(), node.GetSourceRegion(), node.GetSourceAccountId(),
 			details.lastContactDataByte, details.projectsDataByte, details.mgrType)
@@ -210,16 +205,16 @@ func (db *DB) upsertByID(node *manager.NodeMetadata, details nodeDetails) error 
 	return err
 }
 
-func (db *DB) upsertByCloudDetails(node *manager.NodeMetadata, details nodeDetails) (string, error) {
+func (tx *DBTrans) upsertByCloudDetails(node *manager.NodeMetadata, details nodeDetails) (string, error) {
 	var id string
 	var err error
 	if node.GetScanData() != nil {
-		id, err = db.SelectStr(sqlUpsertBySourceIDScanData, node.GetUuid(),
+		id, err = tx.SelectStr(sqlUpsertBySourceIDScanData, node.GetUuid(),
 			node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
 			details.nodeState, details.lastContact, node.GetSourceId(), node.GetSourceRegion(),
 			node.GetSourceAccountId(), node.GetJobUuid(), details.lastContactDataByte, details.projectsDataByte, details.mgrType)
 	} else if node.GetRunData() != nil {
-		id, err = db.SelectStr(sqlUpsertBySourceIDRunData, node.GetUuid(),
+		id, err = tx.SelectStr(sqlUpsertBySourceIDRunData, node.GetUuid(),
 			node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
 			details.nodeState, details.lastContact, node.GetSourceId(), node.GetSourceRegion(),
 			node.GetSourceAccountId(), details.lastContactDataByte, details.projectsDataByte, details.mgrType)
