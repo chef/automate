@@ -44,7 +44,7 @@ chef-alert {
   @include modal-box();
   display: block;
   box-shadow: none;
-  background-color: #F2F5F7;
+  background-color: #F2F5F7; // unique color
   margin-bottom: 1em;
   margin-right: 35px;
   margin-left: -5px;
@@ -113,25 +113,23 @@ chef-alert {
     font-size: 12px;
 
     &.CRITICAL {
-      background-color: #F9DBEA; // TODO: variables (piggy pink lol)
-      color: #BA1E6A; // TODO: variables (maroon)
+      background-color: var(--chef-badge-critical-background);
+      color: var(--chef-badge-critical-color);
     }
 
     &.WARNING {
-      // TODO variables
-      background-color: #FFE5D4;
-      color: #B74500;
+      background-color: var(--chef-badge-warning-background);
+      color: var(--chef-badge-warning-color);
     }
 
     &.UNKNOWN {
-      // TODO variables
-      background-color: #F3F6F8;
-      color: #222435;
+      background-color: var(--chef-lightest-grey);
+      color: var(--chef-primary-dark);
     }
 
     &.OK {
-      background-color: #CFE8FF;
-      color: #005BAB;
+      background-color: var(--chef-badge-success-background);
+      color: var(--chef-badge-success-color);
     }
 
   }
@@ -162,7 +160,6 @@ chef-alert {
   }
 
   .no-healthcheck-messages {
-    // TODO variables
     border: 1px solid;
     margin: 1px;
     border-radius: $global-radius;
@@ -183,19 +180,18 @@ chef-alert {
     padding: 3px 8px 3px 8px;
 
     &.CRITICAL {
-      // TODO: variables!
-      background-color: #961856;
-      color: #FFFFFF;
+      background-color: #961856; // unique color
+      color: var(--chef-white);
     }
 
     &.WARNING {
-      background-color: #B74500;
-      color: #FFFFFF;
+      background-color: var(--chef-badge-warning-color);
+      color: var(--chef-white);
     }
 
     &.UNKNOWN {
-      background-color: #424848;
-      color: #FFFFFF;
+      background-color: #424848; // unique color
+      color: var(--chef-white);
     }
 
 
@@ -203,8 +199,8 @@ chef-alert {
 
   .healthcheck-content {
     border-radius: 0 0 $global-radius $global-radius;
-    background-color: #222435;
-    color: #FFFFFF;
+    background-color: var(--chef-primary-dark);
+    color: var(--chef-white);
     padding: 8px;
     overflow-wrap: break-word;
   }

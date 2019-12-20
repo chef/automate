@@ -80,7 +80,7 @@
             <div class ="health-line">
                 <chef-icon class="health-icon {{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
               <span>
-                {{ healthCheckStatus(service.health_check) }}: 
+                {{ healthCheckStatus(service.health_check) }}:
                 {{ timewizardMessage(service.health_check, service.previous_health_check) }}
                 <a [id]="'health-timestamp-' + i"> {{ service.current_health_since }} ago</a>
               </span>
