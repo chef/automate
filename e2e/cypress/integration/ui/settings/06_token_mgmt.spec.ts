@@ -84,8 +84,9 @@ describe('token management', () => {
       cy.get('chef-table-body').contains(tokenName1).parent().parent()
         .find('[data-cy=token-control] .mat-select-trigger').as('dropdownTrigger');
 
-      cy.get('@dropdownTrigger').click({ force: true }).then( () => {
-        cy.get('.chef-control-menu-x').contains(item);
+      cy.get('@dropdownTrigger').should('be.visible')
+        .click({ force: true }).then( () => {
+          cy.get('.chef-control-menu-x').contains(item);
       });
 
     });
@@ -100,7 +101,7 @@ describe('token management', () => {
 
     cy.get('@dropdownTrigger').should('be.visible')
       .click({ force: true }).then(() =>
-        cy.get('@controlMenu').find('[data-cy=copy-token]').click({force: true})
+        cy.get('.chef-control-menu-x').find('[data-cy=copy-token]').click({force: true})
       );
 
     cy.get('chef-notification').should('be.visible');
@@ -110,8 +111,15 @@ describe('token management', () => {
   it('can delete token', () => {
     cy.get('chef-table-body').contains(tokenName1).parent().parent()
       .find('[data-cy=token-control]').as('controlMenu');
-    cy.get('@controlMenu').should('be.visible').click();
-    cy.get('@controlMenu').find('[data-cy=delete]').click({ force: true });
+
+    cy.get('chef-table-body').contains(tokenName1).parent().parent()
+      .find('[data-cy=token-control] .mat-select-trigger').as('dropdownTrigger');
+
+    cy.get('@dropdownTrigger').should('be.visible')
+      .click({ force: true }).then(() =>
+        cy.get('.chef-control-menu-x').find('[data-cy=delete]').click({ force: true })
+      );
+
     cy.get('app-delete-object-modal').find('button').contains('Delete Token')
       .click({force: true});
     cy.get('chef-table-body').contains(tokenName1).should('not.exist');
