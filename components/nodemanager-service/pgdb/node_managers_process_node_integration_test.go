@@ -10,12 +10,12 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithNoUUID() {
+func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithSourceInfo() {
 	// test that a new node with no uuid, yes source_id makes it into the db
 	// with the right info and is readable
 	nowTime := ptypes.TimestampNow()
 	node := &manager.NodeMetadata{
-		Uuid:            "",
+		Uuid:            "1223-4254-2424-1322",
 		Name:            "123.798.324.32",
 		PlatformName:    "ubuntu",
 		PlatformRelease: "16.04",
@@ -906,9 +906,10 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeInsertsByIDWhen
 	suite.Equal("my really cool node", readNode.Name)
 
 	// send a node in, same uuid, now has cloud data
-	node.SourceId = "i-078973"
-	node.SourceRegion = "eu-west-1"
-	node.SourceAccountId = "999999999999"
+	newNode := node
+	newNode.SourceId = "i-078973"
+	newNode.SourceRegion = "eu-west-1"
+	newNode.SourceAccountId = "999999999999"
 	err = suite.Database.ProcessIncomingNode(node)
 	if err != nil {
 		suite.FailNow(err.Error())

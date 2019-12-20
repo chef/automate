@@ -153,7 +153,10 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 				if pgerr, ok := err.(*pq.Error); ok {
 					if pgerr.Code == pq.ErrorCode("23505") {
 						logrus.Debugf("got duplicate uuid error when attempting upsert. updating by id")
-						err = tx.upsertByID(node, nodeDetails)
+						// start a new transaction b/c we can't continue the transaction after a failed one
+						return Transact(db, func(tx *DBTrans) error {
+							return tx.upsertByID(node, nodeDetails)
+						})
 					}
 				}
 			}
