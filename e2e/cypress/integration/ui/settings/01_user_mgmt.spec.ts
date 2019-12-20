@@ -99,11 +99,11 @@ describe('user management', () => {
     cy.wait('@getUsers');
 
     cy.get('app-user-table chef-table-cell').contains(username).parent()
-      .find('mat-select').as('controlMenu');
+      .find('[data-cy=select] .mat-select-trigger').as('dropdownTrigger');
     // we throw in a should so cypress waits until introspection allows menu to be shown
-    cy.get('@controlMenu').should('be.visible')
+    cy.get('@dropdownTrigger').should('be.visible')
       .click();
-    cy.get('@controlMenu').find('[data-cy=delete]').click({ force: true });
+    cy.get('.chef-control-menu-x').find('[data-cy=delete]').click({ force: true });
 
     // confirm in modal
     cy.get('app-user-management chef-button').contains('Delete User').click();

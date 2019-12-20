@@ -31,8 +31,8 @@
           </chef-table-cell>
           <chef-table-cell class="three-dot-column">
             <!-- TODO: Need to account for v1 / v2 in the app-authorized path -->
-            <!-- <app-authorized [allOf]="['/iam/v2beta/users/{id}', 'delete', user.id]"> -->
-            <mat-select panelClass="chef-control-menu-x">
+            <!-- <app-authorized [allOf]="['/iam/v2/users/{id}', 'delete', user.id]"> -->
+            <mat-select panelClass="chef-control-menu-x" data-cy="select">
               <mat-option data-cy="delete" (click)="removeClicked.emit(user)">{{ removeText }}</mat-option>
             </mat-select>
             <!-- </app-authorized> -->
