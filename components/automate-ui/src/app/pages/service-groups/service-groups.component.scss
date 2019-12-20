@@ -63,6 +63,12 @@ app-search-bar {
   }
 }
 
+.filter.disconnected chef-icon {
+  // This is set in chef-ui-library but automate-ui's copy is in a slightly
+  // different path:
+  background: url(/assets/img/icon-disconnected.svg);
+}
+
 chef-alert {
   align-items: left;
   justify-content: left;

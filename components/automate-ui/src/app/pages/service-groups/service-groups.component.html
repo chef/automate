@@ -53,6 +53,11 @@
       <div class="filter-label">Warning</div>
       <div class="filter-total">{{ sgHealthSummary["warning"] }}</div>
     </chef-option>
+    <chef-option class="filter disconnected" value='disconnected' (click)="statusFilter('disconnected')">
+      <chef-icon class="filter-icon"></chef-icon>
+      <div class="filter-label">Disconnected</div>
+      <div class="filter-total">{{ sgHealthSummary["disconnected"] }}</div>
+    </chef-option>
     <chef-option class="filter success" value='ok' (click)="statusFilter('ok')">
       <chef-icon class="filter-icon">check_circle</chef-icon>
       <div class="filter-label">OK</div>
