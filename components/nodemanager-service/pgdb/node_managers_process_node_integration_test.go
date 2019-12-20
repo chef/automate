@@ -871,45 +871,6 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeCorrectlyAssoci
 	suite.Equal([]string{mgrID}, readNode.ManagerIds)
 }
 
-func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeCorrectlyModifiesRegionValueBeforeStoringInDB() {
-	nowTime := ptypes.TimestampNow()
-	node := &manager.NodeMetadata{
-		Uuid:            "1223-4784-2424-1389",
-		Name:            "my really cool node",
-		PlatformName:    "debian",
-		PlatformRelease: "8.6",
-		JobUuid:         "12345-389244-2433",
-		LastContact:     nowTime,
-		SourceId:        "i-078973",
-		SourceRegion:    "eu-west-1b",
-		SourceAccountId: "999999999999",
-		Tags:            []*common.Kv{},
-		ScanData: &nodes.LastContactData{
-			Id:      "1003-9254-2004-1322",
-			EndTime: nowTime,
-			Status:  nodes.LastContactData_PASSED,
-		},
-	}
-	err := suite.Database.ProcessIncomingNode(node)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
-	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{})
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
-	suite.Equal(1, len(listNodes))
-
-	readNode, err := suite.Database.GetNode(ctx, listNodes[0].Id)
-	if err != nil {
-		suite.FailNow(err.Error())
-	}
-	suite.Equal("my really cool node", readNode.Name)
-	suite.Equal("eu-west-1", readNode.GetCloudInfo().GetSourceRegion())
-	suite.Equal("i-078973", readNode.GetCloudInfo().GetSourceId())
-	suite.Equal("999999999999", readNode.GetCloudInfo().GetSourceAccountId())
-}
-
 func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeInsertsByIDWhenCloudInfoDoesNotExistButDupNodeIDFound() {
 	// send in a node, no cloud info
 	nowTime := ptypes.TimestampNow()
@@ -946,7 +907,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeInsertsByIDWhen
 
 	// send a node in, same uuid, now has cloud data
 	node.SourceId = "i-078973"
-	node.SourceRegion = "eu-west-1b"
+	node.SourceRegion = "eu-west-1"
 	node.SourceAccountId = "999999999999"
 	err = suite.Database.ProcessIncomingNode(node)
 	if err != nil {
