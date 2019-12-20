@@ -247,7 +247,7 @@ var ConvergeHistory = Mapping{
 							},
 							"account_id": {
 								"type": "keyword"
-							}
+							},
 							"region": {
 								"type": "keyword"
 							}
