@@ -69,7 +69,7 @@
     "@angular/language-service": "^8.2.14",
     "@types/faker": "^4.1.8",
     "@types/jasmine": "=3.3.10",
-    "@types/jasminewd2": "=2.0.6",
+    "@types/jasminewd2": "^2.0.8",
     "@types/lodash": "^4.14.149",
     "@types/node": "^10.17.11",
     "ajv": "^6.10.2",
