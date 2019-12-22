@@ -67,7 +67,6 @@
     "@angular/cli": "^8.3.21",
     "@angular/compiler-cli": "^8.2.14",
     "@angular/language-service": "^8.2.14",
-    "@types/diff2html": "0.0.5",
     "@types/faker": "^4.1.8",
     "@types/jasmine": "=3.3.10",
     "@types/jasminewd2": "=2.0.6",
