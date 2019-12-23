@@ -68,14 +68,14 @@
               </chef-table-cell>
               <chef-table-cell class="controls">
                 <mat-select panelClass="chef-control-menu-x" id="menu-{{token.id}}" data-cy="token-control">
-                  <mat-option (onSelectionChange)="notifyCopy()" data-cy="copy-token">
+                  <mat-option (onSelectionChange)="notifyCopy($event)" data-cy="copy-token">
                     <chef-clipboard plain value={{token.value}} label="Copy Token" icon=""></chef-clipboard>
                   </mat-option>
                   <!-- <app-authorized [allOf]="[`/iam/v2beta/tokens/{id}`, 'put', token.id]"> -->
-                  <mat-option (onSelectionChange)="toggleActive(token)">Toggle Status</mat-option>
+                  <mat-option (onSelectionChange)="toggleActive($event, token)">Toggle Status</mat-option>
                   <!-- </app-authorized> -->
                   <!-- <app-authorized [allOf]="[`/iam/v2beta/tokens/{id}`, 'delete', token.id]"> -->
-                  <mat-option (onSelectionChange)="startTokenDelete(token)" data-cy="delete">Delete Token</mat-option>
+                  <mat-option (onSelectionChange)="startTokenDelete($event, token)" data-cy="delete">Delete Token</mat-option>
                   <!-- </app-authorized> -->
                 </mat-select>
              </chef-table-cell>

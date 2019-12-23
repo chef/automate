@@ -28,6 +28,10 @@ import { assignableProjects } from 'app/services/projects-filter/projects-filter
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 
+export interface KeyboardEvent {
+  isUserInput: boolean;
+}
+
 @Component({
   selector: 'app-api-tokens',
   templateUrl: './api-token-list.component.html',
@@ -131,9 +135,11 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public startTokenDelete(token: ApiToken): void {
-    this.tokenToDelete = token;
-    this.deleteModalVisible = true;
+  public startTokenDelete($event: KeyboardEvent, token: ApiToken): void {
+    if ($event.isUserInput) {
+      this.tokenToDelete = token;
+      this.deleteModalVisible = true;
+    }
   }
 
   public deleteToken(): void {
@@ -152,8 +158,10 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
 
   }
 
-  public toggleActive(token: ApiToken): void {
-    this.store.dispatch(new ToggleTokenActive(token));
+  public toggleActive($event: KeyboardEvent, token: ApiToken): void {
+    if ($event.isUserInput) {
+      this.store.dispatch(new ToggleTokenActive(token));
+    }
   }
 
   public openCreateModal(): void {
@@ -166,11 +174,13 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     this.resetCreateModal();
   }
 
-  public notifyCopy(): void {
-    this.store.dispatch(new CreateNotification({
-      type: Type.info,
-      message: 'API Token copied to clipboard.'
-    }));
+  public notifyCopy($event: KeyboardEvent): void {
+    if ($event.isUserInput) {
+      this.store.dispatch(new CreateNotification({
+        type: Type.info,
+        message: 'API Token copied to clipboard.'
+      }));
+    }
   }
 
   private resetCreateModal(): void {
