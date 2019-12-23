@@ -47,8 +47,10 @@ export class IntegrationsListComponent {
     return status === 'loading';
   }
 
-  handleDelete(id) {
-    this.store.dispatch(new DeleteManager({id}));
+  handleDelete($event, id) {
+    if ($event.isUserInput) {
+      this.store.dispatch(new DeleteManager({id}));
+    }
   }
 
   handleEdit(id) {

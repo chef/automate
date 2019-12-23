@@ -31,9 +31,9 @@
         <chef-td class="identifier-cell">{{ user }}/{{ profile.name }}</chef-td>
         <chef-td class="actions-cell">
           <mat-select panelClass="chef-control-menu-x">
-            <mat-option *ngIf="!hasFilter(profile)" (click)="addFilter(profile)">Add Filter</mat-option>
-            <mat-option *ngIf="hasFilter(profile)" (click)="removeFilter(profile)">Remove Filter</mat-option>
-            <mat-option (click)="displayScanResults(profile)">Scan Results</mat-option>
+            <mat-option *ngIf="!hasFilter(profile)" (onSelectionChange)="addFilter(profile)">Add Filter</mat-option>
+            <mat-option *ngIf="hasFilter(profile)" (onSelectionChange)="removeFilter(profile)">Remove Filter</mat-option>
+            <mat-option (onSelectionChange)="displayScanResults(profile)">Scan Results</mat-option>
           </mat-select>
         </chef-td>
       </chef-tr>

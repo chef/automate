@@ -55,8 +55,8 @@
             <chef-td>{{ manager.status }}</chef-td>
             <chef-td class="controls">
               <mat-select panelClass="chef-control-menu-x">
-                <mat-option (click)="handleEdit(manager.id)">Edit Integration</mat-option>
-                <mat-option (click)="handleDelete(manager.id)">Delete Integration</mat-option>
+                <mat-option (onSelectionChange)="handleEdit(manager.id)">Edit Integration</mat-option>
+                <mat-option (onSelectionChange)="handleDelete($event, manager.id)">Delete Integration</mat-option>
               </mat-select>
             </chef-td>
           </chef-tr>

@@ -20,6 +20,10 @@ import {
 
 export type PolicyTabName = 'definition' | 'members';
 
+export interface KeyboardEvent {
+  isUserInput: boolean;
+}
+
 const POLICY_DETAILS_ROUTE = /^\/settings\/policies/;
 
 @Component({
@@ -103,11 +107,13 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
     return JSON.stringify(policy);
   }
 
-  removeMember(member: Member): void {
-    this.store.dispatch(new RemovePolicyMembers(<PolicyMembersMgmtPayload>{
-      id: this.policy.id,
-      members: [member]
-    }));
+  removeMember($event: KeyboardEvent, member: Member): void {
+    if ($event.isUserInput) {
+      this.store.dispatch(new RemovePolicyMembers(<PolicyMembersMgmtPayload>{
+        id: this.policy.id,
+        members: [member]
+      }));
+    }
   }
 
   onSelectedTab(event: { target: { value: PolicyTabName } } ): void {

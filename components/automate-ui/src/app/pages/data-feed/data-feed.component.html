@@ -43,7 +43,7 @@
                 </chef-td>
               <chef-td class="actions">
                 <mat-select panelClass="chef-control-menu-x">
-                  <mat-option (click)="deleteDestination(destination)">Delete Destination</mat-option>
+                  <mat-option (onSelectionChange)="deleteDestination(destination)">Delete Destination</mat-option>
                 </mat-select>
               </chef-td>
             </chef-tr>

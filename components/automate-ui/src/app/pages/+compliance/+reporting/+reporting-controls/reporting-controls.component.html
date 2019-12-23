@@ -44,8 +44,8 @@
         </chef-td>
         <chef-td class="actions-cell">
           <mat-select panelClass="chef-control-menu-x">
-            <mat-option *ngIf="!hasFilter(control)" (click)="addFilter(control)">Add Filter</mat-option>
-            <mat-option *ngIf="hasFilter(control)" (click)="removeFilter(control)">Remove Filter</mat-option>
+            <mat-option *ngIf="!hasFilter(control)" (onSelectionChange)="addFilter(control)">Add Filter</mat-option>
+            <mat-option *ngIf="hasFilter(control)" (onSelectionChange)="removeFilter(control)">Remove Filter</mat-option>
           </mat-select>
         </chef-td>
       </chef-tr>
