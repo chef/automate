@@ -27,6 +27,7 @@
   --blue-de-france: #3DA5FF;
   --gray: #B7BCBC;
   --blue: #174AF0;
+  --palatinate-blue: #0E3DD5;
   --lavender-blue: #BDCBFB;
   --lavender: #DEE5FD;
   --maroon: #BA1E6A;
@@ -84,6 +85,7 @@
   --chef-badge-primary-background: var(--lavender);
   --chef-badge-primary-border: var(--lavender-blue);
   --chef-badge-primary-color: var(--blue);
+  --chef-control-alternate-color: var(--palatinate-blue);
 
   --chef-badge-critical-background: var(--piggy-pink);
   --chef-badge-critical-border: var(--lavender-pink);
@@ -96,4 +98,5 @@
   --chef-badge-success-background: var(--glitter);
   --chef-badge-success-border: var(--columbia-blue);
   --chef-badge-success-color: var(--medium-teal-blue);
+
 }

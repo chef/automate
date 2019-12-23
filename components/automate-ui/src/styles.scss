@@ -261,17 +261,17 @@ input {
     &:after {
       content: '...';
       position: absolute;
-      color: black;
+      color: var(--black);
       bottom: 35%;
       left: 23%;
       font-size: 20px;
     }
 
     &:hover {
-      background-color: #DEE5FD;
+      background-color: var(--chef-badge-primary-background);
 
       &:after {
-        color: #174AF0;
+        color: var(--chef-badge-primary-color);
       }
     }
   }
@@ -279,10 +279,10 @@ input {
   &[aria-owns] {  // hacky alternative to active
 
     .mat-select-trigger {
-      background-color: #BDCBFB;
+      background-color: var(--chef-badge-primary-border);
 
       &:after {
-        color: #0E3DD5;
+        color: var(--chef-control-alternate-color);
       }
     }
   }
