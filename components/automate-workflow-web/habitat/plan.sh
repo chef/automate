@@ -11,7 +11,7 @@ pkg_deps=(
 pkg_build_deps=(
   core/make
   core/gcc
-  core/node10/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
+  core/node/"$(cat "$PLAN_CONTEXT/../.nvmrc")"
   core/phantomjs
 )
 pkg_description="Web interface for Chef Automate Workflow"
