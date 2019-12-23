@@ -244,6 +244,7 @@ input {
 }
 
 [panelclass="chef-control-menu-x"] {
+  text-align: right;
 
   &:focus .mat-select-trigger {
     outline: -webkit-focus-ring-color auto 5px;
