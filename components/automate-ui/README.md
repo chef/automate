@@ -57,36 +57,59 @@ While it is problematic to document this information due to the maintenance burd
 
 **Package @types/jasmine: =3.3.10**
 
-Reason: `make unit` generates this error:
-```
+Reason: `make serve` and `make unit` report this error:
+
+```text
 error TS6200: Definitions of the following identifiers conflict with those in another file: ImplementationCallback, Expected, SpyObjMethodNames, CustomEqualityTester, CustomMatcherFactory, ExpectationFailed, SpecFunction, SpyObj, jasmine
+
+25 type ImplementationCallback = jasmine.ImplementationCallback;
+   ~~~~
+
+  ../node_modules/@types/jasmine/ts3.1/index.d.ts:22:1
+    22 type ImplementationCallback = jasmine.ImplementationCallback;
+       ~~~~
+    Conflicts are in this file.
 ```
+
+There are very few reports of others experiencing this problem and no resolution presents itself.
 Reference: https://stackoverflow.com/a/57592510
 
-**Package @types/jasminewd2: =2.0.6**
+**Package @types/node: ~10.14.22**
 
-Reason:  `make serve` generates this error:
-```
-ERROR in ../node_modules/@types/jasminewd2/index.d.ts:8:23 - error TS2688: Cannot find type definition file for 'jasmine/v2'.
-```
+Reason: The major version should match our node version, which is 10.15.2, so I have constrained it to the highest version less than that.
+That is a guess on my part, could not really confirm what version one should be running, through these references:
+ - https://www.npmjs.com/package/@types/node
+ - https://github.com/DefinitelyTyped/DefinitelyTyped#how-do-definitely-typed-package-versions-relate-to-versions-of-the-corresponding-library
 
-**Package @types/node: ^10.14.19**
+**Package diff2html: ^2.12.1**
 
-Reason: The major version should match our node version, which is 10.15.2 (this is a guess on my part, could neither confirm nor deny it), so I have constrained it to 10.14.* as shown.
+Reason: Later releases are beta; should only be using production-releases.
 
 **Package immutable: ^3.8.2**
 
 Reason: Later releases are release candidates; should only be using production-releases.
 
+**Package rrule: =2.4.1**
+Per https://github.com/chef/automate/pull/1867, future versions have made a breaking change so it breaks our code base.
+
 **Package typescript: ~3.5.3**
 
-Reason: `make serve` reported error that it needs angular < 3.6 so locking it at 3.5.* until a later Angular release.
+Reason: Trying to install the latest version `npm install typescript@3.7.4` reports these warnings
+so maintaining at highest version of 3.5.x:
+
+```text
+@angular-devkit/build-angular@0.803.21 requires a peer of typescript@>=3.1 < 3.6 but none is installed.
+@angular/compiler-cli@8.2.14 requires a peer of typescript@>=3.4 <3.6 but none is installed.
+@ngtools/webpack@8.3.21 requires a peer of typescript@>=3.4 < 3.6 but none is installed.
+```
 
 **Package zone.js: ~0.9.1**
 
-Reason: Trying to install the next version `npm install zone.js@0.10.2` reports that @angular/core requires it:
-```
-@angular/core@8.2.8 requires a peer of zone.js@~0.9.1
+Reason: Trying to install the latest version `npm install zone.js@0.10.2` reports this warning
+so maintaining at current version.
+
+```text
+@angular/core@8.2.14 requires a peer of zone.js@~0.9.1
 ```
 
 ## Angular Module Architecture
