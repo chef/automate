@@ -91,7 +91,7 @@ describe('Admin pages', () => {
       ['Delete User'].forEach((item, index) => {
         it(`when clicked, shows ${item}`, () => {
           // const menu = $('chef-table-new chef-table-body chef-table-row mat-select');
-          const menuTrigger = $('chef-table-new chef-table-body chef-table-row mat-select mat-select-trigger');
+          const menuTrigger = $('chef-table-new chef-table-body chef-table-row mat-select .mat-select-trigger');
           browser.wait(EC.elementToBeClickable(menuTrigger), 5000).then(() => {
             menuTrigger.click().then(() => {
               // const panel = $('.chef-control-menu-x');
@@ -231,11 +231,11 @@ describe('Admin pages', () => {
 
       ['Delete Policy'].forEach((item, index) => {
         it(`when clicked, shows ${item}`, () => {
-          waitForElement('chef-table-new chef-table-body chef-table-row:nth-child(2) mat-select mat-select-trigger')
+          waitForElement('chef-table-new chef-table-body chef-table-row:nth-child(2) mat-select .mat-select-trigger')
             .then(controlButton => {
               browser.wait(EC.elementToBeClickable(controlButton));
               controlButton.click().then(() => {
-                const dropDownOption = controlButton.$(`mat-option:nth-child(${index + 1 + 1}`);
+                const dropDownOption = $(`.chef-control-menu-x mat-option:nth-child(${index + 1}`);
                 const dropDownOpened = () => dropDownOption.getText()
                   .then(val => val === item);
                 browser.wait(dropDownOpened, 100, 'Control options should render.');
@@ -253,11 +253,11 @@ describe('Admin pages', () => {
         waitForElement('chef-table-new chef-table-body chef-table-row:nth-child(2)')
         .then(somePolicy => {
           // open control menu
-          const controlButton = somePolicy.$('mat-select');
+          const controlButton = somePolicy.$('mat-select .mat-select-trigger');
           browser.wait(EC.elementToBeClickable(controlButton));
           controlButton.click().then(() => {
             // select Delete Policy
-            const deleteOption = controlButton.$('mat-option:nth-child(1)');
+            const deleteOption = $('.chef-control-menu-x mat-option:nth-child(1)');
             browser.wait(EC.visibilityOf(deleteOption), 5000, 'Delete option should render');
             deleteOption.click();
 
@@ -899,11 +899,9 @@ describe('Admin pages', () => {
             ['Delete Project'].forEach((item, index) => {
               it(`when clicked, shows ${item}`, () => {
                 $('app-project-list chef-table-new chef-table-body chef-table-row:nth-child(2) ' +
-                  'chef-table-cell:nth-child(3) mat-select mat-select-trigger').
+                  'chef-table-cell:nth-child(3) mat-select .mat-select-trigger').
                   click();
-                const dropDownOption = $(
-                  `app-project-list chef-table-new chef-table-body chef-table-row:nth-child(2)
-                  chef-table-cell:nth-child(3) mat-select mat-option:nth-child(${index + 1})`);
+                const dropDownOption = $(`.chef-control-menu-x mat-option:nth-child(${index + 1})`);
                 const dropDownOpened = () => dropDownOption.getText().then(val => val === item);
                 browser.wait(dropDownOpened, 5000, 'Control options should render.');
               });
@@ -921,11 +919,11 @@ describe('Admin pages', () => {
           waitForElement('app-project-list chef-table-new chef-table-body chef-table-row:nth-child(3)')
             .then(third => {
               browser.wait(EC.presenceOf(third.$('mat-select'))).then(() => {
-                const controlButton = third.$('mat-select');
+                const controlButton = third.$('mat-select .mat-select-trigger');
                 browser.wait(EC.elementToBeClickable(controlButton));
                 controlButton.click().then(() => {
                   // select Delete Project
-                  const deleteOption = controlButton.$('mat-option:nth-child(1)');
+                  const deleteOption = $('.chef-control-panel-x mat-option:nth-child(1)');
                   browser.wait(EC.visibilityOf(deleteOption), 5000,
                     'Delete option should render');
                   deleteOption.click();
