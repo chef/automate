@@ -920,10 +920,11 @@ describe('Admin pages', () => {
             .then(third => {
               browser.wait(EC.presenceOf(third.$('mat-select'))).then(() => {
                 const controlButton = third.$('mat-select .mat-select-trigger');
+
                 browser.wait(EC.elementToBeClickable(controlButton));
                 controlButton.click().then(() => {
                   // select Delete Project
-                  const deleteOption = $('.chef-control-panel-x mat-option:nth-child(1)');
+                  const deleteOption = $('.chef-control-menu-x mat-option:nth-child(1)');
                   browser.wait(EC.visibilityOf(deleteOption), 5000,
                     'Delete option should render');
                   deleteOption.click();
@@ -989,7 +990,7 @@ describe('Admin pages', () => {
       describe('before any typing occurs', () => {
         it('displays the project name in the input and the save button is disabled', () => {
           waitForSpinners().then(() => {
-            const detailsLink = $('#mat-option2');
+            const detailsLink = $('#chef-option2');
             detailsLink.click().then(() => {
               const projectNameInput = $('app-project-details section form chef-form-field input');
               expect(projectNameInput.getAttribute('value')).toBe('My Project');
@@ -1023,7 +1024,7 @@ describe('Admin pages', () => {
         it('enables the save button, updates the project, and notes the save, ' +
           'and then removes note once more typing occurs', () => {
             waitForSpinners().then(() => {
-              const detailsLink = $('#mat-option2');
+              const detailsLink = $('#chef-option2');
               detailsLink.click().then(() => {
                 const projectSaveButton = $('app-project-details section #button-bar button');
                 const projectNameInput = $(
