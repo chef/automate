@@ -22,18 +22,12 @@ export class CreateChefServerModalComponent implements OnInit {
     });
   }
 
-  // WIP for handle input
-  // public handleNameInput(): void {
-  // }
-
-  // public handleDescriptionInput(): void {
-  // }
-
-  // public handleFqdnInput(): void {
-  // }
-
-  // public handleIpAddressInput(): void {
-  // }
+  public handleInput(event: KeyboardEvent): void {
+    if (this.isNavigationKey(event)) {
+      return;
+    }
+    this.conflictError = false;
+  }
 
   closeEvent(): void {
     this.close.emit();
@@ -43,5 +37,8 @@ export class CreateChefServerModalComponent implements OnInit {
     this.createClicked.emit();
   }
 
+  private isNavigationKey(event: KeyboardEvent): boolean {
+    return event.key === 'Shift' || event.key === 'Tab';
+  }
 }
 

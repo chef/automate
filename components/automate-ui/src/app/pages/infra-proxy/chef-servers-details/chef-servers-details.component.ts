@@ -83,8 +83,12 @@ export class ChefServersDetailsComponent implements OnInit, OnDestroy {
     this.updateServerForm = this.fb.group({
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      fqdn: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      ip_address: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      fqdn: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK)
+      ]],
+      ip_address: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK)
+      ]]
     });
 
     this.store.select(routeParams).pipe(

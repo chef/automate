@@ -1,22 +1,22 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
-import { OrgCreateEditModalComponent } from './org-create-edit-modal.component';
+import { OrgCreateModalComponent } from './org-create-modal.component';
 
 xdescribe('OrgCreateEditModalComponent', () => {
-  let component: OrgCreateEditModalComponent;
-  let fixture: ComponentFixture<OrgCreateEditModalComponent>;
+  let component: OrgCreateModalComponent;
+  let fixture: ComponentFixture<OrgCreateModalComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ OrgCreateEditModalComponent ],
+      declarations: [ OrgCreateModalComponent ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
     .compileComponents();
   }));
 
   beforeEach(() => {
-    fixture = TestBed.createComponent(OrgCreateEditModalComponent);
+    fixture = TestBed.createComponent(OrgCreateModalComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

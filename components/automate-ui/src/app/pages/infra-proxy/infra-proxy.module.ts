@@ -7,7 +7,7 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { ChefComponentsModule } from 'app/components/chef-components.module';
 import { ChefServersListComponent } from './chef-servers-list/chef-servers-list.component';
 import { ChefServersDetailsComponent } from './chef-servers-details/chef-servers-details.component';
-import { OrgCreateEditModalComponent } from './org-create-edit-modal/org-create-edit-modal.component';
+import { OrgCreateModalComponent } from './org-create-modal/org-create-modal.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 import { CookbooksListComponent } from './cookbook-list/cookbooks-list.component';
 
@@ -15,7 +15,7 @@ import { CookbooksListComponent } from './cookbook-list/cookbooks-list.component
   declarations: [
     ChefServersListComponent,
     ChefServersDetailsComponent,
-    OrgCreateEditModalComponent,
+    OrgCreateModalComponent,
     CreateChefServerModalComponent,
     CookbooksListComponent
   ],

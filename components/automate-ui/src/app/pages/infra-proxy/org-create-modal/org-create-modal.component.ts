@@ -2,11 +2,11 @@ import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
 @Component({
-  selector: 'app-org-create-edit-modal',
-  templateUrl: './org-create-edit-modal.component.html',
-  styleUrls: ['./org-create-edit-modal.component.scss']
+  selector: 'app-org-create-modal',
+  templateUrl: './org-create-modal.component.html',
+  styleUrls: ['./org-create-modal.component.scss']
 })
-export class OrgCreateEditModalComponent implements OnInit {
+export class OrgCreateModalComponent implements OnInit {
   // @Input() type: string;
   @Input() visible = false;
   @Input() creating = false;
