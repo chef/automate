@@ -14,7 +14,7 @@ func init() {
     "application/json"
   ],
   "paths": {
-    "/infra_proxy/servers": {
+    "/infra/servers": {
       "get": {
         "operationId": "GetServers",
         "responses": {
@@ -54,7 +54,7 @@ func init() {
         ]
       }
     },
-    "/infra_proxy/servers/{id}": {
+    "/infra/servers/{id}": {
       "get": {
         "operationId": "GetServer",
         "responses": {
@@ -130,7 +130,7 @@ func init() {
         ]
       }
     },
-    "/infra_proxy/servers/{name}": {
+    "/infra/servers/{name}": {
       "get": {
         "operationId": "GetServerByName",
         "responses": {
@@ -154,7 +154,7 @@ func init() {
         ]
       }
     },
-    "/infra_proxy/servers/{server_id}/orgs": {
+    "/infra/servers/{server_id}/orgs": {
       "get": {
         "operationId": "GetOrgs",
         "responses": {
@@ -208,7 +208,7 @@ func init() {
         ]
       }
     },
-    "/infra_proxy/servers/{server_id}/orgs/{id}": {
+    "/infra/servers/{server_id}/orgs/{id}": {
       "get": {
         "operationId": "GetOrg",
         "responses": {
@@ -302,7 +302,7 @@ func init() {
         ]
       }
     },
-    "/infra_proxy/servers/{server_id}/orgs/{name}": {
+    "/infra/servers/{server_id}/orgs/{name}": {
       "get": {
         "operationId": "GetOrgByName",
         "responses": {
@@ -332,7 +332,7 @@ func init() {
         ]
       }
     },
-    "/infra_proxy/servers/{server_id}/orgs/{org_id}/cookbooks": {
+    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
       "get": {
         "operationId": "GetCookbooks",
         "responses": {
@@ -362,7 +362,7 @@ func init() {
         ]
       }
     },
-    "/infra_proxy/servers/{server_id}/orgs/{org_id}/cookbooks/num_versions": {
+    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/num_versions": {
       "get": {
         "operationId": "GetCookbooksAvailableVersions",
         "responses": {
@@ -398,7 +398,7 @@ func init() {
         ]
       }
     },
-    "/infra_proxy/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
+    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}": {
       "get": {
         "operationId": "GetCookbook",
         "responses": {
@@ -440,7 +440,7 @@ func init() {
         ]
       }
     },
-    "/infra_proxy/version": {
+    "/infra/version": {
       "get": {
         "operationId": "GetVersion",
         "responses": {
