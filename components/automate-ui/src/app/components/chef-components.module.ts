@@ -5,7 +5,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
-import { MatSnackBarModule, MatSelectModule  } from '@angular/material';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatSelectModule  } from '@angular/material/select';
 
 // Components
 import { AuthorizedComponent } from './authorized/authorized.component';
