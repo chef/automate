@@ -10,6 +10,7 @@ import { DateTime } from 'app/helpers/datetime/datetime';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 import { loading, EntityStatus, pending } from 'app/entities/entities';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { Type } from 'app/entities/notifications/notification.model';
@@ -27,10 +28,6 @@ import { isIAMv2  } from 'app/entities/policies/policy.selectors';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
-
-export interface KeyboardEvent {
-  isUserInput: boolean;
-}
 
 @Component({
   selector: 'app-api-tokens',
@@ -135,7 +132,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public startTokenDelete($event: KeyboardEvent, token: ApiToken): void {
+  public startTokenDelete($event: ChefKeyboardEvent, token: ApiToken): void {
     if ($event.isUserInput) {
       this.tokenToDelete = token;
       this.deleteModalVisible = true;
@@ -158,7 +155,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
 
   }
 
-  public toggleActive($event: KeyboardEvent, token: ApiToken): void {
+  public toggleActive($event: ChefKeyboardEvent, token: ApiToken): void {
     if ($event.isUserInput) {
       this.store.dispatch(new ToggleTokenActive(token));
     }
@@ -174,7 +171,7 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     this.resetCreateModal();
   }
 
-  public notifyCopy($event: KeyboardEvent): void {
+  public notifyCopy($event: ChefKeyboardEvent): void {
     if ($event.isUserInput) {
       this.store.dispatch(new CreateNotification({
         type: Type.info,

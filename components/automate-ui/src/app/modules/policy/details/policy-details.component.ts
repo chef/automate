@@ -17,12 +17,9 @@ import {
 import {
   RemovePolicyMembers, PolicyMembersMgmtPayload
 } from 'app/entities/policies/policy.actions';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 
 export type PolicyTabName = 'definition' | 'members';
-
-export interface KeyboardEvent {
-  isUserInput: boolean;
-}
 
 const POLICY_DETAILS_ROUTE = /^\/settings\/policies/;
 
@@ -107,7 +104,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
     return JSON.stringify(policy);
   }
 
-  removeMember($event: KeyboardEvent, member: Member): void {
+  removeMember($event: ChefKeyboardEvent, member: Member): void {
     if ($event.isUserInput) {
       this.store.dispatch(new RemovePolicyMembers(<PolicyMembersMgmtPayload>{
         id: this.policy.id,
