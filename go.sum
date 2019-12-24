@@ -53,6 +53,8 @@ github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44 h1:y853v6rXx+zefE
 github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44/go.mod h1:bbYlZJ7hK1yFx9hf58LP0zeX7UjIGs20ufpu3evjr+s=
 github.com/cenkalti/backoff v2.1.1+incompatible/go.mod h1:90ReRw6GdpyfrHakVjL/QHaoyV4aDUVVkXQJJJ3NXXM=
 github.com/census-ecosystem/opencensus-go-exporter-aws v0.0.0-20180411051634-41633bc1ff6b/go.mod h1:icwlHTP1AjScKRxD/s/Qinb7mpbcoUPpqaiBvrSS/QI=
+github.com/chef/go-chef v0.3.1-0.20191115205148-7ac24fba7a27 h1:zb1dtm/zUcVrxyDd50XtovQFSQa26y2jJt2Dt7IzDQQ=
+github.com/chef/go-chef v0.3.1-0.20191115205148-7ac24fba7a27/go.mod h1:ft8oU7s0ktse9xzZO4n8wxTz6EKx+V+fuhYxktqXvG8=
 github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816 h1:FA3vWzOqbxQIowYe4AbsdC18JCZzLQc7xQ86FrCxLmw=
 github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816/go.mod h1:WzupinluQEwU43AC1/UZItixzo5R849ewfPDB2ZMDDg=
 github.com/ckaznocha/protoc-gen-lint v0.2.1 h1:wP+SgbHat4ovpPQayCroxK/1pXtnBR4HIo9G+2gTnHU=
@@ -101,8 +103,6 @@ github.com/fsnotify/fsnotify v1.4.7/go.mod h1:jwhsz4b93w/PPRr/qN1Yymfu8t87LnFCMo
 github.com/ghodss/yaml v1.0.0/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
 github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39 h1:8aiwjJixH9Dws9c0mE6yeghmrVhe6csuB+onSjeW31Q=
 github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39/go.mod h1:4dBDuWmgqj2HViK6kFavaiC9ZROes6MMH2rRYeMEF04=
-github.com/go-chef/chef v0.4.0 h1:DUOwuO0G6nazWV86LZf0VlVDF5fG6SgBSN2v8TUi4B0=
-github.com/go-chef/chef v0.4.0/go.mod h1:UJ4KjENmuNiSlUWZl1ccJ8rQPc59OXdGNK8Il+KH2Rs=
 github.com/go-delve/delve v1.3.1 h1:LI0X4aAE0N7ay8uR48aMJ6GNTxamIpcxi1THjwJjenI=
 github.com/go-delve/delve v1.3.1/go.mod h1:LLw6qJfIsRK9WcwV2IRRqsdlgrqzOeuGrQOCOIhDpt8=
 github.com/go-gorp/gorp v2.0.1-0.20180410155428-6032c66e0f5f+incompatible h1:cWM8mu5v0FdhuVs0oqlVI5IcEXfTaAw9Xu025fBqkeQ=
@@ -189,10 +189,10 @@ github.com/jonboulle/clockwork v0.1.0 h1:VKV+ZcuP6l3yW9doeqz6ziZGgcynBVQO+obU0+0
 github.com/jonboulle/clockwork v0.1.0/go.mod h1:Ii8DK3G1RaLaWxj9trq07+26W01tbo22gdxWY5EU2bo=
 github.com/jtolds/gls v0.0.0-20170503224851-77f18212c9c7 h1:EkBV8n/hyCf3FCSmYY5aqZxIXI4VPRMOVH+YVgMJla4=
 github.com/jtolds/gls v0.0.0-20170503224851-77f18212c9c7/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=
-github.com/kevinburke/go-bindata v3.16.0+incompatible h1:TFzFZop2KxGhqNwsyjgmIh5JOrpG940MZlm5gNbxr8g=
-github.com/kevinburke/go-bindata v3.16.0+incompatible/go.mod h1:/pEEZ72flUW2p0yi30bslSp9YqD9pysLxunQDdb2CPM=
 github.com/jtolds/gls v4.20.0+incompatible h1:xdiiI2gbIgH/gLH7ADydsJ1uDOEzR8yvV7C0MuV77Wo=
 github.com/jtolds/gls v4.20.0+incompatible/go.mod h1:QJZ7F/aHp+rZTRtaJ1ow/lLfFfVYBRgL+9YlvaHOwJU=
+github.com/kevinburke/go-bindata v3.16.0+incompatible h1:TFzFZop2KxGhqNwsyjgmIh5JOrpG940MZlm5gNbxr8g=
+github.com/kevinburke/go-bindata v3.16.0+incompatible/go.mod h1:/pEEZ72flUW2p0yi30bslSp9YqD9pysLxunQDdb2CPM=
 github.com/kisielk/errcheck v1.2.0/go.mod h1:/BMXB+zMLi60iA8Vv6Ksmxu/1UDYcXs4uQLJ+jE2L00=
 github.com/kisielk/gotool v1.0.0/go.mod h1:XhKaO+MFFWcvkIS/tQcRk01m1F5IRFswLeQ+oQHNcck=
 github.com/konsorten/go-windows-terminal-sequences v1.0.1/go.mod h1:T0+1ngSBFLxvqU3pZ+m/2kptfBszLMUkC4ZK/EgS/cQ=

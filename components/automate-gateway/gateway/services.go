@@ -45,7 +45,6 @@ import (
 	pb_eventfeed "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
 	pb_iam_v2 "github.com/chef/automate/components/automate-gateway/api/iam/v2"
-	pb_infra_proxy "github.com/chef/automate/components/automate-gateway/api/infra_proxy"
 	pb_legacy "github.com/chef/automate/components/automate-gateway/api/legacy"
 	pb_license "github.com/chef/automate/components/automate-gateway/api/license"
 	pb_notifications "github.com/chef/automate/components/automate-gateway/api/notifications"

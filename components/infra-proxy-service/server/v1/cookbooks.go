@@ -4,10 +4,7 @@ import (
 	"context"
 	"sort"
 
-	proxy "github.com/chef/automate/components/infra-proxy-service/proxy"
-	"github.com/chef/automate/components/infra-proxy-service/service"
-	uuid "github.com/chef/automate/lib/uuid4"
-	"github.com/go-chef/chef"
+	chef "github.com/chef/go-chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -23,7 +20,7 @@ func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*res
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
 	}
 
-	cookbookList, err := client.GetCookbooks()
+	cookbookList, err := client.Cookbooks.List()
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -47,7 +44,7 @@ func (s *Server) GetCookbooksAvailableVersions(ctx context.Context, req *request
 		numVersions = "all"
 	}
 
-	cookbookList, err := client.GetCookbooksAvailableVersions(numVersions)
+	cookbookList, err := client.Cookbooks.ListAvailableVersions(numVersions)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -76,7 +73,7 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 		version = "_latest"
 	}
 
-	cookbook, err := client.GetCookbook(req.Name, version)
+	cookbook, err := client.Cookbooks.GetVersion(req.Name, version)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, err.Error())
 	}
@@ -184,40 +181,4 @@ func fromAPIToListAvailableCookbooks(al chef.CookbookListResult) []*response.Coo
 	})
 
 	return cl
-}
-
-func (s *Server) createClient(ctx context.Context, orgID string) (*proxy.ChefClient, error) {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	UUID, err := uuid.FromString(orgID)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
-	}
-
-	org, err := s.service.Storage.GetOrg(ctx, UUID)
-	if err != nil {
-		return nil, service.ParseStorageError(err, orgID, "org")
-	}
-
-	ServerID, err := uuid.FromString(org.ServerId)
-	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid server: %s", err.Error())
-	}
-
-	server, err := s.service.Storage.GetServer(ctx, ServerID)
-	if err != nil {
-		return nil, service.ParseStorageError(err, ServerID, "org")
-	}
-
-	baseURL := server.IpAddress + "/organizations/" + org.Name + "/"
-
-	client, err := proxy.NewChefClient(&proxy.ChefConfig{
-		Name:    org.AdminUser,
-		Key:     org.AdminKey,
-		SkipSSL: true,
-		BaseURL: baseURL,
-	})
-
-	return client, nil
 }

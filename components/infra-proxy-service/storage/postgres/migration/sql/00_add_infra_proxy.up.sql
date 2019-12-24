@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS orgs (
   name         TEXT NOT NULL DEFAULT '',
   admin_user   TEXT NOT NULL DEFAULT '', /* Added for now but can be thing of managing mutitple keys & users */
   admin_key    TEXT NOT NULL DEFAULT '',
-  server_id    uuid NOT NULL references servers(id) ON DELETE CASCADE,
+  server_id    uuid NOT NULL references servers(id) ON DELETE RESTRICT,
   created_at   TIMESTAMPTZ NOT NULL,
   updated_at   TIMESTAMPTZ NOT NULL,
   UNIQUE(name, server_id)

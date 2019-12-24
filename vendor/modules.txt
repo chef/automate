@@ -81,6 +81,8 @@ github.com/briandowns/spinner
 github.com/buger/goterm
 # github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44
 github.com/buger/jsonparser
+# github.com/chef/go-chef v0.3.1-0.20191115205148-7ac24fba7a27
+github.com/chef/go-chef
 # github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816
 github.com/chef/toml
 # github.com/ckaznocha/protoc-gen-lint v0.2.1
@@ -141,8 +143,6 @@ github.com/felixge/httpsnoop
 github.com/fsnotify/fsnotify
 # github.com/ghodss/yaml v1.0.1-0.20180503022059-e9ed3c6dfb39
 github.com/ghodss/yaml
-# github.com/go-chef/chef v0.4.0
-github.com/go-chef/chef
 # github.com/go-delve/delve v1.3.1
 github.com/go-delve/delve/cmd/dlv
 github.com/go-delve/delve/cmd/dlv/cmds

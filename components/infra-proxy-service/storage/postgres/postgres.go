@@ -56,10 +56,9 @@ func parsePQError(e *pq.Error) error {
 	case "unique_violation":
 		return storage.ErrConflict
 	case "foreign_key_violation":
-		// in this piece of code, a foreign key violation means the team the user
-		// should be added to doesn't exist; a "not found" seems like an OK
+		// in this piece of code, a foreign key violation means the server the org
 		// approximation for now
-		return storage.ErrNotFound
+		return storage.ErrCannotDelete
 	}
 
 	return e

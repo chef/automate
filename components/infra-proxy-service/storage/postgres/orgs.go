@@ -50,6 +50,8 @@ func (p *postgres) getOrg(ctx context.Context, q querier, orgID uuid.UUID) (stor
 }
 
 // GetOrgByName fetches a org by name.
+// TODO: Replace serverID with server name
+// Prefer LEFT OUTER join to in order to append server detail in response
 func (p *postgres) GetOrgByName(ctx context.Context, orgName string, serverID uuid.UUID) (storage.Org, error) {
 	var org storage.Org
 	err := p.db.QueryRowContext(ctx,

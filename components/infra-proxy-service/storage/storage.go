@@ -59,6 +59,10 @@ var (
 	// ErrNotFound is returned when a requested server wasn't found
 	ErrNotFound = errors.New("not found")
 
+	// ErrCannotDelete is returned when a request attempts to delete a server that
+	// is not allowed to be deleted if orgs present
+	ErrCannotDelete = errors.New("cannot delete")
+
 	// ErrConflict is returned when a server there is a clash of server IDs
 	ErrConflict = errors.New("conflict")
 )
