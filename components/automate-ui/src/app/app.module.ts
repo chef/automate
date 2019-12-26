@@ -38,6 +38,7 @@ import { RoleModule } from './modules/roles/roles.module';
 import { LicenseModule } from 'app/modules/license/license.module';
 import { UserModule } from 'app/modules/user/user.module';
 import { TeamModule } from 'app/modules/team/team.module';
+import { InfraProxyModule } from 'app/modules/infra-proxy/infra-proxy.module';
 
 // Services
 import { AttributesService } from './services/attributes/attributes.service';
@@ -75,9 +76,10 @@ import { ManagerRequests } from './entities/managers/manager.requests';
 import { PolicyRequests } from './entities/policies/policy.requests';
 import { ProfileRequests } from './entities/profiles/profile.requests';
 import { ProjectRequests } from './entities/projects/project.requests';
-import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
 import { RoleRequests } from './entities/roles/role.requests';
 import { RuleRequests } from './entities/rules/rule.requests';
+import { ServerRequests } from './entities/servers/server.requests';
+import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
 import { TeamRequests } from './entities/teams/team.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
 import { UserRequests } from './entities/users/user.requests';
@@ -94,9 +96,6 @@ import { ApplicationsComponent } from './pages/applications/applications.compone
 import { AttributesComponent } from './page-components/attributes/attributes.component';
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
-import {
-  ClientRunsSidebarComponent
-} from './page-components/client-runs-sidebar/client-runs-sidebar.component';
 import {
   ClientRunsTableComponent
 } from './page-components/client-runs-table/client-runs-table.component';
@@ -200,7 +199,6 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     AttributesComponent,
     AutomateSettingsComponent,
     ClientRunsComponent,
-    ClientRunsSidebarComponent,
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
     DatafeedComponent,
@@ -269,6 +267,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     CookieModule.forRoot(),
     FormsModule,
     HttpClientModule,
+    InfraProxyModule,
     IntegrationsModule,
     NgrxEffectsModule,
     PolicyModule,
@@ -321,6 +320,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     RuleRequests,
     RulesService,
     RunHistoryStore,
+    ServerRequests,
     ServiceGroupsRequests,
     SessionStorageService,
     SidebarService,

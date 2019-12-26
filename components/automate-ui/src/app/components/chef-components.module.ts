@@ -14,6 +14,7 @@ import { BreadcrumbsComponent } from './breadcrumbs/breadcrumbs.component';
 import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ChefNotificationsComponent } from './notifications/notifications.component';
+import { ClientRunsSidebarComponent } from './client-runs-sidebar/client-runs-sidebar.component';
 import { CreateObjectModalComponent } from './create-object-modal/create-object-modal.component';
 import { CreateUserModalComponent } from 'app/page-components/create-user-modal/create-user-modal.component';
 import { CreateV1TeamModalComponent } from 'app/page-components/create-v1-team-modal/create-v1-team-modal.component';
@@ -76,6 +77,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbComponent,
     CalendarComponent,
     ChefNotificationsComponent,
+    ClientRunsSidebarComponent,
     CreateObjectModalComponent,
     CreateUserModalComponent,
     CreateV1TeamModalComponent,
@@ -113,6 +115,7 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     BreadcrumbComponent,
     CalendarComponent,
     ChefNotificationsComponent,
+    ClientRunsSidebarComponent,
     CreateObjectModalComponent,
     CreateUserModalComponent,
     CreateV1TeamModalComponent,
