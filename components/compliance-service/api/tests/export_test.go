@@ -282,7 +282,7 @@ func TestJSONExportWithControlFilter(t *testing.T) {
 	assert.Equal(t, "nginx-02", report.GetProfiles()[0].GetControls()[0].GetId())
 }
 
-func TestJSONExportWithTwoControlFiltersReturnsError(t *testing.T) {
+func TestJSONExportWithTwoControlsOnlyReturnsThoseTwoControls(t *testing.T) {
 	// get reporting client
 	conn, err := getClientConn()
 	require.NoError(t, err)
@@ -306,10 +306,17 @@ func TestJSONExportWithTwoControlFiltersReturnsError(t *testing.T) {
 	stream, err := reporting.Export(context.Background(), &profileFilterQuery)
 	require.NoError(t, err)
 
-	_, err = stream.Recv()
+	reports, err := getJSONReportsFromStream(stream)
+	require.NoError(t, err)
 
-	grpctest.AssertCode(t, codes.InvalidArgument, err)
-	assert.Equal(t, "rpc error: code = InvalidArgument desc = Invalid: Only one 'control' filter is allowed", err.Error())
+	report := reports[0]
+	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc04", report.GetId())
+	assert.Equal(t, 3, len(report.GetProfiles()))
+	assert.Equal(t, "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988", report.GetProfiles()[0].GetSha256())
+
+	assert.Equal(t, 2, len(report.GetProfiles()[0].GetControls()))
+	assert.Equal(t, "nginx-01", report.GetProfiles()[0].GetControls()[0].GetId())
+	assert.Equal(t, "nginx-02", report.GetProfiles()[0].GetControls()[1].GetId())
 }
 
 func TestJSONNodeExportReturnsAllExpectedReportsForNode(t *testing.T) {
