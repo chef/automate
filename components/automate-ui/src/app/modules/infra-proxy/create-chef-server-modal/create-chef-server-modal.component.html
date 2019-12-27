@@ -36,6 +36,10 @@
             *ngIf="createForm.get('fqdn').hasError('required') && createForm.get('fqdn').dirty">
             FQDN is required.
             </chef-error>
+            <chef-error
+            *ngIf="createForm.get('fqdn').hasError('pattern')">
+            FQDN is invalid.
+            </chef-error>
           </chef-form-field>
         </div>
         <div class="margin">
@@ -47,6 +51,10 @@
             <chef-error
               *ngIf="createForm.get('ip_address').hasError('required') && createForm.get('ip_address').dirty">
               IP Address is required.
+            </chef-error>
+            <chef-error
+              *ngIf="createForm.get('ip_address').hasError('pattern')">
+              IP Address is invalid.
             </chef-error>
           </chef-form-field>
         </div>

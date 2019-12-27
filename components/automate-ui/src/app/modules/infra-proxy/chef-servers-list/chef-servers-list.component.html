@@ -32,18 +32,21 @@
               <chef-table-header-cell>FQDN</chef-table-header-cell>
               <chef-table-header-cell>IP Address</chef-table-header-cell>
               <chef-table-header-cell>Description</chef-table-header-cell>
-              <chef-table-header-cell class="controls"></chef-table-header-cell>
+              <chef-table-header-cell>No Of Orgs</chef-table-header-cell>
+              <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
             </chef-table-row>
           </chef-table-header>
           <chef-table-body>
             <chef-table-row *ngFor= "let server of sortedChefServers$ | async">
               <chef-table-cell>
-                <a [routerLink]="['/infrastructure/chef-servers', server.id]">{{ server.name }}</a>
+                <!-- TODO : Change router link Once Infra Proxy Orgs Introduced -->
+                <a [routerLink]="['/infrastructure/chef-servers']">{{ server.name }}</a>
               </chef-table-cell>
               <chef-table-cell>{{ server.fqdn }}</chef-table-cell>
               <chef-table-cell>{{ server.ip_address }}</chef-table-cell>
               <chef-table-cell>{{ server.description }}</chef-table-cell>
-              <chef-table-cell class="controls">
+              <chef-table-cell>{{ server.orgs_count }}</chef-table-cell>
+              <chef-table-cell class="three-dot-column">
                 <chef-control-menu>
                   <chef-option data-cy="delete" (click)="startServerDelete(server)">Remove Chef Server</chef-option>
                 </chef-control-menu>

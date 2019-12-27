@@ -14,9 +14,7 @@ export interface ServerEntityState extends EntityState<Server> {
   deleteStatus: EntityStatus;
 }
 
-// reusable names of the above properties:
-// TODO (tc): Rename this to GET_ALL_STATUS
-const STATUS = 'status';
+const GET_ALL_STATUS = 'getAllStatus';
 const SAVE_STATUS = 'saveStatus';
 const SAVE_ERROR = 'saveError';
 const UPDATE_STATUS = 'updateStatus';
@@ -42,7 +40,7 @@ export function serverEntityReducer(
 
     case ServerActionTypes.GET_ALL: {
       return set(
-        STATUS,
+        GET_ALL_STATUS,
         EntityStatus.loading,
         serverEntityAdapter.removeAll(state)
       ) as ServerEntityState;
@@ -50,14 +48,14 @@ export function serverEntityReducer(
 
     case ServerActionTypes.GET_ALL_SUCCESS: {
       return set(
-        STATUS,
+        GET_ALL_STATUS,
         EntityStatus.loadingSuccess,
         serverEntityAdapter.addAll(action.payload.servers, state)
       ) as ServerEntityState;
     }
 
     case ServerActionTypes.GET_ALL_FAILURE: {
-      return set(STATUS, EntityStatus.loadingFailure, state) as ServerEntityState;
+      return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state) as ServerEntityState;
     }
 
     case ServerActionTypes.GET: {

@@ -46,10 +46,12 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       fqdn: ['', [Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK)
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.VALID_FQDN)
       ]],
       ip_address: ['', [Validators.required,
-        Validators.pattern(Regex.patterns.NON_BLANK)
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.VALID_IP_ADDRESS)
       ]]
     });
   }
