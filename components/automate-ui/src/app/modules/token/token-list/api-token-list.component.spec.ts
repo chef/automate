@@ -8,6 +8,8 @@ import { runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { apiTokenEntityReducer } from 'app/entities/api-tokens/api-token.reducer';
+import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
+import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
 import { ApiTokenListComponent } from './api-token-list.component';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { projectsFilterReducer } from 'app/services/projects-filter/projects-filter.reducer';
@@ -26,7 +28,9 @@ describe('ApiTokenListComponent', () => {
         StoreModule.forRoot({
           apiTokens: apiTokenEntityReducer,
           policies: policyEntityReducer,
-          projectsFilter: projectsFilterReducer
+          projectsFilter: projectsFilterReducer,
+          notifications: notificationEntityReducer, // not used here but needed to suppress warnings
+          clientRunsEntity: clientRunsEntityReducer // not used here but needed to suppress warnings
         }, { runtimeChecks })
       ],
       providers: [

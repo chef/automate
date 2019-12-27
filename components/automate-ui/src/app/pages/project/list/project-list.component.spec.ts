@@ -110,9 +110,8 @@ describe('ProjectListComponent', () => {
           {
           policies: policyEntityReducer,
           projects: projectEntityReducer,
-          // not used directly in this component, needed to suppress unit test warnings
-          notifications: notificationEntityReducer,
-          clientRunsEntity: clientRunsEntityReducer
+          notifications: notificationEntityReducer, // not used here but needed to suppress warnings
+          clientRunsEntity: clientRunsEntityReducer // not used here but needed to suppress warnings
         }, { runtimeChecks })
       ],
       providers: [

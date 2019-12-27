@@ -1,13 +1,10 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { AutomateSettingsComponent } from './automate-settings.component';
 import { StoreModule } from '@ngrx/store';
-import { runtimeChecks } from 'app/ngrx.reducers';
-import {
-  automateSettingsEntityReducer
-} from 'app/entities/automate-settings/automate-settings.reducer';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormGroup, FormBuilder } from '@angular/forms';
+
+import { ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
 import {
   IngestJob,
   IngestJobs,
@@ -16,6 +13,7 @@ import {
 
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { AutomateSettingsComponent } from './automate-settings.component';
 
 let mockJobSchedulerStatus: JobSchedulerStatus = null;
 
@@ -31,9 +29,7 @@ describe('AutomateSettingsComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        StoreModule.forRoot({
-          automateSettings: automateSettingsEntityReducer
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
       ],
       declarations: [
         AutomateSettingsComponent

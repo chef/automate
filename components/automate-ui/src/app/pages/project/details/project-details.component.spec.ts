@@ -5,11 +5,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
+import { runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
+import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
 import { GetProjectSuccess } from 'app/entities/projects/project.actions';
-import { runtimeChecks } from 'app/ngrx.reducers';
 import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { Project } from 'app/entities/projects/project.model';
 import { Rule } from 'app/entities/rules/rule.model';
@@ -115,7 +117,9 @@ describe('ProjectDetailsComponent', () => {
             navigationId: 0
           }),
           projects: projectEntityReducer,
-          rules: ruleEntityReducer
+          rules: ruleEntityReducer,
+          notifications: notificationEntityReducer, // not used here but needed to suppress warnings
+          clientRunsEntity: clientRunsEntityReducer // not used here but needed to suppress warnings
         }, { runtimeChecks })
       ],
       providers: [
