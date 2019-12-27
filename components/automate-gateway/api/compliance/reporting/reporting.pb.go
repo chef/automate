@@ -2946,7 +2946,7 @@ type ReportingServiceClient interface {
 	//
 	//List all IDs for the latest report for each node, with optional filtering.
 	//Supports filtering, but not pagination or sorting.
-	//Including more than one value for `control`, `profile_id`, or `profile_name` is not allowed.
+	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//Not limited to 10k results.
 	ListReportIds(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ReportIds, error)
@@ -2961,7 +2961,8 @@ type ReportingServiceClient interface {
 	//Fetch a report
 	//
 	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
-	//Including more than one value for `profile_id` is not allowed.
+	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
+	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	ReadReport(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Report, error)
 	//
 	//List suggestions
@@ -3243,7 +3244,7 @@ type ReportingServiceServer interface {
 	//
 	//List all IDs for the latest report for each node, with optional filtering.
 	//Supports filtering, but not pagination or sorting.
-	//Including more than one value for `control`, `profile_id`, or `profile_name` is not allowed.
+	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//Not limited to 10k results.
 	ListReportIds(context.Context, *Query) (*ReportIds, error)
@@ -3258,7 +3259,8 @@ type ReportingServiceServer interface {
 	//Fetch a report
 	//
 	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
-	//Including more than one value for `profile_id` is not allowed.
+	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
+	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	ReadReport(context.Context, *Query) (*Report, error)
 	//
 	//List suggestions

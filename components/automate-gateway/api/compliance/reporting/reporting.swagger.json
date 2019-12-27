@@ -125,7 +125,7 @@
     "/compliance/reporting/report-ids": {
       "post": {
         "summary": "List report IDs",
-        "description": "List all IDs for the latest report for each node, with optional filtering. \nSupports filtering, but not pagination or sorting.\nIncluding more than one value for `control`, `profile_id`, or `profile_name` is not allowed.\nIncluding values for both `profile_id` and `profile_name` in one request is not allowed.\nNot limited to 10k results.",
+        "description": "List all IDs for the latest report for each node, with optional filtering. \nSupports filtering, but not pagination or sorting.\nIncluding more than one value for `profile_id`, or `profile_name` is not allowed.\nIncluding values for both `profile_id` and `profile_name` in one request is not allowed.\nNot limited to 10k results.",
         "operationId": "ListReportIds",
         "responses": {
           "200": {
@@ -181,7 +181,7 @@
     "/compliance/reporting/reports/id/{id}": {
       "post": {
         "summary": "Fetch a report",
-        "description": "Fetch a specific report by ID. Supports filtering, but not pagination or sorting.\nIncluding more than one value for `profile_id` is not allowed.",
+        "description": "Fetch a specific report by ID. Supports filtering, but not pagination or sorting.\nIncluding more than one value for `profile_id`, or `profile_name` is not allowed.\nIncluding values for both `profile_id` and `profile_name` in one request is not allowed.",
         "operationId": "ReadReport",
         "responses": {
           "200": {
