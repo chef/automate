@@ -30,6 +30,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// Return the results in ascending or descending order.
 type Query_OrderType int32
 
 const (
@@ -87,7 +88,9 @@ func (m *RerunResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_RerunResponse proto.InternalMessageInfo
 
 type Id struct {
-	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Unique ID (UUID) assigned to object.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Name of object.
 	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -134,14 +137,18 @@ func (m *Id) GetName() string {
 }
 
 type Query struct {
-	Filters              []*query.Filter `protobuf:"bytes,20,rep,name=filters,proto3" json:"filters,omitempty"`
-	Order                Query_OrderType `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.compliance.scanner.jobs.v1.Query_OrderType" json:"order,omitempty"`
-	Sort                 string          `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
-	Page                 int32           `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
-	PerPage              int32           `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	// Use filters to limit the set of items returned.
+	Filters []*query.Filter `protobuf:"bytes,20,rep,name=filters,proto3" json:"filters,omitempty"`
+	Order   Query_OrderType `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.compliance.scanner.jobs.v1.Query_OrderType" json:"order,omitempty"`
+	// Sort the results on a specific field.
+	Sort string `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
+	// The number of result pages to return.
+	Page int32 `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
+	// The number of results on each page.
+	PerPage              int32    `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Query) Reset()         { *m = Query{} }
@@ -205,7 +212,9 @@ func (m *Query) GetPerPage() int32 {
 }
 
 type ManagerFilter struct {
-	ManagerId            string          `protobuf:"bytes,1,opt,name=manager_id,json=managerId,proto3" json:"manager_id,omitempty"`
+	// Unique ID of a node manager.
+	ManagerId string `protobuf:"bytes,1,opt,name=manager_id,json=managerId,proto3" json:"manager_id,omitempty"`
+	// Use filters to limit the set of items returned.
 	Filters              []*query.Filter `protobuf:"bytes,2,rep,name=filters,proto3" json:"filters,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
@@ -252,30 +261,51 @@ func (m *ManagerFilter) GetFilters() []*query.Filter {
 }
 
 type Job struct {
-	Id                   string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string               `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Type                 string               `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
-	Timeout              int32                `protobuf:"varint,4,opt,name=timeout,proto3" json:"timeout,omitempty"`
-	Tags                 []*query.Kv          `protobuf:"bytes,20,rep,name=tags,proto3" json:"tags,omitempty"`
-	StartTime            *timestamp.Timestamp `protobuf:"bytes,21,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime              *timestamp.Timestamp `protobuf:"bytes,22,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Status               string               `protobuf:"bytes,23,opt,name=status,proto3" json:"status,omitempty"`
-	Retries              int32                `protobuf:"varint,26,opt,name=retries,proto3" json:"retries,omitempty"`
-	RetriesLeft          int32                `protobuf:"varint,27,opt,name=retries_left,json=retriesLeft,proto3" json:"retries_left,omitempty"`
-	Results              []*ResultsRow        `protobuf:"bytes,28,rep,name=results,proto3" json:"results,omitempty"`
-	Nodes                []string             `protobuf:"bytes,100,rep,name=nodes,proto3" json:"nodes,omitempty"`
-	Profiles             []string             `protobuf:"bytes,101,rep,name=profiles,proto3" json:"profiles,omitempty"`
-	NodeCount            int32                `protobuf:"varint,102,opt,name=node_count,json=nodeCount,proto3" json:"node_count,omitempty"`
-	ProfileCount         int32                `protobuf:"varint,103,opt,name=profile_count,json=profileCount,proto3" json:"profile_count,omitempty"`
-	NodeSelectors        []*ManagerFilter     `protobuf:"bytes,104,rep,name=node_selectors,json=nodeSelectors,proto3" json:"node_selectors,omitempty"`
-	ScheduledTime        *timestamp.Timestamp `protobuf:"bytes,105,opt,name=scheduled_time,json=scheduledTime,proto3" json:"scheduled_time,omitempty"`
-	Recurrence           string               `protobuf:"bytes,106,opt,name=recurrence,proto3" json:"recurrence,omitempty"`
-	ParentId             string               `protobuf:"bytes,107,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
-	JobCount             int32                `protobuf:"varint,108,opt,name=job_count,json=jobCount,proto3" json:"job_count,omitempty"`
-	Deleted              bool                 `protobuf:"varint,109,opt,name=deleted,proto3" json:"deleted,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	// Unique ID (UUID) of the scan job.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// User-specified name of the scan job.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Determines the type of Chef InSpec run, `detect` or `exec`.
+	Type string `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
+	// Desired timeout (in seconds) for the scan job execution. Default: 7200 for exec jobs, 600 for detect jobs.
+	Timeout int32 `protobuf:"varint,4,opt,name=timeout,proto3" json:"timeout,omitempty"`
+	// Tags to assign to the scan job.
+	Tags []*query.Kv `protobuf:"bytes,20,rep,name=tags,proto3" json:"tags,omitempty"`
+	// Start time of the scan job, assigned by the service.
+	StartTime *timestamp.Timestamp `protobuf:"bytes,21,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// End time of the scan job, assigned by the service.
+	EndTime *timestamp.Timestamp `protobuf:"bytes,22,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	// Status of the scan job, assigned by the service.
+	Status string `protobuf:"bytes,23,opt,name=status,proto3" json:"status,omitempty"`
+	// Number of times to retry the scan job. Default: 3.
+	Retries int32 `protobuf:"varint,26,opt,name=retries,proto3" json:"retries,omitempty"`
+	// Number of retries left, assigned by the service.
+	RetriesLeft int32 `protobuf:"varint,27,opt,name=retries_left,json=retriesLeft,proto3" json:"retries_left,omitempty"`
+	// Results of the scan job, including a report id if one was generated.
+	Results []*ResultsRow `protobuf:"bytes,28,rep,name=results,proto3" json:"results,omitempty"`
+	// List of node IDs to associate with the scan job.
+	Nodes []string `protobuf:"bytes,100,rep,name=nodes,proto3" json:"nodes,omitempty"`
+	// List of profiles to execute as part of the scan job.
+	Profiles []string `protobuf:"bytes,101,rep,name=profiles,proto3" json:"profiles,omitempty"`
+	// Count of nodes to be scanned as part of the job, assigned by the service.
+	NodeCount int32 `protobuf:"varint,102,opt,name=node_count,json=nodeCount,proto3" json:"node_count,omitempty"`
+	// Count of profiles to be executed as part of the job.
+	ProfileCount int32 `protobuf:"varint,103,opt,name=profile_count,json=profileCount,proto3" json:"profile_count,omitempty"`
+	// Set of node manager IDs and filters to associate with the scan job.
+	NodeSelectors []*ManagerFilter `protobuf:"bytes,104,rep,name=node_selectors,json=nodeSelectors,proto3" json:"node_selectors,omitempty"`
+	// Next scheduled scan execution time.
+	ScheduledTime *timestamp.Timestamp `protobuf:"bytes,105,opt,name=scheduled_time,json=scheduledTime,proto3" json:"scheduled_time,omitempty"`
+	// Recurrence schedule string for the job.
+	Recurrence string `protobuf:"bytes,106,opt,name=recurrence,proto3" json:"recurrence,omitempty"`
+	// ID of parent job to associate with the job, if any.
+	ParentId string `protobuf:"bytes,107,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`
+	// Count of scans executed by the job.
+	JobCount int32 `protobuf:"varint,108,opt,name=job_count,json=jobCount,proto3" json:"job_count,omitempty"`
+	// Boolean used to denote the job has been marked as "deleted" by the user.
+	Deleted              bool     `protobuf:"varint,109,opt,name=deleted,proto3" json:"deleted,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Job) Reset()         { *m = Job{} }
@@ -451,7 +481,9 @@ func (m *Job) GetDeleted() bool {
 }
 
 type Jobs struct {
-	Jobs                 []*Job   `protobuf:"bytes,1,rep,name=jobs,proto3" json:"jobs,omitempty"`
+	// List of jobs.
+	Jobs []*Job `protobuf:"bytes,1,rep,name=jobs,proto3" json:"jobs,omitempty"`
+	// Total number of jobs in the system.
 	Total                int32    `protobuf:"varint,20,opt,name=total,proto3" json:"total,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -498,12 +530,19 @@ func (m *Jobs) GetTotal() int32 {
 }
 
 type ResultsRow struct {
-	NodeId               string               `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
-	ReportId             string               `protobuf:"bytes,2,opt,name=report_id,json=reportId,proto3" json:"report_id,omitempty"`
-	Status               string               `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
-	Result               string               `protobuf:"bytes,4,opt,name=result,proto3" json:"result,omitempty"`
-	JobId                string               `protobuf:"bytes,5,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
-	StartTime            *timestamp.Timestamp `protobuf:"bytes,20,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// ID of the scanned node.
+	NodeId string `protobuf:"bytes,1,opt,name=node_id,json=nodeId,proto3" json:"node_id,omitempty"`
+	// ID of the report generated by the scan.
+	ReportId string `protobuf:"bytes,2,opt,name=report_id,json=reportId,proto3" json:"report_id,omitempty"`
+	// Status of the scan (completed, failed, aborted).
+	Status string `protobuf:"bytes,3,opt,name=status,proto3" json:"status,omitempty"`
+	// Result error message for failed scans.
+	Result string `protobuf:"bytes,4,opt,name=result,proto3" json:"result,omitempty"`
+	// ID of the scan.
+	JobId string `protobuf:"bytes,5,opt,name=job_id,json=jobId,proto3" json:"job_id,omitempty"`
+	// Start time of the scan.
+	StartTime *timestamp.Timestamp `protobuf:"bytes,20,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// End time of the scan.
 	EndTime              *timestamp.Timestamp `protobuf:"bytes,21,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
 	XXX_unrecognized     []byte               `json:"-"`
@@ -690,11 +729,116 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type JobsServiceClient interface {
+	//
+	//Create a scan job
+	//
+	//Creates a scan job. A scan job executes Chef InSpec against the specified nodes.
+	//Requires a user-specified name. Type should be `detect` (checks if the node is reachable and reports the
+	//platform information for the nodes) or `exec` (executes a set of profiles against the nodes).
+	//Nodes to scan may be specified by including an array of node ids to scan or a node manager id along with some optional
+	//filtering information.
+	//Exec jobs require at least one profile to be used as part of the Chef InSpec scan.
+	//Optional recurrence schedules enable regularly scheduled (repeating) scans.
+	//
+	//Example:
+	//```
+	//{
+	//"name": "my testjob",
+	//"tags": [],
+	//"type": "exec",
+	//"nodes": ["i07uc612-7e97-43f2-9b19-256abh785820"],
+	//"profiles": ["https://github.com/dev-sec/linux-baseline/archive/master.tar.gz", "compliance://admin/ssh-baseline#2.2.0"],
+	//"retries": 1,
+	//"node_selectors":[
+	//{
+	//"manager_id":"e69dc612-7e67-43f2-9b19-256afd385820",
+	//"filters":[{"key":"name","values":["ins*"],"exclude":false}]
+	//}
+	//],
+	//"recurrence":"DTSTART=20191231T045100Z;FREQ=DAILY;INTERVAL=1"
+	//}
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:create
+	//```
 	Create(ctx context.Context, in *Job, opts ...grpc.CallOption) (*Id, error)
+	//
+	//Read a scan job
+	//
+	//Read the details of a scan job given an ID.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:get
+	//```
 	Read(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Job, error)
+	//
+	//Update a job
+	//
+	//PUT operation to update the details for a scan job, such as the name, profiles, node set, or recurrence schedule.
+	//Please note that this is a PUT operation, so all scan job details included in the create function
+	//should be included in the PUT message to update.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:update
+	//```
 	Update(ctx context.Context, in *Job, opts ...grpc.CallOption) (*empty.Empty, error)
+	//
+	//Delete a scan job
+	//
+	//Delete a scan job given an id. Note this does not delete the report(s) generated by the scan job.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:delete
+	//```
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
+	//
+	//List of scan jobs
+	//
+	//Returns a list of scan jobs matching the query.
+	//Supports filtering, sorting, and pagination.
+	//Valid filtering fields: job_type, parent_job, status
+	//Valid sorting fields: name, type, status, start_time, end_time
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"key":"job_type","values":["exec"]},
+	//{"key":"parent_job","values":[""]}
+	//],
+	//"page":1,
+	//"per_page":100,
+	//"sort":"end_time",
+	//"order":"DESC"
+	//}
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:list
+	//```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Jobs, error)
+	//
+	//Rerun a scan job
+	//
+	//Does not create a new job in the database. Reads the job info given the job id
+	//and runs a scan. The latest job information is then updated to reflect this latest run.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:rerun
+	//```
 	Rerun(ctx context.Context, in *Id, opts ...grpc.CallOption) (*RerunResponse, error)
 }
 
@@ -762,11 +906,116 @@ func (c *jobsServiceClient) Rerun(ctx context.Context, in *Id, opts ...grpc.Call
 
 // JobsServiceServer is the server API for JobsService service.
 type JobsServiceServer interface {
+	//
+	//Create a scan job
+	//
+	//Creates a scan job. A scan job executes Chef InSpec against the specified nodes.
+	//Requires a user-specified name. Type should be `detect` (checks if the node is reachable and reports the
+	//platform information for the nodes) or `exec` (executes a set of profiles against the nodes).
+	//Nodes to scan may be specified by including an array of node ids to scan or a node manager id along with some optional
+	//filtering information.
+	//Exec jobs require at least one profile to be used as part of the Chef InSpec scan.
+	//Optional recurrence schedules enable regularly scheduled (repeating) scans.
+	//
+	//Example:
+	//```
+	//{
+	//"name": "my testjob",
+	//"tags": [],
+	//"type": "exec",
+	//"nodes": ["i07uc612-7e97-43f2-9b19-256abh785820"],
+	//"profiles": ["https://github.com/dev-sec/linux-baseline/archive/master.tar.gz", "compliance://admin/ssh-baseline#2.2.0"],
+	//"retries": 1,
+	//"node_selectors":[
+	//{
+	//"manager_id":"e69dc612-7e67-43f2-9b19-256afd385820",
+	//"filters":[{"key":"name","values":["ins*"],"exclude":false}]
+	//}
+	//],
+	//"recurrence":"DTSTART=20191231T045100Z;FREQ=DAILY;INTERVAL=1"
+	//}
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:create
+	//```
 	Create(context.Context, *Job) (*Id, error)
+	//
+	//Read a scan job
+	//
+	//Read the details of a scan job given an ID.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:get
+	//```
 	Read(context.Context, *Id) (*Job, error)
+	//
+	//Update a job
+	//
+	//PUT operation to update the details for a scan job, such as the name, profiles, node set, or recurrence schedule.
+	//Please note that this is a PUT operation, so all scan job details included in the create function
+	//should be included in the PUT message to update.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:update
+	//```
 	Update(context.Context, *Job) (*empty.Empty, error)
+	//
+	//Delete a scan job
+	//
+	//Delete a scan job given an id. Note this does not delete the report(s) generated by the scan job.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:delete
+	//```
 	Delete(context.Context, *Id) (*empty.Empty, error)
+	//
+	//List of scan jobs
+	//
+	//Returns a list of scan jobs matching the query.
+	//Supports filtering, sorting, and pagination.
+	//Valid filtering fields: job_type, parent_job, status
+	//Valid sorting fields: name, type, status, start_time, end_time
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"key":"job_type","values":["exec"]},
+	//{"key":"parent_job","values":[""]}
+	//],
+	//"page":1,
+	//"per_page":100,
+	//"sort":"end_time",
+	//"order":"DESC"
+	//}
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:list
+	//```
 	List(context.Context, *Query) (*Jobs, error)
+	//
+	//Rerun a scan job
+	//
+	//Does not create a new job in the database. Reads the job info given the job id
+	//and runs a scan. The latest job information is then updated to reflect this latest run.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:scannerJobs:rerun
+	//```
 	Rerun(context.Context, *Id) (*RerunResponse, error)
 }
 
