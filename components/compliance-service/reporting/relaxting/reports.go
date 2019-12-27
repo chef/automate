@@ -507,11 +507,26 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 	return report, errorutils.ProcessNotFound(nil, reportId)
 }
 
+func arrayIncludes(a []string, matchString string) bool {
+	for _, itemInArray := range a {
+		if itemInArray == matchString {
+			return true
+		}
+	}
+	return false
+}
+
 func convertControl(profileControlsMap map[string]*reportingapi.Control, reportControlMin ESInSpecReportControl, filters map[string][]string) *reportingapi.Control {
 	profileControl := profileControlsMap[reportControlMin.ID]
 
 	if profileControl == nil {
 		return nil
+	}
+
+	if len(filters["control"]) > 0 {
+		if !arrayIncludes(filters["control"], profileControl.Id) {
+			return nil
+		}
 	}
 
 	profileControl.Results = make([]*reportingapi.Result, 0)
