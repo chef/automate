@@ -364,6 +364,8 @@ message ControlStats {
 	int32 skipped = 5;
 	// Impact of the control.
 	float impact = 6;
+	// Count of waived nodes that executed the control.
+	int32 waived = 7;
 }
 
 message Support {
