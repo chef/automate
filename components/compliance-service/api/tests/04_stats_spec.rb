@@ -390,7 +390,10 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
-      #todo - do we need to handle waiver stats in here too?
+      #description: Profile stats list for nodes
+      #filter: in one of the two profiles and end_time
+      #calls: stats::ReadProfiles::GetProfileSummaryByProfileId
+      #depth: Report
       actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
         Stats::ListFilter.new(type: "environment", values: ["DevSec Prod beta"]),
         Stats::ListFilter.new(type: 'end_time', values: ['2018-03-05T23:59:59Z'])
@@ -415,6 +418,30 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
       # {"profileList":[],"profileSummary":{"name":"nginx-baseline","title":"DevSec Nginx Baseline","version":"2.1.0","license":"Apache-2.0","maintainer":"DevSec Hardening Framework Team","copyright":"DevSec Hardening Framework Team","copyrightEmail":"hello@dev-sec.io","summary":"Test-suite for best-practice nginx hardening","supports":[{"osFamily":"unix"}],"stats":{"failed":1,"passed":5,"skipped":2}},"controlStats":[]}
+
+      #description: Profile stats list for nodes
+      #filter: in one of the two profiles and end_time
+      #calls: stats::ReadProfiles::GetProfileSummaryByProfileId
+      #depth: Report
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "environment", values: ["DevSec Prod Zeta"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
+      ],
+                                                                 type: "summary",
+                                                                 id: "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"
+      )
+      expected_data = {
+          "profileSummary" => {
+              "name" => "linux-baseline",
+              "title" => "DevSec Linux Security Baseline",
+              "version" => "2.0.1",
+              "copyright" => "Hardening Framework Team",
+              "copyrightEmail" => "hello@hardening.io",
+              "summary" => "Test-suite for best-preactice os hardening",
+              "stats" => {"failed" => 21, "passed" => 22, "waived" => 2}
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
     end
   end
 end

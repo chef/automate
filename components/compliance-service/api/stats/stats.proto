@@ -124,6 +124,7 @@ message ProfileSummaryStats {
 	int32 skipped = 3;
 	int32 failed_nodes = 4;
 	int32 total_nodes = 5;
+	int32 waived = 6;
 }
 
 message ControlStats {
