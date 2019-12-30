@@ -19,6 +19,20 @@ service NodeManagerService {
 	Create a nodemanager
 
 	Creates a nodemanager given a name, credential id or credential data, and type.
+
+	Example:
+	```
+	{
+    	"name": "my aws api integration with session token",
+		"type": "aws-api",
+		"instance_credentials": [],
+		"credential_data": [
+			{"key": "AWS_ACCESS_KEY_ID", "value": "value" },
+			{"key": "AWS_SECRET_ACCESS_KEY", "value": "value" },
+			{"key": "AWS_SESSION_TOKEN", "value": "value" }
+		]
+  	}
+	```
 	*/
 	rpc Create(NodeManager) returns (Ids) {
 		option (google.api.http) = {
@@ -160,6 +174,16 @@ service NodeManagerService {
 	Supports filtering, sorting, and pagination.
 	Valid filtering fields: 'manager_type'
 	Valid sorting fields: name, type, status, status_message, date_added
+
+	Example:
+	```
+	{
+		"filter_map": [
+			{"key": "manager_type", "values":["aws-ec2"]}
+		], 
+		"sort": "date_added"
+	}
+	```
 	*/
 	rpc List(Query) returns (NodeManagers) {
 		option (google.api.http) = {
@@ -181,6 +205,16 @@ service NodeManagerService {
 
 	Searches the available values for a given field and nodemanager id.
 	Possible fields: regions, tags, name, subscription_id
+
+	Example:
+	```
+	{
+		"query": {
+			"filter_map":[]
+		},
+		"field": "name"
+	}
+	```
 	*/
 	rpc SearchNodeFields(FieldQuery) returns (Fields) {
 		option (google.api.http) = {
@@ -201,6 +235,15 @@ service NodeManagerService {
 	Search nodes
 
 	Searches the available nodes for a given nodemanager id.
+
+	Example:
+	```
+	{
+		"query": {
+			"filter_map":[]
+		}	
+	}
+	```
 	*/
 	rpc SearchNodes(NodeQuery) returns (Nodes) {
 		option (google.api.http) = {

@@ -782,6 +782,20 @@ type NodeManagerServiceClient interface {
 	//Create a nodemanager
 	//
 	//Creates a nodemanager given a name, credential id or credential data, and type.
+	//
+	//Example:
+	//```
+	//{
+	//"name": "my aws api integration with session token",
+	//"type": "aws-api",
+	//"instance_credentials": [],
+	//"credential_data": [
+	//{"key": "AWS_ACCESS_KEY_ID", "value": "value" },
+	//{"key": "AWS_SECRET_ACCESS_KEY", "value": "value" },
+	//{"key": "AWS_SESSION_TOKEN", "value": "value" }
+	//]
+	//}
+	//```
 	Create(ctx context.Context, in *NodeManager, opts ...grpc.CallOption) (*Ids, error)
 	//
 	//Read a nodemanager
@@ -823,17 +837,46 @@ type NodeManagerServiceClient interface {
 	//Supports filtering, sorting, and pagination.
 	//Valid filtering fields: 'manager_type'
 	//Valid sorting fields: name, type, status, status_message, date_added
+	//
+	//Example:
+	//```
+	//{
+	//"filter_map": [
+	//{"key": "manager_type", "values":["aws-ec2"]}
+	//],
+	//"sort": "date_added"
+	//}
+	//```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*NodeManagers, error)
 	//
 	//Search node fields
 	//
 	//Searches the available values for a given field and nodemanager id.
 	//Possible fields: regions, tags, name, subscription_id
+	//
+	//Example:
+	//```
+	//{
+	//"query": {
+	//"filter_map":[]
+	//},
+	//"field": "name"
+	//}
+	//```
 	SearchNodeFields(ctx context.Context, in *FieldQuery, opts ...grpc.CallOption) (*Fields, error)
 	//
 	//Search nodes
 	//
 	//Searches the available nodes for a given nodemanager id.
+	//
+	//Example:
+	//```
+	//{
+	//"query": {
+	//"filter_map":[]
+	//}
+	//}
+	//```
 	SearchNodes(ctx context.Context, in *NodeQuery, opts ...grpc.CallOption) (*Nodes, error)
 	//
 	//Connect
@@ -956,6 +999,20 @@ type NodeManagerServiceServer interface {
 	//Create a nodemanager
 	//
 	//Creates a nodemanager given a name, credential id or credential data, and type.
+	//
+	//Example:
+	//```
+	//{
+	//"name": "my aws api integration with session token",
+	//"type": "aws-api",
+	//"instance_credentials": [],
+	//"credential_data": [
+	//{"key": "AWS_ACCESS_KEY_ID", "value": "value" },
+	//{"key": "AWS_SECRET_ACCESS_KEY", "value": "value" },
+	//{"key": "AWS_SESSION_TOKEN", "value": "value" }
+	//]
+	//}
+	//```
 	Create(context.Context, *NodeManager) (*Ids, error)
 	//
 	//Read a nodemanager
@@ -997,17 +1054,46 @@ type NodeManagerServiceServer interface {
 	//Supports filtering, sorting, and pagination.
 	//Valid filtering fields: 'manager_type'
 	//Valid sorting fields: name, type, status, status_message, date_added
+	//
+	//Example:
+	//```
+	//{
+	//"filter_map": [
+	//{"key": "manager_type", "values":["aws-ec2"]}
+	//],
+	//"sort": "date_added"
+	//}
+	//```
 	List(context.Context, *Query) (*NodeManagers, error)
 	//
 	//Search node fields
 	//
 	//Searches the available values for a given field and nodemanager id.
 	//Possible fields: regions, tags, name, subscription_id
+	//
+	//Example:
+	//```
+	//{
+	//"query": {
+	//"filter_map":[]
+	//},
+	//"field": "name"
+	//}
+	//```
 	SearchNodeFields(context.Context, *FieldQuery) (*Fields, error)
 	//
 	//Search nodes
 	//
 	//Searches the available nodes for a given nodemanager id.
+	//
+	//Example:
+	//```
+	//{
+	//"query": {
+	//"filter_map":[]
+	//}
+	//}
+	//```
 	SearchNodes(context.Context, *NodeQuery) (*Nodes, error)
 	//
 	//Connect
