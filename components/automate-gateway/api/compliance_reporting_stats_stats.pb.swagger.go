@@ -453,6 +453,11 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "Not used."
+        },
+        "waived": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of waived controls for the given profile across nodes."
         }
       },
       "description": "Statistics about the nodes that executed the profile."
