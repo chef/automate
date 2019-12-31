@@ -31,7 +31,7 @@
                       <chef-table-cell class="three-dot-column">
                       <!-- <app-authorized [allOf]="[`/iam/v2/policies/{id}`, 'delete', policy.id]"> -->
                         <mat-select panelClass="chef-control-menu-x" *ngIf="policy.type !== 'CHEF_MANAGED'">
-                          <mat-option (onSelectionChange)="startPolicyDelete(policy)">Delete Policy</mat-option>
+                          <mat-option (onSelectionChange)="startPolicyDelete($event, policy)">Delete Policy</mat-option>
                         </mat-select>
                       <!-- </app-authorized> -->
                       </chef-table-cell>
