@@ -62,7 +62,7 @@ export class PolicyListComponent implements OnInit, OnDestroy {
   }
 
   public startPolicyDelete($event: ChefKeyboardEvent, policy: Policy): void {
-    if ( $event.isUserInput ) {
+    if ($event.isUserInput) {
       this.deleteModalVisible = true;
       this.policyToDelete = policy;
     }
