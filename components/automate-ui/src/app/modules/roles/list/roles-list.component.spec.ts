@@ -2,7 +2,7 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
+import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { RolesListComponent } from './roles-list.component';
@@ -38,7 +38,7 @@ describe('RolesListComponent', () => {
       ],
       imports: [
         ChefPipesModule,
-        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       providers: [
         FeatureFlagsService

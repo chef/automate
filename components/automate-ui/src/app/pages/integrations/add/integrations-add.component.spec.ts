@@ -4,7 +4,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { StoreModule } from '@ngrx/store';
 
-import { ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
+import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { IntegrationsAddComponent } from './integrations-add.component';
 
@@ -17,7 +17,7 @@ describe('IntegrationsAddComponent', () => {
       imports: [
         RouterTestingModule,
         ReactiveFormsModule,
-        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       providers: [
         FeatureFlagsService

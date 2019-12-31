@@ -4,7 +4,7 @@ import { StoreModule } from '@ngrx/store';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormGroup, FormBuilder } from '@angular/forms';
 
-import { ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
+import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import {
   IngestJob,
   IngestJobs,
@@ -29,7 +29,7 @@ describe('AutomateSettingsComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         HttpClientTestingModule,
-        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         AutomateSettingsComponent
