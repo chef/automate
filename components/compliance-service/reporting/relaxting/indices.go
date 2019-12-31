@@ -115,7 +115,7 @@ func wholeCalendarYears(prefix string, startTime time.Time, endTime time.Time) (
 		err = errors.New(StartDateGreaterThanEndDateErrMsg)
 		return indices, straddle, err
 	}
-	endOfStartYear := time.Date(startTime.Year(), time.December, 31, 0, 0, 0, 0, time.UTC)
+	endOfStartYear := time.Date(startTime.Year(), time.December, 31, 23, 59, 59, 0, time.UTC)
 
 	firstWholeCalYear := startTime.Year()
 	if !(startTime.Day() == 1 && startTime.Month() == 1 && (endTime.Equal(endOfStartYear) || endTime.After(endOfStartYear))) {
