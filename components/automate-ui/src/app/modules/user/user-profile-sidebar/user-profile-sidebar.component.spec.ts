@@ -9,7 +9,8 @@ describe('UserProfileSidebarComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule
+      imports: [
+        RouterTestingModule
       ],
       declarations: [
         UserProfileSidebarComponent,

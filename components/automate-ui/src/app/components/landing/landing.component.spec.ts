@@ -154,8 +154,9 @@ describe('LandingComponent', () => {
       providers: [
         { provide: Router, useValue: router }
       ],
-
-      declarations: [LandingComponent]
+      declarations: [
+        LandingComponent
+      ]
     })
       .compileComponents();
   }
