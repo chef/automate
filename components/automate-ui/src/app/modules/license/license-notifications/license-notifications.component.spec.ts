@@ -20,7 +20,7 @@ describe('LicenseNotificationsComponent', () => {
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
-        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
       ],
       declarations: [
         MockComponent({ selector: 'chef-notification', inputs: ['type', 'timeout'] }),
