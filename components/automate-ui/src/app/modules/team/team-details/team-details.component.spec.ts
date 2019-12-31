@@ -2,33 +2,15 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { routerReducer } from '@ngrx/router-store';
-import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store, Action } from '@ngrx/store';
-
 import * as routerStore from '@ngrx/router-store';
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
-import {
-  projectsFilterReducer,
-  projectsFilterInitialState
-} from 'app/services/projects-filter/projects-filter.reducer';
-import {
-  policyEntityReducer, PolicyEntityInitialState
-} from 'app/entities/policies/policy.reducer';
-import {
-  projectEntityReducer,
-  ProjectEntityInitialState
-} from 'app/entities/projects/project.reducer';
+import { MockComponent } from 'ng2-mock-component';
+
+import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { PolicyEntityInitialState } from 'app/entities/policies/policy.reducer';
 import { Project } from 'app/entities/projects/project.model';
 import { GetProjectsSuccess, GetProjects } from 'app/entities/projects/project.actions';
-import {
-  userEntityReducer,
-  UserEntityInitialState
-} from 'app/entities/users/user.reducer';
-import {
-  teamEntityReducer,
-  TeamEntityInitialState
-} from 'app/entities/teams/team.reducer';
 import {
   GetTeamSuccess,
   GetTeamUsersSuccess,
@@ -37,7 +19,6 @@ import {
 } from 'app/entities/teams/team.actions';
 import { Team } from 'app/entities/teams/team.model';
 import { TeamDetailsComponent } from './team-details.component';
-import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
 const declarations: any[] = [
   MockComponent({ selector: 'app-user-table',
@@ -87,20 +68,18 @@ describe('TeamDetailsComponent v2', () => {
   const v2PolicyEntityInitialState = Object.assign({}, PolicyEntityInitialState,
     {iamMajorVersion: 'v2'});
   const initialState = {
+    ...defaultInitialState,
     router: {
       state: {
         url: `/settings/teams/${targetId}`,
         params: { id: targetId },
         queryParams: {},
-        fragment: ''
+        fragment: '',
+        path: []
       },
       navigationId: 0 // what's that zero?
     },
-    users: UserEntityInitialState,
-    teams: TeamEntityInitialState,
-    policies: v2PolicyEntityInitialState,
-    projects: ProjectEntityInitialState,
-    projectsFilter: projectsFilterInitialState
+    policies: v2PolicyEntityInitialState
   };
 
   beforeEach(async(() => {
@@ -112,14 +91,7 @@ describe('TeamDetailsComponent v2', () => {
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot({
-          router: routerReducer,
-          teams: teamEntityReducer,
-          users: userEntityReducer,
-          policies: policyEntityReducer,
-          projects: projectEntityReducer,
-          projectsFilter: projectsFilterReducer
-        }, { initialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
       ]
     }).compileComponents();
   }));
@@ -217,20 +189,18 @@ describe('TeamDetailsComponent v1', () => {
   const v1PolicyEntityInitialState = Object.assign({}, PolicyEntityInitialState,
     {iamMajorVersion: 'v1'});
   const initialState = {
+    ...defaultInitialState,
     router: {
       state: {
         url: `/settings/teams/${targetId}`,
         params: { id: targetId },
         queryParams: {},
-        fragment: ''
+        fragment: '',
+        path: []
       },
       navigationId: 0 // what's that zero?
     },
-    users: UserEntityInitialState,
-    teams: TeamEntityInitialState,
-    policies: v1PolicyEntityInitialState,
-    projects: ProjectEntityInitialState,
-    projectsFilter: projectsFilterInitialState
+    policies: v1PolicyEntityInitialState
   };
 
   beforeEach(async(() => {
@@ -242,14 +212,7 @@ describe('TeamDetailsComponent v1', () => {
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot({
-          router: routerReducer,
-          teams: teamEntityReducer,
-          users: userEntityReducer,
-          policies: policyEntityReducer,
-          projects: projectEntityReducer,
-          projectsFilter: projectsFilterReducer
-        }, { initialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
       ]
     }).compileComponents();
   }));

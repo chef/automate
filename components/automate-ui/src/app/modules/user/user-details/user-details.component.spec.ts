@@ -3,16 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
-import { routerReducer } from '@ngrx/router-store';
 import { Subject } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks, defaultInitialState, ngrxReducers } from 'app/ngrx.reducers';
 import { customMatchers } from 'app/testing/custom-matchers';
-import {
-  userEntityReducer,
-  UserEntityInitialState
-} from 'app/entities/users/user.reducer';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { UserEntityInitialState } from 'app/entities/users/user.reducer';
 import { User } from 'app/entities/users/user.model';
 import {
   GetUser,
@@ -21,8 +18,6 @@ import {
   DeleteUserSuccess
 } from 'app/entities/users/user.actions';
 import { UserDetailsComponent } from './user-details.component';
-
-import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
 describe('UserDetailsComponent', () => {
   let component: UserDetailsComponent;
@@ -39,12 +34,14 @@ describe('UserDetailsComponent', () => {
   };
 
   const initialState = {
+    ...defaultInitialState,
     router: {
       state: {
         url: '/settings/users/alice',
         params: { id: 'alice' },
         queryParams: {},
-        fragment: ''
+        fragment: '',
+        path: []
       },
       navigationId: 0 // what's that zero?
     },
@@ -57,10 +54,7 @@ describe('UserDetailsComponent', () => {
         RouterTestingModule,
         FormsModule,
         ReactiveFormsModule,
-        StoreModule.forRoot({
-          router: routerReducer,
-          users: userEntityReducer
-        }, { initialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
       ],
       declarations: [
         MockComponent({ selector: 'chef-breadcrumbs' }),

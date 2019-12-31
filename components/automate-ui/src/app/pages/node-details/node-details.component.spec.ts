@@ -1,18 +1,21 @@
+import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { TestBed, ComponentFixtureAutoDetect, ComponentFixture } from '@angular/core/testing';
 import { FormsModule } from '@angular/forms';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ActivatedRoute } from '@angular/router';
-import { BehaviorSubject, Subject } from 'rxjs';
-import { runtimeChecks } from 'app/ngrx.reducers';
-import { NodeDetailsComponent  } from './node-details.component';
-import { NodeDetailsService } from '../../services/node-details/node-details.service';
-import { MockComponent } from 'ng2-mock-component';
-import { AttributesService } from '../../services/attributes/attributes.service';
-import { NodeRun } from '../../types/types';
-import { NO_ERRORS_SCHEMA, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
-import { TelemetryService } from '../../services/telemetry/telemetry.service';
-import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { StoreModule } from '@ngrx/store';
+import { BehaviorSubject, Subject } from 'rxjs';
+import { MockComponent } from 'ng2-mock-component';
+
+import { runtimeChecks } from 'app/ngrx.reducers';
+import { NodeRun } from 'app/types/types';
+import { NodeDetailsService } from 'app/services/node-details/node-details.service';
+import { AttributesService } from 'app/services/attributes/attributes.service';
+import { TelemetryService } from 'app/services/telemetry/telemetry.service';
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
+import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
+import { NodeDetailsComponent  } from './node-details.component';
 
 class MockTelemetryService {
   track() { }
@@ -81,6 +84,8 @@ function createTestFixture(
       FormsModule,
       RouterTestingModule,
       StoreModule.forRoot({
+        notifications: notificationEntityReducer, // not used here but needed to suppress warnings
+        clientRunsEntity: clientRunsEntityReducer, // not used here but needed to suppress warnings
         router: () => ({
           state: {
             url: '/',
