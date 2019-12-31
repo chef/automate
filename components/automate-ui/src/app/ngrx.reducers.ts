@@ -133,8 +133,10 @@ export function routerReducer(state = defaultRouterState, action) {
   }
 }
 
+// Note: this is used ONLY for unit tests, but better to be defined here since
+// it needs to mirror the ngrxReducers.
 export const defaultInitialState = {
-  ...defaultRouterState,
+  router: defaultRouterState,
   credentials: credentials.initialState,
   event_feed: eventFeed.initialState,
   scanner: scanner.initialState,
@@ -166,7 +168,7 @@ export const defaultInitialState = {
   serviceGroups: serviceGroups.ServiceGroupEntityInitialState,
   teams: teamEntity.TeamEntityInitialState,
   userperms: permEntity.initialState,
-  users: userEntity.userEntityAdapter.getInitialState
+  users: userEntity.UserEntityInitialState
 };
 
 export const ngrxReducers = {
