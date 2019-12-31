@@ -6,7 +6,14 @@ import { StoreModule, Store, Action } from '@ngrx/store';
 import * as routerStore from '@ngrx/router-store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
+import {
+  NgrxStateAtom,
+  ngrxReducers,
+  defaultInitialState,
+  runtimeChecks,
+  defaultRouterState,
+  defaultRouterRouterState
+} from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { PolicyEntityInitialState } from 'app/entities/policies/policy.reducer';
 import { Project } from 'app/entities/projects/project.model';
@@ -19,6 +26,7 @@ import {
 } from 'app/entities/teams/team.actions';
 import { Team } from 'app/entities/teams/team.model';
 import { TeamDetailsComponent } from './team-details.component';
+import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 const declarations: any[] = [
   MockComponent({ selector: 'app-user-table',
@@ -65,21 +73,19 @@ describe('TeamDetailsComponent v2', () => {
   let router: Router;
   let store: Store<NgrxStateAtom>;
 
-  const v2PolicyEntityInitialState = Object.assign({}, PolicyEntityInitialState,
-    {iamMajorVersion: 'v2'});
   const initialState = {
     ...defaultInitialState,
     router: {
+      ...defaultRouterState,
       state: {
+        ...defaultRouterRouterState,
         url: `/settings/teams/${targetId}`,
-        params: { id: targetId },
-        queryParams: {},
-        fragment: '',
-        path: []
-      },
-      navigationId: 0 // what's that zero?
+        params: { id: targetId }
+      }
     },
-    policies: v2PolicyEntityInitialState
+    policies: {
+      ...PolicyEntityInitialState, iamMajorVersion: 'v2' as IAMMajorVersion
+    }
   };
 
   beforeEach(async(() => {
@@ -186,21 +192,19 @@ describe('TeamDetailsComponent v1', () => {
   let router: Router;
   let store: Store<NgrxStateAtom>;
 
-  const v1PolicyEntityInitialState = Object.assign({}, PolicyEntityInitialState,
-    {iamMajorVersion: 'v1'});
   const initialState = {
     ...defaultInitialState,
     router: {
+      ...defaultRouterState,
       state: {
+        ...defaultRouterRouterState,
         url: `/settings/teams/${targetId}`,
-        params: { id: targetId },
-        queryParams: {},
-        fragment: '',
-        path: []
-      },
-      navigationId: 0 // what's that zero?
+        params: { id: targetId }
+      }
     },
-    policies: v1PolicyEntityInitialState
+    policies: {
+      ...PolicyEntityInitialState, iamMajorVersion: 'v1' as IAMMajorVersion
+    }
   };
 
   beforeEach(async(() => {

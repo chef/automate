@@ -6,7 +6,14 @@ import { StoreModule, Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
-import { NgrxStateAtom, runtimeChecks, defaultInitialState, ngrxReducers } from 'app/ngrx.reducers';
+import {
+  NgrxStateAtom,
+  ngrxReducers,
+  defaultInitialState,
+  runtimeChecks,
+  defaultRouterState,
+  defaultRouterRouterState
+} from 'app/ngrx.reducers';
 import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { UserEntityInitialState } from 'app/entities/users/user.reducer';
@@ -36,14 +43,12 @@ describe('UserDetailsComponent', () => {
   const initialState = {
     ...defaultInitialState,
     router: {
+      ...defaultRouterState,
       state: {
+        ...defaultRouterRouterState,
         url: '/settings/users/alice',
-        params: { id: 'alice' },
-        queryParams: {},
-        fragment: '',
-        path: []
-      },
-      navigationId: 0 // what's that zero?
+        params: { id: 'alice' }
+      }
     },
     users: UserEntityInitialState
   };

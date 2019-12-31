@@ -5,7 +5,14 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { NgrxStateAtom, runtimeChecks, ngrxReducers, defaultInitialState } from 'app/ngrx.reducers';
+import {
+  NgrxStateAtom,
+  ngrxReducers,
+  defaultInitialState,
+  runtimeChecks,
+  defaultRouterState,
+  defaultRouterRouterState
+} from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { Project } from 'app/entities/projects/project.model';
@@ -26,14 +33,12 @@ describe('ApiTokenDetailsComponent', () => {
   const initialState = {
     ...defaultInitialState,
     router: {
+      ...defaultRouterState,
       state: {
+        ...defaultRouterRouterState,
         url: `/settings/tokens/${targetId}`,
-        params: { id: targetId },
-        queryParams: {},
-        fragment: '',
-        path: []
-      },
-      navigationId: 0
+        params: { id: targetId }
+      }
     }
   };
 

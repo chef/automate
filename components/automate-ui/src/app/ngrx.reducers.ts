@@ -110,14 +110,16 @@ export const runtimeChecks = {
   strictActionSerializability: false
 };
 
+export const defaultRouterRouterState = {
+  url: '/',
+  queryParams: {},
+  params: {},
+  fragment: '',
+  path: ['/']
+};
+
 export const defaultRouterState = {
-  state: {
-    url: '/',
-    queryParams: {},
-    params: {},
-    fragment: '',
-    path: ['/']
-  },
+  state: defaultRouterRouterState,
   previousRoute: {},
   navigationId: 0
 };
