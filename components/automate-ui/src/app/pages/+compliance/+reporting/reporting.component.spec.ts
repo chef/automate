@@ -41,20 +41,6 @@ describe('ReportingComponent', () => {
   let router: Router;
   let route: ActivatedRoute;
 
-  const initialState = {
-    router: {
-      state: {
-        url: '/',
-        params: {},
-        queryParams: {},
-        fragment: ''
-      }
-    },
-    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
-    notifications: fromNotifications.InitialState,
-    layout: fromLayout.InitialState
-  };
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -65,7 +51,7 @@ describe('ReportingComponent', () => {
           clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
           notifications: fromNotifications.notificationEntityReducer,
           layout: fromLayout.layoutEntityReducer
-        }, { initialState, runtimeChecks })
+        }, { runtimeChecks })
       ],
       declarations: [
         ReportingComponent,

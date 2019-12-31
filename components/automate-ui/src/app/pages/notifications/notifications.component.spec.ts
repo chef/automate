@@ -5,7 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { Store, StoreModule } from '@ngrx/store';
-import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { MockComponent } from 'ng2-mock-component';
 
 import { Rule, ServiceActionType } from './rule';
@@ -65,7 +65,7 @@ describe('NotificationsComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         NotificationsComponent,

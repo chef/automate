@@ -9,8 +9,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable, throwError, of as observableOf } from 'rxjs';
 import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
-import * as fromNotifications from 'app/entities/notifications/notification.reducer';
+import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
+import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
 import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 class MockProfilesService {
@@ -30,30 +30,16 @@ describe('ProfileDetailsComponent', () => {
     username: 'TestUser'
   };
 
-  const initialState = {
-    router: {
-      state: {
-        url: '/',
-        params: {},
-        queryParams: {},
-        fragment: ''
-      }
-    },
-    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
-    notifications: fromNotifications.InitialState,
-    layout: fromLayout.InitialState
-  };
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
         StoreModule.forRoot({
-          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
-          notifications: fromNotifications.notificationEntityReducer,
+          clientRunsEntity: clientRunsEntityReducer, // not used but needed to suppress warnings
+          notifications: notificationEntityReducer, // not used but needed to suppress warnings
           layout: fromLayout.layoutEntityReducer
-        }, { initialState, runtimeChecks })
+        }, { runtimeChecks })
       ],
       declarations: [
         ProfileDetailsComponent

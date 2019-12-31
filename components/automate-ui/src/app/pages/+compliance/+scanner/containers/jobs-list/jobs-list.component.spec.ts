@@ -4,7 +4,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Router } from '@angular/router';
 import { Store, StoreModule } from '@ngrx/store';
-import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import * as moment from 'moment';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
@@ -21,7 +21,7 @@ describe('JobsListComponent', () => {
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
-        StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         JobsListComponent

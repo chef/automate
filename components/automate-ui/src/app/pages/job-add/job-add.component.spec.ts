@@ -5,7 +5,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { ROUTER_NAVIGATION } from '@ngrx/router-store';
-import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { ChefSessionService } from '../../services/chef-session/chef-session.service';
 import { JobAddComponent, Step } from './job-add.component';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
@@ -37,7 +37,7 @@ describe('JobAddComponent', () => {
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         JobAddComponent

@@ -22,20 +22,6 @@ describe('DatafeedFormComponent', () => {
   let datafeedService: DatafeedService;
   const snapshot = { params: { name: 'name' }};
 
-  const initialState = {
-    router: {
-      state: {
-        url: '/',
-        params: {},
-        queryParams: {},
-        fragment: ''
-      }
-    },
-    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
-    notifications: fromNotifications.InitialState,
-    layout: fromLayout.InitialState
-  };
-
   class MockDatafeedService {
     fetchDestinations(): Observable<Destination[]> { return observableOf([]); }
     fetchDestination(destination) { return observableOf(destination); }
@@ -71,7 +57,7 @@ describe('DatafeedFormComponent', () => {
           clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
           notifications: fromNotifications.notificationEntityReducer,
           layout: fromLayout.layoutEntityReducer
-        }, { initialState, runtimeChecks })
+        }, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();
