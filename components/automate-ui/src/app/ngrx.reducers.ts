@@ -9,7 +9,7 @@ import * as projectsFilter from './services/projects-filter/projects-filter.redu
 import * as apiToken from './entities/api-tokens/api-token.reducer';
 import * as automateSettings from './entities/automate-settings/automate-settings.reducer';
 import * as clientRuns from './entities/client-runs/client-runs.reducer';
-import * as integationsAdd from './pages/integrations/add/integration-add.reducer';
+import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
 import * as integrationsDetail from './pages/integrations/detail/integrations-detail.reducer';
 import * as integrationsEdit from './pages/integrations/edit/integrations-edit.reducer';
 import * as license from './entities/license/license.reducer';
@@ -43,7 +43,7 @@ export interface NgrxStateAtom {
   projectsFilter: projectsFilter.ProjectsFilterState;
 
   // UI State
-  integrations_add: integationsAdd.IntegrationsAddState;
+  integrations_add: integrationsAdd.IntegrationsAddState;
   integrations_detail: integrationsDetail.IntegrationsDetailState;
   integrations_edit: integrationsEdit.IntegrationsEditState;
   job_add: jobAdd.JobAddState;
@@ -145,7 +145,7 @@ export const defaultInitialState = {
   projectsFilter: projectsFilter.projectsFilterInitialState,
 
   // UI State
-  integrations_add: integationsAdd.IntegrationsAddInitialState,
+  integrations_add: integrationsAdd.IntegrationsAddInitialState,
   integrations_detail: integrationsDetail.IntegrationsDetailInitialState,
   integrations_edit: integrationsEdit.IntegrationsEditInitialState,
   job_add: jobAdd.JobAddInitialState,
@@ -185,7 +185,7 @@ export const ngrxReducers = {
   job_add: jobAdd.jobAddReducer,
   job_edit: jobEdit.jobEditReducer,
   job_list: jobList.jobListReducer,
-  integrations_add: integationsAdd.integrationsAddReducer,
+  integrations_add: integrationsAdd.integrationsAddReducer,
   integrations_detail: integrationsDetail.integrationsDetailReducer,
   integrations_edit: integrationsEdit.integrationsEditReducer,
 
