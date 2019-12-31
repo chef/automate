@@ -10,7 +10,6 @@ themes/chef:
 	scripts/clone_hugo.sh
 
 clean:
-	rm -rf site/themes/chef
 	rm -f $(SWAGGER_RESULT_FILE)
 	rm -rf themes/
 	rm -rf public/
