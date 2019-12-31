@@ -315,6 +315,7 @@ func (backend *ES2Backend) GetProfile(hash string) (reportingapi.Profile, error)
 //this is the summary that appears at the top of the page when you select a profile from profiles list at the moment
 // this one does not immediately need to be deep aware as the only things that are used from it in a2 api are version, maintainer and license
 // todo - deep filtering - this should be made depth aware as this still needs to be consumed by api users
+// todo - do we need to handle waiver info in here too?
 func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters map[string][]string) (*stats.ProfileSummary, error) {
 	esIndex, err := GetEsIndex(filters, false, false)
 	if err != nil {
@@ -341,17 +342,26 @@ func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters
 	profilesMinQuery := elastic.NewNestedQuery("profiles", reportIdsAndProfileIDQuery)
 	filtQuery = filtQuery.Must(profilesMinQuery)
 
-	passedFilterAgg := elastic.NewFilterAggregation().Filter(
-		elastic.NewTermQuery("profiles.controls.status", "passed"))
-	failedFilterAgg := elastic.NewFilterAggregation().Filter(
-		elastic.NewTermQuery("profiles.controls.status", "failed"))
-	skippedFilterAgg := elastic.NewFilterAggregation().Filter(
-		elastic.NewTermQuery("profiles.controls.status", "skipped"))
+	waivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
+	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
+		MustNot(waivedQuery))
+
+	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
+		MustNot(waivedQuery))
+
+	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "skipped")).
+		MustNot(waivedQuery))
+
+	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
 	controls := elastic.NewNestedAggregation().Path("profiles.controls")
-	controls.SubAggregation("passed", passedFilterAgg)
-	controls.SubAggregation("failed", failedFilterAgg)
-	controls.SubAggregation("skipped", skippedFilterAgg)
+	controls.SubAggregation("passed", passedFilter)
+	controls.SubAggregation("failed", failedFilter)
+	controls.SubAggregation("skipped", skippedFilter)
+	controls.SubAggregation("waived", waivedFilter)
 
 	profilesFilter := elastic.NewFilterAggregation().Filter(
 		elastic.NewTermQuery("profiles.sha256", profileId))
@@ -402,10 +412,12 @@ func (backend ES2Backend) GetProfileSummaryByProfileId(profileId string, filters
 		passedCount, _ := controlsAggResult.Filter("passed")
 		failedCount, _ := controlsAggResult.Filter("failed")
 		skippedCount, _ := controlsAggResult.Filter("skipped")
+		waivedCount, _ := controlsAggResult.Filter("waived")
 
 		profileMeta.Stats.Passed = int32(passedCount.DocCount)
 		profileMeta.Stats.Failed = int32(failedCount.DocCount)
 		profileMeta.Stats.Skipped = int32(skippedCount.DocCount)
+		profileMeta.Stats.Waived = int32(waivedCount.DocCount)
 
 		return profileMeta, nil
 	}

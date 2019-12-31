@@ -295,76 +295,11 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
-      #todo - this one is not in 04_stats_spec.. it tests deep profile filtering for nodes type
-      # Compliance Summary with profile filter
-      actual_data = GRPC stats, :read_summary, Stats::Query.new(type: "nodes", filters: [
-          Stats::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),
-          Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
-      ])
-      expected_data = {
-          "nodeSummary" => {
-              "compliant" => 1,
-              "noncompliant" => 3,
-              "highRisk" => 2,
-              "mediumRisk" => 1
-          }
-      }
-      assert_equal_json_content(expected_data, actual_data)
 
 
-      #todo - this one is not in 04_stats_spec.. it tests control filtering for nodes type
-      # Compliance Summary with profile filter
-      actual_data = GRPC stats, :read_summary, Stats::Query.new(type: "nodes", filters: [
-          Stats::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),
-          Stats::ListFilter.new(type: "control", values: ["nginx-04"]),
-          Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
-      ])
-      expected_data = {
-          "nodeSummary" => {
-              "compliant" => 1,
-              "noncompliant" => 3,
-              "mediumRisk" => 3
-          }
-      }
-      assert_equal_json_content(expected_data, actual_data)
-
-
-      #todo - this one is not in 04_stats_spec.. it tests deep profile filtering for control type
-      # Compliance Summary with profile filter
-      actual_data = GRPC stats, :read_summary, Stats::Query.new(type: "controls", filters: [
-          Stats::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),
-          Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
-      ])
-      expected_data = {
-          "controlsSummary" => {
-              "failures" => 5,
-              "majors" => 3,
-              "criticals" => 2,
-              "passed" => 7,
-              "skipped" => 4
-          }
-      }
-      assert_equal_json_content(expected_data, actual_data)
-
-
-      #todo - this one is not in 04_stats_spec.. it tests control filtering for control type
-      # Compliance Summary with profile filter
-      actual_data = GRPC stats, :read_summary, Stats::Query.new(type: "controls", filters: [
-          Stats::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),
-          Stats::ListFilter.new(type: "control", values: ["nginx-04"]),
-          Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
-      ])
-      expected_data = {
-          "controlsSummary" => {
-              "failures" => 3,
-              "majors" => 3,
-              "passed" => 1
-          }
-      }
-      assert_equal_json_content(expected_data, actual_data)
-
-
-      # Profile stats for nodes that are using one of the two profiles.
+      #description: Profile stats list for nodes that are using one of the two profiles with waivers.
+      #calls: stats::ReadProfiles::GetProfileListWithAggregatedComplianceSummaries
+      #depth:Profile
       actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
           Stats::ListFilter.new(type: "profile_id", values: ["b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"]),
           Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
@@ -377,15 +312,40 @@ if !ENV['NO_STATS_TESTS']
                   "failures" => 21,
                   "criticals" => 21,
                   "passed" => 22,
-                  # COMMENT THIS OUT WHEN WAIVERS API SUPPORT IS ADDED FOR THIS API CALL
-                  # "waived" => 3
+                  "waived" => 2
               }
           ]
       }
       assert_equal_json_content(expected_data, actual_data)
 
 
-      # profile deep with profile_id specified as a filter
+      #todo - get this one working
+      #description: Profile stats list for nodes that are using one profile and one control.
+      #calls: stats::ReadProfiles::GetProfileListWithAggregatedComplianceSummaries
+      #depth:Control
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),
+          Stats::ListFilter.new(type: "control", values: ["nginx-04"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+      ])
+      expected_data = {
+          "profileList" => [
+              {
+                  "name" => "nginx-baseline",
+                  "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                  "failures" => 3,
+                  "majors" => 3,
+                  "passed" => 1
+              }
+          ]
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      #description: control stats at control depth
+      #scenario: control status passed
+      #calls: stats::ReadProfiles::GetControlListStatsByProfileID
+      #depth:Control
       actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
           Stats::ListFilter.new(type: "environment", values: ["DevSec Prod beta"]),
           Stats::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),
@@ -405,7 +365,10 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
-      # profile deep with profile_id specified as a filter
+      #description: control stats at control depth
+      #scenario: control status skipped
+      #calls: stats::ReadProfiles::GetControlListStatsByProfileID
+      #depth:Control
       actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
           Stats::ListFilter.new(type: "environment", values: ["DevSec Prod beta"]),
           Stats::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),
@@ -427,25 +390,210 @@ if !ENV['NO_STATS_TESTS']
       }
       assert_equal_json_content(expected_data, actual_data)
 
-      #Profile stats for nodes that are using one profile one control.
-      #todo - get this one working
+      #description: control stats at control depth
+      #scenario: control status waived
+      #calls: stats::ReadProfiles::GetControlListStatsByProfileID
+      #depth:Control
       actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
-          Stats::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),
-          Stats::ListFilter.new(type: "control", values: ["nginx-04"]),
-          Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
-      ])
+          Stats::ListFilter.new(type: "environment", values: ["DevSec Prod Zeta"]),
+          Stats::ListFilter.new(type: "profile_id", values: ["b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"]),
+          Stats::ListFilter.new(type: "control", values: ["os-03"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
+      ], type: "controls", id: "b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"
+      )
       expected_data = {
-          "profileList" => [
+          "controlStats" => [
               {
-                  "name" => "nginx-baseline",
-                  "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
-                  "failures" => 3,
-                  "majors" => 3,
-                  "passed" => 1
+
+                  "control" => "os-03",
+                  "title" => "Check owner and permissions for /etc/passwd",
+                  "impact" => 1,
+                  "waived" => 1
+
               }
           ]
       }
       assert_equal_json_content(expected_data, actual_data)
+
+      #description: Profile stats list for nodes.
+      #filter: missing env for a specific profile_id and end_time
+      #calls: stats::ReadProfiles::GetControlListStatsByProfileID
+      #depth: Profile
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "environment", values: ["Missing In Action"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-03-05T23:59:59Z'])
+      ],
+                                                                 type: "controls",
+                                                                 id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
+      )
+      expected_data = {}
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      #description: Profile stats list for nodes.
+      #filter: env and profile_id and end_time
+      #calls: stats::ReadProfiles::GetControlListStatsByProfileID
+      #depth: Profile
+      actual_data = GRPC stats, :read_profiles, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: "environment", values: ["DevSec Prod beta"]),
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-03-05T23:59:59Z'])
+      ],
+                                                                 type: "controls",
+                                                                 id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
+      )
+      expected_data = {
+          "controlStats" => [
+              {
+                  "control" => "nginx-01",
+                  "title" => "Running worker process as non-privileged user",
+                  "passed" => 1,
+                  "impact" => 1
+              },
+              {
+                  "control" => "nginx-02",
+                  "title" => "Check NGINX config file owner, group and permissions.",
+                  "passed" => 1,
+                  "impact" => 1
+              },
+              {
+                  "control" => "nginx-03",
+                  "title" => "Check NGINX three.",
+                  "skipped" => 1,
+                  "impact" => 1
+              },
+              {
+                  "control" => "nginx-04",
+                  "title" => "Check NGINX four",
+                  "passed" => 1,
+                  "impact" => 0.5
+              }
+          ]
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      #description: Profile stats list for nodes.
+      #filter: multiple
+      #calls: stats::ReadProfiles::GetControlListStatsByProfileID
+      #depth: Profile
+      profile_controls = GRPC stats, :read_profiles, Stats::Query.new(
+          filters: [
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-03-05T23:59:59Z']),
+              Stats::ListFilter.new(type: 'job_id', values: ['74a54a28-c628-4f82-86df-555555555555']),
+              Stats::ListFilter.new(type: 'node_id', values: ['9b9f4e51-b049-4b10-9555-10578916e149']),
+              Stats::ListFilter.new(type: 'platform', values: ['centos', 'win']),
+              Stats::ListFilter.new(type: 'status', values: ['passed', 'failed']),
+              Stats::ListFilter.new(type: 'node_name', values: ['centos-beta']),
+              Stats::ListFilter.new(type: 'roles', values: ['dot.role']),
+              Stats::ListFilter.new(type: 'recipes', values: ['java::default']),
+          ],
+          type: "controls",
+          id: "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"
+      )
+      expected_data = {
+          "controlStats" => [
+              {
+                  "control" => "nginx-01",
+                  "title" => "Running worker process as non-privileged user",
+                  "passed" => 2,
+                  "impact" => 1
+              },
+              {
+                  "control" => "nginx-02",
+                  "title" => "Check NGINX config file owner, group and permissions.",
+                  "passed" => 2,
+                  "impact" => 1
+              },
+              {
+                  "control" => "nginx-03",
+                  "title" => "Check NGINX three.",
+                  "skipped" => 2,
+                  "impact" => 1
+              },
+              {
+                  "control" => "nginx-04",
+                  "title" => "Check NGINX four",
+                  "passed" => 1,
+                  "failed" => 1,
+                  "impact" => 0.5
+              }
+          ]
+      }
+      assert_equal_json_content(expected_data, profile_controls)
+
+
+      #####deep summary stats
+      #description: Node stats for profile depth.
+      #filter:  one profile
+      #calls: stats::ReadSummary::GetStatsSummaryNodes
+      #depth: Profile
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "nodes",
+          filters: [
+              Stats::ListFilter.new(type: "profile_id", values: ["b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"]),
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z']),
+          ])
+      expected_data = {
+          "nodeSummary" => {
+              "noncompliant" => 1,
+              "highRisk" => 1
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      #description: Node stats for control depth.
+      #filter:  one profile one control
+      #calls: stats::ReadSummary::GetStatsSummaryNodes
+      #depth: Control
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "nodes",
+          filters: [
+              Stats::ListFilter.new(type: "profile_id", values: ["b53ca05fbfe17a36363a40f3ad5bd70aa20057eaf15a9a9a8124a84d4ef08015"]),
+              Stats::ListFilter.new(type: "control", values: ["os-02"]),
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
+          ])
+      expected_data = {
+          "nodeSummary" => {
+              "waived" => 1
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+
+      # Compliance Summary with profile filter
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "controls",
+          filters: [
+              Stats::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+          ])
+      expected_data = {
+          "controlsSummary" => {
+              "failures" => 5,
+              "majors" => 3,
+              "criticals" => 2,
+              "passed" => 7,
+              "skipped" => 4
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
+      # Compliance Summary with profile filter
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(
+          type: "controls",
+          filters: [
+              Stats::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),
+              Stats::ListFilter.new(type: "control", values: ["nginx-04"]),
+              Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z'])
+          ])
+      expected_data = {
+          "controlsSummary" => {
+              "failures" => 3,
+              "majors" => 3,
+              "passed" => 1
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+
     end
   end
 end
