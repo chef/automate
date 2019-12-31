@@ -21,7 +21,7 @@ describe('JobsListComponent', () => {
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
-        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
       ],
       declarations: [
         JobsListComponent

@@ -65,7 +65,7 @@ describe('NotificationsComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
       ],
       declarations: [
         NotificationsComponent,

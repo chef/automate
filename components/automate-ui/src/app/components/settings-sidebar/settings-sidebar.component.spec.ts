@@ -22,7 +22,7 @@ describe('SettingsSidebarComponent', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
       ],
       declarations: [
         SettingsSidebarComponent,

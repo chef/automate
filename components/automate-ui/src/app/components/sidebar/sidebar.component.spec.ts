@@ -22,7 +22,7 @@ describe('SidebarComponent', () => {
         FeatureFlagsService
       ],
       imports: [
-        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
       ]
     }).compileComponents();
     store = TestBed.get(Store);

@@ -48,7 +48,7 @@ describe('JobEditComponent', () => {
       imports: [
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { ...defaultInitialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
       ],
       declarations: [
         JobEditComponent
