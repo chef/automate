@@ -10,6 +10,7 @@ import { DeletePolicy, GetPolicies } from 'app/entities/policies/policy.actions'
 import { allPolicies, getAllStatus, isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { Policy } from 'app/entities/policies/policy.model';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
   selector: 'app-policy-list',
@@ -60,9 +61,11 @@ export class PolicyListComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public startPolicyDelete(policy: Policy): void {
-    this.deleteModalVisible = true;
-    this.policyToDelete = policy;
+  public startPolicyDelete($event: ChefKeyboardEvent, policy: Policy): void {
+    if ( $event.isUserInput ) {
+      this.deleteModalVisible = true;
+      this.policyToDelete = policy;
+    }
   }
 
   public deletePolicy(): void {
