@@ -197,6 +197,32 @@ func TestIndexDatesEndDateIsEndOfTensRange(t *testing.T) {
 	}
 }
 
+func TestIndexDatesDayBeforeEndDateIsEndOfYear(t *testing.T) {
+	startTime := "2006-12-21T15:04:05Z"
+	endTime := "2006-12-30T23:59:59Z"
+
+	esIndex, err := relaxting.IndexDates(relaxting.CompDailySumIndexPrefix, startTime, endTime)
+
+	if assert.NoError(t, err) {
+		assert.Equal(t, fmt.Sprintf("%[1]s2006.12.21*,%[1]s2006.12.22*,%[1]s2006.12.23*,%[1]s2006.12.24*,"+
+			"%[1]s2006.12.25*,%[1]s2006.12.26*,%[1]s2006.12.27*,%[1]s2006.12.28*,%[1]s2006.12.29*,%[1]s2006.12.30*",
+			relaxting.CompDailySumIndexPrefix), esIndex)
+	}
+}
+
+func TestIndexDatesEndDateIsEndOfYear(t *testing.T) {
+	startTime := "2006-12-21T15:04:05Z"
+	endTime := "2006-12-31T23:59:59Z"
+
+	esIndex, err := relaxting.IndexDates(relaxting.CompDailySumIndexPrefix, startTime, endTime)
+
+	if assert.NoError(t, err) {
+		assert.Equal(t, fmt.Sprintf("%[1]s2006.12.21*,%[1]s2006.12.22*,%[1]s2006.12.23*,%[1]s2006.12.24*,"+
+			"%[1]s2006.12.25*,%[1]s2006.12.26*,%[1]s2006.12.27*,%[1]s2006.12.28*,%[1]s2006.12.29*,%[1]s2006.12.3*",
+			relaxting.CompDailySumIndexPrefix), esIndex)
+	}
+}
+
 func TestIndexDatesStartDateIsAfterStartOfTensRangeAndEndDateIsEndOfTensRange(t *testing.T) {
 	startTime := "2006-01-18T15:04:05Z"
 	endTime := "2006-01-19T15:04:05Z"
