@@ -1539,7 +1539,7 @@ const _ = grpc.SupportPackageIsVersion4
 type DataLifecycleClient interface {
 	// GetStatus returns the aggregate status across all data lifecycle jobs
 	GetStatus(ctx context.Context, in *GetStatusRequest, opts ...grpc.CallOption) (*GetStatusResponse, error)
-	// SetConfig provides a singular endpoint for confiuging all data lifecycle jobs
+	// SetConfig provides a singular endpoint for configuring all data lifecycle jobs
 	SetConfig(ctx context.Context, in *SetConfigRequest, opts ...grpc.CallOption) (*SetConfigResponse, error)
 	// Run runs all data lifecycle actions across all data lifecycle jobs
 	Run(ctx context.Context, in *RunRequest, opts ...grpc.CallOption) (*RunResponse, error)
@@ -1716,7 +1716,7 @@ func (c *dataLifecycleClient) SetComplianceConfig(ctx context.Context, in *SetCo
 type DataLifecycleServer interface {
 	// GetStatus returns the aggregate status across all data lifecycle jobs
 	GetStatus(context.Context, *GetStatusRequest) (*GetStatusResponse, error)
-	// SetConfig provides a singular endpoint for confiuging all data lifecycle jobs
+	// SetConfig provides a singular endpoint for configuring all data lifecycle jobs
 	SetConfig(context.Context, *SetConfigRequest) (*SetConfigResponse, error)
 	// Run runs all data lifecycle actions across all data lifecycle jobs
 	Run(context.Context, *RunRequest) (*RunResponse, error)

@@ -360,7 +360,7 @@ func (m *Id) GetId() string {
 }
 
 type Query struct {
-	// Unique idenfifier.
+	// Unique identifier.
 	Id string `protobuf:"bytes,18,opt,name=id,proto3" json:"id,omitempty"`
 	// File type, either JSON or CSV.
 	Type string `protobuf:"bytes,19,opt,name=type,proto3" json:"type,omitempty"`
@@ -610,7 +610,7 @@ func (m *Failed) GetCritical() int32 {
 	return 0
 }
 
-// A minimal represenation of the statuses of the controls in the report.
+// A minimal representation of the statuses of the controls in the report.
 type ControlSummary struct {
 	// The total number of controls in the report.
 	Total int32 `protobuf:"varint,1,opt,name=total,proto3" json:"total,omitempty"`
@@ -2121,7 +2121,7 @@ func (m *Suggestions) GetSuggestions() []*Suggestion {
 }
 
 type ProfileMins struct {
-	// Minimal represenations of the profiles matching the filters.
+	// Minimal representations of the profiles matching the filters.
 	Profiles []*ProfileMin `protobuf:"bytes,1,rep,name=profiles,proto3" json:"profiles,omitempty"`
 	// Intentionally blank.
 	Counts               *ProfileCounts `protobuf:"bytes,2,opt,name=counts,proto3" json:"counts,omitempty"`
@@ -2237,7 +2237,7 @@ func (m *ProfileCounts) GetPassed() int32 {
 	return 0
 }
 
-// Minimal represenation of a profile.
+// Minimal representation of a profile.
 type ProfileMin struct {
 	// The name of the profile.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -2327,7 +2327,7 @@ type Node struct {
 	LatestReport *LatestReportSummary `protobuf:"bytes,8,opt,name=latest_report,json=latestReport,proto3" json:"latest_report,omitempty"`
 	// The tags assigned to this node.
 	Tags []*Kv `protobuf:"bytes,9,rep,name=tags,proto3" json:"tags,omitempty"`
-	// A minimal represenation of the compliance profiles run against the node.
+	// A minimal representation of the compliance profiles run against the node.
 	Profiles             []*ProfileMeta `protobuf:"bytes,10,rep,name=profiles,proto3" json:"profiles,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}       `json:"-"`
 	XXX_unrecognized     []byte         `json:"-"`
@@ -2926,7 +2926,7 @@ type ReportingServiceClient interface {
 	//Supports pagination, filtering, and sorting.
 	//Limited to 10k results.
 	//
-	//Vaild sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
+	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
 	//latest_report.end_time, latest_report.status, node_name
 	//
 	//Example:
@@ -3223,7 +3223,7 @@ type ReportingServiceServer interface {
 	//Supports pagination, filtering, and sorting.
 	//Limited to 10k results.
 	//
-	//Vaild sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
+	//Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
 	//latest_report.end_time, latest_report.status, node_name
 	//
 	//Example:

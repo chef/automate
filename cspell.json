@@ -298,6 +298,7 @@
         "lorax",
         "lucene",
         "lvalues",
+        "markdownify",
         "marketo",
         "mathml",
         "maxdepth",
@@ -670,7 +671,7 @@
         },
         {
             "name": "shortToken",
-            "pattern": "(['\"])\\S{25,}\\1"
+            "pattern": "(['\"])\\S{25,}\\1|export\\s*\\w+=\\S{25,}"
         },
         {
             "name": "uuid",

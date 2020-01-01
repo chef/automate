@@ -1721,7 +1721,7 @@ type ApplicationsServiceClient interface {
 	//Show 'Disconnected Services' configuration
 	//
 	//Returns the configuration for the task that marks services as disconnected. The `threshold` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. `Threshold` is a string that follows Elasticsearch's date math expressions.
-	//This task is always enabled, cannot be disabled. Because this task runs contiunuously, the response does not return information about its status.
+	//This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
 	GetDisconnectedServicesConfig(ctx context.Context, in *GetDisconnectedServicesConfigReq, opts ...grpc.CallOption) (*PeriodicMandatoryJobConfig, error)
 	//
 	//Change 'Disconnected Services' Configuration
@@ -1963,7 +1963,7 @@ type ApplicationsServiceServer interface {
 	//Show 'Disconnected Services' configuration
 	//
 	//Returns the configuration for the task that marks services as disconnected. The `threshold` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. `Threshold` is a string that follows Elasticsearch's date math expressions.
-	//This task is always enabled, cannot be disabled. Because this task runs contiunuously, the response does not return information about its status.
+	//This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
 	GetDisconnectedServicesConfig(context.Context, *GetDisconnectedServicesConfigReq) (*PeriodicMandatoryJobConfig, error)
 	//
 	//Change 'Disconnected Services' Configuration

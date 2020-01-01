@@ -1058,7 +1058,7 @@ type NodesServiceClient interface {
 	//"filters":[
 	//{"key": "last_scan_status", "values": ["FAILED"]},
 	//{"key": "last_scan_penultimate_status", "values": ["PASSED"]},
-	//{"key": "name", "values": ["mynode*"]}
+	//{"key": "name", "values": ["MyNode*"]}
 	//],
 	//"page":1, "per_page":100,
 	//"sort":"status", "order":"ASC"
@@ -1266,7 +1266,7 @@ type NodesServiceServer interface {
 	//"filters":[
 	//{"key": "last_scan_status", "values": ["FAILED"]},
 	//{"key": "last_scan_penultimate_status", "values": ["PASSED"]},
-	//{"key": "name", "values": ["mynode*"]}
+	//{"key": "name", "values": ["MyNode*"]}
 	//],
 	//"page":1, "per_page":100,
 	//"sort":"status", "order":"ASC"
