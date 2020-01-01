@@ -12,7 +12,7 @@ The list of components that has benchmarks:
 - [Applications Service](https://github.com/chef/automate/tree/master/benchmarks/applications-service)
 
 
-## Directory Scructure
+## Directory Structure
 
 Every component should have its own directory where we will store historical benchmarks
 for every pull request that modifies the component:

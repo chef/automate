@@ -1,6 +1,6 @@
 # Habitat Protobufs
 
-Files in this directory are sync'd in from the habitat project. In the
+Files in this directory are synced in from the habitat project. In the
 synchronization process we make the modifications necessary to compile the
 protos to golang code we can use in Automate. Aside from that, the copy here
 should be verbatim.

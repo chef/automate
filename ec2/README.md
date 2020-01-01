@@ -92,7 +92,7 @@ See the services logs, from studio shell:
 sl
 ```
 
-or from your favourite Linux shell:
+or from your Unix shell:
 ```
 tail -f /hab/studios/home--*/hab/sup/default/sup.log
 ```
