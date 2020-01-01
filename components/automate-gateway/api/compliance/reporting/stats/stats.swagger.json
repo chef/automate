@@ -155,6 +155,11 @@
           "type": "number",
           "format": "float",
           "description": "Impact of the control."
+        },
+        "waived": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Count of waived nodes that executed the control."
         }
       }
     },
@@ -190,6 +195,11 @@
           "type": "integer",
           "format": "int32",
           "description": "The total number of skipped controls in the reports."
+        },
+        "waived": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The total number of waived controls in the reports."
         }
       },
       "description": "Statistics for the controls executed in the compliance reports."
@@ -297,6 +307,11 @@
           "type": "integer",
           "format": "int32",
           "description": "The total number of nodes that failed their compliance scan with one or more control of minor impact."
+        },
+        "waived": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The total number of nodes with a waived compliance scan."
         }
       },
       "description": "Statistics about the nodes scanned in the compliance reports."
@@ -364,6 +379,11 @@
           "type": "integer",
           "format": "int32",
           "description": "Total number of skipped nodes that executed the profile."
+        },
+        "waived": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total number of waived nodes that executed the profile."
         }
       }
     },
