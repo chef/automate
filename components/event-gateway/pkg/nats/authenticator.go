@@ -294,12 +294,12 @@ func (a *automateAuthenticator) tryAuthzV2(ctx context.Context, subjects []strin
 		if status.Convert(err).Code() == codes.FailedPrecondition {
 			return err, true
 		}
-		return errors.Wrapf(err, "authorizing action %q on resource %q for subjects %q", actionV2, resourceV2, subjects), false
+		return errors.Wrapf(err, "authorizing action %q on resource %q for members %q", actionV2, resourceV2, subjects), false
 	}
 	projects := resp.Projects
 
 	if len(projects) == 0 {
-		return errors.Errorf("unauthorized action %q on resource %q for subjects %q", actionV2, resourceV2, subjects), false
+		return errors.Errorf("unauthorized action %q on resource %q for members %q", actionV2, resourceV2, subjects), false
 	}
 	return nil, false
 }
