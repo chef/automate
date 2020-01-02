@@ -57,9 +57,9 @@ build: themes/chef generate_swagger
 spellcheck:
 	@pushd ../.. > /dev/null && \
 		cspell \
-			api/external/**/*.proto \
-			components/automate-chef-io/**/*.md \
-			components/automate-chef-io/data/docs/api-static/**/* \
-			components/automate-chef-io/layouts/**/*.html \
-			components/automate-gateway/**/*.proto \
+			"api/external/**/*.proto" \
+			"components/automate-chef-io/**/*.md" \
+			"components/automate-chef-io/data/docs/api-static/**/*" \
+			"components/automate-chef-io/layouts/**/*.html" \
+			"components/automate-gateway/**/*.proto" \
 	; popd > /dev/null
