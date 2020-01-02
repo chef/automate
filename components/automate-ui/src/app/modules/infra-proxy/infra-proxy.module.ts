@@ -7,11 +7,15 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { ChefComponentsModule } from 'app/components/chef-components.module';
 import { ChefServersListComponent } from './chef-servers-list/chef-servers-list.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
+import { ChefServerDetailsComponent } from './chef-server-details/chef-server-details.component';
+import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
 
 @NgModule({
   declarations: [
     ChefServersListComponent,
-    CreateChefServerModalComponent
+    CreateChefServerModalComponent,
+    ChefServerDetailsComponent,
+    CreateOrgModalComponent
   ],
   imports: [
     CommonModule,

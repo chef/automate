@@ -1,0 +1,44 @@
+<chef-modal [visible]="visible" (closeModal)="closeEvent()">
+  <h2 slot="title">Create New Org</h2>
+  <div class="flex-container">
+    <form [formGroup]="createForm">
+      <div class="name-margin"> 
+        <chef-form-field>
+          <label>
+            <span class="label">Org Name <span aria-hidden="true">*</span></span>
+            <input chefInput name="name" formControlName="name" type="text" data-cy="org-name" autocomplete="off">
+          </label>
+          <chef-error
+            *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
+            Display Name is required.
+          </chef-error>
+        </chef-form-field>
+        <chef-form-field>
+          <label>
+            <span class="label">Admin User <span aria-hidden="true">*</span></span>
+            <input chefInput name="admin_user" formControlName="admin_user" type="text" id="admin-input" data-cy="admin-user" autocomplete="off">
+          </label>
+          <chef-error
+            *ngIf="(createForm.get('admin_user').hasError('required') || createForm.get('admin_user').hasError('pattern')) && createForm.get('admin_user').dirty">
+            Admin user is required.
+          </chef-error>
+        </chef-form-field>
+        <chef-form-field>
+          <label>
+            <span class="label">Admin Key <span aria-hidden="true">*</span></span>
+            <textarea chefInput name="admin_key" id="admin_key" formControlName="admin_key" cols="54" rows="10" placeholder="-----BEGIN RSA PRIVATE KEY -----" autofocus></textarea>
+          </label>
+          <chef-error
+            *ngIf="(createForm.get('admin_key').hasError('required') || createForm.get('admin_key').hasError('pattern')) && createForm.get('admin_key').dirty">
+            Admin key is required.
+          </chef-error>
+        </chef-form-field>
+      </div>
+      <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-org-modal-btn" (click)="createServerOrg()">
+        <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
+        <span *ngIf="!creating">Create Org</span>
+        <span *ngIf="creating">Creating Org ...</span>
+      </chef-button>
+    </form>
+  </div>
+</chef-modal>
