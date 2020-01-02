@@ -163,7 +163,7 @@ func (srv *Server) ListProfiles(ctx context.Context, in *reporting.Query) (*repo
 	return &profileMins, nil
 }
 
-// ListControlItems returns a list of contolListItems based on query
+// ListControlItems returns a list of controlListItems based on query
 func (srv *Server) ListControlItems(ctx context.Context, in *reporting.ControlItemRequest) (*reporting.ControlItems, error) {
 	var controlListItems *reporting.ControlItems
 	if in.Size == 0 {

@@ -75,7 +75,7 @@ func (p EsPolicy) Purge(ctx context.Context, esSidecarClient es.EsSidecarClient)
 	}
 
 	if err != nil {
-		logctx.WithError(err).Error("Failed to purge elaticsearch data")
+		logctx.WithError(err).Error("Failed to purge elasticsearch data")
 		return err
 	}
 

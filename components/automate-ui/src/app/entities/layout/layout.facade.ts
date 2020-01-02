@@ -82,7 +82,7 @@ export class LayoutFacadeService {
     ));
   }
 
-  showInfastructureSidebar(): void {
+  showInfrastructureSidebar(): void {
     this.store.dispatch(new UpdateSidebarMenuGroups(
       this.layoutSidebarService.getInfrastructureSidebar()
     ));

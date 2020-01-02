@@ -37,7 +37,7 @@ func ConfigureJobManager(man *cereal.Manager, config *config.EventFeed) error {
 
 	// Migrate default policy values from the config. The default policies are
 	// only persisted the first time the workflow is created, after which only
-	// new default policies are added and/or existing policies indicies are
+	// new default policies are added and/or existing policies indices are
 	// updated in case they have been migrated.
 
 	p := DefaultPurgePolicies.Es[PurgeFeedPolicyName]

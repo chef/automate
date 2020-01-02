@@ -23,7 +23,7 @@ defmodule Notifications.Data.TimedCache.Test do
       assert 1 == StatefulLoader.hits()
     end
 
-    test "it returns the cached data when cache is alreasy started for a key, without reinvoking loader fun" do
+    test "it returns the cached data when cache is already started for a key, without reinvoking loader fun" do
       :one = TimedCache.start_cache(:start_test, &StatefulLoader.identity/1,
                                     [:one], 100000)
       :one = TimedCache.start_cache(:start_test, &StatefulLoader.identity/1,
@@ -46,7 +46,7 @@ defmodule Notifications.Data.TimedCache.Test do
     end
 
     test "when multiple processes initialize cache concurrently, loader is only run once and both receive correct data" do
-      # Make sure we dont' get stuck waiting if the spawned proc
+      # Make sure we don't get stuck waiting if the spawned proc
       # doesn't get its message out
       report_to = self()
       concurrent_load = fn() ->

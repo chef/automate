@@ -252,7 +252,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.layoutFacade.showInfastructureSidebar();
+    this.layoutFacade.showInfrastructureSidebar();
     // Only load when first opening the /chef-runs page
     this.store.dispatch(new GetWorkflowEnabled());
 

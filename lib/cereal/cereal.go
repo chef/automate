@@ -148,7 +148,7 @@ type Task interface {
 	GetParameters(obj interface{}) error
 
 	// GetMetadata returns metadata about the task, that the task
-	// might use to make decisons about whether to continue
+	// might use to make decisions about whether to continue
 	// running this task.
 	GetMetadata() TaskMetadata
 }
@@ -677,7 +677,7 @@ func WithTaskDequeueWorkers(count int) ManagerOpt {
 	return func(m *Manager) { m.taskDequeueWorkers = count }
 }
 
-// WithOnWorkflowCompleteCallback sets a OnWOrkflowComplete callback
+// WithOnWorkflowCompleteCallback sets an OnWorkflowComplete callback
 // that will be called whenever a workflow is finished (i.e. the
 // workflow returns a failure or completion decision).  This is
 // intended for testing and debugging purposes ONLY.
@@ -754,7 +754,7 @@ type TaskExecutorOpts struct {
 // - in-process notifications that are sent when we think there
 // might be a task available.
 //
-// When either of these tiggers occur, we spawn a new goroutine (the
+// When either of these triggers occur, we spawn a new goroutine (the
 // "task worker") provided that we are under the maximum configured
 // workers for this task executor.
 //
