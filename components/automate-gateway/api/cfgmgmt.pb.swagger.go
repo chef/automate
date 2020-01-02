@@ -1,0 +1,999 @@
+package api
+
+func init() {
+	Swagger.Add("cfgmgmt", `{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/external/cfgmgmt/cfgmgmt.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/cfgmgmt/nodes": {
+      "get": {
+        "summary": "GetNodes",
+        "description": "Returns a list of infra nodes that have checked in to Automate. \nAdding a filter makes a list of all nodes that meet the filter criteria. \nFilters for the same field are ORd together, while filters across different fields are ANDed together.\nSupports pagination, filtering (with wildcard support), and sorting.\nLimited to 10k results.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/nodes?pagination.page=1\u0026pagination.size=100\u0026sorting.field=name\u0026sorting.order=ASC\u0026filter=name:mySO*\u0026filter=platform:ubun*\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetNodes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "description": "Filters to apply to the request for nodes list.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "pagination.page",
+            "description": "Page number of the results to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.size",
+            "description": "Amount of results to include per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "sorting.field",
+            "description": "Field to sort the list results on.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "sorting.order",
+            "description": "Order the results should be returned in.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "enum": [
+              "ASC",
+              "DESC"
+            ],
+            "default": "ASC"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/cfgmgmt/nodes/{node_id}/attribute": {
+      "get": {
+        "summary": "GetAttributes",
+        "description": "Returns the latest reported attributes for the provided node ID.",
+        "operationId": "GetAttributes",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodeAttribute"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "node_id",
+            "description": "Chef guid for the requested node.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/cfgmgmt/nodes/{node_id}/runs": {
+      "get": {
+        "summary": "GetRuns",
+        "description": "Returns a list of run metadata (id, start and end time, and status) for the provided node ID. \nSupports pagination.\nAccepts a ` + "`" + `start` + "`" + ` parameter to denote start date for the list and a filter of type ` + "`" + `status` + "`" + `.",
+        "operationId": "GetRuns",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "node_id",
+            "description": "Chef guid for the node.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "filter",
+            "description": "Filters to apply to the request for runs list.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "pagination.page",
+            "description": "Page number of the results to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pagination.size",
+            "description": "Amount of results to include per page.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "start",
+            "description": "Earliest (in history) run information to return for the runs list.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end",
+            "description": "Latest (in history) run information to return for the runs list.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/cfgmgmt/nodes/{node_id}/runs/{run_id}": {
+      "get": {
+        "summary": "GetNodeRun",
+        "description": "Returns the infra run report for the provided node ID and run ID.",
+        "operationId": "GetNodeRun",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Run"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "node_id",
+            "description": "Chef guid for the requested node.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "run_id",
+            "description": "Run id for the node.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "end_time",
+            "description": "End time on the node's run.",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/cfgmgmt/organizations": {
+      "get": {
+        "summary": "GetOrganizations",
+        "description": "Returns a list of all organizations associated with nodes that have checked in to Automate.",
+        "operationId": "GetOrganizations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/cfgmgmt/policy_revision/{revision_id}": {
+      "get": {
+        "summary": "GetPolicyCookbooks",
+        "description": "Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID. \nPolicy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.",
+        "operationId": "GetPolicyCookbooks",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.PolicyCookbooks"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "revision_id",
+            "description": "Revision id for the policy.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/cfgmgmt/source_fqdns": {
+      "get": {
+        "summary": "GetSourceFqdns",
+        "description": "Returns a list of all chef servers associated with nodes that have checked in to Automate.",
+        "operationId": "GetSourceFqdns",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/cfgmgmt/stats/node_counts": {
+      "get": {
+        "summary": "GetNodesCounts",
+        "description": "Returns totals for failed, success, missing, and overall total infra nodes that have reported into Automate.\nSupports filtering.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/node_counts?filter=name:mySO*\u0026filter=platform:ubun*\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetNodesCounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.NodesCounts"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "description": "List of filters to be applied to the node count results.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/cfgmgmt/stats/run_counts": {
+      "get": {
+        "summary": "GetRunsCounts",
+        "description": "Returns totals for failed and successful runs given a ` + "`" + `node_id` + "`" + `.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd\u0026start=2019-11-02\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetRunsCounts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunsCounts"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "description": "List of filters to be applied to the run count results.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "start",
+            "description": "Earliest (in history) run information to return for the run counts.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end",
+            "description": "Latest (in history) run information to return for the run counts.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "node_id",
+            "description": "Node id associated with the run.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/cfgmgmt/suggestions": {
+      "get": {
+        "summary": "GetSuggestions",
+        "description": "Returns possible filter values given a valid ` + "`" + `type` + "`" + ` parameter. All values returned until two or more\ncharacters are provided for the ` + "`" + `text` + "`" + ` parameter.\nSupports wildcard (* and ?).\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\ncfgmgmt/suggestions?type=environment\u0026text=_d\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetSuggestions",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "object"
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "type",
+            "description": "Field for which suggestions are being returned.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "text",
+            "description": "Text to search on for the type value.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "filter",
+            "description": "Filters to be applied to the results.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
+    "/cfgmgmt/version": {
+      "get": {
+        "operationId": "GetVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
+            }
+          }
+        },
+        "tags": [
+          "hidden"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "chef.automate.api.cfgmgmt.response.ChefError": {
+      "type": "object",
+      "properties": {
+        "class": {
+          "type": "string",
+          "description": "Class for the error."
+        },
+        "message": {
+          "type": "string",
+          "description": "Error message for the failed run."
+        },
+        "backtrace": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Stacktrace for the failure."
+        },
+        "description": {
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Description",
+          "description": "Description for the error."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.CookbookLock": {
+      "type": "object",
+      "properties": {
+        "cookbook": {
+          "type": "string",
+          "description": "Cookbook name."
+        },
+        "policy_identifier": {
+          "type": "string",
+          "description": "Policy identifier for the cookbook lock."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.Deprecation": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "Message for the deprecation."
+        },
+        "url": {
+          "type": "string",
+          "description": "Url reference for the deprecation."
+        },
+        "location": {
+          "type": "string",
+          "description": "Location of the deprecated code."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.Description": {
+      "type": "object",
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Title for the error description."
+        },
+        "sections": {
+          "type": "array",
+          "items": {
+            "type": "object"
+          },
+          "description": "More information about the error."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.ExpandedRunList": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id of the run list collection."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunList"
+          },
+          "description": "Intentionally blank."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.NodeAttribute": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string",
+          "description": "The chef_guid associated with the node."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of the node."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Run list for the node."
+        },
+        "chef_environment": {
+          "type": "string",
+          "description": "The environment for the node."
+        },
+        "normal": {
+          "type": "string",
+          "description": "Stringified json of the normal attributes for the node."
+        },
+        "default": {
+          "type": "string",
+          "description": "Stringified json of the default attributes for the node."
+        },
+        "override": {
+          "type": "string",
+          "description": "Stringified json of the override attributes for the node."
+        },
+        "automatic": {
+          "type": "string",
+          "description": "Stringified json of the automatic attributes for the node."
+        },
+        "normal_value_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Count of normal attributes on the node."
+        },
+        "default_value_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Count of default attributes on the node."
+        },
+        "override_value_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Count of override attributes on the node."
+        },
+        "all_value_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total count of attributes on the node."
+        },
+        "automatic_value_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Count of automatic attributes on the node."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.NodesCounts": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total count of nodes that have reported in to Automate."
+        },
+        "success": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total count of nodes that have reported in to Automate whose last run was successful."
+        },
+        "failure": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total count of nodes that have reported in to Automate whose last run was failed."
+        },
+        "missing": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total count of nodes that have been labeled as 'missing' as determined by node lifecycle settings."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.PolicyCookbooks": {
+      "type": "object",
+      "properties": {
+        "policy_name": {
+          "type": "string",
+          "description": "Name of the policy."
+        },
+        "cookbook_locks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CookbookLock"
+          },
+          "description": "Intentionally blank."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.Resource": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Resource type."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name for the resource."
+        },
+        "id": {
+          "type": "string",
+          "description": "Id of the resource."
+        },
+        "duration": {
+          "type": "string",
+          "description": "Duration of the resource processing."
+        },
+        "delta": {
+          "type": "string",
+          "description": "Change diff for the resource (if it was changed during the run)."
+        },
+        "cookbook_name": {
+          "type": "string",
+          "description": "Cookbook name associated with the resource."
+        },
+        "cookbook_version": {
+          "type": "string",
+          "description": "Version of the cookbook associated with the resource."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the resource (e.g. 'up-to-date')."
+        },
+        "recipe_name": {
+          "type": "string",
+          "description": "Name of the recipe associated with the resource."
+        },
+        "result": {
+          "type": "string",
+          "description": "String result of the resource."
+        },
+        "conditional": {
+          "type": "string",
+          "description": "Conditional rule associated with the resource."
+        },
+        "ignore_failure": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean that denotes whether or not the resource failure should be ignored."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.Run": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Id of the infra node run."
+        },
+        "node_id": {
+          "type": "string",
+          "description": "The chef_guid associated with the node."
+        },
+        "node_name": {
+          "type": "string",
+          "description": "Name of the node."
+        },
+        "organization": {
+          "type": "string",
+          "description": "The organization the node is associated with."
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Start time of the infra run."
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "description": "End time of the infra run."
+        },
+        "source": {
+          "type": "string",
+          "description": "Source of the node run (e.g. chef-solo)."
+        },
+        "status": {
+          "type": "string",
+          "description": "Status of the infra node run."
+        },
+        "total_resource_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Resource count reported on the infra node run."
+        },
+        "updated_resource_count": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Count of resources updated in the infra node run."
+        },
+        "chef_version": {
+          "type": "string",
+          "description": "Chef-client version on the node."
+        },
+        "uptime_seconds": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Count in seconds that the node has been active."
+        },
+        "environment": {
+          "type": "string",
+          "description": "The environment for the node."
+        },
+        "fqdn": {
+          "type": "string",
+          "description": "FQDN of the node."
+        },
+        "source_fqdn": {
+          "type": "string",
+          "description": "Chef server associated with the node."
+        },
+        "ipaddress": {
+          "type": "string",
+          "description": "IP Address for the node."
+        },
+        "resources": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Resource"
+          },
+          "description": "Intentionally blank."
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Run list for the node."
+        },
+        "deprecations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Deprecation"
+          },
+          "description": "Intentionally blank."
+        },
+        "error": {
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ChefError",
+          "description": "Chef Error information, available on failed runs."
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Unused field."
+        },
+        "resource_names": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of resource names for the node."
+        },
+        "recipes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of recipes the node calls."
+        },
+        "chef_tags": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of tags associated with the node."
+        },
+        "cookbooks": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of cookbooks associated with the node."
+        },
+        "platform": {
+          "type": "string",
+          "description": "Full platform string for the node (family + version)."
+        },
+        "platform_family": {
+          "type": "string",
+          "description": "Platform family for the node."
+        },
+        "platform_version": {
+          "type": "string",
+          "description": "Platform version for the node."
+        },
+        "roles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of roles associated with the node."
+        },
+        "policy_name": {
+          "type": "string",
+          "description": "Policy name associated with the node."
+        },
+        "policy_group": {
+          "type": "string",
+          "description": "Policy group associated with the node."
+        },
+        "policy_revision": {
+          "type": "string",
+          "description": "Policy revision associated with the node."
+        },
+        "expanded_run_list": {
+          "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ExpandedRunList",
+          "description": "Expanded run list for the node."
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of projects the node belongs to. This is a concept introduced with IAMv2."
+        },
+        "versioned_cookbooks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.VersionedCookbook"
+          },
+          "title": "List of versioned cookbooks associated with the node"
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.RunList": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "Type of run list item (e.g. 'recipe')."
+        },
+        "name": {
+          "type": "string",
+          "description": "Name of run list item."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of run list item."
+        },
+        "skipped": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Boolean denoting whether or not the run list item was skipped."
+        },
+        "children": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.RunList"
+          },
+          "description": "Intentionally blank."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.RunsCounts": {
+      "type": "object",
+      "properties": {
+        "total": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total count of run reports that have landed in Automate for the node."
+        },
+        "success": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total count of successful run reports that have landed in Automate for the node."
+        },
+        "failure": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Total count of failed run reports that have landed in Automate for the node."
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.VersionedCookbook": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the cookbook."
+        },
+        "version": {
+          "type": "string",
+          "description": "Version of the cookbook."
+        }
+      }
+    },
+    "chef.automate.api.common.query.Pagination": {
+      "type": "object",
+      "properties": {
+        "page": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Page number of the results to return."
+        },
+        "size": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Amount of results to include per page."
+        }
+      }
+    },
+    "chef.automate.api.common.query.SortOrder": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "chef.automate.api.common.query.Sorting": {
+      "type": "object",
+      "properties": {
+        "field": {
+          "type": "string",
+          "description": "Field to sort the list results on."
+        },
+        "order": {
+          "$ref": "#/definitions/chef.automate.api.common.query.SortOrder",
+          "description": "Order the results should be returned in."
+        }
+      }
+    },
+    "chef.automate.api.common.version.VersionInfo": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "sha": {
+          "type": "string"
+        },
+        "built": {
+          "type": "string"
+        }
+      }
+    },
+    "google.protobuf.NullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "` + "`" + `NullValue` + "`" + ` is a singleton enumeration to represent the null value for the\n` + "`" + `Value` + "`" + ` type union.\n\n The JSON representation for ` + "`" + `NullValue` + "`" + ` is JSON ` + "`" + `null` + "`" + `.\n\n - NULL_VALUE: Null value."
+    }
+  }
+}
+`)
+}
