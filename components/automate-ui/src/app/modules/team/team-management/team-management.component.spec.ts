@@ -17,6 +17,7 @@ import {
 } from 'app/entities/teams/team.actions';
 import { TeamManagementComponent } from './team-management.component';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 
 describe('TeamManagementComponent', () => {
   let component: TeamManagementComponent;
@@ -203,12 +204,15 @@ describe('TeamManagementComponent', () => {
 
   describe('delete team', () => {
     let store: Store<NgrxStateAtom>;
+    let mockEvent: ChefKeyboardEvent;
+
     const deleteTeam: Team = {
       guid: 'uuid-1',
       id: 'new-team',
       name: 'new team',
       projects: []
     };
+
 
     beforeEach(() => {
       store = TestBed.get(Store);
@@ -219,7 +223,8 @@ describe('TeamManagementComponent', () => {
     });
 
     it('opens the delete modal', () => {
-      component.startTeamDelete(deleteTeam);
+      mockEvent.isUserInput = true;
+      component.startTeamDelete(mockEvent, deleteTeam);
       fixture.detectChanges();
 
       expect(component.deleteModalVisible).toBe(true);
