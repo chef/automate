@@ -19,6 +19,7 @@ import { ProjectsFilterEffects } from './services/projects-filter/projects-filte
 import { RoleEffects } from './entities/roles/role.effects';
 import { RuleEffects } from './entities/rules/rule.effects';
 import { ServerEffects } from './entities/servers/server.effects';
+import { OrgEffects } from './entities/orgs/org.effects';
 import { ServiceGroupsEffects } from './entities/service-groups/service-groups.effects';
 import { ScannerEffects } from './pages/+compliance/+scanner/state/scanner.effects';
 import { SidebarEffects } from './services/sidebar/sidebar.effects';
@@ -45,6 +46,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       RoleEffects,
       RuleEffects,
       ServerEffects,
+      OrgEffects,
       ServiceGroupsEffects,
       ScannerEffects,
       SidebarEffects,

@@ -1,0 +1,133 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
+        {{ server?.name }}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <chef-heading>{{ server?.name }}</chef-heading>
+        <table>
+          <thead>
+            <tr class="detail-row">
+              <th class="id-column">FQDN</th>
+              <th class="id-column">IP Address</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="detail-row">
+              <td class="id-column">{{ server?.fqdn }}</td>
+              <td class="id-column">{{ server?.ip_address }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+          <chef-option value='orgs' data-cy="orgs-tab">Orgs</chef-option>
+          <chef-option value='details' data-cy="details-tab">Details</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      <section class="page-body" *ngIf="tabValue === 'details'">
+        <form [formGroup]="updateServerForm">
+          <chef-form-field id="update-name">
+            <label>
+              <span class="label">Chef Server Name <span aria-hidden="true">*</span></span>
+              <input chefInput formControlName="name" type="text" autocomplete="off"
+                data-cy="update-chefServer-name">
+            </label>
+            <chef-error
+              *ngIf="(updateServerForm.get('name').hasError('required') || updateServerForm.get('name').hasError('pattern')) && updateServerForm.get('name').dirty">
+              Display Name is required.
+            </chef-error>
+          </chef-form-field>
+          <chef-form-field id="update-description">
+            <label>
+              <span class="label">Chef Server Description <span aria-hidden="true">*</span></span>
+              <input chefInput formControlName="description" type="text" autocomplete="off"
+                data-cy="update-chefServer-description">
+            </label>
+            <chef-error
+              *ngIf="(updateServerForm.get('description').hasError('required') || updateServerForm.get('description').hasError('pattern')) && updateServerForm.get('description').dirty">
+              Description is required.
+            </chef-error>
+          </chef-form-field>
+          <chef-form-field id="update-fqdn">
+            <label>
+              <span class="label">FQDN <span aria-hidden="true">*</span></span>
+              <input chefInput formControlName="fqdn" type="text" autocomplete="off"
+                data-cy="update-chefServer-fqdn">
+            </label>
+            <chef-error
+              *ngIf="(updateServerForm.get('fqdn').hasError('required') || updateServerForm.get('fqdn').hasError('pattern')) && updateServerForm.get('fqdn').dirty">
+              FQDN is required.
+            </chef-error>
+          </chef-form-field>
+          <chef-form-field id="update-ip_address">    
+            <label>
+              <span class="label">IP Address <span aria-hidden="true">*</span></span>
+              <input chefInput formControlName="ip_address" type="text" autocomplete="off"
+                data-cy="update-chefServer-ip_address">
+            </label>
+            <chef-error
+              *ngIf="(updateServerForm.get('ip_address').hasError('required') || updateServerForm.get('ip_address').hasError('pattern')) && updateServerForm.get('ip_address').dirty">
+              FQDN is required.
+            </chef-error>
+          </chef-form-field>  
+          <div id="button-bar">
+            <chef-button [disabled]="isLoading || !updateServerForm.valid || !updateServerForm.dirty"
+              primary inline (click)="saveServer()">                
+            <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
+            <span *ngIf="saving">Saving...</span>
+            <span *ngIf="!saving">Save</span></chef-button>
+            <span id="saved-note" *ngIf="saveSuccessful && !updateServerForm.dirty">All changes saved.</span>
+          </div>
+        </form>
+      </section>
+      <section class="page-body" *ngIf="tabValue === 'orgs'">
+        <ng-container>
+          <chef-toolbar>
+            <chef-button id="create-button" primary (click)="openCreateModal('create')">Create Org</chef-button>
+          </chef-toolbar>
+          <chef-table-new>
+            <chef-table-header>
+              <chef-table-row>
+                <chef-table-header-cell>Org Name</chef-table-header-cell>
+                <chef-table-header-cell>Admin</chef-table-header-cell>
+                <chef-table-header-cell class="controls"></chef-table-header-cell>
+              </chef-table-row>
+            </chef-table-header>
+            <chef-table-body>
+              <chef-table-row *ngFor="let org of orgs">
+                <chef-table-cell>
+                  <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'orgs', org.id, 'cookbooks']">{{ org.name }}</a>
+                </chef-table-cell>
+                <chef-table-cell>{{ org.admin_user }}</chef-table-cell>
+                <chef-table-cell class="controls">
+                  <chef-control-menu>
+                    <chef-option data-cy="delete" (click)="startOrgDelete(org)">Delete Org</chef-option>
+                  </chef-control-menu>
+                </chef-table-cell>
+              </chef-table-row>
+            </chef-table-body>
+          </chef-table-new>
+        </ng-container>
+      </section>
+
+      <app-org-create-edit-modal
+        [visible]="createModalVisible"
+        [creating]="creatingServerOrg"
+        [createForm]="orgForm"
+        (close)="closeCreateModal()"
+        [conflictErrorEvent]="conflictErrorEvent"
+        (createClicked)="createServerOrg()">
+      </app-org-create-edit-modal>
+      <app-delete-object-modal
+        [visible]="deleteModalVisible"
+        objectNoun="org"
+        [objectName]="orgToDelete?.name"
+        (close)="closeDeleteModal()"
+        (deleteClicked)="deleteOrg()"
+        objectAction="Delete">
+      </app-delete-object-modal>
+    </main>
+  </div>
+</div>
