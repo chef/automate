@@ -204,6 +204,10 @@ describe('TeamManagementComponent', () => {
 
   describe('delete team', () => {
     let store: Store<NgrxStateAtom>;
+    // problem here is that ChefKeyboardEvent is a Type
+    // and Keyboard event does not contain isUserInput so can't
+    // instantiate as new ChefKeyboardEvent() (because not an object)
+    // and can't do new KeyboardEvent() because it's missing isUserInput...
     let mockEvent: ChefKeyboardEvent;
 
     const deleteTeam: Team = {
