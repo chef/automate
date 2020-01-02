@@ -44,7 +44,7 @@ You can copy this default certificate, and then add it to your Builder instance'
 
 ```text
 -----BEGIN CERTIFICATE-----
-MIIDfDCCAmSgAcasldkaf...
+MIIDfDCCAmSgAcaSldKaf...
 -----END CERTIFICATE-----
 ```
 

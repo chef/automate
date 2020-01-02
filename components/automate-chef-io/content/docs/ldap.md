@@ -81,7 +81,7 @@ ca_contents
   ca_contents = """-----BEGIN CERTIFICATE-----
   MIICsDCCAhmgAwIBAgIJAJxMopMJbhPkMA0GCSqGSIb
   ...
-  X0uRzUPlpttd5tYFs43nkqxJT6s=
+  X0uRzUPlpTtd5tYFs43nKqxJT6s=
   -----END CERTIFICATE-----"""
   ```
 
