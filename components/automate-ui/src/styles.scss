@@ -243,6 +243,10 @@ input {
   margin-right: 35px;
 }
 
+.three-dot-column {
+  position: relative; // check on this
+}
+
 [panelclass="chef-control-menu-x"] {
   text-align: right;
 
@@ -251,6 +255,10 @@ input {
   }
 
   .mat-select-trigger {
+    position: absolute;
+    right: 10px;
+    top: 19%; // holdover --> figure out exact spacing that is real
+
     display: inline-block;
     border-radius: var(--chef-border-radius);
     background-color: var(--chef-white);
