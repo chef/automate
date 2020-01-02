@@ -107,6 +107,7 @@ checkFiles() {
 
     if [[ "$CHECK_GLOBAL_DOCS" = "true" ]]; then
         >&2 echo -n "global docs [md]... "
+        #shellcheck disable=SC2046
         run_cspell $(find . -name '*.md' | grep -v node_modules | grep -v "^\(\./cache\|\./components\|\./vendor\)") || RETVAL=1
     fi
     [[ $RETVAL -eq 0 ]] || exit $RETVAL
