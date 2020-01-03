@@ -62,8 +62,8 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     private router: Router,
     private layoutFacade: LayoutFacadeService
 
-  ) { 
-    
+  ) {
+
     this.orgForm = fb.group({
       name: ['', [Validators.required]],
       admin_user: ['', [Validators.required]],
