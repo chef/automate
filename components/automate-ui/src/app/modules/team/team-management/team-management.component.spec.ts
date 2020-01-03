@@ -204,11 +204,8 @@ describe('TeamManagementComponent', () => {
 
   describe('delete team', () => {
     let store: Store<NgrxStateAtom>;
-    // problem here is that ChefKeyboardEvent is a Type
-    // and Keyboard event does not contain isUserInput so can't
-    // instantiate as new ChefKeyboardEvent() (because not an object)
-    // and can't do new KeyboardEvent() because it's missing isUserInput...
-    let mockEvent: ChefKeyboardEvent;
+    const mockChefKeyEvent = new KeyboardEvent('keypress') as ChefKeyboardEvent;
+    mockChefKeyEvent.isUserInput = true;
 
     const deleteTeam: Team = {
       guid: 'uuid-1',
@@ -227,8 +224,7 @@ describe('TeamManagementComponent', () => {
     });
 
     it('opens the delete modal', () => {
-      mockEvent.isUserInput = true;
-      component.startTeamDelete(mockEvent, deleteTeam);
+      component.startTeamDelete(mockChefKeyEvent, deleteTeam);
       fixture.detectChanges();
 
       expect(component.deleteModalVisible).toBe(true);
