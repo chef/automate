@@ -94,7 +94,7 @@ service NodeManagerService {
 	Delete a nodemanager
 
 	Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes
-	associated with the manager will be abandoned.	
+	associated with the manager will be re-assigned to the Automate node manager.	
 	*/	
 	rpc Delete(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
@@ -132,7 +132,7 @@ service NodeManagerService {
 	/*
 	Delete a nodemanager and set nodes to have a state of stopped
 
-	Delete a nodemanager and update all associated nodes to have a state of stopped. 
+	Delete a nodemanager and update all associated nodes to have a state of `stopped`. 
 	*/
 	rpc DeleteWithNodeStateStopped(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
@@ -172,7 +172,9 @@ service NodeManagerService {
 
 	Returns a list of nodemanagers matching the query.
 	Supports filtering, sorting, and pagination.
-	Valid filtering fields: 'manager_type'
+
+	Valid filtering fields: manager_type
+
 	Valid sorting fields: name, type, status, status_message, date_added
 
 	Example:
@@ -203,7 +205,7 @@ service NodeManagerService {
 	/*
 	Search node fields
 
-	Searches the available values for a given field and nodemanager id.
+	Searches the available values for a given field across all nodes associated with the nodemanager id.
 	Possible fields: regions, tags, name, subscription_id
 
 	Example:
@@ -263,7 +265,7 @@ service NodeManagerService {
 	/*
 	Connect
 
-	Attempts to reach the API for the given nodemanager id to check validity of the 
+	Attempts to reach the API for the given nodemanager id to validate the 
 	credentials associated with the nodemanager.
 	*/
 	rpc Connect(Id) returns (ConnectResponse) {
