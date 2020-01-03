@@ -43,7 +43,7 @@ message Node {
   string policy_group                         = 17;
   // The policy revision associated with the node.
   string policy_revision                      = 18;
-  // Boolean used to denote whether or not the node has been identfied to be running cookbooks with deprecations.
+  // Boolean used to denote whether or not the node has been identified to be running cookbooks with deprecations.
   bool   has_deprecations                     = 19;
   // Chef Infra version on the node.
   string chef_version                         = 20;

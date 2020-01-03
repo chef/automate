@@ -10,7 +10,6 @@ themes/chef:
 	scripts/clone_hugo.sh
 
 clean:
-	rm -rf site/themes/chef
 	rm -f $(SWAGGER_RESULT_FILE)
 	rm -rf themes/
 	rm -rf public/
@@ -53,3 +52,14 @@ lint: themes/chef
 
 build: themes/chef generate_swagger
 	hugo
+
+# Consult scripts/spellcheck.sh in the root Automate directory for notes on using cspell.
+spellcheck:
+	@pushd ../.. > /dev/null && \
+		cspell \
+			"api/external/**/*.proto" \
+			"components/automate-chef-io/**/*.md" \
+			"components/automate-chef-io/data/docs/api-static/**/*" \
+			"components/automate-chef-io/layouts/**/*.html" \
+			"components/automate-gateway/**/*.proto" \
+	; popd > /dev/null

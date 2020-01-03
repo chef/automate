@@ -17,6 +17,7 @@
         "AND'd",
         "anonymized",
         "ansible",
+        "apop",
         "APIKEY",
         "argname",
         "arrowdown",
@@ -65,6 +66,7 @@
         "checkmark",
         "chefautomate",
         "chefdk",
+        "chefes",
         "chefserver",
         "chgrp",
         "chicklets",
@@ -298,6 +300,7 @@
         "lorax",
         "lucene",
         "lvalues",
+        "markdownify",
         "marketo",
         "mathml",
         "maxdepth",
@@ -531,6 +534,7 @@
         "terraform",
         "testmock",
         "TESTTOKEN",
+        "tfvars",
         "titlecase",
         "Titlef",
         "tmpdir",
@@ -670,7 +674,7 @@
         },
         {
             "name": "shortToken",
-            "pattern": "(['\"])\\S{25,}\\1"
+            "pattern": "(['\"])\\S{25,}\\1|export\\s*\\w+=\\S{25,}"
         },
         {
             "name": "uuid",

@@ -87,7 +87,7 @@ func init() {
     },
     "/data-lifecycle/config": {
       "put": {
-        "summary": "SetConfig provides a singular endpoint for confiuging all data lifecycle jobs",
+        "summary": "SetConfig provides a singular endpoint for configuring all data lifecycle jobs",
         "operationId": "SetConfig",
         "responses": {
           "200": {

@@ -156,7 +156,7 @@ func init() {
     "/compliance/reporting/reports": {
       "post": {
         "summary": "List reports",
-        "description": "Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. \nSupports pagination, filtering, and sorting.\nLimited to 10k results.\n\nVaild sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, \nlatest_report.end_time, latest_report.status, node_name\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\"filters\":\n[\n{\"type\":\"start_time\",\"values\":[\"2019-09-09T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-09-11T23:59:59Z\"]}\n], \n\"page\":1, \"per_page\": 3, \n\"sort\": \"latest_report.status\", \"order\": \"ASC\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. \nSupports pagination, filtering, and sorting.\nLimited to 10k results.\n\nValid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,\nlatest_report.end_time, latest_report.status, node_name\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\"filters\":\n[\n{\"type\":\"start_time\",\"values\":[\"2019-09-09T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-09-11T23:59:59Z\"]}\n], \n\"page\":1, \"per_page\": 3, \n\"sort\": \"latest_report.status\", \"order\": \"ASC\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListReports",
         "responses": {
           "200": {
@@ -197,7 +197,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique idenfifier.",
+            "description": "Unique identifier.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -428,7 +428,7 @@ func init() {
           "description": "Intentionally blank."
         }
       },
-      "description": "A minimal represenation of the statuses of the controls in the report."
+      "description": "A minimal representation of the statuses of the controls in the report."
     },
     "chef.automate.api.compliance.reporting.v1.Dependency": {
       "type": "object",
@@ -630,7 +630,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMeta"
           },
-          "description": "A minimal represenation of the compliance profiles run against the node."
+          "description": "A minimal representation of the compliance profiles run against the node."
         }
       }
     },
@@ -868,7 +868,7 @@ func init() {
           "description": "The aggregated status of the profile across the nodes it has been run on."
         }
       },
-      "description": "Minimal represenation of a profile."
+      "description": "Minimal representation of a profile."
     },
     "chef.automate.api.compliance.reporting.v1.ProfileMins": {
       "type": "object",
@@ -878,7 +878,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileMin"
           },
-          "description": "Minimal represenations of the profiles matching the filters."
+          "description": "Minimal representations of the profiles matching the filters."
         },
         "counts": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ProfileCounts",
@@ -891,7 +891,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique idenfifier."
+          "description": "Unique identifier."
         },
         "type": {
           "type": "string",

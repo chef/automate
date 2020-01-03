@@ -36,7 +36,7 @@ The build and test pipline is composed of a few key parts:
   importantly, the pre-merge verification tests and post merge deploy
   tests are Buildkite pipelines.
 
-- Buildkite Agents: While Builkite is a hosted service, Buildkite jobs
+- Buildkite Agents: While Buildkite is a hosted service, Buildkite jobs
   run on agents that are hosted in our infrastructure.
 
 - EC2 Hosts: The Buildkite Agents run on EC2 instances that are
@@ -66,7 +66,7 @@ past before merging a pull request.
 Each pipeline is defined in a configuration file:
 
 - `verify`: `.expeditor/verify.pipeline.yml`
-- `verfiy-private`: `.expeditor/verify_pipeline.yml`
+- `verify-private`: `.expeditor/verify_pipeline.yml`
 
 The core of these configuration files are the "steps" (we sometimes
 call these "jobs"). Each step runs on a different buildkite-agent and
@@ -204,7 +204,7 @@ These tests use our integration test framework. They look like this:
 
 These tests run against a running A2 instance. To understand these
 tests, read the test definition that is being run (in the above case
-`integration/tests/deep_ugprade`). For more information about the
+`integration/tests/deep_upgrade`). For more information about the
 integration test framework see: `integration/README.md`
 
 ### OK, but, where are the tests?
@@ -291,7 +291,7 @@ access to the underlying buildkite-agents. However, you can:
 
 - Log into the AWS chef-cd account using via Okta. You can then get
   high level information from AWS about the underlying AWS
-  machines. The underying AWS instance ID can be found in the
+  machines. The underlying AWS instance ID can be found in the
   "Environment" tab of a given step. From here you can get high level
   information like monitoring data on the machine in question.
 

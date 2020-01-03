@@ -59,7 +59,7 @@ type Node struct {
 	PolicyGroup string `protobuf:"bytes,17,opt,name=policy_group,json=policyGroup,proto3" json:"policy_group,omitempty"`
 	// The policy revision associated with the node.
 	PolicyRevision string `protobuf:"bytes,18,opt,name=policy_revision,json=policyRevision,proto3" json:"policy_revision,omitempty"`
-	// Boolean used to denote whether or not the node has been identfied to be running cookbooks with deprecations.
+	// Boolean used to denote whether or not the node has been identified to be running cookbooks with deprecations.
 	HasDeprecations bool `protobuf:"varint,19,opt,name=has_deprecations,json=hasDeprecations,proto3" json:"has_deprecations,omitempty"`
 	// Chef Infra version on the node.
 	ChefVersion string `protobuf:"bytes,20,opt,name=chef_version,json=chefVersion,proto3" json:"chef_version,omitempty"`

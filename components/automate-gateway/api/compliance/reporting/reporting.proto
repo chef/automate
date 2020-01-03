@@ -23,7 +23,7 @@ service ReportingService {
 	Supports pagination, filtering, and sorting.
 	Limited to 10k results.
 
-	Vaild sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total, 
+	Valid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,
 	latest_report.end_time, latest_report.status, node_name
 
 	Example:
@@ -342,7 +342,7 @@ message Id {
 }
 
 message Query {
-	// Unique idenfifier.
+	// Unique identifier.
 	string id = 18;
 	// File type, either JSON or CSV.
 	string type = 19;
@@ -387,7 +387,7 @@ message Failed {
 	int32 critical = 4;
 }
 
-// A minimal represenation of the statuses of the controls in the report.
+// A minimal representation of the statuses of the controls in the report.
 message ControlSummary {
 	// The total number of controls in the report.
 	int32 total = 1;
@@ -652,7 +652,7 @@ message Suggestions {
 }
 
 message ProfileMins {
-	// Minimal represenations of the profiles matching the filters.
+	// Minimal representations of the profiles matching the filters.
 	repeated ProfileMin profiles = 1;
 	// Intentionally blank.
 	ProfileCounts counts = 2;
@@ -670,7 +670,7 @@ message ProfileCounts {
 	int32 passed = 4;
 }
 
-// Minimal represenation of a profile.
+// Minimal representation of a profile.
 message ProfileMin {
 	// The name of the profile.
 	string name = 1;
@@ -697,7 +697,7 @@ message Node {
 	LatestReportSummary latest_report = 8;
 	// The tags assigned to this node.
 	repeated Kv tags = 9;
-	// A minimal represenation of the compliance profiles run against the node.
+	// A minimal representation of the compliance profiles run against the node.
 	repeated ProfileMeta profiles = 10;
 }
 

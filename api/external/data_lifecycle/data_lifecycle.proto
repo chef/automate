@@ -27,7 +27,7 @@ service DataLifecycle {
 		option (chef.automate.api.iam.policy).action = "dataLifecycle:status:get";
 	};
 
-	// SetConfig provides a singular endpoint for confiuging all data lifecycle jobs
+	// SetConfig provides a singular endpoint for configuring all data lifecycle jobs
 	rpc SetConfig(SetConfigRequest) returns (SetConfigResponse) {
 		option (google.api.http) = {
 			put: "/data-lifecycle/config";
