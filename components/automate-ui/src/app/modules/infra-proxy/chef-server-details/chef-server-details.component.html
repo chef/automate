@@ -112,14 +112,14 @@
         </ng-container>
       </section>
 
-      <app-org-create-edit-modal
+      <app-create-org-modal
         [visible]="createModalVisible"
         [creating]="creatingServerOrg"
         [createForm]="orgForm"
         (close)="closeCreateModal()"
         [conflictErrorEvent]="conflictErrorEvent"
         (createClicked)="createServerOrg()">
-      </app-org-create-edit-modal>
+      </app-create-org-modal>
       <app-delete-object-modal
         [visible]="deleteModalVisible"
         objectNoun="org"
