@@ -13,6 +13,6 @@
 - [ ] I have read the [CONTRIBUTING document](../CONTRIBUTING.md).
 - [ ] Tests added/updated?
 - [ ] Docs added/updated?
-- [ ] All commits have been signed-off for the [Developer Certificate of Origin](https://github.com/chef/chef/blob/master/CONTRIBUTING.md#developer-certification-of-origin-dco).
+- [ ] All commits have been signed-off for the [Developer Certification of Origin](https://github.com/chef/chef/blob/master/CONTRIBUTING.md#developer-certification-of-origin-dco).
 
 ### :camera: Screenshots, if applicable
