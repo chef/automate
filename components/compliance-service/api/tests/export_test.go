@@ -309,12 +309,14 @@ func TestJSONExportWithTwoControlsOnlyReturnsThoseTwoControls(t *testing.T) {
 	reports, err := getJSONReportsFromStream(stream)
 	require.NoError(t, err)
 
+	require.Len(t, reports, 1)
 	report := reports[0]
 	assert.Equal(t, "bb93e1b2-36d6-439e-ac70-cccccccccc04", report.GetId())
-	assert.Equal(t, 3, len(report.GetProfiles()))
+
+	require.Len(t, report.GetProfiles(), 3)
 	assert.Equal(t, "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988", report.GetProfiles()[0].GetSha256())
 
-	assert.Equal(t, 2, len(report.GetProfiles()[0].GetControls()))
+	require.Len(t, report.GetProfiles()[0].GetControls(), 2)
 	assert.Equal(t, "nginx-01", report.GetProfiles()[0].GetControls()[0].GetId())
 	assert.Equal(t, "nginx-02", report.GetProfiles()[0].GetControls()[1].GetId())
 }
