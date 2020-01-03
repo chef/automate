@@ -434,11 +434,7 @@ func init() {
     "/retention/service_groups/disconnected_services/config": {
       "get": {
         "summary": "Show 'Disconnected Services' configuration",
-<<<<<<< HEAD
         "description": "Returns the configuration for the task that marks services as disconnected. The ` + "`" + `threshold` + "`" + ` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. ` + "`" + `Threshold` + "`" + ` is a string that follows Elasticsearch's date math expressions.\nThis task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.",
-=======
-        "description": "Returns the configuration for the task that marks services as disconnected. The ` + "`" + `threshold` + "`" + ` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. ` + "`" + `Threshold` + "`" + ` is a string that follows Elasticsearch's date math expressions.\nThis task is always enabled, cannot be disabled. Because this task runs contiunuously, the response does not return information about its status.",
->>>>>>> Update gateway api swagger files
         "operationId": "GetDisconnectedServicesConfig",
         "responses": {
           "200": {

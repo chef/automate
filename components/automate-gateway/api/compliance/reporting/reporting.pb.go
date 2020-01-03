@@ -2248,9 +2248,6 @@ func (m *ProfileCounts) GetPassed() int32 {
 	return 0
 }
 
-<<<<<<< HEAD
-// Minimal representation of a profile.
-=======
 func (m *ProfileCounts) GetWaived() int32 {
 	if m != nil {
 		return m.Waived
@@ -2258,8 +2255,7 @@ func (m *ProfileCounts) GetWaived() int32 {
 	return 0
 }
 
-// Minimal represenation of a profile.
->>>>>>> Update proto files
+// Minimal representation of a profile.
 type ProfileMin struct {
 	// The name of the profile.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
