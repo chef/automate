@@ -33,13 +33,12 @@ func TestGatherInfoForNode(t *testing.T) {
 			SourceFqdn:       "chef-server-2",
 			Roles:            []string{"my-cool-role"},
 		},
-		Checkin: nowTime,
-		Ec2: backend.Ec2{
-			InstanceId:                "i-0aee75f0b4b0d9f22",
-			PlacementAvailabilityZone: "us-west-2a",
-		},
-		LatestRunID: "123353254545425",
-		Projects:    []string{"tomato", "cucumber"},
+		Checkin:        nowTime,
+		LatestRunID:    "123353254545425",
+		Projects:       []string{"tomato", "cucumber"},
+		CloudID:        "i-0aee75f0b4b0d9f22",
+		CloudAccountID: "123456789",
+		CloudRegion:    "us-west-2",
 	}
 
 	nodeMetadata, err := gatherInfoForNode(backendNode)
@@ -53,9 +52,10 @@ func TestGatherInfoForNode(t *testing.T) {
 			{Key: "chef-tag", Value: "application"},
 			{Key: "chef-tag", Value: "database"},
 		},
-		LastContact:  timestampNow,
-		SourceId:     "i-0aee75f0b4b0d9f22",
-		SourceRegion: "us-west-2a",
+		LastContact:     timestampNow,
+		SourceId:        "i-0aee75f0b4b0d9f22",
+		SourceRegion:    "us-west-2",
+		SourceAccountId: "123456789",
 		RunData: &nodes.LastContactData{
 			Id:      "123353254545425",
 			EndTime: timestampNow,

@@ -54,6 +54,9 @@ SELECT
   n.last_scan,
   n.last_run,
   n.projects_data,
+  COALESCE(n.source_id, '') AS source_id,
+  COALESCE(n.source_region, '') AS source_region,
+  COALESCE(n.source_account_id, '') AS source_account_id,
   COALESCE(('[' || string_agg('{"key":"' || t.key || '"' || ',"value": "' || t.value || '"}', ',') || ']'), '[]') :: JSON AS tags,
   COALESCE(array_to_json(array_remove(array_agg(DISTINCT m.manager_id), NULL)), '[]') AS manager_ids,
   COALESCE(array_to_json(array_remove(array_agg(p.project_id), NULL)), '[]') AS projects,
@@ -185,6 +188,9 @@ type dbNode struct {
 	LastScan        json.RawMessage  `db:"last_scan"`
 	LastRun         json.RawMessage  `db:"last_run"`
 	ProjectsData    json.RawMessage  `db:"projects_data"`
+	SourceID        string           `db:"source_id"`
+	SourceRegion    string           `db:"source_region"`
+	SourceAccountID string           `db:"source_account_id"`
 }
 
 type nodeCounts struct {
@@ -342,11 +348,21 @@ func translateStatusToEnum(status string) nodes.LastContactData_Status {
 	return nodes.LastContactData_UNKNOWN
 }
 
-func (db *DB) fromDBNodeWithTargetConfig(inNode *dbNode) (*nodes.Node, error) {
+func (db *DB) fromDBNodeWithTargetConfigAndCloudIdentifiers(inNode *dbNode) (*nodes.Node, error) {
 	newNode, err := db.fromDBNode(inNode)
 	if err != nil {
 		return nil, err
 	}
+
+	newNode.CloudInfo = &nodes.CloudInfo{
+		SourceId:        inNode.SourceID,
+		SourceRegion:    inNode.SourceRegion,
+		SourceAccountId: inNode.SourceAccountID,
+	}
+
+	newNode.CloudInfo.SourceId = inNode.SourceID
+	newNode.CloudInfo.SourceRegion = inNode.SourceRegion
+	newNode.CloudInfo.SourceAccountId = inNode.SourceAccountID
 
 	tc := nodes.TargetConfig{}
 	if inNode.TargetConfig != nil {
@@ -722,7 +738,7 @@ func (db *DB) GetNode(ctx context.Context, id string) (*nodes.Node, error) {
 		return nil, errorutils.ProcessSQLNotFound(err, id, "GetNode unable to select node")
 	}
 
-	n, err := db.fromDBNodeWithTargetConfig(&node)
+	n, err := db.fromDBNodeWithTargetConfigAndCloudIdentifiers(&node)
 	if err != nil {
 		return nil, errors.Wrap(err, "GetNode unable to translate node from db struct")
 	}

@@ -179,6 +179,7 @@ func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 		State:           "RUNNING",
 		ScanData:        &nodes.LastContactData{},
 		RunData:         &nodes.LastContactData{},
+		CloudInfo:       &nodes.CloudInfo{},
 	}, node)
 
 	jobsList, err = jobsClient.List(suite.ctx, &jobs.Query{})

@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"time"
 
-	uuid "github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
+	"github.com/lib/pq"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
@@ -16,49 +16,49 @@ import (
 
 const sqlUpsertByIDRunData = `
 INSERT INTO nodes
-	(id, name, platform, platform_version, source_state, 
-		last_contact, source_region, source_account_id, last_run, projects_data, manager)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+	(id, name, platform, platform_version, source_state,
+		last_contact, source_id, source_region, source_account_id, last_run, projects_data, manager)
+VALUES ($1, $2, $3, $4, $5, $6, NULLIF($7,''), NULLIF($8,''), NULLIF($9,''), $10, $11, $12)
 ON CONFLICT (id)
 DO UPDATE
-SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
-	last_contact = $6, last_run = $9, projects_data = $10
+SET name = $2, platform = $3, platform_version = $4, source_state = $5,
+	last_contact = $6, source_id = NULLIF($7,''), source_region = NULLIF($8,''), source_account_id = NULLIF($9,''), last_run = $10, projects_data = $11
 WHERE nodes.source_state != 'TERMINATED';
 `
 
 const sqlUpsertByIDScanData = `
 INSERT INTO nodes
-	(id, name, platform, platform_version, source_state, 
-		last_contact, source_region, source_account_id, last_job, last_scan, projects_data, manager)
-VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+	(id, name, platform, platform_version, source_state,
+		last_contact, source_id, source_region, source_account_id, last_job, last_scan, projects_data, manager)
+VALUES ($1, $2, $3, $4, $5, $6, NULLIF($7,''), NULLIF($8,''), NULLIF($9,''), $10, $11, $12, $13)
 ON CONFLICT (id)
 DO UPDATE
-SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
-	last_contact = $6, last_job = $9, last_scan = $10, projects_data = $11
+SET name = $2, platform = $3, platform_version = $4, source_state = $5,
+	last_contact = $6, source_id = NULLIF($7,''), source_region = NULLIF($8,''), source_account_id = NULLIF($9,''), last_job = $10, last_scan = $11, projects_data = $12
 WHERE nodes.source_state != 'TERMINATED';
 `
 
 const sqlUpsertBySourceIDRunData = `
 INSERT INTO nodes
-	(id, name, platform, platform_version, source_state, 
+	(id, name, platform, platform_version, source_state,
 		last_contact, source_id, source_region, source_account_id, last_run, projects_data, manager)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
 ON CONFLICT (source_id, source_region, source_account_id)
 DO UPDATE
-SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
-	last_contact = $6, last_run = $10, projects_data = $11
+SET name = $2, platform = $3, platform_version = $4, source_state = $5,
+	last_contact = $6,  source_id = $7, source_region = $8, source_account_id = $9, last_run = $10, projects_data = $11
 WHERE nodes.source_state != 'TERMINATED' RETURNING id;
 `
 
 const sqlUpsertBySourceIDScanData = `
 INSERT INTO nodes
-	(id, name, platform, platform_version, source_state, 
+	(id, name, platform, platform_version, source_state,
 		last_contact, source_id, source_region, source_account_id, last_job, last_scan, projects_data, manager)
 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
 ON CONFLICT (source_id, source_region, source_account_id)
 DO UPDATE
-SET name = $2, platform = $3, platform_version = $4, source_state = $5, 
-	last_contact = $6, last_job = $10, last_scan = $11, projects_data = $12
+SET name = $2, platform = $3, platform_version = $4, source_state = $5,
+	last_contact = $6, source_id = $7, source_region = $8, source_account_id = $9, last_job = $10, last_scan = $11, projects_data = $12
 WHERE nodes.source_state != 'TERMINATED' RETURNING id;
 `
 
@@ -88,7 +88,7 @@ type lastContactData struct {
 }
 
 func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
-	logrus.Infof("processing node with uuid %s", node.Uuid)
+	logrus.Debugf("processing node %s with uuid %s", node.Name, node.Uuid)
 	// if node.LastContact is less than 10 min ago, we can assume node to be in "running" state.
 	// if it is more than 10 min ago, we don't know what the state is, so we set to empty string
 	tenMinAgo := time.Now().UTC().Add(time.Minute * -10)
@@ -103,17 +103,15 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 
 	lastContact := ptypes.TimestampString(node.LastContact)
 
+	// note: we shouldn't be able to ever get here without a node id, because this function is called from the
+	// ingestion process, and the ingestion process will reject a report with no node uuid
 	if len(node.GetUuid()) == 0 {
-		id, err := uuid.NewV4()
-		if err != nil {
-			return err
-		}
-		node.Uuid = id.String()
+		return fmt.Errorf("no uuid included in message. aborting.")
 	}
 
 	// the incoming node may hit any of these cases:
 	// 1) it is already registered in our db with same uuid as incoming report: update the node entry
-	// 2) it is already registered in our db with diff uuid, same source_id: update the node by source_id
+	// 2) it is already registered in our db with diff uuid, same source_id, region, acct id: update the node by source_id
 	// 3) it is not in our db, we must add it
 
 	lastContactInfo, err := db.handleIncomingLastContactData(node)
@@ -138,33 +136,29 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	}
 
 	err = Transact(db, func(tx *DBTrans) error {
+		logrus.Debugf("processing node %s with cloud info %s %s %s", node.GetName(), node.GetSourceId(), node.GetSourceAccountId(), node.GetSourceRegion())
+		nodeDetails := nodeDetails{
+			nodeState:           nodeState,
+			lastContact:         lastContact,
+			mgrType:             mgrType,
+			lastContactDataByte: lastContactDataByte,
+			projectsDataByte:    projectsDataByte,
+		}
+
 		if len(node.GetSourceId()) == 0 || len(node.GetSourceAccountId()) == 0 || len(node.GetSourceRegion()) == 0 {
-			if node.GetScanData() != nil {
-				_, err = db.Exec(sqlUpsertByIDScanData, node.GetUuid(),
-					node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
-					nodeState, lastContact, node.GetSourceRegion(), node.GetSourceAccountId(),
-					node.GetJobUuid(), lastContactDataByte, projectsDataByte, mgrType)
-			} else if node.GetRunData() != nil {
-				_, err = db.Exec(sqlUpsertByIDRunData, node.GetUuid(),
-					node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
-					nodeState, lastContact, node.GetSourceRegion(), node.GetSourceAccountId(),
-					lastContactDataByte, projectsDataByte, mgrType)
-			}
+			err = tx.upsertByID(node, nodeDetails)
 		} else {
-			var id string
-			if node.GetScanData() != nil {
-				id, err = db.SelectStr(sqlUpsertBySourceIDScanData, node.GetUuid(),
-					node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
-					nodeState, lastContact, node.GetSourceId(), node.GetSourceRegion(),
-					node.GetSourceAccountId(), node.GetJobUuid(), lastContactDataByte, projectsDataByte, mgrType)
-			} else if node.GetRunData() != nil {
-				id, err = db.SelectStr(sqlUpsertBySourceIDRunData, node.GetUuid(),
-					node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
-					nodeState, lastContact, node.GetSourceId(), node.GetSourceRegion(),
-					node.GetSourceAccountId(), lastContactDataByte, projectsDataByte, mgrType)
-			}
-			if len(id) > 0 {
-				node.Uuid = id
+			node.Uuid, err = tx.upsertByCloudDetails(node, nodeDetails)
+			if err != nil {
+				if pgerr, ok := err.(*pq.Error); ok {
+					if pgerr.Code == pq.ErrorCode("23505") {
+						logrus.Debugf("got duplicate uuid error when attempting upsert. updating by id")
+						// start a new transaction b/c we can't continue the transaction after a failed one
+						return Transact(db, func(tx *DBTrans) error {
+							return tx.upsertByID(node, nodeDetails)
+						})
+					}
+				}
 			}
 		}
 		if err != nil {
@@ -188,6 +182,51 @@ func (db *DB) ProcessIncomingNode(node *manager.NodeMetadata) error {
 	})
 
 	return err
+}
+
+type nodeDetails struct {
+	nodeState           string
+	lastContact         string
+	mgrType             string
+	lastContactDataByte []byte
+	projectsDataByte    []byte
+}
+
+func (tx *DBTrans) upsertByID(node *manager.NodeMetadata, details nodeDetails) error {
+	var err error
+	if node.GetScanData() != nil {
+		_, err = tx.Exec(sqlUpsertByIDScanData, node.GetUuid(),
+			node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
+			details.nodeState, details.lastContact, node.GetSourceId(), node.GetSourceRegion(), node.GetSourceAccountId(),
+			node.GetJobUuid(), details.lastContactDataByte, details.projectsDataByte, details.mgrType)
+	} else if node.GetRunData() != nil {
+		_, err = tx.Exec(sqlUpsertByIDRunData, node.GetUuid(),
+			node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
+			details.nodeState, details.lastContact, node.GetSourceId(), node.GetSourceRegion(), node.GetSourceAccountId(),
+			details.lastContactDataByte, details.projectsDataByte, details.mgrType)
+	}
+	return err
+}
+
+func (tx *DBTrans) upsertByCloudDetails(node *manager.NodeMetadata, details nodeDetails) (string, error) {
+	var id string
+	var err error
+	if node.GetScanData() != nil {
+		id, err = tx.SelectStr(sqlUpsertBySourceIDScanData, node.GetUuid(),
+			node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
+			details.nodeState, details.lastContact, node.GetSourceId(), node.GetSourceRegion(),
+			node.GetSourceAccountId(), node.GetJobUuid(), details.lastContactDataByte, details.projectsDataByte, details.mgrType)
+	} else if node.GetRunData() != nil {
+		id, err = tx.SelectStr(sqlUpsertBySourceIDRunData, node.GetUuid(),
+			node.GetName(), node.GetPlatformName(), node.GetPlatformRelease(),
+			details.nodeState, details.lastContact, node.GetSourceId(), node.GetSourceRegion(),
+			node.GetSourceAccountId(), details.lastContactDataByte, details.projectsDataByte, details.mgrType)
+	}
+	if len(id) > 0 {
+		logrus.Debugf("found match for node %s with details: %s %s %s. Node was updated.", node.GetName(), node.GetSourceId(), node.GetSourceRegion(), node.GetSourceAccountId())
+		return id, err
+	}
+	return node.Uuid, err
 }
 
 func (db *DB) handleIncomingLastContactData(node *manager.NodeMetadata) (lastContactData, error) {

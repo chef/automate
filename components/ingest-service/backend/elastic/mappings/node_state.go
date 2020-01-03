@@ -300,10 +300,26 @@ var nodeProps = `
 			},
 			"public_ipv4": {
 				"type": "ip"
+			},
+		  "account_id": {
+				"type": "keyword",
+				"index": false,
+				"doc_values": false
+			},
+			"region": {
+				"type": "keyword",
+				"index": false,
+				"doc_values": false
 			}
 		}
 	},
 	"cloud_id":{
+		"type": "keyword"
+	},
+	"cloud_region": {
+		"type": "keyword"
+	},
+	"cloud_account_id":{
 		"type": "keyword"
 	},
 	"fqdn": {

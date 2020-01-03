@@ -241,6 +241,7 @@ describe File.basename(__FILE__) do
     node1 = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node_id1)
     node1['last_contact'] = nil
     expected_node1 = {
+      "cloudInfo": {},
       "id": node_id1,
       "name": "M$",
       "manager": "automate",
@@ -265,6 +266,7 @@ describe File.basename(__FILE__) do
     node2 = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node_id2)
     node2['last_contact'] = nil
     expected_node2 ={
+      "cloudInfo": {},
       "id": node_id2,
       "name": "betamaniac",
       "manager": "automate",
@@ -295,6 +297,7 @@ describe File.basename(__FILE__) do
     node3 = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node_id3)
     node3['last_contact'] = nil
     expected_node3 = {
+      "cloudInfo": {},
       "id": node_id3,
       "name": "Alphamale",
       "manager": "automate",
@@ -343,6 +346,7 @@ describe File.basename(__FILE__) do
     updated_node3 = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node_id3)
     updated_node3['last_contact'] = nil
     expected_node3 = {
+      "cloudInfo": {},
       "id": node_id3,
       "name": "Donkey Kong",
       "manager": "automate",
@@ -456,6 +460,7 @@ describe File.basename(__FILE__) do
     super_duper_updated_node_3 = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: node_id3)
     super_duper_updated_node_3['last_contact'] = nil
     expected_node3 = {
+      "cloudInfo": {},
       "id": node_id3,
       "name": "Donkey Kong",
       "manager": "automate",

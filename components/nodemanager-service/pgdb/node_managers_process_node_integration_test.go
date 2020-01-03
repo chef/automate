@@ -10,12 +10,12 @@ import (
 	"github.com/golang/protobuf/ptypes"
 )
 
-func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithNoUUID() {
+func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeWithSourceInfo() {
 	// test that a new node with no uuid, yes source_id makes it into the db
 	// with the right info and is readable
 	nowTime := ptypes.TimestampNow()
 	node := &manager.NodeMetadata{
-		Uuid:            "",
+		Uuid:            "1223-4254-2424-1322",
 		Name:            "123.798.324.32",
 		PlatformName:    "ubuntu",
 		PlatformRelease: "16.04",
@@ -869,4 +869,63 @@ func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeCorrectlyAssoci
 	suite.Equal("my node", readNode.Name)
 	suite.Equal("aws-ec2", readNode.Manager)
 	suite.Equal([]string{mgrID}, readNode.ManagerIds)
+}
+
+func (suite *NodeManagersAndNodesDBSuite) TestProcessIncomingNodeInsertsByIDWhenCloudInfoDoesNotExistButDupNodeIDFound() {
+	// send in a node, no cloud info
+	nowTime := ptypes.TimestampNow()
+	node := &manager.NodeMetadata{
+		Uuid:            "1223-4784-2424-1389",
+		Name:            "my really cool node",
+		PlatformName:    "debian",
+		PlatformRelease: "8.6",
+		JobUuid:         "12345-389244-2433",
+		LastContact:     nowTime,
+		Tags:            []*common.Kv{},
+		ScanData: &nodes.LastContactData{
+			Id:      "1003-9254-2004-1322",
+			EndTime: nowTime,
+			Status:  nodes.LastContactData_PASSED,
+		},
+	}
+	err := suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+
+	listNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(listNodes))
+
+	readNode, err := suite.Database.GetNode(ctx, listNodes[0].Id)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal("my really cool node", readNode.Name)
+
+	// send a node in, same uuid, now has cloud data
+	newNode := node
+	newNode.SourceId = "i-078973"
+	newNode.SourceRegion = "eu-west-1"
+	newNode.SourceAccountId = "999999999999"
+	err = suite.Database.ProcessIncomingNode(node)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+
+	// expect node count/info to NOT have changed, only updated
+	listNodes, _, err = suite.Database.GetNodes("", nodes.Query_ASC, 1, 100, []*common.Filter{})
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal(1, len(listNodes))
+
+	readNode, err = suite.Database.GetNode(ctx, listNodes[0].Id)
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+	suite.Equal("my really cool node", readNode.Name)
+	suite.Equal("eu-west-1", readNode.GetCloudInfo().SourceRegion)
 }

@@ -3,12 +3,14 @@ package pgdb_test
 import (
 	"context"
 	"testing"
+	"time"
 
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	"github.com/chef/automate/components/nodemanager-service/pgdb/dbtest"
+	"github.com/golang/protobuf/ptypes"
 
 	"github.com/stretchr/testify/suite"
 )
@@ -266,6 +268,58 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodesToDBAddsTheInstance
 		suite.FailNow(err.Error())
 	}
 	suite.Equal(0, len(ids))
+}
+
+func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodesToDBDoesNotAddNodeWhenAlreadyPresent() {
+	secretId := "12345678901234567890123456789012"
+
+	mgr := manager.NodeManager{
+		Name:                "tester",
+		Type:                "aws-ec2",
+		CredentialId:        secretId,
+		InstanceCredentials: []*manager.CredentialsByTags{},
+	}
+	mgrId, err := suite.Database.AddNodeManager(&mgr, "999999999999")
+	if err != nil {
+		suite.FailNow(err.Error())
+	}
+
+	fetchedNodes, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 1000, []*common.Filter{})
+	suite.Require().NoError(err)
+
+	time.Sleep(5)
+
+	// we add a "starter" node with cloud info through processnode call
+	err = suite.Database.ProcessIncomingNode(&manager.NodeMetadata{
+		Uuid:            "1234-7823402-2438942",
+		Name:            "my-test",
+		PlatformName:    "windows",
+		SourceId:        "i-93433000",
+		SourceRegion:    "us-west-2",
+		SourceAccountId: "999999999999",
+		LastContact:     ptypes.TimestampNow(),
+		RunData: &nodes.LastContactData{
+			Id:      "1003-9254-2004-1322",
+			EndTime: ptypes.TimestampNow(),
+			Status:  nodes.LastContactData_PASSED,
+		},
+	})
+	suite.NoError(err)
+
+	fetchedNodes2, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 1000, []*common.Filter{})
+	suite.Require().NoError(err)
+
+	suite.Equal((len(fetchedNodes) + 1), len(fetchedNodes2))
+
+	// we send a node with same cloud info through - no new node should be created
+	node := manager.ManagerNode{Id: "i-93433000", Platform: "windows", Region: "us-west-2"}
+	nodeIds := suite.Database.AddManagerNodesToDB([]*manager.ManagerNode{&node}, mgrId, "999999999999", []*manager.CredentialsByTags{}, "aws-ec2")
+	suite.Equal(1, len(nodeIds))
+
+	fetchedNodes3, _, err := suite.Database.GetNodes("", nodes.Query_ASC, 1, 1000, []*common.Filter{})
+	suite.Require().NoError(err)
+
+	suite.Equal(len(fetchedNodes2), len(fetchedNodes3))
 }
 
 func (suite *NodeManagersAndNodesDBSuite) TestDeleteNodeManagerResetsManagerFieldOfNodes() {

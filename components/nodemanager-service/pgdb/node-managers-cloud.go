@@ -229,17 +229,30 @@ func (db *DB) AddManagerNodesToDB(nodesArr []*manager.ManagerNode, managerId str
 			}
 		}
 
+		var dbNodeID string
 		err = Transact(db, func(tx *DBTrans) error {
-			uuid, err = tx.SelectStr(sqlInsertManagerNode, uuid, mgrType, item.Id, jsonTc, item.Name, item.Region, managerAcctId)
+			logctx := logrus.WithFields(logrus.Fields{
+				"name":       item.Name,
+				"id":         item.Id,
+				"region":     item.Region,
+				"account_id": managerAcctId,
+			})
+			logctx.Debug("adding manager node")
+			dbNodeID, err = tx.SelectStr(sqlInsertManagerNode, uuid, mgrType, item.Id, jsonTc, item.Name, item.Region, managerAcctId)
 			if err != nil {
 				return errors.Wrapf(err, "AddManagerNodesToDB unable to insert node with source id %s", item.Id)
 			}
+			if dbNodeID == "" {
+				dbNodeID = uuid
+			} else {
+				logctx.Debug("found a match in the db for node")
+			}
 			// add instancecredentials to nodes_secrets table
-			err = tx.nodeSecret(uuid, credsForInstance)
+			err = tx.nodeSecret(dbNodeID, credsForInstance)
 			if err != nil {
 				return errors.Wrap(err, "AddManagerNodesToDB unable to insert node_secret")
 			}
-			_, err = tx.Exec(deleteNodeTags, uuid)
+			_, err = tx.Exec(deleteNodeTags, dbNodeID)
 			if err != nil {
 				return errors.Wrap(err, "AddManagerNodesToDB unable to delete existing node tags")
 			}
@@ -248,13 +261,13 @@ func (db *DB) AddManagerNodesToDB(nodesArr []*manager.ManagerNode, managerId str
 			if err != nil {
 				return errors.Wrap(err, "AddManagerNodesToDB unable to add tags")
 			}
-			err = tx.tagNode(uuid, tags)
+			err = tx.tagNode(dbNodeID, tags)
 			if err != nil {
 				return errors.Wrap(err, "AddManagerNodesToDB unable to tag node")
 			}
-			_, err = tx.Exec(sqlInsertNodeManagerNode, managerId, uuid)
+			_, err = tx.Exec(sqlInsertNodeManagerNode, managerId, dbNodeID)
 			if err != nil {
-				return errors.Wrapf(err, "AddManagerRegionsToDB unable to insert node_managers_nodes manager_id: %s node_id: %s", managerId, uuid)
+				return errors.Wrapf(err, "AddManagerRegionsToDB unable to insert node_managers_nodes manager_id: %s node_id: %s", managerId, dbNodeID)
 			}
 			return nil
 		})
@@ -262,7 +275,7 @@ func (db *DB) AddManagerNodesToDB(nodesArr []*manager.ManagerNode, managerId str
 			logrus.Errorf("AddManagerNodesToDB unable to complete transaction to insert node and nodes secrets, %+v", err)
 			continue
 		}
-		nodeIds = append(nodeIds, uuid)
+		nodeIds = append(nodeIds, dbNodeID)
 	}
 	return nodeIds
 }
