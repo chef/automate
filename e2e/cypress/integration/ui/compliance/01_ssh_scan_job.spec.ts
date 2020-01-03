@@ -188,7 +188,8 @@ describe('create a manual node ssh scan job and cleanup after', () => {
 
     // delete the credential
     cy.contains(credName).parent().parent().find('mat-select').as('row-menu');
-    cy.get('@row-menu').click().then(() => {
+    cy.contains(credName).parent().parent().find('mat-select-trigger').as('trigger');
+    cy.get('@trigger').click().then(() => {
       cy.get('@row-menu').find('[data-cy=delete]').click({ force: true });
     });
   });
