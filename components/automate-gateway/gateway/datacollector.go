@@ -24,7 +24,7 @@ import (
 
 	ingestProto "github.com/chef/automate/api/external/ingest/request"
 	complianceEvent "github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	inspecEvent "github.com/chef/automate/components/compliance-service/ingest/events/inspec"
+	inspecEvent "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 )
 
 type dataCollectorMsgType int

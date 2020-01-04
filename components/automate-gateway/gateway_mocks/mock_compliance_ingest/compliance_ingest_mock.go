@@ -8,7 +8,7 @@ import (
 	context "context"
 	event "github.com/chef/automate/api/interservice/event"
 	compliance "github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
+	ingest "github.com/chef/automate/api/interservice/compliance/ingest"
 	gomock "github.com/golang/mock/gomock"
 	empty "github.com/golang/protobuf/ptypes/empty"
 	grpc "google.golang.org/grpc"

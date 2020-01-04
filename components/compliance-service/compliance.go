@@ -39,7 +39,7 @@ import (
 	versionserver "github.com/chef/automate/components/compliance-service/api/version/server"
 	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
-	"github.com/chef/automate/components/compliance-service/ingest/ingest"
+	"github.com/chef/automate/api/interservice/compliance/ingest"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	ingestserver "github.com/chef/automate/components/compliance-service/ingest/server"

@@ -12,7 +12,7 @@ import (
 	api "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/ingest"
-	compliance_ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
+	compliance_ingest "github.com/chef/automate/api/interservice/compliance/ingest"
 	"github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )

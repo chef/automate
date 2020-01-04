@@ -1,10 +1,10 @@
 syntax = "proto3";
 
-package chef.automate.domain.compliance.ingest.ingest;
-option go_package = "github.com/chef/automate/components/compliance-service/ingest/ingest";
+package chef.automate.domain.compliance.ingest;
+option go_package = "github.com/chef/automate/api/interservice/compliance/ingest";
 
 import "google/api/annotations.proto";
-import "components/compliance-service/ingest/events/compliance/compliance.proto";
+import "api/interservice/compliance/ingest/events/compliance/compliance.proto";
 import "google/protobuf/empty.proto";
 import "api/interservice/event/event.proto";
 import "google/protobuf/timestamp.proto";
@@ -17,13 +17,13 @@ service ComplianceIngester {
 		};
 	};
 	rpc HandleEvent(chef.automate.domain.event.api.EventMsg) returns (chef.automate.domain.event.api.EventResponse);
-  rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
+	rpc ProjectUpdateStatus(ProjectUpdateStatusReq) returns (ProjectUpdateStatusResp);
 }
 
 message ProjectUpdateStatusReq { }
 
-message ProjectUpdateStatusResp { 
-    string state = 1;
-    google.protobuf.Timestamp estimated_time_complete = 2;
-    float percentage_complete = 3;
+message ProjectUpdateStatusResp {
+	string state = 1;
+	google.protobuf.Timestamp estimated_time_complete = 2;
+	float percentage_complete = 3;
 }

@@ -15,7 +15,7 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	ingest_api "github.com/chef/automate/components/compliance-service/ingest/ingest"
+	ingest_api "github.com/chef/automate/api/interservice/compliance/ingest"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline"
 	"github.com/chef/automate/components/nodemanager-service/api/manager"

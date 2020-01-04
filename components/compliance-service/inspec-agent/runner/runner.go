@@ -19,7 +19,7 @@ import (
 
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	"github.com/chef/automate/components/compliance-service/ingest/ingest"
+	"github.com/chef/automate/api/interservice/compliance/ingest"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"

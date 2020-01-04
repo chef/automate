@@ -5,7 +5,7 @@ import (
 	"net/url"
 
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	"github.com/chef/automate/components/compliance-service/ingest/ingest"
+	"github.com/chef/automate/api/interservice/compliance/ingest"
 	"github.com/chef/automate/components/notifications-client/notifier"
 
 	gp "github.com/golang/protobuf/ptypes/empty"

@@ -27,7 +27,7 @@ import (
 	reporting "github.com/chef/automate/components/compliance-service/api/reporting"
 	stats "github.com/chef/automate/components/compliance-service/api/stats"
 	version "github.com/chef/automate/components/compliance-service/api/version"
-	ingest0 "github.com/chef/automate/components/compliance-service/ingest/ingest"
+	ingest0 "github.com/chef/automate/api/interservice/compliance/ingest"
 	manager "github.com/chef/automate/components/nodemanager-service/api/manager"
 	nodes "github.com/chef/automate/components/nodemanager-service/api/nodes"
 	api "github.com/chef/automate/components/notifications-client/api"

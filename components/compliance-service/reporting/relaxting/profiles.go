@@ -14,7 +14,7 @@ import (
 
 	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/compliance-service/api/stats"
-	ingestinspec "github.com/chef/automate/components/compliance-service/ingest/events/inspec"
+	ingestinspec "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"

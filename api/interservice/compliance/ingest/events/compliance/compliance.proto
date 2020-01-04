@@ -1,9 +1,9 @@
 syntax = "proto3";
 
 package chef.automate.domain.compliance.ingest.events.compliance;
-option go_package = "github.com/chef/automate/components/compliance-service/ingest/events/compliance";
+option go_package = "github.com/chef/automate/api/interservice/compliance/ingest/events/compliance";
 
-import "components/compliance-service/ingest/events/inspec/inspec.proto";
+import "api/interservice/compliance/ingest/events/inspec/inspec.proto";
 import "components/compliance-service/api/common/common.proto";
 
 message Report {

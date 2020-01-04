@@ -13,7 +13,7 @@ import (
 
 	"github.com/chef/automate/components/compliance-service/examples/helpers"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	"github.com/chef/automate/components/compliance-service/ingest/ingest"
+	"github.com/chef/automate/api/interservice/compliance/ingest"
 )
 
 func SendReportToGRPC(file string, threadCount int, reportsPerThread int) error {

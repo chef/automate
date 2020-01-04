@@ -1,7 +1,7 @@
 syntax = "proto3";
 
 package chef.automate.domain.compliance.ingest.events.inspec;
-option go_package = "github.com/chef/automate/components/compliance-service/ingest/events/inspec";
+option go_package = "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec";
 
 import "google/protobuf/struct.proto";
 

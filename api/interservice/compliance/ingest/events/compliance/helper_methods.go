@@ -13,7 +13,7 @@ import (
 
 	"reflect"
 
-	"github.com/chef/automate/components/compliance-service/ingest/events/inspec"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	inspecTypes "github.com/chef/automate/components/compliance-service/inspec"
 	reportingTypes "github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
