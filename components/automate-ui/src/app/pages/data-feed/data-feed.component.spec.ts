@@ -28,20 +28,6 @@ describe('DatafeedComponent', () => {
   const cardId = '#destinations-cards';
   const listId = '#destinations-list';
 
-  const initialState = {
-    router: {
-      state: {
-        url: '/',
-        params: {},
-        queryParams: {},
-        fragment: ''
-      }
-    },
-    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
-    notifications: fromNotifications.InitialState,
-    layout: fromLayout.InitialState
-  };
-
   class MockTelemetryService {
     track() { }
   }
@@ -83,7 +69,7 @@ describe('DatafeedComponent', () => {
           clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
           notifications: fromNotifications.notificationEntityReducer,
           layout: fromLayout.layoutEntityReducer
-        }, { initialState, runtimeChecks })
+        }, { runtimeChecks })
       ],
       declarations: [
         DatafeedComponent

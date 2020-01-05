@@ -19,20 +19,6 @@ describe('NodesAddComponent', () => {
   let fixture: ComponentFixture<NodesAddComponent>;
   let component: NodesAddComponent;
 
-  const initialState = {
-    router: {
-      state: {
-        url: '/',
-        params: {},
-        queryParams: {},
-        fragment: ''
-      }
-    },
-    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
-    notifications: fromNotifications.InitialState,
-    layout: fromLayout.InitialState
-  };
-
   beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -45,7 +31,7 @@ describe('NodesAddComponent', () => {
           clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
           notifications: fromNotifications.notificationEntityReducer,
           layout: fromLayout.layoutEntityReducer
-        }, { initialState, runtimeChecks })
+        }, { runtimeChecks })
       ],
       declarations: [
         NodesAddComponent

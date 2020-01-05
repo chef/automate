@@ -6,11 +6,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
 
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
-import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
-import { projectsFilterReducer } from 'app/services/projects-filter/projects-filter.reducer';
-import { teamEntityReducer } from 'app/entities/teams/team.reducer';
 import { Team } from 'app/entities/teams/team.model';
 import {
   GetTeamsSuccess,
@@ -74,11 +71,7 @@ describe('TeamManagementComponent', () => {
         FormsModule,
         ReactiveFormsModule,
         RouterTestingModule,
-        StoreModule.forRoot({
-          teams: teamEntityReducer,
-          policies: policyEntityReducer,
-          projectsFilter: projectsFilterReducer
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })

@@ -25,20 +25,6 @@ describe('NotificationFormComponent', () => {
   let ruleService: RulesService;
   const snapshot = { params: { id: 'id' }};
 
-  const initialState = {
-    router: {
-      state: {
-        url: '/',
-        params: {},
-        queryParams: {},
-        fragment: ''
-      }
-    },
-    clientRunsEntity: fromClientRuns.ClientRunsEntityInitialState,
-    notifications: fromNotifications.InitialState,
-    layout: fromLayout.InitialState
-  };
-
   class MockRulesService {
     fetchRules(): Observable<Rule[]> { return observableOf([]); }
     fetchRule(rule) { return observableOf(rule); }
@@ -74,7 +60,7 @@ describe('NotificationFormComponent', () => {
           clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
           notifications: fromNotifications.notificationEntityReducer,
           layout: fromLayout.layoutEntityReducer
-        }, { initialState, runtimeChecks })
+        }, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();

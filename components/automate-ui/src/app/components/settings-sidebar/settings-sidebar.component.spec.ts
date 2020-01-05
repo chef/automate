@@ -21,7 +21,8 @@ describe('SettingsSidebarComponent', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [RouterTestingModule,
+      imports: [
+        RouterTestingModule,
         StoreModule.forRoot(ngrxReducers, { initialState: defaultInitialState, runtimeChecks })
       ],
       declarations: [

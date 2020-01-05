@@ -7,11 +7,13 @@ import { StoreModule } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
 import { runtimeChecks } from 'app/ngrx.reducers';
-import * as sidebar from '../../services/sidebar/sidebar.reducer';
+import { EntityStatus } from '../../entities/entities';
+import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
+import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
 import { UpdateNodeFilters } from '../../entities/client-runs/client-runs.actions';
+import * as sidebar from '../../services/sidebar/sidebar.reducer';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { EntityStatus } from '../../entities/entities';
 import { ClientRunsComponent } from './client-runs.component';
 
 class MockTelemetryService {
@@ -47,7 +49,9 @@ describe('ClientRunsComponent', () => {
         RouterTestingModule,
         HttpClientTestingModule,
         StoreModule.forRoot({
-          sidebar: sidebar.sidebarReducer
+          sidebar: sidebar.sidebarReducer,
+          notifications: notificationEntityReducer, // not used here but needed to suppress warnings
+          clientRunsEntity: clientRunsEntityReducer // not used here but needed to suppress warnings
         }, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]

@@ -2,38 +2,26 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
-import { routerReducer } from '@ngrx/router-store';
-import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
+import { MockComponent } from 'ng2-mock-component';
 
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import {
+  NgrxStateAtom,
+  ngrxReducers,
+  defaultInitialState,
+  runtimeChecks,
+  defaultRouterState,
+  defaultRouterRouterState
+} from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import {
-  ApiTokenEntityInitialState,
-  apiTokenEntityReducer
-} from 'app/entities/api-tokens/api-token.reducer';
-import {
-  GetTokenSuccess
-} from 'app/entities/api-tokens/api-token.actions';
-import { ApiToken } from 'app/entities/api-tokens/api-token.model';
-import { ApiTokenDetailsComponent } from './api-token-details.component';
-import {
-  policyEntityReducer,
-  PolicyEntityInitialState
-} from 'app/entities/policies/policy.reducer';
-import {
-  projectEntityReducer,
-  ProjectEntityInitialState
-} from 'app/entities/projects/project.reducer';
-import {
-  projectsFilterReducer,
-  projectsFilterInitialState
-} from 'app/services/projects-filter/projects-filter.reducer';
 import { Project } from 'app/entities/projects/project.model';
 import { GetProjectsSuccess, GetProjects } from 'app/entities/projects/project.actions';
 import { IamVersionResponse } from 'app/entities/policies/policy.requests';
 import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
+import { GetTokenSuccess } from 'app/entities/api-tokens/api-token.actions';
+import { ApiToken } from 'app/entities/api-tokens/api-token.model';
+import { ApiTokenDetailsComponent } from './api-token-details.component';
 
 describe('ApiTokenDetailsComponent', () => {
   let component: ApiTokenDetailsComponent;
@@ -43,19 +31,15 @@ describe('ApiTokenDetailsComponent', () => {
 
   const targetId = 'a-token-01';
   const initialState = {
+    ...defaultInitialState,
     router: {
+      ...defaultRouterState,
       state: {
+        ...defaultRouterRouterState,
         url: `/settings/tokens/${targetId}`,
-        params: { id: targetId },
-        queryParams: {},
-        fragment: ''
-      },
-      navigationId: 0
-    },
-    apiTokens: ApiTokenEntityInitialState,
-    policies: PolicyEntityInitialState,
-    projects: ProjectEntityInitialState,
-    projectsFilter: projectsFilterInitialState
+        params: { id: targetId }
+      }
+    }
   };
 
   beforeEach(async(() => {
@@ -89,13 +73,7 @@ describe('ApiTokenDetailsComponent', () => {
         ReactiveFormsModule,
         RouterTestingModule,
         ChefPipesModule,
-        StoreModule.forRoot({
-          router: routerReducer,
-          apiTokens: apiTokenEntityReducer,
-          policies: policyEntityReducer,
-          projects: projectEntityReducer,
-          projectsFilter: projectsFilterReducer
-        }, { initialState, runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
       ]
     }).compileComponents();
   }));
