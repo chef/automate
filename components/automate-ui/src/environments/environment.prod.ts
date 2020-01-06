@@ -19,6 +19,7 @@ export const environment = {
   config_mgmt_url: '/api/v0/cfgmgmt',
   retention_url: '/api/v0/retention',
   ingest_url: '/api/v0/ingest',
+  infra_proxy_url: '/api/v0/infra',
   deployment_url: '/api/v0/deployment',
   gateway_url: '/api/v0',
   elasticsearch_url: '/api/v0/elasticsearch',

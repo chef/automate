@@ -15,7 +15,7 @@ export class CookbookRequests {
   // tslint:disable-next-line: max-line-length
   public getCookbooksForOrgs(server_id: string, org_id: string): Observable<CookbooksSuccessPayload> {
     return this.http.get<CookbooksSuccessPayload>(
-      `${env.gateway_url}/infra_proxy/servers/${server_id}/orgs/${org_id}/cookbooks`);
+      `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks`);
   }
 
 }

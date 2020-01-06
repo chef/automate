@@ -21,24 +21,24 @@ export class ServerRequests {
   constructor(private http: HttpClient) { }
 
   public getServers(): Observable<ServersResponse> {
-    return this.http.get<ServersResponse>(`${env.gateway_url}/infra_proxy/servers`);
+    return this.http.get<ServersResponse>(`${env.infra_proxy_url}/servers`);
   }
 
   public getServer(id: string): Observable<ServerResponse> {
-    return this.http.get<ServerResponse>(`${env.gateway_url}/infra_proxy/servers/${id}`);
+    return this.http.get<ServerResponse>(`${env.infra_proxy_url}/servers/${id}`);
   }
 
   public createServer(serverData: CreateServerPayload): Observable<ServerResponse> {
     return this.http.post<ServerResponse>(
-      `${env.gateway_url}/infra_proxy/servers`, mapKeys(snakeCase, serverData));
+      `${env.infra_proxy_url}/servers`, mapKeys(snakeCase, serverData));
   }
 
   public updateServer(server: Server): Observable<ServerSuccessPayload> {
     return this.http.put<ServerSuccessPayload>(
-      `${env.gateway_url}/infra_proxy/servers/${server.id}`, server);
+      `${env.infra_proxy_url}/servers/${server.id}`, server);
   }
 
   public deleteServer(id: string): Observable<ServerResponse> {
-    return this.http.delete<ServerResponse>(`${env.gateway_url}/infra_proxy/servers/${id}`);
+    return this.http.delete<ServerResponse>(`${env.infra_proxy_url}/servers/${id}`);
   }
 }
