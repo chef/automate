@@ -74,20 +74,9 @@ func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*rep
 		return nil, err
 	}
 
-	if len(formattedFilters["profile_name"]) > 0 && len(formattedFilters["profile_id"]) > 0 {
-		return nil, status.Error(codes.InvalidArgument, "Invalid: Cannot specify both 'profile_name' and 'profile_id' filters")
-	}
-
-	if len(formattedFilters["profile_name"]) > 1 {
-		return nil, status.Error(codes.InvalidArgument, "Invalid: Only one 'profile_name' filter is allowed")
-	}
-
-	if len(formattedFilters["profile_id"]) > 1 {
-		return nil, status.Error(codes.InvalidArgument, "Invalid: Only one 'profile_id' filter is allowed")
-	}
-
-	if len(formattedFilters["control"]) > 1 {
-		return nil, status.Error(codes.InvalidArgument, "Invalid: Only one 'control' filter is allowed")
+	err = validateReportQueryParams(formattedFilters)
+	if err != nil {
+		return nil, err
 	}
 
 	// Step 1: Retrieving the latest report ID for each node based on the provided filters
@@ -204,7 +193,7 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 		return err
 	}
 
-	err = validateExportQueryParams(formattedFilters)
+	err = validateReportQueryParams(formattedFilters)
 	if err != nil {
 		return err
 	}
@@ -241,7 +230,7 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 	return nil
 }
 
-func validateExportQueryParams(formattedFilters map[string][]string) error {
+func validateReportQueryParams(formattedFilters map[string][]string) error {
 	if len(formattedFilters["profile_name"]) > 0 && len(formattedFilters["profile_id"]) > 0 {
 		return status.Error(codes.InvalidArgument, "Invalid: Cannot specify both 'profile_name' and 'profile_id' filters")
 	}
@@ -253,10 +242,6 @@ func validateExportQueryParams(formattedFilters map[string][]string) error {
 	if len(formattedFilters["profile_id"]) > 1 {
 		return status.Error(codes.InvalidArgument, "Invalid: Only one 'profile_id' filter is allowed")
 	}
-
-	if len(formattedFilters["control"]) > 1 {
-		return status.Error(codes.InvalidArgument, "Invalid: Only one 'control' filter is allowed")
-	}
 	return nil
 }
 
@@ -267,7 +252,7 @@ func (srv *Server) ExportNode(in *reporting.Query, stream reporting.ReportingSer
 		return err
 	}
 
-	err = validateExportQueryParams(formattedFilters)
+	err = validateReportQueryParams(formattedFilters)
 	if err != nil {
 		return err
 	}

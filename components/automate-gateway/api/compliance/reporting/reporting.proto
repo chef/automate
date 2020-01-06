@@ -58,7 +58,7 @@ service ReportingService {
 
 	List all IDs for the latest report for each node, with optional filtering. 
 	Supports filtering, but not pagination or sorting.
-	Including more than one value for `control`, `profile_id`, or `profile_name` is not allowed.
+	Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	Not limited to 10k results.
 	*/
@@ -103,7 +103,8 @@ service ReportingService {
 	Fetch a report
 
 	Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
-	Including more than one value for `profile_id` is not allowed.
+	Including more than one value for `profile_id`, or `profile_name` is not allowed.
+	Including values for both `profile_id` and `profile_name` in one request is not allowed.	
 	*/
 	rpc ReadReport(Query) returns (Report) {
 		option (google.api.http) = {

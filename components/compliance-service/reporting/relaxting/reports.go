@@ -514,6 +514,12 @@ func convertControl(profileControlsMap map[string]*reportingapi.Control, reportC
 		return nil
 	}
 
+	if len(filters["control"]) > 0 {
+		if !stringutils.SliceContains(filters["control"], profileControl.Id) {
+			return nil
+		}
+	}
+
 	profileControl.Results = make([]*reportingapi.Result, 0)
 	if reportControlMin.ID != profileControl.Id {
 		return nil
