@@ -34,6 +34,14 @@ A new static website for Automate is based on [Hugo](https://gohugo.io), the Go-
     brew install jq
     ```
 
+1. (Optional) [Install cspell](https://github.com/streetsidesoftware/cspell/tree/master/packages/cspell)
+
+    To be able to run the optional `make spellcheck` task you'll need to install `cspell`:
+
+    ```shell
+    npm install -g cspell
+    ```
+
 ### Development
 
 1. From the `components/automate-chef-io` directory, run the following command to start the development server.
@@ -68,6 +76,9 @@ make sync
 
 make serve
 : Start the live-reload development environment
+
+make spellcheck
+: Run the spellchecker against the files across the Automate project with documentation content
 
 > If you get a `git clone` related failure when running these commands, you may not have your HTTPS GitHub credentials setup. These commands will clone down the hugo theme via HTTPS.
 [Read these docs](https://help.github.com/articles/which-remote-url-should-i-use/#cloning-with-https-urls-recommended) to learn why we use HTTPS over SSH, and how to setup your GitHub credentials.
@@ -125,6 +136,7 @@ To build the API documentation during development:
 2. Recompile the .proto files as described in the [Automate development guide](https://github.com/chef/automate/blob/master/dev-docs/DEV_ENVIRONMENT.md)
 3. From the top of the `components/automate-chef-io` directory, sync the .swagger files generated with those in the docs component by running `make sync_swagger_files`
 4. Run the hugo server and view the documentation in your browser
+5. (Optional) From the top of the `components/automate-chef-io` directory, check for typos in documentation files by running `make spellcheck`
 
 Rebuilding the API docs is necessary when adding documentation content to Automate's .proto files. Changing the code in the .proto files does not require rebuilding, but new or updated services, messages, or fields require documentation.
 Our goal is to provide timely and accurate documentation for Chef Automate users.
