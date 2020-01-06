@@ -426,6 +426,10 @@ func init() {
         "failed": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Failed",
           "description": "Intentionally blank."
+        },
+        "waived": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.Total",
+          "description": "Intentionally blank."
         }
       },
       "description": "A minimal representation of the statuses of the controls in the report."
@@ -663,6 +667,11 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "The total number of skipped nodes matching the filters."
+        },
+        "total_waived": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The total number of waived nodes matching the filters."
         }
       }
     },
@@ -815,6 +824,11 @@ func init() {
           "type": "integer",
           "format": "int32",
           "description": "The total number of passing nodes matching the filters."
+        },
+        "waived": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The total number of waived nodes matching the filters."
         }
       },
       "description": "Stats on the statuses of nodes matching the filters."
