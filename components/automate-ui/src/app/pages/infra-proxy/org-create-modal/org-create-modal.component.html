@@ -1,5 +1,5 @@
 <chef-modal [visible]="visible" (closeModal)="closeEvent()">
-  <h2 slot="title">Create New Org</h2>
+  <h2 slot="title">Add Organization</h2>
   <div class="flex-container">
     <form [formGroup]="createForm">
       <div class="name-margin">
@@ -23,7 +23,7 @@
         </chef-form-field>
       </div>
       <div id="button-bar">
-        <chef-button primary id="create-org-modal-btn" (click)="createServerOrg()">Create Org</chef-button>
+        <chef-button primary id="create-org-modal-btn" (click)="createServerOrg()">Add Organization</chef-button>
         <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
         <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
       </div>

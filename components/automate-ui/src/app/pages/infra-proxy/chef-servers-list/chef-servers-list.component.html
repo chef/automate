@@ -28,10 +28,11 @@
         <chef-table-new>
           <chef-table-header>
             <chef-table-row>
-              <chef-table-header-cell>Chef Server Name</chef-table-header-cell>
+              <chef-table-header-cell>Name</chef-table-header-cell>
               <chef-table-header-cell>FQDN</chef-table-header-cell>
               <chef-table-header-cell>IP Address</chef-table-header-cell>
               <chef-table-header-cell>Description</chef-table-header-cell>
+              <chef-table-header-cell>No Of Org</chef-table-header-cell>
               <chef-table-header-cell class="controls"></chef-table-header-cell>
             </chef-table-row>
           </chef-table-header>
@@ -43,6 +44,7 @@
               <chef-table-cell>{{ server.fqdn }}</chef-table-cell>
               <chef-table-cell>{{ server.ip_address }}</chef-table-cell>
               <chef-table-cell>{{ server.description }}</chef-table-cell>
+              <chef-table-cell>{{ server.orgs_count }}</chef-table-cell>
               <chef-table-cell class="controls">
                 <chef-control-menu>
                   <chef-option data-cy="delete" (click)="startServerDelete(server)">Remove Chef Server</chef-option>
