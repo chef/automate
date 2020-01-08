@@ -12,7 +12,7 @@
   * [Flexbox](https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Flexible_Box_Layout/Using_CSS_flexible_boxes)
   * Small sample of reusable components currently available in the `/component` library
 
-## CSS dont
+## CSS don't
 
 * `!important`s should NOT be used
 * comments disabling the linter should and will be reviewed with extreme skepticism

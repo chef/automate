@@ -392,7 +392,7 @@ describe('SearchBarComponent', () => {
           component.handleInput('enter', 'chef-?-nodes');
         });
 
-        it('catagory does not allow wildcards', () => {
+        it('category does not allow wildcards', () => {
           jasmine.clock().uninstall();
           jasmine.clock().install();
           component.selectedCategoryType = component.categories[0];

@@ -78,7 +78,7 @@ describe('ReportingOverviewComponent', () => {
       spyOn(router, 'navigate');
       spyOn(console, 'warn');
 
-      component.onDateChanged('lkjasdl');
+      component.onDateChanged('not-a-date');
 
       expect(router.navigate).not.toHaveBeenCalled();
     });
