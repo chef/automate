@@ -61,4 +61,11 @@ kill_docker_pg:
 migrations-append-only-check:
 	@git diff --name-status master... | awk '/[RMD][0-9]*\tcomponents\/teams-service\/postgres\/migration\/sql\//{ print "modified/deleted/renamed: " $$2; ec=1 } END{ exit ec }'
 
+spellcheck:
+	@pushd ../.. > /dev/null; \
+	./scripts/spellcheck.sh --wordsOnly components/teams-service; \
+	EXIT_CODE=$$?; \
+	popd > /dev/null; \
+	exit $$EXIT_CODE
+
 .PHONY: all static unit build compile proto test dep-ensure have-dep lint

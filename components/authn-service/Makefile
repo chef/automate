@@ -63,4 +63,11 @@ kill_docker_pg:
 proto:
 	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component authn-service'
 
+spellcheck:
+	@pushd ../.. > /dev/null; \
+	./scripts/spellcheck.sh --wordsOnly components/authn-service; \
+	EXIT_CODE=$$?; \
+	popd > /dev/null; \
+	exit $$EXIT_CODE
+
 .PHONY: all fmt test vet static unit
