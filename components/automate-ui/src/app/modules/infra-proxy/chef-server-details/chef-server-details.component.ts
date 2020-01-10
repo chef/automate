@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
@@ -11,7 +11,7 @@ import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
-import { EntityStatus, allLoaded, loading } from 'app/entities/entities';
+import { pending, EntityStatus, allLoaded } from 'app/entities/entities';
 import {
   getStatus, serverFromRoute, updateStatus
 } from 'app/entities/servers/server.selectors';
@@ -98,45 +98,46 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
         this.store.dispatch(new GetOrgsForServer({ server_id: id }));
       });
 
-      combineLatest([
-        this.store.select(getStatus),
-        this.store.select(getAllOrgsForServerStatus)
-      ]).pipe(
-        takeUntil(this.isDestroyed)
-      ).subscribe(([getServerSt, getOrgsSt]) => {
-          this.isLoading =
-            !allLoaded([getServerSt, getOrgsSt]);
-        });
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(getAllOrgsForServerStatus)
+    ]).pipe(
+      takeUntil(this.isDestroyed)
+    ).subscribe(([getServerSt, getOrgsSt]) => {
+      this.isLoading =
+        !allLoaded([getServerSt, getOrgsSt]);
+    });
 
-      combineLatest([
-        this.store.select(getStatus),
-        this.store.select(getAllOrgsForServerStatus),
-        this.store.select(serverFromRoute),
-        this.store.select(allOrgs)
-      ]).pipe(
-          filter(([getServerSt, getOrgsSt, _serverState, _allOrgsState]) =>
-            getServerSt === EntityStatus.loadingSuccess &&
-            getOrgsSt === EntityStatus.loadingSuccess),
-          filter(([_getServerSt, _getOrgsSt, serverState, allOrgsState]) =>
-            !isNil(serverState) && !isNil(allOrgsState)),
-          takeUntil(this.isDestroyed)
-        ).subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
-          this.server = { ...ServerState };
-          this.orgs = allOrgsState;
-          this.updateServerForm.controls['name'].setValue(this.server.name);
-          this.updateServerForm.controls['description'].setValue(this.server.description);
-          this.updateServerForm.controls['fqdn'].setValue(this.server.fqdn);
-          this.updateServerForm.controls['ip_address'].setValue(this.server.ip_address);
-          this.creatingServerOrg = false;
-          this.closeCreateModal();
-        });
+    combineLatest([
+      this.store.select(getStatus),
+      this.store.select(getAllOrgsForServerStatus),
+      this.store.select(serverFromRoute),
+      this.store.select(allOrgs)
+    ]).pipe(
+      filter(([getServerStatus, getOrgsStatus, serverState, allOrgsState]) =>
+        getServerStatus === EntityStatus.loadingSuccess &&
+        getOrgsStatus === EntityStatus.loadingSuccess &&
+        !isNil(serverState) &&
+        !isNil(allOrgsState)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([_getServerSt, _getOrgsSt, ServerState, allOrgsState]) => {
+      this.server = { ...ServerState };
+      this.orgs = allOrgsState;
+      this.updateServerForm.controls['name'].setValue(this.server.name);
+      this.updateServerForm.controls['description'].setValue(this.server.description);
+      this.updateServerForm.controls['fqdn'].setValue(this.server.fqdn);
+      this.updateServerForm.controls['ip_address'].setValue(this.server.ip_address);
+      this.creatingServerOrg = false;
+      this.closeCreateModal();
+    });
 
-        this.store.select(deleteOrgStatus).pipe(
-          filter(status => this.id !== undefined && status === EntityStatus.loadingSuccess),
-          takeUntil(this.isDestroyed))
-          .subscribe(() => {
-            this.store.dispatch(new GetServer({ id: this.id }));
-          });
+    this.store.select(deleteOrgStatus).pipe(
+      filter(status => this.id !== undefined && status === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed))
+      .subscribe(() => {
+        this.store.dispatch(new GetServer({ id: this.id })
+      );
+    });
   }
 
   ngOnDestroy(): void {
@@ -201,19 +202,14 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       ip_address: this.updateServerForm.controls.ip_address.value.trim()
     };
     this.store.dispatch(new UpdateServer({server: updatedServer}));
-    const pendingSave = new Subject<boolean>();
-    this.store.select(updateStatus).pipe(
-      filter(identity),
-      takeUntil(pendingSave))
+    this.store.pipe(select(updateStatus),
+      takeUntil(this.isDestroyed),
+      filter(state => this.saving && !pending(state)))
       .subscribe((state) => {
-        if (!loading(state)) {
-          pendingSave.next(true);
-          pendingSave.complete();
-          this.saving = false;
-          this.saveSuccessful = (state === EntityStatus.loadingSuccess);
-          if (this.saveSuccessful) {
-            this.updateServerForm.markAsPristine();
-          }
+        this.saving = false;
+        this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+        if (this.saveSuccessful) {
+          this.updateServerForm.markAsPristine();
         }
       });
   }

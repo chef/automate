@@ -30,18 +30,18 @@
         <form [formGroup]="updateServerForm">
           <chef-form-field id="update-name">
             <label>
-              <span class="label">Chef Server Name <span aria-hidden="true">*</span></span>
+              Chef Server Name <span aria-hidden="true">*</span>
               <input chefInput formControlName="name" type="text" autocomplete="off"
                 data-cy="update-chefServer-name">
             </label>
             <chef-error
               *ngIf="(updateServerForm.get('name').hasError('required') || updateServerForm.get('name').hasError('pattern')) && updateServerForm.get('name').dirty">
-              Display Name is required.
+              Name is required.
             </chef-error>
           </chef-form-field>
           <chef-form-field id="update-description">
             <label>
-              <span class="label">Chef Server Description <span aria-hidden="true">*</span></span>
+              Description <span aria-hidden="true">*</span>
               <input chefInput formControlName="description" type="text" autocomplete="off"
                 data-cy="update-chefServer-description">
             </label>
@@ -52,7 +52,7 @@
           </chef-form-field>
           <chef-form-field id="update-fqdn">
             <label>
-              <span class="label">FQDN <span aria-hidden="true">*</span></span>
+              FQDN <span aria-hidden="true">*</span>
               <input chefInput formControlName="fqdn" type="text" autocomplete="off"
                 data-cy="update-chefServer-fqdn">
             </label>
@@ -63,13 +63,13 @@
           </chef-form-field>
           <chef-form-field id="update-ip_address">    
             <label>
-              <span class="label">IP Address <span aria-hidden="true">*</span></span>
+              IP Address <span aria-hidden="true">*</span>
               <input chefInput formControlName="ip_address" type="text" autocomplete="off"
                 data-cy="update-chefServer-ip_address">
             </label>
             <chef-error
               *ngIf="(updateServerForm.get('ip_address').hasError('required') || updateServerForm.get('ip_address').hasError('pattern')) && updateServerForm.get('ip_address').dirty">
-              FQDN is required.
+              IP Address is required.
             </chef-error>
           </chef-form-field>  
           <div id="button-bar">
