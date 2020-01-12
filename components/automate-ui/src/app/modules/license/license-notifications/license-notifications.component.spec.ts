@@ -27,14 +27,14 @@ describe('LicenseNotificationsComponent', () => {
         LicenseNotificationsComponent],
       providers: [{ provide: LicenseFacadeService, useClass:  MockLicenseFacadeService }]
     }).compileComponents();
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
       spyOn(store, 'dispatch').and.callThrough();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(LicenseNotificationsComponent);
     component = fixture.componentInstance;
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     fixture.detectChanges();
   });
 

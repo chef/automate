@@ -28,7 +28,7 @@ describe('ChefNotificationsComponent', () => {
   }));
 
   beforeEach(() => {
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(ChefNotificationsComponent);
     component = fixture.componentInstance;

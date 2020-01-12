@@ -38,8 +38,8 @@ describe('ReportingControlsComponent', () => {
 
     fixture = TestBed.createComponent(ReportingControlsComponent);
     component = fixture.componentInstance;
-    reportQueryService = TestBed.get(ReportQueryService);
-    reportDataService = TestBed.get(ReportDataService);
+    reportQueryService = TestBed.inject(ReportQueryService);
+    reportDataService = TestBed.inject(ReportDataService);
   });
 
   describe('getData()', () => {

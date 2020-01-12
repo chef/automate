@@ -96,9 +96,9 @@ describe('ApiTokenDetailsComponent', () => {
   ];
 
   beforeEach(() => {
-    router = TestBed.get(Router);
+    router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.stub();
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
 
     fixture = TestBed.createComponent(ApiTokenDetailsComponent);
     component = fixture.componentInstance;

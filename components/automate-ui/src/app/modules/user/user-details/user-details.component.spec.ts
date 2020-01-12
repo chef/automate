@@ -83,9 +83,9 @@ describe('UserDetailsComponent', () => {
         { provide: ActivatedRoute, useValue: {data: isNonAdmin} }
       ]
     });
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
-    router = TestBed.get(Router);
+    router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.stub();
 
     jasmine.addMatchers(customMatchers);

@@ -19,8 +19,8 @@ describe('RulesService', () => {
         HttpClientTestingModule
       ]
     });
-    service = TestBed.get(RulesService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    service = TestBed.inject(RulesService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   describe('fetchRules', () => {

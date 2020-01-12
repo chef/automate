@@ -27,7 +27,7 @@ describe('ResourceItemComponent', () => {
     });
 
     fixture = TestBed.createComponent(ResourceItemComponent);
-    eventService = TestBed.get(NodeDetailsService);
+    eventService = TestBed.inject(NodeDetailsService);
     component = fixture.componentInstance;
     element = fixture.debugElement;
 

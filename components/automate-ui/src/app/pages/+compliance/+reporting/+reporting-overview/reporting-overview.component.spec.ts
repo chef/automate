@@ -46,7 +46,7 @@ describe('ReportingOverviewComponent', () => {
     component = fixture.componentInstance;
     element = fixture.debugElement;
     statsService = element.injector.get(StatsService);
-    router = TestBed.get(Router);
+    router = TestBed.inject(Router);
   });
 
   describe('ngOnInit()', () => {

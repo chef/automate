@@ -33,7 +33,7 @@ describe('NodeDetailsComponent', () => {
 
       fixture = createTestFixture(nodeRunSource);
       component = fixture.componentInstance;
-      eventService = TestBed.get(NodeDetailsService);
+      eventService = TestBed.inject(NodeDetailsService);
       nodeRunSource.next({ nodeRun: createNodeRun() });
     });
 
@@ -63,7 +63,7 @@ describe('NodeDetailsComponent', () => {
 
       fixture = createTestFixture(nodeRunSource);
       component = fixture.componentInstance;
-      eventService = TestBed.get(NodeDetailsService);
+      eventService = TestBed.inject(NodeDetailsService);
     });
 
     describe('nodeRun', () => {

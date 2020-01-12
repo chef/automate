@@ -64,7 +64,7 @@ describe('WelcomeModalComponent', () => {
     fixture = TestBed.createComponent(WelcomeModalComponent);
     component = fixture.componentInstance;
 
-    localStorageService = TestBed.get(LocalStorageService);
+    localStorageService = TestBed.inject(LocalStorageService);
   });
 
   describe('header', () => {

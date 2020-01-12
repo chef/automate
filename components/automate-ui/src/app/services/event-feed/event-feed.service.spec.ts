@@ -28,7 +28,7 @@ describe('EventFeedService', () => {
       ]
     });
 
-    service = TestBed.get(EventFeedService);
+    service = TestBed.inject(EventFeedService);
 
     today = moment().endOf('day');
     oneWeekAgo = moment().subtract(6, 'days').startOf('day');

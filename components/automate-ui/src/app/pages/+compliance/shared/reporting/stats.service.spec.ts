@@ -24,8 +24,8 @@ describe('StatsService', () => {
       ]
     });
 
-    service = TestBed.get(StatsService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    service = TestBed.inject(StatsService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   afterEach(() => {

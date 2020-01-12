@@ -13,7 +13,7 @@ describe('FeatureFlagsService', () => {
     });
 
     localStorage.clear();
-    subject = TestBed.get(FeatureFlagsService);
+    subject = TestBed.inject(FeatureFlagsService);
     subject._features = {};
   });
 

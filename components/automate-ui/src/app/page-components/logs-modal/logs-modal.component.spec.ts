@@ -77,7 +77,7 @@ describe('LogsModalComponent', () => {
 
     fixture = TestBed.createComponent(LogsModalComponent);
     component = fixture.componentInstance;
-    eventService = TestBed.get(NodeDetailsService);
+    eventService = TestBed.inject(NodeDetailsService);
     component.nodeRun = new NodeRun(nodeRunData);
   });
 

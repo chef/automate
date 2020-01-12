@@ -55,9 +55,9 @@ describe('ProfileComponent', () => {
     component = fixture.componentInstance;
     component.ngOnInit();
 
-    metadataService = TestBed.get(MetadataService);
-    telemetryService = TestBed.get(TelemetryService);
-    chefSessionService = TestBed.get(ChefSessionService);
+    metadataService = TestBed.inject(MetadataService);
+    telemetryService = TestBed.inject(TelemetryService);
+    chefSessionService = TestBed.inject(ChefSessionService);
   });
 
   it('hides dropdown by default', () => {
