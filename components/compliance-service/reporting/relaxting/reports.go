@@ -654,6 +654,15 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	controlTermsAgg.SubAggregation("passed",
 		elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "passed")))
 
+	controlTermsAgg.SubAggregation("waived_str",
+		elastic.NewTermsAggregation().Field("profiles.controls.waived_str").Size(1))
+
+	controlTermsAgg.SubAggregation("waiver_data_expiration_date",
+		elastic.NewTermsAggregation().Field("profiles.controls.waiver_data.expiration_date").Size(1))
+
+	controlTermsAgg.SubAggregation("waiver_data_justification",
+		elastic.NewTermsAggregation().Field("profiles.controls.waiver_data.justification").Size(1))
+
 	controlTermsAgg.SubAggregation("end_time", elastic.NewReverseNestedAggregation().SubAggregation("most_recent_report",
 		elastic.NewTermsAggregation().Field("end_time").Size(1)))
 
