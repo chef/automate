@@ -81,7 +81,7 @@ Here is a concrete example, granting `read` permission for the user `user@exampl
 and for the members of `team:ldap:ops` on resource `cfgmgmt:nodes:*`:
 
 ```bash
-curl -s -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"subjects":["user:local:user@example.com"], "action":"read", "resource":"cfgmgmt:nodes:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
+curl -s -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"subjects":["user:local:user@example.com", "team:ldap:ops"], "action":"read", "resource":"cfgmgmt:nodes:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
 ```
 
 ### Action
