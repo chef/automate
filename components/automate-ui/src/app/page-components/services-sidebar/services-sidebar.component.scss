@@ -113,7 +113,7 @@ chef-alert {
   }
 
   .health-info-panel {
-    border-radius: $global-radius;
+    border-radius: 2px;
     align-items: center;
     padding: 8px;
     font-size: 12px;
@@ -145,7 +145,7 @@ chef-alert {
     align-items: flex-start;
     background: $chef-info-alert-light;
     color: $chef-info-alert;
-    border-radius: $global-radius;
+    border-radius: 2px;
     padding: 8px;
     margin-bottom: 8px;
     font-size: 12px;
@@ -168,7 +168,7 @@ chef-alert {
   .no-healthcheck-messages {
     margin: 1px;
     border: 1px solid;
-    border-radius: $global-radius;
+    border-radius: 2px;
     padding: 3px 8px 3px 8px;
 
     a {
@@ -181,8 +181,14 @@ chef-alert {
     padding: 2px;
   }
 
+  // desired space between adjacent healthcheck-message divs is 8px, we have
+  // 2 * 2px == 4px from the padding above which means we need 4px more:
+  .healthcheck-message + .healthcheck-message {
+    margin-top: 4px;
+  }
+
   .healthcheck-header {
-    border-radius: $global-radius $global-radius 0 0;
+    border-radius: 2px 2px 0 0;
     padding: 3px 8px 3px 8px;
 
     &.CRITICAL {
@@ -204,7 +210,7 @@ chef-alert {
   }
 
   .healthcheck-content {
-    border-radius: 0 0 $global-radius $global-radius;
+    border-radius: 0 0 2px 2px;
     background-color: var(--chef-primary-dark);
     color: var(--chef-white);
     padding: 8px;

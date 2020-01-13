@@ -67,6 +67,7 @@
               [tooltip]="tooltipMessageFor('channel')"
               *ngIf="service.update_strategy === 'NONE'">NO CHANNEL: NONE</chef-badge>
           </div>
+          <hr class="health-info-divider" />
           <div class="disconnect-notice" *ngIf="service.disconnected">
             <img class="disconnect-icon" src="assets/img/icon-disconnected.svg" alt="" aria-hidden />
             <div>
@@ -75,7 +76,6 @@
             </div>
             <chef-tooltip [attr.for]="'disconnect-time-' + i">{{ service.last_event_occurred_at | datetime: RFC2822 }}</chef-tooltip>
           </div>
-          <hr class="health-info-divider" />
           <div class="health-info-panel {{service.health_check}}">
             <chef-tooltip [attr.for]="'health-timestamp-' + i">{{ formatTimestamp(service.health_updated_at) }}</chef-tooltip>
             <div class ="health-line">
@@ -88,7 +88,7 @@
             </div>
             <div class="healthcheck-message-collection" *ngIf="service.health_check !== 'OK'">
               <div class="no-healthcheck-messages {{ service.health_check }}" *ngIf="service.health_check_result.stderr === '' && service.health_check_result.stdout === ''" >
-                Health check messages not available. When services specify a health-check hook, the hook's output will be shown here. <a href="https://www.habitat.sh/docs/reference/#sts=health-check">Learn more about writing health-check hooks.</a>
+                Health check messages not available. When services specify a health-check hook, the hook's output will be shown here. Learn more about <a href="https://www.habitat.sh/docs/reference/#sts=health-check">writing health-check hooks.</a>
               </div>
               <div class="healthcheck-message" *ngIf="service.health_check_result.stderr !== ''">
                 <div class="healthcheck-header {{service.health_check}}">
