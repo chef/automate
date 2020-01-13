@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 	"github.com/chef/automate/components/infra-proxy-service/service"
@@ -38,7 +39,20 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 		return nil, status.Error(codes.InvalidArgument, "must supply org server id")
 	}
 
-	org, err := s.service.Storage.StoreOrg(ctx, req.Name, req.AdminUser, req.AdminKey, req.ServerId)
+	newSecret := &secrets.Secret{
+		Name: "infra-proxy-service-admin-key",
+		Type: "ssh",
+		Data: []*secrets.Kv{
+			{Key: "key", Value: req.AdminKey},
+		},
+	}
+
+	secretID, err := s.service.Secrets.Create(ctx, newSecret)
+	if err != nil {
+		return nil, err
+	}
+
+	org, err := s.service.Storage.StoreOrg(ctx, req.Name, req.AdminUser, secretID.GetId(), req.ServerId)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Name, "org")
 	}
@@ -180,6 +194,16 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 	return &response.UpdateOrg{
 		Org: fromStorageOrg(org),
 	}, nil
+}
+
+
+func (s *Server) GetAdminKeyFromSecretService(ctx context.Context, id string, secretsClient secrets.SecretsServiceClient) (*secrets.Secret, error) {
+	secret, err := secretsClient.Read(ctx, &secrets.Id{Id: id})
+	if err != nil {
+		return secret, err
+	}
+
+	return secret, nil
 }
 
 // Create a response.Org from a storage.Org

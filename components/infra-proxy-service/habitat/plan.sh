@@ -22,6 +22,7 @@ pkg_exposes=(
 pkg_binds=(
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
+  [secrets-service]="port"
 )
 
 pkg_bin_dirs=(bin)

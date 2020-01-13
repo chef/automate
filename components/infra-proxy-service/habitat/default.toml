@@ -1,6 +1,11 @@
 [mlsa]
 accept = false
 
+[tls]
+key_contents =""
+cert_contents = ""
+root_cert_contents = ""
+
 [logger]
 format = "text"
 level = "info"
@@ -8,6 +13,10 @@ level = "info"
 [service]
 host = "localhost"
 port = 10153
+
+[secrets]
+host = "localhost"
+port = 10131
 
 [storage]
 database = "chef_infra_proxy"

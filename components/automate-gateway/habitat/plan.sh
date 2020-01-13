@@ -28,6 +28,7 @@ pkg_binds_optional=(
   [data-feed-service]="port"
   [deployment-service]="port"
   [event-feed-service]="port"
+  [infra-proxy-service]="port"
   [ingest-service]="port"
   [license-control-service]="port"
   [local-user-service]="port"

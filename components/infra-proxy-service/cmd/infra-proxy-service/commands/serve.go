@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 
+	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/infra-proxy-service/server"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
@@ -33,6 +34,7 @@ type config struct {
 	PGURL           string `mapstructure:"pg_url"`
 	Database        string `mapstructure:"database"`
 	MigrationsPath  string `mapstructure:"migrations-path"`
+	SecretsAddress  string `mapstructure:"secrets-address"`
 }
 
 func serve(cmd *cobra.Command, args []string) {
@@ -41,6 +43,7 @@ func serve(cmd *cobra.Command, args []string) {
 	cmd.PersistentFlags().String("grpc", "127.0.0.1:10153", "grpc host and port")
 	cmd.PersistentFlags().StringP("pg_url", "p", "", "postgres uri")
 	cmd.PersistentFlags().StringP("migrations-path", "m", "", "migrations path")
+	cmd.PersistentFlags().StringP("secrets-address", "s", "", "secrets-service GRPC address")
 
 	viper.SetConfigFile(args[0])
 	if err := viper.ReadInConfig(); err != nil {
@@ -83,7 +86,18 @@ func serve(cmd *cobra.Command, args []string) {
 		Logger: l,
 	}
 
-	service, err := service.NewPostgresService(l, migrationConfig, connFactory)
+	if cfg.SecretsAddress == "" {
+		fail(errors.New("missing required config secrets_address"))
+	}
+	secretsConn, err := connFactory.Dial("secrets-service", cfg.SecretsAddress)
+	if err != nil {
+		fail(errors.Wrapf(err, "failed to dial secrets-service at (%s)", cfg.SecretsAddress))
+	}
+
+	// get secrets client
+	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
+
+	service, err := service.Start(l, migrationConfig, connFactory, secretsClient)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}
