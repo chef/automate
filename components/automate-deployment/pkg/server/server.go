@@ -69,6 +69,7 @@ type server struct {
 	convergeLoop         *Looper                     // set in StartServer,
 	lcClient             lc.LicenseControlClient     // set when cachedLCClient is called
 	umClient             usermgmt.UserMgmt
+	iamClient			 iammgmt.IAMMgmt
 	converger            converge.Converger
 	senderStore          eventSenderStore
 	ensureStatusTimeout  time.Duration
@@ -541,6 +542,7 @@ func (s *server) doDeploySome(serviceNames []string,
 		if !usedBootstrapBundle {
 			eDeploy.maybeCreateInitialUser(serviceNames)
 			eDeploy.maybeApplyLicense(serviceNames)
+			// eDeploy.maybeUpgradeIAMtoV2()
 		}
 
 		completionMsg := api.CompleteOk
@@ -1600,7 +1602,7 @@ func (s *errDeployer) maybeCreateInitialUser(deployedServices []string) {
 	if hasLUS && hasTS {
 		s.createInitialUser()
 	} else {
-		logrus.Info("Not creating initial because teams-service and local-user-service were not deployed")
+		logrus.Info("Not creating initial user because teams-service and local-user-service were not deployed")
 	}
 }
 
@@ -1712,6 +1714,40 @@ func attemptToCreateInitialUser(ctx context.Context,
 		logger.Debug(msg)
 	}
 	return nil
+}
+
+func (s *errDeployer) maybeUpgradeIAMtoV2(deployedServices []string) {
+	if s.err != nil {
+		return
+	}
+	if stringutils.SliceContains(deployedServices, "authz-service") && stringutils.SliceContains(deployedServices, "teams-service") {
+		s.upgradeIAMToV2()
+	} else {
+		logrus.Info("could not attempt upgrade to IAM v2: authz-service and teams-service were not deployed")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	iamClient, err := s.IAMUpgradeClient(ctx)
+
+	err = iamClient.UpgradeToV2(ctx) 
+	if err != nil {
+		s.err = errors.Wrap(err, "could not upgrade IAM to V2")
+	}
+}
+
+func (s *server) IAMUpgradeClient(ctx context.Context) (iam.IAMMgmt, error) {
+	if s.iamClient == nil {
+		iamUpgradeClient, err := iam_upgrade_client.NewIamUpgradeClient(ctx, s.connFactory,
+			s.AddressForService("authz-service"),
+			s.AddressForService("teams-service"))
+		if err != nil {
+			return nil, err
+		}
+		s.iamClient = iamUpgradeClient
+	}
+	return s.iamClient, nil
 }
 
 func (s *server) DumpDB(req *api.DumpDBRequest, stream api.Deployment_DumpDBServer) error {
