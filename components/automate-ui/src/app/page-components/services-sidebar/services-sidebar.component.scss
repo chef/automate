@@ -57,6 +57,7 @@ chef-alert {
     display: block;
     background-color: $chef-white;
     border-top: 1px solid $gray-pale;
+    // if changed then hr.health-info-divider needs to be adjusted also
     padding: 1em;
     position: relative;
     width: 100%;
@@ -104,6 +105,11 @@ chef-alert {
     align-items: center;
     margin-bottom: 8px;
     font-size: 14px;
+  }
+
+  hr.health-info-divider {
+    margin: 16px -1em 16px -1em;
+    background-color: $gray-pale;
   }
 
   .health-info-panel {
