@@ -91,6 +91,32 @@ describe File.basename(__FILE__) do
     assert_equal_json_content(expected_data, actual_data)
   end
 
+  it "can paginate while listing all profiles by name" do
+    actual_data = GRPC profiles, :list, Profiles::Query.new(
+      name: 'windows-baseline',
+      per_page: 1,
+    )
+
+    expected_data = {
+      "profiles": [
+        {
+          "name": "windows-baseline",
+          "title": "DevSec Windows Security Baseline",
+          "maintainer": "DevSec Hardening Framework Team",
+          "copyright": "DevSec Hardening Framework Team",
+          "copyrightEmail": "hello@dev-sec.io",
+          "license": "Apache 2 license",
+          "summary": "Baselin for best-preactice Windows OS hardening",
+          "version": "1.1.0",
+          "supports"=>[{}],
+          "sha256": "3ed3fcda4b03936f063f65598a7a08b2e37bd7a0a805939d1c0ba861b7160cc8"
+        }
+      ],
+      "total": 1
+    }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
   it "lists all profiles and sort by title" do
     actual_data = GRPC profiles, :list, Profiles::Query.new(
       sort: 'title',
