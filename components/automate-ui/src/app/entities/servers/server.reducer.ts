@@ -19,6 +19,7 @@ const SAVE_STATUS = 'saveStatus';
 const SAVE_ERROR = 'saveError';
 const UPDATE_STATUS = 'updateStatus';
 const GET_STATUS = 'getStatus';
+const DELETE_STATUS = 'deleteStatus';
 
 export const serverEntityAdapter: EntityAdapter<Server> = createEntityAdapter<Server>();
 
@@ -97,16 +98,16 @@ export function serverEntityReducer(
     }
 
     case ServerActionTypes.DELETE: {
-      return set('deleteStatus', EntityStatus.loading, state);
+      return set(DELETE_STATUS, EntityStatus.loading, state);
     }
 
     case ServerActionTypes.DELETE_SUCCESS: {
-      return set('deleteStatus', EntityStatus.loadingSuccess,
+      return set(DELETE_STATUS, EntityStatus.loadingSuccess,
         serverEntityAdapter.removeOne(action.payload.id, state));
     }
 
     case ServerActionTypes.DELETE_FAILURE: {
-      return set('deleteStatus', EntityStatus.loadingFailure, state);
+      return set(DELETE_STATUS, EntityStatus.loadingFailure, state);
     }
 
     case ServerActionTypes.UPDATE:

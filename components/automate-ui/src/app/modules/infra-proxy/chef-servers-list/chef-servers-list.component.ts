@@ -43,6 +43,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
       map(servers => ChefSorters.naturalSort(servers, 'name')));
 
     this.createChefServerForm = this.fb.group({
+      // Must stay in sync with error checks in create-chef-server-modal.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       description: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       fqdn: ['', [Validators.required,
