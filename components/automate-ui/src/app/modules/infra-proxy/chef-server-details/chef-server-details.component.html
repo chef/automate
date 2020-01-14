@@ -26,6 +26,22 @@
           <chef-option value='details' data-cy="details-tab">Details</chef-option>
         </chef-tab-selector>
       </chef-page-header>
+      <app-create-org-modal
+        [visible]="createModalVisible"
+        [creating]="creatingServerOrg"
+        [createForm]="orgForm"
+        (close)="closeCreateModal()"
+        [conflictErrorEvent]="conflictErrorEvent"
+        (createClicked)="createServerOrg()">
+      </app-create-org-modal>
+      <app-delete-object-modal
+        [visible]="deleteModalVisible"
+        objectNoun="org"
+        [objectName]="orgToDelete?.name"
+        (close)="closeDeleteModal()"
+        (deleteClicked)="deleteOrg()"
+        objectAction="Delete">
+      </app-delete-object-modal>
       <section class="page-body" *ngIf="tabValue === 'details'">
         <form [formGroup]="updateServerForm">
           <chef-form-field id="update-name">
@@ -111,23 +127,6 @@
           </chef-table-new>
         </ng-container>
       </section>
-
-      <app-create-org-modal
-        [visible]="createModalVisible"
-        [creating]="creatingServerOrg"
-        [createForm]="orgForm"
-        (close)="closeCreateModal()"
-        [conflictErrorEvent]="conflictErrorEvent"
-        (createClicked)="createServerOrg()">
-      </app-create-org-modal>
-      <app-delete-object-modal
-        [visible]="deleteModalVisible"
-        objectNoun="org"
-        [objectName]="orgToDelete?.name"
-        (close)="closeDeleteModal()"
-        (deleteClicked)="deleteOrg()"
-        objectAction="Delete">
-      </app-delete-object-modal>
     </main>
   </div>
 </div>
