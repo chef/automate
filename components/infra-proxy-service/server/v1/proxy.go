@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 )
 
@@ -55,6 +56,11 @@ func (s *Server) createClient(ctx context.Context, orgID string) (*chef.Client, 
 		return nil, service.ParseStorageError(err, orgID, "org")
 	}
 
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.AdminKey})
+	if err != nil {
+		return nil, err
+	}
+
 	ServerID, err := uuid.FromString(org.ServerId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid server: %s", err.Error())
@@ -72,7 +78,7 @@ func (s *Server) createClient(ctx context.Context, orgID string) (*chef.Client, 
 
 	client, err := NewChefClient(&ChefConfig{
 		Name:    org.AdminUser,
-		Key:     org.AdminKey,
+		Key:     GetOrgAdminKeyFrom(secret),
 		SkipSSL: true,
 		BaseURL: baseURL,
 	})
@@ -95,4 +101,18 @@ func targetURL(fqdn string, IPAddress string, orgName string) (string, error) {
 	baseURL.Scheme = "https"
 
 	return baseURL.String(), nil
+}
+
+// GetOrgAdminKeyFrom returns AdminKey
+func GetOrgAdminKeyFrom(secret *secrets.Secret) (string) {
+	adminKey := ""
+	if secret != nil {
+		for _, item := range secret.Data {
+			if item.Key == "key" {
+				adminKey = item.Value
+			}
+		}
+	}
+
+	return adminKey
 }

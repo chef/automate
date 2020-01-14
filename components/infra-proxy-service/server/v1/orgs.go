@@ -43,6 +43,7 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 		Name: "infra-proxy-service-admin-key",
 		Type: "ssh",
 		Data: []*secrets.Kv{
+			{Key: "username", Value: req.AdminUser},
 			{Key: "key", Value: req.AdminKey},
 		},
 	}
@@ -97,8 +98,19 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 		return nil, service.ParseStorageError(err, req.Id, "org")
 	}
 
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.AdminKey})
+	if err != nil {
+		return nil, err
+	}
+
 	return &response.GetOrg{
-		Org: fromStorageOrg(org),
+		Org: &response.Org{
+			Id:        org.ID.String(),
+			Name:      org.Name,
+			AdminUser: org.AdminUser,
+			AdminKey:  GetOrgAdminKeyFrom(secret),
+			ServerId:  org.ServerId,
+		},
 	}, nil
 }
 
@@ -122,8 +134,19 @@ func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*
 		return nil, service.ParseStorageError(err, req.Name, "org")
 	}
 
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: org.AdminKey})
+	if err != nil {
+		return nil, err
+	}
+
 	return &response.GetOrg{
-		Org: fromStorageOrg(org),
+		Org: &response.Org{
+			Id:        org.ID.String(),
+			Name:      org.Name,
+			AdminUser: org.AdminUser,
+			AdminKey:  GetOrgAdminKeyFrom(secret),
+			ServerId:  org.ServerId,
+		},
 	}, nil
 }
 
@@ -140,6 +163,11 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 	org, err := s.service.Storage.DeleteOrg(ctx, UUID)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Id, "org")
+	}
+
+	_, err = s.service.Secrets.Delete(ctx, &secrets.Id{Id: org.AdminKey})
+	if err != nil {
+		return nil, err
 	}
 
 	return &response.DeleteOrg{
@@ -178,11 +206,38 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
 	}
 
+	oldOrg, err := s.service.Storage.GetOrg(ctx, id)
+	if err != nil {
+		return nil, service.ParseStorageError(err, req.Id, "org")
+	}
+
+	secret, err := s.service.Secrets.Read(ctx, &secrets.Id{Id: oldOrg.AdminKey})
+	if err != nil {
+		return nil, err
+	}
+
+	rawAdminKey := req.AdminKey
+
+	newSecret := &secrets.Secret{
+		Id: secret.GetId(),
+		Name: "infra-proxy-service-admin-key",
+		Type: "ssh",
+		Data: []*secrets.Kv{
+			{Key: "username", Value: req.AdminUser},
+			{Key: "key", Value: rawAdminKey},
+		},
+	}
+
+	_, err = s.service.Secrets.Update(ctx, newSecret)
+	if err != nil {
+		return nil, err
+	}
+
 	orgStruct := storage.Org{
 		ID:        id,
 		Name:      req.Name,
 		AdminUser: req.AdminUser,
-		AdminKey:  req.AdminKey,
+		AdminKey:  oldOrg.AdminKey,
 		ServerId:  req.ServerId,
 	}
 
@@ -192,7 +247,13 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 	}
 
 	return &response.UpdateOrg{
-		Org: fromStorageOrg(org),
+		Org: &response.Org{
+			Id:        org.ID.String(),
+			Name:      org.Name,
+			AdminUser: org.AdminUser,
+			AdminKey:  rawAdminKey,
+			ServerId:  org.ServerId,
+		},
 	}, nil
 }
 
