@@ -233,7 +233,7 @@ In order to find a token's ID, visit the *API Tokens* page.
 
 ### Projects
 
-Projects are used to group and permission Chef Automate resources as well as ingested data, specifically Compliance reports, Chef Server and Compliance events, and Infrastructure nodes.
+Projects are used to group and permission Chef Automate resources as well as ingested data, specifically Compliance reports, Chef Server events, and Infrastructure nodes.
 
 Projects can be managed via the Projects list under the **Settings** tab and consist of an ID, a name, and a collection of ingest rules. Project ingest rules are lists of conditions used only when
 [assigning ingested resources to projects]({{< relref "iam-v2-guide#assigning-ingested-resources-to-projects" >}}),
@@ -393,6 +393,13 @@ Rules of type `Node` can have conditions with attributes `Chef Organization`, `C
 
 Navigate to the project list page once more. Select `Update Projects`. Upon completion of the update, you should be able to
 filter by `project-devops` across Automate's dashboards and see only the ingested data that you expect.
+
+#### Effortless Infra Project
+To create a project that contains all Effortless Infra nodes add a Node ingest rule with a condition that uses an attribute of Chef Server and a value of "localhost".
+
+![](/images/docs/effortless-project-rule.png)
+
+The above rule matches on a node's Chef Server field, which is set to "localhost". This works because all Effortless Infra nodes do not have a Chef Server. Then, by adding a second condition that matches a specific Chef Policy Name, subgroups (i.e., nodes matching a specified policy name) of Effortless Infra nodes can be created. 
 
 #### Project Policies
 

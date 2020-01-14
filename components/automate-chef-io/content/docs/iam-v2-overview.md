@@ -263,12 +263,6 @@ From there, you can select any individual rule to view its list of conditions, a
 
 ![](/images/docs/admin-projects.png)
 
-To create a project that contains all Effortless Infra nodes add a Node ingest rule with a condition that uses an attribute of Chef Server and a value of "localhost".
-
-![](/images/docs/effortless-project-rule.png)
-
-The above rule matches on a node's Chef Server field, which is set to "localhost". This works because all Effortless Infra nodes do not have a Chef Server. Then, by adding a second condition that matches a specific Chef Policy Name, subgroups of Effortless Infra nodes can be created. 
-
 ## Projects in the API
 
 It is also possible to filter APIs by project from the Chef Automate CLI. The following API requests are examples of fetching data using project headers as filters.
