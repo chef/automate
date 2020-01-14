@@ -21,7 +21,7 @@ describe('team management', () => {
         cy.request({
           auth: { bearer: admin.id_token },
           method: 'POST',
-          url: '/apis/iam/v2beta/projects',
+          url: '/apis/iam/v2/projects',
           body: {
             id: project1ID,
             name: project1Name
@@ -30,7 +30,7 @@ describe('team management', () => {
         cy.request({
           auth: { bearer: admin.id_token },
           method: 'POST',
-          url: '/apis/iam/v2beta/projects',
+          url: '/apis/iam/v2/projects',
           body: {
             id: project2ID,
             name: project2Name

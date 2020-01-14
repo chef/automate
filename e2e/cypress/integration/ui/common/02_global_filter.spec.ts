@@ -71,14 +71,14 @@ function cleanupProjects(id_token: string): void {
   cy.request({
     auth: { bearer: id_token },
     method: 'GET',
-    url: '/apis/iam/v2beta/projects',
+    url: '/apis/iam/v2/projects',
     failOnStatusCode: false
   }).then((resp) => {
     for (const project of resp.body.projects) {
       cy.request({
         auth: { bearer: id_token },
         method: 'DELETE',
-        url: `/apis/iam/v2beta/projects/${project.id}`,
+        url: `/apis/iam/v2/projects/${project.id}`,
         failOnStatusCode: false
       });
     }
@@ -89,7 +89,7 @@ function createUser(id_token: string, username: string): void {
   cy.request({
     auth: { bearer: id_token },
     method: 'POST',
-    url: '/apis/iam/v2beta/users',
+    url: '/apis/iam/v2/users',
     failOnStatusCode: false,
     body: {
       id: username,
@@ -103,7 +103,7 @@ function createPolicy(id_token: string, id: string, username: string, projects: 
   cy.request({
     auth: { bearer: id_token },
     method: 'POST',
-    url: '/apis/iam/v2beta/policies',
+    url: '/apis/iam/v2/policies',
     failOnStatusCode: false,
     body: {
       id,
@@ -126,7 +126,7 @@ function createProject(id_token: string, project: CreateProject): void {
   cy.request({
     auth: { bearer: id_token },
     method: 'POST',
-    url: '/apis/iam/v2beta/projects',
+    url: '/apis/iam/v2/projects',
     failOnStatusCode: false,
     body: project
   }).then((response) => {

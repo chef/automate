@@ -25,7 +25,7 @@ control 'iam-v2p1-roles-1' do
   describe 'viewer, editor, project-owner access' do
     before(:all) do
       create_user_resp = automate_api_request(
-        '/apis/iam/v2beta/users',
+        '/apis/iam/v2/users',
         http_method: 'POST',
         request_body: {
           id: VIEWER_USERNAME,
@@ -36,7 +36,7 @@ control 'iam-v2p1-roles-1' do
       expect(create_user_resp.http_status).to eq 200
 
       create_user_resp = automate_api_request(
-        '/apis/iam/v2beta/users',
+        '/apis/iam/v2/users',
         http_method: 'POST',
         request_body: {
           id: EDITOR_USERNAME,
@@ -47,7 +47,7 @@ control 'iam-v2p1-roles-1' do
       expect(create_user_resp.http_status).to eq 200
 
       create_user_resp = automate_api_request(
-        '/apis/iam/v2beta/users',
+        '/apis/iam/v2/users',
         http_method: 'POST',
         request_body: {
           id: PROJECT_OWNER_USERNAME,
@@ -57,7 +57,7 @@ control 'iam-v2p1-roles-1' do
       )
       expect(create_user_resp.http_status).to eq 200
 
-      create_policy_resp = automate_api_request("/apis/iam/v2beta/policies",
+      create_policy_resp = automate_api_request("/apis/iam/v2/policies",
       http_method: 'POST',
       request_body: {
           id: VIEWER_ROLE_ACCESS_POLICY_ID,
@@ -74,7 +74,7 @@ control 'iam-v2p1-roles-1' do
       )
       expect(create_policy_resp.http_status).to eq 200
 
-      create_policy_resp = automate_api_request("/apis/iam/v2beta/policies",
+      create_policy_resp = automate_api_request("/apis/iam/v2/policies",
       http_method: 'POST',
       request_body: {
           id: EDITOR_ROLE_ACCESS_POLICY_ID,
@@ -91,7 +91,7 @@ control 'iam-v2p1-roles-1' do
       )
       expect(create_policy_resp.http_status).to eq 200
 
-      create_policy_resp = automate_api_request("/apis/iam/v2beta/policies",
+      create_policy_resp = automate_api_request("/apis/iam/v2/policies",
         http_method: 'POST',
         request_body: {
           id: PROJECT_OWNER_ROLE_ACCESS_POLICY_ID,
@@ -111,27 +111,27 @@ control 'iam-v2p1-roles-1' do
 
     after(:all) do
       delete_user_resp = automate_api_request(
-        "/apis/iam/v2beta/users/#{VIEWER_USERNAME}", http_method: 'DELETE')
+        "/apis/iam/v2/users/#{VIEWER_USERNAME}", http_method: 'DELETE')
       expect(delete_user_resp.http_status).to eq 200
 
       delete_user_resp = automate_api_request(
-        "/apis/iam/v2beta/users/#{EDITOR_USERNAME}", http_method: 'DELETE')
+        "/apis/iam/v2/users/#{EDITOR_USERNAME}", http_method: 'DELETE')
       expect(delete_user_resp.http_status).to eq 200
 
       delete_user_resp = automate_api_request(
-        "/apis/iam/v2beta/users/#{PROJECT_OWNER_USERNAME}", http_method: 'DELETE')
+        "/apis/iam/v2/users/#{PROJECT_OWNER_USERNAME}", http_method: 'DELETE')
       expect(delete_user_resp.http_status).to eq 200
 
       delete_policy_resp = automate_api_request(
-        "/apis/iam/v2beta/policies/#{VIEWER_ROLE_ACCESS_POLICY_ID}", http_method: 'DELETE')
+        "/apis/iam/v2/policies/#{VIEWER_ROLE_ACCESS_POLICY_ID}", http_method: 'DELETE')
       expect(delete_policy_resp.http_status).to eq 200
 
       delete_policy_resp = automate_api_request(
-        "/apis/iam/v2beta/policies/#{EDITOR_ROLE_ACCESS_POLICY_ID}", http_method: 'DELETE')
+        "/apis/iam/v2/policies/#{EDITOR_ROLE_ACCESS_POLICY_ID}", http_method: 'DELETE')
       expect(delete_policy_resp.http_status).to eq 200
 
       delete_policy_resp = automate_api_request(
-        "/apis/iam/v2beta/policies/#{PROJECT_OWNER_ROLE_ACCESS_POLICY_ID}", http_method: 'DELETE')
+        "/apis/iam/v2/policies/#{PROJECT_OWNER_ROLE_ACCESS_POLICY_ID}", http_method: 'DELETE')
       expect(delete_policy_resp.http_status).to eq 200
     end
 
@@ -529,10 +529,10 @@ control 'iam-v2p1-roles-1' do
     describe "reading IAM data" do
       {
         'GET': %w(
-          /apis/iam/v2beta/users
-          /apis/iam/v2beta/teams
-          /apis/iam/v2beta/users/username
-          /apis/iam/v2beta/teams/some-team-id
+          /apis/iam/v2/users
+          /apis/iam/v2/teams
+          /apis/iam/v2/users/username
+          /apis/iam/v2/teams/some-team-id
         ),
       }.each do |method, urls|
         urls.each do |url|
@@ -560,8 +560,8 @@ control 'iam-v2p1-roles-1' do
 
       {
         'GET': %w(
-          /apis/iam/v2beta/tokens
-          /apis/iam/v2beta/tokens/some-token-id
+          /apis/iam/v2/tokens
+          /apis/iam/v2/tokens/some-token-id
         ),
       }.each do |method, urls|
         urls.each do |url|
@@ -582,19 +582,19 @@ control 'iam-v2p1-roles-1' do
     describe "modifying IAM data" do
       {
         'DELETE': %w(
-          /apis/iam/v2beta/users/username
-          /apis/iam/v2beta/teams/some-team-id
-          /apis/iam/v2beta/tokens/some-token-id
+          /apis/iam/v2/users/username
+          /apis/iam/v2/teams/some-team-id
+          /apis/iam/v2/tokens/some-token-id
         ),
         'PUT': %w(
-          /apis/iam/v2beta/users/username
-          /apis/iam/v2beta/teams/some-team-id
-          /apis/iam/v2beta/tokens/some-token-id
+          /apis/iam/v2/users/username
+          /apis/iam/v2/teams/some-team-id
+          /apis/iam/v2/tokens/some-token-id
         ),
         'POST': %w(
-          /apis/iam/v2beta/users
-          /apis/iam/v2beta/teams
-          /apis/iam/v2beta/tokens
+          /apis/iam/v2/users
+          /apis/iam/v2/teams
+          /apis/iam/v2/tokens
         ),
       }.each do |method, urls|
         urls.each do |url|
@@ -613,11 +613,11 @@ control 'iam-v2p1-roles-1' do
 
       {
         'GET': %w(
-          /apis/iam/v2beta/teams/some-team-id/users
+          /apis/iam/v2/teams/some-team-id/users
         ),
         'POST': %w(
-          /apis/iam/v2beta/teams/some-team-id/users:add
-          /apis/iam/v2beta/teams/some-team-id/users:remove
+          /apis/iam/v2/teams/some-team-id/users:add
+          /apis/iam/v2/teams/some-team-id/users:remove
         ),
       }.each do |method, urls|
         urls.each do |url|
@@ -647,7 +647,7 @@ control 'iam-v2p1-roles-1' do
       it "a #{user} can see their own user record" do
         expect(
           automate_api_request(
-            "/apis/iam/v2beta/users/#{user}",
+            "/apis/iam/v2/users/#{user}",
             http_method: "GET",
             user: user,
           ).http_status
@@ -657,7 +657,7 @@ control 'iam-v2p1-roles-1' do
       it "a #{user} can update their own user record" do
         expect(
           automate_api_request(
-            "/apis/iam/v2beta/users/#{user}",
+            "/apis/iam/v2/users/#{user}",
             http_method: "PUT",
             user: user,
           ).http_status
@@ -667,7 +667,7 @@ control 'iam-v2p1-roles-1' do
       it "a #{user} cannot delete their own user record" do
         expect(
           automate_api_request(
-            "/apis/iam/v2beta/users/#{user}",
+            "/apis/iam/v2/users/#{user}",
             http_method: "DELETE",
             user: user,
           ).http_status
@@ -686,7 +686,7 @@ control 'iam-v2p1-roles-1' do
           it "#{method} #{url} does not return 403 for #{user}" do
             expect(
               automate_api_request(
-                "/apis/iam/v2beta/#{url}",
+                "/apis/iam/v2/#{url}",
                 http_method: method,
                 user: user,
               ).http_status
@@ -722,7 +722,7 @@ control 'iam-v2p1-roles-1' do
             it "#{method} #{url} returns 403 for #{user}" do
               expect(
                 automate_api_request(
-                  "/apis/iam/v2beta/#{url}",
+                  "/apis/iam/v2/#{url}",
                   http_method: method,
                   user: user,
                 ).http_status
@@ -751,7 +751,7 @@ control 'iam-v2p1-roles-1' do
             it "#{method} #{url} returns 403 for #{user}" do
               expect(
                 automate_api_request(
-                  "/apis/iam/v2beta/#{url}",
+                  "/apis/iam/v2/#{url}",
                   http_method: method,
                   user: user,
                 ).http_status
@@ -762,7 +762,7 @@ control 'iam-v2p1-roles-1' do
           it "#{method} #{url} does not return 403 for project-owner" do
             expect(
               automate_api_request(
-                "/apis/iam/v2beta/#{url}",
+                "/apis/iam/v2/#{url}",
                 http_method: method,
                 user: PROJECT_OWNER_USERNAME,
               ).http_status

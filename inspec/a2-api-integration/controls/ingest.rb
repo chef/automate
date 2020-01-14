@@ -14,14 +14,14 @@ control 'ingest-status' do
           'active': true
         }.to_json
       )
-      TEST_TOKEN = test_token_request.parsed_response_body[:value]
-      TEST_TOKEN_ID = test_token_request.parsed_response_body[:id]
+      INGEST_TOKEN = test_token_request.parsed_response_body[:value]
+      INGEST_TOKEN_ID = test_token_request.parsed_response_body[:id]
       expect(test_token_request.http_status).to eq(200)
     end
 
     after(:all) do
       delete_token_request = automate_api_request(
-        "/api/v0/auth/tokens/#{TEST_TOKEN_ID}",
+        "/api/v0/auth/tokens/#{INGEST_TOKEN_ID}",
         http_method: 'DELETE',
       )
       expect(delete_token_request.http_status.to_s).to match(/200|404/)
@@ -31,7 +31,7 @@ control 'ingest-status' do
       expect(
         automate_client_api_request(
           '/data-collector/v0',
-          TEST_TOKEN,
+          INGEST_TOKEN,
           http_method: 'GET',
         ).parsed_response_body[:status]
       ).to eq('ok')

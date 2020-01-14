@@ -50,7 +50,7 @@ describeIfIAMV2p1('project management', () => {
     cy.request({
       auth: { bearer: adminIdToken },
       method: 'GET',
-      url: '/apis/iam/v2beta/projects'
+      url: '/apis/iam/v2/projects'
     }).then((response) => {
       expect(response.status).to.equal(200);
       response.body.projects.map((project: Project) => project.id)
@@ -183,7 +183,7 @@ describeIfIAMV2p1('project management', () => {
 
   itFlaky('can update a project name', () => {
     const updatedProjectName = `updated ${projectName}`;
-    cy.route('GET', `/apis/iam/v2beta/projects/${projectID}`).as('getProject');
+    cy.route('GET', `/apis/iam/v2/projects/${projectID}`).as('getProject');
 
     cy.get('[data-cy=details-tab]').click();
     cy.wait('@getProject');
@@ -233,7 +233,7 @@ describeIfIAMV2p1('project management', () => {
     cy.request({
       auth: { bearer: adminIdToken },
       method: 'GET',
-      url: '/apis/iam/v2beta/projects'
+      url: '/apis/iam/v2/projects'
     }).then((response) => {
       expect(response.status).to.equal(200);
       // no projects are left so we shouldn't render the table at all

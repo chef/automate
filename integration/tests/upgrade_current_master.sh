@@ -5,3 +5,4 @@ test_name="upgrade_current_master"
 test_upgrades=true
 test_upgrade_inspec_profiles=()
 test_upgrade_begin_manifest="current.json"
+test_diagnostics_pre_upgrade_filters="~skip-for-deep-upgrade"

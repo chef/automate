@@ -10,7 +10,7 @@ control 'iam-v2p1-policy-version-1' do
 
   describe 'policy-version access for admin user' do
     it 'retrieves value' do
-      resp = automate_api_request("/apis/iam/v2beta/policy_version")
+      resp = automate_api_request("/apis/iam/v2/policy_version")
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:version][:major]).to eq "V2"
       expect(resp.parsed_response_body[:version][:minor]).to eq "V1"
@@ -23,7 +23,7 @@ control 'iam-v2p1-policy-version-1' do
 
     before(:all) do
       create_user_request = automate_api_request(
-        '/apis/iam/v2beta/users',
+        '/apis/iam/v2/users',
         http_method: 'POST',
         request_body: {
           id: NON_ADMIN_USERNAME,
@@ -36,7 +36,7 @@ control 'iam-v2p1-policy-version-1' do
 
     after(:all) do
       delete_user_request = automate_api_request(
-        "/apis/iam/v2beta/users/#{NON_ADMIN_USERNAME}",
+        "/apis/iam/v2/users/#{NON_ADMIN_USERNAME}",
         http_method: 'DELETE',
       )
       expect(delete_user_request.http_status.to_s).to match(/200|404/)
@@ -44,7 +44,7 @@ control 'iam-v2p1-policy-version-1' do
 
     it 'for non-admin user' do
       resp = automate_api_request(
-        "/apis/iam/v2beta/policy_version",
+        "/apis/iam/v2/policy_version",
         http_method: "GET",
         user: NON_ADMIN_USERNAME,
       )

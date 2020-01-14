@@ -17,7 +17,7 @@ describeIfIAMV2p1('projects API', () => {
     it('gives a 404 when the project does not exist', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        url: '/apis/iam/v2beta/projects/not_found',
+        url: '/apis/iam/v2/projects/not_found',
         failOnStatusCode: false
       }).then((response) => {
         expect(response.status).to.equal(404);
@@ -27,7 +27,7 @@ describeIfIAMV2p1('projects API', () => {
     it('graveyards and then deletes a project that exists', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        url: '/apis/iam/v2beta/projects',
+        url: '/apis/iam/v2/projects',
         method: 'POST',
         body: {
           id: projectID,
@@ -37,7 +37,7 @@ describeIfIAMV2p1('projects API', () => {
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        url: `/apis/iam/v2beta/projects/${projectID}`,
+        url: `/apis/iam/v2/projects/${projectID}`,
         method: 'DELETE'
       });
 
@@ -45,7 +45,7 @@ describeIfIAMV2p1('projects API', () => {
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        url: '/apis/iam/v2beta/projects',
+        url: '/apis/iam/v2/projects',
         method: 'POST',
         body: {
           id: projectID,
@@ -132,7 +132,7 @@ describeIfIAMV2p1('projects API', () => {
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'POST',
-          url: '/apis/iam/v2beta/projects',
+          url: '/apis/iam/v2/projects',
           body: project
         });
       }
@@ -202,7 +202,7 @@ describeIfIAMV2p1('projects API', () => {
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
-          url: `/apis/iam/v2beta/projects/${project.id}/rules`
+          url: `/apis/iam/v2/projects/${project.id}/rules`
         }).then((response) => {
           expect(response.body.rules).to.have.length(0);
         });
@@ -210,7 +210,7 @@ describeIfIAMV2p1('projects API', () => {
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
-          url: `/apis/iam/v2beta/projects/${project.id}`
+          url: `/apis/iam/v2/projects/${project.id}`
         }).then((response) => {
           expect(response.body.project.status).to.equal(noRulesStr);
         });
@@ -219,7 +219,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: '/apis/iam/v2beta/projects'
+        url: '/apis/iam/v2/projects'
       }).then((response) => {
         const projects: Project[] = response.body.projects;
         projects.filter(({ id, status }) => id === avengersProject.id || id === xmenProject.id)
@@ -230,7 +230,7 @@ describeIfIAMV2p1('projects API', () => {
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'POST',
-          url: `/apis/iam/v2beta/projects/${rule.project_id}/rules`,
+          url: `/apis/iam/v2/projects/${rule.project_id}/rules`,
           body: rule
         });
       }
@@ -240,7 +240,7 @@ describeIfIAMV2p1('projects API', () => {
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
-          url: `/apis/iam/v2beta/projects/${project.id}/rules`
+          url: `/apis/iam/v2/projects/${project.id}/rules`
         }).then((response) => {
           expect(response.body.rules).to.have.length(1);
           for (const rule of response.body.rules) {
@@ -251,7 +251,7 @@ describeIfIAMV2p1('projects API', () => {
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
-          url: `/apis/iam/v2beta/projects/${project.id}`
+          url: `/apis/iam/v2/projects/${project.id}`
         }).then((response) => {
           expect(response.body.project.status).to.equal(editsPendingStr);
         });
@@ -260,7 +260,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: '/apis/iam/v2beta/projects'
+        url: '/apis/iam/v2/projects'
       }).then((response) => {
         const projects: Project[] = response.body.projects;
         projects.filter(({ id, status }) => id === avengersProject.id || id === xmenProject.id)
@@ -274,7 +274,7 @@ describeIfIAMV2p1('projects API', () => {
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
-          url: `/apis/iam/v2beta/projects/${project.id}/rules`
+          url: `/apis/iam/v2/projects/${project.id}/rules`
         }).then((response) => {
           expect(response.body.rules).to.have.length(1);
           for (const rule of response.body.rules) {
@@ -285,7 +285,7 @@ describeIfIAMV2p1('projects API', () => {
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'GET',
-          url: `/apis/iam/v2beta/projects/${project.id}`
+          url: `/apis/iam/v2/projects/${project.id}`
         }).then((response) => {
           expect(response.body.project.status).to.equal(rulesAppliedStr);
         });
@@ -294,7 +294,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: '/apis/iam/v2beta/projects'
+        url: '/apis/iam/v2/projects'
       }).then((response) => {
         const projects: Project[] = response.body.projects;
         projects.filter(({ id, status }) => id === avengersProject.id || id === xmenProject.id)
@@ -341,7 +341,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+        url: `/apis/iam/v2/projects/${avengersProject.id}`
       }).then((response) => {
         expect(response.body.project.status).to.equal(rulesAppliedStr);
       });
@@ -349,7 +349,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: '/apis/iam/v2beta/projects'
+        url: '/apis/iam/v2/projects'
       }).then((response) => {
         const projects: Project[] = response.body.projects;
         projects.filter(({ id, status }) => id === avengersProject.id)
@@ -359,14 +359,14 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'PUT',
-        url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${avengersRule.id}`,
+        url: `/apis/iam/v2/projects/${avengersRule.project_id}/rules/${avengersRule.id}`,
         body: updatedAvengersRule
       });
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+        url: `/apis/iam/v2/projects/${avengersProject.id}`
       }).then((response) => {
         expect(response.body.project.status).to.equal(editsPendingStr);
       });
@@ -374,7 +374,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: '/apis/iam/v2beta/projects'
+        url: '/apis/iam/v2/projects'
       }).then((response) => {
         const projects: Project[] = response.body.projects;
         projects.filter(({ id, status }) => id === avengersProject.id)
@@ -397,7 +397,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+        url: `/apis/iam/v2/projects/${avengersProject.id}`
       }).then((response) => {
         expect(response.body.project.status).to.equal(rulesAppliedStr);
       });
@@ -405,7 +405,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: '/apis/iam/v2beta/projects'
+        url: '/apis/iam/v2/projects'
       }).then((response) => {
         const projects: Project[] = response.body.projects;
         projects.filter(({ id, status }) => id === avengersProject.id)
@@ -418,7 +418,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+        url: `/apis/iam/v2/projects/${avengersProject.id}`
       }).then((response) => {
         expect(response.body.project.status).to.equal(rulesAppliedStr);
       });
@@ -426,7 +426,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: '/apis/iam/v2beta/projects'
+        url: '/apis/iam/v2/projects'
       }).then((response) => {
         const projects: Project[] = response.body.projects;
         projects.filter(({ id, status }) => id === avengersProject.id)
@@ -436,13 +436,13 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'DELETE',
-        url: `/apis/iam/v2beta/projects/${avengersRule.project_id}/rules/${avengersRule.id}`
+        url: `/apis/iam/v2/projects/${avengersRule.project_id}/rules/${avengersRule.id}`
       });
 
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+        url: `/apis/iam/v2/projects/${avengersProject.id}`
       }).then((response) => {
         expect(response.body.project.status).to.equal(editsPendingStr);
       });
@@ -450,7 +450,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: '/apis/iam/v2beta/projects'
+        url: '/apis/iam/v2/projects'
       }).then((response) => {
         const projects: Project[] = response.body.projects;
         projects.filter(({ id, status }) => id === avengersProject.id)
@@ -462,7 +462,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: `/apis/iam/v2beta/projects/${avengersProject.id}`
+        url: `/apis/iam/v2/projects/${avengersProject.id}`
       }).then((response) => {
         expect(response.body.project.status).to.equal(noRulesStr);
       });
@@ -470,7 +470,7 @@ describeIfIAMV2p1('projects API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
-        url: '/apis/iam/v2beta/projects'
+        url: '/apis/iam/v2/projects'
       }).then((response) => {
         const projects: Project[] = response.body.projects;
         projects.filter(({ id, status }) => id === avengersProject.id)
@@ -531,7 +531,7 @@ function waitUntilProjectNotInGraveyard(projectID: string, attempts: number): vo
   }
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: '/apis/iam/v2beta/projects',
+    url: '/apis/iam/v2/projects',
     method: 'POST',
     failOnStatusCode: false,
     body: {

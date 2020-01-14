@@ -42,7 +42,7 @@ describe('team details', () => {
         cy.request({
           auth: { bearer: adminIdToken },
           method: 'POST',
-          url: '/apis/iam/v2beta/projects',
+          url: '/apis/iam/v2/projects',
           body: {
             id: project1ID,
             name: project1Name
@@ -52,7 +52,7 @@ describe('team details', () => {
         cy.request({
           auth: { bearer: adminIdToken },
           method: 'POST',
-          url: '/apis/iam/v2beta/projects',
+          url: '/apis/iam/v2/projects',
           body: {
             id: project2ID,
             name: project2Name
@@ -76,7 +76,7 @@ describe('team details', () => {
         cy.request({
           auth: { bearer: adminIdToken },
           method: 'POST',
-          url: `/apis/iam/v2beta/teams/${teamID}/users:add`,
+          url: `/apis/iam/v2/teams/${teamID}/users:add`,
           body: {
             user_ids: [userMembershipID]
           }
@@ -146,7 +146,7 @@ describe('team details', () => {
         cy.request({
           auth: { bearer: adminIdToken },
           method: 'PUT',
-          url: `/apis/iam/v2beta/teams/${teamUIRouteIdentifier}`,
+          url: `/apis/iam/v2/teams/${teamUIRouteIdentifier}`,
           body: {
             name: teamName,
             projects: [project1ID]
@@ -160,7 +160,7 @@ describe('team details', () => {
         cy.request({
           auth: { bearer: adminIdToken },
           method: 'PUT',
-          url: `/apis/iam/v2beta/teams/${teamUIRouteIdentifier}`,
+          url: `/apis/iam/v2/teams/${teamUIRouteIdentifier}`,
           body: {
             name: teamName,
             projects: []

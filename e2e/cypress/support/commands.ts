@@ -63,7 +63,7 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
   cy.request({
     auth: { bearer: idToken },
     method: 'DELETE',
-    url: `/apis/iam/v2beta/tokens/${adminTokenObj.id}`,
+    url: `/apis/iam/v2/tokens/${adminTokenObj.id}`,
     failOnStatusCode: false
   }).then((resp: Cypress.ObjectLike) => {
     expect(resp.status).to.be.oneOf([200, 404]);
@@ -73,7 +73,7 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
   cy.request({
     auth: { bearer: idToken },
     method: 'POST',
-    url: '/apis/iam/v2beta/tokens',
+    url: '/apis/iam/v2/tokens',
     body: adminTokenObj
   }).then((resp: Cypress.ObjectLike) => {
     Cypress.env('ADMIN_TOKEN', resp.body.token.value);
@@ -95,7 +95,7 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
     cy.request({
       auth: { bearer: idToken },
       method: 'POST',
-      url: '/apis/iam/v2beta/policies/administrator-access/members:add',
+      url: '/apis/iam/v2/policies/administrator-access/members:add',
       body: {
         members: [`token:${adminTokenObj.id}`]
       }
@@ -217,7 +217,7 @@ Cypress.Commands.add('applyRulesAndWait', (attempts: number) => {
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'POST',
-    url: '/apis/iam/v2beta/apply-rules'
+    url: '/apis/iam/v2/apply-rules'
   });
 
   waitUntilApplyRulesNotRunning(attempts);
@@ -314,7 +314,7 @@ function waitUntilApplyRulesNotRunning(attempts: number): void {
   }
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: '/apis/iam/v2beta/apply-rules'
+    url: '/apis/iam/v2/apply-rules'
   }).then((response) => {
     if (response.body.state === 'not_running') {
       return;
@@ -353,7 +353,7 @@ function waitUntilAdminTokenPermissioned(attempts: number): void {
   for (let i = 0; i > attempts; i++) {
     cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    url: '/apis/iam/v2beta/projects',
+    url: '/apis/iam/v2/projects',
     method: 'GET',
     failOnStatusCode: false
   }).then((response) => {
@@ -372,7 +372,7 @@ function cleanupProjectsByIDPrefixes(idPrefix: string): void {
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'GET',
-    url: '/apis/iam/v2beta/projects'
+    url: '/apis/iam/v2/projects'
   }).then((resp) => {
     const projectIds: string[] = resp.body.projects
       .filter((project: any) => project.id.startsWith(idPrefix))
@@ -400,7 +400,7 @@ function deleteProjects(projectIdsToDelete: string[], index: number,
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'GET',
-      url: `/apis/iam/v2beta/projects/${projectId}/rules`
+      url: `/apis/iam/v2/projects/${projectId}/rules`
     }).then((rulesResp) => {
       if (rulesResp.body.rules && rulesResp.body.rules.length > 0) {
         const finish = (): void => {
@@ -425,7 +425,7 @@ function deleteProjectRules(projectId: string, rules: any[], finish: () => void)
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'DELETE',
-      url: `/apis/iam/v2beta/projects/${projectId}/rules/${rule.id}`
+      url: `/apis/iam/v2/projects/${projectId}/rules/${rule.id}`
     }).then((deleteResp) => {
       expect(deleteResp.status).to.be.oneOf([200, 404]);
       deleteProjectRules(projectId, rest, finish);
@@ -437,7 +437,7 @@ function deleteProject(projectId: string) {
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'DELETE',
-    url: `/apis/iam/v2beta/projects/${projectId}`
+    url: `/apis/iam/v2/projects/${projectId}`
   }).then((deleteResp) => {
     expect(deleteResp.status).to.be.oneOf([200, 404]);
   });
@@ -447,14 +447,14 @@ function cleanupV2IAMObjectByIDPrefix(idPrefix: string, iamObject: string): void
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'GET',
-    url: `/apis/iam/v2beta/${iamObject}`
+    url: `/apis/iam/v2/${iamObject}`
   }).then((resp) => {
     for (const object of resp.body[iamObject]) {
       if (object.id.startsWith(idPrefix)) {
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'DELETE',
-          url: `/apis/iam/v2beta/${iamObject}/${object.id}`
+          url: `/apis/iam/v2/${iamObject}/${object.id}`
         }).then((deleteResp) => {
           expect(deleteResp.status).to.be.oneOf([200, 404]);
         });

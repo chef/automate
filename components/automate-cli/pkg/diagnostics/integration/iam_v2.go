@@ -61,7 +61,7 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 			vsn := struct {
 				Version struct{ Major, Minor string }
 			}{}
-			err := MustJSONDecodeSuccess(tstCtx.DoLBRequest("/apis/iam/v2beta/policy_version")).WithValue(&vsn)
+			err := MustJSONDecodeSuccess(tstCtx.DoLBRequest("/apis/iam/v2/policy_version")).WithValue(&vsn)
 			if err != nil {
 				return false, "", err
 			}
@@ -73,7 +73,7 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			tstCtx.SetValue("iam-v2-policy-id", save{PolicyID: policyID, RoleID: roleID})
 			err := MustJSONDecodeSuccess(
-				tstCtx.DoLBRequest("/apis/iam/v2beta/roles",
+				tstCtx.DoLBRequest("/apis/iam/v2/roles",
 					lbrequest.WithMethod("POST"),
 					lbrequest.WithJSONStringTemplateBody(roleCreateTemplateStr,
 						struct{ ID, Name string }{ID: roleID, Name: roleName}),
@@ -84,7 +84,7 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 			}
 
 			err = MustJSONDecodeSuccess(
-				tstCtx.DoLBRequest("/apis/iam/v2beta/policies",
+				tstCtx.DoLBRequest("/apis/iam/v2/policies",
 					lbrequest.WithMethod("POST"),
 					lbrequest.WithJSONStringTemplateBody(v2PolicyCreateTemplateStr,
 						struct{ ID, Name, RoleID string }{ID: policyID, Name: policyName, RoleID: roleID}),
@@ -121,7 +121,7 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 					Effect:    "DENY",
 				},
 			}
-			err := MustJSONDecodeSuccess(tstCtx.DoLBRequest("/apis/iam/v2beta/policies/" + loaded.PolicyID)).
+			err := MustJSONDecodeSuccess(tstCtx.DoLBRequest("/apis/iam/v2/policies/" + loaded.PolicyID)).
 				WithValue(&resp)
 			require.NoError(tstCtx, err, "Expected to be able to retrieve stored IAM v2 policy")
 			require.Equal(tstCtx, policyName, resp.Policy.Name)
@@ -136,7 +136,7 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 			}
 
 			err := MustJSONDecodeSuccess(
-				tstCtx.DoLBRequest("/apis/iam/v2beta/roles/"+loaded.RoleID,
+				tstCtx.DoLBRequest("/apis/iam/v2/roles/"+loaded.RoleID,
 					lbrequest.WithMethod("DELETE")),
 			).WithValue(&empty{})
 
@@ -145,7 +145,7 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 			}
 
 			err = MustJSONDecodeSuccess(
-				tstCtx.DoLBRequest("/apis/iam/v2beta/policies/"+loaded.PolicyID,
+				tstCtx.DoLBRequest("/apis/iam/v2/policies/"+loaded.PolicyID,
 					lbrequest.WithMethod("DELETE")),
 			).WithValue(&empty{})
 			return errors.Wrap(err, "Could not delete IAM v2 policy")

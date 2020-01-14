@@ -3,7 +3,7 @@ import { describeIfIAMV2p1 } from '../../../support/constants';
 describeIfIAMV2p1('policies API', () => {
   const defaultAdminReq = {
     headers: {}, // must fill in before use
-    url: '/apis/iam/v2beta/policies'
+    url: '/apis/iam/v2/policies'
   };
   const cypressPrefix = 'test-policies-api';
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -24,7 +24,7 @@ describeIfIAMV2p1('policies API', () => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
-        url: '/apis/iam/v2beta/projects',
+        url: '/apis/iam/v2/projects',
         body: project
       });
     }
@@ -34,7 +34,7 @@ describeIfIAMV2p1('policies API', () => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies', 'projects']);
   });
 
-  describe('POST /apis/iam/v2beta/policies', () => {
+  describe('POST /apis/iam/v2/policies', () => {
     beforeEach(() => {
       cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies']);
     });
@@ -60,7 +60,7 @@ describeIfIAMV2p1('policies API', () => {
     });
   });
 
-  describe('PUT /apis/iam/v2beta/policies', () => {
+  describe('PUT /apis/iam/v2/policies', () => {
     beforeEach(() => {
       cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies']);
     });
@@ -94,7 +94,7 @@ describeIfIAMV2p1('policies API', () => {
       cy.request({
         ...defaultAdminReq,
         method: 'PUT',
-        url: `/apis/iam/v2beta/policies/${policyID}`,
+        url: `/apis/iam/v2/policies/${policyID}`,
         failOnStatusCode: false,
         body: {
           name: `${cypressPrefix} policy ${now}`,
@@ -115,14 +115,14 @@ describeIfIAMV2p1('policies API', () => {
     const defaultNonAdminReq = {
       headers: {}, // must fill in before use
       method: 'POST',
-      url: '/apis/iam/v2beta/policies'
+      url: '/apis/iam/v2/policies'
     };
 
     before(() => {
       cy.request({
         ...defaultAdminReq,
         method: 'POST',
-        url: '/apis/iam/v2beta/tokens',
+        url: '/apis/iam/v2/tokens',
         body: {
           id: nonAdminTokenID,
           name: 'Nonadmin Token'
@@ -165,7 +165,7 @@ describeIfIAMV2p1('policies API', () => {
       cy.request({
         ...defaultAdminReq,
         method: 'DELETE',
-        url: `/apis/iam/v2beta/policies/${policyID}`,
+        url: `/apis/iam/v2/policies/${policyID}`,
         failOnStatusCode: false
       });
     });
@@ -174,12 +174,12 @@ describeIfIAMV2p1('policies API', () => {
       cy.request({
         ...defaultAdminReq,
         method: 'DELETE',
-        url: `/apis/iam/v2beta/policies/${policyID}`,
+        url: `/apis/iam/v2/policies/${policyID}`,
         failOnStatusCode: false
       });
     });
 
-    describe('POST /apis/iam/v2beta/policies', () => {
+    describe('POST /apis/iam/v2/policies', () => {
       it('admin can create a new policy with no projects', () => {
         cy.request({
           ...defaultAdminReq,
@@ -262,7 +262,7 @@ describeIfIAMV2p1('policies API', () => {
         });
     });
 
-    describe('PUT /apis/iam/v2beta/policies', () => {
+    describe('PUT /apis/iam/v2/policies', () => {
       it('admin can update a policy with no projects to have projects', () => {
         cy.request({
           ...defaultAdminReq,
@@ -275,7 +275,7 @@ describeIfIAMV2p1('policies API', () => {
         cy.request({
           ...defaultAdminReq,
           method: 'PUT',
-          url: `/apis/iam/v2beta/policies/${policyID}`,
+          url: `/apis/iam/v2/policies/${policyID}`,
           body: policyWithProjects(policyID, [project1.id, project2.id], statementProjects)
         }).then((response) => {
           expect(response.body.policy.projects).to.have.length(2);
@@ -294,7 +294,7 @@ describeIfIAMV2p1('policies API', () => {
         cy.request({
           ...defaultAdminReq,
           method: 'PUT',
-          url: `/apis/iam/v2beta/policies/${policyID}`,
+          url: `/apis/iam/v2/policies/${policyID}`,
           body: policyWithProjects(policyID, [], statementProjects)
         }).then((response) => {
           expect(response.body.policy.projects).to.have.length(0);
@@ -313,7 +313,7 @@ describeIfIAMV2p1('policies API', () => {
         cy.request({
           ...defaultAdminReq,
           method: 'PUT',
-          url: `/apis/iam/v2beta/policies/${policyID}`,
+          url: `/apis/iam/v2/policies/${policyID}`,
           failOnStatusCode: false,
           body: policyWithProjects(policyID, [project1.id, 'notfound'], statementProjects)
         }).then((response) => {
@@ -334,7 +334,7 @@ describeIfIAMV2p1('policies API', () => {
           cy.request({
             ...defaultNonAdminReq,
             method: 'PUT',
-            url: `/apis/iam/v2beta/policies/${policyID}`,
+            url: `/apis/iam/v2/policies/${policyID}`,
             body: policyWithProjects(policyID, [project2.id], statementProjects)
           }).then((response) => {
             expect(response.body.policy.projects).to.have.length(1);
@@ -354,7 +354,7 @@ describeIfIAMV2p1('policies API', () => {
           cy.request({
             ...defaultNonAdminReq,
             method: 'PUT',
-            url: `/apis/iam/v2beta/policies/${policyID}`,
+            url: `/apis/iam/v2/policies/${policyID}`,
             failOnStatusCode: false,
             body: policyWithProjects(policyID, [project1.id, 'notfound'], statementProjects)
           }).then((response) => {
@@ -375,7 +375,7 @@ describeIfIAMV2p1('policies API', () => {
           cy.request({
             ...defaultNonAdminReq,
             method: 'PUT',
-            url: `/apis/iam/v2beta/policies/${policyID}`,
+            url: `/apis/iam/v2/policies/${policyID}`,
             failOnStatusCode: false,
             body: policyWithProjects(policyID, [project1.id], statementProjects)
           }).then((response) => {
@@ -396,7 +396,7 @@ describeIfIAMV2p1('policies API', () => {
           cy.request({
             ...defaultNonAdminReq,
             method: 'PUT',
-            url: `/apis/iam/v2beta/policies/${policyID}`,
+            url: `/apis/iam/v2/policies/${policyID}`,
             body: policyWithProjects(policyID, [], statementProjects)
           }).then((response) => {
             expect(response.body.policy.projects).to.have.length(0);
@@ -416,7 +416,7 @@ describeIfIAMV2p1('policies API', () => {
           cy.request({
             ...defaultNonAdminReq,
             method: 'PUT',
-            url: `/apis/iam/v2beta/policies/${policyID}`,
+            url: `/apis/iam/v2/policies/${policyID}`,
             failOnStatusCode: false,
             body: policyWithProjects(policyID, [project1.id], statementProjects)
           }).then((response) => {

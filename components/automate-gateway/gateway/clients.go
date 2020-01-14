@@ -13,7 +13,7 @@ import (
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
 	authz "github.com/chef/automate/api/interservice/authz"
-	iam_v2beta "github.com/chef/automate/api/interservice/authz/v2"
+	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	deployment "github.com/chef/automate/api/interservice/deployment"
@@ -90,9 +90,9 @@ type ClientsFactory interface {
 	NotificationsClient() (notifications.NotificationsClient, error)
 	AuthenticationClient() (authn.AuthenticationClient, error)
 	AuthorizationClient() (authz.AuthorizationClient, error)
-	AuthorizationV2Client() (iam_v2beta.AuthorizationClient, error)
-	PoliciesClient() (iam_v2beta.PoliciesClient, error)
-	ProjectsClient() (iam_v2beta.ProjectsClient, error)
+	AuthorizationV2Client() (iam_v2.AuthorizationClient, error)
+	PoliciesClient() (iam_v2.PoliciesClient, error)
+	ProjectsClient() (iam_v2.ProjectsClient, error)
 	TeamsV1Client() (teams_v1.TeamsV1Client, error)
 	TeamsV2Client() (teams_v2.TeamsV2Client, error)
 	TokensMgmtClient() (authn.TokensMgmtClient, error)
@@ -280,32 +280,32 @@ func (c *clientsFactory) AuthorizationClient() (authz.AuthorizationClient, error
 
 // AuthorizationV2Client returns a client for the Authorization (IAMv2) service.
 // It requires the `authz` endpoint to be configured
-func (c *clientsFactory) AuthorizationV2Client() (iam_v2beta.AuthorizationClient, error) {
+func (c *clientsFactory) AuthorizationV2Client() (iam_v2.AuthorizationClient, error) {
 	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
 	}
-	return iam_v2beta.NewAuthorizationClient(conn), nil
+	return iam_v2.NewAuthorizationClient(conn), nil
 }
 
 // PoliciesClient returns a client for the Policies service.
 // It requires the `authz` endpoint to be configured
-func (c *clientsFactory) PoliciesClient() (iam_v2beta.PoliciesClient, error) {
+func (c *clientsFactory) PoliciesClient() (iam_v2.PoliciesClient, error) {
 	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
 	}
-	return iam_v2beta.NewPoliciesClient(conn), nil
+	return iam_v2.NewPoliciesClient(conn), nil
 }
 
 // ProjectsClient returns a client for the Projects service.
 // It requires the `authz` endpoint to be configured
-func (c *clientsFactory) ProjectsClient() (iam_v2beta.ProjectsClient, error) {
+func (c *clientsFactory) ProjectsClient() (iam_v2.ProjectsClient, error) {
 	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
 	}
-	return iam_v2beta.NewProjectsClient(conn), nil
+	return iam_v2.NewProjectsClient(conn), nil
 }
 
 // TeamsV1Client returns a V1 client for the Teams service.

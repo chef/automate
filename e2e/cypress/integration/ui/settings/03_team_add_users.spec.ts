@@ -55,9 +55,9 @@ describe('team add users', () => {
       cy.route('GET', `/api/v0/auth/teams/${teamID}/users`).as('getTeamUsers');
       cy.route('GET', '/api/v0/auth/users').as('getUsers');
     } else {
-      cy.route('GET', `/apis/iam/v2beta/teams/${nameForTeam}`).as('getTeam');
-      cy.route('GET', `/apis/iam/v2beta/teams/${nameForTeam}/users`).as('getTeamUsers');
-      cy.route('GET', '/apis/iam/v2beta/users').as('getUsers');
+      cy.route('GET', `/apis/iam/v2/teams/${nameForTeam}`).as('getTeam');
+      cy.route('GET', `/apis/iam/v2/teams/${nameForTeam}/users`).as('getTeamUsers');
+      cy.route('GET', '/apis/iam/v2/users').as('getUsers');
     }
 
     // TODO move this to the before block so it only happens once
