@@ -275,11 +275,22 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		conf.Deployment.GetV1().GetSvc().GetOverrideOrigin().GetValue())
 
 	err = client.Deploy(writer, conf, deployCmdFlags.skipPreflight, manifestProvider, version.BuildTime, offlineMode, deployCmdFlags.bootstrapBundlePath)
-	if err != nil && !status.IsStatusError(err) {
+	if err != nil {
+		if status.IsStatusError(err) {
+			return err
+		}
 		return status.Annotate(err, status.DeployError)
 	}
 
-	return err
+	err = upgradeIAMToV2(true)
+	if err != nil {
+		if status.IsStatusError(err) {
+			return err
+		}
+		return status.Annotate(err, status.DeployError)
+	}
+
+	return nil
 }
 
 func generatedConfig() (*dc.AutomateConfig, error) {
