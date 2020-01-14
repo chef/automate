@@ -247,13 +247,17 @@ input {
   position: relative; // check on this
 }
 
+.mat-option-text {
+  font-family: 'Muli', Helvetica, Arial, sans-serif;
+}
+
 [panelclass="chef-control-menu-x"] {
   text-align: right;
-
+  
   &:focus .mat-select-trigger {
     outline: -webkit-focus-ring-color auto 5px;
   }
-
+  
   .mat-select-trigger {
     display: inline-block;
 
