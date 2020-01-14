@@ -3,7 +3,7 @@ import { Observable } from 'rxjs';
 import { find } from 'lodash';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { MenuItemGroup } from 'app/entities/layout/layout.model';
+import { MenuItemGroup, MenuItem } from 'app/entities/layout/layout.model';
 
 @Component({
   selector: 'chef-sidebar',
@@ -19,7 +19,7 @@ export class SidebarComponent {
     this.menuGroups$ = layoutFacade.sidebar$;
   }
 
-  public isGroupVisible(menuGroup: MenuItemGroup) {
+  public isGroupVisible(menuGroup: MenuItemGroup): MenuItem {
     return menuGroup.visible && menuGroup.items && find(menuGroup.items, ['visible', true]);
   }
 }
