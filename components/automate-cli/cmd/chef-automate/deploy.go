@@ -7,6 +7,8 @@ import (
 	"os"
 	"path"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/deployment"
+
 	"github.com/spf13/cobra"
 
 	dc "github.com/chef/automate/api/config/deployment"
@@ -282,12 +284,14 @@ func runDeployCmd(cmd *cobra.Command, args []string) error {
 		return status.Annotate(err, status.DeployError)
 	}
 
-	err = upgradeIAMToV2(true)
-	if err != nil {
-		if status.IsStatusError(err) {
-			return err
+	if deployment.ContainsCollection(conf.Deployment, "auth") {
+		err = upgradeIAMToV2(true)
+		if err != nil {
+			if status.IsStatusError(err) {
+				return err
+			}
+			return status.Annotate(err, status.DeployError)
 		}
-		return status.Annotate(err, status.DeployError)
 	}
 
 	return nil
