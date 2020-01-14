@@ -13,10 +13,9 @@ toc = true
 Show the simplest possible experience that most users will experience. We are assuming that experience will be UI only, so present the UI information first followed by CLI information presented in reference format.
 -->
 
-This guide explains the beta version of Chef Automate's new Identity and Access Management (IAM v2) system.
+This guide explains Chef Automate's new Identity and Access Management (IAM v2) system.
 
-IAM v2 is a beta release and its functionality is subject to change during this period, based on customer feedback.
-This feature is opt-in only during the beta period.
+IAM v2 is currently opt-in only.
 Chef Automate users will not be automatically upgraded.
 
 We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2; however, you can choose to not migrate v1 policies by using the provided `--skip-policy-migration` flag with the upgrade command.
@@ -137,7 +136,7 @@ IAM v2 projects are collections of resources either created in Chef Automate, or
 Projects are used in a policy to reduce the scope of that policy's permissions to only the resources assigned to the given projects.
 
 {{< info >}}
-Chef Automate is currently limited to six projects while we continue to refine the user experience during this beta period.
+Chef Automate is currently limited to 300 projects while we continue to refine the user experience.
 See [Configuring Project Limit]({{< relref "iam-v2-guide.md#configuring-project-limit" >}}) for configuration instructions.
 {{< /info >}}
 
