@@ -40,15 +40,8 @@ export class FeatureFlagsComponent implements OnInit {
   public warning: string;
   public flagType: FlagTypes;
 
-  betaWarning = 'The flagged features below have not yet been made generally available. If you ' +
-                'choose to turn them on, be aware that they may contain bugs that could reduce ' +
-                'performance, make the experience poor, or break everything. The warranties in ' +
-                'your license agreement do not apply to the flagged features – they are ' +
-                'provided "as is" with no warranties of any kind, whether express or implied, ' +
-                'and Chef will have no liability to you for any problems in or caused by the ' +
-                'flagged features or any related documentation, whether direct, indirect, ' +
-                'special or consequential, including lost profits or data (our lawyer made us ' +
-                'add the last part).';
+  betaWarning = 'The warranties and indemnities in your license agreement do not apply ' + 
+                'to experimental features. Experimental features are provided "as is" ' + 'with no warranties of any kind, express or implied. Chef disclaims any ' + 'and all liability related in any way to the experimental features or ' + 'any related documentation.';
 
   legacyWarning = 'The flagged features below are in legacy status, meaning they have been ' +
                   'replaced with new functionality in the product.  Legacy features will be ' +
