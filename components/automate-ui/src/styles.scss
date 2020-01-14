@@ -247,8 +247,15 @@ input {
   position: relative; // check on this
 }
 
-.mat-option-text {
+.mat-option {
   font-family: 'Muli', Helvetica, Arial, sans-serif;
+
+  &.mat-active,
+  &:hover:not(.mat-option-disabled),
+  &:focus:not(.mat-option-disabled) {
+    background: $chef-primary-dark;
+    color: $chef-white;
+  }
 }
 
 [panelclass="chef-control-menu-x"] {
