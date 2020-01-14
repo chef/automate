@@ -136,7 +136,7 @@ IAM v2 projects are collections of resources either created in Chef Automate, or
 Projects are used in a policy to reduce the scope of that policy's permissions to only the resources assigned to the given projects.
 
 {{< info >}}
-Chef Automate is currently limited to 300 projects while we continue to refine the user experience.
+Chef Automate is currently limited to six projects while we continue to refine the user experience.
 See [Configuring Project Limit]({{< relref "iam-v2-guide.md#configuring-project-limit" >}}) for configuration instructions.
 {{< /info >}}
 
