@@ -496,10 +496,6 @@ func assertServicesEqual(t *testing.T, expected, actual []*applications.Service)
 				actual[i].HealthCheck,
 				"The health_check of a service is not the expected one")
 			assert.Equal(t,
-				svc.Status,
-				actual[i].Status,
-				"The status of a service is not the expected one")
-			assert.Equal(t,
 				svc.Application,
 				actual[i].Application,
 				"The application of a service is not the expected one")

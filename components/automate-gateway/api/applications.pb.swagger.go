@@ -590,10 +590,6 @@ func init() {
           "$ref": "#/definitions/chef.automate.api.applications.HealthStatus",
           "description": "Intentionally blank."
         },
-        "status": {
-          "$ref": "#/definitions/chef.automate.api.applications.ServiceStatus",
-          "description": "Intentionally blank."
-        },
         "application": {
           "type": "string",
           "description": "Application name."
@@ -711,17 +707,6 @@ func init() {
         }
       },
       "description": "List of service groups."
-    },
-    "chef.automate.api.applications.ServiceStatus": {
-      "type": "string",
-      "enum": [
-        "RUNNING",
-        "INITIALIZING",
-        "DEPLOYING",
-        "DOWN"
-      ],
-      "default": "RUNNING",
-      "description": "The ServiceStatus enum describes the status of the service.\nCurrently unimplemented."
     },
     "chef.automate.api.applications.ServicesBySGRes": {
       "type": "object",
