@@ -2,7 +2,6 @@
 host = "localhost"
 port = 4222
 gateway_port = 10147
-enable_nats_feature = false
 
 [tls]
 key_contents = ""

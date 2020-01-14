@@ -7,8 +7,6 @@ trial_license_url = "{{cfg.service.trial_license_url}}"
 {{/if ~}}
 open_api_ui_dir = "{{pkg.path}}/static/swagger-ui/"
 
-enable_apps_feature = {{cfg.service.enable_apps_feature}}
-
 [log]
 {{~#if cfg.log.level}}
 level = "{{cfg.log.level}}"

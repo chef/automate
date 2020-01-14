@@ -31,7 +31,7 @@ message ConfigRequest {
 				google.protobuf.Int32Value port = 2 [ (chef.automate.api.port) = { name: "service", default: 10132, protocol: "grpc" } ];
 				google.protobuf.Int32Value event_limit = 3;
 				google.protobuf.Int32Value listener_limit = 4;
-				google.protobuf.BoolValue enable_nats_feature = 5;
+				reserved 5;
 			}
 
 			message InternalMessaging {

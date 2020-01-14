@@ -26,11 +26,6 @@ func newHealthCheckCommand() *cobra.Command {
 				cfg.SetLogLevel()
 			}
 
-			// Always return healthy if not enabled
-			if !cfg.Service.Enabled {
-				return nil
-			}
-
 			err = nats.ConnectivityCheck(cfg)
 			if err != nil {
 				return errors.Wrap(err, "checking connectivity")

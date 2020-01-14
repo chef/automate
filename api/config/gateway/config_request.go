@@ -40,8 +40,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.Port = w.Int32(2000)
 	c.V1.Sys.Service.GrpcPort = w.Int32(2001)
 	c.V1.Sys.Service.TrialLicenseUrl = w.String(ValidTrialLicenseURLs[0])
-	c.V1.Sys.Service.Log.Level = w.String("info")      // backwards compat with old log level config
-	c.V1.Sys.Service.EnableAppsFeature = w.Bool(false) // explicitly disable experimental feature
+	c.V1.Sys.Service.Log.Level = w.String("info") // backwards compat with old log level config
 	//c.V1.Sys.Log.Level = w.String("info")
 	//c.V1.Sys.Log.Format = w.String("text")
 
