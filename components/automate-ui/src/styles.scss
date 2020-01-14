@@ -260,11 +260,9 @@ input {
   
   .mat-select-trigger {
     display: inline-block;
-
     position: absolute;
     right: 10px;
-    top: 19%; // holdover --> figure out exact spacing that is real
-
+    top: calc(50% - 16px); // subtracting half the height
     border-radius: var(--chef-border-radius);
     background-color: var(--chef-white);
     width: 32px;
