@@ -397,8 +397,8 @@ message Service {
   string group = 3;
   // Intentionally blank.
   HealthStatus health_check = 4;
-  // Intentionally blank.
-  ServiceStatus status = 5;
+  // Unused.
+  reserved 5;
   // Application name.
   string application = 6;
   // Environment name.
@@ -501,15 +501,6 @@ message PackageIdent {
 message ServiceGroups  {
   // List of service groups.
   repeated ServiceGroup service_groups = 1;
-}
-
-// The ServiceStatus enum describes the status of the service.
-// Currently unimplemented.
-enum ServiceStatus {
-  RUNNING = 0;
-  INITIALIZING = 1;
-  DEPLOYING = 2;
-  DOWN = 3;
 }
 
 // The HealthStatus enumerable matches the Chef Habitat implementation for health-check status:
