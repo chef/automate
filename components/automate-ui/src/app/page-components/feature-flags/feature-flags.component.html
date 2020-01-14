@@ -30,7 +30,7 @@
     </div>
     <div *ngIf="features.length === 0"><b>There are currently no {{ flagType }} features to select.</b></div>
     <div class="buttons">
-      <chef-button (click)="closeModal()" primary>Close</chef-button>
+      <chef-button id="cancel-button" (click)="closeModal()" primary>Close</chef-button>
     </div>
   </div>
 </div>
