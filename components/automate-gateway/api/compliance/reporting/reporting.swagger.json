@@ -368,6 +368,17 @@
         "control_summary": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
           "description": "Intentionally blank."
+        },
+        "waived_str_counts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.WaivedStrCounts"
+          },
+          "title": "An array returns how many nodes have been waived or not"
+        },
+        "waiver_data": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.WaiverData",
+          "title": "If the control has been waived, this returns the waived details"
         }
       }
     },
@@ -1228,6 +1239,40 @@
         }
       },
       "description": "A subtotal of controls."
+    },
+    "chef.automate.api.compliance.reporting.v1.WaivedStrCounts": {
+      "type": "object",
+      "properties": {
+        "waived_str": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.reporting.v1.WaiverData": {
+      "type": "object",
+      "properties": {
+        "expiration_date": {
+          "type": "string"
+        },
+        "justification": {
+          "type": "string"
+        },
+        "run": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "skipped_due_to_waiver": {
+          "type": "boolean",
+          "format": "boolean"
+        },
+        "message": {
+          "type": "string"
+        }
+      }
     },
     "google.protobuf.Any": {
       "type": "object",
