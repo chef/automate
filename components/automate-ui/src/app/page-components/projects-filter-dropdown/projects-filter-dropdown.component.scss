@@ -65,7 +65,7 @@
 
 .dropdown {
   right: -10px;
-  max-width: 250px;
+  // max-width: 250px;
   border: 1px solid $chef-grey;
   font-size: 14px;
   z-index: 3;
@@ -85,6 +85,16 @@
   }
 
   .dropdown-body {
+
+    .search-container {
+      border-bottom: 1px solid $chef-grey;
+    }
+
+    .button-container {
+      display: inline-flex;
+      padding: 9px calc(18px - 8px); // 8px accounts for global margin on buttons
+    }
+
     > span {
       display: block;
       color: $chef-dark-grey;
@@ -124,7 +134,7 @@
 
 chef-click-outside {
   chef-dropdown {
-    overflow-y: auto;
+    // overflow-y: auto;
     max-height: 325px;
   }
 }
