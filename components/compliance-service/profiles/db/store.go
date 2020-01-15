@@ -455,10 +455,18 @@ func (s *Store) ListProfilesMetadata(req ProfilesListRequest) ([]inspec.Metadata
 		sql = sql.Where(terms)
 	}
 
-	// For backwards compatibility, pagination needs to be optional. Including a value for PerPage is how a caller can opt-in to pagination.
-	if req.PerPage > 0 {
+	// For backwards compatibility, pagination needs to be optional, so only paginate when either parameter has been set.
+	if req.Page > 0 || req.PerPage > 0 {
 		perPage := uint64(req.PerPage)
-		page := uint64(req.Page)
+		page := uint64(req.Page) - 1
+
+		if req.Page < 1 {
+			page = 0
+		}
+
+		if req.PerPage < 1 {
+			perPage = 100
+		}
 
 		sql = sql.
 			Limit(perPage).

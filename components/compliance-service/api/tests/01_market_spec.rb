@@ -181,7 +181,7 @@ describe File.basename(__FILE__) do
 
   it "limits list results when per_page parameter is present" do
     actual_data = GRPC profiles, :list, Profiles::Query.new(
-      page: 0,
+      page: 1,
       per_page: 1
     )
     expected_data = {
@@ -206,7 +206,7 @@ describe File.basename(__FILE__) do
 
   it "limits list results when requesting a higher page number" do
     actual_data = GRPC profiles, :list, Profiles::Query.new(
-      page: 1,
+      page: 2,
       per_page: 1
     )
     expected_data = {
