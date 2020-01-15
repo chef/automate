@@ -10,7 +10,7 @@
 
 ### :white_check_mark: Checklist
 
-- [ ] I have read the [CONTRIBUTING document](../CONTRIBUTING.md).
+- [ ] I have read the [CONTRIBUTING document](https://github.com/chef/automate/blob/master/CONTRIBUTING.md).
 - [ ] Tests added/updated?
 - [ ] Docs added/updated?
 - [ ] All commits have been signed-off for the [Developer Certification of Origin](https://github.com/chef/chef/blob/master/CONTRIBUTING.md#developer-certification-of-origin-dco).
