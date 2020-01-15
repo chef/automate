@@ -23,7 +23,7 @@
           <app-user-form [createUserForm]="createUserForm"></app-user-form>
           <div class="line"></div>
           <div class="options">
-            <chef-button primary class="create" (click)="handleCreateUser()" [disabled]="!createUserForm.valid"
+            <chef-button primary class="create" (click)="createUser()" [disabled]="!createUserForm.valid"
               tabindex="2" data-cy="save-user">
               <ng-container *ngIf="!creatingUser">
                 <chef-icon>save</chef-icon>
@@ -40,7 +40,7 @@
       </chef-modal>
   
       <section class="page-body">
-                <app-user-table
+        <app-user-table
           [addButtonText]="addButtonText"
           [removeText]="removeText"
           [users]="users"

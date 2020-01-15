@@ -1,13 +1,14 @@
 <form [formGroup]="createUserForm">
   <chef-form-field>
     <label>
-      <span class="label">User's Full Name <span aria-hidden="true">*</span></span>
-      <input chefInput formControlName="fullname" type="text" autocomplete="off"/>
+      <span class="label">Display Name <span aria-hidden="true">*</span></span>
+      <input chefInput formControlName="displayname" type="text" autocomplete="off"/>
     </label>
-    <chef-error *ngIf="(createUserForm.get('fullname').hasError('required') || createUserForm.get('fullname').hasError('pattern')) && createUserForm.get('fullname').dirty">
-      User's Full Name is required.
+    <chef-error *ngIf="(createUserForm.get('displayname').hasError('required') || createUserForm.get('displayname').hasError('pattern')) && createUserForm.get('displayname').dirty">
+      Display name is required.
     </chef-error>
   </chef-form-field>
+  <span class="detail">Don't worry, display names can be changed later.</span>
   <chef-form-field>
     <label>
       <span class="label">Username <span aria-hidden="true">*</span></span>
