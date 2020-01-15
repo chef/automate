@@ -39,28 +39,47 @@ EOF
     systemctl start loadbalancer.service
 }
 
+# Start elasticsearch, if an S3 endpoint argument is passed in then enable it
 start_external_elasticsearch() {
-    curl -o elasticsearch.rpm https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-6.2.2.rpm
-    rpm --install elasticsearch.rpm
+  local s3_endpoint
+  local version
+  version="6.8.3"
+  s3_endpoint=$1
 
-    cat > /etc/elasticsearch/elasticsearch.yml <<EOF
+  if [ ! -f elasticsearch.rpm ]; then
+    curl -o elasticsearch.rpm "https://artifacts.elastic.co/downloads/elasticsearch/elasticsearch-${version}.rpm"
+  fi
+  rpm --install elasticsearch.rpm
+
+  adduser hab
+
+  mkdir -p /var/opt/chef-automate/backups/automate-elasticsearch-data
+  chmod -R 0777 /var/opt/chef-automate/backups
+
+  mkdir -p /var/run/elasticsearch
+  chown elasticsearch:elasticsearch /var/run/elasticsearch
+  chown -R elasticsearch:elasticsearch /usr/share/elasticsearch/
+
+  cat > /etc/elasticsearch/elasticsearch.yml <<EOF
 cluster.name: "external-network"
 network.host: 127.0.0.1
 http.port: 59200
 transport.tcp.port: "59300-59400"
 path.repo: "/var/opt/chef-automate/backups"
-
 discovery.zen.minimum_master_nodes: 1
 EOF
 
-    adduser hab
+  if [[ -n "${s3_endpoint}" ]]; then
+    echo "y" | /usr/share/elasticsearch/bin/elasticsearch-plugin install "https://artifacts.elastic.co/downloads/elasticsearch-plugins/repository-s3/repository-s3-${version}.zip"
 
-    mkdir -p /var/opt/chef-automate/backups/automate-elasticsearch-data
-    chmod -R 0777 /var/opt/chef-automate/backups
+    cat >> /etc/elasticsearch/elasticsearch.yml <<EOF
+s3.client.default.protocol: "https"
+s3.client.default.read_timeout: "50s"
+s3.client.default.max_retries: 3
+s3.client.default.use_throttle_retries: true
+s3.client.default.endpoint: "${s3_endpoint}"
+EOF
+  fi
 
-    mkdir -p /var/run/elasticsearch
-    chown elasticsearch:elasticsearch /var/run/elasticsearch
-    chown -R elasticsearch:elasticsearch /usr/share/elasticsearch/
-
-    systemctl start elasticsearch.service
+  systemctl start elasticsearch.service
 }

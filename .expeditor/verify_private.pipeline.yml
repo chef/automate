@@ -634,7 +634,7 @@ steps:
   - label: "backup to s3"
     command:
       - integration/run_test integration/tests/backup_s3.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 30
     expeditor:
       accounts:
         - aws/chef-cd
@@ -665,6 +665,22 @@ steps:
         linux:
           single-use: true
           privileged: true
+
+  - label: "backup w external es to s3"
+    command:
+      - integration/run_test integration/tests/backup_external_es_s3.sh
+    timeout_in_minutes: 30
+    expeditor:
+      accounts:
+        - aws/chef-cd
+      executor:
+        linux:
+          single-use: true
+          privileged: true
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
 
   - label: "upgrade dev -> master"
     command:
