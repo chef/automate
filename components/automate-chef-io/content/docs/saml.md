@@ -44,10 +44,10 @@ browsing session of the Chef Automate UI or until they sign out directly.
 
 ## Supported Identity Management Systems
 
-- OKTA
-- Ping
-- OneLogin
 - Office365
+- OKTA
+- OneLogin
+- Ping
 - Tivoli Federated Identity Manager
 
 ## SAML Configuration Settings

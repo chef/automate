@@ -17,7 +17,7 @@ For further questions, the team can be reached at [#auth-team](https://chefio.sl
 
 ## Supported Identity Management Systems
 
-OKTA with SAML and AD with LDAP have anecdotally been reported to be the most common configurations among our users.
+OKTA with SAML and AD with LDAP are the most common configurations among our users.
 We have also had success with the following configurations:
 
 ### SAML
@@ -36,7 +36,7 @@ We have also had success with the following configurations:
 
 - Azure AD with SAML: we cannot support SAML with Azure AD because Automate cannot consume SAML IdP metadata, which Azure relies on to rotate keys.
 - Appleconnect with SAML: invalid signature error.
-- in general, dex does not support idP initiated SSO
+- In general, dex does not support idP initiated SSO. There is a [PR](https://github.com/dexidp/dex/pull/1514) in progress to add this functionality, last updated Sep 24, 2019.
 
 ## authn-service
 

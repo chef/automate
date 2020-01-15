@@ -42,8 +42,8 @@ browsing session of the Chef Automate UI or until they sign out directly.
 
 ## Supported Identity Management Systems
 
-- Microsoft Active Directory (MSAD)
 - Azure Active Directory
+- Microsoft Active Directory (MSAD)
 
 ## Overview
 
