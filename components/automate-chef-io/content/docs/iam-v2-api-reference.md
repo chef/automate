@@ -24,7 +24,7 @@ Keep in mind the following context when exploring this API reference:
    export TOKEN=`chef-automate iam token create <your-token-name-here> --admin`
    ```
 
-2. URIs are relative to `https://<your-domain-here>/apis/iam/v2beta`, unless otherwise noted.
+2. URIs are relative to `https://<your-domain-here>/apis/iam/v2`, unless otherwise noted.
 
 3. Attach the `?pretty` query string to an endpoint to get pretty-printed output.
 
@@ -32,7 +32,7 @@ Putting all of the above information together with the `/policies` endpoint as a
 
 ```bash
 curl -sH "api-token: $TOKEN" \
-  https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies?pretty
+  https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies?pretty
 ```
 
 For those API methods that take JSON data, typically through the `create` and `update` methods,
@@ -118,14 +118,14 @@ The output for this command includes both *Chef-managed* and *Custom* policies.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies?pretty
 ```
 
 ### Getting a Policy
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies/{policy-id}?pretty
 ```
 
 ### Creating a Policy
@@ -136,7 +136,7 @@ Assuming you store the JSON content in the file "policy.json", pass the file to 
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @policy.json -X POST \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies?pretty
 ```
 
 ### Updating a Policy
@@ -148,7 +148,7 @@ The policy ID is immutable and it can only be set at creation time.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @policy.json -X PUT \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies/{policy-id}?pretty
 ```
 
 ### Deleting a Policy
@@ -157,7 +157,7 @@ Deleting a policy is permanent and cannot be undone.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X DELETE \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies/{policy-id}?pretty
 ```
 
 ## Policy Membership
@@ -191,7 +191,7 @@ POST /policies/{**id**}/members:remove | remove from the membership
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies/{policy-id}/members?pretty
 ```
 
 ### Updating All Members on a Policy
@@ -203,7 +203,7 @@ Use this HTTP request to replace the policy's membership:
 ```bash
 curl -sSH "api-token: $TOKEN" -X PUT \
 -d '{"members":["{member-id}","{member-id}","{member-id}"]}' \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies/{policy-id}/members?pretty
 ```
 
 ### Adding Members to a Policy
@@ -214,7 +214,7 @@ Ensure each `member-id` is in the correct [Member Expression]({{< relref "iam-v2
 ```bash
 curl -sSH "api-token: $TOKEN" -X POST \
 -d '{"members":["{member-id}","{member-id}"]}' \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members:add?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies/{policy-id}/members:add?pretty
 ```
 
 ### Removing Members from a Policy
@@ -226,7 +226,7 @@ The removed members will still exist within Chef Automate, but are no longer ass
 ```bash
 curl -sSH "api-token: $TOKEN" -X POST \
 -d '{"members":["{member-id}","{member-id}","{member-id}","{member-id}"]}' \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/policies/{policy-id}/members:remove?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies/{policy-id}/members:remove?pretty
 ```
 
 ## Roles
@@ -278,14 +278,14 @@ The output from this `curl` command includes both *Chef-managed* and *Custom* ro
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/roles?pretty
 ```
 
 ### Getting a Role
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/{role-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/roles/{role-id}?pretty
 ```
 
 ### Creating a Role
@@ -296,7 +296,7 @@ Assuming you store the JSON content in the file "role.json", pass the file to `c
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @role.json -X POST \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/roles?pretty
 ```
 
 ### Updating a Role
@@ -307,7 +307,7 @@ The role ID is immutable and it can only be set at creation time.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @role.json -X PUT \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/{role-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/roles/{role-id}?pretty
 ```
 
 ### Deleting a Role
@@ -316,7 +316,7 @@ Deleting a role is permanent and cannot be undone.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X DELETE \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/roles/{role-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/roles/{role-id}?pretty
 ```
 
 ## Projects
@@ -344,14 +344,14 @@ DELETE /projects/{**id**} | delete a project
 
 ```bash
 curl -sH "api-token: $TOKEN" -X GET \
-  https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects?pretty
+  https://{{< example_fqdn "automate" >}}/apis/iam/v2/projects?pretty
 ```
 
 ### Getting a Project
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/projects/{project-id}?pretty
 ```
 
 ### Creating a Project
@@ -361,7 +361,7 @@ Create a project by composing JSON with all the necessary project properties (se
 ```bash
 curl -sSH "api-token: $TOKEN" -X POST \
 -d '{"name": "Test Project", "id": "test-project-1" }' \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/projects?pretty
 ```
 
 ### Updating a Project
@@ -371,7 +371,7 @@ Remember when updating a project, the project name is the only property of a pro
 ```bash
 curl -sSH "api-token: $TOKEN" -X PUT \
 -d '{"name": "Test Role", "actions": ["compliance:*", "teams:*", "users:*"] }' \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{[project]-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/projects/{[project]-id}?pretty
 ```
 
 ### Deleting a Project
@@ -380,7 +380,7 @@ Deleting a project is permanent and cannot be undone.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X DELETE \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/projects/{project-id}?pretty
 ```
 
 ## Project Rules
@@ -461,7 +461,7 @@ The output lists all rules for a specified project.
 
 ```bash
 curl -sH "api-token: $TOKEN" -X GET \
-  https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}/rules?pretty
+  https://{{< example_fqdn "automate" >}}/apis/iam/v2/projects/{project-id}/rules?pretty
 ```
 
 ### Getting a Project Rule
@@ -470,7 +470,7 @@ This shows the details of a single project, selected by its ID.
 
 ```bash
 curl -sH "api-token: $TOKEN" -X GET \
-  https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}/rules/{rule-id}?pretty
+  https://{{< example_fqdn "automate" >}}/apis/iam/v2/projects/{project-id}/rules/{rule-id}?pretty
 ```
 
 ### Creating a Project Rule
@@ -481,7 +481,7 @@ Assuming you store the JSON content in the file "project-rule.json", pass the fi
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @project-rule.json -X POST \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}/rules?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/projects/{project-id}/rules?pretty
 ```
 
 ### Updating a Project Rule
@@ -490,7 +490,7 @@ When updating a Project Rule, supply all of a rule's properties, not just the on
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @project-rule.json -X PUT \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}/rules/{rule-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/projects/{project-id}/rules/{rule-id}?pretty
 ```
 
 ### Deleting a Project Rule
@@ -499,7 +499,7 @@ Deleting a project rule is permanent and cannot be undone.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X DELETE \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/projects/{project-id}/rules/{rule-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/projects/{project-id}/rules/{rule-id}?pretty
 ```
 
 ## Applying Rules
@@ -540,14 +540,14 @@ PUT /self/{**id**}        | update your own user
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/users?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/users?pretty
 ```
 
 ### Getting a User
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/users/{user-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/users/{user-id}?pretty
 ```
 
 ### Creating a User
@@ -558,7 +558,7 @@ Assuming you store the JSON content in the file "user.json", pass the file to `c
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @user.json -X POST \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/users?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/users?pretty
 ```
 
 ### Updating a User
@@ -569,7 +569,7 @@ The user ID is immutable and it can only be set at creation time.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @user.json -X PUT \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/users/{user-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/users/{user-id}?pretty
 ```
 
 ### Deleting a User
@@ -578,7 +578,7 @@ Deleting a user is permanent and cannot be undone.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X DELETE \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/users/{user-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/users/{user-id}?pretty
 ```
 
 ### List Teams for a User
@@ -588,7 +588,7 @@ Note, the output uses the `membership_id` property of the user instead of the us
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/users/{membership-id}/teams?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/users/{membership-id}/teams?pretty
 ```
 
 ### Updating Your Own User
@@ -599,7 +599,7 @@ Your user ID is immutable and it can only be set at creation time.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @user.json -X PUT \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/self/{user-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/self/{user-id}?pretty
 ```
 
 ## Teams
@@ -629,14 +629,14 @@ DELETE /teams/{**id**}   | delete a team
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/teams?pretty
 ```
 
 ### Getting a Team
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams/{team-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/teams/{team-id}?pretty
 ```
 
 ### Creating a Team
@@ -647,7 +647,7 @@ Assuming you store the JSON content in the file "team.json", pass the file to `c
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @team.json -X POST \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/teams?pretty
 ```
 
 ### Updating a Team
@@ -658,7 +658,7 @@ The team ID is immutable and it can only be set at creation time.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @team.json -X PUT \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams/{team-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/teams/{team-id}?pretty
 ```
 
 ### Deleting a Team
@@ -667,7 +667,7 @@ Deleting a team is permanent and cannot be undone.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X DELETE \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams/{team-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/teams/{team-id}?pretty
 ```
 
 ## Team Membership
@@ -700,7 +700,7 @@ The output lists all local users on the specified team.
 
 ```bash
 curl -sSH "api-token: $TOKEN"  -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams/{team-id}/users?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/teams/{team-id}/users?pretty
 ```
 
 ### Adding Users to a Team
@@ -708,7 +708,7 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams/{team-id}/users?pr
 ```bash
 curl -sSH "api-token: $TOKEN" -X POST \
 -d '{"user_ids":["{membership_id}","{membership_id}"]}' \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams/{team-id}/users:add?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/teams/{team-id}/users:add?pretty
 ```
 
 ### Removing Users from a Team
@@ -718,7 +718,7 @@ The removed users still exists within Chef Automate, but are no longer associate
 ```bash
 curl -sSH "api-token: $TOKEN" -X POST \
 -d '{"user_ids":["{membership_id}","{membership_id}"]}' \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/teams/{team-id}/users:remove?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/teams/{team-id}/users:remove?pretty
 ```
 
 ## Tokens
@@ -751,14 +751,14 @@ This command lists admin and non-admin tokens.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/tokens?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/tokens?pretty
 ```
 
 ### Getting a Token
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X GET \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/tokens/{token-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/tokens/{token-id}?pretty
 ```
 
 ### Creating a Token
@@ -769,7 +769,7 @@ Assuming you store the JSON content in the file "token.json", pass the file to `
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @token.json -X POST \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/tokens?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/tokens?pretty
 ```
 
 Note that this creates **non**-admin tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using `tokens:*`).
@@ -789,7 +789,7 @@ The token ID is immutable and it can only be set at creation time.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -d @token.json -X PUT \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/tokens/{token-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/tokens/{token-id}?pretty
 ```
 
 ### Deleting a Token
@@ -798,5 +798,5 @@ Deleting a token is permanent and cannot be undone.
 
 ```bash
 curl -sSH "api-token: $TOKEN" -X DELETE \
-https://{{< example_fqdn "automate" >}}/apis/iam/v2beta/tokens/{token-id}?pretty
+https://{{< example_fqdn "automate" >}}/apis/iam/v2/tokens/{token-id}?pretty
 ```

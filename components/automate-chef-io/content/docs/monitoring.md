@@ -35,7 +35,7 @@ curl -k -H "api-token: <admin-token>" -H "Content-Type: application/json" -d '{ 
 ```
 If you are using IAM v2, the command is:
 ```bash
-curl -k -H "api-token: <admin-token>" -d '{ "name": "Monitoring", "id": "monitoring", "members": [ "token:<token-id>" ], "statements": [ { "effect": "ALLOW", "actions": [ "system:status:get" ], "projects": [ "*" ] } ] }' -X POST https://automate.example.com/apis/iam/v2beta/policies?pretty
+curl -k -H "api-token: <admin-token>" -d '{ "name": "Monitoring", "id": "monitoring", "members": [ "token:<token-id>" ], "statements": [ { "effect": "ALLOW", "actions": [ "system:status:get" ], "projects": [ "*" ] } ] }' -X POST https://automate.example.com/apis/iam/v2/policies?pretty
 ```
 
 3. Test that your token and policy give you access to the `/status` endpoint by running the following command:
