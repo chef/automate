@@ -37,6 +37,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   private deletingUser = false;
   public updatingUser = false;
+  public preUrlUserId = '';
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -55,7 +56,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       filter(identity),
       takeUntil(this.isDestroyed))
       .subscribe((id: string) => {
-        this.store.dispatch(new GetUser({ id }));
+        if (this.preUrlUserId === '') {
+          this.store.dispatch(new GetUser({ id }));
+          this.preUrlUserId = id;
+        } else {
+          this.store.dispatch(new GetUser({ id: this.preUrlUserId }));
+        }
       });
 
     combineLatest([
