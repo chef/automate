@@ -5,7 +5,6 @@ test_name="ha_data_services_migrate"
 test_external_services=(ha_backend)
 test_diagnostics_filters="~purge"
 test_upgrades=true
-test_diagnostics_pre_upgrade_filters="~skip-for-deep-upgrade"
 
 CURRENT_OLDEST_VERSION=20190501153509
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
