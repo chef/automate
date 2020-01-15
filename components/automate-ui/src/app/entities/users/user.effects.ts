@@ -175,10 +175,12 @@ export class UserEffects {
   @Effect()
   createUserSuccess$ = this.actions$.pipe(
     ofType(UserActionTypes.CREATE_SUCCESS),
-    map(() => new CreateNotification({
-      type: Type.info,
-      message: 'Successfully created a new user'
-    })));
+    map(( { payload: user }: CreateUserSuccess)  =>
+      new CreateNotification({
+        type: Type.info,
+        message: `Created user: ${user.id}.`
+      })
+    ));
 
   @Effect()
   createUserFailure$ = this.actions$.pipe(
