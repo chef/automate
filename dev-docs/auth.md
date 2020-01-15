@@ -15,15 +15,28 @@ We added our own [authn-service](https://github.com/chef/authn-service) as glue 
 
 For further questions, the team can be reached at [#auth-team](https://chefio.slack.com/messages/C61F9HHKK/)
 
-## OpenID Connect aka Dex
+## Supported Identity Management Systems
 
-If you want to use google as an IdP (Identity Provider) or our internal test LDAP server, there are a few variables you can set.
+OKTA with SAML and AD with LDAP have anecdotally been reported to be the most common configurations among our users.
+We have also had success with the following configurations:
 
-To use a test OIDC provider we set up, look for `test oidc provider` on lastpass. Export the value for `Username` as `GOOGLE_CLIENT_ID` and the value for `Password` as `GOOGLE_CLIENT_SECRET`.
+### SAML
 
-For our test ldap server, look up `ldap testhost` and set `LDAP_HOST` to the `Hostname` value. Also look up `ldapbind user` and
-set `LDAP_BIND_DN` and `LDAP_BIND_PW` to the values for `Username` and `Password`, respectively.
+- OKTA
+- Ping
+- OneLogin
+- Office365
+- Tivoli Federated Identity Manager
 
+### LDAP
+
+- Microsoft Active Directory (MSAD)
+
+### Configurations with Known Issues
+
+- Azure AD with SAML: we cannot support SAML with Azure AD because Automate cannot consume SAML IdP metadata, which Azure relies on to rotate keys.
+- Appleconnect with SAML: invalid signature error.
+- in general, dex does not support idP initiated SSO
 
 ## authn-service
 
