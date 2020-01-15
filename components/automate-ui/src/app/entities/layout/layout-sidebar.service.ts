@@ -149,7 +149,7 @@ export class LayoutSidebarService {
                     },
                     {
                         name: 'Data Feeds',
-                        icon: 'notifications',
+                        icon: 'assignment',
                         route: '/settings/data-feed',
                         authorized: {
                             name: 'data_feed',
