@@ -42,6 +42,14 @@ Local, MSAD, and LDAP users will have their Chef Automate sessions refreshed whi
 browsing session of the Chef Automate UI or until they sign out directly.
 {{< /info >}}
 
+## Supported Identity Management Systems
+
+- OKTA
+- Ping
+- OneLogin
+- Office365
+- Tivoli Federated Identity Manager
+
 ## SAML Configuration Settings
 
 The SAML configuration settings are:
