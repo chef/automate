@@ -644,6 +644,10 @@ func init() {
         "health_check_result": {
           "$ref": "#/definitions/chef.automate.api.applications.HealthCheckResult",
           "description": "Intentionally blank."
+        },
+        "id": {
+          "type": "string",
+          "title": "Internal ID"
         }
       }
     },

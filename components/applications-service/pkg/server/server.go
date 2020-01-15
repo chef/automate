@@ -431,6 +431,7 @@ func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*ap
 	services := make([]*applications.Service, len(svcs))
 	for i, svc := range svcs {
 		services[i] = &applications.Service{
+			Id:                  fmt.Sprintf("%d", svc.ID),
 			SupervisorId:        svc.SupMemberID,
 			Release:             svc.FullReleaseString(),
 			Group:               svc.Group,

@@ -426,6 +426,8 @@ message Service {
   string last_event_since = 23;
   // Intentionally blank.
   HealthCheckResult health_check_result = 24;
+  // Internal ID
+  string id = 25;
 }
 
 // Request message for GetServiceGroupsHealthCounts
