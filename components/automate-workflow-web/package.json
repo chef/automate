@@ -15,7 +15,7 @@
     "angular-animate": "=1.7.9",
     "angular-clipboard": "=1.7.0",
     "angular-cookies": "=1.7.9",
-    "angular-embedly": "https://github.com/lithiumtech/angular-embedly/tarball/master",
+    "angular-embedly": "https://github.com/jaym/angular-embedly/tarball/master",
     "angular-emoji-filter": "https://github.com/globaldev/angular-emoji-filter/tarball/master",
     "angular-feature-flags": "https://github.com/mjt01/angular-feature-flags/tarball/v0.1.0",
     "angular-gravatar": "=0.4.2",
