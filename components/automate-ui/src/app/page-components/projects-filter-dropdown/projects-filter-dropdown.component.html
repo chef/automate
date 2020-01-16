@@ -15,14 +15,14 @@
 </button>
 <chef-click-outside omit="dropdown-label" (clickOutside)="handleEscape()">
   <chef-dropdown class="dropdown" id="projects-filter-dropdown" [attr.visible]="dropdownActive" (keydown.esc)="handleEscape()">
-    <!-- <span class="optgroup-label">Projects</span> -->
+    
       <div class="dropdown-body">
 
-        <div class="search-container">
-          search bar here
+        <div class="dropdown-content">
+          <input chefInput type="text" placeholder="Filter projects..." />
         </div>
 
-        <div class="button-container">
+        <div class="dropdown-content flex-row button-container">
           <chef-button
             primary
             [attr.disabled]="!optionsEdited"
@@ -37,17 +37,25 @@
           </chef-button>
         </div>
 
-        <chef-checkbox
-          *ngFor="let option of editableOptions; index as i"
-          [attr.title]="option.label"
-          [checked]="option.checked"
-          (change)="handleOptionChange($event, i)"
-          (keydown.arrowup)="handleArrowUp($event)"
-          (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}</chef-checkbox>
-        <div class="dropdown-footer">
-          <!-- <chef-button primary [attr.disabled]="!optionsEdited" (click)="handleApplyClick()" id="projects-filter-apply-changes">Apply Changes</chef-button> -->
+        <div class="dropdown-content">
+          <chef-checkbox
+            *ngFor="let option of editableOptions; index as i"
+            [attr.title]="option.label"
+            [checked]="option.checked"
+            (change)="handleOptionChange($event, i)"
+            (keydown.arrowup)="handleArrowUp($event)"
+            (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}</chef-checkbox>
         </div>
 
-      </div>
+        <div class="dropdown-content action-container">
+          <button>Create New Project</button>
+        </div>
+
+        <div class="dropdown-content action-container">
+          <button>Edit Projects</button>
+        </div>
+
+      </div> <!-- end dropdown body -->
+
   </chef-dropdown>
 </chef-click-outside>

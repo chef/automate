@@ -65,7 +65,6 @@
 
 .dropdown {
   right: -10px;
-  // max-width: 250px;
   border: 1px solid $chef-grey;
   font-size: 14px;
   z-index: 3;
@@ -86,13 +85,35 @@
 
   .dropdown-body {
 
-    .search-container {
-      border-bottom: 1px solid $chef-grey;
+    .dropdown-content {
+      display: flex;
+      flex-direction: column;
+      padding: 14px;
+
+      &.flex-row {
+        flex-direction: row;
+      }
+
+      & + .dropdown-content {
+        border-top: 1px solid $chef-grey;
+      }
     }
 
-    .button-container {
-      display: inline-flex;
-      padding: 9px calc(18px - 8px); // 8px accounts for global margin on buttons
+    .button-container { // adjust for 8px global margin on buttons
+      padding: calc(14px - 8px);
+    }
+
+
+    .action-container {
+      padding: 0px 1px; // adjust for full container buttons
+
+      button {
+        width: 100%;
+        padding: 14px;
+        text-align: left;
+        border: none;
+        cursor: pointer;
+      }
     }
 
     > span {
@@ -100,21 +121,16 @@
       color: $chef-dark-grey;
       text-transform: uppercase;
       font-size: 11px;
-      padding: 9px 18px 0;
+      padding: 9px 14px 0;
     }
 
     chef-checkbox {
       display: flex;
-      padding: 9px 18px;
       align-items: flex-start;
       font-weight: 600;
 
-      &:first-child {
-        padding-top: 18px;
-      }
-
-      &:last-child {
-        padding-bottom: 18px;
+      & + chef-checkbox {
+        padding-top: 14px;
       }
 
       ::ng-deep .label-wrap {
@@ -123,18 +139,5 @@
         white-space: nowrap;
       }
     }
-  }
-
-  .dropdown-footer {
-    display: flex;
-    justify-content: center;
-    padding: 0 8px 8px 8px;
-  }
-}
-
-chef-click-outside {
-  chef-dropdown {
-    // overflow-y: auto;
-    max-height: 325px;
   }
 }
