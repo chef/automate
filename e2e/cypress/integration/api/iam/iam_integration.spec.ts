@@ -214,6 +214,39 @@ describeIfIAMV2p1('assigning projects', () => {
       });
     });
 
+    it(`when creating ${iamResources} without any projects ` +
+      'and project assignment permission is missing for (unassigned)',  () => {
+      cy.request({
+          headers: { 'api-token': twoAllowedProjectsTok },
+          method: 'POST',
+          url: `/apis/iam/v2/${iamResources}`,
+          failOnStatusCode: false,
+          body: {
+            ...resource,
+            projects: []
+          }
+        }).then((resp) => {
+            expect(resp.status).to.equal(403);
+        });
+      });
+
+    it(`when creating ${iamResources} without projects is allowed ` +
+      'for authorizedAndUnassignedProjToken',  () => {
+      cy.request({
+        headers: { 'api-token': unassignedAndProjectAllowedTok },
+        method: 'POST',
+        url: `/apis/iam/v2/${iamResources}`,
+        failOnStatusCode: false,
+        body: {
+          ...resource,
+          projects: []
+        }
+      }).then((resp) => {
+        expect(resp.status).to.equal(200);
+        expect(resp.body.team.projects).to.have.length(0);
+      });
+    });
+
     it(`when updating ${iamResources}, fails to assign an unauthorized project`, () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },

@@ -156,48 +156,6 @@ describeIfIAMV2p1('project assignment (on object create, assign, unassign)', () 
         });
     });
 
-    it('assigning (unassigned) to authroized is allowed ' +
-        'for authorizedAndUnassignedProjToken',  () => {
-        cy.request({
-        ...authorizedAndUnassignedProjReq,
-        body: {
-            name: testObjectID,
-            projects: [authorizedProject.id]
-        }
-        }).then((resp) => {
-            expect(resp.status).to.equal(200);
-            expect(resp.body.team.projects).to.have.length(1);
-            expect(resp.body.team.projects[0]).to.equal(authorizedProject.id);
-        });
-    });
-
-    it('assigning authorized to (unassigned) is allowed ' +
-        'for authorizedAndUnassignedProjToken',  () => {
-
-        cy.request({
-            ...defaultAdminReq,
-            body: {
-                name: testObjectID,
-                projects: [authorizedProject.id]
-            }
-        }).then((resp) => {
-            expect(resp.status).to.equal(200);
-            expect(resp.body.team.projects).to.have.length(1);
-            expect(resp.body.team.projects[0]).to.equal(authorizedProject.id);
-        });
-
-        cy.request({
-            ...authorizedAndUnassignedProjReq,
-            body: {
-                name: testObjectID,
-                projects: []
-            }
-        }).then((resp) => {
-            expect(resp.status).to.equal(200);
-            expect(resp.body.team.projects).to.have.length(0);
-        });
-    });
-
     it('assigning (unassigned) to unauthorized is not allowed ' +
         'for authorizedAndUnassignedProjToken',  () => {
         cy.request({
@@ -212,7 +170,7 @@ describeIfIAMV2p1('project assignment (on object create, assign, unassign)', () 
         });
     });
 
-    it('assigning authroized to unauthorized is not allowed ' +
+    it('assigning authorized to unauthorized is not allowed ' +
         'for authorizedAndUnassignedProjToken',  () => {
         cy.request({
             ...defaultAdminReq,
@@ -238,7 +196,7 @@ describeIfIAMV2p1('project assignment (on object create, assign, unassign)', () 
         });
     });
 
-    it('assigning (unassigned) to authroized is not allowed ' +
+    it('assigning (unassigned) to authorized is not allowed ' +
         'for authorizedOnlyProjReq',  () => {
         cy.request({
             ...authorizedOnlyProjReq,
@@ -254,7 +212,7 @@ describeIfIAMV2p1('project assignment (on object create, assign, unassign)', () 
 
     // (TC) We do allow users to remove their project, even if results in unassigned and
     // they don't have iam:project:assign perms on unassigned (special case).
-    it('assigning authroized to (unassigned) is allowed ' +
+    it('assigning authorized to (unassigned) is allowed ' +
         'for authorizedOnlyProjReq (special case)',  () => {
         cy.request({
             ...defaultAdminReq,
@@ -277,33 +235,6 @@ describeIfIAMV2p1('project assignment (on object create, assign, unassign)', () 
         }).then((resp) => {
             expect(resp.status).to.equal(200);
             expect(resp.body.team.projects).to.have.length(0);
-        });
-    });
-
-    it('keeping authroized is allowed for authorizedOnlyProjReq ',  () => {
-        cy.request({
-            ...defaultAdminReq,
-            body: {
-                name: testObjectID,
-                projects: [authorizedProject.id]
-            }
-        }).then((resp) => {
-            expect(resp.status).to.equal(200);
-            expect(resp.body.team.projects).to.have.length(1);
-            expect(resp.body.team.projects[0]).to.equal(authorizedProject.id);
-        });
-
-        cy.request({
-            ...authorizedOnlyProjReq,
-            body: {
-                name: testObjectID,
-                projects: [authorizedProject.id]
-            },
-            failOnStatusCode: false
-        }).then((resp) => {
-            expect(resp.status).to.equal(200);
-            expect(resp.body.team.projects).to.have.length(1);
-            expect(resp.body.team.projects[0]).to.equal(authorizedProject.id);
         });
     });
 
@@ -413,40 +344,6 @@ describeIfIAMV2p1('project assignment (on object create, assign, unassign)', () 
             failOnStatusCode: false
         }).then((resp) => {
             expect(resp.status).to.equal(403);
-        });
-    });
-
-    it('creating an object without projects is not allowed ' +
-        'for authorizedOnlyProjReq',  () => {
-        cy.request({
-            ...authorizedOnlyProjReq,
-            body: {
-                id: `${cypressPrefix}-must-assign-${now}`,
-                name: 'broken',
-                projects: []
-            },
-            method: 'POST',
-            url: '/apis/iam/v2beta/teams',
-            failOnStatusCode: false
-        }).then((resp) => {
-            expect(resp.status).to.equal(403);
-        });
-    });
-
-    it('creating an object without projects is allowed ' +
-        'for authorizedAndUnassignedProjToken',  () => {
-        cy.request({
-            ...authorizedAndUnassignedProjReq,
-            body: {
-                id: `${cypressPrefix}-can-make-unassigned-${now}`,
-                name: 'can-make-unassigned',
-                projects: []
-            },
-            method: 'POST',
-            url: '/apis/iam/v2beta/teams'
-        }).then((resp) => {
-            expect(resp.status).to.equal(200);
-            expect(resp.body.team.projects).to.have.length(0);
         });
     });
 });
