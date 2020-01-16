@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, EventEmitter } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { IdMapper } from 'app/helpers/auth/id-mapper';
+import { UsernameMapper } from 'app/helpers/auth/username-mapper';
 
 @Component({
   selector: 'app-user-form',
@@ -41,11 +41,9 @@ export class UserFormComponent implements OnInit {
 
   handleNameInput(event: KeyboardEvent): void {
     if (!this.modifyUsername && !this.isNavigationKey(event)) {
-      console.log('in the handleName here is username' + this.createUserForm.controls.username.value);
       this.conflictError = false;
       this.createUserForm.controls.username.setValue(
-        IdMapper.transform(this.createUserForm.controls.displayname.value.trim()));
-        console.log('in the transformation here is username' + this.createUserForm.controls.username.value);
+        UsernameMapper.transform(this.createUserForm.controls.displayname.value.trim()));
     }
   }
 
