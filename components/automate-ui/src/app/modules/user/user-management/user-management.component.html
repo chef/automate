@@ -20,7 +20,11 @@
           Create User
         </h2>
         <div>
-          <app-user-form [createUserForm]="createUserForm"></app-user-form>
+          <app-user-form 
+            [createUserForm]="createUserForm"
+            [conflictErrorEvent]="conflictErrorEvent"
+            [passwordErrorEvent]="passwordErrorEvent">
+          </app-user-form>
           <div class="line"></div>
           <div class="options">
             <chef-button primary class="create" (click)="createUser()" [disabled]="!createUserForm.valid"

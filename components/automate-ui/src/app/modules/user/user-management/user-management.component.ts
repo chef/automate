@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
+import { isNil } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
@@ -10,11 +11,12 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefValidators } from 'app/helpers/auth/validator';
 import { EntityStatus, pending } from 'app/entities/entities';
-import { allUsers, getStatus, createStatus } from 'app/entities/users/user.selectors';
+import { allUsers, getStatus, createStatus, createError } from 'app/entities/users/user.selectors';
 import {
   CreateUser, DeleteUser, GetUsers, CreateUserPayload
 } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
+import { HttpStatus } from 'app/types/types';
 
 // pattern for valid usernames
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';
@@ -33,6 +35,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public isLoading = true;
   public userToDelete: User;
   public creatingUser = false;
+  // TODO maybe combine these into one smarter emitter?
+  public conflictErrorEvent = new EventEmitter<boolean>();
+  public passwordErrorEvent = new EventEmitter<boolean>();
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -89,9 +94,23 @@ export class UserManagementComponent implements OnInit, OnDestroy {
         }
       });
 
-      // TODO
-      // handle userCreate errors
-      // emit conflictErrorEvent;
+    combineLatest([
+      this.store.select(createStatus),
+      this.store.select(createError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(() => this.createModalVisible),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictErrorEvent.emit(true);
+        } else if (error.status === HttpStatus.BAD_REQUEST) {
+          this.passwordErrorEvent.emit(true);
+        } else {
+          // Close the modal on any error other than conflict and display in banner.
+          this.closeCreateModal();
+        }
+      });
   }
 
   ngOnDestroy() {
@@ -107,6 +126,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public closeCreateModal(): void {
     this.createUserForm.reset();
     this.createModalVisible = false;
+    // do we need to manually reset the errors or is reset enough?
+    // this.conflictErrorEvent.emit(false);
   }
 
   public closeDeleteModal(): void {

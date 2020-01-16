@@ -12,13 +12,16 @@
   <chef-form-field>
     <label>
       <span class="label">Username <span aria-hidden="true">*</span></span>
-      <input chefInput formControlName="username" type="text" autocomplete="off"/>
+      <input chefInput formControlName="username" type="text" autocomplete="off" (keyup)="handleUsernameInput($event)" />
     </label>
     <chef-error *ngIf="createUserForm.get('username').hasError('required') && createUserForm.get('username').dirty">
       Username is required.
     </chef-error>
     <chef-error *ngIf="createUserForm.get('username').hasError('pattern') && createUserForm.get('username').dirty">
       Only letters, numbers, and these characters (<strong>_@.+-</strong>) allowed.
+    </chef-error>
+    <chef-error *ngIf="conflictError">
+      Username "{{createUserForm.get('username').value}}" already exists.
     </chef-error>
   </chef-form-field>
   <chef-form-field>
@@ -31,6 +34,9 @@
     </chef-error>
     <chef-error *ngIf="createUserForm.get('password').hasError('minlength') && createUserForm.get('password').dirty && createUserForm.get('password').touched">
       Password must be at least 8 characters.
+    </chef-error>
+    <chef-error *ngIf="passwordError">
+      Password must contain at least 3 distinct characters.
     </chef-error>
   </chef-form-field>
   <span class="detail">Must be a minimum of 8 total characters with at least 3 distinct characters.<br>
