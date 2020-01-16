@@ -28,6 +28,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   @Output() onSelection = new EventEmitter<ProjectsFilterOption[]>();
 
   editableOptions: ProjectsFilterOption[] = [];
+  filteredOptions: ProjectsFilterOption[] = [];
 
   filterValue = '';
 
@@ -35,8 +36,8 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
 
   dropdownActive = false;
 
-  filterKeydown() {
-    this.editableOptions = this.options.filter(option =>
+  handleFilterKeyUp() {
+    this.filteredOptions = this.editableOptions.filter(option =>
       option.label.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1
     );
   }
@@ -48,7 +49,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   }
 
   resetOptions() {
-    this.editableOptions = cloneDeep(this.options);
+    this.filteredOptions = this.editableOptions = cloneDeep(this.options);
     this.optionsEdited = false;
   }
 
@@ -60,9 +61,9 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   }
 
   handleEscape(): void {
+    this.resetOptions();
     this.filterValue = '';
     this.dropdownActive = false;
-    this.resetOptions();
   }
 
   handleOptionChange(event, index) {

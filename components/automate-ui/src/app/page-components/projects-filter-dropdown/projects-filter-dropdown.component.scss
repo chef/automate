@@ -105,11 +105,11 @@
 
 
     .action-container {
-      padding: 0px 1px; // adjust for full container buttons
+      padding: 1px; // adjust for full container buttons to still see outline
 
       button {
         width: 100%;
-        padding: 14px;
+        padding: 13px; // account for the 1px from the container
         text-align: left;
         border: none;
         cursor: pointer;
@@ -142,11 +142,16 @@
 
     .no-projects {
       padding: 14px 0;
-      
+
       p {
         margin-bottom: 0;
         font-style: italic;
       }
     }
   }
+}
+
+#drop-list {
+  max-height: 365px;
+  overflow-x: scroll;
 }

@@ -24,7 +24,7 @@
             chefInput
             type="text"
             [(ngModel)]="filterValue"
-            (keyup)="filterKeydown()"
+            (keyup)="handleFilterKeyUp()"
             placeholder="Filter projects..." />
         </div>
 
@@ -44,16 +44,16 @@
           </chef-button>
         </div>
 
-        <div class="dropdown-content">
+        <div id="drop-list" class="dropdown-content">
           <chef-checkbox
-            *ngFor="let option of editableOptions; index as i"
+            *ngFor="let option of filteredOptions; index as i"
             [attr.title]="option.label"
             [checked]="option.checked"
             (change)="handleOptionChange($event, i)"
             (keydown.arrowup)="handleArrowUp($event)"
             (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}
           </chef-checkbox>
-          <div class="no-projects" *ngIf="editableOptions.length < 1">
+          <div class="no-projects" *ngIf="filteredOptions.length < 1">
             <p>No projects found.</p>
             <p>You don't have access to any projects that match your search.</p>
           </div>
