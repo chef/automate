@@ -42,6 +42,33 @@ func init() {
         ]
       }
     },
+    "/applications/delete_services_by_id": {
+      "post": {
+        "summary": "Delete the services with the given IDs",
+        "operationId": "DeleteServicesByID",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.applications.ServicesRes"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.applications.DeleteServicesByIDReq"
+            }
+          }
+        ],
+        "tags": [
+          "service_groups"
+        ]
+      }
+    },
     "/applications/disconnected_services": {
       "get": {
         "summary": "Mark Services as Disconnected",
@@ -477,6 +504,18 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.applications.DeleteServicesByIDReq": {
+      "type": "object",
+      "properties": {
+        "ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "List of the database IDs of the services to be deleted."
+        }
+      }
+    },
     "chef.automate.api.applications.DisconnectedServicesReq": {
       "type": "object",
       "properties": {

@@ -335,6 +335,11 @@ func (app *ApplicationsServer) DeleteDisconnectedServices(ctx context.Context,
 	}, nil
 }
 
+func (app *ApplicationsServer) DeleteServicesByID(ctx context.Context,
+	request *applications.DeleteServicesByIDReq) (*applications.ServicesRes, error) {
+	return &applications.ServicesRes{}, nil
+}
+
 func (app *ApplicationsServer) MarkDisconnectedServices(thresholdSeconds int32) ([]*applications.Service, error) {
 	svcs, err := app.storageClient.MarkDisconnectedServices(thresholdSeconds)
 	if err != nil {

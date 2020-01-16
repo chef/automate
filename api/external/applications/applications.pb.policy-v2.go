@@ -52,6 +52,9 @@ func init() {
 	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/DeleteDisconnectedServices", "applications:serviceGroups", "applications:serviceGroups:delete", "POST", "/applications/delete_disconnected_services", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
+	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/DeleteServicesByID", "applications:serviceGroups", "applications:serviceGroups:delete", "POST", "/applications/delete_services_by_id", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 	policyv2.MapMethodTo("/chef.automate.api.applications.ApplicationsService/GetVersion", "system:service:version", "system:serviceVersion:get", "GET", "/applications/version", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})

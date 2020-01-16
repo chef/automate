@@ -172,6 +172,24 @@ service ApplicationsService {
 			tags: "service_groups";
 		};
   };
+
+
+  /*
+  Delete the services with the given IDs
+  */
+  rpc DeleteServicesByID(DeleteServicesByIDReq) returns (ServicesRes ) {
+    option (google.api.http) = {
+      post: "/applications/delete_services_by_id"
+      body: "*"
+    };
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "delete";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:delete";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "service_groups";
+		};
+  };
   /*
   Show Version
 
@@ -348,6 +366,10 @@ message DisconnectedServicesReq {
   int32 threshold_seconds = 2;
 }
 
+message DeleteServicesByIDReq {
+  // List of the database IDs of the services to be deleted.
+  repeated string ids = 1;
+}
 // Request message for ServicesStats.
 message ServicesStatsReq {
 }
