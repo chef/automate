@@ -3,7 +3,7 @@ import { cloneDeep } from 'lodash/fp';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 
-const { ALL_PROJECTS_LABEL, MULTIPLE_PROJECTS_LABEL } = ProjectConstants;
+const { ALL_PROJECTS_LABEL } = ProjectConstants;
 
 @Component({
   selector: 'app-projects-filter-dropdown',
@@ -73,17 +73,17 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   }
 
   updateSelectionCount(): void {
-    this.selectionCount = this.editableOptions.filter( option => option.checked ).length;
-    console.log(this.selectionCount);
-    if (this.selectionCount > 0) {
-      this.selectionLabel = MULTIPLE_PROJECTS_LABEL;
-      this.selectionCountVisible = true;
-      this.selectionCountActive = true;
-    } else {
-      this.selectionLabel = ALL_PROJECTS_LABEL;
-      this.selectionCountVisible = false;
-      this.selectionCountActive = false;
-    }
+    // this.selectionCount = this.editableOptions.filter( option => option.checked ).length;
+    // console.log(this.selectionCount);
+    // if (this.selectionCount > 0) {
+    //   this.selectionLabel = MULTIPLE_PROJECTS_LABEL;
+    //   this.selectionCountVisible = true;
+    //   this.selectionCountActive = true;
+    // } else {
+    //   this.selectionLabel = ALL_PROJECTS_LABEL;
+    //   this.selectionCountVisible = false;
+    //   this.selectionCountActive = false;
+    // }
   }
 
   handleApplySelection() {

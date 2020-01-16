@@ -61,6 +61,7 @@ export function projectsFilterReducer(
     case ProjectsFilterActionTypes.LOAD_OPTIONS_SUCCESS: {
       const mergedOptions = mergeOptions(action.payload.fetched, action.payload.restored);
       const sortedOptions = sortOptions(mergedOptions);
+      console.log(sortedOptions);
       return pipe(
         set('options', sortedOptions),
         set('optionsLoadingStatus', EntityStatus.loadingSuccess),
@@ -186,13 +187,13 @@ function mergeOptions(
 }
 
 function sortOptions(options: ProjectsFilterOption[]): ProjectsFilterOption[] {
-  // Sort all except unassigned, which should always be last
+  // Sort all except unassigned, which should always be first
   const sorted = options.filter(o => o.value !== UNASSIGNED_PROJECT_ID);
   ChefSorters.naturalSort(sorted, 'label');
 
   const unassignedProject = find(['value', UNASSIGNED_PROJECT_ID], options);
   if (unassignedProject) {
-    sorted.push(unassignedProject);
+    sorted.unshift(unassignedProject);
   }
 
   return sorted;
