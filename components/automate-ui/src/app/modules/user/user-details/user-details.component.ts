@@ -5,6 +5,8 @@ import { Store, select } from '@ngrx/store';
 import { combineLatest, Subject, Observable } from 'rxjs';
 import { filter, pluck, takeUntil, map } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
+
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefValidators } from 'app/helpers/auth/validator';
 import { routeURL, routeParams } from 'app/route.selectors';
@@ -43,7 +45,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private layoutFacade: LayoutFacadeService
   ) {
     this.createForms(this.fb);
     }
@@ -76,6 +79,12 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe((data: { isNonAdmin: boolean }) => {
         this.isAdminView = !data.isNonAdmin;
+
+        if (this.isAdminView) {
+          this.layoutFacade.showSettingsSidebar();
+        } else {
+          this.layoutFacade.showUserProfileSidebar();
+        }
 
         // Update the forms once this info has come in
         this.createForms(this.fb);
