@@ -256,6 +256,10 @@ input {
     background: $chef-primary-bright;
     color: $chef-white;
   }
+
+  &:hover:not(.mat-option-disabled):not(.mat-active) {
+    background: lighten($chef-primary-bright, 15%);
+  }
 }
 
 [panelclass="chef-control-menu-x"] {
