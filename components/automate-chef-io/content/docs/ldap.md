@@ -40,6 +40,11 @@ Local, MSAD, and LDAP users will have their Chef Automate sessions refreshed whi
 browsing session of the Chef Automate UI or until they sign out directly.
 {{< /info >}}
 
+## Supported Identity Management Systems
+
+- Azure Active Directory
+- Microsoft Active Directory (MSAD)
+
 ## Overview
 
 This is documentation for configuring Chef Automate's Lightweight Directory Application Protocol (LDAP) and Microsoft Active Directory (MSAD) integrations. LDAP is an established and open standard protocol for interacting with directory servers. A directory server stores information--in this case information for authenticating and authorizing users--in a tree of entries. (It is not a relational database.)
