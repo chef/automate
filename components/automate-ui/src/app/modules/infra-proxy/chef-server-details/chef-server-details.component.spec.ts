@@ -3,13 +3,12 @@ import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { ChefServerDetailsComponent } from './chef-server-details.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
-import { CommonModule }  from '@angular/common';
-import { BrowserModule } from '@angular/platform-browser';
-import { ReactiveFormsModule, FormsModule, FormBuilder } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
+
 import { Org } from 'app/entities/orgs/org.model';
-import { CreateOrgSuccess, CreateOrgFailure } from 'app/entities/orgs/org.actions';
+import { CreateOrgFailure } from 'app/entities/orgs/org.actions';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
@@ -20,15 +19,14 @@ describe('ChefServerDetailsComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      imports: [
-        CommonModule,
-        BrowserModule,
-        ReactiveFormsModule,
-        FormsModule,
-        RouterTestingModule,
-        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
-      ],
       declarations: [
+        MockComponent({
+          selector: 'app-create-org-modal',
+          inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
+          outputs: ['close', 'createClicked']
+          }),
+        MockComponent({ selector: 'chef-button',
+          inputs: ['disabled', 'routerLink'] }),
         MockComponent({ selector: 'chef-control-menu' }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
@@ -53,6 +51,12 @@ describe('ChefServerDetailsComponent', () => {
       providers: [
         FeatureFlagsService
       ],
+      imports: [
+        FormsModule,
+        ReactiveFormsModule,
+        RouterTestingModule,
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+      ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     })
     .compileComponents();
@@ -62,18 +66,6 @@ describe('ChefServerDetailsComponent', () => {
     fixture = TestBed.createComponent(ChefServerDetailsComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    component.updateServerForm = new FormBuilder().group({
-      name: ['', null],
-      description: ['', null],
-      fqdn: ['', null],
-      ip_address: ['', null]
-    });
-
-    component.orgForm = new FormBuilder().group({
-      name: ['', null],
-      admin_user: ['', null],
-      admin_key: ['', null]
-    });
   });
 
   it('should create', () => {
@@ -101,22 +93,9 @@ describe('ChefServerDetailsComponent', () => {
 
     it('opening create modal resets name, description, fqdn and ip_address to empty string', () => {
       component.openCreateModal('create');
-      expect(component.orgForm.controls['name'].value).toEqual('');
-      expect(component.orgForm.controls['admin_user'].value).toEqual('')
-      expect(component.orgForm.controls['admin_key'].value).toEqual('')
-    });
-
-    it('on success, closes modal and adds new server', () => {
-      component.orgForm.controls['name'].setValue(org.name);
-      component.orgForm.controls['admin_user'].setValue(org.admin_user);
-      component.orgForm.controls['admin_key'].setValue(org.admin_key);
-      component.createServerOrg();
-
-      store.dispatch(new CreateOrgSuccess({'org': org}));
-
-      component.orgs.map(orgs => {
-        expect(orgs).toContain(org);
-      });
+      expect(component.orgForm.controls['name'].value).toBe('');
+      expect(component.orgForm.controls['admin_user'].value).toBe('');
+      expect(component.orgForm.controls['admin_key'].value).toBe('');
     });
 
     it('on conflict error, modal is open with conflict error', () => {
