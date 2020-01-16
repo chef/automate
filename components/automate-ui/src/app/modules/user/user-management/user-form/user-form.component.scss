@@ -16,4 +16,12 @@ form {
     color: $chef-primary-dark;
     font-size: 12px;
   }
+
+  #username-fields {
+    font-size: 0.75em;
+
+    .key-label {
+      font-weight: bold;
+    }
+  }
 }

@@ -126,7 +126,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public closeCreateModal(): void {
     this.createUserForm.reset();
     this.createModalVisible = false;
-    // do we need to manually reset the errors or is reset enough?
+    // TODO reset errors(conflict, pswd)/modifyUsername on close
     // this.conflictErrorEvent.emit(false);
   }
 
