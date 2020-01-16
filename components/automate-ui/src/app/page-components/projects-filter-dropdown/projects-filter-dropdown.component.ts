@@ -33,6 +33,13 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
 
   dropdownActive = false;
 
+  filterKeydown(input: string) {
+    this.editableOptions = this.options.filter( option =>
+      option.label.toLowerCase().indexOf(input.toLowerCase()) > -1
+    );
+    // console.log(this.filteredOptions);
+  }
+
   ngOnChanges(changes) {
     if (changes.options && !this.optionsEdited) {
       this.resetOptions();

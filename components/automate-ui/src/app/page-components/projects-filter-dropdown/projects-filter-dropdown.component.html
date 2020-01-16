@@ -15,11 +15,17 @@
 </button>
 <chef-click-outside omit="dropdown-label" (clickOutside)="handleEscape()">
   <chef-dropdown class="dropdown" id="projects-filter-dropdown" [attr.visible]="dropdownActive" (keydown.esc)="handleEscape()">
-    
+
       <div class="dropdown-body">
 
         <div class="dropdown-content">
-          <input chefInput type="text" placeholder="Filter projects..." />
+          <!-- @TODO turn this into reusable Filter Input component -->
+          <input 
+            chefInput
+            #filterInput
+            type="text"
+            (keyup)=filterKeydown(filterInput.value);
+            placeholder="Filter projects..." />
         </div>
 
         <div class="dropdown-content flex-row button-container">
