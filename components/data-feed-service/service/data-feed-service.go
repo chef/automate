@@ -128,7 +128,6 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 
 func handleSendErr(notification datafeedNotification, startTime time.Time, endTime time.Time, err error) {
 	log.Errorf("Failed to send notification to %v. Start: %v, End: %v. %v", notification.url, startTime, endTime, err)
-	// TODO report this failure to the UI with the time window and notification details
 }
 
 func GetCredentials(ctx context.Context, client secrets.SecretsServiceClient, secretID string) (string, string, error) {
@@ -331,7 +330,6 @@ func buildWindowsJson(windowsJson map[string]interface{}) map[string]interface{}
 	windowsJson["os_service_pack"] = servicePack
 
 	//delete(windowsJson, "kernel")
-	// TODO we could get the chassis from the kernel attributes
 
 	return windowsJson
 }
