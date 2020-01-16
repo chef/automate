@@ -28,7 +28,7 @@
 # Options:
 #    -o or --one-line     output each entity on one-line
 #    -s or --show         show the executed curl command
-#    -2 or --v2           use IAM V2 endpoints
+#    -1 or --v1           use IAM V1 endpoints (default is V2)
 #    -p or --projects     project filter; a comma-separate list as a single argument
 #
 # Examples:
@@ -36,7 +36,7 @@
 #     a2 --one users
 #     a2 -s users name bob
 #     a2 -o --show users name bob
-#     a2 --v2 -o --show -p proj1,proj2 roles
+#     a2 --v1 -o --show -p proj1,proj2 roles
 #
 # To run on a different environment you can adjust the env vars for a single invocation. Example:
 # TARGET_HOST=https://fresh-install-dev.cd.chef.co TOK=stVpD9I23OFn_U2OME= a2 -s policies
@@ -53,13 +53,13 @@ authQuery () {
   # process options
   jq_option=
   show_cmd=
-  auth_path="api/v0/auth"
+  auth_path="apis/iam/v2"
   projects=""
   while [[ "$1" =~ ^- ]]; do
     case "$1" in
       -o|--one-line) jq_option="-c"; shift;;
       -s|--show) show_cmd=1; shift;;
-      -2|--v2) auth_path="apis/iam/v2beta"; shift;;
+      -1|--v1) auth_path="api/v0/auth"; shift;;
       -p|--projects) projects="projects: $2"; shift 2;;
       -*) echo "'$1' unknown"; return 1;;
     esac
@@ -93,7 +93,7 @@ authQuery () {
 # Options:
 #    -s or --show         show the executed curl commands
 #    -d or --dry-run      show the curl commands but do not execute them
-#    -2 or --v2           use IAM V2 endpoints
+#    -1 or --v1           use IAM V1 endpoints (default is V2)
 #
 # Example:
 #    authLoad teams captured/teams-from-acceptance.txt
@@ -102,12 +102,12 @@ authLoad() {
   # process options
   dry_run=
   show_cmd=
-  auth_path="api/v0/auth"
+  auth_path="apis/iam/v2"
   while [[ "$1" =~ ^- ]]; do
     case "$1" in
       -s|--show) show_cmd=1; shift;;
       -d|--dry-run) dry_run=1; shift;;
-      -2|--v2) auth_path="apis/iam/v2beta"; shift;;
+      -1|--v1) auth_path="api/v0/auth"; shift;;
       -*) echo "'$1' unknown"; return 1;;
     esac
   done
@@ -163,16 +163,16 @@ authLoad() {
 #         $ authGen policies delete 100 501
 #
 # Options:
-#    -2 or --v2           use IAM V2 endpoints
+#    -1 or --v1           use IAM V1 endpoints (default is V2)
 #
 # TODO: Except for common things (e.g. teams) this supports only IAM v1 so far.
 #
 authGen() {
   # process options
-  auth_path="api/v0/auth"
+  auth_path="apis/iam/v2"
   while [[ "$1" =~ ^- ]]; do
     case "$1" in
-      -2|--v2) auth_path="apis/iam/v2beta"; shift;;
+      -1|--v1) auth_path="api/v0/auth"; shift;;
       -*) echo "'$1' unknown"; return 1;;
     esac
   done
