@@ -174,7 +174,7 @@ export const defaultInitialState = {
   roles: roleEntity.RoleEntityInitialState,
   rules: ruleEntity.RuleEntityInitialState,
   servers: serverEntity.ServerEntityInitialState,
-  orgs: orgEntity.orgEntityAdapter.getInitialState,
+  orgs: orgEntity.OrgEntityInitialState,
   serviceGroups: serviceGroups.ServiceGroupEntityInitialState,
   teams: teamEntity.TeamEntityInitialState,
   userperms: permEntity.initialState,
