@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, EventEmitter } from '@angular/core';
+import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { UsernameMapper } from 'app/helpers/auth/username-mapper';
 
@@ -11,6 +11,9 @@ export class UserFormComponent implements OnInit {
   @Input() createUserForm: FormGroup;
   @Input() conflictErrorEvent: EventEmitter<boolean>;
   @Input() passwordErrorEvent: EventEmitter<boolean>;
+  @Input() closeEvent: EventEmitter<any>;
+
+  @Output() close = new EventEmitter();
 
   public conflictError = false;
   public passwordError = false;
@@ -45,6 +48,11 @@ export class UserFormComponent implements OnInit {
       this.createUserForm.controls.username.setValue(
         UsernameMapper.transform(this.createUserForm.controls.displayname.value.trim()));
     }
+  }
+
+  handleClose(): void {
+    this.modifyUsername = false;
+    this.close.emit();
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {

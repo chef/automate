@@ -38,6 +38,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   // TODO maybe combine these into one smarter emitter?
   public conflictErrorEvent = new EventEmitter<boolean>();
   public passwordErrorEvent = new EventEmitter<boolean>();
+  public closeEvent = new EventEmitter();
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -126,8 +127,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public closeCreateModal(): void {
     this.createUserForm.reset();
     this.createModalVisible = false;
-    // TODO reset errors(conflict, pswd)/modifyUsername on close
-    // this.conflictErrorEvent.emit(false);
+    this.conflictErrorEvent.emit(false);
+    this.passwordErrorEvent.emit(false);
+    this.closeEvent.emit();
   }
 
   public closeDeleteModal(): void {
