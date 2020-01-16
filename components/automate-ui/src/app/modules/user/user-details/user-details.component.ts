@@ -2,26 +2,25 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { combineLatest, Subject } from 'rxjs';
-import { filter, pluck, takeUntil } from 'rxjs/operators';
+import { combineLatest, Subject, Observable } from 'rxjs';
+import { filter, pluck, takeUntil, map } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
-
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefValidators } from 'app/helpers/auth/validator';
-import { routeParams } from 'app/route.selectors';
+import { routeURL, routeParams } from 'app/route.selectors';
 import { EntityStatus, loading } from 'app/entities/entities';
 import {
-  DeleteUser,
   GetUser,
   UpdateUser,
   UpdateSelf
  } from 'app/entities/users/user.actions';
 import {
-  getStatus, userFromRoute, updateStatus, deleteStatus
+  getStatus, userFromRoute, updateStatus
 } from 'app/entities/users/user.selectors';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
+
+export type UserTabName = 'password' | 'details';
 
 @Component({
   selector: 'app-user-details',
@@ -31,19 +30,20 @@ import { Regex } from 'app/helpers/auth/regex';
 export class UserDetailsComponent implements OnInit, OnDestroy {
   public isAdminView = false;
   public user: User;
-  public modalVisible = false;
   public editForm: FormGroup;
   public passwordForm: FormGroup;
   private isDestroyed = new Subject<boolean>();
-  private deletingUser = false;
   public updatingUser = false;
+  public tabValue: UserTabName = 'details';
+  private url: string;
+  public saveSuccessful = false;
+  public loadingGetUser$: Observable<boolean>;
 
   constructor(
     private store: Store<NgrxStateAtom>,
     private router: Router,
     private route: ActivatedRoute,
-    private fb: FormBuilder,
-    private layoutFacade: LayoutFacadeService
+    private fb: FormBuilder
   ) {
     this.createForms(this.fb);
     }
@@ -58,26 +58,24 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         this.store.dispatch(new GetUser({ id }));
       });
 
+    this.loadingGetUser$ = this.store.select(getStatus).pipe(
+        map((status: EntityStatus) =>  status !== EntityStatus.loadingSuccess));
+
     combineLatest([
-      this.store.select(getStatus),
+      this.loadingGetUser$,
       this.store.select(userFromRoute)
     ]).pipe(
-      filter(([status, user]) => status === EntityStatus.loadingSuccess && !isNil(user)),
+      filter(([loadingGetUser, user]) => !loadingGetUser && !isNil(user)),
       takeUntil(this.isDestroyed))
       .subscribe(([_, user]) => {
         this.user = { ...user };
+        this.editForm.patchValue({displayName: this.user.name});
       });
 
     this.route.data.pipe(
       takeUntil(this.isDestroyed))
       .subscribe((data: { isNonAdmin: boolean }) => {
         this.isAdminView = !data.isNonAdmin;
-
-        if (this.isAdminView) {
-          this.layoutFacade.showSettingsSidebar();
-        } else {
-          this.layoutFacade.showUserProfileSidebar();
-        }
 
         // Update the forms once this info has come in
         this.createForms(this.fb);
@@ -87,23 +85,21 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.store.select(updateStatus).pipe(
       takeUntil(this.isDestroyed),
       filter(status => this.updatingUser && !loading(status)))
-      .subscribe(() => {
+      .subscribe((status) => {
         this.updatingUser = false;
         // same status is used for updating password or full name, so we just reset both
-        this.resetForms();
+        this.saveSuccessful = (status === EntityStatus.loadingSuccess);
+        if (this.saveSuccessful) {
+          this.resetForms();
+        }
       });
 
-    this.store.pipe(
-      select(deleteStatus),
-      takeUntil(this.isDestroyed),
-      filter(status => this.deletingUser && !loading(status)))
-      .subscribe((status) => {
-        this.deletingUser = false;
-        this.closeDeleteConfirmationModal();
-        if (status === EntityStatus.loadingSuccess) {
-          this.router.navigate(['/settings', 'users']);
-        }
-    });
+    this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
+      .subscribe((url: string) => {
+        this.url = url;
+        const [, fragment] = url.split('#');
+        this.tabValue = (fragment === 'password') ? 'password' : 'details';
+      });
   }
 
   ngOnDestroy(): void {
@@ -114,10 +110,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   private createForms(fb: FormBuilder): void {
     // Must stay in sync with error checks in user-details.component.html
     this.editForm = fb.group({
-      fullName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+      displayName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     this.passwordForm = fb.group({
-      oldPassword: ['', [ChefValidators.nonAdminLengthValidator(this.isAdminView, 8)]],
       newPassword: ['',
         [Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
@@ -129,37 +124,23 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   private resetForms(): void {
     this.editForm.reset();
-    this.updatingUser = false;
+    if (this.user) {
+      this.editForm.patchValue({displayName: this.user.name});
+    }
     this.passwordForm.reset();
   }
 
   public savePassword(): void {
-    if (this.isAdminView) {
-      this.savePasswordForUser();
-    } else {
-      this.savePasswordForSelf();
-    }
-  }
-
-  private savePasswordForUser(): void {
+    this.updatingUser = true;
+    this.saveSuccessful = false;
     const password = this.passwordForm.get('newPassword').value;
     this.store.dispatch(new UpdateUser({ ...this.user, password }));
   }
 
-  private savePasswordForSelf(): void {
-    const password = this.passwordForm.get('newPassword').value;
-    const previous_password = this.passwordForm.get('oldPassword').value;
-    this.store.dispatch(new UpdateSelf({
-      id: this.user.id,
-      name: this.user.name,
-      membership_id: this.user.membership_id,
-      password: password,
-      previous_password: previous_password
-    }));
-  }
-
-  public saveFullName(): void {
-    const name = this.editForm.get('fullName').value.trim();
+  public saveDisplayName(): void {
+    this.saveSuccessful = false;
+    this.updatingUser = true;
+    const name = this.editForm.get('displayName').value.trim();
     this.store.dispatch(
       this.isAdminView ?
         new UpdateUser({ ...this.user, name })
@@ -170,21 +151,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         }));
   }
 
-  public openDeleteConfirmationModal(): void {
-    this.modalVisible = true;
-  }
-
-  public closeDeleteConfirmationModal(): void {
-    this.modalVisible = false;
-  }
-
-  public deleteUser(): void {
-    this.deletingUser = true;
-    this.store.dispatch(new DeleteUser(this.user));
-  }
-
-  public setUpdatingUser(status: boolean): void {
-    this.editForm.patchValue({fullName: this.user.name});
-    this.updatingUser = status;
+  public onSelectedTab(event: { target: { value: UserTabName } }): void {
+    this.tabValue = event.target.value;
+    // Drop the previous fragment and add the incoming fragment.
+    this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 }

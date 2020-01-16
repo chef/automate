@@ -1,14 +1,6 @@
 <div class="content-container">
   <div class="container">
     <main *ngIf="isAdminView || user?.id">
-      <app-delete-object-modal
-      [visible]="modalVisible"
-      objectNoun="user"
-      [objectName]="user?.name"
-      (close)="closeDeleteConfirmationModal()"
-      (deleteClicked)="deleteUser()"
-      objectAction="Delete">
-      </app-delete-object-modal>
       <chef-breadcrumbs *ngIf="isAdminView">
         <chef-breadcrumb [link]="['/settings/users']">Users</chef-breadcrumb>
         {{ user?.name }}
@@ -17,77 +9,39 @@
       <chef-page-header>
         <div class="detail-row">
           <div class="name-column">
-            <ng-container *ngIf="!updatingUser">
-              <div class="display3">{{ user?.name }}</div>
-            </ng-container>
-            <ng-container *ngIf="updatingUser">
-              <form [formGroup]="editForm">
-                <chef-form-field class="display3">
-                  <label>
-                    <span class="label">Full Name <span aria-hidden="true">*</span></span>
-                    <input chefInput formControlName="fullName"/>
-                  </label>
-                  <chef-error
-                    *ngIf="(editForm.get('fullName').hasError('required') || editForm.get('fullName').hasError('pattern')) && editForm.get('fullName').dirty">
-                    Full Name is required.
-                  </chef-error>
-                </chef-form-field>
-              </form>
-            </ng-container>
-            <div class="container-big-header inline-container">
-              <span class="text"> {{ user?.id }}</span>
-            </div>
-          </div>
-          <div class="button-column">
-            <ng-container *ngIf="!updatingUser">
-              <app-authorized [allOf]="[['/auth/users/{username}', 'put', user?.id], ['/iam/v2/users/{username}', 'put', user?.id],
-                ['/auth/users/{username}', 'get', user?.id], ['/iam/v2/users/{username}', 'get', user?.id]]">
-                <chef-button secondary class="edit-button" (click)="setUpdatingUser(true)">
-                  <chef-icon>mode_edit</chef-icon>
-                  <span>Edit</span>
-                </chef-button>
-              </app-authorized>
-              <app-authorized [allOf]="[['/auth/users/{username}', 'delete', user?.id], ['/iam/v2/users/{username}', 'delete', user?.id],
-                ['/auth/users/{username}', 'get', user?.id], ['/iam/v2/users/{username}', 'get', user?.id]]">
-                <chef-button *ngIf="isAdminView" secondary caution class="delete-button"
-                  (click)="openDeleteConfirmationModal()">
-                  <chef-icon>delete</chef-icon>
-                  <span>Delete user</span>
-                </chef-button>
-              </app-authorized>
-            </ng-container>
-            <ng-container *ngIf="updatingUser">
-              <chef-button primary class="save-button" [disabled]="!editForm.valid || !editForm.dirty"
-                (click)="saveFullName()">
-                <span>Save</span>
-              </chef-button>
-              <chef-button tertiary (click)="setUpdatingUser(false)">Cancel</chef-button>
-            </ng-container>
+            <div class="header-user-name" *ngIf="!isAdminView">Profile: {{ user?.name }}</div>
+            <div class="header-user-name" *ngIf="isAdminView">{{ user?.name }}</div>
+            <div class="header-user-id-label">Username</div>
+            <div class="header-user-id">{{ user?.id }}</div>
           </div>
         </div>
-        <chef-tab-selector>
-          <chef-option value='password'>Password</chef-option>
+        <chef-tab-selector (change)="onSelectedTab($event)" [value]="tabValue">
+          <chef-option value='details'>Details</chef-option>
+          <chef-option value='password'>Reset Password</chef-option>
         </chef-tab-selector>
       </chef-page-header>
-      <section class="page-body">
-        <div *ngIf="!isAdminView" id="password-description">
-          Update your password below. It must have a minimum of 8 characters and contain at least 3 distinct characters.
-        </div>
-        <form [formGroup]="passwordForm">
-          <chef-form-field *ngIf="!isAdminView" class="password">
-            <label>
-              <span class="label">Old Password <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="oldPassword" type="password"/>
-            </label>
+      <section class="page-body" *ngIf="tabValue === 'details'">
+        <form [formGroup]="editForm">
+          <chef-form-field>
+            <label>Display Name<span aria-hidden="true">*</span></label>
+            <input chefInput formControlName="displayName" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
+              data-cy="team-details-name-input">
             <chef-error
-              *ngIf="passwordForm.get('oldPassword').hasError('required') && passwordForm.get('oldPassword').dirty">
-              Old Password is required.
-            </chef-error>
-            <chef-error
-              *ngIf="passwordForm.get('oldPassword').hasError('minlength') && passwordForm.get('oldPassword').dirty">
-              Old Password must be at least 8 characters.
+              *ngIf="(editForm.get('displayName').hasError('required') || editForm.get('displayName').hasError('pattern')) && editForm.get('displayName').dirty">
+              Display Name is required.
             </chef-error>
           </chef-form-field>
+        </form>
+        <chef-button [disabled]="(loadingGetUser$ | async) || !editForm.valid || !editForm.dirty" primary inline
+          (click)="saveDisplayName()" data-cy="user-details-submit-button">
+          <chef-loading-spinner *ngIf="updatingUser"></chef-loading-spinner>
+          <span *ngIf="updatingUser">Saving...</span>
+          <span *ngIf="!updatingUser">Save</span>
+        </chef-button>
+        <span id="saved-note" *ngIf="saveSuccessful && !editForm.dirty">All changes saved.</span>
+      </section>
+      <section class="page-body" *ngIf="tabValue === 'password'">
+        <form [formGroup]="passwordForm">
           <chef-form-field class="password">
             <label>
               <span class="label">New Password <span aria-hidden="true">*</span></span>
@@ -102,6 +56,10 @@
               New Password must be at least 8 characters.
             </chef-error>
           </chef-form-field>
+          <p class="password-description">
+            Must be a minimum of 8 total characters with at least 3 distinct characters. <br/>
+            May include both upper and lower case letters, punctuation marks, and symbols.
+          </p>
           <chef-form-field class="password">
             <label>
               <span class="label">Confirm New Password <span aria-hidden="true">*</span></span>
@@ -112,10 +70,10 @@
               Passwords must match.
             </chef-error>
           </chef-form-field>
-          <chef-button [disabled]="!passwordForm.valid" class="update-password-button" primary (click)="savePassword()">
-            <span>Update Password</span>
-          </chef-button>
         </form>
+        <chef-button [disabled]="!passwordForm.valid" class="update-password-button" primary (click)="savePassword()">
+          <span>Reset Password</span>
+        </chef-button>
       </section>
     </main>
   </div>

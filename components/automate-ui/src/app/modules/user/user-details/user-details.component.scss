@@ -19,7 +19,7 @@
 }
 
 .password {
-  width: 450px;
+  width: 312px;
 }
 
 chef-form-field:first-child.password label {
@@ -35,8 +35,81 @@ chef-form-field:not(:first-child).password label {
   margin-top: 20px;
 }
 
+.password-description {
+  padding-top: 5px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #222435;
+}
+
 chef-page-header {
   // This is because the Password selector is sitting
   // right above the content below the header.
   padding-bottom: 0;
+}
+
+.header-user-name {
+  font-family: Muli;
+  font-size: 18px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.33;
+  letter-spacing: 0.23px;
+  color: #222435;
+  padding-bottom: 20px;
+}
+
+.header-user-id-label {
+  font-family: Muli;
+  font-size: 14px;
+  font-weight: bold;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: 0.2px;
+  color: #222435;
+}
+
+.header-user-id {
+  height: 21px;
+  font-family: Muli;
+  font-size: 14px;
+  font-weight: normal;
+  font-stretch: normal;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: 0.2px;
+  color: #222435;
+}
+
+section {
+  span#saved-note {
+    display: inline-block;
+    margin-top: 5px;
+    font-size: 12px;
+  }
+
+  chef-form-field {
+    width: 310px;
+  }
+
+  chef-button {
+    margin-top: 0;
+    margin-left: 0;
+  }
+
+  form {
+    margin-bottom: 38px;
+  }
+
+  .empty-state {
+    text-align: center;
+
+    p {
+      font-size: 18px;
+      font-weight: 400;
+      margin-top: 42px;
+    }
+  }
 }

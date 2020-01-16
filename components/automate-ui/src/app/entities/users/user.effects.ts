@@ -99,9 +99,9 @@ export class UserEffects {
   @Effect()
   updateUserSuccess$ = this.actions$.pipe(
     ofType(UserActionTypes.UPDATE_SUCCESS),
-    map(() => new CreateNotification({
+    map(( { payload: user }: UpdateUserSuccess) => new CreateNotification({
       type: Type.info,
-      message: 'Successfully updated user'
+      message: `Reset password for user: ${user.id}.`
     })));
 
   @Effect()
@@ -124,14 +124,6 @@ export class UserEffects {
       this.requests.updateSelf(action.payload, version).pipe(
         map((resp: SelfUser) => new UpdateSelfSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
-
-  @Effect()
-  updateSelfSuccess$ = this.actions$.pipe(
-    ofType(UserActionTypes.UPDATE_SELF_SUCCESS),
-    map(() => new CreateNotification({
-      type: Type.info,
-      message: 'Successfully updated your details'
-    })));
 
   @Effect()
   deleteUser$ = combineLatest([

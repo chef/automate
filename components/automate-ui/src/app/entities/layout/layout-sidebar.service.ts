@@ -271,10 +271,10 @@ export class LayoutSidebarService {
 
     public getUserProfileSidebar(): MenuItemGroup[] {
         return [{
-            name: '',
+            name: 'User Menu',
             items: [
                 {
-                    name: 'Your Profile',
+                    name: 'Profile',
                     icon: 'person',
                     route: '',
                     visible: true
