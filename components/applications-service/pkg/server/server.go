@@ -337,7 +337,25 @@ func (app *ApplicationsServer) DeleteDisconnectedServices(ctx context.Context,
 
 func (app *ApplicationsServer) DeleteServicesByID(ctx context.Context,
 	request *applications.DeleteServicesByIDReq) (*applications.ServicesRes, error) {
-	return &applications.ServicesRes{}, nil
+	svcIDs := request.GetIds()
+	if svcIDs == nil {
+		return new(applications.ServicesRes),
+			status.Error(codes.InvalidArgument, "Must specify service IDs to delete")
+	}
+	if len(svcIDs) == 0 {
+		return &applications.ServicesRes{}, nil
+	}
+
+	services, err := app.storageClient.DeleteServicesByID(svcIDs)
+	if err != nil {
+		log.WithError(err).Error("Error deleting services")
+		return new(applications.ServicesRes), status.Error(codes.Internal, err.Error())
+	}
+
+	return &applications.ServicesRes{
+		Services: convertStorageServicesToApplicationsServices(services),
+	}, nil
+
 }
 
 func (app *ApplicationsServer) MarkDisconnectedServices(thresholdSeconds int32) ([]*applications.Service, error) {

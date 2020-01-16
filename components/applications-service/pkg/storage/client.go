@@ -20,6 +20,8 @@ type Client interface {
 	DeleteDisconnectedServices(int32) ([]*Service, error)
 	// @param (thresholdMinutes)
 	MarkDisconnectedServices(int32) ([]*Service, error)
+	// @param (service IDs)
+	DeleteServicesByID([]string) ([]*Service, error)
 	// @param (sortField, sortAsc, page, pageSize, filters)
 	GetServiceGroups(string, bool, int32, int32, map[string][]string) ([]*ServiceGroupDisplay, error)
 	// @param (fieldName, queryFragment)

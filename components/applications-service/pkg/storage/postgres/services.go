@@ -164,6 +164,34 @@ RETURNING s.id
 	, s.health_check_exit_status as health_check_exit_status
 `
 
+	deleteServicesByID = `
+   DELETE FROM service_full AS s
+    WHERE s.id IN (%s)
+RETURNING s.id
+  , s.origin AS origin
+  , s.name AS name
+  , s.version AS version
+  , s.release AS release
+  , s.health_check_stdout AS health_check_stdout
+  , s.health_check_stderr AS health_check_stderr
+  , s.health_check_exit_status AS health_check_exit_status
+  , s.health AS health
+  , s.service_group_name AS group
+  , s.application AS application
+  , s.environment AS environment
+  , s.supervisor_id AS sup_member_id
+  , s.fqdn AS fqdn
+  , s.channel as channel
+  , s.site as site
+  , s.last_event_occurred_at as last_event_occurred_at
+  , s.previous_health as previous_health
+  , s.health_updated_at as health_updated_at
+  , s.disconnected as disconnected
+	, s.health_check_stdout as health_check_stdout
+	, s.health_check_stderr as health_check_stderr
+	, s.health_check_exit_status as health_check_exit_status
+`
+
 	selectServicesHealthCounts = `
 SELECT COUNT(*) AS total
   , COUNT(*) FILTER (WHERE s.health = 'CRITICAL') AS critical
@@ -342,6 +370,23 @@ func (db *Postgres) DeleteDisconnectedServices(thresholdSeconds int32) ([]*stora
 		return nil, errors.Wrap(err, "unable to delete disconnected services")
 	}
 
+	return convertComposedServicesToStorage(services), nil
+}
+
+func (db *Postgres) DeleteServicesByID(svcIDs []string) ([]*storage.Service, error) {
+	var services []*composedService
+
+	for _, svcID := range svcIDs {
+		if !pgutils.IsSqlSafe(svcID) {
+			return nil, errors.Errorf("invalid service id %q", svcID)
+		}
+	}
+
+	query := fmt.Sprintf(deleteServicesByID, strings.Join(svcIDs, ", "))
+	_, err := db.DbMap.Select(&services, query)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to delete services")
+	}
 	return convertComposedServicesToStorage(services), nil
 }
 
