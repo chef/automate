@@ -197,7 +197,7 @@ func (suite *GatewayTestSuite) TestDataLifecycleConfigure() {
 }
 
 // TestDataLifecycleRun ensures that when "run" is called that we actually run
-// data lifecycle jobs on the backend. Each invidual service already has
+// data lifecycle jobs on the backend. Each individual service already has
 // integrations tests for their data lifecycle jobs so we only need to test
 // if the jobs are being triggered successfully. The purge jobs record their
 // start and end times in the database so we can use the timestamps to determine

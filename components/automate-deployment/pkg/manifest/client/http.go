@@ -62,7 +62,7 @@ var packagesChefIOKeyRing openpgp.EntityList
 func init() {
 	entityList, err := openpgp.ReadArmoredKeyRing(strings.NewReader(packagesChefIOSigAsc))
 	if err != nil {
-		panic(errors.Wrap(err, "Failed to read pacakges.chef.io public key"))
+		panic(errors.Wrap(err, "Failed to read packages.chef.io public key"))
 	}
 	packagesChefIOKeyRing = entityList
 }

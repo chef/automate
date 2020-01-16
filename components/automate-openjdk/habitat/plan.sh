@@ -2,7 +2,7 @@
 #shellcheck disable=SC2154
 
 # Instead of wrapping the core/openjdk11 package, we're using our own so that
-# we don't need to depend on ALSA or FreeType, which have non-comaptible licenses.
+# we don't need to depend on ALSA or FreeType, which have non-compatible licenses.
 
 pkg_origin=chef
 pkg_maintainer="Chef Software Inc. <support@chef.io>"

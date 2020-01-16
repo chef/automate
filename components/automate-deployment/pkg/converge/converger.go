@@ -421,7 +421,7 @@ func (w *waitingForRestart) ProcessMessage(_ *converger, msg message) (state, bo
 
 func (w *waitingForRestart) String() string { return "waiting for restart" }
 
-// waitingForReconfigure is a converer state that we enter whenever we
+// waitingForReconfigure is a converger state that we enter whenever we
 // expect to have received a reconfiguration request from the Habitat
 // supervisor.
 type waitingForReconfigure struct {

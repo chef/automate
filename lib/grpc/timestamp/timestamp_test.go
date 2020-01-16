@@ -3,8 +3,8 @@ package timestamp
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
+	"github.com/stretchr/testify/assert"
 )
 
 const (
@@ -24,7 +24,7 @@ func TestTimestampString(t *testing.T) {
 	}{
 		// very basic test
 		{&tspb.Timestamp{Seconds: 0, Nanos: 0}, "1970-01-01T00:00:00Z"},
-		// make sure we dont add nanos to the output
+		// make sure we don't add nanos to the output
 		{&tspb.Timestamp{Seconds: 0, Nanos: 9}, "1970-01-01T00:00:00Z"},
 		// test nil
 		{nil, ""},
@@ -35,4 +35,3 @@ func TestTimestampString(t *testing.T) {
 		assert.Equal(t, test.expected, TimestampString(test.ts))
 	}
 }
-

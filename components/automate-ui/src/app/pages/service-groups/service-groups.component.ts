@@ -46,7 +46,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
   public serviceGroupsError$: Observable<HttpErrorResponse>;
   public sgHealthSummary: ServiceGroupsHealthSummary;
 
-  // Selected sarch bar filters
+  // Selected search bar filters
   public selectedSearchBarFilters = [];
 
   // The selected service-group id that will be sent to the services-sidebar
@@ -244,7 +244,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
     // selected service group. However, this logic does not apply to the
     // *service* status filters (in the services sidebar); when all services
     // are filtered out via those status filters we have a special state that
-    // says, e.g., "none of the services reuturned warning" that we want to
+    // says, e.g., "none of the services returned warning" that we want to
     // show.
     this.store.select(serviceGroupsStatus).subscribe((sgStatus) => {
       if (sgStatus === 'loadingSuccess') {

@@ -2,6 +2,10 @@
 # components/xyz-service/Makefile
 REPOROOT?=../..
 
+# Convert, e.g., "src/github.com/chef/automate/components/teams-service" to "components/teams-service"
+REPO_DIR := $(shell cd $(REPOROOT) && pwd)/
+COMPONENT_DIR := $(shell echo $${PWD\#"$(REPO_DIR)"})
+
 LIBRARY_PATH = github.com/chef/automate/lib
 
 UNAME_S:=$(shell uname -s)
@@ -36,5 +40,12 @@ fmt:
 
 fmt-check:
 	@test -z $(shell gofmt -l ./cmd/ ./pkg/)
+
+spell:
+	@pushd $(REPOROOT) > /dev/null; \
+	./scripts/spellcheck.sh --wordsOnly $(COMPONENT_DIR); \
+	EXIT_CODE=$$?; \
+	popd > /dev/null; \
+	exit $$EXIT_CODE
 
 .PHONY: lint fmt fmt-check golang_version_check

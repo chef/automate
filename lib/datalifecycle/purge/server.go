@@ -50,7 +50,7 @@ func NewServer(
 		hasDefaultPolicies = true
 
 		if s.esSidecarClient == nil {
-			return s, errors.New("server must have an esSidecarClient when configued with es policies")
+			return s, errors.New("server must have an esSidecarClient when configured with es policies")
 		}
 	}
 

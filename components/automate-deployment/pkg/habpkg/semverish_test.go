@@ -106,14 +106,14 @@ func TestSemverCompare(t *testing.T) {
 	}
 }
 
-func BenchmarkParseSemverishVerionBasic(b *testing.B) {
+func BenchmarkParseSemverishVersionBasic(b *testing.B) {
 	v := "1.2.3"
 	for n := 0; n < b.N; n++ {
 		ParseSemverishVersion(v)
 	}
 }
 
-func BenchmarkParseSemverishVerionAll(b *testing.B) {
+func BenchmarkParseSemverishVersionAll(b *testing.B) {
 	l := len(semverTests)
 	for n := 0; n < b.N; n++ {
 		ParseSemverishVersion(semverTests[n%l].input)

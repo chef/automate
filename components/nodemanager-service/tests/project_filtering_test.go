@@ -375,17 +375,17 @@ func TestListProjectFilteringIngestedNodes(t *testing.T) {
 
 				// Get all the node IDs returned.
 				actualNodeIDs := []string{}
-				actualManuallNodeIDs := []string{}
+				actualManualNodeIDs := []string{}
 				for _, node := range nodesResponse.Nodes {
 					if node.Manager == "" {
 						actualNodeIDs = append(actualNodeIDs, node.Id)
 					} else {
-						actualManuallNodeIDs = append(actualManuallNodeIDs, node.Id)
+						actualManualNodeIDs = append(actualManualNodeIDs, node.Id)
 					}
 				}
 
 				for _, nodeID := range manualNodeIds {
-					assert.Contains(t, actualManuallNodeIDs, nodeID)
+					assert.Contains(t, actualManualNodeIDs, nodeID)
 				}
 
 				assert.ElementsMatch(t, actualNodeIDs, test.expectedIngestedNodeIDs)

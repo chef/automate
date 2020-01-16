@@ -108,7 +108,7 @@ func CompareSemverish(a SemverishVersion, b SemverishVersion) int {
 		return SemverishLess
 	}
 
-	// Otherwise, just lexigraphically sort the pre-release, this
+	// Otherwise, just lexicographically sort the pre-release, this
 	// is not what the spec says to do.
 	if a.prerelease < b.prerelease {
 		return SemverishLess

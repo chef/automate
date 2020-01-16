@@ -731,7 +731,7 @@ func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
 	}
 }
 
-// A: more frequest membership means slower authorization times (but not by much)
+// A: more frequent membership means slower authorization times (but not by much)
 // BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_0_policies_that_include_the_subject_as_a_member-8         	   179049	      8298 ns/op	    3193 B/op	      83 allocs/op
 // BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_1_out_of_10_policies_that_include_the_subject_as_a_member-8   140113	     10122 ns/op	    3304 B/op	      86 allocs/op
 // BenchmarkAuthorizedProjectsIncreasingMembershipFrequency/store_with_2_out_of_10_policies_that_include_the_subject_as_a_member-8   135043	     11135 ns/op	    3304 B/op	      86 allocs/op
@@ -831,7 +831,7 @@ func v2BaselineAndRandomPoliciesAndRoles(customPolicyCount int, customRoleCount 
 		}
 
 		for _, id := range customPolicyIDs {
-			// generate btwn range 1..10 statements
+			// generate between range 1..10 statements
 			// 10 is an arbitrary max
 			statementCount := rand.Intn(10-1) + 1
 
@@ -884,7 +884,7 @@ func v2BaselineAndRandomPoliciesAndRoles(customPolicyCount int, customRoleCount 
 				}
 			}
 
-			// generate btwn range 1..total number of members
+			// generate between range 1..total number of members
 			memberCount := rand.Intn((len(members) - 1) + 1)
 
 			// shuffle the array of possible members,

@@ -20,7 +20,7 @@ else
 fi
 
 # Install busybox-static so script evaluations (e.g. #!/bin/bash) will work
-# This ensures normal linxu studios work like Docker studios
+# This ensures normal linux studios work like Docker studios
 log_line "Install busybox-static & bash hart packages"
 hab pkg install core/busybox-static >/dev/null
 hab pkg binlink -d /bin core/busybox-static >/dev/null

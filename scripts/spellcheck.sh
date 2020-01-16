@@ -91,6 +91,13 @@ checkFiles() {
                 >&2 echo -n "$dir [html]... "
                 run_cspell "$dir/src/**/*.html" || RETVAL=1
             fi
+        elif [[ -d $dir/content/docs ]]; then
+            >&2 echo -n "$dir [md]... "
+            run_cspell "$dir/**/*.md" || RETVAL=1
+            >&2 echo -n "$dir [html]... "
+            run_cspell "$dir/**/*.html" || RETVAL=1
+            >&2 echo -n "$dir [api-static]... "
+            run_cspell "$dir/data/docs/api-static/**/*" || RETVAL=1
         else
             >&2 echo -n "$dir [go]... "
             run_cspell "$dir/**/*.go" || RETVAL=1
