@@ -36,10 +36,8 @@ do_test_deploy() {
     remove_admin_from_admins_team # just an example of how to screw A2 IAM up
 
     log_info "Restoring default admin access"
-    # Use the installed version of chef/automate-cli to ensure we use
-    # the current version of chef-automate, not the next version we're upgrading
-    # to.
-    hab pkg exec chef/automate-cli chef-automate iam admin-access restore $AUTOMATE_API_DEFAULT_PASSWORD
+
+    chef-automate iam admin-access restore $AUTOMATE_API_DEFAULT_PASSWORD
 
     do_test_deploy_default
 }

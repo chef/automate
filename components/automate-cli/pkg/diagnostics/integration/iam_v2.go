@@ -61,7 +61,7 @@ func CreateIAMV2Diagnostic() diagnostics.Diagnostic {
 			vsn := struct {
 				Version struct{ Major, Minor string }
 			}{}
-			err := MustJSONDecodeSuccess(tstCtx.DoLBRequest("/apis/iam/v2/policy_version")).WithValue(&vsn)
+			err := MustJSONDecodeSuccess(tstCtx.DoLBRequest("/apis/iam/v2beta/policy_version")).WithValue(&vsn)
 			if err != nil {
 				return false, "", err
 			}
