@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -376,13 +377,17 @@ func (db *Postgres) DeleteDisconnectedServices(thresholdSeconds int32) ([]*stora
 func (db *Postgres) DeleteServicesByID(svcIDs []string) ([]*storage.Service, error) {
 	var services []*composedService
 
+	// We use a more strict regexp than pgutils, since we know the data must be
+	// integers
+	r := regexp.MustCompile("^[0-9]*$")
 	for _, svcID := range svcIDs {
-		if !pgutils.IsSqlSafe(svcID) {
+		if !r.MatchString(svcID) {
 			return nil, errors.Errorf("invalid service id %q", svcID)
 		}
 	}
 
 	query := fmt.Sprintf(deleteServicesByID, strings.Join(svcIDs, ", "))
+
 	_, err := db.DbMap.Select(&services, query)
 	if err != nil {
 		return nil, errors.Wrap(err, "unable to delete services")
