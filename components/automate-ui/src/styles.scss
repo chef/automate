@@ -253,7 +253,7 @@ input {
   &.mat-active,
   &:hover:not(.mat-option-disabled),
   &:focus:not(.mat-option-disabled) {
-    background: $chef-primary-dark;
+    background: $chef-primary-bright;
     color: $chef-white;
   }
 }
