@@ -13,10 +13,7 @@ toc = true
 Show the simplest possible experience that most users will experience. We are assuming that experience will be UI only, so present the UI information first followed by CLI information presented in reference format.
 -->
 
-This guide explains Chef Automate's new Identity and Access Management (IAM v2) system.
-
-IAM v2 is currently opt-in only.
-Chef Automate users will not be automatically upgraded.
+Chef Automate's Identity and Access Management (IAM v2) system is opt-in only, and Chef Automate users will not be automatically upgraded to IAM v2 from IAM v1.
 
 We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2; however, you can choose to not migrate v1 policies by using the provided `--skip-policy-migration` flag with the upgrade command.
 
@@ -136,7 +133,7 @@ IAM v2 projects are collections of resources either created in Chef Automate, or
 Projects are used in a policy to reduce the scope of that policy's permissions to only the resources assigned to the given projects.
 
 {{< info >}}
-Chef Automate is currently limited to six projects while we continue to refine the user experience.
+Chef Automate limits to six projects while we continue to refine the user experience.
 See [Configuring Project Limit]({{< relref "iam-v2-guide.md#configuring-project-limit" >}}) for configuration instructions.
 {{< /info >}}
 
@@ -173,7 +170,7 @@ Once you define your set of projects with their contained ingest rules and condi
 Teams and API tokens may be assigned to projects directly in the UI. Policies and roles can only be assigned through the command line.
 These resources created within Automate do not make use of, nor do they require, any project ingest rules.
 
-Currently, only some resources in Chef Automate respect projects. Only resources that respect projects will be filtered when using the project filter. Resources that do not respect projects will always be displayed and will ignore any applied project filters. After IAM v2 becomes generally available, we will continue the work to make more resources respect projects.
+Only some resources in Chef Automate respect projects. Only resources that respect projects will be filtered when using the project filter. Resources that do not respect projects will always be displayed and will ignore any applied project filters. After IAM v2 becomes generally available, we will continue the work to make more resources respect projects.
 
 #### Resources that respect projects
 
