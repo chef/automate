@@ -107,7 +107,7 @@ export class ServiceGroupsFacadeService {
   public healthCheckStatus(health: string): string {
     switch (health) {
       case 'OK':
-        return 'Ok';
+        return 'OK';
       case 'CRITICAL':
         return 'Critical';
       case 'WARNING':

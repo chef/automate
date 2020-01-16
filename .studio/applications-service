@@ -410,11 +410,42 @@ function applications_populate_database() {
   # Service groups with a larger set of health statuses. This excercises some
   # filtering cases, such as whether a service group with 1 service in critical
   # and 1 warning shows up when filtering for warning.
+
+  ##
+  # We use the east/central/mountain/west variants of the pos-terminal service
+  # to exercise some variations in how the UI displays health check output.
+
   for health_code in $(seq 0 3); do
     applications_publish_supervisor_message --name "pos-terminal" --group "default" \
       --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
       --sup-id "$(uuidgen)" \
-      --application "pos" --environment "production-us-east" --site "ny-123"
+      --application "pos" --environment "production-us-east" --site "ny-123" \
+      --hc-stderr "rm: cannot remove 'results/': Is a directory" \
+      --hc-stdout "rm: cannot remove 'results/': Is a directory" --hc-exit "$health_code"
+  done
+
+  for health_code in $(seq 0 3); do
+    applications_publish_supervisor_message --name "pos-terminal" --group "default" \
+      --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
+      --sup-id "$(uuidgen)" \
+      --application "pos" --environment "production-us-central" --site "chi-123" \
+      --hc-stderr "rm: cannot remove 'results/': Is a directory" \
+      --hc-exit "$health_code"
+  done
+
+  for health_code in $(seq 0 3); do
+    applications_publish_supervisor_message --name "pos-terminal" --group "default" \
+      --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
+      --sup-id "$(uuidgen)" \
+      --application "pos" --environment "production-us-mountain" --site "den-123" \
+      --hc-stdout "rm: cannot remove 'results/': Is a directory" --hc-exit "$health_code"
+  done
+
+  for health_code in $(seq 0 3); do
+    applications_publish_supervisor_message --name "pos-terminal" --group "default" \
+      --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
+      --sup-id "$(uuidgen)" \
+      --application "pos" --environment "production-us-west" --site "sea-123"
   done
 
   for health_code in 0 1 3 ; do

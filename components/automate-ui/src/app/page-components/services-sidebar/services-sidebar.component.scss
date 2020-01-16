@@ -44,7 +44,7 @@ chef-alert {
   @include modal-box();
   display: block;
   box-shadow: none;
-  background-color: #F2F5F7;
+  background-color: #F2F5F7; // unique color
   margin-bottom: 1em;
   margin-right: 35px;
   margin-left: -5px;
@@ -57,6 +57,7 @@ chef-alert {
     display: block;
     background-color: $chef-white;
     border-top: 1px solid $gray-pale;
+    // if changed then hr.health-info-divider needs to be adjusted also
     padding: 1em;
     position: relative;
     width: 100%;
@@ -106,24 +107,121 @@ chef-alert {
     font-size: 14px;
   }
 
+  hr.health-info-divider {
+    margin: 16px -1em 16px -1em;
+    background-color: $gray-pale;
+  }
+
+  .health-info-panel {
+    border-radius: 2px;
+    align-items: center;
+    padding: 8px;
+    font-size: 12px;
+
+    &.CRITICAL {
+      background-color: var(--chef-badge-critical-background);
+      color: var(--chef-badge-critical-color);
+    }
+
+    &.WARNING {
+      background-color: var(--chef-badge-warning-background);
+      color: var(--chef-badge-warning-color);
+    }
+
+    &.UNKNOWN {
+      background-color: var(--chef-lightest-grey);
+      color: var(--chef-primary-dark);
+    }
+
+    &.OK {
+      background-color: var(--chef-badge-success-background);
+      color: var(--chef-badge-success-color);
+    }
+
+  }
+
+  .disconnect-notice {
+    display: flex;
+    align-items: flex-start;
+    background: $chef-info-alert-light;
+    color: $chef-info-alert;
+    border-radius: 2px;
+    padding: 8px;
+    margin-bottom: 8px;
+    font-size: 12px;
+
+    .disconnect-icon {
+      display: block;
+      margin-right: 6px;
+      height: 16px;
+      width: 16px;
+      transform: translateY(2px);
+      flex: none;
+    }
+
+    .disconnect-time:hover {
+      color: $chef-info-alert-dark;
+    }
+
+  }
+
+  .no-healthcheck-messages {
+    margin: 1px;
+    border: 1px solid;
+    border-radius: 2px;
+    padding: 3px 8px 3px 8px;
+
+    a {
+      color: inherit;
+    }
+
+  }
+
+  .healthcheck-message {
+    padding: 2px;
+  }
+
+  // desired space between adjacent healthcheck-message divs is 8px, we have
+  // 2 * 2px == 4px from the padding above which means we need 4px more:
+  .healthcheck-message + .healthcheck-message {
+    margin-top: 4px;
+  }
+
+  .healthcheck-header {
+    border-radius: 2px 2px 0 0;
+    padding: 3px 8px 3px 8px;
+
+    &.CRITICAL {
+      background-color: #961856; // unique color
+      color: var(--chef-white);
+    }
+
+    &.WARNING {
+      background-color: var(--chef-badge-warning-color);
+      color: var(--chef-white);
+    }
+
+    &.UNKNOWN {
+      background-color: #424848; // unique color
+      color: var(--chef-white);
+    }
+
+
+  }
+
+  .healthcheck-content {
+    border-radius: 0 0 2px 2px;
+    background-color: var(--chef-primary-dark);
+    color: var(--chef-white);
+    padding: 8px;
+    overflow-wrap: break-word;
+  }
+
   .health-line {
     display: flex;
-    align-items: center;
+    align-items: flex-start;
     font-size: 12px;
     margin-bottom: 6px;
-  }
-
-  .channel-line {
-    padding-left: 18px;
-    margin-bottom: 8px;
-  }
-
-  .timewizard-line {
-    padding-left: 24px;
-    font-size: 12px;
-    color: $chef-dark-grey;
-    letter-spacing: 0.1px;
-    line-height: 18px;
 
     a {
       color: inherit;
@@ -132,6 +230,18 @@ chef-alert {
     a:hover {
       color: $chef-primary-dark;
     }
+
+    .health-icon {
+      display: block;
+      margin-right: 6px;
+      height: 16px;
+      width: 16px;
+    }
+  }
+
+  .channel-line {
+    padding-left: 18px;
+    margin-bottom: 8px;
   }
 
   chef-icon {
@@ -168,28 +278,3 @@ chef-alert {
   padding-right: 35px;
 }
 
-.disconnect-notice {
-  display: flex;
-  align-items: flex-start;
-  background: $chef-info-alert-light;
-  color: $chef-info-alert;
-  border-radius: $global-radius;
-  padding: 8px;
-  margin-bottom: 8px;
-
-  .disconnect-icon {
-    display: block;
-    margin-right: 6px;
-    height: 14px;
-    width: 14px;
-    transform: translateY(5px);
-  }
-
-  .disconnect-time:hover {
-    color: $chef-info-alert-dark;
-  }
-
-  span:first-child {
-    display: block;
-  }
-}
