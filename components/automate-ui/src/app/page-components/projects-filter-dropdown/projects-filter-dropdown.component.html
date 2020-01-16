@@ -28,18 +28,18 @@
             placeholder="Filter projects..." />
         </div>
 
-        <div class="dropdown-content flex-row button-container">
+        <div class="button-container" *ngIf="filteredOptions.length > 0">
           <chef-button
             primary
             [attr.disabled]="!optionsEdited"
-            (click)="handleApplyClick()"
+            (click)="handleApplySelection()"
             id="projects-filter-apply-changes">
             Apply Changes
           </chef-button>
           <chef-button
           tertiary
           id="projects-filter-clear-selection"
-          (click)="handleEscape()">
+          (click)="handleClearSelection()">
           Clear Selection
           </chef-button>
         </div>

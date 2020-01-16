@@ -90,17 +90,14 @@
       flex-direction: column;
       padding: 14px;
 
-      &.flex-row {
-        flex-direction: row;
-      }
-
       & + .dropdown-content {
         border-top: 1px solid $chef-grey;
       }
     }
 
     .button-container { // adjust for 8px global margin on buttons
-      padding: calc(14px - 8px);
+      display: flex;
+      padding: 0 calc(14px - 8px);
     }
 
 
@@ -127,7 +124,7 @@
     chef-checkbox {
       display: flex;
       align-items: flex-start;
-      font-weight: 600;
+      font-weight: 400;
 
       & + chef-checkbox {
         padding-top: 14px;
