@@ -139,5 +139,14 @@
         white-space: nowrap;
       }
     }
+
+    .no-projects {
+      padding: 14px 0;
+      
+      p {
+        margin-bottom: 0;
+        font-style: italic;
+      }
+    }
   }
 }

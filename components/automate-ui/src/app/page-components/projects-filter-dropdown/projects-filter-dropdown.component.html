@@ -50,7 +50,12 @@
             [checked]="option.checked"
             (change)="handleOptionChange($event, i)"
             (keydown.arrowup)="handleArrowUp($event)"
-            (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}</chef-checkbox>
+            (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}
+          </chef-checkbox>
+          <div class="no-projects" *ngIf="editableOptions.length < 1">
+            <p>No projects found.</p>
+            <p>You don't have access to any projects that match your search.</p>
+          </div>
         </div>
 
         <div class="dropdown-content action-container">

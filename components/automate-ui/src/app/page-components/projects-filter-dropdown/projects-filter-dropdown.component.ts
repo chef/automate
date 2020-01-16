@@ -37,7 +37,6 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
     this.editableOptions = this.options.filter( option =>
       option.label.toLowerCase().indexOf(input.toLowerCase()) > -1
     );
-    // console.log(this.filteredOptions);
   }
 
   ngOnChanges(changes) {
