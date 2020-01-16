@@ -29,13 +29,15 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
 
   editableOptions: ProjectsFilterOption[] = [];
 
+  filterValue = '';
+
   optionsEdited = false;
 
   dropdownActive = false;
 
-  filterKeydown(input: string) {
-    this.editableOptions = this.options.filter( option =>
-      option.label.toLowerCase().indexOf(input.toLowerCase()) > -1
+  filterKeydown() {
+    this.editableOptions = this.options.filter(option =>
+      option.label.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1
     );
   }
 
@@ -57,7 +59,8 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
     }
   }
 
-  handleEscape() {
+  handleEscape(): void {
+    this.filterValue = '';
     this.dropdownActive = false;
     this.resetOptions();
   }

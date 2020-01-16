@@ -22,9 +22,9 @@
           <!-- @TODO turn this into reusable Filter Input component -->
           <input 
             chefInput
-            #filterInput
             type="text"
-            (keyup)=filterKeydown(filterInput.value);
+            [(ngModel)]="filterValue"
+            (keyup)="filterKeydown()"
             placeholder="Filter projects..." />
         </div>
 
@@ -38,7 +38,8 @@
           </chef-button>
           <chef-button
           tertiary
-          id="projects-filter-apply-changes">
+          id="projects-filter-clear-selection"
+          (click)="handleEscape()">
           Clear Selection
           </chef-button>
         </div>
