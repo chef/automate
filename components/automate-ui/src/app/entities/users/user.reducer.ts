@@ -1,5 +1,5 @@
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { set, pipe, unset } from 'lodash/fp';
+import { set, pipe } from 'lodash/fp';
 
 import { EntityStatus } from '../entities';
 import { UserActionTypes, UserActions } from './user.actions';
@@ -92,13 +92,13 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
 
     case UserActionTypes.CREATE:
       return pipe(
-        unset('createError'),
+        set('createError', null),
         set('createStatus', EntityStatus.loading)
       )(state) as UserEntityState;
 
     case UserActionTypes.CREATE_SUCCESS:
       return pipe(
-        unset('createError'),
+        set('createError', null),
         set('createStatus', EntityStatus.loadingSuccess)
       )(userEntityAdapter.addOne(action.payload, state)) as UserEntityState;
 

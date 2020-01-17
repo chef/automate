@@ -11,7 +11,7 @@ describe('UsernameMapper', () => {
       ['my-name$/', 'my-name--', 'replaces trailing unsupported multiple chars with hyphen'],
       ['my^%<>name', 'my----name', 'replaces middle unsupported chars with hyphen'],
       ['#my-name', '-my-name', 'replaces leading unsupported single char with hyphens'],
-      [';=@my-name', '---my-name', 'replaces leading unsupported multiple chars with hyphens'],
+      [';=&my-name', '---my-name', 'replaces leading unsupported multiple chars with hyphens'],
       [' my_name  ', '-my_name--', 'replaces leading/trailing spaces with hyphens'],
       ['my   name', 'my---name', 'replaces middle spaces with hyphens'],
       ['My-Name', 'my-name', 'maps upper case to lower case']
