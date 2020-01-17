@@ -343,7 +343,7 @@ func (app *ApplicationsServer) DeleteServicesByID(ctx context.Context,
 			status.Error(codes.InvalidArgument, "Must specify service IDs to delete")
 	}
 	if len(svcIDs) == 0 {
-		return &applications.ServicesRes{}, nil
+		return new(applications.ServicesRes), nil
 	}
 
 	services, err := app.storageClient.DeleteServicesByID(svcIDs)
