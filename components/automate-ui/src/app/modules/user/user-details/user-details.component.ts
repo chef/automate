@@ -13,8 +13,10 @@ import { routeURL, routeParams } from 'app/route.selectors';
 import { EntityStatus, loading } from 'app/entities/entities';
 import {
   GetUser,
-  UpdateUser,
-  UpdateSelf
+  UpdatePasswordUser,
+  UpdateNameUser,
+  UpdatePasswordSelf,
+  UpdateNameSelf
  } from 'app/entities/users/user.actions';
 import {
   getStatus, userFromRoute, updateStatus
@@ -152,13 +154,13 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   private savePasswordForUser(): void {
     const password = this.passwordForm.get('newPassword').value;
-    this.store.dispatch(new UpdateUser({ ...this.user, password }));
+    this.store.dispatch(new UpdatePasswordUser({ ...this.user, password }));
   }
 
   private savePasswordForSelf(): void {
     const password = this.passwordForm.get('newPassword').value;
     const previous_password = this.passwordForm.get('oldPassword').value;
-    this.store.dispatch(new UpdateSelf({
+    this.store.dispatch(new UpdatePasswordSelf({
       id: this.user.id,
       name: this.user.name,
       membership_id: this.user.membership_id,
@@ -173,8 +175,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     const name = this.displayNameForm.get('displayName').value.trim();
     this.store.dispatch(
       this.isAdminView ?
-        new UpdateUser({ ...this.user, name })
-        : new UpdateSelf({
+        new UpdateNameUser({ ...this.user, name })
+        : new UpdateNameSelf({
           id: this.user.id,
           name: name,
           membership_id: this.user.membership_id

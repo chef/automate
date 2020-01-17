@@ -56,22 +56,40 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
     case UserActionTypes.GET_FAILURE:
       return set('getStatus', EntityStatus.loadingFailure, state);
 
-    case UserActionTypes.UPDATE:
+    case UserActionTypes.UPDATE_PASSWORD_USER:
       return set('updateStatus', EntityStatus.loading, state);
 
-    case UserActionTypes.UPDATE_SUCCESS:
+    case UserActionTypes.UPDATE_PASSWORD_USER_SUCCESS:
       return set('updateStatus', EntityStatus.loadingSuccess,
         userEntityAdapter.updateOne({
           id: action.payload.id,
           changes: action.payload}, state));
 
-    case UserActionTypes.UPDATE_FAILURE:
+    case UserActionTypes.UPDATE_USER_FAILURE:
       return set('updateStatus', EntityStatus.loadingFailure, state);
 
-    case UserActionTypes.UPDATE_SELF:
+    case UserActionTypes.UPDATE_NAME_USER:
       return set('updateStatus', EntityStatus.loading, state);
 
-    case UserActionTypes.UPDATE_SELF_SUCCESS:
+    case UserActionTypes.UPDATE_NAME_USER_SUCCESS:
+      return set('updateStatus', EntityStatus.loadingSuccess,
+        userEntityAdapter.updateOne({
+          id: action.payload.id,
+          changes: action.payload}, state));
+
+    case UserActionTypes.UPDATE_PASSWORD_SELF:
+      return set('updateStatus', EntityStatus.loading, state);
+
+    case UserActionTypes.UPDATE_PASSWORD_SELF_SUCCESS:
+      return set('updateStatus', EntityStatus.loadingSuccess,
+        userEntityAdapter.updateOne({
+          id: action.payload.id,
+          changes: action.payload}, state));
+
+    case UserActionTypes.UPDATE_NAME_SELF:
+      return set('updateStatus', EntityStatus.loading, state);
+
+    case UserActionTypes.UPDATE_NAME_SELF_SUCCESS:
       return set('updateStatus', EntityStatus.loadingSuccess,
         userEntityAdapter.updateOne({
           id: action.payload.id,
