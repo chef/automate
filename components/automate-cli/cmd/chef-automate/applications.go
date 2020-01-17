@@ -289,7 +289,8 @@ func runApplicationsRemoveSvcsCmd(cmd *cobra.Command, args []string) error {
 
 	if !removeSvcsFlags.yes {
 		fmt.Println("")
-		proceed, err := writer.Confirm("The above services will be deleted. Do you wish to continue?")
+		prompt := fmt.Sprintf("The above %d services will be deleted. Do you wish to continue?", len(s.services))
+		proceed, err := writer.Confirm(prompt)
 		if err != nil {
 			return err
 		}
