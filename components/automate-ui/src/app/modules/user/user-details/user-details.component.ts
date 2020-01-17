@@ -122,6 +122,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       displayName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     this.passwordForm = fb.group({
+      oldPassword: ['', [ChefValidators.nonAdminLengthValidator(this.isAdminView, 8)]],
       newPassword: ['',
         [Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
@@ -140,10 +141,30 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   public savePassword(): void {
-    this.saveInProgress = true;
     this.saveSuccessful = false;
+    this.saveInProgress = true;
+    if (this.isAdminView) {
+      this.savePasswordForUser();
+    } else {
+      this.savePasswordForSelf();
+    }
+  }
+
+  private savePasswordForUser(): void {
     const password = this.passwordForm.get('newPassword').value;
     this.store.dispatch(new UpdateUser({ ...this.user, password }));
+  }
+
+  private savePasswordForSelf(): void {
+    const password = this.passwordForm.get('newPassword').value;
+    const previous_password = this.passwordForm.get('oldPassword').value;
+    this.store.dispatch(new UpdateSelf({
+      id: this.user.id,
+      name: this.user.name,
+      membership_id: this.user.membership_id,
+      password: password,
+      previous_password: previous_password
+    }));
   }
 
   public saveDisplayName(): void {

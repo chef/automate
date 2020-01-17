@@ -42,6 +42,20 @@
       </section>
       <section class="page-body" *ngIf="tabValue === 'password'">
         <form [formGroup]="passwordForm">
+          <chef-form-field *ngIf="!isAdminView" class="password">
+            <label>
+              <span class="label">Old Password <span aria-hidden="true">*</span></span>
+              <input chefInput formControlName="oldPassword" type="password"/>
+            </label>
+            <chef-error
+              *ngIf="passwordForm.get('oldPassword').hasError('required') && passwordForm.get('oldPassword').dirty">
+              Old Password is required.
+            </chef-error>
+            <chef-error
+              *ngIf="passwordForm.get('oldPassword').hasError('minlength') && passwordForm.get('oldPassword').dirty">
+              Old Password must be at least 8 characters.
+            </chef-error>
+          </chef-form-field>
           <chef-form-field class="password">
             <label>
               <span class="label">New Password <span aria-hidden="true">*</span></span>
