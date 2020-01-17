@@ -138,7 +138,7 @@ Examples:
 * any requestor at all: `*`
 
 Each user or team must specify its _provider_.
-Automate supports LDAP, SAML, and local users or teams. 
+Automate supports LDAP, SAML, and local users and teams. 
 Here are team examples using all three:
 
 ```text
