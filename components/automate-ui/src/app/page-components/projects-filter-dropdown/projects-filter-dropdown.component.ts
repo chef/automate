@@ -26,6 +26,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   @Input() filterVisible = false;
 
   @Output() onSelection = new EventEmitter<ProjectsFilterOption[]>();
+  @Output() onOptionChange = new EventEmitter<ProjectsFilterOption[]>();
 
   editableOptions: ProjectsFilterOption[] = [];
   filteredOptions: ProjectsFilterOption[] = [];
@@ -69,21 +70,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   handleOptionChange(event, index) {
     this.editableOptions[index].checked = event.detail;
     this.optionsEdited = true;
-    // this.updateSelectionCount();
-  }
-
-  updateSelectionCount(): void {
-    // this.selectionCount = this.editableOptions.filter( option => option.checked ).length;
-    // console.log(this.selectionCount);
-    // if (this.selectionCount > 0) {
-    //   this.selectionLabel = MULTIPLE_PROJECTS_LABEL;
-    //   this.selectionCountVisible = true;
-    //   this.selectionCountActive = true;
-    // } else {
-    //   this.selectionLabel = ALL_PROJECTS_LABEL;
-    //   this.selectionCountVisible = false;
-    //   this.selectionCountActive = false;
-    // }
+    this.onOptionChange.emit(this.editableOptions);
   }
 
   handleApplySelection() {

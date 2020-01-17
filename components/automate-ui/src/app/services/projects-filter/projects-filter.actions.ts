@@ -6,7 +6,8 @@ export enum ProjectsFilterActionTypes {
   LOAD_OPTIONS         = 'PROJECTS_FILTER::LOAD_OPTIONS',
   LOAD_OPTIONS_SUCCESS = 'PROJECTS_FILTER::LOAD_OPTIONS::SUCCESS',
   LOAD_OPTIONS_FAILURE = 'PROJECTS_FILTER::LOAD_OPTIONS::FAILURE',
-  SAVE_OPTIONS =         'PROJECTS_FILTER::SAVE_OPTIONS'
+  SAVE_OPTIONS =         'PROJECTS_FILTER::SAVE_OPTIONS',
+  UPDATE_SELECTION_COUNT = 'PROJECTS_FILTER::UPDATE_SELECTION_COUNT'
 }
 
 export class LoadOptions implements Action {
@@ -28,8 +29,14 @@ export class SaveOptions implements Action {
   constructor(public payload: ProjectsFilterOption[]) { }
 }
 
+export class UpdateSelectionCount implements Action {
+  readonly type = ProjectsFilterActionTypes.UPDATE_SELECTION_COUNT;
+  constructor(public payload: ProjectsFilterOption[]) { }
+}
+
 export type ProjectsFilterActions =
   | LoadOptions
   | LoadOptionsSuccess
   | LoadOptionsFailure
-  | SaveOptions;
+  | SaveOptions
+  | UpdateSelectionCount;
