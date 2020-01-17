@@ -65,6 +65,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
     this.resetOptions();
     this.filterValue = '';
     this.dropdownActive = false;
+    this.onOptionChange.emit(this.editableOptions);
   }
 
   handleOptionChange(event, index) {
