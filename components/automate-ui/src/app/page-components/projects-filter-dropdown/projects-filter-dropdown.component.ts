@@ -27,7 +27,6 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
 
   @Output() onSelection = new EventEmitter<ProjectsFilterOption[]>();
   @Output() onOptionChange = new EventEmitter<ProjectsFilterOption[]>();
-  @Output() onClear = new EventEmitter<ProjectsFilterOption[]>();
 
   editableOptions: ProjectsFilterOption[] = [];
   filteredOptions: ProjectsFilterOption[] = [];

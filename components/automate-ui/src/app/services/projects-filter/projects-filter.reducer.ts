@@ -102,20 +102,6 @@ export function projectsFilterReducer(
         set('selectionCountActive', selectionCountActive(sortedOptions))
       )(state) as ProjectsFilterState;
     }
-
-    case ProjectsFilterActionTypes.RESET_OPTIONS: {
-      // const mergedOptions = mergeOptions(state.options, action.payload);
-      const _resetOptions = resetOptions(action.payload);
-      const sortedOptions = sortOptions(_resetOptions);
-      return pipe(
-        set('options', sortedOptions),
-        set('selectionLabel', selectionLabel(sortedOptions)),
-        set('selectionCount', selectionCount(sortedOptions)),
-        set('selectionCountVisible', selectionCountVisible(sortedOptions)),
-        set('selectionCountActive', selectionCountActive(sortedOptions)),
-        set('dropdownCaretVisible', dropdownCaretVisible(sortedOptions))
-      )(state) as ProjectsFilterState;
-    }
   }
 
   return state;
@@ -160,7 +146,6 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
 
 function selectionCount(options: ProjectsFilterOption[]): number {
   const checkedProjects = options.filter(o => o.checked && o.value !== UNASSIGNED_PROJECT_ID);
-  console.log(checkedProjects.length > 0 ? checkedProjects.length : options.length)
   return checkedProjects.length > 0 ? checkedProjects.length : options.length;
 }
 
@@ -223,9 +208,4 @@ function sortOptions(options: ProjectsFilterOption[]): ProjectsFilterOption[] {
   }
 
   return sorted;
-}
-
-function resetOptions(options: ProjectsFilterOption[]): ProjectsFilterOption[] {
-  options.map(option => option.checked = false);
-  return options;
 }

@@ -35,15 +35,9 @@ export class UpdateSelectionCount implements Action {
   constructor(public payload: ProjectsFilterOption[]) { }
 }
 
-export class ResetOptions implements Action {
-  readonly type = ProjectsFilterActionTypes.RESET_OPTIONS;
-  constructor(public payload: ProjectsFilterOption[]) { }
-}
-
 export type ProjectsFilterActions =
   | LoadOptions
   | LoadOptionsSuccess
   | LoadOptionsFailure
   | SaveOptions
-  | ResetOptions
   | UpdateSelectionCount;

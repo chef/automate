@@ -60,8 +60,4 @@ export class ProjectsFilterService {
     return JSON.parse(localStorage.getItem(STORE_OPTIONS_KEY));
   }
 
-  resetOptions(options: ProjectsFilterOption[]) {
-    this.store.dispatch(new ResetOptions(options));
-  }
-
 }
