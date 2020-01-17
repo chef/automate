@@ -356,4 +356,67 @@ describe File.basename(__FILE__) do
     control_item_array = actual_data['control_items']
     assert_equal(14, control_item_array.size)
   end
+
+  it "control list items with a size of 2" do
+    actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
+        filters: [
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-04-01T00:00:00Z']),
+            Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+        ],
+        size: 10
+    )
+
+    expected_data = {
+      "controlItems" => [
+        {
+          "id" => "apache-01",
+          "title" => "Apache should be running",
+          "profile" => {
+              "title" => "DevSec Apache Baseline",
+              "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+              "version" => "2.0.1"
+          }, "impact" => 1,
+          "endTime" => "2018-03-04T09:18:42Z",
+          "waived_nodes" => [
+            {
+              "waived_str" => "no",
+              "controlSummary" => { "total" => 8, "passed" => {}, "skipped" => {}, "failed" => { "total" => 8 }}
+            },
+            {
+              "waived_str" => "no_expired",
+              "controlSummary" => { "total" => 7, "passed" => {}, "skipped" => {}, "failed" => { "total" => 7 }}
+            },
+            {
+              "waived_str" => "yes_run",
+              "expiration_date" => "2022-02-02",
+              "justification" => "Fix until 2022",
+              "controlSummary" => { "total" => 6, "passed" => { "total" => 6 }, "skipped" => {}, "failed" => {}}
+            },
+            {
+              "waived_str" => "yes_run",
+              "expiration_date" => "2021-01-01",
+              "justification" => "Fix until 2021",
+              "controlSummary" => { "total" => 5, "passed" => {}, "skipped" => {}, "failed" => { "total" => 5 }}
+            },
+            {
+              "waived_str" => "yes",
+              "expiration_date" => "2025-01-01",
+              "justification" => "Sound reasoning 25",
+              "controlSummary" => { "total" => 4, "passed" => {}, "skipped" => { "total" => 4 }, "failed" => {}}
+            },
+            {
+              "waived_str" => "yes",
+              "expiration_date" => "2026-01-01",
+              "justification" => "Sound reasoning 26",
+              "controlSummary" => { "total" => 3, "passed" => {}, "skipped" => { "total" => 3 }, "failed" => {}}
+            }
+          ]
+        }
+      ]
+    }
+    control_item_array = actual_data['control_items']
+    assert_equal(2, control_item_array.size)
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
 end
