@@ -21,24 +21,24 @@
         </chef-tab-selector>
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
-        <form [formGroup]="editForm">
+        <form [formGroup]="displayNameForm">
           <chef-form-field>
             <label>Display Name<span aria-hidden="true">*</span></label>
             <input chefInput formControlName="displayName" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
               data-cy="team-details-name-input">
             <chef-error
-              *ngIf="(editForm.get('displayName').hasError('required') || editForm.get('displayName').hasError('pattern')) && editForm.get('displayName').dirty">
+              *ngIf="(displayNameForm.get('displayName').hasError('required') || displayNameForm.get('displayName').hasError('pattern')) && displayNameForm.get('displayName').dirty">
               Display Name is required.
             </chef-error>
           </chef-form-field>
         </form>
-        <chef-button [disabled]="(loadingGetUser$ | async) || !editForm.valid || !editForm.dirty" primary inline
+        <chef-button [disabled]="(loadingGetUser$ | async) || !displayNameForm.valid || !displayNameForm.dirty" primary inline
           (click)="saveDisplayName()" data-cy="user-details-submit-button">
-          <chef-loading-spinner *ngIf="updatingUser"></chef-loading-spinner>
-          <span *ngIf="updatingUser">Saving...</span>
-          <span *ngIf="!updatingUser">Save</span>
+          <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
+          <span *ngIf="saveInProgress">Saving...</span>
+          <span *ngIf="!saveInProgress">Save</span>
         </chef-button>
-        <span id="saved-note" *ngIf="saveSuccessful && !editForm.dirty">All changes saved.</span>
+        <span id="saved-note" *ngIf="saveSuccessful && !displayNameForm.dirty">All changes saved.</span>
       </section>
       <section class="page-body" *ngIf="tabValue === 'password'">
         <form [formGroup]="passwordForm">

@@ -32,13 +32,13 @@ export type UserTabName = 'password' | 'details';
 export class UserDetailsComponent implements OnInit, OnDestroy {
   public isAdminView = false;
   public user: User;
-  public editForm: FormGroup;
+  public displayNameForm: FormGroup;
   public passwordForm: FormGroup;
   private isDestroyed = new Subject<boolean>();
-  public updatingUser = false;
   public tabValue: UserTabName = 'details';
   private url: string;
   public saveSuccessful = false;
+  public saveInProgress = false;
   public loadingGetUser$: Observable<boolean>;
 
   constructor(
@@ -72,7 +72,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(([_, user]) => {
         this.user = { ...user };
-        this.editForm.patchValue({displayName: this.user.name});
+        this.displayNameForm.patchValue({displayName: this.user.name});
       });
 
     this.route.data.pipe(
@@ -93,10 +93,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
     this.store.select(updateStatus).pipe(
       takeUntil(this.isDestroyed),
-      filter(status => this.updatingUser && !loading(status)))
+      filter(status => this.saveInProgress && !loading(status)))
       .subscribe((status) => {
-        this.updatingUser = false;
-        // same status is used for updating password or full name, so we just reset both
+        this.saveInProgress = false;
+        // same status is used for updating password or display name, so we just reset both
         this.saveSuccessful = (status === EntityStatus.loadingSuccess);
         if (this.saveSuccessful) {
           this.resetForms();
@@ -118,7 +118,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   private createForms(fb: FormBuilder): void {
     // Must stay in sync with error checks in user-details.component.html
-    this.editForm = fb.group({
+    this.displayNameForm = fb.group({
       displayName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     this.passwordForm = fb.group({
@@ -132,15 +132,15 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   }
 
   private resetForms(): void {
-    this.editForm.reset();
+    this.displayNameForm.reset();
     if (this.user) {
-      this.editForm.patchValue({displayName: this.user.name});
+      this.displayNameForm.patchValue({displayName: this.user.name});
     }
     this.passwordForm.reset();
   }
 
   public savePassword(): void {
-    this.updatingUser = true;
+    this.saveInProgress = true;
     this.saveSuccessful = false;
     const password = this.passwordForm.get('newPassword').value;
     this.store.dispatch(new UpdateUser({ ...this.user, password }));
@@ -148,8 +148,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   public saveDisplayName(): void {
     this.saveSuccessful = false;
-    this.updatingUser = true;
-    const name = this.editForm.get('displayName').value.trim();
+    this.saveInProgress = true;
+    const name = this.displayNameForm.get('displayName').value.trim();
     this.store.dispatch(
       this.isAdminView ?
         new UpdateUser({ ...this.user, name })
