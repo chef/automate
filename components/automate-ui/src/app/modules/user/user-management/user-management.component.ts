@@ -55,7 +55,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   ) {
     this.createUserForm = fb.group({
       // Must stay in sync with error checks in user-form.component.html
-      displayname: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      displayName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(USERNAME_PATTERN)]],
       // length validator must be consistent with
       // backend password rules in local-user-service/password/password.go
@@ -151,7 +151,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     const formValues = this.createUserForm.value;
 
     const userCreateReq = <CreateUserPayload>{
-      name: formValues.displayname.trim(),
+      name: formValues.displayName.trim(),
       id: formValues.username,
       password: formValues.password
     };

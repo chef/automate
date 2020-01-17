@@ -26,17 +26,17 @@ export class UserFormComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.conflictErrorEvent.pipe(takeUntil(this.isDestroyed))
       .subscribe((isConflict: boolean) => {
-      this.conflictError = isConflict;
-      // Open the ID input on conflict so user can resolve it.
-      this.modifyUsername = isConflict;
-    });
+        this.conflictError = isConflict;
+        // Open the ID input on conflict so user can resolve it.
+        this.modifyUsername = isConflict;
+      });
 
     this.passwordErrorEvent.pipe(takeUntil(this.isDestroyed))
-    .subscribe((badPassword: boolean) => {
-      this.passwordError = badPassword;
-      this.createUserForm.get('password').reset();
-      this.createUserForm.get('confirmPassword').reset();
-    });
+      .subscribe((badPassword: boolean) => {
+        this.passwordError = badPassword;
+        this.createUserForm.get('password').reset();
+        this.createUserForm.get('confirmPassword').reset();
+      });
   }
 
   ngOnDestroy() {
@@ -55,13 +55,24 @@ export class UserFormComponent implements OnInit, OnDestroy {
     if (!this.modifyUsername && !this.isNavigationKey(event)) {
       this.conflictError = false;
       this.createUserForm.controls.username.setValue(
-        UsernameMapper.transform(this.createUserForm.controls.displayname.value.trim()));
+        UsernameMapper.transform(this.createUserForm.controls.displayName.value.trim()));
     }
   }
 
   handleClose(): void {
     this.modifyUsername = false;
-    this.close.emit();
+  }
+
+  hasAttemptedInput(field: string): boolean {
+    return (this.createUserForm.get(field).touched &&
+      this.createUserForm.get(field).dirty);
+  }
+
+  leftInputEmpty(field: string): boolean {
+    return ((this.createUserForm.get(field).hasError('required') &&
+      this.createUserForm.get(field).touched) ||
+      (this.createUserForm.get(field).hasError('pattern') &&
+        this.createUserForm.get(field).dirty));
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
