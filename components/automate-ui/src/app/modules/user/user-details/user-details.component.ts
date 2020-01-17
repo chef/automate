@@ -55,13 +55,8 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       pluck('id'),
       filter(identity),
       takeUntil(this.isDestroyed))
-      .subscribe((id: string) => {
-        if (this.preUrlUserId === '') {
-          this.store.dispatch(new GetUser({ id }));
-          this.preUrlUserId = id;
-        } else {
-          this.store.dispatch(new GetUser({ id: this.preUrlUserId }));
-        }
+      this.route.params.subscribe(params => {
+        this.store.dispatch(new GetUser({ id: params.id }));
       });
 
     combineLatest([
