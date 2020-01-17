@@ -48,7 +48,7 @@ export class IntegrationsListComponent {
     return status === 'loading';
   }
 
-  handleDelete($event: ChefKeyboardEvent, id) {
+  handleDelete($event: ChefKeyboardEvent, id: string) {
     if ($event.isUserInput) {
       this.store.dispatch(new DeleteManager({id}));
     }
