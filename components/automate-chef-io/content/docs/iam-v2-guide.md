@@ -395,11 +395,14 @@ Navigate to the project list page once more. Select `Update Projects`. Upon comp
 filter by `project-devops` across Automate's dashboards and see only the ingested data that you expect.
 
 #### Effortless Infra Project
-To create a project that contains all Effortless Infra nodes, add a node ingest rule with a condition that uses an attribute of Chef Server and a value of "localhost".
+
+To create a project that contains all Effortless Infra nodes, create a ingest rule with resource type `Node` and a condition that uses attribute `Chef Server`, operator `equals`, and value `localhost`.
 
 ![](/images/docs/effortless-project-rule.png)
 
-The above rule matches on a node's Chef Server field, which is set to "localhost". This works because all Effortless Infra nodes do not have a Chef Server. Then, by adding a second condition that matches a specific Chef Policy name, subgroups (i.e., nodes matching a specified policy name) of Effortless Infra nodes can be created. 
+The above rule matches on a node's Chef Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Server` attribute as `localhost`. 
+
+If desired, create subgroups of Effortless Infra nodes by adding a second condition that matches a specific `Chef Policy Name`. 
 
 #### Project Policies
 
