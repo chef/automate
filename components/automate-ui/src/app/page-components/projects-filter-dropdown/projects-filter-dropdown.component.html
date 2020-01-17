@@ -61,13 +61,13 @@
 
         <!-- <app-authorized #projects [allOf]="['/iam/v2/projects', 'get']"> -->
           <div class="dropdown-content action-container">
-            <button>Create New Project</button>
+            <button (click)="handleCreateNewProject()">Create New Project</button>
           </div>
         <!-- </app-authorized> -->
 
         <!-- <app-authorized #projects [anyOf]="['/iam/v2/projects', 'get']"> -->
           <div class="dropdown-content action-container">
-            <button>Edit Projects</button>
+            <button (click)="handleEditProjects()">Edit Projects</button>
           </div>
         <!-- </app-authorized> -->
 

@@ -83,6 +83,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   handleClearSelection() {
     this.dropdownActive = false;
     this.optionsEdited = false;
+    // uncheck all the options and then save
     this.editableOptions.map(option => option.checked = false);
     this.onSelection.emit(this.editableOptions);
   }
