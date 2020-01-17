@@ -47,7 +47,7 @@
                   <chef-table-cell class="three-dot-column">
                     <!-- <app-authorized [allOf]="['/iam/v2/projects/{id}', 'delete', project.id]"> -->
                       <mat-select panelClass="chef-control-menu-x">
-                        <mat-option (onSelectionChange)="startProjectDelete(project)" data-cy="delete-project">Delete Project</mat-option>
+                        <mat-option (onSelectionChange)="startProjectDelete($event, project)" data-cy="delete-project">Delete Project</mat-option>
                       </mat-select>
                     <!-- </app-authorized> -->
                   </chef-table-cell>
