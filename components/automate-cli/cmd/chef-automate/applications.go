@@ -25,9 +25,8 @@ func init() {
 
 func newApplicationsRootSubcmd() *cobra.Command {
 	return &cobra.Command{
-		Use:    "applications COMMAND",
-		Short:  "Manage applications visibility features",
-		Hidden: true,
+		Use:   "applications COMMAND",
+		Short: "Manage applications visibility features",
 	}
 }
 
