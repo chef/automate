@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ProjectsFilterOption } from './projects-filter.reducer';
 import * as selectors from './projects-filter.selectors';
-import { LoadOptions, SaveOptions, UpdateSelectionCount } from './projects-filter.actions';
+import { LoadOptions, SaveOptions, UpdateSelectionCount, ResetOptions } from './projects-filter.actions';
 
 const STORE_OPTIONS_KEY = 'projectsFilter.options';
 
@@ -58,6 +58,10 @@ export class ProjectsFilterService {
 
   restoreOptions(): ProjectsFilterOption[] {
     return JSON.parse(localStorage.getItem(STORE_OPTIONS_KEY));
+  }
+
+  resetOptions(): void {
+    this.store.dispatch(new ResetOptions());
   }
 
 }
