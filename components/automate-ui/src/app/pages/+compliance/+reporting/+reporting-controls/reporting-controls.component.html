@@ -43,10 +43,10 @@
           </span>
         </chef-td>
         <chef-td class="actions-cell">
-          <chef-control-menu>
-            <chef-option *ngIf="!hasFilter(control)" (click)="addFilter(control)">Add Filter</chef-option>
-            <chef-option *ngIf="hasFilter(control)" (click)="removeFilter(control)">Remove Filter</chef-option>
-          </chef-control-menu>
+          <mat-select panelClass="chef-control-menu">
+            <mat-option *ngIf="!hasFilter(control)" (onSelectionChange)="addFilter(control)">Add Filter</mat-option>
+            <mat-option *ngIf="hasFilter(control)" (onSelectionChange)="removeFilter(control)">Remove Filter</mat-option>
+          </mat-select>
         </chef-td>
       </chef-tr>
     </chef-tbody>

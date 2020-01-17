@@ -32,7 +32,8 @@ describe('RolesListComponent', () => {
         MockComponent({ selector: 'chef-table-header' }),
         MockComponent({ selector: 'chef-table-row' }),
         MockComponent({ selector: 'chef-option' }),
-        MockComponent({ selector: 'chef-control-menu' }),
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'a', inputs: ['routerLink']}),
         RolesListComponent
       ],

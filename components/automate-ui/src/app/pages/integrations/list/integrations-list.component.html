@@ -53,11 +53,11 @@
             <chef-td>{{ manager.type }}</chef-td>
             <chef-td class="column-date">{{ manager.date_added | datetime: RFC2822 }}</chef-td>
             <chef-td>{{ manager.status }}</chef-td>
-            <chef-td class="controls">
-              <chef-control-menu>
-                <chef-option (click)="handleEdit(manager.id)">Edit Integration</chef-option>
-                <chef-option (click)="handleDelete(manager.id)">Delete Integration</chef-option>
-              </chef-control-menu>
+            <chef-td class="three-dot-column">
+              <mat-select panelClass="chef-control-menu">
+                <mat-option (onSelectionChange)="handleEdit(manager.id)">Edit Integration</mat-option>
+                <mat-option (onSelectionChange)="handleDelete($event, manager.id)">Delete Integration</mat-option>
+              </mat-select>
             </chef-td>
           </chef-tr>
         </chef-tbody>

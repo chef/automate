@@ -23,6 +23,7 @@ import {
 import { projectEntityReducer, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectListComponent } from './project-list.component';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 
 describe('ProjectListComponent', () => {
   let component: ProjectListComponent;
@@ -87,11 +88,11 @@ describe('ProjectListComponent', () => {
           inputs: ['visible', 'applyRulesStatus', 'stopRulesInProgress'],
           outputs: ['confirm', 'cancel']
         }),
-        MockComponent({ selector: 'chef-control-menu' }),
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-table-new' }),
@@ -180,6 +181,8 @@ describe('ProjectListComponent', () => {
     });
 
     describe('delete modal', () => {
+      const mockChefKeyEvent = new KeyboardEvent('keypress') as ChefKeyboardEvent;
+      mockChefKeyEvent.isUserInput = true;
 
       using([
         ['NO_RULES'],
@@ -187,7 +190,7 @@ describe('ProjectListComponent', () => {
       ], function (status: ProjectStatus) {
         it(`upon selecting delete from control menu, opens with ${status}`, () => {
           expect(component.deleteModalVisible).toBe(false);
-          component.startProjectDelete(genProject('uuid-111', status));
+          component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', status));
           expect(component.deleteModalVisible).toBe(true);
         });
       });
@@ -198,13 +201,13 @@ describe('ProjectListComponent', () => {
       ], function (status: ProjectStatus) {
         it(`upon selecting delete from control menu, does not open with ${status}`, () => {
           expect(component.deleteModalVisible).toBe(false);
-          component.startProjectDelete(genProject('uuid-111', status));
+          component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', status));
           expect(component.deleteModalVisible).toBe(false);
         });
       });
 
      it('closes upon sending request to back-end', () => {
-        component.startProjectDelete(genProject('uuid-111', 'NO_RULES'));
+       component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', 'NO_RULES'));
         expect(component.deleteModalVisible).toBe(true);
         component.deleteProject();
         expect(component.deleteModalVisible).toBe(false);
@@ -213,6 +216,8 @@ describe('ProjectListComponent', () => {
     });
 
     describe('message modal', () => {
+      const mockChefKeyEvent = new KeyboardEvent('keypress') as ChefKeyboardEvent;
+      mockChefKeyEvent.isUserInput = true;
 
       using([
         ['RULES_APPLIED'],
@@ -220,7 +225,7 @@ describe('ProjectListComponent', () => {
       ], function (status: ProjectStatus) {
         it(`upon selecting delete from control menu, opens with ${status}`, () => {
           expect(component.messageModalVisible).toBe(false);
-          component.startProjectDelete(genProject('uuid-111', status));
+          component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', status));
           expect(component.messageModalVisible).toBe(true);
         });
       });
@@ -231,13 +236,13 @@ describe('ProjectListComponent', () => {
       ], function (status: ProjectStatus) {
         it(`upon selecting delete from control menu, does not open with ${status}`, () => {
           expect(component.messageModalVisible).toBe(false);
-          component.startProjectDelete(genProject('uuid-111', status));
+          component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', status));
           expect(component.messageModalVisible).toBe(false);
         });
       });
 
       it('closes upon request', () => {
-        component.startProjectDelete(genProject('uuid-111', 'EDITS_PENDING'));
+        component.startProjectDelete(mockChefKeyEvent, genProject('uuid-111', 'EDITS_PENDING'));
         expect(component.messageModalVisible).toBe(true);
         component.closeMessageModal();
         expect(component.messageModalVisible).toBe(false);

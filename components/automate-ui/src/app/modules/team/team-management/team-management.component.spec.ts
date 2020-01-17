@@ -17,6 +17,7 @@ import {
 } from 'app/entities/teams/team.actions';
 import { TeamManagementComponent } from './team-management.component';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 
 describe('TeamManagementComponent', () => {
   let component: TeamManagementComponent;
@@ -43,7 +44,8 @@ describe('TeamManagementComponent', () => {
         }),
         MockComponent({ selector: 'chef-button',
                         inputs: ['disabled', 'routerLink'] }),
-        MockComponent({ selector: 'chef-control-menu' }),
+        MockComponent({ selector: 'mat-select' }),
+        MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),
@@ -51,7 +53,6 @@ describe('TeamManagementComponent', () => {
         MockComponent({ selector: 'chef-heading' }),
         MockComponent({ selector: 'chef-icon' }),
         MockComponent({ selector: 'chef-loading-spinner' }),
-        MockComponent({ selector: 'chef-option' }),
         MockComponent({ selector: 'chef-page-header' }),
         MockComponent({ selector: 'chef-subheading' }),
         MockComponent({ selector: 'chef-toolbar' }),
@@ -203,12 +204,16 @@ describe('TeamManagementComponent', () => {
 
   describe('delete team', () => {
     let store: Store<NgrxStateAtom>;
+    const mockChefKeyEvent = new KeyboardEvent('keypress') as ChefKeyboardEvent;
+    mockChefKeyEvent.isUserInput = true;
+
     const deleteTeam: Team = {
       guid: 'uuid-1',
       id: 'new-team',
       name: 'new team',
       projects: []
     };
+
 
     beforeEach(() => {
       store = TestBed.get(Store);
@@ -219,7 +224,7 @@ describe('TeamManagementComponent', () => {
     });
 
     it('opens the delete modal', () => {
-      component.startTeamDelete(deleteTeam);
+      component.startTeamDelete(mockChefKeyEvent, deleteTeam);
       fixture.detectChanges();
 
       expect(component.deleteModalVisible).toBe(true);

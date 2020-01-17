@@ -68,7 +68,7 @@ describe('team management', () => {
         const systemTeams = ['admins', 'editors', 'viewers'];
         systemTeams.forEach(name => {
           cy.get('#table-container chef-table-row').contains(name)
-            .parent().parent().find('chef-control-menu').as('control-menu');
+            .parent().parent().find('mat-select').as('control-menu');
         });
       } else {
         cy.get('#table-container chef-table-header-cell').contains('Name');
@@ -77,7 +77,7 @@ describe('team management', () => {
         const systemTeams = ['admins'];
         systemTeams.forEach(name => {
           cy.get('#table-container chef-table-row').contains(name)
-            .parent().parent().find('chef-control-menu').as('control-menu');
+            .parent().parent().find('mat-select').as('control-menu');
         });
       }
     });

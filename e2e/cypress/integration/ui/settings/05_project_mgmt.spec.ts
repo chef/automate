@@ -24,8 +24,8 @@ describeIfIAMV2p1('project management', () => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminIdToken = admin.id_token;
       cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-        // Set the projects filter to all projects
-        cy.applyProjectsFilter([]);
+      // Set the projects filter to all projects
+      cy.applyProjectsFilter([]);
     });
   });
 
@@ -112,10 +112,10 @@ describeIfIAMV2p1('project management', () => {
     // Node
     cy.get('#create-type-dropdown').select('Node');
     const nodeAttributes = ['Chef Organization', 'Chef Server', 'Environment',
-        'Chef Role', 'Chef Tag', 'Chef Policy Name', 'Chef Policy Group'];
+      'Chef Role', 'Chef Tag', 'Chef Policy Name', 'Chef Policy Group'];
 
     nodeAttributes.forEach((att: string) => {
-        cy.get('[data-cy=attribute-dropdown]').select(att);
+      cy.get('[data-cy=attribute-dropdown]').select(att);
     });
 
     cy.get('[data-cy=operator-dropdown]').select('member of');
@@ -201,11 +201,11 @@ describeIfIAMV2p1('project management', () => {
     cy.get('[data-cy=rules-tab]').click();
 
     cy.get('app-project-details chef-table-cell').contains(ruleID).parent()
-      .find('chef-control-menu').as('controlMenu');
+      .find('mat-select').as('controlMenu');
     // we throw in a should so cypress retries until introspection allows menu to be shown
     cy.get('@controlMenu').should('be.visible')
       .click();
-    cy.get('@controlMenu').find('[data-cy=delete-rule]').click({force: true});
+    cy.get('@controlMenu').find('[data-cy=delete-rule]').click({ force: true });
 
     cy.get('app-project-details chef-button').contains('Delete Rule').click();
 
@@ -220,7 +220,7 @@ describeIfIAMV2p1('project management', () => {
     cy.get('.breadcrumb').click();
 
     cy.get('app-project-list chef-table-cell').contains(projectID).parent()
-      .find('chef-control-menu').as('controlMenu');
+      .find('mat-select').as('controlMenu');
     cy.get('@controlMenu').click({ force: true });
     cy.get('@controlMenu').find('[data-cy=delete-project]').click({ force: true });
 
@@ -239,7 +239,7 @@ describeIfIAMV2p1('project management', () => {
       // no projects are left so we shouldn't render the table at all
       if (response.body.projects.length === 0) {
         cy.get('app-project-list chef-table-body').should('not.exist');
-      // otherwise, check that the projectID is no longer in the table
+        // otherwise, check that the projectID is no longer in the table
       } else {
         cy.get('app-project-list chef-table-body chef-table-cell')
           .contains(projectID).should('not.exist');

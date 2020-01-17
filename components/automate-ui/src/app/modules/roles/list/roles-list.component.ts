@@ -11,6 +11,7 @@ import { GetRoles, DeleteRole } from 'app/entities/roles/role.actions';
 import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { allRoles, getAllStatus } from 'app/entities/roles/role.selectors';
 import { Role } from 'app/entities/roles/role.model';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
   selector: 'app-roles-list',
@@ -48,9 +49,11 @@ export class RolesListComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  public startRoleDelete(role: Role): void {
-    this.roleToDelete = role;
-    this.deleteModalVisible = true;
+  public startRoleDelete($event: ChefKeyboardEvent, role: Role): void {
+    if ($event.isUserInput) {
+      this.roleToDelete = role;
+      this.deleteModalVisible = true;
+    }
   }
 
   public deleteRole(): void {

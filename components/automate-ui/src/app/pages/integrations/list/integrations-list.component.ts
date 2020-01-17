@@ -13,6 +13,7 @@ import {
 } from '../../../entities/managers/manager.selectors';
 import { DeleteManager } from '../../../entities/managers/manager.actions';
 import { routeParams } from '../../../route.selectors';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
   selector: 'app-integrations',
@@ -47,8 +48,10 @@ export class IntegrationsListComponent {
     return status === 'loading';
   }
 
-  handleDelete(id) {
-    this.store.dispatch(new DeleteManager({id}));
+  handleDelete($event: ChefKeyboardEvent, id: string) {
+    if ($event.isUserInput) {
+      this.store.dispatch(new DeleteManager({id}));
+    }
   }
 
   handleEdit(id) {
