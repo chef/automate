@@ -103,7 +103,7 @@ describe('user management', () => {
     // we throw in a should so cypress waits until introspection allows menu to be shown
     cy.get('@dropdownTrigger').should('be.visible')
       .click();
-    cy.get('.chef-control-menu-x').find('[data-cy=delete]').click({ force: true });
+    cy.get('.chef-control-menu').find('[data-cy=delete]').click({ force: true });
 
     // confirm in modal
     cy.get('app-user-management chef-button').contains('Delete User').click();

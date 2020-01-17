@@ -54,7 +54,7 @@
             <chef-td class="column-date">{{ manager.date_added | datetime: RFC2822 }}</chef-td>
             <chef-td>{{ manager.status }}</chef-td>
             <chef-td class="controls">
-              <mat-select panelClass="chef-control-menu-x">
+              <mat-select panelClass="chef-control-menu">
                 <mat-option (onSelectionChange)="handleEdit(manager.id)">Edit Integration</mat-option>
                 <mat-option (onSelectionChange)="handleDelete($event, manager.id)">Delete Integration</mat-option>
               </mat-select>

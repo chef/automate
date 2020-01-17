@@ -95,7 +95,7 @@
           </span>
         </chef-td>
         <chef-td>
-          <mat-select panelClass="chef-control-menu-x">
+          <mat-select panelClass="chef-control-menu">
             <mat-option *ngIf="!hasFilter(node)" (onSelectionChange)="addFilter(node)">Add Filter</mat-option>
             <mat-option *ngIf="hasFilter(node)" (onSelectionChange)="removeFilter(node)">Remove Filter</mat-option>
             <mat-option (onSelectionChange)="displayScanResults(node)">Scan Results</mat-option>

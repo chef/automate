@@ -14,9 +14,7 @@ import { policyFromRoute, getStatus } from 'app/entities/policies/policy.selecto
 import {
   Policy, Member, Type, stringToMember
 } from 'app/entities/policies/policy.model';
-import {
-  RemovePolicyMembers, PolicyMembersMgmtPayload
-} from 'app/entities/policies/policy.actions';
+import { RemovePolicyMembers } from 'app/entities/policies/policy.actions';
 import { ChefKeyboardEvent } from 'app/types/material-types';
 
 export type PolicyTabName = 'definition' | 'members';
@@ -106,7 +104,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
 
   removeMember($event: ChefKeyboardEvent, member: Member): void {
     if ($event.isUserInput) {
-      this.store.dispatch(new RemovePolicyMembers(<PolicyMembersMgmtPayload>{
+      this.store.dispatch(new RemovePolicyMembers({
         id: this.policy.id,
         members: [member]
       }));

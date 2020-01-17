@@ -236,7 +236,7 @@ input {
 }
 
 // Angular Material Overrides
-.chef-control-menu-x {
+.chef-control-menu {
   position: absolute;
   margin-top: 35px;
   right: -48px;
@@ -262,7 +262,7 @@ input {
   }
 }
 
-[panelclass="chef-control-menu-x"] {
+[panelclass="chef-control-menu"] {
   text-align: right;
 
   &:focus .mat-select-trigger {

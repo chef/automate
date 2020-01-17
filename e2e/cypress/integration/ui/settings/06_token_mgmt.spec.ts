@@ -86,7 +86,7 @@ describe('token management', () => {
 
       cy.get('@dropdownTrigger').should('be.visible')
         .click({ force: true }).then( () => {
-          cy.get('.chef-control-menu-x').contains(item);
+          cy.get('.chef-control-menu').contains(item);
       });
 
     });
@@ -101,7 +101,7 @@ describe('token management', () => {
 
     cy.get('@dropdownTrigger').should('be.visible')
       .click({ force: true }).then(() =>
-        cy.get('.chef-control-menu-x').find('[data-cy=copy-token]').click({force: true})
+        cy.get('.chef-control-menu').find('[data-cy=copy-token]').click({force: true})
       );
 
     cy.get('chef-notification').should('be.visible');
@@ -117,7 +117,7 @@ describe('token management', () => {
 
     cy.get('@dropdownTrigger').should('be.visible')
       .click({ force: true }).then(() =>
-        cy.get('.chef-control-menu-x').find('[data-cy=delete]').click({ force: true })
+        cy.get('.chef-control-menu').find('[data-cy=delete]').click({ force: true })
       );
 
     cy.get('app-delete-object-modal').find('button').contains('Delete Token')

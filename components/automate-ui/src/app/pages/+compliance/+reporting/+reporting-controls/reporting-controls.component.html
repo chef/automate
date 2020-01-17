@@ -43,7 +43,7 @@
           </span>
         </chef-td>
         <chef-td class="actions-cell">
-          <mat-select panelClass="chef-control-menu-x">
+          <mat-select panelClass="chef-control-menu">
             <mat-option *ngIf="!hasFilter(control)" (onSelectionChange)="addFilter(control)">Add Filter</mat-option>
             <mat-option *ngIf="hasFilter(control)" (onSelectionChange)="removeFilter(control)">Remove Filter</mat-option>
           </mat-select>

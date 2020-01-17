@@ -67,7 +67,7 @@
                 <ng-container *ngIf="!token.active">Inactive</ng-container>
               </chef-table-cell>
               <chef-table-cell class="three-dot-column">
-                <mat-select panelClass="chef-control-menu-x" id="menu-{{token.id}}" data-cy="token-control">
+                <mat-select panelClass="chef-control-menu" id="menu-{{token.id}}" data-cy="token-control">
                   <mat-option (onSelectionChange)="notifyCopy($event)" data-cy="copy-token">
                     <chef-clipboard plain value={{token.value}} label="Copy Token" icon=""></chef-clipboard>
                   </mat-option>

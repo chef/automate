@@ -30,7 +30,7 @@
         <chef-td class="version-cell">{{ profile.version }}</chef-td>
         <chef-td class="identifier-cell">{{ user }}/{{ profile.name }}</chef-td>
         <chef-td class="actions-cell">
-          <mat-select panelClass="chef-control-menu-x">
+          <mat-select panelClass="chef-control-menu">
             <mat-option *ngIf="!hasFilter(profile)" (onSelectionChange)="addFilter(profile)">Add Filter</mat-option>
             <mat-option *ngIf="hasFilter(profile)" (onSelectionChange)="removeFilter(profile)">Remove Filter</mat-option>
             <mat-option (onSelectionChange)="displayScanResults(profile)">Scan Results</mat-option>

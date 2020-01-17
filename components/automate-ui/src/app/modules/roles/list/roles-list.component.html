@@ -39,7 +39,7 @@
                   <chef-table-cell>{{ role.type | iamType }}</chef-table-cell>
                   <chef-table-cell class="three-dot-column">
                     <!-- <app-authorized [allOf]="[`/iam/v2/roles/{id}`, 'delete', role.id]"> -->
-                    <mat-select panelClass="chef-control-menu-x" *ngIf="(role.type | iamType).toLowerCase() === 'custom'">
+                    <mat-select panelClass="chef-control-menu" *ngIf="(role.type | iamType).toLowerCase() === 'custom'">
                       <mat-option data-cy="delete" (onSelectionChange)="startRoleDelete($event, role)">Delete Role</mat-option>
                     </mat-select>
                     <!-- </app-authorized> -->
