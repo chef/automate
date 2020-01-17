@@ -4,8 +4,9 @@ import { UsernameMapper } from './username-mapper';
 describe('UsernameMapper', () => {
 
     using([
-      ['-0a5l9z@-', '-0a5l9z@-', 'preserves numbers, lowercase letters, hyphens, @ symbol'],
+      ['-0a5l9z-', '-0a5l9z-', 'preserves numbers, lowercase letters, hyphens, @ symbol'],
       ['my_name__', 'my_name__', 'preserves underscores'],
+      ['my.name+last_name@email.com', 'my.name+last_name@email.com', 'preserves email symbols'],
       ['my-name!', 'my-name-', 'replaces trailing unsupported single char with hyphen'],
       ['my-name$/', 'my-name--', 'replaces trailing unsupported multiple chars with hyphen'],
       ['my^%<>name', 'my----name', 'replaces middle unsupported chars with hyphen'],
