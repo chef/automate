@@ -1,13 +1,15 @@
-import { Component, Input, OnInit, EventEmitter, Output } from '@angular/core';
+import { Component, Input, OnInit, OnDestroy, EventEmitter, Output } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { UsernameMapper } from 'app/helpers/auth/username-mapper';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-user-form',
   templateUrl: './user-form.component.html',
   styleUrls: ['./user-form.component.scss']
 })
-export class UserFormComponent implements OnInit {
+export class UserFormComponent implements OnInit, OnDestroy {
   @Input() createUserForm: FormGroup;
   @Input() conflictErrorEvent: EventEmitter<boolean>;
   @Input() passwordErrorEvent: EventEmitter<boolean>;
@@ -19,20 +21,27 @@ export class UserFormComponent implements OnInit {
   public passwordError = false;
   public modifyUsername = false; // Whether the edit Username form is open or not.
 
+  private isDestroyed = new Subject<boolean>();
+
   ngOnInit(): void {
-    this.conflictErrorEvent.subscribe((isConflict: boolean) => {
+    this.conflictErrorEvent.pipe(takeUntil(this.isDestroyed))
+      .subscribe((isConflict: boolean) => {
       this.conflictError = isConflict;
       // Open the ID input on conflict so user can resolve it.
       this.modifyUsername = isConflict;
     });
-    // TODO add takeUntil(this.isDestroyed) to unsubscribe
 
-    this.passwordErrorEvent.subscribe((badPassword: boolean) => {
+    this.passwordErrorEvent.pipe(takeUntil(this.isDestroyed))
+    .subscribe((badPassword: boolean) => {
       this.passwordError = badPassword;
       this.createUserForm.get('password').reset();
       this.createUserForm.get('confirmPassword').reset();
     });
-    // TODO add takeUntil(this.isDestroyed) to unsubscribe
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   handleUsernameInput(event: KeyboardEvent): void {
