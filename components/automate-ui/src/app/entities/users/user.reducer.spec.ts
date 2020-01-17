@@ -18,9 +18,9 @@ import {
   GetUsersSuccessPayload,
   GetUserSuccess,
   GetUser,
-  UpdateUser,
-  UpdateUserSuccess,
   DeleteUserSuccess,
+  UpdateNameUser,
+  UpdatePasswordUserSuccess,
   GetUserFailure,
   UpdateUserFailure,
   DeleteUser,
@@ -167,9 +167,9 @@ describe('userStatusEntityReducer', () => {
       });
     });
 
-    describe('UPDATE', () => {
+    describe('UPDATE_NAME_USER', () => {
       const payload = user;
-      const action = new UpdateUser(payload);
+      const action = new UpdateNameUser(payload);
 
       it('sets status to loading', () => {
         const { updateStatus } = userEntityReducer(initialState, action);
@@ -177,9 +177,9 @@ describe('userStatusEntityReducer', () => {
       });
     });
 
-    describe('UPDATE_SUCCESS', () => {
+    describe('UPDATE_PASSWORD_USER_SUCCESS', () => {
       const payload = { ...user, name: 'test user 123'};
-      const action = new UpdateUserSuccess(payload);
+      const action = new UpdatePasswordUserSuccess(payload);
 
       it('sets status to loadingSuccess', () => {
         const prevState = { ...initialState, state: EntityStatus.loading };
