@@ -90,11 +90,9 @@ describe('Admin pages', () => {
 
       ['Delete User'].forEach((item, index) => {
         it(`when clicked, shows ${item}`, () => {
-          // const menu = $('chef-table-new chef-table-body chef-table-row mat-select');
           const menuTrigger = $('chef-table-new chef-table-body chef-table-row mat-select .mat-select-trigger');
           browser.wait(EC.elementToBeClickable(menuTrigger), 5000).then(() => {
             menuTrigger.click().then(() => {
-              // const panel = $('.chef-control-menu-x');
               const dropDownOption = $(`.chef-control-menu-x mat-option:nth-child(${index + 1}`);
               const dropDownOpened = () => dropDownOption.getText().then(val => val === item);
               browser.wait(dropDownOpened, 100, 'Control options should render.');
