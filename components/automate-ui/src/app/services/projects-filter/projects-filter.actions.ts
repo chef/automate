@@ -37,6 +37,7 @@ export class UpdateSelectionCount implements Action {
 
 export class ResetOptions implements Action {
   readonly type = ProjectsFilterActionTypes.RESET_OPTIONS;
+  constructor(public payload: ProjectsFilterOption[]) { }
 }
 
 export type ProjectsFilterActions =

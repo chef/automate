@@ -27,6 +27,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
 
   @Output() onSelection = new EventEmitter<ProjectsFilterOption[]>();
   @Output() onOptionChange = new EventEmitter<ProjectsFilterOption[]>();
+  @Output() onClear = new EventEmitter<ProjectsFilterOption[]>();
 
   editableOptions: ProjectsFilterOption[] = [];
   filteredOptions: ProjectsFilterOption[] = [];
@@ -81,7 +82,10 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   }
 
   handleClearSelection() {
-    this.handleEscape();
+    this.dropdownActive = false;
+    this.optionsEdited = false;
+    this.editableOptions.map(option => option.checked = false);
+    this.onSelection.emit(this.editableOptions);
   }
 
   handleArrowUp(event: KeyboardEvent) {
