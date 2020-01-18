@@ -9,8 +9,7 @@
       <chef-page-header>
         <div class="detail-row">
           <div class="name-column">
-            <div class="header-user-name" *ngIf="!isAdminView">Profile: {{ user?.name }}</div>
-            <div class="header-user-name" *ngIf="isAdminView">{{ user?.name }}</div>
+            <div class="header-user-name">{{ user?.name }}</div>
             <div class="header-user-id-label">Username</div>
             <div class="header-user-id">{{ user?.id }}</div>
           </div>
@@ -23,7 +22,7 @@
       <section class="page-body" *ngIf="tabValue === 'details'">
         <form [formGroup]="displayNameForm">
           <chef-form-field>
-            <label>Display Name<span aria-hidden="true">*</span></label>
+            <label>Display Name <span aria-hidden="true">*</span></label>
             <input chefInput formControlName="displayName" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
               data-cy="team-details-name-input">
             <chef-error
