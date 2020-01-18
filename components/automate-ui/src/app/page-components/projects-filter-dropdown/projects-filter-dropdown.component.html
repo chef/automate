@@ -59,19 +59,19 @@
           </div>
         </div>
 
-        <!-- <app-authorized #projects [allOf]="['/iam/v2/projects', 'get']"> -->
+        <app-authorized [allOf]="['/iam/v2/projects', 'get']">
           <div class="dropdown-content action-container">
             <button (click)="handleCreateNewProject()">Create New Project</button>
           </div>
-        <!-- </app-authorized> -->
+        </app-authorized>
 
-        <!-- <app-authorized #projects [anyOf]="['/iam/v2/projects', 'get']"> -->
-          <div class="dropdown-content action-container">
+        <!-- <app-authorized [anyOf]="['/iam/v2/projects', 'get']"> -->
+          <!-- <div class="dropdown-content action-container">
             <button (click)="handleEditProjects()">Edit Projects</button>
-          </div>
+          </div> -->
         <!-- </app-authorized> -->
 
-      </div> <!-- end dropdown body -->
+      </div>
 
   </chef-dropdown>
 </chef-click-outside>

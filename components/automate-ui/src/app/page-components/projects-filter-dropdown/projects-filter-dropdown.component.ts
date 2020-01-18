@@ -88,6 +88,14 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
     this.onSelection.emit(this.editableOptions);
   }
 
+  handleCreateNewProject() {
+    console.log('clicked create new project');
+  }
+
+  handleEditProjects() {
+    console.log('clicked edit projects, should route to Projects list');
+  }
+
   handleArrowUp(event: KeyboardEvent) {
     event.preventDefault();
 
