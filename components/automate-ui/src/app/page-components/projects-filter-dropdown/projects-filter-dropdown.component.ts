@@ -89,7 +89,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   }
 
   handleCreateNewProject() {
-    console.log('clicked create new project');
+    console.log('clicked create new project - open modal');
   }
 
   handleEditProjects() {
