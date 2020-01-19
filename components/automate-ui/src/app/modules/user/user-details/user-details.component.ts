@@ -3,7 +3,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { filter, pluck, takeUntil } from 'rxjs/operators';
+import { filter, pluck, takeUntil, first } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
@@ -53,9 +53,9 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       select(routeParams),
       pluck('id'),
       filter(identity),
-      takeUntil(this.isDestroyed))
+      first())
       .subscribe((id: string) => {
-        this.store.dispatch(new GetUser({ id }));
+          this.store.dispatch(new GetUser({ id }));
       });
 
     combineLatest([
