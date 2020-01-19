@@ -3,12 +3,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { FormBuilder, Validators, FormGroup } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { combineLatest, Subject } from 'rxjs';
-import { filter, takeUntil } from 'rxjs/operators';
-import { isNil } from 'lodash/fp';
+import { filter, pluck, takeUntil, first } from 'rxjs/operators';
+import { identity, isNil } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ChefValidators } from 'app/helpers/auth/validator';
+import { routeParams } from 'app/route.selectors';
 import { EntityStatus, loading } from 'app/entities/entities';
 import {
   DeleteUser,
@@ -36,6 +37,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   private deletingUser = false;
   public updatingUser = false;
+  public preUrlUserId = '';
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -48,10 +50,13 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
 
   ngOnInit(): void {
-    this.route.params.pipe(
-      takeUntil(this.isDestroyed))
-      .subscribe(params => {
-        this.store.dispatch(new GetUser({ id: params.id }));
+    this.store.pipe(
+      select(routeParams),
+      pluck('id'),
+      filter(identity),
+      first())
+      .subscribe((id: string) => {
+          this.store.dispatch(new GetUser({ id }));
       });
 
     combineLatest([
