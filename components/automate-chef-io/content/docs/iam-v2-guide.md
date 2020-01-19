@@ -241,7 +241,7 @@ so they are not relevant when assigning IAM resources such as teams or roles.
 
 #### Configuring Project Limit
 
-By default, Chef Automate is currently limited to six projects. If you would like to increase that limit, you will need to do so using the Chef Automate CLI:
+By default, Chef Automate limits you to six projects. You can increase the project limit using the command line.
 
 First, write the file with your new project limit:
 
@@ -356,13 +356,12 @@ Avoid stopping an update unless absolutely necessary. It will leave your system 
 
 Once rules have been successfully applied, the update button will change to `Projects Up-to-Date` and be disabled until the next time there are *pending edits* to any project.
 
-To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navigation. The data in Automate will now be filtered by the selected project.
+To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navigation. The data in Automate filters by the selected `project-devops` project.
 In this example, the effect is revealed by navigating to the Compliance Reports' Nodes tab, which only features nodes that belong to the `devops` Chef Organization.
 
 ![](/images/docs/global-projects-filter.png)
 
-Now that we have the first set of our ingested data associated with our new project, let us add another condition and a new rule to
-add more data to `project-devops`.
+Now that we have the first set of our ingested data associated with our new project, let us add another condition and a new rule to add more data to `project-devops`.
 
 {{% info %}}
 Compliance and Infrastructure ingested resources are not the exact same nodes, so their properties may not be the same.
