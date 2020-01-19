@@ -37,7 +37,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
   private deletingUser = false;
   public updatingUser = false;
-  public preUrlUserId = '';
 
   constructor(
     private store: Store<NgrxStateAtom>,
