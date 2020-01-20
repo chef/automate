@@ -78,9 +78,9 @@
         </form>
         <chef-button [disabled]="isLoadingTeam || !updateNameForm.valid || !updateNameForm.dirty" primary inline
           (click)="saveTeam()" data-cy="team-details-submit-button">
-          <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
-          <span *ngIf="saving">Saving...</span>
-          <span *ngIf="!saving">Save</span>
+          <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
+          <span *ngIf="saveInProgress">Saving...</span>
+          <span *ngIf="!saveInProgress">Save</span>
         </chef-button>
         <span id="saved-note" *ngIf="saveSuccessful && !updateNameForm.dirty">All changes saved.</span>
       </section>
