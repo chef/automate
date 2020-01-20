@@ -11,7 +11,8 @@
   (close)="closePage()">
   <div *ngIf="!(loading$ | async)">
     <div id="no-users-container" *ngIf="usersNotFiltered().length === 0">
-      <p>There are no more local <a [routerLink]="['/settings', 'users']" target="_blank">users</a> to add; create some more!</p>
+      <p>There are no more local users to add; create some more!</p>
+      <chef-button primary (click)="openModal()">Create User</chef-button>
     </div>
     <div id="table-container" *ngIf="usersNotFiltered()?.length > 0">
       <div class="flex">
