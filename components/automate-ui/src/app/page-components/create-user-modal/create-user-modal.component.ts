@@ -2,13 +2,15 @@ import { Component, OnInit, Input, EventEmitter, OnChanges, SimpleChanges, OnDes
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, filter } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { UsernameMapper } from 'app/helpers/auth/username-mapper';
 import { ChefValidators } from 'app/helpers/auth/validator';
+import { EntityStatus } from 'app/entities/entities';
 import { CreateUserPayload, CreateUser } from 'app/entities/users/user.actions';
+import { createStatus } from 'app/entities/users/user.selectors';
 
 // pattern for valid usernames
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';
@@ -95,7 +97,15 @@ export class CreateUserModalComponent implements OnInit, OnDestroy, OnChanges {
     //   });
 
     this.openEvent.pipe(takeUntil(this.isDestroyed))
-      .subscribe(() => this.visible = true);
+      .subscribe(() => {
+        this.creatingUser = false;
+        this.visible = true;
+      });
+
+    this.store.select(createStatus).pipe(
+      filter(state => state === EntityStatus.loadingSuccess),
+      takeUntil(this.isDestroyed))
+      .subscribe(() => this.closeCreateModal());
   }
 
   ngOnDestroy() {
