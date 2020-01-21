@@ -24,7 +24,7 @@ import (
 const (
 	idRegex          = "^[a-z0-9-_]{1,64}$"
 	conditionLimit   = 10 // help avoid the grpc limit of 4194304
-	projectLimit     = 6  // system limitation
+	projectLimit     = 6  // system limitation is 300
 	SuperuserSubject = "tls:service:deployment-service:internal"
 )
 
