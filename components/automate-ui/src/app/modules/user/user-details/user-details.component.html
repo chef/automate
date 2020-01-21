@@ -24,7 +24,7 @@
           <chef-form-field>
             <label>Display Name <span aria-hidden="true">*</span></label>
             <input chefInput formControlName="displayName" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
-              data-cy="team-details-name-input">
+              data-cy="user-details-name-input">
             <chef-error
               *ngIf="(displayNameForm.get('displayName').hasError('required') || displayNameForm.get('displayName').hasError('pattern')) && displayNameForm.get('displayName').dirty">
               Display Name is required.
