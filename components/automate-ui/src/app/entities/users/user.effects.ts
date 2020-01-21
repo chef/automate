@@ -140,6 +140,14 @@ export class UserEffects {
         catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
 
   @Effect()
+  updatePasswordSelfSuccess$ = this.actions$.pipe(
+    ofType(UserActionTypes.UPDATE_PASSWORD_SELF_SUCCESS),
+    map(( { payload: user }: UpdatePasswordSelfSuccess) => new CreateNotification({
+      type: Type.info,
+      message: `Reset password for user: ${user.id}.`
+    })));
+
+  @Effect()
   updateNameSelf$ = combineLatest([
     this.actions$.pipe(ofType<UpdateNameSelf>(UserActionTypes.UPDATE_NAME_SELF)),
     this.store$.select(iamMajorVersion).pipe(filter(identity))])
@@ -148,14 +156,6 @@ export class UserEffects {
       this.requests.updateSelf(action.payload, version).pipe(
         map((resp: SelfUser) => new UpdateNameSelfSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
-
-  @Effect()
-  updatePasswordSelfSuccess$ = this.actions$.pipe(
-    ofType(UserActionTypes.UPDATE_PASSWORD_SELF_SUCCESS),
-    map(( { payload: user }: UpdatePasswordSelfSuccess) => new CreateNotification({
-      type: Type.info,
-      message: `Reset password for user: ${user.id}.`
-    })));
 
   @Effect()
   deleteUser$ = combineLatest([
