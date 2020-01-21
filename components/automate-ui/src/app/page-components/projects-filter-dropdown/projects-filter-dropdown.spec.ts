@@ -181,7 +181,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       });
 
       it('the "Apply" button is enabled', () => {
-        const button = fixture.nativeElement.querySelector('chef-button');
+        const button = fixture.nativeElement.querySelector('#projects-filter-apply-changes');
         expect(button.getAttribute('disabled')).toEqual('false');
       });
     });
@@ -302,7 +302,7 @@ describe('ProjectsFilterDropdownComponent', () => {
         }
       ];
       component.optionsEdited = false;
-      component.handleOptionChange({ detail: true }, 0);
+      component.handleOptionChange({ detail: true }, 'Project 1');
     });
 
     it('updates the value of `checked` to the emitted value', () => {
