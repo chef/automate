@@ -116,6 +116,8 @@ describe('ProjectsFilterDropdownComponent', () => {
           checked: true
         }
       ];
+      // need filteredOptions in order for elements to be displayed in the UI
+      component.filteredOptions = component.editableOptions;
       fixture.detectChanges();
     });
 
@@ -124,15 +126,15 @@ describe('ProjectsFilterDropdownComponent', () => {
       expect(options.length).toEqual(2);
       options.forEach((option: HTMLInputElement, index: number) => {
         const { label, checked } = component.editableOptions[index];
-        expect(option.textContent).toEqual(label);
+        expect(option.textContent.trim()).toEqual(label);
         expect(option.checked).toEqual(checked);
       });
     });
 
     it('displays an "Apply Changes" button', () => {
-      const button = fixture.nativeElement.querySelector('chef-button');
+      const button = fixture.nativeElement.querySelector('#projects-filter-apply-changes');
       expect(button).not.toBeNull();
-      expect(button.textContent).toEqual('Apply Changes');
+      expect(button.textContent.trim()).toEqual('Apply Changes');
       expect(button.hasAttribute('disabled')).toEqual(true);
     });
 
@@ -168,7 +170,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       });
 
       it('the "Apply" button is disabled', () => {
-        const button = fixture.nativeElement.querySelector('chef-button');
+        const button = fixture.nativeElement.querySelector('#projects-filter-apply-changes');
         expect(button.getAttribute('disabled')).toEqual('true');
       });
     });
