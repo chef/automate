@@ -10,6 +10,7 @@ import { DateTime } from 'app/helpers/datetime/datetime';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { HttpStatus } from 'app/types/types';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 import { loading, EntityStatus, pending } from 'app/entities/entities';
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { Type } from 'app/entities/notifications/notification.model';
@@ -131,9 +132,11 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public startTokenDelete(token: ApiToken): void {
-    this.tokenToDelete = token;
-    this.deleteModalVisible = true;
+  public startTokenDelete($event: ChefKeyboardEvent, token: ApiToken): void {
+    if ($event.isUserInput) {
+      this.tokenToDelete = token;
+      this.deleteModalVisible = true;
+    }
   }
 
   public deleteToken(): void {
@@ -152,8 +155,10 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
 
   }
 
-  public toggleActive(token: ApiToken): void {
-    this.store.dispatch(new ToggleTokenActive(token));
+  public toggleActive($event: ChefKeyboardEvent, token: ApiToken): void {
+    if ($event.isUserInput) {
+      this.store.dispatch(new ToggleTokenActive(token));
+    }
   }
 
   public openCreateModal(): void {
@@ -166,11 +171,13 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
     this.resetCreateModal();
   }
 
-  public notifyCopy(): void {
-    this.store.dispatch(new CreateNotification({
-      type: Type.info,
-      message: 'API Token copied to clipboard.'
-    }));
+  public notifyCopy($event: ChefKeyboardEvent): void {
+    if ($event.isUserInput) {
+      this.store.dispatch(new CreateNotification({
+        type: Type.info,
+        message: 'API Token copied to clipboard.'
+      }));
+    }
   }
 
   private resetCreateModal(): void {

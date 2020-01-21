@@ -52,7 +52,7 @@ describe('token management', () => {
   });
 
   after(() => {
-    // can still use v2beta APIs while on v1
+    // can still use v2 APIs while on v1
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['tokens']);
   });
 
@@ -81,17 +81,27 @@ describe('token management', () => {
     ['Copy Token', 'Toggle Status', 'Delete Token'].forEach((item, _) => {
       cy.get('chef-table-body').contains(tokenName1).parent().parent()
         .find('[data-cy=token-control]').as('controlMenu');
-      cy.get('@controlMenu').should('be.visible').click({ force: true });
-      cy.get('@controlMenu').contains(item);
+      cy.get('chef-table-body').contains(tokenName1).parent().parent()
+        .find('[data-cy=token-control] .mat-select-trigger').as('dropdownTrigger');
+
+      cy.get('@dropdownTrigger').should('be.visible')
+        .click({ force: true }).then( () => {
+          cy.get('.chef-control-menu').contains(item);
+      });
+
     });
   });
 
   it('can copy token', () => {
     cy.get('chef-table-body').contains(tokenName1).parent().parent()
     .find('[data-cy=token-control]').as('controlMenu');
-    cy.get('@controlMenu').should('be.visible')
+
+    cy.get('chef-table-body').contains(tokenName1).parent().parent()
+      .find('[data-cy=token-control] .mat-select-trigger').as('dropdownTrigger');
+
+    cy.get('@dropdownTrigger').should('be.visible')
       .click({ force: true }).then(() =>
-        cy.get('@controlMenu').find('[data-cy=copy-token]').click({force: true})
+        cy.get('.chef-control-menu').find('[data-cy=copy-token]').click({force: true})
       );
 
     cy.get('chef-notification').should('be.visible');
@@ -101,8 +111,15 @@ describe('token management', () => {
   it('can delete token', () => {
     cy.get('chef-table-body').contains(tokenName1).parent().parent()
       .find('[data-cy=token-control]').as('controlMenu');
-    cy.get('@controlMenu').should('be.visible').click();
-    cy.get('@controlMenu').find('[data-cy=delete]').click({ force: true });
+
+    cy.get('chef-table-body').contains(tokenName1).parent().parent()
+      .find('[data-cy=token-control] .mat-select-trigger').as('dropdownTrigger');
+
+    cy.get('@dropdownTrigger').should('be.visible')
+      .click({ force: true }).then(() =>
+        cy.get('.chef-control-menu').find('[data-cy=delete]').click({ force: true })
+      );
+
     cy.get('app-delete-object-modal').find('button').contains('Delete Token')
       .click({force: true});
     cy.get('chef-table-body').contains(tokenName1).should('not.exist');

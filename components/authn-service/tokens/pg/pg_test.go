@@ -595,7 +595,7 @@ func TestPurgeProject(t *testing.T) {
 			assert.NoError(err, "failed to get token")
 			assert.ElementsMatch([]string{"otherproject", "otherproject2"}, purgeCheck.Projects)
 		},
-		"when there are mulitple tokens, some with, some without the project to purge": func(t *testing.T) {
+		"when there are multiple tokens, some with, some without the project to purge": func(t *testing.T) {
 			id1 := "other_projects"
 			projects1 := []string{"otherproject", "otherproject2"}
 			resp1, err := store.CreateToken(ctx, id1, description, true, projects1)

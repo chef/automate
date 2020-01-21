@@ -285,7 +285,7 @@ func (s *Scanner) UpdateParentJobSchedule(jobId string, jobCount int32, recurren
 	// Parsing the recurrence RRULE
 	r, err := rrule.StrToRRule(recurrence)
 	if err != nil {
-		return errors.Wrapf(err, "UpdateParentJobSchedule unablee to parse recurrence string")
+		return errors.Wrapf(err, "UpdateParentJobSchedule unable to parse recurrence string")
 	}
 
 	nowTimeUtc := time.Now().UTC()

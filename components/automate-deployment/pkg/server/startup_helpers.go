@@ -39,7 +39,7 @@ func habSupVersion() string {
 }
 
 // maybeResetHabPath adds the bindir from our manifest's hab package
-// to our PATH. This is a developent-mode only operation to account
+// to our PATH. This is a development-mode only operation to account
 // for test cases where we want to deploy with the latest Habitat.
 func maybeResetHabPath(s *server) {
 	if os.Getenv("CHEF_DEV_ENVIRONMENT") != "true" {

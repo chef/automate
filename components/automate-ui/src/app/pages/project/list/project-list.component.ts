@@ -21,6 +21,7 @@ import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/project
 import { Project } from 'app/entities/projects/project.model';
 import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
   selector: 'app-project-list',
@@ -165,13 +166,15 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.messageModalVisible = false;
   }
 
-  public startProjectDelete(p: Project): void {
-    const deletableStates: ProjectStatus[] = ['EDITS_PENDING', 'RULES_APPLIED'];
-    if (deletableStates.includes(p.status)) {
-      this.messageModalVisible = true;
-    } else {
-      this.projectToDelete = p;
-      this.deleteModalVisible = true;
+  public startProjectDelete($event: ChefKeyboardEvent, p: Project): void {
+    if ($event.isUserInput) {
+      const deletableStates: ProjectStatus[] = ['EDITS_PENDING', 'RULES_APPLIED'];
+      if (deletableStates.includes(p.status)) {
+        this.messageModalVisible = true;
+      } else {
+        this.projectToDelete = p;
+        this.deleteModalVisible = true;
+      }
     }
   }
 

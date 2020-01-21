@@ -30,7 +30,7 @@ After=network.target
 Type=idle
 LimitNOFILE=32768
 User=mitmproxy
-ExecStart=/usr/local/bin/mitmdump -p "${mitmport}" --mode transparent -k --confdir=/etc/mitmproxy
+ExecStart=/usr/local/bin/mitmdump -p "${mitmport}" --mode transparent -k --set confdir=/etc/mitmproxy
 
 [Install]
 WantedBy=multi-user.target

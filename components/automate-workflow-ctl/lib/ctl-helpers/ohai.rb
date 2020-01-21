@@ -23,7 +23,7 @@ module CtlHelpers
     # Simplifies resetting the cached ohai for testing purposes.
     def self.reset!
       remove_class_variable(:@@ohai) if class_variable_defined?(:@@ohai)
-      # Dont' return the value of old @@ohai
+      # Don't return the value of old @@ohai
       nil
     end
   end

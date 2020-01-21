@@ -382,7 +382,7 @@ describe('ReportingComponent', () => {
       );
     });
 
-    it('parse invaild interval 1', () => {
+    it('parse invalid interval 1', () => {
       spyOn(reportQueryService, 'setState');
       const endDate = moment().utc().startOf('day').add(12, 'hours');
       const interval = 0;
@@ -405,7 +405,7 @@ describe('ReportingComponent', () => {
       );
     });
 
-    it('parse invaild interval 2', () => {
+    it('parse invalid interval 2', () => {
       spyOn(reportQueryService, 'setState');
       const endDate = moment().utc().startOf('day').add(12, 'hours');
       const interval = 0;

@@ -57,14 +57,6 @@
           <div class ="site-line"><b>Site:</b> {{ service.site  || "--"}}</div>
         </div>
         <div class="body">
-          <div class="disconnect-notice" *ngIf="service.disconnected">
-            <img class="disconnect-icon" src="assets/img/icon-disconnected.svg" alt="" aria-hidden />
-            <div>
-              <span>Disconnected service: Last health check received </span>
-              <span class="disconnect-time" [attr.id]="'disconnect-time-' + i">{{ service.last_event_since }} ago.</span>
-            </div>
-            <chef-tooltip [attr.for]="'disconnect-time-' + i">{{ service.last_event_occurred_at | datetime: RFC2822 }}</chef-tooltip>
-          </div>
           <div class ="release-line"><chef-icon>grain</chef-icon>{{ service.release || "--"}}</div>
           <div class ="channel-line">
             <chef-badge *ngIf="service.update_strategy !== 'NONE'">
@@ -75,14 +67,46 @@
               [tooltip]="tooltipMessageFor('channel')"
               *ngIf="service.update_strategy === 'NONE'">NO CHANNEL: NONE</chef-badge>
           </div>
-          <div class ="health-line">
-            <chef-icon class="{{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
-            {{ healthCheckStatus(service.health_check) }}
+          <hr class="health-info-divider" />
+          <div class="disconnect-notice" *ngIf="service.disconnected">
+            <img class="disconnect-icon" src="assets/img/icon-disconnected.svg" alt="" aria-hidden />
+            <div>
+              <span>Disconnected service: Last health check received </span>
+              <span class="disconnect-time" [attr.id]="'disconnect-time-' + i">{{ service.last_event_since }} ago.</span>
+            </div>
+            <chef-tooltip [attr.for]="'disconnect-time-' + i">{{ service.last_event_occurred_at | datetime: RFC2822 }}</chef-tooltip>
           </div>
-          <chef-tooltip [attr.for]="'health-timestamp-' + i">{{ formatTimestamp(service.health_updated_at) }}</chef-tooltip>
-          <div class="timewizard-line">
-            {{ timewizardMessage(service.health_check, service.previous_health_check) }}
-            <a [id]="'health-timestamp-' + i"> {{ service.current_health_since }} ago</a>
+          <div class="health-info-panel {{service.health_check}}">
+            <chef-tooltip [attr.for]="'health-timestamp-' + i">{{ formatTimestamp(service.health_updated_at) }}</chef-tooltip>
+            <div class ="health-line">
+                <chef-icon class="health-icon {{ service.health_check }}">{{ service.health_check | serviceStatusIcon }}</chef-icon>
+              <span>
+                {{ healthCheckStatus(service.health_check) }}:
+                {{ timewizardMessage(service.health_check, service.previous_health_check) }}
+                <a [id]="'health-timestamp-' + i"> {{ service.current_health_since }} ago</a>
+              </span>
+            </div>
+            <div class="healthcheck-message-collection" *ngIf="service.health_check !== 'OK'">
+              <div class="no-healthcheck-messages {{ service.health_check }}" *ngIf="service.health_check_result.stderr === '' && service.health_check_result.stdout === ''" >
+                Health check messages not available. When services specify a health-check hook, the hook's output will be shown here. Learn more about <a href="https://www.habitat.sh/docs/reference/#sts=health-check">writing health-check hooks.</a>
+              </div>
+              <div class="healthcheck-message" *ngIf="service.health_check_result.stderr !== ''">
+                <div class="healthcheck-header {{service.health_check}}">
+                  Health Check Error Message
+                </div>
+                <div class="healthcheck-content">
+                  {{service.health_check_result.stderr}}
+                </div>
+              </div>
+              <div class="healthcheck-message" *ngIf="service.health_check_result.stdout !== ''">
+                <div class="healthcheck-header {{service.health_check}}">
+                  Health Check Output Message
+                </div>
+                <div class="healthcheck-content">
+                  {{service.health_check_result.stdout}}
+                </div>
+               </div>
+            </div>
           </div>
         </div>
       </li>

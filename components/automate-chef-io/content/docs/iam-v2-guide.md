@@ -233,7 +233,7 @@ In order to find a token's ID, visit the *API Tokens* page.
 
 ### Projects
 
-Projects are used to group and permission Chef Automate resources as well as ingested data, specifically Compliance reports, Chef Server and Compliance events, and Infrastructure nodes.
+Projects are used to group and permission Chef Automate resources as well as ingested data, specifically Compliance reports, Chef Server events, and Infrastructure nodes.
 
 Projects can be managed via the Projects list under the **Settings** tab and consist of an ID, a name, and a collection of ingest rules. Project ingest rules are lists of conditions used only when
 [assigning ingested resources to projects]({{< relref "iam-v2-guide#assigning-ingested-resources-to-projects" >}}),
@@ -241,7 +241,7 @@ so they are not relevant when assigning IAM resources such as teams or roles.
 
 #### Configuring Project Limit
 
-By default, Chef Automate is currently limited to six projects. If you would like to increase that limit, you will need to do so using the Chef Automate CLI:
+By default, Chef Automate limits you to six projects. You can increase the project limit using the command line.
 
 First, write the file with your new project limit:
 
@@ -356,13 +356,12 @@ Avoid stopping an update unless absolutely necessary. It will leave your system 
 
 Once rules have been successfully applied, the update button will change to `Projects Up-to-Date` and be disabled until the next time there are *pending edits* to any project.
 
-To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navigation. The data in Automate will now be filtered by the selected project.
+To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navigation. The data in Automate filters by the selected `project-devops` project.
 In this example, the effect is revealed by navigating to the Compliance Reports' Nodes tab, which only features nodes that belong to the `devops` Chef Organization.
 
 ![](/images/docs/global-projects-filter.png)
 
-Now that we have the first set of our ingested data associated with our new project, let us add another condition and a new rule to
-add more data to `project-devops`.
+Now that we have the first set of our ingested data associated with our new project, let us add another condition and a new rule to add more data to `project-devops`.
 
 {{% info %}}
 Compliance and Infrastructure ingested resources are not the exact same nodes, so their properties may not be the same.
@@ -393,6 +392,16 @@ Rules of type `Node` can have conditions with attributes `Chef Organization`, `C
 
 Navigate to the project list page once more. Select `Update Projects`. Upon completion of the update, you should be able to
 filter by `project-devops` across Automate's dashboards and see only the ingested data that you expect.
+
+#### Effortless Infra Project
+
+To create a project that contains all Effortless Infra nodes, create a ingest rule with resource type `Node` and a condition that uses attribute `Chef Server`, operator `equals`, and value `localhost`.
+
+![](/images/docs/effortless-project-rule.png)
+
+The above rule matches on a node's Chef Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Server` attribute as `localhost`. 
+
+If desired, create subgroups of Effortless Infra nodes by adding a second condition that matches a specific `Chef Policy Name`. 
 
 #### Project Policies
 

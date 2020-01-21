@@ -168,6 +168,18 @@ func (a *Applications) DeleteDisconnectedServices(
 	return a.client.DeleteDisconnectedServices(ctx, request)
 }
 
+func (a *Applications) DeleteServicesByID(
+	ctx context.Context,
+	request *applications.DeleteServicesByIDReq) (*applications.ServicesRes, error) {
+
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return a.client.DeleteServicesByID(ctx, request)
+}
+
 // GetVersion fetches the version of team service
 func (a *Applications) GetVersion(ctx context.Context,
 	e *version.VersionInfoRequest) (*version.VersionInfo, error) {

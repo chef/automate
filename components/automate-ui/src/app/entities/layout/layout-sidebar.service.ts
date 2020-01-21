@@ -71,7 +71,7 @@ export class LayoutSidebarService {
         }];
     }
 
-    public getInfastructureSidebar(): MenuItemGroup[] {
+    public getInfrastructureSidebar(): MenuItemGroup[] {
         return [{
             name: 'Infrastructure',
             items: [

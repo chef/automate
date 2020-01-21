@@ -421,7 +421,7 @@ func (s *Server) Serve() error {
 	// `rpc Export(Query) returns (stream ExportData) {};`
 	mux.HandleFunc("/compliance/reporting/export", s.ReportExportHandler)
 
-	// custome mux route for export of all reports for a single node
+	// custom mux route for export of all reports for a single node
 	mux.HandleFunc("/compliance/reporting/node/export", s.NodeExportHandler)
 
 	// custom mux route for export (ignores its request method)

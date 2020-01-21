@@ -45,7 +45,7 @@ var DefaultPurgePolicies = &purge.Policies{
 func ConfigurePurge(man *cereal.Manager, opts *serveropts.Opts) error {
 	// Migrate default policy values from the config. The default policies are
 	// only persisted the first time the workflow is created, after which only
-	// new default policies are added and/or existing policies indicies are
+	// new default policies are added and/or existing policies indices are
 	// updated in case they have been migrated.
 
 	cp := DefaultPurgePolicies.Es[PurgeConvergeHistoryName]

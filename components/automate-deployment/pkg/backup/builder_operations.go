@@ -227,7 +227,7 @@ func (d *BuilderMinioDumpOperation) copyObjectFromBuilder(backupCtx Context, bac
 	return writer.Close()
 }
 
-// copyObjectFromBackup copiesl data from the backup bucket to the
+// copyObjectFromBackup copies data from the backup bucket to the
 // automate-builder-minio bucket.
 func (d *BuilderMinioDumpOperation) copyObjectFromBackup(backupCtx Context, backupPrefix string, obj string, objVerifier ObjectVerifier) error {
 	ctx := backupCtx.ctx

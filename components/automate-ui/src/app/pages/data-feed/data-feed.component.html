@@ -11,10 +11,10 @@
       </chef-page-header>
 
       <div class="page-body">
-        <chef-alert type="error" *ngIf="errorLoading">There was an error loading destiantions.</chef-alert>
-      
+        <chef-alert type="error" *ngIf="errorLoading">There was an error loading destinations.</chef-alert>
+
         <chef-toolbar>
-        
+
         <app-authorized [anyOf]="['/datafeed/destination', 'post']">
           <div *ngIf="(destinations$ | async)?.length === 0" class="empty-state">
             <p>Create the first datafeed endpoint to get started!</p>
@@ -23,9 +23,9 @@
             <chef-button primary [routerLink]="['/settings/data-feed/form']">Create Destination</chef-button>
           </div>
         </app-authorized>
-        
+
         </chef-toolbar>
-        
+
         <app-authorized [anyOf]="['/datafeed/destinations', 'post']">
           <chef-table *ngIf="(destinations$ | async)?.length > 0" id="destinations-list">
             <chef-tr>
@@ -42,23 +42,23 @@
                   <a [routerLink]="['/settings/data-feed/form', destination.id]">{{ destination.name }}</a>
                 </chef-td>
               <chef-td class="actions">
-                <chef-control-menu>
-                  <chef-option (click)="deleteDestination(destination)">Delete Destination</chef-option>
-                </chef-control-menu>
+                <mat-select panelClass="chef-control-menu">
+                  <mat-option (onSelectionChange)="deleteDestination(destination)">Delete Destination</mat-option>
+                </mat-select>
               </chef-td>
             </chef-tr>
           </chef-table>
-        
+
         </app-authorized>
-      
-      
+
+
         <app-page-picker
           [total]="(destinations$ | async)?.length"
           [perPage]="pageSize"
           [page]="currentPage"
           (pageChanged)="currentPage = $event">
         </app-page-picker>
-      
+
       </div><!--page-body-->
     </main>
   </div><!--destinations-container-->

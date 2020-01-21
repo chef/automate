@@ -743,7 +743,7 @@ func (t *LocalTarget) HabSupRestart(ctx context.Context, sortedServiceList []str
 // shuts down services with a TERM followed (after 8 seconds) by a
 // KILL. We would like to avoid the KILL being sent to our data
 // services. Shutting down services in their reverse startup order
-// makes it more liely that data services will shut down quickly since
+// makes it more likely that data services will shut down quickly since
 // all of their clients have been stopped.
 func (t *LocalTarget) SystemdRestart(ctx context.Context, sortedServiceList []string) (bool, error) {
 	habSupP, err := t.habSup.SupPkg()

@@ -1602,7 +1602,7 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "roles - project removed, with single rule, multiple conitions with one non-matching",
+			description: "roles - project removed, with single rule, multiple conditions with one non-matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "policy_name", Values: []string{"prod"}},
 				{Key: "roles", Values: []string{"frontend", "mysql"}},
@@ -1955,7 +1955,7 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "chef_tags - project updated, single rule, multiple conitions with one non-matching",
+			description: "chef_tags - project updated, single rule, multiple conditions with one non-matching",
 			projectsData: []*nodes.ProjectsData{
 				{Key: "policy_name", Values: []string{"prod"}},
 				{Key: "chef_tags", Values: []string{"dev_sec", "cos"}},
@@ -2162,7 +2162,7 @@ func TestProjectUpdate(t *testing.T) {
 			expectedProjectIDs: []string{"targetProject"},
 		},
 		{
-			description: "chef_tags - project IDs removed, with one condition assoicated to a " +
+			description: "chef_tags - project IDs removed, with one condition associated to a " +
 				"missing ProjectsData field",
 			projectsData: []*nodes.ProjectsData{},
 			projectRules: map[string]*iam_v2.ProjectRules{

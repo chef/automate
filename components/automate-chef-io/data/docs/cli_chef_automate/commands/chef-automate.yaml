@@ -19,9 +19,11 @@ options:
 see_also:
 - admin-token - generate an admin token for use against the Automate API
 - 'airgap - '
+- applications - Manage applications visibility features
 - backup - Chef Automate backup
 - config - Chef Automate configuration
 - deploy - Deploy Chef Automate
+- external-cert - Manage Chef Automate's external certificate
 - gather-logs - Gather system diagnostics and logs
 - iam - Chef Automate iam commands
 - infrastructure - Chef Automate infrastructure

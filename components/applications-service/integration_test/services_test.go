@@ -7,6 +7,7 @@ package integration_test
 
 import (
 	"context"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -1089,4 +1090,144 @@ func TestGetServicesMultiServiceWithEnvWildAppWildAndServiceGroupIdFilter(t *tes
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
 	}
+}
+
+func TestDeleteServicesByID(t *testing.T) {
+	mockHabServices := []*habitat.HealthCheckEvent{
+		NewHabitatEvent(
+			withSupervisorId("sup2"),
+			withServiceGroup("a.test"),
+			withPackageIdent("chef/a/0.1.0/20190101121212"),
+			withHealth("OK"),
+			withApplication("a_app"),
+			withEnvironment("a_env"),
+		),
+		NewHabitatEvent(
+			withSupervisorId("sup3"),
+			withServiceGroup("b.test"),
+			withPackageIdent("chef/a/0.1.0/00000000000000"),
+			withHealth("OK"),
+			withApplication("b_app"),
+			withEnvironment("b_env"),
+		),
+	}
+	ctx := context.Background()
+
+	t.Run("when the request doesn't specify the service IDs", func(t *testing.T) {
+		// request with nil service ID list is an error:
+
+		suite.IngestServices(mockHabServices)
+		defer suite.DeleteDataFromStorage()
+
+		_, err := suite.ApplicationsServer.DeleteServicesByID(ctx, &applications.DeleteServicesByIDReq{})
+		require.Error(t, err)
+	})
+	t.Run("when the request has an empty list of service IDs", func(t *testing.T) {
+		// return empty list, no error
+
+		suite.IngestServices(mockHabServices)
+		defer suite.DeleteDataFromStorage()
+
+		// This case doesn't seem to be possible with JSON but may be possible with grpc.
+		req := &applications.DeleteServicesByIDReq{
+			Ids: []string{},
+		}
+		res, err := suite.ApplicationsServer.DeleteServicesByID(ctx, req)
+		require.NoError(t, err)
+		assert.Empty(t, res.Services)
+	})
+	t.Run("when the request has a nonsense service id", func(t *testing.T) {
+		// return empty list, no error
+
+		suite.IngestServices(mockHabServices)
+		defer suite.DeleteDataFromStorage()
+
+		// This case doesn't seem to be possible with JSON but may be possible with grpc.
+		req := &applications.DeleteServicesByIDReq{
+			Ids: []string{"aliens"},
+		}
+		_, err := suite.ApplicationsServer.DeleteServicesByID(ctx, req)
+		require.Error(t, err)
+	})
+	t.Run("when the request specifies a service that doesn't exist", func(t *testing.T) {
+		// return empty list, no error
+
+		suite.IngestServices(mockHabServices)
+		defer suite.DeleteDataFromStorage()
+
+		// Look at the services so we can find an unused ID
+		response, err := suite.ApplicationsServer.GetServices(ctx, &applications.ServicesReq{})
+		require.NoError(t, err)
+		assert.Len(t, response.GetServices(), 2)
+
+		existingID, err := strconv.Atoi(response.GetServices()[0].Id)
+		require.NoError(t, err)
+
+		missingID := existingID + 100
+
+		req := &applications.DeleteServicesByIDReq{
+			Ids: []string{strconv.Itoa(missingID)},
+		}
+		res, err := suite.ApplicationsServer.DeleteServicesByID(ctx, req)
+		require.NoError(t, err)
+		assert.Empty(t, res.Services)
+	})
+	t.Run("when the request specifies a service that exists", func(t *testing.T) {
+		// returns the service, it's not there on subsequent GET (i.e., it's really deleted)
+
+		suite.IngestServices(mockHabServices)
+		defer suite.DeleteDataFromStorage()
+
+		// find an ID we can delete:
+		beforeDelete, err := suite.ApplicationsServer.GetServices(ctx, &applications.ServicesReq{})
+		require.NoError(t, err)
+		assert.Len(t, beforeDelete.GetServices(), 2)
+
+		IdToDelete := beforeDelete.GetServices()[0].Id
+
+		req := &applications.DeleteServicesByIDReq{
+			Ids: []string{IdToDelete},
+		}
+		res, err := suite.ApplicationsServer.DeleteServicesByID(ctx, req)
+		require.NoError(t, err)
+		require.Len(t, res.Services, 1)
+		assert.Equal(t, IdToDelete, res.Services[0].Id)
+
+		// Get the services again and the deleted one shouldn't be there
+		afterDelete, err := suite.ApplicationsServer.GetServices(ctx, &applications.ServicesReq{})
+		require.NoError(t, err)
+		// We should have 2 - 1 == 1 total services:
+		require.Len(t, afterDelete.GetServices(), 1)
+		// and it is the one we DIDN'T delete:
+		assert.Equal(t, beforeDelete.GetServices()[1].Id, afterDelete.GetServices()[0].Id)
+	})
+	t.Run("when the request specifies serveral services", func(t *testing.T) {
+		// returns the service, it's not there on subsequent GET (i.e., it's really deleted)
+
+		suite.IngestServices(mockHabServices)
+		defer suite.DeleteDataFromStorage()
+
+		// find an ID we can delete:
+		beforeDelete, err := suite.ApplicationsServer.GetServices(ctx, &applications.ServicesReq{})
+		require.NoError(t, err)
+		assert.Len(t, beforeDelete.GetServices(), 2)
+
+		toDelete := []string{}
+		for _, s := range beforeDelete.GetServices() {
+			toDelete = append(toDelete, s.Id)
+		}
+
+		req := &applications.DeleteServicesByIDReq{
+			Ids: toDelete,
+		}
+		res, err := suite.ApplicationsServer.DeleteServicesByID(ctx, req)
+		require.NoError(t, err)
+		require.Len(t, res.Services, 2)
+
+		// Get the services again and the deleted one shouldn't be there
+		afterDelete, err := suite.ApplicationsServer.GetServices(ctx, &applications.ServicesReq{})
+		require.NoError(t, err)
+		// We should have 2 - 2 == 0 total services:
+		require.Len(t, afterDelete.GetServices(), 0)
+	})
 }

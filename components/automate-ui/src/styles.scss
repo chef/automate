@@ -234,3 +234,96 @@ input {
     border-radius: $global-radius $global-radius 0 0;
   }
 }
+
+// Angular Material Overrides
+.chef-control-menu {
+  position: absolute;
+  margin-top: 35px;
+  right: -48px;
+  margin-right: 35px;
+}
+
+.three-dot-column {
+  position: relative;
+  text-align: right;
+}
+
+.mat-option {
+  font-family: 'Muli', Helvetica, Arial, sans-serif;
+
+  &.mat-active,
+  &:hover:not(.mat-option-disabled),
+  &:focus:not(.mat-option-disabled) {
+    background: $chef-primary-bright;
+    color: $chef-white;
+  }
+
+  &:hover:not(.mat-option-disabled):not(.mat-active) {
+    background: lighten($chef-primary-bright, 15%);
+  }
+}
+
+[panelclass="chef-control-menu"] {
+  text-align: right;
+
+  &:focus .mat-select-trigger {
+    outline: -webkit-focus-ring-color auto 5px;
+  }
+
+  .mat-select-trigger {
+    display: inline-block;
+    position: absolute;
+    right: 10px;
+    top: calc(50% - 16px); // subtracting half the height
+    border-radius: var(--chef-border-radius);
+    background-color: var(--chef-white);
+    width: 32px;
+    height: 32px;
+    cursor: pointer;
+
+    &:after {
+      content: '...';
+      position: absolute;
+      color: var(--black);
+      bottom: 35%;
+      left: 23%;
+      font-size: 20px;
+    }
+
+    &:hover {
+      background-color: var(--chef-badge-primary-background);
+
+      &:after {
+        color: var(--chef-badge-primary-color);
+      }
+    }
+  }
+
+  &[aria-owns] {  // hacky alternative for selecting when the panel is open
+
+    .mat-select-trigger {
+      background-color: var(--chef-badge-primary-border);
+
+      &:after {
+        color: var(--chef-control-alternate-color);
+      }
+    }
+  }
+
+  &:disabled {
+
+    .mat-select-trigger {
+      background-color: var(--chef-white);
+
+      &:after {
+        color: #212334;
+      }
+    }
+  }
+
+  .mat-select-placeholder,
+  .mat-select-arrow-wrapper,
+  .mat-select-arrow {
+    display: none;
+  }
+}

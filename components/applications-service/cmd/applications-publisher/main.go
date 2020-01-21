@@ -143,7 +143,7 @@ func main() {
 	)
 
 	// In habitat, the wrappers.StringValue for stdout and stderr will be nil
-	// pointers when there's no content (e.g., a package without a healhcheck
+	// pointers when there's no content (e.g., a package without a healthcheck
 	// command/script). To mimic that behavior we need to initialize the
 	// optionalString variables here with nil pointers for their StringValue
 	// elements.

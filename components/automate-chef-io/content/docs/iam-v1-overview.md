@@ -138,8 +138,8 @@ Examples:
 * any requestor at all: `*`
 
 Each user or team must specify its _provider_.
-Automate currently supports LDAP, SAML,
-and local users or teams. Here are team examples using all three:
+Automate supports LDAP, SAML, and local users and teams. 
+Here are team examples using all three:
 
 ```text
 team:local:the_foos
@@ -476,7 +476,7 @@ To remove that access, delete policies permitting all users to access `cfgmgmt` 
     curl -s -X DELETE -H "api-token: $TOKEN" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies/{id}?pretty
     ```
 
-   Now only users with admin-level permissions have access to anything related
+   After deleting the policies, only users with admin-level permissions have access to anything related
 to Configuration Management. You can follow the same sequence of steps to delete permissions
 to Compliance resources under the `compliance` default policies.
 
@@ -494,7 +494,7 @@ here's how you would give that permission to a specific user or team:
     curl -s -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"subjects":["team:saml:ops"], "action":"*", "resource":"cfgmgmt:*"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/policies?pretty
     ```
 
-   Now only members of the `ops` team may access Configuration Management data and functionality.
+   After applying the new policy, only members of the `ops` team may access Configuration Management data and functionality.
 You can follow the same sequence of steps to delete the default Compliance policy
 and replace it with a new policy restricted to specific teams.
 

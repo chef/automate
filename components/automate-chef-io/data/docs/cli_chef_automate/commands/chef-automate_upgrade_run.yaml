@@ -9,6 +9,8 @@ options:
   shorthand: h
   default_value: "false"
   usage: help for run
+- name: version
+  usage: The exact Chef Automate version to install
 inherited_options:
 - name: debug
   shorthand: d

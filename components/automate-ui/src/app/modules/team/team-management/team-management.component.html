@@ -80,9 +80,9 @@
                     <chef-table-cell class="three-dot-column">
                       <!-- TODO: Need to account for v1 / v2 in the app-authorized path -->
                       <!-- <app-authorized [allOf]="['/iam/v2/teams/{id}', 'delete', team.id]"> -->
-                      <chef-control-menu>
-                        <chef-option (click)="startTeamDelete(team)">Delete Team</chef-option>
-                      </chef-control-menu>
+                      <mat-select panelClass="chef-control-menu">
+                        <mat-option (onSelectionChange)="startTeamDelete($event, team)">Delete Team</mat-option>
+                      </mat-select>
                       <!-- <app-authorized -->
                     </chef-table-cell>
                   </chef-table-row>

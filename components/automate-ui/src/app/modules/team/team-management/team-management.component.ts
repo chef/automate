@@ -22,6 +22,7 @@ import { HttpStatus } from 'app/types/types';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 
 @Component({
   selector: 'app-team-management',
@@ -142,9 +143,11 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.deleteModalVisible = false;
   }
 
-  public startTeamDelete(team: Team): void {
-    this.teamToDelete = team;
-    this.deleteModalVisible = true;
+  public startTeamDelete($event: ChefKeyboardEvent, team: Team): void {
+    if ($event.isUserInput) {
+      this.teamToDelete = team;
+      this.deleteModalVisible = true;
+    }
   }
 
   public deleteTeam(): void {

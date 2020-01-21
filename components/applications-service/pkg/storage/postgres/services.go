@@ -2,6 +2,7 @@ package postgres
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -139,6 +140,34 @@ UPDATE service_full AS s
 SET disconnected = true
 WHERE last_event_occurred_at < now() - ($1 || ' seconds')::interval
   AND disconnected = false
+RETURNING s.id
+  , s.origin AS origin
+  , s.name AS name
+  , s.version AS version
+  , s.release AS release
+  , s.health_check_stdout AS health_check_stdout
+  , s.health_check_stderr AS health_check_stderr
+  , s.health_check_exit_status AS health_check_exit_status
+  , s.health AS health
+  , s.service_group_name AS group
+  , s.application AS application
+  , s.environment AS environment
+  , s.supervisor_id AS sup_member_id
+  , s.fqdn AS fqdn
+  , s.channel as channel
+  , s.site as site
+  , s.last_event_occurred_at as last_event_occurred_at
+  , s.previous_health as previous_health
+  , s.health_updated_at as health_updated_at
+  , s.disconnected as disconnected
+	, s.health_check_stdout as health_check_stdout
+	, s.health_check_stderr as health_check_stderr
+	, s.health_check_exit_status as health_check_exit_status
+`
+
+	deleteServicesByID = `
+   DELETE FROM service_full AS s
+    WHERE s.id IN (%s)
 RETURNING s.id
   , s.origin AS origin
   , s.name AS name
@@ -342,6 +371,27 @@ func (db *Postgres) DeleteDisconnectedServices(thresholdSeconds int32) ([]*stora
 		return nil, errors.Wrap(err, "unable to delete disconnected services")
 	}
 
+	return convertComposedServicesToStorage(services), nil
+}
+
+func (db *Postgres) DeleteServicesByID(svcIDs []string) ([]*storage.Service, error) {
+	var services []*composedService
+
+	// We use a more strict regexp than pgutils, since we know the data must be
+	// integers
+	r := regexp.MustCompile("^[0-9]*$")
+	for _, svcID := range svcIDs {
+		if !r.MatchString(svcID) {
+			return nil, errors.Errorf("invalid service id %q", svcID)
+		}
+	}
+
+	query := fmt.Sprintf(deleteServicesByID, strings.Join(svcIDs, ", "))
+
+	_, err := db.DbMap.Select(&services, query)
+	if err != nil {
+		return nil, errors.Wrap(err, "unable to delete services")
+	}
 	return convertComposedServicesToStorage(services), nil
 }
 

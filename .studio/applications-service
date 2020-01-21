@@ -240,6 +240,12 @@ function applications_publish_supervisor_message() {
   applications-publisher --internal-nats --port 10140 "$@"
 }
 
+function applications_random_fqdn() {
+  # shellcheck disable=SC2002
+  host=$(cat /dev/urandom | tr -dc 'a-z0-9' | fold -w 8 | head -n 1)
+  echo -n "$host.example.net"
+}
+
 # TODO: Delete when slice 1 is done
 document "applications_populate_database" <<DOC
   Populates the database by publishing messages to power the mockups.
@@ -251,6 +257,7 @@ function applications_populate_database() {
   # population; later we'll change it to OK to trigger the timewizard in the
   # UI.
   applications_publish_supervisor_message --name "wizrd" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "2.0.5" --release "20190115181118" --health 2\
     --sup-id "c95fe9ce-5f9e-4983-8ac8-fae4b9ce3933" \
     --site "us-west-1" --application "tw-critical-to-ok" --environment "production"
@@ -259,6 +266,7 @@ function applications_populate_database() {
   for _ in $(seq 1 12); do
     # maximum health check output to show how the UI handles edge case.
     applications_publish_supervisor_message --name nginx --group "default"\
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "1.0.1" --release "20190115184823" --health 2\
       --sup-id "$(uuidgen)" --site "testsite" --channel "stable" \
       --application "bldr-cache" --environment "qa" \
@@ -269,6 +277,7 @@ function applications_populate_database() {
 
   for _ in $(seq 1 11); do
     applications_publish_supervisor_message --name "billing-svc" --group "default"\
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "1.3.4" --release "20190115182382" --health 2\
       --sup-id "$(uuidgen)" --site "testsite" --channel "stable" \
       --application "billing-backend" --environment "qa"
@@ -278,6 +287,7 @@ function applications_populate_database() {
   for _ in $(seq 1 40); do
     # health check output simulates services with health check implemented.
     applications_publish_supervisor_message --name nginx --group default \
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "2.0.0" --release "20190115189976" --health 2\
       --sup-id "$(uuidgen)" --site "testsite" --channel "unstable" \
       --hc-stderr "curl: (7) Failed to connect to localhost port 443: Connection refused" \
@@ -287,6 +297,7 @@ function applications_populate_database() {
   for _ in $(seq 41 50); do
     # health check output simulates services with health check implemented.
     applications_publish_supervisor_message --name nginx --group dev\
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "2.0.0" --release "20190115189976" --health 0\
       --sup-id "$(uuidgen)" --site "testsite" --channel "unstable" \
       --hc-stderr "" --hc-stdout "" --hc-exit 0
@@ -296,6 +307,7 @@ function applications_populate_database() {
   for _ in $(seq 1 40); do
     # health check output simulates services with NO health check implemented.
     applications_publish_supervisor_message --name redis --group default\
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "1.0.1" --release "20190115189830" --health 2\
       --sup-id "$(uuidgen)" --site "default" --channel "stable"
   done
@@ -303,6 +315,7 @@ function applications_populate_database() {
   for _ in $(seq 41 50); do
     # health check output simulates services with NO health check implemented.
     applications_publish_supervisor_message --name redis --group default \
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "1.0.1" --release "20190115189830" --health 0\
       --sup-id "$(uuidgen)" --site "default" --channel "stable"
   done
@@ -310,31 +323,37 @@ function applications_populate_database() {
   # Sample-app
   for _ in $(seq 1 3); do
     applications_publish_supervisor_message --name "sample-app" --group "default"\
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "0.0.1" --release "20190115184890" --health 0\
       --sup-id "$(uuidgen)" --site "default" --channel "stable"
   done
   for _ in $(seq 4 5); do
     applications_publish_supervisor_message --name "sample-app" --group "default"\
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "0.0.1" --release "20190115184890" --health 1\
       --sup-id "$(uuidgen)" --site "default" --channel "stable"
   done
 
   for _ in $(seq 1 4); do
     applications_publish_supervisor_message --name "sample-app" --group "test"\
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "0.0.1" --release "20190115184823" --health 0\
       --sup-id "$(uuidgen)" --site "testsite" --channel "stable"
   done
   applications_publish_supervisor_message --name "sample-app" --group "test"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "0.0.1" --release "20190115184823" --health 1\
     --sup-id "$(uuidgen)" --site "testsite" --channel "stable"
 
   # Acceptance Unknown
   applications_publish_supervisor_message --name "sample-app" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "0.0.1" --health 3 --sup-id "$(uuidgen)" \
     --application "sample-app" --environment "acceptance"
 
   for _ in $(seq 1 120); do
     applications_publish_supervisor_message --name "mobile-api-frontend" --group "default"\
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "2.3" --release "20190115184823" --health 0\
       --sup-id "$(uuidgen)" \
       --site "jp" --application "mobile-app-api" --environment "production"
@@ -342,42 +361,50 @@ function applications_populate_database() {
 
   for _ in $(seq 121 130); do
     applications_publish_supervisor_message --name "mobile-api-frontend" --group "default"\
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "1.9.2" --release "20190115181111" --health 0\
       --sup-id "$(uuidgen)" \
       --site "us-west-1" --application "mobile-app-api" --environment "production"
   done
 
   applications_publish_supervisor_message --name "mobile-api-photos" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "2.0.5" --release "20190115181118" --health 0\
     --sup-id "$(uuidgen)" \
     --site "us-west-1" --application "mobile-app-api" --environment "production"
 
   applications_publish_supervisor_message --name "mobile-api-database" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "2.0.8" --release "20190115181199" --health 0\
     --sup-id "$(uuidgen)" \
     --site "us-west-1" --application "mobile-app-api" --environment "production"
 
   applications_publish_supervisor_message --name "mobile-api-auth" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "2.0.8" --release "20190115181192" --health 0\
     --sup-id "$(uuidgen)" \
     --site "us-west-1" --application "mobile-app-api" --environment "production"
 
   applications_publish_supervisor_message --name "mobile-api-frontend" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "1.9.2" --release "20190115181111" --health 0\
     --sup-id "$(uuidgen)" \
     --site "us-west-1" --application "mobile-app-api" --environment "qa"
 
   applications_publish_supervisor_message --name "mobile-api-photos" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "2.0.5" --release "20190115181118" --health 0\
     --sup-id "$(uuidgen)" \
     --site "us-west-1" --application "mobile-app-api" --environment "qa"
 
   applications_publish_supervisor_message --name "mobile-api-database" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "2.0.8" --release "20190115181199" --health 0\
     --sup-id "$(uuidgen)" \
     --site "us-west-1" --application "mobile-app-api" --environment "qa"
 
   applications_publish_supervisor_message --name "mobile-api-auth" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "2.0.8" --release "20190115181192" --health 2\
     --sup-id "$(uuidgen)" \
     --site "us-west-1" --application "mobile-app-api" --environment "qa"
@@ -387,21 +414,25 @@ function applications_populate_database() {
   # this happens, if users filter by site then the service group's row should
   # be updated to show only the matching data. The services sidebar also should update
   applications_publish_supervisor_message --name "multisite" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "7.8.9" --release "20190115181192" --health 0\
     --sup-id "$(uuidgen)" \
     --site "aaa" --application "multisite-demo" --environment "demo"
 
   applications_publish_supervisor_message --name "multisite" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "7.8.9" --release "20190115181192" --health 2\
     --sup-id "$(uuidgen)" \
     --site "aaa" --application "multisite-demo" --environment "demo"
 
   applications_publish_supervisor_message --name "multisite" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "7.8.9" --release "20190115181192" --health 0\
     --sup-id "$(uuidgen)" \
     --site "bbb" --application "multisite-demo" --environment "demo"
 
   applications_publish_supervisor_message --name "multisite" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "7.8.9" --release "20190115181192" --health 0\
     --sup-id "$(uuidgen)" \
     --site "bbb" --application "multisite-demo" --environment "demo"
@@ -410,15 +441,48 @@ function applications_populate_database() {
   # Service groups with a larger set of health statuses. This excercises some
   # filtering cases, such as whether a service group with 1 service in critical
   # and 1 warning shows up when filtering for warning.
+
+  ##
+  # We use the east/central/mountain/west variants of the pos-terminal service
+  # to exercise some variations in how the UI displays health check output.
+
   for health_code in $(seq 0 3); do
     applications_publish_supervisor_message --name "pos-terminal" --group "default" \
       --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
       --sup-id "$(uuidgen)" \
-      --application "pos" --environment "production-us-east" --site "ny-123"
+      --application "pos" --environment "production-us-east" --site "ny-123" \
+      --hc-stderr "rm: cannot remove 'results/': Is a directory" \
+      --hc-stdout "rm: cannot remove 'results/': Is a directory" --hc-exit "$health_code"
+  done
+
+  for health_code in $(seq 0 3); do
+    applications_publish_supervisor_message --name "pos-terminal" --group "default" \
+      --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
+      --sup-id "$(uuidgen)" \
+      --application "pos" --environment "production-us-central" --site "chi-123" \
+      --hc-stderr "rm: cannot remove 'results/': Is a directory" \
+      --hc-exit "$health_code"
+  done
+
+  for health_code in $(seq 0 3); do
+    applications_publish_supervisor_message --name "pos-terminal" --group "default" \
+      --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
+      --sup-id "$(uuidgen)" \
+      --application "pos" --environment "production-us-mountain" --site "den-123" \
+      --hc-stdout "rm: cannot remove 'results/': Is a directory" --hc-exit "$health_code"
+  done
+
+  for health_code in $(seq 0 3); do
+    applications_publish_supervisor_message --name "pos-terminal" --group "default" \
+      --fqdn "$(applications_random_fqdn)" \
+      --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
+      --sup-id "$(uuidgen)" \
+      --application "pos" --environment "production-us-west" --site "sea-123"
   done
 
   for health_code in 0 1 3 ; do
     applications_publish_supervisor_message --name "pos-terminal" --group "us-east-2" \
+      --fqdn "$(applications_random_fqdn)" \
       --origin custom --version "2.3.4" --release "20190115181111" --health "$health_code" \
       --sup-id "$(uuidgen)" \
       --application "pos" --environment "production-us-east" --site "ny-789"
@@ -427,16 +491,19 @@ function applications_populate_database() {
   # We have a custom visual treatment when application, environment, or channel
   # are blank. Create one of each
   applications_publish_supervisor_message --name "blank-app" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "0.0.1" --release "20190115184890" --health 1\
     --sup-id "$(uuidgen)" --site "default" --channel "stable" \
     --application ""
 
   applications_publish_supervisor_message --name "blank-env" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "0.0.1" --release "20190115184890" --health 1\
     --sup-id "$(uuidgen)" --site "default" --channel "stable" \
     --environment ""
 
   applications_publish_supervisor_message --name "blank-channel" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "0.0.1" --release "20190115184890" --health 1\
     --sup-id "$(uuidgen)" --site "default" --channel ""
 
@@ -447,6 +514,7 @@ function applications_populate_database() {
   # 26 here and pagination will always happen.
   for i in $(seq 26); do
     applications_publish_supervisor_message --name "example$i" --group "default"\
+      --fqdn "$(applications_random_fqdn)" \
       --origin mycorp --version "0.0.1" --health 0 --sup-id "$(uuidgen)" \
       --application "microservice-app" --environment "qa" --site "cloud-oregon"
   done
@@ -454,6 +522,7 @@ function applications_populate_database() {
   # This is the same service from the beginning, we now give it an OK
   # healthcheck to trigger the timewizard
   applications_publish_supervisor_message --name "wizrd" --group "default"\
+    --fqdn "$(applications_random_fqdn)" \
     --origin custom --version "2.0.5" --release "20190115181118" --health 0\
     --sup-id "c95fe9ce-5f9e-4983-8ac8-fae4b9ce3933" \
     --site "us-west-1" --application "tw-critical-to-ok" --environment "production"
