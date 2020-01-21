@@ -30,10 +30,15 @@ describe('user management', () => {
     // we increase the default delay to mimic the average human's typing speed
     // only need this for input values upon which later test assertions depend
     // ref: https://github.com/cypress-io/cypress/issues/534
-    cy.get('[formcontrolname=fullname]').focus()
+    cy.get('[formcontrolname=displayName]').focus()
       .type(name, { delay: typeDelay }).should('have.value', name);
 
-    cy.get('[formcontrolname=username]').focus()
+    // username is auto-generated from the display name
+    cy.get('#username-fields span').contains(`cypress-test-user-${now}`).should('exist');
+
+    // we can also edit the username directly
+    cy.get('[data-cy=edit-username]').click();
+    cy.get('[formcontrolname=username]').focus().clear()
       .type(username, { delay: typeDelay }).should('have.value', username);
 
     cy.get('[formcontrolname=password]').focus()
@@ -68,8 +73,8 @@ describe('user management', () => {
     cy.get('app-user-details chef-form-field').contains('Confirm New Password').should('exist');
 
     cy.get('app-user-details chef-button.edit-button').click();
-    cy.get('[formcontrolname=fullName]').find('input').should('not.be.disabled')
-      .focus().clear().type(updated_name);
+    cy.get('[formcontrolname=fullName]').should('not.be.disabled')
+      .clear().type(updated_name);
 
     cy.get('app-user-details chef-button.save-button').click();
     cy.wait('@updateUser');
@@ -78,9 +83,9 @@ describe('user management', () => {
     // so we test that some change was made to the name, not the exact new name
     cy.get('app-user-details div.name-column').contains('updated').should('exist');
 
-    cy.get('[formcontrolname=newPassword]').find('input')
+    cy.get('[formcontrolname=newPassword]')
       .focus().type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
-    cy.get('[formcontrolname=confirmPassword]').find('input')
+    cy.get('[formcontrolname=confirmPassword]')
       .focus().type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
     cy.get('app-user-details chef-button').contains('Update Password').click({ force: true });
 
