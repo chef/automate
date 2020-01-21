@@ -1,10 +1,10 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
 import { set, pipe } from 'lodash/fp';
 
 import { EntityStatus } from '../entities';
 import { UserActionTypes, UserActions } from './user.actions';
 import { User } from './user.model';
-import { HttpErrorResponse } from '@angular/common/http';
 
 export interface UserEntityState extends EntityState<User> {
   getStatus: EntityStatus;

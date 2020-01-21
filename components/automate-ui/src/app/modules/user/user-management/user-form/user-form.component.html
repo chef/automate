@@ -3,7 +3,7 @@
     <div class="field-margin">
       <chef-form-field>
         <label>
-          <span>Display Name <span aria-hidden="true">*</span></span>
+          Display Name <span aria-hidden="true">*</span>
           <input chefInput formControlName="displayName" type="text" (keyup)="handleNameInput($event)" autocomplete="off"/>
         </label>
         <chef-error *ngIf="leftInputEmpty('displayName')">
@@ -15,7 +15,7 @@
     <div class="field-margin" *ngIf="modifyUsername">
       <chef-form-field>
         <label>
-          <span>Username <span aria-hidden="true">*</span></span>
+          Username <span aria-hidden="true">*</span>
           <input chefInput formControlName="username" type="text" (keyup)="handleUsernameInput($event)" autocomplete="off"/>
         </label>
         <chef-error *ngIf="leftInputEmpty('username')">
@@ -35,13 +35,13 @@
         <span>{{ this.createUserForm?.value.username }}</span>
       </div>
       <chef-toolbar>
-        <chef-button tertiary (click)="modifyUsername = true" id="edit-button-object-modal">Edit Username</chef-button>
+        <chef-button tertiary (click)="modifyUsername = true" data-cy="edit-username">Edit Username</chef-button>
       </chef-toolbar>
     </div>
     <div class="field-margin">
       <chef-form-field>
         <label>
-          <span>Password <span aria-hidden="true">*</span></span>
+          Password <span aria-hidden="true">*</span>
           <input chefInput formControlName="password" type="password"/>
         </label>
         <chef-error *ngIf="leftInputEmpty('password')">
@@ -60,7 +60,7 @@
     <div class="field-margin">
       <chef-form-field>
         <label>
-          <span>Confirm Password <span aria-hidden="true">*</span></span>
+          Confirm Password <span aria-hidden="true">*</span>
           <input chefInput formControlName="confirmPassword" type="password"/>
         </label>
         <chef-error *ngIf="leftInputEmpty('confirmPassword')">

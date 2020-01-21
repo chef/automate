@@ -124,8 +124,7 @@ describe('userStatusEntityReducer', () => {
       const action = new CreateUserFailure(payload);
 
       it('sets status to loadingFailure', () => {
-        const { createStatus } = userEntityReducer(initialState, action);
-        const { createError } = userEntityReducer(initialState, action);
+        const { createStatus, createError } = userEntityReducer(initialState, action);
 
         expect(createStatus).toEqual(EntityStatus.loadingFailure);
         expect(createError).toEqual(action.payload);
@@ -266,10 +265,9 @@ function userState(action: string, ...us: User[]): UserEntityState {
     entities[u.id] = u;
     ids.push(u.id);
   }
-  const createError = null;
   return ['get', 'create', 'update', 'delete']
     .reduce((state, a) => {
       state[a + 'Status'] = a === action ? EntityStatus.loadingSuccess : EntityStatus.notLoaded;
       return state;
-    }, { entities, ids, createError }) as UserEntityState;
+    }, { entities, ids, createError: null }) as UserEntityState;
 }
