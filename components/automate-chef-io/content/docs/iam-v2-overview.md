@@ -296,6 +296,6 @@ curl -kH "api-token: $TOKEN" -H "projects: (unassigned)" \
 This API request returns a list of Compliance nodes that belong to `test-project-1` or `test-project-2`.
 
 ```bash
-curl  -kH "api-token: $TOKEN" -H "projects: test-project-1, test-project-2"  -X POST \  
+curl  -kH "api-token: $TOKEN" -H "projects: test-project-1, test-project-2"  -X POST \
   https://a2-dev.test/api/v0/compliance/reporting/nodes/search?pretty
 ```
