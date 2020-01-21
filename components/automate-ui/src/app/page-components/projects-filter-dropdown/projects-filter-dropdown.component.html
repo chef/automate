@@ -49,7 +49,7 @@
             *ngFor="let option of filteredOptions; index as i"
             [attr.title]="option.label"
             [checked]="option.checked"
-            (change)="handleOptionChange($event, i)"
+            (change)="handleOptionChange($event, option.label)"
             (keydown.arrowup)="handleArrowUp($event)"
             (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}
           </chef-checkbox>

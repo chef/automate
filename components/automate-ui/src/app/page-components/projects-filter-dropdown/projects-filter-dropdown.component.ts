@@ -68,8 +68,12 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
     this.onOptionChange.emit(this.editableOptions);
   }
 
-  handleOptionChange(event, index) {
-    this.editableOptions[index].checked = event.detail;
+  handleOptionChange(event, label) {
+    this.editableOptions.find(option => {
+      if (option.label === label) {
+        option.checked = event.detail;
+      }
+    });
     this.optionsEdited = true;
     this.onOptionChange.emit(this.editableOptions);
   }
