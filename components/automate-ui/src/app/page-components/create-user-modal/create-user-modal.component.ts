@@ -1,7 +1,7 @@
 import { Component, OnInit, Input, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
+import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -10,7 +10,9 @@ import { UsernameMapper } from 'app/helpers/auth/username-mapper';
 import { ChefValidators } from 'app/helpers/auth/validator';
 import { EntityStatus } from 'app/entities/entities';
 import { CreateUserPayload, CreateUser } from 'app/entities/users/user.actions';
-import { createStatus } from 'app/entities/users/user.selectors';
+import { createStatus, createError } from 'app/entities/users/user.selectors';
+import { isNil } from 'lodash/fp';
+import { HttpStatus } from 'app/types/types';
 
 // pattern for valid usernames
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';
@@ -81,21 +83,6 @@ export class CreateUserModalComponent implements OnInit, OnDestroy, OnChanges {
   //////////////////////////////////// FROM user-form.component.ts
 
   ngOnInit() {
-    // TODO
-    // this.conflictErrorEvent.pipe(takeUntil(this.isDestroyed))
-    //   .subscribe((isConflict: boolean) => {
-    //     this.conflictError = isConflict;
-    //     // Open the ID input on conflict so user can resolve it.
-    //     this.modifyUsername = isConflict;
-    //   });
-
-    // this.passwordErrorEvent.pipe(takeUntil(this.isDestroyed))
-    //   .subscribe((badPassword: boolean) => {
-    //     this.passwordError = badPassword;
-    //     this.createUserForm.get('password').reset();
-    //     this.createUserForm.get('confirmPassword').reset();
-    //   });
-
     this.openEvent.pipe(takeUntil(this.isDestroyed))
       .subscribe(() => {
         this.creatingUser = false;
@@ -106,6 +93,26 @@ export class CreateUserModalComponent implements OnInit, OnDestroy, OnChanges {
       filter(state => state === EntityStatus.loadingSuccess),
       takeUntil(this.isDestroyed))
       .subscribe(() => this.closeCreateModal());
+
+    combineLatest([
+      this.store.select(createStatus),
+      this.store.select(createError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        this.creatingUser = false;
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictError = true;
+          // Open the ID input so user can resolve it.
+          this.modifyUsername = true;
+        } else if (error.status === HttpStatus.BAD_REQUEST) {
+          this.passwordError = true;
+        } else {
+          // Close the modal on any error other than conflict and display in banner.
+          this.closeCreateModal();
+        }
+      });
   }
 
   ngOnDestroy() {
