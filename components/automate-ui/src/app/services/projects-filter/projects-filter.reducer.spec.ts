@@ -67,7 +67,7 @@ describe('projectsFilterReducer', () => {
         expect(map('label', options)).toEqual(['a-proj', 'b-proj', 'c-proj', 'd-proj']);
       });
 
-      it('sorts projects except unassigned is put last', () => {
+      it('sorts projects except unassigned is put first', () => {
         const action = genAction(
           genProject('d-proj'),
           genUnassignedProject(),
@@ -79,7 +79,7 @@ describe('projectsFilterReducer', () => {
         const { options } = projectsFilterReducer(initialState, action);
 
         expect(map('value', options))
-          .toEqual(['a-proj', 'b-proj', 'd-proj', 'zz-proj', UNASSIGNED_PROJECT_ID]);
+          .toEqual([UNASSIGNED_PROJECT_ID, 'a-proj', 'b-proj', 'd-proj', 'zz-proj']);
       });
 
       it('sorts embedded numbers smartly', () => {
@@ -142,11 +142,11 @@ describe('projectsFilterReducer', () => {
         const { options } = projectsFilterReducer(initialState, action);
 
         expect(options).toEqual([ // matching in sorted order
+          action.payload.fetched[2],
           action.payload.fetched[3],
           action.payload.fetched[4],
           action.payload.fetched[1],
-          action.payload.fetched[0],
-          action.payload.fetched[2]
+          action.payload.fetched[0]
         ]);
       });
 

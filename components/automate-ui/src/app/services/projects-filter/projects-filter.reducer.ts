@@ -134,7 +134,9 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
   }
 
   if (hasOneChecked || hasOneProjectChecked) {
-    return checkedOptions[0].label;
+    // We need to take the last item in the array because unassigned is first
+    // when unassigned and a single project are checked at the same time
+    return checkedOptions[checkedOptions.length - 1].label;
   }
 
   if (hasSomeProjectsChecked) {
