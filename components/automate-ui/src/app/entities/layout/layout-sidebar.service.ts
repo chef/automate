@@ -276,7 +276,7 @@ export class LayoutSidebarService {
                 {
                     name: 'Profile',
                     icon: 'person',
-                    route: '',
+                    route: '.',
                     visible: true
                 }
             ],
