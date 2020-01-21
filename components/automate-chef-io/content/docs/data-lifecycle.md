@@ -31,6 +31,10 @@ In order to see the data lifecycle job statuses, configure jobs, or run jobs, yo
 an [admin token]({{< relref "api-tokens.md#creating-an-admin-api-token" >}}) or a token
 for a user with `dataLifecycle:*` IAM access.
 
+For Automate 2 versions < 20191129172405, see [older docs](https://github.com/chef/automate/blob/20191104205453/components/automate-chef-io/content/docs/configuration.md#data-retention)
+
+For Automate 2 versions higher than the level mentioned above, use the following
+
 ## Status
 
 To see the combined status and configuration for all data lifecycle jobs you can use the global status endpoint
