@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ProjectsFilterDropdownComponent } from './projects-filter-dropdown.component';
 
@@ -11,6 +12,9 @@ describe('ProjectsFilterDropdownComponent', () => {
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
       declarations: [
         ProjectsFilterDropdownComponent
+      ],
+      imports: [
+        FormsModule
       ]
     })
     .compileComponents();
@@ -310,12 +314,12 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
   });
 
-  describe('handleApplyClick()', () => {
+  describe('handleApplySelection()', () => {
     beforeEach(() => {
       spyOn(component.onSelection, 'emit');
       component.dropdownActive = true;
       component.optionsEdited = true;
-      component.handleApplyClick();
+      component.handleApplySelection();
     });
 
     it('hides the dropdown', () => {
