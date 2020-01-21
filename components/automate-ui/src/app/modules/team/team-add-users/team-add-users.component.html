@@ -10,6 +10,7 @@
   (confirm)="addUsers()"
   (close)="closePage()">
   <div *ngIf="!(loading$ | async)">
+    <app-create-user-modal [openEvent]="openUserModal"></app-create-user-modal>
     <div id="no-users-container" *ngIf="usersNotFiltered().length === 0">
       <p>There are no more local users to add; create some more!</p>
       <chef-button primary (click)="openModal()">Create User</chef-button>
