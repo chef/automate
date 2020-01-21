@@ -1,4 +1,4 @@
-import { Component, OnInit, Input, EventEmitter, OnChanges, SimpleChanges, OnDestroy } from '@angular/core';
+import { Component, OnInit, Input, EventEmitter, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
@@ -22,7 +22,7 @@ const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';
   templateUrl: './create-user-modal.component.html',
   styleUrls: ['./create-user-modal.component.scss']
 })
-export class CreateUserModalComponent implements OnInit, OnDestroy, OnChanges {
+export class CreateUserModalComponent implements OnInit, OnDestroy {
   @Input() openEvent: EventEmitter<boolean>;
 
   public createUserForm: FormGroup;
@@ -36,12 +36,6 @@ export class CreateUserModalComponent implements OnInit, OnDestroy, OnChanges {
   public visible = false;
 
   private isDestroyed = new Subject<boolean>();
-
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes.visible && (changes.visible.currentValue as boolean)) {
-      // TODO
-    }
-  }
 
   closeCreateModal(): void {
     this.visible = false;
