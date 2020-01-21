@@ -91,11 +91,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
     this.editableOptions.map(option => option.checked = false);
     this.onSelection.emit(this.editableOptions);
   }
-
-  handleCreateNewProject() {
-    console.log('clicked create new project - open modal');
-  }
-
+  
   handleArrowUp(event: KeyboardEvent) {
     event.preventDefault();
 
