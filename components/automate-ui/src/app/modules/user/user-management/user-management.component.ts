@@ -75,8 +75,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       this.store.select(allUsers),
       this.store.select(getStatus)
     ]).pipe(
-      takeUntil(this.isDestroyed),
-      filter(([_, uStatus]) => uStatus !== EntityStatus.loading)
+      filter(([_, uStatus]) => uStatus !== EntityStatus.loading),
+      takeUntil(this.isDestroyed)
       ).subscribe(([users, _]: [User[], EntityStatus]) => {
         this.isLoading = false;
         this.layoutFacade.ShowPageLoading(false);
@@ -86,8 +86,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
     this.store.pipe(
       select(createStatus),
-      takeUntil(this.isDestroyed),
-      filter(state => this.createModalVisible && !pending(state)))
+      filter(state => this.createModalVisible && !pending(state)),
+      takeUntil(this.isDestroyed))
       .subscribe(state => {
         this.creatingUser = false;
         if (state === EntityStatus.loadingSuccess) {
@@ -99,9 +99,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       this.store.select(createStatus),
       this.store.select(createError)
     ]).pipe(
-      takeUntil(this.isDestroyed),
       filter(() => this.createModalVisible),
-      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)),
+      takeUntil(this.isDestroyed))
       .subscribe(([_, error]) => {
         if (error.status === HttpStatus.CONFLICT) {
           this.conflictErrorEvent.emit(true);
