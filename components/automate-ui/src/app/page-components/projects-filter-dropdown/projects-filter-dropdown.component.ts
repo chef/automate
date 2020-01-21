@@ -92,10 +92,6 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
     console.log('clicked create new project - open modal');
   }
 
-  handleEditProjects() {
-    console.log('clicked edit projects, should route to Projects list');
-  }
-
   handleArrowUp(event: KeyboardEvent) {
     event.preventDefault();
 
