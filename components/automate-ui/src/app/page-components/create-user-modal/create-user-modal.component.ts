@@ -26,9 +26,6 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
   @Input() openEvent: EventEmitter<boolean>;
 
   public createUserForm: FormGroup;
-  public conflictErrorEvent: EventEmitter<boolean>;
-  public passwordErrorEvent: EventEmitter<boolean>;
-
   public conflictError = false;
   public passwordError = false;
   public modifyUsername = false; // Whether the edit Username form is open or not.
