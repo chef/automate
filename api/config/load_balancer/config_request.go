@@ -46,7 +46,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.AccessLog = w.String("/dev/stdout")
 	c.V1.Sys.Ngx.Http.DefaultType = w.String("application/octet-stream")
 	c.V1.Sys.Ngx.Http.ClientBodyBufferSize = w.String("128k")
-	c.V1.Sys.Ngx.Http.ClientMaxBodySize = w.String("250m")
+	c.V1.Sys.Ngx.Http.ClientMaxBodySize = w.String("2048m")
 	c.V1.Sys.Ngx.Http.KeepaliveTimeout = w.Int32(60)
 	c.V1.Sys.Ngx.Http.KeepaliveRequests = w.Int32(10000)
 	c.V1.Sys.Ngx.Http.Gzip = w.String("on")

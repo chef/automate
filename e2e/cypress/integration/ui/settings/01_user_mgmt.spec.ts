@@ -30,10 +30,15 @@ describe('user management', () => {
     // we increase the default delay to mimic the average human's typing speed
     // only need this for input values upon which later test assertions depend
     // ref: https://github.com/cypress-io/cypress/issues/534
-    cy.get('[formcontrolname=fullname]').focus()
+    cy.get('[formcontrolname=displayName]').focus()
       .type(name, { delay: typeDelay }).should('have.value', name);
 
-    cy.get('[formcontrolname=username]').focus()
+    // username is auto-generated from the display name
+    cy.get('#username-fields span').contains(`cypress-test-user-${now}`).should('exist');
+
+    // we can also edit the username directly
+    cy.get('[data-cy=edit-username]').click();
+    cy.get('[formcontrolname=username]').focus().clear()
       .type(username, { delay: typeDelay }).should('have.value', username);
 
     cy.get('[formcontrolname=password]').focus()

@@ -6,6 +6,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of, combineLatest } from 'rxjs';
 import { identity } from 'lodash/fp';
 
+import { HttpStatus } from 'app/types/types';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
@@ -208,12 +209,13 @@ export class UserEffects {
 
   @Effect()
   createUserFailure$ = this.actions$.pipe(
-    ofType(UserActionTypes.CREATE_FAILURE),
-    map(({ payload }: CreateUserFailure) => {
-      const msg = payload.error.error;
-      return new CreateNotification({
-        type: Type.error,
-        message: `Could not create user: ${msg || payload.error}`
-      });
-    }));
+    ofType<CreateUserFailure>(UserActionTypes.CREATE_FAILURE),
+    // username conflict and bad password handled in the modal, see user-management.component.ts
+    filter(({ payload: { status } }) => {
+      return status !== HttpStatus.CONFLICT && status !== HttpStatus.BAD_REQUEST;
+    }),
+    map(({ payload: { error } }) => new CreateNotification({
+      type: Type.error,
+      message: `Could not create user: ${error.error || error}.`
+    })));
 }

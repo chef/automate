@@ -15,7 +15,12 @@ describe('UserManagementComponent', () => {
 
     TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'app-user-form', inputs: ['createUserForm'] }),
+        MockComponent({ selector: 'app-user-form',
+            inputs: [
+              'createUserForm',
+              'conflictErrorEvent',
+              'passwordErrorEvent'
+            ] }),
         MockComponent({ selector: 'app-user-table',
             inputs: [
               'addButtonText',
@@ -66,7 +71,7 @@ describe('UserManagementComponent', () => {
     });
 
      it('should be valid when all fields are filled out and passwords match', () => {
-      component.createUserForm.controls['fullname'].setValue('Sam');
+      component.createUserForm.controls['displayName'].setValue('Sam');
       component.createUserForm.controls['username'].setValue('Mary');
       component.createUserForm.controls['password'].setValue('imawitch');
       component.createUserForm.controls['confirmPassword'].setValue('imawitch');

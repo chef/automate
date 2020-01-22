@@ -1,5 +1,6 @@
+import { HttpErrorResponse } from '@angular/common/http';
 import { EntityState, EntityAdapter, createEntityAdapter } from '@ngrx/entity';
-import { set } from 'lodash/fp';
+import { set, pipe } from 'lodash/fp';
 
 import { EntityStatus } from '../entities';
 import { UserActionTypes, UserActions } from './user.actions';
@@ -10,6 +11,7 @@ export interface UserEntityState extends EntityState<User> {
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
   createStatus: EntityStatus;
+  createError: HttpErrorResponse;
 }
 
 export const userEntityAdapter: EntityAdapter<User> = createEntityAdapter<User>();
@@ -18,7 +20,8 @@ export const UserEntityInitialState: UserEntityState = userEntityAdapter.getInit
   getStatus: EntityStatus.notLoaded,
   updateStatus: EntityStatus.notLoaded,
   deleteStatus: EntityStatus.notLoaded,
-  createStatus: EntityStatus.notLoaded
+  createStatus: EntityStatus.notLoaded,
+  createError: null
 });
 
 export function userEntityReducer(state: UserEntityState = UserEntityInitialState,
@@ -106,14 +109,22 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
       return set('deleteStatus', EntityStatus.loadingFailure, state);
 
     case UserActionTypes.CREATE:
-      return set('createStatus', EntityStatus.loading, state);
+      return pipe(
+        set('createError', null),
+        set('createStatus', EntityStatus.loading)
+      )(state) as UserEntityState;
 
     case UserActionTypes.CREATE_SUCCESS:
-      return set('createStatus', EntityStatus.loadingSuccess,
-                  userEntityAdapter.addOne(action.payload, state));
+      return pipe(
+        set('createError', null),
+        set('createStatus', EntityStatus.loadingSuccess)
+      )(userEntityAdapter.addOne(action.payload, state)) as UserEntityState;
 
     case UserActionTypes.CREATE_FAILURE:
-      return set('createStatus', EntityStatus.loadingFailure, state);
+      return pipe(
+        set('createError', action.payload),
+        set('createStatus', EntityStatus.loadingFailure)
+      )(state) as UserEntityState;
 
     default:
       return state;

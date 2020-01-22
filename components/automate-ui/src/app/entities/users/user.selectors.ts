@@ -31,6 +31,11 @@ export const createStatus = createSelector(
   (state) => state.createStatus
 );
 
+export const createError = createSelector(
+  userState,
+  (state) => state.createError
+);
+
 export const userFromRoute = createSelector(
   userEntities,
   routeParams,
