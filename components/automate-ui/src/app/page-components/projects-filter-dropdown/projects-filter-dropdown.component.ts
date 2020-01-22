@@ -29,6 +29,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   @Output() onOptionChange = new EventEmitter<ProjectsFilterOption[]>();
 
   editableOptions: ProjectsFilterOption[] = [];
+  // filteredOptions is merely a container for holding a copy of editableOptions that can be altered
   filteredOptions: ProjectsFilterOption[] = [];
 
   filterValue = '';
@@ -37,7 +38,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
 
   dropdownActive = false;
 
-  handleFilterKeyUp() {
+  handleFilterKeyUp(): void {
     this.filteredOptions = this.editableOptions.filter(option =>
       option.label.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1
     );
@@ -71,7 +72,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   handleOptionChange(event, label) {
     this.editableOptions.find(option => {
       if (option.label === label) {
-        option.checked = event.detail;
+        option.checked = event.detail; // provides the new state of the checkbox
       }
     });
     this.optionsEdited = true;
