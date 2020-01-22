@@ -26,12 +26,13 @@ func init() {
           }
         },
         "tags": [
-          "Policies"
+          "hidden"
         ]
       }
     },
     "/iam/v2/policies": {
       "get": {
+        "summary": "List all IAM policies",
         "operationId": "ListPolicies",
         "responses": {
           "200": {
@@ -46,6 +47,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create a new policy",
+        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that act on a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nThe top-level projects list for the policy defines which project(s) the policy belongs to,\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy in the (unassigned) project that grants the viewer role\non a few projects for all LDAP teams:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreatePolicy",
         "responses": {
           "200": {
@@ -72,6 +75,7 @@ func init() {
     },
     "/iam/v2/policies/{id}": {
       "get": {
+        "summary": "Get an IAM policy",
         "operationId": "GetPolicy",
         "responses": {
           "200": {
@@ -94,6 +98,7 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete an IAM policy",
         "operationId": "DeletePolicy",
         "responses": {
           "200": {
@@ -116,6 +121,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update an existing IAM policy",
+        "description": "Very similar to create except the ID cannot be changed.",
         "operationId": "UpdatePolicy",
         "responses": {
           "200": {
@@ -128,6 +135,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the policy to modify. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -148,6 +156,8 @@ func init() {
     },
     "/iam/v2/policies/{id}/members": {
       "get": {
+        "summary": "List policy members",
+        "description": "List all members of a specific policy.",
         "operationId": "ListPolicyMembers",
         "responses": {
           "200": {
@@ -160,6 +170,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the policy to list members of.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -170,6 +181,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Replace policy members",
+        "description": "Replace the entire member list for a specific policy with a new list.",
         "operationId": "ReplacePolicyMembers",
         "responses": {
           "200": {
@@ -182,6 +195,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -202,6 +216,8 @@ func init() {
     },
     "/iam/v2/policies/{id}/members:add": {
       "post": {
+        "summary": "Add policy members",
+        "description": "Add specific members to the member list for a specific policy.",
         "operationId": "AddPolicyMembers",
         "responses": {
           "200": {
@@ -214,6 +230,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -234,6 +251,8 @@ func init() {
     },
     "/iam/v2/policies/{id}/members:remove": {
       "post": {
+        "summary": "Remove policy members",
+        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not part of the member list.",
         "operationId": "RemovePolicyMembers",
         "responses": {
           "200": {
@@ -246,6 +265,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -266,6 +286,8 @@ func init() {
     },
     "/iam/v2/policy_version": {
       "get": {
+        "summary": "Get IAM version",
+        "description": "Returns the major and minor version of IAM that your automate installation is running.",
         "operationId": "GetPolicyVersion",
         "responses": {
           "200": {
@@ -282,6 +304,7 @@ func init() {
     },
     "/iam/v2/projects": {
       "get": {
+        "summary": "List all projects",
         "operationId": "ListProjects",
         "responses": {
           "200": {
@@ -296,6 +319,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create a project",
+        "description": "Creates a new project to be used in the IAM policies that control permissions in Automate.\n\nA project defines the scope for a set of resources. A resource can be in more than one project.",
         "operationId": "CreateProject",
         "responses": {
           "200": {
@@ -322,6 +347,7 @@ func init() {
     },
     "/iam/v2/projects/{id}": {
       "get": {
+        "summary": "Get a project",
         "operationId": "GetProject",
         "responses": {
           "200": {
@@ -344,6 +370,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a project",
+        "description": "Deletes a project. Cascade deletes the project from any resources tagged with it.\nIf a resulting resource no longer belongs to any project, it goes into the (unassigned) project.\n\nAlso cascade deletes this project from any project list in all statements.\nIf the resulting project list for a given statement is empty, it is deleted.\nIf the resulting policy has no statements, it is also deleted.",
         "operationId": "DeleteProject",
         "responses": {
           "200": {
@@ -366,6 +394,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update a project",
+        "description": "Update an existing project. Very similar to create except the ID cannot be changed.",
         "operationId": "UpdateProject",
         "responses": {
           "200": {
@@ -378,6 +408,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the project. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -398,6 +429,7 @@ func init() {
     },
     "/iam/v2/roles": {
       "get": {
+        "summary": "List all roles",
         "operationId": "ListRoles",
         "responses": {
           "200": {
@@ -412,6 +444,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create a new role",
+        "description": "Creates a new role to be used in the IAM policies that control permissions in Automate.\n\nA role defines the scope for a set of actions.",
         "operationId": "CreateRole",
         "responses": {
           "200": {
@@ -438,6 +472,7 @@ func init() {
     },
     "/iam/v2/roles/{id}": {
       "get": {
+        "summary": "Get a role",
         "operationId": "GetRole",
         "responses": {
           "200": {
@@ -460,6 +495,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a role",
+        "description": "This will cascade delete any statements that only contain this role.\nIf the resulting policy has no statements, it is also deleted.",
         "operationId": "DeleteRole",
         "responses": {
           "200": {
@@ -482,6 +519,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update a role",
+        "description": "Update an existing role. Very similar to create except the ID cannot be changed.",
         "operationId": "UpdateRole",
         "responses": {
           "200": {
@@ -494,6 +533,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the role to update. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -524,12 +564,13 @@ func init() {
           }
         },
         "tags": [
-          "Policies"
+          "hidden"
         ]
       }
     },
     "/iam/v2beta/policies": {
       "get": {
+        "summary": "List all IAM policies",
         "operationId": "ListPolicies2",
         "responses": {
           "200": {
@@ -544,6 +585,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create a new policy",
+        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that act on a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nThe top-level projects list for the policy defines which project(s) the policy belongs to,\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy in the (unassigned) project that grants the viewer role\non a few projects for all LDAP teams:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreatePolicy2",
         "responses": {
           "200": {
@@ -570,6 +613,7 @@ func init() {
     },
     "/iam/v2beta/policies/{id}": {
       "get": {
+        "summary": "Get an IAM policy",
         "operationId": "GetPolicy2",
         "responses": {
           "200": {
@@ -592,6 +636,7 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete an IAM policy",
         "operationId": "DeletePolicy2",
         "responses": {
           "200": {
@@ -614,6 +659,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update an existing IAM policy",
+        "description": "Very similar to create except the ID cannot be changed.",
         "operationId": "UpdatePolicy2",
         "responses": {
           "200": {
@@ -626,6 +673,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the policy to modify. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -646,6 +694,8 @@ func init() {
     },
     "/iam/v2beta/policies/{id}/members": {
       "get": {
+        "summary": "List policy members",
+        "description": "List all members of a specific policy.",
         "operationId": "ListPolicyMembers2",
         "responses": {
           "200": {
@@ -658,6 +708,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the policy to list members of.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -668,6 +719,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Replace policy members",
+        "description": "Replace the entire member list for a specific policy with a new list.",
         "operationId": "ReplacePolicyMembers2",
         "responses": {
           "200": {
@@ -680,6 +733,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -700,6 +754,8 @@ func init() {
     },
     "/iam/v2beta/policies/{id}/members:add": {
       "post": {
+        "summary": "Add policy members",
+        "description": "Add specific members to the member list for a specific policy.",
         "operationId": "AddPolicyMembers2",
         "responses": {
           "200": {
@@ -712,6 +768,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -732,6 +789,8 @@ func init() {
     },
     "/iam/v2beta/policies/{id}/members:remove": {
       "post": {
+        "summary": "Remove policy members",
+        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not part of the member list.",
         "operationId": "RemovePolicyMembers2",
         "responses": {
           "200": {
@@ -744,6 +803,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -764,6 +824,8 @@ func init() {
     },
     "/iam/v2beta/policy_version": {
       "get": {
+        "summary": "Get IAM version",
+        "description": "Returns the major and minor version of IAM that your automate installation is running.",
         "operationId": "GetPolicyVersion2",
         "responses": {
           "200": {
@@ -780,6 +842,7 @@ func init() {
     },
     "/iam/v2beta/projects": {
       "get": {
+        "summary": "List all projects",
         "operationId": "ListProjects2",
         "responses": {
           "200": {
@@ -794,6 +857,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create a project",
+        "description": "Creates a new project to be used in the IAM policies that control permissions in Automate.\n\nA project defines the scope for a set of resources. A resource can be in more than one project.",
         "operationId": "CreateProject2",
         "responses": {
           "200": {
@@ -820,6 +885,7 @@ func init() {
     },
     "/iam/v2beta/projects/{id}": {
       "get": {
+        "summary": "Get a project",
         "operationId": "GetProject2",
         "responses": {
           "200": {
@@ -842,6 +908,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a project",
+        "description": "Deletes a project. Cascade deletes the project from any resources tagged with it.\nIf a resulting resource no longer belongs to any project, it goes into the (unassigned) project.\n\nAlso cascade deletes this project from any project list in all statements.\nIf the resulting project list for a given statement is empty, it is deleted.\nIf the resulting policy has no statements, it is also deleted.",
         "operationId": "DeleteProject2",
         "responses": {
           "200": {
@@ -864,6 +932,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update a project",
+        "description": "Update an existing project. Very similar to create except the ID cannot be changed.",
         "operationId": "UpdateProject2",
         "responses": {
           "200": {
@@ -876,6 +946,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the project. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -896,6 +967,7 @@ func init() {
     },
     "/iam/v2beta/roles": {
       "get": {
+        "summary": "List all roles",
         "operationId": "ListRoles2",
         "responses": {
           "200": {
@@ -910,6 +982,8 @@ func init() {
         ]
       },
       "post": {
+        "summary": "Create a new role",
+        "description": "Creates a new role to be used in the IAM policies that control permissions in Automate.\n\nA role defines the scope for a set of actions.",
         "operationId": "CreateRole2",
         "responses": {
           "200": {
@@ -936,6 +1010,7 @@ func init() {
     },
     "/iam/v2beta/roles/{id}": {
       "get": {
+        "summary": "Get a role",
         "operationId": "GetRole2",
         "responses": {
           "200": {
@@ -958,6 +1033,8 @@ func init() {
         ]
       },
       "delete": {
+        "summary": "Delete a role",
+        "description": "This will cascade delete any statements that only contain this role.\nIf the resulting policy has no statements, it is also deleted.",
         "operationId": "DeleteRole2",
         "responses": {
           "200": {
@@ -980,6 +1057,8 @@ func init() {
         ]
       },
       "put": {
+        "summary": "Update a role",
+        "description": "Update an existing role. Very similar to create except the ID cannot be changed.",
         "operationId": "UpdateRole2",
         "responses": {
           "200": {
@@ -992,6 +1071,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "Unique ID for the role to update. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1016,13 +1096,15 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the policy to modify."
         },
         "members": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of members to add to the policy."
         }
       }
     },
@@ -1041,28 +1123,33 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the new policy. Cannot be changed after creation."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the new policy."
         },
         "members": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Members affected by this policy."
         },
         "statements": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Statement"
-          }
+          },
+          "description": "Statements for the new policy. Must contain one or more."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "The list of projects this policy belongs to."
         }
       },
       "description": "Does not contain type as the enduser can only create 'custom' policies."
@@ -1079,10 +1166,12 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the project. Cannot be changed after creation."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the new project."
         }
       }
     },
@@ -1098,22 +1187,26 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the role. Cannot be changed after creation."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the new role."
         },
         "actions": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of actions that this role scopes to."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "The list of projects this role belongs to."
         }
       },
       "description": "Does not contain type as the enduser can only create 'custom' roles."
@@ -1224,31 +1317,37 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the policy."
         },
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the policy. Cannot be changed after creation."
         },
         "type": {
-          "$ref": "#/definitions/chef.automate.api.iam.v2.Type"
+          "$ref": "#/definitions/chef.automate.api.iam.v2.Type",
+          "description": "Whether this policy is user created or chef managed.\nOne of ` + "`" + `CUSTOM` + "`" + `, or ` + "`" + `CHEF_MANAGED` + "`" + `, respectively."
         },
         "members": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Members affected by this policy."
         },
         "statements": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Statement"
-          }
+          },
+          "description": "Statements for the policy. Must contain one or more."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "The list of projects this policy belongs to."
         }
       }
     },
@@ -1256,16 +1355,20 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the project."
         },
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the project. Cannot be changed after creation."
         },
         "type": {
-          "$ref": "#/definitions/chef.automate.api.iam.v2.Type"
+          "$ref": "#/definitions/chef.automate.api.iam.v2.Type",
+          "description": "Whether this policy is user created or chef managed.\nOne of ` + "`" + `CUSTOM` + "`" + `, or ` + "`" + `CHEF_MANAGED` + "`" + `, respectively."
         },
         "status": {
-          "$ref": "#/definitions/chef.automate.api.iam.v2.ProjectRulesStatus"
+          "$ref": "#/definitions/chef.automate.api.iam.v2.ProjectRulesStatus",
+          "description": "The current status of the rules for this project."
         }
       }
     },
@@ -1283,13 +1386,15 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the policy to modify."
         },
         "members": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of members to remove from the policy."
         }
       }
     },
@@ -1308,13 +1413,15 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the policy to modify."
         },
         "members": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of members that replaces previous policy member list."
         }
       }
     },
@@ -1336,25 +1443,30 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the role."
         },
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the role. Cannot be changed after creation."
         },
         "type": {
-          "$ref": "#/definitions/chef.automate.api.iam.v2.Type"
+          "$ref": "#/definitions/chef.automate.api.iam.v2.Type",
+          "description": "Whether this policy is user created or chef managed.\nOne of ` + "`" + `CUSTOM` + "`" + `, or ` + "`" + `CHEF_MANAGED` + "`" + `, respectively."
         },
         "actions": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of actions that this role scopes to."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "The list of projects this role belongs to."
         }
       }
     },
@@ -1362,31 +1474,33 @@ func init() {
       "type": "object",
       "properties": {
         "effect": {
-          "$ref": "#/definitions/chef.automate.api.iam.v2.Statement.Effect"
+          "$ref": "#/definitions/chef.automate.api.iam.v2.Statement.Effect",
+          "description": "Whether the statement allows or denies."
         },
         "actions": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "title": "inline definitions"
+          "description": "DEPRECATED: Actions defined inline. Use role instead."
         },
         "role": {
           "type": "string",
-          "title": "references"
+          "description": "The role defines a set of actions that the statement is scoped to."
         },
         "resources": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "title": "Note: these are for display only, not to be set in CreatePolicy/UpdatePolicy"
+          "description": "DEPRECATED: Resources defined inline. Use projects instead."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "The project list defines the set of resources that the statement is scoped to."
         }
       }
     },
@@ -1410,28 +1524,33 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the policy to modify. Cannot be changed."
         },
         "members": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Members affected by this policy."
         },
         "statements": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Statement"
-          }
+          },
+          "description": "Statements for the policy. Must contain one or more."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for this policy."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "The list of projects this policy belongs to."
         }
       },
       "description": "Does not contain type as the enduser can only create 'custom' policies."
@@ -1448,10 +1567,12 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the project. Cannot be changed."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the project."
         }
       }
     },
@@ -1467,22 +1588,26 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID for the role to update. Cannot be changed."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the role."
         },
         "actions": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of actions that this role scopes to."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "The list of projects this role belongs to."
         }
       }
     },

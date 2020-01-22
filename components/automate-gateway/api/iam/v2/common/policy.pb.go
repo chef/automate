@@ -125,15 +125,22 @@ func (Version_VersionNumber) EnumDescriptor() ([]byte, []int) {
 }
 
 type Policy struct {
-	Name                 string       `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Id                   string       `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	Type                 Type         `protobuf:"varint,3,opt,name=type,proto3,enum=chef.automate.api.iam.v2.Type" json:"type,omitempty"`
-	Members              []string     `protobuf:"bytes,4,rep,name=members,proto3" json:"members,omitempty"`
-	Statements           []*Statement `protobuf:"bytes,5,rep,name=statements,proto3" json:"statements,omitempty"`
-	Projects             []string     `protobuf:"bytes,6,rep,name=projects,proto3" json:"projects,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
+	// Name for the policy.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Unique ID for the policy. Cannot be changed after creation.
+	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	// Whether this policy is user created or chef managed.
+	// One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
+	Type Type `protobuf:"varint,3,opt,name=type,proto3,enum=chef.automate.api.iam.v2.Type" json:"type,omitempty"`
+	// Members affected by this policy.
+	Members []string `protobuf:"bytes,4,rep,name=members,proto3" json:"members,omitempty"`
+	// Statements for the policy. Must contain one or more.
+	Statements []*Statement `protobuf:"bytes,5,rep,name=statements,proto3" json:"statements,omitempty"`
+	// The list of projects this policy belongs to.
+	Projects             []string `protobuf:"bytes,6,rep,name=projects,proto3" json:"projects,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Policy) Reset()         { *m = Policy{} }
@@ -204,13 +211,15 @@ func (m *Policy) GetProjects() []string {
 }
 
 type Statement struct {
+	// Whether the statement allows or denies.
 	Effect Statement_Effect `protobuf:"varint,1,opt,name=effect,proto3,enum=chef.automate.api.iam.v2.Statement_Effect" json:"effect,omitempty"`
-	// inline definitions
+	// DEPRECATED: Actions defined inline. Use role instead.
 	Actions []string `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`
-	// references
+	// The role defines a set of actions that the statement is scoped to.
 	Role string `protobuf:"bytes,4,opt,name=role,proto3" json:"role,omitempty"`
-	// Note: these are for display only, not to be set in CreatePolicy/UpdatePolicy
-	Resources            []string `protobuf:"bytes,5,rep,name=resources,proto3" json:"resources,omitempty"`
+	// DEPRECATED: Resources defined inline. Use projects instead.
+	Resources []string `protobuf:"bytes,5,rep,name=resources,proto3" json:"resources,omitempty"`
+	// The project list defines the set of resources that the statement is scoped to.
 	Projects             []string `protobuf:"bytes,6,rep,name=projects,proto3" json:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -278,10 +287,16 @@ func (m *Statement) GetProjects() []string {
 }
 
 type Role struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Id                   string   `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	Type                 Type     `protobuf:"varint,3,opt,name=type,proto3,enum=chef.automate.api.iam.v2.Type" json:"type,omitempty"`
-	Actions              []string `protobuf:"bytes,4,rep,name=actions,proto3" json:"actions,omitempty"`
+	// Name for the role.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Unique ID for the role. Cannot be changed after creation.
+	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	// Whether this policy is user created or chef managed.
+	// One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
+	Type Type `protobuf:"varint,3,opt,name=type,proto3,enum=chef.automate.api.iam.v2.Type" json:"type,omitempty"`
+	// List of actions that this role scopes to.
+	Actions []string `protobuf:"bytes,4,rep,name=actions,proto3" json:"actions,omitempty"`
+	// The list of projects this role belongs to.
 	Projects             []string `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -349,9 +364,14 @@ func (m *Role) GetProjects() []string {
 }
 
 type Project struct {
-	Name                 string             `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Id                   string             `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	Type                 Type               `protobuf:"varint,3,opt,name=type,proto3,enum=chef.automate.api.iam.v2.Type" json:"type,omitempty"`
+	// Name for the project.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// Unique ID for the project. Cannot be changed after creation.
+	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	// Whether this policy is user created or chef managed.
+	// One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
+	Type Type `protobuf:"varint,3,opt,name=type,proto3,enum=chef.automate.api.iam.v2.Type" json:"type,omitempty"`
+	// The current status of the rules for this project.
 	Status               ProjectRulesStatus `protobuf:"varint,4,opt,name=status,proto3,enum=chef.automate.api.iam.v2.ProjectRulesStatus" json:"status,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`

@@ -196,7 +196,6 @@ Set up automatic tagging in the `components/automate-chef-io/data/docs/api-stati
 
 * Proto files can use tabs and spaces. We have a defacto convention for using tabs since our protos are primarily used with Go code.
 * Endpoints will not show up in the UI unless one or more of their tags are assigned to a tag group, but they will still appear in the Swagger file accessible through the docs in the browser.
-* To explicitly hide an endpoint and remove it from the Swagger file, assign it the tag of `hidden` and it will be filtered out in pre-processing.
 * multiline fields are not allowed in proto files. This the main reason we settled on using the comment style of endpoint documentation.
 
 ### API Style Guide
@@ -259,6 +258,22 @@ Block comments support markdown tables:
   | node_name | node_name.lower |
   */
   rpc ListReports(Query) returns (Reports) {
+```
+
+### Excluding an endpoint
+
+You can exclude an endpoint from the swagger generation by importing this in your proto file:
+
+```go
+import "protoc-gen-swagger/options/annotations.proto";
+```
+
+And adding this annotation to the rpc in question:
+
+```go
+option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+  tags: "hidden";
+};
 ```
 
 ## Service Documentation
