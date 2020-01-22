@@ -1,6 +1,11 @@
 package backup
 
-import "io"
+import (
+	"bufio"
+	"io"
+
+	"go.uber.org/multierr"
+)
 
 // ArtifactStream streams a list of artifacts keys
 // by name. A stream may not produce the same value
@@ -8,6 +13,7 @@ import "io"
 // Returns io.EOF when no more elements will be produced
 type ArtifactStream interface {
 	Next() (string, error)
+	Close() error
 }
 
 // ErrStream is an ArtifactStream that always returns
@@ -24,6 +30,10 @@ type errStream struct {
 
 func (e errStream) Next() (string, error) {
 	return "", e.err
+}
+
+func (e errStream) Close() error {
+	return nil
 }
 
 // EmptyStream is an ArtifactStream that always returns
@@ -78,10 +88,70 @@ func (p *peekableArtifactStream) Peek() (string, error) {
 	return v, nil
 }
 
+func (p *peekableArtifactStream) Close() error {
+	return p.stream.Close()
+}
+
 // NewPeekableArtifactStream wraps the given ArtifactStream so that it can be peeked
 func NewPeekableArtifactStream(s ArtifactStream) PeekableArtifactStream {
 	return &peekableArtifactStream{
 		stream: s,
+	}
+}
+
+type lineReaderStream struct {
+	r        io.ReadCloser
+	scanner  *bufio.Scanner
+	finished bool
+}
+
+func (s *lineReaderStream) Next() (string, error) {
+	if s.finished {
+		return "", io.EOF
+	}
+	s.finished = !s.scanner.Scan()
+
+	if err := s.scanner.Err(); err != nil {
+		return "", err
+	}
+	return s.scanner.Text(), nil
+}
+
+func (s *lineReaderStream) Close() error {
+	return s.r.Close()
+}
+
+func LineReaderStream(reader io.ReadCloser) ArtifactStream {
+	scanner := bufio.NewScanner(reader)
+
+	return &lineReaderStream{
+		r:        reader,
+		scanner:  scanner,
+		finished: false,
+	}
+}
+
+type arrayStream struct {
+	idx   int
+	items []string
+}
+
+func (a *arrayStream) Next() (string, error) {
+	if a.idx >= len(a.items) {
+		return "", io.EOF
+	}
+	idx := a.idx
+	a.idx++
+	return a.items[idx], nil
+}
+
+func (a *arrayStream) Close() error {
+	return nil
+}
+
+func NewArrayStream(items []string) ArtifactStream {
+	return &arrayStream{
+		items: items,
 	}
 }
 
@@ -121,6 +191,12 @@ func (d *xorStream) Next() (string, error) {
 			}
 		}
 	}
+}
+
+func (d *xorStream) Close() error {
+	err1 := d.a.Close()
+	err2 := d.b.Close()
+	return multierr.Combine(err1, err2)
 }
 
 // Xor returns a stream with elements in a or b but not both
@@ -183,6 +259,12 @@ func (d *subStream) Next() (string, error) {
 	}
 }
 
+func (d *subStream) Close() error {
+	err1 := d.a.Close()
+	err2 := d.b.Close()
+	return multierr.Combine(err1, err2)
+}
+
 // Sub returns a stream with elements in a but not in b
 // a - b
 func Sub(a ArtifactStream, b ArtifactStream) ArtifactStream {
@@ -227,6 +309,12 @@ func (d *mergeStream) Next() (string, error) {
 			return d.a.Next()
 		}
 	}
+}
+
+func (d *mergeStream) Close() error {
+	err1 := d.a.Close()
+	err2 := d.b.Close()
+	return multierr.Combine(err1, err2)
 }
 
 // Merge returns a stream which is the union of all the given

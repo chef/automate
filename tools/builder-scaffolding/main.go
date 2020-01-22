@@ -19,6 +19,7 @@ func main() {
 
 	rootCmd.AddCommand(generateCmd)
 	rootCmd.AddCommand(loginCmd)
+	rootCmd.AddCommand(repoCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err.Error())

@@ -7,26 +7,6 @@ import (
 	"testing"
 )
 
-type arrayStream struct {
-	idx   int
-	items []string
-}
-
-func (a *arrayStream) Next() (string, error) {
-	if a.idx >= len(a.items) {
-		return "", io.EOF
-	}
-	idx := a.idx
-	a.idx++
-	return a.items[idx], nil
-}
-
-func NewArrayStream(items []string) ArtifactStream {
-	return &arrayStream{
-		items: items,
-	}
-}
-
 func consume(t *testing.T, stream ArtifactStream) []string {
 	ret := []string{}
 	for {
