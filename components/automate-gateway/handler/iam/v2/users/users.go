@@ -93,7 +93,7 @@ func (p *Server) UpdateUser(
 }
 
 // UpdateSelf allows a user to update their own info,
-// requiring the previous password if they want to change password.
+// requiring the old password if they want to change password.
 func (p *Server) UpdateSelf(
 	ctx context.Context, req *pb_req.UpdateSelfReq) (*pb_resp.UpdateSelfResp, error) {
 	resp, err := p.users.UpdateSelf(ctx, &local_user.UpdateSelfReq{

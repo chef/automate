@@ -5,23 +5,27 @@ import { User } from './user.model';
 import { SelfUser } from './userself.model';
 
 export enum UserActionTypes {
-  DELETE                  = 'USER::DELETE',
-  DELETE_SUCCESS          = 'USER::DELETE::SUCCESS',
-  DELETE_FAILURE          = 'USER::DELETE::FAILURE',
-  GET_ALL                 = 'USER::GET_ALL',
-  GET_ALL_SUCCESS         = 'USER::GET_ALL::SUCCESS',
-  GET_ALL_FAILURE         = 'USER::GET_ALL::FAILURE',
-  GET                     = 'USER::GET',
-  GET_SUCCESS             = 'USER::GET::SUCCESS',
-  GET_FAILURE             = 'USER::GET::FAILURE',
-  UPDATE                  = 'USER::UPDATE',
-  UPDATE_SUCCESS          = 'USER::UPDATE::SUCCESS',
-  UPDATE_FAILURE          = 'USER::UPDATE::FAILURE',
-  UPDATE_SELF             = 'USER::SELF::UPDATE',
-  UPDATE_SELF_SUCCESS     = 'USER::SELF::UPDATE::SUCCESS',
-  CREATE                  = 'USER::CREATE',
-  CREATE_SUCCESS          = 'USER::CREATE::SUCCESS',
-  CREATE_FAILURE          = 'USER::CREATE::FAILURE'
+  DELETE                           = 'USER::DELETE',
+  DELETE_SUCCESS                   = 'USER::DELETE::SUCCESS',
+  DELETE_FAILURE                   = 'USER::DELETE::FAILURE',
+  GET_ALL                          = 'USER::GET_ALL',
+  GET_ALL_SUCCESS                  = 'USER::GET_ALL::SUCCESS',
+  GET_ALL_FAILURE                  = 'USER::GET_ALL::FAILURE',
+  GET                              = 'USER::GET',
+  GET_SUCCESS                      = 'USER::GET::SUCCESS',
+  GET_FAILURE                      = 'USER::GET::FAILURE',
+  UPDATE_NAME_USER                 = 'USER::NAME::UPDATE',
+  UPDATE_NAME_USER_SUCCESS         = 'USER::NAME::UPDATE::SUCCESS',
+  UPDATE_PASSWORD_USER             = 'USER::PASSWORD::UPDATE',
+  UPDATE_PASSWORD_USER_SUCCESS     = 'USER::PASSWORD::UPDATE::SUCCESS',
+  UPDATE_NAME_SELF                 = 'USER::NAME::SELF::UPDATE',
+  UPDATE_NAME_SELF_SUCCESS         = 'USER::NAME::SELF::UPDATE::SUCCESS',
+  UPDATE_PASSWORD_SELF             = 'USER::PASSWORD::SELF::UPDATE',
+  UPDATE_PASSWORD_SELF_SUCCESS     = 'USER::PASSWORD::SELF::UPDATE::SUCCESS',
+  UPDATE_USER_FAILURE              = 'USER::UPDATE::FAILURE',
+  CREATE                           = 'USER::CREATE',
+  CREATE_SUCCESS                   = 'USER::CREATE::SUCCESS',
+  CREATE_FAILURE                   = 'USER::CREATE::FAILURE'
 }
 
 export class GetUsers implements Action {
@@ -57,28 +61,48 @@ export class GetUserFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export class UpdateUser implements Action {
-  readonly type = UserActionTypes.UPDATE;
+export class UpdatePasswordUser implements Action {
+  readonly type = UserActionTypes.UPDATE_PASSWORD_USER;
   constructor(public payload: User) { }
 }
 
-export class UpdateUserSuccess implements Action {
-  readonly type = UserActionTypes.UPDATE_SUCCESS;
+export class UpdatePasswordUserSuccess implements Action {
+  readonly type = UserActionTypes.UPDATE_PASSWORD_USER_SUCCESS;
   constructor(public payload: User) { }
 }
 
 export class UpdateUserFailure implements Action {
-  readonly type = UserActionTypes.UPDATE_FAILURE;
+  readonly type = UserActionTypes.UPDATE_USER_FAILURE;
   constructor(public payload: HttpErrorResponse) { }
 }
 
-export class UpdateSelf implements Action {
-  readonly type = UserActionTypes.UPDATE_SELF;
+export class UpdateNameUser implements Action {
+  readonly type = UserActionTypes.UPDATE_NAME_USER;
+  constructor(public payload: User) { }
+}
+
+export class UpdateNameUserSuccess implements Action {
+  readonly type = UserActionTypes.UPDATE_NAME_USER_SUCCESS;
+  constructor(public payload: User) { }
+}
+
+export class UpdateNameSelf implements Action {
+  readonly type = UserActionTypes.UPDATE_NAME_SELF;
   constructor(public payload: SelfUser) { }
 }
 
-export class UpdateSelfSuccess implements Action {
-  readonly type = UserActionTypes.UPDATE_SELF_SUCCESS;
+export class UpdateNameSelfSuccess implements Action {
+  readonly type = UserActionTypes.UPDATE_NAME_SELF_SUCCESS;
+  constructor(public payload: SelfUser) { }
+}
+
+export class UpdatePasswordSelf implements Action {
+  readonly type = UserActionTypes.UPDATE_PASSWORD_SELF;
+  constructor(public payload: SelfUser) { }
+}
+
+export class UpdatePasswordSelfSuccess implements Action {
+  readonly type = UserActionTypes.UPDATE_PASSWORD_SELF_SUCCESS;
   constructor(public payload: SelfUser) { }
 }
 
@@ -130,11 +154,15 @@ export type UserActions =
   | GetUser
   | GetUserSuccess
   | GetUserFailure
-  | UpdateUser
-  | UpdateUserSuccess
+  | UpdatePasswordUser
+  | UpdatePasswordUserSuccess
+  | UpdateNameUser
+  | UpdateNameUserSuccess
   | UpdateUserFailure
-  | UpdateSelf
-  | UpdateSelfSuccess
+  | UpdatePasswordSelf
+  | UpdatePasswordSelfSuccess
+  | UpdateNameSelf
+  | UpdateNameSelfSuccess
   | CreateUser
   | CreateUserSuccess
   | CreateUserFailure;

@@ -26,11 +26,15 @@ import {
   GetUser,
   GetUserSuccess,
   GetUserFailure,
-  UpdateUser,
-  UpdateUserSuccess,
+  UpdatePasswordUser,
+  UpdatePasswordUserSuccess,
   UpdateUserFailure,
-  UpdateSelf,
-  UpdateSelfSuccess,
+  UpdateNameUser,
+  UpdateNameUserSuccess,
+  UpdatePasswordSelf,
+  UpdatePasswordSelfSuccess,
+  UpdateNameSelf,
+  UpdateNameSelfSuccess,
   UserActionTypes
 } from './user.actions';
 import { UserRequests } from './user.requests';
@@ -88,26 +92,26 @@ export class UserEffects {
     }));
 
   @Effect()
-  updateUser$ = combineLatest([
-    this.actions$.pipe(ofType<UpdateUser>(UserActionTypes.UPDATE)),
+  updatePasswordUser$ = combineLatest([
+    this.actions$.pipe(ofType<UpdatePasswordUser>(UserActionTypes.UPDATE_PASSWORD_USER)),
     this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([action, version]: [UpdateUser, IAMMajorVersion]) =>
+      mergeMap(([action, version]: [UpdatePasswordUser, IAMMajorVersion]) =>
       this.requests.updateUser(action.payload, version).pipe(
-        map((resp: User) => new UpdateUserSuccess(resp)),
+        map((resp: User) => new UpdatePasswordUserSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
 
   @Effect()
-  updateUserSuccess$ = this.actions$.pipe(
-    ofType(UserActionTypes.UPDATE_SUCCESS),
-    map(() => new CreateNotification({
+  updatePasswordUserSuccess$ = this.actions$.pipe(
+    ofType(UserActionTypes.UPDATE_PASSWORD_USER_SUCCESS),
+    map(( { payload: user }: UpdatePasswordUserSuccess) => new CreateNotification({
       type: Type.info,
-      message: 'Successfully updated user'
+      message: `Reset password for user: ${user.id}.`
     })));
 
   @Effect()
   updateUserFailure$ = this.actions$.pipe(
-    ofType(UserActionTypes.UPDATE_FAILURE),
+    ofType(UserActionTypes.UPDATE_USER_FAILURE),
     map(({ payload: { error } }: UpdateUserFailure) => {
       const msg = error.error;
       return new CreateNotification({
@@ -117,22 +121,42 @@ export class UserEffects {
     }));
 
   @Effect()
-  updateSelf$ = combineLatest([
-    this.actions$.pipe(ofType<UpdateSelf>(UserActionTypes.UPDATE_SELF)),
+  updateNameUser$ = combineLatest([
+    this.actions$.pipe(ofType<UpdateNameUser>(UserActionTypes.UPDATE_NAME_USER)),
     this.store$.select(iamMajorVersion).pipe(filter(identity))])
     .pipe(
-      mergeMap(([action, version]: [UpdateSelf, IAMMajorVersion]) =>
-      this.requests.updateSelf(action.payload, version).pipe(
-        map((resp: SelfUser) => new UpdateSelfSuccess(resp)),
+      mergeMap(([action, version]: [UpdateNameUser, IAMMajorVersion]) =>
+      this.requests.updateUser(action.payload, version).pipe(
+        map((resp: User) => new UpdateNameUserSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
 
   @Effect()
-  updateSelfSuccess$ = this.actions$.pipe(
-    ofType(UserActionTypes.UPDATE_SELF_SUCCESS),
-    map(() => new CreateNotification({
+  updatePasswordSelf$ = combineLatest([
+    this.actions$.pipe(ofType<UpdatePasswordSelf>(UserActionTypes.UPDATE_PASSWORD_SELF)),
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
+    .pipe(
+      mergeMap(([action, version]: [UpdatePasswordSelf, IAMMajorVersion]) =>
+      this.requests.updateSelf(action.payload, version).pipe(
+        map((resp: SelfUser) => new UpdatePasswordSelfSuccess(resp)),
+        catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
+
+  @Effect()
+  updatePasswordSelfSuccess$ = this.actions$.pipe(
+    ofType(UserActionTypes.UPDATE_PASSWORD_SELF_SUCCESS),
+    map(( { payload: user }: UpdatePasswordSelfSuccess) => new CreateNotification({
       type: Type.info,
-      message: 'Successfully updated your details'
+      message: `Reset password for user: ${user.id}.`
     })));
+
+  @Effect()
+  updateNameSelf$ = combineLatest([
+    this.actions$.pipe(ofType<UpdateNameSelf>(UserActionTypes.UPDATE_NAME_SELF)),
+    this.store$.select(iamMajorVersion).pipe(filter(identity))])
+    .pipe(
+      mergeMap(([action, version]: [UpdateNameSelf, IAMMajorVersion]) =>
+      this.requests.updateSelf(action.payload, version).pipe(
+        map((resp: SelfUser) => new UpdateNameSelfSuccess(resp)),
+        catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
 
   @Effect()
   deleteUser$ = combineLatest([

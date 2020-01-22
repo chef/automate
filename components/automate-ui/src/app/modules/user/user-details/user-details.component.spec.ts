@@ -20,9 +20,7 @@ import { UserEntityInitialState } from 'app/entities/users/user.reducer';
 import { User } from 'app/entities/users/user.model';
 import {
   GetUser,
-  GetUserSuccess,
-  DeleteUser,
-  DeleteUserSuccess
+  GetUserSuccess
 } from 'app/entities/users/user.actions';
 import { UserDetailsComponent } from './user-details.component';
 
@@ -31,7 +29,6 @@ describe('UserDetailsComponent', () => {
   let fixture: ComponentFixture<UserDetailsComponent>;
   let store: Store<NgrxStateAtom>;
   let router: Router;
-  let element: HTMLElement;
   const isNonAdmin = new Subject<{ isNonAdmin: boolean }>();
 
   const user: User = {
@@ -62,6 +59,8 @@ describe('UserDetailsComponent', () => {
         StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
       ],
       declarations: [
+        MockComponent({ selector: 'chef-loading-spinner' }),
+        MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         MockComponent({ selector: 'chef-breadcrumbs' }),
         MockComponent({ selector: 'chef-breadcrumb', inputs: ['link']}),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
@@ -72,11 +71,8 @@ describe('UserDetailsComponent', () => {
         MockComponent({ selector: 'chef-input' }),
         MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
         MockComponent({ selector: 'chef-page-header' }),
-        MockComponent({ selector: 'chef-tab-selector' }),
+        MockComponent({ selector: 'chef-tab-selector', inputs: ['value']}),
         MockComponent({ selector: 'chef-option' }),
-        MockComponent({ selector: 'app-delete-object-modal',
-          inputs: ['visible', 'objectNoun', 'objectName'],
-          outputs: ['close', 'deleteClicked'] }),
         MockComponent({ selector: 'app-authorized',
                         inputs: ['allOf'],
                         template: '<ng-content></ng-content>' }),
@@ -95,7 +91,6 @@ describe('UserDetailsComponent', () => {
     jasmine.addMatchers(customMatchers);
     fixture = TestBed.createComponent(UserDetailsComponent);
     component = fixture.componentInstance;
-    element = fixture.debugElement.nativeElement;
     fixture.detectChanges();
   });
 
@@ -107,8 +102,22 @@ describe('UserDetailsComponent', () => {
       store.dispatch(new GetUserSuccess(user));
     });
 
-    it('exists', () => {
+    it('should be created', () => {
       expect(component).toBeTruthy();
+    });
+
+    it('defaults to showing details section', () => {
+      expect(component.tabValue).toBe('details');
+    });
+
+    it('show password section when password tab is selected', () => {
+      component.onSelectedTab({ target: { value: 'password' } });
+      expect(component.tabValue).toBe('password');
+    });
+
+    it('show details section when details tab is selected', () => {
+      component.onSelectedTab({ target: { value: 'details' } });
+      expect(component.tabValue).toBe('details');
     });
 
     it('picks up the user from state', () => {
@@ -132,61 +141,5 @@ describe('UserDetailsComponent', () => {
       expect(store.dispatch).toHaveBeenCalledWith(
         new GetUser({ id: user.id }));
     });
-  });
-
-  describe('when deleting the user', () => {
-    beforeEach(() => {
-      store.dispatch(new GetUserSuccess(user));
-      component.deleteUser();
-    });
-
-    it('dispatches an action to delete its user', () => {
-      expect(store.dispatch).toHaveBeenCalledWith(new DeleteUser(user));
-    });
-
-    describe('when it was successful', () => {
-      beforeEach(() => {
-        // this happens when the delete is done:
-        store.dispatch(new DeleteUserSuccess(user));
-      });
-
-      it('navigates back to the user list when the user is gone', () => {
-      component.ngOnInit();
-        expect(router.navigate).toHaveBeenCalledWith(['/settings', 'users']);
-      });
-    });
-
-    // Note (tc): Some conditional components are contained
-    // within mocked components so we can't test them.
-    describe('when the user is an admin', () => {
-      beforeEach(() => {
-        component.isAdminView = true;
-        fixture.detectChanges();
-      });
-
-      it('contains the breadcrumbs', () => {
-        expect(element).toContainPath('chef-breadcrumbs');
-      });
-
-      it('does not contain the password description', () => {
-        expect(element).not.toContainPath('password-description');
-      });
-    });
-
-    describe('when the user is not an admin', () => {
-      beforeEach(() => {
-        component.isAdminView = false;
-        fixture.detectChanges();
-      });
-
-      it('does not contain the breadcrumbs', () => {
-        expect(element).not.toContainPath('chef-breadcrumbs');
-      });
-
-      it('contains the password description', () => {
-        expect(element).toContainPath('#password-description');
-      });
-    });
-
   });
 });
