@@ -28,6 +28,7 @@ export interface ProjectEntityState extends EntityState<Project> {
   updateStatus: EntityStatus;
   deleteStatus: EntityStatus;
   applyRulesStatus: ApplyRulesStatus;
+  realtimeFilter: string;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
@@ -37,6 +38,7 @@ const CREATE_ERROR = 'createError';
 const DELETE_STATUS = 'deleteStatus';
 const UPDATE_STATUS = 'updateStatus';
 const APPLY_RULES_STATUS = 'applyRulesStatus';
+const UPDATE_REALTIME_FILTER = 'updateRealtimeFilter';
 
 export const projectEntityAdapter: EntityAdapter<Project> = createEntityAdapter<Project>();
 
@@ -56,7 +58,8 @@ export const ProjectEntityInitialState: ProjectEntityState = projectEntityAdapte
   createError: null,
   deleteStatus: EntityStatus.notLoaded,
   updateStatus: EntityStatus.notLoaded,
-  applyRulesStatus: initialApplyRulesStatus
+  applyRulesStatus: initialApplyRulesStatus,
+  realtimeFilter: ''
 });
 
 export function projectEntityReducer(
@@ -127,6 +130,9 @@ export function projectEntityReducer(
 
     case ProjectActionTypes.GET_APPLY_RULES_STATUS_SUCCESS:
       return set(APPLY_RULES_STATUS, mapKeys(key => camelCase(key), action.payload), state);
+
+    case ProjectActionTypes.UPDATE_REALTIME_FILTER:
+      return set(UPDATE_REALTIME_FILTER, action.payload, state);
 
     default:
       return state;
