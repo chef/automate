@@ -40,7 +40,7 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
 
   // filteredProjects is merely a container to hold the projectsArray
   // that can be altered
-  public filteredProjects: ProjectChecked[];
+  public filteredProjects: ProjectChecked[] = [];
   public active = false;
   public label = UNASSIGNED_PROJECT_ID;
   public filterValue = '';
