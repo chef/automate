@@ -48,7 +48,7 @@
 
   &:focus {
     outline: none;
-    border-color: $chef-dark-grey;
+    border-color: $chef-grey;
   }
 
   > chef-icon {
@@ -65,12 +65,17 @@ chef-dropdown {
   width: 100%;
   font-size: 14px;
   z-index: 3;
-  border: 1px solid $chef-dark-grey;
+  border: 1px solid $chef-grey;
   border-top: none;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
   overflow-y: auto;
-  max-height: 125px;
+  max-height: 325px;
+
+  #filter-container {
+    padding: 14px;
+    border-bottom: 1px solid $chef-grey;
+  }
 }
 
 chef-checkbox {

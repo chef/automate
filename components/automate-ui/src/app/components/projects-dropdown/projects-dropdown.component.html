@@ -14,8 +14,18 @@
   </button>
   <chef-click-outside (clickOutside)="closeDropdown()">
     <chef-dropdown [attr.visible]="active">
+
+      <div id="filter-container">
+        <input 
+          chefInput
+          type="text"
+          placeholder="Filter projects..." 
+
+          />
+      </div>
+
       <chef-checkbox
-        *ngFor="let project of projectsArray"
+        *ngFor="let project of filteredProjects"
         [checked]="project.checked"
         [attr.title]="project.name"
         (change)="projectChecked($event.detail, project)"
@@ -23,6 +33,12 @@
         (keydown.esc)="closeDropdown()"
         (keydown.arrowup)="moveFocus($event)"
         (keydown.arrowdown)="moveFocus($event)">{{ project['name'] }}</chef-checkbox>
+
+      <div class="no-projects" *ngIf="projectsArray.length < 1">
+        <p>No projects found.</p>
+        <p>You don't have access to any projects that match your search.</p>
+      </div>
+
     </chef-dropdown>
   </chef-click-outside>
 </div>
