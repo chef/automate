@@ -29,7 +29,7 @@ Chef Enterprise Application Stack with Chef Automate + Chef Habitat can scale up
 * 16GB RAM
 * 50 GB disk space
 * Chef Automate, current version
-* Chef Habitat, minimum version 0.89.47
+* Chef Habitat, minimum version 1.5.0
 
 Chef Automate's Compliance and Infrastructure visibility features require additional computing and memory capacity.
 Larger scale systems (15,000+ services) consume significant CPU resources for processing applications data.
@@ -63,7 +63,6 @@ If you have not already done so, [create an API token]({{< ref "api-tokens#creat
 Copy the following event stream command into your editor and replace `MY_APP`, `MY_ENV`, `MY_SITE`, `AUTOMATE_HOSTNAME`, and `API_TOKEN` with the appropriate values.
 
 ```shell
-HAB_FEAT_EVENT_STREAM=1
 hab sup run \
   --event-stream-application="MY_APP" \
   --event-stream-environment="MY_ENV" \
@@ -72,7 +71,6 @@ hab sup run \
   --event-stream-token="API_TOKEN"
 ```
 
-* `HAB_FEAT_EVENT_STREAM=1` enables the event stream
 * [hab sup run](https://www.habitat.sh/docs/habitat-cli/#hab-sup-run) is the hab cli commant to start the Habitat supervisor.
 * `MY_APP` is the name of your application. Chef Automate groups services by application name in the Applications Dashboard
 * `MY_ENV` is the application environment for this supervisor. Chef Automate groups services by environment in the Applications Dashboard
@@ -87,7 +85,6 @@ Paste your customized event stream command into the Chef Habitat command line.
 For example:
 
 ```shell
-HAB_FEAT_EVENT_STREAM=1
 hab sup run \
   --event-stream-application="AmazingEnterpriseApp" \
   --event-stream-environment="acceptance" \
