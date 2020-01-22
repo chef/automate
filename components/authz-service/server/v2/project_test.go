@@ -33,6 +33,8 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
+const projectLimitForTesting = 10 // DefaultProjectLimit is 300
+
 func TestUpdateProject(t *testing.T) {
 	ctx := context.Background()
 
@@ -132,8 +134,8 @@ func TestCreateProject(t *testing.T) {
 			grpctest.AssertCode(t, codes.AlreadyExists, err)
 			assert.Nil(t, resp)
 		}},
-		{"does not create project if max projects surpassed", func(t *testing.T) {
-			for i := 1; i <= constants.MaxProjects; i++ {
+		{"does not create project if project limit surpassed", func(t *testing.T) {
+			for i := 1; i <= projectLimitForTesting; i++ {
 				projectID := "my-id-" + strconv.Itoa(i)
 				project := &api.CreateProjectReq{
 					Id:   projectID,
@@ -144,8 +146,8 @@ func TestCreateProject(t *testing.T) {
 			}
 
 			oneProjectTooMany := &api.CreateProjectReq{
-				Id:   "my-id-" + strconv.Itoa(constants.MaxProjects+1),
-				Name: "name-" + strconv.Itoa(constants.MaxProjects+1),
+				Id:   "my-id-" + strconv.Itoa(projectLimitForTesting+1),
+				Name: "name-" + strconv.Itoa(projectLimitForTesting+1),
 			}
 			resp, err := cl.CreateProject(ctx, oneProjectTooMany)
 			assert.Nil(t, resp)
@@ -490,7 +492,7 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	require.NoError(t, err, "init logger for storage")
 
 	mem_v2 := memstore_v2.New()
-	pg, testDb, _, _, _ := testhelpers.SetupTestDB(t)
+	pg, testDb, _, _, _ := testhelpers.SetupTestDBWithLimit(t, projectLimitForTesting)
 	manager, err := cereal.NewManager(postgres.NewPostgresBackend(testDb.ConnURI))
 	require.NoError(t, err)
 	domainServices := []string{"testdomain"}
