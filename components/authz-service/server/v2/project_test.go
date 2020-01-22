@@ -491,7 +491,8 @@ func setupProjectsAndRules(t *testing.T) (api.ProjectsClient, *cache.Cache, *cac
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
 
-	mem_v2 := memstore_v2.New()
+	mem_v2 := memstore_v2.NewWithProjectLimit(projectLimitForTesting)
+	// TODO: we should be able to optionally use PG. We're only using memstore
 	pg, testDb, _, _, _ := testhelpers.SetupTestDBWithLimit(t, projectLimitForTesting)
 	manager, err := cereal.NewManager(postgres.NewPostgresBackend(testDb.ConnURI))
 	require.NoError(t, err)

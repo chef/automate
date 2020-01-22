@@ -26,16 +26,19 @@ type State struct {
 var ErrTypeAssertionFailed = errors.New("type assertion failed: could not convert interface{} to *storage.Policy")
 
 func New() *State {
-	s := &State{
+	return NewWithProjectLimit(constants_v2.DefaultProjectLimit)
+}
+
+func NewWithProjectLimit(projectLimit int) *State {
+	return &State{
 		policies:       cache.New(cache.NoExpiration, -1 /* never run cleanup */),
 		roles:          cache.New(cache.NoExpiration, -1),
 		projects:       cache.New(cache.NoExpiration, -1),
 		rules:          cache.New(cache.NoExpiration, -1),
 		policyChangeID: 0,
 		changeManager:  newPolicyChangeNotifierManager(),
-		projectLimit:   constants_v2.DefaultProjectLimit,
+		projectLimit:   projectLimit,
 	}
-	return s
 }
 
 func (s *State) bumpPolicyVersion() {
