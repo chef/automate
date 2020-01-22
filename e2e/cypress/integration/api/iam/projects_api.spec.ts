@@ -414,7 +414,6 @@ describeIfIAMV2p1('projects API', () => {
     });
 
     it('deleted rules get applied to nodes', () => {
-
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',

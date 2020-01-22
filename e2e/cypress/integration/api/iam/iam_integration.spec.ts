@@ -148,6 +148,24 @@ describeIfIAMV2p1('assigning projects', () => {
       });
     });
 
+    it(`when creating ${iamResources} without projects is allowed, ` +
+    `successfully creates unassigned ${iamResource}`,  () => {
+      cy.request({
+        headers: { 'api-token': unassignedAndProjectAllowedTok },
+        method: 'POST',
+        url: `/apis/iam/v2/${iamResources}`,
+        failOnStatusCode: false,
+        body: {
+          ...resource,
+          id: `${resource.id}-no-projects`,
+          projects: []
+        }
+      }).then((resp) => {
+        expect(resp.status).to.equal(200);
+        expect(resp.body[`${iamResource}`]['projects']).to.have.length(0);
+      });
+    });
+
     it(`when updating ${iamResources}, successfully assigns an existing authorized project`, () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
@@ -211,6 +229,23 @@ describeIfIAMV2p1('assigning projects', () => {
       }).then((resp) => {
         assert.equal(resp.status, 403);
         expect(resp.body.error).to.have.string(modifyError);
+      });
+    });
+
+    it(`when creating ${iamResources} without any projects and ` +
+    'project assignment permission is missing for (unassigned), ' +
+    `fails to create unassigned ${iamResource}`,  () => {
+      cy.request({
+        headers: { 'api-token': twoAllowedProjectsTok },
+        method: 'POST',
+        url: `/apis/iam/v2/${iamResources}`,
+        failOnStatusCode: false,
+        body: {
+          ...resource,
+          projects: []
+        }
+      }).then((resp) => {
+          expect(resp.status).to.equal(403);
       });
     });
 
@@ -575,64 +610,98 @@ describeIfIAMV2p1('assigning projects', () => {
       });
     });
 
-    it(`when project assignment is not allowed but updating ${iamResource} is allowed,
-    succeeds updating without changing project assignment`, () => {
-      // update seed policy
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'PUT',
-        url: `/apis/iam/v2/policies/${policyId1}`,
-        failOnStatusCode: false,
-        body: {
-          id: policyId1,
-          name: policyId1,
-          members: [
-            `token:${tokenId1}` // aka twoAllowedProjectsTok
-          ],
-          statements: [
-            {
-              effect: 'ALLOW',
-              actions: ['*'], // includes assigning projects
-              projects: [
-                authorizedProject1,
-                authorizedProject2
-              ]
-            },
-            {
-              effect: 'ALLOW',
-              actions: [`iam:${iamResources}:get`, `iam:${iamResources}:update`],
-              projects: [ '*' ] // allows all projects only for the get and update action
-            }
-          ]
-        }
+    describe('when project assignment is not allowed but ' +
+    `updating ${iamResource} is allowed`, () => {
+      before(() => {
+        // update seed policy
+        cy.request({
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+          method: 'PUT',
+          url: `/apis/iam/v2/policies/${policyId1}`,
+          failOnStatusCode: false,
+          body: {
+            id: policyId1,
+            name: policyId1,
+            members: [
+              `token:${tokenId1}` // aka twoAllowedProjectsTok
+            ],
+            statements: [
+              {
+                effect: 'ALLOW',
+                actions: ['*'], // includes assigning projects
+                projects: [
+                  authorizedProject1,
+                  authorizedProject2
+                ]
+              },
+              {
+                effect: 'ALLOW',
+                actions: [`iam:${iamResources}:get`, `iam:${iamResources}:update`],
+                projects: [ '*' ] // allows all projects only for the get and update action
+              }
+            ]
+          }
+        });
       });
 
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'POST',
-        url: `/apis/iam/v2/${iamResources}`,
-        body: {
-          ...resource,
-          id: `${resource.id}-8`,
-          projects: []
-        }
+      it('succeeds updating without changing project assignment when there are no projects', () => {
+        cy.request({
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+          method: 'POST',
+          url: `/apis/iam/v2/${iamResources}`,
+          body: {
+            ...resource,
+            id: `${resource.id}-8`,
+            projects: []
+          }
+        });
+
+        cy.request({
+          headers: { 'api-token': twoAllowedProjectsTok },
+          method: 'PUT',
+          url: `/apis/iam/v2/${iamResources}/${resource.id}-8`,
+          body: {
+            ...resource,
+            id: `${resource.id}-8`,
+            name: `${resource.name} Updated Name`,
+            projects: [] // projects unchanged
+          }
+        }).then((resp) => {
+          assert.equal(resp.status, 200);
+          assert.isUndefined(resp.body.error);
+          assert.deepEqual(resp.body[`${iamResource}`]['projects'], []);
+          assert.deepEqual(resp.body[`${iamResource}`]['name'], `${resource.name} Updated Name`);
+        });
       });
 
-      cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
-        method: 'PUT',
-        url: `/apis/iam/v2/${iamResources}/${resource.id}-8`,
-        body: {
-          ...resource,
-          id: `${resource.id}-8`,
-          name: `${resource.name} Updated Name`,
-          projects: [] // projects unchanged
-        }
-      }).then((resp) => {
-        assert.equal(resp.status, 200);
-        assert.isUndefined(resp.body.error);
-        assert.deepEqual(resp.body[`${iamResource}`]['projects'], []);
-        assert.deepEqual(resp.body[`${iamResource}`]['name'], `${resource.name} Updated Name`);
+      it('succeeds updating without changing project assignment ' +
+      'when there there are unauthorizerd projects', () => {
+        cy.request({
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+          method: 'POST',
+          url: `/apis/iam/v2/${iamResources}`,
+          body: {
+            ...resource,
+            id: `${resource.id}-9`,
+            projects: [unauthorizedProject1]
+          }
+        });
+
+        cy.request({
+          headers: { 'api-token': twoAllowedProjectsTok },
+          method: 'PUT',
+          url: `/apis/iam/v2/${iamResources}/${resource.id}-9`,
+          body: {
+            ...resource,
+            name: `${resource.name} Updated Name`,
+            projects: [unauthorizedProject1] // projects unchanged
+          }
+        }).then((resp) => {
+          assert.equal(resp.status, 200);
+          assert.isUndefined(resp.body.error);
+          assert.deepEqual(resp.body[`${iamResource}`]['projects'], [unauthorizedProject1]);
+          assert.deepEqual(resp.body[`${iamResource}`]['name'], `${resource.name} Updated Name`);
+        });
       });
     });
   });

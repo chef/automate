@@ -217,7 +217,21 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     cy.waitForClientRunsNode(clientRunsNodeId, 30);
   });
 
-  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
+  after(() => {
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.request({
+      headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+      method: 'POST',
+      url: 'api/v0/ingest/events/chef/node-multiple-deletes',
+      body: {
+        node_ids: [
+          clientRunsNodeId,
+          complianceNodeId
+        ]
+      },
+      failOnStatusCode: false
+    });
+  });
 
   describe('Node Manager', () => {
 

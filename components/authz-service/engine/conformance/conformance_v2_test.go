@@ -10,6 +10,7 @@ import (
 
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
+	v2 "github.com/chef/automate/components/authz-service/server/v2"
 )
 
 /************ ************ ************ ************ ************ ************
@@ -40,6 +41,68 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 				require.NoError(t, err)
 				assert.Equal(t, []string{}, actual)
 			})
+			t.Run("test system policies", func(t *testing.T) {
+				actual, err := e.V2ProjectsAuthorized(args([]string{proj1, proj2}))
+				require.NoError(t, err)
+				assert.Equal(t, []string{}, actual)
+
+				isAuthorized := func(subject, action, resource string) func(*testing.T) {
+					return func(t *testing.T) {
+						resp, err := e.V2ProjectsAuthorized(ctx, engine.Subject(subject), engine.Action(action), engine.Resource(resource), engine.Projects(allProjects))
+						require.NoError(t, err)
+						assert.ElementsMatch(t, allProjects, resp)
+					}
+				}
+
+				// put system policies in engine
+				genericSysPols := make([]interface{}, len(v2.SystemPolicies()))
+				for i, sysPol := range v2.SystemPolicies() {
+					genericSysMembers := make([]string, len(sysPol.Members))
+					for _, member := range sysPol.Members {
+						genericSysMembers = append(genericSysMembers, member.Name)
+					}
+					genericSysStatements := make(map[string]interface{})
+					for j, statement := range sysPol.Statements {
+						genericSysStatements[strconv.Itoa(i+j)] = map[string]interface{}{
+							"actions":   statement.Actions,
+							"resources": statement.Resources,
+							"effect":    statement.Effect.String(),
+							"projects":  statement.Projects,
+						}
+					}
+
+					genericSysPols[i] = map[string]interface{}{
+						"type":       "system",
+						"members":    engine.Subject(genericSysMembers...),
+						"statements": genericSysStatements,
+					}
+				}
+
+				setPoliciesV2p1(t, e, genericSysPols...)
+
+				cases := map[string]func(t *testing.T){
+					"service version":                       isAuthorized("user:ldap:alice", "system:serviceVersion:get", "system:service:version"),
+					"introspect all":                        isAuthorized("user:ldap:alice", "iam:introspect:getAll", "iam:introspect"),
+					"introspect some":                       isAuthorized("user:ldap:alice", "iam:introspect:getSome", "iam:introspect"),
+					"introspect get":                        isAuthorized("user:ldap:alice", "iam:introspect:get", "iam:introspect"),
+					"get user record":                       isAuthorized("user:local:alice", "iam:users:get", "iam:users:alice"),
+					"list user record":                      isAuthorized("user:local:alice", "iam:users:list", "iam:users:alice"),
+					"d-s can do allthethings":               isAuthorized("tls:service:deployment-service:cert-id", "iam:users:delete", "iam:users:alice"),
+					"ingest run as provider oc-erchef":      isAuthorized("tls:service:automate-cs-oc-erchef:cert", "infra:ingest:create", "infra:nodes:nodeUUID:runs"),
+					"ingest action as provider oc-erchef":   isAuthorized("tls:service:automate-cs-oc-erchef:cert", "infra:ingest:create", "infra:actions"),
+					"ingest delete as provider oc-erchef":   isAuthorized("tls:service:automate-cs-oc-erchef:cert", "infra:ingest:delete", "infra:nodes"),
+					"ingest liveness as provider oc-erchef": isAuthorized("tls:service:automate-cs-oc-erchef:cert", "infra:ingest:create", "infra:nodes:nodeUUID:liveness"),
+					"ingest run as provider cs-nginx":       isAuthorized("tls:service:automate-cs-nginx:cert", "infra:ingest:create", "infra:nodes:nodeUUID:runs"),
+					"ingest action as provider nginx":       isAuthorized("tls:service:automate-cs-nginx:cert", "infra:ingest:create", "infra:actions"),
+					"ingest delete as provider nginx":       isAuthorized("tls:service:automate-cs-nginx:cert", "infra:ingest:delete", "infra:nodes"),
+					"ingest liveness as provider nginx":     isAuthorized("tls:service:automate-cs-nginx:cert", "infra:ingest:create", "infra:nodes:nodeUUID:liveness"),
+				}
+
+				for desc, test := range cases {
+					t.Run(desc, test)
+				}
+			})
+
 			t.Run("policy with one of the requested projects returns matched project", func(t *testing.T) {
 				pol := map[string]interface{}{
 					"members": engine.Subject(sub),
