@@ -68,7 +68,7 @@ chef-dropdown {
   border-top: none;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
-  overflow-y: auto;
+  overflow-y: scroll;
   max-height: 325px;
 
   #filter-container {
