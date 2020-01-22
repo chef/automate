@@ -86,7 +86,7 @@ func TestUsersGRPC(t *testing.T) {
 		},
 	},
 		Validate: func(email string) bool {
-			return email == "alice@email.com" // only alice's previous password will be valid
+			return email == "alice@email.com" // only alice's old password will be valid
 		},
 	}
 
@@ -311,7 +311,7 @@ func TestUsersGRPC(t *testing.T) {
 			assert.Equal(t, us.Name, req.Name)
 		})
 
-		t.Run("when user wants to update their password but do not pass the correct previous password", func(t *testing.T) {
+		t.Run("when user wants to update their password but do not pass the correct old password", func(t *testing.T) {
 			req := api.UpdateSelfReq{
 				Id:               "bob",
 				Name:             "ChangeAgain",
@@ -325,7 +325,7 @@ func TestUsersGRPC(t *testing.T) {
 			assert.Nil(t, resp)
 		})
 
-		t.Run("when user wants to update their password but does not pass a previous password", func(t *testing.T) {
+		t.Run("when user wants to update their password but does not pass a old password", func(t *testing.T) {
 			req := api.UpdateSelfReq{
 				Id:       "alice",
 				Name:     "ChangeAgain",
