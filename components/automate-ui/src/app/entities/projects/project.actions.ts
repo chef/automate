@@ -27,7 +27,8 @@ export enum ProjectActionTypes {
   APPLY_RULES_STOP_FAILURE       = 'PROJECT::APPLY_RULES_STOP::FAILURE',
   GET_APPLY_RULES_STATUS         = 'PROJECT::GET_APPLY_RULES_STATUS',
   GET_APPLY_RULES_STATUS_SUCCESS = 'PROJECT::GET_APPLY_RULES_STATUS::SUCCESS',
-  GET_APPLY_RULES_STATUS_FAILURE = 'PROJECT::GET_APPLY_RULES_STATUS::FAILURE'
+  GET_APPLY_RULES_STATUS_FAILURE = 'PROJECT::GET_APPLY_RULES_STATUS::FAILURE',
+  UPDATE_REALTIME_FILTER         = 'PROJECT::UPDATE_REALTIME_FILTER'
 }
 
 export interface ProjectSuccessPayload {
@@ -41,6 +42,10 @@ export interface GetApplyRulesStatusSuccessPayload {
   failed: boolean;
   cancelled: boolean;
   failure_message: string;
+}
+
+export interface UpdateRealtimeFilterPayload {
+  filter: string;
 }
 
 export class GetProjects implements Action {
@@ -174,6 +179,11 @@ export class GetApplyRulesStatusFailure implements Action {
   constructor(public payload: HttpErrorResponse) { }
 }
 
+export class UpdateRealtimeFilter implements Action {
+  readonly type = ProjectActionTypes.UPDATE_REALTIME_FILTER;
+  constructor(public payload: UpdateRealtimeFilterPayload) { }
+}
+
 export type ProjectActions =
   | GetProjects
   | GetProjectsSuccess
@@ -198,4 +208,5 @@ export type ProjectActions =
   | ApplyRulesStopFailure
   | GetApplyRulesStatus
   | GetApplyRulesStatusSuccess
-  | GetApplyRulesStatusFailure;
+  | GetApplyRulesStatusFailure
+  | UpdateRealtimeFilter;
