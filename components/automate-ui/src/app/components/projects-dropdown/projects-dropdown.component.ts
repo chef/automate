@@ -38,6 +38,9 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   // Emits a project that changed as a result of a check or uncheck.
   @Output() onProjectChecked = new EventEmitter<ProjectChecked>();
 
+  // filteredProjects is merely a container to hold the projectsArray
+  // that can be altered
+  public filteredProjects: ProjectChecked[];
   public active = false;
   public label = UNASSIGNED_PROJECT_ID;
 
@@ -77,6 +80,13 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
       this.active = false;
     }
   }
+
+  // handleFilterKeyUp() {
+  //   this.filteredProjects = this.projectsArray.filter(project => {
+  //     // project.label.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1
+  //     console.log(project);
+  //   });
+  // }
 
   moveFocus(event: KeyboardEvent): void {
     event.preventDefault();
