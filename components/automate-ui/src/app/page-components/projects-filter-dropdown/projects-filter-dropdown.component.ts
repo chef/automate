@@ -10,7 +10,7 @@ const { ALL_PROJECTS_LABEL } = ProjectConstants;
   templateUrl: './projects-filter-dropdown.component.html',
   styleUrls: [ './projects-filter-dropdown.component.scss' ]
 })
-export class ProjectsFilterDropdownComponent implements OnChanges {
+export class ProjectsFilterDropdownComponent {
   @Input() options: ProjectsFilterOption[] = [];
 
   @Input() selectionLabel = ALL_PROJECTS_LABEL;
@@ -38,12 +38,6 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   optionsEdited = false;
 
   dropdownActive = false;
-
-  ngOnChanges(changes) {
-    if (changes.options && !this.optionsEdited) {
-      this.resetOptions();
-    }
-  }
 
   resetOptions() {
     if (!this.optionsEdited) {
