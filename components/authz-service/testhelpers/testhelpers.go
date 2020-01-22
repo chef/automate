@@ -122,7 +122,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 }
 
 func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng, *migration.Config) {
-	return SetupTestDBWithLimit(t, constants_v2.MaxProjects)
+	return SetupTestDBWithLimit(t, constants_v2.DefaultProjectLimit)
 }
 
 func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *TestDB, *opa.State, *prng.Prng, *migration.Config) {

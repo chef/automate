@@ -33,7 +33,7 @@ func New() *State {
 		rules:          cache.New(cache.NoExpiration, -1),
 		policyChangeID: 0,
 		changeManager:  newPolicyChangeNotifierManager(),
-		projectLimit:   constants_v2.MaxProjects,
+		projectLimit:   constants_v2.DefaultProjectLimit,
 	}
 	return s
 }

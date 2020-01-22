@@ -29,7 +29,7 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Service.Host = w.String("0.0.0.0")
 	c.V1.Sys.Service.Port = w.Int32(10130)
-	c.V1.Sys.Service.ProjectLimit = w.Int32(constants_v2.MaxProjects)
+	c.V1.Sys.Service.ProjectLimit = w.Int32(constants_v2.DefaultProjectLimit)
 	c.V1.Sys.Logger.Level = w.String("info")
 	c.V1.Sys.Logger.Format = w.String("text")
 	c.V1.Sys.Storage.Database = w.String("chef_authz_service")

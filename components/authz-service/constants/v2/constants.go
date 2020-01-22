@@ -49,5 +49,5 @@ const (
 
 // Business logic constants
 const (
-	MaxProjects = 300
+	DefaultProjectLimit = 300
 )
