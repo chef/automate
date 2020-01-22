@@ -33,7 +33,7 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
-const projectLimitForTesting = 10 // DefaultProjectLimit is 300
+const projectLimitForTesting = 10 // DefaultProjectLimit is higher
 
 func TestUpdateProject(t *testing.T) {
 	ctx := context.Background()

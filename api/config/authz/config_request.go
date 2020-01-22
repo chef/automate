@@ -1,10 +1,11 @@
 package authz
 
 import (
+	fmt "fmt"
+
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
-	"github.com/pkg/errors"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -52,9 +53,9 @@ func (c *ConfigRequest) Validate() error {
 			// default.
 			// MinConfigurableProjects supports customers who previously
 			// increased their limit to a number that is lower than the new default.
-			// Can be removed when we no longer limit projects.
-			e := errors.Errorf("project limit must be at least %v", constants_v2.MinConfigurableProjects)
-			cfgErr.AddInvalidValue("auth_z.v1.sys.service.project_limit", e.Error())
+			// It should be removed when we no longer limit projects.
+			failureStr := fmt.Sprintf("project limit must be at least %d", constants_v2.MinConfigurableProjects)
+			cfgErr.AddInvalidValue("auth_z.v1.sys.service.project_limit", failureStr)
 		}
 	}
 

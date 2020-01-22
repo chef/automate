@@ -54,6 +54,6 @@ const (
 	// default.
 	// MinConfigurableProjects supports customers who previously
 	// increased their limit to a number that is lower than the new default.
-	// It should removed when we no longer limit projects.
+	// It should be removed when we no longer limit projects.
 	MinConfigurableProjects = 6
 )
