@@ -18,7 +18,7 @@ This guide details how to install Chef Automate and deploy Chef Habitat Builder 
 Automate-deployed Chef Habitat Builder is a new feature that is in active development. Please contact your Chef representative before using this implementation in production.
 {{< /warning >}}
 
-This guide covers setting up Chef Automate and Chef Habitat Builder on-prem and bootstrapping Chef Habitat Builder on-prem with curated core seed lists from the Chef Habitat public Builder.
+This guide covers setting up Chef Automate and Chef Habitat Builder on-prem, and bootstrapping Chef Habitat Builder on-prem with curated core seed lists from the Chef Habitat public Builder.
 
 The Chef installer includes everything necessary to get started with Chef Automate and Chef Habitat Builder on-prem.
 Bootstrapping Chef Habitat Builder requires:
@@ -59,7 +59,7 @@ Chef Automate and Chef Habitat Builder require:
 * `useradd`
 * `curl` or `wget`
 * The shell that starts Automate should have a max open files setting of at least 65535
-* Run the installation and bootstrapping procedures as the superuser or use `` at the start of each command.
+* Run the installation and bootstrapping procedures as the superuser or use `sudo` at the start of each command.
 
 ### Unsupported Topologies
 
@@ -142,7 +142,7 @@ Use [seed lists](https://github.com/habitat-sh/on-prem-builder/blob/master/packa
 [Sample seed lists](https://github.com/habitat-sh/on-prem-builder/tree/master/package_seed_lists) exist for the following scenarios:
 
 * Full `core`: the full contents of the upstream `core` origin. The x86_64 Linux set expands to 12GB, the Linux kernel2 set to 1GB, and the Windows set to 3.5GB.
-* Core deps: a subset of `core` consisting of commonly-used buildtime dependencies.
+* Core dependencies: a subset of `core` consisting of commonly-used buildtime dependencies.
 * Effortless: packages used to start with the [Effortless pattern](https://github.com/chef/effortless). A complete Effortless implementation requires the contents of both the `stable` and the `unstable` channel.
 
 ### Clone the Chef Habitat Builder On-prem Repository
@@ -168,7 +168,7 @@ cp /hab/svc/automate-load-balancer/data/chef-automate.test.cert /hab/cache/ssl/s
 ### Download Seed List from the Public Chef Habitat Builder
 
 Your host must have access to the internet to download the curated seed list packages from the **public** [Chef Habitat Builder](https://bldr.habitat.sh).
-If you have not already done so, create a user account and personal access token on the **public** [Chef Habitat Builder](https://bldr.habitat.sh/)
+If you have not already done so, create a user account and personal access token on the **public** [Chef Habitat Builder](https://bldr.habitat.sh/).
 
 Use the `hab pkg download` command with a seed list `</path/to/seed_list>` to download packages for
 your desired architecture `<arch>` from a channel `<channel>` to a directory `<artifact-dir>`:
@@ -228,7 +228,7 @@ To finish up, return to your Chef Habitat Builder on-prem installation and view 
 
 Chef Habitat Builder uses the same mechanisms that Chef Automate does for [backups]({{< relref "backup.md" >}}), [log management]({{< relref "log-management.md" >}}), and [uninstalling]({{< relref "troubleshooting.md#uninstalling-chef-automate" >}}).
 
-To change the log level for Chef Habitat Builder only, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+To change the log level for Chef Habitat Builder only, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
 [builder_api.v1.sys.log]
@@ -239,14 +239,14 @@ scoped_levels = ["tokio_core=error", "tokio_reactor=error", "zmq=error", "hyper=
 ## Setting up Automate as an OAuth Provider for Habitat Builder (Deprecated)
 
 {{< warning >}}
-These instructions have been deprecated in favor of using the Chef Automate installer to deploy Chef Habitat on-prem
+These instructions have been deprecated in favor of using the Chef Automate installer to deploy Chef Habitat on-prem.
 {{< /warning >}}
 
 To configure Chef Automate as an OAuth Provider for Habitat Builder, create a TOML file with the partial configuration below.
 Run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 `bldr_client_id` and `bldr_client_secret` simply need to match what you configured for the corresponding
-values in Habitat Builder (see below). However, we strongly recommend those values follow
+values in Chef Habitat Builder (see below). However, we strongly recommend those values follow
 [best practices](https://www.oauth.com/oauth2-servers/client-registration/client-id-secret/)
 for `client_id` and `client_secret` in the Oauth2 standard.
 
@@ -261,10 +261,8 @@ bldr_client_id = "<your Habitat Builder Oauth2 Client ID>"
 bldr_client_secret = "<your Habitat Builder Oauth2 Client Secret>"
 ```
 
-You'll need to add Automate's TLS certificate to Builder's list of accepted certificates
-in addition to these configuration changes.
-Locate Automate's default self-signed certificate by running `cat /hab/svc/automate-load-balancer/data/{{< example_fqdn "automate" >}}.cert`
-You can copy this default certificate, and then add it to your Builder instance's list of accepted certs.
+In addition, add Automate's TLS certificate to Builder's list of accepted certificates.
+Locate Automate's default self-signed certificate by running `cat /hab/svc/automate-load-balancer/data/{{< example_fqdn "automate" >}}.cert`, copy this default certificate, and then add it to your Builder instance's list of accepted certificates.
 
 ```text
 -----BEGIN CERTIFICATE-----
