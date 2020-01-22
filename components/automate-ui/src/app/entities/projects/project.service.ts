@@ -5,7 +5,7 @@ import { Observable } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ApplyRulesStatus } from './project.reducer';
 import * as selectors from './project.selectors';
-import { ApplyRulesStart, ApplyRulesStop, GetApplyRulesStatus, UpdateRealtimeFilter } from './project.actions';
+import { ApplyRulesStart, ApplyRulesStop, GetApplyRulesStatus, GetRealtimeFilter, UpdateRealtimeFilter } from './project.actions';
 
 @Injectable()
 export class ProjectService {
@@ -26,7 +26,12 @@ export class ProjectService {
     this.store.dispatch(new GetApplyRulesStatus());
   }
 
-  updateRealtimeFilter(filterValue) {
-    this.store.dispatch(new UpdateRealtimeFilter(filterValue));
+  updateRealtimeFilter() {
+    // this.store.dispatch(new UpdateRealtimeFilter());
   }
+
+  getFilter(): any {
+    // this.store.dispatch(new GetRealtimeFilter());
+  }
+
 }

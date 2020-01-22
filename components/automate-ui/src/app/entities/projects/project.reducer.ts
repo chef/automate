@@ -59,7 +59,7 @@ export const ProjectEntityInitialState: ProjectEntityState = projectEntityAdapte
   deleteStatus: EntityStatus.notLoaded,
   updateStatus: EntityStatus.notLoaded,
   applyRulesStatus: initialApplyRulesStatus,
-  realtimeFilter: ''
+  realtimeFilter: 'helllo'
 });
 
 export function projectEntityReducer(

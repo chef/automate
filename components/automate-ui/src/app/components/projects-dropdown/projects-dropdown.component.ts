@@ -1,7 +1,10 @@
 import { Component, EventEmitter, Input, Output, OnChanges, OnInit } from '@angular/core';
+import { ProjectService } from 'app/entities/projects/project.service';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
+import { map, takeUntil, filter, take } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 const { UNASSIGNED_PROJECT_ID } = ProjectConstants;
 
@@ -43,7 +46,11 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   public filteredProjects: ProjectChecked[];
   public active = false;
   public label = UNASSIGNED_PROJECT_ID;
-  public filterValue = '';
+  public filterValue;
+
+  private isDestroyed = new Subject<boolean>();
+
+  constructor(private projectService: ProjectService) {}
 
   ngOnInit(): void {
     if (this.projectsUpdated) { // an optional setting
@@ -51,15 +58,25 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
         this.updateLabel();
       });
     }
+    this.getFilterValue();
   }
 
   ngOnChanges(): void {
+    // update to specify
     this.filteredProjects = this.projectsArray;
     this.updateLabel();
   }
 
   get projectsArray(): ProjectChecked[] {
     return ChefSorters.naturalSort(Object.values(this.projects), 'name');
+  }
+
+  getFilterValue() {
+    // this.filterValue = this.projectService.subscribe(
+    //   filter => console.log(filter)
+    // );
+    this.filterValue = this.projectService.getRealtimeFilter$;
+    )
   }
 
   toggleDropdown(event: MouseEvent): void {
@@ -69,7 +86,7 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     }
 
     this.active = !this.active;
-    this.filterValue = '';
+    // this.filterValue = '';
   }
 
   projectChecked(checked: boolean, project: ProjectChecked): void {
@@ -85,7 +102,10 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   }
 
   handleFilterKeyUp(): void {
-    this.filteredProjects = this.filterProjects(this.filterValue);
+    // console.log(this.filterValue);
+    // this.getFilterValue();
+    // this.projectService.updateRealtimeFilter()
+    // this.filteredProjects = this.filterProjects(this.filterValue);
   }
 
   filterProjects(value: string): ProjectChecked[]  {

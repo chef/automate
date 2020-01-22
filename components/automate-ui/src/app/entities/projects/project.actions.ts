@@ -181,7 +181,6 @@ export class GetApplyRulesStatusFailure implements Action {
 
 export class UpdateRealtimeFilter implements Action {
   readonly type = ProjectActionTypes.UPDATE_REALTIME_FILTER;
-  constructor(public payload: UpdateRealtimeFilterPayload) { }
 }
 
 export type ProjectActions =
