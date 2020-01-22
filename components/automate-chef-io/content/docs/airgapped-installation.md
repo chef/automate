@@ -7,7 +7,7 @@ toc = true
 [menu]
   [menu.docs]
     parent = "get_started"
-    weight = 30
+    weight = 40
 +++
 
 ## Overview
