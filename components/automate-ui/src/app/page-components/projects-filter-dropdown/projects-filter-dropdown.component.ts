@@ -52,12 +52,12 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   }
 
   handleFilterKeyUp(): void {
-    this.filteredOptions = this.filterOptions(this.editableOptions);
+    this.filteredOptions = this.filterOptions(this.filterValue);
   }
 
-  filterOptions(options): ProjectsFilterOption[] {
-    return options.filter(option =>
-      option.label.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1);
+  filterOptions(value): ProjectsFilterOption[] {
+    return this.editableOptions.filter(option =>
+      option.label.toLowerCase().indexOf(value.toLowerCase()) > -1);
   }
 
   handleLabelClick() {
