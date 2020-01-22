@@ -68,12 +68,20 @@ chef-dropdown {
   border-top: none;
   border-top-left-radius: 0;
   border-top-right-radius: 0;
-  overflow-y: scroll;
-  max-height: 325px;
-
+  
   #filter-container {
-    padding: 14px;
+    padding: 14px 18px;
     border-bottom: 1px solid $chef-grey;
+  }
+  
+  #project-container {
+    max-height: 210px;
+    overflow-y: scroll;
+  }
+
+  .no-projects {
+    padding: 14px 18px 0px;
+    font-style: italic;
   }
 }
 
