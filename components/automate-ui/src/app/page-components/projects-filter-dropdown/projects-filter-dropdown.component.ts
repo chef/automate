@@ -46,8 +46,9 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   }
 
   resetOptions() {
-    this.filteredOptions = this.editableOptions = cloneDeep(this.options);
-    this.optionsEdited = false;
+    if (!this.optionsEdited) {
+      this.filteredOptions = this.editableOptions = cloneDeep(this.options);
+    }
   }
 
   handleFilterKeyUp(): void {
@@ -60,13 +61,14 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   }
 
   handleLabelClick() {
+    this.resetOptions();
     if (this.editableOptions.length > 1) {
       this.dropdownActive = !this.dropdownActive;
-      this.resetOptions();
     }
   }
 
   handleEscape(): void {
+    this.optionsEdited = false;
     this.resetOptions();
     this.filterValue = '';
     this.dropdownActive = false;
