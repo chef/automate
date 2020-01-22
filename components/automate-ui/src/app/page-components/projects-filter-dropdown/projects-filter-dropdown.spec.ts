@@ -212,6 +212,9 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
 
     it('resets any previous selection changes by copying the provided options', () => {
+      component.optionsEdited = false;
+      component.resetOptions();
+
       expect(component.editableOptions).not.toEqual([]);
       expect(component.editableOptions).not.toBe(component.options);
       expect(component.editableOptions).toEqual(component.options);
