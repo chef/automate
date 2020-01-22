@@ -53,7 +53,7 @@
             (keydown.arrowup)="handleArrowUp($event)"
             (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}
           </chef-checkbox>
-          <div class="no-projects" *ngIf="filteredOptions.length === 1">
+          <div class="no-projects" *ngIf="filteredOptions.length === 0">
             <p>No projects found.</p>
             <p>You don't have access to any projects that match your search.</p>
           </div>

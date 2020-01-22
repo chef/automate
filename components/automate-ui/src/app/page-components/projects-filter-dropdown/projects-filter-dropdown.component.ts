@@ -39,12 +39,6 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
 
   dropdownActive = false;
 
-  handleFilterKeyUp(): void {
-    this.filteredOptions = this.editableOptions.filter(option =>
-      option.label.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1
-    );
-  }
-
   ngOnChanges(changes) {
     if (changes.options && !this.optionsEdited) {
       this.resetOptions();
@@ -54,6 +48,15 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   resetOptions() {
     this.filteredOptions = this.editableOptions = cloneDeep(this.options);
     this.optionsEdited = false;
+  }
+
+  handleFilterKeyUp(): void {
+    this.filteredOptions = this.filterOptions(this.editableOptions);
+  }
+
+  filterOptions(options): ProjectsFilterOption[] {
+    return options.filter(option =>
+      option.label.toLowerCase().indexOf(this.filterValue.toLowerCase()) > -1);
   }
 
   handleLabelClick() {
