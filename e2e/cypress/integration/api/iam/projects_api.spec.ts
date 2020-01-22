@@ -415,6 +415,18 @@ describeIfIAMV2p1('projects API', () => {
 
     it('deleted rules get applied to nodes', () => {
 
+      // TODO debugging
+      cy.request({
+        headers: {
+          'api-token': Cypress.env('ADMIN_TOKEN'),
+          projects: '(unassigned)'
+        },
+        method: 'GET',
+        url: '/api/v0/cfgmgmt/nodes?pagination.size=10'
+      }).then((response) => {
+        expect(response.body).to.equal([]);
+      });
+
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
