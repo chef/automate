@@ -148,7 +148,8 @@ describeIfIAMV2p1('assigning projects', () => {
       });
     });
 
-    it(`when creating ${iamResources} without projects is allowed`,  () => {
+    it(`when creating ${iamResources} without projects is allowed, ` +
+    `successfully creates unassigned ${iamResource}`,  () => {
       cy.request({
         headers: { 'api-token': unassignedAndProjectAllowedTok },
         method: 'POST',
@@ -231,8 +232,9 @@ describeIfIAMV2p1('assigning projects', () => {
       });
     });
 
-    it(`when creating ${iamResources} without any projects ` +
-      'and project assignment permission is missing for (unassigned)',  () => {
+    it(`when creating ${iamResources} without any projects and ` +
+    'project assignment permission is missing for (unassigned), ' +
+    `fails to create unassigned ${iamResource}`,  () => {
       cy.request({
         headers: { 'api-token': twoAllowedProjectsTok },
         method: 'POST',
@@ -374,42 +376,6 @@ describeIfIAMV2p1('assigning projects', () => {
         // there is no intersection between twoAllowedProjectsTok's allowed projects
         // and the resource's current projects
         assert.equal(resp.status, 404);
-      });
-    });
-
-    // (TC) We do allow users to remove their project, even if results in unassigned and
-    // they don't have iam:project:assign perms on unassigned (special case).
-    it('assigning authorized to (unassigned) is allowed ' +
-    'even if missing iam:project:assign on (unassigned) (special case)',  () => {
-      // precondition
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'PUT',
-        url: `/apis/iam/v2/${iamResources}/${resource.id}-2`,
-        failOnStatusCode: false,
-        body: {
-          ...resource,
-          id: `${resource.id}-2`,
-          projects: [authorizedProject1]
-        }
-      }).then((resp) => {
-        expect(resp.status).to.equal(200);
-        assert.deepEqual(resp.body[`${iamResource}`]['projects'], [authorizedProject1]);
-      });
-
-      cy.request({
-        headers: { 'api-token': twoAllowedProjectsTok },
-        method: 'PUT',
-        url: `/apis/iam/v2/${iamResources}/${resource.id}-2`,
-        failOnStatusCode: false,
-        body: {
-          ...resource,
-          id: `${resource.id}-2`,
-          projects: []
-        }
-      }).then((resp) => {
-        expect(resp.status).to.equal(200);
-        assert.deepEqual(resp.body[`${iamResource}`]['projects'], []);
       });
     });
 
