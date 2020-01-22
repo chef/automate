@@ -193,21 +193,21 @@ func (s *Server) UpdateSelf(ctx context.Context, req *local_user.UpdateSelfReq) 
 	if req.Password != "" {
 		if req.PreviousPassword == "" {
 			return nil, status.Error(codes.InvalidArgument,
-				"to update existing password, provide old password")
+				"to update existing password, provide previous password")
 		}
 
-		// check if old password is OK
+		// check if previous password is OK
 		s.logger.Info(fmt.Sprintf("attempting to validate user %s by logging in so we can update their password", req.Email))
 		ok, err := s.users.ValidatePassword(ctx, req.Email, req.PreviousPassword)
 		if err != nil {
-			return nil, status.Error(codes.Internal, "could not validate old password")
+			return nil, status.Error(codes.Internal, "could not validate previous password")
 		}
 		if !ok {
 			// Note: this could be used for guessing passwords; however, to guess a
 			// password using this API, the sender needs some kind of authentication
 			// already. You can also guess passwords completely unauthenticated by
 			// just querying dex.
-			return nil, status.Error(codes.InvalidArgument, "old password does not match")
+			return nil, status.Error(codes.InvalidArgument, "previous password does not match")
 		}
 
 		// If successful, we are set to update using the new hashed password.
