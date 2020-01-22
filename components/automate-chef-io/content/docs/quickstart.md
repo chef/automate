@@ -56,6 +56,27 @@ cat /home/vagrant/automate-credentials.toml
 SCRIPT
 
 Vagrant.configure(2) do |config|
+  class AcceptLicense
+    def to_s
+      return 'true' if ENV['ACCEPT_CHEF_TERMS_AND_MLSA'] == 'true'
+      puts <<TERMS
+To continue, you'll need to accept our terms of service:
+Terms of Service
+https://www.chef.io/terms-of-service
+
+Master License and Services Agreement
+https://www.chef.io/online-master-agreement
+
+I agree to the Terms of Service and the Master License and Services Agreement (y/n)
+TERMS
+      if STDIN.gets.chomp == 'y'
+        'true'
+      else
+        puts 'Chef Software Terms of Service and Master License and Services Agreement were not accepted'
+        exit 1
+      end
+    end
+  end
   config.vm.box      = CFG_BOX
   config.vm.hostname = CFG_HOSTNAME
 
@@ -68,7 +89,9 @@ Vagrant.configure(2) do |config|
 
   config.vm.synced_folder '.', '/opt/a2-testing', create: true
   config.vm.network       'private_network', ip: CFG_IP
-  config.vm.provision     'shell', env: {'CFG_IP' => CFG_IP, 'CFG_HOSTNAME' => CFG_HOSTNAME}, inline: $deployscript
+  config.vm.provision     'shell', env: {'CFG_IP' => CFG_IP,
+                                         'CFG_HOSTNAME' => CFG_HOSTNAME,
+                                         'ACCEPT_CHEF_TERMS_AND_MLSA' => AcceptLicense.new}, inline: $deployscript
 end
 EOH
 ```
