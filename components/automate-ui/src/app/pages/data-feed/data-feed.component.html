@@ -41,7 +41,7 @@
               <chef-td>
                   <a [routerLink]="['/settings/data-feed/form', destination.id]">{{ destination.name }}</a>
                 </chef-td>
-              <chef-td class="actions">
+              <chef-td class="actions three-dot-column">
                 <mat-select panelClass="chef-control-menu">
                   <mat-option (onSelectionChange)="deleteDestination(destination)">Delete Destination</mat-option>
                 </mat-select>

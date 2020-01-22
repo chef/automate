@@ -29,7 +29,7 @@
         </chef-td>
         <chef-td class="version-cell">{{ profile.version }}</chef-td>
         <chef-td class="identifier-cell">{{ user }}/{{ profile.name }}</chef-td>
-        <chef-td class="actions-cell">
+        <chef-td class="actions-cell three-dot-column">
           <mat-select panelClass="chef-control-menu">
             <mat-option *ngIf="!hasFilter(profile)" (onSelectionChange)="addFilter(profile)">Add Filter</mat-option>
             <mat-option *ngIf="hasFilter(profile)" (onSelectionChange)="removeFilter(profile)">Remove Filter</mat-option>
