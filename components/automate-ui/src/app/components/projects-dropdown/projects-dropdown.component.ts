@@ -70,6 +70,7 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
 
     this.active = !this.active;
     this.filterValue = '';
+    this.filteredProjects = this.projectsArray;
   }
 
   projectChecked(checked: boolean, project: ProjectChecked): void {
