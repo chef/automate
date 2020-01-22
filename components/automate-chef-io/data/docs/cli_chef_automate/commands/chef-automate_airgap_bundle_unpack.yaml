@@ -1,10 +1,14 @@
-name: chef-automate airgap bundle
-usage: chef-automate airgap bundle COMMAND [flags]
+name: chef-automate airgap bundle unpack
+usage: |
+  chef-automate airgap bundle unpack /path/to/bundle.aib [flags]
 options:
+- name: harts-only
+  default_value: "false"
+  usage: Only unpack hartifacts and their keys
 - name: help
   shorthand: h
   default_value: "false"
-  usage: help for bundle
+  usage: help for unpack
 inherited_options:
 - name: debug
   shorthand: d
@@ -16,7 +20,4 @@ inherited_options:
 - name: result-json
   usage: Write command result as JSON to PATH
 see_also:
-- 'chef-automate airgap - '
-- 'create - '
-- 'info - '
-- 'unpack - '
+- 'chef-automate airgap bundle - '

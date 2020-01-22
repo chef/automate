@@ -22,7 +22,9 @@ see_also:
 - applications - Manage applications visibility features
 - backup - Chef Automate backup
 - config - Chef Automate configuration
+- debug - Enable profiling, tracing, and other debugging functionality for services
 - deploy - Deploy Chef Automate
+- diagnostics - diagnostics runs integration tests
 - external-cert - Manage Chef Automate's external certificate
 - gather-logs - Gather system diagnostics and logs
 - iam - Chef Automate iam commands

@@ -1,10 +1,11 @@
-name: chef-automate airgap bundle
-usage: chef-automate airgap bundle COMMAND [flags]
+name: chef-automate diagnostics
+synopsis: diagnostics runs integration tests
+usage: chef-automate diagnostics COMMAND [flags]
 options:
 - name: help
   shorthand: h
   default_value: "false"
-  usage: help for bundle
+  usage: help for diagnostics
 inherited_options:
 - name: debug
   shorthand: d
@@ -16,7 +17,5 @@ inherited_options:
 - name: result-json
   usage: Write command result as JSON to PATH
 see_also:
-- 'chef-automate airgap - '
-- 'create - '
-- 'info - '
-- 'unpack - '
+- chef-automate - Chef Automate CLI
+- run - Runs diagnostic tests against Chef Automate
