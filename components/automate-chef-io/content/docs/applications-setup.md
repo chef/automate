@@ -103,8 +103,8 @@ Chef Automate's TLS certificate file is located at `/hab/svc/automate-load-balan
 
 From Chef Automate:
 
-1. On the command line, run `chef-automate config show`
-1. Copy the `[[global.1.frontend_tls]]` certificate contents from the certificate list
+1. On the command line, run `chef-automate external-cert show`
+1. Copy the certificate contents from the output
 1. Make sure to copy it entirely, including `-----BEGIN CERTIFICATE...END CERTIFICATE-----`
 1. Save the file as `automate.cert` somewhere safe and accessible to you
 
@@ -132,7 +132,7 @@ Pass the certificate file as a parameter by adding it to your event stream comma
 For example:
 
 ```shell
-HAB_FEAT_EVENT_STREAM=1 hab sup run \
+hab sup run \
 --event-stream-application=MY_APP \
 --event-stream-environment=MY_ENV \
 --event-stream-site=MY_SITE \
