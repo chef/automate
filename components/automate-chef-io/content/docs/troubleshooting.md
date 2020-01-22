@@ -68,11 +68,10 @@ The following procedure will remove Chef Automate from your system,
 including all data. If you wish to preserve the data, make a backup
 before uninstalling.
 
+With the `chef-automate` CLI:
+
 ```bash
-systemctl stop chef-automate
-pkill chef-automate
-rm -rf /hab
-userdel hab
+chef-automate uninstall
 ```
 
 ## Resetting the Admin Password
