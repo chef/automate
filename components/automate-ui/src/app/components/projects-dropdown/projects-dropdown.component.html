@@ -25,15 +25,17 @@
           />
       </div>
 
-      <chef-checkbox
-        *ngFor="let project of filteredProjects"
-        [checked]="project.checked"
-        [attr.title]="project.name"
-        (change)="projectChecked($event.detail, project)"
-        (keydown.enter)="closeDropdown()"
-        (keydown.esc)="closeDropdown()"
-        (keydown.arrowup)="moveFocus($event)"
-        (keydown.arrowdown)="moveFocus($event)">{{ project['name'] }}</chef-checkbox>
+      <div id="project-container">
+        <chef-checkbox
+          *ngFor="let project of filteredProjects"
+          [checked]="project.checked"
+          [attr.title]="project.name"
+          (change)="projectChecked($event.detail, project)"
+          (keydown.enter)="closeDropdown()"
+          (keydown.esc)="closeDropdown()"
+          (keydown.arrowup)="moveFocus($event)"
+          (keydown.arrowdown)="moveFocus($event)">{{ project['name'] }}</chef-checkbox>
+      </div>
 
       <div class="no-projects" *ngIf="filteredProjects.length === 0">
         <p>No projects found.</p>
