@@ -126,7 +126,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
       displayName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     this.passwordForm = fb.group({
-      oldPassword: ['', [ChefValidators.nonAdminLengthValidator(this.isAdminView, 8)]],
+      previousPassword: ['', [ChefValidators.nonAdminLengthValidator(this.isAdminView, 8)]],
       newPassword: ['',
         [Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
@@ -161,7 +161,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
 
   private savePasswordForSelf(): void {
     const password = this.passwordForm.get('newPassword').value;
-    const previous_password = this.passwordForm.get('oldPassword').value;
+    const previous_password = this.passwordForm.get('previousPassword').value;
     this.store.dispatch(new UpdatePasswordSelf({
       id: this.user.id,
       name: this.user.name,

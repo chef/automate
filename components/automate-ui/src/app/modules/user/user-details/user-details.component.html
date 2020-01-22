@@ -43,16 +43,16 @@
         <form [formGroup]="passwordForm">
           <chef-form-field *ngIf="!isAdminView" class="password">
             <label>
-              <span class="label">Old Password <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="oldPassword" type="password"/>
+              <span class="label">Previous Password <span aria-hidden="true">*</span></span>
+              <input chefInput formControlName="previousPassword" type="password"/>
             </label>
             <chef-error
-              *ngIf="passwordForm.get('oldPassword').hasError('required') && passwordForm.get('oldPassword').dirty">
-              Old Password is required.
+              *ngIf="passwordForm.get('previousPassword').hasError('required') && passwordForm.get('previousPassword').dirty">
+              Previous Password is required.
             </chef-error>
             <chef-error
-              *ngIf="passwordForm.get('oldPassword').hasError('minlength') && passwordForm.get('oldPassword').dirty">
-              Old Password must be at least 8 characters.
+              *ngIf="passwordForm.get('previousPassword').hasError('minlength') && passwordForm.get('previousPassword').dirty">
+              Previous Password must be at least 8 characters.
             </chef-error>
           </chef-form-field>
           <chef-form-field class="password">

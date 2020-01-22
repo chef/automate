@@ -61,7 +61,7 @@ func (a *UsersServer) UpdateUser(ctx context.Context, r *localUserReq.UpdateUser
 }
 
 // UpdateSelf allows a user to update their own info,
-// requiring the old password if they want to change password.
+// requiring the previous password if they want to change password.
 func (a *UsersServer) UpdateSelf(ctx context.Context, r *localUserReq.UpdateSelf) (*localUserRes.User, error) {
 	req := &local_user.UpdateSelfReq{
 		Id:               r.Id,
