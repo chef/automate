@@ -43,7 +43,7 @@ If the data is a relatively small size payload, you can include it in a `curl` c
 curl -sH "api-token: $TOKEN" -d '<your JSON here>' ...
 ```
 
-If the payload is larger, it is often convenient to store the data in a file, then pass that file. For example: 
+If the payload is larger, it is often convenient to store the data in a file, then pass that file. For example:
 
 ```bash
 curl -sH "api-token: $TOKEN" -d @policy.json ...
@@ -164,10 +164,10 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2/policies/{policy-id}?pretty
 
 Chef Automate supports two methods for updating policy membership:
 
-1. Using `PUT` lets you set membership for the entire policy. For more information, see [Updating All Members On a Policy]({{< relref "iam-v2-api-reference/#updating-all-members-on-a-policy" >}}).
+1. Using `PUT` lets you set membership for the entire policy. For more information, see [Updating All Members On a Policy]({{< relref "iam-v2-api-reference#updating-all-members-on-a-policy" >}}).
 
 2. Using `POST` lets you add members to, or remove members from, an existing membership list.
-For more information, see [Adding Members to a Policy]({{< relref "iam-v2-api-reference/#adding-members-to-a-policy" >}}) and [Removing Members from a Policy]({{< relref "iam-v2-api-reference/#removing-members-from-a-policy" >}}).
+For more information, see [Adding Members to a Policy]({{< relref "iam-v2-api-reference#adding-members-to-a-policy" >}}) and [Removing Members from a Policy]({{< relref "iam-v2-api-reference#removing-members-from-a-policy" >}}).
 
 HTTP request                           | Description
 ---------------------------------------|------------
@@ -563,7 +563,7 @@ https://{{< example_fqdn "automate" >}}/apis/iam/v2/users?pretty
 
 ### Updating a User
 
-When updating a user, supply all of a user's properties, not just the ones you wish to update. 
+When updating a user, supply all of a user's properties, not just the ones you wish to update.
 Properties that you do not include are reset to empty values.
 The user ID is immutable and it can only be set at creation time.
 

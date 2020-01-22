@@ -7,7 +7,7 @@ toc = true
 [menu]
   [menu.docs]
     parent = "get_started"
-    weight = 40
+    weight = 60
 +++
 
 This guide shows you how to upgrade your existing Chef Automate 1 installation to Chef Automate 2.

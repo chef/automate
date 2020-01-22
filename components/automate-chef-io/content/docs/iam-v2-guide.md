@@ -139,7 +139,7 @@ The statement allows us to specify the `actions` a user is permitted to take upo
 The `projects` field on a statement is an array that may contain more than one existing project, a wildcard `*` to indicate permission to resources in _any project_, or `(unassigned)` to indicate permission to resources that have not been assigned to a project.
 
 Note that the `projects` property in statements designates permission for the resources within the statement (here, that is `iam:users` and `iam:teams`), _not_ for the policy itself, and _cannot_ be left empty.
-For more about projects, please see [Projects]({{< relref "iam-v2-guide.md#projects" >}}) or [Projects Property]({{< relref "iam-v2-api-reference/#projects-property" >}}) documentation.
+For more about projects, please see [Projects]({{< relref "iam-v2-guide.md#projects" >}}) or [Projects Property]({{< relref "iam-v2-api-reference#projects-property" >}}) documentation.
 
 In this case, we only need a single statement providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_ that have been assigned to the project `project-devops`.
 
@@ -236,7 +236,7 @@ In order to find a token's ID, visit the *API Tokens* page.
 Projects are used to group and permission Chef Automate resources as well as ingested data, specifically Compliance reports, Chef Server events, and Infrastructure nodes.
 
 Projects can be managed via the Projects list under the **Settings** tab and consist of an ID, a name, and a collection of ingest rules. Project ingest rules are lists of conditions used only when
-[assigning ingested resources to projects]({{< relref "iam-v2-guide#assigning-ingested-resources-to-projects" >}}),
+[assigning ingested resources to projects]({{< relref "iam-v2-guide.md#assigning-ingested-resources-to-projects" >}}),
 so they are not relevant when assigning IAM resources such as teams or roles.
 
 #### Configuring Project Limit
@@ -420,7 +420,7 @@ Assume you named your project `Devops`, and have two users: Terry and Kelly. If 
 
 When Terry is a member of the `Devops Project Viewers` policy and not a member of any other policy, they will only be able to see resources assigned to `Devops`. They will not be able to update or delete them. Kelly, however, will be able to update and delete.
 
-See [Policy Membership]({{< relref "iam-v2-guide/#policy-membership" >}}) for more information on policy membership.
+See [Policy Membership]({{< relref "iam-v2-guide.md#policy-membership" >}}) for more information on policy membership.
 
 ## Restoring Admin Access
 

@@ -7,7 +7,7 @@ toc = true
 [menu]
   [menu.docs]
     parent = "get_started"
-    weight = 20
+    weight = 30
 +++
 
 Before beginning your installation, check the [System Requirements]({{< relref "system-requirements.md" >}}) for Automate.
@@ -16,7 +16,9 @@ See [Airgapped Installation]({{< relref "airgapped-installation.md" >}}) for
 installing Chef Automate to a host with no inbound or outbound internet
 traffic.
 
-## Obtain Chef Automate Installation and Admin Tool
+## Download the Chef Automate
+
+Download and unzip Chef Automate:
 
 ```shell
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
@@ -24,12 +26,13 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 
 ## Create Default Configuration
 
+Create a `config.toml` file with default values for your Chef Automate installation:
+
 ```shell
 sudo ./chef-automate init-config
 ```
 
-This will create a config.toml file with default values that should allow you to proceed,
-or you can edit it to specify desired FQDN, login name, and so on.
+You can customize your FQDN, login name, and other values, by changing the values in the `config.toml` in your editor.
 
 If you have requirements around data size and/or redundancy, see [Configuring External
 Data Stores]({{< relref "#configuring-external-data-stores" >}}) for information on
@@ -128,6 +131,7 @@ sudo chef-automate config patch config.toml
 and retry opening Chef Automate in your browser.
 
 ### Configuring External Data Stores
+
 You can configure Chef Automate to use PostgreSQL and Elasticsearch clusters that are not
 deployed via Chef Automate itself. The directions provided below are intended for use only
 during initial deployment of Chef Automate. Please reach out to a Customer Support or
@@ -135,6 +139,7 @@ Customer Success representative for assistance with migrating from a standalone
 installation of Chef Automate to one using externally-deployed data stores.
 
 #### Configuring External Elasticsearch
+
 Add the following to your config.toml:
 
 ```toml
@@ -158,6 +163,7 @@ Add the following to your config.toml:
 Because externally-deployed Elasticsearch nodes will not have access to Automate's built-in backup storage services, you must configure Elasticsearch backup settings separately from Automate's primary backup settings. You can configure backups to use either the local filesystem or S3.
 
 ##### Backup to Local Filesystem
+
 To configure backups to use a local filesystem,
 
 1. Ensure that the filesystems you intend to use for backups are mounted to the same path on all Elasticsearch master and data nodes.
@@ -176,6 +182,7 @@ path = "/var/opt/chef-automate/backups"
 ```
 
 ##### Backup to S3
+
 To configure backups to use S3,
 
 1. Install the [`repository-s3` plugin](https://www.elastic.co/guide/en/elasticsearch/plugins/current/repository-s3.html) on all nodes in your Elasticsearch cluster.
@@ -226,6 +233,7 @@ location = "s3"
 ```
 
 #### Configuring An External PostgreSQL Database
+
 Add the following to your config.toml:
 
 ```toml
@@ -251,4 +259,3 @@ password = "<dbuser password>"
 [global.v1.external.postgresql.backup]
 enable = true
 ```
-

@@ -8,7 +8,7 @@ toc = true
 [menu]
   [menu.docs]
     parent = "get_started"
-    weight = 50
+    weight = 70
 +++
 ## Configuring Backups
 

@@ -8,7 +8,7 @@ toc = true
 [menu]
   [menu.docs]
     parent = "get_started"
-    weight = 5
+    weight = 20
 +++
 
 ## Hardware
