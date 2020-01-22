@@ -269,7 +269,7 @@ describe('ProjectsFilterDropdownComponent', () => {
         component.handleLabelClick();
       });
 
-      it('does nothing', () => {
+      it('only resets options', () => {
         expect(component.resetOptions).toHaveBeenCalled();
         expect(component.dropdownActive).toEqual(false);
       });

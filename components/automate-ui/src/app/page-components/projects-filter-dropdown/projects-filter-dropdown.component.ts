@@ -61,7 +61,6 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   }
 
   handleLabelClick() {
-    // note: check on this in tests
     this.resetOptions();
     if (this.editableOptions.length > 1) {
       this.dropdownActive = !this.dropdownActive;
