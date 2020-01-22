@@ -74,15 +74,6 @@ With the `chef-automate` CLI:
 chef-automate uninstall
 ```
 
-or
-
-```bash
-systemctl stop chef-automate
-pkill chef-automate
-rm -rf /hab
-userdel hab
-```
-
 ## Resetting the Admin Password
 
 Use the following command to completely reset a lost, forgotten, or compromised admin password:
