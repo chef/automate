@@ -41,7 +41,7 @@ describe('ProjectsFilterDropdownComponent', () => {
     it('displays label text', () => {
       label = fixture.nativeElement.querySelector('.dropdown-label');
       expect(label).not.toBeNull();
-      expect(label.textContent.trim()).toContain(component.selectionLabel);
+      expect(label.textContent).toContain(component.selectionLabel);
     });
 
     it('has an "aria-label"', () => {
@@ -70,7 +70,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       it('the selection count is visible', () => {
         count = fixture.nativeElement.querySelector('.selection-count');
         expect(count).not.toBeNull();
-        expect(count.textContent.trim()).toEqual(component.selectionCount.toString());
+        expect(count.textContent).toEqual(component.selectionCount.toString());
       });
     });
 
@@ -126,7 +126,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       expect(options.length).toEqual(2);
       options.forEach((option: HTMLInputElement, index: number) => {
         const { label, checked } = component.editableOptions[index];
-        expect(option.textContent.trim()).toEqual(label);
+        expect(option.textContent).toEqual(label);
         expect(option.checked).toEqual(checked);
       });
     });
@@ -134,7 +134,7 @@ describe('ProjectsFilterDropdownComponent', () => {
     it('displays an "Apply Changes" button', () => {
       const button = fixture.nativeElement.querySelector('#projects-filter-apply-changes');
       expect(button).not.toBeNull();
-      expect(button.textContent.trim()).toEqual('Apply Changes');
+      expect(button.textContent).toEqual('Apply Changes');
       expect(button.hasAttribute('disabled')).toEqual(true);
     });
 
@@ -216,10 +216,6 @@ describe('ProjectsFilterDropdownComponent', () => {
       expect(component.editableOptions).not.toBe(component.options);
       expect(component.editableOptions).toEqual(component.options);
     });
-
-    it('marks the list of options as unedited', () => {
-      expect(component.optionsEdited).toEqual(false);
-    });
   });
 
   describe('handleLabelClick()', () => {
@@ -271,8 +267,8 @@ describe('ProjectsFilterDropdownComponent', () => {
       });
 
       it('does nothing', () => {
+        expect(component.resetOptions).toHaveBeenCalled();
         expect(component.dropdownActive).toEqual(false);
-        expect(component.resetOptions).not.toHaveBeenCalled();
       });
     });
   });

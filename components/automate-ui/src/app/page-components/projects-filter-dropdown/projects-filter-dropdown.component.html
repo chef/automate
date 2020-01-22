@@ -8,9 +8,7 @@
   <span class="selection-label">{{ selectionLabel }}</span>
   <span class="selection-count"
     *ngIf="selectionCountVisible"
-    [ngClass]="{'active': selectionCountActive }">
-    {{ selectionCount }}
-  </span>
+    [ngClass]="{'active': selectionCountActive }">{{ selectionCount }}</span>
   <chef-icon *ngIf="dropdownCaretVisible" aria-hidden>keyboard_arrow_down</chef-icon>
 </button>
 <chef-click-outside omit="dropdown-label" (clickOutside)="handleEscape()">
@@ -33,15 +31,12 @@
             primary
             [attr.disabled]="!optionsEdited"
             (click)="handleApplySelection()"
-            id="projects-filter-apply-changes">
-            Apply Changes
-          </chef-button>
+            id="projects-filter-apply-changes">Apply Changes</chef-button>
+
           <chef-button
           tertiary
           id="projects-filter-clear-selection"
-          (click)="handleClearSelection()">
-          Clear Selection
-          </chef-button>
+          (click)="handleClearSelection()">Clear Selection</chef-button>
         </div>
 
         <div id="drop-list" class="dropdown-content">
@@ -51,8 +46,8 @@
             [checked]="option.checked"
             (change)="handleOptionChange($event, option.label)"
             (keydown.arrowup)="handleArrowUp($event)"
-            (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}
-          </chef-checkbox>
+            (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}</chef-checkbox>
+
           <div class="no-projects" *ngIf="filteredOptions.length === 0">
             <p>No projects found.</p>
             <p>You don't have access to any projects that match your search.</p>
