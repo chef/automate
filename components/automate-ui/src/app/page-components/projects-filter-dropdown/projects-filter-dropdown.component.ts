@@ -55,7 +55,7 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
     this.filteredOptions = this.filterOptions(this.filterValue);
   }
 
-  filterOptions(value): ProjectsFilterOption[] {
+  filterOptions(value: string): ProjectsFilterOption[] {
     return this.editableOptions.filter(option =>
       option.label.toLowerCase().indexOf(value.toLowerCase()) > -1);
   }
