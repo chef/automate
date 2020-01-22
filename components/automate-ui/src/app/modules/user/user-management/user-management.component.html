@@ -14,33 +14,33 @@
         <chef-subheading>Chef Automate only displays local users.</chef-subheading>
       </chef-page-header>
   
-      <chef-modal label="create-user-label" class="user-modal" [visible]="createModalVisible"
+      <chef-modal [visible]="createModalVisible"
         (closeModal)="closeCreateModal()">
-        <h2 id="create-user-label" class="title" slot="title">
-          Create User
-        </h2>
-        <div>
-          <app-user-form [createUserForm]="createUserForm"></app-user-form>
-          <div class="line"></div>
-          <div class="options">
-            <chef-button primary class="create" (click)="handleCreateUser()" [disabled]="!createUserForm.valid"
+        <h2 slot="title"> Create User </h2>
+        <div class="flex-container">
+          <app-user-form 
+            [createUserForm]="createUserForm"
+            [conflictErrorEvent]="conflictErrorEvent"
+            [passwordErrorEvent]="passwordErrorEvent">
+          </app-user-form>
+          <div>
+            <chef-button primary (click)="createUser()" [disabled]="!createUserForm.valid"
               tabindex="2" data-cy="save-user">
               <ng-container *ngIf="!creatingUser">
-                <chef-icon>save</chef-icon>
-                <span>Save and Close </span>
+                Create User
               </ng-container>
               <ng-container *ngIf="creatingUser">
                 <chef-loading-spinner></chef-loading-spinner>
-                <span>Saving...</span>
+                <span>Creating...</span>
               </ng-container>
             </chef-button>
-            <chef-button type="reset" tertiary id="cancel" (click)="closeCreateModal()" tabindex="-1">Cancel</chef-button>
+            <chef-button type="reset" tertiary (click)="closeCreateModal()" tabindex="-1">Cancel</chef-button>
           </div>
         </div>
       </chef-modal>
   
       <section class="page-body">
-                <app-user-table
+        <app-user-table
           [addButtonText]="addButtonText"
           [removeText]="removeText"
           [users]="users"

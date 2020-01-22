@@ -1,5 +1,5 @@
 import {
-  Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges
+  Component, EventEmitter, Input, Output, OnInit, OnDestroy, OnChanges, SimpleChanges
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
@@ -9,13 +9,15 @@ import {
   ProjectChecked,
   ProjectCheckedMap
 } from 'app/components/projects-dropdown/projects-dropdown.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-create-object-modal',
   templateUrl: './create-object-modal.component.html',
   styleUrls: ['./create-object-modal.component.scss']
 })
-export class CreateObjectModalComponent implements OnInit, OnChanges {
+export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges {
   @Input() visible = false;
   @Input() creating = false;
   @Input() objectNoun: string;
@@ -33,12 +35,20 @@ export class CreateObjectModalComponent implements OnInit, OnChanges {
   public conflictError = false;
   public projectsUpdatedEvent = new EventEmitter();
 
+  private isDestroyed = new Subject<boolean>();
+
   ngOnInit(): void {
-    this.conflictErrorEvent.subscribe((isConflict: boolean) => {
+    this.conflictErrorEvent.pipe(takeUntil(this.isDestroyed))
+    .subscribe((isConflict: boolean) => {
       this.conflictError = isConflict;
       // Open the ID input on conflict so user can resolve it.
       this.modifyID = isConflict;
     });
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   ngOnChanges(changes: SimpleChanges): void {

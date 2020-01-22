@@ -1,8 +1,9 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
+import { isNil } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
@@ -10,11 +11,12 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Regex } from 'app/helpers/auth/regex';
 import { ChefValidators } from 'app/helpers/auth/validator';
 import { EntityStatus, pending } from 'app/entities/entities';
-import { allUsers, getStatus, createStatus } from 'app/entities/users/user.selectors';
+import { allUsers, getStatus, createStatus, createError } from 'app/entities/users/user.selectors';
 import {
   CreateUser, DeleteUser, GetUsers, CreateUserPayload
 } from 'app/entities/users/user.actions';
 import { User } from 'app/entities/users/user.model';
+import { HttpStatus } from 'app/types/types';
 
 // pattern for valid usernames
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';
@@ -33,6 +35,10 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public isLoading = true;
   public userToDelete: User;
   public creatingUser = false;
+  // TODO maybe combine these into one smarter emitter?
+  public conflictErrorEvent = new EventEmitter<boolean>();
+  public passwordErrorEvent = new EventEmitter<boolean>();
+  public closeEvent = new EventEmitter();
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
@@ -49,7 +55,7 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   ) {
     this.createUserForm = fb.group({
       // Must stay in sync with error checks in user-form.component.html
-      fullname: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      displayName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(USERNAME_PATTERN)]],
       // length validator must be consistent with
       // backend password rules in local-user-service/password/password.go
@@ -69,8 +75,8 @@ export class UserManagementComponent implements OnInit, OnDestroy {
       this.store.select(allUsers),
       this.store.select(getStatus)
     ]).pipe(
-      takeUntil(this.isDestroyed),
-      filter(([_, uStatus]) => uStatus !== EntityStatus.loading)
+      filter(([_, uStatus]) => uStatus !== EntityStatus.loading),
+      takeUntil(this.isDestroyed)
       ).subscribe(([users, _]: [User[], EntityStatus]) => {
         this.isLoading = false;
         this.layoutFacade.ShowPageLoading(false);
@@ -80,11 +86,29 @@ export class UserManagementComponent implements OnInit, OnDestroy {
 
     this.store.pipe(
       select(createStatus),
-      takeUntil(this.isDestroyed),
-      filter(state => this.createModalVisible && !pending(state)))
+      filter(state => this.createModalVisible && !pending(state)),
+      takeUntil(this.isDestroyed))
       .subscribe(state => {
         this.creatingUser = false;
         if (state === EntityStatus.loadingSuccess) {
+          this.closeCreateModal();
+        }
+      });
+
+    combineLatest([
+      this.store.select(createStatus),
+      this.store.select(createError)
+    ]).pipe(
+      filter(() => this.createModalVisible),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)),
+      takeUntil(this.isDestroyed))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictErrorEvent.emit(true);
+        } else if (error.status === HttpStatus.BAD_REQUEST) {
+          this.passwordErrorEvent.emit(true);
+        } else {
+          // Close the modal on any error other than conflict and display in banner.
           this.closeCreateModal();
         }
       });
@@ -103,6 +127,9 @@ export class UserManagementComponent implements OnInit, OnDestroy {
   public closeCreateModal(): void {
     this.createUserForm.reset();
     this.createModalVisible = false;
+    this.conflictErrorEvent.emit(false);
+    this.passwordErrorEvent.emit(false);
+    this.closeEvent.emit();
   }
 
   public closeDeleteModal(): void {
@@ -119,12 +146,12 @@ export class UserManagementComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeleteUser(this.userToDelete));
   }
 
-  public handleCreateUser(): void {
+  public createUser(): void {
     this.creatingUser = true;
     const formValues = this.createUserForm.value;
 
-    const userCreateReq = <CreateUserPayload>{
-      name: formValues.fullname.trim(),
+    const userCreateReq: CreateUserPayload = {
+      name: formValues.displayName.trim(),
       id: formValues.username,
       password: formValues.password
     };
