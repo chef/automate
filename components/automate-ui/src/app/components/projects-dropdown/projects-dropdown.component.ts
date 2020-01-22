@@ -53,9 +53,12 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnChanges(): void {
-    this.filteredProjects = this.projectsArray;
+  ngOnChanges(changes): void {
     this.updateLabel();
+    // only update the projects list on initialization/the first change
+    if (changes.projects && changes.projects.firstChange) {
+      this.filteredProjects = this.projectsArray;
+    }
   }
 
   get projectsArray(): ProjectChecked[] {
