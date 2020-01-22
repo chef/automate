@@ -42,7 +42,7 @@
             <span>{{ summary.skipped.total | number }}</span>
           </span>
         </chef-td>
-        <chef-td class="actions-cell">
+        <chef-td class="actions-cell three-dot-column">
           <mat-select panelClass="chef-control-menu">
             <mat-option *ngIf="!hasFilter(control)" (onSelectionChange)="addFilter(control)">Add Filter</mat-option>
             <mat-option *ngIf="hasFilter(control)" (onSelectionChange)="removeFilter(control)">Remove Filter</mat-option>

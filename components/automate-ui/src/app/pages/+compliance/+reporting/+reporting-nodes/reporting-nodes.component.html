@@ -94,7 +94,7 @@
             {{ statusControlsSeverity(node.latest_report.controls, node.latest_report.status) | uppercase }}
           </span>
         </chef-td>
-        <chef-td>
+        <chef-td class="three-dot-column">
           <mat-select panelClass="chef-control-menu">
             <mat-option *ngIf="!hasFilter(node)" (onSelectionChange)="addFilter(node)">Add Filter</mat-option>
             <mat-option *ngIf="hasFilter(node)" (onSelectionChange)="removeFilter(node)">Remove Filter</mat-option>
