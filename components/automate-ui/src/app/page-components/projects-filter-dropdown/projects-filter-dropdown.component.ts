@@ -29,7 +29,8 @@ export class ProjectsFilterDropdownComponent implements OnChanges {
   @Output() onOptionChange = new EventEmitter<ProjectsFilterOption[]>();
 
   editableOptions: ProjectsFilterOption[] = [];
-  // filteredOptions is merely a container for holding a copy of editableOptions that can be altered
+  // Filtered options is merely a copy of the editable options
+  // so they can be filtered while maintaining the actual options.
   filteredOptions: ProjectsFilterOption[] = [];
 
   filterValue = '';
