@@ -90,6 +90,18 @@ export function projectsFilterReducer(
         set('dropdownCaretVisible', dropdownCaretVisible(sortedOptions))
       )(state) as ProjectsFilterState;
     }
+
+    case ProjectsFilterActionTypes.UPDATE_SELECTION_COUNT: {
+      // merge any added or removed options with the newly saved values
+      const mergedOptions = mergeOptions(state.options, action.payload);
+      const sortedOptions = sortOptions(mergedOptions);
+      return pipe(
+        set('selectionLabel', selectionLabel(sortedOptions)),
+        set('selectionCount', selectionCount(sortedOptions)),
+        set('selectionCountVisible', selectionCountVisible(sortedOptions)),
+        set('selectionCountActive', selectionCountActive(sortedOptions))
+      )(state) as ProjectsFilterState;
+    }
   }
 
   return state;
@@ -122,7 +134,9 @@ function selectionLabel(options: ProjectsFilterOption[]): string {
   }
 
   if (hasOneChecked || hasOneProjectChecked) {
-    return checkedOptions[0].label;
+    // We need to take the last item in the array because unassigned is first
+    // when unassigned and a single project are checked at the same time
+    return checkedOptions[checkedOptions.length - 1].label;
   }
 
   if (hasSomeProjectsChecked) {
@@ -186,13 +200,13 @@ function mergeOptions(
 }
 
 function sortOptions(options: ProjectsFilterOption[]): ProjectsFilterOption[] {
-  // Sort all except unassigned, which should always be last
+  // Sort all except unassigned, which should always be first
   const sorted = options.filter(o => o.value !== UNASSIGNED_PROJECT_ID);
   ChefSorters.naturalSort(sorted, 'label');
 
   const unassignedProject = find(['value', UNASSIGNED_PROJECT_ID], options);
   if (unassignedProject) {
-    sorted.push(unassignedProject);
+    sorted.unshift(unassignedProject);
   }
 
   return sorted;

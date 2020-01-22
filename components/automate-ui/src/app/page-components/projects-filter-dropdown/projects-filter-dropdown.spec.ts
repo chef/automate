@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ProjectsFilterDropdownComponent } from './projects-filter-dropdown.component';
 
@@ -11,6 +12,9 @@ describe('ProjectsFilterDropdownComponent', () => {
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ],
       declarations: [
         ProjectsFilterDropdownComponent
+      ],
+      imports: [
+        FormsModule
       ]
     })
     .compileComponents();
@@ -37,7 +41,7 @@ describe('ProjectsFilterDropdownComponent', () => {
     it('displays label text', () => {
       label = fixture.nativeElement.querySelector('.dropdown-label');
       expect(label).not.toBeNull();
-      expect(label.textContent.trim()).toContain(component.selectionLabel);
+      expect(label.textContent).toContain(component.selectionLabel);
     });
 
     it('has an "aria-label"', () => {
@@ -66,7 +70,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       it('the selection count is visible', () => {
         count = fixture.nativeElement.querySelector('.selection-count');
         expect(count).not.toBeNull();
-        expect(count.textContent.trim()).toEqual(component.selectionCount.toString());
+        expect(count.textContent).toEqual(component.selectionCount.toString());
       });
     });
 
@@ -112,6 +116,8 @@ describe('ProjectsFilterDropdownComponent', () => {
           checked: true
         }
       ];
+      // need filteredOptions in order for elements to be displayed in the UI
+      component.filteredOptions = component.editableOptions;
       fixture.detectChanges();
     });
 
@@ -126,7 +132,7 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
 
     it('displays an "Apply Changes" button', () => {
-      const button = fixture.nativeElement.querySelector('chef-button');
+      const button = fixture.nativeElement.querySelector('#projects-filter-apply-changes');
       expect(button).not.toBeNull();
       expect(button.textContent).toEqual('Apply Changes');
       expect(button.hasAttribute('disabled')).toEqual(true);
@@ -164,7 +170,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       });
 
       it('the "Apply" button is disabled', () => {
-        const button = fixture.nativeElement.querySelector('chef-button');
+        const button = fixture.nativeElement.querySelector('#projects-filter-apply-changes');
         expect(button.getAttribute('disabled')).toEqual('true');
       });
     });
@@ -177,7 +183,7 @@ describe('ProjectsFilterDropdownComponent', () => {
       });
 
       it('the "Apply" button is enabled', () => {
-        const button = fixture.nativeElement.querySelector('chef-button');
+        const button = fixture.nativeElement.querySelector('#projects-filter-apply-changes');
         expect(button.getAttribute('disabled')).toEqual('false');
       });
     });
@@ -206,13 +212,12 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
 
     it('resets any previous selection changes by copying the provided options', () => {
+      component.optionsEdited = false;
+      component.resetOptions();
+
       expect(component.editableOptions).not.toEqual([]);
       expect(component.editableOptions).not.toBe(component.options);
       expect(component.editableOptions).toEqual(component.options);
-    });
-
-    it('marks the list of options as unedited', () => {
-      expect(component.optionsEdited).toEqual(false);
     });
   });
 
@@ -264,9 +269,9 @@ describe('ProjectsFilterDropdownComponent', () => {
         component.handleLabelClick();
       });
 
-      it('does nothing', () => {
+      it('only resets options', () => {
+        expect(component.resetOptions).toHaveBeenCalled();
         expect(component.dropdownActive).toEqual(false);
-        expect(component.resetOptions).not.toHaveBeenCalled();
       });
     });
   });
@@ -298,7 +303,7 @@ describe('ProjectsFilterDropdownComponent', () => {
         }
       ];
       component.optionsEdited = false;
-      component.handleOptionChange({ detail: true }, 0);
+      component.handleOptionChange({ detail: true }, 'Project 1');
     });
 
     it('updates the value of `checked` to the emitted value', () => {
@@ -310,12 +315,12 @@ describe('ProjectsFilterDropdownComponent', () => {
     });
   });
 
-  describe('handleApplyClick()', () => {
+  describe('handleApplySelection()', () => {
     beforeEach(() => {
       spyOn(component.onSelection, 'emit');
       component.dropdownActive = true;
       component.optionsEdited = true;
-      component.handleApplyClick();
+      component.handleApplySelection();
     });
 
     it('hides the dropdown', () => {

@@ -36,6 +36,7 @@ describeIfIAMV2p1('global projects filter', () => {
       const allowedProjects = [proj1.name, proj2.name, proj3.name, '(unassigned)'];
       // we don't check that projects in dropdown match *exactly* as
       // we can't control creation of other projects in the test env
+    cy.get('.dropdown-label').click();
       allowedProjects.forEach(project => {
         cy.get('#projects-filter-dropdown').contains(project);
       });

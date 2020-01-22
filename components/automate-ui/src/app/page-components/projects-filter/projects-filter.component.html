@@ -6,5 +6,6 @@
   [selectionCountActive]="projectsFilter.selectionCountActive$ | async"
   [dropdownCaretVisible]="projectsFilter.dropdownCaretVisible$ | async"
   [filterVisible]="projectsFilter.filterVisible$ | async"
-  (onSelection)="projectsFilter.saveOptions($event)">
+  (onSelection)="projectsFilter.saveOptions($event)"
+  (onOptionChange)="projectsFilter.updateSelectionCount($event)">
 </app-projects-filter-dropdown>

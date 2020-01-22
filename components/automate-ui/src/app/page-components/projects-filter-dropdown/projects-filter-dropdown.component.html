@@ -8,25 +8,53 @@
   <span class="selection-label">{{ selectionLabel }}</span>
   <span class="selection-count"
     *ngIf="selectionCountVisible"
-    [ngClass]="{'active': selectionCountActive }">
-    {{ selectionCount }}
-  </span>
+    [ngClass]="{'active': selectionCountActive }">{{ selectionCount }}</span>
   <chef-icon *ngIf="dropdownCaretVisible" aria-hidden>keyboard_arrow_down</chef-icon>
 </button>
 <chef-click-outside omit="dropdown-label" (clickOutside)="handleEscape()">
   <chef-dropdown class="dropdown" id="projects-filter-dropdown" [attr.visible]="dropdownActive" (keydown.esc)="handleEscape()">
-    <div class="dropdown-body">
-      <span class="optgroup-label">Projects</span>
-      <chef-checkbox
-        *ngFor="let option of editableOptions; index as i"
-        [attr.title]="option.label"
-        [checked]="option.checked"
-        (change)="handleOptionChange($event, i)"
-        (keydown.arrowup)="handleArrowUp($event)"
-        (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}</chef-checkbox>
-      <div class="dropdown-footer">
-        <chef-button primary [attr.disabled]="!optionsEdited" (click)="handleApplyClick()" id="projects-filter-apply-changes">Apply Changes</chef-button>
+
+      <div class="dropdown-body">
+
+        <div class="dropdown-content">
+          <!-- @TODO turn this into reusable Filter Input component -->
+          <input 
+            chefInput
+            type="text"
+            [(ngModel)]="filterValue"
+            (keyup)="handleFilterKeyUp()"
+            placeholder="Filter projects..." />
+        </div>
+
+        <div class="button-container" *ngIf="filteredOptions.length > 0">
+          <chef-button
+            primary
+            [attr.disabled]="!optionsEdited"
+            (click)="handleApplySelection()"
+            id="projects-filter-apply-changes">Apply Changes</chef-button>
+
+          <chef-button
+          tertiary
+          id="projects-filter-clear-selection"
+          (click)="handleClearSelection()">Clear Selection</chef-button>
+        </div>
+
+        <div id="drop-list" class="dropdown-content">
+          <chef-checkbox
+            *ngFor="let option of filteredOptions"
+            [attr.title]="option.label"
+            [checked]="option.checked"
+            (change)="handleOptionChange($event, option.label)"
+            (keydown.arrowup)="handleArrowUp($event)"
+            (keydown.arrowdown)="handleArrowDown($event)">{{ option.label }}</chef-checkbox>
+
+          <div class="no-projects" *ngIf="filteredOptions.length === 0">
+            <p>No projects found.</p>
+            <p>You don't have access to any projects that match your search.</p>
+          </div>
+        </div>
+
       </div>
-    </div>
+
   </chef-dropdown>
 </chef-click-outside>
