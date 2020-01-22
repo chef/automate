@@ -104,12 +104,12 @@ Accept the license with `y`.
     You should see output similar to:
 
    ```output
-   url = "https://<your_automate_fqdn>"
+   url = "https://{{< example_fqdn "automate" >}}"
    username = "admin"
    password = "abcdefgh1234567890PASSWORDSTRING"
    ```
 
-1. Navigate to `https://<your_automate_fqdn>` in your browser. If you cannot access the site in Google Chrome, try Mozilla Firefox or Microsoft Edge.
+1. Navigate to `https://{{< example_fqdn "automate" >}}` in your browser. If you cannot access the site in Google Chrome, try Mozilla Firefox or Microsoft Edge.
 1. Sign in to Chef Automate using the [credentials provided during deployment]({{< relref
    "install.md#open-chef-automate" >}}).
 1. Select **Applications** in the top navigation bar
@@ -162,7 +162,7 @@ cd on-prem-builder
 The Chef Automate installer uses a self-signed certificate. Copy the SSL public key certificate chain from Chef Automate into `/hab/cache/ssl` with this command:
 
 ```shell
-cp /hab/svc/automate-load-balancer/data/<your_automate_fqdn>.cert /hab/cache/ssl/<your_automate_fqdn>.crt
+cp /hab/svc/automate-load-balancer/data/{{< example_fqdn "automate" >}}.cert /hab/cache/ssl/{{< example_fqdn "automate" >}}.crt
 ```
 
 ### Download Seed List Packages from the Public Chef Habitat Builder
@@ -174,7 +174,7 @@ Use the `hab pkg download` command with a seed list `</path/to/seed_list>` to do
 your desired architecture `<arch>` from a channel `<channel>` to a directory `<artifact-dir>`:
 
 ```shell
-HAB_AUTH_TOKEN=<our_public_builder_personal_access_token> hab pkg download --target <arch> --channel <channel> --file </path/to/seed_list> --download-directory <artifact-dir>
+HAB_AUTH_TOKEN=<your_public_builder_personal_access_token> hab pkg download --target <arch> --channel <channel> --file </path/to/seed_list> --download-directory <artifact-dir>
 ```
 
 For example, to use the Effortless seed list to download `x86_64-linux` packages from the
@@ -189,19 +189,19 @@ HAB_AUTH_TOKEN=<your_public_builder_personal_access_token> hab pkg download --ta
 Run the `bulkupload` command to upload artifacts from `<artifact-dir>` to the `<channel>` channel in on-premises Chef Habitat Builder:
 
 ```shell
-HAB_AUTH_TOKEN=<your_on-prem_Builder_personal_access_token> hab pkg bulkupload --url https://<your_automate_fqdn>/bldr/v1 --channel <channel> <artifact-dir> --auto-create-origins
+HAB_AUTH_TOKEN=<your_on-prem_Builder_personal_access_token> hab pkg bulkupload --url https://{{< example_fqdn "automate" >}}/bldr/v1 --channel <channel> <artifact-dir> --auto-create-origins
 ```
 
 For example,
 
 ```shell
-HAB_AUTH_TOKEN=<your_on-prem_Builder_personal_access_token> hab pkg bulkupload --url https://<your_automate_fqdn>/bldr/v1 --channel stable builder_bootstrap/ --auto-create-origins
+HAB_AUTH_TOKEN=<your_on-prem_Builder_personal_access_token> hab pkg bulkupload --url https://{{< example_fqdn "automate" >}}/bldr/v1 --channel stable builder_bootstrap/ --auto-create-origins
 ```
 
 Should produce the output:
 
 ```output
-Preparing to upload artifacts to the 'stable' channel on https://<your_automate_fqdn>/bldr/v1
+Preparing to upload artifacts to the 'stable' channel on https://{{< example_fqdn "automate" >}}/bldr/v1
 Using builder_bootstrap/artifacts for artifacts and builder_bootstrap/keys signing keys
 Found 46 artifact(s) for upload.
 Discovering origin names from local artifact cache
@@ -222,11 +222,13 @@ The `--auto-create-origins` flag creates each origin listed in the
 use the Chef Habitat Builder UI to create the necessary origins before running the
 `bulkupload` command.
 
-To finish up, return to your Chef Habitat Builder on-prem installation and view the packages that you've added to your `core` origin at `https://<your_automate_fqdn>/bldr/#/origins/core/packages`.
+To finish up, return to your Chef Habitat Builder on-prem installation and view the packages that you've added to your `core` origin at `https://{{< example_fqdn "automate" >}}/bldr/#/origins/core/packages`.
 
 ## Operating Chef Habitat Builder
 
 Chef Habitat Builder uses the same mechanisms that Chef Automate does for [backups]({{< relref "backup.md" >}}), [log management]({{< relref "log-management.md" >}}), and [uninstalling]({{< relref "troubleshooting.md#uninstalling-chef-automate" >}}).
+
+### Logging errors
 
 To change the log level for Chef Habitat Builder only, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
