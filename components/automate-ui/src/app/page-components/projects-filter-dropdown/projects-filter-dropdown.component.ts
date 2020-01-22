@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnChanges, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { cloneDeep } from 'lodash/fp';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { ProjectConstants } from 'app/entities/projects/project.model';
@@ -76,12 +76,12 @@ export class ProjectsFilterDropdownComponent {
       }
     });
     this.optionsEdited = true;
-    this.onOptionChange.emit(this.editableOptions);
   }
 
   handleApplySelection() {
     this.dropdownActive = false;
     this.optionsEdited = false;
+    this.onOptionChange.emit(this.editableOptions);
     this.onSelection.emit(this.editableOptions);
   }
 
