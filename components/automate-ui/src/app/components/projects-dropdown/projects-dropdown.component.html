@@ -25,7 +25,7 @@
       </div>
 
       <chef-checkbox
-        *ngFor="let project of filteredProjects"
+        *ngFor="let project of projectsArray"
         [checked]="project.checked"
         [attr.title]="project.name"
         (change)="projectChecked($event.detail, project)"
@@ -34,7 +34,7 @@
         (keydown.arrowup)="moveFocus($event)"
         (keydown.arrowdown)="moveFocus($event)">{{ project['name'] }}</chef-checkbox>
 
-      <div class="no-projects" *ngIf="projectsArray.length < 1">
+      <div class="no-projects" *ngIf="projectsArray.length === 0">
         <p>No projects found.</p>
         <p>You don't have access to any projects that match your search.</p>
       </div>
