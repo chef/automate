@@ -21,11 +21,6 @@
               <chef-button secondary [disabled]="isDisabled()"
                 id="update-start-button" (click)="openConfirmUpdateStartModal()">{{ getButtonText() }}</chef-button>
             </app-authorized>
-            <app-authorized [allOf]="['/iam/v2/apply-rules', 'delete']">
-              <chef-button *ngIf="(projects.applyRulesStatus$ | async)?.state === ApplyRulesStatusState.Running"
-                [disabled]="cancelRulesInProgress"
-                tertiary id="update-stop-button" (click)="openConfirmUpdateStopModal()">Stop Updating Projects</chef-button>
-            </app-authorized>
           </chef-toolbar>
           <app-authorized [allOf]="['/iam/v2/projects', 'get']">
             <chef-table-new>

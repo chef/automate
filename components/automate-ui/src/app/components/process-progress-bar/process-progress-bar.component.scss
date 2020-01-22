@@ -1,0 +1,48 @@
+@import "~styles/variables";
+
+#process-progress-bar {
+  background-color: #3864f2;
+  height: 48px;
+  padding: 7px 10px;
+  position: relative;
+
+  .info {
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+
+    chef-icon {
+      vertical-align: middle;
+    }
+  }
+
+  button {
+    color: #fff;
+    font-size: 14px;
+    font-weight: inherit;
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+
+  mat-progress-bar {
+    border-radius: 5px;
+    height: 6px;
+    margin-top: 5px;
+    
+    .mat-progress-bar-fill::after {
+      background-color: rgba(255, 255, 255, .7);
+    }
+
+    .mat-progress-bar-buffer {
+      background-color: rgba(255, 255, 255, .5);
+    }
+
+    /* remove animation and the dots*/ 
+    .mat-progress-bar-background {
+      animation: none;
+      background-color: #3863f2;
+      fill: #3863f2;
+    }
+  }
+}

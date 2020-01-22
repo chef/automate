@@ -1,0 +1,20 @@
+<div id="process-progress-bar" [hidden]="!applyRulesInProgress">
+  <span class="info">Updating resources across all projects ({{ percentageComplete }}%)... <chef-icon aria-hidden="true">info</chef-icon></span>
+  <app-authorized [allOf]="['/iam/v2/apply-rules', 'delete']">
+    <button mat-button (click)="openConfirmUpdateStopModal()">Stop Project Update</button>
+  </app-authorized>
+  <mat-progress-bar
+        class="process-progress-bar"
+        [mode]="determinate"
+        [value]="percentageComplete"
+        [bufferValue]="bufferValue">
+    </mat-progress-bar>
+</div>
+
+<app-confirm-apply-stop-modal
+  [visible]="confirmApplyStopModalVisible"
+  [applyRulesStatus]="projects.applyRulesStatus$ | async"
+  [stopRulesInProgress]="cancelRulesInProgress"
+  (confirm)="confirmApplyStop()"
+  (cancel)="cancelApplyStop()">
+</app-confirm-apply-stop-modal>
