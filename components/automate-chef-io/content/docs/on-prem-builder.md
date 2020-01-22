@@ -104,12 +104,12 @@ Accept the license with `y`.
     You should see output similar to:
 
    ```output
-   url = "https://chef-automate.test"
+   url = "https://<your_automate_fqdn>"
    username = "admin"
    password = "abcdefgh1234567890PASSWORDSTRING"
    ```
 
-1. Navigate to `https://chef-automate.test` in your browser. If you cannot access the site in Google Chrome, try Mozilla Firefox or Microsoft Edge.
+1. Navigate to `https://<your_automate_fqdn>` in your browser. If you cannot access the site in Google Chrome, try Mozilla Firefox or Microsoft Edge.
 1. Sign in to Chef Automate using the [credentials provided during deployment]({{< relref
    "install.md#open-chef-automate" >}}).
 1. Select **Applications** in the top navigation bar
@@ -147,7 +147,7 @@ Use [seed lists](https://github.com/habitat-sh/on-prem-builder/blob/master/packa
 
 ### Clone the Chef Habitat Builder On-prem Repository
 
-To access the curated seed lists for bootsrapping Chef Habitat Builder on-prem, you will need to clone the Chef Habitat Builder on-prem repository using https.
+To access the curated seed lists for bootstrapping Chef Habitat Builder on-prem, you will need to clone the Chef Habitat Builder on-prem repository using https.
 
 ```shell
 git clone https://github.com/habitat-sh/on-prem-builder.git
@@ -162,10 +162,10 @@ cd on-prem-builder
 The Chef Automate installer uses a self-signed certificate. Copy the SSL public key certificate chain from Chef Automate into `/hab/cache/ssl` with this command:
 
 ```shell
-cp /hab/svc/automate-load-balancer/data/chef-automate.test.cert /hab/cache/ssl/ssl-certificate.crt
+cp /hab/svc/automate-load-balancer/data/<your_automate_fqdn>.cert /hab/cache/ssl/<your_automate_fqdn>.crt
 ```
 
-### Download Seed List from the Public Chef Habitat Builder
+### Download Seed List Packages from the Public Chef Habitat Builder
 
 Your host must have access to the internet to download the curated seed list packages from the **public** [Chef Habitat Builder](https://bldr.habitat.sh).
 If you have not already done so, create a user account and personal access token on the **public** [Chef Habitat Builder](https://bldr.habitat.sh/).
@@ -174,7 +174,7 @@ Use the `hab pkg download` command with a seed list `</path/to/seed_list>` to do
 your desired architecture `<arch>` from a channel `<channel>` to a directory `<artifact-dir>`:
 
 ```shell
-HAB_AUTH_TOKEN=<your_on_prem_builder_personal_access_token> hab pkg download --target <arch> --channel <channel> --file </path/to/seed_list> --download-directory <artifact-dir>
+HAB_AUTH_TOKEN=<our_public_builder_personal_access_token> hab pkg download --target <arch> --channel <channel> --file </path/to/seed_list> --download-directory <artifact-dir>
 ```
 
 For example, to use the Effortless seed list to download `x86_64-linux` packages from the
@@ -195,25 +195,25 @@ HAB_AUTH_TOKEN=<your_on-prem_Builder_personal_access_token> hab pkg bulkupload -
 For example,
 
 ```shell
-HAB_AUTH_TOKEN=<your_on-prem_Builder_personal_access_token> hab pkg bulkupload --url https://chef-automate.test/bldr/v1 --channel stable builder_bootstrap/ --auto-create-origins
+HAB_AUTH_TOKEN=<your_on-prem_Builder_personal_access_token> hab pkg bulkupload --url https://<your_automate_fqdn>/bldr/v1 --channel stable builder_bootstrap/ --auto-create-origins
 ```
 
 Should produce the output:
 
 ```output
-» Preparing to upload artifacts to the 'stable' channel on https://chef-automate.tebldr/v1
-→ Using builder_bootstrap/artifacts for artifacts and builder_bootstrap/keys signing keys
-→ Found 46 artifact(s) for upload.
-☁ Discovering origin names from local artifact cache
-∵ Missing origin 'chef'
-✓ Origin 'core' already exists
-∵ Missing origin 'effortless'
-Ω Creating origin chef.
-✓ Created origin chef.
-Ω Creating origin effortless.
-✓ Created origin effortless.
+Preparing to upload artifacts to the 'stable' channel on https://<your_automate_fqdn>/bldr/v1
+Using builder_bootstrap/artifacts for artifacts and builder_bootstrap/keys signing keys
+Found 46 artifact(s) for upload.
+Discovering origin names from local artifact cache
+Missing origin 'chef'
+Origin 'core' already exists
+Missing origin 'effortless'
+Creating origin chef.
+Created origin chef.
+Creating origin effortless.
+Created origin effortless.
 75 B / 75 B | [===========================================] 100.00 % 1.31 MB/s d
-» Uploading public origin key chef-20160614114050.pub
+Uploading public origin key chef-20160614114050.pub
 ...
 ```
 
@@ -222,7 +222,7 @@ The `--auto-create-origins` flag creates each origin listed in the
 use the Chef Habitat Builder UI to create the necessary origins before running the
 `bulkupload` command.
 
-To finish up, return to your Chef Habitat Builder on-prem installation and view the packages that you've added to your `core` origin at `https://chef-automate.test/bldr/#/origins/core/packages`.
+To finish up, return to your Chef Habitat Builder on-prem installation and view the packages that you've added to your `core` origin at `https://<your_automate_fqdn>/bldr/#/origins/core/packages`.
 
 ## Operating Chef Habitat Builder
 
