@@ -26,7 +26,7 @@ func init() {
 func newApplicationsRootSubcmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "applications COMMAND",
-		Short: "Manage applications visibility features",
+		Short: "Manage applications observability features",
 	}
 }
 
@@ -150,7 +150,10 @@ func newApplicationsShowSvcsCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "show-svcs",
 		Short: "Show services in the applications database",
-		RunE:  runApplicationsShowSvcsCmd,
+		Long: `
+Display a list of the habitat services stored in the applications database.
+`,
+		RunE: runApplicationsShowSvcsCmd,
 	}
 
 	addFilteringFlagsToCmd(c)
@@ -168,7 +171,14 @@ func newApplicationsRemoveSvcsCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "remove-svcs",
 		Short: "Remove services from the applications database",
-		RunE:  runApplicationsRemoveSvcsCmd,
+		Long: `
+Remove services from the applications database.
+
+You must decommission the services prior to running this command. Services
+removed with this command will be added to the database again if Automate
+receives a health check from the service.
+`,
+		RunE: runApplicationsRemoveSvcsCmd,
 	}
 
 	addFilteringFlagsToCmd(c)
