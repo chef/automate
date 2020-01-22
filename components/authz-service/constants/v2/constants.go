@@ -50,10 +50,10 @@ const (
 // Business logic constants
 const (
 	DefaultProjectLimit = 300
-	// MinConfigurableProjects is based on our original default for customers who have
-	// previously set their project_limit to greater than 6, but less than the
-	// new default of 300.
-	// This exists only due to our current state where users can configure the
-	// limit and should be removed when the limit itself is removed.
+	// Previously, users could not configure their project_limit to be below the
+	// default.
+	// MinConfigurableProjects supports customers who previously
+	// increased their limit to a number that is lower than the new default.
+	// It should removed when we no longer limit projects.
 	MinConfigurableProjects = 6
 )

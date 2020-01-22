@@ -48,9 +48,11 @@ func (c *ConfigRequest) Validate() error {
 
 	if projectLimit != nil {
 		if limit := projectLimit.GetValue(); limit < constants_v2.MinConfigurableProjects {
-			// MinConfigurableProjects supports customers who previously increased
-			// their limit, but not as high as the new limit. Can be removed when
-			// we no longer limit projects.
+			// Previously, users could not configure their project_limit to be below the
+			// default.
+			// MinConfigurableProjects supports customers who previously
+			// increased their limit to a number that is lower than the new default.
+			// Can be removed when we no longer limit projects.
 			e := errors.Errorf("project limit must be at least %v", constants_v2.MinConfigurableProjects)
 			cfgErr.AddInvalidValue("auth_z.v1.sys.service.project_limit", e.Error())
 		}
