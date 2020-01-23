@@ -3,16 +3,16 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
 import { takeUntil, filter } from 'rxjs/operators';
+import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { HttpStatus } from 'app/types/types';
 import { Regex } from 'app/helpers/auth/regex';
 import { UsernameMapper } from 'app/helpers/auth/username-mapper';
 import { ChefValidators } from 'app/helpers/auth/validator';
 import { EntityStatus } from 'app/entities/entities';
 import { CreateUserPayload, CreateUser } from 'app/entities/users/user.actions';
 import { createStatus, createError } from 'app/entities/users/user.selectors';
-import { isNil } from 'lodash/fp';
-import { HttpStatus } from 'app/types/types';
 
 // pattern for valid usernames
 const USERNAME_PATTERN = '[0-9A-Za-z_@.+-]+';
@@ -34,12 +34,6 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
 
   private isDestroyed = new Subject<boolean>();
 
-  closeCreateModal(): void {
-    this.visible = false;
-  }
-
-  //////////////////////////////////// FROM user-management.component.ts
-
   constructor(
     private store: Store<NgrxStateAtom>,
     fb: FormBuilder
@@ -58,25 +52,13 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
     });
   }
 
-  public createUser(): void {
-    this.creatingUser = true;
-    const formValues = this.createUserForm.value;
-
-    const userCreateReq = <CreateUserPayload>{
-      name: formValues.displayName.trim(),
-      id: formValues.username,
-      password: formValues.password
-    };
-
-    this.store.dispatch(new CreateUser(userCreateReq));
-  }
-
-  //////////////////////////////////// FROM user-form.component.ts
-
-  ngOnInit() {
+  ngOnInit(): void {
     this.openEvent.pipe(takeUntil(this.isDestroyed))
       .subscribe(() => {
         this.creatingUser = false;
+        this.conflictError = false;
+        this.passwordError = false;
+        this.createUserForm.reset();
         this.visible = true;
       });
 
@@ -106,9 +88,26 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
       });
   }
 
-  ngOnDestroy() {
+  ngOnDestroy(): void {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  closeCreateModal(): void {
+    this.visible = false;
+  }
+
+  createUser(): void {
+    this.creatingUser = true;
+    const formValues = this.createUserForm.value;
+
+    const userCreateReq: CreateUserPayload = {
+      name: formValues.displayName.trim(),
+      id: formValues.username,
+      password: formValues.password
+    };
+
+    this.store.dispatch(new CreateUser(userCreateReq));
   }
 
   handleUsernameInput(event: KeyboardEvent): void {
