@@ -10,29 +10,14 @@ options:
   shorthand: b
   default_value: /var/opt/chef-automate/backups
   usage: Directory used for backups
-- name: channel
-  shorthand: c
-  default_value: current
-  usage: The habitat channel from which to install packages
-- name: hartifacts
-  usage: The local path to search for override packages
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for restore
-- name: override-origin
-  shorthand: o
-  default_value: chef
-  usage: Habitat origin from which to install packages
 - name: patch-config
   usage: Path to patch config if required
-- name: set-config
-  usage: Path to set config if required
 - name: sha256
   usage: The SHA256 checksum of the backup
-- name: skip-bootstrap
-  default_value: "false"
-  usage: Skip bootstrapping the machine with Habitat
 - name: skip-preflight
   default_value: "false"
   usage: Skip preflight checks when restoring a backup

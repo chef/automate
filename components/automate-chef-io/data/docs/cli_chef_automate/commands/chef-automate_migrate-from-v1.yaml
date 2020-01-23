@@ -25,16 +25,10 @@ options:
   default_value: "0"
   usage: |
     Optional timeout for moving elasticsearch, compliance, and notifications files during Chef Automate v1 migration (0 to disable timeout)
-- name: hartifacts
-  usage: Optional path to cache of local .hart packages
 - name: help
   shorthand: h
   default_value: "false"
   usage: help for migrate-from-v1
-- name: manifest-dir
-  usage: Directory of manifest files
-- name: override-origin
-  usage: Optional origin to install local .hart packages from
 - name: postgres-dump-wait-seconds
   default_value: "0"
   usage: |

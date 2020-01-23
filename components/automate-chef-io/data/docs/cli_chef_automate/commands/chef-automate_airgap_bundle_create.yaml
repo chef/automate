@@ -5,8 +5,6 @@ options:
 - name: channel
   shorthand: c
   usage: Release channel to pull packages from
-- name: hartifacts
-  usage: Path to habitat package artifacts
 - name: help
   shorthand: h
   default_value: "false"
@@ -14,8 +12,6 @@ options:
 - name: manifest
   shorthand: m
   usage: Path to a release manifest.json
-- name: override-origin
-  usage: Origin of habitat package creator
 - name: retries
   shorthand: r
   default_value: "2"
