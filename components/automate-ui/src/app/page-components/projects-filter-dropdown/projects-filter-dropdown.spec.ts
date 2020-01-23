@@ -146,7 +146,7 @@ describe('ProjectsFilterDropdownComponent', () => {
 
       it('the dropdown is hidden', () => {
         const dropdown = fixture.nativeElement.querySelector('.dropdown');
-        expect(dropdown.getAttribute('visible')).toEqual('false');
+        expect(dropdown).toBeNull();
       });
     });
 
