@@ -187,12 +187,24 @@ describe('ChefServersListComponent', () => {
       errors = fqdn.errors || {};
       expect(errors['pattern']).toBeTruthy();
 
+      fqdn.setValue('http://...foo.bar com/');
+      errors = fqdn.errors || {};
+      expect(errors['pattern']).toBeTruthy();
+
       // Set fqdn to valid inputs
       fqdn.setValue('http://fo_o.bar/');
       errors = fqdn.errors || {};
       expect(errors['pattern']).toBeFalsy();
 
       fqdn.setValue('https://bit.ly/2OWGwiL');
+      errors = fqdn.errors || {};
+      expect(errors['pattern']).toBeFalsy();
+
+      fqdn.setValue('http://demo.com/');
+      errors = fqdn.errors || {};
+      expect(errors['pattern']).toBeFalsy();
+
+      fqdn.setValue('https://example_test.co.in/2OWGwiL');
       errors = fqdn.errors || {};
       expect(errors['pattern']).toBeFalsy();
 
