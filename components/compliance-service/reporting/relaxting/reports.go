@@ -814,6 +814,7 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 		Passed:  &reportingapi.Total{},
 		Skipped: &reportingapi.Total{},
 		Failed:  &reportingapi.Failed{},
+		Waived:  &reportingapi.Total{},
 	}
 	if aggResult, found := controlBucket.Aggregations.Terms("title"); found {
 		//there can only be one
@@ -872,6 +873,9 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 			}
 		}
 	}
+	if waived, found := controlBucket.Aggregations.Filter("waived"); found {
+		controlSummary.Waived.Total = int32(waived.DocCount)
+	}
 	if passed, found := controlBucket.Aggregations.Filter("passed"); found {
 		controlSummary.Passed.Total = int32(passed.DocCount)
 	}
@@ -889,8 +893,70 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 			controlSummary.Failed.Critical = total
 		}
 	}
+
+	if waivedStrBuckets, found := controlBucket.Aggregations.Terms("waived_str"); found && len(waivedStrBuckets.Buckets) > 0 {
+		contListItem.WaiverData, err = backend.getWaiverData(waivedStrBuckets)
+		if err != nil {
+			return contListItem, err
+		}
+	}
+
 	contListItem.ControlSummary = controlSummary
 	return contListItem, nil
+}
+
+func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationBucketKeyItems) ([]*reportingapi.WaiverData, error) {
+	waiverDataCollection := make([]*reportingapi.WaiverData, 0)
+
+	for _, waiverDataBucket := range waiverDataBuckets.Buckets {
+		if aggResult, found := waiverDataBucket.Aggregations.Terms("expiration_date"); found && len(aggResult.Buckets) > 0 {
+			for _, expirationBucket := range aggResult.Buckets {
+				expDate, ok := expirationBucket.Key.(string)
+				if !ok {
+					logrus.Errorf("could not convert the value of expiration date: %v, to a string!", expirationBucket)
+				}
+				if aggResult, found := expirationBucket.Aggregations.Terms("justification"); found && len(aggResult.Buckets) > 0 {
+					for _, justificationBucket := range aggResult.Buckets {
+						justification, ok := justificationBucket.Key.(string)
+						if !ok {
+							logrus.Errorf("could not convert the value of justification: %v, to a string!", justificationBucket)
+						}
+
+						controlSummary := &reportingapi.ControlSummary{
+							Passed:  &reportingapi.Total{},
+							Skipped: &reportingapi.Total{},
+							Failed:  &reportingapi.Failed{},
+							Waived:  &reportingapi.Total{},
+						}
+
+						if waived, found := justificationBucket.Aggregations.Filter("waived"); found {
+							controlSummary.Waived.Total = int32(waived.DocCount)
+						}
+						if passed, found := justificationBucket.Aggregations.Filter("passed"); found {
+							controlSummary.Passed.Total = int32(passed.DocCount)
+						}
+						if skipped, found := justificationBucket.Aggregations.Filter("skipped"); found {
+							controlSummary.Skipped.Total = int32(skipped.DocCount)
+						}
+						if failed, found := justificationBucket.Aggregations.Filter("failed"); found {
+							total := int32(failed.DocCount)
+							controlSummary.Failed.Total = total
+						}
+
+						waiverData := &reportingapi.WaiverData{
+							WaivedStr:      waiverDataBucket.Key.(string),
+							ExpirationDate: expDate,
+							Justification:  justification,
+							WaivedDetails:  controlSummary,
+						}
+						waiverDataCollection = append(waiverDataCollection, waiverData)
+					}
+				}
+			}
+		}
+	}
+
+	return waiverDataCollection, nil
 }
 
 //getFiltersQuery - builds up an elasticsearch query filter based on the filters map that is passed in

@@ -56,7 +56,6 @@ message ControlSummary {
 	Total  skipped = 3;
 	Failed failed = 4;
 	Total  waived = 5;
-	repeated ControlSummary waived_details = 6;
 }
 
 message ControlItemRequest {
@@ -66,11 +65,13 @@ message ControlItemRequest {
 }
 
 message WaiverData {
-	string expiration_date = 1;
-	string justification = 2;
-	bool run = 3;
-	bool skipped_due_to_waiver = 4;
-	string message = 5;
+	string waived_str = 1;
+	string expiration_date = 2;
+	string justification = 3;
+	bool run = 4;
+	bool skipped_due_to_waiver = 5;
+	string message = 6;
+	ControlSummary waived_details = 7;
 }
 
 message WaivedStrCounts {
@@ -86,7 +87,7 @@ message ControlItem {
 	google.protobuf.Timestamp end_time = 5;
 	ControlSummary control_summary = 6;
 	repeated WaivedStrCounts waived_str_counts = 7;
-	WaiverData waiver_data = 8;
+	repeated WaiverData waiver_data = 8;
 
 }
 
