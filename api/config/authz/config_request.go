@@ -1,10 +1,11 @@
 package authz
 
 import (
+	fmt "fmt"
+
 	config "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
 	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
-	"github.com/pkg/errors"
 )
 
 // NewConfigRequest returns a new instance of ConfigRequest with zero values.
@@ -29,7 +30,7 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	c.V1.Sys.Service.Host = w.String("0.0.0.0")
 	c.V1.Sys.Service.Port = w.Int32(10130)
-	c.V1.Sys.Service.ProjectLimit = w.Int32(constants_v2.MaxProjects)
+	c.V1.Sys.Service.ProjectLimit = w.Int32(constants_v2.DefaultProjectLimit)
 	c.V1.Sys.Logger.Level = w.String("info")
 	c.V1.Sys.Logger.Format = w.String("text")
 	c.V1.Sys.Storage.Database = w.String("chef_authz_service")
@@ -47,9 +48,14 @@ func (c *ConfigRequest) Validate() error {
 	projectLimit := c.GetV1().GetSys().GetService().GetProjectLimit()
 
 	if projectLimit != nil {
-		if limit := projectLimit.GetValue(); limit < constants_v2.MaxProjects {
-			e := errors.Errorf("project limit must be at least %v", constants_v2.MaxProjects)
-			cfgErr.AddInvalidValue("auth_z.v1.sys.service.project_limit", e.Error())
+		if limit := projectLimit.GetValue(); limit < constants_v2.MinConfigurableProjects {
+			// Previously, users could not configure their project_limit to be below the
+			// default.
+			// MinConfigurableProjects supports customers who previously
+			// increased their limit to a number that is lower than the new default.
+			// It should be removed when we no longer limit projects.
+			failureStr := fmt.Sprintf("project limit must be at least %d", constants_v2.MinConfigurableProjects)
+			cfgErr.AddInvalidValue("auth_z.v1.sys.service.project_limit", failureStr)
 		}
 	}
 

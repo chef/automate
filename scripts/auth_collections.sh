@@ -191,8 +191,8 @@ authGen() {
   SEED=$4
   ID_PREFIX=test-$RESOURCE
   if [[ ! $MODE =~ ^(create|delete)$ ]]; then echo "mode must be 'create' or 'delete'"; return; fi
-  if [[ ! $RESOURCE =~ ^(tokens|users|teams|team-members|policies|rules)$ ]]; then
-    echo "resource must be in: tokens, users, teams, team-members, policies, rules"
+  if [[ ! $RESOURCE =~ ^(projects|tokens|users|teams|team-members|policies|rules)$ ]]; then
+    echo "resource must be in: projects, tokens, users, teams, team-members, policies, rules"
     return
   fi
 
@@ -213,6 +213,9 @@ function create_resource {
   local json
   local resource
   case "$RESOURCE" in
+    projects)
+      json=$(jo -p id="$id" name="$name")
+      resource=$RESOURCE ;;
     tokens)
       json=$(jo -p id="$id" name="$name" description="test token for $name" active=true)
       resource=$RESOURCE ;;
@@ -246,6 +249,7 @@ function delete_resource {
   local id=$ID_PREFIX-$id_index
   local name="$ID_PREFIX $id_index"
   case "$RESOURCE" in
+    projects)  ;;
     tokens)  ;;
     users)  ;;
     teams) 
