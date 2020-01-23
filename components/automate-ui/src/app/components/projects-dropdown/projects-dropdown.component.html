@@ -34,7 +34,7 @@
           (keydown.enter)="closeDropdown()"
           (keydown.esc)="closeDropdown()"
           (keydown.arrowup)="moveFocus($event)"
-          (keydown.arrowdown)="moveFocus($event)">{{ project['name'] }}</chef-checkbox>
+          (keydown.arrowdown)="moveFocus($event)">{{ project.name }}</chef-checkbox>
       </div>
 
       <div class="no-projects" *ngIf="filteredProjects.length === 0">

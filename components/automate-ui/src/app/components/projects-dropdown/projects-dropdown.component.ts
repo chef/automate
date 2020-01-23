@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnChanges, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
@@ -53,7 +53,7 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnChanges(changes): void {
+  ngOnChanges(changes: SimpleChanges): void {
     this.updateLabel();
     // only update the projects list on initialization/the first change
     if (changes.projects && changes.projects.firstChange) {
