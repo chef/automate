@@ -154,7 +154,7 @@ func runBootstrapBundleUnpack(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return status.Wrapf(err, status.FileAccessError, "could not open %q", args[0])
 	}
-	defer f.Close()
+	defer f.Close() // nolint: errcheck
 	if err := b.Unpack(f); err != nil {
 		return err
 	}

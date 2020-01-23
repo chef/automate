@@ -395,9 +395,33 @@ func (r *Runner) ShowBackup(ctx context.Context, t *api.BackupTask) (*api.Backup
 	if err != nil {
 		return nil, err
 	}
+
+	manifestLocation, err := NewBucketManifestLocation(ctx, bucket)
+	if err != nil {
+		return nil, err
+	}
+	// The string in the second arg does not matter since we are using the in-memory
+	// provider.
+	m, err := manifestLocation.Provider().GetCurrentManifest(ctx, "")
+	if err != nil {
+		return nil, err
+	}
+
+	var cliRelease string
+	for _, value := range m.Packages {
+		if value.Name() != "automate-cli" {
+			continue
+		} else {
+			cliRelease = value.Release()
+			break
+		}
+	}
+
 	desc := &api.BackupDescription{
-		Id:     t.TaskID(),
-		Sha256: sha256,
+		Id:            t.TaskID(),
+		Sha256:        sha256,
+		ServerVersion: m.Build,
+		CliVersion:    cliRelease,
 	}
 	return desc, nil
 }

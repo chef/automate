@@ -457,6 +457,7 @@ func maybeS(value int64) string {
 }
 
 func runShowBackupCmd(cmd *cobra.Command, args []string) error {
+	// TODO (yzl): allow either a path to a backup or a backup id to be passed in
 	id, err := api.NewBackupTaskFromID(args[0])
 	if err != nil {
 		return status.Wrapf(
@@ -480,6 +481,15 @@ func runShowBackupCmd(cmd *cobra.Command, args []string) error {
 	// backup integration test uses `cut` to get the SHA256 from this output. You
 	// will need to fix that if you modify this.
 	writer.Bodyf("SHA256: %s", res.Description.Sha256)
+	writer.Bodyf("Build: %s", res.Description.CliVersion)
+	writer.Bodyf("CLI version: %s", res.Description.ServerVersion)
+	writer.Titlef("Version running `backup show`")
+	printClientVersion()
+	err = printServerVersion()
+
+	if err != nil {
+		return err
+	}
 	return nil
 }
 

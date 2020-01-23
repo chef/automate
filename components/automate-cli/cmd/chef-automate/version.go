@@ -42,12 +42,11 @@ func runVersionCmd(cmd *cobra.Command, args []string) error {
 func printClientVersion() {
 	// The client version is built in and hence always available.
 	if verbose {
-		writer.Println("CLI")
-		writer.Println("===")
-		writer.Printf("CLI Build: %s\n", version.BuildTime)
-		writer.Printf("Git SHA: %s\n", version.GitSHA)
+		writer.Title("CLI")
+		writer.Bodyf("CLI Build: %s", version.BuildTime)
+		writer.Bodyf("Git SHA: %s", version.GitSHA)
 	} else {
-		writer.Printf("CLI Build: %s\n", version.BuildTime)
+		writer.Bodyf("CLI Build: %s", version.BuildTime)
 	}
 }
 
@@ -76,20 +75,16 @@ func printServerVersion() error {
 	}
 
 	if verbose {
-		writer.Printf("\n")
-		writer.Println("Server")
-		writer.Println("======")
-		// TODO: (yzl) When we know what we want to display for Version, update it to be something other
-		// than the timestamp.
-		writer.Printf("Server Build: %s\n", response.BuildTimestamp)
-		writer.Printf("Git SHA: %s\n", response.BuildSha)
+		writer.Title("Server")
+		writer.Bodyf("Server Build: %s", response.BuildTimestamp)
+		writer.Bodyf("Git SHA: %s", response.BuildSha)
 		err := printUpgradeStatus()
 		if err != nil {
 			return err
 		}
 	} else {
 		// get a server version
-		writer.Printf("Server Build: %s\n", response.BuildTimestamp)
+		writer.Bodyf("Server Build: %s", response.BuildTimestamp)
 	}
 	status.GlobalResult = versionResult{
 		ClientVersion:   version.BuildTime,
@@ -126,7 +121,7 @@ func printUpgradeStatus() error {
 		// I don't think we can get here without hitting the err != nil above first
 		upgradeStatus = "could not be determined!"
 	}
-	writer.Printf("Upgrade status: %s (Run `chef-automate upgrade status` for more detail)\n", upgradeStatus)
+	writer.Bodyf("Upgrade status: %s (Run `chef-automate upgrade status` for more detail)\n", upgradeStatus)
 	return nil
 }
 
