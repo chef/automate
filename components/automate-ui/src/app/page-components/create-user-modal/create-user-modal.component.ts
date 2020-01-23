@@ -135,7 +135,7 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
       this.createUserForm.get(field).dirty);
   }
 
-  leftInputEmpty(field: string): boolean {
+  hasAttemptedInputWithError(field: string): boolean {
     return ((this.createUserForm.get(field).hasError('required') &&
       this.createUserForm.get(field).touched) ||
       (this.createUserForm.get(field).hasError('pattern') &&
