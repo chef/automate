@@ -11,7 +11,7 @@
     [ngClass]="{'active': selectionCountActive }">{{ selectionCount }}</span>
   <chef-icon *ngIf="dropdownCaretVisible" aria-hidden>keyboard_arrow_down</chef-icon>
 </button>
-<chef-click-outside omit="dropdown-label" (clickOutside)="handleEscape()">
+<chef-click-outside omit="dropdown-label" (clickOutside)="handleEscape()" *ngIf="dropdownActive">
   <chef-dropdown class="dropdown" id="projects-filter-dropdown" [attr.visible]="dropdownActive" (keydown.esc)="handleEscape()">
 
       <div class="dropdown-body">

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnChanges, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
@@ -38,8 +38,12 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   // Emits a project that changed as a result of a check or uncheck.
   @Output() onProjectChecked = new EventEmitter<ProjectChecked>();
 
+  // filteredProjects is merely a container to hold the projectsArray
+  // that can be altered
+  public filteredProjects: ProjectChecked[] = [];
   public active = false;
   public label = UNASSIGNED_PROJECT_ID;
+  public filterValue = '';
 
   ngOnInit(): void {
     if (this.projectsUpdated) { // an optional setting
@@ -49,8 +53,12 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     }
   }
 
-  ngOnChanges(): void {
+  ngOnChanges(changes: SimpleChanges): void {
     this.updateLabel();
+    // only update the projects list on initialization/the first change
+    if (changes.projects && changes.projects.firstChange) {
+      this.filteredProjects = this.projectsArray;
+    }
   }
 
   get projectsArray(): ProjectChecked[] {
@@ -61,6 +69,10 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     event.stopPropagation();
     if (this.disabled) {
       return;
+    }
+    if (!this.active) {
+      this.filterValue = '';
+      this.filteredProjects = this.projectsArray;
     }
 
     this.active = !this.active;
@@ -76,6 +88,16 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     if (this.active) {
       this.active = false;
     }
+  }
+
+  handleFilterKeyUp(): void {
+    this.filteredProjects = this.filterProjects(this.filterValue);
+  }
+
+  filterProjects(value: string): ProjectChecked[]  {
+    return this.projectsArray.filter(project =>
+      project.id.toLowerCase().indexOf(value.toLowerCase()) > -1
+    );
   }
 
   moveFocus(event: KeyboardEvent): void {
