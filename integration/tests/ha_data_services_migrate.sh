@@ -65,3 +65,11 @@ do_upgrade() {
         "$test_backup_id"
 }
 
+do_test_upgrade() {
+    do_test_upgrade_default
+    # doing the patch again shouldn't change anything because
+    # the restore should have patched the config
+    log_info "Making sure patch config doesn't change anything"
+    chef-automate config patch /services/ha_backend.toml
+    do_test_upgrade_default
+}

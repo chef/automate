@@ -107,7 +107,7 @@ func TestMergeAndValidateNewUserOverrideConfig(t *testing.T) {
 		require.Equal(t, expectedCfg, cfg)
 	})
 
-	t.Run("config patch", func(t *testing.T) {
+	t.Run("config patch 1", func(t *testing.T) {
 		cfg := newValidOverrideConfig()
 		rt := NewBackupRestoreTask()
 		rt.S3BackupLocation = &S3BackupLocation{
@@ -156,6 +156,29 @@ func TestMergeAndValidateNewUserOverrideConfig(t *testing.T) {
 				},
 			},
 		}
+		expectedCfg.Global.V1.Log = &config.Log{
+			Level: w.String("debug"),
+		}
+		err := MergeAndValidateNewUserOverrideConfig(cfg, rt)
+		require.NoError(t, err)
+		require.Equal(t, expectedCfg, cfg)
+	})
+
+	t.Run("config patch 2", func(t *testing.T) {
+		cfg := newValidOverrideConfig()
+		rt := NewBackupRestoreTask()
+
+		rt.PatchConfig = &dc.AutomateConfig{
+			Global: config.NewGlobalConfig(),
+		}
+		rt.PatchConfig.Global.V1.Log = &config.Log{
+			Level: w.String("debug"),
+		}
+
+		// Make sure the patch config overrides the default backup config
+		// from the restore task
+		expectedCfg := newValidOverrideConfig()
+
 		expectedCfg.Global.V1.Log = &config.Log{
 			Level: w.String("debug"),
 		}
