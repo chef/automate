@@ -191,7 +191,7 @@
   -->
   <div class="empty-status" *ngIf="(serviceGroupsStatus$ | async) === 'loadingSuccess' && sgHealthSummary.total === 0">
     <h3>Add service groups</h3>
-    <p>Contact your account representative to find out more about adding service groups.</p>
+    <p>Find out more about <a href="https://automate.chef.io/docs/applications-setup/" target="_blank">adding service groups.</a></p>
   </div>
   <div class="empty-status" *ngIf="(serviceGroupsStatus$ | async) === 'loadingSuccess' && sgHealthSummary.total !== 0 && (serviceGroupsList$ | async).length === 0">
     <h3>None of the service groups returned {{ selectedStatus$ | async }}</h3>
