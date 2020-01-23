@@ -203,7 +203,7 @@ func RunMigrations(backend ES2Backend, statusSrv *statusserver.Server) error {
 		return errMsg
 	}
 
-	// Migrates A2 version 5 indices to the current version
+	// Migrates A2 version 6 indices to the current version
 	a2V6Indices := A2V6ElasticSearchIndices{backend: &backend}
 	err = backend.migrate(a2V6Indices, statusSrv, statusserver.MigrationLabelESa2v6)
 	if err != nil {
