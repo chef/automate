@@ -645,26 +645,55 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	controlTermsAgg.SubAggregation("title",
 		elastic.NewTermsAggregation().Field("profiles.controls.title").Size(1))
 
-	controlTermsAgg.SubAggregation("skipped",
-		elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "skipped")))
+	waivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
+	passedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
+		MustNot(waivedQuery))
 
-	controlTermsAgg.SubAggregation("failed",
-		elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "failed")))
+	failedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
+		MustNot(waivedQuery))
 
-	controlTermsAgg.SubAggregation("passed",
-		elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.controls.status", "passed")))
+	skippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "skipped")).
+		MustNot(waivedQuery))
 
-	// Can be up to four waived_str
-	controlTermsAgg.SubAggregation("waived_str",
-		elastic.NewTermsAggregation().Field("profiles.controls.waived_str").Size(4))
+	waivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
-	// We are getting two `expiration_date` buckets to know if we have a mix of waived nodes
-	controlTermsAgg.SubAggregation("waiver_data_expiration_date",
-		elastic.NewTermsAggregation().Field("profiles.controls.waiver_data.expiration_date").Size(2))
+	controlTermsAgg.SubAggregation("skipped", skippedFilter)
+	controlTermsAgg.SubAggregation("failed", failedFilter)
+	controlTermsAgg.SubAggregation("passed", passedFilter)
+	controlTermsAgg.SubAggregation("waived", waivedFilter)
 
-	// We are getting two `justification` buckets to know if we have a mix of waived nodes
-	controlTermsAgg.SubAggregation("waiver_data_justification",
-		elastic.NewTermsAggregation().Field("profiles.controls.waiver_data.justification").Size(2))
+	waivedStrAgg := elastic.NewTermsAggregation().Field("profiles.controls.waived_str").Size(4) //there are 4 different waived_str states
+	waivedButNotRunQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes")
+	waivedAndRunQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes_run")
+	waiverDataWaivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
+	waiverDataPassedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
+		Must(waivedAndRunQuery))
+
+	waiverDataFailedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Must(elastic.NewTermQuery("profiles.controls.status", "failed")).
+		Must(waivedAndRunQuery))
+
+	waiverDataSkippedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
+		Should(elastic.NewTermQuery("profiles.controls.status", "skipped")).
+		Should(waivedButNotRunQuery))
+
+	waiverDataWaivedFilter := elastic.NewFilterAggregation().Filter(waiverDataWaivedQuery)
+
+	waiverDataJustificationAgg := elastic.NewTermsAggregation().Field("profiles.controls.waiver_data.justification").Size(reporting.ESize)
+	waiverDataJustificationAgg.SubAggregation("skipped", waiverDataSkippedFilter)
+	waiverDataJustificationAgg.SubAggregation("failed", waiverDataFailedFilter)
+	waiverDataJustificationAgg.SubAggregation("passed", waiverDataPassedFilter)
+	waiverDataJustificationAgg.SubAggregation("waived", waiverDataWaivedFilter)
+
+	waiverDataExpirationDateAgg := elastic.NewTermsAggregation().Field("profiles.controls.waiver_data.expiration_date").Size(reporting.ESize)
+	waiverDataExpirationDateAgg.SubAggregation("justification", waiverDataJustificationAgg)
+	waivedStrAgg.SubAggregation("expiration_date", waiverDataExpirationDateAgg)
+
+	controlTermsAgg.SubAggregation("waived_str", waivedStrAgg)
 
 	controlTermsAgg.SubAggregation("end_time", elastic.NewReverseNestedAggregation().SubAggregation("most_recent_report",
 		elastic.NewTermsAggregation().Field("end_time").Size(1)))
@@ -747,6 +776,8 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		logrus.Errorf("%s search failed", myName)
 		return nil, err
 	}
+
+	LogQueryPartMin(esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
 	logrus.Debugf("Search query took %d milliseconds\n", searchResult.TookInMillis)
 

@@ -343,6 +343,42 @@ describe File.basename(__FILE__) do
     assert_equal_json_content(expected_data, actual_data)
   end
 
+
+  it "control list items with a size of 4 filtered by control_tag" do
+    actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
+        filters: [
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-01T23:59:59Z']),
+            Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+        ],
+        size: 40
+    )
+    expected_data = {
+        "controlItems" =>
+            [
+                {
+                    "id" => "apache-01",
+                    "title" => "Apache should be running",
+                    "profile" => {
+                        "title" => "DevSec Apache Baseline",
+                        "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a9",
+                        "version" => "2.0.1"
+                    },
+                    "impact" => 1,
+                    "endTime" => "2018-03-04T09:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {
+                            "total" => 1
+                        },
+                        "failed" => {}
+                    }
+                }
+            ]
+    }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
   it "control list items filtered by environment and platform" do
     actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
         filters: [
