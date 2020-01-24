@@ -113,7 +113,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
-            "description": "Applies search and status filters, in the format of ` + "`" + `fieldname:value` + "`" + ` or ` + "`" + `status:value` + "`" + `.",
+            "description": "Applies search and status filters, in the format of ` + "`" + `fieldname:value` + "`" + ` or ` + "`" + `status:value` + "`" + `.\nValid filter fieldnames are:\n* ` + "`" + `origin` + "`" + `: origin component of the service's package identifier\n* ` + "`" + `service` + "`" + `: the name component of the service's package identifier\n* ` + "`" + `version` + "`" + `: the version number component of the service's package identifier\n* ` + "`" + `buildstamp` + "`" + `: the build timestamp (also called \"release\") of the service's package identifier\n* ` + "`" + `channel` + "`" + `: the package channel to which the service subscribes for updates\n* ` + "`" + `application` + "`" + `: the application field of the service's event-stream metadata\n* ` + "`" + `environment` + "`" + `: the environment field of the service's event-stream metadata\n* ` + "`" + `site` + "`" + `: the site field of the service's event-stream metadata\n* ` + "`" + `group` + "`" + `: the suffix of the service group name\nService groups may also be filtered by ` + "`" + `status` + "`" + `, which refers to a service's\nconnected/disconnected state or it's most recent healthcheck result. Valid\nstatus filter parameters are:\n* ` + "`" + `status:disconnected` + "`" + `: only return service groups that contain at least\n  one service in the disconnected state\n* ` + "`" + `status:critical` + "`" + `: only return service groups that contain at least one\n  service that is returning a \"critical\" healthcheck result\n* ` + "`" + `status:critical` + "`" + `: only return service groups that contain at least one\n  service that is returning a \"critical\" healthcheck result\n* ` + "`" + `status:unknown` + "`" + `: only return service groups that contain at least one\n  service that is returning an \"unknown\" healthcheck result and no\n  services returning \"critical\" results\n* ` + "`" + `status:warning` + "`" + `: only return service groups that contain at least one\n  service that is returning a \"warning\" healthcheck result and have no\n  services returning \"critical\" or \"unknown\" results\n* ` + "`" + `status:ok` + "`" + `: only return service groups where all services are returning\n  \"ok\" health check results.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -221,7 +221,7 @@ func init() {
           },
           {
             "name": "filter",
-            "description": "Applies filters, in the format of ` + "`" + `fieldname:value` + "`" + `.",
+            "description": "Applies filters, in the format of ` + "`" + `fieldname:value` + "`" + `.\nSee documentation for ServicesReq for valid filter parameters.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -252,7 +252,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
-            "description": "Applies search filters, in the format of ` + "`" + `fieldname:value` + "`" + `.",
+            "description": "Applies search filters, in the format of ` + "`" + `fieldname:value` + "`" + `.\nSee the documentation for ServiceGroupsReq for valid filter parameters.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -283,7 +283,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
-            "description": "Applies search filters, in the format of ` + "`" + `fieldname:value` + "`" + `.",
+            "description": "Applies search filters, in the format of ` + "`" + `fieldname:value` + "`" + `.\nValid filter fieldnames are:\n* ` + "`" + `origin` + "`" + `: origin component of the service's package identifier\n* ` + "`" + `service` + "`" + `: the name component of the service's package identifier\n* ` + "`" + `version` + "`" + `: the version number component of the service's package identifier\n* ` + "`" + `buildstamp` + "`" + `: the build timestamp (also called \"release\") of the service's package identifier\n* ` + "`" + `channel` + "`" + `: the package channel to which the service subscribes for updates\n* ` + "`" + `application` + "`" + `: the application field of the service's event-stream metadata\n* ` + "`" + `environment` + "`" + `: the environment field of the service's event-stream metadata\n* ` + "`" + `site` + "`" + `: the site field of the service's event-stream metadata\n* ` + "`" + `group` + "`" + `: the suffix of the service group name\nServices may also be filtered by ` + "`" + `status` + "`" + `, which refers to a service's\nconnected/disconnected state or it's most recent healthcheck result. Valid\nstatus filter parameters are:\n* ` + "`" + `status:disconnected` + "`" + `: only return services in the disconnected state\n* ` + "`" + `status:critical` + "`" + `: only return services that are returning a \"critical\"\n  healthcheck result\n* ` + "`" + `status:unknown` + "`" + `: only return services that are returning an \"unknown\"\n  healthcheck result\n* ` + "`" + `status:warning` + "`" + `: only return services that are returning a \"warning\"\n  healthcheck result\n* ` + "`" + `status:ok` + "`" + `: only return services that are returning \"ok\" health check\n  results.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -363,7 +363,7 @@ func init() {
           },
           {
             "name": "filter",
-            "description": "Applies filters, in the format of ` + "`" + `fieldname:value` + "`" + `.",
+            "description": "Applies filters, in the format of ` + "`" + `fieldname:value` + "`" + `.\nSee documentation for ServicesReq for valid filter parameters.",
             "in": "query",
             "required": false,
             "type": "array",

@@ -307,6 +307,28 @@ service ApplicationsService {
 // Request message for listing services.
 message ServicesReq {
   // Applies search filters, in the format of `fieldname:value`.
+  // Valid filter fieldnames are:
+  // * `origin`: origin component of the service's package identifier
+  // * `service`: the name component of the service's package identifier
+  // * `version`: the version number component of the service's package identifier
+  // * `buildstamp`: the build timestamp (also called "release") of the service's package identifier
+  // * `channel`: the package channel to which the service subscribes for updates
+  // * `application`: the application field of the service's event-stream metadata
+  // * `environment`: the environment field of the service's event-stream metadata
+  // * `site`: the site field of the service's event-stream metadata
+  // * `group`: the suffix of the service group name
+  // Services may also be filtered by `status`, which refers to a service's
+  // connected/disconnected state or it's most recent healthcheck result. Valid
+  // status filter parameters are:
+  // * `status:disconnected`: only return services in the disconnected state
+  // * `status:critical`: only return services that are returning a "critical"
+  //   healthcheck result
+  // * `status:unknown`: only return services that are returning an "unknown"
+  //   healthcheck result
+  // * `status:warning`: only return services that are returning a "warning"
+  //   healthcheck result
+  // * `status:ok`: only return services that are returning "ok" health check
+  //   results
   repeated string filter = 1;
   // Applies pagination parameters.
   common.query.Pagination pagination = 2;
@@ -321,6 +343,7 @@ message ServicesDistinctValuesReq {
   // Query value, supports wildcards (* and ?).
   string query_fragment = 2;
   // Applies filters, in the format of `fieldname:value`.
+  // See documentation for ServicesReq for valid filter parameters
   repeated string filter = 3;
 }
 
@@ -333,6 +356,7 @@ message ServicesBySGReq {
   // Applies sorting parameters.
   common.query.Sorting sorting = 3;
   // Applies filters, in the format of `fieldname:value`.
+  // See documentation for ServicesReq for valid filter parameters
   repeated string filter = 5;
 }
 
@@ -455,12 +479,40 @@ message Service {
 // Request message for GetServiceGroupsHealthCounts
 message ServiceGroupsHealthCountsReq {
   // Applies search filters, in the format of `fieldname:value`.
+  // See the documentation for ServiceGroupsReq for valid filter parameters.
   repeated string filter = 1;
 }
 
 // Request message for GetServiceGroups
 message ServiceGroupsReq {
   // Applies search and status filters, in the format of `fieldname:value` or `status:value`.
+  // Valid filter fieldnames are:
+  // * `origin`: origin component of the service's package identifier
+  // * `service`: the name component of the service's package identifier
+  // * `version`: the version number component of the service's package identifier
+  // * `buildstamp`: the build timestamp (also called "release") of the service's package identifier
+  // * `channel`: the package channel to which the service subscribes for updates
+  // * `application`: the application field of the service's event-stream metadata
+  // * `environment`: the environment field of the service's event-stream metadata
+  // * `site`: the site field of the service's event-stream metadata
+  // * `group`: the suffix of the service group name
+  // Service groups may also be filtered by `status`, which refers to a service's
+  // connected/disconnected state or it's most recent healthcheck result. Valid
+  // status filter parameters are:
+  // * `status:disconnected`: only return service groups that contain at least
+  //   one service in the disconnected state
+  // * `status:critical`: only return service groups that contain at least one
+  //   service that is returning a "critical" healthcheck result
+  // * `status:critical`: only return service groups that contain at least one
+  //   service that is returning a "critical" healthcheck result
+  // * `status:unknown`: only return service groups that contain at least one
+  //   service that is returning an "unknown" healthcheck result and no
+  //   services returning "critical" results
+  // * `status:warning`: only return service groups that contain at least one
+  //   service that is returning a "warning" healthcheck result and have no
+  //   services returning "critical" or "unknown" results
+  // * `status:ok`: only return service groups where all services are returning
+  //   "ok" health check results
   repeated string filter = 1;
   // Pagination parameters for service groups list.
   common.query.Pagination pagination = 2;
