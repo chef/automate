@@ -154,6 +154,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
   }
 
+  public handlePasswordInput(): void {
+    this.passwordForm.get('confirmPassword').updateValueAndValidity();
+  }
+
   private savePasswordForUser(): void {
     const password = this.passwordForm.get('newPassword').value;
     this.store.dispatch(new UpdatePasswordUser({ ...this.user, password }));
