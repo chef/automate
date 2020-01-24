@@ -19,14 +19,14 @@ service Policies {
   Create a new policy
 
   Creates a new IAM policy used to control permissions in Automate.
-  A policy is composed of one or more statements that act on a set of members.
+  A policy is composed of one or more statements that grant permissions to a set of members.
   Each statement contains a role as well as a list of projects.
 
   The role defines a set of actions that the statement is scoped to.
   The project list defines the set of resources that the statement is scoped to.
   Pass `"projects": ["*"]` to scope a statement to every project.
 
-  The top-level projects list for the policy defines which project(s) the policy belongs to,
+  The policy's top-level projects list defines which project(s) the policy belongs to, for filtering policies by their projects,
   whereas the statement level projects list defines which project(s) the statement applies to.
 
   This example creates a new policy in the (unassigned) project that grants the viewer role
@@ -155,7 +155,7 @@ service Policies {
   Remove policy members
 
   Remove specific members from the member list for a specific policy. Silently ignores
-  members that are not part of the member list.
+  members that are not already part of the member list.
   */
   rpc RemovePolicyMembers (RemovePolicyMembersReq) returns (RemovePolicyMembersResp) {
     option (google.api.http) = {
@@ -187,7 +187,7 @@ service Policies {
 
   Creates a new role to be used in the IAM policies that control permissions in Automate.
 
-  A role defines the scope for a set of actions.
+  A role defines the scope of actions in a policy statement.
   */
   rpc CreateRole (CreateRoleReq) returns (CreateRoleResp) {
     option (google.api.http) = {
@@ -258,7 +258,7 @@ service Policies {
 
   Creates a new project to be used in the IAM policies that control permissions in Automate.
 
-  A project defines the scope for a set of resources. A resource can be in more than one project.
+  A project defines the scope of resources in a policy statement. Resources can be in more than one project.
   */
   rpc CreateProject (CreateProjectReq) returns (CreateProjectResp) {
     option (google.api.http) = {
