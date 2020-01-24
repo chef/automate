@@ -339,6 +339,12 @@ func DefaultSpecs(serviceNames []string) []Spec {
 		{
 			Name:          "applications-service",
 			WriteMetadata: true,
+			SyncDbsV2: []DatabaseDumpOperationV2{
+				{
+					Name: "chef_applications_service",
+					User: "applications",
+				},
+			},
 		},
 		// NOTE(ssd) 2018-04-16:
 		// The following services don't have anything to back
