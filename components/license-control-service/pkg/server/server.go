@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/timestamp"
@@ -155,8 +156,9 @@ func (s *LicenseControlServer) Update(ctx context.Context, req *lc.UpdateRequest
 	)
 
 	if !req.Force && ptypes.TimestampNow().GetSeconds() > licensedPeriod.end.GetSeconds() {
-		msg := fmt.Sprintf("Rejecting license ID %v, expired at %v; set force=true to override",
-			license.Id, licensedPeriod.end)
+		msg := fmt.Sprintf("Rejecting license ID %v, expired at %s; set force=true to override",
+			license.Id,
+			time.Unix(licensedPeriod.end.GetSeconds(), 0).UTC().Format(time.RFC3339))
 		logctx.Warn(msg)
 		return nil, status.Errorf(codes.InvalidArgument, msg)
 	}
