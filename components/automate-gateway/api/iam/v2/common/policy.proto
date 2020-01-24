@@ -32,6 +32,7 @@ message Statement {
         DENY = 1;
     }
     // Whether the statement allows or denies.
+    // One of `ALLOW`, or `DENY`, respectively.
     Effect effect = 1;
 
     // DEPRECATED: Actions defined inline. Use role instead.

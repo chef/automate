@@ -211,6 +211,7 @@ func (m *Policy) GetProjects() []string {
 
 type Statement struct {
 	// Whether the statement allows or denies.
+	// One of `ALLOW`, or `DENY`, respectively.
 	Effect Statement_Effect `protobuf:"varint,1,opt,name=effect,proto3,enum=chef.automate.api.iam.v2.Statement_Effect" json:"effect,omitempty"`
 	// DEPRECATED: Actions defined inline. Use role instead.
 	Actions []string `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`

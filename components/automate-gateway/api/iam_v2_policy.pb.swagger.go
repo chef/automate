@@ -75,7 +75,7 @@ func init() {
     },
     "/iam/v2/policies/{id}": {
       "get": {
-        "summary": "Get an policy",
+        "summary": "Get a policy",
         "operationId": "GetPolicy",
         "responses": {
           "200": {
@@ -98,7 +98,7 @@ func init() {
         ]
       },
       "delete": {
-        "summary": "Delete an policy",
+        "summary": "Delete a policy",
         "operationId": "DeletePolicy",
         "responses": {
           "200": {
@@ -613,7 +613,7 @@ func init() {
     },
     "/iam/v2beta/policies/{id}": {
       "get": {
-        "summary": "Get an policy",
+        "summary": "Get a policy",
         "operationId": "GetPolicy2",
         "responses": {
           "200": {
@@ -636,7 +636,7 @@ func init() {
         ]
       },
       "delete": {
-        "summary": "Delete an policy",
+        "summary": "Delete a policy",
         "operationId": "DeletePolicy2",
         "responses": {
           "200": {
@@ -1479,7 +1479,7 @@ func init() {
       "properties": {
         "effect": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Statement.Effect",
-          "description": "Whether the statement allows or denies."
+          "description": "Whether the statement allows or denies.\nOne of ` + "`" + `ALLOW` + "`" + `, or ` + "`" + `DENY` + "`" + `, respectively."
         },
         "actions": {
           "type": "array",
