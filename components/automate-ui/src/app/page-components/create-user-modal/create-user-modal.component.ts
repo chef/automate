@@ -125,6 +125,13 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
     }
   }
 
+  handlePasswordInput(event: KeyboardEvent): void {
+    this.createUserForm.get('confirmPassword').updateValueAndValidity();
+    if (!this.isNavigationKey(event)) {
+      this.passwordError = false;
+    }
+  }
+
   handleClose(): void {
     this.modifyUsername = false;
   }

@@ -45,7 +45,7 @@
         <chef-form-field>
           <label>
             Password <span aria-hidden="true">*</span>
-            <input chefInput formControlName="password" type="password" />
+            <input chefInput formControlName="password" type="password" (keyup)="handlePasswordInput($event)"/>
           </label>
           <chef-error *ngIf="hasAttemptedInputWithError('password')">
             Password is required.
