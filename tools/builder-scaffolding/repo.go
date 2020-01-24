@@ -14,8 +14,23 @@ import (
 )
 
 var repoCmd = &cobra.Command{
-	Use:  "repo",
-	RunE: runRepo,
+	Use: "repo",
+}
+
+var snapshotCmd = &cobra.Command{
+	Use:  "snapshot",
+	RunE: runSnapshot,
+}
+
+var removeSnapshotCmd = &cobra.Command{
+	Use:  "remove",
+	Args: cobra.ExactArgs(1),
+	RunE: runRemoveSnapshot,
+}
+
+func init() {
+	repoCmd.AddCommand(snapshotCmd)
+	repoCmd.AddCommand(removeSnapshotCmd)
 }
 
 func backupLocationSpec(hostname string, rootCert []byte, secretStore secrets.SecretsReader) backup.LocationSpecification {
@@ -47,8 +62,7 @@ func bldrLocationSpec(hostname string, rootCert []byte, secretStore secrets.Secr
 	return spec
 }
 
-func runRepo(c *cobra.Command, args []string) error {
-	ctx := context.Background()
+func artifactRepo() (*backup.ArtifactRepo, backup.Bucket) {
 	ipaddr, err := outgoingIPWithUDP()
 	if err != nil {
 		logrus.WithError(err).Fatal("Could not get ip")
@@ -64,7 +78,13 @@ func runRepo(c *cobra.Command, args []string) error {
 	bldrBucket := bldrSpec.ToBucket("")
 	backupSpec := backupLocationSpec(hostname, rootCert, secretStore)
 
-	artifactRepo := backup.NewArtifactRepo(backupSpec)
+	return backup.NewArtifactRepo(backupSpec), bldrBucket
+}
+
+func runSnapshot(c *cobra.Command, args []string) error {
+	ctx := context.Background()
+
+	artifactRepo, bldrBucket := artifactRepo()
 	objects, _, err := bldrBucket.List(ctx, "", false)
 	if err != nil {
 		logrus.WithError(err).Fatal("failed to list builder artifacts")
@@ -83,6 +103,17 @@ func runRepo(c *cobra.Command, args []string) error {
 	_, err = artifactRepo.Snapshot(ctx, snapshotName, bldrBucket, requiredArtifactsStream)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to snapshot")
+	}
+	return nil
+}
+
+func runRemoveSnapshot(c *cobra.Command, args []string) error {
+	ctx := context.Background()
+
+	artifactRepo, _ := artifactRepo()
+
+	if err := artifactRepo.Remove(ctx, args[0]); err != nil {
+		logrus.WithError(err).Fatal("failed to remove snapshot")
 	}
 	return nil
 }

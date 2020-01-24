@@ -88,3 +88,50 @@ func (m *simpleBulkUploader) doUpload(ctx context.Context, req BlobUploadRequest
 
 	return nil
 }
+
+type BulkDeleteIterator interface {
+	// Next will return objects that need to be delete
+	Next() (string, error)
+}
+
+type BulkDeleter interface {
+	Delete(context.Context, BulkDeleteIterator) error
+}
+
+type simpleBulkDeleter struct {
+	prefix string
+	bkt    Bucket
+}
+
+func NewBulkDeleter(bkt Bucket, prefix string) BulkDeleter {
+	return &simpleBulkDeleter{
+		prefix: prefix,
+		bkt:    bkt,
+	}
+}
+
+func (m *simpleBulkDeleter) Delete(ctx context.Context, iterator BulkDeleteIterator) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	for {
+		req, err := iterator.Next()
+		if err != nil {
+			if err == io.EOF {
+				break
+			}
+			logrus.WithError(err).Error("Bulk delete failed")
+			return err
+		}
+		m.doDelete(ctx, req)
+	}
+	logrus.Info("Finished Delete")
+
+	return nil
+}
+
+func (m *simpleBulkDeleter) doDelete(ctx context.Context, keyToDelete string) error {
+	key := path.Join(m.prefix, keyToDelete)
+	logrus.Infof("Deleting Artifact %s", key)
+	return m.bkt.Delete(ctx, []string{key})
+}

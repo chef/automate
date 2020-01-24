@@ -8,6 +8,7 @@ import (
 	"os"
 	"strings"
 
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 )
 
@@ -166,7 +167,36 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string,
 	return nil, nil
 }
 
-func (repo *ArtifactRepo) ListArtifacts(ctx context.Context) ArtifactStream {
+func (repo *ArtifactRepo) Remove(ctx context.Context, name string) error {
+	snapshotFilesReader, err := repo.openSnapshotFile(ctx, name)
+	if err != nil {
+		return err
+	}
+
+	snapshotFiles := LineReaderStream(snapshotFilesReader)
+	defer snapshotFiles.Close()
+
+	// TODO[integrity]: We should really 2 phase commit this change. As it stands now, if
+	// we remove this file and then fail to remove the artifacts, they will be
+	// leaked and we'll have no way to clean them up
+	if err := repo.removeSnapshotFile(ctx, name); err != nil {
+		return err
+	}
+
+	// Get the artifacts in all the snapshots excluding the one we're trying to delete
+	remainingSnapshotsFiles := repo.ListArtifacts(ctx, name)
+	defer remainingSnapshotsFiles.Close()
+
+	// Remove artifacts from the snapshot we're trying to exist which exist in other
+	// snapshots
+	filesToDelete := Sub(snapshotFiles, remainingSnapshotsFiles)
+	defer filesToDelete.Close()
+
+	bulkDeleter := NewBulkDeleter(repo.artifactsRoot, "")
+	return bulkDeleter.Delete(ctx, filesToDelete)
+}
+
+func (repo *ArtifactRepo) ListArtifacts(ctx context.Context, excludedSnapshots ...string) ArtifactStream {
 	snapshots, _, err := repo.snapshotsRoot.List(ctx, "", false)
 	if err != nil {
 		return ErrStream(err)
@@ -178,6 +208,9 @@ func (repo *ArtifactRepo) ListArtifacts(ctx context.Context) ArtifactStream {
 			continue
 		}
 		name := strings.TrimSuffix(snapshot.Name, ".snapshot")
+		if stringutils.SliceContains(excludedSnapshots, name) {
+			continue
+		}
 		reader, err := repo.openSnapshotFile(ctx, name)
 		if err != nil {
 			for _, s := range streams {
@@ -221,4 +254,11 @@ func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (io
 	}
 
 	return tmpFile, nil
+}
+
+func (repo *ArtifactRepo) removeSnapshotFile(ctx context.Context, name string) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	return repo.snapshotsRoot.Delete(ctx, []string{fmt.Sprintf("%s.snapshot", name)})
 }

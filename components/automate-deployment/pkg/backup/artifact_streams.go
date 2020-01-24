@@ -3,6 +3,7 @@ package backup
 import (
 	"bufio"
 	"io"
+	"strings"
 
 	"go.uber.org/multierr"
 )
@@ -106,15 +107,23 @@ type lineReaderStream struct {
 }
 
 func (s *lineReaderStream) Next() (string, error) {
-	if s.finished {
-		return "", io.EOF
-	}
-	s.finished = !s.scanner.Scan()
+	for {
+		if s.finished {
+			return "", io.EOF
+		}
 
-	if err := s.scanner.Err(); err != nil {
-		return "", err
+		s.finished = !s.scanner.Scan()
+
+		if err := s.scanner.Err(); err != nil {
+			return "", err
+		}
+		txt := strings.TrimSpace(s.scanner.Text())
+		if txt == "" {
+			continue
+		}
+		return txt, nil
 	}
-	return s.scanner.Text(), nil
+
 }
 
 func (s *lineReaderStream) Close() error {
