@@ -386,21 +386,7 @@ describe File.basename(__FILE__) do
                             "critical" => 1
                         },
                         "waived" => {}
-                    },
-                    "waivers" => [
-                        {
-                            "waivedStr" => "no_expired",
-                            "expirationDate" => "1977-06-01",
-                            "justification" => "Necessity",
-                            "waiverSummary" =>
-                                {
-                                    "passed" => {},
-                                    "skipped" => {},
-                                    "failed" => {},
-                                    "waived" => {}
-                                }
-                        }
-                    ]
+                    }
                 }
             ]
     }
@@ -433,149 +419,202 @@ describe File.basename(__FILE__) do
 
     expected_data = {
         "controlItems" =>
-            [{
-                 "id" => "pro1-con1",
-                 "title" => "Profile 1 - Control 1",
-                 "profile" => {
-                     "title" => "My Profile 1 title",
-                     "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
-                     "version" => "1.0.1"
-                 },
-                 "impact" => 0.80000001,
-                 "endTime" => "2018-04-01T10:18:41Z",
-                 "controlSummary" => {
-                     "total" => 1,
-                     "passed" => {},
-                     "skipped" => {},
-                     "failed" => {},
-                     "waived" => {"total" => 1}},
-                 "waivers" =>
-                     [{"waivedStr" => "yes_run",
-                       "justification" => "Sound reasoning",
-                       "waiverSummary" =>
-                           {"passed" => {},
-                            "skipped" => {},
-                            "failed" => {"total" => 1},
-                            "waived" => {"total" => 1}}}]},
-             {
-                 "id" => "pro1-con2",
-                 "title" => "Profile 1 - Control 2",
-                 "profile" => {
-                     "title" => "My Profile 1 title",
-                     "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
-                     "version" => "1.0.1"
-                 },
-                 "impact" => 0.89999998,
-                 "endTime" => "2018-04-01T10:18:41Z",
-                 "controlSummary" => {
-                     "total" => 1,
-                     "passed" => {},
-                     "skipped" => {},
-                     "failed" => {},
-                     "waived" => {"total" => 1}},
-                 "waivers" =>
-                     [{"waivedStr" => "yes_run",
-                       "justification" => "Sheer cleverness",
-                       "waiverSummary" =>
-                           {"passed" => {},
-                            "skipped" => {"total" => 1},
-                            "failed" => {},
-                            "waived" => {"total" => 1}}}]},
-             {
-                 "id" => "pro1-con3",
-                 "title" => "Profile 1 - Control 3",
-                 "profile" => {
-                     "title" => "My Profile 1 title",
-                     "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
-                     "version" => "1.0.1"
-                 },
-                 "impact" => 1,
-                 "endTime" => "2018-04-01T10:18:41Z",
-                 "controlSummary" => {
-                     "total" => 1,
-                     "passed" => {},
-                     "skipped" => {},
-                     "failed" => {
-                         "total" => 1,
-                         "critical" => 1
-                     },
-                     "waived" => {}},
-                 "waivers" =>
-                     [{"waivedStr" => "no_expired",
-                       "expirationDate" => "1977-06-01",
-                       "justification" => "Necessity",
-                       "waiverSummary" =>
-                           {"passed" => {}, "skipped" => {}, "failed" => {}, "waived" => {}}}]},
-             {
-                 "id" => "pro1-con4",
-                 "title" => "Profile 1 - Control 4",
-                 "profile" => {
-                     "title" => "My Profile 1 title",
-                     "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
-                     "version" => "1.0.1"
-                 },
-                 "impact" => 0.89999998,
-                 "endTime" => "2018-04-01T10:18:41Z",
-                 "controlSummary" => {
-                     "total" => 1,
-                     "passed" => {},
-                     "skipped" => {},
-                     "failed" => {},
-                     "waived" => {"total" => 1}},
-                 "waivers" =>
-                     [{"waivedStr" => "yes",
-                       "expirationDate" => "2025-06-01",
-                       "justification" => "Whimsy",
-                       "waiverSummary" =>
-                           {"passed" => {},
-                            "skipped" => {"total" => 1},
-                            "failed" => {},
-                            "waived" => {"total" => 1}}}]},
-             {
-                 "id" => "pro1-con5",
-                 "title" => "Profile 1 - Control 5",
-                 "profile" => {
-                     "title" => "My Profile 1 title",
-                     "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
-                     "version" => "1.0.1"
-                 },
-                 "impact" => 0.89999998,
-                 "endTime" => "2018-04-01T10:18:41Z",
-                 "controlSummary" => {
-                     "total" => 1,
-                     "passed" => {},
-                     "skipped" => {},
-                     "failed" => {
-                         "total" => 1,
-                         "critical" => 1
-                     },
-                     "waived" => {}
-                 }
-             },
-             {
-                 "id" => "pro2-con1",
-                 "title" => "Profile 2 - Control 1",
-                 "profile" => {
-                     "title" => "My Profile 2 title",
-                     "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
-                     "version" => "1.0.5"
-                 },
-                 "impact" => 0.80000001,
-                 "endTime" => "2018-04-01T10:18:41Z",
-                 "controlSummary" => {
-                     "total" => 2,
-                     "passed" => {},
-                     "skipped" => {},
-                     "failed" => {},
-                     "waived" => {"total" => 2}},
-                 "waivers" =>
-                     [{"waivedStr" => "yes_run",
-                       "justification" => "Sound reasoning",
-                       "waiverSummary" =>
-                           {"passed" => {},
-                            "skipped" => {},
-                            "failed" => {"total" => 2},
-                            "waived" => {"total" => 2}}}]}]}
+            [
+                {
+                    "id" => "pro1-con1",
+                    "title" => "Profile 1 - Control 1",
+                    "profile" => {
+                        "title" => "My Profile 1 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                        "version" => "1.0.1"
+                    },
+                    "impact" => 0.80000001,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {},
+                        "waived" => {
+                            "total" => 1
+                        }
+                    },
+                    "waivers" =>
+                        [{"waivedStr" => "yes_run",
+                          "justification" => "Sound reasoning",
+                          "waiverSummary" =>
+                              {
+                                  "passed" => {},
+                                  "skipped" => {},
+                                  "failed" => {
+                                      "total" => 1
+                                  },
+                                  "waived" => {
+                                      "total" => 1
+                                  }
+                              }
+                         }
+                        ]
+                },
+                {
+                    "id" => "pro1-con2",
+                    "title" => "Profile 1 - Control 2",
+                    "profile" => {
+                        "title" => "My Profile 1 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                        "version" => "1.0.1"
+                    },
+                    "impact" => 0.89999998,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {},
+                        "waived" => {
+                            "total" => 1
+                        }
+                    },
+                    "waivers" =>
+                        [
+                            {
+                                "waivedStr" => "yes_run",
+                                "justification" => "Sheer cleverness",
+                                "waiverSummary" =>
+                                    {
+                                        "passed" => {},
+                                        "skipped" => {
+                                            "total" => 1
+                                        },
+                                        "failed" => {},
+                                        "waived" => {
+                                            "total" => 1
+                                        }
+                                    }
+                            }
+                        ]
+                },
+                {
+                    "id" => "pro1-con3",
+                    "title" => "Profile 1 - Control 3",
+                    "profile" => {
+                        "title" => "My Profile 1 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                        "version" => "1.0.1"
+                    },
+                    "impact" => 1,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {
+                            "total" => 1,
+                            "critical" => 1
+                        },
+                        "waived" => {}
+                    }
+                },
+                {
+                    "id" => "pro1-con4",
+                    "title" => "Profile 1 - Control 4",
+                    "profile" => {
+                        "title" => "My Profile 1 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                        "version" => "1.0.1"
+                    },
+                    "impact" => 0.89999998,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {},
+                        "waived" => {
+                            "total" => 1
+                        }
+                    },
+                    "waivers" =>
+                        [
+                            {
+                                "waivedStr" => "yes",
+                                "expirationDate" => "2025-06-01",
+                                "justification" => "Whimsy",
+                                "waiverSummary" =>
+                                    {
+                                        "passed" => {},
+                                        "skipped" => {
+                                            "total" => 1
+                                        },
+                                        "failed" => {},
+                                        "waived" => {
+                                            "total" => 1
+                                        }
+                                    }
+                            }
+                        ]
+                },
+                {
+                    "id" => "pro1-con5",
+                    "title" => "Profile 1 - Control 5",
+                    "profile" => {
+                        "title" => "My Profile 1 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                        "version" => "1.0.1"
+                    },
+                    "impact" => 0.89999998,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {
+                            "total" => 1,
+                            "critical" => 1
+                        },
+                        "waived" => {}
+                    }
+                },
+                {
+                    "id" => "pro2-con1",
+                    "title" => "Profile 2 - Control 1",
+                    "profile" => {
+                        "title" => "My Profile 2 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
+                        "version" => "1.0.5"
+                    },
+                    "impact" => 0.80000001,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 2,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {},
+                        "waived" => {
+                            "total" => 2
+                        }
+                    },
+                    "waivers" =>
+                        [
+                            {
+                                "waivedStr" => "yes_run",
+                                "justification" => "Sound reasoning",
+                                "waiverSummary" =>
+                                    {
+                                        "passed" => {},
+                                        "skipped" => {},
+                                        "failed" => {
+                                            "total" => 2
+                                        },
+                                        "waived" => {
+                                            "total" => 2
+                                        }
+                                    }
+                            }
+                        ]
+                }
+            ]
+    }
     control_item_array = actual_data['control_items']
     assert_equal(6, control_item_array.size)
     assert_equal_json_content(expected_data, actual_data)

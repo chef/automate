@@ -693,7 +693,10 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	waiverDataExpirationDateAgg.SubAggregation("justification", waiverDataJustificationAgg)
 	waivedStrAgg.SubAggregation("expiration_date", waiverDataExpirationDateAgg)
 
-	controlTermsAgg.SubAggregation("waived_str", waivedStrAgg)
+	waivedStrFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
+	waivedStrFilter.SubAggregation("waived_str", waivedStrAgg)
+
+	controlTermsAgg.SubAggregation("filtered_waived_str", waivedStrFilter)
 
 	controlTermsAgg.SubAggregation("end_time", elastic.NewReverseNestedAggregation().SubAggregation("most_recent_report",
 		elastic.NewTermsAggregation().Field("end_time").Size(1)))
@@ -894,10 +897,12 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 		}
 	}
 
-	if waivedStrBuckets, found := controlBucket.Aggregations.Terms("waived_str"); found && len(waivedStrBuckets.Buckets) > 0 {
-		contListItem.Waivers, err = backend.getWaiverData(waivedStrBuckets)
-		if err != nil {
-			return contListItem, err
+	if filteredWaivedStr, found := controlBucket.Aggregations.Filter("filtered_waived_str"); found {
+		if waivedStrBuckets, found := filteredWaivedStr.Aggregations.Terms("waived_str"); found && len(waivedStrBuckets.Buckets) > 0 {
+			contListItem.Waivers, err = backend.getWaiverData(waivedStrBuckets)
+			if err != nil {
+				return contListItem, err
+			}
 		}
 	}
 
