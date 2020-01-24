@@ -19,7 +19,7 @@ service Policies {
   Create a new policy
 
   Creates a new IAM policy used to control permissions in Automate.
-  A policy is composed of one or more statements that act on a set of members.
+  A policy is composed of one or more statements that grant permissions to a set of members.
   Each statement contains a role as well as a list of projects.
 
   The role defines a set of actions that the statement is scoped to.
