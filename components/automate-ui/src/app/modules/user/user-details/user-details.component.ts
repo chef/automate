@@ -16,13 +16,19 @@ import { EntityStatus, loading } from 'app/entities/entities';
 import {
   GetUser,
   UpdatePasswordUser,
-  UpdateNameUser,
-  UpdatePasswordSelf,
-  UpdateNameSelf
+  UpdateNameUser
  } from 'app/entities/users/user.actions';
+ import {
+  UpdatePasswordSelf,
+  UpdateNameSelf,
+  GetUserSelf
+ } from 'app/entities/users/userself.actions';
 import {
-  getStatus, userFromRoute, updateStatus
+  getStatus as getUserStatus, userFromRoute, updateStatus as updateUserStatus
 } from 'app/entities/users/user.selectors';
+import {
+  getStatus as getUserSelfStatus, userSelf, updateStatus as updateUserSelfStatus
+} from 'app/entities/users/userself.selectors';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 
@@ -43,7 +49,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   private url: string;
   public saveSuccessful = false;
   public saveInProgress = false;
-  public loadingGetUser$: Observable<boolean>;
+  public loading$: Observable<boolean>;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -56,55 +62,86 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     }
 
   ngOnInit(): void {
-    this.store.pipe(
-      select(routeParams),
-      pluck('id'),
-      filter(identity),
-      first())
-      .subscribe((id: string) => {
-          this.store.dispatch(new GetUser({ id }));
-      });
-
-    this.loadingGetUser$ = this.store.select(getStatus).pipe(
-        map((status: EntityStatus) =>  status !== EntityStatus.loadingSuccess));
-
-    combineLatest([
-      this.loadingGetUser$,
-      this.store.select(userFromRoute)
-    ]).pipe(
-      filter(([loadingGetUser, user]) => !loadingGetUser && !isNil(user)),
-      takeUntil(this.isDestroyed))
-      .subscribe(([_, user]) => {
-        this.user = { ...user };
-        this.displayNameForm.patchValue({displayName: this.user.name});
-      });
-
     this.route.data.pipe(
       takeUntil(this.isDestroyed))
       .subscribe((data: { isNonAdmin: boolean }) => {
+        // isNonAdmin is undefined for admin
+        // isNonAdmin is true for profile
         this.isAdminView = !data.isNonAdmin;
 
         if (this.isAdminView) {
+          this.store.pipe(
+            select(routeParams),
+            pluck('id'),
+            filter(identity),
+            first())
+            .subscribe((id: string) => {
+                this.store.dispatch(new GetUser({ id }));
+            });
           this.layoutFacade.showSettingsSidebar();
+
+          this.loading$ = this.store.select(getUserStatus).pipe(
+            map((status: EntityStatus) =>  status !== EntityStatus.loadingSuccess));
+
+          combineLatest([
+            this.loading$,
+            this.store.select(userFromRoute)
+          ]).pipe(
+            filter(([loadingUserData, user]) => !loadingUserData && !isNil(user)),
+            map(([_, user]) => user),
+            takeUntil(this.isDestroyed))
+            .subscribe((user) => {
+              this.user = { ...user };
+              this.displayNameForm.patchValue({displayName: this.user.name});
+            });
+
+          this.store.select(updateUserStatus).pipe(
+            takeUntil(this.isDestroyed),
+            filter(status => this.saveInProgress && !loading(status)))
+            .subscribe((status) => {
+              this.saveInProgress = false;
+              // same status is used for updating password or display name, so we just reset both
+              this.saveSuccessful = (status === EntityStatus.loadingSuccess);
+              if (this.saveSuccessful) {
+                this.resetForms();
+              }
+            });
         } else {
+          this.store.dispatch(new GetUserSelf());
+
           this.layoutFacade.showUserProfileSidebar();
+
+          this.loading$ = this.store.select(getUserSelfStatus).pipe(
+            map((status: EntityStatus) =>  status !== EntityStatus.loadingSuccess));
+
+          combineLatest([
+            this.loading$,
+            this.store.select(userSelf)
+          ]).pipe(
+            filter(([loadingUserData, user]) => !loadingUserData && !isNil(user)),
+            map(([_, user]) => user),
+            takeUntil(this.isDestroyed))
+            .subscribe((user) => {
+              this.user = { ...user };
+              this.displayNameForm.patchValue({displayName: this.user.name});
+            });
+
+          this.store.select(updateUserSelfStatus).pipe(
+            takeUntil(this.isDestroyed),
+            filter(status => this.saveInProgress && !loading(status)))
+            .subscribe((status) => {
+              this.saveInProgress = false;
+              // same status is used for updating password or display name, so we just reset both
+              this.saveSuccessful = (status === EntityStatus.loadingSuccess);
+              if (this.saveSuccessful) {
+                this.resetForms();
+              }
+            });
         }
 
         // Update the forms once this info has come in
         this.createForms(this.fb);
         this.resetForms();
-      });
-
-    this.store.select(updateStatus).pipe(
-      takeUntil(this.isDestroyed),
-      filter(status => this.saveInProgress && !loading(status)))
-      .subscribe((status) => {
-        this.saveInProgress = false;
-        // same status is used for updating password or display name, so we just reset both
-        this.saveSuccessful = (status === EntityStatus.loadingSuccess);
-        if (this.saveSuccessful) {
-          this.resetForms();
-        }
       });
 
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
@@ -175,14 +212,16 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.saveSuccessful = false;
     this.saveInProgress = true;
     const name = this.displayNameForm.get('displayName').value.trim();
-    this.store.dispatch(
-      this.isAdminView ?
-        new UpdateNameUser({ ...this.user, name })
-        : new UpdateNameSelf({
-          id: this.user.id,
-          name: name,
-          membership_id: this.user.membership_id
-        }));
+    if (this.isAdminView) {
+      this.store.dispatch(
+          new UpdateNameUser({ ...this.user, name }));
+    } else {
+      this.store.dispatch(new UpdateNameSelf({
+        id: this.user.id,
+        name: name,
+        membership_id: this.user.membership_id
+      }));
+    }
   }
 
   public onSelectedTab(event: { target: { value: UserTabName } }): void {
@@ -191,3 +230,17 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
 }
+
+// class UserAdminDetailsComponent {
+//   public Init(): void {
+
+//   }
+
+//   public savePassword(): void {
+
+//   }
+
+//   public saveDisplayName(): void {
+
+//   }
+// }

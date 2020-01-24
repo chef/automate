@@ -1,9 +1,15 @@
 import { Injectable } from '@angular/core';
 import { isNull, isNil } from 'lodash';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 
 import { environment } from '../../../environments/environment';
 import { Jwt } from 'app/helpers/jwt/jwt';
+
+import {
+  SetUserSelfID
+ } from 'app/entities/users/userself.actions';
 
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
@@ -36,7 +42,7 @@ export class ChefSessionService implements CanActivate {
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor() {
+  constructor(private store: Store<NgrxStateAtom>) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
     if (USE_DEFAULT_SESSION) {
@@ -120,12 +126,17 @@ export class ChefSessionService implements CanActivate {
     }
     this.user = <ChefSessionUser>JSON.parse(localStorage.getItem(sessionKey));
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
+    this.store.dispatch(new SetUserSelfID({ id: this.user.username }));
   }
 
   // setSession sets ChefSession's session data in localStorage for having it
   // available for setSessionOrRedirectToLogin() (part of ChefSession's
   // constructor)
   setSession(uuid, fullname, username, id_token: string, groups: Array<string>): void {
+    if (!this.user || username !== this.user.username) {
+      this.store.dispatch(new SetUserSelfID({ id: username }));
+    }
+
     this.user = {
       uuid,
       fullname,

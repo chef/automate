@@ -2,7 +2,6 @@ import { Action } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
 
 import { User } from './user.model';
-import { SelfUser } from './userself.model';
 
 export enum UserActionTypes {
   DELETE                           = 'USER::DELETE',
@@ -18,10 +17,6 @@ export enum UserActionTypes {
   UPDATE_NAME_USER_SUCCESS         = 'USER::NAME::UPDATE::SUCCESS',
   UPDATE_PASSWORD_USER             = 'USER::PASSWORD::UPDATE',
   UPDATE_PASSWORD_USER_SUCCESS     = 'USER::PASSWORD::UPDATE::SUCCESS',
-  UPDATE_NAME_SELF                 = 'USER::NAME::SELF::UPDATE',
-  UPDATE_NAME_SELF_SUCCESS         = 'USER::NAME::SELF::UPDATE::SUCCESS',
-  UPDATE_PASSWORD_SELF             = 'USER::PASSWORD::SELF::UPDATE',
-  UPDATE_PASSWORD_SELF_SUCCESS     = 'USER::PASSWORD::SELF::UPDATE::SUCCESS',
   UPDATE_USER_FAILURE              = 'USER::UPDATE::FAILURE',
   CREATE                           = 'USER::CREATE',
   CREATE_SUCCESS                   = 'USER::CREATE::SUCCESS',
@@ -86,26 +81,6 @@ export class UpdateNameUserSuccess implements Action {
   constructor(public payload: User) { }
 }
 
-export class UpdateNameSelf implements Action {
-  readonly type = UserActionTypes.UPDATE_NAME_SELF;
-  constructor(public payload: SelfUser) { }
-}
-
-export class UpdateNameSelfSuccess implements Action {
-  readonly type = UserActionTypes.UPDATE_NAME_SELF_SUCCESS;
-  constructor(public payload: SelfUser) { }
-}
-
-export class UpdatePasswordSelf implements Action {
-  readonly type = UserActionTypes.UPDATE_PASSWORD_SELF;
-  constructor(public payload: SelfUser) { }
-}
-
-export class UpdatePasswordSelfSuccess implements Action {
-  readonly type = UserActionTypes.UPDATE_PASSWORD_SELF_SUCCESS;
-  constructor(public payload: SelfUser) { }
-}
-
 export class DeleteUser implements Action {
   readonly type = UserActionTypes.DELETE;
   constructor(public payload: User) { }
@@ -159,10 +134,6 @@ export type UserActions =
   | UpdateNameUser
   | UpdateNameUserSuccess
   | UpdateUserFailure
-  | UpdatePasswordSelf
-  | UpdatePasswordSelfSuccess
-  | UpdateNameSelf
-  | UpdateNameSelfSuccess
   | CreateUser
   | CreateUserSuccess
   | CreateUserFailure;

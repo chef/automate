@@ -31,7 +31,7 @@
             </chef-error>
           </chef-form-field>
         </form>
-        <chef-button [disabled]="(loadingGetUser$ | async) || !displayNameForm.valid || !displayNameForm.dirty" primary inline
+        <chef-button [disabled]="(loading$ | async) || !displayNameForm.valid || !displayNameForm.dirty" primary inline
           (click)="saveDisplayName()" data-cy="user-details-submit-button">
           <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
           <span *ngIf="saveInProgress">Saving...</span>
