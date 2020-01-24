@@ -142,10 +142,8 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
   }
 
   hasAttemptedInputWithError(field: string): boolean {
-    return ((this.createUserForm.get(field).hasError('required') &&
-      this.createUserForm.get(field).touched) ||
-      (this.createUserForm.get(field).hasError('pattern') &&
-        this.createUserForm.get(field).dirty));
+    return (this.createUserForm.get(field).hasError('required') &&
+      (this.createUserForm.get(field).touched || this.createUserForm.get(field).dirty));
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
