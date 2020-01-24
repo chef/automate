@@ -222,7 +222,7 @@ service Policies {
 
   Creates a new role to be used in the IAM policies that control permissions in Automate.
 
-  A role defines the scope for a set of actions.
+  A role defines the scope of actions in a policy statement.
   */
   rpc CreateRole (CreateRoleReq) returns (CreateRoleResp) {
     option (google.api.http) = {
