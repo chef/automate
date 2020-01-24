@@ -387,12 +387,12 @@ describe File.basename(__FILE__) do
                         },
                         "waived" => {}
                     },
-                    "waiverData" => [
+                    "waivers" => [
                         {
                             "waivedStr" => "no_expired",
                             "expirationDate" => "1977-06-01",
                             "justification" => "Necessity",
-                            "waivedDetails" =>
+                            "waiverSummary" =>
                                 {
                                     "passed" => {},
                                     "skipped" => {},
@@ -449,10 +449,10 @@ describe File.basename(__FILE__) do
                      "skipped" => {},
                      "failed" => {},
                      "waived" => {"total" => 1}},
-                 "waiverData" =>
+                 "waivers" =>
                      [{"waivedStr" => "yes_run",
                        "justification" => "Sound reasoning",
-                       "waivedDetails" =>
+                       "waiverSummary" =>
                            {"passed" => {},
                             "skipped" => {},
                             "failed" => {"total" => 1},
@@ -473,10 +473,10 @@ describe File.basename(__FILE__) do
                      "skipped" => {},
                      "failed" => {},
                      "waived" => {"total" => 1}},
-                 "waiverData" =>
+                 "waivers" =>
                      [{"waivedStr" => "yes_run",
                        "justification" => "Sheer cleverness",
-                       "waivedDetails" =>
+                       "waiverSummary" =>
                            {"passed" => {},
                             "skipped" => {"total" => 1},
                             "failed" => {},
@@ -500,11 +500,11 @@ describe File.basename(__FILE__) do
                          "critical" => 1
                      },
                      "waived" => {}},
-                 "waiverData" =>
+                 "waivers" =>
                      [{"waivedStr" => "no_expired",
                        "expirationDate" => "1977-06-01",
                        "justification" => "Necessity",
-                       "waivedDetails" =>
+                       "waiverSummary" =>
                            {"passed" => {}, "skipped" => {}, "failed" => {}, "waived" => {}}}]},
              {
                  "id" => "pro1-con4",
@@ -522,11 +522,11 @@ describe File.basename(__FILE__) do
                      "skipped" => {},
                      "failed" => {},
                      "waived" => {"total" => 1}},
-                 "waiverData" =>
+                 "waivers" =>
                      [{"waivedStr" => "yes",
                        "expirationDate" => "2025-06-01",
                        "justification" => "Whimsy",
-                       "waivedDetails" =>
+                       "waiverSummary" =>
                            {"passed" => {},
                             "skipped" => {"total" => 1},
                             "failed" => {},
@@ -568,10 +568,10 @@ describe File.basename(__FILE__) do
                      "skipped" => {},
                      "failed" => {},
                      "waived" => {"total" => 2}},
-                 "waiverData" =>
+                 "waivers" =>
                      [{"waivedStr" => "yes_run",
                        "justification" => "Sound reasoning",
-                       "waivedDetails" =>
+                       "waiverSummary" =>
                            {"passed" => {},
                             "skipped" => {},
                             "failed" => {"total" => 2},

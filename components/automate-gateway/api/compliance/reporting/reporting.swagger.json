@@ -369,16 +369,12 @@
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
           "description": "Intentionally blank."
         },
-        "waived_str_counts": {
+        "waivers": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.WaivedStrCounts"
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.WaiverData"
           },
           "title": "An array returns how many nodes have been waived or not"
-        },
-        "waiver_data": {
-          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.WaiverData",
-          "title": "If the control has been waived, this returns the waived details"
         }
       }
     },
@@ -1240,37 +1236,24 @@
       },
       "description": "A subtotal of controls."
     },
-    "chef.automate.api.compliance.reporting.v1.WaivedStrCounts": {
-      "type": "object",
-      "properties": {
-        "waived_str": {
-          "type": "string"
-        },
-        "count": {
-          "type": "integer",
-          "format": "int32"
-        }
-      }
-    },
     "chef.automate.api.compliance.reporting.v1.WaiverData": {
       "type": "object",
       "properties": {
+        "waived_str": {
+          "type": "string",
+          "title": "String identifying the waived state could be one of: yes, yes_run, no, no_expired"
+        },
         "expiration_date": {
-          "type": "string"
+          "type": "string",
+          "title": "The expiration date for the waiver.. after this date, the control is no longer waived"
         },
         "justification": {
-          "type": "string"
+          "type": "string",
+          "title": "The reason for the waiver"
         },
-        "run": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "skipped_due_to_waiver": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "message": {
-          "type": "string"
+        "waiver_summary": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
+          "title": "What are the counts for the waived controls across nodes?"
         }
       }
     },

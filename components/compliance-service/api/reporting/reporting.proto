@@ -68,15 +68,7 @@ message WaiverData {
 	string waived_str = 1;
 	string expiration_date = 2;
 	string justification = 3;
-	bool run = 4;
-	bool skipped_due_to_waiver = 5;
-	string message = 6;
-	ControlSummary waived_details = 7;
-}
-
-message WaivedStrCounts {
-	string waived_str = 1;
-	int32 count = 2;
+	ControlSummary waiver_summary= 4;
 }
 
 message ControlItem {
@@ -86,9 +78,7 @@ message ControlItem {
 	float impact = 4;
 	google.protobuf.Timestamp end_time = 5;
 	ControlSummary control_summary = 6;
-	repeated WaivedStrCounts waived_str_counts = 7;
-	repeated WaiverData waiver_data = 8;
-
+	repeated WaiverData waivers = 7;
 }
 
 message ControlItems {

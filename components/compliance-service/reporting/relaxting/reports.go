@@ -895,7 +895,7 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 	}
 
 	if waivedStrBuckets, found := controlBucket.Aggregations.Terms("waived_str"); found && len(waivedStrBuckets.Buckets) > 0 {
-		contListItem.WaiverData, err = backend.getWaiverData(waivedStrBuckets)
+		contListItem.Waivers, err = backend.getWaiverData(waivedStrBuckets)
 		if err != nil {
 			return contListItem, err
 		}
@@ -947,7 +947,7 @@ func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationB
 							WaivedStr:      waiverDataBucket.Key.(string),
 							ExpirationDate: expDate,
 							Justification:  justification,
-							WaivedDetails:  controlSummary,
+							WaiverSummary:  controlSummary,
 						}
 						waiverDataCollection = append(waiverDataCollection, waiverData)
 					}
