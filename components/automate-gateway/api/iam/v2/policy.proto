@@ -310,7 +310,7 @@ service Policies {
 
   Creates a new project to be used in the IAM policies that control permissions in Automate.
 
-  A project defines the scope for a set of resources. A resource can be in more than one project.
+  A project defines the scope of resources in a policy statement. Resources can be in more than one project.
   */
   rpc CreateProject (CreateProjectReq) returns (CreateProjectResp) {
     option (google.api.http) = {
