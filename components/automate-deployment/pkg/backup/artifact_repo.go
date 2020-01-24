@@ -68,7 +68,7 @@ type uploadSnapshotArtifactIterator struct {
 func newUploadSnapshotArtifactIterator(ctx context.Context, src Bucket,
 	requiredArtifacts ArtifactStream, artifactsInRepo ArtifactStream) (*uploadSnapshotArtifactIterator, error) {
 
-	snapshotTmpFile, err := ioutil.TempFile("", "builderartifacts")
+	snapshotTmpFile, err := ioutil.TempFile("", "snapshot-new")
 	if err != nil {
 		return nil, err
 	}
@@ -146,6 +146,9 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string,
 	if err != nil {
 		return nil, err
 	}
+
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	snapshotFileWriter, err := repo.snapshotsRoot.NewWriter(ctx, fmt.Sprintf("%s.snapshot", name))
 	if err != nil {
