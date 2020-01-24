@@ -606,6 +606,7 @@ steps:
       ES_VER: 6
       LANG: en_US.UTF-8
     timeout_in_minutes: 20
+    soft_fail: true
     expeditor:
       executor:
         linux:
