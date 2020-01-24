@@ -181,13 +181,13 @@ type PoliciesClient interface {
 	//```
 	CreatePolicy(ctx context.Context, in *request.CreatePolicyReq, opts ...grpc.CallOption) (*response.CreatePolicyResp, error)
 	//
-	//Get an policy
+	//Get a policy
 	GetPolicy(ctx context.Context, in *request.GetPolicyReq, opts ...grpc.CallOption) (*response.GetPolicyResp, error)
 	//
 	//List all policies
 	ListPolicies(ctx context.Context, in *request.ListPoliciesReq, opts ...grpc.CallOption) (*response.ListPoliciesResp, error)
 	//
-	//Delete an policy
+	//Delete a policy
 	DeletePolicy(ctx context.Context, in *request.DeletePolicyReq, opts ...grpc.CallOption) (*response.DeletePolicyResp, error)
 	//
 	//Update an existing policy
@@ -533,13 +533,13 @@ type PoliciesServer interface {
 	//```
 	CreatePolicy(context.Context, *request.CreatePolicyReq) (*response.CreatePolicyResp, error)
 	//
-	//Get an policy
+	//Get a policy
 	GetPolicy(context.Context, *request.GetPolicyReq) (*response.GetPolicyResp, error)
 	//
 	//List all policies
 	ListPolicies(context.Context, *request.ListPoliciesReq) (*response.ListPoliciesResp, error)
 	//
-	//Delete an policy
+	//Delete a policy
 	DeletePolicy(context.Context, *request.DeletePolicyReq) (*response.DeletePolicyResp, error)
 	//
 	//Update an existing policy
