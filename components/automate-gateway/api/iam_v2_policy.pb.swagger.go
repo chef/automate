@@ -32,7 +32,7 @@ func init() {
     },
     "/iam/v2/policies": {
       "get": {
-        "summary": "List all IAM policies",
+        "summary": "List all policies",
         "operationId": "ListPolicies",
         "responses": {
           "200": {
@@ -43,12 +43,12 @@ func init() {
           }
         },
         "tags": [
-          "Policies"
+          "policies"
         ]
       },
       "post": {
         "summary": "Create a new policy",
-        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that act on a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nThe top-level projects list for the policy defines which project(s) the policy belongs to,\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy in the (unassigned) project that grants the viewer role\non a few projects for all LDAP teams:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nThe policy's top-level projects list defines which project(s) the policy belongs to, for filtering policies by their projects,\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy in the (unassigned) project that grants the viewer role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreatePolicy",
         "responses": {
           "200": {
@@ -69,13 +69,13 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
     "/iam/v2/policies/{id}": {
       "get": {
-        "summary": "Get an IAM policy",
+        "summary": "Get an policy",
         "operationId": "GetPolicy",
         "responses": {
           "200": {
@@ -94,11 +94,11 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       },
       "delete": {
-        "summary": "Delete an IAM policy",
+        "summary": "Delete an policy",
         "operationId": "DeletePolicy",
         "responses": {
           "200": {
@@ -117,11 +117,11 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       },
       "put": {
-        "summary": "Update an existing IAM policy",
+        "summary": "Update an existing policy",
         "description": "Very similar to create except the ID cannot be changed.",
         "operationId": "UpdatePolicy",
         "responses": {
@@ -150,7 +150,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
@@ -177,7 +177,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       },
       "put": {
@@ -210,7 +210,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
@@ -245,14 +245,14 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
     "/iam/v2/policies/{id}/members:remove": {
       "post": {
         "summary": "Remove policy members",
-        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not part of the member list.",
+        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not already part of the member list.",
         "operationId": "RemovePolicyMembers",
         "responses": {
           "200": {
@@ -280,7 +280,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
@@ -298,7 +298,7 @@ func init() {
           }
         },
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
@@ -315,12 +315,12 @@ func init() {
           }
         },
         "tags": [
-          "Policies"
+          "projects"
         ]
       },
       "post": {
         "summary": "Create a project",
-        "description": "Creates a new project to be used in the IAM policies that control permissions in Automate.\n\nA project defines the scope for a set of resources. A resource can be in more than one project.",
+        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.",
         "operationId": "CreateProject",
         "responses": {
           "200": {
@@ -341,7 +341,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "projects"
         ]
       }
     },
@@ -366,7 +366,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "projects"
         ]
       },
       "delete": {
@@ -390,7 +390,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "projects"
         ]
       },
       "put": {
@@ -423,7 +423,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "projects"
         ]
       }
     },
@@ -440,12 +440,12 @@ func init() {
           }
         },
         "tags": [
-          "Policies"
+          "roles"
         ]
       },
       "post": {
         "summary": "Create a new role",
-        "description": "Creates a new role to be used in the IAM policies that control permissions in Automate.\n\nA role defines the scope for a set of actions.",
+        "description": "Creates a new role to be used in the policies that control permissions in Automate.\n\nA role defines the scope of actions in a policy statement.",
         "operationId": "CreateRole",
         "responses": {
           "200": {
@@ -466,7 +466,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "roles"
         ]
       }
     },
@@ -491,7 +491,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "roles"
         ]
       },
       "delete": {
@@ -515,7 +515,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "roles"
         ]
       },
       "put": {
@@ -548,7 +548,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "roles"
         ]
       }
     },
@@ -570,7 +570,7 @@ func init() {
     },
     "/iam/v2beta/policies": {
       "get": {
-        "summary": "List all IAM policies",
+        "summary": "List all policies",
         "operationId": "ListPolicies2",
         "responses": {
           "200": {
@@ -581,12 +581,12 @@ func init() {
           }
         },
         "tags": [
-          "Policies"
+          "policies"
         ]
       },
       "post": {
         "summary": "Create a new policy",
-        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that act on a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nThe top-level projects list for the policy defines which project(s) the policy belongs to,\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy in the (unassigned) project that grants the viewer role\non a few projects for all LDAP teams:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nThe policy's top-level projects list defines which project(s) the policy belongs to, for filtering policies by their projects,\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy in the (unassigned) project that grants the viewer role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreatePolicy2",
         "responses": {
           "200": {
@@ -607,13 +607,13 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
     "/iam/v2beta/policies/{id}": {
       "get": {
-        "summary": "Get an IAM policy",
+        "summary": "Get an policy",
         "operationId": "GetPolicy2",
         "responses": {
           "200": {
@@ -632,11 +632,11 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       },
       "delete": {
-        "summary": "Delete an IAM policy",
+        "summary": "Delete an policy",
         "operationId": "DeletePolicy2",
         "responses": {
           "200": {
@@ -655,11 +655,11 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       },
       "put": {
-        "summary": "Update an existing IAM policy",
+        "summary": "Update an existing policy",
         "description": "Very similar to create except the ID cannot be changed.",
         "operationId": "UpdatePolicy2",
         "responses": {
@@ -688,7 +688,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
@@ -715,7 +715,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       },
       "put": {
@@ -748,7 +748,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
@@ -783,14 +783,14 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
     "/iam/v2beta/policies/{id}/members:remove": {
       "post": {
         "summary": "Remove policy members",
-        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not part of the member list.",
+        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not already part of the member list.",
         "operationId": "RemovePolicyMembers2",
         "responses": {
           "200": {
@@ -818,7 +818,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
@@ -836,7 +836,7 @@ func init() {
           }
         },
         "tags": [
-          "Policies"
+          "policies"
         ]
       }
     },
@@ -853,12 +853,12 @@ func init() {
           }
         },
         "tags": [
-          "Policies"
+          "projects"
         ]
       },
       "post": {
         "summary": "Create a project",
-        "description": "Creates a new project to be used in the IAM policies that control permissions in Automate.\n\nA project defines the scope for a set of resources. A resource can be in more than one project.",
+        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.",
         "operationId": "CreateProject2",
         "responses": {
           "200": {
@@ -879,7 +879,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "projects"
         ]
       }
     },
@@ -904,7 +904,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "projects"
         ]
       },
       "delete": {
@@ -928,7 +928,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "projects"
         ]
       },
       "put": {
@@ -961,7 +961,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "projects"
         ]
       }
     },
@@ -978,12 +978,12 @@ func init() {
           }
         },
         "tags": [
-          "Policies"
+          "roles"
         ]
       },
       "post": {
         "summary": "Create a new role",
-        "description": "Creates a new role to be used in the IAM policies that control permissions in Automate.\n\nA role defines the scope for a set of actions.",
+        "description": "Creates a new role to be used in the policies that control permissions in Automate.\n\nA role defines the scope of actions in a policy statement.",
         "operationId": "CreateRole2",
         "responses": {
           "200": {
@@ -1004,7 +1004,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "roles"
         ]
       }
     },
@@ -1029,7 +1029,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "roles"
         ]
       },
       "delete": {
@@ -1053,7 +1053,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "roles"
         ]
       },
       "put": {
@@ -1086,7 +1086,7 @@ func init() {
           }
         ],
         "tags": [
-          "Policies"
+          "roles"
         ]
       }
     }
@@ -1115,7 +1115,8 @@ func init() {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Resulting list of policy members."
         }
       }
     },
@@ -1234,8 +1235,7 @@ func init() {
         "VERSION_2_0",
         "VERSION_2_1"
       ],
-      "default": "VERSION_2_0",
-      "title": "passed to UpgradeToV2 to set version"
+      "default": "VERSION_2_0"
     },
     "chef.automate.api.iam.v2.GetPolicyResp": {
       "type": "object",
@@ -1276,7 +1276,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Policy"
-          }
+          },
+          "description": "Unique ID for the policy to list members of."
         }
       }
     },
@@ -1287,7 +1288,8 @@ func init() {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of policy members."
         }
       }
     },
@@ -1405,7 +1407,8 @@ func init() {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Resulting list of policy members."
         }
       }
     },
@@ -1432,7 +1435,8 @@ func init() {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Resulting list of policy members."
         }
       }
     },
@@ -1639,8 +1643,7 @@ func init() {
         "minor": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Version.VersionNumber"
         }
-      },
-      "title": "the only values that may be returned by GetPolicyVersion"
+      }
     },
     "chef.automate.api.iam.v2.Version.VersionNumber": {
       "type": "string",

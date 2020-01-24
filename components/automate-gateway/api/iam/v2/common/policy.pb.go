@@ -45,7 +45,6 @@ func (Type) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_96f942825c854ad5, []int{0}
 }
 
-// passed to UpgradeToV2 to set version
 type Flag int32
 
 const (
@@ -431,7 +430,6 @@ func (m *Project) GetStatus() ProjectRulesStatus {
 	return ProjectRulesStatus_PROJECT_RULES_STATUS_UNSET
 }
 
-// the only values that may be returned by GetPolicyVersion
 type Version struct {
 	Major                Version_VersionNumber `protobuf:"varint,1,opt,name=major,proto3,enum=chef.automate.api.iam.v2.Version_VersionNumber" json:"major,omitempty"`
 	Minor                Version_VersionNumber `protobuf:"varint,2,opt,name=minor,proto3,enum=chef.automate.api.iam.v2.Version_VersionNumber" json:"minor,omitempty"`
