@@ -26,7 +26,7 @@ service Policies {
   The project list defines the set of resources that the statement is scoped to.
   Pass `"projects": ["*"]` to scope a statement to every project.
 
-  The top-level projects list for the policy defines which project(s) the policy belongs to,
+  The policy's top-level projects list defines which project(s) the policy belongs to, for filtering policies by their projects,
   whereas the statement level projects list defines which project(s) the statement applies to.
 
   This example creates a new policy in the (unassigned) project that grants the viewer role
