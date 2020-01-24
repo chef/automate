@@ -182,7 +182,7 @@ service Policies {
   Remove policy members
 
   Remove specific members from the member list for a specific policy. Silently ignores
-  members that are not part of the member list.
+  members that are not already part of the member list.
   */
   rpc RemovePolicyMembers (RemovePolicyMembersReq) returns (RemovePolicyMembersResp) {
     option (google.api.http) = {
