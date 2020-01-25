@@ -1,6 +1,6 @@
 <div class="content-container">
   <div class="container">
-    <main *ngIf="!(userDetails.loading$ | async)">
+    <main *ngIf="!(loading$ | async)">
       <chef-breadcrumbs *ngIf="userDetails.showBreadcrumbs">
         <chef-breadcrumb [link]="['/settings/users']">Users</chef-breadcrumb>
         {{ userDetails.user?.name }}

@@ -27,7 +27,8 @@ import {
   getStatus as getUserStatus, userFromRoute, updateStatus as updateUserStatus
 } from 'app/entities/users/user.selectors';
 import {
-  getStatus as getUserSelfStatus, userSelf, updateStatus as updateUserSelfStatus
+  getStatus as getUserSelfStatus, userSelf, updateStatus as updateUserSelfStatus,
+  userSelfId
 } from 'app/entities/users/userself.selectors';
 import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
@@ -41,6 +42,7 @@ export type UserTabName = 'password' | 'details';
 })
 export class UserDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
+  public loading$ = new Subject<boolean>();
   public tabValue: UserTabName = 'details';
   private url: string;
   public userDetails: UserDetails;
@@ -54,6 +56,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
+    this.loading$.next(true);
     this.route.data.pipe(
       takeUntil(this.isDestroyed))
       .subscribe((data: { isNonAdmin: boolean }) => {
@@ -62,9 +65,25 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         if (data.isNonAdmin) {
           this.userDetails = new UserProfileDetails(
             this.store, this.layoutFacade, this.isDestroyed, this.fb);
+          this.loading$.next(false);
         } else {
-          this.userDetails = new UserAdminDetails(
-            this.store, this.layoutFacade, this.isDestroyed, this.fb);
+          combineLatest([
+            this.store.pipe(
+              select(routeParams),
+              pluck('id'),
+              filter(identity),
+              first()),
+            this.store.select(userSelfId)
+          ]).subscribe(([routeId, currentUserId]: [string, string]) => {
+            if (routeId === currentUserId) {
+              this.userDetails = new UserAdminSelfDetails(
+                this.store, this.layoutFacade, this.isDestroyed, this.fb);
+            } else {
+              this.userDetails = new UserAdminDetails(routeId,
+                this.store, this.layoutFacade, this.isDestroyed, this.fb);
+            }
+            this.loading$.next(false);
+          });
         }
       });
 
@@ -100,7 +119,6 @@ interface UserDetails {
   loading$: Observable<boolean>;
   saveSuccessful: boolean;
   saveInProgress: boolean;
-  isAdminView: boolean;
   user: User;
   displayNameForm: FormGroup;
   passwordForm: FormGroup;
@@ -116,25 +134,18 @@ class UserAdminDetails implements UserDetails {
   public user: User;
   public saveSuccessful = false;
   public saveInProgress = false;
-  public isAdminView = true;
   public displayNameForm: FormGroup;
   public passwordForm: FormGroup;
   public showBreadcrumbs = true;
   public showPreviousPassword = false;
 
   constructor(
+    userId: string,
     private store: Store<NgrxStateAtom>,
     layoutFacade: LayoutFacadeService,
     isDestroyed: Subject<boolean>,
     fb: FormBuilder) {
-      this.store.pipe(
-        select(routeParams),
-        pluck('id'),
-        filter(identity),
-        first())
-        .subscribe((id: string) => {
-            this.store.dispatch(new GetUser({ id }));
-        });
+      this.store.dispatch(new GetUser({ id: userId }));
 
       layoutFacade.showSettingsSidebar();
       this.createForms(fb);
@@ -208,12 +219,111 @@ class UserAdminDetails implements UserDetails {
   }
 }
 
+class UserAdminSelfDetails implements UserDetails {
+  public loading$: Observable<boolean>;
+  public user: User;
+  public saveSuccessful = false;
+  public saveInProgress = false;
+  public displayNameForm: FormGroup;
+  public passwordForm: FormGroup;
+  public showBreadcrumbs = true;
+  public showPreviousPassword = true;
+
+  constructor(
+    private store: Store<NgrxStateAtom>,
+    layoutFacade: LayoutFacadeService,
+    isDestroyed: Subject<boolean>,
+    fb: FormBuilder) {
+      this.store.dispatch(new GetUserSelf());
+
+      layoutFacade.showSettingsSidebar();
+
+      this.createForms(fb);
+      this.resetForms();
+
+      this.loading$ = this.store.select(getUserSelfStatus).pipe(
+        map((status: EntityStatus) =>  status !== EntityStatus.loadingSuccess));
+
+      combineLatest([
+        this.loading$,
+        this.store.select(userSelf)
+      ]).pipe(
+        filter(([loadingUserData, user]) => !loadingUserData && !isNil(user)),
+        map(([_, user]) => user),
+        takeUntil(isDestroyed))
+        .subscribe((user) => {
+          this.user = { ...user };
+          this.displayNameForm.patchValue({displayName: this.user.name});
+        });
+
+      this.store.select(updateUserSelfStatus).pipe(
+        takeUntil(isDestroyed),
+        filter(status => this.saveInProgress && !loading(status)))
+        .subscribe((status) => {
+          this.saveInProgress = false;
+          // same status is used for updating password or display name, so we just reset both
+          this.saveSuccessful = (status === EntityStatus.loadingSuccess);
+          if (this.saveSuccessful) {
+            this.resetForms();
+          }
+        });
+    }
+
+  public savePassword(): void {
+    this.saveSuccessful = false;
+    this.saveInProgress = true;
+    const password = this.passwordForm.get('newPassword').value;
+    const previous_password = this.passwordForm.get('previousPassword').value;
+    this.store.dispatch(new UpdatePasswordSelf({
+      id: this.user.id,
+      name: this.user.name,
+      membership_id: this.user.membership_id,
+      password: password,
+      previous_password: previous_password
+    }));
+  }
+
+  public saveDisplayName(): void {
+    this.saveSuccessful = false;
+    this.saveInProgress = true;
+    const name = this.displayNameForm.get('displayName').value.trim();
+    this.store.dispatch(new UpdateNameSelf({
+      id: this.user.id,
+      name,
+      membership_id: this.user.membership_id
+    }));
+  }
+
+  private resetForms(): void {
+    this.displayNameForm.reset();
+    if (this.user) {
+      this.displayNameForm.patchValue({displayName: this.user.name});
+    }
+    this.passwordForm.reset();
+  }
+
+  private createForms(fb: FormBuilder): void {
+    // Must stay in sync with error checks in user-details.component.html
+    this.displayNameForm = fb.group({
+      displayName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
+    });
+    this.passwordForm = fb.group({
+      previousPassword: ['', [ChefValidators.nonAdminLengthValidator(false, 8)]],
+      newPassword: ['',
+        [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.minLength(8)]],
+      confirmPassword: ['',
+        [Validators.required, ChefValidators.matchFieldValidator('newPassword')]]
+    });
+  }
+}
+
 class UserProfileDetails implements UserDetails {
   public loading$: Observable<boolean>;
   public user: User;
   public saveSuccessful = false;
   public saveInProgress = false;
-  public isAdminView = false;
   public displayNameForm: FormGroup;
   public passwordForm: FormGroup;
   public showBreadcrumbs = false;
