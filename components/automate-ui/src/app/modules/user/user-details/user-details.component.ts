@@ -60,10 +60,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         // undefined for admin
         // true for profile
         if (data.isNonAdmin) {
-          this.userDetails = new UserProfileDetailsComponent(
+          this.userDetails = new UserProfileDetails(
             this.store, this.layoutFacade, this.isDestroyed, this.fb);
         } else {
-          this.userDetails = new UserAdminDetailsComponent(
+          this.userDetails = new UserAdminDetails(
             this.store, this.layoutFacade, this.isDestroyed, this.fb);
         }
       });
@@ -104,12 +104,14 @@ interface UserDetails {
   user: User;
   displayNameForm: FormGroup;
   passwordForm: FormGroup;
+  showBreadcrumbs: boolean;
+  showPreviousPassword: boolean;
 
   savePassword(): void;
   saveDisplayName(): void;
 }
 
-class UserAdminDetailsComponent implements UserDetails {
+class UserAdminDetails implements UserDetails {
   public loading$: Observable<boolean>;
   public user: User;
   public saveSuccessful = false;
@@ -117,6 +119,8 @@ class UserAdminDetailsComponent implements UserDetails {
   public isAdminView = true;
   public displayNameForm: FormGroup;
   public passwordForm: FormGroup;
+  public showBreadcrumbs = true;
+  public showPreviousPassword = false;
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -204,7 +208,7 @@ class UserAdminDetailsComponent implements UserDetails {
   }
 }
 
-class UserProfileDetailsComponent  implements UserDetails {
+class UserProfileDetails implements UserDetails {
   public loading$: Observable<boolean>;
   public user: User;
   public saveSuccessful = false;
@@ -212,6 +216,8 @@ class UserProfileDetailsComponent  implements UserDetails {
   public isAdminView = false;
   public displayNameForm: FormGroup;
   public passwordForm: FormGroup;
+  public showBreadcrumbs = false;
+  public showPreviousPassword = true;
 
   constructor(
     private store: Store<NgrxStateAtom>,

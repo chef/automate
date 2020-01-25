@@ -1,7 +1,7 @@
 <div class="content-container">
   <div class="container">
-    <main *ngIf="userDetails.isAdminView || userDetails.user?.id">
-      <chef-breadcrumbs *ngIf="userDetails.isAdminView">
+    <main *ngIf="!(userDetails.loading$ | async)">
+      <chef-breadcrumbs *ngIf="userDetails.showBreadcrumbs">
         <chef-breadcrumb [link]="['/settings/users']">Users</chef-breadcrumb>
         {{ userDetails.user?.name }}
       </chef-breadcrumbs>
@@ -41,7 +41,7 @@
       </section>
       <section class="page-body" *ngIf="tabValue === 'password'">
         <form [formGroup]="userDetails.passwordForm">
-          <chef-form-field *ngIf="!userDetails.isAdminView" class="password">
+          <chef-form-field *ngIf="userDetails.showPreviousPassword" class="password">
             <label>
               <span class="label">Previous Password <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="previousPassword" type="password"/>
