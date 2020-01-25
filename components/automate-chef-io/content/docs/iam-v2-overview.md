@@ -7,23 +7,15 @@ toc = true
 [menu]
   [menu.docs]
     parent = "authorization"
-    weight = 30
+    weight = 10
 +++
 <!-- Goal
 Show the simplest possible experience that most users will experience. We are assuming that experience will be UI only, so present the UI information first followed by CLI information presented in reference format.
 -->
 
-Chef Automate's Identity and Access Management (IAM v2) system is opt-in only, and Chef Automate users will not be automatically upgraded to IAM v2 from IAM v1.
-
-We designed IAM v2 to leave your v1 policy data untouched during your upgrade to v2; however, you can choose to not migrate v1 policies by using the provided `--skip-policy-migration` flag with the upgrade command.
-
-Whether or not you migrate your v1 policies, if at any time you decide to revert to v1, your original v1 policies will still be intact.
-Reverting to v1 will remove any new v2 policies, roles, and projects created while using IAM v2.
-Users, teams, and API tokens are shared between v1 and v2, so changes to them will persist.
-
 The [IAM v2 API Reference]({{< relref "iam-v2-api-reference.md" >}}) details command line features.
 
-## New Features in IAM v2
+## Features in IAM v2
 
 IAM v2 policies allow multiple permissions, separating out policy membership from policy definition for fine-grained control, and includes roles for role-based access control.
 Additionally, IAM v2 allows policy members to be managed directly from the Automate UI.
@@ -34,11 +26,11 @@ A policy defines permissions for who may perform what action on which resource s
 The "who" may be a user, a team, or a system.
 Users and teams are designated by name while systems use pre-authorized API tokens to communicate with Automate.
 
-The following diagram shows the new policy structure. We will detail the specifics in the next few sections.
+The following diagram shows the policy structure. We will detail the specifics in the next few sections.
 
 ![](/images/docs/iam-v2-diagram.png)
 
-## New Policy Definition
+## Policy Definition
 
 IAM v2 uses multi-statement policies, which support complex permissions in a single policy, and results in fewer policies required to secure your system.
 Each statement specifies a single permission.
@@ -87,12 +79,12 @@ Roles are discussed in detail in [Role-Based Access Control]({{< relref "iam-v2-
 
 ## Members and Policies
 
-A **member**, which was called a *subject* in v1, may be a user, a team, or an API token.
+A **member**, may be a user, a team, or an API token.
 Users and teams may be *local*, meaning they are defined within Chef Automate, or managed by an external identity provider, specifically LDAP or SAML.
 
 IAM v2 policy *membership* is separate and distinct from policy *definition*.
-(Notice that members were **not** included as part of the [New Policy Definition]({{< relref "iam-v2-overview.md#new-policy-definition" >}}).)
-Notably, with IAM v2, you can modify policy membership for any policy, but you can only adjust policy definition for *Custom* policies.
+(Notice that members were **not** included as part of the [Policy Definition]({{< relref "iam-v2-overview.md#policy-definition" >}}).)
+You can modify policy membership for any policy, but you can only adjust policy definition for *Custom* policies.
 
 ## Policy Types
 
@@ -124,7 +116,7 @@ These default roles are Chef-managed, so they cannot be changed, like Chef-manag
 You can use these default roles in your own policies, or create your own custom roles for more customized permissions.
 Any roles you create can be modified later.
 
-Chef Automate also ships with several default policies that leverage these default roles.
+Chef Automate also has several default policies that leverage these default roles.
 The default policies are: Viewers, Editors, Administrator, and Ingest.
 
 ## Working with Projects
@@ -170,7 +162,7 @@ Once you define your set of projects with their contained ingest rules and condi
 Teams and API tokens may be assigned to projects directly in the UI. Policies and roles can only be assigned through the command line.
 These resources created within Automate do not make use of, nor do they require, any project ingest rules.
 
-Only some resources in Chef Automate respect projects. Only resources that respect projects will be filtered when using the project filter. Resources that do not respect projects will always be displayed and will ignore any applied project filters. After IAM v2 becomes generally available, we will continue the work to make more resources respect projects.
+Only some resources in Chef Automate respect projects. Only resources that respect projects will be filtered when using the project filter. Resources that do not respect projects will always be displayed and will ignore any applied project filters.
 
 #### Resources that respect projects
 

@@ -7,37 +7,17 @@ toc = true
 [menu]
   [menu.docs]
     parent = "authorization"
-    weight = 40
+    weight = 20
 +++
 
-This guide shows you how to upgrade Chef Automate to IAM v2, perform important administrative operations, and revert back to IAM v1.
-After upgrading to IAM v2, you will add members to Chef-managed v2 policies, delete a legacy policy, and write a Team Admin v2 policy that lets a Team Admin manage their users and teams.
-
-## Upgrade to IAM v2
-
-{{< info >}}
-To get the best possible IAM v2 experience, Chef Automate should be running the latest version before upgrading to IAM v2.
-{{< /info >}}
-
-Perform the upgrade to IAM v2 with `chef-automate iam upgrade-to-v2`. The response from your terminal should look something like:
-
-```terminal
-Upgrading to IAM v2.1
-Migrating v1 policies...
-Creating default teams Editors and Viewers...
-
-Migrating existing teams...
-
-Success: Enabled IAM v2.1
-```
-
-To upgrade without porting existing policies, use the command: `chef-automate iam upgrade-to-v2 --skip-policy-migration`.
+This guide shows you how to perform important administrative operations.
+You will add members to Chef-managed v2 policies, delete a legacy policy, and write a Team Admin v2 policy that lets a Team Admin manage their users and teams.
 
 ## View Policies
 
 After you have signed in to Chef Automate, select the **Settings** tab in the top navigation bar, and then select and locate the `Policies` section in the left navigation.
 
-In this section, you can view all of your v2 policies. If you have upgraded without using the `--skip-policy-migration` flag, you will also see v1 policies.
+In this section, you can view all of your v2 policies.
 
 This policy display includes the following:
 
@@ -49,20 +29,13 @@ This policy display includes the following:
 
 ## Policy Conversion
 
-After upgrading, we recommend that you reconstitute your v1 policies as v2 policies.
+We recommend that you reconstitute your v1 policies as v2 policies.
 Once this policy conversion is done, delete the old legacy v1 policies and you will have an up-to-date system.
 
 To delete a legacy policy, open the menu on any custom policy, which is located at the end of the policy row, and select **Delete Policy** from the menu. You will not have this option for Chef-managed policies.
 
 A warning appears if members are still attached to the policy because deleting that policy disrupts access for all of its members.
 However, you will still be able to delete the policy.
-
-In the rare situation that you include the command `--skip-policy-migration` when upgrading, no existing v1 policies will be migrated.
-You will still need to create new v2 policies to preserve any IAM behavior from v1.
-
-{{% warning %}}
-Note: Several legacy policies, including *Compliance Profile Access* and *Ingest Access*, have API tokens that will stop working if not ported.
-{{% /warning %}}
 
 The next few sections explain how to use Chef-managed policies and how to create custom policies.
 
@@ -425,24 +398,16 @@ See [Policy Membership]({{< relref "iam-v2-guide.md#policy-membership" >}}) for 
 While we have safeguards to prevent it, it is possible to lock yourself out of Chef Automate.
 If you have root access to the node where Chef Automate is installed, use the following commands to restore admin access:
 
-This command, which is also available on IAM v1, resets the local `admin` user's password and ensures that user is a member of the local `admins` team, which is a permanent member of the Chef-managed `Administrator` policy.
+This command resets the local `admin` user's password and ensures that the user is a member of the local `admins` team, which is a permanent member of the Chef-managed `Administrator` policy.
 
 ```bash
   chef-automate iam admin-access restore <your new password here>
 ```
 
-Generate a new token and add that token as a new member of the Chef-managed `Administrator` policy. This command is the equivalent of the v1 command `chef-automate admin-token`.
+Generate a new token and add that token as a new member of the Chef-managed `Administrator` policy.
 
 ```bash
   chef-automate iam token create <your token name here> --admin
 ```
 
-## Reverting to IAM v1
 
-Reverting to IAM v1 discards your IAM v2 policies, roles, and projects, and re-configures Chef Automate to use your v1 policies again.
-
-To revert back to IAM v1, use:
-
-```console
-$ chef-automate iam reset-to-v1
-```

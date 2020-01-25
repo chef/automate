@@ -7,11 +7,10 @@ toc = true
 [menu]
   [menu.docs]
     parent = "authorization"
-    weight = 50
+    weight = 30
 +++
 
 This API reference details Chef Automate IAM v2 features from the command line.
-If you are not already on IAM v2, [upgrade to IAM v2]({{< relref "iam-v2-guide.md#upgrade-to-iam-v2" >}}) first to ensure expected outcomes when using `curl` commands.
 
 ## Getting Started
 
