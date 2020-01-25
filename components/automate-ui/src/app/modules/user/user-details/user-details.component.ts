@@ -60,13 +60,17 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     this.route.data.pipe(
       takeUntil(this.isDestroyed))
       .subscribe((data: { isNonAdmin: boolean }) => {
-        // undefined for admin
-        // true for profile
+        // undefined for admin view
+        // true for profile view
         if (data.isNonAdmin) {
           this.userDetails = new UserProfileDetails(
             this.store, this.layoutFacade, this.isDestroyed, this.fb);
           this.loading$.next(false);
         } else {
+          // Is the user the user logged in?
+          // Get the user ID from the URL
+          // Get the current logged in user's ID
+          // compare
           combineLatest([
             this.store.pipe(
               select(routeParams),
@@ -129,6 +133,7 @@ interface UserDetails {
   saveDisplayName(): void;
 }
 
+// This view is used when a user goes to another users detail page.
 class UserAdminDetails implements UserDetails {
   public loading$: Observable<boolean>;
   public user: User;
@@ -219,6 +224,9 @@ class UserAdminDetails implements UserDetails {
   }
 }
 
+// This view is used when a user goes to their own user detail page
+// The differnce between this and when visting another users pages is the previous password must
+// be entered and when the display name is updated the name in the menu is update.
 class UserAdminSelfDetails implements UserDetails {
   public loading$: Observable<boolean>;
   public user: User;
@@ -319,6 +327,7 @@ class UserAdminSelfDetails implements UserDetails {
   }
 }
 
+// This view is used when a user goes to their profile page.
 class UserProfileDetails implements UserDetails {
   public loading$: Observable<boolean>;
   public user: User;
