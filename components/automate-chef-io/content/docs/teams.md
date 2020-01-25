@@ -11,172 +11,29 @@ toc = true
     weight = 60
 +++
 
-{{< info >}}
-This content is specific to IAM v1. See [IAM v2 Overview]({{< ref "iam-v2-overview.md#" >}}) for IAM v2 specific information.
-{{< /info >}}
+## Overview
+This guide will show you how to manage Chef Automate teams. Import existing teams into Chef Automate with [Microsoft AD (LDAP)]({{< ref "configuration.md#microsoft-active-directory" >}}), [generic LDAP]({{< ref "configuration.md#ldap" >}}) or [SAML]({{< ref "configuration.md#saml" >}}). You can create local Chef Automate teams that are independent of LDAP or SAML.
 
-This guide will show you how to manage Chef Automate teams. Import existing teams into Chef Automate with [Microsoft AD (LDAP)]({{< ref "configuration.md#microsoft-active-directory" >}}), [generic LDAP]({{< ref "configuration.md#ldap" >}}) or [SAML]({{< ref "configuration.md#saml" >}}).
+Permission on the `iam:teams` resource is required to interact with teams. Any user that is part of the `admins` team will have this permission, otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 
-You can create local Chef Automate teams that are independent of LDAP or SAML. Teams can be used for [IAM v1 policy-based authorization]({{< ref "iam-v1-overview.md" >}}).
+## Managing Local Teams
 
-## Prerequisites
-
-Before you follow these instructions, we recommend you install the JSON processor [jq](https://stedolan.github.io/jq/) to ensure readable output. Without it, some commands may need to be modified.
-
-You will need administrative access to interact with the teams API. An existing administrative user can provide that access.
-
-To interact with the teams API using cURL, fetch an admin API token available from the `chef-automate` CLI, and set it to a usable variable:
-
-```bash
-export TOKEN=`chef-automate admin-token`
-```
-
-## Teams
-
-### Creating Teams
-
-#### Create a Team from Chef Automate
-
-As an administrative user, you can create a team in the UI from the **Settings** tab. Select _Teams_ in the sidebar, and then use the **Create Team** button:
+### Creating Local Teams
+Navigate to _Teams_ in the **Settings** tab. Then use the **Create Team** button, which opens a helper window for entering the team's _Name_, a unique _ID_, and optionally assign the team to some _Projects_.
 
 ![Create Local Team](/images/docs/admin-tab-teams-list.png)
 
-First, enter a unique name and description for the team. Save your new team:
+### Deleting Local Teams
+Navigate to _Teams_ in the **Settings** tab. Then open the menu at the end of the table row select **Delete Team**.
 
-![Create Team](/images/docs/admin-tab-team-create.png)
+### Adding Local Users to Teams
+To add local users to a team, navigate to _Teams_ from the **Settings** tab and locate the team. Navigate to the team's page, then use the **Add Users** button.
 
-Upon creating the team, you'll be taken to the new team's details page:
+#### Admins Team
+Chef Automate comes with an _Admins_ team, local users can be added directly to this team to assign them admin permissions.
 
-![Team Details](/images/docs/admin-tab-team-details.png)
+### Removing Local Users from Teams
+To remove local users from a team, navigate to _Teams_ from the **Settings** tab and locate the team. Navigate to the team's page, locate the user to remove, then use the menu at the end of the table row to remove the user.
 
-Add users to the new team:
-
-![Add Users](/images/docs/admin-tab-team-add-users.png)
-
-Edit the team name:
-
-![Edit Team](/images/docs/admin-tab-team-edit.png)
-
-Now, you can [create a new policy]({{< ref "iam-v1-overview.md#common-use-cases" >}}) for your team. All members will now have additional access based on that new policy.
-
-#### Create a Team using the Command Line with cURL
-
-To create a Chef Automate team, you'll need to provide a name and description. Team names must be unique.
-
-```bash
-curl -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"name":"Team Name", "description":"My Chef Team"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams?pretty
-```
-
-### Fetching Teams
-
-You can fetch a team by its ID:
-
-```bash
-curl -H  "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{id}?pretty
-```
-
-You can also fetch all teams, collectively:
-
-```bash
-curl -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams?pretty
-```
-
-### Updating Teams
-
-To update a team, you must supply its name and description:
-
-```bash
-curl -X PUT -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"name":"An Updated Team Name", "description": "An updated description"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{ID}?pretty
-```
-
-### Deleting Teams
-
-To delete a team, you must supply its ID:
-
-```bash
-curl -X DELETE -H "api-token: $TOKEN" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{ID}
-```
-
-## Managing Chef Automate User and Team Associations
-
-### Viewing a User's Teams
-
-To view a user's teams, you will need the user's ID:
-
-```bash
-curl -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{user_ID}/teams?pretty
-```
-
-### Viewing a Team's Users
-
-To view a team's users, you will need the team's ID. This returns JSON that contains an array of user IDs associated with the team:
-
-```bash
-curl -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{team_ID}/users?pretty
-```
-
-### Adding Users to a Team
-
-To add users to a team, you will need both the team ID and the IDs of the users you will add:
-
-```bash
-curl -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"user_ids":["userID", "secondUserID"]}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{team_ID}/users?pretty
-```
-
-### Removing Users from a Team
-
-To remove users from a team, you will need both the team ID and the IDs of the users you will remove:
-
-```bash
-curl -X PUT -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"id":"teamID", "user_ids":["userID", "secondUserID"]}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/{team_ID}/users
-```
-
-## Common Use Cases
-
-### Adding Users to the Admin Team
-
-Adding users to the default `admins` team will give them full access to all endpoints in Chef Automate; they will be able to manage policies, users, teams, and integrations.
-
-You may add users on the `admins` Team details page:
-
-![Add Users to Admins](/images/docs/admin-tab-team-add-admins.png)
-
-You may also complete this operation from the command line.
-
-1. Fetch an admin API token available from the `chef-automate` CLI and set it to a usable variable:
-
-    ```bash
-    export TOKEN=`chef-automate admin-token`
-    ```
-
-1. Get the `admins` team ID and set it to a usable variable:
-
-    ```bash
-    export ID=`curl -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams | jq -r '.teams[] | select(.name =="admins").id'`
-    ```
-
-1. Confirm the user IDs for the user(s) you want to add to the `admins` team.
-
-    ID of a single user:
-
-    ```bash
-    curl -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{username} | jq .id
-    ```
-
-    Fetch all users (with IDs):
-
-    ```bash
-    curl -H "api-token: $TOKEN" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/users?pretty
-    ```
-
-1. Add the user(s) to the `admins` team:
-
-    ```bash
-    curl -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"user_ids":["userID", "secondUserID]}' https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/$ID/users?pretty
-    ```
-
-1. Verify that the user is a member of the team by listing all members of the `admins` team:
-
-    ```bash
-    curl -H "api-token: $TOKEN" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/teams/$ID/users?pretty
-    ```
+### Changing Team Details
+Both the team name and the projects a team belongs to can be changed by navigating to _Teams_ from the **Settings** tab, selecting an individual team and then navigating to the **Details** tab.
