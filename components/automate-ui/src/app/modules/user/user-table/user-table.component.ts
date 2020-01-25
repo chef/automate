@@ -1,4 +1,5 @@
 import { Component, Input, Output, OnInit, EventEmitter } from '@angular/core';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 import { User } from 'app/entities/users/user.model';
 
 @Component({
@@ -29,5 +30,11 @@ export class UserTableComponent implements OnInit {
   ngOnInit(): void {
     this.getPermissionsPath = [this.baseUrl, 'get'];
     this.createPermissionsPath = [this.baseUrl, 'post'];
+  }
+
+  deleteUser($event: ChefKeyboardEvent, user: User) {
+    if ($event.isUserInput) {
+      this.removeClicked.emit(user);
+    }
   }
 }
