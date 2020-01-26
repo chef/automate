@@ -56,12 +56,14 @@ build: themes/chef generate_swagger
 # Consult scripts/spellcheck.sh in the root Automate directory for notes on using cspell.
 # This does files in automate-chef-io plus exposed proto files.
 # Alternately, you can use the common `make spell` to skip the proto files.
-spell_all:
-	@pushd ../.. > /dev/null && \
+spell:
+	@pushd ../.. > /dev/null; \
 		cspell \
 			"api/external/**/*.proto" \
 			"components/automate-chef-io/**/*.md" \
 			"components/automate-chef-io/data/docs/api-static/**/*" \
 			"components/automate-chef-io/layouts/**/*.html" \
 			"components/automate-gateway/**/*.proto" \
-	; popd > /dev/null
+		; EXIT_CODE=$$?; \
+		popd > /dev/null; \
+		exit $$EXIT_CODE
