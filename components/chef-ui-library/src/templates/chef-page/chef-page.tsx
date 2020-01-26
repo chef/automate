@@ -98,6 +98,7 @@ export class ChefPage {
   @Event() close: EventEmitter;
 
   render() {
+    const footerStyle = { display: (this.confirmBtnText === '' ? 'none' : 'block') };
     if (this.pageLoading) {
       return [
         <chef-loading-spinner size="50" fixed></chef-loading-spinner>
@@ -129,7 +130,7 @@ export class ChefPage {
           <slot />
         </div>,
 
-        <div id="page-footer">
+        <div id="page-footer" style={footerStyle}>
 
           {(this.secondaryBtnText && this.secondaryBtnShow)
             ? <chef-button

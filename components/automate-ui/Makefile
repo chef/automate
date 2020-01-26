@@ -69,4 +69,12 @@ component/%:
 page-component/%:
 	$(NG_CMD) generate component $(PAGE_COMPONENT_DIR)/$(@F) $(PAGE_COMPONENT_FLAGS)
 
+# Adapted from Makefile.common_go
+spell:
+	@pushd ../.. > /dev/null; \
+	./scripts/spellcheck.sh --wordsOnly components/automate-ui; \
+	EXIT_CODE=$$?; \
+	popd > /dev/null; \
+	exit $$EXIT_CODE
+
 .PHONY: build install test lint unit e2e lint-sass lint-typescript license_scout peer-dependencies e2e-aot unit-all-browsers pr-ready start

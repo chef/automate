@@ -22,7 +22,7 @@
                   <span class="label">Type <span aria-hidden="true">*</span></span>
                   <span class="custom-dropdown">
                     <select id="expression-type-dropdown"
-                            ngDefaultControl 
+                            ngDefaultControl
                             (change)="updateFormDisplay('type')"
                             formControlName="type">
                       <option value='user'>User</option>
@@ -37,15 +37,15 @@
                 </chef-error>
               </chef-form-field>
 
-              <chef-form-field 
-                id="create-identity" 
+              <chef-form-field
+                id="create-identity"
                 *ngIf="expressionForm.contains('identityProvider')"
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 88.2422 }}" >
                 <label>
                   <span class="label">Identity Provider <span aria-hidden="true">*</span></span>
                   <span class="custom-dropdown">
-                    <select id="expression-identity-dropdown" 
-                            ngDefaultControl 
+                    <select id="expression-identity-dropdown"
+                            ngDefaultControl
                             (change)="updateFormDisplay('identityProvider')"
                             formControlName="identityProvider">
                       <option value="ldap">LDAP</option>
@@ -60,8 +60,8 @@
                 </chef-error>
               </chef-form-field>
 
-              <chef-form-field 
-                id="create-name" 
+              <chef-form-field
+                id="create-name"
                 *ngIf="expressionForm.contains('name')"
                 [@dropInAnimation]="{ value: triggerValue, params: { height: 109.219 }}">
                 <label>
@@ -92,10 +92,10 @@
           <div *ngIf="expressionOutput">
             <p id="expression-output" class="note">Member expression: {{ expressionOutput }}</p>
           </div>
-  
+
           <div id="buttons-container">
-            <chef-button primary 
-                        [disabled]="!expressionForm.valid" 
+            <chef-button primary
+                        [disabled]="!expressionForm.valid"
                         (click)="validateAndAddExpression()">Add Expression</chef-button>
             <chef-button tertiary (click)="closeModal()">Cancel</chef-button>
           </div>
@@ -104,12 +104,7 @@
 
       <div id="no-members-container" *ngIf="sortedMembersAvailable.length === 0">
         <h3>Create more local users or local teams first, or add a member expression.</h3>
-        <chef-button
-          primary
-          class="add-member-button"
-          (click)="openModal()">
-            Add Member Expression
-        </chef-button>
+        <chef-button primary (click)="openModal()">Add Member Expression</chef-button>
       </div>
       <div id="table-container" *ngIf="sortedMembersAvailable.length > 0">
         <div class="flex">
