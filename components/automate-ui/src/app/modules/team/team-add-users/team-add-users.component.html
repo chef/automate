@@ -16,13 +16,11 @@
       <chef-button primary (click)="openModal()">Create User</chef-button>
     </div>
     <div id="table-container" *ngIf="usersNotFiltered()?.length > 0">
-      <chef-toolbar>
+      <div id="table-controls">
         <app-authorized [anyOf]="['/iam/v2/teams/{id}/users:add', 'post', team?.id]">
           <chef-button primary (click)="openModal()">Create User</chef-button>
         </app-authorized>
-      </chef-toolbar>
-      <div class="flex">
-        <div id="users-selected" class="flex-right" >
+        <div id="users-selected">
           {{ usersToAddValues().length | pluralize : 'user' : '+s' }} selected
         </div>
       </div>
