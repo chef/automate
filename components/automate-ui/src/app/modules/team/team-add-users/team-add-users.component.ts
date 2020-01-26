@@ -169,7 +169,9 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   }
 
   getConfirmBtnText(): string {
-    if (this.addingUsers) {
+    if (this.usersNotFiltered().length === 0) {
+      return '';
+    } else if (this.addingUsers) {
       return (this.usersToAddValues().length < 2)
         ? 'Adding User...'
         : `Adding ${this.usersToAddValues().length} Users...`;
