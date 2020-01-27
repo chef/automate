@@ -10,7 +10,7 @@ import { ProjectService } from 'app/entities/projects/project.service';
   selector: 'app-process-progress-bar',
   templateUrl: './process-progress-bar.component.html',
   styleUrls: ['./process-progress-bar.component.scss'],
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.None
 })
 export class ProcessProgressBarComponent implements OnInit {
   public confirmApplyStopModalVisible = false;
@@ -20,7 +20,6 @@ export class ProcessProgressBarComponent implements OnInit {
   private isDestroyed = new Subject<boolean>();
   private percentageComplete = 0;
   private applyRulesInProgress = false;
-  
 
   constructor(
     public layoutFacade: LayoutFacadeService,

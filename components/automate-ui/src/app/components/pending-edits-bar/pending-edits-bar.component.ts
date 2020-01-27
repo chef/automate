@@ -14,7 +14,7 @@ import { ApplyRulesStatus } from 'app/entities/projects/project.reducer';
   selector: 'app-pending-edits-bar',
   templateUrl: './pending-edits-bar.component.html',
   styleUrls: ['./pending-edits-bar.component.scss'],
-  encapsulation: ViewEncapsulation.None,
+  encapsulation: ViewEncapsulation.None
 })
 export class PendingEditsBarComponent implements OnDestroy {
   public confirmApplyStartModalVisible = false;

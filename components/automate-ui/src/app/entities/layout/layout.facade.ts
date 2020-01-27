@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 
@@ -24,7 +24,7 @@ enum Height {
 @Injectable({
   providedIn: 'root'
 })
-export class LayoutFacadeService {
+export class LayoutFacadeService implements OnDestroy {
   public layout = {
     header: {
       display: true,
@@ -53,7 +53,7 @@ export class LayoutFacadeService {
     this.store.dispatch(new GetProjects());
     this.menuGroups$ = store.select(sidebarMenuGroups);
     this.showPageLoading$ = store.select(showPageLoading);
-    
+
     store.select(notificationState).subscribe(
       (notifications: Notification[]) => {
         this.layout.header.license =

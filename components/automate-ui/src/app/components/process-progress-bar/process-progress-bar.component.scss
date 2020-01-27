@@ -1,8 +1,8 @@
 @import "~styles/variables";
 
 #process-progress-bar {
-  background-color: #3864f2;
-  color: white;
+  background-color: $chef-primary-bright;
+  color: $chef-white;
   height: 48px;
   padding: 7px 10px;
   position: relative;
@@ -26,7 +26,7 @@
     border-radius: 5px;
     height: 6px;
     margin-top: 5px;
-    
+
     .mat-progress-bar-fill::after {
       background-color: rgba(255, 255, 255, .7);
     }
@@ -35,11 +35,11 @@
       background-color: rgba(255, 255, 255, .5);
     }
 
-    /* remove animation and the dots*/ 
+    /* remove animation and the dots*/
     .mat-progress-bar-background {
       animation: none;
-      background-color: #3863f2;
-      fill: #3863f2;
+      background-color: $chef-primary-bright;
+      fill: $chef-primary-bright;
     }
   }
 }

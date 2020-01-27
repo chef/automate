@@ -158,7 +158,6 @@
     "use-lifecycle-interface": true,
     "use-pipe-transform-interface": true,
     "component-class-suffix": true,
-    "directive-class-suffix": true,
-    "use-component-view-encapsulation": true
+    "directive-class-suffix": true
   }
 }

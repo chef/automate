@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ActivationStart, ActivationEnd, Router, NavigationEnd } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { filter } from 'rxjs/operators';
@@ -13,8 +13,7 @@ import { GetAllUserPerms } from './entities/userperms/userperms.actions';
 @Component({
   selector: 'app-ui',
   templateUrl: './ui.component.html',
-  styleUrls: ['./ui.component.scss'],
-  encapsulation: ViewEncapsulation.None,
+  styleUrls: ['./ui.component.scss']
 })
 export class UIComponent implements OnInit {
   // Feature Flags
