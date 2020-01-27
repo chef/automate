@@ -15,7 +15,11 @@
     {
       "name": "Applications",
       "tags": ["service_groups", "retention"]
-    }
+    },
+    {
+      "name": "Identity and Access Management",
+      "tags": ["policies", "roles", "projects", "tokens"]
+    }	    
   ],
   "tags": [
     { "name": "ReportingService", "x-displayName": "Reporting" },
@@ -23,6 +27,10 @@
     { "name": "ConfigMgmt", "x-displayName": "Nodes" },
     { "name": "NodesService", "x-displayName": "Nodes" },
     { "name": "service_groups", "x-displayName": "Service Groups and Services" },
-    { "name": "retention", "x-displayName": "Service Management" }
+    { "name": "retention", "x-displayName": "Service Management" },
+    { "name": "policies", "x-displayName": "IAM Policies" },
+    { "name": "roles", "x-displayName": "IAM Roles" },
+    { "name": "projects", "x-displayName": "IAM Projects" },
+    { "name": "tokens", "x-displayName": "IAM Tokens" }
   ]
 }

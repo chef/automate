@@ -22,14 +22,20 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type CreateTokenReq struct {
-	Id                   string              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string              `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Active               *wrappers.BoolValue `protobuf:"bytes,3,opt,name=active,proto3" json:"active,omitempty"`
-	Value                string              `protobuf:"bytes,4,opt,name=value,proto3" json:"value,omitempty"`
-	Projects             []string            `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_unrecognized     []byte              `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
+	// Unique, user-specified ID. Cannot be changed.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// User-specified name.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Active state. Defaults to true.
+	// If set to false, token will not be authenticated or authorized.
+	Active *wrappers.BoolValue `protobuf:"bytes,3,opt,name=active,proto3" json:"active,omitempty"`
+	// Unique, optionally user-specified value.
+	Value string `protobuf:"bytes,4,opt,name=value,proto3" json:"value,omitempty"`
+	// Array of projects the token is in. Empty by default.
+	Projects             []string `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *CreateTokenReq) Reset()         { *m = CreateTokenReq{} }
@@ -132,14 +138,18 @@ func (m *GetTokenReq) GetId() string {
 }
 
 type UpdateTokenReq struct {
-	// ID can't be changed; ID used to discover token
-	Id                   string              `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string              `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Active               *wrappers.BoolValue `protobuf:"bytes,3,opt,name=active,proto3" json:"active,omitempty"`
-	Projects             []string            `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}            `json:"-"`
-	XXX_unrecognized     []byte              `json:"-"`
-	XXX_sizecache        int32               `json:"-"`
+	// Unique, user-specified ID. Cannot be changed.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// User-specified name.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Active state. Defaults to true.
+	// If set to false, token will not authenticate.
+	Active *wrappers.BoolValue `protobuf:"bytes,3,opt,name=active,proto3" json:"active,omitempty"`
+	// Array of projects token is in. Empty by default.
+	Projects             []string `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *UpdateTokenReq) Reset()         { *m = UpdateTokenReq{} }

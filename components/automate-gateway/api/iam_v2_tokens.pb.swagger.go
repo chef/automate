@@ -16,6 +16,7 @@ func init() {
   "paths": {
     "/iam/v2/tokens": {
       "get": {
+        "summary": "List all tokens",
         "operationId": "ListTokens",
         "responses": {
           "200": {
@@ -26,10 +27,12 @@ func init() {
           }
         },
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       },
       "post": {
+        "summary": "Create a token",
+        "description": "Creates a token.\nName, ID are required.\nActive defaults to true when not specified.\nValue is auto-generated when not provided.\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"token 1\",\n\"id\": \"token-1\",\n\"active\": true,\n\"projects\": [\n\"east-region\",\n\"west-region\"\n]\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateToken",
         "responses": {
           "200": {
@@ -50,12 +53,14 @@ func init() {
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       }
     },
     "/iam/v2/tokens/{id}": {
       "get": {
+        "summary": "Get a token",
+        "description": "Returns the details for a token.",
         "operationId": "GetToken",
         "responses": {
           "200": {
@@ -74,10 +79,11 @@ func init() {
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       },
       "delete": {
+        "summary": "Delete a token",
         "operationId": "DeleteToken",
         "responses": {
           "200": {
@@ -96,10 +102,12 @@ func init() {
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       },
       "put": {
+        "summary": "Update a token",
+        "description": "This PUT operation will overwrite all fields excepting ID, timestamps, and value,\nincluding those omitted from the request. Include ` + "`" + `name` + "`" + `, ` + "`" + `active` + "`" + ` and ` + "`" + `projects` + "`" + `\nin the request.",
         "operationId": "UpdateToken",
         "responses": {
           "200": {
@@ -112,7 +120,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "ID can't be changed; ID used to discover token",
+            "description": "Unique, user-specified ID. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -127,12 +135,13 @@ func init() {
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       }
     },
     "/iam/v2beta/tokens": {
       "get": {
+        "summary": "List all tokens",
         "operationId": "ListTokens2",
         "responses": {
           "200": {
@@ -143,10 +152,12 @@ func init() {
           }
         },
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       },
       "post": {
+        "summary": "Create a token",
+        "description": "Creates a token.\nName, ID are required.\nActive defaults to true when not specified.\nValue is auto-generated when not provided.\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"token 1\",\n\"id\": \"token-1\",\n\"active\": true,\n\"projects\": [\n\"east-region\",\n\"west-region\"\n]\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateToken2",
         "responses": {
           "200": {
@@ -167,12 +178,14 @@ func init() {
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       }
     },
     "/iam/v2beta/tokens/{id}": {
       "get": {
+        "summary": "Get a token",
+        "description": "Returns the details for a token.",
         "operationId": "GetToken2",
         "responses": {
           "200": {
@@ -191,10 +204,11 @@ func init() {
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       },
       "delete": {
+        "summary": "Delete a token",
         "operationId": "DeleteToken2",
         "responses": {
           "200": {
@@ -213,10 +227,12 @@ func init() {
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       },
       "put": {
+        "summary": "Update a token",
+        "description": "This PUT operation will overwrite all fields excepting ID, timestamps, and value,\nincluding those omitted from the request. Include ` + "`" + `name` + "`" + `, ` + "`" + `active` + "`" + ` and ` + "`" + `projects` + "`" + `\nin the request.",
         "operationId": "UpdateToken2",
         "responses": {
           "200": {
@@ -229,7 +245,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "ID can't be changed; ID used to discover token",
+            "description": "Unique, user-specified ID. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -244,7 +260,7 @@ func init() {
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       }
     }
@@ -254,23 +270,28 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique, user-specified ID. Cannot be changed."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "User-specified name."
         },
         "active": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Active state. Defaults to true.\nIf set to false, token will not be authenticated or authorized."
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique, optionally user-specified value."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Array of projects the token is in. Empty by default."
         }
       }
     },
@@ -311,29 +332,36 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique, optionally user-specified ID. Cannot be changed."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "User-specified name."
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique, optionally user-specified value."
         },
         "active": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Active state. Defaults to true.\nIf set to false, token will not authenticate."
         },
         "created_at": {
-          "type": "string"
+          "type": "string",
+          "description": "Created timestamp."
         },
         "updated_at": {
-          "type": "string"
+          "type": "string",
+          "description": "Updated timestamp."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Array of projects token is in. Empty by default."
         }
       }
     },
@@ -342,20 +370,23 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "title": "ID can't be changed; ID used to discover token"
+          "description": "Unique, user-specified ID. Cannot be changed."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "User-specified name."
         },
         "active": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Active state. Defaults to true.\nIf set to false, token will not authenticate."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Array of projects token is in. Empty by default."
         }
       }
     },
