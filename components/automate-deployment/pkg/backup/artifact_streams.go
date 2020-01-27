@@ -59,6 +59,8 @@ type peekableArtifactStream struct {
 	stream ArtifactStream
 	next   *string
 	err    error
+
+	closed bool
 }
 
 func (p *peekableArtifactStream) Next() (string, error) {
@@ -90,6 +92,10 @@ func (p *peekableArtifactStream) Peek() (string, error) {
 }
 
 func (p *peekableArtifactStream) Close() error {
+	if p.closed {
+		return nil
+	}
+	p.closed = true
 	return p.stream.Close()
 }
 
@@ -104,6 +110,7 @@ type lineReaderStream struct {
 	r        io.ReadCloser
 	scanner  *bufio.Scanner
 	finished bool
+	closed   bool
 }
 
 func (s *lineReaderStream) Next() (string, error) {
@@ -127,6 +134,10 @@ func (s *lineReaderStream) Next() (string, error) {
 }
 
 func (s *lineReaderStream) Close() error {
+	if s.closed {
+		return nil
+	}
+	s.closed = true
 	return s.r.Close()
 }
 

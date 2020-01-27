@@ -26,7 +26,7 @@ func consume(t *testing.T, stream ArtifactStream) []string {
 
 type readCloserTester struct {
 	reader io.ReadCloser
-	called bool
+	called int
 }
 
 func (r *readCloserTester) Read(p []byte) (n int, err error) {
@@ -34,8 +34,22 @@ func (r *readCloserTester) Read(p []byte) (n int, err error) {
 }
 
 func (r *readCloserTester) Close() error {
-	r.called = true
+	r.called++
 	return r.reader.Close()
+}
+
+type streamCloserTester struct {
+	stream ArtifactStream
+	called int
+}
+
+func (s *streamCloserTester) Next() (string, error) {
+	return s.stream.Next()
+}
+
+func (s *streamCloserTester) Close() error {
+	s.called++
+	return s.stream.Close()
 }
 
 func TestPeekableStream(t *testing.T) {
@@ -103,12 +117,13 @@ func TestPeekableStream(t *testing.T) {
 	})
 
 	t.Run("closes underlying stream", func(t *testing.T) {
-		readCloserTester := &readCloserTester{
-			reader: ioutil.NopCloser(bytes.NewBufferString("a\nb\nc")),
+		tester := &streamCloserTester{
+			stream: EmptyStream(),
 		}
-		reader := NewPeekableArtifactStream(LineReaderStream(readCloserTester))
+		reader := NewPeekableArtifactStream(tester)
 		require.NoError(t, reader.Close())
-		assert.True(t, readCloserTester.called)
+		require.NoError(t, reader.Close())
+		assert.Equal(t, 1, tester.called)
 	})
 }
 
@@ -161,8 +176,9 @@ func TestLineReaderStream(t *testing.T) {
 		}
 		reader := LineReaderStream(readCloserTester)
 		assert.Equal(t, []string{"a", "b", "c"}, consume(t, reader))
-		reader.Close()
-		assert.True(t, readCloserTester.called)
+		require.NoError(t, reader.Close())
+		require.NoError(t, reader.Close())
+		assert.Equal(t, 1, readCloserTester.called)
 	})
 }
 
@@ -238,18 +254,17 @@ func TestXor(t *testing.T) {
 	})
 
 	t.Run("closes underlying streams", func(t *testing.T) {
-		readCloserTesterA := &readCloserTester{
-			reader: ioutil.NopCloser(bytes.NewBuffer(nil)),
+		a := &streamCloserTester{
+			stream: EmptyStream(),
 		}
-		readCloserTesterB := &readCloserTester{
-			reader: ioutil.NopCloser(bytes.NewBuffer(nil)),
+		b := &streamCloserTester{
+			stream: EmptyStream(),
 		}
-		a := LineReaderStream(readCloserTesterA)
-		b := LineReaderStream(readCloserTesterB)
 		c := Xor(a, b)
 		require.NoError(t, c.Close())
-		assert.True(t, readCloserTesterA.called)
-		assert.True(t, readCloserTesterB.called)
+		require.NoError(t, c.Close())
+		assert.Equal(t, 1, a.called)
+		assert.Equal(t, 1, b.called)
 	})
 }
 
@@ -332,18 +347,17 @@ func TestSub(t *testing.T) {
 	})
 
 	t.Run("closes underlying streams", func(t *testing.T) {
-		readCloserTesterA := &readCloserTester{
-			reader: ioutil.NopCloser(bytes.NewBuffer(nil)),
+		a := &streamCloserTester{
+			stream: EmptyStream(),
 		}
-		readCloserTesterB := &readCloserTester{
-			reader: ioutil.NopCloser(bytes.NewBuffer(nil)),
+		b := &streamCloserTester{
+			stream: EmptyStream(),
 		}
-		a := LineReaderStream(readCloserTesterA)
-		b := LineReaderStream(readCloserTesterB)
 		c := Sub(a, b)
 		require.NoError(t, c.Close())
-		assert.True(t, readCloserTesterA.called)
-		assert.True(t, readCloserTesterB.called)
+		require.NoError(t, c.Close())
+		assert.Equal(t, 1, a.called)
+		assert.Equal(t, 1, b.called)
 	})
 }
 
@@ -440,50 +454,36 @@ func TestMerge3Streams(t *testing.T) {
 		assert.Equal(t, []string{"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l"}, consume(t, d))
 	})
 
-	t.Run("closes underlying streams 1", func(t *testing.T) {
-		readCloserTesterA := &readCloserTester{
-			reader: ioutil.NopCloser(bytes.NewBuffer(nil)),
-		}
-
-		a := LineReaderStream(readCloserTesterA)
-		c := Merge(a)
-		require.NoError(t, c.Close())
-		assert.True(t, readCloserTesterA.called)
-	})
-
 	t.Run("closes underlying streams 2", func(t *testing.T) {
-		readCloserTesterA := &readCloserTester{
-			reader: ioutil.NopCloser(bytes.NewBuffer(nil)),
+		a := &streamCloserTester{
+			stream: EmptyStream(),
 		}
-		readCloserTesterB := &readCloserTester{
-			reader: ioutil.NopCloser(bytes.NewBuffer(nil)),
+		b := &streamCloserTester{
+			stream: EmptyStream(),
 		}
-		a := LineReaderStream(readCloserTesterA)
-		b := LineReaderStream(readCloserTesterB)
 		c := Merge(a, b)
 		require.NoError(t, c.Close())
-		assert.True(t, readCloserTesterA.called)
-		assert.True(t, readCloserTesterB.called)
+		require.NoError(t, c.Close())
+		assert.Equal(t, 1, a.called)
+		assert.Equal(t, 1, b.called)
 	})
 
 	t.Run("closes underlying streams 3", func(t *testing.T) {
-		readCloserTesterA := &readCloserTester{
-			reader: ioutil.NopCloser(bytes.NewBuffer(nil)),
+		a := &streamCloserTester{
+			stream: EmptyStream(),
 		}
-		readCloserTesterB := &readCloserTester{
-			reader: ioutil.NopCloser(bytes.NewBuffer(nil)),
+		b := &streamCloserTester{
+			stream: EmptyStream(),
 		}
-		readCloserTesterC := &readCloserTester{
-			reader: ioutil.NopCloser(bytes.NewBuffer(nil)),
+		c := &streamCloserTester{
+			stream: EmptyStream(),
 		}
-		a := LineReaderStream(readCloserTesterA)
-		b := LineReaderStream(readCloserTesterB)
-		c := LineReaderStream(readCloserTesterC)
 
 		d := Merge(a, b, c)
 		require.NoError(t, d.Close())
-		assert.True(t, readCloserTesterA.called)
-		assert.True(t, readCloserTesterB.called)
-		assert.True(t, readCloserTesterC.called)
+		require.NoError(t, d.Close())
+		assert.Equal(t, 1, a.called)
+		assert.Equal(t, 1, b.called)
+		assert.Equal(t, 1, c.called)
 	})
 }
