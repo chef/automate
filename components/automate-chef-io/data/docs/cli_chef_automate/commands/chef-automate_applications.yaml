@@ -1,5 +1,5 @@
 name: chef-automate applications
-synopsis: Manage applications visibility features
+synopsis: Manage applications observability features
 usage: chef-automate applications COMMAND [flags]
 options:
 - name: help

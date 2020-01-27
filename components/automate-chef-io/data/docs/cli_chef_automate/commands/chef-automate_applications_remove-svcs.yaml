@@ -1,6 +1,15 @@
 name: chef-automate applications remove-svcs
 synopsis: Remove services from the applications database
 usage: chef-automate applications remove-svcs [flags]
+description: |2
+
+  Remove services from the applications database.
+
+  You must fully decommission services by retiring physical hardware, terminating
+  the VM or container, or by using 'hab svc unload', before using the
+  'remove-svcs' command. Services that are incompletely decommissioned will send
+  a health-check at the appointed time and Automate will re-add them to the
+  services database.
 options:
 - name: all
   default_value: "false"
@@ -65,4 +74,4 @@ inherited_options:
 - name: result-json
   usage: Write command result as JSON to PATH
 see_also:
-- chef-automate applications - Manage applications visibility features
+- chef-automate applications - Manage applications observability features
