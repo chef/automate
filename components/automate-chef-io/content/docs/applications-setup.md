@@ -123,13 +123,13 @@ Chef Habitat automatically searches that directory and uses the certificate at s
 **On Linux systems**, copy the certificate to`/hab/cache/ssl` if you are the root user and `~/.hab/cache/ssl` if you are a non-root user. If you are a non-root user, the full file path is `/Users/username/.hab/cache/ssl/automate.cert`, located in your local user's home directory. Non-root users may need to use `sudo` with the command. For example, as the root user, copy the file with:
 
 ```shell
-cp /hab/svc/automate-load-balancer/data/automate.cert /hab/cache/ssl/automate.cert
+cp /path/to/automate.cert /hab/cache/ssl/automate.cert
 ```
 
 **On Windows systems**, store your certs in `C:\hab\cache\ssl`. For example, copy the file with:
 
 ```powershell
-Copy-Item "C:\hab\svc\automate-load-balancer\data\automate.cert" -Destination "C:\hab\cache\ssl"
+Copy-Item "C:\path\to\automate.cert" -Destination "C:\hab\cache\ssl"
 ```
 
 #### Add the TLS Certificate to Your Event Stream Command

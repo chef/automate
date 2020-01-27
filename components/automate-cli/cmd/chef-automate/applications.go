@@ -174,9 +174,11 @@ func newApplicationsRemoveSvcsCmd() *cobra.Command {
 		Long: `
 Remove services from the applications database.
 
-You must decommission the services prior to running this command. Services
-removed with this command will be added to the database again if Automate
-receives a health check from the service.
+You must fully decommission services by retiring physical hardware, terminating
+the VM or container, or by using 'hab svc unload', before using the
+'remove-svcs' command. Services that are incompletely decommissioned will send
+a health-check at the appointed time and Automate will re-add them to the
+services database.
 `,
 		RunE: runApplicationsRemoveSvcsCmd,
 	}
