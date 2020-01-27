@@ -29,35 +29,6 @@ type ArtifactRepoSnapshotMetadata struct {
 	Checksum string
 }
 
-type loggingStream struct {
-	stream ArtifactStream
-	out    io.Writer
-}
-
-func (s *loggingStream) Next() (string, error) {
-	next, err := s.stream.Next()
-	if err != nil {
-		return "", err
-	}
-
-	if _, err := fmt.Fprintln(s.out, next); err != nil {
-		return "", err
-	}
-
-	return next, nil
-}
-
-func (s *loggingStream) Close() error {
-	return s.stream.Close()
-}
-
-func NewLoggingStream(stream ArtifactStream, out io.Writer) ArtifactStream {
-	return &loggingStream{
-		stream: stream,
-		out:    out,
-	}
-}
-
 type uploadSnapshotArtifactIterator struct {
 	ctx               context.Context
 	artifactsToUpload ArtifactStream

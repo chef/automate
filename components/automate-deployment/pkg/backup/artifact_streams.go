@@ -2,6 +2,7 @@ package backup
 
 import (
 	"bufio"
+	"fmt"
 	"io"
 	"strings"
 
@@ -351,4 +352,38 @@ func Merge(streams ...ArtifactStream) ArtifactStream {
 	}
 
 	return root
+}
+
+type loggingStream struct {
+	stream ArtifactStream
+	out    io.Writer
+	called bool
+}
+
+func (s *loggingStream) Next() (string, error) {
+	next, err := s.stream.Next()
+	if err != nil {
+		return "", err
+	}
+
+	if _, err := fmt.Fprintln(s.out, next); err != nil {
+		return "", err
+	}
+
+	return next, nil
+}
+
+func (s *loggingStream) Close() error {
+	if s.called {
+		return nil
+	}
+	s.called = true
+	return s.stream.Close()
+}
+
+func NewLoggingStream(stream ArtifactStream, out io.Writer) ArtifactStream {
+	return &loggingStream{
+		stream: stream,
+		out:    out,
+	}
 }
