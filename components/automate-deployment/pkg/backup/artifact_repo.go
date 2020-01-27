@@ -119,7 +119,7 @@ func (b *uploadSnapshotArtifactIterator) Close() error {
 func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string,
 	srcBucket Bucket, requiredArtifacts ArtifactStream) (ArtifactRepoSnapshot, error) {
 
-	r, err := repo.openSnapshotFile(ctx, name)
+	r, _, err := repo.openSnapshotFile(ctx, name)
 	if err != nil {
 		if !IsNotExist(err) {
 			return nil, err
@@ -167,31 +167,33 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string,
 	return nil, nil
 }
 
-type restoreOptions struct {
+type artifactRestoreOptions struct {
 	validateChecksum bool
+	checksum         string
 }
 
-type RestoreOpts func(*restoreOptions)
+type ArtifactRestoreOpt func(*artifactRestoreOptions)
 
-func ArtifactRepoRestoreValidateChecksum(checksum string) RestoreOpts {
-	return func(r *restoreOptions) {
+func ArtifactRepoRestoreValidateChecksum(checksum string) ArtifactRestoreOpt {
+	return func(r *artifactRestoreOptions) {
 		r.validateChecksum = true
+		r.checksum = checksum
 	}
 }
 
-func (repo *ArtifactRepo) Restore(ctx context.Context, dstBucket Bucket, name string, optFuncs ...RestoreOpts) error {
-	opts := restoreOptions{}
+func (repo *ArtifactRepo) Restore(ctx context.Context, dstBucket Bucket, name string, optFuncs ...ArtifactRestoreOpt) error {
+	opts := artifactRestoreOptions{}
 	for _, o := range optFuncs {
 		o(&opts)
 	}
-	if opts.validateChecksum {
-		// TODO: checksum validation
-		panic("validate checksum unimplemented")
-	}
 
-	snapshotFilesReader, err := repo.openSnapshotFile(ctx, name)
+	snapshotFilesReader, checksum, err := repo.openSnapshotFile(ctx, name)
 	if err != nil {
 		return err
+	}
+
+	if opts.validateChecksum && checksum != opts.checksum {
+		return errors.New("Invalid checksum")
 	}
 
 	artifactsToRestore := LineReaderStream(snapshotFilesReader)
@@ -213,7 +215,7 @@ func (repo *ArtifactRepo) Restore(ctx context.Context, dstBucket Bucket, name st
 }
 
 func (repo *ArtifactRepo) Remove(ctx context.Context, name string) error {
-	snapshotFilesReader, err := repo.openSnapshotFile(ctx, name)
+	snapshotFilesReader, _, err := repo.openSnapshotFile(ctx, name)
 	if err != nil {
 		return err
 	}
@@ -256,7 +258,7 @@ func (repo *ArtifactRepo) ListArtifacts(ctx context.Context, excludedSnapshots .
 		if stringutils.SliceContains(excludedSnapshots, name) {
 			continue
 		}
-		reader, err := repo.openSnapshotFile(ctx, name)
+		reader, _, err := repo.openSnapshotFile(ctx, name)
 		if err != nil {
 			for _, s := range streams {
 				s.Close()
@@ -269,36 +271,42 @@ func (repo *ArtifactRepo) ListArtifacts(ctx context.Context, excludedSnapshots .
 	return Merge(streams...)
 }
 
-func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (io.ReadCloser, error) {
+func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (io.ReadCloser, string, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	reader, err := repo.snapshotsRoot.NewReader(ctx, fmt.Sprintf("%s.snapshot", name), &NoOpObjectVerifier{})
+	r, err := repo.snapshotsRoot.NewReader(ctx, fmt.Sprintf("%s.snapshot", name), &NoOpObjectVerifier{})
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
+
+	// r is closed with reader
+	reader := newChecksummingReader(r)
+	defer reader.Close()
 
 	tmpFile, err := ioutil.TempFile("", fmt.Sprintf("snapshot-%s", name))
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	if err := os.Remove(tmpFile.Name()); err != nil {
 		tmpFile.Close()
-		return nil, err
+		return nil, "", err
 	}
 
 	if _, err := io.Copy(tmpFile, reader); err != nil {
 		tmpFile.Close()
-		return nil, err
+		return nil, "", err
 	}
+
+	checksum := reader.BlobSHA256()
 
 	if _, err := tmpFile.Seek(0, os.SEEK_SET); err != nil {
 		tmpFile.Close()
-		return nil, err
+		return nil, "", err
 	}
 
-	return tmpFile, nil
+	return tmpFile, checksum, nil
 }
 
 func (repo *ArtifactRepo) removeSnapshotFile(ctx context.Context, name string) error {
