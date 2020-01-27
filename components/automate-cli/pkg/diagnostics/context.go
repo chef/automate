@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/tls"
 	"encoding/json"
+	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -12,6 +13,7 @@ import (
 	"github.com/pkg/errors"
 
 	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/components/applications-service/pkg/nats"
 	"github.com/chef/automate/components/automate-cli/pkg/diagnostics/lbrequest"
 	"github.com/chef/automate/lib/httputils"
 )
@@ -36,6 +38,8 @@ type TestContext interface {
 	WriteJSON(writer io.Writer) error
 	// DoLBRequest performs an authenticated request against the automate load balancer
 	DoLBRequest(path string, opts ...lbrequest.Opts) (*http.Response, error)
+	// PublishViaNATS publishes the messages to the automate event gateway
+	PublishViaNATS([][]byte) error
 	// GetOption returns the Option for the given key
 	GetOption(key string) *Option
 }
@@ -181,6 +185,40 @@ func (c *testContext) DoLBRequest(path string, opts ...lbrequest.Opts) (*http.Re
 	}
 
 	return c.httpClient.Do(req)
+}
+
+func (c *testContext) PublishViaNATS(messages [][]byte) error {
+	authToken, err := c.adminToken()
+	if err != nil {
+		return errors.Wrap(err, "Failed to get admin token")
+	}
+	port := "4222"
+	clientID := "diagnostics"
+	url := fmt.Sprintf("nats://%s@%s:%s", authToken, c.lbURL.Hostname(), port)
+
+	client := nats.NewExternalClient(
+		url,
+		"event-service", clientID, "", "habitat")
+	client.InsecureSkipVerify = true
+
+	// We would need to see the event gateway's service config to know whether to
+	// set this
+	client.DisableTLS = false
+
+	err = client.Connect()
+	if err != nil {
+		return errors.Wrapf(err, "failed to connenct to nats at URL %s", url)
+	}
+	defer client.Close()
+
+	for _, message := range messages {
+		err = client.PublishBytes(message)
+		if err != nil {
+			return errors.Wrap(err, "failed to publish message to automate NATS gateway")
+		}
+	}
+
+	return nil
 }
 
 func (c *testContext) adminToken() (string, error) {
