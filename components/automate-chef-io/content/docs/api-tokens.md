@@ -13,7 +13,7 @@ toc = true
 ## Overview
 Chef Automate API Tokens allow access to the Chef Automate API.
 
-Permission on the `iam:tokens` resource is required to interact with API tokens. Any user that is part of the `admins` team will have this permission, otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
+Permission on the `iam:tokens` resource is required to interact with tokens. Any user that is part of the `admins` team, or the `Administrator` policy will have this permission, otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 
 ## Managing API Tokens
 
