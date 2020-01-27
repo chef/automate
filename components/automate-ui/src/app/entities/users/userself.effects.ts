@@ -48,6 +48,11 @@ export class UserSelfEffects {
   @Effect()
   getUserSelfFailure$ = this.actions$.pipe(
     ofType(UserSelfActionTypes.GET_FAILURE),
+    // when first logging in, we see this failure with no error.
+    // We do not see the error in the network tab.
+    // It looks like it is because the request is canceled.
+    // Here we will filter out that error.
+    filter(({ payload: { error } }: GetUserSelfFailure) => error),
     map(({ payload: { error } }: GetUserSelfFailure) => {
       const msg = error.error;
       return new CreateNotification({
