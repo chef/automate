@@ -120,7 +120,7 @@ Use **one** of these three options:
 
 Chef Habitat automatically searches that directory and uses the certificate at start up.
 
-**On Linux systems**, copy the certificate to`/hab/cache/ssl` if you are the root user and `~/.hab/cache/ssl` if you are a non-root user. If you are a non-root user, the full file path is `/Users/username/.hab/cache/ssl/automate.cert`, located in your local user's home directory. Non-root users may need to use `sudo` with the command. For example, as the root user, copy the file with:
+**On Linux systems**, copy the certificate to`/hab/cache/ssl` if you are the root user, or to `~/.hab/cache/ssl` if you are a non-root user. If you are a non-root user, the full file path is `/Users/username/.hab/cache/ssl/automate.cert`, located in your local user's home directory. Non-root users may need to use `sudo` with the command. For example, as the root user, copy the file with:
 
 ```shell
 cp /path/to/automate.cert /hab/cache/ssl/automate.cert
