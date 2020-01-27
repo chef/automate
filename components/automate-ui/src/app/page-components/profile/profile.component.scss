@@ -78,11 +78,7 @@ a, button:not(.dropdown-toggle) {
   padding: 0 16px 6px;
   font-size: 12px;
   line-height: 24px;
-
-  &:not(:last-child),
-  &:first-child {
-    border-bottom: 1px solid $chef-grey;
-  }
+  border-bottom: 1px solid $chef-grey;
 
   .version,
   .build {

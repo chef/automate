@@ -13,10 +13,15 @@
 <chef-click-outside omit="dropdown-toggle" (clickOutside)="closeDropdown()">
   <chef-dropdown class="dropdown" [attr.visible]="dropdownVisible" (keydown.esc)="closeDropdown()">
     <ul class="dropdown-list">
-      <li class="dropdown-list-item">
-        Signed in as <strong class="dropdown-display-name">{{ displayName }}</strong>
-      </li>
+      <app-authorized not [allOf]="['/auth/users/{username}', 'get', userName]">
+        <li class="dropdown-list-item">
+          Signed in as <strong class="dropdown-display-name">{{ userName }}</strong>
+        </li>
+      </app-authorized>
       <app-authorized [allOf]="['/auth/users/{username}', 'get', userName]">
+        <li class="dropdown-list-item">
+          Signed in as <strong class="dropdown-display-name">{{ displayName }}</strong>
+        </li>
         <li class="dropdown-list-item">
           <a [routerLink]="['/user-details', userName]"
             (click)="closeDropdown()"
