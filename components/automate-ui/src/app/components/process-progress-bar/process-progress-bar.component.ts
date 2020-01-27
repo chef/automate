@@ -17,8 +17,8 @@ export class ProcessProgressBarComponent implements OnInit {
   public cancelRulesInProgress = false;
   public mode = 'determinate';
   public bufferValue = 0;
+  public percentageComplete = 0;
   private isDestroyed = new Subject<boolean>();
-  private percentageComplete = 0;
   private applyRulesInProgress = false;
 
   constructor(
