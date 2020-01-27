@@ -3,6 +3,9 @@
 #shellcheck disable=SC2034
 #shellcheck disable=SC2154
 
+# shellcheck source=integration/helpers/s3.sh
+source "${source_dir}/helpers/s3.sh"
+
 test_name="backup-external-es-s3"
 test_backup_restore=true
 

@@ -373,8 +373,6 @@ export A2_ROOT_DIR="$source_dir/../"
 # Load the shared code
 # shellcheck source=./helpers/log.sh
 source "${source_dir}/helpers/log.sh"
-# shellcheck source=./helpers/s3.sh
-source "${source_dir}/helpers/s3.sh"
 # shellcheck source=./helpers/setup.sh
 source "${source_dir}/helpers/setup.sh"
 # shellcheck source=./helpers/build.sh

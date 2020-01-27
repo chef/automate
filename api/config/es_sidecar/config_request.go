@@ -85,16 +85,15 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 		backupsCfg = &ConfigRequest_V1_System_Backups{}
 	}
 
-	// If we're in external mode, apply and global and external config
+	c.applyGlobalBackupConfig(backupsCfg, g.GetV1().GetBackups())
+
 	if externalCfg.GetEnable().GetValue() {
-		c.applyGlobalBackupConfig(backupsCfg, g.GetV1().GetBackups())
 		c.applyExternalConfig(backupsCfg, externalCfg.GetBackup())
+		// Early return as we don't need to migrate to the backup-gateway with
+		// external es
 		return
 	}
 
-	// If we're in internal mode, apply global config and then ensure that old
-	// internal fs config is migrated to use the backup gateway in S3 mode.
-	c.applyGlobalBackupConfig(backupsCfg, g.GetV1().GetBackups())
 	c.migrateToBackupGateway(backupsCfg)
 
 	return
@@ -173,8 +172,8 @@ func (c *ConfigRequest) applyGlobalBackupConfig(
 		return
 	}
 
-	if backend := global.GetLocation(); backend != nil {
-		cfg.Backend = backend
+	if backend := global.GetLocation().GetValue(); backend != "" {
+		cfg.Backend = w.String(backend)
 	}
 
 	if globalS3 := global.GetS3(); globalS3 != nil {
