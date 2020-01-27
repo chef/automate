@@ -17,10 +17,6 @@
             <app-authorized [allOf]="['/iam/v2/projects', 'post']">
               <chef-button data-cy="create-project" primary (click)="openCreateModal()">Create Project</chef-button>
             </app-authorized>
-            <app-authorized [allOf]="['/iam/v2/apply-rules', 'post']">
-              <chef-button secondary [disabled]="isDisabled()"
-                id="update-start-button" (click)="openConfirmUpdateStartModal()">{{ getButtonText() }}</chef-button>
-            </app-authorized>
           </chef-toolbar>
           <app-authorized [allOf]="['/iam/v2/projects', 'get']">
             <chef-table-new>
@@ -91,20 +87,6 @@
         (deleteClicked)="deleteProject()"
         objectAction="Delete">
       </app-delete-object-modal>
-
-      <app-confirm-apply-start-modal
-        [visible]="confirmApplyStartModalVisible"
-        (confirm)="confirmApplyStart()"
-        (cancel)="cancelApplyStart()">
-      </app-confirm-apply-start-modal>
-
-      <app-confirm-apply-stop-modal
-        [visible]="confirmApplyStopModalVisible"
-        [applyRulesStatus]="projects.applyRulesStatus$ | async"
-        [stopRulesInProgress]="cancelRulesInProgress"
-        (confirm)="confirmApplyStop()"
-        (cancel)="cancelApplyStop()">
-      </app-confirm-apply-stop-modal>
 
       <app-message-modal
         [title]="'Could Not Delete Project'"

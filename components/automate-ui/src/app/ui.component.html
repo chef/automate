@@ -18,13 +18,13 @@
   </app-feature-flags>
   
   <!-- App Header -->
-  <div id="app-header-wrapper" *ngIf="layoutFacade.showHeader">
+  <div id="app-header-wrapper" [hidden]="!layoutFacade.layout.header.display">
     <app-license-notifications (triggerApplyLicense)="licenseApplyModal.openModal();"></app-license-notifications>
     <app-navbar></app-navbar>
   </div>
 
   <!-- App Content -->
-  <div id="app-content-wrapper" [attr.hasNotifications]="layoutFacade.hasGlobalNotifications() ? true : null" [ngStyle]="{'height' : layoutFacade.contentHeight}">
+  <div id="app-content-wrapper" [attr.hasNotifications]="layoutFacade.hasGlobalNotifications() ? true : null" [ngStyle]="layoutFacade.getContentStyle()">
     <div id="main-content-wrapper">
       <div id="notifications-wrapper">
         <app-chef-notifications></app-chef-notifications>
@@ -33,10 +33,14 @@
       <router-outlet></router-outlet>
     </div>
     <!-- App Sidebar -->
-    <chef-sidebar id="app-sidebar" *ngIf="layoutFacade.showSidebar"></chef-sidebar>
+    <div [hidden]="!layoutFacade.layout.sidebar.display">
+      <chef-sidebar id="app-sidebar" [hidden]="!layoutFacade.layout.sidebar.navigation"></chef-sidebar>
+    </div>
+  </div>
+  
+  <!-- User Notifications -->
+  <div [hidden]="!layoutFacade.layout.userNotifications.display">
+    <app-process-progress-bar></app-process-progress-bar>
+    <app-pending-edits-bar></app-pending-edits-bar>
   </div>
 </div>
-
-<!-- User Notifications -->
-<app-process-progress-bar></app-process-progress-bar>
-<app-pending-edits-bar></app-pending-edits-bar>

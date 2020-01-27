@@ -2,6 +2,7 @@ import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import { ProjectService } from 'app/entities/projects/project.service';
 
@@ -22,6 +23,7 @@ export class ProcessProgressBarComponent implements OnInit {
   
 
   constructor(
+    public layoutFacade: LayoutFacadeService,
     public projects: ProjectService
     ) {}
 
@@ -39,6 +41,8 @@ export class ProcessProgressBarComponent implements OnInit {
         if (!this.cancelRulesInProgress && state === ApplyRulesStatusState.Running) {
           this.percentageComplete = percentageComplete;
         }
+        this.layoutFacade.layout.userNotifications.updatesProcessing = this.applyRulesInProgress;
+        this.layoutFacade.updateDisplay();
       });
   }
 

@@ -1,7 +1,8 @@
 @import "~styles/variables";
 
 #pending-edits-bar {
-  background-color: #00b36a;
+  background-color: #3864f2;
+  color: #fff;
   padding: 7px 10px;
   position: relative;
 
@@ -15,8 +16,6 @@
   }
 
   button {
-    font-size: 14px;
-    font-weight: inherit;
     position: absolute;
     right: 0;
     top: 0;
