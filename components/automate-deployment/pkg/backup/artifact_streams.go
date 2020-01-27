@@ -214,20 +214,6 @@ func Xor(a ArtifactStream, b ArtifactStream) ArtifactStream {
 	peekableA := NewPeekableArtifactStream(a)
 	peekableB := NewPeekableArtifactStream(b)
 
-	if _, err := peekableA.Peek(); err != nil {
-		if err == io.EOF {
-			return b
-		}
-		return ErrStream(err)
-	}
-
-	if _, err := peekableB.Peek(); err != nil {
-		if err == io.EOF {
-			return peekableA
-		}
-		return ErrStream(err)
-	}
-
 	return &xorStream{
 		a: peekableA,
 		b: peekableB,
