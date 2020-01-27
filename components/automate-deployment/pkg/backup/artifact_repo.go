@@ -167,6 +167,51 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string,
 	return nil, nil
 }
 
+type restoreOptions struct {
+	validateChecksum bool
+}
+
+type RestoreOpts func(*restoreOptions)
+
+func ArtifactRepoRestoreValidateChecksum(checksum string) RestoreOpts {
+	return func(r *restoreOptions) {
+		r.validateChecksum = true
+	}
+}
+
+func (repo *ArtifactRepo) Restore(ctx context.Context, dstBucket Bucket, name string, optFuncs ...RestoreOpts) error {
+	opts := restoreOptions{}
+	for _, o := range optFuncs {
+		o(&opts)
+	}
+	if opts.validateChecksum {
+		// TODO: checksum validation
+		panic("validate checksum unimplemented")
+	}
+
+	snapshotFilesReader, err := repo.openSnapshotFile(ctx, name)
+	if err != nil {
+		return err
+	}
+
+	artifactsToRestore := LineReaderStream(snapshotFilesReader)
+	defer artifactsToRestore.Close()
+
+	uploader := NewBulkUploader(dstBucket, "")
+
+	uploadIterator, err := newUploadSnapshotArtifactIterator(ctx, repo.artifactsRoot,
+		artifactsToRestore, EmptyStream())
+	if err != nil {
+		return err
+	}
+
+	if err := uploader.Upload(ctx, uploadIterator); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (repo *ArtifactRepo) Remove(ctx context.Context, name string) error {
 	snapshotFilesReader, err := repo.openSnapshotFile(ctx, name)
 	if err != nil {

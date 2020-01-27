@@ -79,7 +79,7 @@ func (m *simpleBulkUploader) doUpload(ctx context.Context, req BlobUploadRequest
 	}
 
 	if _, err := io.Copy(writer, req.Reader); err != nil {
-		return nil
+		return err
 	}
 
 	if err := writer.Close(); err != nil {

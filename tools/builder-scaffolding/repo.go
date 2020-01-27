@@ -22,6 +22,12 @@ var snapshotCmd = &cobra.Command{
 	RunE: runSnapshot,
 }
 
+var restoreCmd = &cobra.Command{
+	Use:  "restore",
+	Args: cobra.ExactArgs(1),
+	RunE: runRestore,
+}
+
 var removeSnapshotCmd = &cobra.Command{
 	Use:  "remove",
 	Args: cobra.ExactArgs(1),
@@ -30,6 +36,7 @@ var removeSnapshotCmd = &cobra.Command{
 
 func init() {
 	repoCmd.AddCommand(snapshotCmd)
+	repoCmd.AddCommand(restoreCmd)
 	repoCmd.AddCommand(removeSnapshotCmd)
 }
 
@@ -104,6 +111,17 @@ func runSnapshot(c *cobra.Command, args []string) error {
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to snapshot")
 	}
+	return nil
+}
+
+func runRestore(c *cobra.Command, args []string) error {
+	ctx := context.Background()
+
+	artifactRepo, bldrBucket := artifactRepo()
+	if err := artifactRepo.Restore(ctx, bldrBucket, args[0]); err != nil {
+		logrus.WithError(err).Fatal("Failed to restore snapshot")
+	}
+
 	return nil
 }
 
