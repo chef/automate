@@ -32,10 +32,10 @@ message Statement {
         DENY = 1;
     }
     // Whether the statement allows or denies.
-    // One of `ALLOW`, or `DENY`, respectively.
+    // One of `ALLOW` or `DENY`, respectively.
     Effect effect = 1;
 
-    // DEPRECATED: Actions defined inline. Use role instead.
+    // Actions defined inline. Best practices recommend that you use custom roles where practical.
     repeated string actions = 3;
 
     // The role defines a set of actions that the statement is scoped to.
@@ -54,7 +54,7 @@ message Role {
     // Unique, user-specified ID. Cannot be changed.
     string id = 2;
     // Whether this policy is user created or chef managed.
-    // One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
+    // One of `CUSTOM` or `CHEF_MANAGED`, respectively.
     Type type = 3;
     // List of actions that this role scopes to.
     repeated string actions = 4;
@@ -68,7 +68,7 @@ message Project {
     // Unique, user-specified ID. Cannot be changed.
     string id = 2;
     // Whether this policy is user created or chef managed.
-    // One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
+    // One of `CUSTOM` or `CHEF_MANAGED`, respectively.
     Type type = 3;
     // The current status of the rules for this project.
     ProjectRulesStatus status = 4;
