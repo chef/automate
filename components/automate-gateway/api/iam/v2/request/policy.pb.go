@@ -23,7 +23,7 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Does not contain type as the enduser can only create 'custom' policies.
 type CreatePolicyReq struct {
-	// Unique ID for the new policy. Cannot be changed after creation.
+	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Name for the new policy.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -169,7 +169,6 @@ func (m *ListPoliciesReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_ListPoliciesReq proto.InternalMessageInfo
 
 type AddPolicyMembersReq struct {
-	// Unique ID for the policy to modify.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// List of members to add to the policy.
 	Members              []string `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
@@ -258,7 +257,7 @@ func (m *GetPolicyReq) GetId() string {
 
 // Does not contain type as the enduser can only create 'custom' policies.
 type UpdatePolicyReq struct {
-	// Unique ID for the policy to modify. Cannot be changed.
+	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Members affected by this policy.
 	Members []string `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
@@ -443,7 +442,6 @@ func (m *ResetToV1Req) XXX_DiscardUnknown() {
 var xxx_messageInfo_ResetToV1Req proto.InternalMessageInfo
 
 type ListPolicyMembersReq struct {
-	// Unique ID for the policy to list members of.
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -483,7 +481,6 @@ func (m *ListPolicyMembersReq) GetId() string {
 }
 
 type ReplacePolicyMembersReq struct {
-	// Unique ID for the policy to modify.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// List of members that replaces previous policy member list.
 	Members              []string `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
@@ -532,7 +529,6 @@ func (m *ReplacePolicyMembersReq) GetMembers() []string {
 }
 
 type RemovePolicyMembersReq struct {
-	// Unique ID for the policy to modify.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// List of members to remove from the policy.
 	Members              []string `protobuf:"bytes,2,rep,name=members,proto3" json:"members,omitempty"`
@@ -582,7 +578,7 @@ func (m *RemovePolicyMembersReq) GetMembers() []string {
 
 // Does not contain type as the enduser can only create 'custom' roles.
 type CreateRoleReq struct {
-	// Unique ID for the role. Cannot be changed after creation.
+	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Name for the new role.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -727,7 +723,7 @@ func (m *DeleteRoleReq) GetId() string {
 }
 
 type UpdateRoleReq struct {
-	// Unique ID for the role to update. Cannot be changed.
+	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Name for the role.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -895,7 +891,7 @@ func (m *ListProjectsReq) XXX_DiscardUnknown() {
 var xxx_messageInfo_ListProjectsReq proto.InternalMessageInfo
 
 type CreateProjectReq struct {
-	// Unique ID for the project. Cannot be changed after creation.
+	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Name for the new project.
 	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
@@ -944,7 +940,7 @@ func (m *CreateProjectReq) GetName() string {
 }
 
 type UpdateProjectReq struct {
-	// Unique ID for the project. Cannot be changed.
+	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	// Name for the project.
 	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`

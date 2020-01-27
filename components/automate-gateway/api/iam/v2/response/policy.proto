@@ -19,7 +19,6 @@ message UpdatePolicyResp {
 }
 
 message ListPoliciesResp {
-  // Unique ID for the policy to list members of.
   repeated Policy policies = 1;
 }
 

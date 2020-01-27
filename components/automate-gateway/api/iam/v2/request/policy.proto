@@ -8,7 +8,7 @@ import "components/automate-gateway/api/iam/v2/common/policy.proto";
 
 // Does not contain type as the enduser can only create 'custom' policies.
 message CreatePolicyReq {
-    // Unique ID for the new policy. Cannot be changed after creation.
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
     // Name for the new policy.
     string name = 2;
@@ -27,7 +27,6 @@ message DeletePolicyReq {
 message ListPoliciesReq {}
 
 message AddPolicyMembersReq {
-    // Unique ID for the policy to modify.
     string id = 1;
     // List of members to add to the policy.
     repeated string members = 2;
@@ -39,7 +38,7 @@ message GetPolicyReq {
 
 // Does not contain type as the enduser can only create 'custom' policies.
 message UpdatePolicyReq {
-    // Unique ID for the policy to modify. Cannot be changed.
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
     // Members affected by this policy.
     repeated string members = 2;
@@ -61,19 +60,16 @@ message GetPolicyVersionReq {}
 message ResetToV1Req {}
 
 message ListPolicyMembersReq {
-    // Unique ID for the policy to list members of.
     string id = 1;
 }
 
 message ReplacePolicyMembersReq {
-    // Unique ID for the policy to modify.
     string id = 1;
     // List of members that replaces previous policy member list.
     repeated string members = 2;
 }
 
 message RemovePolicyMembersReq {
-    // Unique ID for the policy to modify.
     string id = 1;
     // List of members to remove from the policy.
     repeated string members = 2;
@@ -81,7 +77,7 @@ message RemovePolicyMembersReq {
 
 // Does not contain type as the enduser can only create 'custom' roles.
 message CreateRoleReq {
-    // Unique ID for the role. Cannot be changed after creation.
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
     // Name for the new role.
     string name = 2;
@@ -100,7 +96,7 @@ message DeleteRoleReq {
 }
 
 message UpdateRoleReq {
-    // Unique ID for the role to update. Cannot be changed.
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
     // Name for the role.
     string name = 2;
@@ -119,14 +115,14 @@ message GetProjectReq {
 message ListProjectsReq {}
 
 message CreateProjectReq {
-    // Unique ID for the project. Cannot be changed after creation.
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
     // Name for the new project.
     string name = 2;
 }
 
 message UpdateProjectReq {
-    // Unique ID for the project. Cannot be changed.
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
     // Name for the project.
     string name = 2;

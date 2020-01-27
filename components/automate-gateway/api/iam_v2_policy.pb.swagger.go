@@ -135,7 +135,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the policy to modify. Cannot be changed.",
+            "description": "Unique, user-specified ID. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -170,7 +170,6 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the policy to list members of.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -195,7 +194,6 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -230,7 +228,6 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -265,7 +262,6 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -408,7 +404,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the project. Cannot be changed.",
+            "description": "Unique, user-specified ID. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -533,7 +529,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the role to update. Cannot be changed.",
+            "description": "Unique, user-specified ID. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -673,7 +669,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the policy to modify. Cannot be changed.",
+            "description": "Unique, user-specified ID. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -708,7 +704,6 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the policy to list members of.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -733,7 +728,6 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -768,7 +762,6 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -803,7 +796,6 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the policy to modify.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -946,7 +938,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the project. Cannot be changed.",
+            "description": "Unique, user-specified ID. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1071,7 +1063,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "Unique ID for the role to update. Cannot be changed.",
+            "description": "Unique, user-specified ID. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1096,8 +1088,7 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique ID for the policy to modify."
+          "type": "string"
         },
         "members": {
           "type": "array",
@@ -1125,7 +1116,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique ID for the new policy. Cannot be changed after creation."
+          "description": "Unique, user-specified ID. Cannot be changed."
         },
         "name": {
           "type": "string",
@@ -1168,7 +1159,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique ID for the project. Cannot be changed after creation."
+          "description": "Unique, user-specified ID. Cannot be changed."
         },
         "name": {
           "type": "string",
@@ -1189,7 +1180,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique ID for the role. Cannot be changed after creation."
+          "description": "Unique, user-specified ID. Cannot be changed."
         },
         "name": {
           "type": "string",
@@ -1276,8 +1267,7 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Policy"
-          },
-          "description": "Unique ID for the policy to list members of."
+          }
         }
       }
     },
@@ -1324,7 +1314,7 @@ func init() {
         },
         "id": {
           "type": "string",
-          "description": "Unique ID for the policy. Cannot be changed after creation."
+          "description": "Unique, user-specified ID. Cannot be changed."
         },
         "type": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Type",
@@ -1362,7 +1352,7 @@ func init() {
         },
         "id": {
           "type": "string",
-          "description": "Unique ID for the project. Cannot be changed after creation."
+          "description": "Unique, user-specified ID. Cannot be changed."
         },
         "type": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Type",
@@ -1388,8 +1378,7 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique ID for the policy to modify."
+          "type": "string"
         },
         "members": {
           "type": "array",
@@ -1416,8 +1405,7 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string",
-          "description": "Unique ID for the policy to modify."
+          "type": "string"
         },
         "members": {
           "type": "array",
@@ -1452,7 +1440,7 @@ func init() {
         },
         "id": {
           "type": "string",
-          "description": "Unique ID for the role. Cannot be changed after creation."
+          "description": "Unique, user-specified ID. Cannot be changed."
         },
         "type": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Type",
@@ -1529,7 +1517,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique ID for the policy to modify. Cannot be changed."
+          "description": "Unique, user-specified ID. Cannot be changed."
         },
         "members": {
           "type": "array",
@@ -1572,7 +1560,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique ID for the project. Cannot be changed."
+          "description": "Unique, user-specified ID. Cannot be changed."
         },
         "name": {
           "type": "string",
@@ -1593,7 +1581,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Unique ID for the role to update. Cannot be changed."
+          "description": "Unique, user-specified ID. Cannot be changed."
         },
         "name": {
           "type": "string",
