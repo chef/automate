@@ -151,7 +151,7 @@ EventFeed | GetEventTaskCounts | /event_task_counts | GET | events:tasks | count
 EventFeed | GetEventStringBuckets | /eventstrings | GET | events:strings | read
 {{% /responsive-table %}}
 
-## Applications (BETA)
+## Applications
 
 ### Applications page
 
