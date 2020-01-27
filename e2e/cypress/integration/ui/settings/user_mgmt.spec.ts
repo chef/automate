@@ -22,7 +22,7 @@ describe('user management', () => {
     cy.get('app-user-table').should('exist');
 
     // open modal
-    cy.get('[data-cy=app-user-table-add-button]').contains('Create User').click();
+    cy.get('[data-cy=app-user-table-add-button]').click();
     cy.get('app-user-management chef-modal').should('exist');
 
     // we increase the default delay to mimic the average human's typing speed
