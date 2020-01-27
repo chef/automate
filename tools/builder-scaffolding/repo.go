@@ -107,10 +107,12 @@ func runSnapshot(c *cobra.Command, args []string) error {
 
 	snapshotName := time.Now().Format("20060102150405")
 
-	_, err = artifactRepo.Snapshot(ctx, snapshotName, bldrBucket, requiredArtifactsStream)
+	meta, err := artifactRepo.Snapshot(ctx, snapshotName, bldrBucket, requiredArtifactsStream)
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to snapshot")
 	}
+
+	fmt.Printf("%-20s %s\n", meta.Name, meta.Checksum)
 	return nil
 }
 

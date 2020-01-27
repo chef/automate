@@ -24,10 +24,9 @@ func NewArtifactRepo(backupLocationSpec LocationSpecification) *ArtifactRepo {
 	}
 }
 
-type ArtifactRepoSnapshot interface {
-	Name() string
-	List() ArtifactStream
-	SHA256() string
+type ArtifactRepoSnapshotMetadata struct {
+	Name     string
+	Checksum string
 }
 
 type loggingStream struct {
@@ -117,16 +116,16 @@ func (b *uploadSnapshotArtifactIterator) Close() error {
 }
 
 func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string,
-	srcBucket Bucket, requiredArtifacts ArtifactStream) (ArtifactRepoSnapshot, error) {
+	srcBucket Bucket, requiredArtifacts ArtifactStream) (ArtifactRepoSnapshotMetadata, error) {
 
 	r, _, err := repo.openSnapshotFile(ctx, name)
 	if err != nil {
 		if !IsNotExist(err) {
-			return nil, err
+			return ArtifactRepoSnapshotMetadata{}, err
 		}
 	} else {
 		r.Close()
-		return nil, errors.New("Snapshot already exists")
+		return ArtifactRepoSnapshotMetadata{}, errors.New("Snapshot already exists")
 	}
 
 	artifactsInRepo := repo.ListArtifacts(ctx)
@@ -134,37 +133,43 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string,
 
 	uploadIterator, err := newUploadSnapshotArtifactIterator(ctx, srcBucket, requiredArtifacts, artifactsInRepo)
 	if err != nil {
-		return nil, err
+		return ArtifactRepoSnapshotMetadata{}, err
 	}
 	defer uploadIterator.Close() // nolint: errcheck
 
 	uploader := NewBulkUploader(repo.artifactsRoot, "")
 	if err := uploader.Upload(ctx, uploadIterator); err != nil {
-		return nil, err
+		return ArtifactRepoSnapshotMetadata{}, err
 	}
 
-	snapshotFileReader, err := uploadIterator.ReadSnapshotFile()
+	_snapshotFileReader, err := uploadIterator.ReadSnapshotFile()
 	if err != nil {
-		return nil, err
+		return ArtifactRepoSnapshotMetadata{}, err
 	}
+
+	// we don't need to close this as it gets closed with uploadIterator
+	snapshotFileReader := newChecksummingReader(ioutil.NopCloser(_snapshotFileReader))
 
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
 	snapshotFileWriter, err := repo.snapshotsRoot.NewWriter(ctx, fmt.Sprintf("%s.snapshot", name))
 	if err != nil {
-		return nil, err
+		return ArtifactRepoSnapshotMetadata{}, err
 	}
 
 	if _, err := io.Copy(snapshotFileWriter, snapshotFileReader); err != nil {
-		return nil, snapshotFileWriter.Fail(err)
+		return ArtifactRepoSnapshotMetadata{}, snapshotFileWriter.Fail(err)
 	}
 
 	if err := snapshotFileWriter.Close(); err != nil {
-		return nil, err
+		return ArtifactRepoSnapshotMetadata{}, err
 	}
 
-	return nil, nil
+	return ArtifactRepoSnapshotMetadata{
+		Name:     name,
+		Checksum: snapshotFileReader.BlobSHA256(),
+	}, nil
 }
 
 type artifactRestoreOptions struct {
