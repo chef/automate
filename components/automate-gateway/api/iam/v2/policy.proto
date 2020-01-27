@@ -29,7 +29,7 @@ service Policies {
   The policy's top-level projects list defines which project(s) the policy belongs to, for filtering policies by their projects,
   whereas the statement level projects list defines which project(s) the statement applies to.
 
-  This example creates a new policy in the (unassigned) project that grants the viewer role
+  This example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role
   on a few projects for all LDAP teams and a custom role `qa` on a specific project:
 
   ```
