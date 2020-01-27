@@ -415,3 +415,7 @@ curl -sSH "api-token: $TOKEN" -X POST \
 -d '{"user_ids":["{membership_id}","{membership_id}"]}' \
 https://{{< example_fqdn "automate" >}}/apis/iam/v2/teams/{team-id}/users:remove?pretty
 ```
+
+## Tokens
+
+Token endpoints are now documented at [Identity and Access Management Tokens](https://automate.chef.io/docs/api/#tag/Tokens).
