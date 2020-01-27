@@ -139,7 +139,6 @@ func (m *UpdatePolicyResp) GetPolicy() *common.Policy {
 }
 
 type ListPoliciesResp struct {
-	// Unique ID for the policy to list members of.
 	Policies             []*common.Policy `protobuf:"bytes,1,rep,name=policies,proto3" json:"policies,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}         `json:"-"`
 	XXX_unrecognized     []byte           `json:"-"`

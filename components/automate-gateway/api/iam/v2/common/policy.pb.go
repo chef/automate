@@ -126,7 +126,7 @@ func (Version_VersionNumber) EnumDescriptor() ([]byte, []int) {
 type Policy struct {
 	// Name for the policy.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Unique ID for the policy. Cannot be changed after creation.
+	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	// Whether this policy is user created or chef managed.
 	// One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
@@ -289,7 +289,7 @@ func (m *Statement) GetProjects() []string {
 type Role struct {
 	// Name for the role.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Unique ID for the role. Cannot be changed after creation.
+	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	// Whether this policy is user created or chef managed.
 	// One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
@@ -366,7 +366,7 @@ func (m *Role) GetProjects() []string {
 type Project struct {
 	// Name for the project.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Unique ID for the project. Cannot be changed after creation.
+	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	// Whether this policy is user created or chef managed.
 	// One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
