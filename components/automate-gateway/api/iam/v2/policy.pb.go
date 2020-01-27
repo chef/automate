@@ -155,10 +155,10 @@ type PoliciesClient interface {
 	//The project list defines the set of resources that the statement is scoped to.
 	//Pass `"projects": ["*"]` to scope a statement to every project.
 	//
-	//The policy's top-level projects list defines which project(s) the policy belongs to, for filtering policies by their projects,
+	//A policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),
 	//whereas the statement level projects list defines which project(s) the statement applies to.
 	//
-	//This example creates a new policy in the (unassigned) project that grants the viewer role
+	//This example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role
 	//on a few projects for all LDAP teams and a custom role `qa` on a specific project:
 	//
 	//```
@@ -182,12 +182,18 @@ type PoliciesClient interface {
 	CreatePolicy(ctx context.Context, in *request.CreatePolicyReq, opts ...grpc.CallOption) (*response.CreatePolicyResp, error)
 	//
 	//Get a policy
+	//
+	//Get a policy.
 	GetPolicy(ctx context.Context, in *request.GetPolicyReq, opts ...grpc.CallOption) (*response.GetPolicyResp, error)
 	//
 	//List all policies
+	//
+	//List all policies.
 	ListPolicies(ctx context.Context, in *request.ListPoliciesReq, opts ...grpc.CallOption) (*response.ListPoliciesResp, error)
 	//
 	//Delete a policy
+	//
+	//Delete a policy.
 	DeletePolicy(ctx context.Context, in *request.DeletePolicyReq, opts ...grpc.CallOption) (*response.DeletePolicyResp, error)
 	//
 	//Update an existing policy
@@ -229,15 +235,21 @@ type PoliciesClient interface {
 	CreateRole(ctx context.Context, in *request.CreateRoleReq, opts ...grpc.CallOption) (*response.CreateRoleResp, error)
 	//
 	//List all roles
+	//
+	//List all roles.
 	ListRoles(ctx context.Context, in *request.ListRolesReq, opts ...grpc.CallOption) (*response.ListRolesResp, error)
 	//
 	//Get a role
+	//
+	//Get a role.
 	GetRole(ctx context.Context, in *request.GetRoleReq, opts ...grpc.CallOption) (*response.GetRoleResp, error)
 	//
 	//Delete a role
 	//
-	//This will cascade delete any statements that only contain this role.
-	//If the resulting policy has no statements, it is also deleted.
+	//Delete a specified role and removes it from any statements that may have been using it.
+	//If such a statement has no other associated actions, the statement is deleted as well.
+	//Similarly, if that statement removal results in a policy with no other statements,
+	//that policy is removed as well.
 	DeleteRole(ctx context.Context, in *request.DeleteRoleReq, opts ...grpc.CallOption) (*response.DeleteRoleResp, error)
 	//
 	//Update a role
@@ -258,17 +270,20 @@ type PoliciesClient interface {
 	UpdateProject(ctx context.Context, in *request.UpdateProjectReq, opts ...grpc.CallOption) (*response.UpdateProjectResp, error)
 	//
 	//Get a project
+	//
+	//Get a project.
 	GetProject(ctx context.Context, in *request.GetProjectReq, opts ...grpc.CallOption) (*response.GetProjectResp, error)
 	//
 	//List all projects
+	//
+	//List all projects.
 	ListProjects(ctx context.Context, in *request.ListProjectsReq, opts ...grpc.CallOption) (*response.ListProjectsResp, error)
 	//
 	//Delete a project
 	//
-	//Deletes a project. Cascade deletes the project from any resources tagged with it.
-	//If a resulting resource no longer belongs to any project, it goes into the (unassigned) project.
+	//Deletes the project from any resources tagged with it.
 	//
-	//Also cascade deletes this project from any project list in all statements.
+	//Also deletes this project from any project list in all statements.
 	//If the resulting project list for a given statement is empty, it is deleted.
 	//If the resulting policy has no statements, it is also deleted.
 	DeleteProject(ctx context.Context, in *request.DeleteProjectReq, opts ...grpc.CallOption) (*response.DeleteProjectResp, error)
@@ -507,10 +522,10 @@ type PoliciesServer interface {
 	//The project list defines the set of resources that the statement is scoped to.
 	//Pass `"projects": ["*"]` to scope a statement to every project.
 	//
-	//The policy's top-level projects list defines which project(s) the policy belongs to, for filtering policies by their projects,
+	//A policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),
 	//whereas the statement level projects list defines which project(s) the statement applies to.
 	//
-	//This example creates a new policy in the (unassigned) project that grants the viewer role
+	//This example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role
 	//on a few projects for all LDAP teams and a custom role `qa` on a specific project:
 	//
 	//```
@@ -534,12 +549,18 @@ type PoliciesServer interface {
 	CreatePolicy(context.Context, *request.CreatePolicyReq) (*response.CreatePolicyResp, error)
 	//
 	//Get a policy
+	//
+	//Get a policy.
 	GetPolicy(context.Context, *request.GetPolicyReq) (*response.GetPolicyResp, error)
 	//
 	//List all policies
+	//
+	//List all policies.
 	ListPolicies(context.Context, *request.ListPoliciesReq) (*response.ListPoliciesResp, error)
 	//
 	//Delete a policy
+	//
+	//Delete a policy.
 	DeletePolicy(context.Context, *request.DeletePolicyReq) (*response.DeletePolicyResp, error)
 	//
 	//Update an existing policy
@@ -581,15 +602,21 @@ type PoliciesServer interface {
 	CreateRole(context.Context, *request.CreateRoleReq) (*response.CreateRoleResp, error)
 	//
 	//List all roles
+	//
+	//List all roles.
 	ListRoles(context.Context, *request.ListRolesReq) (*response.ListRolesResp, error)
 	//
 	//Get a role
+	//
+	//Get a role.
 	GetRole(context.Context, *request.GetRoleReq) (*response.GetRoleResp, error)
 	//
 	//Delete a role
 	//
-	//This will cascade delete any statements that only contain this role.
-	//If the resulting policy has no statements, it is also deleted.
+	//Delete a specified role and removes it from any statements that may have been using it.
+	//If such a statement has no other associated actions, the statement is deleted as well.
+	//Similarly, if that statement removal results in a policy with no other statements,
+	//that policy is removed as well.
 	DeleteRole(context.Context, *request.DeleteRoleReq) (*response.DeleteRoleResp, error)
 	//
 	//Update a role
@@ -610,17 +637,20 @@ type PoliciesServer interface {
 	UpdateProject(context.Context, *request.UpdateProjectReq) (*response.UpdateProjectResp, error)
 	//
 	//Get a project
+	//
+	//Get a project.
 	GetProject(context.Context, *request.GetProjectReq) (*response.GetProjectResp, error)
 	//
 	//List all projects
+	//
+	//List all projects.
 	ListProjects(context.Context, *request.ListProjectsReq) (*response.ListProjectsResp, error)
 	//
 	//Delete a project
 	//
-	//Deletes a project. Cascade deletes the project from any resources tagged with it.
-	//If a resulting resource no longer belongs to any project, it goes into the (unassigned) project.
+	//Deletes the project from any resources tagged with it.
 	//
-	//Also cascade deletes this project from any project list in all statements.
+	//Also deletes this project from any project list in all statements.
 	//If the resulting project list for a given statement is empty, it is deleted.
 	//If the resulting policy has no statements, it is also deleted.
 	DeleteProject(context.Context, *request.DeleteProjectReq) (*response.DeleteProjectResp, error)

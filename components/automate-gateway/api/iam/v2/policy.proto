@@ -70,6 +70,8 @@ service Policies {
   };
   /*
   Get a policy
+
+  Get a policy.
   */
   rpc GetPolicy (GetPolicyReq) returns (GetPolicyResp) {
     option (google.api.http) = {
@@ -88,6 +90,8 @@ service Policies {
   };
   /*
   List all policies
+
+  List all policies.
   */
   rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {
     option (google.api.http) = {
@@ -106,6 +110,8 @@ service Policies {
   };
   /*
   Delete a policy
+
+  Delete a policy.
   */
   rpc DeletePolicy (DeletePolicyReq) returns (DeletePolicyResp) {
     option (google.api.http) = {
@@ -277,6 +283,8 @@ service Policies {
   };
   /*
   List all roles
+
+  List all roles.
   */
   rpc ListRoles (ListRolesReq) returns (ListRolesResp) {
     option (google.api.http) = {
@@ -295,6 +303,8 @@ service Policies {
   };
   /*
   Get a role
+
+  Get a role.
   */
   rpc GetRole (GetRoleReq) returns (GetRoleResp) {
     option (google.api.http) = {
@@ -314,8 +324,10 @@ service Policies {
   /*
   Delete a role
 
-  This will cascade delete any statements that only contain this role.
-  If the resulting policy has no statements, it is also deleted.
+  Delete a specified role and removes it from any statements that may have been using it.
+  If such a statement has no other associated actions, the statement is deleted as well.
+  Similarly, if that statement removal results in a policy with no other statements,
+  that policy is removed as well.
   */
   rpc DeleteRole (DeleteRoleReq) returns (DeleteRoleResp) {
     option (google.api.http) = {
@@ -402,6 +414,8 @@ service Policies {
   };
   /*
   Get a project
+
+  Get a project.
   */
   rpc GetProject (GetProjectReq) returns (GetProjectResp) {
     option (google.api.http) = {
@@ -420,6 +434,8 @@ service Policies {
   };
   /*
   List all projects
+
+  List all projects.
   */
   rpc ListProjects (ListProjectsReq) returns (ListProjectsResp) {
     option (google.api.http) = {
@@ -439,10 +455,9 @@ service Policies {
   /*
   Delete a project
 
-  Deletes a project. Cascade deletes the project from any resources tagged with it.
-  If a resulting resource no longer belongs to any project, it goes into the (unassigned) project.
+  Deletes the project from any resources tagged with it.
 
-  Also cascade deletes this project from any project list in all statements.
+  Also deletes this project from any project list in all statements.
   If the resulting project list for a given statement is empty, it is deleted.
   If the resulting policy has no statements, it is also deleted.
   */

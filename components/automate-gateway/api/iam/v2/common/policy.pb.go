@@ -129,7 +129,7 @@ type Policy struct {
 	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	// Whether this policy is user created or chef managed.
-	// One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
+	// One of `CUSTOM` or `CHEF_MANAGED`, respectively.
 	Type Type `protobuf:"varint,3,opt,name=type,proto3,enum=chef.automate.api.iam.v2.Type" json:"type,omitempty"`
 	// Members affected by this policy.
 	Members []string `protobuf:"bytes,4,rep,name=members,proto3" json:"members,omitempty"`
@@ -211,9 +211,9 @@ func (m *Policy) GetProjects() []string {
 
 type Statement struct {
 	// Whether the statement allows or denies.
-	// One of `ALLOW`, or `DENY`, respectively.
+	// One of `ALLOW` or `DENY`, respectively.
 	Effect Statement_Effect `protobuf:"varint,1,opt,name=effect,proto3,enum=chef.automate.api.iam.v2.Statement_Effect" json:"effect,omitempty"`
-	// DEPRECATED: Actions defined inline. Use role instead.
+	// Actions defined inline. Best practices recommend that you use custom roles where practical.
 	Actions []string `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`
 	// The role defines a set of actions that the statement is scoped to.
 	Role string `protobuf:"bytes,4,opt,name=role,proto3" json:"role,omitempty"`
@@ -292,7 +292,7 @@ type Role struct {
 	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	// Whether this policy is user created or chef managed.
-	// One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
+	// One of `CUSTOM` or `CHEF_MANAGED`, respectively.
 	Type Type `protobuf:"varint,3,opt,name=type,proto3,enum=chef.automate.api.iam.v2.Type" json:"type,omitempty"`
 	// List of actions that this role scopes to.
 	Actions []string `protobuf:"bytes,4,rep,name=actions,proto3" json:"actions,omitempty"`
@@ -369,7 +369,7 @@ type Project struct {
 	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
 	// Whether this policy is user created or chef managed.
-	// One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
+	// One of `CUSTOM` or `CHEF_MANAGED`, respectively.
 	Type Type `protobuf:"varint,3,opt,name=type,proto3,enum=chef.automate.api.iam.v2.Type" json:"type,omitempty"`
 	// The current status of the rules for this project.
 	Status               ProjectRulesStatus `protobuf:"varint,4,opt,name=status,proto3,enum=chef.automate.api.iam.v2.ProjectRulesStatus" json:"status,omitempty"`

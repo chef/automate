@@ -33,6 +33,7 @@ func init() {
     "/iam/v2/policies": {
       "get": {
         "summary": "List all policies",
+        "description": "List all policies.",
         "operationId": "ListPolicies",
         "responses": {
           "200": {
@@ -48,7 +49,7 @@ func init() {
       },
       "post": {
         "summary": "Create a new policy",
-        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nThe policy's top-level projects list defines which project(s) the policy belongs to, for filtering policies by their projects,\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy in the (unassigned) project that grants the viewer role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreatePolicy",
         "responses": {
           "200": {
@@ -76,6 +77,7 @@ func init() {
     "/iam/v2/policies/{id}": {
       "get": {
         "summary": "Get a policy",
+        "description": "Get a policy.",
         "operationId": "GetPolicy",
         "responses": {
           "200": {
@@ -99,6 +101,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a policy",
+        "description": "Delete a policy.",
         "operationId": "DeletePolicy",
         "responses": {
           "200": {
@@ -301,6 +304,7 @@ func init() {
     "/iam/v2/projects": {
       "get": {
         "summary": "List all projects",
+        "description": "List all projects.",
         "operationId": "ListProjects",
         "responses": {
           "200": {
@@ -344,6 +348,7 @@ func init() {
     "/iam/v2/projects/{id}": {
       "get": {
         "summary": "Get a project",
+        "description": "Get a project.",
         "operationId": "GetProject",
         "responses": {
           "200": {
@@ -367,7 +372,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a project",
-        "description": "Deletes a project. Cascade deletes the project from any resources tagged with it.\nIf a resulting resource no longer belongs to any project, it goes into the (unassigned) project.\n\nAlso cascade deletes this project from any project list in all statements.\nIf the resulting project list for a given statement is empty, it is deleted.\nIf the resulting policy has no statements, it is also deleted.",
+        "description": "Deletes the project from any resources tagged with it.\n\nAlso deletes this project from any project list in all statements.\nIf the resulting project list for a given statement is empty, it is deleted.\nIf the resulting policy has no statements, it is also deleted.",
         "operationId": "DeleteProject",
         "responses": {
           "200": {
@@ -426,6 +431,7 @@ func init() {
     "/iam/v2/roles": {
       "get": {
         "summary": "List all roles",
+        "description": "List all roles.",
         "operationId": "ListRoles",
         "responses": {
           "200": {
@@ -469,6 +475,7 @@ func init() {
     "/iam/v2/roles/{id}": {
       "get": {
         "summary": "Get a role",
+        "description": "Get a role.",
         "operationId": "GetRole",
         "responses": {
           "200": {
@@ -492,7 +499,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a role",
-        "description": "This will cascade delete any statements that only contain this role.\nIf the resulting policy has no statements, it is also deleted.",
+        "description": "Delete a specified role and removes it from any statements that may have been using it.\nIf such a statement has no other associated actions, the statement is deleted as well.\nSimilarly, if that statement removal results in a policy with no other statements,\nthat policy is removed as well.",
         "operationId": "DeleteRole",
         "responses": {
           "200": {
@@ -567,6 +574,7 @@ func init() {
     "/iam/v2beta/policies": {
       "get": {
         "summary": "List all policies",
+        "description": "List all policies.",
         "operationId": "ListPolicies2",
         "responses": {
           "200": {
@@ -582,7 +590,7 @@ func init() {
       },
       "post": {
         "summary": "Create a new policy",
-        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nThe policy's top-level projects list defines which project(s) the policy belongs to, for filtering policies by their projects,\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy in the (unassigned) project that grants the viewer role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreatePolicy2",
         "responses": {
           "200": {
@@ -610,6 +618,7 @@ func init() {
     "/iam/v2beta/policies/{id}": {
       "get": {
         "summary": "Get a policy",
+        "description": "Get a policy.",
         "operationId": "GetPolicy2",
         "responses": {
           "200": {
@@ -633,6 +642,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a policy",
+        "description": "Delete a policy.",
         "operationId": "DeletePolicy2",
         "responses": {
           "200": {
@@ -835,6 +845,7 @@ func init() {
     "/iam/v2beta/projects": {
       "get": {
         "summary": "List all projects",
+        "description": "List all projects.",
         "operationId": "ListProjects2",
         "responses": {
           "200": {
@@ -878,6 +889,7 @@ func init() {
     "/iam/v2beta/projects/{id}": {
       "get": {
         "summary": "Get a project",
+        "description": "Get a project.",
         "operationId": "GetProject2",
         "responses": {
           "200": {
@@ -901,7 +913,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a project",
-        "description": "Deletes a project. Cascade deletes the project from any resources tagged with it.\nIf a resulting resource no longer belongs to any project, it goes into the (unassigned) project.\n\nAlso cascade deletes this project from any project list in all statements.\nIf the resulting project list for a given statement is empty, it is deleted.\nIf the resulting policy has no statements, it is also deleted.",
+        "description": "Deletes the project from any resources tagged with it.\n\nAlso deletes this project from any project list in all statements.\nIf the resulting project list for a given statement is empty, it is deleted.\nIf the resulting policy has no statements, it is also deleted.",
         "operationId": "DeleteProject2",
         "responses": {
           "200": {
@@ -960,6 +972,7 @@ func init() {
     "/iam/v2beta/roles": {
       "get": {
         "summary": "List all roles",
+        "description": "List all roles.",
         "operationId": "ListRoles2",
         "responses": {
           "200": {
@@ -1003,6 +1016,7 @@ func init() {
     "/iam/v2beta/roles/{id}": {
       "get": {
         "summary": "Get a role",
+        "description": "Get a role.",
         "operationId": "GetRole2",
         "responses": {
           "200": {
@@ -1026,7 +1040,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a role",
-        "description": "This will cascade delete any statements that only contain this role.\nIf the resulting policy has no statements, it is also deleted.",
+        "description": "Delete a specified role and removes it from any statements that may have been using it.\nIf such a statement has no other associated actions, the statement is deleted as well.\nSimilarly, if that statement removal results in a policy with no other statements,\nthat policy is removed as well.",
         "operationId": "DeleteRole2",
         "responses": {
           "200": {
@@ -1318,7 +1332,7 @@ func init() {
         },
         "type": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Type",
-          "description": "Whether this policy is user created or chef managed.\nOne of ` + "`" + `CUSTOM` + "`" + `, or ` + "`" + `CHEF_MANAGED` + "`" + `, respectively."
+          "description": "Whether this policy is user created or chef managed.\nOne of ` + "`" + `CUSTOM` + "`" + ` or ` + "`" + `CHEF_MANAGED` + "`" + `, respectively."
         },
         "members": {
           "type": "array",
@@ -1356,7 +1370,7 @@ func init() {
         },
         "type": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Type",
-          "description": "Whether this policy is user created or chef managed.\nOne of ` + "`" + `CUSTOM` + "`" + `, or ` + "`" + `CHEF_MANAGED` + "`" + `, respectively."
+          "description": "Whether this policy is user created or chef managed.\nOne of ` + "`" + `CUSTOM` + "`" + ` or ` + "`" + `CHEF_MANAGED` + "`" + `, respectively."
         },
         "status": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.ProjectRulesStatus",
@@ -1444,7 +1458,7 @@ func init() {
         },
         "type": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Type",
-          "description": "Whether this policy is user created or chef managed.\nOne of ` + "`" + `CUSTOM` + "`" + `, or ` + "`" + `CHEF_MANAGED` + "`" + `, respectively."
+          "description": "Whether this policy is user created or chef managed.\nOne of ` + "`" + `CUSTOM` + "`" + ` or ` + "`" + `CHEF_MANAGED` + "`" + `, respectively."
         },
         "actions": {
           "type": "array",
@@ -1467,14 +1481,14 @@ func init() {
       "properties": {
         "effect": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Statement.Effect",
-          "description": "Whether the statement allows or denies.\nOne of ` + "`" + `ALLOW` + "`" + `, or ` + "`" + `DENY` + "`" + `, respectively."
+          "description": "Whether the statement allows or denies.\nOne of ` + "`" + `ALLOW` + "`" + ` or ` + "`" + `DENY` + "`" + `, respectively."
         },
         "actions": {
           "type": "array",
           "items": {
             "type": "string"
           },
-          "description": "DEPRECATED: Actions defined inline. Use role instead."
+          "description": "Actions defined inline. Best practices recommend that you use custom roles where practical."
         },
         "role": {
           "type": "string",
