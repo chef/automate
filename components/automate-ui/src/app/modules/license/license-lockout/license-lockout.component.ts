@@ -159,6 +159,7 @@ export class LicenseLockoutComponent implements AfterViewInit {
       this.licenseExpired = moment().isAfter(state.license.licensed_period.end);
       licenseCurrentlyExpired = this.licenseExpired;
       this.setExpirationDate(state.license);
+      this.licenseFacade.getLicenseStatus();
     } else { // loadingFailure
       this.trialLicenseApplied = false;
 
