@@ -42,7 +42,7 @@ export type UserTabName = 'password' | 'details';
 })
 export class UserDetailsComponent implements OnInit, OnDestroy {
   private isDestroyed = new Subject<boolean>();
-  public loading$ = new Subject<boolean>();
+  public loading = true;
   public tabValue: UserTabName = 'details';
   private url: string;
   public userDetails: UserDetails;
@@ -56,7 +56,6 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit(): void {
-    this.loading$.next(true);
     this.route.data.pipe(
       takeUntil(this.isDestroyed))
       .subscribe((data: { isNonAdmin: boolean }) => {
@@ -65,7 +64,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
         if (data.isNonAdmin) {
           this.userDetails = new UserProfileDetails(
             this.store, this.layoutFacade, this.isDestroyed, this.fb);
-          this.loading$.next(false);
+          this.loading = false;
         } else {
           // Is this user the logged-in user?
           combineLatest([
@@ -85,7 +84,7 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
               this.userDetails = new UserAdminDetails(routeId,
                 this.store, this.layoutFacade, this.isDestroyed, this.fb);
             }
-            this.loading$.next(false);
+            this.loading = false;
           });
         }
       });
@@ -204,7 +203,6 @@ class UserAdminDetails implements UserDetails {
       displayName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]]
     });
     this.passwordForm = fb.group({
-      previousPassword: ['', [ChefValidators.nonAdminLengthValidator(true, 8)]],
       newPassword: ['',
         [Validators.required,
         Validators.pattern(Regex.patterns.NON_BLANK),
@@ -350,7 +348,7 @@ class UserProfileDetails implements UserDetails {
       this.resetForms();
 
       this.loading$ = this.store.select(getUserSelfStatus).pipe(
-        map((status: EntityStatus) =>  status !== EntityStatus.loadingSuccess));
+        map((status: EntityStatus) => status !== EntityStatus.loadingSuccess));
 
       combineLatest([
         this.loading$,

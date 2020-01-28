@@ -117,7 +117,10 @@ describe('SigninComponent', () => {
         sub: 'Cg0wLTM4NS0yODA4OS0wEgRtb2Nr',
         name: 'Kilgore Trout',
         email: 'kilgore@kilgore.trout',
-        groups: ['authors']
+        groups: ['authors'],
+        federated_claims: {
+          connector_id: 'local'
+        }
       };
       (component as any).idToken = valid_id_token;
 
@@ -128,7 +131,32 @@ describe('SigninComponent', () => {
         'Kilgore Trout',
         'kilgore@kilgore.trout',
         valid_id_token,
-        ['authors']);
+        ['authors'],
+        true);
+    });
+
+    it('sets the SAML session in chef-session from its state', () => {
+      const mock = spyOn(chefSessionService, 'setSession');
+      (component as any).id = {
+        sub: 'Cg0wLTM4NS0yODA4OS0wEgRtb2Nr',
+        name: 'Kilgore Trout',
+        email: 'kilgore@kilgore.trout',
+        groups: ['authors'],
+        federated_claims: {
+          connector_id: 'saml'
+        }
+      };
+      (component as any).idToken = valid_id_token;
+
+      component.setSession();
+
+      expect(mock).toHaveBeenCalledWith(
+        'Cg0wLTM4NS0yODA4OS0wEgRtb2Nr',
+        'Kilgore Trout',
+        'kilgore@kilgore.trout',
+        valid_id_token,
+        ['authors'],
+        false);
     });
   });
 

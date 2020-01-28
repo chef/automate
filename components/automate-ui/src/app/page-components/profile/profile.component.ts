@@ -49,7 +49,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.displayName = this.chefSessionService.username;
+    this.displayName = this.chefSessionService.fullname;
 
     this.versionSub = this.metadataService.getBuildVersion()
       .subscribe((buildVersion) => {
