@@ -391,7 +391,8 @@ func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets) (*d
 	cfg := &dc.AutomateConfig{
 		Global: &ac.GlobalConfig{
 			V1: &ac.V1{
-				Fqdn: w.String(r.Delivery.FQDN),
+				Fqdn:        w.String(r.Delivery.FQDN),
+				FrontendTls: frontendTLSCreds,
 			},
 		},
 		AuthN: &authn.ConfigRequest{
@@ -457,10 +458,9 @@ func generateMigrationOverrideConfig(r *DeliveryRunning, s *DeliverySecrets) (*d
 		LoadBalancer: &lb.ConfigRequest{
 			V1: &lb.ConfigRequest_V1{
 				Sys: &lb.ConfigRequest_V1_System{
-					Service:     lBServiceConfig,
-					Ngx:         lBNginxConfig,
-					Proxy:       proxyConfig,
-					FrontendTls: frontendTLSCreds,
+					Service: lBServiceConfig,
+					Ngx:     lBNginxConfig,
+					Proxy:   proxyConfig,
 				},
 			},
 		},
