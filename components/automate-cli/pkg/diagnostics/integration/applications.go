@@ -27,6 +27,13 @@ const (
 type AppsDiagnosticsRun struct {
 	ServiceGroupSuffix string
 	Events             []*habitat.HealthCheckEvent
+	// For applications testing, the determination of whether to skip the test is
+	// based on (more or less) the version of automate. Some Ci scenarios
+	// generate data with older automate and then verify it with a newer
+	// automate. The test framework does a fresh skip check for each one, which
+	// can lead to the verify step being run after the generate step was skipped.
+	// To handle that, we persist the skipped state
+	Skipped bool
 }
 
 type ServicesResponse struct {
@@ -106,6 +113,8 @@ func AppsCheckSkip(testCtx diagnostics.TestContext) (bool, string, error) {
 	if ok {
 		return false, "", nil
 	}
+	runData := &AppsDiagnosticsRun{Skipped: true}
+	testCtx.SetValue("applications", runData)
 	return true, "target server does not support all required applications APIs", nil
 }
 
@@ -155,6 +164,10 @@ func AppsVerifyData(verifyCtx diagnostics.VerificationTestContext) {
 		verifyCtx.FailNow()
 	}
 
+	if runData.Skipped {
+		return
+	}
+
 	services, err := getServicesWithIngestDelay(verifyCtx, &runData)
 	if err != nil {
 		verifyCtx.Errorf("API did not return a valid response for Applications data: %s", err.Error())
@@ -175,6 +188,11 @@ func AppsCleanupData(testCtx diagnostics.TestContext) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to load run data")
 	}
+
+	if runData.Skipped {
+		return nil
+	}
+
 	services, err := getServicesWithIngestDelay(testCtx, &runData)
 	if err != nil {
 		return errors.Wrap(err, "API did not return a valid response for Applications data")
