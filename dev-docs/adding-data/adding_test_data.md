@@ -1,8 +1,34 @@
-# Adding nodes to populate the compliance reporting page
+# Adding data to event feed
 
 from hab studio:
 
-`chef_load_compliance_nodes`
+`chef_load_actions`
+
+# Adding nodes to populate client runs
+
+from hab studio:
+
+`chef_load_nodes` 
+
+# Adding services to apps page
+
+from hab studio:
+
+`applications_populate_database` 
+
+# Adding nodes to populate compliance reporting
+
+from hab studio:
+
+option one: `chef_load_compliance_scans -N100 -D4 -M3 -T1000` 
+100 nodes, scanning for the past 4 days, max of 3 node scans per day, no more than 1000 total scans. modify the numbers on each of those options to meet your needs.
+
+option two: `chef_load_compliance_nodes` runs the above command with the following easy default options: `-N50 -D10 -M1 -T500`
+
+option three: `load_compliance_reports` will send the reports located in `components/compliance-service/test-data/audit-reports` to your dev enironment. these reports are populated with fields such as chef_server, organization, policy_name. these reports are especially useful when you need to test searchbar functionality for multiple search fields or resource scoped access ingest match rules.
+
+if you need to add reports to a non-dev-env instance, you can use the following command, which loads the same data that the above `load_compliance_reports` command loads: `components/compliance-service/test_data/audit_reports/send_to_data_collector.sh https://a2-url token_value`
+
 
 # Adding nodes to populate the nodes and scan jobs pages
 
@@ -10,7 +36,7 @@ ensure you have `jq` installed
 the token is retrieved by running `get_admin_token` from within the studio
 if you've never run the get_secrets script, or haven't in a while, run `CHEF_USERNAME=username scripts/get_secrets.sh` from the studio
 
-_note: this should be run on your local system, not from within the studio_
+_note: this should be run on your local system, not from within the studio. you will need to be on the vpn_
 `source dev/secrets-env.sh`
 `A2_URL='https://a2-dev.test' A2_TOKEN='token_val' components/compliance-service/scripts/create-pg-data.sh`
 
@@ -38,13 +64,7 @@ AWS:
 ```
 _Note: to add an ec2 integration for aws, change type from "aws-api" to "aws-ec2"_
 
-Azure:
-- search for 'Compliance Azure Creds' in LastPass
-- use these credentials to create your Azure integrations
-
-GCP:
-- search for 'GCP creds (compliance)' in LastPass
-- use these credentials to create your GCP integration
+If testing in an instance running in AWS, you can use the "read creds from cloud env" option to make things easier.
 
 # Deleting data
 
