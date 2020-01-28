@@ -19,6 +19,7 @@ import {
   GetProjectsSuccess
 } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
+import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { ProjectListComponent } from './project-list.component';
 import { ChefKeyboardEvent } from 'app/types/material-types';
 
@@ -96,6 +97,7 @@ describe('ProjectListComponent', () => {
         StoreModule.forRoot(
           {
           policies: policyEntityReducer,
+          projects: projectEntityReducer,
           notifications: notificationEntityReducer, // not used here but needed to suppress warnings
           clientRunsEntity: clientRunsEntityReducer // not used here but needed to suppress warnings
         }, { runtimeChecks })

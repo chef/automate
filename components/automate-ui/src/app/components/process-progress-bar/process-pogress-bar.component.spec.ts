@@ -14,6 +14,7 @@ import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { ProjectService } from 'app/entities/projects/project.service';
 import { ProcessProgressBarComponent } from './process-progress-bar.component';
+import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 
 describe('PendingEditsBarComponent', () => {
   let component: ProcessProgressBarComponent;
@@ -48,6 +49,7 @@ describe('PendingEditsBarComponent', () => {
           inputs: ['visible', 'applyRulesStatus', 'stopRulesInProgress'],
           outputs: ['confirm', 'cancel']
         }),
+        MockComponent({ selector: 'mat-progress-bar', inputs: ['mode', 'value', 'bufferValue'] }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
@@ -70,6 +72,7 @@ describe('PendingEditsBarComponent', () => {
         StoreModule.forRoot(
           {
           policies: policyEntityReducer,
+          projects: projectEntityReducer,
           notifications: notificationEntityReducer, // not used here but needed to suppress warnings
           clientRunsEntity: clientRunsEntityReducer // not used here but needed to suppress warnings
         }, { runtimeChecks })
