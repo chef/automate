@@ -3,6 +3,8 @@ package backup
 import (
 	"compress/gzip"
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -119,25 +121,26 @@ func (b *uploadSnapshotArtifactIterator) EstimatedSize() int64 {
 	return b.numArtifactsToUpload
 }
 
-func (b *uploadSnapshotArtifactIterator) WriteSnapshotFile(w io.Writer) error {
+func (b *uploadSnapshotArtifactIterator) WriteSnapshotFile(w io.Writer) (string, error) {
 	_, err := b.snapshotTmpFile.Seek(0, os.SEEK_SET)
 	if err != nil {
-		return err
+		return "", err
 	}
 
+	checksum := sha256.New()
 	g := gzip.NewWriter(w)
+	m := io.MultiWriter(g, checksum)
 
-	_, err = io.Copy(g, b.snapshotTmpFile)
+	_, err = io.Copy(m, b.snapshotTmpFile)
 	if err != nil {
-		return err
+		return "", err
 	}
 
 	err = g.Close()
 	if err != nil {
-		return err
+		return "", err
 	}
-
-	return nil
+	return hex.EncodeToString(checksum.Sum(nil)), nil
 }
 
 func (b *uploadSnapshotArtifactIterator) Close() error {
@@ -198,13 +201,10 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string, srcBucket B
 		return ArtifactRepoSnapshotMetadata{}, err
 	}
 
-	err = uploadIterator.WriteSnapshotFile(snapshotFileWriter)
+	checksum, err := uploadIterator.WriteSnapshotFile(snapshotFileWriter)
 	if err != nil {
 		return ArtifactRepoSnapshotMetadata{}, err
 	}
-
-	// we don't need to close this as it gets closed with uploadIterator
-	//snapshotFileReader := newChecksummingReader(ioutil.NopCloser(_snapshotFileReader))
 
 	if err := snapshotFileWriter.Close(); err != nil {
 		return ArtifactRepoSnapshotMetadata{}, err
@@ -212,7 +212,7 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string, srcBucket B
 
 	return ArtifactRepoSnapshotMetadata{
 		Name:     name,
-		Checksum: "",
+		Checksum: checksum,
 	}, nil
 }
 
