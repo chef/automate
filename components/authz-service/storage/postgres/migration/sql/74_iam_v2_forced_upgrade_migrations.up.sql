@@ -75,4 +75,6 @@ INSERT INTO iam_statement_projects (statement_id, project_id)
     SELECT db_id, project_db_id('~~ALL-PROJECTS~~') FROM iam_statements
     WHERE db_id NOT IN (SELECT statement_id FROM iam_statement_projects);
 
+DELETE FROM iam_projects WHERE id='default';
+
 COMMMIT;
