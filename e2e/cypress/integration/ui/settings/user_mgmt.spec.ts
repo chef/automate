@@ -63,7 +63,7 @@ describe('user management', () => {
     cy.get('[data-cy=save-user]').click();
     cy.get('app-user-management chef-modal').should('not.be.visible');
     cy.get('#main-content-wrapper').scrollTo('top');
-    cy.get('chef-notification.info').should('be.visible');
+    cy.get('chef-notification.info').contains(`Created user: ${username}`);
 
     cy.get('app-user-table chef-table-cell').contains(username).should('exist');
     cy.get('app-user-table chef-table-cell').contains(name).should('exist');
@@ -107,7 +107,6 @@ describe('user management', () => {
 
     cy.get('.update-password-button').click();
     cy.get('#main-content-wrapper').scrollTo('top');
-    cy.get('chef-notification.info').contains(`Reset password for user: ${username}`)
-      .should('be.visible');
+    cy.get('chef-notification.info').contains(`Reset password for user: ${username}`);
   });
 });
