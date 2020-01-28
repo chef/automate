@@ -154,5 +154,9 @@ UPDATE iam_statements
         actions='{*}'
     AND
         effect='allow';
+        
+DELETE from iam_roles
+    WHERE
+        id = 'iam-members-viewer';
 
 COMMMIT;
