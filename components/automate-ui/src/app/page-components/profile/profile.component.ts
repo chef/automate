@@ -1,7 +1,7 @@
 import {
   Component, ElementRef, OnInit, ViewChild, ViewChildren, OnDestroy
 } from '@angular/core';
-import { Subscription, Observable, combineLatest, Subject } from 'rxjs';
+import { Subscription, Observable, combineLatest, Subject, of } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { filter, takeUntil, map, distinctUntilChanged } from 'rxjs/operators';
@@ -27,6 +27,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
   dropdownVisible = false;
   buildVersion: string;
   displayName: string;
+  isLocalUser: boolean;
   public loading$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
 
@@ -43,29 +44,37 @@ export class ProfileComponent implements OnInit, OnDestroy {
     private chefSessionService: ChefSessionService,
     private metadataService: MetadataService,
     private store: Store<NgrxStateAtom>
-  ) { }
+  ) {
+    this.isLocalUser = chefSessionService.isLocalUser;
+  }
 
   ngOnInit() {
+    this.displayName = this.chefSessionService.username;
+
     this.versionSub = this.metadataService.getBuildVersion()
       .subscribe((buildVersion) => {
         this.buildVersion = buildVersion;
       });
 
-    this.store.dispatch(new GetUserSelf());
+    if (this.chefSessionService.isLocalUser) {
+      this.store.dispatch(new GetUserSelf());
 
-    this.loading$ = this.store.select(getStatus).pipe(
-      map((status: EntityStatus) =>  status !== EntityStatus.loadingSuccess));
+      this.loading$ = this.store.select(getStatus).pipe(
+        map((status: EntityStatus) =>  status !== EntityStatus.loadingSuccess));
 
-    combineLatest([
-      this.loading$,
-      this.store.select(userSelf)
-    ]).pipe(
-      filter(([loadingUserData, user]) => !loadingUserData && !isNil(user)),
-      map(([_, user]) => user.name),
-      distinctUntilChanged(),
-      takeUntil(this.isDestroyed)).subscribe((displayName) => {
-        this.displayName = displayName;
-      });
+      combineLatest([
+        this.loading$,
+        this.store.select(userSelf)
+      ]).pipe(
+        filter(([loadingUserData, user]) => !loadingUserData && !isNil(user)),
+        map(([_, user]) => user.name),
+        distinctUntilChanged(),
+        takeUntil(this.isDestroyed)).subscribe((displayName) => {
+          this.displayName = displayName;
+        });
+    } else {
+      this.loading$ = of(false);
+    }
   }
 
   ngOnDestroy() {
