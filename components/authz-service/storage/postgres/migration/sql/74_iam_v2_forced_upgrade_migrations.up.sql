@@ -110,4 +110,10 @@ UPDATE iam_roles
     WHERE
         id = 'editor';
 
+UPDATE iam_projects
+    SET
+        name = '(unassigned)'
+    WHERE
+        id = '(unassigned)';
+
 COMMMIT;
