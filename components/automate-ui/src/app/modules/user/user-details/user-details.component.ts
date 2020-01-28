@@ -67,16 +67,15 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
             this.store, this.layoutFacade, this.isDestroyed, this.fb);
           this.loading$.next(false);
         } else {
-          // Is the user the user logged in?
-          // Get the user ID from the URL
-          // Get the current logged in user's ID
-          // compare
+          // Is this user the logged-in user?
           combineLatest([
+            // Get the user ID from the URL
             this.store.pipe(
               select(routeParams),
               pluck('id'),
               filter(identity),
               first()),
+            // Get the current logged in user's ID
             this.store.select(userSelfId)
           ]).subscribe(([routeId, currentUserId]: [string, string]) => {
             if (routeId === currentUserId) {
@@ -275,7 +274,7 @@ class UserAdminSelfDetails implements UserDetails {
             this.resetForms();
           }
         });
-    }
+  }
 
   public savePassword(): void {
     this.saveSuccessful = false;
@@ -376,7 +375,7 @@ class UserProfileDetails implements UserDetails {
             this.resetForms();
           }
         });
-    }
+  }
 
   public savePassword(): void {
     this.saveSuccessful = false;
