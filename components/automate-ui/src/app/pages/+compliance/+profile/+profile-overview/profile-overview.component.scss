@@ -37,22 +37,41 @@ chef-loading-spinner {
   }
 
   &.installed {
-    chef-th:first-child,
-    chef-td:first-child,
-    chef-th:last-child,
-    chef-td:last-child {
-      flex-grow: 2;
+    chef-table-header-cell:first-child,
+    chef-table-cell:first-child {
+      width: 120%;
+    }
+
+    chef-table-cell:last-child {
+      chef-button {
+        margin: -0.5em 0;
+      }
+    }
+
+    chef-table-cell {
+      chef-clipboard {
+        margin-left: -0.5em;
+
+        ::ng-deep {
+          chef-button {
+            margin: -0.5em 0;
+          }
+        }
+      }
     }
   }
 
   &.available {
-    chef-th:first-child,
-    chef-td:first-child {
-      flex-grow: 5;
+    chef-table-header-cell:first-child,
+    chef-table-cell:first-child {
+      width: 350%;
     }
 
-    chef-td:last-child {
-      justify-content: flex-end;
+    chef-table-cell:last-child {
+      chef-button {
+        margin: -0.5em 0;
+        float: right;
+      }
     }
   }
 }
@@ -61,7 +80,7 @@ chef-loading-spinner {
   .file-upload-list {
     margin: 1em 0 -0.5em 0;
 
-    chef-td {
+    chef-table-cell {
       flex-basis: auto;
 
       &:first-child {
