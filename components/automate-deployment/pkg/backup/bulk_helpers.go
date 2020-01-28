@@ -18,6 +18,7 @@ type BlobUploadRequest struct {
 type BulkUploadIterator interface {
 	// Next will return objects that need to be uploaded
 	Next() (BlobUploadRequest, error)
+	EstimatedSize() int64
 }
 
 type BulkUploadError struct {
@@ -29,7 +30,7 @@ func (*BulkUploadError) Error() string {
 }
 
 type BulkUploader interface {
-	Upload(context.Context, BulkUploadIterator) error
+	Upload(context.Context, BulkUploadIterator, ArtifactRepoProgressReporter) error
 }
 
 type simpleBulkUploader struct {
@@ -44,10 +45,13 @@ func NewBulkUploader(dst Bucket, prefix string) BulkUploader {
 	}
 }
 
-func (m *simpleBulkUploader) Upload(ctx context.Context, iterator BulkUploadIterator) error {
+func (m *simpleBulkUploader) Upload(ctx context.Context, iterator BulkUploadIterator,
+	progress ArtifactRepoProgressReporter) error {
+
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
-
+	estimatedSize := iterator.EstimatedSize()
+	var count int64
 	for {
 		req, err := iterator.Next()
 		if err != nil {
@@ -57,7 +61,13 @@ func (m *simpleBulkUploader) Upload(ctx context.Context, iterator BulkUploadIter
 			logrus.WithError(err).Error("Bulk upload failed")
 			return err
 		}
-		m.doUpload(ctx, req)
+		if err := m.doUpload(ctx, req); err != nil {
+			return err
+		}
+		count++
+		if progress != nil {
+			progress.ReportProgress(count, estimatedSize)
+		}
 	}
 	logrus.Info("Finished Upload")
 

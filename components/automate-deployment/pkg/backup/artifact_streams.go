@@ -357,7 +357,7 @@ func Merge(streams ...ArtifactStream) ArtifactStream {
 type loggingStream struct {
 	stream ArtifactStream
 	out    io.Writer
-	called bool
+	closed bool
 }
 
 func (s *loggingStream) Next() (string, error) {
@@ -374,10 +374,10 @@ func (s *loggingStream) Next() (string, error) {
 }
 
 func (s *loggingStream) Close() error {
-	if s.called {
+	if s.closed {
 		return nil
 	}
-	s.called = true
+	s.closed = true
 	return s.stream.Close()
 }
 
@@ -385,5 +385,57 @@ func NewLoggingStream(stream ArtifactStream, out io.Writer) ArtifactStream {
 	return &loggingStream{
 		stream: stream,
 		out:    out,
+	}
+}
+
+type CountingStream interface {
+	ArtifactStream
+	Count() int64
+}
+
+type countingStream struct {
+	stream ArtifactStream
+	count  int64
+	closed bool
+}
+
+func (s *countingStream) Next() (string, error) {
+	next, err := s.stream.Next()
+	if err != nil {
+		return "", err
+	}
+
+	s.count++
+
+	return next, nil
+}
+
+func (s *countingStream) Close() error {
+	if s.closed {
+		return nil
+	}
+	s.closed = true
+	return s.stream.Close()
+}
+
+func (s *countingStream) Count() int64 {
+	return s.count
+}
+
+func NewCountingStream(stream ArtifactStream) CountingStream {
+	return &countingStream{
+		stream: stream,
+	}
+}
+
+func ConsumeStream(stream ArtifactStream) error {
+	for {
+		_, err := stream.Next()
+		if err != nil {
+			if err == io.EOF {
+				return nil
+			}
+			return err
+		}
 	}
 }

@@ -40,6 +40,14 @@ func init() {
 	repoCmd.AddCommand(removeSnapshotCmd)
 }
 
+type progressReporter struct {
+	formatString string
+}
+
+func (r *progressReporter) ReportProgress(completed int64, total int64) {
+	logrus.Infof(r.formatString, completed, total)
+}
+
 func backupLocationSpec(hostname string, rootCert []byte, secretStore secrets.SecretsReader) backup.LocationSpecification {
 	spec, err := backup.NewBackupGatewayLocationSpec(
 		fmt.Sprintf("https://%s:10143", hostname),
@@ -107,7 +115,10 @@ func runSnapshot(c *cobra.Command, args []string) error {
 
 	snapshotName := time.Now().Format("20060102150405")
 
-	meta, err := artifactRepo.Snapshot(ctx, snapshotName, bldrBucket, requiredArtifactsStream)
+	progress := &progressReporter{"uploaded %d of %d"}
+
+	meta, err := artifactRepo.Snapshot(ctx, snapshotName, bldrBucket,
+		requiredArtifactsStream, backup.ArtifactRepoSnapshotReportProgress(progress))
 	if err != nil {
 		logrus.WithError(err).Fatal("Failed to snapshot")
 	}
@@ -120,7 +131,10 @@ func runRestore(c *cobra.Command, args []string) error {
 	ctx := context.Background()
 
 	artifactRepo, bldrBucket := artifactRepo()
-	if err := artifactRepo.Restore(ctx, bldrBucket, args[0]); err != nil {
+	progress := &progressReporter{"downloaded %d of %d"}
+
+	if err := artifactRepo.Restore(ctx, bldrBucket, args[0],
+		backup.ArtifactRepoRestoreReportProgress(progress)); err != nil {
 		logrus.WithError(err).Fatal("Failed to restore snapshot")
 	}
 

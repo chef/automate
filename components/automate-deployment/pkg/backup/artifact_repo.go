@@ -17,6 +17,10 @@ type ArtifactRepo struct {
 	snapshotsRoot Bucket
 }
 
+type ArtifactRepoProgressReporter interface {
+	ReportProgress(completed int64, total int64)
+}
+
 func NewArtifactRepo(backupLocationSpec LocationSpecification) *ArtifactRepo {
 	return &ArtifactRepo{
 		artifactsRoot: backupLocationSpec.ToBucket("shared/builder/artifacts"),
@@ -30,28 +34,67 @@ type ArtifactRepoSnapshotMetadata struct {
 }
 
 type uploadSnapshotArtifactIterator struct {
-	ctx               context.Context
-	artifactsToUpload ArtifactStream
-	snapshotTmpFile   *os.File
-	src               Bucket
+	ctx                      context.Context
+	artifactsToUpload        ArtifactStream
+	snapshotTmpFile          *os.File
+	artifactsToUploadTmpFile *os.File
+	numArtifactsToUpload     int64
+	src                      Bucket
 }
 
 func newUploadSnapshotArtifactIterator(ctx context.Context, src Bucket,
 	requiredArtifacts ArtifactStream, artifactsInRepo ArtifactStream) (*uploadSnapshotArtifactIterator, error) {
 
+	artifactsToUploadTmpFile, err := ioutil.TempFile("", "artifacts-to-upload")
+	if err != nil {
+		return nil, err
+	}
+	if err := os.Remove(artifactsToUploadTmpFile.Name()); err != nil {
+		artifactsToUploadTmpFile.Close()
+		return nil, err
+	}
+
 	snapshotTmpFile, err := ioutil.TempFile("", "snapshot-new")
 	if err != nil {
+		artifactsToUploadTmpFile.Close()
 		return nil, err
 	}
 
 	// TODO: check to make sure requiredArtifacts is read until EOF
-	artifactsToUpload := Sub(NewLoggingStream(requiredArtifacts, snapshotTmpFile), artifactsInRepo)
+
+	// We're going to write out the required artifacts and artifacts to upload to temp files.
+	// We need to do this because we want to get the number of artifacts to upload to report
+	// progres
+	artifactsToUploadCounter := NewCountingStream(
+		Sub(NewLoggingStream(requiredArtifacts, snapshotTmpFile), artifactsInRepo))
+	artifactsToUploadWriter := NewLoggingStream(artifactsToUploadCounter, artifactsToUploadTmpFile)
+	defer artifactsToUploadWriter.Close()
+
+	if err := ConsumeStream(artifactsToUploadWriter); err != nil {
+		artifactsToUploadTmpFile.Close()
+		snapshotTmpFile.Close()
+		return nil, err
+	}
+	if err := artifactsToUploadWriter.Close(); err != nil {
+		artifactsToUploadTmpFile.Close()
+		snapshotTmpFile.Close()
+		return nil, err
+	}
+	if _, err := artifactsToUploadTmpFile.Seek(0, os.SEEK_SET); err != nil {
+		artifactsToUploadTmpFile.Close()
+		snapshotTmpFile.Close()
+		return nil, err
+	}
+
+	artifactsToUpload := LineReaderStream(artifactsToUploadTmpFile)
 
 	return &uploadSnapshotArtifactIterator{
-		ctx:               ctx,
-		artifactsToUpload: artifactsToUpload,
-		snapshotTmpFile:   snapshotTmpFile,
-		src:               src,
+		ctx:                      ctx,
+		artifactsToUpload:        artifactsToUpload,
+		snapshotTmpFile:          snapshotTmpFile,
+		artifactsToUploadTmpFile: artifactsToUploadTmpFile,
+		numArtifactsToUpload:     artifactsToUploadCounter.Count(),
+		src:                      src,
 	}, nil
 }
 
@@ -71,6 +114,10 @@ func (b *uploadSnapshotArtifactIterator) Next() (BlobUploadRequest, error) {
 	}, nil
 }
 
+func (b *uploadSnapshotArtifactIterator) EstimatedSize() int64 {
+	return b.numArtifactsToUpload
+}
+
 func (b *uploadSnapshotArtifactIterator) ReadSnapshotFile() (io.Reader, error) {
 	_, err := b.snapshotTmpFile.Seek(0, os.SEEK_SET)
 	if err != nil {
@@ -82,12 +129,29 @@ func (b *uploadSnapshotArtifactIterator) ReadSnapshotFile() (io.Reader, error) {
 
 func (b *uploadSnapshotArtifactIterator) Close() error {
 	b.snapshotTmpFile.Close()
+	b.artifactsToUpload.Close()
 	os.Remove(b.snapshotTmpFile.Name())
 	return nil
 }
 
-func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string,
-	srcBucket Bucket, requiredArtifacts ArtifactStream) (ArtifactRepoSnapshotMetadata, error) {
+type artifactSnapshotOptions struct {
+	progress ArtifactRepoProgressReporter
+}
+
+type ArtifactSnapshotOpt func(*artifactSnapshotOptions)
+
+func ArtifactRepoSnapshotReportProgress(progress ArtifactRepoProgressReporter) ArtifactSnapshotOpt {
+	return func(r *artifactSnapshotOptions) {
+		r.progress = progress
+	}
+}
+
+func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string, srcBucket Bucket,
+	requiredArtifacts ArtifactStream, optFuncs ...ArtifactSnapshotOpt) (ArtifactRepoSnapshotMetadata, error) {
+	opts := artifactSnapshotOptions{}
+	for _, o := range optFuncs {
+		o(&opts)
+	}
 
 	r, _, err := repo.openSnapshotFile(ctx, name)
 	if err != nil {
@@ -109,7 +173,7 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string,
 	defer uploadIterator.Close() // nolint: errcheck
 
 	uploader := NewBulkUploader(repo.artifactsRoot, "")
-	if err := uploader.Upload(ctx, uploadIterator); err != nil {
+	if err := uploader.Upload(ctx, uploadIterator, opts.progress); err != nil {
 		return ArtifactRepoSnapshotMetadata{}, err
 	}
 
@@ -146,6 +210,7 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string,
 type artifactRestoreOptions struct {
 	validateChecksum bool
 	checksum         string
+	progress         ArtifactRepoProgressReporter
 }
 
 type ArtifactRestoreOpt func(*artifactRestoreOptions)
@@ -154,6 +219,12 @@ func ArtifactRepoRestoreValidateChecksum(checksum string) ArtifactRestoreOpt {
 	return func(r *artifactRestoreOptions) {
 		r.validateChecksum = true
 		r.checksum = checksum
+	}
+}
+
+func ArtifactRepoRestoreReportProgress(progress ArtifactRepoProgressReporter) ArtifactRestoreOpt {
+	return func(r *artifactRestoreOptions) {
+		r.progress = progress
 	}
 }
 
@@ -183,7 +254,7 @@ func (repo *ArtifactRepo) Restore(ctx context.Context, dstBucket Bucket, name st
 		return err
 	}
 
-	if err := uploader.Upload(ctx, uploadIterator); err != nil {
+	if err := uploader.Upload(ctx, uploadIterator, opts.progress); err != nil {
 		return err
 	}
 
