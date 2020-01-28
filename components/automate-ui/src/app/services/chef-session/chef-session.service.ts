@@ -18,10 +18,11 @@ const USE_DEFAULT_SESSION = environment.use_default_session;
 export interface ChefSessionUser {
   fullname: string;
   username: string;
+  isLocalUser: boolean;
   groups: Array<string>;
-  id_token: string;
   telemetry_enabled?: boolean;
   uuid: string;
+  id_token: string;
 }
 
 const sessionKey = 'chef-automate-user';
@@ -97,6 +98,7 @@ export class ChefSessionService implements CanActivate {
     if (id === null) {
       return;
     }
+
     this.setSession(
       id.sub,
       id.name,
@@ -105,7 +107,8 @@ export class ChefSessionService implements CanActivate {
       // usage.
       id.email,
       idToken,
-      id.groups);
+      id.groups,
+      id.federated_claims.connector_id === 'local');
   }
 
   // canActivate determines if any of the routes (except signin) can be activated
@@ -132,17 +135,18 @@ export class ChefSessionService implements CanActivate {
   // setSession sets ChefSession's session data in localStorage for having it
   // available for setSessionOrRedirectToLogin() (part of ChefSession's
   // constructor)
-  setSession(uuid, fullname, username, id_token: string, groups: Array<string>): void {
+  setSession(uuid, fullname, username, id_token: string, groups: Array<string>,
+    isLocalUser: boolean): void {
     if (!this.user || username !== this.user.username) {
       this.store.dispatch(new SetUserSelfID({ id: username }));
     }
-
     this.user = {
       uuid,
       fullname,
       username,
       groups,
-      id_token
+      id_token,
+      isLocalUser
     };
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
   }
@@ -185,6 +189,10 @@ export class ChefSessionService implements CanActivate {
   // from the ngrx store.
   currentPath(): string {
     return window.location.pathname;
+  }
+
+  get isLocalUser(): boolean {
+    return this.user.isLocalUser;
   }
 
   get username(): string {
