@@ -118,13 +118,17 @@ func (b *uploadSnapshotArtifactIterator) EstimatedSize() int64 {
 	return b.numArtifactsToUpload
 }
 
-func (b *uploadSnapshotArtifactIterator) ReadSnapshotFile() (io.Reader, error) {
+func (b *uploadSnapshotArtifactIterator) WriteSnapshotFile(w io.Writer) error {
 	_, err := b.snapshotTmpFile.Seek(0, os.SEEK_SET)
 	if err != nil {
-		return nil, err
+		return err
+	}
+	_, err = io.Copy(w, b.snapshotTmpFile)
+	if err != nil {
+		return err
 	}
 
-	return b.snapshotTmpFile, nil
+	return nil
 }
 
 func (b *uploadSnapshotArtifactIterator) Close() error {
@@ -177,14 +181,6 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string, srcBucket B
 		return ArtifactRepoSnapshotMetadata{}, err
 	}
 
-	_snapshotFileReader, err := uploadIterator.ReadSnapshotFile()
-	if err != nil {
-		return ArtifactRepoSnapshotMetadata{}, err
-	}
-
-	// we don't need to close this as it gets closed with uploadIterator
-	snapshotFileReader := newChecksummingReader(ioutil.NopCloser(_snapshotFileReader))
-
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -193,9 +189,13 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string, srcBucket B
 		return ArtifactRepoSnapshotMetadata{}, err
 	}
 
-	if _, err := io.Copy(snapshotFileWriter, snapshotFileReader); err != nil {
-		return ArtifactRepoSnapshotMetadata{}, snapshotFileWriter.Fail(err)
+	err = uploadIterator.WriteSnapshotFile(snapshotFileWriter)
+	if err != nil {
+		return ArtifactRepoSnapshotMetadata{}, err
 	}
+
+	// we don't need to close this as it gets closed with uploadIterator
+	//snapshotFileReader := newChecksummingReader(ioutil.NopCloser(_snapshotFileReader))
 
 	if err := snapshotFileWriter.Close(); err != nil {
 		return ArtifactRepoSnapshotMetadata{}, err
@@ -203,7 +203,7 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string, srcBucket B
 
 	return ArtifactRepoSnapshotMetadata{
 		Name:     name,
-		Checksum: snapshotFileReader.BlobSHA256(),
+		Checksum: "",
 	}, nil
 }
 
