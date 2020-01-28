@@ -17,7 +17,7 @@ Chef Automate supports three different types of users: local users, [LDAP users]
 
 Local users can sign in and interact with the system independent of LDAP or SAML.
 
-Permission on the `iam:users` resource is required to interact with users other than yourself. Any user that is part of the `admins` team, or the `Administrator` policy will have this permission, otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
+Permission on the `iam:users` resource is required to interact with users other than yourself. Any user that is part of the `admins` team, or the `Administrator` policy will have this permission. Otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 
 ## Managing Local Users
 
