@@ -19,9 +19,7 @@ Bundle and the `chef-automate` binary used to create it to the airgapped host fo
 
 ## Obtain a License
 
-Contact your Chef account representative to obtain a license for Chef Automate; Chef
-Automate's trial license feature requires internet connectivity and cannot be used on an
-airgapped host.
+To obtain a trial license for an airgapped host [contact Chef](https://www.chef.io/contact-us/).
 
 ## Create an Airgap Installation Bundle
 
