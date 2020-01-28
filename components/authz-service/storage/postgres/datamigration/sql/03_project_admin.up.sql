@@ -28,4 +28,11 @@ UPDATE iam_roles
     WHERE
         id = 'editor';
 
+UPDATE iam_roles
+    SET
+        id = 'owner',
+        name = 'Owner'
+    WHERE
+        id = 'all-actions';
+
 COMMIT;
