@@ -89,6 +89,7 @@ export class LicenseApplyComponent implements AfterViewInit {
         this.setExpirationDate(fetchStatus.license);
         this.unlockModal();
       });
+      this.licenseFacade.getLicenseStatus();
       return;
     }
 
