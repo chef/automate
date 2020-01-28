@@ -1,6 +1,7 @@
 package backup
 
 import (
+	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
@@ -123,7 +124,15 @@ func (b *uploadSnapshotArtifactIterator) WriteSnapshotFile(w io.Writer) error {
 	if err != nil {
 		return err
 	}
-	_, err = io.Copy(w, b.snapshotTmpFile)
+
+	g := gzip.NewWriter(w)
+
+	_, err = io.Copy(g, b.snapshotTmpFile)
+	if err != nil {
+		return err
+	}
+
+	err = g.Close()
 	if err != nil {
 		return err
 	}
@@ -341,7 +350,13 @@ func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (io
 		return nil, "", err
 	}
 
-	if _, err := io.Copy(tmpFile, reader); err != nil {
+	g, err := gzip.NewReader(reader)
+	if err != nil {
+		return nil, "", err
+	}
+	defer g.Close()
+
+	if _, err := io.Copy(tmpFile, g); err != nil {
 		tmpFile.Close()
 		return nil, "", err
 	}
