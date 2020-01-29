@@ -97,7 +97,7 @@ hab sup run \
 
 The Transport Layer Security (TLS) protocol provides privacy and data integrity during communication between Chef Automate and Chef Habitat. Provide Chef Habitat with Chef Automate's TLS certificate to authorize communication between the two.
 
-### Retrieve Chef Automate's TLS key
+### Retrieve Chef Automate's TLS Certificate
 
 Chef Automate's TLS certificate file is located at `/hab/svc/automate-load-balancer/data/<servername>.cert`.
 
@@ -110,7 +110,7 @@ From Chef Automate:
 3. Make sure to copy it entirely, including `-----BEGIN CERTIFICATE...END CERTIFICATE-----`
 4. Save the file as `automate.cert` somewhere safe and accessible to you
 
-### Share the TLS Key with Chef Habitat
+### Share the TLS Certificate with Chef Habitat
 
 Share the automate certificate with the Chef Habitat supervisor.
 
