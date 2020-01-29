@@ -5,7 +5,6 @@ import { RulesService } from 'app/services/rules/rules.service';
 import { ActivatedRoute } from '@angular/router';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { FeatureFlagsService } from '../../services/feature-flags/feature-flags.service';
 
 enum UrlTestState {
   Inactive,
@@ -52,19 +51,16 @@ export class NotificationFormComponent implements OnInit {
   SLACK = ServiceActionType.SLACK;
   WEBHOOK = ServiceActionType.WEBHOOK;
   SERVICENOW = ServiceActionType.SERVICENOW;
-  showAsset: boolean;
 
   constructor(
     private rulesService: RulesService,
     private route: ActivatedRoute,
-    private layoutFacade: LayoutFacadeService,
-    private featureFlags: FeatureFlagsService
+    private layoutFacade: LayoutFacadeService
   ) {
     this.model = new Model(new Rule('', '', null, '', null, '', false), '', '');
     this.notificationId = this.route.snapshot.params['id'];
     this.isEditRule = this.notificationId ? true : false;
     this.showLoading = this.isEditRule;
-    this.showAsset = this.featureFlags.getFeatureStatus('servicenow_cmdb');
 
     if (this.isEditRule) {
       this.rulesService.fetchRule(this.notificationId)
@@ -89,14 +85,7 @@ export class NotificationFormComponent implements OnInit {
   }
 
   getAlertTypeKeys() {
-    const alertKeys = this.model.rule.getAlertTypeKeys();
-    if (!this.showAsset) {
-      const index = alertKeys.indexOf('Assets');
-      if (index > -1) {
-        alertKeys.splice(index, 1);
-      }
-    }
-    return alertKeys;
+    return this.model.rule.getAlertTypeKeys();
   }
 
   updateCriticalControlsOnly(event) {

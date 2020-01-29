@@ -1,4 +1,4 @@
-export type RuleType = 'CCRFailure' | 'ComplianceFailure' | 'Assets';
+export type RuleType = 'CCRFailure' | 'ComplianceFailure';
 
 // The target type used by the service
 export enum ServiceActionType {
@@ -20,8 +20,7 @@ export class Rule implements RuleInterface {
 
   AlertTypeLabels = {
     CCRFailure: 'Chef client run failures',
-    ComplianceFailure: 'InSpec scan failures',
-    Assets: 'Assets'
+    ComplianceFailure: 'InSpec scan failures'
   };
 
   constructor(
