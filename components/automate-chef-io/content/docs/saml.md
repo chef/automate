@@ -84,7 +84,7 @@ The `groups_attr` setting is optional. However, if it is not provided,
 users authenticating via SAML will not be members of any teams.
 {{% /warning %}}
 
-Chef Automate supports using SAML to authenticate users and apply permissions to SAML groups. See either [IAM v1 Overview]({{< relref "iam-v1-overview.md" >}}) or [IAM v2 Overview]({{< relref "iam-v2-overview.md" >}}).
+Chef Automate supports using SAML to authenticate users and apply permissions to SAML groups. See [IAM v2 Overview]({{< relref "iam-v2-overview.md" >}}).
 
 ```toml
 [dex.v1.sys.connectors.saml]
