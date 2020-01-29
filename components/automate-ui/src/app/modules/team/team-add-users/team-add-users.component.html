@@ -12,12 +12,17 @@
   <div *ngIf="!(loading$ | async)">
     <app-create-user-modal [openEvent]="openUserModal"></app-create-user-modal>
     <div id="no-users-container" *ngIf="usersNotFiltered().length === 0">
-      <p>All local users have already been added; create some more!</p>
-      <chef-button primary (click)="openModal()">Create User</chef-button>
+      <app-authorized not [allOf]="['/iam/v2/users', 'post']">
+        <p>All local users have already been added.</p>
+      </app-authorized>
+      <app-authorized [allOf]="['/iam/v2/users', 'post']">
+        <p>All local users have already been added; create some more!</p>
+        <chef-button primary (click)="openModal()">Create User</chef-button>
+      </app-authorized>
     </div>
     <div id="table-container" *ngIf="usersNotFiltered()?.length > 0">
       <div id="table-controls">
-        <app-authorized [anyOf]="['/iam/v2/teams/{id}/users:add', 'post', team?.id]">
+        <app-authorized [allOf]="['/iam/v2/users', 'post']">
           <chef-button primary (click)="openModal()">Create User</chef-button>
         </app-authorized>
         <div id="users-selected">
