@@ -1,14 +1,15 @@
-# acceptance checklist
+# domain services acceptance checklist
 
 _note: create, edit, and delete of credential, manual node, profile, and scan job are completed in cypress testing_
 
 ## where to go and what to expect
 go to: https://a2-local-inplace-upgrade-acceptance.cd.chef.co/dashboards/event-feed 
-dashboards: (event feed) empty
-applications page: some services data loaded
-infrastructure: (client runs) some older missing nodes
-compliance: (reports) a few nodes reporting in, (scan jobs) a few old scan jobs, (profiles) a few installed profiles
-settings: (node integrations) a few integrations already created, (node credentials) a few credentials already created
+
+dashboards: (event feed) empty\
+applications page: some services data loaded\
+infrastructure: (client runs) some older missing nodes\
+compliance: (reports) a few nodes reporting in, (scan jobs) a few old scan jobs, (profiles) a few installed profiles\
+settings: (node integrations) a few integrations\ already created, (node credentials) a few credentials already created
 
 ## what to test
 
@@ -22,7 +23,7 @@ settings: (node integrations) a few integrations already created, (node credenti
 
 `cd your-automate-repo/components/compliance-service/smokin && kitchen destroy && COLLECTOR_URL='https://a2-local-inplace-upgrade-acceptance.cd.chef.co/data-collector/v0' COLLECTOR_TOKEN='TOKEN_VALUE' kitchen converge`
 
-_note: if you find yourself missing tools, please see https://github.com/chef/automate/blob/master/components/compliance-service/smokin/README.md_ 
+_note: if you find yourself missing tools, please see [the readme](https://github.com/chef/automate/blob/master/components/compliance-service/smokin/README.md)_ 
 
 
 ### test cloud integration, delete and create
@@ -75,12 +76,12 @@ _note: if you find yourself missing tools, please see https://github.com/chef/au
 
 
 ## release notes
-read through the list of changes posted in #a2-release-coordinate
-find the commits from our team
-pick out which ones seem to be most relevant/important for our users
-write a simple, short sentence in the pending release notes to let the customers know about this improvement/bug fix/new feature
+read through the list of changes posted in #a2-release-coordinate\
+find the commits from our team\
+pick out which ones seem to be most relevant/important for our users. if you're unsure, ask in #a2-release-coordinate or ping Natalie directly\
+write a simple, short sentence in the [pending release notes](https://github.com/chef/automate/wiki/Pending-Release-Notes) to let the customers know about this improvement/bug fix/new feature
 
 
 ## let people know you're done
-if you found a bug during acceptance testing and you're not sure if it's blocking, ping Natalie/Jon from #a2-release-coordinate to ask them their opinion
+if you found a bug during acceptance testing and you're not sure if it's blocking, ping Natalie/Jon from #a2-release-coordinate to ask them their opinion\
 if you found no blocking/big bugs, let ppl know you've completed acceptance and release notes with a quick message in #a2-release-coordinate
