@@ -1,17 +1,16 @@
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
-import { ChefServerDetailsComponent } from './chef-server-details.component';
 import { HttpErrorResponse } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { MockComponent } from 'ng2-mock-component';
 import { StoreModule, Store } from '@ngrx/store';
-
-import { Org } from 'app/entities/orgs/org.model';
-import { CreateOrgFailure } from 'app/entities/orgs/org.actions';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
+import { CreateOrgSuccess, CreateOrgFailure } from 'app/entities/orgs/org.actions';
+import { Org } from 'app/entities/orgs/org.model';
 import { HttpStatus } from 'app/types/types';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
+import { ChefServerDetailsComponent } from './chef-server-details.component';
+import { MockComponent } from 'ng2-mock-component';
 
 describe('ChefServerDetailsComponent', () => {
   let component: ChefServerDetailsComponent;
@@ -27,7 +26,7 @@ describe('ChefServerDetailsComponent', () => {
           }),
         MockComponent({ selector: 'chef-button',
           inputs: ['disabled', 'routerLink'] }),
-        MockComponent({ selector: 'chef-control-menu' }),
+        MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),
@@ -74,11 +73,12 @@ describe('ChefServerDetailsComponent', () => {
 
   describe('create org', () => {
     let store: Store<NgrxStateAtom>;
-    const org = <Org> {
+    const org: Org = {
         id: '1',
         name: 'new org',
         admin_user: 'new org user',
-        admin_key: 'new admin key'
+        admin_key: 'new admin key',
+        server_id: '39cabe9d-996e-42cd-91d0-4335b2480aaf'
       };
 
     beforeEach(() => {
@@ -91,14 +91,14 @@ describe('ChefServerDetailsComponent', () => {
       expect(component.createModalVisible).toBe(true);
     });
 
-    it('opening create modal resets name, description, fqdn and ip_address to empty string', () => {
+    it('opening create modal resets name, admin_user and admin_key to empty string', () => {
       component.openCreateModal('create');
-      expect(component.orgForm.controls['name'].value).toBe('');
-      expect(component.orgForm.controls['admin_user'].value).toBe('');
-      expect(component.orgForm.controls['admin_key'].value).toBe('');
+      expect(component.orgForm.controls['name'].value).toEqual('');
+      expect(component.orgForm.controls['admin_user'].value).toEqual('');
+      expect(component.orgForm.controls['admin_key'].value).toEqual('');
     });
 
-    it('on conflict error, modal is open with conflict error', () => {
+    it('on conflict error, modal remains open and displays conflict error', () => {
       spyOn(component.conflictErrorEvent, 'emit');
       component.openCreateModal('create');
       component.orgForm.controls['name'].setValue(org.name);
@@ -115,7 +115,19 @@ describe('ChefServerDetailsComponent', () => {
       expect(component.createModalVisible).toBe(true);
     });
 
-    it('on create error, modal is closed with failure banner', () => {
+    it('on success, closes modal and adds new server', () => {
+      spyOn(component.conflictErrorEvent, 'emit');
+      component.openCreateModal('create');
+      component.orgForm.controls['name'].setValue(org.name);
+      component.orgForm.controls['admin_user'].setValue(org.admin_user);
+      component.orgForm.controls['admin_key'].setValue(org.admin_key);
+      component.createServerOrg();
+
+      store.dispatch(new CreateOrgSuccess({'org': org}));
+      expect(component.createModalVisible).toBe(true);
+    });
+
+    it('on create error, modal is closed (because error is handled by failure banner)', () => {
       spyOn(component.conflictErrorEvent, 'emit');
       component.openCreateModal('create');
       component.orgForm.controls['name'].setValue(org.name);
@@ -127,10 +139,10 @@ describe('ChefServerDetailsComponent', () => {
         status: HttpStatus.INTERNAL_SERVER_ERROR,
         ok: false
       };
+
       store.dispatch(new CreateOrgFailure(error));
 
       expect(component.createModalVisible).toBe(true);
     });
-
   });
 });

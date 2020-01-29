@@ -9,7 +9,7 @@ import { CreateNotification } from 'app/entities/notifications/notification.acti
 import { Type } from 'app/entities/notifications/notification.model';
 
 import {
-  GetOrgsForServer,
+  GetOrgs,
   GetOrgsSuccess,
   OrgsSuccessPayload,
   GetOrgsFailure,
@@ -43,8 +43,8 @@ export class OrgEffects {
   @Effect()
   getOrgsForProject$ = this.actions$.pipe(
       ofType(OrgActionTypes.GET_ALL),
-      mergeMap(({ payload: { server_id } }: GetOrgsForServer) =>
-        this.requests.getOrgsForServer(server_id).pipe(
+      mergeMap(({ payload: { server_id } }: GetOrgs) =>
+        this.requests.getOrgs(server_id).pipe(
           map((resp: OrgsSuccessPayload) => new GetOrgsSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetOrgsFailure(error))))));
 
@@ -141,6 +141,7 @@ export class OrgEffects {
           map((resp: OrgSuccessPayload) => new UpdateOrgSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
             observableOf(new UpdateOrgFailure(error))))));
+
   @Effect()
   updateOrgSuccess$ = this.actions$.pipe(
       ofType(OrgActionTypes.UPDATE_SUCCESS),

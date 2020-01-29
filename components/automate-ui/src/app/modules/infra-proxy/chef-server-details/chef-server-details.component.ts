@@ -18,7 +18,7 @@ import {
 
 import { Server } from 'app/entities/servers/server.model';
 import { GetServer, UpdateServer } from 'app/entities/servers/server.actions';
-import { GetOrgsForServer, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
+import { GetOrgs, CreateOrg, DeleteOrg } from 'app/entities/orgs/org.actions';
 import { Org } from 'app/entities/orgs/org.model';
 import {
   allOrgs,
@@ -72,7 +72,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showInfastructureSidebar();
+    this.layoutFacade.showInfrastructureSidebar();
     // Populate our tabValue from the fragment.
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
     .subscribe((url: string) => {
@@ -95,7 +95,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
       .subscribe((id: string) => {
         this.id = id;
         this.store.dispatch(new GetServer({ id }));
-        this.store.dispatch(new GetOrgsForServer({ server_id: id }));
+        this.store.dispatch(new GetOrgs({ server_id: id }));
       });
 
     combineLatest([

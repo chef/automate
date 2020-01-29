@@ -13,7 +13,7 @@ export class OrgRequests {
 
   constructor(private http: HttpClient) { }
 
-  public getOrgsForServer(server_id: string): Observable<OrgsSuccessPayload> {
+  public getOrgs(server_id: string): Observable<OrgsSuccessPayload> {
     return this.http.get<OrgsSuccessPayload>(
       `${env.gateway_url}/infra_proxy/servers/${server_id}/orgs`);
   }
