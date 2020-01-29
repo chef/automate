@@ -449,7 +449,30 @@ if !ENV['NO_STATS_SUMMARY_TESTS']
           }
       }.to_json
       assert_equal(expected_data, actual_data.to_json)
+    end
 
+    it "returns expected report summary when filtering by control and end_time" do
+      actual_data = GRPC stats, :read_summary, Stats::Query.new(filters: [
+          Stats::ListFilter.new(type: 'end_time', values: ['2018-03-04T23:59:59Z']),
+          Stats::ListFilter.new(type: 'control', values: ['nginx-01'])
+      ])
+      expected_data = {
+          "reportSummary" => {
+              "status" => "failed",
+              "stats" => {
+                  "nodes" => 4,
+                  "platforms" => 2,
+                  "environments" => 2,
+                  "profiles" => 1,
+                  "nodesCnt" => 4,
+                  "controls" => 1
+              }
+          }
+      }
+      assert_equal_json_content(expected_data, actual_data)
+    end
+
+    it "works" do
       # Filter by control_id
       actual_data = GRPC stats, :read_summary, Stats::Query.new(filters: [
           Stats::ListFilter.new(type: "profile_id", values: ["09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988"]),

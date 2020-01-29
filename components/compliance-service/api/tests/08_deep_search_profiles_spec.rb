@@ -9,16 +9,14 @@ describe File.basename(__FILE__) do
     Reporting::ReportingService;
   end
 
+  END_OF_DAY = "23:59:59Z"
+
   it "works" do
     ##### Failure tests #####
     message = "Parameter 'sort' only supports one of the following fields: [name title]"
     assert_grpc_error(message, 3) do
       actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(sort: 'something')
     end
-
-
-    END_OF_DAY = "23:59:59Z"
-
 
     # Test filter by profile_id, one node back  CONTROL!
     actual_nodes = GRPC reporting, :list_nodes, Reporting::Query.new(filters: [
@@ -363,7 +361,31 @@ describe File.basename(__FILE__) do
         }
     }.to_json
     assert_equal_json_sorted(expected_data, actual_data.to_json)
+  end
 
+  it "returns correct profiles when filtering by control" do
+    actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(filters: [
+        Reporting::ListFilter.new(type: "control", values: ["nginx-04"]),
+        Reporting::ListFilter.new(type: "end_time", values: ["2018-03-04T#{END_OF_DAY}"])
+    ])
+    expected_data = {
+        "profiles" =>
+            [
+                {"name" => "nginx-baseline",
+                 "title" => "DevSec Nginx Baseline",
+                 "id" => "09adcbb3b9b3233d5de63cd98a5ba3e155b3aaeb66b5abed379f5fb1ff143988",
+                 "version" => "2.1.0",
+                 "status" => "passed"}
+            ],
+        "counts" => {
+            "total" => 1,
+            "passed" => 1
+        }
+    }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
+  it "works" do
     # Filter by a waived profile_id, making it deep
     actual_data = GRPC reporting, :list_profiles, Reporting::Query.new(
         filters: [
