@@ -1,17 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { Store } from '@ngrx/store';
-import { of, combineLatest } from 'rxjs';
+import { of } from 'rxjs';
 import { catchError, mergeMap, map, filter } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
-import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import {
   ApiTokenActionTypes,
   GetAllTokens,
@@ -34,29 +29,23 @@ import {
   DeleteTokenFailure
 } from './api-token.actions';
 import {
-  ApiTokenRequests,
-  versionizeToken,
-  versionizeTokens
+  ApiTokenRequests
 } from './api-token.requests';
 
 @Injectable()
 export class ApiTokenEffects {
   constructor(
     private actions$: Actions,
-    private requests: ApiTokenRequests,
-    private store$: Store<NgrxStateAtom>
+    private requests: ApiTokenRequests
   ) { }
 
   @Effect()
-  getAllTokens$ = combineLatest([
-    this.actions$.pipe(ofType<GetAllTokens>(ApiTokenActionTypes.GET_ALL)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([_action, version]: [GetAllTokens, IAMMajorVersion]) =>
-        this.requests.getAll(version).pipe(
-          map(resp => new GetAllTokensSuccess(versionizeTokens(resp))),
-          catchError((error: HttpErrorResponse) => of(new GetAllTokensFailure(error))))
-      ));
+  getAllTokens$ = this.actions$.pipe(ofType<GetAllTokens>(ApiTokenActionTypes.GET_ALL),
+    mergeMap((_action) =>
+      this.requests.getAll().pipe(
+        map(resp => new GetAllTokensSuccess(resp)),
+        catchError((error: HttpErrorResponse) => of(new GetAllTokensFailure(error))))
+    ));
 
   @Effect()
   getAllTokensFailure$ = this.actions$.pipe(
@@ -67,14 +56,12 @@ export class ApiTokenEffects {
     })));
 
   @Effect()
-  getToken$ = combineLatest([
-    this.actions$.pipe(ofType<GetToken>(ApiTokenActionTypes.GET)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([{ payload: { id } }, version]: [GetToken, IAMMajorVersion]) =>
-        this.requests.get(id, version).pipe(
-          map(resp => new GetTokenSuccess(versionizeToken(resp))),
-          catchError((error: HttpErrorResponse) => of(new GetTokenFailure(error))))));
+  getToken$ = this.actions$.pipe(ofType<GetToken>(ApiTokenActionTypes.GET),
+    mergeMap(({ payload: { id } }: GetToken) =>
+      this.requests.get(id).pipe(
+        map(resp => new GetTokenSuccess(resp.token)),
+        catchError((error: HttpErrorResponse) => of(new GetTokenFailure(error))))
+    ));
 
   @Effect()
   getTokenFailure$ = this.actions$.pipe(
@@ -85,14 +72,12 @@ export class ApiTokenEffects {
     })));
 
   @Effect()
-  updateToken$ = combineLatest([
-    this.actions$.pipe(ofType<UpdateToken>(ApiTokenActionTypes.UPDATE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([{ payload }, version]: [UpdateToken, IAMMajorVersion]) =>
-        this.requests.update(payload, version).pipe(
-          map(resp => new UpdateTokenSuccess(versionizeToken(resp))),
-          catchError((error: HttpErrorResponse) => of(new UpdateTokenFailure(error))))));
+  updateToken$ = this.actions$.pipe(ofType<UpdateToken>(ApiTokenActionTypes.UPDATE),
+    mergeMap(({ payload }: UpdateToken) =>
+      this.requests.update(payload).pipe(
+        map(resp => new UpdateTokenSuccess(resp.token)),
+        catchError((error: HttpErrorResponse) => of(new UpdateTokenFailure(error))))
+    ));
 
   @Effect()
   updateTokenFailure$ = this.actions$.pipe(
@@ -103,14 +88,12 @@ export class ApiTokenEffects {
     })));
 
   @Effect()
-  createToken$ = combineLatest([
-    this.actions$.pipe(ofType<CreateToken>(ApiTokenActionTypes.CREATE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([{ payload }, version]: [CreateToken, IAMMajorVersion]) =>
-        this.requests.create(payload, version).pipe(
-          map(resp => new CreateTokenSuccess(versionizeToken(resp))),
-          catchError((error: HttpErrorResponse) => of(new CreateTokenFailure(error))))));
+  createToken$ = this.actions$.pipe(ofType<CreateToken>(ApiTokenActionTypes.CREATE),
+    mergeMap(({ payload }: CreateToken) =>
+      this.requests.create(payload).pipe(
+        map(resp => new CreateTokenSuccess(resp.token)),
+        catchError((error: HttpErrorResponse) => of(new CreateTokenFailure(error))))
+    ));
 
   @Effect()
   createTokenSuccess$ = this.actions$.pipe(
@@ -131,14 +114,12 @@ export class ApiTokenEffects {
     })));
 
   @Effect()
-  toggleToken$ = combineLatest([
-    this.actions$.pipe(ofType<ToggleTokenActive>(ApiTokenActionTypes.TOGGLE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([{ payload: { id, active } }, version]: [ToggleTokenActive, IAMMajorVersion]) =>
-        this.requests.toggleActive(id, active, version).pipe(
-          map(resp => new ToggleTokenActiveSuccess(versionizeToken(resp))),
-          catchError((error: HttpErrorResponse) => of(new ToggleTokenActiveFailure(error))))));
+  toggleToken$ = this.actions$.pipe(ofType<ToggleTokenActive>(ApiTokenActionTypes.TOGGLE),
+    mergeMap(({ payload: { id, active } }: ToggleTokenActive) =>
+      this.requests.toggleActive(id, active).pipe(
+        map(resp => new ToggleTokenActiveSuccess(resp.token)),
+        catchError((error: HttpErrorResponse) => of(new ToggleTokenActiveFailure(error))))
+    ));
 
   @Effect()
   toggleTokenSuccess$ = this.actions$.pipe(
@@ -157,14 +138,12 @@ export class ApiTokenEffects {
     })));
 
   @Effect()
-  deleteToken$ = combineLatest([
-    this.actions$.pipe(ofType<DeleteToken>(ApiTokenActionTypes.DELETE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([{ payload }, version]: [DeleteToken, IAMMajorVersion]) =>
-        this.requests.delete(payload.id, version).pipe(
-          map(() => new DeleteTokenSuccess(payload)),
-          catchError((error: HttpErrorResponse) => of(new DeleteTokenFailure(error))))));
+  deleteToken$ = this.actions$.pipe(ofType<DeleteToken>(ApiTokenActionTypes.DELETE),
+    mergeMap(({ payload }: DeleteToken) =>
+      this.requests.delete(payload.id).pipe(
+        map(() => new DeleteTokenSuccess(payload)),
+        catchError((error: HttpErrorResponse) => of(new DeleteTokenFailure(error))))
+    ));
 
   @Effect()
   deleteTokenSuccess$ = this.actions$.pipe(

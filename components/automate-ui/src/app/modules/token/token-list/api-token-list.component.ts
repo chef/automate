@@ -24,7 +24,6 @@ import {
 } from 'app/entities/api-tokens/api-token.actions';
 import { CreateToken } from 'app/entities/api-tokens/api-token.actions';
 import { saveStatus, saveError } from 'app/entities/api-tokens/api-token.selectors';
-import { isIAMv2  } from 'app/entities/policies/policy.selectors';
 import { assignableProjects } from 'app/services/projects-filter/projects-filter.selectors';
 import { Project, ProjectConstants } from 'app/entities/projects/project.model';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
@@ -45,7 +44,6 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
   public conflictErrorEvent = new EventEmitter<boolean>();
   private isDestroyed = new Subject<boolean>();
 
-  public isIAMv2$: Observable<boolean>;
   public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
   public readonly RFC2822 = DateTime.RFC2822;
@@ -63,7 +61,6 @@ export class ApiTokenListComponent implements OnInit, OnDestroy {
       this.layoutFacade.ShowPageLoading(isLoading)
     );
 
-    this.isIAMv2$ = store.select(isIAMv2);
     this.apiTokenCount$ = store.select(totalApiTokens);
 
     this.sortedApiTokens$ = store.pipe(

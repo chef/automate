@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
 
-import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { isProductDeployed } from 'app/staticConfig';
-import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { clientRunsWorkflowEnabled } from 'app/entities/client-runs/client-runs.selectors';
 import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
@@ -17,17 +14,14 @@ import { MenuItemGroup } from './layout.model';
 export class LayoutSidebarService {
     public applicationsFeatureFlagOn: boolean;
     public chefInfraServerViewsFeatureFlagOn: boolean;
-    public isIAMv2$: Observable<boolean>;
     public ServiceNowfeatureFlagOn: boolean;
     private workflowEnabled: boolean;
 
 
     constructor(
-        private store: Store<NgrxStateAtom>,
         private clientRunsStore: Store<fromClientRuns.ClientRunsEntityState>,
         private featureFlagsService: FeatureFlagsService
     ) {
-        this.isIAMv2$ = this.store.select(isIAMv2);
         this.chefInfraServerViewsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('chefInfraServerViews');
         this.applicationsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('applications');
         this.ServiceNowfeatureFlagOn = this.featureFlagsService.getFeatureStatus('servicenow_cmdb');
@@ -272,7 +266,7 @@ export class LayoutSidebarService {
                         visible: true
                     }
                 ],
-                visible: this.isIAMv2$
+                visible: true
             }
         ];
     }

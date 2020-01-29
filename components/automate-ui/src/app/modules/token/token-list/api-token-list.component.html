@@ -12,7 +12,7 @@
       [conflictErrorEvent]="conflictErrorEvent"
       objectNoun="token"
       [createForm]="createTokenForm"
-      [showProjectsDropdown]="isIAMv2$ | async"
+      [showProjectsDropdown]="true"
       [assignableProjects]="dropdownProjects"
       (close)="closeCreateModal()"
       (createClicked)="createToken()">
@@ -43,8 +43,8 @@
           <chef-table-header>
             <chef-table-row>
               <chef-table-header-cell>Name</chef-table-header-cell>
-              <chef-table-header-cell *ngIf="isIAMv2$ | async">ID</chef-table-header-cell>
-              <chef-table-header-cell *ngIf="isIAMv2$ | async">Projects</chef-table-header-cell>
+              <chef-table-header-cell>ID</chef-table-header-cell>
+              <chef-table-header-cell>Projects</chef-table-header-cell>
               <chef-table-header-cell>Created Date</chef-table-header-cell>
               <chef-table-header-cell>Status</chef-table-header-cell>
               <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
@@ -55,8 +55,8 @@
               <chef-table-cell>
                 <a [routerLink]="['/settings/tokens', token.id]">{{ token.name }}</a>
               </chef-table-cell>
-              <chef-table-cell *ngIf="isIAMv2$ | async">{{ token.id }}</chef-table-cell>
-              <chef-table-cell *ngIf="isIAMv2$ | async" class="projects-column">
+              <chef-table-cell>{{ token.id }}</chef-table-cell>
+              <chef-table-cell class="projects-column">
                 <span *ngIf="token.projects.length === 0">{{ unassigned }}</span>
                 <span *ngIf="token.projects.length === 1">{{ token.projects[0] }}</span>
                 <span *ngIf="token.projects.length > 1">{{ token.projects.length }} projects</span>

@@ -16,10 +16,7 @@
           Roles are named groups of actions used to define policies.
         </chef-subheading>
       </chef-page-header>
-      <section *ngIf="!(isIAMv2$ | async)" class="page-body">
-        Currently, you are using IAM v1. Roles are only available when using IAM v2.
-      </section>
-      <section *ngIf="isIAMv2$ | async" class="page-body">
+      <section class="page-body">
         <app-authorized [allOf]="['/iam/v2/roles', 'get']">
           <chef-table-new>
             <chef-table-header>

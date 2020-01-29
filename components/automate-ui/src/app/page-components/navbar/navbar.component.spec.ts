@@ -1,7 +1,6 @@
 import { RouterTestingModule } from '@angular/router/testing';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { StoreModule } from '@ngrx/store';
-import { of as observableOf } from 'rxjs';
 import { NavbarComponent } from './navbar.component';
 import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
@@ -13,7 +12,6 @@ import {
 } from 'app/entities/policies/policy.reducer';
 
 describe('NavbarComponent', () => {
-  let component: NavbarComponent;
   let element: HTMLElement;
   let fixture: ComponentFixture<NavbarComponent>;
 
@@ -45,7 +43,6 @@ describe('NavbarComponent', () => {
 
     fixture = TestBed.createComponent(NavbarComponent);
     fixture.detectChanges();
-    component = fixture.componentInstance;
     element = fixture.nativeElement;
   });
 
@@ -73,14 +70,7 @@ describe('NavbarComponent', () => {
     expect(element.querySelector('app-profile')).not.toBeNull();
   });
 
-  describe('when IAM v2.1 is enabled', () => {
-    beforeEach(() => {
-      component.isIAMv2$ = observableOf(true);
-      fixture.detectChanges();
-    });
-
-    it('displays the projects filter', () => {
-      expect(element.querySelector('app-projects-filter')).not.toBeNull();
-    });
+  it('displays the projects filter', () => {
+    expect(element.querySelector('app-projects-filter')).not.toBeNull();
   });
 });

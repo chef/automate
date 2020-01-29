@@ -1,17 +1,12 @@
 import { catchError, mergeMap, map, filter } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { Store } from '@ngrx/store';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { of, combineLatest } from 'rxjs';
-import { identity } from 'lodash/fp';
+import { of } from 'rxjs';
 
 import { HttpStatus } from 'app/types/types';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
-import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 import {
   CreateUser,
   CreateUserSuccess,
@@ -40,19 +35,16 @@ import { User } from './user.model';
 export class UserEffects {
   constructor(
     private actions$: Actions,
-    private requests: UserRequests,
-    private store$: Store<NgrxStateAtom>
+    private requests: UserRequests
   ) { }
 
   @Effect()
-  getUsers$ = combineLatest([
-    this.actions$.pipe(ofType<GetUsers>(UserActionTypes.GET_ALL)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([_action, version]: [GetUsers, IAMMajorVersion]) =>
-        this.requests.getUsers(version).pipe(
-          map((resp: GetUsersSuccessPayload) => new GetUsersSuccess(resp)),
-          catchError((error: HttpErrorResponse) => of(new GetUsersFailure(error))))));
+  getUsers$ = this.actions$.pipe(ofType<GetUsers>(UserActionTypes.GET_ALL),
+    mergeMap((_action: GetUsers) =>
+      this.requests.getUsers().pipe(
+        map((resp: GetUsersSuccessPayload) => new GetUsersSuccess(resp)),
+        catchError((error: HttpErrorResponse) => of(new GetUsersFailure(error))))
+    ));
 
   @Effect()
   getUsersFailure$ = this.actions$.pipe(
@@ -66,14 +58,12 @@ export class UserEffects {
     }));
 
   @Effect()
-  getUser$ = combineLatest([
-    this.actions$.pipe(ofType<GetUser>(UserActionTypes.GET)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([action, version]: [GetUser, IAMMajorVersion]) =>
-        this.requests.getUser(action.payload.id, version).pipe(
-          map((resp: User) => new GetUserSuccess(resp)),
-          catchError((error: HttpErrorResponse) => of(new GetUserFailure(error))))));
+  getUser$ = this.actions$.pipe(ofType<GetUser>(UserActionTypes.GET),
+    mergeMap((action: GetUser) =>
+      this.requests.getUser(action.payload.id).pipe(
+        map((resp: User) => new GetUserSuccess(resp)),
+        catchError((error: HttpErrorResponse) => of(new GetUserFailure(error))))
+    ));
 
   @Effect()
   getUserFailure$ = this.actions$.pipe(
@@ -87,14 +77,13 @@ export class UserEffects {
     }));
 
   @Effect()
-  updatePasswordUser$ = combineLatest([
-    this.actions$.pipe(ofType<UpdatePasswordUser>(UserActionTypes.UPDATE_PASSWORD_USER)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([action, version]: [UpdatePasswordUser, IAMMajorVersion]) =>
-      this.requests.updateUser(action.payload, version).pipe(
+  updatePasswordUser$ = this.actions$.pipe(
+    ofType<UpdatePasswordUser>(UserActionTypes.UPDATE_PASSWORD_USER),
+    mergeMap((action: UpdatePasswordUser) =>
+      this.requests.updateUser(action.payload).pipe(
         map((resp: User) => new UpdatePasswordUserSuccess(resp)),
-        catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
+        catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))
+    ));
 
   @Effect()
   updatePasswordUserSuccess$ = this.actions$.pipe(
@@ -116,24 +105,21 @@ export class UserEffects {
     }));
 
   @Effect()
-  updateNameUser$ = combineLatest([
-    this.actions$.pipe(ofType<UpdateNameUser>(UserActionTypes.UPDATE_NAME_USER)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([action, version]: [UpdateNameUser, IAMMajorVersion]) =>
-      this.requests.updateUser(action.payload, version).pipe(
+  updateNameUser$ = this.actions$.pipe(
+    ofType<UpdateNameUser>(UserActionTypes.UPDATE_NAME_USER),
+    mergeMap((action: UpdateNameUser) =>
+      this.requests.updateUser(action.payload).pipe(
         map((resp: User) => new UpdateNameUserSuccess(resp)),
-        catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
+        catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))
+    ));
 
   @Effect()
-  deleteUser$ = combineLatest([
-    this.actions$.pipe(ofType<DeleteUser>(UserActionTypes.DELETE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([action, version]: [DeleteUser, IAMMajorVersion]) =>
-      this.requests.deleteUser(action.payload, version).pipe(
+  deleteUser$ = this.actions$.pipe(ofType<DeleteUser>(UserActionTypes.DELETE),
+    mergeMap((action: DeleteUser) =>
+      this.requests.deleteUser(action.payload).pipe(
         map((user: User) => new DeleteUserSuccess(user)),
-        catchError((error: HttpErrorResponse) => of(new DeleteUserFailure(error))))));
+        catchError((error: HttpErrorResponse) => of(new DeleteUserFailure(error))))
+    ));
 
   @Effect()
   deleteUserSuccess$ = this.actions$.pipe(
@@ -155,14 +141,12 @@ export class UserEffects {
     }));
 
   @Effect()
-  createUser$ = combineLatest([
-    this.actions$.pipe(ofType<CreateUser>(UserActionTypes.CREATE)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([action, version]: [CreateUser, IAMMajorVersion]) =>
-      this.requests.createUser(action.payload, version).pipe(
+  createUser$ = this.actions$.pipe(ofType<CreateUser>(UserActionTypes.CREATE),
+    mergeMap((action: CreateUser) =>
+      this.requests.createUser(action.payload).pipe(
         map((resp: User) => new CreateUserSuccess(resp)),
-        catchError((error) => of(new CreateUserFailure(error))))));
+        catchError((error) => of(new CreateUserFailure(error))))
+    ));
 
   @Effect()
   createUserSuccess$ = this.actions$.pipe(

@@ -3,13 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment as env } from 'environments/environment';
-import { Policy, IAMMajorVersion } from './policy.model';
-
-export interface IamVersionResponse {
-  version: {
-    major: IAMMajorVersion;
-  };
-}
+import { Policy } from './policy.model';
 
 export interface PoliciesResponse {
   policies: Policy[];
@@ -27,10 +21,6 @@ export interface MembersResponse {
 export class PolicyRequests {
 
   constructor(private http: HttpClient) { }
-
-  public getIamVersion(): Observable<IamVersionResponse> {
-    return this.http.get<IamVersionResponse>(`${env.auth_v2_url}/policy_version`);
-  }
 
   public getPolicies(): Observable<PoliciesResponse> {
     return this.http.get<PoliciesResponse>(`${env.auth_v2_url}/policies`);
