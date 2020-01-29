@@ -58,7 +58,7 @@
           <chef-form-field class="password">
             <label>
               <span class="label">New Password <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="newPassword" type="password"/>
+              <input chefInput formControlName="newPassword" type="password" (keyup)="handlePasswordInput($event)" />
             </label>
             <chef-error
               *ngIf="(passwordForm.get('newPassword').hasError('required') || passwordForm.get('newPassword').hasError('pattern')) && passwordForm.get('newPassword').dirty">

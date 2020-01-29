@@ -39,7 +39,7 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
     fb: FormBuilder
   ) {
     this.createUserForm = fb.group({
-      // Must stay in sync with error checks in user-form.component.html
+      // Must stay in sync with error checks in create-user-modal.component.html
       displayName: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
       username: ['', [Validators.required, Validators.pattern(USERNAME_PATTERN)]],
       // length validator must be consistent with
@@ -125,6 +125,17 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
     }
   }
 
+  handlePasswordInput(event: KeyboardEvent): void {
+    // This handles the case where a user first enters the password and confirmPassword
+    // then goes back and changes the original password.
+    // Since the match validator is only activated by changes to confirmPassword,
+    // we have to manually revalidate confirmPassword here
+    this.createUserForm.get('confirmPassword').updateValueAndValidity();
+    if (!this.isNavigationKey(event)) {
+      this.passwordError = false;
+    }
+  }
+
   handleClose(): void {
     this.modifyUsername = false;
   }
@@ -134,11 +145,9 @@ export class CreateUserModalComponent implements OnInit, OnDestroy {
       this.createUserForm.get(field).dirty);
   }
 
-  hasAttemptedInputWithError(field: string): boolean {
-    return ((this.createUserForm.get(field).hasError('required') &&
-      this.createUserForm.get(field).touched) ||
-      (this.createUserForm.get(field).hasError('pattern') &&
-        this.createUserForm.get(field).dirty));
+  hasAttemptedInputWithRequiredError(field: string): boolean {
+    return (this.createUserForm.get(field).hasError('required') &&
+      (this.createUserForm.get(field).touched || this.createUserForm.get(field).dirty));
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
