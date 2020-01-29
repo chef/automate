@@ -265,8 +265,8 @@ func (s *Server) startSignalHandler() error {
 			// ErrServerClosed is returned if an HTTP server is shutdown, which
 			// can only happen if it's triggered by a shutdown signal or a
 			// reconfigure signal, in which case the server shutting down is
-			// intended. The shutdown error is only returned nothing goes wrong
-			// when shutting it down, therefore we'll log it and move on.
+			// intended. The is only returned nothing goes wrong when shutting
+			// down, therefore we'll log it and move on.
 			case http.ErrServerClosed:
 				s.logger.Debug("HTTP server was recently shutdown")
 			default:
@@ -279,19 +279,7 @@ func (s *Server) startSignalHandler() error {
 			}
 		case sig := <-s.sigC:
 			switch sig {
-			case syscall.SIGHUP:
-				s.logger.WithField("signal", sig).Info("handling received signal")
-				// Reconfigure
-				err := s.reconfigure()
-				if err != nil {
-					err2 := s.stop()
-					if err2 != nil {
-						err = errors.Wrap(err, err2.Error())
-					}
-
-					return err
-				}
-			case syscall.SIGUSR1, syscall.SIGTERM, syscall.SIGINT:
+			case syscall.SIGUSR1, syscall.SIGTERM, syscall.SIGINT, syscall.SIGHUP:
 				s.logger.WithField("signal", sig).Info("handling received signal")
 				return s.stop()
 			default:
@@ -312,58 +300,6 @@ func (s *Server) stop() error {
 	s.stopNullBackendServer()
 
 	return err
-}
-
-func (s *Server) reconfigure() error {
-	var err error
-
-	s.logger.Info("reconfiguring automate-gateway")
-
-	// Stop servers
-	err = s.stopHTTPServer()
-	if err != nil {
-		return err
-	}
-
-	s.stopGRPCServer()
-
-	// Close client connections
-	s.clientsFactory.Close()
-
-	// Reload config
-	newCfg, err := ConfigFromViper()
-	if err != nil {
-		return err
-	}
-	oldCfg := s.Config
-	s.Config = newCfg
-	s.loadConnFactory()
-	s.loadServiceCerts()
-	s.setLogLevel()
-
-	// The null backend doesn't have any config other than the socket location
-	if oldCfg.GrpcClients.NullBackendSock != newCfg.GrpcClients.NullBackendSock {
-		s.logger.Info("restarting null backend")
-		s.stopNullBackendServer()
-
-		err = s.startNullBackendServer()
-
-		if err != nil {
-			return err
-		}
-	}
-
-	err = s.loadClients()
-	if err != nil {
-		return errors.Wrap(err, "loading backend gRPC clients")
-	}
-
-	err = s.startGRPCServer()
-	if err != nil {
-		return err
-	}
-
-	return s.startHTTPServer()
 }
 
 func (s *Server) startGRPCServer() error {
