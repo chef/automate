@@ -11,6 +11,7 @@ import (
 
 var runFlags struct {
 	authToken string
+	host      string
 	tick      int
 	verbosity int
 }
@@ -27,6 +28,13 @@ func newRunCmd() *cobra.Command {
 		"t",
 		"",
 		"Automate auth token",
+	)
+	c.PersistentFlags().StringVarP(
+		&runFlags.host,
+		"host",
+		"H",
+		"localhost",
+		"Automate hostname",
 	)
 	c.PersistentFlags().IntVar(
 		&runFlags.tick,
@@ -69,7 +77,7 @@ func runRunCmd(cmd *cobra.Command, args []string) error {
 
 	runnerCfg := &generator.RunnerConfig{
 		AuthToken: runFlags.authToken,
-		Host:      "localhost",
+		Host:      runFlags.host,
 		Tick:      runFlags.tick,
 		Verbosity: runFlags.verbosity,
 	}
