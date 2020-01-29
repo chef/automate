@@ -1,15 +1,20 @@
 package backup
 
 import (
+	"io"
 	"sort"
 	"testing"
 
+	"github.com/chef/automate/lib/stringutils"
 	"github.com/leanovate/gopter"
 	"github.com/leanovate/gopter/gen"
 	"github.com/leanovate/gopter/prop"
 )
 
 func sortedUniqueify(in []string) []string {
+	if len(in) == 0 {
+		return in
+	}
 	// https://github.com/golang/go/wiki/SliceTricks#in-place-deduplicate-comparable
 	j := 0
 	for i := 1; i < len(in); i++ {
@@ -32,6 +37,9 @@ func isSorted(in []string) bool {
 }
 
 func isSortedAnUnique(in []string) bool {
+	if len(in) == 0 {
+		return true
+	}
 	if !isSorted(in) {
 		return false
 	}
@@ -61,14 +69,33 @@ func allContained(haystack []string, needles []string) bool {
 	return true
 }
 
+func anyContained(haystack []string, needles []string) bool {
+	for i := 0; i < len(needles); i++ {
+		if stringutils.SliceContains(haystack, needles[i]) {
+			return true
+		}
+	}
+	return false
+}
+
+func stringSliceEquals(a []string, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := 0; i < len(a); i++ {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
 func smallStringListGen() gopter.Gen {
 	return gen.SliceOf(
 		gen.SliceOfN(2, gen.AlphaNumChar()).Map(func(r []rune) string {
 			return string(r)
 		}).WithShrinker(gen.StringShrinker),
-	).SuchThat(func(s []string) bool {
-		return len(s) > 0
-	}).Map(sortStrings).Map(sortedUniqueify)
+	).Map(sortStrings).Map(sortedUniqueify)
 }
 
 func mergeStringLists(t *testing.T, stringLists ...[]string) []string {
@@ -78,6 +105,16 @@ func mergeStringLists(t *testing.T, stringLists ...[]string) []string {
 	}
 	mergedStream := Merge(streams...)
 	return consume(t, mergedStream)
+}
+
+func subStringLists(t *testing.T, a []string, b []string) (_vals []string, _consumed bool) {
+	streamA := NewArrayStream(a)
+	streamB := NewArrayStream(b)
+	subStream := Sub(streamA, streamB)
+	vals := consume(t, subStream)
+	_, err := streamA.Next()
+	consumed := err == io.EOF
+	return vals, consumed
 }
 
 func TestMergePropertyBased(t *testing.T) {
@@ -102,6 +139,74 @@ func TestMergePropertyBased(t *testing.T) {
 		smallStringListGen().WithLabel("a"),
 		smallStringListGen().WithLabel("b"),
 		smallStringListGen().WithLabel("c"),
+	))
+
+	properties.TestingRun(t)
+}
+
+func TestSubPropertyBased(t *testing.T) {
+	parameters := gopter.DefaultTestParameters()
+	parameters.MinSuccessfulTests = 10000
+	properties := gopter.NewProperties(parameters)
+
+	properties.Property("a - a = 0", prop.ForAll(
+		func(a []string) bool {
+			v, _ := subStringLists(t, a, a)
+			return len(v) == 0
+		},
+		smallStringListGen().WithLabel("a"),
+	))
+
+	properties.Property("a - 0 = a", prop.ForAll(
+		func(a []string) bool {
+			v, _ := subStringLists(t, a, []string{})
+			return stringSliceEquals(a, v)
+		},
+		smallStringListGen().WithLabel("a"),
+	))
+
+	properties.Property("0 - a = 0", prop.ForAll(
+		func(a []string) bool {
+			v, _ := subStringLists(t, []string{}, a)
+			return len(v) == 0
+		},
+		smallStringListGen().WithLabel("a"),
+	))
+
+	properties.Property("Result is sorted and contains no duplicates", prop.ForAll(
+		func(a []string, b []string) bool {
+			v, _ := subStringLists(t, a, b)
+			return isSortedAnUnique(v)
+		},
+		smallStringListGen().WithLabel("a"),
+		smallStringListGen().WithLabel("b"),
+	))
+
+	properties.Property("Left stream is entirely consumed", prop.ForAll(
+		func(a []string, b []string) bool {
+			_, consumed := subStringLists(t, a, b)
+			return consumed
+		},
+		smallStringListGen().WithLabel("a"),
+		smallStringListGen().WithLabel("b"),
+	))
+
+	properties.Property("Result does not contain items in b", prop.ForAll(
+		func(a []string, b []string) bool {
+			v, _ := subStringLists(t, a, b)
+			return !anyContained(v, b)
+		},
+		smallStringListGen().WithLabel("a"),
+		smallStringListGen().WithLabel("b"),
+	))
+
+	properties.Property("Result does not contain items not in a", prop.ForAll(
+		func(a []string, b []string) bool {
+			v, _ := subStringLists(t, a, b)
+			return allContained(a, v)
+		},
+		smallStringListGen().WithLabel("a"),
+		smallStringListGen().WithLabel("b"),
 	))
 
 	properties.TestingRun(t)

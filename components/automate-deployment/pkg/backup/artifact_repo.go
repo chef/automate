@@ -63,8 +63,6 @@ func newUploadSnapshotArtifactIterator(ctx context.Context, src Bucket,
 		return nil, err
 	}
 
-	// TODO: check to make sure requiredArtifacts is read until EOF
-
 	// We're going to write out the required artifacts and artifacts to upload to temp files.
 	// We need to do this because we want to get the number of artifacts to upload to report
 	// progres
