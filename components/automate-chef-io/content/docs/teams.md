@@ -24,7 +24,7 @@ Navigate to _Teams_ in the **Settings** tab. Then use the **Create Team** button
 ![Create Local Team](/images/docs/admin-tab-teams-list.png)
 
 ### Deleting Local Teams
-Navigate to _Teams_ in the **Settings** tab. Then open the menu at the end of the table row select **Delete Team**.
+Navigate to _Teams_ in the **Settings** tab. Then open the menu at the end of the table row and select **Delete Team**.
 
 ### Adding Local Users to Teams
 To add local users to a team, navigate to _Teams_ from the **Settings** tab and locate the team. Navigate to the team's page, then use the **Add Users** button.

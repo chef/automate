@@ -53,5 +53,4 @@ curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/apis/iam/
 Navigate to _API Tokens_ in the **Settings** tab. Then open the menu at the end of the table row and select **Delete Token**.
 
 ### Changing API Token Details
-The API token name, projects a team belongs to, and the token's status can be changed by navigating to _API Tokens_ from the **Settings** tab, selecting an individual token and then navigating to the **Details** tab.
-
+The API token name, projects a token belongs to, and the token's status can be changed by navigating to _API Tokens_ from the **Settings** tab, selecting an individual token and then navigating to the **Details** tab.
