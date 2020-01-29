@@ -15,25 +15,25 @@ export class OrgRequests {
 
   public getOrgs(server_id: string): Observable<OrgsSuccessPayload> {
     return this.http.get<OrgsSuccessPayload>(
-      `${env.gateway_url}/infra_proxy/servers/${server_id}/orgs`);
+      `${env.infra_proxy_url}/servers/${server_id}/orgs`);
   }
 
   public getOrg(server_id: string, id: string): Observable<OrgSuccessPayload> {
     return this.http.get<OrgSuccessPayload>(
-      `${env.gateway_url}/infra_proxy/servers/${server_id}/orgs/${id}`);
+      `${env.infra_proxy_url}/servers/${server_id}/orgs/${id}`);
   }
 
   public createOrg(org: CreateOrgPayload): Observable<OrgSuccessPayload> {
     return this.http.post<OrgSuccessPayload>(
-      `${env.gateway_url}/infra_proxy/servers/${org.server_id}/orgs`, org);
+      `${env.infra_proxy_url}/servers/${org.server_id}/orgs`, org);
   }
 
   public deleteOrg(server_id: string, id: string): Observable<{}> {
-    return this.http.delete(`${env.gateway_url}/infra_proxy/servers/${server_id}/orgs/${id}`);
+    return this.http.delete(`${env.infra_proxy_url}/servers/${server_id}/orgs/${id}`);
   }
 
   public updateOrg(org: Org): Observable<OrgSuccessPayload> {
     return this.http.put<OrgSuccessPayload>(
-      `${env.gateway_url}/infra_proxy/servers/${org.server_id}/orgs/${org.id}`, org);
+      `${env.infra_proxy_url}/servers/${org.server_id}/orgs/${org.id}`, org);
   }
 }
