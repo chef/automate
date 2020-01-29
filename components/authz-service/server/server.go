@@ -27,7 +27,6 @@ import (
 	"github.com/chef/automate/components/authz-service/engine"
 	v1 "github.com/chef/automate/components/authz-service/server/v1"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
-	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	v2_postgres "github.com/chef/automate/components/authz-service/storage/v2/postgres"
 )
@@ -35,8 +34,7 @@ import (
 // GRPC creates and listens on grpc server.
 func GRPC(ctx context.Context,
 	addr string, l logger.Logger, connFactory *secureconn.Factory,
-	e engine.Engine, migrationsConfig migration.Config,
-	dataMigrationsConfig datamigration.Config, cerealAddress string,
+	e engine.Engine, migrationsConfig migration.Config, cerealAddress string,
 	projectLimit int) error {
 
 	grpclog.SetLoggerV2(l)
@@ -47,7 +45,7 @@ func GRPC(ctx context.Context,
 	l.Printf("Authz GRPC API listening on %s", addr)
 
 	server, err := NewGRPCServer(ctx, connFactory, l, e, migrationsConfig,
-		dataMigrationsConfig, cerealAddress, projectLimit)
+		cerealAddress, projectLimit)
 	if err != nil {
 		return err
 	}
@@ -57,9 +55,8 @@ func GRPC(ctx context.Context,
 
 // NewGRPCServer creates a grpc server.
 func NewGRPCServer(ctx context.Context,
-	connFactory *secureconn.Factory, l logger.Logger,
-	e engine.Engine, migrationsConfig migration.Config,
-	dataMigrationsConfig datamigration.Config, cerealAddress string,
+	connFactory *secureconn.Factory, l logger.Logger, e engine.Engine,
+	migrationsConfig migration.Config, cerealAddress string,
 	projectLimit int) (*grpc.Server, error) {
 
 	// Note(sr): we're buffering one version struct, as NewPostgresPolicyServer writes
@@ -72,7 +69,7 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v1 server")
 	}
 
-	err = v2_postgres.Initialize(ctx, e, l, migrationsConfig, dataMigrationsConfig, projectLimit)
+	err = v2_postgres.Initialize(ctx, e, l, migrationsConfig, projectLimit)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 postgres singleton")
 	}

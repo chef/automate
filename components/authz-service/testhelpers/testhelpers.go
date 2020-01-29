@@ -24,7 +24,6 @@ import (
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	server "github.com/chef/automate/components/authz-service/server/v2"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
-	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	postgres_v1 "github.com/chef/automate/components/authz-service/storage/v1/postgres"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
@@ -176,12 +175,7 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
-	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../storage/postgres/datamigration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
-	}
-
-	if migrationConfig == nil && dataMigrationConfig == nil {
+	if migrationConfig == nil {
 		t.Skipf("start pg container and set PG_URL to run")
 	}
 
@@ -195,7 +189,7 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 	require.NoError(t, err, "error creating extension")
 
-	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig), projectLimit)
+	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, projectLimit)
 	require.NoError(t, err)
 	return postgres.GetInstance(), &TestDB{
 			DB:      db,

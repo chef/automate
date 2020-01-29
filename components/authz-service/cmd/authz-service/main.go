@@ -12,7 +12,6 @@ import (
 
 	"github.com/chef/automate/components/authz-service/engine/opa"
 	"github.com/chef/automate/components/authz-service/server"
-	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
@@ -106,17 +105,9 @@ Please pass a config file as the only argument to this command.`))
 		Logger: l,
 	}
 
-	// NOTE (TC): These are IAM V2 specific data migrations.
-	// Read more in v2_data_migrations.md.
-	dataMigrationConfig := datamigration.Config{
-		Path:   cfg.DataMigrationsPath,
-		PGURL:  u,
-		Logger: l,
-	}
-
 	// if server.GRPC() returns, it's with an error
 	fail(server.GRPC(ctx, cfg.GRPC, l, connFactory, engine, migrationConfig,
-		dataMigrationConfig, cfg.CerealAddress, cfg.ProjectLimit))
+		cfg.CerealAddress, cfg.ProjectLimit))
 }
 
 // fail outputs the error and exits with a non-zero code

@@ -3,7 +3,7 @@ include ../../Makefile.common_go
 PACKAGE_PATH = github.com/chef/automate/components/authz-service
 
 BINS = ${PACKAGE_PATH}/cmd/authz-service
-MIGRATION_READMES = storage/postgres/migration/sql/README.md storage/postgres/datamigration/sql/README.md
+MIGRATION_READMES = storage/postgres/migration/sql/README.md
 VERSION ?= $(shell git rev-pasrse HEAD)
 BUILD_TIME ?= $(shell date -u '+%Y%m%d%H%M%S')
 GO_LDFLAGS = --ldflags "-X ${LIBRARY_PATH}/version.Version=${BUILD_TIME} -X ${LIBRARY_PATH}/version.GitSHA=${GIT_SHA}"

@@ -634,7 +634,7 @@ To add a new default policy, the following is needed:
 
 - A new IAM v2 (system) policy: they are defined in [server/v2/system](server/v2/system.go#L31).
 - A new IAM v2 default policy (which can be deleted by users), or any additions
-    to default roles, which are done in [datamigrations](storage/postgres/datamigration/sql/).
+    to default roles, which are done in [datamigrations](storage/postgres/migration/sql/).
 
 1. Migration logic: When upgrading from IAM v1 to v2.1, v1 policies are
    converted. The conversion logic needs to be made aware of the new v1 policies, and

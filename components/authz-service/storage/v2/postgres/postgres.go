@@ -13,7 +13,6 @@ import (
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
-	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -31,7 +30,6 @@ type pg struct {
 	db           *sql.DB
 	engine       engine.Engine
 	logger       logger.Logger
-	dataMigConf  datamigration.Config
 	conninfo     string
 	projectLimit int
 }
@@ -47,8 +45,7 @@ func GetInstance() *pg {
 // New instantiates the singleton postgres storage backend.
 // Will only initialize once. Will simply return nil if already initialized.
 func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf migration.Config,
-	dataMigConf datamigration.Config, projectLimit int) error {
-
+	projectLimit int) error {
 	var err error
 	once.Do(func() {
 		l.Infof("applying database migrations from %s", migConf.Path)
@@ -58,7 +55,6 @@ func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf m
 			db:           db,
 			engine:       e,
 			logger:       l,
-			dataMigConf:  dataMigConf,
 			conninfo:     migConf.PGURL.String(),
 			projectLimit: projectLimit}
 	})
@@ -339,7 +335,7 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 }
 
 func (p *pg) ApplyV2DataMigrations(_ context.Context) error {
-	return p.dataMigConf.Migrate()
+	return nil
 }
 
 func (p *pg) GetPolicyChangeID(ctx context.Context) (string, error) {
