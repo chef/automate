@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/chef/automate/components/applications-service/pkg/generator"
+	"github.com/chef/automate/components/applications-load-gen/pkg/generator"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )

@@ -1132,16 +1132,13 @@ paths = [
   "lib/timef/*",
   "lib/tls/*",
   "lib/tracing/*",
-  "lib/uuid4/*",
   "lib/version/*",
-  "vendor/github.com/BurntSushi/toml/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/beorn7/perks/*",
   "vendor/github.com/codahale/hdrhistogram/*",
   "vendor/github.com/davecgh/go-spew/*",
   "vendor/github.com/fsnotify/fsnotify/*",
   "vendor/github.com/go-gorp/gorp/*",
-  "vendor/github.com/gofrs/uuid/*",
   "vendor/github.com/gogo/protobuf/*",
   "vendor/github.com/golang-migrate/migrate/*",
   "vendor/github.com/golang/protobuf/*",
@@ -1192,6 +1189,31 @@ paths = [
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
   "vendor/gopkg.in/yaml.v2/*"
+]
+
+[applications-load-gen]
+plan_path = "components/applications-load-gen"
+paths = [
+  "components/applications-load-gen/*",
+  "api/external/habitat/*",
+  "components/applications-service/*",
+  "lib/tls/*",
+  "lib/uuid4/*",
+  "vendor/github.com/BurntSushi/toml/*",
+  "vendor/github.com/gofrs/uuid/*",
+  "vendor/github.com/gogo/protobuf/*",
+  "vendor/github.com/golang/protobuf/*",
+  "vendor/github.com/nats-io/go-nats/*",
+  "vendor/github.com/nats-io/go-nats-streaming/*",
+  "vendor/github.com/nats-io/nkeys/*",
+  "vendor/github.com/nats-io/nuid/*",
+  "vendor/github.com/pkg/errors/*",
+  "vendor/github.com/sirupsen/logrus/*",
+  "vendor/github.com/spf13/cobra/*",
+  "vendor/github.com/spf13/pflag/*",
+  "vendor/go.uber.org/atomic/*",
+  "vendor/golang.org/x/crypto/*",
+  "vendor/golang.org/x/sys/*"
 ]
 
 [nodemanager-service]

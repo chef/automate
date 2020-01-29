@@ -6,7 +6,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
-	"github.com/chef/automate/components/applications-service/pkg/generator"
+	"github.com/chef/automate/components/applications-load-gen/pkg/generator"
 )
 
 func newDescribeCmd() *cobra.Command {

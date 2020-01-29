@@ -45,6 +45,7 @@ pg-sidecar-service components/pg-sidecar-service
 automate-pg-gateway components/automate-pg-gateway
 event-service components/event-service
 applications-service components/applications-service
+applications-load-gen components/applications-load-gen
 nodemanager-service components/nodemanager-service
 ingest-service components/ingest-service
 license-control-service components/license-control-service
