@@ -6,8 +6,8 @@
   <div class="container">
     <main>
       <chef-page-header [contrasting-background]="false">
-        <chef-heading>Data Feed Destinations</chef-heading>
-        <chef-subheading>Data Feed Destinations for bulk client data and compliance reports.</chef-subheading>
+        <chef-heading>Data Feeds</chef-heading>
+        <chef-subheading>Data Feed for bulk client data and compliance reports.</chef-subheading>
       </chef-page-header>
 
       <div class="page-body">
@@ -17,10 +17,10 @@
 
         <app-authorized [anyOf]="['/datafeed/destination', 'post']">
           <div *ngIf="(destinations$ | async)?.length === 0" class="empty-state">
-            <p>Create the first datafeed endpoint to get started!</p>
+            <p>Create a data feed to get started!</p>
           </div>
           <div [ngClass]="(destinations$ | async)?.length === 0 ? 'empty-state' : ''">
-            <chef-button primary [routerLink]="['/settings/data-feed/form']">Create Destination</chef-button>
+            <chef-button primary [routerLink]="['/settings/data-feed/form']">Create Data Feed</chef-button>
           </div>
         </app-authorized>
 
@@ -31,7 +31,7 @@
             <chef-tr>
               <chef-th class="sort" (click)="toggleSort('name')">
                 <div class="text-and-sort-icons">
-                  <span>Endpoint Name</span>
+                  <span>Name</span>
                   <chef-icon aria-hidden="true" id="{{sortIcon('name')}}" class="sort-icon">arrow_drop_up</chef-icon>
                 </div>
               </chef-th>

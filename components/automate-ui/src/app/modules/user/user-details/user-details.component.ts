@@ -115,6 +115,10 @@ export class UserDetailsComponent implements OnInit, OnDestroy {
     // Drop the previous fragment and add the incoming fragment.
     this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   }
+
+  public handlePasswordInput(): void {
+    this.userDetails.passwordForm.get('confirmPassword').updateValueAndValidity();
+  }
 }
 
 interface UserDetails {
@@ -373,7 +377,7 @@ class UserProfileDetails implements UserDetails {
             this.resetForms();
           }
         });
-  }
+      }
 
   public savePassword(): void {
     this.saveSuccessful = false;

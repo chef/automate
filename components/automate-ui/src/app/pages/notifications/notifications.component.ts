@@ -135,8 +135,6 @@ export class NotificationsComponent implements OnInit {
           acc['ccrRuleCount'] += 1;
         } else if (rule.ruleType === 'ComplianceFailure') {
           acc['complianceRuleCount'] += 1;
-        } else if (rule.ruleType === 'Assets') {
-          acc['assetsRuleCount'] += 1;
         }
 
         if (rule.targetType === ServiceActionType.SLACK) {

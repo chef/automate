@@ -8,7 +8,8 @@
             Display Name <span aria-hidden="true">*</span>
             <input chefInput formControlName="displayName" type="text" (keyup)="handleNameInput($event)" autocomplete="off" />
           </label>
-          <chef-error *ngIf="hasAttemptedInputWithError('displayName')">
+          <chef-error *ngIf="hasAttemptedInputWithRequiredError('displayName') || 
+            (createUserForm.get('displayName').hasError('pattern') && hasAttemptedInput('displayName'))">
             Display name is required.
           </chef-error>
         </chef-form-field>
@@ -20,7 +21,7 @@
             Username <span aria-hidden="true">*</span>
             <input chefInput formControlName="username" type="text" (keyup)="handleUsernameInput($event)" autocomplete="off" />
           </label>
-          <chef-error *ngIf="hasAttemptedInputWithError('username')">
+          <chef-error *ngIf="hasAttemptedInputWithRequiredError('username')">
             Username is required.
           </chef-error>
           <chef-error *ngIf="createUserForm.get('username').hasError('pattern') && hasAttemptedInput('username')">
@@ -45,9 +46,10 @@
         <chef-form-field>
           <label>
             Password <span aria-hidden="true">*</span>
-            <input chefInput formControlName="password" type="password" />
+            <input chefInput formControlName="password" type="password" (keyup)="handlePasswordInput($event)"/>
           </label>
-          <chef-error *ngIf="hasAttemptedInputWithError('password')">
+          <chef-error *ngIf="hasAttemptedInputWithRequiredError('password') || 
+            (createUserForm.get('password').hasError('pattern') && hasAttemptedInput('password'))">
             Password is required.
           </chef-error>
           <chef-error *ngIf="createUserForm.get('password').hasError('minlength') && hasAttemptedInput('password')">
@@ -66,7 +68,7 @@
             Confirm Password <span aria-hidden="true">*</span>
             <input chefInput formControlName="confirmPassword" type="password" />
           </label>
-          <chef-error *ngIf="hasAttemptedInputWithError('confirmPassword')">
+          <chef-error *ngIf="hasAttemptedInputWithRequiredError('confirmPassword')">
             Confirm Password is required.
           </chef-error>
           <chef-error *ngIf="createUserForm.get('confirmPassword').hasError('noMatch') && hasAttemptedInput('confirmPassword')">

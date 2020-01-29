@@ -85,7 +85,6 @@ func (d *DataFeedAggregateTask) Run(ctx context.Context, task cereal.Task) (inte
 
 		if err != nil {
 			log.Errorf("Error retrieving credentials, cannot send asset notification: %v", err)
-			// TODO error handling - need some form of report in automate that indicates when data was sent and if it was successful
 		} else {
 			// build and send notification for this rule
 			notification := datafeedNotification{username: username, password: password, url: destinations[destination].URL, data: buffer}

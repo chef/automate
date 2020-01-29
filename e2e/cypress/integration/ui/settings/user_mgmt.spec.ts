@@ -1,5 +1,3 @@
-import { itFlaky } from '../../../support/constants';
-
 describe('user management', () => {
   before(() => {
     cy.adminLogin('/settings/users').then(() => {
@@ -24,7 +22,7 @@ describe('user management', () => {
     cy.get('app-user-table').should('exist');
 
     // open modal
-    cy.get('[data-cy=app-user-table-add-button]').contains('Create User').click();
+    cy.get('[data-cy=app-user-table-add-button]').click();
     cy.get('app-user-management chef-modal').should('exist');
 
     // we increase the default delay to mimic the average human's typing speed
@@ -41,17 +39,33 @@ describe('user management', () => {
     cy.get('[formcontrolname=username]').focus().clear()
       .type(username, { delay: typeDelay }).should('have.value', username);
 
-    cy.get('[formcontrolname=password]').focus()
+    // type a too short password
+    cy.get('[formcontrolname=password]')
+      .type('1234567', { delay: typeDelay }).should('have.value', '1234567');
+    cy.get('app-create-user-modal chef-error').contains('must be at least')
+      .should('be.visible');
+
+    // type a valid password
+    cy.get('[formcontrolname=password]').clear()
       .type(password, { delay: typeDelay }).should('have.value', password);
 
+    // type a mismatch confirmPassword
     cy.get('[formcontrolname=confirmPassword]')
+      .type('different', { delay: typeDelay }).should('have.value', 'different');
+    cy.get('app-create-user-modal chef-error').contains('must match')
+      .should('be.visible');
+
+    // type a matching confirmPassword
+    cy.get('[formcontrolname=confirmPassword]').clear()
       .type(password, { delay: typeDelay }).should('have.value', password);
 
     // save new user
     cy.get('[data-cy=save-user]').click();
     cy.get('app-user-management chef-modal').should('not.be.visible');
     cy.get('#main-content-wrapper').scrollTo('top');
-    cy.get('chef-notification.info').should('be.visible');
+    cy.get('chef-notification.info').contains(`Created user: ${username}`);
+    // close notification banner so we can assert the password success notification later
+    cy.get('chef-notification.info chef-icon').click();
 
     cy.get('app-user-table chef-table-cell').contains(username).should('exist');
     cy.get('app-user-table chef-table-cell').contains(name).should('exist');
@@ -70,12 +84,33 @@ describe('user management', () => {
     cy.get('app-user-details div.name-column').contains(name).should('exist');
     cy.get('app-user-details div.header-user-id').contains(username).should('exist');
     cy.get('app-user-details chef-form-field').contains('Display Name ').should('exist');
-    cy.get('[formcontrolname=displayName]')
-    .type(' update', { delay: typeDelay }).should('have.value', name + ' update');
+    cy.get('[formcontrolname=displayName]').clear()
+      .type(updated_name, { delay: typeDelay }).should('have.value', updated_name);
 
     // save display name change
     cy.get('[data-cy=user-details-submit-button]').click();
     cy.get('app-user-details span#saved-note').contains('All changes saved.').should('exist');
-    cy.get('app-user-details div.name-column').contains(name + ' update').should('exist');
+    cy.get('app-user-details div.name-column').contains(updated_name).should('exist');
+
+    // click password tab
+    cy.get('app-user-details #chef-option2').click();
+    cy.get('[formcontrolname=newPassword]')
+      .type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
+
+    // type a mismatch confirmPassword
+    cy.get('[formcontrolname=confirmPassword]')
+      .type(password, { delay: typeDelay }).should('have.value', password);
+    cy.get('app-user-details .password:last-of-type chef-error').contains('must match')
+      .should('be.visible');
+
+    // type a matching confirmPassword
+    cy.get('[formcontrolname=confirmPassword]').clear()
+      .type(updated_password, { delay: typeDelay }).should('have.value', updated_password);
+
+    cy.get('.update-password-button').click();
+    cy.get('#main-content-wrapper').scrollTo('top');
+
+    cy.wait('@updateUser');
+    cy.get('chef-notification.info').contains(`Reset password for user: ${username}`);
   });
 });
