@@ -32,7 +32,7 @@
           </chef-form-field>
         </form>
         <chef-button [disabled]="(userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty" primary inline
-          (click)="saveDisplayName()" data-cy="user-details-submit-button">
+          (click)="userDetails.saveDisplayName()" data-cy="user-details-submit-button">
           <chef-loading-spinner *ngIf="userDetails.saveInProgress"></chef-loading-spinner>
           <span *ngIf="userDetails.saveInProgress">Saving...</span>
           <span *ngIf="!userDetails.saveInProgress">Save</span>
@@ -84,7 +84,7 @@
             </chef-error>
           </chef-form-field>
         </form>
-        <chef-button [disabled]="!userDetails.passwordForm.valid" class="update-password-button" primary (click)="savePassword()">
+        <chef-button [disabled]="!userDetails.passwordForm.valid" class="update-password-button" primary (click)="userDetails.savePassword()">
           <span>Reset Password</span>
         </chef-button>
       </section>
