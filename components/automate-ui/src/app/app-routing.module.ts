@@ -75,7 +75,7 @@ const routes: Routes = [
         },
         {
           path: 'teams',
-          loadChildren: './modules/team/team.module#TeamModule'
+          loadChildren: () => import('./modules/team/team.module').then(m => m.TeamModule)
         },
         {
           path: 'tokens',
@@ -87,7 +87,7 @@ const routes: Routes = [
         },
         {
           path: 'users',
-          loadChildren: './modules/user/user.module#UserModule'
+          loadChildren: () => import('./modules/user/user.module').then(m => m.UserModule)
         },
         {
           path: 'policies',
