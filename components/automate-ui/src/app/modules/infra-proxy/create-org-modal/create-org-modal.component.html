@@ -5,7 +5,7 @@
       <div class="name-margin"> 
         <chef-form-field>
           <label>
-            <span class="label">Org Name <span aria-hidden="true">*</span></span>
+            Org Name <span aria-hidden="true">*</span>
             <input chefInput name="name" formControlName="name" type="text" data-cy="org-name" autocomplete="off">
           </label>
           <chef-error
@@ -15,7 +15,7 @@
         </chef-form-field>
         <chef-form-field>
           <label>
-            <span class="label">Admin User <span aria-hidden="true">*</span></span>
+            Admin User <span aria-hidden="true">*</span>
             <input chefInput name="admin_user" formControlName="admin_user" type="text" id="admin-input" data-cy="admin-user" autocomplete="off">
           </label>
           <chef-error
@@ -25,7 +25,7 @@
         </chef-form-field>
         <chef-form-field>
           <label>
-            <span class="label">Admin Key <span aria-hidden="true">*</span></span>
+            Admin Key <span aria-hidden="true">*</span>
             <textarea chefInput name="admin_key" id="admin_key" formControlName="admin_key" cols="54" rows="10" placeholder="-----BEGIN RSA PRIVATE KEY -----" autofocus></textarea>
           </label>
           <chef-error
@@ -37,7 +37,7 @@
       <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-org-modal-btn" (click)="createServerOrg()">
         <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
         <span *ngIf="!creating">Create Org</span>
-        <span *ngIf="creating">Creating Org ...</span>
+        <span *ngIf="creating">Creating Org...</span>
       </chef-button>
     </form>
   </div>

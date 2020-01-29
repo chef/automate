@@ -43,5 +43,5 @@ export const deleteStatus = createSelector(
 export const orgFromRoute = createSelector(
   orgEntities,
   routeParams,
-  (state, { orgid }) => state[orgid]
+  (state, { orgId }) => state[orgId]
 );

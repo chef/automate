@@ -7,7 +7,6 @@ import { FormGroup } from '@angular/forms';
   styleUrls: ['./create-org-modal.component.scss']
 })
 export class CreateOrgModalComponent implements OnInit {
-  // @Input() type: string;
   @Input() visible = false;
   @Input() creating = false;
   @Input() conflictErrorEvent: EventEmitter<boolean>;

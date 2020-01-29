@@ -25,7 +25,7 @@ export interface OrgSuccessPayload {
   org: Org;
 }
 
-export class GetOrgsForServer implements Action {
+export class GetOrgs implements Action {
   readonly type = OrgActionTypes.GET_ALL;
 
   constructor(public payload: { server_id: string }) { }
@@ -124,7 +124,7 @@ export class UpdateOrgFailure implements Action {
 }
 
 export type OrgActions =
-  | GetOrgsForServer
+  | GetOrgs
   | GetOrgsSuccess
   | GetOrgsFailure
   | GetOrg

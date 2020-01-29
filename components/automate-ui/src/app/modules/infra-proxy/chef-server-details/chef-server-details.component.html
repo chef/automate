@@ -108,7 +108,7 @@
               <chef-table-row>
                 <chef-table-header-cell>Org Name</chef-table-header-cell>
                 <chef-table-header-cell>Admin</chef-table-header-cell>
-                <chef-table-header-cell class="controls"></chef-table-header-cell>
+                <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
               </chef-table-row>
             </chef-table-header>
             <chef-table-body>
@@ -117,10 +117,10 @@
                   <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'orgs', org.id, 'cookbooks']">{{ org.name }}</a>
                 </chef-table-cell>
                 <chef-table-cell>{{ org.admin_user }}</chef-table-cell>
-                <chef-table-cell class="controls">
-                  <chef-control-menu>
+                <chef-table-cell class="three-dot-column">
+                  <mat-select>
                     <chef-option data-cy="delete" (click)="startOrgDelete(org)">Delete Org</chef-option>
-                  </chef-control-menu>
+                  </mat-select>
                 </chef-table-cell>
               </chef-table-row>
             </chef-table-body>

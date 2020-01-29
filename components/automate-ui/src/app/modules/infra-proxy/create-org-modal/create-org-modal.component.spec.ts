@@ -4,7 +4,7 @@ import { ReactiveFormsModule, FormBuilder } from '@angular/forms';
 import { CreateOrgModalComponent } from './create-org-modal.component';
 import { MockComponent } from 'ng2-mock-component';
 import { RouterTestingModule } from '@angular/router/testing';
-import { CommonModule }  from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { BrowserModule } from '@angular/platform-browser';
 
 describe('CreateOrgModalComponent', () => {
@@ -21,7 +21,7 @@ describe('CreateOrgModalComponent', () => {
         MockComponent({ selector: 'chef-checkbox' }),
         MockComponent({ selector: 'chef-error' }),
         MockComponent({ selector: 'chef-toolbar' }),
-        MockComponent({ selector: 'chef-modal', inputs: ['visible'] }),
+        MockComponent({ selector: 'chef-modal', inputs: ['visible'] })
       ],
       imports: [
         CommonModule,
