@@ -122,8 +122,7 @@ func (b *uploadSnapshotArtifactIterator) EstimatedSize() int64 {
 }
 
 func (b *uploadSnapshotArtifactIterator) WriteSnapshotFile(w io.Writer) (string, error) {
-	_, err := b.snapshotTmpFile.Seek(0, os.SEEK_SET)
-	if err != nil {
+	if _, err := b.snapshotTmpFile.Seek(0, os.SEEK_SET); err != nil {
 		return "", err
 	}
 
@@ -131,13 +130,11 @@ func (b *uploadSnapshotArtifactIterator) WriteSnapshotFile(w io.Writer) (string,
 	m := io.MultiWriter(w, checksum)
 	g := gzip.NewWriter(m)
 
-	_, err = io.Copy(g, b.snapshotTmpFile)
-	if err != nil {
+	if _, err := io.Copy(g, b.snapshotTmpFile); err != nil {
 		return "", err
 	}
 
-	err = g.Close()
-	if err != nil {
+	if err := g.Close(); err != nil {
 		return "", err
 	}
 	return hex.EncodeToString(checksum.Sum(nil)), nil
