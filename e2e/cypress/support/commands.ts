@@ -331,8 +331,6 @@ function LoginHelper(username: string) {
   cy.server();
   // the gloabl permissions for the user that populates the initial permissions cache
   cy.route('GET', '/api/v0/auth/introspect').as('getAuthPopulateCache');
-  // the parameterized permissions, called for the specific page loaded
-  cy.route('POST', '/api/v0/auth/introspect').as('getAuthParameterized');
 
   // login
   cy.get('#login').type(username);
@@ -345,7 +343,7 @@ function LoginHelper(username: string) {
     cy.get('app-welcome-modal').invoke('hide');
     cy.saveStorage();
 
-    cy.wait(['@getAuthPopulateCache', '@getAuthParameterized']);
+    cy.wait(['@getAuthPopulateCache']);
   });
 }
 
