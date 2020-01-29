@@ -69,7 +69,7 @@ export class ProfileComponent implements OnInit, OnDestroy {
         filter(([loadingUserData, user]) => !loadingUserData && !isNil(user)),
         map(([_, user]) => user.name),
         distinctUntilChanged(),
-        takeUntil(this.isDestroyed)).subscribe((displayName) => {
+        takeUntil(this.isDestroyed)).subscribe(displayName => {
           this.displayName = displayName;
         });
     } else {

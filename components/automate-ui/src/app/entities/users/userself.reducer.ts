@@ -1,6 +1,6 @@
 import { set, pipe } from 'lodash/fp';
 
-import { EntityStatus } from '../entities';
+import { EntityStatus } from 'app/entities/entities';
 import { UserSelfActionTypes, UserSelfActions } from './userself.actions';
 import { SelfUser } from './userself.model';
 

@@ -39,7 +39,7 @@ export class UserSelfEffects {
   getUserSelf$ = combineLatest([
     this.actions$.pipe(ofType<GetUserSelf>(UserSelfActionTypes.GET)),
     this.store$.select(userSelfId).pipe(filter(identity))]).pipe(
-      mergeMap(([_action, userId]: [GetUserSelf, string]) =>
+      mergeMap(([_action, userId]) =>
         this.requests.getUser(userId).pipe(
         map((resp: SelfUser) => new GetUserSelfSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new GetUserSelfFailure(error)))))
@@ -53,7 +53,7 @@ export class UserSelfEffects {
     // It looks like it is because the request is canceled.
     // Here we will filter out that error.
     filter(({ payload: { error } }: GetUserSelfFailure) => error),
-    map(({ payload: { error } }: GetUserSelfFailure) => {
+    map(({ payload: { error } }) => {
       const msg = error.error;
       return new CreateNotification({
         type: Type.error,

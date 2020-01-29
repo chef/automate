@@ -36,7 +36,7 @@ describe('UserDetailsComponent', () => {
   let router: Router;
   const isNonAdmin = new Subject<{ isNonAdmin: boolean }>();
 
-  describe('logged-in user opening thier user page', () => {
+  describe('logged-in user opening their user page', () => {
     const initialState = {
       ...defaultInitialState,
       router: {
@@ -122,13 +122,13 @@ describe('UserDetailsComponent', () => {
         expect(component.tabValue).toBe('details');
       });
 
-      it('show password section when password tab is selected', () => {
+      it('shows password section when password tab is selected', () => {
         component.onSelectedTab({ target: { value: 'password' } });
         expect(component.tabValue).toBe('password');
         expect(component.userDetails.passwordForm.controls['previousPassword']).toBeTruthy();
       });
 
-      it('show details section when details tab is selected', () => {
+      it('shows details section when details tab is selected', () => {
         component.onSelectedTab({ target: { value: 'details' } });
         expect(component.tabValue).toBe('details');
       });
@@ -137,11 +137,11 @@ describe('UserDetailsComponent', () => {
         expect(component.userDetails.user).toEqual(userSelf);
       });
 
-      it('do not show breadcrumbs', () => {
+      it('does not show breadcrumbs', () => {
         expect(component.userDetails.showBreadcrumbs).toEqual(false);
       });
 
-      it('show previous password', () => {
+      it('shows previous password', () => {
         expect(component.userDetails.showPreviousPassword).toEqual(true);
       });
 
@@ -174,15 +174,15 @@ describe('UserDetailsComponent', () => {
           expect(store.dispatch).toHaveBeenCalledWith(new GetUserSelf());
       });
 
-      it('show breadcrumbs', () => {
+      it('shows breadcrumbs', () => {
         expect(component.userDetails.showBreadcrumbs).toEqual(true);
       });
 
-      it('show previous password', () => {
+      it('shows previous password', () => {
         expect(component.userDetails.showPreviousPassword).toEqual(true);
       });
 
-      it('no previous password field', () => {
+      it('does not show previous password field', () => {
         component.onSelectedTab({ target: { value: 'password' } });
         expect(component.tabValue).toBe('password');
         expect(component.userDetails.passwordForm.controls['previousPassword']).toBeTruthy();
@@ -281,15 +281,15 @@ describe('UserDetailsComponent', () => {
             new GetUser({ id: user.id }));
       });
 
-      it('show breadcrumbs', () => {
+      it('shows breadcrumbs', () => {
         expect(component.userDetails.showBreadcrumbs).toEqual(true);
       });
 
-      it('do not show previous password', () => {
+      it('does not show previous password', () => {
         expect(component.userDetails.showPreviousPassword).toEqual(false);
       });
 
-      it('no previous password field', () => {
+      it('does not show previous password field', () => {
         component.onSelectedTab({ target: { value: 'password' } });
         expect(component.tabValue).toBe('password');
         expect(component.userDetails.passwordForm.controls['previousPassword']).toBeUndefined();
