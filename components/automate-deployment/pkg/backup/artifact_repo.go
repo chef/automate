@@ -128,10 +128,10 @@ func (b *uploadSnapshotArtifactIterator) WriteSnapshotFile(w io.Writer) (string,
 	}
 
 	checksum := sha256.New()
-	g := gzip.NewWriter(w)
-	m := io.MultiWriter(g, checksum)
+	m := io.MultiWriter(w, checksum)
+	g := gzip.NewWriter(m)
 
-	_, err = io.Copy(m, b.snapshotTmpFile)
+	_, err = io.Copy(g, b.snapshotTmpFile)
 	if err != nil {
 		return "", err
 	}
