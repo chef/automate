@@ -37,7 +37,7 @@ Chef Automate organizes data from the application and environment tags provided 
 
 ## Prerequisites
 
-The Chef Automate EAS application feature introduces several concepts from Chef Habitat, which are introduced in the following [Glossary]({{< relref "applications.md#Glossary" >}}).
+The Chef Automate EAS application feature introduces several concepts from Chef Habitat, which are introduced in the following [Glossary]({{< relref "applications-dashboard.md#Glossary" >}}).
 
 Find Chef Automate EAS system requirements, installation, and configuration instructions in the [Setting up the Applications Dashboard]({{< relref "applications-setup.md" >}}).
 

@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { combineLatest, Subject, Observable } from 'rxjs';
@@ -47,6 +47,7 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   public addUsersFailed = '';
   public loading$: Observable<boolean>;
   public teamId = '';
+  public openUserModal = new EventEmitter<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -168,7 +169,9 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   }
 
   getConfirmBtnText(): string {
-    if (this.addingUsers) {
+    if (this.usersNotFiltered().length === 0) {
+      return '';
+    } else if (this.addingUsers) {
       return (this.usersToAddValues().length < 2)
         ? 'Adding User...'
         : `Adding ${this.usersToAddValues().length} Users...`;
@@ -186,4 +189,9 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   getErrorMessage(): string {
     return this.addUsersFailed.length > 0 ? this.addUsersFailed : undefined;
   }
+
+  openModal(): void {
+    this.openUserModal.emit(true);
+  }
+
 }

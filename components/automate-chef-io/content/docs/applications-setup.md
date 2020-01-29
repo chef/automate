@@ -18,7 +18,7 @@ Further information about writing Chef Habitat health check hooks can be found i
 
 This Enterprise Application Stack (EAS) integration gives you immediate insight into the status of your Chef Habitat services, even when scaling out to large numbers of services.
 
-The Chef Automate Applications Dashboard gives you operational visibility into your Chef Habitat systems, so you can monitor and respond quickly to changes in your Chef Habitat environments.
+The Chef Automate Applications Dashboard gives you operational observability into your Chef Habitat systems, so you can monitor and respond quickly to changes in your Chef Habitat environments.
 The Applications Dashboard _Service Groups_ table is an overview of your Chef Habitat network, grouped together by package, environment, service group, and application. The right-hand sidebar contains detailed status report cards for each individual service.
 
 ## Requirements and Capacity Planning
@@ -29,9 +29,9 @@ Chef Enterprise Application Stack with Chef Automate + Chef Habitat can scale up
 * 16GB RAM
 * 50 GB disk space
 * Chef Automate, current version
-* Chef Habitat, minimum version 0.89.47
+* Chef Habitat, minimum version 1.5.0
 
-Chef Automate's Compliance and Infrastructure visibility features require additional computing and memory capacity.
+Chef Automate's Compliance and Infrastructure observability features require additional computing and memory capacity.
 Larger scale systems (15,000+ services) consume significant CPU resources for processing applications data.
 
 ## Chef Habitat Service Group Best Practices
@@ -63,16 +63,14 @@ If you have not already done so, [create an API token]({{< ref "api-tokens#creat
 Copy the following event stream command into your editor and replace `MY_APP`, `MY_ENV`, `MY_SITE`, `AUTOMATE_HOSTNAME`, and `API_TOKEN` with the appropriate values.
 
 ```shell
-HAB_FEAT_EVENT_STREAM=1
 hab sup run \
   --event-stream-application="MY_APP" \
   --event-stream-environment="MY_ENV" \
   --event-stream-site="MY_SITE" \
   --event-stream-url="AUTOMATE_HOSTNAME:4222" \
-  --event-stream-token="API_TOKEN"
+  --event-stream-token="API_TOKEN" \
 ```
 
-* `HAB_FEAT_EVENT_STREAM=1` enables the event stream
 * [hab sup run](https://www.habitat.sh/docs/habitat-cli/#hab-sup-run) is the hab cli commant to start the Habitat supervisor.
 * `MY_APP` is the name of your application. Chef Automate groups services by application name in the Applications Dashboard
 * `MY_ENV` is the application environment for this supervisor. Chef Automate groups services by environment in the Applications Dashboard
@@ -87,13 +85,12 @@ Paste your customized event stream command into the Chef Habitat command line.
 For example:
 
 ```shell
-HAB_FEAT_EVENT_STREAM=1
 hab sup run \
   --event-stream-application="AmazingEnterpriseApp" \
   --event-stream-environment="acceptance" \
   --event-stream-site="us-west-2" \
   --event-stream-url="automate.company.com:4222" \
-  --event-stream-token="1234567890abcdefgh"
+  --event-stream-token="1234567890abcdefgh" \
 ```
 
 ## Authorize Communication from Chef Habitat to Chef Automate
@@ -102,14 +99,16 @@ The Transport Layer Security (TLS) protocol provides privacy and data integrity 
 
 ### Retrieve Chef Automate's TLS key
 
-Chef Automate's TLS certificate file is located at `/hab/svc/automate-load-balancer/data/<servername>.crt`.
+Chef Automate's TLS certificate file is located at `/hab/svc/automate-load-balancer/data/<servername>.cert`.
+
+For example, if your FQDN is `automate`, then the file location is: `/hab/svc/automate-load-balancer/data/automate.cert`.
 
 From Chef Automate:
 
-1. On the command line, run `chef-automate config show`
-1. Copy the `[[global.1.frontend_tls]]` certificate contents from the certificate list
-1. Make sure to copy it entirely, including `-----BEGIN CERTIFICATE...END CERTIFICATE-----`
-1. Save the file as `automate.cert` somewhere safe and accessible to you
+1. On the command line, run `chef-automate external-cert show`
+2. Copy the certificate contents from the output
+3. Make sure to copy it entirely, including `-----BEGIN CERTIFICATE...END CERTIFICATE-----`
+4. Save the file as `automate.cert` somewhere safe and accessible to you
 
 ### Share the TLS Key with Chef Habitat
 
@@ -121,10 +120,19 @@ Use **one** of these three options:
 
 Chef Habitat automatically searches that directory and uses the certificate at start up.
 
-* On Linux systems, copy the cert to`/hab/cache/ssl` if you are the root user and `~/.hab/cache/ssl` if you are a non-root user. If you are a non-root user, the full file path is `/Users/username/.hab/cache/ssl/automate.cert`, located in your local user's home directory.
-* On Windows systems, store your certs in `C:\hab\cache\ssl`
+**On Linux systems**, copy the certificate to`/hab/cache/ssl` if you are the root user, or to `~/.hab/cache/ssl` if you are a non-root user. If you are a non-root user, the full file path is `/Users/username/.hab/cache/ssl/automate.cert`, located in your local user's home directory. Non-root users may need to use `sudo` with the command. For example, as the root user, copy the file with:
 
-#### Add the Tls Certificate to Your Event Stream Command
+```shell
+cp /path/to/automate.cert /hab/cache/ssl/automate.cert
+```
+
+**On Windows systems**, store your certs in `C:\hab\cache\ssl`. For example, copy the file with:
+
+```powershell
+Copy-Item "C:\path\to\automate.cert" -Destination "C:\hab\cache\ssl"
+```
+
+#### Add the TLS Certificate to Your Event Stream Command
 
 Pass the certificate file as a parameter by adding it to your event stream command:
 
@@ -135,16 +143,16 @@ Pass the certificate file as a parameter by adding it to your event stream comma
 For example:
 
 ```shell
-HAB_FEAT_EVENT_STREAM=1 hab sup run \
+hab sup run \
 --event-stream-application=MY_APP \
 --event-stream-environment=MY_ENV \
 --event-stream-site=MY_SITE \
 --event-stream-url=AUTOMATE_HOSTNAME:4222 \
---event-stream-token=API_TOKEN
---event-stream-server-certificate=/path/to/automate.cert
+--event-stream-token=API_TOKEN \
+--event-stream-server-certificate=/path/to/automate.cert \
 ```
 
-#### Add the TlS Certificate to Your Certificate Store
+#### Add the TLS Certificate to Your Certificate Store
 
 Add the certificate to your systems platform-specific certificate store.
 These are: `SChannel` on Windows, `Secure Transport` on OSX, and `OpenSSL` on all other platforms. Please follow the instructions for your specific operating system.

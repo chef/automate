@@ -1,6 +1,9 @@
 name: chef-automate applications show-svcs
 synopsis: Show services in the applications database
 usage: chef-automate applications show-svcs [flags]
+description: |2
+
+  Display a list of the habitat services stored in the applications database.
 options:
 - name: application
   shorthand: a
@@ -57,4 +60,4 @@ inherited_options:
 - name: result-json
   usage: Write command result as JSON to PATH
 see_also:
-- chef-automate applications - Manage applications visibility features
+- chef-automate applications - Manage applications observability features

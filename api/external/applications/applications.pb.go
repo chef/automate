@@ -76,6 +76,28 @@ func (HealthStatus) EnumDescriptor() ([]byte, []int) {
 // Request message for listing services.
 type ServicesReq struct {
 	// Applies search filters, in the format of `fieldname:value`.
+	// Valid filter fieldnames are:
+	// * `origin`: origin component of the service's package identifier
+	// * `service`: the name component of the service's package identifier
+	// * `version`: the version number component of the service's package identifier
+	// * `buildstamp`: the build timestamp (also called "release") of the service's package identifier
+	// * `channel`: the package channel to which the service subscribes for updates
+	// * `application`: the application field of the service's event-stream metadata
+	// * `environment`: the environment field of the service's event-stream metadata
+	// * `site`: the site field of the service's event-stream metadata
+	// * `group`: the suffix of the service group name
+	// Services may also be filtered by `status`, which refers to a service's
+	// connected/disconnected state or it's most recent healthcheck result. Valid
+	// status filter parameters are:
+	// * `status:disconnected`: only return services in the disconnected state
+	// * `status:critical`: only return services that are returning a "critical"
+	//   healthcheck result
+	// * `status:unknown`: only return services that are returning an "unknown"
+	//   healthcheck result
+	// * `status:warning`: only return services that are returning a "warning"
+	//   healthcheck result
+	// * `status:ok`: only return services that are returning "ok" health check
+	//   results
 	Filter []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
 	// Applies pagination parameters.
 	Pagination *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
@@ -139,6 +161,7 @@ type ServicesDistinctValuesReq struct {
 	// Query value, supports wildcards (* and ?).
 	QueryFragment string `protobuf:"bytes,2,opt,name=query_fragment,json=queryFragment,proto3" json:"query_fragment,omitempty"`
 	// Applies filters, in the format of `fieldname:value`.
+	// See documentation for ServicesReq for valid filter parameters
 	Filter               []string `protobuf:"bytes,3,rep,name=filter,proto3" json:"filter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -200,6 +223,7 @@ type ServicesBySGReq struct {
 	// Applies sorting parameters.
 	Sorting *query.Sorting `protobuf:"bytes,3,opt,name=sorting,proto3" json:"sorting,omitempty"`
 	// Applies filters, in the format of `fieldname:value`.
+	// See documentation for ServicesReq for valid filter parameters
 	Filter               []string `protobuf:"bytes,5,rep,name=filter,proto3" json:"filter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1001,6 +1025,7 @@ func (m *Service) GetId() string {
 // Request message for GetServiceGroupsHealthCounts
 type ServiceGroupsHealthCountsReq struct {
 	// Applies search filters, in the format of `fieldname:value`.
+	// See the documentation for ServiceGroupsReq for valid filter parameters.
 	Filter               []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1042,6 +1067,33 @@ func (m *ServiceGroupsHealthCountsReq) GetFilter() []string {
 // Request message for GetServiceGroups
 type ServiceGroupsReq struct {
 	// Applies search and status filters, in the format of `fieldname:value` or `status:value`.
+	// Valid filter fieldnames are:
+	// * `origin`: origin component of the service's package identifier
+	// * `service`: the name component of the service's package identifier
+	// * `version`: the version number component of the service's package identifier
+	// * `buildstamp`: the build timestamp (also called "release") of the service's package identifier
+	// * `channel`: the package channel to which the service subscribes for updates
+	// * `application`: the application field of the service's event-stream metadata
+	// * `environment`: the environment field of the service's event-stream metadata
+	// * `site`: the site field of the service's event-stream metadata
+	// * `group`: the suffix of the service group name
+	// Service groups may also be filtered by `status`, which refers to a service's
+	// connected/disconnected state or it's most recent healthcheck result. Valid
+	// status filter parameters are:
+	// * `status:disconnected`: only return service groups that contain at least
+	//   one service in the disconnected state
+	// * `status:critical`: only return service groups that contain at least one
+	//   service that is returning a "critical" healthcheck result
+	// * `status:critical`: only return service groups that contain at least one
+	//   service that is returning a "critical" healthcheck result
+	// * `status:unknown`: only return service groups that contain at least one
+	//   service that is returning an "unknown" healthcheck result and no
+	//   services returning "critical" results
+	// * `status:warning`: only return service groups that contain at least one
+	//   service that is returning a "warning" healthcheck result and have no
+	//   services returning "critical" or "unknown" results
+	// * `status:ok`: only return service groups where all services are returning
+	//   "ok" health check results
 	Filter []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
 	// Pagination parameters for service groups list.
 	Pagination *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`

@@ -26,7 +26,7 @@ func init() {
 func newApplicationsRootSubcmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "applications COMMAND",
-		Short: "Manage applications visibility features",
+		Short: "Manage applications observability features",
 	}
 }
 
@@ -150,7 +150,10 @@ func newApplicationsShowSvcsCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "show-svcs",
 		Short: "Show services in the applications database",
-		RunE:  runApplicationsShowSvcsCmd,
+		Long: `
+Display a list of the habitat services stored in the applications database.
+`,
+		RunE: runApplicationsShowSvcsCmd,
 	}
 
 	addFilteringFlagsToCmd(c)
@@ -168,7 +171,16 @@ func newApplicationsRemoveSvcsCmd() *cobra.Command {
 	c := &cobra.Command{
 		Use:   "remove-svcs",
 		Short: "Remove services from the applications database",
-		RunE:  runApplicationsRemoveSvcsCmd,
+		Long: `
+Remove services from the applications database.
+
+You must fully decommission services by retiring physical hardware, terminating
+the VM or container, or by using 'hab svc unload', before using the
+'remove-svcs' command. Services that are incompletely decommissioned will send
+a health-check at the appointed time and Automate will re-add them to the
+services database.
+`,
+		RunE: runApplicationsRemoveSvcsCmd,
 	}
 
 	addFilteringFlagsToCmd(c)
