@@ -64,6 +64,8 @@ describe('user management', () => {
     cy.get('app-user-management chef-modal').should('not.be.visible');
     cy.get('#main-content-wrapper').scrollTo('top');
     cy.get('chef-notification.info').contains(`Created user: ${username}`);
+    // close notification banner so we can assert the password success notification later
+    cy.get('chef-notification.info chef-icon').click();
 
     cy.get('app-user-table chef-table-cell').contains(username).should('exist');
     cy.get('app-user-table chef-table-cell').contains(name).should('exist');
@@ -107,6 +109,8 @@ describe('user management', () => {
 
     cy.get('.update-password-button').click();
     cy.get('#main-content-wrapper').scrollTo('top');
+
+    cy.wait('@updateUser');
     cy.get('chef-notification.info').contains(`Reset password for user: ${username}`);
   });
 });
