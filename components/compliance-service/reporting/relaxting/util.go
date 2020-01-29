@@ -206,11 +206,14 @@ func GetEsIndex(filters map[string][]string, useSummaryIndex bool, useStartTime 
 }
 
 func GetFilterDepth(filters map[string][]string) int {
-	if len(filters["profile_id"]) == 1 && len(filters["control"]) == 1 {
+	if len(filters["control"]) == 1 {
 		return ControlLevel
-	} else if len(filters["profile_id"]) == 1 && len(filters["control"]) == 0 {
+	}
+
+	if len(filters["profile_id"]) == 1 {
 		return ProfileLevel
 	}
+
 	//right now, if provide no profiles and no control or more than profile or control.. don't go deep.. we'll stay on the report level in this case
 	//this may need to be clarified so that customers do not get confused.
 	//todo - in the future, it will be best to support multiple profiles/controls while staying deep, which is more difficult than it would seem.

@@ -583,6 +583,10 @@ func (depth *ProfileDepth) getStatsSummaryControlsResult(searchResult *elastic.S
 }
 
 func (depth *ProfileDepth) wrap(aggs map[string]elastic.Aggregation) map[string]elastic.Aggregation {
+	if len(depth.filters["profile_id"]) == 0 {
+		return make(map[string]elastic.Aggregation, 0)
+	}
+
 	filteredProfileAgg := elastic.NewFilterAggregation().Filter(elastic.NewTermQuery("profiles.sha256", depth.filters["profile_id"][0]))
 	profilesAgg := elastic.NewNestedAggregation().SubAggregation("filtered_profiles", filteredProfileAgg).Path("profiles")
 	for aggName, agg := range aggs {
