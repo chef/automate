@@ -25,6 +25,7 @@ import { SigninComponent } from './pages/signin/signin.component';
 
 // Components
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
+import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
 import { NodeDetailsComponent } from './pages/node-details/node-details.component';
 import {
   NodeNoRunsDetailsComponent
@@ -201,25 +202,44 @@ const routes: Routes = [
         .then(m => m.ComplianceModule)
     },
     {
-      path: 'infrastructure/client-runs',
+      path: 'infrastructure',
       children: [
         {
           path: '',
-          component: ClientRunsComponent
+          redirectTo: '/infrastructure/client-runs',
+          pathMatch: 'full'
         },
         {
-          path: ':node-id/missing-runs',
-          component: NodeNoRunsDetailsComponent,
-          resolve: {
-            node: NodeNoRunsDetailsResolverService
-          }
+          path: 'client-runs',
+          children: [
+            {
+              path: '',
+              component: ClientRunsComponent
+            },
+            {
+              path: ':node-id/missing-runs',
+              component: NodeNoRunsDetailsComponent,
+              resolve: {
+                node: NodeNoRunsDetailsResolverService
+              }
+            },
+            {
+              path: ':node-id/runs/:run-id',
+              component: NodeDetailsComponent,
+              resolve: {
+                nodeRun: NodeDetailsResolverService
+              }
+            }
+          ]
         },
         {
-          path: ':node-id/runs/:run-id',
-          component: NodeDetailsComponent,
-          resolve: {
-            nodeRun: NodeDetailsResolverService
-          }
+          path: 'chef-servers',
+          children: [
+            {
+              path: '',
+              component: ChefServersListComponent
+            }
+          ]
         }
       ]
     },

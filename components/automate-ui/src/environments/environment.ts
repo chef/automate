@@ -26,6 +26,7 @@ export const environment = {
   retention_url: '/api/v0/retention',
   ingest_url: '/api/v0/ingest',
   deployment_url: '/api/v0/deployment',
+  infra_proxy_url: '/api/v0/infra',
   gateway_url: '/api/v0',
   // TODO:eng-ex remove elasticsearch_url when all es requests go through config-mgmt
   // don't forget to remove it from the proxy

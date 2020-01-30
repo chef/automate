@@ -58,7 +58,7 @@ describe('NavbarComponent', () => {
   using([
     ['Dashboards',     '/dashboards/event-feed',         1],
     ['Applications',   '/applications/service-groups',   2],
-    ['Infrastructure', '/infrastructure/client-runs',    3],
+    ['Infrastructure', '/infrastructure',                3],
     ['Compliance',     '/compliance',                    4],
     ['Settings',       '/settings',                      5]
   ], function (label: string, path: string, position: number) {

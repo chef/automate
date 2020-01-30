@@ -20,7 +20,12 @@ export class Regex {
     NO_MIXED_WILDCARD_ALLOW_HYPHEN: '^(\\*|[-\\w]+)$',
 
     // Allows all special characters except colon :
-    NO_MIXED_WILDCARD_ALLOW_SPECIAL: '^(\\*|[^:*]+)$'
+    NO_MIXED_WILDCARD_ALLOW_SPECIAL: '^(\\*|[^:*]+)$',
+
+    // Allows valid FQDN only
+    VALID_FQDN: /^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-zA-Z0-9_]+([\-\.]{1}[a-zA-Z0-9]+)*\.[a-zA-Z]{2,5}(:[0-9]{1,5})?(\/.*)?$/,
+    // Allows valid IP Address only (ipv4)
+    VALID_IP_ADDRESS: '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$'
   };
 
 }
