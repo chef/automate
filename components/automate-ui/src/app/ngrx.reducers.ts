@@ -173,7 +173,7 @@ export const defaultInitialState = {
   teams: teamEntity.TeamEntityInitialState,
   userperms: permEntity.initialState,
   users: userEntity.UserEntityInitialState,
-  userself: userSelfEntity.UserSelfEntityInitialState
+  userSelf: userSelfEntity.UserSelfEntityInitialState
 };
 
 export const ngrxReducers = {
