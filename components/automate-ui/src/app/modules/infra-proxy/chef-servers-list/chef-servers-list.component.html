@@ -47,9 +47,9 @@
               <chef-table-cell>{{ server.description }}</chef-table-cell>
               <chef-table-cell>{{ server.orgs_count }}</chef-table-cell>
               <chef-table-cell class="three-dot-column">
-                <chef-control-menu>
-                  <chef-option data-cy="delete" (click)="startServerDelete(server)">Remove Chef Server</chef-option>
-                </chef-control-menu>
+                <mat-select panelClass="chef-control-menu" id="menu-{{server.id}}">
+                  <mat-option (onSelectionChange)="startServerDelete($event, server)" data-cy="remove-server">Remove Chef Server</mat-option>
+                </mat-select>
               </chef-table-cell>
             </chef-table-row>
           </chef-table-body>

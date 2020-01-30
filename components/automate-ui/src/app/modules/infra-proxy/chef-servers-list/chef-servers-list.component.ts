@@ -6,6 +6,7 @@ import { Regex } from 'app/helpers/auth/regex';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { isNil } from 'lodash/fp';
 import { HttpStatus } from 'app/types/types';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { loading, EntityStatus, pending } from 'app/entities/entities';
@@ -17,8 +18,7 @@ import { ChefSorters } from 'app/helpers/auth/sorter';
 
 @Component({
   selector: 'app-chef-servers-list',
-  templateUrl: './chef-servers-list.component.html',
-  styleUrls: ['./chef-servers-list.component.scss']
+  templateUrl: './chef-servers-list.component.html'
 })
 export class ChefServersListComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean>;
@@ -120,9 +120,11 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
     this.conflictErrorEvent.emit(false);
   }
 
-  public startServerDelete(server: Server): void {
-    this.serverToDelete = server;
-    this.deleteModalVisible = true;
+  public startServerDelete($event: ChefKeyboardEvent, server: Server): void {
+    if ($event.isUserInput) {
+      this.serverToDelete = server;
+      this.deleteModalVisible = true;
+    }
   }
 
   public deleteServer(): void {
