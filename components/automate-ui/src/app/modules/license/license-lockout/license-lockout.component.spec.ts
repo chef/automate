@@ -147,6 +147,16 @@ describe('LicenseLockoutComponent', () => {
       expect(component.trialRequestInternalError).toBeFalsy();
     });
 
+    it('check "current license status" after the successfully register.', () => {
+      const futureDate = moment().utc().add(2, 'months');
+      setup(genLicenseFetchReducer(futureDate));
+
+      expect(component.licenseExpired).toBeFalsy();
+      expect(component.fetchStatusInternalError).toBeFalsy();
+      expect(component.expirationDate).toEqual(futureDate
+                                      .format(DateTime.RFC2822));
+    });
+
     it('reflects other error as a generic request error', () => {
       // any other HTTP code not mentioned above will do
       const { state } = setup(genErrorRequestReducer(HttpStatus.NOT_FOUND));
