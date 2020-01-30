@@ -12,9 +12,9 @@ toc = true
 +++
 
 ## Overview
-This guide will show you how to manage Chef Automate teams. Import existing teams into Chef Automate with [Microsoft AD (LDAP)]({{< ref "configuration.md#microsoft-active-directory" >}}), [generic LDAP]({{< ref "configuration.md#ldap" >}}) or [SAML]({{< ref "configuration.md#saml" >}}). You can create local Chef Automate teams that are independent of LDAP or SAML.
+This guide will show you how to manage Chef Automate teams. Import existing teams into Chef Automate with [Microsoft AD (LDAP)]({{< ref "configuration.md#microsoft-active-directory" >}}), [generic LDAP]({{< ref "configuration.md#ldap" >}}), or [SAML]({{< ref "configuration.md#saml" >}}). You can create local Chef Automate teams that are independent of LDAP or SAML.
 
-Permission on the `iam:teams` resource is required to interact with teams. Any user that is part of the `admins` team, or the `Administrator` policy will have this permission. Otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
+Permission on the `iam:teams` resource is required to interact with teams. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 
 ## Managing Local Teams
 
@@ -27,10 +27,10 @@ Navigate to _Teams_ in the **Settings** tab. Then use the **Create Team** button
 Navigate to _Teams_ in the **Settings** tab. Then open the menu at the end of the table row and select **Delete Team**.
 
 ### Adding Local Users to Teams
-To add local users to a team, navigate to _Teams_ from the **Settings** tab and locate the team. Navigate to the team's page, then use the **Add Users** button.
+To add local users to a team, navigate to _Teams_ from the **Settings** tab and locate the team. Navigate to the team's page, and then use the **Add Users** button.
 
 #### Admins Team
-Chef Automate comes with an _Admins_ team, local users can be added directly to this team to assign them admin permissions.
+Chef Automate comes with an _Admins_ team. Local users can be added directly to this team, which assigns them admin permissions.
 
 ### Removing Local Users from Teams
 To remove local users from a team, navigate to _Teams_ from the **Settings** tab and locate the team. Navigate to the team's page, locate the user to remove, then use the menu at the end of the table row to remove the user.
