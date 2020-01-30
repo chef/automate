@@ -1,7 +1,6 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { uuidv4 } from '../../../support/helpers';
 
-describeIfIAMV2p1('Project delete', () => {
+describe('Project delete', () => {
   const cypressPrefix = 'test-project-delete';
 
   const project =  {

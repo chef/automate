@@ -42,7 +42,6 @@ do_deploy() {
             ;;
     esac
 
-    export CYPRESS_IAM_VERSION=$IAM
     export CYPRESS_ADMIN_TOKEN=$token
     export CYPRESS_RUN_FLAKY=$FLAKY
 
