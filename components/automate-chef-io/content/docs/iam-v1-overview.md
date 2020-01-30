@@ -162,8 +162,8 @@ Use the ID of the policy to delete it:
 
 ### Open Permissions on All Resources
 
-Chef Automate IAM v1 by default allows all teams to be able to access all parts of the
-application except for administrative features..
+Chef Automate IAM v1 by default allows all teams access to all parts of the
+application except for administrative features.
 
 If you would like to allow another team to access administrative features without
 adding team members to the local `admins` team, you can create a policy allowing
@@ -435,5 +435,4 @@ Authorization | IntrospectAll | /auth/introspect | GET | auth_introspection:intr
 Authorization | IntrospectSome | /auth/introspect_some | POST | auth_introspection:introspect_some | read
 Authorization | Introspect | /auth/introspect | POST | auth_introspection:introspect | read
 {{% /responsive-table %}}
-
 

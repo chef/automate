@@ -12,7 +12,7 @@ toc = true
 +++
 
 ## Overview
-This guide will show you how to manage Chef Automate teams. Import existing teams into Chef Automate with [Microsoft AD (LDAP)]({{< ref "configuration.md#microsoft-active-directory" >}}), [generic LDAP]({{< ref "configuration.md#ldap" >}}), or [SAML]({{< ref "configuration.md#saml" >}}). You can create local Chef Automate teams that are independent of LDAP or SAML.
+This guide will show you how to manage Chef Automate teams. You can import existing teams into Chef Automate with [Microsoft AD (LDAP)]({{< ref "configuration.md#microsoft-active-directory" >}}), [generic LDAP]({{< ref "configuration.md#ldap" >}}), or [SAML]({{< ref "configuration.md#saml" >}}). You can also create local Chef Automate teams that are independent of LDAP or SAML.
 
 Permission on the `iam:teams` resource is required to interact with teams. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 
