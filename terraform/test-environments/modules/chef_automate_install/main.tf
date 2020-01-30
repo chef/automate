@@ -253,7 +253,7 @@ EOF
   key = """${join("\n", formatlist("%s", split("\n", data.aws_s3_bucket_object.wilcard_chef_co_key.body)))}"""
 
 [license_control.v1.svc]
-  license = "${data.aws_s3_bucket_object.internal_license.body}"
+  license = """${data.aws_s3_bucket_object.internal_license.body}"""
 [license_control.v1.sys.telemetry]
   url = "https://telemetry-acceptance.chef.io"
 
