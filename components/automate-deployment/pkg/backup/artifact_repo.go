@@ -300,7 +300,10 @@ func (repo *ArtifactRepo) ListArtifacts(ctx context.Context, excludedSnapshots .
 		return ErrStream(err)
 	}
 
-	streams := make([]ArtifactStream, 0, len(snapshots))
+	// Merge as we go in order to avoid running out of file descriptors and/or stack
+	// in the case where someone has a lot of snapshots.
+
+	lastMergedStream := EmptyStream()
 	for _, snapshot := range snapshots {
 		if !strings.HasSuffix(snapshot.Name, ".snapshot") {
 			continue
@@ -309,17 +312,47 @@ func (repo *ArtifactRepo) ListArtifacts(ctx context.Context, excludedSnapshots .
 		if stringutils.SliceContains(excludedSnapshots, name) {
 			continue
 		}
+
 		reader, _, err := repo.openSnapshotFile(ctx, name)
 		if err != nil {
-			for _, s := range streams {
-				s.Close()
-			}
 			return ErrStream(err)
 		}
-		streams = append(streams, LineReaderStream(reader))
+		lastMergedStream, err = mergeIntoFile(lastMergedStream, LineReaderStream(reader))
+		if err != nil {
+			return ErrStream(err)
+		}
 	}
 
-	return Merge(streams...)
+	return lastMergedStream
+}
+
+// Merge just creates an iterator; create function that merges into a file
+func mergeIntoFile(stream1 ArtifactStream, stream2 ArtifactStream) (ArtifactStream, error) {
+	defer stream1.Close()
+	defer stream2.Close()
+	tmpFile, err := ioutil.TempFile("", "lastMerged")
+	if err != nil {
+		return nil, err
+	}
+	defer os.Remove(tmpFile.Name())
+	s := NewLoggingStream(Merge(stream1, stream2), tmpFile)
+	defer s.Close()
+
+	// Consume the stream to get it written to the tmpfile,
+	// since streams are lazily evaluated.
+	err = ConsumeStream(s)
+	if err != nil {
+		tmpFile.Close()
+		return nil, err
+	}
+
+	// seek to the beginning of the file
+	if _, err := tmpFile.Seek(0, os.SEEK_SET); err != nil {
+		tmpFile.Close()
+		return nil, err
+	}
+
+	return LineReaderStream(tmpFile), nil
 }
 
 func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (io.ReadCloser, string, error) {
