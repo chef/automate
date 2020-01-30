@@ -42,6 +42,9 @@ import {
   ProjectActionTypes,
   ProjectActions
 } from './project.actions';
+import {
+  LoadOptions
+} from 'app/services/projects-filter/projects-filter.actions';
 import { applyRulesStatus } from './project.selectors';
 import { ApplyRulesStatusState } from './project.reducer';
 
@@ -131,12 +134,13 @@ export class ProjectEffects {
   @Effect()
   deleteProjectSuccess$ = this.actions$.pipe(
       ofType(ProjectActionTypes.DELETE_SUCCESS),
-      map(({ payload: { id } }: DeleteProjectSuccess) => {
-        return new CreateNotification({
+      switchMap(({ payload: { id } }: DeleteProjectSuccess) => [
+        new LoadOptions(),
+        new CreateNotification({
           type: Type.info,
           message: `Deleted project ${id}.`
-        });
-      }));
+        })
+      ]));
 
   @Effect()
   deleteProjectFailure$ = this.actions$.pipe(
