@@ -104,4 +104,8 @@ export class UserSelfEffects {
       this.requests.updateSelf(action.payload, version).pipe(
         map((resp: SelfUser) => new UpdateNameSelfSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new UpdateNameSelfFailure(error))))));
+
+  // We are intentionally not sending a notification to the banner for
+  // UpdateNameSelfSuccess actions. A notification is provided next to the save button
+  // on the user details page.
 }

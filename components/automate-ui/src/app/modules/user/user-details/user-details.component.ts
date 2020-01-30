@@ -231,7 +231,7 @@ class UserAdminDetails extends UserDetails {
 }
 
 // This view is used when a user goes to their own user detail page
-// The differnce between this and when visting another users pages is the previous password must
+// The difference between this and when visiting another user's pages is the previous password must
 // be entered and when the display name is updated the name in the menu is update.
 class UserAdminSelfDetails extends UserDetails {
   public showBreadcrumbs = true;
