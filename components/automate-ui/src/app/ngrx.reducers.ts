@@ -30,6 +30,7 @@ import * as ruleEntity from './entities/rules/rule.reducer';
 import * as serviceGroups from './entities/service-groups/service-groups.reducer';
 import * as teamEntity from './entities/teams/team.reducer';
 import * as userEntity from './entities/users/user.reducer';
+import * as userSelfEntity from './entities/users/userself.reducer';
 
 // AOT likely won't allow dynamic object property names here even when the underlying
 // typescript bug preventing it is fixed
@@ -67,6 +68,7 @@ export interface NgrxStateAtom {
   teams: teamEntity.TeamEntityState;
   userperms: permEntity.PermEntityState;
   users: userEntity.UserEntityState;
+  userSelf: userSelfEntity.UserSelfEntityState;
   // Named credentialEntity until we refactor the credentials page
   credentialEntity: credential.CredentialState;
 }
@@ -170,7 +172,8 @@ export const defaultInitialState = {
   serviceGroups: serviceGroups.ServiceGroupEntityInitialState,
   teams: teamEntity.TeamEntityInitialState,
   userperms: permEntity.initialState,
-  users: userEntity.UserEntityInitialState
+  users: userEntity.UserEntityInitialState,
+  userSelf: userSelfEntity.UserSelfEntityInitialState
 };
 
 export const ngrxReducers = {
@@ -208,5 +211,6 @@ export const ngrxReducers = {
   serviceGroups: serviceGroups.serviceGroupsEntityReducer,
   teams: teamEntity.teamEntityReducer,
   userperms: permEntity.permEntityReducer,
-  users: userEntity.userEntityReducer
+  users: userEntity.userEntityReducer,
+  userSelf: userSelfEntity.userSelfEntityReducer
 };

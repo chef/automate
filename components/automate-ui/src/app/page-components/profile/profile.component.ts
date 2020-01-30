@@ -1,12 +1,22 @@
 import {
   Component, ElementRef, OnInit, ViewChild, ViewChildren, OnDestroy
 } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { Subscription, Observable, combineLatest, Subject, of } from 'rxjs';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { filter, takeUntil, map, distinctUntilChanged } from 'rxjs/operators';
+import { isNil } from 'lodash/fp';
+
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MetadataService } from 'app/services/metadata/metadata.service';
+import { EntityStatus } from 'app/entities/entities';
 import {
   WelcomeModalComponent
  } from 'app/page-components/welcome-modal/welcome-modal.component';
+import { userSelf, getStatus } from 'app/entities/users/userself.selectors';
+import {
+  GetUserSelf
+ } from 'app/entities/users/userself.actions';
 
 @Component({
   selector: 'app-profile',
@@ -15,8 +25,11 @@ import {
 })
 export class ProfileComponent implements OnInit, OnDestroy {
   dropdownVisible = false;
-
   buildVersion: string;
+  displayName: string;
+  isLocalUser: boolean;
+  public loading$: Observable<boolean>;
+  private isDestroyed = new Subject<boolean>();
 
   versionSub: Subscription;
 
@@ -29,18 +42,45 @@ export class ProfileComponent implements OnInit, OnDestroy {
 
   constructor(
     private chefSessionService: ChefSessionService,
-    private metadataService: MetadataService
-  ) { }
+    private metadataService: MetadataService,
+    private store: Store<NgrxStateAtom>
+  ) {
+    this.isLocalUser = chefSessionService.isLocalUser;
+  }
 
   ngOnInit() {
+    this.displayName = this.chefSessionService.fullname;
+
     this.versionSub = this.metadataService.getBuildVersion()
       .subscribe((buildVersion) => {
         this.buildVersion = buildVersion;
       });
+
+    if (this.chefSessionService.isLocalUser) {
+      this.store.dispatch(new GetUserSelf());
+
+      this.loading$ = this.store.select(getStatus).pipe(
+        map((status: EntityStatus) =>  status !== EntityStatus.loadingSuccess));
+
+      combineLatest([
+        this.loading$,
+        this.store.select(userSelf)
+      ]).pipe(
+        filter(([loadingUserData, user]) => !loadingUserData && !isNil(user)),
+        map(([_, user]) => user.name),
+        distinctUntilChanged(),
+        takeUntil(this.isDestroyed)).subscribe(displayName => {
+          this.displayName = displayName;
+        });
+    } else {
+      this.loading$ = of(false);
+    }
   }
 
   ngOnDestroy() {
     this.versionSub.unsubscribe();
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   logout() {
@@ -94,10 +134,6 @@ export class ProfileComponent implements OnInit, OnDestroy {
     return this.focusElements.toArray()
       .map((e: ElementRef) => e.nativeElement)
       .indexOf(currentTarget);
-  }
-
-  get displayName(): string {
-    return this.chefSessionService.fullname;
   }
 
   get userName(): string {

@@ -31,15 +31,10 @@ import {
   UpdateUserFailure,
   UpdateNameUser,
   UpdateNameUserSuccess,
-  UpdatePasswordSelf,
-  UpdatePasswordSelfSuccess,
-  UpdateNameSelf,
-  UpdateNameSelfSuccess,
   UserActionTypes
 } from './user.actions';
 import { UserRequests } from './user.requests';
 import { User } from './user.model';
-import { SelfUser } from './userself.model';
 
 @Injectable()
 export class UserEffects {
@@ -128,34 +123,6 @@ export class UserEffects {
       mergeMap(([action, version]: [UpdateNameUser, IAMMajorVersion]) =>
       this.requests.updateUser(action.payload, version).pipe(
         map((resp: User) => new UpdateNameUserSuccess(resp)),
-        catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
-
-  @Effect()
-  updatePasswordSelf$ = combineLatest([
-    this.actions$.pipe(ofType<UpdatePasswordSelf>(UserActionTypes.UPDATE_PASSWORD_SELF)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([action, version]: [UpdatePasswordSelf, IAMMajorVersion]) =>
-      this.requests.updateSelf(action.payload, version).pipe(
-        map((resp: SelfUser) => new UpdatePasswordSelfSuccess(resp)),
-        catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
-
-  @Effect()
-  updatePasswordSelfSuccess$ = this.actions$.pipe(
-    ofType(UserActionTypes.UPDATE_PASSWORD_SELF_SUCCESS),
-    map(( { payload: user }: UpdatePasswordSelfSuccess) => new CreateNotification({
-      type: Type.info,
-      message: `Reset password for user: ${user.id}.`
-    })));
-
-  @Effect()
-  updateNameSelf$ = combineLatest([
-    this.actions$.pipe(ofType<UpdateNameSelf>(UserActionTypes.UPDATE_NAME_SELF)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([action, version]: [UpdateNameSelf, IAMMajorVersion]) =>
-      this.requests.updateSelf(action.payload, version).pipe(
-        map((resp: SelfUser) => new UpdateNameSelfSuccess(resp)),
         catchError((error: HttpErrorResponse) => of(new UpdateUserFailure(error))))));
 
   @Effect()

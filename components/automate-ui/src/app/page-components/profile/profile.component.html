@@ -16,16 +16,14 @@
       <li class="dropdown-list-item">
         Signed in as <strong class="dropdown-display-name">{{ displayName }}</strong>
       </li>
-      <app-authorized [allOf]="['/auth/users/{username}', 'get', userName]">
-        <li class="dropdown-list-item">
-          <a [routerLink]="['/user-details', userName]"
-            (click)="closeDropdown()"
-            (keydown.arrowup)="handleArrowUp($event)"
-            (keydown.arrowdown)="handleArrowDown($event)"
-            class="profile"
-            #focusElement>Profile</a>
-        </li>
-      </app-authorized>
+      <li class="dropdown-list-item" *ngIf="isLocalUser">
+        <a [routerLink]="['/user-details', userName]"
+          (click)="closeDropdown()"
+          (keydown.arrowup)="handleArrowUp($event)"
+          (keydown.arrowdown)="handleArrowDown($event)"
+          class="profile"
+          #focusElement>Profile</a>
+      </li>
       <li class="dropdown-list-item">
         <ul class="dropdown-sub-list">
           <li>

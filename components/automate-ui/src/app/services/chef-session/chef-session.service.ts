@@ -1,9 +1,15 @@
 import { Injectable } from '@angular/core';
 import { isNull, isNil } from 'lodash';
 import { CanActivate, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
+import { Store } from '@ngrx/store';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 
 import { environment } from '../../../environments/environment';
 import { Jwt } from 'app/helpers/jwt/jwt';
+
+import {
+  SetUserSelfID
+ } from 'app/entities/users/userself.actions';
 
 // Should never be on in production. Modify environment.ts locally
 // if you wish to bypass getting a session from dex.
@@ -12,10 +18,11 @@ const USE_DEFAULT_SESSION = environment.use_default_session;
 export interface ChefSessionUser {
   fullname: string;
   username: string;
+  isLocalUser: boolean;
   groups: Array<string>;
-  id_token: string;
   telemetry_enabled?: boolean;
   uuid: string;
+  id_token: string;
 }
 
 const sessionKey = 'chef-automate-user';
@@ -36,7 +43,7 @@ export class ChefSessionService implements CanActivate {
   //// Automatically set when the modal is shown for the first time.
   MODAL_HAS_BEEN_SEEN_KEY = 'welcome-modal-seen';
 
-  constructor() {
+  constructor(private store: Store<NgrxStateAtom>) {
     // In dev mode, set a generic session so we don't
     // have to round-trip to the oidc provider (dex).
     if (USE_DEFAULT_SESSION) {
@@ -91,6 +98,7 @@ export class ChefSessionService implements CanActivate {
     if (id === null) {
       return;
     }
+
     this.setSession(
       id.sub,
       id.name,
@@ -99,7 +107,8 @@ export class ChefSessionService implements CanActivate {
       // usage.
       id.email,
       idToken,
-      id.groups);
+      id.groups,
+      id.federated_claims.connector_id === 'local');
   }
 
   // canActivate determines if any of the routes (except signin) can be activated
@@ -120,18 +129,24 @@ export class ChefSessionService implements CanActivate {
     }
     this.user = <ChefSessionUser>JSON.parse(localStorage.getItem(sessionKey));
     this.user.telemetry_enabled = this.fetchTelemetryPreference();
+    this.store.dispatch(new SetUserSelfID({ id: this.user.username }));
   }
 
   // setSession sets ChefSession's session data in localStorage for having it
   // available for setSessionOrRedirectToLogin() (part of ChefSession's
   // constructor)
-  setSession(uuid, fullname, username, id_token: string, groups: Array<string>): void {
+  setSession(uuid, fullname, username, id_token: string, groups: Array<string>,
+    isLocalUser: boolean): void {
+    if (!this.user || username !== this.user.username) {
+      this.store.dispatch(new SetUserSelfID({ id: username }));
+    }
     this.user = {
       uuid,
       fullname,
       username,
       groups,
-      id_token
+      id_token,
+      isLocalUser
     };
     localStorage.setItem(sessionKey, JSON.stringify(this.user));
   }
@@ -174,6 +189,10 @@ export class ChefSessionService implements CanActivate {
   // from the ngrx store.
   currentPath(): string {
     return window.location.pathname;
+  }
+
+  get isLocalUser(): boolean {
+    return this.user.isLocalUser;
   }
 
   get username(): string {

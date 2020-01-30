@@ -1,11 +1,20 @@
 import { TestBed } from '@angular/core/testing';
 import { ChefSessionService } from './chef-session.service';
+import { StoreModule } from '@ngrx/store';
+import {
+  ngrxReducers,
+  runtimeChecks
+} from 'app/ngrx.reducers';
 
 describe('ChefSessionService', () => {
   let service: ChefSessionService;
+  const initialState = {};
 
   beforeEach(() => {
     TestBed.configureTestingModule({
+      imports: [
+        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
+      ],
       providers: [
         ChefSessionService
       ]
@@ -16,6 +25,10 @@ describe('ChefSessionService', () => {
 
   afterEach(() => {
     localStorage.clear();
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
   });
 
   describe('#tryInitializeSession', () => {

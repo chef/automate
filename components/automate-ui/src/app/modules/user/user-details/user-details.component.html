@@ -1,17 +1,17 @@
 <div class="content-container">
   <div class="container">
-    <main *ngIf="isAdminView || user?.id">
-      <chef-breadcrumbs *ngIf="isAdminView">
+    <main *ngIf="!loading">
+      <chef-breadcrumbs *ngIf="userDetails.showBreadcrumbs">
         <chef-breadcrumb [link]="['/settings/users']">Users</chef-breadcrumb>
-        {{ user?.name }}
+        {{ userDetails.user?.name }}
       </chef-breadcrumbs>
   
       <chef-page-header>
         <div class="detail-row">
           <div class="name-column">
-            <div class="header-user-name">{{ user?.name }}</div>
+            <div class="header-user-name">{{ userDetails.user?.name }}</div>
             <div class="header-user-id-label">Username</div>
-            <div class="header-user-id">{{ user?.id }}</div>
+            <div class="header-user-id">{{ userDetails.user?.id }}</div>
           </div>
         </div>
         <chef-tab-selector (change)="onSelectedTab($event)" [value]="tabValue">
@@ -20,38 +20,38 @@
         </chef-tab-selector>
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'details'">
-        <form [formGroup]="displayNameForm">
+        <form [formGroup]="userDetails.displayNameForm">
           <chef-form-field>
             <label>Display Name <span aria-hidden="true">*</span></label>
-            <input chefInput formControlName="displayName" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
+            <input chefInput formControlName="displayName" type="text" [resetOrigin]="userDetails.saveSuccessful" autocomplete="off"
               data-cy="user-details-name-input">
             <chef-error
-              *ngIf="(displayNameForm.get('displayName').hasError('required') || displayNameForm.get('displayName').hasError('pattern')) && displayNameForm.get('displayName').dirty">
+              *ngIf="(userDetails.displayNameForm.get('displayName').hasError('required') || userDetails.displayNameForm.get('displayName').hasError('pattern')) && userDetails.displayNameForm.get('displayName').dirty">
               Display Name is required.
             </chef-error>
           </chef-form-field>
         </form>
-        <chef-button [disabled]="(loadingGetUser$ | async) || !displayNameForm.valid || !displayNameForm.dirty" primary inline
-          (click)="saveDisplayName()" data-cy="user-details-submit-button">
-          <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
-          <span *ngIf="saveInProgress">Saving...</span>
-          <span *ngIf="!saveInProgress">Save</span>
+        <chef-button [disabled]="(userDetails.loading$ | async) || !userDetails.displayNameForm.valid || !userDetails.displayNameForm.dirty" primary inline
+          (click)="userDetails.saveDisplayName()" data-cy="user-details-submit-button">
+          <chef-loading-spinner *ngIf="userDetails.saveInProgress"></chef-loading-spinner>
+          <span *ngIf="userDetails.saveInProgress">Saving...</span>
+          <span *ngIf="!userDetails.saveInProgress">Save</span>
         </chef-button>
-        <span id="saved-note" *ngIf="saveSuccessful && !displayNameForm.dirty">All changes saved.</span>
+        <span id="saved-note" *ngIf="userDetails.saveSuccessful && !userDetails.displayNameForm.dirty">All changes saved.</span>
       </section>
       <section class="page-body" *ngIf="tabValue === 'password'">
-        <form [formGroup]="passwordForm">
-          <chef-form-field *ngIf="!isAdminView" class="password">
+        <form [formGroup]="userDetails.passwordForm">
+          <chef-form-field *ngIf="userDetails.showPreviousPassword" class="password">
             <label>
               <span class="label">Previous Password <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="previousPassword" type="password"/>
             </label>
             <chef-error
-              *ngIf="passwordForm.get('previousPassword').hasError('required') && passwordForm.get('previousPassword').dirty">
+              *ngIf="userDetails.passwordForm.get('previousPassword').hasError('required') && userDetails.passwordForm.get('previousPassword').dirty">
               Previous Password is required.
             </chef-error>
             <chef-error
-              *ngIf="passwordForm.get('previousPassword').hasError('minlength') && passwordForm.get('previousPassword').dirty">
+              *ngIf="userDetails.passwordForm.get('previousPassword').hasError('minlength') && userDetails.passwordForm.get('previousPassword').dirty">
               Previous Password must be at least 8 characters.
             </chef-error>
           </chef-form-field>
@@ -61,11 +61,11 @@
               <input chefInput formControlName="newPassword" type="password" (keyup)="handlePasswordInput($event)" />
             </label>
             <chef-error
-              *ngIf="(passwordForm.get('newPassword').hasError('required') || passwordForm.get('newPassword').hasError('pattern')) && passwordForm.get('newPassword').dirty">
+              *ngIf="(userDetails.passwordForm.get('newPassword').hasError('required') || userDetails.passwordForm.get('newPassword').hasError('pattern')) && userDetails.passwordForm.get('newPassword').dirty">
               New Password is required.
             </chef-error>
             <chef-error
-              *ngIf="passwordForm.get('newPassword').hasError('minlength') && passwordForm.get('newPassword').dirty">
+              *ngIf="userDetails.passwordForm.get('newPassword').hasError('minlength') && userDetails.passwordForm.get('newPassword').dirty">
               New Password must be at least 8 characters.
             </chef-error>
           </chef-form-field>
@@ -79,12 +79,12 @@
               <input chefInput formControlName="confirmPassword" type="password"/>
             </label>
             <chef-error
-              *ngIf="passwordForm.get('confirmPassword').hasError('noMatch') && passwordForm.get('confirmPassword').dirty">
+              *ngIf="userDetails.passwordForm.get('confirmPassword').hasError('noMatch') && userDetails.passwordForm.get('confirmPassword').dirty">
               Passwords must match.
             </chef-error>
           </chef-form-field>
         </form>
-        <chef-button [disabled]="!passwordForm.valid" class="update-password-button" primary (click)="savePassword()">
+        <chef-button [disabled]="!userDetails.passwordForm.valid" class="update-password-button" primary (click)="userDetails.savePassword()">
           <span>Reset Password</span>
         </chef-button>
       </section>

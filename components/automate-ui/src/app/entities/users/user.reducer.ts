@@ -80,24 +80,6 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
           id: action.payload.id,
           changes: action.payload}, state));
 
-    case UserActionTypes.UPDATE_PASSWORD_SELF:
-      return set('updateStatus', EntityStatus.loading, state);
-
-    case UserActionTypes.UPDATE_PASSWORD_SELF_SUCCESS:
-      return set('updateStatus', EntityStatus.loadingSuccess,
-        userEntityAdapter.updateOne({
-          id: action.payload.id,
-          changes: action.payload}, state));
-
-    case UserActionTypes.UPDATE_NAME_SELF:
-      return set('updateStatus', EntityStatus.loading, state);
-
-    case UserActionTypes.UPDATE_NAME_SELF_SUCCESS:
-      return set('updateStatus', EntityStatus.loadingSuccess,
-        userEntityAdapter.updateOne({
-          id: action.payload.id,
-          changes: action.payload}, state));
-
     case UserActionTypes.DELETE:
       return set('deleteStatus', EntityStatus.loading, state);
 

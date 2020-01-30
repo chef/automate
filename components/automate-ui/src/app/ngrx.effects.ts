@@ -23,6 +23,7 @@ import { ScannerEffects } from './pages/+compliance/+scanner/state/scanner.effec
 import { SidebarEffects } from './services/sidebar/sidebar.effects';
 import { TeamEffects } from './entities/teams/team.effects';
 import { UserEffects } from './entities/users/user.effects';
+import { UserSelfEffects } from './entities/users/userself.effects';
 import { UserPermEffects } from './entities/userperms/userperms.effects';
 
 @NgModule({
@@ -48,6 +49,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       SidebarEffects,
       TeamEffects,
       UserEffects,
+      UserSelfEffects,
       UserPermEffects
     ])
   ],

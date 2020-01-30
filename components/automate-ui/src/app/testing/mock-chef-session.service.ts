@@ -5,6 +5,7 @@ export class MockChefSessionService {
   uuid = 'test_subject';
   id_token = 'test_id_token';
   telemetry_enabled = true;
+  isLocalUser = true;
 
   public logout(): void {}
   public setSession(): void {}

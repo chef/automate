@@ -19,6 +19,11 @@ export interface IDToken {
   email_verified: boolean;
   name: string;
   groups: Array<string>;
+  federated_claims: FederatedClaims;
+}
+
+interface FederatedClaims {
+  connector_id: string;
 }
 
 export interface Entitlement {
