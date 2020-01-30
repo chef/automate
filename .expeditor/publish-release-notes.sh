@@ -28,9 +28,6 @@ pushd ./automate.wiki
 -
 
 ## Backward Incompatibilities
-
-## Beta Features
-### Identity and Access Management v2
 -
 
 EOH
