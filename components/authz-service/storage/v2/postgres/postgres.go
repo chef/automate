@@ -334,10 +334,6 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 	return pol, nil
 }
 
-func (p *pg) ApplyV2DataMigrations(_ context.Context) error {
-	return nil
-}
-
 func (p *pg) GetPolicyChangeID(ctx context.Context) (string, error) {
 	var policyChangeID string
 

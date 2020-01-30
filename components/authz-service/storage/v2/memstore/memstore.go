@@ -551,10 +551,6 @@ func (s *State) Reset(ctx context.Context) error {
 	return nil
 }
 
-func (s *State) ApplyV2DataMigrations(context.Context) error {
-	return nil
-}
-
 func (s *State) Close() error {
 	return nil
 }

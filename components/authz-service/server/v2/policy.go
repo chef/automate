@@ -121,12 +121,6 @@ func NewPoliciesServer(
 	}
 	srv.setVersionForInterceptorSwitch(v)
 
-	if v.Major == api.Version_V2 {
-		if err := srv.store.ApplyV2DataMigrations(ctx); err != nil {
-			return nil, errors.Wrap(err, "error migrating v2 data")
-		}
-	}
-
 	// now that the data is all set, attempt to feed it into OPA:
 	if err := srv.updateEngineStore(ctx); err != nil {
 		return nil, errors.Wrapf(err, "initialize engine storage (%v)", v)
@@ -613,11 +607,6 @@ func (s *policyServer) MigrateToV2(ctx context.Context,
 		}
 		reports = append(reports, fmt.Sprintf("%d v1 policies", len(pols)))
 
-	}
-
-	err = s.store.ApplyV2DataMigrations(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "apply v2 data migrations: %s", err.Error())
 	}
 
 	// we've made it!
