@@ -46,6 +46,7 @@ func GetInstance() *pg {
 // Will only initialize once. Will simply return nil if already initialized.
 func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf migration.Config,
 	projectLimit int) error {
+
 	var err error
 	once.Do(func() {
 		l.Infof("applying database migrations from %s", migConf.Path)
@@ -1763,10 +1764,6 @@ func (p *pg) Reset(ctx context.Context) error {
 	if _, err := p.db.ExecContext(ctx,
 		`TRUNCATE TABLE iam_policies, iam_members, iam_roles, iam_projects CASCADE;`); err != nil {
 		return errors.Wrap(err, "truncate database")
-	}
-
-	if err := p.dataMigConf.Reset(); err != nil {
-		return errors.Wrap(err, "reset v2 data migrations")
 	}
 
 	return nil
