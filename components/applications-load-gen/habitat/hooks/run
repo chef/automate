@@ -8,5 +8,7 @@ exec 2>&1
 {{pkgPathFor "chef/mlsa"}}/bin/accept {{cfg.mlsa.accept}}
 
 exec applications-load-gen run \
-  --profile {{pkg.svc_config_path}}/config.toml \
-  --host {{cfg.automate_host}}
+  --use-builtin-full-profile \
+  --svc-count {{cfg.target.svc_count}} \
+  --host {{cfg.target.host}} \
+  --auth-token {{cfg.target.auth_token}}

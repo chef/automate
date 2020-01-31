@@ -1,16 +1,7 @@
 [mlsa]
 accept = false
 
-[service]
+[target]
 host = "localhost"
-port = 10133
-metrics_port = 20133
-
-[storage]
-database = "chef_applications_service"
-user = "applications"
-
-[tls]
-key_contents = ""
-cert_contents = ""
-root_cert_contents = ""
+auth_token = "replace-me-with-a-real-token"
+svc_count = 0
