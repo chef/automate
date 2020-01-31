@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { cloneDeep } from 'lodash/fp';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
+import { ProjectsFilterService } from 'app/services/projects-filter/projects-filter.service';
 import { ProjectConstants } from 'app/entities/projects/project.model';
 
 const { ALL_PROJECTS_LABEL } = ProjectConstants;
@@ -11,6 +12,9 @@ const { ALL_PROJECTS_LABEL } = ProjectConstants;
   styleUrls: [ './projects-filter-dropdown.component.scss' ]
 })
 export class ProjectsFilterDropdownComponent {
+
+  constructor(public projectsFilterService: ProjectsFilterService) { }
+
   @Input() options: ProjectsFilterOption[] = [];
 
   @Input() selectionLabel = ALL_PROJECTS_LABEL;
@@ -45,8 +49,9 @@ export class ProjectsFilterDropdownComponent {
     }
   }
 
-  handleFilterKeyUp(): void {
-    this.filteredOptions = this.filterOptions(this.filterValue);
+  handleFilterKeyUp(filterValue: string): void {
+    // this.filteredOptions = this.filterOptions(this.filterValue);
+    this.projectsFilterService.updateFilterValue(filterValue);
   }
 
   filterOptions(value: string): ProjectsFilterOption[] {

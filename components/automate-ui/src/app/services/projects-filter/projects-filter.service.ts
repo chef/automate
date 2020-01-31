@@ -40,6 +40,10 @@ export class ProjectsFilterService {
     this.store.dispatch(new UpdateSelectionCount(options));
   }
 
+  updateFilterValue(filterValue: string) {
+    this.store.dispatch(new this.updateFilterValue(filterValue));
+  }
+
   storeOptions(options: ProjectsFilterOption[]) {
     localStorage.setItem(STORE_OPTIONS_KEY, JSON.stringify(options));
 
