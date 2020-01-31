@@ -72,6 +72,13 @@ export class FormControlDirective implements OnInit, OnDestroy, OnChanges {
         distinctUntilChanged()
       )
       .subscribe(newValue => {
+        // If null, undefined, or empty string, we came in to early last time.
+        // So take this value as the originalValue.
+        if (!this.originalValue) {
+          this.originalValue = newValue;
+        }
+        // If the newValue has come around again to the original value,
+        // mark the control pristine.
         if (newValue === this.originalValue) {
           this.control.reset(this.originalValue);
         }
