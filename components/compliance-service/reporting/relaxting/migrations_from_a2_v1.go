@@ -68,6 +68,11 @@ func (migratable A2V1ElasticSearchIndices) postTimeSeriesMigration(dateToMigrate
 		return err
 	}
 
+	return migratable.removeOldIndices(dateToMigrate)
+}
+
+func (migratable A2V1ElasticSearchIndices) removeOldIndices(dateToMigrate time.Time) error {
+	myName := "A2V1ElasticSearchIndices::removeOldIndices"
 	client, err := migratable.backend.ES2Client()
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s cannot connect to ElasticSearch", myName))

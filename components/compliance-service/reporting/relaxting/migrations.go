@@ -27,6 +27,7 @@ type esMigratable interface {
 	postProfilesMigration() error
 	postFeedsMigration() error
 	postMigration() error
+	removeOldIndices(dateToMigrate time.Time) error
 }
 
 const noScript = "NO_SCRIPT"
@@ -39,6 +40,22 @@ func StoreExists(client *elastic.Client, indexName string) (bool, error) {
 	}
 
 	return exists, nil
+}
+
+func ListIndicesForPrefix(client *elastic.Client, prefix string) ([]string, error) {
+	catIndicesResponse, err := client.CatIndices().Index(prefix).Do(context.Background())
+	if err != nil {
+		return nil, err
+	}
+
+	indices := make([]string, len(catIndicesResponse))
+
+	for _, catIndicesResponseRow := range catIndicesResponse {
+		indexName := catIndicesResponseRow.Index
+		//todo - rdm get the date and call the new removeOldIndices func on this interface
+		indices = append(indices, indexName)
+	}
+	return indices, nil
 }
 
 // ReportComplianceStatus returns the overall compliance status of a report based on the passed/failed/skipped control counts
@@ -243,7 +260,7 @@ func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserv
 
 	//migrate the compliance time-series indices
 	statusserver.AddMigrationUpdate(statusSrv, migrationLabel, "Calculating TimeSeries migration range...")
-	earliest, latest, err := backend.getScanDateRange(migratable.getSourceSummaryIndexPrefix())
+	earliest, latest, err := backend.getScanDateRange(migratable)
 	if err != nil {
 		return errors.Wrap(err, fmt.Sprintf("%s unable to get scans date range", myName))
 	}
@@ -314,8 +331,11 @@ func (backend ES2Backend) migrate(migratable esMigratable, statusSrv *statusserv
 	return nil
 }
 
-func (backend ES2Backend) getScanDateRange(indexPrefix string) (*time.Time, *time.Time, error) {
+func (backend ES2Backend) getScanDateRange(migratable esMigratable) (*time.Time, *time.Time, error) {
 	myName := "getScanDateRange"
+
+	indexPrefix := migratable.getSourceSummaryIndexPrefix()
+
 	minScanDateAgg := elastic.NewMinAggregation().Field("end_time").Format("yyyy-MM-dd")
 	maxScanDateAgg := elastic.NewMaxAggregation().Field("end_time").Format("yyyy-MM-dd")
 	searchSource := elastic.NewSearchSource().
@@ -352,6 +372,20 @@ func (backend ES2Backend) getScanDateRange(indexPrefix string) (*time.Time, *tim
 	maxDate, found := searchResult.Aggregations.Min("max_date")
 	if !found {
 		return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to read max_date for range", myName))
+	}
+
+	if minDate.Value == nil {
+		_, err := ListIndicesForPrefix(client, esIndex)
+		if err != nil {
+			return nil, nil, err
+		}
+
+	}
+	if maxDate.Value == nil {
+		_, err := ListIndicesForPrefix(client, esIndex)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	var minDateAsString string

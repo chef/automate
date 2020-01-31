@@ -84,8 +84,14 @@ func (migratable A2V4ElasticSearchIndices) migrateTimeSeries(dateToMigrate time.
 }
 
 func (migratable A2V4ElasticSearchIndices) postTimeSeriesMigration(dateToMigrate time.Time) error {
-	myName := "postMigration"
+	myName := "A2V4ElasticSearchIndices::postTimeSeriesMigration"
 	defer util.TimeTrack(time.Now(), fmt.Sprintf("%s date: %s", myName, dateToMigrate))
+
+	return migratable.removeOldIndices(dateToMigrate)
+}
+
+func (migratable A2V4ElasticSearchIndices) removeOldIndices(dateToMigrate time.Time) error {
+	myName := "A2V4ElasticSearchIndices::removeOldIndices"
 
 	client, err := migratable.backend.ES2Client()
 	if err != nil {
