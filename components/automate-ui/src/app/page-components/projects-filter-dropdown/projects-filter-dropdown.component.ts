@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { cloneDeep } from 'lodash/fp';
 import { ProjectsFilterOption } from 'app/services/projects-filter/projects-filter.reducer';
 import { ProjectsFilterService } from 'app/services/projects-filter/projects-filter.service';
@@ -11,7 +11,7 @@ const { ALL_PROJECTS_LABEL } = ProjectConstants;
   templateUrl: './projects-filter-dropdown.component.html',
   styleUrls: [ './projects-filter-dropdown.component.scss' ]
 })
-export class ProjectsFilterDropdownComponent {
+export class ProjectsFilterDropdownComponent implements OnInit {
 
   constructor(public projectsFilterService: ProjectsFilterService) { }
 
@@ -37,11 +37,16 @@ export class ProjectsFilterDropdownComponent {
   // so they can be filtered while maintaining the actual options.
   filteredOptions: ProjectsFilterOption[] = [];
 
-  filterValue = '';
-
   optionsEdited = false;
 
   dropdownActive = false;
+
+
+  ngOnInit() {
+    this.projectsFilterService.filterValue$.subscribe((filterValue) => {
+      this.filteredOptions = this.filterOptions(filterValue);
+    });
+  }
 
   resetOptions() {
     if (!this.optionsEdited) {
@@ -50,13 +55,16 @@ export class ProjectsFilterDropdownComponent {
   }
 
   handleFilterKeyUp(filterValue: string): void {
-    // this.filteredOptions = this.filterOptions(this.filterValue);
     this.projectsFilterService.updateFilterValue(filterValue);
   }
 
   filterOptions(value: string): ProjectsFilterOption[] {
     return this.editableOptions.filter(option =>
       option.label.toLowerCase().indexOf(value.toLowerCase()) > -1);
+  }
+
+  clearFilterValue(): void {
+    this.projectsFilterService.updateFilterValue('');
   }
 
   handleLabelClick() {
@@ -69,8 +77,8 @@ export class ProjectsFilterDropdownComponent {
   handleEscape(): void {
     this.optionsEdited = false;
     this.resetOptions();
-    this.filterValue = '';
     this.dropdownActive = false;
+    this.clearFilterValue();
     this.onOptionChange.emit(this.editableOptions);
   }
 

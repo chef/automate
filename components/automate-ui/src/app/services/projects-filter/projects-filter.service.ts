@@ -26,6 +26,8 @@ export class ProjectsFilterService {
 
   filterVisible$ = <Observable<boolean>>this.store.select(selectors.filterVisible);
 
+  filterValue$ = <Observable<string>>this.store.select(selectors.filterValue);
+
   constructor(private store: Store<NgrxStateAtom>, private router: Router) { }
 
   loadOptions() {
