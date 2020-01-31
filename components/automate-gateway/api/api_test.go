@@ -10,7 +10,6 @@ import (
 	_ "github.com/chef/automate/api/external/common/query"
 	_ "github.com/chef/automate/api/external/common/version"
 	_ "github.com/chef/automate/api/external/secrets"
-	_ "github.com/chef/automate/components/automate-gateway/api/auth/teams"
 	_ "github.com/chef/automate/components/automate-gateway/api/auth/tokens"
 	_ "github.com/chef/automate/components/automate-gateway/api/auth/users"
 	_ "github.com/chef/automate/components/automate-gateway/api/authz"

@@ -15,9 +15,9 @@ All of the following apply equally to v1 and v2 policies.
 $ go test ./components/automate-gateway/api
 TestGeneratedProtobufUpToDate
 --- FAIL: TestGeneratedProtobufUpToDate (0.06s)
-    --- FAIL: TestGeneratedProtobufUpToDate/components/automate-gateway/api/auth/teams/teams.proto (0.00s)
+    --- FAIL: TestGeneratedProtobufUpToDate/components/automate-gateway/api/iam/v2/teams.proto (0.00s)
 --- FAIL: TestGeneratedPolicyUpToDate (1.42s)
-    --- FAIL: TestGeneratedPolicyUpToDate/components/automate-gateway/api/auth/teams/teams.proto (1.30s)
+    --- FAIL: TestGeneratedPolicyUpToDate/components/automate-gateway/api/iam/v2/teams.proto (1.30s)
 ```
 
 ## Missing ALL actions/resource
@@ -27,11 +27,11 @@ TestGeneratedProtobufUpToDate
 ``` console
 $ go test ./components/automate-gateway/api
 --- FAIL: TestAllProtoFilesAnnotated (0.13s)
-    --- FAIL: TestAllProtoFilesAnnotated/components/automate-gateway/api/auth/teams/teams.proto (0.01s)
-        api_test.go:54: components/automate-gateway/api/auth/teams/teams.proto:chef.automate.api.iam.policy:Teams.GetVersion: no annotations found
+    --- FAIL: TestAllProtoFilesAnnotated/components/automate-gateway/api/iam/v2/teams.proto (0.01s)
+        api_test.go:54: components/automate-gateway/api/iam/v2/teams.proto:chef.automate.api.iam.policy:Teams.GetVersion: no annotations found
 
 # compile_go_protobuf_component automate-gateway
-GEN: components/automate-gateway/api/auth/teams/teams.proto
+GEN: components/automate-gateway/api/iam/v2/teams.proto
 [policy] couldn't apply v2 template: method GetVersion has no extension of type chef.automate.api.iam.policy
 ```
 
@@ -40,11 +40,11 @@ GEN: components/automate-gateway/api/auth/teams/teams.proto
 ``` console
 $ go test ./components/automate-gateway/api
 --- FAIL: TestAllProtoFilesAnnotated (0.13s)
-    --- FAIL: TestAllProtoFilesAnnotated/components/automate-gateway/api/auth/teams/teams.proto (0.01s)
-        api_test.go:54: components/automate-gateway/api/auth/teams/teams.proto:chef.automate.api.iam.policy:Teams.GetVersion: no resource found in "action:\"system:serviceVersion:get\" "
+    --- FAIL: TestAllProtoFilesAnnotated/components/automate-gateway/api/iam/v2/teams.proto (0.01s)
+        api_test.go:54: components/automate-gateway/api/iam/v2/teams.proto:chef.automate.api.iam.policy:Teams.GetVersion: no resource found in "action:\"system:serviceVersion:get\" "
 
 # compile_go_protobuf_component automate-gateway
-GEN: components/automate-gateway/api/auth/teams/teams.proto
+GEN: components/automate-gateway/api/iam/v2/teams.proto
 [policy] couldn't apply v2 template: GetVersion: policy info '&{system:serviceVersion:get }' is missing Resource
 ```
 
@@ -53,11 +53,11 @@ GEN: components/automate-gateway/api/auth/teams/teams.proto
 ``` console
 $ go test ./components/automate-gateway/api
 --- FAIL: TestAllProtoFilesAnnotated (0.13s)
-    --- FAIL: TestAllProtoFilesAnnotated/components/automate-gateway/api/auth/teams/teams.proto (0.01s)
-        api_test.go:54: components/automate-gateway/api/auth/teams/teams.proto:chef.automate.api.iam.policy:Teams.GetVersion: no annotations found
+    --- FAIL: TestAllProtoFilesAnnotated/components/automate-gateway/api/iam/v2/teams.proto (0.01s)
+        api_test.go:54: components/automate-gateway/api/iam/v2/teams.proto:chef.automate.api.iam.policy:Teams.GetVersion: no annotations found
 
 # compile_go_protobuf_component automate-gateway
-GEN: components/automate-gateway/api/auth/teams/teams.proto
+GEN: components/automate-gateway/api/iam/v2/teams.proto
 [policy] couldn't apply v2 template: method GetVersion has no extension of type chef.automate.api.iam.policy
 ```
 
@@ -68,7 +68,7 @@ $ go test ./components/automate-gateway/api
 --not checked--
 
 # compile_go_protobuf_component automate-gateway
-GEN: components/automate-gateway/api/auth/teams/teams.proto
+GEN: components/automate-gateway/api/iam/v2/teams.proto
 [policy] couldn't apply v2 template: GetTeam: Resource 'iam:te*ams:dummy' does not match regex pattern "^[a-z][^:*]*(?::[^:*]+)*$"
 ```
 
@@ -79,7 +79,7 @@ $ go test ./components/automate-gateway/api
 --not checked--
 
 # compile_go_protobuf_component automate-gateway
-GEN: components/automate-gateway/api/auth/teams/teams.proto
+GEN: components/automate-gateway/api/iam/v2/teams.proto
 [policy] couldn't apply v2 template: unknown field name(s) in pattern: id_other
 ```
 
@@ -90,6 +90,6 @@ $ go test ./components/automate-gateway/api
 --not checked--
 
 # compile_go_protobuf_component automate-gateway
-GEN: components/automate-gateway/api/auth/teams/teams.proto
+GEN: components/automate-gateway/api/iam/v2/teams.proto
 --grpc-gateway_out: no field "name" found in GetTeamReq
 ```
