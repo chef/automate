@@ -97,7 +97,6 @@ external_fqdn = "{{.Fqdn}}"
 	assert.Equal(t, testConfig.Host, cfg.Hostname)
 	assert.Equal(t, testConfig.Port, cfg.Port)
 	assert.Equal(t, testConfig.GRPCPort, cfg.GRPCPort)
-	assert.Equal(t, testConfig.Fqdn, cfg.ExternalFqdn)
 
 	assert.Equal(t, testConfig.IngestTarget, cfg.GrpcClients.Endpoints["ingest-service"].Target)
 	iSecure, err := strconv.ParseBool(testConfig.IngestSecure)

@@ -84,6 +84,12 @@ can accept the 30-day trial license when you first sign in to Chef Automate.
 If you are deploying Chef Habitat Builder with Chef Automate in an airgapped environment,
 follow [the documentation on building an airgap bundle]({{< relref "airgapped-installation.md" >}}).
 
+You can deploy Chef Habitat Builder either with a full Chef Automate installation
+or with the Chef Automate auth stack only.
+
+
+#### Deploy Chef Automate and Chef Habitat Builder
+
 To deploy Chef Automate and Chef Habitat Builder, specify both the `builder` and `automate`
 products on the command line. For example:
 
@@ -92,6 +98,74 @@ products on the command line. For example:
 ```
 
 Accept the license with `y`.
+
+#### Deploy Chef Habitat Builder with Chef Automate Auth
+
+To deploy Chef Habitat Builder with the Chef Automate UI and Auth services only, specify the `builder`
+product on the command line. For example:
+
+```shell
+ ./chef-automate deploy --product builder
+```
+
+Accept the license with `y`.
+
+Please note that the Chef Automate UI will only support managing Users, Groups,
+and Authorization policies when deployed without the full Chef Automate stack.
+If you wish to enable all of Chef Automate at a later time you can update the
+product configuration to include the complete Chef Automate stack. For example:
+
+1. Create a new patch configuration toml as `config.toml` and update the products
+  to include both `builder` and `automate`:
+
+    ```toml
+    [deployment.v1.svc]
+      products = ["builder", "automate"]
+    ```
+
+1. Patch the configuration to deploy the rest of the Chef Automate services:
+
+    ```shell
+    ./chef-automate config patch config.toml
+    ```
+
+    You should see output similar to:
+
+    ```output
+    Updating deployment configuration
+
+    Applying deployment configuration
+      Installed automate-elasticsearch
+      Installed automate-es-gateway
+      Installed event-service
+      Installed es-sidecar-service
+      Installed event-feed-service
+      Installed secrets-service
+      Installed applications-service
+      Installed notifications-service
+      Installed nodemanager-service
+      Installed compliance-service
+      Installed ingest-service
+      Installed config-mgmt-service
+      Installed data-feed-service
+      Installed event-gateway
+      Started automate-elasticsearch
+      Started automate-es-gateway
+      Started event-service
+      Started es-sidecar-service
+      Started event-feed-service
+      Started secrets-service
+      Started applications-service
+      Started notifications-service
+      Started nodemanager-service
+      Started compliance-service
+      Started ingest-service
+      Started config-mgmt-service
+      Started data-feed-service
+      Started event-gateway
+      Started automate-load-balancer
+    Success: Configuration patched
+    ```
 
 ### Sign in to Chef Automate and the Chef Habitat Builder
 

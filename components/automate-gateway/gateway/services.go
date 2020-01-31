@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -101,10 +102,15 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	pb_telemetry.RegisterTelemetryServer(grpcServer,
 		handler.NewTelemetryServer(licenseClient, deploymentClient))
 
+	trialLicenseURL, err := s.Config.trialLicenseURL()
+	if err != nil {
+		return err
+	}
+
 	pb_license.RegisterLicenseServer(grpcServer, handler.NewLicenseServer(
 		licenseClient,
 		deploymentClient,
-		s.trialLicenseURL,
+		trialLicenseURL,
 	))
 
 	cfgMgmtClient, err := clients.CfgMgmtClient()
@@ -143,7 +149,11 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 
 	//TODO: We want to try to get rid of this:
 	//      See https://github.com/chef/automate/issues/250
-	chefIngestServer := handler.NewChefIngestServer(s.automateURL, ccrIngester, notifier)
+	automateURL, err := s.Config.automateURL()
+	if err != nil {
+		return errors.Wrap(err, "create ingester service")
+	}
+	chefIngestServer := handler.NewChefIngestServer(automateURL, ccrIngester, notifier)
 	pb_ingest.RegisterChefIngesterServer(grpcServer, chefIngestServer)
 
 	ingestStatusClient, err := clients.IngestStatusClient()
@@ -314,6 +324,8 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_data_feed.RegisterDatafeedServiceServer(grpcServer, handler.NewDatafeedHandler(datafeedClient))
 
+	grpc_prometheus.Register(grpcServer)
+
 	return nil
 }
 
@@ -325,7 +337,7 @@ func openAPIServicesHandler() http.Handler {
 type registerFunc func(context.Context, *runtime.ServeMux, string, []grpc.DialOption) error
 
 // unversionedRESTMux returns all endpoints for the GRPC rest gateway
-func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, error) {
+func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, func(), error) {
 	return muxFromRegisterMap(grpcURI, dopts, map[string]registerFunc{
 		"event feed":           pb_eventfeed.RegisterEventFeedHandlerFromEndpoint,
 		"config management":    pb_cfgmgmt.RegisterConfigMgmtHandlerFromEndpoint,
@@ -354,7 +366,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 	})
 }
 
-func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFeatureFlags) (http.Handler, error) {
+func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFeatureFlags) (http.Handler, func(), error) {
 	endpointMap := map[string]registerFunc{
 		"policies v2": pb_iam_v2.RegisterPoliciesHandlerFromEndpoint,
 		"users v2":    pb_iam_v2.RegisterUsersHandlerFromEndpoint,
@@ -365,7 +377,7 @@ func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFe
 	return muxFromRegisterMap(grpcURI, dopts, endpointMap)
 }
 
-func muxFromRegisterMap(grpcURI string, dopts []grpc.DialOption, localEndpoints map[string]registerFunc) (*runtime.ServeMux, error) {
+func muxFromRegisterMap(grpcURI string, dopts []grpc.DialOption, localEndpoints map[string]registerFunc) (*runtime.ServeMux, func(), error) {
 	opts := []runtime.ServeMuxOption{
 		runtime.WithIncomingHeaderMatcher(headerMatcher),
 		runtime.WithMarshalerOption("application/json+pretty", &runtime.JSONPb{OrigName: true, EmitDefaults: true, Indent: "  "}),
@@ -373,16 +385,16 @@ func muxFromRegisterMap(grpcURI string, dopts []grpc.DialOption, localEndpoints 
 		runtime.WithMetadata(middleware.CertificatePasser),
 	}
 	gwmux := runtime.NewServeMux(opts...)
-	ctx := context.Background()
+	ctx, cancel := context.WithCancel(context.Background())
 
 	// register each endpoint with runtime.ServeMux
 	for ep, register := range localEndpoints {
 		log.Infof("Register %s to REST Gateway %s", ep, grpcURI)
 		if err := register(ctx, gwmux, grpcURI, dopts); err != nil {
-			return nil, errors.Wrapf(err, "cannot serve %s api", ep)
+			return nil, cancel, errors.Wrapf(err, "cannot serve %s api", ep)
 		}
 	}
-	return gwmux, nil
+	return gwmux, cancel, nil
 }
 
 type ProfileRequest struct {

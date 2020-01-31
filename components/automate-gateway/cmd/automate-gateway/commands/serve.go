@@ -1,6 +1,7 @@
 package commands
 
 import (
+	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
@@ -12,7 +13,7 @@ import (
 var serveCmd = &cobra.Command{
 	Use:   "serve",
 	Short: "Launches the api webserver on https://localhost:2000",
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		log.Info("Starting Chef Automate Gateway Service")
 
 		closer, err := tracing.NewGlobalTracer("automate-gateway")
@@ -22,18 +23,12 @@ var serveCmd = &cobra.Command{
 
 		cfg, err := gateway.ConfigFromViper()
 		if err != nil {
-			log.WithError(err).Fatal("Failed to configure service")
+			return errors.Wrap(err, "loading configuration")
 		}
 
-		gw, err := gateway.NewFromConfig(cfg)
-		if err != nil {
-			log.WithError(err).Fatal("Failed to configure service")
-		}
-
-		// if Serve returns, something went wrong
-		if err := gw.Serve(); err != nil {
-			log.WithError(err).Fatal("Failed to start service")
-		}
+		err = gateway.New(cfg).Start()
+		log.WithError(err).Error("exiting")
+		return err
 	},
 }
 

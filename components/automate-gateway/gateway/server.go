@@ -1,12 +1,16 @@
 package gateway
 
 import (
+	"context"
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
 	"net"
 	"net/http"
-	"net/url"
+	"os"
+	"os/signal"
+	"syscall"
+	"time"
 
 	grpc_middleware "github.com/grpc-ecosystem/go-grpc-middleware"
 	grpc_logrus "github.com/grpc-ecosystem/go-grpc-middleware/logging/logrus"
@@ -15,7 +19,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	log "github.com/sirupsen/logrus"
-	"github.com/spf13/viper"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 
@@ -23,236 +26,34 @@ import (
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv1"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
+	"github.com/chef/automate/components/automate-gateway/pkg/nullbackend"
 	"github.com/chef/automate/lib/grpc/debug/debug_api"
 	"github.com/chef/automate/lib/grpc/secureconn"
-	"github.com/chef/automate/lib/tls/certs"
 	"github.com/chef/automate/lib/tracing"
 )
 
-type Config struct {
-	ExternalFqdn string       `mapstructure:"external_fqdn" toml:"external_fqdn"`
-	GrpcClients  ClientConfig `mapstructure:"grpc_clients" toml:"grpc_clients"`
-	GRPCPort     int          `mapstructure:"grpc_port" toml:"grpc_port"`
-	Hostname     string       `mapstructure:"host" toml:"host"`
-	Log          struct {
-		Level string `mapstructure:"level" toml:"level"`
-	} `mapstructure:"log" toml:"log"`
-	OpenAPIUIDir    string `mapstructure:"open_api_ui_dir" toml:"open_api_ui_dir"`
-	Port            int    `mapstructure:"port" toml:"port"`
-	ServiceCerts    *certs.ServiceCerts
-	TLSConfig       certs.TLSConfig `mapstructure:"tls" toml:"tls"`
-	TrialLicenseURL string          `mapstructure:"trial_license_url" toml:"trial_license_url"`
-}
-
-type gwRouteFeatureFlags map[string]bool
-
 // Server holds the state of an instance of this service
 type Server struct {
-	grpcListenHost string
-	grpcListenPort int
-	httpListenHost string
-	httpListenPort int
+	Config
+	clientsFactory ClientsFactory
+	connFactory    *secureconn.Factory
+	serviceKeyPair *tls.Certificate
+	rootCerts      *x509.CertPool
+	authorizer     middleware.SwitchingAuthorizationHandler
 
-	clientsFactory  ClientsFactory
-	connFactory     *secureconn.Factory
-	serviceKeyPair  *tls.Certificate
-	rootCerts       *x509.CertPool
-	automateURL     *url.URL
-	openapiUIDir    string
-	trialLicenseURL *url.URL
-	authorizer      middleware.SwitchingAuthorizationHandler
+	httpServer        *http.Server
+	httpMuxConnCancel func()
+	grpcServer        *grpc.Server
+	nullBackendServer *grpc.Server
 
-	gwRouteFeatureFlags gwRouteFeatureFlags
+	errC chan error
+	sigC chan os.Signal
+
+	logger *log.Entry
 }
 
-func (c *Config) gwRouteFeatureFlags() gwRouteFeatureFlags {
-	g := make(gwRouteFeatureFlags)
-	return g
-}
-
-// ConfigFromViper returns a Gateway config from the services configuration
-// file and the viper CLI arguments.
-func ConfigFromViper() (*Config, error) {
-	config := &Config{}
-
-	// Unmarshall the viper config into the server Config
-	if err := viper.Unmarshal(config); err != nil {
-		log.WithFields(log.Fields{
-			"err": err,
-		}).Error("Failed to marshall config options to server config")
-		return config, err
-	}
-
-	// Fix any relative paths that might be in the config file
-	config.TLSConfig.FixupRelativeTLSPaths(viper.ConfigFileUsed())
-	serviceCerts, err := config.TLSConfig.ReadCerts()
-	if err != nil {
-		log.WithFields(log.Fields{
-			"err": err.Error(),
-		}).Error("Failed to loading x509 key pair and/or root CA certificate")
-		return config, err
-	}
-	config.ServiceCerts = serviceCerts
-
-	// When the gRPC server initializes it'll attempt to create gRPC clients to
-	// to all possible upstreams, even if the targets don't exist. This allows
-	// the gateway to run without any hard binds. Here we take our configured
-	// gRPC client endpoints and add any missing defaults that we might need
-	// in order to initialize those clients.
-	config.GrpcClients.ConfigureDefaultEndpoints()
-
-	return config, nil
-}
-
-// NewFromConfig initializes a Server given a Config
-func NewFromConfig(cfg *Config) (*Server, error) {
-	connFact := secureconn.NewFactory(*cfg.ServiceCerts, secureconn.DisableDebugServer())
-	externalURL, err := url.Parse(cfg.ExternalFqdn)
-	if err != nil {
-		return nil, errors.Wrapf(err, "parse external FQDN from config: %q", cfg.ExternalFqdn)
-	}
-
-	clientsFactory := NewClientsFactory(cfg.GrpcClients, connFact)
-	authzClientV1, err := clientsFactory.AuthorizationClient()
-	if err != nil {
-		return nil, errors.Wrap(err, "create authz client")
-	}
-	authzClientV2, err := clientsFactory.AuthorizationV2Client()
-	if err != nil {
-		return nil, errors.Wrap(err, "create authz_v2 client")
-	}
-
-	opts := []Opts{
-		WithConnectionsFactory(connFact),
-		WithClientsFactory(clientsFactory),
-		WithAuthorizer(authorizer.NewAuthorizer(authv1.AuthorizationHandler(authzClientV1),
-			authv2.AuthorizationHandler(authzClientV2))),
-		WithURI(cfg.Hostname, cfg.Port),
-		WithGRPCURI(cfg.Hostname, cfg.GRPCPort),
-		WithServiceKeyPair(cfg.ServiceCerts.ServiceKeyPair, cfg.ServiceCerts.NewCertPool()),
-		WithAutomateURL(externalURL),
-		WithOpenAPIUIDir(cfg.OpenAPIUIDir),
-		WithLogLevel(cfg.Log.Level),
-		WithRouteFeatureToggles(cfg),
-	}
-	if tlsURL := cfg.TrialLicenseURL; tlsURL != "" {
-		trialLicenseURL, err := url.Parse(tlsURL)
-		if err != nil {
-			return nil, errors.Wrapf(err, "parse trial license URL from config: %q", cfg.TrialLicenseURL)
-		}
-		opts = append(opts, WithTrialLicenseURL(trialLicenseURL))
-	}
-	return New(opts...), nil
-}
-
-// New initializes a *Server from the passed options
-func New(opts ...Opts) *Server {
-	s := &Server{
-		openapiUIDir: "./third_party/swagger-ui/",
-	}
-	for _, opt := range opts {
-		opt(s)
-	}
-	return s
-}
-
-// Opts is for supporting functional options like WithClientsFactory,
-// WithConnectionFactory, ..., passed to New()
-type Opts func(*Server)
-
-// WithClientsFactory allows setting the ClientsFactory to use
-func WithClientsFactory(fy ClientsFactory) Opts {
-	return func(s *Server) {
-		s.clientsFactory = fy
-	}
-}
-
-// WithAuthorizer allows setting the Authorizer to use
-func WithAuthorizer(a middleware.SwitchingAuthorizationHandler) Opts {
-	return func(s *Server) {
-		s.authorizer = a
-	}
-}
-
-// WithConnectionsFactory allows setting the ConnectionsFactory to use
-func WithConnectionsFactory(fy *secureconn.Factory) Opts {
-	return func(s *Server) {
-		s.connFactory = fy
-	}
-}
-
-// WithURI allows setting the URI to use from hostname and port
-func WithURI(hostname string, port int) Opts {
-	return func(s *Server) {
-		s.httpListenHost = hostname
-		s.httpListenPort = port
-	}
-}
-
-// WithGRPCURI allows setting the internal GRPC URI to use from hostname/port
-func WithGRPCURI(hostname string, port int) Opts {
-	return func(s *Server) {
-		s.grpcListenHost = hostname
-		s.grpcListenPort = port
-	}
-}
-
-// WithAutomateURL allows setting the URL used externally
-func WithAutomateURL(u *url.URL) Opts {
-	return func(s *Server) {
-		s.automateURL = u
-	}
-}
-
-// WithTrialLicenseURL allows setting the URL used for trial-license-service
-func WithTrialLicenseURL(u *url.URL) Opts {
-	return func(s *Server) {
-		s.trialLicenseURL = u
-	}
-}
-
-// WithServiceKeyPair allows setting the ServiceKeyPair to use
-func WithServiceKeyPair(cert *tls.Certificate, root *x509.CertPool) Opts {
-	return func(s *Server) {
-		s.serviceKeyPair = cert
-		s.rootCerts = root
-	}
-}
-
-// WithOpenAPIUIDir sets the swagger ui directory
-func WithOpenAPIUIDir(dir string) Opts {
-	return func(s *Server) {
-		s.openapiUIDir = dir
-	}
-}
-
-// WithLogLevel sets the log level to use.
-//
-// Note that we keep the "functional options" style here, although we end up
-// changing the global logger's settings, not the Server. This could become
-// confusing, but it's also paving a way for having the Server control _its own
-// logger_, instead of using the global one.
-// The potential confusing scenario is unlikely: spinning up multiple Server
-// instances with different log levels.
-func WithLogLevel(lvl string) Opts {
-	return func(*Server) {
-		l, err := log.ParseLevel(lvl)
-		if err != nil {
-			log.Warnf("unknown log level %q, using default (info)", lvl)
-			l = log.InfoLevel
-		}
-		log.SetLevel(l)
-	}
-}
-
-func WithRouteFeatureToggles(c *Config) Opts {
-	return func(s *Server) {
-		s.gwRouteFeatureFlags = c.gwRouteFeatureFlags()
-	}
-}
-
-// NewGRPCServer returns a *grpc.Server instance
-func (s *Server) NewGRPCServer() (*grpc.Server, error) {
+// newGRPCServer returns a *grpc.Server instance
+func (s *Server) newGRPCServer() (*grpc.Server, error) {
 	authClient, err := s.clientsFactory.AuthenticationClient()
 	if err != nil {
 		return nil, errors.Wrap(err, "create auth client")
@@ -323,41 +124,249 @@ func (s *Server) NewGRPCServer() (*grpc.Server, error) {
 	return grpcServer, nil
 }
 
-// Serve finalizes the Server setup, and listens for connections. Only
-// returns if something went wrong, with a non-nil error.
-func (s *Server) Serve() error {
-	log.WithFields(log.Fields{
-		"http-host": s.httpListenHost,
-		"http-port": s.httpListenPort,
-	}).Info("Starting server")
+func (s *Server) Start() error {
+	s.errC = make(chan error, 5)
+	s.sigC = make(chan os.Signal, 2)
+	signal.Notify(s.sigC, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGINT, syscall.SIGUSR1)
 
-	// http 2.0 grpc server
-	grpcServer, err := s.NewGRPCServer()
+	s.setLogLevel()
+	s.logger.Info("starting automate-gateway")
+	s.loadConnFactory()
+	s.loadServiceCerts()
+
+	err := s.startNullBackendServer()
 	if err != nil {
-		return errors.Wrap(err, "init GRPC server")
-	}
-	if err := s.RegisterGRPCServices(grpcServer); err != nil {
-		return errors.Wrap(err, "registering GRPC services")
+		return errors.Wrap(err, "starting null backend")
 	}
 
-	// After all your registrations, make sure all of the Prometheus metrics are initialized.
-	grpc_prometheus.Register(grpcServer)
+	err = s.loadClients()
+	if err != nil {
+		return errors.Wrap(err, "loading backend gRPC clients")
+	}
 
+	err = s.loadAuthorizer()
+	if err != nil {
+		return errors.Wrap(err, "loading authorizor")
+	}
+
+	err = s.startGRPCServer()
+	if err != nil {
+		return errors.Wrap(err, "starting gateway gRPC server")
+	}
+
+	err = s.startHTTPServer()
+	if err != nil {
+		return errors.Wrap(err, "starting gateway HTTPS server")
+	}
+
+	return s.startSignalHandler()
+}
+
+func (s *Server) loadConnFactory() {
+	s.logger.Debug("loading gRPC connection factory")
+	s.connFactory = secureconn.NewFactory(*s.Config.ServiceCerts, secureconn.DisableDebugServer())
+
+	return
+}
+
+func (s *Server) loadClients() error {
+	var err error
+
+	s.logger.Info("loading backend gRPC clients")
+
+	s.clientsFactory, err = NewClientsFactory(s.Config.GrpcClients, s.connFactory)
+
+	return err
+}
+
+func (s *Server) loadServiceCerts() {
+	s.logger.Debug("loading automate-gateway service certs")
+
+	s.serviceKeyPair = s.Config.ServiceCerts.ServiceKeyPair
+	s.rootCerts = s.Config.ServiceCerts.NewCertPool()
+
+	return
+}
+
+func (s *Server) setLogLevel() {
+	l, err := log.ParseLevel(s.Config.Log.Level)
+	if err != nil {
+		log.Warnf("unknown log level %q, using default (info)", l)
+		l = log.InfoLevel
+	}
+	log.SetLevel(l)
+
+	return
+}
+
+func (s *Server) loadAuthorizer() error {
+	s.logger.Info("loading authorizer")
+
+	authzClientV1, err := s.clientsFactory.AuthorizationClient()
+	if err != nil {
+		return errors.Wrap(err, "create authz client")
+	}
+	authzClientV2, err := s.clientsFactory.AuthorizationV2Client()
+	if err != nil {
+		return errors.Wrap(err, "create authz_v2 client")
+	}
+
+	s.authorizer = authorizer.NewAuthorizer(
+		authv1.AuthorizationHandler(authzClientV1),
+		authv2.AuthorizationHandler(authzClientV2),
+	)
+
+	return nil
+}
+
+// startNullBackendServer starts the unimplemented backend server
+func (s *Server) startNullBackendServer() error {
+	var err error
+
+	s.logger.Info("starting null backend server")
+
+	nullBackendListener, err := net.Listen("unix", s.Config.GrpcClients.NullBackendSock)
+	if err != nil {
+		return errors.Wrapf(err, "listen on %s", s.Config.GrpcClients.NullBackendSock)
+	}
+
+	s.nullBackendServer = nullbackend.NewServer()
+
+	// Start all servers in goroutines and start watching for user signals. If
+	// an error is returned from a server or an exit signal is received, try to
+	// gracefully stop servers and exit.
+	go func() {
+		err := s.nullBackendServer.Serve(nullBackendListener)
+		if err != nil {
+			s.errC <- errors.Wrap(err, "serve null backend")
+		}
+		return
+	}()
+
+	return nil
+}
+
+func (s *Server) stopNullBackendServer() {
+	s.logger.Info("stopping null backend server")
+
+	s.nullBackendServer.GracefulStop()
+	_ = os.Remove(s.Config.GrpcClients.NullBackendSock)
+
+	return
+}
+
+func (s *Server) startSignalHandler() error {
+	s.logger.Info("starting signal handlers")
+
+	for {
+		select {
+		case err := <-s.errC:
+			switch errors.Cause(err) {
+			// ErrServerClosed is returned if an HTTP server is shutdown, which
+			// can only happen if it's triggered by a shutdown signal or a
+			// reconfigure signal, in which case the server shutting down is
+			// intended. The is only returned nothing goes wrong when shutting
+			// down, therefore we'll log it and move on.
+			case http.ErrServerClosed:
+				s.logger.Debug("HTTP server was recently shutdown")
+			default:
+				s.logger.WithError(err).Error("exiting")
+				err1 := s.stop()
+				if err1 != nil {
+					return errors.Wrap(err, err1.Error())
+				}
+				return err
+			}
+		case sig := <-s.sigC:
+			switch sig {
+			case syscall.SIGUSR1, syscall.SIGTERM, syscall.SIGINT, syscall.SIGHUP:
+				s.logger.WithField("signal", sig).Info("handling received signal")
+				return s.stop()
+			default:
+				s.logger.WithField("signal", sig).Warn("unable to handle received signal")
+			}
+		}
+	}
+
+	return nil
+}
+
+func (s *Server) stop() error {
+	s.logger.Info("stopping automate-gateway")
+
+	err := s.stopHTTPServer()
+
+	s.stopGRPCServer()
+	s.stopNullBackendServer()
+
+	return err
+}
+
+func (s *Server) startGRPCServer() error {
+	var err error
+
+	s.logger.Info("starting gRPC server")
+
+	s.grpcServer, err = s.newGRPCServer()
+	if err != nil {
+		return errors.Wrap(err, "init gRPC server")
+	}
+
+	if err := s.RegisterGRPCServices(s.grpcServer); err != nil {
+		return errors.Wrap(err, "registering gRPC services")
+	}
+
+	grpcURI := fmt.Sprintf("%s:%d", s.Config.Hostname, s.Config.GRPCPort)
+	grpcListener, err := net.Listen("tcp", grpcURI)
+	if err != nil {
+		return errors.Wrapf(err, "listen on %s", grpcURI)
+	}
+
+	go func() {
+		err := s.grpcServer.Serve(grpcListener)
+		if err != nil {
+			s.errC <- errors.Wrap(err, "serve gRPC")
+		}
+		return
+	}()
+
+	return nil
+}
+
+func (s *Server) stopGRPCServer() {
+	s.logger.Info("stopping gRPC server")
+	s.grpcServer.GracefulStop()
+
+	return
+}
+
+func (s *Server) startHTTPServer() error {
+	s.logger.Info("starting HTTPS server")
 	// http 1.1 server
 	mux := http.NewServeMux()
 
 	// dial in options for rest gateway to GRPC
 	// register http 1.1 protobuf gateway services
-	grpcURILocal := fmt.Sprintf("127.0.0.1:%d", s.grpcListenPort)
-	v0Mux, err := unversionedRESTMux(grpcURILocal, s.connFactory.DialOptions("automate-gateway"))
+	grpcURILocal := fmt.Sprintf("127.0.0.1:%d", s.Config.GRPCPort)
+	v0Mux, cancelUnversioned, err := unversionedRESTMux(grpcURILocal, s.connFactory.DialOptions("automate-gateway"))
 	if err != nil {
 		return errors.Wrap(err, "registering v0 REST gateway services")
 	}
 	mux.Handle("/", prettifier(v0Mux))
 
-	versionedMux, err := versionedRESTMux(grpcURILocal, s.connFactory.DialOptions("automate-gateway"), s.gwRouteFeatureFlags)
+	versionedMux, cancelVersioned, err := versionedRESTMux(
+		grpcURILocal,
+		s.connFactory.DialOptions("automate-gateway"),
+		s.Config.gwRouteFeatureFlags(),
+	)
 	if err != nil {
 		return errors.Wrap(err, "registering versioned REST gateway services")
+	}
+
+	s.httpMuxConnCancel = func() {
+		cancelUnversioned()
+		cancelVersioned()
+		return
 	}
 	mux.Handle("/apis/", http.StripPrefix("/apis", prettifier(versionedMux)))
 
@@ -441,14 +450,14 @@ func (s *Server) Serve() error {
 	mux.Handle("/openapi/", http.StripPrefix("/openapi", openAPIServicesHandler()))
 
 	// attach open api ui
-	mux.Handle("/openapi/ui/", http.StripPrefix("/openapi/ui", serveOpenAPIUI(s.openapiUIDir)))
+	mux.Handle("/openapi/ui/", http.StripPrefix("/openapi/ui", serveOpenAPIUI(s.Config.OpenAPIUIDir)))
 
 	// Register Prometheus metrics handler.
 	mux.Handle("/metrics", promhttp.Handler())
 
-	// start server
-	uri := fmt.Sprintf("%s:%d", s.httpListenHost, s.httpListenPort)
-	srv := &http.Server{
+	// start https server
+	uri := fmt.Sprintf("%s:%d", s.Config.Hostname, s.Config.Port)
+	s.httpServer = &http.Server{
 		Addr:    uri,
 		Handler: mux,
 		TLSConfig: &tls.Config{
@@ -463,36 +472,35 @@ func (s *Server) Serve() error {
 		},
 	}
 
-	conn, err := net.Listen("tcp", uri)
+	tcpListener, err := net.Listen("tcp", uri)
 	if err != nil {
 		return errors.Wrapf(err, "listen on %s", uri)
 	}
-	log.WithFields(log.Fields{
-		"uri": uri,
-	}).Info("Serve gRPC/REST")
 
-	grpcURI := fmt.Sprintf("%s:%d", s.grpcListenHost, s.grpcListenPort)
-	grpcConn, err := net.Listen("tcp", grpcURI)
+	httpListener := tls.NewListener(tcpListener, s.httpServer.TLSConfig)
+
+	go func() {
+		err := s.httpServer.Serve(httpListener)
+		if err != nil {
+			s.errC <- errors.Wrap(err, "serve HTTPS")
+		}
+		return
+	}()
+
+	return nil
+}
+
+func (s *Server) stopHTTPServer() error {
+	s.logger.Info("stopping HTTPS server")
+	s.httpMuxConnCancel()
+	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+
+	err := s.httpServer.Shutdown(ctx)
 	if err != nil {
-		return errors.Wrapf(err, "listen on %s", grpcURI)
+		return errors.Wrap(err, "shutting down https server")
 	}
-	log.WithFields(log.Fields{
-		"grpc_uri": grpcURI,
-	}).Info("Serve gRPC")
 
-	// Note: we start both servers in a goroutine, and when one of them returns,
-	// (with what must be an error), we (brutally) abort everything and return
-	// that error.
-	errc := make(chan error)
-	go func() {
-		err := srv.Serve(tls.NewListener(conn, srv.TLSConfig))
-		errc <- errors.Wrap(err, "HTTP")
-	}()
-	go func() {
-		errc <- errors.Wrap(grpcServer.Serve(grpcConn), "GRPC")
-	}()
-
-	return errors.Wrap(<-errc, "Serve")
+	return nil
 }
 
 // prettifier strips the ?pretty query argument, and uses it to indicate that

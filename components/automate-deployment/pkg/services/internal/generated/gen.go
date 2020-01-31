@@ -466,13 +466,26 @@ var ProductMetadataJSON = `
       "hidden": false
     },
     {
+      "name": "ui",
+      "aliases": null,
+      "type": "base",
+      "services": [
+        "chef/automate-gateway",
+        "chef/automate-ui"
+      ],
+      "packages": null,
+      "dependencies": [
+        "core"
+      ],
+      "hidden": false
+    },
+    {
       "name": "automate",
       "aliases": [
         "automate-full"
       ],
       "type": "product",
       "services": [
-        "chef/automate-ui",
         "chef/event-service",
         "chef/event-feed-service",
         "chef/secrets-service",
@@ -483,8 +496,7 @@ var ProductMetadataJSON = `
         "chef/ingest-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/event-gateway",
-        "chef/automate-gateway"
+        "chef/event-gateway"
       ],
       "packages": null,
       "dependencies": [
@@ -492,7 +504,8 @@ var ProductMetadataJSON = `
         "postgresql",
         "elasticsearch",
         "cereal",
-        "auth"
+        "auth",
+        "ui"
       ],
       "hidden": false
     },
@@ -558,7 +571,7 @@ var ProductMetadataJSON = `
         "core",
         "postgresql",
         "auth",
-        "automate"
+        "ui"
       ],
       "hidden": false
     },

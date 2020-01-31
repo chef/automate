@@ -104,12 +104,27 @@
       ]
     },
     {
+      "name": "ui",
+      "type": "base",
+      "dependencies": ["core"],
+      "services": [
+        "chef/automate-gateway",
+        "chef/automate-ui"
+      ]
+    },
+    {
       "name": "automate",
       "type": "product",
-      "dependencies": ["core", "postgresql", "elasticsearch", "cereal", "auth"],
+      "dependencies": [
+        "core",
+        "postgresql",
+        "elasticsearch",
+        "cereal",
+        "auth",
+        "ui"
+      ],
       "aliases": ["automate-full"],
       "services": [
-        "chef/automate-ui",
         "chef/event-service",
         "chef/event-feed-service",
         "chef/secrets-service",
@@ -120,8 +135,7 @@
         "chef/ingest-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
-        "chef/event-gateway",
-        "chef/automate-gateway"
+        "chef/event-gateway"
       ]
     },
     {
@@ -156,7 +170,7 @@
       "name": "builder",
       "type": "product",
       "aliases": ["depot"],
-      "dependencies": ["core", "postgresql", "auth", "automate"],
+      "dependencies": ["core", "postgresql", "auth", "ui"],
       "services": [
         "chef/automate-minio",
         "chef/automate-builder-memcached",
