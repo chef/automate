@@ -52,6 +52,7 @@ func ListIndicesForPrefix(client *elastic.Client, prefix string) ([]string, erro
 
 	for _, catIndicesResponseRow := range catIndicesResponse {
 		indexName := catIndicesResponseRow.Index
+		logrus.Debugf("%nIndex: %s ", indexName)
 		//todo - rdm get the date and call the new removeOldIndices func on this interface
 		indices = append(indices, indexName)
 	}
