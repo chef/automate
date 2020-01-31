@@ -53,24 +53,18 @@ func newRunCmd() *cobra.Command {
 }
 
 func runRunCmd(cmd *cobra.Command, args []string) error {
-	if rootFlags.profileFile == "" && !rootFlags.useDefaultProfile {
-		return errors.New("no profile filename given")
+	if err := rootFlags.ValidateProfileOpts(); err != nil {
+		return err
 	}
 
 	if runFlags.authToken == "" {
 		return errors.New("no auth token given")
 	}
 
-	fmt.Printf("Reading profile %q\n", rootFlags.profileFile)
+	fmt.Printf("Loading profile %q\n", rootFlags.SelectedProfile())
 
-	var profileCfg *generator.LoadProfileCfg
-	var err error
+	profileCfg, err := rootFlags.LoadProfileCfg()
 
-	if rootFlags.useDefaultProfile {
-		profileCfg, err = generator.BuiltinConfig()
-	} else {
-		profileCfg, err = generator.ProfileFromFile(rootFlags.profileFile)
-	}
 	if err != nil {
 		return err
 	}

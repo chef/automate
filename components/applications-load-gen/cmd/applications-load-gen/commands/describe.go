@@ -3,10 +3,7 @@ package commands
 import (
 	"fmt"
 
-	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
-
-	"github.com/chef/automate/components/applications-load-gen/pkg/generator"
 )
 
 func newDescribeCmd() *cobra.Command {
@@ -18,20 +15,13 @@ func newDescribeCmd() *cobra.Command {
 }
 
 func runDescribeCmd(cmd *cobra.Command, args []string) error {
-	if rootFlags.profileFile == "" && !rootFlags.useDefaultProfile {
-		return errors.New("no profile filename given")
+	if err := rootFlags.ValidateProfileOpts(); err != nil {
+		return err
 	}
 
-	fmt.Printf("Reading profile %q\n", rootFlags.profileFile)
+	fmt.Printf("Loading profile %q\n", rootFlags.SelectedProfile())
 
-	var profileCfg *generator.LoadProfileCfg
-	var err error
-
-	if rootFlags.useDefaultProfile {
-		profileCfg, err = generator.BuiltinConfig()
-	} else {
-		profileCfg, err = generator.ProfileFromFile(rootFlags.profileFile)
-	}
+	profileCfg, err := rootFlags.LoadProfileCfg()
 	if err != nil {
 		return err
 	}
