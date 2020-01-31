@@ -6,6 +6,12 @@ import { StoreModule } from '@ngrx/store';
 import { ProjectsFilterDropdownComponent } from './projects-filter-dropdown.component';
 import { ProjectsFilterService } from 'app/services/projects-filter/projects-filter.service';
 
+import { runtimeChecks } from 'app/ngrx.reducers';
+import {
+  projectsFilterInitialState,
+  projectsFilterReducer
+} from 'app/services/projects-filter/projects-filter.reducer';
+
 
 describe('ProjectsFilterDropdownComponent', () => {
   let component: ProjectsFilterDropdownComponent;
@@ -22,7 +28,12 @@ describe('ProjectsFilterDropdownComponent', () => {
       ],
       imports: [
         RouterTestingModule,
-        StoreModule.forRoot([])
+        StoreModule.forRoot({
+          projectsFilter: projectsFilterReducer
+        }, {
+          initialState: { projectsFilter: projectsFilterInitialState },
+          runtimeChecks
+        })
       ]
     })
     .compileComponents();
