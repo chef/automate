@@ -238,17 +238,15 @@ func (repo *ArtifactRepo) Restore(ctx context.Context, dstBucket Bucket, name st
 		o(&opts)
 	}
 
-	snapshotFilesReader, checksum, err := repo.openSnapshotFile(ctx, name)
+	artifactsToRestore, checksum, err := repo.openSnapshotFile(ctx, name)
 	if err != nil {
 		return err
 	}
+	defer artifactsToRestore.Close()
 
 	if opts.validateChecksum && checksum != opts.checksum {
 		return errors.New("Invalid checksum")
 	}
-
-	artifactsToRestore := LineReaderStream(snapshotFilesReader)
-	defer artifactsToRestore.Close()
 
 	uploader := NewBulkUploader(dstBucket, "")
 
@@ -266,12 +264,10 @@ func (repo *ArtifactRepo) Restore(ctx context.Context, dstBucket Bucket, name st
 }
 
 func (repo *ArtifactRepo) Remove(ctx context.Context, name string) error {
-	snapshotFilesReader, _, err := repo.openSnapshotFile(ctx, name)
+	snapshotFiles, _, err := repo.openSnapshotFile(ctx, name)
 	if err != nil {
 		return err
 	}
-
-	snapshotFiles := LineReaderStream(snapshotFilesReader)
 	defer snapshotFiles.Close()
 
 	// TODO[integrity]: We should really 2 phase commit this change. As it stands now, if
@@ -313,14 +309,14 @@ func (repo *ArtifactRepo) ListArtifacts(ctx context.Context, excludedSnapshots .
 			continue
 		}
 
-		reader, _, err := repo.openSnapshotFile(ctx, name)
+		snapshotStream, _, err := repo.openSnapshotFile(ctx, name)
 		if err != nil {
 			return ErrStream(err)
 		}
 		if lastMergedStream == nil {
-			lastMergedStream = LineReaderStream(reader)
+			lastMergedStream = snapshotStream
 		} else {
-			lastMergedStream, err = mergeIntoFile(lastMergedStream, LineReaderStream(reader))
+			lastMergedStream, err = mergeIntoFile(lastMergedStream, snapshotStream)
 			if err != nil {
 				return ErrStream(err)
 			}
@@ -362,7 +358,7 @@ func mergeIntoFile(stream1 ArtifactStream, stream2 ArtifactStream) (ArtifactStre
 	return LineReaderStream(tmpFile), nil
 }
 
-func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (io.ReadCloser, string, error) {
+func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (ArtifactStream, string, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
@@ -403,7 +399,7 @@ func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (io
 		return nil, "", err
 	}
 
-	return tmpFile, checksum, nil
+	return LineReaderStream(tmpFile), checksum, nil
 }
 
 func (repo *ArtifactRepo) removeSnapshotFile(ctx context.Context, name string) error {
