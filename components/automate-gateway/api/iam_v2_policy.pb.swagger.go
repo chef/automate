@@ -125,7 +125,7 @@ func init() {
       },
       "put": {
         "summary": "Update an existing policy",
-        "description": "Very similar to create except the ID cannot be changed.",
+        "description": "When updating a policy you must supply all of that policy's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values!\nThe only exception is the policy ID, which is immutable; it can only be set at creation time.\n\nYou can use this endpoint to modify Custom policies but not Chef-managed policies.\n\nWhile you can use this endpoint to update members on a policy, if that is the only\nproperty you wish to modify (on either Custom or Chef-managed policies),\nyou might find it more convenient to use these endpoints instead:\nAdd policy members\nRemove policy members\nReplace policy members",
         "operationId": "UpdatePolicy",
         "responses": {
           "200": {
@@ -184,7 +184,7 @@ func init() {
       },
       "put": {
         "summary": "Replace policy members",
-        "description": "Replace the entire member list for a specific policy with a new list.",
+        "description": "Replace the entire member list for a specific policy with a new list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.",
         "operationId": "ReplacePolicyMembers",
         "responses": {
           "200": {
@@ -218,7 +218,7 @@ func init() {
     "/iam/v2/policies/{id}/members:add": {
       "post": {
         "summary": "Add policy members",
-        "description": "Add specific members to the member list for a specific policy.",
+        "description": "Add specific members to the member list for a specific policy.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.",
         "operationId": "AddPolicyMembers",
         "responses": {
           "200": {
@@ -252,7 +252,7 @@ func init() {
     "/iam/v2/policies/{id}/members:remove": {
       "post": {
         "summary": "Remove policy members",
-        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not already part of the member list.",
+        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not already part of the member list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.\n\nThe removed members will still exist within Chef Automate, but are no longer associated with this policy.",
         "operationId": "RemovePolicyMembers",
         "responses": {
           "200": {
@@ -431,7 +431,7 @@ func init() {
     "/iam/v2/roles": {
       "get": {
         "summary": "List all roles",
-        "description": "List all roles.",
+        "description": "List all *Chef-managed* and *Custom* roles.",
         "operationId": "ListRoles",
         "responses": {
           "200": {
@@ -447,7 +447,7 @@ func init() {
       },
       "post": {
         "summary": "Create a new role",
-        "description": "Creates a new role to be used in the policies that control permissions in Automate.\n\nA role defines the scope of actions in a policy statement.",
+        "description": "Creates a new role to be used in the policies that control permissions in Automate.\n\nA role defines the scope of actions in a policy statement.\n\nThere are several default *Chef-managed* roles that are essential to the operation of Chef Automate\nand cannot be altered.\nRoles that you create are *Custom* roles, and you have full control about modifying or deleting them.",
         "operationId": "CreateRole",
         "responses": {
           "200": {
@@ -523,7 +523,7 @@ func init() {
       },
       "put": {
         "summary": "Update a role",
-        "description": "Update an existing role. Very similar to create except the ID cannot be changed.",
+        "description": "When updating a role supply all of a role's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values.\nThe only exception is the role ID, which is immutable; it can only be set at creation time.",
         "operationId": "UpdateRole",
         "responses": {
           "200": {
@@ -666,7 +666,7 @@ func init() {
       },
       "put": {
         "summary": "Update an existing policy",
-        "description": "Very similar to create except the ID cannot be changed.",
+        "description": "When updating a policy you must supply all of that policy's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values!\nThe only exception is the policy ID, which is immutable; it can only be set at creation time.\n\nYou can use this endpoint to modify Custom policies but not Chef-managed policies.\n\nWhile you can use this endpoint to update members on a policy, if that is the only\nproperty you wish to modify (on either Custom or Chef-managed policies),\nyou might find it more convenient to use these endpoints instead:\nAdd policy members\nRemove policy members\nReplace policy members",
         "operationId": "UpdatePolicy2",
         "responses": {
           "200": {
@@ -725,7 +725,7 @@ func init() {
       },
       "put": {
         "summary": "Replace policy members",
-        "description": "Replace the entire member list for a specific policy with a new list.",
+        "description": "Replace the entire member list for a specific policy with a new list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.",
         "operationId": "ReplacePolicyMembers2",
         "responses": {
           "200": {
@@ -759,7 +759,7 @@ func init() {
     "/iam/v2beta/policies/{id}/members:add": {
       "post": {
         "summary": "Add policy members",
-        "description": "Add specific members to the member list for a specific policy.",
+        "description": "Add specific members to the member list for a specific policy.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.",
         "operationId": "AddPolicyMembers2",
         "responses": {
           "200": {
@@ -793,7 +793,7 @@ func init() {
     "/iam/v2beta/policies/{id}/members:remove": {
       "post": {
         "summary": "Remove policy members",
-        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not already part of the member list.",
+        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not already part of the member list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.\n\nThe removed members will still exist within Chef Automate, but are no longer associated with this policy.",
         "operationId": "RemovePolicyMembers2",
         "responses": {
           "200": {
@@ -972,7 +972,7 @@ func init() {
     "/iam/v2beta/roles": {
       "get": {
         "summary": "List all roles",
-        "description": "List all roles.",
+        "description": "List all *Chef-managed* and *Custom* roles.",
         "operationId": "ListRoles2",
         "responses": {
           "200": {
@@ -988,7 +988,7 @@ func init() {
       },
       "post": {
         "summary": "Create a new role",
-        "description": "Creates a new role to be used in the policies that control permissions in Automate.\n\nA role defines the scope of actions in a policy statement.",
+        "description": "Creates a new role to be used in the policies that control permissions in Automate.\n\nA role defines the scope of actions in a policy statement.\n\nThere are several default *Chef-managed* roles that are essential to the operation of Chef Automate\nand cannot be altered.\nRoles that you create are *Custom* roles, and you have full control about modifying or deleting them.",
         "operationId": "CreateRole2",
         "responses": {
           "200": {
@@ -1064,7 +1064,7 @@ func init() {
       },
       "put": {
         "summary": "Update a role",
-        "description": "Update an existing role. Very similar to create except the ID cannot be changed.",
+        "description": "When updating a role supply all of a role's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values.\nThe only exception is the role ID, which is immutable; it can only be set at creation time.",
         "operationId": "UpdateRole2",
         "responses": {
           "200": {

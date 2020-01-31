@@ -198,7 +198,18 @@ type PoliciesClient interface {
 	//
 	//Update an existing policy
 	//
-	//Very similar to create except the ID cannot be changed.
+	//When updating a policy you must supply all of that policy's properties, not just the ones you wish to update.
+	//Properties that you do not include are reset to empty values!
+	//The only exception is the policy ID, which is immutable; it can only be set at creation time.
+	//
+	//You can use this endpoint to modify Custom policies but not Chef-managed policies.
+	//
+	//While you can use this endpoint to update members on a policy, if that is the only
+	//property you wish to modify (on either Custom or Chef-managed policies),
+	//you might find it more convenient to use these endpoints instead:
+	//Add policy members
+	//Remove policy members
+	//Replace policy members
 	UpdatePolicy(ctx context.Context, in *request.UpdatePolicyReq, opts ...grpc.CallOption) (*response.UpdatePolicyResp, error)
 	//
 	//Get IAM version
@@ -214,17 +225,28 @@ type PoliciesClient interface {
 	//Replace policy members
 	//
 	//Replace the entire member list for a specific policy with a new list.
+	//
+	//Ensure each element of the members array is in the correct
+	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
 	ReplacePolicyMembers(ctx context.Context, in *request.ReplacePolicyMembersReq, opts ...grpc.CallOption) (*response.ReplacePolicyMembersResp, error)
 	//
 	//Remove policy members
 	//
 	//Remove specific members from the member list for a specific policy. Silently ignores
 	//members that are not already part of the member list.
+	//
+	//Ensure each element of the members array is in the correct
+	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
+	//
+	//The removed members will still exist within Chef Automate, but are no longer associated with this policy.
 	RemovePolicyMembers(ctx context.Context, in *request.RemovePolicyMembersReq, opts ...grpc.CallOption) (*response.RemovePolicyMembersResp, error)
 	//
 	//Add policy members
 	//
 	//Add specific members to the member list for a specific policy.
+	//
+	//Ensure each element of the members array is in the correct
+	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
 	AddPolicyMembers(ctx context.Context, in *request.AddPolicyMembersReq, opts ...grpc.CallOption) (*response.AddPolicyMembersResp, error)
 	//
 	//Create a new role
@@ -232,11 +254,15 @@ type PoliciesClient interface {
 	//Creates a new role to be used in the policies that control permissions in Automate.
 	//
 	//A role defines the scope of actions in a policy statement.
+	//
+	//There are several default *Chef-managed* roles that are essential to the operation of Chef Automate
+	//and cannot be altered.
+	//Roles that you create are *Custom* roles, and you have full control about modifying or deleting them.
 	CreateRole(ctx context.Context, in *request.CreateRoleReq, opts ...grpc.CallOption) (*response.CreateRoleResp, error)
 	//
 	//List all roles
 	//
-	//List all roles.
+	//List all *Chef-managed* and *Custom* roles.
 	ListRoles(ctx context.Context, in *request.ListRolesReq, opts ...grpc.CallOption) (*response.ListRolesResp, error)
 	//
 	//Get a role
@@ -254,7 +280,9 @@ type PoliciesClient interface {
 	//
 	//Update a role
 	//
-	//Update an existing role. Very similar to create except the ID cannot be changed.
+	//When updating a role supply all of a role's properties, not just the ones you wish to update.
+	//Properties that you do not include are reset to empty values.
+	//The only exception is the role ID, which is immutable; it can only be set at creation time.
 	UpdateRole(ctx context.Context, in *request.UpdateRoleReq, opts ...grpc.CallOption) (*response.UpdateRoleResp, error)
 	//
 	//Create a project
@@ -565,7 +593,18 @@ type PoliciesServer interface {
 	//
 	//Update an existing policy
 	//
-	//Very similar to create except the ID cannot be changed.
+	//When updating a policy you must supply all of that policy's properties, not just the ones you wish to update.
+	//Properties that you do not include are reset to empty values!
+	//The only exception is the policy ID, which is immutable; it can only be set at creation time.
+	//
+	//You can use this endpoint to modify Custom policies but not Chef-managed policies.
+	//
+	//While you can use this endpoint to update members on a policy, if that is the only
+	//property you wish to modify (on either Custom or Chef-managed policies),
+	//you might find it more convenient to use these endpoints instead:
+	//Add policy members
+	//Remove policy members
+	//Replace policy members
 	UpdatePolicy(context.Context, *request.UpdatePolicyReq) (*response.UpdatePolicyResp, error)
 	//
 	//Get IAM version
@@ -581,17 +620,28 @@ type PoliciesServer interface {
 	//Replace policy members
 	//
 	//Replace the entire member list for a specific policy with a new list.
+	//
+	//Ensure each element of the members array is in the correct
+	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
 	ReplacePolicyMembers(context.Context, *request.ReplacePolicyMembersReq) (*response.ReplacePolicyMembersResp, error)
 	//
 	//Remove policy members
 	//
 	//Remove specific members from the member list for a specific policy. Silently ignores
 	//members that are not already part of the member list.
+	//
+	//Ensure each element of the members array is in the correct
+	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
+	//
+	//The removed members will still exist within Chef Automate, but are no longer associated with this policy.
 	RemovePolicyMembers(context.Context, *request.RemovePolicyMembersReq) (*response.RemovePolicyMembersResp, error)
 	//
 	//Add policy members
 	//
 	//Add specific members to the member list for a specific policy.
+	//
+	//Ensure each element of the members array is in the correct
+	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
 	AddPolicyMembers(context.Context, *request.AddPolicyMembersReq) (*response.AddPolicyMembersResp, error)
 	//
 	//Create a new role
@@ -599,11 +649,15 @@ type PoliciesServer interface {
 	//Creates a new role to be used in the policies that control permissions in Automate.
 	//
 	//A role defines the scope of actions in a policy statement.
+	//
+	//There are several default *Chef-managed* roles that are essential to the operation of Chef Automate
+	//and cannot be altered.
+	//Roles that you create are *Custom* roles, and you have full control about modifying or deleting them.
 	CreateRole(context.Context, *request.CreateRoleReq) (*response.CreateRoleResp, error)
 	//
 	//List all roles
 	//
-	//List all roles.
+	//List all *Chef-managed* and *Custom* roles.
 	ListRoles(context.Context, *request.ListRolesReq) (*response.ListRolesResp, error)
 	//
 	//Get a role
@@ -621,7 +675,9 @@ type PoliciesServer interface {
 	//
 	//Update a role
 	//
-	//Update an existing role. Very similar to create except the ID cannot be changed.
+	//When updating a role supply all of a role's properties, not just the ones you wish to update.
+	//Properties that you do not include are reset to empty values.
+	//The only exception is the role ID, which is immutable; it can only be set at creation time.
 	UpdateRole(context.Context, *request.UpdateRoleReq) (*response.UpdateRoleResp, error)
 	//
 	//Create a project
