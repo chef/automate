@@ -31,6 +31,8 @@ func runDescribeCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	supGroups.ReScaleTo(rootFlags.svcCount)
+
 	fmt.Print(supGroups.RollupStats())
 
 	for _, supGroup := range supGroups {

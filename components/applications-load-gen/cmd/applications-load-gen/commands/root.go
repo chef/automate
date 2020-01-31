@@ -13,6 +13,7 @@ type LoadGenCommonOpts struct {
 	profileFile           string
 	useDefaultProfile     bool
 	useBuiltinFullProfile bool
+	svcCount              int32
 }
 
 func (l LoadGenCommonOpts) LoadProfileCfg() (*generator.LoadProfileCfg, error) {
@@ -109,6 +110,14 @@ func init() {
 		"use-builtin-full-profile",
 		false,
 		"use more complex builtin load profile",
+	)
+
+	RootCmd.PersistentFlags().Int32VarP(
+		&rootFlags.svcCount,
+		"svc-count",
+		"c",
+		0,
+		"scale the traffic profile to (approximately) the given number of services",
 	)
 
 	RootCmd.AddCommand(newDescribeCmd())

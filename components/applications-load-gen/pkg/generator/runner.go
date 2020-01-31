@@ -61,6 +61,18 @@ func (r *LoadGenRunner) Run(cfg *RunnerConfig) {
 
 type SupervisorGroupCollection []*SupervisorGroup
 
+func (s SupervisorGroupCollection) ReScaleTo(svcCount int32) {
+	if svcCount == 0 {
+		return
+	}
+
+	currentTotal := s.TotalSvcs()
+	scaleFactor := svcCount / currentTotal
+	for _, supGroup := range s {
+		supGroup.Count = supGroup.Count * scaleFactor
+	}
+}
+
 func (s SupervisorGroupCollection) RollupStats() string {
 	var b strings.Builder
 

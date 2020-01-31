@@ -80,6 +80,7 @@ func runRunCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	runner.SupervisorGroups.ReScaleTo(rootFlags.svcCount)
 	runner.Run(runnerCfg)
 	runtime.Goexit() // waits for all the other threads
 	return nil
