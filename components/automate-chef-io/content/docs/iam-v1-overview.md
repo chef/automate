@@ -29,7 +29,7 @@ on a **resource**.
 Without a policy, a user cannot perform the desired action upon the resource.
 
 For example, the following policy permits both the user with
-the email `user@example.com` and members of the LDAP team `ops`
+the email user&#64;example.com and members of the LDAP team `ops`
 to `read` the profiles collected under the `compliance` namespace:
 
 ```bash
