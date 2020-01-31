@@ -46,6 +46,7 @@ func NewConfigRequest() *ConfigRequest {
 }
 
 // DefaultConfigRequest returns a new instance of ConfigRequest with default values.
+// nolint: gomnd
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 	sys := c.V1.Sys
@@ -130,16 +131,21 @@ func (c *ConfigRequest) PrepareSystemConfig(creds *ac.TLSCredentials) (ac.Prepar
 	return c.V1.Sys, nil
 }
 
+// SetGlobalConfig injects global confiugration overrides
 func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
+	// Handle external configuration
 	if g.GetV1().GetExternal().GetElasticsearch().GetEnable().GetValue() {
+		// Disable deploying automate-elasticsearch when we're using external es
 		c.V1.Sys.Disable = w.Bool(true)
+
 		return
 	}
 
 	if b := g.GetV1().GetBackups(); b != nil {
 		if b.GetFilesystem() != nil {
-			// We need to do this so the integration tests for es-sidecar-service
-			// work
+			// If backups are configured to use a filesystem location make sure
+			// that the path is specified in the repo, otherwise Elasticsearch
+			// will not be able to access the directory.
 			c.V1.Sys.Path.Repo = b.GetFilesystem().GetPath()
 
 			if !c.GetV1().GetSys().GetNode().GetData().GetValue() {
@@ -150,7 +156,7 @@ func (c *ConfigRequest) SetGlobalConfig(g *ac.GlobalConfig) {
 		}
 
 		if s3 := b.GetS3(); s3 != nil {
-			client := c.V1.Sys.S3.Client
+			client := c.GetV1().GetSys().GetS3().GetClient()
 			if es := s3.GetEs(); es != nil {
 				if rt := es.GetReadTimeout(); rt != nil {
 					client.ReadTimeout = rt

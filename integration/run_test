@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-
 set -Eeo pipefail
 
 CI=${CI:-false}
@@ -76,9 +75,14 @@ if [[ "$CI" = "true" ]]; then
     echo "uptime"
     uptime
     echo "======================================="
+else
+    # In CI we expect the images to have already pulled the latest docker
+    # layers, but we can't rely on that for local machines. Here we'll make sure
+    # we start containers with the latest images.
+    docker pull chefes/centos-systemd:latest
+    docker pull chefes/a2-integration:latest
 fi
 
-docker pull chefes/centos-systemd:latest
 workdir="/go/src/github.com/chef/automate"
 
 docker_run_args=(
@@ -191,11 +195,11 @@ echo "${docker_run_args[*]}"
 docker run "${docker_run_args[@]}" chefes/a2-integration:latest
 
 if [ $CI != "true" ]; then
-    secret_origin_key=$(hab origin key export --type secret $HAB_ORIGIN)
-    docker exec -e SEC_KEY="$secret_origin_key" "$test_container_name" bash -c 'echo "$SEC_KEY" | hab origin key import'
+    secret_origin_key=$(HAB_LICENSE=accept-no-persist hab origin key export --type secret "$HAB_ORIGIN")
+    docker exec -e SEC_KEY="$secret_origin_key" -e HAB_LICENSE="accept-no-persist" "$test_container_name" bash -c 'echo "$SEC_KEY" | hab origin key import'
 
-    public_origin_key=$(hab origin key export --type public $HAB_ORIGIN)
-    docker exec -e SEC_KEY="$public_origin_key" "$test_container_name" bash -c 'echo "$SEC_KEY" | hab origin key import'
+    public_origin_key=$(HAB_LICENSE=accept-no-persist hab origin key export --type public "$HAB_ORIGIN")
+    docker exec -e SEC_KEY="$public_origin_key" -e HAB_LICENSE="accept-no-persist" "$test_container_name" bash -c 'echo "$SEC_KEY" | hab origin key import'
 fi
 
 echo "Running the docker. Will timeout after $TIMEOUT mins"
