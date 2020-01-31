@@ -11,7 +11,7 @@ toc = true
 +++
 
 ## Overview
-API tokens grant authorized access to the Chef Automate API.
+API Tokens are used to access the Chef Automate API. They are the only way to authenticate against the Chef Automate API. Tokens can be added as members of policies in order to grant them permissions.
 
 Permission on the `iam:tokens` resource is required to interact with tokens. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 

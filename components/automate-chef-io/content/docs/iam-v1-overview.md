@@ -94,7 +94,7 @@ The `subjects` field of a policy contains an array of individual subjects. A sub
 
 A wildcard can replace any term of the subject; however, no terms can follow the wildcard.
 
-Each user or team must specify its _provider_.
+Each user or team must specify its _provider_: _local_, _ldap_, or _saml_.
 
 IAM v1 supports LDAP, SAML,
 and local users or teams. 
