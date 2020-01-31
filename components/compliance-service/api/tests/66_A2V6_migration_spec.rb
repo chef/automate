@@ -281,4 +281,63 @@ describe File.basename(__FILE__) do
     assert_equal('failed', res['profiles'][1]['status'])
     assert_equal('', res['profiles'][1]['skip_message'])
   end
+
+  it "control list itemsfor 2018-02-09 with a size of 3" do
+    actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
+        filters: [
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-02-09T00:00:00Z']),
+            Reporting::ListFilter.new(type: 'end_time', values: ['2018-02-09T23:59:59Z'])
+        ],
+        size: 3
+    )
+
+    expected_data =
+    { "controlItems"=>
+      [{"id"=>"apache-01",
+        "title"=>"Apache should be running",
+        "profile"=>
+         {"title"=>"DevSec Apache Baseline",
+          "id"=>"41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
+          "version"=>"2.0.0"},
+        "impact"=>1,
+        "endTime"=>"2018-02-09T09:18:41Z",
+        "controlSummary"=>
+         {"total"=>1,
+          "passed"=>{},
+          "skipped"=>{"total"=>1},
+          "failed"=>{},
+          "waived"=>{}}},
+       {"id"=>"apache-02",
+        "title"=>"Apache should be enabled",
+        "profile"=>
+         {"title"=>"DevSec Apache Baseline",
+          "id"=>"41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
+          "version"=>"2.0.0"},
+        "impact"=>1,
+        "endTime"=>"2018-02-09T09:18:41Z",
+        "controlSummary"=>
+         {"total"=>1,
+          "passed"=>{},
+          "skipped"=>{"total"=>1},
+          "failed"=>{},
+          "waived"=>{}}},
+       {"id"=>"apache-03",
+        "title"=>"Apache should start max. 1 root-task different",
+        "profile"=>
+         {"title"=>"DevSec Apache Baseline",
+          "id"=>"41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
+          "version"=>"2.0.0"},
+        "impact"=>0.5,
+        "endTime"=>"2018-02-09T09:18:41Z",
+        "controlSummary"=>
+         {"total"=>1,
+          "passed"=>{"total"=>1},
+          "skipped"=>{},
+          "failed"=>{},
+          "waived"=>{}}}]
+    }
+    control_item_array = actual_data['control_items']
+    assert_equal_json_content(expected_data, actual_data)
+    assert_equal(3, control_item_array.size)
+  end
 end
