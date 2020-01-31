@@ -10,7 +10,6 @@ ifdef CI
   verbose?="-v"
 endif
 
-
 all: lint build test
 
 static: lint ${MIGRATION_READMES}
@@ -19,10 +18,6 @@ unit: build test
 .PHONY: ${MIGRATION_READMES}
 ${MIGRATION_READMES}:
 	../../scripts/generate_and_check_migration_files.sh $@
-
-# Regenerate all *.pb.go files
-proto:
-	cd ../../ && hab studio run 'source .studiorc; compile_go_protobuf_component infra-proxy-service'
 
 build:
 	mkdir -p bin/

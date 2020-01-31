@@ -15,6 +15,7 @@ pkg_deps=(
 )
 pkg_exports=(
   [port]=service.port # default service is grpc
+  [host]=service.host
 )
 pkg_exposes=(
   port
