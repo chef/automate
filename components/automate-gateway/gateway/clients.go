@@ -100,7 +100,6 @@ type ClientsFactory interface {
 	AuthorizationV2Client() (iam_v2.AuthorizationClient, error)
 	PoliciesClient() (iam_v2.PoliciesClient, error)
 	ProjectsClient() (iam_v2.ProjectsClient, error)
-	TeamsV1Client() (teams_v1.TeamsV1Client, error)
 	TeamsV2Client() (teams_v2.TeamsV2Client, error)
 	TokensMgmtClient() (authn.TokensMgmtClient, error)
 	UsersMgmtClient() (local_user.UsersMgmtClient, error)

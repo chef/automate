@@ -32,7 +32,6 @@ import (
 	cfgmgmt_request "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
-	pb_teams "github.com/chef/automate/components/automate-gateway/api/auth/teams"
 	pb_tokens "github.com/chef/automate/components/automate-gateway/api/auth/tokens"
 	pb_users "github.com/chef/automate/components/automate-gateway/api/auth/users"
 	pb_authz "github.com/chef/automate/components/automate-gateway/api/authz"
@@ -212,12 +211,6 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	// IAM v2 uses the same client
 	pb_iam_v2.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
 
-	teamsV1Client, err := clients.TeamsV1Client()
-	if err != nil {
-		return errors.Wrap(err, "create V1 client for teams service")
-	}
-	pb_teams.RegisterTeamsServer(grpcServer, handler.NewTeamsServer(teamsV1Client))
-
 	teamsV2Client, err := clients.TeamsV2Client()
 	if err != nil {
 		return errors.Wrap(err, "create V2 client for teams service")
@@ -365,7 +358,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"cc_jobs":              pb_cc_jobs.RegisterJobsServiceHandlerFromEndpoint,
 		"nodes":                pb_nodes.RegisterNodesServiceHandlerFromEndpoint,
 		"profiles":             pb_profiles.RegisterProfilesServiceHandlerFromEndpoint,
-		"teams-service":        pb_teams.RegisterTeamsHandlerFromEndpoint,
+		"teams-service":        pb_iam_v2.RegisterTeamsHandlerFromEndpoint,
 		"node manager":         pb_nodes_manager.RegisterNodeManagerServiceHandlerFromEndpoint,
 		"telemetry":            pb_telemetry.RegisterTelemetryHandlerFromEndpoint,
 		"data-feed":            pb_data_feed.RegisterDatafeedServiceHandlerFromEndpoint,
