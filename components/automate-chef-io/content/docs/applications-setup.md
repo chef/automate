@@ -214,7 +214,7 @@ Applying deployment configuration
   Started event-gateway
 ```
 
-### OAuth on Existing Installations
+### Authenticating Existing Chef Automate and Builder Installations
 
 To configure Chef Automate as an OAuth Provider for Habitat Builder, create a TOML file
 that contains the partial configuration below.
