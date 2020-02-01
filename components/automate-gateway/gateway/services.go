@@ -901,7 +901,7 @@ func (s *Server) authRequest(r *http.Request,
 
 	projects := auth_context.ProjectsFromMetadata(md)
 
-	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resourceV1, actionV1, resourceV2, actionV2, projects)
+	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resourceV2, actionV2, projects)
 	if err != nil {
 		return nil, errors.Wrap(err, "authz-service error")
 	}
