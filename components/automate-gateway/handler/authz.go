@@ -301,9 +301,7 @@ func (a *AuthzServer) getAllowedMap(
 	// Fetches the id of the current user PLUS the team ids for that user
 	subjects := auth_context.FromContext(ctx).Subjects
 
-	resp, err := a.filterHandler.FilterAuthorizedPairs(ctx, subjects,
-		mapByResourceAndActionV1, mapByResourceAndActionV2,
-		methodsInfoV1, methodsInfoV2)
+	resp, err := a.filterHandler.FilterAuthorizedPairs(ctx, subjects, mapByResourceAndActionV2, methodsInfoV2)
 	if err != nil {
 		log.WithError(err).Debug("Error on client.FilterAuthorizedPairs")
 		return nil, err

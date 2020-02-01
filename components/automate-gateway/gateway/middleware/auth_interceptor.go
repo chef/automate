@@ -41,13 +41,13 @@ type SwitchingAuthorizationHandler interface {
 	GRPCAuthorizationHandler
 	SwitchingFilterHandler
 	IsAuthorized(ctx context.Context, subjects []string,
-		resourceV1, actionV1, resourceV2, actionV2 string, projects []string) (AnnotatedAuthorizationResponse, error)
+		resourceV2, actionV2 string, projects []string) (AnnotatedAuthorizationResponse, error)
 }
 
 type SwitchingFilterHandler interface {
 	FilterAuthorizedPairs(ctx context.Context, subjects []string,
-		mapByResourceAndActionV1, mapByResourceAndActionV2 map[pairs.Pair][]string,
-		methodsInfoV1, methodsInfoV2 map[string]pairs.Info,
+		mapByResourceAndActionV2 map[pairs.Pair][]string,
+		methodsInfoV2 map[string]pairs.Info,
 	) (*FilterPairsResponse, error)
 }
 
