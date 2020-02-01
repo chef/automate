@@ -15,7 +15,6 @@ import (
 	"github.com/chef/automate/components/automate-gateway/api/authz/request"
 	"github.com/chef/automate/components/automate-gateway/api/authz/response"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
-	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv1"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
 	"github.com/chef/automate/components/automate-gateway/handler"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
@@ -334,7 +333,5 @@ func testServerAndHandler(t *testing.T) (
 		s,
 		handler.NewAuthzServer(
 			v1Client,
-			authorizer.NewAuthorizer(
-				authv1.AuthorizationHandler(v1Client),
-				authv2.AuthorizationHandler(v2Client)))
+			authorizer.NewAuthorizer(authv2.AuthorizationHandler(v2Client)))
 }
