@@ -1,5 +1,9 @@
 +++
 title = "Users"
+aliases = [
+    "/docs/users-and-teams/",
+    "/docs/admin/"
+]
 description = "Manage Chef Automate Users."
 date = 2018-05-16T16:03:13-07:00
 draft = false

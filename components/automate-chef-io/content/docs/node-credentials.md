@@ -1,5 +1,8 @@
 +++
 title = "Node Credentials"
+aliases = [
+    "/docs/credentials/"
+]
 description = "SSH, WinRM, and sudo credentials to remotely access nodes."
 date = 2018-05-22T17:23:24-07:00
 weight = 20

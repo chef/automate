@@ -1,5 +1,9 @@
 +++
 title = "Node Integrations"
+aliases = [
+    "/docs/integrations/",
+    "/docs/integrations-ui/"
+]
 description = "Connect Chef Automate to cloud services."
 date = 2018-05-22T18:01:36-07:00
 weight = 20

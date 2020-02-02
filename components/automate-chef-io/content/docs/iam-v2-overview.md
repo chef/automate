@@ -1,5 +1,8 @@
 +++
 title = "IAM v2 Overview"
+aliases = [
+    "/docs/authorization/"
+]
 description = "IAM v2 Overview"
 draft = false
 bref = ""

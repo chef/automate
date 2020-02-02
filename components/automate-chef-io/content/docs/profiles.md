@@ -1,5 +1,8 @@
 +++
 title = "Profiles"
+aliases = [
+    "/docs/asset-store/"
+]
 description = "Select and Install Compliance Profiles"
 date = 2018-03-26T16:02:53-07:00
 draft = false
