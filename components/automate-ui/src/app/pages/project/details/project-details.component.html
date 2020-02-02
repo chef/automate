@@ -57,7 +57,7 @@
         <ng-container *ngIf="showRulesTable()">
           <chef-toolbar>
             <app-authorized [allOf]="['/iam/v2/projects', 'post']">
-              <chef-button [routerLink]="['/settings', 'projects', project?.id, 'rules']" id="create-button" primary>Create Rule</chef-button>
+              <chef-button [routerLink]="['/settings', 'projects', project?.id, 'rules']" primary>Create Rule</chef-button>
             </app-authorized>
             <small *ngIf="project?.status === 'EDITS_PENDING'">Edits are pending: update <a [routerLink]="['/settings/projects']">projects</a> to apply edits.</small>
           </chef-toolbar>
