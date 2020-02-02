@@ -23,7 +23,7 @@ Permission on the `iam:users` action is required to interact with users other th
 
 ### Creating Local Users
 
-Navigate to _Users_ in the **Settings** tab. Then use the **Create User** button, which opens a helper window for entering the user's _display name_, a unique _username_, and _password_.
+Navigate to _Users_ in the **Settings** tab. Then use the **Create User** button, which opens a helper window for entering the user's _display name_, and _password_. We automatically generate a username for you, if you would like to change it use the **Edit Username** button.
 
 ![Add Local User](/images/docs/admin-tab-users-list.png)
 

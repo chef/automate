@@ -19,7 +19,7 @@ Permission on the `iam:teams` action is required to interact with teams. Any use
 ## Managing Local Teams
 
 ### Creating Local Teams
-Navigate to _Teams_ in the **Settings** tab. Then use the **Create Team** button, which opens a helper window for entering the team's _Name_, a unique _ID_, and optionally assign the team to some _Projects_.
+Navigate to _Teams_ in the **Settings** tab. Then use the **Create Team** button, which opens a helper window for entering the team's _Name_ and optionally assigning the team to some _Projects_. We automatically generate a team ID for you, if you would like to change it use the **Edit ID** button.
 
 ![Create Local Team](/images/docs/admin-tab-teams-list.png)
 
