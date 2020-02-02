@@ -35,13 +35,13 @@ Navigate to _Users_ in the **Settings** tab. Then open the menu at the end of th
 
 Navigate to _Users_ in the **Settings** tab and locate the user who needs a password reset. Navigate to their user page, and then the **Reset Password** tab. Provide a new password and confirm the new password, then select the **Reset Password** button.
 
-All local users can also reset their own passwords.
+All local users can also reset their own passwords from the _Profile_ menu.
 
 ### Changing Display Names
 
-Navigate to _Users_ in the **Settings** tab and locate the user who needs their display name changed. Navigate to their user page, provide a new display name and select the **Save** button.
+Navigate to _Users_ in the **Settings** tab and locate the user who needs their display name changed. Navigate to their user page, provide a new display name, and select the **Save** button.
 
-All local users can also change their own display names.
+All local users can also change their own display names from the _Profile_ menu.
 
 ## User Self-Maintenance
 

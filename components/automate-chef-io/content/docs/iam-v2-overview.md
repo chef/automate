@@ -32,7 +32,7 @@ The following diagram shows the policy structure. We will detail the specifics i
 
 ## Policy Definition
 
-IAM v2 uses multi-statement policies, which support complex permissions in a single policy, and results in fewer policies required to secure your system.
+IAM v2 uses multi-statement policies that support complex permissions in a single policy.
 Each statement specifies a single permission.
 The net effect (ALLOW or DENY) of a policy is determined by evaluating the effect of each statement and combining them. If there is at least one statement allowing access, and none denying it, then the policy allows access. Otherwise, access is denied.
 
@@ -79,7 +79,7 @@ Roles are discussed in detail in [Role-Based Access Control]({{< relref "iam-v2-
 
 ## Members and Policies
 
-A **member**, may be a user, a team, or an API token.
+A **member** may be a user, a team, or an API token.
 Users and teams may be *local*, meaning they are defined within Chef Automate, or managed by an external identity provider, specifically LDAP or SAML.
 
 IAM v2 policy *membership* is separate and distinct from policy *definition*.
@@ -162,7 +162,7 @@ Once you define your set of projects with their contained ingest rules and condi
 Teams and API tokens may be assigned to projects directly in the UI. Policies and roles can only be assigned through the command line.
 These resources created within Automate do not make use of, nor do they require, any project ingest rules.
 
-Only some resources in Chef Automate respect projects. Only resources that respect projects will be filtered when using the project filter. Resources that do not respect projects will always be displayed and will ignore any applied project filters.
+Only some resources in Chef Automate respect projects and only those will be filtered when using the project filter. Resources that do not respect projects will always be displayed and will ignore any applied project filters.
 
 #### Resources that respect projects
 
