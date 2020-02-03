@@ -11,8 +11,11 @@ import (
 	"os"
 	"strings"
 
+	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
+	"github.com/sirupsen/logrus"
+	"go.uber.org/multierr"
 )
 
 var ErrSnapshotExists error = errors.New("Snapshot already exists")
@@ -38,6 +41,12 @@ type ArtifactRepoSnapshotMetadata struct {
 	Checksum string
 }
 
+// uploadSnapshotArtifactIterator is used to sync files from one bucket to another.
+// It is provided a list of artifacts that are in the dst bucket, along with a list
+// of artifacts that are required from the src bucket. Only the missing artifacts
+// will be uploaded.
+// It is also capable of writing out the snapshot file once the artifacts have been
+// synced
 type uploadSnapshotArtifactIterator struct {
 	ctx                      context.Context
 	artifactsToUpload        ArtifactStream
@@ -45,6 +54,16 @@ type uploadSnapshotArtifactIterator struct {
 	artifactsToUploadTmpFile *os.File
 	numArtifactsToUpload     int64
 	src                      Bucket
+}
+
+func logClose(c io.Closer, msg string) {
+	fileutils.LogClose(c, logrus.StandardLogger(), msg)
+}
+
+func logErr(err error, msg string) {
+	if err != nil {
+		logrus.WithError(err).Error(msg)
+	}
 }
 
 func newUploadSnapshotArtifactIterator(ctx context.Context, src Bucket,
@@ -55,37 +74,41 @@ func newUploadSnapshotArtifactIterator(ctx context.Context, src Bucket,
 		return nil, err
 	}
 	if err := os.Remove(artifactsToUploadTmpFile.Name()); err != nil {
-		artifactsToUploadTmpFile.Close()
+		logClose(artifactsToUploadTmpFile, "failed to close temporary file")
 		return nil, err
 	}
 
 	snapshotTmpFile, err := ioutil.TempFile("", "snapshot-new")
 	if err != nil {
-		artifactsToUploadTmpFile.Close()
+		logClose(artifactsToUploadTmpFile, "failed to close temporary file")
 		return nil, err
 	}
 
 	// We're going to write out the required artifacts and artifacts to upload to temp files.
 	// We need to do this because we want to get the number of artifacts to upload to report
-	// progres
+	// progress
 	artifactsToUploadCounter := NewCountingStream(
 		Sub(NewLoggingStream(requiredArtifacts, snapshotTmpFile), artifactsInRepo))
-	artifactsToUploadWriter := NewLoggingStream(artifactsToUploadCounter, artifactsToUploadTmpFile)
-	defer artifactsToUploadWriter.Close()
+	defer logClose(artifactsToUploadCounter, "failed to close counting stream")
+
+	artifactsToUploadWriter := NewLoggingStream(
+		artifactsToUploadCounter,
+		artifactsToUploadTmpFile)
+	defer logClose(artifactsToUploadWriter, "failed to close logging stream")
 
 	if err := ConsumeStream(artifactsToUploadWriter); err != nil {
-		artifactsToUploadTmpFile.Close()
-		snapshotTmpFile.Close()
+		logClose(artifactsToUploadTmpFile, "failed to close temporary file")
+		logClose(snapshotTmpFile, "failed to close temporary file")
 		return nil, err
 	}
 	if err := artifactsToUploadWriter.Close(); err != nil {
-		artifactsToUploadTmpFile.Close()
-		snapshotTmpFile.Close()
+		logClose(artifactsToUploadTmpFile, "failed to close temporary file")
+		logClose(snapshotTmpFile, "failed to close temporary file")
 		return nil, err
 	}
 	if _, err := artifactsToUploadTmpFile.Seek(0, os.SEEK_SET); err != nil {
-		artifactsToUploadTmpFile.Close()
-		snapshotTmpFile.Close()
+		logClose(artifactsToUploadTmpFile, "failed to close temporary file")
+		logClose(snapshotTmpFile, "failed to close temporary file")
 		return nil, err
 	}
 
@@ -141,10 +164,10 @@ func (b *uploadSnapshotArtifactIterator) WriteSnapshotFile(w io.Writer) (string,
 }
 
 func (b *uploadSnapshotArtifactIterator) Close() error {
-	b.snapshotTmpFile.Close()
-	b.artifactsToUpload.Close()
-	os.Remove(b.snapshotTmpFile.Name())
-	return nil
+	err1 := errors.Wrap(b.snapshotTmpFile.Close(), "failed to close temporary file")
+	err2 := errors.Wrap(b.artifactsToUpload.Close(), "failed to close artifact stream")
+	err3 := errors.Wrap(os.Remove(b.snapshotTmpFile.Name()), "failed to close temporary file")
+	return multierr.Combine(err1, err2, err3)
 }
 
 type artifactSnapshotOptions struct {
@@ -172,12 +195,12 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string, srcBucket B
 			return ArtifactRepoSnapshotMetadata{}, err
 		}
 	} else {
-		r.Close()
+		logClose(r, "failed to close snapshot file reader")
 		return ArtifactRepoSnapshotMetadata{}, ErrSnapshotExists
 	}
 
 	artifactsInRepo := repo.ListArtifacts(ctx)
-	defer artifactsInRepo.Close()
+	defer logClose(artifactsInRepo, "failed to close artifact list stream")
 
 	uploadIterator, err := newUploadSnapshotArtifactIterator(ctx, srcBucket, requiredArtifacts, artifactsInRepo)
 	if err != nil {
@@ -244,9 +267,10 @@ func (repo *ArtifactRepo) Restore(ctx context.Context, dstBucket Bucket, name st
 	if err != nil {
 		return err
 	}
-	defer artifactsToRestore.Close()
+	defer logClose(artifactsToRestore, "failed to close snapshot file reader")
 
 	if opts.validateChecksum && checksum != opts.checksum {
+		// TODO(jaym): We probably need a specific error type for this
 		return errors.New("Invalid checksum")
 	}
 
@@ -270,7 +294,7 @@ func (repo *ArtifactRepo) Remove(ctx context.Context, name string) error {
 	if err != nil {
 		return err
 	}
-	defer snapshotFiles.Close()
+	defer logClose(snapshotFiles, "failed to close snapshot stream")
 
 	// TODO[integrity]: We should really 2 phase commit this change. As it stands now, if
 	// we remove this file and then fail to remove the artifacts, they will be
@@ -281,12 +305,12 @@ func (repo *ArtifactRepo) Remove(ctx context.Context, name string) error {
 
 	// Get the artifacts in all the snapshots excluding the one we're trying to delete
 	remainingSnapshotsFiles := repo.ListArtifacts(ctx, name)
-	defer remainingSnapshotsFiles.Close()
+	defer logClose(remainingSnapshotsFiles, "failed to close artifact list stream")
 
 	// Remove artifacts from the snapshot we're trying to exist which exist in other
 	// snapshots
 	filesToDelete := Sub(snapshotFiles, remainingSnapshotsFiles)
-	defer filesToDelete.Close()
+	defer logClose(filesToDelete, "failed to close fileToDelete stream")
 
 	bulkDeleter := NewBulkDeleter(repo.artifactsRoot, "")
 	return bulkDeleter.Delete(ctx, filesToDelete)
@@ -331,29 +355,31 @@ func (repo *ArtifactRepo) ListArtifacts(ctx context.Context, excludedSnapshots .
 	return lastMergedStream
 }
 
-// Merge just creates an iterator; create function that merges into a file
-func mergeIntoFile(stream1 ArtifactStream, stream2 ArtifactStream) (ArtifactStream, error) {
-	defer stream1.Close()
-	defer stream2.Close()
+// mergeIntoFile takes 2 streams and merges them into 1. This function is not
+// lazy and merges them into a file, and then returns a Stream that reads
+// from the beginning of that file
+func mergeIntoFile(a ArtifactStream, b ArtifactStream) (ArtifactStream, error) {
+	defer logClose(a, "failed to close stream")
+	defer logClose(b, "failed to close stream")
 
 	tmpFile, err := ioutil.TempFile("", "lastMerged")
 	if err != nil {
 		return nil, err
 	}
-	defer os.Remove(tmpFile.Name())
+	defer logErr(os.Remove(tmpFile.Name()), "failed to remove temp file")
 
-	s := NewLoggingStream(Merge(stream1, stream2), tmpFile)
-	defer s.Close()
+	s := NewLoggingStream(Merge(a, b), tmpFile)
+	defer logClose(s, "failed to close logging stream")
 
 	// Consume the stream to get it written to the tmpfile
 	if err := ConsumeStream(s); err != nil {
-		tmpFile.Close()
+		logClose(tmpFile, "failed to close temp file")
 		return nil, err
 	}
 
 	// seek to the beginning of the file
 	if _, err := tmpFile.Seek(0, os.SEEK_SET); err != nil {
-		tmpFile.Close()
+		logClose(tmpFile, "failed to close temp file")
 		return nil, err
 	}
 
@@ -371,7 +397,7 @@ func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (Ar
 
 	// r is closed with reader
 	reader := newChecksummingReader(r)
-	defer reader.Close()
+	defer logClose(reader, "failed to close snapshot reader")
 
 	tmpFile, err := ioutil.TempFile("", fmt.Sprintf("snapshot-%s", name))
 	if err != nil {
@@ -379,25 +405,26 @@ func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (Ar
 	}
 
 	if err := os.Remove(tmpFile.Name()); err != nil {
-		tmpFile.Close()
+		logClose(tmpFile, "failed to close temp file")
 		return nil, "", err
 	}
 
 	g, err := gzip.NewReader(reader)
 	if err != nil {
+		logClose(tmpFile, "failed to close temp file")
 		return nil, "", err
 	}
-	defer g.Close()
+	defer logClose(g, "failed to close gzip reader")
 
 	if _, err := io.Copy(tmpFile, g); err != nil {
-		tmpFile.Close()
+		logClose(tmpFile, "failed to close temp file")
 		return nil, "", err
 	}
 
 	checksum := reader.BlobSHA256()
 
 	if _, err := tmpFile.Seek(0, os.SEEK_SET); err != nil {
-		tmpFile.Close()
+		logClose(tmpFile, "failed to close temp file")
 		return nil, "", err
 	}
 

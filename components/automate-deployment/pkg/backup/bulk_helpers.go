@@ -78,7 +78,7 @@ func (m *simpleBulkUploader) doUpload(ctx context.Context, req BlobUploadRequest
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	defer req.Reader.Close()
+	defer req.Reader.Close() // nolint: errcheck
 
 	key := path.Join(m.prefix, req.Key)
 	logrus.Debugf("Uploading Artifact %s", key)
@@ -134,7 +134,9 @@ func (m *simpleBulkDeleter) Delete(ctx context.Context, iterator BulkDeleteItera
 			logrus.WithError(err).Error("Bulk delete failed")
 			return err
 		}
-		m.doDelete(ctx, req)
+		if err := m.doDelete(ctx, req); err != nil {
+			return err
+		}
 	}
 	logrus.Info("Finished Delete")
 
