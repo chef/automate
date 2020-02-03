@@ -52,8 +52,7 @@ function genLicenseResp(licenseEndDate: moment.Moment): LicenseStatus {
 }
 
 describe('LicenseLockoutComponent', () => {
-  let component: LicenseLockoutComponent;
-
+  let component;
   // Tests on this action make use of the inherent state updating
   // of the underlying component.
   describe('GetLicenseStatus Action', () => {
@@ -147,16 +146,6 @@ describe('LicenseLockoutComponent', () => {
       expect(component.trialRequestInternalError).toBeFalsy();
     });
 
-    it('check "current license status" after the successfully register.', () => {
-      const futureDate = moment().utc().add(2, 'months');
-      setup(genLicenseFetchReducer(futureDate));
-
-      expect(component.licenseExpired).toBeFalsy();
-      expect(component.fetchStatusInternalError).toBeFalsy();
-      expect(component.expirationDate).toEqual(futureDate
-                                      .format(DateTime.RFC2822));
-    });
-
     it('reflects other error as a generic request error', () => {
       // any other HTTP code not mentioned above will do
       const { state } = setup(genErrorRequestReducer(HttpStatus.NOT_FOUND));
@@ -180,6 +169,16 @@ describe('LicenseLockoutComponent', () => {
         component.handleLicenseRequest(state.request);
         expect(store.dispatch).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('GetLicenseStatus() Service', () => {
+    it('check "license status" after the successfully requested license.', () => {
+      const { state } = setup(genLicenseRequestReducer());
+      component.requestingLicense = true;
+      spyOn(component.licenseFacade, 'getLicenseStatus');
+      component.handleLicenseRequest(state.request);
+      expect(component.licenseFacade.getLicenseStatus).toHaveBeenCalled();
     });
   });
 

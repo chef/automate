@@ -11,7 +11,7 @@ import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { EntityStatus } from 'app/entities/entities';
 import { runtimeChecks } from 'app/ngrx.reducers';
-import { ApplyStatus, LicenseStatus, FetchStatus } from 'app/entities/license/license.model';
+import { ApplyStatus, LicenseStatus } from 'app/entities/license/license.model';
 import { LicenseApplyComponent } from './license-apply.component';
 
 function genErrorResp(status: number, msg: string): any /* HttpErrorResponse */ {
@@ -40,7 +40,7 @@ function genLicenseResp(licenseEndDate: moment.Moment): LicenseStatus {
 }
 
 describe('LicenseApplyComponent', () => {
-  let component: LicenseApplyComponent;
+  let component;
 
   it('should be created', () => {
     setup(genLicenseApplyReducer());
@@ -65,16 +65,6 @@ describe('LicenseApplyComponent', () => {
       expect(component.applyLicenseInternalError).toBeFalsy();
       expect(component.badRequestReason).toBe('');
       expect(component.expirationDate).toEqual(futureDate.format(DateTime.RFC2822));
-    });
-
-    it('check "current license status" after the successfully license applied.', () => {
-      const futureDate = moment().utc().add(2, 'months');
-      setup(genLicenseFetchReducer(futureDate));
-
-      expect(component.permissionDenied).toBeFalsy();
-      expect(component.applyLicenseInternalError).toBeFalsy();
-      expect(component.badRequestReason).toBe('');
-      expect(component.licenseExpired).toBeFalsy();
     });
 
     it('reflects permission denied', () => {
@@ -148,6 +138,17 @@ describe('LicenseApplyComponent', () => {
         expect(store.dispatch).not.toHaveBeenCalled();
       });
     });
+
+    describe('GetLicenseStatus() Service', () => {
+      it('check "license status" after the successfully applied license.', () => {
+        const futureDate = moment().utc().add(2, 'months');
+        const { state } = setup(genLicenseApplyReducer(futureDate));
+        component.applyingLicense = true;
+        spyOn(component.licenseFacade, 'getLicenseStatus');
+        component.handleLicenseApply(state.apply);
+        expect(component.licenseFacade.getLicenseStatus).toHaveBeenCalled();
+      });
+    });
   });
 
   function setup(reducer: () => any): { state: any, store: Store<any> } {
@@ -183,17 +184,6 @@ describe('LicenseApplyComponent', () => {
     spyOn(store, 'dispatch').and.callThrough();
     return { state: reducer(), store };
   }
-
-  function genLicenseFetchReducer(licenseEndDate: moment.Moment): () => { fetch: FetchStatus } {
-    return () => ({
-       fetch: {
-         license: genLicenseResp(licenseEndDate || moment().utc().add(2, 'months')),
-         status: EntityStatus.loadingSuccess,
-         expiryMessage: '',
-         errorResp: null
-       }
-     });
-   }
 
   function genLicenseApplyReducer(expiry?: moment.Moment): () => { apply: ApplyStatus } {
     return () => ({
