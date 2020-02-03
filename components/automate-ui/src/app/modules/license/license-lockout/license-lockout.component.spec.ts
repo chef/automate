@@ -52,7 +52,7 @@ function genLicenseResp(licenseEndDate: moment.Moment): LicenseStatus {
 }
 
 describe('LicenseLockoutComponent', () => {
-  let component;
+  let component: LicenseLockoutComponent;
   // Tests on this action make use of the inherent state updating
   // of the underlying component.
   describe('GetLicenseStatus Action', () => {

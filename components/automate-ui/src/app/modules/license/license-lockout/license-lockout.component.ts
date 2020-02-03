@@ -83,7 +83,7 @@ export class LicenseLockoutComponent implements AfterViewInit {
   }
 
   constructor(
-    private licenseFacade: LicenseFacadeService,
+    public licenseFacade: LicenseFacadeService,
     private chefSessionService: ChefSessionService,
     private sessionStorage: SessionStorageService,
     public fb: FormBuilder

@@ -40,7 +40,7 @@ function genLicenseResp(licenseEndDate: moment.Moment): LicenseStatus {
 }
 
 describe('LicenseApplyComponent', () => {
-  let component;
+  let component: LicenseApplyComponent;
 
   it('should be created', () => {
     setup(genLicenseApplyReducer());
