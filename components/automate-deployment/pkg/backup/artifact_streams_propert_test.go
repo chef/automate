@@ -2,106 +2,15 @@ package backup
 
 import (
 	"io"
-	"sort"
 	"testing"
 
-	"github.com/chef/automate/lib/stringutils"
 	"github.com/leanovate/gopter"
-	"github.com/leanovate/gopter/gen"
 	"github.com/leanovate/gopter/prop"
 )
 
-func sortedUniqueify(in []string) []string {
-	if len(in) == 0 {
-		return in
-	}
-	// https://github.com/golang/go/wiki/SliceTricks#in-place-deduplicate-comparable
-	j := 0
-	for i := 1; i < len(in); i++ {
-		if in[j] == in[i] {
-			continue
-		}
-		j++
-		in[j] = in[i]
-	}
-	return in[:j+1]
-}
-
-func sortStrings(in []string) []string {
-	sort.Strings(in)
-	return in
-}
-
-func isSorted(in []string) bool {
-	return sort.IsSorted(sort.StringSlice(in))
-}
-
-func isSortedAnUnique(in []string) bool {
-	if len(in) == 0 {
-		return true
-	}
-	if !isSorted(in) {
-		return false
-	}
-	last := in[0]
-	for i := 1; i < len(in); i++ {
-		if in[i] == last {
-			return false
-		}
-	}
-	return true
-}
-
-func allContained(haystack []string, needles []string) bool {
-	j := 0
-	for i := 0; i < len(needles); i++ {
-	INNER:
-		for {
-			if needles[i] < haystack[j] {
-				return false
-			} else if needles[i] > haystack[j] {
-				j++
-			} else {
-				break INNER
-			}
-		}
-	}
-	return true
-}
-
-func anyContained(haystack []string, needles []string) bool {
-	for i := 0; i < len(needles); i++ {
-		if stringutils.SliceContains(haystack, needles[i]) {
-			return true
-		}
-	}
-	return false
-}
-
-func stringSliceEquals(a []string, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i := 0; i < len(a); i++ {
-		if a[i] != b[i] {
-			return false
-		}
-	}
-	return true
-}
-
-func smallStringListGen() gopter.Gen {
-	return gen.SliceOf(
-		gen.OneGenOf(
-			gen.SliceOfN(2, gen.AlphaNumChar()),
-			gen.SliceOfN(1, gen.AlphaNumChar()),
-		).Map(func(r []rune) string {
-			return string(r)
-		}),
-	).Map(sortStrings).Map(sortedUniqueify)
-}
-
 func mergeStringLists(t *testing.T, stringLists ...[]string) []string {
+	t.Helper()
+
 	streams := make([]ArtifactStream, len(stringLists))
 	for i, s := range stringLists {
 		streams[i] = NewArrayStream(s)

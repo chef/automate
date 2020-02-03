@@ -1,9 +1,7 @@
 package backup
 
 import (
-	"bufio"
 	"bytes"
-	"compress/gzip"
 	"context"
 	"fmt"
 	"io"
@@ -13,7 +11,6 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/leanovate/gopter"
 	"github.com/leanovate/gopter/commands"
 	"github.com/leanovate/gopter/gen"
@@ -84,26 +81,6 @@ func (value snapshotCommand) PreCondition(state commands.State) bool {
 	return true
 }
 
-func readGzipFile(filePath string) ([]string, error) {
-	lines := []string{}
-	f, err := os.Open(filePath)
-	if err != nil {
-		return nil, err
-	}
-	defer f.Close()
-	g, err := gzip.NewReader(f)
-	if err != nil {
-		return nil, err
-	}
-	defer g.Close()
-
-	scanner := bufio.NewScanner(g)
-	for scanner.Scan() {
-		lines = append(lines, scanner.Text())
-	}
-	return lines, scanner.Err()
-}
-
 func (value snapshotCommand) PostCondition(state commands.State, result commands.Result) *gopter.PropResult {
 	st := state.(*testRepoState)
 	res := result.(snapshotCommandResult)
@@ -138,21 +115,6 @@ func (value snapshotCommand) PostCondition(state commands.State, result commands
 	}
 
 	return &gopter.PropResult{Status: gopter.PropTrue}
-}
-
-func checkArtifactsExist(baseDir string, artifacts []string) (bool, error) {
-	for _, artifact := range artifacts {
-		p := path.Join(baseDir, "shared/builder/artifacts", artifact)
-		exists, err := fileutils.PathExists(p)
-		if err != nil {
-			return false, errors.Wrap(err, "could not check artifact file")
-		}
-		if !exists {
-			logrus.Infof("Could not find %q", p)
-			return false, nil
-		}
-	}
-	return true, nil
 }
 
 func (value snapshotCommand) String() string {
@@ -211,12 +173,6 @@ func (value removeSnapshotCommand) PostCondition(state commands.State, result co
 
 func (value removeSnapshotCommand) String() string {
 	return fmt.Sprintf("REMOVE(%s)", value.SnapshotName)
-}
-
-func stringGen(size int) gopter.Gen {
-	return gen.SliceOfN(size, gen.AlphaNumChar()).Map(func(r []rune) string {
-		return string(r)
-	}).WithShrinker(gen.StringShrinker)
 }
 
 var genSnapshotCommand = gen.Struct(
