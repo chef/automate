@@ -21,14 +21,6 @@ type BulkUploadIterator interface {
 	EstimatedSize() int64
 }
 
-type BulkUploadError struct {
-	Failures map[string]error
-}
-
-func (*BulkUploadError) Error() string {
-	return "BulkUplaodError"
-}
-
 type BulkUploader interface {
 	Upload(context.Context, BulkUploadIterator, ArtifactRepoProgressReporter) error
 }
