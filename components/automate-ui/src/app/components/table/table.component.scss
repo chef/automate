@@ -1,9 +1,7 @@
 @import "~styles/variables";
 
 :host {
-  display: table;
-  table-layout: fixed;
+  display: flex;
+  flex-flow: column nowrap;
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0 8px;
 }

@@ -1,7 +1,8 @@
 @import '../table.component';
 
 :host {
-  display: table-row;
-  padding: $size_16;
+  display: flex;
+  flex-flow: row nowrap;
+  margin-bottom: .5em;
   background-color: $white;
 }
