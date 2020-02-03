@@ -9,7 +9,6 @@ import (
 	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
-	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
 	"github.com/chef/automate/components/automate-gateway/api/auth/tokens"
 	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
@@ -23,7 +22,6 @@ type client struct {
 	apiClientConn *grpc.ClientConn
 	// TODO (tc): Add other service clients here as needed.
 	authzClient        authz.AuthorizationClient
-	teamsClient        teams.TeamsClient
 	teamsV2Client      v2.TeamsClient
 	tokensClient       tokens.TokensMgmtClient
 	tokensV2Client     v2.TokensClient
@@ -57,7 +55,6 @@ func OpenConnection(ctx context.Context) (client_type.APIClient, error) {
 		apiClientConn: apiClientConn,
 		// TODO (tc): Add other service clients here as needed.
 		authzClient:        authz.NewAuthorizationClient(apiClientConn),
-		teamsClient:        teams.NewTeamsClient(apiClientConn),
 		teamsV2Client:      v2.NewTeamsClient(apiClientConn),
 		tokensClient:       tokens.NewTokensMgmtClient(apiClientConn),
 		tokensV2Client:     v2.NewTokensClient(apiClientConn),
@@ -70,10 +67,6 @@ func OpenConnection(ctx context.Context) (client_type.APIClient, error) {
 
 func (c client) AuthzClient() authz.AuthorizationClient {
 	return c.authzClient
-}
-
-func (c client) TeamsClient() teams.TeamsClient {
-	return c.teamsClient
 }
 
 func (c client) TeamsV2Client() v2.TeamsClient {

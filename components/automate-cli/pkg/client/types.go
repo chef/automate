@@ -2,7 +2,6 @@ package client
 
 import (
 	"github.com/chef/automate/api/external/applications"
-	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
 	"github.com/chef/automate/components/automate-gateway/api/auth/tokens"
 	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
@@ -16,7 +15,6 @@ import (
 type APIClient interface {
 	// TODO (tc): Add other service clients here as needed.
 	AuthzClient() authz.AuthorizationClient
-	TeamsClient() teams.TeamsClient
 	TeamsV2Client() v2.TeamsClient
 	TokensClient() tokens.TokensMgmtClient
 	TokensV2Client() v2.TokensClient
