@@ -13,6 +13,7 @@ import (
 
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
+	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v1"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -68,7 +69,7 @@ func (m *policyMap) Scan(src interface{}) error {
 func New(ctx context.Context, l logger.Logger, migConf migration.Config) (storage.Storage, error) {
 	l.Infof("applying database migrations from %s", migConf.Path)
 
-	db, err := postgres.New(ctx, migConf)
+	db, err := postgres.New(ctx, migConf, datamigration.Config{})
 	if err != nil {
 		return nil, err
 	}
