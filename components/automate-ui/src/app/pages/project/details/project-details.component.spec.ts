@@ -19,7 +19,7 @@ import { ruleEntityReducer } from 'app/entities/rules/rule.reducer';
 import { GetRulesSuccess } from 'app/entities/rules/rule.actions';
 import { ProjectDetailsComponent } from './project-details.component';
 
-describe('ProjectDetailsComponent', () => {
+fdescribe('ProjectDetailsComponent', () => {
   let component: ProjectDetailsComponent;
   let fixture: ComponentFixture<ProjectDetailsComponent>;
 
@@ -154,12 +154,12 @@ describe('ProjectDetailsComponent', () => {
     fixture.detectChanges();
   });
 
-  describe('when there are no rules', () => {
+  fdescribe('when there are no rules', () => {
     beforeEach(() => {
       component.rules = [];
     });
 
-    it('defaults to showing rules section', () => {
+    fit('defaults to showing rules section', () => {
       expect(component.tabValue).toBe('rules');
     });
 
