@@ -15,18 +15,7 @@ Hello and welcome to Chef Automate 2! This document guides you through the initi
 
 The easiest way to start exploring Chef Automate is to install it on a local VM.
 We recommend using [Vagrant](https://www.vagrantup.com/) to create your test environment.
-Use this Vagrantfile to provision a VM. Chef recommends a minimum of 4GB RAM.
-
-## Add an entry to /etc/hosts
-
-The example Vagrantfile sets the VM hostname to `chef-automate.test`. The installer uses this hostname as the FQDN that Chef Automate listens on.
-For security reasons, you must access Chef Automate's web UI using the configured FQDN.
-To avoid configuring DNS for your test instance, we recommend adding an entry to your workstation's `/etc/hosts` file.
-Use the following command to append the required entry:
-
-```bash
-echo 192.168.33.199 chef-automate.test | sudo tee -a /etc/hosts
-```
+Use the Vagrantfile below to provision a VM. Chef recommends a minimum of 4GB RAM.
 
 ## Create a Vagrantfile
 
@@ -96,7 +85,24 @@ end
 EOH
 ```
 
+## Add an entry to /etc/hosts
+
+The example Vagrantfile sets the VM hostname to `chef-automate.test`. The installer uses this hostname as the FQDN that Chef Automate listens on.
+For security reasons, you must access Chef Automate's web UI using the configured FQDN.
+To avoid configuring DNS for your test instance, we recommend adding an entry to your workstation's `/etc/hosts` file.
+Use the following command to append the required entry:
+
+```bash
+echo 192.168.33.199 chef-automate.test | sudo tee -a /etc/hosts
+```
+
 ## Start the VM
+
+By installing Chef Automate with the Vagrantfile provided above you're automatically giving your consent to
+
+  * [Terms of Service](https://www.chef.io/terms-of-service)
+  * [Master License and Services Agreement](https://www.chef.io/online-master-agreement)
+
 
 Now that you have the `Vagrantfile` in your current directory, provision a new VM by running:
 
@@ -106,14 +112,9 @@ vagrant up
 
 If this is your first time provisioning a VM, this operation may take a few minutes to download the base OS image.
 
-When the command completes, you can access the web UI by browsing to `https://chef-automate.test/` (assuming you followed the above instructions and created an entry in `/etc/hosts`).
+When the command completes, you can access the web UI by browsing to `https://chef-automate.test/`.
 
 You can find login credentials by opening the `automate-credentials.toml`, which the installer has written in your current working directory, or alternatively in an output log.
-
-By installing Chef Automate with the Vagrantfile provided above you're automatically giving your consent to
-
-  * [Terms of Service](https://www.chef.io/terms-of-service)
-  * [Master License and Services Agreement](https://www.chef.io/online-master-agreement)
 
 ## Start a free 60-day Trial
 
@@ -131,4 +132,4 @@ RHEL 7.5, or Ubuntu 16.04 with the following minimum system resources:
 * 5 GB free disk space
 * 2 CPUs
 
-Follow the instructions above, beginning with downloading the `chef-automate` zip file.
+Check the [Installation Guide]({{< relref "install.md" >}}) for instructions.
