@@ -34,3 +34,4 @@ linters:
     - lll
     - whitespace
     - wsl
+    - mnd

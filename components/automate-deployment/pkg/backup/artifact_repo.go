@@ -15,6 +15,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+var ErrSnapshotExists error = errors.New("Snapshot already exists")
+
 type ArtifactRepo struct {
 	artifactsRoot Bucket
 	snapshotsRoot Bucket
@@ -171,7 +173,7 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string, srcBucket B
 		}
 	} else {
 		r.Close()
-		return ArtifactRepoSnapshotMetadata{}, errors.New("Snapshot already exists")
+		return ArtifactRepoSnapshotMetadata{}, ErrSnapshotExists
 	}
 
 	artifactsInRepo := repo.ListArtifacts(ctx)

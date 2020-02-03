@@ -92,9 +92,12 @@ func stringSliceEquals(a []string, b []string) bool {
 
 func smallStringListGen() gopter.Gen {
 	return gen.SliceOf(
-		gen.SliceOfN(2, gen.AlphaNumChar()).Map(func(r []rune) string {
+		gen.OneGenOf(
+			gen.SliceOfN(2, gen.AlphaNumChar()),
+			gen.SliceOfN(1, gen.AlphaNumChar()),
+		).Map(func(r []rune) string {
 			return string(r)
-		}).WithShrinker(gen.StringShrinker),
+		}),
 	).Map(sortStrings).Map(sortedUniqueify)
 }
 

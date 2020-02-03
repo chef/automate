@@ -69,7 +69,7 @@ func (m *simpleBulkUploader) Upload(ctx context.Context, iterator BulkUploadIter
 			progress.ReportProgress(count, estimatedSize)
 		}
 	}
-	logrus.Info("Finished Upload")
+	logrus.Debug("Finished Upload")
 
 	return nil
 }
@@ -81,7 +81,7 @@ func (m *simpleBulkUploader) doUpload(ctx context.Context, req BlobUploadRequest
 	defer req.Reader.Close()
 
 	key := path.Join(m.prefix, req.Key)
-	logrus.Infof("Uploading Artifact %s", key)
+	logrus.Debugf("Uploading Artifact %s", key)
 
 	writer, err := m.dst.NewWriter(ctx, key)
 	if err != nil {
