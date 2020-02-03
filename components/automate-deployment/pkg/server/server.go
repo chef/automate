@@ -760,6 +760,8 @@ func (s *server) ConfigureDeployment(ctx context.Context,
 }
 
 func (s *server) persistDeployment() error {
+	runConfigMigrations(s.deployment)
+
 	_, err := s.deploymentStore.UpdateDeployment(func(d *deployment.Deployment) error {
 		// TODO(jaym) This is not the right way to interact with deployment store. We should
 		//            modify the deployment it gives us with the updates we want and not
@@ -1389,6 +1391,28 @@ func (s *server) initDeploymentFromDB() error {
 	s.deployment = existingDeployment
 
 	return s.persistDeployment()
+}
+
+// runConfigMigrations does any necessary config migrations in the current config version
+func runConfigMigrations(d *deployment.Deployment) {
+	c := d.GetUserOverrideConfigForPersistence()
+	if c == nil {
+		return
+	}
+	if c.GetGlobal().GetV1().GetFrontendTls() == nil &&
+		c.GetLoadBalancer().GetV1().GetSys().GetFrontendTls() != nil {
+		err := d.MergeIntoUserOverrideConfig(&dc.AutomateConfig{
+			Global: &config.GlobalConfig{
+				V1: &config.V1{
+					FrontendTls: c.GetLoadBalancer().GetV1().GetSys().GetFrontendTls(),
+				},
+			},
+		})
+		if err != nil {
+			logrus.WithError(err).Warn("Failed to migrate load balancer config into global config")
+		}
+	}
+
 }
 
 func (s *server) initSecretStore() error {

@@ -99,11 +99,11 @@ do_test_deploy() {
         "$cli_bin" iam token create --admin "diagnostics-test-$RANDOM")
 
     docker exec -t "$_frontend1_container_name" \
-        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1"
+        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~applications"
 
 
     docker exec -t "$_frontend2_container_name" \
-        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1"
+        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~applications"
 
-    "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~purge" "~cli" "~grpc" "~deployment"
+    "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~purge" "~cli" "~grpc" "~deployment" "~applications"
 }
