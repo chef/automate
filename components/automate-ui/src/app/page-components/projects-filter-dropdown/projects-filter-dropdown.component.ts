@@ -33,8 +33,6 @@ export class ProjectsFilterDropdownComponent {
   // so they can be filtered while maintaining the actual options.
   filteredOptions: ProjectsFilterOption[] = [];
 
-  filterValue = '';
-
   optionsEdited = false;
 
   dropdownActive = false;
@@ -45,8 +43,8 @@ export class ProjectsFilterDropdownComponent {
     }
   }
 
-  handleFilterKeyUp(): void {
-    this.filteredOptions = this.filterOptions(this.filterValue);
+  handleFilterKeyUp(filterValue: string): void {
+    this.filteredOptions = this.filterOptions(filterValue);
   }
 
   filterOptions(value: string): ProjectsFilterOption[] {
@@ -64,7 +62,6 @@ export class ProjectsFilterDropdownComponent {
   handleEscape(): void {
     this.optionsEdited = false;
     this.resetOptions();
-    this.filterValue = '';
     this.dropdownActive = false;
     this.onOptionChange.emit(this.editableOptions);
   }
