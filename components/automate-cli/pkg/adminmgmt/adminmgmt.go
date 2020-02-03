@@ -12,11 +12,10 @@ import (
 	authz_constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	teams "github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	teams_req "github.com/chef/automate/components/automate-gateway/api/auth/teams/request"
 	users_req "github.com/chef/automate/components/automate-gateway/api/auth/users/request"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
 	authz_req "github.com/chef/automate/components/automate-gateway/api/authz/request"
+	v2 "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	authz_v2_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 	"github.com/chef/automate/lib/stringutils"
 )
@@ -102,7 +101,7 @@ func AddAdminUserToTeam(ctx context.Context,
 func AddUserToTeam(ctx context.Context,
 	apiClient client.APIClient, teamID, userID string, dryRun bool) (bool, error) {
 
-	getUsersResp, err := apiClient.TeamsClient().GetUsers(ctx, &teams_req.GetUsersReq{
+	getUsersResp, err := apiClient.TeamsV2Client().GetTeamMembership(ctx, &authz_v2_req.GetTeamMembershipReq{
 		Id: teamID,
 	})
 	if err != nil {
@@ -111,7 +110,7 @@ func AddUserToTeam(ctx context.Context,
 
 	addUser := !stringutils.SliceContains(getUsersResp.UserIds, userID)
 	if addUser && !dryRun {
-		_, err := apiClient.TeamsClient().AddUsers(ctx, &teams_req.AddUsersReq{
+		_, err := apiClient.TeamsV2Client().AddTeamMembers(ctx, &authz_v2_req.AddTeamMembersReq{
 			Id:      teamID,
 			UserIds: []string{userID},
 		})
@@ -195,19 +194,20 @@ func UpdateV2AdminsPolicyIfNeeded(ctx context.Context,
 // EnsureTeam creates the desired team if it is missing, and returns the team's
 // ID, together with a boolean indicating if the team was created by this call
 func EnsureTeam(ctx context.Context,
-	id, description string,
+	id, name string,
 	apiClient client.APIClient,
 	dryRun bool) (string, bool, error) {
 
-	teamID, found, err := getTeamIDByName(ctx, apiClient.TeamsClient(), id)
+	teamID, found, err := getTeamIDByName(ctx, apiClient.TeamsV2Client(), id)
 	if err != nil {
 		return "", false, wrapUnexpectedError(err, "Failed to retrieve team %q", id)
 	}
 
 	if !found && !dryRun {
-		createTeamsResp, err := apiClient.TeamsClient().CreateTeam(ctx, &teams_req.CreateTeamReq{
-			Name:        id,
-			Description: description,
+		createTeamsResp, err := apiClient.TeamsV2Client().CreateTeam(ctx, &authz_v2_req.CreateTeamReq{
+			Id:       id,
+			Name:     name,
+			Projects: []string{},
 		})
 		if err != nil {
 			return "", false, wrapUnexpectedError(err, "Failed to create team %q", id)
@@ -223,16 +223,16 @@ func wrapUnexpectedError(err error, wrap string, args ...interface{}) error {
 	return status.Wrapf(err, status.APIError, wrap, args...)
 }
 
-func getTeamIDByName(ctx context.Context, tc teams.TeamsClient, name string) (string, bool, error) {
+func getTeamIDByName(ctx context.Context, tc v2.TeamsClient, name string) (string, bool, error) {
 	var id string
 	var found bool
 
-	getTeamsResp, err := tc.GetTeams(ctx, &teams_req.GetTeamsReq{})
+	listTeamsResp, err := tc.ListTeams(ctx, &authz_v2_req.ListTeamsReq{})
 	if err != nil {
 		return "", false, wrapUnexpectedError(err, "Failed to retrieve admins team")
 	}
 
-	for _, team := range getTeamsResp.Teams {
+	for _, team := range listTeamsResp.Teams {
 		if team.Name == name {
 			id = team.Id
 			found = true

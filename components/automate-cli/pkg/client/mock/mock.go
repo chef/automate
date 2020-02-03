@@ -7,7 +7,6 @@ import (
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
-	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
 	"github.com/chef/automate/components/automate-gateway/api/auth/tokens"
 	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
@@ -21,7 +20,6 @@ import (
 // Mock is a mocked out APIClient.
 type Mock struct {
 	authzClient        authz.AuthorizationClient
-	teamsClient        teams.TeamsClient
 	teamsV2Client      v2.TeamsClient
 	tokensClient       tokens.TokensMgmtClient
 	tokensV2Client     v2.TokensClient
@@ -36,7 +34,6 @@ type Mock struct {
 type ServerMocks struct {
 	AuthzMock    *authz.AuthorizationServerMock
 	PoliciesMock *v2.PoliciesServerMock
-	TeamsMock    *teams.TeamsServerMock
 	TeamsV2Mock  *v2.TeamsServerMock
 	TokensMock   *tokens.TokensMgmtServerMock
 	TokensV2Mock *v2.TokensServerMock
@@ -60,9 +57,6 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 	mockPolicies := v2.NewPoliciesServerMock()
 	v2.RegisterPoliciesServer(grpcGateway, mockPolicies)
 
-	mockTeams := teams.NewTeamsServerMock()
-	teams.RegisterTeamsServer(grpcGateway, mockTeams)
-
 	mockV2Teams := v2.NewTeamsServerMock()
 	v2.RegisterTeamsServer(grpcGateway, mockV2Teams)
 
@@ -78,7 +72,6 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 
 	return Mock{
 			authzClient:        authz.NewAuthorizationClient(gatewayConn),
-			teamsClient:        teams.NewTeamsClient(gatewayConn),
 			teamsV2Client:      v2.NewTeamsClient(gatewayConn),
 			tokensClient:       tokens.NewTokensMgmtClient(gatewayConn),
 			tokensV2Client:     v2.NewTokensClient(gatewayConn),
@@ -91,7 +84,7 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 		ServerMocks{
 			AuthzMock:    mockAuthz,
 			PoliciesMock: mockPolicies,
-			TeamsMock:    mockTeams,
+			TeamsV2Mock:  mockV2Teams,
 			TokensMock:   mockTokens,
 			TokensV2Mock: mockV2Tokens,
 			UsersMock:    mockUsers,
@@ -102,11 +95,6 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 // AuthzClient returns mock AuthzClient
 func (c Mock) AuthzClient() authz.AuthorizationClient {
 	return c.authzClient
-}
-
-// TeamsClient returns mock TeamsClient
-func (c Mock) TeamsClient() teams.TeamsClient {
-	return c.teamsClient
 }
 
 // TeamsClient returns mock TeamsClient

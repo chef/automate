@@ -14,8 +14,8 @@ import (
 
 const createTeamTemplate = `
 {
-	"name": "{{ .Name }}",
-	"description": "diagnostics integration test team"
+	"id": "{{ .ID }}",
+	"name": "diagnostics integration test team"
 }
 `
 
@@ -23,9 +23,9 @@ const createTeamTemplate = `
 // creating a team and getting a team
 type TeamInfo struct {
 	Team struct {
-		ID          string `json:"id"`
-		Name        string `json:"name"`
-		Description string `json:"description"`
+		ID       string   `json:"id"`
+		Name     string   `json:"name"`
+		Projects []string `json:"projects"`
 	} `json:"team"`
 }
 
@@ -39,12 +39,12 @@ func CreateRandomTeam(tstCtx diagnostics.TestContext) (*TeamInfo, error) {
 	teamInfo := TeamInfo{}
 	err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
-			"/api/v0/auth/teams",
+			"/apis/iam/v2/teams",
 			lbrequest.WithMethod("POST"),
 			lbrequest.WithJSONStringTemplateBody(createTeamTemplate, struct {
-				Name string
+				ID string
 			}{
-				Name: TimestampName(),
+				ID: TimestampName(),
 			}),
 		)).WithValue(&teamInfo)
 
