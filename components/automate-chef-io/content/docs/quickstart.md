@@ -11,15 +11,29 @@ toc = true
     weight = 10
 +++
 
-Hello and welcome to Chef Automate 2! This document guides you through the initial installation and trial activation.
+Hello and welcome to Chef Automate! This Quickstart guides you through the initial installation and trial activation.
 
-The easiest way to start exploring Chef Automate is to install it on a local VM.
-We recommend using [Vagrant](https://www.vagrantup.com/) to create your test environment.
-Use the Vagrantfile below to provision a VM. Chef recommends a minimum of 4GB RAM.
+The easiest way to start exploring Chef Automate is to install it on a local virtual machine (VM).
+We created this [Vagrant](https://www.vagrantup.com/) file for you to use in creating your own test environment.
+
+## Prerequisites
+
+For this demonstration, you need:
+
+* Administrator (root) access to your system
+* A virtualization product such as [VirtualBox](https://www.virtualbox.org/) installed on your system
+* [Vagrant](https://www.vagrantup.com/intro/getting-started/) installed on your system
+* 4GB RAM, or more, available for the VM
+
+## Quickstart Overview
+
+Use the command line script below to create a demonstration instance of Chef Automate.
+The script is mostly automated, but it does require a few manual steps.
+By installing Chef Automate with the Vagrantfile provided below you're automatically consenting to Chef Software, Inc.'s [Terms of Service](https://www.chef.io/terms-of-service) and [Master License and Services Agreement](https://www.chef.io/online-master-agreement)
 
 ## Create a Vagrantfile
 
-Copy and paste the command below to create a `Vagrantfile`:
+Copy and paste this script into your command line to create the Chef Automate `Vagrantfile`:
 
 ```ruby
 cat > Vagrantfile <<'EOH'
@@ -98,12 +112,6 @@ echo 192.168.33.199 chef-automate.test | sudo tee -a /etc/hosts
 
 ## Start the VM
 
-By installing Chef Automate with the Vagrantfile provided above you're automatically giving your consent to
-
-  * [Terms of Service](https://www.chef.io/terms-of-service)
-  * [Master License and Services Agreement](https://www.chef.io/online-master-agreement)
-
-
 Now that you have the `Vagrantfile` in your current directory, provision a new VM by running:
 
 ```bash
@@ -132,4 +140,4 @@ RHEL 7.5, or Ubuntu 16.04 with the following minimum system resources:
 * 5 GB free disk space
 * 2 CPUs
 
-Check the [Installation Guide]({{< relref "install.md" >}}) for instructions.
+Follow the [Installation Guide]({{< relref "install.md" >}}) to install Chef Automate on your own resources.
