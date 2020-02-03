@@ -24,7 +24,11 @@ func (a *state) Handle(ctx context.Context,
 func (a *state) IsAuthorized(ctx context.Context, subjects []string,
 	resourceV2, actionV2 string, projects []string,
 ) (middleware.AnnotatedAuthorizationResponse, error) {
-	return a.IsAuthorized(ctx, subjects, resourceV2, actionV2, projects)
+	resp, err := a.v2.IsAuthorized(ctx, subjects, resourceV2, actionV2, projects)
+	if err == nil {
+		return annotate(resp, subjects, resourceV2, actionV2), nil
+	}
+	return nil, err
 }
 
 func (a *state) FilterAuthorizedPairs(ctx context.Context, subjects []string,
