@@ -28,7 +28,8 @@
     { "name": "NodesService", "x-displayName": "Nodes" },
     { "name": "service_groups", "x-displayName": "Service Groups and Services" },
     { "name": "retention", "x-displayName": "Service Management" },
-    { "name": "policies", "x-displayName": "IAM Policies" },
+    { "name": "policies", "x-displayName": "IAM Policies",
+      "description": "A policy defines permissions for who may perform what action on which resources, based on the project. The ‘who’ is a user, a team, or a system. A policy has three components, the agent, the action, and the project. The agent is a user, team, or system. Users and teams are designated by name while systems communicate with Chef Automate using pre-authorized API tokens. Actions are activities that agents can take in relation to Chef Automate’s content and operation. Projects are collections of resources, such as API tokens or ingested compliance nodes." },
     { "name": "roles", "x-displayName": "IAM Roles" },
     { "name": "projects", "x-displayName": "IAM Projects" }
   ]
