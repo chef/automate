@@ -180,6 +180,6 @@ At this point, you can use your existing Chef Automate 1 user credentials to log
 If you've been using LDAP for authenticating users, that configuration will have been migrated as well, and you can use your LDAP credentials to login.
 Historical data will be migrated in the background.
 
-### Upgrading an Airgapped Installation
+### Upgrading an airgapped installation between versions of Chef Automate 2
 
-To upgrade your airgapped installation, see the [Airgapped Installation]({{< relref "airgapped-installation.md#upgrade" >}}) documentation.
+See the [Airgapped Installation]({{< relref "airgapped-installation.md#upgrade" >}}) documentation.
