@@ -65,7 +65,7 @@ const someTeam: Team = {
   projects: []
 };
 
-describe('TeamDetailsComponent v2', () => {
+describe('TeamDetailsComponent', () => {
   let component: TeamDetailsComponent;
   let fixture: ComponentFixture<TeamDetailsComponent>;
   let router: Router;

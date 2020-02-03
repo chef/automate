@@ -142,7 +142,7 @@ describe('ProjectListComponent', () => {
 
   describe('when there are projects', () => {
 
-    it('displays project data for v2', () => {
+    it('displays project data', () => {
       store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       fixture.detectChanges();
       expect(element).toContainPath('chef-table-new');

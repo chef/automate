@@ -4,7 +4,6 @@ import { RouterTestingModule } from '@angular/router/testing';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { using } from 'app/testing/spec-helpers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { SettingsLandingComponent } from 'app/pages/settings-landing/settings-landing.component';
 import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
@@ -96,34 +95,5 @@ describe('SettingsSidebarComponent', () => {
         elements[i].getAttribute('ng-reflect-all-of'),
         settingsLandingComponent.routeList[i].allOfCheck);
     }
-  });
-
-  it('shows 11` links', () => {
-    fixture.detectChanges();
-    const links = element.nativeElement
-      .querySelectorAll('div.nav-items chef-sidebar-entry');
-    expect(links.length).toBe(11);
-  });
-
-  using([
-    ['Notifications', '/settings/notifications', 0],
-    ['Data Feeds', '/settings/data-feed', 1],
-    ['Node Integrations', '/settings/node-integrations', 2],
-    ['Node Credentials', '/settings/node-credentials', 3],
-    ['Node Lifecycle', '/settings/node-lifecycle', 4],
-    ['Users', '/settings/users', 5],
-    ['Teams', '/settings/teams', 6],
-    ['API Tokens', '/settings/tokens', 7],
-    ['Policies', '/settings/policies', 8],
-    ['Roles', '/settings/roles', 9],
-    ['Projects', '/settings/projects', 10]
-  ], (label: string, path: string, position: number) => {
-    it(`displays the ${label} navigation link`, () => {
-      fixture.detectChanges();
-      const links = element.nativeElement
-        .querySelectorAll('div.nav-items chef-sidebar-entry');
-      expect(links[position].innerText).toBe(label);
-      expect(links[position].getAttribute('route')).toBe(path);
-    });
   });
 });

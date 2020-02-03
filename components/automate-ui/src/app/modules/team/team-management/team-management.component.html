@@ -39,15 +39,9 @@
               <chef-table-new>
                 <chef-table-header>
                   <chef-table-row>
-                    <chef-table-header-cell class="id-column">
-                      <span>Name</span>
-                    </chef-table-header-cell>
-                    <chef-table-header-cell class="name-column">
-                      <span>ID</span>
-                    </chef-table-header-cell>
-                    <chef-table-header-cell class="projects-column">
-                      <span>Projects</span>
-                    </chef-table-header-cell>
+                    <chef-table-header-cell class="id-column">Name</chef-table-header-cell>
+                    <chef-table-header-cell class="name-column">ID</chef-table-header-cell>
+                    <chef-table-header-cell class="projects-column">Projects</chef-table-header-cell>
                     <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
                   </chef-table-row>
                 </chef-table-header>
@@ -56,13 +50,11 @@
                     <chef-table-cell class="id-column">
                       <a [routerLink]="['/settings/teams', team.id]">{{ team.name }}</a>
                     </chef-table-cell>
-                    <chef-table-cell class="name-column">
-                      <span>{{ team.id }}</span>
-                    </chef-table-cell>
+                    <chef-table-cell class="name-column">{{ team.id }}</chef-table-cell>
                     <chef-table-cell class="projects-column">
-                      <span *ngIf="team.projects.length === 0">{{ unassigned }}</span>
-                      <span *ngIf="team.projects.length === 1">{{ team.projects[0] }}</span>
-                      <span *ngIf="team.projects.length > 1">{{ team.projects.length }} projects</span>
+                      <ng-container *ngIf="team.projects.length === 0">{{ unassigned }}</ng-container>
+                      <ng-container *ngIf="team.projects.length === 1">{{ team.projects[0] }}</ng-container>
+                      <ng-container *ngIf="team.projects.length > 1">{{ team.projects.length }} projects</ng-container>
                     </chef-table-cell>
                     <chef-table-cell class="three-dot-column">
                       <!-- TODO: Need to account for v1 / v2 in the app-authorized path -->

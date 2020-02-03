@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { combineLatest, Subject, Observable } from 'rxjs';
-import { keyBy, at } from 'lodash/fp';
+import { keyBy, at, identity } from 'lodash/fp';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { filter as lodashFilter } from 'lodash/fp';
 
@@ -55,8 +55,8 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetUsers());
     this.store.select(teamFromRoute).pipe(
       takeUntil(this.isDestroyed),
-      map((team) => [team, team ? team.id : null]),
-      filter(([team, _teamId]) => team != null),
+      filter(identity),
+      map(team => [team, team ? team.id : null]),
       distinctUntilChanged(
         ([_teamA, teamIdA]: [Team, string], [_teamB, teamIdB]: [Team, string]) =>
         teamIdA === teamIdB)

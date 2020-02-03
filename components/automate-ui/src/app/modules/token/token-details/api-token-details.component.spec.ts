@@ -117,7 +117,7 @@ describe('ApiTokenDetailsComponent', () => {
     expect(component.token).toEqual(token);
   });
 
-  it('initializes dropdown with those included on the token checked for v2p1', () => {
+  it('initializes dropdown with those checked on the token', () => {
     spyOn(store, 'dispatch').and.callThrough();
     const tokenProjects  = ['b-proj', 'd-proj'];
     store.dispatch(new GetTokenSuccess({...someToken, projects: tokenProjects}));
@@ -129,7 +129,7 @@ describe('ApiTokenDetailsComponent', () => {
     projectList.forEach(p => {
       expect(component.projects[p.id].checked).toEqual(tokenProjects.includes(p.id));
     });
-   });
+  });
 
   it('sets projects dirty when an unchecked project is checked', () => {
     store.dispatch(new GetTokenSuccess(

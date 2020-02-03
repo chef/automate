@@ -66,7 +66,7 @@ describe('PolicyListComponent', () => {
     expect(element).toContainPath('chef-page-header');
   });
 
-  it('displays policy data for v2', () => {
+  it('displays policy data', () => {
     fixture.detectChanges();
     expect(element).toContainPath('app-authorized');
   });

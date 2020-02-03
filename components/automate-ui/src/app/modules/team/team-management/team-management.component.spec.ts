@@ -29,11 +29,6 @@ describe('TeamManagementComponent', () => {
                         inputs: ['default', 'visible', 'objectNoun', 'objectName'],
                         outputs: ['close', 'deleteClicked'] }),
         MockComponent({
-          selector: 'app-create-v1-team-modal',
-          inputs: ['visible', 'creating', 'conflictErrorEvent', 'createForm'],
-          outputs: ['close', 'createClicked']
-        }),
-        MockComponent({
           selector: 'app-create-object-modal',
           inputs: ['visible', 'creating', 'conflictErrorEvent', 'objectNoun',
             'createForm', 'showProjectsDropdown', 'assignableProjects'],
