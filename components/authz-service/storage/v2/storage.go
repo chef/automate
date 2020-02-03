@@ -43,7 +43,6 @@ type policyStorage interface {
 	UpdatePolicy(context.Context, *Policy) (*Policy, error)
 	ListPolicyMembers(context.Context, string) ([]Member, error)
 	AddPolicyMembers(context.Context, string, []Member) ([]Member, error)
-	ApplyV2DataMigrations(context.Context) error
 
 	// Removes passed subject from all 'members' fields, returning affected
 	// policies

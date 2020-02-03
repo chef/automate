@@ -8,6 +8,8 @@ import (
 	"github.com/chef/automate/lib/logger"
 	"github.com/golang-migrate/migrate"
 	"github.com/pkg/errors"
+
+	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 )
 
 // Config holds the information needed to connect to the database (PGURL), to
@@ -25,7 +27,7 @@ const (
 )
 
 // Migrate executes all migrations we have
-func (c *Config) Migrate() error {
+func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 	pgURL := c.PGURL.String()
 	migrationsPath := c.Path
 	l := c.Logger
@@ -90,10 +92,16 @@ func (c *Config) Migrate() error {
 		// TODO set force-upgrade to failed?
 		return errors.Wrap(err, "IAM v2 force-upgrade failed")
 	}
-
 	// TODO set successful flag for force-upgrade
 
 	// end force-migration if
+
+	// this is idempontent and should be a no-op besides reading
+	// the data_migrations table if we are post-force-upgrade
+	err = dataMigConf.Migrate()
+	if err != nil {
+		return errors.Wrap(err, "IAM data migrations failed")
+	}
 
 	// perform remaining migrations
 	err = m.Up()

@@ -47,61 +47,63 @@ func migrateToV2(ctx context.Context, db *sql.DB) error {
 		return errors.Wrap(err, "could not query IAM migration state")
 	}
 
-	// for _, role := range storage.DefaultRoles() {
-	// 	if _, err := s.store.CreateRole(ctx, &role, true); err != nil {
-	// 		return nil, status.Errorf(codes.Internal, "reset to default roles: %s", err.Error())
-	// 	}
-	// }
+	if ifNotOnV2 {
+		// for _, role := range storage.DefaultRoles() {
+		// 	if _, err := s.store.CreateRole(ctx, &role, true); err != nil {
+		// 		return nil, status.Errorf(codes.Internal, "reset to default roles: %s", err.Error())
+		// 	}
+		// }
 
-	// defaultPolicies, err := storage.DefaultPolicies()
-	// if err != nil {
-	// 	return nil, status.Errorf(codes.Internal, "retrieve default policies: %s", err.Error())
-	// }
+		// defaultPolicies, err := storage.DefaultPolicies()
+		// if err != nil {
+		// 	return nil, status.Errorf(codes.Internal, "retrieve default policies: %s", err.Error())
+		// }
 
-	// for _, pol := range defaultPolicies {
-	// 	if _, err := s.store.CreatePolicy(ctx, &pol, true); err != nil {
-	// 		return nil, status.Errorf(codes.Internal, "reset to default policies: %s", err.Error())
-	// 	}
-	// }
+		// for _, pol := range defaultPolicies {
+		// 	if _, err := s.store.CreatePolicy(ctx, &pol, true); err != nil {
+		// 		return nil, status.Errorf(codes.Internal, "reset to default policies: %s", err.Error())
+		// 	}
+		// }
 
-	// Should be able to drop this code. Happening in migration 74_iam_v2_forced_upgrade...
-	// // Added for testing only; these are handled by data migrations.
-	// for _, project := range storage.DefaultProjects() {
-	// 	if _, err := s.store.CreateProject(ctx, &project, false); err != nil {
-	// 		return nil, status.Errorf(codes.Internal, "reset to default project: %s", err.Error())
-	// 	}
-	// }
+		// Should be able to drop this code. Happening in migration 74_iam_v2_forced_upgrade...
+		// // Added for testing only; these are handled by data migrations.
+		// for _, project := range storage.DefaultProjects() {
+		// 	if _, err := s.store.CreateProject(ctx, &project, false); err != nil {
+		// 		return nil, status.Errorf(codes.Internal, "reset to default project: %s", err.Error())
+		// 	}
+		// }
 
-	// recordFailure := func() {
-	// 	// This should be unlikely, and it doesn't affect our returned error, which,
-	// 	// in any case, is the more interesting error -- so, we merely log it.
-	// 	if err := s.store.Failure(ctx); err != nil {
-	// 		s.log.Errorf("failed to record migration failure status: %s", err)
-	// 	}
-	// }
+		// recordFailure := func() {
+		// 	// This should be unlikely, and it doesn't affect our returned error, which,
+		// 	// in any case, is the more interesting error -- so, we merely log it.
+		// 	if err := s.store.Failure(ctx); err != nil {
+		// 		s.log.Errorf("failed to record migration failure status: %s", err)
+		// 	}
+		// }
 
-	// var reports []string
-	// if !req.SkipV1Policies {
-	// 	errs, err := s.migrateV1Policies(ctx)
-	// 	if err != nil {
-	// 		recordFailure()
-	// 		return nil, status.Errorf(codes.Internal, "migrate v1 policies: %s", err.Error())
-	// 	}
-	// 	for _, e := range errs {
-	// 		reports = append(reports, e.Error())
-	// 	}
-	// } else {
-	// 	// Note 2019/05/22 (sr): policies without subjects are silently ignored -- this
-	// 	// is to be in line with the migration case, that does the same. However, this
-	// 	// could be worth revisiting?
-	// 	pols, err := s.v1.ListPoliciesWithSubjects(ctx)
-	// 	if err != nil {
-	// 		recordFailure()
-	// 		return nil, status.Errorf(codes.Internal, "list v1 policies: %s", err.Error())
-	// 	}
-	// 	reports = append(reports, fmt.Sprintf("%d v1 policies", len(pols)))
+		// var reports []string
+		// if !req.SkipV1Policies {
+		// 	errs, err := s.migrateV1Policies(ctx)
+		// 	if err != nil {
+		// 		recordFailure()
+		// 		return nil, status.Errorf(codes.Internal, "migrate v1 policies: %s", err.Error())
+		// 	}
+		// 	for _, e := range errs {
+		// 		reports = append(reports, e.Error())
+		// 	}
+		// } else {
+		// 	// Note 2019/05/22 (sr): policies without subjects are silently ignored -- this
+		// 	// is to be in line with the migration case, that does the same. However, this
+		// 	// could be worth revisiting?
+		// 	pols, err := s.v1.ListPoliciesWithSubjects(ctx)
+		// 	if err != nil {
+		// 		recordFailure()
+		// 		return nil, status.Errorf(codes.Internal, "list v1 policies: %s", err.Error())
+		// 	}
+		// 	reports = append(reports, fmt.Sprintf("%d v1 policies", len(pols)))
 
-	// }
+		// }
+	}
 
 	// // we've made it!
 	// var v api.Version

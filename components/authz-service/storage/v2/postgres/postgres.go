@@ -53,7 +53,7 @@ func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf m
 	once.Do(func() {
 		l.Infof("applying database migrations from %s", migConf.Path)
 		var db *sql.DB
-		db, err = postgres.New(ctx, migConf)
+		db, err = postgres.New(ctx, migConf, dataMigConf)
 		singletonInstance = &pg{
 			db:           db,
 			engine:       e,
@@ -336,10 +336,6 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 
 	// Currently, we don't change anything from what is passed in.
 	return pol, nil
-}
-
-func (p *pg) ApplyV2DataMigrations(_ context.Context) error {
-	return p.dataMigConf.Migrate()
 }
 
 func (p *pg) GetPolicyChangeID(ctx context.Context) (string, error) {

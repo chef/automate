@@ -9,14 +9,15 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 )
 
 // New returns a new sq.DB connector with the automatic default migrations applied.
-func New(ctx context.Context, migConf migration.Config) (*sql.DB, error) {
+func New(ctx context.Context, migConf migration.Config, dataMigConf datamigration.Config) (*sql.DB, error) {
 	pgURL := migConf.PGURL.String()
 
-	if err := migConf.Migrate(); err != nil {
+	if err := migConf.Migrate(dataMigConf); err != nil {
 		return nil, errors.Wrapf(
 			err,
 			"apply database migrations from %s",

@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -100,6 +99,7 @@ func NewPoliciesServer(
 		l.Warn("cleaned up in-progress migration status")
 	}
 
+	// TODO can all the below go away?
 	// check migration status
 	ms, err := srv.store.MigrationStatus(ctx)
 	if err != nil {
@@ -120,12 +120,6 @@ func NewPoliciesServer(
 		v = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
 	}
 	srv.setVersionForInterceptorSwitch(v)
-
-	if v.Major == api.Version_V2 {
-		if err := srv.store.ApplyV2DataMigrations(ctx); err != nil {
-			return nil, errors.Wrap(err, "error migrating v2 data")
-		}
-	}
 
 	// now that the data is all set, attempt to feed it into OPA:
 	if err := srv.updateEngineStore(ctx); err != nil {
@@ -536,107 +530,8 @@ func (s *policyServer) UpdateRole(
 // any existing V1 policies.
 func (s *policyServer) MigrateToV2(ctx context.Context,
 	req *api.MigrateToV2Req) (*api.MigrateToV2Resp, error) {
-	ms, err := s.store.MigrationStatus(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "retrieve migration status: %s", err.Error())
-	}
 
-	// the 2.1 flag is not related to migration or major version;
-	// it acts as a feature flag around project authz, so no need to migrate
-	// if we're already on some version of v2
-	upgraded, err := s.handleMinorUpgrade(ctx, ms, req.Flag)
-	if err != nil {
-		return nil, err
-	}
-	if upgraded {
-		return &api.MigrateToV2Resp{}, nil
-	}
-
-	if err := s.okToMigrate(ctx, ms); err != nil {
-		return nil, err
-	}
-
-	if err := s.store.InProgress(ctx); err != nil {
-		return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
-	}
-
-	defaultPolicies, err := storage.DefaultPolicies()
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "retrieve default policies: %s", err.Error())
-	}
-
-	for _, role := range storage.DefaultRoles() {
-		if _, err := s.store.CreateRole(ctx, &role, true); err != nil {
-			return nil, status.Errorf(codes.Internal, "reset to default roles: %s", err.Error())
-		}
-	}
-
-	for _, pol := range defaultPolicies {
-		if _, err := s.store.CreatePolicy(ctx, &pol, true); err != nil {
-			return nil, status.Errorf(codes.Internal, "reset to default policies: %s", err.Error())
-		}
-	}
-
-	// Added for testing only; these are handled by data migrations.
-	for _, project := range storage.DefaultProjects() {
-		if _, err := s.store.CreateProject(ctx, &project, false); err != nil {
-			return nil, status.Errorf(codes.Internal, "reset to default project: %s", err.Error())
-		}
-	}
-
-	recordFailure := func() {
-		// This should be unlikely, and it doesn't affect our returned error, which,
-		// in any case, is the more interesting error -- so, we merely log it.
-		if err := s.store.Failure(ctx); err != nil {
-			s.log.Errorf("failed to record migration failure status: %s", err)
-		}
-	}
-
-	var reports []string
-	if !req.SkipV1Policies {
-		errs, err := s.migrateV1Policies(ctx)
-		if err != nil {
-			recordFailure()
-			return nil, status.Errorf(codes.Internal, "migrate v1 policies: %s", err.Error())
-		}
-		for _, e := range errs {
-			reports = append(reports, e.Error())
-		}
-	} else {
-		// Note 2019/05/22 (sr): policies without subjects are silently ignored -- this
-		// is to be in line with the migration case, that does the same. However, this
-		// could be worth revisiting?
-		pols, err := s.v1.ListPoliciesWithSubjects(ctx)
-		if err != nil {
-			recordFailure()
-			return nil, status.Errorf(codes.Internal, "list v1 policies: %s", err.Error())
-		}
-		reports = append(reports, fmt.Sprintf("%d v1 policies", len(pols)))
-
-	}
-
-	err = s.store.ApplyV2DataMigrations(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "apply v2 data migrations: %s", err.Error())
-	}
-
-	// we've made it!
-	var v api.Version
-	switch req.Flag {
-	case api.Flag_VERSION_2_1:
-		err = s.store.SuccessBeta1(ctx)
-		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
-	default:
-		err = s.store.Success(ctx)
-		v = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
-	}
-	if err != nil {
-		recordFailure()
-		return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
-	}
-
-	s.setVersionForInterceptorSwitch(v)
-	return &api.MigrateToV2Resp{Reports: reports}, nil
+	return &api.MigrateToV2Resp{}, nil
 }
 
 func (s *policyServer) handleMinorUpgrade(ctx context.Context, ms storage.MigrationStatus, f api.Flag) (upgraded bool, err error) {

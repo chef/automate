@@ -12,8 +12,8 @@ import (
 	"github.com/chef/automate/lib/logger"
 )
 
-// NOTE (TC): These are IAM V2 specific data migrations. DO NOT APPLY ANY SCHEMA CHANGES HERE!
-// Read more in v2_data_migrations.md.
+// NOTE (TC): datamigration is the last set of IAM force-upgrade data related
+// transformations. PLEASE DO NOT MODIFY THESE MIGRATIONS.
 //
 // Config holds the information needed to connect to the database (PGURL), to
 // find the migration SQL files (Path), and log debug messages (Logger).
