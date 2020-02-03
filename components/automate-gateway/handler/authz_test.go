@@ -35,63 +35,6 @@ import (
 	_ "github.com/chef/automate/components/automate-gateway/api/compliance/profiles"
 )
 
-func TestIntrospectAllV1(t *testing.T) {
-	authzSrv, _, s, hdlr := testServerAndHandler(t)
-	defer s.Close()
-	reset := func() {
-		authzSrv.FilterAuthorizedPairsFunc = nil
-	}
-
-	cases := map[string]struct {
-		authzResp *authz.FilterAuthorizedPairsResp
-		expected  map[string]*response.MethodsAllowed
-	}{
-		"one response pair, mapped": {
-			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies", Action: "create"},
-			}},
-			map[string]*response.MethodsAllowed{"/auth/policies": &response.MethodsAllowed{Post: true}},
-		},
-		"two response pairs, both mapped": {
-			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies", Action: "create"},
-				{Resource: "auth_introspection:introspect_all", Action: "read"},
-			}},
-			map[string]*response.MethodsAllowed{
-				"/auth/introspect": &response.MethodsAllowed{Get: true},
-				"/auth/policies":   &response.MethodsAllowed{Post: true},
-			},
-		},
-		"two response pairs, both mapped, one with holes": {
-			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies", Action: "create"},
-				{Resource: "auth:policies:{id}", Action: "delete"},
-			}},
-			map[string]*response.MethodsAllowed{"/auth/policies": {Post: true}},
-		},
-	}
-
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", middleware.AuthV1.String())
-			req := &request.IntrospectAllReq{}
-			authzSrv.FilterAuthorizedPairsFunc = func(
-				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
-				return tc.authzResp, nil
-			}
-			resp, err := hdlr.IntrospectAll(ctx, req)
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			for key, value := range tc.expected {
-				assert.Contains(t, resp.Endpoints, key)
-				assert.Equal(t, value, resp.Endpoints[key])
-			}
-		})
-		reset()
-	}
-}
-
 func TestIntrospectAllV2(t *testing.T) {
 	authzSrvV1, authzSrv, s, hdlr := testServerAndHandler(t)
 	authzSrvV1.FilterAuthorizedPairsFunc = shouldUseV2PairsFunc
