@@ -55,7 +55,7 @@ func (s *Server) dataCollectorHandler(w http.ResponseWriter, r *http.Request) {
 		actionV2   = "infra:ingest:create"
 	)
 
-	ctx, err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2)
+	ctx, err := s.authRequest(r, resourceV2, actionV2)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
