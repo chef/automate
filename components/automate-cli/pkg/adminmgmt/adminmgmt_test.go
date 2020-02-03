@@ -135,30 +135,43 @@ func TestEnsureTeam(t *testing.T) {
 	require.NoError(t, err)
 	defer apiClient.CloseConnection()
 
-	t.Run("when GetTeams fails with an unexpected error then raise that error", func(t *testing.T) {
-		serverMocks.TeamsMock.GetTeamFunc = getTeamError(codes.Internal)
+	t.Run("when ListTeams fails with an unexpected error then raise that error", func(t *testing.T) {
+		serverMocks.TeamsMock.ListTeamsFunc = listTeamsError(codes.Internal)
 
 		_, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, false)
 		require.Error(t, err)
 	})
 
 	t.Run("when the admins team does not exist", func(t *testing.T) {
-		serverMocks.TeamsMock.GetTeamFunc = getTeamError(codes.NotFound)
+		serverMocks.TeamsMock.ListTeamsFunc = func(
+			context.Context, *iam_req.ListTeamsReq) (*iam_resp.ListTeamsResp, error) {
+
+			return &iam_resp.ListTeamsResp{
+				Teams: []*iam_common.Team{
+					{
+						Id:       "mocked-not-admin-id",
+						Name:     "not-admin",
+						Projects: []string{},
+					},
+				},
+			}, nil
+		}
 
 		t.Run("it is created and found=false is returned", func(t *testing.T) {
 			createAdminID := "mocked-admin-id"
 			serverMocks.TeamsMock.CreateTeamFunc = func(
 				_ context.Context, req *iam_req.CreateTeamReq) (*iam_resp.CreateTeamResp, error) {
 
-				if "admins" != req.Id ||
-					"admins" != req.Name {
+				if "admins" != req.Name ||
+					"admins" != req.Id {
 					return nil, errors.New("unexpected arguments")
 				}
 
 				return &iam_resp.CreateTeamResp{
 					Team: &iam_common.Team{
-						Id:   createAdminID,
-						Name: req.Name,
+						Id:       createAdminID,
+						Name:     req.Name,
+						Projects: []string{},
 					},
 				}, nil
 			}
@@ -178,13 +191,22 @@ func TestEnsureTeam(t *testing.T) {
 	})
 
 	t.Run("when the admins team exists already", func(t *testing.T) {
-		serverMocks.TeamsMock.GetTeamFunc = func(
-			context.Context, *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
+		mockedAdminsID := "mocked-admin-id"
+		serverMocks.TeamsMock.ListTeamsFunc = func(
+			context.Context, *iam_req.ListTeamsReq) (*iam_resp.ListTeamsResp, error) {
 
-			return &iam_resp.GetTeamResp{
-				Team: &iam_common.Team{
-					Id:   "admins",
-					Name: "admins",
+			return &iam_resp.ListTeamsResp{
+				Teams: []*iam_common.Team{
+					{
+						Id:       "mocked-not-admin-id",
+						Name:     "not-admin",
+						Projects: []string{},
+					},
+					{
+						Id:       mockedAdminsID,
+						Name:     "admins",
+						Projects: []string{},
+					},
 				},
 			}, nil
 		}
@@ -373,8 +395,8 @@ func getUserError(c codes.Code) func(context.Context, *iam_req.GetUserReq) (*iam
 	}
 }
 
-func getTeamError(c codes.Code) func(context.Context, *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
-	return func(context.Context, *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
+func listTeamsError(c codes.Code) func(context.Context, *iam_req.ListTeamsReq) (*iam_resp.ListTeamsResp, error) {
+	return func(context.Context, *iam_req.ListTeamsReq) (*iam_resp.ListTeamsResp, error) {
 		return nil, status.Error(c, "unexpected error")
 	}
 }
