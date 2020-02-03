@@ -43,7 +43,6 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   public filteredProjects: ProjectChecked[] = [];
   public active = false;
   public label = UNASSIGNED_PROJECT_ID;
-  public filterValue = '';
 
   ngOnInit(): void {
     if (this.projectsUpdated) { // an optional setting
@@ -71,7 +70,6 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
       return;
     }
     if (!this.active) {
-      this.filterValue = '';
       this.filteredProjects = this.projectsArray;
     }
 
@@ -90,8 +88,8 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     }
   }
 
-  handleFilterKeyUp(): void {
-    this.filteredProjects = this.filterProjects(this.filterValue);
+  handleFilterKeyUp(filterValue: string): void {
+    this.filteredProjects = this.filterProjects(filterValue);
   }
 
   filterProjects(value: string): ProjectChecked[]  {
