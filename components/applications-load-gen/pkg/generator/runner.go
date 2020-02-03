@@ -6,6 +6,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/pkg/errors"
 
@@ -299,16 +300,29 @@ func (m *MessagePrototype) CreateMessage(uuid string) *habitat.HealthCheckEvent 
 		},
 		EventMetadata: &habitat.EventMetadata{
 			SupervisorId: uuid,
+			OccurredAt:   ptypes.TimestampNow(),
 			Application:  m.Application,
 			Environment:  m.Environment,
 			Fqdn:         fmt.Sprintf("%s.example", uuid),
 			Site:         "test",
 		},
-		Result:     habitat.HealthCheckResult_Warning,
+		Result:     healthCheck99PercentOk(),
 		Execution:  &duration.Duration{},
 		Stdout:     &wrappers.StringValue{Value: ""},
 		Stderr:     &wrappers.StringValue{Value: ""},
 		ExitStatus: &wrappers.Int32Value{Value: int32(0)},
+	}
+}
+
+func healthCheck99PercentOk() habitat.HealthCheckResult {
+	n := rand.Intn(1000)
+	switch {
+	case n < 989:
+		return habitat.HealthCheckResult_Ok
+	case n < 994:
+		return habitat.HealthCheckResult_Warning
+	default:
+		return habitat.HealthCheckResult_Critical
 	}
 }
 
