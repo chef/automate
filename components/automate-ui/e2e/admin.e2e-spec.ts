@@ -10,16 +10,6 @@ describe('Admin pages', () => {
   describe('User Management', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .many()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V1',
-            'minor': 'V0'
-          }
-        }));
-
-      fakeServer()
         .get('/api/v0/auth/introspect')
         .many()
         .reply(200, JSON.stringify(
@@ -37,16 +27,15 @@ describe('Admin pages', () => {
         ));
 
       fakeServer()
-        .get('/api/v0/auth/users')
+        .get('/apis/iam/v2/users')
         .many()
         .reply(200, JSON.stringify(
           {
             users: [
               {
-                id: 'b369ef15-6323-4c31-bcbc-23fb0c9ba55d',
+                id: 'admin',
                 name: 'Local Administrator',
-                email: 'admin',
-                username: 'admin'
+                membership_id: '38d792f7-85b4-4127-9c4e-110118e3cca4'
               }
             ]
           }
@@ -143,21 +132,6 @@ describe('Admin pages', () => {
             ]
           }
         ));
-
-      // Note(sr): Technically, this isn't required: the crucial check in the
-      // policy-list component only checks '=== "v1"' and '!== "v1"', and
-      // undefined, or whatever it ends up being when the endpoint is not found,
-      // is unequal "v1". But this is more correct, and less dependant on that
-      // specific detail.
-      fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .many()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V2',
-            'minor': 'V0'
-          }
-        }));
 
       browser.waitForAngularEnabled(false);
       browser.get('/settings/policies');
@@ -288,16 +262,6 @@ describe('Admin pages', () => {
           }
         ));
 
-      fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .many()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V2',
-            'minor': 'V0'
-          }
-        }));
-
       browser.waitForAngularEnabled(false);
       browser.get('/settings/policies/some-test-policy');
     });
@@ -351,7 +315,7 @@ describe('Admin pages', () => {
         ));
 
       fakeServer()
-        .get('/api/v0/auth/users')
+        .get('/apis/iam/v2/users')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -359,27 +323,24 @@ describe('Admin pages', () => {
               {
                 id: 'otheruser',
                 name: 'Otheruser',
-                email: 'otheruser',
-                username: 'otheruser'
+                membership_id: '38d792f7-85b4-4127-9c4e-110118e3cca4'
               },
               {
                 id: 'admin',
                 name: 'Local Administrator',
-                email: 'admin',
-                username: 'admin'
+                membership_id: '8a6e9808-8afa-4b29-ab0b-77a622ee1fb5'
               },
               {
                 id: 'testuser',
                 name: 'Testuser',
-                email: 'testuser',
-                username: 'testuser'
+                membership_id: '3d7b2b3c-7fca-4a66-bc7e-131efd655c4b'
               }
             ]
           }
         ));
 
       fakeServer()
-        .get('/api/v0/auth/teams')
+        .get('/apis/iam/v2/teams')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -641,16 +602,6 @@ describe('Admin pages', () => {
           }
         ));
 
-      fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .many()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V2',
-            'minor': 'V0'
-          }
-        }));
-
       browser.waitForAngularEnabled(false);
       browser.get('/settings/roles');
     });
@@ -700,16 +651,6 @@ describe('Admin pages', () => {
             }
           }
         ));
-
-      fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .many()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V2',
-            'minor': 'V0'
-          }
-        }));
 
       browser.waitForAngularEnabled(false);
       browser.get('/settings/roles/some-test-role');
@@ -809,16 +750,6 @@ describe('Admin pages', () => {
           .any()
           .reply(200, JSON.stringify({ endpoints }));
       });
-
-      fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .any()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V2',
-            'minor': 'V1'
-          }
-        }));
 
       browser.waitForAngularEnabled(false);
       browser.get('/settings/projects');
