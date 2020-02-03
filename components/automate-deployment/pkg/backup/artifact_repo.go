@@ -89,7 +89,7 @@ func newUploadSnapshotArtifactIterator(ctx context.Context, src Bucket,
 		return nil, err
 	}
 
-	artifactsToUpload := LineReaderStream(artifactsToUploadTmpFile)
+	artifactsToUpload := NewLineReaderStream(artifactsToUploadTmpFile)
 
 	return &uploadSnapshotArtifactIterator{
 		ctx:                      ctx,
@@ -357,7 +357,7 @@ func mergeIntoFile(stream1 ArtifactStream, stream2 ArtifactStream) (ArtifactStre
 		return nil, err
 	}
 
-	return LineReaderStream(tmpFile), nil
+	return NewLineReaderStream(tmpFile), nil
 }
 
 func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (ArtifactStream, string, error) {
@@ -401,7 +401,7 @@ func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (Ar
 		return nil, "", err
 	}
 
-	return LineReaderStream(tmpFile), checksum, nil
+	return NewLineReaderStream(tmpFile), checksum, nil
 }
 
 func (repo *ArtifactRepo) removeSnapshotFile(ctx context.Context, name string) error {

@@ -100,8 +100,8 @@ func (p *peekableArtifactStream) Close() error {
 	return p.stream.Close()
 }
 
-// NewPeekableArtifactStream wraps the given ArtifactStream so that it can be peeked
-func NewPeekableArtifactStream(s ArtifactStream) PeekableArtifactStream {
+// NewPeekableStream wraps the given ArtifactStream so that it can be peeked
+func NewPeekableStream(s ArtifactStream) PeekableArtifactStream {
 	return &peekableArtifactStream{
 		stream: s,
 	}
@@ -142,7 +142,9 @@ func (s *lineReaderStream) Close() error {
 	return s.r.Close()
 }
 
-func LineReaderStream(reader io.ReadCloser) ArtifactStream {
+// NewLineReaderStream returns an artifact stream that reads line by line
+// from the provided reader, and produces each line as an item
+func NewLineReaderStream(reader io.ReadCloser) ArtifactStream {
 	scanner := bufio.NewScanner(reader)
 
 	return &lineReaderStream{
@@ -223,8 +225,8 @@ func (d *xorStream) Close() error {
 // Xor returns a stream with elements in a or b but not both
 // a xor b
 func Xor(a ArtifactStream, b ArtifactStream) ArtifactStream {
-	peekableA := NewPeekableArtifactStream(a)
-	peekableB := NewPeekableArtifactStream(b)
+	peekableA := NewPeekableStream(a)
+	peekableB := NewPeekableStream(b)
 
 	return &xorStream{
 		a: peekableA,
@@ -275,8 +277,8 @@ func (d *subStream) Close() error {
 // Sub returns a stream with elements in a but not in b
 // a - b
 func Sub(a ArtifactStream, b ArtifactStream) ArtifactStream {
-	peekableA := NewPeekableArtifactStream(a)
-	peekableB := NewPeekableArtifactStream(b)
+	peekableA := NewPeekableStream(a)
+	peekableB := NewPeekableStream(b)
 
 	return &subStream{
 		a: peekableA,
@@ -334,11 +336,11 @@ func Merge(streams ...ArtifactStream) ArtifactStream {
 	}
 
 	root := &mergeStream{
-		a: NewPeekableArtifactStream(streams[0]),
+		a: NewPeekableStream(streams[0]),
 	}
 	last := root
 	for i := 1; i < len(streams); i++ {
-		p := NewPeekableArtifactStream(streams[i])
+		p := NewPeekableStream(streams[i])
 
 		if i == len(streams)-1 {
 			last.b = p
@@ -346,7 +348,7 @@ func Merge(streams ...ArtifactStream) ArtifactStream {
 			next := &mergeStream{
 				a: p,
 			}
-			last.b = NewPeekableArtifactStream(next)
+			last.b = NewPeekableStream(next)
 			last = next
 		}
 	}
@@ -381,6 +383,8 @@ func (s *loggingStream) Close() error {
 	return s.stream.Close()
 }
 
+// NewLoggingStream returns a stream which writes the produced items to the provided
+// writer as the stream is read.
 func NewLoggingStream(stream ArtifactStream, out io.Writer) ArtifactStream {
 	return &loggingStream{
 		stream: stream,
@@ -388,6 +392,7 @@ func NewLoggingStream(stream ArtifactStream, out io.Writer) ArtifactStream {
 	}
 }
 
+// CountingStream is a stream that keeps track of the number of items procuced
 type CountingStream interface {
 	ArtifactStream
 	Count() int64
@@ -422,12 +427,15 @@ func (s *countingStream) Count() int64 {
 	return s.count
 }
 
+// NewCountingStream returns a stream which keeps track of the number of
+// items produced
 func NewCountingStream(stream ArtifactStream) CountingStream {
 	return &countingStream{
 		stream: stream,
 	}
 }
 
+// ConsumeStream reads all elements in the stream until EOF is reached.
 func ConsumeStream(stream ArtifactStream) error {
 	for {
 		_, err := stream.Next()

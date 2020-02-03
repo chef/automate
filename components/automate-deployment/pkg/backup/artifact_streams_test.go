@@ -2,27 +2,13 @@ package backup
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"io"
 	"io/ioutil"
 	"testing"
-)
 
-func consume(t *testing.T, stream ArtifactStream) []string {
-	ret := []string{}
-	for {
-		v, err := stream.Next()
-		if err != nil {
-			if err == io.EOF {
-				break
-			}
-			require.NoError(t, err)
-		}
-		ret = append(ret, v)
-	}
-	return ret
-}
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
 
 type readCloserTester struct {
 	reader io.ReadCloser
@@ -54,7 +40,7 @@ func (s *streamCloserTester) Close() error {
 
 func TestPeekableStream(t *testing.T) {
 	t.Run("returns EOF for empty stream", func(t *testing.T) {
-		a := NewPeekableArtifactStream(NewArrayStream([]string{}))
+		a := NewPeekableStream(NewArrayStream([]string{}))
 		_, err := a.Peek()
 		assert.Equal(t, io.EOF, err)
 		_, err = a.Peek()
@@ -67,7 +53,7 @@ func TestPeekableStream(t *testing.T) {
 	})
 
 	t.Run("one element", func(t *testing.T) {
-		a := NewPeekableArtifactStream(NewArrayStream([]string{"a"}))
+		a := NewPeekableStream(NewArrayStream([]string{"a"}))
 		v, err := a.Peek()
 		require.NoError(t, err)
 		assert.Equal(t, "a", v)
@@ -88,7 +74,7 @@ func TestPeekableStream(t *testing.T) {
 	})
 
 	t.Run("multiple element", func(t *testing.T) {
-		a := NewPeekableArtifactStream(NewArrayStream([]string{"a", "b"}))
+		a := NewPeekableStream(NewArrayStream([]string{"a", "b"}))
 		v, err := a.Peek()
 		require.NoError(t, err)
 		assert.Equal(t, "a", v)
@@ -120,7 +106,7 @@ func TestPeekableStream(t *testing.T) {
 		tester := &streamCloserTester{
 			stream: EmptyStream(),
 		}
-		reader := NewPeekableArtifactStream(tester)
+		reader := NewPeekableStream(tester)
 		require.NoError(t, reader.Close())
 		require.NoError(t, reader.Close())
 		assert.Equal(t, 1, tester.called)
@@ -130,43 +116,43 @@ func TestPeekableStream(t *testing.T) {
 func TestLineReaderStream(t *testing.T) {
 	t.Run("empty", func(t *testing.T) {
 		buffer := ioutil.NopCloser(bytes.NewBuffer(nil))
-		reader := LineReaderStream(buffer)
+		reader := NewLineReaderStream(buffer)
 		assert.Equal(t, []string{}, consume(t, reader))
 	})
 
 	t.Run("compact", func(t *testing.T) {
 		buffer := ioutil.NopCloser(bytes.NewBufferString("a\nb\nc"))
-		reader := LineReaderStream(buffer)
+		reader := NewLineReaderStream(buffer)
 		assert.Equal(t, []string{"a", "b", "c"}, consume(t, reader))
 	})
 
 	t.Run("compact with trailing newline", func(t *testing.T) {
 		buffer := ioutil.NopCloser(bytes.NewBufferString("a\nb\nc\n"))
-		reader := LineReaderStream(buffer)
+		reader := NewLineReaderStream(buffer)
 		assert.Equal(t, []string{"a", "b", "c"}, consume(t, reader))
 	})
 
 	t.Run("multiple trailing newline", func(t *testing.T) {
 		buffer := ioutil.NopCloser(bytes.NewBufferString("a\nb\nc\n\n\n"))
-		reader := LineReaderStream(buffer)
+		reader := NewLineReaderStream(buffer)
 		assert.Equal(t, []string{"a", "b", "c"}, consume(t, reader))
 	})
 
 	t.Run("starting newline", func(t *testing.T) {
 		buffer := ioutil.NopCloser(bytes.NewBufferString("\na\nb\nc\n"))
-		reader := LineReaderStream(buffer)
+		reader := NewLineReaderStream(buffer)
 		assert.Equal(t, []string{"a", "b", "c"}, consume(t, reader))
 	})
 
 	t.Run("newlines in middle", func(t *testing.T) {
 		buffer := ioutil.NopCloser(bytes.NewBufferString("\na\n\n\nb\n\nc\n"))
-		reader := LineReaderStream(buffer)
+		reader := NewLineReaderStream(buffer)
 		assert.Equal(t, []string{"a", "b", "c"}, consume(t, reader))
 	})
 
 	t.Run("chomps whitespace", func(t *testing.T) {
 		buffer := ioutil.NopCloser(bytes.NewBufferString(" \na \n \n\n b\n  \nc \n "))
-		reader := LineReaderStream(buffer)
+		reader := NewLineReaderStream(buffer)
 		assert.Equal(t, []string{"a", "b", "c"}, consume(t, reader))
 	})
 
@@ -174,7 +160,7 @@ func TestLineReaderStream(t *testing.T) {
 		readCloserTester := &readCloserTester{
 			reader: ioutil.NopCloser(bytes.NewBufferString("a\nb\nc")),
 		}
-		reader := LineReaderStream(readCloserTester)
+		reader := NewLineReaderStream(readCloserTester)
 		assert.Equal(t, []string{"a", "b", "c"}, consume(t, reader))
 		require.NoError(t, reader.Close())
 		require.NoError(t, reader.Close())
