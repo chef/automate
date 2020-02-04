@@ -336,8 +336,6 @@ describe File.basename(__FILE__) do
           "failed"=>{},
           "waived"=>{}}}]
     }
-    control_item_array = actual_data['control_items']
     assert_equal_json_content(expected_data, actual_data)
-    assert_equal(3, control_item_array.size)
   end
 end

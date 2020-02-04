@@ -615,8 +615,6 @@ describe File.basename(__FILE__) do
                 }
             ]
     }
-    control_item_array = actual_data['control_items']
-    assert_equal(6, control_item_array.size)
     assert_equal_json_content(expected_data, actual_data)
   end
 
