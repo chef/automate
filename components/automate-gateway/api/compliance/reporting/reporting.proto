@@ -315,7 +315,7 @@ message WaiverData {
 	string expiration_date = 2;
 	// The reason for the waiver.
 	string justification = 3;
-	// What are the counts for the waived controls across nodes?
+	// Intentionally blank.
 	ControlSummary waiver_summary= 4;
 }
 
