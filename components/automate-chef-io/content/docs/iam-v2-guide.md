@@ -28,11 +28,9 @@ This policy display includes the following:
 ![](/images/docs/admin-policies-migrated.png)
 
 ## Policy Conversion
+If you started on IAM v1 and migrated your IAM v1 policies to IAM v2 then you should move any members of your IAM v1 legacy policies to the appropriate IAM v2 policies and then delete the IAM v1 legacy policies.
 
-We recommend that you reconstitute your v1 policies as v2 policies.
-Once this policy conversion is done, delete the old legacy v1 policies and you will have an up-to-date system.
-
-To delete a legacy policy, open the menu on any custom policy, which is located at the end of the policy row, and select **Delete Policy** from the menu. You will not have this option for Chef-managed policies.
+To delete a legacy policy, open the menu on any custom policy, which is located at the end of the policy row, and select **Delete Policy** from the menu.
 
 A warning appears if members are still attached to the policy because deleting that policy disrupts access for all of its members.
 However, you will still be able to delete the policy.
@@ -112,7 +110,7 @@ The statement allows us to specify the `actions` a user is permitted to take upo
 The `projects` field on a statement is an array that may contain more than one existing project, a wildcard `*` to indicate permission to resources in _any project_, or `(unassigned)` to indicate permission to resources that have not been assigned to a project.
 
 Note that the `projects` property in statements designates permission for the resources within the statement (here, that is `iam:users` and `iam:teams`), _not_ for the policy itself, and _cannot_ be left empty.
-For more about projects, please see [Projects]({{< relref "iam-v2-guide.md#projects" >}}) or [Projects Property]({{< relref "iam-v2-api-reference#projects-property" >}}) documentation.
+For more about projects, see [Projects]({{< relref "iam-v2-guide.md#projects" >}}).
 
 In this case, we only need a single statement providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_ that have been assigned to the project `project-devops`.
 
@@ -159,7 +157,7 @@ In this case, we only need a single statement providing access to the _get_, _li
 }
 ```
 
-Save your JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to send that policy data to Chef Automate.
+Save your JSON file and follow the steps in [Creating a Policy]({{< relref "api/#tag/policies" >}}) to send that policy data to Chef Automate.
 
 ### Policy Membership
 
@@ -264,7 +262,7 @@ If you would like to delegate ownership of a project to another user so that the
 While Automate's local teams and tokens can be directly assigned to a project, ingested resources must be assigned to projects using ingest rules.
 
 Project ingest rules are used to associate ingested resources with projects within Automate. An ingest rule contains conditions that determine if an ingested resource should be moved into the rule's project.
-Each condition contains an attribute, operator, and value. See [Project Rules]({{< relref "iam-v2-api-reference.md#project-rules" >}}) for details on how to manage project rules.
+Each condition contains an attribute, operator, and value. See [Project Rules]({{< relref "api/#tag/projects" >}}) for details on how to manage project rules.
 
 In this example, after [creating a project]({{< relref "iam-v2-guide.md#creating-a-project" >}}) with the ID `project-devops`, you will add an ingest rule to this new project.
 You will update projects to apply this new project rule, causing all matching ingested resources to be associated with `project-devops`.
@@ -409,5 +407,3 @@ Generate a new token and add that token as a new member of the Chef-managed `Adm
 ```bash
   chef-automate iam token create <your token name here> --admin
 ```
-
-

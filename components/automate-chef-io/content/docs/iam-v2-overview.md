@@ -9,11 +9,6 @@ toc = true
     parent = "authorization"
     weight = 10
 +++
-<!-- Goal
-Show the simplest possible experience that most users will experience. We are assuming that experience will be UI only, so present the UI information first followed by CLI information presented in reference format.
--->
-
-The [IAM v2 API Reference]({{< relref "iam-v2-api-reference.md" >}}) details command line features.
 
 ## Features in IAM v2
 
@@ -23,8 +18,7 @@ Perhaps most significantly, IAM v2 supports projects, which allow for filtering 
 
 At the heart of Chef Automate's IAM system is the *policy*.
 A policy defines permissions for who may perform what action on which resource scoped by project.
-The "who" may be a user, a team, or a system.
-Users and teams are designated by name while systems use pre-authorized API tokens to communicate with Automate.
+The "who" may be a user, a team, or an API token.
 
 The following diagram shows the policy structure. We will detail the specifics in the next few sections.
 
@@ -100,7 +94,7 @@ A role is a named list of actions.
 This listing provides the benefits of *encapsulation*, where only the name is needed and is not encumbered by all the details after initial definition, and *reusability*, in applying the role to any statement that needs it.
 
 Chef Automate has 5 default roles.
-To see the actions comprising the roles, see [Chef-managed Roles]({{< relref "iam-v2-api-reference.md#default-chef-managed-roles" >}}).
+To see the actions comprising the roles, see [Chef-managed Roles]({{< relref "api/#tag/roles" >}}).
 
 Role          | Description
 --------------|------------
@@ -125,7 +119,7 @@ IAM v2 projects are collections of resources either created in Chef Automate, or
 Projects are used in a policy to reduce the scope of that policy's permissions to only the resources assigned to the given projects.
 
 {{< info >}}
-Chef Automate limits you to 300 projects while we continue to refine the user experience.
+Chef Automate limits you to 300 projects.
 See [Configuring Project Limit]({{< relref "iam-v2-guide.md#configuring-project-limit" >}}) for configuration instructions.
 {{< /info >}}
 
@@ -173,7 +167,7 @@ Only some resources in Chef Automate respect projects and only those will be fil
 - Teams
 - Roles
 
-#### Resources that do not yet respect projects
+#### Resources that do not respect projects
 
 - Compliance Scan Jobs
 - Compliance Profiles
@@ -210,84 +204,3 @@ Event Attribute        | Chef Organization or Chef Server
 Node Attribute         | Chef Organization, Chef Server, Environment, Chef Role, Chef Tag, Chef Policy Name, or Chef Policy Group
 Operator               | equals of member of
 Values                 | list of one or more values to match on the specified attribute
-
-## Policies, Roles, and Projects in the UI
-
-Chef Automate's **Settings** tab has an *Access Management* heading in the left panel, with pages for *Policies*, *Roles*, and *Projects*.
-
-The _Policy List_ page displays all your policies along with their types (*Chef-managed* or *Custom*) and status (*In use* or *No members*).
-
-![](/images/docs/admin-policies.png)
-
-Select any listed resource to view its details.
-For example, here is the definition of the *Editors* policy after selecting it from the list.
-
-![](/images/docs/admin-policies-editors-definition.png)
-
-Notice also the **Members** tab, which allows you to manage the membership of the policy.
-
-![](/images/docs/admin-policies-editors-members.png)
-
-The *Editors* policy includes, by default, the *editors* team as shown, but you are free to add other members with the **Add Members** button.
-On that page, you can add tokens as well as users and teams.
-Users and teams may be local, LDAP or SAML.
-Upon opening the _Add Members_ page, Automate lists all your local members but filters out those already attached to the policy.
-For example, there is an *editor* user but no `editors` team in the member list because, that team is already a member.
-The **Add Member Expression** button at the bottom, is where you can add LDAP or SAML users and teams.
-
-![](/images/docs/admin-policies-editors-add-members.png)
-
-The _Role List_ page displays all your roles along with their types (*Chef-managed* or *Custom*).
-Selecting a role from the list opens the role's detail page, displaying the definition of the role.
-
-![](/images/docs/admin-roles.png)
-
-The _Project List_ page displays all your projects along with the status of associated project ingest rules (*No rules*, *Edits pending*, or *Applied*).
-When you create or update ingest rules, those changes are staged and **not** directly applied.
-Other users may also stage changes.
-All changes will be applied together when you select the **Update Projects** button.
-
-Selecting a project from the list opens the projects's detail page and displays the list of ingest rules comprising that project.
-From there, you can select any individual rule to view its list of conditions, and then select a condition to view or update its details.
-
-![](/images/docs/admin-projects.png)
-
-## Projects in the API
-
-It is also possible to filter APIs by project from the Chef Automate CLI. The following API requests are examples of fetching data using project headers as filters.
-
-To use these API requests, first:
-
-- [Create an admin token]({{< relref "iam-v2-api-reference.md#creating-a-token" >}}) and set the admin token to the environment variable `$TOKEN`
-- [Create two projects]({{< relref "iam-v2-api-reference.md#creating-a-project" >}}). In our examples below, we use two projects named `test-project-1` and `test-project-2`, respectively.
-- [Assign IAM resources]({{< relref "iam-v2-guide.md#assigning-resources-to-projects" >}}) to both projects
-- [Assign ingested resources]({{< relref "iam-v2-guide.md#assigning-ingested-resources-to-projects" >}}) to both projects
-
-This API request returns a list of teams that belong to `test-project-1`.
-
-```bash
-curl -sH "api-token: $TOKEN" -H "projects: test-project-1" \
-  https://{{< example_fqdn "automate" >}}/apis/iam/v2/teams?pretty
-```
-
-This API request returns a list of tokens that belong to `test-project-2`.
-
-```bash
-curl -sH "api-token: $TOKEN" -H "projects: test-project-2" \
-  https://{{< example_fqdn "automate" >}}/apis/iam/v2/tokens?pretty
-```
-
-This API request returns a list of Infrastructure nodes that do not belong to any project.
-Note that the `(unassigned)` project does not need to be created.
-
-```bash
-curl -kH "api-token: $TOKEN" -H "projects: (unassigned)" \
-  https://a2-dev.test/api/v0/cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC
-```
-
-This API request returns a list of Compliance nodes that belong to `test-project-1` or `test-project-2`.
-
-```bash
-curl  -kH "api-token: $TOKEN" -H "projects: test-project-1, test-project-2"  -X POST \
-  https://a2-dev.test/api/v0/compliance/reporting/nodes/search?pretty
-```
