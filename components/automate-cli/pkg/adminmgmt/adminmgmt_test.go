@@ -181,7 +181,7 @@ func TestEnsureTeam(t *testing.T) {
 			assert.False(t, found)
 		})
 
-		t.Run("and dry run mode is on, it is not created and found=false is returned", func(t *testing.T) {
+		t.Run("and dry run mode is on it is not created, id is empty, and found=false are returned", func(t *testing.T) {
 			serverMocks.TeamsMock.CreateTeamFunc = createTeamCallUnexpected
 
 			found, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, true)
@@ -285,7 +285,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 			}, nil
 		}
 
-		t.Run("it calls AddUsers returns addUser=true", func(t *testing.T) {
+		t.Run("it calls AddTeamMembers returns addUser=true", func(t *testing.T) {
 			serverMocks.TeamsMock.AddTeamMembersFunc = func(
 				_ context.Context, req *iam_req.AddTeamMembersReq) (*iam_resp.AddTeamMembersResp, error) {
 
@@ -302,7 +302,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 			assert.True(t, addUser)
 		})
 
-		t.Run("when AddUsers returns an unexpected error it raises the error", func(t *testing.T) {
+		t.Run("when AddTeamMembers returns an unexpected error it raises the error", func(t *testing.T) {
 			serverMocks.TeamsMock.AddTeamMembersFunc = func(
 				_ context.Context, req *iam_req.AddTeamMembersReq) (*iam_resp.AddTeamMembersResp, error) {
 
