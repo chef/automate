@@ -115,16 +115,12 @@ func migrateToV2(ctx context.Context, db *sql.DB) error {
 			}
 		}
 
-		// defaultPolicies, err := storage.DefaultPolicies()
-		// if err != nil {
-		// 	return nil, status.Errorf(codes.Internal, "retrieve default policies: %s", err.Error())
-		// }
-
-		// for _, pol := range defaultPolicies {
-		// 	if _, err := s.store.CreatePolicy(ctx, &pol, true); err != nil {
-		// 		return nil, status.Errorf(codes.Internal, "reset to default policies: %s", err.Error())
-		// 	}
-		// }
+		// TODO include policy in error? same above?
+		for _, pol := range defaultPolicies() {
+			if err := createPolicy(ctx, db, pol); err != nil {
+				return errors.Wrap(err, "could not create default policy")
+			}
+		}
 
 		// // Added for testing only; these are handled by data migrations.
 		// for _, project := range storage.DefaultProjects() {
@@ -229,19 +225,6 @@ const (
 	Deny
 )
 
-func (e Effect) String() string {
-	strValues := [...]string{
-		"allow",
-		"deny",
-	}
-
-	if e < Allow || e > Deny {
-		panic(fmt.Sprintf("unknown value from iota Effect on String() conversion: %d", e))
-	}
-
-	return strValues[e]
-}
-
 func newStatement(effect Effect, role string, projects, resources, actions []string) Statement {
 	return Statement{
 		Effect:    effect,
@@ -250,6 +233,81 @@ func newStatement(effect Effect, role string, projects, resources, actions []str
 		Actions:   actions,
 		Resources: resources,
 	}
+}
+
+func createPolicy(ctx context.Context, db *sql.DB, pol Policy) error {
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
+
+	// Note(sr): we're using BeginTx with the context that'll be cancelled in a
+	// `defer` when the function ends. This should rollback transactions that
+	// haven't been committed -- what would happen when any of the following
+	// `err != nil` cases return early.
+	// However, I haven't played with this extensively, so there's a bit of a
+	// chance that this understanding is just plain wrong.
+
+	tx, err := db.BeginTx(ctx, nil /* use driver default */)
+	if err != nil {
+		return errors.Wrap(err, "begin create role tx")
+	}
+
+	// This update happens with migrations for default policies
+	// projects := pol.Projects
+	// if projects == nil {
+	// 	projects = []string{}
+	// }
+
+	// TODO: at least for the upgrade (not legacy move), we don't need this
+	// // skip project permissions check on upgrade from v1 or for chef-managed policies
+	// if pol.Type == v2.Custom {
+	// 	err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projects)
+	// 	if err != nil {
+	// 		return nil, p.processError(err)
+	// 	}
+
+	// 	err = projectassignment.AuthorizeProjectAssignment(ctx,
+	// 		p.engine,
+	// 		auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+	// 		[]string{},
+	// 		projects,
+	// 		false)
+	// 	if err != nil {
+	// 		return nil, p.processError(err)
+	// 	}
+	// }
+
+	_, err = tx.ExecContext(ctx,
+		// This helper should be *right* at this point in time
+		`SELECT insert_iam_policy($1, $2, $3);`,
+		pol.ID, pol.Name, pol.Type.String(),
+	)
+	if err != nil {
+		return err
+	}
+
+	for _, member := range pol.Members {
+		_, err := tx.ExecContext(ctx,
+			"INSERT INTO iam_members (name) VALUES ($1) ON CONFLICT DO NOTHING",
+			member.Name)
+		if err != nil {
+			return errors.Wrapf(err, "failed to upsert member %s", member.Name)
+		}
+
+		_, err = tx.ExecContext(ctx,
+			`INSERT INTO iam_policy_members (policy_id, member_id)
+				VALUES (policy_db_id($1), member_db_id($2)) ON CONFLICT DO NOTHING`, pol.ID, member.Name)
+		return errors.Wrapf(err, "failed to upsert member link: member=%s, policy_id=%s", member.Name, pol.ID)
+	}
+
+	// if err := p.notifyPolicyChange(ctx, tx); err != nil {
+	// 	return nil, p.processError(err)
+	// }
+
+	err = tx.Commit()
+	if err != nil {
+		return storage_errors.NewTxCommitError(err)
+	}
+	return nil
 }
 
 // DefaultPolicies shipped with IAM v2, and also the set of policies to which we
