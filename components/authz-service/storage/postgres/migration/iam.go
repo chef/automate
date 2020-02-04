@@ -58,6 +58,18 @@ const (
 	ProjectOwnerRoleID = "project-owner"
 )
 
+// Subjects
+const (
+	// LocalAdminsTeamSubject is the member for the local admins team.
+	LocalAdminsTeamSubject = "team:local:admins"
+
+	// LocalEditorsTeamSubject is the member for the local editors team.
+	LocalEditorsTeamSubject = "team:local:editors"
+
+	// LocalViewersTeamSubject is the member for the local viewers team.
+	LocalViewersTeamSubject = "team:local:viewers"
+)
+
 // IAM v2 well-known project IDs
 const (
 	AllProjectsID         = "~~ALL-PROJECTS~~" // must match rego file!
@@ -182,6 +194,119 @@ versions of the database functions needed for the migrations that do not change.
 This is because this migration is run at a single point in time as part of the schema
 upgrades. So this code need to be compatible with a specific schema version that never changes.
 */
+
+// Policy-related database copy-pasta
+
+// Policy represents a policy definition to be persisted to storage.
+type Policy struct {
+	ID         string      `json:"id"`
+	Name       string      `json:"name"`
+	Members    []Member    `json:"members"`
+	Statements []Statement `json:"statements"`
+	Type       Type        `json:"type"`
+	Projects   []string    `json:"projects"`
+}
+
+type Member struct {
+	Name string `json:"name"`
+}
+
+type Statement struct {
+	Actions   []string `json:"actions"`
+	Resources []string `json:"resources"`
+	Role      string   `json:"role"`
+	Projects  []string `json:"projects"`
+	Effect    Effect   `json:"effect"`
+}
+
+// Effect is an enum of allow or deny for use in Statements.
+type Effect int
+
+const (
+	// Allow represents the allow case for a Statement Effect.
+	Allow Effect = iota
+	// Deny represents the deny case for a Statement Effect.
+	Deny
+)
+
+func (e Effect) String() string {
+	strValues := [...]string{
+		"allow",
+		"deny",
+	}
+
+	if e < Allow || e > Deny {
+		panic(fmt.Sprintf("unknown value from iota Effect on String() conversion: %d", e))
+	}
+
+	return strValues[e]
+}
+
+func newStatement(effect Effect, role string, projects, resources, actions []string) Statement {
+	return Statement{
+		Effect:    effect,
+		Role:      role,
+		Projects:  projects,
+		Actions:   actions,
+		Resources: resources,
+	}
+}
+
+// DefaultPolicies shipped with IAM v2, and also the set of policies to which we
+// factory-reset our storage.
+func defaultPolicies() []Policy {
+	// admin policy statements
+	s1 := newStatement(Allow, "", []string{}, []string{"*"}, []string{"*"})
+	s2 := newStatement(Deny, "", []string{}, []string{"iam:policies:" + AdminPolicyID},
+		[]string{"iam:policies:delete", "iam:policies:update"})
+
+	// editor policy statements
+	s3 := newStatement(Allow, EditorRoleID, []string{}, []string{"*"}, []string{})
+
+	// viewer policy statements
+	s4 := newStatement(Allow, ViewerRoleID, []string{}, []string{"*"}, []string{})
+
+	// ingest policy statements
+	s5 := newStatement(Allow, IngestRoleID, []string{}, []string{"*"}, []string{})
+
+	admin := Member{Name: LocalAdminsTeamSubject}
+	editors := Member{Name: LocalEditorsTeamSubject}
+	viewers := Member{Name: LocalViewersTeamSubject}
+
+	adminPol := Policy{
+		ID:         AdminPolicyID,
+		Name:       "Administrator",
+		Members:    []Member{admin},
+		Statements: []Statement{s1, s2},
+		Type:       ChefManaged,
+	}
+
+	editorPol := Policy{
+		ID:         EditorPolicyID,
+		Name:       "Editors",
+		Members:    []Member{editors},
+		Statements: []Statement{s3},
+		Type:       ChefManaged,
+	}
+
+	viewerPol := Policy{
+		ID:         ViewerPolicyID,
+		Name:       "Viewers",
+		Members:    []Member{viewers},
+		Statements: []Statement{s4},
+		Type:       ChefManaged,
+	}
+
+	ingestPol := Policy{
+		ID:         IngestPolicyID,
+		Name:       "Ingest",
+		Members:    []Member{},
+		Statements: []Statement{s5},
+		Type:       ChefManaged,
+	}
+
+	return []Policy{adminPol, editorPol, viewerPol, ingestPol}
+}
 
 // Role-related database copy-pasta
 
