@@ -20,7 +20,9 @@
     "e2e": "ng e2e",
     "lint": "ng lint",
     "lint:html": "node_modules/htmlhint/bin/htmlhint --config .htmlhintrc src/app/**/*.html",
-    "lint:sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q"
+    "lint:sass": "node node_modules/sass-lint/bin/sass-lint.js -v -q",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
   },
   "private": true,
   "dependencies": {
@@ -67,6 +69,14 @@
     "@angular/cli": "^8.3.21",
     "@angular/compiler-cli": "^8.2.14",
     "@angular/language-service": "^8.2.14",
+    "@babel/core": "^7.8.4",
+    "@storybook/addon-actions": "^5.3.10",
+    "@storybook/addon-links": "^5.3.10",
+    "@storybook/addon-notes": "^5.3.10",
+    "@storybook/addons": "^5.3.10",
+    "@storybook/angular": "^5.3.10",
+    "redux": "^4.0.4",
+    "@stencil/redux": "^0.1.1",
     "@types/faker": "^4.1.8",
     "@types/jasmine": "=3.3.10",
     "@types/jasminewd2": "^2.0.8",
@@ -75,6 +85,7 @@
     "ajv": "^6.10.2",
     "angular2-template-loader": "^0.6.2",
     "axe-webdriverjs": "^2.3.0",
+    "babel-loader": "^8.0.6",
     "codelyzer": "^5.2.1",
     "faker": "^4.1.0",
     "hock": "^1.3.2",
