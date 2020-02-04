@@ -36,8 +36,7 @@ import (
 )
 
 func TestIntrospectAllV2(t *testing.T) {
-	authzSrvV1, authzSrv, s, hdlr := testServerAndHandler(t)
-	authzSrvV1.FilterAuthorizedPairsFunc = shouldUseV2PairsFunc
+	_, authzSrv, s, hdlr := testServerAndHandler(t)
 	defer s.Close()
 	reset := func() {
 		authzSrv.FilterAuthorizedPairsFunc = nil
@@ -103,32 +102,32 @@ func shouldUseV2PairsFunc(context.Context, *authz.FilterAuthorizedPairsReq) (*au
 }
 
 func TestIntrospectSome(t *testing.T) {
-	authzSrv, _, s, hdlr := testServerAndHandler(t)
+	_, authzSrv, s, hdlr := testServerAndHandler(t)
 	defer s.Close()
 	reset := func() {
 		authzSrv.FilterAuthorizedPairsFunc = nil
 	}
 
 	cases := map[string]struct {
-		authzResp *authz.FilterAuthorizedPairsResp
+		authzResp *authz_v2.FilterAuthorizedPairsResp
 		req       *request.IntrospectSomeReq
 		expected  map[string]*response.MethodsAllowed
 	}{
 		"empty response": {
-			&authz.FilterAuthorizedPairsResp{},
+			&authz_v2.FilterAuthorizedPairsResp{},
 			&request.IntrospectSomeReq{},
 			map[string]*response.MethodsAllowed{},
 		},
 		"no response pair": {
-			&authz.FilterAuthorizedPairsResp{},
+			&authz_v2.FilterAuthorizedPairsResp{},
 			&request.IntrospectSomeReq{Paths: []string{
 				"/foo/bar",
 			}},
 			map[string]*response.MethodsAllowed{},
 		},
 		"ONE response pair, from two requested with one an INVALID path": {
-			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies", Action: "create"},
+			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+				{Resource: "iam:policies", Action: "iam:policies:create"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
 				"/foo/bar",
@@ -137,8 +136,8 @@ func TestIntrospectSome(t *testing.T) {
 			map[string]*response.MethodsAllowed{"/auth/policies": {Post: true}},
 		},
 		"TWO response pairs, from two requested with one a DISALLOWED path": {
-			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "service_info:version", Action: "read"},
+			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+				{Resource: "system:service:version", Action: "system:serviceVersion:get"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
 				"/auth/policies",
@@ -150,9 +149,9 @@ func TestIntrospectSome(t *testing.T) {
 			},
 		},
 		"two response pairs, from two requested": {
-			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies", Action: "create"},
-				{Resource: "auth_introspection:introspect_all", Action: "read"},
+			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+				{Resource: "iam:policies", Action: "iam:policies:create"},
+				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
 				"/auth/introspect",
@@ -170,7 +169,7 @@ func TestIntrospectSome(t *testing.T) {
 			ctx := auth_context.NewContext(
 				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "AuthV1")
 			authzSrv.FilterAuthorizedPairsFunc = func(
-				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
+				context.Context, *authz_v2.FilterAuthorizedPairsReq) (*authz_v2.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil
 			}
 			resp, err := hdlr.IntrospectSome(ctx, tc.req)
@@ -183,32 +182,32 @@ func TestIntrospectSome(t *testing.T) {
 }
 
 func TestIntrospect(t *testing.T) {
-	authzSrv, _, s, hdlr := testServerAndHandler(t)
+	_, authzSrv, s, hdlr := testServerAndHandler(t)
 	defer s.Close()
 	reset := func() {
 		authzSrv.FilterAuthorizedPairsFunc = nil
 	}
 
 	cases := map[string]struct {
-		authzResp *authz.FilterAuthorizedPairsResp
+		authzResp *authz_v2.FilterAuthorizedPairsResp
 		req       *request.IntrospectReq
 		expected  map[string]*response.MethodsAllowed
 	}{
 		"empty response": {
-			&authz.FilterAuthorizedPairsResp{},
+			&authz_v2.FilterAuthorizedPairsResp{},
 			&request.IntrospectReq{Parameters: []string{"foo", "bar"}, Path: "/foo/:foo/bar/:bar"},
 			map[string]*response.MethodsAllowed{},
 		},
 		"response pair matching the request with param in path": {
-			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies:f33a996c-b4e8-4328-9730-90f4b351fa6e", Action: "delete"},
+			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+				{Resource: "iam:policies:f33a996c-b4e8-4328-9730-90f4b351fa6e", Action: "iam:policies:delete"},
 			}},
 			&request.IntrospectReq{Path: "/auth/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e"},
 			map[string]*response.MethodsAllowed{"/auth/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e": &response.MethodsAllowed{Delete: true}},
 		},
 		"response pair matching the request with param in POST body": {
-			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "ingest:nodes:f33a996c-b4e8-4328-9730-90f4b351fa6e:runs", Action: "create"},
+			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+				{Resource: "infra:nodes:f33a996c-b4e8-4328-9730-90f4b351fa6e:runs", Action: "infra:ingest:create"},
 			}},
 			&request.IntrospectReq{
 				Parameters: []string{"entity_uuid=f33a996c-b4e8-4328-9730-90f4b351fa6e"},
@@ -216,8 +215,8 @@ func TestIntrospect(t *testing.T) {
 			map[string]*response.MethodsAllowed{"/ingest/events/chef/run": &response.MethodsAllowed{Post: true}},
 		},
 		"response pair matching the request with multiple params in path": {
-			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "cfgmgmt:nodes:42:runs:509", Action: "read"},
+			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+				{Resource: "infra:nodes:42", Action: "infra:nodes:get"},
 			}},
 			&request.IntrospectReq{Path: "/cfgmgmt/nodes/42/runs/509"},
 			map[string]*response.MethodsAllowed{"/cfgmgmt/nodes/42/runs/509": &response.MethodsAllowed{Get: true}},
@@ -238,7 +237,7 @@ func TestIntrospect(t *testing.T) {
 			ctx := auth_context.NewContext(
 				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "AuthV1")
 			authzSrv.FilterAuthorizedPairsFunc = func(
-				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
+				context.Context, *authz_v2.FilterAuthorizedPairsReq) (*authz_v2.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil
 			}
 			resp, err := hdlr.Introspect(ctx, tc.req)
