@@ -377,7 +377,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.WaiverData"
           },
-          "title": "An array returns how many nodes have been waived or not"
+          "description": "A list of waivers for the nodes affected by this control."
         }
       }
     },
@@ -1244,19 +1244,19 @@ func init() {
       "properties": {
         "waived_str": {
           "type": "string",
-          "title": "String identifying the waived state could be one of: yes, yes_run, no, no_expired"
+          "description": "The waived state of the control item. Possible values: ` + "`" + `yes` + "`" + `, ` + "`" + `yes_run` + "`" + `, ` + "`" + `no` + "`" + `, ` + "`" + `no_expired` + "`" + `."
         },
         "expiration_date": {
           "type": "string",
-          "title": "The expiration date for the waiver.. after this date, the control is no longer waived"
+          "description": "The expiration date for the waiver. After this date, the control is no longer waived."
         },
         "justification": {
           "type": "string",
-          "title": "The reason for the waiver"
+          "description": "The reason for the waiver."
         },
         "waiver_summary": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
-          "title": "What are the counts for the waived controls across nodes?"
+          "description": "Intentionally blank."
         }
       }
     },

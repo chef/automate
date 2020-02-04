@@ -116,13 +116,13 @@ func (m *ControlItemRequest) GetFilters() []*ListFilter {
 }
 
 type WaiverData struct {
-	// String identifying the waived state could be one of: yes, yes_run, no, no_expired
+	// The waived state of the control item. Possible values: `yes`, `yes_run`, `no`, `no_expired`.
 	WaivedStr string `protobuf:"bytes,1,opt,name=waived_str,json=waivedStr,proto3" json:"waived_str,omitempty"`
-	// The expiration date for the waiver.. after this date, the control is no longer waived
+	// The expiration date for the waiver. After this date, the control is no longer waived.
 	ExpirationDate string `protobuf:"bytes,2,opt,name=expiration_date,json=expirationDate,proto3" json:"expiration_date,omitempty"`
-	// The reason for the waiver
+	// The reason for the waiver.
 	Justification string `protobuf:"bytes,3,opt,name=justification,proto3" json:"justification,omitempty"`
-	// What are the counts for the waived controls across nodes?
+	// Intentionally blank.
 	WaiverSummary        *ControlSummary `protobuf:"bytes,4,opt,name=waiver_summary,json=waiverSummary,proto3" json:"waiver_summary,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
@@ -195,7 +195,7 @@ type ControlItem struct {
 	EndTime *timestamp.Timestamp `protobuf:"bytes,5,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
 	// Intentionally blank.
 	ControlSummary *ControlSummary `protobuf:"bytes,6,opt,name=control_summary,json=controlSummary,proto3" json:"control_summary,omitempty"`
-	// An array returns how many nodes have been waived or not
+	// A list of waivers for the nodes affected by this control.
 	Waivers              []*WaiverData `protobuf:"bytes,7,rep,name=waivers,proto3" json:"waivers,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
 	XXX_unrecognized     []byte        `json:"-"`
