@@ -6,11 +6,8 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/api/interservice/authz/common"
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/authz/request"
 	"github.com/chef/automate/components/automate-gateway/api/authz/response"
@@ -36,7 +33,7 @@ import (
 )
 
 func TestIntrospectAllV2(t *testing.T) {
-	_, authzSrv, s, hdlr := testServerAndHandler(t)
+	authzSrv, s, hdlr := testServerAndHandler(t)
 	defer s.Close()
 	reset := func() {
 		authzSrv.FilterAuthorizedPairsFunc = nil
@@ -92,17 +89,8 @@ func TestIntrospectAllV2(t *testing.T) {
 	}
 }
 
-func shouldUseV2PairsFunc(context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
-	st := status.New(codes.FailedPrecondition, "should use v2")
-	st, err := st.WithDetails(&common.ErrorShouldUseV2{})
-	if err != nil {
-		return nil, err
-	}
-	return nil, st.Err()
-}
-
 func TestIntrospectSome(t *testing.T) {
-	_, authzSrv, s, hdlr := testServerAndHandler(t)
+	authzSrv, s, hdlr := testServerAndHandler(t)
 	defer s.Close()
 	reset := func() {
 		authzSrv.FilterAuthorizedPairsFunc = nil
@@ -182,7 +170,7 @@ func TestIntrospectSome(t *testing.T) {
 }
 
 func TestIntrospect(t *testing.T) {
-	_, authzSrv, s, hdlr := testServerAndHandler(t)
+	authzSrv, s, hdlr := testServerAndHandler(t)
 	defer s.Close()
 	reset := func() {
 		authzSrv.FilterAuthorizedPairsFunc = nil
@@ -250,19 +238,16 @@ func TestIntrospect(t *testing.T) {
 }
 
 func testServerAndHandler(t *testing.T) (
-	*authz.AuthorizationServerMock,
 	*authz_v2.AuthorizationServerMock,
 	*grpctest.Server,
 	*handler.AuthzServer) {
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*serviceCerts)
 
-	authzSrv := authz.NewAuthorizationServerMock()
-	authzSrvV2 := authz_v2.NewAuthorizationServerMock()
+	authSrv := authz_v2.NewAuthorizationServerMock()
 
 	g := connFactory.NewServer()
-	authz.RegisterAuthorizationServer(g, authzSrv)
-	authz_v2.RegisterAuthorizationServer(g, authzSrvV2)
+	authz_v2.RegisterAuthorizationServer(g, authSrv)
 	s := grpctest.NewServer(g)
 
 	conn, err := connFactory.Dial("authz-service", s.URL)
@@ -270,8 +255,7 @@ func testServerAndHandler(t *testing.T) (
 	v1Client := authz.NewAuthorizationClient(conn)
 	v2Client := authz_v2.NewAuthorizationClient(conn)
 
-	return authzSrv,
-		authzSrvV2,
+	return authSrv,
 		s,
 		handler.NewAuthzServer(
 			v1Client,
