@@ -6,16 +6,11 @@ import (
 	"fmt"
 	"strings"
 
-	constants_v1 "github.com/chef/automate/components/authz-service/constants/v1"
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	storage_v1 "github.com/chef/automate/components/authz-service/storage/v1"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
-	"github.com/chef/automate/components/automate-cli/pkg/status"
+	constants_v1 "github.com/chef/automate/components/authz-service/storage/postgres/migration/constants/v1"
+	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/constants/v2"
 	uuid "github.com/chef/automate/lib/uuid4"
-	"github.com/lib/pq"
 	"github.com/pkg/errors"
-	"google.golang.org/grpc/codes"
 )
 
 const (
@@ -24,65 +19,6 @@ const (
 	enumSuccessful      = "successful"
 	enumSuccessfulBeta1 = "successful-beta1"
 	enumFailed          = "failed"
-)
-
-// IAM v2 default policy IDs.
-const (
-	AdminPolicyID  = "administrator-access"
-	EditorPolicyID = "editor-access"
-	ViewerPolicyID = "viewer-access"
-	IngestPolicyID = "ingest-access"
-)
-
-// IAM v2 system policy IDs. These are never shown to the enduser
-// so GUIDs are fine.
-const (
-	UniversalAccessPolicyID  = "e729c61f-c40a-4bfa-affe-2a541368169f"
-	IngestProviderPolicyID   = "e166f6f9-860d-464a-a91f-be3509369f92"
-	SystemPolicyID           = "1074e13b-a918-4892-98be-47a5a8b2d2b6"
-	SystemLocalUsersPolicyID = "00a38187-7557-4105-92a0-48db63af4103"
-	ChefManagedPolicyID      = "e62bc524-d903-4708-92de-a4435ce0252e"
-)
-
-// V1 -> IAM v2 Legacy Policy IDs.
-const (
-	CfgmgmtPolicyID         = "infrastructure-automation-access-legacy"
-	CompliancePolicyID      = "compliance-access-legacy"
-	EventsPolicyID          = "events-access-legacy"
-	LegacyIngestPolicyID    = "ingest-access-legacy"
-	NodesPolicyID           = "nodes-access-legacy"
-	NodeManagersPolicyID    = "node-managers-access-legacy"
-	SecretsPolicyID         = "secrets-access-legacy"
-	TelemetryPolicyID       = "telemetry-access-legacy"
-	ComplianceTokenPolicyID = "compliance-profile-access-legacy"
-)
-
-// IAM v2 well-known role IDs
-const (
-	OwnerRoleID        = "owner"
-	EditorRoleID       = "editor"
-	ViewerRoleID       = "viewer"
-	IngestRoleID       = "ingest"
-	ProjectOwnerRoleID = "project-owner"
-)
-
-// Subjects
-const (
-	// LocalAdminsTeamSubject is the member for the local admins team.
-	LocalAdminsTeamSubject = "team:local:admins"
-
-	// LocalEditorsTeamSubject is the member for the local editors team.
-	LocalEditorsTeamSubject = "team:local:editors"
-
-	// LocalViewersTeamSubject is the member for the local viewers team.
-	LocalViewersTeamSubject = "team:local:viewers"
-)
-
-// IAM v2 well-known project IDs
-const (
-	AllProjectsID         = "~~ALL-PROJECTS~~" // must match rego file!
-	AllProjectsExternalID = "*"
-	UnassignedProjectID   = "(unassigned)"
 )
 
 func needsV2Migration(ctx context.Context, db *sql.DB) (bool, error) {
@@ -124,14 +60,14 @@ func migrateToV2(ctx context.Context, db *sql.DB) error {
 		}
 
 		// TODO include policy in error? same above?
-		for _, pol := range defaultPolicies() {
-			if err := createPolicy(ctx, db, pol); err != nil {
+		for _, pol := range v2DefaultPolicies() {
+			if _, err := createV2Policy(ctx, db, &pol); err != nil {
 				return errors.Wrap(err, "could not create default policy")
 			}
 		}
 
 		var reports []string
-		errs, err := migrateV1Policies(ctx)
+		errs, err := migrateV1Policies(ctx, db)
 		if err != nil {
 			return errors.Wrap(err, "migrate v1 policies: %s")
 		}
@@ -170,338 +106,14 @@ This is because this migration is run at a single point in time as part of the s
 upgrades. So this code need to be compatible with a specific schema version that never changes.
 */
 
-// Policy-related database copy-pasta
-
-// Policy represents a policy definition to be persisted to storage.
-type Policy struct {
-	ID         string      `json:"id"`
-	Name       string      `json:"name"`
-	Members    []Member    `json:"members"`
-	Statements []Statement `json:"statements"`
-	Type       Type        `json:"type"`
-	Projects   []string    `json:"projects"`
-}
-
-type Member struct {
-	Name string `json:"name"`
-}
-
-type Statement struct {
-	Actions   []string `json:"actions"`
-	Resources []string `json:"resources"`
-	Role      string   `json:"role"`
-	Projects  []string `json:"projects"`
-	Effect    Effect   `json:"effect"`
-}
-
-// Effect is an enum of allow or deny for use in Statements.
-type Effect int
-
-const (
-	// Allow represents the allow case for a Statement Effect.
-	Allow Effect = iota
-	// Deny represents the deny case for a Statement Effect.
-	Deny
-)
-
-func newStatement(effect Effect, role string, projects, resources, actions []string) Statement {
-	return Statement{
-		Effect:    effect,
-		Role:      role,
-		Projects:  projects,
-		Actions:   actions,
-		Resources: resources,
-	}
-}
-
-func createPolicy(ctx context.Context, db *sql.DB, pol Policy) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	// Note(sr): we're using BeginTx with the context that'll be cancelled in a
-	// `defer` when the function ends. This should rollback transactions that
-	// haven't been committed -- what would happen when any of the following
-	// `err != nil` cases return early.
-	// However, I haven't played with this extensively, so there's a bit of a
-	// chance that this understanding is just plain wrong.
-
-	tx, err := db.BeginTx(ctx, nil /* use driver default */)
-	if err != nil {
-		return errors.Wrap(err, "begin create role tx")
-	}
-
-	// This update happens with migrations for default policies
-	// projects := pol.Projects
-	// if projects == nil {
-	// 	projects = []string{}
-	// }
-
-	// TODO: at least for the upgrade (not legacy move), we don't need this
-	// // skip project permissions check on upgrade from v1 or for chef-managed policies
-	// if pol.Type == v2.Custom {
-	// 	err = p.ensureNoProjectsMissingWithQuerier(ctx, tx, projects)
-	// 	if err != nil {
-	// 		return nil, p.processError(err)
-	// 	}
-
-	// 	err = projectassignment.AuthorizeProjectAssignment(ctx,
-	// 		p.engine,
-	// 		auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-	// 		[]string{},
-	// 		projects,
-	// 		false)
-	// 	if err != nil {
-	// 		return nil, p.processError(err)
-	// 	}
-	// }
-
-	_, err = tx.ExecContext(ctx,
-		// This helper should be *right* at this point in time
-		`SELECT insert_iam_policy($1, $2, $3);`,
-		pol.ID, pol.Name, pol.Type.String(),
-	)
-	if err != nil {
-		return err
-	}
-
-	// Cascading drop any existing members.
-	// TODO might need for legacy migration?
-	// _, err := q.ExecContext(ctx,
-	// 	`DELETE FROM iam_policy_members WHERE policy_id=policy_db_id($1);`, policyID)
-	// if err != nil {
-	// 	return err
-	// }
-
-	for _, member := range pol.Members {
-		_, err := tx.ExecContext(ctx,
-			"INSERT INTO iam_members (name) VALUES ($1) ON CONFLICT DO NOTHING",
-			member.Name)
-		if err != nil {
-			return errors.Wrapf(err, "failed to upsert member %s", member.Name)
-		}
-
-		_, err = tx.ExecContext(ctx,
-			`INSERT INTO iam_policy_members (policy_id, member_id)
-				VALUES (policy_db_id($1), member_db_id($2)) ON CONFLICT DO NOTHING`, pol.ID, member.Name)
-		return errors.Wrapf(err, "failed to upsert member link: member=%s, policy_id=%s", member.Name, pol.ID)
-
-	}
-
-	// if err := p.notifyPolicyChange(ctx, tx); err != nil {
-	// 	return nil, p.processError(err)
-	// }
-	// below is the notifyPolicyChange code, ported
-	// _, err := q.ExecContext(ctx, "SELECT notify_policy_change()")
-	// return err
-	err = tx.Commit()
-	if err != nil {
-		return storage_errors.NewTxCommitError(err)
-	}
-	return nil
-}
-
-// DefaultPolicies shipped with IAM v2, and also the set of policies to which we
-// factory-reset our storage.
-func defaultPolicies() []Policy {
-	// admin policy statements
-	s1 := newStatement(Allow, "", []string{}, []string{"*"}, []string{"*"})
-	s2 := newStatement(Deny, "", []string{}, []string{"iam:policies:" + AdminPolicyID},
-		[]string{"iam:policies:delete", "iam:policies:update"})
-
-	// editor policy statements
-	s3 := newStatement(Allow, EditorRoleID, []string{}, []string{"*"}, []string{})
-
-	// viewer policy statements
-	s4 := newStatement(Allow, ViewerRoleID, []string{}, []string{"*"}, []string{})
-
-	// ingest policy statements
-	s5 := newStatement(Allow, IngestRoleID, []string{}, []string{"*"}, []string{})
-
-	admin := Member{Name: LocalAdminsTeamSubject}
-	editors := Member{Name: LocalEditorsTeamSubject}
-	viewers := Member{Name: LocalViewersTeamSubject}
-
-	adminPol := Policy{
-		ID:         AdminPolicyID,
-		Name:       "Administrator",
-		Members:    []Member{admin},
-		Statements: []Statement{s1, s2},
-		Type:       ChefManaged,
-	}
-
-	editorPol := Policy{
-		ID:         EditorPolicyID,
-		Name:       "Editors",
-		Members:    []Member{editors},
-		Statements: []Statement{s3},
-		Type:       ChefManaged,
-	}
-
-	viewerPol := Policy{
-		ID:         ViewerPolicyID,
-		Name:       "Viewers",
-		Members:    []Member{viewers},
-		Statements: []Statement{s4},
-		Type:       ChefManaged,
-	}
-
-	ingestPol := Policy{
-		ID:         IngestPolicyID,
-		Name:       "Ingest",
-		Members:    []Member{},
-		Statements: []Statement{s5},
-		Type:       ChefManaged,
-	}
-
-	return []Policy{adminPol, editorPol, viewerPol, ingestPol}
-}
-
-// Role-related database copy-pasta
-
-func createRole(ctx context.Context, db *sql.DB, role *Role) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	tx, err := db.BeginTx(ctx, nil /* use driver default */)
-	if err != nil {
-		return errors.Wrap(err, "begin create role tx")
-	}
-
-	row := tx.QueryRowContext(ctx, `INSERT INTO iam_roles (id, name, type, actions) VALUES ($1, $2, $3, $4)
-		RETURNING db_id`,
-		role.ID, role.Name, role.Type.String(), pq.Array(role.Actions))
-	var dbID string
-	if err := row.Scan(&dbID); err != nil {
-		return errors.Wrap(err, "insert role")
-	}
-
-	_, err = tx.ExecContext(ctx,
-		`INSERT INTO iam_role_projects (role_id, project_id)
-		SELECT $1, project_db_id(p) FROM unnest($2::TEXT[]) as p`,
-		dbID, pq.Array(role.Projects))
-	if err != nil {
-		return errors.Wrap(err, "insert role projects")
-	}
-
-	err = tx.Commit()
-	if err != nil {
-		return storage_errors.NewTxCommitError(err)
-	}
-
-	return nil
-}
-
-// Type is an enum to denote custom or chef-managed policy.
-type Type int
-
-const (
-	// Custom represents a policy created by the enduser.
-	Custom Type = iota
-	// ChefManaged represents a policy created by Chef Software.
-	ChefManaged
-	// System represents a policy that is only loaded directly into OPA
-	// to allow Automate to function correctly without revealing Automate's
-	// internal policies to the customer
-	// This type is only used in the OPA cache (not in API or database)
-	System
-)
-
-const (
-	customTypeString  = "custom"
-	managedTypeString = "chef-managed"
-	systemTypeString  = "system"
-)
-
-var strValues = [...]string{
-	customTypeString,
-	managedTypeString,
-	systemTypeString,
-}
-
-func (t Type) String() string {
-	if t < Custom || t > System {
-		panic(fmt.Sprintf("unknown value from iota Type on String() conversion: %d", t))
-	}
-
-	return strValues[t]
-}
-
-type Role struct {
-	ID       string   `json:"id"`
-	Name     string   `json:"name"`
-	Actions  []string `json:"actions"`
-	Type     Type     `json:"type"`
-	Projects []string `json:"projects"`
-}
-
-// DefaultRoles defines the default Chef-managed roles provided on storage reset
-func defaultRoles() []Role {
-	owner := Role{
-		ID:      OwnerRoleID,
-		Name:    "Owner",
-		Actions: []string{"*"},
-		Type:    ChefManaged,
-	}
-
-	editor := Role{
-		ID:   EditorRoleID,
-		Name: "Editor",
-		Actions: []string{
-			"infra:*",
-			"compliance:*",
-			"system:*",
-			"event:*",
-			"ingest:*",
-			"secrets:*",
-			"telemetry:*",
-		},
-		Type: ChefManaged,
-	}
-
-	viewer := Role{
-		ID:   ViewerRoleID,
-		Name: "Viewer",
-		Actions: []string{
-			"secrets:*:get",
-			"secrets:*:list",
-			"infra:*:get",
-			"infra:*:list",
-			"compliance:*:get",
-			"compliance:*:list",
-			"system:*:get",
-			"system:*:list",
-			"event:*:get",
-			"event:*:list",
-			"ingest:*:get",
-			"ingest:*:list",
-		},
-		Type: ChefManaged,
-	}
-
-	ingest := Role{
-		ID:   IngestRoleID,
-		Name: "Ingest",
-		Actions: []string{
-			"infra:ingest:*",
-			"compliance:profiles:get",
-			"compliance:profiles:list",
-		},
-		Type: ChefManaged,
-	}
-
-	return []Role{owner, editor, viewer, ingest}
-}
-
-// all the migration code for translating v1 policies
-
 // migrateV1Policies has two error returns: the second one is the ordinary,
 // garden-variety, "something went wrong, I've given up" signal; the first one
 // serves as an aggregate of errors that happened attempting to convert and
 // store individual (custom) policies.
-func migrateV1Policies(ctx context.Context) ([]error, error) {
-	pols, err := ListPoliciesWithSubjects(ctx)
+func migrateV1Policies(ctx context.Context, db *sql.DB) ([]error, error) {
+	pols, err := listPoliciesWithSubjects(ctx, db)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "list v1 policies: %s", err.Error())
+		return nil, errors.Wrap(err, "list v1 policies")
 	}
 
 	var errs []error
@@ -512,7 +124,7 @@ func migrateV1Policies(ctx context.Context) ([]error, error) {
 			continue
 		}
 		if adminTokenPolicy != nil {
-			if err := s.addTokenToAdminPolicy(ctx, adminTokenPolicy.Subjects[0]); err != nil {
+			if err := addTokenToAdminPolicy(ctx, adminTokenPolicy.Subjects[0], db); err != nil {
 				errs = append(errs, errors.Wrapf(err, "adding members %q for admin policy %q", pol.Subjects, pol.ID.String()))
 			}
 			continue // don't migrate admin policies with single token
@@ -526,7 +138,7 @@ func migrateV1Policies(ctx context.Context) ([]error, error) {
 		if storagePol == nil {
 			continue // nothing to create
 		}
-		_, err = s.store.CreatePolicy(ctx, storagePol, true)
+		_, err = createV2Policy(ctx, db, storagePol)
 		switch err {
 		case nil, storage_errors.ErrConflict: // ignore, continue
 		default:
@@ -536,7 +148,7 @@ func migrateV1Policies(ctx context.Context) ([]error, error) {
 	return errs, nil
 }
 
-func migrateV1Policy(pol *storage_v1.Policy) (*storage.Policy, error) {
+func migrateV1Policy(pol *v1Policy) (*v2Policy, error) {
 	wellKnown, err := isWellKnown(pol.ID)
 	if err != nil {
 		return nil, errors.Wrapf(err, "lookup v1 default policy %q", pol.ID.String())
@@ -548,19 +160,19 @@ func migrateV1Policy(pol *storage_v1.Policy) (*storage.Policy, error) {
 	return customPolicyFromV1(pol)
 }
 
-func (s *policyServer) addTokenToAdminPolicy(ctx context.Context, tok string) error {
-	m, err := storage.NewMember(tok)
+func addTokenToAdminPolicy(ctx context.Context, tok string, db *sql.DB) error {
+	m, err := newV2Member(tok)
 	if err != nil {
 		return errors.Wrap(err, "format v2 member for admin team")
 	}
-	mems, err := s.store.AddPolicyMembers(ctx, constants_v2.AdminPolicyID, []storage.Member{m})
+	mems, err := addPolicyMembers(ctx, db, constants_v2.AdminPolicyID, []v2Member{m})
 	if err != nil {
 		return errors.Wrapf(err, "could not add members %q to admin policy", mems)
 	}
 	return nil
 }
 
-func checkForAdminTokenPolicy(pol *storage_v1.Policy) (*storage_v1.Policy, error) {
+func checkForAdminTokenPolicy(pol *v1Policy) (*v1Policy, error) {
 	if pol.Action == "*" && pol.Resource == "*" && len(pol.Subjects) == 1 && strings.HasPrefix(pol.Subjects[0], "token:") {
 		return pol, nil
 	}
@@ -568,7 +180,7 @@ func checkForAdminTokenPolicy(pol *storage_v1.Policy) (*storage_v1.Policy, error
 }
 
 func isWellKnown(id uuid.UUID) (bool, error) {
-	defaultV1, err := storage_v1.DefaultPolicies()
+	defaultV1, err := v1DefaultPolicies()
 	if err != nil {
 		return false, err
 	}
@@ -624,7 +236,7 @@ var v1ComplianceTokenPolicies = map[string]struct{}{
 }
 
 // nolint: gocyclo
-func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
+func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 	if _, found := v1PoliciesToSkip[pol.ID.String()]; found {
 		return nil, nil
 	}
@@ -636,19 +248,16 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	//  CfgmgmtNodesWildcardPolicyID
 	//  CfgmgmtStatsWildcardPolicyID
 	if _, found := v1CfgmgmtPolicies[pol.ID.String()]; found {
-		cfgmgmtStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		cfgmgmtStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"infra:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (cfgmgmt)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (cfgmgmt)")
 		}
-		cfgmgmtPolicy, err := storage.NewPolicy(constants_v2.CfgmgmtPolicyID,
+		cfgmgmtPolicy, err := newV2Policy(constants_v2.CfgmgmtPolicyID,
 			"[Legacy] Infrastructure Automation Access",
-			storage.Custom, []storage.Member{member},
-			[]storage.Statement{cfgmgmtStatement}, noProjects)
+			Custom, []v2Member{member},
+			[]v2Statement{cfgmgmtStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (cfgmgmt)")
 		}
@@ -656,18 +265,15 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if pol.ID.String() == constants_v1.ComplianceWildcardPolicyID {
-		complianceStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		complianceStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"compliance:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (compliance)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (compliance)")
 		}
-		compliancePolicy, err := storage.NewPolicy(constants_v2.CompliancePolicyID,
+		compliancePolicy, err := newV2Policy(constants_v2.CompliancePolicyID,
 			"[Legacy] Compliance Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{complianceStatement}, noProjects)
+			Custom, []v2Member{member}, []v2Statement{complianceStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (cfgmgmt)")
 		}
@@ -675,18 +281,15 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if _, found := v1EventFeedPolicies[pol.ID.String()]; found {
-		eventsStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		eventsStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"event:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (events)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (events)")
 		}
-		eventsPolicy, err := storage.NewPolicy(constants_v2.EventsPolicyID,
+		eventsPolicy, err := newV2Policy(constants_v2.EventsPolicyID,
 			"[Legacy] Events Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{eventsStatement}, noProjects)
+			Custom, []v2Member{member}, []v2Statement{eventsStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (events)")
 		}
@@ -694,19 +297,16 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if pol.ID.String() == constants_v1.IngestWildcardPolicyID {
-		ingestStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		ingestStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"infra:ingest:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (ingest)")
-		}
-		member, err := storage.NewMember("token:*")
+		member, err := newV2Member("token:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (ingest)")
 		}
 
-		ingestPolicy, err := storage.NewPolicy(constants_v2.LegacyIngestPolicyID,
+		ingestPolicy, err := newV2Policy(constants_v2.LegacyIngestPolicyID,
 			"[Legacy] Ingest Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{ingestStatement}, noProjects)
+			Custom, []v2Member{member}, []v2Statement{ingestStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (ingest)")
 		}
@@ -714,21 +314,18 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if _, found := v1NodesPolicies[pol.ID.String()]; found {
-		nodesStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		nodesStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"infra:nodes:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (nodes)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (nodes)")
 		}
-		nodesPolicy, err := storage.NewPolicy(
+		nodesPolicy, err := newV2Policy(
 			constants_v2.NodesPolicyID,
 			"[Legacy] Nodes Access",
-			storage.Custom,
-			[]storage.Member{member},
-			[]storage.Statement{nodesStatement},
+			Custom,
+			[]v2Member{member},
+			[]v2Statement{nodesStatement},
 			noProjects,
 		)
 		if err != nil {
@@ -738,21 +335,18 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if _, found := v1NodeManagersPolicies[pol.ID.String()]; found {
-		nodeManagersStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		nodeManagersStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"infra:nodeManagers:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (nodemanagers)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (nodemanagers)")
 		}
-		nodeManagersPolicy, err := storage.NewPolicy(
+		nodeManagersPolicy, err := newV2Policy(
 			constants_v2.NodeManagersPolicyID,
 			"[Legacy] Node Managers Access",
-			storage.Custom,
-			[]storage.Member{member},
-			[]storage.Statement{nodeManagersStatement},
+			Custom,
+			[]v2Member{member},
+			[]v2Statement{nodeManagersStatement},
 			noProjects,
 		)
 		if err != nil {
@@ -762,21 +356,18 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if _, found := v1SecretsPolicies[pol.ID.String()]; found {
-		secretsStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		secretsStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"secrets:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (secrets)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (secrets)")
 		}
-		secretsPolicy, err := storage.NewPolicy(
+		secretsPolicy, err := newV2Policy(
 			constants_v2.SecretsPolicyID,
 			"[Legacy] Secrets Access",
-			storage.Custom,
-			[]storage.Member{member},
-			[]storage.Statement{secretsStatement},
+			Custom,
+			[]v2Member{member},
+			[]v2Statement{secretsStatement},
 			noProjects,
 		)
 		if err != nil {
@@ -786,21 +377,18 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if pol.ID.String() == constants_v1.TelemetryConfigPolicyID {
-		telemetryStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		telemetryStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"system:telemetryConfig:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (telemetry)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (telemetry)")
 		}
-		telemetryPolicy, err := storage.NewPolicy(
+		telemetryPolicy, err := newV2Policy(
 			constants_v2.TelemetryPolicyID,
 			"[Legacy] Telemetry Access",
-			storage.Custom,
-			[]storage.Member{member},
-			[]storage.Statement{telemetryStatement},
+			Custom,
+			[]v2Member{member},
+			[]v2Statement{telemetryStatement},
 			noProjects,
 		)
 		if err != nil {
@@ -810,21 +398,18 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if _, found := v1ComplianceTokenPolicies[pol.ID.String()]; found {
-		complianceTokenStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		complianceTokenStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"compliance:profiles:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (compliance token)")
-		}
-		member, err := storage.NewMember("token:*")
+		member, err := newV2Member("token:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (compliance token)")
 		}
-		complianceTokenPolicy, err := storage.NewPolicy(
+		complianceTokenPolicy, err := newV2Policy(
 			constants_v2.ComplianceTokenPolicyID,
 			"[Legacy] Compliance Profile Access",
-			storage.Custom,
-			[]storage.Member{member},
-			[]storage.Statement{complianceTokenStatement},
+			Custom,
+			[]v2Member{member},
+			[]v2Statement{complianceTokenStatement},
 			noProjects,
 		)
 		if err != nil {
@@ -836,7 +421,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	return nil, errors.New("unknown \"well-known\" policy")
 }
 
-func customPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
+func customPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 	name := fmt.Sprintf("%s (custom)", pol.ID.String())
 
 	// TODO: If we encounter an unknown action can we just be less permissive with a warning?
@@ -852,26 +437,26 @@ func customPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	// Note: v1 only had (custom) allow policies
-	statement, err := storage.NewStatement(storage.Allow, "", []string{}, []string{resource}, action)
+	statement := newV2Statement(Allow, "", []string{}, []string{resource}, action)
 	if err != nil {
 		return nil, errors.Wrap(err, "format v2 statement")
 	}
 
-	members := make([]storage.Member, len(pol.Subjects))
+	members := make([]v2Member, len(pol.Subjects))
 	for i, subject := range pol.Subjects {
-		memberInt, err := storage.NewMember(subject)
+		memberInt, err := newV2Member(subject)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member")
 		}
 		members[i] = memberInt
 	}
 
-	policy, err := storage.NewPolicy(
+	policy, err := newV2Policy(
 		pol.ID.String(),
 		name,
-		storage.Custom,
+		Custom,
 		members,
-		[]storage.Statement{statement},
+		[]v2Statement{statement},
 		[]string{})
 	if err != nil {
 		return nil, errors.Wrap(err, "format v2 policy")

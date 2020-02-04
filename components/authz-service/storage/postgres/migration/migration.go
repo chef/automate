@@ -64,9 +64,11 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 	// if we are already past the last pre-force-upgrade migration
 	// so confirm that behavior. otherwise need an if statement here.
 	// WE WILL NEED IF STATEMENT HERE
-	err = m.Migrate(PRE_FORCE_UPGRADE_MIGRATION)
-	if err != nil && err != migrate.ErrNoChange {
-		return errors.Wrap(err, "migration up to IAM V2 force upgrade failed")
+	if version < PRE_FORCE_UPGRADE_MIGRATION {
+		err = m.Migrate(PRE_FORCE_UPGRADE_MIGRATION)
+		if err != nil && err != migrate.ErrNoChange {
+			return errors.Wrap(err, "migration up to IAM V2 force upgrade failed")
+		}
 	}
 
 	// TODO force upgrade

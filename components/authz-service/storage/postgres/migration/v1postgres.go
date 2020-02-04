@@ -1,4 +1,4 @@
-package postgres
+package migration
 
 import (
 	"context"
@@ -11,12 +11,6 @@ import (
 	pq "github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	"github.com/chef/automate/components/authz-service/storage/postgres"
-	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
-	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
-	storage "github.com/chef/automate/components/authz-service/storage/v1"
-	"github.com/chef/automate/lib/io/fileutils"
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
@@ -65,85 +59,19 @@ func (m *policyMap) Scan(src interface{}) error {
 	return json.Unmarshal(source, m)
 }
 
-// New instantiates the postgres IAM v1 storage backend.
-func New(ctx context.Context, l logger.Logger, migConf migration.Config) (storage.Storage, error) {
-	l.Infof("applying database migrations from %s", migConf.Path)
-
-	db, err := postgres.New(ctx, migConf, datamigration.Config{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &pg{db: db, logger: l}, nil
-}
-
-func (p *pg) StorePolicy(
-	ctx context.Context,
-	action string, subjects []string, resource string, effect string,
-) (*storage.Policy, error) {
-
-	pm := policyMap{
-		Subjects: subjects,
-		Action:   action,
-		Resource: resource,
-		Effect:   effect,
-	}
-	id, err := uuid.NewV4()
-	if err != nil {
-		return nil, err
-	}
-
-	pol := dbPolicy{}
-	err = p.db.QueryRowContext(ctx,
-		`INSERT INTO policies (id, policy_data, version)
-					VALUES ($1, $2, $3)
-					RETURNING id, policy_data, version, created_at`,
-		id, pm, storage.Version,
-	).Scan(&pol.ID, &pol.PolicyData, &pol.Version, &pol.CreatedAt)
-
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
-	return toStoragePolicy(pol), nil
-}
-
-func (p *pg) ListPolicies(ctx context.Context) ([]*storage.Policy, error) {
-	rows, err := p.db.QueryContext(ctx,
-		`SELECT id, policy_data, version, created_at, updated_at FROM policies`)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-	defer fileutils.LogClose(rows, p.logger, "could not close rows")
-
-	storagePolicies := []*storage.Policy{}
-	for rows.Next() {
-		pol := dbPolicy{}
-		if err := rows.Scan(&pol.ID, &pol.PolicyData, &pol.Version, &pol.CreatedAt, &pol.UpdatedAt); err != nil {
-			return nil, p.processError(err)
-		}
-
-		storagePolicies = append(storagePolicies, toStoragePolicy(pol))
-	}
-	if err := rows.Err(); err != nil {
-		return nil, errors.Wrap(err, "error retrieving result rows")
-	}
-	return storagePolicies, nil
-}
-
-func ListPoliciesWithSubjects(ctx context.Context) ([]*storage.Policy, error) {
-	rows, err := p.db.QueryContext(ctx,
+func listPoliciesWithSubjects(ctx context.Context, db *sql.DB) ([]*v1Policy, error) {
+	rows, err := db.QueryContext(ctx,
 		`SELECT id, policy_data, version, created_at, updated_at FROM policies WHERE policy_data->'subjects' != '[]'`)
 	if err != nil {
-		return nil, p.processError(err)
+		return nil, errors.Wrap(err, "v1 listPoliciesWithSubjects")
 	}
-	defer fileutils.LogClose(rows, p.logger, "could not close rows")
+	defer rows.Close()
 
-	storagePolicies := []*storage.Policy{}
+	storagePolicies := []*v1Policy{}
 	for rows.Next() {
 		pol := dbPolicy{}
 		if err := rows.Scan(&pol.ID, &pol.PolicyData, &pol.Version, &pol.CreatedAt, &pol.UpdatedAt); err != nil {
-			return nil, p.processError(err)
+			return nil, errors.Wrap(err, "v1 listPoliciesWithSubjects")
 		}
 
 		storagePolicies = append(storagePolicies, toStoragePolicy(pol))
@@ -154,55 +82,8 @@ func ListPoliciesWithSubjects(ctx context.Context) ([]*storage.Policy, error) {
 	return storagePolicies, nil
 }
 
-func (p *pg) DeletePolicy(ctx context.Context, id string) (*storage.Policy, error) {
-	var pol dbPolicy
-	err := p.db.QueryRowContext(ctx,
-		`DELETE FROM policies WHERE id = $1
-		 RETURNING id, policy_data, version, created_at, updated_at`, id,
-	).Scan(&pol.ID, &pol.PolicyData, &pol.Version, &pol.CreatedAt, &pol.UpdatedAt)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-
-	return toStoragePolicy(pol), nil
-}
-
-func (p *pg) PurgeSubjectFromPolicies(ctx context.Context, sub string) ([]uuid.UUID, error) {
-	// Note: without the WHERE clause subsetting the affected rows to only those
-	// that really contain this subject, we'd get an UPDATE response indicating
-	// that _every_ row was updated. While this is true (the update operation only
-	// hasn't changed stuff!), it's not what we want.
-	rows, err := p.db.QueryContext(ctx,
-		`UPDATE policies
-		 SET policy_data=jsonb_set(policy_data, '{subjects}', (policy_data->'subjects') - $1),
-		     updated_at=NOW()
-		 WHERE policy_data->'subjects' ? $1
-		 AND deletable=TRUE
-		 RETURNING id`,
-		sub,
-	)
-	if err != nil {
-		return nil, p.processError(err)
-	}
-	defer fileutils.LogClose(rows, p.logger, "could not close rows")
-
-	var polIDs []uuid.UUID
-	for rows.Next() {
-		id := uuid.UUID{}
-		if err := rows.Scan(&id); err != nil {
-			return nil, p.processError(err)
-		}
-
-		polIDs = append(polIDs, id)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, errors.Wrap(err, "error retrieving result rows")
-	}
-	return polIDs, nil
-}
-
-func toStoragePolicy(pol dbPolicy) *storage.Policy {
-	p := storage.Policy{
+func toStoragePolicy(pol dbPolicy) *v1Policy {
+	p := v1Policy{
 		ID:        pol.ID,
 		Subjects:  pol.PolicyData.Subjects,
 		Action:    pol.PolicyData.Action,
@@ -215,12 +96,4 @@ func toStoragePolicy(pol dbPolicy) *storage.Policy {
 		p.UpdatedAt = pol.UpdatedAt.Time
 	}
 	return &p
-}
-
-func (p *pg) processError(err error) error {
-	err = postgres.ProcessError(err)
-	if err == storage_errors.ErrDatabase {
-		p.logger.Debugf("unknown error type from database: %v", err)
-	}
-	return err
 }
