@@ -7,7 +7,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	authz "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/authz/request"
 	"github.com/chef/automate/components/automate-gateway/api/authz/response"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
@@ -39,17 +39,17 @@ func TestIntrospectAllV2(t *testing.T) {
 	}
 
 	cases := map[string]struct {
-		authzResp *authz_v2.FilterAuthorizedPairsResp
+		authzResp *authz.FilterAuthorizedPairsResp
 		expected  map[string]*response.MethodsAllowed
 	}{
 		"one response pair, mapped": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "iam:policies", Action: "iam:policies:create"},
 			}},
 			map[string]*response.MethodsAllowed{"/auth/policies": &response.MethodsAllowed{Post: true}},
 		},
 		"two response pairs, both mapped": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "iam:policies", Action: "iam:policies:create"},
 				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
@@ -59,7 +59,7 @@ func TestIntrospectAllV2(t *testing.T) {
 			},
 		},
 		"two response pairs, both mapped, one with holes": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "iam:policies", Action: "iam:policies:create"},
 				{Resource: "iam:policies:{id}", Action: "iam:policies:delete"},
 			}},
@@ -73,7 +73,7 @@ func TestIntrospectAllV2(t *testing.T) {
 				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action:do", middleware.AuthV2.String())
 			req := &request.IntrospectAllReq{}
 			authzSrv.FilterAuthorizedPairsFunc = func(
-				context.Context, *authz_v2.FilterAuthorizedPairsReq) (*authz_v2.FilterAuthorizedPairsResp, error) {
+				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil
 			}
 			resp, err := hdlr.IntrospectAll(ctx, req)
@@ -96,24 +96,24 @@ func TestIntrospectSome(t *testing.T) {
 	}
 
 	cases := map[string]struct {
-		authzResp *authz_v2.FilterAuthorizedPairsResp
+		authzResp *authz.FilterAuthorizedPairsResp
 		req       *request.IntrospectSomeReq
 		expected  map[string]*response.MethodsAllowed
 	}{
 		"empty response": {
-			&authz_v2.FilterAuthorizedPairsResp{},
+			&authz.FilterAuthorizedPairsResp{},
 			&request.IntrospectSomeReq{},
 			map[string]*response.MethodsAllowed{},
 		},
 		"no response pair": {
-			&authz_v2.FilterAuthorizedPairsResp{},
+			&authz.FilterAuthorizedPairsResp{},
 			&request.IntrospectSomeReq{Paths: []string{
 				"/foo/bar",
 			}},
 			map[string]*response.MethodsAllowed{},
 		},
 		"ONE response pair, from two requested with one an INVALID path": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "iam:policies", Action: "iam:policies:create"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
@@ -123,7 +123,7 @@ func TestIntrospectSome(t *testing.T) {
 			map[string]*response.MethodsAllowed{"/auth/policies": {Post: true}},
 		},
 		"TWO response pairs, from two requested with one a DISALLOWED path": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "system:service:version", Action: "system:serviceVersion:get"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
@@ -136,7 +136,7 @@ func TestIntrospectSome(t *testing.T) {
 			},
 		},
 		"two response pairs, from two requested": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "iam:policies", Action: "iam:policies:create"},
 				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
@@ -156,7 +156,7 @@ func TestIntrospectSome(t *testing.T) {
 			ctx := auth_context.NewContext(
 				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "Auth")
 			authzSrv.FilterAuthorizedPairsFunc = func(
-				context.Context, *authz_v2.FilterAuthorizedPairsReq) (*authz_v2.FilterAuthorizedPairsResp, error) {
+				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil
 			}
 			resp, err := hdlr.IntrospectSome(ctx, tc.req)
@@ -176,24 +176,24 @@ func TestIntrospect(t *testing.T) {
 	}
 
 	cases := map[string]struct {
-		authzResp *authz_v2.FilterAuthorizedPairsResp
+		authzResp *authz.FilterAuthorizedPairsResp
 		req       *request.IntrospectReq
 		expected  map[string]*response.MethodsAllowed
 	}{
 		"empty response": {
-			&authz_v2.FilterAuthorizedPairsResp{},
+			&authz.FilterAuthorizedPairsResp{},
 			&request.IntrospectReq{Parameters: []string{"foo", "bar"}, Path: "/foo/:foo/bar/:bar"},
 			map[string]*response.MethodsAllowed{},
 		},
 		"response pair matching the request with param in path": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "iam:policies:f33a996c-b4e8-4328-9730-90f4b351fa6e", Action: "iam:policies:delete"},
 			}},
 			&request.IntrospectReq{Path: "/auth/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e"},
 			map[string]*response.MethodsAllowed{"/auth/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e": &response.MethodsAllowed{Delete: true}},
 		},
 		"response pair matching the request with param in POST body": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "infra:nodes:f33a996c-b4e8-4328-9730-90f4b351fa6e:runs", Action: "infra:ingest:create"},
 			}},
 			&request.IntrospectReq{
@@ -202,7 +202,7 @@ func TestIntrospect(t *testing.T) {
 			map[string]*response.MethodsAllowed{"/ingest/events/chef/run": &response.MethodsAllowed{Post: true}},
 		},
 		"response pair matching the request with multiple params in path": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
+			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "infra:nodes:42", Action: "infra:nodes:get"},
 			}},
 			&request.IntrospectReq{Path: "/cfgmgmt/nodes/42/runs/509"},
@@ -224,7 +224,7 @@ func TestIntrospect(t *testing.T) {
 			ctx := auth_context.NewContext(
 				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "Auth")
 			authzSrv.FilterAuthorizedPairsFunc = func(
-				context.Context, *authz_v2.FilterAuthorizedPairsReq) (*authz_v2.FilterAuthorizedPairsResp, error) {
+				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil
 			}
 			resp, err := hdlr.Introspect(ctx, tc.req)
@@ -237,21 +237,21 @@ func TestIntrospect(t *testing.T) {
 }
 
 func testServerAndHandler(t *testing.T) (
-	*authz_v2.AuthorizationServerMock,
+	*authz.AuthorizationServerMock,
 	*grpctest.Server,
 	*handler.AuthzServer) {
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*serviceCerts)
 
-	authSrv := authz_v2.NewAuthorizationServerMock()
+	authSrv := authz.NewAuthorizationServerMock()
 
 	g := connFactory.NewServer()
-	authz_v2.RegisterAuthorizationServer(g, authSrv)
+	authz.RegisterAuthorizationServer(g, authSrv)
 	s := grpctest.NewServer(g)
 
 	conn, err := connFactory.Dial("authz-service", s.URL)
 	require.NoError(t, err)
-	v2Client := authz_v2.NewAuthorizationClient(conn)
+	v2Client := authz.NewAuthorizationClient(conn)
 
 	return authSrv,
 		s,
