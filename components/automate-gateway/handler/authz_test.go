@@ -7,7 +7,6 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/chef/automate/api/interservice/authz"
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/authz/request"
 	"github.com/chef/automate/components/automate-gateway/api/authz/response"
@@ -155,7 +154,7 @@ func TestIntrospectSome(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "AuthV1")
+				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "Auth")
 			authzSrv.FilterAuthorizedPairsFunc = func(
 				context.Context, *authz_v2.FilterAuthorizedPairsReq) (*authz_v2.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil
@@ -223,7 +222,7 @@ func TestIntrospect(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "AuthV1")
+				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "Auth")
 			authzSrv.FilterAuthorizedPairsFunc = func(
 				context.Context, *authz_v2.FilterAuthorizedPairsReq) (*authz_v2.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil
@@ -252,12 +251,11 @@ func testServerAndHandler(t *testing.T) (
 
 	conn, err := connFactory.Dial("authz-service", s.URL)
 	require.NoError(t, err)
-	v1Client := authz.NewAuthorizationClient(conn)
 	v2Client := authz_v2.NewAuthorizationClient(conn)
 
 	return authSrv,
 		s,
 		handler.NewAuthzServer(
-			v1Client,
+			nil,
 			authorizer.NewAuthorizer(authv2.AuthorizationHandler(v2Client)))
 }
