@@ -332,7 +332,7 @@ message ControlItem {
 	google.protobuf.Timestamp end_time = 5;
 	// Intentionally blank.
 	ControlSummary control_summary = 6;
-	// An array returns how many nodes have been waived or not
+	// A list of waivers for the nodes affected by this control.
 	repeated WaiverData waivers = 7;
 }
 
