@@ -47,7 +47,7 @@ export class LicenseApplyComponent implements AfterViewInit {
   }
 
   constructor(
-    private licenseFacade: LicenseFacadeService,
+    public licenseFacade: LicenseFacadeService,
     fb: FormBuilder) {
       this.licenseFacade.licenseApplyReason$.subscribe((reason) => {
         this.licenseApplyReason = reason;
@@ -89,7 +89,7 @@ export class LicenseApplyComponent implements AfterViewInit {
         this.setExpirationDate(fetchStatus.license);
         this.unlockModal();
       });
-
+      this.licenseFacade.getLicenseStatus();
       return;
     }
 
