@@ -309,7 +309,7 @@ message ControlItemRequest {
 }
 
 message WaiverData {
-    // String identifying the waived state could be one of: yes, yes_run, no, no_expired
+      // The waived state of the control item. Possible values: `yes`, `yes_run`, `no`, `no_expired`.
 	string waived_str = 1;
 	// The expiration date for the waiver.. after this date, the control is no longer waived
 	string expiration_date = 2;
