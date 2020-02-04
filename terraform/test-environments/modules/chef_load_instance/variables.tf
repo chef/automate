@@ -110,3 +110,8 @@ variable "chef_load_actions" {
   default     = "1000"
   description = "The number of Chef Actions that chef-load will simulate."
 }
+
+variable "apps_load_svcs" {
+  default     = "20000"
+  description = "The number of services that applications-load-gen will simulate."
+}
