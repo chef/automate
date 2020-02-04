@@ -285,6 +285,14 @@ func createPolicy(ctx context.Context, db *sql.DB, pol Policy) error {
 		return err
 	}
 
+	// Cascading drop any existing members.
+	// TODO might need for legacy migration?
+	// _, err := q.ExecContext(ctx,
+	// 	`DELETE FROM iam_policy_members WHERE policy_id=policy_db_id($1);`, policyID)
+	// if err != nil {
+	// 	return err
+	// }
+
 	for _, member := range pol.Members {
 		_, err := tx.ExecContext(ctx,
 			"INSERT INTO iam_members (name) VALUES ($1) ON CONFLICT DO NOTHING",
@@ -297,12 +305,15 @@ func createPolicy(ctx context.Context, db *sql.DB, pol Policy) error {
 			`INSERT INTO iam_policy_members (policy_id, member_id)
 				VALUES (policy_db_id($1), member_db_id($2)) ON CONFLICT DO NOTHING`, pol.ID, member.Name)
 		return errors.Wrapf(err, "failed to upsert member link: member=%s, policy_id=%s", member.Name, pol.ID)
+
 	}
 
 	// if err := p.notifyPolicyChange(ctx, tx); err != nil {
 	// 	return nil, p.processError(err)
 	// }
-
+	// below is the notifyPolicyChange code, ported
+	// _, err := q.ExecContext(ctx, "SELECT notify_policy_change()")
+	// return err
 	err = tx.Commit()
 	if err != nil {
 		return storage_errors.NewTxCommitError(err)
