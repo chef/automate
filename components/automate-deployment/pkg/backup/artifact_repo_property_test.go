@@ -17,6 +17,7 @@ import (
 	"github.com/leanovate/gopter/gen"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -345,6 +346,12 @@ func genRestoreSnapshotCommand(availableSnapshot []string) gopter.Gen {
 	}).WithShrinker(gopter.NoShrinker)
 }
 
+func numOpenFD(t *testing.T) int {
+	fds, err := ioutil.ReadDir("/proc/self/fd/")
+	require.NoError(t, err)
+	return len(fds)
+}
+
 func TestArtifactRepo(t *testing.T) {
 	parameters := gopter.DefaultTestParameters()
 	parameters.MinSuccessfulTests = 300
@@ -392,6 +399,9 @@ func TestArtifactRepo(t *testing.T) {
 		},
 	}
 
+	fdsBefore := numOpenFD(t)
 	properties.Property("artifact repo", commands.Prop(repoCommands))
 	properties.TestingRun(t)
+	fdsAfter := numOpenFD(t)
+	assert.Equal(t, fdsBefore, fdsAfter, "file descriptors leaked")
 }

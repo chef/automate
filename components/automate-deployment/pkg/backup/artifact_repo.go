@@ -281,6 +281,7 @@ func (repo *ArtifactRepo) Restore(ctx context.Context, dstBucket Bucket, name st
 	if err != nil {
 		return err
 	}
+	defer uploadIterator.Close() // nolint: errcheck
 
 	if err := uploader.Upload(ctx, uploadIterator, opts.progress); err != nil {
 		return err
