@@ -12,7 +12,6 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
 import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
-import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
@@ -70,7 +69,7 @@ describe('ProjectListComponent', () => {
         }),
         MockComponent({
           selector: 'app-create-object-modal',
-          inputs: ['creating', 'createForm', 'visible', 'showProjectsDropdown', 'objectNoun', 'conflictErrorEvent', 'createProjectModal'],
+          inputs: ['creating', 'createForm', 'visible', 'objectNoun', 'conflictErrorEvent', 'createProjectModal'],
           outputs: ['close', 'deleteClicked']
         }),
         MockComponent({
@@ -130,7 +129,6 @@ describe('ProjectListComponent', () => {
     element = fixture.debugElement.nativeElement;
     store = TestBed.get(Store);
 
-    store.dispatch(new GetIamVersionSuccess({ version: { major: 'v2' } }));
     fixture.detectChanges();
   });
 
@@ -144,7 +142,7 @@ describe('ProjectListComponent', () => {
 
   describe('when there are projects', () => {
 
-    it('displays project data for v2', () => {
+    it('displays project data', () => {
       store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       fixture.detectChanges();
       expect(element).toContainPath('chef-table-new');
@@ -157,7 +155,6 @@ describe('ProjectListComponent', () => {
     });
 
     it('does not display project data for v1', () => {
-      store.dispatch(new GetIamVersionSuccess({ version: { major: 'v1' } }));
       store.dispatch(new GetProjectsSuccess({ projects: projectList }));
       expect(element).not.toContainPath('chef-table-new');
     });

@@ -1,7 +1,6 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { uuidv4 } from '../../../support/helpers';
 
-describeIfIAMV2p1('project update re-tagging', () => {
+describe('project update re-tagging', () => {
   const cypressPrefix = 'test-node-update';
 
   const projectsWithRule = [

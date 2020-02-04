@@ -79,28 +79,14 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
     Cypress.env('ADMIN_TOKEN', resp.body.token.value);
   });
 
-  // grant permissions based on IAM version
-  if (Cypress.env('IAM_VERSION') === 'v1') {
-    cy.request({
-      auth: { bearer: idToken },
-      method: 'POST',
-      url: '/api/v0/auth/policies',
-      body: {
-        action: '*',
-        resource: '*',
-        subjects: [`token:${adminTokenObj.id}`]
-      }
-    });
-  } else {
-    cy.request({
-      auth: { bearer: idToken },
-      method: 'POST',
-      url: '/apis/iam/v2/policies/administrator-access/members:add',
-      body: {
-        members: [`token:${adminTokenObj.id}`]
-      }
-    });
-  }
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'POST',
+    url: '/apis/iam/v2/policies/administrator-access/members:add',
+    body: {
+      members: [`token:${adminTokenObj.id}`]
+    }
+  });
 
   waitUntilAdminTokenPermissioned(100);
 });
@@ -142,21 +128,19 @@ Cypress.Commands.add('restoreStorage', () => {
     }
   });
 
-  if (Cypress.env('IAM_VERSION') === 'v2.1') {
-    // mock background polling since it's frequent and can interfere with loading wait time
-    cy.route({
-      method: 'GET',
-      url: '**/apply-rules',
-      status: 200,
-      response: {
-        state: 'not_running',
-        estimated_time_complete: '0001-01-01T00:00:00Z',
-        percentage_complete: 1,
-        failed: false,
-        failure_message: ''
-      }
-    });
-  }
+  // mock background polling since it's frequent and can interfere with loading wait time
+  cy.route({
+    method: 'GET',
+    url: '**/apply-rules',
+    status: 200,
+    response: {
+      state: 'not_running',
+      estimated_time_complete: '0001-01-01T00:00:00Z',
+      percentage_complete: 1,
+      failed: false,
+      failure_message: ''
+    }
+  });
 });
 
 Cypress.Commands.add('cleanupV2IAMObjectsByIDPrefixes',

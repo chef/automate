@@ -1,7 +1,6 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { uuidv4 } from '../../../support/helpers';
 
-describeIfIAMV2p1('Action project tagging on ingestion', () => {
+describe('Action project tagging on ingestion', () => {
   const cypressPrefix = 'test-client-runs-update';
   const actionId = uuidv4();
   const entityName = `ingest-action-${Cypress.moment().format('MMDDYYhhmmss')}`;

@@ -2,12 +2,8 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Action } from '@ngrx/store';
 
 import { Policy, Member } from './policy.model';
-import { IamVersionResponse } from './policy.requests';
 
 export enum PolicyActionTypes {
-  GET_IAM_VERSION         = 'POLICY::GET_IAM_VERSION',
-  GET_IAM_VERSION_SUCCESS = 'POLICY::GET_IAM_VERSION_SUCCESS',
-  GET_IAM_VERSION_FAILURE = 'POLICY::GET_IAM_VERSION_FAILURE',
   GET_ALL                 = 'POLICY::GET_ALL',
   GET_ALL_SUCCESS         = 'POLICY::GET_ALL::SUCCESS',
   GET_ALL_FAILURE         = 'POLICY::GET_ALL::FAILURE',
@@ -23,20 +19,6 @@ export enum PolicyActionTypes {
   DELETE                  = 'POLICY::DELETE',
   DELETE_SUCCESS          = 'POLICY::DELETE::SUCCESS',
   DELETE_FAILURE          = 'POLICY::DELETE::FAILURE'
-}
-
-export class GetIamVersion implements Action {
-  readonly type = PolicyActionTypes.GET_IAM_VERSION;
-}
-
-export class GetIamVersionSuccess implements Action {
-  readonly type = PolicyActionTypes.GET_IAM_VERSION_SUCCESS;
-  constructor(public payload: IamVersionResponse) { }
-}
-
-export class GetIamVersionFailure implements Action {
-  readonly type = PolicyActionTypes.GET_IAM_VERSION_FAILURE;
-  constructor(public payload: HttpErrorResponse) { }
 }
 
 export class GetPolicies implements Action {
@@ -142,9 +124,6 @@ export class DeletePolicyFailure implements Action {
 
 
 export type PolicyActions =
-  | GetIamVersion
-  | GetIamVersionSuccess
-  | GetIamVersionFailure
   | GetPolicies
   | GetPoliciesSuccess
   | GetPoliciesFailure

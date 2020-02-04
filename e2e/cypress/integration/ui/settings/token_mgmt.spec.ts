@@ -1,5 +1,3 @@
-import { iamVersion } from '../../../support/constants';
-
 describe('token management', () => {
   const typeDelay = 50;
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -61,10 +59,8 @@ describe('token management', () => {
     cy.get(tokensTable).should('exist');
     cy.get(tokensTable).contains('Name');
     cy.get(tokensTable).contains('Status');
-    if (iamVersion === 'v2.1') {
-        cy.get(tokensTable).contains('ID');
-        cy.get(tokensTable).contains('Projects');
-    }
+    cy.get(tokensTable).contains('ID');
+    cy.get(tokensTable).contains('Projects');
   });
 
   it('displays the returned tokens info', () => {

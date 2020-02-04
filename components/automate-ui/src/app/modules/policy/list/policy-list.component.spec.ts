@@ -1,7 +1,6 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { Store, StoreModule } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
-import { of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
@@ -67,15 +66,8 @@ describe('PolicyListComponent', () => {
     expect(element).toContainPath('chef-page-header');
   });
 
-  it('displays policy data for v2', () => {
-    component.isIAMv2$ = observableOf(true);
+  it('displays policy data', () => {
     fixture.detectChanges();
     expect(element).toContainPath('app-authorized');
-  });
-
-  it('does not display policy data for v1', () => {
-    component.isIAMv2$ = observableOf(false);
-    fixture.detectChanges();
-    expect(element).not.toContainPath('app-authorized');
   });
 });

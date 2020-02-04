@@ -49,7 +49,7 @@
             Also create owner, editor, and viewer policies for this project.
           </chef-checkbox>
         </div>
-        <div class="dropdown-margin" *ngIf="showProjectsDropdown">
+        <div class="dropdown-margin" *ngIf="objectNoun != 'project'">
           <app-projects-dropdown
             [projects]="projects"
             (onProjectChecked)="onProjectChecked($event)"

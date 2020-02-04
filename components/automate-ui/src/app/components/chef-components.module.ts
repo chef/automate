@@ -17,7 +17,6 @@ import { ChefNotificationsComponent } from './notifications/notifications.compon
 import { ClientRunsSidebarComponent } from './client-runs-sidebar/client-runs-sidebar.component';
 import { CreateObjectModalComponent } from './create-object-modal/create-object-modal.component';
 import { CreateUserModalComponent } from 'app/page-components/create-user-modal/create-user-modal.component';
-import { CreateV1TeamModalComponent } from 'app/page-components/create-v1-team-modal/create-v1-team-modal.component';
 import { DeleteObjectModalComponent } from './delete-object-modal/delete-object-modal.component';
 import { ErrorDirective } from './error/error.directive';
 import { FormControlDirective } from './form-control/form-control.directive';
@@ -80,7 +79,6 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     ClientRunsSidebarComponent,
     CreateObjectModalComponent,
     CreateUserModalComponent,
-    CreateV1TeamModalComponent,
     DeleteObjectModalComponent,
     FormFieldComponent,
     GuitarStringComponent,
@@ -118,7 +116,6 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     ClientRunsSidebarComponent,
     CreateObjectModalComponent,
     CreateUserModalComponent,
-    CreateV1TeamModalComponent,
     DeleteObjectModalComponent,
     ErrorDirective,
     FormControlDirective,

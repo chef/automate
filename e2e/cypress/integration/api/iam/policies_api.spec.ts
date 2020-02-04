@@ -1,6 +1,4 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
-
-describeIfIAMV2p1('policies API', () => {
+describe('policies API', () => {
   const defaultAdminReq = {
     headers: {}, // must fill in before use
     url: '/apis/iam/v2/policies'

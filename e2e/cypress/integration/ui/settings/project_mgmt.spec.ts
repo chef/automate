@@ -1,11 +1,11 @@
-import { describeIfIAMV2p1, itFlaky } from '../../../support/constants';
+import { itFlaky } from '../../../support/constants';
 interface Project {
   id: string;
   name: string;
   type: string;
 }
 
-describeIfIAMV2p1('project management', () => {
+describe('project management', () => {
   // we increase the default delay to mimic the average human's typing speed
   // only need this for input values upon which later test assertions depend
   // ref: https://github.com/cypress-io/cypress/issues/534

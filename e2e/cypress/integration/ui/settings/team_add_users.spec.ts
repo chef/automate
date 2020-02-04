@@ -1,4 +1,4 @@
-import { isV1, itFlaky } from '../../../support/constants';
+import { itFlaky } from '../../../support/constants';
 
 describe('team add users', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -9,7 +9,6 @@ describe('team add users', () => {
   const nameForTeam = 'testing-team-' + now;
   let teamID = '';
   let adminIdToken = '';
-  let teamUIRouteIdentifier = '';
 
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
@@ -41,7 +40,6 @@ describe('team add users', () => {
         }
       }).then((resp) => {
         teamID = resp.body.team.id;
-        teamUIRouteIdentifier = isV1() ? teamID : nameForTeam;
       });
 
     });
@@ -50,20 +48,14 @@ describe('team add users', () => {
   beforeEach(() => {
     cy.restoreStorage();
 
-    if (isV1()) {
-      cy.route('GET', `/api/v0/auth/teams/${teamID}`).as('getTeam');
-      cy.route('GET', `/api/v0/auth/teams/${teamID}/users`).as('getTeamUsers');
-      cy.route('GET', '/api/v0/auth/users').as('getUsers');
-    } else {
-      cy.route('GET', `/apis/iam/v2/teams/${nameForTeam}`).as('getTeam');
-      cy.route('GET', `/apis/iam/v2/teams/${nameForTeam}/users`).as('getTeamUsers');
-      cy.route('GET', '/apis/iam/v2/users').as('getUsers');
-    }
+    cy.route('GET', `/apis/iam/v2/teams/${nameForTeam}`).as('getTeam');
+    cy.route('GET', `/apis/iam/v2/teams/${nameForTeam}/users`).as('getTeamUsers');
+    cy.route('GET', '/apis/iam/v2/users').as('getUsers');
 
     // TODO move this to the before block so it only happens once
     // since everytime we `visit` a new url instead of navigating via nav buttons
     // the whole app has to reload, slowing down the test and causing timeouts
-    cy.visit(`/settings/teams/${teamUIRouteIdentifier}/add-users`);
+    cy.visit(`/settings/teams/${nameForTeam}/add-users`);
     cy.wait(['@getTeam', '@getTeamUsers', '@getUsers']);
   });
 
@@ -78,12 +70,12 @@ describe('team add users', () => {
 
   itFlaky('when the x is clicked, it returns to the team details page', () => {
     cy.get('chef-page chef-button.close-button').click();
-    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${nameForTeam}`);
   });
 
   itFlaky('when the cancel button is clicked, it returns to the team details page', () => {
     cy.get('#page-footer #right-buttons chef-button').last().click();
-    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${nameForTeam}`);
   });
 
   itFlaky('navigates to the team users add page', () => {
@@ -108,7 +100,7 @@ describe('team add users', () => {
       .first().contains('Add User').click();
 
     // drops you back on the team details page with user in the team users table
-    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${nameForTeam}`);
     cy.get('chef-table-body').children().should('have.length', 1);
     cy.get('chef-table-body chef-table-cell a').first().contains(nameForUser);
 
@@ -142,14 +134,14 @@ describe('team add users', () => {
     });
 
     // drops you back on the team details page with user in the team users table
-    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}`);
+    cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${nameForTeam}`);
     cy.get('chef-table-body chef-table-cell a').contains(nameForUser);
     cy.get('chef-table-body chef-table-cell a').contains('Local Administrator');
 
     // navigate back to add users and see empty page and message
     cy.get('chef-toolbar chef-button').contains('Add User').click();
     cy.url().should('eq',
-    `${Cypress.config().baseUrl}/settings/teams/${teamUIRouteIdentifier}/add-users`);
+    `${Cypress.config().baseUrl}/settings/teams/${nameForTeam}/add-users`);
     cy.get('chef-table-new').should('not.exist');
     cy.get('#no-users-container p')
       .contains('There are no more local users to add; create some more!');

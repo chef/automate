@@ -1,7 +1,6 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { uuidv4 } from '../../../support/helpers';
 
-describeIfIAMV2p1('Ingestion project tagging', () => {
+describe('Ingestion project tagging', () => {
   const cypressPrefix = 'test-node-ingestion';
 
 

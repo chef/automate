@@ -1,11 +1,9 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
-
 interface CreateProject {
   id: string;
   name: string;
 }
 
-describeIfIAMV2p1('global projects filter', () => {
+describe('global projects filter', () => {
   const proj1 = <CreateProject>
     { id: 'cypress-project-1', name: 'Cypress Project 1 ' + Cypress.moment().format('MMDDYYhhmm') };
   const proj2 = <CreateProject>
