@@ -15,7 +15,7 @@ import (
 type APIClient interface {
 	// TODO (tc): Add other service clients here as needed.
 	AuthzClient() authz.AuthorizationClient
-	TeamsV2Client() v2.TeamsClient
+	TeamsClient() v2.TeamsClient
 	TokensClient() tokens.TokensMgmtClient
 	TokensV2Client() v2.TokensClient
 	UsersClient() users.UsersMgmtClient

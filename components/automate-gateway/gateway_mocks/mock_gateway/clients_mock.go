@@ -16,7 +16,7 @@ import (
 	authz "github.com/chef/automate/api/interservice/authz"
 	v2 "github.com/chef/automate/api/interservice/authz/v2"
 	service "github.com/chef/automate/api/interservice/cfgmgmt/service"
-	"github.com/chef/automate/api/interservice/data_lifecycle"
+	data_lifecycle "github.com/chef/automate/api/interservice/data_lifecycle"
 	deployment "github.com/chef/automate/api/interservice/deployment"
 	event_feed "github.com/chef/automate/api/interservice/event_feed"
 	service0 "github.com/chef/automate/api/interservice/infra_proxy/service"
@@ -25,7 +25,6 @@ import (
 	local_user "github.com/chef/automate/api/interservice/local_user"
 	manager "github.com/chef/automate/api/interservice/nodemanager/manager"
 	nodes "github.com/chef/automate/api/interservice/nodemanager/nodes"
-	v1 "github.com/chef/automate/api/interservice/teams/v1"
 	v20 "github.com/chef/automate/api/interservice/teams/v2"
 	jobs "github.com/chef/automate/components/compliance-service/api/jobs"
 	profiles "github.com/chef/automate/components/compliance-service/api/profiles"
@@ -225,34 +224,19 @@ func (mr *MockClientsFactoryMockRecorder) ProjectsClient() *gomock.Call {
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "ProjectsClient", reflect.TypeOf((*MockClientsFactory)(nil).ProjectsClient))
 }
 
-// TeamsV1Client mocks base method
-func (m *MockClientsFactory) TeamsV1Client() (v1.TeamsV1Client, error) {
+// TeamsClient mocks base method
+func (m *MockClientsFactory) TeamsClient() (v20.TeamsV2Client, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TeamsV1Client")
-	ret0, _ := ret[0].(v1.TeamsV1Client)
-	ret1, _ := ret[1].(error)
-	return ret0, ret1
-}
-
-// TeamsV1Client indicates an expected call of TeamsV1Client
-func (mr *MockClientsFactoryMockRecorder) TeamsV1Client() *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TeamsV1Client", reflect.TypeOf((*MockClientsFactory)(nil).TeamsV1Client))
-}
-
-// TeamsV2Client mocks base method
-func (m *MockClientsFactory) TeamsV2Client() (v20.TeamsV2Client, error) {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "TeamsV2Client")
+	ret := m.ctrl.Call(m, "TeamsClient")
 	ret0, _ := ret[0].(v20.TeamsV2Client)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
-// TeamsV2Client indicates an expected call of TeamsV2Client
-func (mr *MockClientsFactoryMockRecorder) TeamsV2Client() *gomock.Call {
+// TeamsClient indicates an expected call of TeamsClient
+func (mr *MockClientsFactoryMockRecorder) TeamsClient() *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TeamsV2Client", reflect.TypeOf((*MockClientsFactory)(nil).TeamsV2Client))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "TeamsClient", reflect.TypeOf((*MockClientsFactory)(nil).TeamsClient))
 }
 
 // TokensMgmtClient mocks base method
@@ -498,16 +482,16 @@ func (mr *MockClientsFactoryMockRecorder) DeploymentServiceClient() *gomock.Call
 // PurgeClient mocks base method
 func (m *MockClientsFactory) PurgeClient(service string) (data_lifecycle.PurgeClient, error) {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "PurgeClient")
+	ret := m.ctrl.Call(m, "PurgeClient", service)
 	ret0, _ := ret[0].(data_lifecycle.PurgeClient)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
 
 // PurgeClient indicates an expected call of PurgeClient
-func (mr *MockClientsFactoryMockRecorder) PurgeClient(string) *gomock.Call {
+func (mr *MockClientsFactoryMockRecorder) PurgeClient(service interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PurgeClient", reflect.TypeOf((*MockClientsFactory)(nil).PurgeClient))
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "PurgeClient", reflect.TypeOf((*MockClientsFactory)(nil).PurgeClient), service)
 }
 
 // Close mocks base method

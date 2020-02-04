@@ -101,7 +101,7 @@ func AddAdminUserToTeam(ctx context.Context,
 func AddUserToTeam(ctx context.Context,
 	apiClient client.APIClient, teamID, userID string, dryRun bool) (bool, error) {
 
-	getUsersResp, err := apiClient.TeamsV2Client().GetTeamMembership(ctx, &authz_v2_req.GetTeamMembershipReq{
+	getUsersResp, err := apiClient.TeamsClient().GetTeamMembership(ctx, &authz_v2_req.GetTeamMembershipReq{
 		Id: teamID,
 	})
 	if err != nil {
@@ -110,7 +110,7 @@ func AddUserToTeam(ctx context.Context,
 
 	addUser := !stringutils.SliceContains(getUsersResp.UserIds, userID)
 	if addUser && !dryRun {
-		_, err := apiClient.TeamsV2Client().AddTeamMembers(ctx, &authz_v2_req.AddTeamMembersReq{
+		_, err := apiClient.TeamsClient().AddTeamMembers(ctx, &authz_v2_req.AddTeamMembersReq{
 			Id:      teamID,
 			UserIds: []string{userID},
 		})
@@ -198,13 +198,13 @@ func EnsureTeam(ctx context.Context,
 	apiClient client.APIClient,
 	dryRun bool) (string, bool, error) {
 
-	teamID, found, err := getTeamIDByName(ctx, apiClient.TeamsV2Client(), id)
+	teamID, found, err := getTeamIDByName(ctx, apiClient.TeamsClient(), id)
 	if err != nil {
 		return "", false, wrapUnexpectedError(err, "Failed to retrieve team %q", id)
 	}
 
 	if !found && !dryRun {
-		createTeamsResp, err := apiClient.TeamsV2Client().CreateTeam(ctx, &authz_v2_req.CreateTeamReq{
+		createTeamsResp, err := apiClient.TeamsClient().CreateTeam(ctx, &authz_v2_req.CreateTeamReq{
 			Id:       id,
 			Name:     name,
 			Projects: []string{},
