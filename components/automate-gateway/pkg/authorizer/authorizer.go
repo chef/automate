@@ -18,7 +18,7 @@ func NewAuthorizer(v2 middleware.AuthorizationHandler) middleware.SwitchingAutho
 
 func (a *state) Handle(ctx context.Context,
 	subjects []string, projects []string, req interface{}) (context.Context, error) {
-	return a.Handle(ctx, subjects, projects, req)
+	return a.v2.Handle(ctx, subjects, projects, req)
 }
 
 func (a *state) IsAuthorized(ctx context.Context, subjects []string,
