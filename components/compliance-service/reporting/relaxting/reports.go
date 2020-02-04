@@ -668,7 +668,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 	waivedStrAgg := elastic.NewTermsAggregation().Field("profiles.controls.waived_str").Size(4) //there are 4 different waived_str states
 	waivedButNotRunQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes")
 	waivedAndRunQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes_run")
-	waiverDataWaivedQuery := elastic.NewTermsQuery("profiles.controls.waived_str", "yes", "yes_run")
 	waiverDataPassedFilter := elastic.NewFilterAggregation().Filter(elastic.NewBoolQuery().
 		Must(elastic.NewTermQuery("profiles.controls.status", "passed")).
 		Must(waivedAndRunQuery))
@@ -681,7 +680,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		Should(elastic.NewTermQuery("profiles.controls.status", "skipped")).
 		Should(waivedButNotRunQuery))
 
-	waiverDataWaivedFilter := elastic.NewFilterAggregation().Filter(waiverDataWaivedQuery)
+	waiverDataWaivedFilter := elastic.NewFilterAggregation().Filter(waivedQuery)
 
 	waiverDataJustificationAgg := elastic.NewTermsAggregation().Field("profiles.controls.waiver_data.justification").Size(reporting.ESize)
 	waiverDataJustificationAgg.SubAggregation("skipped", waiverDataSkippedFilter)
