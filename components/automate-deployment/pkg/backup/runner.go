@@ -351,7 +351,7 @@ func (r *Runner) ListBackups(ctx context.Context) ([]*api.BackupTask, error) {
 		// We ignore .incomplete, automate-elasticsearch-data, and .tmp (minioMetaBucket)
 		// We no longer need to look in .incomplete as we'll use a status file
 		// to keep track of backups
-		if prefixStr != ".incomplete" && prefixStr != es.RepoBaseName && prefixStr != ".tmp" {
+		if prefixStr != ".incomplete" && prefixStr != es.RepoBaseName && prefixStr != ".tmp" && prefixStr != "shared" {
 			t := r.backupTaskFromSharedPrefix(prefixStr)
 			state := api.BackupTask_IN_PROGRESS // nolint:ineffassign
 

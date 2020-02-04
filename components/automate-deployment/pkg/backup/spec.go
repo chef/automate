@@ -35,6 +35,8 @@ type Spec struct {
 
 	SyncBuilderMinio []BuilderMinioDumpOperation `json:"sync_builder_minio"`
 
+	SyncBuilderMinioV2 []BuilderMinioDumpOperationV2 `json:"sync_builder_minio_v2"`
+
 	// Test operations
 	testSyncOps []testOperation
 
@@ -67,6 +69,11 @@ func (s *Spec) SyncOps() []Operation {
 	}
 
 	for _, sc := range s.SyncBuilderMinio {
+		c := sc
+		ops = append(ops, &c)
+	}
+
+	for _, sc := range s.SyncBuilderMinioV2 {
 		c := sc
 		ops = append(ops, &c)
 	}
@@ -511,9 +518,9 @@ func DefaultSpecs(serviceNames []string) []Spec {
 					User: "automate-builder-api",
 				},
 			},
-			SyncBuilderMinio: []BuilderMinioDumpOperation{
+			SyncBuilderMinioV2: []BuilderMinioDumpOperationV2{
 				{
-					Name: "hartifacts",
+					Name: "bldr",
 				},
 			},
 		},
@@ -558,6 +565,10 @@ func setDefaults(spec Spec) {
 
 	for i := range spec.SyncBuilderMinio {
 		spec.SyncBuilderMinio[i].ObjectName = []string{spec.Name, "artifacts"}
+	}
+
+	for i := range spec.SyncBuilderMinioV2 {
+		spec.SyncBuilderMinioV2[i].ObjectName = []string{spec.Name, "artifacts"}
 	}
 }
 

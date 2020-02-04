@@ -2,10 +2,7 @@ package backup
 
 import (
 	"bufio"
-	"fmt"
 	"io"
-	"io/ioutil"
-	"os"
 	"path"
 
 	"github.com/pkg/errors"
@@ -20,63 +17,7 @@ type BuilderMinioDumpOperation struct {
 var _ Operation = &BuilderMinioDumpOperation{}
 
 func (d *BuilderMinioDumpOperation) Backup(backupCtx Context, om ObjectManifest, progChan chan OperationProgress) error {
-	backupBucketPrefix := d.backupBucketPrefix()
-	ctx := backupCtx.ctx
-
-	logrus.WithFields(logrus.Fields{
-		"name":      d.Name,
-		"backup_id": backupCtx.backupTask.TaskID(),
-		"prefix":    backupBucketPrefix,
-		"operation": "builder_minio_dump",
-		"action":    "backup",
-	}).Info("Running backup operation")
-
-	objects, _, err := backupCtx.builderBucket.List(ctx, "", false)
-	if err != nil {
-		return err
-	}
-	builderArtifacts, err := ioutil.TempFile("", "builderartifacts")
-	if err != nil {
-		return err
-	}
-	defer builderArtifacts.Close()
-	defer os.Remove(builderArtifacts.Name())
-
-	objVerifier := &NoOpObjectVerifier{}
-	for _, obj := range objects {
-		if err := d.copyObjectFromBuilder(backupCtx, backupBucketPrefix, obj, objVerifier); err != nil {
-			return err
-		}
-		if _, err := fmt.Fprintln(builderArtifacts, obj.Name); err != nil {
-			return err
-		}
-	}
-	// Write file with artifact list
-	if _, err := builderArtifacts.Seek(0, os.SEEK_SET); err != nil {
-		return err
-	}
-	objectName := builderArtifactManifestPath(backupBucketPrefix)
-	writer, err := backupCtx.bucket.NewWriter(ctx, objectName)
-	if err != nil {
-		return err
-	}
-
-	if _, err := io.Copy(writer, builderArtifacts); err != nil {
-		writer.Fail(err) // nolint: errcheck
-		return err
-	}
-	if err := writer.Close(); err != nil {
-		return err
-	}
-
-	om.WriteFinished(objectName, writer)
-
-	progChan <- OperationProgress{
-		Name:     d.String(),
-		Progress: float64(100),
-	}
-
-	return nil
+	return errors.New("deprecated backup operation")
 }
 
 func (d *BuilderMinioDumpOperation) Restore(backupCtx Context, serviceName string, verifier ObjectVerifier, progChan chan OperationProgress) error {
