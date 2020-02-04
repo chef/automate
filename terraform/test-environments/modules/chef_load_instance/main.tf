@@ -155,6 +155,7 @@ CONF
     inline = [
       "set -e",
       "sudo hab svc unload chef/chef-load",
+      "sudo hab svc unload chef/applications-load-gen",
       "sudo mv /tmp/chef-load_logrotate.conf /etc/logrotate.d/chef-load",
       "sudo chown root:root /etc/logrotate.d/chef-load",
       "sudo rm -rf /opt/chef_load_sample_data",
@@ -163,7 +164,7 @@ CONF
       "sudo mkdir -p /hab/user/chef-load/config",
       "sudo mkdir -p /hab/user/applications-load-gen/config",
       "sudo mv /tmp/chef-load_user.toml /hab/user/chef-load/config/user.toml",
-      "sudo mv /tmp/applications_load_gen_user.toml /hab/user/applications-load-gen/config/user.toml",
+      "sudo mv /tmp/applications-load-gen_user.toml /hab/user/applications-load-gen/config/user.toml",
       "sudo mv /tmp/group-node-names /etc/cron.hourly/group-node-names",
       "sudo chown root:root /etc/cron.hourly/group-node-names",
       "sudo chmod a+x /etc/cron.hourly/group-node-names",
