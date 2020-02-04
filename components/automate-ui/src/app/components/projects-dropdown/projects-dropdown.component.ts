@@ -1,4 +1,5 @@
 import { Component, EventEmitter, Input, Output, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ProjectsFilterService } from 'app/services/projects-filter/projects-filter.service';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
@@ -22,6 +23,8 @@ export interface ProjectCheckedMap {
   styleUrls: ['./projects-dropdown.component.scss']
 })
 export class ProjectsDropdownComponent implements OnInit, OnChanges {
+
+  constructor(public projectsFilterService: ProjectsFilterService) {}
   // The map of ProjectChecked by id. Any checked changes propagated via
   // onProjectChecked. Updates should be applied to parent component state.
   @Input() projects: ProjectCheckedMap = {};

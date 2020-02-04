@@ -19,7 +19,8 @@
         <input 
           chefInput
           type="text"
-          placeholder="Filter projects..." 
+          placeholder="Filter projects..."
+          [ngModel]="filterValue"
           (keyup)="handleFilterKeyUp($event.target.value)"
           />
       </div>
