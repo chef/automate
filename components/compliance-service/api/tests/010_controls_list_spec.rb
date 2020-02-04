@@ -617,5 +617,4 @@ describe File.basename(__FILE__) do
     }
     assert_equal_json_content(expected_data, actual_data)
   end
-
 end
