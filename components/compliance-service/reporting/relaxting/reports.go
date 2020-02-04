@@ -917,13 +917,13 @@ func (backend *ES2Backend) getWaiverData(waiverDataBuckets *elastic.AggregationB
 			for _, expirationBucket := range aggResult.Buckets {
 				expDate, ok := expirationBucket.Key.(string)
 				if !ok {
-					logrus.Errorf("could not convert the value of expiration date: %v, to a string!", expirationBucket)
+					logrus.Errorf("could not convert the value of expiration date: %v, to a string! Will set expiration date to empty string", expirationBucket)
 				}
 				if aggResult, found := expirationBucket.Aggregations.Terms("justification"); found && len(aggResult.Buckets) > 0 {
 					for _, justificationBucket := range aggResult.Buckets {
 						justification, ok := justificationBucket.Key.(string)
 						if !ok {
-							logrus.Errorf("could not convert the value of justification: %v, to a string!", justificationBucket)
+							logrus.Errorf("could not convert the value of justification: %v, to a string! Will set justification to an empty string", justificationBucket)
 						}
 
 						controlSummary := &reportingapi.ControlSummary{
