@@ -313,7 +313,7 @@ message WaiverData {
 	string waived_str = 1;
 	// The expiration date for the waiver.. after this date, the control is no longer waived
 	string expiration_date = 2;
-	// The reason for the waiver
+	// The reason for the waiver.
 	string justification = 3;
 	// What are the counts for the waived controls across nodes?
 	ControlSummary waiver_summary= 4;
