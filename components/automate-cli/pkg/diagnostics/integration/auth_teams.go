@@ -59,7 +59,7 @@ func GetTeam(tstCtx diagnostics.TestContext, id string) (*TeamInfo, error) {
 	teamInfo := TeamInfo{}
 	err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
-			fmt.Sprintf("/api/v0/auth/teams/%s", id),
+			fmt.Sprintf("/apis/iam/v2/teams/%s", id),
 		)).WithValue(&teamInfo)
 
 	if err != nil {
@@ -72,7 +72,7 @@ func GetTeam(tstCtx diagnostics.TestContext, id string) (*TeamInfo, error) {
 func DeleteTeam(tstCtx diagnostics.TestContext, id string) error {
 	err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
-			fmt.Sprintf("/api/v0/auth/teams/%s", id),
+			fmt.Sprintf("/apis/iam/v2/teams/%s", id),
 			lbrequest.WithMethod("DELETE"),
 		)).Error()
 

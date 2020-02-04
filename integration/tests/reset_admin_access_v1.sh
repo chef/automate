@@ -20,11 +20,11 @@ hab_curl() {
 remove_admin_from_admins_team() {
     local token admins_team_id admin_user_id
     token="$(chef-automate admin-token)"
-    admins_team_id=$(hab_curl -k -s -H "api-token: $token" https://localhost/api/v0/auth/teams | \
+    admins_team_id=$(hab_curl -k -s -H "api-token: $token" https://localhost/apis/iam/v2/teams | \
       jq -r '.teams[] | select(.name == "admins").id')
     admin_user_id=$(hab_curl -k -s -H "api-token: $token" https://localhost/api/v0/auth/users | \
       jq -r '.users[] | select(.username == "admin").id')
-    hab_curl -k -s -H "api-token: $token" "https://localhost/api/v0/auth/teams/${admins_team_id}/users" \
+    hab_curl -k -s -H "api-token: $token" "https://localhost/apis/iam/v2/teams/${admins_team_id}/users" \
       -XPUT -d "{\"user_ids\": [\"$admin_user_id\"]}"
 }
 
