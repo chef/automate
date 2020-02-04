@@ -50,7 +50,7 @@ title 'Automate 2.0 Smoke Tests'
     },
   },
   'teams-service': {
-    path: '/api/v0/auth/teams/version',
+    path: '/apis/iam/v2/teams',
     response_match: {
       name: 'teams-service'
     },

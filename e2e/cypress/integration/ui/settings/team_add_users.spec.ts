@@ -33,7 +33,7 @@ describe('team add users', () => {
       cy.request({
         auth: { bearer: adminIdToken },
         method: 'POST',
-        url: '/api/v0/auth/teams',
+        url: '/apis/iam/v2/teams',
         body: {
           description: descriptionForTeam,
           name: nameForTeam
@@ -113,7 +113,7 @@ describe('team add users', () => {
       cy.request({
         auth: { bearer: adminIdToken },
         method: 'PUT',
-        url: `/api/v0/auth/teams/${teamID}/users`,
+        url: `/apis/iam/v2/teams/${teamID}/users`,
         body: {
           user_ids: [resp.body.id]
         }

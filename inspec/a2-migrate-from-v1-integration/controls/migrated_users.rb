@@ -46,7 +46,7 @@ control 'local-user-migration-2' do
       expect(test_admin_user.http_status.to_s).to eq("200")
       test_admin_user_id = test_admin_user.parsed_response_body[:id]
 
-      teams = automate_api_request('/api/v0/auth/teams')
+      teams = automate_api_request('/apis/iam/v2/teams')
       expect(teams.http_status.to_s).to eq('200')
       admins_team_id = ''
       teams.parsed_response_body[:teams].each do |team|
@@ -56,7 +56,7 @@ control 'local-user-migration-2' do
       end
       expect(admins_team_id).not_to eq('')
 
-      admins_team = automate_api_request("/api/v0/auth/teams/#{admins_team_id}/users")
+      admins_team = automate_api_request("/apis/iam/v2/teams/#{admins_team_id}/users")
       expect(admins_team.http_status.to_s).to eq('200')
 
       expect(admins_team.parsed_response_body[:user_ids]).to eq([admin_user_id, test_admin_user_id])

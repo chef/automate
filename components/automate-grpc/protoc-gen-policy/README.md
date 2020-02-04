@@ -3,14 +3,22 @@
 These are the (ordinary, garden-variety) protobuf definitions used
 to annotate _other_ protobuf definitions with policy information.
 
-Example (from `components/automate-gateway/api/auth/teams/teams.proto`):
+Example (from `components/automate-gateway/api/iam/v2/teams.proto`):
 
 ```go
-  rpc CreateTeam (teams.request.CreateTeamReq) returns (teams.response.CreateTeamResp) {
-    option (google.api.http).post = "/auth/teams";
-    option (google.api.http).body = "*";
+  rpc CreateTeam (CreateTeamReq) returns (CreateTeamResp) {
+    option (google.api.http) = {
+      post: "/iam/v2/teams"
+      body: "*"
+      additional_bindings {
+        post: "/iam/v2beta/teams"
+        body: "*"
+      }
+    };
     option (chef.automate.api.policy).resource = "auth:teams";
     option (chef.automate.api.policy).action = "create";
+    option (chef.automate.api.iam.policy).resource = "iam:teams";
+    option (chef.automate.api.iam.policy).action = "iam:teams:create";
   };
 ```
 
@@ -56,7 +64,7 @@ teams.pb.policy.go from teams.proto, which was annotated with some policy inform
 
 ```bash
 protoc -I$GOPATH/src -I$PWD/vendor -I$PWD/vendor/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
--I. --policy_out=v=4,logtostderr=true:$GOPATH/src $PWD/components/automate-gateway/api/auth/teams/teams.proto`
+-I. --policy_out=v=4,logtostderr=true:$GOPATH/src $PWD/components/automate-gateway/api/iam/v2/teams.proto`
 ```
 
 The `--policy_out` switch is what triggers `protoc` to call `protoc-gen-policy`
