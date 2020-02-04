@@ -31,7 +31,7 @@ describe('TeamManagementComponent', () => {
         MockComponent({
           selector: 'app-create-object-modal',
           inputs: ['visible', 'creating', 'conflictErrorEvent', 'objectNoun',
-            'createForm', 'showProjectsDropdown', 'assignableProjects'],
+            'createForm', 'assignableProjects'],
           outputs: ['close', 'createClicked']
         }),
         MockComponent({ selector: 'chef-button',
