@@ -187,14 +187,14 @@ control 'authz-access-control-1' do
         let(:failure_test_id) { '4ae7307e-0ac2-4871-bda9-ebf6bf28d6a5' }
         let(:test_object) do
           {
-            'name': "inspec_test_team-#{Time.now.to_i}",
-            'description': 'This team was created by inspec tests. DELETE ME.',
+            'id': "inspec_test_team-#{Time.now.to_i}",
+            'name': 'This team was created by inspec tests. DELETE ME.',
           }
         end
         let(:test_update_object) do
           {
-            'name': "inspec_test_team-#{Time.now.to_i}",
-            'description': 'This team was created by inspec tests but was modified. DELETE ME.',
+            'id': "inspec_test_team-#{Time.now.to_i}",
+            'name': 'This team was created by inspec tests but was modified. DELETE ME.',
           }
         end
 
