@@ -35,7 +35,17 @@ func (a *state) FilterAuthorizedPairs(ctx context.Context, subjects []string,
 	mapByResourceAndActionV2 map[pairs.Pair][]string,
 	methodsInfoV2 map[string]pairs.Info,
 ) (*middleware.FilterPairsResponse, error) {
-	return a.FilterAuthorizedPairs(ctx, subjects, mapByResourceAndActionV2, methodsInfoV2)
+	pairsV2 := pairs.GetKeys(mapByResourceAndActionV2)
+	resp, err := a.v2.FilterAuthorizedPairs(ctx, subjects, pairsV2)
+	if err == nil {
+		return &middleware.FilterPairsResponse{
+			MapByResourceAndAction: mapByResourceAndActionV2,
+			MethodsInfo:            methodsInfoV2,
+			Pairs:                  resp,
+		}, nil
+	}
+	return nil, err
+
 }
 
 type annotated struct {

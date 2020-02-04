@@ -153,7 +153,21 @@ func newAuthorizationMocks(t *testing.T, resource, action string) (
 			return &authz.ProjectsAuthorizedResp{Projects: []string{"any"}}, nil
 		},
 	)
-
+	mockAuthzClient.EXPECT().FilterAuthorizedPairs(
+		gomock.Any(),
+		&authz.FilterAuthorizedPairsReq{
+			Subjects: []string{"mock"},
+			Pairs:    []*authz.Pair{},
+		},
+	).DoAndReturn(
+		func(_ context.Context, _ *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
+			return &authz.FilterAuthorizedPairsResp{
+				Pairs: []*authz.Pair{
+					&authz.Pair{Resource: "any", Action: "any"},
+				},
+			}, nil
+		},
+	)
 	return mockAuthClient, mockAuthzClient
 }
 
