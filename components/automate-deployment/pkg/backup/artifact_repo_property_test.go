@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"reflect"
+	"sync"
 	"testing"
 
 	"github.com/leanovate/gopter"
@@ -35,6 +36,52 @@ func (m *mockReadOnlyBucket) List(ctx context.Context, pathPrefix string, delimi
 }
 
 func (m *mockReadOnlyBucket) Delete(ctx context.Context, objectPaths []string) error {
+	return errors.New("unimplemented")
+}
+
+type mockWriteOnlyBucket struct {
+	lock              sync.Mutex
+	uploadedArtifacts []string
+}
+
+type mockBlobWriter struct {
+	io.Writer
+}
+
+func (*mockBlobWriter) BlobSHA256() string {
+	return "unimplemented"
+}
+
+func (*mockBlobWriter) Fail(err error) error {
+	return err
+}
+
+func (*mockBlobWriter) Close() error {
+	return nil
+}
+
+func newMockBlobWriter() BlobWriter {
+	return &mockBlobWriter{
+		Writer: ioutil.Discard,
+	}
+}
+
+func (m *mockWriteOnlyBucket) NewReader(ctx context.Context, path string, verifier ObjectVerifier) (io.ReadCloser, error) {
+	return nil, errors.New("unimplemented")
+}
+
+func (m *mockWriteOnlyBucket) NewWriter(ctx context.Context, path string) (BlobWriter, error) {
+	m.lock.Lock()
+	defer m.lock.Unlock()
+	m.uploadedArtifacts = append(m.uploadedArtifacts, path)
+	return newMockBlobWriter(), nil
+}
+
+func (m *mockWriteOnlyBucket) List(ctx context.Context, pathPrefix string, delimited bool) ([]BucketObject, []SharedPrefix, error) {
+	return nil, nil, errors.New("unimplemented")
+}
+
+func (m *mockWriteOnlyBucket) Delete(ctx context.Context, objectPaths []string) error {
 	return errors.New("unimplemented")
 }
 
@@ -175,6 +222,65 @@ func (value removeSnapshotCommand) String() string {
 	return fmt.Sprintf("REMOVE(%s)", value.SnapshotName)
 }
 
+type restoreSnapshotCommand struct {
+	SnapshotName string
+}
+
+type restoreSnapshotCommandResult struct {
+	RestoredFiles []string
+	Err           error
+}
+
+func (value restoreSnapshotCommand) Run(rts commands.SystemUnderTest) commands.Result {
+	logrus.Infof("Restoring snapshot %s", value.SnapshotName)
+	dstBucket := &mockWriteOnlyBucket{}
+	err := rts.(*repoTestSystem).repo.Restore(context.Background(), dstBucket, value.SnapshotName)
+	return restoreSnapshotCommandResult{
+		Err:           err,
+		RestoredFiles: sortStrings(dstBucket.uploadedArtifacts),
+	}
+}
+
+func (value restoreSnapshotCommand) NextState(state commands.State) commands.State {
+	return state
+}
+
+func (value restoreSnapshotCommand) PreCondition(state commands.State) bool {
+	return true
+}
+
+func (value restoreSnapshotCommand) PostCondition(state commands.State, result commands.Result) *gopter.PropResult {
+	st := state.(*testRepoState)
+	res := result.(restoreSnapshotCommandResult)
+	err := res.Err
+
+	if err != nil {
+		if IsNotExist(err) {
+			if _, exists := st.snapshots[value.SnapshotName]; exists {
+				return gopter.NewPropResult(false, "expected snapshot to restore")
+			}
+			if len(res.RestoredFiles) == 0 {
+				return gopter.NewPropResult(true, "")
+			}
+			return gopter.NewPropResult(false, "expected 0 artifacts restored")
+		}
+		return &gopter.PropResult{
+			Status: gopter.PropError,
+			Error:  err,
+		}
+	}
+
+	if !stringSliceEquals(st.snapshots[value.SnapshotName], res.RestoredFiles) {
+		return gopter.NewPropResult(false, "restored files did not match files expected to be restored")
+	}
+
+	return gopter.NewPropResult(true, "")
+}
+
+func (value restoreSnapshotCommand) String() string {
+	return fmt.Sprintf("RESTORE(%s)", value.SnapshotName)
+}
+
 var genSnapshotCommand = gen.Struct(
 	reflect.TypeOf(snapshotCommand{}),
 	map[string]gopter.Gen{
@@ -211,9 +317,37 @@ func genRemoveSnapshotCommand(availableSnapshot []string) gopter.Gen {
 	}).WithShrinker(gopter.NoShrinker)
 }
 
+func genRestoreSnapshotCommand(availableSnapshot []string) gopter.Gen {
+	snapshotNameGen := []gen.WeightedGen{
+		{
+			Weight: 1,
+			Gen:    stringGen(5),
+		},
+	}
+
+	if len(availableSnapshot) > 0 {
+		ifs := make([]interface{}, len(availableSnapshot))
+		for i, v := range availableSnapshot {
+			ifs[i] = v
+		}
+		snapshotNameGen = append(
+			snapshotNameGen,
+			gen.WeightedGen{
+				Weight: 3,
+				Gen:    gen.OneConstOf(ifs...),
+			})
+	}
+
+	return gen.Weighted(snapshotNameGen).Map(func(snapshotName string) restoreSnapshotCommand {
+		return restoreSnapshotCommand{
+			SnapshotName: snapshotName,
+		}
+	}).WithShrinker(gopter.NoShrinker)
+}
+
 func TestArtifactRepo(t *testing.T) {
 	parameters := gopter.DefaultTestParameters()
-	parameters.MinSuccessfulTests = 200
+	parameters.MinSuccessfulTests = 300
 	parameters.MaxShrinkCount = 1
 	parameters.MaxSize = 80
 	properties := gopter.NewProperties(parameters)
@@ -253,7 +387,8 @@ func TestArtifactRepo(t *testing.T) {
 				keys[i] = k
 				i++
 			}
-			return gen.OneGenOf(genSnapshotCommand, genRemoveSnapshotCommand(keys)).WithShrinker(gopter.NoShrinker)
+			return gen.OneGenOf(genSnapshotCommand,
+				genRestoreSnapshotCommand(keys), genRemoveSnapshotCommand(keys)).WithShrinker(gopter.NoShrinker)
 		},
 	}
 
