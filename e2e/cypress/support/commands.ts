@@ -180,7 +180,7 @@ Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (namePrefix: string) => 
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'GET',
-    url: '/api/v0/auth/teams',
+    url: '/apis/iam/v2/teams',
     failOnStatusCode: false
   }).then((resp) => {
     const body = resp.body;
@@ -189,7 +189,7 @@ Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (namePrefix: string) => 
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
           method: 'DELETE',
-          url: `/api/v0/auth/teams/${team.id}`,
+          url: `/apis/iam/v2/teams/${team.id}`,
           failOnStatusCode: false
         });
       }

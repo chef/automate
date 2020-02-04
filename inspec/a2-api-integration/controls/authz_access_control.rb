@@ -178,8 +178,8 @@ control 'authz-access-control-1' do
     end # try_every_http_verb
 
     shared_examples 'authz access control' do
-      describe '/api/v0/auth/teams' do
-        let(:url) { '/api/v0/auth/teams' }
+      describe '/apis/iam/v2/teams' do
+        let(:url) { '/apis/iam/v2/teams' }
         let(:expect_403_response) { expect_403_for_admin_only_apis }
         let(:id_keys) { ["team", "id"] }
         let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
@@ -200,7 +200,7 @@ control 'authz-access-control-1' do
 
         include_examples 'try_every_http_verb'
         # TODO (tc) Test AddUsers RemoveUsers once they are their own HTTP API endpoints.
-      end # /api/v0/auths/teams
+      end
 
       describe '/api/v0/auth/users' do
         let(:url) { '/api/v0/auth/users' }
