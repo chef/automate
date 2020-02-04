@@ -137,14 +137,14 @@ func TestEnsureTeam(t *testing.T) {
 	defer apiClient.CloseConnection()
 
 	t.Run("when ListTeams fails with an unexpected error then raise that error", func(t *testing.T) {
-		serverMocks.TeamsV2Mock.ListTeamsFunc = listTeamsError(codes.Internal)
+		serverMocks.TeamsMock.ListTeamsFunc = listTeamsError(codes.Internal)
 
 		_, _, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, false)
 		require.Error(t, err)
 	})
 
 	t.Run("when the admins team does not exist", func(t *testing.T) {
-		serverMocks.TeamsV2Mock.ListTeamsFunc = func(
+		serverMocks.TeamsMock.ListTeamsFunc = func(
 			context.Context, *teams_req.ListTeamsReq) (*teams_resp.ListTeamsResp, error) {
 
 			return &teams_resp.ListTeamsResp{
@@ -160,7 +160,7 @@ func TestEnsureTeam(t *testing.T) {
 
 		t.Run("it is created and its id and found=false are returned", func(t *testing.T) {
 			createAdminID := "mocked-admin-id"
-			serverMocks.TeamsV2Mock.CreateTeamFunc = func(
+			serverMocks.TeamsMock.CreateTeamFunc = func(
 				_ context.Context, req *teams_req.CreateTeamReq) (*teams_resp.CreateTeamResp, error) {
 
 				if "admins" != req.Name ||
@@ -184,7 +184,7 @@ func TestEnsureTeam(t *testing.T) {
 		})
 
 		t.Run("and dry run mode is on it is not created, id is empty, and found=false are returned", func(t *testing.T) {
-			serverMocks.TeamsV2Mock.CreateTeamFunc = createTeamCallUnexpected
+			serverMocks.TeamsMock.CreateTeamFunc = createTeamCallUnexpected
 
 			id, found, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, true)
 			require.NoError(t, err)
@@ -195,7 +195,7 @@ func TestEnsureTeam(t *testing.T) {
 
 	t.Run("when the admins team exists already", func(t *testing.T) {
 		mockedAdminsID := "mocked-admin-id"
-		serverMocks.TeamsV2Mock.ListTeamsFunc = func(
+		serverMocks.TeamsMock.ListTeamsFunc = func(
 			context.Context, *teams_req.ListTeamsReq) (*teams_resp.ListTeamsResp, error) {
 
 			return &teams_resp.ListTeamsResp{
@@ -214,7 +214,7 @@ func TestEnsureTeam(t *testing.T) {
 			}, nil
 		}
 
-		serverMocks.TeamsV2Mock.CreateTeamFunc = createTeamCallUnexpected
+		serverMocks.TeamsMock.CreateTeamFunc = createTeamCallUnexpected
 
 		t.Run("it returns the team id and found=true", func(t *testing.T) {
 			id, found, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, false)
@@ -240,7 +240,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 	teamsID := "teams-id"
 	userID := "user-id"
 	t.Run("when GetTeamMembership fails with an unexpected error then raise that error", func(t *testing.T) {
-		serverMocks.TeamsV2Mock.GetTeamMembershipFunc = func(
+		serverMocks.TeamsMock.GetTeamMembershipFunc = func(
 			_ context.Context, req *teams_req.GetTeamMembershipReq) (*teams_resp.GetTeamMembershipResp, error) {
 
 			if teamsID != req.Id {
@@ -254,7 +254,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 	})
 
 	t.Run("when the admin is on the team", func(t *testing.T) {
-		serverMocks.TeamsV2Mock.GetTeamMembershipFunc = func(
+		serverMocks.TeamsMock.GetTeamMembershipFunc = func(
 			_ context.Context, req *teams_req.GetTeamMembershipReq) (*teams_resp.GetTeamMembershipResp, error) {
 
 			if teamsID != req.Id {
@@ -279,7 +279,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 	})
 
 	t.Run("when the admin is not on the team", func(t *testing.T) {
-		serverMocks.TeamsV2Mock.GetTeamMembershipFunc = func(
+		serverMocks.TeamsMock.GetTeamMembershipFunc = func(
 			_ context.Context, req *teams_req.GetTeamMembershipReq) (*teams_resp.GetTeamMembershipResp, error) {
 
 			if teamsID != req.Id {
@@ -291,7 +291,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 		}
 
 		t.Run("it calls AddTeamMembers returns addUser=true", func(t *testing.T) {
-			serverMocks.TeamsV2Mock.AddTeamMembersFunc = func(
+			serverMocks.TeamsMock.AddTeamMembersFunc = func(
 				_ context.Context, req *teams_req.AddTeamMembersReq) (*teams_resp.AddTeamMembersResp, error) {
 
 				if teamsID != req.Id || len(req.UserIds) != 1 || userID != req.UserIds[0] {
@@ -309,7 +309,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 		})
 
 		t.Run("when AddTeamMembers returns an unexpected error it raises the error", func(t *testing.T) {
-			serverMocks.TeamsV2Mock.AddTeamMembersFunc = func(
+			serverMocks.TeamsMock.AddTeamMembersFunc = func(
 				_ context.Context, req *teams_req.AddTeamMembersReq) (*teams_resp.AddTeamMembersResp, error) {
 
 				if teamsID != req.Id || len(req.UserIds) != 1 || userID != req.UserIds[0] {
@@ -323,7 +323,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 		})
 
 		t.Run("and dry run is enabled it returns addUser=false", func(t *testing.T) {
-			serverMocks.TeamsV2Mock.AddTeamMembersFunc = func(
+			serverMocks.TeamsMock.AddTeamMembersFunc = func(
 				context.Context, *teams_req.AddTeamMembersReq) (*teams_resp.AddTeamMembersResp, error) {
 
 				return nil, errors.New("unexpected call")

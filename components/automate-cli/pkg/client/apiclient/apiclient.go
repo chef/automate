@@ -69,7 +69,7 @@ func (c client) AuthzClient() authz.AuthorizationClient {
 	return c.authzClient
 }
 
-func (c client) TeamsV2Client() v2.TeamsClient {
+func (c client) TeamsClient() v2.TeamsClient {
 	return c.teamsV2Client
 }
 

@@ -230,7 +230,7 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 	writer.Print("\n")
 
 	writer.Print("Migrating existing teams...\n\n")
-	_, err = apiClient.TeamsV2Client().ApplyV2DataMigrations(ctx,
+	_, err = apiClient.TeamsClient().ApplyV2DataMigrations(ctx,
 		&iam_req.ApplyV2DataMigrationsReq{})
 	if err != nil {
 		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
@@ -280,7 +280,7 @@ func runIAMResetToV1Cmd(cmd *cobra.Command, args []string) error {
 }
 
 func resetDomainsToV1(ctx context.Context, apiClient client_type.APIClient) error {
-	_, err := apiClient.TeamsV2Client().ResetAllTeamProjects(ctx, &iam_req.ResetAllTeamProjectsReq{})
+	_, err := apiClient.TeamsClient().ResetAllTeamProjects(ctx, &iam_req.ResetAllTeamProjectsReq{})
 	if err != nil {
 		writer.Failf(failedToResetDomainMessage, "teams")
 		return err
