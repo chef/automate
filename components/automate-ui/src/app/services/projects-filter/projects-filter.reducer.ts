@@ -106,7 +106,6 @@ export function projectsFilterReducer(
     }
 
     case ProjectsFilterActionTypes.UPDATE_FILTER_VALUE: {
-      console.log(action.payload);
       return set('filterValue', action.payload, state);
     }
   }
