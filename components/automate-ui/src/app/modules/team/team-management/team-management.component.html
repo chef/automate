@@ -30,7 +30,7 @@
         <ng-container *ngIf="(sortedTeams$ | async)?.length > 0">
           <section>
             <chef-toolbar>
-              <app-authorized [allOf]="['/auth/teams', 'post']">
+              <app-authorized [allOf]="['/iam/v2/teams', 'post']">
                 <chef-button primary (click)="openCreateModal()" data-cy="team-create-button">Create Team</chef-button>
               </app-authorized>
             </chef-toolbar>
@@ -70,7 +70,7 @@
           </section>
         </ng-container>
         <ng-container *ngIf="(sortedTeams$ | async)?.length === 0">
-            <app-authorized [allOf]="['/auth/teams', 'post']">
+            <app-authorized [allOf]="['/iam/v2/teams', 'post']">
               <div class="empty-case-container">
                 <p>Create the first team to get started!</p>
               </div>
@@ -78,7 +78,7 @@
                   <chef-button primary (click)="openCreateModal()">Create Team</chef-button>
               </div>
             </app-authorized>
-            <app-authorized not [allOf]="['/auth/teams', 'post']">
+            <app-authorized not [allOf]="['/iam/v2/teams', 'post']">
               <div class="empty-case-container">
                 <p>It looks like no one has created any teams yet and you<br/>
                   don't have permission to create them.<br/><br/>

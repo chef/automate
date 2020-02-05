@@ -66,8 +66,6 @@ describe('team details', () => {
           description: teamName
         }
       }).then((resp) => {
-        const guid = resp.body.team.id;
-
         cy.request({
           auth: { bearer: adminIdToken },
           method: 'POST',
