@@ -35,6 +35,7 @@ export interface ProjectsFilterState {
   selectionCountActive: boolean;
   dropdownCaretVisible: boolean;
   filterVisible: boolean;
+  filterValue: string;
 }
 
 export const projectsFilterInitialState: ProjectsFilterState = {
@@ -45,7 +46,8 @@ export const projectsFilterInitialState: ProjectsFilterState = {
   selectionCountVisible: false,
   selectionCountActive: false,
   dropdownCaretVisible: false,
-  filterVisible: false
+  filterVisible: false,
+  filterValue: ''
 };
 
 export function projectsFilterReducer(
@@ -101,6 +103,11 @@ export function projectsFilterReducer(
         set('selectionCountVisible', selectionCountVisible(sortedOptions)),
         set('selectionCountActive', selectionCountActive(sortedOptions))
       )(state) as ProjectsFilterState;
+    }
+
+    case ProjectsFilterActionTypes.UPDATE_FILTER_VALUE: {
+      console.log(action.payload);
+      return set('filterValue', action.payload, state);
     }
   }
 

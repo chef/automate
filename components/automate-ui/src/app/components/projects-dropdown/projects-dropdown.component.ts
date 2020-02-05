@@ -92,7 +92,8 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   }
 
   handleFilterKeyUp(filterValue: string): void {
-    this.filteredProjects = this.filterProjects(filterValue);
+    // this.filteredProjects = this.filterProjects(filterValue);
+    this.projectsFilterService.updateFilterValue(filterValue);
   }
 
   filterProjects(value: string): ProjectChecked[]  {

@@ -20,7 +20,7 @@
           chefInput
           type="text"
           placeholder="Filter projects..."
-          [ngModel]="filterValue"
+          [ngModel]="filterValue$ | async"
           (keyup)="handleFilterKeyUp($event.target.value)"
           />
       </div>

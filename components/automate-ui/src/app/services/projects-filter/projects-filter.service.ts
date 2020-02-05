@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ProjectsFilterOption } from './projects-filter.reducer';
 import * as selectors from './projects-filter.selectors';
-import { LoadOptions, SaveOptions, UpdateSelectionCount } from './projects-filter.actions';
+import { LoadOptions, SaveOptions, UpdateSelectionCount, UpdateFilterValue } from './projects-filter.actions';
 
 const STORE_OPTIONS_KEY = 'projectsFilter.options';
 
@@ -38,6 +38,10 @@ export class ProjectsFilterService {
 
   updateSelectionCount(options: ProjectsFilterOption[]) {
     this.store.dispatch(new UpdateSelectionCount(options));
+  }
+
+  updateFilterValue(filterValue: string) {
+    this.store.dispatch(new UpdateFilterValue(filterValue))
   }
 
   storeOptions(options: ProjectsFilterOption[]) {
