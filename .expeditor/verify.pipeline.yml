@@ -523,7 +523,9 @@ steps:
       - cd components/automate-ui
       - ./scripts/build_chef_ui_lib
       - npm run copy-ui-lib
-      - make install e2e
+      - make install
+      - ./scripts/update-webdriver
+      - make e2e
     timeout_in_minutes: 20
     retry:
       automatic:
