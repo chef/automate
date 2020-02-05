@@ -241,9 +241,6 @@ func init() {
 		}
 		return ""
 	})
-	policyv2.MapMethodTo("/chef.automate.api.iam.v2.Policies/UpgradeToV2", "system:iam:upgradeToV2", "system:iam:upgrade", "", "", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
 	policyv2.MapMethodTo("/chef.automate.api.iam.v2.Policies/ResetToV1", "system:iam:resetToV1", "system:iam:reset", "", "", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})

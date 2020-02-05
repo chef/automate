@@ -51,7 +51,6 @@ type PoliciesServerMock struct {
 	GetProjectFunc            func(context.Context, *request.GetProjectReq) (*response.GetProjectResp, error)
 	ListProjectsFunc          func(context.Context, *request.ListProjectsReq) (*response.ListProjectsResp, error)
 	DeleteProjectFunc         func(context.Context, *request.DeleteProjectReq) (*response.DeleteProjectResp, error)
-	UpgradeToV2Func           func(context.Context, *request.UpgradeToV2Req) (*response.UpgradeToV2Resp, error)
 	ResetToV1Func             func(context.Context, *request.ResetToV1Req) (*response.ResetToV1Resp, error)
 	IntrospectAllProjectsFunc func(context.Context, *request.ListProjectsReq) (*response.ListProjectsResp, error)
 }
@@ -296,18 +295,6 @@ func (m *PoliciesServerMock) DeleteProject(ctx context.Context, req *request.Del
 	return nil, status.Error(codes.Internal, "mock: 'DeleteProject' not implemented")
 }
 
-func (m *PoliciesServerMock) UpgradeToV2(ctx context.Context, req *request.UpgradeToV2Req) (*response.UpgradeToV2Resp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.UpgradeToV2Func; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'UpgradeToV2' not implemented")
-}
-
 func (m *PoliciesServerMock) ResetToV1(ctx context.Context, req *request.ResetToV1Req) (*response.ResetToV1Resp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
@@ -354,7 +341,6 @@ func (m *PoliciesServerMock) Reset() {
 	m.GetProjectFunc = nil
 	m.ListProjectsFunc = nil
 	m.DeleteProjectFunc = nil
-	m.UpgradeToV2Func = nil
 	m.ResetToV1Func = nil
 	m.IntrospectAllProjectsFunc = nil
 }

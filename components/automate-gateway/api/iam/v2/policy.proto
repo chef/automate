@@ -274,12 +274,6 @@ service Policies {
   };
   // Expose on GRPC API only so we don't expose this to the enduser.
   // Just want to be able to trigger this via automate-cli.
-  rpc UpgradeToV2 (UpgradeToV2Req) returns (UpgradeToV2Resp) {
-    option (chef.automate.api.policy).resource = "system:iam:upgrade_to_v2";
-    option (chef.automate.api.policy).action = "upgrade";
-    option (chef.automate.api.iam.policy).resource = "system:iam:upgradeToV2";
-    option (chef.automate.api.iam.policy).action = "system:iam:upgrade";
-    };
   rpc ResetToV1 (ResetToV1Req) returns (ResetToV1Resp) {
     option (chef.automate.api.policy).resource = "system:iam:reset_to_v1";
     option (chef.automate.api.policy).action = "reset";
