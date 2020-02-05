@@ -95,6 +95,7 @@ export class FormControlDirective implements OnInit, OnDestroy, OnChanges {
       const resetRequested: boolean = changes.resetOrigin.currentValue;
       if (resetRequested) {
         this.setOriginalValue();
+        this.control.reset(this.originalValue);
       }
     }
   }
