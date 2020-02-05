@@ -81,29 +81,39 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 		return errors.Wrap(err, "opening database connection")
 	}
 
-	// TODO check if we've already run force-upgrade, all the force-upgrade stuff
-	// should be in an if block and should only happen if we haven't force-upgraded yet.
-
-	// begin force-migration if
-
-	// TODO set in-progress flag for new table to indicate force-upgrade (different from IAM version)?
-	// Not sure exactly if / how we wanna handle this yet.
-
-	err = migrateToV2(ctx, db)
-	if err != nil {
-		// TODO set force-upgrade to failed?
-		return errors.Wrap(err, "IAM v2 force-upgrade failed")
+	row := db.QueryRowContext(ctx, "SELECT state FROM force_upgrade_status")
+	var status string
+	if err := row.Scan(&status); err != nil {
+		return errors.Wrap(err, "query force_upgrade_status")
 	}
-	// TODO set successful flag for force-upgrade
 
-	// end force-migration if
+	// TODO should we drop all IAM stuff if in failed state? what about failed miration_status?
+	if status == "init" || status == "failed" {
+
+		// TODO set in-progress flag for new table to indicate force-upgrade (different from IAM version)?
+		// Not sure exactly if / how we wanna handle this yet.
+
+		err = migrateToV2(ctx, db)
+		if err != nil {
+			_, err := db.ExecContext(ctx, "UPDATE force_upgrade_status SET state = 'failed'")
+			if err != nil {
+				return errors.Wrap(err, "IAM v2 force_upgrade_status set failed failure")
+			}
+			return errors.Wrap(err, "IAM v2 force-upgrade failed")
+		}
+
+		_, err := db.ExecContext(ctx, "UPDATE force_upgrade_status SET state = 'successful'")
+		if err != nil {
+			return errors.Wrap(err, "IAM v2 force_upgrade_status set success failure")
+		}
+	}
 
 	// this is idempontent and should be a no-op besides reading
 	// the data_migrations table if we are post-force-upgrade
-	err = dataMigConf.Migrate()
-	if err != nil {
-		return errors.Wrap(err, "IAM data migrations failed")
-	}
+	// err = dataMigConf.Migrate()
+	// if err != nil {
+	// 	return errors.Wrap(err, "IAM data migrations failed")
+	// }
 
 	// perform remaining migrations
 	err = m.Up()
