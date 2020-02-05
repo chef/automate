@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"runtime"
 
-	"github.com/chef/automate/components/applications-service/pkg/generator"
+	"github.com/chef/automate/components/applications-load-gen/pkg/generator"
 	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 )
 
 var runFlags struct {
 	authToken string
+	host      string
 	tick      int
 	verbosity int
 }
@@ -27,6 +28,13 @@ func newRunCmd() *cobra.Command {
 		"t",
 		"",
 		"Automate auth token",
+	)
+	c.PersistentFlags().StringVarP(
+		&runFlags.host,
+		"host",
+		"H",
+		"localhost",
+		"Automate hostname",
 	)
 	c.PersistentFlags().IntVar(
 		&runFlags.tick,
@@ -45,31 +53,25 @@ func newRunCmd() *cobra.Command {
 }
 
 func runRunCmd(cmd *cobra.Command, args []string) error {
-	if rootFlags.profileFile == "" && !rootFlags.useDefaultProfile {
-		return errors.New("no profile filename given")
+	if err := rootFlags.ValidateProfileOpts(); err != nil {
+		return err
 	}
 
 	if runFlags.authToken == "" {
 		return errors.New("no auth token given")
 	}
 
-	fmt.Printf("Reading profile %q\n", rootFlags.profileFile)
+	fmt.Printf("Loading profile %q\n", rootFlags.SelectedProfile())
 
-	var profileCfg *generator.LoadProfileCfg
-	var err error
+	profileCfg, err := rootFlags.LoadProfileCfg()
 
-	if rootFlags.useDefaultProfile {
-		profileCfg, err = generator.BuiltinConfig()
-	} else {
-		profileCfg, err = generator.ProfileFromFile(rootFlags.profileFile)
-	}
 	if err != nil {
 		return err
 	}
 
 	runnerCfg := &generator.RunnerConfig{
 		AuthToken: runFlags.authToken,
-		Host:      "localhost",
+		Host:      runFlags.host,
 		Tick:      runFlags.tick,
 		Verbosity: runFlags.verbosity,
 	}
@@ -78,6 +80,7 @@ func runRunCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	runner.SupervisorGroups.ReScaleTo(rootFlags.svcCount)
 	runner.Run(runnerCfg)
 	runtime.Goexit() // waits for all the other threads
 	return nil

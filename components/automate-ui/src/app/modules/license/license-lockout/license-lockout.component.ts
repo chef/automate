@@ -83,7 +83,7 @@ export class LicenseLockoutComponent implements AfterViewInit {
   }
 
   constructor(
-    private licenseFacade: LicenseFacadeService,
+    public licenseFacade: LicenseFacadeService,
     private chefSessionService: ChefSessionService,
     private sessionStorage: SessionStorageService,
     public fb: FormBuilder
@@ -188,6 +188,7 @@ export class LicenseLockoutComponent implements AfterViewInit {
     if (state.status === EntityStatus.loadingSuccess) {
       this.trialLicenseApplied = true;
       this.unlockModal();
+      this.licenseFacade.getLicenseStatus();
       return;
     }
 

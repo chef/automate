@@ -138,6 +138,17 @@ describe('LicenseApplyComponent', () => {
         expect(store.dispatch).not.toHaveBeenCalled();
       });
     });
+
+    describe('GetLicenseStatus() Service', () => {
+      it('check "license status" after the successfully applied license.', () => {
+        const futureDate = moment().utc().add(2, 'months');
+        const { state } = setup(genLicenseApplyReducer(futureDate));
+        component.applyingLicense = true;
+        spyOn(component.licenseFacade, 'getLicenseStatus');
+        component.handleLicenseApply(state.apply);
+        expect(component.licenseFacade.getLicenseStatus).toHaveBeenCalled();
+      });
+    });
   });
 
   function setup(reducer: () => any): { state: any, store: Store<any> } {

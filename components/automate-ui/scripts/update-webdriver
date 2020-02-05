@@ -1,0 +1,11 @@
+#!/bin/bash
+
+# This script is used in CI to install the chromedriver version for the version 
+# of chrome we have.
+# This along with telling ng e2e not to ask webdriver-manager to update gets
+# us a version that will work.
+# https://github.com/angular/webdriver-manager/issues/351#issuecomment-476595330
+# https://github.com/angular/angular-cli/issues/4640#issuecomment-281361458
+
+./node_modules/protractor/node_modules/webdriver-manager/bin/webdriver-manager \
+    update --versions.chrome=$(google-chrome --version | cut -d ' ' -f 3)

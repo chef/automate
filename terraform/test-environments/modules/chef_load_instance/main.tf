@@ -27,6 +27,18 @@ data "template_file" "chef_load_toml" {
   }
 }
 
+data "template_file" "applications_load_gen_toml" {
+  count = "${var.instance_count}"
+
+  template = "${file("${path.module}/templates/applications_load_gen.toml.tpl")}"
+
+  vars {
+    automate_server_fqdn  = "${var.automate_server_fqdn}"
+    automate_server_token = "${var.automate_server_token}"
+    num_svcs              = "${var.chef_load_nodes}"
+  }
+}
+
 module "chef_load_cd_base" {
   source = "github.com/chef/es-terraform//modules/cd_base"
 
@@ -130,6 +142,11 @@ CONF
   }
 
   provisioner "file" {
+    content     = "${element(data.template_file.applications_load_gen_toml.*.rendered, count.index)}"
+    destination = "/tmp/applications-load-gen_user.toml"
+  }
+
+  provisioner "file" {
     content     = "${var.chef_server_client_key}"
     destination = "/tmp/chef-server-client-key.txt"
   }
@@ -138,13 +155,16 @@ CONF
     inline = [
       "set -e",
       "sudo hab svc unload chef/chef-load",
+      "sudo hab svc unload chef/applications-load-gen",
       "sudo mv /tmp/chef-load_logrotate.conf /etc/logrotate.d/chef-load",
       "sudo chown root:root /etc/logrotate.d/chef-load",
       "sudo rm -rf /opt/chef_load_sample_data",
       "sudo mv /tmp/chef_load_sample_data /opt",
       "sudo mv /tmp/chef-server-client-key.txt /opt",
       "sudo mkdir -p /hab/user/chef-load/config",
+      "sudo mkdir -p /hab/user/applications-load-gen/config",
       "sudo mv /tmp/chef-load_user.toml /hab/user/chef-load/config/user.toml",
+      "sudo mv /tmp/applications-load-gen_user.toml /hab/user/applications-load-gen/config/user.toml",
       "sudo mv /tmp/group-node-names /etc/cron.hourly/group-node-names",
       "sudo chown root:root /etc/cron.hourly/group-node-names",
       "sudo chmod a+x /etc/cron.hourly/group-node-names",
@@ -152,6 +172,7 @@ CONF
       "sudo mkdir -p /var/log/chef-load",
       "sudo chown hab /var/log/chef-load",
       "sudo hab svc load chef/chef-load --channel ${var.chef_load_channel} --strategy at-once",
+      "sudo hab svc load chef/applications-load-gen --channel dev --strategy at-once",
     ]
   }
 }

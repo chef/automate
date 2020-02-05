@@ -1,0 +1,7 @@
+[mlsa]
+accept = false
+
+[target]
+host = "localhost"
+auth_token = "replace-me-with-a-real-token"
+svc_count = 0

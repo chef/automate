@@ -53,7 +53,6 @@ function genLicenseResp(licenseEndDate: moment.Moment): LicenseStatus {
 
 describe('LicenseLockoutComponent', () => {
   let component: LicenseLockoutComponent;
-
   // Tests on this action make use of the inherent state updating
   // of the underlying component.
   describe('GetLicenseStatus Action', () => {
@@ -170,6 +169,16 @@ describe('LicenseLockoutComponent', () => {
         component.handleLicenseRequest(state.request);
         expect(store.dispatch).not.toHaveBeenCalled();
       });
+    });
+  });
+
+  describe('GetLicenseStatus() Service', () => {
+    it('check "license status" after the successfully requested license.', () => {
+      const { state } = setup(genLicenseRequestReducer());
+      component.requestingLicense = true;
+      spyOn(component.licenseFacade, 'getLicenseStatus');
+      component.handleLicenseRequest(state.request);
+      expect(component.licenseFacade.getLicenseStatus).toHaveBeenCalled();
     });
   });
 

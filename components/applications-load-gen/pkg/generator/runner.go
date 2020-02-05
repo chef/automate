@@ -2,10 +2,12 @@ package generator
 
 import (
 	"fmt"
+	"hash/crc32"
 	"math/rand"
 	"strings"
 	"time"
 
+	"github.com/golang/protobuf/ptypes"
 	"github.com/golang/protobuf/ptypes/duration"
 	"github.com/pkg/errors"
 
@@ -60,6 +62,18 @@ func (r *LoadGenRunner) Run(cfg *RunnerConfig) {
 }
 
 type SupervisorGroupCollection []*SupervisorGroup
+
+func (s SupervisorGroupCollection) ReScaleTo(svcCount int32) {
+	if svcCount == 0 {
+		return
+	}
+
+	currentTotal := s.TotalSvcs()
+	scaleFactor := svcCount / currentTotal
+	for _, supGroup := range s {
+		supGroup.Count = supGroup.Count * scaleFactor
+	}
+}
 
 func (s SupervisorGroupCollection) RollupStats() string {
 	var b strings.Builder
@@ -287,16 +301,39 @@ func (m *MessagePrototype) CreateMessage(uuid string) *habitat.HealthCheckEvent 
 		},
 		EventMetadata: &habitat.EventMetadata{
 			SupervisorId: uuid,
+			OccurredAt:   ptypes.TimestampNow(),
 			Application:  m.Application,
 			Environment:  m.Environment,
 			Fqdn:         fmt.Sprintf("%s.example", uuid),
 			Site:         "test",
 		},
-		Result:     habitat.HealthCheckResult_Warning,
+		Result:     healthCheck99PercentOk(uuid, m.PkgName),
 		Execution:  &duration.Duration{},
 		Stdout:     &wrappers.StringValue{Value: ""},
 		Stderr:     &wrappers.StringValue{Value: ""},
 		ExitStatus: &wrappers.Int32Value{Value: int32(0)},
+	}
+}
+
+// healthCheck99PercentOk makes a random-seeming healthcheck result, which on
+// average should return 99% ok results, 0.5% warning and 0.5% critical. It
+// uses the time, truncated to 5 minute increments, and UUID as inputs so that
+// the result will change over time for a particular service but will be stable
+// for 5 minutes at a time. Very frequent changes are not a common scenario and
+// also make the UI a little funky since we currently don't refresh the service
+// groups list in the background.
+func healthCheck99PercentOk(uuid, svcName string) habitat.HealthCheckResult {
+	t := time.Now().Truncate(5 * time.Minute)
+	s := fmt.Sprintf("%s-%s-%s", uuid, svcName, t.String())
+	c := crc32.ChecksumIEEE([]byte(s))
+	n := c % 1000
+	switch {
+	case n < 989:
+		return habitat.HealthCheckResult_Ok
+	case n < 994:
+		return habitat.HealthCheckResult_Warning
+	default:
+		return habitat.HealthCheckResult_Critical
 	}
 }
 
