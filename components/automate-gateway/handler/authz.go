@@ -29,7 +29,7 @@ import (
 
 // AuthzServer is the server interface
 type AuthzServer struct {
-	client        authz.AuthorizationClient
+	client        authz.AuthorizationClient // now only needed for GetVersion
 	filterHandler middleware.SwitchingFilterHandler
 }
 
@@ -56,6 +56,7 @@ func (a *AuthzServer) GetVersion(ctx context.Context, _ *version.VersionInfoRequ
 }
 
 // CreatePolicy creates a new policy in authz-service.
+// No longer used: This is V1
 func (a *AuthzServer) CreatePolicy(ctx context.Context,
 	gwReq *gwAuthzReq.CreatePolicyReq) (*gwAuthzRes.CreatePolicyResp, error) {
 	// we want a user's permissions to be a union of their allowed policies
@@ -76,6 +77,7 @@ func (a *AuthzServer) CreatePolicy(ctx context.Context,
 
 // ListPolicies returns an array of all policy objects
 // that currently exist in authz-service.
+// No longer used: This is V1
 func (a *AuthzServer) ListPolicies(ctx context.Context,
 	gwReq *gwAuthzReq.ListPoliciesReq) (*gwAuthzRes.ListPoliciesResp, error) {
 	domainReq := &authz.ListPoliciesReq{}
@@ -93,6 +95,7 @@ func (a *AuthzServer) ListPolicies(ctx context.Context,
 }
 
 // DeletePolicy removes a policy from authz-service by id.
+// No longer used: This is V1
 func (a *AuthzServer) DeletePolicy(ctx context.Context,
 	gwReq *gwAuthzReq.DeletePolicyReq) (*gwAuthzRes.DeletePolicyResp, error) {
 
