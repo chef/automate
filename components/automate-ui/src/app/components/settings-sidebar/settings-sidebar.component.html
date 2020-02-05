@@ -22,7 +22,7 @@
     <app-authorized #users [allOf]="['/auth/users', 'get']">
       <chef-sidebar-entry route="/settings/users" icon="person">Users</chef-sidebar-entry>
     </app-authorized>
-    <app-authorized  #teams [allOf]="['/auth/teams', 'get']">
+    <app-authorized  #teams [allOf]="['/iam/v2/teams', 'get']">
       <chef-sidebar-entry route="/settings/teams" icon="people">Teams</chef-sidebar-entry>
     </app-authorized>
     <app-authorized  #tokens [anyOf]="[['/auth/tokens', 'get'], ['/iam/v2/tokens', 'get']]">

@@ -240,8 +240,8 @@ describe('AuthorizedComponent real round trip', () => {
                 delete: false,
                 patch: false
               },
-              '/auth/teams': {
-                id: '/auth/teams',
+              '/iam/v2/teams': {
+                id: '/iam/v2/teams',
                 get: true,
                 put: false,
                 post: false,
@@ -265,13 +265,14 @@ describe('AuthorizedComponent real round trip', () => {
       visible = isAuthorized;
     });
 
-    authorizedChecker.setPermissions([<CheckObj>{ endpoint: '/auth/teams', verb: 'get' }], []);
+    authorizedChecker.setPermissions([<CheckObj>{ endpoint: '/iam/v2/teams', verb: 'get' }], []);
     setTimeout(() => {
       expect(visible).toBe(true);
       authorizedChecker.setPermissions([<CheckObj>{ endpoint: '/auth/users', verb: 'get' }], []);
       setTimeout(() => {
         expect(visible).toBe(false);
-        authorizedChecker.setPermissions([<CheckObj>{ endpoint: '/auth/teams', verb: 'get' }], []);
+        authorizedChecker.setPermissions([<CheckObj>{
+          endpoint: '/iam/v2/teams', verb: 'get' }], []);
         setTimeout(() => {
           expect(visible).toBe(true);
           done();
@@ -310,8 +311,8 @@ describe('AuthorizedComponent evalPerms', () => {
             delete: false,
             patch: false
           },
-          '/auth/teams': {
-            id: '/auth/teams',
+          '/iam/v2/teams': {
+            id: '/iam/v2/teams',
             get: true,
             put: false,
             post: false,
@@ -333,14 +334,14 @@ describe('AuthorizedComponent evalPerms', () => {
       { descr: 'empty allOf and anyOf evaluates to true', expected: true },
       { descr: 'requires all of allOf to be true, and returns true',
         allOf: [{ endpoint: '/auth/users', verb: 'get', paramList: [] },
-                { endpoint: '/auth/teams', verb: 'get', paramList: [] }],
+                { endpoint: '/iam/v2/teams', verb: 'get', paramList: [] }],
         expected: true },
       { descr: 'requires all of allOf to be true, and otherwise returns false',
         allOf: [{ endpoint: '/auth/users', verb: 'get', paramList: [] },
-                { endpoint: '/auth/teams', verb: 'put', paramList: [] }]},
+                { endpoint: '/iam/v2/teams', verb: 'put', paramList: [] }]},
       { descr: 'requires any of anyOf to be true',
         anyOf: [{ endpoint: '/auth/users', verb: 'get', paramList: [] },
-                { endpoint: '/auth/teams', verb: 'put', paramList: [] }],
+                { endpoint: '/iam/v2/teams', verb: 'put', paramList: [] }],
         expected: true },
       { descr: 'fills parameters in allOf, when authorized, returns true',
         allOf: [{ endpoint: '/auth/users/{id}', verb: 'get', paramList: 'alice' }],

@@ -214,7 +214,7 @@ export class LayoutSidebarService {
                         route: '/settings/teams',
                         authorized: {
                             name: 'teams',
-                            allOf: ['/auth/teams', 'get']
+                            allOf: ['/iam/v2/teams', 'get']
                         },
                         visible: true
                     },

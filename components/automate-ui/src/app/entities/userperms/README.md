@@ -14,7 +14,7 @@ what the user has permissions for.
 The endpoint is "/auth/introspect" and supports two methods:
 
 1. GET - Does an "IntrospectAll", returning data for all non-parameterized endpoints
-   (i.e. concrete endpoints like "/auth/teams" but not abstract endpoints like "/auth/users/{email}").
+   (i.e. concrete endpoints like "/iam/v2/teams" but not abstract endpoints like "/auth/users/{email}").
 2. POST - Does an "Introspect", returning data for the single endpoint path specified in the payload
    (an example payload might be "path=/auth/users/foo@bar.com" corresponding to "/auth/users/{email}").
 

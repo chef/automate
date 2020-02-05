@@ -42,7 +42,7 @@
         <div id="users-list">
           <div>
             <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
-            since the path to permission on here is /auth/teams/:id/users we'll have to show everything for now. -->
+            since the path to permission on here is /iam/v2/teams/:id/users we'll have to show everything for now. -->
             <app-user-table [addButtonText]="addButtonText" [removeText]="removeText" [users]="users"
               [baseUrl]="'/auth/users/' + team?.id" [overridePermissionsCheck]=true [showTable]="showUsersTable()"
               [showEmptyMessage]="showEmptyStateMessage()" (addClicked)="toggleUserMembershipView()"
