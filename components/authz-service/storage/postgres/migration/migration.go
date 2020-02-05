@@ -21,9 +21,9 @@ type Config struct {
 }
 
 const (
-	// PRE_FORCE_UPGRADE_MIGRATION is last schema migration before force-upgrade.
+	// PreForceUpgradeMigration is last schema migration before force-upgrade.
 	// All of our golang force-upgrade code assumes we are on this schema version.
-	PRE_FORCE_UPGRADE_MIGRATION = 74
+	PreForceUpgradeMigration = 74
 )
 
 // Migrate executes all migrations we have
@@ -64,8 +64,8 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 	// if we are already past the last pre-force-upgrade migration
 	// so confirm that behavior. otherwise need an if statement here.
 	// WE WILL NEED IF STATEMENT HERE
-	if version < PRE_FORCE_UPGRADE_MIGRATION {
-		err = m.Migrate(PRE_FORCE_UPGRADE_MIGRATION)
+	if version < PreForceUpgradeMigration {
+		err = m.Migrate(PreForceUpgradeMigration)
 		if err != nil && err != migrate.ErrNoChange {
 			return errors.Wrap(err, "migration up to IAM V2 force upgrade failed")
 		}
