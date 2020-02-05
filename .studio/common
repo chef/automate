@@ -85,7 +85,6 @@ function compile_client_mocks() {
     cd "/src/api/interservice" || exit 1
     mockgen -source event/event.pb.go -destination event/event.pb.client_mock.go -package event -self_package github.com/chef/automate/api/interservice/event
     mockgen -source authz/v2/project.pb.go -destination authz/v2/project.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
-    mockgen -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
     mockgen -source authz/v2/authz.pb.go -destination authz/v2/authz.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
     mockgen -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
     mockgen -source cfgmgmt/service/cfgmgmt.pb.go -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service -self_package github.com/chef/automate/api/interservice/cfgmgmt/service
