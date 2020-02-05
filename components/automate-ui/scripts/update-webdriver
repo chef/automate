@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./node_modules/protractor/node_modules/webdriver-manager/bin/webdriver-manager update --versions.chrome=$(google-chrome --version | cut -d ' ' -f 3)
