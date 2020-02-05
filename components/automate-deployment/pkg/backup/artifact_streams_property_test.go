@@ -36,7 +36,7 @@ func TestMergePropertyBased(t *testing.T) {
 
 	properties.Property("Merged list is sorted and contains no duplicates", prop.ForAll(
 		func(a []string, b []string, c []string) bool {
-			return isSortedAnUnique(mergeStringLists(t, a, b, c))
+			return isSortedAndUnique(mergeStringLists(t, a, b, c))
 		},
 		smallStringListGen().WithLabel("a"),
 		smallStringListGen().WithLabel("b"),
@@ -88,7 +88,7 @@ func TestSubPropertyBased(t *testing.T) {
 	properties.Property("Result is sorted and contains no duplicates", prop.ForAll(
 		func(a []string, b []string) bool {
 			v, _ := subStringLists(t, a, b)
-			return isSortedAnUnique(v)
+			return isSortedAndUnique(v)
 		},
 		smallStringListGen().WithLabel("a"),
 		smallStringListGen().WithLabel("b"),

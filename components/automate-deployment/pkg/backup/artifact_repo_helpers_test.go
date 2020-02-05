@@ -122,7 +122,7 @@ func isSorted(in []string) bool {
 	return sort.IsSorted(sort.StringSlice(in))
 }
 
-func isSortedAnUnique(in []string) bool {
+func isSortedAndUnique(in []string) bool {
 	if len(in) == 0 {
 		return true
 	}

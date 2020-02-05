@@ -9,9 +9,11 @@ import (
 	"go.uber.org/multierr"
 )
 
-// ArtifactStream streams a list of artifacts keys
+// ArtifactStream is an iterator of artifacts keys
 // by name. A stream may not produce the same value
-// twice.
+// twice. The values produced by a stream are sorted.
+// It is generally not safe to reuse a stream or use them
+// concurrently.
 // Returns io.EOF when no more elements will be produced
 type ArtifactStream interface {
 	Next() (string, error)
@@ -327,7 +329,7 @@ func (d *mergeStream) Close() error {
 }
 
 // Merge returns a stream which is the union of all the given
-// streams
+// streams. Values returned will be unique and sorted.
 func Merge(streams ...ArtifactStream) ArtifactStream {
 	if len(streams) == 0 {
 		return EmptyStream()
