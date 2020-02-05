@@ -214,7 +214,6 @@ describe File.basename(__FILE__) do
     assert_suggestions_text_id_version(expected, actual_data)
   end
 
-
   it "ListSuggestions: controls 'sys' with filter by profile ID" do
     actual_data = GRPC reporting, :list_suggestions, Reporting::SuggestionRequest.new(
       type: 'control',
