@@ -9,38 +9,38 @@ import (
 )
 
 type state struct {
-	v2 middleware.AuthorizationHandler
+	authHandler middleware.AuthorizationHandler
 }
 
-func NewAuthorizer(v2 middleware.AuthorizationHandler) middleware.SwitchingAuthorizationHandler {
-	return &state{v2: v2}
+func NewAuthorizer(authHandler middleware.AuthorizationHandler) middleware.SwitchingAuthorizationHandler {
+	return &state{authHandler: authHandler}
 }
 
 func (a *state) Handle(ctx context.Context,
 	subjects []string, projects []string, req interface{}) (context.Context, error) {
-	return a.v2.Handle(ctx, subjects, projects, req)
+	return a.authHandler.Handle(ctx, subjects, projects, req)
 }
 
 func (a *state) IsAuthorized(ctx context.Context, subjects []string,
-	resourceV2, actionV2 string, projects []string,
+	resource, action string, projects []string,
 ) (middleware.AnnotatedAuthorizationResponse, error) {
-	resp, err := a.v2.IsAuthorized(ctx, subjects, resourceV2, actionV2, projects)
+	resp, err := a.authHandler.IsAuthorized(ctx, subjects, resource, action, projects)
 	if err == nil {
-		return annotate(resp, subjects, resourceV2, actionV2), nil
+		return annotate(resp, subjects, resource, action), nil
 	}
 	return nil, err
 }
 
 func (a *state) FilterAuthorizedPairs(ctx context.Context, subjects []string,
-	mapByResourceAndActionV2 map[pairs.Pair][]string,
-	methodsInfoV2 map[string]pairs.Info,
+	mapByResourceAndAction map[pairs.Pair][]string,
+	methodsInfo map[string]pairs.Info,
 ) (*middleware.FilterPairsResponse, error) {
-	pairsV2 := pairs.GetKeys(mapByResourceAndActionV2)
-	resp, err := a.v2.FilterAuthorizedPairs(ctx, subjects, pairsV2)
+	pairs := pairs.GetKeys(mapByResourceAndAction)
+	resp, err := a.authHandler.FilterAuthorizedPairs(ctx, subjects, pairs)
 	if err == nil {
 		return &middleware.FilterPairsResponse{
-			MapByResourceAndAction: mapByResourceAndActionV2,
-			MethodsInfo:            methodsInfoV2,
+			MapByResourceAndAction: mapByResourceAndAction,
+			MethodsInfo:            methodsInfo,
 			Pairs:                  resp,
 		}, nil
 	}

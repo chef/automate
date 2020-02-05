@@ -443,10 +443,10 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	owner := r.URL.Query().Get("owner")
 
 	const (
-		actionV2 = "compliance:profiles:create"
+		action = "compliance:profiles:create"
 	)
-	resourceV2 := fmt.Sprintf("compliance:profiles:%s", owner)
-	ctx, err := s.authRequest(r, resourceV2, actionV2)
+	resource := fmt.Sprintf("compliance:profiles:%s", owner)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -520,16 +520,16 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Infof("processing profile tar request for owner: %s, name: %s %s", profileOwner, profileName, profileVersion)
 
-	var resourceV2, actionV2 string
+	var resource, action string
 	if len(profileOwner) > 0 {
-		actionV2 = "compliance:profiles:get"
-		resourceV2 = fmt.Sprintf("compliance:profiles:%s", profileOwner)
+		action = "compliance:profiles:get"
+		resource = fmt.Sprintf("compliance:profiles:%s", profileOwner)
 	} else {
-		actionV2 = "compliance:marketProfiles:get"
-		resourceV2 = "compliance:profiles:market"
+		action = "compliance:marketProfiles:get"
+		resource = "compliance:profiles:market"
 	}
 
-	ctx, err := s.authRequest(r, resourceV2, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -568,11 +568,11 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 	// we can't be more specific. Also, we can do this before looking at the
 	// request body.
 	const (
-		resource = "compliance:reporting:reports" // v1 and v2? OK...
-		actionV2 = "compliance:reports:export"
+		resource = "compliance:reporting:reports"
+		action   = "compliance:reports:export"
 	)
 
-	ctx, err := s.authRequest(r, resource, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -632,10 +632,10 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 func (s *Server) NodeExportHandler(w http.ResponseWriter, r *http.Request) {
 	const (
 		resource = "compliance:reporting:nodes:{id}"
-		actionV2 = "compliance:reportNodes:export"
+		action   = "compliance:reportNodes:export"
 	)
 
-	ctx, err := s.authRequest(r, resource, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -665,11 +665,11 @@ func (s *Server) NodeExportHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Request) {
 	const (
-		actionV2   = "infra:nodes:list"
-		resourceV2 = "infra:nodes"
+		action   = "infra:nodes:list"
+		resource = "infra:nodes"
 	)
 
-	ctx, err := s.authRequest(r, resourceV2, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -708,11 +708,11 @@ func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Requ
 
 func (s *Server) configMgmtReportExportHandler(w http.ResponseWriter, r *http.Request) {
 	const (
-		actionV2   = "infra:nodes:list"
-		resourceV2 = "infra:nodes"
+		action   = "infra:nodes:list"
+		resource = "infra:nodes"
 	)
 
-	ctx, err := s.authRequest(r, resourceV2, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -751,11 +751,11 @@ func (s *Server) configMgmtReportExportHandler(w http.ResponseWriter, r *http.Re
 
 func (s *Server) DeploymentStatusHandler(w http.ResponseWriter, r *http.Request) {
 	const (
-		actionV2   = "system:status:get"
-		resourceV2 = "system:service:status"
+		action   = "system:status:get"
+		resource = "system:service:status"
 	)
 
-	ctx, err := s.authRequest(r, resourceV2, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -837,7 +837,7 @@ func init() {
 		func(unexpandedResource string, input interface{}) string { return unexpandedResource })
 }
 
-func (s *Server) authRequest(r *http.Request, resourceV2, actionV2 string) (context.Context, error) {
+func (s *Server) authRequest(r *http.Request, resource, action string) (context.Context, error) {
 	subjects := []string{}
 	// Create a context with the request headers metadata. Normally grpc-gateway
 	// does this, but since this is being used in a custom handler we've got do
@@ -886,7 +886,7 @@ func (s *Server) authRequest(r *http.Request, resourceV2, actionV2 string) (cont
 
 	projects := auth_context.ProjectsFromMetadata(md)
 
-	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resourceV2, actionV2, projects)
+	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resource, action, projects)
 	if err != nil {
 		return nil, errors.Wrap(err, "authz-service error")
 	}

@@ -23,7 +23,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
-	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
+	auth "github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
 	"github.com/chef/automate/components/automate-gateway/pkg/nullbackend"
 	"github.com/chef/automate/lib/grpc/debug/debug_api"
@@ -201,12 +201,12 @@ func (s *Server) setLogLevel() {
 func (s *Server) loadAuthorizer() error {
 	s.logger.Info("loading authorizer")
 
-	authzClientV2, err := s.clientsFactory.AuthorizationV2Client()
+	authzClient, err := s.clientsFactory.AuthorizationV2Client()
 	if err != nil {
-		return errors.Wrap(err, "create authz_v2 client")
+		return errors.Wrap(err, "create authz client")
 	}
 
-	s.authorizer = authorizer.NewAuthorizer(authv2.AuthorizationHandler(authzClientV2))
+	s.authorizer = authorizer.NewAuthorizer(auth.AuthorizationHandler(authzClient))
 
 	return nil
 }
