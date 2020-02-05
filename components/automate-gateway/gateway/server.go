@@ -287,8 +287,6 @@ func (s *Server) startSignalHandler() error {
 			}
 		}
 	}
-
-	return nil
 }
 
 func (s *Server) stop() error {
@@ -493,7 +491,8 @@ func (s *Server) startHTTPServer() error {
 func (s *Server) stopHTTPServer() error {
 	s.logger.Info("stopping HTTPS server")
 	s.httpMuxConnCancel()
-	ctx, _ := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
 	err := s.httpServer.Shutdown(ctx)
 	if err != nil {
