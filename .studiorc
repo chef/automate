@@ -145,7 +145,6 @@ start_all_services() {
      chef-automate license apply "/src/dev/license.jwt"
   fi
   chef-automate dev create-iam-dev-users
-  chef-automate iam upgrade-to-v2 --skip-policy-migration
 }
 
 document "get_admin_token" <<DOC
