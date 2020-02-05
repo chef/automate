@@ -39,6 +39,17 @@ data "template_file" "applications_load_gen_toml" {
   }
 }
 
+data "template_file" "hab_sup_exec_start_conf" {
+  count = "${var.instance_count}"
+
+  template = "${file("${path.module}/templates/hab-sup-exec-start.conf.tpl")}"
+
+  vars {
+    automate_server_fqdn  = "${var.automate_server_fqdn}"
+    automate_server_token = "${var.automate_server_token}"
+  }
+}
+
 module "chef_load_cd_base" {
   source = "github.com/chef/es-terraform//modules/cd_base"
 
@@ -77,12 +88,19 @@ LimitNOFILE=infinity
 EOF
   }
 
+  provisioner "file" {
+    content     = "${element(data.template_file.hab_sup_exec_start_conf.*.rendered, count.index)}"
+    destination = "/tmp/hab-sup-exec-start.conf"
+  }
+
   provisioner "remote-exec" {
     inline = [
       "set -e",
       "sudo mkdir -p /etc/systemd/system/hab-supervisor.service.d",
       "sudo chown root:root /tmp/limits.conf",
+      "sudo chown root:root /tmp/hab-sup-exec-start.conf",
       "sudo mv /tmp/limits.conf /etc/systemd/system/hab-supervisor.service.d/limits.conf",
+      "sudo mv /tmp/limits.conf /etc/systemd/system/hab-supervisor.service.d/hab-sup-exec-start.conf",
     ]
   }
 
