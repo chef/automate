@@ -1,10 +1,7 @@
 import { Component, EventEmitter, Input, Output, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { Store, select } from '@ngrx/store';
-import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Observable } from 'rxjs';
 
 import { ProjectsFilterService } from 'app/services/projects-filter/projects-filter.service';
-import { filterValue } from 'app/services/projects-filter/projects-filter.selectors';
 
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { ProjectConstants, Project } from 'app/entities/projects/project.model';
@@ -29,10 +26,7 @@ export interface ProjectCheckedMap {
 })
 export class ProjectsDropdownComponent implements OnInit, OnChanges {
 
-  constructor(
-    private store: Store<NgrxStateAtom>,
-    public projectsFilterService: ProjectsFilterService
-    ) {}
+  constructor(public projectsFilterService: ProjectsFilterService) {}
   // The map of ProjectChecked by id. Any checked changes propagated via
   // onProjectChecked. Updates should be applied to parent component state.
   @Input() projects: ProjectCheckedMap = {};
@@ -100,12 +94,9 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     }
   }
 
-  handleFilterKeyUp(filterValue: string): void {
-    this.projectsFilterService.updateFilterValue(filterValue);
-  }
-
-  doSomething($event) {
-    console.log($event)
+  updateFilterValue($event: string) {
+    // this.filteredProjects = this.filterProjects($event);
+    this.projectsFilterService.updateFilterValue($event);
   }
 
   filterProjects(value: string): ProjectChecked[]  {

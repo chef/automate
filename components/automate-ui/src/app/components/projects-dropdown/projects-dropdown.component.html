@@ -21,7 +21,7 @@
           type="text"
           placeholder="Filter projects..."
           [ngModel]="filterValue$ | async"
-          (ngModelChange)="handleFilterKeyUp($event)"
+          (ngModelChange)="updateFilterValue($event)"
           />
       </div>
 
