@@ -100,7 +100,7 @@ EOF
       "sudo chown root:root /tmp/limits.conf",
       "sudo chown root:root /tmp/hab-sup-exec-start.conf",
       "sudo mv /tmp/limits.conf /etc/systemd/system/hab-supervisor.service.d/limits.conf",
-      "sudo mv /tmp/limits.conf /etc/systemd/system/hab-supervisor.service.d/hab-sup-exec-start.conf",
+      "sudo mv /tmp/hab-sup-exec-start.conf /etc/systemd/system/hab-supervisor.service.d/hab-sup-exec-start.conf",
     ]
   }
 
