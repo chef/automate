@@ -43,7 +43,7 @@ export class ProjectsFilterService {
   }
 
   updateFilterValue(filterValue: string) {
-    this.store.dispatch(new UpdateFilterValue(filterValue))
+    this.store.dispatch(new UpdateFilterValue(filterValue));
   }
 
   storeOptions(options: ProjectsFilterOption[]) {
