@@ -53,6 +53,7 @@ func migrateToV2(ctx context.Context, db *sql.DB) error {
 	}
 
 	if ifNotOnV2 {
+		recordMigrationStatus(ctx, enumInProgress, db)
 		for _, role := range defaultRoles() {
 			if err := createRole(ctx, db, &role); err != nil {
 				return errors.Wrap(err, "could not create default role")
@@ -66,6 +67,7 @@ func migrateToV2(ctx context.Context, db *sql.DB) error {
 			}
 		}
 
+		// TODO do we need these?
 		var reports []string
 		errs, err := migrateV1Policies(ctx, db)
 		if err != nil {
@@ -74,25 +76,9 @@ func migrateToV2(ctx context.Context, db *sql.DB) error {
 		for _, e := range errs {
 			reports = append(reports, e.Error())
 		}
+		// TODO Refresh policies
+		recordMigrationStatus(ctx, enumSuccessful, db)
 	}
-
-	// // we've made it!
-	// var v api.Version
-	// switch req.Flag {
-	// case api.Flag_VERSION_2_1:
-	// 	err = s.store.SuccessBeta1(ctx)
-	// 	v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
-	// default:
-	// 	err = s.store.Success(ctx)
-	// 	v = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
-	// }
-	// if err != nil {
-	// 	recordFailure()
-	// 	return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
-	// }
-
-	// s.setVersionForInterceptorSwitch(v)
-	// return &api.MigrateToV2Resp{Reports: reports}, nil
 
 	return nil
 }

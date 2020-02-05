@@ -274,3 +274,8 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 			VALUES (policy_db_id($1), member_db_id($2)) ON CONFLICT DO NOTHING`, policyID, member.Name)
 	return errors.Wrapf(err, "failed to upsert member link: member=%s, policy_id=%s", member.Name, policyID)
 }
+
+func recordMigrationStatus(ctx context.Context, ms string, db *sql.DB) error {
+	_, err := db.ExecContext(ctx, `UPDATE migration_status SET state=$1`, ms)
+	return err
+}

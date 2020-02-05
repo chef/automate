@@ -108,7 +108,7 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 		}
 	}
 
-	// this is idempontent and should be a no-op besides reading
+	// this is idempotent and should be a no-op besides reading
 	// the data_migrations table if we are post-force-upgrade
 	// err = dataMigConf.Migrate()
 	// if err != nil {
