@@ -3,9 +3,6 @@ import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
 
 import { LayoutSidebarService } from './layout-sidebar.service';
-import { notificationState } from 'app/entities/notifications/notification.selectors';
-import { Notification, Type } from 'app/entities/notifications/notification.model';
-
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';
 import { sidebarMenuGroups, showPageLoading } from './layout.selectors';
@@ -53,21 +50,7 @@ export class LayoutFacadeService implements OnDestroy {
     this.store.dispatch(new GetProjects());
     this.menuGroups$ = store.select(sidebarMenuGroups);
     this.showPageLoading$ = store.select(showPageLoading);
-
-    store.select(notificationState).subscribe(
-      (notifications: Notification[]) => {
-        this.layout.header.license =
-          notifications &&  notifications.some(n => n.type === Type.license);
-          if (this.layout.header.license) {
-            this.layout.header.license = true;
-            this.updateDisplay();
-          } else {
-            this.layout.header.license = false;
-            this.updateDisplay();
-          }
-      });
-
-      this.updateDisplay();
+    this.updateDisplay();
   }
 
   ngOnDestroy(): void {
@@ -105,7 +88,7 @@ export class LayoutFacadeService implements OnDestroy {
   }
 
   showFullPage(): void {
-    this.contentHeight = 'calc(100vh)';
+    this.contentHeight = '100vh';
     this.layout.header.display = false;
     this.layout.sidebar.display = false;
     this.layout.userNotifications.display = false;
