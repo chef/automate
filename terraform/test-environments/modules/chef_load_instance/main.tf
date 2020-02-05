@@ -35,7 +35,7 @@ data "template_file" "applications_load_gen_toml" {
   vars {
     automate_server_fqdn  = "${var.automate_server_fqdn}"
     automate_server_token = "${var.automate_server_token}"
-    num_svcs              = "${var.chef_load_nodes}"
+    num_svcs              = "${var.apps_load_svcs}"
   }
 }
 
