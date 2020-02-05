@@ -42,7 +42,7 @@ type GatewayLocationSpecification struct {
 	BasePath   string
 	CertPool   *x509.CertPool
 
-	secretStore     secrets.SecretStore
+	secretStore     secrets.SecretsReader
 	secretGroupName string
 }
 
@@ -223,7 +223,7 @@ func NewBackupGatewayLocationSpec(endpoint,
 	bucketName,
 	basePath string,
 	rootCert []byte,
-	secretStore secrets.SecretStore) (LocationSpecification, error) {
+	secretStore secrets.SecretsReader) (LocationSpecification, error) {
 	return NewMinioLocationSpec(endpoint, bucketName, basePath, "backup-gateway",
 		rootCert, secretStore)
 }
@@ -233,7 +233,7 @@ func NewMinioLocationSpec(endpoint,
 	basePath string,
 	groupName string,
 	rootCert []byte,
-	secretStore secrets.SecretStore) (LocationSpecification, error) {
+	secretStore secrets.SecretsReader) (LocationSpecification, error) {
 
 	certPool := x509.NewCertPool()
 	if !certPool.AppendCertsFromPEM(rootCert) {
