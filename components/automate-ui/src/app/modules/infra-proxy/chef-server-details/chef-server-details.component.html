@@ -119,7 +119,7 @@
                 <chef-table-cell>{{ org.admin_user }}</chef-table-cell>
                 <chef-table-cell class="three-dot-column">
                   <mat-select>
-                    <mat-option data-cy="delete" (click)="startOrgDelete(org)">Delete Org</mat-option>
+                    <mat-option data-cy="delete" (onSelectionChange)="startOrgDelete($event, org)">Delete Org</mat-option>
                   </mat-select>
                 </chef-table-cell>
               </chef-table-row>

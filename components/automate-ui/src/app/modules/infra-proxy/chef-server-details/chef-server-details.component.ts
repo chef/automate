@@ -25,6 +25,7 @@ import {
   getAllStatus as getAllOrgsForServerStatus,
   deleteStatus as deleteOrgStatus
 } from 'app/entities/orgs/org.selectors';
+import { ChefKeyboardEvent } from 'app/types/material-types';
 
 export type ChefServerTabName = 'orgs' | 'details';
 
@@ -177,9 +178,11 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
     this.conflictErrorEvent.emit(false);
   }
 
-  public startOrgDelete(org: Org): void {
-    this.orgToDelete = org;
-    this.deleteModalVisible = true;
+  public startOrgDelete($event: ChefKeyboardEvent, org: Org): void {
+    if ($event.isUserInput) {
+      this.orgToDelete = org;
+      this.deleteModalVisible = true;
+    }
   }
 
   public deleteOrg(): void {
