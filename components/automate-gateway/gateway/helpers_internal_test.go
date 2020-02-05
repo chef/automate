@@ -18,7 +18,7 @@ import (
 	"github.com/chef/automate/api/interservice/authn"
 	authz "github.com/chef/automate/api/interservice/authz/v2"
 	ingest "github.com/chef/automate/api/interservice/ingest"
-	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
+	auth "github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
 	mock_gateway "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_gateway"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
 	compliance_ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
@@ -118,7 +118,7 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 
 	gw := New(cfg)
 	gw.clientsFactory = mockClientsFactory
-	gw.authorizer = authorizer.NewAuthorizer(authv2.AuthorizationHandler(mockAuthorizationClient))
+	gw.authorizer = authorizer.NewAuthorizer(auth.AuthorizationHandler(mockAuthorizationClient))
 
 	return *gw
 }
@@ -153,21 +153,7 @@ func newAuthorizationMocks(t *testing.T, resource, action string) (
 			return &authz.ProjectsAuthorizedResp{Projects: []string{"any"}}, nil
 		},
 	)
-	mockAuthzClient.EXPECT().FilterAuthorizedPairs(
-		gomock.Any(),
-		&authz.FilterAuthorizedPairsReq{
-			Subjects: []string{"mock"},
-			Pairs:    []*authz.Pair{},
-		},
-	).DoAndReturn(
-		func(_ context.Context, _ *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
-			return &authz.FilterAuthorizedPairsResp{
-				Pairs: []*authz.Pair{
-					&authz.Pair{Resource: "any", Action: "any"},
-				},
-			}, nil
-		},
-	)
+
 	return mockAuthClient, mockAuthzClient
 }
 

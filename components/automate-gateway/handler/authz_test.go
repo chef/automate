@@ -251,11 +251,11 @@ func testServerAndHandler(t *testing.T) (
 
 	conn, err := connFactory.Dial("authz-service", s.URL)
 	require.NoError(t, err)
-	v2Client := authz.NewAuthorizationClient(conn)
+	client := authz.NewAuthorizationClient(conn)
 
 	return authSrv,
 		s,
 		handler.NewAuthzServer(
 			nil,
-			authorizer.NewAuthorizer(authv2.AuthorizationHandler(v2Client)))
+			authorizer.NewAuthorizer(authv2.AuthorizationHandler(client)))
 }
