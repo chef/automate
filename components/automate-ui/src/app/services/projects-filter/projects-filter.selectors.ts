@@ -41,3 +41,5 @@ export const dropdownCaretVisible = createSelector(projectsFilterState,
 
 export const filterVisible = createSelector(projectsFilterState,
   state => state.filterVisible);
+
+export const filterValue = createSelector(projectsFilterState, state => state.filterValue);
