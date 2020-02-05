@@ -53,12 +53,6 @@ message Project {
     ProjectRulesStatus status = 4;
 }
 
-// passed to UpgradeToV2 to set version
-enum Flag {
-    VERSION_2_0 = 0;
-    VERSION_2_1 = 1;
-}
-
 // the only values that may be returned by GetPolicyVersion
 message Version {
     enum VersionNumber {

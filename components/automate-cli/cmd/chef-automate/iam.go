@@ -174,44 +174,10 @@ func display(v *iam_common.Version) string {
 }
 
 func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
-	upgradeReq := &iam_req.UpgradeToV2Req{
-		Flag:           iam_common.Flag_VERSION_2_1,
-		SkipV1Policies: iamCmdFlags.skipLegacyUpgrade,
-	}
-
-	writer.Title("Upgrading to IAM v2.1")
-
-	if !iamCmdFlags.skipLegacyUpgrade {
-		writer.Println("Migrating v1 policies...")
-	}
-
 	ctx := context.Background()
 	apiClient, err := apiclient.OpenConnection(ctx)
 	if err != nil {
 		return err
-	}
-
-	resp, err := apiClient.PoliciesClient().UpgradeToV2(ctx, upgradeReq)
-	switch grpc_status.Convert(err).Code() {
-	case codes.OK:
-		if len(resp.GetReports()) > 0 {
-			writer.Println("\nSkipped policies:")
-		}
-		for i, report := range resp.GetReports() {
-			if i > 0 {
-				writer.Print("\n")
-			}
-			outputReport(report)
-		}
-	case codes.FailedPrecondition:
-		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
-			"Migration to IAM v2.1 already in progress")
-	case codes.AlreadyExists:
-		writer.Failf(alreadyMigratedMessage, "v2.1")
-		return nil
-	default: // something else: fail
-		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
-			"Failed to reset IAM v2.1 database state")
 	}
 
 	writer.Println("Creating default teams Editors and Viewers...")
