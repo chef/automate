@@ -31,7 +31,7 @@ import (
 	_ "github.com/chef/automate/components/automate-gateway/api/compliance/profiles"
 )
 
-func TestIntrospectAllV2(t *testing.T) {
+func TestIntrospectAll(t *testing.T) {
 	authzSrv, s, hdlr := testServerAndHandler(t)
 	defer s.Close()
 	reset := func() {
@@ -154,7 +154,7 @@ func TestIntrospectSome(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "Auth")
+				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", middleware.AuthV2.String())
 			authzSrv.FilterAuthorizedPairsFunc = func(
 				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil
