@@ -174,6 +174,8 @@ CONF
       "set -e",
       "sudo hab svc unload chef/chef-load || true",
       "sudo hab svc unload chef/applications-load-gen || true",
+      "for _ in {1..5} ; do if hab sup status | grep -q chef-load; then echo \"waiting for chef-load to unload\" && sleep 5; fi; done",
+      "for _ in {1..5} ; do if hab sup status | grep -q applications-load-gen; then echo \"waiting for applications-load-gen to unload\" && sleep 5; fi; done",
       "sudo mv /tmp/chef-load_logrotate.conf /etc/logrotate.d/chef-load",
       "sudo chown root:root /etc/logrotate.d/chef-load",
       "sudo rm -rf /opt/chef_load_sample_data",
