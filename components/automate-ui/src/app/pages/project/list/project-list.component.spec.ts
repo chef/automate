@@ -16,12 +16,10 @@ import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
-  GetProjectsSuccess,
-  GetApplyRulesStatusSuccess,
-  GetApplyRulesStatusSuccessPayload
+  GetProjectsSuccess
 } from 'app/entities/projects/project.actions';
-import { projectEntityReducer, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import { Project } from 'app/entities/projects/project.model';
+import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { ProjectListComponent } from './project-list.component';
 import { ChefKeyboardEvent } from 'app/types/material-types';
 
@@ -29,7 +27,6 @@ describe('ProjectListComponent', () => {
   let component: ProjectListComponent;
   let fixture: ComponentFixture<ProjectListComponent>;
   let element: HTMLElement;
-  let projectService: ProjectService;
   let store: Store<NgrxStateAtom>;
 
   const projectList: Project[] = [
@@ -78,16 +75,6 @@ describe('ProjectListComponent', () => {
           inputs: ['visible' ],
           outputs: ['close' ]
         }),
-         MockComponent({
-          selector: 'app-confirm-apply-start-modal',
-          inputs: ['visible'],
-          outputs: ['confirm', 'cancel']
-        }),
-        MockComponent({
-          selector: 'app-confirm-apply-stop-modal',
-          inputs: ['visible', 'applyRulesStatus', 'stopRulesInProgress'],
-          outputs: ['confirm', 'cancel']
-        }),
         MockComponent({ selector: 'mat-select' }),
         MockComponent({ selector: 'mat-option' }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
@@ -124,7 +111,6 @@ describe('ProjectListComponent', () => {
 
   beforeEach(() => {
     jasmine.addMatchers(customMatchers);
-    projectService = TestBed.get(ProjectService);
     fixture = TestBed.createComponent(ProjectListComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement.nativeElement;
@@ -251,203 +237,12 @@ describe('ProjectListComponent', () => {
     });
   });
 
-  describe('when update-start-confirmation modal emits a cancellation', () => {
-    it('hides the modal', () => {
-      component.openConfirmUpdateStartModal();
-
-      component.cancelApplyStart();
-
-      expect(component.confirmApplyStartModalVisible).toEqual(false);
-    });
-  });
-
-  describe('when update-start-confirmation modal emits a confirmation', () => {
-    beforeEach(() => {
-      spyOn(projectService, 'applyRulesStart');
-      component.openConfirmUpdateStartModal();
-      component.confirmApplyStart();
-    });
-
-    it('hides the modal', () => {
-      expect(component.confirmApplyStartModalVisible).toEqual(false);
-    });
-
-    it('has the projectService start the rule updates', () => {
-      expect(projectService.applyRulesStart).toHaveBeenCalled();
-    });
-  });
-
-  describe('when update-stop-confirmation modal emits a cancellation', () => {
-    it('hides the modal', () => {
-      component.openConfirmUpdateStopModal();
-
-      component.cancelApplyStop();
-
-      expect(component.confirmApplyStopModalVisible).toEqual(false);
-    });
-  });
-
-  describe('when update-stop-confirmation modal emits a confirmation', () => {
-    beforeEach(() => {
-      spyOn(projectService, 'applyRulesStop');
-      component.confirmApplyStart(); // start the update
-      component.openConfirmUpdateStopModal();
-      component.confirmApplyStop(); // emit the confirmation
-    });
-
-    it('keeps the modal open', () => {
-
-      expect(component.confirmApplyStopModalVisible).toEqual(true);
-    });
-
-    it('has the projectService stop the rule updates', () => {
-      expect(projectService.applyRulesStop).toHaveBeenCalled();
-    });
-
-    it('waits until stopping the update completes then closes the modal', () => {
-      store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.NotRunning)));
-      expect(component.confirmApplyStopModalVisible).toEqual(false);
-    });
-  });
-
-  describe('getButtonText', () => {
-    it('labels the button "Projects Up-to-Date" when no projects are edited', () => {
-      const uneditedProject1 = genProject('uuid-111', 'RULES_APPLIED');
-      const uneditedProject2 = genProject('uuid-112', 'RULES_APPLIED');
-      store.dispatch(new GetProjectsSuccess({
-        projects: [uneditedProject1, uneditedProject2]
-      }));
-
-      expect(component.getButtonText()).toEqual('Projects Up-to-Date');
-    });
-
-    it('labels the button "Update Projects" when at least one project is edited', () => {
-      const editedProject = genProject('uuid-99', 'EDITS_PENDING');
-      const uneditedProject1 = genProject('uuid-111', 'RULES_APPLIED');
-      const uneditedProject2 = genProject('uuid-112', 'RULES_APPLIED');
-      store.dispatch(new GetProjectsSuccess({
-        projects: [uneditedProject1, editedProject, uneditedProject2]
-      }));
-
-      expect(component.getButtonText()).toEqual('Update Projects');
-    });
-
-    it('labels the button with percentage during an update', () => {
-      component.confirmApplyStart(); // start the update
-      store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
-        genState(ApplyRulesStatusState.Running)));
-
-      expect(component.getButtonText()).toEqual('Updating Projects 50%...');
-    });
-
-    it('labels the button "Update Projects" if update has failed', () => {
-      store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.NotRunning, true, false)));
-
-      expect(component.getButtonText()).toEqual('Update Projects');
-    });
-
-    it('labels the button "Update Projects" if update was cancelled', () => {
-      store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.NotRunning, false, true)));
-
-      expect(component.getButtonText()).toEqual('Update Projects');
-    });
-  });
-
-  describe('update projects button', () => {
-    it('is disabled if no project has changes', () => {
-      const uneditedProject1 = genProject('uuid-111', 'RULES_APPLIED');
-      const uneditedProject2 = genProject('uuid-112', 'RULES_APPLIED');
-      store.dispatch(new GetProjectsSuccess({ projects: [uneditedProject1, uneditedProject2] }));
-
-      expect(component.isDisabled()).toEqual(true);
-    });
-
-    it('is enabled if some project has changes', () => {
-      const editedProject = genProject('uuid-99', 'EDITS_PENDING');
-      const uneditedProject = genProject('uuid-111', 'RULES_APPLIED');
-      store.dispatch(new GetProjectsSuccess({ projects: [uneditedProject, editedProject] }));
-
-      expect(component.isDisabled()).toEqual(false);
-    });
-
-    it('is disabled if rules are being applied', () => {
-      // isolate rules being applied because button would be enabled with just this
-      store.dispatch(
-        new GetProjectsSuccess({ projects: [genProject('uuid-99', 'EDITS_PENDING')] }));
-
-      component.confirmApplyStart();
-
-      expect(component.isDisabled()).toEqual(true);
-    });
-
-    it('is enabled if rules are not being applied', () => {
-      // isolate rules being applied because button would be enabled with just this
-      store.dispatch(
-        new GetProjectsSuccess({ projects: [genProject('uuid-99', 'EDITS_PENDING')] }));
-
-      component.confirmApplyStart();  // update running
-      expect(component.isDisabled()).toEqual(true);
-      store.dispatch(new GetApplyRulesStatusSuccess( // update finished
-          genState(ApplyRulesStatusState.NotRunning)));
-
-      expect(component.isDisabled()).toEqual(false);
-    });
-
-    it('is enabled if update fails', () => {
-      store.dispatch(
-        new GetProjectsSuccess({ projects: [genProject('uuid-99', 'RULES_APPLIED')] }));
-      component.confirmApplyStart();
-      store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.NotRunning, true, false)));
-
-      expect(component.isDisabled()).toEqual(false);
-    });
-
-    it('is enabled if update is cancelled', () => {
-      store.dispatch(
-        new GetProjectsSuccess({ projects: [genProject('uuid-99', 'RULES_APPLIED')] }));
-      component.confirmApplyStart();
-      store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.NotRunning, false, true)));
-
-      expect(component.isDisabled()).toEqual(false);
-    });
-
-    it('is disabled if update is cancelled but update is still running', () => {
-      store.dispatch(
-        new GetProjectsSuccess({ projects: [genProject('uuid-99', 'RULES_APPLIED')] }));
-      component.confirmApplyStart();
-      store.dispatch(new GetApplyRulesStatusSuccess(
-        genState(ApplyRulesStatusState.Running, false, true)));
-
-      expect(component.isDisabled()).toEqual(true);
-    });
-  });
+  function genProject(id: string, status: ProjectStatus): Project {
+    return {
+      id,
+      status,
+      name: id, // unused
+      type: 'CUSTOM' // unused
+    };
+  }
 });
-
-function genProject(id: string, status: ProjectStatus): Project {
-  return {
-    id,
-    status,
-    name: id, // unused
-    type: 'CUSTOM' // unused
-  };
-}
-
-function genState(
-  state: ApplyRulesStatusState,
-  failed = false,
-  cancelled = false
-): GetApplyRulesStatusSuccessPayload {
-  return {
-    state,
-    failed,
-    cancelled,
-    estimated_time_complete: '', // unused
-    percentage_complete: 0.5, // unused
-    failure_message: '' // unused
-  };
-}

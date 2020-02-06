@@ -7,6 +7,8 @@ import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatSelectModule  } from '@angular/material/select';
+import { MatProgressBarModule } from '@angular/material/progress-bar';
+import { MatButtonModule } from '@angular/material/button';
 
 // Components
 import { AuthorizedComponent } from './authorized/authorized.component';
@@ -15,6 +17,8 @@ import { BreadcrumbComponent } from './breadcrumb/breadcrumb.component';
 import { CalendarComponent } from './calendar/calendar.component';
 import { ChefNotificationsComponent } from './notifications/notifications.component';
 import { ClientRunsSidebarComponent } from './client-runs-sidebar/client-runs-sidebar.component';
+import { ConfirmApplyStartModalComponent } from './confirm-apply-start-modal/confirm-apply-start-modal.component';
+import { ConfirmApplyStopModalComponent } from './confirm-apply-stop-modal/confirm-apply-stop-modal.component';
 import { CreateObjectModalComponent } from './create-object-modal/create-object-modal.component';
 import { CreateUserModalComponent } from 'app/page-components/create-user-modal/create-user-modal.component';
 import { CreateV1TeamModalComponent } from 'app/page-components/create-v1-team-modal/create-v1-team-modal.component';
@@ -38,6 +42,8 @@ import { InputDirective } from './input/input.directive';
 import { LandingComponent } from './landing/landing.component';
 import { MessageModalComponent } from './message-modal/message-modal.component';
 import { PagePickerComponent } from './page-picker/page-picker.component';
+import { PendingEditsBarComponent } from './pending-edits-bar/pending-edits-bar.component';
+import { ProcessProgressBarComponent } from './process-progress-bar/process-progress-bar.component';
 import { ProjectsDropdownComponent } from './projects-dropdown/projects-dropdown.component';
 import { SettingsSidebarComponent } from './settings-sidebar/settings-sidebar.component';
 import { SidebarComponent } from './sidebar/sidebar.component';
@@ -63,13 +69,17 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     // Angular Material
     MatDialogModule,
     MatSelectModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatProgressBarModule,
+    MatButtonModule
   ],
   exports: [
     // Angular Material
     MatDialogModule,
     MatSelectModule,
     MatSnackBarModule,
+    MatProgressBarModule,
+    MatButtonModule,
 
     // Components
     AuthorizedComponent,
@@ -78,6 +88,8 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     CalendarComponent,
     ChefNotificationsComponent,
     ClientRunsSidebarComponent,
+    ConfirmApplyStartModalComponent,
+    ConfirmApplyStopModalComponent,
     CreateObjectModalComponent,
     CreateUserModalComponent,
     CreateV1TeamModalComponent,
@@ -90,6 +102,8 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     LandingComponent,
     MessageModalComponent,
     PagePickerComponent,
+    PendingEditsBarComponent,
+    ProcessProgressBarComponent,
     ProjectsDropdownComponent,
     SettingsSidebarComponent,
     SidebarComponent,
@@ -116,6 +130,8 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     CalendarComponent,
     ChefNotificationsComponent,
     ClientRunsSidebarComponent,
+    ConfirmApplyStartModalComponent,
+    ConfirmApplyStopModalComponent,
     CreateObjectModalComponent,
     CreateUserModalComponent,
     CreateV1TeamModalComponent,
@@ -131,6 +147,8 @@ import { TableHeaderComponent } from './table/table-header/table-header.componen
     LandingComponent,
     MessageModalComponent,
     PagePickerComponent,
+    PendingEditsBarComponent,
+    ProcessProgressBarComponent,
     ProjectsDropdownComponent,
     SettingsSidebarComponent,
     SidebarComponent,

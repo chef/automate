@@ -13,7 +13,7 @@ export class SidebarComponent {
   menuGroups$: Observable<MenuItemGroup[]>;
 
   constructor(
-    @Inject(LayoutFacadeService) layoutFacade: LayoutFacadeService
+    @Inject(LayoutFacadeService) public layoutFacade: LayoutFacadeService
   ) {
     this.menuGroups$ = layoutFacade.menuGroups$;
   }

@@ -1,3 +1,5 @@
+@import './mixins/mat-button-theme';
+
 // Automate mixins
 @mixin base-box-shadow($blurRadius: 14px, $shadowColor: $gray-pale) {
   box-shadow: 0 1px $blurRadius $shadowColor;

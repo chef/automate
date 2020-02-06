@@ -1,10 +1,10 @@
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { notificationState } from 'app/entities/notifications/notification.selectors';
-import { Notification } from 'app/entities/notifications/notification.model';
+import { Notification, Type } from 'app/entities/notifications/notification.model';
 import { DeleteNotification } from 'app/entities/notifications/notification.actions';
 
 @Component({
@@ -13,12 +13,25 @@ import { DeleteNotification } from 'app/entities/notifications/notification.acti
   styleUrls: ['./notifications.component.scss']
 })
 export class ChefNotificationsComponent {
-  notifications$: Observable<Notification[]>;
+  notifications: Notification[];
 
   constructor(
-    private store: Store<NgrxStateAtom>
+    private store: Store<NgrxStateAtom>,
+    public layoutFacade: LayoutFacadeService
   ) {
-    this.notifications$ = store.select(notificationState);
+    store.select(notificationState).subscribe(
+      (notifications: Notification[]) => {
+        this.notifications = notifications;
+        this.layoutFacade.layout.header.license =
+          notifications &&  notifications.some(n => n.type === Type.license);
+          if (this.layoutFacade.layout.header.license) {
+            this.layoutFacade.layout.header.license = true;
+            this.layoutFacade.updateDisplay();
+          } else {
+            this.layoutFacade.layout.header.license = false;
+            this.layoutFacade.updateDisplay();
+          }
+      });
   }
 
   handleNotificationDismissal(id: string): void {

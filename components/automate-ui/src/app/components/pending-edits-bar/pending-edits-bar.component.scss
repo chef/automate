@@ -1,0 +1,24 @@
+@import "~styles/variables";
+
+#pending-edits-bar {
+  background-color: $chef-primary-bright;
+  color: $chef-white;
+  padding: 7px 10px;
+  position: relative;
+
+  .info {
+    font-size: 14px;
+    font-weight: 500;
+
+    a {
+      color: inherit;
+    }
+  }
+
+  button {
+    position: absolute;
+    right: 0;
+    top: 0;
+  }
+}
+
