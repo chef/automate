@@ -4,7 +4,7 @@ describe('team management', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'test-team-mgmt';
   const teamName = `${cypressPrefix} team ${now}`;
-  const customTeamID = `${cypressPrefix}-testing-team-custom-id-${now}`;
+  const customTeamID = `${cypressPrefix}-custom-id-${now}`;
   const project1ID = `${cypressPrefix}-project1-${now}`;
   const project1Name = `${cypressPrefix} project1 ${now}`;
   const project2ID = `${cypressPrefix}-project2-${now}`;
@@ -15,8 +15,9 @@ describe('team management', () => {
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-      cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
+
+      // extra precaution in case the `after` cleanup didn't run due to a failure
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['teams', 'projects', 'policies']);
 
       cy.request({
         auth: { bearer: admin.id_token },
@@ -51,7 +52,8 @@ describe('team management', () => {
 
   afterEach(() => {
     cy.saveStorage();
-    cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
+    // clean up teams in between each test so we can reuse teamName and teamID
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['teams']);
   });
 
   after(() => {
@@ -151,7 +153,8 @@ describe('team management', () => {
       });
 
       afterEach(() => {
-        cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
+        // clean up teams in between each test so we can reuse teamName and teamID
+        cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['teams']);
       });
 
       itFlaky('can create a team with multiple projects', () => {

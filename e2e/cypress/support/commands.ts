@@ -176,27 +176,6 @@ Cypress.Commands.add('cleanupUsersByNamePrefix', (namePrefix: string) => {
   });
 });
 
-Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (namePrefix: string) => {
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'GET',
-    url: '/apis/iam/v2/teams',
-    failOnStatusCode: false
-  }).then((resp) => {
-    const body = resp.body;
-    for (const team of body.teams) {
-      if (team.description.startsWith(namePrefix)) {
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'DELETE',
-          url: `/apis/iam/v2/teams/${team.id}`,
-          failOnStatusCode: false
-        });
-      }
-    }
-  });
-});
-
 Cypress.Commands.add('applyRulesAndWait', (attempts: number) => {
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -432,6 +411,7 @@ function cleanupV2IAMObjectByIDPrefix(idPrefix: string, iamObject: string): void
     url: `/apis/iam/v2/${iamObject}`
   }).then((resp) => {
     for (const object of resp.body[iamObject]) {
+      console.log(object);
       if (object.id.startsWith(idPrefix)) {
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
