@@ -4,12 +4,11 @@ Use this test-kitchen setup to run the audit cookbook in a VM and send the repor
 
  * Vagrant
  * VirtualBox
- * test-kitchen
+ * Install necessary ruby gems:
 
-Berkshelf gem for pulling the cookbooks defined in `Berksfile`
-```bash
-gem install berkshelf
-```
+    ```bash
+    bundle
+    ```
 
 ## Converge a VM with the audit cookbook and send the report to Automate
 ```bash
