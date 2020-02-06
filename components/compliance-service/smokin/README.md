@@ -21,12 +21,14 @@ COLLECTOR_URL='https://A2-HOST/data-collector/v0/' COLLECTOR_TOKEN='TOKEN' kitch
 kitchen destroy
 ```
 
-The value for COLLECTOR_TOKEN can be obtained from Automate's hab studio via command:
-```bash
-get_admin_token
-```
+## Generating a token
 
-or from the Automate UI:
-1. Navigate to `Settings` > `API Tokens` > `Create Token`
-1. Fill in the form.
-1. Click the three dot menu on the right side and click `Copy Token`
+* The value for COLLECTOR_TOKEN can be obtained from Automate's hab studio via command:
+  ```bash
+  get_admin_token
+  ```
+
+* Or from the Automate UI:
+  1. Navigate to `Settings` > `API Tokens` > `Create Token`
+  1. Fill in the form.
+  1. Click the three dot menu on the right side and click `Copy Token`
