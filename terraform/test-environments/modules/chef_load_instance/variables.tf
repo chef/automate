@@ -19,6 +19,16 @@ variable "ssh_username" {
 }
 
 #
+# Habitat
+#
+
+variable "desired_hab_version" {
+  type        = "string"
+  default     = "1.5.0"
+  description = "desired version of the habitat CLI and supervisor"
+}
+
+#
 # Chef Baseline
 #
 
