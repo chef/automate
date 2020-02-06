@@ -308,6 +308,17 @@ message ControlItemRequest {
 	repeated ListFilter filters = 3;
 }
 
+message WaiverData {
+      // The waived state of the control item. Possible values: `yes`, `yes_run`, `no`, `no_expired`.
+	string waived_str = 1;
+	// The expiration date for the waiver. After this date, the control is no longer waived.
+	string expiration_date = 2;
+	// The reason for the waiver.
+	string justification = 3;
+	// Intentionally blank.
+	ControlSummary waiver_summary= 4;
+}
+
 message ControlItem {
 	// The control's unique ID.
 	string id = 1;
@@ -321,6 +332,8 @@ message ControlItem {
 	google.protobuf.Timestamp end_time = 5;
 	// Intentionally blank.
 	ControlSummary control_summary = 6;
+	// A list of waivers for the nodes affected by this control.
+	repeated WaiverData waivers = 7;
 }
 
 message ControlItems {

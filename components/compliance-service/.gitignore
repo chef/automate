@@ -24,3 +24,4 @@ jmeter.log
 smokin/.kitchen
 smokin/Berksfile.lock
 *_pb.rb
+/__debug_bin

@@ -64,13 +64,21 @@ message ControlItemRequest {
 	repeated ListFilter filters = 3;
 }
 
+message WaiverData {
+	string waived_str = 1;
+	string expiration_date = 2;
+	string justification = 3;
+	ControlSummary waiver_summary= 4;
+}
+
 message ControlItem {
-	string id =1;
-	string title=2;
+	string id = 1;
+	string title = 2;
 	ProfileMin profile = 3;
 	float impact = 4;
 	google.protobuf.Timestamp end_time = 5;
 	ControlSummary control_summary = 6;
+	repeated WaiverData waivers = 7;
 }
 
 message ControlItems {
