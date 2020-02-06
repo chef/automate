@@ -25,4 +25,8 @@ The value for COLLECTOR_TOKEN can be obtained from Automate's hab studio via com
 ```bash
 get_admin_token
 ```
-or from the Automate UI: `Admin` > `API Tokens` > `Add API Token` > `Generate API Token` > Copy the value
+
+or from the Automate UI:
+1. Navigate to `Settings` > `API Tokens` > `Create Token`
+1. Fill in the form.
+1. Click the three dot menu on the right side and click `Copy Token`
