@@ -35,7 +35,18 @@ data "template_file" "applications_load_gen_toml" {
   vars {
     automate_server_fqdn  = "${var.automate_server_fqdn}"
     automate_server_token = "${var.automate_server_token}"
-    num_svcs              = "${var.chef_load_nodes}"
+    num_svcs              = "${var.apps_load_svcs}"
+  }
+}
+
+data "template_file" "hab_sup_exec_start_conf" {
+  count = "${var.instance_count}"
+
+  template = "${file("${path.module}/templates/hab-sup-exec-start.conf.tpl")}"
+
+  vars {
+    automate_server_fqdn  = "${var.automate_server_fqdn}"
+    automate_server_token = "${var.automate_server_token}"
   }
 }
 
@@ -77,12 +88,19 @@ LimitNOFILE=infinity
 EOF
   }
 
+  provisioner "file" {
+    content     = "${element(data.template_file.hab_sup_exec_start_conf.*.rendered, count.index)}"
+    destination = "/tmp/hab-sup-exec-start.conf"
+  }
+
   provisioner "remote-exec" {
     inline = [
       "set -e",
       "sudo mkdir -p /etc/systemd/system/hab-supervisor.service.d",
       "sudo chown root:root /tmp/limits.conf",
+      "sudo chown root:root /tmp/hab-sup-exec-start.conf",
       "sudo mv /tmp/limits.conf /etc/systemd/system/hab-supervisor.service.d/limits.conf",
+      "sudo mv /tmp/hab-sup-exec-start.conf /etc/systemd/system/hab-supervisor.service.d/hab-sup-exec-start.conf",
     ]
   }
 
@@ -154,8 +172,8 @@ CONF
   provisioner "remote-exec" {
     inline = [
       "set -e",
-      "sudo hab svc unload chef/chef-load",
-      "sudo hab svc unload chef/applications-load-gen",
+      "sudo hab svc unload chef/chef-load || true",
+      "sudo hab svc unload chef/applications-load-gen || true",
       "sudo mv /tmp/chef-load_logrotate.conf /etc/logrotate.d/chef-load",
       "sudo chown root:root /etc/logrotate.d/chef-load",
       "sudo rm -rf /opt/chef_load_sample_data",

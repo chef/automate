@@ -112,6 +112,6 @@ variable "chef_load_actions" {
 }
 
 variable "apps_load_svcs" {
-  default     = "20000"
+  default     = "10000"
   description = "The number of services that applications-load-gen will simulate."
 }
