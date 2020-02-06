@@ -23,7 +23,7 @@ type Config struct {
 const (
 	// PreForceUpgradeMigration is last schema migration before force-upgrade.
 	// All of our golang force-upgrade code assumes we are on this schema version.
-	PreForceUpgradeMigration = 74
+	PreForceUpgradeMigration = 73
 )
 
 // Migrate executes all migrations we have
