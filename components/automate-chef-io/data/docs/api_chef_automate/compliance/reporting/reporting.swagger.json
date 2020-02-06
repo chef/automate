@@ -368,6 +368,13 @@
         "control_summary": {
           "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
           "description": "Intentionally blank."
+        },
+        "waivers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.WaiverData"
+          },
+          "description": "A list of waivers for the nodes affected by this control."
         }
       }
     },
@@ -1228,6 +1235,27 @@
         }
       },
       "description": "A subtotal of controls."
+    },
+    "chef.automate.api.compliance.reporting.v1.WaiverData": {
+      "type": "object",
+      "properties": {
+        "waived_str": {
+          "type": "string",
+          "description": "The waived state of the control item. Possible values: `yes`, `yes_run`, `no`, `no_expired`."
+        },
+        "expiration_date": {
+          "type": "string",
+          "description": "The expiration date for the waiver. After this date, the control is no longer waived."
+        },
+        "justification": {
+          "type": "string",
+          "description": "The reason for the waiver."
+        },
+        "waiver_summary": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
+          "description": "Intentionally blank."
+        }
+      }
     },
     "google.protobuf.Any": {
       "type": "object",
