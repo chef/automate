@@ -9,23 +9,23 @@
           <chef-alert type="error" *ngIf="fetchStatusInternalError">
             <span>
             Sorry but something went wrong. We are unable to verify license status.
-            Please contact an administrator or <a href="https://www.chef.io/support/" target="_blank" class="error-msg">Chef support</a>.
+            Contact an administrator or <a href="https://www.chef.io/support/" target="_blank" class="error-msg">Chef support</a>.
             </span>
           </chef-alert>
           <chef-alert type="error" *ngIf="permissionDenied">
           We're sorry, but you currently do not have permission to apply a license.
-          Please contact an administrator for permission.
+          Contact an administrator for permission.
           </chef-alert>
           <chef-alert type="error" *ngIf="trialRequestInternalError">
             <span>
             Sorry, but something went wrong. We are unable to get your trial license.
-            Please contact an administrator or <a href="https://www.chef.io/support/" target="_blank" class="error-msg">Chef support</a>.
+            Contact an administrator or <a href="https://www.chef.io/support/" target="_blank" class="error-msg">Chef support</a>.
             </span>
           </chef-alert>
           <chef-alert type="error" *ngIf="trialRequestConnectivityError">
             <span>
             Sorry, but Chef Automate was unable to contact the Chef trial license service.
-            Please contact an administrator or <a href="https://www.chef.io/support/" target="_blank" class="error-msg">Chef support</a>.
+            Contact an administrator or <a href="https://www.chef.io/support/" target="_blank" class="error-msg">Chef support</a>.
             </span>
           </chef-alert>
         </div>
@@ -79,34 +79,30 @@
       <!-- display confirmation once license applied -->
       <ng-container *ngIf="trialLicenseApplied">
         <div class="title">
-          <chef-icon>check_circle</chef-icon> Your Chef Automate trial license has been applied!
+          <chef-icon>check_circle</chef-icon> Trial license has been applied!
         </div>
         <div class="info">
           <div class="subtitle">Your trial license will expire on
             <strong class="date">{{ expirationDate }}</strong>.
-            Keep your eye on the banner at the top of the Chef Automate UI to see
-            a countdown of the time you have left on your trial.
-          </div>
-          <div class="subtitle">
-            <strong>How can we help get you started?</strong>
           </div>
         </div>
 
+        <h2>How can we help get you started?</h2>
         <ul>
           <li>
             <a href="https://automate.chef.io/docs" target="_blank">
-              I'm familiar with Chef, but I need help getting started with Chef Automate.
+              Chef Documentation
               <chef-icon>launch</chef-icon>
             </a>
           </li>
           <li>
             <a href="https://learn.chef.io/" target="_blank">
-              Teach me everything!
+              Learn Chef Rally
               <chef-icon>launch</chef-icon>
             </a>
           </li>
         </ul>
-        <chef-button primary (click)="closeModal()" class="confirmation" id="dismiss-help"> It's ok, I know what I am doing </chef-button>
+        <chef-button primary (click)="closeModal()" class="confirmation" id="dismiss-help">Close</chef-button>
         <app-telemetry-checkbox></app-telemetry-checkbox>
       </ng-container>
     </ng-container>
@@ -114,14 +110,14 @@
     <ng-container *ngIf="fetchStatusInternalError">
         <div class="title">Unable to Verify License</div>
         <div>
-          Something went wrong. Please verify your connectivity to the Chef Automate server.
+          Something went wrong. Verify your connectivity to the Chef Automate server.
           <br/>
-          If this problem persists please contact an administrator
+          If this problem persists contact an administrator
           or <a href="https://www.chef.io/support/" target="_blank" class="error-msg">Chef support</a>.
         </div>
     <div class="button-container">
           <chef-button primary (click)="retryLicenseStatus()">Retry Connection</chef-button>
-          <chef-button secondary (click)="logout()">Logout</chef-button>
+          <chef-button secondary (click)="logout()">Sign out</chef-button>
     </div>
     </ng-container>
 
