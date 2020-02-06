@@ -21,63 +21,32 @@ const (
 	enumFailed          = "failed"
 )
 
-func needsV2Migration(ctx context.Context, db *sql.DB) (bool, error) {
-	var status string
-	row := db.QueryRowContext(ctx, `SELECT state FROM migration_status`)
-	err := row.Scan(&status)
-	if err != nil {
-		return true, err // shouldn't happen, migration initializes state
-	}
-	switch status {
-	case enumPristine:
-		return true, nil
-	case enumSuccessful:
-		return false, nil
-	case enumSuccessfulBeta1:
-		return false, nil
-	// TODO how should we properly handle these cases? is re-running migration enough?
-	case enumInProgress:
-		return true, nil
-	case enumFailed:
-		return true, nil
-	}
-	return true, fmt.Errorf("unexpected migration status: %q", status)
-}
-
-// MigrateToV2 sets the V2 store to its factory defaults and then migrates
+// migrateToV2 sets the V2 store to its factory defaults and then migrates
 // any existing V1 policies, unless the install is already on IAM v2.
 func migrateToV2(ctx context.Context, db *sql.DB) error {
-	ifNotOnV2, err := needsV2Migration(ctx, db)
-	if err != nil {
-		return errors.Wrap(err, "could not query IAM migration state")
+	recordMigrationStatus(ctx, enumInProgress, db)
+	for _, role := range defaultRoles() {
+		if err := createRole(ctx, db, &role); err != nil {
+			return errors.Wrapf(err,
+				"could not create default role with ID: %s", role.ID)
+		}
 	}
 
-	if ifNotOnV2 {
-		recordMigrationStatus(ctx, enumInProgress, db)
-		for _, role := range defaultRoles() {
-			if err := createRole(ctx, db, &role); err != nil {
-				return errors.Wrap(err, "could not create default role")
-			}
+	for _, pol := range v2DefaultPolicies() {
+		if _, err := createV2Policy(ctx, db, &pol); err != nil {
+			return errors.Wrapf(err,
+				"could not create default policy with ID: %s", pol.ID)
 		}
+	}
 
-		// TODO include policy in error? same above?
-		for _, pol := range v2DefaultPolicies() {
-			if _, err := createV2Policy(ctx, db, &pol); err != nil {
-				return errors.Wrap(err, "could not create default policy")
-			}
-		}
+	errs, err := migrateV1Policies(ctx, db)
 
-		// TODO do we need these?
-		var reports []string
-		errs, err := migrateV1Policies(ctx, db)
-		if err != nil {
-			return errors.Wrap(err, "migrate v1 policies: %s")
-		}
-		for _, e := range errs {
-			reports = append(reports, e.Error())
-		}
-		// TODO Refresh policies
-		recordMigrationStatus(ctx, enumSuccessful, db)
+	var reports []string
+	for _, e := range errs {
+		reports = append(reports, e.Error())
+	}
+	if err != nil {
+		return errors.Wrapf(err, "migrate v1 policies: %s", reports)
 	}
 
 	return nil

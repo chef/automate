@@ -3,6 +3,7 @@ package migration
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/lib/pq"
@@ -278,4 +279,35 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 func recordMigrationStatus(ctx context.Context, ms string, db *sql.DB) error {
 	_, err := db.ExecContext(ctx, `UPDATE migration_status SET state=$1`, ms)
 	return err
+}
+
+func migrateFromScratch(ctx context.Context, db *sql.DB) (onV2, isDirty bool, err error) {
+	var status string
+	row := db.QueryRowContext(ctx, `SELECT state FROM migration_status`)
+	err = row.Scan(&status)
+	if err != nil {
+		return false, false, err // shouldn't happen, migration initializes state
+	}
+	switch status {
+	case enumPristine:
+		return true, false, nil
+	case enumSuccessful:
+		return false, false, nil
+	case enumSuccessfulBeta1:
+		return false, false, nil
+	case enumInProgress:
+		return true, true, nil
+	case enumFailed:
+		return true, true, nil
+	}
+	return false, false, fmt.Errorf("unexpected migration status: %q", status)
+}
+
+func resetIAMDb(ctx context.Context, db *sql.DB) error {
+	if _, err := db.ExecContext(ctx,
+		`TRUNCATE TABLE iam_policies, iam_members, iam_roles, iam_projects CASCADE;`); err != nil {
+		return errors.Wrap(err, "truncate database")
+	}
+
+	return nil
 }

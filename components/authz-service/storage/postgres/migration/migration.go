@@ -81,44 +81,56 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 		return errors.Wrap(err, "opening database connection")
 	}
 
-	row := db.QueryRowContext(ctx, "SELECT state FROM force_upgrade_status")
-	var status string
-	if err := row.Scan(&status); err != nil {
-		return errors.Wrap(err, "query force_upgrade_status")
+	if version < PreForceUpgradeMigration {
+		err = m.Migrate(PreForceUpgradeMigration)
+		if err != nil && err != migrate.ErrNoChange {
+			return errors.Wrap(err, "migration up to IAM V2 force upgrade failed")
+		}
 	}
 
-	// TODO should we drop all IAM stuff if in failed state? what about failed miration_status?
-	if status == "init" || status == "failed" {
-
-		// TODO set in-progress flag for new table to indicate force-upgrade (different from IAM version)?
-		// Not sure exactly if / how we wanna handle this yet.
-
+	notOnV2, isDirty, err := migrateFromScratch(ctx, db)
+	if err != nil {
+		return errors.Wrap(err, "failed to retrieve migration_status")
+	}
+	if notOnV2 {
+		if isDirty {
+			// get IAM db in original, clean state to avoid conflicts
+			err = resetIAMDb(ctx, db)
+			if err != nil {
+				return errors.Wrap(err, "reset IAM V2 database")
+			}
+			if err := dataMigConf.Reset(); err != nil {
+				return errors.Wrap(err, "reset v2 data migrations")
+			}
+		}
+		err = recordMigrationStatus(ctx, enumInProgress, db)
+		if err != nil {
+			return errors.Wrapf(err, "failed to set IAM v2 migration_status to %s", enumInProgress)
+		}
 		err = migrateToV2(ctx, db)
 		if err != nil {
-			_, err := db.ExecContext(ctx, "UPDATE force_upgrade_status SET state = 'failed'")
+			statusErr := recordMigrationStatus(ctx, enumFailed, db)
 			if err != nil {
-				return errors.Wrap(err, "IAM v2 force_upgrade_status set failed failure")
+				return errors.Wrapf(statusErr, "failed to set IAM v2 migration_status to %s:%s", enumFailed, err.Error())
 			}
 			return errors.Wrap(err, "IAM v2 force-upgrade failed")
 		}
-
-		_, err := db.ExecContext(ctx, "UPDATE force_upgrade_status SET state = 'successful'")
+		err = recordMigrationStatus(ctx, enumSuccessful, db)
 		if err != nil {
-			return errors.Wrap(err, "IAM v2 force_upgrade_status set success failure")
+			return errors.Wrapf(err, "failed to set IAM v2 migration_status to %s", enumSuccessful)
 		}
 	}
 
-	// this is idempotent and should be a no-op besides reading
-	// the data_migrations table if we are post-force-upgrade
-	// err = dataMigConf.Migrate()
-	// if err != nil {
-	// 	return errors.Wrap(err, "IAM data migrations failed")
-	// }
+	// idempotent
+	err = dataMigConf.Migrate()
+	if err != nil {
+		return errors.Wrap(err, "IAM data migrations failed")
+	}
 
 	// perform remaining migrations
 	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
-		return errors.Wrap(err, "migrations after IAM V2 force upgrade failed")
+		return errors.Wrap(err, "migrations failed")
 	}
 
 	l.Infof("Completed db migrations")
