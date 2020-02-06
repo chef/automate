@@ -5,6 +5,7 @@ import * as moment from 'moment';
 
 import { LicenseFacadeService, LicenseApplyReason } from 'app/entities/license/license.facade';
 import { HttpStatus } from 'app/types/types';
+import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { EntityStatus, pendingState } from 'app/entities/entities';
 import { ApplyStatus, FetchStatus } from 'app/entities/license/license.model';
 import { LicenseStatus, parsedExpirationDate } from 'app/entities/license/license.model';
@@ -48,6 +49,7 @@ export class LicenseApplyComponent implements AfterViewInit {
 
   constructor(
     public licenseFacade: LicenseFacadeService,
+    private chefSessionService: ChefSessionService,
     fb: FormBuilder) {
       this.licenseFacade.licenseApplyReason$.subscribe((reason) => {
         this.licenseApplyReason = reason;
@@ -136,5 +138,9 @@ export class LicenseApplyComponent implements AfterViewInit {
 
   private setExpirationDate(license: LicenseStatus): void {
     this.expirationDate = parsedExpirationDate(license);
+  }
+
+  public logout() {
+    this.chefSessionService.logout();
   }
 }

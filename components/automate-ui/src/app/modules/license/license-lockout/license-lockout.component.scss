@@ -46,7 +46,7 @@
     color: $chef-critical;
   }
 
-  .subtitle {
+  h2 {
     font-size: 14px;
     margin-bottom: 10px;
   }
@@ -117,19 +117,10 @@
       height: 48px;
       align-items: center;
       background-color: transparent;
-      border: 1px solid $gray-pale;
-      border-radius: $global-radius;
       margin-bottom: 1em;
       padding: .5em 1em;
       position: relative;
       font-size: .875em;
-      transition: background-color .2s;
-
-      &:hover {
-        background-color: $chef-grey;
-        cursor: pointer;
-        transition: background-color .2s;
-      }
     }
   }
 
@@ -153,6 +144,11 @@
     min-width: 500px;
     max-width: 600px;
     min-height: 175px;
+  }
+
+  textarea,
+  chef-error {
+    display: block;
   }
 
   .spinner-container, .error-container {

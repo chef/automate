@@ -8,7 +8,6 @@
   .title {
     font-size: 24px;
     font-weight: bold;
-    color: $chef-primary-bright;
     margin-bottom: 1em;
     margin-top: 20px;
 
@@ -78,6 +77,11 @@
     min-width: 500px;
     max-width: 600px;
     min-height: 175px;
+  }
+
+  textarea,
+  chef-error {
+    display: block;
   }
 
   .spinner-container, .error-container {
