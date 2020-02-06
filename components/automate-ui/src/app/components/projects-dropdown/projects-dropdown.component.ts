@@ -56,6 +56,8 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
         this.updateLabel();
       });
     }
+
+    this.filterValue$ = this.projectsFilterService.filterValue$;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -77,6 +79,10 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
     }
     if (!this.active) {
       this.filteredProjects = this.projectsArray;
+
+      this.projectsFilterService.filterValue$.subscribe(filterValue => {
+        this.filteredProjects = this.filterProjects(filterValue);
+      });
     }
 
     this.active = !this.active;
@@ -95,7 +101,6 @@ export class ProjectsDropdownComponent implements OnInit, OnChanges {
   }
 
   updateFilterValue($event: string) {
-    // this.filteredProjects = this.filterProjects($event);
     this.projectsFilterService.updateFilterValue($event);
   }
 

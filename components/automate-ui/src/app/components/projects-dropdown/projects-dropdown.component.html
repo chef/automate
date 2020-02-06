@@ -14,7 +14,7 @@
   </button>
   <chef-click-outside (clickOutside)="closeDropdown()">
     <chef-dropdown [attr.visible]="active">
-
+      <p>{{ filterValue$ | async }}</p>    <!-- this is just for sanity checking -->
       <div id="filter-container">
         <input 
           chefInput
