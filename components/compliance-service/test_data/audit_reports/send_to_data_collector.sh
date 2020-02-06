@@ -49,7 +49,7 @@ function send_to_automate()
   local CURRENT_DATE=${1}
   local NEW_DATE=${2}
   for file in $(ls -1 ${CURRENT_DATE}*); do
-    echo " * $file  using date $NEW_DATE"
+    echo " * Sending \"$file\" with updated date of \"$NEW_DATE\""
     sed "s/$CURRENT_DATE/$NEW_DATE/" "$file" | curl --insecure -H "api-token: $AUTOMATE_API_TOKEN" -X POST "$AUTOMATE_URL" -H "Content-Type: application/json" -d @-
   done
 }
