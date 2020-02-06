@@ -98,32 +98,8 @@ func NewPoliciesServer(
 	if s.Failure(ctx) == nil {
 		l.Warn("cleaned up in-progress migration status")
 	}
-
-	// TODO can all the below go away?
-	// check migration status
-	ms, err := srv.store.MigrationStatus(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "retrieve migration status from storage")
-	}
-	var v api.Version
-	switch ms {
-	case storage.SuccessfulBeta1:
-		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
-	case storage.Successful:
-		// auto-upgrade a 2.0 installation to 2.1
-		_, err := srv.handleMinorUpgrade(ctx, ms, api.Flag_VERSION_2_1)
-		if err != nil {
-			return nil, errors.Wrap(err, "auto-upgrade a 2.0 installation to 2.1")
-		}
-		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
-	default:
-		v = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
-	}
-	srv.setVersionForInterceptorSwitch(v)
-
-	// now that the data is all set, attempt to feed it into OPA:
 	if err := srv.updateEngineStore(ctx); err != nil {
-		return nil, errors.Wrapf(err, "initialize engine storage (%v)", v)
+		return nil, errors.Wrapf(err, "initialize engine storage")
 	}
 
 	return srv, nil
@@ -526,64 +502,6 @@ func (s *policyServer) UpdateRole(
 /* * * * * * * * * * * * * * * * * *   MIGRATION   * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// MigrateToV2 sets the V2 store to its factory defaults and then migrates
-// any existing V1 policies.
-func (s *policyServer) MigrateToV2(ctx context.Context,
-	req *api.MigrateToV2Req) (*api.MigrateToV2Resp, error) {
-
-	return &api.MigrateToV2Resp{}, nil
-}
-
-func (s *policyServer) handleMinorUpgrade(ctx context.Context, ms storage.MigrationStatus, f api.Flag) (upgraded bool, err error) {
-	var version api.Version
-	upgraded = true
-	if f == api.Flag_VERSION_2_1 && ms == storage.Successful {
-		err = s.store.SuccessBeta1(ctx)
-		version = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
-	} else if f == api.Flag_VERSION_2_0 && ms == storage.SuccessfulBeta1 {
-		err = s.store.Success(ctx)
-		version = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
-	} else {
-		upgraded = false
-	}
-
-	if err != nil {
-		return false, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
-	}
-
-	if upgraded {
-		s.setVersionForInterceptorSwitch(version)
-	}
-	return upgraded, nil
-}
-
-// ResetToV1 will mark the migration status as "pristine", which means a
-// following MigrateToV2 call will be accepted.
-func (s *policyServer) ResetToV1(ctx context.Context,
-	req *api.ResetToV1Req) (*api.ResetToV1Resp, error) {
-
-	ms, err := s.store.MigrationStatus(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "retrieve migration status: %s", err.Error())
-	}
-	switch ms {
-	case storage.Pristine:
-		return nil, status.Error(codes.AlreadyExists, "already reset")
-	case storage.InProgress:
-		return nil, status.Error(codes.FailedPrecondition, "migration in progress")
-	case storage.Successful, storage.SuccessfulBeta1, storage.Failed:
-		err := s.store.Pristine(ctx)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
-		}
-	}
-	if err := s.store.Reset(ctx); err != nil {
-		return nil, status.Errorf(codes.Internal, "reset database state: %s", err.Error())
-	}
-	s.setVersionForInterceptorSwitch(api.Version{Major: api.Version_V1, Minor: api.Version_V0})
-	return &api.ResetToV1Resp{}, nil
-}
-
 // GetPolicyVersion returns the status of the data store.
 func (s *policyServer) GetPolicyVersion(ctx context.Context,
 	req *api.GetPolicyVersionReq) (*api.GetPolicyVersionResp, error) {
@@ -620,8 +538,6 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 			"/chef.automate.domain.authz.v2.Policies/CreatePolicy",
 			"/chef.automate.domain.authz.v2.Policies/DeletePolicy",
 			"/chef.automate.domain.authz.v2.Policies/UpdatePolicy",
-			"/chef.automate.domain.authz.v2.Policies/MigrateToV2",
-			"/chef.automate.domain.authz.v2.Policies/ResetToV1",
 			"/chef.automate.domain.authz.v2.Policies/CreateRole",
 			"/chef.automate.domain.authz.v2.Policies/DeleteRole",
 			"/chef.automate.domain.authz.v2.Policies/UpdateRole",

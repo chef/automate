@@ -35,9 +35,7 @@ type PoliciesServerMock struct {
 	ListPoliciesFunc             func(context.Context, *ListPoliciesReq) (*ListPoliciesResp, error)
 	GetPolicyFunc                func(context.Context, *GetPolicyReq) (*Policy, error)
 	UpdatePolicyFunc             func(context.Context, *UpdatePolicyReq) (*Policy, error)
-	MigrateToV2Func              func(context.Context, *MigrateToV2Req) (*MigrateToV2Resp, error)
 	GetPolicyVersionFunc         func(context.Context, *GetPolicyVersionReq) (*GetPolicyVersionResp, error)
-	ResetToV1Func                func(context.Context, *ResetToV1Req) (*ResetToV1Resp, error)
 	CreateRoleFunc               func(context.Context, *CreateRoleReq) (*Role, error)
 	ListRolesFunc                func(context.Context, *ListRolesReq) (*ListRolesResp, error)
 	GetRoleFunc                  func(context.Context, *GetRoleReq) (*Role, error)
@@ -121,18 +119,6 @@ func (m *PoliciesServerMock) UpdatePolicy(ctx context.Context, req *UpdatePolicy
 	return nil, status.Error(codes.Internal, "mock: 'UpdatePolicy' not implemented")
 }
 
-func (m *PoliciesServerMock) MigrateToV2(ctx context.Context, req *MigrateToV2Req) (*MigrateToV2Resp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.MigrateToV2Func; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'MigrateToV2' not implemented")
-}
-
 func (m *PoliciesServerMock) GetPolicyVersion(ctx context.Context, req *GetPolicyVersionReq) (*GetPolicyVersionResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
@@ -143,18 +129,6 @@ func (m *PoliciesServerMock) GetPolicyVersion(ctx context.Context, req *GetPolic
 		return f(ctx, req)
 	}
 	return nil, status.Error(codes.Internal, "mock: 'GetPolicyVersion' not implemented")
-}
-
-func (m *PoliciesServerMock) ResetToV1(ctx context.Context, req *ResetToV1Req) (*ResetToV1Resp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.ResetToV1Func; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'ResetToV1' not implemented")
 }
 
 func (m *PoliciesServerMock) CreateRole(ctx context.Context, req *CreateRoleReq) (*Role, error) {
@@ -273,9 +247,7 @@ func (m *PoliciesServerMock) Reset() {
 	m.ListPoliciesFunc = nil
 	m.GetPolicyFunc = nil
 	m.UpdatePolicyFunc = nil
-	m.MigrateToV2Func = nil
 	m.GetPolicyVersionFunc = nil
-	m.ResetToV1Func = nil
 	m.CreateRoleFunc = nil
 	m.ListRolesFunc = nil
 	m.GetRoleFunc = nil
