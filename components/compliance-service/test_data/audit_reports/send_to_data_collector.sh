@@ -64,4 +64,5 @@ send_to_automate '2018-02-09' $(past_date 0)
 send_to_automate '2018-03-05' $(past_date 2)
 
 send_to_automate '2018-03-04' $(past_date 3)
+send_to_automate '2018-04-01' $(past_date 4)
 send_to_automate '2018-02-09' $(past_date 9)
