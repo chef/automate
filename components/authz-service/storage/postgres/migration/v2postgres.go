@@ -100,7 +100,7 @@ func insertPolicyWithQuerier(ctx context.Context, inputPol *v2Policy, q *sql.Tx)
 
 func replacePolicyMembersWithQuerier(ctx context.Context, policyID string, members []v2Member,
 	q *sql.Tx) error {
-	// Cascading drop any existing members.
+	// Cascade delete any existing members.
 	_, err := q.ExecContext(ctx,
 		`DELETE FROM iam_policy_members WHERE policy_id=policy_db_id($1);`, policyID)
 	if err != nil {
@@ -131,7 +131,7 @@ func insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID string, 
 		return errors.Wrapf(err, "failed to upsert member %s", member.Name)
 	}
 
-	// For now, let's just ignore conflicts if someone is trying to add a user that is already a member.
+	// Ignore conflicts if someone is trying to add a user that is already a member.
 	_, err = q.ExecContext(ctx,
 		`INSERT INTO iam_policy_members (policy_id, member_id)
 			VALUES (policy_db_id($1), member_db_id($2)) ON CONFLICT DO NOTHING`, policyID, member.Name)
@@ -142,7 +142,6 @@ func associatePolicyWithProjects(ctx context.Context,
 	policyID string, inProjects []string,
 	q *sql.Tx) error {
 
-	// TODO this might be simplified as we modify how projects are assigned
 	// Drop any existing associations.
 	_, err := q.ExecContext(ctx,
 		"DELETE FROM iam_policy_projects WHERE policy_id=policy_db_id($1)", policyID)
@@ -269,7 +268,7 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 		return errors.Wrapf(err, "failed to upsert member %s", member.Name)
 	}
 
-	// For now, let's just ignore conflicts if someone is trying to add a user that is already a member.
+	// Ignore conflicts if someone is trying to add a user that is already a member.
 	_, err = q.ExecContext(ctx,
 		`INSERT INTO iam_policy_members (policy_id, member_id)
 			VALUES (policy_db_id($1), member_db_id($2)) ON CONFLICT DO NOTHING`, policyID, member.Name)

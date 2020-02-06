@@ -32,7 +32,7 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 	migrationsPath := c.Path
 	l := c.Logger
 	migrationsTable := ""
-	ctx := context.TODO()
+	ctx := context.Background()
 
 	l.Infof("Running db migrations from %q", migrationsPath)
 	purl, err := addMigrationsTable(pgURL, migrationsTable)
@@ -60,18 +60,6 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 		l.Infof("Current schema version: %v", version)
 	}
 
-	// TODO we want this to no run any migrations
-	// if we are already past the last pre-force-upgrade migration
-	// so confirm that behavior. otherwise need an if statement here.
-	// WE WILL NEED IF STATEMENT HERE
-	if version < PreForceUpgradeMigration {
-		err = m.Migrate(PreForceUpgradeMigration)
-		if err != nil && err != migrate.ErrNoChange {
-			return errors.Wrap(err, "migration up to IAM V2 force upgrade failed")
-		}
-	}
-
-	// TODO force upgrade
 	db, err := sql.Open("postgres", pgURL)
 	if err != nil {
 		return err
@@ -146,7 +134,6 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 	return errors.Wrap(err, "close migrations connection")
 }
 
-// TODO these were stolen from migrate.go
 func addMigrationsTable(u, table string) (string, error) {
 	pgURL, err := url.Parse(u)
 	if err != nil {
