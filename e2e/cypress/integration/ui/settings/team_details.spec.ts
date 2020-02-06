@@ -20,9 +20,9 @@ describe('team details', () => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminIdToken = admin.id_token;
 
+      // extra precaution in case the `after` cleanup didn't run due to a failure
       cy.cleanupUsersByNamePrefix(cypressPrefix);
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-      cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
+      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['teams', 'projects', 'policies']);
 
       cy.request({
         auth: { bearer: adminIdToken },
@@ -62,8 +62,8 @@ describe('team details', () => {
         method: 'POST',
         url: '/apis/iam/v2/teams',
         body: {
-          name: teamID,
-          description: teamName
+          id: teamID,
+          name: teamName
         }
       }).then((resp) => {
         cy.request({
@@ -90,7 +90,8 @@ describe('team details', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupUsersByNamePrefix(cypressPrefix);
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['teams', 'projects', 'policies']);
   });
 
   it('displays team details for admins team', () => {
