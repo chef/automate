@@ -172,8 +172,8 @@ CONF
   provisioner "remote-exec" {
     inline = [
       "set -e",
-      "sudo hab svc unload chef/chef-load",
-      "sudo hab svc unload chef/applications-load-gen",
+      "sudo hab svc unload chef/chef-load || true",
+      "sudo hab svc unload chef/applications-load-gen || true",
       "sudo mv /tmp/chef-load_logrotate.conf /etc/logrotate.d/chef-load",
       "sudo chown root:root /etc/logrotate.d/chef-load",
       "sudo rm -rf /opt/chef_load_sample_data",
