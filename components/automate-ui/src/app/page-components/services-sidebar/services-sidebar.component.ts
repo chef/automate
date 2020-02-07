@@ -33,7 +33,8 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public totalServices = 0;
   public RFC2822 = DateTime.RFC2822;
   public selectedSearchBarFilters = [];
-  public activeAccordions = []; // change to array of numbers
+  public activeErrorAccordions = []; // change to array of numbers
+  public activeHealthAccordions = []; // change to array of numbers
 
   public services$: Observable<GroupService[]>;
   public serviceGroupsStatus$: Observable<EntityStatus>;
@@ -118,11 +119,19 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-  public toggleMore(index: number) {
-    if (this.activeAccordions.includes(index)) {
-      this.activeAccordions = this.activeAccordions.filter(e => e !== index);
+  public toggleMoreErrorMsg(index: number) {
+    if (this.activeErrorAccordions.includes(index)) {
+      this.activeErrorAccordions = this.activeErrorAccordions.filter(n => n !== index);
     } else {
-      this.activeAccordions.push(index);
+      this.activeErrorAccordions.push(index);
+    }
+  }
+
+  public toggleMoreHealthMsg(index: number) {
+    if (this.activeHealthAccordions.includes(index)) {
+      this.activeHealthAccordions = this.activeHealthAccordions.filter(n => n !== index);
+    } else {
+      this.activeHealthAccordions.push(index);
     }
   }
 
