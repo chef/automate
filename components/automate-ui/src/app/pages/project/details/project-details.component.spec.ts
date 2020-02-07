@@ -97,7 +97,6 @@ describe('ProjectDetailsComponent', () => {
         MockComponent({ selector: 'chef-table-row' }),
         MockComponent({ selector: 'chef-table-header-cell' }),
         MockComponent({ selector: 'chef-table-cell' }),
-        MockComponent({ selector: 'ng-container', inputs: ['hidden'] }),
         MockComponent({ selector: 'input', inputs: ['resetOrigin'] }),
         ProjectDetailsComponent
       ],
