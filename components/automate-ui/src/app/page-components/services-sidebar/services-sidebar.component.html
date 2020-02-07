@@ -96,11 +96,13 @@
                 </div>
                 <div class="healthcheck-content" [class.active]="activeErrorAccordions.includes(i)">
                   {{service.health_check_result.stderr}}
+                  <div class="show-more-container">
+                    <button 
+                    *ngIf="service.health_check_result.stderr.length > 138"
+                    class="show-more-button"
+                    (click)="toggleMoreErrorMsg(i)">Show {{ activeErrorAccordions.includes(i) ? "Less" : "More"}}</button>
+                  </div>
                 </div>
-                <button 
-                *ngIf="service.health_check_result.stderr.length > 138"
-                class="show-more-button"
-                (click)="toggleMoreErrorMsg(i)">Show {{ activeErrorAccordions.includes(i) ? "Less" : "More"}}</button>
               </div>
               <div class="healthcheck-message" *ngIf="service.health_check_result.stdout !== ''">
                 <div class="healthcheck-header {{service.health_check}}">
@@ -108,11 +110,13 @@
                 </div>
                 <div class="healthcheck-content" [class.active]="activeHealthAccordions.includes(i)">
                   {{service.health_check_result.stdout}}
+                  <div class="show-more-container">
+                    <button 
+                    *ngIf="service.health_check_result.stdout.length > 138"
+                    class="show-more-button"
+                    (click)="toggleMoreHealthMsg(i)">Show {{ activeHealthAccordions.includes(i) ? "Less" : "More"}}</button>
+                  </div>
                 </div>
-                <button 
-                *ngIf="service.health_check_result.stdout.length > 138"
-                class="show-more-button"
-                (click)="toggleMoreHealthMsg(i)">Show {{ activeHealthAccordions.includes(i) ? "Less" : "More"}}</button>
               </div>
             </div>
           </div>
