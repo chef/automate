@@ -1,9 +1,9 @@
-package migration
+package legacy
 
 import (
 	"fmt"
 
-	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/constants/v2"
+	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 	"github.com/pkg/errors"
 )
 

@@ -1,4 +1,4 @@
-package migration
+package legacy
 
 import (
 	"context"
@@ -6,9 +6,46 @@ import (
 	"fmt"
 
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
+	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )
+
+func MigrateFromScratch(ctx context.Context, db *sql.DB) (onV2, isDirty bool, err error) {
+	var status string
+	row := db.QueryRowContext(ctx, `SELECT state FROM migration_status`)
+	err = row.Scan(&status)
+	if err != nil {
+		return false, false, err // shouldn't happen, migration initializes state
+	}
+	switch status {
+	case constants_v2.EnumPristine:
+		return true, false, nil
+	case constants_v2.EnumSuccessful:
+		return false, false, nil
+	case constants_v2.EnumSuccessfulBeta1:
+		return false, false, nil
+	case constants_v2.EnumInProgress:
+		return true, true, nil
+	case constants_v2.EnumFailed:
+		return true, true, nil
+	}
+	return false, false, fmt.Errorf("unexpected migration status: %q", status)
+}
+
+func ResetIAMDb(ctx context.Context, db *sql.DB) error {
+	if _, err := db.ExecContext(ctx,
+		`TRUNCATE TABLE iam_policies, iam_members, iam_roles, iam_projects CASCADE;`); err != nil {
+		return errors.Wrap(err, "truncate database")
+	}
+
+	return nil
+}
+
+func RecordMigrationStatus(ctx context.Context, ms string, db *sql.DB) error {
+	_, err := db.ExecContext(ctx, `UPDATE migration_status SET state=$1`, ms)
+	return err
+}
 
 func createRole(ctx context.Context, db *sql.DB, role *v2Role) error {
 	ctx, cancel := context.WithCancel(ctx)
@@ -273,40 +310,4 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 		`INSERT INTO iam_policy_members (policy_id, member_id)
 			VALUES (policy_db_id($1), member_db_id($2)) ON CONFLICT DO NOTHING`, policyID, member.Name)
 	return errors.Wrapf(err, "failed to upsert member link: member=%s, policy_id=%s", member.Name, policyID)
-}
-
-func recordMigrationStatus(ctx context.Context, ms string, db *sql.DB) error {
-	_, err := db.ExecContext(ctx, `UPDATE migration_status SET state=$1`, ms)
-	return err
-}
-
-func migrateFromScratch(ctx context.Context, db *sql.DB) (onV2, isDirty bool, err error) {
-	var status string
-	row := db.QueryRowContext(ctx, `SELECT state FROM migration_status`)
-	err = row.Scan(&status)
-	if err != nil {
-		return false, false, err // shouldn't happen, migration initializes state
-	}
-	switch status {
-	case enumPristine:
-		return true, false, nil
-	case enumSuccessful:
-		return false, false, nil
-	case enumSuccessfulBeta1:
-		return false, false, nil
-	case enumInProgress:
-		return true, true, nil
-	case enumFailed:
-		return true, true, nil
-	}
-	return false, false, fmt.Errorf("unexpected migration status: %q", status)
-}
-
-func resetIAMDb(ctx context.Context, db *sql.DB) error {
-	if _, err := db.ExecContext(ctx,
-		`TRUNCATE TABLE iam_policies, iam_members, iam_roles, iam_projects CASCADE;`); err != nil {
-		return errors.Wrap(err, "truncate database")
-	}
-
-	return nil
 }

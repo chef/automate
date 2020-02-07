@@ -1,4 +1,4 @@
-package migration
+package legacy
 
 import (
 	"context"
@@ -7,24 +7,13 @@ import (
 	"strings"
 
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	constants_v1 "github.com/chef/automate/components/authz-service/storage/postgres/migration/constants/v1"
-	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/constants/v2"
+	constants_v1 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v1"
+	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 	uuid "github.com/chef/automate/lib/uuid4"
 	"github.com/pkg/errors"
 )
 
-const (
-	enumPristine        = "init"
-	enumInProgress      = "in-progress"
-	enumSuccessful      = "successful"
-	enumSuccessfulBeta1 = "successful-beta1"
-	enumFailed          = "failed"
-)
-
-// migrateToV2 sets the V2 store to its factory defaults and then migrates
-// any existing V1 policies, unless the install is already on IAM v2.
-func migrateToV2(ctx context.Context, db *sql.DB) error {
-	recordMigrationStatus(ctx, enumInProgress, db)
+func MigrateToV2(ctx context.Context, db *sql.DB) error {
 	for _, role := range defaultRoles() {
 		if err := createRole(ctx, db, &role); err != nil {
 			return errors.Wrapf(err,

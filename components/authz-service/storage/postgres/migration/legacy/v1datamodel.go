@@ -1,9 +1,9 @@
-package migration
+package legacy
 
 import (
 	"time"
 
-	constants "github.com/chef/automate/components/authz-service/storage/postgres/migration/constants/v1"
+	constants "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v1"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 

@@ -1,4 +1,4 @@
-package migration
+package legacy
 
 import (
 	"context"

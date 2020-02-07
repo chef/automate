@@ -67,7 +67,7 @@ func NewGRPCServer(ctx context.Context,
 	vChan := make(chan api_v2.Version, 1)
 	switcher := v2.NewSwitch(vChan)
 
-	v1Server, err := v1.NewPostgresServer(ctx, l, e, migrationsConfig)
+	v1Server, err := v1.NewPostgresServer(ctx, l, e, migrationsConfig, dataMigrationsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v1 server")
 	}

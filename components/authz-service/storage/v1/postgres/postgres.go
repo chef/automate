@@ -66,10 +66,10 @@ func (m *policyMap) Scan(src interface{}) error {
 }
 
 // New instantiates the postgres IAM v1 storage backend.
-func New(ctx context.Context, l logger.Logger, migConf migration.Config) (storage.Storage, error) {
+func New(ctx context.Context, l logger.Logger, migConf migration.Config, dataMigConf datamigration.Config) (storage.Storage, error) {
 	l.Infof("applying database migrations from %s", migConf.Path)
 
-	db, err := postgres.New(ctx, migConf, datamigration.Config{})
+	db, err := postgres.New(ctx, migConf, dataMigConf)
 	if err != nil {
 		return nil, err
 	}

@@ -58,3 +58,11 @@ const (
 	AllProjectsExternalID = "*"
 	UnassignedProjectID   = "(unassigned)"
 )
+
+const (
+	EnumPristine        = "init"
+	EnumInProgress      = "in-progress"
+	EnumSuccessful      = "successful"
+	EnumSuccessfulBeta1 = "successful-beta1"
+	EnumFailed          = "failed"
+)

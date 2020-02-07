@@ -17,6 +17,7 @@ import (
 	"github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v1"
 	memstore_v1 "github.com/chef/automate/components/authz-service/storage/v1/memstore"
@@ -58,9 +59,10 @@ func NewPostgresServer(
 	ctx context.Context,
 	l logger.Logger,
 	e engine.V1Engine,
-	migrationsConfig migration.Config) (*Server, error) {
+	migrationsConfig migration.Config,
+	dataMigrationsConfig datamigration.Config) (*Server, error) {
 
-	p, err := postgres_v1.New(ctx, l, migrationsConfig)
+	p, err := postgres_v1.New(ctx, l, migrationsConfig, dataMigrationsConfig)
 	if err != nil {
 		return nil, errors.Wrapf(err, "init postgres for IAM v1")
 	}

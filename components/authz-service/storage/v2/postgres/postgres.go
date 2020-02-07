@@ -53,7 +53,7 @@ func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf m
 	once.Do(func() {
 		l.Infof("applying database migrations from %s", migConf.Path)
 		var db *sql.DB
-		db, err = postgres.New(ctx, migConf, dataMigConf)
+		db, err = postgres.New(ctx, migConf)
 		singletonInstance = &pg{
 			db:           db,
 			engine:       e,
