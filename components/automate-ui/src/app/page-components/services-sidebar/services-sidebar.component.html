@@ -98,7 +98,8 @@
                   {{service.health_check_result.stderr}}
                 </div>
                 <button 
-                *ngIf="service.health_check_result.stderr.length > 184"
+                *ngIf="service.health_check_result.stderr.length > 138"
+                class="show-more-button"
                 (click)="toggleMoreErrorMsg(i)">Show {{ activeErrorAccordions.includes(i) ? "Less" : "More"}}</button>
               </div>
               <div class="healthcheck-message" *ngIf="service.health_check_result.stdout !== ''">
@@ -109,7 +110,8 @@
                   {{service.health_check_result.stdout}}
                 </div>
                 <button 
-                *ngIf="service.health_check_result.stdout.length > 184" 
+                *ngIf="service.health_check_result.stdout.length > 138"
+                class="show-more-button"
                 (click)="toggleMoreHealthMsg(i)">Show {{ activeHealthAccordions.includes(i) ? "Less" : "More"}}</button>
               </div>
             </div>

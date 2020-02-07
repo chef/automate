@@ -33,8 +33,8 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public totalServices = 0;
   public RFC2822 = DateTime.RFC2822;
   public selectedSearchBarFilters = [];
-  public activeErrorAccordions = []; // change to array of numbers
-  public activeHealthAccordions = []; // change to array of numbers
+  public activeErrorAccordions: number[] = [];
+  public activeHealthAccordions: number[] = [];
 
   public services$: Observable<GroupService[]>;
   public serviceGroupsStatus$: Observable<EntityStatus>;
