@@ -337,24 +337,22 @@ Compliance reports must be using **audit cookbook 7.5+** in order to make use of
 
 Save the rule. If you later need to change the name or the conditions, select the project rule name on the project details page.
 
-You should see a message that says `Edits are pending: update projects to apply edits.` Select the `projects` link in the message to go back to the project list page.
+When edits are pending, a banner will be shown at the bottom of every page. Selecting the `Update Projects` button on that banner will apply those changes.
 
-On the project list page, the button `Update Projects` should be enabled since a new rule has been added to a project. You should also see `Edits pending` in the Ingest Rules column of `project-devops` in the projects table. Select `Update Projects` and confirm the action in the modal that pops up.
-
-![](/images/docs/update-projects-button.png)
+![](/images/docs/admin-projects.png)
 
 Updating a project begins an operation that applies all pending rule edits and then moves ingested resources into the correct projects according to those latest changes. An ingested resource is moved into a project if it matches at least one of the project's rules.
 In this example, upon successful update, all ingested resources whose Chef Organization matches `devops` will be considered a part of the project `project-devops`.
 Only these resources will appear in Automate's dashboards when the `project-devops` project has been selected in the global project filter.
 
-A percentage count appears in the `Update Projects` button while the operation takes place.
-You may cancel the update at any time by selecting `Stop Updating Projects` and confirming the cancel in the modal that pops up.
+A percentage count appears in the bottom banner while the operation takes place.
+You may cancel the update at any time by selecting the `Stop Project Update` button in the banner and confirming the cancel in the modal that pops up.
 
 {{% warning %}}
 Avoid stopping an update unless absolutely necessary. It will leave your system in an unknown state where only some resources have been moved into their projects while others still remain in old projects. Only another successful update will restore the system to an up-to-date state.
 {{% /warning %}}
 
-Once rules have been successfully applied, the update button will change to `Projects Up-to-Date` and be disabled until the next time there are *pending edits* to any project.
+Once rules have been successfully applied, the banner will be dismissed until the next time there are *pending edits* to any project.
 
 To verify that the ingested resources have been moved into the correct projects, select `project-devops` in the global projects filter, which is on the top navigation. The data in Automate filters by the selected `project-devops` project.
 In this example, the effect is revealed by navigating to the Compliance Reports' Nodes tab, which only features nodes that belong to the `devops` Chef Organization.
@@ -390,8 +388,8 @@ Setting the project rule `Resource Type` determines what condition attributes ar
 
 Rules of type `Node` can have conditions with attributes `Chef Organization`, `Chef Server`, `Environment`, `Chef Role`, `Chef Tag`, `Chef Policy Name`, `Chef Policy Group`.
 
-Navigate to the project list page once more. Select `Update Projects`. Upon completion of the update, you should be able to
-filter by `project-devops` across Automate's dashboards and see only the ingested data that you expect.
+Select the `Update Projects` button from the bottom banner. 
+Upon completion of the update, you should be able to filter by `project-devops` across Automate's dashboards and see only the ingested data that you expect.
 
 #### Effortless Infra Project
 
