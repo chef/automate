@@ -258,7 +258,7 @@ exceptions:
     - name: chef/automate-openjdk
       reason: Exception made by Chef Legal
     - name: core/nss-myhostname
-      reason: (dan) Plugin for nss/glibc, doesn't link to our software.
+      reason: Exception made by Chef Legal
 
   ruby:
     - name: highline
