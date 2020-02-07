@@ -34,6 +34,7 @@ applyPolyfills().then(() => {
       if (typeof callback !== 'function') {
         throw new TypeError(callback + ' is not a function');
       }
+      // tslint:disable-next-line
       let t = Object(this), len = t.length >>> 0, k = 0, value;
       if (arguments.length === 2) {
         value = arguments[1];
