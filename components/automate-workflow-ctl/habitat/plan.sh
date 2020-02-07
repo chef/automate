@@ -7,9 +7,8 @@ vendor_origin=${vendor_origin:-"chef"}
 
 pkg_deps=(
   core/coreutils
-  # https://github.com/chef/automate/issues/2733
-  core/ruby/2.5.7/20191025133938
-  core/bundler/1.17.3/20191025140337 # also pinned bc of 2733
+  core/ruby
+  core/bundler
   # NOTE(ssd) 2019-04-03: This dependency isn't needed, but we want to
   # make sure that this package always gets built whenever
   # automate-workflow-server gets built so we have to share all

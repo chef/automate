@@ -257,6 +257,8 @@ exceptions:
       reason: (sd) Binary use only. Already shipped in chef-server. Exception made by Chef Legal
     - name: chef/automate-openjdk
       reason: Exception made by Chef Legal
+    - name: core/nss-myhostname
+      reason: Exception made by Chef Legal
 
   ruby:
     - name: highline
