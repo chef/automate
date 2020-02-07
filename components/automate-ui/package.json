@@ -44,7 +44,7 @@
     "classlist.js": "^1.1.20150312",
     "core-js": "^3.6.4",
     "d3": "^5.15.0",
-    "diff2html": "^2.12.2",
+    "diff2html": "^3.0.0",
     "file-saver": "^2.0.2",
     "immutable": "^3.8.2",
     "jwt-decode": "^2.2.0",
