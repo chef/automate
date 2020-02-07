@@ -3,7 +3,7 @@ import { MockComponent } from 'ng2-mock-component';
 import { NO_ERRORS_SCHEMA } from '@angular/core';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
-
+import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ChefNotificationsComponent } from './notifications.component';
 
 describe('ChefNotificationsComponent', () => {
@@ -19,6 +19,9 @@ describe('ChefNotificationsComponent', () => {
       ],
       imports: [
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
+      ],
+      providers: [
+        FeatureFlagsService
       ],
       schemas: [
         NO_ERRORS_SCHEMA

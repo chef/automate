@@ -41,11 +41,6 @@ describe('project management', () => {
     cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
   });
 
-  it('has a disabled button when there are no rules', () => {
-    cy.get('app-project-list chef-button#update-start-button')
-      .contains('Projects Up-to-Date').should('have.attr', 'disabled');
-  });
-
   it('displays a list of projects', () => {
     cy.request({
       auth: { bearer: adminIdToken },

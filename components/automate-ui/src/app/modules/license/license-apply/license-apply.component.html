@@ -9,21 +9,21 @@
       -->
       <ng-container *ngIf="licenseApplyReason === 1">
         <div class="title">Welcome to Chef Automate!</div>
-        <div class="subtitle">Please enter your license key.</div>
+        <div class="subtitle">Enter your license key.</div>
       </ng-container>
 
       <ng-container *ngIf="licenseApplyReason === 2">
         <div class="title alert">
           <chef-icon>warning</chef-icon> Your Chef Automate license has expired. </div>
-        <div class="subtitle">Please
-          <a href="https://www.chef.io/contact-us/" target="_blank">contact us</a> to get a license. If you already have one, enter it now.
+        <div class="subtitle">
+          <a href="https://www.chef.io/contact-us/" target="_blank">Contact us</a> to get a license. If you already have one, enter it now.
         </div>
       </ng-container>
 
       <ng-container *ngIf="licenseApplyReason === 3">
         <h2 id="apply-license-label" class="title">Apply new Chef Automate license</h2>
         <div class="subtitle">
-          Please <a href="https://www.chef.io/contact-us/" target="_blank">contact us</a> to get a license.
+          <a href="https://www.chef.io/contact-us/" target="_blank">Contact us</a> to get a license.
           If you already have one, enter it now.
         </div>
       </ng-container>
@@ -31,15 +31,15 @@
       <div class="error-container">
         <chef-alert type="error" *ngIf="applyLicenseInternalError">
           <span>
-          Sorry, we're unable to apply this license. Please check your logs or
+          Sorry, we're unable to apply this license. Check your logs or
           contact <a href="https://www.chef.io/support/" target="_blank" class="error-msg">Chef support</a>.
           </span>
         </chef-alert>
         <chef-alert type="error" *ngIf="permissionDenied">
-          We're sorry, but you currently do not have permission to apply a license. Please contact an administrator for permission.
+          We're sorry, but you currently do not have permission to apply a license. Contact an administrator for permission.
         </chef-alert>
         <chef-alert type="error" *ngIf="badRequestReason">
-          Sorry but this license {{ badRequestReason }}. Please enter a valid license.
+          Sorry but this license {{ badRequestReason }}. Enter a valid license.
         </chef-alert>
       </div>
 
@@ -47,11 +47,12 @@
       <form class="apply" [formGroup]="applyForm" (ngSubmit)="onApplyLicenseFormSubmit()" novalidate>
         <chef-form-field>
           <label for="licenseKey">License Key *</label>
-          <textarea name="licenseKey" id="licenseKey" formControlName="licenseKey" cols="65" rows="10" autofocus placeholder="Enter license key here..."></textarea>
+          <textarea name="licenseKey" id="licenseKey" formControlName="licenseKey" cols="65" rows="10" autofocus></textarea>
           <chef-error *ngIf="applyForm.get('licenseKey').hasError('required') && applyForm.get('licenseKey').dirty">License key required</chef-error>
         </chef-form-field>
         <div class="button">
           <chef-button type="submit" primary [disabled]="!applyForm.valid || applyingLicense">Apply License</chef-button>
+          <chef-button tertiary (click)="logout()">Sign Out</chef-button>
         </div>
       </form>
       <div class="spinner-container">

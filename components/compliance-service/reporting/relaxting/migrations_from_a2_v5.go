@@ -12,28 +12,6 @@ import (
 const (
 	a2V5IndexPrefix    = "comp-5-"
 	a2V5SumIndexPrefix = a2V5IndexPrefix + "s-"
-	waiversFullScript  = `
-		def waived_total_zero = ['total': 0];
-		if (ctx._source['profiles'] != null) {
-			for (int i = 0; i < ctx._source.profiles.length; ++i) {
-				if (ctx._source.profiles[i] != null) {
-					if (ctx._source.profiles[i].controls != null ) {
-						for (int j = 0; j < ctx._source.profiles[i].controls.length; ++j) {
-							if (ctx._source.profiles[i].controls[j] != null ) {
-								ctx._source.profiles[i].controls[j].waived_str = "no"
-							}
-						}
-					}
-					if (ctx._source.profiles[i].controls_sums != null) {
-							ctx._source.profiles[i].controls_sums.waived = waived_total_zero;
-					}
-				}
-			}
-		}
-		if (ctx._source.controls_sums != null) {
-				ctx._source.controls_sums.waived = waived_total_zero;
-		}
-	`
 )
 
 // Migration adds

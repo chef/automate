@@ -172,8 +172,14 @@ CONF
   provisioner "remote-exec" {
     inline = [
       "set -e",
-      "sudo hab svc unload chef/chef-load || true",
-      "sudo hab svc unload chef/applications-load-gen || true",
+      "sudo HAB_LICENSE=accept hab svc unload chef/chef-load || true",
+      "sudo HAB_LICENSE=accept hab svc unload chef/applications-load-gen || true",
+      "for _ in {1..5} ; do if sudo hab sup status | grep -q chef-load; then echo \"waiting for chef-load to unload\" && sleep 5; fi; done",
+      "for _ in {1..5} ; do if sudo hab sup status | grep -q applications-load-gen; then echo \"waiting for applications-load-gen to unload\" && sleep 5; fi; done",
+      "sudo mv /bin/hab /bin/hab.old",
+      "sudo HAB_LICENSE=accept /bin/hab.old pkg install core/hab/${var.desired_hab_version} --binlink --force && sudo rm /bin/hab.old",
+      "sudo hab license accept",
+      "sudo hab pkg install core/hab-sup/${var.desired_hab_version}",
       "sudo mv /tmp/chef-load_logrotate.conf /etc/logrotate.d/chef-load",
       "sudo chown root:root /etc/logrotate.d/chef-load",
       "sudo rm -rf /opt/chef_load_sample_data",

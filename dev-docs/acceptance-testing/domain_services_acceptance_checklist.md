@@ -14,10 +14,16 @@ settings: (node integrations) a few integrations\ already created, (node credent
 ## what to test
 
 ### ensure latest audit cookbook + chef-client is compatible with this automate version
-1) ssh to acceptance and get token: 
+1) Generate a token:
 
-`ssh your-ad-user@a2-local-inplace-upgrade-acceptance.cd.chef.co`
-`sudo chef-automate admin-token`
+    * Either ssh to acceptance and get token:
+
+    ```
+    ssh your-ad-user@a2-local-inplace-upgrade-acceptance.cd.chef.co
+    sudo chef-automate admin-token
+    ```
+
+    * Or [Use the Automate UI](https://github.com/chef/automate/blob/master/components/compliance-service/smokin/README.md#generating-a-token)
 
 2) run test-kitchen with latest audit cookbook + chef infra
 

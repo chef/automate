@@ -612,6 +612,7 @@ func getInspecControls(profile []byte) []*inspecEvent.Control {
 				Code:           getStringIfExists("code", control),
 				Desc:           getStringIfExists("desc", control),
 				SourceLocation: getInspecSourceLocation(control),
+				WaiverData:     getInspecControlWaiverData(control),
 				Refs:           getStructArray("refs", control),
 				Tags:           getStructIfExists("tags", control),
 				Results:        getInspecResults(control),
@@ -653,6 +654,21 @@ func getInspecSourceLocation(control []byte) *inspecEvent.SourceLocation {
 		}
 	}
 	return inspecSourceLocation
+}
+
+func getInspecControlWaiverData(control []byte) *inspecEvent.WaiverData {
+	var dataToReturn *inspecEvent.WaiverData
+	sourceLocationBytes, _, _, err := jsonparser.Get(control, "waiver_data")
+	if err == nil {
+		dataToReturn = &inspecEvent.WaiverData{
+			ExpirationDate:     getStringIfExists("expiration_date", sourceLocationBytes),
+			Justification:      getStringIfExists("justification", sourceLocationBytes),
+			Run:                getBoolIfExists("run", sourceLocationBytes),
+			SkippedDueToWaiver: getBoolIfExists("skipped_due_to_waiver", sourceLocationBytes),
+			Message:            getStringIfExists("message", sourceLocationBytes),
+		}
+	}
+	return dataToReturn
 }
 
 func getStructArray(fieldName string, body []byte) []*structpb.Struct {

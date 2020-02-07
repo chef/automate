@@ -1,8 +1,8 @@
 import { Component, EventEmitter, OnInit, OnDestroy } from '@angular/core';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
-import { interval as observableInterval,  Observable, Subject, combineLatest } from 'rxjs';
-import { map, takeUntil, filter, take } from 'rxjs/operators';
+import { Observable, Subject, combineLatest } from 'rxjs';
+import { map, takeUntil, filter } from 'rxjs/operators';
 import { isNil } from 'lodash/fp';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -18,7 +18,6 @@ import {
 } from 'app/entities/projects/project.selectors';
 import { GetProjects, CreateProject, DeleteProject  } from 'app/entities/projects/project.actions';
 import { Project } from 'app/entities/projects/project.model';
-import { ApplyRulesStatus, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import { LoadOptions } from 'app/services/projects-filter/projects-filter.actions';
 import { ChefKeyboardEvent } from 'app/types/material-types';
 
@@ -36,26 +35,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
   public createProjectForm: FormGroup;
   public creatingProject = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
-  public confirmApplyStartModalVisible = false;
-  public confirmApplyStopModalVisible = false;
-
-  // This flag governs filling the above cache.
-  // The state returned by this.projects.applyRulesStatus$ (Running, NotRunning)
-  // is not available soon enough--we need to know the instant the user starts the update.
-  private applyRulesInProgress = false;
-
-  // True if there are any rules that have a status of 'EDITS_PENDING'.
-  private projectsHaveStagedChanges = false;
-
-  private percentageComplete = 0;
-
-  private updateProjectsFailed = false;
-  private updateProjectsCancelled = false;
-  public cancelRulesInProgress = false;
-
-  public applyRulesButtonText$: Observable<string>;
-  public ApplyRulesStatusState = ApplyRulesStatusState;
-
   private isDestroyed = new Subject<boolean>();
 
   public statusLabel: Record<ProjectStatus, string> = {
@@ -92,28 +71,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     );
     this.sortedProjects$ = this.store.select(allProjects).pipe(
       map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name')));
-
-    this.projects.applyRulesStatus$
-      .pipe(takeUntil(this.isDestroyed))
-      .subscribe(({ state, failed, cancelled, percentageComplete }: ApplyRulesStatus) => {
-        if (this.applyRulesInProgress && state === ApplyRulesStatusState.NotRunning) {
-          this.cancelRulesInProgress = false;
-          this.percentageComplete = 0;
-          this.closeConfirmApplyStopModal();
-        }
-        this.applyRulesInProgress = state === ApplyRulesStatusState.Running;
-        this.updateProjectsFailed = failed;
-        this.updateProjectsCancelled = cancelled;
-        if (!this.cancelRulesInProgress && state === ApplyRulesStatusState.Running) {
-          this.percentageComplete = percentageComplete;
-        }
-      });
-
-    this.store.select(allProjects).pipe(
-      takeUntil(this.isDestroyed)
-    ).subscribe((projectList: Project[]) => {
-      this.projectsHaveStagedChanges = projectList.some(p => p.status === 'EDITS_PENDING');
-    });
 
     // handle project creation success response
     this.store.pipe(
@@ -202,71 +159,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     this.creatingProject = false;
     this.createProjectForm.reset();
     this.conflictErrorEvent.emit(false);
-  }
-
-  public openConfirmUpdateStartModal(): void {
-    this.confirmApplyStartModalVisible = true;
-  }
-
-  private closeConfirmApplyStartModal(): void {
-    this.confirmApplyStartModalVisible = false;
-  }
-
-  public confirmApplyStart(): void {
-    this.closeConfirmApplyStartModal();
-    this.projects.applyRulesStart();
-    this.applyRulesInProgress = true;
-
-    // Rapid sampling for 3 seconds for more responsive UX.
-    // If the update is still running, the secondary (active) emitter
-    // will check this status at frequent intervals.
-    // Once the update completes, the tertiary (dormant) emitter
-    // will check this status at INfrequent intervals.
-    // (See getActiveApplyRulesStatus$ and getDormantApplyRulesStatus$.)
-    observableInterval(250).pipe(take(12)) // 12 x 250ms => 3 seconds
-      .subscribe(() => {
-        this.projects.getApplyRulesStatus();
-      });
-  }
-
-  public cancelApplyStart(): void {
-    this.closeConfirmApplyStartModal();
-  }
-
-  public openConfirmUpdateStopModal(): void {
-    this.confirmApplyStopModalVisible = true;
-  }
-
-  private closeConfirmApplyStopModal(): void {
-    this.confirmApplyStopModalVisible = false;
-  }
-
-  public confirmApplyStop(): void {
-    this.cancelRulesInProgress = true;
-    this.projects.applyRulesStop();
-  }
-
-  public cancelApplyStop(): void {
-    this.closeConfirmApplyStopModal();
-  }
-
-  public getButtonText(): string {
-    if (this.applyRulesInProgress) {
-      return `Updating Projects ${Math.round(this.percentageComplete * 100)}%...`;
-    }
-    if (this.projectsHaveStagedChanges
-      || this.updateProjectsCancelled
-      || this.updateProjectsFailed) {
-      return 'Update Projects';
-    }
-    return 'Projects Up-to-Date';
-  }
-
-  public isDisabled(): boolean {
-    return this.applyRulesInProgress ||
-      (!this.projectsHaveStagedChanges
-        && !this.updateProjectsCancelled
-        && !this.updateProjectsFailed);
   }
 
 }

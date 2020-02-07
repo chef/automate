@@ -59,7 +59,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 5
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived" => {}
                 }
             },
             {
@@ -81,7 +82,8 @@ describe File.basename(__FILE__) do
                     "failed" => {
                         "total" => 1,
                         "critical" => 1
-                    }
+                    },
+                    "waived" => {}
                 }
             }
         ]
@@ -121,7 +123,8 @@ describe File.basename(__FILE__) do
                         "total" => 1
                     },
                     "skipped" => {},
-                    "failed" => {}
+                    "failed" => {},
+                    "waived" => {}
                 }
             },
             {
@@ -140,7 +143,8 @@ describe File.basename(__FILE__) do
                         "total" => 1
                     },
                     "skipped" => {},
-                    "failed" => {}
+                    "failed" => {},
+                    "waived" => {}
                 }
             }
         ]
@@ -178,7 +182,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 5
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived" => {}
                 }
             },
             {
@@ -197,7 +202,8 @@ describe File.basename(__FILE__) do
                     "skipped" => {
                         "total" => 4
                     },
-                    "failed" => {}
+                    "failed" => {},
+                    "waived" => {}
                 }
             }
         ]
@@ -237,7 +243,8 @@ describe File.basename(__FILE__) do
                     "failed" => {
                         "total" => 1,
                         "critical" => 1
-                    }
+                    },
+                    "waived" => {}
                 }
             },
             {
@@ -257,7 +264,8 @@ describe File.basename(__FILE__) do
                     "failed" => {
                         "total" => 2,
                         "critical" => 2
-                    }
+                    },
+                    "waived" => {}
                 }
             }
         ]
@@ -297,7 +305,8 @@ describe File.basename(__FILE__) do
                     "failed" => {
                         "total" => 1,
                         "critical" => 1
-                    }
+                    },
+                    "waived" => {}
                 }
             }
         ]
@@ -335,11 +344,53 @@ describe File.basename(__FILE__) do
                         "skipped" => {
                             "total" => 1
                         },
-                        "failed" => {}
+                        "failed" => {},
+                        "waived" => {}
                     }
                 }
             ]
     }
+    assert_equal_json_content(expected_data, actual_data)
+  end
+
+
+  it "control list items with a size of 4 filtered by control_tag" do
+    actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
+        filters: [
+            Reporting::ListFilter.new(type: 'start_time', values: ['2018-03-01T23:59:59Z']),
+            Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z']),
+            Reporting::ListFilter.new(type: "control", values: ["pro1-con3"]),
+
+        ],
+        size: 4
+    )
+    expected_data = {
+        "controlItems" =>
+            [
+                {
+                    "id" => "pro1-con3",
+                    "title" => "Profile 1 - Control 3",
+                    "profile" => {
+                        "title" => "My Profile 1 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                        "version" => "1.0.1"
+                    },
+                    "impact" => 1,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {
+                            "total" => 1,
+                            "critical" => 1
+                        },
+                        "waived" => {}
+                    }
+                }
+            ]
+    }
+
     assert_equal_json_content(expected_data, actual_data)
   end
 
@@ -355,5 +406,215 @@ describe File.basename(__FILE__) do
     )
     control_item_array = actual_data['control_items']
     assert_equal(14, control_item_array.size)
+  end
+
+  it "control list items with a size of 2" do
+    actual_data = GRPC reporting, :list_control_items, Reporting::ControlItemRequest.new(
+        filters: [
+            Reporting::ListFilter.new(type: 'start_time', values: ['2017-04-01T00:00:00Z']),
+            Reporting::ListFilter.new(type: 'end_time', values: ['2018-04-01T23:59:59Z'])
+        ],
+        size: 10
+    )
+
+    expected_data = {
+        "controlItems" =>
+            [
+                {
+                    "id" => "pro1-con1",
+                    "title" => "Profile 1 - Control 1",
+                    "profile" => {
+                        "title" => "My Profile 1 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                        "version" => "1.0.1"
+                    },
+                    "impact" => 0.80000001,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {},
+                        "waived" => {
+                            "total" => 1
+                        }
+                    },
+                    "waivers" =>
+                        [{"waivedStr" => "yes_run",
+                          "justification" => "Sound reasoning",
+                          "waiverSummary" =>
+                              {
+                                  "passed" => {},
+                                  "skipped" => {},
+                                  "failed" => {
+                                      "total" => 1
+                                  },
+                                  "waived" => {
+                                      "total" => 1
+                                  }
+                              }
+                         }
+                        ]
+                },
+                {
+                    "id" => "pro1-con2",
+                    "title" => "Profile 1 - Control 2",
+                    "profile" => {
+                        "title" => "My Profile 1 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                        "version" => "1.0.1"
+                    },
+                    "impact" => 0.89999998,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {},
+                        "waived" => {
+                            "total" => 1
+                        }
+                    },
+                    "waivers" =>
+                        [
+                            {
+                                "waivedStr" => "yes_run",
+                                "justification" => "Sheer cleverness",
+                                "waiverSummary" =>
+                                    {
+                                        "passed" => {},
+                                        "skipped" => {
+                                            "total" => 1
+                                        },
+                                        "failed" => {},
+                                        "waived" => {
+                                            "total" => 1
+                                        }
+                                    }
+                            }
+                        ]
+                },
+                {
+                    "id" => "pro1-con3",
+                    "title" => "Profile 1 - Control 3",
+                    "profile" => {
+                        "title" => "My Profile 1 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                        "version" => "1.0.1"
+                    },
+                    "impact" => 1,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {
+                            "total" => 1,
+                            "critical" => 1
+                        },
+                        "waived" => {}
+                    }
+                },
+                {
+                    "id" => "pro1-con4",
+                    "title" => "Profile 1 - Control 4",
+                    "profile" => {
+                        "title" => "My Profile 1 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                        "version" => "1.0.1"
+                    },
+                    "impact" => 0.89999998,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {},
+                        "waived" => {
+                            "total" => 1
+                        }
+                    },
+                    "waivers" =>
+                        [
+                            {
+                                "waivedStr" => "yes",
+                                "expirationDate" => "2025-06-01",
+                                "justification" => "Whimsy",
+                                "waiverSummary" =>
+                                    {
+                                        "passed" => {},
+                                        "skipped" => {
+                                            "total" => 1
+                                        },
+                                        "failed" => {},
+                                        "waived" => {
+                                            "total" => 1
+                                        }
+                                    }
+                            }
+                        ]
+                },
+                {
+                    "id" => "pro1-con5",
+                    "title" => "Profile 1 - Control 5",
+                    "profile" => {
+                        "title" => "My Profile 1 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea4",
+                        "version" => "1.0.1"
+                    },
+                    "impact" => 0.89999998,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 1,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {
+                            "total" => 1,
+                            "critical" => 1
+                        },
+                        "waived" => {}
+                    }
+                },
+                {
+                    "id" => "pro2-con1",
+                    "title" => "Profile 2 - Control 1",
+                    "profile" => {
+                        "title" => "My Profile 2 title",
+                        "id" => "447542ecfb8a8800ed0146039da3af8fed047f575f6037cfba75f3b664a97ea5",
+                        "version" => "1.0.5"
+                    },
+                    "impact" => 0.80000001,
+                    "endTime" => "2018-04-01T10:18:41Z",
+                    "controlSummary" => {
+                        "total" => 2,
+                        "passed" => {},
+                        "skipped" => {},
+                        "failed" => {},
+                        "waived" => {
+                            "total" => 2
+                        }
+                    },
+                    "waivers" =>
+                        [
+                            {
+                                "waivedStr" => "yes_run",
+                                "justification" => "Sound reasoning",
+                                "waiverSummary" =>
+                                    {
+                                        "passed" => {},
+                                        "skipped" => {},
+                                        "failed" => {
+                                            "total" => 2
+                                        },
+                                        "waived" => {
+                                            "total" => 2
+                                        }
+                                    }
+                            }
+                        ]
+                }
+            ]
+    }
+    assert_equal_json_content(expected_data, actual_data)
   end
 end

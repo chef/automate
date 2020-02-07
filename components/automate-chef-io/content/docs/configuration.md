@@ -123,16 +123,17 @@ Currently you cannot apply a license after your initial deployment by patching t
 
 You can configure Chef Automate to use a proxy either by setting environment variables, or by setting configuration options.
 
-Chef Automate respects the proxy environment variables:
+The command `chef-automate deploy` without a configuration file will respect the proxy environment variables:
 
 * `HTTPS_PROXY`/`https_proxy`
 * `HTTP_PROXY`/`http_proxy`
 * `NO_PROXY`/`no_proxy` (See [Required Sites and Domains]({{< relref "#required-sites-and-domains" >}}).)
 
 Setting these environment variables prior to initial deployment of Chef Automate
-adds them to the configuration.
+adds them to the configuration that Chef Automate generates.
 
-To set a proxy by editing a configuration file, create a TOML file that contains the partial configuration:
+If you provide a configuration file during deployment (`chef-automate deploy
+/path/to/config.toml`), you must specify any proxy settings in that configuration file.
 
 ```toml
 [global.v1.proxy]
@@ -143,6 +144,8 @@ no_proxy = ["0.0.0.0", "127.0.0.1"]
 # password = "<your proxy password>"
 ```
 
+To patch the proxy settings, create a TOML file that contains the `[global.v1.proxy]`
+section and settings.
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ##### Required Sites and Domains

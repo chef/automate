@@ -1,52 +1,86 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
+import { Observable, Subject } from 'rxjs';
 
 import { LayoutSidebarService } from './layout-sidebar.service';
-import { notificationState } from 'app/entities/notifications/notification.selectors';
-import { Notification, Type } from 'app/entities/notifications/notification.model';
-
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';
 import { sidebarMenuGroups, showPageLoading } from './layout.selectors';
 import { ShowPageLoading, UpdateSidebarMenuGroups } from './layout.actions';
 
+import { GetProjects } from 'app/entities/projects/project.actions';
+
 // Important! These must match components/automate-ui/src/styles/_variables.scss
 enum Height {
-  Navigation = '70px',
-  Banner = '110px'
+  Navigation = 70,
+  License = 39,
+  ProcessProgressBar = 48,
+  PendingEditsBar = 36
 }
 
 @Injectable({
   providedIn: 'root'
 })
-export class LayoutFacadeService {
-  headerHeight = '70px';
-  contentHeight = `calc(100% - ${this.headerHeight})`;
-  menuGroups$: Observable<MenuItemGroup[]>;
-  showPageLoading$: Observable<boolean>;
-  showLicenseNotification = false;
-  showHeader = true;
-  showSidebar = true;
+export class LayoutFacadeService implements OnDestroy {
+  public layout = {
+    header: {
+      display: true,
+      license: false,
+      navigation: true
+    },
+    sidebar: {
+      display: true,
+      navigation: true
+    },
+    userNotifications: {
+      display: true,
+      pendingEdits: false,
+      updatesProcessing: false
+    }
+  };
+  public contentHeight = `calc(100% - ${Height.Navigation}px)`;
+  public menuGroups$: Observable<MenuItemGroup[]>;
+  public showPageLoading$: Observable<boolean>;
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<fromLayout.LayoutEntityState>,
     private layoutSidebarService: LayoutSidebarService
   ) {
+    this.store.dispatch(new GetProjects());
     this.menuGroups$ = store.select(sidebarMenuGroups);
     this.showPageLoading$ = store.select(showPageLoading);
+    this.updateDisplay();
+  }
 
-    store.select(notificationState).subscribe(
-      (notifications: Notification[]) => {
-        this.showLicenseNotification =
-          notifications &&  notifications.some(n => n.type === Type.license);
-        this.updateContentHeight(
-          this.showLicenseNotification ? Height.Banner : Height.Navigation);
-      });
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
+  }
+
+  getContentStyle() {
+    return { 'height': this.contentHeight };
+  }
+
+  updateDisplay() {
+    let combinedHeights = 0;
+    if (this.layout.header.navigation) {
+      combinedHeights += Height.Navigation;
+    }
+    if (this.layout.header.license) {
+      combinedHeights += Height.License;
+    }
+    if (this.layout.userNotifications.pendingEdits) {
+      combinedHeights += Height.PendingEditsBar;
+    }
+    if (this.layout.userNotifications.updatesProcessing) {
+      combinedHeights += Height.ProcessProgressBar;
+    }
+    this.contentHeight = `calc(100vh - ${combinedHeights}px)`;
   }
 
   hasGlobalNotifications(): boolean {
-    return this.headerHeight === Height.Banner;
+    return this.layout.sidebar.navigation = true;
   }
 
   ShowPageLoading(showLoading: boolean): void {
@@ -54,20 +88,17 @@ export class LayoutFacadeService {
   }
 
   showFullPage(): void {
-    this.contentHeight = '100%';
-    this.showSidebar = false;
-    this.showHeader = false;
+    this.contentHeight = '100vh';
+    this.layout.header.display = false;
+    this.layout.sidebar.display = false;
+    this.layout.userNotifications.display = false;
   }
 
   hideFullPage(): void {
-    this.updateContentHeight(this.headerHeight);
-    this.showSidebar = true;
-    this.showHeader = true;
-  }
-
-  private updateContentHeight(height: string): void {
-    this.headerHeight = height;
-    this.contentHeight = `calc(100% - ${this.headerHeight})`;
+    this.updateDisplay();
+    this.layout.header.display = true;
+    this.layout.sidebar.display = true;
+    this.layout.userNotifications.display = true;
   }
 
   showDashboardsSidebar(): void {

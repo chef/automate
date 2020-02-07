@@ -282,7 +282,7 @@ var ComplianceRepDate = Mapping{
                   "type": "object",
                   "properties": {
                     "expiration_date": {
-                      "type": "text"
+                      "type": "keyword"
                     },
                     "justification": {
                       "type": "keyword"
