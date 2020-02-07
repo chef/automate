@@ -218,6 +218,7 @@ chef-alert {
     max-height: 74px;
     overflow: hidden;
     transition: .35s max-height;
+
     &.active {
       max-height: 1000px; // temp placeholder
     }
