@@ -30,6 +30,8 @@ const (
 
 // Migrate executes all migrations we have
 func (c *Config) Migrate(dataMigConf datamigration.Config) error {
+	c.Logger.Warn("DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG: INIT")
+
 	pgURL := c.PGURL.String()
 	migrationsPath := c.Path
 	l := c.Logger
@@ -83,6 +85,7 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve migration_status")
 	}
+	c.Logger.Warnf("DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG: ABOUT TO MIGRATE %t", notOnV2)
 
 	if notOnV2 {
 		if isDirty {
@@ -96,23 +99,27 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 			}
 		}
 
+		c.Logger.Warn("DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG: IN PROGRESS")
 		err = legacy.RecordMigrationStatus(ctx, constants_v2.EnumInProgress, db)
 		if err != nil {
 			return errors.Wrapf(err, "failed to set IAM v2 migration_status to %s", constants_v2.EnumInProgress)
 		}
 		err = legacy.MigrateToV2(ctx, db)
 		if err != nil {
+			c.Logger.Warn("DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG: FAILED")
 			statusErr := legacy.RecordMigrationStatus(ctx, constants_v2.EnumFailed, db)
-			if err != nil {
+			if statusErr != nil {
 				return errors.Wrapf(statusErr, "failed to set IAM v2 migration_status to %s:%s", constants_v2.EnumFailed, err.Error())
 			}
 			return errors.Wrap(err, "IAM v2 force-upgrade failed")
 		}
+		c.Logger.Warn("DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG: SUCCESS")
 		err = legacy.RecordMigrationStatus(ctx, constants_v2.EnumSuccessful, db)
 		if err != nil {
 			return errors.Wrapf(err, "failed to set IAM v2 migration_status to %s", constants_v2.EnumSuccessful)
 		}
 	}
+	c.Logger.Warn("DEBUG DEBUG DEBUG DEBUG DEBUG DEBUG: POST MIGRATION")
 
 	// idempotent
 	err = dataMigConf.Migrate()

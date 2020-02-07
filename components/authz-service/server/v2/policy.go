@@ -93,11 +93,6 @@ func NewPoliciesServer(
 		policyRefresher: pr,
 	}
 
-	// If we *could* transition to failure, it means we had an in-progress state
-	// on service startup.
-	if s.Failure(ctx) == nil {
-		l.Warn("cleaned up in-progress migration status")
-	}
 	if err := srv.updateEngineStore(ctx); err != nil {
 		return nil, errors.Wrapf(err, "initialize engine storage")
 	}

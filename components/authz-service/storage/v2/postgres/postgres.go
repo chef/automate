@@ -53,7 +53,7 @@ func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf m
 	once.Do(func() {
 		l.Infof("applying database migrations from %s", migConf.Path)
 		var db *sql.DB
-		db, err = postgres.New(ctx, migConf)
+		db, err = postgres.New(ctx, migConf, dataMigConf)
 		singletonInstance = &pg{
 			db:           db,
 			engine:       e,
@@ -1887,8 +1887,8 @@ func (p *pg) recordMigrationStatus(ctx context.Context, ms string) error {
 }
 
 func (p *pg) recordMigrationStatusWithQuerier(ctx context.Context, ms string, q Querier) error {
-	_, err := q.ExecContext(ctx, `UPDATE migration_status SET state=$1`, ms)
-	return err
+	p.logger.Warn("BEGONE FOUL CODE")
+	return nil
 }
 
 func (p *pg) processError(err error) error {
