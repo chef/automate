@@ -215,6 +215,11 @@ chef-alert {
     color: var(--chef-white);
     padding: 8px;
     overflow-wrap: break-word;
+    max-height: 90px;
+    overflow: hidden;
+    &.active {
+      max-height: unset;
+    }
   }
 
   .health-line {

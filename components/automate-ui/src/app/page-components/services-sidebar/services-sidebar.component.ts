@@ -33,6 +33,7 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public totalServices = 0;
   public RFC2822 = DateTime.RFC2822;
   public selectedSearchBarFilters = [];
+  public activeAccordions = []; // change to array of numbers
 
   public services$: Observable<GroupService[]>;
   public serviceGroupsStatus$: Observable<EntityStatus>;
@@ -114,6 +115,14 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
 
       this.store.dispatch(new UpdateSelectedSG(paramsForDispatch));
       document.querySelector<HTMLElement>('app-services-sidebar').focus();
+    }
+  }
+
+  public toggleMore(index: number) {
+    if (this.activeAccordions.includes(index)) {
+      this.activeAccordions = this.activeAccordions.filter(e => e !== index);
+    } else {
+      this.activeAccordions.push(index);
     }
   }
 
