@@ -68,7 +68,6 @@ func (srv *PGProfileServer) migrateDiskProfiles() error {
 			_, err = srv.storeProfile(namespace, tmpFile)
 			if err != nil {
 				logrus.WithError(err).Errorf("Could not store profile %q", profile)
-				finalError = multierr.Combine(finalError, err)
 			} else {
 				// archive profile, so that we do not import it during next bootup
 				err := market.Archive(srv.profiles.ProfilesPath, namespace, profile)
