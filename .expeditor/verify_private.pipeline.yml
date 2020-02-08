@@ -424,7 +424,33 @@ steps:
 
   - label: "iam v2"
     command:
-      - integration/run_test integration/tests/iam_v2.sh
+      - integration/run_test integration/tests/iam_v2_no_legacy_policies.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
+  - label: "iam v1 force-upgrade to v2"
+    command:
+      - integration/run_test integration/tests/iam_v1_force_upgrade_to_v2.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
+  - label: "iam v2 (v2 only, diagnostics)"
+    command:
+      - integration/run_test integration/tests/iam_v2_upgrade_diagnostics.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
