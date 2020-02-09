@@ -8,7 +8,7 @@ END {
   }
 }
 
-collecting && $0 ~ /chef.automate.api.iam.policy\).action *= *".*"/ {
+collecting && (($0 ~ /chef.automate.api.iam.policy\).action[[:space:]]*=[[:space:]]*".*"/) || (optionFound && $0 ~ /^[[:space:]]*action:[[:space:]]*".*"/)) {
   print ""
   print "  Authorization Action:"
   print ""
@@ -18,9 +18,15 @@ collecting && $0 ~ /chef.automate.api.iam.policy\).action *= *".*"/ {
 
   for (i = 1; i < collecting; i++) print buffer[i]
   collecting = 0
+  optionFound = 0
 }
 
-/^ *\*\// {
+collecting && $0 ~ /chef.automate.api.iam.policy\)[[:space:]]*=/ {
+  print "found it" > "/dev/stderr"
+  optionFound = 1
+}
+
+/^[[:space:]]*\*\// {
   if (collecting) {
     for (i = 1; i < collecting; i++) print buffer[i]
   }
