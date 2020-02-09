@@ -45,3 +45,16 @@ collecting {
 function emptyBuffer(){
   for (i = 1; i < collecting; i++) print buffer[i]
 }
+
+# Define shell function to run this awk script for one file, sitting in automate root directory:
+#   doc_action() { awk -f ./scripts/add_action_doc_to_proto.awk $1 > data.tmp && mv data.tmp $1 ; }
+#   export -f doc_action
+#
+# Run for all proto files that HAVE endpoints and doc-comments, but have NOT been previously annotated:
+#   grep --include=\*.proto -rwl rpc . | xargs grep -l '\*\/' | xargs grep -L "Authorization Action" | xargs -t -n1 -P1 bash -c 'doc_action "$@"' _
+#
+# Next, need to update *.pb.go, *_swagger.json, and *.pb.swagger.go (in hab studio):
+#   with `compile_go_protobuf_component automate-gateway` or `compile_go_protobuf_component api`
+#
+# Finally, update *.swagger.json in automate-chef-io/data/docs/api_chef_automate (in automate-chef-io dir):
+#    make sync_swagger_files
