@@ -1,9 +1,10 @@
 BEGIN {
+  # Changing field separator to be able to easily grab action as 2nd field ($2 below)
   FS = "\""
 }
 
 END {
-  if (collecting) emptyBuffer()
+  if (collecting) replayBuffer()
 }
 
 collecting && (($0 ~ /chef.automate.api.iam.policy\).action[[:space:]]*=[[:space:]]*".*"/) || (optionFound && $0 ~ /^[[:space:]]*action:[[:space:]]*".*"/)) {
@@ -15,7 +16,7 @@ collecting && (($0 ~ /chef.automate.api.iam.policy\).action[[:space:]]*=[[:space
   print whitespace"```"
   print whitespace$2
   print whitespace"```"
-  emptyBuffer()
+  replayBuffer()
 
   # reset for next pass
   collecting = 0
@@ -29,7 +30,7 @@ collecting && $0 ~ /chef.automate.api.iam.policy\)[[:space:]]*=/ {
 
 # A closing comment is the trigger to start collecting
 /^[[:space:]]*\*\// {
-  if (collecting) emptyBuffer()
+  if (collecting) replayBuffer()
   useTab = $0 ~ /^\t/
   collecting = 1
 }
@@ -42,7 +43,7 @@ collecting {
   print
 }
 
-function emptyBuffer(){
+function replayBuffer(){
   for (i = 1; i < collecting; i++) print buffer[i]
 }
 
