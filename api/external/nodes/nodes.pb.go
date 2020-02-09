@@ -1014,11 +1014,23 @@ type NodesServiceClient interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:create
+	//```
 	Create(ctx context.Context, in *Node, opts ...grpc.CallOption) (*Id, error)
 	//
 	//Read a node
 	//
 	//Returns the details for a node given the node ID.
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:get
+	//```
 	Read(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
 	//
 	//Update a node
@@ -1026,17 +1038,35 @@ type NodesServiceClient interface {
 	//This PUT operation overwrites ALL node details and requires the complete set of node details,
 	//consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
 	//Substitute the desired values for the existing node details in the PUT message.
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:update
+	//```
 	Update(ctx context.Context, in *Node, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
 	//Delete a node
 	//
 	//Deletes the node with the node ID.
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:delete
+	//```
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
 	//Bulk delete by ID
 	//
 	//Deletes a set of nodes given a list of IDs.
 	//Invalid IDs will be ignored.
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:delete
+	//```
 	BulkDeleteById(ctx context.Context, in *Ids, opts ...grpc.CallOption) (*BulkDeleteResponse, error)
 	//
 	//List and filter nodes
@@ -1062,12 +1092,24 @@ type NodesServiceClient interface {
 	//"sort":"status", "order":"ASC"
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:list
+	//```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Nodes, error)
 	//
 	//Node status
 	//
 	//Use this to run an `inspec detect` job on the node, which updates the status to reflect
 	//that the node is reachable or unreachable.
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:rerun
+	//```
 	Rerun(ctx context.Context, in *Id, opts ...grpc.CallOption) (*RerunResponse, error)
 	//
 	//Bulk delete nodes
@@ -1081,6 +1123,12 @@ type NodesServiceClient interface {
 	//Example:
 	//```
 	//{"filters": [{"key": "name", "values": ["vj*"]}]}'
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:delete
 	//```
 	BulkDelete(ctx context.Context, in *Query, opts ...grpc.CallOption) (*BulkDeleteResponse, error)
 	//
@@ -1104,6 +1152,12 @@ type NodesServiceClient interface {
 	//{ "key":"test-node", "value":"is-amazing" },
 	//]
 	//}
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:create
 	//```
 	BulkCreate(ctx context.Context, in *Nodes, opts ...grpc.CallOption) (*Ids, error)
 }
@@ -1222,11 +1276,23 @@ type NodesServiceServer interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:create
+	//```
 	Create(context.Context, *Node) (*Id, error)
 	//
 	//Read a node
 	//
 	//Returns the details for a node given the node ID.
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:get
+	//```
 	Read(context.Context, *Id) (*Node, error)
 	//
 	//Update a node
@@ -1234,17 +1300,35 @@ type NodesServiceServer interface {
 	//This PUT operation overwrites ALL node details and requires the complete set of node details,
 	//consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
 	//Substitute the desired values for the existing node details in the PUT message.
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:update
+	//```
 	Update(context.Context, *Node) (*empty.Empty, error)
 	//
 	//Delete a node
 	//
 	//Deletes the node with the node ID.
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:delete
+	//```
 	Delete(context.Context, *Id) (*empty.Empty, error)
 	//
 	//Bulk delete by ID
 	//
 	//Deletes a set of nodes given a list of IDs.
 	//Invalid IDs will be ignored.
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:delete
+	//```
 	BulkDeleteById(context.Context, *Ids) (*BulkDeleteResponse, error)
 	//
 	//List and filter nodes
@@ -1270,12 +1354,24 @@ type NodesServiceServer interface {
 	//"sort":"status", "order":"ASC"
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:list
+	//```
 	List(context.Context, *Query) (*Nodes, error)
 	//
 	//Node status
 	//
 	//Use this to run an `inspec detect` job on the node, which updates the status to reflect
 	//that the node is reachable or unreachable.
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:rerun
+	//```
 	Rerun(context.Context, *Id) (*RerunResponse, error)
 	//
 	//Bulk delete nodes
@@ -1289,6 +1385,12 @@ type NodesServiceServer interface {
 	//Example:
 	//```
 	//{"filters": [{"key": "name", "values": ["vj*"]}]}'
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:delete
 	//```
 	BulkDelete(context.Context, *Query) (*BulkDeleteResponse, error)
 	//
@@ -1312,6 +1414,12 @@ type NodesServiceServer interface {
 	//{ "key":"test-node", "value":"is-amazing" },
 	//]
 	//}
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//infra:nodes:create
 	//```
 	BulkCreate(context.Context, *Nodes) (*Ids, error)
 }
