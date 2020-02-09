@@ -2,6 +2,12 @@ BEGIN {
   FS = "\""
 }
 
+END {
+  if (collecting) {
+    for (i = 1; i < collecting; i++) print buffer[i]
+  }
+}
+
 collecting && $0 ~ /chef.automate.api.iam.policy\).action *= *".*"/ {
   print ""
   print "  Authorization Action:"
@@ -10,14 +16,15 @@ collecting && $0 ~ /chef.automate.api.iam.policy\).action *= *".*"/ {
   print "  "$2
   print "  ```"
 
-  for (i = 1; i < collecting; i++) {
-    print buffer[i]
-  }
+  for (i = 1; i < collecting; i++) print buffer[i]
   collecting = 0
 }
 
 /^ *\*\// {
-    collecting = 1
+  if (collecting) {
+    for (i = 1; i < collecting; i++) print buffer[i]
+  }
+  collecting = 1
 }
 
 collecting {
