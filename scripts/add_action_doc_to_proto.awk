@@ -3,33 +3,34 @@ BEGIN {
 }
 
 END {
-  if (collecting) {
-    for (i = 1; i < collecting; i++) print buffer[i]
-  }
+  if (collecting) emptyBuffer()
 }
 
 collecting && (($0 ~ /chef.automate.api.iam.policy\).action[[:space:]]*=[[:space:]]*".*"/) || (optionFound && $0 ~ /^[[:space:]]*action:[[:space:]]*".*"/)) {
+  # add annotation...
+  whitespace = useTab ? "\t" : "  "
   print ""
-  print "  Authorization Action:"
+  print whitespace"Authorization Action:"
   print ""
-  print "  ```"
-  print "  "$2
-  print "  ```"
+  print whitespace"```"
+  print whitespace$2
+  print whitespace"```"
+  emptyBuffer()
 
-  for (i = 1; i < collecting; i++) print buffer[i]
+  # reset for next pass
   collecting = 0
   optionFound = 0
 }
 
+# Handle `option` across multiple lines (e.g. reporting.proto)
 collecting && $0 ~ /chef.automate.api.iam.policy\)[[:space:]]*=/ {
-  print "found it" > "/dev/stderr"
   optionFound = 1
 }
 
+# A closing comment is the trigger to start collecting
 /^[[:space:]]*\*\// {
-  if (collecting) {
-    for (i = 1; i < collecting; i++) print buffer[i]
-  }
+  if (collecting) emptyBuffer()
+  useTab = $0 ~ /^\t/
   collecting = 1
 }
 
@@ -41,6 +42,6 @@ collecting {
   print
 }
 
-{
-  lastline = $0
+function emptyBuffer(){
+  for (i = 1; i < collecting; i++) print buffer[i]
 }
