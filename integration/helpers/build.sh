@@ -33,7 +33,7 @@ build_tools() {
         make tools
     popd
 
-    export PATH="$deployment_root_dir/bin/linux/:$PATH"
+    export PATH="$PATH:$deployment_root_dir/bin/linux/"
 }
 
 create_manifest() {
