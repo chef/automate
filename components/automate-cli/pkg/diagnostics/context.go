@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"strconv"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -45,6 +46,8 @@ type TestContext interface {
 	GetOption(key string) *Option
 	// GetVersion returns the version of automate that is running
 	GetVersion() (string, error)
+	// IsIAMV2 returns whether or not automate is on the latest version of IAM
+	IsIAMV2() (bool, error)
 }
 
 // VerificationTestContext is accepted by the Verify stage of a diagnostic. This
@@ -228,6 +231,49 @@ func (c *testContext) GetVersion() (string, error) {
 	c.version = resp.Build
 
 	return resp.Build, nil
+}
+
+func (c *testContext) IsIAMV2() (bool, error) {
+	httpResp, err := c.DoLBRequest("/apis/iam/v2beta/policy_version")
+	if err != nil {
+		return false, err
+	}
+	defer httpResp.Body.Close() // nolint: errchech
+
+	if httpResp.StatusCode == 404 {
+		// if the policy version endpoint is not found,
+		// we're either testing an old version of Automate with only v1
+		// or we're testing a version of Automate that has been force-upgraded to v2
+		automateVersion, err := c.GetVersion()
+		if err != nil {
+			return false, err
+		}
+
+		automateVersionInt, err := strconv.ParseInt(automateVersion, 10, 64)
+		if err != nil {
+			return false, err
+		}
+
+		// if the version is earlier than the force-upgrade version,
+		// we must be testing an earlier version of Automate with only IAM v1.
+		// !! TODO change this to the build just before force-upgrade build
+		if automateVersionInt < 20200131232134 {
+			return false, nil
+		}
+
+		// anything after 20200131232134 has been force-upgraded to IAMv2
+		return true, nil
+	}
+
+	vsn := struct {
+		Version struct{ Major, Minor string }
+	}{}
+
+	if err := json.NewDecoder(httpResp.Body).Decode(&vsn); err != nil {
+		return false, err
+	}
+
+	return vsn.Version.Major == "V2", nil
 }
 
 func (c *testContext) PublishViaNATS(messages [][]byte) error {
