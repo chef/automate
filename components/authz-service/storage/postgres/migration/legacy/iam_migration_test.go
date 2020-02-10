@@ -3,15 +3,17 @@ package legacy
 import (
 	"context"
 	"database/sql"
-	_ "github.com/golang-migrate/migrate/source/file"
-	_ "github.com/lib/pq"
+	"fmt"
 	"net/url"
 	"testing"
 
-	"github.com/chef/automate/lib/logger"
-	"github.com/pkg/errors"
+	_ "github.com/golang-migrate/migrate/database/postgres" // make driver available
+	_ "github.com/golang-migrate/migrate/source/file"       // make source available
+	_ "github.com/lib/pq"
 
+	"github.com/chef/automate/lib/logger"
 	"github.com/golang-migrate/migrate"
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -159,7 +161,8 @@ func TestMigrateToV2(t *testing.T) {
 			// assert.Equal(t, v2DefaultPolicyCount, policyStore.ItemCount())
 			for _, pol := range v2DefaultPolicies() {
 				resp, err := queryTestPolicy(ctx, pol.ID, db)
-				assert.NoError(t, err)
+				require.NoError(t, err)
+				fmt.Printf("RESPONSE %s and POL %s", resp, pol)
 				assert.Equal(t, pol.ID, resp.ID)
 			}
 
@@ -492,6 +495,9 @@ func queryTestPolicy(ctx context.Context, id string, db *sql.DB) (*v2Policy, err
 	}
 
 	resp, err := queryPolicy(ctx, id, tx, false)
+	if err != nil {
+		return nil, errors.Wrap(err, "query policy")
+	}
 
 	err = tx.Commit()
 	if err != nil {

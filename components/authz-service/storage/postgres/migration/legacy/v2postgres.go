@@ -283,8 +283,11 @@ func queryPolicy(ctx context.Context, id string, q *sql.Tx, selectForUpdate bool
 	if selectForUpdate {
 		query = "SELECT query_policy($1, $2) FOR UPDATE"
 	}
-	if err := q.QueryRowContext(ctx, query, id, pq.Array([]string{})).
-		Scan(&pol); err != nil {
+	fmt.Printf("ID %s", id)
+	pol_u := q.QueryRowContext(ctx, query, id, pq.Array([]string{}))
+	fmt.Printf("prescan %v", pol_u)
+	if err := pol_u.Scan(&pol); err != nil {
+		fmt.Printf("SCANNING")
 		return nil, err
 	}
 

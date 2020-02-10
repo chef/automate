@@ -1,7 +1,9 @@
 package legacy
 
 import (
+	"encoding/json"
 	"fmt"
+	"strings"
 
 	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 	"github.com/pkg/errors"
@@ -49,6 +51,33 @@ const (
 	System
 )
 
+// NewType converts a string to a Type or returns an error.
+func NewType(in string) (v2Type, error) {
+	switch in {
+	case customTypeString:
+		return Custom, nil
+	case managedTypeString:
+		return ChefManaged, nil
+	case systemTypeString:
+		return System, nil
+	default:
+		return Custom, fmt.Errorf("policy type must be one of %q, you passed %q", strValues, in)
+	}
+}
+
+// UnmarshalJSON implements json unmarshalling for a Type reference
+// so we can pull them out of the database directly as the correct type.
+func (t *v2Type) UnmarshalJSON(b []byte) error {
+	// After byte conversion, things coming out of db as
+	// customTypeString or managedTypeString.
+	result, err := NewType(strings.Trim(string(b), "\""))
+	if err != nil {
+		return err
+	}
+	*t = result
+	return nil
+}
+
 const (
 	customTypeString  = "custom"
 	managedTypeString = "chef-managed"
@@ -77,6 +106,19 @@ type v2Role struct {
 	Projects []string `json:"projects"`
 }
 
+// Scan implements pq Scan interface for a Role reference
+// so we can pull them out of the database directly as the correct type.
+func (p *v2Role) Scan(src interface{}) error {
+	if src == nil {
+		return errors.New("not found")
+	}
+	source, ok := src.([]byte)
+	if !ok {
+		return errors.New("type assertion .([]byte) failed")
+	}
+	return json.Unmarshal(source, p)
+}
+
 // Policy represents a policy definition to be persisted to storage.
 type v2Policy struct {
 	ID         string        `json:"id"`
@@ -85,6 +127,19 @@ type v2Policy struct {
 	Statements []v2Statement `json:"statements"`
 	Type       v2Type        `json:"type"`
 	Projects   []string      `json:"projects"`
+}
+
+// Scan implements pq Scan interface for an Policy reference
+// so we can pull them out of the database directly as the correct type.
+func (p *v2Policy) Scan(src interface{}) error {
+	if src == nil {
+		return errors.New("not found")
+	}
+	source, ok := src.([]byte)
+	if !ok {
+		return errors.New("type assertion .([]byte) failed")
+	}
+	return json.Unmarshal(source, p)
 }
 
 func newV2Policy(
@@ -142,6 +197,31 @@ func (e v2Effect) String() string {
 	}
 
 	return strValues[e]
+}
+
+// NewEffect converts a string to an Effect or returns an error.
+func NewEffect(in string) (v2Effect, error) {
+	switch in {
+	case "allow":
+		return Allow, nil
+	case "deny":
+		return Deny, nil
+	default:
+		return Allow, fmt.Errorf("effect must be one of 'allow' or 'deny', you passed %s", in)
+	}
+}
+
+// UnmarshalJSON implements json unmarshalling for an Effect reference
+// so we can pull them out of the database directly as the correct type.
+func (e *v2Effect) UnmarshalJSON(b []byte) error {
+	// After byte conversion, things coming out of db as
+	// '"deny"' and '"allow"'.
+	result, err := NewEffect(strings.Trim(string(b), "\""))
+	if err != nil {
+		return err
+	}
+	*e = result
+	return nil
 }
 
 func newV2Statement(effect v2Effect, role string, projects, resources, actions []string) v2Statement {
