@@ -43,6 +43,8 @@ type TestContext interface {
 	PublishViaNATS([][]byte) error
 	// GetOption returns the Option for the given key
 	GetOption(key string) *Option
+	// GetVersion returns the version of automate that is running
+	GetVersion() (string, error)
 }
 
 // VerificationTestContext is accepted by the Verify stage of a diagnostic. This
@@ -59,6 +61,7 @@ type testContext struct {
 	lbURL      url.URL
 	dsClient   api.DeploymentClient
 	httpClient *http.Client
+	version    string
 }
 
 type globals struct {
@@ -201,6 +204,30 @@ func (c *testContext) DoLBRequest(path string, opts ...lbrequest.Opts) (*http.Re
 		return resp, nil
 	}
 	return nil, lastErr
+}
+
+func (c *testContext) GetVersion() (string, error) {
+	if c.version != "" {
+		return c.version, nil
+	}
+
+	httpResp, err := c.DoLBRequest("/api/v0/version")
+	if err != nil {
+		return "", err
+	}
+	defer httpResp.Body.Close() // nolint: errchech
+
+	resp := struct {
+		Build string `json:"build_timestamp"`
+	}{}
+
+	if err := json.NewDecoder(httpResp.Body).Decode(&resp); err != nil {
+		return "", err
+	}
+
+	c.version = resp.Build
+
+	return resp.Build, nil
 }
 
 func (c *testContext) PublishViaNATS(messages [][]byte) error {
