@@ -28,9 +28,8 @@ pkg_deps=(
   # packages.
   ${local_platform_tools_origin:-chef}/automate-platform-tools
 
-  # https://github.com/chef/automate/issues/2733
-  core/bundler/1.17.3/20191025140337
-  core/ruby/2.5.7/20191025133938
+  core/bundler
+  core/ruby
   "${vendor_origin}/automate-workflow-ctl"
 )
 
