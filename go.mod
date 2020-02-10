@@ -47,7 +47,7 @@ require (
 	github.com/gogo/protobuf v1.3.0 // indirect
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.2.1-0.20190311213431-837231f7bb37
-	github.com/golang/protobuf v1.3.2
+	github.com/golang/protobuf v1.3.3
 	github.com/google/go-cloud v0.1.1
 	github.com/gorilla/handlers v1.3.0 // indirect
 	github.com/gorilla/mux v1.6.1
