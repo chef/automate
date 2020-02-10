@@ -8,6 +8,7 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/mitchellh/mapstructure"
 	"github.com/pkg/errors"
@@ -177,14 +178,29 @@ func (c *testContext) DoLBRequest(path string, opts ...lbrequest.Opts) (*http.Re
 	}
 
 	opts = append(opts, lbrequest.WithDefaultAuthToken(token), lbrequest.WithURL(c.lbURL))
+	var lastErr error
+	for i := 0; i <= 5; i++ {
+		// Backoff: Sleep for (2^i - 1) seconds
+		time.Sleep(((1 << i) - 1) * time.Second)
+		req, err := lbrequest.New(path, opts...)
 
-	req, err := lbrequest.New(path, opts...)
+		if err != nil {
+			return nil, err
+		}
 
-	if err != nil {
-		return nil, err
+		resp, err := c.httpClient.Do(req)
+		if err != nil {
+			lastErr = err
+			continue
+		}
+		if resp.StatusCode == 503 {
+			lastErr = errors.Errorf("503 Service Unavailable: %s", path)
+			resp.Body.Close() // nolint: errcheck
+			continue
+		}
+		return resp, nil
 	}
-
-	return c.httpClient.Do(req)
+	return nil, lastErr
 }
 
 func (c *testContext) PublishViaNATS(messages [][]byte) error {
