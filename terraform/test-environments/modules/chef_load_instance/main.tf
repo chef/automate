@@ -177,9 +177,10 @@ CONF
       "for _ in {1..5} ; do if sudo hab sup status | grep -q chef-load; then echo \"waiting for chef-load to unload\" && sleep 5; fi; done",
       "for _ in {1..5} ; do if sudo hab sup status | grep -q applications-load-gen; then echo \"waiting for applications-load-gen to unload\" && sleep 5; fi; done",
       "sudo mv /bin/hab /bin/hab.old",
-      "sudo HAB_LICENSE=accept /bin/hab.old pkg install core/hab/${var.desired_hab_version} --binlink --force && sudo rm /bin/hab.old",
+      "sudo HAB_NONINTERACTIVE=true HAB_LICENSE=accept /bin/hab.old pkg install core/hab/${var.desired_hab_version} --binlink --force && sudo rm /bin/hab.old",
       "sudo hab license accept",
-      "sudo hab pkg install core/hab-sup/${var.desired_hab_version}",
+      "sudo HAB_NONINTERACTIVE=true hab pkg install core/hab-sup/${var.desired_hab_version}",
+      "sudo systemctl restart hab-supervisor.service",
       "sudo mv /tmp/chef-load_logrotate.conf /etc/logrotate.d/chef-load",
       "sudo chown root:root /etc/logrotate.d/chef-load",
       "sudo rm -rf /opt/chef_load_sample_data",
@@ -195,8 +196,8 @@ CONF
       "sudo /etc/cron.hourly/group-node-names",
       "sudo mkdir -p /var/log/chef-load",
       "sudo chown hab /var/log/chef-load",
-      "sudo hab svc load chef/chef-load --channel ${var.chef_load_channel} --strategy at-once",
-      "sudo hab svc load chef/applications-load-gen --channel dev --strategy at-once",
+      "sudo HAB_NONINTERACTIVE=true hab svc load chef/chef-load --channel ${var.chef_load_channel} --strategy at-once",
+      "sudo HAB_NONINTERACTIVE=true hab svc load chef/applications-load-gen --channel dev --strategy at-once",
     ]
   }
 }
