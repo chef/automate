@@ -1,12 +1,19 @@
 info:
   description: |
     # Authentication
-    The Chef Automate API typically uses an API token passed in the header of your API request.
+    The Chef Automate API typically uses an API token passed in the header of your API request. You need an admin token to set up Chef Automate.
 
-    To create admin token can and set it as an environment variable use the following command:
+    Create an admin token from the Chef Automate command line:
 
     ```
-    export TOKEN=`chef-automate admin-token`
+    chef-automate admin-token
+    ```
+
+
+    Create admin token and set it as an environment variable for the duration of your terminal session:
+
+    ```
+    export TOKEN='chef-automate admin-token'
     ```
 
     An admin token has unlimited access the entire Chef Automate API.
