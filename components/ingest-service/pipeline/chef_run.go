@@ -31,6 +31,7 @@ func NewChefRunPipeline(client backend.Client, authzClient iam_v2.ProjectsClient
 	)
 
 	chefRunPipeline(in,
+		processor.MessageValidator,
 		processor.BuildTransmogrify(chefIngestRunPipelineConfig.NumberOfMsgsTransformers),
 		processor.ChefRunCorrections,
 		processor.BuildRunProjectTagger(authzClient),
