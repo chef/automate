@@ -2,7 +2,7 @@
 title = "Applications Dashboard"
 description = "Monitor Habitat Services in Chef Automate"
 date = 2019-10-18T18:54:09+00:00
-draft = true
+draft = false
 bref = ""
 toc = true
 [menu]
