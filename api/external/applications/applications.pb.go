@@ -76,6 +76,7 @@ func (HealthStatus) EnumDescriptor() ([]byte, []int) {
 // Request message for listing services.
 type ServicesReq struct {
 	// Applies search filters, in the format of `fieldname:value`.
+	//
 	// Valid filter fieldnames are:
 	// * `origin`: origin component of the service's package identifier
 	// * `service`: the name component of the service's package identifier
@@ -86,6 +87,7 @@ type ServicesReq struct {
 	// * `environment`: the environment field of the service's event-stream metadata
 	// * `site`: the site field of the service's event-stream metadata
 	// * `group`: the suffix of the service group name
+	//
 	// Services may also be filtered by `status`, which refers to a service's
 	// connected/disconnected state or it's most recent healthcheck result. Valid
 	// status filter parameters are:
@@ -1067,6 +1069,7 @@ func (m *ServiceGroupsHealthCountsReq) GetFilter() []string {
 // Request message for GetServiceGroups
 type ServiceGroupsReq struct {
 	// Applies search and status filters, in the format of `fieldname:value` or `status:value`.
+	//
 	// Valid filter fieldnames are:
 	// * `origin`: origin component of the service's package identifier
 	// * `service`: the name component of the service's package identifier
@@ -1077,6 +1080,7 @@ type ServiceGroupsReq struct {
 	// * `environment`: the environment field of the service's event-stream metadata
 	// * `site`: the site field of the service's event-stream metadata
 	// * `group`: the suffix of the service group name
+	//
 	// Service groups may also be filtered by `status`, which refers to a service's
 	// connected/disconnected state or it's most recent healthcheck result. Valid
 	// status filter parameters are:
