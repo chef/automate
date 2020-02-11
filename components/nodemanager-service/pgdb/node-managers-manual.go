@@ -3,7 +3,7 @@ package pgdb
 import (
 	"time"
 
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )

@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 
 	"github.com/aws/aws-sdk-go/service/ec2"
 	"github.com/stretchr/testify/assert"

@@ -27,8 +27,8 @@ import (
 	cc_stats "github.com/chef/automate/components/compliance-service/api/stats"
 	cc_version "github.com/chef/automate/components/compliance-service/api/version"
 	cc_ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 )
 

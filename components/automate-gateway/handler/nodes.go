@@ -14,7 +14,7 @@ import (
 	jobsService "github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
-	nodesService "github.com/chef/automate/components/nodemanager-service/api/nodes"
+	nodesService "github.com/chef/automate/api/interservice/nodemanager/nodes"
 )
 
 type Nodes struct {

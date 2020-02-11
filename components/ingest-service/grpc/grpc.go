@@ -21,7 +21,7 @@ import (
 	"github.com/chef/automate/components/ingest-service/migration"
 	"github.com/chef/automate/components/ingest-service/server"
 	"github.com/chef/automate/components/ingest-service/serveropts"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/cereal"
 	"github.com/chef/automate/lib/cereal/postgres"

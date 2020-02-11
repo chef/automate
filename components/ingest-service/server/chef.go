@@ -12,10 +12,10 @@ import (
 	"github.com/chef/automate/api/external/ingest/response"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/api/interservice/ingest"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline"
 	"github.com/chef/automate/components/ingest-service/serveropts"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/chef/automate/lib/version"
 )
 
