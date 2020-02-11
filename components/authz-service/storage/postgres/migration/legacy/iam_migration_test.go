@@ -3,13 +3,12 @@ package legacy
 import (
 	"context"
 	"database/sql"
-	"fmt"
 	"net/url"
 	"testing"
 
+	"github.com/gofrs/uuid"
 	_ "github.com/golang-migrate/migrate/database/postgres" // make driver available
 	_ "github.com/golang-migrate/migrate/source/file"       // make source available
-	_ "github.com/lib/pq"
 
 	"github.com/chef/automate/lib/logger"
 	"github.com/golang-migrate/migrate"
@@ -19,10 +18,10 @@ import (
 )
 
 const (
-	v2DefaultPolicyCount  = 4 // owner, editor, viewer, ingest
-	v2DefaultRoleCount    = 4 // owner, editor, viewer, ingest
-	v2DefaultProjectCount = 2 // ~~All Projects~~, (unassigned)
-	pgURL                 = "postgres://postgres@127.0.0.1:5432/authz_test?sslmode=disable"
+	v2DefaultAndLegacyPolicyCount = 13 // owner, editor, viewer, ingest + legacy
+	v2DefaultRoleCount            = 4  // owner, editor, viewer, ingest
+	v2DefaultProjectCount         = 2  // ~~All Projects~~, (unassigned)
+	pgURL                         = "postgres://postgres@127.0.0.1:5432/authz_test?sslmode=disable"
 )
 
 // Setup
@@ -162,7 +161,6 @@ func TestMigrateToV2(t *testing.T) {
 			for _, pol := range v2DefaultPolicies() {
 				resp, err := queryTestPolicy(ctx, pol.ID, db)
 				require.NoError(t, err)
-				fmt.Printf("RESPONSE %s and POL %s", resp, pol)
 				assert.Equal(t, pol.ID, resp.ID)
 			}
 
@@ -173,14 +171,42 @@ func TestMigrateToV2(t *testing.T) {
 				assert.Equal(t, role.ID, resp.ID)
 			}
 
-			// // assert.Equal(t, defaultProjectCount, projectStore.ItemCount())
-			// for _, project := range storage.DefaultProjects() {
-			// 	_, found := projectStore.Get(project.ID)
-			// 	assert.True(t, found)
-			// }
 		},
-		// "empty store, custom v1 policy": func(t *testing.T) {
+		"empty store, custom v1 policy with subjects is migrated": func(t *testing.T) {
+			polID := genUUID(t)
+
+			action := "create"
+			subjects := []string{"user:ldap:bob", "team:ldap:ops"}
+			resource := "ingest:nodes"
+			effect := "allow"
+			v1pol, err := storePolicy(ctx, db, polID.String(), action, subjects, resource, effect)
+			require.NoError(t, err)
+			require.NotNil(t, v1pol)
+
+			err = MigrateToV2(ctx, db)
+			require.NoError(t, err)
+
+			v2PolicyCount, err := queryV2PolicyCount(ctx, db)
+			require.NoError(t, err)
+
+			assert.Equal(t, v2DefaultAndLegacyPolicyCount+1, v2PolicyCount)
+
+			migratedPol, err := queryTestPolicy(ctx, polID.String(), db)
+			require.NoError(t, err)
+
+			assert.Equal(t, polID.String(), migratedPol.ID)
+			assert.Equal(t, polID.String()+" (custom)", migratedPol.Name)
+			assert.ElementsMatch(t, []string{"user:ldap:bob", "team:ldap:ops"}, memberSliceToStringSlice(migratedPol.Members))
+			require.Equal(t, 1, len(migratedPol.Statements))
+			statement := migratedPol.Statements[0]
+			assert.Equal(t, Allow, statement.Effect)
+			assert.Equal(t, []string{"*:create"}, statement.Actions)
+			assert.Equal(t, []string{"infra:nodes"}, statement.Resources)
+		},
+		// "empty store, custom v1 policy without subjects is not migrated": func(t *testing.T) {
 		// 	polID := genUUID(t)
+		// 	// store v1 policy
+
 		// 	v1List = v1Lister{pols: []*storage_v1.Policy{
 		// 		{
 		// 			ID:       polID,
@@ -483,8 +509,8 @@ func TestMigrateToV2(t *testing.T) {
 		// reset memstore to "no migrations ever attempted" status
 		// require.NoError(t, status.Pristine(ctx))
 
+		flush(t, db)
 		t.Run(desc, test)
-		//db.Flush()
 	}
 }
 
@@ -529,6 +555,15 @@ func queryRole(ctx context.Context, db *sql.DB, id string) (*v2Role, error) {
 	}
 
 	return &role, nil
+}
+
+func flush(t *testing.T, db *sql.DB) {
+	_, err := db.Exec(`DELETE FROM iam_policies CASCADE;
+		DELETE FROM iam_members CASCADE;
+		DELETE FROM iam_roles CASCADE;
+		DELETE FROM iam_projects CASCADE;
+		DELETE FROM iam_projects_graveyard CASCADE;`)
+	require.NoError(t, err)
 }
 
 // func getMigrationStatus(ctx, db *sql.db) (err error, status string) {
@@ -814,12 +849,12 @@ func queryRole(ctx context.Context, db *sql.DB, id string) (*v2Role, error) {
 // 	return faker.Lorem().Word() + "-" + faker.Lorem().Word()
 // }
 
-// func genUUID(t *testing.T) uuid.UUID {
-// 	t.Helper()
-// 	i, err := uuid.NewV4()
-// 	require.NoError(t, err)
-// 	return i
-// }
+func genUUID(t *testing.T) uuid.UUID {
+	t.Helper()
+	i, err := uuid.NewV4()
+	require.NoError(t, err)
+	return i
+}
 
 // func wellknown(t *testing.T, wellknownID string) *storage_v1.Policy {
 // 	t.Helper()
@@ -832,5 +867,40 @@ func queryRole(ctx context.Context, db *sql.DB, id string) (*v2Role, error) {
 
 // need
 
-// insert v1 policy helper
-// v2 policy getter
+func storePolicy(
+	ctx context.Context, db *sql.DB, id string,
+	action string, subjects []string, resource string, effect string,
+) (*v1Policy, error) {
+
+	pm := policyMap{
+		Subjects: subjects,
+		Action:   action,
+		Resource: resource,
+		Effect:   effect,
+	}
+
+	pol := dbPolicy{}
+	r := db.QueryRowContext(ctx,
+		`INSERT INTO policies (id, policy_data, version)
+					VALUES ($1, $2, $3)
+					RETURNING id, policy_data`,
+		id, pm, 1,
+	)
+
+	err := r.Scan(&pol.ID, &pol.PolicyData)
+	if err != nil {
+		return nil, errors.Wrap(err, "could not insert test policy")
+	}
+
+	return toStoragePolicy(pol), nil
+}
+
+func queryV2PolicyCount(ctx context.Context, db *sql.DB) (int, error) {
+	var count int
+	r := db.QueryRowContext(ctx, "SELECT COUNT(*) from iam_policies")
+	if err := r.Scan(&count); err != nil {
+		return 0, err
+	}
+
+	return count, nil
+}
