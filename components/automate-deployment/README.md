@@ -113,3 +113,4 @@ In some cases, it is necessary to test the real migration code paths
 without the mock interfaces used by self-test. To facilitate this the
 `a1migration` directory has a docker-based test environment suited for
 that purpose.  See the README in that directory for more details.
+
