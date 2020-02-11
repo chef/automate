@@ -202,36 +202,33 @@ func TestMigrateToV2(t *testing.T) {
 			assert.Equal(t, Allow, statement.Effect)
 			assert.Equal(t, []string{"*:create"}, statement.Actions)
 			assert.Equal(t, []string{"infra:nodes"}, statement.Resources)
+
+			err = deletePol(ctx, db, polID.String())
+			require.NoError(t, err)
 		},
-		// "empty store, custom v1 policy without subjects is not migrated": func(t *testing.T) {
-		// 	polID := genUUID(t)
-		// 	// store v1 policy
+		"empty store, custom v1 policy without subjects is not migrated": func(t *testing.T) {
+			polID := genUUID(t)
 
-		// 	v1List = v1Lister{pols: []*storage_v1.Policy{
-		// 		{
-		// 			ID:       polID,
-		// 			Subjects: []string{"user:ldap:bob", "team:ldap:ops"},
-		// 			Action:   "create",
-		// 			Resource: "ingest:nodes",
-		// 		},
-		// 	}}
+			action := "create"
+			subjects := []string{}
+			resource := "ingest:nodes"
+			effect := "allow"
+			v1pol, err := storePolicy(ctx, db, polID.String(), action, subjects, resource, effect)
+			require.NoError(t, err)
+			require.NotNil(t, v1pol)
 
-		// 	resp, err := migrateToV2(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.NotNil(t, resp)
+			err = MigrateToV2(ctx, db)
+			require.NoError(t, err)
 
-		// 	assert.Equal(t, v2DefaultPolicyCount+1, policyStore.ItemCount())
+			v2PolicyCount, err := queryV2PolicyCount(ctx, db)
+			require.NoError(t, err)
 
-		// 	migratedPol := getPolicyFromStore(t, policyStore, polID.String())
-		// 	assert.Equal(t, polID.String(), migratedPol.ID)
-		// 	assert.Equal(t, polID.String()+" (custom)", migratedPol.Name)
-		// 	assert.ElementsMatch(t, []string{"user:ldap:bob", "team:ldap:ops"}, storage.MemberSliceToStringSlice(migratedPol.Members))
-		// 	require.Equal(t, 1, len(migratedPol.Statements))
-		// 	statement := migratedPol.Statements[0]
-		// 	assert.Equal(t, storage.Allow, statement.Effect, "effect is allow")
-		// 	assert.Equal(t, []string{"*:create"}, statement.Actions)
-		// 	assert.Equal(t, []string{"infra:nodes"}, statement.Resources)
-		// },
+			assert.Equal(t, v2DefaultAndLegacyPolicyCount, v2PolicyCount)
+
+			migratedPol, err := queryTestPolicy(ctx, polID.String(), db)
+			require.Nil(t, migratedPol)
+			require.Error(t, err)
+		},
 		// "on admin token policy, adds members to admin policy": func(t *testing.T) {
 		// 	polID := genUUID(t)
 		// 	tok := "token:282f41f1-e763-4094-9c59-c4eec1b71532"
@@ -903,4 +900,9 @@ func queryV2PolicyCount(ctx context.Context, db *sql.DB) (int, error) {
 	}
 
 	return count, nil
+}
+
+func deletePol(ctx context.Context, db *sql.DB, id string) error {
+	_, err := db.ExecContext(ctx, "DELETE FROM policies WHERE id=$1", id)
+	return err
 }
