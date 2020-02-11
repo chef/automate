@@ -137,7 +137,8 @@ func CreateAuthPoliciesDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			tokenInfo, err := CreateRandomToken(tstCtx)
+			tokenInfo, err := CreateRandomToken(tstCtx,
+				fmt.Sprintf("auth-policies-%s", TimestampName()))
 			if err != nil {
 				return err
 			}
