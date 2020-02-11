@@ -1,17 +1,17 @@
 require_relative 'test_support'
 ##### GRPC SETUP #####
-require 'api/nodes/nodes_pb'
-require 'api/nodes/nodes_services_pb'
+require 'api/interservice/nodemanager/nodes/nodes_pb'
+require 'api/interservice/nodemanager/nodes/nodes_services_pb'
 require 'api/external/secrets/secrets_services_pb'
 require 'api/jobs/jobs_pb'
 require 'api/jobs/jobs_services_pb'
-require 'api/manager/manager_pb'
-require 'api/manager/manager_services_pb'
+require 'api/interservice/nodemanager/manager/manager_pb'
+require 'api/interservice/nodemanager/manager/manager_services_pb'
 
 describe File.basename(__FILE__) do
-  Manager = Chef::Automate::Domain::Nodemanager::Api::Manager unless defined?(Manager)
+  Manager = Chef::Automate::Domain::Nodemanager::Manager unless defined?(Manager)
   Jobs = Chef::Automate::Domain::Compliance::Api::Jobs unless defined?(Jobs)
-  Nodes = Chef::Automate::Domain::Nodemanager::Api::Nodes unless defined?(Nodes)
+  Nodes = Chef::Automate::Domain::Nodemanager::Nodes unless defined?(Nodes)
   Secrets = Chef::Automate::Api::Secrets unless defined?(Secrets)
   Common = Chef::Automate::Domain::Compliance::Api::Common unless defined?(Common)
 
