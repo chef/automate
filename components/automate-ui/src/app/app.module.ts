@@ -79,6 +79,7 @@ import { ProjectRequests } from './entities/projects/project.requests';
 import { RoleRequests } from './entities/roles/role.requests';
 import { RuleRequests } from './entities/rules/rule.requests';
 import { ServerRequests } from './entities/servers/server.requests';
+import { OrgRequests } from './entities/orgs/org.requests';
 import { ServiceGroupsRequests } from './entities/service-groups/service-groups.requests';
 import { TeamRequests } from './entities/teams/team.requests';
 import { UserPermsRequests } from './entities/userperms/userperms.requests';
@@ -321,6 +322,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     RulesService,
     RunHistoryStore,
     ServerRequests,
+    OrgRequests,
     ServiceGroupsRequests,
     SessionStorageService,
     SidebarService,

@@ -37,8 +37,8 @@ func NewArtifactRepo(backupLocationSpec LocationSpecification) *ArtifactRepo {
 }
 
 type ArtifactRepoSnapshotMetadata struct {
-	Name     string
-	Checksum string
+	Name     string `json:"name"`
+	Checksum string `json:"checksum"`
 }
 
 // uploadSnapshotArtifactIterator is used to sync files from one bucket to another.

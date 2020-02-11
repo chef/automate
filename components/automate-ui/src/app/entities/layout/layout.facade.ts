@@ -1,7 +1,10 @@
-import { Injectable, OnDestroy } from '@angular/core';
+import { Injectable, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
+import { first, filter } from 'rxjs/operators';
+import { identity } from 'lodash/fp';
 
+import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { LayoutSidebarService } from './layout-sidebar.service';
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';
@@ -21,7 +24,7 @@ enum Height {
 @Injectable({
   providedIn: 'root'
 })
-export class LayoutFacadeService implements OnDestroy {
+export class LayoutFacadeService implements OnInit, OnDestroy {
   public layout = {
     header: {
       display: true,
@@ -47,10 +50,19 @@ export class LayoutFacadeService implements OnDestroy {
     private store: Store<fromLayout.LayoutEntityState>,
     private layoutSidebarService: LayoutSidebarService
   ) {
-    this.store.dispatch(new GetProjects());
     this.menuGroups$ = store.select(sidebarMenuGroups);
     this.showPageLoading$ = store.select(showPageLoading);
     this.updateDisplay();
+  }
+
+  ngOnInit(): void {
+    this.store.select(isIAMv2)
+      .pipe(filter(identity), first())
+      .subscribe(isV2 => {
+        if (isV2) {
+          this.store.dispatch(new GetProjects());
+        }
+      });
   }
 
   ngOnDestroy(): void {
