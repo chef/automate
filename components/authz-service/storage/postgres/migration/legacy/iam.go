@@ -14,6 +14,8 @@ import (
 	"github.com/pkg/errors"
 )
 
+// MigrateToV2 inserts needed IAM v2 resources into the db and
+// migrates any valid v1 policies
 func MigrateToV2(ctx context.Context, db *sql.DB) error {
 	l, err := logger.NewLogger("text", "info")
 	if err != nil {
