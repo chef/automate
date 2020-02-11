@@ -218,7 +218,7 @@ chef-alert {
     overflow-wrap: break-word;
     max-height: 94px;
     overflow: hidden;
-    transition: .35s max-height;
+    transition: .25s max-height;
 
     &.active {
       max-height: 540px; // temp placeholder
@@ -233,11 +233,18 @@ chef-alert {
     background: var(--chef-primary-dark);
 
     .show-more-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       background: transparent;
       border: none;
       color: #9CB2F9; // need to snag varibale from list
       padding: 8px;
       cursor: pointer;
+    }
+
+    .unfold {
+      margin-right: 4px;
     }
   }
 
