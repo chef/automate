@@ -1320,9 +1320,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.iam.v2.ResetToV1Resp": {
-      "type": "object"
-    },
     "chef.automate.api.iam.v2.Role": {
       "type": "object",
       "properties": {

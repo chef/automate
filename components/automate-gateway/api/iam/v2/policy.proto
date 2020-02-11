@@ -272,14 +272,6 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
     option (chef.automate.api.iam.policy).action = "iam:projects:delete";
   };
-  // Expose on GRPC API only so we don't expose this to the enduser.
-  // Just want to be able to trigger this via automate-cli.
-  rpc ResetToV1 (ResetToV1Req) returns (ResetToV1Resp) {
-    option (chef.automate.api.policy).resource = "system:iam:reset_to_v1";
-    option (chef.automate.api.policy).action = "reset";
-    option (chef.automate.api.iam.policy).resource = "system:iam:resetToV1";
-    option (chef.automate.api.iam.policy).action = "system:iam:reset";
-  };
   rpc IntrospectAllProjects (ListProjectsReq) returns (ListProjectsResp) {
     option (google.api.http) = {
       get: "/iam/v2/introspect_projects"

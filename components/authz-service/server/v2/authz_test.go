@@ -119,8 +119,6 @@ func setupV2p1AuthTests(t *testing.T, eng *responderEngine) (context.Context, te
 	vChan := make(chan api_v2.Version, 1)
 	emptyV1List := v1Lister{}
 	ts := setupV2(t, eng, nil, &emptyV1List, vChan)
-	_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-	require.NoError(t, err)
 	return ctx, ts
 }
 
