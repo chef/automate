@@ -359,6 +359,7 @@ paths = [
   "api/external/data_feed/*",
   "api/external/data_lifecycle/*",
   "api/external/ingest/*",
+  "api/external/nodes/*",
   "api/external/secrets/*",
   "api/interservice/authn/*",
   "api/interservice/authz/*",
