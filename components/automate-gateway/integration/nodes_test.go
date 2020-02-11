@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"time"
 
+	gwnodes "github.com/chef/automate/api/external/nodes"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	gwnodes "github.com/chef/automate/components/automate-gateway/api/nodes"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 )

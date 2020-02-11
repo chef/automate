@@ -9,8 +9,8 @@ import (
 	gp "github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/api/external/nodes"
 	nodesService "github.com/chef/automate/api/interservice/nodemanager/nodes"
-	"github.com/chef/automate/components/automate-gateway/api/nodes"
 	"github.com/chef/automate/components/automate-gateway/protobuf"
 	jobsService "github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
