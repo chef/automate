@@ -10,7 +10,6 @@ import (
 	_ "github.com/golang-migrate/migrate/database/postgres" // make driver available
 	_ "github.com/golang-migrate/migrate/source/file"       // make source available
 
-	constants_v1 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v1"
 	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 	"github.com/chef/automate/lib/logger"
 	"github.com/golang-migrate/migrate"
@@ -152,21 +151,17 @@ func TestMigrateToV2(t *testing.T) {
 	require.NoError(t, err, "setup db")
 	// prng := prng.Seed(t)
 
-	// defaultProjectCount := len(v2DefaultPolicies())
-
 	cases := map[string]func(*testing.T){
 		"empty store/default state": func(t *testing.T) {
 			err := MigrateToV2(ctx, db)
 			require.NoError(t, err)
 
-			// assert.Equal(t, v2DefaultPolicyCount, policyStore.ItemCount())
 			for _, pol := range v2DefaultPolicies() {
 				resp, err := queryTestPolicy(ctx, pol.ID, db)
 				require.NoError(t, err)
 				assert.Equal(t, pol.ID, resp.ID)
 			}
 
-			// assert.Equal(t, v2DefaultRoleCount, roleStore.ItemCount())
 			for _, role := range defaultRoles() {
 				resp, err := queryRole(ctx, db, role.ID)
 				assert.NoError(t, err)
@@ -252,7 +247,7 @@ func TestMigrateToV2(t *testing.T) {
 			err = MigrateToV2(ctx, db)
 			v2PolicyCount, err := queryV2PolicyCount(ctx, db)
 			require.NoError(t, err)
-			// members should be added to default admin
+			// members should be added to default admin policy
 			assert.Equal(t, v2DefaultAndLegacyPolicyCount, v2PolicyCount)
 
 			adminPol, err := queryTestPolicy(ctx, constants_v2.AdminPolicyID, db)
@@ -271,137 +266,38 @@ func TestMigrateToV2(t *testing.T) {
 			err = deletePol(ctx, db, polID1.String())
 			require.NoError(t, err)
 		},
-		// "two unconvertible custom v1 policies have their errors collected": func(t *testing.T) {
-		// 	polID := genUUID(t)
-		// 	v1List = v1Lister{pols: []*storage_v1.Policy{
-		// 		{
-		// 			ID:       polID,
-		// 			Subjects: []string{"user:ldap:bob"},
-		// 			Action:   "create",
-		// 			Resource: "injest:nodes",
-		// 		},
-		// 		{
-		// 			ID:       polID,
-		// 			Subjects: []string{"team:ldap:ops"},
-		// 			Action:   "mewantfood",
-		// 			Resource: "ingest:nodes",
-		// 		},
-		// 	}}
-
-		// 	resp, err := migrateToV2(ctx, db)
-		// 	require.NoError(t, err)
-		// 	require.Equal(t, 2, len(resp.GetReports()))
-		// 	for _, rep := range resp.Reports {
-		// 		assert.Regexp(t, `convert v1 policy "[^"]+":`, rep)
-		// 	}
-		// 	assert.Equal(t, v2DefaultPolicyCount, policyStore.ItemCount(), "no additional policy stored")
-		// },
-		// // --------- default policy merging related tests ---------
-		"three default cfgmgmt v1 policies are combined into one": func(t *testing.T) {
-			// confirm exist in v1 db
-			cfgContainer, err := queryV1PolicyID(ctx, db, constants_v1.CfgmgmtNodesContainerPolicyID)
+		"two unconvertible custom v1 policies do not prevent migration": func(t *testing.T) {
+			polID1 := genUUID(t)
+			polID2 := genUUID(t)
+			valPolID := genUUID(t)
+			invalidRes := "injest:nodes"
+			invalidAct := "mewantfood"
+			invV1pol1, err := storePolicy(ctx, db, polID1.String(), "create", []string{"user:ldap:bob"}, invalidRes, "allow")
 			require.NoError(t, err)
-			require.NotNil(t, cfgContainer)
-			cfgNodes, err := queryV1PolicyID(ctx, db, constants_v1.CfgmgmtNodesWildcardPolicyID)
+			require.NotNil(t, invV1pol1)
+			invV1pol2, err := storePolicy(ctx, db, polID2.String(), invalidAct, []string{"user:ldap:bob"}, "ingest:nodes", "allow")
 			require.NoError(t, err)
-			require.NotNil(t, cfgNodes)
-			cfgStats, err := queryV1PolicyID(ctx, db, constants_v1.CfgmgmtStatsWildcardPolicyID)
+			require.NotNil(t, invV1pol2)
+			validV1pol, err := storePolicy(ctx, db, valPolID.String(), "create", []string{"user:ldap:bob"}, "ingest:nodes", "allow")
 			require.NoError(t, err)
-			require.NotNil(t, cfgStats)
+			require.NotNil(t, validV1pol)
 
 			err = MigrateToV2(ctx, db)
 			require.NoError(t, err)
+
 			v2PolicyCount, err := queryV2PolicyCount(ctx, db)
 			require.NoError(t, err)
-			// Note that the three v1 policies are adding up to ONE additional policy
-			assert.Equal(t, v2DefaultAndLegacyPolicyCount, v2PolicyCount)
 
-			cftMgmt, err := queryTestPolicy(ctx, constants_v2.CfgmgmtPolicyID, db)
+			assert.Equal(t, v2DefaultAndLegacyPolicyCount+1, v2PolicyCount)
+
+			// valid one is migrated
+			valid, err := queryTestPolicy(ctx, valPolID.String(), db)
 			require.NoError(t, err)
-			require.NotNil(t, cftMgmt)
-			assert.Equal(t, "[Legacy] Infrastructure Automation Access", cftMgmt.Name)
+			require.NotNil(t, valid)
+
+			err = deletePol(ctx, db, valPolID.String())
+			require.NoError(t, err)
 		},
-		"two default events v1 policies are combined into one": func(t *testing.T) {
-			// confirm exist in v1 db
-			evtsContainer, err := queryV1PolicyID(ctx, db, constants_v1.EventsContainerPolicyID)
-			require.NoError(t, err)
-			require.NotNil(t, evtsContainer)
-			evtsWlcd, err := queryV1PolicyID(ctx, db, constants_v1.EventsWildcardPolicyID)
-			require.NoError(t, err)
-			require.NotNil(t, evtsWlcd)
-
-			err = MigrateToV2(ctx, db)
-			v2PolicyCount, err := queryV2PolicyCount(ctx, db)
-			require.NoError(t, err)
-			// Note that the three v1 policies are adding up to ONE additional policy
-			assert.Equal(t, v2DefaultAndLegacyPolicyCount, v2PolicyCount)
-
-			events, err := queryTestPolicy(ctx, constants_v2.EventsPolicyID, db)
-			require.NoError(t, err)
-			require.NotNil(t, events)
-			assert.Equal(t, "[Legacy] Events Access", events.Name)
-		},
-		// "two default nodes v1 policies are combined into one": func(t *testing.T) {
-		// 	v1List = v1Lister{pols: []*storage_v1.Policy{
-		// 		wellknown(t, constants_v1.NodesContainerPolicyID),
-		// 		wellknown(t, constants_v1.NodesWildcardPolicyID),
-		// 	}}
-
-		// 	resp, err := migrateToV2(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.NotNil(t, resp)
-		// 	// Note that the two v1 policies are adding up to ONE additional policy
-		// 	assert.Equal(t, v2DefaultPolicyCount+1, policyStore.ItemCount())
-
-		// 	pol := getPolicyFromStore(t, policyStore, constants_v2.NodesPolicyID)
-		// 	assert.Equal(t, "[Legacy] Nodes Access", pol.Name)
-		// },
-		// "two default node managers v1 policies are combined into one": func(t *testing.T) {
-		// 	v1List = v1Lister{pols: []*storage_v1.Policy{
-		// 		wellknown(t, constants_v1.NodeManagersContainerPolicyID),
-		// 		wellknown(t, constants_v1.NodeManagersWildcardPolicyID),
-		// 	}}
-
-		// 	resp, err := migrateToV2(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.NotNil(t, resp)
-		// 	// Note that the two v1 policies are adding up to ONE additional policy
-		// 	assert.Equal(t, v2DefaultPolicyCount+1, policyStore.ItemCount())
-
-		// 	pol := getPolicyFromStore(t, policyStore, constants_v2.NodeManagersPolicyID)
-		// 	assert.Equal(t, "[Legacy] Node Managers Access", pol.Name)
-		// },
-		// "two default secrets v1 policies are combined into one": func(t *testing.T) {
-		// 	v1List = v1Lister{pols: []*storage_v1.Policy{
-		// 		wellknown(t, constants_v1.SecretsContainerPolicyID),
-		// 		wellknown(t, constants_v1.SecretsWildcardPolicyID),
-		// 	}}
-
-		// 	resp, err := migrateToV2(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.NotNil(t, resp)
-		// 	// Note that the two v1 policies are adding up to ONE additional policy
-		// 	assert.Equal(t, v2DefaultPolicyCount+1, policyStore.ItemCount())
-
-		// 	pol := getPolicyFromStore(t, policyStore, constants_v2.SecretsPolicyID)
-		// 	assert.Equal(t, "[Legacy] Secrets Access", pol.Name)
-		// },
-		// "three default compliance token v1 policies are combined into one": func(t *testing.T) {
-		// 	v1List = v1Lister{pols: []*storage_v1.Policy{
-		// 		wellknown(t, constants_v1.ComplianceTokenReadProfilesPolicyID),
-		// 		wellknown(t, constants_v1.ComplianceTokenSearchProfilesPolicyID),
-		// 		wellknown(t, constants_v1.ComplianceTokenUploadProfilesPolicyID),
-		// 	}}
-
-		// 	resp, err := migrateToV2(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.NotNil(t, resp)
-		// 	// Note that the three v1 policies are adding up to ONE additional policy
-		// 	assert.Equal(t, v2DefaultPolicyCount+1, policyStore.ItemCount())
-
-		// 	pol := getPolicyFromStore(t, policyStore, constants_v2.ComplianceTokenPolicyID)
-		// 	assert.Equal(t, "[Legacy] Compliance Profile Access", pol.Name)
-		// },
 		// // --------- migration status related tests ---------
 		// "when no migration has been run, migration status is set to v1": func(t *testing.T) {
 		// 	s, err := getMigrationStatus(ctx, db)
