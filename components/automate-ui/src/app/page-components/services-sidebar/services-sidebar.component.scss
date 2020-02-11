@@ -221,7 +221,7 @@ chef-alert {
     transition: .25s max-height;
 
     &.active {
-      max-height: 540px; // temp placeholder
+      max-height: 540px; // need enough space for max 1024 characters
     }
   }
 
@@ -238,7 +238,7 @@ chef-alert {
       justify-content: center;
       background: transparent;
       border: none;
-      color: #9CB2F9; // need to snag varibale from list
+      color: #9CB2F9; // from extended palette
       padding: 8px;
       cursor: pointer;
     }
