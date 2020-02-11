@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
-	nodesserver "github.com/chef/automate/components/nodemanager-service/api/nodes/server"
+	nodesserver "github.com/chef/automate/components/nodemanager-service/server/nodes"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 

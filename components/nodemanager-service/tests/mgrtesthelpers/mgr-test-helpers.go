@@ -6,9 +6,9 @@ import (
 	"os"
 	"strings"
 
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/examples/helpers"
-	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"google.golang.org/grpc"
 )

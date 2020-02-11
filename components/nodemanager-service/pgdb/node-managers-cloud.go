@@ -10,10 +10,10 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
+	"github.com/chef/automate/components/compliance-service/api/common"
+	"github.com/chef/automate/components/compliance-service/utils"
 )
 
 const sqlMgrIds = `
