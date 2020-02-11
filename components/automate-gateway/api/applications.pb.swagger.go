@@ -17,7 +17,7 @@ func init() {
     "/applications/delete_disconnected_services": {
       "post": {
         "summary": "Remove Disconnected Services",
-        "description": "Removes services marked as disconnected based on the `+"`"+`threshold_seconds`+"`"+` setting.\nThis function is not used by the API or CLI and is here for testing purposes.\nThe functionality is currently covered by a periodically running job that can be configured using `+"`"+`UpdateDeleteDisconnectedServicesConfig`+"`"+`.",
+        "description": "Removes services marked as disconnected based on the ` + "`" + `threshold_seconds` + "`" + ` setting.\nThis function is not used by the API or CLI and is here for testing purposes.\nThe functionality is currently covered by a periodically running job that can be configured using ` + "`" + `UpdateDeleteDisconnectedServicesConfig` + "`" + `.",
         "operationId": "DeleteDisconnectedServices",
         "responses": {
           "200": {
@@ -72,7 +72,7 @@ func init() {
     "/applications/disconnected_services": {
       "get": {
         "summary": "Mark Services as Disconnected",
-        "description": "Marks services as disconnected based on the `+"`"+`threshold_seconds`+"`"+` setting.\nThis function is not used by the API or CLI and is here for testing purposes.\nThe functionality is currently covered by a periodically running job that can be configured\nby utilizing the `+"`"+`UpdateDisconnectedServicesConfig`+"`"+` endpoint.",
+        "description": "Marks services as disconnected based on the ` + "`" + `threshold_seconds` + "`" + ` setting.\nThis function is not used by the API or CLI and is here for testing purposes.\nThe functionality is currently covered by a periodically running job that can be configured\nby utilizing the ` + "`" + `UpdateDisconnectedServicesConfig` + "`" + ` endpoint.",
         "operationId": "GetDisconnectedServices",
         "responses": {
           "200": {
@@ -100,7 +100,7 @@ func init() {
     "/applications/service-groups": {
       "get": {
         "summary": "List Service Groups",
-        "description": "Lists service groups with name, health information, and application, environment, package, release metadata.\nAccepts pagination, sorting, search and status filters.\n\nExample:\n`+"`"+``+"`"+``+"`"+`\napplications/service-groups?sorting.field=percent_ok\u0026sorting.order=ASC\u0026pagination.page=1\u0026pagination.size=25\n`+"`"+``+"`"+``+"`"+`",
+        "description": "Lists service groups with name, health information, and application, environment, package, release metadata.\nAccepts pagination, sorting, search and status filters.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\napplications/service-groups?sorting.field=percent_ok\u0026sorting.order=ASC\u0026pagination.page=1\u0026pagination.size=25\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetServiceGroups",
         "responses": {
           "200": {
@@ -113,7 +113,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
-            "description": "Applies search and status filters, in the format of `+"`"+`fieldname:value`+"`"+` or `+"`"+`status:value`+"`"+`.\nValid filter fieldnames are:\n* `+"`"+`origin`+"`"+`: origin component of the service's package identifier\n* `+"`"+`service`+"`"+`: the name component of the service's package identifier\n* `+"`"+`version`+"`"+`: the version number component of the service's package identifier\n* `+"`"+`buildstamp`+"`"+`: the build timestamp (also called \"release\") of the service's package identifier\n* `+"`"+`channel`+"`"+`: the package channel to which the service subscribes for updates\n* `+"`"+`application`+"`"+`: the application field of the service's event-stream metadata\n* `+"`"+`environment`+"`"+`: the environment field of the service's event-stream metadata\n* `+"`"+`site`+"`"+`: the site field of the service's event-stream metadata\n* `+"`"+`group`+"`"+`: the suffix of the service group name\nService groups may also be filtered by `+"`"+`status`+"`"+`, which refers to a service's\nconnected/disconnected state or it's most recent healthcheck result. Valid\nstatus filter parameters are:\n* `+"`"+`status:disconnected`+"`"+`: only return service groups that contain at least\n  one service in the disconnected state\n* `+"`"+`status:critical`+"`"+`: only return service groups that contain at least one\n  service that is returning a \"critical\" healthcheck result\n* `+"`"+`status:critical`+"`"+`: only return service groups that contain at least one\n  service that is returning a \"critical\" healthcheck result\n* `+"`"+`status:unknown`+"`"+`: only return service groups that contain at least one\n  service that is returning an \"unknown\" healthcheck result and no\n  services returning \"critical\" results\n* `+"`"+`status:warning`+"`"+`: only return service groups that contain at least one\n  service that is returning a \"warning\" healthcheck result and have no\n  services returning \"critical\" or \"unknown\" results\n* `+"`"+`status:ok`+"`"+`: only return service groups where all services are returning\n  \"ok\" health check results.",
+            "description": "Applies search and status filters, in the format of ` + "`" + `fieldname:value` + "`" + ` or ` + "`" + `status:value` + "`" + `.\n\nValid filter fieldnames are:\n* ` + "`" + `origin` + "`" + `: origin component of the service's package identifier\n* ` + "`" + `service` + "`" + `: the name component of the service's package identifier\n* ` + "`" + `version` + "`" + `: the version number component of the service's package identifier\n* ` + "`" + `buildstamp` + "`" + `: the build timestamp (also called \"release\") of the service's package identifier\n* ` + "`" + `channel` + "`" + `: the package channel to which the service subscribes for updates\n* ` + "`" + `application` + "`" + `: the application field of the service's event-stream metadata\n* ` + "`" + `environment` + "`" + `: the environment field of the service's event-stream metadata\n* ` + "`" + `site` + "`" + `: the site field of the service's event-stream metadata\n* ` + "`" + `group` + "`" + `: the suffix of the service group name\n\nService groups may also be filtered by ` + "`" + `status` + "`" + `, which refers to a service's\nconnected/disconnected state or it's most recent healthcheck result. Valid\nstatus filter parameters are:\n* ` + "`" + `status:disconnected` + "`" + `: only return service groups that contain at least\n  one service in the disconnected state\n* ` + "`" + `status:critical` + "`" + `: only return service groups that contain at least one\n  service that is returning a \"critical\" healthcheck result\n* ` + "`" + `status:critical` + "`" + `: only return service groups that contain at least one\n  service that is returning a \"critical\" healthcheck result\n* ` + "`" + `status:unknown` + "`" + `: only return service groups that contain at least one\n  service that is returning an \"unknown\" healthcheck result and no\n  services returning \"critical\" results\n* ` + "`" + `status:warning` + "`" + `: only return service groups that contain at least one\n  service that is returning a \"warning\" healthcheck result and have no\n  services returning \"critical\" or \"unknown\" results\n* ` + "`" + `status:ok` + "`" + `: only return service groups where all services are returning\n  \"ok\" health check results",
             "in": "query",
             "required": false,
             "type": "array",
@@ -166,7 +166,7 @@ func init() {
     "/applications/service-groups/{service_group_id}": {
       "get": {
         "summary": "List Services for a Service Group",
-        "description": "List the services for a service group with health status and service metadata.\nUses the service group ID generated by Chef Automate instead of the Chef Habitat- provided ID.\nSupports pagination and filtering.\n\nExample:\n`+"`"+``+"`"+``+"`"+`\napplications/service-groups/1dfff679054c60a10c51d059b6dbf81a765c46f8d3e8ce0752b22ffe8d4d9716?pagination.page=1\u0026pagination.size=25\n`+"`"+``+"`"+``+"`"+`",
+        "description": "List the services for a service group with health status and service metadata.\nUses the service group ID generated by Chef Automate instead of the Chef Habitat- provided ID.\nSupports pagination and filtering.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\napplications/service-groups/1dfff679054c60a10c51d059b6dbf81a765c46f8d3e8ce0752b22ffe8d4d9716?pagination.page=1\u0026pagination.size=25\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetServicesBySG",
         "responses": {
           "200": {
@@ -221,7 +221,7 @@ func init() {
           },
           {
             "name": "filter",
-            "description": "Applies filters, in the format of `+"`"+`fieldname:value`+"`"+`.\nSee documentation for ServicesReq for valid filter parameters.",
+            "description": "Applies filters, in the format of ` + "`" + `fieldname:value` + "`" + `.\nSee documentation for ServicesReq for valid filter parameters.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -252,7 +252,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
-            "description": "Applies search filters, in the format of `+"`"+`fieldname:value`+"`"+`.\nSee the documentation for ServiceGroupsReq for valid filter parameters.",
+            "description": "Applies search filters, in the format of ` + "`" + `fieldname:value` + "`" + `.\nSee the documentation for ServiceGroupsReq for valid filter parameters.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -283,7 +283,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
-            "description": "Applies search filters, in the format of `+"`"+`fieldname:value`+"`"+`.\nValid filter fieldnames are:\n* `+"`"+`origin`+"`"+`: origin component of the service's package identifier\n* `+"`"+`service`+"`"+`: the name component of the service's package identifier\n* `+"`"+`version`+"`"+`: the version number component of the service's package identifier\n* `+"`"+`buildstamp`+"`"+`: the build timestamp (also called \"release\") of the service's package identifier\n* `+"`"+`channel`+"`"+`: the package channel to which the service subscribes for updates\n* `+"`"+`application`+"`"+`: the application field of the service's event-stream metadata\n* `+"`"+`environment`+"`"+`: the environment field of the service's event-stream metadata\n* `+"`"+`site`+"`"+`: the site field of the service's event-stream metadata\n* `+"`"+`group`+"`"+`: the suffix of the service group name\nServices may also be filtered by `+"`"+`status`+"`"+`, which refers to a service's\nconnected/disconnected state or it's most recent healthcheck result. Valid\nstatus filter parameters are:\n* `+"`"+`status:disconnected`+"`"+`: only return services in the disconnected state\n* `+"`"+`status:critical`+"`"+`: only return services that are returning a \"critical\"\n  healthcheck result\n* `+"`"+`status:unknown`+"`"+`: only return services that are returning an \"unknown\"\n  healthcheck result\n* `+"`"+`status:warning`+"`"+`: only return services that are returning a \"warning\"\n  healthcheck result\n* `+"`"+`status:ok`+"`"+`: only return services that are returning \"ok\" health check\n  results.",
+            "description": "Applies search filters, in the format of ` + "`" + `fieldname:value` + "`" + `.\n\nValid filter fieldnames are:\n* ` + "`" + `origin` + "`" + `: origin component of the service's package identifier\n* ` + "`" + `service` + "`" + `: the name component of the service's package identifier\n* ` + "`" + `version` + "`" + `: the version number component of the service's package identifier\n* ` + "`" + `buildstamp` + "`" + `: the build timestamp (also called \"release\") of the service's package identifier\n* ` + "`" + `channel` + "`" + `: the package channel to which the service subscribes for updates\n* ` + "`" + `application` + "`" + `: the application field of the service's event-stream metadata\n* ` + "`" + `environment` + "`" + `: the environment field of the service's event-stream metadata\n* ` + "`" + `site` + "`" + `: the site field of the service's event-stream metadata\n* ` + "`" + `group` + "`" + `: the suffix of the service group name\n\nServices may also be filtered by ` + "`" + `status` + "`" + `, which refers to a service's\nconnected/disconnected state or it's most recent healthcheck result. Valid\nstatus filter parameters are:\n* ` + "`" + `status:disconnected` + "`" + `: only return services in the disconnected state\n* ` + "`" + `status:critical` + "`" + `: only return services that are returning a \"critical\"\n  healthcheck result\n* ` + "`" + `status:unknown` + "`" + `: only return services that are returning an \"unknown\"\n  healthcheck result\n* ` + "`" + `status:warning` + "`" + `: only return services that are returning a \"warning\"\n  healthcheck result\n* ` + "`" + `status:ok` + "`" + `: only return services that are returning \"ok\" health check\n  results",
             "in": "query",
             "required": false,
             "type": "array",
@@ -336,7 +336,7 @@ func init() {
     "/applications/services-distinct-values": {
       "get": {
         "summary": "List Filter Values",
-        "description": "Lists all of the possible filter values for a given valid field.\nLimit the returned values by providing at one or more characters in the `+"`"+`query_fragment`+"`"+` parameter.\nSupports wildcard (* and ?)",
+        "description": "Lists all of the possible filter values for a given valid field.\nLimit the returned values by providing at one or more characters in the ` + "`" + `query_fragment` + "`" + ` parameter.\nSupports wildcard (* and ?)",
         "operationId": "GetServicesDistinctValues",
         "responses": {
           "200": {
@@ -363,7 +363,7 @@ func init() {
           },
           {
             "name": "filter",
-            "description": "Applies filters, in the format of `+"`"+`fieldname:value`+"`"+`.\nSee documentation for ServicesReq for valid filter parameters.",
+            "description": "Applies filters, in the format of ` + "`" + `fieldname:value` + "`" + `.\nSee documentation for ServicesReq for valid filter parameters.",
             "in": "query",
             "required": false,
             "type": "array",
@@ -433,7 +433,7 @@ func init() {
       },
       "post": {
         "summary": "Change 'Remove Disconnected Services' Configuration",
-        "description": "Updates configuration information for the task that deletes services marked as disconnected\nafter 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.\nThis job can be disabled by setting `+"`"+`\"running\": false`+"`"+`.\n\nExample:\n`+"`"+``+"`"+``+"`"+`\nservice_groups/delete_disconnected_services/config\" -d\n'{\n\"threshold\": \"1d\",\n\"running\":true\n}'\n`+"`"+``+"`"+``+"`"+`",
+        "description": "Updates configuration information for the task that deletes services marked as disconnected\nafter 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.\nThis job can be disabled by setting ` + "`" + `\"running\": false` + "`" + `.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\nservice_groups/delete_disconnected_services/config\" -d\n'{\n\"threshold\": \"1d\",\n\"running\":true\n}'\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateDeleteDisconnectedServicesConfig",
         "responses": {
           "200": {
@@ -461,7 +461,7 @@ func init() {
     "/retention/service_groups/disconnected_services/config": {
       "get": {
         "summary": "Show 'Disconnected Services' configuration",
-        "description": "Returns the configuration for the task that marks services as disconnected. The `+"`"+`threshold`+"`"+` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. `+"`"+`Threshold`+"`"+` is a string that follows Elasticsearch's date math expressions.\nThis task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.",
+        "description": "Returns the configuration for the task that marks services as disconnected. The ` + "`" + `threshold` + "`" + ` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. ` + "`" + `Threshold` + "`" + ` is a string that follows Elasticsearch's date math expressions.\nThis task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.",
         "operationId": "GetDisconnectedServicesConfig",
         "responses": {
           "200": {
@@ -477,7 +477,7 @@ func init() {
       },
       "post": {
         "summary": "Change 'Disconnected Services' Configuration",
-        "description": "Changes the configuration for the task that marks services as disconnected after\n'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.\nThis job cannot be disabled, and therefore no information about running is accepted.\n\nExample:\n`+"`"+``+"`"+``+"`"+`\n/retention/service_groups/disconnected_services/config\n'{\n\"threshold\": \"15m\"\n}'\n`+"`"+``+"`"+``+"`"+`",
+        "description": "Changes the configuration for the task that marks services as disconnected after\n'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.\nThis job cannot be disabled, and therefore no information about running is accepted.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n/retention/service_groups/disconnected_services/config\n'{\n\"threshold\": \"15m\"\n}'\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateDisconnectedServicesConfig",
         "responses": {
           "200": {
@@ -591,11 +591,11 @@ func init() {
         "running": {
           "type": "boolean",
           "format": "boolean",
-          "description": "The job status? `+"`"+`false`+"`"+` is disabled, `+"`"+`true`+"`"+` is enabled."
+          "description": "The job status? ` + "`" + `false` + "`" + ` is disabled, ` + "`" + `true` + "`" + ` is enabled."
         },
         "threshold": {
           "type": "string",
-          "description": "The `+"`"+`threshold`+"`"+` setting used by periodic jobs for evaluating services.\nThreshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under `+"`"+`lib/`+"`"+`."
+          "description": "The ` + "`" + `threshold` + "`" + ` setting used by periodic jobs for evaluating services.\nThreshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under ` + "`" + `lib/` + "`" + `."
         }
       },
       "description": "Periodic job configuration."
@@ -605,7 +605,7 @@ func init() {
       "properties": {
         "threshold": {
           "type": "string",
-          "description": "The `+"`"+`threshold`+"`"+` setting used by periodic jobs for evaluating services.\nThreshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under `+"`"+`lib/`+"`"+`."
+          "description": "The ` + "`" + `threshold` + "`" + ` setting used by periodic jobs for evaluating services.\nThreshold is a string that follows Elasticsearch's date math expressions. For more information, see the simpledatemath package under ` + "`" + `lib/` + "`" + `."
         }
       },
       "description": "Configuration for the mandatory periodic job.\nRequired and cannot be disabled."

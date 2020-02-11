@@ -88,11 +88,5 @@ func TempUpload(body io.ReadCloser, suffix string) (string, error) {
 func CheckProfile(tmpWithSuffix string) (inspec.CheckResult, error) {
 	defer util.TimeTrack(time.Now(), "CheckProfile")
 
-	checkResult, err := inspec.Check(tmpWithSuffix)
-	if err != nil {
-		logrus.Error("CheckProfile InSpec Check failed for " + tmpWithSuffix)
-		return checkResult, err
-	}
-
-	return checkResult, nil
+	return inspec.Check(tmpWithSuffix)
 }
