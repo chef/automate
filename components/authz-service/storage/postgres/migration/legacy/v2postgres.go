@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"fmt"
 
+	"github.com/chef/automate/components/authz-service/storage"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 	"github.com/lib/pq"
@@ -95,7 +96,7 @@ func createV2Policy(ctx context.Context, db *sql.DB, pol *v2Policy) (*v2Policy, 
 	}
 
 	if err := insertCompletePolicy(ctx, pol, projects, tx); err != nil {
-		return nil, errors.Wrap(err, "createV2Policy")
+		return nil, err
 	}
 
 	err = tx.Commit()
@@ -107,38 +108,44 @@ func createV2Policy(ctx context.Context, db *sql.DB, pol *v2Policy) (*v2Policy, 
 	return pol, nil
 }
 
-func insertCompletePolicy(ctx context.Context, pol *v2Policy, projects []string, q *sql.Tx) error {
-	if err := insertPolicyWithQuerier(ctx, pol, q); err != nil {
+func insertCompletePolicy(ctx context.Context, pol *v2Policy, projects []string, tx *sql.Tx) error {
+	if err := insertPolicyWithQuerier(ctx, pol, tx); err != nil {
 		return err
 	}
 
-	if err := associatePolicyWithProjects(ctx, pol.ID, projects, q); err != nil {
+	if err := associatePolicyWithProjects(ctx, pol.ID, projects, tx); err != nil {
 		return err
 	}
 
-	if err := insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, q); err != nil {
+	if err := insertPolicyStatementsWithQuerier(ctx, pol.ID, pol.Statements, tx); err != nil {
 		return err
 	}
 	return nil
 }
 
-func insertPolicyWithQuerier(ctx context.Context, inputPol *v2Policy, q *sql.Tx) error {
-	_, err := q.ExecContext(ctx,
+func insertPolicyWithQuerier(ctx context.Context, inputPol *v2Policy, tx *sql.Tx) error {
+	_, err := tx.ExecContext(ctx,
 		`SELECT insert_iam_policy($1, $2, $3);`,
 		inputPol.ID, inputPol.Name, inputPol.Type.String(),
 	)
 	if err != nil {
-		return errors.Wrap(err, "insertPolicyWithQuerier")
+		if err, ok := err.(*pq.Error); ok {
+			switch err.Code {
+			case "23505": // Unique violation
+				return storage.ErrConflict
+			}
+		}
+		return errors.Wrap(storage.ErrDatabase, "insertPolicyWithQuerier")
 	}
 
-	err = replacePolicyMembersWithQuerier(ctx, inputPol.ID, inputPol.Members, q)
+	err = replacePolicyMembersWithQuerier(ctx, inputPol.ID, inputPol.Members, tx)
 	return errors.Wrap(err, "replace policy members")
 }
 
 func replacePolicyMembersWithQuerier(ctx context.Context, policyID string, members []v2Member,
-	q *sql.Tx) error {
+	tx *sql.Tx) error {
 	// Cascade delete any existing members.
-	_, err := q.ExecContext(ctx,
+	_, err := tx.ExecContext(ctx,
 		`DELETE FROM iam_policy_members WHERE policy_id=policy_db_id($1);`, policyID)
 	if err != nil {
 		return errors.Wrap(err, "replacePolicyMembersWithQuerier")
@@ -146,7 +153,7 @@ func replacePolicyMembersWithQuerier(ctx context.Context, policyID string, membe
 
 	// Insert new members.
 	for _, member := range members {
-		err = insertOrReusePolicyMemberWithQuerier(ctx, policyID, member, q)
+		err = insertOrReusePolicyMemberWithQuerier(ctx, policyID, member, tx)
 		if err != nil {
 			return errors.Wrap(err, "replacePolicyMembersWithQuerier")
 		}
@@ -155,13 +162,13 @@ func replacePolicyMembersWithQuerier(ctx context.Context, policyID string, membe
 }
 
 func insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID string, member v2Member,
-	q *sql.Tx) error {
+	tx *sql.Tx) error {
 	// First, we insert the member but on conflict do nothing. Then, we insert the member
 	// into the policy. This is safe to do non-transactionally right now, since we don't support
 	// updating either iam_members id or name columns which is the entire table. Also, we are currently
 	// not deleting any of the rows, but reusing them per name string.
 
-	_, err := q.ExecContext(ctx,
+	_, err := tx.ExecContext(ctx,
 		"INSERT INTO iam_members (name) VALUES ($1) ON CONFLICT DO NOTHING",
 		member.Name)
 	if err != nil {
@@ -169,7 +176,7 @@ func insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID string, 
 	}
 
 	// Ignore conflicts if someone is trying to add a user that is already a member.
-	_, err = q.ExecContext(ctx,
+	_, err = tx.ExecContext(ctx,
 		`INSERT INTO iam_policy_members (policy_id, member_id)
 			VALUES (policy_db_id($1), member_db_id($2)) ON CONFLICT DO NOTHING`, policyID, member.Name)
 	return errors.Wrapf(err, "failed to upsert member link: member=%s, policy_id=%s", member.Name, policyID)
@@ -177,16 +184,16 @@ func insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID string, 
 
 func associatePolicyWithProjects(ctx context.Context,
 	policyID string, inProjects []string,
-	q *sql.Tx) error {
+	tx *sql.Tx) error {
 
 	// Drop any existing associations.
-	_, err := q.ExecContext(ctx,
+	_, err := tx.ExecContext(ctx,
 		"DELETE FROM iam_policy_projects WHERE policy_id=policy_db_id($1)", policyID)
 	if err != nil {
 		return err
 	}
 	for _, project := range inProjects {
-		_, err := q.ExecContext(ctx,
+		_, err := tx.ExecContext(ctx,
 			`INSERT INTO iam_policy_projects (policy_id, project_id) VALUES (policy_db_id($1), project_db_id($2))`,
 			&policyID, &project)
 		if err != nil {
@@ -199,9 +206,9 @@ func associatePolicyWithProjects(ctx context.Context,
 
 func insertPolicyStatementsWithQuerier(ctx context.Context,
 	policyID string, inputStatements []v2Statement,
-	q *sql.Tx) error {
+	tx *sql.Tx) error {
 	for _, s := range inputStatements {
-		_, err := q.ExecContext(ctx,
+		_, err := tx.ExecContext(ctx,
 			`SELECT insert_iam_statement_into_policy($1, $2, $3, $4, $5, $6);`,
 			policyID, s.Effect.String(), pq.Array(s.Actions),
 			pq.Array(s.Resources), s.Role, pq.Array(s.Projects),
@@ -225,7 +232,7 @@ func addPolicyMembers(ctx context.Context, db *sql.DB, id string, members []v2Me
 
 	// Project filtering handled in here. We'll return a 404 right away if we can't find
 	// the policy via ID as filtered by projects.
-	_, err = queryPolicy(ctx, id, tx, false)
+	_, err = queryPolicy(ctx, id, tx)
 	if err != nil {
 		return nil, errors.Wrap(err, "addPolicyMembers")
 	}
@@ -249,8 +256,8 @@ func addPolicyMembers(ctx context.Context, db *sql.DB, id string, members []v2Me
 	return members, nil
 }
 
-func getPolicyMembersWithQuerier(ctx context.Context, id string, q *sql.Tx) ([]v2Member, error) {
-	rows, err := q.QueryContext(ctx,
+func getPolicyMembersWithQuerier(ctx context.Context, id string, tx *sql.Tx) ([]v2Member, error) {
+	rows, err := tx.QueryContext(ctx,
 		`SELECT m.name FROM iam_policy_members AS pm
 			JOIN iam_members AS m ON pm.member_id=m.db_id
 			WHERE pm.policy_id=policy_db_id($1) ORDER BY m.name ASC`, id)
@@ -277,17 +284,11 @@ func getPolicyMembersWithQuerier(ctx context.Context, id string, q *sql.Tx) ([]v
 	return members, nil
 }
 
-func queryPolicy(ctx context.Context, id string, q *sql.Tx, selectForUpdate bool) (*v2Policy, error) {
+func queryPolicy(ctx context.Context, id string, tx *sql.Tx) (*v2Policy, error) {
 	var pol v2Policy
 	query := "SELECT query_policy($1, $2)"
-	if selectForUpdate {
-		query = "SELECT query_policy($1, $2) FOR UPDATE"
-	}
-	fmt.Printf("ID %s", id)
-	pol_u := q.QueryRowContext(ctx, query, id, pq.Array([]string{}))
-	fmt.Printf("prescan %v", pol_u)
+	pol_u := tx.QueryRowContext(ctx, query, id, pq.Array([]string{}))
 	if err := pol_u.Scan(&pol); err != nil {
-		fmt.Printf("SCANNING")
 		return nil, err
 	}
 
@@ -295,13 +296,13 @@ func queryPolicy(ctx context.Context, id string, q *sql.Tx, selectForUpdate bool
 }
 
 func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID string, member v2Member,
-	q *sql.Tx) error {
+	tx *sql.Tx) error {
 	// First, we insert the member but on conflict do nothing. Then, we insert the member
 	// into the policy. This is safe to do non-transactionally right now, since we don't support
 	// updating either iam_members id or name columns which is the entire table. Also, we are currently
 	// not deleting any of the rows, but reusing them per name string.
 
-	_, err := q.ExecContext(ctx,
+	_, err := tx.ExecContext(ctx,
 		"INSERT INTO iam_members (name) VALUES ($1) ON CONFLICT DO NOTHING",
 		member.Name)
 	if err != nil {
@@ -309,7 +310,7 @@ func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID 
 	}
 
 	// Ignore conflicts if someone is trying to add a user that is already a member.
-	_, err = q.ExecContext(ctx,
+	_, err = tx.ExecContext(ctx,
 		`INSERT INTO iam_policy_members (policy_id, member_id)
 			VALUES (policy_db_id($1), member_db_id($2)) ON CONFLICT DO NOTHING`, policyID, member.Name)
 	return errors.Wrapf(err, "failed to upsert member link: member=%s, policy_id=%s", member.Name, policyID)

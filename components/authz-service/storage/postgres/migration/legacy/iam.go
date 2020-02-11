@@ -83,16 +83,16 @@ func migrateV1Policies(ctx context.Context, db *sql.DB) ([]error, error) {
 			}
 			continue // don't migrate admin policies with single token
 		}
-		storagePol, err := migrateV1Policy(pol)
+		v2StoragePol, err := versionizeToV2(pol)
 		if err != nil {
 			// collect error
 			errs = append(errs, errors.Wrapf(err, "convert v1 policy %q", pol.ID.String()))
 			continue // nothing to create
 		}
-		if storagePol == nil {
+		if v2StoragePol == nil {
 			continue // nothing to create
 		}
-		_, err = createV2Policy(ctx, db, storagePol)
+		_, err = createV2Policy(ctx, db, v2StoragePol)
 		switch err {
 		case nil, storage_errors.ErrConflict: // ignore, continue
 		default:
@@ -102,7 +102,7 @@ func migrateV1Policies(ctx context.Context, db *sql.DB) ([]error, error) {
 	return errs, nil
 }
 
-func migrateV1Policy(pol *v1Policy) (*v2Policy, error) {
+func versionizeToV2(pol *v1Policy) (*v2Policy, error) {
 	wellKnown, err := isWellKnown(pol.ID)
 	if err != nil {
 		return nil, errors.Wrapf(err, "lookup v1 default policy %q", pol.ID.String())

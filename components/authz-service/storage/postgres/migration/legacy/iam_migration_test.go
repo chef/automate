@@ -25,50 +25,6 @@ const (
 	pgURL                         = "postgres://postgres@127.0.0.1:5432/authz_test?sslmode=disable"
 )
 
-// Setup
-// initialize dbs
-// migrate to point in time
-// create legacy policies
-// call migrateToV2
-
-// func migrationConfigIfPGTestsToBeRun(l logger.Logger, migrationFolder string) (*migration.Config, error) {
-// 	customPGURL, pgURLPassed := os.LookupEnv("PG_URL")
-// 	ciMode := os.Getenv("CI") == "true"
-
-// 	_, filepath, _, _ := runtime.Caller(1)
-// 	migrationPath := path.Join(path.Dir(filepath), migrationFolder)
-
-// 	// If in CI mode, use the default
-// 	if ciMode {
-// 		pgURL, err := url.Parse("postgres://postgres@127.0.0.1:5432/authz_test?sslmode=disable")
-// 		if err != nil {
-// 			return nil, err
-// 		}
-// 		return &migration.Config{
-// 			Path:   migrationPath,
-// 			Logger: l,
-// 			PGURL:  pgURL,
-// 		}, nil
-// 	}
-
-// 	// If PG_URL wasn't passed (and we aren't in CI)
-// 	// we shouldn't run the postgres tests, return nil.
-// 	if !pgURLPassed {
-// 		return nil, nil
-// 	}
-
-// 	pgURL, err := url.Parse(customPGURL)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	return &migration.Config{
-// 		Path:   migrationPath,
-// 		Logger: l,
-// 		PGURL:  pgURL,
-// 	}, nil
-// }
-
 func addMigrationsTable(u, table string) (string, error) {
 	pgURL, err := url.Parse(u)
 	if err != nil {
@@ -298,107 +254,9 @@ func TestMigrateToV2(t *testing.T) {
 			err = deletePol(ctx, db, valPolID.String())
 			require.NoError(t, err)
 		},
-		// // --------- migration status related tests ---------
-		// "when no migration has been run, migration status is set to v1": func(t *testing.T) {
-		// 	s, err := getMigrationStatus(ctx, db)
-		// 	require.NoError(t, err)
-		// 	require.NotNil(t, s)
-
-		// 	assert.Equal(t, storage.Pristine, s)
-		// },
-		// "when migration recorded as in progress, it's not run": func(t *testing.T) {
-		// 	require.NoError(t, status.InProgress(ctx))
-
-		// 	_, err := migrateToV2(ctx, db)
-		// 	grpctest.AssertCode(t, codes.FailedPrecondition, err)
-
-		// 	assert.Zero(t, policyStore.ItemCount())
-		// 	assert.Zero(t, roleStore.ItemCount())
-		// },
-		// "when migration recorded as failed, it is run": func(t *testing.T) {
-		// 	require.NoError(t, status.InProgress(ctx))
-		// 	require.NoError(t, status.Failure(ctx))
-
-		// 	_, err := migrateToV2(ctx, db)
-		// 	require.NoError(t, err)
-
-		// 	assert.Equal(t, v2DefaultPolicyCount, policyStore.ItemCount())
-		// 	assert.Equal(t, v2DefaultRoleCount, roleStore.ItemCount())
-		// },
-		// "when on 1.0 and flag is 2.0, migration recorded as successful": func(t *testing.T) {
-		// 	s, err := getMigrationStatus(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.Equal(t, storage.Pristine, s)
-
-		// 	resp, err := migrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
-		// 	require.NoError(t, err)
-		// 	assert.NotNil(t, resp)
-
-		// 	s, err = getMigrationStatus(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.Equal(t, storage.Successful, s)
-		// },
-		// "when on 1.0 and flag is 2.1, migration recorded as successful-beta2.1": func(t *testing.T) {
-		// 	s, err := getMigrationStatus(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.Equal(t, storage.Pristine, s)
-
-		// 	resp, err := migrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-		// 	require.NoError(t, err)
-		// 	assert.NotNil(t, resp)
-
-		// 	s, err = getMigrationStatus(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.Equal(t, storage.SuccessfulBeta1, s)
-		// },
-		// "when on 2.0 and flag is 2.0, no migration run": func(t *testing.T) {
-		// 	require.NoError(t, status.Success(ctx))
-
-		// 	_, err := migrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
-		// 	grpctest.AssertCode(t, codes.AlreadyExists, err)
-
-		// 	s, err := getMigrationStatus(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.Equal(t, storage.Successful, s)
-		// },
-		// "when on 2.0 and flag is 2.1, migration recorded as successful-beta2.1": func(t *testing.T) {
-		// 	require.NoError(t, status.Success(ctx))
-
-		// 	resp, err := migrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-		// 	require.NoError(t, err)
-		// 	assert.NotNil(t, resp)
-
-		// 	s, err := getMigrationStatus(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.Equal(t, storage.SuccessfulBeta1, s)
-		// },
-		// "when on 2.1 and flag is 2.1, no migration run": func(t *testing.T) {
-		// 	require.NoError(t, status.SuccessBeta1(ctx))
-
-		// 	_, err := migrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-		// 	grpctest.AssertCode(t, codes.AlreadyExists, err)
-
-		// 	s, err := getMigrationStatus(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.Equal(t, storage.SuccessfulBeta1, s)
-		// },
-		// "when on 2.1 and flag is 2.0, migration recorded as successful": func(t *testing.T) {
-		// 	require.NoError(t, status.SuccessBeta1(ctx))
-
-		// 	resp, err := migrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
-		// 	require.NoError(t, err)
-		// 	assert.NotNil(t, resp)
-
-		// 	s, err := getMigrationStatus(ctx, db)
-		// 	require.NoError(t, err)
-		// 	assert.Equal(t, storage.Successful, s)
-		// },
 	}
 
 	for desc, test := range cases {
-		// reset memstore to "no migrations ever attempted" status
-		// require.NoError(t, status.Pristine(ctx))
-
 		flush(t, db)
 		t.Run(desc, test)
 	}
@@ -410,7 +268,7 @@ func queryTestPolicy(ctx context.Context, id string, db *sql.DB) (*v2Policy, err
 		return nil, errors.Wrap(err, "begin queryTestPolicy tx")
 	}
 
-	resp, err := queryPolicy(ctx, id, tx, false)
+	resp, err := queryPolicy(ctx, id, tx)
 	if err != nil {
 		return nil, errors.Wrap(err, "query policy")
 	}
