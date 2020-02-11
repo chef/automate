@@ -9,11 +9,16 @@ import (
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	constants_v1 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v1"
 	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
+	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 	"github.com/pkg/errors"
 )
 
 func MigrateToV2(ctx context.Context, db *sql.DB) error {
+	l, err := logger.NewLogger("text", "info")
+	if err != nil {
+		return errors.Wrap(err, "could not initialize logger")
+	}
 	for _, role := range defaultRoles() {
 		if err := createRole(ctx, db, &role); err != nil {
 			return errors.Wrapf(err,
@@ -29,13 +34,16 @@ func MigrateToV2(ctx context.Context, db *sql.DB) error {
 	}
 
 	errs, err := migrateV1Policies(ctx, db)
+	if err != nil {
+		return errors.Wrapf(err, "migrate v1 policies")
+	}
 
 	var reports []string
 	for _, e := range errs {
 		reports = append(reports, e.Error())
 	}
-	if err != nil {
-		return errors.Wrapf(err, "migrate v1 policies: %s", reports)
+	if len(reports) != 0 {
+		l.Infof("invalid v1 policies could not be migrated: %v", reports)
 	}
 
 	return nil
