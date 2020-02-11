@@ -117,8 +117,8 @@
                     *ngIf="service.health_check_result.stdout.length > 138"
                     class="show-more-button"
                     (click)="toggleMoreHealthMsg(i)">
-                    <chef-icon class="unfold">{{ activeErrorAccordions.includes(i) ? "unfold_less" : "unfold_more"}}</chef-icon>
-                    Show {{ activeErrorAccordions.includes(i) ? "Less" : "More"}}</button>
+                    <chef-icon class="unfold">{{ activeHealthAccordions.includes(i) ? "unfold_less" : "unfold_more"}}</chef-icon>
+                    Show {{ activeHealthAccordions.includes(i) ? "Less" : "More"}}</button>
                   </div>
                 </div>
               </div>
