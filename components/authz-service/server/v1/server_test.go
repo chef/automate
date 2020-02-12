@@ -25,6 +25,7 @@ import (
 	"github.com/chef/automate/components/authz-service/engine/opa"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	server "github.com/chef/automate/components/authz-service/server/v1"
+	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v1"
 	"github.com/chef/automate/components/authz-service/storage/v1/memstore"
@@ -85,8 +86,9 @@ func setup(t *testing.T) map[string]authz.AuthorizationClient {
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
+	datamigrationConfig := datamigration.Config{}
 	if migrationConfig != nil { // So, we want PG...
-		backend, err := postgres.New(ctx, l, *migrationConfig)
+		backend, err := postgres.New(ctx, l, *migrationConfig, datamigrationConfig)
 		require.NoError(t, err)
 		// reset
 		require.NoError(t, backend.(storage.Resetter).Reset(ctx))

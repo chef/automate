@@ -17,8 +17,11 @@ import (
 	"github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
+	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v1"
 	memstore_v1 "github.com/chef/automate/components/authz-service/storage/v1/memstore"
+	postgres_v1 "github.com/chef/automate/components/authz-service/storage/v1/postgres"
 	"github.com/chef/automate/lib/grpc/health"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/version"
@@ -52,10 +55,18 @@ func NewMemstoreServer(
 }
 
 // NewPostgresServer instantiates a server.Server that connects to a postgres backend
+// NewPostgresServer instantiates a server.Server that connects to a postgres backend
 func NewPostgresServer(
 	ctx context.Context,
 	l logger.Logger,
-	e engine.V1Engine) (*Server, error) {
+	e engine.V1Engine,
+	migrationsConfig migration.Config,
+	datamigrationsConfig datamigration.Config) (*Server, error) {
+
+	p, err := postgres_v1.New(ctx, l, migrationsConfig, datamigrationsConfig)
+	if err != nil {
+		return nil, errors.Wrapf(err, "init postgres for IAM v1")
+	}
 
 	return NewWithStore(ctx, l, e, p, true, false, nil)
 }

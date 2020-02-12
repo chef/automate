@@ -83,7 +83,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
 
-	pgV1, err := postgres_v1.New(ctx, l, *migrationConfig)
+	pgV1, err := postgres_v1.New(ctx, l, *migrationConfig, datamigration.Config{})
 	require.NoError(t, err)
 
 	vChan := make(chan api.Version, 1)
