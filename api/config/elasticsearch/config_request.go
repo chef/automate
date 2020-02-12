@@ -53,6 +53,7 @@ func DefaultConfigRequest() *ConfigRequest {
 
 	// cluster
 	sys.Cluster.Name = w.String("chef-insights") // user.toml override
+	sys.Cluster.MaxShardsPerNode = w.Int32(1000) // default
 	sys.Cluster.Routing.Allocation.NodeConcurrentRecoveries = w.Int32(2)
 	sys.Cluster.Routing.Allocation.NodeInitialPrimariesRecoveries = w.Int32(4)
 	sys.Cluster.Routing.Allocation.SameShardHost = w.Bool(false)

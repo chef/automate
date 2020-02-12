@@ -9,6 +9,7 @@ cluster.routing.allocation.disk.watermark.high: 500MB
 cluster.routing.allocation.disk.watermark.flood_stage: 250MB
 cluster.info.update.interval: 1m
 
+cluster.max_shards_per_node: {{cfg.cluster.max_shards_per_node}}
 
 {{#if cfg.cluster.routing.allocation.awareness_attributes ~}}
 cluster.routing.allocation.awareness.attributes: {{cfg.cluster.routing.allocation.awareness_attributes}}
