@@ -239,16 +239,6 @@ func (p *Server) GetPolicyVersion(
 	}, nil
 }
 
-func (p *Server) ResetToV1(
-	ctx context.Context, in *pb_req.ResetToV1Req) (*pb_resp.ResetToV1Resp, error) {
-	_, err := p.policies.ResetToV1(ctx, &authz.ResetToV1Req{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb_resp.ResetToV1Resp{}, nil
-}
-
 // CreateRole creates a new role.
 func (p *Server) CreateRole(
 	ctx context.Context, in *pb_req.CreateRoleReq) (*pb_resp.CreateRoleResp, error) {

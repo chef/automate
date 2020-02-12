@@ -8,8 +8,6 @@ import (
 
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc/codes"
-	grpc_status "google.golang.org/grpc/status"
 
 	authz_constants "github.com/chef/automate/components/authz-service/constants"
 	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
@@ -113,17 +111,6 @@ func newIAMUpgradeToV2Cmd() *cobra.Command {
 	return cmd
 }
 
-func newIAMResetToV1Cmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "reset-to-v1",
-		Short: "Reset to IAM v1",
-		Long: "Reset to IAM v1. This will revert to policies in place before upgrade to IAM v2 " +
-			"and will remove any v2 policies in place, even if upgrade is re-applied.",
-		RunE: runIAMResetToV1Cmd,
-		Args: cobra.ExactArgs(0),
-	}
-}
-
 func newIAMVersionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
@@ -136,7 +123,6 @@ func newIAMVersionCmd() *cobra.Command {
 func init() {
 	iamCommand := newIAMCommand()
 	iamCommand.AddCommand(newIAMUpgradeToV2Cmd())
-	iamCommand.AddCommand(newIAMResetToV1Cmd())
 	iamCommand.AddCommand(newIAMVersionCmd())
 
 	iamAdminAccessCommand := newIAMAdminAccessCommand()
@@ -213,35 +199,6 @@ func outputReport(report string) {
 	writer.Body(parts[0])
 	if len(parts) >= 2 {
 		writer.Body(strings.TrimSpace(parts[1]))
-	}
-}
-
-func runIAMResetToV1Cmd(cmd *cobra.Command, args []string) error {
-	writer.Title("Resetting to IAM v1.0 (with pre-upgrade v1 policies)...")
-	ctx := context.Background()
-	apiClient, err := apiclient.OpenConnection(ctx)
-	if err != nil {
-		return status.Wrap(err, status.APIUnreachableError,
-			"Failed to create a connection to the API")
-	}
-
-	_, err = apiClient.PoliciesClient().ResetToV1(ctx, &iam_req.ResetToV1Req{})
-	switch grpc_status.Convert(err).Code() {
-	case codes.OK:
-		return resetDomainsToV1(ctx, apiClient)
-	case codes.FailedPrecondition:
-		return status.Wrap(err, status.IAMResetV1DatabaseError,
-			"Migration to IAMv2 in progress")
-	case codes.AlreadyExists:
-		// Reset domain projects to be idempotent on crash of initial attempt
-		err := resetDomainsToV1(ctx, apiClient)
-		if err == nil {
-			writer.Failf(alreadyMigratedMessage, "v1.0")
-		}
-		return err
-	default: // something else: fail
-		return status.Wrap(err, status.IAMResetV1DatabaseError,
-			"Failed to reset IAM state to v1")
 	}
 }
 
