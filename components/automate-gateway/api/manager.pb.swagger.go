@@ -70,11 +70,15 @@ func init() {
       },
       "delete": {
         "summary": "Delete a nodemanager",
+<<<<<<< HEAD
 <<<<<<< HEAD:components/automate-gateway/api/manager.pb.swagger.go
         "description": "Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes\nassociated with the manager will be re-assigned to the Automate node manager.",
 =======
         "description": "Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes\nassociated with the manager will be abandoned.",
 >>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes_manager_manager.pb.swagger.go
+=======
+        "description": "Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes\nassociated with the manager will be abandoned.",
+>>>>>>> f3c031ed33b3477f252cc4fb8492bfe264930ba7
         "operationId": "Delete",
         "responses": {
           "200": {
@@ -134,11 +138,15 @@ func init() {
     "/nodemanagers/id/{id}/with-node-state/stopped": {
       "delete": {
         "summary": "Delete a nodemanager and set nodes to have a state of stopped",
+<<<<<<< HEAD
 <<<<<<< HEAD:components/automate-gateway/api/manager.pb.swagger.go
         "description": "Delete a nodemanager and update all associated nodes to have a state of ` + "`" + `stopped` + "`" + `.",
 =======
         "description": "Delete a nodemanager and update all associated nodes to have a state of stopped.",
 >>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes_manager_manager.pb.swagger.go
+=======
+        "description": "Delete a nodemanager and update all associated nodes to have a state of stopped.",
+>>>>>>> f3c031ed33b3477f252cc4fb8492bfe264930ba7
         "operationId": "DeleteWithNodeStateStopped",
         "responses": {
           "200": {
@@ -219,11 +227,15 @@ func init() {
     "/nodemanagers/id/{node_manager_id}/search-fields": {
       "post": {
         "summary": "Search node fields",
+<<<<<<< HEAD
 <<<<<<< HEAD:components/automate-gateway/api/manager.pb.swagger.go
         "description": "Searches the available values for a given field across all nodes associated with the nodemanager id.\nPossible fields: regions, tags, name, subscription_id\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"query\": {\n\"filter_map\":[]\n},\n\"field\": \"name\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
 =======
         "description": "Searches the available values for a given field and nodemanager id.\nPossible fields: regions, tags, name, subscription_id\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"query\": {\n\"filter_map\":[]\n},\n\"field\": \"name\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
 >>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes_manager_manager.pb.swagger.go
+=======
+        "description": "Searches the available values for a given field and nodemanager id.\nPossible fields: regions, tags, name, subscription_id\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"query\": {\n\"filter_map\":[]\n},\n\"field\": \"name\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
+>>>>>>> f3c031ed33b3477f252cc4fb8492bfe264930ba7
         "operationId": "SearchNodeFields",
         "responses": {
           "200": {
@@ -293,11 +305,15 @@ func init() {
     "/nodemanagers/rerun/id/{id}": {
       "post": {
         "summary": "Connect",
+<<<<<<< HEAD
 <<<<<<< HEAD:components/automate-gateway/api/manager.pb.swagger.go
         "description": "Attempts to reach the API for the given nodemanager id to validate the \ncredentials associated with the nodemanager.",
 =======
         "description": "Attempts to reach the API for the given nodemanager id to check validity of the \ncredentials associated with the nodemanager.",
 >>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes_manager_manager.pb.swagger.go
+=======
+        "description": "Attempts to reach the API for the given nodemanager id to check validity of the \ncredentials associated with the nodemanager.",
+>>>>>>> f3c031ed33b3477f252cc4fb8492bfe264930ba7
         "operationId": "Connect",
         "responses": {
           "200": {
@@ -332,11 +348,15 @@ func init() {
     "/nodemanagers/search": {
       "post": {
         "summary": "List of nodemanagers",
+<<<<<<< HEAD
 <<<<<<< HEAD:components/automate-gateway/api/manager.pb.swagger.go
         "description": "Returns a list of nodemanagers matching the query.\nSupports filtering, sorting, and pagination.\n\nValid filtering fields: manager_type\n\nValid sorting fields: name, type, status, status_message, date_added\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filter_map\": [\n{\"key\": \"manager_type\", \"values\":[\"aws-ec2\"]}\n], \n\"sort\": \"date_added\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
 =======
         "description": "Returns a list of nodemanagers matching the query.\nSupports filtering, sorting, and pagination.\nValid filtering fields: 'manager_type'\nValid sorting fields: name, type, status, status_message, date_added\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filter_map\": [\n{\"key\": \"manager_type\", \"values\":[\"aws-ec2\"]}\n], \n\"sort\": \"date_added\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
 >>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes_manager_manager.pb.swagger.go
+=======
+        "description": "Returns a list of nodemanagers matching the query.\nSupports filtering, sorting, and pagination.\nValid filtering fields: 'manager_type'\nValid sorting fields: name, type, status, status_message, date_added\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filter_map\": [\n{\"key\": \"manager_type\", \"values\":[\"aws-ec2\"]}\n], \n\"sort\": \"date_added\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
+>>>>>>> f3c031ed33b3477f252cc4fb8492bfe264930ba7
         "operationId": "List",
         "responses": {
           "200": {
