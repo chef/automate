@@ -532,7 +532,7 @@ function get_api_token() {
   if [ -f /tmp/api_token ]; then
     cat /tmp/api_token
   else
-    chef-automate admin-token >/tmp/api_token
+    date +%s | xargs -I % chef-automate iam token create admin-token-% --admin >/tmp/api_token
     if [ $? -ne 0 ]; then
       get_api_token_with_policy ingest-access >/tmp/api_token || return 1
     fi
@@ -563,7 +563,7 @@ function get_api_token_with_policy() {
     cat "$token_file"
   else
     if [ "$iam_version" == "v1.0" ]; then
-      chef-automate admin-token >"$token_file"
+      date +%s | xargs -I % chef-automate iam token create admin-token-% --admin >"$token_file"
     else
       # create standard api token
       chef-automate iam token create "$token_description" >"$token_file" || return 1

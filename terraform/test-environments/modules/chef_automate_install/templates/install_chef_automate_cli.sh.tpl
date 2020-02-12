@@ -167,22 +167,12 @@ hab license accept
 # Update to whatever the latest version of hab that got installed is
 hab pkg binlink core/hab --force
 
-if [[ ! -f /root/a2-iamv2-enabled ]]; then
-    case "${iam_version}" in
-    "v2.1")
-      chef-automate iam upgrade-to-v2 --skip-policy-migration
-      chef-automate dev create-iam-dev-users
-      touch /root/a2-iamv2-enabled
-      ;;
-    *)
-      # Do nothing
-      ;;
-    esac
-fi
+chef-automate dev create-iam-dev-users
+touch /root/a2-iamv2-enabled
 
 if [[ "${create_admin_token}" == "true" ]]; then
     if [[ ! -f /root/admin-token.txt ]]; then
-        chef-automate admin-token | tr -d '\n' > /root/admin-token.txt
+        date +%s | xargs -I % chef-automate iam token create admin-token-% --admin | tr -d '\n' > /root/admin-token.txt
     fi
     cp /root/admin-token.txt $(hab pkg path chef/automate-ui)/dist/
 fi

@@ -443,15 +443,6 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2 (migrated w/ v1 policies)"
-    command:
-      - integration/run_test integration/tests/iam_v2_with_v1_policies.sh
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          privileged: true
-
   - label: "iam v2"
     command:
       - integration/run_test integration/tests/iam_v2_no_legacy_policies.sh
@@ -736,27 +727,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "reset admin access v1"
-    command:
-      - integration/run_test integration/tests/reset_admin_access_v1.sh
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          privileged: true
-
   - label: "reset admin access v2"
     command:
       - integration/run_test integration/tests/reset_admin_access_v2.sh
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          privileged: true
-
-  - label: "upgrade / reset IAM v2"
-    command:
-      - integration/run_test integration/tests/upgrade_reset_iam_v2.sh
     timeout_in_minutes: 20
     expeditor:
       executor:
