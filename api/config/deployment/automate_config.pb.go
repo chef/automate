@@ -63,7 +63,6 @@ var _ = math.Inf
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 type AutomateConfig struct {
-	// TODO(ssd) 2019-11-11:  WHHHHYYYYYY aren't these in order.
 	Global               *shared.GlobalConfig             `protobuf:"bytes,19,opt,name=global,proto3" json:"global,omitempty" toml:"global,omitempty" mapstructure:"global,omitempty"`
 	AuthN                *authn.ConfigRequest             `protobuf:"bytes,1,opt,name=auth_n,json=authN,proto3" json:"auth_n,omitempty" toml:"auth_n,omitempty" mapstructure:"auth_n,omitempty"`
 	AuthZ                *authz.ConfigRequest             `protobuf:"bytes,2,opt,name=auth_z,json=authZ,proto3" json:"auth_z,omitempty" toml:"auth_z,omitempty" mapstructure:"auth_z,omitempty"`
