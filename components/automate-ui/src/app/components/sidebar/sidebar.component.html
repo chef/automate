@@ -6,34 +6,23 @@
     <div class="nav-items">
       <span *ngFor="let menuGroup of menuGroups$ | async">
         <div
-          *ngIf="isGroupVisible(menuGroup)"
+          *ngIf="(menuGroup.visible | async) || hasAuthroizedMenuItems(menuGroup)"
           class="menu-item-groups"
         >
           <div class="group">{{ menuGroup.name }}</div>
           <span *ngFor="let menuItem of menuGroup.items">
-            <span *ngIf="menuItem.visible && !menuItem.authorized">
+            <span *ngIf="!menuItem.authorized && (menuItem.visible | async)">
               <chef-sidebar-entry
                 [route]="menuItem.route"
                 [icon]="menuItem.icon"
                 [openInNewPage]="menuItem.openInNewPage"
               >{{ menuItem.name }}</chef-sidebar-entry>
             </span>
-            <span *ngIf="menuItem.visible && menuItem.authorized && menuItem.authorized.anyOf">
-              <app-authorized
-                [menuItem.authorized.name]
-                [anyOf]="menuItem.authorized.anyOf"
-              >
-                <chef-sidebar-entry
-                  [route]="menuItem.route"
-                  [icon]="menuItem.icon"
-                  [openInNewPage]="menuItem.openInNewPage"
-                >{{ menuItem.name }}</chef-sidebar-entry>
-              </app-authorized>
-            </span>
-            <span *ngIf="menuItem.visible && menuItem.authorized && menuItem.authorized.allOf">
+            <span *ngIf="menuItem.authorized && (menuItem.visible | async)">
                 <app-authorized
-                  [menuItem.authorized.name]
+                  [anyOf]="menuItem.authorized.anyOf"
                   [allOf]="menuItem.authorized.allOf"
+                  (isAuthorized)="isAuthorized($event, menuItem)"
                 >
                   <chef-sidebar-entry
                     [route]="menuItem.route"

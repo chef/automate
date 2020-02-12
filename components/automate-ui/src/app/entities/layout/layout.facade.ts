@@ -51,7 +51,6 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     }
   };
   public contentHeight = `calc(100% - ${Height.Navigation}px)`;
-  public menuGroups$: Observable<MenuItemGroup[]>;
   public sidebar$: Observable<MenuItemGroup[]>;
   public showPageLoading$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
@@ -60,7 +59,7 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     private store: Store<fromLayout.LayoutEntityState>,
     private layoutSidebarService: LayoutSidebarService
   ) {
-    this.menuGroups$ = store.select(sidebarMenuGroups);
+    this.store.dispatch(new GetProjects());
     this.sidebar$ = store.select(sidebar);
     this.showPageLoading$ = store.select(showPageLoading);
     this.updateDisplay();

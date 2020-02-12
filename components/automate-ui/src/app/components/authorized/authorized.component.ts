@@ -1,4 +1,4 @@
-import { Component, Input, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
+import { Component, Input, EventEmitter, OnInit, OnDestroy, ChangeDetectorRef, Output } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { isEmpty, isArray, pipe } from 'lodash/fp';
 import { takeUntil, filter, debounceTime } from 'rxjs/operators';
@@ -30,12 +30,12 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
 
   @Input()
   set allOf(val: Check[] | Check) {
-    this._allOf = this.normalizeInput(val);
+    this._allOf = val ? this.normalizeInput(val) : undefined;
   }
 
   @Input()
   set anyOf(val: Check[] | Check) {
-    this._anyOf = this.normalizeInput(val);
+    this._anyOf = val ? this.normalizeInput(val) : undefined;
   }
 
   // Include the bare `not` attribute in your HTML element to negate the check.
@@ -45,6 +45,9 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
   // Defaults to false. Useful when trying to generalize components that contain
   // this component.
   @Input() overrideVisible = false;
+
+  // if you wish to output visible
+  @Output() isAuthorized: EventEmitter<boolean> = new EventEmitter();
 
   public visible = false;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
@@ -68,6 +71,7 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
         const oldVisible = this.visible;
         const newVisible = this.authorizedChecker.evalPerms(perms);
         this.visible = this.not === undefined ? newVisible : !newVisible;
+        this.isAuthorized.emit(this.visible);
 
         // Allow this component to receive updates on pages with "OnPush" strategy.
         if (oldVisible !== this.visible) {

@@ -1,9 +1,9 @@
 import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { find } from 'lodash';
+import { find } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
-import { MenuItemGroup, MenuItem } from 'app/entities/layout/layout.model';
+import { MenuItemGroup } from 'app/entities/layout/layout.model';
 
 @Component({
   selector: 'chef-sidebar',
@@ -19,7 +19,14 @@ export class SidebarComponent {
     this.menuGroups$ = layoutFacade.sidebar$;
   }
 
-  public isGroupVisible(menuGroup: MenuItemGroup): MenuItem {
-    return menuGroup.visible && menuGroup.items && find(menuGroup.items, ['visible', true]);
+  public hasAuthroizedMenuItems(menuItemGroup: any): boolean {
+    const authorizedItem = find(menuItemGroup.items, (menuItem) => {
+      return menuItem.authorized && menuItem.authorized.isAuthorized;
+    });
+    return authorizedItem !== undefined;
+  }
+
+  public isAuthorized($event, menuItem) {
+    menuItem.authorized.isAuthorized = $event;
   }
 }
