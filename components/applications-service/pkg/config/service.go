@@ -37,9 +37,11 @@ type Events struct {
 }
 
 type Postgres struct {
-	URI        string `mapstructure:"uri"`
-	Database   string `mapstructure:"database"`
-	SchemaPath string `mapstructure:"schema_path"`
+	URI          string `mapstructure:"uri"`
+	Database     string `mapstructure:"database"`
+	SchemaPath   string `mapstructure:"schema_path"`
+	MaxOpenConns int    `mapstructure:"max_open_conns"`
+	MaxIdleConns int    `mapstructure:"max_idle_conns"`
 }
 
 type Jobs struct {

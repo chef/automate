@@ -9,6 +9,8 @@ metrics_port = 20133
 [storage]
 database = "chef_applications_service"
 user = "applications"
+max_open_conns = 10
+max_idle_conns = 10
 
 [tls]
 key_contents = ""
