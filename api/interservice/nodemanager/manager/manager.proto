@@ -1,14 +1,14 @@
 syntax = "proto3";
 
-package chef.automate.domain.nodemanager.api.manager;
-option go_package = "github.com/chef/automate/components/nodemanager-service/api/manager";
+package chef.automate.domain.nodemanager.manager;
+option go_package = "github.com/chef/automate/api/interservice/nodemanager/manager";
 
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
 import "components/compliance-service/api/common/common.proto";
-import "components/nodemanager-service/api/nodes/nodes.proto";
+import "api/interservice/nodemanager/nodes/nodes.proto";
 
 
 service NodeManagerService {
@@ -26,7 +26,7 @@ service NodeManagerService {
 	rpc SearchNodes(NodeQuery) returns (Nodes) {};
 	rpc ProcessNode(NodeMetadata) returns (ProcessNodeResponse) {};
 	rpc ChangeNodeState(NodeState) returns (ChangeNodeStateResponse) {};
-	rpc GetNodeWithSecrets(Id) returns (chef.automate.domain.nodemanager.api.nodes.Node) {};
+	rpc GetNodeWithSecrets(Id) returns (chef.automate.domain.nodemanager.nodes.Node) {};
 	rpc SearchManagerNodes(NodeQuery) returns (ManagerNodes) {};
 }
 
@@ -74,9 +74,9 @@ message NodeMetadata {
 	string source_region = 8;
 	string source_account_id = 9;
 	repeated chef.automate.domain.compliance.api.common.Kv tags = 10;
-	chef.automate.domain.nodemanager.api.nodes.LastContactData run_data = 11;
-	chef.automate.domain.nodemanager.api.nodes.LastContactData scan_data = 12;
-	repeated chef.automate.domain.nodemanager.api.nodes.ProjectsData projects_data = 13;
+	chef.automate.domain.nodemanager.nodes.LastContactData run_data = 11;
+	chef.automate.domain.nodemanager.nodes.LastContactData scan_data = 12;
+	repeated chef.automate.domain.nodemanager.nodes.ProjectsData projects_data = 13;
 	repeated string projects = 14;
 	string manager_id = 15;
 }

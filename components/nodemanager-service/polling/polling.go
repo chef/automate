@@ -13,7 +13,7 @@ import (
 	"github.com/chef/automate/components/compliance-service/api/common"
 	event "github.com/chef/automate/components/event-service/config"
 
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/nodemanager-service/managers"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 )

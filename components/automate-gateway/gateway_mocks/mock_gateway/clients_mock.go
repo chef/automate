@@ -22,6 +22,8 @@ import (
 	ingest "github.com/chef/automate/api/interservice/ingest"
 	license_control "github.com/chef/automate/api/interservice/license_control"
 	local_user "github.com/chef/automate/api/interservice/local_user"
+	manager "github.com/chef/automate/api/interservice/nodemanager/manager"
+	nodes "github.com/chef/automate/api/interservice/nodemanager/nodes"
 	v1 "github.com/chef/automate/api/interservice/teams/v1"
 	v20 "github.com/chef/automate/api/interservice/teams/v2"
 	jobs "github.com/chef/automate/components/compliance-service/api/jobs"
@@ -30,8 +32,6 @@ import (
 	stats "github.com/chef/automate/components/compliance-service/api/stats"
 	version "github.com/chef/automate/components/compliance-service/api/version"
 	ingest0 "github.com/chef/automate/components/compliance-service/ingest/ingest"
-	manager "github.com/chef/automate/components/nodemanager-service/api/manager"
-	nodes "github.com/chef/automate/components/nodemanager-service/api/nodes"
 	api "github.com/chef/automate/components/notifications-client/api"
 	notifier "github.com/chef/automate/components/notifications-client/notifier"
 )

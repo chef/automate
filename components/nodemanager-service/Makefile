@@ -135,7 +135,7 @@ ruby-grpc-tools:
 	@if ! gem list grpc -i; then gem install grpc; fi > /dev/null
 	@if ! gem list grpc-tools -i; then gem install grpc-tools; fi > /dev/null
 
-PROTOS = $(shell find . -name '*.proto' | sed 's/\.\///')
+PROTOS = $(shell find ../../api/interservice/nodemanager -name '*.proto')
 RUBY_PROTOS = $(patsubst %.proto, %_pb.rb, $(PROTOS))
 
 generate-ruby-grpc: ruby-grpc-tools $(RUBY_PROTOS)

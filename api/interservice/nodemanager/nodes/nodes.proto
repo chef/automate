@@ -1,7 +1,7 @@
 syntax = "proto3";
 
-package chef.automate.domain.nodemanager.api.nodes;
-option go_package = "github.com/chef/automate/components/nodemanager-service/api/nodes";
+package chef.automate.domain.nodemanager.nodes;
+option go_package = "github.com/chef/automate/api/interservice/nodemanager/nodes";
 
 import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";

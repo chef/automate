@@ -6,8 +6,8 @@ import (
 	"github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2017-12-01/compute"
 
 	"github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2017-05-10/resources"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
 
 	"github.com/stretchr/testify/assert"
 )

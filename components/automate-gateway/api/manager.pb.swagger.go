@@ -1,10 +1,10 @@
 package api
 
 func init() {
-	Swagger.Add("nodes_manager_manager", `{
+	Swagger.Add("manager", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/nodes/manager/manager.proto",
+    "title": "api/external/nodes/manager/manager.proto",
     "version": "version not set"
   },
   "consumes": [
