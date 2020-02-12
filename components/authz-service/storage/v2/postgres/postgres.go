@@ -1784,10 +1784,6 @@ func (p *pg) Close() error {
 	return err
 }
 
-func (p *pg) Pristine(ctx context.Context) error {
-	return p.recordMigrationStatus(ctx, enumPristine)
-}
-
 func (p *pg) singleRowResultOrNotFoundErr(result sql.Result) error {
 	count, err := result.RowsAffected()
 	if err != nil {
@@ -1814,81 +1810,6 @@ func (p *pg) getMapOfRuleAssociations(ctx context.Context, q Querier, id string,
 		set[s] = true
 	}
 	return set, nil
-}
-
-func (p *pg) recordMigrationStatusAndNotifyPG(ctx context.Context, ms string) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
-	if err != nil {
-		return p.processError(err)
-	}
-	if err := p.recordMigrationStatusWithQuerier(ctx, ms, tx); err != nil {
-		return p.processError(err)
-	}
-	if err := p.notifyPolicyChange(ctx, tx); err != nil {
-		return p.processError(err)
-	}
-	if err := tx.Commit(); err != nil {
-		return storage_errors.NewTxCommitError(err)
-	}
-	return nil
-}
-
-func (p *pg) Success(ctx context.Context) error {
-	return p.recordMigrationStatusAndNotifyPG(ctx, enumSuccessful)
-}
-
-func (p *pg) SuccessBeta1(ctx context.Context) error {
-	return p.recordMigrationStatusAndNotifyPG(ctx, enumSuccessfulBeta1)
-}
-
-func (p *pg) InProgress(ctx context.Context) error {
-	return p.recordMigrationStatus(ctx, enumInProgress)
-}
-
-func (p *pg) Failure(ctx context.Context) error {
-	return p.recordMigrationStatus(ctx, enumFailed)
-}
-
-func (p *pg) MigrationStatus(ctx context.Context) (v2.MigrationStatus, error) {
-	var status string
-	row := p.db.QueryRowContext(ctx, `SELECT state FROM migration_status`)
-	err := row.Scan(&status)
-	if err != nil {
-		return 0, err // shouldn't happen, migration initializes state
-	}
-	switch status {
-	case enumPristine:
-		return v2.Pristine, nil
-	case enumSuccessful:
-		return v2.Successful, nil
-	case enumSuccessfulBeta1:
-		return v2.SuccessfulBeta1, nil
-	case enumInProgress:
-		return v2.InProgress, nil
-	case enumFailed:
-		return v2.Failed, nil
-	}
-	return 0, fmt.Errorf("unexpected migration status: %q", status)
-}
-
-const (
-	enumPristine        = "init"
-	enumInProgress      = "in-progress"
-	enumSuccessful      = "successful"
-	enumSuccessfulBeta1 = "successful-beta1"
-	enumFailed          = "failed"
-)
-
-func (p *pg) recordMigrationStatus(ctx context.Context, ms string) error {
-	return p.recordMigrationStatusWithQuerier(ctx, ms, p.db)
-}
-
-func (p *pg) recordMigrationStatusWithQuerier(ctx context.Context, ms string, q Querier) error {
-	p.logger.Warn("BEGONE FOUL CODE")
-	return nil
 }
 
 func (p *pg) processError(err error) error {

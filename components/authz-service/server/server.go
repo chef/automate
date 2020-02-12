@@ -62,11 +62,6 @@ func NewGRPCServer(ctx context.Context,
 	dataMigrationsConfig datamigration.Config, cerealAddress string,
 	projectLimit int) (*grpc.Server, error) {
 
-	// Note(sr): we're buffering one version struct, as NewPostgresPolicyServer writes
-	// to this before we've got readers
-	vChan := make(chan api_v2.Version, 1)
-	switcher := v2.NewSwitch(vChan)
-
 	v1Server, err := v1.NewPostgresServer(ctx, l, e, migrationsConfig, dataMigrationsConfig)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v1 server")
@@ -92,13 +87,13 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v2 projects server")
 	}
 
-	v2AuthzServer, err := v2.NewPostgresAuthzServer(l, e, switcher, v2ProjectsServer)
+	v2AuthzServer, err := v2.NewPostgresAuthzServer(l, e, v2ProjectsServer)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 authz server")
 	}
 
 	v2PolServer, err := v2.NewPostgresPolicyServer(
-		ctx, l, policyRefresher, e, v1Server.Storage(), switcher, vChan)
+		ctx, l, policyRefresher, e, v1Server.Storage())
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 policy server")
 	}
@@ -134,7 +129,6 @@ func NewGRPCServer(ctx context.Context,
 			grpc_middleware.ChainUnaryServer(
 				tracing.ServerInterceptor(tracing.GlobalTracer()),
 				grpc_logrus.UnaryServerInterceptor(logrusEntry, logrusOpts...),
-				switcher.Interceptor,
 				InputValidationInterceptor(),
 				v2PolServer.EngineUpdateInterceptor(),
 			),

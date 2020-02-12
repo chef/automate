@@ -45,7 +45,11 @@ func TestPostgres(t *testing.T) {
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
-	datamigrationConfig := datamigration.Config{}
+	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/datamigration/sql")
+	if err != nil {
+		t.Fatalf("couldn't initialize pg data config for tests: %s", err.Error())
+	}
+
 	if migrationConfig == nil {
 		t.Skipf("start pg container and set PG_URL to run")
 	}
@@ -58,7 +62,7 @@ func TestPostgres(t *testing.T) {
 	_, err = db.ExecContext(ctx, resetDatabaseStatement)
 	require.NoError(t, err)
 
-	backend, err := postgres.New(ctx, l, *migrationConfig, datamigrationConfig)
+	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
 	require.NoError(t, err)
 
 	// ! \\ this needs to happen BEFORE the reset

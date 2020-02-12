@@ -29,8 +29,6 @@ type policyServer struct {
 	store           storage.Storage
 	engine          engine.V2p1Writer
 	v1              storage_v1.PoliciesLister
-	vSwitch         *VersionSwitch
-	vChan           chan api.Version
 	policyRefresher PolicyRefresher
 }
 
@@ -48,11 +46,9 @@ func NewMemstorePolicyServer(
 	l logger.Logger,
 	pr PolicyRefresher,
 	e engine.V2p1Writer,
-	pl storage_v1.PoliciesLister,
-	vSwitch *VersionSwitch,
-	vChan chan api.Version) (PolicyServer, error) {
+	pl storage_v1.PoliciesLister) (PolicyServer, error) {
 
-	return NewPoliciesServer(ctx, l, pr, memstore.New(), e, pl, vSwitch, vChan)
+	return NewPoliciesServer(ctx, l, pr, memstore.New(), e, pl)
 }
 
 // NewPostgresPolicyServer instantiates a server.Server that connects to a postgres backend
@@ -61,15 +57,13 @@ func NewPostgresPolicyServer(
 	l logger.Logger,
 	pr PolicyRefresher,
 	e engine.V2p1Writer,
-	pl storage_v1.PoliciesLister,
-	vSwitch *VersionSwitch,
-	vChan chan api.Version) (PolicyServer, error) {
+	pl storage_v1.PoliciesLister) (PolicyServer, error) {
 
 	s := postgres.GetInstance()
 	if s == nil {
 		return nil, errors.New("postgres v2 singleton not yet initialized for policy server")
 	}
-	return NewPoliciesServer(ctx, l, pr, s, e, pl, vSwitch, vChan)
+	return NewPoliciesServer(ctx, l, pr, s, e, pl)
 }
 
 // NewPoliciesServer returns a new IAM v2 Policy server.
@@ -79,17 +73,13 @@ func NewPoliciesServer(
 	pr PolicyRefresher,
 	s storage.Storage,
 	e engine.V2p1Writer,
-	pl storage_v1.PoliciesLister,
-	vSwitch *VersionSwitch,
-	vChan chan api.Version) (PolicyServer, error) {
+	pl storage_v1.PoliciesLister) (PolicyServer, error) {
 
 	srv := &policyServer{
 		log:             l,
 		store:           s,
 		engine:          e,
 		v1:              pl,
-		vSwitch:         vSwitch,
-		vChan:           vChan,
 		policyRefresher: pr,
 	}
 
@@ -497,15 +487,15 @@ func (s *policyServer) UpdateRole(
 /* * * * * * * * * * * * * * * * * *   MIGRATION   * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
+// TODO Delete
 // GetPolicyVersion returns the status of the data store.
 func (s *policyServer) GetPolicyVersion(ctx context.Context,
 	req *api.GetPolicyVersionReq) (*api.GetPolicyVersionResp, error) {
-	ms, err := s.store.MigrationStatus(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "retrieve migration status: %s", err.Error())
-	}
 	return &api.GetPolicyVersionResp{
-		Version: versionFromInternal(ms),
+		Version: &api.Version{
+			Major: api.Version_V2,
+			Minor: api.Version_V1,
+		},
 	}, nil
 }
 
@@ -658,28 +648,6 @@ func roleFromInternal(role *storage.Role) (*api.Role, error) {
 	return resp, nil
 }
 
-func versionFromInternal(ms storage.MigrationStatus) *api.Version {
-	switch ms {
-	// the `Successful` status can only be directly set in the database
-	// since the API can only upgrade to v2.1 or revert to v1
-	case storage.Successful:
-		return &api.Version{
-			Major: api.Version_V2,
-			Minor: api.Version_V0,
-		}
-	case storage.SuccessfulBeta1:
-		return &api.Version{
-			Major: api.Version_V2,
-			Minor: api.Version_V1,
-		}
-	default:
-		return &api.Version{
-			Major: api.Version_V1,
-			Minor: api.Version_V0,
-		}
-	}
-}
-
 func membersFromAPI(apiMembers []string) ([]storage.Member, error) {
 	members := make([]storage.Member, len(apiMembers))
 	for i, member := range apiMembers {
@@ -743,12 +711,4 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 		}
 	}
 	s.log.WithFields(kv).Info("Policy definition")
-}
-
-// setVersionForInterceptorSwitch informs the interceptor piece of this server
-// to deny v1 requests if set to v2.1 and vice-versa.
-func (s *policyServer) setVersionForInterceptorSwitch(v api.Version) {
-	if s.vChan != nil {
-		s.vChan <- v
-	}
 }

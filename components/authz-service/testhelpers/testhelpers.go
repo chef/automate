@@ -83,16 +83,18 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
 
-	pgV1, err := postgres_v1.New(ctx, l, *migrationConfig, datamigration.Config{})
-	require.NoError(t, err)
+	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../storage/postgres/datamigration/sql")
+	if err != nil {
+		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
+	}
 
-	vChan := make(chan api.Version, 1)
-	vSwitch := server.NewSwitch(vChan)
+	pgV1, err := postgres_v1.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
+	require.NoError(t, err)
 
 	polRefresher, err := v2.NewPostgresPolicyRefresher(ctx, l, opaInstance)
 	require.NoError(t, err)
 
-	polSrv, err := server.NewPoliciesServer(ctx, l, polRefresher, pg, opaInstance, pgV1, vSwitch, vChan)
+	polSrv, err := server.NewPoliciesServer(ctx, l, polRefresher, pg, opaInstance, pgV1)
 	require.NoError(t, err)
 
 	projectUpdateManager := NewMockProjectUpdateManager()
@@ -197,10 +199,14 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 
 	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig), projectLimit)
 	require.NoError(t, err)
-	return postgres.GetInstance(), &TestDB{
-			DB:      db,
-			ConnURI: "postgres://postgres:postgres@127.0.0.1:5432/authz_test?sslmode=disable",
-		},
+	testDB := &TestDB{
+		DB:      db,
+		ConnURI: "postgres://postgres:postgres@127.0.0.1:5432/authz_test?sslmode=disable",
+	}
+
+	// drop default IAM V1 migrated policies since our tests don't assume they are there
+	testDB.Flush(t)
+	return postgres.GetInstance(), testDB,
 		opaInstance, prng.Seed(t), migrationConfig
 }
 

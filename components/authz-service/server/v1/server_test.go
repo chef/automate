@@ -2,6 +2,7 @@ package v1_test
 
 import (
 	"context"
+	"database/sql"
 	"errors"
 	"net/url"
 	"os"
@@ -18,7 +19,6 @@ import (
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
-	version "github.com/chef/automate/api/external/common/version"
 	"github.com/chef/automate/api/interservice/authz"
 	constants "github.com/chef/automate/components/authz-service/constants/v1"
 	"github.com/chef/automate/components/authz-service/engine"
@@ -44,6 +44,11 @@ var useDefaultEngine engine.V1Engine = nil
 
 const uuidLength = 36
 const defaultEffect = "allow"
+
+const resetDatabaseStatement = `DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO public;`
 
 // Some common, arbitrary policy definitions.
 var req1 = &authz.CreatePolicyReq{
@@ -86,9 +91,23 @@ func setup(t *testing.T) map[string]authz.AuthorizationClient {
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
-	datamigrationConfig := datamigration.Config{}
+	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../storage/postgres/datamigration/sql")
+	if err != nil {
+		t.Fatalf("couldn't initialize pg data config for tests: %s", err.Error())
+	}
+
 	if migrationConfig != nil { // So, we want PG...
-		backend, err := postgres.New(ctx, l, *migrationConfig, datamigrationConfig)
+		// reset the db to its initial state
+		db, err := sql.Open("postgres", migrationConfig.PGURL.String())
+		require.NoError(t, err, "error opening db")
+		err = db.Ping()
+		require.NoError(t, err, "error pinging db")
+		_, err = db.ExecContext(ctx, resetDatabaseStatement)
+		require.NoError(t, err, "error resetting db")
+		_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
+		require.NoError(t, err, "error installing uuid-ossp")
+
+		backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
 		require.NoError(t, err)
 		// reset
 		require.NoError(t, backend.(storage.Resetter).Reset(ctx))
@@ -98,21 +117,6 @@ func setup(t *testing.T) map[string]authz.AuthorizationClient {
 	}
 
 	return cls
-}
-
-func TestGetVersion(t *testing.T) {
-	ctx := context.Background()
-	cls := setup(t)
-	for desc, cl := range cls {
-		t.Run(desc, func(t *testing.T) {
-			t.Run("returns expected version", func(t *testing.T) {
-				expectedVersion := "unknown" // Version is injected via linker flags that we don't set during tests
-				resp, err := cl.GetVersion(ctx, &version.VersionInfoRequest{})
-				require.NoError(t, err)
-				assert.Equal(t, expectedVersion, resp.Version)
-			})
-		})
-	}
 }
 
 func TestIsAuthorized(t *testing.T) {

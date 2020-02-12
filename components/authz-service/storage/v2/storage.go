@@ -21,8 +21,6 @@ type Storage interface {
 
 	// Close closes the connection to the backend
 	Close() error
-
-	MigrationStatusProvider
 }
 
 type PolicyChangeNotification struct{}
@@ -80,28 +78,6 @@ type ruleStorage interface {
 	ApplyStagedRules(context.Context) error
 	FetchAppliedRulesByProjectIDs(context.Context) (map[string][]*Rule, error)
 }
-
-type MigrationStatusProvider interface {
-	// record migration status
-	Pristine(context.Context) error // for reset
-	InProgress(context.Context) error
-	Success(context.Context) error
-	SuccessBeta1(context.Context) error
-	Failure(context.Context) error
-
-	// retrieve migration status
-	MigrationStatus(context.Context) (MigrationStatus, error)
-}
-
-type MigrationStatus int8
-
-const (
-	Pristine MigrationStatus = iota
-	InProgress
-	Successful
-	SuccessfulBeta1
-	Failed
-)
 
 // DefaultPolicies shipped with IAM v2, and also the set of policies to which we
 // factory-reset our storage.

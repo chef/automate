@@ -2117,69 +2117,6 @@ func (pl *v1Lister) ListPoliciesWithSubjects(context.Context) ([]*storage_v1.Pol
 	return pols, pl.err
 }
 
-func TestGetPolicyVersion(t *testing.T) {
-	ctx := context.Background()
-	ts := setupV2p1WithWriter(t, dummyWriter)
-	cl := ts.policy
-	store := ts.policyCache
-	status := ts.status
-
-	expectedV1 := &api_v2.Version{
-		Major: api_v2.Version_V1,
-		Minor: api_v2.Version_V0,
-	}
-	expectedV2 := &api_v2.Version{
-		Major: api_v2.Version_V2,
-		Minor: api_v2.Version_V0,
-	}
-	expectedV2p1 := &api_v2.Version{
-		Major: api_v2.Version_V2,
-		Minor: api_v2.Version_V1,
-	}
-
-	cases := map[string]func(*testing.T){
-		"reports initial migration status as v1": func(t *testing.T) {
-			resp, err := cl.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
-			require.NoError(t, err)
-
-			assert.Equal(t, expectedV1, resp.Version)
-		},
-		"reports in-progress migration as still v1": func(t *testing.T) {
-			require.NoError(t, status.InProgress(ctx))
-			resp, err := cl.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
-			require.NoError(t, err)
-			assert.Equal(t, expectedV1, resp.Version)
-		},
-		"reports successful migration as v2": func(t *testing.T) {
-			require.NoError(t, status.Success(ctx))
-			resp, err := cl.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
-			require.NoError(t, err)
-			assert.Equal(t, expectedV2, resp.Version)
-		},
-		"reports successful migration with flag as beta2.1": func(t *testing.T) {
-			require.NoError(t, status.SuccessBeta1(ctx))
-			resp, err := cl.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
-			require.NoError(t, err)
-			assert.Equal(t, expectedV2p1, resp.Version)
-		},
-		"reports failed migration as v1": func(t *testing.T) {
-			require.NoError(t, status.InProgress(ctx))
-			require.NoError(t, status.Failure(ctx))
-			resp, err := cl.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
-			require.NoError(t, err)
-			assert.Equal(t, expectedV1, resp.Version)
-		},
-	}
-
-	for desc, test := range cases {
-		// reset memstore to "no migrations ever attempted" status
-		require.NoError(t, status.Pristine(ctx))
-
-		t.Run(desc, test)
-		store.Flush()
-	}
-}
-
 func TestTypeConversion(t *testing.T) {
 	cases := map[string]storage.Type{
 		"custom":       storage.Custom,
@@ -2477,31 +2414,17 @@ type testSetup struct {
 	policyCache  *cache.Cache
 	roleCache    *cache.Cache
 	projectCache *cache.Cache
-	status       storage.MigrationStatusProvider
-	switcher     *v2.VersionSwitch
 }
 
 func setupV2p1WithWriter(t *testing.T,
 	writer engine.V2p1Writer) testSetup {
-	return setupV2WithMigrationState(t, nil, writer, nil, make(chan api_v2.Version, 1),
-		// Returning MigrationStatus of "SuccessBeta2.1" means we've migrated successfully to IAM v2.1
-		func(s storage.MigrationStatusProvider) error { return s.SuccessBeta1(context.Background()) })
+	return setupV2(t, nil, writer, nil)
 }
 
 func setupV2(t *testing.T,
 	authorizer engine.V2Authorizer,
 	writer engine.V2p1Writer,
-	pl storage_v1.PoliciesLister,
-	vChan chan api_v2.Version) testSetup {
-	return setupV2WithMigrationState(t, authorizer, writer, pl, vChan, nil)
-}
-
-func setupV2WithMigrationState(t *testing.T,
-	authorizer engine.V2Authorizer,
-	writer engine.V2p1Writer,
-	pl storage_v1.PoliciesLister,
-	vChan chan api_v2.Version,
-	migration func(storage.MigrationStatusProvider) error) testSetup {
+	pl storage_v1.PoliciesLister) testSetup {
 
 	t.Helper()
 	ctx := context.Background()
@@ -2514,16 +2437,11 @@ func setupV2WithMigrationState(t *testing.T,
 	}
 
 	mem_v2 := memstore_v2.New()
-	if migration != nil {
-		require.NoError(t, migration(mem_v2)) // this is IAM v2
-	}
-
-	vSwitch := v2.NewSwitch(vChan)
 
 	polRefresher, err := v2.NewPolicyRefresher(ctx, l, writer, mem_v2)
 	require.NoError(t, err)
 
-	polV2, err := v2.NewPoliciesServer(ctx, l, polRefresher, mem_v2, writer, pl, vSwitch, vChan)
+	polV2, err := v2.NewPoliciesServer(ctx, l, polRefresher, mem_v2, writer, pl)
 	require.NoError(t, err)
 
 	require.NoError(t, err)
@@ -2531,7 +2449,7 @@ func setupV2WithMigrationState(t *testing.T,
 		testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockProjectPurger(true), testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
-	authzV2, err := v2.NewAuthzServer(l, authorizer, vSwitch, projectsSrv, mem_v2)
+	authzV2, err := v2.NewAuthzServer(l, authorizer, projectsSrv, mem_v2)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -2542,7 +2460,6 @@ func setupV2WithMigrationState(t *testing.T,
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
 		grpc_middleware.ChainUnaryServer(
 			grpc_server.InputValidationInterceptor(),
-			vSwitch.Interceptor,
 			polV2.EngineUpdateInterceptor(),
 		),
 	))
@@ -2566,8 +2483,6 @@ func setupV2WithMigrationState(t *testing.T,
 		policyCache:  mem_v2.PoliciesCache(),
 		roleCache:    mem_v2.RolesCache(),
 		projectCache: mem_v2.ProjectsCache(),
-		status:       mem_v2,
-		switcher:     vSwitch,
 	}
 }
 
