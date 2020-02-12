@@ -224,26 +224,6 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "automate-gateway-iam-v1"
-    command:
-      - . scripts/verify_setup.sh
-      - |
-        hab studio run "source scripts/verify_studio_init.sh &&
-          start_deployment_service &&
-          chef-automate dev deployinate &&
-          gateway_integration"
-    timeout_in_minutes: 20
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
-
   - label: "automate-gateway-iam-v2"
     command:
       - . scripts/verify_setup.sh
@@ -251,7 +231,6 @@ steps:
         hab studio run "source scripts/verify_studio_init.sh &&
           start_deployment_service &&
           chef-automate dev deployinate &&
-          chef-automate iam upgrade-to-v2 --skip-policy-migration &&
           gateway_integration"
     timeout_in_minutes: 20
     retry:
@@ -445,20 +424,7 @@ steps:
 
   - label: "iam v2"
     command:
-      - integration/run_test integration/tests/iam_v2_no_legacy_policies.sh
-    timeout_in_minutes: 20
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        linux:
-          privileged: true
-
-  - label: "iam v2 (v2 only, diagnostics)"
-    command:
-      - integration/run_test integration/tests/iam_v2_upgrade_diagnostics.sh
+      - integration/run_test integration/tests/iam_v2.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
