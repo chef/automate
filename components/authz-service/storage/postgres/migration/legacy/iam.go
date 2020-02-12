@@ -40,7 +40,7 @@ func MigrateToV2(ctx context.Context, db *sql.DB) error {
 		return errors.Wrapf(err, "migrate v1 policies")
 	}
 
-	var reports []string
+	reports := []string{}
 	for _, e := range errs {
 		reports = append(reports, e.Error())
 	}
@@ -392,9 +392,6 @@ func customPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 
 	// Note: v1 only had (custom) allow policies
 	statement := newV2Statement(Allow, "", []string{}, []string{resource}, action)
-	if err != nil {
-		return nil, errors.Wrap(err, "format v2 statement")
-	}
 
 	members := make([]v2Member, len(pol.Subjects))
 	for i, subject := range pol.Subjects {

@@ -11,14 +11,8 @@ import (
 	pq "github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 )
-
-type pg struct {
-	db     *sql.DB
-	logger logger.Logger
-}
 
 // these correspond to the database format, and get translated into
 // storage.Policy instances when returning them
@@ -65,7 +59,7 @@ func listPoliciesWithSubjects(ctx context.Context, db *sql.DB) ([]*v1Policy, err
 	if err != nil {
 		return nil, errors.Wrap(err, "v1 listPoliciesWithSubjects")
 	}
-	defer rows.Close()
+	defer rows.Close() // nolint: errcheck
 
 	storagePolicies := []*v1Policy{}
 	for rows.Next() {

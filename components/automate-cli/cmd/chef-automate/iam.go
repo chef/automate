@@ -12,7 +12,6 @@ import (
 	authz_constants "github.com/chef/automate/components/authz-service/constants"
 	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/adminmgmt"
-	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	iam_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
@@ -136,11 +135,6 @@ func init() {
 	RootCmd.AddCommand(iamCommand)
 }
 
-// Note: the indentation is to keep this in line with writer.Body()
-const alreadyMigratedMessage = "You are already on IAM version %s."
-
-const failedToResetDomainMessage = "PLEASE RUN THIS COMMAND AGAIN: There was an unexpected error resetting the projects for %s"
-
 type vsn struct {
 	Major iam_common.Version_VersionNumber
 	Minor iam_common.Version_VersionNumber
@@ -190,30 +184,6 @@ func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
 	}
 
 	writer.Success("Enabled IAM v2.1")
-	return nil
-}
-
-func outputReport(report string) {
-	// if it's got ":" in it, split on the first
-	parts := strings.SplitN(report, ":", 2)
-	writer.Body(parts[0])
-	if len(parts) >= 2 {
-		writer.Body(strings.TrimSpace(parts[1]))
-	}
-}
-
-func resetDomainsToV1(ctx context.Context, apiClient client_type.APIClient) error {
-	_, err := apiClient.TeamsV2Client().ResetAllTeamProjects(ctx, &iam_req.ResetAllTeamProjectsReq{})
-	if err != nil {
-		writer.Failf(failedToResetDomainMessage, "teams")
-		return err
-	}
-
-	_, err = apiClient.TokensV2Client().ResetAllTokenProjects(ctx, &iam_req.ResetAllTokenProjectsReq{})
-	if err != nil {
-		writer.Failf(failedToResetDomainMessage, "tokens")
-		return err
-	}
 	return nil
 }
 

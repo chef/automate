@@ -25,17 +25,6 @@ func newV2Member(name string) (v2Member, error) {
 	}, nil
 }
 
-// MemberSliceToStringSlice returns a slice of the
-// names of members or an empty string slice if
-// the member array is of length zero or nil.
-func memberSliceToStringSlice(m []v2Member) []string {
-	memberSlice := make([]string, len(m))
-	for i, member := range m {
-		memberSlice[i] = member.Name
-	}
-	return memberSlice
-}
-
 // Type is an enum to denote custom or chef-managed policy.
 type v2Type int
 

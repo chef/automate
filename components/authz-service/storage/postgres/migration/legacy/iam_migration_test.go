@@ -371,3 +371,14 @@ func queryV1PolicyID(ctx context.Context, db *sql.DB, id string) (*v1Policy, err
 	}
 	return toStoragePolicy(pol), nil
 }
+
+// MemberSliceToStringSlice returns a slice of the
+// names of members or an empty string slice if
+// the member array is of length zero or nil.
+func memberSliceToStringSlice(m []v2Member) []string {
+	memberSlice := make([]string, len(m))
+	for i, member := range m {
+		memberSlice[i] = member.Name
+	}
+	return memberSlice
+}

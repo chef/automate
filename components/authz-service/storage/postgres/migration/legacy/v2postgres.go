@@ -267,7 +267,7 @@ func getPolicyMembersWithQuerier(ctx context.Context, id string, tx *sql.Tx) ([]
 	}
 
 	defer func() {
-		rows.Close()
+		rows.Close() // nolint: errcheck
 	}()
 
 	members := []v2Member{}
@@ -287,31 +287,10 @@ func getPolicyMembersWithQuerier(ctx context.Context, id string, tx *sql.Tx) ([]
 func queryPolicy(ctx context.Context, id string, tx *sql.Tx) (*v2Policy, error) {
 	var pol v2Policy
 	query := "SELECT query_policy($1, $2)"
-	pol_u := tx.QueryRowContext(ctx, query, id, pq.Array([]string{}))
-	if err := pol_u.Scan(&pol); err != nil {
+	r := tx.QueryRowContext(ctx, query, id, pq.Array([]string{}))
+	if err := r.Scan(&pol); err != nil {
 		return nil, err
 	}
 
 	return &pol, nil
-}
-
-func (p *pg) insertOrReusePolicyMemberWithQuerier(ctx context.Context, policyID string, member v2Member,
-	tx *sql.Tx) error {
-	// First, we insert the member but on conflict do nothing. Then, we insert the member
-	// into the policy. This is safe to do non-transactionally right now, since we don't support
-	// updating either iam_members id or name columns which is the entire table. Also, we are currently
-	// not deleting any of the rows, but reusing them per name string.
-
-	_, err := tx.ExecContext(ctx,
-		"INSERT INTO iam_members (name) VALUES ($1) ON CONFLICT DO NOTHING",
-		member.Name)
-	if err != nil {
-		return errors.Wrapf(err, "failed to upsert member %s", member.Name)
-	}
-
-	// Ignore conflicts if someone is trying to add a user that is already a member.
-	_, err = tx.ExecContext(ctx,
-		`INSERT INTO iam_policy_members (policy_id, member_id)
-			VALUES (policy_db_id($1), member_db_id($2)) ON CONFLICT DO NOTHING`, policyID, member.Name)
-	return errors.Wrapf(err, "failed to upsert member link: member=%s, policy_id=%s", member.Name, policyID)
 }
