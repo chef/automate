@@ -84,32 +84,6 @@ func newIAMRestoreDefaultAdminAccessCmd() *cobra.Command {
 	return cmd
 }
 
-func newIAMUpgradeToV2Cmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "upgrade-to-v2",
-		Short: "Upgrade to IAM v2",
-		Long: "Upgrade to IAM v2 and migrate existing v1 policies. " +
-			"On downgrade, any new v2 policies will be reverted.",
-		RunE: runIAMUpgradeToV2Cmd,
-		Args: cobra.ExactArgs(0),
-	}
-	cmd.PersistentFlags().BoolVar(
-		&iamCmdFlags.skipLegacyUpgrade,
-		"skip-policy-migration",
-		false,
-		"Do not migrate policies from IAM v1.")
-
-	// this flag is deprecated and does nothing but we don't wanna error on it
-	cmd.PersistentFlags().BoolVar(
-		&iamCmdFlags.betaVersion,
-		"beta2.1",
-		false,
-		"Upgrade to version 2.1 with beta project authorization.")
-	_ = cmd.PersistentFlags().MarkHidden("beta2.1")
-
-	return cmd
-}
-
 func newIAMVersionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
@@ -121,7 +95,6 @@ func newIAMVersionCmd() *cobra.Command {
 
 func init() {
 	iamCommand := newIAMCommand()
-	iamCommand.AddCommand(newIAMUpgradeToV2Cmd())
 	iamCommand.AddCommand(newIAMVersionCmd())
 
 	iamAdminAccessCommand := newIAMAdminAccessCommand()
@@ -151,40 +124,6 @@ func display(v *iam_common.Version) string {
 	default:
 		return "v1.0"
 	}
-}
-
-func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
-	ctx := context.Background()
-	apiClient, err := apiclient.OpenConnection(ctx)
-	if err != nil {
-		return err
-	}
-
-	writer.Println("Creating default teams Editors and Viewers...")
-	for id, description := range map[string]string{
-		"editors": "Editors",
-		"viewers": "Viewers",
-	} {
-		_, found, err := adminmgmt.EnsureTeam(ctx, id, description, apiClient, false /* no dryrun here */)
-		if err != nil {
-			return err
-		}
-		if found {
-			writer.Skippedf("%s team already exists", description)
-		}
-	}
-	writer.Print("\n")
-
-	writer.Print("Migrating existing teams...\n\n")
-	_, err = apiClient.TeamsV2Client().ApplyV2DataMigrations(ctx,
-		&iam_req.ApplyV2DataMigrationsReq{})
-	if err != nil {
-		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
-			"Failed to migrate teams service")
-	}
-
-	writer.Success("Enabled IAM v2.1")
-	return nil
 }
 
 func runIAMVersionCmd(cmd *cobra.Command, args []string) error {
