@@ -54,59 +54,67 @@ sudo chef-automate deploy --product automate --product chef-server
 ```
 
 ### Via configuration
+
 1. Generate a skeleton configuration file by running
+    ```shell
+      sudo chef-automate init-config
+    ```
 
-```shell
-sudo chef-automate init-config
-```
+1. Add a stanza to the configuration file to deploy Automate and Chef Infra Server
+    ```toml
+      [deployment.v1.svc]
+      products=["automate", "chef-server"]
+    ```
 
-2. Add a stanza to the configuration file to deploy Automate and Chef Infra Server
-```toml
-[deployment.v1.svc]
-products=["automate", "chef-server"]
-```
+1. Make any other configuration changes desired.
 
-3. Make any other configuration changes desired.
+1. Run `chef-automate deploy` with your configuration file:
 
-4. Run `chef-automate deploy` with your configuration file:
-
-```shell
-sudo chef-automate deploy config.toml
-```
+    ```shell
+      sudo chef-automate deploy config.toml
+    ```
 
 ## Install standalone Chef Infra Server using Chef Automate
 You can use either a command-line option or a configuration file to install Chef Infra Server via Chef Automate.
 
 ### Via command line
 1. Generate a skeleton configuration file by running
+    ```shell
+       sudo chef-automate init-config
+    ```
 
-```shell
-sudo chef-automate init-config
-```
+1. Add a stanza to the configuration file to disable Automate data collection:
+    ```toml
+       [erchef.v1.sys.data_collector]
+       enabled = false
+    ```
 
-2. Add a stanza to the configuration file to disable Automate data collection:
-
-```
-[erchef.v1.sys.data_collector]
-enabled = false
-```
-
-3. Use the configuration file to deploy Chef Infra Server:
-
-```shell
-sudo chef-automate deploy --product chef-server <configuration_file>
-```
+1. Use the configuration file to deploy Chef Infra Server:
+    ```shell
+       sudo chef-automate deploy --product chef-server <configuration_file>
+    ```
 
 ### Via configuration
+1. Generate a skeleton configuration file by running
+    ```shell
+      sudo chef-automate init-config
+    ```
 
-```toml
-[deployment.v1.svc]
-products=["chef-server"]
+1. Add a stanza to the configuration file to deploy Chef Infra Server
+    ```toml
+       [deployment.v1.svc]
+       products=["chef-server"]
 
-# Disable Automate data collection as Automate will not be deployed
-[erchef.v1.sys.data_collector]
-enabled = false
-```
+       # Disable Automate data collection as Automate will not be deployed
+       [erchef.v1.sys.data_collector]
+       enabled = false
+    ```
+
+1. Run `chef-automate deploy` with your configuration file:
+
+    ```shell
+      sudo chef-automate deploy config.toml
+    ```
 
 ## Further reading
 See the [Chef Infra Server documentation](https://docs.chef.io/server_overview.html) for
