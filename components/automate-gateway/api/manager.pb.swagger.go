@@ -70,7 +70,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a nodemanager",
-        "description": "Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes\nassociated with the manager will be abandoned.",
+        "description": "Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes\nassociated with the manager will be re-assigned to the Automate node manager.",
         "operationId": "Delete",
         "responses": {
           "200": {
@@ -130,7 +130,7 @@ func init() {
     "/nodemanagers/id/{id}/with-node-state/stopped": {
       "delete": {
         "summary": "Delete a nodemanager and set nodes to have a state of stopped",
-        "description": "Delete a nodemanager and update all associated nodes to have a state of stopped.",
+        "description": "Delete a nodemanager and update all associated nodes to have a state of ` + "`" + `stopped` + "`" + `.",
         "operationId": "DeleteWithNodeStateStopped",
         "responses": {
           "200": {
@@ -211,7 +211,7 @@ func init() {
     "/nodemanagers/id/{node_manager_id}/search-fields": {
       "post": {
         "summary": "Search node fields",
-        "description": "Searches the available values for a given field and nodemanager id.\nPossible fields: regions, tags, name, subscription_id\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"query\": {\n\"filter_map\":[]\n},\n\"field\": \"name\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Searches the available values for a given field across all nodes associated with the nodemanager id.\nPossible fields: regions, tags, name, subscription_id\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"query\": {\n\"filter_map\":[]\n},\n\"field\": \"name\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "SearchNodeFields",
         "responses": {
           "200": {
@@ -281,7 +281,7 @@ func init() {
     "/nodemanagers/rerun/id/{id}": {
       "post": {
         "summary": "Connect",
-        "description": "Attempts to reach the API for the given nodemanager id to check validity of the \ncredentials associated with the nodemanager.",
+        "description": "Attempts to reach the API for the given nodemanager id to validate the \ncredentials associated with the nodemanager.",
         "operationId": "Connect",
         "responses": {
           "200": {
@@ -316,7 +316,7 @@ func init() {
     "/nodemanagers/search": {
       "post": {
         "summary": "List of nodemanagers",
-        "description": "Returns a list of nodemanagers matching the query.\nSupports filtering, sorting, and pagination.\nValid filtering fields: 'manager_type'\nValid sorting fields: name, type, status, status_message, date_added\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filter_map\": [\n{\"key\": \"manager_type\", \"values\":[\"aws-ec2\"]}\n], \n\"sort\": \"date_added\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns a list of nodemanagers matching the query.\nSupports filtering, sorting, and pagination.\n\nValid filtering fields: manager_type\n\nValid sorting fields: name, type, status, status_message, date_added\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filter_map\": [\n{\"key\": \"manager_type\", \"values\":[\"aws-ec2\"]}\n], \n\"sort\": \"date_added\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "List",
         "responses": {
           "200": {

@@ -813,7 +813,7 @@ type NodeManagerServiceClient interface {
 	//Delete a nodemanager
 	//
 	//Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes
-	//associated with the manager will be abandoned.
+	//associated with the manager will be re-assigned to the Automate node manager.
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
 	//Delete a nodemanager and all of its nodes
@@ -823,7 +823,7 @@ type NodeManagerServiceClient interface {
 	//
 	//Delete a nodemanager and set nodes to have a state of stopped
 	//
-	//Delete a nodemanager and update all associated nodes to have a state of stopped.
+	//Delete a nodemanager and update all associated nodes to have a state of `stopped`.
 	DeleteWithNodeStateStopped(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
 	//Delete a nodemanager and set nodes to have a state of terminated
@@ -835,7 +835,9 @@ type NodeManagerServiceClient interface {
 	//
 	//Returns a list of nodemanagers matching the query.
 	//Supports filtering, sorting, and pagination.
-	//Valid filtering fields: 'manager_type'
+	//
+	//Valid filtering fields: manager_type
+	//
 	//Valid sorting fields: name, type, status, status_message, date_added
 	//
 	//Example:
@@ -851,7 +853,7 @@ type NodeManagerServiceClient interface {
 	//
 	//Search node fields
 	//
-	//Searches the available values for a given field and nodemanager id.
+	//Searches the available values for a given field across all nodes associated with the nodemanager id.
 	//Possible fields: regions, tags, name, subscription_id
 	//
 	//Example:
@@ -881,7 +883,7 @@ type NodeManagerServiceClient interface {
 	//
 	//Connect
 	//
-	//Attempts to reach the API for the given nodemanager id to check validity of the
+	//Attempts to reach the API for the given nodemanager id to validate the
 	//credentials associated with the nodemanager.
 	Connect(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ConnectResponse, error)
 }
@@ -1030,7 +1032,7 @@ type NodeManagerServiceServer interface {
 	//Delete a nodemanager
 	//
 	//Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes
-	//associated with the manager will be abandoned.
+	//associated with the manager will be re-assigned to the Automate node manager.
 	Delete(context.Context, *Id) (*empty.Empty, error)
 	//
 	//Delete a nodemanager and all of its nodes
@@ -1040,7 +1042,7 @@ type NodeManagerServiceServer interface {
 	//
 	//Delete a nodemanager and set nodes to have a state of stopped
 	//
-	//Delete a nodemanager and update all associated nodes to have a state of stopped.
+	//Delete a nodemanager and update all associated nodes to have a state of `stopped`.
 	DeleteWithNodeStateStopped(context.Context, *Id) (*empty.Empty, error)
 	//
 	//Delete a nodemanager and set nodes to have a state of terminated
@@ -1052,7 +1054,9 @@ type NodeManagerServiceServer interface {
 	//
 	//Returns a list of nodemanagers matching the query.
 	//Supports filtering, sorting, and pagination.
-	//Valid filtering fields: 'manager_type'
+	//
+	//Valid filtering fields: manager_type
+	//
 	//Valid sorting fields: name, type, status, status_message, date_added
 	//
 	//Example:
@@ -1068,7 +1072,7 @@ type NodeManagerServiceServer interface {
 	//
 	//Search node fields
 	//
-	//Searches the available values for a given field and nodemanager id.
+	//Searches the available values for a given field across all nodes associated with the nodemanager id.
 	//Possible fields: regions, tags, name, subscription_id
 	//
 	//Example:
@@ -1098,7 +1102,7 @@ type NodeManagerServiceServer interface {
 	//
 	//Connect
 	//
-	//Attempts to reach the API for the given nodemanager id to check validity of the
+	//Attempts to reach the API for the given nodemanager id to validate the
 	//credentials associated with the nodemanager.
 	Connect(context.Context, *Id) (*ConnectResponse, error)
 }
