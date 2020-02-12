@@ -180,6 +180,7 @@ paths = [
   "components/automate-gateway/api/authz/*",
   "components/automate-gateway/authz/policy_v2/*",
   "components/automate-grpc/*",
+  "components/session-service/*",
   "lib/authz/*",
   "lib/cereal/*",
   "lib/db/*",
