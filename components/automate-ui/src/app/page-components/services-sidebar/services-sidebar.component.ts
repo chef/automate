@@ -124,17 +124,17 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
 
   public toggleMoreErrorMsg(index: number) {
     if (this.activeErrorAccordions.includes(index)) {
-      this.activeErrorAccordions = this.activeErrorAccordions.filter(n => n !== index);
+      this.activeErrorAccordions = this.activeErrorAccordions.filter(n => n !== index); // close
     } else {
-      this.activeErrorAccordions.push(index);
+      this.activeErrorAccordions.push(index); // open accordion
     }
   }
 
   public toggleMoreHealthMsg(index: number) {
     if (this.activeHealthAccordions.includes(index)) {
-      this.activeHealthAccordions = this.activeHealthAccordions.filter(n => n !== index);
+      this.activeHealthAccordions = this.activeHealthAccordions.filter(n => n !== index); // close
     } else {
-      this.activeHealthAccordions.push(index);
+      this.activeHealthAccordions.push(index); // open accordion
     }
   }
 
