@@ -1,13 +1,13 @@
 ##### GRPC SETUP #####
-require 'api/nodes/nodes_pb'
-require 'api/nodes/nodes_services_pb'
-require 'api/manager/manager_pb'
-require 'api/manager/manager_services_pb'
+require 'api/interservice/nodemanager/nodes/nodes_pb'
+require 'api/interservice/nodemanager/nodes/nodes_services_pb'
+require 'api/interservice/nodemanager/manager/manager_pb'
+require 'api/interservice/nodemanager/manager/manager_services_pb'
 
 describe File.basename(__FILE__) do
   it "works" do
-    Manager = Chef::Automate::Domain::Nodemanager::Api::Manager
-    Nodes = Chef::Automate::Domain::Nodemanager::Api::Nodes
+    Manager = Chef::Automate::Domain::Nodemanager::Manager
+    Nodes = Chef::Automate::Domain::Nodemanager::Nodes
     Common = Chef::Automate::Domain::Compliance::Api::Common
     nodes = Nodes::NodesService
 

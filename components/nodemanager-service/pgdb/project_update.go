@@ -6,7 +6,7 @@ import (
 	"encoding/json"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/stringutils"
 	uuid "github.com/chef/automate/lib/uuid4"

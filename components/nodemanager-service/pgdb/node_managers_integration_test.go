@@ -1,7 +1,7 @@
 package pgdb_test
 
 import (
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 )
 
 func (suite *NodeManagersAndNodesDBSuite) TestUpdateNodeManagerStatus() {

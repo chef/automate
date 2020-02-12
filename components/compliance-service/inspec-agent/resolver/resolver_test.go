@@ -4,10 +4,10 @@ import (
 	"testing"
 
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/inspec"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -122,7 +122,7 @@ func TestAssembleJob(t *testing.T) {
 
 	t.Log("test assembleJob when only one secret is included assigns it to secrets")
 	job, err = assembleJob(&jobs.Job{}, nodeInfo{Name: "test"}, []*inspec.Secrets{
-		&inspec.Secrets{User: "test", Password: "test"},
+		{User: "test", Password: "test"},
 	}, inspec.TargetBaseConfig{})
 	assert.NoError(t, err)
 	assert.NotZero(t, job.TargetConfig.Secrets)
@@ -130,8 +130,8 @@ func TestAssembleJob(t *testing.T) {
 
 	t.Log("test assembleJob when more than one secret is included assigns it to secretsArr")
 	job, err = assembleJob(&jobs.Job{}, nodeInfo{Name: "test"}, []*inspec.Secrets{
-		&inspec.Secrets{User: "test", Password: "test"},
-		&inspec.Secrets{User: "test2", Password: "test2"},
+		{User: "test", Password: "test"},
+		{User: "test2", Password: "test2"},
 	}, inspec.TargetBaseConfig{})
 	assert.NoError(t, err)
 	assert.Zero(t, job.TargetConfig.Secrets)

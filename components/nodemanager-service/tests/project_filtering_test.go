@@ -6,14 +6,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
-	nodesserver "github.com/chef/automate/components/nodemanager-service/api/nodes/server"
+	nodesserver "github.com/chef/automate/components/nodemanager-service/server/nodes"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 

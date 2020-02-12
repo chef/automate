@@ -11,15 +11,16 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/secretsint"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/secureconn"
+	libSecrets "github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -163,7 +164,7 @@ func resolveInspecConfigWithSecrets(tc *nodes.TargetConfig, secretsMaps []map[st
 		}
 		if tc.Backend == "ssh" && secretsMap["username"] != "" {
 			if secretsMap["key"] != "" {
-				keyPath, err := nodes.PrepareSSHPrivateKey(secretsMap["key"])
+				keyPath, err := libSecrets.PrepareSSHPrivateKey(secretsMap["key"])
 				if err != nil {
 					return errors.Wrap(err, "resolveInspecConfigWithSecrets error preparing private key")
 				}

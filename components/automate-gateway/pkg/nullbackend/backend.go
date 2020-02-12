@@ -19,6 +19,9 @@ import (
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/api/interservice/license_control"
+
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	teamsv1 "github.com/chef/automate/api/interservice/teams/v1"
 	teamsv2 "github.com/chef/automate/api/interservice/teams/v2"
 	cc_jobs "github.com/chef/automate/components/compliance-service/api/jobs"
@@ -27,8 +30,6 @@ import (
 	cc_stats "github.com/chef/automate/components/compliance-service/api/stats"
 	cc_version "github.com/chef/automate/components/compliance-service/api/version"
 	cc_ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 )
 
