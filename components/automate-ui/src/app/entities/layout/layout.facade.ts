@@ -1,10 +1,7 @@
 import { Injectable, OnDestroy, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
-import { first, filter } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
 
-import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { LayoutSidebarService } from './layout-sidebar.service';
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';
@@ -56,13 +53,7 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.store.select(isIAMv2)
-      .pipe(filter(identity), first())
-      .subscribe(isV2 => {
-        if (isV2) {
-          this.store.dispatch(new GetProjects());
-        }
-      });
+    this.store.dispatch(new GetProjects());
   }
 
   ngOnDestroy(): void {
