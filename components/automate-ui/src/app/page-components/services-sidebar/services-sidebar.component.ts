@@ -33,6 +33,9 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public totalServices = 0;
   public RFC2822 = DateTime.RFC2822;
   public selectedSearchBarFilters = [];
+
+  // Health Check Accordions
+  public LINES_OUTPUT_3 = 138;  // provides max of 3 lines of output visible by default;
   public activeErrorAccordions: number[] = [];
   public activeHealthAccordions: number[] = [];
 

@@ -98,7 +98,7 @@
                   {{service.health_check_result.stderr}}
                   <div class="show-more-container">
                     <button 
-                    *ngIf="service.health_check_result.stderr.length > 138"
+                    *ngIf="service.health_check_result.stderr.length > LINES_OUTPUT_3"
                     (click)="toggleMoreErrorMsg(i)"
                     class="show-more-button">
                     <chef-icon class="unfold">{{ activeErrorAccordions.includes(i) ? "unfold_less" : "unfold_more"}}</chef-icon>
@@ -114,7 +114,7 @@
                   {{service.health_check_result.stdout}}
                   <div class="show-more-container">
                     <button 
-                    *ngIf="service.health_check_result.stdout.length > 138"
+                    *ngIf="service.health_check_result.stdout.length > LINES_OUTPUT_3"
                     class="show-more-button"
                     (click)="toggleMoreHealthMsg(i)">
                     <chef-icon class="unfold">{{ activeHealthAccordions.includes(i) ? "unfold_less" : "unfold_more"}}</chef-icon>
