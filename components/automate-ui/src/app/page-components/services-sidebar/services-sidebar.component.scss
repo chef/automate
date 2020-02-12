@@ -221,7 +221,10 @@ chef-alert {
     transition: .25s max-height;
 
     &.active {
-      max-height: 540px; // need enough space for max 1024 characters
+      // we need enough space for 1024 characters which is the maximum length
+      // of a health message.  540px maps to enough height for a full message
+      // plus room for the button.
+      max-height: 540px;
     }
   }
 
