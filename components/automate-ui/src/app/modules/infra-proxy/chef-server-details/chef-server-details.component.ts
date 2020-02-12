@@ -9,7 +9,7 @@ import { identity, isNil } from 'lodash/fp';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 
 import { pending, EntityStatus, allLoaded } from 'app/entities/entities';
 import {
@@ -73,7 +73,7 @@ export class ChefServerDetailsComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showInfrastructureSidebar();
+    this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     // Populate our tabValue from the fragment.
     this.store.select(routeURL).pipe(takeUntil(this.isDestroyed))
     .subscribe((url: string) => {
