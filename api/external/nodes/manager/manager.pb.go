@@ -813,7 +813,11 @@ type NodeManagerServiceClient interface {
 	//Delete a nodemanager
 	//
 	//Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes
+<<<<<<< HEAD:api/external/nodes/manager/manager.pb.go
 	//associated with the manager will be re-assigned to the Automate node manager.
+=======
+	//associated with the manager will be abandoned.
+>>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes/manager/manager.pb.go
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
 	//Delete a nodemanager and all of its nodes
@@ -823,7 +827,11 @@ type NodeManagerServiceClient interface {
 	//
 	//Delete a nodemanager and set nodes to have a state of stopped
 	//
+<<<<<<< HEAD:api/external/nodes/manager/manager.pb.go
 	//Delete a nodemanager and update all associated nodes to have a state of `stopped`.
+=======
+	//Delete a nodemanager and update all associated nodes to have a state of stopped.
+>>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes/manager/manager.pb.go
 	DeleteWithNodeStateStopped(ctx context.Context, in *Id, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
 	//Delete a nodemanager and set nodes to have a state of terminated
@@ -835,9 +843,13 @@ type NodeManagerServiceClient interface {
 	//
 	//Returns a list of nodemanagers matching the query.
 	//Supports filtering, sorting, and pagination.
+<<<<<<< HEAD:api/external/nodes/manager/manager.pb.go
 	//
 	//Valid filtering fields: manager_type
 	//
+=======
+	//Valid filtering fields: 'manager_type'
+>>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes/manager/manager.pb.go
 	//Valid sorting fields: name, type, status, status_message, date_added
 	//
 	//Example:
@@ -853,7 +865,11 @@ type NodeManagerServiceClient interface {
 	//
 	//Search node fields
 	//
+<<<<<<< HEAD:api/external/nodes/manager/manager.pb.go
 	//Searches the available values for a given field across all nodes associated with the nodemanager id.
+=======
+	//Searches the available values for a given field and nodemanager id.
+>>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes/manager/manager.pb.go
 	//Possible fields: regions, tags, name, subscription_id
 	//
 	//Example:
@@ -883,7 +899,11 @@ type NodeManagerServiceClient interface {
 	//
 	//Connect
 	//
+<<<<<<< HEAD:api/external/nodes/manager/manager.pb.go
 	//Attempts to reach the API for the given nodemanager id to validate the
+=======
+	//Attempts to reach the API for the given nodemanager id to check validity of the
+>>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes/manager/manager.pb.go
 	//credentials associated with the nodemanager.
 	Connect(ctx context.Context, in *Id, opts ...grpc.CallOption) (*ConnectResponse, error)
 }
@@ -1032,7 +1052,11 @@ type NodeManagerServiceServer interface {
 	//Delete a nodemanager
 	//
 	//Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes
+<<<<<<< HEAD:api/external/nodes/manager/manager.pb.go
 	//associated with the manager will be re-assigned to the Automate node manager.
+=======
+	//associated with the manager will be abandoned.
+>>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes/manager/manager.pb.go
 	Delete(context.Context, *Id) (*empty.Empty, error)
 	//
 	//Delete a nodemanager and all of its nodes
@@ -1042,7 +1066,11 @@ type NodeManagerServiceServer interface {
 	//
 	//Delete a nodemanager and set nodes to have a state of stopped
 	//
+<<<<<<< HEAD:api/external/nodes/manager/manager.pb.go
 	//Delete a nodemanager and update all associated nodes to have a state of `stopped`.
+=======
+	//Delete a nodemanager and update all associated nodes to have a state of stopped.
+>>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes/manager/manager.pb.go
 	DeleteWithNodeStateStopped(context.Context, *Id) (*empty.Empty, error)
 	//
 	//Delete a nodemanager and set nodes to have a state of terminated
@@ -1054,9 +1082,13 @@ type NodeManagerServiceServer interface {
 	//
 	//Returns a list of nodemanagers matching the query.
 	//Supports filtering, sorting, and pagination.
+<<<<<<< HEAD:api/external/nodes/manager/manager.pb.go
 	//
 	//Valid filtering fields: manager_type
 	//
+=======
+	//Valid filtering fields: 'manager_type'
+>>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes/manager/manager.pb.go
 	//Valid sorting fields: name, type, status, status_message, date_added
 	//
 	//Example:
@@ -1072,7 +1104,11 @@ type NodeManagerServiceServer interface {
 	//
 	//Search node fields
 	//
+<<<<<<< HEAD:api/external/nodes/manager/manager.pb.go
 	//Searches the available values for a given field across all nodes associated with the nodemanager id.
+=======
+	//Searches the available values for a given field and nodemanager id.
+>>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes/manager/manager.pb.go
 	//Possible fields: regions, tags, name, subscription_id
 	//
 	//Example:
@@ -1102,7 +1138,11 @@ type NodeManagerServiceServer interface {
 	//
 	//Connect
 	//
+<<<<<<< HEAD:api/external/nodes/manager/manager.pb.go
 	//Attempts to reach the API for the given nodemanager id to validate the
+=======
+	//Attempts to reach the API for the given nodemanager id to check validity of the
+>>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes/manager/manager.pb.go
 	//credentials associated with the nodemanager.
 	Connect(context.Context, *Id) (*ConnectResponse, error)
 }
