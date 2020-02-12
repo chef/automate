@@ -65,8 +65,9 @@ func (g *GrpcBackend) EnqueueWorkflow(ctx context.Context, workflow *cereal.Work
 }
 
 type workflowCompleter struct {
-	s     grpccereal.Cereal_DequeueWorkflowClient
-	tasks []*grpccereal.Task
+	s      grpccereal.Cereal_DequeueWorkflowClient
+	tasks  []*grpccereal.Task
+	cancel context.CancelFunc
 }
 
 var _ cereal.WorkflowCompleter = &workflowCompleter{}
@@ -88,7 +89,7 @@ func (c *workflowCompleter) EnqueueTask(task *cereal.TaskData, opts cereal.TaskE
 }
 
 func (c *workflowCompleter) finish(err error) error {
-	defer c.s.CloseSend() // nolint: errcheck
+	defer c.Close() // nolint: errcheck
 
 	if err != nil {
 		return err
@@ -145,12 +146,15 @@ func (c *workflowCompleter) Done(result []byte) error {
 }
 
 func (c *workflowCompleter) Close() error {
+	defer c.cancel()
 	return c.s.CloseSend()
 }
 
 func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []string) (*cereal.WorkflowEvent, cereal.WorkflowCompleter, error) {
+	ctx, cancel := context.WithCancel(ctx)
 	s, err := g.client.DequeueWorkflow(ctx)
 	if err != nil {
+		cancel()
 		return nil, nil, err
 	}
 
@@ -162,11 +166,13 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 			},
 		},
 	}); err != nil {
+		cancel()
 		return nil, nil, err
 	}
 
 	resp, err := s.Recv()
 	if err != nil {
+		cancel()
 		if st, ok := status.FromError(err); ok {
 			if st.Code() == codes.NotFound {
 				return nil, nil, cereal.ErrNoWorkflowInstances
@@ -177,6 +183,7 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 
 	deq := resp.GetDequeue()
 	if deq == nil {
+		cancel()
 		return nil, nil, errors.New("unexpected")
 	}
 
@@ -185,6 +192,7 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 	if tsProto != nil {
 		ts, err = ptypes.Timestamp(tsProto)
 		if err != nil {
+			cancel()
 			return nil, nil, errors.Wrap(err, "invalid enqueued_at")
 		}
 	}
@@ -210,7 +218,8 @@ func (g *GrpcBackend) DequeueWorkflow(ctx context.Context, workflowNames []strin
 	}
 
 	return wevt, &workflowCompleter{
-		s: s,
+		s:      s,
+		cancel: cancel,
 	}, nil
 }
 
@@ -344,8 +353,10 @@ func (c *taskCompleter) Succeed(result []byte) error {
 }
 
 func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal.TaskData, cereal.TaskCompleter, error) {
+	ctx, cancel := context.WithCancel(ctx)
 	s, err := g.client.DequeueTask(ctx)
 	if err != nil {
+		cancel()
 		return nil, nil, err
 	}
 
@@ -357,11 +368,13 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal
 			},
 		},
 	}); err != nil {
+		cancel()
 		return nil, nil, err
 	}
 
 	resp, err := s.Recv()
 	if err != nil {
+		cancel()
 		if st, ok := status.FromError(err); ok {
 			if st.Code() == codes.NotFound {
 				return nil, nil, cereal.ErrNoTasks
@@ -372,6 +385,7 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal
 
 	deq := resp.GetDequeue()
 	if deq == nil {
+		cancel()
 		return nil, nil, errors.New("invalid msg")
 	}
 
@@ -381,11 +395,11 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal
 	if tsProto != nil {
 		ts, err = ptypes.Timestamp(tsProto)
 		if err != nil {
+			cancel()
 			return nil, nil, errors.Wrap(err, "invalid enqueued_at")
 		}
 	}
 
-	taskCtx, cancel := context.WithCancel(ctx)
 	doneChan := make(chan error, 1)
 	go func() {
 		// This goroutine will read the next, and what must be the last
@@ -416,7 +430,7 @@ func (g *GrpcBackend) DequeueTask(ctx context.Context, taskName string) (*cereal
 			},
 		}, &taskCompleter{
 			s:        s,
-			ctx:      taskCtx,
+			ctx:      ctx,
 			doneChan: doneChan,
 		}, nil
 }
