@@ -25,15 +25,15 @@ import {
   ]
 })
 export class ComplianceSharedModule {
-  static forRoot() {
+  static forRoot(): ModuleWithProviders<ComplianceSharedModule> {
     return {
-      ngModule: ComplianceSharedModule,
-      providers: [
-        StatsService,
-        ReportQueryService,
-        ReportDataService,
-        ScanResultsService
-      ]
+        ngModule: ComplianceSharedModule,
+        providers: [
+            StatsService,
+            ReportQueryService,
+            ReportDataService,
+            ScanResultsService
+        ]
     };
-  }
+}
 }
