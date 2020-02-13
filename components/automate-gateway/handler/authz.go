@@ -18,19 +18,18 @@ import (
 
 	// Gateway Requests/Response/Service definitions
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
-	"github.com/chef/automate/components/automate-gateway/api/authz/policy"
 	gwAuthzReq "github.com/chef/automate/components/automate-gateway/api/authz/request"
 	gwAuthzRes "github.com/chef/automate/components/automate-gateway/api/authz/response"
 
 	// other dependencies
-	"github.com/chef/automate/components/automate-gateway/authz/policy_v2"
+	policy "github.com/chef/automate/components/automate-gateway/authz/policy_v2"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
 // AuthzServer is the server interface
 type AuthzServer struct {
-	client        authz.AuthorizationClient
+	client        authz.AuthorizationClient // now only needed for GetVersion
 	filterHandler middleware.SwitchingFilterHandler
 }
 
@@ -57,6 +56,7 @@ func (a *AuthzServer) GetVersion(ctx context.Context, _ *version.VersionInfoRequ
 }
 
 // CreatePolicy creates a new policy in authz-service.
+// No longer used: This is V1
 func (a *AuthzServer) CreatePolicy(ctx context.Context,
 	gwReq *gwAuthzReq.CreatePolicyReq) (*gwAuthzRes.CreatePolicyResp, error) {
 	// we want a user's permissions to be a union of their allowed policies
@@ -77,6 +77,7 @@ func (a *AuthzServer) CreatePolicy(ctx context.Context,
 
 // ListPolicies returns an array of all policy objects
 // that currently exist in authz-service.
+// No longer used: This is V1
 func (a *AuthzServer) ListPolicies(ctx context.Context,
 	gwReq *gwAuthzReq.ListPoliciesReq) (*gwAuthzRes.ListPoliciesResp, error) {
 	domainReq := &authz.ListPoliciesReq{}
@@ -94,6 +95,7 @@ func (a *AuthzServer) ListPolicies(ctx context.Context,
 }
 
 // DeletePolicy removes a policy from authz-service by id.
+// No longer used: This is V1
 func (a *AuthzServer) DeletePolicy(ctx context.Context,
 	gwReq *gwAuthzReq.DeletePolicyReq) (*gwAuthzRes.DeletePolicyResp, error) {
 
@@ -111,16 +113,12 @@ func (a *AuthzServer) DeletePolicy(ctx context.Context,
 func (a *AuthzServer) IntrospectAll(
 	ctx context.Context, gwReq *gwAuthzReq.IntrospectAllReq) (*gwAuthzRes.IntrospectResp, error) {
 
-	methodsInfoV1 := policy.GetInfoMap()
-	methodsInfoV2 := policy_v2.GetInfoMap()
+	methodsInfo := policy.GetInfoMap()
 
 	// Filter out parameterized API methods; can only evaluate concrete methods.
-	mapByResourceAndActionV1 := pairs.InvertMapNonParameterized(methodsInfoV1)
-	mapByResourceAndActionV2 := pairs.InvertMapNonParameterized(methodsInfoV2)
+	mapByResourceAndAction := pairs.InvertMapNonParameterized(methodsInfo)
 
-	endpointMap, err := a.getAllowedMap(ctx,
-		mapByResourceAndActionV1, mapByResourceAndActionV2,
-		methodsInfoV1, methodsInfoV2)
+	endpointMap, err := a.getAllowedMap(ctx, mapByResourceAndAction, methodsInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -139,21 +137,15 @@ func (a *AuthzServer) IntrospectSome(
 	log := ctxlogrus.Extract(ctx)
 	log.Debugf("Requested paths: " + strings.Join(gwReq.Paths, ", "))
 
-	methodsInfoV1 := policy.GetInfoMap()
-	methodsInfoV2 := policy_v2.GetInfoMap()
+	methodsInfo := policy.GetInfoMap()
 
-	querySetV1 := getSelectedSubset(log, gwReq.Paths, methodsInfoV1)
-	querySetV2 := getSelectedSubset(log, gwReq.Paths, methodsInfoV2)
-	logEndpoints(log, querySetV1)
-	logEndpoints(log, querySetV2)
+	querySet := getSelectedSubset(log, gwReq.Paths, methodsInfo)
+	logEndpoints(log, querySet)
 
 	// Filter out parameterized API methods; can only evaluate concrete methods.
-	mapByResourceAndActionV1 := pairs.InvertMapNonParameterized(querySetV1)
-	mapByResourceAndActionV2 := pairs.InvertMapNonParameterized(querySetV2)
+	mapByResourceAndAction := pairs.InvertMapNonParameterized(querySet)
 
-	endpointMap, err := a.getAllowedMap(ctx,
-		mapByResourceAndActionV1, mapByResourceAndActionV2,
-		methodsInfoV1, methodsInfoV2)
+	endpointMap, err := a.getAllowedMap(ctx, mapByResourceAndAction, methodsInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -175,25 +167,16 @@ func (a *AuthzServer) Introspect(
 	realizedPath := gwReq.Path
 	paramList := gwReq.Parameters // inputs validated during processing below
 
-	methodsInfoV1 := policy.GetInfoMap()
-	methodsInfoV2 := policy_v2.GetInfoMap()
+	methodsInfo := policy.GetInfoMap()
 
 	// Filter out methods that do not match the realizedPath
-	mapByResourceAndActionV1, err := pairs.InvertMapParameterized(methodsInfoV1, realizedPath, paramList)
+	mapByResourceAndAction, err := pairs.InvertMapParameterized(methodsInfo, realizedPath, paramList)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	logIntrospectionDetails(log, mapByResourceAndActionV1)
+	logIntrospectionDetails(log, mapByResourceAndAction)
 
-	mapByResourceAndActionV2, err := pairs.InvertMapParameterized(methodsInfoV2, realizedPath, paramList)
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
-	}
-	logIntrospectionDetails(log, mapByResourceAndActionV2)
-
-	endpointMap, err := a.getAllowedMap(ctx,
-		mapByResourceAndActionV1, mapByResourceAndActionV2,
-		methodsInfoV1, methodsInfoV2)
+	endpointMap, err := a.getAllowedMap(ctx, mapByResourceAndAction, methodsInfo)
 	if err != nil {
 		return nil, err
 	}
@@ -293,17 +276,15 @@ func reportBadPaths(log *logrus.Entry, lookupHash map[string]bool) {
 
 func (a *AuthzServer) getAllowedMap(
 	ctx context.Context,
-	mapByResourceAndActionV1, mapByResourceAndActionV2 map[pairs.Pair][]string,
-	methodsInfoV1, methodsInfoV2 map[string]pairs.Info) (map[string]*gwAuthzRes.MethodsAllowed, error) {
+	mapByResourceAndAction map[pairs.Pair][]string,
+	methodsInfo map[string]pairs.Info) (map[string]*gwAuthzRes.MethodsAllowed, error) {
 
 	log := ctxlogrus.Extract(ctx)
 
 	// Fetches the id of the current user PLUS the team ids for that user
 	subjects := auth_context.FromContext(ctx).Subjects
 
-	resp, err := a.filterHandler.FilterAuthorizedPairs(ctx, subjects,
-		mapByResourceAndActionV1, mapByResourceAndActionV2,
-		methodsInfoV1, methodsInfoV2)
+	resp, err := a.filterHandler.FilterAuthorizedPairs(ctx, subjects, mapByResourceAndAction, methodsInfo)
 	if err != nil {
 		log.WithError(err).Debug("Error on client.FilterAuthorizedPairs")
 		return nil, err

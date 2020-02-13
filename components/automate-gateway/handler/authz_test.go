@@ -6,16 +6,11 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 
-	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/api/interservice/authz/common"
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	authz "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/authz/request"
 	"github.com/chef/automate/components/automate-gateway/api/authz/response"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
-	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv1"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
 	"github.com/chef/automate/components/automate-gateway/handler"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
@@ -36,8 +31,8 @@ import (
 	_ "github.com/chef/automate/components/automate-gateway/api/compliance/profiles"
 )
 
-func TestIntrospectAllV1(t *testing.T) {
-	authzSrv, _, s, hdlr := testServerAndHandler(t)
+func TestIntrospectAll(t *testing.T) {
+	authzSrv, s, hdlr := testServerAndHandler(t)
 	defer s.Close()
 	reset := func() {
 		authzSrv.FilterAuthorizedPairsFunc = nil
@@ -49,14 +44,14 @@ func TestIntrospectAllV1(t *testing.T) {
 	}{
 		"one response pair, mapped": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies", Action: "create"},
+				{Resource: "iam:policies", Action: "iam:policies:create"},
 			}},
 			map[string]*response.MethodsAllowed{"/auth/policies": &response.MethodsAllowed{Post: true}},
 		},
 		"two response pairs, both mapped": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies", Action: "create"},
-				{Resource: "auth_introspection:introspect_all", Action: "read"},
+				{Resource: "iam:policies", Action: "iam:policies:create"},
+				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
 			map[string]*response.MethodsAllowed{
 				"/auth/introspect": &response.MethodsAllowed{Get: true},
@@ -65,8 +60,8 @@ func TestIntrospectAllV1(t *testing.T) {
 		},
 		"two response pairs, both mapped, one with holes": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies", Action: "create"},
-				{Resource: "auth:policies:{id}", Action: "delete"},
+				{Resource: "iam:policies", Action: "iam:policies:create"},
+				{Resource: "iam:policies:{id}", Action: "iam:policies:delete"},
 			}},
 			map[string]*response.MethodsAllowed{"/auth/policies": {Post: true}},
 		},
@@ -75,7 +70,7 @@ func TestIntrospectAllV1(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", middleware.AuthV1.String())
+				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action:do", middleware.AuthV2.String())
 			req := &request.IntrospectAllReq{}
 			authzSrv.FilterAuthorizedPairsFunc = func(
 				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
@@ -93,75 +88,8 @@ func TestIntrospectAllV1(t *testing.T) {
 	}
 }
 
-func TestIntrospectAllV2(t *testing.T) {
-	authzSrvV1, authzSrv, s, hdlr := testServerAndHandler(t)
-	authzSrvV1.FilterAuthorizedPairsFunc = shouldUseV2PairsFunc
-	defer s.Close()
-	reset := func() {
-		authzSrv.FilterAuthorizedPairsFunc = nil
-	}
-
-	cases := map[string]struct {
-		authzResp *authz_v2.FilterAuthorizedPairsResp
-		expected  map[string]*response.MethodsAllowed
-	}{
-		"one response pair, mapped": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
-				{Resource: "iam:policies", Action: "iam:policies:create"},
-			}},
-			map[string]*response.MethodsAllowed{"/auth/policies": &response.MethodsAllowed{Post: true}},
-		},
-		"two response pairs, both mapped": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
-				{Resource: "iam:policies", Action: "iam:policies:create"},
-				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
-			}},
-			map[string]*response.MethodsAllowed{
-				"/auth/introspect": &response.MethodsAllowed{Get: true},
-				"/auth/policies":   &response.MethodsAllowed{Post: true},
-			},
-		},
-		"two response pairs, both mapped, one with holes": {
-			&authz_v2.FilterAuthorizedPairsResp{Pairs: []*authz_v2.Pair{
-				{Resource: "iam:policies", Action: "iam:policies:create"},
-				{Resource: "iam:policies:{id}", Action: "iam:policies:delete"},
-			}},
-			map[string]*response.MethodsAllowed{"/auth/policies": {Post: true}},
-		},
-	}
-
-	for name, tc := range cases {
-		t.Run(name, func(t *testing.T) {
-			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action:do", middleware.AuthV2.String())
-			req := &request.IntrospectAllReq{}
-			authzSrv.FilterAuthorizedPairsFunc = func(
-				context.Context, *authz_v2.FilterAuthorizedPairsReq) (*authz_v2.FilterAuthorizedPairsResp, error) {
-				return tc.authzResp, nil
-			}
-			resp, err := hdlr.IntrospectAll(ctx, req)
-			require.NoError(t, err)
-			require.NotNil(t, resp)
-			for key, value := range tc.expected {
-				assert.Contains(t, resp.Endpoints, key)
-				assert.Equal(t, value, resp.Endpoints[key])
-			}
-		})
-		reset()
-	}
-}
-
-func shouldUseV2PairsFunc(context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
-	st := status.New(codes.FailedPrecondition, "should use v2")
-	st, err := st.WithDetails(&common.ErrorShouldUseV2{})
-	if err != nil {
-		return nil, err
-	}
-	return nil, st.Err()
-}
-
 func TestIntrospectSome(t *testing.T) {
-	authzSrv, _, s, hdlr := testServerAndHandler(t)
+	authzSrv, s, hdlr := testServerAndHandler(t)
 	defer s.Close()
 	reset := func() {
 		authzSrv.FilterAuthorizedPairsFunc = nil
@@ -186,7 +114,7 @@ func TestIntrospectSome(t *testing.T) {
 		},
 		"ONE response pair, from two requested with one an INVALID path": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies", Action: "create"},
+				{Resource: "iam:policies", Action: "iam:policies:create"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
 				"/foo/bar",
@@ -196,7 +124,7 @@ func TestIntrospectSome(t *testing.T) {
 		},
 		"TWO response pairs, from two requested with one a DISALLOWED path": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "service_info:version", Action: "read"},
+				{Resource: "system:service:version", Action: "system:serviceVersion:get"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
 				"/auth/policies",
@@ -209,8 +137,8 @@ func TestIntrospectSome(t *testing.T) {
 		},
 		"two response pairs, from two requested": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies", Action: "create"},
-				{Resource: "auth_introspection:introspect_all", Action: "read"},
+				{Resource: "iam:policies", Action: "iam:policies:create"},
+				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
 				"/auth/introspect",
@@ -226,7 +154,7 @@ func TestIntrospectSome(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "AuthV1")
+				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", middleware.AuthV2.String())
 			authzSrv.FilterAuthorizedPairsFunc = func(
 				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil
@@ -241,7 +169,7 @@ func TestIntrospectSome(t *testing.T) {
 }
 
 func TestIntrospect(t *testing.T) {
-	authzSrv, _, s, hdlr := testServerAndHandler(t)
+	authzSrv, s, hdlr := testServerAndHandler(t)
 	defer s.Close()
 	reset := func() {
 		authzSrv.FilterAuthorizedPairsFunc = nil
@@ -259,14 +187,14 @@ func TestIntrospect(t *testing.T) {
 		},
 		"response pair matching the request with param in path": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "auth:policies:f33a996c-b4e8-4328-9730-90f4b351fa6e", Action: "delete"},
+				{Resource: "iam:policies:f33a996c-b4e8-4328-9730-90f4b351fa6e", Action: "iam:policies:delete"},
 			}},
 			&request.IntrospectReq{Path: "/auth/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e"},
 			map[string]*response.MethodsAllowed{"/auth/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e": &response.MethodsAllowed{Delete: true}},
 		},
 		"response pair matching the request with param in POST body": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "ingest:nodes:f33a996c-b4e8-4328-9730-90f4b351fa6e:runs", Action: "create"},
+				{Resource: "infra:nodes:f33a996c-b4e8-4328-9730-90f4b351fa6e:runs", Action: "infra:ingest:create"},
 			}},
 			&request.IntrospectReq{
 				Parameters: []string{"entity_uuid=f33a996c-b4e8-4328-9730-90f4b351fa6e"},
@@ -275,7 +203,7 @@ func TestIntrospect(t *testing.T) {
 		},
 		"response pair matching the request with multiple params in path": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "cfgmgmt:nodes:42:runs:509", Action: "read"},
+				{Resource: "infra:nodes:42", Action: "infra:nodes:get"},
 			}},
 			&request.IntrospectReq{Path: "/cfgmgmt/nodes/42/runs/509"},
 			map[string]*response.MethodsAllowed{"/cfgmgmt/nodes/42/runs/509": &response.MethodsAllowed{Get: true}},
@@ -294,7 +222,7 @@ func TestIntrospect(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "AuthV1")
+				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "Auth")
 			authzSrv.FilterAuthorizedPairsFunc = func(
 				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil
@@ -310,31 +238,24 @@ func TestIntrospect(t *testing.T) {
 
 func testServerAndHandler(t *testing.T) (
 	*authz.AuthorizationServerMock,
-	*authz_v2.AuthorizationServerMock,
 	*grpctest.Server,
 	*handler.AuthzServer) {
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*serviceCerts)
 
-	authzSrv := authz.NewAuthorizationServerMock()
-	authzSrvV2 := authz_v2.NewAuthorizationServerMock()
+	authSrv := authz.NewAuthorizationServerMock()
 
 	g := connFactory.NewServer()
-	authz.RegisterAuthorizationServer(g, authzSrv)
-	authz_v2.RegisterAuthorizationServer(g, authzSrvV2)
+	authz.RegisterAuthorizationServer(g, authSrv)
 	s := grpctest.NewServer(g)
 
 	conn, err := connFactory.Dial("authz-service", s.URL)
 	require.NoError(t, err)
-	v1Client := authz.NewAuthorizationClient(conn)
-	v2Client := authz_v2.NewAuthorizationClient(conn)
+	client := authz.NewAuthorizationClient(conn)
 
-	return authzSrv,
-		authzSrvV2,
+	return authSrv,
 		s,
 		handler.NewAuthzServer(
-			v1Client,
-			authorizer.NewAuthorizer(
-				authv1.AuthorizationHandler(v1Client),
-				authv2.AuthorizationHandler(v2Client)))
+			nil,
+			authorizer.NewAuthorizer(authv2.AuthorizationHandler(client)))
 }
