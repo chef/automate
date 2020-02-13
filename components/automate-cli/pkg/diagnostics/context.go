@@ -193,8 +193,8 @@ func (c *testContext) DoLBRequest(path string, opts ...lbrequest.Opts) (*http.Re
 			lastErr = err
 			continue
 		}
-		if resp.StatusCode == 503 {
-			lastErr = errors.Errorf("503 Service Unavailable: %s", path)
+		if resp.StatusCode >= 500 {
+			lastErr = errors.Errorf("Got 5xx. %d %s: %s", resp.StatusCode, resp.Status, path)
 			resp.Body.Close() // nolint: errcheck
 			continue
 		}
