@@ -1447,7 +1447,6 @@ paths = [
 plan_path = "components/local-user-service"
 paths = [
   "components/local-user-service/*",
-  "api/external/common/*",
   "api/interservice/authz/*",
   "api/interservice/local_user/*",
   "api/interservice/teams/*",
