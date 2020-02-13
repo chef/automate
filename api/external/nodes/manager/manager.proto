@@ -163,8 +163,6 @@ service NodeManagerService {
 
 	Valid filtering fields: manager_type
 
-	Valid sorting fields: name, type, status, status_message, date_added
-
 	*/
 	rpc List(Query) returns (NodeManagers) {
 		option (google.api.http) = {
@@ -185,8 +183,7 @@ service NodeManagerService {
 	Search Node Fields
 
 	Searches the available values for a given field across all nodes associated with the nodemanager id.
-	Possible fields: regions, tags, name, subscription_id
-
+	
 	*/
 	rpc SearchNodeFields(FieldQuery) returns (Fields) {
 		option (google.api.http) = {
@@ -307,9 +304,9 @@ message FieldQuery {
 	};
 	// Query details (filters) to be applied to the results.
 	Query query = 20;
-	// Field to search on.
+	// Possible search fields: regions, tags, name, subscription_id.
 	string field = 21;
-	// Node manager id.
+	// Node manager ID.
 	string node_manager_id = 22;
 }
 
@@ -331,9 +328,9 @@ message NodeQuery {
 			required: ["node_manager_id"]
 		}
 	};
-	// Query details (filters) to be applied to the results.
+	// Valid search filters: manager_type.
 	Query query = 20;
-	// Node manager id for which the search is being made.
+	// Node manager ID.
 	string node_manager_id = 21;
 }
 

@@ -211,7 +211,7 @@ func init() {
     "/nodemanagers/id/{node_manager_id}/search-fields": {
       "post": {
         "summary": "Search Node Fields",
-        "description": "Searches the available values for a given field across all nodes associated with the nodemanager id.\nPossible fields: regions, tags, name, subscription_id",
+        "description": "Searches the available values for a given field across all nodes associated with the nodemanager id.",
         "operationId": "SearchNodeFields",
         "responses": {
           "200": {
@@ -224,7 +224,7 @@ func init() {
         "parameters": [
           {
             "name": "node_manager_id",
-            "description": "Node manager id.",
+            "description": "Node manager ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -259,7 +259,7 @@ func init() {
         "parameters": [
           {
             "name": "node_manager_id",
-            "description": "Node manager id for which the search is being made.",
+            "description": "Node manager ID.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -316,7 +316,7 @@ func init() {
     "/nodemanagers/search": {
       "post": {
         "summary": "List all Node Managers",
-        "description": "Returns a list of node managers.\nSupports filtering, sorting, and pagination.\n\nValid filtering fields: manager_type\n\nValid sorting fields: name, type, status, status_message, date_added",
+        "description": "Returns a list of node managers.\nSupports filtering, sorting, and pagination.\n\nValid filtering fields: manager_type",
         "operationId": "List",
         "responses": {
           "200": {
@@ -380,11 +380,11 @@ func init() {
         },
         "field": {
           "type": "string",
-          "description": "Field to search on."
+          "description": "Possible search fields: regions, tags, name, subscription_id."
         },
         "node_manager_id": {
           "type": "string",
-          "description": "Node manager id."
+          "description": "Node manager ID."
         }
       },
       "required": [
@@ -534,11 +534,11 @@ func init() {
       "properties": {
         "query": {
           "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Query",
-          "description": "Query details (filters) to be applied to the results."
+          "description": "Valid search filters: manager_type."
         },
         "node_manager_id": {
           "type": "string",
-          "description": "Node manager id for which the search is being made."
+          "description": "Node manager ID."
         }
       },
       "required": [

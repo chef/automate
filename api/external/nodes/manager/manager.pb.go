@@ -289,9 +289,9 @@ func (m *Fields) GetFields() []string {
 type FieldQuery struct {
 	// Query details (filters) to be applied to the results.
 	Query *Query `protobuf:"bytes,20,opt,name=query,proto3" json:"query,omitempty"`
-	// Field to search on.
+	// Possible search fields: regions, tags, name, subscription_id.
 	Field string `protobuf:"bytes,21,opt,name=field,proto3" json:"field,omitempty"`
-	// Node manager id.
+	// Node manager ID.
 	NodeManagerId        string   `protobuf:"bytes,22,opt,name=node_manager_id,json=nodeManagerId,proto3" json:"node_manager_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -394,9 +394,9 @@ func (m *Nodes) GetTotal() int32 {
 }
 
 type NodeQuery struct {
-	// Query details (filters) to be applied to the results.
+	// Valid search filters: manager_type.
 	Query *Query `protobuf:"bytes,20,opt,name=query,proto3" json:"query,omitempty"`
-	// Node manager id for which the search is being made.
+	// Node manager ID.
 	NodeManagerId        string   `protobuf:"bytes,21,opt,name=node_manager_id,json=nodeManagerId,proto3" json:"node_manager_id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -857,14 +857,11 @@ type NodeManagerServiceClient interface {
 	//
 	//Valid filtering fields: manager_type
 	//
-	//Valid sorting fields: name, type, status, status_message, date_added
-	//
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*NodeManagers, error)
 	//
 	//Search Node Fields
 	//
 	//Searches the available values for a given field across all nodes associated with the nodemanager id.
-	//Possible fields: regions, tags, name, subscription_id
 	//
 	SearchNodeFields(ctx context.Context, in *FieldQuery, opts ...grpc.CallOption) (*Fields, error)
 	//
@@ -1036,14 +1033,11 @@ type NodeManagerServiceServer interface {
 	//
 	//Valid filtering fields: manager_type
 	//
-	//Valid sorting fields: name, type, status, status_message, date_added
-	//
 	List(context.Context, *Query) (*NodeManagers, error)
 	//
 	//Search Node Fields
 	//
 	//Searches the available values for a given field across all nodes associated with the nodemanager id.
-	//Possible fields: regions, tags, name, subscription_id
 	//
 	SearchNodeFields(context.Context, *FieldQuery) (*Fields, error)
 	//
