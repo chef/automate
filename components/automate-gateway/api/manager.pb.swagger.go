@@ -436,7 +436,7 @@ func init() {
     "chef.automate.api.nodes.manager.v1.NodeManager": {
       "type": "object",
       "example": {
-        "account_id": "123456789012",
+        "account_id": "12345EXAMPLE",
         "credential_data": [
           {
             "key": "AWS_ACCESS_KEY_ID",
@@ -452,7 +452,7 @@ func init() {
           }
         ],
         "credential_ID": "my-credential-UUID",
-        "id": "cd3ad3d9-2776-4ef1-a904-4c229d1642ee",
+        "id": "cd3ad3d9-2776-4ef1-a904-1EXAMPLEUUID",
         "instance_credentials": [],
         "name": "my aws api integration with session token",
         "type": "aws-ec2"

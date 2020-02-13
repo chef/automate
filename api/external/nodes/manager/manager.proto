@@ -339,7 +339,7 @@ message NodeManager {
 		json_schema: {
 			required: ["id","credential_id","credential_data","type"]
 		}
-		example: {value: '{"account_id": "123456789012","credential_data": [{"key": "AWS_ACCESS_KEY_ID","value": "AKIAIOSFODNN7EXAMPLE"},{"key": "AWS_SECRET_ACCESS_KEY","value": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"},{"key": "AWS_SESSION_TOKEN","value": "AQoDYXdzEPT//////////wEXAMPLEt=="}],"credential_ID": "my-credential-UUID","id": "cd3ad3d9-2776-4ef1-a904-4c229d1642ee","instance_credentials": [],"name": "my aws api integration with session token","type": "aws-ec2"}'}
+		example: {value: '{"account_id": "12345EXAMPLE","credential_data": [{"key": "AWS_ACCESS_KEY_ID","value": "AKIAIOSFODNN7EXAMPLE"},{"key": "AWS_SECRET_ACCESS_KEY","value": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"},{"key": "AWS_SESSION_TOKEN","value": "AQoDYXdzEPT//////////wEXAMPLEt=="}],"credential_ID": "my-credential-UUID","id": "cd3ad3d9-2776-4ef1-a904-1EXAMPLEUUID","instance_credentials": [],"name": "my aws api integration with session token","type": "aws-ec2"}'}
 	};
 	// UUID for the nodemanager.
 	string id = 1;
