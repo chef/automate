@@ -14,7 +14,7 @@
     "/nodemanagers": {
       "post": {
         "summary": "Create a Node Manager",
-        "description": "Creates a node manager given a name, credential ID *or* credential data, and type.",
+        "description": "Creates a node manager given a name, credential id *or* credential data, and type.",
         "operationId": "Create",
         "responses": {
           "200": {
@@ -92,7 +92,7 @@
       },
       "put": {
         "summary": "Update a Node Manager",
-        "description": "Update a node manager's metadata, such as its name, associated credential ID, or data.\nThis is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty (\"\").",
+        "description": "Update a node manager's metadata, such as its name, associated credential id, or data.\nThis is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty (\"\").",
         "operationId": "Update",
         "responses": {
           "200": {
@@ -105,7 +105,7 @@
         "parameters": [
           {
             "name": "id",
-            "description": "UUID for the node manager.",
+            "description": "UUID for the nodemanager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -208,7 +208,7 @@
     "/nodemanagers/id/{node_manager_id}/search-fields": {
       "post": {
         "summary": "Search Node Fields",
-        "description": "Searches the available values for a given field across all nodes associated with the node manager ID.",
+        "description": "Searches the available values for a given field across all nodes associated with the nodemanager id.\nPossible fields: regions, tags, name, subscription_id",
         "operationId": "SearchNodeFields",
         "responses": {
           "200": {
@@ -221,7 +221,7 @@
         "parameters": [
           {
             "name": "node_manager_id",
-            "description": "Node manager ID.",
+            "description": "Node manager id.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -243,7 +243,7 @@
     "/nodemanagers/id/{node_manager_id}/search-nodes": {
       "post": {
         "summary": "Search nodes",
-        "description": "Searches the available nodes for a single node manager by ID.",
+        "description": "Searches the available nodes for a single node manager by id.",
         "operationId": "SearchNodes",
         "responses": {
           "200": {
@@ -256,7 +256,7 @@
         "parameters": [
           {
             "name": "node_manager_id",
-            "description": "Node manager ID for which the search is being made.",
+            "description": "Node manager id for which the search is being made.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -278,7 +278,7 @@
     "/nodemanagers/rerun/id/{id}": {
       "post": {
         "summary": "Connect",
-        "description": "Attempts to reach the API for the given node manager ID to validate the \ncredentials associated with the node manager.",
+        "description": "Attempts to reach the API for the given nodemanager id to validate the \ncredentials associated with the nodemanager.",
         "operationId": "Connect",
         "responses": {
           "200": {
@@ -377,11 +377,11 @@
         },
         "field": {
           "type": "string",
-          "title": "Possible search fields: regions, tags, name, subscription_id"
+          "description": "Field to search on."
         },
         "node_manager_id": {
           "type": "string",
-          "description": "Node manager ID."
+          "description": "Node manager id."
         }
       },
       "required": [
@@ -396,7 +396,7 @@
           "items": {
             "type": "string"
           },
-          "title": "One or more fields: regions, tags, name, subscription_id"
+          "description": "One or more fields: regions, tags, name, subscription_id."
         }
       },
       "required": [
@@ -457,7 +457,7 @@
       "properties": {
         "id": {
           "type": "string",
-          "description": "UUID for the node manager."
+          "description": "UUID for the nodemanager."
         },
         "name": {
           "type": "string",
@@ -465,7 +465,7 @@
         },
         "type": {
           "type": "string",
-          "description": "Type of node manager (aws-ec2, azure-vm, aws-api, azure-api, gcp)."
+          "description": "Type of nodemanager (aws-ec2, azure-vm, aws-api, azure-api, gcp)."
         },
         "credential_id": {
           "type": "string",
@@ -480,23 +480,23 @@
         },
         "status": {
           "type": "string",
-          "description": "Status of the node manager (reachable, unreachable)."
+          "description": "Status of the nodemanager (reachable, unreachable)."
         },
         "account_id": {
           "type": "string",
-          "description": "Account ID associated with the node manager."
+          "description": "Account id associated with the nodemanager."
         },
         "date_added": {
           "type": "string",
           "format": "date-time",
-          "description": "Date the node manager was created."
+          "description": "Date the nodemanager was created."
         },
         "credential_data": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Kv"
           },
-          "description": "Credential data for the node manager. This field is used when a credential\nhas not yet been created, to be able to include credential data (such as AWS_ACCESS_KEY) inline."
+          "description": "Credential data for the nodemanager. This field is used when a credential\nhas not yet been created, to be able to include credential data (such as AWS_ACCESS_KEY) inline."
         }
       },
       "required": [
@@ -535,7 +535,7 @@
         },
         "node_manager_id": {
           "type": "string",
-          "description": "Node manager ID for which the search is being made."
+          "description": "Node manager id for which the search is being made."
         }
       },
       "required": [

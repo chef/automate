@@ -295,7 +295,7 @@ message Fields {
 			required: ["fields"]
 		}
 	};
-	// One or more fields: regions, tags, name, subscription_id
+	// One or more fields: regions, tags, name, subscription_id.
 	repeated string fields = 1;
 }
 

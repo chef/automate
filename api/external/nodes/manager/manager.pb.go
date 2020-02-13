@@ -247,7 +247,7 @@ func (m *Query) GetPerPage() int32 {
 }
 
 type Fields struct {
-	// One or more fields: regions, tags, name, subscription_id
+	// One or more fields: regions, tags, name, subscription_id.
 	Fields               []string `protobuf:"bytes,1,rep,name=fields,proto3" json:"fields,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

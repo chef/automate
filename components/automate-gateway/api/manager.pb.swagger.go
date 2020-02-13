@@ -399,7 +399,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "title": "One or more fields: regions, tags, name, subscription_id"
+          "description": "One or more fields: regions, tags, name, subscription_id."
         }
       },
       "required": [
