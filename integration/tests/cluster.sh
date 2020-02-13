@@ -92,8 +92,13 @@ do_test_deploy() {
     export ELASTICSEARCH_URL="http://$frontend1_ip:10144"
     test_notifications_endpoint="http://$test_container_ip:15555"
 
-    run_inspec_tests "${A2_ROOT_DIR}" "a2-iam-v2-integration"
+    # Inspec tests are less tolerant of transient 500s; we expect a few of
+    # those as bad postgres connections get purged from the various services.
+    # Restart everything before running the tests
+    docker exec -t "$_frontend1_container_name"  "$cli_bin" restart-services
+    docker exec -t "$_frontend2_container_name"  "$cli_bin" restart-services
 
+    run_inspec_tests "${A2_ROOT_DIR}" "a2-iam-v2-integration"
     local admin_token
     admin_token=$(docker exec -t "$_frontend1_container_name" \
         "$cli_bin" iam token create --admin "diagnostics-test-$RANDOM")
@@ -106,6 +111,7 @@ do_test_deploy() {
         "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~applications"
 
     "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~purge" "~cli" "~grpc" "~deployment" "~applications"
+
 }
 
 do_dump_logs() {
