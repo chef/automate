@@ -17,14 +17,14 @@ Use Chef Automate to install Chef Infra Server.
 
 ## System requirements and prerequisites
 ### Hardware
-See the [hardware requirements for Chef Infra Server](https://docs.chef.io/server_overview.html) for guidance on memory and number of CPUs for a standalone Chef Infra Server installation.
+See the [hardware requirements for Chef Infra Server](https://docs.chef.io/install_server_pre.html) for guidance on memory and number of CPUs for a standalone Chef Infra Server installation.
 
-For a single-host installation that contains Chef Infra Server and Chef Automate, start
-with
-* 16 GB of RAM
-* 80 GB of disk space (available to /hab)
-* 4 vCPUs
-* 2 MB of disk space per managed node
+For a single-host installation that contains Chef Infra Server and Chef Automate:
+
+* up to 200 managed nodes: 8GB RAM, 2 vCPUs
+* between 200 and 500 managed nodes: 30GB RAM, 4 vCPUs
+* between 500 and 5000 managed nodes: 61GB RAM, 8vCPUs
+* 80 GB of disk space plus 2 MB of disk space per managed node, available to `/hab`
 
 ### Operating System
 * a Linux kernel of version 3.2 or greater
