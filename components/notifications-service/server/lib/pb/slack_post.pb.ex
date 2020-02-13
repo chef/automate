@@ -1,19 +1,17 @@
-defmodule Slack.Message do
+defmodule Slack.Message.Attachment.Field do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          icon_url: String.t(),
-          text: String.t(),
-          username: String.t(),
-          attachments: [Slack.Message.Attachment.t()]
+          short: boolean,
+          title: String.t(),
+          value: String.t()
         }
-  defstruct [:icon_url, :text, :username, :attachments]
+  defstruct [:short, :title, :value]
 
-  field :icon_url, 1, type: :string
-  field :text, 2, type: :string
-  field :username, 3, type: :string
-  field :attachments, 4, repeated: true, type: Slack.Message.Attachment
+  field :short, 1, type: :bool
+  field :title, 2, type: :string
+  field :value, 3, type: :string
 end
 
 defmodule Slack.Message.Attachment do
@@ -38,18 +36,20 @@ defmodule Slack.Message.Attachment do
   field :fields, 6, repeated: true, type: Slack.Message.Attachment.Field
 end
 
-defmodule Slack.Message.Attachment.Field do
+defmodule Slack.Message do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          short: boolean,
-          title: String.t(),
-          value: String.t()
+          icon_url: String.t(),
+          text: String.t(),
+          username: String.t(),
+          attachments: [Slack.Message.Attachment.t()]
         }
-  defstruct [:short, :title, :value]
+  defstruct [:icon_url, :text, :username, :attachments]
 
-  field :short, 1, type: :bool
-  field :title, 2, type: :string
-  field :value, 3, type: :string
+  field :icon_url, 1, type: :string
+  field :text, 2, type: :string
+  field :username, 3, type: :string
+  field :attachments, 4, repeated: true, type: Slack.Message.Attachment
 end

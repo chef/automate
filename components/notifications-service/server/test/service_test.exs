@@ -41,7 +41,7 @@ defmodule ServiceTest do
         {Data.Store, [], [get_rules: fn() -> {:ok, [rule1(), rule2_slack()]} end]},
       ]) do
         response = Service.list_rules(:ignore, :ignore)
-        expected = RuleListResponse.new(code: 0, messages: [],
+        expected = RuleListResponse.new(code: :OK, messages: [],
                                         rules: [rule1(), rule2_slack()])
 
         assert response ==  expected
@@ -53,7 +53,7 @@ defmodule ServiceTest do
         {Data.Store, [], [get_rules: fn() -> {:ok, []} end]},
       ]) do
         response = Service.list_rules(:ignore, :ignore)
-        assert response == RuleListResponse.new(code: 0, messages: [], rules: [])
+        assert response == RuleListResponse.new(code: :OK, messages: [], rules: [])
       end
     end
   end
@@ -65,7 +65,7 @@ defmodule ServiceTest do
       ]) do
         rule_request = %RuleIdentifier{id: "rule1"}
         response = Service.get_rule(rule_request, :ignore)
-        assert response.code == RuleGetResponse.Code.value(:NOT_FOUND)
+        assert RuleGetResponse.Code.value(response.code) == RuleGetResponse.Code.value(:NOT_FOUND)
         assert length(response.messages) == 1
       end
     end
@@ -76,7 +76,7 @@ defmodule ServiceTest do
       ]) do
         rule_request = %RuleIdentifier{id: "rule2"}
         response = Service.get_rule(rule_request,  :ignore)
-        expected = %RuleGetResponse{code: 0, messages: [],
+        expected = %RuleGetResponse{code: :OK, messages: [],
                                     rule: rule2_slack()}
         assert response == expected
       end
@@ -90,7 +90,7 @@ defmodule ServiceTest do
       ]) do
         rule_request = %RuleIdentifier{id: "rule1"}
         response = Service.delete_rule(rule_request, :ignore)
-        assert response.code == RuleAddResponse.Code.value(:NOT_FOUND)
+        assert RuleAddResponse.Code.value(response.code) == RuleAddResponse.Code.value(:NOT_FOUND)
         assert length(response.messages) == 1
       end
     end
@@ -101,7 +101,7 @@ defmodule ServiceTest do
       ]) do
         rule_request = %RuleIdentifier{id: "rule1_ID"}
         response = Service.delete_rule(rule_request,  :ignore)
-        expected = %RuleDeleteResponse{code: 0, messages: []}
+        expected = %RuleDeleteResponse{code: :DELETED, messages: []}
         assert response == expected
       end
     end
@@ -114,7 +114,7 @@ defmodule ServiceTest do
       ]) do
         rule_request = %{rule1() | id: ""}
         response = Service.add_rule(rule_request,  :ignore)
-        assert response.code == 0
+        assert RuleAddResponse.Code.value(response.code) == RuleAddResponse.Code.value(:ADDED)
         assert response.messages == []
         assert response.id == "abc123"
       end
@@ -126,7 +126,7 @@ defmodule ServiceTest do
       ]) do
         rule_request = %{rule1() | id: ""}
         response = Service.add_rule(rule_request,  :ignore)
-        assert response.code == RuleAddResponse.Code.value(:DUPLICATE_NAME)
+        assert RuleAddResponse.Code.value(response.code) == RuleAddResponse.Code.value(:DUPLICATE_NAME)
         assert length(response.messages) == 1
       end
     end
@@ -134,7 +134,7 @@ defmodule ServiceTest do
 
     test "that it rejects the rule with validation errors if the rule is invalid" do
       response = Service.add_rule(Rule.new(),  :ignore)
-      assert response.code == RuleAddResponse.Code.value(:VALIDATION_ERROR)
+      assert RuleAddResponse.Code.value(response.code) == RuleAddResponse.Code.value(:VALIDATION_ERROR)
       # The specific validations are covered in Validator.Rule.Test
       assert length(response.messages) > 0
     end
@@ -160,7 +160,7 @@ defmodule ServiceTest do
       ]) do
         update_request = %{rule3_webhook() | name: "duplicate-name"}
         response = Service.update_rule(update_request,  :ignore)
-        assert response.code == RuleUpdateResponse.Code.value(:DUPLICATE_NAME)
+        assert RuleUpdateResponse.Code.value(response.code) == RuleUpdateResponse.Code.value(:DUPLICATE_NAME)
         assert length(response.messages) == 1
       end
     end
@@ -168,7 +168,7 @@ defmodule ServiceTest do
     test "that it rejects the rule with validation errors if the rule is invalid" do
       update_request = Rule.new()
       response = Service.update_rule(update_request,  :ignore)
-      assert response.code == RuleUpdateResponse.Code.value(:VALIDATION_ERROR)
+      assert RuleUpdateResponse.Code.value(response.code) == RuleUpdateResponse.Code.value(:VALIDATION_ERROR)
       assert length(response.messages) > 0
     end
   end
