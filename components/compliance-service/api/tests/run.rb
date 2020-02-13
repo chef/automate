@@ -16,6 +16,7 @@ require 'json'
 require 'pry'
 require 'grpc'
 require 'deepsort'
+require 'set'
 
 module VulcanoTest
 
@@ -109,6 +110,10 @@ module VulcanoTest
 
   def assert_equal_json_sorted(expected, actual)
     assert_equal JSON.parse(expected).deep_sort, JSON.parse(actual).deep_sort
+  end
+
+  def assert_same_elements(expected, actual)
+    assert_equal(expected.to_set, actual.to_set)
   end
 end
 
