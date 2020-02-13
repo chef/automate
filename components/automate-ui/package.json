@@ -98,7 +98,7 @@
     "ts-node": "^8.5.4",
     "tslint": "^5.20.1",
     "tslint-defocus": "^2.0.6",
-    "typescript": "~3.7.5",
+    "typescript": "~3.5.3",
     "wallaby-webpack": "^3.9.15"
   }
 }
