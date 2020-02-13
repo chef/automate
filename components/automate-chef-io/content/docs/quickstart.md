@@ -11,32 +11,90 @@ toc = true
     weight = 10
 +++
 
-Hello and welcome to Chef Automate 2! This document guides you through the initial installation and trial activation.
+Hello and welcome to Chef Automate! This Quickstart guides you through the initial installation and trial activation.
 
-The easiest way to start exploring Chef Automate is to install it on a local VM.
-We recommend using [Vagrant][] to create your test environment.
-Use this Vagrantfile to provision a VM. Chef recommends a minimum of 4GB RAM.
+The easiest way to start exploring Chef Automate is to install it on a local virtual machine (VM).
+We created this [Vagrant](https://www.vagrantup.com/) file for you to use in creating your own test environment.
+
+## Prerequisites
+
+For this demonstration, you need:
+
+* Administrator (root) access to your system
+* A virtualization product such as [VirtualBox](https://www.virtualbox.org/) installed on your system
+* [Vagrant](https://www.vagrantup.com/intro/getting-started/) installed on your system
+* 4GB RAM, or more, available for the VM
+
+## Quickstart Overview
+
+Use the command line script below to create a demonstration instance of Chef Automate.
+The script is mostly automated, but it does require a few manual steps.
+By installing Chef Automate with the Vagrantfile provided below you're automatically consenting to Chef Software, Inc.'s [Terms of Service](https://www.chef.io/terms-of-service) and [Master License and Services Agreement](https://www.chef.io/online-master-agreement)
 
 ## Create a Vagrantfile
 
-Copy and paste the command below to create a `Vagrantfile`:
+Copy and paste this script into your command line to create the Chef Automate `Vagrantfile`:
 
 ```ruby
-cat > Vagrantfile <<EOH
-# Put the contents of this snippet in a file named Vagrantfile
+cat > Vagrantfile <<'EOH'
+CFG_BOX      = 'bento/ubuntu-18.04'
+CFG_IP       = '192.168.33.199'
+CFG_HOSTNAME = 'chef-automate.test'
+
+$deployscript = <<-SCRIPT
+export DEBIAN_FRONTEND='noninteractive'
+apt-get -qq update
+apt-get install -y --no-install-recommends curl unzip
+apt-get clean
+sysctl -w vm.max_map_count=262144
+sysctl -w vm.dirty_expire_centisecs=20000
+echo "${CFG_IP} ${CFG_HOSTNAME}" | tee -a /etc/hosts
+curl -fsSL https://packages.chef.io/files/current/automate/latest/chef-automate_linux_amd64.zip -o /tmp/chef-automate_linux_amd64.zip
+unzip -qod /usr/local/bin /tmp/chef-automate_linux_amd64.zip
+chmod +x /usr/local/bin/chef-automate
+chef-automate deploy --accept-terms-and-mlsa
+echo "Server is up and running. Please log in at https://${CFG_HOSTNAME}/"
+echo 'You may log in using credentials provided below:'
+cat /home/vagrant/automate-credentials.toml
+SCRIPT
+
 Vagrant.configure(2) do |config|
+  class AcceptLicense
+    def to_s
+      return 'true' if ENV['ACCEPT_CHEF_TERMS_AND_MLSA'] == 'true'
+      puts <<TERMS
+To continue, you'll need to accept our terms of service:
+Terms of Service
+https://www.chef.io/terms-of-service
+
+Master License and Services Agreement
+https://www.chef.io/online-master-agreement
+
+I agree to the Terms of Service and the Master License and Services Agreement (y/n)
+TERMS
+      if STDIN.gets.chomp == 'y'
+        'true'
+      else
+        puts 'Chef Software Terms of Service and Master License and Services Agreement were not accepted'
+        exit 1
+      end
+    end
+  end
+  config.vm.box      = CFG_BOX
+  config.vm.hostname = CFG_HOSTNAME
+
   config.vm.provider "virtualbox" do |v|
-    v.memory = 8192
-    v.cpus = 2
+    v.name       = 'chef-automate'
+    v.memory     = 4096
+    v.cpus       = 2
+    v.customize ['modifyvm', :id, '--audio', 'none']
   end
 
-  config.vm.box = "bento/ubuntu-16.04"
-  config.vm.synced_folder ".", "/opt/a2-testing", create: true
-  config.vm.hostname = 'chef-automate.test'
-  config.vm.network 'private_network', ip: '192.168.33.199'
-  config.vm.provision "shell", inline: "apt-get update && apt-get install -y unzip"
-  config.vm.provision "shell", inline: "sysctl -w vm.max_map_count=262144"
-  config.vm.provision "shell", inline: "sysctl -w vm.dirty_expire_centisecs=20000"
+  config.vm.synced_folder '.', '/opt/a2-testing', create: true
+  config.vm.network       'private_network', ip: CFG_IP
+  config.vm.provision     'shell', env: {'CFG_IP' => CFG_IP,
+                                         'CFG_HOSTNAME' => CFG_HOSTNAME,
+                                         'ACCEPT_CHEF_TERMS_AND_MLSA' => AcceptLicense.new}, inline: $deployscript
 end
 EOH
 ```
@@ -52,8 +110,6 @@ Use the following command to append the required entry:
 echo 192.168.33.199 chef-automate.test | sudo tee -a /etc/hosts
 ```
 
-[Vagrant]: https://www.vagrantup.com/downloads.html
-
 ## Start the VM
 
 Now that you have the `Vagrantfile` in your current directory, provision a new VM by running:
@@ -62,37 +118,11 @@ Now that you have the `Vagrantfile` in your current directory, provision a new V
 vagrant up
 ```
 
-If this is your first time provisioning a VM, this operation may take a few
-minutes to download the base OS image.
+If this is your first time provisioning a VM, this operation may take a few minutes to download the base OS image.
 
-## Access the VM and Install Chef Automate
+When the command completes, you can access the web UI by browsing to `https://chef-automate.test/`.
 
-1. Open a terminal session on your VM:
-
-     ```bash
-     vagrant ssh
-     ```
-
-1. Download and unzip the command line tool:
-
-     ```bash
-     curl https://packages.chef.io/files/current/automate/latest/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
-     ```
-
-1. Run
-
-     ```bash
-     sudo ./chef-automate deploy
-     ```
-
-    You will be prompted to accept our [Terms of Service][] and our [Master License and Services Agreement][].
-
-Once you've accepted these agreements, the installer downloads, configures, and deploys Chef Automate.
-When the command completes, you can access the web UI by browsing to `https://chef-automate.test/` (assuming you followed the above instructions and created an entry in `/etc/hosts`).
-You can find login credentials by opening the `automate-credentials.toml`, which the installer has written in your current working directory.
-
-   [Terms of Service]: https://www.chef.io/terms-of-service
-   [Master License and Services Agreement]: https://www.chef.io/online-master-agreement
+You can find login credentials by opening the `automate-credentials.toml`, which the installer has written in your current working directory, or alternatively in an output log.
 
 ## Start a free 60-day Trial
 
@@ -110,4 +140,4 @@ RHEL 7.5, or Ubuntu 16.04 with the following minimum system resources:
 * 5 GB free disk space
 * 2 CPUs
 
-Follow the instructions above, beginning with downloading the `chef-automate` zip file.
+Follow the [Installation Guide]({{< relref "install.md" >}}) to install Chef Automate on your own resources.
