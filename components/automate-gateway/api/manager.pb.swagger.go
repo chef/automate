@@ -16,8 +16,8 @@ func init() {
   "paths": {
     "/nodemanagers": {
       "post": {
-        "summary": "Create a nodemanager",
-        "description": "Creates a nodemanager given a name, credential id or credential data, and type.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"my aws api integration with session token\",\n\"type\": \"aws-api\",\n\"instance_credentials\": [],\n\"credential_data\": [\n{\"key\": \"AWS_ACCESS_KEY_ID\", \"value\": \"value\" },\n{\"key\": \"AWS_SECRET_ACCESS_KEY\", \"value\": \"value\" },\n{\"key\": \"AWS_SESSION_TOKEN\", \"value\": \"value\" }\n]\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Create a Node Manager",
+        "description": "Creates a node manager given a name, credential id *or* credential data, and type.",
         "operationId": "Create",
         "responses": {
           "200": {
@@ -44,8 +44,8 @@ func init() {
     },
     "/nodemanagers/id/{id}": {
       "get": {
-        "summary": "Read a nodemanager",
-        "description": "Read the details of a nodemanager given an id.",
+        "summary": "View a Node Manager",
+        "description": "List the details of a node manager.",
         "operationId": "Read",
         "responses": {
           "200": {
@@ -58,7 +58,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "UUID for the nodemanager.",
+            "description": "UUID for the node manager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -69,16 +69,8 @@ func init() {
         ]
       },
       "delete": {
-        "summary": "Delete a nodemanager",
-<<<<<<< HEAD
-<<<<<<< HEAD:components/automate-gateway/api/manager.pb.swagger.go
-        "description": "Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes\nassociated with the manager will be re-assigned to the Automate node manager.",
-=======
-        "description": "Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes\nassociated with the manager will be abandoned.",
->>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes_manager_manager.pb.swagger.go
-=======
-        "description": "Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes\nassociated with the manager will be abandoned.",
->>>>>>> f3c031ed33b3477f252cc4fb8492bfe264930ba7
+        "summary": "Delete a Node Manager",
+        "description": "Delete a single node manager. This deletes the node manager itself and\nre-assigneds its associated nodes to the Automate node manager.",
         "operationId": "Delete",
         "responses": {
           "200": {
@@ -91,7 +83,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "UUID for the nodemanager.",
+            "description": "UUID for the node manager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -102,8 +94,8 @@ func init() {
         ]
       },
       "put": {
-        "summary": "Update a nodemanager",
-        "description": "PUT operation to update the details for a nodemanager, such as the name or associated credential id or data.\nPlease note that this is a PUT operation, so all nodemanager details included in the create function\nshould be included in the PUT message to update.",
+        "summary": "Update a Node Manager",
+        "description": "Update a node manager's metadata, such as its name, associated credential id, or data.\nThis is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty (\"\").",
         "operationId": "Update",
         "responses": {
           "200": {
@@ -137,16 +129,8 @@ func init() {
     },
     "/nodemanagers/id/{id}/with-node-state/stopped": {
       "delete": {
-        "summary": "Delete a nodemanager and set nodes to have a state of stopped",
-<<<<<<< HEAD
-<<<<<<< HEAD:components/automate-gateway/api/manager.pb.swagger.go
-        "description": "Delete a nodemanager and update all associated nodes to have a state of ` + "`" + `stopped` + "`" + `.",
-=======
-        "description": "Delete a nodemanager and update all associated nodes to have a state of stopped.",
->>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes_manager_manager.pb.swagger.go
-=======
-        "description": "Delete a nodemanager and update all associated nodes to have a state of stopped.",
->>>>>>> f3c031ed33b3477f252cc4fb8492bfe264930ba7
+        "summary": "Delete a Node Manager and Stop Nodes",
+        "description": "Delete a node manager and update its associated nodes to ` + "`" + `stopped` + "`" + `.",
         "operationId": "DeleteWithNodeStateStopped",
         "responses": {
           "200": {
@@ -159,7 +143,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "UUID for the nodemanager.",
+            "description": "UUID for the node manager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -172,8 +156,8 @@ func init() {
     },
     "/nodemanagers/id/{id}/with-node-state/terminated": {
       "delete": {
-        "summary": "Delete a nodemanager and set nodes to have a state of terminated",
-        "description": "Delete a nodemanager and update all associated nodes to have a state of terminated.",
+        "summary": "Delete a Node Manager and Terminate Nodes",
+        "description": "Delete a node manager and update its associated nodes to ` + "`" + `terminated` + "`" + `.",
         "operationId": "DeleteWithNodeStateTerminated",
         "responses": {
           "200": {
@@ -186,7 +170,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "UUID for the nodemanager.",
+            "description": "UUID for the node manager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -199,8 +183,8 @@ func init() {
     },
     "/nodemanagers/id/{id}/with-nodes": {
       "delete": {
-        "summary": "Delete a nodemanager and all of its nodes",
-        "description": "Delete a nodemanager and all associated nodes given a nodemanager id.",
+        "summary": "Delete a Node Manager and Delete Nodes",
+        "description": "Delete a node manager and all of its associated nodes.",
         "operationId": "DeleteWithNodes",
         "responses": {
           "200": {
@@ -213,7 +197,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "UUID for the nodemanager.",
+            "description": "UUID for the node manager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -226,16 +210,8 @@ func init() {
     },
     "/nodemanagers/id/{node_manager_id}/search-fields": {
       "post": {
-        "summary": "Search node fields",
-<<<<<<< HEAD
-<<<<<<< HEAD:components/automate-gateway/api/manager.pb.swagger.go
-        "description": "Searches the available values for a given field across all nodes associated with the nodemanager id.\nPossible fields: regions, tags, name, subscription_id\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"query\": {\n\"filter_map\":[]\n},\n\"field\": \"name\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
-=======
-        "description": "Searches the available values for a given field and nodemanager id.\nPossible fields: regions, tags, name, subscription_id\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"query\": {\n\"filter_map\":[]\n},\n\"field\": \"name\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
->>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes_manager_manager.pb.swagger.go
-=======
-        "description": "Searches the available values for a given field and nodemanager id.\nPossible fields: regions, tags, name, subscription_id\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"query\": {\n\"filter_map\":[]\n},\n\"field\": \"name\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
->>>>>>> f3c031ed33b3477f252cc4fb8492bfe264930ba7
+        "summary": "Search Node Fields",
+        "description": "Searches the available values for a given field across all nodes associated with the nodemanager id.\nPossible fields: regions, tags, name, subscription_id",
         "operationId": "SearchNodeFields",
         "responses": {
           "200": {
@@ -248,7 +224,7 @@ func init() {
         "parameters": [
           {
             "name": "node_manager_id",
-            "description": "Nodemanager id for which the search is being made.",
+            "description": "Node manager id.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -270,7 +246,7 @@ func init() {
     "/nodemanagers/id/{node_manager_id}/search-nodes": {
       "post": {
         "summary": "Search nodes",
-        "description": "Searches the available nodes for a given nodemanager id.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"query\": {\n\"filter_map\":[]\n}\t\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Searches the available nodes for a single node manager by id.",
         "operationId": "SearchNodes",
         "responses": {
           "200": {
@@ -283,7 +259,7 @@ func init() {
         "parameters": [
           {
             "name": "node_manager_id",
-            "description": "Nodemanager id for which the search is being made.",
+            "description": "Node manager id for which the search is being made.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -305,15 +281,7 @@ func init() {
     "/nodemanagers/rerun/id/{id}": {
       "post": {
         "summary": "Connect",
-<<<<<<< HEAD
-<<<<<<< HEAD:components/automate-gateway/api/manager.pb.swagger.go
         "description": "Attempts to reach the API for the given nodemanager id to validate the \ncredentials associated with the nodemanager.",
-=======
-        "description": "Attempts to reach the API for the given nodemanager id to check validity of the \ncredentials associated with the nodemanager.",
->>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes_manager_manager.pb.swagger.go
-=======
-        "description": "Attempts to reach the API for the given nodemanager id to check validity of the \ncredentials associated with the nodemanager.",
->>>>>>> f3c031ed33b3477f252cc4fb8492bfe264930ba7
         "operationId": "Connect",
         "responses": {
           "200": {
@@ -326,7 +294,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "UUID for the nodemanager.",
+            "description": "UUID for the node manager.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -347,16 +315,8 @@ func init() {
     },
     "/nodemanagers/search": {
       "post": {
-        "summary": "List of nodemanagers",
-<<<<<<< HEAD
-<<<<<<< HEAD:components/automate-gateway/api/manager.pb.swagger.go
-        "description": "Returns a list of nodemanagers matching the query.\nSupports filtering, sorting, and pagination.\n\nValid filtering fields: manager_type\n\nValid sorting fields: name, type, status, status_message, date_added\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filter_map\": [\n{\"key\": \"manager_type\", \"values\":[\"aws-ec2\"]}\n], \n\"sort\": \"date_added\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
-=======
-        "description": "Returns a list of nodemanagers matching the query.\nSupports filtering, sorting, and pagination.\nValid filtering fields: 'manager_type'\nValid sorting fields: name, type, status, status_message, date_added\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filter_map\": [\n{\"key\": \"manager_type\", \"values\":[\"aws-ec2\"]}\n], \n\"sort\": \"date_added\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
->>>>>>> 1649d33856d4707df5f7edc80962d6485dc17949:components/automate-gateway/api/nodes_manager_manager.pb.swagger.go
-=======
-        "description": "Returns a list of nodemanagers matching the query.\nSupports filtering, sorting, and pagination.\nValid filtering fields: 'manager_type'\nValid sorting fields: name, type, status, status_message, date_added\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filter_map\": [\n{\"key\": \"manager_type\", \"values\":[\"aws-ec2\"]}\n], \n\"sort\": \"date_added\"\n}\n` + "`" + `` + "`" + `` + "`" + `",
->>>>>>> f3c031ed33b3477f252cc4fb8492bfe264930ba7
+        "summary": "List all Node Managers",
+        "description": "Returns a list of node managers.\nSupports filtering, sorting, and pagination.\n\nValid filtering fields: manager_type\n\nValid sorting fields: name, type, status, status_message, date_added",
         "operationId": "List",
         "responses": {
           "200": {
@@ -404,7 +364,12 @@ func init() {
           },
           "description": "List of credential ids to associate with the key/value pair."
         }
-      }
+      },
+      "required": [
+        "tag_key",
+        "tag_value",
+        "credential_ids"
+      ]
     },
     "chef.automate.api.nodes.manager.v1.FieldQuery": {
       "type": "object",
@@ -419,9 +384,12 @@ func init() {
         },
         "node_manager_id": {
           "type": "string",
-          "description": "Nodemanager id for which the search is being made."
+          "description": "Node manager id."
         }
-      }
+      },
+      "required": [
+        "node_manager_id"
+      ]
     },
     "chef.automate.api.nodes.manager.v1.Fields": {
       "type": "object",
@@ -431,18 +399,27 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "List of available fields matching the requested criteria."
+          "title": "One or more fields: regions, tags, name, subscription_id"
         }
-      }
+      },
+      "required": [
+        "fields"
+      ]
     },
     "chef.automate.api.nodes.manager.v1.Id": {
       "type": "object",
+      "example": {
+        "uuid": "cd3ad3d9-2776-4ef1-a904-4c229d1642ee"
+      },
       "properties": {
         "id": {
           "type": "string",
-          "description": "UUID for the nodemanager."
+          "description": "UUID for the node manager."
         }
-      }
+      },
+      "required": [
+        "id"
+      ]
     },
     "chef.automate.api.nodes.manager.v1.Ids": {
       "type": "object",
@@ -452,12 +429,34 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Id"
           },
-          "description": "List of nodemanager UUIDs."
+          "description": "List of node manager UUIDs."
         }
       }
     },
     "chef.automate.api.nodes.manager.v1.NodeManager": {
       "type": "object",
+      "example": {
+        "account_id": "123456789012",
+        "credential_data": [
+          {
+            "key": "AWS_ACCESS_KEY_ID",
+            "value": "AKIAIOSFODNN7EXAMPLE"
+          },
+          {
+            "key": "AWS_SECRET_ACCESS_KEY",
+            "value": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+          },
+          {
+            "key": "AWS_SESSION_TOKEN",
+            "value": "AQoDYXdzEPT//////////wEXAMPLEt=="
+          }
+        ],
+        "credential_ID": "my-credential-UUID",
+        "id": "cd3ad3d9-2776-4ef1-a904-4c229d1642ee",
+        "instance_credentials": [],
+        "name": "my aws api integration with session token",
+        "type": "aws-ec2"
+      },
       "properties": {
         "id": {
           "type": "string",
@@ -465,7 +464,7 @@ func init() {
         },
         "name": {
           "type": "string",
-          "description": "User defined name for the nodemanager."
+          "description": "User defined name for the node manager."
         },
         "type": {
           "type": "string",
@@ -502,10 +501,19 @@ func init() {
           },
           "description": "Credential data for the nodemanager. This field is used when a credential\nhas not yet been created, to be able to include credential data (such as AWS_ACCESS_KEY) inline."
         }
-      }
+      },
+      "required": [
+        "id",
+        "credential_id",
+        "credential_data",
+        "type"
+      ]
     },
     "chef.automate.api.nodes.manager.v1.NodeManagers": {
       "type": "object",
+      "example": {
+        "total": "1"
+      },
       "properties": {
         "managers": {
           "type": "array",
@@ -530,9 +538,12 @@ func init() {
         },
         "node_manager_id": {
           "type": "string",
-          "description": "Nodemanager id for which the search is being made."
+          "description": "Node manager id for which the search is being made."
         }
-      }
+      },
+      "required": [
+        "node_manager_id"
+      ]
     },
     "chef.automate.api.nodes.manager.v1.Nodes": {
       "type": "object",
@@ -549,36 +560,53 @@ func init() {
           "format": "int32",
           "description": "Total count of node names matching the request."
         }
-      }
+      },
+      "required": [
+        "nodes"
+      ]
     },
     "chef.automate.api.nodes.manager.v1.Query": {
       "type": "object",
+      "example": {
+        "filter_map": [
+          {
+            "key": "manager_type",
+            "values": [
+              "aws-ec2"
+            ]
+          }
+        ],
+        "sort": "date_added"
+      },
       "properties": {
         "filter_map": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Filter"
           },
-          "description": "Filters to be applied to the query."
+          "description": "Filters for the query: \"manager_type\"."
         },
         "order": {
           "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.Query.OrderType"
         },
         "sort": {
           "type": "string",
-          "description": "Field to sort on."
+          "description": "Field to use for sorting.\nValid fields are: name, type, status, status_message, date_added."
         },
         "page": {
           "type": "integer",
           "format": "int32",
-          "description": "Page number of results to return."
+          "description": "Starting page for the list. For example, if your query returns 100 pages,\nand you know you're looking for a node manager somewhere in the middle,\nyou might want to start on 50."
         },
         "per_page": {
           "type": "integer",
           "format": "int32",
-          "description": "Count of results that should be returned for each page."
+          "description": "Number of results on each page."
         }
-      }
+      },
+      "required": [
+        "filter_map"
+      ]
     },
     "chef.automate.api.nodes.manager.v1.Query.OrderType": {
       "type": "string",

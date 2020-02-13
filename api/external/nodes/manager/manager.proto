@@ -14,25 +14,14 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 import "components/compliance-service/api/common/common.proto";
 
+import "protoc-gen-swagger/options/annotations.proto";
+
 service NodeManagerService {
 	/*
-	Create a nodemanager
+	Create a Node Manager
 
-	Creates a nodemanager given a name, credential id or credential data, and type.
+	Creates a node manager given a name, credential id *or* credential data, and type.
 
-	Example:
-	```
-	{
-    	"name": "my aws api integration with session token",
-		"type": "aws-api",
-		"instance_credentials": [],
-		"credential_data": [
-			{"key": "AWS_ACCESS_KEY_ID", "value": "value" },
-			{"key": "AWS_SECRET_ACCESS_KEY", "value": "value" },
-			{"key": "AWS_SESSION_TOKEN", "value": "value" }
-		]
-  	}
-	```
 	*/
 	rpc Create(NodeManager) returns (Ids) {
 		option (google.api.http) = {
@@ -50,9 +39,9 @@ service NodeManagerService {
 	};
 
 	/*
-	Read a nodemanager
+	View a Node Manager
 
-	Read the details of a nodemanager given an id.
+	List the details of a node manager.
 	*/
 	rpc Read(Id) returns (NodeManager) {
 		option (google.api.http) = {
@@ -69,11 +58,10 @@ service NodeManagerService {
 	};
 
 	/*
-	Update a nodemanager
+	Update a Node Manager
 
-	PUT operation to update the details for a nodemanager, such as the name or associated credential id or data.
-	Please note that this is a PUT operation, so all nodemanager details included in the create function
-	should be included in the PUT message to update.	
+	Update a node manager's metadata, such as its name, associated credential id, or data.
+	This is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty ("").
 	*/	
 	rpc Update(NodeManager) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
@@ -91,10 +79,10 @@ service NodeManagerService {
 	};
 
 	/*
-	Delete a nodemanager
+	Delete a Node Manager
 
-	Delete a nodemanager given an id. Note this only deletes the manager itself. Any nodes
-	associated with the manager will be re-assigned to the Automate node manager.	
+	Delete a single node manager. This deletes the node manager itself and
+	re-assigneds its associated nodes to the Automate node manager.
 	*/	
 	rpc Delete(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
@@ -111,9 +99,9 @@ service NodeManagerService {
 	};
 
 	/*
-	Delete a nodemanager and all of its nodes
+	Delete a Node Manager and Delete Nodes
 
-	Delete a nodemanager and all associated nodes given a nodemanager id. 
+	Delete a node manager and all of its associated nodes. 
 	*/	
 	rpc DeleteWithNodes(Id) returns (Ids) {
 		option (google.api.http) = {
@@ -130,9 +118,9 @@ service NodeManagerService {
 	};
 
 	/*
-	Delete a nodemanager and set nodes to have a state of stopped
+	Delete a Node Manager and Stop Nodes
 
-	Delete a nodemanager and update all associated nodes to have a state of `stopped`. 
+	Delete a node manager and update its associated nodes to `stopped`. 
 	*/
 	rpc DeleteWithNodeStateStopped(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
@@ -149,9 +137,9 @@ service NodeManagerService {
 	};
 
 	/*
-	Delete a nodemanager and set nodes to have a state of terminated
+	Delete a Node Manager and Terminate Nodes
 
-	Delete a nodemanager and update all associated nodes to have a state of terminated. 
+	Delete a node manager and update its associated nodes to `terminated`. 
 	*/
 	rpc DeleteWithNodeStateTerminated(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
@@ -168,24 +156,15 @@ service NodeManagerService {
 	};
 
 	/*
-	List of nodemanagers
+	List all Node Managers
 
-	Returns a list of nodemanagers matching the query.
+	Returns a list of node managers.
 	Supports filtering, sorting, and pagination.
 
 	Valid filtering fields: manager_type
 
 	Valid sorting fields: name, type, status, status_message, date_added
 
-	Example:
-	```
-	{
-		"filter_map": [
-			{"key": "manager_type", "values":["aws-ec2"]}
-		], 
-		"sort": "date_added"
-	}
-	```
 	*/
 	rpc List(Query) returns (NodeManagers) {
 		option (google.api.http) = {
@@ -203,20 +182,11 @@ service NodeManagerService {
 	};
 
 	/*
-	Search node fields
+	Search Node Fields
 
 	Searches the available values for a given field across all nodes associated with the nodemanager id.
 	Possible fields: regions, tags, name, subscription_id
 
-	Example:
-	```
-	{
-		"query": {
-			"filter_map":[]
-		},
-		"field": "name"
-	}
-	```
 	*/
 	rpc SearchNodeFields(FieldQuery) returns (Fields) {
 		option (google.api.http) = {
@@ -236,16 +206,8 @@ service NodeManagerService {
 	/*
 	Search nodes
 
-	Searches the available nodes for a given nodemanager id.
+	Searches the available nodes for a single node manager by id.
 
-	Example:
-	```
-	{
-		"query": {
-			"filter_map":[]
-		}	
-	}
-	```
 	*/
 	rpc SearchNodes(NodeQuery) returns (Nodes) {
 		option (google.api.http) = {
@@ -287,16 +249,28 @@ service NodeManagerService {
 message ConnectResponse{}
 
 message Id {
-	// UUID for the nodemanager.
+	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["id"]
+		}
+		example: {value: '{"uuid": "cd3ad3d9-2776-4ef1-a904-4c229d1642ee"}'}
+	};
+	// UUID for the node manager.
 	string id = 1;
 }
 message Ids {
-	// List of nodemanager UUIDs.
+	// List of node manager UUIDs.
 	repeated Id ids = 1;
 }
 
 message Query {
-	// Filters to be applied to the query.
+	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["filter_map"]
+			}
+		example: {value: '{"filter_map": [{"key": "manager_type","values":["aws-ec2"]}],"sort": "date_added"}'}
+	};
+	// Filters for the query: "manager_type".
 	repeated chef.automate.domain.compliance.api.common.Filter filter_map = 25;
 	// Sort the results in ascending or descending order.
 	enum OrderType {
@@ -304,29 +278,47 @@ message Query {
 		DESC = 1;
 	}
 	OrderType order = 21;
-	// Field to sort on.
+	// Field to use for sorting.
+	// Valid fields are: name, type, status, status_message, date_added.
 	string sort = 22;
-	// Page number of results to return.
+	// Starting page for the list. For example, if your query returns 100 pages,
+	// and you know you're looking for a node manager somewhere in the middle,
+	// you might want to start on 50.
 	int32 page = 23;
-	// Count of results that should be returned for each page.
+	// Number of results on each page.
 	int32 per_page = 24;
 }
 
 message Fields {
-	// List of available fields matching the requested criteria.
+	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["fields"]
+		}
+	};
+	// One or more fields: regions, tags, name, subscription_id
 	repeated string fields = 1;
 }
 
 message FieldQuery {
+	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["node_manager_id"]
+		}
+	};
 	// Query details (filters) to be applied to the results.
 	Query query = 20;
 	// Field to search on.
 	string field = 21;
-	// Nodemanager id for which the search is being made.
+	// Node manager id.
 	string node_manager_id = 22;
 }
 
 message Nodes {
+	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["nodes"]
+		}
+	};
 	// List of node names matching the request.
 	repeated string nodes = 1;
 	// Total count of node names matching the request.
@@ -334,16 +326,27 @@ message Nodes {
 }
 
 message NodeQuery {
+	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["node_manager_id"]
+		}
+	};
 	// Query details (filters) to be applied to the results.
 	Query query = 20;
-	// Nodemanager id for which the search is being made.
+	// Node manager id for which the search is being made.
 	string node_manager_id = 21;
 }
 
 message NodeManager {
+	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["id","credential_id","credential_data","type"]
+		}
+		example: {value: '{"account_id": "123456789012","credential_data": [{"key": "AWS_ACCESS_KEY_ID","value": "AKIAIOSFODNN7EXAMPLE"},{"key": "AWS_SECRET_ACCESS_KEY","value": "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"},{"key": "AWS_SESSION_TOKEN","value": "AQoDYXdzEPT//////////wEXAMPLEt=="}],"credential_ID": "my-credential-UUID","id": "cd3ad3d9-2776-4ef1-a904-4c229d1642ee","instance_credentials": [],"name": "my aws api integration with session token","type": "aws-ec2"}'}
+	};
 	// UUID for the nodemanager.
 	string id = 1;
-	// User defined name for the nodemanager.
+	// User defined name for the node manager.
 	string name = 2;
 	// Type of nodemanager (aws-ec2, azure-vm, aws-api, azure-api, gcp).
 	string type = 3;
@@ -362,6 +365,11 @@ message NodeManager {
 	repeated chef.automate.domain.compliance.api.common.Kv credential_data = 26;
 }
 message CredentialsByTags {
+	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+		json_schema: {
+			required: ["tag_key","tag_value","credential_ids"]
+		}
+	};
 	// Tag key to match on.
 	string tag_key = 20;
 	// Tag value to match on.
@@ -370,8 +378,12 @@ message CredentialsByTags {
 	repeated string credential_ids = 22;
 }
 message NodeManagers {
+	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+		example: { value: '{"total": "1"}' }
+	};
 	// List of nodemanagers.
 	repeated NodeManager managers = 1;
 	// Total count of nodemanagers.
 	int32 total = 20;
 }
+
