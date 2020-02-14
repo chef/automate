@@ -1,6 +1,12 @@
 #!/bin/bash
 # set -x
 
+echo "Annotate authorization actions"
+
+doc_action() { awk -f ./scripts/add_action_doc_to_proto.awk $1 > data.tmp && mv data.tmp $1 ; }
+export -f doc_action
+grep --include=\*.proto -rwl rpc api | xargs grep -l '\*\/' | xargs -t -n1 -P1 bash -c 'doc_action "$@"' _
+
 echo "Generate Go, Swagger, Validation, and GRPC Gateway"
 
 # Unlike gen-go, the gateway, swagger, and validation protoc extension don't
