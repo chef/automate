@@ -1,0 +1,36 @@
+#!{{pkgPathFor "core/bash"}}/bin/bash
+
+exec 2>&1
+
+# ElasticSearch >= 6 doesn't allow configuring index settings in the elasticsearch.yml
+# so we need to configure these after ElasticSearch is up.
+
+# The post-run hook is fired immediately after run and doesn't wait until
+# elasticsearch is healthy. Therefore, we'll loop in the health-check until
+# it's green (0) or yellow (1) before we try and make the request.
+
+{{#if svc.me.cfg.http-host ~}}
+HOST="{{svc.me.sys.ip}}"
+{{else}}
+HOST="127.0.0.1"
+{{/if ~}}
+
+source {{pkg.svc_config_path}}/health_check
+
+wait_until_healthy 300 # seconds
+
+if [[ $? -ne 0 ]]; then
+  echo "timed out waiting for elasticsearch to become healthy"
+  exit 1
+fi
+
+echo "Configuring index settings"
+curl \
+  -s \
+  -i \
+  -H 'Content-Type: application/json'\
+  -X PUT "http://${HOST}:{{cfg.network.port}}/_all/_settings?preserve_existing=true" \
+  -d '{
+    "index.number_of_replicas": "{{cfg.index.number_of_replicas}}",
+    "index.refresh_interval": "{{cfg.index.refresh_interval}}"
+  }'

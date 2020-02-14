@@ -27,6 +27,7 @@ func NewConfigRequest() *ConfigRequest {
 					Fielddata: &ConfigRequest_V1_Fielddata{},
 					Breaker:   &ConfigRequest_V1_Breaker{},
 				},
+				Index:     &ConfigRequest_V1_Index{},
 				Bootstrap: &ConfigRequest_V1_Bootstrap{},
 				Network:   &ConfigRequest_V1_Network{},
 				Transport: &ConfigRequest_V1_Transport{},
@@ -74,6 +75,10 @@ func DefaultConfigRequest() *ConfigRequest {
 	sys.Indices.Breaker.FielddataOverhead = w.String("1.03")
 	sys.Indices.Breaker.RequestLimit = w.String("40%")
 	sys.Indices.Breaker.RequestOverhead = w.String("1")
+
+	// index
+	sys.Index.NumberOfReplicas = w.Int32(0)
+	sys.Index.RefreshInterval = w.String("1s")
 
 	// bootstrap
 	sys.Bootstrap.MemoryLock = w.Bool(false)
