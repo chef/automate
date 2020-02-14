@@ -223,8 +223,26 @@ func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []st
 	nodeDataContent["macaddress"] = macAddress
 	nodeDataContent["hostname"] = hostname
 	nodeDataContent["ipaddress"] = ipaddress
+	addDataContent(nodeDataContent, attributesJson)
 	nodeData["node"] = nodeDataContent
 	return nodeData, nil
+}
+
+func addDataContent(nodeDataContent map[string]interface{}, attributes map[string]interface{}) {
+	if strings.ToLower(attributes["os"].(string)) == "windows" {
+		kernel := attributes["kernel"].(map[string]interface{})
+		osInfo := kernel["os_info"].(map[string]interface{})
+		nodeDataContent["serial_number"] = osInfo["serial_number"]
+		servicePackMajorVersion := fmt.Sprintf("%g", osInfo["service_pack_major_version"].(float64))
+		servicePackMinorVersion := fmt.Sprintf("%g", osInfo["service_pack_minor_version"].(float64))
+		servicePack := strings.Join([]string{servicePackMajorVersion, servicePackMinorVersion}, ".")
+		nodeDataContent["os_service_pack"] = servicePack
+	} else {
+		// assume linux
+		dmi := attributes["dmi"].(map[string]interface{})
+		system := dmi["system"].(map[string]interface{})
+		nodeDataContent["serial_number"] = system["serial_number"]
+	}
 }
 
 func getNodeFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, error) {
