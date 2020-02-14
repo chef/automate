@@ -10,8 +10,8 @@ import (
 	"github.com/chef/automate/api/external/habitat"
 	"github.com/chef/automate/lib/tls/certs"
 
-	natsc "github.com/nats-io/go-nats"
-	stan "github.com/nats-io/go-nats-streaming"
+	natsc "github.com/nats-io/nats.go"
+	stan "github.com/nats-io/stan.go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )

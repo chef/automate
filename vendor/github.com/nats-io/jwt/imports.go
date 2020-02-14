@@ -1,3 +1,18 @@
+/*
+ * Copyright 2018-2019 The NATS Authors
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package jwt
 
 import (
@@ -9,12 +24,21 @@ import (
 
 // Import describes a mapping from another account into this one
 type Import struct {
-	Name    string     `json:"name,omitempty"`
-	Subject Subject    `json:"subject,omitempty"`
-	Account string     `json:"account,omitempty"`
-	Token   string     `json:"token,omitempty"`
-	To      Subject    `json:"to,omitempty"`
-	Type    ExportType `json:"type,omitempty"`
+	Name string `json:"name,omitempty"`
+	// Subject field in an import is always from the perspective of the
+	// initial publisher - in the case of a stream it is the account owning
+	// the stream (the exporter), and in the case of a service it is the
+	// account making the request (the importer).
+	Subject Subject `json:"subject,omitempty"`
+	Account string  `json:"account,omitempty"`
+	Token   string  `json:"token,omitempty"`
+	// To field in an import is always from the perspective of the subscriber
+	// in the case of a stream it is the client of the stream (the importer),
+	// from the perspective of a service, it is the subscription waiting for
+	// requests (the exporter). If the field is empty, it will default to the
+	// value in the Subject field.
+	To   Subject    `json:"to,omitempty"`
+	Type ExportType `json:"type,omitempty"`
 }
 
 // IsService returns true if the import is of type service
@@ -39,10 +63,11 @@ func (i *Import) Validate(actPubKey string, vr *ValidationResults) {
 
 	i.Subject.Validate(vr)
 
-	if i.IsService() {
-		if i.Subject.HasWildCards() {
-			vr.AddWarning("services cannot have wildcard subject: %q", i.Subject)
-		}
+	if i.IsService() && i.Subject.HasWildCards() {
+		vr.AddError("services cannot have wildcard subject: %q", i.Subject)
+	}
+	if i.IsStream() && i.To.HasWildCards() {
+		vr.AddError("streams cannot have wildcard to subject: %q", i.Subject)
 	}
 
 	var act *ActivationClaims
@@ -96,7 +121,14 @@ type Imports []*Import
 
 // Validate checks if an import is valid for the wrapping account
 func (i *Imports) Validate(acctPubKey string, vr *ValidationResults) {
+	toSet := make(map[Subject]bool, len(*i))
 	for _, v := range *i {
+		if v.Type == Service {
+			if _, ok := toSet[v.To]; ok {
+				vr.AddError("Duplicate To subjects for %q", v.To)
+			}
+			toSet[v.To] = true
+		}
 		v.Validate(acctPubKey, vr)
 	}
 }
@@ -104,4 +136,16 @@ func (i *Imports) Validate(acctPubKey string, vr *ValidationResults) {
 // Add is a simple way to add imports
 func (i *Imports) Add(a ...*Import) {
 	*i = append(*i, a...)
+}
+
+func (i Imports) Len() int {
+	return len(i)
+}
+
+func (i Imports) Swap(j, k int) {
+	i[j], i[k] = i[k], i[j]
+}
+
+func (i Imports) Less(j, k int) bool {
+	return i[j].Subject < i[k].Subject
 }

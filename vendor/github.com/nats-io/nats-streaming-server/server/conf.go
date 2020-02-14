@@ -1,4 +1,4 @@
-// Copyright 2016-2018 The NATS Authors
+// Copyright 2016-2019 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -21,11 +21,15 @@ import (
 	"strings"
 	"time"
 
-	"github.com/nats-io/gnatsd/conf"
-	natsd "github.com/nats-io/gnatsd/server"
+	"github.com/nats-io/nats-server/v2/conf"
+	natsd "github.com/nats-io/nats-server/v2/server"
 	"github.com/nats-io/nats-streaming-server/stores"
 	"github.com/nats-io/nats-streaming-server/util"
 )
+
+func init() {
+	natsd.NoErrOnUnknownFields(true)
+}
 
 // ProcessConfigFile parses the configuration file `configFile` and updates
 // the given Streaming options `opts`.
@@ -91,6 +95,11 @@ func ProcessConfigFile(configFile string, opts *Options) error {
 				return err
 			}
 			opts.NATSServerURL = v.(string)
+		case "credentials":
+			if err := checkType(k, reflect.String, v); err != nil {
+				return err
+			}
+			opts.NATSCredentials = v.(string)
 		case "secure":
 			if err := checkType(k, reflect.Bool, v); err != nil {
 				return err
@@ -209,6 +218,16 @@ func parseTLS(itf interface{}, opts *Options) error {
 				return err
 			}
 			opts.ClientCA = v.(string)
+		case "server_name", "server_hostname":
+			if err := checkType(k, reflect.String, v); err != nil {
+				return err
+			}
+			opts.TLSServerName = v.(string)
+		case "skip_verify", "insecure":
+			if err := checkType(k, reflect.Bool, v); err != nil {
+				return err
+			}
+			opts.TLSSkipVerify = v.(bool)
 		}
 	}
 	return nil
@@ -268,6 +287,11 @@ func parseCluster(itf interface{}, opts *Options) error {
 				return err
 			}
 			opts.Clustering.Sync = v.(bool)
+		case "proceed_on_restore_failure":
+			if err := checkType(k, reflect.Bool, v); err != nil {
+				return err
+			}
+			opts.Clustering.ProceedOnRestoreFailure = v.(bool)
 		case "raft_logging":
 			if err := checkType(k, reflect.Bool, v); err != nil {
 				return err
@@ -494,6 +518,20 @@ func parseFileOptions(itf interface{}, opts *Options) error {
 				return err
 			}
 			opts.FileStoreOpts.ParallelRecovery = int(v.(int64))
+		case "file_read_buffer_size", "read_buffer_size":
+			if err := checkType(k, reflect.Int64, v); err != nil {
+				return err
+			}
+			opts.FileStoreOpts.ReadBufferSize = int(v.(int64))
+		case "file_auto_sync", "auto_sync":
+			if err := checkType(k, reflect.String, v); err != nil {
+				return err
+			}
+			dur, err := time.ParseDuration(v.(string))
+			if err != nil {
+				return err
+			}
+			opts.FileStoreOpts.AutoSync = dur
 		}
 	}
 	return nil
@@ -588,6 +626,7 @@ func ConfigureOptions(fs *flag.FlagSet, args []string, printVersion, printHelp, 
 	fs.IntVar(&sopts.FileStoreOpts.CompactInterval, "file_compact_interval", stores.DefaultFileStoreOptions.CompactInterval, "stan.FileStoreOpts.CompactInterval")
 	fs.String("file_compact_min_size", fmt.Sprintf("%v", stores.DefaultFileStoreOptions.CompactMinFileSize), "stan.FileStoreOpts.CompactMinFileSize")
 	fs.String("file_buffer_size", fmt.Sprintf("%v", stores.DefaultFileStoreOptions.BufferSize), "stan.FileStoreOpts.BufferSize")
+	fs.String("file_read_buffer_size", fmt.Sprintf("%v", stores.DefaultFileStoreOptions.ReadBufferSize), "")
 	fs.BoolVar(&sopts.FileStoreOpts.DoCRC, "file_crc", stores.DefaultFileStoreOptions.DoCRC, "stan.FileStoreOpts.DoCRC")
 	fs.Int64Var(&sopts.FileStoreOpts.CRCPolynomial, "file_crc_poly", stores.DefaultFileStoreOptions.CRCPolynomial, "stan.FileStoreOpts.CRCPolynomial")
 	fs.BoolVar(&sopts.FileStoreOpts.DoSync, "file_sync", stores.DefaultFileStoreOptions.DoSync, "stan.FileStoreOpts.DoSync")
@@ -598,6 +637,7 @@ func ConfigureOptions(fs *flag.FlagSet, args []string, printVersion, printHelp, 
 	fs.Int64Var(&sopts.FileStoreOpts.FileDescriptorsLimit, "file_fds_limit", stores.DefaultFileStoreOptions.FileDescriptorsLimit, "stan.FileStoreOpts.FileDescriptorsLimit")
 	fs.IntVar(&sopts.FileStoreOpts.ParallelRecovery, "file_parallel_recovery", stores.DefaultFileStoreOptions.ParallelRecovery, "stan.FileStoreOpts.ParallelRecovery")
 	fs.BoolVar(&sopts.FileStoreOpts.TruncateUnexpectedEOF, "file_truncate_bad_eof", stores.DefaultFileStoreOptions.TruncateUnexpectedEOF, "Truncate files for which there is an unexpected EOF on recovery, dataloss may occur")
+	fs.DurationVar(&sopts.FileStoreOpts.AutoSync, "file_auto_sync", stores.DefaultFileStoreOptions.AutoSync, "Interval at which the store should be automatically flushed and sync'ed on disk (<= 0 to disable)")
 	fs.IntVar(&sopts.IOBatchSize, "io_batch_size", DefaultIOBatchSize, "stan.IOBatchSize")
 	fs.Int64Var(&sopts.IOSleepTime, "io_sleep_time", DefaultIOSleepTime, "stan.IOSleepTime")
 	fs.StringVar(&sopts.FTGroupName, "ft_group", "", "stan.FTGroupName")
@@ -611,6 +651,7 @@ func ConfigureOptions(fs *flag.FlagSet, args []string, printVersion, printHelp, 
 	fs.Int64Var(&sopts.Clustering.TrailingLogs, "cluster_trailing_logs", DefaultTrailingLogs, "stan.Clustering.TrailingLogs")
 	fs.BoolVar(&sopts.Clustering.Sync, "cluster_sync", false, "stan.Clustering.Sync")
 	fs.BoolVar(&sopts.Clustering.RaftLogging, "cluster_raft_logging", false, "")
+	fs.BoolVar(&sopts.Clustering.ProceedOnRestoreFailure, "cluster_proceed_on_restore_failure", false, "")
 	fs.StringVar(&sopts.SQLStoreOpts.Driver, "sql_driver", "", "SQL Driver")
 	fs.StringVar(&sopts.SQLStoreOpts.Source, "sql_source", "", "SQL Data Source")
 	defSQLOpts := stores.DefaultSQLStoreOptions()
@@ -690,6 +731,10 @@ func ConfigureOptions(fs *flag.FlagSet, args []string, printVersion, printHelp, 
 			var i64 int64
 			i64, flagErr = getBytes(f)
 			sopts.FileStoreOpts.BufferSize = int(i64)
+		case "file_read_buffer_size":
+			var i64 int64
+			i64, flagErr = getBytes(f)
+			sopts.FileStoreOpts.ReadBufferSize = int(i64)
 		}
 	})
 	if flagErr != nil {

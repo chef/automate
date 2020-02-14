@@ -1,3 +1,18 @@
+/*
+ * Copyright 2018-2019 The NATS Authors
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package jwt
 
 import (
@@ -153,6 +168,7 @@ func (tr *TimeRange) Validate(vr *ValidationResults) {
 }
 
 // Limits are used to control acccess for users and importing accounts
+// Src is a comma separated list of CIDR specifications
 type Limits struct {
 	Max     int64       `json:"max,omitempty"`
 	Payload int64       `json:"payload,omitempty"`
@@ -170,10 +186,14 @@ func (l *Limits) Validate(vr *ValidationResults) {
 	}
 
 	if l.Src != "" {
-		ip := net.ParseIP(l.Src)
+		elements := strings.Split(l.Src, ",")
 
-		if ip == nil {
-			vr.AddError("invalid src %q in limits", l.Src)
+		for _, cidr := range elements {
+			cidr = strings.TrimSpace(cidr)
+			_, ipNet, err := net.ParseCIDR(cidr)
+			if err != nil || ipNet == nil {
+				vr.AddError("invalid cidr %q in user src limits", cidr)
+			}
 		}
 	}
 
@@ -200,16 +220,32 @@ func (p *Permission) Validate(vr *ValidationResults) {
 	}
 }
 
+// ResponsePermission can be used to allow responses to any reply subject
+// that is received on a valid subscription.
+type ResponsePermission struct {
+	MaxMsgs int           `json:"max"`
+	Expires time.Duration `json:"ttl"`
+}
+
+// Validate the response permission.
+func (p *ResponsePermission) Validate(vr *ValidationResults) {
+	// Any values can be valid for now.
+}
+
 // Permissions are used to restrict subject access, either on a user or for everyone on a server by default
 type Permissions struct {
-	Pub Permission `json:"pub,omitempty"`
-	Sub Permission `json:"sub,omitempty"`
+	Pub  Permission          `json:"pub,omitempty"`
+	Sub  Permission          `json:"sub,omitempty"`
+	Resp *ResponsePermission `json:"resp,omitempty"`
 }
 
 // Validate the pub and sub fields in the permissions list
 func (p *Permissions) Validate(vr *ValidationResults) {
 	p.Pub.Validate(vr)
 	p.Sub.Validate(vr)
+	if p.Resp != nil {
+		p.Resp.Validate(vr)
+	}
 }
 
 // StringList is a wrapper for an array of strings

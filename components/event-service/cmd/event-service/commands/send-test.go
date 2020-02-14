@@ -7,8 +7,8 @@ import (
 	"io/ioutil"
 	"time"
 
-	natsc "github.com/nats-io/go-nats"
-	streamc "github.com/nats-io/go-nats-streaming"
+	natsc "github.com/nats-io/nats.go"
+	streamc "github.com/nats-io/stan.go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"

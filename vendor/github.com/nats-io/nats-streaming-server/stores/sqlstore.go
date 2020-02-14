@@ -1,4 +1,4 @@
-// Copyright 2017-2018 The NATS Authors
+// Copyright 2017-2019 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -23,11 +23,11 @@ import (
 	"sync/atomic"
 	"time"
 
-	"github.com/nats-io/go-nats-streaming/pb"
 	"github.com/nats-io/nats-streaming-server/logger"
 	"github.com/nats-io/nats-streaming-server/spb"
 	"github.com/nats-io/nats-streaming-server/util"
 	"github.com/nats-io/nuid"
+	"github.com/nats-io/stan.go/pb"
 )
 
 const (
@@ -104,10 +104,10 @@ var sqlStmts = []string{
 	"INSERT INTO Channels (id, name, maxmsgs, maxbytes, maxage) VALUES (?, ?, ?, ?, ?)",                          // sqlAddChannel
 	"INSERT INTO Messages VALUES (?, ?, ?, ?, ?)",                                                                // sqlStoreMsg
 	"SELECT timestamp, data FROM Messages WHERE id=? AND seq=?",                                                  // sqlLookupMsg
-	"SELECT seq FROM Messages WHERE id=? AND timestamp>=? LIMIT 1",                                               // sqlGetSequenceFromTimestamp
+	"SELECT seq FROM Messages WHERE id=? AND timestamp>=? ORDER BY seq LIMIT 1",                                  // sqlGetSequenceFromTimestamp
 	"UPDATE Channels SET maxseq=? WHERE id=?",                                                                    // sqlUpdateChannelMaxSeq
 	"SELECT COUNT(seq), COALESCE(MAX(seq), 0), COALESCE(SUM(size), 0) FROM Messages WHERE id=? AND timestamp<=?", // sqlGetExpiredMessages
-	"SELECT timestamp FROM Messages WHERE id=? AND seq>=? LIMIT 1",                                               // sqlGetFirstMsgTimestamp
+	"SELECT timestamp FROM Messages WHERE id=? AND seq>=? ORDER BY seq LIMIT 1",                                  // sqlGetFirstMsgTimestamp
 	"DELETE FROM Messages WHERE id=? AND seq<=?",                                                                 // sqlDeletedMsgsWithSeqLowerThan
 	"SELECT size FROM Messages WHERE id=? AND seq=?",                                                             // sqlGetSizeOfMessage
 	"DELETE FROM Messages WHERE id=? AND seq=?",                                                                  // sqlDeleteMessage
@@ -181,6 +181,10 @@ const (
 	// Number of missed update interval after which the lock is assumed
 	// lost and another instance can update it.
 	sqlDefaultLockLostCount = 3
+
+	// Limit of number of messages in the cache before message store
+	// is automatically flushed on a Store() call.
+	sqlDefaultMsgCacheLimit = 1024
 )
 
 // These are initialized based on the constants that have reasonable values.
@@ -195,6 +199,7 @@ var (
 	sqlLockUpdateInterval        = sqlDefaultLockUpdateInterval
 	sqlLockLostCount             = sqlDefaultLockLostCount
 	sqlNoPanic                   = false // Used in tests to avoid go-routine to panic
+	sqlMsgCacheLimit             = sqlDefaultMsgCacheLimit
 )
 
 // SQLStoreOptions are used to configure the SQL Store.
@@ -326,6 +331,7 @@ type SQLMsgStore struct {
 	channelID   int64
 	sqlStore    *SQLStore // Reference to "parent" store
 	expireTimer *time.Timer
+	fTimestamp  int64
 	wg          sync.WaitGroup
 
 	// If option NoBuffering is false, uses this cache for storing Store()
@@ -337,10 +343,11 @@ type SQLMsgStore struct {
 }
 
 type sqlMsgsCache struct {
-	msgs map[uint64]*sqlCachedMsg
-	head *sqlCachedMsg
-	tail *sqlCachedMsg
-	free *sqlCachedMsg
+	msgs  map[uint64]*sqlCachedMsg
+	head  *sqlCachedMsg
+	tail  *sqlCachedMsg
+	free  *sqlCachedMsg
+	count int
 }
 
 type sqlCachedMsg struct {
@@ -377,7 +384,11 @@ var sqlSeqArrayPool = &sync.Pool{
 // DefaultStoreLimits.
 func NewSQLStore(log logger.Logger, driver, source string, limits *StoreLimits, options ...SQLStoreOption) (*SQLStore, error) {
 	initSQLStmts.Do(func() { initSQLStmtsTable(driver) })
-	db, err := sql.Open(driver, source)
+	realDriver := driver
+	if driver == driverPostgres {
+		realDriver = "pq-deadlines"
+	}
+	db, err := sql.Open(realDriver, source)
 	if err != nil {
 		return nil, err
 	}
@@ -454,13 +465,26 @@ func (s *SQLStore) GetExclusiveLock() (bool, error) {
 		for i := 0; i < sqlLockLostCount; i++ {
 			time.Sleep(time.Duration(1.5 * float64(sqlLockUpdateInterval)))
 			hasLock, id, tick, err = s.acquireDBLock(false)
-			if hasLock || err != nil || id != prevID || tick != prevTick {
-				return hasLock, err
+			// If the current lock owner is closed, the lockID is being
+			// cleaned from the entry in the table, which could allow the
+			// call above to acquired the lock even though the "steal"
+			// boolean is false. If we got the lock, ensure we start the
+			// "tick" update process.
+			if hasLock {
+				break
+			}
+			// If we got an error or ID and/or tick has changed, simply
+			// return that we don't have the lock.
+			if err != nil || id != prevID || tick != prevTick {
+				return false, err
 			}
 			prevTick = tick
 		}
-		// Try to steal.
-		hasLock, _, _, err = s.acquireDBLock(true)
+		if !hasLock {
+			// Still did not get the lock but there was no update to the
+			// lock table, so try to steal.
+			hasLock, _, _, err = s.acquireDBLock(true)
+		}
 	}
 	if hasLock {
 		// Success. Keep track that we own the lock so we can clear
@@ -480,7 +504,7 @@ func (s *SQLStore) updateDBLock() {
 
 	var (
 		ticker  = time.NewTicker(sqlLockUpdateInterval)
-		hasLock = true
+		hasLock bool
 		err     error
 		failed  int
 	)
@@ -680,8 +704,7 @@ func (s *SQLStore) createPreparedStmts() error {
 func initSQLStmtsTable(driver string) {
 	// The sqlStmts table is initialized with MySQL statements.
 	// Update the statements for the selected driver.
-	switch driver {
-	case driverPostgres:
+	if driver == driverPostgres {
 		// Replace ? with $1, $2, etc...
 		for i, stmt := range sqlStmts {
 			n := 0
@@ -1330,6 +1353,7 @@ func (mc *sqlMsgsCache) add(msg *pb.MsgProto, data []byte) {
 		mc.tail.next = cachedMsg
 	}
 	mc.tail = cachedMsg
+	mc.count++
 }
 
 func (mc *sqlMsgsCache) transferToFreeList() {
@@ -1339,6 +1363,7 @@ func (mc *sqlMsgsCache) transferToFreeList() {
 	}
 	mc.head = nil
 	mc.tail = nil
+	mc.count = 0
 }
 
 func (mc *sqlMsgsCache) pop() *sqlCachedMsg {
@@ -1349,6 +1374,7 @@ func (mc *sqlMsgsCache) pop() *sqlCachedMsg {
 		if mc.head == nil {
 			mc.tail = nil
 		}
+		mc.count--
 	}
 	return cm
 }
@@ -1370,14 +1396,20 @@ func (ms *SQLMsgStore) Store(m *pb.MsgProto) (uint64, error) {
 
 	useCache := !ms.sqlStore.opts.NoCaching
 	if useCache {
+		if ms.writeCache.count >= sqlMsgCacheLimit {
+			if err := ms.flush(); err != nil {
+				return 0, err
+			}
+		}
 		ms.writeCache.add(m, msgBytes)
 	} else {
 		if _, err := ms.sqlStore.preparedStmts[sqlStoreMsg].Exec(ms.channelID, seq, m.Timestamp, dataLen, msgBytes); err != nil {
 			return 0, sqlStmtError(sqlStoreMsg, err)
 		}
 	}
-	if ms.first == 0 {
+	if ms.first == 0 || ms.first == seq {
 		ms.first = seq
+		ms.fTimestamp = m.Timestamp
 	}
 	ms.last = seq
 	ms.totalCount++
@@ -1430,7 +1462,7 @@ func (ms *SQLMsgStore) Store(m *pb.MsgProto) (uint64, error) {
 
 func (ms *SQLMsgStore) createExpireTimer() {
 	ms.wg.Add(1)
-	ms.expireTimer = time.AfterFunc(ms.limits.MaxAge, ms.expireMsgs)
+	ms.expireTimer = time.AfterFunc(ms.msgExpireIn(ms.fTimestamp), ms.expireMsgs)
 }
 
 // Lookup implements the MsgStore interface
@@ -1532,7 +1564,6 @@ func (ms *SQLMsgStore) expireMsgs() {
 		count     int
 		maxSeq    uint64
 		totalSize uint64
-		timestamp int64
 	)
 	processErr := func(errCode int, err error) {
 		ms.log.Errorf("Unable to perform expiration for channel %q: %v", ms.subject, sqlStmtError(errCode, err))
@@ -1564,24 +1595,24 @@ func (ms *SQLMsgStore) expireMsgs() {
 			ms.totalBytes -= totalSize
 		}
 		// Reset since we are in a loop
-		timestamp = 0
+		ms.fTimestamp = 0
 		// If there is any message left in the channel, find out what the expiration
 		// timer needs to be set to.
 		if ms.totalCount > 0 {
 			r = ms.sqlStore.preparedStmts[sqlGetFirstMsgTimestamp].QueryRow(ms.channelID, ms.first)
-			if err := r.Scan(&timestamp); err != nil {
+			if err := r.Scan(&ms.fTimestamp); err != nil {
 				processErr(sqlGetFirstMsgTimestamp, err)
 				return
 			}
 		}
 		// No message left or no message to expire. The timer will be recreated when
 		// a new message is added to the channel.
-		if timestamp == 0 {
-			ms.wg.Done()
+		if ms.fTimestamp == 0 {
 			ms.expireTimer = nil
+			ms.wg.Done()
 			return
 		}
-		elapsed := time.Duration(time.Now().UnixNano() - timestamp)
+		elapsed := time.Duration(time.Now().UnixNano() - ms.fTimestamp)
 		if elapsed < ms.limits.MaxAge {
 			ms.expireTimer.Reset(ms.limits.MaxAge - elapsed)
 			// Done with the for loop
@@ -1947,11 +1978,14 @@ func (ss *SQLSubStore) deleteSubPendingRow(subid, rowid uint64) error {
 func (ss *SQLSubStore) recoverPendingRow(rows *sql.Rows, sub *spb.SubState, ap *sqlSubAcksPending, pendingAcks PendingAcks,
 	gcedRows map[uint64]struct{}) error {
 	var (
-		seq, lastSent           uint64
+		rowID, seq, lastSent    uint64
 		pendingBytes, acksBytes []byte
 	)
-	if err := rows.Scan(&ss.curRow, &seq, &lastSent, &pendingBytes, &acksBytes); err != nil && err != sql.ErrNoRows {
+	if err := rows.Scan(&rowID, &seq, &lastSent, &pendingBytes, &acksBytes); err != nil && err != sql.ErrNoRows {
 		return err
+	}
+	if rowID > ss.curRow {
+		ss.curRow = rowID
 	}
 	// If seq is non zero, this was created from a non-buffered run.
 	if seq > 0 {
@@ -1963,7 +1997,7 @@ func (ss *SQLSubStore) recoverPendingRow(rows *sql.Rows, sub *spb.SubState, ap *
 		var row *sqlSubsPendingRow
 		if ap != nil {
 			row = &sqlSubsPendingRow{
-				ID:   ss.curRow,
+				ID:   rowID,
 				msgs: sqlSeqMapPool.Get().(map[uint64]struct{}),
 			}
 			ap.lastSent = lastSent
