@@ -204,6 +204,8 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 	if _, found := v1CfgmgmtPolicies[pol.ID.String()]; found {
 		cfgmgmtStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"infra:*"})
+		cfgmgmtStatementDeny := newV2Statement(Deny, "", []string{},
+			[]string{"*"}, []string{"infra:ingest:*"})
 		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (cfgmgmt)")
@@ -211,7 +213,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 		cfgmgmtPolicy, err := newV2Policy(constants_v2.CfgmgmtPolicyID,
 			"[Legacy] Infrastructure Automation Access",
 			Custom, []v2Member{member},
-			[]v2Statement{cfgmgmtStatement}, noProjects)
+			[]v2Statement{cfgmgmtStatement, cfgmgmtStatementDeny}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (cfgmgmt)")
 		}
