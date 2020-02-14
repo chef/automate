@@ -38,7 +38,7 @@ type TeamInfo struct {
 	} `json:"team"`
 }
 
-type authTeamSave struct {
+type iamTeamSave struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
 	IsV2 bool   `json:"is_v2"`
@@ -137,7 +137,7 @@ func DeleteTeam(tstCtx diagnostics.TestContext, id string) error {
 
 // GetTeamID determines which identifier to use when fetching the team, since
 // the ID field is different across IAM v1 and and v2
-func GetTeamID(tstCtx diagnostics.TestContext, team authTeamSave) (string, error) {
+func GetTeamID(tstCtx diagnostics.TestContext, team iamTeamSave) (string, error) {
 	// if the team was saved as a v1 team, it has an auto-generated guid ID and unique name
 	if !team.IsV2 {
 		upgradedToV2, err := tstCtx.IsIAMV2()
@@ -155,17 +155,17 @@ func GetTeamID(tstCtx diagnostics.TestContext, team authTeamSave) (string, error
 	return team.ID, nil
 }
 
-// CreateAuthTeamsDiagnostic creates a diagnostic for auth teams
-func CreateAuthTeamsDiagnostic() diagnostics.Diagnostic {
+// CreateIAMTeamsDiagnostic creates a diagnostic for iam teams
+func CreateIAMTeamsDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
-		Name: "auth-teams",
-		Tags: diagnostics.Tags{"auth"},
+		Name: "iam-teams",
+		Tags: diagnostics.Tags{"iam"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			teamInfo, err := CreateRandomTeam(tstCtx)
 			if err != nil {
 				return err
 			}
-			tstCtx.SetValue("auth-teams", &authTeamSave{
+			tstCtx.SetValue("iam-teams", &iamTeamSave{
 				ID:   teamInfo.Team.ID,
 				Name: teamInfo.Team.Name,
 				IsV2: teamInfo.IsV2,
@@ -173,8 +173,8 @@ func CreateAuthTeamsDiagnostic() diagnostics.Diagnostic {
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := authTeamSave{}
-			err := tstCtx.GetValue("auth-teams", &loaded)
+			loaded := iamTeamSave{}
+			err := tstCtx.GetValue("iam-teams", &loaded)
 			require.NoError(tstCtx, err, "Could not load generated context")
 
 			id, err := GetTeamID(tstCtx, loaded)
@@ -184,8 +184,8 @@ func CreateAuthTeamsDiagnostic() diagnostics.Diagnostic {
 			assert.Equal(tstCtx, id, teamInfo.Team.ID, "Received unexpected team ID")
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := authTeamSave{}
-			err := tstCtx.GetValue("auth-teams", &loaded)
+			loaded := iamTeamSave{}
+			err := tstCtx.GetValue("iam-teams", &loaded)
 			if err != nil {
 				return errors.Wrap(err, "Could not load generated context")
 			}
@@ -201,6 +201,6 @@ func CreateAuthTeamsDiagnostic() diagnostics.Diagnostic {
 
 func init() {
 	diagnostics.RegisterDiagnostic(
-		CreateAuthTeamsDiagnostic(),
+		CreateIAMTeamsDiagnostic(),
 	)
 }

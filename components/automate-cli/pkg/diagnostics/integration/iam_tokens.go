@@ -40,7 +40,7 @@ type V2TokenInfo struct {
 	Token TokenInfo
 }
 
-type authTokenSave struct {
+type iamTokenSave struct {
 	ID string `json:"id"`
 }
 
@@ -138,26 +138,26 @@ func DeleteToken(tstCtx diagnostics.TestContext, id string) error {
 	return nil
 }
 
-// CreateAuthTokensDiagnostic create the diagnostic struct for auth tokens
-func CreateAuthTokensDiagnostic() diagnostics.Diagnostic {
+// CreateIAMTokensDiagnostic create the diagnostic struct for iam tokens
+func CreateIAMTokensDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
-		Name: "auth-tokens",
-		Tags: diagnostics.Tags{"auth"},
+		Name: "iam-tokens",
+		Tags: diagnostics.Tags{"iam"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			tokenInfo, err := CreateRandomToken(tstCtx,
-				fmt.Sprintf("auth-tokens-%s", TimestampName()))
+				fmt.Sprintf("iam-tokens-%s", TimestampName()))
 			if err != nil {
 				return err
 			}
 
-			tstCtx.SetValue("auth-tokens", &authTokenSave{
+			tstCtx.SetValue("iam-tokens", &iamTokenSave{
 				ID: tokenInfo.ID,
 			})
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := authTokenSave{}
-			err := tstCtx.GetValue("auth-tokens", &loaded)
+			loaded := iamTokenSave{}
+			err := tstCtx.GetValue("iam-tokens", &loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
 
 			tokenInfo, err := GetToken(tstCtx, loaded.ID)
@@ -166,8 +166,8 @@ func CreateAuthTokensDiagnostic() diagnostics.Diagnostic {
 			assert.Equal(tstCtx, loaded.ID, tokenInfo.ID)
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := authTokenSave{}
-			err := tstCtx.GetValue("auth-tokens", &loaded)
+			loaded := iamTokenSave{}
+			err := tstCtx.GetValue("iam-tokens", &loaded)
 			if err != nil {
 				return errors.Wrap(err, "Could not find generated context")
 			}
@@ -179,6 +179,6 @@ func CreateAuthTokensDiagnostic() diagnostics.Diagnostic {
 
 func init() {
 	diagnostics.RegisterDiagnostic(
-		CreateAuthTokensDiagnostic(),
+		CreateIAMTokensDiagnostic(),
 	)
 }

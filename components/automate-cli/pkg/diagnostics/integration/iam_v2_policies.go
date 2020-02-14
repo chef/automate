@@ -44,7 +44,7 @@ type PolicyParameters struct {
 	ProjectID string
 }
 
-type authV2PoliciesSave struct {
+type iamV2PoliciesSave struct {
 	TokenID    string `json:"token_id"`
 	TokenValue string `json:"token_value"`
 	PolicyID   string `json:"policy_id"`
@@ -87,11 +87,11 @@ func CreateV2Policy(tstCtx diagnostics.TestContext, pol PolicyParameters) (*Poli
 	return &policyInfo, nil
 }
 
-// CreateAuthV2PoliciesDiagnostic create the diagnostic struct for v2 policies.
-func CreateAuthV2PoliciesDiagnostic() diagnostics.Diagnostic {
+// CreateIAMV2PoliciesDiagnostic create the diagnostic struct for v2 policies.
+func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
-		Name: "auth-policies-v2",
-		Tags: diagnostics.Tags{"auth"},
+		Name: "iam-policies-v2",
+		Tags: diagnostics.Tags{"iam"},
 		Skip: func(tstCtx diagnostics.TestContext) (bool, string, error) {
 			isV2, err := tstCtx.IsIAMV2()
 			if err != nil {
@@ -102,7 +102,7 @@ func CreateAuthV2PoliciesDiagnostic() diagnostics.Diagnostic {
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			// generate all the components of the policy
 			tokenInfo, err := CreateRandomToken(tstCtx,
-				fmt.Sprintf("auth-policies-v2-%s", TimestampName()))
+				fmt.Sprintf("iam-policies-v2-%s", TimestampName()))
 			if err != nil {
 				return err
 			}
@@ -136,7 +136,7 @@ func CreateAuthV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			tstCtx.SetValue("auth-policies-v2", authV2PoliciesSave{
+			tstCtx.SetValue("iam-policies-v2", iamV2PoliciesSave{
 				TokenID:    pol.TokenID,
 				TokenValue: tokenInfo.Value,
 				PolicyID:   policyInfo.ID,
@@ -148,8 +148,8 @@ func CreateAuthV2PoliciesDiagnostic() diagnostics.Diagnostic {
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := authV2PoliciesSave{}
-			err := tstCtx.GetValue("auth-policies-v2", &loaded)
+			loaded := iamV2PoliciesSave{}
+			err := tstCtx.GetValue("iam-policies-v2", &loaded)
 			require.NoError(tstCtx, err, "Could not load generated context")
 
 			// assert policy is enforced
@@ -190,8 +190,8 @@ func CreateAuthV2PoliciesDiagnostic() diagnostics.Diagnostic {
 			require.ElementsMatch(tstCtx, expectedStmts, resp.Policy.Statements)
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := authV2PoliciesSave{}
-			err := tstCtx.GetValue("auth-policies-v2", &loaded)
+			loaded := iamV2PoliciesSave{}
+			err := tstCtx.GetValue("iam-policies-v2", &loaded)
 			if err != nil {
 				return errors.Wrap(err, "Could not load generated context")
 			}
@@ -210,6 +210,6 @@ func CreateAuthV2PoliciesDiagnostic() diagnostics.Diagnostic {
 
 func init() {
 	diagnostics.RegisterDiagnostic(
-		CreateAuthV2PoliciesDiagnostic(),
+		CreateIAMV2PoliciesDiagnostic(),
 	)
 }

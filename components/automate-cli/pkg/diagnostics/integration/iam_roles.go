@@ -29,7 +29,7 @@ type RoleInfo struct {
 	}
 }
 
-type authRoleSave struct {
+type iamRoleSave struct {
 	ID      string   `json:"id"`
 	Actions []string `json:"actions"`
 }
@@ -84,11 +84,11 @@ func DeleteRole(tstCtx diagnostics.TestContext, id string) error {
 	return nil
 }
 
-// CreateAuthRolesDiagnostic create the diagnostic struct for auth roles
-func CreateAuthRolesDiagnostic() diagnostics.Diagnostic {
+// CreateIAMRolesDiagnostic create the diagnostic struct for iam roles
+func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
-		Name: "auth-roles",
-		Tags: diagnostics.Tags{"auth"},
+		Name: "iam-roles",
+		Tags: diagnostics.Tags{"iam"},
 		Skip: func(tstCtx diagnostics.TestContext) (bool, string, error) {
 			isV2, err := tstCtx.IsIAMV2()
 			if err != nil {
@@ -102,15 +102,15 @@ func CreateAuthRolesDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			tstCtx.SetValue("auth-roles", &authRoleSave{
+			tstCtx.SetValue("iam-roles", &iamRoleSave{
 				ID:      roleInfo.Role.ID,
 				Actions: roleInfo.Role.Actions,
 			})
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := authRoleSave{}
-			err := tstCtx.GetValue("auth-roles", &loaded)
+			loaded := iamRoleSave{}
+			err := tstCtx.GetValue("iam-roles", &loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
 
 			roleInfo, err := GetRole(tstCtx, loaded.ID)
@@ -120,8 +120,8 @@ func CreateAuthRolesDiagnostic() diagnostics.Diagnostic {
 			assert.Equal(tstCtx, loaded.Actions, roleInfo.Role.Actions)
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := authRoleSave{}
-			err := tstCtx.GetValue("auth-roles", &loaded)
+			loaded := iamRoleSave{}
+			err := tstCtx.GetValue("iam-roles", &loaded)
 			if err != nil {
 				return errors.Wrap(err, "Could not find generated context")
 			}
@@ -133,6 +133,6 @@ func CreateAuthRolesDiagnostic() diagnostics.Diagnostic {
 
 func init() {
 	diagnostics.RegisterDiagnostic(
-		CreateAuthRolesDiagnostic(),
+		CreateIAMRolesDiagnostic(),
 	)
 }

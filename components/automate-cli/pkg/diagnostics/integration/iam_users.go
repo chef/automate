@@ -43,7 +43,7 @@ type V2UserInfo struct {
 	User UserInfo
 }
 
-type authUserSave struct {
+type iamUserSave struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
 	IsV2     bool   `json:"is_v2"`
@@ -148,7 +148,7 @@ func DeleteUser(tstCtx diagnostics.TestContext, username string) error {
 
 // GetUserID determines which identifier to use when fetching the user, since
 // the ID field is different across IAM v1 and and v2
-func GetUserID(user authUserSave) (string, error) {
+func GetUserID(user iamUserSave) (string, error) {
 	if !user.IsV2 {
 		// if the user was saved as a v1 user, its identifier is its Username
 		return user.Username, nil
@@ -157,18 +157,18 @@ func GetUserID(user authUserSave) (string, error) {
 	return user.ID, nil
 }
 
-// CreateAuthUsersDiagnostic create the diagnostic struct for auth users
-func CreateAuthUsersDiagnostic() diagnostics.Diagnostic {
+// CreateIAMUsersDiagnostic create the diagnostic struct for iam users
+func CreateIAMUsersDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
-		Name: "auth-users",
-		Tags: diagnostics.Tags{"auth"},
+		Name: "iam-users",
+		Tags: diagnostics.Tags{"iam"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			userInfo, err := CreateRandomUser(tstCtx)
 			if err != nil {
 				return err
 			}
 
-			tstCtx.SetValue("auth-users", &authUserSave{
+			tstCtx.SetValue("iam-users", &iamUserSave{
 				ID:       userInfo.ID,
 				Username: userInfo.Username,
 				IsV2:     userInfo.IsV2,
@@ -176,8 +176,8 @@ func CreateAuthUsersDiagnostic() diagnostics.Diagnostic {
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := authUserSave{}
-			err := tstCtx.GetValue("auth-users", &loaded)
+			loaded := iamUserSave{}
+			err := tstCtx.GetValue("iam-users", &loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
 
 			id, err := GetUserID(loaded)
@@ -194,8 +194,8 @@ func CreateAuthUsersDiagnostic() diagnostics.Diagnostic {
 			}
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := authUserSave{}
-			err := tstCtx.GetValue("auth-users", &loaded)
+			loaded := iamUserSave{}
+			err := tstCtx.GetValue("iam-users", &loaded)
 			if err != nil {
 				return errors.Wrap(err, "Could not find generated context")
 			}
@@ -211,6 +211,6 @@ func CreateAuthUsersDiagnostic() diagnostics.Diagnostic {
 
 func init() {
 	diagnostics.RegisterDiagnostic(
-		CreateAuthUsersDiagnostic(),
+		CreateIAMUsersDiagnostic(),
 	)
 }
