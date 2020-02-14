@@ -79,13 +79,13 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 		return errors.Wrap(err, "opening database connection")
 	}
 
-	notOnV2, isDirty, err := legacy.MigrateFromScratch(ctx, db)
+	isOnV1, isDirty, err := legacy.MigrationStatus(ctx, db)
 	if err != nil {
 		return errors.Wrap(err, "failed to retrieve migration_status")
 	}
 
-	if notOnV2 {
-		if isDirty {
+	if isOnV1 {
+		if isDirty { // we've attempted to migrate and not finished
 			// get IAM db in original, clean state to avoid conflicts
 			err = legacy.ResetIAMDb(ctx, db)
 			if err != nil {

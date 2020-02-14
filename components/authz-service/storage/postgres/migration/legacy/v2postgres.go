@@ -12,7 +12,7 @@ import (
 	"github.com/pkg/errors"
 )
 
-func MigrateFromScratch(ctx context.Context, db *sql.DB) (needsMigration, isDirty bool, err error) {
+func MigrationStatus(ctx context.Context, db *sql.DB) (isOnV1, isDirty bool, err error) {
 	var status string
 	row := db.QueryRowContext(ctx, `SELECT state FROM migration_status`)
 	err = row.Scan(&status)
