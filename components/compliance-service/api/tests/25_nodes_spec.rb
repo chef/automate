@@ -570,7 +570,7 @@ describe File.basename(__FILE__) do
       ),
       field: "tags"
     )
-    assert_equal(["department", "boss"], tag_keys["fields"])
+    assert_same_elements(["department", "boss"], tag_keys["fields"])
 
     names = MANAGER_GRPC manager, :search_node_fields, Manager::FieldQuery.new(
       node_manager_id: "e69dc612-7e67-43f2-9b19-256afd385820",
