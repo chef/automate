@@ -255,6 +255,32 @@ func (s *Server) ResetToV1(ctx context.Context,
 	return &teams.ResetToV1Resp{}, nil
 }
 
+// GRPC API functions only used internally (not used in gateway).
+
+// PurgeUserMembership removes the user's membership from all teams to which
+// the user belongs and returns that list of teams
+func (s *Server) PurgeUserMembership(ctx context.Context,
+	req *teams.PurgeUserMembershipReq) (*teams.PurgeUserMembershipResp, error) {
+
+	if req.UserId == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid userId")
+	}
+
+	teamUUIDs, err := s.service.Storage.PurgeUserMembership(ctx, req.UserId)
+	if err != nil {
+		return nil, service.ParseStorageError(err, req.UserId, "user")
+	}
+
+	teamIDs := make([]string, len(teamUUIDs))
+	for i, teamUUID := range teamUUIDs {
+		teamIDs[i] = teamUUID.String()
+	}
+
+	return &teams.PurgeUserMembershipResp{
+		Ids: teamIDs,
+	}, nil
+}
+
 func fromStorage(s storage.Team) *teams.Team {
 	return &teams.Team{
 		Id:       s.Name,

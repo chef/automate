@@ -13,7 +13,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	authz "github.com/chef/automate/api/interservice/authz/common"
-	teams "github.com/chef/automate/api/interservice/teams/v1"
+	teams "github.com/chef/automate/api/interservice/teams/v2"
 	"github.com/chef/automate/components/local-user-service/password"
 	"github.com/chef/automate/components/local-user-service/users"
 	"github.com/chef/automate/lib/grpc/health"
@@ -42,7 +42,7 @@ type Server struct {
 	validator       *password.Validator
 	connFactory     *secureconn.Factory
 	health          *health.Service
-	teamsClient     teams.TeamsV1Client
+	teamsClient     teams.TeamsV2Client
 	a1UserData      string
 	a1UserRolesData string
 	authzClient     authz.SubjectPurgeClient
@@ -94,7 +94,7 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		users:           usrs,
 		validator:       val,
 		connFactory:     secureconn.NewFactory(*c.ServiceCerts),
-		teamsClient:     teams.NewTeamsV1Client(conn),
+		teamsClient:     teams.NewTeamsV2Client(conn),
 		a1UserData:      c.A1UserData,
 		a1UserRolesData: c.A1UserRolesData,
 		authzClient:     authz.NewSubjectPurgeClient(authzConn),
@@ -204,7 +204,7 @@ func (s *Server) MigrateA1UserRoles(ctx context.Context) error {
 		}
 		userIDsToAdd[i] = u.ID
 	}
-	_, err = s.teamsClient.AddUsers(ctx, &teams.AddUsersReq{Id: adminsID, UserIds: userIDsToAdd})
+	_, err = s.teamsClient.AddTeamMembers(ctx, &teams.AddTeamMembersReq{Id: adminsID, UserIds: userIDsToAdd})
 	if err != nil {
 		return errors.Wrap(err, "failed to add users to admins team")
 	}
@@ -219,13 +219,13 @@ func (s *Server) cleanupA1UserRolesData() error {
 }
 
 func (s *Server) ensureAdminsTeamExists(ctx context.Context) (string, error) {
-	resp, err := s.teamsClient.GetTeamByName(ctx, &teams.GetTeamByNameReq{Name: "admins"})
+	resp, err := s.teamsClient.GetTeam(ctx, &teams.GetTeamReq{Id: "admins"})
 	if err != nil {
 		if status.Convert(err).Code() != codes.NotFound {
 			return "", errors.Wrap(err, "failed to fetch team \"admins\"")
 		}
 		// create "admins" team
-		resp, err := s.teamsClient.CreateTeam(ctx, &teams.CreateTeamReq{Name: "admins", Description: "TODO"})
+		resp, err := s.teamsClient.CreateTeam(ctx, &teams.CreateTeamReq{Id: "admins", Name: "admins"})
 		if err != nil {
 			return "", errors.Wrap(err, "failed to create team \"admins\"")
 		}
