@@ -19,21 +19,56 @@ const createProjectTemplate = `
 }
 `
 
-// ProjectInfo represents the project parameters, including v1 and v2 fields.
+const createRuleTemplate = `
+{
+	"id":"{{ .ID }}",
+	"name":"{{ .ID }} test rule",
+	"type": "NODE",
+	"project_id": "{{ .ProjectID }}",
+	"conditions": [
+		{
+			"attribute": "CHEF_SERVER",
+			"operator": "EQUALS",
+			"values": ["testing"]
+		}
+	]
+}
+`
+
+// ProjectInfo represents the project parameters
 type ProjectInfo struct {
 	Project struct {
 		ID   string `json:"id"`
 		Name string `json:"name"`
+		Rule Rule
 	}
 }
 
-type authProjectSave struct {
-	ID string `json:"id"`
+// Rule represents the rule parameters
+type Rule struct {
+	ID   string `json:"id"`
+	Name string `json:"name"`
 }
 
-// CreateRandomProject creates a project
-func CreateRandomProject(tstCtx diagnostics.TestContext) (*ProjectInfo, error) {
+// RuleInfo represents the nested rule response
+type RuleInfo struct {
+	Rule Rule
+}
+
+// RulesInfo represents the nested rules response
+type RulesInfo struct {
+	Rules []Rule
+}
+
+type authProjectSave struct {
+	ID     string `json:"id"`
+	RuleID string `json:"rule_id"`
+}
+
+// CreateRandomProjectWithRule creates a project with an associated rule
+func CreateRandomProjectWithRule(tstCtx diagnostics.TestContext) (*ProjectInfo, error) {
 	projectInfo := ProjectInfo{}
+	id := TimestampName()
 	err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
 			"/apis/iam/v2/projects",
@@ -41,7 +76,7 @@ func CreateRandomProject(tstCtx diagnostics.TestContext) (*ProjectInfo, error) {
 			lbrequest.WithJSONStringTemplateBody(createProjectTemplate, struct {
 				ID string
 			}{
-				ID: TimestampName(),
+				ID: id,
 			}),
 		)).WithValue(&projectInfo)
 
@@ -49,24 +84,54 @@ func CreateRandomProject(tstCtx diagnostics.TestContext) (*ProjectInfo, error) {
 		return nil, errors.Wrap(err, "Could not create project")
 	}
 
+	ruleResp := RuleInfo{}
+	err = MustJSONDecodeSuccess(
+		tstCtx.DoLBRequest(
+			fmt.Sprintf("/apis/iam/v2/projects/%s/rules", id),
+			lbrequest.WithMethod("POST"),
+			lbrequest.WithJSONStringTemplateBody(createRuleTemplate, struct {
+				ID        string
+				ProjectID string
+			}{
+				ID:        fmt.Sprintf("rule-%s", TimestampName()),
+				ProjectID: projectInfo.Project.ID,
+			}),
+		)).WithValue(&ruleResp)
+
+	if err != nil {
+		return nil, errors.Wrap(err, "Could not create rule")
+	}
+	projectInfo.Project.Rule = ruleResp.Rule
+
 	return &projectInfo, nil
 }
 
-// GetProject fetches the given project
+// GetProject fetches the given project and its associated rule
 func GetProject(tstCtx diagnostics.TestContext, id string) (*ProjectInfo, error) {
 	projectInfo := ProjectInfo{}
 	err := MustJSONDecodeSuccess(tstCtx.DoLBRequest(
 		fmt.Sprintf("/apis/iam/v2/projects/%s", id),
 	)).WithValue(&projectInfo)
-
 	if err != nil {
 		return nil, errors.Wrap(err, "Could not fetch project")
 	}
+
+	rulesInfo := RulesInfo{}
+	err = MustJSONDecodeSuccess(tstCtx.DoLBRequest(
+		fmt.Sprintf("/apis/iam/v2/projects/%s/rules", id),
+	)).WithValue(&rulesInfo)
+	if err != nil {
+		return nil, errors.Wrap(err, "Could not fetch rules")
+	}
+	// there's only one created rule
+	projectInfo.Project.Rule = rulesInfo.Rules[0]
+
 	return &projectInfo, nil
 }
 
 // DeleteProject deletes the project with the given id
 func DeleteProject(tstCtx diagnostics.TestContext, id string) error {
+	// any associated rules are cascaded deleted with the project
 	err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
 			fmt.Sprintf("/apis/iam/v2/projects/%s", id),
@@ -92,13 +157,14 @@ func CreateAuthProjectsDiagnostic() diagnostics.Diagnostic {
 			return !isV2, "requires IAM v2", nil
 		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			projectInfo, err := CreateRandomProject(tstCtx)
+			projectInfo, err := CreateRandomProjectWithRule(tstCtx)
 			if err != nil {
 				return err
 			}
 
 			tstCtx.SetValue("auth-projects", &authProjectSave{
-				ID: projectInfo.Project.ID,
+				ID:     projectInfo.Project.ID,
+				RuleID: projectInfo.Project.Rule.ID,
 			})
 			return nil
 		},
@@ -111,6 +177,7 @@ func CreateAuthProjectsDiagnostic() diagnostics.Diagnostic {
 			require.NoError(tstCtx, err)
 
 			assert.Equal(tstCtx, loaded.ID, projectInfo.Project.ID)
+			assert.Equal(tstCtx, loaded.RuleID, projectInfo.Project.Rule.ID)
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
 			loaded := authProjectSave{}

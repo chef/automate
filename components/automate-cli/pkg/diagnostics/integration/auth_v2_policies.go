@@ -118,7 +118,7 @@ func CreateAuthV2PoliciesDiagnostic() diagnostics.Diagnostic {
 			if err != nil {
 				return err
 			}
-			projectInfo, err := CreateRandomProject(tstCtx)
+			projectInfo, err := CreateRandomProjectWithRule(tstCtx)
 			if err != nil {
 				return err
 			}
