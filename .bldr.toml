@@ -711,7 +711,6 @@ paths = [
   "lib/stringutils/*",
   "lib/tls/*",
   "lib/tracing/*",
-  "lib/uuid4/*",
   "lib/version/*",
   "vendor/github.com/apache/thrift/*",
   "vendor/github.com/aws/aws-sdk-go/*",
