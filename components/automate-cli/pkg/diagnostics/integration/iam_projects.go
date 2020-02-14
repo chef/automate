@@ -66,9 +66,8 @@ type iamProjectSave struct {
 }
 
 // CreateRandomProjectWithRule creates a project with an associated rule
-func CreateRandomProjectWithRule(tstCtx diagnostics.TestContext) (*ProjectInfo, error) {
+func CreateRandomProjectWithRule(tstCtx diagnostics.TestContext, id string) (*ProjectInfo, error) {
 	projectInfo := ProjectInfo{}
-	id := TimestampName()
 	err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
 			"/apis/iam/v2/projects",
@@ -93,7 +92,7 @@ func CreateRandomProjectWithRule(tstCtx diagnostics.TestContext) (*ProjectInfo, 
 				ID        string
 				ProjectID string
 			}{
-				ID:        fmt.Sprintf("rule-%s", TimestampName()),
+				ID:        fmt.Sprintf("%s-rule-1", id),
 				ProjectID: projectInfo.Project.ID,
 			}),
 		)).WithValue(&ruleResp)
@@ -157,7 +156,8 @@ func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 			return !isV2, "requires IAM v2", nil
 		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			projectInfo, err := CreateRandomProjectWithRule(tstCtx)
+			projectInfo, err := CreateRandomProjectWithRule(tstCtx,
+				fmt.Sprintf("iam-projects-%s", TimestampName()))
 			if err != nil {
 				return err
 			}

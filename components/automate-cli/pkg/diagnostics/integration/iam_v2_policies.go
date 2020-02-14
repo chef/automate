@@ -100,25 +100,28 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 			return !isV2, "requires IAM v2", nil
 		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
+			// use a specific ID prefix so there are no conflicts with others tests
+			// different resources can have the same ID
+			id := fmt.Sprintf("iam-policies-v2-%s", TimestampName())
+
 			// generate all the components of the policy
-			tokenInfo, err := CreateRandomToken(tstCtx,
-				fmt.Sprintf("iam-policies-v2-%s", TimestampName()))
+			tokenInfo, err := CreateRandomToken(tstCtx, id)
 			if err != nil {
 				return err
 			}
-			teamInfo, err := CreateRandomTeam(tstCtx)
+			teamInfo, err := CreateRandomTeam(tstCtx, id)
 			if err != nil {
 				return err
 			}
-			userInfo, err := CreateRandomUser(tstCtx)
+			userInfo, err := CreateRandomUser(tstCtx, id)
 			if err != nil {
 				return err
 			}
-			roleInfo, err := CreateRandomRole(tstCtx, "system:serviceVersion:get")
+			roleInfo, err := CreateRandomRole(tstCtx, id, "system:serviceVersion:get")
 			if err != nil {
 				return err
 			}
-			projectInfo, err := CreateRandomProjectWithRule(tstCtx)
+			projectInfo, err := CreateRandomProjectWithRule(tstCtx, id)
 			if err != nil {
 				return err
 			}

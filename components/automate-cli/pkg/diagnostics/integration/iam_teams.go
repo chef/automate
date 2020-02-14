@@ -45,7 +45,7 @@ type iamTeamSave struct {
 }
 
 // CreateRandomTeam creates a team with a random identifier
-func CreateRandomTeam(tstCtx diagnostics.TestContext) (*TeamInfo, error) {
+func CreateRandomTeam(tstCtx diagnostics.TestContext, id string) (*TeamInfo, error) {
 	var err error
 	isV2, err := tstCtx.IsIAMV2()
 	if err != nil {
@@ -61,7 +61,7 @@ func CreateRandomTeam(tstCtx diagnostics.TestContext) (*TeamInfo, error) {
 				lbrequest.WithJSONStringTemplateBody(createV2TeamTemplate, struct {
 					ID string
 				}{
-					ID: TimestampName(),
+					ID: id,
 				}),
 			)).WithValue(&teamInfo)
 	} else {
@@ -161,7 +161,7 @@ func CreateIAMTeamsDiagnostic() diagnostics.Diagnostic {
 		Name: "iam-teams",
 		Tags: diagnostics.Tags{"iam"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			teamInfo, err := CreateRandomTeam(tstCtx)
+			teamInfo, err := CreateRandomTeam(tstCtx, fmt.Sprintf("iam-teams-%s", TimestampName()))
 			if err != nil {
 				return err
 			}
