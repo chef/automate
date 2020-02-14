@@ -135,9 +135,7 @@ func (d *DataFeedAggregateTask) buildDatafeed(ctx context.Context, nodeIDs map[s
 		}
 		// update the message with the full report
 		if report != nil {
-			message := nodeData["node_data"].(map[string]interface{})
-			message["report"] = report
-			nodeData["node_data"] = message
+			nodeData["report"] = report
 		}
 		nodeMessages[ip] = nodeData
 	}
@@ -164,14 +162,15 @@ func (d *DataFeedAggregateTask) getNodeClientData(ctx context.Context, ipaddress
 	} else if nodeID.ClientID == "" && updatedNodesOnly {
 		// get hosts data
 		filters := []string{"ipaddress:" + ipaddress}
-		macAddress, hostname, err := getNodeHostFields(ctx, d.cfgMgmt, filters)
+		_, macAddress, hostname, err := getNodeHostFields(ctx, d.cfgMgmt, filters)
 		if err != nil {
 			log.Errorf("Error getting node macaddress and hostname %v", err)
 		}
 		nodeDataContent := make(map[string]interface{})
 		nodeDataContent["macaddress"] = macAddress
 		nodeDataContent["hostname"] = hostname
-		nodeData["node_data"] = nodeDataContent
+		nodeDataContent["ipaddress"] = ipaddress
+		nodeData["node"] = nodeDataContent
 	}
 	if err != nil {
 		return nodeData, err
