@@ -50,7 +50,7 @@ type iamUserSave struct {
 }
 
 // CreateRandomUser creates a random user
-func CreateRandomUser(tstCtx diagnostics.TestContext) (*UserInfo, error) {
+func CreateRandomUser(tstCtx diagnostics.TestContext, id string) (*UserInfo, error) {
 	var err error
 	isV2, err := tstCtx.IsIAMV2()
 	if err != nil {
@@ -68,7 +68,7 @@ func CreateRandomUser(tstCtx diagnostics.TestContext) (*UserInfo, error) {
 					ID       string
 					Password string
 				}{
-					ID:       TimestampName(),
+					ID:       id,
 					Password: Password(),
 				}),
 			)).WithValue(&v2UserInfo)
@@ -163,7 +163,7 @@ func CreateIAMUsersDiagnostic() diagnostics.Diagnostic {
 		Name: "iam-users",
 		Tags: diagnostics.Tags{"iam"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			userInfo, err := CreateRandomUser(tstCtx)
+			userInfo, err := CreateRandomUser(tstCtx, fmt.Sprintf("iam-users-%s", TimestampName()))
 			if err != nil {
 				return err
 			}
