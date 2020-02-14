@@ -24,7 +24,7 @@ type PolicyInfo struct {
 	ID string `json:"id"`
 }
 
-type authV1PoliciesSave struct {
+type iamV1PoliciesSave struct {
 	TokenID    string `json:"token_id"`
 	TokenValue string `json:"token_value"`
 	PolicyID   string `json:"policy_id"`
@@ -81,12 +81,12 @@ func DeletePolicy(tstCtx diagnostics.TestContext, id string) error {
 	return nil
 }
 
-// CreateAuthV1PoliciesDiagnostic create the diagnostic struct for auth tokens
+// CreateIAMV1PoliciesDiagnostic create the diagnostic struct for iam tokens
 // and v1 policies.
-func CreateAuthV1PoliciesDiagnostic() diagnostics.Diagnostic {
+func CreateIAMV1PoliciesDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
-		Name: "auth-policies-v1",
-		Tags: diagnostics.Tags{"auth"},
+		Name: "iam-policies-v1",
+		Tags: diagnostics.Tags{"iam"},
 		Skip: func(tstCtx diagnostics.TestContext) (bool, string, error) {
 			isV2, err := tstCtx.IsIAMV2()
 			if err != nil {
@@ -96,7 +96,7 @@ func CreateAuthV1PoliciesDiagnostic() diagnostics.Diagnostic {
 		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
 			tokenInfo, err := CreateRandomToken(tstCtx,
-				fmt.Sprintf("auth-policies-v1-%s", TimestampName()))
+				fmt.Sprintf("iam-policies-v1-%s", TimestampName()))
 			if err != nil {
 				return err
 			}
@@ -106,7 +106,7 @@ func CreateAuthV1PoliciesDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			tstCtx.SetValue("auth-policies-v1", authV1PoliciesSave{
+			tstCtx.SetValue("iam-policies-v1", iamV1PoliciesSave{
 				TokenID:    tokenInfo.ID,
 				PolicyID:   policyInfo.ID,
 				TokenValue: tokenInfo.Value,
@@ -114,8 +114,8 @@ func CreateAuthV1PoliciesDiagnostic() diagnostics.Diagnostic {
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := authV1PoliciesSave{}
-			err := tstCtx.GetValue("auth-policies-v1", &loaded)
+			loaded := iamV1PoliciesSave{}
+			err := tstCtx.GetValue("iam-policies-v1", &loaded)
 			require.NoError(tstCtx, err, "Could not load generated context")
 			err = MustJSONDecodeSuccess(
 				tstCtx.DoLBRequest(
@@ -125,8 +125,8 @@ func CreateAuthV1PoliciesDiagnostic() diagnostics.Diagnostic {
 			require.NoError(tstCtx, err, "Expected to be able to read gateway version")
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := authV1PoliciesSave{}
-			err := tstCtx.GetValue("auth-policies-v1", &loaded)
+			loaded := iamV1PoliciesSave{}
+			err := tstCtx.GetValue("iam-policies-v1", &loaded)
 			if err != nil {
 				return errors.Wrap(err, "Could not load generated context")
 			}
@@ -141,6 +141,6 @@ func CreateAuthV1PoliciesDiagnostic() diagnostics.Diagnostic {
 
 func init() {
 	diagnostics.RegisterDiagnostic(
-		CreateAuthV1PoliciesDiagnostic(),
+		CreateIAMV1PoliciesDiagnostic(),
 	)
 }

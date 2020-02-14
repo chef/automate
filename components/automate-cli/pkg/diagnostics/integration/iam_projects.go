@@ -60,7 +60,7 @@ type RulesInfo struct {
 	Rules []Rule
 }
 
-type authProjectSave struct {
+type iamProjectSave struct {
 	ID     string `json:"id"`
 	RuleID string `json:"rule_id"`
 }
@@ -144,11 +144,11 @@ func DeleteProject(tstCtx diagnostics.TestContext, id string) error {
 	return nil
 }
 
-// CreateAuthProjectsDiagnostic create the diagnostic struct for auth projects
-func CreateAuthProjectsDiagnostic() diagnostics.Diagnostic {
+// CreateIAMProjectsDiagnostic create the diagnostic struct for iam projects
+func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
-		Name: "auth-projects",
-		Tags: diagnostics.Tags{"auth"},
+		Name: "iam-projects",
+		Tags: diagnostics.Tags{"iam"},
 		Skip: func(tstCtx diagnostics.TestContext) (bool, string, error) {
 			isV2, err := tstCtx.IsIAMV2()
 			if err != nil {
@@ -162,15 +162,15 @@ func CreateAuthProjectsDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			tstCtx.SetValue("auth-projects", &authProjectSave{
+			tstCtx.SetValue("iam-projects", &iamProjectSave{
 				ID:     projectInfo.Project.ID,
 				RuleID: projectInfo.Project.Rule.ID,
 			})
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := authProjectSave{}
-			err := tstCtx.GetValue("auth-projects", &loaded)
+			loaded := iamProjectSave{}
+			err := tstCtx.GetValue("iam-projects", &loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
 
 			projectInfo, err := GetProject(tstCtx, loaded.ID)
@@ -180,8 +180,8 @@ func CreateAuthProjectsDiagnostic() diagnostics.Diagnostic {
 			assert.Equal(tstCtx, loaded.RuleID, projectInfo.Project.Rule.ID)
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := authProjectSave{}
-			err := tstCtx.GetValue("auth-projects", &loaded)
+			loaded := iamProjectSave{}
+			err := tstCtx.GetValue("iam-projects", &loaded)
 			if err != nil {
 				return errors.Wrap(err, "Could not find generated context")
 			}
@@ -193,6 +193,6 @@ func CreateAuthProjectsDiagnostic() diagnostics.Diagnostic {
 
 func init() {
 	diagnostics.RegisterDiagnostic(
-		CreateAuthProjectsDiagnostic(),
+		CreateIAMProjectsDiagnostic(),
 	)
 }
