@@ -55,7 +55,6 @@ func NewMemstoreServer(
 }
 
 // NewPostgresServer instantiates a server.Server that connects to a postgres backend
-// NewPostgresServer instantiates a server.Server that connects to a postgres backend
 func NewPostgresServer(
 	ctx context.Context,
 	l logger.Logger,
