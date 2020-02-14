@@ -103,7 +103,6 @@ paths = [
   "components/authn-service/*",
   "api/config/platform/*",
   "api/config/shared/*",
-  "api/external/common/*",
   "api/interservice/authn/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
