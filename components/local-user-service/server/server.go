@@ -225,7 +225,7 @@ func (s *Server) ensureAdminsTeamExists(ctx context.Context) (string, error) {
 			return "", errors.Wrap(err, "failed to fetch team \"admins\"")
 		}
 		// create "admins" team
-		resp, err := s.teamsClient.CreateTeam(ctx, &teams.CreateTeamReq{Id: "admins", Name: "TODO"})
+		resp, err := s.teamsClient.CreateTeam(ctx, &teams.CreateTeamReq{Id: "admins", Name: "admins"})
 		if err != nil {
 			return "", errors.Wrap(err, "failed to create team \"admins\"")
 		}
