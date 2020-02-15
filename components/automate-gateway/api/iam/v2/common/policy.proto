@@ -4,13 +4,18 @@ package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/common";
 
 import "components/automate-gateway/api/iam/v2/common/rules.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 
 enum Type {
     CHEF_MANAGED = 0;
     CUSTOM = 1;
 }
-
+// These are Policies
 message Policy {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      example: { value: '{"name": "My Viewer Policy","id": "viewer-policy","type": ["CUSTOM", "CHEF_MANAGED"],"members": ["team:ldap:*"],"statement": [{"role": "viewer","projects":["project1", "project2"]},{"role": "qa","projects": ["acceptanceProject"]}],"projects": []}'}
+    };
+
     // Name for the policy.
     string name = 1;
     // Unique, user-specified ID. Cannot be changed.
@@ -25,30 +30,35 @@ message Policy {
     // The list of projects this policy belongs to.
     repeated string projects = 6;
 }
-
+// These are projects
 message Statement {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      example: { value: '{"id": "team-managers-devops","members":["user:local:bob","user:local:gamma"],"name": "Team Devops Managers","projects": ["project-devops"], "statements": {"effect": "ALLOW","actions": ["iam:users:update","iam:users:list","iam:users:get","iam:teams:update","iam:teams:list","iam:teams:get"]}}'}
+    };
+
     enum Effect {
         ALLOW = 0;
         DENY = 1;
     }
+
     // Whether the statement allows or denies.
     // One of `ALLOW` or `DENY`, respectively.
     Effect effect = 1;
-
-    // Actions defined inline. Best practices recommend that you use custom roles where practical.
+    // Defines the actions for the members of this policy. The best practice is to use chef-managed roles or to define custom roles for unique action sets.
     repeated string actions = 3;
-
     // The role defines a set of actions that the statement is scoped to.
     string role = 4;
-
     // DEPRECATED: Resources defined inline. Use projects instead.
     repeated string resources = 5;
-
     // The project list defines the set of resources that the statement is scoped to.
     repeated string projects = 6;
 }
-
+// These are Roles
 message Role {
+  // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+  //   example: { value: ['{"role": "Editor"}, "id": "project-editors","type": "CHEF_MANAGED", "actions": ["iam:users:update","iam:users:list","iam:users:get","iam:teams:update","iam:teams:list","iam:teams:get"],"projects": ["project-devops"]'}
+  // };
+
     // Name for the role.
     string name = 1;
     // Unique, user-specified ID. Cannot be changed.
@@ -63,6 +73,10 @@ message Role {
 }
 
 message Project {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    example: { value: '{"name": "project-devops","id": "project-devops", "type":"CHEF_MANAGED", "status": []}'}
+  };
+
     // Name for the project.
     string name = 1;
     // Unique, user-specified ID. Cannot be changed.

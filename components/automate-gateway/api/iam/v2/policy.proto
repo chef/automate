@@ -18,11 +18,14 @@ service Policies {
   /*
   Create a new policy
 
-  Creates a new IAM policy used to control permissions in Automate.
-  A policy is composed of one or more statements that grant permissions to a set of members.
-  Each statement contains a role as well as a list of projects.
+  Use Chef Automate IAM uses multi-statement policies to support complex permissions in a single policy.
 
-  The role defines a set of actions that the statement is scoped to.
+  Policies are based on projects. Projects group and define the rules for access to Chef Automate resources and data, specifically Compliance reports, Chef Server events, and Infrastructure nodes.
+
+  A policy is made up of one or more statements that grant permissions to a set of members.
+  Each statement is made up of a role as well as a list of projects.
+
+  A role defines the set of actions that the statement is scoped to.
   The project list defines the set of resources that the statement is scoped to.
   Pass `"projects": ["*"]` to scope a statement to every project.
 
@@ -34,7 +37,7 @@ service Policies {
 
   ```
   {
-    "name": "My Viewer Policy",
+    "name": "Viewer Policy",
     "id": "viewer-policy",
     "members": ["team:ldap:*"],
     "statements" : [
@@ -77,9 +80,9 @@ service Policies {
   rpc GetPolicy (GetPolicyReq) returns (GetPolicyResp) {
     option (google.api.http) = {
       get: "/iam/v2/policies/{id}"
-      additional_bindings {
-        get: "/iam/v2beta/policies/{id}"
-      }
+      // additional_bindings {
+      //   get: "/iam/v2beta/policies/{id}"
+      // }
     };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "get";
@@ -98,9 +101,9 @@ service Policies {
   rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {
     option (google.api.http) = {
       get: "/iam/v2/policies"
-      additional_bindings {
-        get: "/iam/v2beta/policies"
-      }
+      // additional_bindings {
+      //   get: "/iam/v2beta/policies"
+      // }
     };
     option (chef.automate.api.policy).resource = "auth:policies";
     option (chef.automate.api.policy).action = "read";

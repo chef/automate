@@ -49,7 +49,7 @@ func init() {
       },
       "post": {
         "summary": "Create a new policy",
-        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Use Chef Automate IAM uses multi-statement policies to support complex permissions in a single policy.\n\nPolicies are based on projects. Projects group and define the rules for access to Chef Automate resources and data, specifically Compliance reports, Chef Server events, and Infrastructure nodes.\n\nA policy is made up of one or more statements that grant permissions to a set of members.\nEach statement is made up of a role as well as a list of projects.\n\nA role defines the set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreatePolicy",
         "responses": {
           "200": {
@@ -572,25 +572,9 @@ func init() {
       }
     },
     "/iam/v2beta/policies": {
-      "get": {
-        "summary": "List all policies",
-        "description": "List all policies.",
-        "operationId": "ListPolicies2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.ListPoliciesResp"
-            }
-          }
-        },
-        "tags": [
-          "policies"
-        ]
-      },
       "post": {
         "summary": "Create a new policy",
-        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Use Chef Automate IAM uses multi-statement policies to support complex permissions in a single policy.\n\nPolicies are based on projects. Projects group and define the rules for access to Chef Automate resources and data, specifically Compliance reports, Chef Server events, and Infrastructure nodes.\n\nA policy is made up of one or more statements that grant permissions to a set of members.\nEach statement is made up of a role as well as a list of projects.\n\nA role defines the set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreatePolicy2",
         "responses": {
           "200": {
@@ -616,30 +600,6 @@ func init() {
       }
     },
     "/iam/v2beta/policies/{id}": {
-      "get": {
-        "summary": "Get a policy",
-        "description": "Get a policy.",
-        "operationId": "GetPolicy2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.GetPolicyResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "policies"
-        ]
-      },
       "delete": {
         "summary": "Delete a policy",
         "description": "Delete a policy.",
@@ -1321,6 +1281,33 @@ func init() {
     },
     "chef.automate.api.iam.v2.Policy": {
       "type": "object",
+      "example": {
+        "name": "My Viewer Policy",
+        "id": "viewer-policy",
+        "type": [
+          "CUSTOM",
+          "CHEF_MANAGED"
+        ],
+        "members": [
+          "team:ldap:*"
+        ],
+        "statement": [
+          {
+            "role": "viewer",
+            "projects": [
+              "project1",
+              "project2"
+            ]
+          },
+          {
+            "role": "qa",
+            "projects": [
+              "acceptanceProject"
+            ]
+          }
+        ],
+        "projects": []
+      },
       "properties": {
         "name": {
           "type": "string",
@@ -1355,10 +1342,17 @@ func init() {
           },
           "description": "The list of projects this policy belongs to."
         }
-      }
+      },
+      "title": "These are Policies"
     },
     "chef.automate.api.iam.v2.Project": {
       "type": "object",
+      "example": {
+        "name": "project-devops",
+        "id": "project-devops",
+        "type": "CHEF_MANAGED",
+        "status": []
+      },
       "properties": {
         "name": {
           "type": "string",
@@ -1474,10 +1468,33 @@ func init() {
           },
           "description": "The list of projects this role belongs to."
         }
-      }
+      },
+      "title": "These are Roles"
     },
     "chef.automate.api.iam.v2.Statement": {
       "type": "object",
+      "example": {
+        "id": "team-managers-devops",
+        "members": [
+          "user:local:bob",
+          "user:local:gamma"
+        ],
+        "name": "Team Devops Managers",
+        "projects": [
+          "project-devops"
+        ],
+        "statements": {
+          "effect": "ALLOW",
+          "actions": [
+            "iam:users:update",
+            "iam:users:list",
+            "iam:users:get",
+            "iam:teams:update",
+            "iam:teams:list",
+            "iam:teams:get"
+          ]
+        }
+      },
       "properties": {
         "effect": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Statement.Effect",
@@ -1488,7 +1505,7 @@ func init() {
           "items": {
             "type": "string"
           },
-          "description": "Actions defined inline. Best practices recommend that you use custom roles where practical."
+          "description": "Defines the actions for the members of this policy. The best practice is to use chef-managed roles or to define custom roles for unique action sets."
         },
         "role": {
           "type": "string",
@@ -1508,7 +1525,8 @@ func init() {
           },
           "description": "The project list defines the set of resources that the statement is scoped to."
         }
-      }
+      },
+      "title": "These are projects"
     },
     "chef.automate.api.iam.v2.Statement.Effect": {
       "type": "string",
