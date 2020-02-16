@@ -16,9 +16,17 @@
   }
 
   button {
+    border: 1px $chef-white solid;
+    margin: 5px 5px 0 0;
+    line-height: 26px;
     position: absolute;
     right: 0;
     top: 0;
+  }
+
+  button:hover,
+  button:focus {
+    background-color: #174af0;
   }
 }
 
