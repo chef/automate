@@ -3,11 +3,12 @@
 #pending-edits-bar {
   background-color: $chef-primary-bright;
   color: $chef-white;
-  padding: 7px 10px;
+  padding: 16px 10px;
   position: relative;
+  font-size: 16px;
 
   .info {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
 
     a {
@@ -17,8 +18,7 @@
 
   button {
     border: 1px $chef-white solid;
-    margin: 5px 5px 0 0;
-    line-height: 26px;
+    margin: 8px;
     position: absolute;
     right: 0;
     top: 0;

@@ -3,12 +3,13 @@
 #process-progress-bar {
   background-color: $chef-primary-bright;
   color: $chef-white;
-  height: 48px;
-  padding: 7px 10px;
+  //height: 48px;
+  padding: 11px 10px;
   position: relative;
+  font-size: 16px;
 
   .info {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
 
     chef-icon {
@@ -18,8 +19,7 @@
 
   button {
     border: 1px $chef-white solid;
-    margin: 5px 5px 0 0;
-    line-height: 26px;
+    margin: 8px;
     position: absolute;
     right: 0;
     top: 0;
@@ -34,6 +34,7 @@
     border-radius: 5px;
     height: 6px;
     margin-top: 5px;
+    width: 87%;
 
     .mat-progress-bar-fill::after {
       background-color: rgba(255, 255, 255, .7);
