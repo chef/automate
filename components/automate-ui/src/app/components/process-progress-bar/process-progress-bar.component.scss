@@ -16,8 +16,8 @@
   }
 
   button {
-    border: 1px $chef-white solid;
     margin: 8px;
+    border: 1px solid $chef-white;
     position: absolute;
     right: 0;
     top: 0;
@@ -25,7 +25,7 @@
 
   button:hover,
   button:focus {
-    background-color: #174af0;
+    background-color: #174AF0;
   }
 
   mat-progress-bar {
