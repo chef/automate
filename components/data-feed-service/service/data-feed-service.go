@@ -217,13 +217,14 @@ func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []st
 		log.Errorf("Error getting node run %v", err)
 		return nodeData, err
 	}
-	ipaddress, macAddress, hostname := getHostAttributes(attributesJson)
+	automaticAttrs := attributesJson["automatic"].(map[string]interface{})
+	ipaddress, macAddress, hostname := getHostAttributes(automaticAttrs)
 	nodeDataContent := make(map[string]interface{})
 	nodeData["client_run"] = lastRun
 	nodeDataContent["macaddress"] = macAddress
 	nodeDataContent["hostname"] = hostname
 	nodeDataContent["ipaddress"] = ipaddress
-	addDataContent(nodeDataContent, attributesJson)
+	addDataContent(nodeDataContent, automaticAttrs)
 	nodeData["node"] = nodeDataContent
 	return nodeData, nil
 }
@@ -276,12 +277,13 @@ func getNodeAttributes(ctx context.Context, client cfgmgmt.CfgMgmtClient, nodeId
 		return attributesJson, err
 	}
 
-	err = json.Unmarshal([]byte(nodeAttributes.Automatic), &attributesJson)
+	automatic := make(map[string]interface{})
+	err = json.Unmarshal([]byte(nodeAttributes.Automatic), &automatic)
 	if err != nil {
 		log.Errorf("Could not parse automatic attributes from json: %v", err)
 		return attributesJson, err
 	}
-	attributesJson = buildDynamicJson(attributesJson)
+	attributesJson["automatic"] = automatic
 	return attributesJson, nil
 }
 
@@ -294,7 +296,7 @@ func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filter
 	if err != nil {
 		return "", "", "", err
 	}
-	ipaddress, macAddress, hostname := getHostAttributes(attributesJson)
+	ipaddress, macAddress, hostname := getHostAttributes(attributesJson["automatic"].(map[string]interface{}))
 	return ipaddress, macAddress, hostname, nil
 }
 

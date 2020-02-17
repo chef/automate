@@ -118,9 +118,8 @@ func (d *DataFeedAggregateTask) buildDatafeed(ctx context.Context, nodeIDs map[s
 			log.Errorf("Error getting node data %v", err)
 			continue
 		}
-
-		if attributes, ok := nodeData["attributes"]; ok {
-			ipaddress := attributes.(map[string]interface{})["ipaddress"].(string)
+		if automatic, ok := nodeData["attributes"].(map[string]interface{})["automatic"]; ok {
+			ipaddress := automatic.(map[string]interface{})["ipaddress"].(string)
 
 			if ip != ipaddress {
 				log.Errorf("Error node ip address %s and attributes ip address %s mismatch", ip, ipaddress)
