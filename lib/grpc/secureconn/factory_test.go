@@ -7,7 +7,6 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-	"google.golang.org/grpc/balancer"
 	"google.golang.org/grpc/codes"
 	pb "google.golang.org/grpc/examples/helloworld/helloworld"
 	"google.golang.org/grpc/status"
@@ -79,10 +78,7 @@ func TestSecureConnFactory(t *testing.T) {
 
 		s, ok := status.FromError(err)
 		require.True(t, ok)
-		expected := balancer.ErrTransientFailure.Error() + ", latest connection error: connection error: " +
-			"desc = \"transport: authentication handshake failed: x509: certificate is valid for root-a-service, " +
-			"not root-foo-service\""
-		assert.Equal(t, expected, s.Message())
+		assert.Regexp(t, "authentication handshake failed: x509.*valid for root-a-service, not root-foo-service", s.Message())
 	})
 
 	t.Run("Test incorrectly signed client cert and correct server name", func(t *testing.T) {
@@ -97,9 +93,7 @@ func TestSecureConnFactory(t *testing.T) {
 
 		s, ok := status.FromError(err)
 		require.True(t, ok)
-		expected := "all SubConns are in TransientFailure, latest connection error: connection error: " +
-			"desc = \"transport: authentication handshake failed: x509: certificate signed by unknown authority\""
-		assert.Equal(t, expected, s.Message())
+		assert.Regexp(t, "authentication handshake failed: x509.*certificate signed by unknown authority", s.Message())
 	})
 }
 
