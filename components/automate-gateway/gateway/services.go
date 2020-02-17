@@ -317,6 +317,12 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	)
 	pb_data_lifecycle.RegisterDataLifecycleServer(grpcServer, dataLifecycleServer)
 
+	infraProxyClient, err := clients.InfraProxyClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for infra proxy service")
+	}
+	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient))
+
 	// Reflection to be able to make grpcurl calls
 	reflection.Register(grpcServer)
 
@@ -325,12 +331,6 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		return errors.Wrap(err, "create client for secret service")
 	}
 	pb_data_feed.RegisterDatafeedServiceServer(grpcServer, handler.NewDatafeedHandler(datafeedClient))
-
-	infraProxyClient, err := clients.InfraProxyClient()
-	if err != nil {
-		return errors.Wrap(err, "create client for infra proxy service")
-	}
-	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient))
 
 	grpc_prometheus.Register(grpcServer)
 
