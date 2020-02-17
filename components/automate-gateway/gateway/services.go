@@ -57,12 +57,12 @@ import (
 	"github.com/chef/automate/components/automate-gateway/handler"
 	handler_compliance "github.com/chef/automate/components/automate-gateway/handler/compliance"
 	handler_data_lifecycle "github.com/chef/automate/components/automate-gateway/handler/data_lifecycle"
-	handler_infra_proxy "github.com/chef/automate/components/automate-gateway/handler/infra_proxy"
 	handler_policies "github.com/chef/automate/components/automate-gateway/handler/iam/v2/policy"
 	handler_rules "github.com/chef/automate/components/automate-gateway/handler/iam/v2/rules"
 	handler_teams "github.com/chef/automate/components/automate-gateway/handler/iam/v2/teams"
 	handler_tokens "github.com/chef/automate/components/automate-gateway/handler/iam/v2/tokens"
 	handler_users "github.com/chef/automate/components/automate-gateway/handler/iam/v2/users"
+	handler_infra_proxy "github.com/chef/automate/components/automate-gateway/handler/infra_proxy"
 
 	// anything else
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
