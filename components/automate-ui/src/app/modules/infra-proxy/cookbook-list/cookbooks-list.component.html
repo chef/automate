@@ -1,0 +1,98 @@
+<div class="content-container">
+    <div class="container">
+        <main>
+            <chef-breadcrumbs>
+                <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Orgs</chef-breadcrumb>
+                {{ org?.name }}
+            </chef-breadcrumbs>
+            <chef-page-header>
+                <chef-heading>{{ org?.name }}</chef-heading>
+                <table>
+                    <thead>
+                        <tr class="detail-row">
+                            <th class="id-column">Name</th>
+                            <th class="id-column">Admin User</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="detail-row">
+                            <td class="id-column">{{ org?.name }}</td>
+                            <td class="id-column">{{ org?.admin_user }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+                    <chef-option value='cookbooks' data-cy="cookbooks-tab">Cookbooks</chef-option>
+                    <chef-option value='details' data-cy="details-tab">Details</chef-option>
+                </chef-tab-selector>
+            </chef-page-header>
+            <section class="page-body" *ngIf="tabValue === 'details'">
+                <form [formGroup]="updateOrgForm">
+                    <chef-form-field>
+                        <label>
+                            <span class="label">Name <span aria-hidden="true">*</span></span>
+                            <input chefInput formControlName="name" type="text" autocomplete="off"
+                                data-cy="update-org-name">
+                        </label>
+                        <chef-error
+                            *ngIf="(updateOrgForm.get('name').hasError('required') || updateOrgForm.get('name').hasError('pattern')) && updateOrgForm.get('name').dirty">
+                            Display Name is required.
+                        </chef-error>
+                    </chef-form-field>
+                    <chef-form-field>
+                        <label>
+                            <span class="label">Admin User <span aria-hidden="true">*</span></span>
+                            <input chefInput formControlName="admin_user" type="text" autocomplete="off"
+                                data-cy="update-Org-admin-user">
+                        </label>
+                        <chef-error
+                            *ngIf="(updateOrgForm.get('admin_user').hasError('required') || updateOrgForm.get('admin_user').hasError('pattern')) && updateOrgForm.get('admin_user').dirty">
+                            Admin User is required.
+                        </chef-error>
+                    </chef-form-field>
+                    <chef-form-field>
+                        <label>
+                            <span class="label">Admin Key<span aria-hidden="true">*</span></span>
+                            <textarea rows="27" cols="54" chefInput placeholder="-----BEGIN RSA PRIVATE KEY -----"
+                                formControlName="admin_key" data-cy="update-org-admin-key"></textarea>
+                        </label>
+                        <chef-error
+                            *ngIf="(updateOrgForm.get('admin_key').hasError('required') || updateOrgForm.get('admin_key').hasError('pattern')) && updateOrgForm.get('admin_key').dirty">
+                            Admin Key is required.
+                        </chef-error>
+                    </chef-form-field>
+                    <chef-form-field>
+                        <div id="button-bar">
+                            <chef-button [disabled]="isLoading || !updateOrgForm.valid || !updateOrgForm.dirty" primary
+                                inline (click)="saveOrg()">
+                                <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
+                                <span *ngIf="saving">Saving...</span>
+                                <span *ngIf="!saving">Save</span>
+                            </chef-button>
+                            <span id="saved-note" *ngIf="saveSuccessful && !updateOrgForm.dirty">All changes
+                                saved.</span>
+                        </div>
+                    </chef-form-field>
+                </form>
+            </section>
+            <section class="page-body" *ngIf="tabValue === 'cookbooks'">
+                <ng-container>
+                    <chef-table-new>
+                        <chef-table-header>
+                            <chef-table-row>
+                                <chef-table-header-cell>Cookbook Name</chef-table-header-cell>
+                                <chef-table-header-cell>Cookbook Version</chef-table-header-cell>
+                            </chef-table-row>
+                        </chef-table-header>
+                        <chef-table-body>
+                            <!-- <chef-table-row *ngFor="let cookbook of cookbooks">
+                                <chef-table-cell>{{ cookbook.name }}</chef-table-cell>
+                                <chef-table-cell>{{ cookbook.version }}</chef-table-cell>
+                            </chef-table-row> -->
+                        </chef-table-body>
+                    </chef-table-new>
+                </ng-container>
+            </section>
+        </main>
+    </div>
+</div>

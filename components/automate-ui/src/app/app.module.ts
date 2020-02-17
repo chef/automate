@@ -68,6 +68,7 @@ import { TelemetryService } from './services/telemetry/telemetry.service';
 // Requests
 import { ApiTokenRequests } from './entities/api-tokens/api-token.requests';
 import { AutomateSettingsRequests } from './entities/automate-settings/automate-settings.requests';
+import { CookbookRequests } from './entities/cookbooks/cookbook.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
 import { JobRequests } from './entities/jobs/job.requests';
@@ -291,6 +292,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ChefSessionService,
     ConfigService,
     ClientRunsRequests,
+    CookbookRequests,
     CredentialRequests,
     DatafeedService,
     EventFeedService,

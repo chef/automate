@@ -1,0 +1,135 @@
+@import "~styles/variables";
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+chef-toolbar {
+  display: block;
+  position: relative;
+  margin-bottom: 5px;
+
+  small {
+    bottom: 2px;
+    color: $chef-dark-grey;
+    position: absolute;
+    right: 0;
+  }
+}
+
+chef-tab-selector {
+  chef-option {
+    margin-right: 16px;
+    color: $chef-primary-dark;
+  }
+}
+
+form {
+  input {
+    font-size: 1.02em;
+    width: 520px;
+    margin-bottom: -6px;
+  }
+
+  textarea {
+    font-size: 1.02em;
+    width: 520px;
+  }
+
+  .errors {
+    width: 520px;
+    margin-top: -6px;
+  }
+
+  input[type="text"]:disabled {
+    opacity: 0.5;
+    background-color: $chef-grey;
+    border: none;
+  }
+
+  #changes-not-allowed {
+    font-size: 12px;
+  }
+
+  #button-bar {
+    margin-top: 15px;
+
+    span#saved-note {
+      display: inline-block;
+      margin-top: 5px;
+      font-size: 12px;
+    }
+
+    chef-button {
+      margin-top: 0;
+      margin-left: 0;
+
+      chef-loading-spinner {
+        position: relative;
+        top: 2px;
+        margin-right: 5px;
+      }
+    }
+  }
+}
+
+thead {
+  font-size: 14px;
+  letter-spacing: 0.2px;
+  color: $chef-primary-dark;
+}
+
+th {
+  text-align: left;
+  padding: 0px;
+}
+
+tbody > .detail-row {
+  padding-top: 0px;
+  padding-bottom: 15px;
+}
+
+.detail-row {
+  display: flex;
+  color: $chef-primary-dark;
+}
+
+.id-column {
+  width: 33%;
+  padding-top: 0px;
+  padding-left: 0px;
+}
+
+.type-column {
+  width: 66%;
+  padding-top: 0px;
+  padding-left: 0px;
+}
+
+chef-table-new {
+  .controls {
+    text-align: right;
+  }
+
+  a {
+    cursor: pointer;
+    text-decoration: underline;
+  }
+}
+
+.empty-case-container {
+  margin-top: 42px;
+  //display: flex;
+  justify-content: center;
+  //flex-direction: column;
+  text-align: center;
+
+  .empty-case-entry {
+    margin-top: 18px;
+    margin-bottom: 0;
+  }
+
+  p {
+    font-size: 18px;
+  }
+}
