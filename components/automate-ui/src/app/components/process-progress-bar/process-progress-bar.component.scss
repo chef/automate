@@ -25,7 +25,7 @@
 
   button:hover,
   button:focus {
-    background-color: #174AF0;
+    background-color: $chef-primary-hover;
   }
 
   mat-progress-bar {
@@ -35,11 +35,11 @@
     width: calc(100% - 175px);
 
     .mat-progress-bar-fill::after {
-      background-color: rgba(255, 255, 255, .7);
+      background-color: rgba($chef-white, .7);
     }
 
     .mat-progress-bar-buffer {
-      background-color: rgba(255, 255, 255, .5);
+      background-color: rgba($chef-white, .5);
     }
 
     /* remove animation and the dots*/
