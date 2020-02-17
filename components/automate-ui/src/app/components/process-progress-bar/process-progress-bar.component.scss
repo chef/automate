@@ -32,6 +32,7 @@
     border-radius: 5px;
     height: 6px;
     margin-top: 5px;
+    // 175px allows space for the button
     width: calc(100% - 175px);
 
     .mat-progress-bar-fill::after {
