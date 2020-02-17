@@ -3,11 +3,11 @@
 #pending-edits-bar {
   background-color: $chef-primary-bright;
   color: $chef-white;
-  padding: 7px 10px;
+  padding: 16px 10px;
   position: relative;
 
   .info {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
 
     a {
@@ -16,9 +16,16 @@
   }
 
   button {
+    margin: 8px;
+    border: 1px solid $chef-white;
     position: absolute;
     right: 0;
     top: 0;
+  }
+
+  button:hover,
+  button:focus {
+    background-color: $chef-primary-hover;
   }
 }
 

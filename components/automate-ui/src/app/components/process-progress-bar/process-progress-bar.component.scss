@@ -3,12 +3,11 @@
 #process-progress-bar {
   background-color: $chef-primary-bright;
   color: $chef-white;
-  height: 48px;
-  padding: 7px 10px;
+  padding: 11px 10px;
   position: relative;
 
   .info {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: 500;
 
     chef-icon {
@@ -17,22 +16,31 @@
   }
 
   button {
+    margin: 8px;
+    border: 1px solid $chef-white;
     position: absolute;
     right: 0;
     top: 0;
+  }
+
+  button:hover,
+  button:focus {
+    background-color: $chef-primary-hover;
   }
 
   mat-progress-bar {
     border-radius: 5px;
     height: 6px;
     margin-top: 5px;
+    // 175px allows space for the button
+    width: calc(100% - 175px);
 
     .mat-progress-bar-fill::after {
-      background-color: rgba(255, 255, 255, .7);
+      background-color: rgba($chef-white, .7);
     }
 
     .mat-progress-bar-buffer {
-      background-color: rgba(255, 255, 255, .5);
+      background-color: rgba($chef-white, .5);
     }
 
     /* remove animation and the dots*/
