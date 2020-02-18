@@ -11,7 +11,6 @@
         <app-create-data-feed-modal
           [visible]="createModalVisible"
           [creating]="creatingDataFeed"
-          [sending]="sendingDataFeed"
           [createForm]="createDataFeedForm"
           (close)="closeCreateModal()"
           [conflictErrorEvent]="conflictErrorEvent"
@@ -20,7 +19,7 @@
         <app-delete-object-modal
           [visible]="deleteModalVisible"
           objectNoun="data-feed"
-          [objectName]="DataFeedToDelete?.name"
+          [objectName]="dataFeedToDelete?.name"
           (close)="closeDeleteModal()"
           (deleteClicked)="deleteDataFeed()"
           objectAction="Delete">
@@ -40,7 +39,7 @@
           </div>
         </chef-toolbar>
 
-        <chef-table-new>
+        <chef-table-new *ngIf="(sortedDestinations$ | async) > 0">
           <chef-table-header>
             <chef-table-row>
               <chef-table-header-cell>Name</chef-table-header-cell>
@@ -54,6 +53,7 @@
               </chef-table-cell>
               <chef-table-cell class="three-dot-column">
                 <mat-select panelClass="chef-control-menu" id="menu-{{destination.id}}">
+                  <mat-option (onSelectionChange)="startDataFeedSendTest($event, destination)" data-cy="remove-data-feed">Test Data Feed</mat-option>
                   <mat-option (onSelectionChange)="startDataFeedDelete($event, destination)" data-cy="remove-data-feed">Delete Data Feed</mat-option>
                 </mat-select>
               </chef-table-cell>

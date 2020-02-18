@@ -24,7 +24,7 @@
               <input chefInput formControlName="url" type="text" id="url-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
             <chef-error
-            *ngIf="(createForm.get('url').hasError('required') || createForm.get('url').hasError('pattern')) && createForm.get('url').dirty">
+            *ngIf="createForm.get('url').hasError('required') && createForm.get('url').dirty">
             Data Feed URL is required.
             </chef-error>
             <chef-error *ngIf="createForm.get('url').hasError('pattern')">
