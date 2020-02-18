@@ -18,6 +18,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 	"unicode"
 
@@ -115,6 +116,7 @@ func (d defaultDialer) DialContext(ctx context.Context, network, address string)
 
 type conn struct {
 	c         net.Conn
+	originalC net.Conn
 	buf       *bufio.Reader
 	namei     int
 	scratch   [512]byte
@@ -299,6 +301,7 @@ func (c *Connector) open(ctx context.Context) (cn *conn, err error) {
 	if err != nil {
 		return nil, err
 	}
+	cn.originalC = cn.c
 
 	err = cn.ssl(o)
 	if err != nil {
@@ -784,6 +787,8 @@ func (cn *conn) Prepare(q string) (_ driver.Stmt, err error) {
 	}
 	defer cn.errRecover(&err)
 
+	cn.checkConnection()
+
 	if len(q) >= 4 && strings.EqualFold(q[:4], "COPY") {
 		s, err := cn.prepareCopyIn(q)
 		if err == nil {
@@ -826,6 +831,8 @@ func (cn *conn) query(query string, args []driver.Value) (_ *rows, err error) {
 	}
 	defer cn.errRecover(&err)
 
+	cn.checkConnection()
+
 	// Check to see if we can use the "simpleQuery" interface, which is
 	// *much* faster than going through prepare/exec
 	if len(args) == 0 {
@@ -856,6 +863,8 @@ func (cn *conn) Exec(query string, args []driver.Value) (res driver.Result, err 
 		return nil, driver.ErrBadConn
 	}
 	defer cn.errRecover(&err)
+
+	cn.checkConnection()
 
 	// Check to see if we can use the "simpleExec" interface, which is
 	// *much* faster than going through prepare/exec
@@ -890,6 +899,22 @@ func (cn *conn) send(m *writeBuf) {
 	_, err := cn.c.Write(m.wrap())
 	if err != nil {
 		panic(err)
+	}
+}
+
+func (cn *conn) checkConnection() {
+	switch v := cn.originalC.(type) {
+	case *net.TCPConn:
+		raw, err := v.SyscallConn()
+		errval := 0
+		if err == nil {
+			raw.Control(func(fd uintptr) {
+				errval, _ = syscall.GetsockoptInt(int(fd), syscall.SOL_SOCKET, syscall.SO_ERROR)
+			})
+		}
+		if errval != 0 {
+			panic(driver.ErrBadConn)
+		}
 	}
 }
 
