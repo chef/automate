@@ -59,7 +59,7 @@ export class DestinationRequests {
 
   public updateDestination(destination: Destination): Observable<DestinationSuccessPayload> {
     return this.http.delete<DestinationResponse>(encodeURI(
-      this.joinToDatafeedUrl(['destination', destination.name.toString()])));
+      this.joinToDatafeedUrl(['destination', destination.name])));
   }
 
   public deleteDestination(id: string): Observable<DestinationResponse> {
