@@ -95,8 +95,8 @@ do_test_deploy() {
     # Inspec tests are less tolerant of transient 500s; we expect a few of
     # those as bad postgres connections get purged from the various services.
     # Restart everything before running the tests
-    docker exec -t "$_frontend1_container_name"  "$cli_bin" restart-services
-    docker exec -t "$_frontend2_container_name"  "$cli_bin" restart-services
+    #docker exec -t "$_frontend1_container_name"  "$cli_bin" restart-services
+    #docker exec -t "$_frontend2_container_name"  "$cli_bin" restart-services
 
     run_inspec_tests "${A2_ROOT_DIR}" "a2-iam-v2-integration"
     local admin_token
