@@ -16,11 +16,7 @@ import (
 
 // MigrateToV2 inserts needed IAM v2 resources into the db and
 // migrates any valid v1 policies
-func MigrateToV2(ctx context.Context, db *sql.DB) error {
-	l, err := logger.NewLogger("text", "info")
-	if err != nil {
-		return errors.Wrap(err, "could not initialize logger")
-	}
+func MigrateToV2(ctx context.Context, db *sql.DB, shouldMigrateV1Policies bool) error {
 	for _, role := range defaultRoles() {
 		if err := createRole(ctx, db, &role); err != nil {
 			return errors.Wrapf(err,
@@ -35,17 +31,11 @@ func MigrateToV2(ctx context.Context, db *sql.DB) error {
 		}
 	}
 
-	errs, err := migrateV1Policies(ctx, db)
-	if err != nil {
-		return errors.Wrapf(err, "migrate v1 policies")
-	}
-
-	reports := []string{}
-	for _, e := range errs {
-		reports = append(reports, e.Error())
-	}
-	if len(reports) != 0 {
-		l.Infof("invalid v1 policies could not be migrated: %v", reports)
+	if shouldMigrateV1Policies {
+		err := migrateV1Policies(ctx, db)
+		if err != nil {
+			return errors.Wrapf(err, "migrate v1 policies")
+		}
 	}
 
 	return nil
@@ -60,14 +50,15 @@ This is because this migration is run at a single point in time as part of the s
 upgrades. So this code need to be compatible with a specific schema version that never changes.
 */
 
-// migrateV1Policies has two error returns: the second one is the ordinary,
-// garden-variety, "something went wrong, I've given up" signal; the first one
-// serves as an aggregate of errors that happened attempting to convert and
-// store individual (custom) policies.
-func migrateV1Policies(ctx context.Context, db *sql.DB) ([]error, error) {
+func migrateV1Policies(ctx context.Context, db *sql.DB) error {
+	l, err := logger.NewLogger("text", "info")
+	if err != nil {
+		return errors.Wrap(err, "could not initialize logger")
+	}
+
 	pols, err := listPoliciesWithSubjects(ctx, db)
 	if err != nil {
-		return nil, errors.Wrap(err, "list v1 policies")
+		return errors.Wrap(err, "list v1 policies")
 	}
 
 	var errs []error
@@ -99,7 +90,16 @@ func migrateV1Policies(ctx context.Context, db *sql.DB) ([]error, error) {
 			errs = append(errs, errors.Wrapf(err, "store converted v1 policy %q", pol.ID.String()))
 		}
 	}
-	return errs, nil
+
+	reports := []string{}
+	for _, e := range errs {
+		reports = append(reports, e.Error())
+	}
+	if len(reports) != 0 {
+		l.Infof("invalid v1 policies could not be migrated: %v", reports)
+	}
+
+	return nil
 }
 
 func versionizeToV2(pol *v1Policy) (*v2Policy, error) {

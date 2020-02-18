@@ -84,6 +84,9 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 		return errors.Wrap(err, "failed to retrieve migration_status")
 	}
 
+	// do not migrate policies if we're on a fresh install
+	migrateV1Policies := version != 0
+
 	if isOnV1 {
 		if isDirty { // we've attempted to migrate and not finished
 			// get IAM db in original, clean state to avoid conflicts
@@ -94,13 +97,16 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 			if err := dataMigConf.Reset(); err != nil {
 				return errors.Wrap(err, "reset v2 data migrations")
 			}
+			if version != 0 {
+				migrateV1Policies = true
+			}
 		}
 
 		err = legacy.RecordMigrationStatus(ctx, constants_v2.EnumInProgress, db)
 		if err != nil {
 			return errors.Wrapf(err, "failed to set IAM v2 migration_status to %s", constants_v2.EnumInProgress)
 		}
-		err = legacy.MigrateToV2(ctx, db)
+		err = legacy.MigrateToV2(ctx, db, migrateV1Policies)
 		if err != nil {
 			statusErr := legacy.RecordMigrationStatus(ctx, constants_v2.EnumFailed, db)
 			if statusErr != nil {
