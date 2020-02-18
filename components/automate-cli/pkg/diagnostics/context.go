@@ -8,7 +8,6 @@ import (
 	"io"
 	"net/http"
 	"net/url"
-	"strconv"
 	"time"
 
 	"github.com/mitchellh/mapstructure"
@@ -240,40 +239,26 @@ func (c *testContext) IsIAMV2() (bool, error) {
 	}
 	defer httpResp.Body.Close()
 
-	if httpResp.StatusCode == 404 {
-		// if the policy version endpoint is not found,
-		// we're either testing an old version of Automate with only v1
-		// or we're testing a version of Automate that has been force-upgraded to v2
-		automateVersion, err := c.GetVersion()
-		if err != nil {
-			return false, err
-		}
+	if httpResp.StatusCode == 200 {
+		vsn := struct {
+			Version struct{ Major, Minor string }
+		}{}
 
-		automateVersionInt, err := strconv.ParseInt(automateVersion, 10, 64)
-		if err != nil {
-			return false, err
-		}
-
-		// if the version is earlier than the force-upgrade version,
-		// we must be testing an earlier version of Automate with only IAM v1.
-		// !! TODO change this to the build just before force-upgrade build
-		if automateVersionInt < 20200131232134 {
+		if err := json.NewDecoder(httpResp.Body).Decode(&vsn); err != nil {
+			// on ancient versions of Automate, any unknown	prefix on an API query
+			// gets redirected by nginx to serve up the UI and responds with 200.
+			// We can assume v1 in this case.
 			return false, nil
 		}
-
-		// anything after 20200131232134 has been force-upgraded to IAMv2
-		return true, nil
+		return vsn.Version.Major == "V2", nil
+	} else if httpResp.StatusCode == 404 {
+		// if the /policy_version endpoint is not found,
+		// we must be testing an old version of Automate with only v1.
+		return false, nil
 	}
 
-	vsn := struct {
-		Version struct{ Major, Minor string }
-	}{}
-
-	if err := json.NewDecoder(httpResp.Body).Decode(&vsn); err != nil {
-		return false, err
-	}
-
-	return vsn.Version.Major == "V2", nil
+	// any other unexpected responses get caught here
+	return false, errors.Errorf("failed to verify IAM version with status code: %v", httpResp.StatusCode)
 }
 
 func (c *testContext) PublishViaNATS(messages [][]byte) error {
