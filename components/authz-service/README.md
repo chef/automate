@@ -617,6 +617,7 @@ and access to all _administrative_ tasks to all users in the local admins group
 (`team:local:admins`).
 This allows you to explore the user interface immediately,
 unencumbered with policy roadblocks limiting what you can see.
+<!-- TODO: link is broken any reference? -->
 The set of default policies is [here](../../docs/default_policies.md).
 
 That set of default policies may even be fine for certain organizations.
@@ -643,6 +644,7 @@ To add a new default policy, the following is needed:
 
 ### Policy API
 
+<!-- TODO: Can we update it with Open API Doc? -->
 Documentation of the complete Policy API are available [here](TBD).
 **Link to the swagger docs, or should the content be inline here??**
 
