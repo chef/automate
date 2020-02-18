@@ -44,3 +44,7 @@ do_install() {
   mkdir "${pkg_prefix}/schema"
   cp -r pkg/storage/postgres/schema/sql/* "${pkg_prefix}/schema"
 }
+
+do_strip() {
+  return 0
+}

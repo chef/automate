@@ -26,6 +26,7 @@ import { SigninComponent } from './pages/signin/signin.component';
 // Components
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
+import { ChefServerDetailsComponent } from './modules/infra-proxy/chef-server-details/chef-server-details.component';
 import { NodeDetailsComponent } from './pages/node-details/node-details.component';
 import {
   NodeNoRunsDetailsComponent
@@ -238,6 +239,10 @@ const routes: Routes = [
             {
               path: '',
               component: ChefServersListComponent
+            },
+            {
+              path: ':id',
+              component: ChefServerDetailsComponent
             }
           ]
         }

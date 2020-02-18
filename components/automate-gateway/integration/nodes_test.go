@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
+	gwnodes "github.com/chef/automate/api/external/nodes"
 	"github.com/chef/automate/api/external/secrets"
-	gwnodes "github.com/chef/automate/components/automate-gateway/api/nodes"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 )
 
 func (suite *GatewayTestSuite) TestGatewayNodesClient() {

@@ -1713,17 +1713,35 @@ type ApplicationsServiceClient interface {
 	//```
 	//applications/service-groups?sorting.field=percent_ok&sorting.order=ASC&pagination.page=1&pagination.size=25
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServiceGroups(ctx context.Context, in *ServiceGroupsReq, opts ...grpc.CallOption) (*ServiceGroups, error)
 	//
 	//List Service Groups Health Counts
 	//
-	//Lists the total service group health reports by critical, warning, ok, and unknown responses. Supports search and status filtering.
+	//Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServiceGroupsHealthCounts(ctx context.Context, in *ServiceGroupsHealthCountsReq, opts ...grpc.CallOption) (*HealthCounts, error)
 	//
 	//List Services
 	//
 	//Lists service health status and service metadata for services.
 	//Supports pagination and search and status filtering. For a list of services for a specific service-group see "List Services for a Service Group" (GetServicesBySG endpoint).
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServices(ctx context.Context, in *ServicesReq, opts ...grpc.CallOption) (*ServicesRes, error)
 	//
 	//List Filter Values
@@ -1732,6 +1750,12 @@ type ApplicationsServiceClient interface {
 	//Limit the returned values by providing at one or more characters in the `query_fragment` parameter.
 	//Supports wildcard (* and ?)
 	//
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServicesDistinctValues(ctx context.Context, in *ServicesDistinctValuesReq, opts ...grpc.CallOption) (*ServicesDistinctValuesRes, error)
 	//
 	//List Services for a Service Group
@@ -1744,6 +1768,12 @@ type ApplicationsServiceClient interface {
 	//```
 	//applications/service-groups/1dfff679054c60a10c51d059b6dbf81a765c46f8d3e8ce0752b22ffe8d4d9716?pagination.page=1&pagination.size=25
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServicesBySG(ctx context.Context, in *ServicesBySGReq, opts ...grpc.CallOption) (*ServicesBySGRes, error)
 	//
 	//Show Summary
@@ -1751,6 +1781,12 @@ type ApplicationsServiceClient interface {
 	//Shows a summary of service-groups, services, deployments, and supervisors.
 	//Used for telemetry.
 	//Does not support filtering.
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServicesStats(ctx context.Context, in *ServicesStatsReq, opts ...grpc.CallOption) (*ServicesStatsRes, error)
 	//
 	//Mark Services as Disconnected
@@ -1759,6 +1795,12 @@ type ApplicationsServiceClient interface {
 	//This function is not used by the API or CLI and is here for testing purposes.
 	//The functionality is currently covered by a periodically running job that can be configured
 	//by utilizing the `UpdateDisconnectedServicesConfig` endpoint.
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetDisconnectedServices(ctx context.Context, in *DisconnectedServicesReq, opts ...grpc.CallOption) (*ServicesRes, error)
 	//
 	//Remove Disconnected Services
@@ -1766,20 +1808,44 @@ type ApplicationsServiceClient interface {
 	//Removes services marked as disconnected based on the `threshold_seconds` setting.
 	//This function is not used by the API or CLI and is here for testing purposes.
 	//The functionality is currently covered by a periodically running job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:delete
+	//```
 	DeleteDisconnectedServices(ctx context.Context, in *DisconnectedServicesReq, opts ...grpc.CallOption) (*ServicesRes, error)
 	//
 	//Delete the services with the given IDs
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:delete
+	//```
 	DeleteServicesByID(ctx context.Context, in *DeleteServicesByIDReq, opts ...grpc.CallOption) (*ServicesRes, error)
 	//
 	//Show Version
 	//
 	//Displays the current version of the applications-service
+	//
+	//Authorization Action:
+	//
+	//```
+	//system:serviceVersion:get
+	//```
 	GetVersion(ctx context.Context, in *version.VersionInfoRequest, opts ...grpc.CallOption) (*version.VersionInfo, error)
 	//
 	//Show 'Disconnected Services' configuration
 	//
 	//Returns the configuration for the task that marks services as disconnected. The `threshold` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. `Threshold` is a string that follows Elasticsearch's date math expressions.
 	//This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
+	//
+	//Authorization Action:
+	//
+	//```
+	//retention:serviceGroups:get
+	//```
 	GetDisconnectedServicesConfig(ctx context.Context, in *GetDisconnectedServicesConfigReq, opts ...grpc.CallOption) (*PeriodicMandatoryJobConfig, error)
 	//
 	//Change 'Disconnected Services' Configuration
@@ -1795,6 +1861,12 @@ type ApplicationsServiceClient interface {
 	//"threshold": "15m"
 	//}'
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//retention:serviceGroups:update
+	//```
 	UpdateDisconnectedServicesConfig(ctx context.Context, in *PeriodicMandatoryJobConfig, opts ...grpc.CallOption) (*UpdateDisconnectedServicesConfigRes, error)
 	//
 	//Show 'Remove Disconnected Services' Configuration
@@ -1802,6 +1874,12 @@ type ApplicationsServiceClient interface {
 	//Displays configuration for the task that deletes services marked as disconnected
 	//after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
 	//This job is disabled if running is set to false.
+	//
+	//Authorization Action:
+	//
+	//```
+	//retention:serviceGroups:get
+	//```
 	GetDeleteDisconnectedServicesConfig(ctx context.Context, in *GetDeleteDisconnectedServicesConfigReq, opts ...grpc.CallOption) (*PeriodicJobConfig, error)
 	//
 	//Change 'Remove Disconnected Services' Configuration
@@ -1817,6 +1895,12 @@ type ApplicationsServiceClient interface {
 	//"threshold": "1d",
 	//"running":true
 	//}'
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//retention:serviceGroups:update
 	//```
 	UpdateDeleteDisconnectedServicesConfig(ctx context.Context, in *PeriodicJobConfig, opts ...grpc.CallOption) (*UpdateDeleteDisconnectedServicesConfigRes, error)
 }
@@ -1967,17 +2051,35 @@ type ApplicationsServiceServer interface {
 	//```
 	//applications/service-groups?sorting.field=percent_ok&sorting.order=ASC&pagination.page=1&pagination.size=25
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServiceGroups(context.Context, *ServiceGroupsReq) (*ServiceGroups, error)
 	//
 	//List Service Groups Health Counts
 	//
-	//Lists the total service group health reports by critical, warning, ok, and unknown responses. Supports search and status filtering.
+	//Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServiceGroupsHealthCounts(context.Context, *ServiceGroupsHealthCountsReq) (*HealthCounts, error)
 	//
 	//List Services
 	//
 	//Lists service health status and service metadata for services.
 	//Supports pagination and search and status filtering. For a list of services for a specific service-group see "List Services for a Service Group" (GetServicesBySG endpoint).
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServices(context.Context, *ServicesReq) (*ServicesRes, error)
 	//
 	//List Filter Values
@@ -1986,6 +2088,12 @@ type ApplicationsServiceServer interface {
 	//Limit the returned values by providing at one or more characters in the `query_fragment` parameter.
 	//Supports wildcard (* and ?)
 	//
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServicesDistinctValues(context.Context, *ServicesDistinctValuesReq) (*ServicesDistinctValuesRes, error)
 	//
 	//List Services for a Service Group
@@ -1998,6 +2106,12 @@ type ApplicationsServiceServer interface {
 	//```
 	//applications/service-groups/1dfff679054c60a10c51d059b6dbf81a765c46f8d3e8ce0752b22ffe8d4d9716?pagination.page=1&pagination.size=25
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServicesBySG(context.Context, *ServicesBySGReq) (*ServicesBySGRes, error)
 	//
 	//Show Summary
@@ -2005,6 +2119,12 @@ type ApplicationsServiceServer interface {
 	//Shows a summary of service-groups, services, deployments, and supervisors.
 	//Used for telemetry.
 	//Does not support filtering.
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetServicesStats(context.Context, *ServicesStatsReq) (*ServicesStatsRes, error)
 	//
 	//Mark Services as Disconnected
@@ -2013,6 +2133,12 @@ type ApplicationsServiceServer interface {
 	//This function is not used by the API or CLI and is here for testing purposes.
 	//The functionality is currently covered by a periodically running job that can be configured
 	//by utilizing the `UpdateDisconnectedServicesConfig` endpoint.
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:list
+	//```
 	GetDisconnectedServices(context.Context, *DisconnectedServicesReq) (*ServicesRes, error)
 	//
 	//Remove Disconnected Services
@@ -2020,20 +2146,44 @@ type ApplicationsServiceServer interface {
 	//Removes services marked as disconnected based on the `threshold_seconds` setting.
 	//This function is not used by the API or CLI and is here for testing purposes.
 	//The functionality is currently covered by a periodically running job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:delete
+	//```
 	DeleteDisconnectedServices(context.Context, *DisconnectedServicesReq) (*ServicesRes, error)
 	//
 	//Delete the services with the given IDs
+	//
+	//Authorization Action:
+	//
+	//```
+	//applications:serviceGroups:delete
+	//```
 	DeleteServicesByID(context.Context, *DeleteServicesByIDReq) (*ServicesRes, error)
 	//
 	//Show Version
 	//
 	//Displays the current version of the applications-service
+	//
+	//Authorization Action:
+	//
+	//```
+	//system:serviceVersion:get
+	//```
 	GetVersion(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
 	//
 	//Show 'Disconnected Services' configuration
 	//
 	//Returns the configuration for the task that marks services as disconnected. The `threshold` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. `Threshold` is a string that follows Elasticsearch's date math expressions.
 	//This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
+	//
+	//Authorization Action:
+	//
+	//```
+	//retention:serviceGroups:get
+	//```
 	GetDisconnectedServicesConfig(context.Context, *GetDisconnectedServicesConfigReq) (*PeriodicMandatoryJobConfig, error)
 	//
 	//Change 'Disconnected Services' Configuration
@@ -2049,6 +2199,12 @@ type ApplicationsServiceServer interface {
 	//"threshold": "15m"
 	//}'
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//retention:serviceGroups:update
+	//```
 	UpdateDisconnectedServicesConfig(context.Context, *PeriodicMandatoryJobConfig) (*UpdateDisconnectedServicesConfigRes, error)
 	//
 	//Show 'Remove Disconnected Services' Configuration
@@ -2056,6 +2212,12 @@ type ApplicationsServiceServer interface {
 	//Displays configuration for the task that deletes services marked as disconnected
 	//after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
 	//This job is disabled if running is set to false.
+	//
+	//Authorization Action:
+	//
+	//```
+	//retention:serviceGroups:get
+	//```
 	GetDeleteDisconnectedServicesConfig(context.Context, *GetDeleteDisconnectedServicesConfigReq) (*PeriodicJobConfig, error)
 	//
 	//Change 'Remove Disconnected Services' Configuration
@@ -2071,6 +2233,12 @@ type ApplicationsServiceServer interface {
 	//"threshold": "1d",
 	//"running":true
 	//}'
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//retention:serviceGroups:update
 	//```
 	UpdateDeleteDisconnectedServicesConfig(context.Context, *PeriodicJobConfig) (*UpdateDeleteDisconnectedServicesConfigRes, error)
 }

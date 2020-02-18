@@ -9,6 +9,8 @@ import (
 	_ "github.com/chef/automate/api/external/cfgmgmt"
 	_ "github.com/chef/automate/api/external/common/query"
 	_ "github.com/chef/automate/api/external/common/version"
+	_ "github.com/chef/automate/api/external/nodes"
+	_ "github.com/chef/automate/api/external/nodes/manager"
 	_ "github.com/chef/automate/api/external/secrets"
 	_ "github.com/chef/automate/components/automate-gateway/api/auth/teams"
 	_ "github.com/chef/automate/components/automate-gateway/api/auth/tokens"
@@ -24,8 +26,6 @@ import (
 	_ "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	_ "github.com/chef/automate/components/automate-gateway/api/legacy"
 	_ "github.com/chef/automate/components/automate-gateway/api/license"
-	_ "github.com/chef/automate/components/automate-gateway/api/nodes"
-	_ "github.com/chef/automate/components/automate-gateway/api/nodes/manager"
 	_ "github.com/chef/automate/components/automate-gateway/api/notifications"
 	_ "github.com/chef/automate/components/automate-gateway/api/telemetry"
 )

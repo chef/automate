@@ -1639,6 +1639,12 @@ type StatsServiceClient interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportSummary:get
+	//```
 	ReadSummary(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Summary, error)
 	//
 	//Read Trend
@@ -1660,6 +1666,12 @@ type StatsServiceClient interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportTrend:get
+	//```
 	ReadTrend(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Trends, error)
 	//
 	//Read Profiles
@@ -1680,6 +1692,12 @@ type StatsServiceClient interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportProfiles:get
+	//```
 	ReadProfiles(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Profile, error)
 	//
 	//Read Failures
@@ -1698,6 +1716,12 @@ type StatsServiceClient interface {
 	//{"type":"types","values":["platform","environment"]}
 	//]
 	//}
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportFailures:get
 	//```
 	ReadFailures(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Failures, error)
 }
@@ -1767,6 +1791,12 @@ type StatsServiceServer interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportSummary:get
+	//```
 	ReadSummary(context.Context, *Query) (*Summary, error)
 	//
 	//Read Trend
@@ -1788,6 +1818,12 @@ type StatsServiceServer interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportTrend:get
+	//```
 	ReadTrend(context.Context, *Query) (*Trends, error)
 	//
 	//Read Profiles
@@ -1808,6 +1844,12 @@ type StatsServiceServer interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportProfiles:get
+	//```
 	ReadProfiles(context.Context, *Query) (*Profile, error)
 	//
 	//Read Failures
@@ -1826,6 +1868,12 @@ type StatsServiceServer interface {
 	//{"type":"types","values":["platform","environment"]}
 	//]
 	//}
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportFailures:get
 	//```
 	ReadFailures(context.Context, *Query) (*Failures, error)
 }

@@ -10,13 +10,13 @@ import (
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	event "github.com/chef/automate/api/interservice/event"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	nodes "github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/ingest/server"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	nodes "github.com/chef/automate/components/nodemanager-service/api/nodes"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/lib/grpc/auth_context"
 

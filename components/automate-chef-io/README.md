@@ -124,7 +124,7 @@ http://localhost:1313/docs/api
 
 ### Building API Docs
 
-Chef Automate  generates API documentation from protoc files comments using
+Chef Automate generates API documentation from proto files comments using
 
 * [grpc-gateway protoc-gen-swagger](https://github.com/grpc-ecosystem/grpc-gateway/tree/master/protoc-gen-swagger) as the protoc compiler
 * [OpenAPI 2.0 specification](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md) as the API schema
@@ -132,7 +132,7 @@ Chef Automate  generates API documentation from protoc files comments using
 
 To build the API documentation during development:
 
-1. Make any edits to the .proto files necessary.
+1. Make any edits to the .proto files necessary. Note that an "Authorization Action:" section will be added automatically in the next step.
 2. Recompile the .proto files as described in the [Automate development guide](https://github.com/chef/automate/blob/master/dev-docs/DEV_ENVIRONMENT.md)
 3. From the top of the `components/automate-chef-io` directory, sync the .swagger files generated with those in the docs component by running `make sync_swagger_files`
 4. Run the hugo server and view the documentation in your browser
@@ -319,7 +319,7 @@ rpc ListReports(Query) returns (Reports) {
   };
 ```
 
-Resource documentation provides RPC-level description. It is sometimes also called "method description" because it documents the what you can do with a specific API HTTP Method.
+Resource documentation provides RPC-level description. It is sometimes also called "method description" because it documents what you can do with a specific API HTTP Method.
 
 Use block/leading comments for RPC-level/method documentation.
 
@@ -338,6 +338,25 @@ Compare the leading comments to the content of the API documentation for the `Re
 The rendered documentation:
 
 ![View of rendered API docs](./static/images/docs/api-resource-definition.png)
+
+Note that once you recompile the proto files as described earlier, the actual source comment above will be updated to include an authorization action, for any relevant methods.
+
+```go
+  /*
+  Fetch a node #(summary)
+
+  Fetch a specific node by id. #(description)
+  Does not support filtering, pagination or sorting.
+
+  Authorization Action:
+
+  ```
+  compliance:reportNodes:get
+  ```
+
+  */
+  rpc ReadNode(Id) returns (Node) {
+```
 
 ### Message Level Descriptions
 

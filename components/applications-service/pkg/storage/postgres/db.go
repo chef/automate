@@ -55,6 +55,12 @@ func (db *Postgres) connect() error {
 		return errors.Wrapf(err, "Failed to open database with uri: %s", db.URI)
 	}
 
+	if db.MaxIdleConns > 0 {
+		dbMap.SetMaxIdleConns(db.MaxIdleConns)
+	}
+	if db.MaxOpenConns > 0 {
+		dbMap.SetMaxOpenConns(db.MaxOpenConns)
+	}
 	// Configure the database mapping object
 	db.DbMap = &gorp.DbMap{Db: dbMap, Dialect: gorp.PostgresDialect{}}
 

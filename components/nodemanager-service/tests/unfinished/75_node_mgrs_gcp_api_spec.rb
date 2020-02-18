@@ -1,18 +1,18 @@
 ##### GRPC SETUP #####
-require 'api/manager/manager_pb'
-require 'api/manager/manager_services_pb'
+require 'api/interservice/nodemanager/manager/manager_pb'
+require 'api/interservice/nodemanager/manager/manager_services_pb'
 require 'api/external/secrets/secrets_services_pb'
-require 'api/nodes/nodes_pb'
-require 'api/nodes/nodes_services_pb'
+require 'api/interservice/nodemanager/nodes/nodes_pb'
+require 'api/interservice/nodemanager/nodes/nodes_services_pb'
 require 'api/jobs/jobs_pb'
 require 'api/jobs/jobs_services_pb'
 =begin
 describe File.basename(__FILE__) do
   GOOGLE_CREDENTIALS_JSON = ENV['GOOGLE_CREDENTIALS_JSON'] || raise('GOOGLE_CREDENTIALS_JSON ENV variable missing, needs to contain the contents of the google service account json file')
 
-  Manager = Chef::Automate::Domain::Nodemanager::Api::Manager unless defined?(Manager)
+  Manager = Chef::Automate::Domain::Nodemanager::Manager unless defined?(Manager)
   Secrets = Chef::Automate::Api::Secrets unless defined?(Secrets)
-  Nodes = Chef::Automate::Domain::Nodemanager::Api::Nodes unless defined?(Nodes)
+  Nodes = Chef::Automate::Domain::Nodemanager::Nodes unless defined?(Nodes)
   Jobs = Chef::Automate::Domain::Compliance::Api::Jobs unless defined?(Jobs)
   Common = Chef::Automate::Domain::Compliance::Api::Common unless defined?(Common)
 

@@ -66,6 +66,7 @@ components/automate-cs-nginx/chef-server-ctl
 # vim
 *.swp
 *.swo
+*.swn
 
 # CI/CD Pipeline
 manifest.json

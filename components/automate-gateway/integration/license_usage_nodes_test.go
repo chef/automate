@@ -8,11 +8,11 @@ import (
 	"github.com/golang/protobuf/ptypes"
 
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 )
 
 func (suite *GatewayTestSuite) TestLicenseUsageNodes() {

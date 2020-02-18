@@ -39,8 +39,7 @@
           <chef-table-body>
             <chef-table-row *ngFor= "let server of sortedChefServers$ | async">
               <chef-table-cell>
-                <!-- TODO : Change router link Once Infra Proxy Orgs Introduced -->
-                <a [routerLink]="['/infrastructure/chef-servers']">{{ server.name }}</a>
+                <a [routerLink]="['/infrastructure/chef-servers', server.id]">{{ server.name }}</a>
               </chef-table-cell>
               <chef-table-cell>{{ server.fqdn }}</chef-table-cell>
               <chef-table-cell>{{ server.ip_address }}</chef-table-cell>

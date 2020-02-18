@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
@@ -13,12 +15,11 @@ import (
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"
 	"github.com/chef/automate/components/compliance-service/utils"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/components/nodemanager-service/managers"
 	"github.com/chef/automate/components/nodemanager-service/managers/awsec2"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
 	"github.com/chef/automate/lib/errorutils"
+	libSecrets "github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/gofrs/uuid"
 
@@ -832,7 +833,7 @@ func getNodeCredentials(secret *secrets.Secret) (*inspec.Secrets, error) {
 		for _, item := range secret.Data {
 			if item.Key == "key" {
 				sshKey = item.Value
-				path, err = nodes.PrepareSSHPrivateKey(sshKey)
+				path, err = libSecrets.PrepareSSHPrivateKey(sshKey)
 				if err != nil {
 					return nil, fmt.Errorf("getNodeCredentials Failed to prepare SSH key for remote: %s", err)
 				}

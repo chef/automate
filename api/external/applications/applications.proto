@@ -27,6 +27,12 @@ service ApplicationsService {
   ```
   applications/service-groups?sorting.field=percent_ok&sorting.order=ASC&pagination.page=1&pagination.size=25
   ```
+
+  Authorization Action:
+
+  ```
+  applications:serviceGroups:list
+  ```
   */
   rpc GetServiceGroups(ServiceGroupsReq) returns (ServiceGroups) {
     option (google.api.http).get = "/applications/service-groups";
@@ -45,7 +51,13 @@ service ApplicationsService {
   /*
   List Service Groups Health Counts
 
-  Lists the total service group health reports by critical, warning, ok, and unknown responses. Supports search and status filtering.
+  Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
+
+  Authorization Action:
+
+  ```
+  applications:serviceGroups:list
+  ```
   */
   rpc GetServiceGroupsHealthCounts(ServiceGroupsHealthCountsReq) returns (HealthCounts) {
     option (google.api.http).get = "/applications/service_groups_health_counts";
@@ -62,6 +74,12 @@ service ApplicationsService {
 
   Lists service health status and service metadata for services.
   Supports pagination and search and status filtering. For a list of services for a specific service-group see "List Services for a Service Group" (GetServicesBySG endpoint).
+
+  Authorization Action:
+
+  ```
+  applications:serviceGroups:list
+  ```
   */
   rpc GetServices(ServicesReq) returns (ServicesRes) {
     option (google.api.http).get = "/applications/services";
@@ -81,6 +99,12 @@ service ApplicationsService {
   Limit the returned values by providing at one or more characters in the `query_fragment` parameter.
   Supports wildcard (* and ?)
 
+
+  Authorization Action:
+
+  ```
+  applications:serviceGroups:list
+  ```
   */
   rpc GetServicesDistinctValues(ServicesDistinctValuesReq) returns (ServicesDistinctValuesRes) {
     option (google.api.http).get = "/applications/services-distinct-values";
@@ -103,6 +127,12 @@ service ApplicationsService {
   ```
   applications/service-groups/1dfff679054c60a10c51d059b6dbf81a765c46f8d3e8ce0752b22ffe8d4d9716?pagination.page=1&pagination.size=25
   ```
+
+  Authorization Action:
+
+  ```
+  applications:serviceGroups:list
+  ```
   */
   rpc GetServicesBySG(ServicesBySGReq) returns (ServicesBySGRes) {
     option (google.api.http).get = "/applications/service-groups/{service_group_id}";
@@ -121,6 +151,12 @@ service ApplicationsService {
   Shows a summary of service-groups, services, deployments, and supervisors.
   Used for telemetry.
   Does not support filtering.
+
+  Authorization Action:
+
+  ```
+  applications:serviceGroups:list
+  ```
   */
   rpc GetServicesStats(ServicesStatsReq) returns (ServicesStatsRes) {
     option (google.api.http).get = "/applications/stats";
@@ -140,6 +176,12 @@ service ApplicationsService {
   This function is not used by the API or CLI and is here for testing purposes.
   The functionality is currently covered by a periodically running job that can be configured
   by utilizing the `UpdateDisconnectedServicesConfig` endpoint.
+
+  Authorization Action:
+
+  ```
+  applications:serviceGroups:list
+  ```
   */
   rpc GetDisconnectedServices(DisconnectedServicesReq) returns (ServicesRes ) {
     option (google.api.http).get = "/applications/disconnected_services";
@@ -158,6 +200,12 @@ service ApplicationsService {
   Removes services marked as disconnected based on the `threshold_seconds` setting.
   This function is not used by the API or CLI and is here for testing purposes.
   The functionality is currently covered by a periodically running job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
+
+  Authorization Action:
+
+  ```
+  applications:serviceGroups:delete
+  ```
   */
   rpc DeleteDisconnectedServices(DisconnectedServicesReq) returns (ServicesRes ) {
     option (google.api.http) = {
@@ -176,6 +224,12 @@ service ApplicationsService {
 
   /*
   Delete the services with the given IDs
+
+  Authorization Action:
+
+  ```
+  applications:serviceGroups:delete
+  ```
   */
   rpc DeleteServicesByID(DeleteServicesByIDReq) returns (ServicesRes ) {
     option (google.api.http) = {
@@ -194,6 +248,12 @@ service ApplicationsService {
   Show Version
 
   Displays the current version of the applications-service
+
+  Authorization Action:
+
+  ```
+  system:serviceVersion:get
+  ```
   */
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get = "/applications/version";
@@ -211,6 +271,12 @@ service ApplicationsService {
 
   Returns the configuration for the task that marks services as disconnected. The `threshold` setting defines the period of time between the last report from a node and the moment when Chef Automate marks it as disconnected. `Threshold` is a string that follows Elasticsearch's date math expressions.
   This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
+
+  Authorization Action:
+
+  ```
+  retention:serviceGroups:get
+  ```
   */
   rpc GetDisconnectedServicesConfig(GetDisconnectedServicesConfigReq) returns (PeriodicMandatoryJobConfig) {
     option (google.api.http).get = "/retention/service_groups/disconnected_services/config";
@@ -237,6 +303,12 @@ service ApplicationsService {
     "threshold": "15m"
   }'
   ```
+
+  Authorization Action:
+
+  ```
+  retention:serviceGroups:update
+  ```
   */
   rpc UpdateDisconnectedServicesConfig(PeriodicMandatoryJobConfig) returns (UpdateDisconnectedServicesConfigRes) {
     option (google.api.http) = {
@@ -259,6 +331,12 @@ service ApplicationsService {
   Displays configuration for the task that deletes services marked as disconnected
   after 'threshold'. Threshold is a string that follows Elasticsearch's date math expressions.
   This job is disabled if running is set to false.
+
+  Authorization Action:
+
+  ```
+  retention:serviceGroups:get
+  ```
   */
   rpc GetDeleteDisconnectedServicesConfig(GetDeleteDisconnectedServicesConfigReq) returns (PeriodicJobConfig) {
     option (google.api.http).get = "/retention/service_groups/delete_disconnected_services/config";
@@ -285,6 +363,12 @@ service ApplicationsService {
     "threshold": "1d",
     "running":true
   }'
+  ```
+
+  Authorization Action:
+
+  ```
+  retention:serviceGroups:update
   ```
   */
   rpc UpdateDeleteDisconnectedServicesConfig(PeriodicJobConfig) returns (UpdateDeleteDisconnectedServicesConfigRes) {

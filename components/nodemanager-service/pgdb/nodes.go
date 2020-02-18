@@ -16,11 +16,11 @@ import (
 
 	"sort"
 
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/utils"
-	"github.com/chef/automate/components/nodemanager-service/api/manager"
-	"github.com/chef/automate/components/nodemanager-service/api/nodes"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
 )
@@ -57,9 +57,9 @@ SELECT
   COALESCE(n.source_id, '') AS source_id,
   COALESCE(n.source_region, '') AS source_region,
   COALESCE(n.source_account_id, '') AS source_account_id,
-  COALESCE(('[' || string_agg('{"key":"' || t.key || '"' || ',"value": "' || t.value || '"}', ',') || ']'), '[]') :: JSON AS tags,
+  COALESCE(('[' || string_agg(DISTINCT '{"key":"' || t.key || '"' || ',"value": "' || t.value || '"}', ',') || ']'), '[]') :: JSON AS tags,
   COALESCE(array_to_json(array_remove(array_agg(DISTINCT m.manager_id), NULL)), '[]') AS manager_ids,
-  COALESCE(array_to_json(array_remove(array_agg(p.project_id), NULL)), '[]') AS projects,
+  COALESCE(array_to_json(array_remove(array_agg(DISTINCT p.project_id), NULL)), '[]') AS projects,
   COUNT(*) OVER () AS total_count
 FROM nodes n
   LEFT JOIN nodes_tags nt ON n.id = nt.node_id

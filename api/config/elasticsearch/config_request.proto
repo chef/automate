@@ -55,6 +55,7 @@ message ConfigRequest {
 		message Cluster {
 			reserved 1;
 			google.protobuf.StringValue name = 3;
+			google.protobuf.Int32Value max_shards_per_node = 4;
 			Routing routing = 2;
 		}
 

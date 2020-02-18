@@ -1,14 +1,14 @@
 ##### GRPC SETUP #####
-require 'api/nodes/nodes_pb'
-require 'api/nodes/nodes_services_pb'
+require 'api/interservice/nodemanager/nodes/nodes_pb'
+require 'api/interservice/nodemanager/nodes/nodes_services_pb'
 require 'api/external/secrets/secrets_services_pb'
 require 'api/jobs/jobs_pb'
 require 'api/jobs/jobs_services_pb'
-require 'api/manager/manager_pb'
-require 'api/manager/manager_services_pb'
+require 'api/interservice/nodemanager/manager/manager_pb'
+require 'api/interservice/nodemanager/manager/manager_services_pb'
 
 describe File.basename(__FILE__) do
-  Nodes = Chef::Automate::Domain::Nodemanager::Api::Nodes unless defined?(Nodes)
+  Nodes = Chef::Automate::Domain::Nodemanager::Nodes unless defined?(Nodes)
   Secrets = Chef::Automate::Api::Secrets unless defined?(Secrets)
   Common = Chef::Automate::Domain::Compliance::Api::Common unless defined?(Common)
 
@@ -89,7 +89,7 @@ describe File.basename(__FILE__) do
     assert_equal("winrm", node_read.target_config.backend)
 
     second_node = actual_nodes['nodes'].find {|n| n.name == "my-ssh-node-127.0.0.1" }
-    assert_equal([Common::Kv.new( key:"test-node", value:"is-amazing" ), Common::Kv.new( key:"compliance-service", value:"rockin-like-whoa" )], second_node.tags)
+    assert_same_elements([Common::Kv.new( key:"test-node", value:"is-amazing" ), Common::Kv.new( key:"compliance-service", value:"rockin-like-whoa" )], second_node.tags)
     # read node to evaluate target config info
     node_read = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: second_node.id)
     assert_equal(22, node_read.target_config.port)
@@ -97,7 +97,7 @@ describe File.basename(__FILE__) do
     assert_equal("ssh", node_read.target_config.backend)
 
     third_node = actual_nodes['nodes'].find {|n| n.name == "my-ssh-node-localhost" }
-    assert_equal([Common::Kv.new( key:"test-node", value:"is-amazing" ), Common::Kv.new( key:"compliance-service", value:"rockin-like-whoa" )], third_node.tags)
+    assert_same_elements([Common::Kv.new( key:"test-node", value:"is-amazing" ), Common::Kv.new( key:"compliance-service", value:"rockin-like-whoa" )], third_node.tags)
     # read node to evaluate target config info
     node_read = MANAGER_GRPC nodes, :read, Nodes::Id.new(id: third_node.id)
     assert_equal(22, node_read.target_config.port)
