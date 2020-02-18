@@ -87,7 +87,7 @@ export function destinationEntityReducer(
       return pipe(
         unset(SAVE_ERROR),
         set(SAVE_STATUS, EntityStatus.loadingSuccess)
-      )(destinationEntityAdapter.addOne(action.payload.destination, state)) as DestinationEntityState;
+      )(destinationEntityAdapter.addOne(action.payload, state)) as DestinationEntityState;
     }
 
     case DestinationActionTypes.CREATE_FAILURE: {

@@ -25,7 +25,7 @@ import {
   UpdateDestinationFailure,
   DeleteDestination,
   DeleteDestinationSuccess,
-  DeleteDestinationFailure
+  DeleteDestinationFailure,
 } from './destination.actions';
 
 import {
@@ -84,7 +84,7 @@ export class DestinationEffects {
       ofType(DestinationActionTypes.CREATE),
       mergeMap(({ payload, username, password }: CreateDestination) =>
       this.requests.createDestination( payload, username, password ).pipe(
-        map((resp: DestinationSuccessPayload) => new CreateDestinationSuccess(resp)),
+        map(() => new CreateDestinationSuccess(payload)),
         catchError((error: HttpErrorResponse) => observableOf(new CreateDestinationFailure(error))))));
   
   @Effect()
@@ -92,7 +92,7 @@ export class DestinationEffects {
       ofType(DestinationActionTypes.CREATE_SUCCESS),
       map(({ payload  }: CreateDestinationSuccess) => new CreateNotification({
       type: Type.info,
-      message: `Created data feed ${payload}`
+      message: `Created data feed ${payload.name}`
     })));
 
   @Effect()
