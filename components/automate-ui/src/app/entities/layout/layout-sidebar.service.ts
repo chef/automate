@@ -19,10 +19,10 @@ import { Sidebars } from './layout.model';
 export class LayoutSidebarService implements OnInit, OnDestroy {
     public applicationsFeatureFlagOn: boolean;
     public chefInfraServerViewsFeatureFlagOn: boolean;
-    public isIAMv2: Observable<boolean>;
+    public isIAMv2$: Observable<boolean>;
     public ServiceNowFeatureFlagOn: boolean;
     private activeSidebar: string;
-    private workflowEnabled: Observable<boolean>;
+    private workflowEnabled$: Observable<boolean>;
     private isDestroyed = new Subject<boolean>();
     private sidebar: Sidebars;
 
@@ -33,8 +33,8 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
     ) {
         this.applicationsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('applications');
         this.ServiceNowFeatureFlagOn = this.featureFlagsService.getFeatureStatus('servicenow_cmdb');
-        this.isIAMv2 = this.store.select(isIAMv2);
-        this.workflowEnabled = this.clientRunsStore.select(clientRunsWorkflowEnabled);
+        this.isIAMv2$ = this.store.select(isIAMv2);
+        this.workflowEnabled$ = this.clientRunsStore.select(clientRunsWorkflowEnabled);
         // this.store.select(isIAMv2).pipe(
         //   takeUntil(this.isDestroyed)
         // ).subscribe(
@@ -47,7 +47,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
         //   takeUntil(this.isDestroyed)
         // ).subscribe(
         //     (workflowEnabled) => {
-        //         this.workflowEnabled = workflowEnabled;
+        //         this.workflowEnabled$ = workflowEnabled;
         //         this.updateSidebars();
         //     }
         // );
@@ -81,7 +81,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
               openInNewPage: true
             }
           ],
-          visible: this.applicationsFeatureFlagOn
+          visible$: this.applicationsFeatureFlagOn
         }],
         infrastructure: [{
           name: 'Infrastructure',
@@ -95,13 +95,13 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
               name: 'Chef Servers',
               icon: 'storage',
               route: '/infrastructure/chef-servers',
-              visible: this.chefInfraServerViewsFeatureFlagOn
+              visible$: this.chefInfraServerViewsFeatureFlagOn
             },
             {
               name: 'Workflow',
               icon: 'local_shipping',
               route: '/workflow',
-              visible: this.workflowEnabled
+              visible$: this.workflowEnabled$
             }
           ]
         }],
@@ -156,7 +156,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
                 authorized: {
                   anyOf: ['/datafeed/destinations', 'post']
                 },
-                visible: this.ServiceNowFeatureFlagOn
+                visible$: this.ServiceNowFeatureFlagOn
               },
               {
                 name: 'Node Integrations',
@@ -243,7 +243,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
                 }
               }
             ],
-            visible: this.isIAMv2
+            visible$: this.isIAMv2$
           }
         ],
         profile: [{
@@ -280,7 +280,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
                 this.setVisibleValuesToObservables(menuItem);
               });
             }
-            menuGroup.visible = this.setMenuGroupVisibility(menuGroup);
+            menuGroup.visible$ = this.setMenuGroupVisibility(menuGroup);
           }
         });
       });
@@ -288,20 +288,20 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
     }
 
     private setVisibleValuesToObservables(item: any): void {
-      if (item.visible === undefined) {
-        item.visible = new BehaviorSubject(true);
-      } else if (!item.visible.subscribe) {
-        item.visible = new BehaviorSubject(item.visible);
+      if (item.visible$ === undefined) {
+        item.visible$ = new BehaviorSubject(true);
+      } else if (!item.visible$.subscribe) {
+        item.visible$ = new BehaviorSubject(item.visible$);
       }
     }
 
     private setMenuGroupVisibility(menuGroup: any): any {
       let anyMenuItemsVisible = false;
       forEach(menuGroup.items, (menuItem) => {
-        if (menuItem.visible === undefined) {
+        if (menuItem.visible$ === undefined) {
           anyMenuItemsVisible = true;
-        } else if (menuItem.visible.subscribe) {
-          menuItem.visible.subscribe((value) => {
+        } else if (menuItem.visible$.subscribe) {
+          menuItem.visible$.subscribe((value) => {
             anyMenuItemsVisible = value ? true : anyMenuItemsVisible;
           });
         }

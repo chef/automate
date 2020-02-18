@@ -24,7 +24,7 @@ export interface Sidebars {
 export interface MenuItemGroup {
   name: string;
   items: MenuItem[];
-  visible?: any;
+  visible$?: Observable<boolean>;
 }
 
 // MenuItem {
@@ -41,7 +41,7 @@ export interface MenuItem {
   iconRotation?: number;
   route: string;
   authorized?: Authorized;
-  visible?: Observable<any>;
+  visible$?: Observable<boolean>;
   openInNewPage?: boolean;
 }
 

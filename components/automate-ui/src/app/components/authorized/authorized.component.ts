@@ -30,12 +30,12 @@ export class AuthorizedComponent implements OnInit, OnDestroy {
 
   @Input()
   set allOf(val: Check[] | Check) {
-    this._allOf = val ? this.normalizeInput(val) : undefined;
+    this._allOf = val ? this.normalizeInput(val) : [];
   }
 
   @Input()
   set anyOf(val: Check[] | Check) {
-    this._anyOf = val ? this.normalizeInput(val) : undefined;
+    this._anyOf = val ? this.normalizeInput(val) : [];
   }
 
   // Include the bare `not` attribute in your HTML element to negate the check.

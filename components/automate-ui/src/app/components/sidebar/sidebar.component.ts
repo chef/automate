@@ -1,6 +1,5 @@
 import { Component, Inject } from '@angular/core';
 import { Observable } from 'rxjs';
-import { find } from 'lodash/fp';
 
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { MenuItemGroup } from 'app/entities/layout/layout.model';
@@ -19,14 +18,14 @@ export class SidebarComponent {
     this.menuGroups$ = layoutFacade.sidebar$;
   }
 
-  public hasAuthroizedMenuItems(menuItemGroup: any): boolean {
-    const authorizedItem = find(menuItemGroup.items, (menuItem) => {
-      return menuItem.authorized && menuItem.authorized.isAuthorized;
-    });
-    return authorizedItem !== undefined;
+  public hasAuthroizedMenuItems(menuItemGroup: any): void {
+    menuItemGroup.hasAuthroizedMenuItems =
+      menuItemGroup.items.filter(menuItem =>
+        menuItem.authorized && menuItem.authorized.isAuthorized).length > 0;
   }
 
-  public isAuthorized($event, menuItem) {
+  public isAuthorized($event, menuItem, menuGroup) {
     menuItem.authorized.isAuthorized = $event;
+    this.hasAuthroizedMenuItems(menuGroup);
   }
 }
