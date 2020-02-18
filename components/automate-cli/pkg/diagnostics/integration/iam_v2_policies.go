@@ -17,7 +17,7 @@ const createV2PolicyTemplateStr = `
 	"name": "{{ .ID }} test policy",
 	"members": [
 		"token:{{ .TokenID }}", 
-		"user:local:{{ .UserID}}", 
+		"user:local:{{ .UserID }}", 
 		"team:local:{{ .TeamID }}"
 	],
 	"statements": [
@@ -87,7 +87,7 @@ func CreateV2Policy(tstCtx diagnostics.TestContext, pol PolicyParameters) (*Poli
 	return &policyInfo, nil
 }
 
-// CreateIAMV2PoliciesDiagnostic create the diagnostic struct for v2 policies.
+// CreateIAMV2PoliciesDiagnostic creates the diagnostic struct for v2 policies.
 func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "iam-policies-v2",
@@ -100,28 +100,28 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 			return !isV2, "requires IAM v2", nil
 		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			// use a specific ID prefix so there are no conflicts with others tests
+			// use a specific ID prefix so there are no conflicts with other tests.
 			// different resources can have the same ID
 			id := fmt.Sprintf("iam-policies-v2-%s", TimestampName())
 
 			// generate all the components of the policy
-			tokenInfo, err := CreateRandomToken(tstCtx, id)
+			tokenInfo, err := CreateToken(tstCtx, id)
 			if err != nil {
 				return err
 			}
-			teamInfo, err := CreateRandomTeam(tstCtx, id)
+			teamInfo, err := CreateTeam(tstCtx, id)
 			if err != nil {
 				return err
 			}
-			userInfo, err := CreateRandomUser(tstCtx, id)
+			userInfo, err := CreateUser(tstCtx, id)
 			if err != nil {
 				return err
 			}
-			roleInfo, err := CreateRandomRole(tstCtx, id, "system:serviceVersion:get")
+			roleInfo, err := CreateRole(tstCtx, id, "system:serviceVersion:get")
 			if err != nil {
 				return err
 			}
-			projectInfo, err := CreateRandomProjectWithRule(tstCtx, id)
+			projectInfo, err := CreateProjectWithRule(tstCtx, id)
 			if err != nil {
 				return err
 			}
@@ -155,7 +155,9 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 			err := tstCtx.GetValue("iam-policies-v2", &loaded)
 			require.NoError(tstCtx, err, "Could not load generated context")
 
-			// assert policy is enforced
+			// assert policy is enforced by fetching the gateway version with the member token.
+			// this endpoint corresponds to the "system:serviceVersion:get" action
+			// (which is the policy's role's action).
 			err = MustJSONDecodeSuccess(
 				tstCtx.DoLBRequest(
 					"/api/v0/gateway/version",

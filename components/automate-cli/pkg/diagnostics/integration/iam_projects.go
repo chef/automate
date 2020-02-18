@@ -65,8 +65,8 @@ type iamProjectSave struct {
 	RuleID string `json:"rule_id"`
 }
 
-// CreateRandomProjectWithRule creates a project with an associated rule
-func CreateRandomProjectWithRule(tstCtx diagnostics.TestContext, id string) (*ProjectInfo, error) {
+// CreateProjectWithRule creates a project using the given id with an associated rule
+func CreateProjectWithRule(tstCtx diagnostics.TestContext, id string) (*ProjectInfo, error) {
 	projectInfo := ProjectInfo{}
 	err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
@@ -130,7 +130,7 @@ func GetProject(tstCtx diagnostics.TestContext, id string) (*ProjectInfo, error)
 
 // DeleteProject deletes the project with the given id
 func DeleteProject(tstCtx diagnostics.TestContext, id string) error {
-	// any associated rules are cascaded deleted with the project
+	// any associated rules are cascade-deleted with the project
 	err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
 			fmt.Sprintf("/apis/iam/v2/projects/%s", id),
@@ -143,7 +143,7 @@ func DeleteProject(tstCtx diagnostics.TestContext, id string) error {
 	return nil
 }
 
-// CreateIAMProjectsDiagnostic create the diagnostic struct for iam projects
+// CreateIAMProjectsDiagnostic creates the diagnostic struct for iam projects
 func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "iam-projects",
@@ -156,7 +156,7 @@ func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 			return !isV2, "requires IAM v2", nil
 		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			projectInfo, err := CreateRandomProjectWithRule(tstCtx,
+			projectInfo, err := CreateProjectWithRule(tstCtx,
 				fmt.Sprintf("iam-projects-%s", TimestampName()))
 			if err != nil {
 				return err

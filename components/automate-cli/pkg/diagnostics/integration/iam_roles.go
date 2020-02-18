@@ -34,8 +34,8 @@ type iamRoleSave struct {
 	Actions []string `json:"actions"`
 }
 
-// CreateRandomRole creates a role
-func CreateRandomRole(tstCtx diagnostics.TestContext, id string, action string) (*RoleInfo, error) {
+// CreateRole creates a role with the given id and action
+func CreateRole(tstCtx diagnostics.TestContext, id string, action string) (*RoleInfo, error) {
 	roleInfo := RoleInfo{}
 	err := MustJSONDecodeSuccess(
 		tstCtx.DoLBRequest(
@@ -84,7 +84,7 @@ func DeleteRole(tstCtx diagnostics.TestContext, id string) error {
 	return nil
 }
 
-// CreateIAMRolesDiagnostic create the diagnostic struct for iam roles
+// CreateIAMRolesDiagnostic creates the diagnostic struct for iam roles
 func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "iam-roles",
@@ -97,7 +97,7 @@ func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 			return !isV2, "requires IAM v2", nil
 		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			roleInfo, err := CreateRandomRole(tstCtx,
+			roleInfo, err := CreateRole(tstCtx,
 				fmt.Sprintf("iam-roles-%s", TimestampName()), "system:serviceVersion:get")
 			if err != nil {
 				return err

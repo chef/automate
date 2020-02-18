@@ -218,7 +218,7 @@ func (c *testContext) GetVersion() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	defer httpResp.Body.Close() // nolint: errchech
+	defer httpResp.Body.Close()
 
 	resp := struct {
 		Build string `json:"build_timestamp"`
@@ -238,7 +238,7 @@ func (c *testContext) IsIAMV2() (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	defer httpResp.Body.Close() // nolint: errchech
+	defer httpResp.Body.Close()
 
 	if httpResp.StatusCode == 404 {
 		// if the policy version endpoint is not found,
@@ -296,7 +296,7 @@ func (c *testContext) PublishViaNATS(messages [][]byte) error {
 
 	err = client.Connect()
 	if err != nil {
-		return errors.Wrapf(err, "failed to connenct to nats at URL %s", url)
+		return errors.Wrapf(err, "failed to connect to nats at URL %s", url)
 	}
 	defer client.Close()
 

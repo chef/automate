@@ -81,7 +81,7 @@ func DeletePolicy(tstCtx diagnostics.TestContext, id string) error {
 	return nil
 }
 
-// CreateIAMV1PoliciesDiagnostic create the diagnostic struct for iam tokens
+// CreateIAMV1PoliciesDiagnostic creates the diagnostic struct for iam tokens
 // and v1 policies.
 func CreateIAMV1PoliciesDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
@@ -95,7 +95,7 @@ func CreateIAMV1PoliciesDiagnostic() diagnostics.Diagnostic {
 			return isV2, "requires IAM v1", nil
 		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			tokenInfo, err := CreateRandomToken(tstCtx,
+			tokenInfo, err := CreateToken(tstCtx,
 				fmt.Sprintf("iam-policies-v1-%s", TimestampName()))
 			if err != nil {
 				return err

@@ -29,7 +29,7 @@ const createV2UserTemplate = `
 `
 
 // UserInfo represents the user parameters, including v1 and v2 fields.
-// Password will be provided when only when creating, not when fetching.
+// Password will be provided only when creating, not when fetching.
 type UserInfo struct {
 	ID       string `json:"id"`
 	Name     string `json:"name"`
@@ -49,8 +49,8 @@ type iamUserSave struct {
 	IsV2     bool   `json:"is_v2"`
 }
 
-// CreateRandomUser creates a random user
-func CreateRandomUser(tstCtx diagnostics.TestContext, id string) (*UserInfo, error) {
+// CreateUser creates a user with the given id
+func CreateUser(tstCtx diagnostics.TestContext, id string) (*UserInfo, error) {
 	var err error
 	isV2, err := tstCtx.IsIAMV2()
 	if err != nil {
@@ -110,7 +110,7 @@ func GetUser(tstCtx diagnostics.TestContext, id string) (*UserInfo, error) {
 		userInfo = v2UserInfo.User
 	} else {
 		err = MustJSONDecodeSuccess(tstCtx.DoLBRequest(
-			fmt.Sprintf(fmt.Sprintf("/api/v0/auth/users/%s", id)),
+			fmt.Sprintf("/api/v0/auth/users/%s", id),
 		)).WithValue(&userInfo)
 	}
 
@@ -120,7 +120,7 @@ func GetUser(tstCtx diagnostics.TestContext, id string) (*UserInfo, error) {
 	return &userInfo, nil
 }
 
-// DeleteUser user deletes the given user
+// DeleteUser deletes the given user
 func DeleteUser(tstCtx diagnostics.TestContext, username string) error {
 	isV2, err := tstCtx.IsIAMV2()
 	if err != nil {
@@ -147,7 +147,7 @@ func DeleteUser(tstCtx diagnostics.TestContext, username string) error {
 }
 
 // GetUserID determines which identifier to use when fetching the user, since
-// the ID field is different across IAM v1 and and v2
+// the ID field is different between IAM v1 and v2
 func GetUserID(user iamUserSave) (string, error) {
 	if !user.IsV2 {
 		// if the user was saved as a v1 user, its identifier is its Username
@@ -157,13 +157,13 @@ func GetUserID(user iamUserSave) (string, error) {
 	return user.ID, nil
 }
 
-// CreateIAMUsersDiagnostic create the diagnostic struct for iam users
+// CreateIAMUsersDiagnostic creates the diagnostic struct for iam users
 func CreateIAMUsersDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "iam-users",
 		Tags: diagnostics.Tags{"iam"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			userInfo, err := CreateRandomUser(tstCtx, fmt.Sprintf("iam-users-%s", TimestampName()))
+			userInfo, err := CreateUser(tstCtx, fmt.Sprintf("iam-users-%s", TimestampName()))
 			if err != nil {
 				return err
 			}

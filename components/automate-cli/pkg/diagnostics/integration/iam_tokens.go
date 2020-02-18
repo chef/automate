@@ -44,8 +44,8 @@ type iamTokenSave struct {
 	ID string `json:"id"`
 }
 
-// CreateRandomToken creates a token
-func CreateRandomToken(tstCtx diagnostics.TestContext, id string) (*TokenInfo, error) {
+// CreateToken creates a token with the given id
+func CreateToken(tstCtx diagnostics.TestContext, id string) (*TokenInfo, error) {
 	var err error
 	isV2, err := tstCtx.IsIAMV2()
 	if err != nil {
@@ -102,7 +102,7 @@ func GetToken(tstCtx diagnostics.TestContext, id string) (*TokenInfo, error) {
 		tokenInfo = v2TokenInfo.Token
 	} else {
 		err = MustJSONDecodeSuccess(tstCtx.DoLBRequest(
-			fmt.Sprintf(fmt.Sprintf("/api/v0/auth/tokens/%s", id)),
+			fmt.Sprintf("/api/v0/auth/tokens/%s", id),
 		)).WithValue(&tokenInfo)
 	}
 
@@ -138,13 +138,13 @@ func DeleteToken(tstCtx diagnostics.TestContext, id string) error {
 	return nil
 }
 
-// CreateIAMTokensDiagnostic create the diagnostic struct for iam tokens
+// CreateIAMTokensDiagnostic creates the diagnostic struct for iam tokens
 func CreateIAMTokensDiagnostic() diagnostics.Diagnostic {
 	return diagnostics.Diagnostic{
 		Name: "iam-tokens",
 		Tags: diagnostics.Tags{"iam"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			tokenInfo, err := CreateRandomToken(tstCtx,
+			tokenInfo, err := CreateToken(tstCtx,
 				fmt.Sprintf("iam-tokens-%s", TimestampName()))
 			if err != nil {
 				return err

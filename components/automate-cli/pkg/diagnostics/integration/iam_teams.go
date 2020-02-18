@@ -26,7 +26,7 @@ const createV2TeamTemplate = `
 }
 `
 
-// TeamInfo contains information about a team, icluding v1 and v2 fields. This
+// TeamInfo contains information about a team, including v1 and v2 fields. This
 // is returned when creating a team and getting a team
 type TeamInfo struct {
 	IsV2 bool
@@ -44,8 +44,8 @@ type iamTeamSave struct {
 	IsV2 bool   `json:"is_v2"`
 }
 
-// CreateRandomTeam creates a team with a random identifier
-func CreateRandomTeam(tstCtx diagnostics.TestContext, id string) (*TeamInfo, error) {
+// CreateTeam creates a team with the given identifier
+func CreateTeam(tstCtx diagnostics.TestContext, id string) (*TeamInfo, error) {
 	var err error
 	isV2, err := tstCtx.IsIAMV2()
 	if err != nil {
@@ -136,7 +136,7 @@ func DeleteTeam(tstCtx diagnostics.TestContext, id string) error {
 }
 
 // GetTeamID determines which identifier to use when fetching the team, since
-// the ID field is different across IAM v1 and and v2
+// the ID field is different between IAM v1 and v2
 func GetTeamID(tstCtx diagnostics.TestContext, team iamTeamSave) (string, error) {
 	// if the team was saved as a v1 team, it has an auto-generated guid ID and unique name
 	if !team.IsV2 {
@@ -161,7 +161,7 @@ func CreateIAMTeamsDiagnostic() diagnostics.Diagnostic {
 		Name: "iam-teams",
 		Tags: diagnostics.Tags{"iam"},
 		Generate: func(tstCtx diagnostics.TestContext) error {
-			teamInfo, err := CreateRandomTeam(tstCtx, fmt.Sprintf("iam-teams-%s", TimestampName()))
+			teamInfo, err := CreateTeam(tstCtx, fmt.Sprintf("iam-teams-%s", TimestampName()))
 			if err != nil {
 				return err
 			}
