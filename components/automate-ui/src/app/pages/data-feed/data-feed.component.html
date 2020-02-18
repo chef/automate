@@ -8,64 +8,58 @@
       <chef-page-header>
         <chef-heading>Data Feeds</chef-heading>
         <chef-subheading>Data Feed for bulk client data and compliance reports.</chef-subheading>
+        <app-create-data-feed-modal
+          [visible]="createModalVisible"
+          [creating]="creatingDataFeed"
+          [sending]="sendingDataFeed"
+          [createForm]="createDataFeedForm"
+          (close)="closeCreateModal()"
+          [conflictErrorEvent]="conflictErrorEvent"
+          (createClicked)="createDataFeed()">
+        </app-create-data-feed-modal>
+        <app-delete-object-modal
+          [visible]="deleteModalVisible"
+          objectNoun="data-feed"
+          [objectName]="DataFeedToDelete?.name"
+          (close)="closeDeleteModal()"
+          (deleteClicked)="deleteDataFeed()"
+          objectAction="Delete">
+        </app-delete-object-modal>
       </chef-page-header>
 
       <div class="page-body">
         <chef-alert type="error" *ngIf="errorLoading">There was an error loading destinations.</chef-alert>
 
         <chef-toolbar>
-
-        <app-authorized [anyOf]="['/datafeed/destination', 'post']">
-          <div *ngIf="(destinations$ | async)?.length === 0" class="empty-state">
+          <div *ngIf="(sortedDestinations$ | async)?.length === 0" class="empty-state">
             <p>Create a data feed to get started!</p>
           </div>
-          <div [ngClass]="(destinations$ | async)?.length === 0 ? 'empty-state' : ''">
-            <chef-button primary [routerLink]="['/settings/data-feed/form']">Create Data Feed</chef-button>
+          <div [ngClass]="(sortedDestinations$ | async)?.length > 0 ? '' : 'empty-state'">
+            <!-- <chef-button primary [routerLink]="['/settings/data-feed/form']">Create Data Feed</chef-button> -->
+            <chef-button primary (click)="openCreateModal()">Create Data Feed</chef-button>
           </div>
-        </app-authorized>
-
         </chef-toolbar>
-
-        <app-authorized [anyOf]="['/datafeed/destinations', 'post']">
-          <chef-table *ngIf="(destinations$ | async)?.length > 0" id="destinations-list">
-            <chef-thead>
-              <chef-tr>
-                <chef-th class="sort" tabindex="0" role="button"
-                  (keyup.enter)="toggleSort('name')"
-                  (click)="toggleSort('name')">
-                  <div class="text-and-sort-icons">
-                    <span>Name</span>
-                    <chef-icon aria-hidden="true" id="{{sortIcon('name')}}" class="sort-icon">arrow_drop_up</chef-icon>
-                  </div>
-                </chef-th>
-              </chef-tr>
-            </chef-thead>
-            <chef-tbody>
-              <chef-tr tabindex="0" *ngFor="let destination of destinations$ | async |
-                slice:(pageSize * (currentPage - 1)):(pageSize * (currentPage - 1)) + pageSize">
-                <chef-td>
-                  <a [routerLink]="['/settings/data-feed/form', destination.id]">{{ destination.name }}</a>
-                </chef-td>
-                <chef-td class="actions three-dot-column">
-                  <mat-select panelClass="chef-control-menu">
-                    <mat-option (onSelectionChange)="deleteDestination(destination)">Delete Destination</mat-option>
-                  </mat-select>
-                </chef-td>
-              </chef-tr>
-            </chef-tbody>
-          </chef-table>
-
-        </app-authorized>
-
-
-        <app-page-picker
-          [total]="(destinations$ | async)?.length"
-          [perPage]="pageSize"
-          [page]="currentPage"
-          (pageChanged)="currentPage = $event">
-        </app-page-picker>
-
-      </div><!--page-body-->
+        <chef-table>
+          <chef-thead>
+            <chef-tr>
+              <chef-th>Name</chef-th>
+              <chef-th class="three-dot-column"></chef-th>
+            </chef-tr>
+          </chef-thead>
+          <chef-tbody>
+            <chef-tr *ngFor= "let destination of sortedDestinations$ | async">
+              <chef-td>
+                <a [routerLink]="['/settings/data-feed/form', destination.id]">{{ destination.name }}</a>
+              </chef-td>
+              <chef-td class="three-dot-column">
+                <mat-select panelClass="chef-control-menu" id="menu-{{destination.id}}">
+                  <mat-option (onSelectionChange)="startDataFeedDelete($event, destination)" data-cy="remove-data-feed">Delete Data Feed</mat-option>
+                </mat-select>
+              </chef-td>
+            </chef-tr>
+          </chef-tbody>
+        </chef-table>
+      </div>
     </main>
-  </div><!--destinations-container-->
+  </div>
 </div>

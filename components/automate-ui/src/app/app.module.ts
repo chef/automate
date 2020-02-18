@@ -71,6 +71,7 @@ import { CookbookRequests } from './entities/cookbooks/cookbook.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
 import { DesktopRequests } from './entities/desktop/desktop.requests';
+import { DestinationRequests } from './entities/destinations/destination.requests';
 import { JobRequests } from './entities/jobs/job.requests';
 import { LicenseStatusRequests } from './entities/license/license.requests';
 import { ManagerRequests } from './entities/managers/manager.requests';
@@ -98,6 +99,7 @@ import { ApplicationsComponent } from './pages/applications/applications.compone
 import { AttributesComponent } from './page-components/attributes/attributes.component';
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ClientRunsComponent } from './pages/client-runs/client-runs.component';
+import { CreateDataFeedModalComponent } from './pages/create-data-feed-modal/create-data-feed-modal.component';
 import {
   ClientRunsTableComponent
 } from './page-components/client-runs-table/client-runs-table.component';
@@ -197,6 +199,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ClientRunsComponent,
     ClientRunsTableComponent,
     ConvergeRadialGraphComponent,
+    CreateDataFeedModalComponent,
     DatafeedComponent,
     DatafeedFormComponent,
     DateSelectorComponent,
@@ -288,6 +291,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     CredentialRequests,
     DatafeedService,
     DesktopRequests,
+    DestinationRequests,
     EventFeedService,
     FeatureFlagsService,
     HistorySelection,

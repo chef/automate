@@ -2,6 +2,7 @@ import { Params, RouterStateSnapshot, UrlSegment } from '@angular/router';
 import * as router from '@ngrx/router-store';
 import { set, get, pipe, map } from 'lodash/fp';
 import * as credentials from './pages/+compliance/+credentials/credentials.state';
+import * as destinationEntity from './entities/destinations/destination.reducer';
 import * as scanner from './pages/+compliance/+scanner/state/scanner.state';
 import * as eventFeed from './services/event-feed/event-feed.reducer';
 import * as projectsFilter from './services/projects-filter/projects-filter.reducer';
@@ -58,6 +59,7 @@ export interface NgrxStateAtom {
   automateSettings: automateSettings.AutomateSettingsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
+  destinations: destinationEntity.DestinationEntityState
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
@@ -166,6 +168,7 @@ export const defaultInitialState = {
   automateSettings: automateSettings.AutomateSettingsEntityInitialState,
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
+  destinations: destinationEntity.DestinationEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
   licenseStatus: license.LicenseStatusEntityInitialState,
   managers: manager.ManagerEntityInitialState,
@@ -208,6 +211,7 @@ export const ngrxReducers = {
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
   credentialEntity: credential.credentialReducer,
+  destinations: destinationEntity.destinationEntityReducer,
   jobs: jobEntity.jobEntityReducer,
   managers: manager.managerEntityReducer,
   licenseStatus: license.licenseStatusEntityReducer,
