@@ -42,7 +42,7 @@ func StoreExists(client *elastic.Client, indexName string) (bool, error) {
 	return exists, nil
 }
 
-func ListIndicesForPrefix(client *elastic.Client, prefix string) ([]string, error) {
+func cleanupEmptyIndicesForPrefix(client *elastic.Client, prefix string, migratable esMigratable) ([]string, error) {
 	catIndicesResponse, err := client.CatIndices().Index(prefix).Do(context.Background())
 	if err != nil {
 		return nil, err
@@ -53,8 +53,16 @@ func ListIndicesForPrefix(client *elastic.Client, prefix string) ([]string, erro
 	for _, catIndicesResponseRow := range catIndicesResponse {
 		indexName := catIndicesResponseRow.Index
 		logrus.Debugf("%nIndex: %s ", indexName)
-		//todo - rdm get the date and call the new removeOldIndices func on this interface
-		indices = append(indices, indexName)
+
+		dateAsStr := strings.SplitAfterN(indexName, "-", 4)
+		dateToRemove, err := time.Parse("2006.01.02", dateAsStr[len(dateAsStr)-1])
+		if err != nil {
+			return indices, err
+		}
+		err = migratable.removeOldIndices(dateToRemove)
+		if err != nil {
+			return indices, err
+		}
 	}
 	return indices, nil
 }
@@ -376,17 +384,14 @@ func (backend ES2Backend) getScanDateRange(migratable esMigratable) (*time.Time,
 	}
 
 	if minDate.Value == nil {
-		_, err := ListIndicesForPrefix(client, esIndex)
+		//if we are here, it means that there are indices with this prefix but not any elasticsearch documents within those indices
+		//if there were, then mindDate.value would be non-nil
+		//in this case, we need to remove all of the indices with this prefix.. they are all empty anyway
+		_, err := cleanupEmptyIndicesForPrefix(client, esIndex, migratable)
 		if err != nil {
-			return nil, nil, err
+			return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to delete the empty indices that need to be removed", myName))
 		}
-
-	}
-	if maxDate.Value == nil {
-		_, err := ListIndicesForPrefix(client, esIndex)
-		if err != nil {
-			return nil, nil, err
-		}
+		return nil, nil, errors.Errorf("%s there were not any reports in elasticsearch indices that are prefixed with %s, these indices, therefore, have been sucessfully deleted", myName, esIndex)
 	}
 
 	var minDateAsString string
