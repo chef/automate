@@ -126,7 +126,14 @@ export function projectEntityReducer(
       return set(UPDATE_STATUS, EntityStatus.loadingFailure, state);
 
     case ProjectActionTypes.GET_APPLY_RULES_STATUS_SUCCESS:
-      return set(APPLY_RULES_STATUS, mapKeys(key => camelCase(key), action.payload), state);
+      return set(
+        APPLY_RULES_STATUS,
+        mapKeys(key => camelCase(key),
+          {
+            ...action.payload,
+            percentage_complete: action.payload.percentage_complete * 100
+          }),
+        state);
 
     default:
       return state;
