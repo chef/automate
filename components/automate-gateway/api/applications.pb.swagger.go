@@ -101,7 +101,7 @@ func init() {
     "/applications/service-groups": {
       "get": {
         "summary": "List Service Groups",
-        "description": "Lists service groups with name, health information, and application, environment, package, release metadata.\nAccepts pagination, sorting, search and status filters.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\napplications/service-groups?sorting.field=percent_ok\u0026sorting.order=ASC\u0026pagination.page=1\u0026pagination.size=25\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\napplications:serviceGroups:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Lists service groups with name, health information, and application, environment, package, release metadata.\nAccepts pagination, sorting, search, and status filters.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\napplications/service-groups?sorting.field=percent_ok\u0026sorting.order=ASC\u0026pagination.page=1\u0026pagination.size=25\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\napplications:serviceGroups:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetServiceGroups",
         "responses": {
           "200": {
@@ -382,7 +382,7 @@ func init() {
     "/applications/stats": {
       "get": {
         "summary": "Show Summary",
-        "description": "Shows a summary of service-groups, services, deployments and supervisors.\nUsed for telemetry.\nDoes not support filtering.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\napplications:serviceGroups:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Shows a summary of service-groups, services, deployments, and supervisors.\nUsed for telemetry.\nDoes not support filtering.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\napplications:serviceGroups:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetServicesStats",
         "responses": {
           "200": {
