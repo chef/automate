@@ -40,11 +40,7 @@ export function serverEntityReducer(
   switch (action.type) {
 
     case ServerActionTypes.GET_ALL: {
-      return set(
-        GET_ALL_STATUS,
-        EntityStatus.loading,
-        serverEntityAdapter.removeAll(state)
-      ) as ServerEntityState;
+      return set(GET_ALL_STATUS, EntityStatus.loading, state);
     }
 
     case ServerActionTypes.GET_ALL_SUCCESS: {

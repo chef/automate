@@ -45,13 +45,8 @@ export function apiTokenEntityReducer(
   switch (action.type) {
 
     case ApiTokenActionTypes.GET_ALL: {
-      return set(
-        STATUS,
-        EntityStatus.loading,
-        // clear token state to ensure we fetch the latest data
-        apiTokenEntityAdapter.removeAll(state)
-      ) as ApiTokenEntityState;
-    }
+      return set(STATUS, EntityStatus.loading, state);
+   }
 
     case ApiTokenActionTypes.GET_ALL_SUCCESS: {
       return set(
