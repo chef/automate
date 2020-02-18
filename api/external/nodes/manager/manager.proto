@@ -62,7 +62,7 @@ service NodeManagerService {
 
 	Update a node manager's metadata, such as its name, associated credential id, or data.
 	This is a PUT operation and it overwrites ALL of the existing node manager metadata. Include all fields, because a PUT operation overwrites any missing fields to empty ("").
-	*/	
+	*/
 	rpc Update(NodeManager) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			put: "/nodemanagers/id/{id}"
@@ -82,8 +82,8 @@ service NodeManagerService {
 	Delete a Node Manager
 
 	Delete a single node manager. This deletes the node manager itself and
-	re-assigneds its associated nodes to the Automate node manager.
-	*/	
+	reassigns its associated nodes to the Automate node manager.
+	*/
 	rpc Delete(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
 			delete: "/nodemanagers/id/{id}"
@@ -101,8 +101,8 @@ service NodeManagerService {
 	/*
 	Delete a Node Manager and Delete Nodes
 
-	Delete a node manager and all of its associated nodes. 
-	*/	
+	Delete a node manager and all of its associated nodes.
+	*/
 	rpc DeleteWithNodes(Id) returns (Ids) {
 		option (google.api.http) = {
 			delete: "/nodemanagers/id/{id}/with-nodes"
@@ -120,7 +120,7 @@ service NodeManagerService {
 	/*
 	Delete a Node Manager and Stop Nodes
 
-	Delete a node manager and update its associated nodes to `stopped`. 
+	Delete a node manager and update its associated nodes to `stopped`.
 	*/
 	rpc DeleteWithNodeStateStopped(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
@@ -139,7 +139,7 @@ service NodeManagerService {
 	/*
 	Delete a Node Manager and Terminate Nodes
 
-	Delete a node manager and update its associated nodes to `terminated`. 
+	Delete a node manager and update its associated nodes to `terminated`.
 	*/
 	rpc DeleteWithNodeStateTerminated(Id) returns (google.protobuf.Empty) {
 		option (google.api.http) = {
@@ -183,7 +183,7 @@ service NodeManagerService {
 	Search Node Fields
 
 	Searches the available values for a given field across all nodes associated with the nodemanager id.
-	
+
 	*/
 	rpc SearchNodeFields(FieldQuery) returns (Fields) {
 		option (google.api.http) = {
@@ -224,7 +224,7 @@ service NodeManagerService {
 	/*
 	Connect
 
-	Attempts to reach the API for the given nodemanager id to validate the 
+	Attempts to reach the API for the given nodemanager id to validate the
 	credentials associated with the nodemanager.
 	*/
 	rpc Connect(Id) returns (ConnectResponse) {
@@ -280,18 +280,13 @@ message Query {
 	string sort = 22;
 	// Starting page for the list. For example, if your query returns 100 pages,
 	// and you know you're looking for a node manager somewhere in the middle,
-	// you might want to start on 50.
+	// you might want to start on page 50.
 	int32 page = 23;
 	// Number of results on each page.
 	int32 per_page = 24;
 }
 
 message Fields {
-	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["fields"]
-		}
-	};
 	// One or more fields: regions, tags, name, subscription_id.
 	repeated string fields = 1;
 }
@@ -311,11 +306,6 @@ message FieldQuery {
 }
 
 message Nodes {
-	option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-		json_schema: {
-			required: ["nodes"]
-		}
-	};
 	// List of node names matching the request.
 	repeated string nodes = 1;
 	// Total count of node names matching the request.
@@ -349,16 +339,22 @@ message NodeManager {
 	string type = 3;
 	// UUID of credential containing the information to connect to aws, azure, or gcp.
 	string credential_id = 20;
-	// List of tag and credential uuid associations to make. These are ssh, winrm, and sudo creds used to access instances.
+  // Use either 'credential_id' OR 'credential_data'.
+  // 'credential_data' will overwrite values in 'credential_id'.
+  // 'credential_id' is a list of tag and credential uuids for making
+  // node manager associations.
+  // These are ssh, winrm, and sudo credentials needed to access nodes.
 	repeated CredentialsByTags instance_credentials = 21;
 	// Status of the nodemanager (reachable, unreachable).
 	string status = 22;
 	// Account id associated with the nodemanager.
 	string account_id = 24;
 	// Date the nodemanager was created.
-	google.protobuf.Timestamp date_added = 25;
-	// Credential data for the nodemanager. This field is used when a credential
-	// has not yet been created, to be able to include credential data (such as AWS_ACCESS_KEY) inline.
+  google.protobuf.Timestamp date_added = 25;
+  // Use either 'credential_data' OR 'credential_id'.
+  // 'credential_data' will overwrite values in 'credential_id'.
+  // Use 'credential_data' when you have not yet created node credentials
+  // and provide credential data (such as AWS_ACCESS_KEY) inline.
 	repeated chef.automate.domain.compliance.api.common.Kv credential_data = 26;
 }
 message CredentialsByTags {

@@ -70,7 +70,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a Node Manager",
-        "description": "Delete a single node manager. This deletes the node manager itself and\nre-assigneds its associated nodes to the Automate node manager.",
+        "description": "Delete a single node manager. This deletes the node manager itself and\nreassigns its associated nodes to the Automate node manager.",
         "operationId": "Delete",
         "responses": {
           "200": {
@@ -281,7 +281,7 @@ func init() {
     "/nodemanagers/rerun/id/{id}": {
       "post": {
         "summary": "Connect",
-        "description": "Attempts to reach the API for the given nodemanager id to validate the \ncredentials associated with the nodemanager.",
+        "description": "Attempts to reach the API for the given nodemanager id to validate the\ncredentials associated with the nodemanager.",
         "operationId": "Connect",
         "responses": {
           "200": {
@@ -401,10 +401,7 @@ func init() {
           },
           "description": "One or more fields: regions, tags, name, subscription_id."
         }
-      },
-      "required": [
-        "fields"
-      ]
+      }
     },
     "chef.automate.api.nodes.manager.v1.Id": {
       "type": "object",
@@ -479,7 +476,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.CredentialsByTags"
           },
-          "description": "List of tag and credential uuid associations to make. These are ssh, winrm, and sudo creds used to access instances."
+          "description": "Use either credential_id OR credential_data.\ncredential_data will overwrite credential_id.\ncredential_id is a list of tag and credential uuids for making\nnode manager associations.\nThese are ssh, winrm, and sudo credentials needed to access nodes."
         },
         "status": {
           "type": "string",
@@ -499,7 +496,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Kv"
           },
-          "description": "Credential data for the nodemanager. This field is used when a credential\nhas not yet been created, to be able to include credential data (such as AWS_ACCESS_KEY) inline."
+          "description": "Use either credential_data OR credential_id.\ncredential_data will overwrite credential_id.\nUse credential_data when you have not yet created credentials for the node.\nYou will provide credential data (such as AWS_ACCESS_KEY) inline."
         }
       },
       "required": [
@@ -560,10 +557,7 @@ func init() {
           "format": "int32",
           "description": "Total count of node names matching the request."
         }
-      },
-      "required": [
-        "nodes"
-      ]
+      }
     },
     "chef.automate.api.nodes.manager.v1.Query": {
       "type": "object",
@@ -596,7 +590,7 @@ func init() {
         "page": {
           "type": "integer",
           "format": "int32",
-          "description": "Starting page for the list. For example, if your query returns 100 pages,\nand you know you're looking for a node manager somewhere in the middle,\nyou might want to start on 50."
+          "description": "Starting page for the list. For example, if your query returns 100 pages,\nand you know you're looking for a node manager somewhere in the middle,\nyou might want to start on page 50."
         },
         "per_page": {
           "type": "integer",
