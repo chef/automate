@@ -10,6 +10,7 @@ import { CredentialsEffects } from './pages/+compliance/+credentials/credentials
 // CredentialsEffects will be removed when the credentials page is refactored.
 import { CredentialEffects } from './entities/credentials/credential.effects';
 import { DesktopEffects } from './entities/desktop/desktop.effects';
+import { DestinationEffects } from './entities/destinations/destination.effects';
 import { EventFeedEffects } from './services/event-feed/event-feed.effects';
 import { JobEffects } from './entities/jobs/job.effects';
 import { LicenseStatusEffects } from './entities/license/license.effects';
@@ -39,6 +40,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       CredentialsEffects,
       CredentialEffects,
       DesktopEffects,
+      DestinationEffects,
       EventFeedEffects,
       JobEffects,
       LicenseStatusEffects,

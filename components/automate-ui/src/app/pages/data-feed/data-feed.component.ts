@@ -1,135 +1,218 @@
-import { of as observableOf,  Observable } from 'rxjs';
-
-import { map, filter } from 'rxjs/operators';
-import { Component, OnInit } from '@angular/core';
-import { MatDialog } from '@angular/material/dialog';
-import { MatSnackBar } from '@angular/material/snack-bar';
-
-import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
-import { SortDirection } from '../../types/types';
-import { DatafeedService } from '../../services/data-feed/data-feed.service';
-import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
+import { Store, select } from '@ngrx/store';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { filter, takeUntil, map } from 'rxjs/operators';
+import { Regex } from 'app/helpers/auth/regex';
+import { Observable, combineLatest, Subject } from 'rxjs';
+import { isNil } from 'lodash/fp';
+import { HttpStatus } from 'app/types/types';
+import { loading, EntityStatus, pending } from 'app/entities/entities';
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { ChefKeyboardEvent } from 'app/types/material-types';
+import { Destination } from '../../entities/destinations/destination.model';
 import {
-  DeleteDatafeedDialogComponent
-} from 'app/page-components/delete-data-feed-dialog/delete-data-feed-dialog.component';
-import { Destination } from './destination';
+  allDestinations, getStatus, saveStatus, saveError } from 'app/entities/destinations/destination.selectors';
+import { CreateDestination, GetDestinations, DeleteDestination } from 'app/entities/destinations/destination.actions';
+import { ChefSorters } from 'app/helpers/auth/sorter';
+import { DatafeedService } from 'app/services/data-feed/data-feed.service';
 
-export interface FieldDirection {
-  name: SortDirection;
-  url: SortDirection;
+enum UrlTestState {
+  Inactive,
+  Loading,
+  Success,
+  Failure
 }
+
+type Modal = 'url';
 
 @Component({
   selector: 'app-data-feed',
   templateUrl: './data-feed.component.html',
   styleUrls: ['./data-feed.component.scss']
 })
-export class DatafeedComponent implements OnInit {
-  destinations$: Observable<Destination[]> = observableOf([]);
-  errorLoading = false;
-  currentPage = 1;
-  pageSize = 10;
-  sortField: string;
-  sortDir: FieldDirection;
-  permissionDenied = false;
-
+export class DatafeedComponent implements OnInit, OnDestroy {
+  public loading$: Observable<boolean>;
+  public sortedDestinations$: Observable<Destination[]>;
+  public createModalVisible = false;
+  public createDataFeedForm: FormGroup;
+  public creatingDataFeed = false;
+  public conflictErrorEvent = new EventEmitter<boolean>();
+  private isDestroyed = new Subject<boolean>();
+  public dataFeedToDelete: Destination;
+  public deleteModalVisible = false;
+  public sendingDataFeed = false;
+  public urlState = UrlTestState;
+  public hookStatus = UrlTestState.Inactive;
+  public urlStatusModalVisible = false;
   constructor(
+    private store: Store<NgrxStateAtom>,
+    private fb: FormBuilder,
     private layoutFacade: LayoutFacadeService,
-    private service: DatafeedService,
-    public dialog: MatDialog,
-    public snackBar: MatSnackBar,
-    private telemetryService: TelemetryService
-  ) { }
+    private datafeedService: DatafeedService
+  ) {
 
-  ngOnInit() {
-    this.layoutFacade.showSidebar(Sidebar.Settings);
-    this.destinations$ = this.service.fetchDestinations();
-    this.destinations$.subscribe(destinations => {
-        this.sendCountToTelemetry(destinations);
-      },
-      error => {
-        if (error.status === 403) {
-          this.permissionDenied = true;
-        } else  {
-          this.errorLoading = true;
-        }
-      }
-    );
-    this.resetSortDir();
-    this.toggleSort('name');
-  }
-
-  toggleSort(field: string) {
-    if (field === this.sortField) {
-      // when sorting is inverted for the currently sorted column
-      this.sortDir[field] = this.sortDir[field] === 'asc' ? 'desc' : 'asc';
-    } else {
-      // when sorting a different column than the currently sorted one
-      this.resetSortDir();
-    }
-    this.sortField = field;
-    this.updateSort(field, this.sortDir[field]);
-  }
-  sortIcon(field: string): string {
-    if (field === this.sortField) {
-      return 'sort-' + this.sortDir[field];
-    } else {
-      return 'sort-asc';
-    }
-  }
-
-  deleteDestination(destination: Destination) {
-    const dialogRef2 = this.dialog.open(DeleteDatafeedDialogComponent);
-    dialogRef2.afterClosed().pipe(
-      filter((result: any) => result === 'delete' ))
-      .subscribe(_result => {
-        this.service.deleteDestination(destination).subscribe(_res => {
-          this.snackBarMessage(`Destination '${destination.name}' was deleted.`);
-          this.refreshDestinations();
-        }, err => {
-          const body = err;
-          this.snackBarMessage(`Could not delete destination '${destination.name}': ${body}`);
-        });
-      });
-  }
-
-  snackBarMessage(message) {
-    this.snackBar.open(message, '', { duration: 6000 } );
-  }
-
-  private updateSort(field: string, direction: string) {
-    this.destinations$ = this.destinations$.pipe(map(destinations => {
-      let sortedDestinations: Destination[] = [];
-      if (field === 'name') {
-        sortedDestinations = destinations.sort((r1: Destination, r2: Destination) => {
-          return r1.name.localeCompare(r2.name);
-        });
-      }
-      if (direction === 'asc') {
-        return sortedDestinations;
-      } else {
-        return sortedDestinations.reverse();
-      }
-    }));
-  }
-
-  private resetSortDir(): void {
-    this.sortDir = {
-      name: 'asc',
-      url: 'asc'
-    };
-  }
-
-  private sendCountToTelemetry(destinations: Destination[]) {
-    this.telemetryService.track('datafeedDestinationsCount', destinations.length);
-  }
-
-  refreshDestinations() {
-    this.destinations$ = this.service.fetchDestinations();
-    this.destinations$.subscribe(destinations => {
-      this.sendCountToTelemetry(destinations);
-      this.updateSort(this.sortField, this.sortDir[this.sortField]);
+    this.loading$ = store.pipe(select(getStatus), map(loading));
+    this.sortedDestinations$ = store.pipe(
+      select(allDestinations),
+      map(destinations => ChefSorters.naturalSort(destinations, 'name')));
+    this.createDataFeedForm = this.fb.group({
+      // Must stay in sync with error checks in create-data-feed-modal.component.html
+      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      url: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK),
+        Validators.pattern(Regex.patterns.VALID_FQDN)
+      ]],
+      username: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
+      password: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK)
+      ]]
     });
   }
 
+  ngOnInit() {
+    this.layoutFacade.showSettingsSidebar();
+    this.store.dispatch(new GetDestinations());
+    this.store.pipe(
+      select(saveStatus),
+      takeUntil(this.isDestroyed),
+      filter(state => this.createModalVisible && !pending(state)))
+      .subscribe(state => {
+        this.creatingDataFeed = false;
+        if (state === EntityStatus.loadingSuccess) {
+          this.closeCreateModal();
+          this.hookStatus = UrlTestState.Inactive;
+        }
+      });
+
+    combineLatest([
+      this.store.select(saveStatus),
+      this.store.select(saveError)
+    ]).pipe(
+      takeUntil(this.isDestroyed),
+      filter(() => this.createModalVisible),
+      filter(([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
+      .subscribe(([_, error]) => {
+        if (error.status === HttpStatus.CONFLICT) {
+          this.conflictErrorEvent.emit(true);
+        } else {
+          // Close the modal on any error other than conflict and display in banner.
+          this.closeCreateModal();
+          this.hookStatus = UrlTestState.Inactive;
+        }
+      });
+  }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
+  }
+
+  public openCreateModal(): void {
+    this.createModalVisible = true;
+    this.resetCreateModal();
+  }
+
+  public closeCreateModal(): void {
+    this.createModalVisible = false;
+    this.resetCreateModal();
+  }
+
+  public createDataFeed(): void {
+    this.creatingDataFeed = true;
+    const destinationObj = new Destination(undefined, '', '', '');
+    destinationObj.name = this.createDataFeedForm.controls['username'].value.trim();
+    destinationObj.url = this.createDataFeedForm.controls['url'].value.trim();
+    const username: string = this.createDataFeedForm.controls['username'].value.trim();
+    const password: string = this.createDataFeedForm.controls['password'].value.trim();
+    this.store.dispatch(new CreateDestination(destinationObj, username, password));
+  }
+
+  private resetCreateModal(): void {
+    this.hookStatus = UrlTestState.Inactive;
+    this.creatingDataFeed = false;
+    this.createDataFeedForm.reset();
+    this.conflictErrorEvent.emit(false);
+  }
+
+  public startDataFeedDelete($event: ChefKeyboardEvent, destination: Destination): void {
+    if ($event.isUserInput) {
+      this.dataFeedToDelete = destination;
+      this.deleteModalVisible = true;
+    }
+  }
+
+  public startDataFeedSendTest($event: ChefKeyboardEvent, destination: Destination) {
+    if ($event.isUserInput) {
+      this.hookStatus = UrlTestState.Loading;
+      if (destination) {
+        this.datafeedService.testDestinationWithSecretId(destination.url,
+          destination.secret_id)
+          .subscribe(
+            () => this.revealUrlStatusUsingSecretId(UrlTestState.Success),
+            () => this.revealUrlStatusUsingSecretId(UrlTestState.Failure)
+          );
+      }
+    }
+  }
+
+  public deleteDataFeed(): void {
+    this.closeDeleteModal();
+    this.store.dispatch(new DeleteDestination(this.dataFeedToDelete));
+  }
+
+  public closeDeleteModal(): void {
+    this.deleteModalVisible = false;
+  }
+
+  public sendTestForDataFeed(): void {
+    this.sendingDataFeed = true;
+    this.hookStatus = UrlTestState.Loading;
+    const targetUrl: string =  this.createDataFeedForm.controls['url'].value;
+    const targetUsername: string = this.createDataFeedForm.controls['username'].value;
+    const targetPassword: string = this.createDataFeedForm.controls['password'].value;
+    if (targetUrl && targetUsername && targetPassword) {
+      this.datafeedService.testDestinationWithUsernamePassword(targetUrl,
+        targetUsername, targetPassword).subscribe(
+          () => this.revealUrlStatus(UrlTestState.Success),
+          () => this.revealUrlStatus(UrlTestState.Failure)
+        );
+    } else {
+      this.datafeedService.testDestinationWithNoCreds(targetUrl)
+        .subscribe(
+          () => this.revealUrlStatus(UrlTestState.Success),
+          () => this.revealUrlStatus(UrlTestState.Failure)
+        );
+    }
+    this.sendingDataFeed = false;
+  }
+
+  private revealUrlStatus(status: UrlTestState) {
+    this.hookStatus = status;
+  }
+
+  private revealUrlStatusUsingSecretId(status: UrlTestState) {
+    this.hookStatus = status;
+    this.openModal('url');
+  }
+
+  public openModal(type: Modal): void {
+    switch (type) {
+      case 'url':
+        this.urlStatusModalVisible = true;
+        return;
+      default:
+        return;
+    }
+  }
+
+  public closeModal(type: Modal): void {
+    switch (type) {
+      case 'url':
+        this.urlStatusModalVisible = false;
+        return;
+      default:
+        return;
+    }
+  }
 }
