@@ -173,8 +173,7 @@ CONF
   provisioner "remote-exec" {
     inline = [
       "set -e",
-      "sudo HAB_LICENSE=accept hab svc unload chef/chef-load || true",
-      "sudo HAB_LICENSE=accept hab svc unload chef/applications-load-gen || true",
+      "sudo rm -f /hab/sup/default/specs/* || true",
       "sudo mv /bin/hab /bin/hab.old",
       "sudo HAB_NONINTERACTIVE=true HAB_LICENSE=accept /bin/hab.old pkg install core/hab/${var.desired_hab_version} --binlink --force && sudo rm /bin/hab.old",
       "sudo hab license accept",
@@ -196,8 +195,8 @@ CONF
       "sudo /etc/cron.hourly/group-node-names",
       "sudo mkdir -p /var/log/chef-load",
       "sudo chown hab /var/log/chef-load",
-      "sudo HAB_NONINTERACTIVE=true hab svc load chef/chef-load --channel ${var.chef_load_channel} --strategy at-once",
-      "sudo HAB_NONINTERACTIVE=true hab svc load chef/applications-load-gen --channel dev --strategy at-once",
+      "sudo HAB_NONINTERACTIVE=true hab svc load -f chef/chef-load --channel ${var.chef_load_channel} --strategy at-once",
+      "sudo HAB_NONINTERACTIVE=true hab svc load -f chef/applications-load-gen --channel dev --strategy at-once",
     ]
   }
 }

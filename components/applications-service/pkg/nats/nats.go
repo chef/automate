@@ -3,6 +3,7 @@ package nats
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -148,7 +149,21 @@ func (nc *NatsClient) Connect() error {
 }
 
 func (nc *NatsClient) tryConnect(tlsConf *tls.Config) (*natsc.Conn, stan.Conn, error) {
-	natsOpts := []natsc.Option{}
+	natsOpts := []natsc.Option{
+		// not well documented, but setting MaxReconnects to negative number means
+		// infinite reconnects
+		// https://github.com/nats-io/nats.go/blob/93a68d7e795f11c0aa30cfa38cf9a4702ae8d8b7/nats.go#L1077
+		natsc.MaxReconnects(-1),
+		// Space out the reconnect attempts a little bit over the default of 2s
+		// since we'll try forever
+		natsc.ReconnectWait(10),
+		// Log disconnections so Automate operators can be made aware of them
+		// TODO: when we upgrade NATS client, this option becomes deprecated in
+		// favor of `DisconnectErrHandler`, which is the same except the callback
+		// function takes error as a second argument
+		natsc.DisconnectHandler(logNatsDisconnect),
+		natsc.ReconnectHandler(logNatsReconnect),
+	}
 	if tlsConf != nil {
 		natsOpts = append(natsOpts, natsc.Secure(tlsConf))
 	}
@@ -246,4 +261,28 @@ func (nc *NatsClient) natsTLSConfig() (*tls.Config, error) {
 
 	return t, nil
 
+}
+
+// logNatsDisconnect logs disconnections to the Automate logs.
+// TODO: when we upgrade the nats library, upgrade this to the version that
+// takes an error as a second argument.
+func logNatsDisconnect(c *natsc.Conn) {
+	log.WithError(c.LastError()).WithFields(log.Fields{
+		"servers":            c.Servers(),
+		"conn_status":        c.Status(),
+		"stats":              fmt.Sprintf("%+v", c.Stats()),
+		"tls_required":       c.TLSRequired(),
+		"nats_auth_required": c.AuthRequired(),
+	}).Error("Connection to NATS server lost, attempting to reconnect")
+}
+
+func logNatsReconnect(c *natsc.Conn) {
+	log.WithFields(log.Fields{
+		"servers":            c.Servers(),
+		"conn_status":        c.Status(),
+		"stats":              fmt.Sprintf("%+v", c.Stats()),
+		"tls_required":       c.TLSRequired(),
+		"nats_auth_required": c.AuthRequired(),
+		"last_err":           c.LastError(),
+	}).Info("Connection to NATS server re-established")
 }
