@@ -19,6 +19,7 @@ import (
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/api/interservice/event_feed"
+	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/service"
 	chef_ingest "github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/api/interservice/license_control"
 	"github.com/chef/automate/api/interservice/local_user"
@@ -48,6 +49,7 @@ var grpcServices = []string{
 	"data-feed-service",
 	"deployment-service",
 	"event-feed-service",
+	"infra-proxy-service",
 	"ingest-service",
 	"license-control-service",
 	"local-user-service",
@@ -117,6 +119,7 @@ type ClientsFactory interface {
 	DeploymentServiceClient() (deployment.DeploymentClient, error)
 	DatafeedClient() (data_feed.DatafeedServiceClient, error)
 	PurgeClient(service string) (data_lifecycle.PurgeClient, error)
+	InfraProxyClient() (infra_proxy.InfraProxyClient, error)
 	Close() error
 }
 
@@ -445,6 +448,14 @@ func (c *clientsFactory) PurgeClient(service string) (data_lifecycle.PurgeClient
 		return nil, err
 	}
 	return data_lifecycle.NewPurgeClient(conn), nil
+}
+
+func (c *clientsFactory) InfraProxyClient() (infra_proxy.InfraProxyClient, error) {
+	conn, err := c.connectionByName("infra-proxy-service")
+	if err != nil {
+		return nil, err
+	}
+	return infra_proxy.NewInfraProxyClient(conn), nil
 }
 
 func (c *clientsFactory) connectionByName(name string) (*grpc.ClientConn, error) {

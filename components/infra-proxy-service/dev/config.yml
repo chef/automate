@@ -1,0 +1,14 @@
+---
+grpc: "127.0.0.1:10153"
+log-level: "info"
+log-format: "text"
+
+tls:
+  cert_path: ../../../dev/certs/infra-proxy-service.crt
+  key_path: ../../../dev/certs/infra-proxy-service.key
+  root_ca_path: ../../../dev/certs/Chef_Automate_FAKE_Dev.crt
+
+pg_url: "postgresql://postgres@127.0.0.1:5432/infra_proxy_test?sslmode=disable"
+database: infra_proxy_test
+migrations-path: storage/postgres/migration/sql/
+secrets-address: "0.0.0.0:10131"

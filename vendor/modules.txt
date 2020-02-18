@@ -81,6 +81,8 @@ github.com/briandowns/spinner
 github.com/buger/goterm
 # github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44
 github.com/buger/jsonparser
+# github.com/chef/go-chef v0.3.1-0.20191115205148-7ac24fba7a27
+github.com/chef/go-chef
 # github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816
 github.com/chef/toml
 # github.com/ckaznocha/protoc-gen-lint v0.2.1
@@ -459,7 +461,7 @@ github.com/spf13/pflag
 github.com/spf13/viper
 # github.com/stretchr/objx v0.1.1
 github.com/stretchr/objx
-# github.com/stretchr/testify v1.3.0
+# github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
 github.com/stretchr/testify/mock
 github.com/stretchr/testify/require

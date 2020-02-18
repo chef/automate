@@ -1,0 +1,12 @@
+#!/bin/bash
+#
+# This is the place you can extend the funcitonality of the studio
+
+hab pkg install chef/studio-common >/dev/null
+source "$(hab pkg path chef/studio-common)/bin/studio-common"
+
+function run_tests() {
+  install_if_missing core/go go
+  install_if_missing core/gcc gcc
+  go test
+}

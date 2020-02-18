@@ -225,6 +225,16 @@ var ProductMetadataJSON = `
       }
     },
     {
+      "name": "chef/infra-proxy-service",
+      "metadata": {
+        "name": "chef/infra-proxy-service",
+        "data_service": false,
+        "binlinks": null,
+        "uses_platform_scaffolding": true,
+        "bootstrap": null
+      }
+    },
+    {
       "name": "chef/config-mgmt-service",
       "metadata": null
     },
@@ -494,6 +504,7 @@ var ProductMetadataJSON = `
         "chef/nodemanager-service",
         "chef/compliance-service",
         "chef/ingest-service",
+        "chef/infra-proxy-service",
         "chef/config-mgmt-service",
         "chef/data-feed-service",
         "chef/event-gateway"

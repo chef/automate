@@ -1,0 +1,5 @@
+{
+  "name": "chef/infra-proxy-service",
+  "data_service": false,
+  "uses_platform_scaffolding": true
+}
