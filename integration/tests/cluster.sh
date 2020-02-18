@@ -107,3 +107,13 @@ do_test_deploy() {
 
     "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~purge" "~cli" "~grpc" "~deployment" "~applications"
 }
+
+do_dump_logs() {
+    do_dump_logs_default
+
+    _frontend1_container_name="$(service_container_name "cluster1")"
+    _frontend2_container_name="$(service_container_name "cluster2")"
+
+    docker exec -t "$_frontend1_container_name" journalctl --no-pager -u chef-automate > "logs/frontend1"
+    docker exec -t "$_frontend2_container_name" journalctl --no-pager -u chef-automate > "logs/frontend2"
+}

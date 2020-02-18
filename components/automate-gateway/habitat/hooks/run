@@ -80,11 +80,19 @@ addNoProxy {{datafeed.sys.ip}}
 {{~/if}}
 {{~/eachAlive}}
 {{~#eachAlive bind.nodemanager-service.members as |manager|}}
- {{~#if @last}}
- # Add nodemanager to no_proxy
- addNoProxy {{manager.sys.ip}}
- {{~/if}}
- {{~/eachAlive}}
+{{~#if @last}}
+# Add nodemanager to no_proxy
+addNoProxy {{manager.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+{{~#eachAlive bind.infra-proxy-service.members as |infra|}}
+{{~#if @last}}
+# Add infra-proxy-service to no_proxy
+addNoProxy {{infra.sys.ip}}
+{{~/if}}
+{{~/eachAlive}}
+
+
 
 
 # If the gateway was shut down cleanly the socket should be cleaned up. We'll

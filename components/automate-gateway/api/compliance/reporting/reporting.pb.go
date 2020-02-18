@@ -3052,6 +3052,12 @@ type ReportingServiceClient interface {
 	//"sort": "latest_report.status", "order": "ASC"
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reports:list
+	//```
 	ListReports(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Reports, error)
 	//
 	//List report IDs
@@ -3061,6 +3067,12 @@ type ReportingServiceClient interface {
 	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//Not limited to 10k results.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportids:list
+	//```
 	ListReportIds(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ReportIds, error)
 	//
 	//List controls
@@ -3068,6 +3080,12 @@ type ReportingServiceClient interface {
 	//Lists controls from the last run, with optional filtering.
 	//Supports filtering, but not pagination or sorting.
 	//Limited to 100 results by default.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:controlItems:list
+	//```
 	ListControlItems(ctx context.Context, in *ControlItemRequest, opts ...grpc.CallOption) (*ControlItems, error)
 	//
 	//Fetch a report
@@ -3075,6 +3093,12 @@ type ReportingServiceClient interface {
 	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reports:get
+	//```
 	ReadReport(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Report, error)
 	//
 	//List suggestions
@@ -3114,6 +3138,12 @@ type ReportingServiceClient interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportSuggestions:list
+	//```
 	ListSuggestions(ctx context.Context, in *SuggestionRequest, opts ...grpc.CallOption) (*Suggestions, error)
 	//
 	//List profiles
@@ -3121,6 +3151,12 @@ type ReportingServiceClient interface {
 	//List all profiles in use, with optional filtering.
 	//Supports pagination, filtering, and sorting.
 	//Valid sort fields: name, title
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportProfiles:list
+	//```
 	ListProfiles(ctx context.Context, in *Query, opts ...grpc.CallOption) (*ProfileMins, error)
 	Export(ctx context.Context, in *Query, opts ...grpc.CallOption) (ReportingService_ExportClient, error)
 	ExportNode(ctx context.Context, in *Query, opts ...grpc.CallOption) (ReportingService_ExportNodeClient, error)
@@ -3130,6 +3166,12 @@ type ReportingServiceClient interface {
 	//Fetch a specific node by ID.
 	//Supports filtering by profile or control.
 	//Does not support pagination or sorting.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportNodes:get
+	//```
 	ReadNode(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Node, error)
 	//
 	//List nodes
@@ -3159,6 +3201,12 @@ type ReportingServiceClient interface {
 	//"page":1,"per_page":100,
 	//"sort":"environment","order":"ASC"
 	//}
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportNodes:list
 	//```
 	ListNodes(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Nodes, error)
 	GetVersion(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*version.VersionInfo, error)
@@ -3350,6 +3398,12 @@ type ReportingServiceServer interface {
 	//"sort": "latest_report.status", "order": "ASC"
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reports:list
+	//```
 	ListReports(context.Context, *Query) (*Reports, error)
 	//
 	//List report IDs
@@ -3359,6 +3413,12 @@ type ReportingServiceServer interface {
 	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//Not limited to 10k results.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportids:list
+	//```
 	ListReportIds(context.Context, *Query) (*ReportIds, error)
 	//
 	//List controls
@@ -3366,6 +3426,12 @@ type ReportingServiceServer interface {
 	//Lists controls from the last run, with optional filtering.
 	//Supports filtering, but not pagination or sorting.
 	//Limited to 100 results by default.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:controlItems:list
+	//```
 	ListControlItems(context.Context, *ControlItemRequest) (*ControlItems, error)
 	//
 	//Fetch a report
@@ -3373,6 +3439,12 @@ type ReportingServiceServer interface {
 	//Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
 	//Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reports:get
+	//```
 	ReadReport(context.Context, *Query) (*Report, error)
 	//
 	//List suggestions
@@ -3412,6 +3484,12 @@ type ReportingServiceServer interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportSuggestions:list
+	//```
 	ListSuggestions(context.Context, *SuggestionRequest) (*Suggestions, error)
 	//
 	//List profiles
@@ -3419,6 +3497,12 @@ type ReportingServiceServer interface {
 	//List all profiles in use, with optional filtering.
 	//Supports pagination, filtering, and sorting.
 	//Valid sort fields: name, title
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportProfiles:list
+	//```
 	ListProfiles(context.Context, *Query) (*ProfileMins, error)
 	Export(*Query, ReportingService_ExportServer) error
 	ExportNode(*Query, ReportingService_ExportNodeServer) error
@@ -3428,6 +3512,12 @@ type ReportingServiceServer interface {
 	//Fetch a specific node by ID.
 	//Supports filtering by profile or control.
 	//Does not support pagination or sorting.
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportNodes:get
+	//```
 	ReadNode(context.Context, *Id) (*Node, error)
 	//
 	//List nodes
@@ -3457,6 +3547,12 @@ type ReportingServiceServer interface {
 	//"page":1,"per_page":100,
 	//"sort":"environment","order":"ASC"
 	//}
+	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//compliance:reportNodes:list
 	//```
 	ListNodes(context.Context, *Query) (*Nodes, error)
 	GetVersion(context.Context, *empty.Empty) (*version.VersionInfo, error)

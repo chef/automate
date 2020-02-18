@@ -30,6 +30,12 @@ service StatsService {
 		]
 	}
 	```
+
+	Authorization Action:
+
+	```
+	compliance:reportSummary:get
+	```
 	*/
 	rpc ReadSummary(Query) returns (Summary) {
 		option (google.api.http) = {
@@ -66,6 +72,12 @@ service StatsService {
 		]
 	}
 	```
+
+	Authorization Action:
+
+	```
+	compliance:reportTrend:get
+	```
 	*/
 	rpc ReadTrend(Query) returns (Trends) {
 		option (google.api.http) = {
@@ -101,6 +113,12 @@ service StatsService {
 		]
 	}
 	```
+
+	Authorization Action:
+
+	```
+	compliance:reportProfiles:get
+	```
 	*/
 	rpc ReadProfiles(Query) returns (Profile) {
 		option (google.api.http) = {
@@ -134,6 +152,12 @@ service StatsService {
 			{"type":"types","values":["platform","environment"]}
 		]
 	}
+	```
+
+	Authorization Action:
+
+	```
+	compliance:reportFailures:get
 	```
 	*/
 	rpc ReadFailures(Query) returns (Failures) {

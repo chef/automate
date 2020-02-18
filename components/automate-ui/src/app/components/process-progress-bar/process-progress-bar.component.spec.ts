@@ -135,7 +135,7 @@ describe('ProcessProgressBarComponent', () => {
       component.projects.applyRulesStart(); // start the update
       store.dispatch(new GetApplyRulesStatusSuccess( // side effect of the update
         genState(ApplyRulesStatusState.Running)));
-      expect(component.percentageComplete).toEqual(0.5);
+      expect(component.percentageComplete).toEqual(50);
     });
   });
 

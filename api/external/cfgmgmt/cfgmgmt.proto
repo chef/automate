@@ -39,6 +39,12 @@ service ConfigMgmt {
   ```
   cfgmgmt/nodes?pagination.page=1&pagination.size=100&sorting.field=name&sorting.order=ASC&filter=name:mySO*&filter=platform:ubun*
   ```
+
+	Authorization Action:
+
+	```
+	infra:nodes:list
+	```
 	*/
   rpc GetNodes(cfgmgmt.request.Nodes) returns (google.protobuf.ListValue) {
     option (google.api.http).get = "/cfgmgmt/nodes";
@@ -54,6 +60,12 @@ service ConfigMgmt {
   Returns a list of run metadata (id, start and end time, and status) for the provided node ID. 
   Supports pagination.
   Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
+
+	Authorization Action:
+
+	```
+	infra:nodes:list
+	```
 	*/
   rpc GetRuns(cfgmgmt.request.Runs) returns (google.protobuf.ListValue) {
     option (google.api.http).get = "/cfgmgmt/nodes/{node_id}/runs";
@@ -73,6 +85,12 @@ service ConfigMgmt {
   ```
   cfgmgmt/stats/node_counts?filter=name:mySO*&filter=platform:ubun*
   ```
+
+	Authorization Action:
+
+	```
+	infra:nodes:list
+	```
 	*/
   rpc GetNodesCounts (cfgmgmt.request.NodesCounts) returns (cfgmgmt.response.NodesCounts) {
     option (google.api.http).get = "/cfgmgmt/stats/node_counts";
@@ -91,6 +109,12 @@ service ConfigMgmt {
   ```
   cfgmgmt/stats/run_counts?node_id=821fff07-abc9-4160-96b1-83d68ae5cfdd&start=2019-11-02
   ```
+
+	Authorization Action:
+
+	```
+	infra:nodes:list
+	```
 	*/
   rpc GetRunsCounts (cfgmgmt.request.RunsCounts) returns (cfgmgmt.response.RunsCounts) {
     option (google.api.http).get = "/cfgmgmt/stats/run_counts";
@@ -104,6 +128,12 @@ service ConfigMgmt {
   GetNodeRun
 
   Returns the infra run report for the provided node ID and run ID.
+
+	Authorization Action:
+
+	```
+	infra:nodes:get
+	```
 	*/
   rpc GetNodeRun (cfgmgmt.request.NodeRun) returns (cfgmgmt.response.Run) {
     option (google.api.http).get = "/cfgmgmt/nodes/{node_id}/runs/{run_id}";
@@ -124,6 +154,12 @@ service ConfigMgmt {
   ```
   cfgmgmt/suggestions?type=environment&text=_d
   ```
+
+	Authorization Action:
+
+	```
+	infra:nodes:list
+	```
 	*/
   rpc GetSuggestions (common.query.Suggestion) returns (google.protobuf.ListValue) {
     option (google.api.http).get = "/cfgmgmt/suggestions";
@@ -138,6 +174,12 @@ service ConfigMgmt {
   GetOrganizations
 
   Returns a list of all organizations associated with nodes that have checked in to Automate.
+
+	Authorization Action:
+
+	```
+	infra:nodes:list
+	```
 	*/
   rpc GetOrganizations(cfgmgmt.request.Organizations) returns (google.protobuf.ListValue) {
     option (google.api.http).get = "/cfgmgmt/organizations";
@@ -152,6 +194,12 @@ service ConfigMgmt {
   GetSourceFqdns
 
   Returns a list of all chef servers associated with nodes that have checked in to Automate.
+
+	Authorization Action:
+
+	```
+	infra:nodes:list
+	```
 	*/
   rpc GetSourceFqdns(cfgmgmt.request.SourceFqdns) returns (google.protobuf.ListValue) {
     option (google.api.http).get = "/cfgmgmt/source_fqdns";
@@ -166,6 +214,12 @@ service ConfigMgmt {
   GetAttributes
 
   Returns the latest reported attributes for the provided node ID.
+
+	Authorization Action:
+
+	```
+	infra:nodes:get
+	```
 	*/
   rpc GetAttributes (cfgmgmt.request.Node) returns (cfgmgmt.response.NodeAttribute) {
     option (google.api.http).get = "/cfgmgmt/nodes/{node_id}/attribute";
@@ -191,6 +245,12 @@ service ConfigMgmt {
 
   Returns Policy Names with a list of cookbook names and associated policy identifiers based on a policy revision ID. 
   Policy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.
+
+	Authorization Action:
+
+	```
+	infra:nodes:list
+	```
 	*/
   rpc GetPolicyCookbooks(cfgmgmt.request.PolicyRevision) returns (cfgmgmt.response.PolicyCookbooks) {
     option (google.api.http).get =  "/cfgmgmt/policy_revision/{revision_id}";

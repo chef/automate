@@ -34,6 +34,11 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
   public RFC2822 = DateTime.RFC2822;
   public selectedSearchBarFilters = [];
 
+  // Health Check Accordions
+  public LINES_OUTPUT_3 = 138;  // provides max of 3 lines of output visible by default;
+  public activeErrorAccordions: number[] = [];
+  public activeHealthAccordions: number[] = [];
+
   public services$: Observable<GroupService[]>;
   public serviceGroupsStatus$: Observable<EntityStatus>;
   public serviceGroupsError$: Observable<HttpErrorResponse>;
@@ -114,6 +119,22 @@ export class ServicesSidebarComponent implements OnInit, OnDestroy {
 
       this.store.dispatch(new UpdateSelectedSG(paramsForDispatch));
       document.querySelector<HTMLElement>('app-services-sidebar').focus();
+    }
+  }
+
+  public toggleMoreErrorMsg(index: number) {
+    if (this.activeErrorAccordions.includes(index)) {
+      this.activeErrorAccordions = this.activeErrorAccordions.filter(n => n !== index); // close
+    } else {
+      this.activeErrorAccordions.push(index); // open accordion
+    }
+  }
+
+  public toggleMoreHealthMsg(index: number) {
+    if (this.activeHealthAccordions.includes(index)) {
+      this.activeHealthAccordions = this.activeHealthAccordions.filter(n => n !== index); // close
+    } else {
+      this.activeHealthAccordions.push(index); // open accordion
     }
   }
 

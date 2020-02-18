@@ -211,8 +211,27 @@ defmodule Notifications.Data.Store do
      unqualified_type_name(type), url, secret_id, critical_controls_only]
   end
 
-  defp rule_event_to_value(event), do: Rule.Event.value(String.to_atom(event))
-  defp rule_value_to_event(value), do: Rule.Event.key(value)
+  defp rule_event_to_value(event) when is_integer(event) do 
+    event
+  end
+
+  defp rule_event_to_value(event) when is_atom(event) do 
+    Rule.Event.value(String.to_atom(event))
+  end
+
+  defp rule_event_to_value(event) do 
+    Rule.Event.value(String.to_atom(event))
+  end
+
+  defp rule_value_to_event(value) when is_atom(value) do 
+    value
+  end
+
+  defp rule_value_to_event(value) do 
+    Rule.Event.key(value)
+  end
+
+
   defp propval(list, key), do: :proplists.get_value(key, list)
   defp unqualified_type_name(qualified_name), do: List.last(Module.split(qualified_name))
 end

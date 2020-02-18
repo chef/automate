@@ -23,6 +23,7 @@ import (
 	pb_cfgmgmt "github.com/chef/automate/api/external/cfgmgmt"
 	pb_data_feed "github.com/chef/automate/api/external/data_feed"
 	pb_data_lifecycle "github.com/chef/automate/api/external/data_lifecycle"
+	pb_infra_proxy "github.com/chef/automate/api/external/infra_proxy"
 	pb_ingest "github.com/chef/automate/api/external/ingest"
 	pb_nodes "github.com/chef/automate/api/external/nodes"
 	pb_nodes_manager "github.com/chef/automate/api/external/nodes/manager"
@@ -61,6 +62,7 @@ import (
 	handler_teams "github.com/chef/automate/components/automate-gateway/handler/iam/v2/teams"
 	handler_tokens "github.com/chef/automate/components/automate-gateway/handler/iam/v2/tokens"
 	handler_users "github.com/chef/automate/components/automate-gateway/handler/iam/v2/users"
+	handler_infra_proxy "github.com/chef/automate/components/automate-gateway/handler/infra_proxy"
 
 	// anything else
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
@@ -315,6 +317,12 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	)
 	pb_data_lifecycle.RegisterDataLifecycleServer(grpcServer, dataLifecycleServer)
 
+	infraProxyClient, err := clients.InfraProxyClient()
+	if err != nil {
+		return errors.Wrap(err, "create client for infra proxy service")
+	}
+	pb_infra_proxy.RegisterInfraProxyServer(grpcServer, handler_infra_proxy.NewInfraProxyHandler(infraProxyClient))
+
 	// Reflection to be able to make grpcurl calls
 	reflection.Register(grpcServer)
 
@@ -363,6 +371,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"data-feed":            pb_data_feed.RegisterDatafeedServiceHandlerFromEndpoint,
 		"data-lifecycle":       pb_data_lifecycle.RegisterDataLifecycleHandlerFromEndpoint,
 		"applications":         pb_apps.RegisterApplicationsServiceHandlerFromEndpoint,
+		"infra-proxy":          pb_infra_proxy.RegisterInfraProxyHandlerFromEndpoint,
 	})
 }
 

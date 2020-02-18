@@ -30,6 +30,118 @@ defmodule Notifications.TimeInfo do
   field :end_time, 2, type: :string
 end
 
+defmodule Notifications.Profile.Control.Result do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          status: String.t(),
+          code_desc: String.t(),
+          run_time: float | :infinity | :negative_infinity | :nan,
+          start_time: String.t(),
+          message: String.t(),
+          skip_message: String.t()
+        }
+  defstruct [:status, :code_desc, :run_time, :start_time, :message, :skip_message]
+
+  field :status, 1, type: :string
+  field :code_desc, 2, type: :string
+  field :run_time, 3, type: :float
+  field :start_time, 4, type: :string
+  field :message, 5, type: :string
+  field :skip_message, 6, type: :string
+end
+
+defmodule Notifications.Profile.Control.ResultTotals do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          num_tests: integer,
+          num_failed_tests: integer,
+          num_skipped_tests: integer,
+          num_passed_tests: integer
+        }
+  defstruct [:num_tests, :num_failed_tests, :num_skipped_tests, :num_passed_tests]
+
+  field :num_tests, 1, type: :int32
+  field :num_failed_tests, 2, type: :int32
+  field :num_skipped_tests, 3, type: :int32
+  field :num_passed_tests, 4, type: :int32
+end
+
+defmodule Notifications.Profile.Control do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          id: String.t(),
+          impact: float | :infinity | :negative_infinity | :nan,
+          title: String.t(),
+          code: String.t(),
+          desc: String.t(),
+          source_location: Notifications.SourceLocation.t() | nil,
+          refs: [Notifications.Refs.t()],
+          failed_results: [Notifications.Profile.Control.Result.t()],
+          stats: Notifications.Profile.Control.ResultTotals.t() | nil
+        }
+  defstruct [:id, :impact, :title, :code, :desc, :source_location, :refs, :failed_results, :stats]
+
+  field :id, 1, type: :string
+  field :impact, 2, type: :float
+  field :title, 3, type: :string
+  field :code, 4, type: :string
+  field :desc, 5, type: :string
+  field :source_location, 6, type: Notifications.SourceLocation
+  field :refs, 7, repeated: true, type: Notifications.Refs
+  field :failed_results, 9, repeated: true, type: Notifications.Profile.Control.Result
+  field :stats, 10, type: Notifications.Profile.Control.ResultTotals
+end
+
+defmodule Notifications.Profile.Attribute.Options do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          description: String.t()
+        }
+  defstruct [:description]
+
+  field :description, 1, type: :string
+end
+
+defmodule Notifications.Profile.Attribute do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          name: String.t(),
+          options: Notifications.Profile.Attribute.Options.t() | nil
+        }
+  defstruct [:name, :options]
+
+  field :name, 1, type: :string
+  field :options, 2, type: Notifications.Profile.Attribute.Options
+end
+
+defmodule Notifications.Profile.ControlTotals do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          num_tests: integer,
+          num_failed_tests: integer,
+          num_skipped_tests: integer,
+          num_passed_tests: integer
+        }
+  defstruct [:num_tests, :num_failed_tests, :num_skipped_tests, :num_passed_tests]
+
+  field :num_tests, 1, type: :int32
+  field :num_failed_tests, 2, type: :int32
+  field :num_skipped_tests, 3, type: :int32
+  field :num_passed_tests, 4, type: :int32
+end
+
 defmodule Notifications.Profile do
   @moduledoc false
   use Protobuf, syntax: :proto3
@@ -78,118 +190,6 @@ defmodule Notifications.Profile do
   field :attributes, 11, repeated: true, type: Notifications.Profile.Attribute
   field :failed_controls, 12, repeated: true, type: Notifications.Profile.Control
   field :stats, 13, type: Notifications.Profile.ControlTotals
-end
-
-defmodule Notifications.Profile.Control do
-  @moduledoc false
-  use Protobuf, syntax: :proto3
-
-  @type t :: %__MODULE__{
-          id: String.t(),
-          impact: float | :infinity | :negative_infinity | :nan,
-          title: String.t(),
-          code: String.t(),
-          desc: String.t(),
-          source_location: Notifications.SourceLocation.t() | nil,
-          refs: [Notifications.Refs.t()],
-          failed_results: [Notifications.Profile.Control.Result.t()],
-          stats: Notifications.Profile.Control.ResultTotals.t() | nil
-        }
-  defstruct [:id, :impact, :title, :code, :desc, :source_location, :refs, :failed_results, :stats]
-
-  field :id, 1, type: :string
-  field :impact, 2, type: :float
-  field :title, 3, type: :string
-  field :code, 4, type: :string
-  field :desc, 5, type: :string
-  field :source_location, 6, type: Notifications.SourceLocation
-  field :refs, 7, repeated: true, type: Notifications.Refs
-  field :failed_results, 9, repeated: true, type: Notifications.Profile.Control.Result
-  field :stats, 10, type: Notifications.Profile.Control.ResultTotals
-end
-
-defmodule Notifications.Profile.Control.Result do
-  @moduledoc false
-  use Protobuf, syntax: :proto3
-
-  @type t :: %__MODULE__{
-          status: String.t(),
-          code_desc: String.t(),
-          run_time: float | :infinity | :negative_infinity | :nan,
-          start_time: String.t(),
-          message: String.t(),
-          skip_message: String.t()
-        }
-  defstruct [:status, :code_desc, :run_time, :start_time, :message, :skip_message]
-
-  field :status, 1, type: :string
-  field :code_desc, 2, type: :string
-  field :run_time, 3, type: :float
-  field :start_time, 4, type: :string
-  field :message, 5, type: :string
-  field :skip_message, 6, type: :string
-end
-
-defmodule Notifications.Profile.Control.ResultTotals do
-  @moduledoc false
-  use Protobuf, syntax: :proto3
-
-  @type t :: %__MODULE__{
-          num_tests: integer,
-          num_failed_tests: integer,
-          num_skipped_tests: integer,
-          num_passed_tests: integer
-        }
-  defstruct [:num_tests, :num_failed_tests, :num_skipped_tests, :num_passed_tests]
-
-  field :num_tests, 1, type: :int32
-  field :num_failed_tests, 2, type: :int32
-  field :num_skipped_tests, 3, type: :int32
-  field :num_passed_tests, 4, type: :int32
-end
-
-defmodule Notifications.Profile.Attribute do
-  @moduledoc false
-  use Protobuf, syntax: :proto3
-
-  @type t :: %__MODULE__{
-          name: String.t(),
-          options: Notifications.Profile.Attribute.Options.t() | nil
-        }
-  defstruct [:name, :options]
-
-  field :name, 1, type: :string
-  field :options, 2, type: Notifications.Profile.Attribute.Options
-end
-
-defmodule Notifications.Profile.Attribute.Options do
-  @moduledoc false
-  use Protobuf, syntax: :proto3
-
-  @type t :: %__MODULE__{
-          description: String.t()
-        }
-  defstruct [:description]
-
-  field :description, 1, type: :string
-end
-
-defmodule Notifications.Profile.ControlTotals do
-  @moduledoc false
-  use Protobuf, syntax: :proto3
-
-  @type t :: %__MODULE__{
-          num_tests: integer,
-          num_failed_tests: integer,
-          num_skipped_tests: integer,
-          num_passed_tests: integer
-        }
-  defstruct [:num_tests, :num_failed_tests, :num_skipped_tests, :num_passed_tests]
-
-  field :num_tests, 1, type: :int32
-  field :num_failed_tests, 2, type: :int32
-  field :num_skipped_tests, 3, type: :int32
-  field :num_passed_tests, 4, type: :int32
 end
 
 defmodule Notifications.SourceLocation do
@@ -260,6 +260,26 @@ defmodule Notifications.ComplianceSuccess do
   field :timestamp, 6, type: :string
 end
 
+defmodule Notifications.ComplianceFailure.ControlTotals do
+  @moduledoc false
+  use Protobuf, syntax: :proto3
+
+  @type t :: %__MODULE__{
+          skipped: integer,
+          passed: integer,
+          failed: integer,
+          critical: integer,
+          critical_failed: integer
+        }
+  defstruct [:skipped, :passed, :failed, :critical, :critical_failed]
+
+  field :skipped, 1, type: :int32
+  field :passed, 2, type: :int32
+  field :failed, 3, type: :int32
+  field :critical, 4, type: :int32
+  field :critical_failed, 5, type: :int32
+end
+
 defmodule Notifications.ComplianceFailure do
   @moduledoc false
   use Protobuf, syntax: :proto3
@@ -296,26 +316,6 @@ defmodule Notifications.ComplianceFailure do
   field :failed_profiles, 7, repeated: true, type: Notifications.Profile
   field :end_time, 8, type: :string
   field :timestamp, 9, type: :string
-end
-
-defmodule Notifications.ComplianceFailure.ControlTotals do
-  @moduledoc false
-  use Protobuf, syntax: :proto3
-
-  @type t :: %__MODULE__{
-          skipped: integer,
-          passed: integer,
-          failed: integer,
-          critical: integer,
-          critical_failed: integer
-        }
-  defstruct [:skipped, :passed, :failed, :critical, :critical_failed]
-
-  field :skipped, 1, type: :int32
-  field :passed, 2, type: :int32
-  field :failed, 3, type: :int32
-  field :critical, 4, type: :int32
-  field :critical_failed, 5, type: :int32
 end
 
 defmodule Notifications.CCRFailure do

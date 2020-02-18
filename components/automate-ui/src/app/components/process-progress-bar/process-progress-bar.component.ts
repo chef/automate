@@ -38,7 +38,7 @@ export class ProcessProgressBarComponent implements OnInit {
         }
         this.applyRulesInProgress = state === ApplyRulesStatusState.Running;
         if (!this.cancelRulesInProgress && state === ApplyRulesStatusState.Running) {
-          this.percentageComplete = percentageComplete;
+          this.percentageComplete = Math.floor(percentageComplete);
         }
         this.layoutFacade.layout.userNotifications.updatesProcessing = this.applyRulesInProgress;
         this.layoutFacade.updateDisplay();

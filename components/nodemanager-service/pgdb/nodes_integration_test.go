@@ -610,3 +610,26 @@ func (suite *NodesIntegrationSuite) TestFilterByScanDataAndRunDataStatus() {
 	suite.Equal(nodes.LastContactData_FAILED, listNodes[0].GetScanData().GetStatus())
 	suite.Equal(nodes.LastContactData_PASSED, listNodes[0].GetRunData().GetStatus())
 }
+
+func (suite *NodesIntegrationSuite) TestGetNodeDoesNotReturnDuplicatedData() {
+	ctx := context.Background()
+
+	mgr1 := manager.NodeManager{Name: "mgr1", Type: "aws-ec2"}
+	mgrID1, err := suite.Database.AddNodeManager(&mgr1, "11111111")
+	suite.Require().NoError(err)
+
+	node1 := manager.ManagerNode{Id: "i-1111111", Region: "us-west-2", Host: "Node1"}
+	nodeIds := suite.Database.AddManagerNodesToDB([]*manager.ManagerNode{&node1}, mgrID1, "242403433", []*manager.CredentialsByTags{}, "aws-ec2")
+	suite.Require().Equal(1, len(nodeIds))
+	nodeId := nodeIds[0]
+
+	tags := []*common.Kv{{Key: "nachos", Value: "yes"}, {Key: "tacos", Value: "no"}}
+	projects := []string{"Favorite Food", "Taco Bell Menu"}
+	err = suite.Database.UpdateNode(&nodes.Node{Id: nodeId, Projects: projects, Tags: tags})
+	suite.Require().NoError(err)
+
+	testNode, err := suite.Database.GetNode(ctx, nodeId)
+	suite.Require().NoError(err)
+	suite.Equal(projects, testNode.Projects)
+	suite.Equal(tags, testNode.Tags)
+}

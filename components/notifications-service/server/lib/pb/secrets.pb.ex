@@ -1,3 +1,13 @@
+defmodule Chef.Automate.Api.Secrets.Query.OrderType do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto3
+
+  @type t :: integer | :ASC | :DESC
+
+  field :ASC, 0
+  field :DESC, 1
+end
+
 defmodule Chef.Automate.Api.Secrets.UpdateResponse do
   @moduledoc false
   use Protobuf, syntax: :proto3
@@ -32,7 +42,7 @@ defmodule Chef.Automate.Api.Secrets.Query do
 
   @type t :: %__MODULE__{
           filters: [Chef.Automate.Api.Secrets.Filter.t()],
-          order: atom | integer,
+          order: Chef.Automate.Api.Secrets.Query.OrderType.t(),
           sort: String.t(),
           page: integer,
           per_page: integer
@@ -44,14 +54,6 @@ defmodule Chef.Automate.Api.Secrets.Query do
   field :sort, 22, type: :string
   field :page, 23, type: :int32
   field :per_page, 24, type: :int32
-end
-
-defmodule Chef.Automate.Api.Secrets.Query.OrderType do
-  @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
-
-  field :ASC, 0
-  field :DESC, 1
 end
 
 defmodule Chef.Automate.Api.Secrets.Secret do

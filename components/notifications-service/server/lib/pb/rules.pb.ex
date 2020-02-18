@@ -1,3 +1,94 @@
+defmodule Notifications.Rule.Event do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto3
+
+  @type t :: integer | :CCRFailure | :CCRSuccess | :ComplianceFailure | :ComplianceSuccess
+
+  field :CCRFailure, 0
+  field :CCRSuccess, 1
+  field :ComplianceFailure, 2
+  field :ComplianceSuccess, 3
+end
+
+defmodule Notifications.URLValidationResponse.Code do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto3
+
+  @type t :: integer | :OK | :ERROR | :INVALID_URL | :NOTIFICATIONS_UNAVAIALBLE | :INTERNAL_ERROR
+
+  field :OK, 0
+  field :ERROR, 1
+  field :INVALID_URL, 4
+  field :NOTIFICATIONS_UNAVAIALBLE, 98
+  field :INTERNAL_ERROR, 99
+end
+
+defmodule Notifications.RuleUpdateResponse.Code do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto3
+
+  @type t :: integer | :OK | :DUPLICATE_NAME | :NOT_FOUND | :VALIDATION_ERROR | :INTERNAL_ERROR
+
+  field :OK, 0
+  field :DUPLICATE_NAME, 1
+  field :NOT_FOUND, 2
+  field :VALIDATION_ERROR, 4
+  field :INTERNAL_ERROR, 99
+end
+
+defmodule Notifications.RuleDeleteResponse.Code do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto3
+
+  @type t :: integer | :DELETED | :NOT_FOUND | :INTERNAL_ERROR
+
+  field :DELETED, 0
+  field :NOT_FOUND, 2
+  field :INTERNAL_ERROR, 99
+end
+
+defmodule Notifications.RuleAddResponse.Code do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto3
+
+  @type t ::
+          integer
+          | :ADDED
+          | :DUPLICATE_NAME
+          | :NOT_FOUND
+          | :INVALID_ACTION_CONFIG
+          | :VALIDATION_ERROR
+          | :INTERNAL_ERROR
+
+  field :ADDED, 0
+  field :DUPLICATE_NAME, 1
+  field :NOT_FOUND, 2
+  field :INVALID_ACTION_CONFIG, 3
+  field :VALIDATION_ERROR, 4
+  field :INTERNAL_ERROR, 99
+end
+
+defmodule Notifications.RuleGetResponse.Code do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto3
+
+  @type t :: integer | :OK | :NOT_FOUND | :INTERNAL_ERROR
+
+  field :OK, 0
+  field :NOT_FOUND, 2
+  field :INTERNAL_ERROR, 99
+end
+
+defmodule Notifications.RuleListResponse.Code do
+  @moduledoc false
+  use Protobuf, enum: true, syntax: :proto3
+
+  @type t :: integer | :OK | :INTERNAL_ERROR
+
+  field :OK, 0
+  field :INTERNAL_ERROR, 99
+end
+
 defmodule Notifications.Empty do
   @moduledoc false
   use Protobuf, syntax: :proto3
@@ -54,7 +145,7 @@ defmodule Notifications.Rule do
           action: {atom, any},
           id: String.t(),
           name: String.t(),
-          event: atom | integer
+          event: Notifications.Rule.Event.t()
         }
   defstruct [:action, :id, :name, :event]
 
@@ -65,16 +156,6 @@ defmodule Notifications.Rule do
   field :SlackAlert, 4, type: Notifications.SlackAlert, oneof: 0
   field :WebhookAlert, 5, type: Notifications.WebhookAlert, oneof: 0
   field :ServiceNowAlert, 6, type: Notifications.ServiceNowAlert, oneof: 0
-end
-
-defmodule Notifications.Rule.Event do
-  @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
-
-  field :CCRFailure, 0
-  field :CCRSuccess, 1
-  field :ComplianceFailure, 2
-  field :ComplianceSuccess, 3
 end
 
 defmodule Notifications.UsernamePassword do
@@ -125,24 +206,13 @@ defmodule Notifications.URLValidationResponse do
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          code: atom | integer,
+          code: Notifications.URLValidationResponse.Code.t(),
           messages: [String.t()]
         }
   defstruct [:code, :messages]
 
   field :code, 1, type: Notifications.URLValidationResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
-end
-
-defmodule Notifications.URLValidationResponse.Code do
-  @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
-
-  field :OK, 0
-  field :ERROR, 1
-  field :INVALID_URL, 4
-  field :NOTIFICATIONS_UNAVAIALBLE, 98
-  field :INTERNAL_ERROR, 99
 end
 
 defmodule Notifications.RuleIdentifier do
@@ -162,7 +232,7 @@ defmodule Notifications.RuleUpdateResponse do
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          code: atom | integer,
+          code: Notifications.RuleUpdateResponse.Code.t(),
           messages: [String.t()]
         }
   defstruct [:code, :messages]
@@ -171,23 +241,12 @@ defmodule Notifications.RuleUpdateResponse do
   field :messages, 2, repeated: true, type: :string
 end
 
-defmodule Notifications.RuleUpdateResponse.Code do
-  @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
-
-  field :OK, 0
-  field :DUPLICATE_NAME, 1
-  field :NOT_FOUND, 2
-  field :VALIDATION_ERROR, 4
-  field :INTERNAL_ERROR, 99
-end
-
 defmodule Notifications.RuleDeleteResponse do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          code: atom | integer,
+          code: Notifications.RuleDeleteResponse.Code.t(),
           messages: [String.t()]
         }
   defstruct [:code, :messages]
@@ -196,21 +255,12 @@ defmodule Notifications.RuleDeleteResponse do
   field :messages, 2, repeated: true, type: :string
 end
 
-defmodule Notifications.RuleDeleteResponse.Code do
-  @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
-
-  field :DELETED, 0
-  field :NOT_FOUND, 2
-  field :INTERNAL_ERROR, 99
-end
-
 defmodule Notifications.RuleAddResponse do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          code: atom | integer,
+          code: Notifications.RuleAddResponse.Code.t(),
           messages: [String.t()],
           id: String.t()
         }
@@ -221,24 +271,12 @@ defmodule Notifications.RuleAddResponse do
   field :id, 3, type: :string
 end
 
-defmodule Notifications.RuleAddResponse.Code do
-  @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
-
-  field :ADDED, 0
-  field :DUPLICATE_NAME, 1
-  field :NOT_FOUND, 2
-  field :INVALID_ACTION_CONFIG, 3
-  field :VALIDATION_ERROR, 4
-  field :INTERNAL_ERROR, 99
-end
-
 defmodule Notifications.RuleGetResponse do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          code: atom | integer,
+          code: Notifications.RuleGetResponse.Code.t(),
           messages: [String.t()],
           rule: Notifications.Rule.t() | nil
         }
@@ -249,21 +287,12 @@ defmodule Notifications.RuleGetResponse do
   field :rule, 3, type: Notifications.Rule
 end
 
-defmodule Notifications.RuleGetResponse.Code do
-  @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
-
-  field :OK, 0
-  field :NOT_FOUND, 2
-  field :INTERNAL_ERROR, 99
-end
-
 defmodule Notifications.RuleListResponse do
   @moduledoc false
   use Protobuf, syntax: :proto3
 
   @type t :: %__MODULE__{
-          code: atom | integer,
+          code: Notifications.RuleListResponse.Code.t(),
           messages: [String.t()],
           rules: [Notifications.Rule.t()]
         }
@@ -272,12 +301,4 @@ defmodule Notifications.RuleListResponse do
   field :code, 1, type: Notifications.RuleListResponse.Code, enum: true
   field :messages, 2, repeated: true, type: :string
   field :rules, 3, repeated: true, type: Notifications.Rule
-end
-
-defmodule Notifications.RuleListResponse.Code do
-  @moduledoc false
-  use Protobuf, enum: true, syntax: :proto3
-
-  field :OK, 0
-  field :INTERNAL_ERROR, 99
 end

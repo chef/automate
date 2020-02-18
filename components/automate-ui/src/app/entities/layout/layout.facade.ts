@@ -14,8 +14,8 @@ import { GetProjects } from 'app/entities/projects/project.actions';
 enum Height {
   Navigation = 70,
   License = 39,
-  ProcessProgressBar = 48,
-  PendingEditsBar = 36
+  ProcessProgressBar = 54,
+  PendingEditsBar = 52
 }
 
 @Injectable({
