@@ -52,7 +52,7 @@ func cleanupEmptyIndicesForPrefix(client *elastic.Client, prefix string, migrata
 
 	for _, catIndicesResponseRow := range catIndicesResponse {
 		indexName := catIndicesResponseRow.Index
-		logrus.Debugf("%nIndex: %s ", indexName)
+		logrus.Debugf("\nIndex: %s ", indexName)
 
 		dateAsStr := strings.SplitAfterN(indexName, "-", 4)
 		dateToRemove, err := time.Parse("2006.01.02", dateAsStr[len(dateAsStr)-1])
@@ -391,7 +391,7 @@ func (backend ES2Backend) getScanDateRange(migratable esMigratable) (*time.Time,
 		if err != nil {
 			return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to delete the empty indices that need to be removed", myName))
 		}
-		return nil, nil, errors.Errorf("%s there were not any reports in elasticsearch indices that are prefixed with %s, these indices, therefore, have been sucessfully deleted", myName, esIndex)
+		return nil, nil, errors.Errorf("%s there were not any reports in elasticsearch indices that are prefixed with %s, these indices, therefore, have been successfully deleted", myName, esIndex)
 	}
 
 	var minDateAsString string
