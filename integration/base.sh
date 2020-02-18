@@ -314,11 +314,21 @@ do_cleanup() {
 }
 
 
+do_dump_logs() {
+    do_dump_logs_default
+}
+
+do_dump_logs_default() {
+    :
+}
+
+
 # if we encounter an error we should dump the logs
 dump_logs() {
     errcode=$?
     break_log "remaining"
     journalctl -u chef-automate -u requestbin -u elasticsearch --no-pager > logs/all
+    do_dump_logs
 
     if command -v buildkite-agent
     then
@@ -331,6 +341,7 @@ dump_logs() {
                 echo "Failed to upload elasticsearch logs"
             fi
         fi
+
 
         if ! buildkite-agent artifact upload "logs/*"
         then
