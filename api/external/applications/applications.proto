@@ -319,8 +319,8 @@ message ServicesReq {
   // * `site`: the site field of the service's event-stream metadata
   // * `group`: the suffix of the service group name
   //
-  // `status` filters refine the service results by a service's
-  //  most recent connected/disconnected state or healthcheck result.
+  // `status` filters refine the service results by
+  //  current state or most recent healthcheck result.
   //  Valid status filter parameters are:
   // * `status:disconnected`: returns services in a disconnected state
   // * `status:critical`: returns services with a "critical" healthcheck result
