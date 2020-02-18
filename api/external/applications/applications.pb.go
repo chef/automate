@@ -88,8 +88,12 @@ type ServicesReq struct {
 	// * `site`: the site field of the service's event-stream metadata
 	// * `group`: the suffix of the service group name
 	//
-	// `status` filters refine the service results by a service's
-	//  most recent connected/disconnected state or healthcheck result.
+	// `status` filters refine service results by a service's
+	//  current state or most recent healthcheck result.
+	//  Disconnected services keep their last healthcheck result
+	//  until their reports are removed by Chef Automate.
+	//  When you apply a healthcheck filter, the report includes
+	//  all recently disconnected services.
 	//  Valid status filter parameters are:
 	// * `status:disconnected`: returns services in a disconnected state
 	// * `status:critical`: returns services with a "critical" healthcheck result
@@ -1703,7 +1707,7 @@ type ApplicationsServiceClient interface {
 	//List Service Groups
 	//
 	//Lists service groups with name, health information, and application, environment, package, release metadata.
-	//Accepts pagination, sorting, search and status filters.
+	//Accepts pagination, sorting, search, and status filters.
 	//
 	//Example:
 	//```
@@ -1713,7 +1717,7 @@ type ApplicationsServiceClient interface {
 	//
 	//List Service Groups Health Counts
 	//
-	//Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
+	//Lists the total service group health reports by critical, warning, ok, and unknown responses. Supports search and status filtering.
 	GetServiceGroupsHealthCounts(ctx context.Context, in *ServiceGroupsHealthCountsReq, opts ...grpc.CallOption) (*HealthCounts, error)
 	//
 	//List Services
@@ -1744,7 +1748,7 @@ type ApplicationsServiceClient interface {
 	//
 	//Show Summary
 	//
-	//Shows a summary of service-groups, services, deployments and supervisors.
+	//Shows a summary of service-groups, services, deployments, and supervisors.
 	//Used for telemetry.
 	//Does not support filtering.
 	GetServicesStats(ctx context.Context, in *ServicesStatsReq, opts ...grpc.CallOption) (*ServicesStatsRes, error)
@@ -1957,7 +1961,7 @@ type ApplicationsServiceServer interface {
 	//List Service Groups
 	//
 	//Lists service groups with name, health information, and application, environment, package, release metadata.
-	//Accepts pagination, sorting, search and status filters.
+	//Accepts pagination, sorting, search, and status filters.
 	//
 	//Example:
 	//```
@@ -1967,7 +1971,7 @@ type ApplicationsServiceServer interface {
 	//
 	//List Service Groups Health Counts
 	//
-	//Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
+	//Lists the total service group health reports by critical, warning, ok, and unknown responses. Supports search and status filtering.
 	GetServiceGroupsHealthCounts(context.Context, *ServiceGroupsHealthCountsReq) (*HealthCounts, error)
 	//
 	//List Services
@@ -1998,7 +2002,7 @@ type ApplicationsServiceServer interface {
 	//
 	//Show Summary
 	//
-	//Shows a summary of service-groups, services, deployments and supervisors.
+	//Shows a summary of service-groups, services, deployments, and supervisors.
 	//Used for telemetry.
 	//Does not support filtering.
 	GetServicesStats(context.Context, *ServicesStatsReq) (*ServicesStatsRes, error)

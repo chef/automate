@@ -100,7 +100,7 @@ func init() {
     "/applications/service-groups": {
       "get": {
         "summary": "List Service Groups",
-        "description": "Lists service groups with name, health information, and application, environment, package, release metadata.\nAccepts pagination, sorting, search and status filters.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\napplications/service-groups?sorting.field=percent_ok\u0026sorting.order=ASC\u0026pagination.page=1\u0026pagination.size=25\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Lists service groups with name, health information, and application, environment, package, release metadata.\nAccepts pagination, sorting, search, and status filters.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\napplications/service-groups?sorting.field=percent_ok\u0026sorting.order=ASC\u0026pagination.page=1\u0026pagination.size=25\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetServiceGroups",
         "responses": {
           "200": {
@@ -239,7 +239,7 @@ func init() {
     "/applications/service_groups_health_counts": {
       "get": {
         "summary": "List Service Groups Health Counts",
-        "description": "Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.",
+        "description": "Lists the total service group health reports by critical, warning, ok, and unknown responses. Supports search and status filtering.",
         "operationId": "GetServiceGroupsHealthCounts",
         "responses": {
           "200": {
@@ -283,7 +283,7 @@ func init() {
         "parameters": [
           {
             "name": "filter",
-            "description": "Applies search filters, in the format of ` + "`" + `fieldname:value` + "`" + `.\n\nValid filter fieldnames are:\n* ` + "`" + `origin` + "`" + `: origin component of the service's package identifier\n* ` + "`" + `service` + "`" + `: the name component of the service's package identifier\n* ` + "`" + `version` + "`" + `: the version number component of the service's package identifier\n* ` + "`" + `buildstamp` + "`" + `: the build timestamp (also called \"release\") of the service's package identifier\n* ` + "`" + `channel` + "`" + `: the package channel to which the service subscribes for updates\n* ` + "`" + `application` + "`" + `: the application field of the service's event-stream metadata\n* ` + "`" + `environment` + "`" + `: the environment field of the service's event-stream metadata\n* ` + "`" + `site` + "`" + `: the site field of the service's event-stream metadata\n* ` + "`" + `group` + "`" + `: the suffix of the service group name\n\n` + "`" + `status` + "`" + ` filters refine the service results by a service's\n most recent connected/disconnected state or healthcheck result.\n Valid status filter parameters are:\n* ` + "`" + `status:disconnected` + "`" + `: returns services in a disconnected state\n* ` + "`" + `status:critical` + "`" + `: returns services with a \"critical\" healthcheck result\n* ` + "`" + `status:unknown` + "`" + `: returns services with an \"unknown\" healthcheck result\n* ` + "`" + `status:warning` + "`" + `: returns services with a \"warning\" healthcheck result\n* ` + "`" + `status:ok` + "`" + `: returns services with an  \"ok\" health check result",
+            "description": "Applies search filters, in the format of ` + "`" + `fieldname:value` + "`" + `.\n\nValid filter fieldnames are:\n* ` + "`" + `origin` + "`" + `: origin component of the service's package identifier\n* ` + "`" + `service` + "`" + `: the name component of the service's package identifier\n* ` + "`" + `version` + "`" + `: the version number component of the service's package identifier\n* ` + "`" + `buildstamp` + "`" + `: the build timestamp (also called \"release\") of the service's package identifier\n* ` + "`" + `channel` + "`" + `: the package channel to which the service subscribes for updates\n* ` + "`" + `application` + "`" + `: the application field of the service's event-stream metadata\n* ` + "`" + `environment` + "`" + `: the environment field of the service's event-stream metadata\n* ` + "`" + `site` + "`" + `: the site field of the service's event-stream metadata\n* ` + "`" + `group` + "`" + `: the suffix of the service group name\n\n` + "`" + `status` + "`" + ` filters refine service results by a service's\n current state or most recent healthcheck result.\n Disconnected services keep their last healthcheck result\n until their reports are removed by Chef Automate.\n When you apply a healthcheck filter, the report includes\n all recently disconnected services.\n Valid status filter parameters are:\n* ` + "`" + `status:disconnected` + "`" + `: returns services in a disconnected state\n* ` + "`" + `status:critical` + "`" + `: returns services with a \"critical\" healthcheck result\n* ` + "`" + `status:unknown` + "`" + `: returns services with an \"unknown\" healthcheck result\n* ` + "`" + `status:warning` + "`" + `: returns services with a \"warning\" healthcheck result\n* ` + "`" + `status:ok` + "`" + `: returns services with an  \"ok\" health check result",
             "in": "query",
             "required": false,
             "type": "array",
@@ -381,7 +381,7 @@ func init() {
     "/applications/stats": {
       "get": {
         "summary": "Show Summary",
-        "description": "Shows a summary of service-groups, services, deployments and supervisors.\nUsed for telemetry.\nDoes not support filtering.",
+        "description": "Shows a summary of service-groups, services, deployments, and supervisors.\nUsed for telemetry.\nDoes not support filtering.",
         "operationId": "GetServicesStats",
         "responses": {
           "200": {

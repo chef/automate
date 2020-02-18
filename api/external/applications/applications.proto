@@ -21,7 +21,7 @@ service ApplicationsService {
   List Service Groups
 
   Lists service groups with name, health information, and application, environment, package, release metadata.
-  Accepts pagination, sorting, search and status filters.
+  Accepts pagination, sorting, search, and status filters.
 
   Example:
   ```
@@ -45,7 +45,7 @@ service ApplicationsService {
   /*
   List Service Groups Health Counts
 
-  Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
+  Lists the total service group health reports by critical, warning, ok, and unknown responses. Supports search and status filtering.
   */
   rpc GetServiceGroupsHealthCounts(ServiceGroupsHealthCountsReq) returns (HealthCounts) {
     option (google.api.http).get = "/applications/service_groups_health_counts";
@@ -118,7 +118,7 @@ service ApplicationsService {
   /*
   Show Summary
 
-  Shows a summary of service-groups, services, deployments and supervisors.
+  Shows a summary of service-groups, services, deployments, and supervisors.
   Used for telemetry.
   Does not support filtering.
   */
@@ -319,8 +319,12 @@ message ServicesReq {
   // * `site`: the site field of the service's event-stream metadata
   // * `group`: the suffix of the service group name
   //
-  // `status` filters refine the service results by
+  // `status` filters refine service results by a service's
   //  current state or most recent healthcheck result.
+  //  Disconnected services keep their last healthcheck result
+  //  until their reports are removed by Chef Automate.
+  //  When you apply a healthcheck filter, the report includes
+  //  all recently disconnected services.
   //  Valid status filter parameters are:
   // * `status:disconnected`: returns services in a disconnected state
   // * `status:critical`: returns services with a "critical" healthcheck result
