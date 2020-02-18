@@ -651,7 +651,7 @@ These setup steps will make the process as productive as possible for you.
 
 1. Install the `jq` JSON formatter to be able to get pretty-printed output (`brew install jq`).
 1. Install the `jo` JSON generator to be able to type JSON concisely (`brew install jo`).
-1. In habitat studio, generate a non-expiring token (`generate_supertoken`).
+1. In habitat studio, generate a non-expiring token (`get_admin_token`).
 1. Copy that token into the `TOK` value in the following snippet and
   then execute to define these shell variables:
 
