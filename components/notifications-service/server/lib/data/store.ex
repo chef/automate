@@ -215,6 +215,10 @@ defmodule Notifications.Data.Store do
     event
   end
 
+  defp rule_event_to_value(event) when is_atom(event) do 
+    Rule.Event.value(String.to_atom(event))
+  end
+
   defp rule_event_to_value(event) do 
     Rule.Event.value(String.to_atom(event))
   end
