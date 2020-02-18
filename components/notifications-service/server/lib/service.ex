@@ -143,7 +143,7 @@ defmodule Notifications.Service do
   # These two functions rely on our commont Response message structures
   # for the Rules API. Each has a message code (Code enum) and a 'messages' repeating string.
   defp mk_response(type_mod, code, messages) do
-    type_mod.new(code: enum_to_value_for_type(code, type_mod), messages: messages)
+    type_mod.new(code: code, messages: messages)
   end
 
   defp enum_to_value_for_type(code, type_mod) do
