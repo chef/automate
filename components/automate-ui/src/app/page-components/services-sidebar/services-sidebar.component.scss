@@ -210,11 +210,45 @@ chef-alert {
   }
 
   .healthcheck-content {
+    position: relative;
     border-radius: 0 0 2px 2px;
     background-color: var(--chef-primary-dark);
     color: var(--chef-white);
-    padding: 8px;
+    padding: 8px 8px 40px 8px;
     overflow-wrap: break-word;
+    max-height: 94px;
+    overflow: hidden;
+    transition: .25s max-height;
+
+    &.active {
+      // we need enough space for 1024 characters which is the maximum length
+      // of a health message.  540px maps to enough height for a full message
+      // plus room for the button.
+      max-height: 540px;
+    }
+  }
+
+  .show-more-container {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: var(--chef-primary-dark);
+
+    .show-more-button {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: #9CB2F9; // from extended palette
+      padding: 8px;
+      cursor: pointer;
+    }
+
+    .unfold {
+      margin-right: 4px;
+    }
   }
 
   .health-line {

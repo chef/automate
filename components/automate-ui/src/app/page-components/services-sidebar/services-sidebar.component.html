@@ -94,18 +94,34 @@
                 <div class="healthcheck-header {{service.health_check}}">
                   Health Check Error Message
                 </div>
-                <div class="healthcheck-content">
+                <div class="healthcheck-content" [class.active]="activeErrorAccordions.includes(i)">
                   {{service.health_check_result.stderr}}
+                  <div class="show-more-container">
+                    <button 
+                    *ngIf="service.health_check_result.stderr.length > LINES_OUTPUT_3"
+                    (click)="toggleMoreErrorMsg(i)"
+                    class="show-more-button">
+                    <chef-icon class="unfold">{{ activeErrorAccordions.includes(i) ? "unfold_less" : "unfold_more"}}</chef-icon>
+                    Show {{ activeErrorAccordions.includes(i) ? "Less" : "More"}}</button>
+                  </div>
                 </div>
               </div>
               <div class="healthcheck-message" *ngIf="service.health_check_result.stdout !== ''">
                 <div class="healthcheck-header {{service.health_check}}">
                   Health Check Output Message
                 </div>
-                <div class="healthcheck-content">
+                <div class="healthcheck-content" [class.active]="activeHealthAccordions.includes(i)">
                   {{service.health_check_result.stdout}}
+                  <div class="show-more-container">
+                    <button 
+                    *ngIf="service.health_check_result.stdout.length > LINES_OUTPUT_3"
+                    class="show-more-button"
+                    (click)="toggleMoreHealthMsg(i)">
+                    <chef-icon class="unfold">{{ activeHealthAccordions.includes(i) ? "unfold_less" : "unfold_more"}}</chef-icon>
+                    Show {{ activeHealthAccordions.includes(i) ? "Less" : "More"}}</button>
+                  </div>
                 </div>
-               </div>
+              </div>
             </div>
           </div>
         </div>
