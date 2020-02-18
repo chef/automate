@@ -336,14 +336,14 @@ message NodeManager {
 	// User defined name for the node manager.
 	string name = 2;
 	// Type of nodemanager (aws-ec2, azure-vm, aws-api, azure-api, gcp).
-	string type = 3;
-	// UUID of credential containing the information to connect to aws, azure, or gcp.
-	string credential_id = 20;
+  string type = 3;
   // Use either 'credential_id' OR 'credential_data'.
   // 'credential_data' will overwrite values in 'credential_id'.
-  // 'credential_id' is a list of tag and credential uuids for making
-  // node manager associations.
-  // These are ssh, winrm, and sudo credentials needed to access nodes.
+  // The 'credential_id' is the UUID of credential with the information
+  // you need to connect to aws, azure, or gcp.
+	string credential_id = 20;
+  // List of tag and credential UUID associations for making node managers.
+  // These are ssh, winrm, and sudo creds used to access instances.
 	repeated CredentialsByTags instance_credentials = 21;
 	// Status of the nodemanager (reachable, unreachable).
 	string status = 22;

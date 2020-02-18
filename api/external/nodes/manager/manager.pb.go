@@ -449,13 +449,13 @@ type NodeManager struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Type of nodemanager (aws-ec2, azure-vm, aws-api, azure-api, gcp).
 	Type string `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
-	// UUID of credential containing the information to connect to aws, azure, or gcp.
+	// Use either 'credential_id' OR 'credential_data'.
+	// 'credential_data' will overwrite values in 'credential_id'.
+	// The 'credential_id' is the UUID of credential with the information
+	// you need to connect to aws, azure, or gcp.
 	CredentialId string `protobuf:"bytes,20,opt,name=credential_id,json=credentialId,proto3" json:"credential_id,omitempty"`
-	// Use either credential_id OR credential_data.
-	// credential_data will overwrite credential_id.
-	// credential_id is a list of tag and credential uuids for making
-	// node manager associations.
-	// These are ssh, winrm, and sudo credentials needed to access nodes.
+	// List of tag and credential uuid associations for making node managers.
+	// These are ssh, winrm, and sudo creds used to access instances.
 	InstanceCredentials []*CredentialsByTags `protobuf:"bytes,21,rep,name=instance_credentials,json=instanceCredentials,proto3" json:"instance_credentials,omitempty"`
 	// Status of the nodemanager (reachable, unreachable).
 	Status string `protobuf:"bytes,22,opt,name=status,proto3" json:"status,omitempty"`
@@ -463,10 +463,10 @@ type NodeManager struct {
 	AccountId string `protobuf:"bytes,24,opt,name=account_id,json=accountId,proto3" json:"account_id,omitempty"`
 	// Date the nodemanager was created.
 	DateAdded *timestamp.Timestamp `protobuf:"bytes,25,opt,name=date_added,json=dateAdded,proto3" json:"date_added,omitempty"`
-	// Use either credential_data OR credential_id.
-	// credential_data will overwrite credential_id.
-	// Use credential_data when you have not yet created credentials for the node.
-	// You will provide credential data (such as AWS_ACCESS_KEY) inline.
+	// Use either 'credential_data' OR 'credential_id'.
+	// 'credential_data' will overwrite values in 'credential_id'.
+	// Use 'credential_data' when you have not yet created node credentials
+	// and provide credential data (such as AWS_ACCESS_KEY) inline.
 	CredentialData       []*common.Kv `protobuf:"bytes,26,rep,name=credential_data,json=credentialData,proto3" json:"credential_data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
 	XXX_unrecognized     []byte       `json:"-"`

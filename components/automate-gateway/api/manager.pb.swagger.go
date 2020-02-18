@@ -469,14 +469,14 @@ func init() {
         },
         "credential_id": {
           "type": "string",
-          "description": "UUID of credential containing the information to connect to aws, azure, or gcp."
+          "description": "Use either 'credential_id' OR 'credential_data'.\n'credential_data' will overwrite values in 'credential_id'.\nThe 'credential_id' is the UUID of credential with the information\nyou need to connect to aws, azure, or gcp."
         },
         "instance_credentials": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.nodes.manager.v1.CredentialsByTags"
           },
-          "description": "Use either credential_id OR credential_data.\ncredential_data will overwrite credential_id.\ncredential_id is a list of tag and credential uuids for making\nnode manager associations.\nThese are ssh, winrm, and sudo credentials needed to access nodes."
+          "description": "List of tag and credential uuid associations for making node managers.\nThese are ssh, winrm, and sudo creds used to access instances."
         },
         "status": {
           "type": "string",
@@ -496,7 +496,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Kv"
           },
-          "description": "Use either credential_data OR credential_id.\ncredential_data will overwrite credential_id.\nUse credential_data when you have not yet created credentials for the node.\nYou will provide credential data (such as AWS_ACCESS_KEY) inline."
+          "description": "Use either 'credential_data' OR 'credential_id'.\n'credential_data' will overwrite values in 'credential_id'.\nUse 'credential_data' when you have not yet created node credentials\nand provide credential data (such as AWS_ACCESS_KEY) inline."
         }
       },
       "required": [
