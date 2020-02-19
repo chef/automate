@@ -9,8 +9,6 @@ import (
 	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
-	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
 	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
 	iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
@@ -22,10 +20,9 @@ type client struct {
 	apiClientConn *grpc.ClientConn
 	// TODO (tc): Add other service clients here as needed.
 	authzClient        authz.AuthorizationClient
-	teamsClient        teams.TeamsClient
-	teamsV2Client      iam.TeamsClient
-	TokensClient       iam.TokensClient
-	usersClient        users.UsersMgmtClient
+	teamsClient        iam.TeamsClient
+	tokensClient       iam.TokensClient
+	usersClient        iam.UsersClient
 	policiesClient     iam.PoliciesClient
 	reportingClient    reporting.ReportingServiceClient
 	applicationsClient applications.ApplicationsServiceClient
@@ -55,10 +52,9 @@ func OpenConnection(ctx context.Context) (client_type.APIClient, error) {
 		apiClientConn: apiClientConn,
 		// TODO (tc): Add other service clients here as needed.
 		authzClient:        authz.NewAuthorizationClient(apiClientConn),
-		teamsClient:        teams.NewTeamsClient(apiClientConn),
-		teamsV2Client:      iam.NewTeamsClient(apiClientConn),
-		TokensClient:       iam.NewTokensClient(apiClientConn),
-		usersClient:        users.NewUsersMgmtClient(apiClientConn),
+		teamsClient:        iam.NewTeamsClient(apiClientConn),
+		tokensClient:       iam.NewTokensClient(apiClientConn),
+		usersClient:        iam.NewUsersClient(apiClientConn),
 		policiesClient:     iam.NewPoliciesClient(apiClientConn),
 		reportingClient:    reporting.NewReportingServiceClient(apiClientConn),
 		applicationsClient: applications.NewApplicationsServiceClient(apiClientConn),
@@ -69,19 +65,15 @@ func (c client) AuthzClient() authz.AuthorizationClient {
 	return c.authzClient
 }
 
-func (c client) TeamsClient() teams.TeamsClient {
+func (c client) TeamsClient() iam.TeamsClient {
 	return c.teamsClient
 }
 
-func (c client) TeamsV2Client() iam.TeamsClient {
-	return c.teamsV2Client
-}
-
 func (c client) TokensClient() iam.TokensClient {
-	return c.TokensClient
+	return c.tokensClient
 }
 
-func (c client) UsersClient() users.UsersMgmtClient {
+func (c client) UsersClient() iam.UsersClient {
 	return c.usersClient
 }
 

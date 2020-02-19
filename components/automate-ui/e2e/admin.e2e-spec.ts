@@ -15,7 +15,7 @@ describe('Admin pages', () => {
         .reply(200, JSON.stringify(
           {
             endpoints: {
-              '/auth/users': {
+              '/iam/v2/users': {
                 get: true,
                 put: false,
                 post: true,

@@ -9,7 +9,6 @@ import (
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/spf13/cobra"
 
-	authz_constants "github.com/chef/automate/components/authz-service/constants"
 	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/adminmgmt"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
@@ -17,6 +16,8 @@ import (
 	iam_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
 	iam_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 )
+
+const adminsID = "admins"
 
 var iamCmdFlags = struct {
 	dryRun            bool
@@ -157,7 +158,7 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 	}
 
 	// restore admin user and team if needed
-	userID, adminUserFound, err := adminmgmt.CreateAdminUserOrUpdatePassword(ctx,
+	membershipID, adminUserFound, err := adminmgmt.CreateAdminUserOrUpdatePassword(ctx,
 		apiClient, newAdminPassword, iamCmdFlags.dryRun)
 	if err != nil {
 		return err
@@ -169,8 +170,7 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 		writer.Success("Created new admin user with specified password")
 	}
 
-	adminsTeamID, adminsTeamFound, err := adminmgmt.CreateAdminTeamIfMissing(ctx,
-		apiClient, iamCmdFlags.dryRun)
+	adminsTeamFound, err := adminmgmt.CreateAdminTeamIfMissing(ctx, apiClient, iamCmdFlags.dryRun)
 	if err != nil {
 		return err
 	}
@@ -183,11 +183,11 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 
 	// In dry-run mode, we might be missing some IDs that would have been created.
 	// We'll only hit this condition in dry-run mode.
-	if iamCmdFlags.dryRun && (userID == "" || adminsTeamID == "") {
+	if iamCmdFlags.dryRun && (membershipID == "" || !adminsTeamFound) {
 		writer.Success("Added admin user to admins team")
 	} else { // non-dry-run mode or dry-run mode where user and team already existed.
 		userAdded, err := adminmgmt.AddAdminUserToTeam(ctx,
-			apiClient, adminsTeamID, userID, iamCmdFlags.dryRun)
+			apiClient, adminsID, membershipID, iamCmdFlags.dryRun)
 		if err != nil {
 			return err
 		}
@@ -199,51 +199,17 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 		}
 	}
 
-	// grant access to admins team if needed
-	resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &iam_req.GetPolicyVersionReq{})
+	foundAdminsTeaminV2AdminPolicy, err := adminmgmt.UpdateAdminsPolicyIfNeeded(ctx,
+		apiClient, iamCmdFlags.dryRun)
 	if err != nil {
-		return status.Wrap(err, status.APIError, "Failed to verify IAM version")
+		return err
 	}
 
-	writer.Titlef("Checking IAM %s policies for admin policy with admins team.\n", display(resp.Version))
-
-	switch resp.Version.Major {
-	case iam_common.Version_V1:
-		foundV1AdminPolicy, createdNewV1Policy, err := adminmgmt.UpdateV1AdminsPolicyIfNeeded(ctx,
-			apiClient, iamCmdFlags.dryRun)
-		if err != nil {
-			return err
-		}
-
-		if foundV1AdminPolicy {
-			writer.Skipped("Found admin policy that contains the admins team")
-		} else {
-			// Note: (tc) This should never happen currently since we currently don't support
-			// editing policies but adding for future-proofing against the functionality.
-			// Note: (sr) PurgeSubjectFromPolicies can alter policies -- when a user or a
-			// team is removed; so, this could be more realistic than we think.
-			writer.Successf("Found default admins team policy but it did not contain "+
-				"the admins team subject (%s). Added admins team to default admin policy.",
-				authz_constants.LocalAdminsTeamSubject)
-		}
-		if createdNewV1Policy {
-			writer.Success("Created new admins policy")
-		}
-	case iam_common.Version_V2:
-		foundAdminsTeaminV2AdminPolicy, err := adminmgmt.UpdateV2AdminsPolicyIfNeeded(ctx,
-			apiClient, iamCmdFlags.dryRun)
-		if err != nil {
-			return err
-		}
-
-		if !foundAdminsTeaminV2AdminPolicy {
-			writer.Success("Added local team: admins to Chef-managed policy: Admin")
-		}
-
-		writer.Skipped("Found local team: admins in Chef-managed policy: Admin")
-	default:
-		// do nothing
+	if !foundAdminsTeaminV2AdminPolicy {
+		writer.Success("Added local 'admins' team to Chef-managed 'Administrator' policy")
 	}
+
+	writer.Skipped("Found local 'admins' team in Chef-managed 'Administrator' policy")
 
 	if err := apiClient.CloseConnection(); err != nil {
 		return status.Wrap(err, status.APIUnreachableError, "Failed to close connection to the API")
