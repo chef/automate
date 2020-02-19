@@ -341,12 +341,8 @@ func DefaultSysctlCheck() Check {
 var externalURLs = []string{
 	"https://licensing.chef.io/status",
 	"https://bldr.habitat.sh",
-	"https://api.bintray.com",
 	"https://raw.githubusercontent.com",
 	"https://packages.chef.io",
-	"https://akamai.bintray.com",
-	"https://dl.bintray.com",
-	"https://bintray.com",
 	"https://github.com",
 	"https://downloads.chef.io",
 }
