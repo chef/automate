@@ -13,7 +13,7 @@ import (
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 )
 
-// New returns a new sq.DB connector with the automatic default migrations applied.
+// New returns a new sql.DB connector with the automatic default migrations applied.
 func New(ctx context.Context, migConf migration.Config, dataMigConf datamigration.Config) (*sql.DB, error) {
 	pgURL := migConf.PGURL.String()
 
