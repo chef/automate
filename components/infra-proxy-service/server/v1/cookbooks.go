@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"fmt"
 	"sort"
 
 	chef "github.com/chef/go-chef"
@@ -11,6 +12,17 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 )
+
+// NodeAttribute attributes of the node
+type NodeAttribute struct {
+	Name            string `json:"name"`
+	ChefGUID        string `json:"chef_guid"`
+	CheckIn         string `json:"checkin"`
+	ChefEnvironment string `json:"chef_environment"`
+	Platform        string `json:"platform"`
+	PolicyGroup     string `json:"policy_group"`
+	Uptime          string `json:"uptime"`
+}
 
 // GetCookbooks get cookbooks list
 func (s *Server) GetCookbooks(ctx context.Context, req *request.Cookbooks) (*response.Cookbooks, error) {
@@ -99,6 +111,31 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 	}, nil
 }
 
+// GetCookbookAffectedNodes get the nodes using cookbook
+func (s *Server) GetCookbookAffectedNodes(ctx context.Context, req *request.Cookbook) (*response.CookbookAffectedNodes, error) {
+
+	query := map[string]interface{}{
+		"name":             []string{"name"},
+		"platform":         []string{"platform"},
+		"chef_environment": []string{"chef_environment"},
+		"policy_group":     []string{"policy_group"},
+		"chef_guid":        []string{"chef_guid"},
+		"uptime":           []string{"uptime"},
+		"checkin":          []string{"checkin"},
+	}
+
+	client, err := s.createClient(ctx, req.OrgId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+	}
+
+	res, err := client.Search.PartialExec("node", fmt.Sprintf("cookbooks_%s_version:%s", req.Name, req.Version), query)
+
+	return &response.CookbookAffectedNodes{
+		Nodes: fromSearchAPIToCookbookNodes(res),
+	}, nil
+}
+
 func parseCookbookItems(items []chef.CookbookItem) []*response.CookbookItem {
 	cl := make([]*response.CookbookItem, len(items))
 	for i, c := range items {
@@ -181,4 +218,58 @@ func fromAPIToListAvailableCookbooks(al chef.CookbookListResult) []*response.Coo
 	})
 
 	return cl
+}
+
+func fromSearchAPIToCookbookNodes(sr chef.SearchResult) []*response.NodeAttribute {
+	results := make([]*response.NodeAttribute, len(sr.Rows))
+	index := 0
+	for _, element := range sr.Rows {
+		node := getNodeAttributeFromRes(element)
+		results[index] = &response.NodeAttribute{
+			Name:        node.Name,
+			CheckIn:     node.CheckIn,
+			ChefGuid:    node.ChefGUID,
+			Environment: node.ChefEnvironment,
+			Platform:    node.Platform,
+			PolicyGroup: node.PolicyGroup,
+			Uptime:      node.Uptime,
+		}
+		index++
+	}
+
+	return results
+}
+
+func getNodeAttributeFromRes(data interface{}) NodeAttribute {
+	m := data.(map[string]interface{})["data"].(map[string]interface{})
+	node := NodeAttribute{}
+	if name, ok := m["name"].(string); ok {
+		node.Name = name
+	}
+
+	if checkin, ok := m["checkin"].(string); ok {
+		node.CheckIn = checkin
+	}
+
+	if chefGUID, ok := m["chef_guid"].(string); ok {
+		node.ChefGUID = chefGUID
+	}
+
+	if environment, ok := m["chef_environment"].(string); ok {
+		node.ChefEnvironment = environment
+	}
+
+	if platform, ok := m["platform"].(string); ok {
+		node.Platform = platform
+	}
+
+	if policyGroup, ok := m["policy_group"].(string); ok {
+		node.PolicyGroup = policyGroup
+	}
+
+	if uptime, ok := m["uptime"].(string); ok {
+		node.Uptime = uptime
+	}
+
+	return node
 }
