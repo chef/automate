@@ -13,6 +13,7 @@ toc = true
 
 # Overview
 
+Data Lifecycle manages the retention of events, service groups, Chef Client runs, compliance reports and scans in Chef Automate.
 Chef Automate stores data from the `ingest-service`, `event-feed-service`,
 `compliance-service` and `applications-service` in ElasticSearch or PostgreSQL.
 Over time users may wish to prune data from Chef Automate by creating data
