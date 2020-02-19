@@ -53,10 +53,19 @@ export CGO_ENABLED=0
 export GO111MODULE=on
 
 # Specify where to put 'go installed' binaries
-export GOBIN=/src/bin
+setup_gobin() {
+    local vendor_hash
+    vendor_hash=$(sha256sum /src/vendor/modules.txt | cut -c1-16)
+    export GOBIN_BASE="/src/bin"
+    GOBIN="${GOBIN_BASE}/${vendor_hash}"
+    export GOBIN
+    mkdir -p "$GOBIN"
+}
+
+setup_gobin
 
 # Make 'go installed' binaries available in the PATH
-export PATH=$PATH:/src/bin
+export PATH=$PATH:$GOBIN
 
 # Enable vendor mode by default
 export GOFLAGS=-mod=vendor
@@ -126,8 +135,11 @@ GETTING_STARTED
 # Memory check. Because we all always forget to change the docker preferences
 # when we re-install it
 total_memory_kb=$(grep MemTotal /proc/meminfo | grep -o -E '[[:digit:]]+')
-# 8 gigs == 8164340kb, subtract a few kb so we can just do a less than comp
-if (( total_memory_kb < 8164000 )); then
+# 8 gigs == 8164340kb, subtract a few MB so we can just do a less than
+# comp and to account for the fact that MemTotal is the physical ram
+# reported by the BIOS less the kernel binary code and some other
+# reserved regions.
+if (( total_memory_kb < 8000000 )); then
   warn "!!!"
   warn "This system has less than 8Gb of RAM. You will not be able to run a full Automate deployment."
   warn "!!!"
@@ -221,6 +233,18 @@ prepare_system() {
 }
 
 prepare_system
+
+log_old_bindirs() {
+  readarray -t old_bindirs < <(find "$GOBIN_BASE" -maxdepth 1 -mindepth 1 -type d -not -path "$GOBIN")
+  if [ ${#old_bindirs[@]} -gt 0 ]; then
+    warn "The following bin directories are out-dated and can be cleaned up:"
+    for old_dir in "${old_bindirs[@]}"; do
+      warn "  $old_dir"
+    done
+  fi
+}
+
+log_old_bindirs
 
 # Saves the in memory bash history to a file
 save_history() {
