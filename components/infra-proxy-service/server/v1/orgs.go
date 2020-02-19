@@ -54,7 +54,7 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 		return nil, err
 	}
 
-	org, err := s.service.Storage.StoreOrg(ctx, req.Name, req.AdminUser, secretID.GetId(), req.ServerId)
+	org, err := s.service.Storage.StoreOrg(ctx, req.Name, req.AdminUser, secretID.GetId(), req.ServerId, req.Projects)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Name, "org")
 	}

@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 
+	// adapter for database/sql
 	"github.com/pkg/errors"
 
 	"github.com/chef/automate/components/infra-proxy-service/storage"

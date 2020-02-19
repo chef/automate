@@ -10,6 +10,8 @@ import (
 	"github.com/spf13/viper"
 
 	secrets "github.com/chef/automate/api/external/secrets"
+	authz "github.com/chef/automate/api/interservice/authz/common"
+	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/infra-proxy-service/server"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
@@ -34,6 +36,7 @@ type config struct {
 	PGURL           string `mapstructure:"pg_url"`
 	Database        string `mapstructure:"database"`
 	MigrationsPath  string `mapstructure:"migrations-path"`
+	AuthzAddress    string `mapstructure:"authz-address"`
 	SecretsAddress  string `mapstructure:"secrets-address"`
 }
 
@@ -43,6 +46,7 @@ func serve(cmd *cobra.Command, args []string) {
 	cmd.PersistentFlags().String("grpc", "127.0.0.1:10153", "grpc host and port")
 	cmd.PersistentFlags().StringP("pg_url", "p", "", "postgres uri")
 	cmd.PersistentFlags().StringP("migrations-path", "m", "", "migrations path")
+	cmd.PersistentFlags().StringP("authz-address", "a", "", "authz-service GRPC address")
 	cmd.PersistentFlags().StringP("secrets-address", "s", "", "secrets-service GRPC address")
 
 	viper.SetConfigFile(args[0])
@@ -86,6 +90,17 @@ func serve(cmd *cobra.Command, args []string) {
 		Logger: l,
 	}
 
+	if cfg.AuthzAddress == "" {
+		fail(errors.New("missing required config authz_address"))
+	}
+	authzConn, err := connFactory.Dial("authz-service", cfg.AuthzAddress)
+	if err != nil {
+		fail(errors.Wrapf(err, "failed to dial authz-service at (%s)", cfg.AuthzAddress))
+	}
+	authzClient := authz.NewSubjectPurgeClient(authzConn)
+	authzV2PoliciesClient := authz_v2.NewPoliciesClient(authzConn)
+	authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
+
 	if cfg.SecretsAddress == "" {
 		fail(errors.New("missing required config secrets_address"))
 	}
@@ -97,7 +112,9 @@ func serve(cmd *cobra.Command, args []string) {
 	// get secrets client
 	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
 
-	service, err := service.Start(l, migrationConfig, connFactory, secretsClient)
+	service, err := service.Start(l, migrationConfig,
+		connFactory, secretsClient,
+		authzClient, authzV2PoliciesClient, authzV2AuthorizationClient)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}

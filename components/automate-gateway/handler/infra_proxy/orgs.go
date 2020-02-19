@@ -60,6 +60,7 @@ func (a *InfraProxyServer) CreateOrg(ctx context.Context, r *gwreq.CreateOrg) (*
 		AdminUser: r.AdminUser,
 		AdminKey:  r.AdminKey,
 		ServerId:  r.ServerId,
+		Projects:  r.Projects,
 	}
 	res, err := a.client.CreateOrg(ctx, req)
 	if err != nil {
@@ -78,6 +79,7 @@ func (a *InfraProxyServer) UpdateOrg(ctx context.Context, r *gwreq.UpdateOrg) (*
 		AdminUser: r.AdminUser,
 		AdminKey:  r.AdminKey,
 		ServerId:  r.ServerId,
+		Projects:  r.Projects,
 	}
 	res, err := a.client.UpdateOrg(ctx, req)
 	if err != nil {
@@ -109,6 +111,7 @@ func fromUpstreamOrg(t *infra_res.Org) *gwres.Org {
 		AdminUser: t.GetAdminUser(),
 		AdminKey:  t.GetAdminKey(),
 		ServerId:  t.GetServerId(),
+		Projects:  t.GetProjects(),
 	}
 }
 
