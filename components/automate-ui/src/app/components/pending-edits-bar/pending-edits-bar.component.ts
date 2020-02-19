@@ -85,7 +85,7 @@ export class PendingEditsBarComponent implements OnDestroy {
     this.closeConfirmApplyStartModal();
   }
 
-  get hideBar() {
+  get isBarHidden() {
     return !this.layoutFacade.layout.userNotifications.pendingEdits
       || this.layoutFacade.layout.userNotifications.updatesProcessing;
   }

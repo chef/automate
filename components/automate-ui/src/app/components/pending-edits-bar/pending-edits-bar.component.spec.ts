@@ -137,7 +137,7 @@ describe('PendingEditsBarComponent', () => {
       const uneditedProject2 = genProject('uuid-112', 'RULES_APPLIED');
       store.dispatch(new GetProjectsSuccess({ projects: [uneditedProject1, uneditedProject2] }));
       component.updateDisplay();
-      expect(component.hideBar).toEqual(true);
+      expect(component.isBarHidden).toEqual(true);
     });
 
     it('is visible if some project has changes', () => {
@@ -145,7 +145,7 @@ describe('PendingEditsBarComponent', () => {
       const uneditedProject = genProject('uuid-111', 'RULES_APPLIED');
       store.dispatch(new GetProjectsSuccess({ projects: [uneditedProject, editedProject] }));
       component.updateDisplay();
-      expect(component.hideBar).toEqual(false);
+      expect(component.isBarHidden).toEqual(false);
     });
 
     it('is visible if some project has changes... UNLESS progress bar is active', () => {
@@ -156,7 +156,7 @@ describe('PendingEditsBarComponent', () => {
 
       component.layoutFacade.layout.userNotifications.updatesProcessing = true;
 
-      expect(component.hideBar).toEqual(true);
+      expect(component.isBarHidden).toEqual(true);
     });
 
     it('is visible if rules are not being applied', () => {
@@ -168,7 +168,7 @@ describe('PendingEditsBarComponent', () => {
       store.dispatch(new GetApplyRulesStatusSuccess( // update finished
           genState(ApplyRulesStatusState.NotRunning)));
       component.updateDisplay();
-      expect(component.hideBar).toEqual(false);
+      expect(component.isBarHidden).toEqual(false);
     });
 
     it('is visible if update fails', () => {
@@ -178,7 +178,7 @@ describe('PendingEditsBarComponent', () => {
       store.dispatch(new GetApplyRulesStatusSuccess(
         genState(ApplyRulesStatusState.NotRunning, true, false)));
       component.updateDisplay();
-      expect(component.hideBar).toEqual(false);
+      expect(component.isBarHidden).toEqual(false);
     });
 
     it('is visible if update is cancelled', () => {
@@ -188,7 +188,7 @@ describe('PendingEditsBarComponent', () => {
       store.dispatch(new GetApplyRulesStatusSuccess(
         genState(ApplyRulesStatusState.NotRunning, false, true)));
       component.updateDisplay();
-      expect(component.hideBar).toEqual(false);
+      expect(component.isBarHidden).toEqual(false);
     });
 
     it('is displayed if update is cancelled but update is still running', () => {
@@ -198,7 +198,7 @@ describe('PendingEditsBarComponent', () => {
       store.dispatch(new GetApplyRulesStatusSuccess(
         genState(ApplyRulesStatusState.Running, false, true)));
       component.updateDisplay();
-      expect(component.hideBar).toEqual(false);
+      expect(component.isBarHidden).toEqual(false);
     });
   });
 
