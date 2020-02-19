@@ -30,12 +30,7 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
   switch (action.type) {
 
     case UserActionTypes.GET_ALL:
-      return set(
-        'getStatus',
-        EntityStatus.loading,
-        // clear user state to ensure we fetch the latest data
-        userEntityAdapter.removeAll(state)
-      ) as UserEntityState;
+      return set('getStatus', EntityStatus.loading, state);
 
     case UserActionTypes.GET_ALL_SUCCESS:
       return set('getStatus', EntityStatus.loadingSuccess,

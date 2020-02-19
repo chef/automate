@@ -24,7 +24,7 @@ export function roleEntityReducer(state: RoleEntityState = RoleEntityInitialStat
 
   switch (action.type) {
     case RoleActionTypes.GET_ALL:
-      return set('getAllStatus', EntityStatus.loading, roleEntityAdapter.removeAll(state));
+      return set('getAllStatus', EntityStatus.loading, state);
 
     case RoleActionTypes.GET_ALL_SUCCESS:
       return set('getAllStatus', EntityStatus.loadingSuccess,

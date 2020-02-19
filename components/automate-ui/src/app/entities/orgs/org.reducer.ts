@@ -40,7 +40,7 @@ export function orgEntityReducer(
 
   switch (action.type) {
     case OrgActionTypes.GET_ALL:
-      return set(GET_ALL_STATUS, EntityStatus.loading, orgEntityAdapter.removeAll(state));
+      return set(GET_ALL_STATUS, EntityStatus.loading, state);
 
     case OrgActionTypes.GET_ALL_SUCCESS:
       return pipe(
