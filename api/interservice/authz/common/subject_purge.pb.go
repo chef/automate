@@ -219,11 +219,11 @@ var fileDescriptor_78588a1a247c8462 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // SubjectPurgeClient is the client API for SubjectPurge service.
 //
@@ -233,10 +233,10 @@ type SubjectPurgeClient interface {
 }
 
 type subjectPurgeClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewSubjectPurgeClient(cc *grpc.ClientConn) SubjectPurgeClient {
+func NewSubjectPurgeClient(cc grpc.ClientConnInterface) SubjectPurgeClient {
 	return &subjectPurgeClient{cc}
 }
 

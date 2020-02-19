@@ -77,11 +77,11 @@ var fileDescriptor_a3ccb1f707d1e4d8 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // UsersMgmtClient is the client API for UsersMgmt service.
 //
@@ -94,15 +94,19 @@ type UsersMgmtClient interface {
 	UpdateUser(ctx context.Context, in *request.UpdateUser, opts ...grpc.CallOption) (*response.User, error)
 	UpdateSelf(ctx context.Context, in *request.UpdateSelf, opts ...grpc.CallOption) (*response.User, error)
 	// deprecated API
+	//
+	// Deprecated: Do not use.
 	GetUser(ctx context.Context, in *request.Email, opts ...grpc.CallOption) (*response.User, error)
+	//
+	// Deprecated: Do not use.
 	DeleteUser(ctx context.Context, in *request.Email, opts ...grpc.CallOption) (*response.DeleteUserResp, error)
 }
 
 type usersMgmtClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewUsersMgmtClient(cc *grpc.ClientConn) UsersMgmtClient {
+func NewUsersMgmtClient(cc grpc.ClientConnInterface) UsersMgmtClient {
 	return &usersMgmtClient{cc}
 }
 
@@ -189,7 +193,11 @@ type UsersMgmtServer interface {
 	UpdateUser(context.Context, *request.UpdateUser) (*response.User, error)
 	UpdateSelf(context.Context, *request.UpdateSelf) (*response.User, error)
 	// deprecated API
+	//
+	// Deprecated: Do not use.
 	GetUser(context.Context, *request.Email) (*response.User, error)
+	//
+	// Deprecated: Do not use.
 	DeleteUser(context.Context, *request.Email) (*response.DeleteUserResp, error)
 }
 
