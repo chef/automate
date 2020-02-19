@@ -655,11 +655,11 @@ var fileDescriptor_65ff3d3f7473d71c = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // TokensMgmtClient is the client API for TokensMgmt service.
 //
@@ -675,10 +675,10 @@ type TokensMgmtClient interface {
 }
 
 type tokensMgmtClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewTokensMgmtClient(cc *grpc.ClientConn) TokensMgmtClient {
+func NewTokensMgmtClient(cc grpc.ClientConnInterface) TokensMgmtClient {
 	return &tokensMgmtClient{cc}
 }
 

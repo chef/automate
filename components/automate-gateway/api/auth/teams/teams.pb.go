@@ -90,11 +90,11 @@ var fileDescriptor_08939e612c056cbd = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // TeamsClient is the client API for Teams service.
 //
@@ -113,10 +113,10 @@ type TeamsClient interface {
 }
 
 type teamsClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewTeamsClient(cc *grpc.ClientConn) TeamsClient {
+func NewTeamsClient(cc grpc.ClientConnInterface) TeamsClient {
 	return &teamsClient{cc}
 }
 
