@@ -50,11 +50,11 @@ describe('ConfirmApplyStopModalComponent', () => {
   describe('progress bar', () => {
     using([
       [0,     '0% complete'],
-      [0.1,   '10% complete'],
-      [0.5,   '50% complete'],
-      [0.919, '91% complete'],
-      [0.92,  '92% complete'],
-      [1,     '100% complete']
+      [0.75,  '0% complete'],
+      [10,   '10% complete'],
+      [91.9, '91% complete'],
+      [92,   '92% complete'],
+      [100, '100% complete']
     ], (percentageComplete, progressPrefixText) => {
       it('displays correct percentage', () => {
         component.updateProgress({ ...component.applyRulesStatus, percentageComplete });
@@ -88,14 +88,14 @@ describe('ConfirmApplyStopModalComponent', () => {
     });
 
     it('does not update percentage once update is cancelled', () => {
-      component.updateProgress({ ...component.applyRulesStatus, percentageComplete: 0.1 });
+      component.updateProgress({ ...component.applyRulesStatus, percentageComplete: 10.0201 });
       expect(component.progressPrefixText).toContain('10%');
-      component.updateProgress({ ...component.applyRulesStatus, percentageComplete: 0.2 });
+      component.updateProgress({ ...component.applyRulesStatus, percentageComplete: 20.5 });
       expect(component.progressPrefixText).toContain('20%');
 
       component.stopRulesInProgress = true;
 
-      component.updateProgress({ ...component.applyRulesStatus, percentageComplete: 0.3 });
+      component.updateProgress({ ...component.applyRulesStatus, percentageComplete: 30.111 });
       expect(component.progressPrefixText).toContain('20%');
     });
 
