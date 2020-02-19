@@ -27,6 +27,7 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Service.Port = w.Int32(10145)
 
 	c.V1.Sys.Timeouts.Connect = w.Int32(5)
+	c.V1.Sys.Timeouts.Idle = w.Int32(43200)
 	return c
 }
 
