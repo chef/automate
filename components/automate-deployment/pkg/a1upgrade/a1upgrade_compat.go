@@ -89,8 +89,7 @@ const proxyEnabledMsg = `
          # Uncomment the following lines and set the parameters as necessary.
          # user = "<your proxy user>"
          # password = "<your proxy password>"
-         # no_proxy = ["whitelist", "should", "include", "packages.chef.io","raw.githubusercontent.com",
-                       "api.bintray.com","bldr.habitat.sh","akamai.bintray.com","dl.bintray.com","bintray.com"]
+         # no_proxy = ["whitelist", "should", "include", "packages.chef.io","raw.githubusercontent.com", "bldr.habitat.sh"]
 `
 
 const disasterRecoveryEnabledMsg = `

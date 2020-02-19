@@ -10,7 +10,7 @@ import {
   withLatestFrom,
   switchMap
 } from 'rxjs/operators';
-import { of, Observable } from 'rxjs';
+import { of } from 'rxjs';
 import * as moment from 'moment';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
@@ -25,8 +25,7 @@ import {
   UserPermsResponsePayload,
   GetUserParamPerms,
   GetUserParamPermsSuccess,
-  GetUserParamPermsFailure,
-  UserPermsActions
+  GetUserParamPermsFailure
 } from './userperms.actions';
 import { UserPermsRequests } from './userperms.requests';
 import { getlastFetchTime, allPerms } from './userperms.selectors';
@@ -65,18 +64,15 @@ export class UserPermEffects {
     withLatestFrom(this.store.select(allPerms)),
     switchMap(
       ([[action, lastTime], list]: [[GetSomeUserPerms, Date], IndexedEntities<UserPermEntity>]) => {
-        let obs: Observable<UserPermsActions>;
         const isFresh = !!list && !this.stale(lastTime);
-        if (isFresh) {
+        return isFresh ?
           // TODO: This works, but it has extraneous 'id' property in the payload.
           // Should strip that from each entry in the list.
-          obs = of(new GetSomeUserPermsSuccess(list));
-        } else {
-          this.requests.fetchSome(action.payload).pipe(
+          of(new GetSomeUserPermsSuccess(list))
+
+          : this.requests.fetchSome(action.payload).pipe(
             map((resp: UserPermsResponsePayload) => new GetSomeUserPermsSuccess(resp.endpoints)),
             catchError((error: HttpErrorResponse) => of(new GetSomeUserPermsFailure(error))));
-        }
-        return obs;
       }));
 
   @Effect()

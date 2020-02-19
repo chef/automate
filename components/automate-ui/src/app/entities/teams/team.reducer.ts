@@ -42,12 +42,7 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
   switch (action.type) {
 
     case TeamActionTypes.GET_ALL: {
-      return set(
-        'getAllStatus',
-        EntityStatus.loading,
-        // clear team state to ensure we fetch the latest data
-        teamEntityAdapter.removeAll(state)
-      ) as TeamEntityState;
+      return set('getAllStatus', EntityStatus.loading, state);
     }
 
     case TeamActionTypes.GET_ALL_SUCCESS: {
