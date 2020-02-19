@@ -57,7 +57,7 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 		if err != nil {
 			return errors.Wrap(err, "force to working schema version")
 		}
-		l.Infof("Forced to previous version: %v to reattempt migration", int(version)-1)
+		l.Infof("Forced to previous version %v to reattempt migration", int(version)-1)
 	} else {
 		l.Infof("Current schema version: %v", version)
 	}
