@@ -16,16 +16,35 @@ export class SidebarComponent {
     @Inject(LayoutFacadeService) public layoutFacade: LayoutFacadeService
   ) {
     this.menuGroups$ = layoutFacade.sidebar$;
+    this.updateMenuGroupVisibility();
   }
 
-  public hasAuthroizedMenuItems(menuItemGroup: any): void {
+  public updateMenuGroupVisibility(): void {
+    this.menuGroups$.subscribe((menuGroups: MenuItemGroup[]) => {
+      if (menuGroups) {
+        menuGroups.forEach(menuItemGroup => this.hasVisibleMenuItems(menuItemGroup));
+      }
+    });
+  }
+
+  public hasVisibleMenuItems(menuItemGroup: any): void {
     menuItemGroup.hasAuthroizedMenuItems =
-      menuItemGroup.items.filter(menuItem =>
+      this.hasAuthroizedMenuItems(menuItemGroup) ||
+      this.hasNoAuthroizedMenuItems(menuItemGroup);
+  }
+
+  public hasAuthroizedMenuItems(menuItemGroup: any): boolean {
+    return menuItemGroup.items.filter(menuItem =>
         menuItem.authorized && menuItem.authorized.isAuthorized).length > 0;
+  }
+
+  public hasNoAuthroizedMenuItems(menuItemGroup: any): boolean {
+    return menuItemGroup.items.filter(menuItem =>
+        menuItem.authorized === undefined).length > 0;
   }
 
   public isAuthorized($event, menuItem, menuGroup) {
     menuItem.authorized.isAuthorized = $event;
-    this.hasAuthroizedMenuItems(menuGroup);
+    this.hasVisibleMenuItems(menuGroup);
   }
 }
