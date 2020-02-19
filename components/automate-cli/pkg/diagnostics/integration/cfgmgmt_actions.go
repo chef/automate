@@ -123,8 +123,17 @@ func CreateCfgmgmtActionsDiagnostic() diagnostics.Diagnostic {
 			maxTries := 5
 
 			for _, entity := range loaded.CreatedEntities {
-				reqPath := fmt.Sprintf("/api/v0/eventfeed?collapse=true&page_size=100&start=%d&end=%d", entity.RecordedAtMillis-1, entity.RecordedAtMillis+1)
+				reqPath := fmt.Sprintf("/api/v0/eventfeed?collapse=true&page_size=100&start=%d&end=%d", entity.RecordedAtMillis-1000, entity.RecordedAtMillis+1000)
 				found := false
+
+				type eventsFeedResp struct {
+					Events []struct {
+						EntityName string `json:"entity_name"`
+					} `json:"events"`
+				}
+
+				respUnmarshalled := eventsFeedResp{}
+
 			RETRY_LOOP:
 				for {
 					resp, err := tstCtx.DoLBRequest(reqPath)
@@ -137,13 +146,7 @@ func CreateCfgmgmtActionsDiagnostic() diagnostics.Diagnostic {
 					// We wont retry a flakey backend. It should always return 200
 					require.Equal(tstCtx, 200, resp.StatusCode, "Failed to GET %s", reqPath)
 
-					type eventsFeedResp struct {
-						Events []struct {
-							EntityName string `json:"entity_name"`
-						} `json:"events"`
-					}
-
-					respUnmarshalled := eventsFeedResp{}
+					respUnmarshalled = eventsFeedResp{}
 					err = json.NewDecoder(resp.Body).Decode(&respUnmarshalled)
 					// We should always get valid json
 					require.NoError(tstCtx, err, "Failed to decode body of GET %s", reqPath)
@@ -158,9 +161,9 @@ func CreateCfgmgmtActionsDiagnostic() diagnostics.Diagnostic {
 					if tries >= maxTries {
 						break RETRY_LOOP
 					}
-					time.Sleep(2 * time.Duration(tries) * time.Second)
+					time.Sleep(5 * time.Duration(tries) * time.Second)
 				}
-				assert.True(tstCtx, found, "Could not find entity %s in GET %s", entity.EntityName, reqPath)
+				assert.True(tstCtx, found, "Could not find entity %s in GET %s; did get %+v", entity.EntityName, reqPath, respUnmarshalled)
 			}
 
 		},
