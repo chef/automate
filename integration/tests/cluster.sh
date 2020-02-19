@@ -61,9 +61,6 @@ do_deploy() {
             --accept-terms-and-mlsa
 
     docker exec -t "$_frontend1_container_name" \
-        "$cli_bin" iam upgrade-to-v2
-
-    docker exec -t "$_frontend1_container_name" \
         "$cli_bin" bootstrap bundle create -o bootstrap.abb
 
     docker exec -t "$_frontend2_container_name" \

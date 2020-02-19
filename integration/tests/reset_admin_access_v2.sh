@@ -30,7 +30,7 @@ hab_curl() {
 remove_admin_user() {
     local token
     token=$(chef-automate iam token create ADMIN_TEST --admin)
-    hab_curl -fsS -k -H "api-token: $token" "https://localhost/api/v0/auth/users/admin" \
+    hab_curl -fsS -k -H "api-token: $token" "https://localhost/apis/iam/v2/users/admin" \
       -XDELETE
 }
 
@@ -38,9 +38,6 @@ remove_admin_user() {
 export AUTOMATE_API_DEFAULT_PASSWORD="reset-admin-password"
 
 do_test_deploy() {
-    log_info "run chef-automate iam upgrade-to-v2"
-    chef-automate iam upgrade-to-v2 || return 1
-
     log_info "Deleting local admin user"
     remove_admin_user || return 1 # just an example of how to screw A2 IAM up
 

@@ -2,9 +2,7 @@ package v2
 
 import (
 	"context"
-	"strings"
 
-	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -13,7 +11,6 @@ import (
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 
-	"github.com/chef/automate/api/interservice/authz/common"
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
@@ -27,25 +24,23 @@ import (
 type authzServer struct {
 	log      logger.Logger
 	engine   engine.V2Authorizer
-	vSwitch  *VersionSwitch
 	projects api.ProjectsServer
 	store    storage.Storage
 }
 
 // NewPostgresAuthzServer returns a new IAM v2 Authz server.
-func NewPostgresAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch, p api.ProjectsServer) (api.AuthorizationServer, error) {
+func NewPostgresAuthzServer(l logger.Logger, e engine.V2Authorizer, p api.ProjectsServer) (api.AuthorizationServer, error) {
 	s := postgres.GetInstance()
 	if s == nil {
 		return nil, errors.New("postgres v2 singleton not yet initialized for authz server")
 	}
-	return NewAuthzServer(l, e, v, p, s)
+	return NewAuthzServer(l, e, p, s)
 }
 
-func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, v *VersionSwitch, p api.ProjectsServer, s storage.Storage) (api.AuthorizationServer, error) {
+func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, p api.ProjectsServer, s storage.Storage) (api.AuthorizationServer, error) {
 	return &authzServer{
 		log:      l,
 		engine:   e,
-		vSwitch:  v,
 		projects: p,
 		store:    s,
 	}, nil
@@ -157,12 +152,6 @@ func (s *authzServer) ValidateProjectAssignment(
 	ctx context.Context,
 	req *api.ValidateProjectAssignmentReq) (*api.ValidateProjectAssignmentResp, error) {
 
-	// If we are on V1 just return success. Other services are calling
-	// this function in version unaware ways.
-	if s.isV1() {
-		return &api.ValidateProjectAssignmentResp{}, nil
-	}
-
 	newProjects := req.NewProjects
 	if len(newProjects) == 0 {
 		newProjects = []string{}
@@ -260,76 +249,4 @@ func toEnginePairs(pairs []*api.Pair) []engine.Pair {
 		ps[i] = engine.Pair{Resource: engine.Resource(p.Resource), Action: engine.Action(p.Action)}
 	}
 	return ps
-}
-
-type VersionSwitch struct {
-	Version api.Version
-}
-
-func (v *VersionSwitch) Interceptor(ctx context.Context,
-	req interface{},
-	info *grpc.UnaryServerInfo,
-	handler grpc.UnaryHandler) (interface{}, error) {
-	// For Authorization calls (IsAuthorized, FilterAuthorizedPairs), we decline
-	// cross-overs.
-	//
-	// Note: v2 policy related calls have their own service, so, for example, the
-	// endpoint for retrieving whether IAMv1 or v2 is used, GetPolicyVersion, is
-	// "/chef.automate.domain.authz.v2.Policies/GetPolicyVersion", and thus
-	// exempt from this version check.
-
-	// These methods skip the check, though they are in the relevant service
-	// definition:
-	fullMethod := info.FullMethod
-	if strings.HasSuffix(fullMethod, "GetVersion") ||
-		// ValidateProjectAssignment is called within CreateToken/UpdateToken
-		// Since our tokens server is not version-aware, we need to exempt this call
-		// ValidateProjectAssignment itself *will* respond correctly to IAM version
-		strings.HasSuffix(fullMethod, "ValidateProjectAssignment") {
-		return handler(ctx, req)
-	}
-
-	v1Req := strings.HasPrefix(fullMethod, "/chef.automate.domain.authz.Authorization/")
-	v2Req := strings.HasPrefix(fullMethod, "/chef.automate.domain.authz.v2.Authorization/")
-
-	if v.Version.Major == api.Version_V2 && v1Req {
-		st := status.New(codes.FailedPrecondition, "authz-service set to v2")
-		st, err := st.WithDetails(&common.ErrorShouldUseV2{})
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
-		}
-		return nil, st.Err()
-	}
-	if v.Version.Major == api.Version_V1 && v2Req {
-		st := status.New(codes.FailedPrecondition, "authz-service set to v1")
-		st, err := st.WithDetails(&common.ErrorShouldUseV1{})
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "failed to add details to err: %v", err)
-		}
-		return nil, st.Err()
-	}
-	return handler(ctx, req)
-}
-
-func NewSwitch(c chan api.Version) *VersionSwitch {
-	x := VersionSwitch{
-		Version: api.Version{
-			Major: api.Version_V1,
-			Minor: api.Version_V0,
-		},
-	}
-	go func() {
-		for {
-			select {
-			case v := <-c:
-				x.Version = v
-			}
-		}
-	}()
-	return &x
-}
-
-func (s *authzServer) isV1() bool {
-	version := s.vSwitch.Version
-	return version.Major == api.Version_V1
 }

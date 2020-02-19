@@ -1,45 +1,64 @@
-package v2
+package legacy
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"strings"
 
-	"github.com/pkg/errors"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-
-	constants_v1 "github.com/chef/automate/components/authz-service/constants/v1"
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	storage_v1 "github.com/chef/automate/components/authz-service/storage/v1"
-	storage "github.com/chef/automate/components/authz-service/storage/v2"
+	constants_v1 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v1"
+	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
+	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
+	"github.com/pkg/errors"
 )
 
-// Note: it would be silly to translate the migration status into errors twice,
-// so this method is an exception to the "only grpc handlers return status
-// instances" rule.
-func (s *policyServer) okToMigrate(ctx context.Context, ms storage.MigrationStatus) error {
-	switch ms {
-	case storage.Successful, storage.SuccessfulBeta1:
-		return status.Error(codes.AlreadyExists, "already migrated")
-	case storage.InProgress:
-		return status.Error(codes.FailedPrecondition, "migration already in progress")
-	case storage.Failed:
-		s.log.Info("migration failed before; attempting again")
+// MigrateToV2 inserts needed IAM v2 resources into the db and
+// migrates any valid v1 policies
+func MigrateToV2(ctx context.Context, db *sql.DB, shouldMigrateV1Policies bool) error {
+	for _, role := range defaultRoles() {
+		if err := createRole(ctx, db, &role); err != nil {
+			return errors.Wrapf(err,
+				"could not create default role with ID: %s", role.ID)
+		}
 	}
+
+	for _, pol := range v2DefaultPolicies() {
+		if _, err := createV2Policy(ctx, db, &pol); err != nil {
+			return errors.Wrapf(err,
+				"could not create default policy with ID: %s", pol.ID)
+		}
+	}
+
+	if shouldMigrateV1Policies {
+		err := migrateV1Policies(ctx, db)
+		if err != nil {
+			return errors.Wrapf(err, "migrate v1 policies")
+		}
+	}
+
 	return nil
 }
 
-// migrateV1Policies has two error returns: the second one is the ordinary,
-// garden-variety, "something went wrong, I've given up" signal; the first one
-// serves as an aggregate of errors that happened attempting to convert and
-// store individual (custom) policies.
-func (s *policyServer) migrateV1Policies(ctx context.Context) ([]error, error) {
-	pols, err := s.v1.ListPoliciesWithSubjects(ctx)
+/*
+COPY PASTA DATABASE CODE
+
+The below is code we've copied from our database functionality because we need
+versions of the database functions needed for the migrations that do not change.
+This is because this migration is run at a single point in time as part of the schema
+upgrades. So this code need to be compatible with a specific schema version that never changes.
+*/
+
+func migrateV1Policies(ctx context.Context, db *sql.DB) error {
+	l, err := logger.NewLogger("text", "info")
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "list v1 policies: %s", err.Error())
+		return errors.Wrap(err, "could not initialize logger")
+	}
+
+	pols, err := listPoliciesWithSubjects(ctx, db)
+	if err != nil {
+		return errors.Wrap(err, "list v1 policies")
 	}
 
 	var errs []error
@@ -50,31 +69,40 @@ func (s *policyServer) migrateV1Policies(ctx context.Context) ([]error, error) {
 			continue
 		}
 		if adminTokenPolicy != nil {
-			if err := s.addTokenToAdminPolicy(ctx, adminTokenPolicy.Subjects[0]); err != nil {
+			if err := addTokenToAdminPolicy(ctx, adminTokenPolicy.Subjects[0], db); err != nil {
 				errs = append(errs, errors.Wrapf(err, "adding members %q for admin policy %q", pol.Subjects, pol.ID.String()))
 			}
 			continue // don't migrate admin policies with single token
 		}
-		storagePol, err := migrateV1Policy(pol)
+		v2StoragePol, err := versionizeToV2(pol)
 		if err != nil {
 			// collect error
 			errs = append(errs, errors.Wrapf(err, "convert v1 policy %q", pol.ID.String()))
 			continue // nothing to create
 		}
-		if storagePol == nil {
+		if v2StoragePol == nil {
 			continue // nothing to create
 		}
-		_, err = s.store.CreatePolicy(ctx, storagePol, true)
+		_, err = createV2Policy(ctx, db, v2StoragePol)
 		switch err {
 		case nil, storage_errors.ErrConflict: // ignore, continue
 		default:
 			errs = append(errs, errors.Wrapf(err, "store converted v1 policy %q", pol.ID.String()))
 		}
 	}
-	return errs, nil
+
+	reports := []string{}
+	for _, e := range errs {
+		reports = append(reports, e.Error())
+	}
+	if len(reports) != 0 {
+		l.Infof("invalid v1 policies could not be migrated: %v", reports)
+	}
+
+	return nil
 }
 
-func migrateV1Policy(pol *storage_v1.Policy) (*storage.Policy, error) {
+func versionizeToV2(pol *v1Policy) (*v2Policy, error) {
 	wellKnown, err := isWellKnown(pol.ID)
 	if err != nil {
 		return nil, errors.Wrapf(err, "lookup v1 default policy %q", pol.ID.String())
@@ -86,19 +114,19 @@ func migrateV1Policy(pol *storage_v1.Policy) (*storage.Policy, error) {
 	return customPolicyFromV1(pol)
 }
 
-func (s *policyServer) addTokenToAdminPolicy(ctx context.Context, tok string) error {
-	m, err := storage.NewMember(tok)
+func addTokenToAdminPolicy(ctx context.Context, tok string, db *sql.DB) error {
+	m, err := newV2Member(tok)
 	if err != nil {
 		return errors.Wrap(err, "format v2 member for admin team")
 	}
-	mems, err := s.store.AddPolicyMembers(ctx, constants_v2.AdminPolicyID, []storage.Member{m})
+	mems, err := addPolicyMembers(ctx, db, constants_v2.AdminPolicyID, []v2Member{m})
 	if err != nil {
 		return errors.Wrapf(err, "could not add members %q to admin policy", mems)
 	}
 	return nil
 }
 
-func checkForAdminTokenPolicy(pol *storage_v1.Policy) (*storage_v1.Policy, error) {
+func checkForAdminTokenPolicy(pol *v1Policy) (*v1Policy, error) {
 	if pol.Action == "*" && pol.Resource == "*" && len(pol.Subjects) == 1 && strings.HasPrefix(pol.Subjects[0], "token:") {
 		return pol, nil
 	}
@@ -106,7 +134,7 @@ func checkForAdminTokenPolicy(pol *storage_v1.Policy) (*storage_v1.Policy, error
 }
 
 func isWellKnown(id uuid.UUID) (bool, error) {
-	defaultV1, err := storage_v1.DefaultPolicies()
+	defaultV1, err := v1DefaultPolicies()
 	if err != nil {
 		return false, err
 	}
@@ -162,7 +190,7 @@ var v1ComplianceTokenPolicies = map[string]struct{}{
 }
 
 // nolint: gocyclo
-func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
+func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 	if _, found := v1PoliciesToSkip[pol.ID.String()]; found {
 		return nil, nil
 	}
@@ -174,19 +202,18 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	//  CfgmgmtNodesWildcardPolicyID
 	//  CfgmgmtStatsWildcardPolicyID
 	if _, found := v1CfgmgmtPolicies[pol.ID.String()]; found {
-		cfgmgmtStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		cfgmgmtStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"infra:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (cfgmgmt)")
-		}
-		member, err := storage.NewMember("user:*")
+		cfgmgmtStatementDeny := newV2Statement(Deny, "", []string{},
+			[]string{"*"}, []string{"infra:ingest:*"})
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (cfgmgmt)")
 		}
-		cfgmgmtPolicy, err := storage.NewPolicy(constants_v2.CfgmgmtPolicyID,
+		cfgmgmtPolicy, err := newV2Policy(constants_v2.CfgmgmtPolicyID,
 			"[Legacy] Infrastructure Automation Access",
-			storage.Custom, []storage.Member{member},
-			[]storage.Statement{cfgmgmtStatement}, noProjects)
+			Custom, []v2Member{member},
+			[]v2Statement{cfgmgmtStatement, cfgmgmtStatementDeny}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (cfgmgmt)")
 		}
@@ -194,18 +221,15 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if pol.ID.String() == constants_v1.ComplianceWildcardPolicyID {
-		complianceStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		complianceStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"compliance:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (compliance)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (compliance)")
 		}
-		compliancePolicy, err := storage.NewPolicy(constants_v2.CompliancePolicyID,
+		compliancePolicy, err := newV2Policy(constants_v2.CompliancePolicyID,
 			"[Legacy] Compliance Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{complianceStatement}, noProjects)
+			Custom, []v2Member{member}, []v2Statement{complianceStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (cfgmgmt)")
 		}
@@ -213,18 +237,15 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if _, found := v1EventFeedPolicies[pol.ID.String()]; found {
-		eventsStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		eventsStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"event:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (events)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (events)")
 		}
-		eventsPolicy, err := storage.NewPolicy(constants_v2.EventsPolicyID,
+		eventsPolicy, err := newV2Policy(constants_v2.EventsPolicyID,
 			"[Legacy] Events Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{eventsStatement}, noProjects)
+			Custom, []v2Member{member}, []v2Statement{eventsStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (events)")
 		}
@@ -232,19 +253,16 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if pol.ID.String() == constants_v1.IngestWildcardPolicyID {
-		ingestStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		ingestStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"infra:ingest:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (ingest)")
-		}
-		member, err := storage.NewMember("token:*")
+		member, err := newV2Member("token:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (ingest)")
 		}
 
-		ingestPolicy, err := storage.NewPolicy(constants_v2.LegacyIngestPolicyID,
+		ingestPolicy, err := newV2Policy(constants_v2.LegacyIngestPolicyID,
 			"[Legacy] Ingest Access",
-			storage.Custom, []storage.Member{member}, []storage.Statement{ingestStatement}, noProjects)
+			Custom, []v2Member{member}, []v2Statement{ingestStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (ingest)")
 		}
@@ -252,21 +270,18 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if _, found := v1NodesPolicies[pol.ID.String()]; found {
-		nodesStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		nodesStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"infra:nodes:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (nodes)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (nodes)")
 		}
-		nodesPolicy, err := storage.NewPolicy(
+		nodesPolicy, err := newV2Policy(
 			constants_v2.NodesPolicyID,
 			"[Legacy] Nodes Access",
-			storage.Custom,
-			[]storage.Member{member},
-			[]storage.Statement{nodesStatement},
+			Custom,
+			[]v2Member{member},
+			[]v2Statement{nodesStatement},
 			noProjects,
 		)
 		if err != nil {
@@ -276,21 +291,18 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if _, found := v1NodeManagersPolicies[pol.ID.String()]; found {
-		nodeManagersStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		nodeManagersStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"infra:nodeManagers:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (nodemanagers)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (nodemanagers)")
 		}
-		nodeManagersPolicy, err := storage.NewPolicy(
+		nodeManagersPolicy, err := newV2Policy(
 			constants_v2.NodeManagersPolicyID,
 			"[Legacy] Node Managers Access",
-			storage.Custom,
-			[]storage.Member{member},
-			[]storage.Statement{nodeManagersStatement},
+			Custom,
+			[]v2Member{member},
+			[]v2Statement{nodeManagersStatement},
 			noProjects,
 		)
 		if err != nil {
@@ -300,21 +312,18 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if _, found := v1SecretsPolicies[pol.ID.String()]; found {
-		secretsStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		secretsStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"secrets:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (secrets)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (secrets)")
 		}
-		secretsPolicy, err := storage.NewPolicy(
+		secretsPolicy, err := newV2Policy(
 			constants_v2.SecretsPolicyID,
 			"[Legacy] Secrets Access",
-			storage.Custom,
-			[]storage.Member{member},
-			[]storage.Statement{secretsStatement},
+			Custom,
+			[]v2Member{member},
+			[]v2Statement{secretsStatement},
 			noProjects,
 		)
 		if err != nil {
@@ -324,21 +333,18 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if pol.ID.String() == constants_v1.TelemetryConfigPolicyID {
-		telemetryStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		telemetryStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"system:telemetryConfig:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (telemetry)")
-		}
-		member, err := storage.NewMember("user:*")
+		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (telemetry)")
 		}
-		telemetryPolicy, err := storage.NewPolicy(
+		telemetryPolicy, err := newV2Policy(
 			constants_v2.TelemetryPolicyID,
 			"[Legacy] Telemetry Access",
-			storage.Custom,
-			[]storage.Member{member},
-			[]storage.Statement{telemetryStatement},
+			Custom,
+			[]v2Member{member},
+			[]v2Statement{telemetryStatement},
 			noProjects,
 		)
 		if err != nil {
@@ -348,21 +354,18 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	if _, found := v1ComplianceTokenPolicies[pol.ID.String()]; found {
-		complianceTokenStatement, err := storage.NewStatement(storage.Allow, "", []string{},
+		complianceTokenStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"compliance:profiles:*"})
-		if err != nil {
-			return nil, errors.Wrap(err, "format v2 statement (compliance token)")
-		}
-		member, err := storage.NewMember("token:*")
+		member, err := newV2Member("token:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (compliance token)")
 		}
-		complianceTokenPolicy, err := storage.NewPolicy(
+		complianceTokenPolicy, err := newV2Policy(
 			constants_v2.ComplianceTokenPolicyID,
 			"[Legacy] Compliance Profile Access",
-			storage.Custom,
-			[]storage.Member{member},
-			[]storage.Statement{complianceTokenStatement},
+			Custom,
+			[]v2Member{member},
+			[]v2Statement{complianceTokenStatement},
 			noProjects,
 		)
 		if err != nil {
@@ -374,7 +377,7 @@ func legacyPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	return nil, errors.New("unknown \"well-known\" policy")
 }
 
-func customPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
+func customPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 	name := fmt.Sprintf("%s (custom)", pol.ID.String())
 
 	// TODO: If we encounter an unknown action can we just be less permissive with a warning?
@@ -390,26 +393,23 @@ func customPolicyFromV1(pol *storage_v1.Policy) (*storage.Policy, error) {
 	}
 
 	// Note: v1 only had (custom) allow policies
-	statement, err := storage.NewStatement(storage.Allow, "", []string{}, []string{resource}, action)
-	if err != nil {
-		return nil, errors.Wrap(err, "format v2 statement")
-	}
+	statement := newV2Statement(Allow, "", []string{}, []string{resource}, action)
 
-	members := make([]storage.Member, len(pol.Subjects))
+	members := make([]v2Member, len(pol.Subjects))
 	for i, subject := range pol.Subjects {
-		memberInt, err := storage.NewMember(subject)
+		memberInt, err := newV2Member(subject)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member")
 		}
 		members[i] = memberInt
 	}
 
-	policy, err := storage.NewPolicy(
+	policy, err := newV2Policy(
 		pol.ID.String(),
 		name,
-		storage.Custom,
+		Custom,
 		members,
-		[]storage.Statement{statement},
+		[]v2Statement{statement},
 		[]string{})
 	if err != nil {
 		return nil, errors.Wrap(err, "format v2 policy")

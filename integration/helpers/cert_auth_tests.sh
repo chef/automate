@@ -26,7 +26,7 @@ hab_curl() {
 
 grant_permissions() {
     local token
-    token="$(chef-automate admin-token)"
+    token="$(date +%s | xargs -I % chef-automate iam token create admin-token-% --admin)"
     hab_curl --insecure -H "api-token: $token" https://localhost/api/v0/auth/policies --data @<(cat <<EOF
     {
         "subjects": [

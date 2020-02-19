@@ -39,11 +39,6 @@ message UpdatePolicyReq {
     repeated string projects = 9;
 }
 
-message UpgradeToV2Req {
-    Flag flag = 1;
-    bool skip_v1_policies = 2;
-}
-
 message GetPolicyVersionReq {}
 
 message ResetToV1Req {}

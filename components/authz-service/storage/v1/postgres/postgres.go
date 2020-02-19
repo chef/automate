@@ -13,6 +13,7 @@ import (
 
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
+	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v1"
 	"github.com/chef/automate/lib/io/fileutils"
@@ -65,10 +66,10 @@ func (m *policyMap) Scan(src interface{}) error {
 }
 
 // New instantiates the postgres IAM v1 storage backend.
-func New(ctx context.Context, l logger.Logger, migConf migration.Config) (storage.Storage, error) {
+func New(ctx context.Context, l logger.Logger, migConf migration.Config, dataMigConf datamigration.Config) (storage.Storage, error) {
 	l.Infof("applying database migrations from %s", migConf.Path)
 
-	db, err := postgres.New(ctx, migConf)
+	db, err := postgres.New(ctx, migConf, dataMigConf)
 	if err != nil {
 		return nil, err
 	}

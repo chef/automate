@@ -16,13 +16,6 @@ do_deploy() {
     chef-automate license apply "$A2_LICENSE"
     timestamp=$(date +"%m-%d-%y-%H-%M")
 
-    log_info "run chef-automate iam upgrade-to-v2 --skip-policy-migration"
-    if ! output=$(chef-automate iam upgrade-to-v2 --skip-policy-migration); then
-        log_error "Non-zero exit code, output:"
-        log_error "$output"
-        return 1
-    fi
-
     log_info "generating admin token"
     if ! token=$(chef-automate iam token create "$timestamp-tok" --admin); then
         log_error "Non-zero exit code, output:"

@@ -1135,15 +1135,6 @@ func init() {
     "chef.automate.api.iam.v2.DeleteRoleResp": {
       "type": "object"
     },
-    "chef.automate.api.iam.v2.Flag": {
-      "type": "string",
-      "enum": [
-        "VERSION_2_0",
-        "VERSION_2_1"
-      ],
-      "default": "VERSION_2_0",
-      "title": "passed to UpgradeToV2 to set version"
-    },
     "chef.automate.api.iam.v2.GetPolicyResp": {
       "type": "object",
       "properties": {
@@ -1329,9 +1320,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.iam.v2.ResetToV1Resp": {
-      "type": "object"
-    },
     "chef.automate.api.iam.v2.Role": {
       "type": "object",
       "properties": {
@@ -1491,17 +1479,6 @@ func init() {
       "properties": {
         "role": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Role"
-        }
-      }
-    },
-    "chef.automate.api.iam.v2.UpgradeToV2Resp": {
-      "type": "object",
-      "properties": {
-        "reports": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
         }
       }
     },
