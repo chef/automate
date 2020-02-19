@@ -384,14 +384,29 @@ func (backend ES2Backend) getScanDateRange(migratable esMigratable) (*time.Time,
 	}
 
 	if minDate.Value == nil {
-		//if we are here, it means that there are indices with this prefix but not any elasticsearch documents within those indices
-		//if there were, then mindDate.value would be non-nil
-		//in this case, we need to remove all of the indices with this prefix.. they are all empty anyway
-		_, err := cleanupEmptyIndicesForPrefix(client, esIndex, migratable)
+		count, err := backend.getDocCountForIndex(esIndex)
 		if err != nil {
-			return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to delete the empty indices that need to be removed", myName))
+			logrus.Warnf("%s - could not get doc count for index: %s.", myName, esIndex)
+			return nil, nil, nil
 		}
-		return nil, nil, errors.Errorf("%s there were not any reports in elasticsearch indices that are prefixed with %s, these indices, therefore, have been successfully deleted", myName, esIndex)
+
+		if count == 0 {
+			//if we are here, it means that there are indices with this prefix but not any elasticsearch documents within those indices
+			//if there were, then mindDate.value would be non-nil
+			//in this case, we need to remove all of the indices with this prefix.. they are all empty anyway
+			_, err := cleanupEmptyIndicesForPrefix(client, esIndex, migratable)
+			if err != nil {
+				return nil, nil, errors.Wrap(err, fmt.Sprintf("%s unable to delete the empty indices that need to be removed", myName))
+			}
+			logrus.Warnf("%s - there were not any reports in elasticsearch indices that are prefixed with %s, these indices, therefore, have been successfully deleted", myName, esIndex)
+			return nil, nil, nil
+		} else {
+			//in this case, we have documents in at least one of the time series indices but no document has end_time
+			// For now, we do not want to do any cleanup. We'll simply place a warning in the log.
+			// This is a very unusual scenario and should therefore be inspected with human eyes to determine remedy
+			logrus.Warnf("%s - there were documents in index: %s but for some reason they don't have any end_time attributes. You should inspect them to determine if they should be removed.", myName, indexPrefix)
+			return nil, nil, nil
+		}
 	}
 
 	var minDateAsString string
@@ -422,6 +437,22 @@ func (backend ES2Backend) getScanDateRange(migratable esMigratable) (*time.Time,
 	}
 
 	return &earliestScanDate, &mostRecentScanDate, nil
+}
+
+func (backend ES2Backend) getDocCountForIndex(index string) (int64, error) {
+	myName := "getDocCountForIndex"
+
+	client, err := backend.ES2Client()
+	if err != nil {
+		return 0, errors.Wrap(err, fmt.Sprintf("%s cannot connect to ElasticSearch", myName))
+	}
+
+	// Count documents
+	count, err := client.Count(index).Do(context.TODO())
+	if err != nil {
+		return 0, errors.Wrap(err, fmt.Sprintf("%s cannot get doc count for index prefix %s", myName, index))
+	}
+	return count, nil
 }
 
 func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (bool, error) {
