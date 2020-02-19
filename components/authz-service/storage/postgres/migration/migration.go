@@ -139,8 +139,6 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 		return errors.Wrap(err, "close migration db connection")
 	}
 
-	// The first error is trying to Close() the source. For our file source,
-	// that's always nil
 	_, err = m.Close()
 	return errors.Wrap(err, "close migrations connection")
 }

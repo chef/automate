@@ -13,7 +13,8 @@ import (
 )
 
 // NOTE (TC): datamigration is the last set of IAM force-upgrade data related
-// transformations. PLEASE DO NOT MODIFY THESE MIGRATIONS.
+// transformations. PLEASE DO NOT MODIFY THESE MIGRATIONS. They happen at a specific
+// point as part of the schema migrations so modifications might break.
 //
 // Config holds the information needed to connect to the database (PGURL), to
 // find the migration SQL files (Path), and log debug messages (Logger).

@@ -562,21 +562,17 @@ function get_api_token_with_policy() {
   if [ -f "$token_file" ]; then
     cat "$token_file"
   else
-    if [ "$iam_version" == "v1.0" ]; then
-      date +%s | xargs -I % chef-automate iam token create admin-token-% --admin >"$token_file"
-    else
-      # create standard api token
-      chef-automate iam token create "$token_description" >"$token_file" || return 1
-      # retrieve the tokens' ID
-      local token_id
-      token_id="$(curl -fsS --insecure -H "api-token: $(get_admin_token)" \
-       "${GATEWAY_URL}/auth/tokens" |\
-         jq -er --arg token "$token_description" '[.tokens[] | select(.description == $token) | .id] | first' )"
-      # and add it to policy
-      curl -fsS --insecure -H "api-token: $(get_admin_token)" \
-        --data "$(jq -nc --arg token "$token_id"  '{ members: [ "token:\($token)" ]}')" \
-       "${GATEWAY_URL}/apis/iam/v2/policies/${policy}/members:add" >/dev/null
-    fi
+    # create standard api token
+    chef-automate iam token create "$token_description" >"$token_file" || return 1
+    # retrieve the tokens' ID
+    local token_id
+    token_id="$(curl -fsS --insecure -H "api-token: $(get_admin_token)" \
+      "${GATEWAY_URL}/auth/tokens" |\
+        jq -er --arg token "$token_description" '[.tokens[] | select(.description == $token) | .id] | first' )"
+    # and add it to policy
+    curl -fsS --insecure -H "api-token: $(get_admin_token)" \
+      --data "$(jq -nc --arg token "$token_id"  '{ members: [ "token:\($token)" ]}')" \
+      "${GATEWAY_URL}/apis/iam/v2/policies/${policy}/members:add" >/dev/null
     cat "$token_file"
   fi
 }
