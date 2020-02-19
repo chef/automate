@@ -6,6 +6,7 @@ pkg_license=('Chef-MLSA')
 pkg_description="HTML for automate.chef.io"
 pkg_upstream_url="https://www.chef.io/automate"
 pkg_build_deps=(
+  core/curl
   core/git
   core/hugo
   core/jq-static
