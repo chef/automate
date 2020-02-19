@@ -65,7 +65,7 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 	if version < PreForceUpgradeMigration {
 		err = m.Migrate(PreForceUpgradeMigration)
 		if err != nil && err != migrate.ErrNoChange {
-			return errors.Wrap(err, "migration up to IAM V2 force upgrade failed")
+			return errors.Wrap(err, "migration up to IAM-V2-force-upgrade failed")
 		}
 	}
 
