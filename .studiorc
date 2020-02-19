@@ -156,10 +156,7 @@ get_admin_token() {
     cat /tmp/admin_token
   else
     # note: we don't have to suppress stderr, $(get_api_token) won't capture it.
-    if ! date +%s | xargs -I % chef-automate iam token create admin-token-% --admin >/tmp/admin_token; then
-      # attempt iam v2 cmd
-      chef-automate iam token create "api-token-$$" --admin >/tmp/admin_token || return 1
-    fi
+    date +%s | xargs -I % chef-automate iam token create admin-token-% --admin >/tmp/admin_token || return 1
     cat /tmp/admin_token
   fi
 }

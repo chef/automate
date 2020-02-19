@@ -168,7 +168,6 @@ hab license accept
 hab pkg binlink core/hab --force
 
 chef-automate dev create-iam-dev-users
-touch /root/a2-iamv2-enabled
 
 if [[ "${create_admin_token}" == "true" ]]; then
     if [[ ! -f /root/admin-token.txt ]]; then
