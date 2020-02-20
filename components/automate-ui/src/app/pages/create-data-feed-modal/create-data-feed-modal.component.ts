@@ -1,6 +1,13 @@
 import { Component, EventEmitter, Input, Output, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 
+enum UrlTestState {
+  Inactive,
+  Loading,
+  Success,
+  Failure
+}
+
 @Component({
   selector: 'app-create-data-feed-modal',
   templateUrl: './create-data-feed-modal.component.html',
@@ -13,11 +20,13 @@ export class CreateDataFeedModalComponent implements OnInit {
   @Input() conflictErrorEvent: EventEmitter<boolean>;
   @Output() close = new EventEmitter();
   @Output() createClicked = new EventEmitter();
-  // @Output() sendTestClicked = new EventEmitter();
+  @Output() sendTestClicked = new EventEmitter();
   @Input() createForm: FormGroup;
+  @Input() hookStatus = UrlTestState.Inactive;
 
   public conflictError = false;
-
+  public urlState = UrlTestState
+  
   ngOnInit() {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
       this.conflictError = isConflict;
@@ -39,10 +48,13 @@ export class CreateDataFeedModalComponent implements OnInit {
     this.createClicked.emit();
   }
 
-  // sendTest($event: Event) {
-  //   $event.preventDefault();
-  //   this.sendTestClicked.emit();
-  // }
+  sendTest() {
+    this.sendTestClicked.emit();
+  }
+
+  urlPresent() {
+    return this.createForm.controls.url.value !== ""
+  }
 
   private isNavigationKey(event: KeyboardEvent): boolean {
     return event.key === 'Shift' || event.key === 'Tab';

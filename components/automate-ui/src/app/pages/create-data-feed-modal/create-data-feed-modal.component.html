@@ -8,6 +8,7 @@
               <span class="label">Name <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="name" type="text" id="name-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
+            <span class="input-desc">Don't worry, data feed name can be changed later.</span>
             <chef-error
             *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
             Display Name is required.
@@ -38,6 +39,7 @@
               <span class="label">Username <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="username" type="text" id="username-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
+            <span class="input-desc">Encrypted, and only used to access the data feed.</span>
             <chef-error *ngIf="createForm.get('username').hasError('required') && createForm.get('username').dirty">
               Username is required.
             </chef-error>
@@ -47,25 +49,41 @@
           <chef-form-field>
             <label>
               <span class="label">Password <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="password" type="text" id="password-input" (keyup)="handleInput($event)" autocomplete="off"/>
+              <input chefInput formControlName="password" type="password" id="password-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
+            <span class="input-desc">Encrypted, and only used to access the data feed.</span>
             <chef-error
               *ngIf="createForm.get('password').hasError('password') && createForm.get('password').dirty">
               Password is required.
             </chef-error>
           </chef-form-field>
         </div>
+        <chef-error
+          *ngIf="createForm.get('password').hasError('password') && createForm.get('password').dirty">
+          Password is required.
+        </chef-error>
+
         <div id="button-bar">
+          <div class="url-failed" *ngIf="hookStatus === urlState.Failure">
+            <chef-icon class="url-failed-icon">warning</chef-icon>
+            <span>Unable to connect, check URL, username and password.</span>
+          </div>
+          
+          <div class="url-success" *ngIf="hookStatus === urlState.Success">
+            <chef-icon class="url-success-icon">done</chef-icon>
+            <span class="status-heading">Data feed test connected successfully!</span>
+          </div>
+
           <chef-button [disabled]="!createForm?.valid || creating || conflictError"  primary id="create-button-object-modal" (click)="createDataFeed()">
             <chef-loading-spinner *ngIf="creating"></chef-loading-spinner>
             <span *ngIf="!creating">Create Data Feed</span>
             <span *ngIf="creating">Creating Data Feed...</span>
           </chef-button>
-          <!-- <chef-button primary [disabled]="!createForm?.valid || creating || conflictError" (click)="sendTest($event)">
+          <chef-button secondary [disabled]="!urlPresent() || creating" (click)="sendTest()">
             <chef-loading-spinner *ngIf="sending"></chef-loading-spinner>
-            <span *ngIf="!sending">Send a test</span>
-            <span *ngIf="sending">Sending test....</span>
-          </chef-button> -->
+            <span *ngIf="!sending">Test Data Feed</span>
+            <span *ngIf="sending">Testing Data Feed...</span>
+          </chef-button>
           <chef-button tertiary (click)="closeEvent()">Cancel</chef-button>
         </div>
       </form>

@@ -18,7 +18,7 @@ chef-modal {
     }
 
     form {
-      flex-basis: 60%;
+      flex-basis: 61%;
 
       input {
         font-size: 1em;
@@ -39,4 +39,34 @@ chef-modal {
       }
     }
   }
+
+  .url-failed {
+    font-size: 13px;
+    text-align: center;
+    background-color: #DC267F;
+    color: #fff;
+    border-radius: 4px;
+    padding: 2px;
+  }
+  
+  .url-success {
+    font-size: 13px;
+    text-align: center;
+    background-color: #1074C4;
+    color: #fff;
+    border-radius: 4px;
+    padding: 2px;
+  }
+
+  .url-success-icon {
+    background-color: #FFF;
+    color:rgb(56, 100, 242);
+    border-radius: 50px;
+    margin: 2px;
+  }
+}
+
+.input-desc {
+  font-size: 10px;
+  font-weight: 100;
 }
