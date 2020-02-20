@@ -28,17 +28,17 @@ export class SidebarComponent {
   }
 
   public hasVisibleMenuItems(menuItemGroup: any): void {
-    menuItemGroup.hasAuthroizedMenuItems =
-      this.hasAuthroizedMenuItems(menuItemGroup) ||
-      this.hasNoAuthroizedMenuItems(menuItemGroup);
+    menuItemGroup.hasAuthorizedMenuItems =
+      this.hasAuthorizedMenuItems(menuItemGroup) ||
+      this.hasNoAuthorizedMenuItems(menuItemGroup);
   }
 
-  public hasAuthroizedMenuItems(menuItemGroup: any): boolean {
+  public hasAuthorizedMenuItems(menuItemGroup: any): boolean {
     return menuItemGroup.items.filter(menuItem =>
         menuItem.authorized && menuItem.authorized.isAuthorized).length > 0;
   }
 
-  public hasNoAuthroizedMenuItems(menuItemGroup: any): boolean {
+  public hasNoAuthorizedMenuItems(menuItemGroup: any): boolean {
     return menuItemGroup.items.filter(menuItem =>
         menuItem.authorized === undefined).length > 0;
   }

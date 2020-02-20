@@ -2,7 +2,6 @@ import { Injectable, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
 import { forEach } from 'lodash';
-// import { takeUntil } from 'rxjs/operators';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { isProductDeployed } from 'app/staticConfig';
@@ -24,7 +23,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
     private activeSidebar: string;
     private workflowEnabled$: Observable<boolean>;
     private isDestroyed = new Subject<boolean>();
-    private sidebar: Sidebars;
+    private sidebars: Sidebars;
 
     constructor(
         private store: Store<NgrxStateAtom>,
@@ -35,26 +34,10 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
         this.ServiceNowFeatureFlagOn = this.featureFlagsService.getFeatureStatus('servicenow_cmdb');
         this.isIAMv2$ = this.store.select(isIAMv2);
         this.workflowEnabled$ = this.clientRunsStore.select(clientRunsWorkflowEnabled);
-        // this.store.select(isIAMv2).pipe(
-        //   takeUntil(this.isDestroyed)
-        // ).subscribe(
-        //     (IAMv2) => {
-        //         this.isIAMv2 = IAMv2;
-        //         this.updateSidebars();
-        //     }
-        // );
-        // this.clientRunsStore.select(clientRunsWorkflowEnabled).pipe(
-        //   takeUntil(this.isDestroyed)
-        // ).subscribe(
-        //     (workflowEnabled) => {
-        //         this.workflowEnabled$ = workflowEnabled;
-        //         this.updateSidebars();
-        //     }
-        // );
     }
 
     populateSidebar() {
-      const sidebar = {
+      const sidebars = {
         active: '',
         dashboards: [{
           name: 'Dashboards',
@@ -257,7 +240,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
           ]
         }]
       };
-      this.sidebar = this.updateVisibleValues(sidebar);
+      this.sidebars = this.updateVisibleValues(sidebars);
     }
 
     ngOnInit() {
@@ -269,9 +252,9 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
       this.isDestroyed.complete();
     }
 
-    private updateVisibleValues(sidebar): Sidebars {
-      forEach(sidebar, (_value, key) => {
-        const menuGroups = sidebar[key];
+    private updateVisibleValues(sidebars: any): Sidebars {
+      forEach(sidebars, (_value, key) => {
+        const menuGroups = sidebars[key];
         forEach(menuGroups, (menuGroup) => {
           if (menuGroup && menuGroup.name) {
             this.setVisibleValuesToObservables(menuGroup);
@@ -284,7 +267,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
           }
         });
       });
-      return sidebar;
+      return sidebars;
     }
 
     private setVisibleValuesToObservables(item: any): void {
@@ -315,7 +298,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
     public updateSidebars(sidebarName?: string): void {
       this.populateSidebar();
       this.activeSidebar = sidebarName || this.activeSidebar;
-      this.sidebar.active = this.activeSidebar;
-      this.store.dispatch(new UpdateSidebars(this.sidebar));
+      this.sidebars.active = this.activeSidebar;
+      this.store.dispatch(new UpdateSidebars(this.sidebars));
     }
 }

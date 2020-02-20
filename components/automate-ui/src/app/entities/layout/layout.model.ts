@@ -1,6 +1,6 @@
 import { Observable } from 'rxjs';
 
-// Sidebar {
+// Sidebars {
 //   active: "dashboards",
 //   dashboards: []
 // }
@@ -18,7 +18,7 @@ export interface Sidebars {
 // MenuItemGroup {
 //   name: "Node Management",
 //   items: [],
-//   visible: Observable
+//   visible$: Observable<boolean>
 // }
 
 export interface MenuItemGroup {
@@ -32,7 +32,7 @@ export interface MenuItemGroup {
 //   icon: "notifications",
 //   route: "/settings/data-feed",
 //   authorized: {},
-//   visible: Observable
+//   visible$: Observable<boolean>
 // }
 
 export interface MenuItem {
