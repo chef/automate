@@ -63,15 +63,6 @@ func initPostgresDB(pgURL string) (*sql.DB, error) {
 	return db, nil
 }
 
-func (p *postgres) UpgradeToV2(ctx context.Context) error {
-	return nil
-}
-
-func (p *postgres) ResetToV1(ctx context.Context) error {
-	_, err := p.db.ExecContext(ctx, "UPDATE teams SET projects='{}'")
-	return err
-}
-
 // StoreTeam saves a team to the DB. This is used by IAM v1 ONLY!
 func (p *postgres) StoreTeam(ctx context.Context, name string, description string) (storage.Team, error) {
 	return p.insertTeam(ctx, name, description, []string{})
