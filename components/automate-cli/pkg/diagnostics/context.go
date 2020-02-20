@@ -233,32 +233,54 @@ func (c *testContext) GetVersion() (string, error) {
 }
 
 func (c *testContext) IsIAMV2() (bool, error) {
-	httpResp, err := c.DoLBRequest("/apis/iam/v2beta/policy_version")
+	vsn := struct {
+		Version struct{ Major, Minor string }
+	}{}
+
+	v2betaResp, err := c.DoLBRequest("/apis/iam/v2beta/policy_version")
 	if err != nil {
 		return false, err
 	}
-	defer httpResp.Body.Close()
+	defer v2betaResp.Body.Close()
 
-	if httpResp.StatusCode == 200 {
-		vsn := struct {
-			Version struct{ Major, Minor string }
-		}{}
-
-		if err := json.NewDecoder(httpResp.Body).Decode(&vsn); err != nil {
+	if v2betaResp.StatusCode == 200 {
+		if err := json.NewDecoder(v2betaResp.Body).Decode(&vsn); err != nil {
 			// on ancient versions of Automate, any unknown	prefix on an API query
 			// gets redirected by nginx to serve up the UI and responds with 200.
 			// We can assume v1 in this case.
 			return false, nil
 		}
+
 		return vsn.Version.Major == "V2", nil
-	} else if httpResp.StatusCode == 404 {
-		// if the /policy_version endpoint is not found,
-		// we must be testing an old version of Automate with only v1.
-		return false, nil
+
+	} else if v2betaResp.StatusCode == 404 {
+		// before assuming v1, we check the v2 policy_version API,
+		// since we might be on a post-force-upgrade version of Automate
+		v2Resp, err := c.DoLBRequest("/apis/iam/v2/policy_version")
+		if err != nil {
+			return false, err
+		}
+		defer v2Resp.Body.Close()
+
+		if v2Resp.StatusCode == 200 {
+			if err := json.NewDecoder(v2betaResp.Body).Decode(&vsn); err != nil {
+				// See decoder comment above,  we assume v1 in this case.
+				return false, nil
+			}
+
+			return vsn.Version.Major == "V2", nil
+
+			// if the /policy_version endpoint is not found using the v2 or v2beta prefix,
+			// we must be testing an old version of Automate with only v1.
+		} else if v2Resp.StatusCode == 404 {
+			return false, nil
+		}
+
+		return false, errors.Errorf("failed to verify IAM version with status code: %v", v2Resp.StatusCode)
 	}
 
 	// any other unexpected responses get caught here
-	return false, errors.Errorf("failed to verify IAM version with status code: %v", httpResp.StatusCode)
+	return false, errors.Errorf("failed to verify IAM version with status code: %v", v2betaResp.StatusCode)
 }
 
 func (c *testContext) PublishViaNATS(messages [][]byte) error {
