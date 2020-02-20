@@ -10,13 +10,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	natsc "github.com/nats-io/go-nats"
 	stan "github.com/nats-io/go-nats-streaming"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/authz"
+	policies "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
@@ -36,19 +37,25 @@ func (s *Suite) initNATSAuthTest() error {
 		return err
 	}
 
-	policiesResp, err := s.AuthzClient.ListPolicies(ctx, &authz.ListPoliciesReq{})
+	policiesResp, err := s.AuthzClient.ListPolicies(ctx, &policies.ListPoliciesReq{})
 	if err != nil {
 		return err
 	}
 
-	for _, p := range policiesResp.Policies {
-		if p.Resource == "ingest:*" {
-			s.AuthPoliciesToRestore = append(s.AuthPoliciesToRestore, p)
+PolicyLoop:
+	for _, policy := range policiesResp.Policies {
+		for _, statement := range policy.Statements {
+			for _, resource := range statement.Resources {
+				if resource == "ingest:*" {
+					s.AuthPoliciesToRestore = append(s.AuthPoliciesToRestore, policy)
+					continue PolicyLoop
+				}
+			}
 		}
 	}
 
 	for _, p := range s.AuthPoliciesToRestore {
-		_, err := s.AuthzClient.DeletePolicy(ctx, &authz.DeletePolicyReq{Id: p.Id})
+		_, err := s.AuthzClient.DeletePolicy(ctx, &policies.DeletePolicyReq{Id: p.Id})
 		if err != nil {
 			return err
 		}
@@ -64,11 +71,15 @@ func (s *Suite) teardownNATSAuthTest() {
 	defer s.authzConn.Close()
 
 	for _, p := range s.AuthPoliciesToRestore {
-		_, err := s.AuthzClient.CreatePolicy(ctx, &authz.CreatePolicyReq{
-			Action:   p.Action,
-			Subjects: p.Subjects,
-			Resource: p.Resource,
-		})
+		createReq := &policies.CreatePolicyReq{
+			Id:      p.Id,
+			Name:    p.Name,
+			Members: p.Members,
+		}
+		for _, statement := range p.Statements {
+			createReq.Statements = append(createReq.Statements, statement)
+		}
+		_, err := suite.AuthzClient.CreatePolicy(ctx, createReq)
 		if err != nil {
 			fmt.Printf("Error in NATS Auth Test teardown: %s\n", err)
 		}
@@ -89,7 +100,7 @@ func (s *Suite) initAuthzClient() error {
 		return err
 	}
 
-	authzClient := authz.NewAuthorizationClient(authzConn)
+	authzClient := policies.NewPoliciesClient(authzConn)
 
 	s.authzConn = authzConn
 	s.AuthzClient = authzClient
@@ -175,7 +186,7 @@ func TestEventGatewayAuth(t *testing.T) {
 
 	t.Run("when the authZ subject doesn't have permissions for ingest, cannot connect to NATS", func(t *testing.T) {
 		// only allowing read should make this token invalid for ingest
-		notAuthorizedToken := getNewToken(t, "read")
+		notAuthorizedToken := getNewToken(t, "*:read")
 
 		natsURLNotAuthorized := fmt.Sprintf(natsURLfmt, notAuthorizedToken)
 		_, err := natsc.Connect(natsURLNotAuthorized)
@@ -212,10 +223,19 @@ func getNewToken(t *testing.T, authorizedAction string) string {
 	})
 	require.NoError(t, err)
 
-	_, err = suite.AuthzClient.CreatePolicy(ctx, &authz.CreatePolicyReq{
-		Action:   authorizedAction,
-		Subjects: []string{fmt.Sprintf("token:%s", response.Id)},
-		Resource: "*",
+	polID := "nats-test-policy-" + uuid.Must(uuid.NewV4()).String()
+	_, err = suite.AuthzClient.CreatePolicy(ctx, &policies.CreatePolicyReq{
+		Id:      polID,
+		Name:    polID,
+		Members: []string{fmt.Sprintf("token:%s", response.Id)},
+		Statements: []*policies.Statement{
+			&policies.Statement{
+				Effect:   policies.Statement_ALLOW,
+				Actions:  []string{authorizedAction},
+				Projects: []string{"*"},
+			},
+		},
+		Projects: []string{},
 	})
 	require.NoError(t, err)
 

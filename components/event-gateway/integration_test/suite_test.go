@@ -9,7 +9,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/chef/automate/api/interservice/authz"
+	policies "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
 )
@@ -27,8 +27,8 @@ var (
 
 type Suite struct {
 	connFactory           *secureconn.Factory
-	AuthPoliciesToRestore []*authz.Policy
-	AuthzClient           authz.AuthorizationClient
+	AuthPoliciesToRestore []*policies.Policy
+	AuthzClient           policies.PoliciesClient
 	authzConn             *grpc.ClientConn
 }
 
