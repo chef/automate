@@ -66,7 +66,7 @@ export class GetDestinationFailure implements Action {
 export interface CreateDesinationPayload {
   name: string;
   url: string;
-  secret_id?: string;
+  secret_id: string;
 }
 
 export class CreateDestination implements Action {
