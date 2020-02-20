@@ -42,11 +42,14 @@ func (chefAction ChefAction) FinishProcessing(err error) {
 	if err == nil {
 		// Adding new metric; Time for a message to go through the pipeline
 		log.WithFields(log.Fields{
-			"message_id": chefAction.ID,
-			"message":    "ChefAction",
-			"metric":     "pipeline",
-			"type":       "ingest_time",
-			"ms":         chefAction.ClockProcessingTime(),
+			"message_id":  chefAction.ID,
+			"message":     "ChefAction",
+			"metric":      "pipeline",
+			"type":        "ingest_time",
+			"ms":          chefAction.ClockProcessingTime(),
+			"entity_name": chefAction.InternalChefAction.EntityName,
+			"entity_type": chefAction.InternalChefAction.EntityType,
+			"entity_task": chefAction.InternalChefAction.Task,
 		}).Info("Message ingested successfully")
 	}
 }

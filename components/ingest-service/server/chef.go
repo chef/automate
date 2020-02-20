@@ -65,7 +65,7 @@ func (s *ChefIngestServer) ProcessChefRun(ctx context.Context, run *chef.Run) (*
 		err = <-errc
 
 		if err != nil {
-			log.WithError(err).Error("Message failure")
+			log.WithError(err).Error("Chef run ingestion failure")
 		}
 	} else if run.GetMessageType() == "run_start" {
 		log.WithFields(log.Fields{
@@ -95,7 +95,7 @@ func (s *ChefIngestServer) ProcessChefAction(ctx context.Context, action *chef.A
 		err := <-errc
 
 		if err != nil {
-			log.WithError(err).Error("Message failure")
+			log.WithError(err).Error("Chef Action ingestion failure")
 		}
 		return &response.ProcessChefActionResponse{}, err
 	}

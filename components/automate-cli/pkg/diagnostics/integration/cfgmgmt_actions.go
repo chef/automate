@@ -83,15 +83,16 @@ func CreateCfgmgmtActionsDiagnostic() diagnostics.Diagnostic {
 					return err
 				}
 
-				save.CreatedEntities = append(save.CreatedEntities, cfgmgmtActionsEntity{
+				e := cfgmgmtActionsEntity{
 					EntityName:       entityName,
 					RecordedAtMillis: day.UnixNano() / int64(time.Millisecond),
-				})
+				}
+				save.CreatedEntities = append(save.CreatedEntities, e)
 
 				tstCtx.SetValue("cfgmgmt-actions", save)
 
 				resp, err := tstCtx.DoLBRequest(
-					"/api/v0/events/data-collector",
+					"/api/v0/events/data-collector?z=cfgmgmt-actions",
 					lbrequest.WithMethod("POST"),
 					lbrequest.WithJSONBody(buf.String()),
 				)
@@ -123,7 +124,7 @@ func CreateCfgmgmtActionsDiagnostic() diagnostics.Diagnostic {
 			maxTries := 5
 
 			for _, entity := range loaded.CreatedEntities {
-				reqPath := fmt.Sprintf("/api/v0/eventfeed?collapse=true&page_size=100&start=%d&end=%d", entity.RecordedAtMillis-1000, entity.RecordedAtMillis+1000)
+				reqPath := fmt.Sprintf("/api/v0/eventfeed?collapse=true&page_size=100&start=%d&end=%d", entity.RecordedAtMillis-600000, entity.RecordedAtMillis+600000)
 				found := false
 
 				type eventsFeedResp struct {
@@ -163,7 +164,7 @@ func CreateCfgmgmtActionsDiagnostic() diagnostics.Diagnostic {
 					}
 					time.Sleep(5 * time.Duration(tries) * time.Second)
 				}
-				assert.True(tstCtx, found, "Could not find entity %s in GET %s; did get %+v", entity.EntityName, reqPath, respUnmarshalled)
+				assert.True(tstCtx, found, "[%s] Could not find entity %s in GET %s; did get %+v", time.Now().UTC().String(), entity.EntityName, reqPath, respUnmarshalled)
 			}
 
 		},
