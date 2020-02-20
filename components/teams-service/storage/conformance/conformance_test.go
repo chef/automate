@@ -16,7 +16,6 @@ import (
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/memstore"
 	"github.com/chef/automate/components/teams-service/storage/postgres"
-	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/test"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -80,11 +79,6 @@ func TestStorage(t *testing.T) {
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
-	dataMigrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../postgres/datamigration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg data config for tests: %s", err.Error())
-	}
-
 	if migrationConfig == nil {
 		mem, err := memstore.New(ctx, l)
 		require.NoError(t, err)
@@ -104,7 +98,7 @@ func TestStorage(t *testing.T) {
 
 		authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
 
-		adp, err := postgres.New(l, *migrationConfig, *(*datamigration.Config)(dataMigrationConfig), true, authzV2AuthorizationClient)
+		adp, err := postgres.New(l, *migrationConfig, true, authzV2AuthorizationClient)
 		require.NoError(t, err)
 		adapters["postgres"] = adp
 
