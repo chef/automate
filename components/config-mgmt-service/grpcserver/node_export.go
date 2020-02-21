@@ -86,12 +86,6 @@ func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.
 	ctx, cancel := context.WithDeadline(streamCtx, deadline)
 	defer cancel()
 
-	pageSize := 100
-	start := time.Time{}
-	end := time.Time{}
-	var cursorValue interface{}
-	cursorID := ""
-	sortField, sortAsc := request.Sorting.GetParameters()
 	nodeFilters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
 		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
@@ -100,7 +94,7 @@ func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.
 
 	nodeFilters, err = filterByProjects(ctx, nodeFilters)
 	if err != nil {
-		return err
+		return status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
 	// Adding the exists = true filter to the list of filters, because nodes
@@ -108,35 +102,56 @@ func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.
 	// even after the node no longer exists
 	nodeFilters["exists"] = []string{"true"}
 
-	actualSortField := params.ConvertParamToNodeStateBackendLowerFilter(sortField)
+	nodePager := s.nodePager(ctx, request, nodeFilters)
 
-	nodes, err := s.client.GetNodesPageByCursor(ctx, start, end,
-		nodeFilters, cursorValue, cursorID, pageSize, actualSortField, sortAsc)
-	if err != nil {
-		return status.Errorf(codes.Internal, err.Error())
-	}
+	for {
+		nodes, err := nodePager()
+		if err != nil {
+			return status.Errorf(codes.Internal, err.Error())
+		}
 
-	for len(nodes) > 0 {
 		err = sendResult(nodes)
 		if err != nil {
 			return status.Errorf(codes.Internal, "Failed to stream nodes Error: %s", err.Error())
+		}
+
+		if len(nodes) == 0 {
+			break
+		}
+	}
+
+	return nil
+}
+
+func (s *CfgMgmtServer) nodePager(ctx context.Context, request *pRequest.NodeExport, nodeFilters map[string][]string) func() ([]backend.Node, error) {
+	pageSize := 100
+	start := time.Time{}
+	end := time.Time{}
+	var cursorValue interface{}
+	cursorID := ""
+	sortField, sortAsc := request.Sorting.GetParameters()
+	actualSortField := params.ConvertParamToNodeStateBackendLowerFilter(sortField)
+
+	return func() ([]backend.Node, error) {
+		nodes, err := s.client.GetNodesPageByCursor(ctx, start, end,
+			nodeFilters, cursorValue, cursorID, pageSize, actualSortField, sortAsc)
+		if err != nil {
+			return []backend.Node{}, err
+		}
+
+		if len(nodes) == 0 {
+			return []backend.Node{}, nil
 		}
 
 		lastNode := nodes[len(nodes)-1]
 		cursorID = lastNode.EntityUuid
 		cursorValue, err = backend.GetSortableFieldValue(sortField, lastNode)
 		if err != nil {
-			return err
+			return []backend.Node{}, err
 		}
 
-		nodes, err = s.client.GetNodesPageByCursor(ctx, start, end,
-			nodeFilters, cursorValue, cursorID, pageSize, actualSortField, sortAsc)
-		if err != nil {
-			return status.Errorf(codes.Internal, err.Error())
-		}
+		return nodes, nil
 	}
-
-	return nil
 }
 
 func jsonExport(stream service.CfgMgmt_NodeExportServer) exportHandler {
