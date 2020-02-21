@@ -63,7 +63,22 @@ If you already [created an Admin API token]({{< relref "#creating-an-admin-api-t
 You can give it a description to denote its use:
 
 ```bash
-curl -s -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"description":"My shiny new token"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/tokens | jq .id
+curl -s -k -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"description":"My shiny new token"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/tokens | jq .id
+```
+
+### List all the tokens
+
+```bash
+curl -s -k -H "api-token: $ADMIN-TOKEN" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/tokens | jq .
+```
+
+### Create a clone of a previous token, as long as the chosen ID is unused
+
+```bash
+curl -s -k -H "api-token: $ADMIN-TOKEN" -H "Content-Type: application/json" -d
+'{"id":"86df8557-8f52-4561-a55a-1dfc14ede8e6","description":"My previous shiny new token","value": "QB-zpu3he_pCfbQkE9H_MeWYuu0=","active":true}' https://automate-deployment.test/api/v0/auth/tokens
+
+{"id":"86df8557-8f52-4561-a55a-1dfc14ede8e6","description":"My previous shiny new token","value":"QB-zpu3he_pCfbQkE9H_MeWYuu0=","active":true,"created":"2020-02-21T21:02:30Z","updated":"2020-02-21T21:02:30Z"}
 ```
 
 ## Creating an Admin API Token
