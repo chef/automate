@@ -19,7 +19,7 @@ control 'upgrade-iam-v2-1' do
         .reject{ |p| /^\[Legacy\]/.match(p[:name]) }
 
       # default policies automatically added during migration
-      expect(other_policies.length).to eq 4
+      expect(other_policies.length).to be >= 4
     end
 
     it 'the editors default policy includes editor role' do
