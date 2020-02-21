@@ -5,7 +5,16 @@
 # For details on the elasticsearch health colors, see:
 # https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html
 
+export POST_RUN_SENTINEL="{{pkg.svc_var_path}}/post-run-completed"
+
 function health_check() {
+
+  # When the post-run hook completes it'll write out this file. If the file does
+  # not exist we'll assume it has not completed and therefore we should fail.
+  if [[ ! -f ${POST_RUN_SENTINEL} ]]; then
+    return 2
+  fi
+
   local es_host
   {{#if svc.me.cfg.http-host ~}}
   es_host="{{svc.me.sys.ip}}"

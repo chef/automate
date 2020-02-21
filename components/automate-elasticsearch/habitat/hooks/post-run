@@ -21,7 +21,13 @@ HOST="127.0.0.1"
 
 source {{pkg.svc_config_path}}/health_check
 
-if [[ $(wait_until_healthy 300) -ne 0 ]]; then
+# Ideally we could wait for this to be healthy in a loop forever but habitat
+# doesn't currently kill hooks when a service is unloaded:
+# https://github.com/habitat-sh/habitat/issues/7494
+#
+# Therefore, we'll ensure that this eventually times out and dies. If it's
+# taking longer than 10 minutes to get to yellow or green we're in trouble.
+if [[ $(wait_until_healthy 600) -ne 0 ]]; then
   echo "Timed out waiting for elasticsearch to become healthy, not applying index settings"
   exit 0 # always exit 0 in post-run or it'll retry
 fi
@@ -36,6 +42,10 @@ curl \
     "index.number_of_replicas": "{{cfg.index.number_of_replicas}}",
     "index.refresh_interval": "{{cfg.index.refresh_interval}}"
   }'
+
+# The health-check hook will return an error unless we signal to it though touching
+# the sentinel.
+touch ${POST_RUN_SENTINEL}
 
 exit 0
 {{~/if}}
