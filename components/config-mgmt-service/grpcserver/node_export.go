@@ -68,10 +68,16 @@ type displayNode struct {
 
 // NodeExport streams a json or csv export
 func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.CfgMgmt_NodeExportServer) error {
-	exporter, err := getExportHandler(request.OutputType, stream)
-	if err != nil {
-		return err
+	var sendResult exportHandler
+	switch request.OutputType {
+	case "", "json":
+		sendResult = jsonExport(stream)
+	case "csv":
+		sendResult = csvExport(stream)
+	default:
+		return status.Error(codes.Unauthenticated, fmt.Sprintf("%s export is not supported", request.OutputType))
 	}
+
 	streamCtx := stream.Context()
 	deadline, ok := streamCtx.Deadline()
 	if !ok {
@@ -79,22 +85,7 @@ func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.
 	}
 	ctx, cancel := context.WithDeadline(streamCtx, deadline)
 	defer cancel()
-	return s.exportNodes(ctx, request, exporter)
-}
 
-func getExportHandler(outputType string, stream service.CfgMgmt_NodeExportServer) (exportHandler, error) {
-	switch outputType {
-	case "", "json":
-		return jsonExport(stream), nil
-	case "csv":
-		return csvExport(stream), nil
-	default:
-		return nil, status.Error(codes.Unauthenticated, fmt.Sprintf(outputType+" export is not supported"))
-	}
-}
-
-func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeExport,
-	sendResult exportHandler) error {
 	pageSize := 100
 	start := time.Time{}
 	end := time.Time{}
