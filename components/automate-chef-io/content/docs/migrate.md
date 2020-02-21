@@ -113,7 +113,7 @@ If you rely on any of the capabilities listed below, we recommend you continue t
 Chef continues support of Chef Automate 1 while we develop upgrade paths for these capabilities on the new platform.
 For more information, please contact your Chef account representative.
 
-* **Chef Manage:** Chef Automate 2, unlike Automate 1 cannot serve as a SAML auth proxy
+* **Chef Manage:** Chef Automate 2, unlike Automate 1, cannot serve as a SAML auth proxy
 * **FIPS:** Chef Automate 2 cannot currently operate in FIPS mode
 * **Disaster Recovery:** Chef Automate 2 cannot currently operate in a primary/standby mode
 * **Custom Kibana dashboards:** Chef Automate 2 does not include Kibana in its technology stack
