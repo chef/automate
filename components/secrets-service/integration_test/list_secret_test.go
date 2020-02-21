@@ -66,21 +66,21 @@ func TestListSecretOrder(t *testing.T) {
 			order: secrets.Query_ASC,
 			sort:  "name",
 			inputSecrets: []*secrets.Secret{
-				&secrets.Secret{
+				{
 					Name: "a",
 					Type: "ssh",
 					Data: appendKvs(
 						&secrets.Kv{Key: "username", Value: "username"},
 						&secrets.Kv{Key: "password", Value: "password"}),
 				},
-				&secrets.Secret{
+				{
 					Name: "c",
 					Type: "ssh",
 					Data: appendKvs(
 						&secrets.Kv{Key: "username", Value: "username"},
 						&secrets.Kv{Key: "password", Value: "password"}),
 				},
-				&secrets.Secret{
+				{
 					Name: "b",
 					Type: "ssh",
 					Data: appendKvs(
@@ -89,15 +89,15 @@ func TestListSecretOrder(t *testing.T) {
 				},
 			},
 			outputSecrets: []*secrets.Secret{
-				&secrets.Secret{
+				{
 					Name: "a",
 					Type: "ssh",
 				},
-				&secrets.Secret{
+				{
 					Name: "b",
 					Type: "ssh",
 				},
-				&secrets.Secret{
+				{
 					Name: "c",
 					Type: "ssh",
 				},
@@ -108,21 +108,21 @@ func TestListSecretOrder(t *testing.T) {
 			order: secrets.Query_DESC,
 			sort:  "name",
 			inputSecrets: []*secrets.Secret{
-				&secrets.Secret{
+				{
 					Name: "a",
 					Type: "ssh",
 					Data: appendKvs(
 						&secrets.Kv{Key: "username", Value: "username"},
 						&secrets.Kv{Key: "password", Value: "password"}),
 				},
-				&secrets.Secret{
+				{
 					Name: "c",
 					Type: "ssh",
 					Data: appendKvs(
 						&secrets.Kv{Key: "username", Value: "username"},
 						&secrets.Kv{Key: "password", Value: "password"}),
 				},
-				&secrets.Secret{
+				{
 					Name: "b",
 					Type: "ssh",
 					Data: appendKvs(
@@ -131,15 +131,15 @@ func TestListSecretOrder(t *testing.T) {
 				},
 			},
 			outputSecrets: []*secrets.Secret{
-				&secrets.Secret{
+				{
 					Name: "c",
 					Type: "ssh",
 				},
-				&secrets.Secret{
+				{
 					Name: "b",
 					Type: "ssh",
 				},
-				&secrets.Secret{
+				{
 					Name: "a",
 					Type: "ssh",
 				},
@@ -150,21 +150,21 @@ func TestListSecretOrder(t *testing.T) {
 			order: secrets.Query_DESC,
 			sort:  "type",
 			inputSecrets: []*secrets.Secret{
-				&secrets.Secret{
+				{
 					Name: "a",
 					Type: "ssh",
 					Data: appendKvs(
 						&secrets.Kv{Key: "username", Value: "username"},
 						&secrets.Kv{Key: "password", Value: "password"}),
 				},
-				&secrets.Secret{
+				{
 					Name: "c",
 					Type: "service_now",
 					Data: appendKvs(
 						&secrets.Kv{Key: "username", Value: "username"},
 						&secrets.Kv{Key: "password", Value: "password"}),
 				},
-				&secrets.Secret{
+				{
 					Name: "b",
 					Type: "winrm",
 					Data: appendKvs(
@@ -173,15 +173,15 @@ func TestListSecretOrder(t *testing.T) {
 				},
 			},
 			outputSecrets: []*secrets.Secret{
-				&secrets.Secret{
+				{
 					Name: "b",
 					Type: "winrm",
 				},
-				&secrets.Secret{
+				{
 					Name: "a",
 					Type: "ssh",
 				},
-				&secrets.Secret{
+				{
 					Name: "c",
 					Type: "service_now",
 				},
@@ -192,21 +192,21 @@ func TestListSecretOrder(t *testing.T) {
 			order: secrets.Query_ASC,
 			sort:  "type",
 			inputSecrets: []*secrets.Secret{
-				&secrets.Secret{
+				{
 					Name: "a",
 					Type: "ssh",
 					Data: appendKvs(
 						&secrets.Kv{Key: "username", Value: "username"},
 						&secrets.Kv{Key: "password", Value: "password"}),
 				},
-				&secrets.Secret{
+				{
 					Name: "c",
 					Type: "service_now",
 					Data: appendKvs(
 						&secrets.Kv{Key: "username", Value: "username"},
 						&secrets.Kv{Key: "password", Value: "password"}),
 				},
-				&secrets.Secret{
+				{
 					Name: "b",
 					Type: "winrm",
 					Data: appendKvs(
@@ -215,15 +215,15 @@ func TestListSecretOrder(t *testing.T) {
 				},
 			},
 			outputSecrets: []*secrets.Secret{
-				&secrets.Secret{
+				{
 					Name: "c",
 					Type: "service_now",
 				},
-				&secrets.Secret{
+				{
 					Name: "a",
 					Type: "ssh",
 				},
-				&secrets.Secret{
+				{
 					Name: "b",
 					Type: "winrm",
 				},
