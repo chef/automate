@@ -229,16 +229,11 @@ function go_component_static_tests() {
   verify_component $1 || return $?
   local component=$1
 
-  log_line "Collecting ${component}'s go files"
-  local gofiles
-  gofiles=$(find components/$component/ -maxdepth 3 -name '*.go')
-  [ -z "$gofiles" ] && return 0
-
   log_line "Installing gofmt"
   install_if_missing core/go gofmt
 
   log_line "Testing $component go files"
-  unformatted=$(gofmt -l "$gofiles")
+  unformatted=$(gofmt -l components/$component)
   if [ -z "$unformatted" ]
   then
     log_line "Success!! $component"
