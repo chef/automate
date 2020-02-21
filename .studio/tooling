@@ -147,4 +147,5 @@ function revendor() {
   pushd /src || return 1
     make revendor
   popd || return 1
+  setup_gobin
 }

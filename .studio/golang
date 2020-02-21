@@ -113,7 +113,7 @@ complete -F _component_auto_complete go_build_component
 document "reload_component_binary" <<DOC
   Reloads the component binary from the '/src' directory. (Build a binary with 'go_build')
 
-  This helper will force load a binary located at '/src/bin/\$component' into your already installed
+  This helper will force load a binary located at '$GOBIN/\$component' into your already installed
   habitat package. If no package have been installed, it will try to install one.
 DOC
 function reload_component_binary() {
@@ -131,16 +131,16 @@ function reload_component_binary() {
     fi
   fi
 
-  [ ! -f /src/bin/${component} ] && go_build_component $component
+  [ ! -f "$GOBIN/${component}" ] && go_build_component "$component"
 
   # TODO: (@afiune) This is a bit too extreme but what we are trying to avoid is to
   # be polling to the depot for newer packages, since we disable that functionality
   # we have to force load the binary like this. Maybe I'll revisit this latter.
   log_line " Reloading $component binary"
   # we need to unlink the old one so that the new one my be updated and then relinked
-  unlink ${component_path}/bin/${component}
-  kill_running_service $component
-  cp /src/bin/${component} ${component_path}/bin/${component}
+  unlink "${component_path}/bin/${component}"
+  kill_running_service "$component"
+  cp "$GOBIN/${component}" "${component_path}/bin/${component}"
   if [[ $? != 0 ]]; then
     error "There was a problem trying to reload the $component binary."
     error "Run 'go_build_component $component' and try again."
