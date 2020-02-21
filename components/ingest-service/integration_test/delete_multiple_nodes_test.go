@@ -16,7 +16,7 @@ func TestMarkForDeleteOneNode(t *testing.T) {
 		req    = new(chef.MultipleNodeDeleteRequest)
 		nodeID = newUUID()
 		nodes  = []iBackend.Node{
-			iBackend.Node{
+			{
 				NodeInfo: iBackend.NodeInfo{
 					EntityUuid: nodeID,
 				},
