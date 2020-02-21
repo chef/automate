@@ -2439,11 +2439,11 @@ var fileDescriptor_96e4c16478599b1f = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // CerealClient is the client API for Cereal service.
 //
@@ -2463,10 +2463,10 @@ type CerealClient interface {
 }
 
 type cerealClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewCerealClient(cc *grpc.ClientConn) CerealClient {
+func NewCerealClient(cc grpc.ClientConnInterface) CerealClient {
 	return &cerealClient{cc}
 }
 

@@ -84,11 +84,11 @@ var fileDescriptor_b890cb1282e7b3dd = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // AuthorizationClient is the client API for Authorization service.
 //
@@ -104,10 +104,10 @@ type AuthorizationClient interface {
 }
 
 type authorizationClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewAuthorizationClient(cc *grpc.ClientConn) AuthorizationClient {
+func NewAuthorizationClient(cc grpc.ClientConnInterface) AuthorizationClient {
 	return &authorizationClient{cc}
 }
 

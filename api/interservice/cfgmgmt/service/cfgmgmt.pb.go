@@ -81,11 +81,11 @@ var fileDescriptor_2d8f0c4330cc0845 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // CfgMgmtClient is the client API for CfgMgmt service.
 //
@@ -113,10 +113,10 @@ type CfgMgmtClient interface {
 }
 
 type cfgMgmtClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewCfgMgmtClient(cc *grpc.ClientConn) CfgMgmtClient {
+func NewCfgMgmtClient(cc grpc.ClientConnInterface) CfgMgmtClient {
 	return &cfgMgmtClient{cc}
 }
 

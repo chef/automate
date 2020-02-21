@@ -524,11 +524,11 @@ var fileDescriptor_ac8fabc120c5cbd2 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // SecretsServiceClient is the client API for SecretsService service.
 //
@@ -542,10 +542,10 @@ type SecretsServiceClient interface {
 }
 
 type secretsServiceClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewSecretsServiceClient(cc *grpc.ClientConn) SecretsServiceClient {
+func NewSecretsServiceClient(cc grpc.ClientConnInterface) SecretsServiceClient {
 	return &secretsServiceClient{cc}
 }
 

@@ -650,11 +650,11 @@ var fileDescriptor_eebdcc40a6dbce13 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // PurgeClient is the client API for Purge service.
 //
@@ -666,10 +666,10 @@ type PurgeClient interface {
 }
 
 type purgeClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewPurgeClient(cc *grpc.ClientConn) PurgeClient {
+func NewPurgeClient(cc grpc.ClientConnInterface) PurgeClient {
 	return &purgeClient{cc}
 }
 

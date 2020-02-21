@@ -46,7 +46,7 @@ export class ConfirmApplyStopModalComponent implements OnChanges {
     const durCountdown = etc.diff(now) < 0 ? '00:00:00' : `${durHours}:${durMins}:${durSecs}`;
 
     this.progressValue = percentageComplete;
-    this.progressPrefixText = `${Math.floor(percentageComplete * 100)}% complete`;
+    this.progressPrefixText = `${Math.floor(percentageComplete)}% complete`;
     this.progressSuffixText = `${durCountdown} until finished`;
   }
 }
