@@ -44,7 +44,7 @@ func GetInstance() *pg {
 	return singletonInstance
 }
 
-// New instantiates the singleton postgres storage backend.
+// Initialize instantiates the singleton postgres storage backend.
 // Will only initialize once. Will simply return nil if already initialized.
 func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf migration.Config,
 	dataMigConf datamigration.Config, projectLimit int) error {

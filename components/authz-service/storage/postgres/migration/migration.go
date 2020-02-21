@@ -36,7 +36,7 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 	migrationsTable := ""
 	ctx := context.Background()
 
-	l.Infof("Running db migrations from %q", migrationsPath)
+	l.Info("Running db migrations...")
 	purl, err := addMigrationsTable(pgURL, migrationsTable)
 	if err != nil {
 		return errors.Wrap(err, "parse PG URL")
@@ -63,7 +63,9 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 	}
 
 	if version < PreForceUpgradeMigration {
+		l.Infof("Migrating schema from version %v to %v...", version, PreForceUpgradeMigration)
 		err = m.Migrate(PreForceUpgradeMigration)
+		l.Infof("Migrating schema from version %v to %v -- complete", version, PreForceUpgradeMigration)
 		if err != nil && err != migrate.ErrNoChange {
 			return errors.Wrap(err, "migration up to IAM-V2-force-upgrade failed")
 		}
@@ -90,6 +92,7 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 	if isOnV1 {
 		if isDirty { // we've attempted to migrate and not finished
 			// get IAM db in original, clean state to avoid conflicts
+			l.Infof("Detected unfinished migration; resetting IAM DB to original, clean state")
 			err = legacy.ResetIAMDb(ctx, db)
 			if err != nil {
 				return errors.Wrap(err, "reset IAM V2 database")
@@ -106,7 +109,9 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 		if err != nil {
 			return errors.Wrapf(err, "failed to set IAM v2 migration_status to %s", constants_v2.EnumInProgress)
 		}
+		l.Info("Migrating from IAM v1 to v2...")
 		err = legacy.MigrateToV2(ctx, db, migrateV1Policies)
+		l.Info("Migrating from IAM v1 to v2 -- complete")
 		if err != nil {
 			statusErr := legacy.RecordMigrationStatus(ctx, constants_v2.EnumFailed, db)
 			if statusErr != nil {
@@ -121,18 +126,26 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 	}
 
 	// idempotent
+	l.Info("Migrating data if needed...")
 	err = dataMigConf.Migrate()
+	l.Info("Migrating data if needed -- complete")
 	if err != nil {
 		return errors.Wrap(err, "IAM data migrations failed")
 	}
 
 	// perform remaining migrations
+	l.Infof("Migrating schema post-version %v...", PreForceUpgradeMigration)
 	err = m.Up()
 	if err != nil && err != migrate.ErrNoChange {
 		return errors.Wrap(err, "migrations failed")
 	}
+	resolution := "complete"
+	if err == migrate.ErrNoChange {
+		resolution = "no changes necessary"
+	}
+	l.Infof("Migrating schema post-version %v -- %s", PreForceUpgradeMigration, resolution)
 
-	l.Infof("Completed db migrations")
+	l.Info("Running db migrations -- complete")
 
 	err = db.Close()
 	if err != nil {
