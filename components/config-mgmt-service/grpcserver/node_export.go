@@ -157,12 +157,15 @@ func (s *CfgMgmtServer) nodePager(ctx context.Context, request *pRequest.NodeExp
 func jsonExport(stream service.CfgMgmt_NodeExportServer) exportHandler {
 	initialRun := true
 	return func(nodes []backend.Node) error {
+		// If this is the first set of nodes to export, prepend "[" to start a JSON document.
 		if initialRun {
 			err := stream.Send(&response.ExportData{Content: []byte("[")})
 			if err != nil {
 				return err
 			}
 			initialRun = false
+			// If this is not the first set of nodes and the collection has elements,
+			// prepend the "," that couldn't get added in the previous call to this function.
 		} else if len(nodes) != 0 {
 			err := stream.Send(&response.ExportData{Content: []byte(",")})
 			if err != nil {
@@ -170,6 +173,7 @@ func jsonExport(stream service.CfgMgmt_NodeExportServer) exportHandler {
 			}
 		}
 
+		// If the collection has no elements, append "]" to close the JSON document and stop.
 		if len(nodes) == 0 {
 			err := stream.Send(&response.ExportData{Content: []byte("]")})
 			if err != nil {
@@ -189,7 +193,10 @@ func jsonExport(stream service.CfgMgmt_NodeExportServer) exportHandler {
 				return fmt.Errorf("Failed to marshal JSON export data: %+v", err)
 			}
 
-			if i != len(nodes) - 1 {
+			// If this is the last element of the collection passed to this function call,
+			// there is not enough information to know if this is the last element overall.
+			// So, only append "," if it can be determined that there are more elements.
+			if i != len(nodes)-1 {
 				raw = append(raw, ',')
 			}
 
