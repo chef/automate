@@ -104,7 +104,7 @@ func CreateCfgmgmtActionsDiagnostic() diagnostics.Diagnostic {
 					_ = resp.Body.Close()
 				}()
 				if resp.StatusCode != 200 {
-					return errors.Wrapf(err, "Failed to POST /api/v0/events/data-collector: Body:\n%s", buf.String())
+					return errors.Errorf("Failed to POST /api/v0/events/data-collector: Body:\n%s", buf.String())
 				}
 			}
 
