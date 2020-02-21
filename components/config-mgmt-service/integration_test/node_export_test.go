@@ -759,17 +759,12 @@ func TestNodeExportPagingJSON(t *testing.T) {
 		data = append(data, tdata.GetContent()...)
 	}
 
-	actualNumberOfNodes := 0
-	dec := json.NewDecoder(bytes.NewReader(data))
-	for dec.More() {
-		var nodes []interface{}
-		err := dec.Decode(&nodes)
-		require.NoError(t, err)
+	var outputNodes []interface{}
+	err = json.Unmarshal(data, &outputNodes)
 
-		actualNumberOfNodes += len(nodes)
-	}
+	require.NoError(t, err)
 
-	assert.Equal(t, numberOfNodes, actualNumberOfNodes)
+	assert.Equal(t, numberOfNodes, len(outputNodes))
 }
 
 func TestNodeExportPagingCSV(t *testing.T) {
