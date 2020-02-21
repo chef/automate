@@ -47,7 +47,7 @@ func TestComplexChefErrorToResponseError(t *testing.T) {
 		}{
 			Title: "title",
 			Sections: []map[string]interface{}{
-				map[string]interface{}{
+				{
 					"Chef::Exceptions":        "Text text text",
 					"Chef::Super::Stacktrace": "lalala",
 				},
@@ -61,7 +61,7 @@ func TestComplexChefErrorToResponseError(t *testing.T) {
 		Backtrace: []string{"backtrace"},
 		Description: &response.Description{
 			Title: "title",
-			Sections: []*stpb.Struct{&stpb.Struct{
+			Sections: []*stpb.Struct{{
 				Fields: map[string]*stpb.Value{
 					"Chef::Exceptions":        {Kind: &stpb.Value_StringValue{"Text text text"}},
 					"Chef::Super::Stacktrace": {Kind: &stpb.Value_StringValue{"lalala"}},

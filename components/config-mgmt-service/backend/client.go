@@ -94,7 +94,7 @@ type InventoryNode struct {
 	LastCCRReceived time.Time `json:"lastCCRReceived"`
 	NodeName        string    `json:"node_name"`
 	Fqdn            string    `json:"fqdn"`
-	IPAddress       string	  `json:"ipaddress"`
+	IPAddress       string    `json:"ipaddress"`
 }
 
 // NodesCounts type
