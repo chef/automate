@@ -24,7 +24,7 @@ func TestNodesMissingSchedulerBasic(t *testing.T) {
 		expected = new(ingest.MarkNodesMissingResponse)
 		now      = time.Now() // The time that we will use to check the timestamp update
 		nodes    = []iBackend.Node{
-			iBackend.Node{
+			{
 				NodeInfo: iBackend.NodeInfo{
 					EntityUuid:       newUUID(),
 					Status:           "success",

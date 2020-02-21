@@ -143,25 +143,25 @@ func TestPurge(t *testing.T) {
 		)
 
 		actions := []iBackend.InternalChefAction{
-			iBackend.InternalChefAction{
+			{
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org1",
 				Projects:         []string{"org1"},
 				RecordedAt:       time.Now(), // today's index
 			},
-			iBackend.InternalChefAction{
+			{
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org2",
 				Projects:         []string{"org2"},
 				RecordedAt:       time.Now().Add(time.Hour * -24),
 			},
-			iBackend.InternalChefAction{
+			{
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org1",
 				Projects:         []string{"org1"},
 				RecordedAt:       time.Now().Add(time.Hour * -48),
 			},
-			iBackend.InternalChefAction{
+			{
 				RemoteHostname:   "chef-server.org",
 				OrganizationName: "org2",
 				Projects:         []string{"org2"},
