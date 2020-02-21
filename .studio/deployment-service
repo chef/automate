@@ -91,9 +91,9 @@ document "upgrade_from_v1_self_test" <<DOC
 DOC
 function upgrade_from_v1_self_test {
   # Ensure that self-test mode shims are compiled and in the path
-  [[ -f /src/bin/pg_dump ]] || go_build_pkg components/automate-deployment/cmd/pg_dump
-  [[ -f /src/bin/automate-ctl ]] || go_build_pkg components/automate-deployment/cmd/automate-ctl
-  [[ -f /src/bin/chef-server-ctl ]] || go_build_pkg components/automate-deployment/cmd/chef-server-ctl
+  [[ -f "$GOBIN/pg_dump" ]] || go_build_pkg components/automate-deployment/cmd/pg_dump
+  [[ -f "$GOBIN/automate-ctl" ]] || go_build_pkg components/automate-deployment/cmd/automate-ctl
+  [[ -f "$GOBIN/chef-server-ctl" ]] || go_build_pkg components/automate-deployment/cmd/chef-server-ctl
 
   local failure_code=$FAILURE
   if [ -n "$1" ]; then
@@ -107,7 +107,7 @@ function upgrade_from_v1_self_test {
 
   install_chef_automate_cli
 
-  PATH=/src/bin:$PATH CHEF_AUTOMATE_SKIP_SYSTEMD=true FAILURE=$failure_code \
+  PATH=$GOBIN:$PATH CHEF_AUTOMATE_SKIP_SYSTEMD=true FAILURE=$failure_code \
     chef-automate upgrade-from-v1 /src/dev/config.toml \
       --hartifacts /src/results \
       --override-origin "$HAB_ORIGIN" \
