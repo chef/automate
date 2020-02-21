@@ -50,7 +50,7 @@ func (chefAction ChefAction) FinishProcessing(err error) {
 			"entity_name": chefAction.InternalChefAction.EntityName,
 			"entity_type": chefAction.InternalChefAction.EntityType,
 			"entity_task": chefAction.InternalChefAction.Task,
-		}).Info("Message ingested successfully")
+		}).Info("Chef Action message ingested successfully")
 	}
 }
 

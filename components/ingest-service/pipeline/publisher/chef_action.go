@@ -35,11 +35,12 @@ func ChefAction(in <-chan message.ChefAction, client backend.Client, out chan<- 
 			err := client.InsertAction(msg.Ctx, msg.InternalChefAction)
 			if err != nil {
 				log.WithError(err).WithFields(log.Fields{
-					"publisher_id":    number,
-					"message_id":      msg.ID,
-					"buffer_size":     len(out),
-					"internal_action": msg.InternalChefAction,
-					"entity":          msg.InternalChefAction.EntityName,
+					"publisher_id": number,
+					"message_id":   msg.ID,
+					"buffer_size":  len(out),
+					"entity_name":  msg.InternalChefAction.EntityName,
+					"entity_type":  msg.InternalChefAction.EntityType,
+					"entity_task":  msg.InternalChefAction.Task,
 				}).Error("Failed to insert Chef Action")
 				msg.FinishProcessing(status.Errorf(codes.Internal, err.Error()))
 			} else {
