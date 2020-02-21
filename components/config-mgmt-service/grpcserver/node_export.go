@@ -155,24 +155,50 @@ func (s *CfgMgmtServer) nodePager(ctx context.Context, request *pRequest.NodeExp
 }
 
 func jsonExport(stream service.CfgMgmt_NodeExportServer) exportHandler {
+	initialRun := true
 	return func(nodes []backend.Node) error {
-		displayNodeCollection := nodeCollectionToDisplayNodeCollection(nodes)
-
-		raw, err := json.Marshal(displayNodeCollection)
-		if err != nil {
-			return fmt.Errorf("Failed to marshal JSON export data: %+v", err)
+		if initialRun {
+			err := stream.Send(&response.ExportData{Content: []byte("[")})
+			if err != nil {
+				return err
+			}
+			initialRun = false
+		} else if len(nodes) != 0 {
+			err := stream.Send(&response.ExportData{Content: []byte(",")})
+			if err != nil {
+				return err
+			}
 		}
 
-		reader := bytes.NewReader(raw)
-		buf := make([]byte, streamBufferSize)
+		if len(nodes) == 0 {
+			err := stream.Send(&response.ExportData{Content: []byte("]")})
+			if err != nil {
+				return err
+			}
+			return nil
+		}
 
 		writer := chunks.NewWriter(streamBufferSize, func(p []byte) error {
 			return stream.Send(&response.ExportData{Content: p})
 		})
+		buf := make([]byte, streamBufferSize)
 
-		_, err = io.CopyBuffer(writer, reader, buf)
-		if err != nil {
-			return fmt.Errorf("Failed to export JSON: %+v", err)
+		for i := range nodes {
+			raw, err := json.Marshal(nodeToDisplayNode(nodes[i]))
+			if err != nil {
+				return fmt.Errorf("Failed to marshal JSON export data: %+v", err)
+			}
+
+			if i != len(nodes) - 1 {
+				raw = append(raw, ',')
+			}
+
+			reader := bytes.NewReader(raw)
+
+			_, err = io.CopyBuffer(writer, reader, buf)
+			if err != nil {
+				return fmt.Errorf("Failed to export JSON: %+v", err)
+			}
 		}
 
 		return nil
