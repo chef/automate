@@ -194,6 +194,10 @@
         "success": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -297,6 +301,10 @@
         "success": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },

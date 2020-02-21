@@ -48,8 +48,9 @@ func NewDatafeedServer(db *dao.DB, config *config.DataFeedConfig, connFactory *s
 func (datafeedServer *DatafeedServer) AddDestination(ctx context.Context, destination *datafeed.AddDestinationRequest) (*datafeed.AddDestinationResponse, error) {
 	log.Infof("AddDestination %s", destination)
 	response := &datafeed.AddDestinationResponse{Success: false}
-	success, err := datafeedServer.db.AddDestination(destination)
+	success, id, err := datafeedServer.db.AddDestination(destination)
 	response.Success = success
+	response.Id = id
 	if err != nil {
 		return response, errorutils.FormatErrorMsg(err, "")
 	}

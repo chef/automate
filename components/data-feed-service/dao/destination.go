@@ -45,7 +45,7 @@ func dbToGetDestinationResponse(inDestination *Destination) *datafeed.GetDestina
 	return &newDestination
 }
 
-func (db *DB) AddDestination(destination *datafeed.AddDestinationRequest) (bool, error) {
+func (db *DB) AddDestination(destination *datafeed.AddDestinationRequest) (bool, int64, error) {
 	dbDestination := addToDBDestination(destination)
 	err := Transact(db, func(tx *DBTrans) error {
 		if err := tx.Insert(dbDestination); err != nil {
@@ -55,9 +55,9 @@ func (db *DB) AddDestination(destination *datafeed.AddDestinationRequest) (bool,
 	})
 
 	if err != nil {
-		return false, err
+		return false, -1, err
 	}
-	return true, err
+	return true, dbDestination.ID, err
 }
 
 func (db *DB) DeleteDestination(delete *datafeed.DeleteDestinationRequest) (bool, error) {
