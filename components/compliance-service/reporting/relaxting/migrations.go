@@ -43,6 +43,7 @@ func StoreExists(client *elastic.Client, indexName string) (bool, error) {
 }
 
 func cleanupEmptyIndicesForPrefix(client *elastic.Client, prefix string, migratable esMigratable) ([]string, error) {
+	myName := "cleanupEmptyIndicesForPrefix"
 	catIndicesResponse, err := client.CatIndices().Index(prefix).Do(context.Background())
 	if err != nil {
 		return nil, err
@@ -55,13 +56,17 @@ func cleanupEmptyIndicesForPrefix(client *elastic.Client, prefix string, migrata
 		logrus.Debugf("\nIndex: %s ", indexName)
 
 		dateAsStr := strings.SplitAfterN(indexName, "-", 4)
-		dateToRemove, err := time.Parse("2006.01.02", dateAsStr[len(dateAsStr)-1])
-		if err != nil {
-			return indices, err
-		}
-		err = migratable.removeOldIndices(dateToRemove)
-		if err != nil {
-			return indices, err
+		if len(dateAsStr) > 0 {
+			dateToRemove, err := time.Parse("2006.01.02", dateAsStr[len(dateAsStr)-1])
+			if err != nil {
+				return indices, err
+			}
+			err = migratable.removeOldIndices(dateToRemove)
+			if err != nil {
+				return indices, err
+			}
+		} else {
+			logrus.Warnf("%s - trying to cleanup index: %s, which doesn't have a timeseries date as a suffix", myName, indexName)
 		}
 	}
 	return indices, nil
