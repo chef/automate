@@ -37,7 +37,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
     }
 
     populateSidebar() {
-      const sidebars = {
+      const sidebars: Sidebars = {
         active: '',
         dashboards: [{
           name: 'Dashboards',
@@ -64,7 +64,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
               openInNewPage: true
             }
           ],
-          visible$: this.applicationsFeatureFlagOn
+          visible$: new BehaviorSubject(this.applicationsFeatureFlagOn)
         }],
         infrastructure: [{
           name: 'Infrastructure',
@@ -78,7 +78,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
               name: 'Chef Servers',
               icon: 'storage',
               route: '/infrastructure/chef-servers',
-              visible$: this.chefInfraServerViewsFeatureFlagOn
+              visible$: new BehaviorSubject(this.chefInfraServerViewsFeatureFlagOn)
             },
             {
               name: 'Workflow',
@@ -139,7 +139,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
                 authorized: {
                   anyOf: ['/datafeed/destinations', 'post']
                 },
-                visible$: this.ServiceNowFeatureFlagOn
+                visible$: new BehaviorSubject(this.ServiceNowFeatureFlagOn)
               },
               {
                 name: 'Node Integrations',
@@ -252,7 +252,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
       this.isDestroyed.complete();
     }
 
-    private updateVisibleValues(sidebars: any): Sidebars {
+    private updateVisibleValues(sidebars: Sidebars): Sidebars {
       forEach(sidebars, (_value, key) => {
         const menuGroups = sidebars[key];
         forEach(menuGroups, (menuGroup) => {

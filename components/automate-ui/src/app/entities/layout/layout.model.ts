@@ -18,12 +18,14 @@ export interface Sidebars {
 // MenuItemGroup {
 //   name: "Node Management",
 //   items: [],
+//   hasVisibleMenuItems: true,
 //   visible$: Observable<boolean>
 // }
 
 export interface MenuItemGroup {
   name: string;
   items: MenuItem[];
+  hasVisibleMenuItems?: boolean;
   visible$?: Observable<boolean>;
 }
 

@@ -19,32 +19,32 @@ export class SidebarComponent {
     this.updateMenuGroupVisibility();
   }
 
-  public updateMenuGroupVisibility(): void {
+  public isAuthorized($event, menuItem, menuGroup) {
+    menuItem.authorized.isAuthorized = $event;
+    this.setGroupVisibility(menuGroup);
+  }
+
+  public hasMenuItemsNotRequiringAuthorization(menuItemGroup: any): boolean {
+    return menuItemGroup.items.some(menuItem =>
+      menuItem.authorized === undefined);
+  }
+
+  private updateMenuGroupVisibility(): void {
     this.menuGroups$.subscribe((menuGroups: MenuItemGroup[]) => {
       if (menuGroups) {
-        menuGroups.forEach(menuItemGroup => this.hasVisibleMenuItems(menuItemGroup));
+        menuGroups.forEach(menuItemGroup => this.setGroupVisibility(menuItemGroup));
       }
     });
   }
 
-  public hasVisibleMenuItems(menuItemGroup: any): void {
-    menuItemGroup.hasAuthorizedMenuItems =
-      this.hasAuthorizedMenuItems(menuItemGroup) ||
-      this.hasNoAuthorizedMenuItems(menuItemGroup);
+  private setGroupVisibility(menuItemGroup: MenuItemGroup): void {
+    menuItemGroup.hasVisibleMenuItems =
+      this.hasVisibleMenuItems(menuItemGroup) ||
+      this.hasMenuItemsNotRequiringAuthorization(menuItemGroup);
   }
 
-  public hasAuthorizedMenuItems(menuItemGroup: any): boolean {
-    return menuItemGroup.items.filter(menuItem =>
-        menuItem.authorized && menuItem.authorized.isAuthorized).length > 0;
-  }
-
-  public hasNoAuthorizedMenuItems(menuItemGroup: any): boolean {
-    return menuItemGroup.items.filter(menuItem =>
-        menuItem.authorized === undefined).length > 0;
-  }
-
-  public isAuthorized($event, menuItem, menuGroup) {
-    menuItem.authorized.isAuthorized = $event;
-    this.hasVisibleMenuItems(menuGroup);
+  private hasVisibleMenuItems(menuItemGroup: any): boolean {
+    return  menuItemGroup.items.some(menuItem =>
+          menuItem.authorized && menuItem.authorized.isAuthorized);
   }
 }
