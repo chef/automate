@@ -33,7 +33,7 @@ func init() {
     "/iam/v2/policies": {
       "get": {
         "summary": "List all policies",
-        "description": "List all policies.",
+        "description": "List all policies.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListPolicies",
         "responses": {
           "200": {
@@ -49,7 +49,7 @@ func init() {
       },
       "post": {
         "summary": "Create a new policy",
-        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreatePolicy",
         "responses": {
           "200": {
@@ -77,7 +77,7 @@ func init() {
     "/iam/v2/policies/{id}": {
       "get": {
         "summary": "Get a policy",
-        "description": "Get a policy.",
+        "description": "Get a policy.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetPolicy",
         "responses": {
           "200": {
@@ -101,7 +101,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a policy",
-        "description": "Delete a policy.",
+        "description": "Delete a policy.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeletePolicy",
         "responses": {
           "200": {
@@ -125,7 +125,7 @@ func init() {
       },
       "put": {
         "summary": "Update an existing policy",
-        "description": "When updating a policy you must supply all of that policy's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values!\nThe only exception is the policy ID, which is immutable; it can only be set at creation time.\n\nYou can use this endpoint to modify Custom policies but not Chef-managed policies.\n\nWhile you can use this endpoint to update members on a policy, if that is the only\nproperty you wish to modify (on either Custom or Chef-managed policies),\nyou might find it more convenient to use these endpoints instead:\nAdd policy members\nRemove policy members\nReplace policy members",
+        "description": "When updating a policy you must supply all of that policy's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values!\nThe only exception is the policy ID, which is immutable; it can only be set at creation time.\n\nYou can use this endpoint to modify Custom policies but not Chef-managed policies.\n\nWhile you can use this endpoint to update members on a policy, if that is the only\nproperty you wish to modify (on either Custom or Chef-managed policies),\nyou might find it more convenient to use these endpoints instead:\nAdd policy members\nRemove policy members\nReplace policy members\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdatePolicy",
         "responses": {
           "200": {
@@ -160,7 +160,7 @@ func init() {
     "/iam/v2/policies/{id}/members": {
       "get": {
         "summary": "List policy members",
-        "description": "List all members of a specific policy.",
+        "description": "List all members of a specific policy.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policyMembers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListPolicyMembers",
         "responses": {
           "200": {
@@ -184,7 +184,7 @@ func init() {
       },
       "put": {
         "summary": "Replace policy members",
-        "description": "Replace the entire member list for a specific policy with a new list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.",
+        "description": "Replace the entire member list for a specific policy with a new list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policyMembers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReplacePolicyMembers",
         "responses": {
           "200": {
@@ -218,7 +218,7 @@ func init() {
     "/iam/v2/policies/{id}/members:add": {
       "post": {
         "summary": "Add policy members",
-        "description": "Add specific members to the member list for a specific policy.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.",
+        "description": "Add specific members to the member list for a specific policy.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policyMembers:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "AddPolicyMembers",
         "responses": {
           "200": {
@@ -252,7 +252,7 @@ func init() {
     "/iam/v2/policies/{id}/members:remove": {
       "post": {
         "summary": "Remove policy members",
-        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not already part of the member list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.\n\nThe removed members will still exist within Chef Automate, but are no longer associated with this policy.",
+        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not already part of the member list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.\n\nThe removed members will still exist within Chef Automate, but are no longer associated with this policy.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policyMembers:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "RemovePolicyMembers",
         "responses": {
           "200": {
@@ -286,7 +286,7 @@ func init() {
     "/iam/v2/policy_version": {
       "get": {
         "summary": "Get IAM version",
-        "description": "Returns the major and minor version of IAM that your automate installation is running.",
+        "description": "Returns the major and minor version of IAM that your automate installation is running.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetPolicyVersion",
         "responses": {
           "200": {
@@ -304,7 +304,7 @@ func init() {
     "/iam/v2/projects": {
       "get": {
         "summary": "List all projects",
-        "description": "List all projects.",
+        "description": "List all projects.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListProjects",
         "responses": {
           "200": {
@@ -320,7 +320,7 @@ func init() {
       },
       "post": {
         "summary": "Create a project",
-        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.",
+        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateProject",
         "responses": {
           "200": {
@@ -348,7 +348,7 @@ func init() {
     "/iam/v2/projects/{id}": {
       "get": {
         "summary": "Get a project",
-        "description": "Get a project.",
+        "description": "Get a project.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetProject",
         "responses": {
           "200": {
@@ -372,7 +372,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a project",
-        "description": "Deletes the project from any resources tagged with it.\n\nAlso deletes this project from any project list in all statements.\nIf the resulting project list for a given statement is empty, it is deleted.\nIf the resulting policy has no statements, it is also deleted.",
+        "description": "Deletes the project from any resources tagged with it.\n\nAlso deletes this project from any project list in all statements.\nIf the resulting project list for a given statement is empty, it is deleted.\nIf the resulting policy has no statements, it is also deleted.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteProject",
         "responses": {
           "200": {
@@ -396,7 +396,7 @@ func init() {
       },
       "put": {
         "summary": "Update a project",
-        "description": "Update an existing project. Very similar to create except the ID cannot be changed.",
+        "description": "Update an existing project. Very similar to create except the ID cannot be changed.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateProject",
         "responses": {
           "200": {
@@ -431,7 +431,7 @@ func init() {
     "/iam/v2/roles": {
       "get": {
         "summary": "List all roles",
-        "description": "List all *Chef-managed* and *Custom* roles.",
+        "description": "List all *Chef-managed* and *Custom* roles.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListRoles",
         "responses": {
           "200": {
@@ -447,7 +447,7 @@ func init() {
       },
       "post": {
         "summary": "Create a new role",
-        "description": "Creates a new role to be used in the policies that control permissions in Automate.\n\nA role defines the scope of actions in a policy statement.\n\nThere are several default *Chef-managed* roles that are essential to the operation of Chef Automate\nand cannot be altered.\nRoles that you create are *Custom* roles, and you have full control about modifying or deleting them.",
+        "description": "Creates a new role to be used in the policies that control permissions in Automate.\n\nA role defines the scope of actions in a policy statement.\n\nThere are several default *Chef-managed* roles that are essential to the operation of Chef Automate\nand cannot be altered.\nRoles that you create are *Custom* roles, and you have full control about modifying or deleting them.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateRole",
         "responses": {
           "200": {
@@ -475,7 +475,7 @@ func init() {
     "/iam/v2/roles/{id}": {
       "get": {
         "summary": "Get a role",
-        "description": "Get a role.",
+        "description": "Get a role.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetRole",
         "responses": {
           "200": {
@@ -499,7 +499,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a role",
-        "description": "Delete a specified role and removes it from any statements that may have been using it.\nIf such a statement has no other associated actions, the statement is deleted as well.\nSimilarly, if that statement removal results in a policy with no other statements,\nthat policy is removed as well.",
+        "description": "Delete a specified role and removes it from any statements that may have been using it.\nIf such a statement has no other associated actions, the statement is deleted as well.\nSimilarly, if that statement removal results in a policy with no other statements,\nthat policy is removed as well.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteRole",
         "responses": {
           "200": {
@@ -523,7 +523,7 @@ func init() {
       },
       "put": {
         "summary": "Update a role",
-        "description": "When updating a role supply all of a role's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values.\nThe only exception is the role ID, which is immutable; it can only be set at creation time.",
+        "description": "When updating a role supply all of a role's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values.\nThe only exception is the role ID, which is immutable; it can only be set at creation time.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateRole",
         "responses": {
           "200": {
@@ -574,7 +574,7 @@ func init() {
     "/iam/v2beta/policies": {
       "get": {
         "summary": "List all policies",
-        "description": "List all policies.",
+        "description": "List all policies.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListPolicies2",
         "responses": {
           "200": {
@@ -590,7 +590,7 @@ func init() {
       },
       "post": {
         "summary": "Create a new policy",
-        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a new IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's top-level projects list defines which project(s) the policy belongs to (for filtering policies by their projects),\nwhereas the statement level projects list defines which project(s) the statement applies to.\n\nThis example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project:\n\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreatePolicy2",
         "responses": {
           "200": {
@@ -618,7 +618,7 @@ func init() {
     "/iam/v2beta/policies/{id}": {
       "get": {
         "summary": "Get a policy",
-        "description": "Get a policy.",
+        "description": "Get a policy.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetPolicy2",
         "responses": {
           "200": {
@@ -642,7 +642,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a policy",
-        "description": "Delete a policy.",
+        "description": "Delete a policy.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeletePolicy2",
         "responses": {
           "200": {
@@ -666,7 +666,7 @@ func init() {
       },
       "put": {
         "summary": "Update an existing policy",
-        "description": "When updating a policy you must supply all of that policy's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values!\nThe only exception is the policy ID, which is immutable; it can only be set at creation time.\n\nYou can use this endpoint to modify Custom policies but not Chef-managed policies.\n\nWhile you can use this endpoint to update members on a policy, if that is the only\nproperty you wish to modify (on either Custom or Chef-managed policies),\nyou might find it more convenient to use these endpoints instead:\nAdd policy members\nRemove policy members\nReplace policy members",
+        "description": "When updating a policy you must supply all of that policy's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values!\nThe only exception is the policy ID, which is immutable; it can only be set at creation time.\n\nYou can use this endpoint to modify Custom policies but not Chef-managed policies.\n\nWhile you can use this endpoint to update members on a policy, if that is the only\nproperty you wish to modify (on either Custom or Chef-managed policies),\nyou might find it more convenient to use these endpoints instead:\nAdd policy members\nRemove policy members\nReplace policy members\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdatePolicy2",
         "responses": {
           "200": {
@@ -701,7 +701,7 @@ func init() {
     "/iam/v2beta/policies/{id}/members": {
       "get": {
         "summary": "List policy members",
-        "description": "List all members of a specific policy.",
+        "description": "List all members of a specific policy.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policyMembers:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListPolicyMembers2",
         "responses": {
           "200": {
@@ -725,7 +725,7 @@ func init() {
       },
       "put": {
         "summary": "Replace policy members",
-        "description": "Replace the entire member list for a specific policy with a new list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.",
+        "description": "Replace the entire member list for a specific policy with a new list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policyMembers:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReplacePolicyMembers2",
         "responses": {
           "200": {
@@ -759,7 +759,7 @@ func init() {
     "/iam/v2beta/policies/{id}/members:add": {
       "post": {
         "summary": "Add policy members",
-        "description": "Add specific members to the member list for a specific policy.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.",
+        "description": "Add specific members to the member list for a specific policy.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policyMembers:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "AddPolicyMembers2",
         "responses": {
           "200": {
@@ -793,7 +793,7 @@ func init() {
     "/iam/v2beta/policies/{id}/members:remove": {
       "post": {
         "summary": "Remove policy members",
-        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not already part of the member list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.\n\nThe removed members will still exist within Chef Automate, but are no longer associated with this policy.",
+        "description": "Remove specific members from the member list for a specific policy. Silently ignores\nmembers that are not already part of the member list.\n\nEnsure each element of the members array is in the correct\n[Member Expression]({{\u003c relref \"iam-v2-guide.md#member-expressions\" \u003e}}) format.\n\nThe removed members will still exist within Chef Automate, but are no longer associated with this policy.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policyMembers:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "RemovePolicyMembers2",
         "responses": {
           "200": {
@@ -827,7 +827,7 @@ func init() {
     "/iam/v2beta/policy_version": {
       "get": {
         "summary": "Get IAM version",
-        "description": "Returns the major and minor version of IAM that your automate installation is running.",
+        "description": "Returns the major and minor version of IAM that your automate installation is running.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetPolicyVersion2",
         "responses": {
           "200": {
@@ -845,7 +845,7 @@ func init() {
     "/iam/v2beta/projects": {
       "get": {
         "summary": "List all projects",
-        "description": "List all projects.",
+        "description": "List all projects.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListProjects2",
         "responses": {
           "200": {
@@ -861,7 +861,7 @@ func init() {
       },
       "post": {
         "summary": "Create a project",
-        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.",
+        "description": "Creates a new project to be used in the policies that control permissions in Automate.\n\nA project defines the scope of resources in a policy statement. Resources can be in more than one project.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateProject2",
         "responses": {
           "200": {
@@ -889,7 +889,7 @@ func init() {
     "/iam/v2beta/projects/{id}": {
       "get": {
         "summary": "Get a project",
-        "description": "Get a project.",
+        "description": "Get a project.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetProject2",
         "responses": {
           "200": {
@@ -913,7 +913,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a project",
-        "description": "Deletes the project from any resources tagged with it.\n\nAlso deletes this project from any project list in all statements.\nIf the resulting project list for a given statement is empty, it is deleted.\nIf the resulting policy has no statements, it is also deleted.",
+        "description": "Deletes the project from any resources tagged with it.\n\nAlso deletes this project from any project list in all statements.\nIf the resulting project list for a given statement is empty, it is deleted.\nIf the resulting policy has no statements, it is also deleted.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteProject2",
         "responses": {
           "200": {
@@ -937,7 +937,7 @@ func init() {
       },
       "put": {
         "summary": "Update a project",
-        "description": "Update an existing project. Very similar to create except the ID cannot be changed.",
+        "description": "Update an existing project. Very similar to create except the ID cannot be changed.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateProject2",
         "responses": {
           "200": {
@@ -972,7 +972,7 @@ func init() {
     "/iam/v2beta/roles": {
       "get": {
         "summary": "List all roles",
-        "description": "List all *Chef-managed* and *Custom* roles.",
+        "description": "List all *Chef-managed* and *Custom* roles.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListRoles2",
         "responses": {
           "200": {
@@ -988,7 +988,7 @@ func init() {
       },
       "post": {
         "summary": "Create a new role",
-        "description": "Creates a new role to be used in the policies that control permissions in Automate.\n\nA role defines the scope of actions in a policy statement.\n\nThere are several default *Chef-managed* roles that are essential to the operation of Chef Automate\nand cannot be altered.\nRoles that you create are *Custom* roles, and you have full control about modifying or deleting them.",
+        "description": "Creates a new role to be used in the policies that control permissions in Automate.\n\nA role defines the scope of actions in a policy statement.\n\nThere are several default *Chef-managed* roles that are essential to the operation of Chef Automate\nand cannot be altered.\nRoles that you create are *Custom* roles, and you have full control about modifying or deleting them.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateRole2",
         "responses": {
           "200": {
@@ -1016,7 +1016,7 @@ func init() {
     "/iam/v2beta/roles/{id}": {
       "get": {
         "summary": "Get a role",
-        "description": "Get a role.",
+        "description": "Get a role.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetRole2",
         "responses": {
           "200": {
@@ -1040,7 +1040,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a role",
-        "description": "Delete a specified role and removes it from any statements that may have been using it.\nIf such a statement has no other associated actions, the statement is deleted as well.\nSimilarly, if that statement removal results in a policy with no other statements,\nthat policy is removed as well.",
+        "description": "Delete a specified role and removes it from any statements that may have been using it.\nIf such a statement has no other associated actions, the statement is deleted as well.\nSimilarly, if that statement removal results in a policy with no other statements,\nthat policy is removed as well.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteRole2",
         "responses": {
           "200": {
@@ -1064,7 +1064,7 @@ func init() {
       },
       "put": {
         "summary": "Update a role",
-        "description": "When updating a role supply all of a role's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values.\nThe only exception is the role ID, which is immutable; it can only be set at creation time.",
+        "description": "When updating a role supply all of a role's properties, not just the ones you wish to update.\nProperties that you do not include are reset to empty values.\nThe only exception is the role ID, which is immutable; it can only be set at creation time.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:roles:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateRole2",
         "responses": {
           "200": {
@@ -1111,7 +1111,10 @@ func init() {
           },
           "description": "List of members to add to the policy."
         }
-      }
+      },
+      "required": [
+        "id"
+      ]
     },
     "chef.automate.api.iam.v2.AddPolicyMembersResp": {
       "type": "object",
@@ -1158,7 +1161,12 @@ func init() {
           "description": "The list of projects this policy belongs to."
         }
       },
-      "description": "Does not contain type as the enduser can only create 'custom' policies."
+      "description": "Does not contain type as the enduser can only create 'custom' policies.",
+      "required": [
+        "id",
+        "name",
+        "statements"
+      ]
     },
     "chef.automate.api.iam.v2.CreatePolicyResp": {
       "type": "object",
@@ -1179,7 +1187,10 @@ func init() {
           "type": "string",
           "description": "Name for the new project."
         }
-      }
+      },
+      "required": [
+        "id"
+      ]
     },
     "chef.automate.api.iam.v2.CreateProjectResp": {
       "type": "object",
@@ -1215,7 +1226,11 @@ func init() {
           "description": "The list of projects this role belongs to."
         }
       },
-      "description": "Does not contain type as the enduser can only create 'custom' roles."
+      "description": "Does not contain type as the enduser can only create 'custom' roles.",
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.CreateRoleResp": {
       "type": "object",
@@ -1401,7 +1416,10 @@ func init() {
           },
           "description": "List of members to remove from the policy."
         }
-      }
+      },
+      "required": [
+        "id"
+      ]
     },
     "chef.automate.api.iam.v2.RemovePolicyMembersResp": {
       "type": "object",
@@ -1428,7 +1446,10 @@ func init() {
           },
           "description": "List of members that replaces previous policy member list."
         }
-      }
+      },
+      "required": [
+        "id"
+      ]
     },
     "chef.automate.api.iam.v2.ReplacePolicyMembersResp": {
       "type": "object",
@@ -1559,7 +1580,11 @@ func init() {
           "description": "The list of projects this policy belongs to."
         }
       },
-      "description": "Does not contain type as the enduser can only create 'custom' policies."
+      "description": "Does not contain type as the enduser can only create 'custom' policies.",
+      "required": [
+        "id",
+        "statements"
+      ]
     },
     "chef.automate.api.iam.v2.UpdatePolicyResp": {
       "type": "object",
@@ -1580,7 +1605,10 @@ func init() {
           "type": "string",
           "description": "Name for the project."
         }
-      }
+      },
+      "required": [
+        "id"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateProjectResp": {
       "type": "object",
@@ -1615,7 +1643,11 @@ func init() {
           },
           "description": "The list of projects this role belongs to."
         }
-      }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateRoleResp": {
       "type": "object",
