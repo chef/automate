@@ -100,6 +100,9 @@ var a2Config = config{
 		{regex: `components/automate-dex/habitat/config/ldap-ca.pem`},
 		{regex: `components/automate-dex/habitat/config/saml-ca.pem`},
 		{regex: `components/automate-postgresql/habitat/config/server.key`},
+
+		// It's an example in the readme of a crypto lib
+		{regex: `vendor/github.com/nats-io/nkeys/README.md`},
 	},
 	contentInclude: []pattern{
 		{
