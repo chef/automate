@@ -2,33 +2,29 @@
 # copyright: 2018, Chef Software, Inc.
 # license: All rights reserved
 
-# This test suite is meant to verify whether calls return unauthorized (403) or not for
-# 'normal' users and admin users. Please don't test for API behavior beyond that; only for
-# whether the invoker is authorized or not to make the call.
-#
-# Also, please note that if we don't set up the routing for an API correctly, that will result
-# in a 404, which this approaches considers a success (its not a 403!), so if we want these
-# tests to give improve our confidence that we are permissioning our APIs correctly, we need
-# to make sure the routing is correct.
+# This test suite is meant to verify APIs return 403 or not, given legacy policy permissions.
+# Please don't test for API behavior beyond that; 
+# only for whether the invoker is authorized or not to make the call.
 
 require_relative '../../constants'
 
-title 'authorization access control integration tests'
+title 'IAM access control integration tests'
 
 NON_ADMIN_USERNAME = 'inspec_test_non_admin'
 
-control 'authz-access-control-1' do
-  title 'AuthZ access control'
-  desc 'Verify proper access control for both admin and non-admin users'
+control 'iam-legacy-access-control-1' do
+  title 'IAM access control with legacy policies'
+  desc 'Verify proper access for both admin and users who are not members of any policies. 
+  V1 Legacy policies gave all users default permissions to most APIs, besides the IAM APIs.'
 
-  describe 'AuthZ access control' do
+  describe 'IAM access control with migrated legacy policies' do
     before(:all) do
       create_non_admin_request = automate_api_request(
-        '/api/v0/auth/users',
+        '/apis/iam/v2/users',
         http_method: 'POST',
         request_body: {
+          'id': NON_ADMIN_USERNAME,
           'name': NON_ADMIN_USERNAME,
-          'username': NON_ADMIN_USERNAME,
           'password': ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
         }.to_json
       )
@@ -36,11 +32,11 @@ control 'authz-access-control-1' do
       expect(create_non_admin_request.http_status.to_s).to match(/200|409/)
 
       test_token_request = automate_api_request(
-        '/api/v0/auth/tokens',
+        '/apis/iam/v2/tokens',
         http_method: 'POST',
         request_body: {
-          'description': 'inspec_test_token',
-          'active': true
+          'id': "inspec_test_token-#{Time.now.to_i}"
+          'name': 'inspec_test_token',
         }.to_json
       )
       TEST_TOKEN = test_token_request.parsed_response_body[:value]
@@ -51,7 +47,7 @@ control 'authz-access-control-1' do
 
     after(:all) do
       delete_non_admin_request = automate_api_request(
-        "/api/v0/auth/users/#{NON_ADMIN_USERNAME}",
+        "/apis/iam/v2/users/#{NON_ADMIN_USERNAME}",
         http_method: 'DELETE',
       )
 
@@ -59,7 +55,7 @@ control 'authz-access-control-1' do
 
 
       delete_token_request = automate_api_request(
-        "/api/v0/auth/tokens/#{TEST_TOKEN_ID}",
+        "/apis/iam/v2/tokens/#{TEST_TOKEN_ID}",
         http_method: 'DELETE',
       )
 
@@ -88,11 +84,11 @@ control 'authz-access-control-1' do
     #              to perform those actions on.
     #
     #  url: The base URL you wish to test against.
-    #    Example: `let(:url) { '/api/v0/auth/users' }`
+    #    Example: `let(:url) { '/apis/iam/v2/users' }`
     #
     #  id_keys: The path to the key that contains the relevant id your HTTP URL needs for actions on an object.
-    #    Example: If /api/v0/auth/:id is the path for your API and your object returned from POST looks like
-    #             {"team"=>{"id"=>"85419132-8a84-4d5a-9a5b-41c8e570ce93"}}
+    #    Example: If /apis/iam/v2/:id is the path for your API and your object returned from POST looks like
+    #             {"team"=>{"id"=>"test-team"}}
     #             You should use `let(:id_keys) { ["team", "id"] }`
     #
     #  test_object: A hash of the object you wish to POST (will be convert to JSON).
@@ -177,66 +173,159 @@ control 'authz-access-control-1' do
       end
     end # try_every_http_verb
 
+<<<<<<< HEAD:inspec/a2-api-integration/controls/authz_access_control.rb
     shared_examples 'authz access control' do
+=======
+    shared_examples 'iam access control (with v1 legacy policies)' do
+>>>>>>> inspec: port authz_access_control to legacy_access:inspec/a2-iam-legacy-integration/controls/legacy_access.rb
       describe '/apis/iam/v2/teams' do
         let(:url) { '/apis/iam/v2/teams' }
         let(:expect_403_response) { expect_403_for_admin_only_apis }
         let(:id_keys) { ["team", "id"] }
         let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
         # Random valid ID to use in 403 case.
-        let(:failure_test_id) { '4ae7307e-0ac2-4871-bda9-ebf6bf28d6a5' }
+        let(:failure_test_id) { 'does-not-exist' }
         let(:test_object) do
           {
             'id': "inspec_test_team-#{Time.now.to_i}",
             'name': 'This team was created by inspec tests. DELETE ME.',
+<<<<<<< HEAD:inspec/a2-api-integration/controls/authz_access_control.rb
+=======
+            'projects': []
+>>>>>>> inspec: port authz_access_control to legacy_access:inspec/a2-iam-legacy-integration/controls/legacy_access.rb
           }
         end
-        let(:test_update_object) do
+        let(:test_update_object) { test_obect }
+
+        include_examples 'try_every_http_verb'
+
+        it "AddUsers returns the correct response code" do
+          expect(
+            automate_api_request(
+              "/apis/iam/v2/teams/inspec_test_team-#{Time.now.to_i}/users:add",
+              http_method: 'POST',
+              user: user,
+              request_headers: { "Content-type": "application/json" },
+              request_body: { user_ids: ['some_user', 'another_user'] }.to_json,
+            ).http_status
+
+          ).to eq(expect_403_for_admin_only_apis)
+        end
+
+        it "RemoveUsers returns the correct response code" do
+          expect(
+            automate_api_request(
+              "/apis/iam/v2/teams/inspec_test_team-#{Time.now.to_i}/users:remove",
+              http_method: 'POST',
+              user: user,
+              request_headers: { "Content-type": "application/json" },
+              request_body: { user_ids: ['some_user', 'another_user'] }.to_json,
+            ).http_status
+
+          ).to eq(expect_403_for_admin_only_apis)
+        end
+      end # /apis/iam/v2s/teams
+
+      describe '/apis/iam/v2/users' do
+        let(:url) { '/apis/iam/v2/users' }
+        let(:expect_403_response) { expect_403_for_admin_only_apis }
+        let(:id_keys) { ["user", "id"] }
+        let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
+        let(:failure_test_id) { 'doesnotexist@example.com' }
+        let(:test_id) { "inspec_test_user-#{Time.now.to_i}" }
+        let(:test_object) do
           {
+<<<<<<< HEAD:inspec/a2-api-integration/controls/authz_access_control.rb
             'id': "inspec_test_team-#{Time.now.to_i}",
             'name': 'This team was created by inspec tests but was modified. DELETE ME.',
-          }
-        end
-
-        include_examples 'try_every_http_verb'
-        # TODO (tc) Test AddUsers RemoveUsers once they are their own HTTP API endpoints.
-      end
-
-      describe '/api/v0/auth/users' do
-        let(:url) { '/api/v0/auth/users' }
-        let(:expect_403_response) { expect_403_for_admin_only_apis }
-        let(:id_keys) { ["username"] }
-        let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
-        let(:failure_test_id) { 'some_email@example.com' }
-        let(:test_name) { "inspec_test_user-#{Time.now.to_i}" }
-        let(:test_object) do
-          {
-            'name': test_name,
-            'username': test_name,
+=======
+            'name': test_id,
+            'id': test_id,
             'password': 'chefautomate',
+>>>>>>> inspec: port authz_access_control to legacy_access:inspec/a2-iam-legacy-integration/controls/legacy_access.rb
           }
         end
-        let(:test_update_object) do
+        let(:test_update_object) { test_obect }
+
+        include_examples 'try_every_http_verb'
+<<<<<<< HEAD:inspec/a2-api-integration/controls/authz_access_control.rb
+        # TODO (tc) Test AddUsers RemoveUsers once they are their own HTTP API endpoints.
+=======
+>>>>>>> inspec: port authz_access_control to legacy_access:inspec/a2-iam-legacy-integration/controls/legacy_access.rb
+      end
+
+      describe '/apis/iam/v2/tokens' do
+        let(:url) { '/apis/iam/v2/tokens' }
+        let(:expect_403_response) { expect_403_for_admin_only_apis }
+        let(:id_keys) { ["token", "id"] }
+        let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
+        let(:failure_test_id) { 'does-not-exist' }
+        let(:test_object) do
           {
-            'name': test_name,
-            'username': test_name,
-            'id': 'some_nonsense',
+            'id': "inspec_test_token-#{Time.now.to_i}",
+            'name': 'This token was created by inspec tests. DELETE ME.',
+            'projects': []
           }
         end
+        let(:test_update_object) { test_object }
 
         include_examples 'try_every_http_verb'
       end
 
-      describe '/api/v0/auth/tokens' do
-        let(:url) { '/api/v0/auth/tokens' }
+      describe '/apis/iam/v2/policies' do
+        let(:url) { '/apis/iam/v2/policies' }
         let(:expect_403_response) { expect_403_for_admin_only_apis }
-        let(:id_keys) { ["id"] }
+        let(:id_keys) { ["policy", "id"] }
         let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
-        let(:failure_test_id) { '4ae7307e-0ac2-4871-bda9-ebf6bf28d6a5' }
+        let(:failure_test_id) { 'does-not-exist' }
         let(:test_object) do
           {
-            'description': 'This token was created by inspec tests. DELETE ME.',
-            'active': false,
+            'id': "inspec_test_policy-#{Time.now.to_i}",
+            'name': 'This policy was created by inspec tests. DELETE ME.',
+            "members": ["user:local:inspec", "team:local:inspec"],
+            "statements": [
+              {
+                "effect": "ALLOW",
+                "actions": "do:some:thing",
+                "projects": "*"
+              }
+            ]
+            'projects': []
+          }
+        end
+        let(:test_update_object) { test_object }
+
+        include_examples 'try_every_http_verb'
+      end
+
+      describe '/apis/iam/v2/roles' do
+        let(:url) { '/apis/iam/v2/roles' }
+        let(:expect_403_response) { expect_403_for_admin_only_apis }
+        let(:id_keys) { ["role", "id"] }
+        let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
+        let(:failure_test_id) { 'does-not-exist' }
+        let(:test_object) do
+          {
+            'id': "inspec_test_role-#{Time.now.to_i}",
+            'name': 'This role was created by inspec tests. DELETE ME.',
+            'projects': []
+          }
+        end
+        let(:test_update_object) { test_object }
+
+        include_examples 'try_every_http_verb'
+      end
+
+      describe '/apis/iam/v2/projects' do
+        let(:url) { '/apis/iam/v2/projects' }
+        let(:expect_403_response) { expect_403_for_admin_only_apis }
+        let(:id_keys) { ["project", "id"] }
+        let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
+        let(:failure_test_id) { 'does-not-exist' }
+        let(:test_object) do
+          {
+            'id': "inspec_test_project-#{Time.now.to_i}",
+            'name': 'This project was created by inspec tests. DELETE ME.'
           }
         end
         let(:test_update_object) { test_object }
@@ -250,7 +339,7 @@ control 'authz-access-control-1' do
         let(:id_keys) { ["id"] }
         let(:success_expected) { false }
         let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
-        let(:failure_test_id) { '4ae7307e-0ac2-4871-bda9-ebf6bf28d6a5' }
+        let(:failure_test_id) { 'does-not-exist' }
         let(:test_object) do
           { "rule": {
               "name": "test!!!",
@@ -278,11 +367,11 @@ control 'authz-access-control-1' do
 
       it "gateway/policy_version returns the correct response code" do
           policy_version_request = automate_api_request(
-            "/apis/iam/v2/policy_version", # V2 endpoint also used for v1
+            "/apis/iam/v2/policy_version",
             http_method: 'GET',
             user: user,
           )
-          expect(policy_version_request.http_status == 403).to eq(expect_403_for_all_apis)
+          expect(policy_version_request.http_status == 403).to eq(expect_403_for_all_apis) # always true
       end
 
       describe '/api/v0/cfgmgmt/' do
@@ -644,217 +733,169 @@ control 'authz-access-control-1' do
       include_examples 'authz access control'
     end
   end
-end
 
-control 'authz-access-control-iam-v1' do
-  title 'access control checks specific to the v1 default policies'
-
-  describe 'AuthZ access control' do
-    before(:all) do
-      create_non_admin_request = automate_api_request(
-        '/api/v0/auth/users',
-        http_method: 'POST',
-        request_body: {
-          'name': NON_ADMIN_USERNAME,
-          'username': NON_ADMIN_USERNAME,
-          'password': ENV['AUTOMATE_API_DEFAULT_PASSWORD'] || 'chefautomate',
-        }.to_json
-      )
-      expect(create_non_admin_request.http_status.to_s).to match(/200|409/)
-
-      test_token_request = automate_api_request(
-        '/api/v0/auth/tokens',
-        http_method: 'POST',
-        request_body: {
-          'description': 'inspec_test_token',
-          'active': true
-        }.to_json
-      )
-      TEST_TOKEN_V1 = test_token_request.parsed_response_body[:value]
-      TEST_TOKEN_ID_V1= test_token_request.parsed_response_body[:id]
-
-      expect(test_token_request.http_status).to eq(200)
+  # compliance:profiles for client calls should be permitted by default
+  describe '/api/v0/compliance/profiles/search as client' do
+    it "api/v0/compliance/profiles/search returns the correct response code for client" do
+      expect(
+        automate_client_api_request(
+          "/api/v0/compliance/profiles/search",
+          TEST_TOKEN_V1,
+          http_method: 'POST'
+        ).http_status
+      ).to eq(200)
     end
+  end
 
-    after(:all) do
-      delete_non_admin_request = automate_api_request(
-        "/api/v0/auth/users/#{NON_ADMIN_USERNAME}",
-        http_method: 'DELETE',
-      )
-      expect(delete_non_admin_request.http_status.to_s).to match(/200|404/)
-
-      delete_token_request = automate_api_request(
-        "/api/v0/auth/tokens/#{TEST_TOKEN_ID_V1}",
-        http_method: 'DELETE',
-      )
-      expect(delete_token_request.http_status.to_s).to match(/200|404/)
-    end
-
-    # compliance:profiles for client calls should be permitted by default
-    describe '/api/v0/compliance/profiles/search as client' do
-      it "api/v0/compliance/profiles/search returns the correct response code for client" do
-        expect(
-          automate_client_api_request(
-            "/api/v0/compliance/profiles/search",
-            TEST_TOKEN_V1,
-            http_method: 'POST'
-          ).http_status
-        ).to eq(200)
-      end
-    end
-
-    describe 'legacy data-collector endpoints' do
-      %w(
-        /api/v0/events/data-collector
-        /data-collector/v0
-      ).each do |url|
-        { 'GET': 200, 'POST': 400 }.each do |method, status|
-          it "#{method} #{url} returns the correct response code for client" do
-            expect(
-              automate_client_api_request(
-                url,
-                TEST_TOKEN_V1,
-                http_method: method,
-              ).http_status
-            ).to eq(status)
-          end
-        end
-      end
-    end
-
-    describe '/api/v0/ingest/events/chef/' do
-      {
-        run: { entity_uuid: 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
-        action: {},
-        nodedelete: { node_id: 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
-      }.each do |url, body|
-        it "#{url} returns the correct response code for client" do
+  describe 'legacy data-collector endpoints' do
+    %w(
+      /api/v0/events/data-collector
+      /data-collector/v0
+    ).each do |url|
+      { 'GET': 200, 'POST': 400 }.each do |method, status|
+        it "#{method} #{url} returns the correct response code for client" do
           expect(
             automate_client_api_request(
-              "/api/v0/ingest/events/chef/#{url}",
+              url,
               TEST_TOKEN_V1,
-              http_method: 'POST',
-              request_body: body.to_json,
+              http_method: method,
             ).http_status
-          ).not_to eq(403)
+          ).to eq(status)
         end
       end
     end
+  end
 
-    # ingest multiple delete
-    describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
-      it "returns the correct response code for client" do
+  describe '/api/v0/ingest/events/chef/' do
+    {
+      run: { entity_uuid: 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
+      action: {},
+      nodedelete: { node_id: 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
+    }.each do |url, body|
+      it "#{url} returns the correct response code for client" do
         expect(
-            automate_client_api_request(
-              "/api/v0/ingest/events/chef/node-multiple-deletes",
-              TEST_TOKEN,
-              http_method: 'POST',
-              request_body: { node_ids: [ 'fake-2d83-47ce-8e46-84d1e85be6c7' ] }.to_json,
-            ).http_status
-          ).not_to eq(403)
+          automate_client_api_request(
+            "/api/v0/ingest/events/chef/#{url}",
+            TEST_TOKEN_V1,
+            http_method: 'POST',
+            request_body: body.to_json,
+          ).http_status
+        ).not_to eq(403)
       end
     end
+  end
 
-    shared_examples 'authz access control (iam v1)' do
-      # ingest
-      describe '/api/v0/ingest/events/chef/' do
-        {
-          'run': { 'entity_uuid': 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
-          'action': {},
-          'nodedelete': { 'node_id': 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
-        }.each do |url, body|
-          it "#{url} returns the correct response code for user" do
-              expect(
-                automate_api_request(
-                  "/api/v0/ingest/events/chef/#{url}",
-                  http_method: 'POST',
-                  user: user,
-                  request_body: body.to_json,
-                ).http_status == 403
-              ).to be(expect_403_for_client_only_endpoints)
-          end
-        end
+  # ingest multiple delete
+  describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
+    it "returns the correct response code for client" do
+      expect(
+          automate_client_api_request(
+            "/api/v0/ingest/events/chef/node-multiple-deletes",
+            TEST_TOKEN,
+            http_method: 'POST',
+            request_body: { node_ids: [ 'fake-2d83-47ce-8e46-84d1e85be6c7' ] }.to_json,
+          ).http_status
+        ).not_to eq(403)
+    end
+  end
+
+  # ingest
+  describe '/api/v0/ingest/events/chef/' do
+    {
+      'run': { 'entity_uuid': 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
+      'action': {},
+      'nodedelete': { 'node_id': 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
+    }.each do |url, body|
+      it "#{url} returns the correct response code for user" do
+          expect(
+            automate_api_request(
+              "/api/v0/ingest/events/chef/#{url}",
+              http_method: 'POST',
+              user: user,
+              request_body: body.to_json,
+            ).http_status == 403
+          ).to be(expect_403_for_client_only_endpoints)
       end
+    end
+  end
 
-      # ingest multiple delete
-      describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
-        it "returns the correct response code for user" do
+  # ingest multiple delete
+  describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
+    it "returns the correct response code for user" do
+        expect(
+          automate_api_request(
+            "/api/v0/ingest/events/chef/node-multiple-deletes",
+            http_method: 'POST',
+            user: user,
+            request_body: { node_ids: [ 'fake-2d83-47ce-8e46-84d1e85be6c7' ] }.to_json,
+          ).http_status == 403
+        ).to be(expect_403_for_admin_only_apis)
+    end
+  end
+
+  # legacy data-collector
+  describe 'legacy data-collector endpoints' do
+    %w(
+      /api/v0/events/data-collector
+      /data-collector/v0
+    ).each do |url|
+      %w(GET POST).each do |method|
+        it "#{method} #{url} returns the correct response code for user" do
             expect(
               automate_api_request(
-                "/api/v0/ingest/events/chef/node-multiple-deletes",
-                http_method: 'POST',
+                url,
+                http_method: method,
                 user: user,
-                request_body: { node_ids: [ 'fake-2d83-47ce-8e46-84d1e85be6c7' ] }.to_json,
+              ).http_status == 403
+            ).to be(expect_403_for_client_only_endpoints)
+        end
+      end
+    end
+  end
+
+  # {job,node-missing,delete-node}-scheduler
+  describe '/api/v0/retention/nodes/' do
+    {
+      'POST': %w(
+        delete-nodes/config
+        missing-nodes/config
+        missing-nodes-deletion/config
+      ),
+      'GET': %w(
+        status
+      ),
+    }.each do |method, urls|
+      urls.each do |url|
+        it "#{url} returns the correct response code" do
+            expect(
+              automate_api_request(
+                "/api/v0/retention/nodes/#{url}",
+                http_method: method,
+                user: user,
               ).http_status == 403
             ).to be(expect_403_for_admin_only_apis)
         end
       end
-
-      # legacy data-collector
-      describe 'legacy data-collector endpoints' do
-        %w(
-          /api/v0/events/data-collector
-          /data-collector/v0
-        ).each do |url|
-          %w(GET POST).each do |method|
-            it "#{method} #{url} returns the correct response code for user" do
-                expect(
-                  automate_api_request(
-                    url,
-                    http_method: method,
-                    user: user,
-                  ).http_status == 403
-                ).to be(expect_403_for_client_only_endpoints)
-            end
-          end
-        end
-      end
-
-      # {job,node-missing,delete-node}-scheduler
-      describe '/api/v0/retention/nodes/' do
-        {
-          'POST': %w(
-            delete-nodes/config
-            missing-nodes/config
-            missing-nodes-deletion/config
-          ),
-          'GET': %w(
-            status
-          ),
-        }.each do |method, urls|
-          urls.each do |url|
-            it "#{url} returns the correct response code" do
-                expect(
-                  automate_api_request(
-                    "/api/v0/retention/nodes/#{url}",
-                    http_method: method,
-                    user: user,
-                  ).http_status == 403
-                ).to be(expect_403_for_admin_only_apis)
-            end
-          end
-        end
-      end
     end
+  end
 
-    describe 'when making requests as an admin' do
-      let(:expect_403_for_admin_only_apis) { false }
-      let(:expect_403_for_all_apis) { false }
-      let(:expect_403_for_client_only_endpoints) { false }
-      let(:user) { ADMIN_USER_ID }
-      let(:success_expected) { true }
+  describe 'when making requests as an admin' do
+    let(:expect_403_for_admin_only_apis) { false }
+    let(:expect_403_for_all_apis) { false }
+    let(:expect_403_for_client_only_endpoints) { false }
+    let(:user) { ADMIN_USER_ID }
+    let(:success_expected) { true }
 
-      include_examples 'authz access control (iam v1)'
-    end
+    include_examples 'iam access control (with v1 legacy policies)'
+  end
 
-    describe 'when making requests as a non-admin' do
-      let(:expect_403_for_admin_only_apis) { true }
-      let(:expect_403_for_all_apis) { false }
-      let(:expect_403_for_client_only_endpoints) { true }
-      let(:user) { NON_ADMIN_USERNAME }
-      let(:success_expected) { false }
+  describe 'when making requests as a non-admin' do
+    let(:expect_403_for_admin_only_apis) { true }
+    let(:expect_403_for_all_apis) { false }
+    let(:expect_403_for_client_only_endpoints) { true }
+    let(:user) { NON_ADMIN_USERNAME }
+    let(:success_expected) { false }
 
-      include_examples 'authz access control (iam v1)'
-    end
+    include_examples 'iam access control (with v1 legacy policies)'
   end
 end
