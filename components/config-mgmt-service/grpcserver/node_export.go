@@ -102,7 +102,9 @@ func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.
 	// even after the node no longer exists
 	nodeFilters["exists"] = []string{"true"}
 
-	nodePager := s.nodePager(ctx, request, nodeFilters)
+	sortField, sortAsc := request.Sorting.GetParameters()
+
+	nodePager := s.nodePager(ctx, sortField, sortAsc, nodeFilters)
 
 	for {
 		nodes, err := nodePager()
@@ -123,13 +125,12 @@ func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.
 	return nil
 }
 
-func (s *CfgMgmtServer) nodePager(ctx context.Context, request *pRequest.NodeExport, nodeFilters map[string][]string) func() ([]backend.Node, error) {
+func (s *CfgMgmtServer) nodePager(ctx context.Context, sortField string, sortAsc bool, nodeFilters map[string][]string) func() ([]backend.Node, error) {
 	pageSize := 100
 	start := time.Time{}
 	end := time.Time{}
 	var cursorValue interface{}
 	cursorID := ""
-	sortField, sortAsc := request.Sorting.GetParameters()
 	actualSortField := params.ConvertParamToNodeStateBackendLowerFilter(sortField)
 
 	return func() ([]backend.Node, error) {
