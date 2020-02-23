@@ -4,8 +4,14 @@ package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/request";
 
 import "google/protobuf/wrappers.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 
 message CreateTokenReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
     // Unique, user-specified ID. Cannot be changed.
     string id = 1;
     // User-specified name.
