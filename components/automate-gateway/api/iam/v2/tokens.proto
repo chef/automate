@@ -33,6 +33,12 @@ service Tokens {
     ]
   }
   ```
+
+  Authorization Action:
+
+  ```
+  iam:tokens:create
+  ```
   */
   rpc CreateToken (CreateTokenReq) returns (CreateTokenResp) {
     option (google.api.http) = {
@@ -52,6 +58,12 @@ service Tokens {
   Get a token
 
   Returns the details for a token.
+
+  Authorization Action:
+
+  ```
+  iam:tokens:get
+  ```
   */
   rpc GetToken (GetTokenReq) returns (GetTokenResp) {
     option (google.api.http) = {
@@ -72,6 +84,12 @@ service Tokens {
   This PUT operation will overwrite all fields excepting ID, timestamps, and value,
   including those omitted from the request. Include `name`, `active` and `projects`
   in the request.
+
+  Authorization Action:
+
+  ```
+  iam:tokens:update
+  ```
   */
   rpc UpdateToken (UpdateTokenReq) returns (UpdateTokenResp) {
     option (google.api.http) = {
@@ -89,6 +107,12 @@ service Tokens {
 
   /*
   Delete a token
+
+  Authorization Action:
+
+  ```
+  iam:tokens:delete
+  ```
   */
   rpc DeleteToken (DeleteTokenReq) returns (DeleteTokenResp) {
     option (google.api.http) = {
@@ -105,6 +129,12 @@ service Tokens {
 
   /*
   List all tokens
+
+  Authorization Action:
+
+  ```
+  iam:tokens:list
+  ```
   */
   rpc ListTokens (ListTokensReq) returns (ListTokensResp) {
     option (google.api.http) = {
