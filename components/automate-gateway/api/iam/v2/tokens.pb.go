@@ -106,11 +106,23 @@ type TokensClient interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:tokens:create
+	//```
 	CreateToken(ctx context.Context, in *request.CreateTokenReq, opts ...grpc.CallOption) (*response.CreateTokenResp, error)
 	//
 	//Get a token
 	//
 	//Returns the details for a token.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:tokens:get
+	//```
 	GetToken(ctx context.Context, in *request.GetTokenReq, opts ...grpc.CallOption) (*response.GetTokenResp, error)
 	//
 	//Update a token
@@ -118,12 +130,30 @@ type TokensClient interface {
 	//This PUT operation will overwrite all fields excepting ID, timestamps, and value,
 	//including those omitted from the request. Include `name`, `active` and `projects`
 	//in the request.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:tokens:update
+	//```
 	UpdateToken(ctx context.Context, in *request.UpdateTokenReq, opts ...grpc.CallOption) (*response.UpdateTokenResp, error)
 	//
 	//Delete a token
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:tokens:delete
+	//```
 	DeleteToken(ctx context.Context, in *request.DeleteTokenReq, opts ...grpc.CallOption) (*response.DeleteTokenResp, error)
 	//
 	//List all tokens
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:tokens:list
+	//```
 	ListTokens(ctx context.Context, in *request.ListTokensReq, opts ...grpc.CallOption) (*response.ListTokensResp, error)
 	// Expose on GRPC API only so we don't expose this to the enduser.
 	// Just want to be able to trigger this via automate-cli.
@@ -212,11 +242,23 @@ type TokensServer interface {
 	//]
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:tokens:create
+	//```
 	CreateToken(context.Context, *request.CreateTokenReq) (*response.CreateTokenResp, error)
 	//
 	//Get a token
 	//
 	//Returns the details for a token.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:tokens:get
+	//```
 	GetToken(context.Context, *request.GetTokenReq) (*response.GetTokenResp, error)
 	//
 	//Update a token
@@ -224,12 +266,30 @@ type TokensServer interface {
 	//This PUT operation will overwrite all fields excepting ID, timestamps, and value,
 	//including those omitted from the request. Include `name`, `active` and `projects`
 	//in the request.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:tokens:update
+	//```
 	UpdateToken(context.Context, *request.UpdateTokenReq) (*response.UpdateTokenResp, error)
 	//
 	//Delete a token
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:tokens:delete
+	//```
 	DeleteToken(context.Context, *request.DeleteTokenReq) (*response.DeleteTokenResp, error)
 	//
 	//List all tokens
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:tokens:list
+	//```
 	ListTokens(context.Context, *request.ListTokensReq) (*response.ListTokensResp, error)
 	// Expose on GRPC API only so we don't expose this to the enduser.
 	// Just want to be able to trigger this via automate-cli.

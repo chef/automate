@@ -17,6 +17,7 @@ func init() {
     "/iam/v2/tokens": {
       "get": {
         "summary": "List all tokens",
+        "description": "Authorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListTokens",
         "responses": {
           "200": {
@@ -32,7 +33,7 @@ func init() {
       },
       "post": {
         "summary": "Create a token",
-        "description": "Creates a token.\nName, ID are required.\nActive defaults to true when not specified.\nValue is auto-generated when not provided.\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"token 1\",\n\"id\": \"token-1\",\n\"active\": true,\n\"projects\": [\n\"east-region\",\n\"west-region\"\n]\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a token.\nName, ID are required.\nActive defaults to true when not specified.\nValue is auto-generated when not provided.\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"token 1\",\n\"id\": \"token-1\",\n\"active\": true,\n\"projects\": [\n\"east-region\",\n\"west-region\"\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateToken",
         "responses": {
           "200": {
@@ -60,7 +61,7 @@ func init() {
     "/iam/v2/tokens/{id}": {
       "get": {
         "summary": "Get a token",
-        "description": "Returns the details for a token.",
+        "description": "Returns the details for a token.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetToken",
         "responses": {
           "200": {
@@ -84,6 +85,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a token",
+        "description": "Authorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteToken",
         "responses": {
           "200": {
@@ -107,7 +109,7 @@ func init() {
       },
       "put": {
         "summary": "Update a token",
-        "description": "This PUT operation will overwrite all fields excepting ID, timestamps, and value,\nincluding those omitted from the request. Include ` + "`" + `name` + "`" + `, ` + "`" + `active` + "`" + ` and ` + "`" + `projects` + "`" + `\nin the request.",
+        "description": "This PUT operation will overwrite all fields excepting ID, timestamps, and value,\nincluding those omitted from the request. Include ` + "`" + `name` + "`" + `, ` + "`" + `active` + "`" + ` and ` + "`" + `projects` + "`" + `\nin the request.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateToken",
         "responses": {
           "200": {
@@ -142,6 +144,7 @@ func init() {
     "/iam/v2beta/tokens": {
       "get": {
         "summary": "List all tokens",
+        "description": "Authorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListTokens2",
         "responses": {
           "200": {
@@ -157,7 +160,7 @@ func init() {
       },
       "post": {
         "summary": "Create a token",
-        "description": "Creates a token.\nName, ID are required.\nActive defaults to true when not specified.\nValue is auto-generated when not provided.\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"token 1\",\n\"id\": \"token-1\",\n\"active\": true,\n\"projects\": [\n\"east-region\",\n\"west-region\"\n]\n}\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a token.\nName, ID are required.\nActive defaults to true when not specified.\nValue is auto-generated when not provided.\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"token 1\",\n\"id\": \"token-1\",\n\"active\": true,\n\"projects\": [\n\"east-region\",\n\"west-region\"\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateToken2",
         "responses": {
           "200": {
@@ -185,7 +188,7 @@ func init() {
     "/iam/v2beta/tokens/{id}": {
       "get": {
         "summary": "Get a token",
-        "description": "Returns the details for a token.",
+        "description": "Returns the details for a token.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetToken2",
         "responses": {
           "200": {
@@ -209,6 +212,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a token",
+        "description": "Authorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteToken2",
         "responses": {
           "200": {
@@ -232,7 +236,7 @@ func init() {
       },
       "put": {
         "summary": "Update a token",
-        "description": "This PUT operation will overwrite all fields excepting ID, timestamps, and value,\nincluding those omitted from the request. Include ` + "`" + `name` + "`" + `, ` + "`" + `active` + "`" + ` and ` + "`" + `projects` + "`" + `\nin the request.",
+        "description": "This PUT operation will overwrite all fields excepting ID, timestamps, and value,\nincluding those omitted from the request. Include ` + "`" + `name` + "`" + `, ` + "`" + `active` + "`" + ` and ` + "`" + `projects` + "`" + `\nin the request.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateToken2",
         "responses": {
           "200": {
@@ -293,7 +297,10 @@ func init() {
           },
           "description": "Array of projects the token is in. Empty by default."
         }
-      }
+      },
+      "required": [
+        "id"
+      ]
     },
     "chef.automate.api.iam.v2.CreateTokenResp": {
       "type": "object",
