@@ -9,7 +9,7 @@ We evaluated a set of tools that would meet our requirements in [Authentication 
 
 - [Dex](https://github.com/coreos/dex) as OpenID solution
 
-We added our own [authn-service](../components/authn-service) as glue between those services to add support for non-human clients. If you're interessted, please read the [design documentation](../components/authn-service/DESIGN.md).
+We added our own [authn-service](../components/authn-service) as glue between those services to add support for non-human clients. If you're interested, please read the [design documentation](../components/authn-service/DESIGN.md).
 
 ![authn diagram](../components/authn-service/docs/images/authn_service_situation.png)
 
