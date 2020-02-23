@@ -5,15 +5,27 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/ia
 
 import "components/automate-gateway/api/iam/v2/common/rules.proto";
 
+import "protoc-gen-swagger/options/annotations.proto";
+
 message CreateRuleReq {
-    string id = 1;
-    string project_id = 2;
-    string name = 3;
-    RuleType type = 4;
-    repeated Condition conditions = 5;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "project_id", "name", "type", "conditions"]
+    }
+  };
+  string id = 1;
+  string project_id = 2;
+  string name = 3;
+  RuleType type = 4;
+  repeated Condition conditions = 5;
 }
 
 message UpdateRuleReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "project_id", "name", "type", "conditions"]
+    }
+  };
   string id = 1;
   string project_id = 2;
   string name = 3;
@@ -22,6 +34,11 @@ message UpdateRuleReq {
 }
 
 message GetRuleReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "project_id" ]
+    }
+  };
   string id = 1;
   string project_id = 2;
 }
@@ -29,10 +46,20 @@ message GetRuleReq {
 message ListRulesReq {}
 
 message ListRulesForProjectReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
   string id = 1;
 }
 
 message DeleteRuleReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "project_id" ]
+    }
+  };
   string id = 1;
   string project_id = 2;
 }
