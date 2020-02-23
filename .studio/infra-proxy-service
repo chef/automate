@@ -1,0 +1,91 @@
+#!/bin/bash
+#
+# Helper methods specific for the infra-proxy-service
+
+document "start_infra_proxy_service" <<DOC
+  Build and start the local infra-proxy-service
+DOC
+function start_infra_proxy_service() {
+  build components/infra-proxy-service/
+  start_deployment_service
+  chef-automate dev deploy-some $HAB_ORIGIN/infra-proxy-service --with-deps
+}
+
+document "infra_service_load_sample_data" <<DOC
+  Before running this command make sure either run `start_infra_proxy_service` or `start_all_services`
+  Hits the create server & org endpoint inside the infra-proxy-service. (CreateServer & CreateOrg)
+
+  1. -N No of records Default: 50
+  2. -S Chef server name's prefix Default: chef-server
+  3. -O Chef server org's name prefix Default: chef-org
+
+  Example:
+  -----------------------------
+  infra_service_load_sample_data -N 100 -S chef-server -O chef-org
+DOC
+
+function infra_service_load_sample_data() {
+  install_if_missing core/jq-static jq
+  install_if_missing core/grpcurl grpcurl
+
+  local OPTIND opt 
+  local records=50
+  local server_prefix="chef-server"
+  local org_prefix="chef-org"
+  while getopts ":N:S:O:" opt; do
+    case $opt in
+      N) records="$OPTARG"
+      ;;
+      S) server_prefix="$OPTARG"
+      ;;
+      O) org_prefix="$OPTARG"
+      ;;
+      \?) echo "Invalid option -$OPTARG" >&2
+      ;;
+      : )
+      echo "Invalid option: $OPTARG requires an argument" 1>&2
+      ;;
+    esac
+  done
+  shift $((OPTIND -1))
+  
+  log_line "Started Loading sample data..."
+  log_line "Total number of records: $records"
+  log_line "Chef server's name prefix: $server_prefix"
+  log_line "Chef server org's name prefix: $org_prefix"
+
+  for _ in $(seq 1 ${records}); do
+   local ip_address=$(printf "%d.%d.%d.%d" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))")
+   local timestamp=$(date +%s%N)
+
+   infra_service_create_servers_orgs "${server_prefix}-${timestamp}" \
+   "${server_prefix}-${timestamp}" \
+   "${ip_address}" \
+   "${server_prefix}-${timestamp}.com" \
+   "${org_prefix}-${timestamp}" \
+   "${org_prefix}-${timestamp}-user" \
+   "-----BEGIN RSA PRIVATE KEY-----\n${org_prefix}=${timestamp}-key"
+  done  
+  log_line "Sample data loaded..."
+}
+
+function infra_service_create_servers_orgs() {
+  local server_id=$(chef-automate dev grpcurl infra-proxy-service -- -d \
+  "$(cat << EOF
+    {"name": "$1", "description": "$2", "ip_address": "$3", "fqdn": "$4"}
+EOF
+  )" chef.automate.domain.infra_proxy.service.InfraProxy.CreateServer | jq .server.id)
+
+  chef-automate dev grpcurl infra-proxy-service -- -d \
+  "$(cat << EOF
+    {"name": "$5", "admin_user": "$6", "admin_key": "$7", "server_id": $server_id}
+EOF
+  )" chef.automate.domain.infra_proxy.service.InfraProxy.CreateOrg >/dev/null 2>&1
+}
+
+document "infra_service_psql" <<DOC
+   Enter psql with the infra proxy service database
+DOC
+function infra_service_psql() {
+  chef-automate dev psql chef_infra_proxy
+}
