@@ -1,3 +1,18 @@
+/*
+ * Copyright 2018 The NATS Authors
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package jwt
 
 import (
@@ -47,6 +62,9 @@ func (a *Activation) Validate(vr *ValidationResults) {
 type ActivationClaims struct {
 	ClaimsData
 	Activation `json:"nats,omitempty"`
+	// IssuerAccount stores the public key for the account the issuer represents.
+	// When set, the claim was issued by a signing key.
+	IssuerAccount string `json:"issuer_account,omitempty"`
 }
 
 // NewActivationClaims creates a new activation claim with the provided sub
@@ -65,7 +83,7 @@ func (a *ActivationClaims) Encode(pair nkeys.KeyPair) (string, error) {
 		return "", errors.New("expected subject to be an account")
 	}
 	a.ClaimsData.Type = ActivationClaim
-	return a.ClaimsData.encode(pair, a)
+	return a.ClaimsData.Encode(pair, a)
 }
 
 // DecodeActivationClaims tries to create an activation claim from a JWT string
@@ -86,6 +104,9 @@ func (a *ActivationClaims) Payload() interface{} {
 func (a *ActivationClaims) Validate(vr *ValidationResults) {
 	a.ClaimsData.Validate(vr)
 	a.Activation.Validate(vr)
+	if a.IssuerAccount != "" && !nkeys.IsValidPublicAccountKey(a.IssuerAccount) {
+		vr.AddError("account_id is not an account public key")
+	}
 }
 
 // ExpectedPrefixes defines the types that can sign an activation jwt, account and oeprator

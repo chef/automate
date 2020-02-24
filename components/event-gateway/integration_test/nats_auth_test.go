@@ -10,8 +10,8 @@ import (
 	"testing"
 	"time"
 
-	natsc "github.com/nats-io/go-nats"
-	stan "github.com/nats-io/go-nats-streaming"
+	natsc "github.com/nats-io/nats.go"
+	stan "github.com/nats-io/stan.go"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 

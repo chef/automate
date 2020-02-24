@@ -1,8 +1,8 @@
 package nats
 
 import (
-	natsc "github.com/nats-io/go-nats"
-	stan "github.com/nats-io/go-nats-streaming"
+	natsc "github.com/nats-io/nats.go"
+	stan "github.com/nats-io/stan.go"
 	log "github.com/sirupsen/logrus"
 )
 
