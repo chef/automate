@@ -12,7 +12,7 @@ function start_infra_proxy_service() {
 }
 
 document "infra_service_load_sample_data" <<DOC
-  Before running this command make sure either run `start_infra_proxy_service` or `start_all_services`
+  Before running this command make sure either run 'start_infra_proxy_service' or 'start_all_services'
   Hits the create server & org endpoint inside the infra-proxy-service. (CreateServer & CreateOrg)
 
   1. -N No of records Default: 50
