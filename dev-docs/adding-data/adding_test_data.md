@@ -66,6 +66,18 @@ _Note: to add an ec2 integration for aws, change type from "aws-api" to "aws-ec2
 
 If testing in an instance running in AWS, you can use the "read creds from cloud env" option to make things easier.
 
+# Adding data to infra views
+
+from hab studio:
+
+ensure you have `jq` installed
+
+option one: `infra_service_load_sample_data`
+By default, 50 records of the infra servers and orgs will be added with the prefix `chef-server` and `chef-org` respectively.
+
+option one: `infra_service_load_sample_data -N 100 -S infra-server -O infra-org`
+100 records of the infra servers and orgs will be added, modify the numbers on each of those options to meet your needs.
+
 # Deleting data
 
 to delete the postgres data:
