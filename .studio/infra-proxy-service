@@ -66,7 +66,7 @@ function infra_service_load_sample_data() {
    "${server_prefix}-${timestamp}.com" \
    "${org_prefix}-${timestamp}" \
    "${org_prefix}-${timestamp}-user" \
-   "-----BEGIN RSA PRIVATE KEY-----\n${org_prefix}=${timestamp}-key"
+   "--ORG_ADMIN_KEY--"
   done  
   log_line "Sample data loaded..."
 }
