@@ -1110,7 +1110,8 @@
         }
       },
       "required": [
-        "id"
+        "id",
+        "members"
       ]
     },
     "chef.automate.api.iam.v2.AddPolicyMembersResp": {
@@ -1186,7 +1187,8 @@
         }
       },
       "required": [
-        "id"
+        "id",
+        "name"
       ]
     },
     "chef.automate.api.iam.v2.CreateProjectResp": {
@@ -1226,7 +1228,8 @@
       "description": "Does not contain type as the enduser can only create 'custom' roles.",
       "required": [
         "id",
-        "name"
+        "name",
+        "actions"
       ]
     },
     "chef.automate.api.iam.v2.CreateRoleResp": {
@@ -1415,7 +1418,8 @@
         }
       },
       "required": [
-        "id"
+        "id",
+        "members"
       ]
     },
     "chef.automate.api.iam.v2.RemovePolicyMembersResp": {
@@ -1580,6 +1584,7 @@
       "description": "Does not contain type as the enduser can only create 'custom' policies.",
       "required": [
         "id",
+        "name",
         "statements"
       ]
     },
@@ -1604,7 +1609,8 @@
         }
       },
       "required": [
-        "id"
+        "id",
+        "name"
       ]
     },
     "chef.automate.api.iam.v2.UpdateProjectResp": {
@@ -1643,7 +1649,8 @@
       },
       "required": [
         "id",
-        "name"
+        "name",
+        "actions"
       ]
     },
     "chef.automate.api.iam.v2.UpdateRoleResp": {
