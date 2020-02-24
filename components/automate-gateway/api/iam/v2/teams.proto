@@ -14,9 +14,6 @@ service Teams {
   rpc ListTeams (ListTeamsReq) returns (ListTeamsResp) {
     option (google.api.http) = {
       get: "/iam/v2/teams"
-      additional_bindings {
-        get: "/iam/v2beta/teams"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:teams";
     option (chef.automate.api.policy).action = "read";
@@ -26,9 +23,6 @@ service Teams {
   rpc GetTeam (GetTeamReq) returns (GetTeamResp) {
     option (google.api.http) = {
       get: "/iam/v2/teams/{id}"
-      additional_bindings {
-        get: "/iam/v2beta/teams/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "read";
@@ -39,10 +33,6 @@ service Teams {
     option (google.api.http) = {
       post: "/iam/v2/teams"
       body: "*"
-      additional_bindings {
-        post: "/iam/v2beta/teams"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:teams";
     option (chef.automate.api.policy).action = "create";
@@ -53,10 +43,6 @@ service Teams {
     option (google.api.http) = {
       put: "/iam/v2/teams/{id}"
       body: "*"
-      additional_bindings {
-        put: "/iam/v2beta/teams/{id}"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "update";
@@ -66,9 +52,6 @@ service Teams {
   rpc DeleteTeam (DeleteTeamReq) returns (DeleteTeamResp) {
     option (google.api.http) = {
       delete: "/iam/v2/teams/{id}"
-      additional_bindings {
-        delete: "/iam/v2beta/teams/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "delete";
@@ -78,9 +61,6 @@ service Teams {
   rpc GetTeamMembership (GetTeamMembershipReq) returns (GetTeamMembershipResp) {
     option (google.api.http) = {
       get: "/iam/v2/teams/{id}/users"
-      additional_bindings {
-        get: "/iam/v2beta/teams/{id}/users"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}:users";
     option (chef.automate.api.policy).action = "read";
@@ -91,10 +71,6 @@ service Teams {
     option (google.api.http) = {
       post: "/iam/v2/teams/{id}/users:add"
       body: "*"
-      additional_bindings {
-        post: "/iam/v2beta/teams/{id}/users:add"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "create";
@@ -105,10 +81,6 @@ service Teams {
     option (google.api.http) = {
       post: "/iam/v2/teams/{id}/users:remove"
       body: "*"
-      additional_bindings {
-        post: "/iam/v2beta/teams/{id}/users:remove"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:teams:{id}";
     option (chef.automate.api.policy).action = "delete";
@@ -118,9 +90,6 @@ service Teams {
   rpc GetTeamsForMember (GetTeamsForMemberReq) returns (GetTeamsForMemberResp) {
     option (google.api.http) = {
       get: "/iam/v2/users/{id}/teams"
-      additional_bindings {
-        get: "/iam/v2beta/users/{id}/teams"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:users:{id}:teams";
     option (chef.automate.api.policy).action = "read";

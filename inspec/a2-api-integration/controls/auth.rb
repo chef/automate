@@ -80,7 +80,7 @@ control 'auth-1' do
       expect(response.parsed_response_body[:id]).to eq token_id
       expect(response.parsed_response_body[:active]).to eq true
 
-      # only the v2beta tokens API has the projects field exposed
+      # only the v2 tokens API has the projects field exposed
       expect(response.parsed_response_body[:projects]).to eq nil
     end
   end
