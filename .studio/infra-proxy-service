@@ -54,9 +54,11 @@ function infra_service_load_sample_data() {
   log_line "Chef server's name prefix: $server_prefix"
   log_line "Chef server org's name prefix: $org_prefix"
 
+  local ip_address
+  local timestamp
   for _ in $(seq 1 ${records}); do
-   local ip_address=$(printf "%d.%d.%d.%d" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))")
-   local timestamp=$(date +%s%N)
+   ip_address=$(printf "%d.%d.%d.%d" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))" "$((RANDOM % 256))")
+   timestamp=$(date +%s%N)
 
    infra_service_create_servers_orgs "${server_prefix}-${timestamp}" \
    "${server_prefix}-${timestamp}" \
@@ -70,7 +72,8 @@ function infra_service_load_sample_data() {
 }
 
 function infra_service_create_servers_orgs() {
-  local server_id=$(chef-automate dev grpcurl infra-proxy-service -- -d \
+  local server_id
+  server_id=$(chef-automate dev grpcurl infra-proxy-service -- -d \
   "$(cat << EOF
     {"name": "$1", "description": "$2", "ip_address": "$3", "fqdn": "$4"}
 EOF
