@@ -94,24 +94,24 @@ The resource plucks the `id_token` out of that response.
 * There's an example Go method in [`docs/examples/api_request.go`](examples/api_request.go).
 
 ## Using the Identity and Access Management System in the Automate UI
-By default any new user, team, or non-admin api token is denied access to everything. They all need to be added to polciies in order to be granted permissions. 
+By default any new user, team, or non-admin API token is denied access to everything. They all need to be added to policies in order to be granted permissions. 
 
 ### Adding a New User to a New Policy
 1. Create an admin token using 
     ```
     export TOKEN=`chef-automate iam token create <your-token-name-here> --admin`
     ```
-1. Create a new role, this role will allow access to the Event Feed, Applications, and Projects list.
+1. Create a new role; this role will allow access to the Event Feed, Applications, and Projects list.
     ```
-    curl -k -sSH "api-token: $TOKEN" -d '{"name": "Example Role","id": "example-role", "actions": ["event:*", "applications:*", "iam:projects:list"]}' -X POST https://a2-dev.test/apis/iam/v2beta/roles?pretty
+    curl -k -sSH "api-token: $TOKEN" -d '{"name": "Example Role","id": "example-role", "actions": ["event:*", "applications:*", "iam:projects:list"]}' -X POST https://a2-dev.test/apis/iam/v2/roles?pretty
     ```
 1. Create a new policy using the role you just created. You can find out more about [creating policies](https://automate.chef.io/docs/iam-v2-guide/#creating-custom-policies) in our documentation.
     ```
-    curl -k -sSH "api-token: $TOKEN" -d '{"name": "Example Policy", "id": "example-policy", "statements": [{"effect": "ALLOW", "role": "example-role", "projects": ["*"]}]}' -X POST https://a2-dev.test/apis/iam/v2beta/policies?pretty
+    curl -k -sSH "api-token: $TOKEN" -d '{"name": "Example Policy", "id": "example-policy", "statements": [{"effect": "ALLOW", "role": "example-role", "projects": ["*"]}]}' -X POST https://a2-dev.test/apis/iam/v2/policies?pretty
     ```
 1. Sign in with the username `admin` and password `chefautomate`
 1. Navigate to Settings > Users and create a new user
 1. Navigate to Settings > Policies > the policy you just created > Members
 1. Add the user you just created as a member of the policy
-1. Sign out as admin and in as your new user
+1. Sign out as admin and sign in as your new user
 1. You should see the Event Feed, Applications, and Settings top-nav items, as that is what the user you just created has access to.
