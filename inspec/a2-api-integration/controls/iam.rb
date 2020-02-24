@@ -26,19 +26,16 @@ control 'iam-1' do
                        id: TOKEN_ID,
                        name: TOKEN_NAME
                      }.to_json)
-
-        puts response
-        puts response.parsed_response_body
   
         expect(response.http_status).to eq 200
         [:id, :name, :value, :active, :created_at, :updated_at, :projects].each do |key|
-          expect(response.parsed_response_body.token.keys).to include key
-          expect(response.parsed_response_body.token[key]).not_to eq ''
+          expect(response.parsed_response_body[:token].keys).to include key
+          expect(response.parsed_response_body[:token][key]).not_to eq ''
         end
-        expect(response.parsed_response_body.token[:id]).to eq TOKEN_ID
-        expect(response.parsed_response_body.token[:name]).to eq TOKEN_NAME
-        expect(response.parsed_response_body.token[:active]).to eq true
-        expect(response.parsed_response_body.token[:projects]).to eq []
+        expect(response.parsed_response_body[:token][:id]).to eq TOKEN_ID
+        expect(response.parsed_response_body[:token][:name]).to eq TOKEN_NAME
+        expect(response.parsed_response_body[:token][:active]).to eq true
+        expect(response.parsed_response_body[:token][:projects]).to eq []
       end
   
       it "allows you to specify the ID and returns a 409 on conflict" do
@@ -71,10 +68,10 @@ control 'iam-1' do
       it "returns the new token" do
         response = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}")
         expect(response.http_status).to eq 200
-        expect(response.parsed_response_body.token[:id]).to eq TOKEN_ID
-        expect(response.parsed_response_body.token[:name]).to eq TOKEN_NAME
-        expect(response.parsed_response_body.token[:active]).to eq true
-        expect(response.parsed_response_body.token[:projects]).to eq []
+        expect(response.parsed_response_body[:token][:id]).to eq TOKEN_ID
+        expect(response.parsed_response_body[:token][:name]).to eq TOKEN_NAME
+        expect(response.parsed_response_body[:token][:active]).to eq true
+        expect(response.parsed_response_body[:token][:projects]).to eq []
       end
   
       it "returns 404 Not Found if the token does not exist" do
@@ -91,11 +88,11 @@ control 'iam-1' do
                                           active: false
                                         }.to_json)
         expect(response.http_status).to eq 200
-        expect(response.parsed_response_body[:active]).to eq false
+        expect(response.parsed_response_body[:token][:active]).to eq false
   
         tok = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}")
         expect(response.http_status).to eq 200
-        expect(response.parsed_response_body[:active]).to eq false
+        expect(response.parsed_response_body[:token][:active]).to eq false
       end
   
           it "returns 404 Not Found if the token does not exist" do
