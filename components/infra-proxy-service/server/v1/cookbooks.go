@@ -121,7 +121,7 @@ func (s *Server) GetCookbookAffectedNodes(ctx context.Context, req *request.Cook
 		"policy_group":     []string{"policy_group"},
 		"chef_guid":        []string{"chef_guid"},
 		"uptime":           []string{"uptime"},
-		"checkin":          []string{"checkin"},
+		"ohai_time":        []string{"ohai_time"},
 	}
 
 	client, err := s.createClient(ctx, req.OrgId)
@@ -247,7 +247,7 @@ func getNodeAttributeFromRes(data interface{}) NodeAttribute {
 		node.Name = name
 	}
 
-	if checkin, ok := m["checkin"].(string); ok {
+	if checkin, ok := m["ohai_time"].(string); ok {
 		node.CheckIn = checkin
 	}
 

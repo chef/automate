@@ -128,7 +128,6 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:cookbooks";
     option (chef.automate.api.iam.policy).action = "infra:serverOrgCookbooks:list";
   };
-
   rpc GetCookbooksAvailableVersions (infra_proxy.request.CookbooksAvailableVersions) returns (infra_proxy.response.CookbooksAvailableVersions) {
     option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/num_versions";
     option (chef.automate.api.policy).resource = "infra:servers:{server_id}:orgs:{org_id}/cookbooks";
@@ -136,9 +135,15 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:cookbooks";
     option (chef.automate.api.iam.policy).action = "infra:serverOrgCookbooks:list";
   };
-
   rpc GetCookbook (infra_proxy.request.Cookbook) returns (infra_proxy.response.Cookbook) {
     option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}";
+    option (chef.automate.api.policy).resource = "infra:servers:{server_id}:orgs:{org_id}/cookbooks";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:cookbooks";
+    option (chef.automate.api.iam.policy).action = "infra:serverOrgCookbooks:get";
+  };
+  rpc GetCookbookAffectedNodes (infra_proxy.request.Cookbook) returns (infra_proxy.response.CookbookAffectedNodes) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/affected-nodes";
     option (chef.automate.api.policy).resource = "infra:servers:{server_id}:orgs:{org_id}/cookbooks";
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:cookbooks";
