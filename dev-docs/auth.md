@@ -94,7 +94,7 @@ The resource plucks the `id_token` out of that response.
 * There's an example Go method in [`docs/examples/api_request.go`](examples/api_request.go).
 
 ## Using the Identity and Access Management System in the Automate UI
-By default any new user, team, or non-admin API token is denied access to everything. They all need to be added to policies in order to be granted permissions. 
+By default, any new user, team, or non-admin API token is denied access to everything. They all need to be added to teams or policies in order to be granted permission. 
 
 ### Adding a New User to a New Policy
 1. Create an admin token using 
