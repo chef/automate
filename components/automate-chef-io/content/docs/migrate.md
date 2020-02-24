@@ -110,7 +110,7 @@ To configure Chef Automate 1 backups, see the [Chef Automate 1 Documentation](ht
 Chef Automate 2 includes significant architectural and technical improvements to the core product platform.
 For the initial releases of this new major version, we do not yet support a handful of capabilities that were present in Chef Automate 1.
 If you rely on any of the capabilities listed below, we recommend you continue to use Chef Automate 1.
-Chef continues support of Chef Automate 1 while we develop upgrade paths for these capabilities on the new platform.
+However, note that Chef Automate 1 reached end-of-life on December 31, 2019.
 For more information, please contact your Chef account representative.
 
 * **Chef Manage:** Chef Automate 2, unlike Automate 1, cannot serve as a SAML auth proxy
