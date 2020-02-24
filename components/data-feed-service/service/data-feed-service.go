@@ -286,6 +286,10 @@ func getNodeAttributes(ctx context.Context, client cfgmgmt.CfgMgmtClient, nodeId
 	attributesJson["default_value_count"] = nodeAttributes.DefaultValueCount
 	attributesJson["normal_value_count"] = nodeAttributes.NormalValueCount
 	attributesJson["override_value_count"] = nodeAttributes.OverrideValueCount
+	attributesJson["node_id"] = nodeAttributes.NodeId
+	attributesJson["name"] = nodeAttributes.Name
+	attributesJson["run_list"] = nodeAttributes.RunList
+	attributesJson["chef_environment"] = nodeAttributes.ChefEnvironment
 
 	return attributesJson, nil
 }
