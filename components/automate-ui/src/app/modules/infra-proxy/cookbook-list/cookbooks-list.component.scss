@@ -25,20 +25,14 @@ chef-tab-selector {
 }
 
 form {
-  input {
-    font-size: 1.02em;
-    width: 520px;
-    margin-bottom: -6px;
+
+  chef-form-field {
+    width: 300px;
+    margin-bottom: 15px;
   }
 
   textarea {
-    font-size: 1.02em;
-    width: 520px;
-  }
-
-  .errors {
-    width: 520px;
-    margin-top: -6px;
+    height: 200px;
   }
 
   input[type="text"]:disabled {

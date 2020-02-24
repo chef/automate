@@ -2,7 +2,8 @@
     <div class="container">
         <main>
             <chef-breadcrumbs>
-                <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Orgs</chef-breadcrumb>
+                <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Servers</chef-breadcrumb>
+                <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', org?.server_id]">Orgs</chef-breadcrumb>
                 {{ org?.name }}
             </chef-breadcrumbs>
             <chef-page-header>
@@ -53,8 +54,8 @@
                     <chef-form-field>
                         <label>
                             <span class="label">Admin Key<span aria-hidden="true">*</span></span>
-                            <textarea rows="27" cols="54" chefInput placeholder="-----BEGIN RSA PRIVATE KEY -----"
-                                formControlName="admin_key" data-cy="update-org-admin-key"></textarea>
+                            <textarea rows="27" cols="10" chefInput placeholder="-----BEGIN RSA PRIVATE KEY -----"
+                                formControlName="admin_key" data-cy="update-org-admin-key"></textarea>   
                         </label>
                         <chef-error
                             *ngIf="(updateOrgForm.get('admin_key').hasError('required') || updateOrgForm.get('admin_key').hasError('pattern')) && updateOrgForm.get('admin_key').dirty">
