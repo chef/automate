@@ -9,7 +9,7 @@ import "protoc-gen-swagger/options/annotations.proto";
 message CreateTokenReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
-        required: ["id"]
+        required: ["id", "name"]
       }
     };
     // Unique, user-specified ID. Cannot be changed.
@@ -31,7 +31,12 @@ message GetTokenReq {
 }
 
 message UpdateTokenReq {
-    // Unique, user-specified ID. Cannot be changed.
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["name"]
+      }
+    };
+     // Unique, user-specified ID. Cannot be changed.
     string id = 1;
     // User-specified name.
     string name = 2;
