@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"net/url"
 	"path"
 	"regexp"
@@ -27,6 +28,12 @@ backend = "fs"
 const (
 	// RepoBaseName is a basename that is used to namespace all snapshot repos
 	RepoBaseName = "automate-elasticsearch-data"
+
+	// deleteRetryInterval is the time to sleep between retrying snapshot deletes
+	deleteInterval = 5 * time.Second
+	// maxDeleteWaitTime is the maximum amount of time we'll wait for a delete to
+	// be acknowledged
+	maxDeleteWaitTime = 10 * time.Minute
 )
 
 // BackupsConfig contains settings for Es snapshot repo type and options, as
@@ -461,6 +468,8 @@ type deleteResponse struct {
 // DeleteSnapshot takes a context, service name and snapshot name and deletes
 // the snapshot.
 func (es *Elastic) DeleteSnapshot(ctx context.Context, serviceName, snapshotName string) error {
+	ctx, cancel := context.WithTimeout(ctx, maxDeleteWaitTime)
+	defer cancel()
 	ctxLog := log.WithFields(log.Fields{
 		"action":        "DeleteSnapshot",
 		"service_name":  serviceName,
@@ -482,6 +491,16 @@ func (es *Elastic) DeleteSnapshot(ctx context.Context, serviceName, snapshotName
 		Method: "DELETE",
 		Path:   path,
 		Params: url.Values{},
+		Retrier: elastic.RetrierFunc(func(ctx context.Context, retry int,
+			req *http.Request, resp *http.Response, err error) (time.Duration, bool, error) {
+			// ES does not allow multiple snapshot deletes to happen in parallel.
+			// It will return a 503 when you try. This will fix that:
+			// See https://github.com/chef/automate/issues/2568
+			if resp != nil && resp.StatusCode >= 500 {
+				return deleteInterval, true, nil
+			}
+			return 0, false, nil
+		}),
 	})
 
 	if err != nil {
@@ -507,7 +526,7 @@ func (es *Elastic) DeleteSnapshot(ctx context.Context, serviceName, snapshotName
 		)
 	}
 
-	ctxLog.Info("deleted snapshot")
+	ctxLog.Info("deleted snapshot acknowledged")
 	return nil
 }
 
