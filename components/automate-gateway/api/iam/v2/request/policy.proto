@@ -40,7 +40,7 @@ message ListPoliciesReq {}
 message AddPolicyMembersReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
-        required: ["id"]
+        required: ["id", "members"]
       }
     };
     string id = 1;
@@ -61,7 +61,7 @@ message GetPolicyReq {
 message UpdatePolicyReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
-        required: ["id", "statements"]
+        required: ["id", "name", "statements"]
       }
     };
     // Unique, user-specified ID. Cannot be changed.
@@ -108,7 +108,7 @@ message ReplacePolicyMembersReq {
 message RemovePolicyMembersReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
-        required: ["id"]
+        required: ["id", "members"]
       }
     };
     string id = 1;
@@ -120,7 +120,7 @@ message RemovePolicyMembersReq {
 message CreateRoleReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
-        required: ["id", "name"]
+        required: ["id", "name", "actions"]
       }
     };
     // Unique, user-specified ID. Cannot be changed.
@@ -154,7 +154,7 @@ message DeleteRoleReq {
 message UpdateRoleReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
-        required: ["id", "name"]
+        required: ["id", "name", "actions"]
       }
     };
     // Unique, user-specified ID. Cannot be changed.
@@ -183,7 +183,7 @@ message ListProjectsReq {}
 message CreateProjectReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
-        required: ["id"]
+        required: ["id", "name"]
       }
     };
     // Unique, user-specified ID. Cannot be changed.
@@ -195,7 +195,7 @@ message CreateProjectReq {
 message UpdateProjectReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
-        required: ["id"]
+        required: ["id", "name"]
       }
     };
      // Unique, user-specified ID. Cannot be changed.
