@@ -28,7 +28,8 @@ This policy display includes the following:
 ![](/images/docs/admin-policies-migrated.png)
 
 ## Policy Conversion
-If you started on IAM v1 and migrated your IAM v1 policies to IAM v2 then you should move any members of your IAM v1 legacy policies to the appropriate IAM v2 policies and then delete the IAM v1 legacy policies.
+
+If you started on IAM v1 and migrated your IAM v1 policies to IAM v2, then you should move any members of your IAM v1 legacy policies to the appropriate IAM v2 policies and afterwards delete the IAM v1 legacy policies.
 
 To delete a legacy policy, open the menu on any custom policy, which is located at the end of the policy row, and select **Delete Policy** from the menu.
 
