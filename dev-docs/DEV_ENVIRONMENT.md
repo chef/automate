@@ -73,8 +73,12 @@ If you want to develop against the UI:
 # start_all_services
 ```
 
-Open <https://a2-dev.test> in your browser. Log in with `admin` and `chefautomate` as username and
-password, respectively.
+Open <https://a2-dev.test/> in your browser.
+
+Sign in as `admin`, `viewer`, or `editor` all with the same password of `chefautomate`.
+  - `admin` gives access to everything.
+  - `editor` is what most users expereince which gives them access to everything except for `Node Credentials`, `Notifications`, Identity pages, Roles, and Policies.
+  - `viewer` gives access to the same pages as `editor`, but users cannot take any action.
 
 ## Setup
 
