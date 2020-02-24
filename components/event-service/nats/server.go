@@ -9,9 +9,9 @@ import (
 	"github.com/chef/automate/components/event-service/config"
 
 	natsd "github.com/nats-io/gnatsd/server"
-	"github.com/nats-io/go-nats"
 	streamd "github.com/nats-io/nats-streaming-server/server" // nolint: misspell
 	stores "github.com/nats-io/nats-streaming-server/stores"
+	nats "github.com/nats-io/nats.go"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 )

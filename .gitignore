@@ -57,6 +57,7 @@ cache/golangci-lint*
 
 # for built component binary files
 bin/
+tools/credscan/credscan
 # bin stubs/wrappers/etc. in the hab dir
 !/components/*/habitat/bin/
 !/components/*/habitat/bin/*

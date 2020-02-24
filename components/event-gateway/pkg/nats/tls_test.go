@@ -9,7 +9,7 @@ import (
 
 	"github.com/chef/automate/components/event-gateway/pkg/config"
 	"github.com/chef/automate/lib/tls/certs"
-	natsc "github.com/nats-io/go-nats"
+	natsc "github.com/nats-io/nats.go"
 	"github.com/stretchr/testify/require"
 )
 

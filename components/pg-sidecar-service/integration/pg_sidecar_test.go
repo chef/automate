@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/gofrs/uuid"
+	"github.com/lib/pq"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/status"
@@ -578,7 +579,7 @@ SELECT EXISTS
   )
 ;`
 
-	return c.BoolQuery(fmt.Sprintf(tableOwnedByQuery, pg.QuoteLiteral(role), pg.QuoteLiteral(table)))
+	return c.BoolQuery(fmt.Sprintf(tableOwnedByQuery, pq.QuoteLiteral(role), pq.QuoteLiteral(table)))
 }
 
 func (h *pgHelper) hasSuperuser(role string) (bool, error) {

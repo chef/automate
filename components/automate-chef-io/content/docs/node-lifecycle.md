@@ -14,7 +14,7 @@ toc = true
 
 ## Overview
 
-From the **Settings** tab, navigate to the _Node Lifecycle_ page in the sidebar.
+Node Lifecycle manages the retention of Chef Client runs in Chef Automate. From the **Settings** tab, navigate to the _Node Lifecycle_ page in the sidebar.
 
 ### Missing Nodes
 

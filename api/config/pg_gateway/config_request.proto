@@ -32,6 +32,7 @@ message ConfigRequest {
 
 			message Timeouts {
 				google.protobuf.Int32Value connect = 1;
+				google.protobuf.Int32Value idle = 2;
 			}
 		}
 	}

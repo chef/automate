@@ -71,10 +71,10 @@ instead of using the `start_automate_ui_background` helper method._
 1. Open <https://a2-dev.test/> in your browser. If you have issues with sign in, please clear all site data (local
    and session storage and cookies) for `https://a2-dev.test` and re-navigate back to the root of
    <https://a2-dev.test/>.
-    - Sign in as `admin`, `viewer`, or `editor` all with the same password of `chefautomate`.
-      - `admin` gives access to everything.
-      - `editor` is what most users expereince which gives them access to everything except for `Node Credentials`, `Notifications`, Identity pages, Roles, and Policies.
-      - `viewer` gives access to the same pages as `editor`, but users cannot take any action.
+   - Sign in as `admin`, `viewer`, or `editor`, each using the same password of `chefautomate`.
+     - `admin` gives access to everything.
+     - `editor` defines the permissions most users will have. It gives them access to everything except for `Node Credentials`, `Notifications`, Identity pages, Roles, and Policies.
+     - `viewer` gives access to the same pages as `editor`, but users cannot take any action.
 
 1. Optional step: Turn on client-side feature flags by typing the letter sequence on any page in the UI. After toggling a feature flag, a browser refresh is required.
     * Type `beta` to open the beta features modal

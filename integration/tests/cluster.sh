@@ -89,7 +89,21 @@ do_test_deploy() {
     export ELASTICSEARCH_URL="http://$frontend1_ip:10144"
     test_notifications_endpoint="http://$test_container_ip:15555"
 
-    run_inspec_tests "${A2_ROOT_DIR}" "a2-iam-v2-integration"
+    # The backend will timeout pg connections after 5 minutes, which will
+    # result in an EPIPE error in the services when they attempt to use the
+    # dead connection. The inspec tests can't handle this and don't have an
+    # easy retry mechanism, so we create some throwaway tokens to work through
+    # busted connections.
+    # Note that this disconnection isn't caused by automate-pg-gateway, which
+    # we have tuned to be more tolerant of idle connections.
+    # See also:
+    # * https://github.com/lib/pq/issues/870
+    # * https://github.com/lib/pq/pull/871
+    # * https://github.com/lib/pq/issues/939
+    docker exec -t "$_frontend1_container_name" "$cli_bin" iam token create --admin "$(date +%s)" || true
+    docker exec -t "$_frontend1_container_name" "$cli_bin" iam token create --admin "$(date +%s)" || true
+    docker exec -t "$_frontend2_container_name" "$cli_bin" iam token create --admin "$(date +%s)" || true
+    docker exec -t "$_frontend2_container_name" "$cli_bin" iam token create --admin "$(date +%s)" || true
 
     local admin_token
     admin_token=$(docker exec -t "$_frontend1_container_name" \
@@ -98,11 +112,13 @@ do_test_deploy() {
     docker exec -t "$_frontend1_container_name" \
         "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~applications"
 
-
     docker exec -t "$_frontend2_container_name" \
         "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~applications"
 
+    run_inspec_tests "${A2_ROOT_DIR}" "a2-iam-v2-integration"
+
     "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~purge" "~cli" "~grpc" "~deployment" "~applications"
+
 }
 
 do_dump_logs() {

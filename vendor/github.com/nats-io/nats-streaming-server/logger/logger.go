@@ -1,4 +1,4 @@
-// Copyright 2017-2018 The NATS Authors
+// Copyright 2017-2019 The NATS Authors
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
@@ -17,8 +17,8 @@ import (
 	"io"
 	"sync"
 
-	natsdLogger "github.com/nats-io/gnatsd/logger"
-	natsd "github.com/nats-io/gnatsd/server"
+	natsdLogger "github.com/nats-io/nats-server/v2/logger"
+	natsd "github.com/nats-io/nats-server/v2/server"
 )
 
 // LogPrefix is prefixed to all NATS Streaming log messages
@@ -36,6 +36,7 @@ type StanLogger struct {
 	trace bool
 	ltime bool
 	lfile string
+	fszl  int64
 	log   natsd.Logger
 }
 
@@ -52,6 +53,13 @@ func (s *StanLogger) SetLogger(log Logger, logtime, debug, trace bool, logfile s
 	s.debug = debug
 	s.trace = trace
 	s.lfile = logfile
+	s.mu.Unlock()
+}
+
+// SetFileSizeLimit sets the size limit for a logfile
+func (s *StanLogger) SetFileSizeLimit(limit int64) {
+	s.mu.Lock()
+	s.fszl = limit
 	s.mu.Unlock()
 }
 
@@ -80,6 +88,9 @@ func (s *StanLogger) ReopenLogFile() {
 		}
 	}
 	fileLog := natsdLogger.NewFileLogger(s.lfile, s.ltime, s.debug, s.trace, true)
+	if s.fszl > 0 {
+		fileLog.SetSizeLimit(s.fszl)
+	}
 	s.log = fileLog
 	s.mu.Unlock()
 	s.Noticef("File log re-opened")

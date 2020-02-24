@@ -5,3 +5,5 @@ status_port = 10146
 
 [timeouts]
 connect = 5
+# 12 hours
+idle = 43200
