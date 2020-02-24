@@ -299,7 +299,8 @@ func init() {
         }
       },
       "required": [
-        "id"
+        "id",
+        "name"
       ]
     },
     "chef.automate.api.iam.v2.CreateTokenResp": {
@@ -395,7 +396,10 @@ func init() {
           },
           "description": "Array of projects token is in. Empty by default."
         }
-      }
+      },
+      "required": [
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateTokenResp": {
       "type": "object",
