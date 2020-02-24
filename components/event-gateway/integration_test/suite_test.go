@@ -26,10 +26,9 @@ var (
 )
 
 type Suite struct {
-	connFactory           *secureconn.Factory
-	AuthPoliciesToRestore []*policies.Policy
-	AuthzClient           policies.PoliciesClient
-	authzConn             *grpc.ClientConn
+	connFactory *secureconn.Factory
+	AuthzClient policies.PoliciesClient
+	authzConn   *grpc.ClientConn
 }
 
 func NewSuite() *Suite {

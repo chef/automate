@@ -31,34 +31,9 @@ import (
 // (otherwise the default policy would always give permissions so auth would
 // succeed). We stash the policy on the Suite and restore it in the teardown
 func (s *Suite) initNATSAuthTest() error {
-	ctx := context.Background()
 	err := s.initAuthzClient()
 	if err != nil {
 		return err
-	}
-
-	policiesResp, err := s.AuthzClient.ListPolicies(ctx, &policies.ListPoliciesReq{})
-	if err != nil {
-		return err
-	}
-
-PolicyLoop:
-	for _, policy := range policiesResp.Policies {
-		for _, statement := range policy.Statements {
-			for _, resource := range statement.Resources {
-				if resource == "ingest:*" {
-					s.AuthPoliciesToRestore = append(s.AuthPoliciesToRestore, policy)
-					continue PolicyLoop
-				}
-			}
-		}
-	}
-
-	for _, p := range s.AuthPoliciesToRestore {
-		_, err := s.AuthzClient.DeletePolicy(ctx, &policies.DeletePolicyReq{Id: p.Id})
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -67,24 +42,7 @@ PolicyLoop:
 // teardownNATSAuthTest re-creates any auth policies that were deleted in the
 // initNATSAuthTest step.
 func (s *Suite) teardownNATSAuthTest() {
-	ctx := context.Background()
 	defer s.authzConn.Close()
-
-	for _, p := range s.AuthPoliciesToRestore {
-		createReq := &policies.CreatePolicyReq{
-			Id:      p.Id,
-			Name:    p.Name,
-			Members: p.Members,
-		}
-		for _, statement := range p.Statements {
-			createReq.Statements = append(createReq.Statements, statement)
-		}
-		_, err := suite.AuthzClient.CreatePolicy(ctx, createReq)
-		if err != nil {
-			fmt.Printf("Error in NATS Auth Test teardown: %s\n", err)
-		}
-	}
-
 }
 
 func (s *Suite) initAuthzClient() error {
