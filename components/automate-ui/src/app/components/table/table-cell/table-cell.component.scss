@@ -1,12 +1,16 @@
 @import '../table.component';
 
 :host {
+  display: inline-block;
   padding: $size_16;
   vertical-align: middle;
   text-align: left;
   font-size: 14px;
   border-bottom: 1px solid $chef-grey;
   border-top: 1px solid $chef-grey;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 :host:first-child {
