@@ -1,7 +1,6 @@
 import { Injectable, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
-import { forEach } from 'lodash';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { isProductDeployed } from 'app/staticConfig';
