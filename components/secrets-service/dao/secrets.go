@@ -17,6 +17,7 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 
+	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
@@ -141,13 +142,13 @@ func (secretsDb *DB) fromDBSelectSecret(inSecret *secretSelect) (*secrets.Secret
 	newSecret.Name = inSecret.Name
 	newSecret.Type = inSecret.Type
 	newSecret.LastModified, _ = ptypes.TimestampProto(inSecret.LastModified)
-	var tags []*secrets.Kv
+	var tags []*query.Kv
 	err := json.Unmarshal(inSecret.Tags, &tags)
 	if err != nil {
 		return nil, errors.Wrap(err, "fromDBSelectSecret error unmarshalling tags")
 	}
 	newSecret.Tags = tags
-	var data []*secrets.Kv
+	var data []*query.Kv
 	if inSecret.Data != "" {
 		decodedEncryptedString, err := base64.StdEncoding.DecodeString(inSecret.Data)
 		if err != nil {
@@ -282,7 +283,7 @@ func (secretsDb *DB) SecretExists(id string) (exists bool, err error) {
 
 // GetSecrets retrieves all secrets from the db matching input query params
 func (secretsDb *DB) GetSecrets(sortField string, insortOrder secrets.Query_OrderType, pageNr int32,
-	perPage int32, filters []*secrets.Filter) ([]*secrets.Secret, int64, error) {
+	perPage int32, filters []*query.Filter) ([]*secrets.Secret, int64, error) {
 	var sortOrder string
 	sortField = valueOrDefaultStr(sortField, "name")
 	if insortOrder == 1 {
@@ -334,7 +335,7 @@ var secretsFilterField = map[string]string{
 	"type": "type",
 }
 
-func validateSecretFilters(filters []*secrets.Filter) error {
+func validateSecretFilters(filters []*query.Filter) error {
 	for _, filter := range filters {
 		switch filter.Key {
 		case "type":

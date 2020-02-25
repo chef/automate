@@ -10,9 +10,9 @@ import (
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
-	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/compliance-service/api/jobs"
+	"github.com/chef/automate/api/external/compliance/reporting"
+	"github.com/chef/automate/api/interservice/compliance/common"
+	"github.com/chef/automate/api/interservice/compliance/jobs"
 )
 
 func (suite *GatewayTestSuite) TestLicenseUsageNodes() {

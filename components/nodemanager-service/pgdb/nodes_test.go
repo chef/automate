@@ -3,8 +3,7 @@ package pgdb
 import (
 	"testing"
 
-	"github.com/chef/automate/components/compliance-service/api/common"
-
+	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/stretchr/testify/assert"
 )
 

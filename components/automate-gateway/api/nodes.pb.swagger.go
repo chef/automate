@@ -268,6 +268,40 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.common.query.Filter": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Field to filter on."
+        },
+        "exclude": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Include matches for this filter.(boolean)\n` + "`" + `true` + "`" + ` (default) *includes* all nodes that match this filter. \n` + "`" + `false` + "`" + ` *excludes* all nodes that match this filter."
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Field values to filter on."
+        }
+      }
+    },
+    "chef.automate.api.common.query.Kv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Tag key."
+        },
+        "value": {
+          "type": "string",
+          "description": "Tag value."
+        }
+      }
+    },
     "chef.automate.api.nodes.v1.BulkDeleteResponse": {
       "type": "object",
       "properties": {
@@ -360,7 +394,7 @@ func init() {
         "tags": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Kv"
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
           },
           "description": "Node tags."
         },
@@ -456,7 +490,7 @@ func init() {
         "filters": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Filter"
+            "$ref": "#/definitions/chef.automate.api.common.query.Filter"
           },
           "description": "Use filters to limit the set of nodes to delete."
         },
@@ -582,40 +616,6 @@ func init() {
         }
       },
       "description": "Details for ssh/winrm access of the node."
-    },
-    "chef.automate.domain.compliance.api.common.Filter": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "Field to filter on."
-        },
-        "exclude": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Include matches for this filter.(boolean)\n` + "`" + `true` + "`" + ` (default) *includes* all nodes that match this filter. \n` + "`" + `false` + "`" + ` *excludes* all nodes that match this filter."
-        },
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Field values to filter on."
-        }
-      }
-    },
-    "chef.automate.domain.compliance.api.common.Kv": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "Tag key."
-        },
-        "value": {
-          "type": "string",
-          "description": "Tag value."
-        }
-      }
     }
   }
 }

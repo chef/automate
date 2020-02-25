@@ -1,0 +1,418 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "api/external/compliance/scanner/jobs/jobs.proto",
+    "version": "version not set"
+  },
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/compliance/scanner/jobs": {
+      "post": {
+        "operationId": "Create",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Id"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Job"
+            }
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      }
+    },
+    "/compliance/scanner/jobs/id/{id}": {
+      "get": {
+        "operationId": "Read",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Job"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      },
+      "delete": {
+        "operationId": "Delete",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      },
+      "put": {
+        "operationId": "Update",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "properties": {}
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Job"
+            }
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      }
+    },
+    "/compliance/scanner/jobs/rerun/id/{id}": {
+      "get": {
+        "operationId": "Rerun",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.RerunResponse"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      }
+    },
+    "/compliance/scanner/jobs/search": {
+      "post": {
+        "operationId": "List",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Jobs"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Query"
+            }
+          }
+        ],
+        "tags": [
+          "JobsService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "chef.automate.api.common.query.Filter": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Field to filter on."
+        },
+        "exclude": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Include matches for this filter.(boolean)\n`true` (default) *includes* all nodes that match this filter. \n`false` *excludes* all nodes that match this filter."
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Field values to filter on."
+        }
+      }
+    },
+    "chef.automate.api.common.query.Kv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Tag key."
+        },
+        "value": {
+          "type": "string",
+          "description": "Tag value."
+        }
+      }
+    },
+    "chef.automate.api.compliance.scanner.jobs.v1.Id": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.compliance.scanner.jobs.v1.Job": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        },
+        "timeout": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "tags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
+          }
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string"
+        },
+        "retries": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "retries_left": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.ResultsRow"
+          }
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "profiles": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "node_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "profile_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "node_selectors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.ManagerFilter"
+          }
+        },
+        "scheduled_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "recurrence": {
+          "type": "string"
+        },
+        "parent_id": {
+          "type": "string"
+        },
+        "job_count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "deleted": {
+          "type": "boolean",
+          "format": "boolean"
+        }
+      }
+    },
+    "chef.automate.api.compliance.scanner.jobs.v1.Jobs": {
+      "type": "object",
+      "properties": {
+        "jobs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Job"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.scanner.jobs.v1.ManagerFilter": {
+      "type": "object",
+      "properties": {
+        "manager_id": {
+          "type": "string"
+        },
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Filter"
+          }
+        }
+      }
+    },
+    "chef.automate.api.compliance.scanner.jobs.v1.Query": {
+      "type": "object",
+      "properties": {
+        "filters": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.common.query.Filter"
+          }
+        },
+        "order": {
+          "$ref": "#/definitions/chef.automate.api.compliance.scanner.jobs.v1.Query.OrderType"
+        },
+        "sort": {
+          "type": "string"
+        },
+        "page": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "per_page": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.compliance.scanner.jobs.v1.Query.OrderType": {
+      "type": "string",
+      "enum": [
+        "ASC",
+        "DESC"
+      ],
+      "default": "ASC"
+    },
+    "chef.automate.api.compliance.scanner.jobs.v1.RerunResponse": {
+      "type": "object"
+    },
+    "chef.automate.api.compliance.scanner.jobs.v1.ResultsRow": {
+      "type": "object",
+      "properties": {
+        "node_id": {
+          "type": "string"
+        },
+        "report_id": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "result": {
+          "type": "string"
+        },
+        "job_id": {
+          "type": "string"
+        },
+        "start_time": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    }
+  }
+}

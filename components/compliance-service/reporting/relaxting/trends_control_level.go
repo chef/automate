@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/chef/automate/components/compliance-service/api/stats"
+	"github.com/chef/automate/api/interservice/compliance/stats"
 	"github.com/olivere/elastic"
 	"github.com/sirupsen/logrus"
 )

@@ -3,9 +3,9 @@ package pgdb_test
 import (
 	"time"
 
+	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	"github.com/chef/automate/components/compliance-service/api/common"
 )
 
 func (suite *NodeManagersAndNodesDBSuite) TestGetManualNodesDueGetsTheRightNodes() {

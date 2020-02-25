@@ -4,7 +4,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/chef/automate/components/compliance-service/api/reporting"
+	"github.com/chef/automate/api/interservice/compliance/reporting"
 )
 
 func TestExport(t *testing.T) {

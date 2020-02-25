@@ -6,7 +6,7 @@ import (
 	"io/ioutil"
 	"log"
 
-	ps "github.com/chef/automate/components/compliance-service/api/profiles"
+	ps "github.com/chef/automate/api/interservice/compliance/profiles"
 	"github.com/chef/automate/components/compliance-service/examples/helpers"
 )
 

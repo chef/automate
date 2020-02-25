@@ -9,11 +9,11 @@ import (
 	gp "github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/nodes"
+	jobsService "github.com/chef/automate/api/interservice/compliance/jobs"
 	nodesService "github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/automate-gateway/protobuf"
-	jobsService "github.com/chef/automate/components/compliance-service/api/jobs"
-	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 )
 
@@ -36,12 +36,17 @@ func NewNodesHandler(nodesClient nodesService.NodesServiceClient, jobsClient job
 // on all their nodes. If the _no_auto_detect value is true, the function will return
 // the node without the auto detect tag and a value of false
 func handleAutoDetectTags(in *nodes.Node) (*nodes.Node, bool) {
-	noAutoDetect := pgdb.FindKeyValue(in.Tags, "_no_auto_detect").Value
+	key, found := FindKeyValue(in.Tags, "_no_auto_detect")
+	noAutoDetect := ""
+	if found {
+		noAutoDetect = key.Value
+	}
+
 	noAutoDetectBool, err := strconv.ParseBool(noAutoDetect)
 	if err != nil {
 		return in, true
 	}
-	in.Tags = pgdb.RemoveKeyValue(in.Tags, "_no_auto_detect")
+	in.Tags = RemoveKeyValue(in.Tags, "_no_auto_detect")
 	return in, !noAutoDetectBool
 }
 
@@ -221,4 +226,25 @@ func (a *Nodes) runDetectJob(ctx context.Context, id string) {
 	if err != nil {
 		logrus.WithError(err).Errorf("unable to create detect job for manager %s", id)
 	}
+}
+
+// FindKeyValue finds a Tag object in the array based on key match
+func FindKeyValue(tags []*query.Kv, key string) (*query.Kv, bool) {
+	for _, tag := range tags {
+		if tag.Key == key {
+			return tag, true
+		}
+	}
+	return &query.Kv{}, false
+}
+
+// RemoveKeyValue removes an item from the array base on key match
+func RemoveKeyValue(tags []*query.Kv, key string) []*query.Kv {
+	for i, tag := range tags {
+		if tag.Key == key {
+			tags[i] = tags[len(tags)-1]
+			return tags[:len(tags)-1]
+		}
+	}
+	return tags
 }

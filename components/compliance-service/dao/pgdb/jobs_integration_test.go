@@ -8,7 +8,7 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/chef/automate/components/compliance-service/api/jobs"
+	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb/dbtest"
 )
 

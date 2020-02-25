@@ -20,16 +20,16 @@ import (
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/api/interservice/license_control"
 
+	cc_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
+	cc_jobs "github.com/chef/automate/api/interservice/compliance/jobs"
+	cc_profiles "github.com/chef/automate/api/interservice/compliance/profiles"
+	cc_reporting "github.com/chef/automate/api/interservice/compliance/reporting"
+	cc_stats "github.com/chef/automate/api/interservice/compliance/stats"
+	cc_version "github.com/chef/automate/api/interservice/compliance/version"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	teamsv1 "github.com/chef/automate/api/interservice/teams/v1"
 	teamsv2 "github.com/chef/automate/api/interservice/teams/v2"
-	cc_jobs "github.com/chef/automate/components/compliance-service/api/jobs"
-	cc_profiles "github.com/chef/automate/components/compliance-service/api/profiles"
-	cc_reporting "github.com/chef/automate/components/compliance-service/api/reporting"
-	cc_stats "github.com/chef/automate/components/compliance-service/api/stats"
-	cc_version "github.com/chef/automate/components/compliance-service/api/version"
-	cc_ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 )
 

@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/external/applications"
+	"github.com/chef/automate/api/external/compliance/reporting"
 	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
@@ -13,7 +14,6 @@ import (
 	"github.com/chef/automate/components/automate-gateway/api/auth/tokens"
 	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
-	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
 	v2 "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"

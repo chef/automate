@@ -7,6 +7,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/secrets"
 )
 
@@ -24,19 +25,19 @@ func TestListSecretFiltersFail(t *testing.T) {
 	ctx := context.Background()
 
 	filtersDataCollection := []struct {
-		filters []*secrets.Filter
+		filters []*query.Filter
 		message string
 	}{
 		{
 			filters: appendFilters(
-				&secrets.Filter{Key: "ssh", Exclude: true, Values: []string{"tom", "cat"}},
-				&secrets.Filter{Key: "ssh", Exclude: false, Values: []string{"tom", "cat"}},
+				&query.Filter{Key: "ssh", Exclude: true, Values: []string{"tom", "cat"}},
+				&query.Filter{Key: "ssh", Exclude: false, Values: []string{"tom", "cat"}},
 			),
 			message: "Failure because cannot have the same key be excluded and included",
 		},
 		{
 			filters: appendFilters(
-				&secrets.Filter{Key: "invalided_type", Exclude: true, Values: []string{}},
+				&query.Filter{Key: "invalided_type", Exclude: true, Values: []string{}},
 			),
 			message: "Failure because not valied type",
 		},
@@ -70,22 +71,22 @@ func TestListSecretOrder(t *testing.T) {
 					Name: "a",
 					Type: "ssh",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 				{
 					Name: "c",
 					Type: "ssh",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 				{
 					Name: "b",
 					Type: "ssh",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 			},
 			outputSecrets: []*secrets.Secret{
@@ -112,22 +113,22 @@ func TestListSecretOrder(t *testing.T) {
 					Name: "a",
 					Type: "ssh",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 				{
 					Name: "c",
 					Type: "ssh",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 				{
 					Name: "b",
 					Type: "ssh",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 			},
 			outputSecrets: []*secrets.Secret{
@@ -154,22 +155,22 @@ func TestListSecretOrder(t *testing.T) {
 					Name: "a",
 					Type: "ssh",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 				{
 					Name: "c",
 					Type: "service_now",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 				{
 					Name: "b",
 					Type: "winrm",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 			},
 			outputSecrets: []*secrets.Secret{
@@ -196,22 +197,22 @@ func TestListSecretOrder(t *testing.T) {
 					Name: "a",
 					Type: "ssh",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 				{
 					Name: "c",
 					Type: "service_now",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 				{
 					Name: "b",
 					Type: "winrm",
 					Data: appendKvs(
-						&secrets.Kv{Key: "username", Value: "username"},
-						&secrets.Kv{Key: "password", Value: "password"}),
+						&query.Kv{Key: "username", Value: "username"},
+						&query.Kv{Key: "password", Value: "password"}),
 				},
 			},
 			outputSecrets: []*secrets.Secret{
@@ -268,8 +269,8 @@ func TestListSecretPaging(t *testing.T) {
 		secret := &secrets.Secret{
 			Name: strconv.Itoa(index),
 			Type: "ssh",
-			Data: appendKvs(&secrets.Kv{Key: "username", Value: "username"},
-				&secrets.Kv{Key: "password", Value: "password"}),
+			Data: appendKvs(&query.Kv{Key: "username", Value: "username"},
+				&query.Kv{Key: "password", Value: "password"}),
 		}
 		id, err := secretsServer.Create(ctx, secret)
 		assert.NoError(t, err)

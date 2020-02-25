@@ -5,7 +5,7 @@ import (
 
 	"sort"
 
-	"github.com/chef/automate/components/compliance-service/api/profiles"
+	"github.com/chef/automate/api/interservice/compliance/profiles"
 	"github.com/chef/automate/components/compliance-service/inspec"
 )
 

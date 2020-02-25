@@ -6,9 +6,9 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 
-	apiReporting "github.com/chef/automate/components/compliance-service/api/reporting"
+	apiReporting "github.com/chef/automate/api/interservice/compliance/reporting"
+	"github.com/chef/automate/api/interservice/compliance/stats"
 	reportingServer "github.com/chef/automate/components/compliance-service/api/reporting/server"
-	"github.com/chef/automate/components/compliance-service/api/stats"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

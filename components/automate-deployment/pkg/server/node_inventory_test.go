@@ -3,8 +3,8 @@ package server
 import (
 	"testing"
 
+	"github.com/chef/automate/api/interservice/compliance/reporting"
 	api "github.com/chef/automate/api/interservice/deployment"
-	"github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/stretchr/testify/assert"
 )
 

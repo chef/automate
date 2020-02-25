@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/stretchr/testify/assert"
 )
@@ -22,54 +23,54 @@ func TestCreateSecretSuccessful(t *testing.T) {
 
 	dataSecrets := []struct {
 		sType string
-		data  []*secrets.Kv
+		data  []*query.Kv
 	}{
 		{
 			sType: "ssh",
-			data: appendKvs(&secrets.Kv{Key: "username", Value: "username"},
-				&secrets.Kv{Key: "password", Value: "password"}),
+			data: appendKvs(&query.Kv{Key: "username", Value: "username"},
+				&query.Kv{Key: "password", Value: "password"}),
 		},
 		{
 			sType: "ssh",
-			data: appendKvs(&secrets.Kv{Key: "username", Value: "username"},
-				&secrets.Kv{Key: "key", Value: "key"}),
+			data: appendKvs(&query.Kv{Key: "username", Value: "username"},
+				&query.Kv{Key: "key", Value: "key"}),
 		},
 		{
 			sType: "service_now",
-			data: appendKvs(&secrets.Kv{Key: "username", Value: "username"},
-				&secrets.Kv{Key: "password", Value: "password"}),
+			data: appendKvs(&query.Kv{Key: "username", Value: "username"},
+				&query.Kv{Key: "password", Value: "password"}),
 		},
 		{
 			sType: "sudo",
-			data:  appendKvs(&secrets.Kv{Key: "password", Value: "password"}),
+			data:  appendKvs(&query.Kv{Key: "password", Value: "password"}),
 		},
 		{
 			sType: "sudo",
-			data:  appendKvs(&secrets.Kv{Key: "options", Value: "options"}),
+			data:  appendKvs(&query.Kv{Key: "options", Value: "options"}),
 		},
 		{
 			sType: "aws",
-			data:  appendKvs(&secrets.Kv{Key: "ARN_ROLE", Value: "ARN_ROLE"}),
+			data:  appendKvs(&query.Kv{Key: "ARN_ROLE", Value: "ARN_ROLE"}),
 		},
 		{
 			sType: "aws",
 			data: appendKvs(
-				&secrets.Kv{Key: "ARN_ROLE", Value: ""},
-				&secrets.Kv{Key: "AWS_ACCESS_KEY_ID", Value: "AWS_ACCESS_KEY_ID"},
-				&secrets.Kv{Key: "AWS_SECRET_ACCESS_KEY", Value: "AWS_SECRET_ACCESS_KEY"}),
+				&query.Kv{Key: "ARN_ROLE", Value: ""},
+				&query.Kv{Key: "AWS_ACCESS_KEY_ID", Value: "AWS_ACCESS_KEY_ID"},
+				&query.Kv{Key: "AWS_SECRET_ACCESS_KEY", Value: "AWS_SECRET_ACCESS_KEY"}),
 		},
 		{
 			sType: "azure",
 			data: appendKvs(
-				&secrets.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
-				&secrets.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"},
-				&secrets.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"}),
+				&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
+				&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"},
+				&query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"}),
 		},
 		{
 			// should this one fail, because we are not use a known type
 			sType: "not_handled",
-			data: appendKvs(&secrets.Kv{Key: "username", Value: "username"},
-				&secrets.Kv{Key: "password", Value: "password"}),
+			data: appendKvs(&query.Kv{Key: "username", Value: "username"},
+				&query.Kv{Key: "password", Value: "password"}),
 		},
 		{
 			// should this one fail, because we are not storing any data
@@ -77,8 +78,8 @@ func TestCreateSecretSuccessful(t *testing.T) {
 		},
 		{
 			// should a type be required?
-			data: appendKvs(&secrets.Kv{Key: "username", Value: "username"},
-				&secrets.Kv{Key: "password", Value: "password"}),
+			data: appendKvs(&query.Kv{Key: "username", Value: "username"},
+				&query.Kv{Key: "password", Value: "password"}),
 		},
 		{
 			// should this one fail, because we are not storing any data and their is not type
@@ -113,44 +114,44 @@ func TestCreateSecretFailure(t *testing.T) {
 
 	dataSecrets := []struct {
 		sType string
-		data  []*secrets.Kv
+		data  []*query.Kv
 	}{
 		{
 			sType: "ssh",
 		},
 		{
 			sType: "ssh",
-			data:  appendKvs(&secrets.Kv{Key: "password", Value: "password"}),
+			data:  appendKvs(&query.Kv{Key: "password", Value: "password"}),
 		},
 		{
 			sType: "ssh",
-			data:  appendKvs(&secrets.Kv{Key: "username", Value: "username"}),
+			data:  appendKvs(&query.Kv{Key: "username", Value: "username"}),
 		},
 		{
 			sType: "winrm",
 		},
 		{
 			sType: "winrm",
-			data:  appendKvs(&secrets.Kv{Key: "password", Value: "password"}),
+			data:  appendKvs(&query.Kv{Key: "password", Value: "password"}),
 		},
 		{
 			sType: "winrm",
-			data:  appendKvs(&secrets.Kv{Key: "username", Value: "username"}),
+			data:  appendKvs(&query.Kv{Key: "username", Value: "username"}),
 		},
 		{
 			sType: "service_now",
 		},
 		{
 			sType: "service_now",
-			data:  appendKvs(&secrets.Kv{Key: "password", Value: "password"}),
+			data:  appendKvs(&query.Kv{Key: "password", Value: "password"}),
 		},
 		{
 			sType: "service_now",
-			data:  appendKvs(&secrets.Kv{Key: "username", Value: "username"}),
+			data:  appendKvs(&query.Kv{Key: "username", Value: "username"}),
 		},
 		{
 			sType: "service_now",
-			data:  appendKvs(&secrets.Kv{Key: "username", Value: "username"}, &secrets.Kv{Key: "key", Value: "key"}),
+			data:  appendKvs(&query.Kv{Key: "username", Value: "username"}, &query.Kv{Key: "key", Value: "key"}),
 		},
 		{
 			sType: "sudo",
@@ -160,19 +161,19 @@ func TestCreateSecretFailure(t *testing.T) {
 		},
 		{
 			sType: "aws",
-			data:  appendKvs(&secrets.Kv{Key: "ARN_ROLE", Value: ""}),
+			data:  appendKvs(&query.Kv{Key: "ARN_ROLE", Value: ""}),
 		},
 		{
 			sType: "aws",
 			data: appendKvs(
-				&secrets.Kv{Key: "ARN_ROLE", Value: ""},
-				&secrets.Kv{Key: "AWS_SECRET_ACCESS_KEY", Value: "AWS_SECRET_ACCESS_KEY"}),
+				&query.Kv{Key: "ARN_ROLE", Value: ""},
+				&query.Kv{Key: "AWS_SECRET_ACCESS_KEY", Value: "AWS_SECRET_ACCESS_KEY"}),
 		},
 		{
 			sType: "aws",
 			data: appendKvs(
-				&secrets.Kv{Key: "ARN_ROLE", Value: ""},
-				&secrets.Kv{Key: "AWS_ACCESS_KEY_ID", Value: "AWS_ACCESS_KEY_ID"}),
+				&query.Kv{Key: "ARN_ROLE", Value: ""},
+				&query.Kv{Key: "AWS_ACCESS_KEY_ID", Value: "AWS_ACCESS_KEY_ID"}),
 		},
 		{
 			sType: "azure",
@@ -180,20 +181,20 @@ func TestCreateSecretFailure(t *testing.T) {
 		{
 			sType: "azure",
 			data: appendKvs(
-				&secrets.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"},
-				&secrets.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"}),
+				&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"},
+				&query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"}),
 		},
 		{
 			sType: "azure",
 			data: appendKvs(
-				&secrets.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
-				&secrets.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"}),
+				&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
+				&query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"}),
 		},
 		{
 			sType: "azure",
 			data: appendKvs(
-				&secrets.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
-				&secrets.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"}),
+				&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
+				&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"}),
 		},
 	}
 

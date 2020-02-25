@@ -4,14 +4,14 @@ import (
 	"encoding/json"
 	"testing"
 
-	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/external/common/query"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
 func TestKeyValueToRawMapReturnsEmptyMessageWhenArrayEmpty(t *testing.T) {
-	var tags []*secrets.Kv
+	var tags []*query.Kv
 	var bytes []byte
 	var err error
 	var j json.RawMessage
@@ -25,9 +25,9 @@ func TestKeyValueToRawMapReturnsEmptyMessageWhenArrayEmpty(t *testing.T) {
 }
 
 func TestKeyValueToRawMapReturnsJsonMessage(t *testing.T) {
-	secret1 := secrets.Kv{Key: "key1", Value: "value1"}
-	secret2 := secrets.Kv{Key: "key2", Value: "value2"}
-	tags := []*secrets.Kv{&secret1, &secret2}
+	secret1 := query.Kv{Key: "key1", Value: "value1"}
+	secret2 := query.Kv{Key: "key2", Value: "value2"}
+	tags := []*query.Kv{&secret1, &secret2}
 
 	var bytes []byte
 	var err error
@@ -42,7 +42,7 @@ func TestKeyValueToRawMapReturnsJsonMessage(t *testing.T) {
 }
 
 func TestRawMapToKeyValueReturnsEmptyTagsWhenJsonEmpty(t *testing.T) {
-	var tags []*secrets.Kv
+	var tags []*query.Kv
 	j := json.RawMessage(`{}`)
 
 	result, err := RawMapToKeyValue(j)
@@ -53,9 +53,9 @@ func TestRawMapToKeyValueReturnsEmptyTagsWhenJsonEmpty(t *testing.T) {
 }
 
 func TestRawMapToKeyValueReturnsKeyValues(t *testing.T) {
-	secret1 := secrets.Kv{Key: "key1", Value: "value1"}
-	secret2 := secrets.Kv{Key: "key2", Value: "value2"}
-	tags := []*secrets.Kv{&secret1, &secret2}
+	secret1 := query.Kv{Key: "key1", Value: "value1"}
+	secret2 := query.Kv{Key: "key2", Value: "value2"}
+	tags := []*query.Kv{&secret1, &secret2}
 
 	j := json.RawMessage(`{"key1":"value1","key2":"value2"}`)
 

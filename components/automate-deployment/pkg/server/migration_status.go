@@ -13,9 +13,9 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	compliance "github.com/chef/automate/api/interservice/compliance/status"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/api/interservice/ingest"
-	compliance "github.com/chef/automate/components/compliance-service/api/status"
 )
 
 // Amount of time to wait for a single service to report its status

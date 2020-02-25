@@ -1,0 +1,22 @@
+syntax = "proto3";
+
+package chef.automate.domain.compliance.common;
+option go_package = "github.com/chef/automate/api/interservice/compliance/common";
+
+message Filter {
+	// Field to filter on.
+	string key = 20;
+	// Include matches for this filter.(boolean)
+	// `true` (default) *includes* all nodes that match this filter. 
+	// `false` *excludes* all nodes that match this filter.
+	bool exclude = 22;
+	// Field values to filter on.
+	repeated string values = 23;
+}
+
+message Kv {
+	// Tag key.
+	string key = 1;
+	// Tag value.
+	string value = 2;
+}

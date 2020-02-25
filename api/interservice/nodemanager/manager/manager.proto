@@ -7,7 +7,7 @@ import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 import "google/protobuf/timestamp.proto";
 
-import "components/compliance-service/api/common/common.proto";
+import "api/interservice/compliance/common/common.proto";
 import "api/interservice/nodemanager/nodes/nodes.proto";
 
 
@@ -52,7 +52,7 @@ message NodeState {
 }
 
 message Query {
-	repeated chef.automate.domain.compliance.api.common.Filter filter_map = 25;
+	repeated chef.automate.domain.compliance.common.Filter filter_map = 25;
 
 	enum OrderType {
 		ASC = 0;
@@ -73,7 +73,7 @@ message NodeMetadata {
 	string source_id = 7;
 	string source_region = 8;
 	string source_account_id = 9;
-	repeated chef.automate.domain.compliance.api.common.Kv tags = 10;
+	repeated chef.automate.domain.compliance.common.Kv tags = 10;
 	chef.automate.domain.nodemanager.nodes.LastContactData run_data = 11;
 	chef.automate.domain.nodemanager.nodes.LastContactData scan_data = 12;
 	repeated chef.automate.domain.nodemanager.nodes.ProjectsData projects_data = 13;
@@ -111,7 +111,7 @@ message NodeManager {
 		string status = 22;
 		string account_id = 24;
 		google.protobuf.Timestamp date_added = 25;
-		repeated chef.automate.domain.compliance.api.common.Kv credential_data = 26;
+		repeated chef.automate.domain.compliance.common.Kv credential_data = 26;
 		string account_alias = 27;
 }
 message CredentialsByTags {
@@ -130,7 +130,7 @@ message ManagerNode {
 	string id = 1; 
 	string host = 2;
 	string public_ip = 3;
-	repeated chef.automate.domain.compliance.api.common.Kv tags = 4;
+	repeated chef.automate.domain.compliance.common.Kv tags = 4;
 	string platform = 5;  
 	// should all these be tags??    
 	string region = 6;    
