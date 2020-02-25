@@ -10,6 +10,10 @@
   border-top: 1px solid $chef-grey;
   overflow: hidden;
   text-overflow: ellipsis;
+
+  &.text-right {
+    text-align: right;
+  }
 }
 
 :host:first-child {
