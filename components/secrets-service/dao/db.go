@@ -1,7 +1,6 @@
 package dao
 
 import (
-	gosql "database/sql"
 	"sort"
 	"time"
 
@@ -12,6 +11,7 @@ import (
 	logs "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/secrets-service/config"
+	"github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/db/migrator"
 	"github.com/chef/automate/lib/logger"
 )
@@ -72,7 +72,7 @@ func initPostgresDB(conf *config.Postgres) (*gorp.DbMap, error) {
 	pgURI := conf.ConnectionString
 
 	logs.Debugf("Use PostgreSQL backend %s", pgURI)
-	db, err := gosql.Open("postgres", pgURI)
+	db, err := db.PGOpen(pgURI)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to open database with uri: %s", pgURI)
 	}
