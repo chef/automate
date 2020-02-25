@@ -498,7 +498,14 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Condition"
           }
         }
-      }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "name",
+        "type",
+        "conditions"
+      ]
     },
     "chef.automate.api.iam.v2.CreateRuleResp": {
       "type": "object",
@@ -608,7 +615,14 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Condition"
           }
         }
-      }
+      },
+      "required": [
+        "id",
+        "project_id",
+        "name",
+        "type",
+        "conditions"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateRuleResp": {
       "type": "object",

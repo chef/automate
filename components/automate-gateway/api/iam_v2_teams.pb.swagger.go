@@ -484,7 +484,11 @@ func init() {
             "type": "string"
           }
         }
-      }
+      },
+      "required": [
+        "id",
+        "user_ids"
+      ]
     },
     "chef.automate.api.iam.v2.AddTeamMembersResp": {
       "type": "object",
@@ -515,7 +519,11 @@ func init() {
             "type": "string"
           }
         }
-      }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.CreateTeamResp": {
       "type": "object",
@@ -586,7 +594,11 @@ func init() {
             "type": "string"
           }
         }
-      }
+      },
+      "required": [
+        "id",
+        "user_ids"
+      ]
     },
     "chef.automate.api.iam.v2.RemoveTeamMembersResp": {
       "type": "object",
@@ -634,7 +646,11 @@ func init() {
             "type": "string"
           }
         }
-      }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateTeamResp": {
       "type": "object",
