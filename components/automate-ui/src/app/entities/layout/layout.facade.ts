@@ -80,11 +80,11 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  getContentStyle() {
+  getContentStyle(): any {
     return { 'height': this.contentHeight };
   }
 
-  updateDisplay() {
+  updateDisplay(): void {
     let combinedHeights = 0;
     if (this.layout.header.navigation) {
       combinedHeights += Height.Navigation;
@@ -105,7 +105,7 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     return this.layout.sidebar.navigation = true;
   }
 
-  ShowPageLoading(showLoading: boolean) {
+  ShowPageLoading(showLoading: boolean): void {
     this.store.dispatch( new ShowPageLoading(showLoading));
   }
 

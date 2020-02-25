@@ -39,11 +39,11 @@ export class SidebarComponent {
 
   private setGroupVisibility(menuItemGroup: MenuItemGroup): void {
     menuItemGroup.hasVisibleMenuItems =
-      this.hasVisibleMenuItems(menuItemGroup) ||
+      this.hasAuthorizedMenuItems(menuItemGroup) ||
       this.hasMenuItemsNotRequiringAuthorization(menuItemGroup);
   }
 
-  private hasVisibleMenuItems(menuItemGroup: any): boolean {
+  private hasAuthorizedMenuItems(menuItemGroup: any): boolean {
     return  menuItemGroup.items.some(menuItem =>
           menuItem.authorized && menuItem.authorized.isAuthorized);
   }

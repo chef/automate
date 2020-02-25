@@ -11,6 +11,7 @@ import { clientRunsWorkflowEnabled } from 'app/entities/client-runs/client-runs.
 import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
 import { UpdateSidebars } from './layout.actions';
 import { Sidebars } from './layout.model';
+import { MenuItemGroup } from 'app/entities/layout/layout.model';
 
 @Injectable({
     providedIn: 'root'
@@ -253,18 +254,17 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
     }
 
     private updateVisibleValues(sidebars: Sidebars): Sidebars {
-      forEach(sidebars, (_value, key) => {
-        const menuGroups = sidebars[key];
-        forEach(menuGroups, (menuGroup) => {
-          if (menuGroup && menuGroup.name) {
-            this.setVisibleValuesToObservables(menuGroup);
-            if (menuGroup.items) {
-              forEach(menuGroup.items, (menuItem) => {
-                this.setVisibleValuesToObservables(menuItem);
-              });
-            }
-            menuGroup.visible$ = this.setMenuGroupVisibility(menuGroup);
+      Object.values(sidebars)
+      .filter(menuGroups => menuGroups instanceof Array)
+      .forEach((menuGroups: MenuItemGroup[]) => {
+        menuGroups.forEach(menuGroup => {
+          this.setVisibleValuesToObservables(menuGroup);
+          if (menuGroup.items) {
+            menuGroup.items.forEach(menuItem => {
+              this.setVisibleValuesToObservables(menuItem);
+            });
           }
+          menuGroup.visible$ = menuGroup.visible$ ? menuGroup.visible$ : new BehaviorSubject(true);
         });
       });
       return sidebars;
@@ -276,20 +276,6 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
       } else if (!item.visible$.subscribe) {
         item.visible$ = new BehaviorSubject(item.visible$);
       }
-    }
-
-    private setMenuGroupVisibility(menuGroup: any): any {
-      let anyMenuItemsVisible = false;
-      forEach(menuGroup.items, (menuItem) => {
-        if (menuItem.visible$ === undefined) {
-          anyMenuItemsVisible = true;
-        } else if (menuItem.visible$.subscribe) {
-          menuItem.visible$.subscribe((value) => {
-            anyMenuItemsVisible = value ? true : anyMenuItemsVisible;
-          });
-        }
-      });
-      return new BehaviorSubject(anyMenuItemsVisible);
     }
 
     // For sidebars, we are constraining <app-authorized> attributes:
