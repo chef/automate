@@ -35,12 +35,12 @@ control 'iam-legacy-access-control-1' do
         '/apis/iam/v2/tokens',
         http_method: 'POST',
         request_body: {
-          'id': "inspec_test_token-#{Time.now.to_i}"
-          'name': 'inspec_test_token',
+          'id': "inspec_test_token-#{Time.now.to_i}",
+          'name': 'inspec_test_token'
         }.to_json
       )
-      TEST_TOKEN = test_token_request.parsed_response_body[:value]
-      TEST_TOKEN_ID = test_token_request.parsed_response_body[:id]
+      TEST_TOKEN = test_token_request.parsed_response_body[:token][:value]
+      TEST_TOKEN_ID = test_token_request.parsed_response_body[:token][:id]
 
       expect(test_token_request.http_status).to eq(200)
     end
@@ -50,7 +50,6 @@ control 'iam-legacy-access-control-1' do
         "/apis/iam/v2/users/#{NON_ADMIN_USERNAME}",
         http_method: 'DELETE',
       )
-
       expect(delete_non_admin_request.http_status.to_s).to match(/200|404/)
 
 
@@ -58,7 +57,6 @@ control 'iam-legacy-access-control-1' do
         "/apis/iam/v2/tokens/#{TEST_TOKEN_ID}",
         http_method: 'DELETE',
       )
-
       expect(delete_token_request.http_status.to_s).to match(/200|404/)
     end
 
@@ -93,7 +91,6 @@ control 'iam-legacy-access-control-1' do
     #
     #  test_object: A hash of the object you wish to POST (will be convert to JSON).
     #
-    #  test_update_object: A hash of the object you wish to PUT (will be convert to JSON).
     shared_examples 'try_every_http_verb' do
       resp_id = nil
 
@@ -154,7 +151,7 @@ control 'iam-legacy-access-control-1' do
                 "#{url}/#{resp_id}",
                 http_method: 'PUT',
                 user: user,
-                request_body: test_update_object.to_json,
+                request_body: test_object.to_json,
               ).http_status.to_s == url + ":PUT:403"
             ).to be(expect_403_response)
           end
@@ -168,22 +165,24 @@ control 'iam-legacy-access-control-1' do
               ).http_status.to_s == url + ":DELETE:403"
             ).to be(expect_403_response)
           end
-
         end
       end
     end # try_every_http_verb
 
+<<<<<<< HEAD
 <<<<<<< HEAD:inspec/a2-api-integration/controls/authz_access_control.rb
     shared_examples 'authz access control' do
 =======
     shared_examples 'iam access control (with v1 legacy policies)' do
 >>>>>>> inspec: port authz_access_control to legacy_access:inspec/a2-iam-legacy-integration/controls/legacy_access.rb
+=======
+    shared_examples 'iam access control with v1 legacy policies' do
+>>>>>>> inspec: add legacy_access tests
       describe '/apis/iam/v2/teams' do
         let(:url) { '/apis/iam/v2/teams' }
         let(:expect_403_response) { expect_403_for_admin_only_apis }
         let(:id_keys) { ["team", "id"] }
         let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
-        # Random valid ID to use in 403 case.
         let(:failure_test_id) { 'does-not-exist' }
         let(:test_object) do
           {
@@ -195,11 +194,10 @@ control 'iam-legacy-access-control-1' do
 >>>>>>> inspec: port authz_access_control to legacy_access:inspec/a2-iam-legacy-integration/controls/legacy_access.rb
           }
         end
-        let(:test_update_object) { test_obect }
 
         include_examples 'try_every_http_verb'
 
-        it "AddUsers returns the correct response code" do
+        it "POST /apis/iam/v2/teams/{id}/users:add returns the correct response code" do
           expect(
             automate_api_request(
               "/apis/iam/v2/teams/inspec_test_team-#{Time.now.to_i}/users:add",
@@ -207,12 +205,12 @@ control 'iam-legacy-access-control-1' do
               user: user,
               request_headers: { "Content-type": "application/json" },
               request_body: { user_ids: ['some_user', 'another_user'] }.to_json,
-            ).http_status
+            ).http_status == 403
 
           ).to eq(expect_403_for_admin_only_apis)
         end
 
-        it "RemoveUsers returns the correct response code" do
+        it "POST /apis/iam/v2/teams/{id}/users:remove returns the correct response code" do
           expect(
             automate_api_request(
               "/apis/iam/v2/teams/inspec_test_team-#{Time.now.to_i}/users:remove",
@@ -220,7 +218,7 @@ control 'iam-legacy-access-control-1' do
               user: user,
               request_headers: { "Content-type": "application/json" },
               request_body: { user_ids: ['some_user', 'another_user'] }.to_json,
-            ).http_status
+            ).http_status == 403
 
           ).to eq(expect_403_for_admin_only_apis)
         end
@@ -245,7 +243,6 @@ control 'iam-legacy-access-control-1' do
 >>>>>>> inspec: port authz_access_control to legacy_access:inspec/a2-iam-legacy-integration/controls/legacy_access.rb
           }
         end
-        let(:test_update_object) { test_obect }
 
         include_examples 'try_every_http_verb'
 <<<<<<< HEAD:inspec/a2-api-integration/controls/authz_access_control.rb
@@ -262,12 +259,11 @@ control 'iam-legacy-access-control-1' do
         let(:failure_test_id) { 'does-not-exist' }
         let(:test_object) do
           {
-            'id': "inspec_test_token-#{Time.now.to_i}",
+            'id': "inspec_test_token_2-#{Time.now.to_i}",
             'name': 'This token was created by inspec tests. DELETE ME.',
             'projects': []
           }
         end
-        let(:test_update_object) { test_object }
 
         include_examples 'try_every_http_verb'
       end
@@ -286,14 +282,13 @@ control 'iam-legacy-access-control-1' do
             "statements": [
               {
                 "effect": "ALLOW",
-                "actions": "do:some:thing",
-                "projects": "*"
+                "actions": ["do:some:thing"],
+                "projects": ["*"]
               }
-            ]
+            ],
             'projects': []
           }
         end
-        let(:test_update_object) { test_object }
 
         include_examples 'try_every_http_verb'
       end
@@ -308,10 +303,10 @@ control 'iam-legacy-access-control-1' do
           {
             'id': "inspec_test_role-#{Time.now.to_i}",
             'name': 'This role was created by inspec tests. DELETE ME.',
+            'actions': ['do:a:thing'],
             'projects': []
           }
         end
-        let(:test_update_object) { test_object }
 
         include_examples 'try_every_http_verb'
       end
@@ -328,7 +323,6 @@ control 'iam-legacy-access-control-1' do
             'name': 'This project was created by inspec tests. DELETE ME.'
           }
         end
-        let(:test_update_object) { test_object }
 
         include_examples 'try_every_http_verb'
       end
@@ -350,35 +344,68 @@ control 'iam-legacy-access-control-1' do
               }
             }
         end
-        let(:test_update_object) { test_object }
 
         include_examples 'try_every_http_verb'
       end
 
-      it "gateway/version returns the correct response code" do
+      describe 'version endpoints' do
+        it "GET gateway/version returns the correct response code" do
           expect(
             automate_api_request(
               "/api/v0/version",
               http_method: 'GET',
               user: user,
             ).http_status == 403
-          ).to eq(expect_403_for_all_apis)
-      end
+          ).to eq(expect_403_for_all_apis) # always true
+        end
 
-      it "gateway/policy_version returns the correct response code" do
-          policy_version_request = automate_api_request(
-            "/apis/iam/v2/policy_version",
-            http_method: 'GET',
-            user: user,
-          )
-          expect(policy_version_request.http_status == 403).to eq(expect_403_for_all_apis) # always true
+        it "GET iam/v2/policy_version returns the correct response code" do
+          expect(
+            automate_api_request(
+              "/apis/iam/v2/policy_version",
+              http_method: 'GET',
+              user: user,
+            ).http_status == 403
+          ).to eq(expect_403_for_all_apis) # always true
+        end
+
+        it "GET cfgmgmt/version returns the correct response code" do
+            expect(
+              automate_api_request(
+                "/api/v0/cfgmgmt/version",
+                http_method: 'GET',
+                user: user,
+              ).http_status == 403
+            ).to eq(expect_403_for_all_apis) # always true
+        end
+
+        it "GET deployment/service_versions returns the correct response code" do
+          expect(
+            automate_api_request(
+              "/api/v0/deployment/service_versions",
+              http_method: 'GET',
+              user: user,
+            ).http_status == 403
+          ).to eq(expect_403_for_all_apis) # always true
+        end
+
+        it "GET reporting/version returns the correct response code" do
+          expect(
+            automate_api_request(
+              "/api/v0/compliance/reporting/version",
+              http_method: 'GET',
+              user: user,
+            ).http_status == 403
+          ).to eq(expect_403_for_all_apis) # always true
+        end
       end
 
       describe '/api/v0/cfgmgmt/' do
         before(:all) do
           node = "chefdk-debian-7-tester-2d206b_run_converge"
-          node_request = automate_api_request(
+          node_request = automate_client_api_request(
             '/data-collector/v0',
+            TEST_TOKEN, # users not allowed to post to this API
             http_method: 'POST',
             request_body: inspec.profile.file("fixtures/converge/#{node}.json")
           )
@@ -386,8 +413,9 @@ control 'iam-legacy-access-control-1' do
           expect(node_request.http_status).to eq 200
 
           policy_node = "policy-node"
-          policy_node_request = automate_api_request(
+          policy_node_request = automate_client_api_request(
             '/data-collector/v0',
+            TEST_TOKEN, # users not allowed to post to this API
             http_method: 'POST',
             request_body: inspec.profile.file("fixtures/converge/#{policy_node}.json")
           )
@@ -409,7 +437,6 @@ control 'iam-legacy-access-control-1' do
           organizations
           source_fqdns
           nodes/82760210-4686-497e-b039-efca78dee64b/attribute
-          version
           policy_revision/6c215da3266a20fd7a56ae9f1e3073e47c124f713a0e1eb74619a035325cd482
           suggestions?type=cookbook&text=b
         ).each do |url|
@@ -418,62 +445,58 @@ control 'iam-legacy-access-control-1' do
                 automate_api_request(
                   "/api/v0/cfgmgmt/#{url}",
                   http_method: 'GET',
-                  user: user,
-                ).http_status.to_s
-
-                # in travis, test nodes aren't always created in time, so might get authorized 404 response
-              ).to match(/200|404/)
+                  user: user
+                ).http_status == 403
+              ).to eq(expect_403_for_all_apis) # always true
           end
         end
       end
 
-      # event-feed-related endpoints
-      describe '/api/v0/' do
-        %w(
-          eventfeed
-          event_type_counts
-          eventstrings
-        ).each do |url|
-          it "#{url} returns the correct response code" do
+    # event-feed-related endpoints
+    describe '/api/v0/' do
+      %w(
+        eventfeed
+        event_type_counts
+        eventstrings
+      ).each do |url|
+        it "#{url} returns the correct response code" do
+            expect(
+              automate_api_request(
+                "/api/v0/#{url}",
+                http_method: 'GET',
+                user: user,
+              ).http_status == 403
+            ).to eq(expect_403_for_all_apis) # always true
+        end
+      end
+    end
+
+    #secrets endpoints
+    describe '/api/v0/secrets' do
+      {
+        'GET': %w(
+          secrets/id/SECRETID
+        ),
+        'DELETE': %w(secrets/id/SECRETID),
+        'POST': %w(
+          secrets
+          secrets/search
+        ),
+        'PATCH': %w(secrets/id/SECRETID)
+      }.each do |method, urls|
+        urls.each do |url|
+          it "#{method} #{url} returns the correct response code" do
               expect(
                 automate_api_request(
                   "/api/v0/#{url}",
-                  http_method: 'GET',
+                  http_method: method,
                   user: user,
-                ).http_status.to_s
-
-                # eventstrings gives us a 400, but that's ok, it means we've passed authz
-              ).to match(/200|400/)
+                ).http_status == 403
+              ).to eq(expect_403_for_all_apis)
           end
         end
       end
-
-      #secrets endpoints
-      describe '/api/v0/secrets' do
-        {
-          'GET': %w(
-            secrets/id/SECRETID
-          ),
-          'DELETE': %w(secrets/id/SECRETID),
-          'POST': %w(
-            secrets
-            secrets/search
-          ),
-          'PATCH': %w(secrets/id/SECRETID)
-        }.each do |method, urls|
-          urls.each do |url|
-            it "#{method} #{url} returns the correct response code" do
-                expect(
-                  automate_api_request(
-                    "/api/v0/#{url}",
-                    http_method: method,
-                    user: user,
-                  ).http_status == 403
-                ).to eq(expect_403_for_all_apis)
-            end
-          end
-        end
-      end
+    end
 
       # nodemanagers endpoints
       describe '/api/v0/nodemanagers' do
@@ -548,7 +571,6 @@ control 'iam-legacy-access-control-1' do
             profiles/OWNER-FOO/NAME-FOO/version/VERSION-FOO/tar
             market/read/NAME-FOO/version/VERSION-FOO
             reporting/nodes/id/SOMENODEID
-            reporting/version
             scanner/jobs/id/JOBID
             scanner/jobs/rerun/id/JOBID
           ),
@@ -647,18 +669,6 @@ control 'iam-legacy-access-control-1' do
         end
       end
 
-      describe '/api/v0/deployment' do
-        it "GET deployment/service_versions returns the correct response code" do
-            expect(
-              automate_api_request(
-                "/api/v0/deployment/service_versions",
-                http_method: 'GET',
-                user: user,
-              ).http_status
-            ).to eq(200)
-        end
-      end
-
       describe 'license REST handlers' do
         it "POST license returns the correct response code" do
           expect(
@@ -668,7 +678,7 @@ control 'iam-legacy-access-control-1' do
               user: user,
             ).http_status == 403
 
-          ).to match(expect_403_for_admin_only_apis)
+          ).to eq(expect_403_for_admin_only_apis)
         end
 
         it "GET license/status returns the correct response code" do
@@ -679,7 +689,7 @@ control 'iam-legacy-access-control-1' do
               user: user,
             ).http_status == 403
 
-          ).to match(expect_403_for_all_apis)
+          ).to eq(expect_403_for_all_apis)
         end
 
         it "POST license/request returns the correct response code" do
@@ -690,212 +700,191 @@ control 'iam-legacy-access-control-1' do
               user: user,
             ).http_status == 403
 
-          ).to match(expect_403_for_admin_only_apis)
+          ).to eq(expect_403_for_admin_only_apis)
         end
       end
-    end
 
-    # default policy allows client access
-    # TODO how to distinguish between a 'read' and 'upload' if http calls
-    # aren't important?
-    describe 'compliance REST handlers for client calls' do
-      it "POST profiles returns the correct response code" do
-        expect(
-          automate_client_api_request(
-            "/api/v0/compliance/profiles?owner=OWNER",
-            TEST_TOKEN,
-            http_method: 'POST',
-            request_headers: { "Content-type": "application/json" },
-            request_body: { name: 'NAME', version: 'VER' }.to_json,
-          ).http_status.to_s
+      # default policy allows client access
+      # TODO how to distinguish between a 'read' and 'upload' if http calls
+      # aren't important?
+      describe 'compliance REST handlers for client calls' do
+        it "POST profiles returns the correct response code" do
+          expect(
+            automate_client_api_request(
+              "/api/v0/compliance/profiles?owner=OWNER",
+              TEST_TOKEN,
+              http_method: 'POST',
+              request_headers: { "Content-type": "application/json" },
+              request_body: { name: 'NAME', version: 'VER' }.to_json,
+            ).http_status.to_s
 
-        ).to match(/400/)
+          ).to match(/400/)
+        end
+      end
+
+      describe '/api/v0/compliance/profiles/search as client' do
+        it "api/v0/compliance/profiles/search returns the correct response code for client" do
+          expect(
+            automate_client_api_request(
+              "/api/v0/compliance/profiles/search",
+              TEST_TOKEN,
+              http_method: 'POST'
+            ).http_status
+          ).to eq(200)
+        end
+      end
+
+      describe 'legacy data-collector endpoints' do
+        %w(
+          /api/v0/events/data-collector
+          /data-collector/v0
+        ).each do |url|
+          { 'GET': 200, 'POST': 400 }.each do |method, status|
+            it "#{method} #{url} returns the correct response code for client" do
+              expect(
+                automate_client_api_request(
+                  url,
+                  TEST_TOKEN,
+                  http_method: method,
+                ).http_status
+              ).to eq(status)
+            end
+          end
+        end
+      end
+
+      describe '/api/v0/ingest/events/chef/' do
+        {
+          run: { entity_uuid: 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
+          action: {},
+          nodedelete: { node_id: 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
+        }.each do |url, body|
+          it "#{url} returns the correct response code for client" do
+            expect(
+              automate_client_api_request(
+                "/api/v0/ingest/events/chef/#{url}",
+                TEST_TOKEN,
+                http_method: 'POST',
+                request_body: body.to_json,
+              ).http_status
+            ).not_to eq(403)
+          end
+        end
+      end
+
+      # ingest multiple delete
+      describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
+        it "returns the correct response code for client" do
+          expect(
+              automate_client_api_request(
+                "/api/v0/ingest/events/chef/node-multiple-deletes",
+                TEST_TOKEN,
+                http_method: 'POST',
+                request_body: { node_ids: [ 'fake-2d83-47ce-8e46-84d1e85be6c7' ] }.to_json,
+              ).http_status
+            ).not_to eq(403)
+        end
+      end
+
+      # ingest
+      describe '/api/v0/ingest/events/chef/' do
+        {
+          'run': { 'entity_uuid': 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
+          'action': {},
+          'nodedelete': { 'node_id': 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
+        }.each do |url, body|
+          it "#{url} returns the correct response code for user" do
+              expect(
+                automate_api_request(
+                  "/api/v0/ingest/events/chef/#{url}",
+                  http_method: 'POST',
+                  user: user,
+                  request_body: body.to_json,
+                ).http_status
+              ).to be(403)
+          end
+        end
+      end
+
+      # ingest multiple delete
+      describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
+        it "returns the correct response code for user" do
+            expect(
+              automate_api_request(
+                "/api/v0/ingest/events/chef/node-multiple-deletes",
+                http_method: 'POST',
+                user: user,
+                request_body: { node_ids: [ 'fake-2d83-47ce-8e46-84d1e85be6c7' ] }.to_json,
+              ).http_status
+            ).to be(403)
+        end
+      end
+
+      # legacy data-collector
+      describe 'legacy data-collector endpoints' do
+        %w(
+          /api/v0/events/data-collector
+          /data-collector/v0
+        ).each do |url|
+          %w(GET POST).each do |method|
+            it "#{method} #{url} returns the correct response code for user" do
+                expect(
+                  automate_api_request(
+                    url,
+                    http_method: method,
+                    user: user,
+                  ).http_status
+                ).to be(403)
+            end
+          end
+        end
+      end
+
+      # {job,node-missing,delete-node}-scheduler
+      describe '/api/v0/retention/nodes/' do
+        {
+          'POST': %w(
+            delete-nodes/config
+            missing-nodes/config
+            missing-nodes-deletion/config
+          ),
+          'GET': %w(
+            status
+          ),
+        }.each do |method, urls|
+          urls.each do |url|
+            it "#{url} returns the correct response code" do
+                expect(
+                  automate_api_request(
+                    "/api/v0/retention/nodes/#{url}",
+                    http_method: method,
+                    user: user,
+                  ).http_status == 403
+                ).to be(expect_403_for_admin_only_apis)
+            end
+          end
+        end
       end
     end
 
     describe 'when making requests as an admin' do
       let(:expect_403_for_admin_only_apis) { false }
       let(:expect_403_for_all_apis) { false }
-      let(:expect_403_for_client_only_endpoints) { false }
+      let(:expect_403_for_client_only_apis) { false }
       let(:user) { ADMIN_USER_ID }
       let(:success_expected) { true }
 
-      include_examples 'authz access control'
+      include_examples 'iam access control with v1 legacy policies'
     end
 
     describe 'when making requests as a non-admin' do
       let(:expect_403_for_admin_only_apis) { true }
       let(:expect_403_for_all_apis) { false }
-      let(:expect_403_for_client_only_endpoints) { true }
+      let(:expect_403_for_client_only_apis) { true }
       let(:user) { NON_ADMIN_USERNAME }
       let(:success_expected) { false }
 
-      include_examples 'authz access control'
+      include_examples 'iam access control with v1 legacy policies'
     end
-  end
-
-  # compliance:profiles for client calls should be permitted by default
-  describe '/api/v0/compliance/profiles/search as client' do
-    it "api/v0/compliance/profiles/search returns the correct response code for client" do
-      expect(
-        automate_client_api_request(
-          "/api/v0/compliance/profiles/search",
-          TEST_TOKEN_V1,
-          http_method: 'POST'
-        ).http_status
-      ).to eq(200)
-    end
-  end
-
-  describe 'legacy data-collector endpoints' do
-    %w(
-      /api/v0/events/data-collector
-      /data-collector/v0
-    ).each do |url|
-      { 'GET': 200, 'POST': 400 }.each do |method, status|
-        it "#{method} #{url} returns the correct response code for client" do
-          expect(
-            automate_client_api_request(
-              url,
-              TEST_TOKEN_V1,
-              http_method: method,
-            ).http_status
-          ).to eq(status)
-        end
-      end
-    end
-  end
-
-  describe '/api/v0/ingest/events/chef/' do
-    {
-      run: { entity_uuid: 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
-      action: {},
-      nodedelete: { node_id: 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
-    }.each do |url, body|
-      it "#{url} returns the correct response code for client" do
-        expect(
-          automate_client_api_request(
-            "/api/v0/ingest/events/chef/#{url}",
-            TEST_TOKEN_V1,
-            http_method: 'POST',
-            request_body: body.to_json,
-          ).http_status
-        ).not_to eq(403)
-      end
-    end
-  end
-
-  # ingest multiple delete
-  describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
-    it "returns the correct response code for client" do
-      expect(
-          automate_client_api_request(
-            "/api/v0/ingest/events/chef/node-multiple-deletes",
-            TEST_TOKEN,
-            http_method: 'POST',
-            request_body: { node_ids: [ 'fake-2d83-47ce-8e46-84d1e85be6c7' ] }.to_json,
-          ).http_status
-        ).not_to eq(403)
-    end
-  end
-
-  # ingest
-  describe '/api/v0/ingest/events/chef/' do
-    {
-      'run': { 'entity_uuid': 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
-      'action': {},
-      'nodedelete': { 'node_id': 'a6597b02-2d83-47ce-8e46-84d1e85be6c7' },
-    }.each do |url, body|
-      it "#{url} returns the correct response code for user" do
-          expect(
-            automate_api_request(
-              "/api/v0/ingest/events/chef/#{url}",
-              http_method: 'POST',
-              user: user,
-              request_body: body.to_json,
-            ).http_status == 403
-          ).to be(expect_403_for_client_only_endpoints)
-      end
-    end
-  end
-
-  # ingest multiple delete
-  describe '/api/v0/ingest/events/chef/node-multiple-deletes' do
-    it "returns the correct response code for user" do
-        expect(
-          automate_api_request(
-            "/api/v0/ingest/events/chef/node-multiple-deletes",
-            http_method: 'POST',
-            user: user,
-            request_body: { node_ids: [ 'fake-2d83-47ce-8e46-84d1e85be6c7' ] }.to_json,
-          ).http_status == 403
-        ).to be(expect_403_for_admin_only_apis)
-    end
-  end
-
-  # legacy data-collector
-  describe 'legacy data-collector endpoints' do
-    %w(
-      /api/v0/events/data-collector
-      /data-collector/v0
-    ).each do |url|
-      %w(GET POST).each do |method|
-        it "#{method} #{url} returns the correct response code for user" do
-            expect(
-              automate_api_request(
-                url,
-                http_method: method,
-                user: user,
-              ).http_status == 403
-            ).to be(expect_403_for_client_only_endpoints)
-        end
-      end
-    end
-  end
-
-  # {job,node-missing,delete-node}-scheduler
-  describe '/api/v0/retention/nodes/' do
-    {
-      'POST': %w(
-        delete-nodes/config
-        missing-nodes/config
-        missing-nodes-deletion/config
-      ),
-      'GET': %w(
-        status
-      ),
-    }.each do |method, urls|
-      urls.each do |url|
-        it "#{url} returns the correct response code" do
-            expect(
-              automate_api_request(
-                "/api/v0/retention/nodes/#{url}",
-                http_method: method,
-                user: user,
-              ).http_status == 403
-            ).to be(expect_403_for_admin_only_apis)
-        end
-      end
-    end
-  end
-
-  describe 'when making requests as an admin' do
-    let(:expect_403_for_admin_only_apis) { false }
-    let(:expect_403_for_all_apis) { false }
-    let(:expect_403_for_client_only_endpoints) { false }
-    let(:user) { ADMIN_USER_ID }
-    let(:success_expected) { true }
-
-    include_examples 'iam access control (with v1 legacy policies)'
-  end
-
-  describe 'when making requests as a non-admin' do
-    let(:expect_403_for_admin_only_apis) { true }
-    let(:expect_403_for_all_apis) { false }
-    let(:expect_403_for_client_only_endpoints) { true }
-    let(:user) { NON_ADMIN_USERNAME }
-    let(:success_expected) { false }
-
-    include_examples 'iam access control (with v1 legacy policies)'
   end
 end
