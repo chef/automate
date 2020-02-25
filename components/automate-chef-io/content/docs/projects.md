@@ -20,7 +20,7 @@ Permission for the `iam:projects` action is required to interact with projects.
 
 ### Creating Projects
 
-Navigate to _Projects_ in the **Settings** tab. Then use the **Create Project** button, which opens a dialog box for entering the project's _Name_. We automatically generate a project ID for you. If you would like to change it, use the **Edit ID** button.
+Navigate to _Projects_ in the **Settings** tab. Then use the **Create Project** button, which opens a dialog box for entering the project's _Name_. A project ID automatically generates upon creation. If you would like to change the project ID, use the **Edit ID** button.
 
 When a project is created, three policies that control access to that project are also created. Those policies include: _Project Owner_, _Project Editor_, and _Project Viewer_. Adding members to these policies will grant them access to the project.
 
