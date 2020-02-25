@@ -3,6 +3,7 @@ package integration_test
 import (
 	"bytes"
 	"context"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"github.com/buger/jsonparser"
@@ -690,7 +691,7 @@ func TestNodeExportLoopBug(t *testing.T) {
 	}
 }
 
-func TestNodeExportPaging(t *testing.T) {
+func TestNodeExportPagingJSON(t *testing.T) {
 	esClient := elastic.New(elasticsearchUrl)
 	c := config.New(esClient)
 	server := grpcserver.NewCfgMgmtServer(c)
@@ -758,15 +759,86 @@ func TestNodeExportPaging(t *testing.T) {
 		data = append(data, tdata.GetContent()...)
 	}
 
-	actualNumberOfNodes := 0
-	dec := json.NewDecoder(bytes.NewReader(data))
-	for dec.More() {
-		var nodes []interface{}
-		err := dec.Decode(&nodes)
-		require.NoError(t, err)
+	var outputNodes []interface{}
+	err = json.Unmarshal(data, &outputNodes)
 
-		actualNumberOfNodes += len(nodes)
+	require.NoError(t, err)
+
+	assert.Equal(t, numberOfNodes, len(outputNodes))
+}
+
+func TestNodeExportPagingCSV(t *testing.T) {
+	esClient := elastic.New(elasticsearchUrl)
+	c := config.New(esClient)
+	server := grpcserver.NewCfgMgmtServer(c)
+
+	lis := bufconn.Listen(1024 * 1024)
+	s := grpc.NewServer()
+	api.RegisterCfgMgmtServer(s, server)
+
+	go func() {
+		if err := s.Serve(lis); err != nil {
+			t.Fatalf("Server exited with error: %v", err)
+		}
+	}()
+
+	dialer := func(string, time.Duration) (net.Conn, error) { return lis.Dial() }
+
+	conn, err := grpc.DialContext(context.Background(), "bufnet", grpc.WithDialer(dialer), grpc.WithInsecure())
+	defer conn.Close()
+	require.NoError(t, err)
+
+	client := api.NewCfgMgmtClient(conn)
+
+	names := []string{
+		"Taco Bell",
+		"taco bell",
+		"TACO BELL",
+		"tACO bELL",
+		"TACO bell",
 	}
 
-	assert.Equal(t, numberOfNodes, actualNumberOfNodes)
+	// page size is hardcoded to 100, so to test the pagination code we need more than that.
+	numberOfNodes := 150
+	nodes := make([]iBackend.Node, numberOfNodes)
+	for i := 0; i < numberOfNodes; i++ {
+		nodes[i].Exists = true
+		nodes[i].NodeInfo = iBackend.NodeInfo{
+			NodeName:   names[i%len(names)],
+			EntityUuid: newUUID(),
+		}
+	}
+
+	// Add nodes with projects
+	suite.IngestNodes(nodes)
+	defer suite.DeleteAllDocuments()
+
+	response, err := client.NodeExport(context.Background(), &request.NodeExport{
+		OutputType: "csv",
+		Sorting: &request.Sorting{
+			Field: backend.Name,
+		},
+	})
+
+	require.NoError(t, err)
+	require.NotNil(t, response)
+
+	data := make([]byte, 0)
+	for {
+		tdata, err := response.Recv()
+		if err != nil && err == io.EOF {
+			data = append(data, tdata.GetContent()...)
+			break
+		}
+
+		require.NoError(t, err)
+		data = append(data, tdata.GetContent()...)
+	}
+
+	reader := csv.NewReader(bytes.NewReader(data))
+	outputNodes, err := reader.ReadAll()
+
+	require.NoError(t, err)
+	// Add 1 for the CSV header
+	assert.Equal(t, numberOfNodes+1, len(outputNodes))
 }
