@@ -65,7 +65,7 @@ service ChefIngester {
     option (chef.automate.api.policy).resource = "ingest:nodes";
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "infra:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:ingestNodes:delete";
+    option (chef.automate.api.iam.policy).action = "infra:ingest:delete";
   };
   rpc ProcessLivenessPing(ingest.request.Liveness) returns (ingest.response.ProcessLivenessResponse) {
     option (google.api.http) = {
