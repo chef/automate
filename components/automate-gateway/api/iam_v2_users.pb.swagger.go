@@ -328,7 +328,12 @@ func init() {
         "password": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "id",
+        "name",
+        "password"
+      ]
     },
     "chef.automate.api.iam.v2.CreateUserResp": {
       "type": "object",
@@ -377,7 +382,11 @@ func init() {
         "previous_password": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateSelfResp": {
       "type": "object",
@@ -400,7 +409,11 @@ func init() {
         "password": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateUserResp": {
       "type": "object",
