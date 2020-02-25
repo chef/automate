@@ -37,7 +37,7 @@ func (a *adapter) CreateTokenWithValue(ctx context.Context,
 		id = uid.String()
 	}
 
-	return a.insertToken(ctx, id, description, value, active, projects)
+	return a.insertToken(ctx, id, description, value, active, projects, true)
 }
 
 func (a *adapter) CreateLegacyTokenWithValue(ctx context.Context, value string) (*tokens.Token, error) {
@@ -50,7 +50,7 @@ func (a *adapter) CreateLegacyTokenWithValue(ctx context.Context, value string) 
 		return nil, err
 	}
 
-	return a.insertToken(ctx, id.String(), tokens.LegacyTokenDescription, value, true, []string{})
+	return a.insertToken(ctx, id.String(), tokens.LegacyTokenDescription, value, true, []string{}, false)
 }
 
 // PurgeProject removes a project from every token it exists in
@@ -72,24 +72,30 @@ func (a *adapter) ResetToV1(ctx context.Context) error {
 }
 
 func (a *adapter) insertToken(ctx context.Context,
-	id string, description string, value string, active bool, projects []string) (*tokens.Token, error) {
+	id string, description string, value string, active bool, projects []string, isLegacyToken bool) (*tokens.Token, error) {
 
 	t := tokens.Token{}
 	// ensure we do not pass null projects to db and break the not null constraint
 	if projects == nil {
 		projects = []string{}
 	}
-	_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
-		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
-		OldProjects:     []string{},
-		NewProjects:     projects,
-		IsUpdateRequest: false,
-	})
-	if err != nil {
-		return nil, err
+
+	// we do not wish to validate projects for the A1 legacy token case
+	// since that is an internal DB call kicked off as part of the server startup code
+	// with no subjects
+	if isLegacyToken {
+		_, err := a.validator.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+			Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+			OldProjects:     []string{},
+			NewProjects:     projects,
+			IsUpdateRequest: false,
+		})
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	err = a.db.QueryRowContext(ctx,
+	err := a.db.QueryRowContext(ctx,
 		`INSERT INTO chef_authn_tokens(id, description, value, active, project_ids, created, updated)
 		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
 		RETURNING id, description, value, active, project_ids, created, updated`,
@@ -145,7 +151,7 @@ func (a *adapter) UpdateToken(ctx context.Context,
 	if description != "" {
 		row = tx.QueryRowContext(ctx,
 			`UPDATE chef_authn_tokens cat
-			SET active=$2, description=$3, project_ids=$4, updated=NOW() 
+			SET active=$2, description=$3, project_ids=$4, updated=NOW()
 			WHERE id=$1 AND projects_match(cat.project_ids, $5::TEXT[])
 			RETURNING id, description, value, active, project_ids, created, updated`,
 			id, active, description, pq.Array(updatedProjects), pq.Array(projectsFilter))
