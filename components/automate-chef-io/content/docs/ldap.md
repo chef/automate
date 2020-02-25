@@ -32,7 +32,7 @@ Chef Automate does not support using _two_ SAML IdPs or _two_ LDAP services simu
 Switching between a Microsoft AD configuration and generic LDAP configuration will
 not affect your policies, as they are both LDAP configurations.
 However, switching between either of those configurations and a SAML configuration will
-require you to make new policies if using [IAM v1]({{< relref "iam-v1-overview.md" >}}), or adjust the policy membership if using [IAM v2]({{< relref "iam-v2-overview.md" >}}).
+require you to adjust the [IAM v2]({{< relref "iam-v2-overview.md" >}}) policy membership.
 
 {{< info >}}
 Users who sign in via SAML will have a session time of 24 hours before needing to sign in again.
@@ -269,7 +269,7 @@ Once the user has provided a username and password at the sign in screen, Chef A
 
 #### Authorization with LDAP
 
-Chef Automate supports defining permissions for LDAP users and their groups. See either [IAM v1 subjects]({{< ref "iam-v1-overview.md#subjects" >}}) or [IAM v2 members and policies]({{< ref "iam-v2-overview.md#members-and-policies" >}}).
+Chef Automate supports defining permissions for LDAP users and their groups. See [IAM v2 members and policies]({{< ref "iam-v2-overview.md#members-and-policies" >}}).
 
 #### Connect
 
