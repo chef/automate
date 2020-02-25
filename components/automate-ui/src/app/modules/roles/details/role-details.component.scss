@@ -44,9 +44,12 @@ tbody > .detail-row {
 }
 
 .id-column {
+  display: inline-block;
   width: 33%;
   padding-top: 0px;
   padding-left: 0px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .type-column {
