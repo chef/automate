@@ -4,5 +4,5 @@ interface StaticConfig {
 const staticConfig: StaticConfig = window['staticAutomateConfig'] || {};
 
 export function isProductDeployed(productName: string): boolean {
-  return staticConfig.products.includes(productName);
+  return staticConfig.products && staticConfig.products.includes(productName);
 }

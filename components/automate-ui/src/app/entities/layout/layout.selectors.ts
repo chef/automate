@@ -4,12 +4,14 @@ import { LayoutEntityState } from './layout.reducer';
 
 export const layoutState = createFeatureSelector<LayoutEntityState>('layout');
 
-export const sidebarMenuGroups = createSelector(
-    layoutState,
-    (layout) => layout.menuGroups
-  );
+export const sidebar = createSelector(
+  layoutState,
+  (layout) => {
+    return layout.sidebars[layout.sidebars.active];
+  }
+);
 
-  export const showPageLoading = createSelector(
+export const showPageLoading = createSelector(
     layoutState,
     (layout) => layout.showPageLoading
   );
