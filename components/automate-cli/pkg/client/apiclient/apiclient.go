@@ -10,7 +10,6 @@ import (
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
 	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	"github.com/chef/automate/components/automate-gateway/api/auth/tokens"
 	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
 	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
@@ -25,7 +24,6 @@ type client struct {
 	authzClient        authz.AuthorizationClient
 	teamsClient        teams.TeamsClient
 	teamsV2Client      v2.TeamsClient
-	tokensClient       tokens.TokensMgmtClient
 	tokensV2Client     v2.TokensClient
 	usersClient        users.UsersMgmtClient
 	policiesClient     v2.PoliciesClient
@@ -59,7 +57,6 @@ func OpenConnection(ctx context.Context) (client_type.APIClient, error) {
 		authzClient:        authz.NewAuthorizationClient(apiClientConn),
 		teamsClient:        teams.NewTeamsClient(apiClientConn),
 		teamsV2Client:      v2.NewTeamsClient(apiClientConn),
-		tokensClient:       tokens.NewTokensMgmtClient(apiClientConn),
 		tokensV2Client:     v2.NewTokensClient(apiClientConn),
 		usersClient:        users.NewUsersMgmtClient(apiClientConn),
 		policiesClient:     v2.NewPoliciesClient(apiClientConn),
@@ -78,10 +75,6 @@ func (c client) TeamsClient() teams.TeamsClient {
 
 func (c client) TeamsV2Client() v2.TeamsClient {
 	return c.teamsV2Client
-}
-
-func (c client) TokensClient() tokens.TokensMgmtClient {
-	return c.tokensClient
 }
 
 func (c client) TokensV2Client() v2.TokensClient {

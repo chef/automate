@@ -23,7 +23,6 @@ type Mock struct {
 	authzClient        authz.AuthorizationClient
 	teamsClient        teams.TeamsClient
 	teamsV2Client      v2.TeamsClient
-	tokensClient       tokens.TokensMgmtClient
 	tokensV2Client     v2.TokensClient
 	usersClient        users.UsersMgmtClient
 	policiesClient     v2.PoliciesClient
@@ -80,7 +79,6 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 			authzClient:        authz.NewAuthorizationClient(gatewayConn),
 			teamsClient:        teams.NewTeamsClient(gatewayConn),
 			teamsV2Client:      v2.NewTeamsClient(gatewayConn),
-			tokensClient:       tokens.NewTokensMgmtClient(gatewayConn),
 			tokensV2Client:     v2.NewTokensClient(gatewayConn),
 			usersClient:        users.NewUsersMgmtClient(gatewayConn),
 			policiesClient:     v2.NewPoliciesClient(gatewayConn),
@@ -112,11 +110,6 @@ func (c Mock) TeamsClient() teams.TeamsClient {
 // TeamsClient returns mock TeamsClient
 func (c Mock) TeamsV2Client() v2.TeamsClient {
 	return c.teamsV2Client
-}
-
-// TokensClient returns mock TokensClient
-func (c Mock) TokensClient() tokens.TokensMgmtClient {
-	return c.tokensClient
 }
 
 // TokensV2Client returns mock TokensV2Client
