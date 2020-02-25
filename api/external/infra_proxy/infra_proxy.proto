@@ -10,6 +10,7 @@ import "api/external/infra_proxy/request/servers.proto";
 import "api/external/infra_proxy/request/cookbooks.proto";
 import "api/external/infra_proxy/request/roles.proto";
 import "api/external/infra_proxy/request/clients.proto";
+import "api/external/infra_proxy/request/databags.proto";
 import "api/external/infra_proxy/request/environments.proto";
 
 import "api/external/infra_proxy/response/orgs.proto";
@@ -17,6 +18,7 @@ import "api/external/infra_proxy/response/servers.proto";
 import "api/external/infra_proxy/response/cookbooks.proto";
 import "api/external/infra_proxy/response/roles.proto";
 import "api/external/infra_proxy/response/clients.proto";
+import "api/external/infra_proxy/response/databags.proto";
 import "api/external/infra_proxy/response/environments.proto";
 
 import "api/external/common/version/version.proto";
@@ -183,6 +185,21 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:clients";
     option (chef.automate.api.iam.policy).action = "infra:serverOrgClients:get";
   }
+
+  rpc GetDataBags (infra_proxy.request.DataBags) returns (infra_proxy.response.DataBags) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
+    option (chef.automate.api.policy).resource = "infra:servers:{server_id}:orgs:{org_id}/data_bags";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:data_bags";
+    option (chef.automate.api.iam.policy).action = "infra:serverOrgDataBags:list";
+  };
+  rpc GetDataBagItem (infra_proxy.request.DataBag) returns (infra_proxy.response.DataBag) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}";
+    option (chef.automate.api.policy).resource = "infra:servers:{server_id}:orgs:{org_id}/data_bags";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:data_bags";
+    option (chef.automate.api.iam.policy).action = "infra:serverOrgDataBags:get";
+  };
 
   rpc GetEnvironments (infra_proxy.request.Environments) returns (infra_proxy.response.Environments) {
     option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/environments";

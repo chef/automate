@@ -545,6 +545,84 @@
         ]
       }
     },
+    "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
+      "get": {
+        "operationId": "GetDataBags",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBags"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
+      "get": {
+        "operationId": "GetDataBagItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBag"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "item",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/infra/servers/{server_id}/orgs/{org_id}/environment/{name}": {
       "get": {
         "operationId": "GetEnvironment",
@@ -1079,6 +1157,33 @@
       "properties": {
         "server": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.DataBag": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.DataBagListItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.DataBags": {
+      "type": "object",
+      "properties": {
+        "data_bags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBagListItem"
+          }
         }
       }
     },

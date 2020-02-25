@@ -326,6 +326,42 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetDataBags", "infra:servers:{server_id}:orgs:{org_id}/data_bags", "read", "GET", "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.DataBags); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetDataBagItem", "infra:servers:{server_id}:orgs:{org_id}/data_bags", "read", "GET", "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.DataBag); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				case "item":
+					return m.Item
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetEnvironments", "infra:chefServers:{server_id}:orgs:{org_id}/environments", "read", "GET", "/infra/servers/{server_id}/orgs/{org_id}/environments", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Environments); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
