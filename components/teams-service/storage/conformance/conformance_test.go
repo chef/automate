@@ -16,7 +16,6 @@ import (
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/memstore"
 	"github.com/chef/automate/components/teams-service/storage/postgres"
-	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/test"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -59,7 +58,6 @@ func TestStorage(t *testing.T) {
 		testPurgeProjectOtherProjectsExcludingOneToPurge,
 		testPurgeProjectOtherProjectsIncludingOneToPurge,
 		testPurgeProjectUniversal,
-		testResetToV1,
 	}
 
 	// lazy way to randomize tests
@@ -78,11 +76,6 @@ func TestStorage(t *testing.T) {
 	migrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../postgres/migration/sql")
 	if err != nil {
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
-	}
-
-	dataMigrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../postgres/datamigration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg data config for tests: %s", err.Error())
 	}
 
 	if migrationConfig == nil {
@@ -104,7 +97,7 @@ func TestStorage(t *testing.T) {
 
 		authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
 
-		adp, err := postgres.New(l, *migrationConfig, *(*datamigration.Config)(dataMigrationConfig), true, authzV2AuthorizationClient)
+		adp, err := postgres.New(l, *migrationConfig, true, authzV2AuthorizationClient)
 		require.NoError(t, err)
 		adapters["postgres"] = adp
 
@@ -629,30 +622,6 @@ func testPurgeProjectUniversal(ctx context.Context, t *testing.T, s storage.Stor
 	purgeCheck4, err := s.GetTeamByName(ctx, name4)
 	assert.NoError(t, err)
 	assert.ElementsMatch(t, []string{}, purgeCheck4.Projects)
-}
-
-func testResetToV1(ctx context.Context, t *testing.T, s storage.Storage) {
-	resp1, err := s.StoreTeamWithProjects(ctx, "team1", "team1 desc", []string{})
-	assert.NoError(t, err, "failed to store team1")
-	assert.ElementsMatch(t, []string{}, resp1.Projects)
-
-	resp2, err := s.StoreTeamWithProjects(ctx, "team2", "team2 desc", []string{"otherproject"})
-	assert.NoError(t, err, "failed to store team2")
-	assert.ElementsMatch(t, []string{"otherproject"}, resp2.Projects)
-
-	resp3, err := s.StoreTeamWithProjects(ctx, "team3", "team13desc", []string{"otherproject", "otherproject2"})
-	assert.NoError(t, err, "failed to store team3")
-	assert.ElementsMatch(t, []string{"otherproject", "otherproject2"}, resp3.Projects)
-
-	err = s.ResetToV1(ctx)
-	assert.NoError(t, err, "failed to reset to v1")
-
-	teams, err := s.GetTeams(ctx)
-	assert.NoError(t, err, "failed to list teams")
-	assert.Equal(t, 3+len(storage.NonDeletableTeams), len(teams))
-	for _, team := range teams {
-		assert.ElementsMatch(t, []string{}, team.Projects)
-	}
 }
 
 func defaultValidateProjectAssignmentFunc(context.Context,

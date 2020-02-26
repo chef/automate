@@ -38,8 +38,6 @@ type TeamsV2ServerMock struct {
 	RemoveTeamMembersFunc   func(context.Context, *RemoveTeamMembersReq) (*RemoveTeamMembersResp, error)
 	GetTeamsForMemberFunc   func(context.Context, *GetTeamsForMemberReq) (*GetTeamsForMemberResp, error)
 	GetTeamMembershipFunc   func(context.Context, *GetTeamMembershipReq) (*GetTeamMembershipResp, error)
-	UpgradeToV2Func         func(context.Context, *UpgradeToV2Req) (*UpgradeToV2Resp, error)
-	ResetToV1Func           func(context.Context, *ResetToV1Req) (*ResetToV1Resp, error)
 	PurgeUserMembershipFunc func(context.Context, *PurgeUserMembershipReq) (*PurgeUserMembershipResp, error)
 }
 
@@ -151,30 +149,6 @@ func (m *TeamsV2ServerMock) GetTeamMembership(ctx context.Context, req *GetTeamM
 	return nil, status.Error(codes.Internal, "mock: 'GetTeamMembership' not implemented")
 }
 
-func (m *TeamsV2ServerMock) UpgradeToV2(ctx context.Context, req *UpgradeToV2Req) (*UpgradeToV2Resp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.UpgradeToV2Func; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'UpgradeToV2' not implemented")
-}
-
-func (m *TeamsV2ServerMock) ResetToV1(ctx context.Context, req *ResetToV1Req) (*ResetToV1Resp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.ResetToV1Func; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'ResetToV1' not implemented")
-}
-
 func (m *TeamsV2ServerMock) PurgeUserMembership(ctx context.Context, req *PurgeUserMembershipReq) (*PurgeUserMembershipResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
@@ -198,7 +172,5 @@ func (m *TeamsV2ServerMock) Reset() {
 	m.RemoveTeamMembersFunc = nil
 	m.GetTeamsForMemberFunc = nil
 	m.GetTeamMembershipFunc = nil
-	m.UpgradeToV2Func = nil
-	m.ResetToV1Func = nil
 	m.PurgeUserMembershipFunc = nil
 }

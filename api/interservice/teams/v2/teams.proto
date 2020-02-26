@@ -159,7 +159,5 @@ service TeamsV2 {
   rpc RemoveTeamMembers (RemoveTeamMembersReq) returns (RemoveTeamMembersResp) {};
   rpc GetTeamsForMember (GetTeamsForMemberReq) returns (GetTeamsForMemberResp) {};
   rpc GetTeamMembership (GetTeamMembershipReq) returns (GetTeamMembershipResp) {};
-  rpc UpgradeToV2 (UpgradeToV2Req) returns (UpgradeToV2Resp) {};
-  rpc ResetToV1 (ResetToV1Req) returns (ResetToV1Resp) {};
   rpc PurgeUserMembership (PurgeUserMembershipReq) returns (PurgeUserMembershipResp) {};
 }
