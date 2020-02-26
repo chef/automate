@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 
 	apiReporting "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/api/interservice/compliance/stats"
