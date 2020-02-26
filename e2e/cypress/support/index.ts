@@ -58,7 +58,7 @@ before(function () {
       // to do this first.
       cy.request({
         auth: { bearer: admin.id_token },
-        url: '/apis/iam/v2beta/policy_version'
+        url: '/apis/iam/v2/policy_version'
       }).then((response) => {
         if (Cypress.env('IAM_VERSION') === IAMV2) {
           expect(response.body.version.major).to.equal('V2');
