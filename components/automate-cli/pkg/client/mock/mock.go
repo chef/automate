@@ -36,7 +36,7 @@ type ServerMocks struct {
 	PoliciesMock *v2.PoliciesServerMock
 	TeamsMock    *teams.TeamsServerMock
 	TeamsV2Mock  *v2.TeamsServerMock
-	TokensV2Mock *v2.TokensServerMock
+	TokensMock   *v2.TokensServerMock
 	UsersMock    *users.UsersMgmtServerMock
 }
 
@@ -51,8 +51,8 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 	mockAuthz := authz.NewAuthorizationServerMock()
 	authz.RegisterAuthorizationServer(grpcGateway, mockAuthz)
 
-	mockV2Tokens := v2.NewTokensServerMock()
-	v2.RegisterTokensServer(grpcGateway, mockV2Tokens)
+	mockTokens := v2.NewTokensServerMock()
+	v2.RegisterTokensServer(grpcGateway, mockTokens)
 
 	mockPolicies := v2.NewPoliciesServerMock()
 	v2.RegisterPoliciesServer(grpcGateway, mockPolicies)
@@ -86,7 +86,6 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 			PoliciesMock: mockPolicies,
 			TeamsMock:    mockTeams,
 			TokensMock:   mockTokens,
-			TokensV2Mock: mockV2Tokens,
 			UsersMock:    mockUsers,
 		},
 		nil
