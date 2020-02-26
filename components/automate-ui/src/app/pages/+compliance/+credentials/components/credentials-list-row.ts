@@ -6,8 +6,7 @@ import { CredentialsLogic } from '../credentials.logic';
 
 @Component({
   selector: 'app-credentials-list-row',
-  templateUrl: './credentials-list-row.html',
-  styleUrls: ['./credentials-list-row.scss']
+  templateUrl: './credentials-list-row.html'
 })
 export class CredentialsListRowComponent {
   @Input()
