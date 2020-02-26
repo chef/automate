@@ -45,7 +45,7 @@ RUN_COMMAND_RACECHECK = RUN_MODE="test" go run --race -ldflags $(LDFLAGS) cmd/co
 RUN_COMMAND_INFO = $(RUN_COMMAND) --log-level "info"
 RUN_COMMAND_DEBUG = $(RUN_COMMAND) --log-level "debug"
 TEST_PATH = "$(PWD)/api/tests"
-RUN_GRPCURL_COMPLIANCE_VERSION = grpcurl --insecure -cert $(SSL_CERT) -key $(SSL_KEY) localhost:$(PORT) chef.automate.domain.compliance.api.version.VersionService/Version
+RUN_GRPCURL_COMPLIANCE_VERSION = grpcurl --insecure -cert $(SSL_CERT) -key $(SSL_KEY) localhost:$(PORT) chef.automate.domain.compliance.version.VersionService/Version
 
 # Image maintained here: https://github.com/chef/release-engineering/blob/master/components/dockerfiles/chefes/ssh-target/Dockerfile.ubuntu1804
 SSH_TARGET_IMAGE?=chefes/ssh-target-ubuntu1804:latest
