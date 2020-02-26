@@ -64,9 +64,6 @@ service Policies {
   rpc GetPolicyVersion (GetPolicyVersionReq) returns (GetPolicyVersionResp) {
     option (google.api.http) = {
       get: "/iam/v2/policy_version"
-      additional_bindings {
-        get: "/iam/v2beta/policy_version"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:policies";
     option (chef.automate.api.policy).action = "read";

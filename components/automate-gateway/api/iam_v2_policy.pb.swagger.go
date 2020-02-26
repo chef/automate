@@ -511,22 +511,6 @@ func init() {
           "Policies"
         ]
       }
-    },
-    "/iam/v2beta/policy_version": {
-      "get": {
-        "operationId": "GetPolicyVersion2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.GetPolicyVersionResp"
-            }
-          }
-        },
-        "tags": [
-          "Policies"
-        ]
-      }
     }
   },
   "definitions": {
