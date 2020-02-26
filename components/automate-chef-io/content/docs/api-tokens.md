@@ -36,13 +36,13 @@ Admin tokens are tokens that are automatically added to the Administrator policy
 Admin tokens can only be created using the `chef-automate` command line.
 
 ```
-chef-automate iam token create <your-token-name> --admin
+chef-automate iam token create <your-token-id> --admin
 ```
 
 To create an admin token and immediately store it in an environment variable for easy access, you can instead run:
 
 ```bash
-export TOKEN=`chef-automate iam token create <your-token-name> --admin`
+export TOKEN=`chef-automate iam token create <your-token-id> --admin`
 echo $TOKEN
 ```
 
