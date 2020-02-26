@@ -46,36 +46,37 @@ h2 {
   margin: 0 8px;
 }
 
+
+
 // temporary - needs to go in theme file for material
 mat-form-field {
   width: 120px;
-  margin: 0 8px;
+  margin: 0 8px 0 0;
 }
-// chef-td {
-//   &.description {
-//     flex-basis: 45%;
-//   }
 
-//   &.input {
-//     flex: none;
-//   }
+// this is not working but it is the cause of our box misalignment
+// .mat-form-field-infix {
+//     padding: 0;
+//     border-top: 0;
 // }
 
-// input {
-//   width: 60px;
-//   height: 100%;
-// }
+[panelClass="chef-dropdown"] {
+  height: 45px;
+  background-color: #FFFFFF;
+  padding: 1em;
+  font-size: 14px;
+  border: 1px solid #E6EBEE;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border 0.4s ease;
+}
 
-// chef-select {
-//   width: 120px;
-// }
+// end temporary
 
 
 
 chef-checkbox {
-  // font-size: 17px;
-  // width: 110px;
-
   ::ng-deep .mat-checkbox-layout {
     padding-bottom: 0;
   }
