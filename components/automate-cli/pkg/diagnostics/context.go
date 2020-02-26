@@ -237,6 +237,8 @@ func (c *testContext) IsIAMV2() (bool, error) {
 		Version struct{ Major, Minor string }
 	}{}
 
+	// this API path was removed on 2/26/20, but this diagnostic still checks it
+	// in case it's testing an old version of Automate that has only the v2beta path
 	v2betaResp, err := c.DoLBRequest("/apis/iam/v2beta/policy_version")
 	if err != nil {
 		return false, err
@@ -263,7 +265,7 @@ func (c *testContext) IsIAMV2() (bool, error) {
 		defer v2Resp.Body.Close()
 
 		if v2Resp.StatusCode == 200 {
-			if err := json.NewDecoder(v2betaResp.Body).Decode(&vsn); err != nil {
+			if err := json.NewDecoder(v2Resp.Body).Decode(&vsn); err != nil {
 				// See decoder comment above,  we assume v1 in this case.
 				return false, nil
 			}
