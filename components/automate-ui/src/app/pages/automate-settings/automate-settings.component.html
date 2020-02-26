@@ -17,19 +17,23 @@
       <div class="page-body">
 
         <div class="group-section">
+          <chef-button primary [disabled]="noChanges()" (click)="applyChanges()">Save Changes</chef-button>
+        </div>
+
+        <div class="group-section">
           <h2>Event Feed</h2>
           <div class="checkbox-row">
             <div class="checkbox-container">
               <chef-checkbox></chef-checkbox>
             </div>
-            <p>Remove event feed data after<input chefInput value="30" />days</p>
+            <p>Remove event feed data after<input chefInput type="number" value="30" />days</p>
           </div>
 
           <div class="checkbox-row">
             <div class="checkbox-container">
               <chef-checkbox></chef-checkbox>
             </div>
-            <p>Remove Chef Server actions after<input chefInput value="30" />days</p>
+            <p>Remove Chef Server actions after<input chefInput type="number" value="30" />days</p>
           </div>
         </div>
 
@@ -41,7 +45,7 @@
             </div>
 
             <p>When no health check reports have been received for a service in
-              <input chefInput value="5" />
+              <input chefInput type="number" value="5" />
               <mat-form-field>
               <mat-select>
                   <mat-option value="minutes">minutes</mat-option>
@@ -57,7 +61,7 @@
               <chef-checkbox></chef-checkbox>
             </div>
             <p>Remove services labeled as disconnected after
-              <input chefInput value="7" />
+              <input chefInput type="number" value="7" />
               <mat-form-field>
                 <mat-select>
                   <mat-option value="minutes">minutes</mat-option>
@@ -71,10 +75,63 @@
 
         <div class="group-section">
           <h2>Client Runs</h2>
+          <div class="checkbox-row">
+            <div class="checkbox-container">
+              <chef-checkbox></chef-checkbox>
+            </div>
+            <p>Remove data for Chef Client runs after<input chefInput type="number" value="30" />days</p>
+          </div>
+
+          <div class="checkbox-row">
+            <div class="checkbox-container">
+              <chef-checkbox></chef-checkbox>
+            </div>
+          
+            <p>When no Chef Client run data has been received from a node in
+              <input chefInput type="number" value="30" />
+              <mat-form-field>
+                <mat-select>
+                  <mat-option value="minutes">minutes</mat-option>
+                  <mat-option value="hours">hours</mat-option>
+                  <mat-option value="days">days</mat-option>
+                </mat-select>
+              </mat-form-field>
+              , label the node as missing
+            </p>
+          </div>
+
+          <div class="checkbox-row secondary-row">
+            <div class="checkbox-container">
+              <chef-checkbox></chef-checkbox>
+            </div>
+            <p>Remove nodes labeled as missing after<input chefInput type="number" value="30" />
+            <mat-form-field>
+              <mat-select>
+                <mat-option value="minutes">minutes</mat-option>
+                <mat-option value="hours">hours</mat-option>
+                <mat-option value="days">days</mat-option>
+              </mat-select>
+            </mat-form-field>
+            </p>
+          </div>
         </div>
 
         <div class="group-section">
           <h2>Compliance</h2>
+          <div class="checkbox-row">
+            <div class="checkbox-container">
+              <chef-checkbox></chef-checkbox>
+            </div>
+            <p>Remove compliance reports after<input chefInput type="number" value="30" />days</p>
+          </div>
+
+          <div class="checkbox-row">
+            <div class="checkbox-container">
+              <chef-checkbox></chef-checkbox>
+            </div>
+            <p>Remove compliance scans after<input chefInput type="number" value="30" />days</p>
+          </div>
+
         </div>
 
 
@@ -125,9 +182,7 @@
           </chef-tbody>
         </chef-table> -->
 
-        <div class="center">
-          <chef-button primary [disabled]="noChanges()" (click)="applyChanges()">Apply Changes</chef-button>
-        </div>
+
       </div>
     </main>
   </div>
