@@ -46,12 +46,12 @@
 
             <p>When no health check reports have been received for a service in
               <input chefInput type="number" value="5" />
-              <mat-form-field>
-              <mat-select>
+              <mat-form-field appearance="none">
+                <mat-select panelClass="chef-dropdown">
                   <mat-option value="minutes">minutes</mat-option>
                   <mat-option value="hours">hours</mat-option>
                   <mat-option value="days">days</mat-option>
-              </mat-select>
+                </mat-select>
               </mat-form-field>
               , label the service as disconnected</p>
           </div>
@@ -62,8 +62,8 @@
             </div>
             <p>Remove services labeled as disconnected after
               <input chefInput type="number" value="7" />
-              <mat-form-field>
-                <mat-select>
+              <mat-form-field appearance="none">
+                <mat-select panelClass="chef-dropdown">
                   <mat-option value="minutes">minutes</mat-option>
                   <mat-option value="hours">hours</mat-option>
                   <mat-option value="days">days</mat-option>
@@ -89,8 +89,8 @@
           
             <p>When no Chef Client run data has been received from a node in
               <input chefInput type="number" value="30" />
-              <mat-form-field>
-                <mat-select>
+              <mat-form-field appearance="none">
+                <mat-select panelClass="chef-dropdown">
                   <mat-option value="minutes">minutes</mat-option>
                   <mat-option value="hours">hours</mat-option>
                   <mat-option value="days">days</mat-option>
@@ -105,8 +105,8 @@
               <chef-checkbox></chef-checkbox>
             </div>
             <p>Remove nodes labeled as missing after<input chefInput type="number" value="30" />
-            <mat-form-field>
-              <mat-select>
+            <mat-form-field appearance="none">
+              <mat-select panelClass="chef-dropdown">
                 <mat-option value="minutes">minutes</mat-option>
                 <mat-option value="hours">hours</mat-option>
                 <mat-option value="days">days</mat-option>
