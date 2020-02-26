@@ -199,8 +199,6 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create client for tokens mgmt service")
 	}
-	pb_tokens.RegisterTokensMgmtServer(grpcServer, handler.NewTokensMgmtServer(tokensMgmtClient))
-	// IAM v2 uses the same client
 	pb_iam_v2.RegisterTokensServer(grpcServer, handler_tokens.NewServer(tokensMgmtClient))
 
 	usersMgmtClient, err := clients.UsersMgmtClient()
@@ -355,7 +353,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"gateway":              pb_gateway.RegisterGatewayHandlerFromEndpoint,
 		"legacy":               pb_legacy.RegisterLegacyDataCollectorHandlerFromEndpoint,
 		"license":              pb_license.RegisterLicenseHandlerFromEndpoint,
-		"auth tokens":          pb_tokens.RegisterTokensMgmtHandlerFromEndpoint,
+		"auth tokens":          pb_iam_v2.RegisterTokensHandlerFromEndpoint,
 		"auth users":           pb_users.RegisterUsersMgmtHandlerFromEndpoint,
 		"authz":                pb_authz.RegisterAuthorizationHandlerFromEndpoint,
 		"secrets":              pb_secrets.RegisterSecretsServiceHandlerFromEndpoint,
