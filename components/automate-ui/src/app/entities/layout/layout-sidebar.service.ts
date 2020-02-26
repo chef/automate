@@ -119,8 +119,16 @@ export class LayoutSidebarService {
         }],
         settings: [
           {
-            name: 'Node Management',
+            name: 'General Settings',
             items: [
+              {
+                name: 'Data Lifecycle',
+                icon: 'storage',
+                route: '/settings/node-lifecycle',
+                authorized: {
+                  anyOf: ['/retention/nodes/status', 'get']
+                }
+              },
               {
                 name: 'Notifications',
                 icon: 'notifications',
@@ -128,7 +136,12 @@ export class LayoutSidebarService {
                 authorized: {
                   anyOf: ['/notifications/rules', 'get']
                 }
-              },
+              }
+            ]
+          },
+          {
+            name: 'Node Management',
+            items: [
               {
                 name: 'Data Feeds',
                 icon: 'assignment',
@@ -153,14 +166,6 @@ export class LayoutSidebarService {
                 route: '/settings/node-credentials',
                 authorized: {
                   anyOf: ['/secrets/search', 'post']
-                }
-              },
-              {
-                name: 'Node Lifecycle',
-                icon: 'storage',
-                route: '/settings/node-lifecycle',
-                authorized: {
-                  anyOf: ['/retention/nodes/status', 'get']
                 }
               }
             ]
