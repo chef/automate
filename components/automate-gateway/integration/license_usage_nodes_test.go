@@ -7,12 +7,13 @@ import (
 
 	"github.com/golang/protobuf/ptypes"
 
-	"github.com/chef/automate/api/external/secrets"
-	"github.com/chef/automate/api/interservice/nodemanager/manager"
-	"github.com/chef/automate/api/interservice/nodemanager/nodes"
+	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/compliance/reporting"
+	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 )
 
 func (suite *GatewayTestSuite) TestLicenseUsageNodes() {
@@ -47,7 +48,7 @@ func (suite *GatewayTestSuite) TestLicenseUsageNodes() {
 	secretID, err := secretsClient.Create(suite.ctx, &secrets.Secret{
 		Name: "test secret",
 		Type: "ssh",
-		Data: []*secrets.Kv{
+		Data: []*query.Kv{
 			{Key: "username", Value: suite.target.User},
 			{Key: "key", Value: suite.target.Key},
 		},
