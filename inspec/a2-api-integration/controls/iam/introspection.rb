@@ -1,13 +1,13 @@
+require_relative '../../../constants'
+
 # encoding: utf-8
-# copyright: 2018, Chef Software, Inc.
+# copyright: 2017, Chef Software, Inc.
 # license: All rights reserved
+title 'iam introspection'
 
-title 'IAM v2 migration API authz introspection integration tests'
-
-control 'introspection-iam-v2-1' do
-  title 'authz introspection with IAM v2'
-  desc 'these checks ensure that authz introspection works
-    after having switched to IAM v2'
+control 'iam-introspection-1' do
+  title 'iam introspection'
+  desc 'these checks ensure that introspection works, enabling the UI to precalculate the permissions of the logged-in user'
 
   describe 'introspect all' do
     it 'returns what we expect' do

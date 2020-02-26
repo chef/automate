@@ -1,11 +1,12 @@
+require_relative '../../../constants'
+
 # encoding: utf-8
-# copyright: 2019, Chef Software, Inc.
+# copyright: 2017, Chef Software, Inc.
 # license: All rights reserved
+title 'iam project filtering integration tests'
 
-title 'IAM v2.1 project filtering API integration tests'
-
-control 'iam-v2-projects-1' do
-  title 'v2.1-only access for project filtering'
+control 'iam-project-filtering-1' do
+  title 'project filtering using the role API as an example'
 
   CUSTOM_PROJECT_ID_1 = "inspec-custom-project-role-test-1-#{TIMESTAMP}"
   CUSTOM_PROJECT_ID_2 = "inspec-custom-project-role-test-2-#{TIMESTAMP}"
@@ -48,7 +49,7 @@ control 'iam-v2-projects-1' do
 
   Projects = [ CUSTOM_PROJECT_1, CUSTOM_PROJECT_2 ]
 
-  describe 'role projects' do
+  describe 'project filtering' do
     before(:all) do
       Projects.each do|project|
         resp = automate_api_request("/apis/iam/v2/projects",
@@ -148,7 +149,7 @@ control 'iam-v2-projects-1' do
     end
 
     describe 'roles with deny statements' do
-      POLICY_ID = "inspec-test-policy-1-#{TIMESTAMP}"
+      DENY_POLICY_ID = "inspec-test-policy-1-#{TIMESTAMP}"
       POLICY_ROLE_ID = "inspec-test-role-1-#{TIMESTAMP}"
 
       before(:all) do
@@ -165,7 +166,7 @@ control 'iam-v2-projects-1' do
         resp = automate_api_request("/apis/iam/v2/policies",
           http_method: 'POST',
           request_body: {
-            id: POLICY_ID,
+            id: DENY_POLICY_ID,
             name: 'brand new name',
             members: ["user:local:*", "token:*"],
             statements: [
@@ -186,7 +187,7 @@ control 'iam-v2-projects-1' do
       end
 
       after(:all) do
-        resp = automate_api_request("/apis/iam/v2/policies/#{POLICY_ID}", http_method: 'delete')
+        resp = automate_api_request("/apis/iam/v2/policies/#{DENY_POLICY_ID}", http_method: 'delete')
         expect(resp.http_status).to eq 200
         resp = automate_api_request("/apis/iam/v2/roles/#{POLICY_ROLE_ID}", http_method: 'delete')
         expect(resp.http_status).to eq 200
@@ -394,9 +395,6 @@ control 'iam-v2-projects-1' do
         end
 
       end #DeleteRole
-
     end
-
   end
-
 end
