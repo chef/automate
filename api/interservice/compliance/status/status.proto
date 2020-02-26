@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package chef.automate.domain.compliance.api.status;
+package chef.automate.domain.compliance.status;
 option go_package = "github.com/chef/automate/api/interservice/compliance/status";
 
 import "google/protobuf/empty.proto";

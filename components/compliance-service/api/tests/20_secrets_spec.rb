@@ -1,7 +1,9 @@
 require 'api/external/secrets/secrets_services_pb'
+require 'api/external/common/query/parameters_pb'
 
 describe File.basename(__FILE__) do
   Secrets = Chef::Automate::Api::Secrets unless defined?(Secrets)
+  Query = Chef::Automate::Api::Common::Query unless defined?(Query)
 
   def secrets ; Secrets::SecretsService ; end
 
@@ -25,8 +27,8 @@ describe File.basename(__FILE__) do
     assert_grpc_error("Invalid data content for secret type \'ssh\'. A \'username\' field is required", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
-          Secrets::Kv.new(key: "user", value: "bobby"),
-          Secrets::Kv.new(key: "password", value: "x")
+          Query::Kv.new(key: "user", value: "bobby"),
+          Query::Kv.new(key: "password", value: "x")
         ],
         name: "zoe",
         tags: [],
@@ -37,11 +39,11 @@ describe File.basename(__FILE__) do
     assert_grpc_error("Invalid data content for secret type 'aws'. AWS_ACCESS_KEY_ID not provided", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
-          Secrets::Kv.new(
+          Query::Kv.new(
               key: "AWS_ACCESS_ID",
               value: "123"
           ),
-          Secrets::Kv.new(
+          Query::Kv.new(
               key: "AWS_SECRET_ACCESS_KEY",
               value: "123"
           )
@@ -55,15 +57,15 @@ describe File.basename(__FILE__) do
     assert_grpc_error("Invalid data content for secret type 'azure'. AZURE_CLIENT_SECRET not provided", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
-          Secrets::Kv.new(
+          Query::Kv.new(
               key: "AZURE_CLIENT_ID",
               value: "123"
           ),
-          Secrets::Kv.new(
+          Query::Kv.new(
               key: "AZURE_CLIENT",
               value: "123"
           ),
-          Secrets::Kv.new(
+          Query::Kv.new(
             key: "TENANT_ID",
             value: "123"
           )
@@ -77,8 +79,8 @@ describe File.basename(__FILE__) do
     assert_grpc_error("Invalid data content for secret type \'ssh\'. A \'password\' or \'key\' field is required", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
-          Secrets::Kv.new(key: "username", value: "bobby"),
-          Secrets::Kv.new(key: "assword", value: "x")
+          Query::Kv.new(key: "username", value: "bobby"),
+          Query::Kv.new(key: "assword", value: "x")
         ],
         name: "bob",
         tags: [],
@@ -89,8 +91,8 @@ describe File.basename(__FILE__) do
     assert_grpc_error("Invalid data content for secret type \'winrm\'. A \'password\' field is required", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
-          Secrets::Kv.new(key: "username", value: "bobby"),
-          Secrets::Kv.new(key: "assword", value: "x")
+          Query::Kv.new(key: "username", value: "bobby"),
+          Query::Kv.new(key: "assword", value: "x")
         ],
         name: "bob",
         tags: [],
@@ -101,7 +103,7 @@ describe File.basename(__FILE__) do
     assert_grpc_error("Invalid data content for secret type \'sudo\'. A \'password\' or \'options\' field is required", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
-          Secrets::Kv.new(key: "ok", value: "doky")
+          Query::Kv.new(key: "ok", value: "doky")
         ],
         name: "dok",
         tags: [],
@@ -112,7 +114,7 @@ describe File.basename(__FILE__) do
     assert_grpc_error("Invalid secret, \'name\' is a required parameter", 3) do
       SS_GRPC secrets, :create, Secrets::Secret.new(
         data: [
-          Secrets::Kv.new(key: "ok", value: "doky")
+          Query::Kv.new(key: "ok", value: "doky")
         ],
         name: "",
         tags: [],
@@ -131,8 +133,8 @@ describe File.basename(__FILE__) do
     # Add a secret without tags or type
     secret1 = SS_GRPC secrets, :create, Secrets::Secret.new(
       data: [
-        Secrets::Kv.new(key: "username", value: "bobby"),
-        Secrets::Kv.new(key: "password", value: "b055y-th3_w1nn3r")
+        Query::Kv.new(key: "username", value: "bobby"),
+        Query::Kv.new(key: "password", value: "b055y-th3_w1nn3r")
       ],
       name: "betasec",
       tags: [],
@@ -146,13 +148,13 @@ describe File.basename(__FILE__) do
 
     secret2 = SS_GRPC secrets, :create, Secrets::Secret.new(
       data: [
-        Secrets::Kv.new(key: "username", value: "myuser"),
-        Secrets::Kv.new(key: "password", value: "sup3rs3cr3t")
+        Query::Kv.new(key: "username", value: "myuser"),
+        Query::Kv.new(key: "password", value: "sup3rs3cr3t")
       ],
       name: "Alphasec",
       tags: [
-        Secrets::Kv.new(key: "department", value: "marketing"),
-        Secrets::Kv.new(key: "reason", value: "How do I know?")
+        Query::Kv.new(key: "department", value: "marketing"),
+        Query::Kv.new(key: "reason", value: "How do I know?")
       ],
       type: "ssh"
     )
@@ -164,7 +166,7 @@ describe File.basename(__FILE__) do
 
     secret3 = SS_GRPC secrets, :create, Secrets::Secret.new(
       data: [
-        Secrets::Kv.new(key: "password", value: "qwerty")
+        Query::Kv.new(key: "password", value: "qwerty")
       ],
       name: "SUDO rocks",
       tags: [],
@@ -178,8 +180,8 @@ describe File.basename(__FILE__) do
 
     secret4 = SS_GRPC secrets, :create, Secrets::Secret.new(
       data: [
-        Secrets::Kv.new(key: "username", value: "administratore"),
-        Secrets::Kv.new(key: "password", value: "qwerty")
+        Query::Kv.new(key: "username", value: "administratore"),
+        Query::Kv.new(key: "password", value: "qwerty")
       ],
       name: "Windows $tuff",
       tags: [],
@@ -274,8 +276,8 @@ describe File.basename(__FILE__) do
     # Get secret by id with all details
     secret1_json = SS_GRPC secrets, :read, Secrets::Id.new(id: secret_id1)
     assert_equal(Google::Protobuf::Timestamp, secret1_json['last_modified'].class)
-    if array_contains_elem(secret1_json['data'], Secrets::Kv.new(key: "password", value: "b055y-th3_w1nn3r")) &&
-      array_contains_elem(secret1_json['data'], Secrets::Kv.new(key: "username", value: "bobby"))
+    if array_contains_elem(secret1_json['data'], Query::Kv.new(key: "password", value: "b055y-th3_w1nn3r")) &&
+      array_contains_elem(secret1_json['data'], Query::Kv.new(key: "username", value: "bobby"))
       data = true
     end
     assert_equal(true, data)
@@ -286,10 +288,10 @@ describe File.basename(__FILE__) do
     # Get secret by id with all details
     secret2_json = SS_GRPC secrets, :read, Secrets::Id.new(id: secret_id2)
     assert_equal(Google::Protobuf::Timestamp, secret2_json['last_modified'].class)
-    if array_contains_elem(secret2_json['data'], Secrets::Kv.new(key: "password", value: "sup3rs3cr3t")) &&
-      array_contains_elem(secret2_json['data'], Secrets::Kv.new(key: "username", value: "myuser")) &&
-      array_contains_elem(secret2_json['tags'], Secrets::Kv.new(key: "department", value: "marketing")) &&
-      array_contains_elem(secret2_json['tags'], Secrets::Kv.new(key: "reason", value: "How do I know?"))
+    if array_contains_elem(secret2_json['data'], Query::Kv.new(key: "password", value: "sup3rs3cr3t")) &&
+      array_contains_elem(secret2_json['data'], Query::Kv.new(key: "username", value: "myuser")) &&
+      array_contains_elem(secret2_json['tags'], Query::Kv.new(key: "department", value: "marketing")) &&
+      array_contains_elem(secret2_json['tags'], Query::Kv.new(key: "reason", value: "How do I know?"))
       data = true
       tags = true
     end
@@ -302,13 +304,13 @@ describe File.basename(__FILE__) do
     # Add a secret
     secret1 = SS_GRPC secrets, :create, Secrets::Secret.new(
       data: [
-        Secrets::Kv.new(key: "username", value: "updatable-username"),
-        Secrets::Kv.new(key: "password", value: "updatable-password")
+        Query::Kv.new(key: "username", value: "updatable-username"),
+        Query::Kv.new(key: "password", value: "updatable-password")
       ],
       name: "updatable-sec",
       tags: [
-        Secrets::Kv.new(key: "updatable-tag", value: "before-update"),
-        Secrets::Kv.new(key: "non-updatable-tag", value: "should-stay-the-same")
+        Query::Kv.new(key: "updatable-tag", value: "before-update"),
+        Query::Kv.new(key: "non-updatable-tag", value: "should-stay-the-same")
       ],
       type: "ssh"
     )
@@ -317,12 +319,12 @@ describe File.basename(__FILE__) do
     SS_GRPC secrets, :update, Secrets::Secret.new(
       id: secret_id,
       data: [
-        Secrets::Kv.new(key: "username", value: "new-username")
+        Query::Kv.new(key: "username", value: "new-username")
       ],
       name: "updatable-sec",
       tags: [
-        Secrets::Kv.new(key: "updatable-tag", value: "after-update"),
-        Secrets::Kv.new(key: "non-updatable-tag", value: "should-stay-the-same")
+        Query::Kv.new(key: "updatable-tag", value: "after-update"),
+        Query::Kv.new(key: "non-updatable-tag", value: "should-stay-the-same")
       ],
       type: "ssh"
     )
@@ -330,10 +332,10 @@ describe File.basename(__FILE__) do
     # Get secret by id with all details to compare
     secret2 = SS_GRPC secrets, :read, Secrets::Id.new(id: secret_id)
     assert_equal(Google::Protobuf::Timestamp, secret2['last_modified'].class)
-    if array_contains_elem(secret2['data'], Secrets::Kv.new(key: "password", value: "updatable-password")) &&
-      array_contains_elem(secret2['data'], Secrets::Kv.new(key: "username", value: "new-username")) &&
-      array_contains_elem(secret2['tags'], Secrets::Kv.new(key: "updatable-tag", value: "after-update")) &&
-      array_contains_elem(secret2['tags'], Secrets::Kv.new(key: "non-updatable-tag", value: "should-stay-the-same"))
+    if array_contains_elem(secret2['data'], Query::Kv.new(key: "password", value: "updatable-password")) &&
+      array_contains_elem(secret2['data'], Query::Kv.new(key: "username", value: "new-username")) &&
+      array_contains_elem(secret2['tags'], Query::Kv.new(key: "updatable-tag", value: "after-update")) &&
+      array_contains_elem(secret2['tags'], Query::Kv.new(key: "non-updatable-tag", value: "should-stay-the-same"))
       data = true
       tags = true
     end
@@ -346,12 +348,12 @@ describe File.basename(__FILE__) do
     SS_GRPC secrets, :update, Secrets::Secret.new(
       id: secret_id,
       data: [
-        Secrets::Kv.new(key: "password", value: "new-password")
+        Query::Kv.new(key: "password", value: "new-password")
       ],
       name: "newname",
       tags: [
-        Secrets::Kv.new(key: "updatable-tag", value: "after-update"),
-        Secrets::Kv.new(key: "a new tag", value: "should-stay-the-same")
+        Query::Kv.new(key: "updatable-tag", value: "after-update"),
+        Query::Kv.new(key: "a new tag", value: "should-stay-the-same")
       ],
       type: "winrm"
     )
@@ -359,10 +361,10 @@ describe File.basename(__FILE__) do
     # Get secret by id with all details to compare
     secret3 = SS_GRPC secrets, :read, Secrets::Id.new(id: secret_id)
     assert_equal(Google::Protobuf::Timestamp, secret3['last_modified'].class)
-    if array_contains_elem(secret3['data'], Secrets::Kv.new(key: "password", value: "new-password")) &&
-      array_contains_elem(secret3['data'], Secrets::Kv.new(key: "username", value: "new-username")) &&
-      array_contains_elem(secret3['tags'], Secrets::Kv.new(key: "updatable-tag", value: "after-update")) &&
-      array_contains_elem(secret3['tags'], Secrets::Kv.new(key: "a new tag", value: "should-stay-the-same"))
+    if array_contains_elem(secret3['data'], Query::Kv.new(key: "password", value: "new-password")) &&
+      array_contains_elem(secret3['data'], Query::Kv.new(key: "username", value: "new-username")) &&
+      array_contains_elem(secret3['tags'], Query::Kv.new(key: "updatable-tag", value: "after-update")) &&
+      array_contains_elem(secret3['tags'], Query::Kv.new(key: "a new tag", value: "should-stay-the-same"))
       data = true
       tags = true
     end
@@ -376,8 +378,8 @@ describe File.basename(__FILE__) do
       id: secret_id,
       name: "super-new-name",
       data: [
-        Secrets::Kv.new(key: "username", value: "super-new-username"),
-        Secrets::Kv.new(key: "password", value: "super-updatable-password")
+        Query::Kv.new(key: "username", value: "super-new-username"),
+        Query::Kv.new(key: "password", value: "super-updatable-password")
       ],
       type: "winrm"
     )
@@ -385,8 +387,8 @@ describe File.basename(__FILE__) do
     # Get secret by id with all details to compare
     secret4 = SS_GRPC secrets, :read, Secrets::Id.new(id: secret_id)
     assert_equal(Google::Protobuf::Timestamp, secret4['last_modified'].class)
-    if array_contains_elem(secret4['data'], Secrets::Kv.new(key: "password", value: "super-updatable-password")) &&
-      array_contains_elem(secret4['data'], Secrets::Kv.new(key: "username", value: "super-new-username"))
+    if array_contains_elem(secret4['data'], Query::Kv.new(key: "password", value: "super-updatable-password")) &&
+      array_contains_elem(secret4['data'], Query::Kv.new(key: "username", value: "super-new-username"))
       data = true
     end
     assert_equal(true, data)
@@ -395,14 +397,14 @@ describe File.basename(__FILE__) do
     assert_equal('winrm', secret4['type'])
 
     # Get all secrets, filtered
-    res = SS_GRPC secrets, :list, Secrets::Query.new(filters:[Secrets::Filter.new(key: "type", values: ["ssh"])])
+    res = SS_GRPC secrets, :list, Secrets::Query.new(filters:[Query::Filter.new(key: "type", values: ["ssh"])])
     assert_equal(1, res.total)
 
     # Add another secret
     SS_GRPC secrets, :create, Secrets::Secret.new(
       data: [
-        Secrets::Kv.new(key: "username", value: "updatable-username"),
-        Secrets::Kv.new(key: "password", value: "updatable-password")
+        Query::Kv.new(key: "username", value: "updatable-username"),
+        Query::Kv.new(key: "password", value: "updatable-password")
       ],
       name: "updatable-sec",
       tags: [],
@@ -410,11 +412,11 @@ describe File.basename(__FILE__) do
     )
 
     # Get filtered secrets again, expect 2
-    res = SS_GRPC secrets, :list, Secrets::Query.new(filters:[Secrets::Filter.new(key: "type", values: ["ssh"])])
+    res = SS_GRPC secrets, :list, Secrets::Query.new(filters:[Query::Filter.new(key: "type", values: ["ssh"])])
     assert_equal(2, res.total)
 
     # Test filtering with a different type
-    res = SS_GRPC secrets, :list, Secrets::Query.new(filters:[Secrets::Filter.new(key: "type", values: ["winrm"])])
+    res = SS_GRPC secrets, :list, Secrets::Query.new(filters:[Query::Filter.new(key: "type", values: ["winrm"])])
     assert_equal(2, res.total)
   end
 end

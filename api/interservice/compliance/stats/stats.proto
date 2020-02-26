@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package chef.automate.domain.compliance.api.stats;
+package chef.automate.domain.compliance.stats;
 option go_package = "github.com/chef/automate/api/interservice/compliance/stats";
 
 import "google/api/annotations.proto";

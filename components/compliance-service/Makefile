@@ -84,7 +84,7 @@ ruby-grpc-tools:
 	@if ! gem list grpc -i; then gem install grpc -v 1.18.0 ; fi > /dev/null
 	@if ! gem list grpc-tools -i; then gem install grpc-tools -v 1.18.0; fi > /dev/null
 
-PROTOS = $(shell find . -name '*.proto' | sed 's/\.\///')
+PROTOS = $(shell find ../../api/interservice/compliance ../../api/external/common -name '*.proto')
 RUBY_PROTOS = $(patsubst %.proto, %_pb.rb, $(PROTOS))
 
 EXTRA_PROTOS = '../../components/automate-grpc/protoc-gen-policy/iam/policy_pb.rb' '../../components/automate-grpc/protoc-gen-policy/api/policy_pb.rb' '../../components/automate-grpc/protoc-gen-policy/api/annotations_pb.rb' '../../components/automate-grpc/protoc-gen-policy/iam/annotations_pb.rb'

@@ -6,6 +6,7 @@ require 'api/interservice/nodemanager/nodes/nodes_pb'
 require 'api/interservice/nodemanager/nodes/nodes_services_pb'
 require 'api/jobs/jobs_pb'
 require 'api/jobs/jobs_services_pb'
+require 'api/external/common/query/parameters_pb'
 =begin
 describe File.basename(__FILE__) do
   GOOGLE_CREDENTIALS_JSON = ENV['GOOGLE_CREDENTIALS_JSON'] || raise('GOOGLE_CREDENTIALS_JSON ENV variable missing, needs to contain the contents of the google service account json file')
@@ -13,8 +14,9 @@ describe File.basename(__FILE__) do
   Manager = Chef::Automate::Domain::Nodemanager::Manager unless defined?(Manager)
   Secrets = Chef::Automate::Api::Secrets unless defined?(Secrets)
   Nodes = Chef::Automate::Domain::Nodemanager::Nodes unless defined?(Nodes)
-  Jobs = Chef::Automate::Domain::Compliance::Api::Jobs unless defined?(Jobs)
-  Common = Chef::Automate::Domain::Compliance::Api::Common unless defined?(Common)
+  Jobs = Chef::Automate::Domain::Compliance::Jobs unless defined?(Jobs)
+  Common = Chef::Automate::Domain::Compliance::Common unless defined?(Common)
+  Query = Chef::Automate::Api::Common::Query unless defined?(Query)
 
   def manager ; Manager::NodeManagerService ; end
   def secrets ; Secrets::SecretsService ; end
@@ -51,7 +53,7 @@ describe File.basename(__FILE__) do
         tags: [],
         type: "gcp",
         data: [
-          Secrets::Kv.new(
+          Query::Kv.new(
             key: "GOOGLE_CREDENTIALS",
             value: "bad one"
           )
@@ -65,7 +67,7 @@ describe File.basename(__FILE__) do
         tags: [],
         type: "gcp",
         data: [
-          Secrets::Kv.new(
+          Query::Kv.new(
             key: "GOOGLE_CREDENTIALS_JSON",
             value: "bad two"
           )
@@ -79,7 +81,7 @@ describe File.basename(__FILE__) do
         tags: [],
         type: "gcp",
         data: [
-          Secrets::Kv.new(
+          Query::Kv.new(
             key: "GOOGLE_CREDENTIALS_JSON",
             value: '{"client_id":"764086051850...","client_secret":"d-FL95Q19q7MQm...","type":"authorized_user"}'
           )
@@ -139,7 +141,7 @@ describe File.basename(__FILE__) do
       name:"My GCP Cred",
       type:"gcp-api",
       data: [
-        Secrets::Kv.new(
+        Query::Kv.new(
           key: "GOOGLE_CREDENTIALS_JSON",
           value: GOOGLE_CREDENTIALS_JSON
         )
