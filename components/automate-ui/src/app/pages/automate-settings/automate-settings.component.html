@@ -15,7 +15,70 @@
       </chef-page-header>
 
       <div class="page-body">
-        <chef-table>
+
+        <div class="group-section">
+          <h2>Event Feed</h2>
+          <div class="checkbox-row">
+            <div class="checkbox-container">
+              <chef-checkbox></chef-checkbox>
+            </div>
+            <p>Remove event feed data after<input chefInput value="30" />days</p>
+          </div>
+
+          <div class="checkbox-row">
+            <div class="checkbox-container">
+              <chef-checkbox></chef-checkbox>
+            </div>
+            <p>Remove Chef Server actions after<input chefInput value="30" />days</p>
+          </div>
+        </div>
+
+        <div class="group-section">
+          <h2>Service Groups</h2>
+          <div class="checkbox-row">
+            <div class="checkbox-container">
+              <chef-checkbox></chef-checkbox>
+            </div>
+
+            <p>When no health check reports have been received for a service in
+              <input chefInput value="5" />
+              <mat-form-field>
+              <mat-select>
+                  <mat-option value="minutes">minutes</mat-option>
+                  <mat-option value="hours">hours</mat-option>
+                  <mat-option value="days">days</mat-option>
+              </mat-select>
+              </mat-form-field>
+              , label the service as disconnected</p>
+          </div>
+          
+          <div class="checkbox-row secondary-row">
+            <div class="checkbox-container">
+              <chef-checkbox></chef-checkbox>
+            </div>
+            <p>Remove services labeled as disconnected after
+              <input chefInput value="7" />
+              <mat-form-field>
+                <mat-select>
+                  <mat-option value="minutes">minutes</mat-option>
+                  <mat-option value="hours">hours</mat-option>
+                  <mat-option value="days">days</mat-option>
+                </mat-select>
+              </mat-form-field>
+            </p>
+          </div>
+        </div>
+
+        <div class="group-section">
+          <h2>Client Runs</h2>
+        </div>
+
+        <div class="group-section">
+          <h2>Compliance</h2>
+        </div>
+
+
+        <!-- <chef-table>
           <chef-tbody>
             <chef-tr [formGroup]="missingNodesForm">
               <chef-td><b>Missing Nodes</b></chef-td>
@@ -60,7 +123,7 @@
               </chef-td>
             </chef-tr>
           </chef-tbody>
-        </chef-table>
+        </chef-table> -->
 
         <div class="center">
           <chef-button primary [disabled]="noChanges()" (click)="applyChanges()">Apply Changes</chef-button>

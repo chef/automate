@@ -1,33 +1,79 @@
 @import "~styles/variables";
 
-chef-td {
-  &.description {
-    flex-basis: 45%;
+h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.group-section {
+  margin-bottom: 30px;
+}
+
+.checkbox-row {
+  display: flex;
+  
+  & + .checkbox-row {
+    margin-top: 12px;
   }
 
-  &.input {
-    flex: none;
+  .checkbox-container {
+    margin-top: 15px;
+  }
+
+  chef-checkbox {
+    margin-right: 8px;
+    font-size: 17px;
+  }
+
+  input {
+    width: 60px;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  &.secondary-row {
+    margin-left: 69px;
   }
 }
 
-input {
-  width: 60px;
-  height: 100%;
+.chef-input {
+  margin: 0 8px;
 }
 
-chef-select {
+// temporary - needs to go in theme file for material
+mat-form-field {
   width: 120px;
 }
+// chef-td {
+//   &.description {
+//     flex-basis: 45%;
+//   }
 
-.center {
-  margin: auto;
-  padding: 10px;
-  width: 10%;
-}
+//   &.input {
+//     flex: none;
+//   }
+// }
+
+// input {
+//   width: 60px;
+//   height: 100%;
+// }
+
+// chef-select {
+//   width: 120px;
+// }
+
+// .center {
+//   margin: auto;
+//   padding: 10px;
+//   width: 10%;
+// }
 
 chef-checkbox {
-  font-size: 17px;
-  width: 110px;
+  // font-size: 17px;
+  // width: 110px;
 
   ::ng-deep .mat-checkbox-layout {
     padding-bottom: 0;
