@@ -153,10 +153,7 @@ service Policies {
   While you can use this endpoint to update members on a policy, if that is the only
   property you wish to modify (on either Custom or Chef-managed policies),
   you might find it more convenient to use these endpoints instead:
-
-   * Add policy members
-   * Remove policy members
-   * Replace policy members
+  Add policy members, Remove policy members, or Replace policy members.
 
   Authorization Action:
   ```
