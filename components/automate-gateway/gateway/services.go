@@ -206,7 +206,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_iam.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
 
-	teamsV2Client, err := clients.TeamsClient()
+	teamsClient, err := clients.TeamsClient()
 	if err != nil {
 		return errors.Wrap(err, "create V2 client for teams service")
 	}
@@ -350,7 +350,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"cc_jobs":              pb_cc_jobs.RegisterJobsServiceHandlerFromEndpoint,
 		"nodes":                pb_nodes.RegisterNodesServiceHandlerFromEndpoint,
 		"profiles":             pb_profiles.RegisterProfilesServiceHandlerFromEndpoint,
-		"teams-service":        pb_iam_v2.RegisterTeamsHandlerFromEndpoint,
+		"teams-service":        pb_iam.RegisterTeamsHandlerFromEndpoint,
 		"node manager":         pb_nodes_manager.RegisterNodeManagerServiceHandlerFromEndpoint,
 		"telemetry":            pb_telemetry.RegisterTelemetryHandlerFromEndpoint,
 		"data-feed":            pb_data_feed.RegisterDatafeedServiceHandlerFromEndpoint,

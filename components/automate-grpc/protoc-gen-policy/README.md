@@ -10,10 +10,6 @@ Example (from `components/automate-gateway/api/iam/v2/teams.proto`):
     option (google.api.http) = {
       post: "/iam/v2/teams"
       body: "*"
-      additional_bindings {
-        post: "/iam/v2beta/teams"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:teams";
     option (chef.automate.api.policy).action = "create";
