@@ -25,7 +25,7 @@
     <app-authorized  #teams [allOf]="['/auth/teams', 'get']">
       <chef-sidebar-entry route="/settings/teams" icon="people">Teams</chef-sidebar-entry>
     </app-authorized>
-    <app-authorized  #tokens [anyOf]="[['/auth/tokens', 'get'], ['/iam/v2/tokens', 'get']]">
+    <app-authorized  #tokens [allOf]="['/iam/v2/tokens', 'get']">
       <chef-sidebar-entry route="/settings/tokens" icon="vpn_key">API Tokens</chef-sidebar-entry>
     </app-authorized>
 
