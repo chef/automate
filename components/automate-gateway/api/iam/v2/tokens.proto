@@ -4,6 +4,7 @@ package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2";
 
 import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 import "components/automate-gateway/api/iam/v2/request/tokens.proto";
 import "components/automate-gateway/api/iam/v2/response/tokens.proto";
 
@@ -13,6 +14,26 @@ import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Tokens {
+
+  /*
+  Create a token
+
+  Creates a token.
+  Name, ID are required.
+  Active defaults to true when not specified.
+  Value is auto-generated when not provided.
+  ```
+  {
+    "name": "token 1",
+    "id": "token-1",
+    "active": true,
+    "projects": [
+      "east-region",
+      "west-region"
+    ]
+  }
+  ```
+  */
   rpc CreateToken (CreateTokenReq) returns (CreateTokenResp) {
     option (google.api.http) = {
       post: "/iam/v2/tokens"
@@ -22,7 +43,16 @@ service Tokens {
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:tokens";
     option (chef.automate.api.iam.policy).action = "iam:tokens:create";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+    };
   };
+
+  /*
+  Get a token
+
+  Returns the details for a token.
+  */
   rpc GetToken (GetTokenReq) returns (GetTokenResp) {
     option (google.api.http) = {
       get: "/iam/v2/tokens/{id}"
@@ -31,7 +61,18 @@ service Tokens {
     option (chef.automate.api.policy).action = "get";
     option (chef.automate.api.iam.policy).resource = "iam:tokens:{id}";
     option (chef.automate.api.iam.policy).action = "iam:tokens:get";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+    };
   };
+
+  /*
+  Update a token
+
+  This PUT operation will overwrite all fields excepting ID, timestamps, and value,
+  including those omitted from the request. Include `name`, `active` and `projects`
+  in the request.
+  */
   rpc UpdateToken (UpdateTokenReq) returns (UpdateTokenResp) {
     option (google.api.http) = {
       put: "/iam/v2/tokens/{id}"
@@ -41,7 +82,14 @@ service Tokens {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:tokens:{id}";
     option (chef.automate.api.iam.policy).action = "iam:tokens:update";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+    };
   };
+
+  /*
+  Delete a token
+  */
   rpc DeleteToken (DeleteTokenReq) returns (DeleteTokenResp) {
     option (google.api.http) = {
       delete: "/iam/v2/tokens/{id}"
@@ -50,7 +98,14 @@ service Tokens {
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:tokens:{id}";
     option (chef.automate.api.iam.policy).action = "iam:tokens:delete";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+    };
   };
+
+  /*
+  List all tokens
+  */
   rpc ListTokens (ListTokensReq) returns (ListTokensResp) {
     option (google.api.http) = {
       get: "/iam/v2/tokens"
@@ -59,6 +114,9 @@ service Tokens {
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:tokens";
     option (chef.automate.api.iam.policy).action = "iam:tokens:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+    };
   }
   // Expose on GRPC API only so we don't expose this to the enduser.
   // Just want to be able to trigger this via automate-cli.
@@ -67,5 +125,8 @@ service Tokens {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:tokens";
     option (chef.automate.api.iam.policy).action = "iam:tokens:update";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "hidden";
+    };
   }
 };
