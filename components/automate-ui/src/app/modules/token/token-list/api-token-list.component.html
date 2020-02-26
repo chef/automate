@@ -28,7 +28,7 @@
 
     <div class="page-body">
       <chef-toolbar>
-        <app-authorized [anyOf]="[['/iam/v2/tokens', 'post'], ['/auth/tokens', 'post']]">
+        <app-authorized [anyOf]="['/iam/v2/tokens', 'post']">
           <div *ngIf="(apiTokenCount$ | async) === 0" class="empty-state">
             <p>Create the first token to get started!</p>
           </div>
@@ -37,7 +37,7 @@
           </div>
         </app-authorized>
       </chef-toolbar>
-      <app-authorized [anyOf]="[['/iam/v2/tokens', 'get'], ['/auth/tokens', 'get']]">
+      <app-authorized [allOf]="['/iam/v2/tokens', 'get']">
         <chef-table-new *ngIf="(apiTokenCount$ | async) > 0">
           <chef-table-header>
             <chef-table-row>

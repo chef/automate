@@ -33,7 +33,6 @@ import (
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_teams "github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	pb_tokens "github.com/chef/automate/components/automate-gateway/api/auth/tokens"
 	pb_users "github.com/chef/automate/components/automate-gateway/api/auth/users"
 	pb_authz "github.com/chef/automate/components/automate-gateway/api/authz"
 	policy "github.com/chef/automate/components/automate-gateway/api/authz/policy"

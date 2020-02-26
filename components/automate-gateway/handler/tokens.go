@@ -6,8 +6,8 @@ import (
 	// upstream definitions
 	"github.com/chef/automate/api/interservice/authn"
 
-	authReq "github.com/chef/automate/components/automate-gateway/api/auth/tokens/request"
-	authRes "github.com/chef/automate/components/automate-gateway/api/auth/tokens/response"
+	authReq "github.com/chef/automate/components/automate-gateway/api/iam/v2/request/tokens"
+	authRes "github.com/chef/automate/components/automate-gateway/api/iam/v2/response/tokens"
 )
 
 // TokensServer stores token

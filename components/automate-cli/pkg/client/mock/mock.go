@@ -8,7 +8,6 @@ import (
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	"github.com/chef/automate/components/automate-gateway/api/auth/tokens"
 	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
 	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
@@ -37,7 +36,6 @@ type ServerMocks struct {
 	PoliciesMock *v2.PoliciesServerMock
 	TeamsMock    *teams.TeamsServerMock
 	TeamsV2Mock  *v2.TeamsServerMock
-	TokensMock   *tokens.TokensMgmtServerMock
 	TokensV2Mock *v2.TokensServerMock
 	UsersMock    *users.UsersMgmtServerMock
 }
@@ -64,9 +62,6 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 
 	mockV2Teams := v2.NewTeamsServerMock()
 	v2.RegisterTeamsServer(grpcGateway, mockV2Teams)
-
-	mockTokens := tokens.NewTokensMgmtServerMock()
-	tokens.RegisterTokensMgmtServer(grpcGateway, mockTokens)
 
 	mockUsers := users.NewUsersMgmtServerMock()
 	users.RegisterUsersMgmtServer(grpcGateway, mockUsers)
