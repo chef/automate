@@ -31,8 +31,7 @@ message Statement {
         ALLOW = 0;
         DENY = 1;
     }
-    // Whether the statement allows or denies.
-    // One of `ALLOW` or `DENY`, respectively.
+    // Whether the statement allows (`ALLOW`) or denies (`DENY`).
     Effect effect = 1;
 
     // Actions defined inline. Best practices recommend that you use custom roles where practical.
@@ -53,12 +52,11 @@ message Role {
     string name = 1;
     // Unique, user-specified ID. Cannot be changed.
     string id = 2;
-    // Whether this policy is user created or chef managed.
-    // One of `CUSTOM` or `CHEF_MANAGED`, respectively.
+    // Whether this policy is user created (`CUSTOM`) or chef managed (`CHEF_MANAGED`).
     Type type = 3;
-    // List of actions that this role scopes to.
+    // List of actions this role scopes to.
     repeated string actions = 4;
-    // The list of projects this role belongs to.
+    // List of projects this role belongs to.
     repeated string projects = 5;
 }
 
@@ -67,8 +65,7 @@ message Project {
     string name = 1;
     // Unique, user-specified ID. Cannot be changed.
     string id = 2;
-    // Whether this policy is user created or chef managed.
-    // One of `CUSTOM` or `CHEF_MANAGED`, respectively.
+    // Whether this policy is user created (`CUSTOM`) or chef managed (`CHEF_MANAGED`).
     Type type = 3;
     // The current status of the rules for this project.
     ProjectRulesStatus status = 4;

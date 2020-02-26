@@ -19,9 +19,8 @@ service Tokens {
   Create a token
 
   Creates a token.
-  Name, ID are required.
   Active defaults to true when not specified.
-  Value is auto-generated when not provided.
+  Value is auto-generated when not specified.
   ```
   {
     "name": "token 1",
@@ -35,7 +34,6 @@ service Tokens {
   ```
 
   Authorization Action:
-
   ```
   iam:tokens:create
   ```
@@ -60,7 +58,6 @@ service Tokens {
   Returns the details for a token.
 
   Authorization Action:
-
   ```
   iam:tokens:get
   ```
@@ -81,12 +78,11 @@ service Tokens {
   /*
   Update a token
 
-  This PUT operation will overwrite all fields excepting ID, timestamps, and value,
-  including those omitted from the request. Include `name`, `active` and `projects`
-  in the request.
+  This operation overwrites all fields excepting ID, timestamps, and value,
+  including those omitted from the request, so be sure to specify all properties.
+  Properties that you do not include are reset to empty values.
 
   Authorization Action:
-
   ```
   iam:tokens:update
   ```
@@ -108,8 +104,9 @@ service Tokens {
   /*
   Delete a token
 
-  Authorization Action:
+  Delete a token and remove it from any policies.
 
+  Authorization Action:
   ```
   iam:tokens:delete
   ```
@@ -130,8 +127,9 @@ service Tokens {
   /*
   List all tokens
 
-  Authorization Action:
+  List all tokens.
 
+  Authorization Action:
   ```
   iam:tokens:list
   ```

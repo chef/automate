@@ -6,7 +6,7 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/ia
 message Token {
     // Unique, optionally user-specified ID. Cannot be changed.
     string id = 1;
-    // User-specified name.
+    // Name for the token.
     string name = 2;
     // Unique, optionally user-specified value.
     string value = 3;
@@ -17,6 +17,6 @@ message Token {
     string created_at = 5;
     // Updated timestamp.
     string updated_at = 6;
-    // Array of projects token is in. Empty by default.
+    // List of projects this token belongs to; empty by default.
     repeated string projects = 7;
 }
