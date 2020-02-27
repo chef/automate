@@ -60,6 +60,30 @@ control 'iam-legacy-access-control-1' do
       expect(delete_token_request.http_status.to_s).to match(/200|404/)
     end
 
+    it 'includes the legacy policies we expect' do
+      resp = automate_api_request('/apis/iam/v2/policies')
+      expect(resp.http_status).to eq 200
+
+      all_policies = resp.parsed_response_body[:policies]
+      legacy_policies = all_policies.select{ |p| /^\[Legacy\]/.match(p[:name]) }
+
+      expected_policies = [
+        "events-access-legacy", 
+        "ingest-access-legacy", 
+        "nodes-access-legacy", 
+        "node-managers-access-legacy",
+        "secrets-access-legacy",
+        "compliance-profile-access-legacy",
+        "telemetry-access-legacy",
+        "compliance-access-legacy",
+        "infrastructure-automation-access-legacy"
+      ]
+
+      expected_policies.each do |policy|
+        expect(legacy_policies).to include(policy)
+      end
+    end
+
     # This shared example will attempt to test all CRUD operations in a standard way on a URL.
     # If the pattern used here doesn't fit what you are testing, feel free to not use it!
     # It can test getting all objects, as well as CRUD on a single object.
