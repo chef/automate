@@ -91,7 +91,9 @@ message ConfigRequest {
 					google.protobuf.Int32Value large_client_header_buffers_number = 22;
 					google.protobuf.StringValue sendfile = 15;
 					google.protobuf.StringValue ssl_ciphers = 16;
+					google.protobuf.StringValue ssl_client_certificate_filename = 26;
 					google.protobuf.StringValue ssl_protocols = 17;
+					google.protobuf.StringValue ssl_verify_client = 25;
 					google.protobuf.StringValue tcp_nodelay = 18;
 					google.protobuf.StringValue tcp_nopush = 19;
 
