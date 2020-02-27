@@ -3,9 +3,9 @@ package compliance
 import (
 	"context"
 
-	"github.com/chef/automate/components/automate-gateway/api/compliance/profiles"
+	"github.com/chef/automate/api/external/compliance/profiles"
+	profileService "github.com/chef/automate/api/interservice/compliance/profiles"
 	"github.com/chef/automate/components/automate-gateway/protobuf"
-	profileService "github.com/chef/automate/components/compliance-service/api/profiles"
 	"github.com/golang/protobuf/proto"
 	gp "github.com/golang/protobuf/ptypes/empty"
 )

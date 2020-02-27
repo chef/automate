@@ -13,7 +13,8 @@ import (
 
 	"reflect"
 
-	"github.com/chef/automate/components/compliance-service/ingest/events/inspec"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	inspec_api "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	inspecTypes "github.com/chef/automate/components/compliance-service/inspec"
 	reportingTypes "github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
@@ -27,10 +28,6 @@ const DocVersion = "1"
 // https://www.elastic.co/guide/en/elasticsearch/reference/6.4/ignore-above.html
 const maxESKeywordBytes = 32766
 
-func (report *Report) ToJSON() (string, error) {
-	return (&jsonpb.Marshaler{OrigName: true}).MarshalToString(report)
-}
-
 // ProfileControlSummary returns a NodeControlSummary struct with the counted controls based on their status and criticality,
 // This is working on all profiles embedded in a full json report.
 // total: count for all controls in the report, e.g. 100
@@ -40,11 +37,11 @@ func (report *Report) ToJSON() (string, error) {
 // failed.total: count for all failed controls, e.g. 50
 // failed.minor/major/critical: split the total failed controls in 3 buckets based on the criticality,
 // e.g. minor: 10, major: 15, critical: 25
-func ProfileControlSummary(profile *inspec.Profile) *reportingTypes.NodeControlSummary {
+func ProfileControlSummary(profile *inspec_api.Profile) *reportingTypes.NodeControlSummary {
 	summary := reportingTypes.NodeControlSummary{}
 	for _, control := range profile.Controls {
 		summary.Total++
-		if control.WaiverData != nil && !reflect.DeepEqual(*control.WaiverData, inspec.WaiverData{}) && !strings.HasPrefix(control.WaiverData.Message, "Waiver expired") {
+		if control.WaiverData != nil && !reflect.DeepEqual(*control.WaiverData, inspec_api.WaiverData{}) && !strings.HasPrefix(control.WaiverData.Message, "Waiver expired") {
 			// Expired waived controls are not waived. This way, we can use the actual status of the executed control
 			summary.Waived.Total++
 		} else {
@@ -96,8 +93,8 @@ func ReportComplianceStatus(summary *reportingTypes.NodeControlSummary) (status 
 }
 
 // WaivedStr returns a string label based on the control waived status
-func WaivedStr(data *inspec.WaiverData) (str string) {
-	if data == nil || reflect.DeepEqual(*data, inspec.WaiverData{}) {
+func WaivedStr(data *inspec_api.WaiverData) (str string) {
+	if data == nil || reflect.DeepEqual(*data, inspec_api.WaiverData{}) {
 		return inspec.ControlWaivedStrNo
 	}
 
@@ -114,7 +111,7 @@ func WaivedStr(data *inspec.WaiverData) (str string) {
 
 // ReportProfilesFromInSpecProfiles extracts the reports specific information
 // from the profile, leaving out the static profile data
-func ReportProfilesFromInSpecProfiles(profiles []*inspec.Profile, profilesSums []relaxting.ESInSpecSummaryProfile) (profilesRep []relaxting.ESInSpecReportProfile) {
+func ReportProfilesFromInSpecProfiles(profiles []*inspec_api.Profile, profilesSums []relaxting.ESInSpecSummaryProfile) (profilesRep []relaxting.ESInSpecReportProfile) {
 	// Creating a profilesSums hash to lookup the sums based on the profile (name|sha) string
 	profilesSumsHash := make(map[string]relaxting.ESInSpecSummaryProfile, len(profilesSums))
 	for _, profileSums := range profilesSums {
@@ -225,7 +222,7 @@ type AttributeOption struct {
 
 // ProfilesFromReport takes the profiles array of an inspec full json report and returns the profiles
 // with only the static information, without the results of the controls as the report has it
-func ProfilesFromReport(reportProfiles []*inspec.Profile) (profiles []*relaxting.ESInspecProfile, err error) {
+func ProfilesFromReport(reportProfiles []*inspec_api.Profile) (profiles []*relaxting.ESInspecProfile, err error) {
 	for _, reportProfile := range reportProfiles {
 		esProfile := relaxting.ESInspecProfile{
 			Name:           reportProfile.Name,
@@ -350,7 +347,7 @@ func arrayOfStructToJson(objs []*structpb.Struct) (string, error) {
 
 // FixInheritedProfiles updates profiles so they include all controls from the profiles they depend on
 // Dependent profiles will be removed from the list of profiles
-func FixInheritedProfiles(reportProfiles []*inspec.Profile) (fixedProfiles []*inspec.Profile) {
+func FixInheritedProfiles(reportProfiles []*inspec_api.Profile) (fixedProfiles []*inspec_api.Profile) {
 	// gather all profile dependencies first
 	dependencies := make([]string, 0)
 	for _, profile := range reportProfiles {
@@ -380,13 +377,13 @@ func FixInheritedProfiles(reportProfiles []*inspec.Profile) (fixedProfiles []*in
 	return fixedProfiles
 }
 
-func NameSha(p *inspec.Profile) string {
+func NameSha(p *inspec_api.Profile) string {
 	return fmt.Sprintf("%s|%s", p.Name, p.Sha256)
 }
 
 // mergeControls workarounds an inspec report bug where inherited controls that show up
 // under the wrapper profile have missing or blank code and result fields
-func mergeControls(dst *inspec.Control, src *inspec.Control) {
+func mergeControls(dst *inspec_api.Control, src *inspec_api.Control) {
 	if dst == nil {
 		return
 	}
@@ -399,15 +396,15 @@ func mergeControls(dst *inspec.Control, src *inspec.Control) {
 }
 
 // takes an array of *Control
-func hashControls(controls []*inspec.Control) map[string]*inspec.Control {
-	controlsHash := make(map[string]*inspec.Control, 0)
+func hashControls(controls []*inspec_api.Control) map[string]*inspec_api.Control {
+	controlsHash := make(map[string]*inspec_api.Control, 0)
 	for _, control := range controls {
 		controlsHash[control.Id] = control
 	}
 	return controlsHash
 }
 
-func getControlsFromDeps(ownControls bool, forProfile *inspec.Profile, reportProfiles []*inspec.Profile) (allControls []*inspec.Control) {
+func getControlsFromDeps(ownControls bool, forProfile *inspec_api.Profile, reportProfiles []*inspec_api.Profile) (allControls []*inspec.Control) {
 	if ownControls == true {
 		allControls = forProfile.Controls
 	}

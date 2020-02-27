@@ -17,9 +17,9 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/components/compliance-service/api/jobs"
-	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	"github.com/chef/automate/components/compliance-service/ingest/ingest"
+	ingest_events_compliance_api "github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
+	"github.com/chef/automate/api/interservice/compliance/ingest/ingest"
+	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/remote"
@@ -495,7 +495,7 @@ func (t *InspecJobTask) handleCompletedJob(ctx context.Context, job types.Inspec
 }
 
 func (t *InspecJobTask) reportIt(ctx context.Context, job *types.InspecJob, content []byte, reportID string) error {
-	var report compliance.Report
+	var report ingest_events_compliance_api.Report
 	unmarshaler := &jsonpb.Unmarshaler{AllowUnknownFields: true}
 	if err := unmarshaler.Unmarshal(bytes.NewReader(content), &report); err != nil {
 		return errors.Wrap(err, "reportIt was unable to unmarshal the report output into a compliance.Report struct")

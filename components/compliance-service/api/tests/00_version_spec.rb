@@ -1,10 +1,10 @@
 ##### GRPC SETUP #####
-require 'api/version/version_pb'
-require 'api/version/version_services_pb'
+require 'api/interservice/compliance/version/version_pb'
+require 'api/interservice/compliance/version/version_services_pb'
 
 describe File.basename(__FILE__) do
   it "works" do
-    version = Chef::Automate::Domain::Compliance::Api::Version::VersionService
+    version = Chef::Automate::Domain::Compliance::Version::VersionService
 
     SHA = `git rev-parse HEAD`.chomp
     resp = GRPC version, :version, Google::Protobuf::Empty.new()

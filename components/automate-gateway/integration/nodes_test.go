@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/chef/automate/api/external/common/query"
 	gwnodes "github.com/chef/automate/api/external/nodes"
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/compliance-service/api/jobs"
 )
 
 func (suite *GatewayTestSuite) TestGatewayNodesClient() {
@@ -40,7 +40,7 @@ func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 	secretID, err := secretsClient.Create(suite.ctx, &secrets.Secret{
 		Name: "test secret",
 		Type: "ssh",
-		Data: []*secrets.Kv{
+		Data: []*query.Kv{
 			{Key: "username", Value: suite.target.User},
 			{Key: "key", Value: suite.target.Key},
 		},
@@ -51,7 +51,7 @@ func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 	badSecretID, err := secretsClient.Create(suite.ctx, &secrets.Secret{
 		Name: "test secret",
 		Type: "ssh",
-		Data: []*secrets.Kv{
+		Data: []*query.Kv{
 			{Key: "username", Value: suite.target.User},
 			{Key: "password", Value: "definitely not the password"},
 		},
@@ -62,7 +62,7 @@ func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 	// create node
 	nodeID, err := gatewayNodesClient.Create(suite.ctx, &gwnodes.Node{
 		Name: "test node",
-		Tags: []*common.Kv{
+		Tags: []*query.Kv{
 			{Key: "_no_auto_detect", Value: "true"},
 		},
 		TargetConfig: &gwnodes.TargetConfig{
@@ -85,7 +85,7 @@ func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 	_, err = gatewayNodesClient.Update(suite.ctx, &gwnodes.Node{
 		Id:   nodeID.Id,
 		Name: "test node",
-		Tags: []*common.Kv{
+		Tags: []*query.Kv{
 			{Key: "_no_auto_detect", Value: "false"},
 		},
 		TargetConfig: &gwnodes.TargetConfig{
@@ -200,7 +200,7 @@ func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 	ids, err := gatewayNodesClient.BulkCreate(suite.ctx, &gwnodes.Nodes{
 		Nodes: []*gwnodes.Node{{
 			Name: "test node",
-			Tags: []*common.Kv{
+			Tags: []*query.Kv{
 				{Key: "_no_auto_detect", Value: "true"},
 			},
 			TargetConfig: &gwnodes.TargetConfig{
@@ -224,7 +224,7 @@ func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 	ids, err = gatewayNodesClient.BulkCreate(suite.ctx, &gwnodes.Nodes{
 		Nodes: []*gwnodes.Node{{
 			Name: "test node",
-			Tags: []*common.Kv{},
+			Tags: []*query.Kv{},
 			TargetConfig: &gwnodes.TargetConfig{
 				Backend: "ssh",
 				Hosts:   []string{suite.target.Host},

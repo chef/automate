@@ -8,14 +8,14 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/components/secrets-service/utils"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/pgutils"
 )
 
-func mergeFilters(mergeableFilters []*secrets.Filter) ([]secrets.Filter, error) {
-	filterMap := make(map[string]secrets.Filter)
+func mergeFilters(mergeableFilters []*query.Filter) ([]query.Filter, error) {
+	filterMap := make(map[string]query.Filter)
 
 	for _, mf := range mergeableFilters {
 		var values []string
@@ -30,10 +30,10 @@ func mergeFilters(mergeableFilters []*secrets.Filter) ([]secrets.Filter, error) 
 			values = mf.Values
 		}
 
-		filterMap[key] = secrets.Filter{Key: key, Values: values, Exclude: mf.Exclude}
+		filterMap[key] = query.Filter{Key: key, Values: values, Exclude: mf.Exclude}
 	}
 
-	filters := make([]secrets.Filter, len(filterMap))
+	filters := make([]query.Filter, len(filterMap))
 	i := 0
 	for k := range filterMap {
 		filters[i] = filterMap[k]
@@ -43,7 +43,7 @@ func mergeFilters(mergeableFilters []*secrets.Filter) ([]secrets.Filter, error) 
 }
 
 // Takes a filter map (should be validated for content) and table abbreviation and returns a wherefilter
-func buildWhereFilter(mergeableFilters []*secrets.Filter, tableAbbrev string, filterField map[string]string) (whereFilter string, err error) {
+func buildWhereFilter(mergeableFilters []*query.Filter, tableAbbrev string, filterField map[string]string) (whereFilter string, err error) {
 	if len(mergeableFilters) == 0 {
 		return "", nil
 	}

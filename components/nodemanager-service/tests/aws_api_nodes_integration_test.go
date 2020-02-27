@@ -6,7 +6,7 @@ import (
 
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	"github.com/chef/automate/components/compliance-service/api/common"
+	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/components/nodemanager-service/tests/mgrtesthelpers"
 
 	"github.com/stretchr/testify/require"

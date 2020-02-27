@@ -1,8 +1,8 @@
-require 'api/profiles/profiles_pb'
-require 'api/profiles/profiles_services_pb'
+require 'api/interservice/compliance/profiles/profiles_pb'
+require 'api/interservice/compliance/profiles/profiles_services_pb'
 
 describe File.basename(__FILE__) do
-  Profiles = Chef::Automate::Domain::Compliance::Api::Profiles unless defined?(Profiles)
+  Profiles = Chef::Automate::Domain::Compliance::Profiles unless defined?(Profiles)
 
   def profiles;
     Profiles::ProfilesService;

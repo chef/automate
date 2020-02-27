@@ -9,8 +9,8 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/interservice/compliance/common"
 	aEvent "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/compliance-service/api/common"
 	event "github.com/chef/automate/components/event-service/config"
 
 	"github.com/chef/automate/api/interservice/nodemanager/manager"

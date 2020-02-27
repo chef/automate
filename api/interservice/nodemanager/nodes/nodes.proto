@@ -7,7 +7,7 @@ import "google/protobuf/timestamp.proto";
 import "google/api/annotations.proto";
 import "google/protobuf/empty.proto";
 
-import "components/compliance-service/api/common/common.proto";
+import "api/interservice/compliance/common/common.proto";
 
 service NodesService {
 	rpc Create(Node) returns (Id) {};
@@ -46,7 +46,7 @@ message Id {
 	string id = 1;
 }
 message Query {
-	repeated chef.automate.domain.compliance.api.common.Filter filters = 20;
+	repeated chef.automate.domain.compliance.common.Filter filters = 20;
 	enum OrderType {
 		ASC = 0;
 		DESC = 1;
@@ -102,7 +102,7 @@ message Node {
 	string platform = 3;
 	string platform_version = 4;
 	string manager = 5;
-	repeated chef.automate.domain.compliance.api.common.Kv tags = 20;
+	repeated chef.automate.domain.compliance.common.Kv tags = 20;
 	google.protobuf.Timestamp last_contact = 21;
 	string status = 22;
 	ResultsRow last_job = 23;

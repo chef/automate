@@ -3,7 +3,7 @@ package pgdb
 import (
 	"github.com/pkg/errors"
 
-	"github.com/chef/automate/components/compliance-service/api/common"
+	"github.com/chef/automate/api/interservice/compliance/common"
 )
 
 type tag struct {

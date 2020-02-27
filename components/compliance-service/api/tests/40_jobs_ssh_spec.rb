@@ -3,17 +3,19 @@ require_relative 'test_support'
 require 'api/interservice/nodemanager/nodes/nodes_pb'
 require 'api/interservice/nodemanager/nodes/nodes_services_pb'
 require 'api/external/secrets/secrets_services_pb'
-require 'api/jobs/jobs_pb'
-require 'api/jobs/jobs_services_pb'
-require 'api/profiles/profiles_pb'
-require 'api/profiles/profiles_services_pb'
+require 'api/interservice/compliance/jobs/jobs_pb'
+require 'api/interservice/compliance/jobs/jobs_services_pb'
+require 'api/interservice/compliance/profiles/profiles_pb'
+require 'api/interservice/compliance/profiles/profiles_services_pb'
+require 'api/external/common/query/parameters_pb'
 
 describe File.basename(__FILE__) do
-  Profiles = Chef::Automate::Domain::Compliance::Api::Profiles unless defined?(Profiles)
+  Profiles = Chef::Automate::Domain::Compliance::Profiles unless defined?(Profiles)
   Nodes = Chef::Automate::Domain::Nodemanager::Nodes unless defined?(Nodes)
   Secrets = Chef::Automate::Api::Secrets unless defined?(Secrets)
-  Jobs = Chef::Automate::Domain::Compliance::Api::Jobs unless defined?(Jobs)
-  Common = Chef::Automate::Domain::Compliance::Api::Common unless defined?(Common)
+  Jobs = Chef::Automate::Domain::Compliance::Jobs unless defined?(Jobs)
+  Common = Chef::Automate::Domain::Compliance::Common unless defined?(Common)
+  Query = Chef::Automate::Api::Common::Query unless defined?(Query)
 
   def jobs ; Jobs::JobsService ; end
   def nodes ; Nodes::NodesService ; end
@@ -61,8 +63,8 @@ describe File.basename(__FILE__) do
       name: "My SSH Login secrets",
       type: "ssh",
       data: [
-        Secrets::Kv.new( key: "username", value: "wrong" ),
-        Secrets::Kv.new( key: "password", value: "password" )
+        Query::Kv.new( key: "username", value: "wrong" ),
+        Query::Kv.new( key: "password", value: "password" )
       ],
       tags: []
     )).id
@@ -70,7 +72,7 @@ describe File.basename(__FILE__) do
     SS_GRPC secrets, :update, Secrets::Secret.new(
       id: secret_id1,
       data: [
-        Secrets::Kv.new( key: "username", value: "pwsudo" )
+        Query::Kv.new( key: "username", value: "pwsudo" )
       ],
       tags: []
     )
@@ -79,7 +81,7 @@ describe File.basename(__FILE__) do
       name: "My SSH sudo secrets",
       type: "sudo",
       data: [
-        Secrets::Kv.new( key: "password", value: "password" )
+        Query::Kv.new( key: "password", value: "password" )
       ],
       tags: []
     )).id
@@ -90,8 +92,8 @@ describe File.basename(__FILE__) do
       name: "My SSH sudo secrets",
       type: "ssh",
       data: [
-        Secrets::Kv.new( key: "username", value: "nosudo" ),
-        Secrets::Kv.new( key: "key", value: SSH_PRIVATE_KEY )
+        Query::Kv.new( key: "username", value: "nosudo" ),
+        Query::Kv.new( key: "key", value: SSH_PRIVATE_KEY )
       ],
       tags: []
     )).id

@@ -1,10 +1,10 @@
 ##### GRPC SETUP #####
-require 'api/stats/stats_pb'
-require 'api/stats/stats_services_pb'
+require 'api/interservice/compliance/stats/stats_pb'
+require 'api/interservice/compliance/stats/stats_services_pb'
 
 if !ENV['NO_STATS_TESTS']
   describe File.basename(__FILE__) do
-    Stats = Chef::Automate::Domain::Compliance::Api::Stats
+    Stats = Chef::Automate::Domain::Compliance::Stats
 
     def stats;
       Stats::StatsService;

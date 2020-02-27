@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/components/secrets-service/dao"
 )
@@ -52,8 +53,8 @@ func deleteAllSecrets() {
 	}
 }
 
-func appendKvs(kvs ...*secrets.Kv) []*secrets.Kv {
-	array := make([]*secrets.Kv, len(kvs))
+func appendKvs(kvs ...*query.Kv) []*query.Kv {
+	array := make([]*query.Kv, len(kvs))
 
 	for i, kv := range kvs {
 		array[i] = kv
@@ -62,8 +63,8 @@ func appendKvs(kvs ...*secrets.Kv) []*secrets.Kv {
 	return array
 }
 
-func appendFilters(filters ...*secrets.Filter) []*secrets.Filter {
-	array := make([]*secrets.Filter, len(filters))
+func appendFilters(filters ...*query.Filter) []*query.Filter {
+	array := make([]*query.Filter, len(filters))
 
 	for i, filter := range filters {
 		array[i] = filter

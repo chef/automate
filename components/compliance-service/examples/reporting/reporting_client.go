@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 
-	rs "github.com/chef/automate/components/compliance-service/api/reporting"
+	rs "github.com/chef/automate/api/interservice/compliance/reporting"
 	reportingtest "github.com/chef/automate/components/compliance-service/examples/reporting/test"
 )
 

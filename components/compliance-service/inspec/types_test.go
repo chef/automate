@@ -3,7 +3,7 @@ package inspec
 import (
 	"testing"
 
-	"github.com/chef/automate/components/compliance-service/api/reporting"
+	"github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/stretchr/testify/assert"
 )
 

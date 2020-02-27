@@ -3,17 +3,19 @@ require_relative 'test_support'
 require 'api/interservice/nodemanager/nodes/nodes_pb'
 require 'api/interservice/nodemanager/nodes/nodes_services_pb'
 require 'api/external/secrets/secrets_services_pb'
-require 'api/jobs/jobs_pb'
-require 'api/jobs/jobs_services_pb'
+require 'api/interservice/compliance/jobs/jobs_pb'
+require 'api/interservice/compliance/jobs/jobs_services_pb'
 require 'api/interservice/nodemanager/manager/manager_pb'
 require 'api/interservice/nodemanager/manager/manager_services_pb'
+require 'api/external/common/query/parameters_pb'
 
 describe File.basename(__FILE__) do
   Manager = Chef::Automate::Domain::Nodemanager::Manager unless defined?(Manager)
-  Jobs = Chef::Automate::Domain::Compliance::Api::Jobs unless defined?(Jobs)
+  Jobs = Chef::Automate::Domain::Compliance::Jobs unless defined?(Jobs)
   Nodes = Chef::Automate::Domain::Nodemanager::Nodes unless defined?(Nodes)
   Secrets = Chef::Automate::Api::Secrets unless defined?(Secrets)
-  Common = Chef::Automate::Domain::Compliance::Api::Common unless defined?(Common)
+  Common = Chef::Automate::Domain::Compliance::Common unless defined?(Common)
+  Query = Chef::Automate::Api::Common::Query unless defined?(Query)
 
   def manager ; Manager::NodeManagerService ; end
   def jobs ; Jobs::JobsService ; end
@@ -41,8 +43,8 @@ describe File.basename(__FILE__) do
     cleanup
     secret = SS_GRPC secrets, :create, Secrets::Secret.new(
       data: [
-        Secrets::Kv.new( key: "username", value: "bobby" ),
-        Secrets::Kv.new( key: "password", value: "b055y-th3_w1nn3r" )
+        Query::Kv.new( key: "username", value: "bobby" ),
+        Query::Kv.new( key: "password", value: "b055y-th3_w1nn3r" )
       ],
       name: "betasec",
       tags: [],

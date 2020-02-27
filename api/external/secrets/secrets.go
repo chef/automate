@@ -3,6 +3,7 @@ package secrets
 import (
 	"encoding/json"
 
+	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/lib/errorutils"
 	logs "github.com/sirupsen/logrus"
 )
@@ -139,7 +140,7 @@ func (s *Secret) Merge(newSecret *Secret) {
 	}).Debug("existing secret merged with new secret")
 }
 
-func kvsToMap(kvs []*Kv) map[string]string {
+func kvsToMap(kvs []*query.Kv) map[string]string {
 	m := make(map[string]string)
 	for _, kv := range kvs {
 		m[kv.Key] = kv.Value
@@ -147,10 +148,10 @@ func kvsToMap(kvs []*Kv) map[string]string {
 	return m
 }
 
-func mapToKvs(m map[string]string) []*Kv {
-	kvs := make([]*Kv, 0)
+func mapToKvs(m map[string]string) []*query.Kv {
+	kvs := make([]*query.Kv, 0)
 	for key, value := range m {
-		kvs = append(kvs, &Kv{
+		kvs = append(kvs, &query.Kv{
 			Key:   key,
 			Value: value,
 		})

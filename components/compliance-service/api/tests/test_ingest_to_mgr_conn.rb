@@ -8,7 +8,7 @@ describe File.basename(__FILE__) do
   it "works" do
     Manager = Chef::Automate::Domain::Nodemanager::Manager
     Nodes = Chef::Automate::Domain::Nodemanager::Nodes
-    Common = Chef::Automate::Domain::Compliance::Api::Common
+    Common = Chef::Automate::Domain::Compliance::Common
     nodes = Nodes::NodesService
 
     original_manually_managed_nodes = MANAGER_GRPC nodes, :list, Nodes::Query.new(filters: [Common::Filter.new(key: "manager_id", values: ["e69dc612-7e67-43f2-9b19-256afd385820"])])
