@@ -548,6 +548,72 @@ func init() {
         ]
       }
     },
+    "/infra/servers/{server_id}/orgs/{org_id}/environment/{name}": {
+      "get": {
+        "operationId": "GetEnvironment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environment"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/infra/servers/{server_id}/orgs/{org_id}/environments": {
+      "get": {
+        "operationId": "GetEnvironments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environments"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
         "operationId": "GetRoles",
@@ -1027,6 +1093,48 @@ func init() {
       "properties": {
         "server": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Environment": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "chef_type": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "json_class": {
+          "type": "string"
+        },
+        "cookbook_versions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.EnvironmentListItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Environments": {
+      "type": "object",
+      "properties": {
+        "environments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.EnvironmentListItem"
+          }
         }
       }
     },
