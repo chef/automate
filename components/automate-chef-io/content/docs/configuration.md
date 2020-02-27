@@ -355,7 +355,11 @@ To configure your Chef Automate installation's load balancer, create a TOML file
 # large_client_header_buffers_number = 4
 # sendfile = "on"
 # ssl_ciphers = "ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384:ECDHE-ECDSA-CHACHA20-POLY1305:ECDHE-RSA-CHACHA20-POLY1305:ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-SHA384:ECDHE-RSA-AES256-SHA384:ECDHE-ECDSA-AES128-SHA256:ECDHE-RSA-AES128-SHA256:AES256-GCM-SHA384:!aNULL:!eNULL:!EXPORT"
+# Setting ssl_client_certificate_filename to "" will result in ssl_client_certificate not
+# being set in nginx.conf.
+# ssl_client_certificate_filename = "root_ca.crt"
 # ssl_protocols = "TLSv1.2"
+# ssl_verify_client = "optional"
 # tcp_nodelay = "on"
 # tcp_nopush = "on"
 [load_balancer.v1.sys.proxy]
