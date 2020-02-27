@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/components/teams-service/storage"
 	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
+	"github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
@@ -60,16 +61,16 @@ func New(logger logger.Logger, migrationConfig migration.Config,
 }
 
 func initPostgresDB(pgURL string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", pgURL)
+	d, err := db.PGOpen(pgURL)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := db.Ping(); err != nil {
+	if err := d.Ping(); err != nil {
 		return nil, errors.Wrap(err, "opening database connection")
 	}
 
-	return db, nil
+	return d, nil
 }
 
 func (p *postgres) UpgradeToV2(ctx context.Context) error {

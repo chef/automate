@@ -3,43 +3,85 @@ syntax = "proto3";
 package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/request";
 
+import "protoc-gen-swagger/options/annotations.proto";
+
 message ListTeamsReq {}
 
 message GetTeamReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
     string id = 1;
 }
 
 message CreateTeamReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "name"]
+      }
+    };
     string id = 1;
     string name = 2;
     repeated string projects = 3;
 }
 
 message UpdateTeamReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "name"]
+      }
+    };
     string id = 1;
     string name = 2;
     repeated string projects = 3;
 }
 
 message DeleteTeamReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
     string id = 1;
 }
 
 message AddTeamMembersReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "user_ids"]
+      }
+    };
     string id = 1;
     repeated string user_ids = 2;
 }
 
 message GetTeamMembershipReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
     string id = 1;
 }
 
 message RemoveTeamMembersReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "user_ids"]
+      }
+    };
     string id = 1;
     repeated string user_ids = 2;
 }
 
 message GetTeamsForMemberReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
     string id = 1;
 }
 

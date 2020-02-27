@@ -241,234 +241,6 @@ func init() {
           "Teams"
         ]
       }
-    },
-    "/iam/v2beta/teams": {
-      "get": {
-        "operationId": "ListTeams2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.ListTeamsResp"
-            }
-          }
-        },
-        "tags": [
-          "Teams"
-        ]
-      },
-      "post": {
-        "operationId": "CreateTeam2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.CreateTeamResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.CreateTeamReq"
-            }
-          }
-        ],
-        "tags": [
-          "Teams"
-        ]
-      }
-    },
-    "/iam/v2beta/teams/{id}": {
-      "get": {
-        "operationId": "GetTeam2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.GetTeamResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Teams"
-        ]
-      },
-      "delete": {
-        "operationId": "DeleteTeam2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.DeleteTeamResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Teams"
-        ]
-      },
-      "put": {
-        "operationId": "UpdateTeam2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.UpdateTeamResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.UpdateTeamReq"
-            }
-          }
-        ],
-        "tags": [
-          "Teams"
-        ]
-      }
-    },
-    "/iam/v2beta/teams/{id}/users": {
-      "get": {
-        "operationId": "GetTeamMembership2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.GetTeamMembershipResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Teams"
-        ]
-      }
-    },
-    "/iam/v2beta/teams/{id}/users:add": {
-      "post": {
-        "operationId": "AddTeamMembers2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.AddTeamMembersResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.AddTeamMembersReq"
-            }
-          }
-        ],
-        "tags": [
-          "Teams"
-        ]
-      }
-    },
-    "/iam/v2beta/teams/{id}/users:remove": {
-      "post": {
-        "operationId": "RemoveTeamMembers2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.RemoveTeamMembersResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.RemoveTeamMembersReq"
-            }
-          }
-        ],
-        "tags": [
-          "Teams"
-        ]
-      }
-    },
-    "/iam/v2beta/users/{id}/teams": {
-      "get": {
-        "operationId": "GetTeamsForMember2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.GetTeamsForMemberResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Teams"
-        ]
-      }
     }
   },
   "definitions": {
@@ -484,7 +256,11 @@ func init() {
             "type": "string"
           }
         }
-      }
+      },
+      "required": [
+        "id",
+        "user_ids"
+      ]
     },
     "chef.automate.api.iam.v2.AddTeamMembersResp": {
       "type": "object",
@@ -515,7 +291,11 @@ func init() {
             "type": "string"
           }
         }
-      }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.CreateTeamResp": {
       "type": "object",
@@ -586,7 +366,11 @@ func init() {
             "type": "string"
           }
         }
-      }
+      },
+      "required": [
+        "id",
+        "user_ids"
+      ]
     },
     "chef.automate.api.iam.v2.RemoveTeamMembersResp": {
       "type": "object",
@@ -634,7 +418,11 @@ func init() {
             "type": "string"
           }
         }
-      }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateTeamResp": {
       "type": "object",

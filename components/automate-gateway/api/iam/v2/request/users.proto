@@ -3,7 +3,14 @@ syntax = "proto3";
 package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/request";
 
+import "protoc-gen-swagger/options/annotations.proto";
+
 message CreateUserReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "name", "password"]
+    }
+  };
   string id = 1;
   string name = 2;
   string password = 3;
@@ -13,14 +20,29 @@ message ListUsersReq {
 }
 
 message DeleteUserReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
   string id = 1;
 }
 
 message GetUserReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
   string id = 1;
 }
 
 message UpdateUserReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "name"]
+    }
+  };
   // The id cannot be changed, it's for determining which user this is supposed
   // to update
   string id = 1;
@@ -29,6 +51,11 @@ message UpdateUserReq {
 }
 
 message UpdateSelfReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "name"]
+    }
+  };
   // The id cannot be changed, it's for determining which user this is supposed
   // to update
   string id = 1;

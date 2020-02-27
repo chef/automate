@@ -217,13 +217,33 @@ func getNodeData(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []st
 		log.Errorf("Error getting node run %v", err)
 		return nodeData, err
 	}
-	macAddress, hostname := getHostAttributes(attributesJson)
+	automaticAttrs := attributesJson["automatic"].(map[string]interface{})
+	ipaddress, macAddress, hostname := getHostAttributes(automaticAttrs)
 	nodeDataContent := make(map[string]interface{})
-	nodeDataContent["last_run"] = lastRun
+	nodeData["client_run"] = lastRun
 	nodeDataContent["macaddress"] = macAddress
 	nodeDataContent["hostname"] = hostname
-	nodeData["node_data"] = nodeDataContent
+	nodeDataContent["ipaddress"] = ipaddress
+	addDataContent(nodeDataContent, automaticAttrs)
+	nodeData["node"] = nodeDataContent
 	return nodeData, nil
+}
+
+func addDataContent(nodeDataContent map[string]interface{}, attributes map[string]interface{}) {
+	if strings.ToLower(attributes["os"].(string)) == "windows" {
+		kernel := attributes["kernel"].(map[string]interface{})
+		osInfo := kernel["os_info"].(map[string]interface{})
+		nodeDataContent["serial_number"] = osInfo["serial_number"]
+		servicePackMajorVersion := fmt.Sprintf("%g", osInfo["service_pack_major_version"].(float64))
+		servicePackMinorVersion := fmt.Sprintf("%g", osInfo["service_pack_minor_version"].(float64))
+		servicePack := strings.Join([]string{servicePackMajorVersion, servicePackMinorVersion}, ".")
+		nodeDataContent["os_service_pack"] = servicePack
+	} else {
+		// assume linux
+		dmi := attributes["dmi"].(map[string]interface{})
+		system := dmi["system"].(map[string]interface{})
+		nodeDataContent["serial_number"] = system["serial_number"]
+	}
 }
 
 func getNodeFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, error) {
@@ -257,79 +277,45 @@ func getNodeAttributes(ctx context.Context, client cfgmgmt.CfgMgmtClient, nodeId
 		return attributesJson, err
 	}
 
-	err = json.Unmarshal([]byte(nodeAttributes.Automatic), &attributesJson)
-	if err != nil {
-		log.Errorf("Could not parse automatic attributes from json: %v", err)
-		return attributesJson, err
-	}
-	attributesJson = buildDynamicJson(attributesJson)
+	attributesJson["automatic"] = getAttributesAsJson(nodeAttributes.Automatic, "automatic")
+	attributesJson["default"] = getAttributesAsJson(nodeAttributes.Default, "default")
+	attributesJson["normal"] = getAttributesAsJson(nodeAttributes.Normal, "normal")
+	attributesJson["override"] = getAttributesAsJson(nodeAttributes.Override, "override")
+	attributesJson["all_value_count"] = nodeAttributes.AllValueCount
+	attributesJson["automatic_value_count"] = nodeAttributes.AutomaticValueCount
+	attributesJson["default_value_count"] = nodeAttributes.DefaultValueCount
+	attributesJson["normal_value_count"] = nodeAttributes.NormalValueCount
+	attributesJson["override_value_count"] = nodeAttributes.OverrideValueCount
+	attributesJson["node_id"] = nodeAttributes.NodeId
+	attributesJson["name"] = nodeAttributes.Name
+	attributesJson["run_list"] = nodeAttributes.RunList
+	attributesJson["chef_environment"] = nodeAttributes.ChefEnvironment
+
 	return attributesJson, nil
 }
 
-func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, error) {
+func getAttributesAsJson(attributes string, attributeType string) map[string]interface{} {
+	attributesJson := make(map[string]interface{})
+	err := json.Unmarshal([]byte(attributes), &attributesJson)
+	if err != nil {
+		log.Errorf("Could not parse %v attributes from json: %v", attributeType, err)
+	}
+	return attributesJson
+}
+
+func getNodeHostFields(ctx context.Context, client cfgmgmt.CfgMgmtClient, filters []string) (string, string, string, error) {
 	nodeId, _, err := getNodeFields(ctx, client, filters)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
 	attributesJson, err := getNodeAttributes(ctx, client, nodeId)
 	if err != nil {
-		return "", "", err
+		return "", "", "", err
 	}
-	macAddress, hostname := getHostAttributes(attributesJson)
-	return macAddress, hostname, nil
+	ipaddress, macAddress, hostname := getHostAttributes(attributesJson["automatic"].(map[string]interface{}))
+	return ipaddress, macAddress, hostname, nil
 }
 
-func getHostAttributes(attributesJson map[string]interface{}) (string, string) {
-	return attributesJson["macaddress"].(string), attributesJson["hostname"].(string)
-}
-
-func buildDynamicJson(automaticJson map[string]interface{}) map[string]interface{} {
-	// check what format he json is e.g. ubuntu/ windows
-	// remove specific sections
-	// insert normalised
-	var dynamicJson map[string]interface{}
-	if automaticJson["lsb"] != nil {
-		dynamicJson = buildUbuntuJson(automaticJson)
-	} else if automaticJson["os"] == "windows" {
-		dynamicJson = buildWindowsJson(automaticJson)
-	}
-
-	return dynamicJson
-}
-
-func buildUbuntuJson(ubuntuJson map[string]interface{}) map[string]interface{} {
-	// check what format he json is e.g. ubuntu/ windows
-	// remove specific sections
-	// insert normalised
-
-	lsb := ubuntuJson["lsb"].(map[string]interface{})
-	ubuntuJson["description"] = lsb["description"]
-
-	dmi := ubuntuJson["dmi"].(map[string]interface{})
-	system := dmi["system"].(map[string]interface{})
-	ubuntuJson["serial_number"] = system["serial_number"]
-
-	//delete(ubuntuJson, "lsb")
-	//delete(ubuntuJson, "system")
-
-	return ubuntuJson
-}
-
-func buildWindowsJson(windowsJson map[string]interface{}) map[string]interface{} {
-	// check what format he json is e.g. ubuntu/ windows
-	// remove specific sections
-	// insert normalised
-
-	kernel := windowsJson["kernel"].(map[string]interface{})
-	windowsJson["description"] = kernel["name"]
-	osInfo := kernel["os_info"].(map[string]interface{})
-	windowsJson["serial_number"] = osInfo["serial_number"]
-	servicePackMajorVersion := fmt.Sprintf("%g", osInfo["service_pack_major_version"].(float64))
-	servicePackMinorVersion := fmt.Sprintf("%g", osInfo["service_pack_minor_version"].(float64))
-	servicePack := strings.Join([]string{servicePackMajorVersion, servicePackMinorVersion}, ".")
-	windowsJson["os_service_pack"] = servicePack
-
-	//delete(windowsJson, "kernel")
-
-	return windowsJson
+func getHostAttributes(attributesJson map[string]interface{}) (string, string, string) {
+	return attributesJson["ipaddress"].(string), attributesJson["macaddress"].(string), attributesJson["hostname"].(string)
 }

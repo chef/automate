@@ -1,14 +1,13 @@
 package postgres
 
 import (
-	gosql "database/sql"
-
 	"github.com/go-gorp/gorp"
 	_ "github.com/lib/pq"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/applications-service/pkg/config"
+	libdb "github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/db/migrator"
 	"github.com/chef/automate/lib/logger"
 )
@@ -50,7 +49,7 @@ func (db *Postgres) ping() error {
 
 // connect opens a connection to the database
 func (db *Postgres) connect() error {
-	dbMap, err := gosql.Open("postgres", db.URI)
+	dbMap, err := libdb.PGOpen(db.URI)
 	if err != nil {
 		return errors.Wrapf(err, "Failed to open database with uri: %s", db.URI)
 	}

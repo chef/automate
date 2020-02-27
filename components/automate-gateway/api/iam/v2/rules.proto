@@ -18,10 +18,6 @@ service Rules {
     option (google.api.http) = {
       post: "/iam/v2/projects/{project_id}/rules"
       body: "*"
-      additional_bindings {
-        post: "/iam/v2beta/projects/{project_id}/rules"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:projects:{project_id}";
     option (chef.automate.api.policy).action = "update";
@@ -33,10 +29,6 @@ service Rules {
     option (google.api.http) = {
       put: "/iam/v2/projects/{project_id}/rules/{id}"
       body: "*"
-      additional_bindings {
-        put: "/iam/v2beta/projects/{project_id}/rules/{id}"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:projects:{project_id}";
     option (chef.automate.api.policy).action = "update";
@@ -47,9 +39,6 @@ service Rules {
   rpc GetRule (GetRuleReq) returns (GetRuleResp) {
     option (google.api.http) = {
       get: "/iam/v2/projects/{project_id}/rules/{id}"
-      additional_bindings {
-        get: "/iam/v2beta/projects/{project_id}/rules/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:projects:{project_id}";
     option (chef.automate.api.policy).action = "get";
@@ -60,9 +49,6 @@ service Rules {
   rpc ListRulesForProject (ListRulesForProjectReq) returns (ListRulesForProjectResp) {
     option (google.api.http) = {
       get: "/iam/v2/projects/{id}/rules"
-      additional_bindings {
-        get: "/iam/v2beta/projects/{id}/rules"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:projects:{id}";
     option (chef.automate.api.policy).action = "get";
@@ -73,9 +59,6 @@ service Rules {
   rpc DeleteRule (DeleteRuleReq) returns (DeleteRuleResp) {
     option (google.api.http) = {
       delete: "/iam/v2/projects/{project_id}/rules/{id}"
-      additional_bindings {
-        delete: "/iam/v2beta/projects/{project_id}/rules/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:projects:{project_id}";
     option (chef.automate.api.policy).action = "update";
@@ -86,9 +69,6 @@ service Rules {
   rpc ApplyRulesStart (ApplyRulesStartReq) returns (ApplyRulesStartResp) {
     option (google.api.http) = {
       post: "/iam/v2/apply-rules"
-      additional_bindings {
-        post: "/iam/v2beta/apply-rules"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:rules";
     option (chef.automate.api.policy).action = "apply-rules-start";
@@ -99,9 +79,6 @@ service Rules {
   rpc ApplyRulesCancel (ApplyRulesCancelReq) returns (ApplyRulesCancelResp) {
     option (google.api.http) = {
       delete: "/iam/v2/apply-rules"
-      additional_bindings {
-        delete: "/iam/v2beta/apply-rules"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:rules";
     option (chef.automate.api.policy).action = "apply-rules-cancel";
@@ -112,9 +89,6 @@ service Rules {
   rpc ApplyRulesStatus (ApplyRulesStatusReq) returns (ApplyRulesStatusResp) {
     option (google.api.http) = {
       get: "/iam/v2/apply-rules"
-      additional_bindings {
-        get: "/iam/v2beta/apply-rules"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:rules";
     option (chef.automate.api.policy).action = "apply-rules-status";

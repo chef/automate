@@ -1,15 +1,15 @@
 import { set } from 'lodash/fp';
-import { MenuItemGroup } from './layout.model';
+import { Sidebars } from './layout.model';
 import { LayoutActions, LayoutActionTypes } from './layout.actions';
 
 export interface LayoutEntityState {
   showPageLoading: boolean;
-  menuGroups: MenuItemGroup[];
+  sidebars: Sidebars;
 }
 
 export const InitialState: LayoutEntityState = {
   showPageLoading: false,
-  menuGroups: []
+  sidebars: {}
 };
 
 export function layoutEntityReducer(
@@ -22,8 +22,8 @@ export function layoutEntityReducer(
       return set('showPageLoading', action.payload)(state);
     }
 
-    case LayoutActionTypes.UPDATE_SIDEBAR_MENU_GROUPS: {
-      return set('menuGroups', action.payload)(state);
+    case LayoutActionTypes.UPDATE_SIDEBARS: {
+      return set('sidebars', action.payload)(state);
     }
 
     default:

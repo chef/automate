@@ -1,7 +1,6 @@
 package datamigration
 
 import (
-	"database/sql"
 	"net/url"
 
 	"github.com/golang-migrate/migrate"
@@ -9,6 +8,7 @@ import (
 	_ "github.com/golang-migrate/migrate/source/file"     // make source available
 	"github.com/pkg/errors"
 
+	"github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -73,11 +73,11 @@ func (c *Config) Reset() error {
 }
 
 func (c *Config) open() (*migrate.Migrate, error) {
-	db, err := sql.Open("postgres", c.PGURL.String())
+	d, err := db.PGOpen(c.PGURL.String(), db.WithoutPinger())
 	if err != nil {
 		return nil, errors.Wrap(err, "init v2 sql client")
 	}
-	driver, err := postgres.WithInstance(db, &postgres.Config{
+	driver, err := postgres.WithInstance(d, &postgres.Config{
 		MigrationsTable: "data_migrations",
 	})
 	if err != nil {
