@@ -186,8 +186,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
                 icon: 'vpn_key',
                 route: '/settings/tokens',
                 authorized: {
-                  anyOf: [['/auth/tokens', 'get'],
-                  ['/iam/v2/tokens', 'get']]
+                  allOf: ['/iam/v2/tokens', 'get']
                 }
               }
             ]
