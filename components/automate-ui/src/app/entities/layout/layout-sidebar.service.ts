@@ -2,6 +2,7 @@ import { Injectable, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Subject, Observable, BehaviorSubject } from 'rxjs';
 
+import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { isProductDeployed } from 'app/staticConfig';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { clientRunsWorkflowEnabled } from 'app/entities/client-runs/client-runs.selectors';
@@ -23,6 +24,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
     private sidebars: Sidebars;
 
     constructor(
+        private store: Store<NgrxStateAtom>,
         private clientRunsStore: Store<fromClientRuns.ClientRunsEntityState>,
         private featureFlagsService: FeatureFlagsService
     ) {
