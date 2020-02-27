@@ -18,7 +18,7 @@ service NodesService {
 	/*
 	Create a node
 
-	Creates a node and adds it to the "Automate" node manager.
+	Creates a node and adds it to the Automate node manager.
 	Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
 	Useful for creating nodes for the purpose of running compliance scan jobs.
 
@@ -88,7 +88,7 @@ service NodesService {
 	/*
 	Update a node
 
-	This PUT operation overwrites ALL node details and requires the complete set of node details, 
+	This PUT operation overwrites ALL node details and requires the complete set of node details,
 	consisting of a FQDN or IP address, a user-specified name, and the ID for an ssh or winrm credential.
 	Substitute the desired values for the existing node details in the PUT message.
 
@@ -168,10 +168,10 @@ service NodesService {
 	/*
 	List and filter nodes
 
-	Makes a list of nodes. 
+	Makes a list of nodes.
 	Supports filtering, pagination, and sorting.
 	Adding a filter narrows the list of nodes only those that match the filter or filters.
-	Supported filters: 
+	Supported filters:
 	account_id, last_contact, manager_id, manager_type, name, platform_name,
 	platform_release, region, source_id, state, statechange_timerange, status,
 	last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
@@ -240,7 +240,7 @@ service NodesService {
 	/*
 	Bulk delete nodes
 
-	Deletes a set of nodes that match a filter. 
+	Deletes a set of nodes that match a filter.
 	Available filters: account_id, last_contact, manager_id, manager_type, name, platform_name,
 	platform_release, region, source_id, state, statechange_timerange, status,
 	last_run_timerange, last_scan_timerange, last_run_status, last_scan_status,
@@ -403,9 +403,9 @@ message Node {
 	string name_prefix = 27;
 	// List of projects associated with the node. Projects are a concept introduced in IAMv2.
 	repeated string projects = 28;
-	// Most recent node data from the last Chef Infra run results. 
+	// Most recent node data from the last Chef Infra run results.
 	LastContactData run_data = 29;
-	// Most recent compliance scan data for the node from the last InSpec scan. 
+	// Most recent compliance scan data for the node from the last InSpec scan.
 	LastContactData scan_data = 30;
 }
 
