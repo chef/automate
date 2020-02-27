@@ -52,13 +52,12 @@ h2 {
 mat-form-field {
   width: 120px;
   margin: 0 8px 0 0;
-}
 
-// this is not working but it is the cause of our box misalignment
-// .mat-form-field-infix {
-//     padding: 0;
-//     border-top: 0;
-// }
+  ::ng-deep .mat-form-field-infix {
+    padding: 0;
+    border-top: 0;
+  }
+}
 
 [panelClass="chef-dropdown"] {
   height: 45px;
