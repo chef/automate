@@ -6,7 +6,7 @@ info:
     To create admin token can and set it as an environment variable use the following command:
 
     ```
-    export TOKEN=`chef-automate iam token create <TOKEN-ID> --admin`
+    export TOKEN=`chef-automate iam token create <TOKEN-NAME> --admin`
     ```
 
     An admin token has unlimited access the entire Chef Automate API.
