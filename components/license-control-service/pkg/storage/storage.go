@@ -15,6 +15,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/components/license-control-service/pkg/keys"
+	"github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/db/migrator"
 	"github.com/chef/automate/lib/logger"
 )
@@ -84,11 +85,11 @@ type PGBackend struct {
 }
 
 func (p *PGBackend) Init(ctx context.Context, l *keys.LicenseParser) error {
-	db, err := sql.Open("postgres", p.pgURL)
+	d, err := db.PGOpenContext(ctx, p.pgURL)
 	if err != nil {
 		return errors.Wrap(err, "failed to open database connection")
 	}
-	p.db = db
+	p.db = d
 
 	err = migrator.Migrate(p.pgURL, p.migrationPath, logger.NewLogrusStandardLogger(), false)
 	if err != nil {

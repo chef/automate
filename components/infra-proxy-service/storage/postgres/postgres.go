@@ -9,6 +9,7 @@ import (
 
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
+	"github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/logger"
 )
 
@@ -37,16 +38,16 @@ func New(logger logger.Logger, migrationConfig migration.Config) (storage.Storag
 }
 
 func initPostgresDB(pgURL string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", pgURL)
+	d, err := db.PGOpen(pgURL)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := db.Ping(); err != nil {
+	if err := d.Ping(); err != nil {
 		return nil, errors.Wrap(err, "opening database connection")
 	}
 
-	return db, nil
+	return d, nil
 }
 
 // translate lib/pq error into storage.Err*
