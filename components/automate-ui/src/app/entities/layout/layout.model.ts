@@ -1,13 +1,32 @@
+import { Observable } from 'rxjs';
+
+// Sidebars {
+//   active: "dashboards",
+//   dashboards: []
+// }
+
+export interface Sidebars {
+  active?: string;
+  dashboards?: MenuItemGroup[];
+  applications?: MenuItemGroup[];
+  infrastructure?: MenuItemGroup[];
+  compliance?: MenuItemGroup[];
+  settings?: MenuItemGroup[];
+  profile?: MenuItemGroup[];
+}
+
 // MenuItemGroup {
 //   name: "Node Management",
 //   items: [],
-//   visible: true
+//   hasVisibleMenuItems: true,
+//   visible$: Observable<boolean>
 // }
 
 export interface MenuItemGroup {
   name: string;
   items: MenuItem[];
-  visible: any; // boolean or observable
+  hasVisibleMenuItems?: boolean;
+  visible$?: Observable<boolean>;
 }
 
 // MenuItem {
@@ -15,7 +34,7 @@ export interface MenuItemGroup {
 //   icon: "notifications",
 //   route: "/settings/data-feed",
 //   authorized: {},
-//   visible: true
+//   visible$: Observable<boolean>
 // }
 
 export interface MenuItem {
@@ -24,17 +43,18 @@ export interface MenuItem {
   iconRotation?: number;
   route: string;
   authorized?: Authorized;
-  visible: boolean;
+  visible$?: Observable<boolean>;
   openInNewPage?: boolean;
 }
 
 // Authorized {
-//   type: "notifications",
-//   permissions: "['/notifications/rules', 'get']"
+//   isAuthorized: false,
+//   allOf: "['/notifications/rules', 'get']"
+//   anyOf: "['/notifications/rules', 'get']"
 // }
 
 export interface Authorized {
-  name: string;
+  isAuthorized?: boolean;
   allOf?: any[];
   anyOf?: any[];
 }

@@ -8,7 +8,7 @@ import { isNil } from 'lodash/fp';
 import { HttpStatus } from 'app/types/types';
 import { ChefKeyboardEvent } from 'app/types/material-types';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { loading, EntityStatus, pending } from 'app/entities/entities';
 import { Server } from 'app/entities/servers/server.model';
 import {
@@ -58,7 +58,7 @@ export class ChefServersListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showInfrastructureSidebar();
+    this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     this.store.dispatch(new GetServers());
     this.store.pipe(
       select(saveStatus),

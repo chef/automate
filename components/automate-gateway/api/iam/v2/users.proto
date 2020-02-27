@@ -18,10 +18,6 @@ service Users {
     option (google.api.http) = {
       post: "/iam/v2/users"
       body: "*"
-      additional_bindings {
-        post: "/iam/v2beta/users"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:users";
     option (chef.automate.api.policy).action = "create";
@@ -31,9 +27,6 @@ service Users {
   rpc ListUsers (ListUsersReq) returns (ListUsersResp) {
     option (google.api.http) = {
       get: "/iam/v2/users"
-      additional_bindings {
-        get: "/iam/v2beta/users"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:users";
     option (chef.automate.api.policy).action = "read";
@@ -43,9 +36,6 @@ service Users {
   rpc GetUser (GetUserReq) returns (GetUserResp) {
     option (google.api.http) = {
       get: "/iam/v2/users/{id}"
-      additional_bindings {
-        get: "/iam/v2beta/users/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:users:{id}";
     option (chef.automate.api.policy).action = "get";
@@ -55,9 +45,6 @@ service Users {
   rpc DeleteUser (DeleteUserReq) returns (DeleteUserResp) {
     option (google.api.http) = {
       delete: "/iam/v2/users/{id}"
-      additional_bindings {
-        delete: "/iam/v2beta/users/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:users:{id}";
     option (chef.automate.api.policy).action = "delete";
@@ -68,10 +55,6 @@ service Users {
     option (google.api.http) = {
       put: "/iam/v2/users/{id}"
       body: "*"
-      additional_bindings {
-        put: "/iam/v2beta/users/{id}"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:users:{id}";
     option (chef.automate.api.policy).action = "update";
@@ -82,10 +65,6 @@ service Users {
     option (google.api.http) = {
       put: "/iam/v2/self/{id}"
       body: "*"
-      additional_bindings {
-        put: "/iam/v2beta/self/{id}"
-        body: "*"
-      }
     };
     // The users namespace, as opposed for auth:users, is for actions users
     // are allowed to perform on themselves by default without admin permissions.

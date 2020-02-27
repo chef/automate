@@ -5,8 +5,8 @@ import { Observable, Subject } from 'rxjs';
 import { LayoutSidebarService } from './layout-sidebar.service';
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';
-import { sidebarMenuGroups, showPageLoading } from './layout.selectors';
-import { ShowPageLoading, UpdateSidebarMenuGroups } from './layout.actions';
+import { sidebar,  showPageLoading } from './layout.selectors';
+import { ShowPageLoading } from './layout.actions';
 
 import { GetProjects } from 'app/entities/projects/project.actions';
 
@@ -16,6 +16,15 @@ enum Height {
   License = 39,
   ProcessProgressBar = 54,
   PendingEditsBar = 52
+}
+
+export enum Sidebar {
+  Dashboards = 'dashboards',
+  Applications = 'applications',
+  Infrastructure = 'infrastructure',
+  Compliance = 'compliance',
+  Settings = 'settings',
+  Profile = 'profile'
 }
 
 @Injectable({
@@ -39,7 +48,7 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     }
   };
   public contentHeight = `calc(100% - ${Height.Navigation}px)`;
-  public menuGroups$: Observable<MenuItemGroup[]>;
+  public sidebar$: Observable<MenuItemGroup[]>;
   public showPageLoading$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
 
@@ -47,7 +56,8 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     private store: Store<fromLayout.LayoutEntityState>,
     private layoutSidebarService: LayoutSidebarService
   ) {
-    this.menuGroups$ = store.select(sidebarMenuGroups);
+    this.store.dispatch(new GetProjects());
+    this.sidebar$ = store.select(sidebar);
     this.showPageLoading$ = store.select(showPageLoading);
     this.updateDisplay();
   }
@@ -61,11 +71,11 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  getContentStyle() {
+  getContentStyle(): any {
     return { 'height': this.contentHeight };
   }
 
-  updateDisplay() {
+  updateDisplay(): void {
     let combinedHeights = 0;
     if (this.layout.header.navigation) {
       combinedHeights += Height.Navigation;
@@ -87,7 +97,7 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
   }
 
   ShowPageLoading(showLoading: boolean): void {
-    this.store.dispatch(new ShowPageLoading(showLoading));
+    this.store.dispatch( new ShowPageLoading(showLoading));
   }
 
   showFullPage(): void {
@@ -104,39 +114,7 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     this.layout.userNotifications.display = true;
   }
 
-  showDashboardsSidebar(): void {
-    this.store.dispatch(new UpdateSidebarMenuGroups(
-      this.layoutSidebarService.getDashboardsSidebar()
-    ));
-  }
-
-  showApplicationsSidebar(): void {
-    this.store.dispatch(new UpdateSidebarMenuGroups(
-      this.layoutSidebarService.getApplicationsSidebar()
-    ));
-  }
-
-  showInfrastructureSidebar(): void {
-    this.store.dispatch(new UpdateSidebarMenuGroups(
-      this.layoutSidebarService.getInfrastructureSidebar()
-    ));
-  }
-
-  showComplianceSidebar(): void {
-    this.store.dispatch(new UpdateSidebarMenuGroups(
-      this.layoutSidebarService.getComplianceSidebar()
-    ));
-  }
-
-  showSettingsSidebar(): void {
-    this.store.dispatch(new UpdateSidebarMenuGroups(
-      this.layoutSidebarService.getSettingsSidebar()
-    ));
-  }
-
-  showUserProfileSidebar(): void {
-    this.store.dispatch(new UpdateSidebarMenuGroups(
-      this.layoutSidebarService.getUserProfileSidebar()
-    ));
+  showSidebar(sidebarName: string) {
+    this.layoutSidebarService.updateSidebars(sidebarName);
   }
 }

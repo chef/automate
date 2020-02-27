@@ -43,7 +43,7 @@ import {
   ClientRunsRequests
 } from '../../entities/client-runs/client-runs.requests';
 import { EntityStatus } from '../../entities/entities';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 
 @Component({
   selector: 'app-client-runs',
@@ -252,7 +252,7 @@ export class ClientRunsComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.layoutFacade.showInfrastructureSidebar();
+    this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     // Only load when first opening the /chef-runs page
     this.store.dispatch(new GetWorkflowEnabled());
 

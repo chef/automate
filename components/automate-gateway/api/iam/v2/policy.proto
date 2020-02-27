@@ -18,10 +18,6 @@ service Policies {
     option (google.api.http) = {
       post: "/iam/v2/policies"
       body: "*"
-      additional_bindings {
-        post: "/iam/v2beta/policies"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:policies";
     option (chef.automate.api.policy).action = "create";
@@ -31,9 +27,6 @@ service Policies {
   rpc GetPolicy (GetPolicyReq) returns (GetPolicyResp) {
     option (google.api.http) = {
       get: "/iam/v2/policies/{id}"
-      additional_bindings {
-        get: "/iam/v2beta/policies/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "get";
@@ -43,9 +36,6 @@ service Policies {
   rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {
     option (google.api.http) = {
       get: "/iam/v2/policies"
-      additional_bindings {
-        get: "/iam/v2beta/policies"      
-      }
     };
     option (chef.automate.api.policy).resource = "auth:policies";
     option (chef.automate.api.policy).action = "read";
@@ -55,9 +45,6 @@ service Policies {
   rpc DeletePolicy (DeletePolicyReq) returns (DeletePolicyResp) {
     option (google.api.http) = {
       delete: "/iam/v2/policies/{id}"
-      additional_bindings {
-        delete: "/iam/v2beta/policies/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "delete";
@@ -68,10 +55,6 @@ service Policies {
     option (google.api.http) = {
       put: "/iam/v2/policies/{id}"
       body: "*"
-      additional_bindings {
-        put: "/iam/v2beta/policies/{id}"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "update";
@@ -81,9 +64,6 @@ service Policies {
   rpc GetPolicyVersion (GetPolicyVersionReq) returns (GetPolicyVersionResp) {
     option (google.api.http) = {
       get: "/iam/v2/policy_version"
-      additional_bindings {
-        get: "/iam/v2beta/policy_version"     
-      }
     };
     option (chef.automate.api.policy).resource = "auth:policies";
     option (chef.automate.api.policy).action = "read";
@@ -93,9 +73,6 @@ service Policies {
   rpc ListPolicyMembers (ListPolicyMembersReq) returns (ListPolicyMembersResp) {
     option (google.api.http) = {
       get: "/iam/v2/policies/{id}/members"
-      additional_bindings {
-        get: "/iam/v2beta/policies/{id}/members"    
-      }
     };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "read";
@@ -106,10 +83,6 @@ service Policies {
     option (google.api.http) = {
       put: "/iam/v2/policies/{id}/members"
       body: "*"
-      additional_bindings {
-        put: "/iam/v2beta/policies/{id}/members"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "update";
@@ -120,10 +93,6 @@ service Policies {
     option (google.api.http) = {
       post: "/iam/v2/policies/{id}/members:remove"
       body: "*"
-      additional_bindings {
-        post: "/iam/v2beta/policies/{id}/members:remove"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "delete";
@@ -134,10 +103,6 @@ service Policies {
     option (google.api.http) = {
       post: "/iam/v2/policies/{id}/members:add"
       body: "*"
-      additional_bindings {
-        post: "/iam/v2beta/policies/{id}/members:add"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:policies:{id}";
     option (chef.automate.api.policy).action = "create";
@@ -148,10 +113,6 @@ service Policies {
     option (google.api.http) = {
       post: "/iam/v2/roles"
       body: "*"
-      additional_bindings {
-        post: "/iam/v2beta/roles"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:roles";
     option (chef.automate.api.policy).action = "create";
@@ -161,9 +122,6 @@ service Policies {
   rpc ListRoles (ListRolesReq) returns (ListRolesResp) {
     option (google.api.http) = {
       get: "/iam/v2/roles"
-      additional_bindings {
-        get: "/iam/v2beta/roles"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:roles";
     option (chef.automate.api.policy).action = "read";
@@ -173,9 +131,6 @@ service Policies {
   rpc GetRole (GetRoleReq) returns (GetRoleResp) {
     option (google.api.http) = {
       get: "/iam/v2/roles/{id}"
-      additional_bindings {
-        get: "/iam/v2beta/roles/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:roles:{id}";
     option (chef.automate.api.policy).action = "get";
@@ -185,9 +140,6 @@ service Policies {
   rpc DeleteRole (DeleteRoleReq) returns (DeleteRoleResp) {
     option (google.api.http) = {
       delete: "/iam/v2/roles/{id}"
-      additional_bindings {
-        delete: "/iam/v2beta/roles/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:roles:{id}";
     option (chef.automate.api.policy).action = "delete";
@@ -198,10 +150,6 @@ service Policies {
     option (google.api.http) = {
       put: "/iam/v2/roles/{id}"
       body: "*"
-      additional_bindings {
-        put: "/iam/v2beta/roles/{id}"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:roles:{id}";
     option (chef.automate.api.policy).action = "update";
@@ -212,10 +160,6 @@ service Policies {
     option (google.api.http) = {
       post: "/iam/v2/projects"
       body: "*"
-      additional_bindings {
-        post: "/iam/v2beta/projects"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:projects";
     option (chef.automate.api.policy).action = "create";
@@ -226,10 +170,6 @@ service Policies {
     option (google.api.http) = {
       put: "/iam/v2/projects/{id}"
       body: "*"
-      additional_bindings {
-        put: "/iam/v2beta/projects/{id}"
-        body: "*"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:projects:{id}";
     option (chef.automate.api.policy).action = "update";
@@ -239,9 +179,6 @@ service Policies {
   rpc GetProject (GetProjectReq) returns (GetProjectResp) {
     option (google.api.http) = {
       get: "/iam/v2/projects/{id}"
-      additional_bindings {
-        get: "/iam/v2beta/projects/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:projects:{id}";
     option (chef.automate.api.policy).action = "get";
@@ -251,9 +188,6 @@ service Policies {
   rpc ListProjects (ListProjectsReq) returns (ListProjectsResp) {
     option (google.api.http) = {
       get: "/iam/v2/projects"
-      additional_bindings {
-        get: "/iam/v2beta/projects"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:projects";
     option (chef.automate.api.policy).action = "read";
@@ -263,9 +197,6 @@ service Policies {
   rpc DeleteProject (DeleteProjectReq) returns (DeleteProjectResp) {
     option (google.api.http) = {
       delete: "/iam/v2/projects/{id}"
-      additional_bindings {
-        delete: "/iam/v2beta/projects/{id}"
-      }
     };
     option (chef.automate.api.policy).resource = "auth:projects:{id}";
     option (chef.automate.api.policy).action = "delete";
@@ -275,9 +206,6 @@ service Policies {
   rpc IntrospectAllProjects (ListProjectsReq) returns (ListProjectsResp) {
     option (google.api.http) = {
       get: "/iam/v2/introspect_projects"
-      additional_bindings {
-        get: "/iam/v2beta/introspect_projects"
-      }
     };
     option (chef.automate.api.policy).resource = "auth_introspection:introspect_all_projects";
     option (chef.automate.api.policy).action = "read";

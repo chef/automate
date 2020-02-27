@@ -68,10 +68,16 @@ type displayNode struct {
 
 // NodeExport streams a json or csv export
 func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.CfgMgmt_NodeExportServer) error {
-	exporter, err := getExportHandler(request.OutputType, stream)
-	if err != nil {
-		return err
+	var sendResult exportHandler
+	switch request.OutputType {
+	case "", "json":
+		sendResult = jsonExport(stream)
+	case "csv":
+		sendResult = csvExport(stream)
+	default:
+		return status.Error(codes.Unauthenticated, fmt.Sprintf("%s export is not supported", request.OutputType))
 	}
+
 	streamCtx := stream.Context()
 	deadline, ok := streamCtx.Deadline()
 	if !ok {
@@ -79,28 +85,7 @@ func (s *CfgMgmtServer) NodeExport(request *pRequest.NodeExport, stream service.
 	}
 	ctx, cancel := context.WithDeadline(streamCtx, deadline)
 	defer cancel()
-	return s.exportNodes(ctx, request, exporter)
-}
 
-func getExportHandler(outputType string, stream service.CfgMgmt_NodeExportServer) (exportHandler, error) {
-	switch outputType {
-	case "", "json":
-		return jsonExport(stream), nil
-	case "csv":
-		return csvExport(stream), nil
-	default:
-		return nil, status.Error(codes.Unauthenticated, fmt.Sprintf(outputType+" export is not supported"))
-	}
-}
-
-func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeExport,
-	sendResult exportHandler) error {
-	pageSize := 100
-	start := time.Time{}
-	end := time.Time{}
-	var cursorValue interface{}
-	cursorID := ""
-	sortField, sortAsc := request.Sorting.GetParameters()
 	nodeFilters, err := stringutils.FormatFiltersWithKeyConverter(request.Filter,
 		params.ConvertParamToNodeStateBackendLowerFilter)
 	if err != nil {
@@ -109,7 +94,7 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 
 	nodeFilters, err = filterByProjects(ctx, nodeFilters)
 	if err != nil {
-		return err
+		return status.Errorf(codes.InvalidArgument, err.Error())
 	}
 
 	// Adding the exists = true filter to the list of filters, because nodes
@@ -117,56 +102,111 @@ func (s *CfgMgmtServer) exportNodes(ctx context.Context, request *pRequest.NodeE
 	// even after the node no longer exists
 	nodeFilters["exists"] = []string{"true"}
 
-	actualSortField := params.ConvertParamToNodeStateBackendLowerFilter(sortField)
+	sortField, sortAsc := request.Sorting.GetParameters()
 
-	nodes, err := s.client.GetNodesPageByCursor(ctx, start, end,
-		nodeFilters, cursorValue, cursorID, pageSize, actualSortField, sortAsc)
-	if err != nil {
-		return status.Errorf(codes.Internal, err.Error())
-	}
+	nodePager := s.nodePager(ctx, sortField, sortAsc, nodeFilters)
 
-	for len(nodes) > 0 {
+	for {
+		nodes, err := nodePager()
+		if err != nil {
+			return status.Errorf(codes.Internal, err.Error())
+		}
+
 		err = sendResult(nodes)
 		if err != nil {
 			return status.Errorf(codes.Internal, "Failed to stream nodes Error: %s", err.Error())
 		}
 
-		lastNode := nodes[len(nodes)-1]
-		cursorID = lastNode.EntityUuid
-		cursorValue, err = backend.GetSortableFieldValue(sortField, lastNode)
-		if err != nil {
-			return err
-		}
-
-		nodes, err = s.client.GetNodesPageByCursor(ctx, start, end,
-			nodeFilters, cursorValue, cursorID, pageSize, actualSortField, sortAsc)
-		if err != nil {
-			return status.Errorf(codes.Internal, err.Error())
+		if len(nodes) == 0 {
+			break
 		}
 	}
 
 	return nil
 }
 
-func jsonExport(stream service.CfgMgmt_NodeExportServer) exportHandler {
-	return func(nodes []backend.Node) error {
-		displayNodeCollection := nodeCollectionToDisplayNodeCollection(nodes)
+func (s *CfgMgmtServer) nodePager(ctx context.Context, sortField string, sortAsc bool, nodeFilters map[string][]string) func() ([]backend.Node, error) {
+	pageSize := 100
+	start := time.Time{}
+	end := time.Time{}
+	var cursorValue interface{}
+	cursorID := ""
+	actualSortField := params.ConvertParamToNodeStateBackendLowerFilter(sortField)
 
-		raw, err := json.Marshal(displayNodeCollection)
+	return func() ([]backend.Node, error) {
+		nodes, err := s.client.GetNodesPageByCursor(ctx, start, end,
+			nodeFilters, cursorValue, cursorID, pageSize, actualSortField, sortAsc)
 		if err != nil {
-			return fmt.Errorf("Failed to marshal JSON export data: %+v", err)
+			return []backend.Node{}, err
 		}
 
-		reader := bytes.NewReader(raw)
-		buf := make([]byte, streamBufferSize)
+		if len(nodes) == 0 {
+			return []backend.Node{}, nil
+		}
+
+		lastNode := nodes[len(nodes)-1]
+		cursorID = lastNode.EntityUuid
+		cursorValue, err = backend.GetSortableFieldValue(sortField, lastNode)
+		if err != nil {
+			return []backend.Node{}, err
+		}
+
+		return nodes, nil
+	}
+}
+
+func jsonExport(stream service.CfgMgmt_NodeExportServer) exportHandler {
+	initialRun := true
+	return func(nodes []backend.Node) error {
+		// If this is the first set of nodes to export, prepend "[" to start a JSON document.
+		if initialRun {
+			err := stream.Send(&response.ExportData{Content: []byte{'['}})
+			if err != nil {
+				return err
+			}
+			initialRun = false
+			// If this is not the first set of nodes and the collection has elements,
+			// prepend the "," that couldn't get added in the previous call to this function.
+		} else if len(nodes) != 0 {
+			err := stream.Send(&response.ExportData{Content: []byte{','}})
+			if err != nil {
+				return err
+			}
+		}
+
+		// If the collection has no elements, append "]" to close the JSON document and stop.
+		if len(nodes) == 0 {
+			err := stream.Send(&response.ExportData{Content: []byte{']'}})
+			if err != nil {
+				return err
+			}
+			return nil
+		}
 
 		writer := chunks.NewWriter(streamBufferSize, func(p []byte) error {
 			return stream.Send(&response.ExportData{Content: p})
 		})
+		buf := make([]byte, streamBufferSize)
 
-		_, err = io.CopyBuffer(writer, reader, buf)
-		if err != nil {
-			return fmt.Errorf("Failed to export JSON: %+v", err)
+		for i := range nodes {
+			raw, err := json.Marshal(nodeToDisplayNode(nodes[i]))
+			if err != nil {
+				return fmt.Errorf("Failed to marshal JSON export data: %+v", err)
+			}
+
+			// If this is the last element of the collection passed to this function call,
+			// there is not enough information to know if this is the last element overall.
+			// So, only append "," if it can be determined that there are more elements.
+			if i != len(nodes)-1 {
+				raw = append(raw, ',')
+			}
+
+			reader := bytes.NewReader(raw)
+
+			_, err = io.CopyBuffer(writer, reader, buf)
+			if err != nil {
+				return fmt.Errorf("Failed to export JSON: %+v", err)
+			}
 		}
 
 		return nil

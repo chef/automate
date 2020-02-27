@@ -163,156 +163,6 @@ func init() {
           "Users"
         ]
       }
-    },
-    "/iam/v2beta/self/{id}": {
-      "put": {
-        "operationId": "UpdateSelf2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.UpdateSelfResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "The id cannot be changed, it's for determining which user this is supposed\nto update",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.UpdateSelfReq"
-            }
-          }
-        ],
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/iam/v2beta/users": {
-      "get": {
-        "operationId": "ListUsers2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.ListUsersResp"
-            }
-          }
-        },
-        "tags": [
-          "Users"
-        ]
-      },
-      "post": {
-        "operationId": "CreateUser2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.CreateUserResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.CreateUserReq"
-            }
-          }
-        ],
-        "tags": [
-          "Users"
-        ]
-      }
-    },
-    "/iam/v2beta/users/{id}": {
-      "get": {
-        "operationId": "GetUser2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.GetUserResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Users"
-        ]
-      },
-      "delete": {
-        "operationId": "DeleteUser2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.DeleteUserResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Users"
-        ]
-      },
-      "put": {
-        "operationId": "UpdateUser2",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.UpdateUserResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "description": "The id cannot be changed, it's for determining which user this is supposed\nto update",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.iam.v2.UpdateUserReq"
-            }
-          }
-        ],
-        "tags": [
-          "Users"
-        ]
-      }
     }
   },
   "definitions": {
@@ -328,7 +178,12 @@ func init() {
         "password": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "id",
+        "name",
+        "password"
+      ]
     },
     "chef.automate.api.iam.v2.CreateUserResp": {
       "type": "object",
@@ -377,7 +232,11 @@ func init() {
         "previous_password": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateSelfResp": {
       "type": "object",
@@ -400,7 +259,11 @@ func init() {
         "password": {
           "type": "string"
         }
-      }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateUserResp": {
       "type": "object",

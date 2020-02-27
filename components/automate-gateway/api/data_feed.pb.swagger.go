@@ -197,6 +197,10 @@ func init() {
         "success": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },
@@ -300,6 +304,10 @@ func init() {
         "success": {
           "type": "boolean",
           "format": "boolean"
+        },
+        "id": {
+          "type": "string",
+          "format": "int64"
         }
       }
     },

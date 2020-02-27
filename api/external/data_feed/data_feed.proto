@@ -104,6 +104,7 @@ message AddDestinationRequest {
 
 message AddDestinationResponse {
   bool success = 1;
+  int64 id = 2;
 }
 
 message GetDestinationRequest {
@@ -112,7 +113,7 @@ message GetDestinationRequest {
 
 message GetDestinationResponse {
   bool success  = 1;
-	int64  id		  = 2;
+  int64  id		= 2;
   string name   = 3;
   string url    = 4;
   string secret = 5;
@@ -127,7 +128,7 @@ message DeleteDestinationResponse {
 }
 
 message UpdateDestinationRequest {	
-	int64  id		  = 1;
+  int64  id		= 1;
   string name   = 2;
   string url    = 3;
   string secret = 4;
@@ -135,6 +136,7 @@ message UpdateDestinationRequest {
 
 message UpdateDestinationResponse {
   bool success = 1;
+  int64 id = 2;
 }
 
 message ListDestinationRequest {}
