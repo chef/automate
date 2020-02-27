@@ -2,7 +2,7 @@
 
 #shellcheck disable=SC2034
 test_name="reset admin access v2"
-test_deploy_inspec_profiles=(a2-iam-v2-integration a2-iam-v2-upgrade-legacy-v1-policies)
+test_deploy_inspec_profiles=(a2-api-integration a2-iam-integration)
 # Note: we can't run diagnostics AND inspec, so skip diagnostics
 test_skip_diagnostics=true
 
