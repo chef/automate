@@ -20,6 +20,8 @@ control 'iam-custom-legacy-policies-to-migrate-1' do
   
     before(:all) do
       create_non_admin_resp = automate_api_request(
+        # we need to keep this deprecated path here because this test is run
+        # on an older version of Automate
         '/api/v0/auth/users',
         http_method: 'POST',
         request_body: {
@@ -32,11 +34,13 @@ control 'iam-custom-legacy-policies-to-migrate-1' do
       expect(create_non_admin_resp.http_status.to_s).to match(/200|409/)
 
       test_token_resp = automate_api_request(
+        # we need to keep this deprecated path here because this test is run
+        # on an older version of Automate
         '/api/v0/auth/tokens',
         http_method: 'POST',
         request_body: {
           'id': MIGRATED_TOKEN_ID,
-          'values': MIGRATED_TOKEN,
+          'value': MIGRATED_TOKEN,
           'description': 'v1 inspec admin token to be migrated',
           'active': true
         }.to_json
@@ -52,6 +56,8 @@ control 'iam-custom-legacy-policies-to-migrate-1' do
       it 'can create policy for token to make it an admin token' do
         expect(
           automate_api_request(
+            # we need to keep this deprecated path here because this test is run
+            # on an older version of Automate
             '/api/v0/auth/policies',
             http_method: 'POST',
             request_body: {
@@ -66,6 +72,8 @@ control 'iam-custom-legacy-policies-to-migrate-1' do
       it 'token with admin permissions can access policies (admin-only resource)' do
         expect(
           automate_client_api_request(
+            # we need to keep this deprecated path here because this test is run
+            # on an older version of Automate
             '/api/v0/auth/policies',
             TOKEN
           ).http_status
@@ -77,6 +85,8 @@ control 'iam-custom-legacy-policies-to-migrate-1' do
       it 'can create policy for a user to grant them access to view the teams list' do
         expect(
           automate_api_request(
+            # we need to keep this deprecated path here because this test is run
+            # on an older version of Automate
             '/api/v0/auth/policies',
             http_method: 'POST',
             request_body: {
@@ -91,6 +101,8 @@ control 'iam-custom-legacy-policies-to-migrate-1' do
       it 'the team-viewer user can access the team list' do
         expect(
           automate_api_request(
+            # we need to keep this deprecated path here because this test is run
+            # on an older version of Automate
             '/api/v0/auth/teams',
             http_method: 'GET',
             user: MIGRATED_TEAM_VIEWER
