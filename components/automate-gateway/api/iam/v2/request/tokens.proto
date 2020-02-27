@@ -12,7 +12,7 @@ message CreateTokenReq {
         required: ["id", "name"]
       }
     };
-    // Unique, user-specified ID. Cannot be changed.
+    // Unique ID. Cannot be changed.
     string id = 1;
     // Name for the token.
     string name = 2;
@@ -21,7 +21,7 @@ message CreateTokenReq {
     google.protobuf.BoolValue active = 3;
     // Unique value for the token; if omitted the system will generate this.
     string value = 4;
-    // List of projects this token belongs to; empty by default.
+    // List of projects this token belongs to.
     repeated string projects = 5;
 }
 
@@ -37,14 +37,14 @@ message UpdateTokenReq {
         required: ["name"]
       }
     };
-     // Unique, user-specified ID. Cannot be changed.
+     // Unique ID. Cannot be changed.
     string id = 1;
     // Name for the token.
     string name = 2;
     // Active state. Defaults to true.
     // If set to false, token will not be authenticated or authorized.
     google.protobuf.BoolValue active = 3;
-    // List of projects this token belongs to; empty by default.
+    // List of projects this token belongs to.
     repeated string projects = 5;
 }
 

@@ -21,6 +21,8 @@ service Tokens {
   Creates a token.
   Active defaults to true when not specified.
   Value is auto-generated when not specified.
+  
+  Example:
   ```
   {
     "name": "token 1",
@@ -31,6 +33,14 @@ service Tokens {
       "west-region"
     ]
   }
+  ```
+
+  Note that this creates *non-admin* tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using `tokens:*``).
+
+  You cannot create admin tokens via the REST API.
+  Admin tokens can only be created by specifying the `--admin` flag to this chef-automate sub-command:
+  ```
+  chef-automate iam token create <your-token-name> --admin`
   ```
 
   Authorization Action:
@@ -127,7 +137,7 @@ service Tokens {
   /*
   List all tokens
 
-  List all tokens.
+  List all tokens, both admin and non-admin.
 
   Authorization Action:
   ```

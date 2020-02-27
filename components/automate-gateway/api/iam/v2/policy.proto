@@ -17,9 +17,9 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 service Policies {
 
   /*
-  Create a new policy
+  Create a custom policy
 
-  Creates a new IAM policy used to control permissions in Automate.
+  Creates a custom IAM policy used to control permissions in Automate.
   A policy is composed of one or more statements that grant permissions to a set of members.
   Each statement contains a role as well as a list of projects.
 
@@ -27,8 +27,8 @@ service Policies {
   The project list defines the set of resources that the statement is scoped to.
   Pass `"projects": ["*"]` to scope a statement to every project.
 
-  A policy's top-level projects list defines which projects the policy belongs to (for filtering policies by their projects),
-  whereas the statement level projects list defines which project(s) the statement applies to.
+  A policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),
+  whereas the *statement-level* projects list defines which projects the statement applies to.
 
   This example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role
   on a few projects for all LDAP teams and a custom role `qa` on a specific project.
@@ -119,9 +119,9 @@ service Policies {
   };
 
   /*
-  Delete a policy
+  Delete a custom policy
 
-  Delete a policy.
+  Delete a specified custom policy. You cannot delete Chef-managed policies.
 
   Authorization Action:
   ```
@@ -142,17 +142,15 @@ service Policies {
   };
 
   /*
-  Update an existing policy
+  Update a custom policy
 
-  When updating a policy you must supply all of that policy's properties, not just the ones you wish to update.
-  Properties that you do not include are reset to empty values!
+  This operation overwrites all fields excepting ID,
+  including those omitted from the request, so be sure to specify all properties.
+  Properties that you do not include are reset to empty values.
   The only exception is the policy ID, which is immutable; it can only be set at creation time.
 
-  You can use this endpoint to modify Custom policies but not Chef-managed policies.
-
   While you can use this endpoint to update members on a policy, if that is the only
-  property you wish to modify (on either Custom or Chef-managed policies),
-  you might find it more convenient to use these endpoints instead:
+  property you wish to modify you might find it more convenient to use one of these endpoints instead:
   Add policy members, Remove policy members, or Replace policy members.
 
   Authorization Action:
@@ -223,10 +221,11 @@ service Policies {
   /*
   Replace policy members
 
-  Replace the entire member list for a specific policy with a new list.
+  Replace the entire member list of a specific policy with a new list.
+  You may use this endpoint to update members of either Custom or Chef-managed policies.
 
   Ensure each element of the members array is in the correct
-  [Member Expression] (https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+  [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
 
   Authorization Action:
   ```
@@ -250,11 +249,12 @@ service Policies {
   /*
   Remove policy members
 
-  Remove specific members from the member list for a specific policy. Silently ignores
+  Remove members from the member list of a specific policy. Silently ignores
   members that are not already part of the member list.
+  You may use this endpoint to update members of either Custom or Chef-managed policies.
 
   Ensure each element of the members array is in the correct
-  [Member Expression] (https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+  [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
 
   The removed members will still exist within Chef Automate, but are no longer associated with this policy.
 
@@ -280,10 +280,11 @@ service Policies {
   /*
   Add policy members
 
-  Add specific members to the member list for a specific policy.
+  Add members to the member list of a specific policy.
+  You may use this endpoint to update members of either Custom or Chef-managed policies.
 
   Ensure each element of the members array is in the correct
-  [Member Expression] (https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
+  [Member Expression](https://automate.chef.io/docs/iam-v2-guide/#member-expressions) format.
 
   Authorization Action:
   ```
@@ -305,15 +306,11 @@ service Policies {
   };
 
   /*
-  Create a new role
+  Create a custom role
 
   Creates a new role to be used in the policies that control permissions in Automate.
 
   A role defines the scope of actions in a policy statement.
-
-  There are several default *Chef-managed* roles that are essential to the operation of Chef Automate
-  and cannot be altered.
-  Roles that you create are *Custom* roles, and you have full control about modifying or deleting them.
 
   Authorization Action:
   ```
@@ -381,9 +378,9 @@ service Policies {
   };
 
   /*
-  Delete a role
+  Delete a custom role
 
-  Delete a specified role and removes it from any statements that may have been using it.
+  Delete a specified custom role (you cannot delete Chef-managed roles) and remove it from any statements that may have been using it.
   If such a statement has no other associated actions, the statement is deleted as well.
   Similarly, if that statement removal results in a policy with no other statements,
   that policy is removed as well.
@@ -407,7 +404,7 @@ service Policies {
   };
 
   /*
-  Update a role
+  Update a custom role
 
   This operation overwrites all fields excepting ID,
   including those omitted from the request, so be sure to specify all properties.

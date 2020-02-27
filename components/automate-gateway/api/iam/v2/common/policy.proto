@@ -13,16 +13,15 @@ enum Type {
 message Policy {
     // Name for the policy.
     string name = 1;
-    // Unique, user-specified ID. Cannot be changed.
+    // Unique ID. Cannot be changed.
     string id = 2;
-    // Whether this policy is user created or chef managed.
-    // One of `CUSTOM` or `CHEF_MANAGED`, respectively.
+    // This doc-comment is ignored for an enum.
     Type type = 3;
-    // Members affected by this policy.
+    // Members affected by this policy. May be empty.
     repeated string members = 4;
-    // Statements for the policy. Must contain one or more.
+    // Statements for the policy. Will contain one or more.
     repeated Statement statements = 5;
-    // The list of projects this policy belongs to.
+    // List of projects this policy belongs to. May be empty.
     repeated string projects = 6;
 }
 
@@ -31,10 +30,11 @@ message Statement {
         ALLOW = 0;
         DENY = 1;
     }
-    // Whether the statement allows (`ALLOW`) or denies (`DENY`).
+    // This doc-comment is ignored for an enum.
     Effect effect = 1;
 
-    // Actions defined inline. Best practices recommend that you use custom roles where practical.
+    // Actions defined inline. May be empty.
+    // Best practices recommend that you use custom roles rather than inline actions where practical.
     repeated string actions = 3;
 
     // The role defines a set of actions that the statement is scoped to.
@@ -43,27 +43,27 @@ message Statement {
     // DEPRECATED: Resources defined inline. Use projects instead.
     repeated string resources = 5;
 
-    // The project list defines the set of resources that the statement is scoped to.
+    // The project list defines the set of resources that the statement is scoped to. May be empty.
     repeated string projects = 6;
 }
 
 message Role {
     // Name for the role.
     string name = 1;
-    // Unique, user-specified ID. Cannot be changed.
+    // Unique ID. Cannot be changed.
     string id = 2;
     // Whether this policy is user created (`CUSTOM`) or chef managed (`CHEF_MANAGED`).
     Type type = 3;
-    // List of actions this role scopes to.
+    // List of actions this role scopes to. Will contain one or more.
     repeated string actions = 4;
-    // List of projects this role belongs to.
+    // List of projects this role belongs to. May be empty.
     repeated string projects = 5;
 }
 
 message Project {
     // Name for the project.
     string name = 1;
-    // Unique, user-specified ID. Cannot be changed.
+    // Unique ID. Cannot be changed.
     string id = 2;
     // Whether this policy is user created (`CUSTOM`) or chef managed (`CHEF_MANAGED`).
     Type type = 3;

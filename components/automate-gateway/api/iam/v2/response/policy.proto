@@ -6,6 +6,8 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/ia
 // Statement, Policy definitions
 import "components/automate-gateway/api/iam/v2/common/policy.proto";
 
+// NB: Doc annotations in responses will only apply for simple types; others will be ignored.
+
 message CreatePolicyResp {
   Policy policy = 1;
 }

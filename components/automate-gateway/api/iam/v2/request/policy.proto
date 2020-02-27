@@ -14,15 +14,15 @@ message CreatePolicyReq {
         required: ["id", "name", "statements"]
       }
     };
-    // Unique, user-specified ID. Cannot be changed.
+    // Unique ID. Cannot be changed.
     string id = 1;
     // Name for the policy.
     string name = 2;
-    // Members affected by this policy; empty by default.
+    // Members affected by this policy.
     repeated string members = 3;
     // Statements for the policy.
     repeated Statement statements = 4;
-    // List of projects this policy belongs to; empty by default.
+    // List of projects this policy belongs to.
     repeated string projects = 5;
 }
 
@@ -67,7 +67,7 @@ message UpdatePolicyReq {
         required: ["id", "name", "statements"]
       }
     };
-    // Unique, user-specified ID. Cannot be changed.
+    // Unique ID. Cannot be changed.
     string id = 1;
     // Members affected by this policy.
     repeated string members = 2;
@@ -75,7 +75,7 @@ message UpdatePolicyReq {
     repeated Statement statements = 3;
     // Name for this policy.
     string name = 8;
-    // List of projects this policy belongs to; empty by default.
+    // List of projects this policy belongs to.
     repeated string projects = 9;
 }
 
@@ -129,7 +129,7 @@ message CreateRoleReq {
         required: ["id", "name", "actions"]
       }
     };
-    // Unique, user-specified ID. Cannot be changed.
+    // Unique ID. Cannot be changed.
     string id = 1;
     // Name for the role.
     string name = 2;
@@ -165,7 +165,7 @@ message UpdateRoleReq {
         required: ["id", "name", "actions"]
       }
     };
-    // Unique, user-specified ID. Cannot be changed.
+    // Unique ID. Cannot be changed.
     string id = 1;
     // Name for the role.
     string name = 2;
@@ -195,7 +195,7 @@ message CreateProjectReq {
         required: ["id", "name"]
       }
     };
-    // Unique, user-specified ID. Cannot be changed.
+    // Unique ID. Cannot be changed.
     string id = 1;
     // Name for the new project.
     string name = 2;
@@ -207,7 +207,7 @@ message UpdateProjectReq {
         required: ["id", "name"]
       }
     };
-     // Unique, user-specified ID. Cannot be changed.
+     // Unique ID. Cannot be changed.
     string id = 1;
     // Name for the project.
     string name = 2;
