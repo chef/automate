@@ -4,9 +4,8 @@
 test_name="iam_v1_force_upgrade_to_v2"
 test_upgrades=true
 test_upgrade_strategy="none"
-# TODO decide what inspec profiles we want to test before AND after force-upgrade
 test_deploy_inspec_profiles=(a2-iam-v1-integration)
-test_upgrade_inspec_profiles=(a2-iam-legacy-integration)
+test_upgrade_inspec_profiles=(a2-iam-legacy-integration a2-api-integration)
 # Note: we can't run diagnostics AND inspec, so skip diagnostics
 test_skip_diagnostics=true
 
@@ -35,10 +34,3 @@ do_deploy() {
         --skip-preflight \
         --debug
 }
-
-
-
-# TODO 
-  # decide what inspec suites/diagnostics need to run in each test scenario (v1->v2, v2-no-legacy->v2, v2-legacy->v2)
-
-  # test anything else we expect after the force-upgrade (might need new inspec tests?)
