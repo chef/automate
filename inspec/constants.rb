@@ -10,12 +10,12 @@ DEFAULT_ROLE_IDS = [
     "ingest",
     "project-owner"
 ]
-DEFAULT_POLICY_IDS = [
-    "administrator-access",
-    "editor-access",
-    "viewer-access",
-    "ingest-access"
-]
+
+ADMIN_POLICY_ID = "administrator-access"
+EDITOR_POLICY_ID = "editor-access"
+VIEWER_POLICY_ID = "viewer-access"
+INGEST_POLICY_ID = "ingest-access"
+
 UNASSIGNED_PROJECT_ID = '(unassigned)'
 UNASSIGNED_PROJECT_NAME = UNASSIGNED_PROJECT_ID
 

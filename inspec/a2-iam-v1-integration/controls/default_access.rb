@@ -11,6 +11,8 @@
 # tests to give improve our confidence that we are permissioning our APIs correctly, we need
 # to make sure the routing is correct.
 
+# This test uses the v1 APIs because it runs on an older version of Automate
+
 require_relative '../../constants'
 
 title 'default authorization access control integration tests'

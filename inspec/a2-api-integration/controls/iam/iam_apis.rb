@@ -13,6 +13,7 @@ control 'iam-api-1' do
 
   TOKEN_ID = "iam-1-token-#{TIMESTAMP}"
   TOKEN_ID_2 = "iam-1-token-2-#{TIMESTAMP}"
+  TOKEN_ID_3 = "iam-1-token-3-#{TIMESTAMP}"
   TOKEN_NAME = 'iam REST API integration test token'
   USER_ID = "inspec-user-#{TIMESTAMP}"
   TEAM_ID = "inspec-team-#{TIMESTAMP}"
@@ -48,6 +49,8 @@ control 'iam-api-1' do
       resp = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}", http_method: 'DELETE')
       expect(resp.http_status.to_s).to match(/200|404/)
       resp = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID_2}", http_method: 'DELETE')
+      expect(resp.http_status.to_s).to match(/200|404/)
+      resp = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID_3}", http_method: 'DELETE')
       expect(resp.http_status.to_s).to match(/200|404/)
       resp = automate_api_request("/apis/iam/v2/projects/#{project_id}", http_method: 'DELETE')
       expect(resp.http_status.to_s).to match(/200|404/)
@@ -112,11 +115,10 @@ control 'iam-api-1' do
       resp = automate_api_request("/apis/iam/v2/tokens",
         http_method: 'POST',
         request_body: {
-          id: "project-missing-token-#{TIMESTAMP}",
-          name: "inspec test token create missing projects",
-          projects: []
+          id: TOKEN_ID_3,
+          name: TOKEN_ID_3
         }.to_json
-      )
+      ) 
       expect(resp.http_status).to eq 200
     end
 

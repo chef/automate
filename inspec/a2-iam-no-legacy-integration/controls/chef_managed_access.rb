@@ -18,10 +18,6 @@ control 'iam-chef-managed-access-1' do
 
   PROJECT_ID = "inspec-project-#{TIMESTAMP}"
 
-  # chef-managed IDs saved in inspec/constants.rb
-  ADMIN_POLICY_ID = DEFAULT_POLICY_IDS[0]
-  EDITOR_POLICY_ID = DEFAULT_POLICY_IDS[1]
-  VIEWER_POLICY_ID = DEFAULT_POLICY_IDS[2]
   PROJECT_OWNER_POLICY_ID = "#{PROJECT_ID}-project-owners"
 
   describe 'chef-managed policy access' do
