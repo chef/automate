@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/compliance/reporting/reporting.proto",
+    "title": "api/external/compliance/reporting/reporting.proto",
     "version": "version not set"
   },
   "consumes": [
