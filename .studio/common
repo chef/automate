@@ -60,7 +60,7 @@ function compile_go_protobuf_component() {
       case $path in
           # NOTE: Don't warn for services that haven't been moved or
           # which still have some protos that they use internally
-          api|api/config|automate-deployment|automate-gateway|compliance-service|nodemanager-service|notifications-service)
+          api|api/config|automate-deployment|automate-gateway|notifications-service)
               return 1
               ;;
           *)
