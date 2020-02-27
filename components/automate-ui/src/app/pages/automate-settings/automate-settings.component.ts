@@ -127,6 +127,8 @@ export class AutomateSettingsComponent implements OnInit {
   // patchDisableValue is the workaround for the chef-checkbox molecule since it is not
   // an input annotation we need to patch the value inside the FormGroup
   public patchDisableValue(form, checked: boolean) {
+    console.log(`${form} is checked: ${checked}`);
+    console.log(form.controls.disable.value);
     form.controls['disable'].setValue(checked);
   }
 
