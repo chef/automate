@@ -4,6 +4,7 @@
 test_name="iam_v1_force_upgrade_to_v2_diagnostics"
 test_upgrades=true
 test_upgrade_strategy="none"
+test_diagnostics_pre_upgrade_filters="~skip-for-deep-upgrade"
 
 # Note: we can't run diagnostics AND inspec, so skip diagnostics
 test_skip_diagnostics=false
