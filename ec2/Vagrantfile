@@ -291,9 +291,9 @@ Vagrant.configure('2') do |config|
     aws.secret_access_key = "#{aws_secret_access_key}"
     aws.session_token = "#{aws_session_token}" if aws_session_token
     aws.keypair_name = ENV['AWS_SSH_KEY_NAME']
-    aws.instance_type = 'm5.large'      # 2CPU, 8GB RAM
+    #aws.instance_type = 'm5.large'      # 2CPU, 8GB RAM
     #aws.instance_type = 'm5.xlarge'    # 4CPU, 16GB RAM
-    #aws.instance_type = 'm5.2xlarge'   # 8CPU, 32GB RAM
+    aws.instance_type = 'm5.2xlarge'   # 8CPU, 32GB RAM
     aws.region = 'us-east-2'            # US East (Ohio)
     aws.ami = 'ami-026f49896b1af2759'   # Ubuntu 18.04 LTS in region 'us-east-2'
     aws.tags = {
