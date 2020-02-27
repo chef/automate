@@ -43,7 +43,6 @@ import (
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_eventfeed "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
-	pb_iam_v2 "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	pb_legacy "github.com/chef/automate/components/automate-gateway/api/legacy"
 	pb_license "github.com/chef/automate/components/automate-gateway/api/license"
 	pb_notifications "github.com/chef/automate/components/automate-gateway/api/notifications"
@@ -191,15 +190,15 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create projects client for authz-service")
 	}
-	pb_iam_v2.RegisterPoliciesServer(grpcServer,
+	pb_iam.RegisterPoliciesServer(grpcServer,
 		handler_policies.NewServer(policiesClient, projectsClient, authzV2Client))
-	pb_iam_v2.RegisterRulesServer(grpcServer, handler_rules.NewServer(projectsClient))
+	pb_iam.RegisterRulesServer(grpcServer, handler_rules.NewServer(projectsClient))
 
 	tokensMgmtClient, err := clients.TokensMgmtClient()
 	if err != nil {
 		return errors.Wrap(err, "create client for tokens mgmt service")
 	}
-	pb_iam_v2.RegisterTokensServer(grpcServer, handler_tokens.NewServer(tokensMgmtClient))
+	pb_iam.RegisterTokensServer(grpcServer, handler_tokens.NewServer(tokensMgmtClient))
 
 	usersMgmtClient, err := clients.UsersMgmtClient()
 	if err != nil {
@@ -207,7 +206,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	}
 	pb_users.RegisterUsersMgmtServer(grpcServer, handler.NewUsersMgmtServer(usersMgmtClient))
 	// IAM v2 uses the same client
-	pb_iam_v2.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
+	pb_iam.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
 
 	teamsV1Client, err := clients.TeamsV1Client()
 	if err != nil {
@@ -219,7 +218,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create V2 client for teams service")
 	}
-	pb_iam_v2.RegisterTeamsServer(grpcServer, handler_teams.NewServer(teamsV2Client))
+	pb_iam.RegisterTeamsServer(grpcServer, handler_teams.NewServer(teamsV2Client))
 
 	secretsClient, err := clients.SecretClient()
 	if err != nil {
@@ -353,7 +352,7 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"gateway":              pb_gateway.RegisterGatewayHandlerFromEndpoint,
 		"legacy":               pb_legacy.RegisterLegacyDataCollectorHandlerFromEndpoint,
 		"license":              pb_license.RegisterLicenseHandlerFromEndpoint,
-		"auth tokens":          pb_iam_v2.RegisterTokensHandlerFromEndpoint,
+		"auth tokens":          pb_iam.RegisterTokensHandlerFromEndpoint,
 		"auth users":           pb_users.RegisterUsersMgmtHandlerFromEndpoint,
 		"authz":                pb_authz.RegisterAuthorizationHandlerFromEndpoint,
 		"secrets":              pb_secrets.RegisterSecretsServiceHandlerFromEndpoint,
@@ -374,11 +373,11 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 
 func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFeatureFlags) (http.Handler, func(), error) {
 	endpointMap := map[string]registerFunc{
-		"policies v2": pb_iam_v2.RegisterPoliciesHandlerFromEndpoint,
-		"users v2":    pb_iam_v2.RegisterUsersHandlerFromEndpoint,
-		"tokens v2":   pb_iam_v2.RegisterTokensHandlerFromEndpoint,
-		"teams v2":    pb_iam_v2.RegisterTeamsHandlerFromEndpoint,
-		"rules v2":    pb_iam_v2.RegisterRulesHandlerFromEndpoint,
+		"policies v2": pb_iam.RegisterPoliciesHandlerFromEndpoint,
+		"users v2":    pb_iam.RegisterUsersHandlerFromEndpoint,
+		"tokens v2":   pb_iam.RegisterTokensHandlerFromEndpoint,
+		"teams v2":    pb_iam.RegisterTeamsHandlerFromEndpoint,
+		"rules v2":    pb_iam.RegisterRulesHandlerFromEndpoint,
 	}
 	return muxFromRegisterMap(grpcURI, dopts, endpointMap)
 }

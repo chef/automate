@@ -6,7 +6,6 @@ import (
 	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
 	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
-	v2 "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 )
 
 // APIClient is an API client ready for making requests against our public API.
@@ -16,10 +15,10 @@ type APIClient interface {
 	// TODO (tc): Add other service clients here as needed.
 	AuthzClient() authz.AuthorizationClient
 	TeamsClient() teams.TeamsClient
-	TeamsV2Client() v2.TeamsClient
-	TokensV2Client() v2.TokensClient
+	TeamsV2Client() iam.TeamsClient
+	TokensClient() iam.TokensClient
 	UsersClient() users.UsersMgmtClient
-	PoliciesClient() v2.PoliciesClient
+	PoliciesClient() iam.PoliciesClient
 	ReportingClient() reporting.ReportingServiceClient
 	ApplicationsClient() applications.ApplicationsServiceClient
 	CloseConnection() error
