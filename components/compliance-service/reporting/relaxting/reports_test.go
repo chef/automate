@@ -117,7 +117,16 @@ func TestConvertControlFiltersByTagOnlyMatch(t *testing.T) {
 		StringTags: []ESInSpecReportControlStringTags{
 			{Key: "cci", Values: []string{""}},
 		},
+		WaivedStr: "yes_run",
+		WaiverData: &ESInSpecReportControlsWaiverData{
+			ExpirationDate:     "2025-06-01",
+			Run:                true,
+			Justification:      "Some reason",
+			SkippedDueToWaiver: false,
+			Message:            "Some message",
+		},
 	}
+
 	filters["control_tag:cci"] = []string{""}
 	convertedControl := convertControl(profileControlsMap, inspecReportControl789, filters)
 
@@ -131,5 +140,13 @@ func TestConvertControlFiltersByTagOnlyMatch(t *testing.T) {
 		StringTags: stringTags,
 		Refs:       make([]*reportingapi.Ref, 0),
 		Results:    make([]*reportingapi.Result, 0),
+		WaiverStr:  "yes_run",
+		WaiverData: &reportingapi.OrigWaiverData{
+			ExpirationDate:     "2025-06-01",
+			Run:                true,
+			Justification:      "Some reason",
+			SkippedDueToWaiver: false,
+			Message:            "Some message",
+		},
 	}, convertedControl)
 }

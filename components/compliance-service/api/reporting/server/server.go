@@ -95,7 +95,7 @@ func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*rep
 	return &ids, nil
 }
 
-// ReadReport returns a reports based on id
+// ReadReport returns a report based on id
 func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*reporting.Report, error) {
 	formattedFilters := formatFilters(in.Filters)
 	//todo - deep filtering - should we open this up to more than just one?  only for ReadReport?

@@ -544,6 +544,16 @@ func convertControl(profileControlsMap map[string]*reportingapi.Control, reportC
 		Title:          profileControl.Title,
 		SourceLocation: profileControl.SourceLocation,
 		Results:        minResults,
+		WaiverStr:      reportControlMin.WaivedStr,
+	}
+	if reportControlMin.WaiverData != nil {
+		convertedControl.WaiverData = &reportingapi.OrigWaiverData{
+			ExpirationDate:     reportControlMin.WaiverData.ExpirationDate,
+			Justification:      reportControlMin.WaiverData.Justification,
+			Run:                reportControlMin.WaiverData.Run,
+			SkippedDueToWaiver: reportControlMin.WaiverData.SkippedDueToWaiver,
+			Message:            reportControlMin.WaiverData.Message,
+		}
 	}
 
 	jsonTags := make(map[string]*reportingapi.TagValues, 0)
@@ -572,7 +582,6 @@ func convertControl(profileControlsMap map[string]*reportingapi.Control, reportC
 		}
 	}
 	return &convertedControl
-
 }
 
 func doesControlTagMatchFilter(filters map[string][]string,
