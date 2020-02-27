@@ -17,8 +17,8 @@
       "tags": ["service_groups", "retention"]
     },
     {
-      "name": "Authorization",
-      "tags": ["Policies"]
+      "name": "Identity and Access Management",
+      "tags": ["policies", "roles", "projects"]
     }
   ],
   "tags": [
@@ -29,6 +29,8 @@
     { "name": "service_groups", "x-displayName": "Service Groups and Services" },
     { "name": "retention", "x-displayName": "Service Management" },
     { "name": "NodeManagerService", "x-displayName": "Node Managers" },
-    { "name": "Policies", "x-displayName": "Identity and Access Management" }
+    { "name": "policies", "x-displayName": "IAM Policies" },
+    { "name": "roles", "x-displayName": "IAM Roles" },
+    { "name": "projects", "x-displayName": "IAM Projects" }
   ]
 }

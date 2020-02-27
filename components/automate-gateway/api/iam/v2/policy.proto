@@ -30,7 +30,7 @@ service Policies {
   whereas the statement level projects list defines which project(s) the statement applies to.
 
   This example creates a new policy in the (unassigned) project that grants the viewer role
-  on a few projects for all LDAP teams:
+  on a few projects for all LDAP teams and a custom role `qa` on a specific project:
 
   ```
   {
@@ -41,6 +41,10 @@ service Policies {
       {
         "role": "viewer",
         "projects": ["project1", "project2"]
+      },
+      {
+        "role": "qa",
+        "projects": ["acceptanceProject"]
       }
     ],
     "projects": []
@@ -56,9 +60,12 @@ service Policies {
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:policies";
     option (chef.automate.api.iam.policy).action = "iam:policies:create";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
   /*
-  Get an IAM policy
+  Get a policy
   */
   rpc GetPolicy (GetPolicyReq) returns (GetPolicyResp) {
     option (google.api.http) = {
@@ -68,9 +75,12 @@ service Policies {
     option (chef.automate.api.policy).action = "get";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
     option (chef.automate.api.iam.policy).action = "iam:policies:get"; // TODO: check
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
   /*
-  List all IAM policies
+  List all policies
   */
   rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {
     option (google.api.http) = {
@@ -80,9 +90,12 @@ service Policies {
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:policies";
     option (chef.automate.api.iam.policy).action = "iam:policies:list";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
   /*
-  Delete an IAM policy
+  Delete a policy
   */
   rpc DeletePolicy (DeletePolicyReq) returns (DeletePolicyResp) {
     option (google.api.http) = {
@@ -92,9 +105,12 @@ service Policies {
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
     option (chef.automate.api.iam.policy).action = "iam:policies:delete";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
   /*
-  Update an existing IAM policy
+  Update an existing policy
 
   Very similar to create except the ID cannot be changed.
   */
@@ -107,7 +123,10 @@ service Policies {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
     option (chef.automate.api.iam.policy).action = "iam:policies:update";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
   /*
   Get IAM version
 
@@ -121,7 +140,10 @@ service Policies {
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:policyVersion";
     option (chef.automate.api.iam.policy).action = "iam:policies:get";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
   /*
   List policy members
 
@@ -135,7 +157,10 @@ service Policies {
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:get";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
   /*
   Replace policy members
 
@@ -150,7 +175,10 @@ service Policies {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:update";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
   /*
   Remove policy members
 
@@ -166,7 +194,10 @@ service Policies {
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:delete";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
   /*
   Add policy members
 
@@ -181,11 +212,14 @@ service Policies {
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:create";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+		};
+  };
   /*
   Create a new role
 
-  Creates a new role to be used in the IAM policies that control permissions in Automate.
+  Creates a new role to be used in the policies that control permissions in Automate.
 
   A role defines the scope of actions in a policy statement.
   */
@@ -198,7 +232,10 @@ service Policies {
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:roles";
     option (chef.automate.api.iam.policy).action = "iam:roles:create";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "roles";
+		};
+  };
   /*
   List all roles
   */
@@ -210,7 +247,10 @@ service Policies {
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:roles";
     option (chef.automate.api.iam.policy).action = "iam:roles:list";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "roles";
+		};
+  };
   /*
   Get a role
   */
@@ -222,6 +262,9 @@ service Policies {
     option (chef.automate.api.policy).action = "get";
     option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
     option (chef.automate.api.iam.policy).action = "iam:roles:get";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "roles";
+		};
   };
   /*
   Delete a role
@@ -237,7 +280,10 @@ service Policies {
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
     option (chef.automate.api.iam.policy).action = "iam:roles:delete";
-    };
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "roles";
+		};
+  };
   /*
   Update a role
 
@@ -252,11 +298,14 @@ service Policies {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
     option (chef.automate.api.iam.policy).action = "iam:roles:update";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "roles";
+		};
   };
   /*
   Create a project
 
-  Creates a new project to be used in the IAM policies that control permissions in Automate.
+  Creates a new project to be used in the policies that control permissions in Automate.
 
   A project defines the scope of resources in a policy statement. Resources can be in more than one project.
   */
@@ -269,6 +318,9 @@ service Policies {
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:projects";
     option (chef.automate.api.iam.policy).action = "iam:projects:create";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+		};
   };
   /*
   Update a project
@@ -284,6 +336,9 @@ service Policies {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
     option (chef.automate.api.iam.policy).action = "iam:projects:update";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+		};
   };
   /*
   Get a project
@@ -296,6 +351,9 @@ service Policies {
     option (chef.automate.api.policy).action = "get";
     option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
     option (chef.automate.api.iam.policy).action = "iam:projects:get";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+		};
   };
   /*
   List all projects
@@ -308,6 +366,9 @@ service Policies {
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:projects";
     option (chef.automate.api.iam.policy).action = "iam:projects:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+		};
   };
   /*
   Delete a project
@@ -327,6 +388,9 @@ service Policies {
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
     option (chef.automate.api.iam.policy).action = "iam:projects:delete";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+		};
   };
 
   // Expose on GRPC API only so we don't expose this to the enduser.
@@ -338,8 +402,8 @@ service Policies {
     option (chef.automate.api.iam.policy).action = "system:iam:upgrade";
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
 			tags: "hidden";
-		};
     };
+  };
   rpc ResetToV1 (ResetToV1Req) returns (ResetToV1Resp) {
     option (chef.automate.api.policy).resource = "system:iam:reset_to_v1";
     option (chef.automate.api.policy).action = "reset";
