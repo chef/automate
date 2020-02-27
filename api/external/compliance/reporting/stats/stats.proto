@@ -32,7 +32,6 @@ service StatsService {
 	```
 
 	Authorization Action:
-
 	```
 	compliance:reportSummary:get
 	```
@@ -74,7 +73,6 @@ service StatsService {
 	```
 
 	Authorization Action:
-
 	```
 	compliance:reportTrend:get
 	```
@@ -115,7 +113,6 @@ service StatsService {
 	```
 
 	Authorization Action:
-
 	```
 	compliance:reportProfiles:get
 	```
@@ -155,7 +152,6 @@ service StatsService {
 	```
 
 	Authorization Action:
-
 	```
 	compliance:reportFailures:get
 	```
