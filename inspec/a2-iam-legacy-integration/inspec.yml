@@ -4,7 +4,7 @@ maintainer: Chef Software, Inc.
 copyright: Chef Software, Inc.
 copyright_email: engineering@chef.io
 license: All Rights Reserved
-summary: An InSpec profile for integration testing the force-upgrade from IAM v1 to IAM v2.1
+summary: An InSpec profile for integration testing the force-upgrade to IAM v2.1 with legacy policies
 version: 0.1.0
 depends:
   - name: a2-resource-pack

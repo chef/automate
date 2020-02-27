@@ -18,3 +18,7 @@ DEFAULT_POLICY_IDS = [
 ]
 UNASSIGNED_PROJECT_ID = '(unassigned)'
 UNASSIGNED_PROJECT_NAME = UNASSIGNED_PROJECT_ID
+
+MIGRATED_TOKEN_ID = "inspec-migrated-admin-token"
+MIGRATED_TOKEN = "o2Q8iCbyvxX8W4393BvyyqmL-ug="
+MIGRATED_TEAM_VIEWER = "inspec-test-non-admin"

@@ -4,7 +4,7 @@ maintainer: Chef Software, Inc.
 copyright: Chef Software, Inc.
 copyright_email: engineering@chef.io
 license: All Rights Reserved
-summary: An InSpec profile for integration testing deprecated IAM v1
+summary: An InSpec profile for integration testing deprecated IAM v1 behavior
 version: 0.1.0
 depends:
   - name: a2-resource-pack
