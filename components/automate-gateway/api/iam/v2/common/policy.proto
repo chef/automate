@@ -13,7 +13,7 @@ enum Type {
 message Policy {
     // Name for the policy.
     string name = 1;
-    // Unique ID for the policy. Cannot be changed after creation.
+    // Unique, user-specified ID. Cannot be changed.
     string id = 2;
     // Whether this policy is user created or chef managed.
     // One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
@@ -51,7 +51,7 @@ message Statement {
 message Role {
     // Name for the role.
     string name = 1;
-    // Unique ID for the role. Cannot be changed after creation.
+    // Unique, user-specified ID. Cannot be changed.
     string id = 2;
     // Whether this policy is user created or chef managed.
     // One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
@@ -65,7 +65,7 @@ message Role {
 message Project {
     // Name for the project.
     string name = 1;
-    // Unique ID for the project. Cannot be changed after creation.
+    // Unique, user-specified ID. Cannot be changed.
     string id = 2;
     // Whether this policy is user created or chef managed.
     // One of `CUSTOM`, or `CHEF_MANAGED`, respectively.
