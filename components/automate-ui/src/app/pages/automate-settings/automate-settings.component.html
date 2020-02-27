@@ -20,13 +20,19 @@
           <chef-button primary [disabled]="noChanges()" (click)="applyChanges()">Save Changes</chef-button>
         </div>
 
-        <div class="group-section">
+        <div class="group-section" [formGroup]="eventFeedForm">
           <h2>Event Feed</h2>
           <div class="checkbox-row">
             <div class="checkbox-container">
-              <chef-checkbox></chef-checkbox>
+              <chef-checkbox
+              [checked]="eventFeedForm.value.disable"
+              (change)="patchDisableValue(eventFeedForm, $event.detail)">
+            </chef-checkbox>
             </div>
-            <p>Remove event feed data after<input chefInput type="number" value="30" />days</p>
+            <p>Remove event feed data after
+              <input chefInput type="number" 
+              formControlName="threshold"
+              [disabled]="eventFeedForm.value.disable"/>days</p>
           </div>
 
           <div class="checkbox-row">
