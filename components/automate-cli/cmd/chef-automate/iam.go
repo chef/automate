@@ -274,7 +274,7 @@ func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
 		id = iamCmdFlags.tokenID
 	}
 
-	tokenResp, err := apiClient.TokensV2Client().CreateToken(ctx, &iam_req.CreateTokenReq{
+	tokenResp, err := apiClient.TokensClient().CreateToken(ctx, &iam_req.CreateTokenReq{
 		Id:     id,
 		Name:   name,
 		Active: &wrappers.BoolValue{Value: true},

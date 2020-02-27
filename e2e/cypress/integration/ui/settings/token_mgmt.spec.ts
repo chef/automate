@@ -16,10 +16,10 @@ describe('token management', () => {
       cy.request({
         auth: { bearer: admin.id_token },
         method: 'POST',
-        url: '/api/v0/auth/tokens',
+        url: '/apis/iam/v2/tokens',
         body: {
           id: tokenID1,
-          description: tokenName1,
+          name: tokenName1,
           active: true
         }
       });
@@ -27,10 +27,10 @@ describe('token management', () => {
       cy.request({
         auth: { bearer: admin.id_token },
         method: 'POST',
-        url: '/api/v0/auth/tokens',
+        url: '/apis/iam/v2/tokens',
         body: {
           id: tokenID2,
-          description: tokenName2,
+          name: tokenName2,
           active: false
         }
       });

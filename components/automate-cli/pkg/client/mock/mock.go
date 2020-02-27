@@ -8,11 +8,10 @@ import (
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	"github.com/chef/automate/components/automate-gateway/api/auth/tokens"
 	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
 	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
-	v2 "github.com/chef/automate/components/automate-gateway/api/iam/v2"
+	iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/test/helpers"
@@ -22,11 +21,10 @@ import (
 type Mock struct {
 	authzClient        authz.AuthorizationClient
 	teamsClient        teams.TeamsClient
-	teamsV2Client      v2.TeamsClient
-	tokensClient       tokens.TokensMgmtClient
-	tokensV2Client     v2.TokensClient
+	teamsV2Client      iam.TeamsClient
+	TokensClient       iam.TokensClient
 	usersClient        users.UsersMgmtClient
-	policiesClient     v2.PoliciesClient
+	policiesClient     iam.PoliciesClient
 	reportingClient    reporting.ReportingServiceClient
 	applicationsClient applications.ApplicationsServiceClient
 	close              func()
@@ -35,11 +33,10 @@ type Mock struct {
 // ServerMocks are mocked out API servers
 type ServerMocks struct {
 	AuthzMock    *authz.AuthorizationServerMock
-	PoliciesMock *v2.PoliciesServerMock
+	PoliciesMock *iam.PoliciesServerMock
 	TeamsMock    *teams.TeamsServerMock
-	TeamsV2Mock  *v2.TeamsServerMock
-	TokensMock   *tokens.TokensMgmtServerMock
-	TokensV2Mock *v2.TokensServerMock
+	TeamsV2Mock  *iam.TeamsServerMock
+	TokensMock   *iam.TokensServerMock
 	UsersMock    *users.UsersMgmtServerMock
 }
 
@@ -54,20 +51,17 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 	mockAuthz := authz.NewAuthorizationServerMock()
 	authz.RegisterAuthorizationServer(grpcGateway, mockAuthz)
 
-	mockV2Tokens := v2.NewTokensServerMock()
-	v2.RegisterTokensServer(grpcGateway, mockV2Tokens)
+	mockTokens := iam.NewTokensServerMock()
+	iam.RegisterTokensServer(grpcGateway, mockTokens)
 
-	mockPolicies := v2.NewPoliciesServerMock()
-	v2.RegisterPoliciesServer(grpcGateway, mockPolicies)
+	mockPolicies := iam.NewPoliciesServerMock()
+	iam.RegisterPoliciesServer(grpcGateway, mockPolicies)
 
 	mockTeams := teams.NewTeamsServerMock()
 	teams.RegisterTeamsServer(grpcGateway, mockTeams)
 
-	mockV2Teams := v2.NewTeamsServerMock()
-	v2.RegisterTeamsServer(grpcGateway, mockV2Teams)
-
-	mockTokens := tokens.NewTokensMgmtServerMock()
-	tokens.RegisterTokensMgmtServer(grpcGateway, mockTokens)
+	mockV2Teams := iam.NewTeamsServerMock()
+	iam.RegisterTeamsServer(grpcGateway, mockV2Teams)
 
 	mockUsers := users.NewUsersMgmtServerMock()
 	users.RegisterUsersMgmtServer(grpcGateway, mockUsers)
@@ -79,11 +73,10 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 	return Mock{
 			authzClient:        authz.NewAuthorizationClient(gatewayConn),
 			teamsClient:        teams.NewTeamsClient(gatewayConn),
-			teamsV2Client:      v2.NewTeamsClient(gatewayConn),
-			tokensClient:       tokens.NewTokensMgmtClient(gatewayConn),
-			tokensV2Client:     v2.NewTokensClient(gatewayConn),
+			teamsV2Client:      iam.NewTeamsClient(gatewayConn),
+			TokensClient:       iam.NewTokensClient(gatewayConn),
 			usersClient:        users.NewUsersMgmtClient(gatewayConn),
-			policiesClient:     v2.NewPoliciesClient(gatewayConn),
+			policiesClient:     iam.NewPoliciesClient(gatewayConn),
 			reportingClient:    reporting.NewReportingServiceClient(gatewayConn),
 			applicationsClient: applications.NewApplicationsServiceClient(gatewayConn),
 			close:              grpcServer.Close,
@@ -93,7 +86,6 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 			PoliciesMock: mockPolicies,
 			TeamsMock:    mockTeams,
 			TokensMock:   mockTokens,
-			TokensV2Mock: mockV2Tokens,
 			UsersMock:    mockUsers,
 		},
 		nil
@@ -110,18 +102,13 @@ func (c Mock) TeamsClient() teams.TeamsClient {
 }
 
 // TeamsClient returns mock TeamsClient
-func (c Mock) TeamsV2Client() v2.TeamsClient {
+func (c Mock) TeamsV2Client() iam.TeamsClient {
 	return c.teamsV2Client
 }
 
 // TokensClient returns mock TokensClient
-func (c Mock) TokensClient() tokens.TokensMgmtClient {
-	return c.tokensClient
-}
-
-// TokensV2Client returns mock TokensV2Client
-func (c Mock) TokensV2Client() v2.TokensClient {
-	return c.tokensV2Client
+func (c Mock) TokensClient() iam.TokensClient {
+	return c.TokensClient
 }
 
 // UsersClient returns mock UsersClient
@@ -130,7 +117,7 @@ func (c Mock) UsersClient() users.UsersMgmtClient {
 }
 
 // PoliciesClient returns mock PoliciesClient
-func (c Mock) PoliciesClient() v2.PoliciesClient {
+func (c Mock) PoliciesClient() iam.PoliciesClient {
 	return c.policiesClient
 }
 

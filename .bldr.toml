@@ -818,7 +818,6 @@ paths = [
   "api/config/ui/*",
   "api/config/workflow_nginx/*",
   "api/config/workflow_server/*",
-  "api/external/common/*",
   "api/external/ingest/*",
   "api/interservice/authn/*",
   "api/interservice/authz/*",

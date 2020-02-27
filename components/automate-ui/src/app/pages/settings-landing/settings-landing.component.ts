@@ -17,10 +17,7 @@ export class SettingsLandingComponent {
     { anyOfCheck: [['/retention/nodes/status', 'get', '']], route: '/settings/node-lifecycle' },
     { allOfCheck: [['/auth/users', 'get', '']], route: '/settings/users' },
     { allOfCheck: [['/auth/teams', 'get', '']], route: '/settings/teams' },
-    {
-      anyOfCheck: [['/auth/tokens', 'get', ''], ['/iam/v2/tokens', 'get', '']],
-      route: '/settings/tokens'
-    },
+    { allOfCheck: [['/iam/v2/tokens', 'get', '']], route: '/settings/tokens' },
     { allOfCheck: [['/iam/v2/policies', 'get', '']], route: '/settings/policies' },
     { allOfCheck: [['/iam/v2/roles', 'get', '']], route: '/settings/roles' },
     { allOfCheck: [['/iam/v2/projects', 'get', '']], route: '/settings/projects' }
