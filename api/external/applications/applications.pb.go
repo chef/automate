@@ -88,18 +88,18 @@ type ServicesReq struct {
 	// * `site`: the site field of the service's event-stream metadata
 	// * `group`: the suffix of the service group name
 	//
-	// Services may also be filtered by `status`, which refers to a service's
-	// connected/disconnected state or it's most recent healthcheck result. Valid
-	// status filter parameters are:
-	// * `status:disconnected`: only return services in the disconnected state
-	// * `status:critical`: only return services that are returning a "critical"
-	//   healthcheck result
-	// * `status:unknown`: only return services that are returning an "unknown"
-	//   healthcheck result
-	// * `status:warning`: only return services that are returning a "warning"
-	//   healthcheck result
-	// * `status:ok`: only return services that are returning "ok" health check
-	//   results
+	// `status` filters refine service results by a service's
+	//  current state or most recent healthcheck result.
+	//  Disconnected services keep their last healthcheck result
+	//  until their reports are removed by Chef Automate.
+	//  When you apply a healthcheck filter, the report includes
+	//  all recently disconnected services.
+	//  Valid status filter parameters are:
+	// * `status:disconnected`: returns services in a disconnected state
+	// * `status:critical`: returns services with a "critical" healthcheck result
+	// * `status:unknown`: returns services with an "unknown" healthcheck result
+	// * `status:warning`: returns services with a "warning" healthcheck result
+	// * `status:ok`: returns services with an  "ok" health check result
 	Filter []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
 	// Applies pagination parameters.
 	Pagination *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
@@ -1081,23 +1081,15 @@ type ServiceGroupsReq struct {
 	// * `site`: the site field of the service's event-stream metadata
 	// * `group`: the suffix of the service group name
 	//
-	// Service groups may also be filtered by `status`, which refers to a service's
-	// connected/disconnected state or it's most recent healthcheck result. Valid
-	// status filter parameters are:
-	// * `status:disconnected`: only return service groups that contain at least
-	//   one service in the disconnected state
-	// * `status:critical`: only return service groups that contain at least one
-	//   service that is returning a "critical" healthcheck result
-	// * `status:critical`: only return service groups that contain at least one
-	//   service that is returning a "critical" healthcheck result
-	// * `status:unknown`: only return service groups that contain at least one
-	//   service that is returning an "unknown" healthcheck result and no
-	//   services returning "critical" results
-	// * `status:warning`: only return service groups that contain at least one
-	//   service that is returning a "warning" healthcheck result and have no
-	//   services returning "critical" or "unknown" results
-	// * `status:ok`: only return service groups where all services are returning
-	//   "ok" health check results
+	// `status` filters refine the service group results by a service's
+	//  most recent connected/disconnected state or healthcheck result.
+	//
+	//  Valid status filter parameters are:
+	// * `status:disconnected`: returns service groups with at least one service in a disconnected state
+	// * `status:critical`: returns service groups with a with at least one service in a "critical" healthcheck result
+	// * `status:unknown`: returns service groups with at least one service with an "unknown" healthcheck result
+	// * `status:warning`: returns service groups with at least one service with a "warning" healthcheck result
+	// * `status:ok`: returns service groups with at least one service with an "ok" health check result
 	Filter []string `protobuf:"bytes,1,rep,name=filter,proto3" json:"filter,omitempty"`
 	// Pagination parameters for service groups list.
 	Pagination *query.Pagination `protobuf:"bytes,2,opt,name=pagination,proto3" json:"pagination,omitempty"`
@@ -1715,7 +1707,7 @@ type ApplicationsServiceClient interface {
 	//List Service Groups
 	//
 	//Lists service groups with name, health information, and application, environment, package, release metadata.
-	//Accepts pagination, sorting, search and status filters.
+	//Accepts pagination, sorting, search, and status filters.
 	//
 	//Example:
 	//```
@@ -1786,7 +1778,7 @@ type ApplicationsServiceClient interface {
 	//
 	//Show Summary
 	//
-	//Shows a summary of service-groups, services, deployments and supervisors.
+	//Shows a summary of service-groups, services, deployments, and supervisors.
 	//Used for telemetry.
 	//Does not support filtering.
 	//
@@ -2053,7 +2045,7 @@ type ApplicationsServiceServer interface {
 	//List Service Groups
 	//
 	//Lists service groups with name, health information, and application, environment, package, release metadata.
-	//Accepts pagination, sorting, search and status filters.
+	//Accepts pagination, sorting, search, and status filters.
 	//
 	//Example:
 	//```
@@ -2124,7 +2116,7 @@ type ApplicationsServiceServer interface {
 	//
 	//Show Summary
 	//
-	//Shows a summary of service-groups, services, deployments and supervisors.
+	//Shows a summary of service-groups, services, deployments, and supervisors.
 	//Used for telemetry.
 	//Does not support filtering.
 	//
