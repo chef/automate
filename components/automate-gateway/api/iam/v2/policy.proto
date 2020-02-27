@@ -64,6 +64,7 @@ service Policies {
 			tags: "policies";
 		};
   };
+
   /*
   Get a policy
 
@@ -81,6 +82,7 @@ service Policies {
 			tags: "policies";
 		};
   };
+
   /*
   List all policies
 
@@ -98,6 +100,7 @@ service Policies {
 			tags: "policies";
 		};
   };
+
   /*
   Delete a policy
 
@@ -115,10 +118,22 @@ service Policies {
 			tags: "policies";
 		};
   };
+
   /*
   Update an existing policy
 
-  Very similar to create except the ID cannot be changed.
+  When updating a policy you must supply all of that policy's properties, not just the ones you wish to update.
+  Properties that you do not include are reset to empty values!
+  The only exception is the policy ID, which is immutable; it can only be set at creation time.
+
+  You can use this endpoint to modify Custom policies but not Chef-managed policies.
+
+  While you can use this endpoint to update members on a policy, if that is the only
+  property you wish to modify (on either Custom or Chef-managed policies),
+  you might find it more convenient to use these endpoints instead:
+    Add policy members
+    Remove policy members
+    Replace policy members
   */
   rpc UpdatePolicy (UpdatePolicyReq) returns (UpdatePolicyResp) {
     option (google.api.http) = {
@@ -133,6 +148,7 @@ service Policies {
 			tags: "policies";
 		};
   };
+
   /*
   Get IAM version
 
@@ -150,6 +166,7 @@ service Policies {
 			tags: "policies";
 		};
   };
+
   /*
   List policy members
 
@@ -167,10 +184,14 @@ service Policies {
 			tags: "policies";
 		};
   };
+
   /*
   Replace policy members
 
   Replace the entire member list for a specific policy with a new list.
+
+  Ensure each element of the members array is in the correct
+  [Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
   */
   rpc ReplacePolicyMembers (ReplacePolicyMembersReq) returns (ReplacePolicyMembersResp) {
     option (google.api.http) = {
@@ -185,11 +206,17 @@ service Policies {
 			tags: "policies";
 		};
   };
+
   /*
   Remove policy members
 
   Remove specific members from the member list for a specific policy. Silently ignores
   members that are not already part of the member list.
+
+  Ensure each element of the members array is in the correct
+  [Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
+
+  The removed members will still exist within Chef Automate, but are no longer associated with this policy.
   */
   rpc RemovePolicyMembers (RemovePolicyMembersReq) returns (RemovePolicyMembersResp) {
     option (google.api.http) = {
@@ -204,10 +231,14 @@ service Policies {
 			tags: "policies";
 		};
   };
+
   /*
   Add policy members
 
   Add specific members to the member list for a specific policy.
+
+  Ensure each element of the members array is in the correct
+  [Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
   */
   rpc AddPolicyMembers (AddPolicyMembersReq) returns (AddPolicyMembersResp) {
     option (google.api.http) = {
@@ -222,12 +253,17 @@ service Policies {
 			tags: "policies";
 		};
   };
+
   /*
   Create a new role
 
   Creates a new role to be used in the policies that control permissions in Automate.
 
   A role defines the scope of actions in a policy statement.
+
+  There are several default *Chef-managed* roles that are essential to the operation of Chef Automate
+  and cannot be altered.
+  Roles that you create are *Custom* roles, and you have full control about modifying or deleting them.
   */
   rpc CreateRole (CreateRoleReq) returns (CreateRoleResp) {
     option (google.api.http) = {
@@ -242,10 +278,11 @@ service Policies {
 			tags: "roles";
 		};
   };
+
   /*
   List all roles
 
-  List all roles.
+  List all *Chef-managed* and *Custom* roles.
   */
   rpc ListRoles (ListRolesReq) returns (ListRolesResp) {
     option (google.api.http) = {
@@ -259,6 +296,7 @@ service Policies {
 			tags: "roles";
 		};
   };
+
   /*
   Get a role
 
@@ -276,6 +314,7 @@ service Policies {
 			tags: "roles";
 		};
   };
+
   /*
   Delete a role
 
@@ -296,10 +335,13 @@ service Policies {
 			tags: "roles";
 		};
   };
+
   /*
   Update a role
 
-  Update an existing role. Very similar to create except the ID cannot be changed.
+  When updating a role supply all of a role's properties, not just the ones you wish to update.
+  Properties that you do not include are reset to empty values.
+  The only exception is the role ID, which is immutable; it can only be set at creation time.
   */
   rpc UpdateRole (UpdateRoleReq) returns (UpdateRoleResp) {
     option (google.api.http) = {
@@ -314,6 +356,7 @@ service Policies {
 			tags: "roles";
 		};
   };
+
   /*
   Create a project
 
@@ -334,6 +377,7 @@ service Policies {
 			tags: "projects";
 		};
   };
+
   /*
   Update a project
 
@@ -352,6 +396,7 @@ service Policies {
 			tags: "projects";
 		};
   };
+
   /*
   Get a project
 
@@ -369,6 +414,7 @@ service Policies {
 			tags: "projects";
 		};
   };
+
   /*
   List all projects
 
@@ -386,6 +432,7 @@ service Policies {
 			tags: "projects";
 		};
   };
+
   /*
   Delete a project
 
