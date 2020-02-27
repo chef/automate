@@ -6,6 +6,7 @@ hab pkg install -b core/go core/git core/ruby core/jq-static core/shellcheck cor
 
 echo "Checking Go Dependencies"
 go mod verify
+go mod tidy -v
 git diff --exit-code --ignore-submodules=all # fail if anything's been changed
 
 echo "Checking automate-deployment binds.txt"
