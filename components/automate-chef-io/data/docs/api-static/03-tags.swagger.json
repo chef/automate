@@ -15,6 +15,10 @@
     {
       "name": "Applications",
       "tags": ["service_groups", "retention"]
+    },
+    {
+      "name": "Authorization",
+      "tags": ["Policies"]
     }
   ],
   "tags": [
@@ -24,6 +28,7 @@
     { "name": "NodesService", "x-displayName": "Managed Nodes" },
     { "name": "service_groups", "x-displayName": "Service Groups and Services" },
     { "name": "retention", "x-displayName": "Service Management" },
-    { "name": "NodeManagerService", "x-displayName": "Node Managers" }
+    { "name": "NodeManagerService", "x-displayName": "Node Managers" },
+    { "name": "Policies", "x-displayName": "Identity and Access Management" }
   ]
 }

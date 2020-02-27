@@ -4,6 +4,7 @@ package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2";
 
 import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 
 import "components/automate-gateway/api/iam/v2/request/policy.proto";
 import "components/automate-gateway/api/iam/v2/response/policy.proto";
@@ -14,6 +15,38 @@ import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Policies {
+  /*
+  Create a new policy
+
+  Creates a new IAM policy used to control permissions in Automate.
+  A policy is composed of one or more statements that act on a set of members.
+  Each statement contains a role as well as a list of projects.
+
+  The role defines a set of actions that the statement is scoped to.
+  The project list defines the set of resources that the statement is scoped to.
+  Pass `"projects": ["*"]` to scope a statement to every project.
+
+  The top-level projects list for the policy defines which project(s) the policy belongs to,
+  whereas the statement level projects list defines which project(s) the statement applies to.
+
+  This example creates a new policy in the (unassigned) project that grants the viewer role
+  on a few projects for all LDAP teams:
+
+  ```
+  {
+    "name": "My Viewer Policy",
+    "id": "viewer-policy",
+    "members": ["team:ldap:*"],
+    "statements" : [
+      {
+        "role": "viewer",
+        "projects": ["project1", "project2"]
+      }
+    ],
+    "projects": []
+  }
+  ```
+  */
   rpc CreatePolicy (CreatePolicyReq) returns (CreatePolicyResp) {
     option (google.api.http) = {
       post: "/iam/v2/policies"
@@ -24,6 +57,9 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:policies";
     option (chef.automate.api.iam.policy).action = "iam:policies:create";
     };
+  /*
+  Get an IAM policy
+  */
   rpc GetPolicy (GetPolicyReq) returns (GetPolicyResp) {
     option (google.api.http) = {
       get: "/iam/v2/policies/{id}"
@@ -33,6 +69,9 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
     option (chef.automate.api.iam.policy).action = "iam:policies:get"; // TODO: check
     };
+  /*
+  List all IAM policies
+  */
   rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {
     option (google.api.http) = {
       get: "/iam/v2/policies"
@@ -42,6 +81,9 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:policies";
     option (chef.automate.api.iam.policy).action = "iam:policies:list";
     };
+  /*
+  Delete an IAM policy
+  */
   rpc DeletePolicy (DeletePolicyReq) returns (DeletePolicyResp) {
     option (google.api.http) = {
       delete: "/iam/v2/policies/{id}"
@@ -51,6 +93,11 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
     option (chef.automate.api.iam.policy).action = "iam:policies:delete";
     };
+  /*
+  Update an existing IAM policy
+
+  Very similar to create except the ID cannot be changed.
+  */
   rpc UpdatePolicy (UpdatePolicyReq) returns (UpdatePolicyResp) {
     option (google.api.http) = {
       put: "/iam/v2/policies/{id}"
@@ -61,6 +108,11 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
     option (chef.automate.api.iam.policy).action = "iam:policies:update";
     };
+  /*
+  Get IAM version
+
+  Returns the major and minor version of IAM that your automate installation is running.
+  */
   rpc GetPolicyVersion (GetPolicyVersionReq) returns (GetPolicyVersionResp) {
     option (google.api.http) = {
       get: "/iam/v2/policy_version"
@@ -70,6 +122,11 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:policyVersion";
     option (chef.automate.api.iam.policy).action = "iam:policies:get";
     };
+  /*
+  List policy members
+
+  List all members of a specific policy.
+  */
   rpc ListPolicyMembers (ListPolicyMembersReq) returns (ListPolicyMembersResp) {
     option (google.api.http) = {
       get: "/iam/v2/policies/{id}/members"
@@ -79,6 +136,11 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:get";
     };
+  /*
+  Replace policy members
+
+  Replace the entire member list for a specific policy with a new list.
+  */
   rpc ReplacePolicyMembers (ReplacePolicyMembersReq) returns (ReplacePolicyMembersResp) {
     option (google.api.http) = {
       put: "/iam/v2/policies/{id}/members"
@@ -89,6 +151,12 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:update";
     };
+  /*
+  Remove policy members
+
+  Remove specific members from the member list for a specific policy. Silently ignores
+  members that are not part of the member list.
+  */
   rpc RemovePolicyMembers (RemovePolicyMembersReq) returns (RemovePolicyMembersResp) {
     option (google.api.http) = {
       post: "/iam/v2/policies/{id}/members:remove"
@@ -99,6 +167,11 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:delete";
     };
+  /*
+  Add policy members
+
+  Add specific members to the member list for a specific policy.
+  */
   rpc AddPolicyMembers (AddPolicyMembersReq) returns (AddPolicyMembersResp) {
     option (google.api.http) = {
       post: "/iam/v2/policies/{id}/members:add"
@@ -109,6 +182,13 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:create";
     };
+  /*
+  Create a new role
+
+  Creates a new role to be used in the IAM policies that control permissions in Automate.
+
+  A role defines the scope for a set of actions.
+  */
   rpc CreateRole (CreateRoleReq) returns (CreateRoleResp) {
     option (google.api.http) = {
       post: "/iam/v2/roles"
@@ -119,6 +199,9 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:roles";
     option (chef.automate.api.iam.policy).action = "iam:roles:create";
     };
+  /*
+  List all roles
+  */
   rpc ListRoles (ListRolesReq) returns (ListRolesResp) {
     option (google.api.http) = {
       get: "/iam/v2/roles"
@@ -128,6 +211,9 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:roles";
     option (chef.automate.api.iam.policy).action = "iam:roles:list";
     };
+  /*
+  Get a role
+  */
   rpc GetRole (GetRoleReq) returns (GetRoleResp) {
     option (google.api.http) = {
       get: "/iam/v2/roles/{id}"
@@ -137,6 +223,12 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
     option (chef.automate.api.iam.policy).action = "iam:roles:get";
   };
+  /*
+  Delete a role
+
+  This will cascade delete any statements that only contain this role.
+  If the resulting policy has no statements, it is also deleted.
+  */
   rpc DeleteRole (DeleteRoleReq) returns (DeleteRoleResp) {
     option (google.api.http) = {
       delete: "/iam/v2/roles/{id}"
@@ -146,6 +238,11 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
     option (chef.automate.api.iam.policy).action = "iam:roles:delete";
     };
+  /*
+  Update a role
+
+  Update an existing role. Very similar to create except the ID cannot be changed.
+  */
   rpc UpdateRole (UpdateRoleReq) returns (UpdateRoleResp) {
     option (google.api.http) = {
       put: "/iam/v2/roles/{id}"
@@ -156,6 +253,13 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
     option (chef.automate.api.iam.policy).action = "iam:roles:update";
   };
+  /*
+  Create a project
+
+  Creates a new project to be used in the IAM policies that control permissions in Automate.
+
+  A project defines the scope for a set of resources. A resource can be in more than one project.
+  */
   rpc CreateProject (CreateProjectReq) returns (CreateProjectResp) {
     option (google.api.http) = {
       post: "/iam/v2/projects"
@@ -166,6 +270,11 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:projects";
     option (chef.automate.api.iam.policy).action = "iam:projects:create";
   };
+  /*
+  Update a project
+
+  Update an existing project. Very similar to create except the ID cannot be changed.
+  */
   rpc UpdateProject (UpdateProjectReq) returns (UpdateProjectResp) {
     option (google.api.http) = {
       put: "/iam/v2/projects/{id}"
@@ -176,6 +285,9 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
     option (chef.automate.api.iam.policy).action = "iam:projects:update";
   };
+  /*
+  Get a project
+  */
   rpc GetProject (GetProjectReq) returns (GetProjectResp) {
     option (google.api.http) = {
       get: "/iam/v2/projects/{id}"
@@ -185,6 +297,9 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
     option (chef.automate.api.iam.policy).action = "iam:projects:get";
   };
+  /*
+  List all projects
+  */
   rpc ListProjects (ListProjectsReq) returns (ListProjectsResp) {
     option (google.api.http) = {
       get: "/iam/v2/projects"
@@ -194,6 +309,16 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:projects";
     option (chef.automate.api.iam.policy).action = "iam:projects:list";
   };
+  /*
+  Delete a project
+
+  Deletes a project. Cascade deletes the project from any resources tagged with it.
+  If a resulting resource no longer belongs to any project, it goes into the (unassigned) project.
+
+  Also cascade deletes this project from any project list in all statements.
+  If the resulting project list for a given statement is empty, it is deleted.
+  If the resulting policy has no statements, it is also deleted.
+  */
   rpc DeleteProject (DeleteProjectReq) returns (DeleteProjectResp) {
     option (google.api.http) = {
       delete: "/iam/v2/projects/{id}"
@@ -203,6 +328,7 @@ service Policies {
     option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
     option (chef.automate.api.iam.policy).action = "iam:projects:delete";
   };
+
   // Expose on GRPC API only so we don't expose this to the enduser.
   // Just want to be able to trigger this via automate-cli.
   rpc UpgradeToV2 (UpgradeToV2Req) returns (UpgradeToV2Resp) {
@@ -210,12 +336,18 @@ service Policies {
     option (chef.automate.api.policy).action = "upgrade";
     option (chef.automate.api.iam.policy).resource = "system:iam:upgradeToV2";
     option (chef.automate.api.iam.policy).action = "system:iam:upgrade";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "hidden";
+		};
     };
   rpc ResetToV1 (ResetToV1Req) returns (ResetToV1Resp) {
     option (chef.automate.api.policy).resource = "system:iam:reset_to_v1";
     option (chef.automate.api.policy).action = "reset";
     option (chef.automate.api.iam.policy).resource = "system:iam:resetToV1";
     option (chef.automate.api.iam.policy).action = "system:iam:reset";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "hidden";
+		};
   };
   rpc IntrospectAllProjects (ListProjectsReq) returns (ListProjectsResp) {
     option (google.api.http) = {
@@ -225,6 +357,8 @@ service Policies {
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "iam:introspect";
     option (chef.automate.api.iam.policy).action = "iam:introspect:getAllProjects";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "hidden";
+		};
   };
- 
 }
