@@ -67,15 +67,15 @@ control 'iam-migrated-custom-legacy-policies-1' do
         expect(get_policies_resp.http_status).to eq 200
 
         all_policies = get_policies_resp.parsed_response_body[:policies]
-        legacy_policies = all_policies.select{ |p| /^\[Legacy\]/.match(p[:name]) }
+        custom_policies = all_policies.select{ |p| p[:type] == 'CUSTOM' }
 
-        # legacy policies have randomly generated IDs, so we have to search for our migrated policy
+        # custom legacy policies have randomly generated IDs, so we have to search for our migrated policy
         migrated_policy_found = false
-
-        legacy_policies.each do |policy|
+        custom_policies.each do |policy|
           first_statement = policy[:statements][0]
+
           # "auth:teams" resource is migrated to "iam:teams" and "read" is migrated to ["*:get", "*:list"]
-          if first_statement[:resource] == "iam:teams" && first_statement[:actions].sort == ["*:get", "*:list"]
+          if first_statement[:resources] == ["iam:teams"] && first_statement[:actions].sort == ["*:get", "*:list"]
             migrated_policy_found = true
           end
         end

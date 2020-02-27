@@ -66,6 +66,7 @@ control 'iam-legacy-access-control-1' do
 
       all_policies = resp.parsed_response_body[:policies]
       legacy_policies = all_policies.select{ |p| /^\[Legacy\]/.match(p[:name]) }
+      legacy_policy_ids = legacy_policies.map { |p| p[:id] }
 
       expected_policies = [
         "events-access-legacy", 
@@ -80,7 +81,7 @@ control 'iam-legacy-access-control-1' do
       ]
 
       expected_policies.each do |policy|
-        expect(legacy_policies).to include(policy)
+        expect(legacy_policy_ids).to include(policy)
       end
     end
 
