@@ -422,19 +422,6 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2"
-    command:
-      - integration/run_test integration/tests/iam_v2_no_legacy_policies.sh
-    timeout_in_minutes: 20
-    expeditor:
-      secrets:
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-      executor:
-        linux:
-          privileged: true
-
   - label: "iam v1 force-upgrade to v2"
     command:
       - integration/run_test integration/tests/iam_v1_force_upgrade_to_v2.sh
@@ -448,9 +435,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2 (v2 only, diagnostics)"
+  - label: "iam v1 force-upgrade to v2 (diagnostics only)"
     command:
-      - integration/run_test integration/tests/iam_v2_upgrade_diagnostics.sh
+      - integration/run_test integration/tests/iam_v1_force_upgrade_to_v2_diagnostics.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
@@ -736,9 +723,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "reset admin access v2"
+  - label: "reset admin access"
     command:
-      - integration/run_test integration/tests/reset_admin_access_v2.sh
+      - integration/run_test integration/tests/reset_admin_access.sh
     timeout_in_minutes: 20
     expeditor:
       executor:
