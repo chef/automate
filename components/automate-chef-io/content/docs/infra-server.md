@@ -39,7 +39,7 @@ For a single-host installation that contains Chef Infra Server and Chef Automate
 
 A single-host installation that contains Chef Infra Server and Chef Automate will require 80 GB of disk space plus 2 MB of disk space per managed node that is available to `/hab`.
 
-### Via Command Line
+### Installation Via Command Line
 
 To install Chef Automate and Chef Infra Server on the same host, run this command:
 
@@ -47,7 +47,7 @@ To install Chef Automate and Chef Infra Server on the same host, run this comman
 sudo chef-automate deploy --product automate --product chef-server
 ```
 
-### Via Configuration
+### Installation Via Configuration
 
 To install Chef Automate and Chef Infra Server on the same host via configuration will still require a command line interface.
 
@@ -80,7 +80,7 @@ You can use either a command line option or a configuration file to install Chef
 
 For a standalone Chef Infra Server installation, see the [hardware requirements for Chef Infra Server](https://docs.chef.io/install_server_pre/) for guidance on memory and number of CPUs.
 
-### Via command line
+### Installation Via Command Line
 
 1. Generate a skeleton configuration file by running:
 
@@ -101,7 +101,7 @@ For a standalone Chef Infra Server installation, see the [hardware requirements 
        sudo chef-automate deploy --product chef-server <configuration_file>
     ```
 
-### Via configuration
+### Installation Via Configuration
 
 1. Generate a skeleton configuration file by running the following command:
 
