@@ -643,9 +643,7 @@ To add a new default policy, the following is needed:
 
 ### Policy API
 
-<!-- TODO: Can we update it with Open API Doc? -->
-Documentation of the complete Policy API are available [here](TBD).
-**Link to the swagger docs, or should the content be inline here??**
+[Policy API Documentation](https://automate.chef.io/docs/api/#tag/policies)
 
 Managing policies is done via the command line.
 These setup steps will make the process as productive as possible for you.
