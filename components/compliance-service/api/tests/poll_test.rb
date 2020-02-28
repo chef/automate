@@ -7,9 +7,9 @@ require 'api/interservice/nodemanager/nodes/nodes_pb'
 require 'api/interservice/nodemanager/nodes/nodes_services_pb'
 
 Manager = Chef::Automate::Domain::Nodemanager::Manager
-Secrets = Chef::Automate::Domain::Compliance::Api::Secrets
+Secrets = Chef::Automate::Domain::Compliance::Secrets
 Nodes = Chef::Automate::Domain::Nodemanager::Nodes
-Common = Chef::Automate::Domain::Compliance::Api::Common
+Common = Chef::Automate::Domain::Compliance::Common
 
 def self.manager ; Manager::NodeManagerService ; end
 def self.secrets ; Secrets::SecretsService ; end

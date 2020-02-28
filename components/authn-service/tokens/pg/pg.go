@@ -9,6 +9,7 @@ import (
 
 	// adapter for database/sql
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
+	"github.com/chef/automate/lib/db"
 	platform_config "github.com/chef/automate/lib/platform/config"
 	"github.com/chef/automate/lib/tls/certs"
 
@@ -62,16 +63,16 @@ func (c *Config) Open(_ *certs.ServiceCerts, logger *zap.Logger,
 }
 
 func (c *Config) initPostgresDB(pgURL *url.URL) (*sql.DB, error) {
-	db, err := sql.Open("postgres", pgURL.String())
+	d, err := db.PGOpen(pgURL.String())
 	if err != nil {
 		return nil, err
 	}
 	if c.MaxConnections > 0 {
-		db.SetMaxOpenConns(c.MaxConnections)
+		d.SetMaxOpenConns(c.MaxConnections)
 	}
-	if err := db.Ping(); err != nil {
+	if err := d.Ping(); err != nil {
 		return nil, errors.Wrap(err, "opening database connection")
 	}
 
-	return db, nil
+	return d, nil
 }

@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/chef/automate/components/compliance-service/api/common"
+	"github.com/chef/automate/api/interservice/compliance/common"
 )
 
 //DiffArray - A util func that takes two string arrays (a and b), and returns an array containing elements that are in a but not b

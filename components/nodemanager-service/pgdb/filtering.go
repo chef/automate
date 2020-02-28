@@ -9,8 +9,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	"github.com/chef/automate/api/interservice/compliance/common"
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
-	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/utils"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/pgutils"

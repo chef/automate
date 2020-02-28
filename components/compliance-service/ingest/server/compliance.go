@@ -13,10 +13,10 @@ import (
 	"google.golang.org/grpc/status"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
+	ingest_api "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
-	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	ingest_api "github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline"
 	"github.com/chef/automate/components/notifications-client/builder"

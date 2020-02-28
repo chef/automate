@@ -12,7 +12,8 @@ import (
 
 	"sort"
 
-	"github.com/chef/automate/components/compliance-service/ingest/events/inspec"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/golang/protobuf/jsonpb"
@@ -405,8 +406,8 @@ func parseProfiles(js *string) (profiles []*inspec.Profile) {
 	return profiles
 }
 
-func parseReport(js *string) *Report {
-	rep := Report{}
+func parseReport(js *string) *compliance.Report {
+	rep := compliance.Report{}
 	err := jsonpb.Unmarshal(strings.NewReader(*js), &rep)
 	if err != nil {
 		logrus.Error(err.Error())

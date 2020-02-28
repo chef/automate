@@ -2,15 +2,17 @@
 require 'api/interservice/nodemanager/nodes/nodes_pb'
 require 'api/interservice/nodemanager/nodes/nodes_services_pb'
 require 'api/external/secrets/secrets_services_pb'
-require 'api/jobs/jobs_pb'
-require 'api/jobs/jobs_services_pb'
+require 'api/interservice/compliance/jobs/jobs_pb'
+require 'api/interservice/compliance/jobs/jobs_services_pb'
 require 'api/interservice/nodemanager/manager/manager_pb'
 require 'api/interservice/nodemanager/manager/manager_services_pb'
+require 'api/external/common/query/parameters_pb'
 
 describe File.basename(__FILE__) do
   Nodes = Chef::Automate::Domain::Nodemanager::Nodes unless defined?(Nodes)
   Secrets = Chef::Automate::Api::Secrets unless defined?(Secrets)
-  Common = Chef::Automate::Domain::Compliance::Api::Common unless defined?(Common)
+  Common = Chef::Automate::Domain::Compliance::Common unless defined?(Common)
+  Query = Chef::Automate::Api::Common::Query unless defined?(Query)
 
   def secrets ; Secrets::SecretsService ; end
   def nodes ; Nodes::NodesService ; end
@@ -35,8 +37,8 @@ describe File.basename(__FILE__) do
       name:"My WinRM Cred",
       type:"ssh",
       data: [
-        Secrets::Kv.new(key:"username", value:"administrator"),
-        Secrets::Kv.new(key:"password", value:"123456" )
+        Query::Kv.new(key:"username", value:"administrator"),
+        Query::Kv.new(key:"password", value:"123456" )
       ],
       tags:[]
     )

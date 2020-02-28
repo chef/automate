@@ -7,7 +7,7 @@ import (
 	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 
-	"github.com/chef/automate/components/compliance-service/api/stats"
+	"github.com/chef/automate/api/interservice/compliance/stats"
 	"github.com/chef/automate/lib/errorutils"
 )
 

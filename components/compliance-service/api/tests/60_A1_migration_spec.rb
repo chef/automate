@@ -1,9 +1,9 @@
 ##### GRPC SETUP #####
-require 'api/reporting/reporting_pb'
-require 'api/reporting/reporting_services_pb'
+require 'api/interservice/compliance/reporting/reporting_pb'
+require 'api/interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
-  Reporting = Chef::Automate::Domain::Compliance::Api::Reporting unless defined?(Reporting)
+  Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)
 
   it "works" do
     reporting = Reporting::ReportingService

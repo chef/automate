@@ -28,7 +28,7 @@ import (
 	_ "github.com/chef/automate/api/external/cfgmgmt"
 	_ "github.com/chef/automate/api/external/ingest"
 	_ "github.com/chef/automate/components/automate-gateway/api/authz"
-	_ "github.com/chef/automate/components/automate-gateway/api/compliance/profiles"
+	_ "github.com/chef/automate/api/external/compliance/profiles"
 )
 
 func TestIntrospectAll(t *testing.T) {

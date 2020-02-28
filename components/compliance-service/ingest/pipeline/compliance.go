@@ -8,8 +8,8 @@ import (
 	"time"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
-	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/message"
 	"github.com/chef/automate/components/compliance-service/ingest/pipeline/processor"

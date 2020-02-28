@@ -5,7 +5,6 @@ import (
 	"crypto/rand"
 	"crypto/subtle"
 	"crypto/tls"
-	"database/sql"
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
@@ -23,6 +22,7 @@ import (
 
 	"github.com/chef/automate/components/session-service/migration"
 	"github.com/chef/automate/components/session-service/oidc"
+	"github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/logger"
 	util "github.com/chef/automate/lib/oidc"
@@ -146,12 +146,12 @@ func NewInMemory(
 }
 
 func initStore(pgURL *url.URL) (scs.Store, error) {
-	db, err := sql.Open("postgres", pgURL.String())
+	d, err := db.PGOpen(pgURL.String())
 	if err != nil {
 		return nil, errors.Wrap(err, "open DB")
 	}
 
-	return pgstore.New(db, dbCleanupInterval), nil
+	return pgstore.New(d, dbCleanupInterval), nil
 }
 
 func (s *Server) initHandlers() {

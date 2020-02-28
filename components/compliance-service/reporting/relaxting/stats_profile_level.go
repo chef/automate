@@ -5,7 +5,7 @@ import (
 
 	"github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/components/compliance-service/api/stats"
+	"github.com/chef/automate/api/interservice/compliance/stats"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"

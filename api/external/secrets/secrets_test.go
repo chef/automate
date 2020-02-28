@@ -3,6 +3,7 @@ package secrets
 import (
 	"testing"
 
+	"github.com/chef/automate/api/external/common/query"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -19,7 +20,7 @@ var exampleValidationFailures = []struct {
 	{Secret{
 		Name: "name",
 		Type: "ssh",
-		Data: appendKvs(&Kv{Key: "username", Value: ""}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: ""}),
 	}, "Invalid data content for secret type 'ssh'. A 'username' field is required"},
 	{Secret{
 		Name: "name",
@@ -28,44 +29,44 @@ var exampleValidationFailures = []struct {
 	{Secret{
 		Name: "name",
 		Type: "ssh",
-		Data: appendKvs(&Kv{Key: "username", Value: "name"}, &Kv{Key: "password", Value: ""}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "name"}, &query.Kv{Key: "password", Value: ""}),
 	}, "Invalid data content for secret type 'ssh'. A 'password' or 'key' field is required"},
 	{Secret{
 		Name: "name",
 		Type: "ssh",
-		Data: appendKvs(&Kv{Key: "username", Value: "name"}, &Kv{Key: "key", Value: ""}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "name"}, &query.Kv{Key: "key", Value: ""}),
 	}, "Invalid data content for secret type 'ssh'. A 'password' or 'key' field is required"},
 	{Secret{
 		Name: "name",
 		Type: "ssh",
-		Data: appendKvs(&Kv{Key: "username", Value: "name"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "name"}),
 	}, "Invalid data content for secret type 'ssh'. A 'password' or 'key' field is required"},
 	{Secret{
 		Name: "name",
 		Type: "ssh",
-		Data: appendKvs(&Kv{Key: "username", Value: "name"}, &Kv{Key: "key", Value: "my_key"}, &Kv{Key: "password", Value: "my_password"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "name"}, &query.Kv{Key: "key", Value: "my_key"}, &query.Kv{Key: "password", Value: "my_password"}),
 	}, "Invalid data content for secret type 'ssh'. 'password' and 'key' fields are mutually exclusive"},
 	//winrm
 	{Secret{
 		Name: "name",
 		Type: "winrm",
-		Data: appendKvs(&Kv{Key: "username", Value: ""}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: ""}),
 	}, "Invalid data content for secret type 'winrm'. A 'username' field is required"},
 	{Secret{
 		Name: "name",
 		Type: "winrm",
-		Data: appendKvs(&Kv{Key: "username", Value: "name"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "name"}),
 	}, "Invalid data content for secret type 'winrm'. A 'password' field is required"},
 	{Secret{
 		Name: "name",
 		Type: "winrm",
-		Data: appendKvs(&Kv{Key: "username", Value: "name"}, &Kv{Key: "password", Value: ""}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "name"}, &query.Kv{Key: "password", Value: ""}),
 	}, "Invalid data content for secret type 'winrm'. A 'password' field is required"},
 	//sudo
 	{Secret{
 		Name: "name",
 		Type: "sudo",
-		Data: appendKvs(&Kv{Key: "password", Value: ""}, &Kv{Key: "options", Value: ""}),
+		Data: appendKvs(&query.Kv{Key: "password", Value: ""}, &query.Kv{Key: "options", Value: ""}),
 	}, "Invalid data content for secret type 'sudo'. A 'password' or 'options' field is required"},
 	{Secret{
 		Name: "name",
@@ -75,43 +76,43 @@ var exampleValidationFailures = []struct {
 	{Secret{
 		Name: "name",
 		Type: "service_now",
-		Data: appendKvs(&Kv{Key: "username", Value: "name"})},
+		Data: appendKvs(&query.Kv{Key: "username", Value: "name"})},
 		"Invalid data content for secret type 'service_now'. A 'password' field is required"},
 	{Secret{
 		Name: "name",
 		Type: "service_now",
-		Data: appendKvs(&Kv{Key: "password", Value: "name"})},
+		Data: appendKvs(&query.Kv{Key: "password", Value: "name"})},
 		"Invalid data content for secret type 'service_now'. A 'username' field is required"},
 	//aws
 	{Secret{
 		Name: "name",
 		Type: "aws",
-		Data: appendKvs(&Kv{Key: "ARN_ROLE", Value: ""}, &Kv{Key: "AWS_ACCESS_KEY_ID", Value: "ID"})},
+		Data: appendKvs(&query.Kv{Key: "ARN_ROLE", Value: ""}, &query.Kv{Key: "AWS_ACCESS_KEY_ID", Value: "ID"})},
 		"Invalid data content for secret type 'aws'. AWS_SECRET_ACCESS_KEY not provided",
 	},
 	{Secret{
 		Name: "name",
 		Type: "aws",
-		Data: appendKvs(&Kv{Key: "ARN_ROLE", Value: ""})},
+		Data: appendKvs(&query.Kv{Key: "ARN_ROLE", Value: ""})},
 		"Invalid data content for secret type 'aws'. AWS_ACCESS_KEY_ID not provided",
 	},
 	//azure
 	{Secret{
 		Name: "name",
 		Type: "azure",
-		Data: appendKvs(&Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"}, &Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"})},
+		Data: appendKvs(&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"}, &query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"})},
 		"Invalid data content for secret type 'azure'. AZURE_TENANT_ID not provided",
 	},
 	{Secret{
 		Name: "name",
 		Type: "azure",
-		Data: appendKvs(&Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"}, &Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})},
+		Data: appendKvs(&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"}, &query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})},
 		"Invalid data content for secret type 'azure'. AZURE_CLIENT_SECRET not provided",
 	},
 	{Secret{
 		Name: "name",
 		Type: "azure",
-		Data: appendKvs(&Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"}, &Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})},
+		Data: appendKvs(&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"}, &query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})},
 		"Invalid data content for secret type 'azure'. AZURE_CLIENT_ID not provided",
 	},
 }
@@ -122,48 +123,50 @@ var exampleValidationSuccesses = []struct {
 	{Secret{
 		Name: "name",
 		Type: "ssh",
-		Data: appendKvs(&Kv{Key: "username", Value: "name"}, &Kv{Key: "password", Value: "password"})}},
+		Data: appendKvs(&query.Kv{Key: "username", Value: "name"}, &query.Kv{Key: "password", Value: "password"})}},
 	{Secret{
 		Name: "name",
 		Type: "ssh",
-		Data: appendKvs(&Kv{Key: "username", Value: "key"}, &Kv{Key: "password", Value: "private_key"})}},
+		Data: appendKvs(&query.Kv{Key: "username", Value: "key"}, &query.Kv{Key: "password", Value: "private_key"})}},
 	//winrm
 	{Secret{
 		Name: "name",
 		Type: "winrm",
-		Data: appendKvs(&Kv{Key: "username", Value: "name"}, &Kv{Key: "password", Value: "password"})}},
+		Data: appendKvs(&query.Kv{Key: "username", Value: "name"}, &query.Kv{Key: "password", Value: "password"})}},
 	//sudo
 	{Secret{
 		Name: "name",
 		Type: "sudo",
-		Data: appendKvs(&Kv{Key: "password", Value: "pass"})}},
+		Data: appendKvs(&query.Kv{Key: "password", Value: "pass"})}},
 	{Secret{
 		Name: "name",
 		Type: "sudo",
-		Data: appendKvs(&Kv{Key: "options", Value: "my opts"})}},
+		Data: appendKvs(&query.Kv{Key: "options", Value: "my opts"})}},
 	//service now
 	{Secret{
 		Name: "name",
 		Type: "service_now",
-		Data: appendKvs(&Kv{Key: "username", Value: "name"}, &Kv{Key: "password", Value: "password"})}},
+		Data: appendKvs(&query.Kv{Key: "username", Value: "name"}, &query.Kv{Key: "password", Value: "password"})}},
 	//aws
 	{Secret{
 		Name: "name",
 		Type: "aws",
-		Data: appendKvs(&Kv{Key: "ARN_ROLE", Value: ""}, &Kv{Key: "AWS_ACCESS_KEY_ID", Value: "ID"}, &Kv{Key: "AWS_SECRET_ACCESS_KEY", Value: "key"})}},
+		Data: appendKvs(&query.Kv{Key: "ARN_ROLE", Value: ""}, &query.Kv{Key: "AWS_ACCESS_KEY_ID", Value: "ID"}, &query.Kv{Key: "AWS_SECRET_ACCESS_KEY", Value: "key"})}},
 	{Secret{
 		Name: "name",
 		Type: "aws",
-		Data: appendKvs(&Kv{Key: "ARN_ROLE", Value: "arn role"})}},
+		Data: appendKvs(&query.Kv{Key: "ARN_ROLE", Value: "arn role"})}},
 	//azure
 	{Secret{
 		Name: "name",
 		Type: "azure",
-		Data: appendKvs(&Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"}, &Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"}, &Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})}},
+		Data: appendKvs(&query.Kv{Key: "AZURE_CLIENT_ID", Value: "AZURE_CLIENT_ID"},
+			&query.Kv{Key: "AZURE_CLIENT_SECRET", Value: "AZURE_CLIENT_SECRET"},
+			&query.Kv{Key: "AZURE_TENANT_ID", Value: "AZURE_TENANT_ID"})}},
 }
 
-func appendKvs(kvs ...*Kv) []*Kv {
-	array := make([]*Kv, len(kvs))
+func appendKvs(kvs ...*query.Kv) []*query.Kv {
+	array := make([]*query.Kv, len(kvs))
 
 	for i, kv := range kvs {
 		array[i] = kv
@@ -196,8 +199,8 @@ func TestMergeReplacesName(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}, &Kv{Key: "password", Value: "pass"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}, &query.Kv{Key: "password", Value: "pass"}),
 	}
 	expected := existing
 	expected.Name = "New Name"
@@ -214,8 +217,8 @@ func TestMergeReplacesType(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}, &Kv{Key: "password", Value: "pass"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}, &query.Kv{Key: "password", Value: "pass"}),
 	}
 	expected := existing
 	expected.Type = "winrm"
@@ -232,13 +235,13 @@ func TestMergeReplacesTags(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}, &Kv{Key: "password", Value: "pass"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}, &query.Kv{Key: "password", Value: "pass"}),
 	}
 	expected := existing
-	expected.Tags = appendKvs(&Kv{Key: "new tag", Value: "new tag value"})
+	expected.Tags = appendKvs(&query.Kv{Key: "new tag", Value: "new tag value"})
 
-	existing.Merge(&Secret{Tags: appendKvs(&Kv{Key: "new tag", Value: "new tag value"})})
+	existing.Merge(&Secret{Tags: appendKvs(&query.Kv{Key: "new tag", Value: "new tag value"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)
@@ -250,13 +253,13 @@ func TestMergeReplacesUsernameInData(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}, &Kv{Key: "password", Value: "pass"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}, &query.Kv{Key: "password", Value: "pass"}),
 	}
 	expected := existing
-	expected.Data = appendKvs(&Kv{Key: "username", Value: "new user"}, &Kv{Key: "password", Value: "pass"})
+	expected.Data = appendKvs(&query.Kv{Key: "username", Value: "new user"}, &query.Kv{Key: "password", Value: "pass"})
 
-	existing.Merge(&Secret{Data: appendKvs(&Kv{Key: "username", Value: "new user"})})
+	existing.Merge(&Secret{Data: appendKvs(&query.Kv{Key: "username", Value: "new user"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)
@@ -268,13 +271,13 @@ func TestMergeAddsUsernameInData(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "password", Value: "pass"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "password", Value: "pass"}),
 	}
 	expected := existing
-	expected.Data = appendKvs(&Kv{Key: "username", Value: "new user"}, &Kv{Key: "password", Value: "pass"})
+	expected.Data = appendKvs(&query.Kv{Key: "username", Value: "new user"}, &query.Kv{Key: "password", Value: "pass"})
 
-	existing.Merge(&Secret{Data: appendKvs(&Kv{Key: "username", Value: "new user"})})
+	existing.Merge(&Secret{Data: appendKvs(&query.Kv{Key: "username", Value: "new user"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)
@@ -286,13 +289,13 @@ func TestMergeReplacesPasswordInData(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}, &Kv{Key: "password", Value: "pass"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}, &query.Kv{Key: "password", Value: "pass"}),
 	}
 	expected := existing
-	expected.Data = appendKvs(&Kv{Key: "password", Value: "new password"}, &Kv{Key: "username", Value: "user"})
+	expected.Data = appendKvs(&query.Kv{Key: "password", Value: "new password"}, &query.Kv{Key: "username", Value: "user"})
 
-	existing.Merge(&Secret{Data: appendKvs(&Kv{Key: "password", Value: "new password"})})
+	existing.Merge(&Secret{Data: appendKvs(&query.Kv{Key: "password", Value: "new password"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)
@@ -304,13 +307,13 @@ func TestMergeAddsPasswordInData(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}),
 	}
 	expected := existing
-	expected.Data = appendKvs(&Kv{Key: "password", Value: "new password"}, &Kv{Key: "username", Value: "user"})
+	expected.Data = appendKvs(&query.Kv{Key: "password", Value: "new password"}, &query.Kv{Key: "username", Value: "user"})
 
-	existing.Merge(&Secret{Data: appendKvs(&Kv{Key: "password", Value: "new password"})})
+	existing.Merge(&Secret{Data: appendKvs(&query.Kv{Key: "password", Value: "new password"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)
@@ -322,13 +325,13 @@ func TestMergeReplacesKeyInData(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}, &Kv{Key: "key", Value: "old key"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}, &query.Kv{Key: "key", Value: "old key"}),
 	}
 	expected := existing
-	expected.Data = appendKvs(&Kv{Key: "key", Value: "new key"}, &Kv{Key: "username", Value: "user"})
+	expected.Data = appendKvs(&query.Kv{Key: "key", Value: "new key"}, &query.Kv{Key: "username", Value: "user"})
 
-	existing.Merge(&Secret{Data: appendKvs(&Kv{Key: "key", Value: "new key"})})
+	existing.Merge(&Secret{Data: appendKvs(&query.Kv{Key: "key", Value: "new key"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)
@@ -340,13 +343,13 @@ func TestMergeAddsKeyInData(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}),
 	}
 	expected := existing
-	expected.Data = appendKvs(&Kv{Key: "key", Value: "new key"}, &Kv{Key: "username", Value: "user"})
+	expected.Data = appendKvs(&query.Kv{Key: "key", Value: "new key"}, &query.Kv{Key: "username", Value: "user"})
 
-	existing.Merge(&Secret{Data: appendKvs(&Kv{Key: "key", Value: "new key"})})
+	existing.Merge(&Secret{Data: appendKvs(&query.Kv{Key: "key", Value: "new key"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)
@@ -358,13 +361,13 @@ func TestMergeReplacesSudoOptionsInData(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "sudo",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}, &Kv{Key: "options", Value: "opts"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}, &query.Kv{Key: "options", Value: "opts"}),
 	}
 	expected := existing
-	expected.Data = appendKvs(&Kv{Key: "username", Value: "user"}, &Kv{Key: "options", Value: "my new opts"})
+	expected.Data = appendKvs(&query.Kv{Key: "username", Value: "user"}, &query.Kv{Key: "options", Value: "my new opts"})
 
-	existing.Merge(&Secret{Data: appendKvs(&Kv{Key: "options", Value: "my new opts"})})
+	existing.Merge(&Secret{Data: appendKvs(&query.Kv{Key: "options", Value: "my new opts"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)
@@ -376,13 +379,13 @@ func TestMergeAddsSudoOptionsInData(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "sudo",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}),
 	}
 	expected := existing
-	expected.Data = appendKvs(&Kv{Key: "username", Value: "user"}, &Kv{Key: "options", Value: "my new opts"})
+	expected.Data = appendKvs(&query.Kv{Key: "username", Value: "user"}, &query.Kv{Key: "options", Value: "my new opts"})
 
-	existing.Merge(&Secret{Data: appendKvs(&Kv{Key: "options", Value: "my new opts"})})
+	existing.Merge(&Secret{Data: appendKvs(&query.Kv{Key: "options", Value: "my new opts"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)
@@ -394,12 +397,12 @@ func TestMergeIgnoresOptionsInData(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}),
 	}
 	expected := existing
 
-	existing.Merge(&Secret{Data: appendKvs(&Kv{Key: "options", Value: "my new opts"})})
+	existing.Merge(&Secret{Data: appendKvs(&query.Kv{Key: "options", Value: "my new opts"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)
@@ -411,13 +414,13 @@ func TestMergeReplacesKeyWithPasswordInData(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}, &Kv{Key: "key", Value: "my_key"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}, &query.Kv{Key: "key", Value: "my_key"}),
 	}
 	expected := existing
-	expected.Data = appendKvs(&Kv{Key: "password", Value: "my_password"}, &Kv{Key: "username", Value: "user"})
+	expected.Data = appendKvs(&query.Kv{Key: "password", Value: "my_password"}, &query.Kv{Key: "username", Value: "user"})
 
-	existing.Merge(&Secret{Data: appendKvs(&Kv{Key: "password", Value: "my_password"})})
+	existing.Merge(&Secret{Data: appendKvs(&query.Kv{Key: "password", Value: "my_password"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)
@@ -429,13 +432,13 @@ func TestMergeReplacesPasswordWithKeyInData(t *testing.T) {
 	existing := Secret{
 		Name: "Name",
 		Type: "ssh",
-		Tags: appendKvs(&Kv{Key: "test tag", Value: "tag value"}),
-		Data: appendKvs(&Kv{Key: "username", Value: "user"}, &Kv{Key: "password", Value: "my_password"}),
+		Tags: appendKvs(&query.Kv{Key: "test tag", Value: "tag value"}),
+		Data: appendKvs(&query.Kv{Key: "username", Value: "user"}, &query.Kv{Key: "password", Value: "my_password"}),
 	}
 	expected := existing
-	expected.Data = appendKvs(&Kv{Key: "key", Value: "my_key"}, &Kv{Key: "username", Value: "user"})
+	expected.Data = appendKvs(&query.Kv{Key: "key", Value: "my_key"}, &query.Kv{Key: "username", Value: "user"})
 
-	existing.Merge(&Secret{Data: appendKvs(&Kv{Key: "key", Value: "my_key"})})
+	existing.Merge(&Secret{Data: appendKvs(&query.Kv{Key: "key", Value: "my_key"})})
 
 	assert.ElementsMatch(t, expected.Data, existing.Data)
 	assert.ElementsMatch(t, expected.Tags, existing.Tags)

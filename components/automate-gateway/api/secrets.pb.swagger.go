@@ -144,42 +144,47 @@ func init() {
     }
   },
   "definitions": {
-    "chef.automate.api.secrets.DeleteResponse": {
-      "type": "object"
-    },
-    "chef.automate.api.secrets.Filter": {
+    "chef.automate.api.common.query.Filter": {
       "type": "object",
       "properties": {
         "key": {
-          "type": "string"
+          "type": "string",
+          "description": "Field to filter on."
         },
         "exclude": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Include matches for this filter.(boolean)\n` + "`" + `true` + "`" + ` (default) *includes* all nodes that match this filter. \n` + "`" + `false` + "`" + ` *excludes* all nodes that match this filter."
         },
         "values": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "Field values to filter on."
         }
       }
+    },
+    "chef.automate.api.common.query.Kv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Tag key."
+        },
+        "value": {
+          "type": "string",
+          "description": "Tag value."
+        }
+      }
+    },
+    "chef.automate.api.secrets.DeleteResponse": {
+      "type": "object"
     },
     "chef.automate.api.secrets.Id": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
-        }
-      }
-    },
-    "chef.automate.api.secrets.Kv": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string"
-        },
-        "value": {
           "type": "string"
         }
       }
@@ -190,7 +195,7 @@ func init() {
         "filters": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.secrets.Filter"
+            "$ref": "#/definitions/chef.automate.api.common.query.Filter"
           }
         },
         "order": {
@@ -236,13 +241,13 @@ func init() {
         "tags": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.secrets.Kv"
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
           }
         },
         "data": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.api.secrets.Kv"
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
           }
         }
       }

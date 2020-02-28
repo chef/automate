@@ -7,7 +7,7 @@ import (
 
 	"time"
 
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
+	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/golang/protobuf/ptypes"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"

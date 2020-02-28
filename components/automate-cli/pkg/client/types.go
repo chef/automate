@@ -2,9 +2,8 @@ package client
 
 import (
 	"github.com/chef/automate/api/external/applications"
-
+	"github.com/chef/automate/api/external/compliance/reporting"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
-	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
 	iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 )
 

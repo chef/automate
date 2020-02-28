@@ -8,7 +8,7 @@ import (
 	pb "github.com/golang/protobuf/ptypes/empty"
 	"github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/components/compliance-service/api/status"
+	"github.com/chef/automate/api/interservice/compliance/status"
 )
 
 // List of labels used to differentiate between migrations that can run independent of each other

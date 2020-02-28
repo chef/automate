@@ -3,7 +3,7 @@ package relaxting
 import (
 	"testing"
 
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
+	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/stretchr/testify/assert"
 )
 

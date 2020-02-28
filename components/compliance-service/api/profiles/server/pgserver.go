@@ -14,8 +14,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/api/interservice/compliance/profiles"
 	automate_event "github.com/chef/automate/api/interservice/event"
-	"github.com/chef/automate/components/compliance-service/api/profiles"
 	"github.com/chef/automate/components/compliance-service/api/profiles/conversion"
 	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/components/compliance-service/inspec"

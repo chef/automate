@@ -10,8 +10,8 @@ import (
 
 	configReq "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	"github.com/chef/automate/api/interservice/cfgmgmt/service"
+	"github.com/chef/automate/api/interservice/compliance/reporting"
 	api "github.com/chef/automate/api/interservice/deployment"
-	"github.com/chef/automate/components/compliance-service/api/reporting"
 	tslib "github.com/chef/automate/lib/grpc/timestamp"
 )
 

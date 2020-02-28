@@ -3,7 +3,7 @@ package inspec
 import (
 	"encoding/json"
 
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
+	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"gopkg.in/yaml.v2"
 )
 

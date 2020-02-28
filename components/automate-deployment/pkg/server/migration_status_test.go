@@ -6,9 +6,9 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	compliance "github.com/chef/automate/api/interservice/compliance/status"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/api/interservice/ingest"
-	compliance "github.com/chef/automate/components/compliance-service/api/status"
 )
 
 func TestIngestResponseToServiceMigrationStatus(t *testing.T) {

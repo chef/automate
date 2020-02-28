@@ -1,7 +1,7 @@
 package relaxting
 
 import (
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
+	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/olivere/elastic"

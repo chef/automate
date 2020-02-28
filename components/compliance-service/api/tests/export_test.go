@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
 
-	rs "github.com/chef/automate/components/compliance-service/api/reporting"
+	rs "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/examples/helpers"
 	"github.com/chef/automate/lib/grpc/grpctest"
 )

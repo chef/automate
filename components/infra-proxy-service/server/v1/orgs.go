@@ -6,6 +6,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/api/external/common/query"
 	secrets "github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/infra_proxy/request"
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
@@ -42,7 +43,7 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 	newSecret := &secrets.Secret{
 		Name: "infra-proxy-service-admin-key",
 		Type: "ssh",
-		Data: []*secrets.Kv{
+		Data: []*query.Kv{
 			{Key: "username", Value: req.AdminUser},
 			{Key: "key", Value: req.AdminKey},
 		},
@@ -219,10 +220,10 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 	rawAdminKey := req.AdminKey
 
 	newSecret := &secrets.Secret{
-		Id: secret.GetId(),
+		Id:   secret.GetId(),
 		Name: "infra-proxy-service-admin-key",
 		Type: "ssh",
-		Data: []*secrets.Kv{
+		Data: []*query.Kv{
 			{Key: "username", Value: req.AdminUser},
 			{Key: "key", Value: rawAdminKey},
 		},
@@ -256,7 +257,6 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		},
 	}, nil
 }
-
 
 func (s *Server) GetAdminKeyFromSecretService(ctx context.Context, id string, secretsClient secrets.SecretsServiceClient) (*secrets.Secret, error) {
 	secret, err := secretsClient.Read(ctx, &secrets.Id{Id: id})

@@ -3,14 +3,16 @@ require_relative 'test_support'
 require 'api/interservice/nodemanager/nodes/nodes_pb'
 require 'api/interservice/nodemanager/nodes/nodes_services_pb'
 require 'api/external/secrets/secrets_services_pb'
-require 'api/jobs/jobs_pb'
-require 'api/jobs/jobs_services_pb'
+require 'api/interservice/compliance/jobs/jobs_pb'
+require 'api/interservice/compliance/jobs/jobs_services_pb'
+require 'api/external/common/query/parameters_pb'
 
 describe File.basename(__FILE__) do
-  Jobs = Chef::Automate::Domain::Compliance::Api::Jobs unless defined?(Jobs)
+  Jobs = Chef::Automate::Domain::Compliance::Jobs unless defined?(Jobs)
   Secrets = Chef::Automate::Api::Secrets unless defined?(Secrets)
   Nodes = Chef::Automate::Domain::Nodemanager::Nodes unless defined?(Nodes)
-  Common = Chef::Automate::Domain::Compliance::Api::Common unless defined?(Common)
+  Common = Chef::Automate::Domain::Compliance::Common unless defined?(Common)
+  Query = Chef::Automate::Api::Common::Query unless defined?(Query)
 
   def jobs ; Jobs::JobsService ; end
   def secrets ; Secrets::SecretsService ; end
@@ -43,8 +45,8 @@ describe File.basename(__FILE__) do
       name: "My SSH Login secrets",
       type: "ssh",
       data: [
-        Secrets::Kv.new(key: "username", value: "pwsudo"),
-        Secrets::Kv.new(key: "password", value: "password")
+        Query::Kv.new(key: "username", value: "pwsudo"),
+        Query::Kv.new(key: "password", value: "password")
       ],
       tags: []
     )).id

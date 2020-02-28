@@ -4,7 +4,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	"github.com/chef/automate/components/compliance-service/api/common"
+	"github.com/chef/automate/api/interservice/compliance/common"
 )
 
 const sqlFindTagID = `
