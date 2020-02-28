@@ -39,7 +39,6 @@ service ReportingService {
 	```	
 
 	Authorization Action:
-
 	```
 	compliance:reports:list
 	```
@@ -69,7 +68,6 @@ service ReportingService {
 	Not limited to 10k results.
 
 	Authorization Action:
-
 	```
 	compliance:reportids:list
 	```
@@ -97,7 +95,6 @@ service ReportingService {
 	Limited to 100 results by default.
 
 	Authorization Action:
-
 	```
 	compliance:controlItems:list
 	```
@@ -125,7 +122,6 @@ service ReportingService {
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.	
 
 	Authorization Action:
-
 	```
 	compliance:reports:get
 	```
@@ -185,7 +181,6 @@ service ReportingService {
 	```
 
 	Authorization Action:
-
 	```
 	compliance:reportSuggestions:list
 	```
@@ -213,7 +208,6 @@ service ReportingService {
 	Valid sort fields: name, title
 
 	Authorization Action:
-
 	```
 	compliance:reportProfiles:list
 	```
@@ -245,7 +239,6 @@ service ReportingService {
 	Does not support pagination or sorting.
 
 	Authorization Action:
-
 	```
 	compliance:reportNodes:get
 	```
@@ -295,7 +288,6 @@ service ReportingService {
 	```
 
 	Authorization Action:
-
 	```
 	compliance:reportNodes:list
 	```

@@ -17,7 +17,6 @@ collecting && (($0 ~ /chef.automate.api.iam.policy\).action[[:space:]]*=[[:space
   whitespace = useTab ? "\t" : "  "
   print ""
   print whitespace"Authorization Action:"
-  print ""
   print whitespace"```"
   print whitespace$2
   print whitespace"```"

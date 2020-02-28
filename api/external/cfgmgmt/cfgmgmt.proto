@@ -41,7 +41,6 @@ service ConfigMgmt {
   ```
 
 	Authorization Action:
-
 	```
 	infra:nodes:list
 	```
@@ -62,7 +61,6 @@ service ConfigMgmt {
   Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 
 	Authorization Action:
-
 	```
 	infra:nodes:list
 	```
@@ -87,7 +85,6 @@ service ConfigMgmt {
   ```
 
 	Authorization Action:
-
 	```
 	infra:nodes:list
 	```
@@ -111,7 +108,6 @@ service ConfigMgmt {
   ```
 
 	Authorization Action:
-
 	```
 	infra:nodes:list
 	```
@@ -130,7 +126,6 @@ service ConfigMgmt {
   Returns the infra run report for the provided node ID and run ID.
 
 	Authorization Action:
-
 	```
 	infra:nodes:get
 	```
@@ -156,7 +151,6 @@ service ConfigMgmt {
   ```
 
 	Authorization Action:
-
 	```
 	infra:nodes:list
 	```
@@ -176,7 +170,6 @@ service ConfigMgmt {
   Returns a list of all organizations associated with nodes that have checked in to Automate.
 
 	Authorization Action:
-
 	```
 	infra:nodes:list
 	```
@@ -196,7 +189,6 @@ service ConfigMgmt {
   Returns a list of all chef servers associated with nodes that have checked in to Automate.
 
 	Authorization Action:
-
 	```
 	infra:nodes:list
 	```
@@ -216,7 +208,6 @@ service ConfigMgmt {
   Returns the latest reported attributes for the provided node ID.
 
 	Authorization Action:
-
 	```
 	infra:nodes:get
 	```
@@ -247,7 +238,6 @@ service ConfigMgmt {
   Policy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.
 
 	Authorization Action:
-
 	```
 	infra:nodes:list
 	```

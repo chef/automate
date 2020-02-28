@@ -29,7 +29,6 @@ service ApplicationsService {
   ```
 
   Authorization Action:
-
   ```
   applications:serviceGroups:list
   ```
@@ -54,7 +53,6 @@ service ApplicationsService {
   Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
 
   Authorization Action:
-
   ```
   applications:serviceGroups:list
   ```
@@ -76,7 +74,6 @@ service ApplicationsService {
   Supports pagination and search and status filtering. For a list of services for a specific service-group see "List Services for a Service Group" (GetServicesBySG endpoint).
 
   Authorization Action:
-
   ```
   applications:serviceGroups:list
   ```
@@ -101,7 +98,6 @@ service ApplicationsService {
 
 
   Authorization Action:
-
   ```
   applications:serviceGroups:list
   ```
@@ -129,7 +125,6 @@ service ApplicationsService {
   ```
 
   Authorization Action:
-
   ```
   applications:serviceGroups:list
   ```
@@ -153,7 +148,6 @@ service ApplicationsService {
   Does not support filtering.
 
   Authorization Action:
-
   ```
   applications:serviceGroups:list
   ```
@@ -178,7 +172,6 @@ service ApplicationsService {
   by utilizing the `UpdateDisconnectedServicesConfig` endpoint.
 
   Authorization Action:
-
   ```
   applications:serviceGroups:list
   ```
@@ -202,7 +195,6 @@ service ApplicationsService {
   The functionality is currently covered by a periodically running job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
 
   Authorization Action:
-
   ```
   applications:serviceGroups:delete
   ```
@@ -226,7 +218,6 @@ service ApplicationsService {
   Delete the services with the given IDs
 
   Authorization Action:
-
   ```
   applications:serviceGroups:delete
   ```
@@ -250,7 +241,6 @@ service ApplicationsService {
   Displays the current version of the applications-service
 
   Authorization Action:
-
   ```
   system:serviceVersion:get
   ```
@@ -273,7 +263,6 @@ service ApplicationsService {
   This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
 
   Authorization Action:
-
   ```
   retention:serviceGroups:get
   ```
@@ -305,7 +294,6 @@ service ApplicationsService {
   ```
 
   Authorization Action:
-
   ```
   retention:serviceGroups:update
   ```
@@ -333,7 +321,6 @@ service ApplicationsService {
   This job is disabled if running is set to false.
 
   Authorization Action:
-
   ```
   retention:serviceGroups:get
   ```
@@ -366,7 +353,6 @@ service ApplicationsService {
   ```
 
   Authorization Action:
-
   ```
   retention:serviceGroups:update
   ```

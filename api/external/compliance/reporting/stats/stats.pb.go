@@ -1641,7 +1641,6 @@ type StatsServiceClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportSummary:get
 	//```
@@ -1668,7 +1667,6 @@ type StatsServiceClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportTrend:get
 	//```
@@ -1694,7 +1692,6 @@ type StatsServiceClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportProfiles:get
 	//```
@@ -1719,7 +1716,6 @@ type StatsServiceClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportFailures:get
 	//```
@@ -1793,7 +1789,6 @@ type StatsServiceServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportSummary:get
 	//```
@@ -1820,7 +1815,6 @@ type StatsServiceServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportTrend:get
 	//```
@@ -1846,7 +1840,6 @@ type StatsServiceServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportProfiles:get
 	//```
@@ -1871,7 +1864,6 @@ type StatsServiceServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportFailures:get
 	//```

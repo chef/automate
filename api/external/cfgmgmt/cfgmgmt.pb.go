@@ -124,7 +124,6 @@ type ConfigMgmtClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -137,7 +136,6 @@ type ConfigMgmtClient interface {
 	//Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -154,7 +152,6 @@ type ConfigMgmtClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -170,7 +167,6 @@ type ConfigMgmtClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -181,7 +177,6 @@ type ConfigMgmtClient interface {
 	//Returns the infra run report for the provided node ID and run ID.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:get
 	//```
@@ -199,7 +194,6 @@ type ConfigMgmtClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -210,7 +204,6 @@ type ConfigMgmtClient interface {
 	//Returns a list of all organizations associated with nodes that have checked in to Automate.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -221,7 +214,6 @@ type ConfigMgmtClient interface {
 	//Returns a list of all chef servers associated with nodes that have checked in to Automate.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -232,7 +224,6 @@ type ConfigMgmtClient interface {
 	//Returns the latest reported attributes for the provided node ID.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:get
 	//```
@@ -245,7 +236,6 @@ type ConfigMgmtClient interface {
 	//Policy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -376,7 +366,6 @@ type ConfigMgmtServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -389,7 +378,6 @@ type ConfigMgmtServer interface {
 	//Accepts a `start` parameter to denote start date for the list and a filter of type `status`.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -406,7 +394,6 @@ type ConfigMgmtServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -422,7 +409,6 @@ type ConfigMgmtServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -433,7 +419,6 @@ type ConfigMgmtServer interface {
 	//Returns the infra run report for the provided node ID and run ID.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:get
 	//```
@@ -451,7 +436,6 @@ type ConfigMgmtServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -462,7 +446,6 @@ type ConfigMgmtServer interface {
 	//Returns a list of all organizations associated with nodes that have checked in to Automate.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -473,7 +456,6 @@ type ConfigMgmtServer interface {
 	//Returns a list of all chef servers associated with nodes that have checked in to Automate.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
@@ -484,7 +466,6 @@ type ConfigMgmtServer interface {
 	//Returns the latest reported attributes for the provided node ID.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:get
 	//```
@@ -497,7 +478,6 @@ type ConfigMgmtServer interface {
 	//Policy revision ids are sent with an infra run report and identifies which instance of a policy the node used for this run.
 	//
 	//Authorization Action:
-	//
 	//```
 	//infra:nodes:list
 	//```
