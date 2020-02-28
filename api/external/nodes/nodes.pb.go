@@ -993,7 +993,7 @@ type NodesServiceClient interface {
 	//
 	//Create a node
 	//
-	//Creates a node and adds it to the "Automate" node manager.
+	//Creates a node and adds it to the Automate node manager.
 	//Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
 	//Useful for creating nodes for the purpose of running compliance scan jobs.
 	//
@@ -1255,7 +1255,7 @@ type NodesServiceServer interface {
 	//
 	//Create a node
 	//
-	//Creates a node and adds it to the "Automate" node manager.
+	//Creates a node and adds it to the Automate node manager.
 	//Requires a FQDN or IP address, a user-specified name, and a ssh or winrm credential reference.
 	//Useful for creating nodes for the purpose of running compliance scan jobs.
 	//

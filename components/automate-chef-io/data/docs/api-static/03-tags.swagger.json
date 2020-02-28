@@ -9,8 +9,8 @@
       "tags": ["ConfigMgmt"]
     },
     {
-      "name": "Nodes",
-      "tags": ["NodesService"]
+      "name": "Node Management",
+      "tags": ["NodeManagerService", "NodesService"]
     },
     {
       "name": "Applications",
@@ -21,8 +21,9 @@
     { "name": "ReportingService", "x-displayName": "Reporting" },
     { "name": "StatsService", "x-displayName": "Stats" },
     { "name": "ConfigMgmt", "x-displayName": "Nodes" },
-    { "name": "NodesService", "x-displayName": "Nodes" },
+    { "name": "NodesService", "x-displayName": "Managed Nodes" },
     { "name": "service_groups", "x-displayName": "Service Groups and Services" },
-    { "name": "retention", "x-displayName": "Service Management" }
+    { "name": "retention", "x-displayName": "Service Management" },
+    { "name": "NodeManagerService", "x-displayName": "Node Managers" }
   ]
 }
