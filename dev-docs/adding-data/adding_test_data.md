@@ -32,9 +32,18 @@ if you need to add reports to a non-dev-env instance, you can use the following 
 
 # Adding nodes to populate the nodes and scan jobs pages
 
-ensure you have `jq` installed
-the token is retrieved by running `get_admin_token` from within the studio
-if you've never run the get_secrets script, or haven't in a while, run `CHEF_USERNAME=username scripts/get_secrets.sh` from the studio
+option 1:
+if you don't care if the nodes are reachable and scan jobs are successful, do the following:
+- create an ssh or winrm credential in your Automate GUI at `a2-url/settings/node-credentials` with fake data
+- create a node in your Automate GUI at `a2-url/compliance/scan-jobs/nodes/add` with host `fake-localhost` and attach your fake credential 
+- ensure you've installed a profile or two in your Automate GUI under `a2-url/compliance/compliance-profiles`
+- create a scan job at `a2-url/jobs/add` using the profile and node 
+
+option 2:
+this should give you some reachable nodes and successful scan jobs, and some unreachable nodes/unsuccessful jobs:
+ensure you have `jq` installed locally (`brew install jq`)
+get a token for the api call: `get_admin_token` from within the studio is the quickest way
+get the secrets: run `cat dev/secrets-env.sh` - if there's nothing there, run `CHEF_USERNAME=username scripts/get_secrets.sh`
 
 _note: this should be run on your local system, not from within the studio. you will need to be on the vpn_
 `source dev/secrets-env.sh`
@@ -42,12 +51,14 @@ _note: this should be run on your local system, not from within the studio. you 
 
 # Adding profiles
 
-this should be done by downloading profiles from the "Available" tab under the "Asset Store"
+this should be done by downloading profiles from the "Available" tab under the Compliance->Profiles
 
 # Adding cloud integrations
 
 AWS:
  - use the `okta_aws` functionality to get your temporary aws credentials (see details here)[https://chefio.atlassian.net/wiki/spaces/ENG/pages/94259373/SOP-001+-+Gaining+access+to+okta+AWS+accounts+via+the+AWS+API#SOP-001-GainingaccesstooktaAWSaccountsviatheAWSAPI-Step1:Installokta_aws]
+
+ - get your credentials: `cat ~/.aws/credentials`
 
  - use the api to add integrations using these credentials:
  ```
@@ -56,9 +67,9 @@ AWS:
     "type": "aws-api",
     "instance_credentials": [],
     "credential_data": [
-            {"key": "AWS_ACCESS_KEY_ID", "value": "value" },
-            {"key": "AWS_SECRET_ACCESS_KEY", "value": "value" },
-            {"key": "AWS_SESSION_TOKEN", "value": "value" }
+            {"key": "AWS_ACCESS_KEY_ID", "value": "your-aws-access-key" },
+            {"key": "AWS_SECRET_ACCESS_KEY", "value": "your-aws-secret-key" },
+            {"key": "AWS_SESSION_TOKEN", "value": "your-aws-token" }
    ]
 }'
 ```
