@@ -17,7 +17,7 @@ func init() {
     "/compliance/reporting/controls": {
       "post": {
         "summary": "List controls",
-        "description": "Lists controls from the last run, with optional filtering. \nSupports filtering, but not pagination or sorting.\nLimited to 100 results by default.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:controlItems:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Lists controls from the last run, with optional filtering. \nSupports filtering, but not pagination or sorting.\nLimited to 100 results by default.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:controlItems:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListControlItems",
         "responses": {
           "200": {
@@ -45,7 +45,7 @@ func init() {
     "/compliance/reporting/nodes/id/{id}": {
       "get": {
         "summary": "Fetch a node",
-        "description": "Fetch a specific node by ID.\nSupports filtering by profile or control. \nDoes not support pagination or sorting.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportNodes:get\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Fetch a specific node by ID.\nSupports filtering by profile or control. \nDoes not support pagination or sorting.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportNodes:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReadNode",
         "responses": {
           "200": {
@@ -72,7 +72,7 @@ func init() {
     "/compliance/reporting/nodes/search": {
       "post": {
         "summary": "List nodes",
-        "description": "List all nodes, with optional filtering, pagination, and sorting.\nLimited to 10k results.\n\n| Sort parameter | Sort value |\n| --- | --- |\n| environment | environment.lower |\n| latest_report.controls.failed.critical | controls_sums.failed.critical |\n| latest_report.controls.failed.total | controls_sums.failed.total |\n| latest_report.end_time (default) | end_time |\n| latest_report.status | status |\n| name | node_name.lower |\n| platform | platform.full |\n| status | status |\n\nExample: \n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n],\n\"page\":1,\"per_page\":100,\n\"sort\":\"environment\",\"order\":\"ASC\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportNodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "List all nodes, with optional filtering, pagination, and sorting.\nLimited to 10k results.\n\n| Sort parameter | Sort value |\n| --- | --- |\n| environment | environment.lower |\n| latest_report.controls.failed.critical | controls_sums.failed.critical |\n| latest_report.controls.failed.total | controls_sums.failed.total |\n| latest_report.end_time (default) | end_time |\n| latest_report.status | status |\n| name | node_name.lower |\n| platform | platform.full |\n| status | status |\n\nExample: \n` + "`" + `` + "`" + `` + "`" + `\n{\n\"filters\":[\n{\"type\":\"environment\",\"values\":[\"dev*\"]},\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n],\n\"page\":1,\"per_page\":100,\n\"sort\":\"environment\",\"order\":\"ASC\"\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportNodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListNodes",
         "responses": {
           "200": {
@@ -100,7 +100,7 @@ func init() {
     "/compliance/reporting/profiles": {
       "post": {
         "summary": "List profiles",
-        "description": "List all profiles in use, with optional filtering. \nSupports pagination, filtering, and sorting.\nValid sort fields: name, title\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportProfiles:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "List all profiles in use, with optional filtering. \nSupports pagination, filtering, and sorting.\nValid sort fields: name, title\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportProfiles:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListProfiles",
         "responses": {
           "200": {
@@ -128,7 +128,7 @@ func init() {
     "/compliance/reporting/report-ids": {
       "post": {
         "summary": "List report IDs",
-        "description": "List all IDs for the latest report for each node, with optional filtering. \nSupports filtering, but not pagination or sorting.\nIncluding more than one value for ` + "`" + `profile_id` + "`" + `, or ` + "`" + `profile_name` + "`" + ` is not allowed.\nIncluding values for both ` + "`" + `profile_id` + "`" + ` and ` + "`" + `profile_name` + "`" + ` in one request is not allowed.\nNot limited to 10k results.\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportids:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "List all IDs for the latest report for each node, with optional filtering. \nSupports filtering, but not pagination or sorting.\nIncluding more than one value for ` + "`" + `profile_id` + "`" + `, or ` + "`" + `profile_name` + "`" + ` is not allowed.\nIncluding values for both ` + "`" + `profile_id` + "`" + ` and ` + "`" + `profile_name` + "`" + ` in one request is not allowed.\nNot limited to 10k results.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportids:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListReportIds",
         "responses": {
           "200": {
@@ -156,7 +156,7 @@ func init() {
     "/compliance/reporting/reports": {
       "post": {
         "summary": "List reports",
-        "description": "Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. \nSupports pagination, filtering, and sorting.\nLimited to 10k results.\n\nValid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,\nlatest_report.end_time, latest_report.status, node_name\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\"filters\":\n[\n{\"type\":\"start_time\",\"values\":[\"2019-09-09T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-09-11T23:59:59Z\"]}\n], \n\"page\":1, \"per_page\": 3, \n\"sort\": \"latest_report.status\", \"order\": \"ASC\"\n}\n` + "`" + `` + "`" + `` + "`" + `\t\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. \nSupports pagination, filtering, and sorting.\nLimited to 10k results.\n\nValid sort fields: latest_report.controls.failed.critical, latest_report.controls.failed.total,\nlatest_report.end_time, latest_report.status, node_name\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\"filters\":\n[\n{\"type\":\"start_time\",\"values\":[\"2019-09-09T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-09-11T23:59:59Z\"]}\n], \n\"page\":1, \"per_page\": 3, \n\"sort\": \"latest_report.status\", \"order\": \"ASC\"\n}\n` + "`" + `` + "`" + `` + "`" + `\t\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListReports",
         "responses": {
           "200": {
@@ -184,7 +184,7 @@ func init() {
     "/compliance/reporting/reports/id/{id}": {
       "post": {
         "summary": "Fetch a report",
-        "description": "Fetch a specific report by ID. Supports filtering, but not pagination or sorting.\nIncluding more than one value for ` + "`" + `profile_id` + "`" + `, or ` + "`" + `profile_name` + "`" + ` is not allowed.\nIncluding values for both ` + "`" + `profile_id` + "`" + ` and ` + "`" + `profile_name` + "`" + ` in one request is not allowed.\t\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:get\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Fetch a specific report by ID. Supports filtering, but not pagination or sorting.\nIncluding more than one value for ` + "`" + `profile_id` + "`" + `, or ` + "`" + `profile_name` + "`" + ` is not allowed.\nIncluding values for both ` + "`" + `profile_id` + "`" + ` and ` + "`" + `profile_name` + "`" + ` in one request is not allowed.\t\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reports:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ReadReport",
         "responses": {
           "200": {
@@ -219,7 +219,7 @@ func init() {
     "/compliance/reporting/suggestions": {
       "post": {
         "summary": "List suggestions",
-        "description": "Get suggestions for compliance reporting resources based on matching text substrings.\nSupports filtering, but not pagination or sorting.\n` + "`" + `type` + "`" + ` parameter is required. It must be one of the parameters from the following table.\n\n| Suggestion type parameter | Suggestion type value |\n| --- | --- |\n| chef_server | source_fqdn |\n| chef_tags | chef_tags |\n| control | profiles.controls.title |\n| control_tag_key | profiles.controls.string_tags.key |\n| control_tag_value | profiles.controls.string_tags.values |\n| environment | environment |\n| inspec_version | version |\n| node | node_name |\n| organization | organization_name |\n| platform | platform.name |\n| platform_with_version | platform.full |\n| policy_group | policy_group |\n| policy_name | policy_name |\n| profile | profiles.title |\n| profile_with_version | profiles.full |\n| recipe | recipes |\n| role | roles |\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"type\":\"environment\",\n\"text\":\"aws*\",\n\"filters\":[\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportSuggestions:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Get suggestions for compliance reporting resources based on matching text substrings.\nSupports filtering, but not pagination or sorting.\n` + "`" + `type` + "`" + ` parameter is required. It must be one of the parameters from the following table.\n\n| Suggestion type parameter | Suggestion type value |\n| --- | --- |\n| chef_server | source_fqdn |\n| chef_tags | chef_tags |\n| control | profiles.controls.title |\n| control_tag_key | profiles.controls.string_tags.key |\n| control_tag_value | profiles.controls.string_tags.values |\n| environment | environment |\n| inspec_version | version |\n| node | node_name |\n| organization | organization_name |\n| platform | platform.name |\n| platform_with_version | platform.full |\n| policy_group | policy_group |\n| policy_name | policy_name |\n| profile | profiles.title |\n| profile_with_version | profiles.full |\n| recipe | recipes |\n| role | roles |\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"type\":\"environment\",\n\"text\":\"aws*\",\n\"filters\":[\n{\"type\":\"start_time\",\"values\":[\"2019-10-26T00:00:00Z\"]},\n{\"type\":\"end_time\",\"values\":[\"2019-11-05T23:59:59Z\"]}\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ncompliance:reportSuggestions:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListSuggestions",
         "responses": {
           "200": {

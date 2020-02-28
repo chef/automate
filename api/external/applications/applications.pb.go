@@ -1715,7 +1715,6 @@ type ApplicationsServiceClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -1726,7 +1725,6 @@ type ApplicationsServiceClient interface {
 	//Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -1738,7 +1736,6 @@ type ApplicationsServiceClient interface {
 	//Supports pagination and search and status filtering. For a list of services for a specific service-group see "List Services for a Service Group" (GetServicesBySG endpoint).
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -1752,7 +1749,6 @@ type ApplicationsServiceClient interface {
 	//
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -1770,7 +1766,6 @@ type ApplicationsServiceClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -1783,7 +1778,6 @@ type ApplicationsServiceClient interface {
 	//Does not support filtering.
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -1797,7 +1791,6 @@ type ApplicationsServiceClient interface {
 	//by utilizing the `UpdateDisconnectedServicesConfig` endpoint.
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -1810,7 +1803,6 @@ type ApplicationsServiceClient interface {
 	//The functionality is currently covered by a periodically running job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:delete
 	//```
@@ -1819,7 +1811,6 @@ type ApplicationsServiceClient interface {
 	//Delete the services with the given IDs
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:delete
 	//```
@@ -1830,7 +1821,6 @@ type ApplicationsServiceClient interface {
 	//Displays the current version of the applications-service
 	//
 	//Authorization Action:
-	//
 	//```
 	//system:serviceVersion:get
 	//```
@@ -1842,7 +1832,6 @@ type ApplicationsServiceClient interface {
 	//This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
 	//
 	//Authorization Action:
-	//
 	//```
 	//retention:serviceGroups:get
 	//```
@@ -1863,7 +1852,6 @@ type ApplicationsServiceClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//retention:serviceGroups:update
 	//```
@@ -1876,7 +1864,6 @@ type ApplicationsServiceClient interface {
 	//This job is disabled if running is set to false.
 	//
 	//Authorization Action:
-	//
 	//```
 	//retention:serviceGroups:get
 	//```
@@ -1898,7 +1885,6 @@ type ApplicationsServiceClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//retention:serviceGroups:update
 	//```
@@ -2053,7 +2039,6 @@ type ApplicationsServiceServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -2064,7 +2049,6 @@ type ApplicationsServiceServer interface {
 	//Lists the total service group health reports by critical, warning, ok and unknown responses. Supports search and status filtering.
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -2076,7 +2060,6 @@ type ApplicationsServiceServer interface {
 	//Supports pagination and search and status filtering. For a list of services for a specific service-group see "List Services for a Service Group" (GetServicesBySG endpoint).
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -2090,7 +2073,6 @@ type ApplicationsServiceServer interface {
 	//
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -2108,7 +2090,6 @@ type ApplicationsServiceServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -2121,7 +2102,6 @@ type ApplicationsServiceServer interface {
 	//Does not support filtering.
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -2135,7 +2115,6 @@ type ApplicationsServiceServer interface {
 	//by utilizing the `UpdateDisconnectedServicesConfig` endpoint.
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:list
 	//```
@@ -2148,7 +2127,6 @@ type ApplicationsServiceServer interface {
 	//The functionality is currently covered by a periodically running job that can be configured using `UpdateDeleteDisconnectedServicesConfig`.
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:delete
 	//```
@@ -2157,7 +2135,6 @@ type ApplicationsServiceServer interface {
 	//Delete the services with the given IDs
 	//
 	//Authorization Action:
-	//
 	//```
 	//applications:serviceGroups:delete
 	//```
@@ -2168,7 +2145,6 @@ type ApplicationsServiceServer interface {
 	//Displays the current version of the applications-service
 	//
 	//Authorization Action:
-	//
 	//```
 	//system:serviceVersion:get
 	//```
@@ -2180,7 +2156,6 @@ type ApplicationsServiceServer interface {
 	//This task is always enabled, cannot be disabled. Because this task runs continuously, the response does not return information about its status.
 	//
 	//Authorization Action:
-	//
 	//```
 	//retention:serviceGroups:get
 	//```
@@ -2201,7 +2176,6 @@ type ApplicationsServiceServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//retention:serviceGroups:update
 	//```
@@ -2214,7 +2188,6 @@ type ApplicationsServiceServer interface {
 	//This job is disabled if running is set to false.
 	//
 	//Authorization Action:
-	//
 	//```
 	//retention:serviceGroups:get
 	//```
@@ -2236,7 +2209,6 @@ type ApplicationsServiceServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//retention:serviceGroups:update
 	//```

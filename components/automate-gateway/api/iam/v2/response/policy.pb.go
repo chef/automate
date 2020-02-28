@@ -178,6 +178,7 @@ func (m *ListPoliciesResp) GetPolicies() []*common.Policy {
 }
 
 type AddPolicyMembersResp struct {
+	// Resulting list of policy members.
 	Members              []string `protobuf:"bytes,1,rep,name=members,proto3" json:"members,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -357,6 +358,7 @@ func (m *ResetToV1Resp) XXX_DiscardUnknown() {
 var xxx_messageInfo_ResetToV1Resp proto.InternalMessageInfo
 
 type ListPolicyMembersResp struct {
+	// List of policy members.
 	Members              []string `protobuf:"bytes,1,rep,name=members,proto3" json:"members,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -396,6 +398,7 @@ func (m *ListPolicyMembersResp) GetMembers() []string {
 }
 
 type ReplacePolicyMembersResp struct {
+	// Resulting list of policy members.
 	Members              []string `protobuf:"bytes,1,rep,name=members,proto3" json:"members,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -435,6 +438,7 @@ func (m *ReplacePolicyMembersResp) GetMembers() []string {
 }
 
 type RemovePolicyMembersResp struct {
+	// Resulting list of policy members.
 	Members              []string `protobuf:"bytes,1,rep,name=members,proto3" json:"members,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`

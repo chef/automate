@@ -16,6 +16,8 @@ func init() {
   "paths": {
     "/iam/v2/tokens": {
       "get": {
+        "summary": "List all tokens",
+        "description": "List all tokens, both admin and non-admin.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListTokens",
         "responses": {
           "200": {
@@ -26,10 +28,12 @@ func init() {
           }
         },
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       },
       "post": {
+        "summary": "Create a token",
+        "description": "Creates a token.\nActive defaults to true when not specified.\nValue is auto-generated when not specified.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"token 1\",\n\"id\": \"token-1\",\n\"active\": true,\n\"projects\": [\n\"east-region\",\n\"west-region\"\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nNote that this creates *non-admin* tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using ` + "`" + `tokens:*` + "`" + `` + "`" + `).\n\nYou cannot create admin tokens via the REST API.\nAdmin tokens can only be created by specifying the ` + "`" + `--admin` + "`" + ` flag to this chef-automate sub-command:\n` + "`" + `` + "`" + `` + "`" + `\nchef-automate iam token create \u003cyour-token-name\u003e --admin` + "`" + `\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateToken",
         "responses": {
           "200": {
@@ -50,12 +54,14 @@ func init() {
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       }
     },
     "/iam/v2/tokens/{id}": {
       "get": {
+        "summary": "Get a token",
+        "description": "Returns the details for a token.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetToken",
         "responses": {
           "200": {
@@ -68,16 +74,19 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "ID of the token.",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       },
       "delete": {
+        "summary": "Delete a token",
+        "description": "Delete a token and remove it from any policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteToken",
         "responses": {
           "200": {
@@ -90,16 +99,19 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "ID of the token.",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       },
       "put": {
+        "summary": "Update a token",
+        "description": "This operation overwrites all fields excepting ID, timestamps, and value,\nincluding those omitted from the request, so be sure to specify all properties.\nProperties that you do not include are reset to empty values.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateToken",
         "responses": {
           "200": {
@@ -112,7 +124,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "ID can't be changed; ID used to discover token",
+            "description": "Unique ID. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -127,7 +139,7 @@ func init() {
           }
         ],
         "tags": [
-          "Tokens"
+          "tokens"
         ]
       }
     }
@@ -137,25 +149,34 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID. Cannot be changed."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the token."
         },
         "active": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Active state. Defaults to true.\nIf set to false, token will not be authenticated or authorized."
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique value for the token; if omitted the system will generate this."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of projects this token belongs to."
         }
-      }
+      },
+      "required": [
+        "id",
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.CreateTokenResp": {
       "type": "object",
@@ -194,29 +215,36 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID. Cannot be changed."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the token."
         },
         "value": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique, optionally user-specified value."
         },
         "active": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Active state. Defaults to true.\nIf set to false, token will not authenticate."
         },
         "created_at": {
-          "type": "string"
+          "type": "string",
+          "description": "Created timestamp."
         },
         "updated_at": {
-          "type": "string"
+          "type": "string",
+          "description": "Updated timestamp."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of projects this token belongs to. May be empty."
         }
       }
     },
@@ -225,22 +253,28 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "title": "ID can't be changed; ID used to discover token"
+          "description": "Unique ID. Cannot be changed."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the token."
         },
         "active": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Active state. Defaults to true.\nIf set to false, token will not be authenticated or authorized."
         },
         "projects": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of projects this token belongs to."
         }
-      }
+      },
+      "required": [
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateTokenResp": {
       "type": "object",
