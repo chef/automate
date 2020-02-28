@@ -6,6 +6,8 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/ia
 // Statement, Policy definitions
 import "components/automate-gateway/api/iam/v2/common/policy.proto";
 
+// NB: Doc annotations in responses will only apply for simple types; others will be ignored.
+
 message CreatePolicyResp {
   Policy policy = 1;
 }
@@ -23,6 +25,7 @@ message ListPoliciesResp {
 }
 
 message AddPolicyMembersResp {
+  // Resulting list of policy members.
   repeated string members = 1;
 }
 
@@ -39,14 +42,17 @@ message GetPolicyVersionResp {
 message ResetToV1Resp {}
 
 message ListPolicyMembersResp {
+  // List of policy members.
   repeated string members = 1;
 }
 
 message ReplacePolicyMembersResp {
+  // Resulting list of policy members.
   repeated string members = 1;
 }
 
 message RemovePolicyMembersResp {
+  // Resulting list of policy members.
   repeated string members = 1;
 }
 

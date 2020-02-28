@@ -3053,7 +3053,6 @@ type ReportingServiceClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reports:list
 	//```
@@ -3068,7 +3067,6 @@ type ReportingServiceClient interface {
 	//Not limited to 10k results.
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportids:list
 	//```
@@ -3081,7 +3079,6 @@ type ReportingServiceClient interface {
 	//Limited to 100 results by default.
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:controlItems:list
 	//```
@@ -3094,7 +3091,6 @@ type ReportingServiceClient interface {
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reports:get
 	//```
@@ -3139,7 +3135,6 @@ type ReportingServiceClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportSuggestions:list
 	//```
@@ -3152,7 +3147,6 @@ type ReportingServiceClient interface {
 	//Valid sort fields: name, title
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportProfiles:list
 	//```
@@ -3167,7 +3161,6 @@ type ReportingServiceClient interface {
 	//Does not support pagination or sorting.
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportNodes:get
 	//```
@@ -3203,7 +3196,6 @@ type ReportingServiceClient interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportNodes:list
 	//```
@@ -3399,7 +3391,6 @@ type ReportingServiceServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reports:list
 	//```
@@ -3414,7 +3405,6 @@ type ReportingServiceServer interface {
 	//Not limited to 10k results.
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportids:list
 	//```
@@ -3427,7 +3417,6 @@ type ReportingServiceServer interface {
 	//Limited to 100 results by default.
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:controlItems:list
 	//```
@@ -3440,7 +3429,6 @@ type ReportingServiceServer interface {
 	//Including values for both `profile_id` and `profile_name` in one request is not allowed.
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reports:get
 	//```
@@ -3485,7 +3473,6 @@ type ReportingServiceServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportSuggestions:list
 	//```
@@ -3498,7 +3485,6 @@ type ReportingServiceServer interface {
 	//Valid sort fields: name, title
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportProfiles:list
 	//```
@@ -3513,7 +3499,6 @@ type ReportingServiceServer interface {
 	//Does not support pagination or sorting.
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportNodes:get
 	//```
@@ -3549,7 +3534,6 @@ type ReportingServiceServer interface {
 	//```
 	//
 	//Authorization Action:
-	//
 	//```
 	//compliance:reportNodes:list
 	//```
