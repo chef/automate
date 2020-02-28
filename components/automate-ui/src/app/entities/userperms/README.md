@@ -46,7 +46,7 @@ Example:
 {
   "endpoints": {
     "/iam/v2/tokens": { "delete": false, "get": true, "post": true, "put": false },
-    "/auth/policies": { "delete": false, "get": true, "post": true, "put": false },
+    "/iam/v2/policies": { "delete": false, "get": true, "post": true, "put": false },
     "/cfgmgmt/stats/run_counts": { "delete": false, "get": true, "post": false, "put": false },
     "/cfgmgmt/suggestions": { "delete": false, "get": true, "post": false, "put": false },
     "/cfgmgmt/version": { "delete": false, "get": true, "post": false, "put": false }

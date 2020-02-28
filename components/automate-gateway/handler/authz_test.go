@@ -26,9 +26,11 @@ import (
 	// Here in this testbed, that automatically includes less than 40 endpoints
 	// (primarily nodes, notifications, and secrets at the time of writing).
 	_ "github.com/chef/automate/api/external/cfgmgmt"
+	_ "github.com/chef/automate/api/external/compliance/profiles"
 	_ "github.com/chef/automate/api/external/ingest"
 	_ "github.com/chef/automate/components/automate-gateway/api/authz"
-	_ "github.com/chef/automate/api/external/compliance/profiles"
+	_ "github.com/chef/automate/components/automate-gateway/api/iam/v2"
+	_ "github.com/chef/automate/components/automate-gateway/api/notifications"
 )
 
 func TestIntrospectAll(t *testing.T) {
@@ -44,26 +46,26 @@ func TestIntrospectAll(t *testing.T) {
 	}{
 		"one response pair, mapped": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "iam:policies", Action: "iam:policies:create"},
+				{Resource: "notifications:rules", Action: "notifications:notifyRules:create"},
 			}},
-			map[string]*response.MethodsAllowed{"/auth/policies": &response.MethodsAllowed{Post: true}},
+			map[string]*response.MethodsAllowed{"/notifications/rules": &response.MethodsAllowed{Post: true}},
 		},
 		"two response pairs, both mapped": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "iam:policies", Action: "iam:policies:create"},
+				{Resource: "notifications:rules", Action: "notifications:notifyRules:create"},
 				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
 			map[string]*response.MethodsAllowed{
-				"/auth/introspect": &response.MethodsAllowed{Get: true},
-				"/auth/policies":   &response.MethodsAllowed{Post: true},
+				"/auth/introspect":     &response.MethodsAllowed{Get: true},
+				"/notifications/rules": &response.MethodsAllowed{Post: true},
 			},
 		},
 		"two response pairs, both mapped, one with holes": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "iam:policies", Action: "iam:policies:create"},
-				{Resource: "iam:policies:{id}", Action: "iam:policies:delete"},
+				{Resource: "notifications:rules", Action: "notifications:notifyRules:create"},
+				{Resource: "notifications:rules:id}", Action: "notifications:notifyRules:delete"},
 			}},
-			map[string]*response.MethodsAllowed{"/auth/policies": {Post: true}},
+			map[string]*response.MethodsAllowed{"/notifications/rules": {Post: true}},
 		},
 	}
 
@@ -114,39 +116,39 @@ func TestIntrospectSome(t *testing.T) {
 		},
 		"ONE response pair, from two requested with one an INVALID path": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "iam:policies", Action: "iam:policies:create"},
+				{Resource: "notifications:rules", Action: "notifications:notifyRules:create"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
 				"/foo/bar",
-				"/auth/policies",
+				"/notifications/rules",
 			}},
-			map[string]*response.MethodsAllowed{"/auth/policies": {Post: true}},
+			map[string]*response.MethodsAllowed{"/notifications/rules": {Post: true}},
 		},
 		"TWO response pairs, from two requested with one a DISALLOWED path": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "system:service:version", Action: "system:serviceVersion:get"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
-				"/auth/policies",
-				"/auth/policies/version",
+				"/notifications/rules",
+				"/notifications/version",
 			}},
 			map[string]*response.MethodsAllowed{
-				"/auth/policies":         {Get: false, Post: false, Put: false, Delete: false, Patch: false},
-				"/auth/policies/version": {Get: true, Post: false, Put: false, Delete: false, Patch: false},
+				"/notifications/rules":   {Get: false, Post: false, Put: false, Delete: false, Patch: false},
+				"/notifications/version": {Get: true, Post: false, Put: false, Delete: false, Patch: false},
 			},
 		},
 		"two response pairs, from two requested": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "iam:policies", Action: "iam:policies:create"},
+				{Resource: "notifications:rules", Action: "notifications:notifyRules:create"},
 				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
 				"/auth/introspect",
-				"/auth/policies",
+				"/notifications/rules",
 			}},
 			map[string]*response.MethodsAllowed{
-				"/auth/introspect": {Get: true},
-				"/auth/policies":   {Post: true},
+				"/auth/introspect":     {Get: true},
+				"/notifications/rules": {Post: true},
 			},
 		},
 	}
@@ -189,8 +191,8 @@ func TestIntrospect(t *testing.T) {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
 				{Resource: "iam:policies:f33a996c-b4e8-4328-9730-90f4b351fa6e", Action: "iam:policies:delete"},
 			}},
-			&request.IntrospectReq{Path: "/auth/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e"},
-			map[string]*response.MethodsAllowed{"/auth/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e": &response.MethodsAllowed{Delete: true}},
+			&request.IntrospectReq{Path: "/iam/v2/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e"},
+			map[string]*response.MethodsAllowed{"/iam/v2/policies/f33a996c-b4e8-4328-9730-90f4b351fa6e": &response.MethodsAllowed{Delete: true}},
 		},
 		"response pair matching the request with param in POST body": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
