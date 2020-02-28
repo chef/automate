@@ -340,6 +340,40 @@
     }
   },
   "definitions": {
+    "chef.automate.api.common.query.Filter": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Field to filter on."
+        },
+        "exclude": {
+          "type": "boolean",
+          "format": "boolean",
+          "description": "Include matches for this filter.(boolean)\n`true` (default) *includes* all nodes that match this filter. \n`false` *excludes* all nodes that match this filter."
+        },
+        "values": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Field values to filter on."
+        }
+      }
+    },
+    "chef.automate.api.common.query.Kv": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string",
+          "description": "Tag key."
+        },
+        "value": {
+          "type": "string",
+          "description": "Tag value."
+        }
+      }
+    },
     "chef.automate.api.nodes.manager.v1.ConnectResponse": {
       "type": "object"
     },
@@ -491,7 +525,7 @@
         "credential_data": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Kv"
+            "$ref": "#/definitions/chef.automate.api.common.query.Kv"
           },
           "description": "Use either 'credential_data' OR 'credential_id'.\n'credential_data' will overwrite values in 'credential_id'.\nUse 'credential_data' when you have not yet created node credentials\nand provide credential data (such as AWS_ACCESS_KEY) inline."
         }
@@ -573,7 +607,7 @@
         "filter_map": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/chef.automate.domain.compliance.api.common.Filter"
+            "$ref": "#/definitions/chef.automate.api.common.query.Filter"
           },
           "description": "Filters for the query: \"manager_type\"."
         },
@@ -607,40 +641,6 @@
       ],
       "default": "ASC",
       "description": "Sort the results in ascending or descending order."
-    },
-    "chef.automate.domain.compliance.api.common.Filter": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "Field to filter on."
-        },
-        "exclude": {
-          "type": "boolean",
-          "format": "boolean",
-          "description": "Include matches for this filter.(boolean)\n`true` (default) *includes* all nodes that match this filter. \n`false` *excludes* all nodes that match this filter."
-        },
-        "values": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          },
-          "description": "Field values to filter on."
-        }
-      }
-    },
-    "chef.automate.domain.compliance.api.common.Kv": {
-      "type": "object",
-      "properties": {
-        "key": {
-          "type": "string",
-          "description": "Tag key."
-        },
-        "value": {
-          "type": "string",
-          "description": "Tag value."
-        }
-      }
     }
   }
 }
