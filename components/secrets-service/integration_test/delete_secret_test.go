@@ -4,6 +4,7 @@ import (
 	"context"
 	"testing"
 
+	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/stretchr/testify/assert"
 )
@@ -32,8 +33,8 @@ func TestDeleteSecretCreateAndDelete(t *testing.T) {
 		Name: "name",
 		Type: "ssh",
 		Data: appendKvs(
-			&secrets.Kv{Key: "username", Value: "username"},
-			&secrets.Kv{Key: "password", Value: "password"}),
+			&query.Kv{Key: "username", Value: "username"},
+			&query.Kv{Key: "password", Value: "password"}),
 	}
 
 	// Create one secret

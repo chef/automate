@@ -13,6 +13,7 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/lib/cereal"
+	"github.com/chef/automate/lib/db"
 )
 
 const (
@@ -254,7 +255,7 @@ func (pg *PostgresBackend) Init() error {
 }
 
 func (pg *PostgresBackend) newDB() (*sql.DB, error) {
-	db, err := sql.Open("postgres", pg.connURI)
+	db, err := db.PGOpen(pg.connURI, db.WithoutPinger())
 	if err != nil {
 		return nil, err
 	}

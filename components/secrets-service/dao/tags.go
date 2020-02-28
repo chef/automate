@@ -5,7 +5,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/external/common/query"
 )
 
 type secretTag struct {
@@ -14,7 +14,7 @@ type secretTag struct {
 	Value string `db:"value"`
 }
 
-func (trans *DBTrans) addSecretTags(tags []*secrets.Kv) ([]string, error) {
+func (trans *DBTrans) addSecretTags(tags []*query.Kv) ([]string, error) {
 	tagIDs := make([]string, 0)
 	tagArr := make([]interface{}, 0)
 	for _, keyValue := range tags {
@@ -49,7 +49,7 @@ func (trans *DBTrans) tagSecret(secretID string, tagIDs []string) error {
 }
 
 // KeyValueToRawMap helps convert an array of KeyValues in a Map and convert it to json
-func KeyValueToRawMap(arr []*secrets.Kv) (json.RawMessage, error) {
+func KeyValueToRawMap(arr []*query.Kv) (json.RawMessage, error) {
 	zaMap := make(map[string]string, 0)
 	for _, kv := range arr {
 		zaMap[kv.Key] = kv.Value
@@ -62,7 +62,7 @@ func KeyValueToRawMap(arr []*secrets.Kv) (json.RawMessage, error) {
 }
 
 // RawMapToKeyValue helps convert an array of KeyValues in a Map and convert it to json
-func RawMapToKeyValue(rawJSON json.RawMessage) ([]*secrets.Kv, error) {
+func RawMapToKeyValue(rawJSON json.RawMessage) ([]*query.Kv, error) {
 	var zaMap map[string]string
 
 	err := json.Unmarshal(rawJSON, &zaMap)
@@ -70,9 +70,9 @@ func RawMapToKeyValue(rawJSON json.RawMessage) ([]*secrets.Kv, error) {
 		return nil, errors.Wrap(err, "rawMapToKeyValue unable to unmarshal map")
 	}
 
-	zaArray := make([]*secrets.Kv, 0, len(zaMap))
+	zaArray := make([]*query.Kv, 0, len(zaMap))
 	for k, v := range zaMap {
-		zaArray = append(zaArray, &secrets.Kv{Key: k, Value: v})
+		zaArray = append(zaArray, &query.Kv{Key: k, Value: v})
 	}
 	return zaArray, nil
 }

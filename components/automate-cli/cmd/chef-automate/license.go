@@ -15,11 +15,11 @@ import (
 	grpc_codes "google.golang.org/grpc/codes"
 	grpc_status "google.golang.org/grpc/status"
 
+	"github.com/chef/automate/api/external/compliance/reporting"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/client"
-	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
 	tslib "github.com/chef/automate/lib/grpc/timestamp"
 )
 

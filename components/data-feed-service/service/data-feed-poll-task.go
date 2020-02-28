@@ -11,7 +11,7 @@ import (
 
 	cfgmgmtRequest "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
-	"github.com/chef/automate/components/compliance-service/api/reporting"
+	"github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/data-feed-service/config"
 	"github.com/chef/automate/components/data-feed-service/dao"
 	"github.com/chef/automate/lib/cereal"

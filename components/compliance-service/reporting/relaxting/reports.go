@@ -14,8 +14,8 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"

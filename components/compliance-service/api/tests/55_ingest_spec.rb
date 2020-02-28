@@ -2,16 +2,16 @@ require_relative 'test_support'
 ##### GRPC SETUP #####
 require 'api/interservice/nodemanager/nodes/nodes_pb'
 require 'api/interservice/nodemanager/nodes/nodes_services_pb'
-require 'api/jobs/jobs_pb'
-require 'api/jobs/jobs_services_pb'
-require 'api/reporting/reporting_pb'
-require 'api/reporting/reporting_services_pb'
+require 'api/interservice/compliance/jobs/jobs_pb'
+require 'api/interservice/compliance/jobs/jobs_services_pb'
+require 'api/interservice/compliance/reporting/reporting_pb'
+require 'api/interservice/compliance/reporting/reporting_services_pb'
 
 describe File.basename(__FILE__) do
-  Reporting = Chef::Automate::Domain::Compliance::Api::Reporting unless defined?(Reporting)
+  Reporting = Chef::Automate::Domain::Compliance::Reporting unless defined?(Reporting)
   Nodes = Chef::Automate::Domain::Nodemanager::Nodes unless defined?(Nodes)
-  Jobs = Chef::Automate::Domain::Compliance::Api::Jobs unless defined?(Jobs)
-  Common = Chef::Automate::Domain::Compliance::Api::Common unless defined?(Common)
+  Jobs = Chef::Automate::Domain::Compliance::Jobs unless defined?(Jobs)
+  Common = Chef::Automate::Domain::Compliance::Common unless defined?(Common)
 
   reporting = Reporting::ReportingService
   nodes = Nodes::NodesService

@@ -5,7 +5,7 @@ import (
 
 	pb "github.com/golang/protobuf/ptypes/empty"
 
-	ver_api "github.com/chef/automate/components/compliance-service/api/version"
+	ver_api "github.com/chef/automate/api/interservice/compliance/version"
 	"github.com/chef/automate/components/compliance-service/config"
 	"github.com/chef/automate/lib/version"
 )

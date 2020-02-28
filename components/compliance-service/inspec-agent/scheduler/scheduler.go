@@ -9,7 +9,7 @@ import (
 	"github.com/sirupsen/logrus"
 	rrule "github.com/teambition/rrule-go"
 
-	"github.com/chef/automate/components/compliance-service/api/jobs"
+	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/runner"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/compliance-service/scanner"

@@ -45,13 +45,13 @@ func (a *Secrets) Read(ctx context.Context, in *secrets.Id) (*secrets.Secret, er
 	if err != nil {
 		return nil, err
 	}
-	if key, found := findKeyValue(out.Data, "password"); found {
+	if key, found := FindKeyValue(out.Data, "password"); found {
 		key.Value = ""
 	}
-	if key, found := findKeyValue(out.Data, "sudo_password"); found {
+	if key, found := FindKeyValue(out.Data, "sudo_password"); found {
 		key.Value = ""
 	}
-	if key, found := findKeyValue(out.Data, "key"); found {
+	if key, found := FindKeyValue(out.Data, "key"); found {
 		key.Value = ""
 	}
 	return out, nil
@@ -97,13 +97,4 @@ func (a *Secrets) List(ctx context.Context, in *secrets.Query) (*secrets.Secrets
 		return nil, err
 	}
 	return out, nil
-}
-
-func findKeyValue(items []*secrets.Kv, key string) (*secrets.Kv, bool) {
-	for _, item := range items {
-		if item.Key == key {
-			return item, true
-		}
-	}
-	return nil, false
 }

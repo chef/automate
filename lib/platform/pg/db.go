@@ -5,6 +5,8 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/sirupsen/logrus"
+
+	"github.com/chef/automate/lib/db"
 )
 
 // A DBProvider allows you to connect to a DB
@@ -51,7 +53,7 @@ func Connect(info ConnInfoURI, dbname string) (DB, error) {
 }
 
 func (s *sqlDBProvider) Connect(info ConnInfoURI, dbname string) (DB, error) {
-	db, err := sql.Open("postgres", info.ConnURI(dbname))
+	db, err := db.PGOpen(info.ConnURI(dbname), db.WithoutPinger())
 	if err != nil {
 		return nil, err
 	}

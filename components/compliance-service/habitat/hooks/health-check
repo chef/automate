@@ -26,7 +26,7 @@ response=$(grpcurl -max-time 2 \
   -cert {{pkg.svc_config_path}}/service.crt \
   -key {{pkg.svc_config_path}}/service.key \
   {{sys.ip}}:{{cfg.service.port}} \
-  chef.automate.domain.compliance.api.version.VersionService.Version 2>&1)
+  chef.automate.domain.compliance.version.VersionService.Version 2>&1)
 
 parse_result=$(echo "$response" | jq -r .name)
 

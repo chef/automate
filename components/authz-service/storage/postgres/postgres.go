@@ -11,6 +11,7 @@ import (
 	"github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
+	"github.com/chef/automate/lib/db"
 )
 
 // New returns a new sql.DB connector with the automatic default migrations applied.
@@ -37,16 +38,16 @@ func New(ctx context.Context, migConf migration.Config, dataMigConf datamigratio
 }
 
 func initPostgresDB(ctx context.Context, pgURL string) (*sql.DB, error) {
-	db, err := sql.Open("postgres", pgURL)
+	d, err := db.PGOpenContext(ctx, pgURL)
 	if err != nil {
 		return nil, err
 	}
 
-	if err := db.PingContext(ctx); err != nil {
+	if err := d.PingContext(ctx); err != nil {
 		return nil, err
 	}
 
-	return db, nil
+	return d, nil
 }
 
 // ProcessError is used to translate DB-related errors into the error types

@@ -6,10 +6,10 @@ import (
 	"strings"
 
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/interservice/compliance/common"
+	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
@@ -22,7 +22,6 @@ import (
 	libSecrets "github.com/chef/automate/lib/secrets"
 	"github.com/chef/automate/lib/stringutils"
 	"github.com/gofrs/uuid"
-
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 )

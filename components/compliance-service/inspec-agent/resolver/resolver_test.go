@@ -4,9 +4,10 @@ import (
 	"testing"
 
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/external/common/query"
+	"github.com/chef/automate/api/interservice/compliance/common"
+	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
-	"github.com/chef/automate/components/compliance-service/api/common"
-	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -61,7 +62,7 @@ func TestHandleSSMNodes(t *testing.T) {
 func TestGetNodeCredentials(t *testing.T) {
 	secret := &secrets.Secret{
 		Type: "ssh",
-		Data: []*secrets.Kv{{Key: "username", Value: "my-user"}, {Key: "password", Value: "my-password"}},
+		Data: []*query.Kv{{Key: "username", Value: "my-user"}, {Key: "password", Value: "my-password"}},
 	}
 	inspecSecrets, err := getNodeCredentials(secret)
 	require.NoError(t, err)
@@ -69,7 +70,7 @@ func TestGetNodeCredentials(t *testing.T) {
 
 	secret = &secrets.Secret{
 		Type: "winrm",
-		Data: []*secrets.Kv{{Key: "username", Value: "my-user"}, {Key: "password", Value: "my-password"}},
+		Data: []*query.Kv{{Key: "username", Value: "my-user"}, {Key: "password", Value: "my-password"}},
 	}
 	inspecSecrets, err = getNodeCredentials(secret)
 	require.NoError(t, err)
@@ -77,7 +78,7 @@ func TestGetNodeCredentials(t *testing.T) {
 
 	secret = &secrets.Secret{
 		Type: "sudo",
-		Data: []*secrets.Kv{{Key: "password", Value: "my-sudo-password"}},
+		Data: []*query.Kv{{Key: "password", Value: "my-sudo-password"}},
 	}
 	inspecSecrets, err = getNodeCredentials(secret)
 	require.NoError(t, err)

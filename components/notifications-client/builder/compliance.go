@@ -8,8 +8,8 @@ import (
 	"github.com/golang/protobuf/jsonpb"
 	proto "github.com/golang/protobuf/proto"
 
-	"github.com/chef/automate/components/compliance-service/ingest/events/compliance"
-	"github.com/chef/automate/components/compliance-service/ingest/events/inspec"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	. "github.com/chef/automate/components/notifications-client/api"
 )
 

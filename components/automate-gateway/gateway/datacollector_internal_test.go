@@ -16,8 +16,8 @@ import (
 	"testing"
 
 	ingestReq "github.com/chef/automate/api/external/ingest/request"
+	mock_compliance_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/api/interservice/ingest"
-	mock_compliance_ingest "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_compliance_ingest"
 	mock_notifier "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_notifier"
 	"github.com/golang/mock/gomock"
 	gp "github.com/golang/protobuf/ptypes/empty"

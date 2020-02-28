@@ -5,9 +5,9 @@ import (
 	"fmt"
 
 	"github.com/chef/automate/api/external/nodes/manager"
+	jobsService "github.com/chef/automate/api/interservice/compliance/jobs"
 	nodeManagerService "github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/automate-gateway/protobuf"
-	jobsService "github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/golang/protobuf/proto"
 	gp "github.com/golang/protobuf/ptypes/empty"

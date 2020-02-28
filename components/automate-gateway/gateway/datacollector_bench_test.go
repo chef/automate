@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	ingestProto "github.com/chef/automate/api/external/ingest/request"
-	complianceEvent "github.com/chef/automate/components/compliance-service/ingest/events/compliance"
+	complianceEvent "github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 )
 
 func init() {

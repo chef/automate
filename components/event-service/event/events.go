@@ -9,10 +9,10 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
+	compliance_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	api "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/api/interservice/ingest"
-	compliance_ingest "github.com/chef/automate/components/compliance-service/ingest/ingest"
 	"github.com/chef/automate/components/event-service/config"
 	"github.com/chef/automate/lib/grpc/secureconn"
 )

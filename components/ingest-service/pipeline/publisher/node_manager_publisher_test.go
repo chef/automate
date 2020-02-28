@@ -6,9 +6,9 @@ import (
 	"time"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
+	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline/message"
 	"github.com/golang/mock/gomock"

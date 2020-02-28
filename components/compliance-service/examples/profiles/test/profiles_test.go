@@ -5,7 +5,7 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/chef/automate/components/compliance-service/api/profiles"
+	"github.com/chef/automate/api/interservice/compliance/profiles"
 )
 
 func TestUpload(t *testing.T) {

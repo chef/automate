@@ -12,10 +12,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/secrets"
+	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	"github.com/chef/automate/components/compliance-service/api/common"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/nodemanager-service/managers"
 	"github.com/chef/automate/components/nodemanager-service/mgrtypes"
@@ -123,9 +124,9 @@ func (srv *Server) handleCredentialData(ctx context.Context, in *manager.NodeMan
 	if strings.HasPrefix(in.Type, "gcp") {
 		credType = "gcp"
 	}
-	secretsKv := []*secrets.Kv{}
+	secretsKv := []*query.Kv{}
 	for _, kv := range in.CredentialData {
-		secretsKv = append(secretsKv, &secrets.Kv{Key: kv.Key, Value: kv.Value})
+		secretsKv = append(secretsKv, &query.Kv{Key: kv.Key, Value: kv.Value})
 	}
 	newSecret := &secrets.Secret{
 		Name: "auto-generated-credential",

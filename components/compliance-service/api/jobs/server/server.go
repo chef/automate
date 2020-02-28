@@ -14,10 +14,10 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/api/interservice/compliance/jobs"
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	"github.com/chef/automate/components/compliance-service/api/jobs"
 	"github.com/chef/automate/components/compliance-service/dao/pgdb"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/scheduler"
 	"github.com/chef/automate/components/compliance-service/scanner"

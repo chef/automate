@@ -1,7 +1,6 @@
 package pgdb
 
 import (
-	gosql "database/sql"
 	"sort"
 	"time"
 
@@ -13,6 +12,7 @@ import (
 
 	"github.com/chef/automate/components/nodemanager-service/config"
 	project_update_lib "github.com/chef/automate/lib/authz"
+	"github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/db/migrator"
 	"github.com/chef/automate/lib/logger"
 )
@@ -84,7 +84,7 @@ func Transact(db *DB, txFunc func(*DBTrans) error) error {
 
 func InitDB(connectionString string) (*DB, error) {
 	logrus.Debugf("Use PostgreSQL backend %s", connectionString)
-	sql, err := gosql.Open("postgres", connectionString)
+	sql, err := db.PGOpen(connectionString)
 	if err != nil {
 		return nil, errors.Wrapf(err, "Failed to open database with uri: %s", connectionString)
 	}

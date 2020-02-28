@@ -14,7 +14,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/status"
 
-	reportingapi "github.com/chef/automate/components/compliance-service/api/reporting"
+	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/lib/errorutils"
 	"google.golang.org/grpc/codes"
 )

@@ -10,12 +10,12 @@ import (
 	"github.com/sirupsen/logrus"
 
 	version "github.com/chef/automate/api/external/common/version"
-	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
+	"github.com/chef/automate/api/external/compliance/reporting"
+	"github.com/chef/automate/api/interservice/compliance/jobs"
+	jobsService "github.com/chef/automate/api/interservice/compliance/jobs"
+	reportingService "github.com/chef/automate/api/interservice/compliance/reporting"
+	versionService "github.com/chef/automate/api/interservice/compliance/version"
 	"github.com/chef/automate/components/automate-gateway/protobuf"
-	"github.com/chef/automate/components/compliance-service/api/jobs"
-	jobsService "github.com/chef/automate/components/compliance-service/api/jobs"
-	reportingService "github.com/chef/automate/components/compliance-service/api/reporting"
-	versionService "github.com/chef/automate/components/compliance-service/api/version"
 )
 
 type Reporting struct {
@@ -24,7 +24,8 @@ type Reporting struct {
 	scanner jobsService.JobsServiceClient
 }
 
-func NewReportingHandler(reportingClient reportingService.ReportingServiceClient, versionClient versionService.VersionServiceClient, jobsClient jobsService.JobsServiceClient) *Reporting {
+func NewReportingHandler(reportingClient reportingService.ReportingServiceClient,
+	versionClient versionService.VersionServiceClient, jobsClient jobsService.JobsServiceClient) *Reporting {
 	return &Reporting{
 		client:  reportingClient,
 		version: versionClient,
