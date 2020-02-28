@@ -132,7 +132,7 @@ Chef Automate generates API documentation from proto files comments using
 
 To build the API documentation during development:
 
-1. Make any edits to the .proto files necessary. Note that an "Authorization Action:" section will be added automatically in the next step.
+1. Make any edits to the .proto files necessary. Note that an "Authorization Action:" section will be added automatically in the next step. See [this pull request](https://github.com/chef/automate/pull/2982) for details on how and what to document and things to watch out for.
 2. Recompile the .proto files as described in the [Automate development guide](https://github.com/chef/automate/blob/master/dev-docs/DEV_ENVIRONMENT.md)
 3. From the top of the `components/automate-chef-io` directory, sync the .swagger files generated with those in the docs component by running `make sync_swagger_files`
 4. Run the hugo server and view the documentation in your browser
