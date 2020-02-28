@@ -617,7 +617,7 @@ and access to all _administrative_ tasks to all users in the local admins group
 (`team:local:admins`).
 This allows you to explore the user interface immediately,
 unencumbered with policy roadblocks limiting what you can see.
-The set of default policies is [here](../../docs/default_policies.md).
+The set of default policies is described in the [iam v2 overview](../../components/automate-chef-io/content/docs/iam-v2-overview.md).
 
 That set of default policies may even be fine for certain organizations.
 For others, it will be necessary to add and remove policies
@@ -643,15 +643,14 @@ To add a new default policy, the following is needed:
 
 ### Policy API
 
-Documentation of the complete Policy API are available [here](TBD).
-**Link to the swagger docs, or should the content be inline here??**
+[Policy API Documentation](https://automate.chef.io/docs/api/#tag/policies)
 
 Managing policies is done via the command line.
 These setup steps will make the process as productive as possible for you.
 
 1. Install the `jq` JSON formatter to be able to get pretty-printed output (`brew install jq`).
 1. Install the `jo` JSON generator to be able to type JSON concisely (`brew install jo`).
-1. In habitat studio, generate a non-expiring token (`generate_supertoken`).
+1. In habitat studio, generate a non-expiring token (`get_admin_token`).
 1. Copy that token into the `TOK` value in the following snippet and
   then execute to define these shell variables:
 
