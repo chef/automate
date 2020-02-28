@@ -617,7 +617,7 @@ and access to all _administrative_ tasks to all users in the local admins group
 (`team:local:admins`).
 This allows you to explore the user interface immediately,
 unencumbered with policy roadblocks limiting what you can see.
-The set of default policies is described [here](../../components/automate-chef-io/content/docs/iam-v2-overview.md).
+The set of default policies is described in the [iam v2 overview](../../components/automate-chef-io/content/docs/iam-v2-overview.md).
 
 That set of default policies may even be fine for certain organizations.
 For others, it will be necessary to add and remove policies
