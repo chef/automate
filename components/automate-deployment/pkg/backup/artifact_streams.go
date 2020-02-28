@@ -2,10 +2,16 @@ package backup
 
 import (
 	"bufio"
+	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"sort"
 	"strings"
 
+	"github.com/pkg/errors"
 	"go.uber.org/multierr"
 )
 
@@ -435,6 +441,123 @@ func NewCountingStream(stream ArtifactStream) CountingStream {
 	return &countingStream{
 		stream: stream,
 	}
+}
+
+// ReplayableStream is a stream that consumes a stream to a file and allows
+// it to be replayed several times
+type ReplayableStream interface {
+	ArtifactStream
+	Reset() error
+}
+
+type replayableStream struct {
+	writeStream  ArtifactStream
+	replayStream ArtifactStream
+	replayFile   *os.File
+	hasWritten   bool
+	useReplay    bool
+	closed       bool
+}
+
+// NewReplayableStream returns a stream which is cached to a temporary file
+// and is replyable if it has been reset.
+func NewReplayableStream(stream ArtifactStream) (ReplayableStream, error) {
+	var err error
+	var replayFile *os.File
+
+	replayFile, err = ioutil.TempFile("", "replayableStream")
+	if err != nil {
+		return nil, err
+	}
+
+	return &replayableStream{
+		replayFile:  replayFile,
+		writeStream: NewLoggingStream(stream, replayFile),
+	}, nil
+}
+
+func (s *replayableStream) Next() (string, error) {
+	var next string
+	var err error
+
+	if s.writeStream == nil {
+		return "", errors.New("unable to read from stream")
+	}
+
+	s.hasWritten = true
+
+	if s.useReplay {
+		next, err = s.replayStream.Next()
+	} else {
+		next, err = s.writeStream.Next()
+	}
+
+	return next, err
+}
+
+func (s *replayableStream) Reset() error {
+	if !s.hasWritten {
+		return nil
+	}
+
+	// Ensure that we consume the whole write stream before we start using
+	// the replay stream
+	if !s.useReplay {
+		if err := ConsumeStream(s.writeStream); err != nil {
+			return err
+		}
+	}
+
+	s.useReplay = true
+
+	if _, err := s.replayFile.Seek(0, os.SEEK_SET); err != nil {
+		return err
+	}
+
+	s.replayStream = NewLineReaderStream(s.replayFile)
+
+	return nil
+}
+
+func (s *replayableStream) Close() error {
+	if s.closed {
+		return nil
+	}
+
+	var (
+		err1 error
+		err2 error
+	)
+
+	if s.replayFile != nil {
+		err1 = os.Remove(s.replayFile.Name())
+	}
+
+	if s.useReplay {
+		err2 = s.replayStream.Close()
+	}
+
+	s.closed = true
+	return multierr.Combine(err1, err2, s.writeStream.Close())
+}
+
+// NewBucketObjectNameStream takes a bucket and returns a streams of all object
+// names for the given path
+func NewBucketObjectNameStream(ctx context.Context, bucket Bucket, pathPrefix string) (ArtifactStream, error) {
+	objects, _, err := bucket.List(ctx, pathPrefix, false)
+	if err != nil {
+		return nil, err
+	}
+	names := []string{}
+	for _, obj := range objects {
+		if filepath.Ext(obj.Name) == ".hart" {
+			names = append(names, obj.Name)
+		}
+	}
+
+	sort.Strings(names)
+
+	return NewArrayStream(names), nil
 }
 
 // ConsumeStream reads all elements in the stream until EOF is reached.

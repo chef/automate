@@ -93,6 +93,12 @@ func (c *BackupStatusResponse) Format() string {
 		msg = fmt.Sprintf("Restoring backup %s", c.GetTaskIds()[0])
 	case BackupStatusResponse_IDLE:
 		msg = fmt.Sprintf("Idle")
+	case BackupStatusResponse_VERIFY_INTEGRITY:
+		if len(c.GetTaskIds()) == 1 {
+			msg = fmt.Sprintf("Verifying backup %s", c.GetTaskIds()[0])
+		} else {
+			msg = fmt.Sprintf("Verifying backups %s", strings.Join(c.GetTaskIds(), ", "))
+		}
 	default:
 		msg = "Unknown"
 	}

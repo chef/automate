@@ -1,13 +1,18 @@
 package main
 
 import (
+	"bufio"
 	"context"
 	"crypto/tls"
 	"fmt"
 	"io/ioutil"
 	"math/rand"
 	"net/http"
+	"os"
 	"path"
+	"path/filepath"
+	"regexp"
+	"strings"
 	"time"
 
 	"github.com/aws/aws-sdk-go/aws"
@@ -18,8 +23,72 @@ import (
 	"gocloud.dev/blob"
 	"gocloud.dev/blob/s3blob"
 
+	"github.com/chef/automate/components/automate-deployment/pkg/cli"
 	"github.com/chef/automate/lib/httputils"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/platform/command"
 )
+
+var generateCmd = &cobra.Command{
+	Use:  "generate",
+	RunE: runGenerate,
+}
+
+var generateRealCmd = &cobra.Command{
+	Use:  "real",
+	RunE: runGenerateReal,
+	Args: cobra.ExactArgs(1), // path
+}
+
+var realCmdOpts = struct {
+	PlanPath string
+	NumPkgs  int
+	Username string
+	Password string
+	SeedList string
+	Seed     bool
+	URL      string
+	Debug    bool
+}{}
+
+func init() {
+	generateRealCmd.PersistentFlags().IntVarP(
+		&realCmdOpts.NumPkgs, "package-count", "c", 3,
+		"Number of packages to generate",
+	)
+
+	generateRealCmd.PersistentFlags().StringVarP(
+		&realCmdOpts.Username, "user", "u", "admin",
+		"Depot username",
+	)
+
+	generateRealCmd.PersistentFlags().StringVarP(
+		&realCmdOpts.Password, "password", "p", "chefautomate",
+		"Depot password",
+	)
+
+	generateRealCmd.PersistentFlags().StringVarP(
+		&realCmdOpts.URL, "url", "", "https://localhost/bldr/v1",
+		"Depot password",
+	)
+
+	generateRealCmd.PersistentFlags().StringVarP(
+		&realCmdOpts.SeedList, "seed-list", "l", "core_deps_x86_64-linux_stable",
+		"Core deps seed list",
+	)
+
+	generateRealCmd.PersistentFlags().BoolVarP(
+		&realCmdOpts.Seed, "seed", "s", false,
+		"Seed the core deps",
+	)
+
+	generateRealCmd.PersistentFlags().BoolVarP(
+		&realCmdOpts.Debug, "debug", "d", false,
+		"Enable debug mode",
+	)
+
+	generateCmd.AddCommand(generateRealCmd)
+}
 
 type Generator interface {
 	Generate() string
@@ -84,6 +153,135 @@ func (g *TimestampGenerator) Generate() string {
 	return timestamp.Format("20060102150405")
 }
 
+type RealPlanGenerator struct {
+}
+
+func (r *RealPlanGenerator) Generate() error {
+	writer := cli.NewWriter(os.Stdout, os.Stderr, os.Stdin)
+	writer.StartSpinner()
+	fail := func(err error) error {
+		writer.StopSpinner()
+		writer.Fail(command.StderrFromError(err))
+		writer.FailError(err)
+		return err
+	}
+
+	harts := []string{}
+	identReg := regexp.MustCompile(`pkg_artifact=(.*)`)
+	cwd, err := os.Getwd()
+	if err != nil {
+		return fail(err)
+	}
+
+	for i := 0; i < realCmdOpts.NumPkgs; i++ {
+		habOpts := []command.Opt{command.Args("pkg", "build", realCmdOpts.PlanPath)}
+
+		if realCmdOpts.Debug {
+			habOpts = append(habOpts, command.Stderr(os.Stderr))
+			habOpts = append(habOpts, command.Stdout(os.Stdout))
+		}
+
+		err := command.Run("hab", habOpts...)
+		if err != nil {
+			return fail(err)
+		}
+
+		lastEnvP := filepath.Join(cwd, "results", "last_build.env")
+		lastEnv, err := os.Open(lastEnvP)
+		defer lastEnv.Close() // nolint errcheck
+		if err != nil {
+			return fail(err)
+		}
+
+		scanner := bufio.NewScanner(lastEnv)
+		for scanner.Scan() {
+			l := scanner.Text()
+			matches := identReg.FindAllString(l, 1)
+			if len(matches) > 0 {
+				parts := strings.Split(matches[0], "=")
+				hart := filepath.Join(cwd, "results", parts[1])
+				defer os.Remove(hart) // nolint errcheck
+				harts = append(harts, hart)
+				break
+			}
+		}
+	}
+
+	tmpDir, err := ioutil.TempDir(filepath.Join(cwd, "results"), "gen")
+	if err != nil {
+		return fail(err)
+	}
+	defer os.RemoveAll(tmpDir) // nolint errcheck
+
+	// bulkupload looks for the "artifacts" and "keys" dir in the root directory
+	// that is passed
+	artifactsDir := filepath.Join(tmpDir, "artifacts")
+	err = os.Mkdir(artifactsDir, 0644)
+	if err != nil {
+		return fail(err)
+	}
+	keysDir := filepath.Join(tmpDir, "keys")
+
+	for _, hart := range harts {
+		if err = fileutils.CopyFile(hart, filepath.Join(artifactsDir, filepath.Base(hart))); err != nil {
+			return fail(err)
+		}
+	}
+
+	err = fileutils.CopyDir("/hab/cache/keys", keysDir, fileutils.Overwrite())
+	if err != nil {
+		return fail(err)
+	}
+
+	token, err := doLogin(realCmdOpts.Username, realCmdOpts.Password)
+	if err != nil {
+		return err
+	}
+
+	if realCmdOpts.Seed {
+		// TODO: Download seed list and upload it to the builder
+	}
+
+	habOpts := []command.Opt{
+		command.Envvar("HAB_AUTH_TOKEN", token),
+		command.Envvar("HAB_SSL_CERT_VERIFY_NONE", "1"),
+		command.Args("pkg", "bulkupload",
+			"--url", realCmdOpts.URL,
+			"--channel", "stable", tmpDir,
+			"--auto-create-origins",
+		),
+	}
+
+	if realCmdOpts.Debug {
+		habOpts = append(habOpts, command.Stderr(os.Stderr))
+		habOpts = append(habOpts, command.Stdout(os.Stdout))
+	}
+
+	err = command.Run("hab", habOpts...)
+	if err != nil {
+		return fail(err)
+	}
+
+	writer.StopSpinner()
+	return nil
+}
+
+func NewRealPlanGenerator() *RealPlanGenerator {
+	return &RealPlanGenerator{}
+}
+
+func runGenerateReal(c *cobra.Command, args []string) error {
+	generator := NewRealPlanGenerator()
+
+	if len(args) > 0 {
+		if path := args[0]; path != "" {
+			realCmdOpts.PlanPath = path
+		}
+	}
+
+	return generator.Generate()
+}
+
 func initS3Bucket(bucketName string) (*blob.Bucket, error) {
 	accessKey, err := ioutil.ReadFile(
 		"/hab/svc/deployment-service/data/shared/minio/access_key")
@@ -118,7 +316,7 @@ func initS3Bucket(bucketName string) (*blob.Bucket, error) {
 
 	bucket, err := s3blob.OpenBucket(context.Background(), s, bucketName, nil)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrapf(err, "opening bucket %s", bucketName)
 	}
 
 	return bucket, nil
@@ -171,7 +369,7 @@ func runGenerate(c *cobra.Command, args []string) error {
 						packageName,
 						"0.1.0",
 						release))
-				fmt.Printf("Creating %s\n", s3Path)
+				fmt.Printf("Creating %s/%s\n", bucketName, s3Path)
 				if err := writeFile(bucket, s3Path); err != nil {
 					return err
 				}

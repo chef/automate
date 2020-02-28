@@ -237,6 +237,62 @@ func DeleteBackups(conTimeout, reqTimeout time.Duration, ids []*api.BackupTask) 
 	return res, err
 }
 
+// BackupIntegrityShow makes a gRPC request to the deployment-service and returns
+// the backup integrity status
+func BackupIntegrityShow(conTimeout, reqTimeout time.Duration) (*api.BackupIntegrityShowResponse, error) {
+	con, ctx, cancel, err := newCon(conTimeout, reqTimeout)
+	defer cancel()
+
+	if err != nil {
+		return &api.BackupIntegrityShowResponse{}, status.Wrap(
+			err,
+			status.DeploymentServiceUnreachableError,
+			"Connection to deployment-service failed",
+		)
+	}
+
+	req := &api.BackupIntegrityShowRequest{}
+	res, err := con.BackupIntegrityShow(ctx, req)
+	if err != nil {
+		err = status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request to cancel backup failed",
+		)
+	}
+
+	return res, err
+}
+
+// ValidateBackupIntegrity makes a gRPC request to the deployment-service and returns
+// the backup integrity status
+func ValidateBackupIntegrity(conTimeout, reqTimeout time.Duration, ids []*api.BackupTask) (*api.ValidateBackupIntegrityResponse, error) {
+	con, ctx, cancel, err := newCon(conTimeout, reqTimeout)
+	defer cancel()
+
+	if err != nil {
+		return &api.ValidateBackupIntegrityResponse{}, status.Wrap(
+			err,
+			status.DeploymentServiceUnreachableError,
+			"Connection to deployment-service failed",
+		)
+	}
+
+	req := &api.ValidateBackupIntegrityRequest{
+		Backups: ids,
+	}
+	res, err := con.ValidateBackupIntegrity(ctx, req)
+	if err != nil {
+		err = status.Wrap(
+			err,
+			status.DeploymentServiceCallError,
+			"Request to cancel backup failed",
+		)
+	}
+
+	return res, err
+}
+
 func newCon(conTimeout, reqTimeout time.Duration) (api.DeployClientStreamer, context.Context, func(), error) {
 	reqCtx, cancel := context.WithTimeout(context.Background(), reqTimeout)
 	con, err := Connection(conTimeout)

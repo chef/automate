@@ -12,14 +12,10 @@ func main() {
 		Use: "builder-scaffolding",
 	}
 
-	generateCmd := &cobra.Command{
-		Use:  "generate",
-		RunE: runGenerate,
-	}
-
 	rootCmd.AddCommand(generateCmd)
 	rootCmd.AddCommand(loginCmd)
 	rootCmd.AddCommand(repoCmd)
+	rootCmd.AddCommand(integrityCmd)
 
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Println(err.Error())

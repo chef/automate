@@ -41,13 +41,14 @@ var backupCmdFlags = struct {
 	airgap         string
 	yes            bool
 
-	createWaitTimeout  int64
-	listWaitTimeout    int64
-	showWaitTimeout    int64
-	deleteWaitTimeout  int64
-	restoreWaitTimeout int64
-	statusWaitTimeout  int64
-	cancelWaitTimeout  int64
+	createWaitTimeout    int64
+	listWaitTimeout      int64
+	showWaitTimeout      int64
+	deleteWaitTimeout    int64
+	restoreWaitTimeout   int64
+	statusWaitTimeout    int64
+	cancelWaitTimeout    int64
+	integrityWaitTimeout int64
 
 	s3Endpoint     string
 	s3AccessKey    string
@@ -61,6 +62,9 @@ var backupCmdFlags = struct {
 }{}
 
 func init() {
+	integrityBackupCmd.AddCommand(integrityBackupValidateCmd)
+	integrityBackupCmd.AddCommand(integrityBackupShowCmd)
+
 	backupCmd.AddCommand(createBackupCmd)
 	backupCmd.AddCommand(listBackupCmd)
 	backupCmd.AddCommand(showBackupCmd)
@@ -69,6 +73,7 @@ func init() {
 	backupCmd.AddCommand(fixBackupRepoPermissionsCmd)
 	backupCmd.AddCommand(statusBackupCmd)
 	backupCmd.AddCommand(cancelBackupCmd)
+	backupCmd.AddCommand(integrityBackupCmd)
 
 	backupCmd.PersistentFlags().BoolVarP(&backupCmdFlags.noProgress, "no-progress", "", false, "Don't follow operation progress")
 	backupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.requestTimeout, "request-timeout", "r", 20, "API request timeout for deployment-service in seconds")
@@ -86,6 +91,7 @@ func init() {
 	statusBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.statusWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
 
 	cancelBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.cancelWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
+	integrityBackupCmd.PersistentFlags().Int64VarP(&backupCmdFlags.integrityWaitTimeout, "wait-timeout", "t", 60, "How long to wait for a operation to complete before raising an error")
 
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.baseBackupDir, "backup-dir", "b", "/var/opt/chef-automate/backups", "Directory used for backups")
 	restoreBackupCmd.PersistentFlags().StringVarP(&backupCmdFlags.overrideOrigin, "override-origin", "o", "chef", "Habitat origin from which to install packages")
@@ -190,6 +196,26 @@ var cancelBackupCmd = &cobra.Command{
 	Long:  "Cancel the currently running backup create, delete, or restore operation",
 	RunE:  runCancelBackupCmd,
 	Args:  cobra.ExactArgs(0),
+}
+
+var integrityBackupCmd = &cobra.Command{
+	Use:   "integrity COMMAND",
+	Short: "Chef Automate shared object integrity",
+}
+
+var integrityBackupShowCmd = &cobra.Command{
+	Use:   "show",
+	Short: "show the shared object integrity metadata",
+	Long:  "Show the shared object integrity metadata",
+	RunE:  runBackupIntegrityShowCmd,
+	Args:  cobra.ExactArgs(0),
+}
+
+var integrityBackupValidateCmd = &cobra.Command{
+	Use:   "validate [ID IDN]",
+	Short: "validate the shared object integrity",
+	Long:  "Validate the shared object integrity. Arguments are assumed to be backup ID's that you wish to validate, if left empty it will validate all snapshots",
+	RunE:  runValidateBackupIntegrity,
 }
 
 func runCreateBackupCmd(cmd *cobra.Command, args []string) error {
@@ -519,6 +545,41 @@ func runCancelBackupCmd(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
+func runBackupIntegrityShowCmd(cmd *cobra.Command, args []string) error {
+	res, err := client.BackupIntegrityShow(
+		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
+		time.Duration(backupCmdFlags.integrityWaitTimeout)*time.Second,
+	)
+	if err != nil {
+		return err
+	}
+
+	writer.Println(res.Format())
+
+	return nil
+}
+
+func runValidateBackupIntegrity(cmd *cobra.Command, args []string) error {
+	ids, err := idsToBackupTasks(args)
+	if err != nil {
+		return err
+
+	}
+
+	res, err := client.ValidateBackupIntegrity(
+		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
+		time.Duration(backupCmdFlags.integrityWaitTimeout)*time.Second,
+		ids,
+	)
+	if err != nil {
+		return err
+	}
+
+	writer.Println(res.Format())
+
+	return nil
+}
+
 func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 	if len(args) == 0 {
 		return status.New(
@@ -527,18 +588,10 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 		)
 	}
 
-	ids := make([]*api.BackupTask, len(args))
-	for i, arg := range args {
-		id, err := api.NewBackupTaskFromID(arg)
-		if err != nil {
-			return status.Wrapf(
-				err,
-				status.InvalidCommandArgsError,
-				"Converting %s into a backup ID failed",
-				arg,
-			)
-		}
-		ids[i] = id
+	ids, err := idsToBackupTasks(args)
+	if err != nil {
+		return err
+
 	}
 
 	if !backupDeleteCmdFlags.yes {
@@ -555,7 +608,7 @@ func runDeleteBackupCmd(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	_, err := client.DeleteBackups(
+	_, err = client.DeleteBackups(
 		time.Duration(backupCmdFlags.requestTimeout)*time.Second,
 		time.Duration(backupCmdFlags.deleteWaitTimeout)*time.Second,
 		ids,
@@ -851,4 +904,22 @@ func runRestoreBackupCmd(cmd *cobra.Command, args []string) error {
 
 	writer.Successf("Restored backup %s", res.Restore.Backup.TaskID())
 	return nil
+}
+
+func idsToBackupTasks(args []string) ([]*api.BackupTask, error) {
+	ids := make([]*api.BackupTask, len(args))
+	for i, arg := range args {
+		id, err := api.NewBackupTaskFromID(arg)
+		if err != nil {
+			return ids, status.Wrapf(
+				err,
+				status.InvalidCommandArgsError,
+				"Converting %s into a backup ID failed",
+				arg,
+			)
+		}
+		ids[i] = id
+	}
+
+	return ids, nil
 }

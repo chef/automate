@@ -255,6 +255,47 @@ func (s *server) BackupStatus(ctx context.Context, req *api.BackupStatusRequest)
 	return task.Status, nil
 }
 
+// ValidateBackupIntegrity
+func (s *server) ValidateBackupIntegrity(ctx context.Context, req *api.ValidateBackupIntegrityRequest) (*api.ValidateBackupIntegrityResponse, error) {
+
+	if !s.HasConfiguredDeployment() {
+		return nil, ErrorNotConfigured
+	}
+
+	// NOTE: we only lock the deployment to ensure that another backup doesn't
+	// happen while we're validating. We might not need this but it seems
+	// like a safe bet.
+	err := s.acquireLock(ctx) // Unlocked by the backup runner
+	if err != nil {
+		logrus.WithError(err).Error("Failed to acquire lock")
+		return nil, err
+	}
+
+	snapshotIntegrity, err := s.backupRunner.ValidateBackupIntegrity(ctx, s.deployment, req.GetBackups())
+	if err != nil {
+		logrus.WithError(err).Error("Failed to validate backups")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &api.ValidateBackupIntegrityResponse{Snapshots: snapshotIntegrity}, nil
+}
+
+// BackupIntegrityShow shows the latest integrity check results
+func (s *server) BackupIntegrityShow(ctx context.Context, req *api.BackupIntegrityShowRequest) (*api.BackupIntegrityShowResponse, error) {
+
+	if !s.HasConfiguredDeployment() {
+		return nil, ErrorNotConfigured
+	}
+
+	snapshotIntegrity, err := s.backupRunner.BackupIntegrityShow(ctx, req)
+	if err != nil {
+		logrus.WithError(err).Error("Failed to get backup integrity")
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	return &api.BackupIntegrityShowResponse{Snapshots: snapshotIntegrity}, nil
+}
+
 func (s *server) backupGatewayLocationSpec() (backup.LocationSpecification, error) {
 	var bucket string
 	var basePath string

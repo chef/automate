@@ -1,24 +1,32 @@
 package backup
 
 import (
+	"bytes"
 	"compress/gzip"
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
+	"regexp"
 	"strings"
+	"time"
 
-	"github.com/chef/automate/lib/io/fileutils"
-	"github.com/chef/automate/lib/stringutils"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"go.uber.org/multierr"
+
+	api "github.com/chef/automate/api/interservice/deployment"
+	"github.com/chef/automate/lib/io/fileutils"
+	"github.com/chef/automate/lib/stringutils"
 )
 
 var ErrSnapshotExists error = errors.New("Snapshot already exists")
+
+const SnapshotIntegrityMetadataFileName = "snapshot.integrity"
 
 type ArtifactRepo struct {
 	artifactsRoot Bucket
@@ -160,6 +168,7 @@ func (b *uploadSnapshotArtifactIterator) WriteSnapshotFile(w io.Writer) (string,
 	if err := g.Close(); err != nil {
 		return "", err
 	}
+
 	return hex.EncodeToString(checksum.Sum(nil)), nil
 }
 
@@ -199,7 +208,7 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string, srcBucket B
 		return ArtifactRepoSnapshotMetadata{}, ErrSnapshotExists
 	}
 
-	artifactsInRepo := repo.ListArtifacts(ctx)
+	artifactsInRepo := repo.ListAssumedArtifacts(ctx)
 	defer logClose(artifactsInRepo, "failed to close artifact list stream")
 
 	uploadIterator, err := newUploadSnapshotArtifactIterator(ctx, srcBucket, requiredArtifacts, artifactsInRepo)
@@ -216,7 +225,7 @@ func (repo *ArtifactRepo) Snapshot(ctx context.Context, name string, srcBucket B
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	snapshotFileWriter, err := repo.snapshotsRoot.NewWriter(ctx, fmt.Sprintf("%s.snapshot", name))
+	snapshotFileWriter, err := repo.snapshotsRoot.NewWriter(ctx, toSnapshotName(name))
 	if err != nil {
 		return ArtifactRepoSnapshotMetadata{}, err
 	}
@@ -304,8 +313,12 @@ func (repo *ArtifactRepo) Remove(ctx context.Context, name string) error {
 		return err
 	}
 
+	if err := repo.removeFromSnapshotIntegrity(ctx, name); err != nil {
+		return err
+	}
+
 	// Get the artifacts in all the snapshots excluding the one we're trying to delete
-	remainingSnapshotsFiles := repo.ListArtifacts(ctx, name)
+	remainingSnapshotsFiles := repo.ListAssumedArtifacts(ctx, name)
 	defer logClose(remainingSnapshotsFiles, "failed to close artifact list stream")
 
 	// Remove artifacts from the snapshot we're trying to exist which exist in other
@@ -317,26 +330,23 @@ func (repo *ArtifactRepo) Remove(ctx context.Context, name string) error {
 	return bulkDeleter.Delete(ctx, filesToDelete)
 }
 
-func (repo *ArtifactRepo) ListArtifacts(ctx context.Context, excludedSnapshots ...string) ArtifactStream {
-	snapshots, _, err := repo.snapshotsRoot.List(ctx, "", false)
+// ListAssumedArtifacts aggregates all the required artifacts from all snapshots
+// and returns a stream. It is presumed to be much cheaper to scan every snapshot
+// metadata file and aggregate the artifacts rather than list every object that
+// is currently in the repo. The downside of course is that we aren't sure that
+// such objects exist.
+func (repo *ArtifactRepo) ListAssumedArtifacts(ctx context.Context, excludedSnapshots ...string) ArtifactStream {
+	var lastMergedStream ArtifactStream
+
+	// Merge as we go in order to avoid running out of file descriptors and/or stack
+	// in the case where someone has a lot of snapshots.
+	snapshots, err := repo.snapshots(ctx, ExcludeSnapshots(excludedSnapshots))
 	if err != nil {
 		return ErrStream(err)
 	}
 
-	// Merge as we go in order to avoid running out of file descriptors and/or stack
-	// in the case where someone has a lot of snapshots.
-
-	var lastMergedStream ArtifactStream
-	for _, snapshot := range snapshots {
-		if !strings.HasSuffix(snapshot.Name, ".snapshot") {
-			continue
-		}
-		name := strings.TrimSuffix(snapshot.Name, ".snapshot")
-		if stringutils.SliceContains(excludedSnapshots, name) {
-			continue
-		}
-
-		snapshotStream, _, err := repo.openSnapshotFile(ctx, name)
+	for _, snapshotName := range snapshots {
+		snapshotStream, _, err := repo.openSnapshotFile(ctx, snapshotName)
 		if err != nil {
 			return ErrStream(err)
 		}
@@ -353,7 +363,213 @@ func (repo *ArtifactRepo) ListArtifacts(ctx context.Context, excludedSnapshots .
 	if lastMergedStream == nil {
 		return EmptyStream()
 	}
+
 	return lastMergedStream
+}
+
+// ListArtifacts returns a stream of the actual object names from the bucket.
+func (repo *ArtifactRepo) ListArtifacts(ctx context.Context) ArtifactStream {
+	stream, err := NewBucketObjectNameStream(ctx, repo.artifactsRoot, "")
+	if err != nil {
+		return ErrStream(err)
+	}
+
+	return stream
+}
+
+func snapshotsInBucket(objects []BucketObject, filters ...FilterSnapshotOpt) ([]string, error) {
+	options := &filterSnapshotOptions{
+		exclude: []string{},
+		only:    []string{},
+	}
+	snapshots := []string{}
+
+	for _, o := range filters {
+		o(options)
+	}
+
+	for _, object := range objects {
+		if !strings.HasSuffix(object.Name, ".snapshot") {
+			continue
+		}
+		name := strings.TrimSuffix(object.Name, ".snapshot")
+
+		if stringutils.SliceContains(options.exclude, name) {
+			continue
+		}
+
+		snapshots = append(snapshots, name)
+	}
+
+	if len(options.only) > 0 {
+		for _, required := range options.only {
+			if !stringutils.SliceContains(snapshots, required) {
+				return snapshots, errors.Errorf("missing desired snapshot %s", required)
+			}
+		}
+
+		return options.only, nil
+	}
+
+	return snapshots, nil
+}
+
+type filterSnapshotOptions struct {
+	exclude []string
+	only    []string
+}
+
+type FilterSnapshotOpt func(*filterSnapshotOptions)
+
+func ExcludeSnapshots(snapshots []string) FilterSnapshotOpt {
+	return func(r *filterSnapshotOptions) {
+		r.exclude = snapshots
+	}
+}
+
+func OnlySnapshots(snapshots []string) FilterSnapshotOpt {
+	return func(r *filterSnapshotOptions) {
+		r.only = snapshots
+	}
+}
+
+// Snapshots filters through the repo's snapshot bucket and returns
+// a slice of snapshot names
+func (repo *ArtifactRepo) snapshots(ctx context.Context, filters ...FilterSnapshotOpt) ([]string, error) {
+	// Gather all snapshots names we
+	bucketObjects, _, err := repo.snapshotsRoot.List(ctx, "", false)
+	if err != nil {
+		return nil, err
+	}
+
+	return snapshotsInBucket(bucketObjects, filters...)
+}
+
+// ValidateSnapshotIntegrity validates snapshot integrity by scanning the repo
+// artifacts list and ensuring that each snapshot's required artifacts are
+// present.
+func (repo *ArtifactRepo) ValidateSnapshotIntegrity(ctx context.Context, filters ...FilterSnapshotOpt) error {
+	replayableArtifactsStream, err := NewReplayableStream(repo.ListArtifacts(ctx))
+	if err != nil {
+		return errors.Wrap(err, "gathering artifact list")
+	}
+	defer logClose(replayableArtifactsStream, "close replayable artifacts stream")
+
+	integrityMetadata, err := repo.ReadSnapshotIntegrityMetadata(ctx)
+	if err != nil {
+		return err
+	}
+
+	snapshots, err := repo.snapshots(ctx, filters...)
+	if err != nil {
+		return err
+	}
+
+	for _, snapshotName := range snapshots {
+		logrus.WithField("snapshot", snapshotName).Info("Validating snapshot integrity")
+		snapshotStream, _, err := repo.openSnapshotFile(ctx, snapshotName)
+		if err != nil {
+			return err
+		}
+
+		// Reset the replayable artifact stream each time so that we can
+		// replay it.
+		if err = replayableArtifactsStream.Reset(); err != nil {
+			return err
+		}
+
+		defer logClose(snapshotStream, "close snapshot stream")
+		if err != nil {
+			return err
+		}
+
+		missing := Sub(snapshotStream, replayableArtifactsStream)
+
+		if err = repo.updateSnapshotIntegrityMetadata(ctx, integrityMetadata, snapshotName, missing); err != nil {
+			return err
+		}
+	}
+
+	return repo.writeSnapshotIntegrityMetadata(ctx, integrityMetadata)
+}
+
+type ArtifactRepoIntegrityMetadata struct {
+	Snapshots map[string]ArtifactRepoSnapshotIntegrityMetadata `json:"snapshots"`
+}
+
+func NewArtifactRepoIntegrityMetadata() *ArtifactRepoIntegrityMetadata {
+	return &ArtifactRepoIntegrityMetadata{
+		Snapshots: map[string]ArtifactRepoSnapshotIntegrityMetadata{},
+	}
+}
+
+type ArtifactRepoSnapshotIntegrityMetadata struct {
+	LastVerified string   `json:"last_verified"`
+	Missing      []string `json:"missing"`
+	Corrupted    bool     `json:"corrupted"`
+}
+
+func NewArtifactRepoSnapshotIntegrityMetadata() ArtifactRepoSnapshotIntegrityMetadata {
+	return ArtifactRepoSnapshotIntegrityMetadata{
+		Missing: []string{},
+	}
+}
+
+// updateSnapshotIntegrityMetadata consumes a missing artifact stream for a given
+// snapshot and pdates an in memory repo integrity metadata with a new snapshot
+// integrity metadata result.
+func (repo *ArtifactRepo) updateSnapshotIntegrityMetadata(
+	ctx context.Context,
+	currentMetadata *ArtifactRepoIntegrityMetadata,
+	snapshotName string,
+	missingArtifacts ArtifactStream) error {
+
+	defer logClose(missingArtifacts, "close missing stream")
+
+	metadata, exists := currentMetadata.Snapshots[snapshotName]
+	if !exists {
+		metadata = NewArtifactRepoSnapshotIntegrityMetadata()
+	} else {
+		metadata.Missing = []string{}
+	}
+
+	metadata.LastVerified = time.Now().Format(api.BackupTaskFormat)
+	metadata.Corrupted = false
+
+	for {
+		artifact, err := missingArtifacts.Next()
+		if artifact != "" {
+			metadata.Corrupted = true
+			metadata.Missing = append(metadata.Missing, artifact)
+		}
+
+		if err == io.EOF {
+			break
+		}
+
+		if err != nil {
+			return err
+		}
+	}
+
+	currentMetadata.Snapshots[snapshotName] = metadata
+
+	return nil
+}
+
+func (repo *ArtifactRepo) removeFromSnapshotIntegrity(ctx context.Context, name string) error {
+	meta, err := repo.ReadSnapshotIntegrityMetadata(ctx)
+	if err != nil {
+		return err
+	}
+
+	_, exists := meta.Snapshots[name]
+	if !exists {
+		return nil
+	}
+
+	delete(meta.Snapshots, name)
+	return repo.writeSnapshotIntegrityMetadata(ctx, meta)
 }
 
 // mergeIntoFile takes 2 streams and merges them into 1. This function is not
@@ -387,20 +603,22 @@ func mergeIntoFile(a ArtifactStream, b ArtifactStream) (ArtifactStream, error) {
 	return NewLineReaderStream(tmpFile), nil
 }
 
-func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (ArtifactStream, string, error) {
+// openGzipFile returns an artifact stream of an uncrompressed gzip file, the
+// file contents checkum, and any error encountered.
+func (repo *ArtifactRepo) openGzipFile(ctx context.Context, name string) (ArtifactStream, string, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	r, err := repo.snapshotsRoot.NewReader(ctx, fmt.Sprintf("%s.snapshot", name), &NoOpObjectVerifier{})
+	r, err := repo.snapshotsRoot.NewReader(ctx, name, &NoOpObjectVerifier{})
 	if err != nil {
 		return nil, "", err
 	}
 
 	// r is closed with reader
 	reader := newChecksummingReader(r)
-	defer logClose(reader, "failed to close snapshot reader")
+	defer logClose(reader, "failed to close file reader")
 
-	tmpFile, err := ioutil.TempFile("", fmt.Sprintf("snapshot-%s", name))
+	tmpFile, err := ioutil.TempFile("", name)
 	if err != nil {
 		return nil, "", err
 	}
@@ -432,9 +650,65 @@ func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (Ar
 	return NewLineReaderStream(tmpFile), checksum, nil
 }
 
+func (repo *ArtifactRepo) openSnapshotFile(ctx context.Context, name string) (ArtifactStream, string, error) {
+	return repo.openGzipFile(ctx, toSnapshotName(name))
+}
+
+// ReadSnapshotIntegrityMetadata reads the snapshot integrity metadata file
+func (repo *ArtifactRepo) ReadSnapshotIntegrityMetadata(ctx context.Context) (*ArtifactRepoIntegrityMetadata, error) {
+	metadata := NewArtifactRepoIntegrityMetadata()
+
+	metadataStream, _, err := repo.openGzipFile(ctx, SnapshotIntegrityMetadataFileName)
+	if err != nil {
+		if IsNotExist(err) {
+			return metadata, nil
+		}
+
+		return nil, err
+	}
+
+	buff := &bytes.Buffer{}
+	writer := NewLoggingStream(metadataStream, buff)
+	defer logClose(writer, "failed to logging stream")
+
+	if err := ConsumeStream(writer); err != nil {
+		return nil, err
+	}
+
+	return metadata, json.Unmarshal(buff.Bytes(), metadata)
+}
+
+func (repo *ArtifactRepo) writeSnapshotIntegrityMetadata(ctx context.Context, metadata *ArtifactRepoIntegrityMetadata) error {
+	bytes, err := json.Marshal(metadata)
+	if err != nil {
+		return err
+	}
+
+	metadataWriter, err := repo.snapshotsRoot.NewWriter(ctx, SnapshotIntegrityMetadataFileName)
+	if err != nil {
+		return err
+	}
+	defer logClose(metadataWriter, "failed to close metadata writer")
+
+	gzipWriter := gzip.NewWriter(metadataWriter)
+	defer logClose(gzipWriter, "failed to close gzip writer")
+
+	_, err = gzipWriter.Write(bytes)
+	return err
+}
+
 func (repo *ArtifactRepo) removeSnapshotFile(ctx context.Context, name string) error {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
 
-	return repo.snapshotsRoot.Delete(ctx, []string{fmt.Sprintf("%s.snapshot", name)})
+	return repo.snapshotsRoot.Delete(ctx, []string{toSnapshotName(name)})
+}
+
+func toSnapshotName(name string) string {
+	r := regexp.MustCompile(`\w+\.snapshot`)
+	if r.Match([]byte(name)) {
+		return name
+	}
+
+	return fmt.Sprintf("%s.snapshot", name)
 }

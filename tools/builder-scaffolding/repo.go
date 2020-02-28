@@ -7,10 +7,11 @@ import (
 	"net"
 	"time"
 
-	"github.com/chef/automate/components/automate-deployment/pkg/backup"
-	"github.com/chef/automate/lib/secrets"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+
+	"github.com/chef/automate/components/automate-deployment/pkg/backup"
+	"github.com/chef/automate/lib/secrets"
 )
 
 var repoCmd = &cobra.Command{
@@ -24,7 +25,7 @@ var snapshotCmd = &cobra.Command{
 
 var restoreCmd = &cobra.Command{
 	Use:  "restore",
-	Args: cobra.ExactArgs(1),
+	Args: cobra.ExactArgs(1), // nolint: gomnd
 	RunE: runRestore,
 }
 
