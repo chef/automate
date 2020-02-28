@@ -33,7 +33,6 @@ import (
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_teams "github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	pb_users "github.com/chef/automate/components/automate-gateway/api/auth/users"
 	pb_authz "github.com/chef/automate/components/automate-gateway/api/authz"
 	policy "github.com/chef/automate/components/automate-gateway/api/authz/policy"
 	pb_profiles "github.com/chef/automate/components/automate-gateway/api/compliance/profiles"
@@ -43,6 +42,7 @@ import (
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_eventfeed "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
+	pb_iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	pb_legacy "github.com/chef/automate/components/automate-gateway/api/legacy"
 	pb_license "github.com/chef/automate/components/automate-gateway/api/license"
 	pb_notifications "github.com/chef/automate/components/automate-gateway/api/notifications"
@@ -204,7 +204,6 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create client for users mgmt service")
 	}
-	pb_users.RegisterUsersMgmtServer(grpcServer, handler.NewUsersMgmtServer(usersMgmtClient))
 	// IAM v2 uses the same client
 	pb_iam.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
 
@@ -352,8 +351,6 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"gateway":              pb_gateway.RegisterGatewayHandlerFromEndpoint,
 		"legacy":               pb_legacy.RegisterLegacyDataCollectorHandlerFromEndpoint,
 		"license":              pb_license.RegisterLicenseHandlerFromEndpoint,
-		"auth tokens":          pb_iam.RegisterTokensHandlerFromEndpoint,
-		"auth users":           pb_users.RegisterUsersMgmtHandlerFromEndpoint,
 		"authz":                pb_authz.RegisterAuthorizationHandlerFromEndpoint,
 		"secrets":              pb_secrets.RegisterSecretsServiceHandlerFromEndpoint,
 		"cc_reporting":         pb_cc_reporting.RegisterReportingServiceHandlerFromEndpoint,

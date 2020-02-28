@@ -7,8 +7,6 @@ import (
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
-	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	"github.com/chef/automate/components/automate-gateway/api/auth/users"
 	"github.com/chef/automate/components/automate-gateway/api/authz"
 	"github.com/chef/automate/components/automate-gateway/api/compliance/reporting"
 	iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
@@ -20,10 +18,9 @@ import (
 // Mock is a mocked out APIClient.
 type Mock struct {
 	authzClient        authz.AuthorizationClient
-	teamsClient        teams.TeamsClient
-	teamsV2Client      iam.TeamsClient
-	TokensClient       iam.TokensClient
-	usersClient        users.UsersMgmtClient
+	teamsClient        iam.TeamsClient
+	tokensClient       iam.TokensClient
+	usersClient        iam.UsersClient
 	policiesClient     iam.PoliciesClient
 	reportingClient    reporting.ReportingServiceClient
 	applicationsClient applications.ApplicationsServiceClient
@@ -34,10 +31,9 @@ type Mock struct {
 type ServerMocks struct {
 	AuthzMock    *authz.AuthorizationServerMock
 	PoliciesMock *iam.PoliciesServerMock
-	TeamsMock    *teams.TeamsServerMock
-	TeamsV2Mock  *iam.TeamsServerMock
+	TeamsMock    *iam.TeamsServerMock
 	TokensMock   *iam.TokensServerMock
-	UsersMock    *users.UsersMgmtServerMock
+	UsersMock    *iam.UsersServerMock
 }
 
 // CreateMockConn returns a mocked version of APIClient that
@@ -57,14 +53,11 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 	mockPolicies := iam.NewPoliciesServerMock()
 	iam.RegisterPoliciesServer(grpcGateway, mockPolicies)
 
-	mockTeams := teams.NewTeamsServerMock()
-	teams.RegisterTeamsServer(grpcGateway, mockTeams)
+	mockTeams := iam.NewTeamsServerMock()
+	iam.RegisterTeamsServer(grpcGateway, mockTeams)
 
-	mockV2Teams := iam.NewTeamsServerMock()
-	iam.RegisterTeamsServer(grpcGateway, mockV2Teams)
-
-	mockUsers := users.NewUsersMgmtServerMock()
-	users.RegisterUsersMgmtServer(grpcGateway, mockUsers)
+	mockUsers := iam.NewUsersServerMock()
+	iam.RegisterUsersServer(grpcGateway, mockUsers)
 
 	grpcServer := grpctest.NewServer(grpcGateway)
 	gatewayConn, err := connFactory.Dial("automate-gateway", grpcServer.URL)
@@ -72,10 +65,9 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 
 	return Mock{
 			authzClient:        authz.NewAuthorizationClient(gatewayConn),
-			teamsClient:        teams.NewTeamsClient(gatewayConn),
-			teamsV2Client:      iam.NewTeamsClient(gatewayConn),
-			TokensClient:       iam.NewTokensClient(gatewayConn),
-			usersClient:        users.NewUsersMgmtClient(gatewayConn),
+			teamsClient:        iam.NewTeamsClient(gatewayConn),
+			tokensClient:       iam.NewTokensClient(gatewayConn),
+			usersClient:        iam.NewUsersClient(gatewayConn),
 			policiesClient:     iam.NewPoliciesClient(gatewayConn),
 			reportingClient:    reporting.NewReportingServiceClient(gatewayConn),
 			applicationsClient: applications.NewApplicationsServiceClient(gatewayConn),
@@ -97,22 +89,17 @@ func (c Mock) AuthzClient() authz.AuthorizationClient {
 }
 
 // TeamsClient returns mock TeamsClient
-func (c Mock) TeamsClient() teams.TeamsClient {
+func (c Mock) TeamsClient() iam.TeamsClient {
 	return c.teamsClient
-}
-
-// TeamsClient returns mock TeamsClient
-func (c Mock) TeamsV2Client() iam.TeamsClient {
-	return c.teamsV2Client
 }
 
 // TokensClient returns mock TokensClient
 func (c Mock) TokensClient() iam.TokensClient {
-	return c.TokensClient
+	return c.tokensClient
 }
 
 // UsersClient returns mock UsersClient
-func (c Mock) UsersClient() users.UsersMgmtClient {
+func (c Mock) UsersClient() iam.UsersClient {
 	return c.usersClient
 }
 

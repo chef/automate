@@ -692,7 +692,6 @@ paths = [
   "components/applications-service/*",
   "components/authz-service/*",
   "components/automate-deployment/*",
-  "components/automate-gateway/api/auth/*",
   "components/automate-gateway/api/authz/*",
   "components/automate-gateway/api/compliance/*",
   "components/automate-gateway/api/iam/*",
