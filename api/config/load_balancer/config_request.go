@@ -1,8 +1,10 @@
 package load_balancer
 
 import (
+	fmt "fmt"
 	"net"
 	"os"
+	"regexp"
 	"sync"
 	"syscall"
 
@@ -32,6 +34,7 @@ func NewConfigRequest() *ConfigRequest {
 }
 
 // DefaultConfigRequest returns a new ConfigRequest instance with default values.
+// nolint: gomnd
 func DefaultConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 	c.V1.Sys.Service.HttpsPort = w.Int32(443)
@@ -64,6 +67,11 @@ func DefaultConfigRequest() *ConfigRequest {
 	c.V1.Sys.Ngx.Http.SslProtocols = w.String("TLSv1.2 TLSv1.3")
 	c.V1.Sys.Ngx.Http.TcpNodelay = w.String("on")
 	c.V1.Sys.Ngx.Http.TcpNopush = w.String("on")
+	c.V1.Sys.Ngx.Http.ProxyBuffering = w.String("on")
+	c.V1.Sys.Ngx.Http.ProxyBufferSize = w.String("8k")
+	c.V1.Sys.Ngx.Http.ProxyBuffers = w.String("8 8k")
+	c.V1.Sys.Ngx.Http.ProxyBusyBuffersSize = w.String("16k")
+
 	c.V1.Sys.Ngx.Http.Ipv6Supported = w.Bool(ipV6Supported())
 	c.V1.Sys.StaticConfig.Products = []string{"automate"}
 	return c
@@ -82,6 +90,7 @@ func NewNginxConfig() *ConfigRequest_V1_System_Nginx {
 
 // ValidateConfigRequest validates that the config is sufficient to start the
 // Service and returns true.
+// nolint: gomnd
 func (c *ConfigRequest) Validate() error {
 	cfgErr := config.NewInvalidConfigError()
 
@@ -110,6 +119,16 @@ func (c *ConfigRequest) Validate() error {
 			if tls.ServerName == "" {
 				cfgErr.AddInvalidValue("load_balancer.v1.sys.frontend_tls.server_name", "server_name must be a valid FQDN")
 			}
+		}
+	}
+
+	if proxyBuffers := c.GetV1().GetSys().GetNgx().GetHttp().GetProxyBuffers().GetValue(); proxyBuffers != "" {
+		regex := regexp.MustCompile(`\d+ \d+k`)
+		if !regex.MatchString(proxyBuffers) {
+			cfgErr.AddInvalidValue(
+				"load_balancer.v1.sys.ngx.http.proxy_buffers",
+				fmt.Sprintf("'%s' must be a number followed by size, eg: '8 8k'", proxyBuffers),
+			)
 		}
 	}
 
@@ -174,7 +193,7 @@ func ipV6Supported() bool {
 	capProbed.Do(func() {
 		l, err := net.Listen("tcp6", "")
 		if err == nil {
-			l.Close()
+			_ = l.Close()
 			return
 		}
 
