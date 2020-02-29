@@ -295,7 +295,7 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 }
 
 // GetReport returns the information about a single report
-func (backend *ES2Backend) GetReport(esIndex string, reportId string,
+func (backend *ES2Backend) GetReport(reportId string,
 	filters map[string][]string) (*reportingapi.Report, error) {
 	myName := "GetReport"
 	var report *reportingapi.Report
@@ -306,9 +306,6 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 	}
 
 	queryInfo := depth.getQueryInfo()
-
-	//normally, we compute the esIndex when we create a new Depth obj.. here we overwrite it what what's been passed in.
-	queryInfo.esIndex = esIndex
 
 	//normally, we compute the boolQuery when we create a new Depth obj.. here we, instead call a variation of the full
 	// query builder. we need to do this because this variation of filter query provides this func with deeper

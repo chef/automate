@@ -106,8 +106,7 @@ func (srv *Server) ReadReport(ctx context.Context, in *reporting.Query) (*report
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
-	// Using ComplianceTwenty as the report might not be in the latest index
-	report, err := srv.es.GetReport(relaxting.ComplianceDailyRepTwenty, in.Id, formattedFilters)
+	report, err := srv.es.GetReport(in.Id, formattedFilters)
 	if err != nil {
 		return nil, errorutils.FormatErrorMsg(err, in.Id)
 	}
@@ -217,7 +216,7 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 	total := len(reportIDs)
 	// Step 2: get all reports one by one in reverse order to be sorted asc by end_time
 	for idx := total - 1; idx >= 0; idx-- {
-		cur, err := srv.es.GetReport(esIndex, reportIDs[idx], formattedFilters)
+		cur, err := srv.es.GetReport(reportIDs[idx], formattedFilters)
 		if err != nil {
 			return status.Error(codes.NotFound, fmt.Sprintf("Failed to retrieve report %d/%d with ID %s . Error: %s", idx, total, reportIDs[idx], err))
 		}
@@ -277,7 +276,7 @@ func (srv *Server) ExportNode(in *reporting.Query, stream reporting.ReportingSer
 
 	// Step 2: get all reports one by one
 	for _, report := range reportsList {
-		cur, err := srv.es.GetReport("", report.GetId(), formattedFilters)
+		cur, err := srv.es.GetReport(report.GetId(), formattedFilters)
 		if err != nil {
 			return status.Error(codes.NotFound, fmt.Sprintf("Failed to retrieve report with ID %s. Error: %s", report.GetId(), err))
 		}
