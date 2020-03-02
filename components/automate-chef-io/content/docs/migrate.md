@@ -13,7 +13,7 @@ toc = true
     weight = 60
 +++
 
-Chef Automate versions 1.0.0-1.8.96 reached end-of-life on December 31, 2019 and are no longer supported. For more information and for help upgrading your system,please contact your Chef account representative.
+Chef Automate versions 1.0.0-1.8.96 reached end-of-life on December 31, 2019 and are no longer supported. For more information and for help upgrading your system, please contact your Chef account representative.
 The current Chef Automate versions includes significant architectural and technical improvements to the core product platform.
 This guide shows you how to migrate your existing Chef Automate installation to the current Chef Automate.
 
