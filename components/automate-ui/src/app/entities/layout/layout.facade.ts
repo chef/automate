@@ -59,7 +59,6 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     private store: Store<fromLayout.LayoutEntityState>,
     private layoutSidebarService: LayoutSidebarService
   ) {
-    this.store.dispatch(new GetProjects());
     this.sidebar$ = store.select(sidebar);
     this.showPageLoading$ = store.select(showPageLoading);
     this.updateDisplay();
