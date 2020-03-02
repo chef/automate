@@ -55,58 +55,6 @@ func (a *AuthzServer) GetVersion(ctx context.Context, _ *version.VersionInfoRequ
 	return res, nil
 }
 
-// CreatePolicy creates a new policy in authz-service.
-// No longer used: This is V1
-func (a *AuthzServer) CreatePolicy(ctx context.Context,
-	gwReq *gwAuthzReq.CreatePolicyReq) (*gwAuthzRes.CreatePolicyResp, error) {
-	// we want a user's permissions to be a union of their allowed policies
-	// so only "allow" policies can be created
-	domainReq := &authz.CreatePolicyReq{
-		Subjects: gwReq.GetSubjects(),
-		Action:   gwReq.GetAction(),
-		Resource: gwReq.GetResource(),
-	}
-	domainRes, err := a.client.CreatePolicy(ctx, domainReq)
-	if err != nil {
-		return nil, err
-	}
-
-	// field names are the same, so we can cast this
-	return (*gwAuthzRes.CreatePolicyResp)(domainPolicyToGatewayPolicy(domainRes.Policy)), nil
-}
-
-// ListPolicies returns an array of all policy objects
-// that currently exist in authz-service.
-// No longer used: This is V1
-func (a *AuthzServer) ListPolicies(ctx context.Context,
-	gwReq *gwAuthzReq.ListPoliciesReq) (*gwAuthzRes.ListPoliciesResp, error) {
-	domainReq := &authz.ListPoliciesReq{}
-	domainRes, err := a.client.ListPolicies(ctx, domainReq)
-	if err != nil {
-		return nil, err
-	}
-
-	gwRes := gwAuthzRes.ListPoliciesResp{}
-	for _, pol := range domainRes.GetPolicies() {
-		gwRes.Policies = append(gwRes.Policies, domainPolicyToGatewayPolicy(pol))
-	}
-
-	return &gwRes, nil
-}
-
-// DeletePolicy removes a policy from authz-service by id.
-// No longer used: This is V1
-func (a *AuthzServer) DeletePolicy(ctx context.Context,
-	gwReq *gwAuthzReq.DeletePolicyReq) (*gwAuthzRes.DeletePolicyResp, error) {
-
-	domainRes, err := a.client.DeletePolicy(ctx, (*authz.DeletePolicyReq)(gwReq))
-	if err != nil {
-		return nil, err
-	}
-
-	return (*gwAuthzRes.DeletePolicyResp)(domainPolicyToGatewayPolicy(domainRes.Policy)), nil
-}
-
 // IntrospectAll returns a list of all HTTP endpoints the requestor has access to and,
 // for each endpoint, a map of the supported HTTP methods with a Boolean status
 // indicating allowed or denied.
@@ -296,10 +244,6 @@ func (a *AuthzServer) getAllowedMap(
 		return nil, err
 	}
 	return endpointMap, nil
-}
-
-func domainPolicyToGatewayPolicy(pol *authz.Policy) *gwAuthzRes.Policy {
-	return (*gwAuthzRes.Policy)(pol)
 }
 
 func logIntrospectionDetails(log *logrus.Entry, pairMap map[pairs.Pair][]string) {

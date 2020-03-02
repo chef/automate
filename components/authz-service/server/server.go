@@ -98,7 +98,7 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v2 policy server")
 	}
 
-	subjectPurgeServer, err := v2.NewSubjectPurgeServer(ctx, l, v1Server, v2PolServer)
+	subjectPurgeServer, err := v2.NewSubjectPurgeServer(ctx, l, v2PolServer)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize subject purge server")
 	}

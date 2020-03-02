@@ -13,8 +13,6 @@ import (
 	authz_constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/adminmgmt"
 	"github.com/chef/automate/components/automate-cli/pkg/client/mock"
-	authz_req "github.com/chef/automate/components/automate-gateway/api/authz/request"
-	authz_resp "github.com/chef/automate/components/automate-gateway/api/authz/response"
 	iam_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
 	iam_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 	iam_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
@@ -384,13 +382,4 @@ func getTeamError(c codes.Code) func(context.Context, *iam_req.GetTeamReq) (*iam
 func createTeamCallUnexpected(
 	context.Context, *iam_req.CreateTeamReq) (*iam_resp.CreateTeamResp, error) {
 	return nil, errors.New("unexpected call")
-}
-
-func createDefaultAdminPolicy(_ context.Context, req *authz_req.CreatePolicyReq) (*authz_resp.CreatePolicyResp, error) {
-	if req.Action != "*" || req.Resource != "*" || len(req.Subjects) != 1 ||
-		req.Subjects[0] != authz_constants.LocalAdminsTeamSubject {
-		return nil, errors.New("unexpected arguments")
-	}
-	// We don't care about content of response, just that no error was returned.
-	return &authz_resp.CreatePolicyResp{}, nil
 }

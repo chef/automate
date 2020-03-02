@@ -218,9 +218,6 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 	return nil
 }
 
-const adminTokenIAMPreconditionError = "`chef-automate iam token create NAME --admin` is an IAM v2 command.\n" +
-	"For v1 use `chef-automate admin-token`.\n"
-
 func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
 	name := args[0]
 
@@ -252,14 +249,6 @@ func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if iamCmdFlags.adminToken {
-		resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &iam_req.GetPolicyVersionReq{})
-		if err != nil {
-			return status.Wrap(err, status.APIError, "Failed to retrieve IAM version")
-		}
-		if resp.Version.Major == iam_common.Version_V1 {
-			return status.New(status.APIError, adminTokenIAMPreconditionError)
-		}
-
 		member := fmt.Sprintf("token:%s", tokenResp.Token.Id)
 		_, err = apiClient.PoliciesClient().AddPolicyMembers(ctx, &iam_req.AddPolicyMembersReq{
 			Id:      v2_constants.AdminPolicyID,

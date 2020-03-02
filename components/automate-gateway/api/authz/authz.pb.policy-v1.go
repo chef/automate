@@ -9,40 +9,6 @@ import (
 )
 
 func init() {
-	policy.MapMethodTo("/chef.automate.api.authz.Authorization/GetVersion", "service_info:version", "read", "GET", "/auth/policies/version", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
-	policy.MapMethodTo("/chef.automate.api.authz.Authorization/CreatePolicy", "auth:policies", "create", "POST", "/auth/policies", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*request.CreatePolicyReq); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "action":
-					return m.Action
-				case "resource":
-					return m.Resource
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
-	})
-	policy.MapMethodTo("/chef.automate.api.authz.Authorization/ListPolicies", "auth:policies", "read", "GET", "/auth/policies", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
-	policy.MapMethodTo("/chef.automate.api.authz.Authorization/DeletePolicy", "auth:policies:{id}", "delete", "DELETE", "/auth/policies/{id}", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*request.DeletePolicyReq); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "id":
-					return m.Id
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
-	})
 	policy.MapMethodTo("/chef.automate.api.authz.Authorization/IntrospectAll", "auth_introspection:introspect_all", "read", "GET", "/auth/introspect", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
