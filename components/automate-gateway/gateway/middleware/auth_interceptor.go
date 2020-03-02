@@ -98,6 +98,60 @@ type authInterceptor struct {
 	authz GRPCAuthorizationHandler
 }
 
+func (a *authInterceptor) combinedAuth(ctxIn context.Context, req interface{}) (context.Context, error) {
+	// extract request-scoped logger
+	log := ctxlogrus.Extract(ctxIn)
+
+	// this context is only used for authenticating the request: we need
+	// headers!
+	// grpc-gateway translates these into metadata, and we'll forward that to
+	// authn-service below. we don't want that metadata on _every_ request,
+	// though, so this context is separated out
+	authCtx := ctxIn
+
+	// transfer incoming metadata to outgoing metadata
+	// if !ok, this will default to the ctx set above, and most likely be
+	// rejected by authn-service. However, we don't want to duplicate the
+	// "when is a request potentially good for authentication" logic here,
+	// so this will just go to authn-service as-is.
+	var md metadata.MD
+	var ok bool
+	if md, ok = metadata.FromIncomingContext(authCtx); ok {
+		authCtx = metadata.NewOutgoingContext(authCtx, md)
+	}
+
+	var subs []string
+	var authResponse *authn.AuthenticateResponse
+	var err error
+
+	certSubject, ok := headerAuthValidForClientAndPeer(ctxIn)
+	if ok && !fromGateway(certSubject) {
+		subs = []string{certSubject}
+		log.Debugf("using client cert to authenticate request: %q", certSubject)
+	} else { // ordinary authn by calling authn-service
+		authResponse, err = a.authn.Authenticate(authCtx, &authn.AuthenticateRequest{})
+		if err != nil {
+			log.Debugf("error authenticating request: %s", err)
+			return nil, err
+		}
+		subs = append(authResponse.Teams, authResponse.Subject)
+	}
+
+	projects := auth_context.ProjectsFromMetadata(md)
+
+	ctxOut, err := a.authz.Handle(authCtx, subs, projects, req)
+	if err != nil {
+		return nil, err
+	}
+
+	// pass on all auth metadata to domain services
+	// services can use that metadata in authz-related decisions
+	// like allowing project assignment
+	log.Debug("injecting auth context to downstream")
+	ctxOut = auth_context.NewOutgoingContext(ctxOut)
+	return ctxOut, nil
+}
+
 // UnaryInterceptor returns a grpc UnaryServerInterceptor that performs AuthN/Z.
 func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 	return func(
@@ -106,87 +160,67 @@ func (a *authInterceptor) UnaryServerInterceptor() grpc.UnaryServerInterceptor {
 		info *grpc.UnaryServerInfo,
 		handler grpc.UnaryHandler) (interface{}, error) {
 
-		// extract request-scoped logger
-		log := ctxlogrus.Extract(ctx)
-
-		// this context is only used for authenticating the request: we need
-		// headers!
-		// grpc-gateway translates these into metadata, and we'll forward that to
-		// authn-service below. we don't want that metadata on _every_ request,
-		// though, so this context is separated out
-		authCtx := ctx
-
-		// transfer incoming metadata to outgoing metadata
-		// if !ok, this will default to the ctx set above, and most likely be
-		// rejected by authn-service. However, we don't want to duplicate the
-		// "when is a request potentially good for authentication" logic here,
-		// so this will just go to authn-service as-is.
-		var md metadata.MD
-		var ok bool
-		if md, ok = metadata.FromIncomingContext(authCtx); ok {
-			authCtx = metadata.NewOutgoingContext(authCtx, md)
-		}
-
-		var subs []string
-		var authResponse *authn.AuthenticateResponse
-		var err error
-
-		certSubject, ok := headerAuthValidForClientAndPeer(ctx)
-		if ok && !fromGateway(certSubject) {
-			subs = []string{certSubject}
-			log.Debugf("using client cert to authenticate request: %q", certSubject)
-		} else { // ordinary authn by calling authn-service
-			authResponse, err = a.authn.Authenticate(authCtx, &authn.AuthenticateRequest{})
-			if err != nil {
-				log.Debugf("error authenticating request: %s", err)
-				return nil, err
-			}
-			subs = append(authResponse.Teams, authResponse.Subject)
-		}
-
-		projects := auth_context.ProjectsFromMetadata(md)
-
-		ctx, err = a.authz.Handle(authCtx, subs, projects, req)
+		ctxForDownstream, err := a.combinedAuth(ctx, req)
 		if err != nil {
 			return nil, err
 		}
 
-		// pass on all auth metadata to domain services
-		// services can use that metadata in authz-related decisions
-		// like allowing project assignment
-		log.Debugf("injecting auth context for method %q to downstream", info.FullMethod)
-		ctx = auth_context.NewOutgoingContext(ctx)
-
-		return handler(ctx, req)
+		return handler(ctxForDownstream, req)
 	}
 }
 
+// interceptedServerStream wraps a grpc.ServerStream in order to allow an
+// updated context to be given to the handler. The auth process updates the
+// context with auth metadata which should be passed along to the domain
+// service that ultimately handles the request.
+type interceptedServerStream struct {
+	ctx context.Context
+	grpc.ServerStream
+}
+
+func (i *interceptedServerStream) Context() context.Context {
+	return i.ctx
+}
+
 func (a *authInterceptor) StreamServerInterceptor() grpc.StreamServerInterceptor {
-	return func(srv interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+	return func(req interface{}, ss grpc.ServerStream, info *grpc.StreamServerInfo, handler grpc.StreamHandler) error {
+
 		// This is the only method of the reflection service, see
 		// https://github.com/grpc/grpc/blob/aef957950/src/proto/grpc/reflection/v1alpha/reflection.proto#L21-L26
 		if info.FullMethod == "/grpc.reflection.v1alpha.ServerReflection/ServerReflectionInfo" {
-			return handler(srv, ss)
+			return handler(req, ss)
 		}
 
 		//!\\ Note: this ^ is a stop-gap while we haven't (conceptually) figured out
 		//          authz for streaming services. Do not add further methods please.
 
-		// This is a hack. Since streaming is not supported, we want to make sure you still have some valid cert
-		// when trying to do things that are streaming based. This is currently only used for the debug endpoint.
-		// I think this is ok because we had an http endpoint that was not auth'd at all. Also, we don't expose
-		// gateway over grpc, and connecting to grpc requires a signed cert. So this is probably overkill and
-		// simply skipping the check would be fine, but we'll go and make sure the cert is the one the CLI is
-		// using
-		if _, ok := srv.(DeploymentCertAuthOnly); ok {
+		// Special case for the debug server; requires the deployment service's
+		// cert. At the time when this case was added, we didn't support auth on
+		// streaming services but we needed it for this one thing.
+		if _, ok := req.(DeploymentCertAuthOnly); ok {
 			certSubject, ok := headerAuthValidForClientAndPeer(ss.Context())
 			if ok && fromDeployment(certSubject) {
-				return handler(srv, ss)
+				return handler(req, ss)
 			}
 			return status.Errorf(codes.PermissionDenied, "unauthorized access to %s", info.FullMethod)
 
 		}
-		return errors.New("to be implemented")
+
+		// A client stream kinda resembles a sequence of several requests. We do
+		// not have consensus about how we want do deal with that so these are
+		// disallowed for now.
+		if info.IsClientStream {
+			return errors.New("to be implemented")
+		}
+
+		ctxForDownstream, err := a.combinedAuth(ss.Context(), req)
+		if err != nil {
+			return err
+		}
+
+		i := interceptedServerStream{ctx: ctxForDownstream, ServerStream: ss}
+
+		return handler(req, &i)
 	}
 }
 
