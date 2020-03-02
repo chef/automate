@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
@@ -49,7 +49,7 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
   ) { }
 
   ngOnInit() {
-    this.layoutFacade.showInfrastructureSidebar();
+    this.layoutFacade.showSidebar(Sidebar.Infrastructure);
 
     this.store.select(routeURL).pipe()
     .subscribe((url: string) => {

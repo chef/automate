@@ -76,6 +76,9 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
               name: 'Chef Servers',
               icon: 'storage',
               route: '/infrastructure/chef-servers',
+              authorized: {
+                anyOf: [['/infra/servers', 'get']]
+              },
               visible$: new BehaviorSubject(this.chefInfraServerViewsFeatureFlagOn)
             },
             {
