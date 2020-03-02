@@ -37,7 +37,7 @@ For a single-host installation that contains Chef Infra Server and Chef Automate
 * between 200 and 500 managed nodes: 30GB RAM, 4 vCPUs
 * between 500 and 5000 managed nodes: 61GB RAM, 8vCPUs
 
-A single-host installation that contains Chef Infra Server and Chef Automate will require 80 GB of disk space plus 2 MB of disk space per managed node that is available to `/hab`.
+A single-host installation that contains Chef Infra Server and Chef Automate will require a `/hab` directory that contains 80 GB of disk space for software artifacts plus 2 MB of disk space per managed node.
 
 ### Specify Products From the Command Line
 
