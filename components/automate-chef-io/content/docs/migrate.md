@@ -13,7 +13,11 @@ toc = true
     weight = 60
 +++
 
-This guide shows you how to migrate your existing Chef Automate 1 installation to Chef Automate 2.
+Chef Automate versions 1.0.0-1.8.96 reached end-of-life on December 31, 2019 and are no longer supported. For more information and for help upgrading your system, please contact your Chef account representative.
+The current Chef Automate versions includes significant architectural and technical improvements to the core product platform.
+This guide shows you how to migrate your existing Chef Automate installation to the current Chef Automate.
+
+In this guide, we call Chef Automate versions 1.0.0-1.8.96 "Chef Automate 1" and the current version "Chef Automate 2".
 
 ## Overview
 
@@ -99,7 +103,7 @@ While we've taken care to make the migration process as smooth as possible, this
 
 The Chef Automate 2 migration process puts your Chef Automate 1 installation into maintenance mode, shuts it down, and starts Chef Automate 2. During the downtime, the migration process takes a backup of your Chef Automate 1 data and exports some of its data to a local snapshot, which is imported into Chef Automate 2.
 
-To minimize this downtime, we recommended that you take an online backup of Chef Automate 1 just prior to the upgrade. Historical information such as Chef Client run data and compliance scan data is backed up incrementally, which means that the upgrade only needs to transfer data that has been added since the last backup.
+To minimize this downtime, we recommended that you create an online backup of Chef Automate 1 just prior to the upgrade. Historical information such as Chef Client run data and compliance scan data is backed up incrementally, which means that the upgrade only needs to transfer data that has been added since the last backup.
 
 By default, the Chef Automate 2 upgrade process will not proceed if your Chef Automate 1 installation does not have backups configured. Invoke the migration using the `--skip-backup-check` flag to avoid this check.
 
@@ -108,10 +112,7 @@ To configure Chef Automate 1 backups, see the [Chef Automate 1 Documentation](ht
 ### Unsupported Features and Topologies
 
 Chef Automate 2 includes significant architectural and technical improvements to the core product platform.
-For the initial releases of this new major version, we do not yet support a handful of capabilities that were present in Chef Automate 1.
-If you rely on any of the capabilities listed below, we recommend you continue to use Chef Automate 1.
-Chef continues support of Chef Automate 1 while we develop upgrade paths for these capabilities on the new platform.
-For more information, please contact your Chef account representative.
+If you rely on any of the capabilities listed below, we recommend you continue to using your existing Chef Automate installation.
 
 * **Chef Manage:** Chef Automate 2, unlike Automate 1, cannot serve as a SAML auth proxy
 * **FIPS:** Chef Automate 2 cannot currently operate in FIPS mode
