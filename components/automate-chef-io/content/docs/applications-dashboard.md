@@ -110,7 +110,7 @@ Change the _Missing_ and _Delete_ settings for disconnected services under **Nod
 Using the API, change the `threshold` setting for marking a service as disconnected with an API call similar to:
 
 ```bash
-curl -sSX POST "https://automate-url/apis/v0/retention/service_groups/disconnected_services/config" -d
+curl -sSX POST "https://automate-url/api/v0/retention/service_groups/disconnected_services/config" -d
 '{
   "threshold": "15m"
 }'
@@ -132,7 +132,7 @@ Through the API, disable service removal by setting `"running": false`.
 Configure the `threshold` for removing disconnected services with an API with a call similar to:
 
 ```bash
-curl -sSX POST "https://automate-url/apis/v0/retention/service_groups/delete_disconnected_services/config" -d
+curl -sSX POST "https://automate-url/api/v0/retention/service_groups/delete_disconnected_services/config" -d
 '{
   "threshold": "1d",
   "running":true
