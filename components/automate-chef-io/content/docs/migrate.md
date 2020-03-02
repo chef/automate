@@ -112,7 +112,6 @@ To configure Chef Automate 1 backups, see the [Chef Automate 1 Documentation](ht
 ### Unsupported Features and Topologies
 
 Chef Automate 2 includes significant architectural and technical improvements to the core product platform.
-For the initial releases of this new major version, we do not yet support a handful of capabilities that were present in Chef Automate 1.
 If you rely on any of the capabilities listed below, we recommend you continue to using your existing Chef Automate installation.
 
 * **Chef Manage:** Chef Automate 2, unlike Automate 1, cannot serve as a SAML auth proxy
