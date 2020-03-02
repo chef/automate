@@ -10,7 +10,7 @@ describe('Admin pages', () => {
   describe('User Management', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/api/v0/auth/introspect')
+        .get('/apis/iam/v2/introspect')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -95,7 +95,7 @@ describe('Admin pages', () => {
   describe('Policies list', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/api/v0/auth/introspect')
+        .get('/apis/iam/v2/introspect')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -297,7 +297,7 @@ describe('Admin pages', () => {
   describe('Roles list', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/api/v0/auth/introspect')
+        .get('/apis/iam/v2/introspect')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -416,7 +416,7 @@ describe('Admin pages', () => {
   describe('Projects list', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/api/v0/auth/introspect')
+        .get('/apis/iam/v2/introspect')
         .any()
         .reply(200, JSON.stringify(
           {
@@ -474,7 +474,7 @@ describe('Admin pages', () => {
           }
         };
         fakeServer()
-          .post('/api/v0/auth/introspect', JSON.stringify(
+          .post('/apis/iam/v2/introspect', JSON.stringify(
             {
               path,
               parameters: []
