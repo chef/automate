@@ -1,7 +1,7 @@
 {
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/authz/authz.proto",
+    "title": "components/automate-gateway/api/iam/v2/introspect.proto",
     "version": "version not set"
   },
   "consumes": [
@@ -11,14 +11,14 @@
     "application/json"
   ],
   "paths": {
-    "/auth/introspect": {
+    "/iam/v2/introspect": {
       "get": {
         "operationId": "IntrospectAll",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.authz.response.IntrospectResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2.IntrospectResp"
             }
           }
         },
@@ -32,7 +32,7 @@
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.authz.response.IntrospectResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2.IntrospectResp"
             }
           }
         },
@@ -42,7 +42,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.authz.request.IntrospectReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2.IntrospectReq"
             }
           }
         ],
@@ -51,14 +51,14 @@
         ]
       }
     },
-    "/auth/introspect_some": {
+    "/iam/v2/introspect_some": {
       "post": {
         "operationId": "IntrospectSome",
         "responses": {
           "200": {
             "description": "A successful response.",
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.authz.response.IntrospectResp"
+              "$ref": "#/definitions/chef.automate.api.iam.v2.IntrospectResp"
             }
           }
         },
@@ -68,7 +68,7 @@
             "in": "body",
             "required": true,
             "schema": {
-              "$ref": "#/definitions/chef.automate.api.authz.request.IntrospectSomeReq"
+              "$ref": "#/definitions/chef.automate.api.iam.v2.IntrospectSomeReq"
             }
           }
         ],
@@ -79,7 +79,7 @@
     }
   },
   "definitions": {
-    "chef.automate.api.authz.request.IntrospectReq": {
+    "chef.automate.api.iam.v2.IntrospectReq": {
       "type": "object",
       "properties": {
         "path": {
@@ -93,7 +93,18 @@
         }
       }
     },
-    "chef.automate.api.authz.request.IntrospectSomeReq": {
+    "chef.automate.api.iam.v2.IntrospectResp": {
+      "type": "object",
+      "properties": {
+        "endpoints": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/chef.automate.api.iam.v2.MethodsAllowed"
+          }
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.IntrospectSomeReq": {
       "type": "object",
       "properties": {
         "paths": {
@@ -104,18 +115,7 @@
         }
       }
     },
-    "chef.automate.api.authz.response.IntrospectResp": {
-      "type": "object",
-      "properties": {
-        "endpoints": {
-          "type": "object",
-          "additionalProperties": {
-            "$ref": "#/definitions/chef.automate.api.authz.response.MethodsAllowed"
-          }
-        }
-      }
-    },
-    "chef.automate.api.authz.response.MethodsAllowed": {
+    "chef.automate.api.iam.v2.MethodsAllowed": {
       "type": "object",
       "properties": {
         "get": {
