@@ -25,6 +25,8 @@ type Client interface {
 	// @param (context, threshold)
 	MarkNodesMissing(context.Context, string) (int, error)
 	// @param (context, threshold)
+	GetNodesToMarkMissing(context.Context, string) ([]string, error)
+	// @param (context, threshold)
 	DeleteMarkedNodes(context.Context, string) (int, error)
 	// @param (context, threshold)
 	MarkMissingNodesForDeletion(context.Context, string) (int, error)

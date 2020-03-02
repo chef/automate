@@ -19,9 +19,63 @@ import (
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 )
 
+type nodeUUID struct {
+	EntityUUID string `json:"entity_uuid"`
+}
+
+// GetNodesToMarkMissing gets all the node that need updated to missing
+func (es *Backend) GetNodesToMarkMissing(ctx context.Context, threshold string) ([]string, error) {
+	nodesIndex := mappings.NodeState.Alias
+
+	// The range query that will gather the nodes that have
+	// not checked in the threshold, also do not retrieve nodes
+	// that already on status=missing or marked for delete (exists=false)
+	rangeQueryThreshold := elastic.NewRangeQuery(fieldCheckin).Lt("now-" + threshold)
+	termQueryStatusMissing := elastic.NewTermsQuery("status", "missing")
+	termQueryMarkedForDelete := elastic.NewTermsQuery(nodeExists, "false")
+
+	boolQuery := elastic.NewBoolQuery().
+		Must(rangeQueryThreshold).
+		MustNot(termQueryStatusMissing).
+		MustNot(termQueryMarkedForDelete)
+
+	// Use a ScrollService since this is a batch process that might
+	// have a large amount of data, think about them as a cursor on
+	// a traditional database.
+	scrollService := es.client.
+		Scroll(nodesIndex).
+		Query(boolQuery).
+		FetchSourceContext(elastic.NewFetchSourceContext(true).Include("entity_uuid")).
+		Size(100).      // The size of the pages to scroll
+		KeepAlive("5m") // Time ES will keep the cursor open
+
+	// Make sure that we clear the scroll service
+	defer scrollService.Clear(ctx) // nolint: errcheck
+
+	nodeIds := []string{}
+	for {
+		// Scroll through the results by pages
+		searchResult, err := scrollService.Do(ctx)
+		if err != nil {
+			break
+		}
+
+		var nodeID nodeUUID
+		for _, hit := range searchResult.Hits.Hits {
+			err := json.Unmarshal(*hit.Source, &nodeID)
+			if err != nil {
+				return nodeIds, err
+			}
+
+			nodeIds = append(nodeIds, nodeID.EntityUUID)
+		}
+	}
+
+	return nodeIds, nil
+}
+
 // MarkNodesMissing marks all nodes that have passed the specified threshold as 'missing'
 func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) (int, error) {
-	// TODO: (afiune) Update me when we get rid of the AllMappings array
 	var (
 		updateCount int
 		nodesIndex  = mappings.NodeState.Alias

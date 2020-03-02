@@ -159,7 +159,7 @@ func Spawn(opts *serveropts.Opts) error {
 	defer esSidecarConn.Close() // nolint: errcheck
 	esSidecarClient := es_sidecar.NewEsSidecarClient(esSidecarConn)
 
-	err = server.InitializeJobManager(jobManager, client, esSidecarClient)
+	err = server.InitializeJobManager(jobManager, client, esSidecarClient, nodeMgrServiceClient)
 	if err != nil {
 		logrus.WithError(err).Fatal("could not initialize job manager")
 		return err

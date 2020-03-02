@@ -47,6 +47,7 @@ message NodeState {
 		RUNNING = 0;
 		STOPPED = 1;
 		TERMINATED = 2;
+		MISSING = 3;
 	}
 	State state = 2;
 }
