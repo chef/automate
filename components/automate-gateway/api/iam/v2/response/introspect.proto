@@ -2,8 +2,8 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 
-package chef.automate.api.authz.response;
-option go_package = "github.com/chef/automate/components/automate-gateway/api/authz/response";
+package chef.automate.api.iam.v2;
+option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2/response";
 
 message MethodsAllowed {
     bool get = 1;
