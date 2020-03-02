@@ -1,4 +1,4 @@
-package handler
+package introspect
 
 import (
 	"context"
@@ -18,8 +18,8 @@ import (
 
 	// Gateway Requests/Response/Service definitions
 	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
-	gwAuthzReq "github.com/chef/automate/components/automate-gateway/api/authz/request"
-	gwAuthzRes "github.com/chef/automate/components/automate-gateway/api/authz/response"
+	gwAuthzReq "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
+	gwAuthzRes "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 
 	// other dependencies
 	policy "github.com/chef/automate/components/automate-gateway/authz/policy_v2"
@@ -33,8 +33,8 @@ type AuthzServer struct {
 	filterHandler middleware.SwitchingFilterHandler
 }
 
-// NewAuthzServer creates a server with its client
-func NewAuthzServer(
+// NewServer creates a server with its client
+func NewServer(
 	client authz.AuthorizationClient,
 	filterHandler middleware.SwitchingFilterHandler,
 ) *AuthzServer {

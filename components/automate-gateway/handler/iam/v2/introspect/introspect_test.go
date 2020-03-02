@@ -1,4 +1,4 @@
-package handler_test
+package introspect_test
 
 import (
 	"context"
@@ -8,11 +8,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	authz "github.com/chef/automate/api/interservice/authz/v2"
-	"github.com/chef/automate/components/automate-gateway/api/authz/request"
-	"github.com/chef/automate/components/automate-gateway/api/authz/response"
+	"github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
+	"github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
-	"github.com/chef/automate/components/automate-gateway/handler"
+	handler_introspect "github.com/chef/automate/components/automate-gateway/handler/iam/v2/introspect"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -28,7 +28,6 @@ import (
 	_ "github.com/chef/automate/api/external/cfgmgmt"
 	_ "github.com/chef/automate/api/external/compliance/profiles"
 	_ "github.com/chef/automate/api/external/ingest"
-	_ "github.com/chef/automate/components/automate-gateway/api/authz"
 	_ "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	_ "github.com/chef/automate/components/automate-gateway/api/notifications"
 )
@@ -56,7 +55,7 @@ func TestIntrospectAll(t *testing.T) {
 				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
 			map[string]*response.MethodsAllowed{
-				"/auth/introspect":     &response.MethodsAllowed{Get: true},
+				"/iam/v2/introspect":   &response.MethodsAllowed{Get: true},
 				"/notifications/rules": &response.MethodsAllowed{Post: true},
 			},
 		},
@@ -143,11 +142,11 @@ func TestIntrospectSome(t *testing.T) {
 				{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
 			}},
 			&request.IntrospectSomeReq{Paths: []string{
-				"/auth/introspect",
+				"/iam/v2/introspect",
 				"/notifications/rules",
 			}},
 			map[string]*response.MethodsAllowed{
-				"/auth/introspect":     {Get: true},
+				"/iam/v2/introspect":   {Get: true},
 				"/notifications/rules": {Post: true},
 			},
 		},
@@ -241,7 +240,7 @@ func TestIntrospect(t *testing.T) {
 func testServerAndHandler(t *testing.T) (
 	*authz.AuthorizationServerMock,
 	*grpctest.Server,
-	*handler.AuthzServer) {
+	*handler_introspect.AuthzServer) {
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*serviceCerts)
 
@@ -257,7 +256,7 @@ func testServerAndHandler(t *testing.T) (
 
 	return authSrv,
 		s,
-		handler.NewAuthzServer(
+		handler_introspect.NewServer(
 			nil,
 			authorizer.NewAuthorizer(authv2.AuthorizationHandler(client)))
 }
