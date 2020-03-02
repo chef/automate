@@ -6,7 +6,7 @@ test_upgrades=true
 test_upgrade_strategy="none"
 test_diagnostics_pre_upgrade_filters="~skip-for-deep-upgrade"
 
-# Note: we can't run diagnostics AND inspec, so skip diagnostics
+# Note: we can't run diagnostics AND inspec, so we don't include any inspec tests
 test_skip_diagnostics=false
 
 # on this version, Automate had upgrade-to-v2 and the first three v2 data migrations
