@@ -2,6 +2,7 @@ package handler
 
 import (
 	"context"
+	"io"
 
 	"github.com/chef/automate/api/external/applications"
 	version "github.com/chef/automate/api/external/common/version"
@@ -58,6 +59,39 @@ func (a *Applications) GetServices(
 	}).Debug("rpc call")
 
 	return a.client.GetServices(ctx, request)
+}
+
+func (a *Applications) FindServices(
+	request *applications.ServicesReq,
+	streamOut applications.ApplicationsService_FindServicesServer) error {
+
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	// This contains auth metadata we want to pass on
+	ctx := streamOut.Context()
+
+	streamIn, err := a.client.FindServices(ctx, request)
+	if err != nil {
+		return err
+	}
+	for {
+		svc, err := streamIn.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		err = streamOut.Send(svc)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (a *Applications) GetServicesDistinctValues(ctx context.Context,

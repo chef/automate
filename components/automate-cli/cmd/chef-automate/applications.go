@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"time"
 
@@ -10,7 +11,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/chef/automate/api/external/applications"
-	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
 )
 
@@ -343,26 +343,21 @@ func (s *serviceSet) Load() error {
 	ctx, cancel := context.WithTimeout(context.Background(), 60*time.Second)
 	defer cancel()
 
-	// GetServices API is paginated; we find out how many services there are and
-	// then set the page size to greater than that so we don't have to loop.
-	// This should be revisited if this command is frequently used to fetch more
-	// than 100k-ish services on RAM constrained machines
-	statsReq := &applications.ServicesStatsReq{}
-	stats, err := s.appsClient.GetServicesStats(ctx, statsReq)
-	if err != nil {
-		return err
-	}
-
-	servicesCount := stats.TotalServices
-
 	req := makeServicesReqWithFilters()
-	req.Pagination = &query.Pagination{Size: servicesCount + 100}
-
-	res, err := s.appsClient.GetServices(ctx, req)
+	streamIn, err := s.appsClient.FindServices(ctx, req)
 	if err != nil {
 		return err
 	}
-	s.services = res.GetServices()
+	for {
+		svc, err := streamIn.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return err
+		}
+		s.services = append(s.services, svc)
+	}
 
 	return nil
 }
