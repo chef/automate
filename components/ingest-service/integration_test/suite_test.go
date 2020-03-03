@@ -389,7 +389,8 @@ func createServices(s *Suite) error {
 	esSidecarClient := es_sidecar.NewEsSidecarClient(esSidecarConn)
 	s.cleanup = esSidecarConn.Close
 
-	err = server.InitializeJobManager(jobManager, s.ingest, es_sidecar.NewEsSidecarClient(esSidecarConn))
+	err = server.InitializeJobManager(jobManager, s.ingest,
+		es_sidecar.NewEsSidecarClient(esSidecarConn), s.managerServiceClientMock)
 	if err != nil {
 		return errors.Wrap(err, "could not initialize job manager")
 	}

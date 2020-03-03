@@ -13,18 +13,24 @@ import (
 	"encoding/json"
 	"time"
 
+	"github.com/pkg/errors"
+
 	"github.com/olivere/elastic"
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 )
 
+type nodeUUID struct {
+	EntityUUID string `json:"entity_uuid"`
+}
+
 // MarkNodesMissing marks all nodes that have passed the specified threshold as 'missing'
-func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) (int, error) {
-	// TODO: (afiune) Update me when we get rid of the AllMappings array
+func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) ([]string, error) {
 	var (
 		updateCount int
 		nodesIndex  = mappings.NodeState.Alias
+		nodeIds     = []string{}
 	)
 
 	// The range query that will gather the nodes that have
@@ -45,6 +51,7 @@ func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) (int,
 	scrollService := es.client.
 		Scroll(nodesIndex).
 		Query(boolQuery).
+		FetchSourceContext(elastic.NewFetchSourceContext(true).Include("entity_uuid")).
 		Size(100).      // The size of the pages to scroll
 		KeepAlive("5m") // Time ES will keep the cursor open
 
@@ -60,7 +67,12 @@ func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) (int,
 
 		// Generate the BulkRequest from the hits from previous search
 		bulkRequest := es.client.Bulk()
+		var nodeID nodeUUID
 		for _, hit := range searchResult.Hits.Hits {
+			err := json.Unmarshal(*hit.Source, &nodeID)
+			if err != nil {
+				return nodeIds, err
+			}
 			updateReq := elastic.NewBulkUpdateRequest().
 				Index(nodesIndex).
 				Type(hit.Type).
@@ -73,6 +85,7 @@ func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) (int,
 					Timestamp: time.Now().UTC(),
 				})
 			bulkRequest = bulkRequest.Add(updateReq)
+			nodeIds = append(nodeIds, nodeID.EntityUUID)
 		}
 
 		// Execute the BulkRequest
@@ -83,11 +96,15 @@ func (es *Backend) MarkNodesMissing(ctx context.Context, threshold string) (int,
 
 		// If one Bulk failed, lets exit
 		if err != nil {
-			return updateCount, err
+			return nodeIds, err
 		}
 	}
 
-	return updateCount, nil
+	if updateCount != len(nodeIds) {
+		return nodeIds, errors.Errorf("not all the nodes were updated")
+	}
+
+	return nodeIds, nil
 }
 
 // DeleteMarkedNodes will delete all the nodes from elasticsearch that no longer

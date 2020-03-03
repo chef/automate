@@ -11,6 +11,7 @@ import (
 
 	es "github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/ingest"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/config"
 	"github.com/chef/automate/lib/cereal"
@@ -29,16 +30,20 @@ var (
 	MissingNodesForDeletionScheduleName = "periodic_missing_nodes_for_deletion"
 )
 
-func InitializeJobManager(c *cereal.Manager, client backend.Client, esSidecarClient es.EsSidecarClient) error {
-	err := patterns.RegisterSingleTaskWorkflowExecutor(c, DeleteNodesWorkflowName, false, &DeleteExpiredMarkedNodesTask{client}, cereal.TaskExecutorOpts{})
+func InitializeJobManager(c *cereal.Manager, client backend.Client, esSidecarClient es.EsSidecarClient,
+	nodeMgrClient manager.NodeManagerServiceClient) error {
+	err := patterns.RegisterSingleTaskWorkflowExecutor(c, DeleteNodesWorkflowName,
+		false, &DeleteExpiredMarkedNodesTask{client}, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err
 	}
-	err = patterns.RegisterSingleTaskWorkflowExecutor(c, MissingNodesWorkflowName, false, &MarkNodesMissingTask{client}, cereal.TaskExecutorOpts{})
+	err = patterns.RegisterSingleTaskWorkflowExecutor(c, MissingNodesWorkflowName,
+		false, &MarkNodesMissingTask{client, nodeMgrClient}, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err
 	}
-	err = patterns.RegisterSingleTaskWorkflowExecutor(c, MissingNodesForDeletionWorkflowName, false, &MarkMissingNodesForDeletionTask{client}, cereal.TaskExecutorOpts{})
+	err = patterns.RegisterSingleTaskWorkflowExecutor(c, MissingNodesForDeletionWorkflowName,
+		false, &MarkMissingNodesForDeletionTask{client}, cereal.TaskExecutorOpts{})
 	if err != nil {
 		return err
 	}
@@ -107,7 +112,8 @@ func (t *DeleteExpiredMarkedNodesTask) Run(ctx context.Context, task cereal.Task
 }
 
 type MarkNodesMissingTask struct {
-	Client backend.Client
+	Client        backend.Client
+	NodeMgrClient manager.NodeManagerServiceClient
 }
 
 func (t *MarkNodesMissingTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
@@ -117,7 +123,7 @@ func (t *MarkNodesMissingTask) Run(ctx context.Context, task cereal.Task) (inter
 		return nil, errors.Wrap(err, "could not get threshold parameter")
 	}
 
-	return nil, markNodesMissing(ctx, threshold, t.Client)
+	return nil, markNodesMissing(ctx, threshold, t.Client, t.NodeMgrClient)
 }
 
 type MarkMissingNodesForDeletionTask struct {
@@ -136,21 +142,36 @@ func (t *MarkMissingNodesForDeletionTask) Run(ctx context.Context, task cereal.T
 
 // markNodesMissing is a job that will call the backend to mark
 // all nodes that haven't checked in passed the threshold
-func markNodesMissing(ctx context.Context, threshold string, client backend.Client) error {
+func markNodesMissing(ctx context.Context, threshold string, client backend.Client,
+	nodeMgrClient manager.NodeManagerServiceClient) error {
 	logctx := log.WithFields(log.Fields{
 		"threshold": threshold,
 		"job":       "MarkMissingNodesForDeletion",
 	})
 
 	logctx.Debug("Starting job")
-	updateCount, err := client.MarkNodesMissing(ctx, threshold)
+
+	// mark the nodes missing
+	updatedNodeIDs, err := client.MarkNodesMissing(ctx, threshold)
 	if err != nil {
 		logctx.WithError(err).Error("Job failed")
 		return err
 	}
 
-	f := log.Fields{"nodes_updated": updateCount}
-	if updateCount > 0 {
+	// Walk through each node and update the status in the nodemanager
+	for _, nodeID := range updatedNodeIDs {
+		_, err = nodeMgrClient.ChangeNodeState(ctx, &manager.NodeState{
+			Id:    nodeID,
+			State: manager.NodeState_MISSING,
+		})
+		if err != nil {
+			logctx.WithError(err).Error("Job failed")
+			return err
+		}
+	}
+
+	f := log.Fields{"nodes_updated": len(updatedNodeIDs)}
+	if len(updatedNodeIDs) > 0 {
 		logctx.WithFields(f).Info("Job updated nodes")
 	} else {
 		logctx.WithFields(f).Debug("Job ran without updates")

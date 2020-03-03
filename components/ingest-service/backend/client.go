@@ -23,7 +23,7 @@ type Client interface {
 	// @param (context, backend.InternalChefAction)
 	InsertAction(context.Context, InternalChefAction) error
 	// @param (context, threshold)
-	MarkNodesMissing(context.Context, string) (int, error)
+	MarkNodesMissing(context.Context, string) ([]string, error)
 	// @param (context, threshold)
 	DeleteMarkedNodes(context.Context, string) (int, error)
 	// @param (context, threshold)
