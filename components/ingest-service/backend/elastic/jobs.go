@@ -200,11 +200,12 @@ func (es *Backend) DeleteMarkedNodes(ctx context.Context, threshold string) (upd
 
 // MarkMissingNodesForDeletion will mark all the nodes that have been missing for over the
 // specified threshold time as 'ready for deletion'. (that is, mark the node as exists=false)
-func (es *Backend) MarkMissingNodesForDeletion(ctx context.Context, threshold string) (int, error) {
+func (es *Backend) MarkMissingNodesForDeletion(ctx context.Context, threshold string) ([]string, error) {
 	var (
 		updateCount int
 		docIDs      []string
 		nodesIndex  = mappings.NodeState.Alias
+		nodeIds     = []string{}
 	)
 
 	// The range query that will gather the nodes that have been missing
@@ -225,6 +226,7 @@ func (es *Backend) MarkMissingNodesForDeletion(ctx context.Context, threshold st
 	scrollService := es.client.
 		Scroll(nodesIndex).
 		Query(boolQuery).
+		FetchSourceContext(elastic.NewFetchSourceContext(true).Include("entity_uuid")).
 		Size(100).      // The size of the pages to scroll
 		KeepAlive("5m") // Time ES will keep the cursor open
 
@@ -239,8 +241,14 @@ func (es *Backend) MarkMissingNodesForDeletion(ctx context.Context, threshold st
 		}
 
 		docIDs = make([]string, 0)
+		var nodeID nodeUUID
 		for _, hit := range searchResult.Hits.Hits {
+			err := json.Unmarshal(*hit.Source, &nodeID)
+			if err != nil {
+				return nodeIds, err
+			}
 			docIDs = append(docIDs, hit.Id)
+			nodeIds = append(nodeIds, nodeID.EntityUUID)
 		}
 
 		// Execute the BulkRequest
@@ -251,9 +259,13 @@ func (es *Backend) MarkMissingNodesForDeletion(ctx context.Context, threshold st
 
 		// If one Bulk failed, lets exit
 		if err != nil {
-			return updateCount, err
+			return nodeIds, err
 		}
 	}
 
-	return updateCount, nil
+	if updateCount != len(nodeIds) {
+		return nodeIds, errors.Errorf("not all the nodes were updated")
+	}
+
+	return nodeIds, nil
 }
