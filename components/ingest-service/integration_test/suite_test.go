@@ -25,6 +25,7 @@ import (
 	"github.com/chef/automate/api/interservice/es_sidecar"
 	"github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	cfgBackend "github.com/chef/automate/components/config-mgmt-service/backend"
 	cfgElastic "github.com/chef/automate/components/config-mgmt-service/backend/elastic"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
@@ -73,6 +74,7 @@ type Suite struct {
 	projectsClient           *iam_v2.MockProjectsClient
 	eventServiceClientMock   *event.MockEventServiceClient
 	managerServiceClientMock *manager.MockNodeManagerServiceClient
+	nodesServiceClientMock   *nodes.MockNodesServiceClient
 	cleanup                  func() error
 }
 
@@ -390,7 +392,8 @@ func createServices(s *Suite) error {
 	s.cleanup = esSidecarConn.Close
 
 	err = server.InitializeJobManager(jobManager, s.ingest,
-		es_sidecar.NewEsSidecarClient(esSidecarConn), s.managerServiceClientMock)
+		es_sidecar.NewEsSidecarClient(esSidecarConn), s.managerServiceClientMock,
+		s.nodesServiceClientMock)
 	if err != nil {
 		return errors.Wrap(err, "could not initialize job manager")
 	}
@@ -441,6 +444,8 @@ func createMocksWithDefaultFunctions(s *Suite) {
 	s.managerServiceClientMock = manager.NewMockNodeManagerServiceClient(gomock.NewController(nil))
 	s.managerServiceClientMock.EXPECT().ProcessNode(gomock.Any(), gomock.Any()).AnyTimes().Return(
 		&manager.ProcessNodeResponse{}, nil)
+
+	s.nodesServiceClientMock = nodes.NewMockNodesServiceClient(gomock.NewController(nil))
 }
 
 func createMocksWithTestObject(s *Suite, t *testing.T) {

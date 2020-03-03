@@ -103,6 +103,7 @@ function compile_client_mocks() {
     mockgen_debug -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/ingest
     mockgen_debug -source event_feed/event_feed.pb.go -destination event_feed/event_feed.pb.client_mock.go -package event_feed -self_package github.com/chef/automate/api/interservice/event_feed
     mockgen_debug -source nodemanager/manager/manager.pb.go -destination nodemanager/manager/manager.pb.client_mock.go -package manager -self_package github.com/chef/automate/api/interservice/nodemanager/manager
+    mockgen_debug -source nodemanager/nodes/nodes.pb.go -destination nodemanager/nodes/nodes.pb.client_mock.go -package nodes -self_package github.com/chef/automate/api/interservice/nodemanager/nodes
   )
 }
 
