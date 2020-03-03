@@ -3,10 +3,10 @@ import { itFlaky } from '../../../support/constants';
 describe('team add users', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'test-add-users';
-  const userDisplayName = `${cypressPrefix} user ${now}`;
-  const username = `${cypressPrefix}-testing-user-${now}`;
-  const teamName = 'testing team';
-  const teamID = `${cypressPrefix}-testing-team-${now}`;
+  const userName = `${cypressPrefix} name ${now}`;
+  const userID = `${cypressPrefix}-add-users-${now}`;
+  const teamName = `${cypressPrefix} team ${now}`;
+  const teamID = `${cypressPrefix}-team-${now}`;
   let adminIdToken = '';
 
   before(() => {
@@ -14,19 +14,16 @@ describe('team add users', () => {
       // clean up leftover teams in case of previous test failures
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminIdToken = admin.id_token;
-
-      // extra precaution in case the `after` cleanup didn't run due to a failure
-      cy.cleanupUsersByNamePrefix(cypressPrefix);
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['teams']);
+      cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['users', 'teams']);
 
       // create custom user and team
       cy.request({
         auth: { bearer: adminIdToken },
         method: 'POST',
-        url: '/api/v0/auth/users',
+        url: '/apis/iam/v2/users',
         body: {
-          username: username,
-          name: userDisplayName,
+          id: userID,
+          name: userName,
           password: 'chefautomate'
         }
       });
@@ -62,8 +59,7 @@ describe('team add users', () => {
   });
 
   after(() => {
-    cy.cleanupUsersByNamePrefix(cypressPrefix);
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['teams']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['users', 'teams']);
   });
 
   itFlaky('when the x is clicked, it returns to the team details page', () => {
@@ -79,8 +75,7 @@ describe('team add users', () => {
   itFlaky('navigates to the team users add page', () => {
     cy.get('chef-page-header h1').contains(`Add Users to ${teamName}`);
 
-    cy.get('chef-tbody chef-tr').contains('chef-tr', username)
-      .contains(userDisplayName);
+    cy.get('chef-tbody chef-tr').contains(userID);
 
     // Assert that there's more than two users: the one we created and admin,
     // that always exists.
@@ -90,7 +85,7 @@ describe('team add users', () => {
   });
 
   itFlaky('adds a single user', () => {
-    cy.get('chef-tbody').contains('chef-tr', username)
+    cy.get('chef-tbody').contains('chef-tr', userID)
       .find('chef-checkbox').click();
     cy.get('#users-selected').contains('1 user selected');
 
@@ -99,19 +94,19 @@ describe('team add users', () => {
 
     // drops you back on the team details page with user in the team users table
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamID}`);
-    cy.get('chef-table-body').children().should('have.length', 1);
-    cy.get('chef-table-body chef-table-cell a').first().contains(userDisplayName);
+    cy.get('chef-tbody').children().should('have.length', 1);
+    cy.get('chef-tbody chef-td a').first().contains(userName);
 
     // remove user from team
     cy.request({
       auth: { bearer: adminIdToken },
       method: 'GET',
-      url: `/api/v0/auth/users/${username}`
+      url: `/apis/iam/v2/users/${userID}`
     }).then((resp) => {
       cy.request({
         auth: { bearer: adminIdToken },
-        method: 'POST',
-        url: `/apis/iam/v2/teams/${teamID}/users:remove`,
+        method: 'PUT',
+        url: `/apis/iam/v2/teams/${teamID}/users`,
         body: {
           user_ids: [resp.body.id]
         }
@@ -133,8 +128,8 @@ describe('team add users', () => {
 
     // drops you back on the team details page with user in the team users table
     cy.url().should('eq', `${Cypress.config().baseUrl}/settings/teams/${teamID}`);
-    cy.get('chef-table-body chef-table-cell a').contains(userDisplayName);
-    cy.get('chef-table-body chef-table-cell a').contains('Local Administrator');
+    cy.get('chef-tbody chef-td a').contains(userName);
+    cy.get('chef-tbody chef-td a').contains('Local Administrator');
 
     // navigate back to add users and see empty page and message
     cy.get('chef-toolbar chef-button').contains('Add User').click();

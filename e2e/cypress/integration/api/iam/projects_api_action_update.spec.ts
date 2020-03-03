@@ -49,7 +49,7 @@ describe('Action project update tagging', () => {
   const start = Cypress.moment().utc().subtract(3, 'day').valueOf().toString();
 
   before(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
     // Ingest an action with attributes that match all the projects
     cy.fixture('action/environment_create.json').then((action) => {
@@ -89,7 +89,7 @@ describe('Action project update tagging', () => {
     cy.applyRulesAndWait(100);
   });
 
-  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
+  after(() => cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
 
   for (const projectWithRule of projectsWithRule) {
     it(`when a project has a rule that matches an action's ${projectWithRule.rule.name},

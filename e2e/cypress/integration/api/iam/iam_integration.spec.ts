@@ -27,7 +27,7 @@ describe('assigning projects', () => {
   before(() => {
     // TODO cleanup projects in before block (can't do now bc we have a project
     // limit and cereal runs async to delete projects)
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, iamResourcesToTest);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, iamResourcesToTest);
 
     for (const id of [
       authorizedProject1,
@@ -122,7 +122,7 @@ describe('assigning projects', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, objectsToCleanUp);
   });
 
   iamResourcesToTest.forEach((iamResources: string) => {

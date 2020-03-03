@@ -50,8 +50,7 @@ describe('token management', () => {
   });
 
   after(() => {
-    // can still use v2 APIs while on v1
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['tokens']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['tokens']);
   });
 
   it('displays token table', () => {

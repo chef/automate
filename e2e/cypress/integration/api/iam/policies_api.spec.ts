@@ -41,7 +41,7 @@ describe('policies API', () => {
 
   before(() => {
     defaultAdminReq.headers = { 'api-token': Cypress.env('ADMIN_TOKEN') };
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies', 'projects']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['policies', 'projects']);
 
     for (const project of [project1, project2]) {
       cy.request({
@@ -54,17 +54,17 @@ describe('policies API', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies', 'projects']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['policies', 'projects']);
   });
 
   describe('policies API', () => {
 
     before(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies']);
+      cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['policies']);
     });
 
     after(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['policies']);
+      cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['policies']);
     });
 
     describe('POST /apis/iam/v2/policies', () => {
@@ -311,7 +311,7 @@ describe('policies API', () => {
     });
 
     after(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix,
+      cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix,
         ['projects', 'policies', 'tokens']);
     });
 

@@ -148,7 +148,7 @@ describe('project update re-tagging', () => {
   const end = Cypress.moment().utc().endOf('day').format();
 
   before(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
     // Ingest a InSpec report with attribues that match all the projects
     cy.fixture('compliance/inspec-report.json').then((report) => {
@@ -217,7 +217,7 @@ describe('project update re-tagging', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',

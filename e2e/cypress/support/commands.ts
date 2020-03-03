@@ -143,35 +143,14 @@ Cypress.Commands.add('restoreStorage', () => {
   });
 });
 
-Cypress.Commands.add('cleanupV2IAMObjectsByIDPrefixes',
+Cypress.Commands.add('cleanupIAMObjectsByIDPrefixes',
   (idPrefix: string, iamObjects: string[]) => {
 
   iamObjects.forEach((iamObject) => {
     if (iamObject === 'projects') {
       cleanupProjectsByIDPrefixes(idPrefix);
     } else {
-      cleanupV2IAMObjectByIDPrefix(idPrefix, iamObject);
-    }
-  });
-});
-
-Cypress.Commands.add('cleanupUsersByNamePrefix', (namePrefix: string) => {
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'GET',
-    url: '/api/v0/auth/users',
-    failOnStatusCode: false
-  }).then((resp) => {
-    const body = resp.body;
-    for (const user of body.users) {
-      if (user.name.startsWith(namePrefix)) {
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'DELETE',
-          url: `/api/v0/auth/users/${user.username}`,
-          failOnStatusCode: false
-        });
-      }
+      cleanupIAMObjectByIDPrefix(idPrefix, iamObject);
     }
   });
 });
@@ -404,7 +383,7 @@ function deleteProject(projectId: string) {
   });
 }
 
-function cleanupV2IAMObjectByIDPrefix(idPrefix: string, iamObject: string): void {
+function cleanupIAMObjectByIDPrefix(idPrefix: string, iamObject: string): void {
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'GET',
