@@ -224,7 +224,7 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "automate-gateway-iam-v2"
+  - label: "iam automate-gateway integration"
     command:
       - . scripts/verify_setup.sh
       - |
