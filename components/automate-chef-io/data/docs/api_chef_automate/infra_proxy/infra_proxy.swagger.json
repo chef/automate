@@ -437,6 +437,72 @@
         ]
       }
     },
+    "/infra/servers/{server_id}/orgs/{org_id}/roles": {
+      "get": {
+        "operationId": "GetRoles",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Roles"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/infra/servers/{server_id}/orgs/{org_id}/roles/{name}": {
+      "get": {
+        "operationId": "GetRole",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Role"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/infra/version": {
       "get": {
         "operationId": "GetVersion",
@@ -838,6 +904,48 @@
         },
         "server_id": {
           "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Role": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "chef_type": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "run_list": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "json_class": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.RoleListItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Roles": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.RoleListItem"
+          }
         }
       }
     },
