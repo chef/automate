@@ -94,6 +94,10 @@ message ConfigRequest {
 					google.protobuf.StringValue ssl_protocols = 17;
 					google.protobuf.StringValue tcp_nodelay = 18;
 					google.protobuf.StringValue tcp_nopush = 19;
+					google.protobuf.StringValue proxy_buffering = 25;
+					google.protobuf.StringValue proxy_buffer_size = 26;
+					google.protobuf.StringValue proxy_buffers = 27;
+					google.protobuf.StringValue proxy_busy_buffers_size = 28;
 
 					// Auto-calculated
 					google.protobuf.BoolValue ipv6_supported = 24;

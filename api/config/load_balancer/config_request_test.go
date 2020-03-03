@@ -115,6 +115,20 @@ func TestValidateGlobalConfig(t *testing.T) {
 	)
 }
 
+func TestValidateProxyBuffers(t *testing.T) {
+	t.Run("with valid config", func(t *testing.T) {
+		c := newValidConfigRequest()
+		c.V1.Sys.Ngx.Http.ProxyBuffers = w.String("6 16k")
+		assert.NoError(t, c.Validate())
+	})
+
+	t.Run("with invalid config", func(t *testing.T) {
+		c := newValidConfigRequest()
+		c.V1.Sys.Ngx.Http.ProxyBuffers = w.String("16k")
+		assert.Error(t, c.Validate())
+	})
+}
+
 func newValidConfigRequest() *ConfigRequest {
 	c := NewConfigRequest()
 	c.V1.Sys.Service.ExternalFqdn = w.String("default_value_in_test.example")
