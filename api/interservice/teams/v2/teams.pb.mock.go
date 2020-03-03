@@ -6,6 +6,7 @@ package v2
 import (
 	"context"
 
+	version "github.com/chef/automate/api/external/common/version"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -29,6 +30,7 @@ func NewTeamsV2ServerMockWithoutValidation() *TeamsV2ServerMock {
 // methods with "not implemented" returns
 type TeamsV2ServerMock struct {
 	validateRequests      bool
+	GetVersionFunc        func(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
 	GetTeamFunc           func(context.Context, *GetTeamReq) (*GetTeamResp, error)
 	ListTeamsFunc         func(context.Context, *ListTeamsReq) (*ListTeamsResp, error)
 	CreateTeamFunc        func(context.Context, *CreateTeamReq) (*CreateTeamResp, error)
@@ -40,6 +42,18 @@ type TeamsV2ServerMock struct {
 	GetTeamMembershipFunc func(context.Context, *GetTeamMembershipReq) (*GetTeamMembershipResp, error)
 	UpgradeToV2Func       func(context.Context, *UpgradeToV2Req) (*UpgradeToV2Resp, error)
 	ResetToV1Func         func(context.Context, *ResetToV1Req) (*ResetToV1Resp, error)
+}
+
+func (m *TeamsV2ServerMock) GetVersion(ctx context.Context, req *version.VersionInfoRequest) (*version.VersionInfo, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.GetVersionFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'GetVersion' not implemented")
 }
 
 func (m *TeamsV2ServerMock) GetTeam(ctx context.Context, req *GetTeamReq) (*GetTeamResp, error) {
@@ -176,6 +190,7 @@ func (m *TeamsV2ServerMock) ResetToV1(ctx context.Context, req *ResetToV1Req) (*
 
 // Reset resets all overridden functions
 func (m *TeamsV2ServerMock) Reset() {
+	m.GetVersionFunc = nil
 	m.GetTeamFunc = nil
 	m.ListTeamsFunc = nil
 	m.CreateTeamFunc = nil

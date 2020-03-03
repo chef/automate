@@ -31,6 +31,7 @@ func NewTeamsServerMockWithoutValidation() *TeamsServerMock {
 // methods with "not implemented" returns
 type TeamsServerMock struct {
 	validateRequests          bool
+	GetVersionFunc            func(context.Context, *request.GetVersionReq) (*response.GetVersionResp, error)
 	ListTeamsFunc             func(context.Context, *request.ListTeamsReq) (*response.ListTeamsResp, error)
 	GetTeamFunc               func(context.Context, *request.GetTeamReq) (*response.GetTeamResp, error)
 	CreateTeamFunc            func(context.Context, *request.CreateTeamReq) (*response.CreateTeamResp, error)
