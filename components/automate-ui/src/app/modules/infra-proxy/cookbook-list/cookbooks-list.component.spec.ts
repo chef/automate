@@ -2,33 +2,20 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { CookbooksListComponent } from './cookbooks-list.component';
-// import { HttpErrorResponse } from '@angular/common/http';
 import { RouterTestingModule } from '@angular/router/testing';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MockComponent } from 'ng2-mock-component';
 import { StoreModule } from '@ngrx/store';
-// import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
-// import { HttpStatus } from 'app/types/types';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 
-xdescribe('CookbooksListComponent', () => {
+describe('CookbooksListComponent', () => {
   let component: CookbooksListComponent;
   let fixture: ComponentFixture<CookbooksListComponent>;
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ CookbooksListComponent ],
-      schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
-    })
-    .compileComponents();
-  }));
-
-  beforeEach(async(() => {
-    TestBed.configureTestingModule({
       declarations: [
-        MockComponent({ selector: 'chef-button',
-                inputs: ['disabled', 'routerLink'] }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
         MockComponent({ selector: 'chef-error' }),
