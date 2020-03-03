@@ -723,9 +723,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "reset admin access"
+  - label: "iam reset admin access"
     command:
-      - integration/run_test integration/tests/reset_admin_access.sh
+      - integration/run_test integration/tests/iam_reset_admin_access.sh
     timeout_in_minutes: 20
     expeditor:
       executor:
