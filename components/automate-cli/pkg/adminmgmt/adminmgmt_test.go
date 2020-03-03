@@ -176,6 +176,11 @@ func TestEnsureTeam(t *testing.T) {
 				}, nil
 			}
 
+			serverMocks.TeamsMock.GetTeamFunc = func(
+				_ context.Context, req *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
+				return nil, status.Error(codes.NotFound, "Not Found")
+			}
+
 			found, err := adminmgmt.CreateAdminTeamIfMissing(ctx, apiClient, false)
 			require.NoError(t, err)
 			assert.False(t, found)
@@ -191,22 +196,13 @@ func TestEnsureTeam(t *testing.T) {
 	})
 
 	t.Run("when the admins team exists already", func(t *testing.T) {
-		mockedAdminsID := "mocked-admin-id"
-		serverMocks.TeamsMock.ListTeamsFunc = func(
-			context.Context, *iam_req.ListTeamsReq) (*iam_resp.ListTeamsResp, error) {
-
-			return &iam_resp.ListTeamsResp{
-				Teams: []*iam_common.Team{
-					{
-						Id:       "mocked-not-admin-id",
-						Name:     "not-admin",
-						Projects: []string{},
-					},
-					{
-						Id:       mockedAdminsID,
-						Name:     "admins",
-						Projects: []string{},
-					},
+		serverMocks.TeamsMock.GetTeamFunc = func(
+			_ context.Context, req *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
+			return &iam_resp.GetTeamResp{
+				Team: &iam_common.Team{
+					Id:       "admins",
+					Name:     "admins",
+					Projects: []string{},
 				},
 			}, nil
 		}
