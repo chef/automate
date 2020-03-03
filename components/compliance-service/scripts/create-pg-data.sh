@@ -10,13 +10,17 @@
 
 url=${A2_URL}
 token=${A2_TOKEN}
-node_count=12
+node_count=3
 job_count=3
 docker_machine=`docker ps | awk 'FNR == 2 {print $1}'`
 
-echo "target docker machine: " $docker_machine
-echo "target acceptance host: " $AUTOMATE_ACCEPTANCE_TARGET_HOST
-echo "running data generation script for pg data against ${url} with ${token}"
+printf "\ntarget docker machine: " $docker_machine
+printf "\ntarget acceptance host: " $AUTOMATE_ACCEPTANCE_TARGET_HOST
+printf "\n\nrunning data generation script for pg data against ${url} with ${token}"
+
+[ -z "$AUTOMATE_ACCEPTANCE_TARGET_HOST" ] && printf "\n\nEC2 HOST VALUE EMPTY!! please run the get_secrets script\n\n"
+[ -z "$token" ] && printf "\nAPI TOKEN EMPTY! please include a token for communicating with the Automate API\n\nABORTING" && exit
+
 
 # create the ssh secrets
 echo "creating ssh secret for vagrant"
@@ -43,8 +47,10 @@ ssh_secret_ec2=$(curl -s --insecure -H "api-token: $token" $url/api/v0/secrets -
 
 echo $ssh_secret_ec2
 
+# upload a profile
+curl --insecure -F file=@components/compliance-service/api/tests/mario-0.1.0.tar.gz -H "api-token: $token"  $url/api/v0/compliance/profiles?owner=admin
 
-# add nodes
+# add nodes and jobs
 for i in $(seq 1 $((node_count/3))); do
   echo "creating node" $i
   vagrant_node_id=$( curl -s --insecure -H "api-token: $token" $url/api/v0/nodes -d '{
@@ -62,6 +68,18 @@ for i in $(seq 1 $((node_count/3))); do
       ]
   }' | jq '.id'); echo $vagrant_node_id; done
 
+for i in $(seq 1 $((job_count/3))); do
+  echo "creating job" $i
+  echo $(curl -s --insecure -H "api-token: $token" $url/api/v0/compliance/scanner/jobs -d '{
+      "name": "my job",
+      "tags": [],
+      "type": "exec",
+      "nodes": ['${vagrant_node_id}'],
+      "profiles": ["https://github.com/dev-sec/linux-baseline/archive/master.tar.gz", "https://github.com/dev-sec/ssh-baseline/archive/master.tar.gz"],
+      "retries": 1,
+      "node_selectors": []
+  }' | jq '.id'); done
+
  for i in $(seq 1 $((node_count/3))); do
   echo "creating node" $i
   docker_node_id=$( curl -s --insecure -H "api-token: $token" $url/api/v0/nodes -d '{
@@ -78,6 +96,18 @@ for i in $(seq 1 $((node_count/3))); do
         { "key":"compliance-service", "value":"rockin like whoa" }
       ]
   }' | jq '.id'); echo $docker_node_id; done 
+
+for i in $(seq 1 $((job_count/3))); do
+  echo "creating job" $i
+  echo $(curl -s --insecure -H "api-token: $token" $url/api/v0/compliance/scanner/jobs -d '{
+      "name": "my job",
+      "tags": [],
+      "type": "exec",
+      "nodes": ['${docker_node_id}'],
+      "profiles": ["https://github.com/dev-sec/linux-baseline/archive/master.tar.gz", "https://github.com/dev-sec/ssh-baseline/archive/master.tar.gz"],
+      "retries": 1,
+      "node_selectors": []
+  }' | jq '.id'); done
 
 for i in $(seq 1 $((node_count/3))); do
   echo "creating node" $i
@@ -97,11 +127,7 @@ for i in $(seq 1 $((node_count/3))); do
       ]
   }' | jq '.id'); echo $ec2_node_id; done
 
-# upload a profile
-curl --insecure -F file=@components/compliance-service/api/tests/mario-0.1.0.tar.gz -H "api-token: $token"  $url/api/v0/compliance/profiles?owner=admin
-
-# add jobs
-for i in $(seq 1 ${job_count}); do
+for i in $(seq 1 $((job_count/3))); do
   echo "creating job" $i
   echo $(curl -s --insecure -H "api-token: $token" $url/api/v0/compliance/scanner/jobs -d '{
       "name": "my job",
