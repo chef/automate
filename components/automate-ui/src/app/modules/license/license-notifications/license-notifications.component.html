@@ -1,5 +1,5 @@
-<ng-container *ngFor="let notification of notifications$ | async">
-  <chef-notification *ngIf="notification.type === 'license'"
+<ng-container *ngFor="let notification of notifications">
+  <chef-notification
     [className]="'license-banner'"
     [type]="'error'"
     [timeout]="notification.timeout" (dismissed)="handleNotificationDismissal(notification.id)">
