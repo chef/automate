@@ -5,6 +5,10 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/ia
 
 import "components/automate-gateway/api/iam/v2/common/teams.proto";
 
+message GetVersionResp {
+  string version  = 1;
+}
+
 message GetTeamResp {
     Team team = 1;
 }

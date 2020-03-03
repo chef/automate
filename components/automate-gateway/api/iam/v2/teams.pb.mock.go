@@ -44,6 +44,18 @@ type TeamsServerMock struct {
 	ResetAllTeamProjectsFunc  func(context.Context, *request.ResetAllTeamProjectsReq) (*response.ResetAllTeamProjectsResp, error)
 }
 
+func (m *TeamsServerMock) GetVersion(ctx context.Context, req *request.GetVersionReq) (*response.GetVersionResp, error) {
+	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
+		if err := msg.Validate(); err != nil {
+			return nil, status.Error(codes.InvalidArgument, err.Error())
+		}
+	}
+	if f := m.GetVersionFunc; f != nil {
+		return f(ctx, req)
+	}
+	return nil, status.Error(codes.Internal, "mock: 'GetVersion' not implemented")
+}
+
 func (m *TeamsServerMock) ListTeams(ctx context.Context, req *request.ListTeamsReq) (*response.ListTeamsResp, error) {
 	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
 		if err := msg.Validate(); err != nil {
@@ -178,6 +190,7 @@ func (m *TeamsServerMock) ResetAllTeamProjects(ctx context.Context, req *request
 
 // Reset resets all overridden functions
 func (m *TeamsServerMock) Reset() {
+	m.GetVersionFunc = nil
 	m.ListTeamsFunc = nil
 	m.GetTeamFunc = nil
 	m.CreateTeamFunc = nil

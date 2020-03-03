@@ -3,6 +3,7 @@ package teams
 import (
 	"context"
 
+	version "github.com/chef/automate/api/external/common/version"
 	teams "github.com/chef/automate/api/interservice/teams/v2"
 
 	// Teams Service Gateway Requests/Response/Service definitions
@@ -19,6 +20,18 @@ func NewServer(client teams.TeamsV2Client) *Server {
 	return &Server{
 		client: client,
 	}
+}
+
+// TODO
+// GetVersion returns service version
+func (a *Server) GetVersion(ctx context.Context, _ *version.VersionInfoRequest) (*version.VersionInfo, error) {
+	req := &version.VersionInfoRequest{}
+	res, err := a.client.GetVersion(ctx, req)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }
 
 // ListTeams fetches an array of existing teams

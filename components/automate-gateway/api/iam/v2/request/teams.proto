@@ -5,6 +5,8 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/ia
 
 import "protoc-gen-swagger/options/annotations.proto";
 
+message GetVersionReq {}
+
 message ListTeamsReq {}
 
 message GetTeamReq {

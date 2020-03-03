@@ -9,6 +9,9 @@ import (
 )
 
 func init() {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/GetVersion", "service_info:version", "read", "GET", "/iam/v2/teams_version", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/ListTeams", "auth:teams", "read", "GET", "/iam/v2/teams", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})

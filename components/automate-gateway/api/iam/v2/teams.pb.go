@@ -98,6 +98,7 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type TeamsClient interface {
+	GetVersion(ctx context.Context, in *request.GetVersionReq, opts ...grpc.CallOption) (*response.GetVersionResp, error)
 	ListTeams(ctx context.Context, in *request.ListTeamsReq, opts ...grpc.CallOption) (*response.ListTeamsResp, error)
 	GetTeam(ctx context.Context, in *request.GetTeamReq, opts ...grpc.CallOption) (*response.GetTeamResp, error)
 	CreateTeam(ctx context.Context, in *request.CreateTeamReq, opts ...grpc.CallOption) (*response.CreateTeamResp, error)
@@ -121,6 +122,15 @@ type teamsClient struct {
 
 func NewTeamsClient(cc grpc.ClientConnInterface) TeamsClient {
 	return &teamsClient{cc}
+}
+
+func (c *teamsClient) GetVersion(ctx context.Context, in *request.GetVersionReq, opts ...grpc.CallOption) (*response.GetVersionResp, error) {
+	out := new(response.GetVersionResp)
+	err := c.cc.Invoke(ctx, "/chef.automate.api.iam.v2.Teams/GetVersion", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *teamsClient) ListTeams(ctx context.Context, in *request.ListTeamsReq, opts ...grpc.CallOption) (*response.ListTeamsResp, error) {
@@ -224,6 +234,7 @@ func (c *teamsClient) ResetAllTeamProjects(ctx context.Context, in *request.Rese
 
 // TeamsServer is the server API for Teams service.
 type TeamsServer interface {
+	GetVersion(context.Context, *request.GetVersionReq) (*response.GetVersionResp, error)
 	ListTeams(context.Context, *request.ListTeamsReq) (*response.ListTeamsResp, error)
 	GetTeam(context.Context, *request.GetTeamReq) (*response.GetTeamResp, error)
 	CreateTeam(context.Context, *request.CreateTeamReq) (*response.CreateTeamResp, error)
@@ -245,6 +256,9 @@ type TeamsServer interface {
 type UnimplementedTeamsServer struct {
 }
 
+func (*UnimplementedTeamsServer) GetVersion(ctx context.Context, req *request.GetVersionReq) (*response.GetVersionResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetVersion not implemented")
+}
 func (*UnimplementedTeamsServer) ListTeams(ctx context.Context, req *request.ListTeamsReq) (*response.ListTeamsResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTeams not implemented")
 }
@@ -281,6 +295,24 @@ func (*UnimplementedTeamsServer) ResetAllTeamProjects(ctx context.Context, req *
 
 func RegisterTeamsServer(s *grpc.Server, srv TeamsServer) {
 	s.RegisterService(&_Teams_serviceDesc, srv)
+}
+
+func _Teams_GetVersion_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(request.GetVersionReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(TeamsServer).GetVersion(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/chef.automate.api.iam.v2.Teams/GetVersion",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(TeamsServer).GetVersion(ctx, req.(*request.GetVersionReq))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Teams_ListTeams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -485,6 +517,10 @@ var _Teams_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "chef.automate.api.iam.v2.Teams",
 	HandlerType: (*TeamsServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "GetVersion",
+			Handler:    _Teams_GetVersion_Handler,
+		},
 		{
 			MethodName: "ListTeams",
 			Handler:    _Teams_ListTeams_Handler,

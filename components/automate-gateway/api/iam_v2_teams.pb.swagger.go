@@ -218,6 +218,22 @@ func init() {
         ]
       }
     },
+    "/iam/v2/teams_version": {
+      "get": {
+        "operationId": "GetVersion",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.iam.v2.GetVersionResp"
+            }
+          }
+        },
+        "tags": [
+          "Teams"
+        ]
+      }
+    },
     "/iam/v2/users/{id}/teams": {
       "get": {
         "operationId": "GetTeamsForMember",
@@ -340,6 +356,14 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Team"
           }
+        }
+      }
+    },
+    "chef.automate.api.iam.v2.GetVersionResp": {
+      "type": "object",
+      "properties": {
+        "version": {
+          "type": "string"
         }
       }
     },
