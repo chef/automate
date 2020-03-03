@@ -60,6 +60,11 @@ chef-loading-spinner {
       font-size: 14px;
       padding: 2px 10px 2px 0;
     }
+
+    td {
+      overflow-wrap: break-word;
+      word-break: break-all;
+    }
   }
 
   &.failed {
