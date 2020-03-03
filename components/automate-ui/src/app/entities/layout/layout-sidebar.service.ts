@@ -104,8 +104,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
               icon: 'wifi_tethering',
               route: '/compliance/scan-jobs',
               authorized: {
-                allOf: [['/compliance/scanner/jobs', 'post'],
-                ['/compliance/scanner/jobs/search', 'post']]
+                allOf: ['/compliance/scanner/jobs/search', 'post']
               }
             },
             {
