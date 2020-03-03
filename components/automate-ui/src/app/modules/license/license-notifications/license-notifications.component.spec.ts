@@ -18,6 +18,14 @@ describe('LicenseNotificationsComponent', () => {
     notifications$: Observable<Notification[]> = new BehaviorSubject([]);
   }
 
+  class MockLayoutFacadeService extends LicenseFacadeService {
+    layout = {
+      license: {
+        display: true
+      }
+    };
+  }
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -28,7 +36,7 @@ describe('LicenseNotificationsComponent', () => {
         LicenseNotificationsComponent],
       providers: [
         { provide: LicenseFacadeService, useClass:  MockLicenseFacadeService },
-        { provide: LayoutFacadeService }
+        { provide: LayoutFacadeService, useClass:  MockLayoutFacadeService }
       ]
     }).compileComponents();
       store = TestBed.get(Store);
