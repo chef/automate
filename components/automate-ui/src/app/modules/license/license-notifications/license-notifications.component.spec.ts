@@ -4,6 +4,7 @@ import { Observable, BehaviorSubject } from 'rxjs';
 import { StoreModule, Store } from '@ngrx/store';
 import { NgrxStateAtom, ngrxReducers, defaultInitialState, runtimeChecks } from 'app/ngrx.reducers';
 
+import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 import { LicenseNotificationsComponent } from './license-notifications.component';
 import { LicenseFacadeService } from 'app/entities/license/license.facade';
 import { Notification } from 'app/entities/notifications/notification.model';
@@ -17,6 +18,14 @@ describe('LicenseNotificationsComponent', () => {
     notifications$: Observable<Notification[]> = new BehaviorSubject([]);
   }
 
+  class MockLayoutFacadeService extends LicenseFacadeService {
+    layout = {
+      license: {
+        display: true
+      }
+    };
+  }
+
   beforeEach(async(() => {
     TestBed.configureTestingModule({
       imports: [
@@ -25,7 +34,10 @@ describe('LicenseNotificationsComponent', () => {
       declarations: [
         MockComponent({ selector: 'chef-notification', inputs: ['type', 'timeout'] }),
         LicenseNotificationsComponent],
-      providers: [{ provide: LicenseFacadeService, useClass:  MockLicenseFacadeService }]
+      providers: [
+        { provide: LicenseFacadeService, useClass:  MockLicenseFacadeService },
+        { provide: LayoutFacadeService, useClass:  MockLayoutFacadeService }
+      ]
     }).compileComponents();
       store = TestBed.get(Store);
       spyOn(store, 'dispatch').and.callThrough();
