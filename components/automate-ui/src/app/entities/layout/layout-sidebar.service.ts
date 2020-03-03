@@ -16,7 +16,6 @@ import { MenuItemGroup } from 'app/entities/layout/layout.model';
     providedIn: 'root'
 })
 export class LayoutSidebarService implements OnInit, OnDestroy {
-    public applicationsFeatureFlagOn: boolean;
     public chefInfraServerViewsFeatureFlagOn: boolean;
     public isIAMv2$: Observable<boolean>;
     public ServiceNowFeatureFlagOn: boolean;
@@ -30,7 +29,6 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
         private clientRunsStore: Store<fromClientRuns.ClientRunsEntityState>,
         private featureFlagsService: FeatureFlagsService
     ) {
-        this.applicationsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('applications');
         this.ServiceNowFeatureFlagOn = this.featureFlagsService.getFeatureStatus('servicenow_cmdb');
         this.isIAMv2$ = this.store.select(isIAMv2);
         this.workflowEnabled$ = this.clientRunsStore.select(clientRunsWorkflowEnabled);
@@ -63,8 +61,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
               route: isProductDeployed('builder') ? '/bldr' : 'https://bldr.habitat.sh',
               openInNewPage: true
             }
-          ],
-          visible$: new BehaviorSubject(this.applicationsFeatureFlagOn)
+          ]
         }],
         infrastructure: [{
           name: 'Infrastructure',
