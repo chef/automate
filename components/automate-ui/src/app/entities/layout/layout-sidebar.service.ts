@@ -30,6 +30,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
         private featureFlagsService: FeatureFlagsService
     ) {
         this.ServiceNowFeatureFlagOn = this.featureFlagsService.getFeatureStatus('servicenow_cmdb');
+        this.chefInfraServerViewsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('chefInfraServerViews');
         this.isIAMv2$ = this.store.select(isIAMv2);
         this.workflowEnabled$ = this.clientRunsStore.select(clientRunsWorkflowEnabled);
     }
