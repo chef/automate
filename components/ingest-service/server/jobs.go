@@ -151,15 +151,15 @@ func markNodesMissing(ctx context.Context, threshold string, client backend.Clie
 
 	logctx.Debug("Starting job")
 
-	// Get all nodes that need marked missing
-	nodeIDs, err := client.GetNodesToMarkMissing(ctx, threshold)
+	// mark the nodes missing
+	updatedNodeIDs, err := client.MarkNodesMissing(ctx, threshold)
 	if err != nil {
 		logctx.WithError(err).Error("Job failed")
 		return err
 	}
 
 	// Walk through each node and update the status in the nodemanager
-	for _, nodeID := range nodeIDs {
+	for _, nodeID := range updatedNodeIDs {
 		_, err = nodeMgrClient.ChangeNodeState(ctx, &manager.NodeState{
 			Id:    nodeID,
 			State: manager.NodeState_MISSING,
@@ -170,15 +170,8 @@ func markNodesMissing(ctx context.Context, threshold string, client backend.Clie
 		}
 	}
 
-	// mark the nodes missing
-	updateCount, err := client.MarkNodesMissing(ctx, threshold)
-	if err != nil {
-		logctx.WithError(err).Error("Job failed")
-		return err
-	}
-
-	f := log.Fields{"nodes_updated": updateCount}
-	if updateCount > 0 {
+	f := log.Fields{"nodes_updated": len(updatedNodeIDs)}
+	if len(updatedNodeIDs) > 0 {
 		logctx.WithFields(f).Info("Job updated nodes")
 	} else {
 		logctx.WithFields(f).Debug("Job ran without updates")
