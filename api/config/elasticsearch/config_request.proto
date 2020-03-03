@@ -37,6 +37,7 @@ message ConfigRequest {
 			S3 s3 = 16;
 			chef.automate.infra.config.TLSCredentials tls = 17;
 			Deprecated deprecated = 18;
+			Index index = 20;
 
 			google.protobuf.BoolValue disable = 19; // If set to true, automate-elasticsearch will noop. Derived from the global config
 		}
@@ -80,6 +81,11 @@ message ConfigRequest {
 			Recovery recovery = 1;
 			Fielddata fielddata = 2;
 			Breaker breaker = 3;
+		}
+
+		message Index {
+			google.protobuf.Int32Value number_of_replicas = 1;
+			google.protobuf.StringValue refresh_interval = 2;
 		}
 
 		message Bootstrap {

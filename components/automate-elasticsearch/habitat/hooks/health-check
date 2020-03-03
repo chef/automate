@@ -1,33 +1,11 @@
-#!/bin/sh
-#
+#!{{pkgPathFor "core/bash"}}/bin/bash
 
 {{#if cfg.disable ~}}
 exit 0
 {{~else}}
+source {{pkg.svc_config_path}}/health_check
 
-# Elasticsearch Health Check for Habitat
+health_check
 
-# For details on the elasticsearch health colors, see:
-# https://www.elastic.co/guide/en/elasticsearch/reference/current/cluster-health.html
-{{#if svc.me.cfg.http-host ~}}
-ES_HOST="{{svc.me.sys.ip}}"
-{{else}}
-ES_HOST="127.0.0.1"
-{{/if ~}}
-
-color="$(curl -s --noproxy "$ES_HOST" "http://$ES_HOST:{{svc.me.cfg.http-port}}/_cat/health?h=st")"
-
-case $color in
-  "green")
-    rc=0 ;;                     # OK (200)
-  "yellow")
-    rc=1 ;;                     # WARNING (200)
-  "red")
-    rc=2 ;;                     # CRITICAL (503)
-  *)
-    rc=3 ;;                     # UNKNOWN (500)
-esac
-
-exit $rc
-
+exit $?
 {{~/if}}
