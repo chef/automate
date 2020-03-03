@@ -422,9 +422,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v1 force-upgrade to v2"
+  - label: "iam v1 to v2 force-upgrade"
     command:
-      - integration/run_test integration/tests/iam_v1_force_upgrade_to_v2.sh
+      - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
@@ -435,9 +435,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v1 force-upgrade to v2 (diagnostics only)"
+  - label: "iam v1 to v2 force-upgrade (diagnostics only)"
     command:
-      - integration/run_test integration/tests/iam_v1_force_upgrade_to_v2_diagnostics.sh
+      - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade_diagnostics.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
