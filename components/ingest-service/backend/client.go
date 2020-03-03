@@ -27,7 +27,7 @@ type Client interface {
 	// @param (context, threshold)
 	DeleteMarkedNodes(context.Context, string) (int, error)
 	// @param (context, threshold)
-	MarkMissingNodesForDeletion(context.Context, string) (int, error)
+	MarkMissingNodesForDeletion(context.Context, string) ([]string, error)
 	// @param (context, nodeIDs []string)
 	MarkForDeleteMultipleNodesByID(ctx context.Context, nodeIDs []string) (int, error)
 	// @param (context, nodeID string)
