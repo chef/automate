@@ -8,10 +8,12 @@ import "google/api/annotations.proto";
 import "api/external/infra_proxy/request/orgs.proto";
 import "api/external/infra_proxy/request/servers.proto";
 import "api/external/infra_proxy/request/cookbooks.proto";
+import "api/external/infra_proxy/request/roles.proto";
 
 import "api/external/infra_proxy/response/orgs.proto";
 import "api/external/infra_proxy/response/servers.proto";
 import "api/external/infra_proxy/response/cookbooks.proto";
+import "api/external/infra_proxy/response/roles.proto";
 
 import "api/external/common/version/version.proto";
 
@@ -141,5 +143,20 @@ service InfraProxy {
     option (chef.automate.api.policy).action = "read";
     option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:cookbooks";
     option (chef.automate.api.iam.policy).action = "infra:serverOrgCookbooks:get";
+  };
+
+  rpc GetRoles (infra_proxy.request.Roles) returns (infra_proxy.response.Roles) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/roles";
+    option (chef.automate.api.policy).resource = "infra:servers:{server_id}:orgs:{org_id}/roles";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:roles";
+    option (chef.automate.api.iam.policy).action = "infra:serverOrgRoles:list";
+  };
+  rpc GetRole (infra_proxy.request.Role) returns (infra_proxy.response.Role) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/roles/{name}";
+    option (chef.automate.api.policy).resource = "infra:servers:{server_id}:orgs:{org_id}/roles";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:servers:{server_id}:orgs:{org_id}:roles";
+    option (chef.automate.api.iam.policy).action = "infra:serverOrgRoles:get";
   };
 }
