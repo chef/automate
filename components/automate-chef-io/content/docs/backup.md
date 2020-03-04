@@ -21,7 +21,7 @@ Backups can be stored in a configurable backup directory. The backup directory s
 
 We recommend that you configure a backup directory on a disk with sufficient free space.
 
-The the default backup directory is `/var/opt/chef-automate/backups`. If it does not exist it will be created during deployment.
+The default backup directory is `/var/opt/chef-automate/backups`. If it does not exist, the deployment process creates it.
 
 To configure your Chef Automate installation's backup directory to another location:
 
@@ -123,7 +123,7 @@ Make a backup with the following command:
 chef-automate backup create
 ```
 
-The command will show the backup progress for each service. If the backup is successful, you will see a success message and timestamp of the backup:
+The command shows the backup progress for each service. A successful backup displays a success message containing the timestamp of the backup:
 
 ```shell
 Success: Created backup 20180518010336
@@ -135,7 +135,7 @@ include both the configuration data and the reporting data contained in the stan
 backup.
 
 The [configured]({{< ref "backup.md#backup-to-filesystem" >}}) backup directory contains both the timestamp-based directory for the configuration, and the reporting data stored in the `automate-elasticsearch-data` directory.
-You will need to archive both of these directory types in any single-file backups you create.
+You must archive both of these directory types in any single-file backups you create.
 
 A timestamp-based directory can be distinguished from the `automate-elasticsearch-data` directory by its file name format, such as `20180518010336`.
 
@@ -147,7 +147,7 @@ You can list existing backups with the `backup list` command:
 chef-automate backup list
 ```
 
-The output will show each backup, and its age:
+The output shows each backup and its age:
 
 ```shell
         Backup        State  Age
@@ -193,7 +193,7 @@ Restore Chef Automate to an instance on which Automate is not already installed.
   1. If you are restoring from a single-file backup archive, copy your archive to the machine on which you wish to restore and extract it to the [configured backup directory]({{< ref "backup.md#backup-to-filesystem" >}}).
 
 #### Restore in an Internet-Connected Environment
-If you have [configured the backup directory]({{< ref "backup.md#backup-to-filesystem" >}}) to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate will use the most recent backup in the backup directory.
+If you have [configured the backup directory]({{< ref "backup.md#backup-to-filesystem" >}}) to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate uses the most recent backup in the backup directory.
 
 To restore on a fresh host:
 
@@ -208,7 +208,7 @@ chef-automate backup restore </path/to/backups/>BACKUP_ID --skip-preflight
 ```
 
 #### Restore in an Airgapped Environment
-To restore a backup of an [airgapped installation]({{< relref "airgapped-installation.md" >}}), you must specify the [Airgap Installation Bundle]({{< relref "airgapped-installation.md#create-an-airgap-installation-bundle" >}}) used by the installation. If you have [configured the backup directory]({{< ref "backup.md#backup-to-filesystem" >}}) to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate will use the most recent backup in the backup directory.
+To restore a backup of an [airgapped installation]({{< relref "airgapped-installation.md" >}}), you must specify the [Airgap Installation Bundle]({{< relref "airgapped-installation.md#create-an-airgap-installation-bundle" >}}) used by the installation. If you have [configured the backup directory]({{< ref "backup.md#backup-to-filesystem" >}}) to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate uses the most recent backup in the backup directory.
 
 To restore on a fresh host:
 
@@ -235,7 +235,7 @@ To restore on a host on which Automate has already been installed:
 chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
 ```
 
-If the restore is successful, you will see the following message at the end of the status output:
+A successful restore shows the timestamp of the backup used at the end of the status output:
 
 ```shell
 Success: Restored backup 20180517223558
