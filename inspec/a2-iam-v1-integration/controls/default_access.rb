@@ -289,28 +289,22 @@ control 'authz-access-control-1' do
 
       describe '/api/v0/cfgmgmt/' do
         before(:all) do
-          node = "chefdk-debian-7-tester-2d206b_run_converge"
           node_request = automate_api_request(
             '/data-collector/v0',
             http_method: 'POST',
-            request_body: inspec.profile.file("fixtures/converge/#{node}.json")
+            request_body: {}
           )
+          # to save time on this test we don't post any data
+          # this results int a bad request 
+          # but we only care that it doesn't get a 403
+          expect(node_request.http_status).to eq 400
 
-          expect(node_request.http_status).to eq 200
-
-          policy_node = "policy-node"
           policy_node_request = automate_api_request(
             '/data-collector/v0',
             http_method: 'POST',
-            request_body: inspec.profile.file("fixtures/converge/#{policy_node}.json")
+            request_body: {}
           )
-
-          expect(policy_node_request.http_status).to eq 200
-
-          # Wait for data to be indexed
-          command('sleep 15') do
-            its('exit_status') { should eq 0 }
-          end
+          expect(policy_node_request.http_status).to eq 400
         end
 
         %w(

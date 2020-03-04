@@ -1,5 +1,5 @@
 # encoding: utf-8
-# copyright: 2018, Chef Software, Inc.
+# copyright: 2020, Chef Software, Inc.
 # license: All rights reserved
 
 require_relative '../../constants'

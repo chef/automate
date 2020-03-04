@@ -1,7 +1,7 @@
 require_relative '../../../constants'
 
 # encoding: utf-8
-# copyright: 2017, Chef Software, Inc.
+# copyright: 2020, Chef Software, Inc.
 # license: All rights reserved
 title 'iam project filtering integration tests'
 

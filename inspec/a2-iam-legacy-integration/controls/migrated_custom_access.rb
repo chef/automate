@@ -1,8 +1,8 @@
 # encoding: utf-8
-# copyright: 2018, Chef Software, Inc.
+# copyright: 2020, Chef Software, Inc.
 # license: All rights reserved
 
-# This test suite must ONLY run on iam_v1_force_upgrade_to_v2.sh.
+# This test suite must ONLY run on iam_v1_to_v2_force_upgrade.sh.
 # That test scenario tests a specific case that upgrades an old version of 
 # Automate using IAM v1 to the latest Automate, which force-upgrades it to IAM v2
 # The test a2-iam-v1-integration/controls/custom_access_to_migrate.rb adds a custom policy to that older version.

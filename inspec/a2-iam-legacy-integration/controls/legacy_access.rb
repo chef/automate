@@ -1,5 +1,5 @@
 # encoding: utf-8
-# copyright: 2018, Chef Software, Inc.
+# copyright: 2020, Chef Software, Inc.
 # license: All rights reserved
 
 # This test suite is meant to verify APIs return 403 or not, given legacy policy permissions.
@@ -427,30 +427,24 @@ control 'iam-legacy-access-control-1' do
 
       describe '/api/v0/cfgmgmt/' do
         before(:all) do
-          node = "chefdk-debian-7-tester-2d206b_run_converge"
           node_request = automate_client_api_request(
             '/data-collector/v0',
             TEST_TOKEN, # users not allowed to post to this API
             http_method: 'POST',
-            request_body: inspec.profile.file("fixtures/converge/#{node}.json")
+            request_body: {}
           )
+          # to save time on this test we don't post any data
+          # this results int a bad request 
+          # but we only care that it doesn't get a 403
+          expect(node_request.http_status).to eq 400
 
-          expect(node_request.http_status).to eq 200
-
-          policy_node = "policy-node"
           policy_node_request = automate_client_api_request(
             '/data-collector/v0',
             TEST_TOKEN, # users not allowed to post to this API
             http_method: 'POST',
-            request_body: inspec.profile.file("fixtures/converge/#{policy_node}.json")
+            request_body: {}
           )
-
-          expect(policy_node_request.http_status).to eq 200
-
-          # Wait for data to be indexed
-          command('sleep 15') do
-            its('exit_status') { should eq 0 }
-          end
+          expect(policy_node_request.http_status).to eq 400
         end
 
         %w(

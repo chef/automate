@@ -389,7 +389,7 @@ steps:
   # end-to-end testing. These tests all test full deployments of
   # Automate in different configurations.
   #
-  - label: ":cypress: (flaky included)"
+  - label: "cypress (flaky included) :cypress:"
     command:
       - FLAKY=yes integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 20
@@ -412,7 +412,7 @@ steps:
         linux:
           privileged: true
 
-  - label: ":cypress:"
+  - label: "cypress :cypress:"
     command:
       - FLAKY=no integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 25

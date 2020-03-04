@@ -42,18 +42,14 @@ control 'local-user-migration-2' do
     it "exists and contains the admin users' IDs" do
       admin_user = automate_api_request('apis/iam/v2/users/admin')
       expect(admin_user.http_status).to eq(200)
-      puts admin_user.parsed_response_body
       admin_membership_id = admin_user.parsed_response_body[:user][:membership_id]
 
       test_admin_user = automate_api_request('apis/iam/v2/users/test-admin')
       expect(test_admin_user.http_status).to eq(200)
-      puts test_admin_user.parsed_response_body
       test_admin_membership_id = test_admin_user.parsed_response_body[:user][:membership_id]
 
       admins_team = automate_api_request("apis/iam/v2/teams/#{admins_team_id}/users")
       expect(admins_team.http_status).to eq(200)
-
-      puts admins_team.parsed_response_body
 
       [admin_membership_id, test_admin_membership_id].each do |id| 
         expect(admins_team.parsed_response_body[:user_ids]).to include(id)
