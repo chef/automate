@@ -210,7 +210,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create V2 client for teams service")
 	}
-	pb_iam.RegisterTeamsServer(grpcServer, handler_teams.NewServer(teamsV2Client))
+	pb_iam.RegisterTeamsServer(grpcServer, handler_teams.NewServer(teamsClient))
 
 	secretsClient, err := clients.SecretClient()
 	if err != nil {
