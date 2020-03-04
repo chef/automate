@@ -341,7 +341,7 @@ func init() {
           },
           "description": "Metadata defined on the control in key-value format."
         },
-        "waiver_str": {
+        "waived_str": {
           "type": "string",
           "title": "Indicates if the control has been waived or not"
         },

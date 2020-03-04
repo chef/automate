@@ -1255,10 +1255,11 @@ describe File.basename(__FILE__) do
     if res['profiles'].is_a?(Google::Protobuf::RepeatedField)
       assert_equal(2, res['profiles'].length)
       assert_equal(5, res['profiles'][0]['controls'].length)
-      assert_equal('yes_run', res['profiles'][0]['controls'][0]['waiver_str'])
+      require 'pry'; binding.pry #############TODO: REMOVE ME
+      assert_equal('yes_run', res['profiles'][0]['controls'][0]['waived_str'])
       assert_equal_json_sorted('{"justification": "Sound reasoning", "run": true}', res['profiles'][0]['controls'][0]['waiver_data'].to_json)
 
-      assert_equal('no_expired', res['profiles'][0]['controls'][2]['waiver_str'])
+      assert_equal('no_expired', res['profiles'][0]['controls'][2]['waived_str'])
       assert_equal_json_sorted('{"expirationDate": "1977-06-01", "justification": "Necessity", "message": "Waiver expired on 1977-06-01, evaluating control normally"}', res['profiles'][0]['controls'][2]['waiver_data'].to_json)
     end
   end
