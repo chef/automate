@@ -23,7 +23,7 @@ You can install and download one of our 300+ ready-to-use compliance profiles fr
 
 ## Using Profiles
 
-Navigate to the _Profiles_ page by selecting the **Profiles** tab at the top of the Chef Automate screen or by heading to `https://{{< example_fqdn "automate" >}}compliance/compliance-profiles`.
+Navigate to the _Profiles_ page by selecting the **Profiles** tab at the top of the Chef Automate screen or by heading to `https://{{< example_fqdn "automate" >}}/compliance/compliance-profiles`.
 
 Profiles has a search bar and two views: the _Profiles_ page, which displays the profiles you've installed
 in your unique namespace within Chef Automate,
