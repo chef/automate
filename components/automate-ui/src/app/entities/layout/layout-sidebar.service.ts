@@ -15,7 +15,6 @@ import { MenuItemGroup } from 'app/entities/layout/layout.model';
     providedIn: 'root'
 })
 export class LayoutSidebarService implements OnInit, OnDestroy {
-    public applicationsFeatureFlagOn: boolean;
     public chefInfraServerViewsFeatureFlagOn: boolean;
     public ServiceNowFeatureFlagOn: boolean;
     private activeSidebar: string;
@@ -28,8 +27,8 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
         private clientRunsStore: Store<fromClientRuns.ClientRunsEntityState>,
         private featureFlagsService: FeatureFlagsService
     ) {
-        this.applicationsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('applications');
         this.ServiceNowFeatureFlagOn = this.featureFlagsService.getFeatureStatus('servicenow_cmdb');
+        this.chefInfraServerViewsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('chefInfraServerViews');
         this.workflowEnabled$ = this.clientRunsStore.select(clientRunsWorkflowEnabled);
     }
 
@@ -60,8 +59,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
               route: isProductDeployed('builder') ? '/bldr' : 'https://bldr.habitat.sh',
               openInNewPage: true
             }
-          ],
-          visible$: new BehaviorSubject(this.applicationsFeatureFlagOn)
+          ]
         }],
         infrastructure: [{
           name: 'Infrastructure',
@@ -103,8 +101,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
               icon: 'wifi_tethering',
               route: '/compliance/scan-jobs',
               authorized: {
-                allOf: [['/compliance/scanner/jobs', 'post'],
-                ['/compliance/scanner/jobs/search', 'post']]
+                allOf: ['/compliance/scanner/jobs/search', 'post']
               }
             },
             {

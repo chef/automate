@@ -104,7 +104,7 @@ func targetURL(fqdn string, IPAddress string, orgName string) (string, error) {
 }
 
 // GetOrgAdminKeyFrom returns AdminKey
-func GetOrgAdminKeyFrom(secret *secrets.Secret) (string) {
+func GetOrgAdminKeyFrom(secret *secrets.Secret) string {
 	adminKey := ""
 	if secret != nil {
 		for _, item := range secret.Data {

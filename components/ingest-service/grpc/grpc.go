@@ -17,6 +17,7 @@ import (
 	automate_event "github.com/chef/automate/api/interservice/event"
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/migration"
@@ -159,7 +160,10 @@ func Spawn(opts *serveropts.Opts) error {
 	defer esSidecarConn.Close() // nolint: errcheck
 	esSidecarClient := es_sidecar.NewEsSidecarClient(esSidecarConn)
 
-	err = server.InitializeJobManager(jobManager, client, esSidecarClient)
+	nodesServiceClient := nodes.NewNodesServiceClient(nodeMgrConn)
+
+	err = server.InitializeJobManager(jobManager, client, esSidecarClient, nodeMgrServiceClient,
+		nodesServiceClient)
 	if err != nil {
 		logrus.WithError(err).Fatal("could not initialize job manager")
 		return err

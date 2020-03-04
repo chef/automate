@@ -32,6 +32,9 @@ export enum Sidebar {
 })
 export class LayoutFacadeService implements OnInit, OnDestroy {
   public layout = {
+    license: {
+      display: true
+    },
     header: {
       display: true,
       license: false,
@@ -56,7 +59,6 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     private store: Store<fromLayout.LayoutEntityState>,
     private layoutSidebarService: LayoutSidebarService
   ) {
-    this.store.dispatch(new GetProjects());
     this.sidebar$ = store.select(sidebar);
     this.showPageLoading$ = store.select(showPageLoading);
     this.updateDisplay();
@@ -93,7 +95,7 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
   }
 
   hasGlobalNotifications(): boolean {
-    return this.layout.sidebar.navigation = true;
+    return this.layout.license.display;
   }
 
   ShowPageLoading(showLoading: boolean): void {
