@@ -58,7 +58,7 @@ steps:
       HAB_NONINTERACTIVE: true
     expeditor:
       secrets:
-        HAB_STUDIO_SECRET_GITHUB_TOKEN:
+        GITHUB_TOKEN:
           account: github
           field: token
       executor:

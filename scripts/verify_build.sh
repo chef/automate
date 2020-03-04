@@ -69,6 +69,7 @@ if [[ "$build_commands" != "" ]]; then
     # We override HAB_CACHE_KEY_PATH to ensure we only see the key we
     # generated in this build
     export HAB_DOCKER_OPTS="--label buildkitejob=$BUILDKITE_JOB_ID"
+    export HAB_STUDIO_SECRET_GITHUB_TOKEN="$GITHUB_TOKEN"
     HAB_ORIGIN=chef HAB_CACHE_KEY_PATH=$RESOLVED_RESULTS_DIR DO_CHECK=true hab studio run -D "source .studiorc; set -e; $build_commands"
 fi
 
