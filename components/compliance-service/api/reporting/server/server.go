@@ -66,8 +66,6 @@ func (srv *Server) ListReports(ctx context.Context, in *reporting.Query) (*repor
 
 // ListReportIds returns a list of reports based on query
 func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*reporting.ReportIds, error) {
-	var ids reporting.ReportIds
-
 	formattedFilters := formatFilters(in.Filters)
 	formattedFilters, err := filterByProjects(ctx, formattedFilters)
 	if err != nil {
@@ -90,9 +88,7 @@ func (srv *Server) ListReportIds(ctx context.Context, in *reporting.Query) (*rep
 		return nil, status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
 	}
 
-	ids.Ids = reportIDs
-
-	return &ids, nil
+	return reportIDs, nil
 }
 
 // ReadReport returns a report based on id
@@ -213,16 +209,16 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 		return status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
 	}
 
-	total := len(reportIDs)
+	total := len(reportIDs.Ids)
 	// Step 2: get all reports one by one in reverse order to be sorted asc by end_time
 	for idx := total - 1; idx >= 0; idx-- {
-		cur, err := srv.es.GetReport(reportIDs[idx], formattedFilters)
+		cur, err := srv.es.GetReport(reportIDs.Ids[idx], formattedFilters)
 		if err != nil {
-			return status.Error(codes.NotFound, fmt.Sprintf("Failed to retrieve report %d/%d with ID %s . Error: %s", idx, total, reportIDs[idx], err))
+			return status.Error(codes.NotFound, fmt.Sprintf("Failed to retrieve report %d/%d with ID %s . Error: %s", idx, total, reportIDs.Ids[idx], err))
 		}
 		err = exporter(cur)
 		if err != nil {
-			return status.Error(codes.Internal, fmt.Sprintf("Failed to stream report %d/%d with ID %s . Error: %s", idx, total, reportIDs[idx], err))
+			return status.Error(codes.Internal, fmt.Sprintf("Failed to stream report %d/%d with ID %s . Error: %s", idx, total, reportIDs.Ids[idx], err))
 		}
 	}
 

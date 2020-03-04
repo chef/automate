@@ -12,6 +12,7 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
+	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	statusserver "github.com/chef/automate/components/compliance-service/api/status/server"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
@@ -520,7 +521,7 @@ func (backend ES2Backend) reindex(src, dest, reindexScript, srcDocType string) (
 	return indexToMigrateExists, nil
 }
 
-func (backend ES2Backend) getLatestReportIds(sumDailyToday string) ([]string, error) {
+func (backend ES2Backend) getLatestReportIds(sumDailyToday string) (*reportingapi.ReportIds, error) {
 	myName := "getLatestReportIds"
 	reportIds, err := backend.getNodeReportIdsFromTimeseries(sumDailyToday, make(map[string][]string, 0), false)
 	if err != nil {
@@ -564,7 +565,7 @@ func (backend *ES2Backend) markTimeseriesDailyLatest(dateToMigrate time.Time) er
 
 	indicesToUpdate := fmt.Sprintf("%s*,%s*", summaryIndexToUpdate, reportIndexToUpdate)
 	idsQuery := elastic.NewIdsQuery(mappings.DocType)
-	idsQuery.Ids(reportIds...)
+	idsQuery.Ids(reportIds.Ids...)
 
 	script := elastic.NewScript("ctx._source.daily_latest = true")
 	_, err = elastic.NewUpdateByQueryService(client).
