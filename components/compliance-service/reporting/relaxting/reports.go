@@ -544,7 +544,7 @@ func convertControl(profileControlsMap map[string]*reportingapi.Control, reportC
 		Title:          profileControl.Title,
 		SourceLocation: profileControl.SourceLocation,
 		Results:        minResults,
-		WaiverStr:      reportControlMin.WaivedStr,
+		WaivedStr:      reportControlMin.WaivedStr,
 	}
 	if reportControlMin.WaiverData != nil {
 		convertedControl.WaiverData = &reportingapi.OrigWaiverData{

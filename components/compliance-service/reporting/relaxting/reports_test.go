@@ -140,7 +140,7 @@ func TestConvertControlFiltersByTagOnlyMatch(t *testing.T) {
 		StringTags: stringTags,
 		Refs:       make([]*reportingapi.Ref, 0),
 		Results:    make([]*reportingapi.Result, 0),
-		WaiverStr:  "yes_run",
+		WaivedStr:  "yes_run",
 		WaiverData: &reportingapi.OrigWaiverData{
 			ExpirationDate:     "2025-06-01",
 			Run:                true,
