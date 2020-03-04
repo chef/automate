@@ -8,7 +8,6 @@ import (
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/compliance/reporting"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
-	"github.com/chef/automate/components/automate-gateway/api/authz"
 	iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -17,7 +16,7 @@ import (
 
 // Mock is a mocked out APIClient.
 type Mock struct {
-	authzClient        authz.AuthorizationClient
+	authzClient        iam.AuthorizationClient
 	teamsClient        iam.TeamsClient
 	tokensClient       iam.TokensClient
 	usersClient        iam.UsersClient
@@ -29,7 +28,7 @@ type Mock struct {
 
 // ServerMocks are mocked out API servers
 type ServerMocks struct {
-	AuthzMock    *authz.AuthorizationServerMock
+	AuthzMock    *iam.AuthorizationServerMock
 	PoliciesMock *iam.PoliciesServerMock
 	TeamsMock    *iam.TeamsServerMock
 	TokensMock   *iam.TokensServerMock
@@ -44,8 +43,8 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 	connFactory := secureconn.NewFactory(*deployCerts)
 	grpcGateway := connFactory.NewServer()
 
-	mockAuthz := authz.NewAuthorizationServerMock()
-	authz.RegisterAuthorizationServer(grpcGateway, mockAuthz)
+	mockAuthz := iam.NewAuthorizationServerMock()
+	iam.RegisterAuthorizationServer(grpcGateway, mockAuthz)
 
 	mockTokens := iam.NewTokensServerMock()
 	iam.RegisterTokensServer(grpcGateway, mockTokens)
@@ -64,7 +63,7 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 	require.NoError(t, err)
 
 	return Mock{
-			authzClient:        authz.NewAuthorizationClient(gatewayConn),
+			authzClient:        iam.NewAuthorizationClient(gatewayConn),
 			teamsClient:        iam.NewTeamsClient(gatewayConn),
 			tokensClient:       iam.NewTokensClient(gatewayConn),
 			usersClient:        iam.NewUsersClient(gatewayConn),
@@ -84,7 +83,7 @@ func CreateMockConn(t *testing.T) (client.APIClient, ServerMocks, error) {
 }
 
 // AuthzClient returns mock AuthzClient
-func (c Mock) AuthzClient() authz.AuthorizationClient {
+func (c Mock) AuthzClient() iam.AuthorizationClient {
 	return c.authzClient
 }
 

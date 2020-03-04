@@ -10,7 +10,6 @@ import (
 	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
-	"github.com/chef/automate/components/automate-gateway/api/authz"
 	iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
@@ -19,7 +18,7 @@ import (
 type client struct {
 	apiClientConn *grpc.ClientConn
 	// TODO (tc): Add other service clients here as needed.
-	authzClient        authz.AuthorizationClient
+	authzClient        iam.AuthorizationClient
 	teamsClient        iam.TeamsClient
 	tokensClient       iam.TokensClient
 	usersClient        iam.UsersClient
@@ -51,7 +50,7 @@ func OpenConnection(ctx context.Context) (client_type.APIClient, error) {
 	return client{
 		apiClientConn: apiClientConn,
 		// TODO (tc): Add other service clients here as needed.
-		authzClient:        authz.NewAuthorizationClient(apiClientConn),
+		authzClient:        iam.NewAuthorizationClient(apiClientConn),
 		teamsClient:        iam.NewTeamsClient(apiClientConn),
 		tokensClient:       iam.NewTokensClient(apiClientConn),
 		usersClient:        iam.NewUsersClient(apiClientConn),
@@ -61,7 +60,7 @@ func OpenConnection(ctx context.Context) (client_type.APIClient, error) {
 	}, nil
 }
 
-func (c client) AuthzClient() authz.AuthorizationClient {
+func (c client) AuthzClient() iam.AuthorizationClient {
 	return c.authzClient
 }
 
