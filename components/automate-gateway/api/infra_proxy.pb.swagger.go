@@ -548,48 +548,6 @@ func init() {
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/affected-nodes": {
-      "get": {
-        "operationId": "GetCookbookAffectedNodes",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookAffectedNodes"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "server_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "org_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "name",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "version",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "InfraProxy"
-        ]
-      }
-    },
     "/infra/version": {
       "get": {
         "operationId": "GetVersion",
@@ -819,17 +777,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.infra_proxy.response.CookbookAffectedNodes": {
-      "type": "object",
-      "properties": {
-        "nodes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.NodeAttribute"
-          }
-        }
-      }
-    },
     "chef.automate.api.infra_proxy.response.CookbookAllVersion": {
       "type": "object",
       "properties": {
@@ -993,35 +940,6 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
           }
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.response.NodeAttribute": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "chef_guid": {
-          "type": "string"
-        },
-        "url": {
-          "type": "string"
-        },
-        "check_in": {
-          "type": "string"
-        },
-        "uptime": {
-          "type": "string"
-        },
-        "platform": {
-          "type": "string"
-        },
-        "environment": {
-          "type": "string"
-        },
-        "policy_group": {
-          "type": "string"
         }
       }
     },
