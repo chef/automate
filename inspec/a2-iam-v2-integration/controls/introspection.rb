@@ -11,14 +11,14 @@ control 'introspection-iam-v2-1' do
 
   describe 'introspect all' do
     it 'returns what we expect' do
-      resp = automate_api_request('/api/v0/auth/introspect')
+      resp = automate_api_request('/apis/iam/v2/introspect')
       expect(resp.http_status).to eq 200
     end
   end
 
   describe 'introspect some' do
     it 'returns what we expect' do
-      resp = automate_api_request('/api/v0/auth/introspect_some',
+      resp = automate_api_request('/apis/iam/v2/introspect_some',
                                   http_method: 'POST',
                                   request_body:  {
                                     paths: [
@@ -56,20 +56,20 @@ control 'introspection-iam-v2-1' do
     end
   end
 
-  describe 'introspect some with parameters' do
+  describe 'introspect (single) with parameters' do
     it 'returns what we expect' do
-      resp = automate_api_request('/api/v0/auth/introspect',
+      resp = automate_api_request('/apis/iam/v2/introspect',
                                   http_method: 'POST',
                                   request_body:  {
-                                    path: '/auth/policies/foo',
-                                    parameters: [ 'foo' ],
+                                    path: '/iam/v2/policies/foo',
+                                    parameters: [ ], # not used
                                   }.to_json)
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:endpoints]).to eq(
         {
-          '/auth/policies/foo': {
-            'get': false,
-            'put': false,
+          '/iam/v2/policies/foo': {
+            'get': true,
+            'put': true,
             'post': false,
             'delete': true,
             'patch': false
