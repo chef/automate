@@ -129,14 +129,15 @@ The command will show the backup progress for each service. If the backup is suc
 Success: Created backup 20180518010336
 ```
 
-## Storing Backups in a Single-file Archive for Airgapped Installations
+### Storing a Filesystem Backup in a Single-file Archive
+Some users prefer to store backups offline in single-file archives. Such archives must
+include both the configuration data and the reporting data contained in the standard
+backup.
 
-The backup directory contains both the timestamp-based directory for the configuration, and the reporting data stored in the `automate-elasticsearch-data` directory. 
-You will need to archive both of these directory types in any offline backups you create.
+The [configured]({{< ref "backup.md#backup-to-filesystem" >}}) backup directory contains both the timestamp-based directory for the configuration, and the reporting data stored in the `automate-elasticsearch-data` directory.
+You will need to archive both of these directory types in any single-file backups you create.
 
-By default, the backup directory will be located at `/var/opt/chef-automate/backups`. 
 A timestamp-based directory can be distinguished from the `automate-elasticsearch-data` directory by its file name format, such as `20180518010336`.
-
 
 ## Listing Backups
 
@@ -177,25 +178,61 @@ chef-automate backup list s3://bucket_name/base_path
 where `bucket_name` is the name of the S3 bucket `base_path` an optional path within the bucket where the backups live.
 
 ## Restoring Chef Automate
+Restore Chef Automate to an instance on which Automate is not already installed.
 
-Restore Chef Automate to an instance on which Automate is not already installed. The directory used for restoring Chef Automate must have access to the filesystem used for the backup. If you used a network-attached filesystem backup, mount the shared backup directory to the same mount point that was configured when the backup was created. If the backup directory is not a network-attached filesystem, copy the backup directory to the location that was configured when the backup was created.
+### Restore From a Filesystem Backup
 
-If you have configured the backup directory to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate will use the most recent backup in the backup directory:
+#### Prerequisites
+1. The `chef-automate` command line utility must be installed on the host on which you
+   plan to run the restore.
+1. Chef Automate must have access to a backup directory in the [configured location]({{< ref
+"backup.md#backup-to-filesystem" >}}):
+  1. If you used a network-attached filesystem backup, mount the shared backup directory to the same mount point that was configured when the backup was created.
+  1. If the backup directory is not a network-attached filesystem, copy the backup directory to the location that was [configured]({{< ref
+"backup.md#backup-to-filesystem" >}}) when the backup was created.
+  1. If you are restoring from a single-file backup archive, copy your archive to the machine on which you wish to restore and extract it to the [configured backup directory]({{< ref "backup.md#backup-to-filesystem" >}}).
+
+#### Restore in an Internet-Connected Environment
+If you have [configured the backup directory]({{< ref "backup.md#backup-to-filesystem" >}}) to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate will use the most recent backup in the backup directory.
+
+To restore on a fresh host:
 
 ```shell
-chef-automate backup restore /path/to/backups/BACKUP_ID
+chef-automate backup restore </path/to/backups/>BACKUP_ID
 ```
 
-If backups are stored in S3:
+To restore on a host on which Automate has already been installed:
+
+```shell
+chef-automate backup restore </path/to/backups/>BACKUP_ID --skip-preflight
+```
+
+#### Restore in an Airgapped Environment
+To restore a backup of an [airgapped installation]({{< relref "airgapped-installation.md" >}}), you must specify the [Airgap Installation Bundle]({{< relref "airgapped-installation.md#create-an-airgap-installation-bundle" >}}) used by the installation. If you have [configured the backup directory]({{< ref "backup.md#backup-to-filesystem" >}}) to a directory that is not default (`/var/opt/chef-automate/backups`) you must supply the backup directory; if you do not provide a backup ID, Chef Automate will use the most recent backup in the backup directory.
+
+To restore on a fresh host:
+
+```shell
+chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID
+```
+
+To restore on a host on which Automate has already been installed:
+
+```shell
+chef-automate backup restore --airgap-bundle </path/to/bundle> </path/to/backups/>BACKUP_ID --skip-preflight
+```
+
+### Restore From an S3 Backup
+To restore on a fresh host:
 
 ```shell
 chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID
 ```
 
-To restore a backup of an [airgapped installation]({{< relref "airgapped-installation.md" >}}), you must extract your single-file backup archive into the default backup directory of `/var/opt/chef-automate/backups`, and specify the [Airgap Installation Bundle]({{< relref "airgapped-installation.md#create-an-airgap-installation-bundle" >}}) being used by the installation:
+To restore on a host on which Automate has already been installed:
 
 ```shell
-chef-automate backup restore --airgap-bundle </path/to/bundle> /var/opt/chef-automate/backups/BACKUP_ID
+chef-automate backup restore s3://bucket_name/path/to/backups/BACKUP_ID --skip-preflight
 ```
 
 If the restore is successful, you will see the following message at the end of the status output:
@@ -203,6 +240,44 @@ If the restore is successful, you will see the following message at the end of t
 ```shell
 Success: Restored backup 20180517223558
 ```
+
+### Update the FQDN
+Chef Automate's restore process expects to run on a host with the same FQDN as
+the host on which the backup was created. If the host on which the restore has run has a
+different FQDN, patch the FQDN and TLS certificate once the restore has completed:
+
+1. On the host on which you are restoring Chef Automate, run
+
+    ```shell
+    chef-automate init-config
+    ```
+to generate a configuration file for that host.
+1. Create a `patch.toml` file that contains the FQDN, TLS certificate, and TLS key entries from the
+   generated configuration:
+   ```toml
+    [global.v1]
+    fqdn = "<new-fqdn>"
+
+    [[global.v1.frontend_tls]]
+    # The TLS certificate for the load balancer frontend.
+    cert = """-----BEGIN CERTIFICATE-----
+    <certificate-for-new-fqdn>
+    -----END CERTIFICATE-----
+    """
+
+    # The TLS RSA key for the load balancer frontend.
+    key = """-----BEGIN RSA PRIVATE KEY-----
+    <key-for-new-fqdn>
+    -----END RSA PRIVATE KEY-----
+    """
+   ```
+1. Run
+   ```shell
+   chef-automate config patch </path/to/patch.toml>
+   ```
+   to patch the restored Automate
+   installation with the new FQDN, TLS certificate, and TLS key configuration entries.
+
 
 ## Deleting Backups
 
