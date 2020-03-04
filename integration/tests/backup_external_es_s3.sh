@@ -23,20 +23,14 @@ do_setup() {
 
 do_create_config() {
   do_create_config_default
-
+  do_create_config_s3_default
   cat <<EOF >> "$test_config_path"
-[global.v1.backups]
-  location = "s3"
 [global.v1.external.elasticsearch]
   enable = true
   nodes = ["http://127.0.0.1:59200"]
 [global.v1.external.elasticsearch.backup]
   enable = true
   location = "s3"
-[global.v1.backups.s3.bucket]
-  name = "${s3_bucket_name}"
-  base_path = "${s3_bucket_base_path}"
-  endpoint = "${s3_endpoint}"
 EOF
 }
 
