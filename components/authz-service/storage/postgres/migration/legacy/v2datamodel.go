@@ -336,3 +336,102 @@ func v2DefaultPolicies() []v2Policy {
 
 	return []v2Policy{adminPol, editorPol, viewerPol, ingestPol}
 }
+
+// v1LegacyPolicies shipped with IAM v2. They are the migrated versions of v1 default policies
+func v1LegacyPolicies() []v2Policy {
+	allUsers := v2Member{Name: "user:*"}
+	allTokens := v2Member{Name: "token:*"}
+
+	s1 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"compliance:*"})
+	compliancePol := v2Policy{
+		ID:         constants_v2.CompliancePolicyID,
+		Name:       "[Legacy] Compliance Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s1},
+		Type:       Custom,
+	}
+
+	s2 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"compliance:profiles:*"})
+	complianceProfilePol := v2Policy{
+		ID:         constants_v2.ComplianceTokenPolicyID,
+		Name:       "[Legacy] Compliance Profile Access",
+		Members:    []v2Member{allTokens},
+		Statements: []v2Statement{s2},
+		Type:       Custom,
+	}
+
+	s3 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"event:*"})
+	eventPol := v2Policy{
+		ID:         constants_v2.EventsPolicyID,
+		Name:       "[Legacy] Events Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s3},
+		Type:       Custom,
+	}
+
+	s4 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"infra:*"})
+	infraPol := v2Policy{
+		ID:         constants_v2.CfgmgmtPolicyID,
+		Name:       "[Legacy] Infrastructure Automation Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s4},
+		Type:       Custom,
+	}
+
+	s5 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"ingest:*"})
+	ingestPol := v2Policy{
+		ID:         constants_v2.IngestPolicyID,
+		Name:       "[Legacy] Ingest Access",
+		Members:    []v2Member{allTokens},
+		Statements: []v2Statement{s5},
+		Type:       Custom,
+	}
+
+	s6 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"infra:nodes:*"})
+	nodePol := v2Policy{
+		ID:         constants_v2.NodesPolicyID,
+		Name:       "[Legacy] Nodes Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s6},
+		Type:       Custom,
+	}
+
+	s7 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"infra:nodeManagers:*"})
+	nodeManagerPol := v2Policy{
+		ID:         constants_v2.NodeManagersPolicyID,
+		Name:       "[Legacy] Node Managers Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s7},
+		Type:       Custom,
+	}
+
+	s8 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"secrets:*"})
+	secretPol := v2Policy{
+		ID:         constants_v2.SecretsPolicyID,
+		Name:       "[Legacy] Secrets Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s8},
+		Type:       Custom,
+	}
+
+	s9 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"system:telemetryConfig:*"})
+	telemetryPol := v2Policy{
+		ID:         constants_v2.TelemetryPolicyID,
+		Name:       "[Legacy] Telemetry Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s9},
+		Type:       Custom,
+	}
+
+	return []v2Policy{
+		compliancePol,
+		complianceProfilePol,
+		eventPol,
+		infraPol,
+		ingestPol,
+		nodePol,
+		nodeManagerPol,
+		secretPol,
+		telemetryPol,
+	}
+}

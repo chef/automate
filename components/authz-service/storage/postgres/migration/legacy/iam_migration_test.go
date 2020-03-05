@@ -38,10 +38,16 @@ func TestMigrateToV2(t *testing.T) {
 
 	cases := map[string]func(*testing.T){
 		"empty store/default state": func(t *testing.T) {
-			err := MigrateToV2(ctx, db, false)
+			err := MigrateToV2(ctx, db, true)
 			require.NoError(t, err)
 
 			for _, pol := range v2DefaultPolicies() {
+				resp, err := queryTestPolicy(ctx, pol.ID, db)
+				require.NoError(t, err)
+				assert.Equal(t, pol.ID, resp.ID)
+			}
+
+			for _, pol := range v1LegacyPolicies() {
 				resp, err := queryTestPolicy(ctx, pol.ID, db)
 				require.NoError(t, err)
 				assert.Equal(t, pol.ID, resp.ID)
