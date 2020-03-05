@@ -40,7 +40,7 @@ steps:
     expeditor:
       secrets:
         GITHUB_TOKEN:
-          account: github
+          account: github/chef
           field: token
       executor:
         docker:
@@ -59,7 +59,7 @@ steps:
     expeditor:
       secrets:
         HAB_STUDIO_SECRET_GITHUB_TOKEN:
-          account: github
+          account: github/chef
           field: token
       executor:
         linux:
