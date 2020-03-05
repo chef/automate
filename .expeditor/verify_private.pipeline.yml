@@ -646,6 +646,15 @@ steps:
         A2_LICENSE:
           path: secret/a2/license
           field: license
+        AWS_ACCESS_KEY_ID:
+          account: aws/chef-cd
+          field: access_key_id
+        AWS_SECRET_ACCESS_KEY:
+          account: aws/chef-cd
+          field: secret_access_key
+        AWS_SESSION_TOKEN:
+          account: aws/chef-cd
+          field: session_token
   - label: "ontop backup "
     command:
       - integration/run_test integration/tests/backup_ontop.sh
@@ -681,7 +690,15 @@ steps:
         A2_LICENSE:
           path: secret/a2/license
           field: license
-
+        AWS_ACCESS_KEY_ID:
+          account: aws/chef-cd
+          field: access_key_id
+        AWS_SECRET_ACCESS_KEY:
+          account: aws/chef-cd
+          field: secret_access_key
+        AWS_SESSION_TOKEN:
+          account: aws/chef-cd
+          field: session_token
   - label: "upgrade dev -> master"
     command:
       - integration/run_test integration/tests/upgrade.sh

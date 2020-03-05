@@ -11,16 +11,7 @@ test_backup_restore=true
 
 do_create_config() {
   do_create_config_default
-
-  #shellcheck disable=SC2154
-  cat <<EOF >> "$test_config_path"
-[global.v1.backups]
-  location = "s3"
-[global.v1.backups.s3.bucket]
-  name = "${s3_bucket_name}"
-  base_path = "${s3_bucket_base_path}"
-  endpoint = "${s3_endpoint}"
-EOF
+  do_create_config_s3_default
 }
 
 do_deploy() {
