@@ -88,14 +88,14 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 					"get user record":                       isAuthorized("user:local:alice", "iam:users:get", "iam:users:alice"),
 					"list user record":                      isAuthorized("user:local:alice", "iam:users:list", "iam:users:alice"),
 					"d-s can do allthethings":               isAuthorized("tls:service:deployment-service:cert-id", "iam:users:delete", "iam:users:alice"),
-					"ingest run as provider oc-erchef":      isAuthorized("tls:service:automate-cs-oc-erchef:cert", "infra:ingest:create", "infra:nodes:nodeUUID:runs"),
-					"ingest action as provider oc-erchef":   isAuthorized("tls:service:automate-cs-oc-erchef:cert", "infra:ingest:create", "infra:actions"),
-					"ingest delete as provider oc-erchef":   isAuthorized("tls:service:automate-cs-oc-erchef:cert", "infra:ingest:delete", "infra:nodes"),
-					"ingest liveness as provider oc-erchef": isAuthorized("tls:service:automate-cs-oc-erchef:cert", "infra:ingest:create", "infra:nodes:nodeUUID:liveness"),
-					"ingest run as provider cs-nginx":       isAuthorized("tls:service:automate-cs-nginx:cert", "infra:ingest:create", "infra:nodes:nodeUUID:runs"),
-					"ingest action as provider nginx":       isAuthorized("tls:service:automate-cs-nginx:cert", "infra:ingest:create", "infra:actions"),
-					"ingest delete as provider nginx":       isAuthorized("tls:service:automate-cs-nginx:cert", "infra:ingest:delete", "infra:nodes"),
-					"ingest liveness as provider nginx":     isAuthorized("tls:service:automate-cs-nginx:cert", "infra:ingest:create", "infra:nodes:nodeUUID:liveness"),
+					"ingest run as provider oc-erchef":      isAuthorized("tls:service:automate-cs-oc-erchef:cert", "ingest:nodes:create", "ingest:nodes:nodeUUID:runs"),
+					"ingest action as provider oc-erchef":   isAuthorized("tls:service:automate-cs-oc-erchef:cert", "ingest:actions:create", "ingest:actions"),
+					"ingest delete as provider oc-erchef":   isAuthorized("tls:service:automate-cs-oc-erchef:cert", "ingest:nodes:delete", "ingest:nodes"),
+					"ingest liveness as provider oc-erchef": isAuthorized("tls:service:automate-cs-oc-erchef:cert", "ingest:nodes:create", "ingest:nodes:nodeUUID:liveness"),
+					"ingest run as provider cs-nginx":       isAuthorized("tls:service:automate-cs-nginx:cert", "ingest:nodes:create", "ingest:nodes:nodeUUID:runs"),
+					"ingest action as provider nginx":       isAuthorized("tls:service:automate-cs-nginx:cert", "ingest:actions:create", "ingest:actions"),
+					"ingest delete as provider nginx":       isAuthorized("tls:service:automate-cs-nginx:cert", "ingest:nodes:delete", "ingest:nodes"),
+					"ingest liveness as provider nginx":     isAuthorized("tls:service:automate-cs-nginx:cert", "ingest:nodes:create", "ingest:nodes:nodeUUID:liveness"),
 				}
 
 				for desc, test := range cases {

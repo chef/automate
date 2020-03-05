@@ -49,8 +49,8 @@ func (s *Server) dataCollectorHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Auth Policy
 	const (
-		resource = "infra:ingest:unifiedEvents"
-		action   = "infra:ingest:create"
+		resource = "ingest:unifiedEvents"
+		action   = "ingest:unifiedEvents:create"
 	)
 
 	ctx, err := s.authRequest(r, resource, action)
