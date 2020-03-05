@@ -53,6 +53,8 @@ export class AutomateSettingsComponent implements OnInit {
     }
   };
   eventFeedForm: FormGroup;
+  serviceGroupForm: FormGroup;
+
   clientRunsForm: FormGroup;
   complianceDataForm: FormGroup;
   missingNodesForm: FormGroup;
@@ -83,12 +85,23 @@ export class AutomateSettingsComponent implements OnInit {
 
     this.eventFeedForm = this.fb.group({
       feedData: this.fb.group({
-        unit: ['d'],
+        unit: {value: 'd', disabled: true},
         threshold: {value: 3, disabled: true}
       }),
       serverActions: this.fb.group({
-        unit: ['d'],
-        threshold: {value: 30, disabled: true}
+        unit: { value: 'd', disabled: true },
+        threshold: { value: 30, disabled: true }
+      })
+    });
+
+    this.serviceGroupForm = this.fb.group({
+      healthChecks: this.fb.group({
+        unit: { value: 'd', disabled: true },
+        threshold: {value: 5, disabled: true}
+      }),
+      removeServices: this.fb.group({
+        unit: { value: 'd', disabled: true },
+        threshold: {value: 7, disabled: true}
       })
     });
 
@@ -139,10 +152,9 @@ export class AutomateSettingsComponent implements OnInit {
 
   // patchDisableValue is the workaround for the chef-checkbox molecule since it is not
   // an input annotation we need to patch the value inside the FormGroup
-  public patchDisableValue(form, _formGroupName: string,
-                          _formControlName: string, checked: boolean) {
+  public patchDisableValue(form, _formGroupName: string, checked: boolean) {
     // currentInput is a reference to the input associated with its checkbox
-    const currentInput = form.controls[_formGroupName].controls[_formControlName];
+    const currentInput = form.get(_formGroupName);
     checked === true
       ? currentInput.enable()
       : currentInput.disable();
