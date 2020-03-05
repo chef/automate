@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
@@ -71,23 +71,23 @@ export class AutomateSettingsComponent implements OnInit {
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
-    private formBuilder: FormBuilder,
+    private fb: FormBuilder,
     private telemetryService: TelemetryService
   ) {
     const formDetails = this.defaultFormData;
-    // this.eventFeedForm = this.formBuilder.group(formDetails['eventFeed']);
-    this.clientRunsForm = this.formBuilder.group(formDetails['clientRuns']);
-    this.complianceDataForm = this.formBuilder.group(formDetails['complianceData']);
-    this.missingNodesForm = this.formBuilder.group(formDetails['missingNodes']);
-    this.deleteMissingNodesForm = this.formBuilder.group(formDetails['deleteMissingNodes']);
+    // this.eventFeedForm = this.fb.group(formDetails['eventFeed']);
+    this.clientRunsForm = this.fb.group(formDetails['clientRuns']);
+    this.complianceDataForm = this.fb.group(formDetails['complianceData']);
+    this.missingNodesForm = this.fb.group(formDetails['missingNodes']);
+    this.deleteMissingNodesForm = this.fb.group(formDetails['deleteMissingNodes']);
 
-    this.eventFeedForm = this.formBuilder.group({
+    this.eventFeedForm = this.fb.group({
       unit: ['d'],
       threshold: {value: 3, disabled: true}
     });
 
 
-    this.automateSettingsForm = this.formBuilder.group({
+    this.automateSettingsForm = this.fb.group({
       eventFeed: this.eventFeedForm,
       clientRuns: this.clientRunsForm,
       complianceData: this.complianceDataForm,
@@ -232,24 +232,24 @@ export class AutomateSettingsComponent implements OnInit {
 
       switch (job.name) {
         case IngestJobs.MissingNodes: {
-          this.missingNodesForm = this.formBuilder.group(form);
+          this.missingNodesForm = this.fb.group(form);
           break;
         }
         case IngestJobs.MissingNodesForDeletion: {
-          this.deleteMissingNodesForm = this.formBuilder.group(form);
+          this.deleteMissingNodesForm = this.fb.group(form);
           break;
         }
         // TODO @afiune missing forms to add, at the moment we can't modify
         // this parameter/settings since the services take it at startup.
         // (we need to change that first)
         //
-        // this.clientRunsForm = this.formBuilder.group(form);
-        // this.complianceDataForm = this.formBuilder.group(form);
-        // this.eventFeedForm = this.formBuilder.group(form);
+        // this.clientRunsForm = this.fb.group(form);
+        // this.complianceDataForm = this.fb.group(form);
+        // this.eventFeedForm = this.fb.group(form);
       }
     });
 
-    this.automateSettingsForm = this.formBuilder.group({
+    this.automateSettingsForm = this.fb.group({
       eventFeed: this.eventFeedForm,
       clientRuns: this.clientRunsForm,
       complianceData: this.complianceDataForm,
