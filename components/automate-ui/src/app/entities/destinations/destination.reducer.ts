@@ -21,7 +21,8 @@ const UPDATE_STATUS = 'updateStatus';
 const GET_STATUS = 'getStatus';
 const DELETE_STATUS = 'deleteStatus';
 
-export const destinationEntityAdapter: EntityAdapter<Destination> = createEntityAdapter<Destination>();
+export const destinationEntityAdapter: EntityAdapter<Destination> =
+  createEntityAdapter<Destination>();
 
 export const DestinationEntityInitialState: DestinationEntityState =
 destinationEntityAdapter.getInitialState({
@@ -56,7 +57,8 @@ export function destinationEntityReducer(
     }
 
     case DestinationActionTypes.GET_ALL_FAILURE: {
-      return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state) as DestinationEntityState;
+      return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state
+        ) as DestinationEntityState;
     }
 
     case DestinationActionTypes.GET: {

@@ -53,7 +53,6 @@ export class DatafeedComponent implements OnInit, OnDestroy {
   ) {
 
     this.loading$ = store.pipe(select(getStatus), map(loading));
-    
     this.sortedDestinations$ = store.pipe(
       select(allDestinations),
       map(destinations => ChefSorters.naturalSort(destinations, 'name')));
