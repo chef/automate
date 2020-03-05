@@ -14,6 +14,11 @@ OLD_VERSION=20190501153509
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${OLD_VERSION}.json"
 
+# this test script:
+# 1. deploys an older version of Automate on IAM v1.
+# 2. runs a2-iam-v1-integration inspec tests.
+# 3. upgrades Automate to the latest build. This force-upgrades the system to IAM v2.
+# 4. runs a2-iam-legacy-integration and a2-api-integration inspec tests.
 
 do_deploy() {
     #shellcheck disable=SC2154
