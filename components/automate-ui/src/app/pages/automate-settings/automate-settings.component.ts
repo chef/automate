@@ -168,20 +168,6 @@ export class AutomateSettingsComponent implements OnInit {
     return !this.formChanged;
   }
 
-  // patchUnitValue is the workaround for the chef-select molecule since it is not
-  // an input annotation we need to patch the value inside the FormGroup
-  public patchUnitValue(form, event) {
-    form.controls['unit'].setValue(event.target.value);
-  }
-
-  // isUnitValue is the workaround for the chef-select molecule since it is not
-  // a select field we need to check value to use inside FormGroup
-  public isUnitValue(form, unit: string) {
-    return form.controls['unit'].value === unit;
-  }
-
-  // toggleInput is the workaround for the chef-checkbox molecule since it is not
-  // an input annotation we need to patch the value inside the FormGroup
   public toggleInput(form, _formGroupName: string, checked: boolean) {
     // currentInput is a reference to the input associated with its checkbox
     const currentInput = form.get(_formGroupName);
