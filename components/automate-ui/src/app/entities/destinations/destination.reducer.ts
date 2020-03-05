@@ -71,7 +71,7 @@ export function destinationEntityReducer(
       return set(
         GET_STATUS,
         EntityStatus.loadingSuccess,
-        destinationEntityAdapter.addOne(action.payload.destination, state)
+        destinationEntityAdapter.addOne(action.payload, state)
       ) as DestinationEntityState;
     }
 

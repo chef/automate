@@ -107,6 +107,7 @@ import {
   ConvergeRadialGraphComponent
 } from './page-components/converge-radial-graph/converge-radial-graph.component';
 import { DatafeedFormComponent } from './pages/data-feed-form/data-feed-form.component';
+import { DataFeedDetailsComponent } from './pages/data-feed-details/data-feed-details.component';
 import { DatafeedComponent } from './pages/data-feed/data-feed.component';
 import { DateSelectorComponent } from './page-components/date-selector/date-selector.component';
 import {
@@ -202,6 +203,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     CreateDataFeedModalComponent,
     DatafeedComponent,
     DatafeedFormComponent,
+    DataFeedDetailsComponent,
     DateSelectorComponent,
     DeletableNodeControlComponent,
     DeleteDatafeedDialogComponent,

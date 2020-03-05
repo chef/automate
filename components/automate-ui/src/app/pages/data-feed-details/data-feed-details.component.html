@@ -1,0 +1,58 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/settings/data-feed']">Data Feed</chef-breadcrumb>
+        {{ destination?.name }}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <chef-heading>{{ destination?.name }}</chef-heading>
+        <table>
+          <thead>
+            <tr class="detail-row">
+              <th class="header-column">URL</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="detail-row">
+              <td class="header-column" data-cy="destination-url">{{ destination?.url }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <chef-tab-selector [value]="tabValue">
+          <chef-option value='details'>Details</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      <section class="page-body">
+        <form [formGroup]="updateForm">
+          <chef-form-field>
+            <label>Name <span aria-hidden="true">*</span></label>
+            <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="name-input"/>
+            <chef-error *ngIf="(nameCtrl.hasError('required') || nameCtrl.hasError('pattern')) && nameCtrl.dirty">
+              Name is required.
+            </chef-error>
+          </chef-form-field>
+          <chef-form-field>
+            <label>Data Feed URL <span aria-hidden="true">*</span></label>
+            <input chefInput formControlName="url" type="text" [resetOrigin]="saveSuccessful" autocomplete="off" data-cy="url-input"/>
+            <chef-error *ngIf="urlCtrl.hasError('required')">
+              Data Feed URL is required.
+            </chef-error>
+            <chef-error *ngIf="urlCtrl.hasError('pattern')">
+              Data Feed URL is invalid.
+            </chef-error>
+          </chef-form-field>
+          
+        </form>
+        <div id="save">
+          <chef-button primary [disabled]="saveInProgress || !updateForm.valid || !this.updateForm.dirty" (click)="saveDataFeed()">
+            <chef-loading-spinner *ngIf="saveInProgress"></chef-loading-spinner>
+            <span *ngIf="saveInProgress">Saving...</span>
+            <span *ngIf="!saveInProgress">Save</span>
+          </chef-button>
+          <span id="saved-note" *ngIf="saveSuccessful && !updateForm.dirty">All changes saved.</span>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

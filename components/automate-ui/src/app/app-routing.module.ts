@@ -21,6 +21,7 @@ import { NotificationsComponent } from './pages/notifications/notifications.comp
 import { NotificationFormComponent } from './pages/notification-form/notification-form.component';
 import { DatafeedComponent } from './pages/data-feed/data-feed.component';
 import { DatafeedFormComponent } from './pages/data-feed-form/data-feed-form.component';
+import { DataFeedDetailsComponent } from './pages/data-feed-details/data-feed-details.component';
 import { SigninComponent } from './pages/signin/signin.component';
 
 // Components
@@ -175,6 +176,10 @@ const routes: Routes = [
           ]
         },
         {
+          path: 'data-feeds/:id',
+          component: DataFeedDetailsComponent
+        },
+        {
           path: 'data-feed',
           children: [
             {
@@ -190,7 +195,7 @@ const routes: Routes = [
               component: DatafeedFormComponent
             }
           ]
-        }
+        },
       ]
     },
     {

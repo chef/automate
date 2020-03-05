@@ -53,7 +53,7 @@ export class CreateDataFeedModalComponent implements OnInit {
   }
 
   urlPresent() {
-    return this.createForm.controls.url.value !== ""
+    return this.createForm.controls.url.value !== "" ? true : false
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {

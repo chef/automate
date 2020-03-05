@@ -8,7 +8,7 @@
               <span class="label">Name <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="name" type="text" id="name-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
-            <span class="input-desc">Don't worry, data feed name can be changed later.</span>
+            <span class="i-desc">Don't worry, data feed name can be changed later.</span>
             <chef-error
             *ngIf="(createForm.get('name').hasError('required') || createForm.get('name').hasError('pattern')) && createForm.get('name').dirty">
             Display Name is required.
@@ -39,7 +39,7 @@
               <span class="label">Username <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="username" type="text" id="username-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
-            <span class="input-desc">Encrypted, and only used to access the data feed.</span>
+            <span class="i-desc">Encrypted, and only used to access the data feed.</span>
             <chef-error *ngIf="createForm.get('username').hasError('required') && createForm.get('username').dirty">
               Username is required.
             </chef-error>
@@ -51,7 +51,7 @@
               <span class="label">Password <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="password" type="password" id="password-input" (keyup)="handleInput($event)" autocomplete="off"/>
             </label>
-            <span class="input-desc">Encrypted, and only used to access the data feed.</span>
+            <span class="i-desc">Encrypted, and only used to access the data feed.</span>
             <chef-error
               *ngIf="createForm.get('password').hasError('password') && createForm.get('password').dirty">
               Password is required.
@@ -79,7 +79,7 @@
             <span *ngIf="!creating">Create Data Feed</span>
             <span *ngIf="creating">Creating Data Feed...</span>
           </chef-button>
-          <chef-button secondary [disabled]="!urlPresent() || creating" (click)="sendTest()">
+          <chef-button secondary [disabled]="!urlPresent()" (click)="sendTest()">
             <chef-loading-spinner *ngIf="sending"></chef-loading-spinner>
             <span *ngIf="!sending">Test Data Feed</span>
             <span *ngIf="sending">Testing Data Feed...</span>
