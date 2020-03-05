@@ -25,7 +25,7 @@
           <div class="checkbox-row" formGroupName="feedData">
             <div class="checkbox-container">
               <chef-checkbox
-              (change)="patchDisableValue(eventFeedForm, 'feedData', $event.detail)">
+              (change)="toggleInput(eventFeedForm, 'feedData', $event.detail)">
             </chef-checkbox>
             </div>
               <p>Remove event feed data after
@@ -35,7 +35,7 @@
           <div class="checkbox-row" formGroupName="serverActions">
             <div class="checkbox-container">
               <chef-checkbox
-                (change)="patchDisableValue(eventFeedForm, 'serverActions', $event.detail)">
+                (change)="toggleInput(eventFeedForm, 'serverActions', $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove Chef Server actions after<input chefInput type="number" formControlName="threshold" />days</p>
@@ -47,8 +47,8 @@
           <div class="checkbox-row" formGroupName="healthChecks">
             <div class="checkbox-container">
               <chef-checkbox
-              (change)="patchDisableValue(serviceGroupForm, 'healthChecks', $event.detail)"
-              ></chef-checkbox>
+              (change)="toggleInput(serviceGroupForm, 'healthChecks', $event.detail)">
+              </chef-checkbox>
             </div>
 
             <p>When no health check reports have been received for a service in
@@ -63,17 +63,19 @@
               , label the service as disconnected</p>
           </div>
           
-          <div class="checkbox-row secondary-row">
+          <div class="checkbox-row secondary-row" formGroupName="removeServices">
             <div class="checkbox-container">
-              <chef-checkbox></chef-checkbox>
+              <chef-checkbox
+              (change)="toggleInput(serviceGroupForm, 'removeServices', $event.detail)">
+              </chef-checkbox>
             </div>
             <p>Remove services labeled as disconnected after
-              <input chefInput type="number" value="7" />
+              <input chefInput type="number" formControlName="threshold" />
               <mat-form-field appearance="none">
-                <mat-select panelClass="chef-dropdown">
-                  <mat-option value="minutes">minutes</mat-option>
-                  <mat-option value="hours">hours</mat-option>
-                  <mat-option value="days">days</mat-option>
+                <mat-select panelClass="chef-dropdown" formControlName="unit">
+                  <mat-option value="m">minutes</mat-option>
+                  <mat-option value="h">hours</mat-option>
+                  <mat-option value="d">days</mat-option>
                 </mat-select>
               </mat-form-field>
             </p>
