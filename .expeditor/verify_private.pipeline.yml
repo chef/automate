@@ -50,6 +50,7 @@ steps:
   # integration tests.
   - label: build
     command:
+      - ls /var/opt/ci-studio-common
       - env
     timeout_in_minutes: 45
     env:
