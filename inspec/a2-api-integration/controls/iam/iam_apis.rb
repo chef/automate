@@ -16,6 +16,7 @@ control 'iam-api-1' do
   TOKEN_ID_3 = "iam-1-token-3-#{TIMESTAMP}"
   TOKEN_NAME = 'iam REST API integration test token'
   USER_ID = "inspec-user-#{TIMESTAMP}"
+  USER_ID_2 = "inspec-user-2-#{TIMESTAMP}"
   TEAM_ID = "inspec-team-#{TIMESTAMP}"
   POLICY_ID = "inspec-custom-policy-#{TIMESTAMP}"
   ROLE_ID = "inspec-custom-role-#{TIMESTAMP}"
@@ -58,7 +59,7 @@ control 'iam-api-1' do
       expect(resp.http_status.to_s).to match(/200|404/)
     end
 
-    it "CREATE token responds properly to happy path inputs" do
+    it "CREATE returns created token with happy path inputs" do
       resp = automate_api_request("/apis/iam/v2/tokens")
       expect(resp.http_status).to eq 200
       init_token_count = resp.parsed_response_body[:tokens].length
@@ -123,6 +124,7 @@ control 'iam-api-1' do
     end
 
     it "CREATE token returns a 409 on ID conflict" do
+      # token with this id was created above and still exists
       response = automate_api_request(
         "/apis/iam/v2/tokens",
         http_method: "POST",
@@ -140,7 +142,7 @@ control 'iam-api-1' do
       expect(resp.parsed_response_body.keys).to include (:tokens)
     end
 
-    it "GET token responds properly to happy path inputs" do
+    it "GET token returns token with happy path inputs" do
       resp = automate_api_request("/apis/iam/v2/tokens/#{TOKEN_ID}")
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:token][:id]).to eq TOKEN_ID
@@ -263,10 +265,9 @@ control 'iam-api-1' do
     end
 
     describe "when multiple users exists" do
-      let (:custom_user_id_2) { 'inspec-user-2' }
       let (:custom_user_2) do
         {
-          id: custom_user_id_2,
+          id: USER_ID_2,
           name: "display name 2",
           password: "chefautomate"
         }
@@ -290,7 +291,7 @@ control 'iam-api-1' do
         resp = automate_api_request("/apis/iam/v2/users/#{USER_ID}", http_method: 'DELETE')
         expect(resp.http_status.to_s).to match(/200|404/)
 
-        resp = automate_api_request("/apis/iam/v2/users/#{custom_user_id_2}", http_method: 'DELETE')
+        resp = automate_api_request("/apis/iam/v2/users/#{USER_ID_2}", http_method: 'DELETE')
         expect(resp.http_status.to_s).to match(/200|404/)
       end
 
@@ -301,7 +302,7 @@ control 'iam-api-1' do
 
           user_ids = resp.parsed_response_body[:users].map { |u| u[:id] }
           expect(user_ids).to include(USER_ID)
-          expect(user_ids).to include(custom_user_id_2)
+          expect(user_ids).to include(USER_ID_2)
           expect(user_ids).to include(ADMIN_USER_ID)
         end
       end
@@ -541,7 +542,7 @@ control 'iam-api-1' do
       expect(resp.parsed_response_body[:user_ids]).to eq [user_id_1]
     end
 
-    it "GET teams for user responds properly to happy path inputs" do
+    it "GET teams-for-user responds properly to happy path inputs" do
       user = "83a2fe1f-0793-4cbe-9b4b-737a9316a515"
       resp = automate_api_request("/apis/iam/v2/teams/#{TEAM_ID}/users:add",
         http_method: 'POST',
@@ -1093,16 +1094,16 @@ control 'iam-api-1' do
         expect(resp.http_status).to eq 200
   
         all_policies = resp.parsed_response_body[:policies]
-        policies = all_policies.select{ |p| /^team:local:viewers$/.match(p[:members][0]) }
+        policies = all_policies.select{ |p| /^team:local:editor$/.match(p[:members][0]) }
         expect(policies.length).to eq 1
       end
   
-      it 'the viewers default policy includes editor role' do
+      it 'the viewers default policy includes viewer role' do
         resp = automate_api_request('/apis/iam/v2/policies')
         expect(resp.http_status).to eq 200
   
         all_policies = resp.parsed_response_body[:policies]
-        policies = all_policies.select{ |p| /^team:local:editors$/.match(p[:members][0]) }
+        policies = all_policies.select{ |p| /^team:local:viewer$/.match(p[:members][0]) }
         expect(policies.length).to eq 1
       end
     end
@@ -1223,7 +1224,7 @@ EOF
         }.to_json()
       )
       expect(resp.http_status).to eq 400
-      expect(resp.parsed_response_body[:error]).to eq "could not parse statements: cannot define resources on v2 policy"
+      expect(resp.parsed_response_body[:error]).to eq "could not parse statements: cannot define resources on policy"
     end
 
     it "LIST policies responds properly" do
@@ -1308,5 +1309,4 @@ EOF
     end
   end
 end
-
 

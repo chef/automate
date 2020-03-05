@@ -140,7 +140,7 @@ func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 			loaded := iamRoleSave{}
 			err := tstCtx.GetValue("iam-roles", &loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
-			if loaded.Skipped == true {
+			if loaded.Skipped {
 				// this happens in the v1->v2 force upgrade scenario:
 				// when we run generate diagnostic data while on v1
 				// then force-upgrade to v2
@@ -159,7 +159,7 @@ func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
 			loaded := iamRoleSave{}
 			err := tstCtx.GetValue("iam-roles", &loaded)
-			if loaded.Skipped == true {
+			if loaded.Skipped {
 				// if diagnostic was run on v1, generating roles was skipped
 				// so nothing to clean up here
 				return nil

@@ -133,7 +133,7 @@ describe('policies API', () => {
 
           const policyIDs = response.body.policies.map((pol: Policy) => pol.id);
 
-          chefManagedPolicyIDs.forEach((id: string) => {
+          chefManagedPolicyIDs.forEach(id => {
             expect(policyIDs).include(id);
           });
           expect(policyIDs).to.include(policyID);

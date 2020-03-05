@@ -552,7 +552,7 @@ DOC
 function get_api_token_with_policy() {
   check_if_deployinate_started || return 1
 
-  local policy_id=${1:?"usage: get_api_token_with_policy POLICYID"}
+  local policy_id=${1:?"usage: get_api_token_with_policy POLICY_ID"}
   local token_id="api-token-id-${policy_id}"
   local token_file="/tmp/api_token_${policy_id}"
 

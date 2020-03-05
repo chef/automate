@@ -199,13 +199,13 @@ func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 			loaded := iamProjectSave{}
 			err := tstCtx.GetValue("iam-projects", &loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
-			if loaded.Skipped == true {
-				// this happens in the v1->v2 force upgrade scenario:
-				// when we run generate diagnostic data while on v1
-				// then force-upgrade to v2
-				// then run verify and cleanup on that data
-				// for projects, since the Generate step was skipped
-				// there is nothing to verify on v2
+			if loaded.Skipped {
+				// This happens in the v1->v2 force upgrade scenario:
+				// when we run "Generate diagnostic data" while on v1,
+				// then force-upgrade to v2,
+				// then run Verify and Cleanup on that data.
+				// Since the Generate step was skipped,
+				// there is nothing to verify on v2.
 				return
 			}
 
@@ -218,7 +218,7 @@ func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
 			loaded := iamProjectSave{}
 			err := tstCtx.GetValue("iam-projects", &loaded)
-			if loaded.Skipped == true {
+			if loaded.Skipped {
 				// if diagnostic was run on v1, generating projects was skipped
 				// so nothing to clean up here
 				return nil

@@ -14,7 +14,7 @@ title 'v1 custom policy migrates to v2'
 
 control 'iam-custom-legacy-policies-to-migrate-1' do
   title 'IAM access control with legacy custom policies'
-  desc 'Verify that a custom v1 legacy policies are migrated to v2 during force-upgrade.'
+  desc 'Verify that custom v1 legacy policies are migrated to v2 during force-upgrade.'
 
   describe 'using custom policies' do
   

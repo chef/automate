@@ -207,7 +207,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 			v2loaded := generatedV2PolicyData{}
 			err = tstCtx.GetValue("iam-policies-v2", &v2loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
-			if v2loaded.Skipped == true {
+			if v2loaded.Skipped {
 				// in the v1->v2 force upgrade scenario:
 				// we only migrate v1 policy data,
 				// we do not generate v2 policies
@@ -256,7 +256,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
 			loaded := generatedV2PolicyData{}
 			err := tstCtx.GetValue("iam-policies-v2", &loaded)
-			if loaded.Skipped == true {
+			if loaded.Skipped {
 				// if diagnostic was run on v1, generating v2 policies was skipped
 				// so nothing to clean up here
 				return nil

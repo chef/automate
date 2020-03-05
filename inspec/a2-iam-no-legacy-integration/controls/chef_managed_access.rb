@@ -14,7 +14,7 @@ control 'iam-chef-managed-access-1' do
   EDITOR_USER_ID = "inspec-editor-#{TIMESTAMP}"
   PROJECT_OWNER_USER_ID = "inspec-project-owner-#{TIMESTAMP}"
 
-  ALL_ROLES = [ADMIN_USER_ID, VIEWER_USER_ID, EDITOR_USER_ID, PROJECT_OWNER_USER_ID]
+  ALL_USERS_ACROSS_ROLES = [ADMIN_USER_ID, VIEWER_USER_ID, EDITOR_USER_ID, PROJECT_OWNER_USER_ID]
 
   PROJECT_ID = "inspec-project-#{TIMESTAMP}"
 
@@ -135,7 +135,7 @@ control 'iam-chef-managed-access-1' do
         ]
       }.each do |method, urls|
         urls.each do |url|
-          ALL_ROLES.each do |user|
+          ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
                 automate_api_request(
@@ -230,7 +230,7 @@ control 'iam-chef-managed-access-1' do
         ]
       }.each do |method, urls|
         urls.each do |url|
-          ALL_ROLES.each do |user|
+          ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               status = automate_api_request(
                 "/api/v0/#{url}",
@@ -302,7 +302,7 @@ control 'iam-chef-managed-access-1' do
         ]
       }.each do |method, urls|
         urls.each do |url|
-          ALL_ROLES.each do |user|
+          ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               status = automate_api_request(
                 "/api/v0/cfgmgmt/#{url}",
@@ -329,7 +329,7 @@ control 'iam-chef-managed-access-1' do
         ]
       }.each do |method, urls|
         urls.each do |url|
-          ALL_ROLES.each do |user|
+          ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
                 automate_api_request(
@@ -360,7 +360,7 @@ control 'iam-chef-managed-access-1' do
         ]
       }.each do |method, urls|
         urls.each do |url|
-          ALL_ROLES.each do |user|
+          ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               status = automate_api_request(
                 "/api/v0/#{url}",
@@ -385,7 +385,7 @@ control 'iam-chef-managed-access-1' do
         ]
       }.each do |method, urls|
         urls.each do |url|
-          ALL_ROLES.each do |user|
+          ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
                 automate_api_request(
@@ -449,7 +449,7 @@ control 'iam-chef-managed-access-1' do
         ]
       }.each do |method, urls|
         urls.each do |url|
-          ALL_ROLES.each do |user|
+          ALL_USERS_ACROSS_ROLES.each do |user|
             it "#{method} #{url} does not return 403 for #{user}" do
               expect(
                 automate_api_request(
@@ -644,7 +644,7 @@ control 'iam-chef-managed-access-1' do
         end
       end
 
-    ALL_ROLES.each do |user|
+    ALL_USERS_ACROSS_ROLES.each do |user|
       it "a #{user} can see their own user record" do
         expect(
           automate_api_request(
@@ -683,7 +683,7 @@ control 'iam-chef-managed-access-1' do
       )
     }.each do |method, urls|
       urls.each do |url|
-        ALL_ROLES.each do |user|
+        ALL_USERS_ACROSS_ROLES.each do |user|
           it "#{method} #{url} does not return 403 for #{user}" do
             expect(
               automate_api_request(
