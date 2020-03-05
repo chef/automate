@@ -28,8 +28,7 @@ import (
 	cc_version "github.com/chef/automate/api/interservice/compliance/version"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	teamsv1 "github.com/chef/automate/api/interservice/teams/v1"
-	teamsv2 "github.com/chef/automate/api/interservice/teams/v2"
+	teams "github.com/chef/automate/api/interservice/teams/v2"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 )
 
@@ -59,8 +58,7 @@ func NewServer() *grpc.Server {
 	manager.RegisterNodeManagerServiceServer(s, &manager.UnimplementedNodeManagerServiceServer{})
 	nodes.RegisterNodesServiceServer(s, &nodes.UnimplementedNodesServiceServer{})
 	notifications.RegisterNotificationsServer(s, &notifications.UnimplementedNotificationsServer{})
-	teamsv1.RegisterTeamsV1Server(s, &teamsv1.UnimplementedTeamsV1Server{})
-	teamsv2.RegisterTeamsV2Server(s, &teamsv2.UnimplementedTeamsV2Server{})
+	teams.RegisterTeamsV2Server(s, &teams.UnimplementedTeamsV2Server{})
 	secrets.RegisterSecretsServiceServer(s, &secrets.UnimplementedSecretsServiceServer{})
 
 	return s

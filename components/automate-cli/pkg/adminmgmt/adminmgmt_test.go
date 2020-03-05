@@ -135,32 +135,50 @@ func TestEnsureTeam(t *testing.T) {
 	require.NoError(t, err)
 	defer apiClient.CloseConnection()
 
-	t.Run("when GetTeams fails with an unexpected error then raise that error", func(t *testing.T) {
-		serverMocks.TeamsMock.GetTeamFunc = getTeamError(codes.Internal)
+	t.Run("when ListTeams fails with an unexpected error then raise that error", func(t *testing.T) {
+		serverMocks.TeamsMock.ListTeamsFunc = listTeamsError(codes.Internal)
 
 		_, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, false)
 		require.Error(t, err)
 	})
 
 	t.Run("when the admins team does not exist", func(t *testing.T) {
-		serverMocks.TeamsMock.GetTeamFunc = getTeamError(codes.NotFound)
+		serverMocks.TeamsMock.ListTeamsFunc = func(
+			context.Context, *iam_req.ListTeamsReq) (*iam_resp.ListTeamsResp, error) {
+
+			return &iam_resp.ListTeamsResp{
+				Teams: []*iam_common.Team{
+					{
+						Id:       "mocked-not-admin-id",
+						Name:     "not-admin",
+						Projects: []string{},
+					},
+				},
+			}, nil
+		}
 
 		t.Run("it is created and found=false is returned", func(t *testing.T) {
 			createAdminID := "mocked-admin-id"
 			serverMocks.TeamsMock.CreateTeamFunc = func(
 				_ context.Context, req *iam_req.CreateTeamReq) (*iam_resp.CreateTeamResp, error) {
 
-				if "admins" != req.Id ||
-					"admins" != req.Name {
+				if "admins" != req.Name ||
+					"admins" != req.Id {
 					return nil, errors.New("unexpected arguments")
 				}
 
 				return &iam_resp.CreateTeamResp{
 					Team: &iam_common.Team{
-						Id:   createAdminID,
-						Name: req.Name,
+						Id:       createAdminID,
+						Name:     req.Name,
+						Projects: []string{},
 					},
 				}, nil
+			}
+
+			serverMocks.TeamsMock.GetTeamFunc = func(
+				_ context.Context, req *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
+				return nil, status.Error(codes.NotFound, "Not Found")
 			}
 
 			found, err := adminmgmt.CreateAdminTeamIfMissing(ctx, apiClient, false)
@@ -168,7 +186,7 @@ func TestEnsureTeam(t *testing.T) {
 			assert.False(t, found)
 		})
 
-		t.Run("and dry run mode is on, it is not created and found=false is returned", func(t *testing.T) {
+		t.Run("and dry run mode is on it is not created, id is empty, and found=false are returned", func(t *testing.T) {
 			serverMocks.TeamsMock.CreateTeamFunc = createTeamCallUnexpected
 
 			found, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, true)
@@ -179,12 +197,12 @@ func TestEnsureTeam(t *testing.T) {
 
 	t.Run("when the admins team exists already", func(t *testing.T) {
 		serverMocks.TeamsMock.GetTeamFunc = func(
-			context.Context, *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
-
+			_ context.Context, req *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
 			return &iam_resp.GetTeamResp{
 				Team: &iam_common.Team{
-					Id:   "admins",
-					Name: "admins",
+					Id:       "admins",
+					Name:     "admins",
+					Projects: []string{},
 				},
 			}, nil
 		}
@@ -263,7 +281,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 			}, nil
 		}
 
-		t.Run("it calls AddUsers returns addUser=true", func(t *testing.T) {
+		t.Run("it calls AddTeamMembers returns addUser=true", func(t *testing.T) {
 			serverMocks.TeamsMock.AddTeamMembersFunc = func(
 				_ context.Context, req *iam_req.AddTeamMembersReq) (*iam_resp.AddTeamMembersResp, error) {
 
@@ -280,7 +298,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 			assert.True(t, addUser)
 		})
 
-		t.Run("when AddUsers returns an unexpected error it raises the error", func(t *testing.T) {
+		t.Run("when AddTeamMembers returns an unexpected error it raises the error", func(t *testing.T) {
 			serverMocks.TeamsMock.AddTeamMembersFunc = func(
 				_ context.Context, req *iam_req.AddTeamMembersReq) (*iam_resp.AddTeamMembersResp, error) {
 
@@ -373,8 +391,8 @@ func getUserError(c codes.Code) func(context.Context, *iam_req.GetUserReq) (*iam
 	}
 }
 
-func getTeamError(c codes.Code) func(context.Context, *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
-	return func(context.Context, *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
+func listTeamsError(c codes.Code) func(context.Context, *iam_req.ListTeamsReq) (*iam_resp.ListTeamsResp, error) {
+	return func(context.Context, *iam_req.ListTeamsReq) (*iam_resp.ListTeamsResp, error) {
 		return nil, status.Error(c, "unexpected error")
 	}
 }

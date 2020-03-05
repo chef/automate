@@ -162,8 +162,9 @@ func EnsureTeam(ctx context.Context,
 
 	if !found && !dryRun {
 		_, err := apiClient.TeamsClient().CreateTeam(ctx, &iam_req.CreateTeamReq{
-			Id:   id,
-			Name: name,
+			Id:       id,
+			Name:     name,
+			Projects: []string{},
 		})
 		if err != nil {
 			return false, wrapUnexpectedError(err, "Failed to create team %q", id)
