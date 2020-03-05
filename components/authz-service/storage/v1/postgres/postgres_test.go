@@ -17,6 +17,7 @@ import (
 
 	constants "github.com/chef/automate/components/authz-service/constants/v1"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v1"
 	"github.com/chef/automate/components/authz-service/storage/v1/postgres"
@@ -44,6 +45,11 @@ func TestPostgres(t *testing.T) {
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
+	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../../postgres/datamigration/sql")
+	if err != nil {
+		t.Fatalf("couldn't initialize pg data config for tests: %s", err.Error())
+	}
+
 	if migrationConfig == nil {
 		t.Skipf("start pg container and set PG_URL to run")
 	}
@@ -56,7 +62,7 @@ func TestPostgres(t *testing.T) {
 	_, err = db.ExecContext(ctx, resetDatabaseStatement)
 	require.NoError(t, err)
 
-	backend, err := postgres.New(ctx, l, *migrationConfig)
+	backend, err := postgres.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
 	require.NoError(t, err)
 
 	// ! \\ this needs to happen BEFORE the reset

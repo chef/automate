@@ -11,7 +11,7 @@ title 'Automate 2.0 Smoke Tests'
     },
   },
   'authz-service': {
-    path: '/api/v0/auth/policies/version',
+    path: '/apis/iam/v2/policy_version',
     response_match: {
       name: 'authz-service'
     },

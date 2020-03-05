@@ -79,106 +79,9 @@ func init() {
           "Authorization"
         ]
       }
-    },
-    "/auth/policies": {
-      "get": {
-        "operationId": "ListPolicies",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.authz.response.ListPoliciesResp"
-            }
-          }
-        },
-        "tags": [
-          "Authorization"
-        ]
-      },
-      "post": {
-        "operationId": "CreatePolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.authz.response.CreatePolicyResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.authz.request.CreatePolicyReq"
-            }
-          }
-        ],
-        "tags": [
-          "Authorization"
-        ]
-      }
-    },
-    "/auth/policies/version": {
-      "get": {
-        "operationId": "GetVersion",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.common.version.VersionInfo"
-            }
-          }
-        },
-        "tags": [
-          "Authorization"
-        ]
-      }
-    },
-    "/auth/policies/{id}": {
-      "delete": {
-        "operationId": "DeletePolicy",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.authz.response.DeletePolicyResp"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "Authorization"
-        ]
-      }
     }
   },
   "definitions": {
-    "chef.automate.api.authz.request.CreatePolicyReq": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "type": "string"
-        },
-        "subjects": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "resource": {
-          "type": "string"
-        }
-      }
-    },
     "chef.automate.api.authz.request.IntrospectReq": {
       "type": "object",
       "properties": {
@@ -204,69 +107,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.authz.response.CreatePolicyResp": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "type": "string"
-        },
-        "subjects": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "id": {
-          "type": "string"
-        },
-        "resource": {
-          "type": "string"
-        },
-        "effect": {
-          "type": "string"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "date-time"
-        }
-      },
-      "description": "We aren't using a Policy message here since we want to\nreturn a flat object via our external HTTP API."
-    },
-    "chef.automate.api.authz.response.DeletePolicyResp": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "type": "string"
-        },
-        "subjects": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "id": {
-          "type": "string"
-        },
-        "resource": {
-          "type": "string"
-        },
-        "effect": {
-          "type": "string"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
     "chef.automate.api.authz.response.IntrospectResp": {
       "type": "object",
       "properties": {
@@ -274,17 +114,6 @@ func init() {
           "type": "object",
           "additionalProperties": {
             "$ref": "#/definitions/chef.automate.api.authz.response.MethodsAllowed"
-          }
-        }
-      }
-    },
-    "chef.automate.api.authz.response.ListPoliciesResp": {
-      "type": "object",
-      "properties": {
-        "policies": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.authz.response.Policy"
           }
         }
       }
@@ -311,54 +140,6 @@ func init() {
         "patch": {
           "type": "boolean",
           "format": "boolean"
-        }
-      }
-    },
-    "chef.automate.api.authz.response.Policy": {
-      "type": "object",
-      "properties": {
-        "action": {
-          "type": "string"
-        },
-        "subjects": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "id": {
-          "type": "string"
-        },
-        "resource": {
-          "type": "string"
-        },
-        "effect": {
-          "type": "string"
-        },
-        "created_at": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updated_at": {
-          "type": "string",
-          "format": "date-time"
-        }
-      }
-    },
-    "chef.automate.api.common.version.VersionInfo": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "version": {
-          "type": "string"
-        },
-        "sha": {
-          "type": "string"
-        },
-        "built": {
-          "type": "string"
         }
       }
     }

@@ -15,7 +15,7 @@ import (
 	api "github.com/chef/automate/api/interservice/authn"
 	authz "github.com/chef/automate/api/interservice/authz/common"
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	teams "github.com/chef/automate/api/interservice/teams/v1"
+	teams "github.com/chef/automate/api/interservice/teams/v2"
 	"github.com/chef/automate/components/authn-service/authenticator"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	"github.com/chef/automate/lib/grpc/health"
@@ -48,7 +48,7 @@ type Server struct {
 	authenticators     map[string]authenticator.Authenticator
 	logger             *zap.Logger
 	connFactory        *secureconn.Factory
-	teamsClient        teams.TeamsV1Client
+	teamsClient        teams.TeamsV2Client
 	authzSubjectClient authz.SubjectPurgeClient
 	authzV2Client      authz_v2.AuthorizationClient
 	health             *health.Service
@@ -167,7 +167,7 @@ func newServer(ctx context.Context, c Config, authzV2Client authz_v2.Authorizati
 		authenticators:     authenticators,
 		logger:             c.Logger,
 		connFactory:        factory,
-		teamsClient:        teams.NewTeamsV1Client(teamsConn),
+		teamsClient:        teams.NewTeamsV2Client(teamsConn),
 		health:             health.NewService(),
 	}
 
@@ -178,13 +178,13 @@ func newServer(ctx context.Context, c Config, authzV2Client authz_v2.Authorizati
 }
 
 func (s *Server) fetchLocalTeams(ctx context.Context, userID string) ([]string, error) {
-	teamsResp, err := s.teamsClient.GetTeamsForUser(ctx, &teams.GetTeamsForUserReq{UserId: userID})
+	teamsResp, err := s.teamsClient.GetTeamsForMember(ctx, &teams.GetTeamsForMemberReq{UserId: userID})
 	if err != nil {
 		return nil, errors.Wrapf(err, "failed to fetch local teams for user %q", userID)
 	}
 	teams := make([]string, len(teamsResp.GetTeams()))
 	for i, team := range teamsResp.GetTeams() {
-		teams[i] = team.GetName()
+		teams[i] = team.GetId()
 	}
 
 	return teams, nil

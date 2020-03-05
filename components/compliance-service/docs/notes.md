@@ -42,11 +42,8 @@ sudo chef-automate restart-services
 
 #### get a token for api calls
 ```
-sudo chef-automate admin-token
+sudo chef-automate iam token create <token-name> --admin
 ```
-
-
-
 
 ## working with compliance service in A2 (dev mode/hab studio)
 

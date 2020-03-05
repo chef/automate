@@ -14,7 +14,7 @@ import (
 
 	authz "github.com/chef/automate/api/interservice/authz/common"
 	api "github.com/chef/automate/api/interservice/local_user"
-	teams_api "github.com/chef/automate/api/interservice/teams/v1"
+	teams_api "github.com/chef/automate/api/interservice/teams/v2"
 	"github.com/chef/automate/components/local-user-service/users"
 	usersMock "github.com/chef/automate/components/local-user-service/users/mock"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -552,13 +552,13 @@ func TestUsersGRPCInternalErrors(t *testing.T) {
 	})
 }
 
-func newTeamsMock(t *testing.T) (*grpctest.Server, *teams_api.TeamsV1ServerMock) {
+func newTeamsMock(t *testing.T) (*grpctest.Server, *teams_api.TeamsV2ServerMock) {
 	t.Helper()
 	certs := helpers.LoadDevCerts(t, "teams-service")
-	mockTeams := teams_api.NewTeamsV1ServerMock()
+	mockTeams := teams_api.NewTeamsV2ServerMock()
 	connFactory := secureconn.NewFactory(*certs)
 	g := connFactory.NewServer()
-	teams_api.RegisterTeamsV1Server(g, mockTeams)
+	teams_api.RegisterTeamsV2Server(g, mockTeams)
 	teams := grpctest.NewServer(g)
 	return teams, mockTeams
 }

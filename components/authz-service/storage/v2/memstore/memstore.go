@@ -19,7 +19,6 @@ type State struct {
 	roles          *cache.Cache
 	projects       *cache.Cache
 	rules          *cache.Cache
-	ms             storage.MigrationStatus
 	projectLimit   int
 }
 
@@ -551,39 +550,8 @@ func (s *State) Reset(ctx context.Context) error {
 	return nil
 }
 
-func (s *State) ApplyV2DataMigrations(context.Context) error {
-	return nil
-}
-
 func (s *State) Close() error {
 	return nil
-}
-
-func (s *State) Success(context.Context) error {
-	s.ms = storage.Successful
-	return nil
-}
-
-func (s *State) SuccessBeta1(context.Context) error {
-	s.ms = storage.SuccessfulBeta1
-	return nil
-}
-
-func (s *State) InProgress(context.Context) error {
-	s.ms = storage.InProgress
-	return nil
-}
-
-func (s *State) Failure(context.Context) error {
-	if s.ms == storage.InProgress {
-		s.ms = storage.Failed
-		return nil
-	}
-	return errors.New("cannot transition to failure")
-}
-
-func (s *State) MigrationStatus(context.Context) (storage.MigrationStatus, error) {
-	return s.ms, nil
 }
 
 // PoliciesCache is used in testing
@@ -604,8 +572,4 @@ func (s *State) ProjectsCache() *cache.Cache {
 // RulesCache is used in testing
 func (s *State) RulesCache() *cache.Cache {
 	return s.rules
-}
-func (s *State) Pristine(context.Context) error {
-	s.ms = storage.Pristine
-	return nil
 }

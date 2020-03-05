@@ -1,4 +1,4 @@
-import { describeIfIAMV2p1, isV1, itFlaky } from '../../../support/constants';
+import { itFlaky } from '../../../support/constants';
 
 describe('team details', () => {
   let adminIdToken = '';
@@ -11,7 +11,6 @@ describe('team details', () => {
   const project2ID = `${cypressPrefix}-project2-${now}`;
   const project2Name = `${cypressPrefix} project2 ${now}`;
   const unassigned = '(unassigned)';
-  let teamUIRouteIdentifier = '';
   const nameForUser = cypressPrefix + ' user ' + now;
   const usernameForUser = cypressPrefix + 'testing-user-' + now;
   let userMembershipID = '';
@@ -38,27 +37,25 @@ describe('team details', () => {
         userMembershipID = resp.body.id;
       });
 
-      if (!isV1()) {
-        cy.request({
-          auth: { bearer: adminIdToken },
-          method: 'POST',
-          url: '/apis/iam/v2/projects',
-          body: {
-            id: project1ID,
-            name: project1Name
-          }
-        });
+      cy.request({
+        auth: { bearer: adminIdToken },
+        method: 'POST',
+        url: '/apis/iam/v2/projects',
+        body: {
+          id: project1ID,
+          name: project1Name
+        }
+      });
 
-        cy.request({
-          auth: { bearer: adminIdToken },
-          method: 'POST',
-          url: '/apis/iam/v2/projects',
-          body: {
-            id: project2ID,
-            name: project2Name
-          }
-        });
-      }
+      cy.request({
+        auth: { bearer: adminIdToken },
+        method: 'POST',
+        url: '/apis/iam/v2/projects',
+        body: {
+          id: project2ID,
+          name: project2Name
+        }
+      });
 
       cy.request({
         auth: { bearer: adminIdToken },
@@ -71,8 +68,6 @@ describe('team details', () => {
       }).then((resp) => {
         const guid = resp.body.team.id;
 
-        teamUIRouteIdentifier = isV1() ? guid : teamID;
-
         cy.request({
           auth: { bearer: adminIdToken },
           method: 'POST',
@@ -82,7 +77,7 @@ describe('team details', () => {
           }
         });
 
-        cy.visit(`/settings/teams/${teamUIRouteIdentifier}#users`);
+        cy.visit(`/settings/teams/${teamID}#users`);
         cy.get('app-welcome-modal').invoke('hide');
       });
     });
@@ -101,11 +96,10 @@ describe('team details', () => {
   });
 
   it('displays team details for admins team', () => {
-    const title = isV1() ? teamID : teamName ;
     cy.get('chef-breadcrumbs').contains('Teams');
-    cy.get('chef-breadcrumbs').contains(title);
+    cy.get('chef-breadcrumbs').contains(teamName);
 
-    cy.get('.page-title').contains(title);
+    cy.get('.page-title').contains(teamName);
     cy.contains('Add User');
   });
 
@@ -119,7 +113,7 @@ describe('team details', () => {
     });
   });
 
-  describeIfIAMV2p1('update team projects (IAM v2.1 only)', () => {
+  describe('update team projects', () => {
     const dropdownNameUntilEllipsisLen = 25;
 
     context('when only the unassigned project is selected', () => {
@@ -146,7 +140,7 @@ describe('team details', () => {
         cy.request({
           auth: { bearer: adminIdToken },
           method: 'PUT',
-          url: `/apis/iam/v2/teams/${teamUIRouteIdentifier}`,
+          url: `/apis/iam/v2/teams/${teamID}`,
           body: {
             name: teamName,
             projects: [project1ID]
@@ -160,7 +154,7 @@ describe('team details', () => {
         cy.request({
           auth: { bearer: adminIdToken },
           method: 'PUT',
-          url: `/apis/iam/v2/teams/${teamUIRouteIdentifier}`,
+          url: `/apis/iam/v2/teams/${teamID}`,
           body: {
             name: teamName,
             projects: []

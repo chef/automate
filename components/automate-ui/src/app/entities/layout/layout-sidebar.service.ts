@@ -4,7 +4,6 @@ import { Subject, Observable, BehaviorSubject } from 'rxjs';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { isProductDeployed } from 'app/staticConfig';
-import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { clientRunsWorkflowEnabled } from 'app/entities/client-runs/client-runs.selectors';
 import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
@@ -17,7 +16,6 @@ import { MenuItemGroup } from 'app/entities/layout/layout.model';
 })
 export class LayoutSidebarService implements OnInit, OnDestroy {
     public chefInfraServerViewsFeatureFlagOn: boolean;
-    public isIAMv2$: Observable<boolean>;
     public ServiceNowFeatureFlagOn: boolean;
     private activeSidebar: string;
     private workflowEnabled$: Observable<boolean>;
@@ -31,7 +29,6 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
     ) {
         this.ServiceNowFeatureFlagOn = this.featureFlagsService.getFeatureStatus('servicenow_cmdb');
         this.chefInfraServerViewsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('chefInfraServerViews');
-        this.isIAMv2$ = this.store.select(isIAMv2);
         this.workflowEnabled$ = this.clientRunsStore.select(clientRunsWorkflowEnabled);
     }
 
@@ -173,7 +170,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
                 icon: 'person',
                 route: '/settings/users',
                 authorized: {
-                  allOf: ['/auth/users', 'get']
+                  allOf: ['/iam/v2/users', 'get']
                 }
               },
               {
@@ -222,8 +219,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
                   allOf: ['/iam/v2/projects', 'get']
                 }
               }
-            ],
-            visible$: this.isIAMv2$
+            ]
           }
         ],
         profile: [{

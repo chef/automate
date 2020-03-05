@@ -39,14 +39,12 @@ import (
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_teams "github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	pb_tokens "github.com/chef/automate/components/automate-gateway/api/auth/tokens"
-	pb_users "github.com/chef/automate/components/automate-gateway/api/auth/users"
 	pb_authz "github.com/chef/automate/components/automate-gateway/api/authz"
 	policy "github.com/chef/automate/components/automate-gateway/api/authz/policy"
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_eventfeed "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
-	pb_iam_v2 "github.com/chef/automate/components/automate-gateway/api/iam/v2"
+	pb_iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	pb_legacy "github.com/chef/automate/components/automate-gateway/api/legacy"
 	pb_license "github.com/chef/automate/components/automate-gateway/api/license"
 	pb_notifications "github.com/chef/automate/components/automate-gateway/api/notifications"
@@ -192,25 +190,22 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create projects client for authz-service")
 	}
-	pb_iam_v2.RegisterPoliciesServer(grpcServer,
+	pb_iam.RegisterPoliciesServer(grpcServer,
 		handler_policies.NewServer(policiesClient, projectsClient, authzV2Client))
-	pb_iam_v2.RegisterRulesServer(grpcServer, handler_rules.NewServer(projectsClient))
+	pb_iam.RegisterRulesServer(grpcServer, handler_rules.NewServer(projectsClient))
 
 	tokensMgmtClient, err := clients.TokensMgmtClient()
 	if err != nil {
 		return errors.Wrap(err, "create client for tokens mgmt service")
 	}
-	pb_tokens.RegisterTokensMgmtServer(grpcServer, handler.NewTokensMgmtServer(tokensMgmtClient))
-	// IAM v2 uses the same client
-	pb_iam_v2.RegisterTokensServer(grpcServer, handler_tokens.NewServer(tokensMgmtClient))
+	pb_iam.RegisterTokensServer(grpcServer, handler_tokens.NewServer(tokensMgmtClient))
 
 	usersMgmtClient, err := clients.UsersMgmtClient()
 	if err != nil {
 		return errors.Wrap(err, "create client for users mgmt service")
 	}
-	pb_users.RegisterUsersMgmtServer(grpcServer, handler.NewUsersMgmtServer(usersMgmtClient))
 	// IAM v2 uses the same client
-	pb_iam_v2.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
+	pb_iam.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
 
 	teamsV1Client, err := clients.TeamsV1Client()
 	if err != nil {
@@ -222,7 +217,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create V2 client for teams service")
 	}
-	pb_iam_v2.RegisterTeamsServer(grpcServer, handler_teams.NewServer(teamsV2Client))
+	pb_iam.RegisterTeamsServer(grpcServer, handler_teams.NewServer(teamsV2Client))
 
 	secretsClient, err := clients.SecretClient()
 	if err != nil {
@@ -356,8 +351,6 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"gateway":              pb_gateway.RegisterGatewayHandlerFromEndpoint,
 		"legacy":               pb_legacy.RegisterLegacyDataCollectorHandlerFromEndpoint,
 		"license":              pb_license.RegisterLicenseHandlerFromEndpoint,
-		"auth tokens":          pb_tokens.RegisterTokensMgmtHandlerFromEndpoint,
-		"auth users":           pb_users.RegisterUsersMgmtHandlerFromEndpoint,
 		"authz":                pb_authz.RegisterAuthorizationHandlerFromEndpoint,
 		"secrets":              pb_secrets.RegisterSecretsServiceHandlerFromEndpoint,
 		"cc_reporting":         pb_cc_reporting.RegisterReportingServiceHandlerFromEndpoint,
@@ -377,11 +370,11 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 
 func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFeatureFlags) (http.Handler, func(), error) {
 	endpointMap := map[string]registerFunc{
-		"policies v2": pb_iam_v2.RegisterPoliciesHandlerFromEndpoint,
-		"users v2":    pb_iam_v2.RegisterUsersHandlerFromEndpoint,
-		"tokens v2":   pb_iam_v2.RegisterTokensHandlerFromEndpoint,
-		"teams v2":    pb_iam_v2.RegisterTeamsHandlerFromEndpoint,
-		"rules v2":    pb_iam_v2.RegisterRulesHandlerFromEndpoint,
+		"policies v2": pb_iam.RegisterPoliciesHandlerFromEndpoint,
+		"users v2":    pb_iam.RegisterUsersHandlerFromEndpoint,
+		"tokens v2":   pb_iam.RegisterTokensHandlerFromEndpoint,
+		"teams v2":    pb_iam.RegisterTeamsHandlerFromEndpoint,
+		"rules v2":    pb_iam.RegisterRulesHandlerFromEndpoint,
 	}
 	return muxFromRegisterMap(grpcURI, dopts, endpointMap)
 }
@@ -452,12 +445,10 @@ func (s *Server) ProfileCreateHandler(w http.ResponseWriter, r *http.Request) {
 	owner := r.URL.Query().Get("owner")
 
 	const (
-		actionV1 = "upload"
-		actionV2 = "compliance:profiles:create"
+		action = "compliance:profiles:create"
 	)
-	resourceV1 := fmt.Sprintf("compliance:profiles:storage:%s", owner)
-	resourceV2 := fmt.Sprintf("compliance:profiles:%s", owner)
-	ctx, err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2)
+	resource := fmt.Sprintf("compliance:profiles:%s", owner)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -531,19 +522,16 @@ func (s *Server) ProfileTarHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	log.Infof("processing profile tar request for owner: %s, name: %s %s", profileOwner, profileName, profileVersion)
 
-	var resourceV1, actionV1, resourceV2, actionV2 string
-	actionV1 = "read"
+	var resource, action string
 	if len(profileOwner) > 0 {
-		resourceV1 = fmt.Sprintf("compliance:profiles:storage:%s", profileOwner)
-		actionV2 = "compliance:profiles:get"
-		resourceV2 = fmt.Sprintf("compliance:profiles:%s", profileOwner)
+		action = "compliance:profiles:get"
+		resource = fmt.Sprintf("compliance:profiles:%s", profileOwner)
 	} else {
-		resourceV1 = "compliance:profiles:market"
-		actionV2 = "compliance:marketProfiles:get"
-		resourceV2 = "compliance:profiles:market"
+		action = "compliance:marketProfiles:get"
+		resource = "compliance:profiles:market"
 	}
 
-	ctx, err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -582,12 +570,11 @@ func (s *Server) ReportExportHandler(w http.ResponseWriter, r *http.Request) {
 	// we can't be more specific. Also, we can do this before looking at the
 	// request body.
 	const (
-		resource = "compliance:reporting:reports" // v1 and v2? OK...
-		actionV1 = "export"
-		actionV2 = "compliance:reports:export"
+		resource = "compliance:reporting:reports"
+		action   = "compliance:reports:export"
 	)
 
-	ctx, err := s.authRequest(r, resource, actionV1, resource, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -647,11 +634,10 @@ func writeContent(w http.ResponseWriter, stream reporting.ReportingService_Expor
 func (s *Server) NodeExportHandler(w http.ResponseWriter, r *http.Request) {
 	const (
 		resource = "compliance:reporting:nodes:{id}"
-		actionV1 = "export"
-		actionV2 = "compliance:reportNodes:export"
+		action   = "compliance:reportNodes:export"
 	)
 
-	ctx, err := s.authRequest(r, resource, actionV1, resource, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -681,13 +667,11 @@ func (s *Server) NodeExportHandler(w http.ResponseWriter, r *http.Request) {
 
 func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Request) {
 	const (
-		actionV1   = "read"
-		resourceV1 = "cfgmgmt:nodes"
-		actionV2   = "infra:nodes:list"
-		resourceV2 = "infra:nodes"
+		action   = "infra:nodes:list"
+		resource = "infra:nodes"
 	)
 
-	ctx, err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -726,13 +710,11 @@ func (s *Server) configMgmtNodeExportHandler(w http.ResponseWriter, r *http.Requ
 
 func (s *Server) configMgmtReportExportHandler(w http.ResponseWriter, r *http.Request) {
 	const (
-		actionV1   = "read"
-		resourceV1 = "cfgmgmt:nodes"
-		actionV2   = "infra:nodes:list"
-		resourceV2 = "infra:nodes"
+		action   = "infra:nodes:list"
+		resource = "infra:nodes"
 	)
 
-	ctx, err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -771,13 +753,11 @@ func (s *Server) configMgmtReportExportHandler(w http.ResponseWriter, r *http.Re
 
 func (s *Server) DeploymentStatusHandler(w http.ResponseWriter, r *http.Request) {
 	const (
-		actionV1   = "read"
-		resourceV1 = "service_info:status"
-		actionV2   = "system:status:get"
-		resourceV2 = "system:service:status"
+		action   = "system:status:get"
+		resource = "system:service:status"
 	)
 
-	ctx, err := s.authRequest(r, resourceV1, actionV1, resourceV2, actionV2)
+	ctx, err := s.authRequest(r, resource, action)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
@@ -859,9 +839,7 @@ func init() {
 		func(unexpandedResource string, input interface{}) string { return unexpandedResource })
 }
 
-func (s *Server) authRequest(r *http.Request,
-	resourceV1, actionV1, resourceV2, actionV2 string,
-) (context.Context, error) {
+func (s *Server) authRequest(r *http.Request, resource, action string) (context.Context, error) {
 	subjects := []string{}
 	// Create a context with the request headers metadata. Normally grpc-gateway
 	// does this, but since this is being used in a custom handler we've got do
@@ -910,7 +888,7 @@ func (s *Server) authRequest(r *http.Request,
 
 	projects := auth_context.ProjectsFromMetadata(md)
 
-	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resourceV1, actionV1, resourceV2, actionV2, projects)
+	authzResp, err := s.authorizer.IsAuthorized(ctx, subjects, resource, action, projects)
 	if err != nil {
 		return nil, errors.Wrap(err, "authz-service error")
 	}

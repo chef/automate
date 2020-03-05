@@ -273,9 +273,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.iam.v2.ApplyV2DataMigrationsResp": {
-      "type": "object"
-    },
     "chef.automate.api.iam.v2.CreateTeamReq": {
       "type": "object",
       "properties": {
@@ -382,9 +379,6 @@ func init() {
           }
         }
       }
-    },
-    "chef.automate.api.iam.v2.ResetAllTeamProjectsResp": {
-      "type": "object"
     },
     "chef.automate.api.iam.v2.Team": {
       "type": "object",

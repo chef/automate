@@ -21,7 +21,6 @@ export class CreateObjectModalComponent implements OnInit, OnDestroy, OnChanges 
   @Input() visible = false;
   @Input() creating = false;
   @Input() objectNoun: string;
-  @Input() showProjectsDropdown = false;
   @Input() createProjectModal = false;
   @Input() assignableProjects: Project[] = [];
   @Input() createForm: FormGroup; // NB: The form must contain 'name' and 'id' fields

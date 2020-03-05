@@ -10,7 +10,6 @@ import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
 import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
-import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
@@ -98,8 +97,6 @@ describe('PendingEditsBarComponent', () => {
     fixture = TestBed.createComponent(PendingEditsBarComponent);
     component = fixture.componentInstance;
     store = TestBed.get(Store);
-
-    store.dispatch(new GetIamVersionSuccess({ version: { major: 'v2' } }));
     fixture.detectChanges();
   });
 

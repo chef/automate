@@ -3,10 +3,7 @@ package v1
 import (
 	"context"
 	"fmt"
-	"time"
 
-	"github.com/golang/protobuf/ptypes"
-	"github.com/golang/protobuf/ptypes/timestamp"
 	"github.com/pkg/errors"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -16,7 +13,7 @@ import (
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
-	storage_errors "github.com/chef/automate/components/authz-service/storage"
+	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
 	storage "github.com/chef/automate/components/authz-service/storage/v1"
 	memstore_v1 "github.com/chef/automate/components/authz-service/storage/v1/memstore"
@@ -58,9 +55,10 @@ func NewPostgresServer(
 	ctx context.Context,
 	l logger.Logger,
 	e engine.V1Engine,
-	migrationsConfig migration.Config) (*Server, error) {
+	migrationsConfig migration.Config,
+	datamigrationsConfig datamigration.Config) (*Server, error) {
 
-	p, err := postgres_v1.New(ctx, l, migrationsConfig)
+	p, err := postgres_v1.New(ctx, l, migrationsConfig, datamigrationsConfig)
 	if err != nil {
 		return nil, errors.Wrapf(err, "init postgres for IAM v1")
 	}
@@ -155,143 +153,6 @@ func toEnginePairs(pairs []*authz.Pair) []engine.Pair {
 		ps[i] = engine.Pair{Resource: engine.Resource(p.Resource), Action: engine.Action(p.Action)}
 	}
 	return ps
-}
-
-// CreatePolicy allows the user to persist a policy that informs AuthZ rules.
-func (s *Server) CreatePolicy(
-	ctx context.Context,
-	req *authz.CreatePolicyReq) (*authz.CreatePolicyResp, error) {
-
-	var policy *storage.Policy
-	var err error
-	if policy, err = s.storage.StorePolicy(ctx, req.Action, req.Subjects, req.Resource, DefaultEffect); err != nil {
-		return nil, unexpectedError(err)
-	}
-
-	if err = s.updateEngineStore(ctx); err != nil {
-		return nil, unexpectedError(err)
-	}
-
-	pol, err := fromStorage(policy)
-	if err != nil {
-		return nil, unexpectedError(err)
-	}
-	return &authz.CreatePolicyResp{
-		Policy: pol,
-	}, nil
-}
-
-// ListPolicies returns a list of all policies from storage.
-func (s *Server) ListPolicies(
-	ctx context.Context,
-	req *authz.ListPoliciesReq) (*authz.ListPoliciesResp, error) {
-
-	var policies []*storage.Policy
-	var err error
-	if policies, err = s.storage.ListPolicies(ctx); err != nil {
-		return nil, unexpectedError(err)
-	}
-
-	pols, err := fromStorageToList(policies)
-	if err != nil {
-		return nil, unexpectedError(err)
-	}
-
-	return &authz.ListPoliciesResp{
-		Policies: pols,
-	}, nil
-}
-
-// DeletePolicy removes a policy from storage by id.
-func (s *Server) DeletePolicy(
-	ctx context.Context,
-	req *authz.DeletePolicyReq) (*authz.DeletePolicyResp, error) {
-
-	var policy *storage.Policy
-	var err error
-	if policy, err = s.storage.DeletePolicy(ctx, req.Id); err != nil {
-		switch err {
-		case storage_errors.ErrNotFound:
-			return nil, status.Errorf(codes.NotFound, "no policy with id %q found to delete", req.Id)
-		case storage_errors.ErrCannotDelete:
-			return nil, status.Errorf(codes.InvalidArgument,
-				"policy with id %q is marked as non-deletable and cannot be removed", req.Id)
-		}
-		return nil, unexpectedError(err)
-	}
-
-	if err = s.updateEngineStore(ctx); err != nil {
-		return nil, unexpectedError(err)
-	}
-
-	pol, err := fromStorage(policy)
-	if err != nil {
-		return nil, unexpectedError(err)
-	}
-	return &authz.DeletePolicyResp{
-		Policy: pol,
-	}, nil
-}
-
-func (s *Server) PurgeSubjectFromPolicies(
-	ctx context.Context,
-	req *authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
-	policies, err := s.storage.PurgeSubjectFromPolicies(ctx, req.Subject)
-	if err != nil {
-		return nil, unexpectedError(err)
-	}
-
-	err = s.updateEngineStore(ctx)
-	if err != nil {
-		return nil, unexpectedError(err)
-	}
-
-	polIDs := make([]string, len(policies))
-	for i := range policies {
-		polIDs[i] = policies[i].String()
-	}
-
-	return &authz.PurgeSubjectFromPoliciesResp{Ids: polIDs}, nil
-}
-
-func fromStorage(s *storage.Policy) (*authz.Policy, error) {
-	createdAt, err := ptypes.TimestampProto(s.CreatedAt)
-	if err != nil {
-		return nil, errors.Wrapf(err, "could not convert policy with ID %q from database.", s.ID)
-	}
-
-	var updatedAt *timestamp.Timestamp
-	unset := time.Time{}
-	if s.UpdatedAt != unset {
-		updatedAt, err = ptypes.TimestampProto(s.UpdatedAt)
-		if err != nil {
-			return nil, errors.Wrapf(err, "could not convert policy with ID %q from database.", s.ID)
-		}
-	}
-	p := authz.Policy{
-		Action:    s.Action,
-		Id:        s.ID.String(),
-		Resource:  s.Resource,
-		Subjects:  s.Subjects,
-		Effect:    s.Effect,
-		CreatedAt: createdAt,
-		UpdatedAt: updatedAt,
-	}
-	return &p, nil
-}
-
-func fromStorageToList(sl []*storage.Policy) ([]*authz.Policy, error) {
-	tl := make([]*authz.Policy, len(sl))
-
-	for i, policy := range sl {
-		pol, err := fromStorage(policy)
-		if err != nil {
-			return nil, err
-		}
-		tl[i] = pol
-	}
-
-	return tl, nil
 }
 
 func unexpectedError(err error) error {

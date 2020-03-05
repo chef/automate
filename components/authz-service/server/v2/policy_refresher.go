@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	api "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
@@ -245,23 +244,4 @@ func (refresher *policyRefresher) getRoleMap(ctx context.Context) (map[string]in
 		}
 	}
 	return data, nil
-}
-
-func (refresher *policyRefresher) getIAMVersion(ctx context.Context) (api.Version, error) {
-	var vsn api.Version
-	ms, err := refresher.store.MigrationStatus(ctx)
-	if err != nil {
-		return vsn, err
-	}
-	switch ms {
-	// this case should no longer happen
-	// since the iam v2 upgrade command always upgrades to v2.1
-	case storage.Successful:
-		vsn = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
-	case storage.SuccessfulBeta1:
-		vsn = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
-	default:
-		vsn = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
-	}
-	return vsn, nil
 }

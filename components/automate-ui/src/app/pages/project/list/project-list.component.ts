@@ -12,7 +12,6 @@ import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
-import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectService } from 'app/entities/projects/project.service';
 import {
   allProjects, getAllStatus, createStatus, createError
@@ -28,7 +27,6 @@ import { ChefKeyboardEvent } from 'app/types/material-types';
   styleUrls: ['./project-list.component.scss']
 })
 export class ProjectListComponent implements OnInit, OnDestroy {
-  public isIAMv2$: Observable<boolean>;
   public sortedProjects$: Observable<Project[]>;
   public projectToDelete: Project;
   public deleteModalVisible = false;
@@ -73,8 +71,6 @@ export class ProjectListComponent implements OnInit, OnDestroy {
     );
     this.sortedProjects$ = this.store.select(allProjects).pipe(
       map((unsorted: Project[]) => ChefSorters.naturalSort(unsorted, 'name')));
-
-    this.isIAMv2$ = this.store.select(isIAMv2);
 
     // handle project creation success response
     this.store.pipe(

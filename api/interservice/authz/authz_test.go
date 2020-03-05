@@ -180,104 +180,6 @@ var (
 	}
 )
 
-func TestValidateCreatePolicyReq(t *testing.T) {
-	t.Run("resource", func(t *testing.T) {
-		cases := map[string]struct {
-			cases    map[string]string
-			testFunc func(validatable) func(*testing.T)
-		}{
-			"negative": {actionAndResourceTests.negative, expectFailure},
-			"positive": {actionAndResourceTests.positive, expectSuccess},
-			"variable": {actionAndResourceTests.variable, expectSuccess},
-			"wildcard": {actionAndResourceTests.wildcards, expectSuccess},
-		}
-		for class, test := range cases {
-			t.Run(class, func(t *testing.T) {
-				for name, tc := range test.cases {
-					t.Run(name, test.testFunc(&authz.CreatePolicyReq{
-						Subjects: engine.Subject("team:local:admins"),
-						Resource: tc,
-						Action:   "read",
-					}))
-				}
-			})
-		}
-	})
-
-	t.Run("action", func(t *testing.T) {
-		cases := map[string]struct {
-			cases    map[string]string
-			testFunc func(validatable) func(*testing.T)
-		}{
-			"negative": {actionAndResourceTests.negative, expectFailure},
-			"positive": {actionAndResourceTests.positive, expectSuccess},
-			"wildcard": {actionAndResourceTests.wildcards, expectSuccess},
-		}
-		for class, test := range cases {
-			t.Run(class, func(t *testing.T) {
-				for name, tc := range test.cases {
-					t.Run(name, test.testFunc(&authz.CreatePolicyReq{
-						Subjects: engine.Subject("team:local:admins"),
-						Resource: "nodes:foo",
-						Action:   tc,
-					}))
-				}
-			})
-		}
-	})
-
-	t.Run("subject", func(t *testing.T) {
-		cases := map[string]struct {
-			cases    map[string][]string
-			testFunc func(validatable) func(*testing.T)
-		}{
-			"negative": {subjectsTests.negative, expectFailure},
-			"positive": {subjectsTests.positive, expectSuccess},
-			"wildcard": {subjectsTests.wildcards, expectSuccess},
-		}
-		for class, test := range cases {
-			t.Run(class, func(t *testing.T) {
-				for name, tc := range test.cases {
-					t.Run(name, test.testFunc(&authz.CreatePolicyReq{
-						Subjects: tc,
-						Resource: "nodes:foo",
-						Action:   "read",
-					}))
-				}
-			})
-		}
-	})
-}
-
-func TestValidateDeletePolicyReq(t *testing.T) {
-	negativeCases := map[string]string{
-		"empty":                      "",
-		"not a UUIDv4":               "IAmaUuidV4pleaseBelieveMe",
-		"same in length as a UUIDv4": "11111111-1111-1111-1111-111111111111",
-	}
-	positiveCases := map[string]string{
-		"proper UUIDv4":                "1d36c4ff-d0cb-4ad1-90ed-55a892a0d9c8",
-		"proper UUIDv4 with uppercase": "1D36C4FF-D0CB-4AD1-90ED-55A892A0D9C8",
-		"looks odd but is UUIDv4":      "00000000-0000-4000-8000-000000000000",
-	}
-
-	tests := map[string]struct {
-		cases    map[string]string
-		testFunc func(validatable) func(*testing.T)
-	}{
-		"negative": {negativeCases, expectFailure},
-		"positive": {positiveCases, expectSuccess},
-	}
-
-	for class, test := range tests {
-		t.Run(class, func(t *testing.T) {
-			for name, tc := range test.cases {
-				t.Run(name, test.testFunc(&authz.DeletePolicyReq{Id: tc}))
-			}
-		})
-	}
-}
-
 func TestValidateIsAuthorizedReq(t *testing.T) {
 	// Note that wildcards are used only for defining policies,
 	// not when checking authorization. Thus, it is useful to ensure
@@ -430,32 +332,6 @@ func TestValidateFilterAuthorizedPairsReq(t *testing.T) {
 							},
 						},
 					}))
-				}
-			})
-		}
-	})
-}
-
-func TestValidatePurgeSubjectFromPolicies(t *testing.T) {
-	t.Run("subject", func(t *testing.T) {
-		cases := map[string]struct {
-			cases    map[string][]string
-			testFunc func(validatable) func(*testing.T)
-		}{
-			"negative": {subjectsTests.negative, expectFailure},
-			"positive": {subjectsTests.positive, expectSuccess},
-			"wildcard": {subjectsTests.wildcards, expectSuccess},
-		}
-		for class, test := range cases {
-			t.Run(class, func(t *testing.T) {
-				for name, tc := range test.cases {
-					t.Run(name, func(t *testing.T) {
-						for _, sub := range tc {
-							t.Run(sub, test.testFunc(&authz.PurgeSubjectFromPoliciesReq{
-								Subject: sub,
-							}))
-						}
-					})
 				}
 			})
 		}

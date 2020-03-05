@@ -13,8 +13,6 @@ import (
 	_ "github.com/chef/automate/api/external/nodes/manager"
 	_ "github.com/chef/automate/api/external/secrets"
 	_ "github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	_ "github.com/chef/automate/components/automate-gateway/api/auth/tokens"
-	_ "github.com/chef/automate/components/automate-gateway/api/auth/users"
 	_ "github.com/chef/automate/components/automate-gateway/api/authz"
 	_ "github.com/chef/automate/api/external/compliance/profiles"
 	_ "github.com/chef/automate/api/external/compliance/reporting"

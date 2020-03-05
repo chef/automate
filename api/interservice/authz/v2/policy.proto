@@ -281,9 +281,7 @@ service Policies {
     rpc ListPolicies (ListPoliciesReq) returns (ListPoliciesResp) {};
     rpc GetPolicy (GetPolicyReq) returns (Policy) {};
     rpc UpdatePolicy (UpdatePolicyReq) returns (Policy) {};
-    rpc MigrateToV2 (MigrateToV2Req) returns (MigrateToV2Resp) {};
     rpc GetPolicyVersion (GetPolicyVersionReq) returns (GetPolicyVersionResp) {};
-    rpc ResetToV1 (ResetToV1Req) returns (ResetToV1Resp) {};
     rpc CreateRole (CreateRoleReq) returns (Role) {};
     rpc ListRoles (ListRolesReq) returns (ListRolesResp) {};
     rpc GetRole (GetRoleReq) returns (Role) {};

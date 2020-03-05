@@ -667,7 +667,7 @@ With those preliminaries, the following concise syntax gives you access to the P
 This endpoint lists all the policies currently in the policy store.
 
 ```bash
-curl -sSkH "$TOKEN_ARG" $TARGET_HOST/auth/policies | jq .
+curl -sSkH "$TOKEN_ARG" $TARGET_HOST/apis/iam/v2/policies | jq .
 ```
 
 #### Introspect Permissions for Current User
@@ -685,7 +685,7 @@ curl -sSkH "$TOKEN_ARG" $TARGET_HOST/auth/introspect | jq .
 This command executes an HTTP `POST` request.
 
 ```bash
-curl -sSkH "$TOKEN_ARG" $TARGET_HOST/auth/policies --data "$(jo -p subjects=$(jo -a user:local:test@example.com) resource=auth:teams:* action=read version=v0)" | jq .
+curl -sSkH "$TOKEN_ARG" $TARGET_HOST/apis/iam/v2/policies --data "$(jo -p subjects=$(jo -a user:local:test@example.com) resource=auth:teams:* action=read version=v0)" | jq .
 ```
 
 #### Delete Policy
@@ -694,7 +694,7 @@ Use "List Policies" above to find the unique identifier for the policy you wish 
 and supply it here with an HTTP `DELETE` request.
 
 ```bash
-curl -sSkH "$TOKEN_ARG" $TARGET_HOST/auth/policies/f4fd7963-21db-4b5b-a8df-aa688056ed9d --request DELETE | jq .
+curl -sSkH "$TOKEN_ARG" $TARGET_HOST/apis/iam/v2/policies/f4fd7963-21db-4b5b-a8df-aa688056ed9d --request DELETE | jq .
 ```
 
 ### Introspection (How to Query Permissions)

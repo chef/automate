@@ -6,7 +6,6 @@ package authz
 import (
 	"context"
 
-	version "github.com/chef/automate/api/external/common/version"
 	request "github.com/chef/automate/components/automate-gateway/api/authz/request"
 	response "github.com/chef/automate/components/automate-gateway/api/authz/response"
 	"google.golang.org/grpc/codes"
@@ -32,61 +31,9 @@ func NewAuthorizationServerMockWithoutValidation() *AuthorizationServerMock {
 // methods with "not implemented" returns
 type AuthorizationServerMock struct {
 	validateRequests   bool
-	GetVersionFunc     func(context.Context, *version.VersionInfoRequest) (*version.VersionInfo, error)
-	CreatePolicyFunc   func(context.Context, *request.CreatePolicyReq) (*response.CreatePolicyResp, error)
-	ListPoliciesFunc   func(context.Context, *request.ListPoliciesReq) (*response.ListPoliciesResp, error)
-	DeletePolicyFunc   func(context.Context, *request.DeletePolicyReq) (*response.DeletePolicyResp, error)
 	IntrospectAllFunc  func(context.Context, *request.IntrospectAllReq) (*response.IntrospectResp, error)
 	IntrospectSomeFunc func(context.Context, *request.IntrospectSomeReq) (*response.IntrospectResp, error)
 	IntrospectFunc     func(context.Context, *request.IntrospectReq) (*response.IntrospectResp, error)
-}
-
-func (m *AuthorizationServerMock) GetVersion(ctx context.Context, req *version.VersionInfoRequest) (*version.VersionInfo, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.GetVersionFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'GetVersion' not implemented")
-}
-
-func (m *AuthorizationServerMock) CreatePolicy(ctx context.Context, req *request.CreatePolicyReq) (*response.CreatePolicyResp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.CreatePolicyFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'CreatePolicy' not implemented")
-}
-
-func (m *AuthorizationServerMock) ListPolicies(ctx context.Context, req *request.ListPoliciesReq) (*response.ListPoliciesResp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.ListPoliciesFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'ListPolicies' not implemented")
-}
-
-func (m *AuthorizationServerMock) DeletePolicy(ctx context.Context, req *request.DeletePolicyReq) (*response.DeletePolicyResp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.DeletePolicyFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'DeletePolicy' not implemented")
 }
 
 func (m *AuthorizationServerMock) IntrospectAll(ctx context.Context, req *request.IntrospectAllReq) (*response.IntrospectResp, error) {
@@ -127,10 +74,6 @@ func (m *AuthorizationServerMock) Introspect(ctx context.Context, req *request.I
 
 // Reset resets all overridden functions
 func (m *AuthorizationServerMock) Reset() {
-	m.GetVersionFunc = nil
-	m.CreatePolicyFunc = nil
-	m.ListPoliciesFunc = nil
-	m.DeletePolicyFunc = nil
 	m.IntrospectAllFunc = nil
 	m.IntrospectSomeFunc = nil
 	m.IntrospectFunc = nil

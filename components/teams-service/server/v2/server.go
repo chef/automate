@@ -233,26 +233,30 @@ func (s *Server) GetTeamMembership(ctx context.Context,
 	}, err
 }
 
-// UpgradeToV2 applies all IAM v2 specific data migrations.
-func (s *Server) UpgradeToV2(ctx context.Context,
-	_ *teams.UpgradeToV2Req) (*teams.UpgradeToV2Resp, error) {
+// GRPC API functions only used internally (not used in gateway).
 
-	err := s.service.Storage.UpgradeToV2(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "there was an error migrating v2 data: %s", err.Error())
+// PurgeUserMembership removes the user's membership from all teams to which
+// the user belongs and returns that list of teams
+func (s *Server) PurgeUserMembership(ctx context.Context,
+	req *teams.PurgeUserMembershipReq) (*teams.PurgeUserMembershipResp, error) {
+
+	if req.UserId == "" {
+		return nil, status.Error(codes.InvalidArgument, "invalid userId")
 	}
-	return &teams.UpgradeToV2Resp{}, nil
-}
 
-// ResetToV1 removes all projects from every team.
-func (s *Server) ResetToV1(ctx context.Context,
-	_ *teams.ResetToV1Req) (*teams.ResetToV1Resp, error) {
-
-	err := s.service.Storage.ResetToV1(ctx)
+	teamUUIDs, err := s.service.Storage.PurgeUserMembership(ctx, req.UserId)
 	if err != nil {
-		return nil, status.Errorf(codes.Internal, "there was an error resetting teams to v1: %s", err.Error())
+		return nil, service.ParseStorageError(err, req.UserId, "user")
 	}
-	return &teams.ResetToV1Resp{}, nil
+
+	teamIDs := make([]string, len(teamUUIDs))
+	for i, teamUUID := range teamUUIDs {
+		teamIDs[i] = teamUUID.String()
+	}
+
+	return &teams.PurgeUserMembershipResp{
+		Ids: teamIDs,
+	}, nil
 }
 
 func fromStorage(s storage.Team) *teams.Team {

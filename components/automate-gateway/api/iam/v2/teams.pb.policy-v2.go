@@ -120,10 +120,4 @@ func init() {
 		}
 		return ""
 	})
-	policyv2.MapMethodTo("/chef.automate.api.iam.v2.Teams/ApplyV2DataMigrations", "iam:teams", "iam:teams:update", "", "", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
-	policyv2.MapMethodTo("/chef.automate.api.iam.v2.Teams/ResetAllTeamProjects", "iam:teams", "iam:teams:update", "", "", func(unexpandedResource string, input interface{}) string {
-		return unexpandedResource
-	})
 }

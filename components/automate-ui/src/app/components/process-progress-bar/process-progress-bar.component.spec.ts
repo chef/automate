@@ -10,7 +10,6 @@ import { customMatchers } from 'app/testing/custom-matchers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
 import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
-import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
 import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
 import { ProjectService } from 'app/entities/projects/project.service';
 import { ProcessProgressBarComponent } from './process-progress-bar.component';
@@ -95,8 +94,6 @@ describe('ProcessProgressBarComponent', () => {
     fixture = TestBed.createComponent(ProcessProgressBarComponent);
     component = fixture.componentInstance;
     store = TestBed.get(Store);
-
-    store.dispatch(new GetIamVersionSuccess({ version: { major: 'v2' } }));
     fixture.detectChanges();
   });
 

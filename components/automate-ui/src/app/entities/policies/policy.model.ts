@@ -15,7 +15,6 @@ export interface Statement {
 }
 
 export type IAMType = 'CHEF_MANAGED' | 'CUSTOM';
-export type IAMMajorVersion = 'v1' | 'v2';
 
 export interface Member {
   name: string;

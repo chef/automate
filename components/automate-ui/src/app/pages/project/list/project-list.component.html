@@ -7,11 +7,8 @@
           Projects group resources together.
         </chef-subheading>
       </chef-page-header>
-      <section *ngIf="!(isIAMv2$ | async)" class="page-body">
-        Currently, you are using IAM v1. Projects are only available with IAM v2.
-      </section>
 
-      <section *ngIf="isIAMv2$ | async" class="page-body">
+      <section class="page-body">
         <ng-container *ngIf="(sortedProjects$ | async)?.length > 0">
           <chef-toolbar>
             <app-authorized [allOf]="['/iam/v2/projects', 'post']">
@@ -69,7 +66,6 @@
 
       <app-create-object-modal
         [visible]="createModalVisible"
-        [showProjectsDropdown]="false"
         [createProjectModal]="true"
         [creating]="creatingProject"
         [conflictErrorEvent]="conflictErrorEvent"

@@ -1,6 +1,4 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
-
-describeIfIAMV2p1('projects API', () => {
+describe('projects API', () => {
   const cypressPrefix = 'test-projects-api';
   interface Project {
     id: string;

@@ -2,8 +2,8 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, FormControl, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store, select } from '@ngrx/store';
-import { isEmpty, keyBy, at, xor, isNil } from 'lodash/fp';
-import { combineLatest, Subject, Observable } from 'rxjs';
+import { isEmpty, keyBy, at, xor, isNil, identity } from 'lodash/fp';
+import { combineLatest, Subject } from 'rxjs';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
@@ -15,10 +15,8 @@ import { User } from 'app/entities/users/user.model';
 import { Regex } from 'app/helpers/auth/regex';
 import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import {
-  v1TeamFromRoute,
-  v2TeamFromRoute,
+  teamFromRoute,
   teamUsers,
   getStatus,
   getUsersStatus as getTeamUsersStatus,
@@ -70,9 +68,7 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
   public addButtonText = 'Add Users';
   public removeText = 'Remove User';
 
-  public isIAMv2$: Observable<boolean>;
   public teamId = '';
-  public descriptionOrName = '';
   public projects: ProjectCheckedMap = {};
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
 
@@ -95,12 +91,6 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.layoutFacade.showSidebar(Sidebar.Settings);
-
-    this.isIAMv2$ = this.store.select(isIAMv2);
-
-    this.isIAMv2$.pipe(takeUntil(this.isDestroyed))
-      .subscribe((isV2) => this.descriptionOrName = isV2 ? 'name' : 'description');
-
     this.store.dispatch(new GetUsers());
 
     this.store.select(routeState).pipe(
@@ -141,37 +131,21 @@ export class TeamDetailsComponent implements OnInit, OnDestroy {
       }
     });
 
-    const team$ = combineLatest([
-      this.isIAMv2$,
-      this.store.select(v1TeamFromRoute),
-      this.store.select(v2TeamFromRoute)
-    ]).pipe(
-      filter(([isV2, _v1TeamFromRoute, _v2TeamFromRoute]) => isV2 !== null),
-      map(([isV2, v1Team, v2Team]) => isV2 ? v2Team : v1Team ));
-
-    combineLatest([this.isIAMv2$, team$]).pipe(
+    this.store.select(teamFromRoute).pipe(
       takeUntil(this.isDestroyed),
-      filter(([_isV2, team]) => team !== undefined),
-      distinctUntilChanged(([previousIsV2, previousTeam], [currentIsV2, currentTeam]) =>
-        previousIsV2 === currentIsV2 && previousTeam === currentTeam)
-    ).subscribe(([isV2, team]) => {
-      if (isV2) {
-        this.teamId = team.id;
-      } else {
-        this.teamId = team.guid;
-      }
+      filter(identity)
+    ).subscribe((team) => {
+      this.teamId = team.id;
       this.team = team;
       this.updateNameForm.controls.name.setValue(this.team.name);
       this.store.dispatch(new GetTeamUsers({ id: this.teamId }));
-      if (isV2) {
-        this.store.dispatch(new GetProjects());
-      }
+      this.store.dispatch(new GetProjects());
     });
 
     combineLatest([
       this.store.select(allProjects),
       this.store.select(getAllProjectStatus),
-      team$
+      this.store.select(teamFromRoute)
     ]).pipe(
       takeUntil(this.isDestroyed),
       filter(([_, pStatus, team]) => !pending(pStatus) && !isNil(team))
