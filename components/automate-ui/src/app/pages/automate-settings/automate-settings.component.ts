@@ -132,11 +132,12 @@ export class AutomateSettingsComponent implements OnInit {
     this.automateSettingsForm = this.fb.group({
       eventFeed: this.eventFeedForm,
       serviceGroup: this.serviceGroupForm,
-
       clientRuns: this.clientRunsForm,
-      complianceData: this.complianceDataForm,
-      missingNodes: this.missingNodesForm,
-      deleteMissingNodes: this.deleteMissingNodesForm
+      complianceData: this.complianceDataForm
+
+      // now part of client runs -- prob get deleted
+      // missingNodes: this.missingNodesForm,
+      // deleteMissingNodes: this.deleteMissingNodesForm
     });
   }
 
@@ -156,6 +157,10 @@ export class AutomateSettingsComponent implements OnInit {
           this.onChanges();
         }
       });
+  }
+
+  testPrintValues() {
+    console.log(this.automateSettingsForm.value);
   }
 
   // Has the form changed?
@@ -299,10 +304,13 @@ export class AutomateSettingsComponent implements OnInit {
 
     this.automateSettingsForm = this.fb.group({
       eventFeed: this.eventFeedForm,
+      serviceGroup: this.serviceGroupForm,
       clientRuns: this.clientRunsForm,
-      complianceData: this.complianceDataForm,
-      missingNodes: this.missingNodesForm,
-      deleteMissingNodes: this.deleteMissingNodesForm
+      complianceData: this.complianceDataForm
+
+      // now part of client runs -- prob get deleted
+      // missingNodes: this.missingNodesForm,
+      // deleteMissingNodes: this.deleteMissingNodesForm
     });
   }
 
