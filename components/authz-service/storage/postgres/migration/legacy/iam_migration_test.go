@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -274,6 +275,13 @@ func queryTestPolicy(ctx context.Context, id string, db *sql.DB) (*v2Policy, err
 
 	resp, err := queryPolicy(ctx, id, tx)
 	if err != nil {
+		// The not found on json unmarshall case
+		if strings.HasPrefix(err.Error(), "sql: Scan error on column index 0") &&
+			strings.HasSuffix(err.Error(), "not found") {
+			return nil, errors.Errorf("policy not found %s", id)
+		} else {
+			return nil, err
+		}
 		return nil, errors.Wrap(err, "query policy")
 	}
 
