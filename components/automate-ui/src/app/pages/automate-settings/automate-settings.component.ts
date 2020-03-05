@@ -85,29 +85,31 @@ export class AutomateSettingsComponent implements OnInit {
 
     this.eventFeedForm = this.fb.group({
       feedData: this.fb.group({
-        unit: {value: 'd', disabled: true},
-        threshold: {value: 3, disabled: true}
+        threshold: {value: 3, disabled: true},
+        unit: {value: 'd', disabled: true}
       }),
       serverActions: this.fb.group({
-        unit: { value: 'd', disabled: true },
-        threshold: { value: 30, disabled: true }
+        threshold: { value: 30, disabled: true },
+        unit: { value: 'd', disabled: true }
       })
     });
 
     this.serviceGroupForm = this.fb.group({
       healthChecks: this.fb.group({
-        unit: { value: 'd', disabled: true },
-        threshold: {value: 5, disabled: true}
+        threshold: {value: 5, disabled: true},
+        unit: { value: 'd', disabled: true }
       }),
       removeServices: this.fb.group({
-        unit: { value: 'd', disabled: true },
-        threshold: {value: 7, disabled: true}
+        threshold: {value: 7, disabled: true},
+        unit: { value: 'd', disabled: true }
       })
     });
 
 
     this.automateSettingsForm = this.fb.group({
       eventFeed: this.eventFeedForm,
+      serviceGroup: this.serviceGroupForm,
+
       clientRuns: this.clientRunsForm,
       complianceData: this.complianceDataForm,
       missingNodes: this.missingNodesForm,
@@ -150,9 +152,9 @@ export class AutomateSettingsComponent implements OnInit {
     return form.controls['unit'].value === unit;
   }
 
-  // patchDisableValue is the workaround for the chef-checkbox molecule since it is not
+  // toggleInput is the workaround for the chef-checkbox molecule since it is not
   // an input annotation we need to patch the value inside the FormGroup
-  public patchDisableValue(form, _formGroupName: string, checked: boolean) {
+  public toggleInput(form, _formGroupName: string, checked: boolean) {
     // currentInput is a reference to the input associated with its checkbox
     const currentInput = form.get(_formGroupName);
     checked === true
