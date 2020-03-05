@@ -78,8 +78,8 @@ export class AutomateSettingsComponent implements OnInit {
   ) {
     const formDetails = this.defaultFormData;
     // this.eventFeedForm = this.fb.group(formDetails['eventFeed']);
-    this.clientRunsForm = this.fb.group(formDetails['clientRuns']);
-    this.complianceDataForm = this.fb.group(formDetails['complianceData']);
+    // this.clientRunsForm = this.fb.group(formDetails['clientRuns']);
+    // this.complianceDataForm = this.fb.group(formDetails['complianceData']);
     this.missingNodesForm = this.fb.group(formDetails['missingNodes']);
     this.deleteMissingNodesForm = this.fb.group(formDetails['deleteMissingNodes']);
 
@@ -102,6 +102,29 @@ export class AutomateSettingsComponent implements OnInit {
       removeServices: this.fb.group({
         threshold: {value: 7, disabled: true},
         unit: { value: 'd', disabled: true }
+      })
+    });
+
+    this.clientRunsForm = this.fb.group({
+      removeData: this.fb.group({
+        threshold: {value: 30, disabled: true}
+      }),
+      labelMissing: this.fb.group({
+        threshold: { value: 30, disabled: true },
+        unit: { value: 'd', disabled: true }
+      }),
+      removeMissing: this.fb.group({
+        threshold: { value: 30, disabled: true },
+        unit: { value: 'd', disabled: true }
+      })
+    });
+
+    this.complianceDataForm = this.fb.group({
+      reports: this.fb.group({
+        threshold: { value: 30, disabled: true }
+      }),
+      scans: this.fb.group({
+        threshold: { value: 30, disabled: true }
       })
     });
 
