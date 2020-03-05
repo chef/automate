@@ -3,7 +3,6 @@ package client
 import (
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/compliance/reporting"
-	"github.com/chef/automate/components/automate-gateway/api/authz"
 	iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 )
 
@@ -11,7 +10,7 @@ import (
 // The client will auth via the deployment-service cert, which has a system level
 // policy granting it universal access to our API.
 type APIClient interface {
-	AuthzClient() authz.AuthorizationClient
+	AuthzClient() iam.AuthorizationClient
 	TeamsClient() iam.TeamsClient
 	TokensClient() iam.TokensClient
 	UsersClient() iam.UsersClient

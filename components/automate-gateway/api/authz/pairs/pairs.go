@@ -8,7 +8,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	gwAuthzRes "github.com/chef/automate/components/automate-gateway/api/authz/response"
+	gwAuthzRes "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 )
 
 // FindStringSubmatch returns an array.

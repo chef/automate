@@ -39,11 +39,11 @@ import (
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
 	pb_teams "github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	pb_authz "github.com/chef/automate/components/automate-gateway/api/authz"
 	policy "github.com/chef/automate/components/automate-gateway/api/authz/policy"
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_eventfeed "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
+	pb_authz "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	pb_iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	pb_legacy "github.com/chef/automate/components/automate-gateway/api/legacy"
 	pb_license "github.com/chef/automate/components/automate-gateway/api/license"
@@ -55,6 +55,7 @@ import (
 	"github.com/chef/automate/components/automate-gateway/handler"
 	handler_compliance "github.com/chef/automate/components/automate-gateway/handler/compliance"
 	handler_data_lifecycle "github.com/chef/automate/components/automate-gateway/handler/data_lifecycle"
+	handler_introspect "github.com/chef/automate/components/automate-gateway/handler/iam/v2/introspect"
 	handler_policies "github.com/chef/automate/components/automate-gateway/handler/iam/v2/policy"
 	handler_rules "github.com/chef/automate/components/automate-gateway/handler/iam/v2/rules"
 	handler_teams "github.com/chef/automate/components/automate-gateway/handler/iam/v2/teams"
@@ -180,7 +181,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		return errors.Wrap(err, "create client for authzV2 service")
 	}
 	pb_authz.RegisterAuthorizationServer(grpcServer,
-		handler.NewAuthzServer(authzClient, s.authorizer))
+		handler_introspect.NewServer(authzClient, s.authorizer))
 
 	policiesClient, err := clients.PoliciesClient()
 	if err != nil {
@@ -204,7 +205,6 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create client for users mgmt service")
 	}
-	// IAM v2 uses the same client
 	pb_iam.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
 
 	teamsV1Client, err := clients.TeamsV1Client()
@@ -351,7 +351,6 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 		"gateway":              pb_gateway.RegisterGatewayHandlerFromEndpoint,
 		"legacy":               pb_legacy.RegisterLegacyDataCollectorHandlerFromEndpoint,
 		"license":              pb_license.RegisterLicenseHandlerFromEndpoint,
-		"authz":                pb_authz.RegisterAuthorizationHandlerFromEndpoint,
 		"secrets":              pb_secrets.RegisterSecretsServiceHandlerFromEndpoint,
 		"cc_reporting":         pb_cc_reporting.RegisterReportingServiceHandlerFromEndpoint,
 		"cc_stats":             pb_cc_stats.RegisterStatsServiceHandlerFromEndpoint,
@@ -370,11 +369,12 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 
 func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFeatureFlags) (http.Handler, func(), error) {
 	endpointMap := map[string]registerFunc{
-		"policies v2": pb_iam.RegisterPoliciesHandlerFromEndpoint,
-		"users v2":    pb_iam.RegisterUsersHandlerFromEndpoint,
-		"tokens v2":   pb_iam.RegisterTokensHandlerFromEndpoint,
-		"teams v2":    pb_iam.RegisterTeamsHandlerFromEndpoint,
-		"rules v2":    pb_iam.RegisterRulesHandlerFromEndpoint,
+		"policies":   pb_iam.RegisterPoliciesHandlerFromEndpoint,
+		"users":      pb_iam.RegisterUsersHandlerFromEndpoint,
+		"tokens":     pb_iam.RegisterTokensHandlerFromEndpoint,
+		"teams":      pb_iam.RegisterTeamsHandlerFromEndpoint,
+		"rules":      pb_iam.RegisterRulesHandlerFromEndpoint,
+		"introspect": pb_iam.RegisterAuthorizationHandlerFromEndpoint,
 	}
 	return muxFromRegisterMap(grpcURI, dopts, endpointMap)
 }

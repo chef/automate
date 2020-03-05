@@ -1,10 +1,10 @@
 package api
 
 func init() {
-	Swagger.Add("authz_response_authz", `{
+	Swagger.Add("iam_v2_response_introspect", `{
   "swagger": "2.0",
   "info": {
-    "title": "components/automate-gateway/api/authz/response/authz.proto",
+    "title": "components/automate-gateway/api/iam/v2/response/introspect.proto",
     "version": "version not set"
   },
   "consumes": [

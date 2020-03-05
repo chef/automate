@@ -313,8 +313,8 @@ function waitUntilApplyRulesNotRunning(attempts: number): void {
 function LoginHelper(username: string) {
   cy.url().should('include', '/dex/auth/local');
   cy.server();
-  // the gloabl permissions for the user that populates the initial permissions cache
-  cy.route('GET', '/api/v0/auth/introspect').as('getAuthPopulateCache');
+  // the global permissions for the user that populates the initial permissions cache
+  cy.route('GET', '/apis/iam/v2/introspect').as('getAuthPopulateCache');
 
   // login
   cy.get('#login').type(username);

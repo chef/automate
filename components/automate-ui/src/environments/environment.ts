@@ -14,8 +14,7 @@ app will fail to build. These are the current environment files:
 export const environment = {
   production: false,
   applications_url: '/api/v0/applications',
-  auth_url: '/api/v0/auth',
-  auth_v2_url: '/apis/iam/v2',
+  iam_url: '/apis/iam/v2',
   users_url: '/api/v0/users',
   secrets_url: '/api/v0/secrets',
   nodes_url: '/api/v0/nodes',
