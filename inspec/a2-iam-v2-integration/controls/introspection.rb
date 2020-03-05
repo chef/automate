@@ -56,14 +56,14 @@ control 'introspection-iam-v2-1' do
     end
   end
 
-  describe 'introspect (single) with parameters' do
+  describe 'introspect with parameterized endpoint' do
     it 'returns what we expect' do
       resp = automate_api_request('/apis/iam/v2/introspect',
                                   http_method: 'POST',
                                   request_body:  {
-                                    path: '/iam/v2/policies/foo',
-                                    parameters: [ ], # not used
+                                    path: '/iam/v2/policies/foo'
                                   }.to_json)
+      # The parameter is "foo" because the matching path is '/iam/v2/policies/{id}'
       expect(resp.http_status).to eq 200
       expect(resp.parsed_response_body[:endpoints]).to eq(
         {

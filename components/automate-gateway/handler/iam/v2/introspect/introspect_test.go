@@ -12,7 +12,7 @@ import (
 	"github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
-	handler_introspect "github.com/chef/automate/components/automate-gateway/handler/iam/v2/introspect"
+	"github.com/chef/automate/components/automate-gateway/handler/iam/v2/introspect"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -240,7 +240,7 @@ func TestIntrospect(t *testing.T) {
 func testServerAndHandler(t *testing.T) (
 	*authz.AuthorizationServerMock,
 	*grpctest.Server,
-	*handler_introspect.AuthzServer) {
+	*introspect.AuthzServer) {
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
 	connFactory := secureconn.NewFactory(*serviceCerts)
 
@@ -256,7 +256,7 @@ func testServerAndHandler(t *testing.T) (
 
 	return authSrv,
 		s,
-		handler_introspect.NewServer(
+		introspect.NewServer(
 			nil,
 			authorizer.NewAuthorizer(authv2.AuthorizationHandler(client)))
 }

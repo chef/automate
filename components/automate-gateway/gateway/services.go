@@ -205,7 +205,6 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 	if err != nil {
 		return errors.Wrap(err, "create client for users mgmt service")
 	}
-	// IAM v2 uses the same client
 	pb_iam.RegisterUsersServer(grpcServer, handler_users.NewServer(usersMgmtClient))
 
 	teamsV1Client, err := clients.TeamsV1Client()
@@ -370,12 +369,12 @@ func unversionedRESTMux(grpcURI string, dopts []grpc.DialOption) (http.Handler, 
 
 func versionedRESTMux(grpcURI string, dopts []grpc.DialOption, toggles gwRouteFeatureFlags) (http.Handler, func(), error) {
 	endpointMap := map[string]registerFunc{
-		"policies v2":   pb_iam.RegisterPoliciesHandlerFromEndpoint,
-		"users v2":      pb_iam.RegisterUsersHandlerFromEndpoint,
-		"tokens v2":     pb_iam.RegisterTokensHandlerFromEndpoint,
-		"teams v2":      pb_iam.RegisterTeamsHandlerFromEndpoint,
-		"rules v2":      pb_iam.RegisterRulesHandlerFromEndpoint,
-		"introspect v2": pb_iam.RegisterAuthorizationHandlerFromEndpoint,
+		"policies":   pb_iam.RegisterPoliciesHandlerFromEndpoint,
+		"users":      pb_iam.RegisterUsersHandlerFromEndpoint,
+		"tokens":     pb_iam.RegisterTokensHandlerFromEndpoint,
+		"teams":      pb_iam.RegisterTeamsHandlerFromEndpoint,
+		"rules":      pb_iam.RegisterRulesHandlerFromEndpoint,
+		"introspect": pb_iam.RegisterAuthorizationHandlerFromEndpoint,
 	}
 	return muxFromRegisterMap(grpcURI, dopts, endpointMap)
 }
