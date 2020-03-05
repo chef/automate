@@ -22,22 +22,23 @@
 
         <div class="group-section" [formGroup]="eventFeedForm">
           <h2>Event Feed</h2>
-          <div class="checkbox-row">
+          <div class="checkbox-row" formGroupName="feedData">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="eventFeedForm.value.disable"
-              (change)="patchDisableValue(eventFeedForm, 'threshold', $event.detail)">
+              (change)="patchDisableValue(eventFeedForm, 'feedData', 'threshold', $event.detail)">
             </chef-checkbox>
             </div>
               <p>Remove event feed data after
                 <input chefInput type="number" formControlName="threshold" />days</p>
           </div>
 
-          <div class="checkbox-row">
+          <div class="checkbox-row" formGroupName="serverActions">
             <div class="checkbox-container">
-              <chef-checkbox></chef-checkbox>
+              <chef-checkbox
+                (change)="patchDisableValue(eventFeedForm, 'serverActions', 'threshold', $event.detail)">
+              </chef-checkbox>
             </div>
-            <p>Remove Chef Server actions after<input chefInput type="number" />days</p>
+            <p>Remove Chef Server actions after<input chefInput type="number" formControlName="threshold" />days</p>
           </div>
         </div>
 
