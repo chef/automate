@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"sort"
+	"strconv"
 
 	chef "github.com/chef/go-chef"
 	"google.golang.org/grpc/codes"
@@ -247,8 +248,8 @@ func getNodeAttributeFromRes(data interface{}) NodeAttribute {
 		node.Name = name
 	}
 
-	if checkin, ok := m["ohai_time"].(string); ok {
-		node.CheckIn = checkin
+	if checkin, ok := m["ohai_time"].(float64); ok {
+		node.CheckIn = strconv.FormatFloat(checkin, 'E', -1, 64)
 	}
 
 	if chefGUID, ok := m["chef_guid"].(string); ok {
