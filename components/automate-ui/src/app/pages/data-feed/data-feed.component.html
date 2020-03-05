@@ -36,14 +36,14 @@
         <chef-table *ngIf="(sortedDestinations$ | async)?.length !== 0">
           <chef-thead>
             <chef-tr>
-              <chef-th>Name</chef-th>
-              <chef-th class="three-dot-column"></chef-th>
+              <chef-td>Name</chef-td>
+              <chef-td class="three-dot-column"></chef-td>
             </chef-tr>
           </chef-thead>
           <chef-tbody>
             <chef-tr *ngFor= "let destination of sortedDestinations$ | async">
               <chef-td>
-                <a [routerLink]="['/settings/data-feed/form', destination.id]">{{ destination.name }}</a>
+                <a [routerLink]="['/settings/data-feeds/', destination.id]">{{ destination.name }}</a>
               </chef-td>
               <chef-modal label="url-modal-label" [visible]="urlStatusModalVisible" (closeModal)="closeModal('url')">
                 <div class="status-modal">

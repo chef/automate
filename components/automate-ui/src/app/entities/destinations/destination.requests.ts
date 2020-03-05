@@ -4,9 +4,9 @@ import { of as observableOf, Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { environment } from 'environments/environment';
 import { compact, concat } from 'lodash';
-import { mapKeys, snakeCase } from 'lodash/fp';
+// import { mapKeys, snakeCase } from 'lodash/fp';
 import { Destination } from './destination.model';
-import { CreateDesinationPayload ,DestinationSuccessPayload } from './destination.actions';
+import { DestinationSuccessPayload } from './destination.actions';
 
 export interface DestinationsResponse {
   destinations: Destination[];
@@ -44,30 +44,36 @@ export class DestinationRequests {
     return this.http.post<DestinationsResponse>(encodeURI(this.joinToDatafeedUrl(['destinations'])), {});
   }
 
-  public getDestination(id: string): Observable<DestinationResponse> {
-    return this.http.get<DestinationResponse>(this.joinToDatafeedUrl(['destination', id]));
+  // public getDestination(id: string): Observable<DestinationResponse> {
+  //   return this.http.get<DestinationResponse>(this.joinToDatafeedUrl(['destination', id]));
+  // }
+
+  public getDestination(id: string): Observable<Destination> {
+    return this.http.get<DestinationResponse>(this.joinToDatafeedUrl(['destination', id]))
+    .pipe(map((destinationsJson: DestinationResponse) => Destination.fromResponse(destinationsJson)));
   }
 
-  public createDestination(destinationData: CreateDesinationPayload, targetUsername: string, targetPassword: string): Observable<DestinationResponse> {
+  public createDestination(destinationData: Destination, targetUsername: string, targetPassword: string): Observable<DestinationResponse> {
     return this.createSecret(destinationData, targetUsername, targetPassword)
       .pipe(mergeMap((secretId: string) => {
         destinationData.secret_id = secretId;
         return this.http.post<DestinationResponse>(
-          this.joinToDatafeedUrl(['destination']), mapKeys(snakeCase, destinationData));
+          this.joinToDatafeedUrl(['destination']), Destination.fromResponse(destinationData));
       }));
   }
 
   public updateDestination(destination: Destination): Observable<DestinationSuccessPayload> {
-    return this.http.delete<DestinationResponse>(encodeURI(
-      this.joinToDatafeedUrl(['destination', destination.name])));
+    const response: any = destination.toRequest();
+    return this.http.patch<DestinationResponse>(encodeURI(
+      this.joinToDatafeedUrl(['destination', destination.id.toString()])), response);
   }
 
-  public deleteDestination(id: string): Observable<DestinationResponse> {
+  public deleteDestination(id: number): Observable<DestinationResponse> {
     return this.http.delete<DestinationResponse>(encodeURI(
       this.joinToDatafeedUrl(['destination', id.toString()])));
   }
 
-  private createSecret(destination: CreateDesinationPayload, targetUsername: string,
+  private createSecret(destination: Destination, targetUsername: string,
     targetPassword: string): Observable<string> {
     if ( targetUsername.length > 0 || targetPassword.length > 0 ) {
       const secret = this.newSecret('', destination.name, targetUsername, targetPassword);

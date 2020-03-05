@@ -38,9 +38,9 @@ describe('CreateChefServerModalComponent', () => {
     component.createForm = new FormBuilder().group({
       id: ['', null],
       name: ['', null],
-      description: ['', null],
-      fqdn: ['', null],
-      ip_address: ['', null]
+      url: ['', null],
+      username: ['', null],
+      password: ['', null]
     });
     component.conflictErrorEvent = new EventEmitter();
     fixture.detectChanges();

@@ -29,9 +29,9 @@ import {
 } from './destination.actions';
 
 import {
-  DestinationRequests,
-  DestinationResponse
+  DestinationRequests
 } from './destination.requests';
+import { Destination } from './destination.model';
 
 @Injectable()
 export class DestinationEffects {
@@ -64,7 +64,7 @@ export class DestinationEffects {
       ofType(DestinationActionTypes.GET),
       mergeMap(({ payload: { id }}: GetDestination) =>
         this.requests.getDestination(id).pipe(
-          map((resp: DestinationResponse) => new GetDestinationSuccess(resp)),
+          map((resp: Destination) => new GetDestinationSuccess(resp)),
           catchError((error: HttpErrorResponse) =>
           observableOf(new GetDestinationFailure(error, id))))));
 
