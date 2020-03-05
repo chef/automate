@@ -25,7 +25,7 @@
           <div class="checkbox-row" formGroupName="feedData">
             <div class="checkbox-container">
               <chef-checkbox
-              (change)="patchDisableValue(eventFeedForm, 'feedData', 'threshold', $event.detail)">
+              (change)="patchDisableValue(eventFeedForm, 'feedData', $event.detail)">
             </chef-checkbox>
             </div>
               <p>Remove event feed data after
@@ -35,27 +35,29 @@
           <div class="checkbox-row" formGroupName="serverActions">
             <div class="checkbox-container">
               <chef-checkbox
-                (change)="patchDisableValue(eventFeedForm, 'serverActions', 'threshold', $event.detail)">
+                (change)="patchDisableValue(eventFeedForm, 'serverActions', $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove Chef Server actions after<input chefInput type="number" formControlName="threshold" />days</p>
           </div>
         </div>
 
-        <div class="group-section">
+        <div class="group-section" [formGroup]="serviceGroupForm">
           <h2>Service Groups</h2>
-          <div class="checkbox-row">
+          <div class="checkbox-row" formGroupName="healthChecks">
             <div class="checkbox-container">
-              <chef-checkbox></chef-checkbox>
+              <chef-checkbox
+              (change)="patchDisableValue(serviceGroupForm, 'healthChecks', $event.detail)"
+              ></chef-checkbox>
             </div>
 
             <p>When no health check reports have been received for a service in
-              <input chefInput type="number" value="5" />
+              <input chefInput type="number" formControlName="threshold" />
               <mat-form-field appearance="none">
-                <mat-select panelClass="chef-dropdown">
-                  <mat-option value="minutes">minutes</mat-option>
-                  <mat-option value="hours">hours</mat-option>
-                  <mat-option value="days">days</mat-option>
+                <mat-select panelClass="chef-dropdown" formControlName="unit">
+                  <mat-option value="m">minutes</mat-option>
+                  <mat-option value="h">hours</mat-option>
+                  <mat-option value="d">days</mat-option>
                 </mat-select>
               </mat-form-field>
               , label the service as disconnected</p>
