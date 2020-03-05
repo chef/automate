@@ -100,7 +100,9 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 			"took",
 			"hits.total",
 			"aggregations.nodes.buckets.key",
-			"aggregations.nodes.buckets.distinct.hits.hits._id").
+			"aggregations.nodes.buckets.distinct.hits.hits._id",
+			"aggregations.nodes.buckets.distinct.hits.hits._source.end_time",
+		).
 		SearchSource(searchSource).
 		Do(context.Background())
 
@@ -122,6 +124,13 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 			topHits, _ := nodeBucket.Aggregations.TopHits("distinct")
 			nodeID := fmt.Sprintf("%s", nodeBucket.Key)
 			for _, hit := range topHits.Hits.Hits {
+				var endTimeSource string
+				if hit.Source != nil {
+					err = json.Unmarshal(*hit.Source, &endTimeSource)
+					if err == nil {
+
+					}
+				}
 				endTime, _ := time.Parse("2006-01-02T15:04:05", "2018-02-09T09:18:41Z")
 				endTimeTimestamp, _ := ptypes.TimestampProto(endTime)
 
