@@ -29,7 +29,7 @@ type RoleInfo struct {
 	}
 }
 
-type iamRoleSave struct {
+type generatedRoleData struct {
 	ID      string   `json:"id"`
 	Actions []string `json:"actions"`
 	Skipped bool     `json:"skipped"`
@@ -97,17 +97,17 @@ func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 			}
 
 			// the Skip function is run before each step: Generate, Verify, and Cleanup
-			loaded := iamRoleSave{}
+			loaded := generatedRoleData{}
 			err = tstCtx.GetValue("iam-roles", &loaded)
 			if err != nil {
 				// this is the first time running this diagnostic,
 				// so we save whether or not we're skipping it
-				tstCtx.SetValue("iam-roles", &iamRoleSave{
+				tstCtx.SetValue("iam-roles", &generatedRoleData{
 					Skipped: !isV2,
 				})
 			} else {
 				// the diagnostic has been run before, so we keep track of its saved values
-				tstCtx.SetValue("iam-roles", &iamRoleSave{
+				tstCtx.SetValue("iam-roles", &generatedRoleData{
 					ID:      loaded.ID,
 					Actions: loaded.Actions,
 					Skipped: loaded.Skipped,
@@ -123,13 +123,13 @@ func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			loaded := iamRoleSave{}
+			loaded := generatedRoleData{}
 			err = tstCtx.GetValue("iam-roles", &loaded)
 			if err != nil {
 				return errors.Errorf(err.Error(), "could not find generated context")
 			}
 
-			tstCtx.SetValue("iam-roles", &iamRoleSave{
+			tstCtx.SetValue("iam-roles", &generatedRoleData{
 				ID:      roleInfo.Role.ID,
 				Actions: roleInfo.Role.Actions,
 				Skipped: loaded.Skipped,
@@ -137,7 +137,7 @@ func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := iamRoleSave{}
+			loaded := generatedRoleData{}
 			err := tstCtx.GetValue("iam-roles", &loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
 			if loaded.Skipped {
@@ -157,7 +157,7 @@ func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 			assert.Equal(tstCtx, loaded.Actions, roleInfo.Role.Actions)
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := iamRoleSave{}
+			loaded := generatedRoleData{}
 			err := tstCtx.GetValue("iam-roles", &loaded)
 			if loaded.Skipped {
 				// if diagnostic was run on v1, generating roles was skipped

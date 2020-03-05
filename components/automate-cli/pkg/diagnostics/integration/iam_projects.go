@@ -60,7 +60,7 @@ type RulesInfo struct {
 	Rules []Rule
 }
 
-type iamProjectSave struct {
+type generatedProjectData struct {
 	ID      string `json:"id"`
 	RuleID  string `json:"rule_id"`
 	Skipped bool   `json:"skipped"`
@@ -156,17 +156,17 @@ func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 			}
 
 			// the Skip function is run before each step: Generate, Verify, and Cleanup
-			loaded := iamProjectSave{}
+			loaded := generatedProjectData{}
 			err = tstCtx.GetValue("iam-projects", &loaded)
 			if err != nil {
 				// this is the first time running this diagnostic,
 				// so we save whether or not we're skipping it
-				tstCtx.SetValue("iam-projects", &iamProjectSave{
+				tstCtx.SetValue("iam-projects", &generatedProjectData{
 					Skipped: !isV2,
 				})
 			} else {
 				// the diagnostic has been run before, so we keep track of its saved values
-				tstCtx.SetValue("iam-projects", &iamProjectSave{
+				tstCtx.SetValue("iam-projects", &generatedProjectData{
 					ID:      loaded.ID,
 					RuleID:  loaded.RuleID,
 					Skipped: loaded.Skipped,
@@ -182,13 +182,13 @@ func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			loaded := iamProjectSave{}
+			loaded := generatedProjectData{}
 			err = tstCtx.GetValue("iam-projects", &loaded)
 			if err != nil {
 				return errors.Errorf(err.Error(), "could not find generated context")
 			}
 
-			tstCtx.SetValue("iam-projects", &iamProjectSave{
+			tstCtx.SetValue("iam-projects", &generatedProjectData{
 				ID:      projectInfo.Project.ID,
 				RuleID:  projectInfo.Project.Rule.ID,
 				Skipped: loaded.Skipped,
@@ -196,7 +196,7 @@ func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := iamProjectSave{}
+			loaded := generatedProjectData{}
 			err := tstCtx.GetValue("iam-projects", &loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
 			if loaded.Skipped {
@@ -216,7 +216,7 @@ func CreateIAMProjectsDiagnostic() diagnostics.Diagnostic {
 			assert.Equal(tstCtx, loaded.RuleID, projectInfo.Project.Rule.ID)
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := iamProjectSave{}
+			loaded := generatedProjectData{}
 			err := tstCtx.GetValue("iam-projects", &loaded)
 			if loaded.Skipped {
 				// if diagnostic was run on v1, generating projects was skipped

@@ -40,7 +40,7 @@ type V2TokenInfo struct {
 	Token TokenInfo
 }
 
-type iamTokenSave struct {
+type generatedTokenData struct {
 	ID string `json:"id"`
 }
 
@@ -150,13 +150,13 @@ func CreateIAMTokensDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			tstCtx.SetValue("iam-tokens", &iamTokenSave{
+			tstCtx.SetValue("iam-tokens", &generatedTokenData{
 				ID: tokenInfo.ID,
 			})
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := iamTokenSave{}
+			loaded := generatedTokenData{}
 			err := tstCtx.GetValue("iam-tokens", &loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
 
@@ -166,7 +166,7 @@ func CreateIAMTokensDiagnostic() diagnostics.Diagnostic {
 			assert.Equal(tstCtx, loaded.ID, tokenInfo.ID)
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := iamTokenSave{}
+			loaded := generatedTokenData{}
 			err := tstCtx.GetValue("iam-tokens", &loaded)
 			if err != nil {
 				return errors.Wrap(err, "Could not find generated context")

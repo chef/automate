@@ -184,7 +184,7 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
 			// in case there was an upgrade, check for v1 policy data
-			v1loaded := iamV1PoliciesSave{}
+			v1loaded := generatedV1PolicyData{}
 			err := tstCtx.GetValue("iam-policies-v1", &v1loaded)
 			// if generate was run while on v1 and cleanup was skipped,
 			// we can verify that the v1 policy was migrated to v2
