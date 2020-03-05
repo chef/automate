@@ -20,19 +20,19 @@ export class ApiTokenRequests {
   constructor(private http: HttpClient) {}
 
   public getAll(): Observable<GetAllTokensResponse<ApiToken>> {
-    return this.http.get<GetAllTokensResponse<ApiToken>>(`${env.auth_v2_url}/tokens`);
+    return this.http.get<GetAllTokensResponse<ApiToken>>(`${env.iam_url}/tokens`);
   }
 
   public get(id: string): Observable<TokenPayloadResponse> {
-    return this.http.get<TokenPayloadResponse>(`${env.auth_v2_url}/tokens/${id}`);
+    return this.http.get<TokenPayloadResponse>(`${env.iam_url}/tokens/${id}`);
   }
 
   public update(token: ApiToken): Observable<TokenPayloadResponse> {
-    return this.http.put<TokenPayloadResponse>(`${env.auth_v2_url}/tokens/${token.id}`, token);
+    return this.http.put<TokenPayloadResponse>(`${env.iam_url}/tokens/${token.id}`, token);
   }
 
   public create({ id, name, projects }: CreateTokenPayload): Observable<TokenPayloadResponse> {
-    return this.http.post<TokenPayloadResponse>(`${env.auth_v2_url}/tokens`,
+    return this.http.post<TokenPayloadResponse>(`${env.iam_url}/tokens`,
       { id, name, projects, active: true }
     );
   }
@@ -40,11 +40,11 @@ export class ApiTokenRequests {
   // Note: toggleActive takes the EXISTING value in `active`, and will take care
   // of flipping it.
   public toggleActive(id: string, active: boolean): Observable<TokenPayloadResponse> {
-    return this.http.put<TokenPayloadResponse>(`${env.auth_v2_url}/tokens/${id}`,
+    return this.http.put<TokenPayloadResponse>(`${env.iam_url}/tokens/${id}`,
       { active: !active });
   }
 
   public delete(id: string): Observable<Object> {
-    return this.http.delete(`${env.auth_v2_url}/tokens/${id}`);
+    return this.http.delete(`${env.iam_url}/tokens/${id}`);
   }
 }

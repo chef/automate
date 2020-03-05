@@ -23,33 +23,33 @@ export class UserRequests {
   constructor(private http: HttpClient) { }
 
   public getUsers(): Observable<UsersResponse> {
-    return this.http.get<UsersResponse>(`${env.auth_v2_url}/users`);
+    return this.http.get<UsersResponse>(`${env.iam_url}/users`);
   }
 
   public getUser(id: string): Observable<User> {
-    return this.http.get<UserResponse>(`${env.auth_v2_url}/users/${id}`)
+    return this.http.get<UserResponse>(`${env.iam_url}/users/${id}`)
       .pipe(map(userResponse => userResponse.user));
   }
 
   public createUser(userData: CreateUserPayload): Observable<User> {
-    return this.http.post<UserResponse>(`${env.auth_v2_url}/users`, mapKeys(snakeCase, userData))
+    return this.http.post<UserResponse>(`${env.iam_url}/users`, mapKeys(snakeCase, userData))
       .pipe(map(userResponse => userResponse.user));
   }
 
   public updateUser(userData: User): Observable<User> {
-    return this.http.put<UserResponse>(`${env.auth_v2_url}/users/${userData.id}`,
+    return this.http.put<UserResponse>(`${env.iam_url}/users/${userData.id}`,
       mapKeys(snakeCase, userData))
         .pipe(map(userResponse => userResponse.user));
   }
 
   public updateSelf(userData: SelfUser): Observable<User> {
-    return this.http.put<UserResponse>(`${env.auth_v2_url}/self/${userData.id}`,
+    return this.http.put<UserResponse>(`${env.iam_url}/self/${userData.id}`,
       mapKeys(snakeCase, userData))
         .pipe(map(userResponse => userResponse.user));
   }
 
   public deleteUser(user: User): Observable<User> {
-    return this.http.delete<UserResponse>(`${env.auth_v2_url}/users/${user.id}`).pipe(
+    return this.http.delete<UserResponse>(`${env.iam_url}/users/${user.id}`).pipe(
       map(() => user)); // bounce it back, so it can be used
   }
 }

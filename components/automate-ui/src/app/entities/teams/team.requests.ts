@@ -25,41 +25,41 @@ export class TeamRequests {
   constructor(private http: HttpClient) { }
 
   public getTeams(): Observable<TeamsResponse> {
-    return this.http.get<TeamsResponse>(`${env.auth_v2_url}/teams`);
+    return this.http.get<TeamsResponse>(`${env.iam_url}/teams`);
   }
 
   public getTeam(id: string): Observable<TeamResponse> {
-    return this.http.get<TeamResponse>(`${env.auth_v2_url}/teams/${id}`);
+    return this.http.get<TeamResponse>(`${env.iam_url}/teams/${id}`);
   }
 
   public getTeamUsers(id: string): Observable<UsersResponse> {
-    return this.http.get<UsersResponse>(`${env.auth_v2_url}/teams/${id}/users`);
+    return this.http.get<UsersResponse>(`${env.iam_url}/teams/${id}/users`);
   }
 
   public createTeam(teamData: CreateTeamPayload): Observable<TeamResponse> {
-    return this.http.post<TeamResponse>(`${env.auth_v2_url}/teams`, mapKeys(snakeCase, teamData));
+    return this.http.post<TeamResponse>(`${env.iam_url}/teams`, mapKeys(snakeCase, teamData));
   }
 
   public updateTeam(teamData: Team): Observable<TeamResponse> {
-    return this.http.put<TeamResponse>(`${env.auth_v2_url}/teams/${teamData.id}`,
+    return this.http.put<TeamResponse>(`${env.iam_url}/teams/${teamData.id}`,
       mapKeys(snakeCase, teamData));
   }
 
   public deleteTeam(team: Team): Observable<TeamResponse> {
-    return this.http.delete<TeamResponse>(`${env.auth_v2_url}/teams/${team.id}`);
+    return this.http.delete<TeamResponse>(`${env.iam_url}/teams/${team.id}`);
   }
 
   public addTeamUsers(teamData: TeamUserMgmtPayload):
     Observable<UsersResponse> {
 
     return this.http.post<UsersResponse>(
-      `${env.auth_v2_url}/teams/${teamData.id}/users:add`, mapKeys(snakeCase, teamData));
+      `${env.iam_url}/teams/${teamData.id}/users:add`, mapKeys(snakeCase, teamData));
   }
 
    public removeTeamUsers(teamData: TeamUserMgmtPayload):
     Observable<UsersResponse | Team> {
 
     return this.http.post<UsersResponse>(
-      `${env.auth_v2_url}/teams/${teamData.id}/users:remove`, mapKeys(snakeCase, teamData));
+      `${env.iam_url}/teams/${teamData.id}/users:remove`, mapKeys(snakeCase, teamData));
   }
 }
