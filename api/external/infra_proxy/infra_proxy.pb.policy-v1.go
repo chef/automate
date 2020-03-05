@@ -243,6 +243,25 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetCookbookAffectedNodes", "infra:servers:{server_id}:orgs:{org_id}/cookbooks", "read", "GET", "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/affected-nodes", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.Cookbook); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				case "version":
+					return m.Version
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetRoles", "infra:servers:{server_id}:orgs:{org_id}/roles", "read", "GET", "/infra/servers/{server_id}/orgs/{org_id}/roles", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Roles); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
