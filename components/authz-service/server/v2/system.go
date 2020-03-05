@@ -109,7 +109,7 @@ func SystemPolicies() []*storage.Policy {
 		Statements: []storage.Statement{
 			{
 				Effect:    storage.Allow,
-				Actions:   []string{"ingest:nodes:*", "compliance:profiles:get", "compliance:profiles:list"},
+				Actions:   []string{"ingest:*", "compliance:profiles:get", "compliance:profiles:list"},
 				Resources: []string{"*"},
 				Projects:  []string{constants.AllProjectsID},
 			},
