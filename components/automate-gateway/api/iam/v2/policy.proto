@@ -30,28 +30,8 @@ service Policies {
   A policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),
   whereas the *statement-level* projects list defines which projects the statement applies to.
 
-  This example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role
+  The example creates a new policy not associated with any project (because the top-level `projects` property is empty) that grants the `viewer` role
   on a few projects for all LDAP teams and a custom role `qa` on a specific project.
-
-  Example:
-  ```
-  {
-    "name": "My Viewer Policy",
-    "id": "viewer-policy",
-    "members": ["team:ldap:*"],
-    "statements" : [
-      {
-        "role": "viewer",
-        "projects": ["project1", "project2"]
-      },
-      {
-        "role": "qa",
-        "projects": ["acceptanceProject"]
-      }
-    ],
-    "projects": []
-  }
-  ```
 
   Authorization Action:
   ```
@@ -59,6 +39,32 @@ service Policies {
   ```
   */
   rpc CreatePolicy (CreatePolicyReq) returns (CreatePolicyResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+										string_value: '{"name": "My Viewer Policy","id": "custom-viewer-policy","members": ["team:ldap:*"], "statements": [{"role": "viewer","projects": ["project1", "project2"], "effect": "ALLOW"},{"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}';
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       post: "/iam/v2/policies"
       body: "*"
@@ -67,9 +73,6 @@ service Policies {
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:policies";
     option (chef.automate.api.iam.policy).action = "iam:policies:create";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "policies";
-		};
   };
 
   /*
@@ -159,6 +162,32 @@ service Policies {
   ```
   */
   rpc UpdatePolicy (UpdatePolicyReq) returns (UpdatePolicyResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "My Updated Viewer Policy", "members": ["user:ldap:newuser", "team:ldap:newteam"], "statements": [{"role": "viewer","projects":["project1", "project2"], "effect": "ALLOW"},{"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}'
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       put: "/iam/v2/policies/{id}"
       body: "*"
@@ -167,9 +196,6 @@ service Policies {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}";
     option (chef.automate.api.iam.policy).action = "iam:policies:update";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "policies";
-		};
   };
 
   /*
@@ -233,6 +259,32 @@ service Policies {
   ```
   */
   rpc ReplacePolicyMembers (ReplacePolicyMembersReq) returns (ReplacePolicyMembersResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"members": ["team:local:viewers", "user:local:test"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       put: "/iam/v2/policies/{id}/members"
       body: "*"
@@ -241,9 +293,6 @@ service Policies {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:update";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "policies";
-		};
   };
 
   /*
@@ -264,6 +313,32 @@ service Policies {
   ```
   */
   rpc RemovePolicyMembers (RemovePolicyMembersReq) returns (RemovePolicyMembersResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"members": ["team:local:viewers", "user:local:test"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       post: "/iam/v2/policies/{id}/members:remove"
       body: "*"
@@ -272,9 +347,6 @@ service Policies {
     option (chef.automate.api.policy).action = "delete";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:delete";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "policies";
-		};
   };
 
   /*
@@ -292,6 +364,32 @@ service Policies {
   ```
   */
   rpc AddPolicyMembers (AddPolicyMembersReq) returns (AddPolicyMembersResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "policies";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"members": ["team:local:viewers", "user:local:test"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       post: "/iam/v2/policies/{id}/members:add"
       body: "*"
@@ -300,9 +398,6 @@ service Policies {
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:policies:{id}:members";
     option (chef.automate.api.iam.policy).action = "iam:policyMembers:create";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "policies";
-		};
   };
 
   /*
@@ -318,6 +413,32 @@ service Policies {
   ```
   */
   rpc CreateRole (CreateRoleReq) returns (CreateRoleResp) {
+		option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "roles";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+										string_value: '{"id": "custom-role", "name": "My Custom Secret Manager Role", "actions": ["secrets:*", "iam:projects:list"]}';
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       post: "/iam/v2/roles"
       body: "*"
@@ -326,9 +447,6 @@ service Policies {
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:roles";
     option (chef.automate.api.iam.policy).action = "iam:roles:create";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "roles";
-		};
   };
 
   /*
@@ -416,6 +534,32 @@ service Policies {
   ```
   */
   rpc UpdateRole (UpdateRoleReq) returns (UpdateRoleResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "roles";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "My Updated Custom Secret Manager Role", "actions": ["secrets:*", "iam:projects:list"]}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       put: "/iam/v2/roles/{id}"
       body: "*"
@@ -424,9 +568,6 @@ service Policies {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:roles:{id}";
     option (chef.automate.api.iam.policy).action = "iam:roles:update";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "roles";
-		};
   };
 
   /*
@@ -442,6 +583,32 @@ service Policies {
   ```
   */
   rpc CreateProject (CreateProjectReq) returns (CreateProjectResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "My Custom Project", "id": "custom-project"}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       post: "/iam/v2/projects"
       body: "*"
@@ -450,9 +617,6 @@ service Policies {
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:projects";
     option (chef.automate.api.iam.policy).action = "iam:projects:create";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "projects";
-		};
   };
 
   /*
@@ -466,6 +630,32 @@ service Policies {
   ```
   */
   rpc UpdateProject (UpdateProjectReq) returns (UpdateProjectResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "projects";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "My Custom Updated Project Name"}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       put: "/iam/v2/projects/{id}"
       body: "*"
@@ -474,9 +664,6 @@ service Policies {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:projects:{id}";
     option (chef.automate.api.iam.policy).action = "iam:projects:update";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-			tags: "projects";
-		};
   };
 
   /*

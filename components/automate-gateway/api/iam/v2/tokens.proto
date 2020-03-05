@@ -21,19 +21,6 @@ service Tokens {
   Creates a token.
   Active defaults to true when not specified.
   Value is auto-generated when not specified.
-  
-  Example:
-  ```
-  {
-    "name": "token 1",
-    "id": "token-1",
-    "active": true,
-    "projects": [
-      "east-region",
-      "west-region"
-    ]
-  }
-  ```
 
   Note that this creates *non-admin* tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using `tokens:*``).
 
@@ -49,6 +36,32 @@ service Tokens {
   ```
   */
   rpc CreateToken (CreateTokenReq) returns (CreateTokenResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+										string_value: '{"name": "token 1", "id": "token-1", "active": true, "projects": ["east-region", "west-region"]}';
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       post: "/iam/v2/tokens"
       body: "*"
@@ -57,9 +70,6 @@ service Tokens {
     option (chef.automate.api.policy).action = "create";
     option (chef.automate.api.iam.policy).resource = "iam:tokens";
     option (chef.automate.api.iam.policy).action = "iam:tokens:create";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-      tags: "tokens"
-    };
   };
 
   /*
@@ -98,6 +108,32 @@ service Tokens {
   ```
   */
   rpc UpdateToken (UpdateTokenReq) returns (UpdateTokenResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "tokens"
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+										string_value: '{"name": "updated token name", "active": true, "projects": ["east-region", "south-region"]}';
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       put: "/iam/v2/tokens/{id}"
       body: "*"
@@ -106,9 +142,6 @@ service Tokens {
     option (chef.automate.api.policy).action = "update";
     option (chef.automate.api.iam.policy).resource = "iam:tokens:{id}";
     option (chef.automate.api.iam.policy).action = "iam:tokens:update";
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
-      tags: "tokens"
-    };
   };
 
   /*

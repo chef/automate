@@ -49,7 +49,7 @@ func init() {
       },
       "post": {
         "summary": "Create a custom policy",
-        "description": "Creates a custom IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),\nwhereas the *statement-level* projects list defines which projects the statement applies to.\n\nThis example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"My Viewer Policy\",\n\"id\": \"viewer-policy\",\n\"members\": [\"team:ldap:*\"],\n\"statements\" : [\n{\n\"role\": \"viewer\",\n\"projects\": [\"project1\", \"project2\"]\n},\n{\n\"role\": \"qa\",\n\"projects\": [\"acceptanceProject\"]\n}\n],\n\"projects\": []\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a custom IAM policy used to control permissions in Automate.\nA policy is composed of one or more statements that grant permissions to a set of members.\nEach statement contains a role as well as a list of projects.\n\nThe role defines a set of actions that the statement is scoped to.\nThe project list defines the set of resources that the statement is scoped to.\nPass ` + "`" + `\"projects\": [\"*\"]` + "`" + ` to scope a statement to every project.\n\nA policy's *top-level* projects list defines which projects the policy belongs to (for filtering policies by their projects),\nwhereas the *statement-level* projects list defines which projects the statement applies to.\n\nThe example creates a new policy not associated with any project (because the top-level ` + "`" + `projects` + "`" + ` property is empty) that grants the ` + "`" + `viewer` + "`" + ` role\non a few projects for all LDAP teams and a custom role ` + "`" + `qa` + "`" + ` on a specific project.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:policies:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreatePolicy",
         "responses": {
           "200": {
@@ -71,6 +71,12 @@ func init() {
         ],
         "tags": [
           "policies"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"My Viewer Policy\",\"id\": \"custom-viewer-policy\",\"members\": [\"team:ldap:*\"], \"statements\": [{\"role\": \"viewer\",\"projects\": [\"project1\", \"project2\"], \"effect\": \"ALLOW\"},{\"role\": \"qa\",\"projects\": [\"acceptanceProject\"], \"effect\": \"ALLOW\"}],\"projects\": []}"
+          }
         ]
       }
     },
@@ -156,6 +162,12 @@ func init() {
         ],
         "tags": [
           "policies"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"My Updated Viewer Policy\", \"members\": [\"user:ldap:newuser\", \"team:ldap:newteam\"], \"statements\": [{\"role\": \"viewer\",\"projects\":[\"project1\", \"project2\"], \"effect\": \"ALLOW\"},{\"role\": \"qa\",\"projects\": [\"acceptanceProject\"], \"effect\": \"ALLOW\"}],\"projects\": []}"
+          }
         ]
       }
     },
@@ -216,6 +228,12 @@ func init() {
         ],
         "tags": [
           "policies"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"members\": [\"team:local:viewers\", \"user:local:test\"]}"
+          }
         ]
       }
     },
@@ -251,6 +269,12 @@ func init() {
         ],
         "tags": [
           "policies"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"members\": [\"team:local:viewers\", \"user:local:test\"]}"
+          }
         ]
       }
     },
@@ -286,6 +310,12 @@ func init() {
         ],
         "tags": [
           "policies"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"members\": [\"team:local:viewers\", \"user:local:test\"]}"
+          }
         ]
       }
     },
@@ -348,6 +378,12 @@ func init() {
         ],
         "tags": [
           "projects"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"My Custom Project\", \"id\": \"custom-project\"}"
+          }
         ]
       }
     },
@@ -433,6 +469,12 @@ func init() {
         ],
         "tags": [
           "projects"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"My Custom Updated Project Name\"}"
+          }
         ]
       }
     },
@@ -477,6 +519,12 @@ func init() {
         ],
         "tags": [
           "roles"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"id\": \"custom-role\", \"name\": \"My Custom Secret Manager Role\", \"actions\": [\"secrets:*\", \"iam:projects:list\"]}"
+          }
         ]
       }
     },
@@ -562,6 +610,12 @@ func init() {
         ],
         "tags": [
           "roles"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"My Updated Custom Secret Manager Role\", \"actions\": [\"secrets:*\", \"iam:projects:list\"]}"
+          }
         ]
       }
     }

@@ -30,7 +30,7 @@
       },
       "post": {
         "summary": "Create a token",
-        "description": "Creates a token.\nActive defaults to true when not specified.\nValue is auto-generated when not specified.\n\nExample:\n```\n{\n\"name\": \"token 1\",\n\"id\": \"token-1\",\n\"active\": true,\n\"projects\": [\n\"east-region\",\n\"west-region\"\n]\n}\n```\n\nNote that this creates *non-admin* tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using `tokens:*``).\n\nYou cannot create admin tokens via the REST API.\nAdmin tokens can only be created by specifying the `--admin` flag to this chef-automate sub-command:\n```\nchef-automate iam token create \u003cyour-token-name\u003e --admin`\n```\n\nAuthorization Action:\n```\niam:tokens:create\n```",
+        "description": "Creates a token.\nActive defaults to true when not specified.\nValue is auto-generated when not specified.\n\nNote that this creates *non-admin* tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using `tokens:*``).\n\nYou cannot create admin tokens via the REST API.\nAdmin tokens can only be created by specifying the `--admin` flag to this chef-automate sub-command:\n```\nchef-automate iam token create \u003cyour-token-name\u003e --admin`\n```\n\nAuthorization Action:\n```\niam:tokens:create\n```",
         "operationId": "CreateToken",
         "responses": {
           "200": {
@@ -52,6 +52,12 @@
         ],
         "tags": [
           "tokens"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"token 1\", \"id\": \"token-1\", \"active\": true, \"projects\": [\"east-region\", \"west-region\"]}"
+          }
         ]
       }
     },
@@ -137,6 +143,12 @@
         ],
         "tags": [
           "tokens"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"updated token name\", \"active\": true, \"projects\": [\"east-region\", \"south-region\"]}"
+          }
         ]
       }
     }
