@@ -82,8 +82,14 @@ export class AutomateSettingsComponent implements OnInit {
     this.deleteMissingNodesForm = this.fb.group(formDetails['deleteMissingNodes']);
 
     this.eventFeedForm = this.fb.group({
-      unit: ['d'],
-      threshold: {value: 3, disabled: true}
+      feedData: this.fb.group({
+        unit: ['d'],
+        threshold: {value: 3, disabled: true}
+      }),
+      serverActions: this.fb.group({
+        unit: ['d'],
+        threshold: {value: 30, disabled: true}
+      })
     });
 
 
@@ -133,8 +139,13 @@ export class AutomateSettingsComponent implements OnInit {
 
   // patchDisableValue is the workaround for the chef-checkbox molecule since it is not
   // an input annotation we need to patch the value inside the FormGroup
-  public patchDisableValue(form, inputName: string, checked: boolean) {
-    checked === true ? form.controls[inputName].enable() : form.controls[inputName].disable();
+  public patchDisableValue(form, _formGroupName: string,
+                          _formControlName: string, checked: boolean) {
+    // currentInput is a reference to the input associated with its checkbox
+    const currentInput = form.controls[_formGroupName].controls[_formControlName];
+    checked === true
+      ? currentInput.enable()
+      : currentInput.disable();
   }
 
   // Apply the changes that the user updated in the forms
