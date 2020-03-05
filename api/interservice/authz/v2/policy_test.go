@@ -360,7 +360,7 @@ func TestValidationCreatePolicy_Actions(t *testing.T) {
 			"infra::create",
 			"ingest:camelCaseThings:",
 			"Ingest:camelCaseThings:create",
-			"ingest:camelCaseThings:create",
+			"ingest:CamelCaseThings:create",
 			"ingest:camelCaseThings:Create",
 			"Ingest:camelCaseThings:*",
 			"ingest:CamelCaseThings:*",
