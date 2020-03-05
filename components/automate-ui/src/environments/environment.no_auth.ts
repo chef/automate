@@ -1,7 +1,6 @@
 export const environment = {
     production: false,
     applications_url: '/api/v0/applications',
-    auth_url: '/api/v0/auth',
     auth_v2_url: '/apis/iam/v2',
     users_url: '/api/v0/users',
     secrets_url: '/api/v0/secrets',
