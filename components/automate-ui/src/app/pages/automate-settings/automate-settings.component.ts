@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
@@ -28,7 +28,7 @@ export class AutomateSettingsComponent implements OnInit {
   private defaultFormData = {
     eventFeed: {
       unit: 'd',
-      threshold: '',
+      threshold: '3',
       disable: false
     },
     clientRuns: {
@@ -75,11 +75,18 @@ export class AutomateSettingsComponent implements OnInit {
     private telemetryService: TelemetryService
   ) {
     const formDetails = this.defaultFormData;
-    this.eventFeedForm = this.formBuilder.group(formDetails['eventFeed']);
+    // this.eventFeedForm = this.formBuilder.group(formDetails['eventFeed']);
     this.clientRunsForm = this.formBuilder.group(formDetails['clientRuns']);
     this.complianceDataForm = this.formBuilder.group(formDetails['complianceData']);
     this.missingNodesForm = this.formBuilder.group(formDetails['missingNodes']);
     this.deleteMissingNodesForm = this.formBuilder.group(formDetails['deleteMissingNodes']);
+
+    this.eventFeedForm = this.formBuilder.group({
+      unit: ['d'],
+      threshold: {value: 3, disabled: true}
+    });
+
+
     this.automateSettingsForm = this.formBuilder.group({
       eventFeed: this.eventFeedForm,
       clientRuns: this.clientRunsForm,
@@ -126,10 +133,8 @@ export class AutomateSettingsComponent implements OnInit {
 
   // patchDisableValue is the workaround for the chef-checkbox molecule since it is not
   // an input annotation we need to patch the value inside the FormGroup
-  public patchDisableValue(form, checked: boolean) {
-    console.log(`${form} is checked: ${checked}`);
-    console.log(form.controls.disable.value);
-    form.controls['disable'].setValue(checked);
+  public patchDisableValue(form, inputName: string, checked: boolean) {
+    checked === true ? form.controls[inputName].enable() : form.controls[inputName].disable();
   }
 
   // Apply the changes that the user updated in the forms
