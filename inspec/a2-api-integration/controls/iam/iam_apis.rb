@@ -1089,21 +1089,21 @@ control 'iam-api-1' do
         expect(policy_ids).to include("viewer-access")
       end
   
-      it 'the editors default policy includes editor role' do
+      it 'the editors default policy includes editor team' do
         resp = automate_api_request('/apis/iam/v2/policies')
         expect(resp.http_status).to eq 200
   
         all_policies = resp.parsed_response_body[:policies]
-        policies = all_policies.select{ |p| /^team:local:editor$/.match(p[:members][0]) }
+        policies = all_policies.select{ |p| /^team:local:editors$/.match(p[:members][0]) }
         expect(policies.length).to eq 1
       end
   
-      it 'the viewers default policy includes viewer role' do
+      it 'the viewers default policy includes viewer team' do
         resp = automate_api_request('/apis/iam/v2/policies')
         expect(resp.http_status).to eq 200
   
         all_policies = resp.parsed_response_body[:policies]
-        policies = all_policies.select{ |p| /^team:local:viewer$/.match(p[:members][0]) }
+        policies = all_policies.select{ |p| /^team:local:viewers$/.match(p[:members][0]) }
         expect(policies.length).to eq 1
       end
     end
