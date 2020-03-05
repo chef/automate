@@ -25,7 +25,7 @@ import {
   UpdateDestinationFailure,
   DeleteDestination,
   DeleteDestinationSuccess,
-  DeleteDestinationFailure,
+  DeleteDestinationFailure
 } from './destination.actions';
 
 import {
@@ -46,7 +46,8 @@ export class DestinationEffects {
       mergeMap(() =>
         this.requests.getDestinations().pipe(
           map((resp: GetDestinationsSuccessPayload) => new GetDestinationsSuccess(resp)),
-          catchError((error: HttpErrorResponse) => observableOf(new GetDestinationsFailure(error))))));
+          catchError((error: HttpErrorResponse) =>
+            observableOf(new GetDestinationsFailure(error))))));
 
   @Effect()
   getDestinationsFailure$ = this.actions$.pipe(
@@ -85,8 +86,9 @@ export class DestinationEffects {
       mergeMap(({ payload, username, password }: CreateDestination) =>
       this.requests.createDestination( payload, username, password ).pipe(
         map(() => new CreateDestinationSuccess(payload)),
-        catchError((error: HttpErrorResponse) => observableOf(new CreateDestinationFailure(error))))));
-  
+        catchError((error: HttpErrorResponse) =>
+          observableOf(new CreateDestinationFailure(error))))));
+
   @Effect()
   createDestinationSuccess$ = this.actions$.pipe(
       ofType(DestinationActionTypes.CREATE_SUCCESS),

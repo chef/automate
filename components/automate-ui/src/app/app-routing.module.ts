@@ -176,7 +176,7 @@ const routes: Routes = [
           ]
         },
         {
-          path: 'data-feeds/:id',
+          path: 'data-feed/:id',
           component: DataFeedDetailsComponent
         },
         {
@@ -195,7 +195,7 @@ const routes: Routes = [
               component: DatafeedFormComponent
             }
           ]
-        },
+        }
       ]
     },
     {

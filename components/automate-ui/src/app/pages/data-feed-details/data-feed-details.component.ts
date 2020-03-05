@@ -35,14 +35,14 @@ export class DataFeedDetailsComponent implements OnInit {
     fb: FormBuilder,
     private layoutFacade: LayoutFacadeService
   ) {
-    
+
     this.updateForm = fb.group({
       // Must stay in sync with error checks in data-feed-details.component.html
       name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      url: ['', [Validators.required, 
-        Validators.pattern(Regex.patterns.NON_BLANK), 
+      url: ['', [Validators.required,
+        Validators.pattern(Regex.patterns.NON_BLANK),
         Validators.pattern(Regex.patterns.VALID_FQDN)
-      ]],
+      ]]
     });
   }
 
@@ -62,7 +62,8 @@ export class DataFeedDetailsComponent implements OnInit {
       this.store.select(getStatus),
       this.store.select(destinationFromRoute)
     ]).pipe(
-      filter(([status, destination]) => status === EntityStatus.loadingSuccess && !isNil(destination)),
+      filter(([status, destination]) =>
+      status === EntityStatus.loadingSuccess && !isNil(destination)),
       takeUntil(this.isDestroyed))
       .subscribe(([_, destination]) => {
         this.destination = destination;
@@ -87,8 +88,8 @@ export class DataFeedDetailsComponent implements OnInit {
   public saveDataFeed(): void {
     this.saveSuccessful = false;
     this.saveInProgress = true;
-    const destinationObj = new Destination(undefined, '', '', '')
-    destinationObj.id = this.destination.id
+    const destinationObj = new Destination(undefined, '', '', '');
+    destinationObj.id = this.destination.id;
     destinationObj.name = this.updateForm.controls['name'].value.trim();
     destinationObj.url = this.updateForm.controls['url'].value.trim();
     this.store.dispatch(new UpdateDestination({ destination: destinationObj }));

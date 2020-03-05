@@ -25,8 +25,8 @@ export class CreateDataFeedModalComponent implements OnInit {
   @Input() hookStatus = UrlTestState.Inactive;
 
   public conflictError = false;
-  public urlState = UrlTestState
-  
+  public urlState = UrlTestState;
+
   ngOnInit() {
     this.conflictErrorEvent.subscribe((isConflict: boolean) => {
       this.conflictError = isConflict;
@@ -53,7 +53,7 @@ export class CreateDataFeedModalComponent implements OnInit {
   }
 
   urlPresent() {
-    return this.createForm.controls.url.value !== "" ? true : false
+    return this.createForm.controls.url.value !== '' ? true : false;
   }
 
   private isNavigationKey(event: KeyboardEvent): boolean {

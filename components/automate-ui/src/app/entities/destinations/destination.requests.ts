@@ -41,19 +41,19 @@ export class DestinationRequests {
   constructor(private http: HttpClient) { }
 
   public getDestinations(): Observable<DestinationsResponse> {
-    return this.http.post<DestinationsResponse>(encodeURI(this.joinToDatafeedUrl(['destinations'])), {});
+    return this.http.post<DestinationsResponse>(encodeURI(
+      this.joinToDatafeedUrl(['destinations'])), {});
   }
-
-  // public getDestination(id: string): Observable<DestinationResponse> {
-  //   return this.http.get<DestinationResponse>(this.joinToDatafeedUrl(['destination', id]));
-  // }
 
   public getDestination(id: string): Observable<Destination> {
     return this.http.get<DestinationResponse>(this.joinToDatafeedUrl(['destination', id]))
-    .pipe(map((destinationsJson: DestinationResponse) => Destination.fromResponse(destinationsJson)));
+    .pipe(map((destinationsJson: DestinationResponse) =>
+    Destination.fromResponse(destinationsJson)));
   }
 
-  public createDestination(destinationData: Destination, targetUsername: string, targetPassword: string): Observable<DestinationResponse> {
+  public createDestination(destinationData: Destination,
+    targetUsername: string, targetPassword: string):
+    Observable<DestinationResponse> {
     return this.createSecret(destinationData, targetUsername, targetPassword)
       .pipe(mergeMap((secretId: string) => {
         destinationData.secret_id = secretId;
