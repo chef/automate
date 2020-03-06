@@ -124,14 +124,12 @@ func (Version_VersionNumber) EnumDescriptor() ([]byte, []int) {
 	return fileDescriptor_96f942825c854ad5, []int{4, 0}
 }
 
-// These are Policies
 type Policy struct {
 	// Name for the policy.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	// Whether this policy is user created or chef managed.
-	// One of `CUSTOM` or `CHEF_MANAGED`, respectively.
+	// This doc-comment is ignored for an enum.
 	Type Type `protobuf:"varint,3,opt,name=type,proto3,enum=chef.automate.api.iam.v2.Type" json:"type,omitempty"`
 	// Members affected by this policy.
 	Members []string `protobuf:"bytes,4,rep,name=members,proto3" json:"members,omitempty"`
@@ -211,10 +209,8 @@ func (m *Policy) GetProjects() []string {
 	return nil
 }
 
-// These are projects
 type Statement struct {
-	// Whether the statement allows or denies.
-	// One of `ALLOW` or `DENY`, respectively.
+	// This doc-comment is ignored for an enum.
 	Effect Statement_Effect `protobuf:"varint,1,opt,name=effect,proto3,enum=chef.automate.api.iam.v2.Statement_Effect" json:"effect,omitempty"`
 	// Defines the actions for the members of this policy. The best practice is to use chef-managed roles or to define custom roles for unique action sets.
 	Actions []string `protobuf:"bytes,3,rep,name=actions,proto3" json:"actions,omitempty"`
@@ -289,7 +285,6 @@ func (m *Statement) GetProjects() []string {
 	return nil
 }
 
-// These are Roles
 type Role struct {
 	// Name for the role.
 	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
