@@ -189,7 +189,7 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 	// between database content and hardcoded storage default policies actually
 	// compares the migrated policies with the hardcoded ones (and NOT the
 	// hardcoded policies with the hardcoded policies).
-	db := openDB(t)
+	db := openDB(t, migrationConfig.PGURL.String())
 	_, err = db.ExecContext(ctx, resetDatabaseStatement)
 	require.NoError(t, err, "error resetting database")
 	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
@@ -199,7 +199,7 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 	require.NoError(t, err)
 	return postgres.GetInstance(), &TestDB{
 			DB:      db,
-			ConnURI: "postgres://postgres:postgres@127.0.0.1:5432/authz_test?sslmode=disable",
+			ConnURI: migrationConfig.PGURL.String(),
 		},
 		opaInstance, prng.Seed(t), migrationConfig
 }
@@ -259,9 +259,9 @@ func migrationConfigIfPGTestsToBeRun(l logger.Logger, migrationFolder string) (*
 	}, nil
 }
 
-func openDB(t *testing.T) *sql.DB {
+func openDB(t *testing.T, pgurl string) *sql.DB {
 	t.Helper()
-	db, err := sql.Open("postgres", "postgres://postgres:postgres@127.0.0.1:5432/authz_test?sslmode=disable")
+	db, err := sql.Open("postgres", pgurl)
 	require.NoError(t, err, "error opening db")
 	err = db.Ping()
 	require.NoError(t, err, "error pinging db")

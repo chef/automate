@@ -69,7 +69,7 @@ func setup(t *testing.T) (tokens.Storage, *sql.DB) {
 	backend, err := pgCfg.Open(nil, l, authzV2Client)
 	require.NoError(t, err)
 
-	db := openDB(t)
+	db := openDB(t, pgCfg.PGURL)
 	reset(t, db)
 
 	return backend, db
@@ -105,9 +105,9 @@ func initializePG() (*pg.Config, error) {
 	}, nil
 }
 
-func openDB(t *testing.T) *sql.DB {
+func openDB(t *testing.T, pgURL string) *sql.DB {
 	t.Helper()
-	db, err := sql.Open("postgres", constants.TestPgURL)
+	db, err := sql.Open("postgres", pgURL)
 	require.NoError(t, err, "error opening db")
 	err = db.Ping()
 	require.NoError(t, err, "error pinging db")

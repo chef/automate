@@ -37,7 +37,7 @@ test:
 test/%:
 	go test -v -cover -count=1 -parallel=1 -p 1 $(PACKAGE_PATH)/$(subst test/,,$(@D))/... -run $(@F)
 
-PG_URL ?= "postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable"
+PG_URL ?= "postgresql://postgres@127.0.0.1:5432/authz_test?sslmode=disable&password=docker"
 DOCKER_CLEAN_MSG = "\nDocker container still up; run 'make kill_docker_pg' to clean it up when finished."
 
 test_with_db: db_container
@@ -60,8 +60,7 @@ db_container:
 	psql -d $(PG_URL) -c "CREATE EXTENSION IF NOT EXISTS \"uuid-ossp\""
 
 setup_docker_pg:
-	docker run --name authz-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=authz_test -p 5432:5432 -d postgres:9
-
+	docker run --name authz-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=authz_test -e POSTGRES_PASSWORD=docker -p 5432:5432 -d postgres:9
 
 kill_docker_pg:
 	docker rm -f authz-postgres || true
