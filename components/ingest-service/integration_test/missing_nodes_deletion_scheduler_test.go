@@ -25,7 +25,7 @@ func TestMissingNodesForDeletionSchedulerBasic(t *testing.T) {
 		expected = new(ingest.MarkMissingNodesForDeletionResponse)
 		now      = time.Now() // The time that we will use to check the timestamp update
 		nodes    = []iBackend.Node{
-			iBackend.Node{
+			{
 				NodeInfo: iBackend.NodeInfo{
 					EntityUuid:       newUUID(),
 					Status:           "missing",

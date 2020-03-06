@@ -374,11 +374,11 @@ var fileDescriptor_6a32ec645813ca57 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // IngestStatusClient is the client API for IngestStatus service.
 //
@@ -390,10 +390,10 @@ type IngestStatusClient interface {
 }
 
 type ingestStatusClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewIngestStatusClient(cc *grpc.ClientConn) IngestStatusClient {
+func NewIngestStatusClient(cc grpc.ClientConnInterface) IngestStatusClient {
 	return &ingestStatusClient{cc}
 }
 

@@ -222,11 +222,11 @@ var fileDescriptor_10bff82644343582 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // ComplianceStatusClient is the client API for ComplianceStatus service.
 //
@@ -236,10 +236,10 @@ type ComplianceStatusClient interface {
 }
 
 type complianceStatusClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewComplianceStatusClient(cc *grpc.ClientConn) ComplianceStatusClient {
+func NewComplianceStatusClient(cc grpc.ClientConnInterface) ComplianceStatusClient {
 	return &complianceStatusClient{cc}
 }
 

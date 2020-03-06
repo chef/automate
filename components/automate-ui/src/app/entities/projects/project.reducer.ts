@@ -65,7 +65,7 @@ export function projectEntityReducer(
 
   switch (action.type) {
     case ProjectActionTypes.GET_ALL:
-      return set(GET_ALL_STATUS, EntityStatus.loading, projectEntityAdapter.removeAll(state));
+      return set(GET_ALL_STATUS, EntityStatus.loading, state);
 
     case ProjectActionTypes.GET_ALL_SUCCESS:
       return set(GET_ALL_STATUS, EntityStatus.loadingSuccess,

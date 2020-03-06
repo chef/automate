@@ -6,10 +6,14 @@ SWAGGER_DIR=data/docs/api_chef_automate
 SWAGGER_FILES=$(shell find $(SWAGGER_DIR) -name '*.swagger.json')
 STATIC_SWAGGER_FILES=$(shell find data/docs/api-static/ -type f | sort -n)
 
+REDOC_FILE=static/redoc.standalone.js
+REDOC_VERSION=2.0.0-rc.23
+
 themes/chef:
 	scripts/clone_hugo.sh
 
 clean:
+	rm -f $(REDOC_FILE)
 	rm -f $(SWAGGER_RESULT_FILE)
 	rm -rf themes/
 	rm -rf public/
@@ -44,13 +48,13 @@ generate_swagger: $(SWAGGER_RESULT_FILE)
 		jq -es 'if . == [] then null else .[] | .paths = (.paths | with_entries( select( all( .value[].tags[]; . != "hidden") ) ) ) end' \
 		> $(SWAGGER_RESULT_FILE)
 
-serve: sync generate_swagger
+serve: sync generate_swagger $(REDOC_FILE)
 	hugo server --buildDrafts --noHTTPCache
 
 lint: themes/chef
 	hugo -D
 
-build: themes/chef generate_swagger
+build: themes/chef generate_swagger $(REDOC_FILE)
 	hugo
 
 # Consult scripts/spellcheck.sh in the root Automate directory for notes on using cspell.
@@ -66,3 +70,6 @@ spellcheck:
 		; EXIT_CODE=$$?; \
 		popd > /dev/null; \
 		exit $$EXIT_CODE
+
+$(REDOC_FILE):
+	curl -s -f -o $(REDOC_FILE) https://cdn.jsdelivr.net/npm/redoc@$(REDOC_VERSION)/bundles/redoc.standalone.js

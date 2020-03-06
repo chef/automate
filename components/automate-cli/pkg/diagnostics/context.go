@@ -43,6 +43,10 @@ type TestContext interface {
 	PublishViaNATS([][]byte) error
 	// GetOption returns the Option for the given key
 	GetOption(key string) *Option
+	// GetVersion returns the version of automate that is running
+	GetVersion() (string, error)
+	// IsIAMV2 returns whether or not automate is on the latest version of IAM
+	IsIAMV2() (bool, error)
 }
 
 // VerificationTestContext is accepted by the Verify stage of a diagnostic. This
@@ -59,6 +63,7 @@ type testContext struct {
 	lbURL      url.URL
 	dsClient   api.DeploymentClient
 	httpClient *http.Client
+	version    string
 }
 
 type globals struct {
@@ -203,6 +208,81 @@ func (c *testContext) DoLBRequest(path string, opts ...lbrequest.Opts) (*http.Re
 	return nil, lastErr
 }
 
+func (c *testContext) GetVersion() (string, error) {
+	if c.version != "" {
+		return c.version, nil
+	}
+
+	httpResp, err := c.DoLBRequest("/api/v0/version")
+	if err != nil {
+		return "", err
+	}
+	defer httpResp.Body.Close()
+
+	resp := struct {
+		Build string `json:"build_timestamp"`
+	}{}
+
+	if err := json.NewDecoder(httpResp.Body).Decode(&resp); err != nil {
+		return "", err
+	}
+
+	c.version = resp.Build
+
+	return resp.Build, nil
+}
+
+func (c *testContext) IsIAMV2() (bool, error) {
+	vsn := struct {
+		Version struct{ Major, Minor string }
+	}{}
+
+	v2betaResp, err := c.DoLBRequest("/apis/iam/v2beta/policy_version")
+	if err != nil {
+		return false, err
+	}
+	defer v2betaResp.Body.Close()
+
+	if v2betaResp.StatusCode == 200 {
+		if err := json.NewDecoder(v2betaResp.Body).Decode(&vsn); err != nil {
+			// on ancient versions of Automate, any unknown	prefix on an API query
+			// gets redirected by nginx to serve up the UI and responds with 200.
+			// We can assume v1 in this case.
+			return false, nil
+		}
+
+		return vsn.Version.Major == "V2", nil
+
+	} else if v2betaResp.StatusCode == 404 {
+		// before assuming v1, we check the v2 policy_version API,
+		// since we might be on a post-force-upgrade version of Automate
+		v2Resp, err := c.DoLBRequest("/apis/iam/v2/policy_version")
+		if err != nil {
+			return false, err
+		}
+		defer v2Resp.Body.Close()
+
+		if v2Resp.StatusCode == 200 {
+			if err := json.NewDecoder(v2betaResp.Body).Decode(&vsn); err != nil {
+				// See decoder comment above,  we assume v1 in this case.
+				return false, nil
+			}
+
+			return vsn.Version.Major == "V2", nil
+
+			// if the /policy_version endpoint is not found using the v2 or v2beta prefix,
+			// we must be testing an old version of Automate with only v1.
+		} else if v2Resp.StatusCode == 404 {
+			return false, nil
+		}
+
+		return false, errors.Errorf("failed to verify IAM version with status code: %v", v2Resp.StatusCode)
+	}
+
+	// any other unexpected responses get caught here
+	return false, errors.Errorf("failed to verify IAM version with status code: %v", v2betaResp.StatusCode)
+}
+
 func (c *testContext) PublishViaNATS(messages [][]byte) error {
 	authToken, err := c.adminToken()
 	if err != nil {
@@ -223,7 +303,7 @@ func (c *testContext) PublishViaNATS(messages [][]byte) error {
 
 	err = client.Connect()
 	if err != nil {
-		return errors.Wrapf(err, "failed to connenct to nats at URL %s", url)
+		return errors.Wrapf(err, "failed to connect to nats at URL %s", url)
 	}
 	defer client.Close()
 

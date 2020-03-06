@@ -5402,11 +5402,11 @@ var fileDescriptor_6db583793d7d5250 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // DeploymentClient is the client API for Deployment service.
 //
@@ -5460,10 +5460,10 @@ type DeploymentClient interface {
 }
 
 type deploymentClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewDeploymentClient(cc *grpc.ClientConn) DeploymentClient {
+func NewDeploymentClient(cc grpc.ClientConnInterface) DeploymentClient {
 	return &deploymentClient{cc}
 }
 

@@ -14,15 +14,15 @@ message CreatePolicyReq {
         required: ["id", "name", "statements"]
       }
     };
-    // Unique ID. Cannot be changed.
+    // Unique, user-specified ID. Cannot be changed.
     string id = 1;
-    // Name for the policy.
+    // Name for the new policy.
     string name = 2;
     // Members affected by this policy.
     repeated string members = 3;
-    // Statements for the policy.
+    // Statements for the new policy. Must contain one or more.
     repeated Statement statements = 4;
-    // List of projects this policy belongs to.
+    // The list of projects this policy belongs to.
     repeated string projects = 5;
 }
 

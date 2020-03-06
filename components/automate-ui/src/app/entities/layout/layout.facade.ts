@@ -82,13 +82,13 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     if (this.layout.header.license) {
       combinedHeights += Height.License;
     }
-    if (this.layout.userNotifications.pendingEdits) {
-      combinedHeights += Height.PendingEditsBar;
-    }
+    // order matters for these two: pending is suppressed if processing
     if (this.layout.userNotifications.updatesProcessing) {
       combinedHeights += Height.ProcessProgressBar;
+    } else if (this.layout.userNotifications.pendingEdits) {
+      combinedHeights += Height.PendingEditsBar;
     }
-    this.contentHeight = `calc(100vh - ${combinedHeights}px)`;
+   this.contentHeight = `calc(100vh - ${combinedHeights}px)`;
   }
 
   hasGlobalNotifications(): boolean {

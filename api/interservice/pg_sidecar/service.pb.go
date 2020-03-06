@@ -1037,11 +1037,11 @@ var fileDescriptor_45f2bde384397dbe = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // PGSidecarClient is the client API for PGSidecar service.
 //
@@ -1058,10 +1058,10 @@ type PGSidecarClient interface {
 }
 
 type pGSidecarClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewPGSidecarClient(cc *grpc.ClientConn) PGSidecarClient {
+func NewPGSidecarClient(cc grpc.ClientConnInterface) PGSidecarClient {
 	return &pGSidecarClient{cc}
 }
 

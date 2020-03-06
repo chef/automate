@@ -784,11 +784,11 @@ var fileDescriptor_dfa5074251be5580 = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // DatafeedServiceClient is the client API for DatafeedService service.
 //
@@ -803,10 +803,10 @@ type DatafeedServiceClient interface {
 }
 
 type datafeedServiceClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewDatafeedServiceClient(cc *grpc.ClientConn) DatafeedServiceClient {
+func NewDatafeedServiceClient(cc grpc.ClientConnInterface) DatafeedServiceClient {
 	return &datafeedServiceClient{cc}
 }
 

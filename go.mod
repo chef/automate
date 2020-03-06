@@ -48,7 +48,7 @@ require (
 	github.com/gogo/protobuf v1.3.0 // indirect
 	github.com/golang-migrate/migrate v3.5.4+incompatible
 	github.com/golang/mock v1.2.1-0.20190311213431-837231f7bb37
-	github.com/golang/protobuf v1.3.2
+	github.com/golang/protobuf v1.3.3
 	github.com/google/go-cloud v0.1.1
 	github.com/gorilla/handlers v1.3.0 // indirect
 	github.com/gorilla/mux v1.6.1
@@ -121,12 +121,14 @@ require (
 	go.uber.org/multierr v1.1.1-0.20180122172545-ddea229ff1df
 	go.uber.org/zap v1.7.2-0.20171031232209-f85c78b1dd99
 	golang.org/x/crypto v0.0.0-20190308221718-c2843e01d9a2
+	golang.org/x/net v0.0.0-20200202094626-16171245cfb2 // indirect
 	golang.org/x/oauth2 v0.0.0-20190604053449-0f29369cfe45
 	golang.org/x/perf v0.0.0-20190823172224-ecb187b06eb0
-	golang.org/x/text v0.3.1-0.20171218113626-eb22672bea55
+	golang.org/x/sys v0.0.0-20200202164722-d101bd2416d5 // indirect
+	golang.org/x/text v0.3.2
 	google.golang.org/api v0.0.0-20180829000535-087779f1d2c9
-	google.golang.org/genproto v0.0.0-20190927181202-20e1ac93f88c
-	google.golang.org/grpc v1.24.0
+	google.golang.org/genproto v0.0.0-20200211111953-2dc5924e3898
+	google.golang.org/grpc v1.27.1
 	gopkg.in/asn1-ber.v1 v1.0.0-20170511165959-379148ca0225 // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.20
 	gopkg.in/ldap.v2 v2.5.1 // indirect

@@ -86,7 +86,7 @@ func TestPolicyCookbooksWithOneAction(t *testing.T) {
 	data = strings.Replace(data, "\n", "", -1)
 	data = strings.Replace(data, "\t", "", -1)
 	action := []iBackend.InternalChefAction{
-		iBackend.InternalChefAction{
+		{
 			RecordedAt: recordedAt,
 			RevisionId: revisionId,
 			Data:       data,
@@ -101,11 +101,11 @@ func TestPolicyCookbooksWithOneAction(t *testing.T) {
 	expected := &response.PolicyCookbooks{
 		PolicyName: "cd-infrastructure-base",
 		CookbookLocks: []*response.CookbookLock{
-			&response.CookbookLock{
+			{
 				Cookbook:         "chefops-base",
 				PolicyIdentifier: "9b2832d8802559fd9611ae1e9bc6ee20bf258a40",
 			},
-			&response.CookbookLock{
+			{
 				Cookbook:         "audit",
 				PolicyIdentifier: "9778186fc1326e8901c3f37942d2cecc5d1d04f0",
 			},

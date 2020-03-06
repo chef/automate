@@ -47,7 +47,7 @@ func TestMarkForDeleteNodeTerminated(t *testing.T) {
 		}
 		nodeID = newUUID()
 		node   = []iBackend.Node{
-			iBackend.Node{
+			{
 				NodeInfo: iBackend.NodeInfo{
 					EntityUuid: nodeID,
 				},

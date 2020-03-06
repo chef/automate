@@ -83,11 +83,11 @@ var fileDescriptor_28c6f49a8332221c = []byte{
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
-var _ grpc.ClientConn
+var _ grpc.ClientConnInterface
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
-const _ = grpc.SupportPackageIsVersion4
+const _ = grpc.SupportPackageIsVersion6
 
 // RulesClient is the client API for Rules service.
 //
@@ -104,10 +104,10 @@ type RulesClient interface {
 }
 
 type rulesClient struct {
-	cc *grpc.ClientConn
+	cc grpc.ClientConnInterface
 }
 
-func NewRulesClient(cc *grpc.ClientConn) RulesClient {
+func NewRulesClient(cc grpc.ClientConnInterface) RulesClient {
 	return &rulesClient{cc}
 }
 
