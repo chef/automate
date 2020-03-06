@@ -79,6 +79,10 @@ s3.client.default.max_retries: 3
 s3.client.default.use_throttle_retries: true
 s3.client.default.endpoint: "${s3_endpoint}"
 EOF
+
+    echo "$AWS_ACCESS_KEY_ID" | /usr/share/elasticsearch/bin/elasticsearch-keystore add s3.client.default.access_key
+    echo "$AWS_SECRET_ACCESS_KEY" | /usr/share/elasticsearch/bin/elasticsearch-keystore add s3.client.default.secret_key
+    echo "$AWS_SESSION_TOKEN" | /usr/share/elasticsearch/bin/elasticsearch-keystore add s3.client.default.session_token
   fi
 
   systemctl start elasticsearch.service
