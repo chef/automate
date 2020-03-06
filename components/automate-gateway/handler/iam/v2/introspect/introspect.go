@@ -22,7 +22,7 @@ import (
 	gwAuthzRes "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 
 	// other dependencies
-	policy "github.com/chef/automate/components/automate-gateway/authz/policy_v2"
+	"github.com/chef/automate/components/automate-gateway/api/authz/policy"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
