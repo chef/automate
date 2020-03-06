@@ -134,12 +134,16 @@ func run(args []string, conf *TargetConfig, timeout time.Duration, env map[strin
 
 	var cmd *exec.Cmd
 	if conf == nil {
+		// TODO: rm debug
+		fmt.Println("!!! nil conf branch")
 		cmd = exec.CommandContext(ctx, args[0], args[1:]...)
 	} else {
 		jsonConf, err := json.Marshal(conf)
 		if err != nil {
 			return nil, nil, err
 		}
+
+		fmt.Printf("!!! jsonconf %+v\n", conf)
 
 		args = append(args, "--json-config=-") // read config from stdin
 		cmd = exec.CommandContext(ctx, args[0], args[1:]...)
