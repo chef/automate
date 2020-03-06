@@ -69,13 +69,17 @@ func (backend ES2Backend) getDocIdHits(esIndex string,
 func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	filters map[string][]string,
 	latestOnly bool) (*reportingapi.ReportIds, error) {
+	myName := "getNodeReportIdsFromTimeseries"
 	nodeReport := make(map[string]reportingapi.ReportData, 0)
 	boolQuery := backend.getFiltersQuery(filters, latestOnly)
+
+	fsc := elastic.NewFetchSourceContext(true).Include("end_time")
 
 	// aggs
 	aggs := elastic.NewTermsAggregation().Field("node_uuid").Size(reporting.ESize).
 		SubAggregation("distinct", elastic.NewTopHitsAggregation().Size(1).
-			FetchSource(false).
+			FetchSourceContext(fsc).
+			//FetchSource(false).
 			Sort("end_time", false))
 
 	client, err := backend.ES2Client()
@@ -101,7 +105,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 			"hits.total",
 			"aggregations.nodes.buckets.key",
 			"aggregations.nodes.buckets.distinct.hits.hits._id",
-			"aggregations.nodes.buckets.distinct.hits.hits._source.end_time",
+			"aggregations.nodes.buckets.distinct.hits.hits._source",
 		).
 		SearchSource(searchSource).
 		Do(context.Background())
@@ -116,6 +120,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 		// no matching report IDs is not an error, just return an empty array
 		return nil, nil
 	}
+	LogQueryPartMin(esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
 	//reportIds := make([]*reportingapi.ReportIds, 0)
 	outermostAgg, _ := searchResult.Aggregations.Terms("nodes")
@@ -124,15 +129,18 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 			topHits, _ := nodeBucket.Aggregations.TopHits("distinct")
 			nodeID := fmt.Sprintf("%s", nodeBucket.Key)
 			for _, hit := range topHits.Hits.Hits {
-				var endTimeSource string
+				type endTimeSource struct {
+					EndTime time.Time `json:"end_time"`
+				}
+				var et endTimeSource
 				if hit.Source != nil {
-					err = json.Unmarshal(*hit.Source, &endTimeSource)
+					err = json.Unmarshal(*hit.Source, &et)
 					if err == nil {
 
 					}
 				}
-				endTime, _ := time.Parse("2006-01-02T15:04:05", "2018-02-09T09:18:41Z")
-				endTimeTimestamp, _ := ptypes.TimestampProto(endTime)
+				logrus.Infof("et %v", et)
+				endTimeTimestamp, _ := ptypes.TimestampProto(et.EndTime)
 
 				repData := reportingapi.ReportData{}
 				repData.Id = hit.Id

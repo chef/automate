@@ -465,6 +465,15 @@ message Reports {
 message ReportIds {
 	// The list of unique report identifiers found matching the query.
 	repeated string ids = 1;
+	// The list of unique report identifiers with their respective end_time, found matching the query.
+	repeated ReportData report_data = 2;
+}
+
+message ReportData{
+	// The report run_uuid
+	string id = 1;
+	// The time in UTC that the scan was completed
+	google.protobuf.Timestamp end_time = 2;
 }
 
 message Report {
