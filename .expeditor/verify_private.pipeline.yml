@@ -474,9 +474,9 @@ steps:
         linux:
           privileged: true
 
-   - label: "iam v2 with legacy force-upgrade to latest v2"
+  - label: "iam v2 with legacy force-upgrade to latest v2"
     command:
-      - integration/run_test integration/tests/iam_v2_force_upgrade_to_v2_with_legacy.sh
+      - integration/run_test integration/tests/iam_v2_legacy_to_v2_force_upgrade.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
