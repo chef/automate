@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
+	"github.com/chef/automate/components/automate-gateway/api/iam/v2/pairs"
 )
 
 func TestAuthzPairs(t *testing.T) {

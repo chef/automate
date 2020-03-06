@@ -13,7 +13,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
-	"github.com/chef/automate/components/automate-gateway/api/authz/policy"
+	"github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 )
 
 func TestAuthzPolicy(t *testing.T) {

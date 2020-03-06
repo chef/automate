@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
+	"github.com/chef/automate/components/automate-gateway/api/iam/v2/pairs"
 )
 
 // ExpansionFunc dictates how a parameter is filled in to a resource placeholder.

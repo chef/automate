@@ -47,7 +47,7 @@ type policyBundle struct {
 }
 
 var policyVersion = policyBundle{
-	pkg:       "github.com/chef/automate/components/automate-gateway/api/authz/policy",
+	pkg:       "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy",
 	extension: iam.E_Policy,
 	convert: func(x interface{}) *policyInfo {
 		if y, ok := x.(*iam.PolicyInfo); ok {
