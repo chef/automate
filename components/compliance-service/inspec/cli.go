@@ -89,7 +89,7 @@ func Scan(paths []string, target *TargetConfig, timeout time.Duration, env map[s
 	}
 
 	if stdOutErr != "" {
-		scanErr := getInspecError(string(stdErr), err, target, timeout)
+		scanErr := getInspecError("", string(stdErr), err, target, timeout)
 		scanErr.Message = stdOutErr + "\n" + scanErr.Message
 		return nil, nil, scanErr
 	}
@@ -111,7 +111,7 @@ func Detect(target *TargetConfig, timeout time.Duration, env map[string]string) 
 
 	if err != nil {
 		// all connection errors etc go here
-		return nil, getInspecError(string(serr), err, target, timeout)
+		return nil, getInspecError(string(out), string(serr), err, target, timeout)
 	}
 
 	var res OSInfo
@@ -132,6 +132,13 @@ func run(args []string, conf *TargetConfig, timeout time.Duration, env map[strin
 	ctx, cancel := context.WithTimeout(context.Background(), timeout)
 	defer cancel()
 
+	which, _ := exec.LookPath(args[0]) // nolint: errcheck
+	logrus.WithFields(logrus.Fields{
+		"path":  os.Getenv("PATH"),
+		"args":  args,
+		"env":   env,
+		"which": which,
+	}).Info("Running inspec cli command")
 	var cmd *exec.Cmd
 	if conf == nil {
 		cmd = exec.CommandContext(ctx, args[0], args[1:]...)
@@ -234,64 +241,71 @@ func Archive(profilePath string, outputPath string) error {
 	return nil
 }
 
-func getInspecError(serr string, err error, target *TargetConfig, timeout time.Duration) *Error {
+func getInspecError(stdOut string, stdErr string, err error, target *TargetConfig, timeout time.Duration) *Error {
 	connErr := "Errno::ECONNREFUSED"
-	if strings.Index(serr, connErr) >= 0 {
-		return NewInspecError(CONN_REFUSED,
-			"Failed to connect to "+target.Hostname+", connection refused.")
+	for _, serr := range []string{stdOut, stdErr} {
+		if strings.Index(serr, connErr) >= 0 {
+			return NewInspecError(CONN_REFUSED,
+				"Failed to connect to "+target.Hostname+", connection refused.")
+		}
+		noTTYErr := "Errno::ENOTTY"
+		if strings.Index(serr, noTTYErr) >= 0 {
+			return NewInspecError(AUTH_FAILED,
+				"Authentication failed for "+target.Hostname)
+		}
+		hostDownErr := "Errno::EHOSTDOWN"
+		if strings.Index(serr, hostDownErr) >= 0 {
+			return NewInspecError(UNREACHABLE_HOST,
+				"Failed to connect to "+target.Hostname+", host is unreachable.")
+		}
+		connTimeoutErr := "Net::SSH::ConnectionTimeout"
+		if strings.Index(serr, connTimeoutErr) >= 0 {
+			return NewInspecError(CONN_TIMEOUT,
+				"Failed to connect to "+target.Hostname+", connection timeout.")
+		}
+		authErr := "Net::SSH::AuthenticationFailed"
+		if strings.Index(serr, authErr) >= 0 {
+			return NewInspecError(AUTH_FAILED,
+				"Authentication failed for "+target.Hostname)
+		}
+		sudoErr := "Sudo requires a password"
+		if strings.Index(serr, sudoErr) >= 0 {
+			return NewInspecError(SUDO_PW_REQUIRED,
+				"Failed to run commands on "+target.Hostname+
+					": The node is configured to use sudo, but sudo requires a password to run commands.")
+		}
+		pwErr := "Wrong sudo password"
+		if strings.Index(serr, pwErr) >= 0 {
+			return NewInspecError(WRONG_SUDO_PW,
+				"Failed to run commands on "+target.Hostname+
+					": Sudo password is incorrect.")
+		}
+		nosudoErr := "Can't find sudo command"
+		if strings.Index(serr, nosudoErr) >= 0 {
+			return NewInspecError(NO_SUDO,
+				"Failed to run commands on "+target.Hostname+
+					": Cannot use sudo, please deactivate it or configure sudo for this user.")
+		}
+		notInSudoersErr := "is not in the sudoers file"
+		if strings.Index(serr, notInSudoersErr) >= 0 {
+			return NewInspecError(NO_SUDO,
+				"Failed to run commands on "+target.Hostname+
+					": User is not in sudoers file.")
+		}
 	}
-	noTTYErr := "Errno::ENOTTY"
-	if strings.Index(serr, noTTYErr) >= 0 {
-		return NewInspecError(AUTH_FAILED,
-			"Authentication failed for "+target.Hostname)
-	}
-	hostDownErr := "Errno::EHOSTDOWN"
-	if strings.Index(serr, hostDownErr) >= 0 {
-		return NewInspecError(UNREACHABLE_HOST,
-			"Failed to connect to "+target.Hostname+", host is unreachable.")
-	}
-	connTimeoutErr := "Net::SSH::ConnectionTimeout"
-	if strings.Index(serr, connTimeoutErr) >= 0 {
-		return NewInspecError(CONN_TIMEOUT,
-			"Failed to connect to "+target.Hostname+", connection timeout.")
-	}
-	authErr := "Net::SSH::AuthenticationFailed"
-	if strings.Index(serr, authErr) >= 0 {
-		return NewInspecError(AUTH_FAILED,
-			"Authentication failed for "+target.Hostname)
-	}
-	sudoErr := "Sudo requires a password"
-	if strings.Index(serr, sudoErr) >= 0 {
-		return NewInspecError(SUDO_PW_REQUIRED,
-			"Failed to run commands on "+target.Hostname+
-				": The node is configured to use sudo, but sudo requires a password to run commands.")
-	}
-	pwErr := "Wrong sudo password"
-	if strings.Index(serr, pwErr) >= 0 {
-		return NewInspecError(WRONG_SUDO_PW,
-			"Failed to run commands on "+target.Hostname+
-				": Sudo password is incorrect.")
-	}
-	nosudoErr := "Can't find sudo command"
-	if strings.Index(serr, nosudoErr) >= 0 {
-		return NewInspecError(NO_SUDO,
-			"Failed to run commands on "+target.Hostname+
-				": Cannot use sudo, please deactivate it or configure sudo for this user.")
-	}
-	notInSudoersErr := "is not in the sudoers file"
-	if strings.Index(serr, notInSudoersErr) >= 0 {
-		return NewInspecError(NO_SUDO,
-			"Failed to run commands on "+target.Hostname+
-				": User is not in sudoers file.")
-	}
+
 	if err.Error() == "execute timeout" {
 		return NewInspecError(CONN_TIMEOUT,
 			"Failed to connect to "+target.Hostname+
 				", connection timed out after "+timeout.String())
 	}
 
+	errStr := "STDERR: " + stdErr
+	if stdOut != "" {
+		errStr = "\n\nSTDOUT: " + stdOut
+	}
 	return NewInspecError(UNKNOWN_ERROR,
-		"Unknown inspec error for "+target.Hostname+": "+err.Error()+"\n\nSTDERR: "+serr)
+		"Unknown inspec error for "+target.Hostname+": "+err.Error()+"\n\n"+errStr)
 }
 
 func findJsonLine(in []byte) []byte {
