@@ -138,6 +138,24 @@ func local_request_Policies_ListPolicies_0(ctx context.Context, marshaler runtim
 
 }
 
+func request_Policies_ListPolicies_1(ctx context.Context, marshaler runtime.Marshaler, client PoliciesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.ListPoliciesReq
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.ListPolicies(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_Policies_ListPolicies_1(ctx context.Context, marshaler runtime.Marshaler, server PoliciesServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.ListPoliciesReq
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.ListPolicies(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_Policies_DeletePolicy_0(ctx context.Context, marshaler runtime.Marshaler, client PoliciesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.DeletePolicyReq
 	var metadata runtime.ServerMetadata
@@ -280,6 +298,24 @@ func local_request_Policies_GetPolicyVersion_0(ctx context.Context, marshaler ru
 
 }
 
+func request_Policies_GetPolicyVersion_1(ctx context.Context, marshaler runtime.Marshaler, client PoliciesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.GetPolicyVersionReq
+	var metadata runtime.ServerMetadata
+
+	msg, err := client.GetPolicyVersion(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_Policies_GetPolicyVersion_1(ctx context.Context, marshaler runtime.Marshaler, server PoliciesServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.GetPolicyVersionReq
+	var metadata runtime.ServerMetadata
+
+	msg, err := server.GetPolicyVersion(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
 func request_Policies_ListPolicyMembers_0(ctx context.Context, marshaler runtime.Marshaler, client PoliciesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.ListPolicyMembersReq
 	var metadata runtime.ServerMetadata
@@ -308,6 +344,60 @@ func request_Policies_ListPolicyMembers_0(ctx context.Context, marshaler runtime
 }
 
 func local_request_Policies_ListPolicyMembers_0(ctx context.Context, marshaler runtime.Marshaler, server PoliciesServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.ListPolicyMembersReq
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	msg, err := server.ListPolicyMembers(ctx, &protoReq)
+	return msg, metadata, err
+
+}
+
+func request_Policies_ListPolicyMembers_1(ctx context.Context, marshaler runtime.Marshaler, client PoliciesClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
+	var protoReq request.ListPolicyMembersReq
+	var metadata runtime.ServerMetadata
+
+	var (
+		val string
+		ok  bool
+		err error
+		_   = err
+	)
+
+	val, ok = pathParams["id"]
+	if !ok {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "id")
+	}
+
+	protoReq.Id, err = runtime.String(val)
+
+	if err != nil {
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "id", err)
+	}
+
+	msg, err := client.ListPolicyMembers(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
+	return msg, metadata, err
+
+}
+
+func local_request_Policies_ListPolicyMembers_1(ctx context.Context, marshaler runtime.Marshaler, server PoliciesServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq request.ListPolicyMembersReq
 	var metadata runtime.ServerMetadata
 
@@ -1087,6 +1177,26 @@ func RegisterPoliciesHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 
 	})
 
+	mux.Handle("GET", pattern_Policies_ListPolicies_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Policies_ListPolicies_1(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Policies_ListPolicies_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("DELETE", pattern_Policies_DeletePolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1147,6 +1257,26 @@ func RegisterPoliciesHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 
 	})
 
+	mux.Handle("GET", pattern_Policies_GetPolicyVersion_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Policies_GetPolicyVersion_1(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Policies_GetPolicyVersion_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_Policies_ListPolicyMembers_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1164,6 +1294,26 @@ func RegisterPoliciesHandlerServer(ctx context.Context, mux *runtime.ServeMux, s
 		}
 
 		forward_Policies_ListPolicyMembers_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_Policies_ListPolicyMembers_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateIncomingContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := local_request_Policies_ListPolicyMembers_1(rctx, inboundMarshaler, server, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Policies_ListPolicyMembers_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1548,6 +1698,26 @@ func RegisterPoliciesHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 
 	})
 
+	mux.Handle("GET", pattern_Policies_ListPolicies_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Policies_ListPolicies_1(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Policies_ListPolicies_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("DELETE", pattern_Policies_DeletePolicy_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1608,6 +1778,26 @@ func RegisterPoliciesHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 
 	})
 
+	mux.Handle("GET", pattern_Policies_GetPolicyVersion_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Policies_GetPolicyVersion_1(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Policies_GetPolicyVersion_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
 	mux.Handle("GET", pattern_Policies_ListPolicyMembers_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -1625,6 +1815,26 @@ func RegisterPoliciesHandlerClient(ctx context.Context, mux *runtime.ServeMux, c
 		}
 
 		forward_Policies_ListPolicyMembers_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
+	})
+
+	mux.Handle("GET", pattern_Policies_ListPolicyMembers_1, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
+		ctx, cancel := context.WithCancel(req.Context())
+		defer cancel()
+		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
+		rctx, err := runtime.AnnotateContext(ctx, mux, req)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+		resp, md, err := request_Policies_ListPolicyMembers_1(rctx, inboundMarshaler, client, req, pathParams)
+		ctx = runtime.NewServerMetadataContext(ctx, md)
+		if err != nil {
+			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
+			return
+		}
+
+		forward_Policies_ListPolicyMembers_1(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
 
 	})
 
@@ -1918,13 +2128,19 @@ var (
 
 	pattern_Policies_ListPolicies_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2", "policies"}, "", runtime.AssumeColonVerbOpt(true)))
 
+	pattern_Policies_ListPolicies_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "policies"}, "", runtime.AssumeColonVerbOpt(true)))
+
 	pattern_Policies_DeletePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2", "policies", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Policies_UpdatePolicy_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3}, []string{"iam", "v2", "policies", "id"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Policies_GetPolicyVersion_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2", "policy_version"}, "", runtime.AssumeColonVerbOpt(true)))
 
+	pattern_Policies_GetPolicyVersion_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2}, []string{"iam", "v2beta", "policy_version"}, "", runtime.AssumeColonVerbOpt(true)))
+
 	pattern_Policies_ListPolicyMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2", "policies", "id", "members"}, "", runtime.AssumeColonVerbOpt(true)))
+
+	pattern_Policies_ListPolicyMembers_1 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2beta", "policies", "id", "members"}, "", runtime.AssumeColonVerbOpt(true)))
 
 	pattern_Policies_ReplacePolicyMembers_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 1, 0, 4, 1, 5, 3, 2, 4}, []string{"iam", "v2", "policies", "id", "members"}, "", runtime.AssumeColonVerbOpt(true)))
 
@@ -1962,13 +2178,19 @@ var (
 
 	forward_Policies_ListPolicies_0 = runtime.ForwardResponseMessage
 
+	forward_Policies_ListPolicies_1 = runtime.ForwardResponseMessage
+
 	forward_Policies_DeletePolicy_0 = runtime.ForwardResponseMessage
 
 	forward_Policies_UpdatePolicy_0 = runtime.ForwardResponseMessage
 
 	forward_Policies_GetPolicyVersion_0 = runtime.ForwardResponseMessage
 
+	forward_Policies_GetPolicyVersion_1 = runtime.ForwardResponseMessage
+
 	forward_Policies_ListPolicyMembers_0 = runtime.ForwardResponseMessage
+
+	forward_Policies_ListPolicyMembers_1 = runtime.ForwardResponseMessage
 
 	forward_Policies_ReplacePolicyMembers_0 = runtime.ForwardResponseMessage
 

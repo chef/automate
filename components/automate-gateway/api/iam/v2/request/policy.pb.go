@@ -24,15 +24,15 @@ const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
 // Does not contain type as the enduser can only create 'custom' policies.
 type CreatePolicyReq struct {
-	// Unique ID. Cannot be changed.
+	// Unique, user-specified ID. Cannot be changed.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	// Name for the policy.
+	// Name for the new policy.
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Members affected by this policy.
 	Members []string `protobuf:"bytes,3,rep,name=members,proto3" json:"members,omitempty"`
-	// Statements for the policy.
+	// Statements for the new policy. Must contain one or more.
 	Statements []*common.Statement `protobuf:"bytes,4,rep,name=statements,proto3" json:"statements,omitempty"`
-	// List of projects this policy belongs to.
+	// The list of projects this policy belongs to.
 	Projects             []string `protobuf:"bytes,5,rep,name=projects,proto3" json:"projects,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
