@@ -76,7 +76,7 @@ var policyVersions = map[string]policyBundle{
 		},
 	},
 	"v2": {
-		pkg:       "github.com/chef/automate/components/automate-gateway/authz/policy_v2",
+		pkg:       "github.com/chef/automate/components/automate-gateway/authz/policy",
 		extension: iam.E_Policy,
 		convert: func(x interface{}) *policyInfo {
 			if y, ok := x.(*iam.PolicyInfo); ok {
