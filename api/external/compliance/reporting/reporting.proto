@@ -656,9 +656,9 @@ message Control {
 	// Metadata defined on the control in key-value format.
 	map<string, string> tags = 9;
 	// Indicates if the control has been waived or not
-	string waived_str = 10;
+	string waived_str = 11;
 	// Additional details for waived controls
-	OrigWaiverData waiver_data = 11;
+	OrigWaiverData waiver_data = 12;
 }
 
 // OrigWaiverData as it originally came from the InSpec report
