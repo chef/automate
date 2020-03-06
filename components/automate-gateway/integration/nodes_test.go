@@ -173,7 +173,7 @@ func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 		Name:            "test node",
 		Manager:         "automate",
 		Platform:        "redhat",
-		PlatformVersion: "7.5",
+		PlatformVersion: "7.7",
 		ManagerIds:      []string{"e69dc612-7e67-43f2-9b19-256afd385820"},
 		Status:          "reachable",
 		State:           "RUNNING",
