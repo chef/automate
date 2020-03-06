@@ -34,7 +34,7 @@ func TestCreatesValidCode(t *testing.T) {
 	fullPath := func(baseFileName, pkgName string) string {
 		return filepath.Join(a2Root,
 			// TODO: Get rid of v2 here; where does the generated file add it on?
-			fmt.Sprintf("components/mock-service/%s/%s.pb.policy-v2.go", pkgName, baseFileName))
+			fmt.Sprintf("components/mock-service/%s/%s.pb.policy.go", pkgName, baseFileName))
 	}
 
 	tests := map[string]struct {
