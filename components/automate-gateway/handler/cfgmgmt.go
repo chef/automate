@@ -183,6 +183,8 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context, request *cfgReq.Node
 
 	cfgMgmtRequest := &cmsReq.NodesCounts{
 		Filter: request.Filter,
+		Start:  request.Start,
+		End:    request.End,
 	}
 
 	cfgmgmtNodesCounts, err := s.cfgMgmtClient.GetNodesCounts(ctx, cfgMgmtRequest)

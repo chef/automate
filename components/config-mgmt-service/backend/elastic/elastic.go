@@ -30,6 +30,7 @@ const (
 
 	// Elasticsearch fields we use within this package
 	RunFieldTimestamp    = "start_time"
+	NodeCheckinTimestamp = "checkin"
 	RunFieldEndTimestamp = "end_time"
 	ActionFieldTimestamp = "recorded_at"
 	ActionFieldID        = "id"

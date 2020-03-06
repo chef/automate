@@ -5,6 +5,8 @@ option go_package = "github.com/chef/automate/api/interservice/cfgmgmt/request";
 
 message NodesCounts {
   repeated string filter = 1;
+  string start = 2;
+  string end = 3;
 }
 
 message RunsCounts {

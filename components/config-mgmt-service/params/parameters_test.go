@@ -61,6 +61,21 @@ func TestStringDateRangeToTimeWithValidDatesReturnTrue(t *testing.T) {
 	}
 }
 
+func TestStringDateTimeRangeToTimeWithValidDatesReturnTrue(t *testing.T) {
+	cases := []string{
+		"2017-12-01T01:01:01Z", // YYYY-MM-DD
+		"2017-01-31T23:59:10Z", // YYYY-MM-DD
+		"1988-07-07T12:00:00Z", // YYYY-MM-DD
+	}
+
+	for _, test := range cases {
+		t.Run(fmt.Sprintf("with date '%v' it should be 'ok=true'", test), func(t *testing.T) {
+			_, ok := subject.StringDateTimeRangeToTime(test)
+			assert.True(t, ok)
+		})
+	}
+}
+
 func TestValidateDateRangeWithInvalidDatesReturnFalse(t *testing.T) {
 	cases := []struct {
 		expected bool

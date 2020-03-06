@@ -181,6 +181,39 @@ func ValidateDateRange(start string, end string) bool {
 	return true
 }
 
+func ValidateDateTimeRange(start string, end string) bool {
+	var (
+		startTime time.Time
+		endTime   time.Time
+		ok        bool
+	)
+
+	if start != "" {
+		startTime, ok = StringDateTimeRangeToTime(start)
+		if !ok {
+			return false
+		}
+	}
+
+	if end != "" {
+		endTime, ok = StringDateTimeRangeToTime(end)
+		if !ok {
+			return false
+		}
+	}
+
+	// If both were provided, lets verify that the
+	// end time is after the start time
+	if end != "" && start != "" {
+		if endTime.Equal(startTime) {
+			return true
+		}
+		return endTime.After(startTime)
+	}
+
+	return true
+}
+
 // ValidateMillsecondDateRange will validate that the provided start & end date are valid. That means
 // the start time must be less than or equal to the end time
 //
@@ -263,6 +296,14 @@ func StringDateRangeToTime(date string) (time.Time, bool) {
 		layout = "2006-01-02"
 	)
 	dTime, err := time.ParseInLocation(layout, date, loc)
+	if err != nil {
+		return dTime, false
+	}
+	return dTime, true
+}
+
+func StringDateTimeRangeToTime(date string) (time.Time, bool) {
+	dTime, err := time.Parse(time.RFC3339, date)
 	if err != nil {
 		return dTime, false
 	}

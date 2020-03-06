@@ -316,6 +316,20 @@ func init() {
               "type": "string"
             },
             "collectionFormat": "multi"
+          },
+          {
+            "name": "start",
+            "description": "Earliest node checkin time to return for the node counts.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "end",
+            "description": "Latest node checkin time to return for the node counts.",
+            "in": "query",
+            "required": false,
+            "type": "string"
           }
         ],
         "tags": [
