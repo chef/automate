@@ -23,9 +23,5 @@ export ES_PATH_CONF="{{pkg.svc_config_path}}"
 source {{pkg.svc_config_path}}/init_keystore
 source {{pkg.svc_config_path}}/init_ca
 
-# Make sure the old post-run sentinel file does not exist
-source {{pkg.svc_config_path}}/health_check
-[[ -f ${POST_RUN_SENTINEL} ]] && rm ${POST_RUN_SENTINEL}
-
 exec elasticsearch
 {{~/if}}
