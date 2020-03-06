@@ -84,47 +84,64 @@ export class AutomateSettingsComponent implements OnInit {
     this.deleteMissingNodesForm = this.fb.group(formDetails['deleteMissingNodes']);
 
     this.eventFeedForm = this.fb.group({
+      disabled: this.fb.group({
+        feedData: false,
+        serverActions: false
+      }),
       feedData: this.fb.group({
-        threshold: {value: 3, disabled: true},
-        unit: {value: 'd', disabled: true}
+        threshold: {value: 30, disabled: false},
+        unit: {value: 'd', disabled: false}
       }),
       serverActions: this.fb.group({
-        threshold: { value: 30, disabled: true },
-        unit: { value: 'd', disabled: true }
+        threshold: { value: 30, disabled: false },
+        unit: { value: 'd', disabled: false }
       })
     });
 
     this.serviceGroupForm = this.fb.group({
+      disabled: this.fb.group({
+        healthChecks: true,
+        removeServices: false
+      }),
       healthChecks: this.fb.group({
         threshold: {value: 5, disabled: true},
-        unit: { value: 'd', disabled: true }
+        unit: { value: 'm', disabled: true }
       }),
       removeServices: this.fb.group({
-        threshold: {value: 7, disabled: true},
-        unit: { value: 'd', disabled: true }
+        threshold: {value: 7, disabled: false},
+        unit: { value: 'd', disabled: false }
       })
     });
 
     this.clientRunsForm = this.fb.group({
+      disabled: this.fb.group({
+        removeData: false,
+        labelMissing: false,
+        removeMissing: false
+      }),
       removeData: this.fb.group({
-        threshold: {value: 30, disabled: true}
+        threshold: {value: 30, disabled: false}
       }),
       labelMissing: this.fb.group({
-        threshold: { value: 30, disabled: true },
-        unit: { value: 'd', disabled: true }
+        threshold: { value: 30, disabled: false },
+        unit: { value: 'd', disabled: false }
       }),
       removeMissing: this.fb.group({
-        threshold: { value: 30, disabled: true },
-        unit: { value: 'd', disabled: true }
+        threshold: { value: 30, disabled: false },
+        unit: { value: 'd', disabled: false }
       })
     });
 
     this.complianceDataForm = this.fb.group({
+      disabled: this.fb.group({
+        reports: false,
+        scans: false
+      }),
       reports: this.fb.group({
-        threshold: { value: 30, disabled: true }
+        threshold: { value: 30, disabled: false }
       }),
       scans: this.fb.group({
-        threshold: { value: 30, disabled: true }
+        threshold: { value: 30, disabled: false }
       })
     });
 
@@ -169,11 +186,20 @@ export class AutomateSettingsComponent implements OnInit {
   }
 
   public toggleInput(form, _formGroupName: string, checked: boolean) {
+    // patchValue is a workaround for the chef-checkbox because we need to be
+    // able to store a reference to it being checked or not
+    form.get('disabled').patchValue({
+      [_formGroupName]: !checked
+    });
+
     // currentInput is a reference to the input associated with its checkbox
     const currentInput = form.get(_formGroupName);
-    checked === true
-      ? currentInput.enable()
-      : currentInput.disable();
+
+    if (checked === true) {
+      currentInput.enable();
+    } else {
+      currentInput.disable();
+    }
   }
 
   // Apply the changes that the user updated in the forms
@@ -263,6 +289,7 @@ export class AutomateSettingsComponent implements OnInit {
 
     jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
       const [threshold, unit] = this.splitThreshold(job.threshold);
+      console.log(job);
       const form = {
         disable: !job.running,
         threshold: threshold,
