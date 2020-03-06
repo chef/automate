@@ -1,6 +1,6 @@
 +++
 title = "Node Lifecycle"
-description = "Control the lifecycle of nodes."
+description = "Chef Automate Node Lifecycle: Node Management and Node Retention"
 date = 2018-05-19T21:56:37-07:00
 weight = 20
 draft = false
