@@ -8,7 +8,7 @@ import { Observable, combineLatest, Subject } from 'rxjs';
 import { isNil } from 'lodash/fp';
 import { HttpStatus } from 'app/types/types';
 import { loading, EntityStatus, pending } from 'app/entities/entities';
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ChefKeyboardEvent } from 'app/types/material-types';
 import { Destination } from '../../entities/destinations/destination.model';
 import {
@@ -71,7 +71,7 @@ export class DatafeedComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.layoutFacade.showSettingsSidebar();
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetDestinations());
     this.store.pipe(
       select(saveStatus),

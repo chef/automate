@@ -5,7 +5,7 @@ import { identity, isNil } from 'lodash/fp';
 import { combineLatest, Subject } from 'rxjs';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 
-import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
+import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
@@ -47,8 +47,7 @@ export class DataFeedDetailsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.layoutFacade.showSettingsSidebar();
-
+    this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.pipe(
       select(routeParams),
       pluck('id'),
