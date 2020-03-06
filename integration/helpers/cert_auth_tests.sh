@@ -38,7 +38,8 @@ grant_permissions() {
         "statements": [
             {
                 "effect": "ALLOW",
-                "actions": [ "infra:ingest:get" ],
+                "actions": [ "ingest:*" ],
+
                 "projects": [ "*" ]
             }
         ]
