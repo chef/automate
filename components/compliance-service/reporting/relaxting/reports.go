@@ -122,7 +122,6 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	}
 	LogQueryPartMin(esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
-	//reportIds := make([]*reportingapi.ReportIds, 0)
 	outermostAgg, _ := searchResult.Aggregations.Terms("nodes")
 	if outermostAgg != nil {
 		for _, nodeBucket := range outermostAgg.Buckets {
@@ -139,7 +138,6 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 
 					}
 				}
-				logrus.Infof("et %v", et)
 				endTimeTimestamp, _ := ptypes.TimestampProto(et.EndTime)
 
 				repData := reportingapi.ReportData{}
@@ -150,9 +148,6 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 			}
 		}
 	}
-	//todo - rdm wait.. what? why are we doing this?  look closer at this before proceeding!!
-	//reportIds := MapValues(nodeReport)
-
 	reportIds := make([]string, len(nodeReport))
 	reportData := make([]*reportingapi.ReportData, len(nodeReport))
 	i := 0
