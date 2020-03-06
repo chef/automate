@@ -799,8 +799,8 @@ control 'iam-legacy-access-control-1' do
                   http_method: 'POST',
                   user: user,
                   request_body: body.to_json,
-                ).http_status
-              ).to be(403)
+                ).http_status == 403
+              ).to eq(expect_403_for_admin_only_apis)
           end
         end
       end
@@ -814,8 +814,8 @@ control 'iam-legacy-access-control-1' do
                 http_method: 'POST',
                 user: user,
                 request_body: { node_ids: [ 'fake-2d83-47ce-8e46-84d1e85be6c7' ] }.to_json,
-              ).http_status
-            ).to be(403)
+                ).http_status == 403
+              ).to eq(expect_403_for_admin_only_apis)
         end
       end
 
@@ -832,8 +832,8 @@ control 'iam-legacy-access-control-1' do
                     url,
                     http_method: method,
                     user: user,
-                  ).http_status
-                ).to be(403)
+                ).http_status == 403
+              ).to eq(expect_403_for_admin_only_apis)
             end
           end
         end
