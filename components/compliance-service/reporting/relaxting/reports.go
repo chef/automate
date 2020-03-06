@@ -157,8 +157,9 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	reportData := make([]*reportingapi.ReportData, len(nodeReport))
 	i := 0
 	for _, v := range nodeReport {
-		reportData[i] = &v
-		reportIds[i] = v.Id
+		a := v
+		reportData[i] = &a
+		reportIds[i] = a.Id
 		i++
 	}
 
