@@ -13,6 +13,7 @@ import (
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/pipeline"
 	"github.com/chef/automate/components/ingest-service/serveropts"
@@ -25,6 +26,7 @@ type ChefIngestServer struct {
 	client             backend.Client
 	authzClient        iam_v2.ProjectsClient
 	nodeMgrClient      manager.NodeManagerServiceClient
+	nodesClient        nodes.NodesServiceClient
 }
 
 // NewChefIngestServer creates a new server instance and it automatically
@@ -32,7 +34,8 @@ type ChefIngestServer struct {
 // backend client
 func NewChefIngestServer(client backend.Client, authzClient iam_v2.ProjectsClient,
 	nodeMgrClient manager.NodeManagerServiceClient,
-	chefIngestServerConfig serveropts.ChefIngestServerConfig) *ChefIngestServer {
+	chefIngestServerConfig serveropts.ChefIngestServerConfig,
+	nodesClient nodes.NodesServiceClient) *ChefIngestServer {
 	return &ChefIngestServer{
 		chefRunPipeline: pipeline.NewChefRunPipeline(client, authzClient,
 			nodeMgrClient, chefIngestServerConfig.ChefIngestRunPipelineConfig),
@@ -41,6 +44,7 @@ func NewChefIngestServer(client backend.Client, authzClient iam_v2.ProjectsClien
 		client:        client,
 		authzClient:   authzClient,
 		nodeMgrClient: nodeMgrClient,
+		nodesClient:   nodesClient,
 	}
 }
 
@@ -134,39 +138,72 @@ func (s *ChefIngestServer) ProcessLivenessPing(ctx context.Context, liveness *ch
 }
 
 // ProcessMultipleNodeDeletes send multiple deletes actions
-func (s *ChefIngestServer) ProcessMultipleNodeDeletes(ctx context.Context, multipleNodeDeleteRequest *chef.MultipleNodeDeleteRequest) (*response.ProcessMultipleNodeDeleteResponse, error) {
+func (s *ChefIngestServer) ProcessMultipleNodeDeletes(ctx context.Context,
+	multipleNodeDeleteRequest *chef.MultipleNodeDeleteRequest) (*response.ProcessMultipleNodeDeleteResponse, error) {
 	log.WithFields(log.Fields{
 		"func":    nameOfFunc(),
 		"Request": multipleNodeDeleteRequest}).Debug("rpc call")
 
 	_, err := s.client.MarkForDeleteMultipleNodesByID(ctx, multipleNodeDeleteRequest.NodeIds)
+	if err != nil {
+		return &response.ProcessMultipleNodeDeleteResponse{}, err
+	}
 
-	return &response.ProcessMultipleNodeDeleteResponse{}, err
+	for _, nodeID := range multipleNodeDeleteRequest.NodeIds {
+		_, err = s.nodesClient.Delete(ctx, &nodes.Id{Id: nodeID})
+		if err != nil {
+			return &response.ProcessMultipleNodeDeleteResponse{}, err
+		}
+	}
+
+	return &response.ProcessMultipleNodeDeleteResponse{}, nil
 }
 
 // ProcessNodeDelete send a delete action threw the action pipeline
-func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context, delete *chef.Delete) (*response.ProcessNodeDeleteResponse, error) {
+func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
+	delete *chef.Delete) (*response.ProcessNodeDeleteResponse, error) {
 	log.WithFields(log.Fields{"func": nameOfFunc()}).Debug("rpc call")
-	// Validate on presence of delete fields, add RecordedAt Time
-	if delete.GetNodeId() != "" ||
-		// Must have NodeId OR all three of the other three fields
-		(delete.GetOrganizationName() != "" &&
-			delete.GetServiceHostname() != "" &&
-			delete.GetNodeName() != "") {
-		action := chef.Action{
-			Id:               delete.GetId(),
-			EntityName:       delete.GetNodeName(),
-			OrganizationName: delete.GetOrganizationName(),
-			ServiceHostname:  delete.GetServiceHostname(),
-			NodeId:           delete.GetNodeId(),
-			MessageType:      "action",
-			Task:             "delete",
-			EntityType:       "node",
-			RecordedAt:       time.Now().Format(time.RFC3339),
+
+	// Must have NodeId OR all three of the other three fields
+	if delete.GetNodeId() != "" {
+		_, err := s.client.DeleteNodeByID(ctx, delete.GetNodeId())
+		if err != nil {
+			return &response.ProcessNodeDeleteResponse{}, err
 		}
-		_, err := s.ProcessChefAction(ctx, &action)
+
+		_, err = s.nodesClient.Delete(ctx, &nodes.Id{Id: delete.GetNodeId()})
 
 		return &response.ProcessNodeDeleteResponse{}, err
+	} else if delete.GetOrganizationName() != "" &&
+		delete.GetServiceHostname() != "" &&
+		delete.GetNodeName() != "" {
+
+		filters := map[string]string{
+			"organization_name": delete.GetOrganizationName(),
+			"node_name":         delete.GetNodeName(),
+			"source_fqdn":       delete.GetServiceHostname(),
+		}
+		nodeIDs, err := s.client.FindNodeIDsByFields(ctx, filters)
+		if err != nil {
+			return &response.ProcessNodeDeleteResponse{}, err
+		}
+
+		if len(nodeIDs) == 0 {
+			return &response.ProcessNodeDeleteResponse{}, nil
+		}
+
+		_, err = s.client.MarkForDeleteMultipleNodesByID(ctx, nodeIDs)
+		if err != nil {
+			return &response.ProcessNodeDeleteResponse{}, err
+		}
+
+		for _, nodeID := range nodeIDs {
+			_, err = s.nodesClient.Delete(ctx, &nodes.Id{Id: nodeID})
+			if err != nil {
+				return &response.ProcessNodeDeleteResponse{}, err
+			}
+		}
+		return &response.ProcessNodeDeleteResponse{}, nil
 	}
 
 	errMsg := "Unknown NodeName, OrganizationName and RemoteHostname, or NodeId"

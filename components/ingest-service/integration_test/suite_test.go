@@ -358,7 +358,7 @@ func createServices(s *Suite) error {
 	// res, err := suite.ChefIngestServer.ProcessChefAction(ctx, &req)
 	// ```
 	s.ChefIngestServer = server.NewChefIngestServer(s.ingest, s.projectsClient,
-		s.managerServiceClientMock, chefIngestServerConfig)
+		s.managerServiceClientMock, chefIngestServerConfig, s.nodesServiceClientMock)
 
 	s.EventHandlerServer = server.NewAutomateEventHandlerServer(iClient, *s.ChefIngestServer,
 		s.projectsClient, s.eventServiceClientMock)
@@ -446,6 +446,8 @@ func createMocksWithDefaultFunctions(s *Suite) {
 		&manager.ProcessNodeResponse{}, nil)
 
 	s.nodesServiceClientMock = nodes.NewMockNodesServiceClient(gomock.NewController(nil))
+	s.nodesServiceClientMock.EXPECT().Delete(gomock.Any(), gomock.Any()).AnyTimes().Return(
+		nil, nil)
 }
 
 func createMocksWithTestObject(s *Suite, t *testing.T) {

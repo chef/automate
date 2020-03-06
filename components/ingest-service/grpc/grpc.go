@@ -129,10 +129,11 @@ func Spawn(opts *serveropts.Opts) error {
 	defer nodeMgrConn.Close() // nolint: errcheck
 
 	nodeMgrServiceClient := manager.NewNodeManagerServiceClient(nodeMgrConn)
+	nodesServiceClient := nodes.NewNodesServiceClient(nodeMgrConn)
 
 	// ChefRuns
 	chefIngest := server.NewChefIngestServer(client, authzProjectsClient, nodeMgrServiceClient,
-		opts.ChefIngestServerConfig)
+		opts.ChefIngestServerConfig, nodesServiceClient)
 	ingest.RegisterChefIngesterServer(grpcServer, chefIngest)
 
 	// Pass the chef ingest server to give status about the pipelines
@@ -159,8 +160,6 @@ func Spawn(opts *serveropts.Opts) error {
 	}
 	defer esSidecarConn.Close() // nolint: errcheck
 	esSidecarClient := es_sidecar.NewEsSidecarClient(esSidecarConn)
-
-	nodesServiceClient := nodes.NewNodesServiceClient(nodeMgrConn)
 
 	err = server.InitializeJobManager(jobManager, client, esSidecarClient, nodeMgrServiceClient,
 		nodesServiceClient)
