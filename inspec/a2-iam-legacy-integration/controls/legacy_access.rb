@@ -194,15 +194,7 @@ control 'iam-legacy-access-control-1' do
       end
     end # try_every_http_verb
 
-<<<<<<< HEAD
-<<<<<<< HEAD:inspec/a2-api-integration/controls/authz_access_control.rb
-    shared_examples 'authz access control' do
-=======
-    shared_examples 'iam access control (with v1 legacy policies)' do
->>>>>>> inspec: port authz_access_control to legacy_access:inspec/a2-iam-legacy-integration/controls/legacy_access.rb
-=======
     shared_examples 'iam access control with v1 legacy policies' do
->>>>>>> inspec: add legacy_access tests
       describe '/apis/iam/v2/teams' do
         let(:url) { '/apis/iam/v2/teams' }
         let(:expect_403_response) { expect_403_for_admin_only_apis }
@@ -213,10 +205,7 @@ control 'iam-legacy-access-control-1' do
           {
             'id': "inspec_test_team-#{TIMESTAMP}",
             'name': 'This team was created by inspec tests. DELETE ME.',
-<<<<<<< HEAD:inspec/a2-api-integration/controls/authz_access_control.rb
-=======
             'projects': []
->>>>>>> inspec: port authz_access_control to legacy_access:inspec/a2-iam-legacy-integration/controls/legacy_access.rb
           }
         end
 
@@ -258,22 +247,13 @@ control 'iam-legacy-access-control-1' do
         let(:test_id) { "inspec_test_user-#{TIMESTAMP}" }
         let(:test_object) do
           {
-<<<<<<< HEAD:inspec/a2-api-integration/controls/authz_access_control.rb
-            'id': "inspec_test_team-#{Time.now.to_i}",
-            'name': 'This team was created by inspec tests but was modified. DELETE ME.',
-=======
             'name': test_id,
             'id': test_id,
             'password': 'chefautomate',
->>>>>>> inspec: port authz_access_control to legacy_access:inspec/a2-iam-legacy-integration/controls/legacy_access.rb
           }
         end
 
         include_examples 'try_every_http_verb'
-<<<<<<< HEAD:inspec/a2-api-integration/controls/authz_access_control.rb
-        # TODO (tc) Test AddUsers RemoveUsers once they are their own HTTP API endpoints.
-=======
->>>>>>> inspec: port authz_access_control to legacy_access:inspec/a2-iam-legacy-integration/controls/legacy_access.rb
       end
 
       describe '/apis/iam/v2/tokens' do
