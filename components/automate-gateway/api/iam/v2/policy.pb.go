@@ -183,21 +183,45 @@ type PoliciesClient interface {
 	//"projects": []
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:create
+	//```
 	CreatePolicy(ctx context.Context, in *request.CreatePolicyReq, opts ...grpc.CallOption) (*response.CreatePolicyResp, error)
 	//
 	//Get a policy
 	//
 	//Get a policy.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:get
+	//```
 	GetPolicy(ctx context.Context, in *request.GetPolicyReq, opts ...grpc.CallOption) (*response.GetPolicyResp, error)
 	//
 	//List all policies
 	//
 	//List all policies.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:list
+	//```
 	ListPolicies(ctx context.Context, in *request.ListPoliciesReq, opts ...grpc.CallOption) (*response.ListPoliciesResp, error)
 	//
 	//Delete a policy
 	//
 	//Delete a policy.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:delete
+	//```
 	DeletePolicy(ctx context.Context, in *request.DeletePolicyReq, opts ...grpc.CallOption) (*response.DeletePolicyResp, error)
 	//
 	//Update an existing policy
@@ -214,16 +238,34 @@ type PoliciesClient interface {
 	//Add policy members
 	//Remove policy members
 	//Replace policy members
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:update
+	//```
 	UpdatePolicy(ctx context.Context, in *request.UpdatePolicyReq, opts ...grpc.CallOption) (*response.UpdatePolicyResp, error)
 	//
 	//Get IAM version
 	//
 	//Returns the major and minor version of IAM that your automate installation is running.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:get
+	//```
 	GetPolicyVersion(ctx context.Context, in *request.GetPolicyVersionReq, opts ...grpc.CallOption) (*response.GetPolicyVersionResp, error)
 	//
 	//List policy members
 	//
 	//List all members of a specific policy.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policyMembers:get
+	//```
 	ListPolicyMembers(ctx context.Context, in *request.ListPolicyMembersReq, opts ...grpc.CallOption) (*response.ListPolicyMembersResp, error)
 	//
 	//Replace policy members
@@ -232,6 +274,12 @@ type PoliciesClient interface {
 	//
 	//Ensure each element of the members array is in the correct
 	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policyMembers:update
+	//```
 	ReplacePolicyMembers(ctx context.Context, in *request.ReplacePolicyMembersReq, opts ...grpc.CallOption) (*response.ReplacePolicyMembersResp, error)
 	//
 	//Remove policy members
@@ -243,6 +291,12 @@ type PoliciesClient interface {
 	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
 	//
 	//The removed members will still exist within Chef Automate, but are no longer associated with this policy.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policyMembers:delete
+	//```
 	RemovePolicyMembers(ctx context.Context, in *request.RemovePolicyMembersReq, opts ...grpc.CallOption) (*response.RemovePolicyMembersResp, error)
 	//
 	//Add policy members
@@ -251,6 +305,12 @@ type PoliciesClient interface {
 	//
 	//Ensure each element of the members array is in the correct
 	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policyMembers:create
+	//```
 	AddPolicyMembers(ctx context.Context, in *request.AddPolicyMembersReq, opts ...grpc.CallOption) (*response.AddPolicyMembersResp, error)
 	//
 	//Create a new role
@@ -262,16 +322,34 @@ type PoliciesClient interface {
 	//There are several default *Chef-managed* roles that are essential to the operation of Chef Automate
 	//and cannot be altered.
 	//Roles that you create are *Custom* roles, and you have full control about modifying or deleting them.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:roles:create
+	//```
 	CreateRole(ctx context.Context, in *request.CreateRoleReq, opts ...grpc.CallOption) (*response.CreateRoleResp, error)
 	//
 	//List all roles
 	//
 	//List all *Chef-managed* and *Custom* roles.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:roles:list
+	//```
 	ListRoles(ctx context.Context, in *request.ListRolesReq, opts ...grpc.CallOption) (*response.ListRolesResp, error)
 	//
 	//Get a role
 	//
 	//Get a role.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:roles:get
+	//```
 	GetRole(ctx context.Context, in *request.GetRoleReq, opts ...grpc.CallOption) (*response.GetRoleResp, error)
 	//
 	//Delete a role
@@ -280,6 +358,12 @@ type PoliciesClient interface {
 	//If such a statement has no other associated actions, the statement is deleted as well.
 	//Similarly, if that statement removal results in a policy with no other statements,
 	//that policy is removed as well.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:roles:delete
+	//```
 	DeleteRole(ctx context.Context, in *request.DeleteRoleReq, opts ...grpc.CallOption) (*response.DeleteRoleResp, error)
 	//
 	//Update a role
@@ -287,6 +371,12 @@ type PoliciesClient interface {
 	//When updating a role supply all of a role's properties, not just the ones you wish to update.
 	//Properties that you do not include are reset to empty values.
 	//The only exception is the role ID, which is immutable; it can only be set at creation time.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:roles:update
+	//```
 	UpdateRole(ctx context.Context, in *request.UpdateRoleReq, opts ...grpc.CallOption) (*response.UpdateRoleResp, error)
 	//
 	//Create a project
@@ -294,21 +384,45 @@ type PoliciesClient interface {
 	//Creates a new project to be used in the policies that control permissions in Automate.
 	//
 	//A project defines the scope of resources in a policy statement. Resources can be in more than one project.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:projects:create
+	//```
 	CreateProject(ctx context.Context, in *request.CreateProjectReq, opts ...grpc.CallOption) (*response.CreateProjectResp, error)
 	//
 	//Update a project
 	//
 	//Update an existing project. Very similar to create except the ID cannot be changed.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:projects:update
+	//```
 	UpdateProject(ctx context.Context, in *request.UpdateProjectReq, opts ...grpc.CallOption) (*response.UpdateProjectResp, error)
 	//
 	//Get a project
 	//
 	//Get a project.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:projects:get
+	//```
 	GetProject(ctx context.Context, in *request.GetProjectReq, opts ...grpc.CallOption) (*response.GetProjectResp, error)
 	//
 	//List all projects
 	//
 	//List all projects.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:projects:list
+	//```
 	ListProjects(ctx context.Context, in *request.ListProjectsReq, opts ...grpc.CallOption) (*response.ListProjectsResp, error)
 	//
 	//Delete a project
@@ -318,6 +432,12 @@ type PoliciesClient interface {
 	//Also deletes this project from any project list in all statements.
 	//If the resulting project list for a given statement is empty, it is deleted.
 	//If the resulting policy has no statements, it is also deleted.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:projects:delete
+	//```
 	DeleteProject(ctx context.Context, in *request.DeleteProjectReq, opts ...grpc.CallOption) (*response.DeleteProjectResp, error)
 	// Expose on GRPC API only so we don't expose this to the enduser.
 	// Just want to be able to trigger this via automate-cli.
@@ -581,21 +701,45 @@ type PoliciesServer interface {
 	//"projects": []
 	//}
 	//```
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:create
+	//```
 	CreatePolicy(context.Context, *request.CreatePolicyReq) (*response.CreatePolicyResp, error)
 	//
 	//Get a policy
 	//
 	//Get a policy.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:get
+	//```
 	GetPolicy(context.Context, *request.GetPolicyReq) (*response.GetPolicyResp, error)
 	//
 	//List all policies
 	//
 	//List all policies.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:list
+	//```
 	ListPolicies(context.Context, *request.ListPoliciesReq) (*response.ListPoliciesResp, error)
 	//
 	//Delete a policy
 	//
 	//Delete a policy.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:delete
+	//```
 	DeletePolicy(context.Context, *request.DeletePolicyReq) (*response.DeletePolicyResp, error)
 	//
 	//Update an existing policy
@@ -612,16 +756,34 @@ type PoliciesServer interface {
 	//Add policy members
 	//Remove policy members
 	//Replace policy members
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:update
+	//```
 	UpdatePolicy(context.Context, *request.UpdatePolicyReq) (*response.UpdatePolicyResp, error)
 	//
 	//Get IAM version
 	//
 	//Returns the major and minor version of IAM that your automate installation is running.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policies:get
+	//```
 	GetPolicyVersion(context.Context, *request.GetPolicyVersionReq) (*response.GetPolicyVersionResp, error)
 	//
 	//List policy members
 	//
 	//List all members of a specific policy.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policyMembers:get
+	//```
 	ListPolicyMembers(context.Context, *request.ListPolicyMembersReq) (*response.ListPolicyMembersResp, error)
 	//
 	//Replace policy members
@@ -630,6 +792,12 @@ type PoliciesServer interface {
 	//
 	//Ensure each element of the members array is in the correct
 	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policyMembers:update
+	//```
 	ReplacePolicyMembers(context.Context, *request.ReplacePolicyMembersReq) (*response.ReplacePolicyMembersResp, error)
 	//
 	//Remove policy members
@@ -641,6 +809,12 @@ type PoliciesServer interface {
 	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
 	//
 	//The removed members will still exist within Chef Automate, but are no longer associated with this policy.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policyMembers:delete
+	//```
 	RemovePolicyMembers(context.Context, *request.RemovePolicyMembersReq) (*response.RemovePolicyMembersResp, error)
 	//
 	//Add policy members
@@ -649,6 +823,12 @@ type PoliciesServer interface {
 	//
 	//Ensure each element of the members array is in the correct
 	//[Member Expression]({{< relref "iam-v2-guide.md#member-expressions" >}}) format.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:policyMembers:create
+	//```
 	AddPolicyMembers(context.Context, *request.AddPolicyMembersReq) (*response.AddPolicyMembersResp, error)
 	//
 	//Create a new role
@@ -660,16 +840,34 @@ type PoliciesServer interface {
 	//There are several default *Chef-managed* roles that are essential to the operation of Chef Automate
 	//and cannot be altered.
 	//Roles that you create are *Custom* roles, and you have full control about modifying or deleting them.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:roles:create
+	//```
 	CreateRole(context.Context, *request.CreateRoleReq) (*response.CreateRoleResp, error)
 	//
 	//List all roles
 	//
 	//List all *Chef-managed* and *Custom* roles.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:roles:list
+	//```
 	ListRoles(context.Context, *request.ListRolesReq) (*response.ListRolesResp, error)
 	//
 	//Get a role
 	//
 	//Get a role.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:roles:get
+	//```
 	GetRole(context.Context, *request.GetRoleReq) (*response.GetRoleResp, error)
 	//
 	//Delete a role
@@ -678,6 +876,12 @@ type PoliciesServer interface {
 	//If such a statement has no other associated actions, the statement is deleted as well.
 	//Similarly, if that statement removal results in a policy with no other statements,
 	//that policy is removed as well.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:roles:delete
+	//```
 	DeleteRole(context.Context, *request.DeleteRoleReq) (*response.DeleteRoleResp, error)
 	//
 	//Update a role
@@ -685,6 +889,12 @@ type PoliciesServer interface {
 	//When updating a role supply all of a role's properties, not just the ones you wish to update.
 	//Properties that you do not include are reset to empty values.
 	//The only exception is the role ID, which is immutable; it can only be set at creation time.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:roles:update
+	//```
 	UpdateRole(context.Context, *request.UpdateRoleReq) (*response.UpdateRoleResp, error)
 	//
 	//Create a project
@@ -692,21 +902,45 @@ type PoliciesServer interface {
 	//Creates a new project to be used in the policies that control permissions in Automate.
 	//
 	//A project defines the scope of resources in a policy statement. Resources can be in more than one project.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:projects:create
+	//```
 	CreateProject(context.Context, *request.CreateProjectReq) (*response.CreateProjectResp, error)
 	//
 	//Update a project
 	//
 	//Update an existing project. Very similar to create except the ID cannot be changed.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:projects:update
+	//```
 	UpdateProject(context.Context, *request.UpdateProjectReq) (*response.UpdateProjectResp, error)
 	//
 	//Get a project
 	//
 	//Get a project.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:projects:get
+	//```
 	GetProject(context.Context, *request.GetProjectReq) (*response.GetProjectResp, error)
 	//
 	//List all projects
 	//
 	//List all projects.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:projects:list
+	//```
 	ListProjects(context.Context, *request.ListProjectsReq) (*response.ListProjectsResp, error)
 	//
 	//Delete a project
@@ -716,6 +950,12 @@ type PoliciesServer interface {
 	//Also deletes this project from any project list in all statements.
 	//If the resulting project list for a given statement is empty, it is deleted.
 	//If the resulting policy has no statements, it is also deleted.
+	//
+	//Authorization Action:
+	//
+	//```
+	//iam:projects:delete
+	//```
 	DeleteProject(context.Context, *request.DeleteProjectReq) (*response.DeleteProjectResp, error)
 	// Expose on GRPC API only so we don't expose this to the enduser.
 	// Just want to be able to trigger this via automate-cli.
