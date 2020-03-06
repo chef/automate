@@ -90,7 +90,7 @@ func TestMigrateToV2(t *testing.T) {
 			statement := migratedPol.Statements[0]
 			assert.Equal(t, Allow, statement.Effect)
 			assert.Equal(t, []string{"*:create"}, statement.Actions)
-			assert.Equal(t, []string{"infra:nodes"}, statement.Resources)
+			assert.Equal(t, []string{"ingest:nodes"}, statement.Resources)
 
 			err = deletePol(ctx, db, polID.String())
 			require.NoError(t, err)
