@@ -10,7 +10,7 @@ enum Type {
     CHEF_MANAGED = 0;
     CUSTOM = 1;
 }
-// These are Policies
+
 message Policy {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       example: { value: '{"name": "My Viewer Policy","id": "viewer-policy","type": ["CUSTOM", "CHEF_MANAGED"],"members": ["team:ldap:*"],"statement": [{"role": "viewer","projects":["project1", "project2"]},{"role": "qa","projects": ["acceptanceProject"]}],"projects": []}'}
@@ -20,8 +20,7 @@ message Policy {
     string name = 1;
     // Unique, user-specified ID. Cannot be changed.
     string id = 2;
-    // Whether this policy is user created or chef managed.
-    // One of `CUSTOM` or `CHEF_MANAGED`, respectively.
+    // This doc-comment is ignored for an enum.
     Type type = 3;
     // Members affected by this policy.
     repeated string members = 4;
@@ -30,7 +29,7 @@ message Policy {
     // The list of projects this policy belongs to.
     repeated string projects = 6;
 }
-// These are projects
+
 message Statement {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       example: { value: '{"id": "team-managers-devops","members":["user:local:bob","user:local:gamma"],"name": "Team Devops Managers","projects": ["project-devops"], "statements": {"effect": "ALLOW","actions": ["iam:users:update","iam:users:list","iam:users:get","iam:teams:update","iam:teams:list","iam:teams:get"]}}'}
@@ -41,8 +40,7 @@ message Statement {
         DENY = 1;
     }
 
-    // Whether the statement allows or denies.
-    // One of `ALLOW` or `DENY`, respectively.
+    // This doc-comment is ignored for an enum.
     Effect effect = 1;
     // Defines the actions for the members of this policy. The best practice is to use chef-managed roles or to define custom roles for unique action sets.
     repeated string actions = 3;
@@ -53,7 +51,7 @@ message Statement {
     // The project list defines the set of resources that the statement is scoped to.
     repeated string projects = 6;
 }
-// These are Roles
+
 message Role {
   // option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
   //   example: { value: ['{"role": "Editor"}, "id": "project-editors","type": "CHEF_MANAGED", "actions": ["iam:users:update","iam:users:list","iam:users:get","iam:teams:update","iam:teams:list","iam:teams:get"],"projects": ["project-devops"]'}

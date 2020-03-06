@@ -5,48 +5,77 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/ia
 
 // Statement, Policy definitions
 import "components/automate-gateway/api/iam/v2/common/policy.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 
 // Does not contain type as the enduser can only create 'custom' policies.
 message CreatePolicyReq {
-    // Unique, user-specified ID. Cannot be changed.
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "name", "statements"]
+      }
+    };
+    // Unique ID. Cannot be changed.
     string id = 1;
-    // Name for the new policy.
+    // Name for the policy.
     string name = 2;
     // Members affected by this policy.
     repeated string members = 3;
-    // Statements for the new policy. Must contain one or more.
+    // Statements for the policy.
     repeated Statement statements = 4;
-    // The list of projects this policy belongs to.
+    // List of projects this policy belongs to.
     repeated string projects = 5;
 }
 
 message DeletePolicyReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
+    // ID of the policy.
     string id = 1;
 }
 
 message ListPoliciesReq {}
 
 message AddPolicyMembersReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "members"]
+      }
+    };
+    // ID of the policy.
     string id = 1;
     // List of members to add to the policy.
     repeated string members = 2;
 }
 
 message GetPolicyReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
+    // ID of the policy.
     string id = 1;
 }
 
 // Does not contain type as the enduser can only create 'custom' policies.
 message UpdatePolicyReq {
-    // Unique, user-specified ID. Cannot be changed.
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "name", "statements"]
+      }
+    };
+    // Unique ID. Cannot be changed.
     string id = 1;
     // Members affected by this policy.
     repeated string members = 2;
-    // Statements for the policy. Must contain one or more.
+    // Statements for the policy.
     repeated Statement statements = 3;
     // Name for this policy.
     string name = 8;
-    // The list of projects this policy belongs to.
+    // List of projects this policy belongs to.
     repeated string projects = 9;
 }
 
@@ -60,16 +89,34 @@ message GetPolicyVersionReq {}
 message ResetToV1Req {}
 
 message ListPolicyMembersReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
+    // ID of the policy.
     string id = 1;
 }
 
 message ReplacePolicyMembersReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
+    // ID of the policy.
     string id = 1;
     // List of members that replaces previous policy member list.
     repeated string members = 2;
 }
 
 message RemovePolicyMembersReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "members"]
+      }
+    };
+    // ID of the policy.
     string id = 1;
     // List of members to remove from the policy.
     repeated string members = 2;
@@ -77,57 +124,101 @@ message RemovePolicyMembersReq {
 
 // Does not contain type as the enduser can only create 'custom' roles.
 message CreateRoleReq {
-    // Unique, user-specified ID. Cannot be changed.
-    string id = 1;
-    // Name for the new role.
-    string name = 2;
-    // List of actions that this role scopes to.
-    repeated string actions = 3;
-    // The list of projects this role belongs to.
-    repeated string projects = 4;
-}
-
-message GetRoleReq {
-    string id = 1;
-}
-
-message DeleteRoleReq {
-    string id = 1;
-}
-
-message UpdateRoleReq {
-    // Unique, user-specified ID. Cannot be changed.
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "name", "actions"]
+      }
+    };
+    // Unique ID. Cannot be changed.
     string id = 1;
     // Name for the role.
     string name = 2;
     // List of actions that this role scopes to.
     repeated string actions = 3;
-    // The list of projects this role belongs to.
+    // List of projects this role belongs to.
+    repeated string projects = 4;
+}
+
+message GetRoleReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
+    // ID of the role.
+    string id = 1;
+}
+
+message DeleteRoleReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
+    // ID of the role.
+    string id = 1;
+}
+
+message UpdateRoleReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "name", "actions"]
+      }
+    };
+    // Unique ID. Cannot be changed.
+    string id = 1;
+    // Name for the role.
+    string name = 2;
+    // List of actions that this role scopes to.
+    repeated string actions = 3;
+    // List of projects this role belongs to.
     repeated string projects = 4;
 }
 
 message ListRolesReq {}
 
 message GetProjectReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
+    // ID of the project.
     string id = 1;
 }
 
 message ListProjectsReq {}
 
 message CreateProjectReq {
-    // Unique, user-specified ID. Cannot be changed.
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "name"]
+      }
+    };
+    // Unique ID. Cannot be changed.
     string id = 1;
     // Name for the new project.
     string name = 2;
 }
 
 message UpdateProjectReq {
-    // Unique, user-specified ID. Cannot be changed.
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id", "name"]
+      }
+    };
+     // Unique ID. Cannot be changed.
     string id = 1;
     // Name for the project.
     string name = 2;
 }
 
 message DeleteProjectReq {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+      json_schema: {
+        required: ["id"]
+      }
+    };
+    // ID of the project.
     string id = 1;
 }
