@@ -33,7 +33,6 @@ func TestCreatesValidCode(t *testing.T) {
 	}
 	fullPath := func(baseFileName, pkgName string) string {
 		return filepath.Join(a2Root,
-			// TODO: Get rid of v2 here; where does the generated file add it on?
 			fmt.Sprintf("components/mock-service/%s/%s.pb.policy.go", pkgName, baseFileName))
 	}
 
@@ -41,6 +40,7 @@ func TestCreatesValidCode(t *testing.T) {
 		filename string
 		checks   []checkFunc
 	}{
+		// NB: Each test uses an actual proto file from the testdata directory.
 		"no services defined": {
 			testdata("no_services"),
 			check(noError, outputFiles(0))},
