@@ -284,11 +284,13 @@ export class AutomateSettingsComponent implements OnInit {
   // Update forms until we get the job scheduler status
   public updateForm(jobSchedulerStatus: JobSchedulerStatus) {
     if (jobSchedulerStatus === null) {
+      console.log('updateForm: null');
       return;
     }
 
     jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
       const [threshold, unit] = this.splitThreshold(job.threshold);
+      console.log('updateForm: job');
       console.log(job);
       const form = {
         disable: !job.running,
