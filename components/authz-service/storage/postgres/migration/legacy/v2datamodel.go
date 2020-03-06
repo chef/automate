@@ -271,7 +271,7 @@ func defaultRoles() []v2Role {
 		ID:   constants_v2.IngestRoleID,
 		Name: "Ingest",
 		Actions: []string{
-			"infra:ingest:*",
+			"ingest:*",
 			"compliance:profiles:get",
 			"compliance:profiles:list",
 		},
