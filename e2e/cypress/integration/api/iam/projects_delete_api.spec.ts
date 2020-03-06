@@ -23,10 +23,10 @@ describe('Project delete', () => {
   };
 
   before(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
   });
 
-  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
+  after(() => cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
 
   it('deleting a project', () => {
     // Create a project

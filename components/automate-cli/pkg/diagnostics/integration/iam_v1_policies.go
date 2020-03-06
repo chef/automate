@@ -24,7 +24,7 @@ type PolicyInfo struct {
 	ID string `json:"id"`
 }
 
-type iamV1PoliciesSave struct {
+type generatedV1PolicyData struct {
 	TokenID    string `json:"token_id"`
 	TokenValue string `json:"token_value"`
 	PolicyID   string `json:"policy_id"`
@@ -106,7 +106,7 @@ func CreateIAMV1PoliciesDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			tstCtx.SetValue("iam-policies-v1", iamV1PoliciesSave{
+			tstCtx.SetValue("iam-policies-v1", generatedV1PolicyData{
 				TokenID:    tokenInfo.ID,
 				PolicyID:   policyInfo.ID,
 				TokenValue: tokenInfo.Value,
@@ -114,7 +114,7 @@ func CreateIAMV1PoliciesDiagnostic() diagnostics.Diagnostic {
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := iamV1PoliciesSave{}
+			loaded := generatedV1PolicyData{}
 			err := tstCtx.GetValue("iam-policies-v1", &loaded)
 			require.NoError(tstCtx, err, "Could not load generated context")
 			err = MustJSONDecodeSuccess(
@@ -125,7 +125,7 @@ func CreateIAMV1PoliciesDiagnostic() diagnostics.Diagnostic {
 			require.NoError(tstCtx, err, "Expected to be able to read gateway version")
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := iamV1PoliciesSave{}
+			loaded := generatedV1PolicyData{}
 			err := tstCtx.GetValue("iam-policies-v1", &loaded)
 			if err != nil {
 				return errors.Wrap(err, "Could not load generated context")

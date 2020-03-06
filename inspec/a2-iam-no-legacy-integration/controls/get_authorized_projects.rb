@@ -4,10 +4,10 @@
 
 require_relative '../../constants'
 
-title 'IAM v2.1 get all allowed projects for global projects filter'
+title 'get all allowed projects for global projects filter'
 
-control 'iam-v2-global-projects-filter-1' do
-  title 'getting all allowed projects for a user on v2.1'
+control 'iam-global-projects-filter-1' do
+  title 'getting all allowed projects for a user'
 
  describe 'allowed projects' do
     PROJECT_ID_1 = "inspec-custom-project-1-#{Time.now.utc.to_i}"

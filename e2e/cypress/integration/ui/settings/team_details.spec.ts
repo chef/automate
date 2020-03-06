@@ -11,8 +11,8 @@ describe('team details', () => {
   const project2ID = `${cypressPrefix}-project2-${now}`;
   const project2Name = `${cypressPrefix} project2 ${now}`;
   const unassigned = '(unassigned)';
-  const nameForUser = cypressPrefix + ' user ' + now;
-  const usernameForUser = cypressPrefix + 'testing-user-' + now;
+  const userName = `${cypressPrefix} name ${now}`;
+  const userID = `${cypressPrefix}-testing-user-${now}`;
   let userMembershipID = '';
 
   before(() => {
@@ -20,21 +20,19 @@ describe('team details', () => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminIdToken = admin.id_token;
 
-      // extra precaution in case the `after` cleanup didn't run due to a failure
-      cy.cleanupUsersByNamePrefix(cypressPrefix);
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['teams', 'projects', 'policies']);
+      cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['users', 'teams', 'projects']);
 
       cy.request({
         auth: { bearer: adminIdToken },
         method: 'POST',
-        url: '/api/v0/auth/users',
+        url: '/apis/iam/v2/users',
         body: {
-          username: usernameForUser,
-          name: nameForUser,
+          id: userID,
+          name: userName,
           password: 'chefautomate'
         }
       }).then((resp) => {
-        userMembershipID = resp.body.id;
+        userMembershipID = resp.body.user.membership_id;
       });
 
       cy.request({
@@ -65,7 +63,7 @@ describe('team details', () => {
           id: teamID,
           name: teamName
         }
-      }).then((resp) => {
+      }).then(() => {
         cy.request({
           auth: { bearer: adminIdToken },
           method: 'POST',
@@ -90,8 +88,7 @@ describe('team details', () => {
   });
 
   after(() => {
-    cy.cleanupUsersByNamePrefix(cypressPrefix);
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['teams', 'projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['users', 'teams', 'projects']);
   });
 
   it('displays team details for admins team', () => {
@@ -107,8 +104,8 @@ describe('team details', () => {
       cy.get('chef-option').contains('Users');
       cy.get('app-user-table chef-table-header-cell').contains('Name');
       cy.get('app-user-table chef-table-header-cell').contains('Username');
-      cy.get('app-user-table chef-table-cell').contains(usernameForUser);
-      cy.get('app-user-table chef-table-cell').contains(nameForUser);
+      cy.get('app-user-table chef-table-cell').contains(userID);
+      cy.get('app-user-table chef-table-cell').contains(userName);
     });
   });
 

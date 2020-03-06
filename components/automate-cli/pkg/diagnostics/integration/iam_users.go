@@ -43,7 +43,7 @@ type V2UserInfo struct {
 	User UserInfo
 }
 
-type iamUserSave struct {
+type generatedUserData struct {
 	ID       string `json:"id"`
 	Username string `json:"username"`
 	IsV2     bool   `json:"is_v2"`
@@ -148,7 +148,7 @@ func DeleteUser(tstCtx diagnostics.TestContext, username string) error {
 
 // GetUserID determines which identifier to use when fetching the user, since
 // the ID field is different between IAM v1 and v2
-func GetUserID(user iamUserSave) (string, error) {
+func GetUserID(user generatedUserData) (string, error) {
 	if !user.IsV2 {
 		// if the user was saved as a v1 user, its identifier is its Username
 		return user.Username, nil
@@ -168,7 +168,7 @@ func CreateIAMUsersDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			tstCtx.SetValue("iam-users", &iamUserSave{
+			tstCtx.SetValue("iam-users", &generatedUserData{
 				ID:       userInfo.ID,
 				Username: userInfo.Username,
 				IsV2:     userInfo.IsV2,
@@ -176,7 +176,7 @@ func CreateIAMUsersDiagnostic() diagnostics.Diagnostic {
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := iamUserSave{}
+			loaded := generatedUserData{}
 			err := tstCtx.GetValue("iam-users", &loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
 
@@ -194,7 +194,7 @@ func CreateIAMUsersDiagnostic() diagnostics.Diagnostic {
 			}
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := iamUserSave{}
+			loaded := generatedUserData{}
 			err := tstCtx.GetValue("iam-users", &loaded)
 			if err != nil {
 				return errors.Wrap(err, "Could not find generated context")

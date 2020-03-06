@@ -509,7 +509,7 @@ func convertAPIStatementSliceToDomain(external []*pb_common.Statement) ([]*authz
 	for i, statement := range external {
 		// lest former v1 users attempt to create policy with resources (which are ignored)
 		if len(statement.Resources) > 0 {
-			return nil, errors.New("cannot define resources on v2 policy")
+			return nil, errors.New("cannot define resources on policy")
 		}
 		effectValue, ok := authz.Statement_Effect_value[statement.Effect.String()]
 		if !ok {

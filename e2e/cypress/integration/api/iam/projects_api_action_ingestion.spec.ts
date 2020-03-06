@@ -49,7 +49,7 @@ describe('Action project tagging on ingestion', () => {
   // we run most of the API calls, including the time-intensive apply-rules,
   // in the before block so we only have to run them once
   before(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
     // create the projects with one rule
     projectsWithRule.forEach(projectWithRule => {
@@ -90,7 +90,7 @@ describe('Action project tagging on ingestion', () => {
     waitForAction(entityName, 30);
   });
 
-  after(() => cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
+  after(() => cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']));
 
   projectsWithRule.forEach((projectWithRule) => {
     const attribute = projectWithRule.rule.name;

@@ -92,7 +92,7 @@ func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 		engine.Pair{Resource: "compliance:reporting:profiles", Action: "compliance:reportProfiles:list"},
 		engine.Pair{Resource: "system:license", Action: "system:license:apply"},
 		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
-		engine.Pair{Resource: "infra:nodes", Action: "infra:ingestNodes:delete"},
+		engine.Pair{Resource: "infra:nodes", Action: "infra:ingest:delete"},
 		engine.Pair{Resource: "iam:roles", Action: "iam:roles:list"},
 		engine.Pair{Resource: "retention:serviceGroups", Action: "retention:serviceGroups:get"},
 		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:validate"},

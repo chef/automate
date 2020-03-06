@@ -1,10 +1,10 @@
-name: a2-iam-v2-no-legacy-policies
-title: InSpec Automate Integration Profile for IAM v2 migration
+name: a2-iam-no-legacy-integration
+title: InSpec Automate Integration Profile for IAM v2.1 force-upgrade
 maintainer: Chef Software, Inc.
 copyright: Chef Software, Inc.
 copyright_email: engineering@chef.io
 license: All Rights Reserved
-summary: An InSpec profile for integration testing the IAM v2 migration
+summary: An InSpec profile for integration testing the force-upgrade to IAM v2.1 with no legacy policies
 version: 0.1.0
 depends:
   - name: a2-resource-pack

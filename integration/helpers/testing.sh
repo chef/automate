@@ -41,7 +41,7 @@ run_inspec_tests() {
 }
 
 verify_packages() {
-    log_info "Verifying all Habitat Packages"e
+    log_info "Verifying all Habitat Packages"
     chef-automate dev verify-packages
     log_info "Done verifying all Habitat Packages"
 }

@@ -11,15 +11,17 @@
 # tests to give improve our confidence that we are permissioning our APIs correctly, we need
 # to make sure the routing is correct.
 
+# This test uses the v1 APIs because it runs on an older version of Automate
+
 require_relative '../../constants'
 
-title 'authorization access control integration tests'
+title 'default authorization access control integration tests'
 
 NON_ADMIN_USERNAME = 'inspec_test_non_admin'
 
 control 'authz-access-control-1' do
   title 'AuthZ access control'
-  desc 'Verify proper access control for both admin and non-admin users'
+  desc 'Verify access granted by default policies for both admin and non-admin users'
 
   describe 'AuthZ access control' do
     before(:all) do
@@ -178,8 +180,8 @@ control 'authz-access-control-1' do
     end # try_every_http_verb
 
     shared_examples 'authz access control' do
-      describe '/apis/iam/v2/teams' do
-        let(:url) { '/apis/iam/v2/teams' }
+      describe '/api/v0/auth/teams' do
+        let(:url) { '/api/v0/auth/teams' }
         let(:expect_403_response) { expect_403_for_admin_only_apis }
         let(:id_keys) { ["team", "id"] }
         let(:http_verbs) { ["GET_ALL", "POST", "GET", "PUT", "DELETE"] }
@@ -187,20 +189,20 @@ control 'authz-access-control-1' do
         let(:failure_test_id) { '4ae7307e-0ac2-4871-bda9-ebf6bf28d6a5' }
         let(:test_object) do
           {
-            'id': "inspec_test_team-#{Time.now.to_i}",
-            'name': 'This team was created by inspec tests. DELETE ME.',
+            'name': "inspec_test_team-#{Time.now.to_i}",
+            'description': 'This team was created by inspec tests. DELETE ME.',
           }
         end
         let(:test_update_object) do
           {
-            'id': "inspec_test_team-#{Time.now.to_i}",
-            'name': 'This team was created by inspec tests but was modified. DELETE ME.',
+            'name': "inspec_test_team-#{Time.now.to_i}",
+            'description': 'This team was created by inspec tests but was modified. DELETE ME.',
           }
         end
 
         include_examples 'try_every_http_verb'
         # TODO (tc) Test AddUsers RemoveUsers once they are their own HTTP API endpoints.
-      end
+      end # /api/v0/auths/teams
 
       describe '/api/v0/auth/users' do
         let(:url) { '/api/v0/auth/users' }
@@ -287,28 +289,22 @@ control 'authz-access-control-1' do
 
       describe '/api/v0/cfgmgmt/' do
         before(:all) do
-          node = "chefdk-debian-7-tester-2d206b_run_converge"
           node_request = automate_api_request(
             '/data-collector/v0',
             http_method: 'POST',
-            request_body: inspec.profile.file("fixtures/converge/#{node}.json")
+            request_body: {}
           )
+          # to save time on this test we don't post any data
+          # this results int a bad request 
+          # but we only care that it doesn't get a 403
+          expect(node_request.http_status).to eq 400
 
-          expect(node_request.http_status).to eq 200
-
-          policy_node = "policy-node"
           policy_node_request = automate_api_request(
             '/data-collector/v0',
             http_method: 'POST',
-            request_body: inspec.profile.file("fixtures/converge/#{policy_node}.json")
+            request_body: {}
           )
-
-          expect(policy_node_request.http_status).to eq 200
-
-          # Wait for data to be indexed
-          command('sleep 15') do
-            its('exit_status') { should eq 0 }
-          end
+          expect(policy_node_request.http_status).to eq 400
         end
 
         %w(

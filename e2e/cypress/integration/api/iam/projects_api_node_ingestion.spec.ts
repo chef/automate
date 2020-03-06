@@ -148,7 +148,7 @@ describe('Ingestion project tagging', () => {
   const end = Cypress.moment().utc().endOf('day').format();
 
   before(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
     // create the projects with one rule
     projectsWithRule.forEach(projectWithRule => {
@@ -217,7 +217,7 @@ describe('Ingestion project tagging', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',

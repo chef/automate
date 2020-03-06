@@ -122,7 +122,7 @@ func init() {
 		}
 		return ""
 	})
-	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessMultipleNodeDeletes", "infra:nodes", "infra:ingestNodes:delete", "POST", "/ingest/events/chef/node-multiple-deletes", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessMultipleNodeDeletes", "infra:nodes", "infra:ingest:delete", "POST", "/ingest/events/chef/node-multiple-deletes", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
 	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessLivenessPing", "infra:nodes:{entity_uuid}:liveness", "infra:ingest:create", "POST", "/ingest/events/chef/liveness", func(unexpandedResource string, input interface{}) string {

@@ -44,7 +44,7 @@ type PolicyParameters struct {
 	ProjectID string
 }
 
-type iamV2PoliciesSave struct {
+type generatedV2PolicyData struct {
 	TokenID    string `json:"token_id"`
 	TokenValue string `json:"token_value"`
 	PolicyID   string `json:"policy_id"`
@@ -52,6 +52,7 @@ type iamV2PoliciesSave struct {
 	UserID     string `json:"user_id"`
 	RoleID     string `json:"role_id"`
 	ProjectID  string `json:"project_id"`
+	Skipped    bool   `json:"skipped"`
 }
 
 // CreateV2Policy creates a policy using the given policy fields
@@ -97,6 +98,30 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 			if err != nil {
 				return false, "", err
 			}
+
+			// the Skip function is run before each step: Generate, Verify, and Cleanup
+			loaded := generatedV2PolicyData{}
+			err = tstCtx.GetValue("iam-policies-v2", &loaded)
+			if err != nil {
+				// this is the first time running this diagnostic,
+				// so we save whether or not we're skipping it
+				tstCtx.SetValue("iam-policies-v2", &generatedV2PolicyData{
+					Skipped: !isV2,
+				})
+			} else {
+				// the diagnostic has been run before, so we keep track of its saved values
+				tstCtx.SetValue("iam-policies-v2", &generatedV2PolicyData{
+					TokenID:    loaded.TokenID,
+					TokenValue: loaded.TokenValue,
+					PolicyID:   loaded.PolicyID,
+					TeamID:     loaded.TeamID,
+					UserID:     loaded.UserID,
+					RoleID:     loaded.RoleID,
+					ProjectID:  loaded.ProjectID,
+					Skipped:    loaded.Skipped,
+				})
+			}
+
 			return !isV2, "requires IAM v2", nil
 		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
@@ -139,7 +164,13 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			tstCtx.SetValue("iam-policies-v2", iamV2PoliciesSave{
+			loaded := generatedV2PolicyData{}
+			err = tstCtx.GetValue("iam-policies-v2", &loaded)
+			if err != nil {
+				return errors.Errorf(err.Error(), "could not find generated context")
+			}
+
+			tstCtx.SetValue("iam-policies-v2", generatedV2PolicyData{
 				TokenID:    pol.TokenID,
 				TokenValue: tokenInfo.Value,
 				PolicyID:   policyInfo.ID,
@@ -147,21 +178,49 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 				UserID:     pol.UserID,
 				RoleID:     pol.RoleID,
 				ProjectID:  pol.ProjectID,
+				Skipped:    loaded.Skipped,
 			})
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := iamV2PoliciesSave{}
-			err := tstCtx.GetValue("iam-policies-v2", &loaded)
-			require.NoError(tstCtx, err, "Could not load generated context")
+			// in case there was an upgrade, check for v1 policy data
+			v1loaded := generatedV1PolicyData{}
+			err := tstCtx.GetValue("iam-policies-v1", &v1loaded)
+			// if generate was run while on v1 and cleanup was skipped,
+			// we can verify that the v1 policy was migrated to v2
+			if err == nil {
+				// the policy should exist as a migrated v2 policy
+				err = MustJSONDecodeSuccess(
+					tstCtx.DoLBRequest(
+						fmt.Sprintf("/apis/iam/v2/policies/%s", v1loaded.PolicyID),
+					)).Error()
+				require.NoError(tstCtx, err, "Expected to be able to read gateway version")
 
-			// assert policy is enforced by fetching the gateway version with the member token.
+				err = MustJSONDecodeSuccess(
+					tstCtx.DoLBRequest(
+						"/api/v0/gateway/version",
+						lbrequest.WithAuthToken(v1loaded.TokenValue),
+					)).Error()
+				require.NoError(tstCtx, err, "Expected to be able to read gateway version")
+			}
+
+			v2loaded := generatedV2PolicyData{}
+			err = tstCtx.GetValue("iam-policies-v2", &v2loaded)
+			require.NoError(tstCtx, err, "Could not find generated context")
+			if v2loaded.Skipped {
+				// in the v1->v2 force upgrade scenario:
+				// we only migrate v1 policy data,
+				// we do not generate v2 policies
+				return
+			}
+
+			// assert v2 policy is enforced by fetching the gateway version with the member token.
 			// this endpoint corresponds to the "system:serviceVersion:get" action
 			// (which is the policy's role's action).
 			err = MustJSONDecodeSuccess(
 				tstCtx.DoLBRequest(
 					"/api/v0/gateway/version",
-					lbrequest.WithAuthToken(loaded.TokenValue),
+					lbrequest.WithAuthToken(v2loaded.TokenValue),
 				)).Error()
 			require.NoError(tstCtx, err, "Expected to be able to read gateway version")
 
@@ -180,23 +239,28 @@ func CreateIAMV2PoliciesDiagnostic() diagnostics.Diagnostic {
 			}{}
 			expectedStmts := []Statement{
 				{
-					Role:      loaded.RoleID,
+					Role:      v2loaded.RoleID,
 					Resources: []string{"*"},
-					Projects:  []string{loaded.ProjectID},
+					Projects:  []string{v2loaded.ProjectID},
 					Effect:    "ALLOW",
 				},
 			}
-			err = MustJSONDecodeSuccess(tstCtx.DoLBRequest("/apis/iam/v2/policies/" + loaded.PolicyID)).
+			err = MustJSONDecodeSuccess(tstCtx.DoLBRequest("/apis/iam/v2/policies/" + v2loaded.PolicyID)).
 				WithValue(&resp)
 			require.NoError(tstCtx, err, "Expected to be able to retrieve stored IAM v2 policy")
-			require.Equal(tstCtx, loaded.PolicyID, resp.Policy.ID)
+			require.Equal(tstCtx, v2loaded.PolicyID, resp.Policy.ID)
 			require.Equal(tstCtx, "CUSTOM", resp.Policy.Type)
-			require.Contains(tstCtx, resp.Policy.Members, fmt.Sprintf("token:%s", loaded.TokenID))
+			require.Contains(tstCtx, resp.Policy.Members, fmt.Sprintf("token:%s", v2loaded.TokenID))
 			require.ElementsMatch(tstCtx, expectedStmts, resp.Policy.Statements)
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := iamV2PoliciesSave{}
+			loaded := generatedV2PolicyData{}
 			err := tstCtx.GetValue("iam-policies-v2", &loaded)
+			if loaded.Skipped {
+				// if diagnostic was run on v1, generating v2 policies was skipped
+				// so nothing to clean up here
+				return nil
+			}
 			if err != nil {
 				return errors.Wrap(err, "Could not load generated context")
 			}
