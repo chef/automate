@@ -67,3 +67,18 @@ message CookbookAllVersion {
     string current_version  = 2;
     repeated string versions = 3;
 }
+
+message CookbookAffectedNodes {
+    repeated NodeAttribute nodes = 1;
+}
+
+message NodeAttribute {
+    string name         = 1;
+    string chef_guid    = 2;
+    string url          = 3;
+    string check_in     = 4;
+    string uptime       = 5;
+    string platform     = 6;
+    string environment  = 7;
+    string policy_group = 8;
+}
