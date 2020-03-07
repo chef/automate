@@ -9,6 +9,21 @@ import (
 )
 
 func init() {
+	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/CreateTeam", "auth:teams", "create", "POST", "/iam/v2/teams", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.CreateTeamReq); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "id":
+					return m.Id
+				case "name":
+					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/ListTeams", "auth:teams", "read", "GET", "/iam/v2/teams", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
@@ -18,21 +33,6 @@ func init() {
 				switch want {
 				case "id":
 					return m.Id
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
-	})
-	policy.MapMethodTo("/chef.automate.api.iam.v2.Teams/CreateTeam", "auth:teams", "create", "POST", "/iam/v2/teams", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*request.CreateTeamReq); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "id":
-					return m.Id
-				case "name":
-					return m.Name
 				default:
 					return ""
 				}

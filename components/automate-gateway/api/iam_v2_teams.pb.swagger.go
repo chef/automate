@@ -16,6 +16,8 @@ func init() {
   "paths": {
     "/iam/v2/teams": {
       "get": {
+        "summary": "List all local teams",
+        "description": "List all local teams.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListTeams",
         "responses": {
           "200": {
@@ -26,10 +28,12 @@ func init() {
           }
         },
         "tags": [
-          "Teams"
+          "teams"
         ]
       },
       "post": {
+        "summary": "Create a local team",
+        "description": "Creates a local team, used to group local users as members of IAM policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateTeam",
         "responses": {
           "200": {
@@ -50,12 +54,20 @@ func init() {
           }
         ],
         "tags": [
-          "Teams"
+          "teams"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"id\": \"test-id\", \"name\": \"My Test Team\", \"projects\": [\"project1\", \"project2\"]}"
+          }
         ]
       }
     },
     "/iam/v2/teams/{id}": {
       "get": {
+        "summary": "Get a team",
+        "description": "Returns the details for a team.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetTeam",
         "responses": {
           "200": {
@@ -74,10 +86,12 @@ func init() {
           }
         ],
         "tags": [
-          "Teams"
+          "teams"
         ]
       },
       "delete": {
+        "summary": "Delete a local team",
+        "description": "Delete a local team and remove it from any policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteTeam",
         "responses": {
           "200": {
@@ -96,10 +110,12 @@ func init() {
           }
         ],
         "tags": [
-          "Teams"
+          "teams"
         ]
       },
       "put": {
+        "summary": "Update a local team",
+        "description": "Update a local team.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateTeam",
         "responses": {
           "200": {
@@ -126,12 +142,20 @@ func init() {
           }
         ],
         "tags": [
-          "Teams"
+          "teams"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"My Update Test Team\", \"projects\": [\"project1\", \"projectnew\"]}"
+          }
         ]
       }
     },
     "/iam/v2/teams/{id}/users": {
       "get": {
+        "summary": "Get local team membership",
+        "description": "Lists all users of a local team. Users are listed by their membership_id.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetTeamMembership",
         "responses": {
           "200": {
@@ -150,12 +174,14 @@ func init() {
           }
         ],
         "tags": [
-          "Teams"
+          "teams"
         ]
       }
     },
     "/iam/v2/teams/{id}/users:add": {
       "post": {
+        "summary": "Add local team membership",
+        "description": "Add a list of users to a local team. Users are added by their membership_id.\nThe request will ignore any members that do not exist.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "AddTeamMembers",
         "responses": {
           "200": {
@@ -182,12 +208,20 @@ func init() {
           }
         ],
         "tags": [
-          "Teams"
+          "teams"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{user_ids: [\"527ed96f-2ecb-4f8f-abd7-0bf6511459ac\", \"987c8475-5747-4f9b-a766-c337f73965ae\"]}"
+          }
         ]
       }
     },
     "/iam/v2/teams/{id}/users:remove": {
       "post": {
+        "summary": "Remove local team membership",
+        "description": "Remove a list of users from a local team. Users are removed by their membership_id.\nThe request will ignore any members that were not on the team or do not exist.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "RemoveTeamMembers",
         "responses": {
           "200": {
@@ -214,12 +248,20 @@ func init() {
           }
         ],
         "tags": [
-          "Teams"
+          "teams"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{user_ids: [\"527ed96f-2ecb-4f8f-abd7-0bf6511459ac\", \"987c8475-5747-4f9b-a766-c337f73965ae\"]}"
+          }
         ]
       }
     },
     "/iam/v2/users/{id}/teams": {
       "get": {
+        "summary": "Get team membership for a user",
+        "description": "Lists all local teams for a specific user. You must use their membership_id in the request URL.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:userTeams:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetTeamsForMember",
         "responses": {
           "200": {
@@ -238,7 +280,7 @@ func init() {
           }
         ],
         "tags": [
-          "Teams"
+          "teams"
         ]
       }
     }
