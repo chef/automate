@@ -346,7 +346,7 @@ func TestValidationCreatePolicy_Actions(t *testing.T) {
 			"no:camels:here",
 			"*:mark-for-deletion", // legacy
 			"infra:*:create",
-			"ingest:nodes:*",
+			"ingest:camelCaseThings:*",
 		},
 		false: {
 			"*:*:*",
