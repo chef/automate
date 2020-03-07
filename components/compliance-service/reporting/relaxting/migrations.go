@@ -563,6 +563,10 @@ func (backend *ES2Backend) markTimeseriesDailyLatest(dateToMigrate time.Time) er
 		return err
 	}
 
+	if reportIds == nil {
+		return nil
+	}
+
 	indicesToUpdate := fmt.Sprintf("%s*,%s*", summaryIndexToUpdate, reportIndexToUpdate)
 	idsQuery := elastic.NewIdsQuery(mappings.DocType)
 	idsQuery.Ids(reportIds.Ids...)

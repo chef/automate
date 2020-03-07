@@ -209,6 +209,10 @@ func (srv *Server) Export(in *reporting.Query, stream reporting.ReportingService
 		return status.Error(codes.Internal, fmt.Sprintf("Failed to determine how many reports exist: %s", err))
 	}
 
+	if reportIDs == nil {
+		return nil
+	}
+
 	total := len(reportIDs.Ids)
 	// Step 2: get all reports one by one in reverse order to be sorted asc by end_time
 	for idx := total - 1; idx >= 0; idx-- {
