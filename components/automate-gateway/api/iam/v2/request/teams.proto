@@ -21,6 +21,7 @@ message CreateTeamReq {
       json_schema: {
         required: ["id", "name"]
       }
+      example: { value: '{"id": "test-id", "name": "My Test Team", "projects": ["project1", "project2"]}'}
     };
     string id = 1;
     string name = 2;

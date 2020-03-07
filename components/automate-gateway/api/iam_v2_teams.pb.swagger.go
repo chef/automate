@@ -320,6 +320,14 @@ func init() {
     },
     "chef.automate.api.iam.v2.CreateTeamReq": {
       "type": "object",
+      "example": {
+        "id": "test-id",
+        "name": "My Test Team",
+        "projects": [
+          "project1",
+          "project2"
+        ]
+      },
       "properties": {
         "id": {
           "type": "string"
@@ -341,6 +349,14 @@ func init() {
     },
     "chef.automate.api.iam.v2.CreateTeamResp": {
       "type": "object",
+      "example": {
+        "id": "test-id",
+        "name": "My Test Team",
+        "projects": [
+          "project1",
+          "project2"
+        ]
+      },
       "properties": {
         "team": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Team"
