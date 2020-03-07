@@ -317,6 +317,7 @@ Vagrant.configure('2') do |config|
       aws.elastic_ip = ENV['AWS_EC2_IP']
     end
 
+
     aws.security_groups = ['ssh-http-go-debug']
     override.ssh.username = 'ubuntu'
     override.ssh.private_key_path = ssh_key_path
