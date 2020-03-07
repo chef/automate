@@ -654,6 +654,7 @@ describe File.basename(__FILE__) do
 
       assert_equal('nginx-01', res['profiles'][0]['controls'][0]['id'])
       assert_equal(1, res['profiles'][0]['controls'][0]['impact'])
+      assert_equal('no', res['profiles'][0]['controls'][0]['waived_str'])
       assert_equal(Google::Protobuf::Map, res['profiles'][0]['controls'][0]['tags'].class)
       assert_equal('Running worker process as non-privileged user', res['profiles'][0]['controls'][0]['title'])
       assert_equal(1, res['profiles'][0]['controls'][0]['results'].length)
