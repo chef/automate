@@ -67,7 +67,7 @@ export class ProfileOverviewComponent implements OnInit, OnDestroy {
   // Tabs
   selectedTab: 'installed' | 'available' = 'installed';
 
-  @ViewChild('uploadModal', { static: false }) uploadModal: ElementRef;
+  @ViewChild('uploadModal') uploadModal: ElementRef;
 
   // Empty Page
   profilesEmpty = false;
