@@ -74,14 +74,14 @@ error TS6200: Definitions of the following identifiers conflict with those in an
 There are very few reports of others experiencing this problem and no resolution presents itself.
 Reference: https://stackoverflow.com/a/57592510
 
-**Package @types/node: ~12.12.26**
+**Package @types/node: ~12.12.29**
 
 Reason: The major version should match our node version, which is 12.13.1, so I have constrained it to the highest version less than that.
 That is a guess on my part, could not really confirm what version one should be running, through these references:
  - https://www.npmjs.com/package/@types/node
  - https://github.com/DefinitelyTyped/DefinitelyTyped#how-do-definitely-typed-package-versions-relate-to-versions-of-the-corresponding-library
 
-**Package diff2html: ^2.12.1**
+**Package diff2html: ^2.12.2**
 
 Reason: Trying to install the latest version `npm install diff2html@3.0.0` reports these errors:
 
