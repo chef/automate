@@ -33,7 +33,7 @@ describe('ProjectEffects', () => {
       ]
     });
 
-    effects = TestBed.get(ProjectEffects);
+    effects = TestBed.inject(ProjectEffects);
   });
 
   it('DeleteProjectSuccess ensuring the loadOption and CreateNotification are both created',

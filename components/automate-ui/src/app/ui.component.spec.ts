@@ -29,7 +29,7 @@ xdescribe('UIComponent', () => {
   //     ]
   //   });
   //
-  //   session = TestBed.get(ChefSessionService);
+  //   session = TestBed.inject(ChefSessionService);
   // });
 
   describe('UI Component', () => {

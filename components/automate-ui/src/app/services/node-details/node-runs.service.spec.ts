@@ -20,8 +20,8 @@ describe('NodeRunsService', () => {
       ]
     });
 
-    service = TestBed.get(NodeRunsService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    service = TestBed.inject(NodeRunsService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   describe('getPolicyCookbooks()', () => {

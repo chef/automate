@@ -59,8 +59,8 @@ describe('ClientRunsComponent', () => {
 
     fixture = TestBed.createComponent(ClientRunsComponent);
     component = fixture.componentInstance;
-    router = TestBed.get(Router);
-    route = TestBed.get(ActivatedRoute);
+    router = TestBed.inject(Router);
+    route = TestBed.inject(ActivatedRoute);
   });
 
   describe('sets categoryTypes', () => {

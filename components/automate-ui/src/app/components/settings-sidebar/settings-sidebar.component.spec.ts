@@ -46,7 +46,7 @@ describe('SettingsSidebarComponent', () => {
         FeatureFlagsService
       ]
     });
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(SettingsSidebarComponent);
     component = fixture.componentInstance;

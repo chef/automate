@@ -63,7 +63,7 @@ describe('AuthorizedComponent', () => {
         AuthorizedComponent
       ]
     }).compileComponents();
-    const store: Store<NgrxStateAtom> = TestBed.get(Store);
+    const store: Store<NgrxStateAtom> = TestBed.inject(Store);
     dispatchSpy = spyOn(store, 'dispatch').and.callThrough();
   }));
 

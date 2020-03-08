@@ -31,11 +31,11 @@ describe('JobsListComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(JobsListComponent);
     component = fixture.componentInstance;
-    router = TestBed.get(Router);
+    router = TestBed.inject(Router);
   });
 
   describe('timeFromNow()', () => {

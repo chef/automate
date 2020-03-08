@@ -64,14 +64,14 @@ describe('NotificationFormComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
       spyOn(store, 'dispatch').and.callThrough();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(NotificationFormComponent);
     component = fixture.componentInstance;
-    ruleService = TestBed.get(RulesService);
+    ruleService = TestBed.inject(RulesService);
     fixture.detectChanges();
   });
 

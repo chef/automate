@@ -99,7 +99,7 @@ describe('TeamManagementComponent', () => {
       };
 
     beforeEach(() => {
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
       component.isIAMv2 = false;
     });
 
@@ -176,7 +176,7 @@ describe('TeamManagementComponent', () => {
     };
 
     beforeEach(() => {
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
       component.isIAMv2 = true;
     });
 
@@ -216,7 +216,7 @@ describe('TeamManagementComponent', () => {
 
 
     beforeEach(() => {
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
       store.dispatch(new GetTeamsSuccess({
         teams: []
       }));

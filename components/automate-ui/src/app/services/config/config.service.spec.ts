@@ -20,8 +20,8 @@ describe('ConfigService', () => {
       ]
     });
 
-    service = TestBed.get(ConfigService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    service = TestBed.inject(ConfigService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   describe('when no config file available', () => {

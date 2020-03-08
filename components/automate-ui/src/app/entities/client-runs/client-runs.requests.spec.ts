@@ -23,8 +23,8 @@ describe('ClientRunsRequests', () => {
       ]
     });
 
-    service = TestBed.get(ClientRunsRequests);
-    httpTestingController = TestBed.get(HttpTestingController);
+    service = TestBed.inject(ClientRunsRequests);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   describe('getSuggestions()', () => {
