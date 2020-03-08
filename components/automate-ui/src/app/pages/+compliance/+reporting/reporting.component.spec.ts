@@ -61,7 +61,7 @@ describe('ReportingComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(ReportingComponent);
     component = fixture.componentInstance;
@@ -69,8 +69,8 @@ describe('ReportingComponent', () => {
     statsService = element.injector.get(StatsService);
     suggestionsService = element.injector.get(SuggestionsService);
     reportQueryService = element.injector.get(ReportQueryService);
-    router = TestBed.get(Router);
-    route = TestBed.get(ActivatedRoute);
+    router = TestBed.inject(Router);
+    route = TestBed.inject(ActivatedRoute);
   });
 
   it('displays tabs', () => {

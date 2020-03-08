@@ -82,10 +82,10 @@ describe('ProcessProgressBarComponent', () => {
 
   beforeEach(() => {
     jasmine.addMatchers(customMatchers);
-    projectService = TestBed.get(ProjectService);
+    projectService = TestBed.inject(ProjectService);
     fixture = TestBed.createComponent(ProcessProgressBarComponent);
     component = fixture.componentInstance;
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
 
     store.dispatch(new GetIamVersionSuccess({ version: { major: 'v2' } }));
     fixture.detectChanges();

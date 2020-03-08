@@ -103,9 +103,9 @@ describe('TeamDetailsComponent v2', () => {
   }));
 
   beforeEach(() => {
-    router = TestBed.get(Router);
+    router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.stub();
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
 
     fixture = TestBed.createComponent(TeamDetailsComponent);
     component = fixture.componentInstance;
@@ -222,9 +222,9 @@ describe('TeamDetailsComponent v1', () => {
   }));
 
   beforeEach(() => {
-    router = TestBed.get(Router);
+    router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.stub();
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
 
     fixture = TestBed.createComponent(TeamDetailsComponent);
     component = fixture.componentInstance;

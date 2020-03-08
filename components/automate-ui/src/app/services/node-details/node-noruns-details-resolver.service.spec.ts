@@ -48,7 +48,7 @@ describe('NodeNoRunsDetailsResolverService', () => {
     });
 
     route = new MockRoute();
-    service = TestBed.get(NodeNoRunsDetailsResolverService);
+    service = TestBed.inject(NodeNoRunsDetailsResolverService);
   });
 
   describe('node list with one value is returned (normal case)', () => {

@@ -59,9 +59,9 @@ describe('ServiceGroupsComponent', () => {
 
     fixture = TestBed.createComponent(ServiceGroupsComponent);
     component = fixture.componentInstance;
-    router = TestBed.get(Router);
-    route = TestBed.get(ActivatedRoute);
-    ngrxStore = TestBed.get(Store);
+    router = TestBed.inject(Router);
+    route = TestBed.inject(ActivatedRoute);
+    ngrxStore = TestBed.inject(Store);
     component.ngOnInit();
   });
 

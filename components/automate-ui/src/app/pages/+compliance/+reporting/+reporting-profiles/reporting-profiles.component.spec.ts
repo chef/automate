@@ -40,7 +40,7 @@ describe('ReportingProfilesComponent', () => {
 
     fixture = TestBed.createComponent(ReportingProfilesComponent);
     component = fixture.componentInstance;
-    reportQueryService = TestBed.get(ReportQueryService);
+    reportQueryService = TestBed.inject(ReportQueryService);
   });
 
   describe('onProfilesListPageChanged()', () => {

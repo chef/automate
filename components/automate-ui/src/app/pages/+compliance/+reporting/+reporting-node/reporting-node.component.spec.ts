@@ -40,7 +40,7 @@ describe('ReportingNodeComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(ReportingNodeComponent);
     component = fixture.componentInstance;

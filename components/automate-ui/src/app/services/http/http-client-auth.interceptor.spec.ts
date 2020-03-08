@@ -19,9 +19,9 @@ describe('HttpClientAuthInterceptor', () => {
   describe('common functionality', () => {
     beforeEach(() => {
       configure();
-      httpClient = TestBed.get(HttpClient);
-      httpMock = TestBed.get(HttpTestingController);
-      chefSession = TestBed.get(ChefSessionService);
+      httpClient = TestBed.inject(HttpClient);
+      httpMock = TestBed.inject(HttpTestingController);
+      chefSession = TestBed.inject(ChefSessionService);
       spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
     });
 
@@ -75,9 +75,9 @@ describe('HttpClientAuthInterceptor', () => {
       describe(description, () => {
         beforeEach(() => {
           configure(projectList);
-          httpClient = TestBed.get(HttpClient);
-          httpMock = TestBed.get(HttpTestingController);
-          chefSession = TestBed.get(ChefSessionService);
+          httpClient = TestBed.inject(HttpClient);
+          httpMock = TestBed.inject(HttpTestingController);
+          chefSession = TestBed.inject(ChefSessionService);
           spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
         });
 
@@ -110,9 +110,9 @@ describe('HttpClientAuthInterceptor', () => {
 
         beforeEach(() => {
           configure(projectList);
-          httpClient = TestBed.get(HttpClient);
-          httpMock = TestBed.get(HttpTestingController);
-          chefSession = TestBed.get(ChefSessionService);
+          httpClient = TestBed.inject(HttpClient);
+          httpMock = TestBed.inject(HttpTestingController);
+          chefSession = TestBed.inject(ChefSessionService);
           spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
         });
 
@@ -136,9 +136,9 @@ describe('HttpClientAuthInterceptor', () => {
           { value: 'proj4', label: 'proj 4', type: 'CUSTOM', checked: false }
         ];
         configure(projectList);
-        httpClient = TestBed.get(HttpClient);
-        httpMock = TestBed.get(HttpTestingController);
-        chefSession = TestBed.get(ChefSessionService);
+        httpClient = TestBed.inject(HttpClient);
+        httpMock = TestBed.inject(HttpTestingController);
+        chefSession = TestBed.inject(ChefSessionService);
         spyOnProperty(chefSession, 'id_token', 'get').and.returnValue('token');
       });
 

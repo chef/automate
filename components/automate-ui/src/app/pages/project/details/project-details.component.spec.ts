@@ -125,8 +125,8 @@ describe('ProjectDetailsComponent', () => {
   let router: Router;
 
   beforeEach(() => {
-    store = TestBed.get(Store);
-    router = TestBed.get(Router);
+    store = TestBed.inject(Store);
+    router = TestBed.inject(Router);
 
     store.dispatch(new GetProjectSuccess({
       project: {

@@ -77,11 +77,11 @@ describe('DatafeedComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(DatafeedComponent);
     component = fixture.componentInstance;
-    telemetryService = TestBed.get(TelemetryService);
+    telemetryService = TestBed.inject(TelemetryService);
     fixture.detectChanges();
   });
 

@@ -54,14 +54,14 @@ describe('DatafeedFormComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
       spyOn(store, 'dispatch').and.callThrough();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(DatafeedFormComponent);
     component = fixture.componentInstance;
-    datafeedService = TestBed.get(DatafeedService);
+    datafeedService = TestBed.inject(DatafeedService);
     fixture.detectChanges();
   });
 
