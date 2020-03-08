@@ -1,9 +1,11 @@
 // TODO eng-ex discuss if this should be turned into a module
 import * as moment from 'moment';
+import { Injectable } from "@angular/core";
 
 type Moment = moment.Moment;
 type Duration = moment.Duration;
 
+@Injectable()
 export class HistorySelection {
   // List of all supported selections to be displayed in the selector component
   static Durations: { [key: string]: Duration } = {

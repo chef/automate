@@ -4,14 +4,14 @@
     "outDir": "../out-tsc/app",
     "baseUrl": "./"
 },
-  "exclude": [
-    "test.ts",
-    "wallabyTest.ts",
-    "**/*.spec.ts",
-    "**/*.mock.ts",
-    "assets/chef-ui-library/**/*.*"
-  ],
   "angularCompilerOptions": {
     "preserveWhitespaces": true
-  }
+  },
+  "files": [
+    "main.ts",
+    "polyfills.ts"
+  ],
+  "include": [
+    "src/**/*.d.ts"
+  ]
 }
