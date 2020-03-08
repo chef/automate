@@ -40,7 +40,7 @@
     "@ngrx/router-store": "^8.6.0",
     "@ngrx/store": "^8.6.0",
     "@ngrx/store-devtools": "^8.6.0",
-    "@nguniversal/express-engine": "^8.2.6",
+    "@nguniversal/express-engine": "^9.0.1",
     "classlist.js": "^1.1.20150312",
     "core-js": "^3.6.4",
     "d3": "^5.15.0",
