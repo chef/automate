@@ -131,7 +131,7 @@ func (m *Module) processFile(f pgs.File) {
 	err := m.applyTemplate(&out, policyVersion, f)
 	if err != nil {
 		m.Logf("couldn't apply template: %s", err)
-		m.Fail("code generation failed for all policy versions")
+		m.Fail("code generation failed")
 	} else {
 		generatedFileName := m.ctx.OutputPath(f).SetExt(fmt.Sprintf(".%s.go", moduleName)).String()
 		m.AddGeneratorFile(generatedFileName, out.String())
