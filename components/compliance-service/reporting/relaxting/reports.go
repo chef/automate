@@ -70,21 +70,21 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	filters map[string][]string,
 	latestOnly bool) (*reportingapi.ReportIds, error) {
 	myName := "getNodeReportIdsFromTimeseries"
+	var repIds reportingapi.ReportIds
+
 	nodeReport := make(map[string]reportingapi.ReportData, 0)
 	boolQuery := backend.getFiltersQuery(filters, latestOnly)
 
 	fsc := elastic.NewFetchSourceContext(true).Include("end_time")
 
-	// aggs
 	aggs := elastic.NewTermsAggregation().Field("node_uuid").Size(reporting.ESize).
 		SubAggregation("distinct", elastic.NewTopHitsAggregation().Size(1).
 			FetchSourceContext(fsc).
-			//FetchSource(false).
 			Sort("end_time", false))
 
 	client, err := backend.ES2Client()
 	if err != nil {
-		return nil, errors.Wrap(err, "getNodeReportIdsFromTimeseries cannot connect to elasticsearch")
+		return &repIds, errors.Wrap(err, "getNodeReportIdsFromTimeseries cannot connect to elasticsearch")
 	}
 
 	searchSource := elastic.NewSearchSource().
@@ -94,7 +94,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return nil, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to get Source")
+		return &repIds, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to get Source")
 	}
 	LogQueryPartMin(esIndex, source, "getNodeReportIdsFromTimeseries query searchSource")
 
@@ -112,13 +112,13 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 
 	if err != nil {
 		logrus.Errorf("unable to getNodeReportIdsFromTimeseries %v", err)
-		return nil, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to complete search")
+		return &repIds, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to complete search")
 	}
 
 	if searchResult.TotalHits() == 0 || searchResult.Hits.TotalHits == 0 {
 		logrus.Debugf("getNodeReportIdsFromTimeseries: No report ids for the given filters: %+v\n", filters)
 		// no matching report IDs is not an error, just return an empty array
-		return nil, nil
+		return &repIds, nil
 	}
 	LogQueryPartMin(esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
@@ -128,14 +128,12 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 			topHits, _ := nodeBucket.Aggregations.TopHits("distinct")
 			nodeID := fmt.Sprintf("%s", nodeBucket.Key)
 			for _, hit := range topHits.Hits.Hits {
-				type endTimeSource struct {
-					EndTime time.Time `json:"end_time"`
-				}
-				var et endTimeSource
+				var et EndTimeSource
 				if hit.Source != nil {
 					err = json.Unmarshal(*hit.Source, &et)
-					if err == nil {
-
+					if err != nil {
+						logrus.Errorf("could not get the end_time for runid: %s %v", hit.Id, err)
+						continue
 					}
 				}
 				endTimeTimestamp, _ := ptypes.TimestampProto(et.EndTime)
@@ -157,16 +155,13 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 		reportIds[i] = a.Id
 		i++
 	}
-
-	repIds := &reportingapi.ReportIds{
-		Ids:        reportIds,
-		ReportData: reportData,
-	}
+	repIds.Ids = reportIds
+	repIds.ReportData = reportData
 
 	logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
 		len(reportIds), searchResult.TookInMillis)
 
-	return repIds, nil
+	return &repIds, nil
 }
 
 func (backend ES2Backend) GetReportIds(esIndex string, filters map[string][]string) (*reportingapi.ReportIds, error) {

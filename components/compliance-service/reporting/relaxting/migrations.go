@@ -563,7 +563,7 @@ func (backend *ES2Backend) markTimeseriesDailyLatest(dateToMigrate time.Time) er
 		return err
 	}
 
-	if reportIds == nil {
+	if reportIds == nil || len(reportIds.Ids) == 0 {
 		return nil
 	}
 
