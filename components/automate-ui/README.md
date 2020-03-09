@@ -28,10 +28,10 @@ With the plugin installed, this TOC will update automatically when you save the 
 
 ## Requirements
 
-1. node. We currently use node 10.15.2, but the current version number is always
+1. node. We currently use node 12.13.1, but the current version number is always
    present in the **.nvmrc** file. Use [NVM](https://github.com/nvm-sh/nvm) to install node.
 
-1. npm. We currently use npm 6.4.1 which ships with node 10.15.2 so no additional
+1. npm. We currently use npm 6.12.1 which ships with node 12.13.1 so no additional
    installation should be necessary.
 
 1. [direnv](https://direnv.net/). This can be installed with `brew install
@@ -74,16 +74,22 @@ error TS6200: Definitions of the following identifiers conflict with those in an
 There are very few reports of others experiencing this problem and no resolution presents itself.
 Reference: https://stackoverflow.com/a/57592510
 
-**Package @types/node: ~10.14.22**
+**Package @types/node: ~12.12.29**
 
-Reason: The major version should match our node version, which is 10.15.2, so I have constrained it to the highest version less than that.
+Reason: The major version should match our node version, which is 12.13.1, so I have constrained it to the highest version less than that.
 That is a guess on my part, could not really confirm what version one should be running, through these references:
  - https://www.npmjs.com/package/@types/node
  - https://github.com/DefinitelyTyped/DefinitelyTyped#how-do-definitely-typed-package-versions-relate-to-versions-of-the-corresponding-library
 
-**Package diff2html: ^2.12.1**
+**Package diff2html: ^2.12.2**
 
-Reason: Later releases are beta; should only be using production-releases.
+Reason: Trying to install the latest version `npm install diff2html@3.0.0` reports these errors:
+
+```text
+delta-viewer.component.ts:3:10 - error TS2305: Module '"../../../../node_modules/diff2html/lib/diff2html"' has no exported member 'Diff2Html'.
+```
+
+Reference https://github.com/rtfpessoa/diff2html
 
 **Package immutable: ^3.8.2**
 
@@ -91,6 +97,18 @@ Reason: Later releases are release candidates; should only be using production-r
 
 **Package rrule: =2.4.1**
 Per https://github.com/chef/automate/pull/1867, future versions have made a breaking change so it breaks our code base.
+
+**Package tslint: ^5.20.1**
+
+Reason: Trying to install the latest version `npm install tslint@6.0.0` reports these warnings
+so maintaining at highest version of 5.x.x:
+
+```text
+npm WARN deprecated tslint@6.0.0: TSLint has been deprecated in favor of ESLint. Please see https://github.com/palantir/tslint/issues/4534 for more information.
+npm WARN codelyzer@5.2.1 requires a peer of tslint@^5.0.0 but none is installed. You must install peer dependencies yourself.
+npm WARN rxjs-tslint@0.1.7 requires a peer of tslint@^5.0.0 but none is installed. You must install peer dependencies yourself.
+npm WARN tslint-defocus@2.0.6 requires a peer of tslint@^5.x but none is installed. You must install peer dependencies yourself.
+```
 
 **Package typescript: ~3.5.3**
 
