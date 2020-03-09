@@ -101,6 +101,10 @@ func (d *TestableContinueDecision) AssertTaskEnqueued(taskName cereal.TaskName) 
 	return e
 }
 
+func (d *TestableContinueDecision) AssertNoTasksEnqueued() {
+	require.True(d.t, len(d.enqueuedTasks) == 0, "expected no tasks to be enqueued")
+}
+
 func NewWorkflowInstance(t *testing.T, instanceName string) *WorkflowInstance {
 	return &WorkflowInstance{
 		t:            t,

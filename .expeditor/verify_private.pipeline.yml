@@ -469,7 +469,7 @@ steps:
   - label: ":cypress: IAMv2"
     command:
       - FLAKY=no IAM=v2.1 integration/run_test integration/tests/cypress_e2e.sh
-    timeout_in_minutes: 25
+    timeout_in_minutes: 30
     expeditor:
       secrets: *cypress_secrets
       executor:
