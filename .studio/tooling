@@ -119,7 +119,7 @@ document "install_go_tool" <<DOC
   module vendor directory when installing the binary to the GOBIN directory.
 DOC
 function install_go_tool() {
-  install_if_missing core/go go
+  install_if_missing "$(desired_golang_ident)" go
 
   local go_cmd="go install -v"
 
@@ -141,7 +141,7 @@ document "revendor" <<DOC
   Revendor the go modules vendor directory
 DOC
 function revendor() {
-  install_if_missing core/go go
+  install_if_missing "$(desired_golang_ident)" go
   install_if_missing core/make make
 
   pushd /src || return 1

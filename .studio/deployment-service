@@ -201,9 +201,11 @@ document "deployment_generate" <<DOC
   After updating the services.json and binds.txt files this command needs to be run
 DOC
 function deployment_generate() {
+  local go_ident
+  go_ident=$(desired_golang_ident)
   install_if_missing core/git git
-  install_if_missing core/go go
-  install_if_missing core/go gofmt
+  install_if_missing "$go_ident" go
+  install_if_missing "$go_ident" gofmt
 
   pushd /src/components/automate-deployment >/dev/null;
     make generate;
@@ -214,9 +216,12 @@ document "deployment_update_bindings" <<DOC
   After updating the binds.txt this command needs to be ran
 DOC
 function deployment_update_bindings() {
+  local go_ident
+  go_ident=$(desired_golang_ident)
+
   install_if_missing core/git git
-  install_if_missing core/go go
-  install_if_missing core/go gofmt
+  install_if_missing "$go_ident" go
+  install_if_missing "$go_ident" gofmt
 
   pushd /src/components/automate-deployment >/dev/null;
     make update-bindings;
