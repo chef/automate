@@ -9,7 +9,7 @@ desired_golang_version() {
 }
 
 hab pkg install -b core/git core/ruby core/jq-static core/shellcheck core/cacerts
-hab pkg install -b core/go/$(desired_golang_version)
+hab pkg install -b "core/go/$(desired_golang_version)"
 
 echo "Checking Go Dependencies"
 go mod verify
