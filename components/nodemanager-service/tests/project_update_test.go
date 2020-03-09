@@ -7,9 +7,9 @@ import (
 	"time"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/components/nodemanager-service/config"
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	"github.com/gofrs/uuid"

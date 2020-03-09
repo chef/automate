@@ -6,6 +6,11 @@ import (
 	"encoding/csv"
 	"encoding/json"
 	"fmt"
+	"io"
+	"net"
+	"testing"
+	"time"
+
 	"github.com/buger/jsonparser"
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	api "github.com/chef/automate/api/interservice/cfgmgmt/service"
@@ -20,10 +25,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
-	"io"
-	"net"
-	"testing"
-	"time"
 )
 
 func TestNodeExportIncludesChefTags(t *testing.T) {

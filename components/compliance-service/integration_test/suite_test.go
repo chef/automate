@@ -23,9 +23,9 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/jsonpb"
 	empty "github.com/golang/protobuf/ptypes/empty"
-	"github.com/olivere/elastic"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 var complianceReportIndex = fmt.Sprintf("%s-%s", mappings.ComplianceRepDate.Index, "*")

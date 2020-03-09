@@ -15,8 +15,8 @@ import (
 	"github.com/stretchr/testify/assert"
 
 	ingestProto "github.com/chef/automate/api/external/ingest/request"
-	subject "github.com/chef/automate/components/automate-gateway/gateway"
 	inspecEvent "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
+	subject "github.com/chef/automate/components/automate-gateway/gateway"
 )
 
 func readExample(path string) []byte {

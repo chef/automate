@@ -11,12 +11,13 @@ import (
 	"os"
 	"time"
 
+	log "github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
+
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	iElastic "github.com/chef/automate/components/ingest-service/backend/elastic"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
 	"github.com/chef/automate/lib/grpc/auth_context"
-	"github.com/olivere/elastic"
-	log "github.com/sirupsen/logrus"
 )
 
 // Suite helps you manipulate various stages of your tests, it provides

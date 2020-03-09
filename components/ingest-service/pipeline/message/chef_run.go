@@ -5,8 +5,8 @@ import (
 	"time"
 
 	uuid "github.com/gofrs/uuid"
-	"github.com/olivere/elastic"
 	log "github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	chef "github.com/chef/automate/api/external/ingest/request"
 	"github.com/chef/automate/components/ingest-service/backend"
