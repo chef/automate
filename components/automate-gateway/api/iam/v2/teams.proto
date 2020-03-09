@@ -15,7 +15,7 @@ service Teams {
   /*
   Create a local team
 
-  Creates a local team, used to group local users as members of IAM policies.
+  Creates a local team that is used to group local users as members of IAM policies.
 
   Authorization Action:
   ```
