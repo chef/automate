@@ -46,7 +46,7 @@
         <form [formGroup]="updateServerForm">
           <chef-form-field id="update-name">
             <label>
-                <span class="label">Chef Server Name <span aria-hidden="true">*</span></span>
+                <span class="label">Name <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="name" type="text" autocomplete="off"
                 data-cy="update-chefServer-name">
             </label>
@@ -101,7 +101,7 @@
       <section class="page-body" *ngIf="tabValue === 'orgs'">
         <ng-container>
           <chef-toolbar>
-            <chef-button id="create-button" primary (click)="openCreateModal('create')">Create Org</chef-button>
+            <chef-button id="create-button" primary (click)="openCreateModal('create')">Add Org</chef-button>
           </chef-toolbar>
           <chef-table-new>
             <chef-table-header>
