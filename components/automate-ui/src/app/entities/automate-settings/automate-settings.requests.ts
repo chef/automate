@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+
 import {
   JobSchedulerStatus,
   RespJob,
@@ -24,6 +25,9 @@ export class AutomateSettingsRequests {
   public fetchJobSchedulerStatus(_params): Observable<JobSchedulerStatus> {
     const url = `${RETENTION_URL}/nodes/status`;
 
+    // NEW ENDPOINT FOR DATA-LIFECYCLE
+    // const url = '/api/v0/data-lifecycle/status';
+
     return this.http
       .get<RespJobSchedulerStatus>(url).pipe(
       map((res) => this.convertResponseToJobSchedulerStatus(res)));
@@ -33,6 +37,8 @@ export class AutomateSettingsRequests {
   // it with the provided threshold and running state
   configureIngestJob(job: IngestJob): Observable<any> {
     let url: string;
+
+    console.log('configure inject Job');
 
     switch (job.name) {
       case IngestJobs.MissingNodes: {
@@ -65,6 +71,17 @@ export class AutomateSettingsRequests {
   private convertResponseToJobSchedulerStatus(
     respJobSchedulerStatus: RespJobSchedulerStatus): JobSchedulerStatus {
       const jobs = respJobSchedulerStatus.jobs.map((respJob: RespJob) => new IngestJob(respJob));
-      return new JobSchedulerStatus(respJobSchedulerStatus.running, jobs);
+
+    // console.log(respJobSchedulerStatus);
+
+    // const jobs = Object.keys(respJobSchedulerStatus).map( (k, i) => {
+    //   return new IngestJob( respJobSchedulerStatus[k].jobs[i] );
+    // });
+
+    console.log(jobs);
+
+
+      // return new JobSchedulerStatus(respJobSchedulerStatus.running, jobs);
+      return;
   }
 }
