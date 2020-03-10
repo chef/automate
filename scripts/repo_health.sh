@@ -2,7 +2,14 @@
 
 set -e
 
-hab pkg install -b core/go core/git core/ruby core/jq-static core/shellcheck core/cacerts
+desired_golang_version() {
+    local top_level
+    top_level=$(git rev-parse --show-toplevel)
+    cat "$top_level/GOLANG_VERSION"
+}
+
+hab pkg install -b core/git core/ruby core/jq-static core/shellcheck core/cacerts
+hab pkg install -b "core/go/$(desired_golang_version)"
 
 echo "Checking Go Dependencies"
 go mod verify

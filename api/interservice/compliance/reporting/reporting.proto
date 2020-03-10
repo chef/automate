@@ -91,7 +91,14 @@ message Reports {
 }
 message ReportIds {
 	repeated string ids = 1;
+	repeated ReportData report_data = 2;
 }
+
+message ReportData{
+	string id = 1;
+	google.protobuf.Timestamp end_time = 2;
+}
+
 message Report {
 	string id = 1;
 	string node_id = 2;
@@ -192,7 +199,20 @@ message Control {
 	repeated Ref refs = 8;
 	map<string, string> tags = 9;
 	map<string, TagValues> string_tags = 10;
+	string waived_str = 11;
+	OrigWaiverData waiver_data = 12;
 }
+
+// WaiverData as it originally came from the InSpec report
+// Will supplement this with waived_str to make consumption easier
+message OrigWaiverData {
+	string expiration_date = 1;
+	string justification = 2;
+	bool run = 3;
+	bool skipped_due_to_waiver = 4;
+	string message = 5;
+}
+
 message TagValues {
 	repeated string values = 1;
 }

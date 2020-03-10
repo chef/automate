@@ -57,3 +57,12 @@ func (m *Mapping) IndexTimeseriesFmt(date time.Time) string {
 	utcDate := date.UTC().Format("2006.01.02")
 	return fmt.Sprintf("%s-%s", m.Index, utcDate)
 }
+
+func (m *Mapping) IndexTimeseriesScanDate(indexName string) (time.Time, error) {
+	var dateStr string
+	if _, err := fmt.Sscanf(indexName, m.Index+"-%s", &dateStr); err != nil {
+		return time.Time{}, err
+	}
+
+	return time.Parse("2006.01.02", dateStr)
+}

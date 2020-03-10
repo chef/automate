@@ -10,6 +10,7 @@ import (
 )
 
 type Client interface {
+	project_update_lib.SerializedProjectUpdate
 	// @param None
 	Initializing() bool
 	// @param (context, UTC time)
@@ -54,6 +55,8 @@ type Client interface {
 	RecordLivenessPing(context.Context, Liveness) error
 	// @param (context, instanceID)
 	FindNodeIDByInstanceId(context.Context, string) ([]string, error)
+	// @param (context, filter)
+	FindNodeIDsByFields(context.Context, map[string]string) ([]string, error)
 	// @param (data)
 	CreateBulkNodeUpdateRequest(Node) elastic.BulkableRequest
 	// @param (data)

@@ -211,6 +211,11 @@ func (backend *ESClient) UpdateProjectTags(ctx context.Context, projectTaggingRu
 }
 
 func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
+	index := fmt.Sprintf("%s-%s", mappings.ComplianceRepDate.Index, "*")
+	return backend.UpdateReportProjectsTagsForIndex(ctx, index, projectTaggingRules)
+}
+
+func (backend *ESClient) UpdateReportProjectsTagsForIndex(ctx context.Context, index string, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
 
 	script := `
 		ArrayList matchingProjects = new ArrayList();
@@ -335,8 +340,6 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
  `
 
 	docType := mappings.DocType
-	mapping := mappings.ComplianceRepDate
-	index := fmt.Sprintf("%s-%s", mapping.Index, "*")
 
 	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
@@ -353,6 +356,11 @@ func (backend *ESClient) UpdateReportProjectsTags(ctx context.Context, projectTa
 }
 
 func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
+	index := fmt.Sprintf("%s-%s", mappings.ComplianceSumDate.Index, "*")
+	return backend.UpdateSummaryProjectsTagsForIndex(ctx, index, projectTaggingRules)
+}
+
+func (backend *ESClient) UpdateSummaryProjectsTagsForIndex(ctx context.Context, index string, projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
 
 	script := `
 		ArrayList matchingProjects = new ArrayList();
@@ -477,8 +485,6 @@ func (backend *ESClient) UpdateSummaryProjectsTags(ctx context.Context, projectT
  `
 
 	docType := mappings.DocType
-	mapping := mappings.ComplianceSumDate
-	index := fmt.Sprintf("%s-%s", mapping.Index, "*")
 
 	startTaskResult, err := elastic.NewUpdateByQueryService(backend.client).
 		Index(index).
@@ -571,6 +577,16 @@ func getPercentageComplete(status interface{}) (float64, bool) {
 		return 0, false
 	}
 
+	conflicts, ok := statusMap["version_conflicts"].(float64)
+	if !ok {
+		return 0, false
+	}
+
+	noops, ok := statusMap["noops"].(float64)
+	if !ok {
+		return 0, false
+	}
+
 	total, ok := statusMap["total"].(float64)
 	if !ok {
 		return 0, false
@@ -580,7 +596,7 @@ func getPercentageComplete(status interface{}) (float64, bool) {
 		return 1, true
 	}
 
-	return (created + deleted + updated) / total, true
+	return (created + deleted + updated + conflicts + noops) / total, true
 }
 
 func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2.ProjectRules) map[string]interface{} {

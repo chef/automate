@@ -19,7 +19,7 @@ service ReportingService {
 	/*
 	List reports
 
-	Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria. 
+	Makes a list of reports. Adding a filter makes a list of all node reports that meet the filter criteria.
 	Supports pagination, filtering, and sorting.
 	Limited to 10k results.
 
@@ -32,11 +32,11 @@ service ReportingService {
 		[
 			{"type":"start_time","values":["2019-09-09T00:00:00Z"]},
 			{"type":"end_time","values":["2019-09-11T23:59:59Z"]}
-		], 
-		"page":1, "per_page": 3, 
+		],
+		"page":1, "per_page": 3,
 		"sort": "latest_report.status", "order": "ASC"
 	}
-	```	
+	```
 
 	Authorization Action:
 	```
@@ -61,7 +61,7 @@ service ReportingService {
 	/*
 	List report IDs
 
-	List all IDs for the latest report for each node, with optional filtering. 
+	List all IDs for the latest report for each node, with optional filtering.
 	Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id`, or `profile_name` is not allowed.
 	Including values for both `profile_id` and `profile_name` in one request is not allowed.
@@ -90,7 +90,7 @@ service ReportingService {
 	/*
 	List controls
 
-	Lists controls from the last run, with optional filtering. 
+	Lists controls from the last run, with optional filtering.
 	Supports filtering, but not pagination or sorting.
 	Limited to 100 results by default.
 
@@ -119,7 +119,7 @@ service ReportingService {
 
 	Fetch a specific report by ID. Supports filtering, but not pagination or sorting.
 	Including more than one value for `profile_id`, or `profile_name` is not allowed.
-	Including values for both `profile_id` and `profile_name` in one request is not allowed.	
+	Including values for both `profile_id` and `profile_name` in one request is not allowed.
 
 	Authorization Action:
 	```
@@ -203,7 +203,7 @@ service ReportingService {
 	/*
 	List profiles
 
-	List all profiles in use, with optional filtering. 
+	List all profiles in use, with optional filtering.
 	Supports pagination, filtering, and sorting.
 	Valid sort fields: name, title
 
@@ -235,7 +235,7 @@ service ReportingService {
 	Fetch a node
 
 	Fetch a specific node by ID.
-	Supports filtering by profile or control. 
+	Supports filtering by profile or control.
 	Does not support pagination or sorting.
 
 	Authorization Action:
@@ -274,7 +274,7 @@ service ReportingService {
 	| platform | platform.full |
 	| status | status |
 
-	Example: 
+	Example:
 	```
 	{
 		"filters":[
@@ -349,7 +349,7 @@ message ControlItemRequest {
 }
 
 message WaiverData {
-      // The waived state of the control item. Possible values: `yes`, `yes_run`, `no`, `no_expired`.
+	// The waived state of the control item. Possible values: `yes`, `yes_run`, `no`, `no_expired`.
 	string waived_str = 1;
 	// The expiration date for the waiver. After this date, the control is no longer waived.
 	string expiration_date = 2;
@@ -465,6 +465,15 @@ message Reports {
 message ReportIds {
 	// The list of unique report identifiers found matching the query.
 	repeated string ids = 1;
+	// The list of unique report identifiers with their respective end_time, found matching the query.
+	repeated ReportData report_data = 2;
+}
+
+message ReportData{
+	// The report run_uuid
+	string id = 1;
+	// The time in UTC that the scan was completed
+	google.protobuf.Timestamp end_time = 2;
 }
 
 message Report {
@@ -655,6 +664,20 @@ message Control {
 	repeated Ref refs = 8;
 	// Metadata defined on the control in key-value format.
 	map<string, string> tags = 9;
+	// Indicates if the control has been waived or not
+	string waived_str = 11;
+	// Additional details for waived controls
+	OrigWaiverData waiver_data = 12;
+}
+
+// OrigWaiverData as it originally came from the InSpec report
+// Will supplement this with waived_str to make consumption easier
+message OrigWaiverData {
+	string expiration_date = 1;
+	string justification = 2;
+	bool run = 3;
+	bool skipped_due_to_waiver = 4;
+	string message = 5;
 }
 
 message Attribute {

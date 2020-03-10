@@ -75,7 +75,6 @@ describe('ProjectRulesComponent', () => {
         MockComponent({ selector: 'chef-tr' }),
         MockComponent({ selector: 'chef-th' }),
         MockComponent({ selector: 'chef-td' }),
-        MockComponent({ selector: 'ng-container', inputs: ['hidden'] }),
         ProjectRulesComponent
       ],
       imports: [

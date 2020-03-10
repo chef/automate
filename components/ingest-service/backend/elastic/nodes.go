@@ -7,6 +7,7 @@ package elastic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"time"
 
@@ -80,7 +81,7 @@ func (es *Backend) DeleteNodeByID(ctx context.Context, nodeID string) (int, erro
 	filters := map[string]string{
 		"entity_uuid": nodeID,
 	}
-	docIDs, err := es.findNodeIDByFields(ctx, filters)
+	docIDs, err := es.findDocIDByFields(ctx, filters)
 
 	if err != nil {
 		return 0, err
@@ -239,7 +240,7 @@ func (es *Backend) DeleteNodeByFields(ctx context.Context, orgName string, remot
 		"node_name":         nodeName,
 		"source_fqdn":       remoteHostname,
 	}
-	docIDs, err := es.findNodeIDByFields(ctx, filters)
+	docIDs, err := es.findDocIDByFields(ctx, filters)
 
 	if err != nil {
 		return 0, err
@@ -316,7 +317,7 @@ func (es *Backend) FindNodeIDByInstanceId(ctx context.Context, instanceId string
 
 }
 
-func (es *Backend) findNodeIDByFields(ctx context.Context, filters map[string]string) ([]string, error) {
+func (es *Backend) findDocIDByFields(ctx context.Context, filters map[string]string) ([]string, error) {
 	var docIDs []string
 
 	// Main boolQuery
@@ -348,7 +349,46 @@ func (es *Backend) findNodeIDByFields(ctx context.Context, filters map[string]st
 	}
 
 	return docIDs, nil
+}
 
+func (es *Backend) FindNodeIDsByFields(ctx context.Context, filters map[string]string) ([]string, error) {
+	var nodeIDs []string
+
+	// Main boolQuery
+	mainQuery := newBoolQueryFromFilters(filters)
+
+	// Add a filter that will prevent to return Nodes that are
+	// already marked as "DELETED", that is that has the field
+	// `exists` equals to `false`
+	termQueryNotExists := elastic.NewTermsQuery(nodeExists, false)
+	mainQuery.MustNot(termQueryNotExists)
+
+	searchResult, err := es.client.Search().
+		Query(mainQuery).
+		FetchSourceContext(elastic.NewFetchSourceContext(true).Include("entity_uuid")).
+		Index(mappings.NodeState.Alias).
+		Do(ctx)
+
+	// Return an error if the search was not successful
+	if err != nil {
+		return nil, err
+	}
+
+	if searchResult.Hits.TotalHits > 0 {
+		nodeIDs = make([]string, searchResult.Hits.TotalHits)
+		var nodeID nodeUUID
+		for i, hit := range searchResult.Hits.Hits {
+			err := json.Unmarshal(*hit.Source, &nodeID)
+			if err != nil {
+				return nil, err
+			}
+			nodeIDs[i] = nodeID.EntityUUID
+		}
+	} else {
+		return []string{}, nil
+	}
+
+	return nodeIDs, nil
 }
 
 func convertProjectTaggingRulesToEsParams(projectTaggingRules map[string]*iam_v2.ProjectRules) map[string]interface{} {

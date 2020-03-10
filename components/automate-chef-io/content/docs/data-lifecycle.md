@@ -1,6 +1,6 @@
 +++
 title = "Data Lifecycle"
-description = "Chef Automate Data Lifecycle"
+description = "Chef Automate Data Lifecycle: Data Management and Data Retention"
 date = 2019-11-13T18:54:09+00:00
 draft = false
 bref = ""
@@ -177,13 +177,13 @@ curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_
 
 ### Job Settings
 
-All jobs have the following options: 
+All jobs have the following options:
 
 * `recurrence` (string) A recurrence rule that determines how often, at what interval, and when to initially start a scheduled
   job. Any valid recurrence rule [as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt) is valid in this field.
 * `disabled` (bool) Whether or not this job should be enabled
 
-Infra node lifecycle jobs have the following options: 
+Infra node lifecycle jobs have the following options:
 
 * `threshold` (string) setting that allows the user to use `1w` style notation to denote how long before the infra job is trigged.
 
@@ -245,7 +245,7 @@ The `infra` data type has four data lifecycle jobs, three are for node lifecycle
 * `periodic_purge_timeseries` how often to run the purge job
   * `actions` Chef Infra Server actions
   * `converge-history` Chef Infra Client converge data
- 
+
 #### Compliance Job Settings
 
 The `compliance` data type has one compliance purge job with two ElasticSearch purge policies.
