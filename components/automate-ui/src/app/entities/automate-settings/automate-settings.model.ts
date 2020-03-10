@@ -35,6 +35,12 @@ export interface RespJobSchedulerStatus {
 // IngestJobs is an enum that defines the list of jobs that the
 // JobScheduler has inside the ingest-service
 export enum IngestJobs {
+
+  // INFRA //
+  // DeleteNodes: Removes completely from elasticsearch nodes that
+  // have been marked for deletion
+  DeleteNodes = 'delete_nodes',
+
   // MissingNodes: Checks when a node hasn't check-in
   // for a period of time
   MissingNodes = 'missing_nodes',
@@ -43,9 +49,10 @@ export enum IngestJobs {
   // for a period of time
   MissingNodesForDeletion = 'missing_nodes_for_deletion',
 
-  // DeleteNodes: Removes completely from elasticsearch nodes that
-  // have been marked for deletion
-  DeleteNodes = 'delete_nodes'
+  PeriodicPurgeTimeseries = 'periodic_purge_timeseries',
+
+  // COMPLIANCE //
+  PeriodicPurge = 'periodic_purge'
 }
 
 export class IngestJob {
