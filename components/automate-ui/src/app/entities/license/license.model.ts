@@ -1,6 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { EntityStatus } from '../entities';
-import { LicenseStatus } from './license.model';
 import * as moment from 'moment';
 import { DateTime } from '../../helpers/datetime/datetime';
 

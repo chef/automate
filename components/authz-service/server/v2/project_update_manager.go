@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/chef/automate/lib/stringutils"
 	uuid "github.com/chef/automate/lib/uuid4"
 
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
@@ -37,12 +38,17 @@ var (
 	ProjectUpdateWorkflowName = cereal.NewWorkflowName("ProjectUpdate")
 	ProjectUpdateInstanceName = "SingletonV1"
 	ApplyStagedRulesTaskName  = cereal.NewTaskName("authz/ApplyStagedRules")
+
+	serialSubworkflowName = "serialized"
 )
 
-var ProjectUpdateDomainServices = []string{
-	"ingest",
-	"compliance",
+var ParallelProjectUpdateDomainServices = []string{
 	"nodemanager",
+}
+
+var SerializedProjectUpdateDomainServices = []string{
+	"compliance",
+	"ingest",
 }
 
 type ProjectUpdateStatus interface {
@@ -71,39 +77,43 @@ func createProjectUpdateID() string {
 }
 
 func NewWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
-	// This funcations creates a WorkflowExecutor out of multiple smaller workflow executors.
+	// This function creates a WorkflowExecutor out of multiple smaller workflow executors.
 	// First, we want the ApplyStagedRules database commit stuff to run. Then, we want
 	// the domain services to update.
-	// So, that's a chain of [applyStagedRulesExecutor, domainSvcExecutor]
-	// domainSvcExecutor is itself a bunch of smaller workflows that run in parallel. There
-	// is one executor per domain service being updated
+	// So, that's a chain of [applyStagedRulesExecutor, parallelWorkflowExecutor]
+	// parallelWorkflowExecutor is itself a bunch of smaller workflows that run in parallel.
+	// There is a DomainServiceExecutor for nodemanager, and a SerializedWorkflowExecutor
+	// for any services that need to update elasticsearch. SerializedWorkflowExecutor will
+	// ensure that only one index is updated at a time and prevent elasticsearch from falling
+	// over.
 	// applyStagedRulesExecutor is simply an executor that runs ApplyStagedRulesTaskExecutor
 	// An ascii art below describes that it all looks like when it's tied together
 	/*
 	   +--------------------------------------------------+
 	   |                                                  |
-	   |  +------------+       +------------------------+ |
-	   |  |            |       |                        | |
-	   |  | Apply      | Chain | +--------------------+ | |    +-----------------+
-	   |  | Staged     +------>+ |Domain Service      | cereal |Start Update     |
-	   |  | Rules      |       | |Update Workflow     <-+-+---->Update Status    |
-	   |  | Workflow   |       | |(compliance)        | | |    |       compliance|
-	   |  +------------+      P| +--------------------+ | |    +-----------------+
-	   |                      a|                        | |
-	   |                      r| +--------------------+ | |    +-----------------+
-	   |                      a| |Domain Service      | cereal |Start Update     |
-	   |                      l| |Update Workflow     <-+-+---->Update Status    |
-	   |                      l| |(ingest)            | | |    |           ingest|
-	   |                      e| +--------------------+ | |    +-----------------+
-	   |                      l|                        | |
-	   |                       | +--------------------+ | |    +-----------------+
+	   |  +------------+       +------------------------+ |    +-----------------+
+	   |  |            |       |                        | |    |ListTasks        |
+	   |  | Apply      | Chain | +--------------------+ + +    |RunTask          |
+	   |  | Staged     +------>+ |SerializedWorkflow  | cereal |MonitorTask      |
+	   |  | Rules      |       | |                    <-+-+---->CancelTask       |
+	   |  | Workflow   |       | |                    | | |    |       compliance|
+	   |  +------------+      P| |                    | | |    +-----------------+
+	   |                      a| |                    | | |    +-----------------+
+	   |                      r| |                    | + +    |ListTasks        |
+	   |                      a| |                    | cereal |RunTask          |
+	   |                      l| |                    <-+-+---->MonitorTask      |
+	   |                      l| |                    | | |    |CancelTask       |
+	   |                      e| |                    | | |    |           ingest|
+	   |                      l| +--------------------+ | |    +-----------------+
+	   |                       | +--------------------+ + +    +-----------------+
 	   |                       | |Domain Service      | cereal |Start Update     |
 	   |                       | |Update Workflow     <-+-+---->Update Status    |
-	   |                       | |(...)               | | |    |              ...|
+	   |                       | |nodemanager         | | |    |      nodemanager|
 	   |                       | +--------------------+ | |    +-----------------+
 	   |                       +------------------------+ |
 	   |                                     authz-service|
 	   +--------------------------------------------------+
+
 	*/
 	workflowMap := make(map[string]cereal.WorkflowExecutor)
 	lock := sync.Mutex{}
@@ -114,18 +124,28 @@ func NewWorkflowExecutor() (*patterns.ChainWorkflowExecutor, error) {
 	// we can generate the workflow executor for the correct domain service easily.
 	// The logic only depends on the name. This means that an instance of authz that
 	// didn't know about a domain service can still drive its workflow.
-	domainSvcExecutor := patterns.NewParallelWorkflowExecutor(func(key string) (cereal.WorkflowExecutor, bool) {
+	parallelWorkflowExecutor := patterns.NewParallelWorkflowExecutor(func(key string) (cereal.WorkflowExecutor, bool) {
 		lock.Lock()
 		defer lock.Unlock()
 		if workflowExecutor, ok := workflowMap[key]; ok {
 			return workflowExecutor, true
 		}
+
+		var workflowExecutor cereal.WorkflowExecutor
+		if key == serialSubworkflowName {
+			workflowExecutor = project_update_tags.NewSerializedWorkflowExecutor()
+		} else if stringutils.SliceContains(ParallelProjectUpdateDomainServices, key) {
+			workflowExecutor = project_update_tags.NewWorkflowExecutorForDomainService(key)
+		} else {
+			logrus.Errorf("invalid parallel subworkflow %q", key)
+			return nil, false
+		}
+
 		logrus.Infof("creating workflow executor for %q", key)
-		workflowExecutor := project_update_tags.NewWorkflowExecutorForDomainService(key)
 		workflowMap[key] = workflowExecutor
 		return workflowExecutor, true
 	})
-	return patterns.NewChainWorkflowExecutor(applyStagedRulesExecutor, domainSvcExecutor)
+	return patterns.NewChainWorkflowExecutor(applyStagedRulesExecutor, parallelWorkflowExecutor)
 }
 
 type ApplyStagedRulesTaskExecutor struct {
@@ -162,10 +182,9 @@ func (s *ApplyStagedRulesTaskExecutor) Run(ctx context.Context, task cereal.Task
 }
 
 type CerealProjectUpdateManager struct {
-	manager        *cereal.Manager
-	workflowName   cereal.WorkflowName
-	instanceName   string
-	domainServices []string
+	manager      *cereal.Manager
+	workflowName cereal.WorkflowName
+	instanceName string
 }
 
 func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logger, s storage.Storage, pr PolicyRefresher) (ProjectUpdateMgr, error) {
@@ -189,10 +208,9 @@ func RegisterCerealProjectUpdateManager(manager *cereal.Manager, log logger.Logg
 	}
 
 	updateManager := &CerealProjectUpdateManager{
-		manager:        manager,
-		workflowName:   ProjectUpdateWorkflowName,
-		instanceName:   ProjectUpdateInstanceName,
-		domainServices: ProjectUpdateDomainServices,
+		manager:      manager,
+		workflowName: ProjectUpdateWorkflowName,
+		instanceName: ProjectUpdateInstanceName,
 	}
 
 	return updateManager, nil
@@ -207,14 +225,22 @@ func (m *CerealProjectUpdateManager) Cancel() error {
 }
 
 func (m *CerealProjectUpdateManager) Start() error {
+	projectUpdateID := createProjectUpdateID()
 	params := map[string]interface{}{}
 
-	for _, svc := range m.domainServices {
-		params[svc] = project_update_tags.DomainProjectUpdateWorkflowParameters{
-			ProjectUpdateID: createProjectUpdateID(),
-		}
+	parallelSubworkflows := make([]string, 0, len(ParallelProjectUpdateDomainServices)+1)
+	parallelSubworkflows = append(parallelSubworkflows, serialSubworkflowName)
+	params[serialSubworkflowName] = project_update_tags.SerializedProjectUpdateWorkflowParams{
+		ProjectUpdateID: projectUpdateID,
+		DomainServices:  SerializedProjectUpdateDomainServices,
 	}
-	domainSvcUpdateWorkflowParams, err := patterns.ToParallelWorkflowParameters(m.domainServices, params)
+	for _, svc := range ParallelProjectUpdateDomainServices {
+		params[svc] = project_update_tags.DomainProjectUpdateWorkflowParameters{
+			ProjectUpdateID: projectUpdateID,
+		}
+		parallelSubworkflows = append(parallelSubworkflows, svc)
+	}
+	domainSvcUpdateWorkflowParams, err := patterns.ToParallelWorkflowParameters(parallelSubworkflows, params)
 	if err != nil {
 		return err
 	}
@@ -284,19 +310,18 @@ func (w *workflowInstance) PercentageComplete() float64 {
 		return 1.0
 	}
 
-	domainJobStatuses := w.collectAllDomainServiceJobStatuses()
-	if len(domainJobStatuses) == 0 {
-		return 1.0
+	progress, err := w.collectProgress()
+	if err != nil {
+		logrus.WithError(err).Error("Failed to get progress")
+		return 0
 	}
 
-	longestDomainJobStatus := project_update_tags.FindSlowestJobStatus(domainJobStatuses)
-
-	return float64(longestDomainJobStatus.PercentageComplete)
+	return float64(progress)
 }
 
 func (w *workflowInstance) EstimatedTimeComplete() time.Time {
 	longestDomainJobStatus := project_update_tags.FindSlowestJobStatus(
-		w.collectAllDomainServiceJobStatuses())
+		w.collectRunningJobStatuses())
 
 	longestDomainTimeEstimate := time.Unix(longestDomainJobStatus.EstimatedEndTimeInSec, 0)
 
@@ -390,7 +415,82 @@ func (m *CerealProjectUpdateManager) Status() (ProjectUpdateStatus, error) {
 	return projectUpdateInstance, nil
 }
 
-func (w *workflowInstance) collectAllDomainServiceJobStatuses() []project_update_tags.JobStatus {
+func (w *workflowInstance) collectProgress() (float32, error) {
+	if !w.IsRunning() {
+		return 1, nil
+	}
+	domainServicesUpdateInstance, err := w.GetUpdateDomainServicesInstance()
+	if err != nil {
+		return 0, err
+	}
+
+	progress := []float32{}
+	weight := []int{}
+
+	for _, d := range domainServicesUpdateInstance.ListSubWorkflows() {
+		subWorkflow, err := domainServicesUpdateInstance.GetSubWorkflow(d)
+		if err != nil {
+			logrus.WithError(err).Errorf("failed to get subworkflow for %q", d)
+			continue
+		}
+
+		if d == serialSubworkflowName {
+			state := project_update_tags.SerializedProjectUpdateWorkflowState{}
+			if subWorkflow.IsRunning() {
+				if err := subWorkflow.GetPayload(&state); err != nil {
+					logrus.WithError(err).Errorf("failed to get payload for %q", d)
+					continue
+				}
+			} else {
+				if err := subWorkflow.GetResult(&state); err != nil {
+					logrus.WithError(err).Errorf("failed to get result for %q", d)
+					continue
+				}
+			}
+
+			if state.Phase == project_update_tags.SerializedProjectUpdateWorkflowPhaseRunning && state.Running.TotalTasks > 0 {
+				progress = append(progress,
+					state.Running.RunningTask.LastStatus.PercentageComplete)
+				weight = append(weight, 1)
+			}
+			progress = append(progress, 1)
+			weight = append(weight, state.Running.CompletedTasks)
+
+			progress = append(progress, 0)
+			weight = append(weight, len(state.Running.RemainingTasks))
+		} else {
+			payload := project_update_tags.DomainProjectUpdateWorkflowPayload{}
+			if subWorkflow.IsRunning() {
+				if err := subWorkflow.GetPayload(&payload); err != nil {
+					logrus.WithError(err).Errorf("failed to get payload for %q", d)
+					continue
+				}
+				progress = append(progress, payload.MergedJobStatus.PercentageComplete)
+				weight = append(weight, 1)
+			} else {
+				progress = append(progress, 1)
+				weight = append(weight, 1)
+			}
+		}
+	}
+
+	totalWeight := 0
+	for i := range weight {
+		totalWeight += weight[i]
+	}
+
+	if totalWeight == 0 {
+		return 0, nil
+	}
+	var prog float32
+	for i := range weight {
+		prog += (progress[i] * float32(weight[i]) / float32(totalWeight))
+	}
+
+	return prog, nil
+}
+
+func (w *workflowInstance) collectRunningJobStatuses() []project_update_tags.JobStatus {
 	jobStatuses := make([]project_update_tags.JobStatus, 0)
 	if !w.IsRunning() {
 		return jobStatuses
@@ -408,11 +508,31 @@ func (w *workflowInstance) collectAllDomainServiceJobStatuses() []project_update
 		}
 		payload := project_update_tags.DomainProjectUpdateWorkflowPayload{}
 		if subWorkflow.IsRunning() {
-			if err := subWorkflow.GetPayload(&payload); err != nil {
-				logrus.WithError(err).Errorf("failed to get payload for %q", d)
-				continue
+			if d == serialSubworkflowName {
+				state := project_update_tags.SerializedProjectUpdateWorkflowState{}
+				if err := subWorkflow.GetPayload(&state); err != nil {
+					logrus.WithError(err).Errorf("failed to get payload for %q", d)
+					continue
+				}
+				if state.Running.CompletedTasks > 0 && state.Running.TotalTasks > 0 &&
+					!state.Running.StartTime.IsZero() && !state.Running.LastUpdated.IsZero() {
+					percentComplete := (float64(state.Running.CompletedTasks) + float64(state.Running.RunningTask.LastStatus.PercentageComplete)) / float64(state.Running.TotalTasks)
+					elapsed := state.Running.LastUpdated.Sub(state.Running.StartTime)
+					expectedDuration := time.Duration(float64(elapsed) / percentComplete)
+					jobStatuses = append(jobStatuses, project_update_tags.JobStatus{
+						Completed:             false,
+						PercentageComplete:    float32(percentComplete),
+						EstimatedEndTimeInSec: state.Running.StartTime.Add(expectedDuration).Unix(),
+					})
+				}
+			} else {
+				if err := subWorkflow.GetPayload(&payload); err != nil {
+					logrus.WithError(err).Errorf("failed to get payload for %q", d)
+					continue
+				}
+				jobStatuses = append(jobStatuses, payload.MergedJobStatus)
 			}
-			jobStatuses = append(jobStatuses, payload.MergedJobStatus)
+
 		}
 	}
 

@@ -10,6 +10,7 @@ import (
 )
 
 type Client interface {
+	project_update_lib.SerializedProjectUpdate
 	// @param None
 	Initializing() bool
 	// @param (context, UTC time)

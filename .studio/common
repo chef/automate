@@ -161,6 +161,10 @@ function link_component_bin() {
   return 0
 }
 
+function desired_golang_ident() {
+    echo "core/go/$(cat /src/GOLANG_VERSION)"
+}
+
 function start_sup() {
   hab svc status 2>/dev/null 1>&2
   [[ $? == 0 ]] && return

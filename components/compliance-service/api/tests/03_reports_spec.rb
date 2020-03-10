@@ -1250,5 +1250,16 @@ describe File.basename(__FILE__) do
       assert_equal('apache-baseline', res['profiles'][0]['name'])
       assert_equal('3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww', res['id'])
     end
+
+    res = GRPC reporting, :read_report, Reporting::Query.new(filters: [], id: '44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy')
+    if res['profiles'].is_a?(Google::Protobuf::RepeatedField)
+      assert_equal(2, res['profiles'].length)
+      assert_equal(5, res['profiles'][0]['controls'].length)
+      assert_equal('yes_run', res['profiles'][0]['controls'][0]['waived_str'])
+      assert_equal_json_sorted('{"justification": "Sound reasoning", "run": true}', res['profiles'][0]['controls'][0]['waiver_data'].to_json)
+
+      assert_equal('no_expired', res['profiles'][0]['controls'][2]['waived_str'])
+      assert_equal_json_sorted('{"expirationDate": "1977-06-01", "justification": "Necessity", "message": "Waiver expired on 1977-06-01, evaluating control normally"}', res['profiles'][0]['controls'][2]['waiver_data'].to_json)
+    end
   end
 end

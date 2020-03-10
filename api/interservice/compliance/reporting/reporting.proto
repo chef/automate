@@ -192,7 +192,20 @@ message Control {
 	repeated Ref refs = 8;
 	map<string, string> tags = 9;
 	map<string, TagValues> string_tags = 10;
+	string waived_str = 11;
+	OrigWaiverData waiver_data = 12;
 }
+
+// WaiverData as it originally came from the InSpec report
+// Will supplement this with waived_str to make consumption easier
+message OrigWaiverData {
+	string expiration_date = 1;
+	string justification = 2;
+	bool run = 3;
+	bool skipped_due_to_waiver = 4;
+	string message = 5;
+}
+
 message TagValues {
 	repeated string values = 1;
 }
