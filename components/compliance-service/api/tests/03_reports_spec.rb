@@ -33,7 +33,8 @@ describe File.basename(__FILE__) do
     ])
     expected_json =
         {
-            "ids" => ["3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"]
+            "ids" => ["3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"],
+            "reportData" => [{"endTime" => "2018-03-04T10:18:41Z", "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"}]
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
@@ -44,14 +45,25 @@ describe File.basename(__FILE__) do
     ])
     expected_json =
         {
-            "ids" => ["3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
-                      "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy",
-                      "44024b50-2e0d-42fa-dddd-wwwwwwwwwwww",
-                      "bb93e1b2-36d6-439e-ac70-cccccccccc05",
-                      "bb93e1b2-36d6-439e-ac70-cccccccccc06",
-                      "bb93e1b2-36d6-439e-ac70-cccccccccc08",
-                      "bb93e1b2-36d6-439e-ac70-cccccccccc09",
-                      "bb93e1b2-36d6-439e-ac70-cccccccccc10"
+            "ids" => [
+                "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
+                "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy",
+                "44024b50-2e0d-42fa-dddd-wwwwwwwwwwww",
+                "bb93e1b2-36d6-439e-ac70-cccccccccc05",
+                "bb93e1b2-36d6-439e-ac70-cccccccccc06",
+                "bb93e1b2-36d6-439e-ac70-cccccccccc08",
+                "bb93e1b2-36d6-439e-ac70-cccccccccc09",
+                "bb93e1b2-36d6-439e-ac70-cccccccccc10"
+            ],
+            "reportData" => [
+                {"endTime" => "2018-03-04T10:18:41Z", "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"},
+                {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-dddd-wwwwwwwwwwww"},
+                {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy"},
+                {"endTime" => "2018-03-05T02:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05"},
+                {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06"},
+                {"endTime" => "2018-03-07T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
+                {"endTime" => "2018-03-04T09:18:43Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09"},
+                {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10"}
             ]
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
@@ -68,8 +80,15 @@ describe File.basename(__FILE__) do
                       "bb93e1b2-36d6-439e-ac70-cccccccccc04",
                       "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc09"
+            ],
+            "reportData" => [
+                {"endTime" => "2018-02-09T09:18:41Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"},
+                {"endTime" => "2018-03-04T09:18:41Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04"},
+                {"endTime" => "2018-03-04T09:18:43Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09"},
+                {"endTime" => "2018-03-04T10:18:41Z", "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"}
             ]
         }.to_json
+
     assert_equal_json_sorted(expected_json, actual_data.to_json)
 
     # Get all until march 4th up to and including beginning of day
@@ -80,6 +99,9 @@ describe File.basename(__FILE__) do
         {
             "ids" => [
                 "44024b50-2e0d-42fa-a57c-dddddddddddd"
+            ],
+            "reportData" => [
+                {"endTime" => "2018-02-09T09:18:41Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"}
             ]
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
@@ -94,6 +116,9 @@ describe File.basename(__FILE__) do
         {
             "ids" => [
                 "bb93e1b2-36d6-439e-ac70-cccccccccc04"
+            ],
+            "reportData" => [
+                {"endTime" => "2018-03-04T09:18:41Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc04"}
             ]
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)
@@ -111,6 +136,17 @@ describe File.basename(__FILE__) do
                       "bb93e1b2-36d6-439e-ac70-cccccccccc08",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc09",
                       "bb93e1b2-36d6-439e-ac70-cccccccccc10"
+            ],
+            "reportData" => [
+                {"endTime" => "2018-02-09T09:18:41Z", "id" => "44024b50-2e0d-42fa-a57c-dddddddddddd"},
+                {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc06"},
+                {"endTime" => "2018-03-04T09:18:42Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc10"},
+                {"endTime" => "2018-03-04T09:18:43Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc09"},
+                {"endTime" => "2018-03-04T10:18:41Z", "id" => "3ca95021-84c1-43a6-a2e7-wwwwwwwwwwww"},
+                {"endTime" => "2018-03-05T02:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc05"},
+                {"endTime" => "2018-03-07T03:02:02Z", "id" => "bb93e1b2-36d6-439e-ac70-cccccccccc08"},
+                {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-cccc-yyyyyyyyyyyy"},
+                {"endTime" => "2018-04-01T10:18:41Z", "id" => "44024b50-2e0d-42fa-dddd-wwwwwwwwwwww"}
             ]
         }.to_json
     assert_equal_json_sorted(expected_json, actual_data.to_json)

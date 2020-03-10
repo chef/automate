@@ -68,19 +68,23 @@ func (backend ES2Backend) getDocIdHits(esIndex string,
 
 func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 	filters map[string][]string,
-	latestOnly bool) ([]string, error) {
-	nodeReport := make(map[string]string, 0)
+	latestOnly bool) (*reportingapi.ReportIds, error) {
+	myName := "getNodeReportIdsFromTimeseries"
+	var repIds reportingapi.ReportIds
+
+	nodeReport := make(map[string]reportingapi.ReportData, 0)
 	boolQuery := backend.getFiltersQuery(filters, latestOnly)
 
-	// aggs
+	fsc := elastic.NewFetchSourceContext(true).Include("end_time")
+
 	aggs := elastic.NewTermsAggregation().Field("node_uuid").Size(reporting.ESize).
 		SubAggregation("distinct", elastic.NewTopHitsAggregation().Size(1).
-			FetchSource(false).
+			FetchSourceContext(fsc).
 			Sort("end_time", false))
 
 	client, err := backend.ES2Client()
 	if err != nil {
-		return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries cannot connect to elasticsearch")
+		return &repIds, errors.Wrap(err, "getNodeReportIdsFromTimeseries cannot connect to elasticsearch")
 	}
 
 	searchSource := elastic.NewSearchSource().
@@ -90,7 +94,7 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 
 	source, err := searchSource.Source()
 	if err != nil {
-		return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to get Source")
+		return &repIds, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to get Source")
 	}
 	LogQueryPartMin(esIndex, source, "getNodeReportIdsFromTimeseries query searchSource")
 
@@ -100,20 +104,23 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 			"took",
 			"hits.total",
 			"aggregations.nodes.buckets.key",
-			"aggregations.nodes.buckets.distinct.hits.hits._id").
+			"aggregations.nodes.buckets.distinct.hits.hits._id",
+			"aggregations.nodes.buckets.distinct.hits.hits._source",
+		).
 		SearchSource(searchSource).
 		Do(context.Background())
 
 	if err != nil {
 		logrus.Errorf("unable to getNodeReportIdsFromTimeseries %v", err)
-		return []string{}, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to complete search")
+		return &repIds, errors.Wrap(err, "getNodeReportIdsFromTimeseries unable to complete search")
 	}
 
 	if searchResult.TotalHits() == 0 || searchResult.Hits.TotalHits == 0 {
 		logrus.Debugf("getNodeReportIdsFromTimeseries: No report ids for the given filters: %+v\n", filters)
 		// no matching report IDs is not an error, just return an empty array
-		return []string{}, nil
+		return &repIds, nil
 	}
+	LogQueryPartMin(esIndex, searchResult.Aggregations, fmt.Sprintf("%s searchResult aggs", myName))
 
 	outermostAgg, _ := searchResult.Aggregations.Terms("nodes")
 	if outermostAgg != nil {
@@ -121,23 +128,49 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 			topHits, _ := nodeBucket.Aggregations.TopHits("distinct")
 			nodeID := fmt.Sprintf("%s", nodeBucket.Key)
 			for _, hit := range topHits.Hits.Hits {
-				nodeReport[nodeID] = hit.Id
+				var et EndTimeSource
+				if hit.Source != nil {
+					err = json.Unmarshal(*hit.Source, &et)
+					if err != nil {
+						logrus.Errorf("could not get the end_time for runid: %s %v", hit.Id, err)
+						continue
+					}
+				}
+				endTimeTimestamp, err := ptypes.TimestampProto(et.EndTime)
+				if err != nil {
+					logrus.Errorf("error converting end_time for runid: %s %v", hit.Id, err)
+				}
+
+				repData := reportingapi.ReportData{}
+				repData.Id = hit.Id
+				repData.EndTime = endTimeTimestamp
+
+				nodeReport[nodeID] = repData
 			}
 		}
 	}
-
-	reportIds := MapValues(nodeReport)
+	reportIds := make([]string, len(nodeReport))
+	reportData := make([]*reportingapi.ReportData, len(nodeReport))
+	i := 0
+	for _, v := range nodeReport {
+		a := v
+		reportData[i] = &a
+		reportIds[i] = a.Id
+		i++
+	}
+	repIds.Ids = reportIds
+	repIds.ReportData = reportData
 
 	logrus.Debugf("getNodeReportIdsFromTimeseries returning %d report ids in %d milliseconds\n",
 		len(reportIds), searchResult.TookInMillis)
 
-	return reportIds, nil
+	return &repIds, nil
 }
 
-func (backend ES2Backend) GetReportIds(esIndex string, filters map[string][]string) ([]string, error) {
+func (backend ES2Backend) GetReportIds(esIndex string, filters map[string][]string) (*reportingapi.ReportIds, error) {
 	reportIds, err := backend.getNodeReportIdsFromTimeseries(esIndex, filters, true)
 	if err != nil {
-		return []string{}, errors.Wrap(err, "GetReportIds unable to get node report ids")
+		return nil, errors.Wrap(err, "GetReportIds unable to get node report ids")
 	}
 
 	return reportIds, nil
@@ -295,7 +328,7 @@ func (backend *ES2Backend) GetReports(from int32, size int32, filters map[string
 }
 
 // GetReport returns the information about a single report
-func (backend *ES2Backend) GetReport(esIndex string, reportId string,
+func (backend *ES2Backend) GetReport(reportId string,
 	filters map[string][]string) (*reportingapi.Report, error) {
 	myName := "GetReport"
 	var report *reportingapi.Report
@@ -306,9 +339,6 @@ func (backend *ES2Backend) GetReport(esIndex string, reportId string,
 	}
 
 	queryInfo := depth.getQueryInfo()
-
-	//normally, we compute the esIndex when we create a new Depth obj.. here we overwrite it what what's been passed in.
-	queryInfo.esIndex = esIndex
 
 	//normally, we compute the boolQuery when we create a new Depth obj.. here we, instead call a variation of the full
 	// query builder. we need to do this because this variation of filter query provides this func with deeper
