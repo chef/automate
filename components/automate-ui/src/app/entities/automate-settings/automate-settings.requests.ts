@@ -13,6 +13,8 @@ import {
 } from './automate-settings.model';
 
 import { environment } from '../../../environments/environment';
+import { jobSchedulerStatus } from './automate-settings.selectors';
+
 const RETENTION_URL = environment.retention_url;
 
 @Injectable()
@@ -23,10 +25,10 @@ export class AutomateSettingsRequests {
   // fetchJobSchedulerStatus sends an HTTP GET Request to read the status of the JobScheduler
   // living inside the ingest-service
   public fetchJobSchedulerStatus(_params): Observable<JobSchedulerStatus> {
-    const url = `${RETENTION_URL}/nodes/status`;
+    // const url = `${RETENTION_URL}/nodes/status`;
 
     // NEW ENDPOINT FOR DATA-LIFECYCLE
-    // const url = '/api/v0/data-lifecycle/status';
+    const url = '/api/v0/data-lifecycle/status';
 
     return this.http
       .get<RespJobSchedulerStatus>(url).pipe(
@@ -58,8 +60,9 @@ export class AutomateSettingsRequests {
     }
 
     const body = {
+      // March 10 - this will need full updating with new RespJob type
       'threshold': job.threshold,
-      'running': job.running
+      'running': job.disabled
       // We can also modify how often the job runs (every X time)
       // but we don't need that now!
       // 'every': job.every
@@ -70,18 +73,18 @@ export class AutomateSettingsRequests {
 
   private convertResponseToJobSchedulerStatus(
     respJobSchedulerStatus: RespJobSchedulerStatus): JobSchedulerStatus {
-      const jobs = respJobSchedulerStatus.jobs.map((respJob: RespJob) => new IngestJob(respJob));
+      // THIS IS MENTAL - THIS HAS TO CHANGE
+    const allJobs = {};
 
-    // console.log(respJobSchedulerStatus);
+    Object.keys(respJobSchedulerStatus).forEach((category: string) => {
+      if (respJobSchedulerStatus[category]) {
+        const catJobs = respJobSchedulerStatus[category].jobs
+          .map((respJob: RespJob) => new IngestJob(respJob));
+        allJobs[category] = catJobs;
+      }
+    });
 
-    // const jobs = Object.keys(respJobSchedulerStatus).map( (k, i) => {
-    //   return new IngestJob( respJobSchedulerStatus[k].jobs[i] );
-    // });
-
-    console.log(jobs);
-
-
-      // return new JobSchedulerStatus(respJobSchedulerStatus.running, jobs);
-      return;
+    return new JobSchedulerStatus(allJobs);
   }
+
 }

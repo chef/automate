@@ -6,7 +6,8 @@ import { NgrxStateAtom } from '../../ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import {
   automateSettingsState,
-  changeConfiguration
+  changeConfiguration,
+  jobSchedulerStatus
 } from '../../entities/automate-settings/automate-settings.selectors';
 import {
   GetSettings,
@@ -210,13 +211,14 @@ export class AutomateSettingsComponent implements OnInit {
     //
     // We will apply the changes on the rest when we expose the forms
     const jobs: IngestJob[] = [
+      // March 10 - this will need full updating to match RespJob and IngestJob
       IngestJobs.MissingNodes,
       IngestJobs.MissingNodesForDeletion
     ].map(jobName => {
       const jobForm = this.getJobForm(jobName);
       const job = new IngestJob(null);
       job.name = jobName;
-      job.running = !jobForm.disable;
+      job.disabled = !jobForm.disable;
       job.threshold = jobForm.threshold + jobForm.unit;
       return job;
     });
@@ -282,40 +284,65 @@ export class AutomateSettingsComponent implements OnInit {
   }
 
   // Update forms until we get the job scheduler status
-  public updateForm(jobSchedulerStatus: JobSchedulerStatus) {
+  public updateForm(jobSchedulerStatus: any) {
     if (jobSchedulerStatus === null) {
       console.log('updateForm: null');
       return;
     }
 
-    jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
-      const [threshold, unit] = this.splitThreshold(job.threshold);
-      console.log('updateForm: job');
-      console.log(job);
-      const form = {
-        disable: !job.running,
-        threshold: threshold,
-        unit: unit
-      };
+    console.log('jobScheduleStatus');
+    console.log(jobSchedulerStatus);
 
-      switch (job.name) {
-        case IngestJobs.MissingNodes: {
-          this.missingNodesForm = this.fb.group(form);
-          break;
-        }
-        case IngestJobs.MissingNodesForDeletion: {
-          this.deleteMissingNodesForm = this.fb.group(form);
-          break;
-        }
-        // TODO @afiune missing forms to add, at the moment we can't modify
-        // this parameter/settings since the services take it at startup.
-        // (we need to change that first)
-        //
-        // this.clientRunsForm = this.fb.group(form);
-        // this.complianceDataForm = this.fb.group(form);
-        // this.eventFeedForm = this.fb.group(form);
-      }
-    });
+    // Object.entries(jobSchedulerStatus).forEach(([key, value]) => {
+    //   console.log(key);
+    //   console.log(value);
+
+    //   switch (key) {
+    //     case 'event_feed' {
+    //       this.eventFeedForm = this.fb.group({
+    //         disabled: this.fb.group({
+    //           feedData: false,
+    //           serverActions: false
+    //         }),
+    //         feedData: this.fb.group({
+    //           threshold: { value: 30, disabled: false },
+    //           unit: { value: 'd', disabled: false }
+    //         }),
+    //         serverActions: this.fb.group({
+    //           threshold: { value: 30, disabled: false },
+    //           unit: { value: 'd', disabled: false }
+    //         })
+    //       });
+    //     }
+    //   }
+    // })
+
+    // jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
+    //   const [threshold, unit] = this.splitThreshold(job.threshold);
+    //   const form = {
+    //     disable: !job.disabled,
+    //     threshold: threshold,
+    //     unit: unit
+    //   };
+
+    //   switch (job.name) {
+    //     case IngestJobs.MissingNodes: {
+    //       this.missingNodesForm = this.fb.group(form);
+    //       break;
+    //     }
+    //     case IngestJobs.MissingNodesForDeletion: {
+    //       this.deleteMissingNodesForm = this.fb.group(form);
+    //       break;
+    //     }
+    //     // TODO @afiune missing forms to add, at the moment we can't modify
+    //     // this parameter/settings since the services take it at startup.
+    //     // (we need to change that first)
+    //     //
+    //     // this.clientRunsForm = this.fb.group(form);
+    //     // this.complianceDataForm = this.fb.group(form);
+    //     // this.eventFeedForm = this.fb.group(form);
+    //   }
+    // });
 
     this.automateSettingsForm = this.fb.group({
       eventFeed: this.eventFeedForm,

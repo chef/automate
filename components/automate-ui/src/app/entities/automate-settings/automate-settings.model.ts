@@ -1,15 +1,27 @@
 export class JobSchedulerStatus {
-  running: boolean;
-  jobs: IngestJob[];
+  infra?: {
+    jobs: IngestJob[];
+  };
+  compliance?: {
+    jobs: IngestJob[];
+  };
+  event_feed?: {
+    jobs: IngestJob[];
+  };
+  services?: {
+    jobs: IngestJob[];
+  };
 
-  constructor(running: boolean, ingestJobs: IngestJob[]) {
-    this.running = running;
-    this.jobs = ingestJobs;
+  constructor(allJobs: any) {
+    this.infra = allJobs.infra;
+    this.compliance = allJobs.compliance;
+    this.event_feed = allJobs.event_feed;
+    this.services = allJobs.services;
   }
 
-  getJob(name: string): IngestJob {
-    return this.jobs.find((job: IngestJob) => job.name === name);
-  }
+  // getJob(name: string): IngestJob {
+  //   return this.jobs.find((job: IngestJob) => job.name === name);
+  // }
 }
 
 export interface ConfigureSettingsRequest {
@@ -17,19 +29,32 @@ export interface ConfigureSettingsRequest {
 }
 
 export interface RespJob {
-  running: boolean;
   name: string;
-  every: string;
+  disabled: boolean;
+  recurrence: string;
   threshold: string;
-  last_run: Date;
-  next_run: Date;
-  last_elapsed: Date;
-  started_on: Date;
+  purge_policies: any; // needs specific type
+  last_elapsed?: Date;
+  next_due_at?: Date;
+  last_enqueued_at?: Date;
+  last_started_at?: Date;
+  last_ended_at?: Date;
 }
 
+// Note: Can I nest an interface?
 export interface RespJobSchedulerStatus {
-  running: boolean;
-  jobs: RespJob[];
+  infra: {
+    jobs: RespJob[];
+  };
+  compliance: {
+    jobs: RespJob[];
+  };
+  event_feed: {
+    jobs: RespJob[];
+  };
+  services: {
+    jobs: RespJob[];
+  };
 }
 
 // IngestJobs is an enum that defines the list of jobs that the
@@ -56,25 +81,29 @@ export enum IngestJobs {
 }
 
 export class IngestJob {
-  running: boolean;
   name: string;
+  disabled: boolean;
+  recurrence: string;
   threshold: string;
-  every?: string;
-  lastRun?: Date;
-  nextRun?: Date;
-  lastElapsed?: Date;
-  startedOn?: Date;
+  purge_policies: any; // needs specific type
+  last_elapsed?: Date;
+  next_due_at?: Date;
+  last_enqueued_at?: Date;
+  last_started_at?: Date;
+  last_ended_at?: Date;
 
   constructor(respJob: RespJob) {
     if (respJob !== null) {
-      this.running = respJob.running;
       this.name = respJob.name;
-      this.every = respJob.every;
+      this.disabled = respJob.disabled;
+      this.recurrence = respJob.recurrence;
       this.threshold = respJob.threshold;
-      this.lastRun = new Date(respJob.last_run);
-      this.nextRun = new Date(respJob.next_run);
-      this.lastElapsed = new Date(respJob.last_elapsed);
-      this.startedOn = new Date(respJob.started_on);
+      this.purge_policies = respJob.purge_policies;
+      this.last_elapsed = new Date(respJob.last_elapsed);
+      this.next_due_at = new Date(respJob.next_due_at);
+      this.last_enqueued_at = new Date(respJob.last_enqueued_at);
+      this.last_started_at = new Date(respJob.last_started_at);
+      this.last_ended_at = new Date(respJob.last_ended_at);
     }
   }
 }
