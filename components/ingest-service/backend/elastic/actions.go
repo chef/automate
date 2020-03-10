@@ -9,7 +9,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/olivere/elastic"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/ingest-service/backend"

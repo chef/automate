@@ -17,12 +17,12 @@ import (
 
 	"github.com/chef/automate/api/interservice/authn"
 	"github.com/chef/automate/api/interservice/authz"
+	compliance_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	ingest "github.com/chef/automate/api/interservice/ingest"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv1"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
 	mock_gateway "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_gateway"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
-	compliance_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/components/notifications-client/notifier"
 )
 

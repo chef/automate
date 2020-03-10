@@ -3,7 +3,7 @@ package persistence
 import (
 	"context"
 
-	olivere "github.com/olivere/elastic"
+	olivere "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"
 	project_update_lib "github.com/chef/automate/lib/authz"

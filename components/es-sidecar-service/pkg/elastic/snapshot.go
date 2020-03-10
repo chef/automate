@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 /*

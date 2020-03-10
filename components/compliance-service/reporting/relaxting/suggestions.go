@@ -8,15 +8,16 @@ import (
 	"sort"
 	"strings"
 
-	elastic "github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/schollz/closestmatch"
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc/status"
+	elastic "gopkg.in/olivere/elastic.v6"
+
+	"google.golang.org/grpc/codes"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/lib/errorutils"
-	"google.golang.org/grpc/codes"
 )
 
 // GetSuggestions - Report #12
@@ -222,7 +223,7 @@ func (backend ES2Backend) getAggSuggestions(ctx context.Context, client *elastic
 			if mymaxscore == nil {
 				continue // protect the code below from trouble
 			}
-			oneSugg := reportingapi.Suggestion{Text: string(myaggBucket.KeyNumber), Score: float32(*mymaxscore.Value)}
+			oneSugg := reportingapi.Suggestion{Text: myaggBucket.Key.(string), Score: float32(*mymaxscore.Value)}
 			if mytophit != nil {
 				for _, hit := range mytophit.Hits.Hits {
 					if target == "node_name" {
@@ -291,7 +292,7 @@ func (backend ES2Backend) getArrayAggSuggestions(ctx context.Context, client *el
 	suggs := make([]string, 0)
 	if aggResult != nil {
 		for _, bucket := range aggResult.Buckets {
-			suggs = append(suggs, string(bucket.KeyNumber))
+			suggs = append(suggs, bucket.Key.(string))
 		}
 	}
 

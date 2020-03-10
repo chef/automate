@@ -4,16 +4,19 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
+	"os"
 	"strings"
 	"sync"
 	"time"
 
-	"github.com/chef/automate/lib/grpc/auth_context"
 	structpb "github.com/golang/protobuf/ptypes/struct"
-	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
+
+	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
 type ES2Backend struct {
@@ -68,6 +71,7 @@ func (backend *ES2Backend) ES2Client() (*elastic.Client, error) {
 			elastic.SetHttpClient(backend.getHttpClient()),
 			elastic.SetURL(backend.ESUrl),
 			elastic.SetSniff(false),
+			elastic.SetTraceLog(log.New(os.Stdout, "olivere: ", log.Lshortfile)),
 		)
 	})
 	return esClient, err

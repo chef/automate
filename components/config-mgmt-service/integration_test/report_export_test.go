@@ -3,6 +3,11 @@ package integration_test
 import (
 	"context"
 	"fmt"
+	"io"
+	"net"
+	"testing"
+	"time"
+
 	"github.com/buger/jsonparser"
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	api "github.com/chef/automate/api/interservice/cfgmgmt/service"
@@ -18,10 +23,6 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/test/bufconn"
-	"io"
-	"net"
-	"testing"
-	"time"
 )
 
 func TestReportExportProjectFilters(t *testing.T) {

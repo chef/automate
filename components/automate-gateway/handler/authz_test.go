@@ -31,9 +31,9 @@ import (
 	// Here in this testbed, that automatically includes less than 40 endpoints
 	// (primarily nodes, notifications, and secrets at the time of writing).
 	_ "github.com/chef/automate/api/external/cfgmgmt"
+	_ "github.com/chef/automate/api/external/compliance/profiles"
 	_ "github.com/chef/automate/api/external/ingest"
 	_ "github.com/chef/automate/components/automate-gateway/api/authz"
-	_ "github.com/chef/automate/api/external/compliance/profiles"
 )
 
 func TestIntrospectAllV1(t *testing.T) {

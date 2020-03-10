@@ -10,9 +10,9 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/ptypes"
-	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
@@ -880,18 +880,15 @@ func (backend *ES2Backend) getControlItem(controlBucket *elastic.AggregationBuck
 	if profileResult, found := controlBucket.Aggregations.ReverseNested("profile"); found {
 		if result, found := profileResult.Terms("sha"); found && len(result.Buckets) > 0 {
 			sha := result.Buckets[0]
-			name := sha.KeyNumber
-			profileMin.Id = string(name)
+			profileMin.Id = sha.Key.(string)
 		}
 		if result, found := profileResult.Terms("title"); found && len(result.Buckets) > 0 {
 			title := result.Buckets[0]
-			name := title.KeyNumber
-			profileMin.Title = string(name)
+			profileMin.Title = title.Key.(string)
 		}
 		if result, found := profileResult.Terms("version"); found && len(result.Buckets) > 0 {
 			version := result.Buckets[0]
-			name := version.KeyNumber
-			profileMin.Version = string(name)
+			profileMin.Version = version.Key.(string)
 		}
 	}
 	contListItem.Profile = profileMin

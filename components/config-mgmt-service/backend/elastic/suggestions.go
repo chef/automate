@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/chef/automate/lib/stringutils"
-	"github.com/olivere/elastic"
 	"github.com/schollz/closestmatch"
 	log "github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
+
+	"github.com/chef/automate/lib/stringutils"
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 )
@@ -166,7 +167,7 @@ func (es Backend) getAggSuggestions(term string, text string, filters map[string
 		for _, reportBucket := range aggResult.Buckets {
 			distinct, _ := reportBucket.Aggregations.TopHits("distinct")
 			for _, hit := range distinct.Hits.Hits {
-				oneSugg := backend.Suggestion{Text: string(reportBucket.KeyNumber), Score: float32(*hit.Score)}
+				oneSugg := backend.Suggestion{Text: reportBucket.Key.(string), Score: float32(*hit.Score)}
 				suggs = append(suggs, oneSugg)
 			}
 		}
@@ -244,10 +245,10 @@ func (es Backend) getArrayAggSuggestions(term string, text string, filters map[s
 
 	aggResult, _ := searchResult.Aggregations.Terms("myagg")
 
-	suggs := make([]string, 0)
+	suggs := []string{}
 	if aggResult != nil {
 		for _, bucket := range aggResult.Buckets {
-			suggs = append(suggs, string(bucket.KeyNumber))
+			suggs = append(suggs, bucket.Key.(string))
 		}
 	}
 
