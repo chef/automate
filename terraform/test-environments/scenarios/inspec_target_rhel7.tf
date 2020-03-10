@@ -18,7 +18,7 @@ module "inspec_target_rhel7" {
   vpc            = "${var.environment}"
   platform       = "rhel-7"
   key_name       = "cd-infrastructure"
-  instance_type  = "t2.medium"
+  instance_type  = "t3.small"
   root_volume_gb = "20"
 
   # Required AWS Tags
