@@ -2,7 +2,7 @@
   <div class="container">
     <main>
       <chef-breadcrumbs>
-        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Servers</chef-breadcrumb>
         {{ server?.name }}
       </chef-breadcrumbs>
       <chef-page-header>
@@ -46,7 +46,7 @@
         <form [formGroup]="updateServerForm">
           <chef-form-field id="update-name">
             <label>
-                <span class="label">Chef Server Name <span aria-hidden="true">*</span></span>
+                <span class="label">Name <span aria-hidden="true">*</span></span>
               <input chefInput formControlName="name" type="text" autocomplete="off"
                 data-cy="update-chefServer-name">
             </label>
@@ -101,7 +101,7 @@
       <section class="page-body" *ngIf="tabValue === 'orgs'">
         <ng-container>
           <chef-toolbar>
-            <chef-button id="create-button" primary (click)="openCreateModal('create')">Create Org</chef-button>
+            <chef-button id="create-button" primary (click)="openCreateModal('create')">Add Org</chef-button>
           </chef-toolbar>
           <chef-table-new>
             <chef-table-header>
@@ -114,11 +114,11 @@
             <chef-table-body>
               <chef-table-row *ngFor="let org of orgs">
                 <chef-table-cell>
-                  <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'orgs', org.id, 'cookbooks']">{{ org.name }}</a>
+                  <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'org', org.id, 'cookbooks']">{{ org.name }}</a>
                 </chef-table-cell>
                 <chef-table-cell>{{ org.admin_user }}</chef-table-cell>
                 <chef-table-cell class="three-dot-column">
-                  <mat-select>
+                  <mat-select panelClass="chef-control-menu" id="menu-{{org.id}}">
                     <mat-option data-cy="delete" (onSelectionChange)="startOrgDelete($event, org)">Delete Org</mat-option>
                   </mat-select>
                 </chef-table-cell>

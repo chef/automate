@@ -26,13 +26,13 @@ chef-tab-selector {
 
 form {
 
-  #update-name {
-    width: 240px;
+  chef-form-field {
+    width: 300px;
+    margin-bottom: 15px;
   }
 
-  input {
-    font-size: 1em;
-    width: 240px;
+  textarea {
+    height: 200px;
   }
 
   input[type="text"]:disabled {

@@ -27,6 +27,7 @@ import { SigninComponent } from './pages/signin/signin.component';
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
 import { ChefServerDetailsComponent } from './modules/infra-proxy/chef-server-details/chef-server-details.component';
+import { CookbooksListComponent } from './modules/infra-proxy/cookbook-list/cookbooks-list.component';
 import { NodeDetailsComponent } from './pages/node-details/node-details.component';
 import {
   NodeNoRunsDetailsComponent
@@ -243,6 +244,10 @@ const routes: Routes = [
             {
               path: ':id',
               component: ChefServerDetailsComponent
+            },
+            {
+              path: ':id/org/:orgid/cookbooks',
+              component: CookbooksListComponent
             }
           ]
         }
