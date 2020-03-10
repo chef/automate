@@ -177,6 +177,10 @@ func serveGrpc(ctx context.Context, db *pgdb.DB, connFactory *secureconn.Factory
 		if err != nil {
 			logrus.WithError(err).Fatal("could not register project update task executors")
 		}
+		err = project_update_lib.RegisterSerialTaskExecutors(cerealProjectUpdateManager, "compliance", ingesticESClient, authzProjectsClient)
+		if err != nil {
+			logrus.WithError(err).Fatal("could not register project update task executors")
+		}
 		if err := cerealProjectUpdateManager.Start(ctx); err != nil {
 			logrus.WithError(err).Fatal("could not start cereal manager")
 		}

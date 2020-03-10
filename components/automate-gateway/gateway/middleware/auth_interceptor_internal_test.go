@@ -5,18 +5,54 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/pem"
+	"errors"
 	"fmt"
 	"net/url"
 	"testing"
 
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/peer"
 
+	"github.com/chef/automate/api/interservice/authn"
+	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
+
+type testAuthnClient struct {
+	err error
+}
+
+func (t testAuthnClient) Authenticate(ctx context.Context, in *authn.AuthenticateRequest, opts ...grpc.CallOption) (*authn.AuthenticateResponse, error) {
+	if t.err != nil {
+		return nil, t.err
+	}
+	return &authn.AuthenticateResponse{Teams: []string{"sample-auth-response-team"}, Subject: "sample-auth-response-subject"}, nil
+}
+
+type testAuthzHandler struct {
+	err error
+}
+
+func (t testAuthzHandler) Handle(ctx context.Context, subjects []string, projects []string, req interface{}) (context.Context, error) {
+	if t.err != nil {
+		return nil, t.err
+	}
+	// Notes:
+	// * The real implementation of `Handle` is currently in
+	// gateway/middleware/authv2/authv2.go (assuming iamv2); it uses this same
+	// auth_context.NewContext() to create the context it returns.
+	// * This test implementation is just hard coding everything because I didn't
+	// need anything more complicated than that. Feel free to modify if that
+	// changes.
+	resource := "test resource"
+	action := "test action"
+	return auth_context.NewContext(ctx, subjects, projects, resource, action, "middleware test instance"), nil
+}
 
 func TestHeaderAuthValidForClientAndPeer(t *testing.T) {
 	albCert, _ := devCertToEncodedAndPeer(t, "automate-load-balancer")
@@ -62,6 +98,7 @@ func TestHeaderAuthValidForClientAndPeer(t *testing.T) {
 			ctx:           metadata.NewIncomingContext(context.Background(), metadata.Pairs()),
 			expectFailure: true},
 	}
+
 	for desc, tc := range cases {
 		t.Run(desc, func(t *testing.T) {
 			name, ok := headerAuthValidForClientAndPeer(tc.ctx)
@@ -72,6 +109,90 @@ func TestHeaderAuthValidForClientAndPeer(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestComboAuth(t *testing.T) {
+	albCert, _ := devCertToEncodedAndPeer(t, "automate-load-balancer")
+	agCert, agPeer := devCertToEncodedAndPeer(t, "automate-gateway")
+	otherServiceCert, _ := devCertToEncodedAndPeer(t, "deployment-service")
+
+	reqFromALBCtx := metadata.NewIncomingContext(
+		peer.NewContext(context.Background(), agPeer),
+		metadata.Pairs("x-client-cert", albCert, "grpcgateway-x-client-cert", agCert,
+			runtime.MetadataPrefix+"projects", "project1,project2",
+		))
+
+	reqDirectToGatewayCtx := metadata.NewIncomingContext(
+		peer.NewContext(context.Background(), agPeer),
+		metadata.Pairs("x-client-cert", albCert, "grpcgateway-x-client-cert", otherServiceCert,
+			runtime.MetadataPrefix+"projects", "project1,project2",
+		))
+
+	t.Run("It returns error for authn failure", func(t *testing.T) {
+		authnErr := errors.New("sample authn failure")
+		a := authInterceptor{
+			authn: testAuthnClient{err: authnErr},
+			authz: testAuthzHandler{},
+		}
+		_, err := a.combinedAuth(reqFromALBCtx, nil)
+		require.Error(t, err)
+		// the upstream returns specific grpc error types for failures, they should
+		// not be wrapped or modified
+		assert.Equal(t, authnErr, err)
+	})
+	t.Run("It returns error for authz failure", func(t *testing.T) {
+		authzErr := errors.New("sample authz failure")
+		a := authInterceptor{
+			authn: testAuthnClient{},
+			authz: testAuthzHandler{err: authzErr},
+		}
+		_, err := a.combinedAuth(reqFromALBCtx, nil)
+		require.Error(t, err)
+		// the upstream returns specific grpc error types for failures, they should
+		// not be wrapped or modified
+		assert.Equal(t, authzErr, err)
+	})
+	t.Run("It forwards metadata correctly for successful auth for requests from Automate Load Balancer", func(t *testing.T) {
+		a := authInterceptor{
+			authn: testAuthnClient{},
+			authz: testAuthzHandler{},
+		}
+
+		returnedCtx, err := a.combinedAuth(reqFromALBCtx, nil)
+		require.NoError(t, err)
+
+		authInfo := auth_context.FromContext(returnedCtx)
+
+		expectedSubj := []string{"sample-auth-response-team", "sample-auth-response-subject"}
+		expectedProjects := []string{"project1", "project2"}
+
+		assert.Equal(t, expectedSubj, authInfo.Subjects)
+		assert.Equal(t, expectedProjects, authInfo.Projects)
+		assert.Equal(t, "test resource", authInfo.Resource)
+		assert.Equal(t, "test action", authInfo.Action)
+		assert.Equal(t, "middleware test instance", authInfo.PolicyVersion)
+	})
+
+	t.Run("It forwards metadata correctly for successful auth for direct requests using certificate auth", func(t *testing.T) {
+		a := authInterceptor{
+			authn: testAuthnClient{},
+			authz: testAuthzHandler{},
+		}
+
+		returnedCtx, err := a.combinedAuth(reqDirectToGatewayCtx, nil)
+		require.NoError(t, err)
+
+		authInfo := auth_context.FromContext(returnedCtx)
+
+		expectedSubj := []string{"tls:service:deployment-service:f42fec42094a67caee0c485ee28ec03587170fabfa8a2d7d06188a5acbcee6f0"}
+		expectedProjects := []string{"project1", "project2"}
+
+		assert.Equal(t, expectedSubj, authInfo.Subjects)
+		assert.Equal(t, expectedProjects, authInfo.Projects)
+		assert.Equal(t, "test resource", authInfo.Resource)
+		assert.Equal(t, "test action", authInfo.Action)
+		assert.Equal(t, "middleware test instance", authInfo.PolicyVersion)
+	})
 }
 
 func devCertToEncodedAndPeer(t *testing.T, service string) (string, *peer.Peer) {

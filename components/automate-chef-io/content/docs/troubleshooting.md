@@ -7,7 +7,7 @@ bref = ""
 toc = true
 +++
 
-## chef-automate CLI errors
+## chef-automate CLI Errors
 
 ### Error: Unable to make a request to the deployment-service
 
@@ -30,7 +30,7 @@ should not be placed in the PATH manually as the deployment process will do it.
 
 ## Low Disk Space
 
-Chef Automate will emit warnings similar to the following when the available disk space on the system drops below 1 GB:
+Chef Automate emits a warning when the available disk space on the system drops below 1 GB, for example:
 
 ```bash
 es-sidecar-service.default(O): time="2018-05-16T00:07:16Z" level=error msg="Disk free below critical threshold" avail_bytes=43368448 host=127.0.0.1 mount="/ (overlay)" threshold_bytes=536870912 total_bytes=31361703936
@@ -38,7 +38,7 @@ es-sidecar-service.default(O): time="2018-05-16T00:07:16Z" level=error msg="Disk
 
 ### Recovering from Low Disk Conditions
 
-Chef Automate is configured to disable disk writes when disk space drops below 250 MB. If this happens, you will see log messages similar to the following:
+Chef Automate disables disk writes if available disk space drops below 250 MB and logs a message similar to:
 
 ```bash
 ingest-service.default(O): time="2018-05-16T00:10:09Z" level=error msg="Message failure" error="rpc error: code = Internal desc = elastic: Error 403 (Forbidden): blocked by: [FORBIDDEN/12/index read-only / allow delete (api)]; [type=cluster_block_exception] elastic: Error 403 (Forbidden): blocked by: [FORBIDDEN/12/index read-only / allow delete (api)]; [type=cluster_block_exception]"
@@ -84,7 +84,7 @@ chef-automate iam admin-access restore NEW_PASSWORD
 
 This command causes Automate to inspect your A2 IAM resource and initiates a series of steps for applying the new password to the "admin" user--in effect reconstituting the admin--and connecting it with full administrative permissions.
 
-The process Automate follows for resetting the admin password may include: recreating the user record, recreating the "admins" local team, and recreating the default policy that grants access to all resources for for the newly reconstituted local admin team.
+The process Automate follows for resetting the admin password may include: recreating the user record, recreating the "admins" local team, and recreating the default policy that grants access to all resources for the newly reconstituted local admin team.
 
 To see what exactly will happen in your system, pass `--dry-run`:
 

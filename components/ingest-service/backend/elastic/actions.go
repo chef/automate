@@ -33,6 +33,12 @@ func (es *Backend) CreateBulkActionRequest(action backend.InternalChefAction) el
 
 func (es *Backend) UpdateActionProjectTags(ctx context.Context,
 	projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
+	return es.UpdateActionProjectTagsForIndex(ctx, fmt.Sprintf("%s-%s", mappings.Actions.Index, "*"),
+		projectTaggingRules)
+}
+
+func (es *Backend) UpdateActionProjectTagsForIndex(ctx context.Context, index string,
+	projectTaggingRules map[string]*iam_v2.ProjectRules) (string, error) {
 	script := `
 		ArrayList matchingProjects = new ArrayList();
 		for (def project : params.projects) {
@@ -75,8 +81,6 @@ func (es *Backend) UpdateActionProjectTags(ctx context.Context,
 
 		ctx._source.projects = matchingProjects.toArray();
 	`
-
-	index := fmt.Sprintf("%s-%s", mappings.Actions.Index, "*")
 
 	startTaskResult, err := elastic.NewUpdateByQueryService(es.client).
 		Index(index).

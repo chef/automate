@@ -213,6 +213,11 @@ func Spawn(opts *serveropts.Opts) error {
 		return err
 	}
 
+	err = project_update_lib.RegisterSerialTaskExecutors(projectUpdateManager, "ingest", client, authzProjectsClient)
+	if err != nil {
+		return err
+	}
+
 	if err := projectUpdateManager.Start(context.Background()); err != nil {
 		return err
 	}

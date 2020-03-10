@@ -187,7 +187,8 @@ describe File.basename(__FILE__) do
                 }
               ],
               "stringTags": {},
-              "tags": {}
+              "tags": {},
+              "waivedStr"=>"no"
             },
             {
               "id": "/etc/passwd must exist",
@@ -205,7 +206,8 @@ describe File.basename(__FILE__) do
                 }
               ],
               "stringTags": {},
-              "tags": {}
+              "tags": {},
+              "waivedStr"=>"no"
             }
           ],
           "status": "passed"
