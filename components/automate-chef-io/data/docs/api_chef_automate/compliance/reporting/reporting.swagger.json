@@ -1088,6 +1088,20 @@
         }
       }
     },
+    "chef.automate.api.compliance.reporting.v1.ReportData": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "title": "The report run_uuid"
+        },
+        "end_time": {
+          "type": "string",
+          "format": "date-time",
+          "title": "The time in UTC that the scan was completed"
+        }
+      }
+    },
     "chef.automate.api.compliance.reporting.v1.ReportIds": {
       "type": "object",
       "properties": {
@@ -1097,6 +1111,13 @@
             "type": "string"
           },
           "description": "The list of unique report identifiers found matching the query."
+        },
+        "report_data": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ReportData"
+          },
+          "description": "The list of unique report identifiers with their respective end_time, found matching the query."
         }
       }
     },
