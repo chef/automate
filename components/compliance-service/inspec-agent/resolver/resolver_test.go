@@ -138,3 +138,37 @@ func TestAssembleJob(t *testing.T) {
 	assert.Zero(t, job.TargetConfig.Secrets)
 	assert.NotZero(t, job.TargetConfig.SecretsArr)
 }
+
+func TestHandleNodeInfoCorrectlyAssignsName(t *testing.T) {
+	nodeDetails := handleNodeInfo(&manager.ManagerNode{
+		Name: "test-name",
+		Host: "localhost",
+	})
+	assert.Equal(t, "test-name", nodeDetails.Name)
+
+	nodeDetails = handleNodeInfo(&manager.ManagerNode{
+		Name: "",
+		Host: "localhost",
+	})
+	assert.Equal(t, "localhost", nodeDetails.Name)
+}
+
+func TestHandleNodeInfoObservesTagValues(t *testing.T) {
+	nodeDetails := handleNodeInfo(&manager.ManagerNode{
+		Name: "test-name",
+		Host: "localhost",
+		Tags: []*common.Kv{
+			{Key: "Name", Value: "tag-named-instance"},
+		},
+	})
+	assert.Equal(t, "tag-named-instance", nodeDetails.Name)
+
+	nodeDetails = handleNodeInfo(&manager.ManagerNode{
+		Name: "test-name",
+		Host: "localhost",
+		Tags: []*common.Kv{
+			{Key: "Environment", Value: "test-env"},
+		},
+	})
+	assert.Equal(t, "test-env", nodeDetails.Environment)
+}
