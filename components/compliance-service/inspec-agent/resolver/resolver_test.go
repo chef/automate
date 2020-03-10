@@ -3,8 +3,8 @@ package resolver
 import (
 	"testing"
 
-	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/external/common/query"
+	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"

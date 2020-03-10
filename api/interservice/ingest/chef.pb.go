@@ -133,7 +133,9 @@ func init() {
 	proto.RegisterType((*VersionRequest)(nil), "chef.automate.domain.ingest.VersionRequest")
 }
 
-func init() { proto.RegisterFile("api/interservice/ingest/chef.proto", fileDescriptor_c66653d428694e3c) }
+func init() {
+	proto.RegisterFile("api/interservice/ingest/chef.proto", fileDescriptor_c66653d428694e3c)
+}
 
 var fileDescriptor_c66653d428694e3c = []byte{
 	// 521 bytes of a gzipped FileDescriptorProto

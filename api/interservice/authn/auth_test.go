@@ -53,7 +53,7 @@ func TestValidationCreateTokenID(t *testing.T) {
 			Id: "valid-id",
 		},
 		"underscore in IDs": &authn.CreateTokenReq{
-			Id: "valid_id",
+			Id:       "valid_id",
 			Projects: []string{"project_1", "project_2"},
 		},
 		"with no characters": &authn.CreateTokenReq{

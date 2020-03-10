@@ -1,7 +1,9 @@
 package client
 
-import "testing"
-import "os"
+import (
+	"os"
+	"testing"
+)
 
 func TestGetAddress(t *testing.T) {
 	tests := []struct {

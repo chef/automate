@@ -725,7 +725,9 @@ func init() {
 	proto.RegisterType((*StopResponse)(nil), "chef.automate.domain.event.api.StopResponse")
 }
 
-func init() { proto.RegisterFile("api/interservice/event/event.proto", fileDescriptor_31af132f90312373) }
+func init() {
+	proto.RegisterFile("api/interservice/event/event.proto", fileDescriptor_31af132f90312373)
+}
 
 var fileDescriptor_31af132f90312373 = []byte{
 	// 618 bytes of a gzipped FileDescriptorProto

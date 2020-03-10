@@ -31,7 +31,7 @@ func Start(l logger.Logger, migrationsConfig migration.Config, connFactory *secu
 		Logger:      l,
 		ConnFactory: connFactory,
 		Storage:     p,
-		Secrets: secretsClient,
+		Secrets:     secretsClient,
 	}, nil
 }
 

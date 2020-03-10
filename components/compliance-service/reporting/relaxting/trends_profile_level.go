@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/chef/automate/api/interservice/compliance/stats"
-	"github.com/olivere/elastic"
 	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 func (depth *ProfileDepth) getTrendAggs(trendType string,

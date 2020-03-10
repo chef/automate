@@ -9,9 +9,9 @@ import (
 
 	"github.com/golang/protobuf/jsonpb"
 	structpb "github.com/golang/protobuf/ptypes/struct"
-	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting/util"

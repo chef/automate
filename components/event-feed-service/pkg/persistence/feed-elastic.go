@@ -7,9 +7,9 @@ import (
 	"strconv"
 	"time"
 
-	olivere "github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	olivere "gopkg.in/olivere/elastic.v6"
 
 	feedErrors "github.com/chef/automate/components/event-feed-service/pkg/errors"
 	"github.com/chef/automate/components/event-feed-service/pkg/feed"

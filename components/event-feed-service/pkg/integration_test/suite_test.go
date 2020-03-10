@@ -6,15 +6,16 @@ import (
 	"os"
 	"path"
 
+	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc"
+	olivere "gopkg.in/olivere/elastic.v6"
+
 	"github.com/chef/automate/api/interservice/data_lifecycle"
 	"github.com/chef/automate/api/interservice/event_feed"
 	"github.com/chef/automate/components/event-feed-service/pkg/persistence"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
-	olivere "github.com/olivere/elastic"
-	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
-	"google.golang.org/grpc"
 )
 
 // Suite helps you manipulate various stages of your tests. It provides

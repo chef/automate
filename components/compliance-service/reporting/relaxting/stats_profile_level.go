@@ -5,12 +5,13 @@ import (
 
 	"github.com/sirupsen/logrus"
 
+	"github.com/pkg/errors"
+	elastic "gopkg.in/olivere/elastic.v6"
+
 	"github.com/chef/automate/api/interservice/compliance/stats"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/lib/errorutils"
 	"github.com/chef/automate/lib/stringutils"
-	"github.com/olivere/elastic"
-	"github.com/pkg/errors"
 )
 
 func (depth *ProfileDepth) getControlListStatsByProfileIdAggs(
@@ -77,7 +78,7 @@ func (depth *ProfileDepth) getControlListStatsByProfileIdResults(
 					return nil, err
 				}
 				for _, bucket := range totalsAgg.Buckets {
-					controlID := string(bucket.KeyNumber)
+					controlID := bucket.Key.(string)
 					controlMeta := controlMetaMap[controlID]
 					passedCount, _ := bucket.Filter("passed")
 					failedCount, _ := bucket.Filter("failed")
@@ -145,7 +146,7 @@ func (depth *ProfileDepth) getProfileListWithAggregatedComplianceSummariesResult
 		totalsAgg, _ := aggRoot.Terms("totals")
 		if totalsAgg != nil {
 			for _, bucket := range totalsAgg.Buckets {
-				profileName, profileId := rightSplit(string(bucket.KeyNumber), "|") // bucket.KeyNumber
+				profileName, profileId := rightSplit(bucket.Key.(string), "|")
 
 				//if we have a profile_id filter and if our result set doesn't contain it, skip it
 				if profilesFilterArray, found := filters["profile_id"]; found {
@@ -284,7 +285,7 @@ func (depth *ProfileDepth) topFailuresResultProfile(aggRoot *elastic.Aggregation
 				for _, statBucket := range topsy.Buckets {
 					count := int(statBucket.DocCount)
 					if count > 0 {
-						statSummary := stats.FailureSummary{Name: string(statBucket.KeyNumber), Failures: int32(count)}
+						statSummary := stats.FailureSummary{Name: statBucket.Key.(string), Failures: int32(count)}
 						topFailures.Profiles = append(topFailures.Profiles, &statSummary)
 					}
 				}
@@ -302,7 +303,7 @@ func (depth *ProfileDepth) topFailuresResultPlatform(aggRoot *elastic.Aggregatio
 					for _, statBucket := range toplist.Buckets {
 						count := int(statBucket.DocCount)
 						if count > 0 {
-							statSummary := stats.FailureSummary{Name: string(statBucket.KeyNumber), Failures: int32(count)}
+							statSummary := stats.FailureSummary{Name: statBucket.Key.(string), Failures: int32(count)}
 							topFailures.Platforms = append(topFailures.Platforms, &statSummary)
 						}
 					}
@@ -321,7 +322,7 @@ func (depth *ProfileDepth) topFailuresResultEnvironment(aggRoot *elastic.Aggrega
 					for _, statBucket := range toplist.Buckets {
 						count := int(statBucket.DocCount)
 						if count > 0 {
-							statSummary := stats.FailureSummary{Name: string(statBucket.KeyNumber), Failures: int32(count)}
+							statSummary := stats.FailureSummary{Name: statBucket.Key.(string), Failures: int32(count)}
 							topFailures.Environments = append(topFailures.Environments, &statSummary)
 						}
 					}
@@ -340,7 +341,7 @@ func (depth *ProfileDepth) topFailuresResultControl(aggRoot *elastic.Aggregation
 			for _, bucket := range totalsAgg.Buckets {
 				count := int(bucket.DocCount)
 				if count > 0 {
-					statSummary := stats.FailureSummary{Name: string(bucket.KeyNumber), Failures: int32(count)}
+					statSummary := stats.FailureSummary{Name: bucket.Key.(string), Failures: int32(count)}
 					topFailures.Controls = append(topFailures.Controls, &statSummary)
 				}
 			}
@@ -430,7 +431,7 @@ func (depth *ProfileDepth) getStatsSummaryResult(searchResult *elastic.SearchRes
 			} else {
 				numberOfProfiles := 0
 				for _, profileBucket := range profiles.Buckets {
-					_, profileId := rightSplit(string(profileBucket.KeyNumber), "|")
+					_, profileId := rightSplit(profileBucket.Key.(string), "|")
 					if stringutils.SliceContains(depth.filters["profile_id"], profileId) {
 						numberOfProfiles++
 					}

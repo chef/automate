@@ -805,8 +805,10 @@ type UpdateDeleteDisconnectedServicesConfigRes struct {
 func (m *UpdateDeleteDisconnectedServicesConfigRes) Reset() {
 	*m = UpdateDeleteDisconnectedServicesConfigRes{}
 }
-func (m *UpdateDeleteDisconnectedServicesConfigRes) String() string { return proto.CompactTextString(m) }
-func (*UpdateDeleteDisconnectedServicesConfigRes) ProtoMessage()    {}
+func (m *UpdateDeleteDisconnectedServicesConfigRes) String() string {
+	return proto.CompactTextString(m)
+}
+func (*UpdateDeleteDisconnectedServicesConfigRes) ProtoMessage() {}
 func (*UpdateDeleteDisconnectedServicesConfigRes) Descriptor() ([]byte, []int) {
 	return fileDescriptor_6daf34f0710a8049, []int{15}
 }

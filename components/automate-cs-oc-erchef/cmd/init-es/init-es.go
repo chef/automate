@@ -10,8 +10,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/olivere/elastic"
 	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 var defaultTimeout = 15 * time.Second

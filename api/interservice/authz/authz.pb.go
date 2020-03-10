@@ -376,7 +376,9 @@ func init() {
 	proto.RegisterType((*Pair)(nil), "chef.automate.domain.authz.Pair")
 }
 
-func init() { proto.RegisterFile("api/interservice/authz/authz.proto", fileDescriptor_145513b0a9558cd4) }
+func init() {
+	proto.RegisterFile("api/interservice/authz/authz.proto", fileDescriptor_145513b0a9558cd4)
+}
 
 var fileDescriptor_145513b0a9558cd4 = []byte{
 	// 673 bytes of a gzipped FileDescriptorProto

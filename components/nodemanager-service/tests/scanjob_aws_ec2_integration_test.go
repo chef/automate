@@ -11,9 +11,9 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/nodemanager-service/tests/mgrtesthelpers"
 )
 

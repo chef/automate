@@ -454,6 +454,7 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -574,6 +575,7 @@ paths = [
   "vendor/google.golang.org/api/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -632,6 +634,7 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -767,6 +770,7 @@ paths = [
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
   "vendor/gopkg.in/cheggaaa/pb.v1/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -918,6 +922,7 @@ paths = [
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
   "vendor/gopkg.in/cheggaaa/pb.v1/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -962,6 +967,7 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -1191,6 +1197,7 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -1312,6 +1319,7 @@ paths = [
   "vendor/google.golang.org/api/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -1388,6 +1396,7 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -1568,6 +1577,7 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -1766,7 +1776,8 @@ paths = [
   "vendor/github.com/olivere/elastic/*",
   "vendor/github.com/pkg/errors/*",
   "vendor/github.com/sirupsen/logrus/*",
-  "vendor/golang.org/x/sys/*"
+  "vendor/golang.org/x/sys/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*"
 ]
 
 [automate-cs-nginx]
@@ -1868,6 +1879,7 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -1925,6 +1937,7 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 
@@ -2051,6 +2064,7 @@ paths = [
   "vendor/golang.org/x/text/*",
   "vendor/google.golang.org/genproto/*",
   "vendor/google.golang.org/grpc/*",
+  "vendor/gopkg.in/olivere/elastic.v6/*",
   "vendor/gopkg.in/yaml.v2/*"
 ]
 

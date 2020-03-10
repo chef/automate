@@ -362,7 +362,9 @@ func init() {
 	proto.RegisterType((*Secrets)(nil), "chef.automate.api.secrets.Secrets")
 }
 
-func init() { proto.RegisterFile("api/external/secrets/secrets.proto", fileDescriptor_ac8fabc120c5cbd2) }
+func init() {
+	proto.RegisterFile("api/external/secrets/secrets.proto", fileDescriptor_ac8fabc120c5cbd2)
+}
 
 var fileDescriptor_ac8fabc120c5cbd2 = []byte{
 	// 780 bytes of a gzipped FileDescriptorProto

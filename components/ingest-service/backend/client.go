@@ -3,7 +3,7 @@ package backend
 import (
 	"context"
 
-	"github.com/olivere/elastic"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	project_update_lib "github.com/chef/automate/lib/authz"
@@ -55,6 +55,8 @@ type Client interface {
 	RecordLivenessPing(context.Context, Liveness) error
 	// @param (context, instanceID)
 	FindNodeIDByInstanceId(context.Context, string) ([]string, error)
+	// @param (context, filter)
+	FindNodeIDsByFields(context.Context, map[string]string) ([]string, error)
 	// @param (data)
 	CreateBulkNodeUpdateRequest(Node) elastic.BulkableRequest
 	// @param (data)

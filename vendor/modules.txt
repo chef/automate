@@ -81,10 +81,10 @@ github.com/briandowns/spinner
 github.com/buger/goterm
 # github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44
 github.com/buger/jsonparser
-# github.com/chef/go-chef v0.3.1-0.20191115205148-7ac24fba7a27
-github.com/chef/go-chef
 # github.com/cespare/xxhash/v2 v2.1.1
 github.com/cespare/xxhash/v2
+# github.com/chef/go-chef v0.3.1-0.20191115205148-7ac24fba7a27
+github.com/chef/go-chef
 # github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816
 github.com/chef/toml
 # github.com/ckaznocha/protoc-gen-lint v0.2.1
@@ -371,7 +371,6 @@ github.com/nats-io/nuid
 github.com/nats-io/stan.go
 github.com/nats-io/stan.go/pb
 # github.com/olivere/elastic v6.2.16+incompatible
-github.com/olivere/elastic
 github.com/olivere/elastic/config
 github.com/olivere/elastic/uritemplates
 # github.com/open-policy-agent/opa v0.14.2
@@ -542,7 +541,7 @@ golang.org/x/crypto/pkcs12/internal/rc2
 golang.org/x/crypto/poly1305
 golang.org/x/crypto/salsa20/salsa
 golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20200202094626-16171245cfb2
+# golang.org/x/net v0.0.0-20191002035440-2ec189313ef0
 golang.org/x/net/context
 golang.org/x/net/context/ctxhttp
 golang.org/x/net/http/httpguts
@@ -573,7 +572,7 @@ golang.org/x/sys/windows/svc
 golang.org/x/sys/windows/svc/debug
 golang.org/x/sys/windows/svc/eventlog
 golang.org/x/sys/windows/svc/mgr
-# golang.org/x/text v0.3.2
+# golang.org/x/text v0.3.1-0.20171218113626-eb22672bea55
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
@@ -660,6 +659,8 @@ gopkg.in/asn1-ber.v1
 gopkg.in/cheggaaa/pb.v1
 # gopkg.in/ldap.v2 v2.5.1
 gopkg.in/ldap.v2
+# gopkg.in/olivere/elastic.v6 v6.2.28
+gopkg.in/olivere/elastic.v6
 # gopkg.in/segmentio/analytics-go.v3 v3.0.1
 gopkg.in/segmentio/analytics-go.v3
 # gopkg.in/square/go-jose.v2 v2.1.3

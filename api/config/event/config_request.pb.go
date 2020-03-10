@@ -263,8 +263,10 @@ type ConfigRequest_V1_System_InternalMessaging struct {
 func (m *ConfigRequest_V1_System_InternalMessaging) Reset() {
 	*m = ConfigRequest_V1_System_InternalMessaging{}
 }
-func (m *ConfigRequest_V1_System_InternalMessaging) String() string { return proto.CompactTextString(m) }
-func (*ConfigRequest_V1_System_InternalMessaging) ProtoMessage()    {}
+func (m *ConfigRequest_V1_System_InternalMessaging) String() string {
+	return proto.CompactTextString(m)
+}
+func (*ConfigRequest_V1_System_InternalMessaging) ProtoMessage() {}
 func (*ConfigRequest_V1_System_InternalMessaging) Descriptor() ([]byte, []int) {
 	return fileDescriptor_5a54f2ee94cf6f9c, []int{0, 0, 0, 1}
 }

@@ -546,7 +546,9 @@ func init() {
 	proto.RegisterType((*ConfigRequest_V1_Service)(nil), "chef.automate.ui.ConfigRequest.V1.Service")
 }
 
-func init() { proto.RegisterFile("api/config/ui/config_request.proto", fileDescriptor_eb1f83cc31afa701) }
+func init() {
+	proto.RegisterFile("api/config/ui/config_request.proto", fileDescriptor_eb1f83cc31afa701)
+}
 
 var fileDescriptor_eb1f83cc31afa701 = []byte{
 	// 883 bytes of a gzipped FileDescriptorProto

@@ -27,7 +27,7 @@ describe("/events/chef/nodedelete", function () {
     });
   });
 
-  describe("posting example message no elastic search data", function () {
+  describe("trying to delete a node that does not exist with organization_name, service_hostname, node_name", function () {
     // Because as soon as a Node is created it can be deleted, even if it's never been run, there's
     // a possibility automate might never know about it, and therefore we need it to not throw an
     // error if it has no record of the node we're trying to delete.
@@ -36,6 +36,22 @@ describe("/events/chef/nodedelete", function () {
 
       // Wait for the post and the refresh requests.
       return chakram.all([chakram.post(endpoint(), chefDelete.json())]).then(function(responses) {
+        expect(responses[0]).to.have.status(200);
+      });
+    });
+  });
+
+  describe("trying to delete a node that does not exist with node ID", function () {
+    // Because as soon as a Node is created it can be deleted, even if it's never been run, there's
+    // a possibility automate might never know about it, and therefore we need it to not throw an
+    // error if it has no record of the node we're trying to delete.
+    it("should return 200", function () {
+      let chefDelete = {
+        node_id: "fake_id"
+      };
+
+      // Wait for the post and the refresh requests.
+      return chakram.all([chakram.post(endpoint(), chefDelete)]).then(function(responses) {
         expect(responses[0]).to.have.status(200);
       });
     });

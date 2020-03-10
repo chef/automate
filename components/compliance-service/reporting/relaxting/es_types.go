@@ -281,3 +281,7 @@ type ESMigrationInfo struct {
 	MostRecentValidLatestDate time.Time `json:"most_recent_valid_latest_date,omitempty"`
 	CurrentIndicesVersion     string    `json:"current_indices_version,omitempty"`
 }
+
+type EndTimeSource struct {
+	EndTime time.Time `json:"end_time"`
+}

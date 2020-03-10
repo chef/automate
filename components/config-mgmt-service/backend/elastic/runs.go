@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/olivere/elastic"
 	log "github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
