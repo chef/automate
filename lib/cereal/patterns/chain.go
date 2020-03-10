@@ -139,6 +139,20 @@ type ChainWorkflowInstance struct {
 	err       error
 }
 
+func (instance *ChainWorkflowInstance) WithPayload(payload *ChainWorkflowPayload) {
+	instance.isRunning = true
+	instance.payload = payload
+}
+
+func (instance *ChainWorkflowInstance) WithParams(params *ChainWorkflowParams) {
+	instance.params = params
+}
+
+func (instance *ChainWorkflowInstance) WithResult(result *ChainWorkflowPayload) {
+	instance.isRunning = false
+	instance.result = result
+}
+
 func (instance *ChainWorkflowInstance) GetSubWorkflow(idx int) (cereal.ImmutableWorkflowInstance, error) {
 	if instance.err != nil {
 		return nil, instance.err

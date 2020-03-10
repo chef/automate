@@ -514,9 +514,12 @@ func (w *workflowInstance) collectRunningJobStatuses() []project_update_tags.Job
 					logrus.WithError(err).Errorf("failed to get payload for %q", d)
 					continue
 				}
-				if state.Running.CompletedTasks > 0 && state.Running.TotalTasks > 0 &&
+				if state.Running.TotalTasks > 0 &&
 					!state.Running.StartTime.IsZero() && !state.Running.LastUpdated.IsZero() {
 					percentComplete := (float64(state.Running.CompletedTasks) + float64(state.Running.RunningTask.LastStatus.PercentageComplete)) / float64(state.Running.TotalTasks)
+					if percentComplete == 0 {
+						continue
+					}
 					elapsed := state.Running.LastUpdated.Sub(state.Running.StartTime)
 					expectedDuration := time.Duration(float64(elapsed) / percentComplete)
 					jobStatuses = append(jobStatuses, project_update_tags.JobStatus{

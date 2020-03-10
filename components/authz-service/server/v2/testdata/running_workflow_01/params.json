@@ -1,0 +1,23 @@
+{
+	"WorkflowParams": [
+	  {},
+	  {
+		"SubworkflowKeys": [
+		  "serialized",
+		  "nodemanager"
+		],
+		"WorkflowParams": {
+		  "nodemanager": {
+			"ProjectUpdateID": "4c07acd7-0a30-48b3-900a-e3bdbdae4277"
+		  },
+		  "serialized": {
+			"ProjectUpdateID": "4c07acd7-0a30-48b3-900a-e3bdbdae4277",
+			"DomainServices": [
+			  "compliance",
+			  "ingest"
+			]
+		  }
+		}
+	  }
+	]
+}
