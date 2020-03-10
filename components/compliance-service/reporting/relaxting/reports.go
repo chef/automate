@@ -136,7 +136,10 @@ func (backend ES2Backend) getNodeReportIdsFromTimeseries(esIndex string,
 						continue
 					}
 				}
-				endTimeTimestamp, _ := ptypes.TimestampProto(et.EndTime)
+				endTimeTimestamp, err := ptypes.TimestampProto(et.EndTime)
+				if err != nil {
+					logrus.Errorf("error converting end_time for runid: %s %v", hit.Id, err)
+				}
 
 				repData := reportingapi.ReportData{}
 				repData.Id = hit.Id
