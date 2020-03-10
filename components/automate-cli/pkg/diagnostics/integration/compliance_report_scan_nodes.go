@@ -222,7 +222,9 @@ func CreateComplianceReportScanNodesDiagnostic() diagnostics.Diagnostic {
 			}
 
 			defer func() {
-				_ = resp.Body.Close()
+				if resp != nil {
+					_ = resp.Body.Close()
+				}
 			}()
 
 			if resp.StatusCode != 200 {
@@ -246,7 +248,7 @@ func CreateComplianceReportScanNodesDiagnostic() diagnostics.Diagnostic {
 				errs = append(errs, errors.Wrapf(err, "Failed to delete %s", err))
 			}
 
-			if resp.StatusCode != 200 {
+			if resp != nil && resp.StatusCode != 200 {
 				errs = append(errs, errors.Errorf("Failed to delete %s. Got status code %d", reqPath, resp.StatusCode))
 				fmt.Printf("%+v\n", errs)
 			}
