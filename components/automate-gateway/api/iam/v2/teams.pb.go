@@ -118,9 +118,9 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type TeamsClient interface {
 	//
-	//Create a local team
+	//Creates a local team
 	//
-	//Creates a local team, used to group local users as members of IAM policies.
+	//Creates a local team that is used to group local users as members of IAM policies.
 	//
 	//Authorization Action:
 	//```
@@ -128,9 +128,9 @@ type TeamsClient interface {
 	//```
 	CreateTeam(ctx context.Context, in *request.CreateTeamReq, opts ...grpc.CallOption) (*response.CreateTeamResp, error)
 	//
-	//List all local teams
+	//Lists all local teams
 	//
-	//List all local teams.
+	//Lists all local teams.
 	//
 	//Authorization Action:
 	//```
@@ -148,9 +148,9 @@ type TeamsClient interface {
 	//```
 	GetTeam(ctx context.Context, in *request.GetTeamReq, opts ...grpc.CallOption) (*response.GetTeamResp, error)
 	//
-	//Update a local team
+	//Updates a local team
 	//
-	//Update a local team.
+	//Updates a local team.
 	//
 	//Authorization Action:
 	//```
@@ -158,9 +158,9 @@ type TeamsClient interface {
 	//```
 	UpdateTeam(ctx context.Context, in *request.UpdateTeamReq, opts ...grpc.CallOption) (*response.UpdateTeamResp, error)
 	//
-	//Delete a local team
+	//Deletes a local team
 	//
-	//Delete a local team and remove it from any policies.
+	//Deletes a local team and remove it from any policies.
 	//
 	//Authorization Action:
 	//```
@@ -168,7 +168,7 @@ type TeamsClient interface {
 	//```
 	DeleteTeam(ctx context.Context, in *request.DeleteTeamReq, opts ...grpc.CallOption) (*response.DeleteTeamResp, error)
 	//
-	//Get local team membership
+	//Gets local team membership
 	//
 	//Lists all users of a local team. Users are listed by their membership_id.
 	//
@@ -178,9 +178,9 @@ type TeamsClient interface {
 	//```
 	GetTeamMembership(ctx context.Context, in *request.GetTeamMembershipReq, opts ...grpc.CallOption) (*response.GetTeamMembershipResp, error)
 	//
-	//Add local team membership
+	//Adds local team membership
 	//
-	//Add a list of users to a local team. Users are added by their membership_id.
+	//Adds a list of users to a local team. Users are added by their membership_id.
 	//The request will ignore any members that do not exist.
 	//
 	//Authorization Action:
@@ -189,9 +189,9 @@ type TeamsClient interface {
 	//```
 	AddTeamMembers(ctx context.Context, in *request.AddTeamMembersReq, opts ...grpc.CallOption) (*response.AddTeamMembersResp, error)
 	//
-	//Remove local team membership
+	//Removes local team membership
 	//
-	//Remove a list of users from a local team. Users are removed by their membership_id.
+	//Removes a list of users from a local team. Users are removed by their membership_id.
 	//The request will ignore any members that were not on the team or do not exist.
 	//
 	//Authorization Action:
@@ -200,7 +200,7 @@ type TeamsClient interface {
 	//```
 	RemoveTeamMembers(ctx context.Context, in *request.RemoveTeamMembersReq, opts ...grpc.CallOption) (*response.RemoveTeamMembersResp, error)
 	//
-	//Get team membership for a user
+	//Gets team membership for a user
 	//
 	//Lists all local teams for a specific user. You must use their membership_id in the request URL.
 	//
@@ -327,9 +327,9 @@ func (c *teamsClient) ResetAllTeamProjects(ctx context.Context, in *request.Rese
 // TeamsServer is the server API for Teams service.
 type TeamsServer interface {
 	//
-	//Create a local team
+	//Creates a local team
 	//
-	//Creates a local team, used to group local users as members of IAM policies.
+	//Creates a local team that is used to group local users as members of IAM policies.
 	//
 	//Authorization Action:
 	//```
@@ -337,9 +337,9 @@ type TeamsServer interface {
 	//```
 	CreateTeam(context.Context, *request.CreateTeamReq) (*response.CreateTeamResp, error)
 	//
-	//List all local teams
+	//Lists all local teams
 	//
-	//List all local teams.
+	//Lists all local teams.
 	//
 	//Authorization Action:
 	//```
@@ -357,9 +357,9 @@ type TeamsServer interface {
 	//```
 	GetTeam(context.Context, *request.GetTeamReq) (*response.GetTeamResp, error)
 	//
-	//Update a local team
+	//Updates a local team
 	//
-	//Update a local team.
+	//Updates a local team.
 	//
 	//Authorization Action:
 	//```
@@ -367,9 +367,9 @@ type TeamsServer interface {
 	//```
 	UpdateTeam(context.Context, *request.UpdateTeamReq) (*response.UpdateTeamResp, error)
 	//
-	//Delete a local team
+	//Deletes a local team
 	//
-	//Delete a local team and remove it from any policies.
+	//Deletes a local team and remove it from any policies.
 	//
 	//Authorization Action:
 	//```
@@ -377,7 +377,7 @@ type TeamsServer interface {
 	//```
 	DeleteTeam(context.Context, *request.DeleteTeamReq) (*response.DeleteTeamResp, error)
 	//
-	//Get local team membership
+	//Gets local team membership
 	//
 	//Lists all users of a local team. Users are listed by their membership_id.
 	//
@@ -387,9 +387,9 @@ type TeamsServer interface {
 	//```
 	GetTeamMembership(context.Context, *request.GetTeamMembershipReq) (*response.GetTeamMembershipResp, error)
 	//
-	//Add local team membership
+	//Adds local team membership
 	//
-	//Add a list of users to a local team. Users are added by their membership_id.
+	//Adds a list of users to a local team. Users are added by their membership_id.
 	//The request will ignore any members that do not exist.
 	//
 	//Authorization Action:
@@ -398,9 +398,9 @@ type TeamsServer interface {
 	//```
 	AddTeamMembers(context.Context, *request.AddTeamMembersReq) (*response.AddTeamMembersResp, error)
 	//
-	//Remove local team membership
+	//Removes local team membership
 	//
-	//Remove a list of users from a local team. Users are removed by their membership_id.
+	//Removes a list of users from a local team. Users are removed by their membership_id.
 	//The request will ignore any members that were not on the team or do not exist.
 	//
 	//Authorization Action:
@@ -409,7 +409,7 @@ type TeamsServer interface {
 	//```
 	RemoveTeamMembers(context.Context, *request.RemoveTeamMembersReq) (*response.RemoveTeamMembersResp, error)
 	//
-	//Get team membership for a user
+	//Gets team membership for a user
 	//
 	//Lists all local teams for a specific user. You must use their membership_id in the request URL.
 	//

@@ -13,7 +13,7 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Teams {
   /*
-  Create a local team
+  Creates a local team
 
   Creates a local team that is used to group local users as members of IAM policies.
 
@@ -60,9 +60,9 @@ service Teams {
   };
 
   /*
-  List all local teams
+  Lists all local teams
 
-  List all local teams.
+  Lists all local teams.
 
   Authorization Action:
   ```
@@ -106,9 +106,9 @@ service Teams {
   };
 
   /*
-  Update a local team
+  Updates a local team
 
-  Update a local team.
+  Updates a local team.
 
   Authorization Action:
   ```
@@ -153,9 +153,9 @@ service Teams {
   };
 
   /*
-  Delete a local team
+  Deletes a local team
 
-  Delete a local team and remove it from any policies.
+  Deletes a local team and remove it from any policies.
 
   Authorization Action:
   ```
@@ -176,7 +176,7 @@ service Teams {
   };
 
   /*
-  Get local team membership
+  Gets local team membership
 
   Lists all users of a local team. Users are listed by their membership_id.
 
@@ -199,9 +199,9 @@ service Teams {
   };
 
   /*
-  Add local team membership
+  Adds local team membership
 
-  Add a list of users to a local team. Users are added by their membership_id.
+  Adds a list of users to a local team. Users are added by their membership_id.
   The request will ignore any members that do not exist.
 
   Authorization Action:
@@ -247,9 +247,9 @@ service Teams {
   };
 
   /*
-  Remove local team membership
+  Removes local team membership
 
-  Remove a list of users from a local team. Users are removed by their membership_id.
+  Removes a list of users from a local team. Users are removed by their membership_id.
   The request will ignore any members that were not on the team or do not exist.
 
   Authorization Action:
@@ -295,7 +295,7 @@ service Teams {
   };
 
   /*
-  Get team membership for a user
+  Gets team membership for a user
 
   Lists all local teams for a specific user. You must use their membership_id in the request URL.
 
