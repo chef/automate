@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/golang/protobuf/jsonpb"
-	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	ingestinspec "github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"

@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"gopkg.in/cheggaaa/pb.v1"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/components/automate-deployment/pkg/assets"
 	"github.com/chef/automate/components/automate-deployment/pkg/cli"

@@ -390,8 +390,10 @@ type ConfigureMissingNodesForDeletionScheduler struct {
 func (m *ConfigureMissingNodesForDeletionScheduler) Reset() {
 	*m = ConfigureMissingNodesForDeletionScheduler{}
 }
-func (m *ConfigureMissingNodesForDeletionScheduler) String() string { return proto.CompactTextString(m) }
-func (*ConfigureMissingNodesForDeletionScheduler) ProtoMessage()    {}
+func (m *ConfigureMissingNodesForDeletionScheduler) String() string {
+	return proto.CompactTextString(m)
+}
+func (*ConfigureMissingNodesForDeletionScheduler) ProtoMessage() {}
 func (*ConfigureMissingNodesForDeletionScheduler) Descriptor() ([]byte, []int) {
 	return fileDescriptor_508c2e89803f2db0, []int{9}
 }

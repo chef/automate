@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/interservice/compliance/stats"
 	"github.com/chef/automate/lib/errorutils"

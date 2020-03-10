@@ -15,10 +15,10 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 	"github.com/spf13/viper"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/api/interservice/data_lifecycle"

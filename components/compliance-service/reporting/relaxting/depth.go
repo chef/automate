@@ -3,9 +3,9 @@ package relaxting
 import (
 	"encoding/json"
 
-	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	"github.com/chef/automate/api/interservice/compliance/ingest/events/inspec"
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"

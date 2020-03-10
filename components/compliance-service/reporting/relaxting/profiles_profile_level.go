@@ -1,11 +1,12 @@
 package relaxting
 
 import (
+	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
+
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/components/compliance-service/reporting"
 	"github.com/chef/automate/lib/stringutils"
-	"github.com/olivere/elastic"
-	"github.com/sirupsen/logrus"
 )
 
 //todo - this looks very close to the report depth version of it.. double check and if so lets' harmonize them
@@ -44,7 +45,7 @@ func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 		totalsAgg, _ := aggRoot.Terms("totals")
 		if totalsAgg != nil {
 			for _, bucket := range totalsAgg.Buckets {
-				profileName, profileId := rightSplit(string(bucket.KeyNumber), "|") // bucket.KeyNumber
+				profileName, profileId := rightSplit(bucket.Key.(string), "|")
 
 				if profilesFilterArray, found := filters["profile_id"]; found {
 					if !stringutils.SliceContains(profilesFilterArray, profileId) {

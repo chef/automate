@@ -6,9 +6,10 @@ package mock_notifier
 
 import (
 	context "context"
+	reflect "reflect"
+
 	api "github.com/chef/automate/components/notifications-client/api"
 	gomock "github.com/golang/mock/gomock"
-	reflect "reflect"
 )
 
 // MockNotifier is a mock of Notifier interface

@@ -10,7 +10,7 @@ import (
 
 	"github.com/chef/automate/components/ingest-service/backend"
 	"github.com/chef/automate/components/ingest-service/backend/elastic/mappings"
-	"github.com/olivere/elastic"
+	elastic "gopkg.in/olivere/elastic.v6"
 )
 
 // InsertRun inserts a Chef Client Run into converge-history-YYYY.MM.DD index

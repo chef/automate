@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/olivere/elastic"
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	statusserver "github.com/chef/automate/components/compliance-service/api/status/server"

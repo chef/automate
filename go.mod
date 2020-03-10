@@ -80,7 +80,7 @@ require (
 	github.com/nats-io/nats-streaming-server v0.17.0
 	github.com/nats-io/nats.go v1.9.1
 	github.com/nats-io/stan.go v0.6.0
-	github.com/olivere/elastic v6.2.16+incompatible
+	github.com/olivere/elastic v6.2.16+incompatible // indirect
 	github.com/open-policy-agent/opa v0.14.2
 	github.com/opencontainers/go-digest v1.0.0-rc1 // indirect
 	github.com/opentracing/opentracing-go v1.0.2
@@ -128,6 +128,7 @@ require (
 	gopkg.in/asn1-ber.v1 v1.0.0-20170511165959-379148ca0225 // indirect
 	gopkg.in/cheggaaa/pb.v1 v1.0.20
 	gopkg.in/ldap.v2 v2.5.1 // indirect
+	gopkg.in/olivere/elastic.v6 v6.2.28
 	gopkg.in/segmentio/analytics-go.v3 v3.0.1
 	gopkg.in/square/go-jose.v2 v2.1.3
 	gopkg.in/yaml.v2 v2.2.5

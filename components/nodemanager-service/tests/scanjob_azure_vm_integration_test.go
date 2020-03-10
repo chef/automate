@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
-	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/api/interservice/compliance/reporting"
+	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/components/nodemanager-service/tests/mgrtesthelpers"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"

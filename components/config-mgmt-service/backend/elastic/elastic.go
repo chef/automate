@@ -12,7 +12,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/olivere/elastic"
+	elastic "gopkg.in/olivere/elastic.v6"
 
 	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/config-mgmt-service/backend"
@@ -61,7 +61,8 @@ func New(url string) *Backend {
 	esClient, err := elastic.NewClient(
 		// In the future we will need to create a custom http.Client to pass headers.
 		// => (ent? user? token?)
-		//elastic.SetHttpClient(httpClient),
+		// elastic.SetHttpClient(httpClient),
+		// elastic.SetTraceLog(log.New(os.Stdout, "olivere: ", log.Lshortfile)),
 		elastic.SetURL(es.Url),
 		elastic.SetSniff(false),
 	)

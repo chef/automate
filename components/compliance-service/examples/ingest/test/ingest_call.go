@@ -11,9 +11,9 @@ import (
 	"github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 
+	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 	"github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	"github.com/chef/automate/components/compliance-service/examples/helpers"
-	"github.com/chef/automate/api/interservice/compliance/ingest/events/compliance"
 )
 
 func SendReportToGRPC(file string, threadCount int, reportsPerThread int) error {

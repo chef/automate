@@ -1,11 +1,12 @@
 package relaxting
 
 import (
+	"github.com/sirupsen/logrus"
+	elastic "gopkg.in/olivere/elastic.v6"
+
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
 	"github.com/chef/automate/api/interservice/compliance/stats"
 	"github.com/chef/automate/components/compliance-service/reporting"
-	"github.com/olivere/elastic"
-	"github.com/sirupsen/logrus"
 )
 
 //todo - refactor this to call ControlDepth::getControlListStatsByProfileIdResults and adjust.
@@ -93,13 +94,11 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 					len(profileInfoResult.Buckets) > 0 {
 
 					profileInfoBucket := profileInfoResult.Buckets[0]
-					name := profileInfoBucket.KeyNumber
-					summary.Name = string(name)
+					summary.Name = profileInfoBucket.Key.(string)
 
 					if profileShaResult, found := profileInfoBucket.Terms("sha"); found &&
 						len(profileShaResult.Buckets) > 0 {
-						sha := profileShaResult.Buckets[0].KeyNumber
-						summary.Id = string(sha)
+						summary.Id = profileShaResult.Buckets[0].Key.(string)
 					}
 				}
 			}
