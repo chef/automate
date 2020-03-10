@@ -34,7 +34,7 @@ func TestNodeExists(t *testing.T) {
 func TestGetNodesCounts(t *testing.T) {
 	expected := *new(backend.NodesCounts)
 	filterMap := make(map[string][]string)
-	nodeState, err := subject.New().GetNodesCounts(filterMap)
+	nodeState, err := subject.New().GetNodesCounts(filterMap, "", "")
 	assert.Nil(t, err)
 	assert.Equal(t, nodeState, expected)
 }

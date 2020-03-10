@@ -9,6 +9,7 @@ import (
 	"context"
 	"fmt"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc/codes"
@@ -100,6 +101,81 @@ func TestStatsNodesCountsWithTwoNodes(t *testing.T) {
 	// Assert the results
 	assert.Nil(t, err)
 	assert.Equal(t, expected, res)
+}
+
+func TestStatsNodesCountsWithTwoNodesDateFilter(t *testing.T) {
+	// Generate the objects you want to ingest
+	nodes := []iBackend.Node{
+		{
+			Checkin: time.Now().Add(-time.Hour * 24 * 3),
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid:       newUUID(),
+				Status:           "success",
+				NodeName:         "node1",
+				OrganizationName: "org1",
+				Environment:      "env1",
+			},
+			Exists: true,
+		},
+		{
+			Checkin: time.Now().Add(-time.Hour),
+			NodeInfo: iBackend.NodeInfo{
+				EntityUuid:       newUUID(),
+				Status:           "failure",
+				NodeName:         "node2",
+				OrganizationName: "org1",
+				Environment:      "env1",
+			},
+			Exists: true,
+		},
+	}
+
+	// Ingest the nodes, this will automatically refresh the indexes
+	suite.IngestNodes(nodes)
+
+	defer suite.DeleteAllDocuments()
+
+	ctx := context.Background()
+
+	cases := []struct {
+		description      string
+		request          *request.NodesCounts
+		expectedResponse *response.NodesCounts
+	}{
+		{
+			description: "The last 24 hours, only include the missing node",
+			request: &request.NodesCounts{
+				Start: time.Now().Add(-time.Hour * 24).Format(time.RFC3339),
+				End:   time.Now().Format(time.RFC3339),
+			},
+			expectedResponse: &response.NodesCounts{
+				Total:   1,
+				Failure: 1,
+				Success: 0,
+			},
+		},
+		{
+			description: "The last 4 days, includes both nodes",
+			request: &request.NodesCounts{
+				Start: time.Now().Add(-time.Hour * 24 * 4).Format(time.RFC3339),
+				End:   time.Now().Format(time.RFC3339),
+			},
+			expectedResponse: &response.NodesCounts{
+				Total:   2,
+				Failure: 1,
+				Success: 1,
+			},
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(fmt.Sprintf("description: %s", testCase.description), func(t *testing.T) {
+			res, err := cfgmgmt.GetNodesCounts(ctx, testCase.request)
+
+			assert.Nil(t, err)
+			assert.Equal(t, testCase.expectedResponse, res)
+		})
+	}
 }
 
 // A more complex test that requires data ingestion
