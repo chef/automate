@@ -162,57 +162,71 @@ func (s *ChefIngestServer) ProcessMultipleNodeDeletes(ctx context.Context,
 // ProcessNodeDelete send a delete action threw the action pipeline
 func (s *ChefIngestServer) ProcessNodeDelete(ctx context.Context,
 	delete *chef.Delete) (*response.ProcessNodeDeleteResponse, error) {
+	var (
+		nodeIDs []string
+		err     error
+	)
 	log.WithFields(log.Fields{"func": nameOfFunc()}).Debug("rpc call")
 
-	// Must have NodeId OR all three of the other three fields
 	if delete.GetNodeId() != "" {
-		_, err := s.client.DeleteNodeByID(ctx, delete.GetNodeId())
+		filters := map[string]string{
+			"entity_uuid": delete.GetNodeId(),
+		}
+		nodeIDs, err = s.client.FindNodeIDsByFields(ctx, filters)
 		if err != nil {
 			return &response.ProcessNodeDeleteResponse{}, err
 		}
-
-		_, err = s.nodesClient.Delete(ctx, &nodes.Id{Id: delete.GetNodeId()})
-
-		return &response.ProcessNodeDeleteResponse{}, err
 	} else if delete.GetOrganizationName() != "" &&
 		delete.GetServiceHostname() != "" &&
 		delete.GetNodeName() != "" {
-
 		filters := map[string]string{
 			"organization_name": delete.GetOrganizationName(),
 			"node_name":         delete.GetNodeName(),
 			"source_fqdn":       delete.GetServiceHostname(),
 		}
-		nodeIDs, err := s.client.FindNodeIDsByFields(ctx, filters)
+		nodeIDs, err = s.client.FindNodeIDsByFields(ctx, filters)
 		if err != nil {
 			return &response.ProcessNodeDeleteResponse{}, err
 		}
+	} else {
+		errMsg := "Unknown NodeName, OrganizationName and RemoteHostname, or NodeId"
+		log.WithFields(log.Fields{
+			"message_type": "delete",
+			"error":        errMsg,
+		}).Error("not processing")
 
-		if len(nodeIDs) == 0 {
-			return &response.ProcessNodeDeleteResponse{}, nil
-		}
+		return &response.ProcessNodeDeleteResponse{}, status.Errorf(codes.InvalidArgument, "Missing one or more necessary fields. %s", errMsg)
+	}
 
-		_, err = s.client.MarkForDeleteMultipleNodesByID(ctx, nodeIDs)
-		if err != nil {
-			return &response.ProcessNodeDeleteResponse{}, err
-		}
-
-		for _, nodeID := range nodeIDs {
-			_, err = s.nodesClient.Delete(ctx, &nodes.Id{Id: nodeID})
-			if err != nil {
-				return &response.ProcessNodeDeleteResponse{}, err
-			}
-		}
+	if len(nodeIDs) == 0 {
 		return &response.ProcessNodeDeleteResponse{}, nil
 	}
 
-	errMsg := "Unknown NodeName, OrganizationName and RemoteHostname, or NodeId"
-	log.WithFields(log.Fields{
-		"message_type": "delete",
-		"error":        errMsg,
-	}).Error("not processing")
+	for _, nodeID := range nodeIDs {
+		action := chef.Action{
+			Id:               delete.GetId(),
+			EntityName:       delete.GetNodeName(),
+			OrganizationName: delete.GetOrganizationName(),
+			ServiceHostname:  delete.GetServiceHostname(),
+			NodeId:           delete.GetNodeId(),
+			MessageType:      "action",
+			Task:             "delete",
+			EntityType:       "node",
+			RecordedAt:       time.Now().Format(time.RFC3339),
+		}
 
-	return &response.ProcessNodeDeleteResponse{}, status.Errorf(codes.InvalidArgument, "Missing one or more necessary fields. %s", errMsg)
+		_, err := s.ProcessChefAction(ctx, &action)
+		if err != nil {
+			return &response.ProcessNodeDeleteResponse{}, err
+		}
+
+		_, err = s.nodesClient.Delete(ctx, &nodes.Id{Id: nodeID})
+		if err != nil {
+			return &response.ProcessNodeDeleteResponse{}, err
+		}
+	}
+
+	return &response.ProcessNodeDeleteResponse{}, nil
 }
 
 // GetVersion returns the service version
