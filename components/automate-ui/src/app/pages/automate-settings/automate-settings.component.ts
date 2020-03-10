@@ -293,29 +293,24 @@ export class AutomateSettingsComponent implements OnInit {
     console.log('jobScheduleStatus');
     console.log(jobSchedulerStatus);
 
-    // Object.entries(jobSchedulerStatus).forEach(([key, value]) => {
-    //   console.log(key);
-    //   console.log(value);
+    Object.entries(jobSchedulerStatus).forEach(([key, value]) => {
+      console.log(key);
+      console.log(value);
 
-    //   switch (key) {
-    //     case 'event_feed' {
-    //       this.eventFeedForm = this.fb.group({
-    //         disabled: this.fb.group({
-    //           feedData: false,
-    //           serverActions: false
-    //         }),
-    //         feedData: this.fb.group({
-    //           threshold: { value: 30, disabled: false },
-    //           unit: { value: 'd', disabled: false }
-    //         }),
-    //         serverActions: this.fb.group({
-    //           threshold: { value: 30, disabled: false },
-    //           unit: { value: 'd', disabled: false }
-    //         })
-    //       });
-    //     }
-    //   }
-    // })
+      // key is the category, i.e. infra, compliance, etc.
+      switch (key) {
+        case 'infra':
+          break;
+        case 'compliance':
+          // this.complianceDataForm = this.fb.group(<form here>);
+          break;
+        case 'event_feed':
+          break;
+        case 'services':
+          break;
+      }
+
+    });
 
     // jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
     //   const [threshold, unit] = this.splitThreshold(job.threshold);

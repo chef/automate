@@ -13,7 +13,6 @@ import {
 } from './automate-settings.model';
 
 import { environment } from '../../../environments/environment';
-import { jobSchedulerStatus } from './automate-settings.selectors';
 
 const RETENTION_URL = environment.retention_url;
 
