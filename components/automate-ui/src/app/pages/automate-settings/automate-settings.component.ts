@@ -26,33 +26,6 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 })
 
 export class AutomateSettingsComponent implements OnInit {
-  private defaultFormData = {
-    eventFeed: {
-      unit: 'd',
-      threshold: '3',
-      disable: false
-    },
-    clientRuns: {
-      unit: 'd',
-      threshold: '',
-      disable: false
-    },
-    complianceData: {
-      unit: 'd',
-      threshold: '',
-      disable: false
-    },
-    missingNodes: {
-      unit: 'd',
-      threshold: '',
-      disable: false
-    },
-    deleteMissingNodes: {
-      unit: 'd',
-      threshold: '',
-      disable: false
-    }
-  };
 
   private defaultFormData2 = {
     eventFeedRemoveData: {
@@ -61,43 +34,43 @@ export class AutomateSettingsComponent implements OnInit {
       disabled: false
     },
     eventFeedServerActions: {
-      unit: 'd',
-      threshold: '30',
+      unit: { value: 'd', disabled: false },
+      threshold: { value: '30', disabled: false },
       disabled: false
     },
     serviceGroupNoHealthChecks: {
-      unit: 'm',
-      threshold: '5',
+      unit: { value: 'm', disabled: true },
+      threshold: { value: '5', disabled: true },
       disabled: true
     },
     serviceGroupRemoveServices: {
-      unit: 'd',
-      threshold: '5',
+      unit: { value: 'd', disabled: false },
+      threshold: { value: '5', disabled: false },
       disabled: false
     },
     clientRunsRemoveData: {
-      unit: 'd',
-      threshold: '30',
+      unit: { value: 'd', disabled: false },
+      threshold: { value: '30', disabled: false },
       disabled: false
     },
     clientRunsLabelMissing: {
-      unit: 'd',
-      threshold: '30',
+      unit: { value: 'd', disabled: false },
+      threshold: { value: '30', disabled: false },
       disabled: false
     },
     clientRunsRemoveNodes: {
-      unit: 'd',
-      threshold: '30',
+      unit: { value: 'd', disabled: false },
+      threshold: { value: '30', disabled: false },
       disabled: false
     },
     complianceRemoveReports: {
-      unit: 'd',
-      threshold: '30',
+      unit: { value: 'd', disabled: false },
+      threshold: { value: '30', disabled: false },
       disabled: false
     },
     complianceRemoveScans: {
-      unit: 'd',
-      threshold: '30',
+      unit: { value: 'd', disabled: false },
+      threshold: { value: '30', disabled: false },
       disabled: false
     }
   };
@@ -158,22 +131,7 @@ export class AutomateSettingsComponent implements OnInit {
 
 
 
-    // this.eventFeedForm = this.fb.group({
-    //   disabled: this.fb.group({
-    //     feedData: false,
-    //     serverActions: false
-    //   }),
-    //   feedData: this.fb.group({
-    //     threshold: {value: 30, disabled: false},
-    //     unit: {value: 'd', disabled: false}
-    //   }),
-    //   serverActions: this.fb.group({
-    //     threshold: { value: 30, disabled: false },
-    //     unit: { value: 'd', disabled: false }
-    //   })
-    // });
-
-
+    // Put the whole form together
     this.automateSettingsForm = this.fb.group({
       // Event Feed
       eventFeedRemoveData: this.eventFeedRemoveData,
@@ -336,34 +294,14 @@ export class AutomateSettingsComponent implements OnInit {
         }
         break;
 
+        case 'compliance': {
+          this.populateCompliance(job);
+        }
+        break;
+
         default:
           break;
       }
-
-      // const [threshold, unit] = this.splitThreshold(job.threshold);
-      // const form = {
-      //   disable: !job.disabled,
-      //   threshold: threshold,
-      //   unit: unit
-      // };
-
-      // switch (job.name) {
-      //   case IngestJobs.MissingNodes: {
-      //     this.missingNodesForm = this.fb.group(form);
-      //     break;
-      //   }
-      //   case IngestJobs.MissingNodesForDeletion: {
-      //     this.deleteMissingNodesForm = this.fb.group(form);
-      //     break;
-      //   }
-      //   // TODO @afiune missing forms to add, at the moment we can't modify
-      //   // this parameter/settings since the services take it at startup.
-      //   // (we need to change that first)
-      //   //
-      //   // this.clientRunsForm = this.fb.group(form);
-      //   // this.complianceDataForm = this.fb.group(form);
-      //   // this.eventFeedForm = this.fb.group(form);
-      // } // END SWITCH STATEMENT
 
     });
 
@@ -408,34 +346,37 @@ export class AutomateSettingsComponent implements OnInit {
 
     switch (job.name) {
       case 'missing_nodes': {
-        const [formUnit, formThreshold] = this.splitThreshold(job.threshold);
+        this.handleDisable(this.clientRunsRemoveData);
+        const [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.clientRunsRemoveData.patchValue({
-          unit: {value: formUnit, disabled: job.disabled},
-          threshold: { value: formThreshold, disabled: job.disabled },
+          unit: formUnit.toString(),
+          threshold: formThreshold.toString(),
           disabled: job.disabled
         });
       }
       break;
 
       case 'missing_nodes_for_deletion': {
-        const [formUnit, formThreshold] = this.splitThreshold(job.threshold);
+        this.handleDisable(this.clientRunsLabelMissing);
+        const [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.clientRunsLabelMissing.patchValue({
-          unit: { value: formUnit, disabled: job.disabled },
-          threshold: { value: formThreshold, disabled: job.disabled },
+          unit: formUnit.toString(),
+          threshold: formThreshold.toString(),
           disabled: job.disabled
         });
       }
       break;
 
       case 'delete_nodes': {
-        console.log('delete_nodes');
+        console.log('delete_nodes not implemented');
       }
       break;
 
       case 'periodic_purge_timeseries': {
         const formValues = job.purge_policies.elasticsearch;
+        this.handleDisable(this.clientRunsRemoveNodes, formValues[1].disabled);
         this.clientRunsRemoveNodes.patchValue({
-          threshold: {value: formValues[1].older_than_days.toString(), disabled: formValues[1].disabled},
+          threshold: formValues[1].older_than_days.toString(),
           disabled: formValues[1].disabled
         });
       }
@@ -444,6 +385,48 @@ export class AutomateSettingsComponent implements OnInit {
       default:
         break;
     }
+  }
+
+  private populateCompliance(job: IngestJob): void {
+    const _jobs = job.purge_policies.elasticsearch;
+
+    _jobs.forEach(_job => {
+      const form = {
+        threshold: _job.older_than_days,
+        disabled: _job.disabled
+      }
+
+      switch (_job.name) {
+
+        case 'compliance-reports': {
+          this.handleDisable(this.complianceRemoveReports, _job.disabled);
+          this.complianceRemoveReports.patchValue(form);
+        }
+        break;
+
+        case 'compliance-scans': {
+          this.handleDisable(this.complianceRemoveScans, _job.disabled);
+          this.complianceRemoveScans.patchValue(form);
+        }
+        break;
+
+        default:
+          break;
+      }
+    });
+
+
+  }
+
+  private handleDisable(form, disabled: boolean = false): void {
+    if ( form.disabled || disabled ) {
+      // this loops through the rest of the form to disable it
+      const pertinentGroups = ['unit', 'threshold'];
+      pertinentGroups.forEach(control => {
+          form.get(control).disable();
+      });
+    }
+    return;
   }
 
 }
