@@ -295,25 +295,24 @@ export class AutomateSettingsComponent implements OnInit {
 
     // NOTE: THIS MAY NEED TO BE CONVERTED BACK TO EACH LINE HAVING ITS OWN FORM INSTEAD OF GROUPED
     // FOLLOW UP WITH SUSAN ABOUT THE PROPER MAPPING
-    
-    Object.entries(jobSchedulerStatus).forEach(([ key , value ]) => {
+
+    Object.entries(jobSchedulerStatus).forEach(([ key, value ]) => {
       // key is the category, i.e. infra, compliance, etc.
       if (value) {
-        value.forEach((job: IngestJob) => {
 
           switch (key) {
             case 'infra': {
-              console.log('infra');
+              this.clientRunsForm = this.buildClientRunsForm(value);
             }
             break;
 
             case 'compliance': {
-              this.complianceDataForm = this.buildComplianceForm(job);
+              this.complianceDataForm = this.buildComplianceForm(value);
             }
             break;
 
             case 'event_feed': {
-              this.eventFeedForm = this.buildEventFeedForm(job);
+              // this.eventFeedForm = this.buildEventFeedForm(job);
             }
             break;
 
@@ -326,7 +325,7 @@ export class AutomateSettingsComponent implements OnInit {
               break;
 
           }
-        }); // end value.forEach
+
       }
 
       }); // end object.entries
@@ -408,9 +407,56 @@ export class AutomateSettingsComponent implements OnInit {
     });
   }
 
-  private buildComplianceForm(job: IngestJob) {
-    const reports = job.purge_policies.elasticsearch[0];
-    const scans = job.purge_policies.elasticsearch[1];
+  private buildClientRunsForm(jobs: IngestJob[]) {
+    console.log(jobs);
+    const removeData = jobs[0]; // missing_nodes
+
+    const labelMissing = jobs[1]; // missing_nodes_for_deletion
+    const [ labelMissingThreshold, labelMissingUnit ] = this.splitThreshold(labelMissing.threshold);
+
+    const removeMissing = jobs[3].purge_policies.elasticsearch[1]; // converge-history
+
+
+    return this.fb.group({
+      disabled: this.fb.group({
+        removeData: removeData.disabled,
+        labelMissing: labelMissing.disabled,
+        removeMissing: removeMissing.disabled
+      }),
+      removeData: this.fb.group({
+        threshold: {
+          value: removeData.threshold,
+          disabled: removeData.disabled
+        }
+      }),
+      labelMissing: this.fb.group({
+        threshold: {
+          value: labelMissingThreshold,
+          disabled: labelMissing.disabled
+        },
+        unit: {
+          value: labelMissingUnit,
+          disabled: labelMissing.disabled
+        }
+      }),
+      removeMissing: this.fb.group({
+        threshold: {
+          value: removeMissing.older_than_days,
+          disabled: removeMissing.disabled
+        },
+        unit: {
+        value: 'd',
+        disabled: removeMissing.disabled
+       }
+      })
+    });
+  } // end buildClient form
+
+  private buildComplianceForm(jobs: IngestJob[]) {
+    const reports = jobs[0].purge_policies.elasticsearch[0];
+    const scans = jobs[0].purge_policies.elasticsearch[1];
+
+
     return this.fb.group({
       disabled: this.fb.group({
         reports: reports.disabled,
@@ -429,6 +475,7 @@ export class AutomateSettingsComponent implements OnInit {
         }
       })
     });
-  }
+  } // end buildform
+
 
 }

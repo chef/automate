@@ -41,7 +41,6 @@ export interface RespJob {
   last_ended_at?: Date;
 }
 
-// Note: Can I nest an interface?
 export interface RespJobSchedulerStatus {
   infra: {
     jobs: RespJob[];
@@ -60,6 +59,8 @@ export interface RespJobSchedulerStatus {
 // IngestJobs is an enum that defines the list of jobs that the
 // JobScheduler has inside the ingest-service
 export enum IngestJobs {
+
+  // ***************** NEEDS UPDATE TO MATCH NEW JOB SCHEDULER ***************** //
 
   // INFRA //
   // DeleteNodes: Removes completely from elasticsearch nodes that
