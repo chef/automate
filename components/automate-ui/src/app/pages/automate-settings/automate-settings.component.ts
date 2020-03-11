@@ -251,7 +251,7 @@ export class AutomateSettingsComponent implements OnInit {
       IngestJobs.MissingNodesForDeletion
     ].map(jobName => {
       const jobForm = this.getJobForm(jobName);
-      const job = new IngestJob(null);
+      const job = new IngestJob(null, null);
       job.name = jobName;
       job.disabled = !jobForm.disable;
       job.threshold = jobForm.threshold + jobForm.unit;
@@ -328,32 +328,44 @@ export class AutomateSettingsComponent implements OnInit {
     console.log('jobScheduleStatus');
     console.log(jobSchedulerStatus);
 
-    // jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
-    //   const [threshold, unit] = this.splitThreshold(job.threshold);
-    //   const form = {
-    //     disable: !job.disabled,
-    //     threshold: threshold,
-    //     unit: unit
-    //   };
+    jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
 
-    //   switch (job.name) {
-    //     case IngestJobs.MissingNodes: {
-    //       this.missingNodesForm = this.fb.group(form);
-    //       break;
-    //     }
-    //     case IngestJobs.MissingNodesForDeletion: {
-    //       this.deleteMissingNodesForm = this.fb.group(form);
-    //       break;
-    //     }
-    //     // TODO @afiune missing forms to add, at the moment we can't modify
-    //     // this parameter/settings since the services take it at startup.
-    //     // (we need to change that first)
-    //     //
-    //     // this.clientRunsForm = this.fb.group(form);
-    //     // this.complianceDataForm = this.fb.group(form);
-    //     // this.eventFeedForm = this.fb.group(form);
-    //   }
-    // });
+      switch (job.category) {
+        case 'infra': {
+          this.populateInfra(job);
+        }
+        break;
+
+        default:
+          break;
+      }
+
+      // const [threshold, unit] = this.splitThreshold(job.threshold);
+      // const form = {
+      //   disable: !job.disabled,
+      //   threshold: threshold,
+      //   unit: unit
+      // };
+
+      // switch (job.name) {
+      //   case IngestJobs.MissingNodes: {
+      //     this.missingNodesForm = this.fb.group(form);
+      //     break;
+      //   }
+      //   case IngestJobs.MissingNodesForDeletion: {
+      //     this.deleteMissingNodesForm = this.fb.group(form);
+      //     break;
+      //   }
+      //   // TODO @afiune missing forms to add, at the moment we can't modify
+      //   // this parameter/settings since the services take it at startup.
+      //   // (we need to change that first)
+      //   //
+      //   // this.clientRunsForm = this.fb.group(form);
+      //   // this.complianceDataForm = this.fb.group(form);
+      //   // this.eventFeedForm = this.fb.group(form);
+      // } // END SWITCH STATEMENT
+
+    });
 
     this.automateSettingsForm = this.fb.group({
       // Event Feed
@@ -390,6 +402,48 @@ export class AutomateSettingsComponent implements OnInit {
       threshold.slice(0, threshold.length - 1),
       threshold.slice(-1)
     ];
+  }
+
+  private populateInfra(job: IngestJob): void {
+
+    switch (job.name) {
+      case 'missing_nodes': {
+        const [formUnit, formThreshold] = this.splitThreshold(job.threshold);
+        this.clientRunsRemoveData.patchValue({
+          unit: {value: formUnit, disabled: job.disabled},
+          threshold: { value: formThreshold, disabled: job.disabled },
+          disabled: job.disabled
+        });
+      }
+      break;
+
+      case 'missing_nodes_for_deletion': {
+        const [formUnit, formThreshold] = this.splitThreshold(job.threshold);
+        this.clientRunsLabelMissing.patchValue({
+          unit: { value: formUnit, disabled: job.disabled },
+          threshold: { value: formThreshold, disabled: job.disabled },
+          disabled: job.disabled
+        });
+      }
+      break;
+
+      case 'delete_nodes': {
+        console.log('delete_nodes');
+      }
+      break;
+
+      case 'periodic_purge_timeseries': {
+        const formValues = job.purge_policies.elasticsearch;
+        this.clientRunsRemoveNodes.patchValue({
+          threshold: {value: formValues[1].older_than_days.toString(), disabled: formValues[1].disabled},
+          disabled: formValues[1].disabled
+        });
+      }
+      break;
+
+      default:
+        break;
+    }
   }
 
 }

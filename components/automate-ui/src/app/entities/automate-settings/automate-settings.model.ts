@@ -5,6 +5,7 @@ export class JobSchedulerStatus {
     this.jobs = ingestJobs;
   }
 
+  // Will need to add category as an argument as well
   getJob(name: string): IngestJob {
     return this.jobs.find((job: IngestJob) => job.name === name);
   }
