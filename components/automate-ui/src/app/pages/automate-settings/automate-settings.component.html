@@ -21,37 +21,37 @@
           <chef-button secondary [disabled]="noChanges()" (click)="testPrintValues()">Print Values</chef-button>
         </div>
 
-        <div class="group-section" [formGroup]="eventFeedForm">
+        <div class="group-section">
           <h2>Event Feed</h2>
-          <div class="checkbox-row" formGroupName="feedData">
+          <div class="checkbox-row" [formGroup]="eventFeedRemoveData">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!eventFeedForm.controls.disabled.controls.feedData.value"
-              (change)="toggleInput(eventFeedForm, 'feedData', $event.detail)">
+              [checked]="!eventFeedRemoveData.disabled"
+              (change)="toggleInput(eventFeedRemoveData, $event.detail)">
             </chef-checkbox>
             </div>
               <p>Remove event feed data after
                 <input chefInput type="number" formControlName="threshold" />days</p>
           </div>
 
-          <div class="checkbox-row" formGroupName="serverActions">
+          <div class="checkbox-row" [formGroup]="eventFeedServerActions">
             <div class="checkbox-container">
               <chef-checkbox
-                [checked]="!eventFeedForm.controls.disabled.controls.serverActions.value"
-                (change)="toggleInput(eventFeedForm, 'serverActions', $event.detail)">
+                [checked]="!eventFeedServerActions.disabled"
+                (change)="toggleInput(eventFeedServerActions, $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove Chef Server actions after<input chefInput type="number" formControlName="threshold" />days</p>
           </div>
         </div>
 
-        <div class="group-section" [formGroup]="serviceGroupForm">
+        <div class="group-section">
           <h2>Service Groups</h2>
-          <div class="checkbox-row" formGroupName="healthChecks">
+          <div class="checkbox-row" [formGroup]="serviceGroupNoHealthChecks">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!serviceGroupForm.controls.disabled.controls.healthChecks.value"
-              (change)="toggleInput(serviceGroupForm, 'healthChecks', $event.detail)">
+              [checked]="!serviceGroupNoHealthChecks.disabled"
+              (change)="toggleInput(serviceGroupNoHealthChecks, $event.detail)">
               </chef-checkbox>
             </div>
 
@@ -67,11 +67,11 @@
               , label the service as disconnected</p>
           </div>
           
-          <div class="checkbox-row secondary-row" formGroupName="removeServices">
+          <div class="checkbox-row secondary-row" [formGroup]="serviceGroupRemoveServices">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!serviceGroupForm.controls.disabled.controls.removeServices.value"
-              (change)="toggleInput(serviceGroupForm, 'removeServices', $event.detail)">
+              [checked]="!serviceGroupRemoveServices.disabled"
+              (change)="toggleInput(serviceGroupRemoveServices, $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove services labeled as disconnected after
@@ -87,23 +87,23 @@
           </div>
         </div>
 
-        <div class="group-section" [formGroup]="clientRunsForm">
+        <div class="group-section">
           <h2>Client Runs</h2>
-          <div class="checkbox-row" formGroupName="removeData">
+          <div class="checkbox-row" [formGroup]="clientRunsRemoveData">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!clientRunsForm.controls.disabled.controls.removeData.value"
-              (change)="toggleInput(clientRunsForm, 'removeData', $event.detail)">
+              [checked]="!clientRunsRemoveData.disabled"
+              (change)="toggleInput(clientRunsRemoveData, $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove data for Chef Client runs after<input chefInput type="number" formControlName="threshold" />days</p>
           </div>
 
-          <div class="checkbox-row" formGroupName="labelMissing">
+          <div class="checkbox-row" [formGroup]="clientRunsLabelMissing">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!clientRunsForm.controls.disabled.controls.labelMissing.value"
-              (change)="toggleInput(clientRunsForm, 'labelMissing', $event.detail)">
+              [checked]="!clientRunsLabelMissing.disabled"
+              (change)="toggleInput(clientRunsLabelMissing, $event.detail)">
               </chef-checkbox>
             </div>
           
@@ -120,11 +120,11 @@
             </p>
           </div>
 
-          <div class="checkbox-row secondary-row" formGroupName="removeMissing">
+          <div class="checkbox-row secondary-row" [formGroup]="clientRunsRemoveNodes">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!clientRunsForm.controls.disabled.controls.removeMissing.value"
-              (change)="toggleInput(clientRunsForm, 'removeMissing', $event.detail)">
+              [checked]="!clientRunsRemoveNodes.disabled"
+              (change)="toggleInput(clientRunsRemoveNodes, $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove nodes labeled as missing after<input chefInput type="number" formControlName="threshold" />
@@ -139,23 +139,23 @@
           </div>
         </div>
 
-        <div class="group-section" [formGroup]="complianceDataForm">
+        <div class="group-section">
           <h2>Compliance</h2>
-          <div class="checkbox-row" formGroupName="reports">
+          <div class="checkbox-row" [formGroup]="complianceRemoveReports">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!complianceDataForm.controls.disabled.controls.reports.value"
-              (change)="toggleInput(complianceDataForm, 'reports', $event.detail)">
+              [checked]="!complianceRemoveReports.disabled"
+              (change)="toggleInput(complianceRemoveReports, $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove compliance reports after<input chefInput type="number" formControlName="threshold" />days</p>
           </div>
 
-          <div class="checkbox-row" formGroupName="scans">
+          <div class="checkbox-row" [formGroup]="complianceRemoveScans">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!complianceDataForm.controls.disabled.controls.scans.value"
-              (change)="toggleInput(complianceDataForm, 'scans', $event.detail)">
+              [checked]="!complianceRemoveScans.disabled"
+              (change)="toggleInput(complianceRemoveScans, $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove compliance scans after<input chefInput type="number" formControlName="threshold" />days</p>

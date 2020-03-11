@@ -53,13 +53,73 @@ export class AutomateSettingsComponent implements OnInit {
       disable: false
     }
   };
-  eventFeedForm: FormGroup;
-  serviceGroupForm: FormGroup;
 
-  clientRunsForm: FormGroup;
-  complianceDataForm: FormGroup;
-  missingNodesForm: FormGroup;
-  deleteMissingNodesForm: FormGroup;
+  private defaultFormData2 = {
+    eventFeedRemoveData: {
+      unit: { value: 'd', disabled: false },
+      threshold: {value: '30', disabled: false},
+      disabled: false
+    },
+    eventFeedServerActions: {
+      unit: 'd',
+      threshold: '30',
+      disabled: false
+    },
+    serviceGroupNoHealthChecks: {
+      unit: 'm',
+      threshold: '5',
+      disabled: true
+    },
+    serviceGroupRemoveServices: {
+      unit: 'd',
+      threshold: '5',
+      disabled: false
+    },
+    clientRunsRemoveData: {
+      unit: 'd',
+      threshold: '30',
+      disabled: false
+    },
+    clientRunsLabelMissing: {
+      unit: 'd',
+      threshold: '30',
+      disabled: false
+    },
+    clientRunsRemoveNodes: {
+      unit: 'd',
+      threshold: '30',
+      disabled: false
+    },
+    complianceRemoveReports: {
+      unit: 'd',
+      threshold: '30',
+      disabled: false
+    },
+    complianceRemoveScans: {
+      unit: 'd',
+      threshold: '30',
+      disabled: false
+    }
+  };
+
+
+  // Event Feed
+  eventFeedRemoveData: FormGroup;
+  eventFeedServerActions: FormGroup;
+
+  // Service Groups
+  serviceGroupNoHealthChecks: FormGroup;
+  serviceGroupRemoveServices: FormGroup;
+
+  // Client Runs
+  clientRunsRemoveData: FormGroup;
+  clientRunsLabelMissing: FormGroup;
+  clientRunsRemoveNodes: FormGroup;
+
+  // Compliance
+  complianceRemoveReports: FormGroup;
+  complianceRemoveScans: FormGroup;
+
   automateSettingsForm: FormGroup;
   jobSchedulerStatus: JobSchedulerStatus;
 
@@ -77,85 +137,59 @@ export class AutomateSettingsComponent implements OnInit {
     private fb: FormBuilder,
     private telemetryService: TelemetryService
   ) {
-    const formDetails = this.defaultFormData;
-    // this.eventFeedForm = this.fb.group(formDetails['eventFeed']);
-    // this.clientRunsForm = this.fb.group(formDetails['clientRuns']);
-    // this.complianceDataForm = this.fb.group(formDetails['complianceData']);
-    this.missingNodesForm = this.fb.group(formDetails['missingNodes']);
-    this.deleteMissingNodesForm = this.fb.group(formDetails['deleteMissingNodes']);
+    const formDetails = this.defaultFormData2;
 
-    this.eventFeedForm = this.fb.group({
-      disabled: this.fb.group({
-        feedData: false,
-        serverActions: false
-      }),
-      feedData: this.fb.group({
-        threshold: {value: 30, disabled: false},
-        unit: {value: 'd', disabled: false}
-      }),
-      serverActions: this.fb.group({
-        threshold: { value: 30, disabled: false },
-        unit: { value: 'd', disabled: false }
-      })
-    });
+//  EventFeed
+    this.eventFeedRemoveData = this.fb.group(formDetails['eventFeedRemoveData']);
+    this.eventFeedServerActions = this.fb.group(formDetails['eventFeedServerActions']);
 
-    this.serviceGroupForm = this.fb.group({
-      disabled: this.fb.group({
-        healthChecks: true,
-        removeServices: false
-      }),
-      healthChecks: this.fb.group({
-        threshold: {value: 5, disabled: true},
-        unit: { value: 'm', disabled: true }
-      }),
-      removeServices: this.fb.group({
-        threshold: {value: 7, disabled: false},
-        unit: { value: 'd', disabled: false }
-      })
-    });
+    // Service Groups
+    this.serviceGroupNoHealthChecks = this.fb.group(formDetails['serviceGroupNoHealthChecks']);
+    this.serviceGroupRemoveServices = this.fb.group(formDetails['serviceGroupRemoveServices']);
 
-    this.clientRunsForm = this.fb.group({
-      disabled: this.fb.group({
-        removeData: false,
-        labelMissing: false,
-        removeMissing: false
-      }),
-      removeData: this.fb.group({
-        threshold: {value: 30, disabled: false}
-      }),
-      labelMissing: this.fb.group({
-        threshold: { value: 30, disabled: false },
-        unit: { value: 'd', disabled: false }
-      }),
-      removeMissing: this.fb.group({
-        threshold: { value: 30, disabled: false },
-        unit: { value: 'd', disabled: false }
-      })
-    });
+    // Client Runs
+    this.clientRunsRemoveData = this.fb.group(formDetails['clientRunsRemoveData']);
+    this.clientRunsLabelMissing = this.fb.group(formDetails['clientRunsLabelMissing']);
+    this.clientRunsRemoveNodes = this.fb.group(formDetails['clientRunsRemoveNodes']);
 
-    this.complianceDataForm = this.fb.group({
-      disabled: this.fb.group({
-        reports: false,
-        scans: false
-      }),
-      reports: this.fb.group({
-        threshold: { value: 30, disabled: false }
-      }),
-      scans: this.fb.group({
-        threshold: { value: 30, disabled: false }
-      })
-    });
+    // Compliance
+    this.complianceRemoveReports = this.fb.group(formDetails['complianceRemoveReports']);
+    this.complianceRemoveScans = this.fb.group(formDetails['complianceRemoveScans']);
+
+
+
+    // this.eventFeedForm = this.fb.group({
+    //   disabled: this.fb.group({
+    //     feedData: false,
+    //     serverActions: false
+    //   }),
+    //   feedData: this.fb.group({
+    //     threshold: {value: 30, disabled: false},
+    //     unit: {value: 'd', disabled: false}
+    //   }),
+    //   serverActions: this.fb.group({
+    //     threshold: { value: 30, disabled: false },
+    //     unit: { value: 'd', disabled: false }
+    //   })
+    // });
 
 
     this.automateSettingsForm = this.fb.group({
-      eventFeed: this.eventFeedForm,
-      serviceGroup: this.serviceGroupForm,
-      clientRuns: this.clientRunsForm,
-      complianceData: this.complianceDataForm
+      // Event Feed
+      eventFeedRemoveData: this.eventFeedRemoveData,
+      eventFeedServerActions: this.eventFeedServerActions,
+      // Service Groups
+      serviceGroupNoHealthChecks: this.serviceGroupNoHealthChecks,
+      serviceGroupRemoveServices: this.serviceGroupRemoveServices,
 
-      // now part of client runs -- prob get deleted
-      // missingNodes: this.missingNodesForm,
-      // deleteMissingNodes: this.deleteMissingNodesForm
+      // Client Runs
+      clientRunsRemoveData: this.clientRunsRemoveData,
+      clientRunsLabelMissing: this.clientRunsLabelMissing,
+      clientRunsRemoveNodes: this.clientRunsRemoveNodes,
+
+      // Compliance
+      complianceRemoveReports: this.complianceRemoveReports,
+      complianceRemoveScans: this.complianceRemoveScans
     });
   }
 
@@ -186,21 +220,22 @@ export class AutomateSettingsComponent implements OnInit {
     return !this.formChanged;
   }
 
-  public toggleInput(form, _formGroupName: string, checked: boolean) {
+  public toggleInput(form, checked: boolean) {
     // patchValue is a workaround for the chef-checkbox because we need to be
     // able to store a reference to it being checked or not
-    form.get('disabled').patchValue({
-      [_formGroupName]: !checked
+    form.patchValue({
+      disabled: !checked
     });
 
-    // currentInput is a reference to the input associated with its checkbox
-    const currentInput = form.get(_formGroupName);
-
-    if (checked === true) {
-      currentInput.enable();
-    } else {
-      currentInput.disable();
-    }
+    // this loops through the rest of the form to disable it
+    const pertinentGroups = [ 'unit', 'threshold' ];
+    pertinentGroups.forEach(control => {
+      if (checked === true) {
+        form.get(control).enable();
+      } else {
+        form.get(control).disable();
+      }
+    });
   }
 
   // Apply the changes that the user updated in the forms
@@ -293,44 +328,6 @@ export class AutomateSettingsComponent implements OnInit {
     console.log('jobScheduleStatus');
     console.log(jobSchedulerStatus);
 
-    // NOTE: THIS MAY NEED TO BE CONVERTED BACK TO EACH LINE HAVING ITS OWN FORM INSTEAD OF GROUPED
-    // FOLLOW UP WITH SUSAN ABOUT THE PROPER MAPPING
-
-    Object.entries(jobSchedulerStatus).forEach(([ key, value ]) => {
-      // key is the category, i.e. infra, compliance, etc.
-      if (value) {
-
-          switch (key) {
-            case 'infra': {
-              this.clientRunsForm = this.buildClientRunsForm(value);
-            }
-            break;
-
-            case 'compliance': {
-              this.complianceDataForm = this.buildComplianceForm(value);
-            }
-            break;
-
-            case 'event_feed': {
-              // this.eventFeedForm = this.buildEventFeedForm(job);
-            }
-            break;
-
-            case 'services': {
-              console.log('services');
-            }
-            break;
-
-            default:
-              break;
-
-          }
-
-      }
-
-      }); // end object.entries
-
-
     // jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
     //   const [threshold, unit] = this.splitThreshold(job.threshold);
     //   const form = {
@@ -359,14 +356,21 @@ export class AutomateSettingsComponent implements OnInit {
     // });
 
     this.automateSettingsForm = this.fb.group({
-      eventFeed: this.eventFeedForm,
-      serviceGroup: this.serviceGroupForm,
-      clientRuns: this.clientRunsForm,
-      complianceData: this.complianceDataForm
+      // Event Feed
+      eventFeedRemoveData: this.eventFeedRemoveData,
+      eventFeedServerActions: this.eventFeedServerActions,
+      // Service Groups
+      serviceGroupNoHealthChecks: this.serviceGroupNoHealthChecks,
+      serviceGroupRemoveServices: this.serviceGroupRemoveServices,
 
-      // now part of client runs -- prob get deleted
-      // missingNodes: this.missingNodesForm,
-      // deleteMissingNodes: this.deleteMissingNodesForm
+      // Client Runs
+      clientRunsRemoveData: this.clientRunsRemoveData,
+      clientRunsLabelMissing: this.clientRunsLabelMissing,
+      clientRunsRemoveNodes: this.clientRunsRemoveNodes,
+
+      // Compliance
+      complianceRemoveReports: this.complianceRemoveReports,
+      complianceRemoveScans: this.complianceRemoveScans
     });
   }
 
@@ -387,95 +391,5 @@ export class AutomateSettingsComponent implements OnInit {
       threshold.slice(-1)
     ];
   }
-
-
-  private buildEventFeedForm(job: IngestJob) {
-    // Need to figure out what maps to where
-    return this.fb.group({
-      disabled: this.fb.group({
-        feedData: false,
-        serverActions: false
-      }),
-      feedData: this.fb.group({
-        threshold: { value: 30, disabled: false },
-        unit: { value: 'd', disabled: false }
-      }),
-      serverActions: this.fb.group({
-        threshold: { value: 30, disabled: false },
-        unit: { value: 'd', disabled: false }
-      })
-    });
-  }
-
-  private buildClientRunsForm(jobs: IngestJob[]) {
-    console.log(jobs);
-    const removeData = jobs[0]; // missing_nodes
-
-    const labelMissing = jobs[1]; // missing_nodes_for_deletion
-    const [ labelMissingThreshold, labelMissingUnit ] = this.splitThreshold(labelMissing.threshold);
-
-    const removeMissing = jobs[3].purge_policies.elasticsearch[1]; // converge-history
-
-
-    return this.fb.group({
-      disabled: this.fb.group({
-        removeData: removeData.disabled,
-        labelMissing: labelMissing.disabled,
-        removeMissing: removeMissing.disabled
-      }),
-      removeData: this.fb.group({
-        threshold: {
-          value: removeData.threshold,
-          disabled: removeData.disabled
-        }
-      }),
-      labelMissing: this.fb.group({
-        threshold: {
-          value: labelMissingThreshold,
-          disabled: labelMissing.disabled
-        },
-        unit: {
-          value: labelMissingUnit,
-          disabled: labelMissing.disabled
-        }
-      }),
-      removeMissing: this.fb.group({
-        threshold: {
-          value: removeMissing.older_than_days,
-          disabled: removeMissing.disabled
-        },
-        unit: {
-        value: 'd',
-        disabled: removeMissing.disabled
-       }
-      })
-    });
-  } // end buildClient form
-
-  private buildComplianceForm(jobs: IngestJob[]) {
-    const reports = jobs[0].purge_policies.elasticsearch[0];
-    const scans = jobs[0].purge_policies.elasticsearch[1];
-
-
-    return this.fb.group({
-      disabled: this.fb.group({
-        reports: reports.disabled,
-        scans: reports.disabled
-      }),
-      reports: this.fb.group({
-        threshold: {
-          value: reports.older_than_days,
-          disabled: reports.disabled
-        }
-      }),
-      scans: this.fb.group({
-        threshold: {
-          value: scans.older_than_days,
-          disabled: scans.disabled
-        }
-      })
-    });
-  } // end buildform
-
 
 }
