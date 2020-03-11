@@ -83,13 +83,16 @@ That is a guess on my part, could not really confirm what version one should be 
 
 **Package diff2html: ^2.12.2**
 
-Reason: Trying to install the latest version `npm install diff2html@3.0.0` reports these errors:
+Reason: After installing the latest version (`npm install diff2html@3`) then `ng build` reports these errors:
 
 ```text
-delta-viewer.component.ts:3:10 - error TS2305: Module '"../../../../node_modules/diff2html/lib/diff2html"' has no exported member 'Diff2Html'.
+ERROR in Module build failed (from ./node_modules/sass-loader/dist/cjs.js):
+SassError: File to import not found or unreadable: ~diff2html/dist/diff2html.
+        on line 4 of /Users/msorens/code/go/src/github.com/chef/automate/components/automate-ui/src/app/page-components/delta-viewer/delta-viewer.component.scss
+>>   @import "~diff2html/dist/diff2html";
 ```
 
-Reference https://github.com/rtfpessoa/diff2html
+Reference: https://github.com/rtfpessoa/diff2html
 
 **Package immutable: ^3.8.2**
 
@@ -100,7 +103,7 @@ Per https://github.com/chef/automate/pull/1867, future versions have made a brea
 
 **Package tslint: ^5.20.1**
 
-Reason: Trying to install the latest version `npm install tslint@6.0.0` reports these warnings
+Reason: Trying to install the latest version `npm install tslint@6` reports these warnings
 so maintaining at highest version of 5.x.x:
 
 ```text
@@ -121,14 +124,16 @@ so maintaining at highest version of 3.5.x:
 @ngtools/webpack@8.3.21 requires a peer of typescript@>=3.4 < 3.6 but none is installed.
 ```
 
-**Package zone.js: ~0.9.1**
+**Package @nguniversal/express-engine: 9.0.0-rc.2**
 
-Reason: Trying to install the latest version `npm install zone.js@0.10.2` reports this warning
-so maintaining at current version.
+Reason: `ng build` reported this error:
 
 ```text
-@angular/core@8.2.14 requires a peer of zone.js@~0.9.1
+ERROR in The target entry-point "ngx-cookie" has missing dependencies:
+ - express-serve-static-core
 ```
+
+Reference: https://github.com/salemdar/ngx-cookie/issues/106
 
 ## Angular Module Architecture
 
