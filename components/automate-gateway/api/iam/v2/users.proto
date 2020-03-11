@@ -21,6 +21,11 @@ service Users {
 
   Creates a local user that can become a member of IAM policies.
   Id must be unique.
+
+  Authorization Action:
+  ```
+  iam:users:create
+  ```
   */
   rpc CreateUser (CreateUserReq) returns (CreateUserResp) {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
