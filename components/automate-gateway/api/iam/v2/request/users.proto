@@ -34,6 +34,9 @@ message GetUserReq {
 
 message UpdateUserReq {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["name"]
+    },
     example: { value: '{"name": "New Name", "password": "aSafePassword"}'}
   };
   // ID of the user. Cannot be changed. Used to sign in.
@@ -46,6 +49,9 @@ message UpdateUserReq {
 
 message UpdateSelfReq {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["name"]
+    },
     example: { value: '{"name": "My New Name", "password": "aNewSafePassword", "previous_password": "aPreviousSafePassword"}'}
   };
   // ID of the user. Cannot be changed. Used to sign in.

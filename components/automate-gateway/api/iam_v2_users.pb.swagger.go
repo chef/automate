@@ -279,7 +279,10 @@ func init() {
           "type": "string",
           "description": "Previous password for user.\nOptional, but if included, password is also required."
         }
-      }
+      },
+      "required": [
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateSelfResp": {
       "type": "object",
@@ -308,7 +311,10 @@ func init() {
           "type": "string",
           "description": "Password used to log in. Will overwrite preexisting password."
         }
-      }
+      },
+      "required": [
+        "name"
+      ]
     },
     "chef.automate.api.iam.v2.UpdateUserResp": {
       "type": "object",
