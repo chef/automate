@@ -40,7 +40,7 @@ service Users {
 								fields {
 									key: "source";
 									value {
-                    string_value: '{"name": "Your Name", "id": "username001rulez", "password": "aSafePassword"}';
+                    string_value: '{"name": "Display Name", "id": "username001rulez", "password": "aSafePassword"}';
                   }
 								}
 							}
@@ -156,7 +156,7 @@ service Users {
 								fields {
 									key: "source";
 									value {
-                    string_value: '{"name": "Your Name", "password": "aSafePassword"}';
+                    string_value: '{"name": "New Name", "password": "aSafePassword"}';
                   }
 								}
 							}

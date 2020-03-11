@@ -9,15 +9,18 @@ message CreateUserReq {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
     json_schema: {
       required: ["id", "name", "password"]
-    }
+    },
+    example: { value: '{"name": "Display Name", "id": "username001rulez", "password": "aSafePassword"}'}
   };
+  // Unique ID. Cannot be changed. Used to log in.
   string id = 1;
+  // Display name for local user.
   string name = 2;
+  // Password for user. Used to log in.
   string password = 3;
 }
 
-message ListUsersReq {
-}
+message ListUsersReq {}
 
 message DeleteUserReq {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
@@ -25,6 +28,7 @@ message DeleteUserReq {
       required: ["id"]
     }
   };
+  // ID of the user.
   string id = 1;
 }
 
@@ -34,6 +38,7 @@ message GetUserReq {
       required: ["id"]
     }
   };
+  // ID of the user.
   string id = 1;
 }
 
@@ -41,11 +46,12 @@ message UpdateUserReq {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
     json_schema: {
       required: ["id", "name"]
-    }
+    },
+    example: { value: '{"name": "New Name", "password": "aSafePassword"}'}
   };
-  // The id cannot be changed, it's for determining which user this is supposed
-  // to update
+  // ID of the user. Cannot be changed. Used to log in.
   string id = 1;
+  // Display name for local user.
   string name = 2;
   string password = 3;
 }
@@ -54,15 +60,18 @@ message UpdateSelfReq {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
     json_schema: {
       required: ["id", "name"]
-    }
+    },
+    example: { value: '{"name": "My New Name", "password": "aNewSafePassword", "previous_password": "aPreviousSafePassword"}'}
   };
-  // The id cannot be changed, it's for determining which user this is supposed
-  // to update
+  // ID of the user. Cannot be changed. Used to log in.
   string id = 1;
+  // Display name for local user.
   string name = 2;
-  // Note: for UpdateSelfReq, the password and previous_password are optional,
-  // but if passed, they must both be passed.
+  // New password for user. Used to log in.
+  // Optional, but if included, previous_password is also required.
   string password = 3;
+  // Previous password for user.
+  // Optional, but if included, password is also required.
   string previous_password = 4;
 }
 
