@@ -284,7 +284,7 @@ export class AutomateSettingsComponent implements OnInit {
   }
 
   // Update forms until we get the job scheduler status
-  public updateForm(jobSchedulerStatus: any) {
+  public updateForm(jobSchedulerStatus: JobSchedulerStatus) {
     if (jobSchedulerStatus === null) {
       console.log('updateForm: null');
       return;
@@ -293,24 +293,41 @@ export class AutomateSettingsComponent implements OnInit {
     console.log('jobScheduleStatus');
     console.log(jobSchedulerStatus);
 
-    Object.entries(jobSchedulerStatus).forEach(([key, value]) => {
-      console.log(key);
-      console.log(value);
-
+    Object.entries(jobSchedulerStatus).forEach(([ key , value ]) => {
       // key is the category, i.e. infra, compliance, etc.
-      switch (key) {
-        case 'infra':
-          break;
-        case 'compliance':
-          // this.complianceDataForm = this.fb.group(<form here>);
-          break;
-        case 'event_feed':
-          break;
-        case 'services':
-          break;
+      if (value) {
+        value.forEach((job: IngestJob) => {
+
+          switch (key) {
+            case 'infra': {
+              console.log('infra');
+            }
+            break;
+
+            case 'compliance': {
+              this.complianceDataForm = this.buildComplianceForm(job);
+            }
+            break;
+
+            case 'event_feed': {
+              this.eventFeedForm = this.buildEventFeedForm(job);
+            }
+            break;
+
+            case 'services': {
+              console.log('services');
+            }
+            break;
+
+            default:
+              break;
+
+          }
+        }); // end value.forEach
       }
 
-    });
+      }); // end object.entries
+
 
     // jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
     //   const [threshold, unit] = this.splitThreshold(job.threshold);
@@ -368,4 +385,47 @@ export class AutomateSettingsComponent implements OnInit {
       threshold.slice(-1)
     ];
   }
+
+
+  private buildEventFeedForm(job: IngestJob) {
+    // Need to figure out what maps to where
+    return this.fb.group({
+      disabled: this.fb.group({
+        feedData: false,
+        serverActions: false
+      }),
+      feedData: this.fb.group({
+        threshold: { value: 30, disabled: false },
+        unit: { value: 'd', disabled: false }
+      }),
+      serverActions: this.fb.group({
+        threshold: { value: 30, disabled: false },
+        unit: { value: 'd', disabled: false }
+      })
+    });
+  }
+
+  private buildComplianceForm(job: IngestJob) {
+    const reports = job.purge_policies.elasticsearch[0];
+    const scans = job.purge_policies.elasticsearch[1];
+    return this.fb.group({
+      disabled: this.fb.group({
+        reports: reports.disabled,
+        scans: reports.disabled
+      }),
+      reports: this.fb.group({
+        threshold: {
+          value: reports.older_than_days,
+          disabled: reports.disabled
+        }
+      }),
+      scans: this.fb.group({
+        threshold: {
+          value: scans.older_than_days,
+          disabled: scans.disabled
+        }
+      })
+    });
+  }
+
 }
