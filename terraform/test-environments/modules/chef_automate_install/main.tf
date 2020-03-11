@@ -114,6 +114,7 @@ SystemMaxUse=${var.journald_system_max_use}
 SystemMaxFileSize=1G
 RateLimitBurst=0
 RateLimitInterval=0
+ForwardToSyslog=no
 EOF
   }
 
