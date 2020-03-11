@@ -1,5 +1,14 @@
 #!/bin/bash
 
+# this test script:
+# 1. deploys an older version of Automate and upgrades it to v2 using the beta CLI,
+#    skipping v1 policy migration.
+# 2. runs diagnostics without cleaning up the data. all v1 diagnostics are skipped 
+#    because the system is on v2.
+# 3. upgrades Automate to the latest build. This force-upgrades the system to IAM v2.
+# 4. runs diagnostics, verify and cleanup steps only. 
+#    all v1 diagnostics are skipped.
+
 #shellcheck disable=SC2034
 test_name="iam_force_upgrade_to_v2_with_no_legacy"
 test_upgrades=true
