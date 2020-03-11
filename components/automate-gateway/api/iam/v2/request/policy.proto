@@ -5,6 +5,7 @@ option go_package = "github.com/chef/automate/components/automate-gateway/api/ia
 
 // Statement, Policy definitions
 import "components/automate-gateway/api/iam/v2/common/policy.proto";
+
 import "protoc-gen-swagger/options/annotations.proto";
 
 // Does not contain type as the enduser can only create 'custom' policies.
@@ -12,7 +13,8 @@ message CreatePolicyReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["id", "name", "statements"]
-      }
+      },
+      example: { value: '{"name": "My Viewer Policy","id": "custom-viewer-policy","members": ["team:ldap:*"], "statements": [{"role": "viewer","projects": ["project1", "project2"], "effect": "ALLOW"}, {"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}'}
     };
     // Unique ID. Cannot be changed.
     string id = 1;
@@ -26,31 +28,19 @@ message CreatePolicyReq {
     repeated string projects = 5;
 }
 
-message DeletePolicyReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id"]
-      }
-    };
-    // ID of the policy.
-    string id = 1;
+message GetPolicyReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"]
+    }
+  };
+  // ID of the policy.
+  string id = 1;
 }
 
 message ListPoliciesReq {}
 
-message AddPolicyMembersReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id", "members"]
-      }
-    };
-    // ID of the policy.
-    string id = 1;
-    // List of members to add to the policy.
-    repeated string members = 2;
-}
-
-message GetPolicyReq {
+message DeletePolicyReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["id"]
@@ -62,36 +52,30 @@ message GetPolicyReq {
 
 // Does not contain type as the enduser can only create 'custom' policies.
 message UpdatePolicyReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id", "name", "statements"]
-      }
-    };
-    // Unique ID. Cannot be changed.
-    string id = 1;
-    // Members affected by this policy.
-    repeated string members = 2;
-    // Statements for the policy.
-    repeated Statement statements = 3;
-    // Name for this policy.
-    string name = 8;
-    // List of projects this policy belongs to.
-    repeated string projects = 9;
-}
-
-message UpgradeToV2Req {
-    Flag flag = 1;
-    bool skip_v1_policies = 2;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "name", "statements"],
+    },
+    example: { value: '{"name": "My Updated Viewer Policy", "members": ["user:ldap:newuser", "team:ldap:newteam"], "statements": [{"role": "viewer","projects":["project1", "project2"], "effect": "ALLOW"},{"role": "qa","projects": ["acceptanceProject"], "effect": "ALLOW"}],"projects": []}'}
+  };
+  // Unique ID. Cannot be changed.
+  string id = 1;
+  // Members affected by this policy.
+  repeated string members = 2;
+  // Statements for the policy.
+  repeated Statement statements = 3;
+  // Name for this policy.
+  string name = 8;
+  // List of projects this policy belongs to.
+  repeated string projects = 9;
 }
 
 message GetPolicyVersionReq {}
 
-message ResetToV1Req {}
-
 message ListPolicyMembersReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
-        required: ["id"]
+        required: ["id"],
       }
     };
     // ID of the policy.
@@ -99,26 +83,41 @@ message ListPolicyMembersReq {
 }
 
 message ReplacePolicyMembersReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id"]
-      }
-    };
-    // ID of the policy.
-    string id = 1;
-    // List of members that replaces previous policy member list.
-    repeated string members = 2;
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id"],
+    },
+    example: { value: '{"members": ["team:local:viewers", "user:local:test"]}'}
+  };
+  // ID of the policy.
+  string id = 1;
+  // List of members that replaces previous policy member list.
+  repeated string members = 2;
 }
 
 message RemovePolicyMembersReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "members"]
+    },
+    example: { value: '{"members": ["user:local:test"]}'}
+  };
+  // ID of the policy.
+  string id = 1;
+  // List of members to remove from the policy.
+  repeated string members = 2;
+}
+
+message AddPolicyMembersReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["id", "members"]
-      }
+      },
+      example: { value: '{"members": ["team:local:viewers", "user:local:test"]}'}
     };
     // ID of the policy.
     string id = 1;
-    // List of members to remove from the policy.
+    // List of members to add to the policy.
     repeated string members = 2;
 }
 
@@ -127,7 +126,8 @@ message CreateRoleReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["id", "name", "actions"]
-      }
+      },
+      example: { value: '{"id": "custom-role", "name": "My Custom Secret Manager Role", "actions": ["secrets:*", "iam:projects:list"]}'}
     };
     // Unique ID. Cannot be changed.
     string id = 1;
@@ -138,6 +138,8 @@ message CreateRoleReq {
     // List of projects this role belongs to.
     repeated string projects = 4;
 }
+
+message ListRolesReq {}
 
 message GetRoleReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
@@ -163,7 +165,8 @@ message UpdateRoleReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["id", "name", "actions"]
-      }
+      },
+      example: { value: '{"name": "My Updated Custom Secret Manager Role", "actions": ["secrets:*", "iam:projects:list"]}'}
     };
     // Unique ID. Cannot be changed.
     string id = 1;
@@ -175,7 +178,31 @@ message UpdateRoleReq {
     repeated string projects = 4;
 }
 
-message ListRolesReq {}
+message CreateProjectReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "name"]
+    },
+    example: { value: '{"name": "My Custom Project", "id": "custom-project"}'}
+  };
+  // Unique ID. Cannot be changed.
+  string id = 1;
+  // Name for the new project.
+  string name = 2;
+}
+
+message UpdateProjectReq {
+  option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
+    json_schema: {
+      required: ["id", "name"]
+    },
+    example: { value: '{"name": "My Custom Project"}'}
+  };
+   // Unique ID. Cannot be changed.
+  string id = 1;
+  // Name for the project.
+  string name = 2;
+}
 
 message GetProjectReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
@@ -189,30 +216,6 @@ message GetProjectReq {
 
 message ListProjectsReq {}
 
-message CreateProjectReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id", "name"]
-      }
-    };
-    // Unique ID. Cannot be changed.
-    string id = 1;
-    // Name for the new project.
-    string name = 2;
-}
-
-message UpdateProjectReq {
-    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
-      json_schema: {
-        required: ["id", "name"]
-      }
-    };
-     // Unique ID. Cannot be changed.
-    string id = 1;
-    // Name for the project.
-    string name = 2;
-}
-
 message DeleteProjectReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
@@ -222,3 +225,10 @@ message DeleteProjectReq {
     // ID of the project.
     string id = 1;
 }
+
+message UpgradeToV2Req {
+  Flag flag = 1;
+  bool skip_v1_policies = 2;
+}
+
+message ResetToV1Req {}

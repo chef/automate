@@ -16,7 +16,7 @@ import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 service Tokens {
 
   /*
-  Create a token
+  Creates a token
 
   Creates a token.
   Active defaults to true when not specified.
@@ -73,7 +73,7 @@ service Tokens {
   };
 
   /*
-  Get a token
+  Gets a token
 
   Returns the details for a token.
 
@@ -96,7 +96,7 @@ service Tokens {
   };
 
   /*
-  Update a token
+  Updates a token
 
   This operation overwrites all fields excepting ID, timestamps, and value,
   including those omitted from the request, so be sure to specify all properties.
@@ -145,9 +145,9 @@ service Tokens {
   };
 
   /*
-  Delete a token
+  Deletes a token
 
-  Delete a token and remove it from any policies.
+  Deletes a token and remove it from any policies.
 
   Authorization Action:
   ```
@@ -168,9 +168,9 @@ service Tokens {
   };
 
   /*
-  List all tokens
+  Lists all tokens
 
-  List all tokens, both admin and non-admin.
+  Lists all tokens, both admin and non-admin.
 
   Authorization Action:
   ```

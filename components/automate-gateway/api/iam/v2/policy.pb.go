@@ -170,7 +170,7 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type PoliciesClient interface {
 	//
-	//Create a custom policy
+	//Creates a custom policy
 	//
 	//Creates a custom IAM policy used to control permissions in Automate.
 	//A policy is composed of one or more statements that grant permissions to a set of members.
@@ -192,7 +192,7 @@ type PoliciesClient interface {
 	//```
 	CreatePolicy(ctx context.Context, in *request.CreatePolicyReq, opts ...grpc.CallOption) (*response.CreatePolicyResp, error)
 	//
-	//Get a policy
+	//Gets a policy
 	//
 	//Returns the details for a policy.
 	//
@@ -202,9 +202,9 @@ type PoliciesClient interface {
 	//```
 	GetPolicy(ctx context.Context, in *request.GetPolicyReq, opts ...grpc.CallOption) (*response.GetPolicyResp, error)
 	//
-	//List all policies
+	//Lists all policies
 	//
-	//List all policies.
+	//Lists all policies.
 	//
 	//Authorization Action:
 	//```
@@ -212,9 +212,9 @@ type PoliciesClient interface {
 	//```
 	ListPolicies(ctx context.Context, in *request.ListPoliciesReq, opts ...grpc.CallOption) (*response.ListPoliciesResp, error)
 	//
-	//Delete a custom policy
+	//Deletes a custom policy
 	//
-	//Delete a specified custom policy. You cannot delete Chef-managed policies.
+	//Deletes a specified custom policy. You cannot delete Chef-managed policies.
 	//
 	//Authorization Action:
 	//```
@@ -222,7 +222,7 @@ type PoliciesClient interface {
 	//```
 	DeletePolicy(ctx context.Context, in *request.DeletePolicyReq, opts ...grpc.CallOption) (*response.DeletePolicyResp, error)
 	//
-	//Update a custom policy
+	//Updates a custom policy
 	//
 	//This operation overwrites all fields excepting ID,
 	//including those omitted from the request, so be sure to specify all properties.
@@ -239,7 +239,7 @@ type PoliciesClient interface {
 	//```
 	UpdatePolicy(ctx context.Context, in *request.UpdatePolicyReq, opts ...grpc.CallOption) (*response.UpdatePolicyResp, error)
 	//
-	//Get IAM version
+	//Gets IAM version
 	//
 	//Returns the major and minor version of IAM that your automate installation is running.
 	//
@@ -249,9 +249,9 @@ type PoliciesClient interface {
 	//```
 	GetPolicyVersion(ctx context.Context, in *request.GetPolicyVersionReq, opts ...grpc.CallOption) (*response.GetPolicyVersionResp, error)
 	//
-	//List policy members
+	//Lists policy members
 	//
-	//List all members of a specific policy.
+	//Lists all members of a specific policy.
 	//
 	//Authorization Action:
 	//```
@@ -259,9 +259,9 @@ type PoliciesClient interface {
 	//```
 	ListPolicyMembers(ctx context.Context, in *request.ListPolicyMembersReq, opts ...grpc.CallOption) (*response.ListPolicyMembersResp, error)
 	//
-	//Replace policy members
+	//Replaces policy members
 	//
-	//Replace the entire member list of a specific policy with a new list.
+	//Replaces the entire member list of a specific policy with a new list.
 	//You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
 	//Ensure each element of the members array is in the correct
@@ -273,9 +273,9 @@ type PoliciesClient interface {
 	//```
 	ReplacePolicyMembers(ctx context.Context, in *request.ReplacePolicyMembersReq, opts ...grpc.CallOption) (*response.ReplacePolicyMembersResp, error)
 	//
-	//Remove policy members
+	//Removes policy members
 	//
-	//Remove members from the member list of a specific policy. Silently ignores
+	//Removes members from the member list of a specific policy. Silently ignores
 	//members that are not already part of the member list.
 	//You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
@@ -290,9 +290,9 @@ type PoliciesClient interface {
 	//```
 	RemovePolicyMembers(ctx context.Context, in *request.RemovePolicyMembersReq, opts ...grpc.CallOption) (*response.RemovePolicyMembersResp, error)
 	//
-	//Add policy members
+	//Adds policy members
 	//
-	//Add members to the member list of a specific policy.
+	//Adds members to the member list of a specific policy.
 	//You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
 	//Ensure each element of the members array is in the correct
@@ -304,7 +304,7 @@ type PoliciesClient interface {
 	//```
 	AddPolicyMembers(ctx context.Context, in *request.AddPolicyMembersReq, opts ...grpc.CallOption) (*response.AddPolicyMembersResp, error)
 	//
-	//Create a custom role
+	//Creates a custom role
 	//
 	//Creates a new role to be used in the policies that control permissions in Automate.
 	//
@@ -316,9 +316,9 @@ type PoliciesClient interface {
 	//```
 	CreateRole(ctx context.Context, in *request.CreateRoleReq, opts ...grpc.CallOption) (*response.CreateRoleResp, error)
 	//
-	//List all roles
+	//Lists all roles
 	//
-	//List all *Chef-managed* and *Custom* roles.
+	//Lists all *Chef-managed* and *Custom* roles.
 	//
 	//Authorization Action:
 	//```
@@ -326,7 +326,7 @@ type PoliciesClient interface {
 	//```
 	ListRoles(ctx context.Context, in *request.ListRolesReq, opts ...grpc.CallOption) (*response.ListRolesResp, error)
 	//
-	//Get a role
+	//Gets a role
 	//
 	//Returns the details for a role.
 	//
@@ -336,9 +336,9 @@ type PoliciesClient interface {
 	//```
 	GetRole(ctx context.Context, in *request.GetRoleReq, opts ...grpc.CallOption) (*response.GetRoleResp, error)
 	//
-	//Delete a custom role
+	//Deletes a custom role
 	//
-	//Delete a specified custom role (you cannot delete Chef-managed roles) and remove it from any statements that may have been using it.
+	//Deletes a specified custom role (you cannot delete Chef-managed roles) and remove it from any statements that may have been using it.
 	//If such a statement has no other associated actions, the statement is deleted as well.
 	//Similarly, if that statement removal results in a policy with no other statements,
 	//that policy is removed as well.
@@ -349,7 +349,7 @@ type PoliciesClient interface {
 	//```
 	DeleteRole(ctx context.Context, in *request.DeleteRoleReq, opts ...grpc.CallOption) (*response.DeleteRoleResp, error)
 	//
-	//Update a custom role
+	//Updates a custom role
 	//
 	//This operation overwrites all fields excepting ID,
 	//including those omitted from the request, so be sure to specify all properties.
@@ -361,7 +361,7 @@ type PoliciesClient interface {
 	//```
 	UpdateRole(ctx context.Context, in *request.UpdateRoleReq, opts ...grpc.CallOption) (*response.UpdateRoleResp, error)
 	//
-	//Create a project
+	//Creates a project
 	//
 	//Creates a new project to be used in the policies that control permissions in Automate.
 	//
@@ -373,7 +373,7 @@ type PoliciesClient interface {
 	//```
 	CreateProject(ctx context.Context, in *request.CreateProjectReq, opts ...grpc.CallOption) (*response.CreateProjectResp, error)
 	//
-	//Update a project
+	//Updates a project
 	//
 	//Updates the name of an existing project.
 	//
@@ -383,7 +383,7 @@ type PoliciesClient interface {
 	//```
 	UpdateProject(ctx context.Context, in *request.UpdateProjectReq, opts ...grpc.CallOption) (*response.UpdateProjectResp, error)
 	//
-	//Get a project
+	//Gets a project
 	//
 	//Returns the details for a project.
 	//
@@ -393,9 +393,9 @@ type PoliciesClient interface {
 	//```
 	GetProject(ctx context.Context, in *request.GetProjectReq, opts ...grpc.CallOption) (*response.GetProjectResp, error)
 	//
-	//List all projects
+	//Lists all projects
 	//
-	//List all projects.
+	//Lists all projects.
 	//
 	//Authorization Action:
 	//```
@@ -403,9 +403,9 @@ type PoliciesClient interface {
 	//```
 	ListProjects(ctx context.Context, in *request.ListProjectsReq, opts ...grpc.CallOption) (*response.ListProjectsResp, error)
 	//
-	//Delete a project
+	//Deletes a project
 	//
-	//Delete a project from any resources tagged with it.
+	//Deletes a project from any resources tagged with it.
 	//
 	//Also deletes this project from any project list in any policy statements.
 	//If the resulting project list for a given statement is empty, it is deleted.
@@ -641,7 +641,7 @@ func (c *policiesClient) IntrospectAllProjects(ctx context.Context, in *request.
 // PoliciesServer is the server API for Policies service.
 type PoliciesServer interface {
 	//
-	//Create a custom policy
+	//Creates a custom policy
 	//
 	//Creates a custom IAM policy used to control permissions in Automate.
 	//A policy is composed of one or more statements that grant permissions to a set of members.
@@ -663,7 +663,7 @@ type PoliciesServer interface {
 	//```
 	CreatePolicy(context.Context, *request.CreatePolicyReq) (*response.CreatePolicyResp, error)
 	//
-	//Get a policy
+	//Gets a policy
 	//
 	//Returns the details for a policy.
 	//
@@ -673,9 +673,9 @@ type PoliciesServer interface {
 	//```
 	GetPolicy(context.Context, *request.GetPolicyReq) (*response.GetPolicyResp, error)
 	//
-	//List all policies
+	//Lists all policies
 	//
-	//List all policies.
+	//Lists all policies.
 	//
 	//Authorization Action:
 	//```
@@ -683,9 +683,9 @@ type PoliciesServer interface {
 	//```
 	ListPolicies(context.Context, *request.ListPoliciesReq) (*response.ListPoliciesResp, error)
 	//
-	//Delete a custom policy
+	//Deletes a custom policy
 	//
-	//Delete a specified custom policy. You cannot delete Chef-managed policies.
+	//Deletes a specified custom policy. You cannot delete Chef-managed policies.
 	//
 	//Authorization Action:
 	//```
@@ -693,7 +693,7 @@ type PoliciesServer interface {
 	//```
 	DeletePolicy(context.Context, *request.DeletePolicyReq) (*response.DeletePolicyResp, error)
 	//
-	//Update a custom policy
+	//Updates a custom policy
 	//
 	//This operation overwrites all fields excepting ID,
 	//including those omitted from the request, so be sure to specify all properties.
@@ -710,7 +710,7 @@ type PoliciesServer interface {
 	//```
 	UpdatePolicy(context.Context, *request.UpdatePolicyReq) (*response.UpdatePolicyResp, error)
 	//
-	//Get IAM version
+	//Gets IAM version
 	//
 	//Returns the major and minor version of IAM that your automate installation is running.
 	//
@@ -720,9 +720,9 @@ type PoliciesServer interface {
 	//```
 	GetPolicyVersion(context.Context, *request.GetPolicyVersionReq) (*response.GetPolicyVersionResp, error)
 	//
-	//List policy members
+	//Lists policy members
 	//
-	//List all members of a specific policy.
+	//Lists all members of a specific policy.
 	//
 	//Authorization Action:
 	//```
@@ -730,9 +730,9 @@ type PoliciesServer interface {
 	//```
 	ListPolicyMembers(context.Context, *request.ListPolicyMembersReq) (*response.ListPolicyMembersResp, error)
 	//
-	//Replace policy members
+	//Replaces policy members
 	//
-	//Replace the entire member list of a specific policy with a new list.
+	//Replaces the entire member list of a specific policy with a new list.
 	//You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
 	//Ensure each element of the members array is in the correct
@@ -744,9 +744,9 @@ type PoliciesServer interface {
 	//```
 	ReplacePolicyMembers(context.Context, *request.ReplacePolicyMembersReq) (*response.ReplacePolicyMembersResp, error)
 	//
-	//Remove policy members
+	//Removes policy members
 	//
-	//Remove members from the member list of a specific policy. Silently ignores
+	//Removes members from the member list of a specific policy. Silently ignores
 	//members that are not already part of the member list.
 	//You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
@@ -761,9 +761,9 @@ type PoliciesServer interface {
 	//```
 	RemovePolicyMembers(context.Context, *request.RemovePolicyMembersReq) (*response.RemovePolicyMembersResp, error)
 	//
-	//Add policy members
+	//Adds policy members
 	//
-	//Add members to the member list of a specific policy.
+	//Adds members to the member list of a specific policy.
 	//You may use this endpoint to update members of either Custom or Chef-managed policies.
 	//
 	//Ensure each element of the members array is in the correct
@@ -775,7 +775,7 @@ type PoliciesServer interface {
 	//```
 	AddPolicyMembers(context.Context, *request.AddPolicyMembersReq) (*response.AddPolicyMembersResp, error)
 	//
-	//Create a custom role
+	//Creates a custom role
 	//
 	//Creates a new role to be used in the policies that control permissions in Automate.
 	//
@@ -787,9 +787,9 @@ type PoliciesServer interface {
 	//```
 	CreateRole(context.Context, *request.CreateRoleReq) (*response.CreateRoleResp, error)
 	//
-	//List all roles
+	//Lists all roles
 	//
-	//List all *Chef-managed* and *Custom* roles.
+	//Lists all *Chef-managed* and *Custom* roles.
 	//
 	//Authorization Action:
 	//```
@@ -797,7 +797,7 @@ type PoliciesServer interface {
 	//```
 	ListRoles(context.Context, *request.ListRolesReq) (*response.ListRolesResp, error)
 	//
-	//Get a role
+	//Gets a role
 	//
 	//Returns the details for a role.
 	//
@@ -807,9 +807,9 @@ type PoliciesServer interface {
 	//```
 	GetRole(context.Context, *request.GetRoleReq) (*response.GetRoleResp, error)
 	//
-	//Delete a custom role
+	//Deletes a custom role
 	//
-	//Delete a specified custom role (you cannot delete Chef-managed roles) and remove it from any statements that may have been using it.
+	//Deletes a specified custom role (you cannot delete Chef-managed roles) and remove it from any statements that may have been using it.
 	//If such a statement has no other associated actions, the statement is deleted as well.
 	//Similarly, if that statement removal results in a policy with no other statements,
 	//that policy is removed as well.
@@ -820,7 +820,7 @@ type PoliciesServer interface {
 	//```
 	DeleteRole(context.Context, *request.DeleteRoleReq) (*response.DeleteRoleResp, error)
 	//
-	//Update a custom role
+	//Updates a custom role
 	//
 	//This operation overwrites all fields excepting ID,
 	//including those omitted from the request, so be sure to specify all properties.
@@ -832,7 +832,7 @@ type PoliciesServer interface {
 	//```
 	UpdateRole(context.Context, *request.UpdateRoleReq) (*response.UpdateRoleResp, error)
 	//
-	//Create a project
+	//Creates a project
 	//
 	//Creates a new project to be used in the policies that control permissions in Automate.
 	//
@@ -844,7 +844,7 @@ type PoliciesServer interface {
 	//```
 	CreateProject(context.Context, *request.CreateProjectReq) (*response.CreateProjectResp, error)
 	//
-	//Update a project
+	//Updates a project
 	//
 	//Updates the name of an existing project.
 	//
@@ -854,7 +854,7 @@ type PoliciesServer interface {
 	//```
 	UpdateProject(context.Context, *request.UpdateProjectReq) (*response.UpdateProjectResp, error)
 	//
-	//Get a project
+	//Gets a project
 	//
 	//Returns the details for a project.
 	//
@@ -864,9 +864,9 @@ type PoliciesServer interface {
 	//```
 	GetProject(context.Context, *request.GetProjectReq) (*response.GetProjectResp, error)
 	//
-	//List all projects
+	//Lists all projects
 	//
-	//List all projects.
+	//Lists all projects.
 	//
 	//Authorization Action:
 	//```
@@ -874,9 +874,9 @@ type PoliciesServer interface {
 	//```
 	ListProjects(context.Context, *request.ListProjectsReq) (*response.ListProjectsResp, error)
 	//
-	//Delete a project
+	//Deletes a project
 	//
-	//Delete a project from any resources tagged with it.
+	//Deletes a project from any resources tagged with it.
 	//
 	//Also deletes this project from any project list in any policy statements.
 	//If the resulting project list for a given statement is empty, it is deleted.

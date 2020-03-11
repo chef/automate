@@ -98,7 +98,7 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type TokensClient interface {
 	//
-	//Create a token
+	//Creates a token
 	//
 	//Creates a token.
 	//Active defaults to true when not specified.
@@ -118,7 +118,7 @@ type TokensClient interface {
 	//```
 	CreateToken(ctx context.Context, in *request.CreateTokenReq, opts ...grpc.CallOption) (*response.CreateTokenResp, error)
 	//
-	//Get a token
+	//Gets a token
 	//
 	//Returns the details for a token.
 	//
@@ -128,7 +128,7 @@ type TokensClient interface {
 	//```
 	GetToken(ctx context.Context, in *request.GetTokenReq, opts ...grpc.CallOption) (*response.GetTokenResp, error)
 	//
-	//Update a token
+	//Updates a token
 	//
 	//This operation overwrites all fields excepting ID, timestamps, and value,
 	//including those omitted from the request, so be sure to specify all properties.
@@ -140,9 +140,9 @@ type TokensClient interface {
 	//```
 	UpdateToken(ctx context.Context, in *request.UpdateTokenReq, opts ...grpc.CallOption) (*response.UpdateTokenResp, error)
 	//
-	//Delete a token
+	//Deletes a token
 	//
-	//Delete a token and remove it from any policies.
+	//Deletes a token and remove it from any policies.
 	//
 	//Authorization Action:
 	//```
@@ -150,9 +150,9 @@ type TokensClient interface {
 	//```
 	DeleteToken(ctx context.Context, in *request.DeleteTokenReq, opts ...grpc.CallOption) (*response.DeleteTokenResp, error)
 	//
-	//List all tokens
+	//Lists all tokens
 	//
-	//List all tokens, both admin and non-admin.
+	//Lists all tokens, both admin and non-admin.
 	//
 	//Authorization Action:
 	//```
@@ -229,7 +229,7 @@ func (c *tokensClient) ResetAllTokenProjects(ctx context.Context, in *request.Re
 // TokensServer is the server API for Tokens service.
 type TokensServer interface {
 	//
-	//Create a token
+	//Creates a token
 	//
 	//Creates a token.
 	//Active defaults to true when not specified.
@@ -249,7 +249,7 @@ type TokensServer interface {
 	//```
 	CreateToken(context.Context, *request.CreateTokenReq) (*response.CreateTokenResp, error)
 	//
-	//Get a token
+	//Gets a token
 	//
 	//Returns the details for a token.
 	//
@@ -259,7 +259,7 @@ type TokensServer interface {
 	//```
 	GetToken(context.Context, *request.GetTokenReq) (*response.GetTokenResp, error)
 	//
-	//Update a token
+	//Updates a token
 	//
 	//This operation overwrites all fields excepting ID, timestamps, and value,
 	//including those omitted from the request, so be sure to specify all properties.
@@ -271,9 +271,9 @@ type TokensServer interface {
 	//```
 	UpdateToken(context.Context, *request.UpdateTokenReq) (*response.UpdateTokenResp, error)
 	//
-	//Delete a token
+	//Deletes a token
 	//
-	//Delete a token and remove it from any policies.
+	//Deletes a token and remove it from any policies.
 	//
 	//Authorization Action:
 	//```
@@ -281,9 +281,9 @@ type TokensServer interface {
 	//```
 	DeleteToken(context.Context, *request.DeleteTokenReq) (*response.DeleteTokenResp, error)
 	//
-	//List all tokens
+	//Lists all tokens
 	//
-	//List all tokens, both admin and non-admin.
+	//Lists all tokens, both admin and non-admin.
 	//
 	//Authorization Action:
 	//```
