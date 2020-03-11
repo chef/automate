@@ -6,8 +6,7 @@ import { NgrxStateAtom } from '../../ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import {
   automateSettingsState,
-  changeConfiguration,
-  jobSchedulerStatus
+  changeConfiguration
 } from '../../entities/automate-settings/automate-settings.selectors';
 import {
   GetSettings,
@@ -294,8 +293,9 @@ export class AutomateSettingsComponent implements OnInit {
         }
         break;
 
-        case 'compliance': {
-          this.populateCompliance(job);
+        case 'compliance': // fallthrough
+        case 'event_feed': {
+          this.populateNested(job);
         }
         break;
 
@@ -374,8 +374,14 @@ export class AutomateSettingsComponent implements OnInit {
 
       case 'periodic_purge_timeseries': {
         const formValues = job.purge_policies.elasticsearch;
-        this.handleDisable(this.clientRunsRemoveNodes, formValues[1].disabled);
+        this.handleDisable(this.clientRunsRemoveNodes, formValues[0].disabled);
         this.clientRunsRemoveNodes.patchValue({
+          threshold: formValues[0].older_than_days.toString(),
+          disabled: formValues[0].disabled
+        });
+        // this maps to the EventFeed Chef Server Actions, though it lives in infra
+        this.handleDisable(this.eventFeedServerActions, formValues[1].disabled);
+        this.eventFeedServerActions.patchValue({
           threshold: formValues[1].older_than_days.toString(),
           disabled: formValues[1].disabled
         });
@@ -387,14 +393,14 @@ export class AutomateSettingsComponent implements OnInit {
     }
   }
 
-  private populateCompliance(job: IngestJob): void {
+  private populateNested(job: IngestJob): void {
     const _jobs = job.purge_policies.elasticsearch;
 
     _jobs.forEach(_job => {
       const form = {
         threshold: _job.older_than_days,
         disabled: _job.disabled
-      }
+      };
 
       switch (_job.name) {
 
@@ -410,12 +416,16 @@ export class AutomateSettingsComponent implements OnInit {
         }
         break;
 
+        case 'feed': {
+          this.handleDisable(this.eventFeedRemoveData, _job.disabled);
+          this.eventFeedRemoveData.patchValue(form);
+        }
+        break;
+
         default:
           break;
       }
     });
-
-
   }
 
   private handleDisable(form, disabled: boolean = false): void {
@@ -425,8 +435,8 @@ export class AutomateSettingsComponent implements OnInit {
       pertinentGroups.forEach(control => {
           form.get(control).disable();
       });
+      return;
     }
-    return;
   }
 
 }
