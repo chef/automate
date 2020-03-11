@@ -1,7 +1,6 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { uuidv4 } from '../../../support/helpers';
 
-describeIfIAMV2p1('Nodemanager config mgmt node rpc deletion', () => {
+describe('Nodemanager config mgmt node rpc deletion', () => {
   describe('multiple node deletion', () => {
     const cypressPrefix = 'test-nodemanager-node-rpc-delete-nonid';
     const clientRunsNodeId1 = uuidv4();
