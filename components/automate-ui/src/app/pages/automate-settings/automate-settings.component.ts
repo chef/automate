@@ -293,6 +293,9 @@ export class AutomateSettingsComponent implements OnInit {
     console.log('jobScheduleStatus');
     console.log(jobSchedulerStatus);
 
+    // NOTE: THIS MAY NEED TO BE CONVERTED BACK TO EACH LINE HAVING ITS OWN FORM INSTEAD OF GROUPED
+    // FOLLOW UP WITH SUSAN ABOUT THE PROPER MAPPING
+    
     Object.entries(jobSchedulerStatus).forEach(([ key , value ]) => {
       // key is the category, i.e. infra, compliance, etc.
       if (value) {
