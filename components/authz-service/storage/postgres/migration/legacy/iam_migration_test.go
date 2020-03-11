@@ -279,8 +279,6 @@ func queryTestPolicy(ctx context.Context, id string, db *sql.DB) (*v2Policy, err
 		if strings.HasPrefix(err.Error(), "sql: Scan error on column index 0") &&
 			strings.HasSuffix(err.Error(), "not found") {
 			return nil, errors.Errorf("policy not found %s", id)
-		} else {
-			return nil, err
 		}
 		return nil, errors.Wrap(err, "query policy")
 	}
@@ -397,7 +395,9 @@ func memberSliceToStringSlice(m []v2Member) []string {
 	return memberSlice
 }
 
-// v1LegacyPolicies is a consolidated list of the v1LegacyPolicies
+// v1LegacyPolicies is a consolidated list of the v1LegacyPolicies that are ported
+// in the migratev1policies call. They-- like everything under legacy-- should
+// remain untouched once this code is live.
 func v1LegacyPolicies() []v2Policy {
 	allUsers := v2Member{Name: "user:*"}
 	allTokens := v2Member{Name: "token:*"}
