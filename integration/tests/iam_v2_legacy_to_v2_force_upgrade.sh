@@ -1,11 +1,28 @@
 #!/bin/bash
 
+# this test script:
+# 1. deploys an older version of Automate and upgrades it to v2 using the beta CLI,
+#    including v1 policy migration.
+# 2. runs inspec tests to verify IAM v2 behavior with legacy v1 policies.
+# 3. upgrades Automate to the latest build. This force-upgrades the system to IAM v2.
+# 4. runs inspec tests to verify that the system was not disrupted by the force-upgrade
+#    and legacy v1 policies continue to be enforced.
+
 #shellcheck disable=SC2034
 test_name="iam_force_upgrade_to_v2_with_legacy"
 test_upgrades=true
 test_upgrade_strategy="none"
+
+# a2-iam-no-legacy-integration verifies permissions on an IAM v2 system 
+# with v1 legacy policies
 test_deploy_inspec_profiles=(a2-iam-legacy-integration)
-test_upgrade_inspec_profiles=(a2-iam-legacy-integration a2-api-integration)
+
+# a2-deploy-integration verifies that the system is up and all APIs work correctly
+# (which now includes only IAM v2 APIs)
+# a2-iam-legacy-integration verifies that migrated v1 legacy policies persisted 
+# and their permissions are enforced
+test_upgrade_inspec_profiles=(a2-iam-legacy-integration a2-deploy-integration)
+
 # Note: we can't run diagnostics AND inspec, so skip diagnostics
 test_skip_diagnostics=true
 
