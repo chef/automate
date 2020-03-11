@@ -73,13 +73,13 @@ export class AutomateSettingsRequests {
   private convertResponseToJobSchedulerStatus(
     respJobSchedulerStatus: RespJobSchedulerStatus): JobSchedulerStatus {
       // THIS IS MENTAL - THIS HAS TO CHANGE
-    const allJobs = {};
+    const allJobs = [];
 
     Object.keys(respJobSchedulerStatus).forEach((category: string) => {
       if (respJobSchedulerStatus[category]) {
         const catJobs = respJobSchedulerStatus[category].jobs
-          .map((respJob: RespJob) => new IngestJob(respJob));
-        allJobs[category] = catJobs;
+          .map((respJob: RespJob) => new IngestJob(category, respJob));
+        allJobs.push(...catJobs);
       }
     });
 

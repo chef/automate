@@ -1,27 +1,13 @@
 export class JobSchedulerStatus {
-  infra?: {
-    jobs: IngestJob[];
-  };
-  compliance?: {
-    jobs: IngestJob[];
-  };
-  event_feed?: {
-    jobs: IngestJob[];
-  };
-  services?: {
-    jobs: IngestJob[];
-  };
+  jobs: IngestJob[];
 
-  constructor(allJobs: any) {
-    this.infra = allJobs.infra;
-    this.compliance = allJobs.compliance;
-    this.event_feed = allJobs.event_feed;
-    this.services = allJobs.services;
+  constructor(ingestJobs: IngestJob[]) {
+    this.jobs = ingestJobs;
   }
 
-  // getJob(name: string): IngestJob {
-  //   return this.jobs.find((job: IngestJob) => job.name === name);
-  // }
+  getJob(name: string): IngestJob {
+    return this.jobs.find((job: IngestJob) => job.name === name);
+  }
 }
 
 export interface ConfigureSettingsRequest {
@@ -82,6 +68,7 @@ export enum IngestJobs {
 }
 
 export class IngestJob {
+  category: string;
   name: string;
   disabled: boolean;
   recurrence: string;
@@ -93,8 +80,9 @@ export class IngestJob {
   last_started_at?: Date;
   last_ended_at?: Date;
 
-  constructor(respJob: RespJob) {
+  constructor(category: string, respJob: RespJob) {
     if (respJob !== null) {
+      this.category = category;
       this.name = respJob.name;
       this.disabled = respJob.disabled;
       this.recurrence = respJob.recurrence;
