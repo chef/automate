@@ -21,6 +21,9 @@ describe('user management', () => {
   it('can create a user', () => {
     cy.get('app-user-table').should('exist');
 
+    // local admin user should always exist
+    cy.get('.username-column').contains('admin').should('exist');
+
     // open modal
     cy.get('[data-cy=app-user-table-add-button]').click();
     cy.get('app-user-management chef-modal').should('exist');
@@ -42,6 +45,9 @@ describe('user management', () => {
     // type a too short password
     cy.get('[formcontrolname=password]')
       .type('1234567', { delay: typeDelay }).should('have.value', '1234567');
+
+    // focus on a different form field to trigger password error
+    cy.get('[formcontrolname=confirmPassword]').focus();
     cy.get('app-create-user-modal chef-error').contains('must be at least')
       .should('be.visible');
 
@@ -52,6 +58,9 @@ describe('user management', () => {
     // type a mismatch confirmPassword
     cy.get('[formcontrolname=confirmPassword]')
       .type('different', { delay: typeDelay }).should('have.value', 'different');
+
+    // focus on a different form field to trigger confirmPassword error
+    cy.get('[formcontrolname=password]').focus();
     cy.get('app-create-user-modal chef-error').contains('must match')
       .should('be.visible');
 
@@ -100,6 +109,7 @@ describe('user management', () => {
     // type a mismatch confirmPassword
     cy.get('[formcontrolname=confirmPassword]')
       .type(password, { delay: typeDelay }).should('have.value', password);
+
     cy.get('app-user-details .password:last-of-type chef-error').contains('must match')
       .should('be.visible');
 
