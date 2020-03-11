@@ -19,8 +19,7 @@ service Users {
   /*
   Create a user
 
-  Creates a local user that can become a member of IAM policies.
-  Id must be unique.
+  Creates a local user that can become a member of IAM teams and IAM policies.
 
   Authorization Action:
   ```

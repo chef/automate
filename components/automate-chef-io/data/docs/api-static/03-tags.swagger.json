@@ -18,7 +18,7 @@
     },
     {
       "name": "Identity",
-      "tags": ["teams", "tokens"]
+      "tags": ["teams", "tokens", "users"]
     },
     {
       "name": "Access Management",
@@ -43,6 +43,8 @@
       "description": "Tokens are used for API access to Automate endpoints as well as by systems (e.g. Chef Servers) to communicate with Automate." },
     { "name": "JobsService", "x-displayName": "Scan Jobs" },
     { "name": "teams", "x-displayName": "IAM Teams",
-      "description": "Teams are used to group local users for policy membership."}
+      "description": "Teams are used to group local users for policy membership."},
+    { "name": "users", "x-displayName": "IAM Local Users",
+      "description": "IAM local users are not attached to external identity providers. They can be members of IAM teams and IAM policies." }
   ]
 }
