@@ -6,7 +6,7 @@ info:
     To create admin token can and set it as an environment variable use the following command:
 
     ```
-    export TOKEN=`chef-automate admin-token`
+    export TOKEN='chef-automate admin-token'
     ```
 
     An admin token has unlimited access the entire Chef Automate API.
@@ -17,7 +17,7 @@ info:
     curl -s -H "api-token: $TOKEN" https://automate.example.com/api/v0/auth/policies -v
     ```
 
-    To create api tokens with limited permissions, use your admin token to create a standard token. You can then write a policy that exactly defines the API access for the standard token.
+    To create api tokens with limited permissions, use your admin token to create a standard token. You can then write a policy that defines the API access for the standard token.
 
     In this example, the `curl` command creates the new token and the `export` command saves as an environment variable with the name "TOKEN2".
 
