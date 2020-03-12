@@ -88,7 +88,7 @@
       },
       "delete": {
         "summary": "Deletes a local team",
-        "description": "Deletes a local team and remove it from any policies.\n\nAuthorization Action:\n```\niam:teams:delete\n```",
+        "description": "Deletes a local team and removes it from any policies.\n\nAuthorization Action:\n```\niam:teams:delete\n```",
         "operationId": "DeleteTeam",
         "responses": {
           "200": {
@@ -178,7 +178,7 @@
     "/iam/v2/teams/{id}/users:add": {
       "post": {
         "summary": "Adds local team membership",
-        "description": "Adds a list of users to a local team. Users are added by their membership_id.\nThe request will ignore any members that do not exist.\n\nAuthorization Action:\n```\niam:teamUsers:create\n```",
+        "description": "Adds a list of users to a local team. Users are added by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n```\niam:teamUsers:create\n```",
         "operationId": "AddTeamMembers",
         "responses": {
           "200": {
@@ -218,7 +218,7 @@
     "/iam/v2/teams/{id}/users:remove": {
       "post": {
         "summary": "Removes local team membership",
-        "description": "Removes a list of users from a local team. Users are removed by their membership_id.\nThe request will ignore any members that were not on the team or do not exist.\n\nAuthorization Action:\n```\niam:teamUsers:delete\n```",
+        "description": "Removes a list of users from a local team. Users are removed by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n```\niam:teamUsers:delete\n```",
         "operationId": "RemoveTeamMembers",
         "responses": {
           "200": {
@@ -310,14 +310,10 @@
     "chef.automate.api.iam.v2.AddTeamMembersResp": {
       "type": "object",
       "example": {
-        "team": {
-          "id": "test-id",
-          "name": "My Test Team",
-          "projects": [
-            "project1",
-            "project2"
-          ]
-        }
+        "user_ids": [
+          "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
+          "353a62d4-85fa-4423-b12a-f6608a562ae9"
+        ]
       },
       "properties": {
         "user_ids": {
@@ -399,14 +395,10 @@
     "chef.automate.api.iam.v2.GetTeamMembershipResp": {
       "type": "object",
       "example": {
-        "team": {
-          "id": "test-id",
-          "name": "My Test Team",
-          "projects": [
-            "project1",
-            "project2"
-          ]
-        }
+        "user_ids": [
+          "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
+          "353a62d4-85fa-4423-b12a-f6608a562ae9"
+        ]
       },
       "properties": {
         "user_ids": {
@@ -419,6 +411,16 @@
     },
     "chef.automate.api.iam.v2.GetTeamResp": {
       "type": "object",
+      "example": {
+        "team": {
+          "id": "test-id",
+          "name": "My Test Team",
+          "projects": [
+            "project1",
+            "project2"
+          ]
+        }
+      },
       "properties": {
         "team": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Team"
@@ -512,14 +514,10 @@
     "chef.automate.api.iam.v2.RemoveTeamMembersResp": {
       "type": "object",
       "example": {
-        "team": {
-          "id": "test-id",
-          "name": "My Test Team",
-          "projects": [
-            "project1",
-            "project2"
-          ]
-        }
+        "user_ids": [
+          "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
+          "353a62d4-85fa-4423-b12a-f6608a562ae9"
+        ]
       },
       "properties": {
         "user_ids": {

@@ -16,8 +16,8 @@ func init() {
   "paths": {
     "/iam/v2/teams": {
       "get": {
-        "summary": "List all local teams",
-        "description": "List all local teams.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Lists all local teams",
+        "description": "Lists all local teams.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListTeams",
         "responses": {
           "200": {
@@ -32,8 +32,8 @@ func init() {
         ]
       },
       "post": {
-        "summary": "Create a local team",
-        "description": "Creates a local team, used to group local users as members of IAM policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Creates a local team",
+        "description": "Creates a local team that is used to group local users as members of IAM policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateTeam",
         "responses": {
           "200": {
@@ -90,8 +90,8 @@ func init() {
         ]
       },
       "delete": {
-        "summary": "Delete a local team",
-        "description": "Delete a local team and remove it from any policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:delete\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Deletes a local team",
+        "description": "Deletes a local team and removes it from any policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteTeam",
         "responses": {
           "200": {
@@ -114,8 +114,8 @@ func init() {
         ]
       },
       "put": {
-        "summary": "Update a local team",
-        "description": "Update a local team.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:update\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Updates a local team",
+        "description": "Updates a local team.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teams:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateTeam",
         "responses": {
           "200": {
@@ -154,7 +154,7 @@ func init() {
     },
     "/iam/v2/teams/{id}/users": {
       "get": {
-        "summary": "Get local team membership",
+        "summary": "Gets local team membership",
         "description": "Lists all users of a local team. Users are listed by their membership_id.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetTeamMembership",
         "responses": {
@@ -180,8 +180,8 @@ func init() {
     },
     "/iam/v2/teams/{id}/users:add": {
       "post": {
-        "summary": "Add local team membership",
-        "description": "Add a list of users to a local team. Users are added by their membership_id.\nThe request will ignore any members that do not exist.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Adds local team membership",
+        "description": "Adds a list of users to a local team. Users are added by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "AddTeamMembers",
         "responses": {
           "200": {
@@ -220,8 +220,8 @@ func init() {
     },
     "/iam/v2/teams/{id}/users:remove": {
       "post": {
-        "summary": "Remove local team membership",
-        "description": "Remove a list of users from a local team. Users are removed by their membership_id.\nThe request will ignore any members that were not on the team or do not exist.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:delete\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Removes local team membership",
+        "description": "Removes a list of users from a local team. Users are removed by their membership_id.\nThe request currently does not validate that membership_id maps to a real user.\n\nThe membership_id for users can be found via GET /apis/iam/v2/users/\u003cuser_id\u003e.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:teamUsers:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "RemoveTeamMembers",
         "responses": {
           "200": {
@@ -260,7 +260,7 @@ func init() {
     },
     "/iam/v2/users/{id}/teams": {
       "get": {
-        "summary": "Get team membership for a user",
+        "summary": "Gets team membership for a user",
         "description": "Lists all local teams for a specific user. You must use their membership_id in the request URL.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:userTeams:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetTeamsForMember",
         "responses": {
@@ -288,6 +288,12 @@ func init() {
   "definitions": {
     "chef.automate.api.iam.v2.AddTeamMembersReq": {
       "type": "object",
+      "example": {
+        "user_ids": [
+          "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
+          "353a62d4-85fa-4423-b12a-f6608a562ae9"
+        ]
+      },
       "properties": {
         "id": {
           "type": "string"
@@ -306,6 +312,12 @@ func init() {
     },
     "chef.automate.api.iam.v2.AddTeamMembersResp": {
       "type": "object",
+      "example": {
+        "user_ids": [
+          "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
+          "353a62d4-85fa-4423-b12a-f6608a562ae9"
+        ]
+      },
       "properties": {
         "user_ids": {
           "type": "array",
@@ -350,12 +362,14 @@ func init() {
     "chef.automate.api.iam.v2.CreateTeamResp": {
       "type": "object",
       "example": {
-        "id": "test-id",
-        "name": "My Test Team",
-        "projects": [
-          "project1",
-          "project2"
-        ]
+        "team": {
+          "id": "test-id",
+          "name": "My Test Team",
+          "projects": [
+            "project1",
+            "project2"
+          ]
+        }
       },
       "properties": {
         "team": {
@@ -365,6 +379,16 @@ func init() {
     },
     "chef.automate.api.iam.v2.DeleteTeamResp": {
       "type": "object",
+      "example": {
+        "team": {
+          "id": "test-id",
+          "name": "My Test Team",
+          "projects": [
+            "project1",
+            "project2"
+          ]
+        }
+      },
       "properties": {
         "team": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Team"
@@ -373,6 +397,12 @@ func init() {
     },
     "chef.automate.api.iam.v2.GetTeamMembershipResp": {
       "type": "object",
+      "example": {
+        "user_ids": [
+          "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
+          "353a62d4-85fa-4423-b12a-f6608a562ae9"
+        ]
+      },
       "properties": {
         "user_ids": {
           "type": "array",
@@ -384,6 +414,16 @@ func init() {
     },
     "chef.automate.api.iam.v2.GetTeamResp": {
       "type": "object",
+      "example": {
+        "team": {
+          "id": "test-id",
+          "name": "My Test Team",
+          "projects": [
+            "project1",
+            "project2"
+          ]
+        }
+      },
       "properties": {
         "team": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Team"
@@ -392,6 +432,25 @@ func init() {
     },
     "chef.automate.api.iam.v2.GetTeamsForMemberResp": {
       "type": "object",
+      "example": {
+        "teams": [
+          {
+            "id": "test-1",
+            "name": "My Test Team",
+            "projects": [
+              "project1",
+              "project2"
+            ]
+          },
+          {
+            "id": "test-2",
+            "name": "My Test Team 2",
+            "projects": [
+              "project1"
+            ]
+          }
+        ]
+      },
       "properties": {
         "teams": {
           "type": "array",
@@ -403,6 +462,25 @@ func init() {
     },
     "chef.automate.api.iam.v2.ListTeamsResp": {
       "type": "object",
+      "example": {
+        "teams": [
+          {
+            "id": "test-1",
+            "name": "My Test Team",
+            "projects": [
+              "project1",
+              "project2"
+            ]
+          },
+          {
+            "id": "test-2",
+            "name": "My Test Team 2",
+            "projects": [
+              "project1"
+            ]
+          }
+        ]
+      },
       "properties": {
         "teams": {
           "type": "array",
@@ -414,6 +492,12 @@ func init() {
     },
     "chef.automate.api.iam.v2.RemoveTeamMembersReq": {
       "type": "object",
+      "example": {
+        "user_ids": [
+          "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
+          "353a62d4-85fa-4423-b12a-f6608a562ae9"
+        ]
+      },
       "properties": {
         "id": {
           "type": "string"
@@ -432,6 +516,12 @@ func init() {
     },
     "chef.automate.api.iam.v2.RemoveTeamMembersResp": {
       "type": "object",
+      "example": {
+        "user_ids": [
+          "527ed96f-2ecb-4f8f-abd7-0bf6511459ac",
+          "353a62d4-85fa-4423-b12a-f6608a562ae9"
+        ]
+      },
       "properties": {
         "user_ids": {
           "type": "array",
@@ -463,6 +553,13 @@ func init() {
     },
     "chef.automate.api.iam.v2.UpdateTeamReq": {
       "type": "object",
+      "example": {
+        "name": "My Test Team",
+        "projects": [
+          "project1",
+          "project2"
+        ]
+      },
       "properties": {
         "id": {
           "type": "string"
@@ -484,6 +581,16 @@ func init() {
     },
     "chef.automate.api.iam.v2.UpdateTeamResp": {
       "type": "object",
+      "example": {
+        "team": {
+          "id": "test-id",
+          "name": "My Test Team",
+          "projects": [
+            "project1",
+            "project2"
+          ]
+        }
+      },
       "properties": {
         "team": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Team"

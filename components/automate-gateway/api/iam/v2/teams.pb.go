@@ -160,7 +160,7 @@ type TeamsClient interface {
 	//
 	//Deletes a local team
 	//
-	//Deletes a local team and remove it from any policies.
+	//Deletes a local team and removes it from any policies.
 	//
 	//Authorization Action:
 	//```
@@ -181,7 +181,9 @@ type TeamsClient interface {
 	//Adds local team membership
 	//
 	//Adds a list of users to a local team. Users are added by their membership_id.
-	//The request will ignore any members that do not exist.
+	//The request currently does not validate that membership_id maps to a real user.
+	//
+	//The membership_id for users can be found via GET /apis/iam/v2/users/<user_id>.
 	//
 	//Authorization Action:
 	//```
@@ -192,7 +194,9 @@ type TeamsClient interface {
 	//Removes local team membership
 	//
 	//Removes a list of users from a local team. Users are removed by their membership_id.
-	//The request will ignore any members that were not on the team or do not exist.
+	//The request currently does not validate that membership_id maps to a real user.
+	//
+	//The membership_id for users can be found via GET /apis/iam/v2/users/<user_id>.
 	//
 	//Authorization Action:
 	//```
@@ -369,7 +373,7 @@ type TeamsServer interface {
 	//
 	//Deletes a local team
 	//
-	//Deletes a local team and remove it from any policies.
+	//Deletes a local team and removes it from any policies.
 	//
 	//Authorization Action:
 	//```
@@ -390,7 +394,9 @@ type TeamsServer interface {
 	//Adds local team membership
 	//
 	//Adds a list of users to a local team. Users are added by their membership_id.
-	//The request will ignore any members that do not exist.
+	//The request currently does not validate that membership_id maps to a real user.
+	//
+	//The membership_id for users can be found via GET /apis/iam/v2/users/<user_id>.
 	//
 	//Authorization Action:
 	//```
@@ -401,7 +407,9 @@ type TeamsServer interface {
 	//Removes local team membership
 	//
 	//Removes a list of users from a local team. Users are removed by their membership_id.
-	//The request will ignore any members that were not on the team or do not exist.
+	//The request currently does not validate that membership_id maps to a real user.
+	//
+	//The membership_id for users can be found via GET /apis/iam/v2/users/<user_id>.
 	//
 	//Authorization Action:
 	//```
