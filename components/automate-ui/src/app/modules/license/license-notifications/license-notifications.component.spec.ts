@@ -1,3 +1,4 @@
+import { Injectable } from '@angular/core';
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { MockComponent } from 'ng2-mock-component';
 import { Observable, BehaviorSubject } from 'rxjs';
@@ -14,10 +15,12 @@ describe('LicenseNotificationsComponent', () => {
   let component: LicenseNotificationsComponent;
   let fixture: ComponentFixture<LicenseNotificationsComponent>;
 
+  @Injectable()
   class MockLicenseFacadeService extends LicenseFacadeService {
     notifications$: Observable<Notification[]> = new BehaviorSubject([]);
   }
 
+  @Injectable()
   class MockLayoutFacadeService extends LicenseFacadeService {
     layout = {
       license: {
