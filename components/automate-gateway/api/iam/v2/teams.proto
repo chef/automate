@@ -155,7 +155,7 @@ service Teams {
   /*
   Deletes a local team
 
-  Deletes a local team and remove it from any policies.
+  Deletes a local team and removes it from any policies.
 
   Authorization Action:
   ```
