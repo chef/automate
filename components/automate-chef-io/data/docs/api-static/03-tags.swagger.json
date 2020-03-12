@@ -18,7 +18,7 @@
     },
     {
       "name": "Identity",
-      "tags": ["tokens"]
+      "tags": ["teams", "tokens"]
     },
     {
       "name": "Access Management",
@@ -41,6 +41,8 @@
       "description": "Projects are used to group and permission Chef Automate resources as well as ingested data, specifically Compliance reports, Chef Server events, and Infrastructure nodes." },
     { "name": "tokens", "x-displayName": "IAM API Tokens",
       "description": "Tokens are used for API access to Automate endpoints as well as by systems (e.g. Chef Servers) to communicate with Automate." },
-    { "name": "JobsService", "x-displayName": "Scan Jobs" }
+    { "name": "JobsService", "x-displayName": "Scan Jobs" },
+    { "name": "teams", "x-displayName": "IAM Teams",
+      "description": "Teams are used to group local users for policy membership."}
   ]
 }
