@@ -26,7 +26,7 @@
           <div class="checkbox-row" [formGroup]="eventFeedRemoveData">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!eventFeedRemoveData.disabled"
+              [checked]="!eventFeedRemoveData.value.disabled"
               (change)="toggleInput(eventFeedRemoveData, $event.detail)">
             </chef-checkbox>
             </div>
@@ -37,7 +37,7 @@
           <div class="checkbox-row" [formGroup]="eventFeedServerActions">
             <div class="checkbox-container">
               <chef-checkbox
-                [checked]="!eventFeedServerActions.disabled"
+                [checked]="!eventFeedServerActions.value.disabled"
                 (change)="toggleInput(eventFeedServerActions, $event.detail)">
               </chef-checkbox>
             </div>
@@ -50,7 +50,7 @@
           <div class="checkbox-row" [formGroup]="serviceGroupNoHealthChecks">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!serviceGroupNoHealthChecks.disabled"
+              [checked]="!serviceGroupNoHealthChecks.value.disabled"
               (change)="toggleInput(serviceGroupNoHealthChecks, $event.detail)">
               </chef-checkbox>
             </div>
@@ -70,7 +70,7 @@
           <div class="checkbox-row secondary-row" [formGroup]="serviceGroupRemoveServices">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!serviceGroupRemoveServices.disabled"
+              [checked]="!serviceGroupRemoveServices.value.disabled"
               (change)="toggleInput(serviceGroupRemoveServices, $event.detail)">
               </chef-checkbox>
             </div>
@@ -92,7 +92,7 @@
           <div class="checkbox-row" [formGroup]="clientRunsRemoveData">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!clientRunsRemoveData.disabled"
+              [checked]="!clientRunsRemoveData.value.disabled"
               (change)="toggleInput(clientRunsRemoveData, $event.detail)">
               </chef-checkbox>
             </div>
@@ -102,7 +102,7 @@
           <div class="checkbox-row" [formGroup]="clientRunsLabelMissing">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!clientRunsLabelMissing.disabled"
+              [checked]="!clientRunsLabelMissing.value.disabled"
               (change)="toggleInput(clientRunsLabelMissing, $event.detail)">
               </chef-checkbox>
             </div>
@@ -123,7 +123,7 @@
           <div class="checkbox-row secondary-row" [formGroup]="clientRunsRemoveNodes">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!clientRunsRemoveNodes.disabled"
+              [checked]="!clientRunsRemoveNodes.value.disabled"
               (change)="toggleInput(clientRunsRemoveNodes, $event.detail)">
               </chef-checkbox>
             </div>
@@ -144,7 +144,7 @@
           <div class="checkbox-row" [formGroup]="complianceRemoveReports">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!complianceRemoveReports.disabled"
+              [checked]="!complianceRemoveReports.value.disabled"
               (change)="toggleInput(complianceRemoveReports, $event.detail)">
               </chef-checkbox>
             </div>
@@ -154,7 +154,7 @@
           <div class="checkbox-row" [formGroup]="complianceRemoveScans">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!complianceRemoveScans.disabled"
+              [checked]="!complianceRemoveScans.value.disabled"
               (change)="toggleInput(complianceRemoveScans, $event.detail)">
               </chef-checkbox>
             </div>

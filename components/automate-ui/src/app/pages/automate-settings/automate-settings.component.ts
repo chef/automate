@@ -26,7 +26,7 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 export class AutomateSettingsComponent implements OnInit {
 
-  private defaultFormData2 = {
+  private defaultFormData = {
     eventFeedRemoveData: {
       category: 'event_feed',
       unit: { value: 'd', disabled: false },
@@ -125,7 +125,7 @@ export class AutomateSettingsComponent implements OnInit {
     private fb: FormBuilder,
     private telemetryService: TelemetryService
   ) {
-    const formDetails = this.defaultFormData2;
+    const formDetails = this.defaultFormData;
 
 //  EventFeed
     this.eventFeedRemoveData = this.fb.group(formDetails['eventFeedRemoveData']);
@@ -178,7 +178,7 @@ export class AutomateSettingsComponent implements OnInit {
         } else {
           this.jobSchedulerStatus = automateSettingsSelector.jobSchedulerStatus;
           this.telemetryService.track('lifecycleConfiguration', this.jobSchedulerStatus);
-          this.updateForm(this.jobSchedulerStatus);
+          // this.updateForm(this.jobSchedulerStatus);
           this.onChanges();
         }
       });
@@ -393,7 +393,7 @@ export class AutomateSettingsComponent implements OnInit {
       unit: formUnit.toString(),
       threshold: formThreshold.toString(),
       disabled: job.disabled
-    }
+    };
 
     switch (job.name) {
       case 'missing_nodes': {
