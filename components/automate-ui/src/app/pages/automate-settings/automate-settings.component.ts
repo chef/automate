@@ -278,7 +278,6 @@ export class AutomateSettingsComponent implements OnInit {
   // Update forms until we get the job scheduler status
   public updateForm(jobSchedulerStatus: JobSchedulerStatus) {
     if (jobSchedulerStatus === null) {
-      console.log('updateForm: null');
       return;
     }
 
@@ -343,27 +342,25 @@ export class AutomateSettingsComponent implements OnInit {
   }
 
   private populateInfra(job: IngestJob): void {
+    let formThreshold, formUnit;
+    const form = {
+      unit: formUnit.toString(),
+      threshold: formThreshold.toString(),
+      disabled: job.disabled
+    }
 
     switch (job.name) {
       case 'missing_nodes': {
         this.handleDisable(this.clientRunsRemoveData);
-        const [formThreshold, formUnit] = this.splitThreshold(job.threshold);
-        this.clientRunsRemoveData.patchValue({
-          unit: formUnit.toString(),
-          threshold: formThreshold.toString(),
-          disabled: job.disabled
-        });
+        [formThreshold, formUnit] = this.splitThreshold(job.threshold);
+        this.clientRunsRemoveData.patchValue(form);
       }
       break;
 
       case 'missing_nodes_for_deletion': {
         this.handleDisable(this.clientRunsLabelMissing);
-        const [formThreshold, formUnit] = this.splitThreshold(job.threshold);
-        this.clientRunsLabelMissing.patchValue({
-          unit: formUnit.toString(),
-          threshold: formThreshold.toString(),
-          disabled: job.disabled
-        });
+        [formThreshold, formUnit] = this.splitThreshold(job.threshold);
+        this.clientRunsLabelMissing.patchValue(form);
       }
       break;
 
