@@ -16,8 +16,8 @@ func init() {
   "paths": {
     "/iam/v2/tokens": {
       "get": {
-        "summary": "List all tokens",
-        "description": "List all tokens, both admin and non-admin.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Lists all tokens",
+        "description": "Lists all tokens, both admin and non-admin.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListTokens",
         "responses": {
           "200": {
@@ -32,8 +32,8 @@ func init() {
         ]
       },
       "post": {
-        "summary": "Create a token",
-        "description": "Creates a token.\nActive defaults to true when not specified.\nValue is auto-generated when not specified.\n\nExample:\n` + "`" + `` + "`" + `` + "`" + `\n{\n\"name\": \"token 1\",\n\"id\": \"token-1\",\n\"active\": true,\n\"projects\": [\n\"east-region\",\n\"west-region\"\n]\n}\n` + "`" + `` + "`" + `` + "`" + `\n\nNote that this creates *non-admin* tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using ` + "`" + `tokens:*` + "`" + `` + "`" + `).\n\nYou cannot create admin tokens via the REST API.\nAdmin tokens can only be created by specifying the ` + "`" + `--admin` + "`" + ` flag to this chef-automate sub-command:\n` + "`" + `` + "`" + `` + "`" + `\nchef-automate iam token create \u003cyour-token-name\u003e --admin` + "`" + `\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Creates a token",
+        "description": "Creates a token.\nActive defaults to true when not specified.\nValue is auto-generated when not specified.\n\nNote that this creates *non-admin* tokens that may then be assigned permissions via policies just like users or teams (unless you have already created policies that encompass all tokens using ` + "`" + `tokens:*` + "`" + `` + "`" + `).\n\nYou cannot create admin tokens via the REST API.\nAdmin tokens can only be created by specifying the ` + "`" + `--admin` + "`" + ` flag to this chef-automate sub-command:\n` + "`" + `` + "`" + `` + "`" + `\nchef-automate iam token create \u003cyour-token-name\u003e --admin` + "`" + `\n` + "`" + `` + "`" + `` + "`" + `\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateToken",
         "responses": {
           "200": {
@@ -55,12 +55,18 @@ func init() {
         ],
         "tags": [
           "tokens"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"token 1\", \"id\": \"token-1\", \"active\": true, \"projects\": [\"east-region\", \"west-region\"]}"
+          }
         ]
       }
     },
     "/iam/v2/tokens/{id}": {
       "get": {
-        "summary": "Get a token",
+        "summary": "Gets a token",
         "description": "Returns the details for a token.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetToken",
         "responses": {
@@ -85,8 +91,8 @@ func init() {
         ]
       },
       "delete": {
-        "summary": "Delete a token",
-        "description": "Delete a token and remove it from any policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:delete\n` + "`" + `` + "`" + `` + "`" + `",
+        "summary": "Deletes a token",
+        "description": "Deletes a token and remove it from any policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteToken",
         "responses": {
           "200": {
@@ -110,7 +116,7 @@ func init() {
         ]
       },
       "put": {
-        "summary": "Update a token",
+        "summary": "Updates a token",
         "description": "This operation overwrites all fields excepting ID, timestamps, and value,\nincluding those omitted from the request, so be sure to specify all properties.\nProperties that you do not include are reset to empty values.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:tokens:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateToken",
         "responses": {
@@ -140,6 +146,12 @@ func init() {
         ],
         "tags": [
           "tokens"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"updated token name\", \"active\": true, \"projects\": [\"east-region\", \"south-region\"]}"
+          }
         ]
       }
     }
@@ -147,6 +159,15 @@ func init() {
   "definitions": {
     "chef.automate.api.iam.v2.CreateTokenReq": {
       "type": "object",
+      "example": {
+        "name": "token 1",
+        "id": "token-1",
+        "active": true,
+        "projects": [
+          "east-region",
+          "west-region"
+        ]
+      },
       "properties": {
         "id": {
           "type": "string",
@@ -180,6 +201,15 @@ func init() {
     },
     "chef.automate.api.iam.v2.CreateTokenResp": {
       "type": "object",
+      "example": {
+        "name": "token 1",
+        "id": "token-1",
+        "active": true,
+        "projects": [
+          "east-region",
+          "west-region"
+        ]
+      },
       "properties": {
         "token": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Token"
@@ -191,6 +221,15 @@ func init() {
     },
     "chef.automate.api.iam.v2.GetTokenResp": {
       "type": "object",
+      "example": {
+        "name": "token 1",
+        "id": "token-1",
+        "active": true,
+        "projects": [
+          "east-region",
+          "west-region"
+        ]
+      },
       "properties": {
         "token": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Token"
@@ -199,6 +238,28 @@ func init() {
     },
     "chef.automate.api.iam.v2.ListTokensResp": {
       "type": "object",
+      "example": {
+        "tokens": [
+          {
+            "name": "token 1",
+            "id": "token-1",
+            "active": true,
+            "projects": [
+              "east-region",
+              "west-region"
+            ]
+          },
+          {
+            "name": "token 2",
+            "id": "token-2",
+            "active": false,
+            "projects": [
+              "north-region",
+              "south-region"
+            ]
+          }
+        ]
+      },
       "properties": {
         "tokens": {
           "type": "array",
@@ -250,6 +311,14 @@ func init() {
     },
     "chef.automate.api.iam.v2.UpdateTokenReq": {
       "type": "object",
+      "example": {
+        "name": "updated token name",
+        "active": true,
+        "projects": [
+          "east-region",
+          "south-region"
+        ]
+      },
       "properties": {
         "id": {
           "type": "string",
@@ -278,6 +347,15 @@ func init() {
     },
     "chef.automate.api.iam.v2.UpdateTokenResp": {
       "type": "object",
+      "example": {
+        "name": "token 1",
+        "id": "token-1",
+        "active": true,
+        "projects": [
+          "east-region",
+          "west-region"
+        ]
+      },
       "properties": {
         "token": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Token"
