@@ -19,7 +19,6 @@ import (
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/tokens/mock"
 	"github.com/chef/automate/components/authn-service/tokens/pg"
-	"github.com/chef/automate/components/authn-service/tokens/pg/testconstants"
 	tokens "github.com/chef/automate/components/authn-service/tokens/types"
 	tutil "github.com/chef/automate/components/authn-service/tokens/util"
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -38,26 +37,44 @@ func init() {
 	rand.Seed(time.Now().Unix())
 }
 
+func initializePG() (*pg.Config, error) {
+	ciMode := os.Getenv("CI") == "true"
+
+	// If in CI mode, use the default
+	if ciMode {
+		return &pg.Config{
+			PGURL:          constants.TestPgURL,
+			MigrationsPath: "sql/",
+		}, nil
+	}
+
+	customPGURL, pgURLPassed := os.LookupEnv("PG_URL")
+
+	// If PG_URL wasn't passed (and we aren't in CI)
+	// we shouldn't run the postgres tests, return nil.
+	if !pgURLPassed {
+		return nil, nil
+	}
+
+	return &pg.Config{
+		PGURL:          customPGURL,
+		MigrationsPath: "sql/",
+	}, nil
+}
+
 type adapterTestFunc func(context.Context, *testing.T, tokens.Storage)
 
 // TestToken tests the mock and pg adapters via their implemented adapter
 // interface
 func TestToken(t *testing.T) {
-	pgURLGiven := false
-
-	// Note: this matches CI
-	pgCfg := pg.Config{
-		PGURL:          constants.TestPgURL,
-		MigrationsPath: "pg/sql/",
-	}
-	if v, found := os.LookupEnv("PG_URL"); found {
-		pgCfg.PGURL = v
-		pgURLGiven = true
+	pgCfg, err := initializePG()
+	if err != nil {
+		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
 	adapters := map[string]tokens.TokenConfig{
 		"mock": &mock.Config{},
-		"pg":   &pgCfg,
+		"pg":   pgCfg,
 	}
 
 	authzCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -110,11 +127,11 @@ func TestToken(t *testing.T) {
 					//   - if this is running on CI, never skip
 					// Why bother skipping? -- We don't want our test suite to require
 					// a running postgres instance, as that we would be annoying.
-					if pgURLGiven || os.Getenv("CI") == "true" {
+					if pgCfg == nil {
 						t.Fatalf("opening connector: %s", err)
 					} else {
 						t.Logf("opening database: %s", err)
-						t.Logf(testconstants.SkipPGMessageFmt, pgCfg.PGURL)
+						t.Logf("failed to open test database with PG_URL: %q", pgCfg.PGURL)
 						t.SkipNow()
 					}
 				}

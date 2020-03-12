@@ -52,7 +52,7 @@ func TestPostgres(t *testing.T) {
 	// between database content and hardcoded storage default policies actually
 	// compares the migrated policies with the hardcoded ones (and NOT the
 	// hardcoded policies with the hardcoded policies).
-	db := openDB(t)
+	db := openDB(t, migrationConfig.PGURL.String())
 	_, err = db.ExecContext(ctx, resetDatabaseStatement)
 	require.NoError(t, err)
 
@@ -85,7 +85,7 @@ func TestPostgres(t *testing.T) {
 	// Reset db before each test. This will restore default policies.
 	r := backend.(storage.Resetter)
 
-	testFuncs := map[string]func(*testing.T, storage.Storage, context.Context){
+	testFuncs := map[string]func(*testing.T, storage.Storage, context.Context, string){
 		"ListPolicies":             testListPolicies,
 		"StorePolicy":              testStorePolicy,
 		"DeletePolicy":             testDeletePolicy,
@@ -103,7 +103,7 @@ func TestPostgres(t *testing.T) {
 					dumpResp(t, resp)
 				}
 			})
-			test(t, backend, ctx)
+			test(t, backend, ctx, migrationConfig.PGURL.String())
 		})
 	}
 }
@@ -112,7 +112,7 @@ func dumpResp(t *testing.T, resp interface{}) {
 	t.Errorf("resp: %s", spew.Sdump(resp))
 }
 
-func testListPolicies(t *testing.T, s storage.Storage, ctx context.Context) {
+func testListPolicies(t *testing.T, s storage.Storage, ctx context.Context, _ string) {
 	t.Run("database with default policies", func(t *testing.T) {
 		resp, err := s.ListPolicies(ctx)
 		require.NoError(t, err)
@@ -122,7 +122,7 @@ func testListPolicies(t *testing.T, s storage.Storage, ctx context.Context) {
 	})
 }
 
-func testStorePolicy(t *testing.T, s storage.Storage, ctx context.Context) {
+func testStorePolicy(t *testing.T, s storage.Storage, ctx context.Context, _ string) {
 	t.Run("database with one row in addition to default policies", func(t *testing.T) {
 		resp, err := s.StorePolicy(
 			ctx,
@@ -143,8 +143,8 @@ func testStorePolicy(t *testing.T, s storage.Storage, ctx context.Context) {
 	})
 }
 
-func testDeletePolicy(t *testing.T, s storage.Storage, ctx context.Context) {
-	db := openDB(t)
+func testDeletePolicy(t *testing.T, s storage.Storage, ctx context.Context, pgurl string) {
+	db := openDB(t, pgurl)
 
 	t.Run("database with one row", func(t *testing.T) {
 		u := uuid.Must(uuid.NewV4())
@@ -187,7 +187,7 @@ func testDeletePolicy(t *testing.T, s storage.Storage, ctx context.Context) {
 	})
 }
 
-func testPurgeSubjectFromPolicies(t *testing.T, s storage.Storage, ctx context.Context) {
+func testPurgeSubjectFromPolicies(t *testing.T, s storage.Storage, ctx context.Context, pgurl string) {
 	t.Run("database with only default policies", func(t *testing.T) {
 		noopCases := map[string]string{
 			"subject not in policy":           "user:local:purge",
@@ -217,7 +217,7 @@ func testPurgeSubjectFromPolicies(t *testing.T, s storage.Storage, ctx context.C
 
 		for desc, tc := range cases {
 			t.Run(desc, func(t *testing.T) {
-				db := openDB(t)
+				db := openDB(t, pgurl)
 				u := uuid.Must(uuid.NewV4())
 				p := []byte(fmt.Sprintf(`{"subjects": %s, "action": "*", "resource": "auth:*", "effect": "allow"}`, tc))
 				_, err := db.ExecContext(ctx, `INSERT INTO policies (id, policy_data, version) VALUES ($1, $2, $3)`,
@@ -292,9 +292,9 @@ func migrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*mi
 	}, nil
 }
 
-func openDB(t *testing.T) *sql.DB {
+func openDB(t *testing.T, pgurl string) *sql.DB {
 	t.Helper()
-	db, err := sql.Open("postgres", "postgres://postgres:postgres@127.0.0.1:5432/authz_test?sslmode=disable")
+	db, err := sql.Open("postgres", pgurl)
 	require.NoError(t, err, "error opening db")
 	err = db.Ping()
 	require.NoError(t, err, "error pinging db")

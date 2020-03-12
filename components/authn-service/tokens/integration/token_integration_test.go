@@ -22,7 +22,6 @@ import (
 	"github.com/chef/automate/components/authn-service/constants"
 	"github.com/chef/automate/components/authn-service/server"
 	"github.com/chef/automate/components/authn-service/tokens/pg"
-	"github.com/chef/automate/components/authn-service/tokens/pg/testconstants"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/test/helpers"
@@ -34,6 +33,31 @@ func init() {
 	cfg := zap.NewProductionConfig()
 	cfg.Level.SetLevel(zap.ErrorLevel)
 	logger, _ = cfg.Build()
+}
+
+func initializePG() (*pg.Config, error) {
+	ciMode := os.Getenv("CI") == "true"
+
+	// If in CI mode, use the default
+	if ciMode {
+		return &pg.Config{
+			PGURL:          constants.TestPgURL,
+			MigrationsPath: "sql/",
+		}, nil
+	}
+
+	customPGURL, pgURLPassed := os.LookupEnv("PG_URL")
+
+	// If PG_URL wasn't passed (and we aren't in CI)
+	// we shouldn't run the postgres tests, return nil.
+	if !pgURLPassed {
+		return nil, nil
+	}
+
+	return &pg.Config{
+		PGURL:          customPGURL,
+		MigrationsPath: "sql/",
+	}, nil
 }
 
 // In TestChefClientAuthn, we stand up a server that
@@ -61,14 +85,9 @@ func TestChefClientAuthn(t *testing.T) {
 		t.Fatalf("parse test upstream URL %+v: %v", upstream, err)
 	}
 
-	pgURLGiven := false
-	pgCfg := pg.Config{
-		PGURL:          constants.TestPgURL,
-		MigrationsPath: "../pg/sql/",
-	}
-	if v, found := os.LookupEnv("PG_URL"); found {
-		pgCfg.PGURL = v
-		pgURLGiven = true
+	pgCfg, err := initializePG()
+	if err != nil {
+		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
 	serviceCerts := helpers.LoadDevCerts(t, "authn-service")
@@ -82,11 +101,11 @@ func TestChefClientAuthn(t *testing.T) {
 				Headers: []string{"x-data-collector-token", "api-token"},
 				Storage: tokenauthn.StorageConfig{
 					Type:   "postgres",
-					Config: &pgCfg,
+					Config: pgCfg,
 				},
 			},
 		},
-		Token:        &pgCfg,
+		Token:        pgCfg,
 		ServiceCerts: serviceCerts,
 	}
 
@@ -96,11 +115,11 @@ func TestChefClientAuthn(t *testing.T) {
 	serv, err := server.NewServer(ctx, config, authorizationClient)
 	if err != nil {
 		// SKIP these tests if there's no PG_URL given -- and never skip during CI!
-		if pgURLGiven || os.Getenv("CI") == "true" {
+		if pgCfg == nil {
 			t.Fatalf("opening connector: %s", err)
 		} else {
 			t.Logf("opening database: %s", err)
-			t.Logf(testconstants.SkipPGMessageFmt, pgCfg.PGURL)
+			t.Logf("failed to open test database with PG_URL: %q", pgCfg.PGURL)
 			t.SkipNow()
 		}
 		t.Fatalf("opening connector: %s", err)
