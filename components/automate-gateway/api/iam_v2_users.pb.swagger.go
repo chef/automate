@@ -16,6 +16,8 @@ func init() {
   "paths": {
     "/iam/v2/self/{id}": {
       "put": {
+        "summary": "Update self (as user)",
+        "description": "Updates a local user's own name or password.\nIf changing the password, both \"password\" and \"previous_password\" are required.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:usersSelf:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateSelf",
         "responses": {
           "200": {
@@ -28,7 +30,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "The id cannot be changed, it's for determining which user this is supposed\nto update",
+            "description": "ID of the user. Cannot be changed. Used to sign in.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -43,12 +45,20 @@ func init() {
           }
         ],
         "tags": [
-          "Users"
+          "users"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"My New Name\", \"password\": \"aNewSafePassword\", \"previous_password\": \"aPreviousSafePassword\"}"
+          }
         ]
       }
     },
     "/iam/v2/users": {
       "get": {
+        "summary": "List all users",
+        "description": "Lists all local users.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListUsers",
         "responses": {
           "200": {
@@ -59,10 +69,12 @@ func init() {
           }
         },
         "tags": [
-          "Users"
+          "users"
         ]
       },
       "post": {
+        "summary": "Create a user",
+        "description": "Creates a local user that can sign in to Automate and be a member of IAM teams\nand IAM policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateUser",
         "responses": {
           "200": {
@@ -83,12 +95,20 @@ func init() {
           }
         ],
         "tags": [
-          "Users"
+          "users"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"Display Name\", \"id\": \"username001rulez\", \"password\": \"aSafePassword\"}"
+          }
         ]
       }
     },
     "/iam/v2/users/{id}": {
       "get": {
+        "summary": "Get a user",
+        "description": "Returns the details for a local user.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetUser",
         "responses": {
           "200": {
@@ -101,16 +121,19 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "ID of the user.",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "Users"
+          "users"
         ]
       },
       "delete": {
+        "summary": "Delete a user",
+        "description": "Deletes a local user.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteUser",
         "responses": {
           "200": {
@@ -123,16 +146,19 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "ID of the user.",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "Users"
+          "users"
         ]
       },
       "put": {
+        "summary": "Update a user",
+        "description": "Updates a local user's name or password.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateUser",
         "responses": {
           "200": {
@@ -145,7 +171,7 @@ func init() {
         "parameters": [
           {
             "name": "id",
-            "description": "The id cannot be changed, it's for determining which user this is supposed\nto update",
+            "description": "ID of the user. Cannot be changed. Used to sign in.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -160,7 +186,13 @@ func init() {
           }
         ],
         "tags": [
-          "Users"
+          "users"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"name\": \"New Name\", \"password\": \"aSafePassword\"}"
+          }
         ]
       }
     }
@@ -168,15 +200,23 @@ func init() {
   "definitions": {
     "chef.automate.api.iam.v2.CreateUserReq": {
       "type": "object",
+      "example": {
+        "name": "Display Name",
+        "id": "username001rulez",
+        "password": "aSafePassword"
+      },
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID. Cannot be changed. Used to sign in."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Display name for local user."
         },
         "password": {
-          "type": "string"
+          "type": "string",
+          "description": "Password for user. Used to sign in."
         }
       },
       "required": [
@@ -217,24 +257,30 @@ func init() {
     },
     "chef.automate.api.iam.v2.UpdateSelfReq": {
       "type": "object",
+      "example": {
+        "name": "My New Name",
+        "password": "aNewSafePassword",
+        "previous_password": "aPreviousSafePassword"
+      },
       "properties": {
         "id": {
           "type": "string",
-          "title": "The id cannot be changed, it's for determining which user this is supposed\nto update"
+          "description": "ID of the user. Cannot be changed. Used to sign in."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Display name for local user."
         },
         "password": {
           "type": "string",
-          "description": "Note: for UpdateSelfReq, the password and previous_password are optional,\nbut if passed, they must both be passed."
+          "description": "New password for user. Used to sign in.\nOptional, but if included, previous_password is also required."
         },
         "previous_password": {
-          "type": "string"
+          "type": "string",
+          "description": "Previous password for user.\nOptional, but if included, password is also required."
         }
       },
       "required": [
-        "id",
         "name"
       ]
     },
@@ -248,20 +294,25 @@ func init() {
     },
     "chef.automate.api.iam.v2.UpdateUserReq": {
       "type": "object",
+      "example": {
+        "name": "New Name",
+        "password": "aSafePassword"
+      },
       "properties": {
         "id": {
           "type": "string",
-          "title": "The id cannot be changed, it's for determining which user this is supposed\nto update"
+          "description": "ID of the user. Cannot be changed. Used to sign in."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Display name for local user."
         },
         "password": {
-          "type": "string"
+          "type": "string",
+          "description": "Password used to log in. Will overwrite preexisting password."
         }
       },
       "required": [
-        "id",
         "name"
       ]
     },
@@ -277,14 +328,16 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Display name for local user."
         },
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID. Cannot be changed. Used to log in."
         },
         "membership_id": {
           "type": "string",
-          "title": "TODO (tc): Will remove post-GA"
+          "description": "Unique ID used to add local users to local teams. Cannot be changed."
         }
       }
     }

@@ -4,6 +4,7 @@ package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2";
 
 import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 
 import "components/automate-gateway/api/iam/v2/request/users.proto";
 import "components/automate-gateway/api/iam/v2/response/users.proto";
@@ -14,7 +15,45 @@ import "components/automate-grpc/protoc-gen-policy/api/annotations.proto";
 import "components/automate-grpc/protoc-gen-policy/iam/annotations.proto";
 
 service Users {
+
+  /*
+  Create a user
+
+  Creates a local user that can sign in to Automate and be a member of IAM teams
+  and IAM policies.
+
+  Authorization Action:
+  ```
+  iam:users:create
+  ```
+  */
   rpc CreateUser (CreateUserReq) returns (CreateUserResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "users";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "Display Name", "id": "username001rulez", "password": "aSafePassword"}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       post: "/iam/v2/users"
       body: "*"
@@ -24,7 +63,21 @@ service Users {
     option (chef.automate.api.iam.policy).resource = "iam:users";
     option (chef.automate.api.iam.policy).action = "iam:users:create";
   };
+  
+  /*
+  List all users
+
+  Lists all local users.
+
+  Authorization Action:
+  ```
+  iam:users:list
+  ```
+  */
   rpc ListUsers (ListUsersReq) returns (ListUsersResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "users";
+    };
     option (google.api.http) = {
       get: "/iam/v2/users"
     };
@@ -33,7 +86,21 @@ service Users {
     option (chef.automate.api.iam.policy).resource = "iam:users";
     option (chef.automate.api.iam.policy).action = "iam:users:list";
   };
+
+  /*
+  Get a user
+
+  Returns the details for a local user.
+
+  Authorization Action:
+  ```
+  iam:users:get
+  ```
+  */
   rpc GetUser (GetUserReq) returns (GetUserResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "users";
+    };
     option (google.api.http) = {
       get: "/iam/v2/users/{id}"
     };
@@ -42,7 +109,21 @@ service Users {
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}";
     option (chef.automate.api.iam.policy).action = "iam:users:get";
   };
+
+  /*
+  Delete a user
+
+  Deletes a local user.
+
+  Authorization Action:
+  ```
+  iam:users:delete
+  ```
+  */
   rpc DeleteUser (DeleteUserReq) returns (DeleteUserResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "users";
+    };
     option (google.api.http) = {
       delete: "/iam/v2/users/{id}"
     };
@@ -51,7 +132,44 @@ service Users {
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}";
     option (chef.automate.api.iam.policy).action = "iam:users:delete";
   };
+
+  /*
+  Update a user
+
+  Updates a local user's name or password.
+
+  Authorization Action:
+  ```
+  iam:users:update
+  ```
+  */
   rpc UpdateUser (UpdateUserReq) returns (UpdateUserResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "users";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "New Name", "password": "aSafePassword"}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       put: "/iam/v2/users/{id}"
       body: "*"
@@ -61,7 +179,45 @@ service Users {
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}";
     option (chef.automate.api.iam.policy).action = "iam:users:update";
   };
+
+  /*
+  Update self (as user) 
+
+  Updates a local user's own name or password.
+  If changing the password, both "password" and "previous_password" are required.
+
+  Authorization Action:
+  ```
+  iam:usersSelf:update
+  ```
+  */
   rpc UpdateSelf (UpdateSelfReq) returns (UpdateSelfResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "users";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"name": "My New Name", "password": "aNewSafePassword", "previous_password": "aPreviousSafePassword"}';
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       put: "/iam/v2/self/{id}"
       body: "*"
