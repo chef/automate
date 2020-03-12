@@ -111,6 +111,7 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 			AdminUser: org.AdminUser,
 			AdminKey:  GetOrgAdminKeyFrom(secret),
 			ServerId:  org.ServerId,
+			Projects:  org.Projects,
 		},
 	}, nil
 }
@@ -240,6 +241,7 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		AdminUser: req.AdminUser,
 		AdminKey:  oldOrg.AdminKey,
 		ServerId:  req.ServerId,
+		Projects:  req.Projects,
 	}
 
 	org, err := s.service.Storage.EditOrg(ctx, orgStruct)
@@ -254,17 +256,9 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 			AdminUser: org.AdminUser,
 			AdminKey:  rawAdminKey,
 			ServerId:  org.ServerId,
+			Projects:  org.Projects,
 		},
 	}, nil
-}
-
-func (s *Server) GetAdminKeyFromSecretService(ctx context.Context, id string, secretsClient secrets.SecretsServiceClient) (*secrets.Secret, error) {
-	secret, err := secretsClient.Read(ctx, &secrets.Id{Id: id})
-	if err != nil {
-		return secret, err
-	}
-
-	return secret, nil
 }
 
 // Create a response.Org from a storage.Org
@@ -275,6 +269,7 @@ func fromStorageOrg(s storage.Org) *response.Org {
 		AdminUser: s.AdminUser,
 		AdminKey:  s.AdminKey,
 		ServerId:  s.ServerId,
+		Projects:  s.Projects,
 	}
 }
 
