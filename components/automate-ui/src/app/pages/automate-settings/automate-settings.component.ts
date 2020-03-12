@@ -178,7 +178,7 @@ export class AutomateSettingsComponent implements OnInit {
         } else {
           this.jobSchedulerStatus = automateSettingsSelector.jobSchedulerStatus;
           this.telemetryService.track('lifecycleConfiguration', this.jobSchedulerStatus);
-          // this.updateForm(this.jobSchedulerStatus);
+          this.updateForm(this.jobSchedulerStatus);
           this.onChanges();
         }
       });
@@ -389,24 +389,27 @@ export class AutomateSettingsComponent implements OnInit {
 
   private populateInfra(job: IngestJob): void {
     let formThreshold, formUnit;
-    const form = {
-      unit: formUnit.toString(),
-      threshold: formThreshold.toString(),
-      disabled: job.disabled
-    };
 
     switch (job.name) {
       case 'missing_nodes': {
         this.handleDisable(this.clientRunsRemoveData);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
-        this.clientRunsRemoveData.patchValue(form);
+        this.clientRunsRemoveData.patchValue({
+            unit: formUnit,
+            threshold: formThreshold,
+            disabled: job.disabled
+          });
       }
       break;
 
       case 'missing_nodes_for_deletion': {
         this.handleDisable(this.clientRunsLabelMissing);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
-        this.clientRunsLabelMissing.patchValue(form);
+        this.clientRunsLabelMissing.patchValue({
+          unit: formUnit,
+          threshold: formThreshold,
+          disabled: job.disabled
+        });
       }
       break;
 

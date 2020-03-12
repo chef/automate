@@ -8,7 +8,7 @@ import {
   JobSchedulerStatus,
   RespJob,
   IngestJob,
-  // IngestJobs,
+  IngestJobs,
   RespJobSchedulerStatus
 } from './automate-settings.model';
 
@@ -37,38 +37,37 @@ export class AutomateSettingsRequests {
   // configureIngestJob sends an HTTP POST Request to the provided ingest job to configure
   // it with the provided threshold and running state
   configureIngestJob(job: IngestJob): Observable<any> {
-    // let url: string;
+    let url: string;
 
     console.log('configure inject Job');
 
-    // switch (job.name) {
-    //   // case IngestJobs.MissingNodes: {
-    //   //   url = `${RETENTION_URL}/nodes/missing-nodes/config`;
-    //   //   break;
-    //   // }
-    //   // case IngestJobs.MissingNodesForDeletion: {
-    //   //   url = `${RETENTION_URL}/nodes/missing-nodes-deletion/config`;
-    //   //   break;
-    //   // }
-    //   // case IngestJobs.DeleteNodes: {
-    //   //   url = `${RETENTION_URL}/nodes/delete-nodes/config`;
-    //   //   break;
-    //   // }
-    //   default:
-    //     return;
-    // }
+    switch (job.name) {
+      // case IngestJobs.MissingNodes: {
+      //   url = `${RETENTION_URL}/nodes/missing-nodes/config`;
+      //   break;
+      // }
+      // case IngestJobs.MissingNodesForDeletion: {
+      //   url = `${RETENTION_URL}/nodes/missing-nodes-deletion/config`;
+      //   break;
+      // }
+      // case IngestJobs.DeleteNodes: {
+      //   url = `${RETENTION_URL}/nodes/delete-nodes/config`;
+      //   break;
+      // }
+      default:
+        return;
+    }
 
-    // const body = {
-    //   // March 10 - this will need full updating with new RespJob type
-    //   'threshold': job.threshold,
-    //   'running': job.disabled
-    //   // We can also modify how often the job runs (every X time)
-    //   // but we don't need that now!
-    //   // 'every': job.every
-    // };
+    const body = {
+      // March 10 - this will need full updating with new RespJob type
+      'threshold': job.threshold,
+      'running': job.disabled
+      // We can also modify how often the job runs (every X time)
+      // but we don't need that now!
+      // 'every': job.every
+    };
 
-    // return this.http.post<any>(url, body);
-    return;
+    return this.http.post<any>(url, body);
   }
 
   private convertResponseToJobSchedulerStatus(
