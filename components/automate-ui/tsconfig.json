@@ -23,6 +23,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true
   },
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true
+  },
   "exclude": [
     "**/node_modules/*",
     "dist/*",
