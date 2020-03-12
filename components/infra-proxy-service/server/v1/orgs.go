@@ -84,7 +84,7 @@ func (s *Server) GetOrgs(ctx context.Context, req *request.GetOrgs) (*response.G
 	}, nil
 }
 
-// GetOrg takes an ID and returns a org object
+// GetOrg takes an ID and returns an org object
 func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.GetOrg, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -116,7 +116,7 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 	}, nil
 }
 
-// GetOrgByName takes a org name, server_id and returns a org object
+// GetOrgByName takes an org name, server_id and returns an org object
 func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*response.GetOrg, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -152,7 +152,7 @@ func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*
 	}, nil
 }
 
-// DeleteOrg deletes a org from the db
+// DeleteOrg deletes an org from the db
 func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*response.DeleteOrg, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -177,7 +177,7 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 	}, nil
 }
 
-// UpdateOrg updates a org in the db via post
+// UpdateOrg updates an org in the db via post
 func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*response.UpdateOrg, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()

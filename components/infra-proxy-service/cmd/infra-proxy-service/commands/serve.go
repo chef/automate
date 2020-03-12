@@ -98,7 +98,6 @@ func serve(cmd *cobra.Command, args []string) {
 		fail(errors.Wrapf(err, "failed to dial authz-service at (%s)", cfg.AuthzAddress))
 	}
 	authzClient := authz.NewSubjectPurgeClient(authzConn)
-	authzV2PoliciesClient := authz_v2.NewPoliciesClient(authzConn)
 	authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
 
 	if cfg.SecretsAddress == "" {
@@ -112,9 +111,8 @@ func serve(cmd *cobra.Command, args []string) {
 	// get secrets client
 	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
 
-	service, err := service.Start(l, migrationConfig,
-		connFactory, secretsClient,
-		authzClient, authzV2PoliciesClient, authzV2AuthorizationClient)
+	service, err := service.Start(l, migrationConfig, connFactory,
+		secretsClient, authzClient, authzV2AuthorizationClient)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}

@@ -14,7 +14,7 @@ import (
 	uuid "github.com/chef/automate/lib/uuid4"
 )
 
-// StoreOrg saves a org to the DB.
+// StoreOrg saves an org to the DB.
 func (p *postgres) StoreOrg(ctx context.Context, name string, adminUser string, adminKey string, serverID string, projects []string) (storage.Org, error) {
 	return p.insertOrg(ctx, name, adminUser, adminKey, serverID, projects)
 }
@@ -52,7 +52,7 @@ func (p *postgres) insertOrg(ctx context.Context,
 	return org, nil
 }
 
-// GetOrg fetches a org by id.
+// GetOrg fetches an org by id.
 func (p *postgres) GetOrg(ctx context.Context, orgID uuid.UUID) (storage.Org, error) {
 	return p.getOrg(ctx, p.db, orgID)
 }
@@ -70,7 +70,7 @@ func (p *postgres) getOrg(ctx context.Context, q querier, orgID uuid.UUID) (stor
 	return org, nil
 }
 
-// GetOrgByName fetches a org by name.
+// GetOrgByName fetches an org by name.
 // TODO: Replace serverID with server name
 // Prefer LEFT OUTER join to in order to append server detail in response
 func (p *postgres) GetOrgByName(ctx context.Context, orgName string, serverID uuid.UUID) (storage.Org, error) {
@@ -87,7 +87,7 @@ func (p *postgres) GetOrgByName(ctx context.Context, orgName string, serverID uu
 	return org, nil
 }
 
-// DeleteOrg deletes a org from the DB.
+// DeleteOrg deletes an org from the DB.
 func (p *postgres) DeleteOrg(ctx context.Context, orgID uuid.UUID) (storage.Org, error) {
 	var org storage.Org
 	err := p.db.QueryRowContext(ctx,
