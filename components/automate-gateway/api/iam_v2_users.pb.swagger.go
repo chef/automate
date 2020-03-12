@@ -17,7 +17,7 @@ func init() {
     "/iam/v2/self/{id}": {
       "put": {
         "summary": "Update self (as user)",
-        "description": "Updates a local user's own name or password.\nThe fields \"password\" and \"previous_password\" are not generally required;\nhowever, if one is present, then the other is required.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:usersSelf:update\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Updates a local user's own name or password.\nIf changing the password, both \"password\" and \"previous_password\" are required.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:usersSelf:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateSelf",
         "responses": {
           "200": {
@@ -74,7 +74,7 @@ func init() {
       },
       "post": {
         "summary": "Create a user",
-        "description": "Creates a local user that can become a member of IAM teams and IAM policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:create\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Creates a local user that can sign in to Automate and be a member of IAM teams\nand IAM policies.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:create\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateUser",
         "responses": {
           "200": {
@@ -108,7 +108,7 @@ func init() {
     "/iam/v2/users/{id}": {
       "get": {
         "summary": "Get a user",
-        "description": "Returns the details for a user.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:get\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns the details for a local user.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetUser",
         "responses": {
           "200": {
@@ -133,7 +133,7 @@ func init() {
       },
       "delete": {
         "summary": "Delete a user",
-        "description": "Deletes a user.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:delete\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Deletes a local user.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:users:delete\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteUser",
         "responses": {
           "200": {

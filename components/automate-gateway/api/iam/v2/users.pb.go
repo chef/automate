@@ -102,7 +102,8 @@ type UsersClient interface {
 	//
 	//Create a user
 	//
-	//Creates a local user that can become a member of IAM teams and IAM policies.
+	//Creates a local user that can sign in to Automate and be a member of IAM teams
+	//and IAM policies.
 	//
 	//Authorization Action:
 	//```
@@ -122,7 +123,7 @@ type UsersClient interface {
 	//
 	//Get a user
 	//
-	//Returns the details for a user.
+	//Returns the details for a local user.
 	//
 	//Authorization Action:
 	//```
@@ -132,7 +133,7 @@ type UsersClient interface {
 	//
 	//Delete a user
 	//
-	//Deletes a user.
+	//Deletes a local user.
 	//
 	//Authorization Action:
 	//```
@@ -153,8 +154,7 @@ type UsersClient interface {
 	//Update self (as user)
 	//
 	//Updates a local user's own name or password.
-	//The fields "password" and "previous_password" are not generally required;
-	//however, if one is present, then the other is required.
+	//If changing the password, both "password" and "previous_password" are required.
 	//
 	//Authorization Action:
 	//```
@@ -230,7 +230,8 @@ type UsersServer interface {
 	//
 	//Create a user
 	//
-	//Creates a local user that can become a member of IAM teams and IAM policies.
+	//Creates a local user that can sign in to Automate and be a member of IAM teams
+	//and IAM policies.
 	//
 	//Authorization Action:
 	//```
@@ -250,7 +251,7 @@ type UsersServer interface {
 	//
 	//Get a user
 	//
-	//Returns the details for a user.
+	//Returns the details for a local user.
 	//
 	//Authorization Action:
 	//```
@@ -260,7 +261,7 @@ type UsersServer interface {
 	//
 	//Delete a user
 	//
-	//Deletes a user.
+	//Deletes a local user.
 	//
 	//Authorization Action:
 	//```
@@ -281,8 +282,7 @@ type UsersServer interface {
 	//Update self (as user)
 	//
 	//Updates a local user's own name or password.
-	//The fields "password" and "previous_password" are not generally required;
-	//however, if one is present, then the other is required.
+	//If changing the password, both "password" and "previous_password" are required.
 	//
 	//Authorization Action:
 	//```
