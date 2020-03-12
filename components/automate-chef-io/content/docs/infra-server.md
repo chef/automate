@@ -12,12 +12,12 @@ toc = true
     weight = 60
 +++
 
-Use Chef Automate to install Chef Infra Server either for a single-host installation that contains Chef Infra Server and Chef Automate, or for a standalone Chef Infra Server instance. See the [Chef Infra Server documentation](https://docs.chef.io/server_overview/) for
-instructions and guidance on using and managing your Chef Infra Server.
+Use Chef Automate to install Chef Infra Server either for a single-host installation that contains Chef Infra Server and Chef Automate, or for a standalone Chef Infra Server instance. 
+See the [Chef Infra Server documentation](https://docs.chef.io/server_overview/) for instructions and guidance on using and managing your Chef Infra Server.
 
-## System requirements and prerequisites
+## System Requirements and Prerequisites
 
-Before beginning your installation, check the [System Requirements]({{< relref "system-requirements.md" >}}) for Automate, and ensure that the `chef-automate` command line tool is installed.
+Before beginning your installation, check the [System Requirements]({{< relref "system-requirements.md" >}}) for Chef Automate, and ensure that the `chef-automate` command line tool installed.
 
 To download the `chef-automate` command line tool, run the following command in your command line interface:
 
@@ -25,11 +25,12 @@ To download the `chef-automate` command line tool, run the following command in 
 curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automate_linux_amd64.zip | gunzip - > chef-automate && chmod +x chef-automate
 ```
 
-## Install Chef Automate and Chef Infra Server on the same host
+## How to Install Chef Automate and Chef Infra Server on the Same Host
 
-Use either a command line interface or a configuration file to install Chef Automate and Chef Infra Server on the same host. Run the commands as the superuser or use `sudo` at the start of each command.
+Use either a command line interface or a configuration file to install Chef Automate and Chef Infra Server on the same host. 
+Installations require elevated privileges, so run the commands as the superuser or use `sudo` at the start of each command.
 
-### Hardware Requirements
+### Hardware Requirements for Single-Host Installation
 
 For a single-host installation that contains Chef Infra Server and Chef Automate, we recommend the following memory and vCPU minimums:
 
@@ -39,17 +40,18 @@ For a single-host installation that contains Chef Infra Server and Chef Automate
 
 A single-host installation that contains Chef Infra Server and Chef Automate requires a `/hab` directory that contains 80 GB of disk space for software artifacts plus 2 MB of disk space per managed node.
 
-### Specify Products From the Command Line
+### Command Line Install of Chef Automate and Infra Server
 
-To install Chef Automate and Chef Infra Server on the same host, run this command:
+Install Chef Automate and Chef Infra Server on the same host with this command:
 
 ```shell
 sudo chef-automate deploy --product automate --product chef-server
 ```
 
-### Specify Products Via the Configuration
+### Configuration File Install of Chef Automate and Infra Server
 
-To install Chef Automate and Chef Infra Server on the same host via configuration still requires a command line interface.
+Installing Chef Automate and Chef Infra Server on the same host using a configuration file also requires the use of the Chef Automate CLI. 
+Installations require elevated privileges, so run the commands as the superuser or use `sudo` at the start of each command.
 
 1. First, generate a skeleton configuration file by running this command:
 
@@ -57,7 +59,7 @@ To install Chef Automate and Chef Infra Server on the same host via configuratio
       sudo chef-automate init-config
     ```
 
-1. Add a stanza to the configuration file to deploy Automate and Chef Infra Server:
+1. Add a stanza to the configuration file to deploy Chef Automate and Chef Infra Server:
 
     ```toml
       [deployment.v1.svc]
@@ -72,20 +74,21 @@ To install Chef Automate and Chef Infra Server on the same host via configuratio
       sudo chef-automate deploy config.toml
     ```
 
-## Install standalone Chef Infra Server using Chef Automate
+## How to Install Standalone Chef Infra Server through Chef Automate
 
-You can use either a command line option or a configuration file to install Chef Infra Server via Chef Automate. Run the commands as the superuser or use `sudo` at the start of each command.
+Use either a command line interface or a configuration file to install Chef Infra Server through Chef Automate.
 
-### Hardware Requirements
+### Hardware Requirements for Standalone Chef Infra Server Installation
 
 For a standalone Chef Infra Server installation, see the [hardware requirements for Chef Infra Server](https://docs.chef.io/install_server_pre/) for guidance on memory and number of CPUs.
 
-### Specify Product on the Command Line
-When Automate deploys the Chef Infra Server, it automatically configures the Chef Infra
-Server to collect data to send to Automate. To deploy standalone Chef Infra Server with Automate, you
-must turn off data collection in the configuration.
+### Command Line Install of Standalone Chef Infra Server
 
-1. Generate a skeleton configuration file by running:
+When Chef Automate deploys the Chef Infra Server, it automatically configures the Chef Infra Server to collect data to send to Chef Automate. 
+To deploy standalone Chef Infra Server with Chef Automate, you must turn off data collection in the configuration.
+Installations require elevated privileges, so run the commands as the superuser or use `sudo` at the start of each command.
+
+1. First, generate a skeleton configuration file by running:
 
     ```shell
        sudo chef-automate init-config
@@ -104,9 +107,14 @@ must turn off data collection in the configuration.
        sudo chef-automate deploy --product chef-server <configuration_file>
     ```
 
-### Specify Product Via Configuration
+### Configuration File Install of Standalone Chef Infra Server
 
-1. Generate a skeleton configuration file by running the following command:
+Installing Chef Infra Server through Chef Automate using a configuration file also requires the use of the Chef Automate CLI. 
+When Chef Automate deploys the Chef Infra Server, it automatically configures the Chef Infra Server to collect data to send to Chef Automate. 
+To deploy standalone Chef Infra Server with Chef Automate, you must turn off data collection in the configuration.
+Installations require elevated privileges, so run the commands as the superuser or use `sudo` at the start of each command.
+
+1. First, generate a skeleton configuration file by running the following command:
 
     ```shell
       sudo chef-automate init-config
