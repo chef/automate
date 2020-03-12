@@ -4,9 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 	"strings"
 	"sync"
 	"time"
@@ -71,7 +69,6 @@ func (backend *ES2Backend) ES2Client() (*elastic.Client, error) {
 			elastic.SetHttpClient(backend.getHttpClient()),
 			elastic.SetURL(backend.ESUrl),
 			elastic.SetSniff(false),
-			elastic.SetTraceLog(log.New(os.Stdout, "olivere: ", log.Lshortfile)),
 		)
 	})
 	return esClient, err

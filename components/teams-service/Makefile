@@ -42,11 +42,11 @@ test:
 
 test_with_db:
 	@docker ps | grep teams-postgres || (echo "Docker postgres not up. Run make setup_docker_pg and try this command again."; exit 1)
-	@PG_URL="postgresql://postgres@127.0.0.1:5432/teams_test?sslmode=disable&timezone=UTC" go test $(packages) -p 1 --parallel 1 -cover
+	@PGTZ=UTC PG_URL="postgresql://postgres@127.0.0.1:5432/teams_test?sslmode=disable&password=docker" go test $(packages) -p 1 --parallel 1 -cover
 	@echo "Docker containers still up, run 'make kill_docker_pg' to bring them down or test again with make test_with_db."
 
 setup_docker_pg:
-	docker run --name teams-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=teams_test -p 5432:5432 -d postgres:9
+	docker run --name teams-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=teams_test -e POSTGRES_PASSWORD=docker -p 5432:5432 -d postgres:9
 	sleep 5 # let docker come up
 	# This creates the extension we need to use UUIDs in the migrations.
 	# Done in habitat in prod. Not done in code because you must be a superuser.

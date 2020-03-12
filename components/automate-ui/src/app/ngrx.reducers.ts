@@ -9,6 +9,7 @@ import * as projectsFilter from './services/projects-filter/projects-filter.redu
 import * as apiToken from './entities/api-tokens/api-token.reducer';
 import * as automateSettings from './entities/automate-settings/automate-settings.reducer';
 import * as clientRuns from './entities/client-runs/client-runs.reducer';
+import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
 import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
 import * as integrationsDetail from './pages/integrations/detail/integrations-detail.reducer';
 import * as integrationsEdit from './pages/integrations/edit/integrations-edit.reducer';
@@ -57,6 +58,7 @@ export interface NgrxStateAtom {
   apiTokens: apiToken.ApiTokenEntityState;
   automateSettings: automateSettings.AutomateSettingsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
+  cookbooks: cookbookEntity.CookbookEntityState;
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
@@ -164,6 +166,7 @@ export const defaultInitialState = {
   apiTokens: apiToken.ApiTokenEntityInitialState,
   automateSettings: automateSettings.AutomateSettingsEntityInitialState,
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
+  cookbooks: cookbookEntity.CookbookEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
   licenseStatus: license.LicenseStatusEntityInitialState,
   managers: manager.ManagerEntityInitialState,
@@ -204,6 +207,7 @@ export const ngrxReducers = {
   apiTokens: apiToken.apiTokenEntityReducer,
   automateSettings: automateSettings.automateSettingsEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
+  cookbooks: cookbookEntity.cookbookEntityReducer,
   credentialEntity: credential.credentialReducer,
   jobs: jobEntity.jobEntityReducer,
   managers: manager.managerEntityReducer,
