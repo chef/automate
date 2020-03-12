@@ -52,20 +52,33 @@ export enum IngestJobs {
   // INFRA //
   // DeleteNodes: Removes completely from elasticsearch nodes that
   // have been marked for deletion
-  DeleteNodes = 'delete_nodes',
+  // DeleteNodes = 'delete_nodes',
 
-  // MissingNodes: Checks when a node hasn't check-in
-  // for a period of time
-  MissingNodes = 'missing_nodes',
+  // // MissingNodes: Checks when a node hasn't check-in
+  // // for a period of time
+  // MissingNodes = 'missing_nodes',
 
-  // MissingNodesForDeletion: Checks when a node has been missing
-  // for a period of time
-  MissingNodesForDeletion = 'missing_nodes_for_deletion',
+  // // MissingNodesForDeletion: Checks when a node has been missing
+  // // for a period of time
+  // MissingNodesForDeletion = 'missing_nodes_for_deletion',
 
-  PeriodicPurgeTimeseries = 'periodic_purge_timeseries',
 
-  // COMPLIANCE //
-  PeriodicPurge = 'periodic_purge'
+  //  EventFeed
+  EventFeedRemoveData = 'eventFeedRemoveData',
+  EventFeedServerActions = 'eventFeedServerActions',
+
+  // Service Groups
+  ServiceGroupNoHealthChecks = 'serviceGroupNoHealthChecks',
+  ServiceGroupRemoveServices = 'serviceGroupRemoveServices',
+
+  // Client Runs
+  ClientRunsRemoveData = 'clientRunsRemoveData',
+  ClientRunsLabelMissing = 'clientRunsLabelMissing',
+  ClientRunsRemoveNodes = 'clientRunsRemoveNodes',
+
+  // Compliance
+  ComplianceRemoveReports = 'complianceRemoveReports',
+  ComplianceRemoveScans = 'complianceRemoveScans'
 }
 
 export class IngestJob {

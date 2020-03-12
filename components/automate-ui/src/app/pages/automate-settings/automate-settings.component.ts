@@ -28,46 +28,62 @@ export class AutomateSettingsComponent implements OnInit {
 
   private defaultFormData2 = {
     eventFeedRemoveData: {
+      category: 'event_feed',
       unit: { value: 'd', disabled: false },
       threshold: {value: '30', disabled: false},
       disabled: false
     },
     eventFeedServerActions: {
+      category: 'infra',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
     },
     serviceGroupNoHealthChecks: {
+      category: 'services',
+      name: '',
       unit: { value: 'm', disabled: true },
       threshold: { value: '5', disabled: true },
       disabled: true
     },
     serviceGroupRemoveServices: {
+      category: 'services',
+      name: '',
       unit: { value: 'd', disabled: false },
       threshold: { value: '5', disabled: false },
       disabled: false
     },
     clientRunsRemoveData: {
+      category: 'infra',
+      name: 'missing_nodes',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
     },
     clientRunsLabelMissing: {
+      category: 'infra',
+      name: 'missing_nodes_for_deletion',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
     },
     clientRunsRemoveNodes: {
+      category: 'infra',
+      name: 'periodic_purge_timeseries',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
     },
     complianceRemoveReports: {
+      category: 'compliance',
+      name: 'periodic_purge',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
     },
     complianceRemoveScans: {
+      category: 'compliance',
+      name: 'periodic_purge',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
@@ -197,20 +213,31 @@ export class AutomateSettingsComponent implements OnInit {
 
   // Apply the changes that the user updated in the forms
   public applyChanges() {
-    // (@afiune) At the moment the only two forms that are enabled are:
-    // => 'missingNodes'
-    // => 'deleteMissingNodes'
-    //
-    // We will apply the changes on the rest when we expose the forms
+    // Note: Services are currently not enabled through the form
     const jobs: IngestJob[] = [
       // March 10 - this will need full updating to match RespJob and IngestJob
-      IngestJobs.MissingNodes,
-      IngestJobs.MissingNodesForDeletion
+      // IngestJobs.MissingNodes,
+      // IngestJobs.MissingNodesForDeletion
+
+      // Event Feed
+      IngestJobs.EventFeedRemoveData,
+      IngestJobs.EventFeedServerActions,
+      // Service Groups
+      IngestJobs.ServiceGroupNoHealthChecks,
+      IngestJobs.ServiceGroupRemoveServices,
+      // Client Runs
+      IngestJobs.ClientRunsRemoveData,
+      IngestJobs.ClientRunsLabelMissing,
+      IngestJobs.ClientRunsRemoveNodes,
+      // Compliance
+      IngestJobs.ComplianceRemoveReports,
+      IngestJobs.ComplianceRemoveScans
     ].map(jobName => {
       const jobForm = this.getJobForm(jobName);
       const job = new IngestJob(null, null);
-      job.name = jobName;
-      job.disabled = !jobForm.disable;
+      job.name = jobForm.name;
+      job.category = jobForm.category;
+      job.disabled = jobForm.disabled;
       job.threshold = jobForm.threshold + jobForm.unit;
       return job;
     });
@@ -311,12 +338,10 @@ export class AutomateSettingsComponent implements OnInit {
       // Service Groups
       serviceGroupNoHealthChecks: this.serviceGroupNoHealthChecks,
       serviceGroupRemoveServices: this.serviceGroupRemoveServices,
-
       // Client Runs
       clientRunsRemoveData: this.clientRunsRemoveData,
       clientRunsLabelMissing: this.clientRunsLabelMissing,
       clientRunsRemoveNodes: this.clientRunsRemoveNodes,
-
       // Compliance
       complianceRemoveReports: this.complianceRemoveReports,
       complianceRemoveScans: this.complianceRemoveScans
@@ -325,11 +350,32 @@ export class AutomateSettingsComponent implements OnInit {
 
   private getJobForm(job: string) {
     switch (job) {
-      case IngestJobs.MissingNodes: {
-        return this.automateSettingsForm.value['missingNodes'];
+      case IngestJobs.EventFeedRemoveData: {
+        return this.automateSettingsForm.value['eventFeedRemoveData'];
       }
-      case IngestJobs.MissingNodesForDeletion: {
-        return this.automateSettingsForm.value['deleteMissingNodes'];
+      case IngestJobs.EventFeedServerActions: {
+        return this.automateSettingsForm.value['eventFeedServerActions'];
+      }
+      case IngestJobs.ServiceGroupNoHealthChecks: {
+        return this.automateSettingsForm.value['serviceGroupNoHealthChecks'];
+      }
+      case IngestJobs.ServiceGroupRemoveServices: {
+        return this.automateSettingsForm.value['serviceGroupRemoveServices'];
+      }
+      case IngestJobs.ClientRunsRemoveData: {
+        return this.automateSettingsForm.value['clientRunsRemoveData'];
+      }
+      case IngestJobs.ClientRunsLabelMissing: {
+        return this.automateSettingsForm.value['clientRunsLabelMissing'];
+      }
+      case IngestJobs.ClientRunsRemoveNodes: {
+        return this.automateSettingsForm.value['clientRunsRemoveNodes'];
+      }
+      case IngestJobs.ComplianceRemoveReports: {
+        return this.automateSettingsForm.value['complianceRemoveReports'];
+      }
+      case IngestJobs.ComplianceRemoveScans: {
+        return this.automateSettingsForm.value['complianceRemoveScans'];
       }
     }
   }
