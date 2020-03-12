@@ -29,12 +29,14 @@ export class AutomateSettingsComponent implements OnInit {
   private defaultFormData = {
     eventFeedRemoveData: {
       category: 'event_feed',
+      name: '',
       unit: { value: 'd', disabled: false },
       threshold: {value: '30', disabled: false},
       disabled: false
     },
     eventFeedServerActions: {
       category: 'infra',
+      name: '',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
@@ -215,10 +217,6 @@ export class AutomateSettingsComponent implements OnInit {
   public applyChanges() {
     // Note: Services are currently not enabled through the form
     const jobs: IngestJob[] = [
-      // March 10 - this will need full updating to match RespJob and IngestJob
-      // IngestJobs.MissingNodes,
-      // IngestJobs.MissingNodesForDeletion
-
       // Event Feed
       IngestJobs.EventFeedRemoveData,
       IngestJobs.EventFeedServerActions,
@@ -234,11 +232,13 @@ export class AutomateSettingsComponent implements OnInit {
       IngestJobs.ComplianceRemoveScans
     ].map(jobName => {
       const jobForm = this.getJobForm(jobName);
+      console.log('---------------');
+      console.log(jobForm);
       const job = new IngestJob(null, null);
       job.name = jobForm.name;
       job.category = jobForm.category;
       job.disabled = jobForm.disabled;
-      job.threshold = jobForm.threshold + jobForm.unit;
+      job.threshold = jobForm.disabled ? '' : jobForm.threshold + jobForm.unit;
       return job;
     });
 
@@ -249,6 +249,7 @@ export class AutomateSettingsComponent implements OnInit {
           const error = changeConfigurationSelector.errorResp;
           const errMsg = 'Unable to update one or more settings.';
           this.showErrorNotification(error, errMsg);
+          // SHOULD RESET THE FORM HERE IF THERE IS AN ERROR
         } else {
           this.formChanged = false;
           this.showSuccessNotification();
@@ -348,8 +349,8 @@ export class AutomateSettingsComponent implements OnInit {
     });
   }
 
-  private getJobForm(job: string) {
-    switch (job) {
+  private getJobForm(jobName: string) {
+    switch (jobName) {
       case IngestJobs.EventFeedRemoveData: {
         return this.automateSettingsForm.value['eventFeedRemoveData'];
       }

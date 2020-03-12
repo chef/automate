@@ -37,9 +37,10 @@ export class AutomateSettingsRequests {
   // configureIngestJob sends an HTTP POST Request to the provided ingest job to configure
   // it with the provided threshold and running state
   configureIngestJob(job: IngestJob): Observable<any> {
-    let url: string;
+    const url = '/api/v0/data-lifecycle/config';
 
-    console.log('configure inject Job');
+    console.log('configure injest Job');
+    console.log(job);
 
     switch (job.name) {
       // case IngestJobs.MissingNodes: {
@@ -54,8 +55,6 @@ export class AutomateSettingsRequests {
       //   url = `${RETENTION_URL}/nodes/delete-nodes/config`;
       //   break;
       // }
-      default:
-        return;
     }
 
     const body = {
