@@ -15,6 +15,10 @@ interface TimeIntervals {
   findStartDate: (endDate: moment.Moment) => moment.Moment;
 }
 
+interface ReportSummary {
+  end_time: string;
+}
+
 @Injectable()
 export class ReportQueryService {
 
@@ -51,6 +55,23 @@ export class ReportQueryService {
       interval: reportQuery.interval,
       filters: [...reportQuery.filters]
     };
+  }
+
+  // getReportQueryForReport provides the same functionality as getReportQuery,
+  // but uses the additional information in the given report summary to make
+  // the query more efficient for the backend server.
+  getReportQueryForReport(report: ReportSummary): ReportQuery {
+    // Reports are stored separately (per-day) according to their `end_time` on
+    // the server; therefore, the API to fetch a report is much faster/uses
+    // fewer resources when we limit the date/time range of our query to the
+    // minimum possible. We use the `end_time` we already have from the report
+    // to restrict our query to a very narrow time range. The StatsService will
+    // take care of setting the start and end dates to the beginning and end of
+    // the given day as needed.
+    const query = this.getReportQuery();
+    query.startDate = moment(report.end_time);
+    query.endDate = moment(report.end_time);
+    return query;
   }
 
   setState(newState: ReportQuery) {

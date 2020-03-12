@@ -45,7 +45,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.statsService.getReports(reportQuery, {sort: 'latest_report.end_time', order: 'DESC'})
       .subscribe(reports => {
         this.reports = reports;
-        this.statsService.getSingleReport(reports[0].id, reportQuery)
+        const queryForReport = this.reportQuery.getReportQueryForReport(reports[0]);
+        this.statsService.getSingleReport(reports[0].id, queryForReport)
           .subscribe(data => {
             this.reportLoading = false;
             this.layoutFacade.ShowPageLoading(false);
@@ -62,7 +63,8 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   onReportItemClick(_event, report) {
     this.reportLoading = true;
     this.layoutFacade.ShowPageLoading(true);
-    this.statsService.getSingleReport(report.id, this.reportQuery.getReportQuery())
+    const reportQuery = this.reportQuery.getReportQueryForReport(report);
+    this.statsService.getSingleReport(report.id, reportQuery)
       .subscribe(data => {
         this.reportLoading = false;
         this.layoutFacade.ShowPageLoading(false);
