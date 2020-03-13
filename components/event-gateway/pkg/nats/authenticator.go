@@ -31,8 +31,8 @@ import (
 const (
 	resourceV1 = "ingest:unified_events"
 	actionV1   = "create"
-	resourceV2 = "infra:ingest:unifiedEvents"
-	actionV2   = "infra:ingest:create"
+	resourceV2 = "ingest:unifiedEvents"
+	actionV2   = "ingest:unifiedEvents:create"
 )
 
 const authzClientTimeout = 60 * time.Second

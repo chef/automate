@@ -204,8 +204,6 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 	if _, found := v1CfgmgmtPolicies[pol.ID.String()]; found {
 		cfgmgmtStatement := newV2Statement(Allow, "", []string{},
 			[]string{"*"}, []string{"infra:*"})
-		cfgmgmtStatementDeny := newV2Statement(Deny, "", []string{},
-			[]string{"*"}, []string{"infra:ingest:*"})
 		member, err := newV2Member("user:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (cfgmgmt)")
@@ -213,7 +211,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 		cfgmgmtPolicy, err := newV2Policy(constants_v2.CfgmgmtPolicyID,
 			"[Legacy] Infrastructure Automation Access",
 			Custom, []v2Member{member},
-			[]v2Statement{cfgmgmtStatement, cfgmgmtStatementDeny}, noProjects)
+			[]v2Statement{cfgmgmtStatement}, noProjects)
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 policy (cfgmgmt)")
 		}
@@ -254,7 +252,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 
 	if pol.ID.String() == constants_v1.IngestWildcardPolicyID {
 		ingestStatement := newV2Statement(Allow, "", []string{},
-			[]string{"*"}, []string{"infra:ingest:*"})
+			[]string{"*"}, []string{"ingest:*"})
 		member, err := newV2Member("token:*")
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (ingest)")
@@ -467,17 +465,11 @@ func convertV1Resource(resource string) (string, error) {
 	case "events":
 		return convertV1Events(terms)
 	case "ingest":
-		// Special case: "ingest:status" -> "infra:ingest:status" (no wildcards to worry about)
-		if terms[1] == "status" {
-			return "infra:ingest:status", nil
-		}
-
-		// Special case: "ingest:unified_events" -> "infra:unifiedEvents" (no wildcards to worry about)
+		// Special case: "ingest:unified_events" -> "ingest:unifiedEvents" (no wildcards to worry about)
 		if terms[1] == "unified_events" {
-			return "infra:unifiedEvents", nil
+			return "ingest:unifiedEvents", nil
 		}
 
-		terms = changeTerm(terms, "ingest", "infra")
 		terms = changeTerm(terms, "unified_events", "unifiedEvents")
 		return combineTermsIntoResource(terms...), nil
 	case "license":
@@ -582,19 +574,16 @@ func convertV1Action(action string, resource string) ([]string, error) {
 		return []string{"*:getAll", "*:getSome", "*:get"}, nil
 	}
 
-	// resource ingest:* is a special case to handle since we collapsed
-	// that top-level ingest term into infra:ingest.
-	// Only need to handle the * case specially though.
 	if terms[0] == "ingest" && terms[1] == "*" {
 		switch action {
 		case "*":
-			return []string{"infra:ingest:*"}, nil
+			return []string{"ingest:*"}, nil
 		case "create":
-			return []string{"infra:ingest:create", "infra:ingestUnifiedEvents:create"}, nil
+			return []string{"ingest:*:create"}, nil
 		case "delete":
-			return []string{"infra:ingest:delete"}, nil
+			return []string{"ingest:*:delete"}, nil
 		case "status":
-			return []string{"infra:ingestStatus:get"}, nil
+			return []string{"ingest:status:get"}, nil
 		}
 
 		return []string{"*:getAll", "*:getSome", "*:get"}, nil

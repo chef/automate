@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"net/url"
+	"strings"
 	"testing"
 
 	"github.com/gofrs/uuid"
@@ -38,10 +39,16 @@ func TestMigrateToV2(t *testing.T) {
 
 	cases := map[string]func(*testing.T){
 		"empty store/default state": func(t *testing.T) {
-			err := MigrateToV2(ctx, db, false)
+			err := MigrateToV2(ctx, db, true)
 			require.NoError(t, err)
 
 			for _, pol := range v2DefaultPolicies() {
+				resp, err := queryTestPolicy(ctx, pol.ID, db)
+				require.NoError(t, err)
+				assert.Equal(t, pol.ID, resp.ID)
+			}
+
+			for _, pol := range v1LegacyPolicies() {
 				resp, err := queryTestPolicy(ctx, pol.ID, db)
 				require.NoError(t, err)
 				assert.Equal(t, pol.ID, resp.ID)
@@ -83,7 +90,7 @@ func TestMigrateToV2(t *testing.T) {
 			statement := migratedPol.Statements[0]
 			assert.Equal(t, Allow, statement.Effect)
 			assert.Equal(t, []string{"*:create"}, statement.Actions)
-			assert.Equal(t, []string{"infra:nodes"}, statement.Resources)
+			assert.Equal(t, []string{"ingest:nodes"}, statement.Resources)
 
 			err = deletePol(ctx, db, polID.String())
 			require.NoError(t, err)
@@ -268,6 +275,11 @@ func queryTestPolicy(ctx context.Context, id string, db *sql.DB) (*v2Policy, err
 
 	resp, err := queryPolicy(ctx, id, tx)
 	if err != nil {
+		// The not found on json unmarshall case
+		if strings.HasPrefix(err.Error(), "sql: Scan error on column index 0") &&
+			strings.HasSuffix(err.Error(), "not found") {
+			return nil, errors.Errorf("policy not found %s", id)
+		}
 		return nil, errors.Wrap(err, "query policy")
 	}
 
@@ -381,4 +393,105 @@ func memberSliceToStringSlice(m []v2Member) []string {
 		memberSlice[i] = member.Name
 	}
 	return memberSlice
+}
+
+// v1LegacyPolicies is a consolidated list of the v1LegacyPolicies that are ported
+// in the migratev1policies call. They-- like everything under legacy-- should
+// remain untouched once this code is live.
+func v1LegacyPolicies() []v2Policy {
+	allUsers := v2Member{Name: "user:*"}
+	allTokens := v2Member{Name: "token:*"}
+
+	s1 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"compliance:*"})
+	compliancePol := v2Policy{
+		ID:         constants_v2.CompliancePolicyID,
+		Name:       "[Legacy] Compliance Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s1},
+		Type:       Custom,
+	}
+
+	s2 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"compliance:profiles:*"})
+	complianceProfilePol := v2Policy{
+		ID:         constants_v2.ComplianceTokenPolicyID,
+		Name:       "[Legacy] Compliance Profile Access",
+		Members:    []v2Member{allTokens},
+		Statements: []v2Statement{s2},
+		Type:       Custom,
+	}
+
+	s3 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"event:*"})
+	eventPol := v2Policy{
+		ID:         constants_v2.EventsPolicyID,
+		Name:       "[Legacy] Events Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s3},
+		Type:       Custom,
+	}
+
+	s4 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"infra:*"})
+	infraPol := v2Policy{
+		ID:         constants_v2.CfgmgmtPolicyID,
+		Name:       "[Legacy] Infrastructure Automation Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s4},
+		Type:       Custom,
+	}
+
+	s5 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"ingest:*"})
+	ingestPol := v2Policy{
+		ID:         constants_v2.IngestPolicyID,
+		Name:       "[Legacy] Ingest Access",
+		Members:    []v2Member{allTokens},
+		Statements: []v2Statement{s5},
+		Type:       Custom,
+	}
+
+	s6 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"infra:nodes:*"})
+	nodePol := v2Policy{
+		ID:         constants_v2.NodesPolicyID,
+		Name:       "[Legacy] Nodes Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s6},
+		Type:       Custom,
+	}
+
+	s7 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"infra:nodeManagers:*"})
+	nodeManagerPol := v2Policy{
+		ID:         constants_v2.NodeManagersPolicyID,
+		Name:       "[Legacy] Node Managers Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s7},
+		Type:       Custom,
+	}
+
+	s8 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"secrets:*"})
+	secretPol := v2Policy{
+		ID:         constants_v2.SecretsPolicyID,
+		Name:       "[Legacy] Secrets Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s8},
+		Type:       Custom,
+	}
+
+	s9 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"system:telemetryConfig:*"})
+	telemetryPol := v2Policy{
+		ID:         constants_v2.TelemetryPolicyID,
+		Name:       "[Legacy] Telemetry Access",
+		Members:    []v2Member{allUsers},
+		Statements: []v2Statement{s9},
+		Type:       Custom,
+	}
+
+	return []v2Policy{
+		compliancePol,
+		complianceProfilePol,
+		eventPol,
+		infraPol,
+		ingestPol,
+		nodePol,
+		nodeManagerPol,
+		secretPol,
+		telemetryPol,
+	}
 }

@@ -174,7 +174,7 @@
       "statements": {
         "f777e560-663f-45b0-93a5-f955843be34c": {
           "actions": [
-            "infra:ingest:*",
+            "ingest:nodes:*",
             "compliance:profiles:get",
             "compliance:profiles:list"
           ],
@@ -345,7 +345,7 @@
       "statements": {
         "9873c446-5d9a-463a-9c0b-1015f878a9e8": {
           "actions": [
-            "infra:ingest:*"
+            "ingest:nodes:*"
           ],
           "effect": "allow",
           "projects": [
@@ -484,7 +484,7 @@
     },
     "ingest": {
       "actions": [
-        "infra:ingest:*",
+        "ingest:nodes:*",
         "compliance:profiles:get",
         "compliance:profiles:list"
       ]

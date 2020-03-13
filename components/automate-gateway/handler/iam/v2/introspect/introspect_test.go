@@ -195,7 +195,7 @@ func TestIntrospect(t *testing.T) {
 		},
 		"response pair matching the request with param in POST body": {
 			&authz.FilterAuthorizedPairsResp{Pairs: []*authz.Pair{
-				{Resource: "infra:nodes:f33a996c-b4e8-4328-9730-90f4b351fa6e:runs", Action: "infra:ingest:create"},
+				{Resource: "ingest:nodes:f33a996c-b4e8-4328-9730-90f4b351fa6e:runs", Action: "ingest:nodes:create"},
 			}},
 			&request.IntrospectReq{
 				Parameters: []string{"entity_uuid=f33a996c-b4e8-4328-9730-90f4b351fa6e"},

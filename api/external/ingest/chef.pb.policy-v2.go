@@ -9,7 +9,7 @@ import (
 )
 
 func init() {
-	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessChefRun", "infra:nodes:{entity_uuid}:runs", "infra:ingest:create", "POST", "/ingest/events/chef/run", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessChefRun", "ingest:nodes:{entity_uuid}:runs", "ingest:nodes:create", "POST", "/ingest/events/chef/run", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Run); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -48,7 +48,7 @@ func init() {
 		}
 		return ""
 	})
-	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessChefAction", "infra:actions", "infra:ingest:create", "POST", "/ingest/events/chef/action", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessChefAction", "ingest:actions", "ingest:actions:create", "POST", "/ingest/events/chef/action", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Action); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -99,7 +99,7 @@ func init() {
 		}
 		return ""
 	})
-	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessNodeDelete", "infra:nodes", "infra:ingest:delete", "POST", "/ingest/events/chef/nodedelete", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessNodeDelete", "ingest:nodes", "ingest:nodes:delete", "POST", "/ingest/events/chef/nodedelete", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Delete); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -122,10 +122,10 @@ func init() {
 		}
 		return ""
 	})
-	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessMultipleNodeDeletes", "infra:nodes", "infra:ingest:delete", "POST", "/ingest/events/chef/node-multiple-deletes", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessMultipleNodeDeletes", "ingest:nodes", "ingest:nodes:delete", "POST", "/ingest/events/chef/node-multiple-deletes", func(unexpandedResource string, input interface{}) string {
 		return unexpandedResource
 	})
-	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessLivenessPing", "infra:nodes:{entity_uuid}:liveness", "infra:ingest:create", "POST", "/ingest/events/chef/liveness", func(unexpandedResource string, input interface{}) string {
+	policyv2.MapMethodTo("/chef.automate.api.ingest.ChefIngester/ProcessLivenessPing", "ingest:nodes:{entity_uuid}:liveness", "ingest:nodes:create", "POST", "/ingest/events/chef/liveness", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Liveness); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {

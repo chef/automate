@@ -246,10 +246,10 @@ test_authorized_project_real_data {
 		"members": ["team:local:viewers"],
 		"statements": {
 			"sid1": {"effect": "allow", "actions": ["infra:*:list"], "resources": ["*"], "projects": ["project-p1", "project-p2"]},
-			"sid2": {"effect": "allow", "actions": ["infra:ingest:create"], "resources": ["*"], "projects": ["project-p3"]},
+			"sid2": {"effect": "allow", "actions": ["ingest:nodes:create"], "resources": ["*"], "projects": ["project-p3"]},
 		},
 	}
-		 with input as {"subjects": ["team:local:viewers"], "action": "infra:ingest:create", "resource": "infra:nodes:52", "projects": ["project-p3"]}
+		 with input as {"subjects": ["team:local:viewers"], "action": "ingest:nodes:create", "resource": "ingest:nodes:52", "projects": ["project-p3"]}
 
 	actual_projects == {"project-p3"}
 }
@@ -315,10 +315,10 @@ test_authorized_project_deny_real_data {
 		"members": ["team:local:viewers"],
 		"statements": {
 			"sid1": {"effect": "allow", "actions": ["infra:*:list"], "resources": ["*"], "projects": ["project-p1", "project-p2"]},
-			"sid2": {"effect": "deny", "actions": ["infra:ingest:create"], "resources": ["*"], "projects": ["project-p1"]},
+			"sid2": {"effect": "deny", "actions": ["ingest:nodes:create"], "resources": ["*"], "projects": ["project-p1"]},
 		},
 	}
-		 with input as {"subjects": ["team:local:viewers"], "action": "infra:ingest:create", "resource": "infra:nodes:52", "projects": ["project-p1"]}
+		 with input as {"subjects": ["team:local:viewers"], "action": "ingest:nodes:create", "resource": "ingest:nodes:52", "projects": ["project-p1"]}
 
 	actual_projects == set()
 }
