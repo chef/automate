@@ -1,6 +1,6 @@
 <chef-radial-chart class="chart">
   <span slot="innerText">
-    {{ data.failed + data.passed + data.skipped | number }} Total {{ type | titlecase }}
+    {{ data.failed + data.passed + data.skipped + data.waived | number }} Total {{ type | titlecase }}
   </span>
 
   <chef-data-point [value]="data.failed" class="failed">
@@ -11,6 +11,9 @@
   </chef-data-point>
   <chef-data-point [value]="data.skipped" class="skipped">
     {{ data.skipped | number }} Skipped {{ type | titlecase }}
+  </chef-data-point>
+  <chef-data-point [value]="data.waived" class="waived">
+    {{ data.waived | number }} Wavied {{ type | titlecase }}
   </chef-data-point>
 
   <chef-data-point [value]="data.critical" secondary class="critical">
@@ -41,5 +44,10 @@
   <dd class="legend-item-label">
     <span class="legend-item-status skipped"></span>
     <span>Skipped {{ type | titlecase }}</span>
+  </dd>
+  <dt class="legend-item-total">{{ data.waived | number }}</dt>
+  <dd class="legend-item-label">
+    <span class="legend-item-status skipped"></span>
+    <span>Waived {{ type | titlecase }}</span>
   </dd>
 </dl>

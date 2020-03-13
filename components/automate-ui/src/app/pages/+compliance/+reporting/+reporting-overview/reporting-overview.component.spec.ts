@@ -197,6 +197,7 @@ describe('ReportingOverviewComponent', () => {
           'failed': 4,
           'passed': 10,
           'skipped': 6,
+          'waived': 1,
           'critical': 4,
           'major': 2,
           'minor': 8
@@ -254,6 +255,7 @@ describe('ReportingOverviewComponent', () => {
           'failures': 9,
           'passed': 1,
           'skipped': 0,
+          'wavied': 1,
           'criticals': 2,
           'majors': 2,
           'minors': 5
@@ -266,6 +268,7 @@ describe('ReportingOverviewComponent', () => {
           'failed': 9,
           'passed': 1,
           'skipped': 0,
+          'waived': 1,
           'critical': 2,
           'major': 2,
           'minor': 5

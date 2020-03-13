@@ -245,6 +245,7 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
       passed: data.compliant,
       skipped: data.skipped,
       failed: data.noncompliant,
+      waived: data.waived,
       critical: data.high_risk,
       major: data.medium_risk,
       minor: data.low_risk
@@ -255,6 +256,7 @@ export class ReportingOverviewComponent implements OnInit, OnDestroy {
     return {
       passed: data.passed,
       skipped: data.skipped,
+      waived: data.waived,
       failed: data.failures,
       critical: data.criticals,
       major: data.majors,

@@ -29,6 +29,10 @@
       color: $chef-grey;
     }
 
+    .waived {
+      color: $chef-med-grey;
+    }
+
     .critical {
       color: $chef-critical;
     }
@@ -98,6 +102,10 @@
 
       &.skipped {
         background: $chef-grey;
+      }
+
+      &.waived {
+        background: $chef-med-grey;
       }
     }
   }
