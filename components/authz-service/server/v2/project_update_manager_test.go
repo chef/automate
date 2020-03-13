@@ -1,10 +1,13 @@
 package v2
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"os"
 	"testing"
+	"text/template"
+	"time"
 
 	"github.com/chef/automate/lib/cereal/patterns"
 	"github.com/stretchr/testify/require"
@@ -46,7 +49,25 @@ func loadWorkflowFromDisk(t *testing.T, name string) *workflowInstance {
 	} else {
 		defer fPayload.Close()
 		payload := patterns.ChainWorkflowPayload{}
-		if err := json.NewDecoder(fPayload).Decode(&payload); err != nil {
+
+		tmpl, err := template.ParseFiles(payloadFname)
+		if err != nil {
+			t.Fatalf("could not parse file: %s", err)
+		}
+
+		b := bytes.NewBuffer(nil)
+		err = tmpl.Execute(b, struct {
+			StartTime   string
+			LastUpdated string
+		}{
+			StartTime:   time.Now().Format(time.RFC3339),
+			LastUpdated: time.Now().Add(time.Minute).Format(time.RFC3339),
+		})
+		if err != nil {
+			t.Fatalf("could not update time fields in template: %s", err)
+		}
+
+		if err := json.Unmarshal(b.Bytes(), &payload); err != nil {
 			t.Fatalf("failed to decode %s", payloadFname)
 		}
 		w.WithPayload(&payload)
