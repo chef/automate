@@ -1,8 +1,15 @@
 <div id="pending-edits-bar" [hidden]="isBarHidden">
-  <span class="info">Project edits pending, update <a [routerLink]="['/settings/projects']">projects</a> to apply changes.</span>
-  <app-authorized [allOf]="['/iam/v2/apply-rules', 'post']">
-    <button mat-button (click)="openConfirmUpdateStartModal()">Update Projects</button>
-  </app-authorized>
+  <div [className]="updateProjectsFailed ? 'failure-container' : 'normal-container'">
+    <span *ngIf="!updateProjectsFailed" class="info">
+      Project edits pending, update <a [routerLink]="['/settings/projects']">projects</a> to apply changes.
+    </span>
+    <span *ngIf="updateProjectsFailed" class="info">
+      Project update failed. Review system status from the command line with <pre>chef-automate status</pre> and try again.
+    </span>
+    <app-authorized [allOf]="['/iam/v2/apply-rules', 'post']">
+      <button mat-button (click)="openConfirmUpdateStartModal()">Update Projects</button>
+    </app-authorized>
+  </div>
 </div>
 
 <app-confirm-apply-start-modal

@@ -20,7 +20,7 @@ export class PendingEditsBarComponent implements OnDestroy {
   public confirmApplyStartModalVisible = false;
   private isDestroyed = new Subject<boolean>();
   private projectsHaveStagedChanges = false;
-  private updateProjectsFailed = false;
+  public updateProjectsFailed = false;
   private updateProjectsCancelled = false;
 
   constructor(

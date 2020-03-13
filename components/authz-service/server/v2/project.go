@@ -258,11 +258,16 @@ func (s *ProjectState) ApplyRulesStatus(
 		s.log.Errorf("Could not convert EstimatedTimeComplete to protobuf Timestamp %v", err)
 		time = &tspb.Timestamp{}
 	}
+	// When cancelling failed gets triggered, too, so let's suppress that
+	// to make cancel unambiguous.
+	// (Leaving FailureMessage as that just reports "Canceled".)
+	failed := status.Failed() && !status.Cancelled()
+
 	return &api.ApplyRulesStatusResp{
 		State:                 string(status.State()),
 		PercentageComplete:    float32(status.PercentageComplete()),
 		EstimatedTimeComplete: time,
-		Failed:                status.Failed(),
+		Failed:                failed,
 		FailureMessage:        status.FailureMessage(),
 		Cancelled:             status.Cancelled(),
 	}, nil
