@@ -278,7 +278,18 @@ func (db *Postgres) GetServices(
 		sortOrder,
 	)
 
-	_, err = db.DbMap.Select(&services, formattedQuery, pageSize, offset)
+	var pageSizeForQuery *string
+	if pageSize == 0 {
+		// postgres lets you use `LIMIT ALL` to have an unlimited result size, but
+		// lib/pq doesn't let you pass "ALL" as the parameter. Postgres will
+		// interpret `LIMIT NULL` the same as `LIMIT ALL`, so we use that as a workaround
+		pageSizeForQuery = nil
+	} else {
+		p := fmt.Sprintf("%d", pageSize)
+		pageSizeForQuery = &p
+	}
+
+	_, err = db.DbMap.Select(&services, formattedQuery, pageSizeForQuery, offset)
 	return convertComposedServicesToStorage(services), err
 }
 

@@ -90,6 +90,26 @@ service ApplicationsService {
   };
 
   /*
+  Find Services
+
+  Lists service health status and service metadata for services matching the given criteria. All matching services are returned via a stream response.
+
+  Authorization Action:
+  ```
+  applications:serviceGroups:list
+  ```
+  */
+  rpc FindServices(ServicesReq) returns (stream Service) {
+    option (chef.automate.api.policy).resource = "service_groups";
+    option (chef.automate.api.policy).action = "list";
+    option (chef.automate.api.iam.policy).resource = "applications:serviceGroups";
+    option (chef.automate.api.iam.policy).action = "applications:serviceGroups:list";
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "service_groups";
+		};
+  };
+
+  /*
   List Filter Values
 
   Lists all of the possible filter values for a given valid field.

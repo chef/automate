@@ -15,11 +15,30 @@ import (
 	"github.com/golang/protobuf/ptypes"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc/metadata"
 
 	"github.com/chef/automate/api/external/applications"
 	"github.com/chef/automate/api/external/common/query"
 	"github.com/chef/automate/api/external/habitat"
 )
+
+type mockSrvStream struct {
+	SentMsgs []*applications.Service
+}
+
+func (m *mockSrvStream) Context() context.Context {
+	return context.Background()
+}
+func (m *mockSrvStream) SetHeader(metadata.MD) error   { return nil }
+func (m *mockSrvStream) SendHeader(metadata.MD) error  { return nil }
+func (m *mockSrvStream) SendMsg(msg interface{}) error { return nil }
+func (m *mockSrvStream) RecvMsg(msg interface{}) error { return nil }
+func (m *mockSrvStream) SetTrailer(metadata.MD)        {}
+
+func (m *mockSrvStream) Send(s *applications.Service) error {
+	m.SentMsgs = append(m.SentMsgs, s)
+	return nil
+}
 
 func TestGetServicesBasic(t *testing.T) {
 	var (
@@ -30,6 +49,12 @@ func TestGetServicesBasic(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServices(ctx, request)
 	assert.Nil(t, err)
 	assert.Equal(t, expected, response)
+
+	stream := &mockSrvStream{}
+
+	err = suite.ApplicationsServer.FindServices(request, stream)
+	require.NoError(t, err)
+	assertServicesEqual(t, expected.Services, stream.SentMsgs)
 }
 
 func TestGetServicesSortParameterError(t *testing.T) {
@@ -90,6 +115,12 @@ func TestGetServicesSingleService(t *testing.T) {
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -165,6 +196,12 @@ func TestGetServicesMultiService(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServices(ctx, request)
 	assert.Nil(t, err)
 	assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+	stream := &mockSrvStream{}
+
+	err = suite.ApplicationsServer.FindServices(request, stream)
+	require.NoError(t, err)
+	assertServicesEqual(t, expected.Services, stream.SentMsgs)
 }
 
 func TestGetServicesWithDisconnectedServices(t *testing.T) {
@@ -301,6 +338,12 @@ func TestGetServicesMultiServicaSortDESC(t *testing.T) {
 	response, err := suite.ApplicationsServer.GetServices(ctx, request)
 	assert.Nil(t, err)
 	assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+	stream := &mockSrvStream{}
+
+	err = suite.ApplicationsServer.FindServices(request, stream)
+	require.NoError(t, err)
+	assertServicesEqual(t, expected.Services, stream.SentMsgs)
 }
 
 func TestGetServicesMultiServicaPagination(t *testing.T) {
@@ -426,6 +469,12 @@ func TestGetServicesMultiServiceWithServiceGroupIDFilter(t *testing.T) {
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -459,6 +508,12 @@ func TestGetServicesMultiServiceWithHealthFilter(t *testing.T) {
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -496,6 +551,12 @@ func TestGetServicesMultiServiceWithHealthAndServiceGroupIdFilter(t *testing.T) 
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -554,6 +615,12 @@ func TestGetServicesMultiServiceWithOriginAndServiceGroupIdFilter(t *testing.T) 
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -614,6 +681,12 @@ func TestGetServicesMultiServiceWithSiteAndServiceGroupIdFilter(t *testing.T) {
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -675,6 +748,12 @@ func TestGetServicesMultiServiceWithChannelAndServiceGroupIdFilter(t *testing.T)
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -733,6 +812,12 @@ func TestGetServicesMultiServiceWithVersionAndServiceGroupIdFilter(t *testing.T)
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -790,6 +875,12 @@ func TestGetServicesMultiServiceWithBuildstampAndServiceGroupIdFilter(t *testing
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -840,6 +931,12 @@ func TestGetServicesMultiServiceWithEnvironmentAndServiceGroupIdFilter(t *testin
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -890,6 +987,12 @@ func TestGetServicesMultiServiceWithApplicationAndServiceGroupIdFilter(t *testin
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -940,6 +1043,12 @@ func TestGetServicesMultiServiceWithGroupNameAndServiceGroupIdFilter(t *testing.
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -990,6 +1099,12 @@ func TestGetServicesMultiServiceWithServiceNameAndServiceGroupIdFilter(t *testin
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -1039,6 +1154,12 @@ func TestGetServicesMultiServiceWithEnvWildAndServiceGroupIdFilter(t *testing.T)
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
@@ -1089,6 +1210,12 @@ func TestGetServicesMultiServiceWithEnvWildAppWildAndServiceGroupIdFilter(t *tes
 		response, err := suite.ApplicationsServer.GetServices(ctx, request)
 		assert.Nil(t, err)
 		assertServicesEqual(t, expected.GetServices(), response.GetServices())
+
+		stream := &mockSrvStream{}
+
+		err = suite.ApplicationsServer.FindServices(request, stream)
+		require.NoError(t, err)
+		assertServicesEqual(t, expected.Services, stream.SentMsgs)
 	}
 }
 
