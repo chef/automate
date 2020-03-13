@@ -17,9 +17,9 @@ service ProfilesService {
 	rpc Create (stream ProfilePostRequest) returns (CheckResult) {};
 
 	/*
-	Read an installed profile
+	Show an installed profile
 
-	Read the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+	Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
 
 
 	Authorization Action:
@@ -42,10 +42,10 @@ service ProfilesService {
 	};
 
 	/*
-	Read a market profile
+	Show an available profile
 
-	Read the details of an un-installed profile given the profile name and version.
-	in the UI, these are the profiles under the "Available" tab. 
+	Show the details of an un-installed profile using the profile name and version.
+	in the UI, these are the profiles under the "Available" tab.
 	These profiles are created and maintained by Chef, shipped with Chef Automate.
 
 
@@ -67,7 +67,7 @@ service ProfilesService {
 			action: "compliance:marketProfiles:get"
 		};
 	};
-	
+
 	// grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
 	// so we do not auto-generate the route for profile download; we instead custom handle with mux
 	rpc ReadTar(ProfileDetails) returns (stream ProfileData) {};
@@ -99,7 +99,7 @@ service ProfilesService {
 	};
 
 	/*
-	List all profiles
+	List all available profiles
 
 	Lists all profiles available for the Automate instance.
 	Empty params return all "market" profiles.
@@ -115,9 +115,9 @@ service ProfilesService {
 	{
 		"filters":[
 			{"type": "title", "values": [ "Dev*"]}
-		], 
-		"page": 1, 
-		"per_page": 3, 
+		],
+		"page": 1,
+		"per_page": 3,
 		"owner": "admin"
 	}
 	```
@@ -145,7 +145,7 @@ service ProfilesService {
 }
 
 message ProfilePostRequest {
-	// Automate user to associate the profile with. Only this user will be able to see the profile in the Automate GUI.
+	// Associate an automate user with a profile. A profile is visible only to its associated user.
 	string owner = 5;
 	// Intentionally blank.
 	Chunk chunk = 2;
@@ -254,7 +254,7 @@ message Ref {
 message Result {
 	// Status of the test results (passed, failed, skipped).
 	string status = 1;
-	// The code (test) that was executed.
+	// The code (test) executed.
 	string code_desc = 2;
 	// The amount of time it took to execute the test.
 	float run_time = 3;
@@ -262,7 +262,7 @@ message Result {
 	string start_time = 4;
 	// The failure message.
 	string message = 5;
-	// Reason why the test was skipped.
+	// Reason for skipping the test.
 	string skip_message = 6;
 }
 message SourceLocation {
@@ -336,7 +336,7 @@ message ResultSummary {
 	bool valid = 1;
 	// Timestamp of when the `inspec check` command was executed.
 	string timestamp = 2;
-	// Path of the profile that was checked.
+	// Path of the checked profile.
 	string location = 3;
 	// Count of controls in the profile.
 	int32 controls = 4;
@@ -354,7 +354,7 @@ message CheckMessage {
 	string msg = 5;
 }
 message ListFilter {
-	// List of values to filter on. 
+	// List of values to filter on.
 	repeated string values = 20;
 	// The field to filter on.
 	string type = 21;

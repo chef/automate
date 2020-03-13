@@ -54,7 +54,7 @@ func (Query_OrderType) EnumDescriptor() ([]byte, []int) {
 }
 
 type ProfilePostRequest struct {
-	// Automate user to associate the profile with. Only this user will be able to see the profile in the Automate GUI.
+	// Associate an automate user with a profile. A profile is visible only to its associated user.
 	Owner string `protobuf:"bytes,5,opt,name=owner,proto3" json:"owner,omitempty"`
 	// Intentionally blank.
 	Chunk *Chunk `protobuf:"bytes,2,opt,name=chunk,proto3" json:"chunk,omitempty"`
@@ -727,7 +727,7 @@ func (m *Ref) GetRef() string {
 type Result struct {
 	// Status of the test results (passed, failed, skipped).
 	Status string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	// The code (test) that was executed.
+	// The code (test) executed.
 	CodeDesc string `protobuf:"bytes,2,opt,name=code_desc,json=codeDesc,proto3" json:"code_desc,omitempty"`
 	// The amount of time it took to execute the test.
 	RunTime float32 `protobuf:"fixed32,3,opt,name=run_time,json=runTime,proto3" json:"run_time,omitempty"`
@@ -735,7 +735,7 @@ type Result struct {
 	StartTime string `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
 	// The failure message.
 	Message string `protobuf:"bytes,5,opt,name=message,proto3" json:"message,omitempty"`
-	// Reason why the test was skipped.
+	// Reason for skipping the test.
 	SkipMessage          string   `protobuf:"bytes,6,opt,name=skip_message,json=skipMessage,proto3" json:"skip_message,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1277,7 +1277,7 @@ type ResultSummary struct {
 	Valid bool `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
 	// Timestamp of when the `inspec check` command was executed.
 	Timestamp string `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	// Path of the profile that was checked.
+	// Path of the checked profile.
 	Location string `protobuf:"bytes,3,opt,name=location,proto3" json:"location,omitempty"`
 	// Count of controls in the profile.
 	Controls             int32    `protobuf:"varint,4,opt,name=controls,proto3" json:"controls,omitempty"`
@@ -1732,9 +1732,9 @@ type ProfilesServiceClient interface {
 	// so we do not auto-generate the route for profile upload; we instead custom handle with mux
 	Create(ctx context.Context, opts ...grpc.CallOption) (ProfilesService_CreateClient, error)
 	//
-	//Read an installed profile
+	//Show an installed profile
 	//
-	//Read the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+	//Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
 	//
 	//
 	//Authorization Action:
@@ -1743,9 +1743,9 @@ type ProfilesServiceClient interface {
 	//```
 	Read(ctx context.Context, in *ProfileDetails, opts ...grpc.CallOption) (*Profile, error)
 	//
-	//Read a market profile
+	//Show an available profile
 	//
-	//Read the details of an un-installed profile given the profile name and version.
+	//Show the details of an un-installed profile using the profile name and version.
 	//in the UI, these are the profiles under the "Available" tab.
 	//These profiles are created and maintained by Chef, shipped with Chef Automate.
 	//
@@ -1771,7 +1771,7 @@ type ProfilesServiceClient interface {
 	//```
 	Delete(ctx context.Context, in *ProfileDetails, opts ...grpc.CallOption) (*empty.Empty, error)
 	//
-	//List all profiles
+	//List all available profiles
 	//
 	//Lists all profiles available for the Automate instance.
 	//Empty params return all "market" profiles.
@@ -1918,9 +1918,9 @@ type ProfilesServiceServer interface {
 	// so we do not auto-generate the route for profile upload; we instead custom handle with mux
 	Create(ProfilesService_CreateServer) error
 	//
-	//Read an installed profile
+	//Show an installed profile
 	//
-	//Read the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+	//Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
 	//
 	//
 	//Authorization Action:
@@ -1929,9 +1929,9 @@ type ProfilesServiceServer interface {
 	//```
 	Read(context.Context, *ProfileDetails) (*Profile, error)
 	//
-	//Read a market profile
+	//Show an available profile
 	//
-	//Read the details of an un-installed profile given the profile name and version.
+	//Show the details of an un-installed profile using the profile name and version.
 	//in the UI, these are the profiles under the "Available" tab.
 	//These profiles are created and maintained by Chef, shipped with Chef Automate.
 	//
@@ -1957,7 +1957,7 @@ type ProfilesServiceServer interface {
 	//```
 	Delete(context.Context, *ProfileDetails) (*empty.Empty, error)
 	//
-	//List all profiles
+	//List all available profiles
 	//
 	//Lists all profiles available for the Automate instance.
 	//Empty params return all "market" profiles.
