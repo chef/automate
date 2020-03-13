@@ -13,8 +13,8 @@
   "paths": {
     "/compliance/market/read/{name}/version/{version}": {
       "get": {
-        "summary": "Read a market profile",
-        "description": "Read the details of an un-installed profile given the profile name and version.\nin the UI, these are the profiles under the \"Available\" tab. \nThese profiles are created and maintained by Chef, shipped with Chef Automate.\n\n\nAuthorization Action:\n```\ncompliance:marketProfiles:get\n```",
+        "summary": "View an available profile",
+        "description": "View the details of an un-installed profile using the profile name and version.\nin the UI, these are the profiles under the \"Available\" tab.\nThese profiles are created and maintained by Chef, shipped with Chef Automate.\n\n\nAuthorization Action:\n```\ncompliance:marketProfiles:get\n```",
         "operationId": "ReadFromMarket",
         "responses": {
           "200": {
@@ -54,8 +54,8 @@
     },
     "/compliance/profiles/read/{owner}/{name}/version/{version}": {
       "get": {
-        "summary": "Read an installed profile",
-        "description": "Read the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.\n\n\nAuthorization Action:\n```\ncompliance:profiles:get\n```",
+        "summary": "View an installed profile",
+        "description": "View the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.\n\n\nAuthorization Action:\n```\ncompliance:profiles:get\n```",
         "operationId": "Read",
         "responses": {
           "200": {
@@ -95,8 +95,8 @@
     },
     "/compliance/profiles/search": {
       "post": {
-        "summary": "List all profiles",
-        "description": "Lists all profiles available for the Automate instance.\nEmpty params return all \"market\" profiles.\nSpecifying the `owner` field returns all profiles installed for the specified user.\n\nSupports pagination, sorting, and filtering (wildcard supported).\n\nSupported sort fields: title, name (default: title)\nSupported filter fields: name, version, title\n\nExample:\n```\n{\n\"filters\":[\n{\"type\": \"title\", \"values\": [ \"Dev*\"]}\n], \n\"page\": 1, \n\"per_page\": 3, \n\"owner\": \"admin\"\n}\n```\n\n\nAuthorization Action:\n```\ncompliance:profiles:list\n```",
+        "summary": "List all available profiles",
+        "description": "Lists all profiles available for the Automate instance.\nEmpty params return all \"market\" profiles.\nSpecifying the `owner` field returns all profiles installed for the specified user.\n\nSupports pagination, sorting, and filtering (wildcard supported).\n\nSupported sort fields: title, name (default: title)\nSupported filter fields: name, version, title\n\nExample:\n```\n{\n\"filters\":[\n{\"type\": \"title\", \"values\": [ \"Dev*\"]}\n],\n\"page\": 1,\n\"per_page\": 3,\n\"owner\": \"admin\"\n}\n```\n\n\nAuthorization Action:\n```\ncompliance:profiles:list\n```",
         "operationId": "List",
         "responses": {
           "200": {
@@ -595,7 +595,7 @@
         },
         "code_desc": {
           "type": "string",
-          "description": "The code (test) that was executed."
+          "description": "The code (test) executed."
         },
         "run_time": {
           "type": "number",
@@ -612,7 +612,7 @@
         },
         "skip_message": {
           "type": "string",
-          "description": "Reason why the test was skipped."
+          "description": "Reason for skipping the test."
         }
       }
     },
@@ -630,7 +630,7 @@
         },
         "location": {
           "type": "string",
-          "description": "Path of the profile that was checked."
+          "description": "Path of the checked profile."
         },
         "controls": {
           "type": "integer",
