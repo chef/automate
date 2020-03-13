@@ -46,7 +46,7 @@ steps:
         limit: 1
     concurrency: 1
     concurrency_group: chef-automate-master/deploy/$CHANNEL
-    timeout_in_minutes: 30
+    timeout_in_minutes: 35
     expeditor:
       secrets:
         CYPRESS_RECORD_KEY:
