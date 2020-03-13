@@ -34,11 +34,12 @@ export class AutomateSettingsEffects {
     ofType(AutomateSettingsActionTypes.CONFIGURE_SETTINGS),
     mergeMap((action: ConfigureSettings) => {
       const jobsRequests = [];
-      jobsRequests.push(this.requests.configureIngestJob(action.payload.jobs));
+      jobsRequests.push(this.requests.configureIngestJobs(action.payload.jobs));
       // action.payload.jobs.forEach((job) => {
         //   jobsRequests.push(this.requests.configureIngestJob(job));
         // });
         console.log('***********************');
+        // won't need to forkJoin because we only make one api call now
       return forkJoin(jobsRequests).pipe(
         map((_resp) => new ConfigureSettingsSuccess({})),
         catchError((error) => of(new ConfigureSettingsFailure(error))));

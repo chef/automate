@@ -29,14 +29,16 @@ export class AutomateSettingsComponent implements OnInit {
   private defaultFormData = {
     eventFeedRemoveData: {
       category: 'event_feed',
-      name: '',
+      name: 'periodic_purge',
+      nested_name: 'feed',
       unit: { value: 'd', disabled: false },
       threshold: {value: '30', disabled: false},
       disabled: false
     },
     eventFeedServerActions: {
       category: 'infra',
-      name: '',
+      name: 'periodic_purge_timeseries',
+      nested_name: 'actions',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
@@ -72,6 +74,7 @@ export class AutomateSettingsComponent implements OnInit {
     clientRunsRemoveNodes: {
       category: 'infra',
       name: 'periodic_purge_timeseries',
+      nested_name: 'converge-history',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
@@ -79,6 +82,7 @@ export class AutomateSettingsComponent implements OnInit {
     complianceRemoveReports: {
       category: 'compliance',
       name: 'periodic_purge',
+      nested_name: 'compliance-reports',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
@@ -86,6 +90,7 @@ export class AutomateSettingsComponent implements OnInit {
     complianceRemoveScans: {
       category: 'compliance',
       name: 'periodic_purge',
+      nested_name: 'compliance-scans',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
@@ -237,6 +242,7 @@ export class AutomateSettingsComponent implements OnInit {
       job.name = jobForm.name;
       job.disabled = jobForm.disabled;
       job.threshold = jobForm.disabled ? '' : jobForm.threshold + jobForm.unit;
+      job.nested_name = jobForm.nested_name ? jobForm.nested_name : '';
       return job;
     });
 

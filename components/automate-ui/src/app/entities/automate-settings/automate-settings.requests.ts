@@ -8,7 +8,6 @@ import {
   JobSchedulerStatus,
   RespJob,
   IngestJob,
-  IngestJobs,
   RespJobSchedulerStatus
 } from './automate-settings.model';
 
@@ -36,7 +35,7 @@ export class AutomateSettingsRequests {
 
   // configureIngestJob sends an HTTP POST Request to the provided ingest job to configure
   // it with the provided threshold and running state
-  configureIngestJob(jobs: IngestJob[]): Observable<any> {
+  configureIngestJobs(jobs: IngestJob[]): Observable<any> {
     const url = '/api/v0/data-lifecycle/config';
     // console.log(jobs);
     // console.log('configure injest Job');
@@ -72,6 +71,12 @@ export class AutomateSettingsRequests {
         case 'purge_policies':    // fallthrough
         case 'periodic_purge_timeseries':
           thisJob = this.unfurlIngestJob(job, true);
+          const outer = {
+            'name': job.name,
+            'purge_policies': {
+            'elasticsearch': []
+            }
+          };
           body[job.category]['job_settings'].push(thisJob);
           break;
       }
@@ -85,17 +90,10 @@ export class AutomateSettingsRequests {
   private unfurlIngestJob(job: IngestJob, nested: boolean = false) {
     if (nested) {
       return {
-        'name': job.name,
-        'purge_policies': {
-          'elasticsearch': [
-            {
-              'policy_name': 'make nested attribute',
-              'older_than_days': job.threshold,
-              'disabled': job.disabled
-            }
-          ]
-        }
-      };
+        'policy_name': job.nested_name,
+        'older_than_days': job.threshold,
+        'disabled': job.disabled
+      }
     } else {
       return {
         'name': job.name,

@@ -17,6 +17,7 @@ export interface ConfigureSettingsRequest {
 
 export interface RespJob {
   name: string;
+  nested_name?: string;
   disabled: boolean;
   recurrence: string;
   threshold: string;
@@ -84,6 +85,7 @@ export enum IngestJobs {
 export class IngestJob {
   category: string;
   name: string;
+  nested_name?: string;
   disabled: boolean;
   recurrence: string;
   threshold: string;
@@ -98,6 +100,7 @@ export class IngestJob {
     if (respJob !== null) {
       this.category = category;
       this.name = respJob.name;
+      this.nested_name = respJob.nested_name;
       this.disabled = respJob.disabled;
       this.recurrence = respJob.recurrence;
       this.threshold = respJob.threshold;
