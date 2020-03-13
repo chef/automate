@@ -18,8 +18,8 @@ test_diagnostics_pre_upgrade_filters="~skip-for-deep-upgrade"
 # Note: we can't run diagnostics AND inspec, so we don't include any inspec tests
 test_skip_diagnostics=false
 
-# on this version, Automate had upgrade-to-v2 and the first three v2 data migrations
-OLD_VERSION=20190501153509
+# on this version, we released IAM v2 GA
+OLD_VERSION=20200127203438
 OLD_MANIFEST_DIR="${A2_ROOT_DIR}/components/automate-deployment/testdata/old_manifests/"
 DEEP_UPGRADE_PATH="${OLD_MANIFEST_DIR}/${OLD_VERSION}.json"
 
