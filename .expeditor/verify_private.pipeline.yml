@@ -413,7 +413,7 @@ steps:
   - label: ":cypress: (flaky included) IAMv1"
     command:
       - FLAKY=yes IAM=v1 integration/run_test integration/tests/cypress_e2e.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 35
     soft_fail: true
     expeditor:
       secrets: &cypress_secrets
@@ -447,7 +447,7 @@ steps:
   - label: ":cypress: IAMv1"
     command:
       - FLAKY=no IAM=v1 integration/run_test integration/tests/cypress_e2e.sh
-    timeout_in_minutes: 20
+    timeout_in_minutes: 35
     expeditor:
       secrets: &cypress_secrets
         A2_LICENSE:
@@ -469,7 +469,7 @@ steps:
   - label: ":cypress: IAMv2"
     command:
       - FLAKY=no IAM=v2.1 integration/run_test integration/tests/cypress_e2e.sh
-    timeout_in_minutes: 30
+    timeout_in_minutes: 35
     expeditor:
       secrets: *cypress_secrets
       executor:
