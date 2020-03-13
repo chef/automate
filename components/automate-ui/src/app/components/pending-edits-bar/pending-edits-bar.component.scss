@@ -3,8 +3,16 @@
 #pending-edits-bar {
   background-color: $chef-primary-bright;
   color: $chef-white;
-  padding: 16px 10px;
   position: relative;
+
+  .normal-container {
+    padding: 16px 10px;
+  }
+
+  .failure-container {
+    padding: 16px 10px;
+    background-color: $chef-critical;
+  }
 
   .info {
     font-size: 16px;
@@ -12,6 +20,11 @@
 
     a {
       color: inherit;
+    }
+
+    pre {
+      display: inline;
+      padding: 0;
     }
   }
 
@@ -23,8 +36,13 @@
     top: 0;
   }
 
-  button:hover,
-  button:focus {
+  .failure-container button:hover,
+  .failure-container button:focus {
+    background-color: $chef-critical-hover;
+  }
+
+  .normal-container button:hover,
+  .normal-container button:focus {
     background-color: $chef-primary-hover;
   }
 }
