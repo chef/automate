@@ -36,38 +36,75 @@ export class AutomateSettingsRequests {
 
   // configureIngestJob sends an HTTP POST Request to the provided ingest job to configure
   // it with the provided threshold and running state
-  configureIngestJob(job: IngestJob): Observable<any> {
+  configureIngestJob(jobs: IngestJob[]): Observable<any> {
     const url = '/api/v0/data-lifecycle/config';
-
-    console.log('configure injest Job');
-    console.log(job);
-
-    switch (job.name) {
-      // case IngestJobs.MissingNodes: {
-      //   url = `${RETENTION_URL}/nodes/missing-nodes/config`;
-      //   break;
-      // }
-      // case IngestJobs.MissingNodesForDeletion: {
-      //   url = `${RETENTION_URL}/nodes/missing-nodes-deletion/config`;
-      //   break;
-      // }
-      // case IngestJobs.DeleteNodes: {
-      //   url = `${RETENTION_URL}/nodes/delete-nodes/config`;
-      //   break;
-      // }
-    }
+    // console.log(jobs);
+    // console.log('configure injest Job');
+    // console.log(job);
 
     const body = {
-      // March 10 - this will need full updating with new RespJob type
-      'threshold': job.threshold,
-      'running': job.disabled
-      // We can also modify how often the job runs (every X time)
-      // but we don't need that now!
-      // 'every': job.every
+      'infra' : {
+        'job_settings': []
+      },
+      'compliance': {
+        'job_settings': []
+      },
+      'event_feed': {
+        'job_settings': []
+      },
+      'services': {
+        'job_settings': []
+      }
     };
 
+
+    jobs.forEach((job: IngestJob) => {
+      let thisJob;
+
+      switch (job.name) {
+        case 'delete_nodes':      // fallthrough
+        case 'missing_nodes':     // fallthrough
+        case 'missing_nodes_for_deletion':
+          thisJob = this.unfurlIngestJob(job);
+          body[job.category]['job_settings'].push(thisJob);
+          break;
+
+        case 'purge_policies':    // fallthrough
+        case 'periodic_purge_timeseries':
+          thisJob = this.unfurlIngestJob(job, true);
+          body[job.category]['job_settings'].push(thisJob);
+          break;
+      }
+
+    });
+
+    console.log(body);
     return this.http.post<any>(url, body);
   }
+
+  private unfurlIngestJob(job: IngestJob, nested: boolean = false) {
+    if (nested) {
+      return {
+        'name': job.name,
+        'purge_policies': {
+          'elasticsearch': [
+            {
+              'policy_name': 'make nested attribute',
+              'older_than_days': job.threshold,
+              'disabled': job.disabled
+            }
+          ]
+        }
+      };
+    } else {
+      return {
+        'name': job.name,
+        'threshold': job.threshold,
+        'disabled': job.disabled  // threshold is likely gone if diabled so check on if all are necessary
+      };
+    }
+  }
+
 
   private convertResponseToJobSchedulerStatus(
     respJobSchedulerStatus: RespJobSchedulerStatus): JobSchedulerStatus {

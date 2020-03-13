@@ -232,11 +232,9 @@ export class AutomateSettingsComponent implements OnInit {
       IngestJobs.ComplianceRemoveScans
     ].map(jobName => {
       const jobForm = this.getJobForm(jobName);
-      console.log('---------------');
-      console.log(jobForm);
       const job = new IngestJob(null, null);
-      job.name = jobForm.name;
       job.category = jobForm.category;
+      job.name = jobForm.name;
       job.disabled = jobForm.disabled;
       job.threshold = jobForm.disabled ? '' : jobForm.threshold + jobForm.unit;
       return job;
