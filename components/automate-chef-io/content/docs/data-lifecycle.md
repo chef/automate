@@ -27,13 +27,11 @@ The `data-lifecycle` API allows configuring and running lifecycle jobs by data t
 
 Different jobs are available depending on the data type you wish to configure or run.
 
-In order to see the data lifecycle job statuses, configure jobs, or run jobs, you will need
-an [admin token]({{< relref "api-tokens.md#creating-an-admin-api-token" >}}) or a token
-for a user with `dataLifecycle:*` IAM access.
+In order to see the data lifecycle job statuses, configure jobs, or run jobs, you will need an [admin token]({{< relref "api-tokens.md#creating-an-admin-api-token" >}}) or a token for a user with `dataLifecycle:*` IAM access.
 
-For Automate 2 versions < 20191129172405, see [older docs](https://github.com/chef/automate/blob/20191104205453/components/automate-chef-io/content/docs/configuration.md#data-retention)
-
-For Automate 2 versions higher than the level mentioned above, use the following
+{{% warning %}}
+Note: Chef Automate releases earlier than 20191129172405 handled data retention differently. The [upgrade documentation]({{< ref "install/#upgrades" >}}) covers configuring your system to install new Chef Automate versions, or contact your customer support agent for guidance. You can also use the [previous documentation](https://github.com/chef/automate/blob/20191104205453/components/automate-chef-io/content/docs/configuration.md#data-retention) for help with configuring data retention on older Chef Automate installations.
+{{% /warning %}}
 
 ## Status
 
