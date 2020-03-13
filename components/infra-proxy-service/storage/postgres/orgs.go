@@ -7,7 +7,6 @@ import (
 	"github.com/pkg/errors"
 
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	"github.com/chef/automate/components/infra-proxy-service/constants"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -22,9 +21,9 @@ func (p *postgres) StoreOrg(ctx context.Context, name string, adminUser string, 
 func (p *postgres) insertOrg(ctx context.Context,
 	name string, adminUser string, adminKey string, serverID string, projects []string) (storage.Org, error) {
 
-	// ensure we do not pass null projects to db and break the "not null" & check <> '{}' constraint
+	// ensure we do not pass null projects to db and break the "not null"
 	if len(projects) == 0 {
-		projects = []string{constants.UnassignedProjectID}
+		projects = []string{}
 	}
 
 	// will only return an error if authz is in v2.1 mode
@@ -107,7 +106,7 @@ func (p *postgres) EditOrg(ctx context.Context, org storage.Org) (storage.Org, e
 
 	// ensure we do not pass null projects to db
 	if org.Projects == nil {
-		org.Projects = []string{constants.UnassignedProjectID}
+		org.Projects = []string{}
 	}
 
 	err := p.db.QueryRowContext(ctx,
