@@ -10,17 +10,15 @@ toc = true
     weight = 10
 +++
 
-## Features in IAM v2
-
 IAM v2 policies allow multiple permissions, distinguish policy membership from policy definition for fine-grained control, and include roles for role-based access control.
 Additionally, IAM v2 allows policy members to be managed directly from Chef Automate in the browser.
 Perhaps most significantly, IAM v2 supports projects, which allow for filtering and segregation of your data amongst your user base.
 
 The *policy* exists at the heart of Chef Automate's IAM system.
-A policy defines permissions for who may perform what action on which resource scoped by project.
+A policy defines permissions for who may perform what action on which resource and scopes these permissions by project.
 The "who" may be a user, a team, or an API token.
 
-The following diagram shows the new policy structure. We detail the specifics in the next few sections.
+The following diagram shows the new policy structure. We detail the specifics in the next sections.
 
 ![](/images/docs/iam-v2-diagram.png)
 
@@ -45,8 +43,8 @@ The following examples illustrate the net effect of a policy and if it grants ac
   _Net effect_: Access denied to user1 to view the list of users.
   This example illustrates the global default DENY condition.
 - Bob is a member of team alpha and team omega.
-  Team alpha contains a broad range of permissions, while team omega is very restricted in what its members may access.
-  The "major teams" policy has a statement that allows team alpha to access the resource `compliance:reporting:nodes`, while it has another statement that denies Team Omega access to that very same resource. 
+  Team alpha contains a broad range of permissions, while team omega is significantly restricted in what its members may access.
+  The "major teams" policy has a statement that allows team alpha to access the resource `compliance:reporting:nodes`, while it has another statement that denies Team Omega access to the same resource. 
   _Net effect_: The policy denies Bob access because at least one statement denies access.
 - Mary is a member of the default viewers team, which allows read access to everything because of the default Viewers policy.
   Mary is also a member of the deployment team, which has permission to upload and download profiles.
@@ -105,12 +103,12 @@ Owner         | **Do** everything in the system *including* IAM
 Project Owner | Editor + **view** and **assign** projects
 Ingest        | Ingest data into the system
 
-Just like policies, roles are considered either *Chef-managed* or *Custom*.
-Default Chef-managed roles cannot be changed, like Chef-managed policies.
+Just like policies, roles are either *Chef-managed* or *Custom* types.
+Default Chef-managed roles cannot change, like Chef-managed policies.
 You can use these default Chef-managed roles in your policies, or create your custom roles for more customized permissions.
 Any roles you create can be modified later.
 
-Chef Automate also ships with several default policies that leverage these default roles.
+Chef Automate also ships with default policies that leverage these default roles.
 The default policies are Viewers, Editors, Administrator, and Ingest.
 
 ## Working with Projects
@@ -135,7 +133,7 @@ Set up IAM v2 projects using the following steps:
 3. [Assign resources to projects]({{< relref "iam-v2-overview.md#assigning-resources-to-projects" >}}).
 4. Select the projects to filter in the UI.
    After creating projects, use the **global project filter** in the top navigation to select one or more projects for viewing.
-   No selection means all resources for which you have permission will be displayed.
+   No selection displays all resources for which you have permission.
 
 By default, Chef Automate includes a *project-owner* role, so the global admin may delegate much of these responsibilities for project management to others and alleviate some of the burden for the global admin.
 
