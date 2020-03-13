@@ -43,11 +43,6 @@ export class PendingEditsBarComponent implements OnDestroy {
         this.updateProjectsCancelled = cancelled;
         this.updateDisplay();
       });
-    observableInterval(5000)
-      .subscribe(() => {
-        this.projects.getApplyRulesStatus();
-      });
-
     }
 
   ngOnDestroy(): void {
