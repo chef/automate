@@ -23,7 +23,6 @@ export class AutomateSettingsRequests {
   // fetchJobSchedulerStatus sends an HTTP GET Request to read the status of the JobScheduler
   // living inside the ingest-service
   public fetchJobSchedulerStatus(_params): Observable<JobSchedulerStatus> {
-    // const url = `${RETENTION_URL}/nodes/status`;
 
     // NEW ENDPOINT FOR DATA-LIFECYCLE
     const url = '/api/v0/data-lifecycle/status';
@@ -33,7 +32,7 @@ export class AutomateSettingsRequests {
       map((res) => this.convertResponseToJobSchedulerStatus(res)));
   }
 
-  // configureIngestJob sends an HTTP POST Request to the provided ingest job to configure
+  // configureIngestJob sends an HTTP PUT Request to the provided ingest job to configure
   // it with the provided threshold and running state
   configureIngestJobs(jobs: IngestJob[]): Observable<any> {
     const url = '/api/v0/data-lifecycle/config';
@@ -68,9 +67,6 @@ export class AutomateSettingsRequests {
             }
           }
         ]
-      },
-      'services': {
-        'job_settings': []
       }
     };
 
@@ -100,8 +96,7 @@ export class AutomateSettingsRequests {
 
     });
 
-    console.log(body);
-    return this.http.post<any>(url, body);
+    return this.http.put<any>(url, body);
   }
 
   private unfurlIngestJob(job: IngestJob, nested: boolean = false) {
@@ -115,8 +110,8 @@ export class AutomateSettingsRequests {
       return {
         'name': job.name,
         'threshold': job.threshold,
-        'disabled': job.disabled  // threshold is likely gone if
-                                  // diabled so check on if all are necessary
+        'disabled': false  // threshold is likely gone if
+                           // diabled so check on if all are necessary
       };
     }
   }
