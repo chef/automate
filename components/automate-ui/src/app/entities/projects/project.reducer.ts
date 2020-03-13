@@ -128,6 +128,7 @@ export function projectEntityReducer(
     case ProjectActionTypes.GET_APPLY_RULES_STATUS_SUCCESS:
       const payload: GetApplyRulesStatusSuccessPayload = {
         ...action.payload,
+        failed: Math.random() > 0.5,
         percentage_complete: action.payload.percentage_complete * 100
       };
       return set(APPLY_RULES_STATUS, mapKeys(key => camelCase(key), payload), state);
