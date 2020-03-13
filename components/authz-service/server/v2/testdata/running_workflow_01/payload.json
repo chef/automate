@@ -2856,8 +2856,8 @@
                 ],
                 "CompletedTasks": 0,
                 "TotalTasks": 186,
-                "StartTime": "2020-03-09T18:01:53.19500762Z",
-                "LastUpdated": "2020-03-09T18:21:47.387265641Z"
+                "StartTime": "{{ .StartTime }}",
+                "LastUpdated": "{{ .LastUpdated }}"
               },
               "MonitorFailures": 0
             },
