@@ -262,6 +262,35 @@ func (app *ApplicationsServer) GetServices(
 	}, nil
 }
 
+func (app *ApplicationsServer) FindServices(
+	request *applications.ServicesReq,
+	stream applications.ApplicationsService_FindServicesServer) error {
+
+	filters, err := stringutils.FormatFilters(request.GetFilter())
+	if err != nil {
+		return status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	sortField, sortAsc, err := params.GetSortParamsForServices(request.GetSorting())
+	if err != nil {
+		return status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	services, err := app.storageClient.GetServices(sortField, sortAsc, 1, 0, filters)
+	if err != nil {
+		log.WithError(err).Error("Error retrieving services")
+		return status.Error(codes.Internal, err.Error())
+	}
+
+	for _, s := range services {
+		if err := stream.Send(convertStorageServiceToApplicationsService(s)); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
 func (app *ApplicationsServer) GetServicesStats(ctx context.Context,
 	request *applications.ServicesStatsReq) (*applications.ServicesStatsRes, error) {
 
@@ -453,28 +482,33 @@ func (app *ApplicationsServer) UpdateDeleteDisconnectedServicesConfig(ctx contex
 func convertStorageServicesToApplicationsServices(svcs []*storage.Service) []*applications.Service {
 	services := make([]*applications.Service, len(svcs))
 	for i, svc := range svcs {
-		services[i] = &applications.Service{
-			Id:                  fmt.Sprintf("%d", svc.ID),
-			SupervisorId:        svc.SupMemberID,
-			Release:             svc.FullReleaseString(),
-			Group:               svc.Group,
-			HealthCheck:         convertHealthStatusToProto(svc.Health),
-			Application:         svc.Application,
-			Environment:         svc.Environment,
-			Fqdn:                svc.Fqdn,
-			Channel:             svc.Channel,
-			UpdateStrategy:      svc.UpdateStrategy,
-			Site:                svc.Site,
-			PreviousHealthCheck: convertHealthStatusToProto(svc.PreviousHealth),
-			CurrentHealthSince:  timef.IntervalUntilNow(svc.HealthUpdatedAt),
-			HealthUpdatedAt:     convertOrCreateProtoTimestamp(svc.HealthUpdatedAt),
-			Disconnected:        svc.Disconnected,
-			LastEventOccurredAt: convertOrCreateProtoTimestamp(svc.LastEventOccurredAt),
-			LastEventSince:      timef.IntervalUntilNow(svc.LastEventOccurredAt),
-			HealthCheckResult:   convertHealthCheckResult(svc),
-		}
+		services[i] = convertStorageServiceToApplicationsService(svc)
 	}
 	return services
+}
+
+func convertStorageServiceToApplicationsService(svc *storage.Service) *applications.Service {
+	return &applications.Service{
+		Id:                  fmt.Sprintf("%d", svc.ID),
+		SupervisorId:        svc.SupMemberID,
+		Release:             svc.FullReleaseString(),
+		Group:               svc.Group,
+		HealthCheck:         convertHealthStatusToProto(svc.Health),
+		Application:         svc.Application,
+		Environment:         svc.Environment,
+		Fqdn:                svc.Fqdn,
+		Channel:             svc.Channel,
+		UpdateStrategy:      svc.UpdateStrategy,
+		Site:                svc.Site,
+		PreviousHealthCheck: convertHealthStatusToProto(svc.PreviousHealth),
+		CurrentHealthSince:  timef.IntervalUntilNow(svc.HealthUpdatedAt),
+		HealthUpdatedAt:     convertOrCreateProtoTimestamp(svc.HealthUpdatedAt),
+		Disconnected:        svc.Disconnected,
+		LastEventOccurredAt: convertOrCreateProtoTimestamp(svc.LastEventOccurredAt),
+		LastEventSince:      timef.IntervalUntilNow(svc.LastEventOccurredAt),
+		HealthCheckResult:   convertHealthCheckResult(svc),
+	}
+
 }
 
 // convert a go native time to proto timestamp

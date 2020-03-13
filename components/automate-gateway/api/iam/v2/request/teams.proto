@@ -20,7 +20,8 @@ message CreateTeamReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["id", "name"]
-      }
+      },
+      example: { value: '{"id": "test-id", "name": "My Test Team", "projects": ["project1", "project2"]}'}
     };
     string id = 1;
     string name = 2;
@@ -31,7 +32,8 @@ message UpdateTeamReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["id", "name"]
-      }
+      },
+      example: { value: '{"name": "My Test Team", "projects": ["project1", "project2"]}'}
     };
     string id = 1;
     string name = 2;
@@ -51,7 +53,8 @@ message AddTeamMembersReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["id", "user_ids"]
-      }
+      },
+      example: { value: '{"user_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
     };
     string id = 1;
     repeated string user_ids = 2;
@@ -70,7 +73,8 @@ message RemoveTeamMembersReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["id", "user_ids"]
-      }
+      },
+      example: { value: '{"user_ids": ["527ed96f-2ecb-4f8f-abd7-0bf6511459ac", "353a62d4-85fa-4423-b12a-f6608a562ae9"]}'}
     };
     string id = 1;
     repeated string user_ids = 2;

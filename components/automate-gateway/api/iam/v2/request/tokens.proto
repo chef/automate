@@ -10,7 +10,8 @@ message CreateTokenReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["id", "name"]
-      }
+      },
+      example: { value: '{"name": "token 1", "id": "token-1", "active": true, "projects": ["east-region", "west-region"]}'}
     };
     // Unique ID. Cannot be changed.
     string id = 1;
@@ -35,7 +36,8 @@ message UpdateTokenReq {
     option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
       json_schema: {
         required: ["name"]
-      }
+      },
+      example: { value: '{"name": "updated token name", "active": true, "projects": ["east-region", "south-region"]}'}
     };
      // Unique ID. Cannot be changed.
     string id = 1;
