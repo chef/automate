@@ -210,7 +210,7 @@ export class AutomateSettingsComponent implements OnInit {
     // this loops through the rest of the form to disable it
     const pertinentGroups = [ 'unit', 'threshold' ];
     pertinentGroups.forEach(control => {
-      if (checked === true) {
+      if ( checked ) {
         form.get(control).enable();
       } else {
         form.get(control).disable();
@@ -247,6 +247,7 @@ export class AutomateSettingsComponent implements OnInit {
         job.nested_name = jobForm.nested_name;
         job.threshold = jobForm.threshold;
       }
+
       return job;
     });
 
@@ -317,9 +318,6 @@ export class AutomateSettingsComponent implements OnInit {
       return;
     }
 
-    console.log('jobScheduleStatus');
-    console.log(jobSchedulerStatus);
-
     jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
 
       switch (job.category) {
@@ -355,6 +353,7 @@ export class AutomateSettingsComponent implements OnInit {
       complianceRemoveReports: this.complianceRemoveReports,
       complianceRemoveScans: this.complianceRemoveScans
     });
+
   }
 
   private getJobForm(jobName: string) {
@@ -423,23 +422,12 @@ export class AutomateSettingsComponent implements OnInit {
       break;
 
       case 'delete_nodes': {
-        console.log('delete_nodes not implemented');
+        // delete_nodes not implemented
       }
       break;
 
       case 'periodic_purge_timeseries': {
-        const formValues = job.purge_policies.elasticsearch;
-        this.handleDisable(this.clientRunsRemoveNodes, formValues[0].disabled);
-        this.clientRunsRemoveNodes.patchValue({
-          threshold: formValues[0].older_than_days.toString(),
-          disabled: formValues[0].disabled
-        });
-        // this maps to the EventFeed Chef Server Actions, though it lives in infra
-        this.handleDisable(this.eventFeedServerActions, formValues[1].disabled);
-        this.eventFeedServerActions.patchValue({
-          threshold: formValues[1].older_than_days.toString(),
-          disabled: formValues[1].disabled
-        });
+        this.populateNested(job);
       }
       break;
 
@@ -477,6 +465,18 @@ export class AutomateSettingsComponent implements OnInit {
         }
         break;
 
+        case 'actions': {
+          this.handleDisable(this.eventFeedServerActions, _job.disabled);
+          this.eventFeedServerActions.patchValue(form);
+        }
+        break;
+
+        case 'converge-history': {
+          this.handleDisable(this.clientRunsRemoveNodes, _job.disabled);
+          this.clientRunsRemoveNodes.patchValue(form);
+        }
+          break;
+
         default:
           break;
       }
@@ -484,14 +484,16 @@ export class AutomateSettingsComponent implements OnInit {
   }
 
   private handleDisable(form, disabled: boolean = false): void {
-    if ( form.disabled || disabled ) {
-      // this loops through the rest of the form to disable it
-      const pertinentGroups = ['unit', 'threshold'];
-      pertinentGroups.forEach(control => {
-          form.get(control).disable();
-      });
-      return;
-    }
+    // this loops through the rest of the form to disable/enable it
+    const pertinentGroups = ['unit', 'threshold'];
+    pertinentGroups.forEach(control => {
+      if ( disabled ) {
+        form.get(control).disable();
+      } else {
+        form.get(control).enable();
+      }
+    });
+    return;
   }
 
 }
