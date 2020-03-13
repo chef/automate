@@ -22,9 +22,11 @@
     <chef-tbody *ngIf="!reportData.profilesListLoading">
       <chef-tr *ngFor="let profile of reportData.profilesList.items">
         <chef-td class="title-cell">
+          <!-- Material Icon Font -->
           <chef-icon *ngIf="profile.status !== 'waived'" class="status-icon" [ngClass]="profile.status">
             {{ statusIcon(profile.status) }}
           </chef-icon>
+          <!-- Custom Waived Icon -->
           <div *ngIf="profile.status === 'waived'" class="waived-icon"></div>
           <a [routerLink]="['/compliance/reports/profiles', profile.id]">{{ profile.title }}</a>
         </chef-td>
@@ -105,7 +107,9 @@
               *ngFor="let control of layerTwoData[status]"
               class="results-profiles-list-item">
               <div class="list-item-summary">
+                <!-- Material Icon Font -->
                 <chef-icon *ngIf="status !== 'waived'" class="list-item-icon" [ngClass]="status">{{ statusIcon(status) }}</chef-icon>
+                <!-- Custom Waived Icon -->
                 <div *ngIf="status === 'waived'" class="waived-icon"></div>
                 <div class="list-item-text">
                   <p class="node-name">
