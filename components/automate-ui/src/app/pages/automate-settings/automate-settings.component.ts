@@ -237,12 +237,16 @@ export class AutomateSettingsComponent implements OnInit {
       IngestJobs.ComplianceRemoveScans
     ].map(jobName => {
       const jobForm = this.getJobForm(jobName);
+      const isNested = jobForm.nested_name ? true : false;
       const job = new IngestJob(null, null);
       job.category = jobForm.category;
       job.name = jobForm.name;
       job.disabled = jobForm.disabled;
       job.threshold = jobForm.disabled ? '' : jobForm.threshold + jobForm.unit;
-      job.nested_name = jobForm.nested_name ? jobForm.nested_name : '';
+      if ( isNested ) {
+        job.nested_name = jobForm.nested_name;
+        job.threshold = jobForm.threshold;
+      }
       return job;
     });
 
