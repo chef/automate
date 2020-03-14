@@ -24,9 +24,10 @@ The following diagram shows the new policy structure. We detail the specifics in
 
 ## Policy Definition
 
-IAM v2 uses multi-statement policies that support complex permissions in a single policy.
-Each statement specifies a single permission.
-Evaluating the effect of each statement and combining them determines the net effect (ALLOW or DENY) of a policy. If at least one statement allows access, and none denies it, then the policy allows access. Otherwise, access denied.
+IAM v2 uses multi-statement policies that support complex permissions.
+Each statement in a policy specifies a single permission.
+Chef Automate determines a policy's net effect through the evaluation and combinations of permission statements. 
+If at least one statement allows access, and none denies it, then the policy allows access. Otherwise, access denied.
 
 Access is granted only if explicitly allowed in some policy and not explicitly denied in any policy.
 IAM policy evaluation order is:
@@ -37,7 +38,7 @@ IAM policy evaluation order is:
 
 ### Net Effect Examples
 
-The following examples illustrate the net effect of a policy and if it grants access to a user:
+The following examples illustrate the net effect of a policy and how it grants access to a user:
 
 - User1, or any team that user1 belongs to, does not include a policy with the `iam:users:list` action.
   _Net effect_: Access denied to user1 to view the list of users.
@@ -90,7 +91,7 @@ The membership can be modified in both types of policies.
 ## Role-Based Access Control
 
 A role is a named list of actions.
-This listing provides the benefits of *encapsulation*, where only the name is needed and not burdened by all the details after initial definition, and *reusability*, in applying the role to any statement that needs it.
+This list provides the benefit of *encapsulation*, so when included in a policy statement, only the name is needed and the policy is not burdened by all the details. Also the list offers *reusability* as you can apply the role to any statement that needs it.
 
 Chef Automate has five default roles.
 To see the actions comprising the roles, see [Chef-managed Roles]({{< relref "api/#tag/roles" >}}).
@@ -125,10 +126,10 @@ See [Configuring Project Limit]({{< relref "iam-v2-guide.md#configuring-project-
 
 Set up IAM v2 projects using the following steps:
 
-1. Define each project via the UI.
+1. Define each project using the browser.
    Start on the _Projects List_ page to create your projects.
 2. Create or modify IAM policy statements to restrict permissions to specific projects as needed.
-   *Every* statement must either indicate specific projects or specify the wildcard (`*`), which denotes all projects.
+   *Every* statement must either indicate specific projects, specify the wildcard (`*`), which denotes all projects, or specify as `(unassigned)`, which provides permissions on objects without projects.
    By default, any previously existing policies are automatically set up with that wildcard, so they apply to all projects.
 3. [Assign resources to projects]({{< relref "iam-v2-overview.md#assigning-resources-to-projects" >}}).
 4. Select the projects to filter in the UI.
@@ -139,7 +140,7 @@ By default, Chef Automate includes a *project-owner* role, so the global admin m
 
 ### Assigning Resources to Projects
 
-Two categories of resources exist for assignment to projects:
+Two categories of resources exist for project assignment:
 
 - Ingested client run and compliance nodes
 - Teams, API Tokens, Policies, and Roles created in Automate
