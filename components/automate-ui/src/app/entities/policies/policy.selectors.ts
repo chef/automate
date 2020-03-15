@@ -16,9 +16,10 @@ export const iamMajorVersion = createSelector(
   (state) => state.iamMajorVersion
 );
 
+// This is used early enough that we have to guard against undefined (at least for unit tests)
 export const isIAMv2 = createSelector(
   policyState,
-  (state) => (state.iamMajorVersion === 'v2')
+  (state) => (state && state.iamMajorVersion === 'v2')
 );
 
 export const getAllStatus = createSelector(
