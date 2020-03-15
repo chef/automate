@@ -86,6 +86,7 @@ export class JobAddComponent implements OnDestroy {
 
   public ngOnDestroy() {
     this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   public setupForm() {
