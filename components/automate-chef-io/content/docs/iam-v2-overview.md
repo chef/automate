@@ -10,9 +10,9 @@ toc = true
     weight = 10
 +++
 
-IAM v2 allows direct management of policy members from Chef Automate in the browser. 
-Also, IAM v2 supports projects, which allow for filtering and segregation of your data amongst your user base.
-IAM v2 policies allow multiple permissions, distinguish policy membership from policy definition for fine-grained control, and include roles for role-based access control.
+Chef Automate's Identity and Access Managment (IAM) allows direct management of policy members from Chef Automate in the browser.
+IAM supports the projects feature, which allow for filtering and segregation of your data amongst your user base.
+IAM policies allow you to use multiple permissions, distinguish policy membership from policy definition for fine-grained control, and include roles for role-based access control.
 
 The *policy* exists at the heart of Chef Automate's IAM system.
 A policy defines permissions for who may perform what action on which resource and scopes these permissions by project.
@@ -24,9 +24,9 @@ The following diagram shows the new policy structure. We detail the specifics in
 
 ## Policy Definition
 
-IAM v2 uses multi-statement policies that support complex permissions.
+IAM  uses multi-statement policies that support complex permissions.
 Each statement in a policy specifies a single permission.
-Chef Automate determines a policy's net effect through the evaluation and combinations of permission statements. 
+Chef Automate determines a policy's net effect through the evaluation and combinations of permission statements.
 If at least one statement allows access, and none denies it, then the policy allows access. Otherwise, access denied.
 
 Access is granted if explicitly allowed in some policy and not explicitly denied in any policy.
@@ -45,7 +45,7 @@ The following examples illustrate the net effect of a policy and how it grants a
   This example illustrates the global default DENY condition.
 - Bob is a member of team alpha and team omega.
   Team alpha contains a broad range of permissions, while team omega experiences severe restrictions in what its members may access.
-  The "major teams" policy has a statement that allows team alpha to access the resource `compliance:reporting:nodes`, while it has another statement that denies Team Omega access to the same resource. 
+  The "major teams" policy has a statement that allows team alpha to access the resource `compliance:reporting:nodes`, while it has another statement that denies Team Omega access to the same resource.
   _Net effect_: The policy denies Bob access because at least one statement denies access.
 - Mary is a member of the default viewers team, which allows read access to everything because of the default Viewers policy.
   Mary is also a member of the deployment team, which has permission to upload and download profiles.
@@ -53,7 +53,7 @@ The following examples illustrate the net effect of a policy and how it grants a
 
 ### Properties of a Policy
 
-An IAM v2 policy consists of a list of **statements**, where each statement describes a permission.
+An IAM  policy consists of a list of **statements**, where each statement describes a permission.
 
 ### Properties of a Statement
 
@@ -67,7 +67,7 @@ Projects   | list of project IDs to constrain the role
 
 ### Properties of a Role
 
-An IAM v2 role consists of a list of **actions**. 
+An IAM  role consists of a list of **actions**.
 Some examples of these actions include listing IAM users, getting compliance profiles, or updating node status.
 Find more details about roles in [Role-Based Access Control]({{< relref "iam-v2-overview.md#role-based-access-control" >}}).
 
@@ -82,8 +82,8 @@ You can edit policy membership for any policy, but you can adjust only the polic
 
 ## Policy Types
 
-IAM v2 distinguishes two types of policies: *Chef-managed* and *Custom*.
-Chef provides *Chef-managed* policies, which are integral to the operation of Chef Automate. 
+IAM  distinguishes two types of policies: *Chef-managed* and *Custom*.
+Chef provides *Chef-managed* policies, which are integral to the operation of Chef Automate.
 You cannot change the policy statements in Chef-managed policies.
 *Custom* policies are policies that you create for your own needs. You can add, edit, and delete policy statements in your custom policies.
 
@@ -92,7 +92,7 @@ Both types of policies allow for membership modification.
 ## Role-Based Access Control
 
 A role is a named list of actions.
-This list provides the benefit of *encapsulation*. 
+This list provides the benefit of *encapsulation*.
 A policy statement only needs the role's name, and the policy is not burdened by all the details.
 Also, the list offers *reusability* as you can apply the role to any statement that needs it.
 
@@ -117,7 +117,7 @@ The default policies are Viewers, Editors, Administrator, and Ingest.
 
 ## Working with Projects
 
-IAM v2 projects are collections of resources either created in Chef Automate or ingested from external data providers, such as Chef Infra and Chef InSpec.
+IAM  projects are collections of resources either created in Chef Automate or ingested from external data providers, such as Chef Infra and Chef InSpec.
 Projects used in a policy reduce the scope of that policy's permissions to only the resources assigned to the given projects.
 
 {{< info >}}
@@ -127,7 +127,7 @@ See [Configuring Project Limit]({{< relref "iam-v2-guide.md#configuring-project-
 
 ### Setting Up Projects
 
-Set up IAM v2 projects using the following steps:
+Set up IAM  projects using the following steps:
 
 1. Define each project using the browser.
    Start on the _Projects List_ page to create your projects.
@@ -156,7 +156,7 @@ An ingest rule specifies one or more conditions, and each condition specifies a 
 
 Once you define your set of projects with their contained ingest rules and conditions, use the **Update Projects** button on the bottom of any page to apply those definitions.
 
-You can assign teams and API tokens to projects directly in the browser. 
+You can assign teams and API tokens to projects directly in the browser.
 You can assign policies and roles only through the command line.
 These resources created within Chef Automate do not make use of, nor do they require, any project ingest rules.
 
