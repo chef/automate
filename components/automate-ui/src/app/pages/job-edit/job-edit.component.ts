@@ -57,7 +57,7 @@ export class JobEditComponent implements OnDestroy {
   profiles$: Observable<Profile[]>;
   job$: Observable<Job>;
 
-  isDestroyed: Subject<boolean> = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,

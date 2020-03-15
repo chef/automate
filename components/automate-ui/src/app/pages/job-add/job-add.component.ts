@@ -54,7 +54,7 @@ export class JobAddComponent implements OnDestroy {
   managers$: Observable<Manager[]>;
   profiles$: Observable<Profile[]>;
 
-  isDestroyed: Subject<boolean> = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
