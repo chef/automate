@@ -1,7 +1,6 @@
 import {
   Component,
   OnInit,
-  OnDestroy,
   OnChanges,
   ElementRef,
   HostListener,
@@ -11,17 +10,16 @@ import {
   SimpleChanges,
   ViewChild
 } from '@angular/core';
+import * as moment from 'moment';
+import { reduce } from 'lodash/fp';
+import * as d3 from 'd3';
 import { GuitarString,
   GuitarStringCollection,
   GuitarStringItem,
   DateRange
 } from '../../types/types';
-import * as moment from 'moment';
-import { initialState } from '../../services/event-feed/event-feed.reducer';
-import { Subject } from 'rxjs';
-import { reduce } from 'lodash/fp';
-import * as d3 from 'd3';
 import { DateTime } from 'app/helpers/datetime/datetime';
+import { initialState } from '../../services/event-feed/event-feed.reducer';
 
 export class GuitarStringDataContainer {
   dynamicallyBucketedGuitarStrings: GuitarString[] = [];
@@ -266,8 +264,7 @@ export class GraphicProportions {
   templateUrl: './event-feed-guitar-strings.component.html',
   styleUrls: ['./event-feed-guitar-strings.component.scss']
 })
-export class EventFeedGuitarStringsComponent implements OnInit, OnDestroy, OnChanges {
-  private isDestroyed: Subject<boolean> = new Subject<boolean>();
+export class EventFeedGuitarStringsComponent implements OnInit, OnChanges {
   @Output() newDateRange: EventEmitter<DateRange> = new EventEmitter();
   @Input() guitarStringCollection: GuitarStringCollection = initialState.guitarStringCollection;
 
@@ -323,11 +320,6 @@ export class EventFeedGuitarStringsComponent implements OnInit, OnDestroy, OnCha
   }
 
   itemSelected(_item: GuitarStringItem): void {}
-
-  ngOnDestroy(): void {
-    this.isDestroyed.next(true);
-    this.isDestroyed.complete();
-  }
 
   @HostListener('window:resize', ['$event.target'])
   onResize() {
