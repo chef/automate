@@ -1,5 +1,5 @@
 +++
-title = "IAM v1 Overview"
+title = "IAM v1 Overview (Deprecated)"
 aliases = [
     "/docs/authorization-overview/",
     "/docs/default-policies/",
