@@ -24,7 +24,7 @@ The following diagram shows the new policy structure. We detail the specifics in
 
 ## Policy Definition
 
-IAM  uses multi-statement policies that support complex permissions.
+IAM uses multi-statement policies that support complex permissions.
 Each statement in a policy specifies a single permission.
 Chef Automate determines a policy's net effect through the evaluation and combinations of permission statements.
 If at least one statement allows access, and none denies it, then the policy allows access. Otherwise, access denied.
@@ -53,7 +53,7 @@ The following examples illustrate the net effect of a policy and how it grants a
 
 ### Properties of a Policy
 
-An IAM  policy consists of a list of **statements**, where each statement describes a permission.
+An IAM policy consists of a list of **statements**, where each statement describes a permission.
 
 ### Properties of a Statement
 
@@ -67,7 +67,7 @@ Projects   | list of project IDs to constrain the role
 
 ### Properties of a Role
 
-An IAM  role consists of a list of **actions**.
+An IAM role consists of a list of **actions**.
 Some examples of these actions include listing IAM users, getting compliance profiles, or updating node status.
 Find more details about roles in [Role-Based Access Control]({{< relref "iam-v2-overview.md#role-based-access-control" >}}).
 
@@ -82,7 +82,7 @@ You can edit policy membership for any policy, but you can adjust only the polic
 
 ## Policy Types
 
-IAM  distinguishes two types of policies: *Chef-managed* and *Custom*.
+IAM distinguishes two types of policies: *Chef-managed* and *Custom*.
 Chef provides *Chef-managed* policies, which are integral to the operation of Chef Automate.
 You cannot change the policy statements in Chef-managed policies.
 *Custom* policies are policies that you create for your own needs. You can add, edit, and delete policy statements in your custom policies.
@@ -117,7 +117,7 @@ The default policies are Viewers, Editors, Administrator, and Ingest.
 
 ## Working with Projects
 
-IAM  projects are collections of resources either created in Chef Automate or ingested from external data providers, such as Chef Infra and Chef InSpec.
+IAM projects are collections of resources either created in Chef Automate or ingested from external data providers, such as Chef Infra and Chef InSpec.
 Projects used in a policy reduce the scope of that policy's permissions to only the resources assigned to the given projects.
 
 {{< info >}}
@@ -127,7 +127,7 @@ See [Configuring Project Limit]({{< relref "iam-v2-guide.md#configuring-project-
 
 ### Setting Up Projects
 
-Set up IAM  projects using the following steps:
+Set up IAM projects using the following steps:
 
 1. Define each project using the browser.
    Start on the _Projects List_ page to create your projects.
