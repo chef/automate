@@ -1,6 +1,6 @@
 +++
-title = "IAM v2 Users Guide"
-description = "IAM v2 Users Guide"
+title = "IAM Users Guide"
+description = "IAM Users Guide"
 draft = false
 bref = ""
 toc = true
@@ -360,7 +360,7 @@ Setting the project rule `Resource Type` determines what condition attributes ar
 
 Rules of type `Node` can have conditions with attributes `Chef Organization`, `Chef Server`, `Environment`, `Chef Role`, `Chef Tag`, `Chef Policy Name`, `Chef Policy Group`.
 
-Select the `Update Projects` button from the bottom banner. 
+Select the `Update Projects` button from the bottom banner.
 Upon completion of the update, you should be able to filter by `project-devops` across Automate's dashboards and see only the ingested data that you expect.
 
 #### Effortless Infra Project
@@ -369,9 +369,9 @@ To create a project that contains all Effortless Infra nodes, create a ingest ru
 
 ![](/images/docs/effortless-project-rule.png)
 
-The above rule matches on a node's Chef Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Server` attribute as `localhost`. 
+The above rule matches on a node's Chef Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Server` attribute as `localhost`.
 
-If desired, create subgroups of Effortless Infra nodes by adding a second condition that matches a specific `Chef Policy Name`. 
+If desired, create subgroups of Effortless Infra nodes by adding a second condition that matches a specific `Chef Policy Name`.
 
 #### Project Policies
 

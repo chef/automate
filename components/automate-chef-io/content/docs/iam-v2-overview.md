@@ -1,6 +1,6 @@
 +++
-title = "IAM v2 Overview"
-description = "IAM v2 Overview"
+title = "IAM Overview"
+description = "IAM Overview"
 draft = false
 bref = ""
 toc = true
@@ -10,7 +10,7 @@ toc = true
     weight = 10
 +++
 
-## Features in IAM v2
+## Features of IAM
 
 IAM v2 policies allow multiple permissions, separating out policy membership from policy definition for fine-grained control, and includes roles for role-based access control.
 Additionally, IAM v2 allows policy members to be managed directly from the Automate UI.
