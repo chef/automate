@@ -1,0 +1,53 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <chef-breadcrumbs>
+        <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', org?.server_id]">Orgs</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', org?.server_id, role?.name]">Roles</chef-breadcrumb>
+         {{role?.name}}
+      </chef-breadcrumbs>
+      <chef-page-header>
+        <chef-heading>{{role?.name}}</chef-heading>
+        <table>
+          <thead>
+            <tr class="detail-row">
+              <th class="id-column">Description</th>
+              <th class="id-column">Last updated</th>
+              <th class="id-column">Changed by</th>
+              <th class="id-column">Environment</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr class="detail-row">
+              <td class="id-column">{{role?.description}}</td>
+              <td class="id-column">March 13, 2020 10:10 PM</td>
+              <td class="id-column">Vinay</td>
+              <td class="id-column">_default, Prod_env</td>
+            </tr>
+          </tbody>
+        </table>
+        <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+          <chef-option value='runList' data-cy="runList-tab">Run List</chef-option>
+          <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
+          <chef-option value='affectedNodes' data-cy="affectedNodes-tab">Affected Nodes</chef-option>
+        </chef-tab-selector>
+      </chef-page-header>
+      <section class="page-body" *ngIf="tabValue === 'runList'">
+
+<h2>Tree as Array of Nodes</h2>
+<treetable
+  [tree]="arrayOfNodesTree"
+  (nodeClicked)="logNode($event)">
+</treetable>
+        
+      </section>
+      <section class="page-body" *ngIf="tabValue === 'attributes'">
+        
+      </section>
+      <section class="page-body" *ngIf="tabValue === 'affectedNodes'">
+        
+      </section>
+    </main>
+  </div>
+</div>

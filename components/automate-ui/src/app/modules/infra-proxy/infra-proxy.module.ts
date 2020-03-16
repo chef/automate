@@ -8,8 +8,11 @@ import { ChefComponentsModule } from 'app/components/chef-components.module';
 import { ChefServerDetailsComponent } from './chef-server-details/chef-server-details.component';
 import { ChefServersListComponent } from './chef-servers-list/chef-servers-list.component';
 import { CookbooksListComponent } from './cookbook-list/cookbooks-list.component';
+import { InfraRolesListComponent } from './infra-roles-list/infra-roles-list.component';
+import { InfraRoleDetailsComponent } from './infra-role-details/infra-role-details.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
+import { TreetableModule } from 'ng-material-treetable';
 
 
 @NgModule({
@@ -17,6 +20,8 @@ import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.com
     ChefServersListComponent,
     ChefServerDetailsComponent,
     CookbooksListComponent,
+    InfraRolesListComponent,
+    InfraRoleDetailsComponent,
     CreateChefServerModalComponent,
     CreateOrgModalComponent
   ],
@@ -25,6 +30,7 @@ import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.com
     AppRoutingModule,
     ChefComponentsModule,
     ChefPipesModule,
+    TreetableModule,
     FormsModule,
     ReactiveFormsModule
   ],
