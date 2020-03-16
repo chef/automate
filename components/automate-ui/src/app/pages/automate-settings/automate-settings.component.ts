@@ -48,7 +48,7 @@ export class AutomateSettingsComponent implements OnInit {
       name: '',
       unit: { value: 'm', disabled: true },
       threshold: { value: '5', disabled: true },
-      disabled: true
+      disabled: false // special case: only alterable by the API so we want to show as enabled
     },
     serviceGroupRemoveServices: {
       category: 'services',

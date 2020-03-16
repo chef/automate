@@ -51,7 +51,8 @@
             <div class="checkbox-container">
               <chef-checkbox
               [checked]="!serviceGroupNoHealthChecks.value.disabled"
-              (change)="toggleInput(serviceGroupNoHealthChecks, $event.detail)">
+              disabled="true">
+              <!-- this is currently not changeable by the user -->
               </chef-checkbox>
             </div>
 
