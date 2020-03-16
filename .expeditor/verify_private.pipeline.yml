@@ -448,6 +448,32 @@ steps:
         linux:
           privileged: true
 
+  - label: "iam v2 force-upgrade to v2 with no legacy policies"
+    command:
+      - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
+  - label: "iam v2 force-upgrade to v2 with no legacy policies (diagnostics only)"
+    command:
+      - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade_diagnostics.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
   - label: "a1migration"
     command:
       - integration/run_test integration/tests/a1migration.sh
