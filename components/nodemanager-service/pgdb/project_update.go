@@ -197,6 +197,12 @@ ORDER BY id asc
 LIMIT $3;
 `
 
+const countNodesProjectData = `
+SELECT
+	count(*)
+FROM nodes
+`
+
 const defaultLimit = 1000
 
 type nodeDataIterator struct {
@@ -215,7 +221,7 @@ func (iter *nodeDataIterator) Next() ([]*NodeProjectData, error) {
 	logrus.WithFields(logrus.Fields{
 		"start": iter.rangeStart,
 		"end":   iter.rangeEnd,
-	}).Info("Running select nodes query")
+	}).Info("Processing nodes for project update")
 	_, err := iter.db.Select(&nodesDaos, selectNodesProjectDataRange, iter.rangeStart, iter.rangeEnd, defaultLimit)
 
 	if len(nodesDaos) == 0 {
@@ -245,19 +251,6 @@ var uuidChars = []byte{
 	'c', 'd', 'e', 'f',
 }
 
-func uuidPrefixRanges256() []string {
-	prefixes := make([]string, 256)
-	for i := 0; i < 16; i++ {
-		for j := 0; j < 16; j++ {
-			prefix := make([]byte, 2)
-			prefix[0] = uuidChars[i]
-			prefix[1] = uuidChars[j]
-			prefixes[i*16+j] = string(prefix)
-		}
-	}
-	return prefixes
-}
-
 func uuidPrefixRanges16() []string {
 	prefixes := make([]string, 16)
 	for i := 0; i < 16; i++ {
@@ -269,37 +262,48 @@ func uuidPrefixRanges16() []string {
 }
 
 func (db *DB) ListProjectUpdateTasks(ctx context.Context) ([]project_update_lib.SerializedProjectUpdateTask, error) {
-	//prefixes := uuidPrefixRanges16()
-	//tasks := make([]project_update_lib.SerializedProjectUpdateTask, len(prefixes))
-	tasks := make([]project_update_lib.SerializedProjectUpdateTask, 1)
-	tasks[0] = project_update_lib.SerializedProjectUpdateTask{
-		Priority: 1 << 62,
-		Params: map[string]string{
-			"s": "a",
-			"e": "g",
-		},
+
+	var count int
+	row := db.Db.QueryRow(countNodesProjectData)
+	if err := row.Scan(&count); err != nil {
+		return nil, err
 	}
 
-	/*
-		for i := 0; i < len(prefixes); i++ {
-			start := prefixes[i]
-			end := ""
-			if i+1 < len(prefixes) {
-				end = prefixes[i+1]
-			} else {
-				end = "g"
-			}
+	if count <= 50000 {
+		// This should be about 10 seconds of work, we'll just do it in 1 batch
+		tasks := make([]project_update_lib.SerializedProjectUpdateTask, 1)
+		tasks[0] = project_update_lib.SerializedProjectUpdateTask{
+			Priority: 1 << 62,
+			Params: map[string]string{
+				"s": "a",
+				"e": "g",
+			},
+		}
+		return tasks, nil
+	}
 
-			tasks[i] = project_update_lib.SerializedProjectUpdateTask{
-				Priority: 1 << 62,
-				Params: map[string]string{
-					"s": start,
-					"e": end,
-				},
-			}
-		}*/
+	prefixes := uuidPrefixRanges16()
+	logrus.Infof("Found %d nodes, splitting into %d chunks", count, len(prefixes))
+	tasks := make([]project_update_lib.SerializedProjectUpdateTask, len(prefixes))
+	for i := 0; i < len(prefixes); i++ {
+		start := prefixes[i]
+		end := ""
+		if i+1 < len(prefixes) {
+			end = prefixes[i+1]
+		} else {
+			end = "g"
+		}
 
+		tasks[i] = project_update_lib.SerializedProjectUpdateTask{
+			Priority: 1 << 62,
+			Params: map[string]string{
+				"s": start,
+				"e": end,
+			},
+		}
+	}
 	return tasks, nil
+
 }
 
 func (db *DB) RunProjectUpdateTask(ctx context.Context, projectUpdateID string,
@@ -308,10 +312,13 @@ func (db *DB) RunProjectUpdateTask(ctx context.Context, projectUpdateID string,
 	project_update_lib.SerializedProjectUpdateTaskStatus,
 	error) {
 
-	logrus.Info("Start Run")
-
 	start := params["s"]
 	end := params["e"]
+
+	logrus.WithFields(logrus.Fields{
+		"start": start,
+		"end":   end,
+	}).Info("Running project update task for nodemanager")
 
 	if start == "" || end == "" {
 		return "", project_update_lib.SerializedProjectUpdateTaskStatus{}, errors.New("Invalid params")
@@ -327,7 +334,10 @@ func (db *DB) RunProjectUpdateTask(ctx context.Context, projectUpdateID string,
 		nodes, err := iter.Next()
 		if err != nil {
 			if err == io.EOF {
-				logrus.Info("End Run")
+				logrus.WithFields(logrus.Fields{
+					"start": start,
+					"end":   end,
+				}).Info("project update task complete for nodemanager")
 				return "", project_update_lib.SerializedProjectUpdateTaskStatus{
 					State:              project_update_lib.SerializedProjectUpdateTaskSuccess,
 					PercentageComplete: 1.0,
