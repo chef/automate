@@ -55,7 +55,7 @@ export class AutomateSettingsComponent implements OnInit {
       name: '',
       unit: { value: 'd', disabled: true },
       threshold: { value: '5', disabled: true },
-      disabled: false // special case: API not ready to alter yet
+      disabled: false // special case: API not ready to alter
     },
     clientRunsRemoveData: {
       category: 'infra',
