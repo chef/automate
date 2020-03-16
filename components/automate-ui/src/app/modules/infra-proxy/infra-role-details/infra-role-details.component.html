@@ -28,16 +28,9 @@
       <section class="page-body" *ngIf="tabValue === 'runList'">
         <div *ngIf="show">
           <treetable 
-              [tree]="arrayOfNodesTree"
-                >
+            [tree]="arrayOfNodesTree">
           </treetable>
       </div>
-        
-      </section>
-      <section class="page-body" *ngIf="tabValue === 'attributes'">
-        
-      </section>
-      <section class="page-body" *ngIf="tabValue === 'affectedNodes'">
         
       </section>
     </main>
