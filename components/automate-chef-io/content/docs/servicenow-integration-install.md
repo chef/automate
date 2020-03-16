@@ -28,7 +28,7 @@ The Chef Automate Incident Creation application is a ServiceNow certified scoped
 #### Prerequisites
 
 * The ServiceNow instance must be publicly reachable on https port 443
-* [Chef automate server installation](https://docs.chef.io/chef_automate.html)
+* [Chef automate server installation](/docs/install/)
 * ServiceNow package - System Import Sets com.glide.system_import_set, min version 1.0.0
 
 ## Configuration

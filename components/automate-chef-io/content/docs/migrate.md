@@ -107,7 +107,7 @@ To minimize this downtime, we recommended that you create an online backup of Ch
 
 By default, the Chef Automate 2 upgrade process will not proceed if your Chef Automate 1 installation does not have backups configured. Invoke the migration using the `--skip-backup-check` flag to avoid this check.
 
-To configure Chef Automate 1 backups, see the [Chef Automate 1 Documentation](https://docs.chef.io/delivery_server_backup.html).
+To configure Chef Automate 1 backups, see the [Chef Automate 1 Documentation](https://docs.chef.io/delivery_server_backup/).
 
 ### Unsupported Features and Topologies
 
@@ -154,7 +154,7 @@ To use Workflow with Chef Automate 2 specify the `--enable-workflow` option to e
 Login to Chef Automate to start a trial. The trial provides you with a 60-day license.
 Requesting a trial license requires internet connectivity in your Chef Automate 2 instance (only at the time of the license request).
 
-If you are migrating an [airgapped Chef Automate installation](https://docs.chef.io/install_chef_air_gap.html#chef-automate),
+If you are migrating an [airgapped Chef Automate installation](https://docs.chef.io/install_chef_air_gap/#chef-automate),
 contact your Chef account representative for a Chef Automate 2 license.
 
 ## Migrate
