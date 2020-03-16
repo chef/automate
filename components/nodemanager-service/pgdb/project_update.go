@@ -38,8 +38,18 @@ func (db *DB) JobStatus(ctx context.Context, jobID string) (project_update_lib.J
 }
 
 func (db *DB) updateNodes(nodes []*NodeProjectData, projectRules map[string]*iam_v2.ProjectRules) error {
-	nodeUpdates := make([]nodeUpdate, len(nodes))
 	allProjectIDs := collectProjectIDs(projectRules)
+	err := Transact(db, func(tx *DBTrans) error {
+		err := tx.ensureProjects(allProjectIDs)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	nodeUpdates := make([]nodeUpdate, len(nodes))
 	for i, node := range nodes {
 		matchingProjectIDs := getMatchingProjectIDs(node, projectRules)
 		nodeUpdates[i] = nodeUpdate{
@@ -48,13 +58,13 @@ func (db *DB) updateNodes(nodes []*NodeProjectData, projectRules map[string]*iam
 		}
 	}
 
-	return db.updateNodeProjectIDs(nodeUpdates, allProjectIDs)
+	return db.updateNodeProjectIDs(nodeUpdates)
 }
 
 // updateNodeProjectIDs - update the nodes project IDs
-func (db *DB) updateNodeProjectIDs(nodeUpdates []nodeUpdate, allProjectIDs []string) error {
+func (db *DB) updateNodeProjectIDs(nodeUpdates []nodeUpdate) error {
 	return Transact(db, func(tx *DBTrans) error {
-		err := tx.bulkUpdateNodeProjects(nodeUpdates, allProjectIDs)
+		err := tx.bulkUpdateNodeProjects(nodeUpdates)
 		if err != nil {
 			return errors.Wrap(err, "updateNodeProjectIDs unable to add projects to node")
 		}

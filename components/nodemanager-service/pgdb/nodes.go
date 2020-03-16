@@ -1041,7 +1041,7 @@ type nodeUpdate struct {
 	projectIDs []string
 }
 
-func (tx *DBTrans) bulkUpdateNodeProjects(nodeUpdates []nodeUpdate, allProjectIDs []string) error {
+func (tx *DBTrans) ensureProjects(allProjectIDs []string) error {
 	insertProject, err := tx.Prepare(`
 		INSERT into projects (id, project_id)
 		VALUES ($1, $2)
@@ -1057,6 +1057,11 @@ func (tx *DBTrans) bulkUpdateNodeProjects(nodeUpdates []nodeUpdate, allProjectID
 			return err
 		}
 	}
+
+	return nil
+}
+
+func (tx *DBTrans) bulkUpdateNodeProjects(nodeUpdates []nodeUpdate) error {
 
 	deleteStmt, err := tx.Prepare(`DELETE FROM nodes_projects WHERE node_id = $1;`)
 	if err != nil {
