@@ -1,8 +1,6 @@
 import { describeIfIAMV2p1 } from '../../../support/constants';
-import { uuidv4 } from '../../../support/helpers';
+import { eventExist, uuidv4 } from '../../../support/helpers';
 
-const actionStart = Cypress.moment().utc().subtract(3, 'day').valueOf().toString();
-const actionEnd = Cypress.moment().utc().endOf('day').valueOf().toString();
 const nodeStart = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
 const nodeEnd = Cypress.moment().utc().endOf('day').format();
 const now = Cypress.moment().format('MMDDYYhhmm');
@@ -297,7 +295,7 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     cy.waitForClientRunsNode(clientRunsNodeId, 30);
 
     // wait for the action to be ingested
-    waitForAction(entityName, 30);
+    cy.waitForAction(entityName, 30);
   });
 
   after(() => {
@@ -400,7 +398,10 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     }
   });
 
-  describe('Action', () => {
+  describe('Actions', () => {
+    const actionStart = Cypress.moment().utc().subtract(3, 'day').valueOf().toString();
+    const actionEnd = Cypress.moment().utc().endOf('day').valueOf().toString();
+
     projectsWithEventRules.forEach((projectWithRule) => {
       const attribute = projectWithRule.rule.name;
       it(`when a project has a rule that matches an action's ${attribute},
@@ -422,37 +423,3 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     });
   });
 });
-
-function waitForAction(entityName: string, maxRetries: number) {
-  cy.request({
-    headers: {
-      projects: ['*'],
-      'api-token': Cypress.env('ADMIN_TOKEN')
-    },
-    method: 'GET',
-    url: `api/v0/eventfeed?collapse=false&page_size=100&start=${actionStart}&end=${actionEnd}`
-  })
-    .then((resp: Cypress.ObjectLike) => {
-      // to avoid getting stuck in an infinite loop
-      if (maxRetries === 0) {
-        expect(0).to.equal(1);
-        return;
-      }
-      if (resp.body.events && resp.body.events.length > 0 &&
-        eventExist(entityName, resp.body.events)) {
-        return;
-      }
-      cy.wait(1000);
-      waitForAction(entityName, maxRetries - 1);
-    });
-}
-
-function eventExist(entityName: string, events: any[]): boolean {
-  for (const event of events) {
-    if (event.entity_name === entityName) {
-      return true;
-    }
-  }
-
-  return false;
-}
