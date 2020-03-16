@@ -42,13 +42,12 @@ var (
 	serialSubworkflowName = "serialized"
 )
 
-var ParallelProjectUpdateDomainServices = []string{
-	"nodemanager",
-}
+var ParallelProjectUpdateDomainServices = []string{}
 
 var SerializedProjectUpdateDomainServices = []string{
 	"compliance",
 	"ingest",
+	"nodemanager",
 }
 
 type ProjectUpdateStatus interface {

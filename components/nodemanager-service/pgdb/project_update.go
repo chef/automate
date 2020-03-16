@@ -2,6 +2,7 @@ package pgdb
 
 import (
 	"context"
+	"io"
 
 	"encoding/json"
 
@@ -9,18 +10,10 @@ import (
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	project_update_lib "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/stringutils"
-	uuid "github.com/chef/automate/lib/uuid4"
+	"github.com/go-gorp/gorp"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
-
-const selectNodesProjectData = `
-SELECT
-  n.id,
-  n.projects_data
-FROM nodes n 
-WHERE n.manager = '';
-`
 
 type NodeProjectData struct {
 	ID                   string `db:"id"`
@@ -28,151 +21,46 @@ type NodeProjectData struct {
 	ProjectDataKeyValues []*nodes.ProjectsData
 }
 
-type ProjectUpdate struct {
-	jobStatus      project_update_lib.JobStatus
-	jobStatusError error
-	running        bool
-	ID             string
-}
-
-func (projectUpdate *ProjectUpdate) start(jobUUID string) {
-	projectUpdate.jobStatusError = nil
-	projectUpdate.running = true
-	projectUpdate.jobStatus = project_update_lib.JobStatus{
-		Completed:             false,
-		PercentageComplete:    0,
-		EstimatedEndTimeInSec: 0,
-	}
-	projectUpdate.ID = jobUUID
-}
-
-func (projectUpdate *ProjectUpdate) cancel(jobUUID string) {
-	if projectUpdate.ID == jobUUID {
-		projectUpdate.running = false
-	}
-}
-
-func (projectUpdate *ProjectUpdate) getJobStatus(jobUUID string) (project_update_lib.JobStatus, error) {
-	if projectUpdate.ID == jobUUID {
-		if projectUpdate.jobStatusError != nil {
-			return project_update_lib.JobStatus{}, projectUpdate.jobStatusError
-		}
-		return projectUpdate.jobStatus, nil
-	}
-
-	// If the jobID does not match the currently running job then it must have completed before.
-	return project_update_lib.JobStatus{
-		Completed:             true,
-		PercentageComplete:    1,
-		EstimatedEndTimeInSec: 0,
-	}, nil
-}
-
-func (projectUpdate *ProjectUpdate) updateProjectStatus(percentageComplete float32) {
-	projectUpdate.jobStatus = project_update_lib.JobStatus{
-		Completed:             false,
-		PercentageComplete:    percentageComplete,
-		EstimatedEndTimeInSec: 0,
-	}
-}
-
-func (projectUpdate *ProjectUpdate) updateComplete() {
-	projectUpdate.jobStatus = project_update_lib.JobStatus{
-		Completed:             true,
-		PercentageComplete:    1.0,
-		EstimatedEndTimeInSec: 0,
-	}
-	projectUpdate.running = false
-}
-
-func (projectUpdate *ProjectUpdate) updateFail(err error) {
-	projectUpdate.jobStatusError = err
-	projectUpdate.jobStatus = project_update_lib.JobStatus{
-		Completed:             true,
-		PercentageComplete:    1.0,
-		EstimatedEndTimeInSec: 0,
-	}
-	projectUpdate.running = false
-}
-
 // JobCancel - cancel the a currently running project update
 func (db *DB) JobCancel(ctx context.Context, jobID string) error {
-	log.Debugf("Node manager project update JobCancel %s", jobID)
-	db.ProjectUpdate.cancel(jobID)
-	return nil
+	return errors.New("Unimplemented")
 }
 
 // UpdateProjectTags - start a project update
 func (db *DB) UpdateProjectTags(ctx context.Context,
 	projectRules map[string]*iam_v2.ProjectRules) ([]string, error) {
-	jobUUID := uuid.Must(uuid.NewV4()).String()
-	log.Debugf("Running node manager UpdateProjectTags %v ID: %s", projectRules, jobUUID)
-
-	db.ProjectUpdate.start(jobUUID)
-
-	go db.updateNodes(projectRules)
-
-	return []string{jobUUID}, nil
+	return nil, errors.New("Unimplemented")
 }
 
 // JobStatus - get the job status of the project update
 func (db *DB) JobStatus(ctx context.Context, jobID string) (project_update_lib.JobStatus, error) {
-	return db.ProjectUpdate.getJobStatus(jobID)
+	return project_update_lib.JobStatus{}, errors.New("Unimplemented")
 }
 
-func (db *DB) updateNodes(projectRules map[string]*iam_v2.ProjectRules) {
-	nodes, err := db.getAllNodes()
-	if err != nil {
-		db.ProjectUpdate.updateFail(err)
-		return
-	}
-
-	numberOfNodes := float32(len(nodes))
-	for index, node := range nodes {
-		if !db.ProjectUpdate.running {
-			db.ProjectUpdate.updateComplete()
-			return
-		}
+func (db *DB) updateNodes(nodes []*NodeProjectData, projectRules map[string]*iam_v2.ProjectRules) error {
+	nodeUpdates := make([]nodeUpdate, len(nodes))
+	allProjectIDs := collectProjectIDs(projectRules)
+	for i, node := range nodes {
 		matchingProjectIDs := getMatchingProjectIDs(node, projectRules)
-
-		err = db.updateNodeProjectIDs(node, matchingProjectIDs)
-		if err != nil {
-			db.ProjectUpdate.updateFail(err)
-			return
+		nodeUpdates[i] = nodeUpdate{
+			nodeID:     node.ID,
+			projectIDs: matchingProjectIDs,
 		}
-
-		db.ProjectUpdate.updateProjectStatus(float32((index + 1)) / numberOfNodes)
 	}
 
-	db.ProjectUpdate.updateComplete()
+	return db.updateNodeProjectIDs(nodeUpdates, allProjectIDs)
 }
 
 // updateNodeProjectIDs - update the nodes project IDs
-func (db *DB) updateNodeProjectIDs(node *NodeProjectData, matchingProjectIDs []string) error {
+func (db *DB) updateNodeProjectIDs(nodeUpdates []nodeUpdate, allProjectIDs []string) error {
 	return Transact(db, func(tx *DBTrans) error {
-		err := tx.updateNodeProjects(node.ID, matchingProjectIDs)
+		err := tx.bulkUpdateNodeProjects(nodeUpdates, allProjectIDs)
 		if err != nil {
 			return errors.Wrap(err, "updateNodeProjectIDs unable to add projects to node")
 		}
 
 		return nil
 	})
-}
-
-func (db *DB) getAllNodes() ([]*NodeProjectData, error) {
-	var nodesDaos []*NodeProjectData
-	_, err := db.Select(&nodesDaos, selectNodesProjectData)
-
-	for _, node := range nodesDaos {
-		dbProjectsData := []*nodes.ProjectsData{}
-		err := json.Unmarshal([]byte(node.Data), &dbProjectsData)
-		if err != nil {
-			return nodesDaos, errors.Wrap(err, "getAllNodes unable to unmarshal projects data")
-		}
-
-		node.ProjectDataKeyValues = dbProjectsData
-	}
-	return nodesDaos, err
 }
 
 func getMatchingProjectIDs(node *NodeProjectData, projectRules map[string]*iam_v2.ProjectRules) []string {
@@ -185,6 +73,16 @@ func getMatchingProjectIDs(node *NodeProjectData, projectRules map[string]*iam_v
 	}
 
 	return matchingProjects
+}
+
+func collectProjectIDs(projectRules map[string]*iam_v2.ProjectRules) []string {
+	projects := make([]string, 0, len(projectRules))
+
+	for projectName := range projectRules {
+		projects = append(projects, projectName)
+	}
+
+	return projects
 }
 
 // Only one rule has to be true for the project to match (ORed together).
@@ -284,4 +182,177 @@ func (node *NodeProjectData) getValues(valuesType string) []string {
 	}
 
 	return []string{}
+}
+
+const selectNodesProjectDataRange = `
+SELECT
+  n.id,
+  n.projects_data
+FROM nodes n 
+WHERE 
+  n.manager = '' AND
+  n.id > $1 AND
+  n.id < $2
+ORDER BY id asc
+LIMIT $3;
+`
+
+const defaultLimit = 1000
+
+type nodeDataIterator struct {
+	rangeStart string
+	rangeEnd   string
+	eof        bool
+	db         *gorp.DbMap
+}
+
+func (iter *nodeDataIterator) Next() ([]*NodeProjectData, error) {
+	var nodesDaos []*NodeProjectData
+	if iter.eof {
+		return nil, io.EOF
+	}
+
+	logrus.WithFields(logrus.Fields{
+		"start": iter.rangeStart,
+		"end":   iter.rangeEnd,
+	}).Info("Running select nodes query")
+	_, err := iter.db.Select(&nodesDaos, selectNodesProjectDataRange, iter.rangeStart, iter.rangeEnd, defaultLimit)
+
+	if len(nodesDaos) == 0 {
+		iter.eof = true
+		return nil, io.EOF
+	}
+
+	for _, node := range nodesDaos {
+		dbProjectsData := []*nodes.ProjectsData{}
+		err := json.Unmarshal([]byte(node.Data), &dbProjectsData)
+		if err != nil {
+			return nodesDaos, errors.Wrap(err, "getNodes unable to unmarshal projects data")
+		}
+
+		node.ProjectDataKeyValues = dbProjectsData
+	}
+
+	iter.rangeStart = nodesDaos[len(nodesDaos)-1].ID
+
+	return nodesDaos, err
+}
+
+var uuidChars = []byte{
+	'0', '1', '2', '3',
+	'4', '5', '6', '7',
+	'8', '9', 'a', 'b',
+	'c', 'd', 'e', 'f',
+}
+
+func uuidPrefixRanges256() []string {
+	prefixes := make([]string, 256)
+	for i := 0; i < 16; i++ {
+		for j := 0; j < 16; j++ {
+			prefix := make([]byte, 2)
+			prefix[0] = uuidChars[i]
+			prefix[1] = uuidChars[j]
+			prefixes[i*16+j] = string(prefix)
+		}
+	}
+	return prefixes
+}
+
+func uuidPrefixRanges16() []string {
+	prefixes := make([]string, 16)
+	for i := 0; i < 16; i++ {
+		prefix := make([]byte, 1)
+		prefix[0] = uuidChars[i]
+		prefixes[i] = string(uuidChars[i])
+	}
+	return prefixes
+}
+
+func (db *DB) ListProjectUpdateTasks(ctx context.Context) ([]project_update_lib.SerializedProjectUpdateTask, error) {
+	//prefixes := uuidPrefixRanges16()
+	//tasks := make([]project_update_lib.SerializedProjectUpdateTask, len(prefixes))
+	tasks := make([]project_update_lib.SerializedProjectUpdateTask, 1)
+	tasks[0] = project_update_lib.SerializedProjectUpdateTask{
+		Priority: 1 << 62,
+		Params: map[string]string{
+			"s": "a",
+			"e": "g",
+		},
+	}
+
+	/*
+		for i := 0; i < len(prefixes); i++ {
+			start := prefixes[i]
+			end := ""
+			if i+1 < len(prefixes) {
+				end = prefixes[i+1]
+			} else {
+				end = "g"
+			}
+
+			tasks[i] = project_update_lib.SerializedProjectUpdateTask{
+				Priority: 1 << 62,
+				Params: map[string]string{
+					"s": start,
+					"e": end,
+				},
+			}
+		}*/
+
+	return tasks, nil
+}
+
+func (db *DB) RunProjectUpdateTask(ctx context.Context, projectUpdateID string,
+	params map[string]string, projectTaggingRules map[string]*iam_v2.ProjectRules) (
+	project_update_lib.SerializedProjectUpdateTaskID,
+	project_update_lib.SerializedProjectUpdateTaskStatus,
+	error) {
+
+	logrus.Info("Start Run")
+
+	start := params["s"]
+	end := params["e"]
+
+	if start == "" || end == "" {
+		return "", project_update_lib.SerializedProjectUpdateTaskStatus{}, errors.New("Invalid params")
+	}
+
+	iter := nodeDataIterator{
+		rangeStart: start,
+		rangeEnd:   end,
+		db:         db.DbMap,
+	}
+
+	for {
+		nodes, err := iter.Next()
+		if err != nil {
+			if err == io.EOF {
+				logrus.Info("End Run")
+				return "", project_update_lib.SerializedProjectUpdateTaskStatus{
+					State:              project_update_lib.SerializedProjectUpdateTaskSuccess,
+					PercentageComplete: 1.0,
+				}, nil
+
+			}
+			return "", project_update_lib.SerializedProjectUpdateTaskStatus{}, err
+		}
+
+		if err := db.updateNodes(nodes, projectTaggingRules); err != nil {
+			return "", project_update_lib.SerializedProjectUpdateTaskStatus{}, err
+		}
+	}
+
+}
+
+func (db *DB) MonitorProjectUpdateTask(ctx context.Context,
+	projectUpdateID string, id project_update_lib.SerializedProjectUpdateTaskID) (
+	project_update_lib.SerializedProjectUpdateTaskStatus, error) {
+
+	return project_update_lib.NoStatus, errors.New("Unimplemented")
+
+}
+
+func (db *DB) CancelProjectUpdateTask(ctx context.Context, projectUpdateID string,
+	id project_update_lib.SerializedProjectUpdateTaskID) error {
+	return errors.New("Unimplemented")
 }
