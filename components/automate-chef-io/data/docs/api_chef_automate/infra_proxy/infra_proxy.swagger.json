@@ -395,72 +395,6 @@
         ]
       }
     },
-    "/infra/servers/{server_id}/orgs/{org_id}/clients": {
-      "get": {
-        "operationId": "GetClients",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Clients"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "server_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "org_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "InfraProxy"
-        ]
-      }
-    },
-    "/infra/servers/{server_id}/orgs/{org_id}/clients/{name}": {
-      "get": {
-        "operationId": "GetClient",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Client"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "server_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "org_id",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "name",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "InfraProxy"
-        ]
-      }
-    },
     "/infra/servers/{server_id}/orgs/{org_id}/cookbooks": {
       "get": {
         "operationId": "GetCookbooks",
@@ -783,65 +717,6 @@
         },
         "ip_address": {
           "type": "string"
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.response.Client": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        },
-        "client_name": {
-          "type": "string"
-        },
-        "org_name": {
-          "type": "string"
-        },
-        "admin": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "validator": {
-          "type": "boolean",
-          "format": "boolean"
-        },
-        "certificate": {
-          "type": "string"
-        },
-        "public_key": {
-          "type": "string"
-        },
-        "private_key": {
-          "type": "string"
-        },
-        "uri": {
-          "type": "string"
-        },
-        "json_class": {
-          "type": "string"
-        },
-        "chef_type": {
-          "type": "string"
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.response.ClientListItem": {
-      "type": "object",
-      "properties": {
-        "name": {
-          "type": "string"
-        }
-      }
-    },
-    "chef.automate.api.infra_proxy.response.Clients": {
-      "type": "object",
-      "properties": {
-        "clients": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ClientListItem"
-          }
         }
       }
     },
