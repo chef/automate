@@ -7,10 +7,8 @@ import { MockComponent } from 'ng2-mock-component';
 import { using } from 'app/testing/spec-helpers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { runtimeChecks } from 'app/ngrx.reducers';
-import { projectEntityReducer } from 'app/entities/projects/project.reducer';
+import { runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { Rule, Condition, ConditionOperator, RuleType } from 'app/entities/rules/rule.model';
-import { ruleEntityReducer } from 'app/entities/rules/rule.reducer';
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectRulesComponent } from './project-rules.component';
 import { of as observableOf } from 'rxjs';
@@ -82,6 +80,7 @@ describe('ProjectRulesComponent', () => {
         RouterTestingModule,
         ChefPipesModule,
         StoreModule.forRoot({
+          ...ngrxReducers,
           router: () => ({
             state: {
               url: '/projects/uuid-1/rules',
@@ -92,9 +91,7 @@ describe('ProjectRulesComponent', () => {
             },
             previousRoute: {},
             navigationId: 0
-          }),
-          projects: projectEntityReducer,
-          rules: ruleEntityReducer
+          })
         }, { runtimeChecks })
       ],
       providers: [

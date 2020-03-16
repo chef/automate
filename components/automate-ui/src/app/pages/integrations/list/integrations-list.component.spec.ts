@@ -3,10 +3,7 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { RouterTestingModule } from '@angular/router/testing';
 import { StoreModule } from '@ngrx/store';
 
-import { runtimeChecks } from 'app/ngrx.reducers';
-import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
-import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
-import { managerEntityReducer } from '../../../entities/managers/manager.reducer';
+import { runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { ChefPipesModule } from '../../../pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { IntegrationsListComponent } from './integrations-list.component';
@@ -21,6 +18,7 @@ describe('IntegrationsListComponent', () => {
         RouterTestingModule,
         ChefPipesModule,
         StoreModule.forRoot({
+          ...ngrxReducers,
           router: () => ({
             state: {
               url: '/',
@@ -31,10 +29,7 @@ describe('IntegrationsListComponent', () => {
             },
             previousRoute: {},
             navigationId: 0
-          }),
-          managers: managerEntityReducer,
-          notifications: notificationEntityReducer, // not used here but needed to suppress warnings
-          clientRunsEntity: clientRunsEntityReducer // not used here but needed to suppress warnings
+          })
         }, { runtimeChecks })
       ],
       declarations: [
