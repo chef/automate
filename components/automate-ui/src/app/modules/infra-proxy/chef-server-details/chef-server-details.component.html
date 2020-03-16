@@ -120,6 +120,7 @@
                 <chef-table-cell class="three-dot-column">
                   <mat-select panelClass="chef-control-menu" id="menu-{{org.id}}">
                     <mat-option data-cy="delete" (onSelectionChange)="startOrgDelete($event, org)">Delete Org</mat-option>
+                    <mat-option data-cy="roles"> <a [routerLink]="['/infrastructure','chef-servers', server?.id, 'org', org.id, 'role']">Infra Role</a></mat-option>
                   </mat-select>
                 </chef-table-cell>
               </chef-table-row>

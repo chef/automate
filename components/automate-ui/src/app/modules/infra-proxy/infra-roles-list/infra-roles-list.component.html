@@ -1,0 +1,50 @@
+<div class="content-container">
+    <div class="container">
+        <main>
+            <chef-breadcrumbs>
+                <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Servers</chef-breadcrumb>
+                <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', org?.server_id]">Orgs</chef-breadcrumb>
+                {{ org?.name }}
+            </chef-breadcrumbs>
+            <chef-page-header>
+                <chef-heading>{{ org?.name }}</chef-heading>
+                <table>
+                    <thead>
+                        <tr class="detail-row">
+                            <th class="id-column">Name</th>
+                            <th class="id-column">Admin User</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="detail-row">
+                            <td class="id-column">{{ org?.name }}</td>
+                            <td class="id-column">{{ org?.admin_user }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+                <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
+                    <chef-option value='roles' data-cy="roles-tab">Roles</chef-option>
+                    <chef-option value='details' data-cy="details-tab">Details</chef-option>
+                </chef-tab-selector>
+            </chef-page-header>
+            <section class="page-body" *ngIf="tabValue === 'roles'">
+                <ng-container>
+                    <chef-table-new>
+                        <chef-table-header>
+                            <chef-table-row>
+                                <chef-table-header-cell>Role Name</chef-table-header-cell>
+                            </chef-table-row>
+                        </chef-table-header>
+                        <chef-table-body>
+                            <chef-table-row *ngFor="let role of roles">
+                                <chef-table-cell>
+                                    <a [routerLink]="['/infrastructure','chef-servers', serverId, 'org', OrgId, 'role', role.name]">{{ role.name }}</a>
+                                    </chef-table-cell>
+                            </chef-table-row>
+                        </chef-table-body>
+                    </chef-table-new>
+                </ng-container>
+            </section>
+        </main>
+    </div>
+</div>
