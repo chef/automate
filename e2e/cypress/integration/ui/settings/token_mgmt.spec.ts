@@ -1,3 +1,6 @@
+import { iamVersion } from '../../../support/constants';
+import { itFlaky } from '../../../support/constants';
+
 describe('token management', () => {
   const typeDelay = 50;
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -72,7 +75,7 @@ describe('token management', () => {
       .get('chef-table-cell').contains('Inactive');
   });
 
-  it('control menu has all options', () => {
+  itFlaky('control menu has all options', () => {
     ['Copy Token', 'Toggle Status', 'Delete Token'].forEach((item, _) => {
       cy.get('chef-table-body').contains(tokenName1).parent().parent()
         .find('[data-cy=token-control]').as('controlMenu');
@@ -87,7 +90,7 @@ describe('token management', () => {
     });
   });
 
-  it('can copy token', () => {
+  itFlaky('can copy token', () => {
     cy.get('chef-table-body').contains(tokenName1).parent().parent()
     .find('[data-cy=token-control]').as('controlMenu');
 
