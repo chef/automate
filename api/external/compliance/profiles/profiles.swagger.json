@@ -13,6 +13,8 @@
   "paths": {
     "/compliance/market/read/{name}/version/{version}": {
       "get": {
+        "summary": "Show an available profile",
+        "description": "Show the details of an un-installed profile using the profile name and version.\nin the UI, these are the profiles under the \"Available\" tab.\nThese profiles are created and maintained by Chef, shipped with Chef Automate.\n\n\nAuthorization Action:\n```\ncompliance:marketProfiles:get\n```",
         "operationId": "ReadFromMarket",
         "responses": {
           "200": {
@@ -25,18 +27,21 @@
         "parameters": [
           {
             "name": "name",
+            "description": "Name of the profile.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "version",
+            "description": "Version of the profile.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "owner",
+            "description": "Automate user associated with the profile.",
             "in": "query",
             "required": false,
             "type": "string"
@@ -49,6 +54,8 @@
     },
     "/compliance/profiles/read/{owner}/{name}/version/{version}": {
       "get": {
+        "summary": "Show an installed profile",
+        "description": "Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.\n\n\nAuthorization Action:\n```\ncompliance:profiles:get\n```",
         "operationId": "Read",
         "responses": {
           "200": {
@@ -61,18 +68,21 @@
         "parameters": [
           {
             "name": "owner",
+            "description": "Automate user associated with the profile.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Name of the profile.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "version",
+            "description": "Version of the profile.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -85,6 +95,8 @@
     },
     "/compliance/profiles/search": {
       "post": {
+        "summary": "List all available profiles",
+        "description": "Lists all profiles available for the Automate instance.\nEmpty params return all \"market\" profiles.\nSpecifying the `owner` field returns all profiles installed for the specified user.\n\nSupports pagination, sorting, and filtering (wildcard supported).\n\nSupported sort fields: title, name (default: title)\nSupported filter fields: name, version, title\n\nExample:\n```\n{\n\"filters\":[\n{\"type\": \"title\", \"values\": [ \"Dev*\"]}\n],\n\"page\": 1,\n\"per_page\": 3,\n\"owner\": \"admin\"\n}\n```\n\n\nAuthorization Action:\n```\ncompliance:profiles:list\n```",
         "operationId": "List",
         "responses": {
           "200": {
@@ -111,6 +123,8 @@
     },
     "/compliance/profiles/{owner}/{name}/version/{version}": {
       "delete": {
+        "summary": "Delete an installed profile",
+        "description": "Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.\nNote: this action \"uninstalls\" the profile. This has no impact on the market profiles.\n\n\nAuthorization Action:\n```\ncompliance:profiles:delete\n```",
         "operationId": "Delete",
         "responses": {
           "200": {
@@ -123,18 +137,21 @@
         "parameters": [
           {
             "name": "owner",
+            "description": "Automate user associated with the profile.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Name of the profile.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "version",
+            "description": "Version of the profile.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -162,21 +179,26 @@
       "type": "object",
       "properties": {
         "file": {
-          "type": "string"
+          "type": "string",
+          "description": "Profile file where the error or warning exists."
         },
         "line": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Profile line where the error or warning exists."
         },
         "column": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Column where the error or warning exists."
         },
         "control_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Control ID associated with the error or warning."
         },
         "msg": {
-          "type": "string"
+          "type": "string",
+          "description": "Message associated with the error or warning."
         }
       }
     },
@@ -184,19 +206,22 @@
       "type": "object",
       "properties": {
         "summary": {
-          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.ResultSummary"
+          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.ResultSummary",
+          "description": "Intentionally blank."
         },
         "errors": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.CheckMessage"
-          }
+          },
+          "description": "Errors returned by the `inspec check` command."
         },
         "warnings": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.CheckMessage"
-          }
+          },
+          "description": "Warnings returned by the `inspec check` command."
         }
       }
     },
@@ -211,47 +236,57 @@
           "type": "string",
           "format": "int64"
         }
-      }
+      },
+      "description": "Profile contents in byte form."
     },
     "chef.automate.api.compliance.profiles.v1.Control": {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "The ID of the control."
         },
         "code": {
-          "type": "string"
+          "type": "string",
+          "description": "The code (test) for the control."
         },
         "desc": {
-          "type": "string"
+          "type": "string",
+          "description": "The description of the control."
         },
         "impact": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "description": "The impact of the control."
         },
         "title": {
-          "type": "string"
+          "type": "string",
+          "description": "The title of the control."
         },
         "source_location": {
-          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.SourceLocation"
+          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.SourceLocation",
+          "description": "Intentionally blank."
         },
         "results": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Result"
-          }
+          },
+          "description": "The results of the control tests."
         },
         "refs": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Ref"
-          }
+          },
+          "description": "The refs associated with the control."
         },
         "tags": {
           "type": "object",
           "additionalProperties": {
             "type": "string"
-          }
+          },
+          "description": "The tags associated with the control."
         }
       }
     },
@@ -259,37 +294,48 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the profile."
         },
         "url": {
-          "type": "string"
+          "type": "string",
+          "description": "URL of the profile."
         },
         "path": {
-          "type": "string"
+          "type": "string",
+          "description": "Path of the profile."
         },
         "git": {
-          "type": "string"
+          "type": "string",
+          "description": "Git location of the profile."
         },
         "branch": {
-          "type": "string"
+          "type": "string",
+          "description": "Branch of the profile."
         },
         "tag": {
-          "type": "string"
+          "type": "string",
+          "description": "Tag associated with the profile."
         },
         "commit": {
-          "type": "string"
+          "type": "string",
+          "description": "Commit sha for the profile."
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "Version of the profile."
         },
         "supermarket": {
-          "type": "string"
+          "type": "string",
+          "description": "Supermarket address of the profile."
         },
         "github": {
-          "type": "string"
+          "type": "string",
+          "description": "Github address of the profile."
         },
         "compliance": {
-          "type": "string"
+          "type": "string",
+          "description": "Automate address of the profile."
         }
       }
     },
@@ -317,10 +363,12 @@
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "List of values to filter on."
         },
         "type": {
-          "type": "string"
+          "type": "string",
+          "description": "The field to filter on."
         }
       }
     },
@@ -328,15 +376,19 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "Name of the profile (as specified in the inspec.yml)"
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "Version of the profile."
         },
         "content_type": {
-          "type": "string"
+          "type": "string",
+          "title": "Content type of the profile (e.g. application/json, application/x-gtar, application/gzip)"
         }
-      }
+      },
+      "description": "Metadata about the profile."
     },
     "chef.automate.api.compliance.profiles.v1.Option": {
       "type": "object",
@@ -353,46 +405,58 @@
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "title": "The profile name, as specified in the inspec.yml"
         },
         "title": {
-          "type": "string"
+          "type": "string",
+          "title": "The profile title, as specified in the inspec.yml"
         },
         "maintainer": {
-          "type": "string"
+          "type": "string",
+          "title": "The profile maintainer, as specified in the inspec.yml"
         },
         "copyright": {
-          "type": "string"
+          "type": "string",
+          "title": "The profile copyright, as specified in the inspec.yml"
         },
         "copyright_email": {
-          "type": "string"
+          "type": "string",
+          "title": "The profile copyright email, as specified in the inspec.yml"
         },
         "license": {
-          "type": "string"
+          "type": "string",
+          "title": "The profile license, as specified in the inspec.yml"
         },
         "summary": {
-          "type": "string"
+          "type": "string",
+          "title": "The profile summary, as specified in the inspec.yml"
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "title": "The profile version, as specified in the inspec.yml"
         },
         "owner": {
-          "type": "string"
+          "type": "string",
+          "description": "The Automate user associated with the profile."
         },
         "supports": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Support"
-          }
+          },
+          "title": "The list of operating systems compatible with the profile, as specified in the inspec.yml"
         },
         "depends": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Dependency"
-          }
+          },
+          "title": "The list of dependencies the profile has, as specified in the inspec.yml"
         },
         "sha256": {
-          "type": "string"
+          "type": "string",
+          "description": "The SHA256 of the profile."
         },
         "groups": {
           "type": "array",
@@ -404,16 +468,19 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Control"
-          }
+          },
+          "description": "The list of controls in the profile."
         },
         "attributes": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Attribute"
-          }
+          },
+          "description": "The list of attributes in the profile."
         },
         "latest_version": {
-          "type": "string"
+          "type": "string",
+          "description": "The latest version of the profile."
         }
       }
     },
@@ -421,17 +488,21 @@
       "type": "object",
       "properties": {
         "owner": {
-          "type": "string"
+          "type": "string",
+          "description": "Automate user associated with the profile."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the profile."
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "Version of the profile."
         },
         "data": {
           "type": "string",
-          "format": "byte"
+          "format": "byte",
+          "description": "Profile contents in byte form."
         }
       }
     },
@@ -442,11 +513,13 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Profile"
-          }
+          },
+          "description": "List of profiles matching the query."
         },
         "total": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Total count of profiles matching the query."
         }
       }
     },
@@ -457,30 +530,38 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.ListFilter"
-          }
+          },
+          "title": "Filters to apply to the query"
         },
         "order": {
-          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Query.OrderType"
+          "$ref": "#/definitions/chef.automate.api.compliance.profiles.v1.Query.OrderType",
+          "description": "Order in which to sort. Defaults to ASC."
         },
         "sort": {
-          "type": "string"
+          "type": "string",
+          "description": "Field on which to sort."
         },
         "page": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Page of results requested."
         },
         "per_page": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Number of results to return per page."
         },
         "owner": {
-          "type": "string"
+          "type": "string",
+          "description": "Automate user associated with the profile."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the profile (as defined in `inspec.yml`)."
         },
         "version": {
-          "type": "string"
+          "type": "string",
+          "description": "Version of the profile (as defined in `inspec.yml`)."
         }
       }
     },
@@ -496,10 +577,12 @@
       "type": "object",
       "properties": {
         "url": {
-          "type": "string"
+          "type": "string",
+          "description": "URL of the ref."
         },
         "ref": {
-          "type": "string"
+          "type": "string",
+          "description": "Ref for the control."
         }
       }
     },
@@ -507,23 +590,29 @@
       "type": "object",
       "properties": {
         "status": {
-          "type": "string"
+          "type": "string",
+          "description": "Status of the test results (passed, failed, skipped)."
         },
         "code_desc": {
-          "type": "string"
+          "type": "string",
+          "description": "The code (test) executed."
         },
         "run_time": {
           "type": "number",
-          "format": "float"
+          "format": "float",
+          "description": "The amount of time it took to execute the test."
         },
         "start_time": {
-          "type": "string"
+          "type": "string",
+          "description": "The time the test started."
         },
         "message": {
-          "type": "string"
+          "type": "string",
+          "description": "The failure message."
         },
         "skip_message": {
-          "type": "string"
+          "type": "string",
+          "description": "Reason for skipping the test."
         }
       }
     },
@@ -532,17 +621,21 @@
       "properties": {
         "valid": {
           "type": "boolean",
-          "format": "boolean"
+          "format": "boolean",
+          "description": "Boolean that denotes if the profile is valid or not (as reported by `inspec check`)."
         },
         "timestamp": {
-          "type": "string"
+          "type": "string",
+          "description": "Timestamp of when the `inspec check` command was executed."
         },
         "location": {
-          "type": "string"
+          "type": "string",
+          "description": "Path of the checked profile."
         },
         "controls": {
           "type": "integer",
-          "format": "int32"
+          "format": "int32",
+          "description": "Count of controls in the profile."
         }
       }
     },
@@ -562,19 +655,24 @@
       "type": "object",
       "properties": {
         "os_name": {
-          "type": "string"
+          "type": "string",
+          "description": "OS name supported by the profile."
         },
         "os_family": {
-          "type": "string"
+          "type": "string",
+          "description": "OS family supported by the profile."
         },
         "release": {
-          "type": "string"
+          "type": "string",
+          "description": "OS release supported by the profile."
         },
         "inspec_version": {
-          "type": "string"
+          "type": "string",
+          "description": "Minimum InSpec version required for the profile."
         },
         "platform": {
-          "type": "string"
+          "type": "string",
+          "description": "Platform supported by the profile."
         }
       }
     },

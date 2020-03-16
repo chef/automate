@@ -54,8 +54,11 @@ func (Query_OrderType) EnumDescriptor() ([]byte, []int) {
 }
 
 type ProfilePostRequest struct {
-	Owner                string    `protobuf:"bytes,5,opt,name=owner,proto3" json:"owner,omitempty"`
-	Chunk                *Chunk    `protobuf:"bytes,2,opt,name=chunk,proto3" json:"chunk,omitempty"`
+	// Associate an automate user with a profile. A profile is visible only to its associated user.
+	Owner string `protobuf:"bytes,5,opt,name=owner,proto3" json:"owner,omitempty"`
+	// Intentionally blank.
+	Chunk *Chunk `protobuf:"bytes,2,opt,name=chunk,proto3" json:"chunk,omitempty"`
+	// Intentionally blank.
 	Meta                 *Metadata `protobuf:"bytes,3,opt,name=meta,proto3" json:"meta,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
 	XXX_unrecognized     []byte    `json:"-"`
@@ -108,9 +111,13 @@ func (m *ProfilePostRequest) GetMeta() *Metadata {
 	return nil
 }
 
+// Metadata about the profile.
 type Metadata struct {
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string   `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	// Name of the profile (as specified in the inspec.yml)
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Version of the profile.
+	Version string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	// Content type of the profile (e.g. application/json, application/x-gtar, application/gzip)
 	ContentType          string   `protobuf:"bytes,4,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -163,6 +170,7 @@ func (m *Metadata) GetContentType() string {
 	return ""
 }
 
+// Profile contents in byte form.
 type Chunk struct {
 	Data                 []byte   `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`
 	Position             int64    `protobuf:"varint,2,opt,name=position,proto3" json:"position,omitempty"`
@@ -211,9 +219,13 @@ func (m *Chunk) GetPosition() int64 {
 }
 
 type ProfileData struct {
-	Owner                string   `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string   `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	// Automate user associated with the profile.
+	Owner string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
+	// Name of the profile.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Version of the profile.
+	Version string `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
+	// Profile contents in byte form.
 	Data                 []byte   `protobuf:"bytes,4,opt,name=data,proto3" json:"data,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -274,11 +286,13 @@ func (m *ProfileData) GetData() []byte {
 }
 
 type Profiles struct {
-	Profiles             []*Profile `protobuf:"bytes,1,rep,name=profiles,proto3" json:"profiles,omitempty"`
-	Total                int32      `protobuf:"varint,20,opt,name=total,proto3" json:"total,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
-	XXX_unrecognized     []byte     `json:"-"`
-	XXX_sizecache        int32      `json:"-"`
+	// List of profiles matching the query.
+	Profiles []*Profile `protobuf:"bytes,1,rep,name=profiles,proto3" json:"profiles,omitempty"`
+	// Total count of profiles matching the query.
+	Total                int32    `protobuf:"varint,20,opt,name=total,proto3" json:"total,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Profiles) Reset()         { *m = Profiles{} }
@@ -321,25 +335,40 @@ func (m *Profiles) GetTotal() int32 {
 }
 
 type Profile struct {
-	Name                 string        `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Title                string        `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Maintainer           string        `protobuf:"bytes,3,opt,name=maintainer,proto3" json:"maintainer,omitempty"`
-	Copyright            string        `protobuf:"bytes,4,opt,name=copyright,proto3" json:"copyright,omitempty"`
-	CopyrightEmail       string        `protobuf:"bytes,5,opt,name=copyright_email,json=copyrightEmail,proto3" json:"copyright_email,omitempty"`
-	License              string        `protobuf:"bytes,6,opt,name=license,proto3" json:"license,omitempty"`
-	Summary              string        `protobuf:"bytes,7,opt,name=summary,proto3" json:"summary,omitempty"`
-	Version              string        `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
-	Owner                string        `protobuf:"bytes,9,opt,name=owner,proto3" json:"owner,omitempty"`
-	Supports             []*Support    `protobuf:"bytes,16,rep,name=supports,proto3" json:"supports,omitempty"`
-	Depends              []*Dependency `protobuf:"bytes,17,rep,name=depends,proto3" json:"depends,omitempty"`
-	Sha256               string        `protobuf:"bytes,18,opt,name=sha256,proto3" json:"sha256,omitempty"`
-	Groups               []*Group      `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
-	Controls             []*Control    `protobuf:"bytes,20,rep,name=controls,proto3" json:"controls,omitempty"`
-	Attributes           []*Attribute  `protobuf:"bytes,21,rep,name=attributes,proto3" json:"attributes,omitempty"`
-	LatestVersion        string        `protobuf:"bytes,22,opt,name=latest_version,json=latestVersion,proto3" json:"latest_version,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}      `json:"-"`
-	XXX_unrecognized     []byte        `json:"-"`
-	XXX_sizecache        int32         `json:"-"`
+	// The profile name, as specified in the inspec.yml
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// The profile title, as specified in the inspec.yml
+	Title string `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	// The profile maintainer, as specified in the inspec.yml
+	Maintainer string `protobuf:"bytes,3,opt,name=maintainer,proto3" json:"maintainer,omitempty"`
+	// The profile copyright, as specified in the inspec.yml
+	Copyright string `protobuf:"bytes,4,opt,name=copyright,proto3" json:"copyright,omitempty"`
+	// The profile copyright email, as specified in the inspec.yml
+	CopyrightEmail string `protobuf:"bytes,5,opt,name=copyright_email,json=copyrightEmail,proto3" json:"copyright_email,omitempty"`
+	// The profile license, as specified in the inspec.yml
+	License string `protobuf:"bytes,6,opt,name=license,proto3" json:"license,omitempty"`
+	// The profile summary, as specified in the inspec.yml
+	Summary string `protobuf:"bytes,7,opt,name=summary,proto3" json:"summary,omitempty"`
+	// The profile version, as specified in the inspec.yml
+	Version string `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
+	// The Automate user associated with the profile.
+	Owner string `protobuf:"bytes,9,opt,name=owner,proto3" json:"owner,omitempty"`
+	// The list of operating systems compatible with the profile, as specified in the inspec.yml
+	Supports []*Support `protobuf:"bytes,16,rep,name=supports,proto3" json:"supports,omitempty"`
+	// The list of dependencies the profile has, as specified in the inspec.yml
+	Depends []*Dependency `protobuf:"bytes,17,rep,name=depends,proto3" json:"depends,omitempty"`
+	// The SHA256 of the profile.
+	Sha256 string   `protobuf:"bytes,18,opt,name=sha256,proto3" json:"sha256,omitempty"`
+	Groups []*Group `protobuf:"bytes,19,rep,name=groups,proto3" json:"groups,omitempty"`
+	// The list of controls in the profile.
+	Controls []*Control `protobuf:"bytes,20,rep,name=controls,proto3" json:"controls,omitempty"`
+	// The list of attributes in the profile.
+	Attributes []*Attribute `protobuf:"bytes,21,rep,name=attributes,proto3" json:"attributes,omitempty"`
+	// The latest version of the profile.
+	LatestVersion        string   `protobuf:"bytes,22,opt,name=latest_version,json=latestVersion,proto3" json:"latest_version,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Profile) Reset()         { *m = Profile{} }
@@ -535,14 +564,23 @@ func (m *Group) GetControls() []string {
 }
 
 type Control struct {
-	Id                   string            `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Code                 string            `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
-	Desc                 string            `protobuf:"bytes,3,opt,name=desc,proto3" json:"desc,omitempty"`
-	Impact               float32           `protobuf:"fixed32,4,opt,name=impact,proto3" json:"impact,omitempty"`
-	Title                string            `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
-	SourceLocation       *SourceLocation   `protobuf:"bytes,6,opt,name=source_location,json=sourceLocation,proto3" json:"source_location,omitempty"`
-	Results              []*Result         `protobuf:"bytes,7,rep,name=results,proto3" json:"results,omitempty"`
-	Refs                 []*Ref            `protobuf:"bytes,8,rep,name=refs,proto3" json:"refs,omitempty"`
+	// The ID of the control.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// The code (test) for the control.
+	Code string `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	// The description of the control.
+	Desc string `protobuf:"bytes,3,opt,name=desc,proto3" json:"desc,omitempty"`
+	// The impact of the control.
+	Impact float32 `protobuf:"fixed32,4,opt,name=impact,proto3" json:"impact,omitempty"`
+	// The title of the control.
+	Title string `protobuf:"bytes,5,opt,name=title,proto3" json:"title,omitempty"`
+	// Intentionally blank.
+	SourceLocation *SourceLocation `protobuf:"bytes,6,opt,name=source_location,json=sourceLocation,proto3" json:"source_location,omitempty"`
+	// The results of the control tests.
+	Results []*Result `protobuf:"bytes,7,rep,name=results,proto3" json:"results,omitempty"`
+	// The refs associated with the control.
+	Refs []*Ref `protobuf:"bytes,8,rep,name=refs,proto3" json:"refs,omitempty"`
+	// The tags associated with the control.
 	Tags                 map[string]string `protobuf:"bytes,9,rep,name=tags,proto3" json:"tags,omitempty" protobuf_key:"bytes,1,opt,name=key,proto3" protobuf_val:"bytes,2,opt,name=value,proto3"`
 	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
 	XXX_unrecognized     []byte            `json:"-"`
@@ -638,7 +676,9 @@ func (m *Control) GetTags() map[string]string {
 }
 
 type Ref struct {
-	Url                  string   `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	// URL of the ref.
+	Url string `protobuf:"bytes,1,opt,name=url,proto3" json:"url,omitempty"`
+	// Ref for the control.
 	Ref                  string   `protobuf:"bytes,2,opt,name=ref,proto3" json:"ref,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -685,11 +725,17 @@ func (m *Ref) GetRef() string {
 }
 
 type Result struct {
-	Status               string   `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	CodeDesc             string   `protobuf:"bytes,2,opt,name=code_desc,json=codeDesc,proto3" json:"code_desc,omitempty"`
-	RunTime              float32  `protobuf:"fixed32,3,opt,name=run_time,json=runTime,proto3" json:"run_time,omitempty"`
-	StartTime            string   `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	Message              string   `protobuf:"bytes,5,opt,name=message,proto3" json:"message,omitempty"`
+	// Status of the test results (passed, failed, skipped).
+	Status string `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	// The code (test) executed.
+	CodeDesc string `protobuf:"bytes,2,opt,name=code_desc,json=codeDesc,proto3" json:"code_desc,omitempty"`
+	// The amount of time it took to execute the test.
+	RunTime float32 `protobuf:"fixed32,3,opt,name=run_time,json=runTime,proto3" json:"run_time,omitempty"`
+	// The time the test started.
+	StartTime string `protobuf:"bytes,4,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// The failure message.
+	Message string `protobuf:"bytes,5,opt,name=message,proto3" json:"message,omitempty"`
+	// Reason for skipping the test.
 	SkipMessage          string   `protobuf:"bytes,6,opt,name=skip_message,json=skipMessage,proto3" json:"skip_message,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -905,10 +951,15 @@ func (m *Option) GetDefault() string {
 }
 
 type Support struct {
-	OsName               string   `protobuf:"bytes,1,opt,name=os_name,json=osName,proto3" json:"os_name,omitempty"`
-	OsFamily             string   `protobuf:"bytes,2,opt,name=os_family,json=osFamily,proto3" json:"os_family,omitempty"`
-	Release              string   `protobuf:"bytes,3,opt,name=release,proto3" json:"release,omitempty"`
-	InspecVersion        string   `protobuf:"bytes,4,opt,name=inspec_version,json=inspecVersion,proto3" json:"inspec_version,omitempty"`
+	// OS name supported by the profile.
+	OsName string `protobuf:"bytes,1,opt,name=os_name,json=osName,proto3" json:"os_name,omitempty"`
+	// OS family supported by the profile.
+	OsFamily string `protobuf:"bytes,2,opt,name=os_family,json=osFamily,proto3" json:"os_family,omitempty"`
+	// OS release supported by the profile.
+	Release string `protobuf:"bytes,3,opt,name=release,proto3" json:"release,omitempty"`
+	// Minimum InSpec version required for the profile.
+	InspecVersion string `protobuf:"bytes,4,opt,name=inspec_version,json=inspecVersion,proto3" json:"inspec_version,omitempty"`
+	// Platform supported by the profile.
 	Platform             string   `protobuf:"bytes,5,opt,name=platform,proto3" json:"platform,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -976,16 +1027,27 @@ func (m *Support) GetPlatform() string {
 }
 
 type Dependency struct {
-	Name                 string   `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	Url                  string   `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
-	Path                 string   `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
-	Git                  string   `protobuf:"bytes,4,opt,name=git,proto3" json:"git,omitempty"`
-	Branch               string   `protobuf:"bytes,5,opt,name=branch,proto3" json:"branch,omitempty"`
-	Tag                  string   `protobuf:"bytes,6,opt,name=tag,proto3" json:"tag,omitempty"`
-	Commit               string   `protobuf:"bytes,7,opt,name=commit,proto3" json:"commit,omitempty"`
-	Version              string   `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
-	Supermarket          string   `protobuf:"bytes,9,opt,name=supermarket,proto3" json:"supermarket,omitempty"`
-	Github               string   `protobuf:"bytes,10,opt,name=github,proto3" json:"github,omitempty"`
+	// Name of the profile.
+	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	// URL of the profile.
+	Url string `protobuf:"bytes,2,opt,name=url,proto3" json:"url,omitempty"`
+	// Path of the profile.
+	Path string `protobuf:"bytes,3,opt,name=path,proto3" json:"path,omitempty"`
+	// Git location of the profile.
+	Git string `protobuf:"bytes,4,opt,name=git,proto3" json:"git,omitempty"`
+	// Branch of the profile.
+	Branch string `protobuf:"bytes,5,opt,name=branch,proto3" json:"branch,omitempty"`
+	// Tag associated with the profile.
+	Tag string `protobuf:"bytes,6,opt,name=tag,proto3" json:"tag,omitempty"`
+	// Commit sha for the profile.
+	Commit string `protobuf:"bytes,7,opt,name=commit,proto3" json:"commit,omitempty"`
+	// Version of the profile.
+	Version string `protobuf:"bytes,8,opt,name=version,proto3" json:"version,omitempty"`
+	// Supermarket address of the profile.
+	Supermarket string `protobuf:"bytes,9,opt,name=supermarket,proto3" json:"supermarket,omitempty"`
+	// Github address of the profile.
+	Github string `protobuf:"bytes,10,opt,name=github,proto3" json:"github,omitempty"`
+	// Automate address of the profile.
 	Compliance           string   `protobuf:"bytes,11,opt,name=compliance,proto3" json:"compliance,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1095,8 +1157,11 @@ func (m *Dependency) GetCompliance() string {
 }
 
 type ProfileDetails struct {
-	Owner                string   `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
-	Name                 string   `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Automate user associated with the profile.
+	Owner string `protobuf:"bytes,1,opt,name=owner,proto3" json:"owner,omitempty"`
+	// Name of the profile.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Version of the profile.
 	Version              string   `protobuf:"bytes,3,opt,name=version,proto3" json:"version,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1150,8 +1215,11 @@ func (m *ProfileDetails) GetVersion() string {
 }
 
 type CheckResult struct {
-	Summary              *ResultSummary  `protobuf:"bytes,1,opt,name=summary,proto3" json:"summary,omitempty"`
-	Errors               []*CheckMessage `protobuf:"bytes,2,rep,name=errors,proto3" json:"errors,omitempty"`
+	// Intentionally blank.
+	Summary *ResultSummary `protobuf:"bytes,1,opt,name=summary,proto3" json:"summary,omitempty"`
+	// Errors returned by the `inspec check` command.
+	Errors []*CheckMessage `protobuf:"bytes,2,rep,name=errors,proto3" json:"errors,omitempty"`
+	// Warnings returned by the `inspec check` command.
 	Warnings             []*CheckMessage `protobuf:"bytes,3,rep,name=warnings,proto3" json:"warnings,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
 	XXX_unrecognized     []byte          `json:"-"`
@@ -1205,9 +1273,13 @@ func (m *CheckResult) GetWarnings() []*CheckMessage {
 }
 
 type ResultSummary struct {
-	Valid                bool     `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
-	Timestamp            string   `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
-	Location             string   `protobuf:"bytes,3,opt,name=location,proto3" json:"location,omitempty"`
+	// Boolean that denotes if the profile is valid or not (as reported by `inspec check`).
+	Valid bool `protobuf:"varint,1,opt,name=valid,proto3" json:"valid,omitempty"`
+	// Timestamp of when the `inspec check` command was executed.
+	Timestamp string `protobuf:"bytes,2,opt,name=timestamp,proto3" json:"timestamp,omitempty"`
+	// Path of the checked profile.
+	Location string `protobuf:"bytes,3,opt,name=location,proto3" json:"location,omitempty"`
+	// Count of controls in the profile.
 	Controls             int32    `protobuf:"varint,4,opt,name=controls,proto3" json:"controls,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1268,10 +1340,15 @@ func (m *ResultSummary) GetControls() int32 {
 }
 
 type CheckMessage struct {
-	File                 string   `protobuf:"bytes,1,opt,name=file,proto3" json:"file,omitempty"`
-	Line                 int32    `protobuf:"varint,2,opt,name=line,proto3" json:"line,omitempty"`
-	Column               int32    `protobuf:"varint,3,opt,name=column,proto3" json:"column,omitempty"`
-	ControlId            string   `protobuf:"bytes,4,opt,name=control_id,json=controlId,proto3" json:"control_id,omitempty"`
+	// Profile file where the error or warning exists.
+	File string `protobuf:"bytes,1,opt,name=file,proto3" json:"file,omitempty"`
+	// Profile line where the error or warning exists.
+	Line int32 `protobuf:"varint,2,opt,name=line,proto3" json:"line,omitempty"`
+	// Column where the error or warning exists.
+	Column int32 `protobuf:"varint,3,opt,name=column,proto3" json:"column,omitempty"`
+	// Control ID associated with the error or warning.
+	ControlId string `protobuf:"bytes,4,opt,name=control_id,json=controlId,proto3" json:"control_id,omitempty"`
+	// Message associated with the error or warning.
 	Msg                  string   `protobuf:"bytes,5,opt,name=msg,proto3" json:"msg,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1339,7 +1416,9 @@ func (m *CheckMessage) GetMsg() string {
 }
 
 type ListFilter struct {
-	Values               []string `protobuf:"bytes,20,rep,name=values,proto3" json:"values,omitempty"`
+	// List of values to filter on.
+	Values []string `protobuf:"bytes,20,rep,name=values,proto3" json:"values,omitempty"`
+	// The field to filter on.
 	Type                 string   `protobuf:"bytes,21,opt,name=type,proto3" json:"type,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -1386,17 +1465,25 @@ func (m *ListFilter) GetType() string {
 }
 
 type Query struct {
-	Filters              []*ListFilter   `protobuf:"bytes,20,rep,name=filters,proto3" json:"filters,omitempty"`
-	Order                Query_OrderType `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.compliance.profiles.v1.Query_OrderType" json:"order,omitempty"`
-	Sort                 string          `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
-	Page                 int32           `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
-	PerPage              int32           `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
-	Owner                string          `protobuf:"bytes,25,opt,name=owner,proto3" json:"owner,omitempty"`
-	Name                 string          `protobuf:"bytes,26,opt,name=name,proto3" json:"name,omitempty"`
-	Version              string          `protobuf:"bytes,27,opt,name=version,proto3" json:"version,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	// Filters to apply to the query
+	Filters []*ListFilter `protobuf:"bytes,20,rep,name=filters,proto3" json:"filters,omitempty"`
+	// Order in which to sort. Defaults to ASC.
+	Order Query_OrderType `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.compliance.profiles.v1.Query_OrderType" json:"order,omitempty"`
+	// Field on which to sort.
+	Sort string `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
+	// Page of results requested.
+	Page int32 `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
+	// Number of results to return per page.
+	PerPage int32 `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
+	// Automate user associated with the profile.
+	Owner string `protobuf:"bytes,25,opt,name=owner,proto3" json:"owner,omitempty"`
+	// Name of the profile (as defined in `inspec.yml`).
+	Name string `protobuf:"bytes,26,opt,name=name,proto3" json:"name,omitempty"`
+	// Version of the profile (as defined in `inspec.yml`).
+	Version              string   `protobuf:"bytes,27,opt,name=version,proto3" json:"version,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Query) Reset()         { *m = Query{} }
@@ -1644,12 +1731,74 @@ type ProfilesServiceClient interface {
 	// grpc gateway is not able to handle multi-part upload; https://github.com/grpc-ecosystem/grpc-gateway/issues/410
 	// so we do not auto-generate the route for profile upload; we instead custom handle with mux
 	Create(ctx context.Context, opts ...grpc.CallOption) (ProfilesService_CreateClient, error)
+	//
+	//Show an installed profile
+	//
+	//Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+	//
+	//
+	//Authorization Action:
+	//```
+	//compliance:profiles:get
+	//```
 	Read(ctx context.Context, in *ProfileDetails, opts ...grpc.CallOption) (*Profile, error)
+	//
+	//Show an available profile
+	//
+	//Show the details of an un-installed profile using the profile name and version.
+	//in the UI, these are the profiles under the "Available" tab.
+	//These profiles are created and maintained by Chef, shipped with Chef Automate.
+	//
+	//
+	//Authorization Action:
+	//```
+	//compliance:marketProfiles:get
+	//```
 	ReadFromMarket(ctx context.Context, in *ProfileDetails, opts ...grpc.CallOption) (*Profile, error)
 	// grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
 	// so we do not auto-generate the route for profile download; we instead custom handle with mux
 	ReadTar(ctx context.Context, in *ProfileDetails, opts ...grpc.CallOption) (ProfilesService_ReadTarClient, error)
+	//
+	//Delete an installed profile
+	//
+	//Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+	//Note: this action "uninstalls" the profile. This has no impact on the market profiles.
+	//
+	//
+	//Authorization Action:
+	//```
+	//compliance:profiles:delete
+	//```
 	Delete(ctx context.Context, in *ProfileDetails, opts ...grpc.CallOption) (*empty.Empty, error)
+	//
+	//List all available profiles
+	//
+	//Lists all profiles available for the Automate instance.
+	//Empty params return all "market" profiles.
+	//Specifying the `owner` field returns all profiles installed for the specified user.
+	//
+	//Supports pagination, sorting, and filtering (wildcard supported).
+	//
+	//Supported sort fields: title, name (default: title)
+	//Supported filter fields: name, version, title
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"type": "title", "values": [ "Dev*"]}
+	//],
+	//"page": 1,
+	//"per_page": 3,
+	//"owner": "admin"
+	//}
+	//```
+	//
+	//
+	//Authorization Action:
+	//```
+	//compliance:profiles:list
+	//```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Profiles, error)
 }
 
@@ -1768,12 +1917,74 @@ type ProfilesServiceServer interface {
 	// grpc gateway is not able to handle multi-part upload; https://github.com/grpc-ecosystem/grpc-gateway/issues/410
 	// so we do not auto-generate the route for profile upload; we instead custom handle with mux
 	Create(ProfilesService_CreateServer) error
+	//
+	//Show an installed profile
+	//
+	//Show the details of an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+	//
+	//
+	//Authorization Action:
+	//```
+	//compliance:profiles:get
+	//```
 	Read(context.Context, *ProfileDetails) (*Profile, error)
+	//
+	//Show an available profile
+	//
+	//Show the details of an un-installed profile using the profile name and version.
+	//in the UI, these are the profiles under the "Available" tab.
+	//These profiles are created and maintained by Chef, shipped with Chef Automate.
+	//
+	//
+	//Authorization Action:
+	//```
+	//compliance:marketProfiles:get
+	//```
 	ReadFromMarket(context.Context, *ProfileDetails) (*Profile, error)
 	// grpc gateway is not able to handle streaming; https://github.com/grpc-ecosystem/grpc-gateway/issues/435
 	// so we do not auto-generate the route for profile download; we instead custom handle with mux
 	ReadTar(*ProfileDetails, ProfilesService_ReadTarServer) error
+	//
+	//Delete an installed profile
+	//
+	//Delete an installed profile given the profile name, owner (Automate user associated with the profile), and version.
+	//Note: this action "uninstalls" the profile. This has no impact on the market profiles.
+	//
+	//
+	//Authorization Action:
+	//```
+	//compliance:profiles:delete
+	//```
 	Delete(context.Context, *ProfileDetails) (*empty.Empty, error)
+	//
+	//List all available profiles
+	//
+	//Lists all profiles available for the Automate instance.
+	//Empty params return all "market" profiles.
+	//Specifying the `owner` field returns all profiles installed for the specified user.
+	//
+	//Supports pagination, sorting, and filtering (wildcard supported).
+	//
+	//Supported sort fields: title, name (default: title)
+	//Supported filter fields: name, version, title
+	//
+	//Example:
+	//```
+	//{
+	//"filters":[
+	//{"type": "title", "values": [ "Dev*"]}
+	//],
+	//"page": 1,
+	//"per_page": 3,
+	//"owner": "admin"
+	//}
+	//```
+	//
+	//
+	//Authorization Action:
+	//```
+	//compliance:profiles:list
+	//```
 	List(context.Context, *Query) (*Profiles, error)
 }
 

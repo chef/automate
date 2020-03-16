@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { set, pipe, unset, mapKeys, camelCase } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
-import { ProjectActionTypes, ProjectActions } from './project.actions';
+import { ProjectActionTypes, ProjectActions, GetApplyRulesStatusSuccessPayload } from './project.actions';
 import { Project } from './project.model';
 
 export enum ApplyRulesStatusState {
@@ -126,14 +126,11 @@ export function projectEntityReducer(
       return set(UPDATE_STATUS, EntityStatus.loadingFailure, state);
 
     case ProjectActionTypes.GET_APPLY_RULES_STATUS_SUCCESS:
-      return set(
-        APPLY_RULES_STATUS,
-        mapKeys(key => camelCase(key),
-          {
-            ...action.payload,
-            percentage_complete: action.payload.percentage_complete * 100
-          }),
-        state);
+      const payload: GetApplyRulesStatusSuccessPayload = {
+        ...action.payload,
+        percentage_complete: action.payload.percentage_complete * 100
+      };
+      return set(APPLY_RULES_STATUS, mapKeys(key => camelCase(key), payload), state);
 
     default:
       return state;

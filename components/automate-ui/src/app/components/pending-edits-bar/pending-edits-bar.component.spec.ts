@@ -1,4 +1,5 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
+import { By } from '@angular/platform-browser';
 import { RouterTestingModule } from '@angular/router/testing';
 import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
@@ -6,7 +7,7 @@ import { MockComponent } from 'ng2-mock-component';
 
 import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
-import { customMatchers } from 'app/testing/custom-matchers';
+import { using } from 'app/testing/spec-helpers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
 import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
@@ -15,16 +16,17 @@ import { Project } from 'app/entities/projects/project.model';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { ProjectService } from 'app/entities/projects/project.service';
 import { projectEntityReducer, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
-import { PendingEditsBarComponent } from './pending-edits-bar.component';
 import {
   GetProjectsSuccess,
   GetApplyRulesStatusSuccess,
   GetApplyRulesStatusSuccessPayload
 } from 'app/entities/projects/project.actions';
+import { PendingEditsBarComponent } from './pending-edits-bar.component';
 
 describe('PendingEditsBarComponent', () => {
   let component: PendingEditsBarComponent;
   let fixture: ComponentFixture<PendingEditsBarComponent>;
+  let element: HTMLElement;
   let projectService: ProjectService;
   let store: Store<NgrxStateAtom>;
 
@@ -92,10 +94,10 @@ describe('PendingEditsBarComponent', () => {
   }));
 
   beforeEach(() => {
-    jasmine.addMatchers(customMatchers);
     projectService = TestBed.get(ProjectService);
     fixture = TestBed.createComponent(PendingEditsBarComponent);
     component = fixture.componentInstance;
+    element = fixture.debugElement.query(By.css('#pending-edits-bar')).nativeElement;
     store = TestBed.get(Store);
     fixture.detectChanges();
   });
@@ -104,31 +106,35 @@ describe('PendingEditsBarComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('when update-start-confirmation modal emits a cancellation', () => {
-    it('hides the modal', () => {
-      component.openConfirmUpdateStartModal();
-      component.cancelApplyStart();
-      expect(component.confirmApplyStartModalVisible).toEqual(false);
-    });
-  });
+  describe('update-start-confirmation modal', () => {
 
-  describe('when update-start-confirmation modal emits a confirmation', () => {
-    beforeEach(() => {
-      spyOn(projectService, 'applyRulesStart');
-      component.openConfirmUpdateStartModal();
-      component.confirmApplyStart();
+    describe('when it emits a cancellation', () => {
+      it('it hides the modal', () => {
+        component.openConfirmUpdateStartModal();
+        component.cancelApplyStart();
+        expect(component.confirmApplyStartModalVisible).toEqual(false);
+      });
     });
 
-    it('hides the modal', () => {
-      expect(component.confirmApplyStartModalVisible).toEqual(false);
-    });
+    describe('when it emits a confirmation', () => {
+      beforeEach(() => {
+        spyOn(projectService, 'applyRulesStart');
+        component.openConfirmUpdateStartModal();
+        component.confirmApplyStart();
+      });
 
-    it('has the projectService start the rule updates', () => {
-      expect(projectService.applyRulesStart).toHaveBeenCalled();
+      it('it hides the modal', () => {
+        expect(component.confirmApplyStartModalVisible).toEqual(false);
+      });
+
+      it('the projectService starts the rule updates', () => {
+        expect(projectService.applyRulesStart).toHaveBeenCalled();
+      });
     });
   });
 
   describe('pending edits bar', () => {
+
     it('is hidden if no project has changes', () => {
       const uneditedProject1 = genProject('uuid-111', 'RULES_APPLIED');
       const uneditedProject2 = genProject('uuid-112', 'RULES_APPLIED');
@@ -188,7 +194,7 @@ describe('PendingEditsBarComponent', () => {
       expect(component.isBarHidden).toEqual(false);
     });
 
-    it('is displayed if update is cancelled but update is still running', () => {
+    it('is visible if update is cancelled but update is still running', () => {
       store.dispatch(
         new GetProjectsSuccess({ projects: [genProject('uuid-99', 'RULES_APPLIED')] }));
       component.confirmApplyStart();
@@ -197,8 +203,29 @@ describe('PendingEditsBarComponent', () => {
       component.updateDisplay();
       expect(component.isBarHidden).toEqual(false);
     });
-  });
 
+    it('displays edits pending message before update is applied', () => {
+      store.dispatch(
+        new GetProjectsSuccess({ projects: [genProject('uuid-99', 'EDITS_PENDING')] }));
+      fixture.detectChanges();
+      expect(element.textContent).toContain('Project edits pending');
+    });
+
+    using([
+      ['is cancelled', false, true, 'edits pending'],
+      ['fails', true, false, 'update failed'],
+      // if it could happen, failure takes precedence:
+      ['both fails and is cancelled', true, true, 'update failed']
+    ], function (description: string, failed: boolean, cancelled: boolean, message: string) {
+      it(`displays "${message}" message when update ${description}`, () => {
+        store.dispatch(new GetApplyRulesStatusSuccess(
+          genState(ApplyRulesStatusState.NotRunning, failed, cancelled)));
+        fixture.detectChanges();
+        expect(element.textContent).toContain(`Project ${message}`);
+      });
+    });
+
+  });
 });
 
 function genProject(id: string, status: ProjectStatus): Project {

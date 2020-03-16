@@ -99,8 +99,8 @@ func (backend *Backend) MonitorProjectUpdateTask(ctx context.Context,
 	if res.Completed {
 		projectUpdateStatus.PercentageComplete = 1
 		if res.Response == nil {
-			projectUpdateStatus.State = project_update_lib.SerializedProjectUpdateTaskFailed
-			projectUpdateStatus.Error = "response missing from completed task"
+			projectUpdateStatus.State = project_update_lib.SerializedProjectUpdateTaskSuccess
+			logrus.Warnf("response missing from completed task for task %s", id)
 		} else if len(res.Response.Failures) > 0 {
 			projectUpdateStatus.State = project_update_lib.SerializedProjectUpdateTaskFailed
 			projectUpdateStatus.Error = res.Response.Failures[0]
