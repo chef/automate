@@ -7,7 +7,7 @@ toc = true
 [menu]
   [menu.docs]
     parent = "workflow"
-    weight = 20 
+    weight = 20
 +++
 
 Workflow is a legacy feature for Chef Automate, which was designed for managing changes to both infrastructure and application code.
@@ -60,7 +60,7 @@ Migration of Workflow data must happen during your upgrade to Chef Automate 2.
 
 ### Build a Standalone Chef Server
 
-Create a standalone Chef server following the [standalone server installation](https://docs.chef.io/install_server.html#standalone).
+Create a standalone Chef server following the [standalone server installation](https://docs.chef.io/install_server/#standalone).
 
 Then, on the Chef server:
 

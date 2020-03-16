@@ -40,7 +40,7 @@ You can add a new runner via `workflow-ctl` from your Chef Automate server. Log 
 
 After the [install-runner](/ctl_automate_server.html#install-runner) command succeeds, the new runner will appear in the **Manage Runners** tab in the **Workflow** area on the _Client Runs_ page. Selecting  the `Test` button verifies that you can dispatch jobs to the runner by opening a ssh connection to it. If the test fails and the runner is unreachable, an error should appear in the UI.
 
-Supported runner platforms are listed [here](https://docs.chef.io/platforms.html#runners).
+Supported runner platforms are listed [here](https://docs.chef.io/platforms/#chef-automate-job-runners).
 
 ### Removing a Runner
 

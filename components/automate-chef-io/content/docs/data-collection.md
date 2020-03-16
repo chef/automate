@@ -169,7 +169,7 @@ via the Chef Server. Please see the audit cookbook for an
 Chef Automate uses Elasticsearch to store its data, and the default Chef Automate install includes a single Elasticsearch service.
 This is sufficient to run production workloads; however, for greater data retention, we recommend using a multi-node Elasticsearch cluster with replication and sharding to store and protect your data.
 
-As of Chef Automate 1.7.114, the compliance service uses a ``compliance-latest`` Elasticsearch index to improves the performance of the reporting APIs at scale. Chef Automate creates this index automatically as part of the upgrade to Chef Automate 1.7.114. The index is updated with each new compliance report. If the ``compliance-latest`` Elasticsearch index becomes out of sync with the time-series data, it can be regenerated using the ``workflow-ctl migrate-compliance`` subcommand. For more information, see [migrate-compliance ](https://docs.chef.io/ctl_automate_server.html#migrate-compliance).
+As of Chef Automate 1.7.114, the compliance service uses a ``compliance-latest`` Elasticsearch index to improves the performance of the reporting APIs at scale. Chef Automate creates this index automatically as part of the upgrade to Chef Automate 1.7.114. The index is updated with each new compliance report. If the ``compliance-latest`` Elasticsearch index becomes out of sync with the time-series data, it can be regenerated using the ``workflow-ctl migrate-compliance`` subcommand. For more information, see [migrate-compliance ](https://docs.chef.io/ctl_automate_server/#migrate-compliance).
 
 ### Prerequisites
 
