@@ -59,4 +59,4 @@ export function infraRoleEntityReducer(
   }
 }
 export const getEntityById = (name: string) =>
-(state: InfraRoleEntityState) => state.entities[name];
+  (state: InfraRoleEntityState) => state.entities[name];
