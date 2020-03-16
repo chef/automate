@@ -39,7 +39,7 @@ _Resources_ displays the status of the most recent resources are failed, success
 Selecting the tabs with these names will filter the list to show only those resources.
 _Run List_ shows cookbooks, roles and recipes. For a node using policyfiles, you will be able to see the policy ID's for each cookbook listed.
 _Attributes_ shows an expandable list of node properties. Use the search bar to discover the node attributes by attribute name, key name, or value. The search results show by highlighting matching attributes. Use the _default_, _normal_, _override_, and _automatic_ buttons beneath the search bar to filter attributes by to these categories.
-Learn more about [attributes](https://docs.chef.io/attributes.html)
+Learn more about [attributes](https://docs.chef.io/attributes/)
 
 When looking at a failed Chef client run, selecting "view error log" button at the top of the page opens a window showing the error message and backtrace. Use the downloaded button to save the error message.
 
@@ -58,46 +58,46 @@ To save a search, select the share button to the right of the search bar, and co
 
 #### Node Filters
 
-[Attribute](https://docs.chef.io/attributes.html)
+[Attribute](https://docs.chef.io/attributes/)
 : Search for an attribute key, this will not search across attribute values.
 
-[Chef Organization](https://docs.chef.io/server_orgs.html)
+[Chef Organization](https://docs.chef.io/server_orgs/)
 : A Chef Server organization name.
 
-[Chef Server](https://docs.chef.io/server_components.html)
+[Chef Server](https://docs.chef.io/server_overview/)
 : A Chef Server URL.
 
-[Cookbook](https://docs.chef.io/cookbooks.html)
+[Cookbook](https://docs.chef.io/cookbooks/)
 : A cookbook name.
 
-[Environment](https://docs.chef.io/environments.html)
+[Environment](https://docs.chef.io/environments/)
 : Nodes can have one environment.
 
-[Node Name](https://docs.chef.io/nodes.html#about-node-names)
+[Node Name](https://docs.chef.io/nodes/#about-node-names)
 : Name of the node.
 
-[Platform](https://docs.chef.io/platforms.html#chef-automate-server)
+[Platform](https://docs.chef.io/platforms/#chef-automate-server)
 : OS Platform of a node.
 
-[Policy Group](https://docs.chef.io/policyfile.html#settings)
+[Policy Group](https://docs.chef.io/policyfile/#settings)
 : Policy group name, only nodes using policyfiles will be shown.
 
-[Policy Name](https://docs.chef.io/policyfile.html#settings)
+[Policy Name](https://docs.chef.io/policyfile/#settings)
 : Name of the policy as set in policyfile.rb, only nodes using policyfiles will be shown.
 
-[Policy Revision](https://docs.chef.io/release_notes_server.html#policies-name-revisions)
+[Policy Revision](https://docs.chef.io/release_notes_server/#policiesnamerevisions)
 : The policy revision ID, only nodes using policyfiles will be shown.
 
-[Recipe](https://docs.chef.io/recipes.html)
+[Recipe](https://docs.chef.io/recipes/)
 : A recipe within a cookbook.
 
-[Resource Name](https://docs.chef.io/resource_reference.html)
+[Resource Name](https://docs.chef.io/resources/)
 : A resource within a cookbook.
 
-[Role](https://docs.chef.io/roles.html)
+[Role](https://docs.chef.io/roles/)
 : Search by nodes assigned to a role. Nodes can have zero or many roles.
 
-See more about [policyfiles](https://docs.chef.io/policyfile.html).
+See more about [policyfiles](https://docs.chef.io/policyfile/).
 
 ## Managing Node Data
 
@@ -167,7 +167,7 @@ Configuring the UUID on the client side keeps the node associated with the same 
 In the node's `client.rb`, set `chef_guid` to the _desired UUID_.
 If the node already exists, check that it uses the correct UUID, otherwise it will appear as a new node the next time it is recreated.
 
-See the `client.rb` documentation for more information about [configuring your client nodes](https://docs.chef.io/config_rb_client.html).
+See the `client.rb` documentation for more information about [configuring your client nodes](https://docs.chef.io/config_rb_client/).
 
 The following are the configuration parameters available:
 
