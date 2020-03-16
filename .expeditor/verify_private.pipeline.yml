@@ -448,7 +448,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2 force-upgrade to v2 with no legacy policies"
+  - label: "iam v2 with no legacy policies force-upgrade to v2"
     command:
       - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
     timeout_in_minutes: 20
@@ -461,7 +461,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2 force-upgrade to v2 with no legacy policies (diagnostics only)"
+  - label: "iam v2 with no legacy policies force upgrade to v2 (diagnostics only)"
     command:
       - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade_diagnostics.sh
     timeout_in_minutes: 20
@@ -474,7 +474,7 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2 force-upgrade to v2 with legacy policies"
+  - label: "iam v2 with legacy policies force upgrade to v2"
     command:
       - integration/run_test integration/tests/iam_v2_legacy_to_v2_force_upgrade.sh
     timeout_in_minutes: 20
