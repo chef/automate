@@ -109,7 +109,7 @@ export class AutomateSettingsRequests {
       return {
         'name': job.name,
         'threshold': job.threshold,
-        'disabled': false
+        'disabled': job.disabled
       };
     }
   }
