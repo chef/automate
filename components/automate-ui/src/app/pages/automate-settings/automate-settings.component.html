@@ -72,7 +72,8 @@
             <div class="checkbox-container">
               <chef-checkbox
               [checked]="!serviceGroupRemoveServices.value.disabled"
-              (change)="toggleInput(serviceGroupRemoveServices, $event.detail)">
+              (change)="toggleInput(serviceGroupRemoveServices, $event.detail)"
+              disabled="true">
               </chef-checkbox>
             </div>
             <p>Remove services labeled as disconnected after

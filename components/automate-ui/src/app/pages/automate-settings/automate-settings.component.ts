@@ -53,9 +53,9 @@ export class AutomateSettingsComponent implements OnInit {
     serviceGroupRemoveServices: {
       category: 'services',
       name: '',
-      unit: { value: 'd', disabled: false },
-      threshold: { value: '5', disabled: false },
-      disabled: false
+      unit: { value: 'd', disabled: true },
+      threshold: { value: '5', disabled: true },
+      disabled: false // special case: API not ready to alter yet
     },
     clientRunsRemoveData: {
       category: 'infra',
