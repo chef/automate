@@ -76,4 +76,7 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.compliance.profiles.v1.ProfilesService/MetaSearch", "compliance:profiles", "compliance:profiles:list", "POST", "/compliance/profiles/metasearch", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }
