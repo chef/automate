@@ -92,8 +92,7 @@ func NewGRPCServer(ctx context.Context,
 		return nil, errors.Wrap(err, "could not initialize v2 authz server")
 	}
 
-	v2PolServer, err := v2.NewPostgresPolicyServer(
-		ctx, l, policyRefresher, e, v1Server.Storage())
+	v2PolServer, err := v2.NewPostgresPolicyServer(ctx, l, policyRefresher, e)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 policy server")
 	}

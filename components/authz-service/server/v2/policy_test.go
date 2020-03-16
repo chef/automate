@@ -26,7 +26,6 @@ import (
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
-	storage_v1 "github.com/chef/automate/components/authz-service/storage/v1"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	memstore_v2 "github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/testhelpers"
@@ -2098,25 +2097,6 @@ func TestGetRole(t *testing.T) {
 	}
 }
 
-type v1Lister struct {
-	pols []*storage_v1.Policy
-	err  error
-}
-
-func (pl *v1Lister) ListPolicies(context.Context) ([]*storage_v1.Policy, error) {
-	return pl.pols, pl.err
-}
-
-func (pl *v1Lister) ListPoliciesWithSubjects(context.Context) ([]*storage_v1.Policy, error) {
-	pols := []*storage_v1.Policy{}
-	for _, p := range pl.pols {
-		if len(p.Subjects) > 0 {
-			pols = append(pols, p)
-		}
-	}
-	return pols, pl.err
-}
-
 func TestTypeConversion(t *testing.T) {
 	cases := map[string]storage.Type{
 		"custom":       storage.Custom,
@@ -2418,13 +2398,12 @@ type testSetup struct {
 
 func setupV2p1WithWriter(t *testing.T,
 	writer engine.V2p1Writer) testSetup {
-	return setupV2(t, nil, writer, nil)
+	return setupV2(t, nil, writer)
 }
 
 func setupV2(t *testing.T,
 	authorizer engine.V2Authorizer,
-	writer engine.V2p1Writer,
-	pl storage_v1.PoliciesLister) testSetup {
+	writer engine.V2p1Writer) testSetup {
 
 	t.Helper()
 	ctx := context.Background()
@@ -2441,7 +2420,7 @@ func setupV2(t *testing.T,
 	polRefresher, err := v2.NewPolicyRefresher(ctx, l, writer, mem_v2)
 	require.NoError(t, err)
 
-	polV2, err := v2.NewPoliciesServer(ctx, l, polRefresher, mem_v2, writer, pl)
+	polV2, err := v2.NewPoliciesServer(ctx, l, polRefresher, mem_v2, writer)
 	require.NoError(t, err)
 
 	require.NoError(t, err)
@@ -2715,13 +2694,4 @@ func genUUID(t *testing.T) uuid.UUID {
 	i, err := uuid.NewV4()
 	require.NoError(t, err)
 	return i
-}
-
-func wellknown(t *testing.T, wellknownID string) *storage_v1.Policy {
-	t.Helper()
-	v1DefaultPols, err := storage_v1.DefaultPolicies()
-	require.NoError(t, err)
-	inputPol, found := v1DefaultPols[wellknownID]
-	require.True(t, found)
-	return inputPol
 }

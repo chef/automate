@@ -15,7 +15,6 @@ import (
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	storage_v1 "github.com/chef/automate/components/authz-service/storage/v1"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
@@ -28,7 +27,6 @@ type policyServer struct {
 	log             logger.Logger
 	store           storage.Storage
 	engine          engine.V2p1Writer
-	v1              storage_v1.PoliciesLister
 	policyRefresher PolicyRefresher
 }
 
@@ -45,10 +43,9 @@ func NewMemstorePolicyServer(
 	ctx context.Context,
 	l logger.Logger,
 	pr PolicyRefresher,
-	e engine.V2p1Writer,
-	pl storage_v1.PoliciesLister) (PolicyServer, error) {
+	e engine.V2p1Writer) (PolicyServer, error) {
 
-	return NewPoliciesServer(ctx, l, pr, memstore.New(), e, pl)
+	return NewPoliciesServer(ctx, l, pr, memstore.New(), e)
 }
 
 // NewPostgresPolicyServer instantiates a server.Server that connects to a postgres backend
@@ -56,14 +53,13 @@ func NewPostgresPolicyServer(
 	ctx context.Context,
 	l logger.Logger,
 	pr PolicyRefresher,
-	e engine.V2p1Writer,
-	pl storage_v1.PoliciesLister) (PolicyServer, error) {
+	e engine.V2p1Writer) (PolicyServer, error) {
 
 	s := postgres.GetInstance()
 	if s == nil {
 		return nil, errors.New("postgres v2 singleton not yet initialized for policy server")
 	}
-	return NewPoliciesServer(ctx, l, pr, s, e, pl)
+	return NewPoliciesServer(ctx, l, pr, s, e)
 }
 
 // NewPoliciesServer returns a new IAM v2 Policy server.
@@ -72,14 +68,12 @@ func NewPoliciesServer(
 	l logger.Logger,
 	pr PolicyRefresher,
 	s storage.Storage,
-	e engine.V2p1Writer,
-	pl storage_v1.PoliciesLister) (PolicyServer, error) {
+	e engine.V2p1Writer) (PolicyServer, error) {
 
 	srv := &policyServer{
 		log:             l,
 		store:           s,
 		engine:          e,
-		v1:              pl,
 		policyRefresher: pr,
 	}
 
@@ -338,7 +332,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 	if req.Id == constants.AdminPolicyID {
 		for _, member := range members {
 			if member.Name == "team:local:admins" {
-				return nil, status.Error(codes.PermissionDenied, `cannot remove local team: 
+				return nil, status.Error(codes.PermissionDenied, `cannot remove local team:
 				admins from Chef-managed policy: Admin`)
 			}
 		}
