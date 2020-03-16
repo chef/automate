@@ -70,7 +70,6 @@ export class AutomateSettingsRequests {
       }
     };
 
-
     jobs.forEach((job: IngestJob) => {
       let thisJob;
       let matchedNest;
@@ -110,8 +109,7 @@ export class AutomateSettingsRequests {
       return {
         'name': job.name,
         'threshold': job.threshold,
-        'disabled': false  // threshold is likely gone if
-                           // diabled so check on if all are necessary
+        'disabled': false
       };
     }
   }
@@ -119,7 +117,7 @@ export class AutomateSettingsRequests {
 
   private convertResponseToJobSchedulerStatus(
     respJobSchedulerStatus: RespJobSchedulerStatus): JobSchedulerStatus {
-      // THIS IS MENTAL - THIS HAS TO CHANGE
+
     const allJobs = [];
 
     Object.keys(respJobSchedulerStatus).forEach((category: string) => {

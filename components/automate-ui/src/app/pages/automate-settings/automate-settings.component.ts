@@ -237,12 +237,13 @@ export class AutomateSettingsComponent implements OnInit {
       IngestJobs.ComplianceRemoveScans
     ].map(jobName => {
       const jobForm = this.getJobForm(jobName);
+      if (jobName === 'clientRunsRemoveData') { console.log( jobForm ) }
       const isNested = jobForm.nested_name ? true : false;
       const job = new IngestJob(null, null);
       job.category = jobForm.category;
       job.name = jobForm.name;
       job.disabled = jobForm.disabled;
-      job.threshold = jobForm.disabled ? '' : jobForm.threshold + jobForm.unit;
+      job.threshold = jobForm.threshold + jobForm.unit;
       if ( isNested ) {
         job.nested_name = jobForm.nested_name;
         job.threshold = jobForm.threshold;
@@ -260,6 +261,7 @@ export class AutomateSettingsComponent implements OnInit {
           this.showErrorNotification(error, errMsg);
           // SHOULD RESET THE FORM HERE IF THERE IS AN ERROR
         } else {
+          console.log('success');
           this.formChanged = false;
           this.showSuccessNotification();
         }
@@ -317,6 +319,7 @@ export class AutomateSettingsComponent implements OnInit {
     if (jobSchedulerStatus === null) {
       return;
     }
+    console.log('updateForm not null');
 
     jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
 
@@ -359,31 +362,31 @@ export class AutomateSettingsComponent implements OnInit {
   private getJobForm(jobName: string) {
     switch (jobName) {
       case IngestJobs.EventFeedRemoveData: {
-        return this.automateSettingsForm.value['eventFeedRemoveData'];
+        return this.automateSettingsForm.getRawValue()['eventFeedRemoveData'];
       }
       case IngestJobs.EventFeedServerActions: {
-        return this.automateSettingsForm.value['eventFeedServerActions'];
+        return this.automateSettingsForm.getRawValue()['eventFeedServerActions'];
       }
       case IngestJobs.ServiceGroupNoHealthChecks: {
-        return this.automateSettingsForm.value['serviceGroupNoHealthChecks'];
+        return this.automateSettingsForm.getRawValue()['serviceGroupNoHealthChecks'];
       }
       case IngestJobs.ServiceGroupRemoveServices: {
-        return this.automateSettingsForm.value['serviceGroupRemoveServices'];
+        return this.automateSettingsForm.getRawValue()['serviceGroupRemoveServices'];
       }
       case IngestJobs.ClientRunsRemoveData: {
-        return this.automateSettingsForm.value['clientRunsRemoveData'];
+        return this.automateSettingsForm.getRawValue()['clientRunsRemoveData'];
       }
       case IngestJobs.ClientRunsLabelMissing: {
-        return this.automateSettingsForm.value['clientRunsLabelMissing'];
+        return this.automateSettingsForm.getRawValue()['clientRunsLabelMissing'];
       }
       case IngestJobs.ClientRunsRemoveNodes: {
-        return this.automateSettingsForm.value['clientRunsRemoveNodes'];
+        return this.automateSettingsForm.getRawValue()['clientRunsRemoveNodes'];
       }
       case IngestJobs.ComplianceRemoveReports: {
-        return this.automateSettingsForm.value['complianceRemoveReports'];
+        return this.automateSettingsForm.getRawValue()['complianceRemoveReports'];
       }
       case IngestJobs.ComplianceRemoveScans: {
-        return this.automateSettingsForm.value['complianceRemoveScans'];
+        return this.automateSettingsForm.getRawValue()['complianceRemoveScans'];
       }
     }
   }
@@ -400,7 +403,7 @@ export class AutomateSettingsComponent implements OnInit {
 
     switch (job.name) {
       case 'missing_nodes': {
-        this.handleDisable(this.clientRunsRemoveData);
+        this.handleDisable(this.clientRunsRemoveData, job.disabled);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.clientRunsRemoveData.patchValue({
             unit: formUnit,
@@ -411,7 +414,7 @@ export class AutomateSettingsComponent implements OnInit {
       break;
 
       case 'missing_nodes_for_deletion': {
-        this.handleDisable(this.clientRunsLabelMissing);
+        this.handleDisable(this.clientRunsLabelMissing, job.disabled);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.clientRunsLabelMissing.patchValue({
           unit: formUnit,
