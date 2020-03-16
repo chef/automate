@@ -53,6 +53,8 @@ import {
 
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
+import { InfraRolesListComponent } from './modules/infra-proxy/infra-roles-list/infra-roles-list.component';
+import { InfraRoleDetailsComponent } from './modules/infra-proxy/infra-role-details/infra-role-details.component';
 
 const routes: Routes = [
   {
@@ -248,6 +250,15 @@ const routes: Routes = [
             {
               path: ':id/org/:orgid/cookbooks',
               component: CookbooksListComponent
+            },
+            {
+              path: ':id/org/:orgid/role',
+              component: InfraRolesListComponent,
+
+            },
+            {
+            path: ':id/org/:orgid/role/:name',
+              component: InfraRoleDetailsComponent
             }
           ]
         }
