@@ -16,7 +16,7 @@ toc = true
 +++
 
 {{< warning >}}
-This documentation and the feature it covers, IAM v1, are deprecated. This documentation will be removed soon. Most Chef Automate installations upgraded automatically to the current IAM implementation. Contact your customer service representative for help upgrading airgapped installations.
+This documentation and the feature it covers, IAM v1, are deprecated. This documentation will be removed soon. Most Chef Automate installations upgraded automatically to the current IAM implementation. The [Airgap Installation documentation {{< relref "airgapped-installation.md/#upgrades" >}} covers the manual upgrade process for systems without internet connectivity.
 The current IAM documentation pages are: the [IAM Overview]({{< relref "iam-v2-overview" >}}), the [IAM Guide]({{< relref "iam-v2-guide" >}}) and the [Chef Automate API]({{< relref "docs/api/#tag/teams" >}}).
 {{< /warning >}}
 
@@ -48,7 +48,7 @@ Policies can contain wildcards to match a range of values.
 
 ## Structure
 
-A policy has three essential components: the **subjects**, which is
+A policy has three components: the **subjects**, which is
 a list of users and teams, the **action** that those users/team members are allowed to perform,
 and the **resource** on which they perform actions. Resources can be very granular,
 but for most instances, restricting at the uppermost namespace will suffice.
