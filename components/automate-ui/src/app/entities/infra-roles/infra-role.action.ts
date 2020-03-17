@@ -47,7 +47,7 @@ export class GetRole implements Action {
   export class GetRoleSuccess implements Action {
     readonly type = RoleActionTypes.GET_SUCCESS;
   
-    constructor(public payload: RoleSuccessPayload) { }
+    constructor(public payload: InfraRole) { }
   }
   
   export class GetRoleFailure implements Action {

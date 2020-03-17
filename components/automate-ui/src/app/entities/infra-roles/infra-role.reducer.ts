@@ -3,14 +3,15 @@ import { set, pipe } from 'lodash/fp';
 
 import { EntityStatus } from 'app/entities/entities';
 import { RoleActionTypes, RoleActions } from './infra-role.action';
-import { InfraRole, RoleItem } from './infra-role.model';
+import { InfraRole } from './infra-role.model';
 
 export interface InfraRoleEntityState extends EntityState<InfraRole> {
+  status: EntityStatus;
   getAllStatus: EntityStatus;
   getStatus: EntityStatus;
 }
 
-export interface RoleItemEntityState extends EntityState<RoleItem> {
+export interface RoleItemEntityState extends EntityState<InfraRole> {
     getAllStatus: EntityStatus;
     getStatusItem: EntityStatus;
   }
@@ -19,12 +20,12 @@ const GET_ALL_STATUS = 'getAllStatus';
 const GET_STATUS = 'getStatus';
 
 export const infraRoleEntityAdapter: EntityAdapter<InfraRole> = createEntityAdapter<InfraRole>({
-  selectId: selectUserId
+  selectId: (role: InfraRole) => role.name
 });
 
-export const roleItemEntityAdapter: EntityAdapter<RoleItem> = createEntityAdapter<RoleItem>({
-    selectId: (role: RoleItem) => role.name
-  });
+// export const roleItemEntityAdapter: EntityAdapter<InfraRole> = createEntityAdapter<InfraRole>({
+//     selectId: (role: InfraRole) => role.name
+//   });
 
 export function selectUserId(a: InfraRole): string {
     //In this case this would be optional since primary key is id
@@ -58,7 +59,7 @@ export function infraRoleEntityReducer(
   
     case RoleActionTypes.GET_SUCCESS:
        return set(GET_STATUS, EntityStatus.loadingSuccess,
-        infraRoleEntityAdapter.addOne(action.payload.name, state));
+        infraRoleEntityAdapter.addOne(action.payload, state));
   
     case RoleActionTypes.GET_FAILURE:
       return set(GET_STATUS, EntityStatus.loadingFailure, state);
