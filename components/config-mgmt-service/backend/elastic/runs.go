@@ -3,6 +3,7 @@ package elastic
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"strings"
 	"time"
 
@@ -67,6 +68,67 @@ func (es Backend) GetRun(runID string, endTime time.Time) (backend.Run, error) {
 	}
 
 	return run, nil
+}
+
+func (es Backend) GetTimeseriCheckinCounts(startTime, endTime time.Time) ([]backend.CheckInPeroid, error) {
+	var (
+		dateHistoTag   = "dateHisto"
+		mainQuery      = elastic.NewBoolQuery()
+		eventTypeItems = "items"
+	)
+
+	rangeQuery, _ := newRangeQuery(startTime.Format(time.RFC3339),
+		endTime.Format(time.RFC3339), "end_time")
+
+	mainQuery = mainQuery.Must(rangeQuery)
+
+	timezone := getTimezoneSoStartAtMidnight(startTime)
+
+	bucketHist := elastic.NewDateHistogramAggregation().Field("end_time").
+		Interval("1d").
+		MinDocCount(0). // needed to return empty buckets
+		ExtendedBounds(
+			startTime.Format(time.RFC3339), endTime.Format(time.RFC3339)). // needed to return empty buckets
+		Format("yyyy-MM-dd'T'HH:mm:ssZ").
+		TimeZone(timezone). // needed start the buckets at the beginning of the day.
+		SubAggregation(eventTypeItems,
+			elastic.NewTermsAggregation().Field("entity_uuid"))
+
+	searchResult, err := es.client.Search().
+		Index("converge-history-*").
+		Query(mainQuery).
+		Aggregation(dateHistoTag, bucketHist).
+		Do(context.Background())
+	if err != nil {
+		return []backend.CheckInPeroid{}, err
+	}
+
+	dateHistoRes, found := searchResult.Aggregations.DateHistogram(dateHistoTag)
+	if !found {
+		return []backend.CheckInPeroid{}, fmt.Errorf("no runs found")
+	}
+
+	checkInPeroids := make([]backend.CheckInPeroid, len(dateHistoRes.Buckets))
+	for index, bucket := range dateHistoRes.Buckets {
+		item, found := bucket.Aggregations.Terms(eventTypeItems)
+		if !found {
+			return []backend.CheckInPeroid{}, fmt.Errorf("no runs found")
+		}
+		checkInPeroids[index].CheckInCount = len(item.Buckets)
+		checkInPeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
+		checkInPeroids[index].End = startTime.Add(time.Hour * 24 *
+			time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
+	}
+
+	return checkInPeroids, nil
+}
+
+func getTimezoneSoStartAtMidnight(start time.Time) string {
+	if start.Hour() < 12 {
+		return fmt.Sprintf("-%02d:00", start.Hour())
+	}
+
+	return fmt.Sprintf("+%02d:00", (24 - start.Hour()))
 }
 
 // GetRunsCounts returns a RunsCounts object that contains the number of success, failure, total runs for a node

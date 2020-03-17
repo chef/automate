@@ -62,6 +62,7 @@ type Client interface {
 	// returns (Runs, error)
 	GetRunsPageByCursor(context.Context, string, time.Time, time.Time, map[string][]string, time.Time,
 		string, int, bool) ([]Run, error)
+	GetTimeseriCheckinCounts(time.Time, time.Time) ([]CheckInPeroid, error)
 }
 
 // Types that we consume from the ingest-service
@@ -79,6 +80,12 @@ type Action ingest.InternalChefAction
 type Deprecation ingest.Deprecation
 
 type Resource ingest.Resource
+
+type CheckInPeroid struct {
+	Start        time.Time
+	End          time.Time
+	CheckInCount int
+}
 
 type InventoryNode struct {
 	EntityUUID       string     `json:"entity_uuid"`
