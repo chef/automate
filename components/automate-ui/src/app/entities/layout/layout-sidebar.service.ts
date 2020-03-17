@@ -181,7 +181,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
                 icon: 'people',
                 route: '/settings/teams',
                 authorized: {
-                  allOf: ['/auth/teams', 'get']
+                  allOf: ['/iam/v2/teams', 'get']
                 }
               },
               {
