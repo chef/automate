@@ -138,24 +138,24 @@ describe('AutomateSettingsComponent', () => {
 
   });
 
-  // describe('when jobSchedulerStatus is null', () => {
-  //   it('does not update the forms', () => {
-  //     const formBeforeUpdate = component.automateSettingsForm;
-  //     component.updateForm(null);
-  //     expect(component.automateSettingsForm).toEqual(formBeforeUpdate);
-  //   });
-  // });
+  describe('when jobSchedulerStatus is null', () => {
+    it('does not update the forms', () => {
+      const formBeforeUpdate = component.automateSettingsForm;
+      component.updateForm(null);
+      expect(component.automateSettingsForm).toEqual(formBeforeUpdate);
+    });
+  });
 
-  // describe('noChanges()', () => {
-  //   it('reports if there has been any changes to the form', () => {
-  //     component.ngOnInit();
-  //     expect(component.noChanges()).toEqual(true);
-  //     component.patchDisableValue(component.deleteMissingNodesForm, true);
-  //     expect(component.noChanges()).toEqual(false);
-  //   });
-  // });
+  describe('noChanges()', () => {
+    it('reports if there has been any changes to the form', () => {
+      component.ngOnInit();
+      expect(component.noChanges()).toEqual(true);
+      component.toggleInput(component.eventFeedRemoveData, true);
+      expect(component.noChanges()).toEqual(false);
+    });
+  });
 
-  // describe('when jobSchedulerStatus is set', () => {
+  describe('when jobSchedulerStatus is set', () => {
   //   beforeAll(() => {
   //     const jobMissingNodes: IngestJob = {
   //       running: false,
@@ -231,7 +231,7 @@ describe('AutomateSettingsComponent', () => {
       //   });
       // });
 
-    // });
+    });
 
 });
 
