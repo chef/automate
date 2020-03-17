@@ -652,6 +652,13 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	contListItems := make([]*reportingapi.ControlItem, 0)
 
+	controlSummaryTotals := &reportingapi.ControlSummary{
+		Passed:  &reportingapi.Total{},
+		Skipped: &reportingapi.Total{},
+		Failed:  &reportingapi.Failed{},
+		Waived:  &reportingapi.Total{},
+	}
+
 	client, err := backend.ES2Client()
 	if err != nil {
 		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
@@ -833,6 +840,11 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 								return nil, err
 							}
 							contListItems = append(contListItems, &contListItem)
+							controlSummaryTotals.Passed.Total += contListItem.ControlSummary.Passed.Total
+							controlSummaryTotals.Failed.Total += contListItem.ControlSummary.Failed.Total
+							controlSummaryTotals.Skipped.Total += contListItem.ControlSummary.Skipped.Total
+							controlSummaryTotals.Waived.Total += contListItem.ControlSummary.Waived.Total
+							controlSummaryTotals.Total += contListItem.ControlSummary.Total
 						}
 					}
 				}
@@ -840,7 +852,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		}
 	}
 
-	contListItemList := &reportingapi.ControlItems{ControlItems: contListItems}
+	contListItemList := &reportingapi.ControlItems{ControlItems: contListItems, ControlSummaryTotals: controlSummaryTotals}
 	return contListItemList, nil
 }
 
