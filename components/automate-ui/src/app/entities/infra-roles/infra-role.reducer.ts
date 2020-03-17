@@ -50,7 +50,6 @@ export function infraRoleEntityReducer(
     case RoleActionTypes.GET_SUCCESS:
        return set(GET_STATUS, EntityStatus.loadingSuccess,
         infraRoleEntityAdapter.addOne(action.payload, state));
-
     case RoleActionTypes.GET_FAILURE:
       return set(GET_STATUS, EntityStatus.loadingFailure, state);
 
