@@ -34,7 +34,7 @@ export function userEntityReducer(state: UserEntityState = UserEntityInitialStat
 
     case UserActionTypes.GET_ALL_SUCCESS:
       return set('getStatus', EntityStatus.loadingSuccess,
-        userEntityAdapter.addAll(action.payload.users, state));
+        userEntityAdapter.setAll(action.payload.users, state));
 
     case UserActionTypes.GET_ALL_FAILURE:
       return set('getStatus', EntityStatus.loadingFailure, state);

@@ -25,7 +25,7 @@ export function jobEntityReducer(state: JobEntityState = JobEntityInitialState,
 
     case JobActionTypes.GET_JOBS_SUCCESS:
       return set('status', EntityStatus.loadingSuccess,
-                 jobEntityAdapter.addAll(action.payload.jobs, state));
+                 jobEntityAdapter.setAll(action.payload.jobs, state));
 
     case JobActionTypes.GET_JOBS_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);
