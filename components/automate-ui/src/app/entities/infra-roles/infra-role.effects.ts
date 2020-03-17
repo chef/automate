@@ -14,7 +14,6 @@ import {
   GetRolesFailure,
   RoleActionTypes,
   GetRole,
-  RoleSuccessPayload,
   GetRoleSuccess,
   GetRoleFailure
 } from './infra-role.action';
@@ -55,7 +54,7 @@ export class InfraRoleEffects {
       ofType(RoleActionTypes.GET),
       mergeMap(({ payload: { server_id, org_id, name } }: GetRole) =>
         this.requests.getRole(server_id, org_id, name).pipe(
-          map((resp: RoleSuccessPayload) => new GetRoleSuccess(resp)),
+          map((resp) => new GetRoleSuccess(resp)),
           catchError((error: HttpErrorResponse) => observableOf(new GetRoleFailure(error))))));
 
  @Effect()
