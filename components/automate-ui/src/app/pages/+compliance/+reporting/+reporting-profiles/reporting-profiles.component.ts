@@ -177,27 +177,10 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
     this.statsService.getSingleReport(reportID, filters).pipe(
       takeUntil(this.isDestroyed))
       .subscribe(data => {
-        const controls = this.addControlStatus(data);
+        const controls = data.profiles[0].controls;
         this.layerTwoData = Object.assign({'id': item.name }, groupBy(controls, 'status'));
         this.scanResultsPane = 1;
       });
-  }
-
-  addControlStatus(data) {
-    return data.profiles[0].controls.map(control => {
-      if (control.results) {
-        const isSkipped = control.results.every(r => r.status === 'skipped');
-        const isFailed = control.results.some(r => r.status === 'failed');
-        if (isSkipped) {
-          control.status = 'skipped';
-        } else if (isFailed) {
-          control.status = 'failed';
-        } else {
-          control.status = 'passed';
-        }
-      }
-      return control;
-    });
   }
 
   setControl(item) {

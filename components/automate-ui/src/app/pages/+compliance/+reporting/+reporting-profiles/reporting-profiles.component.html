@@ -22,9 +22,12 @@
     <chef-tbody *ngIf="!reportData.profilesListLoading">
       <chef-tr *ngFor="let profile of reportData.profilesList.items">
         <chef-td class="title-cell">
-          <chef-icon class="status-icon" [ngClass]="profile.status">
+          <!-- Material Icon Font -->
+          <chef-icon *ngIf="profile.status !== 'waived'" class="status-icon" [ngClass]="profile.status">
             {{ statusIcon(profile.status) }}
           </chef-icon>
+          <!-- Custom Waived Icon -->
+          <div *ngIf="profile.status === 'waived'" class="waived-icon"></div>
           <a [routerLink]="['/compliance/reports/profiles', profile.id]">{{ profile.title }}</a>
         </chef-td>
         <chef-td class="version-cell">{{ profile.version }}</chef-td>
@@ -70,12 +73,13 @@
           <p>Tap on a node to view detailed scan results</p>
         </div>
         <ul class="results-profiles-list">
-          <ng-container *ngFor="let status of ['failed', 'passed', 'skipped']">
+          <ng-container *ngFor="let status of ['failed', 'passed', 'skipped', 'waived']">
             <li
               *ngFor="let node of layerOneData[status]"
               class="results-profiles-list-item">
               <div class="list-item-summary">
-                <chef-icon class="list-item-icon" [ngClass]="node.status">{{ statusIcon(status) }}</chef-icon>
+                <chef-icon *ngIf="node.status !== 'waived'" class="list-item-icon" [ngClass]="node.status">{{ statusIcon(status) }}</chef-icon>
+                <div *ngIf="node.status === 'waived'" class="waived-icon"></div>
                 <div class="list-item-text">
                   <p class="node-name">
                     <strong>{{ node.name }}</strong>
@@ -98,12 +102,15 @@
           <p>{{ layerTwoData?.id }}</p>
         </div>
         <ul class="results-profiles-list">
-          <ng-container *ngFor="let status of ['failed', 'passed', 'skipped']">
+          <ng-container *ngFor="let status of ['failed', 'passed', 'skipped', 'waived']">
             <li
               *ngFor="let control of layerTwoData[status]"
               class="results-profiles-list-item">
               <div class="list-item-summary">
-                <chef-icon class="list-item-icon" [ngClass]="status">{{ statusIcon(status) }}</chef-icon>
+                <!-- Material Icon Font -->
+                <chef-icon *ngIf="status !== 'waived'" class="list-item-icon" [ngClass]="status">{{ statusIcon(status) }}</chef-icon>
+                <!-- Custom Waived Icon -->
+                <div *ngIf="status === 'waived'" class="waived-icon"></div>
                 <div class="list-item-text">
                   <p class="node-name">
                     <strong>{{ control.title }}</strong>
