@@ -57,7 +57,7 @@ export class JobEditComponent implements OnDestroy {
   profiles$: Observable<Profile[]>;
   job$: Observable<Job>;
 
-  isDestroyed: Subject<boolean> = new Subject<boolean>();
+  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -99,6 +99,7 @@ export class JobEditComponent implements OnDestroy {
 
   public ngOnDestroy() {
     this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   public setupForm() {
@@ -156,8 +157,8 @@ export class JobEditComponent implements OnDestroy {
         this.profiles$,
         this.job$
       ]).pipe(
-      takeUntil(this.isDestroyed),
-      debounceTime(250))
+        takeUntil(this.isDestroyed),
+        debounceTime(250))
       .subscribe(([managers, profiles, job]: any) => {
         form.get('id').setValue(job.id);
 
@@ -191,8 +192,10 @@ export class JobEditComponent implements OnDestroy {
                 values: this.fb.array(ns['values']),
                 include: !ns['exclude']
               });
-              tagGroup.get('key').valueChanges.pipe(
-                startWith(tagGroup.get('key').value))
+              tagGroup.get('key').valueChanges
+                .pipe(
+                  startWith(tagGroup.get('key').value),
+                  takeUntil(this.isDestroyed))
                 .subscribe(key => {
                   const field = `tags:${key}`;
                   this.store.dispatch(new ManagerSearchFields({managerId, field}));
