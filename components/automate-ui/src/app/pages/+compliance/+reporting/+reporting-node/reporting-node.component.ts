@@ -115,7 +115,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
       if (status === 'all') {
         return true;
       }
-      if (status === 'passed' || status === 'skipped') {
+      if (status === 'passed' || status === 'skipped' || status === 'waived') {
         return c.status === status;
       }
       if (status === 'critical') {

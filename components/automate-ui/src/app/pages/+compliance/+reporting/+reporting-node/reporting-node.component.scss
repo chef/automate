@@ -167,7 +167,7 @@ chef-tooltip[for='skipped-count'] {
       display: flex;
       align-items: center;
 
-      chef-icon {
+      .filter-icon {
         margin: -2px 0.5em 0 0;
       }
     }
@@ -203,6 +203,10 @@ chef-tooltip[for='skipped-count'] {
 
       &.passed  {
         background: $chef-success;
+      }
+
+      &.waived  {
+        background: $chef-dark-grey;
       }
     }
 
@@ -243,7 +247,7 @@ chef-tooltip[for='skipped-count'] {
       flex-grow: 5;
       word-break: break-all;
 
-      chef-icon {
+      .status-icon {
         margin-right: 1em;
       }
 
@@ -539,5 +543,25 @@ chef-tooltip[for='skipped-count'] {
         }
       }
     }
+  }
+}
+
+dl.waiver-details {
+  display: flex;
+  flex-flow: row wrap;
+
+  dt, dd {
+    font-size: 14px;
+    margin: 5px 0;
+  }
+
+  dt {
+    flex-basis: 15%;
+    font-weight: bold;
+  }
+
+  dd {
+    flex-basis: 85%;
+    flex-grow: 1;
   }
 }
