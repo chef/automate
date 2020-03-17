@@ -257,54 +257,31 @@ describe('AutomateSettingsComponent', () => {
         expect(newFormValues.disabled).toEqual(disabledStatus);
         expect(newFormValues.threshold).toEqual(threshold);
       })
-    })
+    });
 
-    // it('updates the "deleteMissingNodes" form group correctly', () => {
-    //   component.updateForm(mockJobSchedulerStatus);
+    describe('when user applyChanges()', () => {
+      it('saves settings', () => {
+        component.updateForm(mockJobSchedulerStatus);
+        component.applyChanges();
+        expect(component.formChanged).toEqual(false);
+        expect(component.notificationType).toEqual('info');
+        expect(component.notificationMessage)
+          .toEqual('All settings have been updated successfully');
+        expect(component.notificationVisible).toEqual(true);
+      });
 
-    //   const deleteMssingNodesValues = component.automateSettingsForm
-    //     .controls.deleteMissingNodes.value;
-
-    //   expect(deleteMssingNodesValues.disable).toEqual(false);
-    //   expect(deleteMssingNodesValues.threshold).toEqual('24');
-    //   expect(deleteMssingNodesValues.unit).toEqual('h');
-    // });
-
-    // it('does not updates the "eventFeed" form group', () => {
-    //   component.updateForm(mockJobSchedulerStatus);
-
-    //   const eventFeedValues = component.automateSettingsForm
-    //     .controls.eventFeed.value;
-
-    //   // These are the defaults
-    //   expect(eventFeedValues.disable).toEqual(false);
-    //   expect(eventFeedValues.threshold).toEqual('');
-    //   expect(eventFeedValues.unit).toEqual('d');
-    // });
-
-    // describe('when user applyChanges()', () => {
-    //   it('saves settings', () => {
-    //     component.updateForm(mockJobSchedulerStatus);
-    //     component.applyChanges();
-    //     expect(component.formChanged).toEqual(false);
-    //     expect(component.notificationType).toEqual('info');
-    //     expect(component.notificationMessage)
-    //       .toEqual('All settings have been updated successfully');
-    //     expect(component.notificationVisible).toEqual(true);
-    //   });
-
-      // xdescribe('and there is an error', () => {
-      //   it('triggers a notification error (shows a banner)', () => {
-      //     component.updateForm(mockJobSchedulerStatus);
-      //     component.applyChanges();
-      //     expect(component.notificationType).toEqual('error');
-      //     expect(component.notificationMessage)
-      //       .toEqual('Unable to update one or more settings. Verify the console logs.');
-      //     expect(component.notificationVisible).toEqual(true);
-      //   });
-      // });
+      xdescribe('and there is an error', () => {
+        it('triggers a notification error (shows a banner)', () => {
+          component.updateForm(mockJobSchedulerStatus);
+          component.applyChanges();
+          expect(component.notificationType).toEqual('error');
+          expect(component.notificationMessage)
+            .toEqual('Unable to update one or more settings. Verify the console logs.');
+          expect(component.notificationVisible).toEqual(true);
+        });
+      });
 
     });
 
-});
-
+  });
+})
