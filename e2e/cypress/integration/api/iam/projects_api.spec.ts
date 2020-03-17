@@ -8,96 +8,57 @@ describeIfIAMV2p1('projects API', () => {
     status: string;
   }
 
-  describe('project graveyarding and deletion', () => {
-    const projectID = `${cypressPrefix}-to-delete-${Cypress.moment().format('MMDDYYhhmm')}`;
-    before(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-    });
+  const avengersProject = {
+    id: `${cypressPrefix}-project1-${Cypress.moment().format('MMDDYYhhmm')}`,
+    name: 'Test Avengers Project'
+  };
 
-    it('gives a 404 when the project does not exist', () => {
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        url: '/apis/iam/v2/projects/not_found',
-        failOnStatusCode: false
-      }).then((response) => {
-        expect(response.status).to.equal(404);
-      });
-    });
+  const xmenProject = {
+    id: `${cypressPrefix}-project2-${Cypress.moment().format('MMDDYYhhmm')}`,
+    name: 'Test X-men Project'
+  };
 
-    it('graveyards and then deletes a project that exists', () => {
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        url: '/apis/iam/v2/projects',
-        method: 'POST',
-        body: {
-          id: projectID,
-          name: 'to delete'
-        }
-      });
+  const avengersRule = {
+    id: 'avengers-rule-1',
+    name: 'first rule of avengers project',
+    type: 'NODE',
+    project_id: avengersProject.id,
+    conditions: [
+      {
+        attribute: 'CHEF_ORGANIZATION',
+        operator: 'EQUALS',
+        values: ['avengers']
+      }
+    ]
+  };
 
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        url: `/apis/iam/v2/projects/${projectID}`,
-        method: 'DELETE'
-      });
+  const xmenRule = {
+    id: 'xmen-rule-1',
+    name: 'first rule of xmen project',
+    type: 'NODE',
+    project_id: xmenProject.id,
+    conditions: [
+      {
+        attribute: 'CHEF_ORGANIZATION',
+        operator: 'EQUALS',
+        values: ['xmen']
+      }
+    ]
+  };
 
-      waitUntilProjectNotInGraveyard(projectID, 100);
-
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        url: '/apis/iam/v2/projects',
-        method: 'POST',
-        body: {
-          id: projectID,
-          name: 'will fail'
-        },
-        failOnStatusCode: false
-      }).then((response) => {
-        expect(response.status).to.equal(409);
-      });
-      waitUntilProjectNotInGraveyard(projectID, 100);
-    });
-
+  before(() => {
+    // Cypress recommends state cleanup in the before block to ensure
+    // it gets run every time:
+    // tslint:disable-next-line:max-line-length
+    // https://docs.cypress.io/guides/references/best-practices.html#Using-after-or-afterEach-hooks
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
   });
 
-  describe('applying project', () => {
-    const avengersProject = {
-      id: `${cypressPrefix}-project1-${Cypress.moment().format('MMDDYYhhmm')}`,
-      name: 'Test Avengers Project'
-    };
+  after(() => {
+    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+  });
 
-    const xmenProject = {
-      id: `${cypressPrefix}-project2-${Cypress.moment().format('MMDDYYhhmm')}`,
-      name: 'Test X-men Project'
-    };
-
-    const avengersRule = {
-      id: 'avengers-rule-1',
-      name: 'first rule of avengers project',
-      type: 'NODE',
-      project_id: avengersProject.id,
-      conditions: [
-        {
-          attribute: 'CHEF_ORGANIZATION',
-          operator: 'EQUALS',
-          values: ['avengers']
-        }
-      ]
-    };
-
-    const xmenRule = {
-      id: 'xmen-rule-1',
-      name: 'first rule of xmen project',
-      type: 'NODE',
-      project_id: xmenProject.id,
-      conditions: [
-        {
-          attribute: 'CHEF_ORGANIZATION',
-          operator: 'EQUALS',
-          values: ['xmen']
-        }
-      ]
-    };
+  describe('applying project rules', () => {
 
     // testing values
     const noRulesStr = 'NO_RULES';
@@ -107,12 +68,6 @@ describeIfIAMV2p1('projects API', () => {
     const numberOfNodesAdded = 4;
 
     before(() => {
-      // Cypress recommends state cleanup in the before block to ensure
-      // it gets run every time:
-      // tslint:disable-next-line:max-line-length
-      // https://docs.cypress.io/guides/references/best-practices.html#Using-after-or-afterEach-hooks
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
@@ -192,10 +147,6 @@ describeIfIAMV2p1('projects API', () => {
       });
     });
 
-    after(() => {
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-    });
-
     it('new rules get applied to nodes', () => {
       // initially no rules
       for (const project of [avengersProject, xmenProject]) {
@@ -267,7 +218,7 @@ describeIfIAMV2p1('projects API', () => {
           .forEach(({ status }) => expect(status).to.equal(editsPendingStr));
       });
 
-      cy.applyRulesAndWait(500);
+      cy.applyRulesAndWait(100);
 
       // confirm rules are applied
       for (const project of [avengersProject, xmenProject]) {
@@ -414,6 +365,7 @@ describeIfIAMV2p1('projects API', () => {
     });
 
     it('deleted rules get applied to nodes', () => {
+      // verify project has applied rules
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
@@ -422,22 +374,14 @@ describeIfIAMV2p1('projects API', () => {
         expect(response.body.project.status).to.equal(rulesAppliedStr);
       });
 
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'GET',
-        url: '/apis/iam/v2/projects'
-      }).then((response) => {
-        const projects: Project[] = response.body.projects;
-        projects.filter(({ id, status }) => id === avengersProject.id)
-          .forEach(({ status }) => expect(status).to.equal(rulesAppliedStr));
-      });
-
+      // delete the project's rule
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'DELETE',
         url: `/apis/iam/v2/projects/${avengersRule.project_id}/rules/${avengersRule.id}`
       });
 
+      // verify project now has edits pending
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
@@ -446,18 +390,9 @@ describeIfIAMV2p1('projects API', () => {
         expect(response.body.project.status).to.equal(editsPendingStr);
       });
 
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'GET',
-        url: '/apis/iam/v2/projects'
-      }).then((response) => {
-        const projects: Project[] = response.body.projects;
-        projects.filter(({ id, status }) => id === avengersProject.id)
-          .forEach(({ status }) => expect(status).to.equal(editsPendingStr));
-      });
-
       cy.applyRulesAndWait(100);
 
+      // verify the project no longer has any rules
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'GET',
@@ -466,16 +401,7 @@ describeIfIAMV2p1('projects API', () => {
         expect(response.body.project.status).to.equal(noRulesStr);
       });
 
-      cy.request({
-        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-        method: 'GET',
-        url: '/apis/iam/v2/projects'
-      }).then((response) => {
-        const projects: Project[] = response.body.projects;
-        projects.filter(({ id, status }) => id === avengersProject.id)
-          .forEach(({ status }) => expect(status).to.equal(noRulesStr));
-      });
-
+      // verify the project is no longer applied to node data
       cy.request({
         headers: {
           'api-token': Cypress.env('ADMIN_TOKEN'),
@@ -497,6 +423,105 @@ describeIfIAMV2p1('projects API', () => {
       }).then((response) => {
         expect(response.body).to.have.length(2);
       });
+    });
+  });
+
+  describe('project graveyarding and deletion', () => {
+    it('gives a 404 when the project does not exist', () => {
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        url: '/apis/iam/v2/projects/not_found',
+        failOnStatusCode: false
+      }).then((response) => {
+        expect(response.status).to.equal(404);
+      });
+    });
+
+    it('fails to delete project with staged or applied rules', () => {
+
+      // Try to delete a project with an applied rule
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'DELETE',
+        url: `/apis/iam/v2/projects/${xmenProject.id}`,
+        failOnStatusCode: false
+      }).then((deleteResp) => {
+        expect(deleteResp.status,
+          'Fails to delete a project with a applied rule').to.be.equal(400);
+      });
+
+      // Add a new staged rule to a project with existing rules
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: `/apis/iam/v2/projects/${xmenProject.id}/rules`,
+        body: {
+          id: 'xmen-rule-2',
+          name: 'second rule of xmen project',
+          type: 'NODE',
+          project_id: xmenProject.id,
+          conditions: [
+            {
+              attribute: 'CHEF_ORGANIZATION',
+              operator: 'EQUALS',
+              values: ['xmen']
+            }
+          ]
+        }
+      });
+
+      // Try to delete the project with a staged rule
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'DELETE',
+        url: `/apis/iam/v2/projects/${xmenProject.id}`,
+        failOnStatusCode: false
+      }).then((deleteResp) => {
+        expect(deleteResp.status,
+          'Fails to delete a project with a staged rule').to.equal(400);
+      });
+
+      // Delete an applied rule
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'DELETE',
+        url: `/apis/iam/v2/projects/${xmenProject.id}/rules/${xmenRule.id}`
+      });
+
+      // Try to delete a project with a deleted rule that has not been applied
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'DELETE',
+        url: `/apis/iam/v2/projects/${xmenProject.id}`,
+        failOnStatusCode: false
+      }).then((deleteResp) => {
+        expect(deleteResp.status,
+          'Fails to delete a project with a deleted rule that has not been applied')
+          .to.be.equal(400);
+      });
+    });
+
+    it('successfully deletes a project with no rules', () => {
+
+      // Try deleting a project with no rules
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'DELETE',
+        url: `/apis/iam/v2/projects/${avengersProject.id}`
+      }).then((deleteResp) => {
+        expect(deleteResp.status).to.be.equal(200);
+      });
+
+      // Ensure the project is removed
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'GET',
+        url: '/apis/iam/v2/projects'
+      }).then((resp: Cypress.ObjectLike) => {
+        expect(responseContainsProject(resp.body.projects, avengersProject.id)).to.be.equal(false);
+      });
+
+      waitUntilProjectNotInGraveyard(avengersProject.id, 100);
     });
   });
 });
@@ -526,7 +551,7 @@ function waitForUnassignedNodes(totalNodes: number, maxRetries: number) {
 
 function waitUntilProjectNotInGraveyard(projectID: string, attempts: number): void {
   if (attempts === -1) {
-    throw new Error('apply-rules never finished');
+    throw new Error('project-delete never finished');
   }
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
@@ -547,4 +572,10 @@ function waitUntilProjectNotInGraveyard(projectID: string, attempts: number): vo
       waitUntilProjectNotInGraveyard(projectID, --attempts);
     }
   });
+}
+
+function responseContainsProject(projectsResponse: any, projectId: string): boolean {
+  return projectsResponse &&
+    projectsResponse.length > 0 &&
+    projectsResponse.some((p: any) => p.id === projectId);
 }

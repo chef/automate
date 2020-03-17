@@ -435,6 +435,17 @@ function deleteProjects(projectIdsToDelete: string[], index: number,
         // Delete all the rules then call the deleteProjects with the next project
         deleteProjectRules(projectId, rulesResp.body.rules, finish);
       } else {
+        // make sure there are no rules staged for deletion that need to be applied
+        cy.request({
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+          method: 'GET',
+          url: `/apis/iam/v2/projects/${projectId}`
+        }).then((projectResp) => {
+          if (projectResp.body.project.status === 'EDITS_PENDING') {
+            rulesWereDeleted = true;
+          }
+        });
+
         deleteProjects(projectIdsToDelete, index + 1, rulesWereDeleted);
       }
     });
