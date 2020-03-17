@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -12,7 +12,7 @@ import { ProjectService } from 'app/entities/projects/project.service';
   styleUrls: ['./process-progress-bar.component.scss'],
   encapsulation: ViewEncapsulation.None
 })
-export class ProcessProgressBarComponent implements OnInit {
+export class ProcessProgressBarComponent implements OnInit, OnDestroy {
   public confirmApplyStopModalVisible = false;
   public cancelRulesInProgress = false;
   public mode = 'determinate';
@@ -43,6 +43,11 @@ export class ProcessProgressBarComponent implements OnInit {
         this.layoutFacade.layout.userNotifications.updatesProcessing = this.applyRulesInProgress;
         this.layoutFacade.updateDisplay();
       });
+  }
+
+  ngOnDestroy() {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
   public openConfirmUpdateStopModal(): void {

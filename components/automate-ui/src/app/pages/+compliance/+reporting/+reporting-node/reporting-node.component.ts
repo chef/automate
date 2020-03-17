@@ -6,6 +6,7 @@ import { ReportQueryService } from '../../shared/reporting/report-query.service'
 import * as moment from 'moment';
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-reporting-node',
@@ -43,10 +44,12 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     reportQuery.filters = reportQuery.filters.concat([{type: {name: 'node_id'}, value: {id}}]);
 
     this.statsService.getReports(reportQuery, {sort: 'latest_report.end_time', order: 'DESC'})
+      .pipe(takeUntil(this.isDestroyed))
       .subscribe(reports => {
         this.reports = reports;
         const queryForReport = this.reportQuery.getReportQueryForReport(reports[0]);
         this.statsService.getSingleReport(reports[0].id, queryForReport)
+          .pipe(takeUntil(this.isDestroyed))
           .subscribe(data => {
             this.reportLoading = false;
             this.layoutFacade.ShowPageLoading(false);
@@ -65,6 +68,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
     this.layoutFacade.ShowPageLoading(true);
     const reportQuery = this.reportQuery.getReportQueryForReport(report);
     this.statsService.getSingleReport(report.id, reportQuery)
+      .pipe(takeUntil(this.isDestroyed))
       .subscribe(data => {
         this.reportLoading = false;
         this.layoutFacade.ShowPageLoading(false);

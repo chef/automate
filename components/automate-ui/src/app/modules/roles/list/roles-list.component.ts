@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ChefSorters } from 'app/helpers/auth/sorter';
@@ -28,8 +28,11 @@ export class RolesListComponent implements OnInit, OnDestroy {
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService
   ) {
-    store.select(getAllStatus).pipe(map(loading)).subscribe((isloading) =>
-      this.layoutFacade.ShowPageLoading(isloading));
+    store.select(getAllStatus).pipe(
+      map(loading),
+      takeUntil(this.isDestroyed)
+    ).subscribe(isLoading =>
+      this.layoutFacade.ShowPageLoading(isLoading));
 
     this.sortedRoles$ = store.select(allRoles).pipe(
       map((roles: Role[]) => ChefSorters.naturalSort(roles, 'name')));
