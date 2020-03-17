@@ -17,11 +17,26 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { AutomateSettingsComponent } from './automate-settings.component';
 
+import { using } from 'app/testing/spec-helpers';
+
 let mockJobSchedulerStatus: JobSchedulerStatus = null;
 
 class MockTelemetryService {
   track() { }
 }
+
+// A reusable list of all the form names
+const ALL_FORMS = [
+  'eventFeedRemoveData',
+  'eventFeedServerActions',
+  'serviceGroupNoHealthChecks',
+  'serviceGroupRemoveServices',
+  'clientRunsRemoveData',
+  'clientRunsLabelMissing',
+  'clientRunsRemoveNodes',
+  'complianceRemoveReports',
+  'complianceRemoveScans'
+];
 
 describe('AutomateSettingsComponent', () => {
   let component: AutomateSettingsComponent;
@@ -71,26 +86,57 @@ describe('AutomateSettingsComponent', () => {
   it('sets defaults for all form groups', () => {
     expect(component.automateSettingsForm).not.toEqual(null);
     expect(component.automateSettingsForm instanceof FormGroup).toBe(true);
-    expect(Object.keys(component.automateSettingsForm.controls)).toEqual([
-      'eventFeedRemoveData',
-      'eventFeedServerActions',
-      'serviceGroupNoHealthChecks',
-      'serviceGroupRemoveServices',
-      'clientRunsRemoveData',
-      'clientRunsLabelMissing',
-      'clientRunsRemoveNodes',
-      'complianceRemoveReports',
-      'complianceRemoveScans'
-    ]);
+    expect(Object.keys(component.automateSettingsForm.controls)).toEqual(ALL_FORMS);
   });
 
-  // describe('patchDisableValue(form, value)', () => {
-  //   it('updates the value of the disable control from the provided form', () => {
-  //     expect(component.clientRunsForm.value.disable).toEqual(false);
-  //     component.patchDisableValue(component.clientRunsForm, true);
-  //     expect(component.clientRunsForm.value.disable).toEqual(true);
-  //   });
-  // });
+  describe('toggleInput(form, value)', () => {
+
+    using([
+      ['eventFeedRemoveData', false, true],
+      ['eventFeedRemoveData', false, true ],
+      ['eventFeedServerActions', false, true ],
+      // Service Groups on not currently uncheckable through the UI
+      // ['serviceGroupNoHealthChecks', false, true ],
+      // ['serviceGroupRemoveServices', false, true ],
+      ['clientRunsRemoveData', false, true ],
+      ['clientRunsLabelMissing', false, true ],
+      ['clientRunsRemoveNodes', false, true ],
+      ['complianceRemoveReports', false, true ],
+      ['complianceRemoveScans', false, true ]
+    ], function( form: string, currentState: boolean, expectedState: boolean) {
+      it('deactivates the asociated form', () => {
+        expect(component[form].value.disabled).toEqual(currentState);
+        component.toggleInput(component[form], currentState);
+        expect(component[form].value.disabled).toEqual(expectedState);
+        expect(component[form].get('unit').disabled).toBe(expectedState);
+        expect(component[form].get('threshold').disabled).toBe(expectedState);
+      });
+    });
+
+    using([
+      ['eventFeedRemoveData', true, false ],
+      ['eventFeedRemoveData', true, false ],
+      ['eventFeedServerActions', true, false ],
+      // Service Groups on not currently uncheckable through the UI
+      // ['serviceGroupNoHealthChecks', true, false ],
+      // ['serviceGroupRemoveServices', true, false ],
+      ['clientRunsRemoveData', true, false ],
+      ['clientRunsLabelMissing', true, false ],
+      ['clientRunsRemoveNodes', true, false ],
+      ['complianceRemoveReports', true, false ],
+      ['complianceRemoveScans', true, false ]
+    ], function (form: string, currentState: boolean, expectedState: boolean) {
+      it('deactivates the asociated form', () => {
+        component[form].patchValue({disabled: true}); // Set each form to Activated to start
+        expect(component[form].value.disabled).toEqual(currentState);
+        component.toggleInput(component[form], currentState);
+        expect(component[form].value.disabled).toEqual(expectedState);
+        expect(component[form].get('unit').disabled).toBe(expectedState);
+        expect(component[form].get('threshold').disabled).toBe(expectedState);
+      });
+    });
+
+  });
 
   // describe('when jobSchedulerStatus is null', () => {
   //   it('does not update the forms', () => {
