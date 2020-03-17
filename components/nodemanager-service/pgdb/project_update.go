@@ -280,7 +280,6 @@ func (db *DB) ListProjectUpdateTasks(ctx context.Context) ([]project_update_lib.
 	}
 
 	if count <= 50000 {
-		// This should be about 10 seconds of work, we'll just do it in 1 batch
 		tasks := make([]project_update_lib.SerializedProjectUpdateTask, 1)
 		tasks[0] = project_update_lib.SerializedProjectUpdateTask{
 			Priority: 1 << 62,
