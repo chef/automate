@@ -23,7 +23,7 @@
       display: flex;
       align-items: center;
 
-      chef-icon {
+      .filter-icon {
         margin: -2px 0.5em 0 0;
       }
     }
@@ -51,6 +51,10 @@
 
       &.passed  {
         background: $chef-success;
+      }
+
+      &.waived  {
+        background: $chef-dark-grey;
       }
     }
 
@@ -86,7 +90,7 @@
     &:first-child {
       flex-grow: 2;
 
-      chef-icon {
+      .status-icon {
         margin-right: 1em;
       }
     }
