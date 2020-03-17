@@ -86,10 +86,10 @@ export class IngestJob {
   category: string;
   name: string;
   nested_name?: string;
-  disabled: boolean;
-  recurrence: string;
+  recurrence?: string;
   threshold: string;
-  purge_policies: any; // needs specific type
+  disabled: boolean;
+  purge_policies?: any; // needs specific type
   last_elapsed?: Date;
   next_due_at?: Date;
   last_enqueued_at?: Date;

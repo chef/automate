@@ -156,35 +156,43 @@ describe('AutomateSettingsComponent', () => {
   });
 
   describe('when jobSchedulerStatus is set', () => {
-  //   beforeAll(() => {
-  //     const jobMissingNodes: IngestJob = {
-  //       running: false,
-  //       name: IngestJobs.MissingNodes,
-  //       threshold: '60m',
-  //       every: '1h'
-  //     };
-  //     const jobMissingNodesForDeletion: IngestJob = {
-  //       running: true,
-  //       name: IngestJobs.MissingNodesForDeletion,
-  //       threshold: '24h',
-  //       every: '60m'
-  //     };
-  //     mockJobSchedulerStatus = new JobSchedulerStatus(true, [
-  //       jobMissingNodes,
-  //       jobMissingNodesForDeletion
-  //     ]);
-  //   });
+    beforeAll(() => {
+      const eventFeedRemoveData: IngestJob = {
+        name: "periodic_purge",
+        category: 'event_feed',
+        nested_name: 'feed',
+        disabled: true,
+        recurrence: "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
+        threshold: "",
+        purge_policies: {
+          elasticsearch: [
+            {
+              name: "feed",
+              index: "eventfeed-2-feeds",
+              older_than_days: 60,
+              custom_purge_field: "pub_timestamp",
+              disabled: false
+            }
+          ],
+          postgres: []
+        }
+      };
 
-    // it('updates the "missingNodes" form group correctly', () => {
-    //   component.updateForm(mockJobSchedulerStatus);
+      mockJobSchedulerStatus = new JobSchedulerStatus([
+        eventFeedRemoveData
+        // EventFeedServerActions
+      ]);
+    });
 
-    //   const missingNodesValues = component.automateSettingsForm
-    //     .controls.missingNodes.value;
+    it('updates the "eventFeedRemoveData" form group correctly', () => {
+      component.updateForm(mockJobSchedulerStatus);
+      fixture.detectChanges();
 
-    //   expect(missingNodesValues.disable).toEqual(true);
-    //   expect(missingNodesValues.threshold).toEqual('60');
-    //   expect(missingNodesValues.unit).toEqual('m');
-    // });
+      const newFormValues = component.eventFeedRemoveData;
+
+      expect(newFormValues.value.disabled).toEqual(false);
+      expect(newFormValues.value.threshold).toEqual(60);
+    });
 
     // it('updates the "deleteMissingNodes" form group correctly', () => {
     //   component.updateForm(mockJobSchedulerStatus);
