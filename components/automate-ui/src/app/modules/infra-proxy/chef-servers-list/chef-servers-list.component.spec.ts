@@ -86,7 +86,7 @@ describe('ChefServersListComponent', () => {
       };
 
     beforeEach(() => {
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
     });
 
     it('openCreateModal opens modal', () => {

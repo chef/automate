@@ -17,8 +17,8 @@ describe('MetadataService', () => {
       ]
     });
 
-    metadata_service = TestBed.get(MetadataService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    metadata_service = TestBed.inject(MetadataService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   it('should be created', inject([MetadataService], (service: MetadataService) => {

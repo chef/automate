@@ -47,7 +47,7 @@ describe('NodeDetailsResolverService', () => {
         { provide: Router, useValue: router }]
     });
 
-    service = TestBed.get(NodeDetailsResolverService);
+    service = TestBed.inject(NodeDetailsResolverService);
     route = new MockRoute();
   });
 

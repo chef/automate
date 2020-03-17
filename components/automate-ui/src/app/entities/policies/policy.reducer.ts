@@ -38,7 +38,7 @@ export function policyEntityReducer(state: PolicyEntityState = PolicyEntityIniti
 
     case PolicyActionTypes.GET_ALL_SUCCESS:
     return set('getAllStatus', EntityStatus.loadingSuccess,
-        policyEntityAdapter.addAll(action.payload.policies, state)) as PolicyEntityState;
+        policyEntityAdapter.setAll(action.payload.policies, state)) as PolicyEntityState;
 
     case PolicyActionTypes.GET_ALL_FAILURE:
       return set('getAllStatus', EntityStatus.loadingFailure, state) as PolicyEntityState;

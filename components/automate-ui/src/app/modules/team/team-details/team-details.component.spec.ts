@@ -101,9 +101,9 @@ describe('TeamDetailsComponent', () => {
   }));
 
   beforeEach(() => {
-    router = TestBed.get(Router);
+    router = TestBed.inject(Router);
     spyOn(router, 'navigate').and.stub();
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
 
     fixture = TestBed.createComponent(TeamDetailsComponent);
     component = fixture.componentInstance;
@@ -180,6 +180,95 @@ describe('TeamDetailsComponent', () => {
       type: 'CUSTOM' // unused
     };
   }
+});
+
+describe('TeamDetailsComponent v1', () => {
+  let component: TeamDetailsComponent;
+  let fixture: ComponentFixture<TeamDetailsComponent>;
+  let router: Router;
+  let store: Store<NgrxStateAtom>;
+
+  const initialState = {
+    ...defaultInitialState,
+    router: {
+      ...defaultRouterState,
+      state: {
+        ...defaultRouterRouterState,
+        url: `/settings/teams/${targetId}`,
+        params: { id: targetId }
+      }
+    },
+    policies: {
+      ...PolicyEntityInitialState, iamMajorVersion: 'v1' as IAMMajorVersion
+    }
+  };
+
+  beforeEach(async(() => {
+    TestBed.configureTestingModule({
+      declarations: declarations,
+      providers: [
+        FeatureFlagsService
+      ],
+      imports: [
+        ReactiveFormsModule,
+        RouterTestingModule,
+        StoreModule.forRoot(ngrxReducers, { initialState, runtimeChecks })
+      ]
+    }).compileComponents();
+  }));
+
+  beforeEach(() => {
+    router = TestBed.inject(Router);
+    spyOn(router, 'navigate').and.stub();
+    store = TestBed.inject(Store);
+
+    fixture = TestBed.createComponent(TeamDetailsComponent);
+    component = fixture.componentInstance;
+    component.team = someTeam;
+    fixture.detectChanges();
+  });
+
+  it('handles team users for v1', () => {
+    spyOn(store, 'dispatch').and.callThrough();
+    const team: Team = { id: 'any', guid: targetId, name: 'any', projects: [] };
+    component.isIAMv2$.subscribe(isV2 => expect(isV2).toBeFalsy());
+    store.dispatch(new GetTeamSuccess(team));
+
+    expect(store.dispatch).toHaveBeenCalledWith(new GetTeamUsers({ id: targetId }));
+    expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
+  });
+
+  it('GetTeam is not requested when switching to the users page', () => {
+    spyOn(store, 'dispatch').and.callThrough();
+    component.isIAMv2$.subscribe(isV2 => expect(isV2).toBeFalsy());
+    // This simulates updating the URL.
+    store.dispatch(new GetRoute({
+        'routerState': {
+          'url': '/settings/users/admin', // <- update of the url to switch to the user's page for admin
+          'params': {
+            'id': 'admin'
+          },
+          'queryParams': {},
+          'fragment': null,
+          'path': ['/', 'settings', 'users', 'admin']
+        }, 'event': {
+          'id': 2,
+          'url': '/settings/users/admin',
+          'urlAfterRedirects': '/settings/users/admin',
+          'state': {
+            'url': '/settings/users/admin',
+            'params': {
+              'id': 'admin'
+            },
+            'queryParams': {},
+            'fragment': null,
+            'path': ['/', 'settings', 'users', 'admin']}
+        }
+      }));
+
+    // GetTeam should not be called because we are not on the teams page any more.
+    expect(store.dispatch).not.toHaveBeenCalledWith(new GetTeam({id: 'admin'}));
+  });
 });
 
 export class GetRoute implements Action {

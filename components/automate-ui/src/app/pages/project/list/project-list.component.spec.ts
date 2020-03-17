@@ -104,7 +104,7 @@ describe('ProjectListComponent', () => {
     fixture = TestBed.createComponent(ProjectListComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement.nativeElement;
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
 
     fixture.detectChanges();
   });

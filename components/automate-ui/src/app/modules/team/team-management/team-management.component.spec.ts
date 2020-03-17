@@ -81,6 +81,83 @@ describe('TeamManagementComponent', () => {
     expect(component).toBeTruthy();
   });
 
+  describe('create v1 team', () => {
+    let store: Store<NgrxStateAtom>;
+    const team = <Team> {
+        guid: 'uuid-1',
+        id: 'new', // corresponds to v1 team Name
+        name: 'The Brand New Team', // corresponds to v1 team Description
+        projects: []
+      };
+
+    beforeEach(() => {
+      store = TestBed.inject(Store);
+      component.isIAMv2 = false;
+    });
+
+    it('openCreateModal on v1 opens v1 modal', () => {
+      expect(component.createV1TeamModalVisible).toBe(false);
+      expect(component.createModalVisible).toBe(false);
+      component.openCreateModal();
+      expect(component.createV1TeamModalVisible).toBe(true);
+      expect(component.createModalVisible).toBe(false);
+    });
+
+    it('opening create modal resets name and description to empty string', () => {
+      component.createV1TeamForm.controls['name'].setValue('any');
+      component.createV1TeamForm.controls['description'].setValue('any');
+      component.openCreateModal();
+      expect(component.createV1TeamForm.controls['name'].value).toBe(null);
+      expect(component.createV1TeamForm.controls['description'].value).toBe(null);
+    });
+
+    it('on success, closes modal and adds new team', () => {
+      component.createV1TeamForm.controls['name'].setValue(team.id);
+      component.createV1TeamForm.controls['description'].setValue(team.name);
+      component.createV1Team();
+
+      store.dispatch(new CreateTeamSuccess(team));
+
+      component.sortedTeams$.subscribe(teams => {
+        expect(teams).toContain(team);
+      });
+    });
+
+    it('on conflict error, modal is open with conflict error', () => {
+      spyOn(component.conflictErrorEvent, 'emit');
+      component.openCreateModal();
+      component.createV1TeamForm.controls['name'].setValue(team.id);
+      component.createV1TeamForm.controls['description'].setValue(team.name);
+      component.createV1Team();
+
+      const conflict = <HttpErrorResponse>{
+        status: HttpStatus.CONFLICT,
+        ok: false
+      };
+      store.dispatch(new CreateTeamFailure(conflict));
+
+      expect(component.createV1TeamModalVisible).toBe(true);
+      expect(component.conflictErrorEvent.emit).toHaveBeenCalled();
+    });
+
+    it('on create error, modal is closed with failure banner', () => {
+      spyOn(component.conflictErrorEvent, 'emit');
+      component.openCreateModal();
+      component.createV1TeamForm.controls['name'].setValue(team.id);
+      component.createV1TeamForm.controls['description'].setValue(team.name);
+      component.createV1Team();
+
+      const error = <HttpErrorResponse>{
+        status: HttpStatus.INTERNAL_SERVER_ERROR,
+        ok: false
+      };
+      store.dispatch(new CreateTeamFailure(error));
+
+      expect(component.createV1TeamModalVisible).toBe(false);
+      expect(component.conflictErrorEvent.emit).toHaveBeenCalledWith(false);
+    });
+  });
+
   describe('create v2 team', () => {
     let store: Store<NgrxStateAtom>;
     const team: Team = {
@@ -91,7 +168,8 @@ describe('TeamManagementComponent', () => {
     };
 
     beforeEach(() => {
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
+      component.isIAMv2 = true;
     });
 
     it('openCreateModal on v2 opens v2 modal', () => {
@@ -128,7 +206,7 @@ describe('TeamManagementComponent', () => {
 
 
     beforeEach(() => {
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
       store.dispatch(new GetTeamsSuccess({
         teams: []
       }));

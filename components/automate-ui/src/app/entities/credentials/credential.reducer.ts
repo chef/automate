@@ -24,7 +24,7 @@ export function credentialReducer(state: CredentialState = InitialState,
 
     case CredentialActionTypes.SEARCH_SUCCESS:
       return set('status', EntityStatus.loadingSuccess,
-                 credentialAdapter.addAll(action.payload, state));
+                 credentialAdapter.setAll(action.payload, state));
 
     case CredentialActionTypes.SEARCH_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);

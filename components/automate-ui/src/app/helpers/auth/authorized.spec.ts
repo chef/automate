@@ -24,7 +24,7 @@ describe('AuthorizedComponent setPermissions', () => {
         }, { runtimeChecks })
       ]
     }).compileComponents();
-    const store: Store<NgrxStateAtom> = TestBed.get(Store);
+    const store: Store<NgrxStateAtom> = TestBed.inject(Store);
     authorizedChecker = new AuthorizedChecker(store);
     dispatchSpy = spyOn(store, 'dispatch');
   }));
@@ -255,7 +255,7 @@ describe('AuthorizedComponent real round trip', () => {
       ]
     })
     .compileComponents();
-    const store: Store<NgrxStateAtom> = TestBed.get(Store);
+    const store: Store<NgrxStateAtom> = TestBed.inject(Store);
     authorizedChecker = new AuthorizedChecker(store);
   }));
 
@@ -294,7 +294,7 @@ describe('AuthorizedComponent evalPerms', () => {
         }, { runtimeChecks })
       ]
     }).compileComponents();
-    const store: Store<NgrxStateAtom> = TestBed.get(Store);
+    const store: Store<NgrxStateAtom> = TestBed.inject(Store);
     ac = new AuthorizedChecker(store);
   }));
 

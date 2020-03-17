@@ -98,7 +98,7 @@ export class LayoutFacadeService {
   }
 
   ShowPageLoading(showLoading: boolean): void {
-    this.store.dispatch( new ShowPageLoading(showLoading));
+    setTimeout(() => this.store.dispatch(new ShowPageLoading(showLoading)));
   }
 
   showFullPage(): void {

@@ -25,8 +25,8 @@ describe('SuggestionsService', () => {
       ]
     });
 
-    service = TestBed.get(SuggestionsService);
-    httpTestingController = TestBed.get(HttpTestingController);
+    service = TestBed.inject(SuggestionsService);
+    httpTestingController = TestBed.inject(HttpTestingController);
   });
 
   describe('getSuggestions()', () => {

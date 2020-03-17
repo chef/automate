@@ -11,7 +11,7 @@ describe('ReportQueryService', () => {
       ]
     });
 
-    service = TestBed.get(ReportQueryService);
+    service = TestBed.inject(ReportQueryService);
   });
 
   describe('FilterTitle', () => {

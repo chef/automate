@@ -45,7 +45,7 @@ export function orgEntityReducer(
     case OrgActionTypes.GET_ALL_SUCCESS:
       return pipe(
         set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
-        (orgEntityAdapter.addAll(action.payload.orgs, state)) as OrgEntityState;
+        (orgEntityAdapter.setAll(action.payload.orgs, state)) as OrgEntityState;
 
     case OrgActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);

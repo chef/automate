@@ -38,7 +38,7 @@ describe('ReportingProfileComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(ReportingProfileComponent);
     component = fixture.componentInstance;
