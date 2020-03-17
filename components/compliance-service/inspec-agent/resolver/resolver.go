@@ -485,7 +485,7 @@ func (r *Resolver) handleAzureVmNodes(ctx context.Context, m *manager.NodeManage
 	return r.handleManagerNodes(ctx, m, nodeCollections, job)
 }
 
-func handleNodeInfo(node *manager.ManagerNode) nodeInfo {
+func nodeInfoFromManagerNode(node *manager.ManagerNode) nodeInfo {
 	var nodeDetails nodeInfo
 	if len(node.Name) == 0 {
 		nodeDetails.Name = node.Host
@@ -553,7 +553,7 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 					backend = inspec.BackendWinRm
 				}
 				logrus.Debugf("inspec agent resolver handling node with backend: %s -- ssm ping status: %s", backend, node.Ssm)
-				nodeDetails := handleNodeInfo(node)
+				nodeDetails := nodeInfoFromManagerNode(node)
 				credsArr := r.handleInstanceCredentials(ctx, group.manager.InstanceCredentials, node)
 				ssmJob := false
 				// if the user has specified ssh/winrm secrets to be associated with the node

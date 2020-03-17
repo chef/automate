@@ -139,22 +139,22 @@ func TestAssembleJob(t *testing.T) {
 	assert.NotZero(t, job.TargetConfig.SecretsArr)
 }
 
-func TestHandleNodeInfoCorrectlyAssignsName(t *testing.T) {
-	nodeDetails := handleNodeInfo(&manager.ManagerNode{
+func TestnodeInfoFromManagerNodeCorrectlyAssignsName(t *testing.T) {
+	nodeDetails := nodeInfoFromManagerNode(&manager.ManagerNode{
 		Name: "test-name",
 		Host: "localhost",
 	})
 	assert.Equal(t, "test-name", nodeDetails.Name)
 
-	nodeDetails = handleNodeInfo(&manager.ManagerNode{
+	nodeDetails = nodeInfoFromManagerNode(&manager.ManagerNode{
 		Name: "",
 		Host: "localhost",
 	})
 	assert.Equal(t, "localhost", nodeDetails.Name)
 }
 
-func TestHandleNodeInfoObservesTagValues(t *testing.T) {
-	nodeDetails := handleNodeInfo(&manager.ManagerNode{
+func TestnodeInfoFromManagerNodeObservesTagValues(t *testing.T) {
+	nodeDetails := nodeInfoFromManagerNode(&manager.ManagerNode{
 		Name: "test-name",
 		Host: "localhost",
 		Tags: []*common.Kv{
@@ -163,7 +163,7 @@ func TestHandleNodeInfoObservesTagValues(t *testing.T) {
 	})
 	assert.Equal(t, "tag-named-instance", nodeDetails.Name)
 
-	nodeDetails = handleNodeInfo(&manager.ManagerNode{
+	nodeDetails = nodeInfoFromManagerNode(&manager.ManagerNode{
 		Name: "test-name",
 		Host: "localhost",
 		Tags: []*common.Kv{
