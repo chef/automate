@@ -188,10 +188,10 @@ describe('AutomateSettingsComponent', () => {
       component.updateForm(mockJobSchedulerStatus);
       fixture.detectChanges();
 
-      const newFormValues = component.eventFeedRemoveData;
+      const newFormValues = component.eventFeedRemoveData.value;
 
-      expect(newFormValues.value.disabled).toEqual(false);
-      expect(newFormValues.value.threshold).toEqual(60);
+      expect(newFormValues.disabled).toEqual(false);
+      expect(newFormValues.threshold).toEqual(60);
     });
 
     // it('updates the "deleteMissingNodes" form group correctly', () => {
