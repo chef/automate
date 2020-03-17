@@ -27,7 +27,6 @@ require (
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
 	github.com/coreos/go-oidc v2.0.0+incompatible
 	github.com/dave/jennifer v0.17.0
-	github.com/davecgh/go-spew v1.1.1
 	github.com/dexidp/dex v2.19.0+incompatible
 	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/dimchansky/utfbom v0.0.0-20170328061312-6c6132ff69f0 // indirect
