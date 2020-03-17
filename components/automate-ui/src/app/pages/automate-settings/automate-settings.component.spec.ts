@@ -160,39 +160,104 @@ describe('AutomateSettingsComponent', () => {
       const eventFeedRemoveData: IngestJob = {
         name: "periodic_purge",
         category: 'event_feed',
-        nested_name: 'feed',
         disabled: true,
-        recurrence: "FREQ=DAILY;DTSTART=20191106T180243Z;INTERVAL=2",
         threshold: "",
         purge_policies: {
           elasticsearch: [
             {
               name: "feed",
-              index: "eventfeed-2-feeds",
-              older_than_days: 60,
-              custom_purge_field: "pub_timestamp",
+              older_than_days: 53,
               disabled: false
             }
-          ],
-          postgres: []
+          ]
         }
       };
 
+      const infraNestedForms: IngestJob = {
+        name: "periodic_purge_timeseries",
+        category: 'infra',
+        disabled: false,
+        threshold: "",
+        purge_policies: {
+          elasticsearch: [
+            {
+              name: "actions",
+              older_than_days: 22, // default is 30, since disabled
+              disabled: true       // is true older than should be null
+            },
+            {
+              name: "converge-history",
+              older_than_days: 12,
+              disabled: false
+            }
+          ]
+        },
+      };
+
+      const complianceForms: IngestJob = {
+        category: 'compliance',
+        name: "periodic_purge",
+        disabled: true,
+        purge_policies: {
+          elasticsearch: [
+            {
+              name: "compliance-reports",
+              older_than_days: 105,
+              disabled: false
+            },
+            {
+              name: "compliance-scans",
+              older_than_days: 92,
+              disabled: false
+            }
+          ]
+        }
+      }
+
+      const clientRunsRemoveData: IngestJob = {
+        category: 'infra',
+        name: "missing_nodes",
+        disabled : false,
+        threshold : "7d"
+      };
+
+      const clientRunsLabelMissing: IngestJob = {
+        category: 'infra',
+        name: "missing_nodes_for_deletion",
+        disabled: false,
+        threshold: "14m"
+      };
+
       mockJobSchedulerStatus = new JobSchedulerStatus([
-        eventFeedRemoveData
-        // EventFeedServerActions
+        eventFeedRemoveData,
+        infraNestedForms,
+        clientRunsRemoveData,
+        clientRunsLabelMissing,
+        complianceForms
       ]);
     });
 
-    it('updates the "eventFeedRemoveData" form group correctly', () => {
-      component.updateForm(mockJobSchedulerStatus);
-      fixture.detectChanges();
+    using([
+      ['eventFeedRemoveData', false, 53 ], 
+      ['eventFeedServerActions', true, undefined ], // Infra purge_timeseries -> server_actions
+      // ['serviceGroupNoHealthChecks', false, 5 ], // Services not enabled yet
+      // ['serviceGroupRemoveServices', false, 5 ], // Services not enabled yet
+      ['clientRunsRemoveData', false, '7' ], // Infra Remove data
+      ['clientRunsLabelMissing', false, '14' ], // Infra label as missing data
+      ['clientRunsRemoveNodes', false, 12 ], // Infra purge_timeseries -> converge_history
+      ['complianceRemoveReports', false, 105 ], // Compliance
+      ['complianceRemoveScans', false, 92 ] // Compliance
+    ], function(formName: string, disabledStatus: boolean, threshold: number | string) {
+      it(`when form nested, it updates the ${formName} form group correctly`, () => {
+        component.updateForm(mockJobSchedulerStatus);
+        fixture.detectChanges();
+        
+        const newFormValues = component[formName].value;
 
-      const newFormValues = component.eventFeedRemoveData.value;
-
-      expect(newFormValues.disabled).toEqual(false);
-      expect(newFormValues.threshold).toEqual(60);
-    });
+        expect(newFormValues.disabled).toEqual(disabledStatus);
+        expect(newFormValues.threshold).toEqual(threshold);
+      })
+    })
 
     // it('updates the "deleteMissingNodes" form group correctly', () => {
     //   component.updateForm(mockJobSchedulerStatus);
