@@ -3,6 +3,8 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatFormFieldModule, MatSelectModule, MatOptionModule } from '@angular/material';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import {
@@ -14,7 +16,6 @@ import {
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { AutomateSettingsComponent } from './automate-settings.component';
-import { MockComponent } from 'ng2-mock-component';
 
 let mockJobSchedulerStatus: JobSchedulerStatus = null;
 
@@ -31,14 +32,14 @@ describe('AutomateSettingsComponent', () => {
       imports: [
         FormsModule,
         ReactiveFormsModule,
+        MatFormFieldModule,
+        MatSelectModule,
+        MatOptionModule,
+        BrowserAnimationsModule,
         HttpClientTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
-        MockComponent({ selector: 'chef-checkbox', inputs: ['checked']}),
-        MockComponent({ selector: 'mat-form-field'}),
-        MockComponent({ selector: 'mat-select'}),
-        MockComponent({ selector: 'mat-option'}),
         AutomateSettingsComponent
       ],
       providers: [
