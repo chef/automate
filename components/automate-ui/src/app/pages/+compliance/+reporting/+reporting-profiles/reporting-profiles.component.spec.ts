@@ -64,26 +64,4 @@ describe('ReportingProfilesComponent', () => {
       expect(component.getData).toHaveBeenCalledWith(reportQuery);
     });
   });
-
-  describe('addControlStatus()', () => {
-    const data = {profiles: [
-      {
-        controls: [
-          { results: [ {status: 'skipped'}, {status: 'passed'} ] },
-          { results: [ {status: 'passed'}, {status: 'passed'} ] },
-          { results: [ {status: 'failed'}, {status: 'passed'} ] },
-          { results: [ {status: 'skipped'}, {status: 'skipped'} ] }
-        ]
-      }
-    ]};
-    const expected = [
-      { results: [ { status: 'skipped' }, { status: 'passed' } ], status: 'passed' },
-      { results: [ { status: 'passed' }, { status: 'passed' } ], status: 'passed' },
-      { results: [ { status: 'failed' }, { status: 'passed' } ], status: 'failed' },
-      { results: [ { status: 'skipped'}, {status: 'skipped'} ], status: 'skipped' }
-    ];
-    it('sets the status for the control according to results', () => {
-      expect(component.addControlStatus(data)).toEqual(expected);
-    });
-  });
 });
