@@ -23,7 +23,6 @@ export class AutomateSettingsRequests {
   // fetchJobSchedulerStatus sends an HTTP GET Request to read the status of the JobScheduler
   // living inside the ingest-service
   public fetchJobSchedulerStatus(_params): Observable<JobSchedulerStatus> {
-
     // NEW ENDPOINT FOR DATA-LIFECYCLE
     const url = '/api/v0/data-lifecycle/status';
 

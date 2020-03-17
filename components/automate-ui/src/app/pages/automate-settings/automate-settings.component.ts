@@ -176,6 +176,7 @@ export class AutomateSettingsComponent implements OnInit {
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetSettings({}));
+
     this.store.select(automateSettingsState)
       .subscribe((automateSettingsSelector) => {
         if (automateSettingsSelector.errorResp !== null) {
@@ -185,6 +186,8 @@ export class AutomateSettingsComponent implements OnInit {
         } else {
           this.jobSchedulerStatus = automateSettingsSelector.jobSchedulerStatus;
           this.telemetryService.track('lifecycleConfiguration', this.jobSchedulerStatus);
+          console.log('----------------------');
+          console.log(automateSettingsSelector);
           this.updateForm(this.jobSchedulerStatus);
           this.onChanges();
         }
@@ -237,7 +240,6 @@ export class AutomateSettingsComponent implements OnInit {
       IngestJobs.ComplianceRemoveScans
     ].map(jobName => {
       const jobForm = this.getJobForm(jobName);
-      if (jobName === 'clientRunsRemoveData') { console.log( jobForm ) }
       const isNested = jobForm.nested_name ? true : false;
       const job = new IngestJob(null, null);
       job.category = jobForm.category;
@@ -252,7 +254,9 @@ export class AutomateSettingsComponent implements OnInit {
       return job;
     });
 
+
     this.store.dispatch(new ConfigureSettings({jobs: jobs}));
+    console.log('dispatch');
     this.store.select(changeConfiguration)
       .subscribe((changeConfigurationSelector) => {
         if (changeConfigurationSelector.errorResp !== null) {
@@ -261,7 +265,6 @@ export class AutomateSettingsComponent implements OnInit {
           this.showErrorNotification(error, errMsg);
           // SHOULD RESET THE FORM HERE IF THERE IS AN ERROR
         } else {
-          console.log('success');
           this.formChanged = false;
           this.showSuccessNotification();
         }
@@ -319,7 +322,6 @@ export class AutomateSettingsComponent implements OnInit {
     if (jobSchedulerStatus === null) {
       return;
     }
-    console.log('updateForm not null');
 
     jobSchedulerStatus.jobs.forEach((job: IngestJob) => {
 
@@ -340,23 +342,6 @@ export class AutomateSettingsComponent implements OnInit {
       }
 
     });
-
-    this.automateSettingsForm = this.fb.group({
-      // Event Feed
-      eventFeedRemoveData: this.eventFeedRemoveData,
-      eventFeedServerActions: this.eventFeedServerActions,
-      // Service Groups
-      serviceGroupNoHealthChecks: this.serviceGroupNoHealthChecks,
-      serviceGroupRemoveServices: this.serviceGroupRemoveServices,
-      // Client Runs
-      clientRunsRemoveData: this.clientRunsRemoveData,
-      clientRunsLabelMissing: this.clientRunsLabelMissing,
-      clientRunsRemoveNodes: this.clientRunsRemoveNodes,
-      // Compliance
-      complianceRemoveReports: this.complianceRemoveReports,
-      complianceRemoveScans: this.complianceRemoveScans
-    });
-
   }
 
   private getJobForm(jobName: string) {
@@ -406,10 +391,10 @@ export class AutomateSettingsComponent implements OnInit {
         this.handleDisable(this.clientRunsRemoveData, job.disabled);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.clientRunsRemoveData.patchValue({
-            unit: formUnit,
-            threshold: formThreshold,
-            disabled: job.disabled
-          });
+          unit: formUnit,
+          threshold: formThreshold,
+          disabled: job.disabled
+        });
       }
       break;
 

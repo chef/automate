@@ -9,7 +9,7 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import {
   IngestJob,
-  IngestJobs,
+  // IngestJobs,
   JobSchedulerStatus
 } from 'app/entities/automate-settings/automate-settings.model';
 
@@ -158,14 +158,14 @@ describe('AutomateSettingsComponent', () => {
   describe('when jobSchedulerStatus is set', () => {
     beforeAll(() => {
       const eventFeedRemoveData: IngestJob = {
-        name: "periodic_purge",
+        name: 'periodic_purge',
         category: 'event_feed',
         disabled: true,
-        threshold: "",
+        threshold: '',
         purge_policies: {
           elasticsearch: [
             {
-              name: "feed",
+              name: 'feed',
               older_than_days: 53,
               disabled: false
             }
@@ -174,58 +174,59 @@ describe('AutomateSettingsComponent', () => {
       };
 
       const infraNestedForms: IngestJob = {
-        name: "periodic_purge_timeseries",
+        name: 'periodic_purge_timeseries',
         category: 'infra',
         disabled: false,
-        threshold: "",
+        threshold: '',
         purge_policies: {
           elasticsearch: [
             {
-              name: "actions",
+              name: 'actions',
               older_than_days: 22, // default is 30, since disabled
               disabled: true       // is true older than should be null
             },
             {
-              name: "converge-history",
+              name: 'converge-history',
               older_than_days: 12,
               disabled: false
             }
           ]
-        },
+        }
       };
 
       const complianceForms: IngestJob = {
         category: 'compliance',
-        name: "periodic_purge",
+        name: 'periodic_purge',
+        threshold: '',
         disabled: true,
         purge_policies: {
           elasticsearch: [
             {
-              name: "compliance-reports",
+              name: 'compliance-reports',
               older_than_days: 105,
               disabled: false
             },
             {
-              name: "compliance-scans",
+              name: 'compliance-scans',
               older_than_days: 92,
               disabled: false
             }
           ]
         }
-      }
+      };
 
       const clientRunsRemoveData: IngestJob = {
         category: 'infra',
-        name: "missing_nodes",
+        name: 'missing_nodes',
         disabled : false,
-        threshold : "7d"
+        threshold : '7d'
       };
 
       const clientRunsLabelMissing: IngestJob = {
         category: 'infra',
-        name: "missing_nodes_for_deletion",
+        name: 'missing_nodes_for_deletion',
         disabled: false,
-        threshold: "14m"
+        threshold: '14m'
       };
 
       mockJobSchedulerStatus = new JobSchedulerStatus([
@@ -238,7 +239,7 @@ describe('AutomateSettingsComponent', () => {
     });
 
     using([
-      ['eventFeedRemoveData', false, 53 ], 
+      ['eventFeedRemoveData', false, 53 ],
       ['eventFeedServerActions', true, undefined ], // Infra purge_timeseries -> server_actions
       // ['serviceGroupNoHealthChecks', false, 5 ], // Services not enabled yet
       // ['serviceGroupRemoveServices', false, 5 ], // Services not enabled yet
@@ -251,12 +252,12 @@ describe('AutomateSettingsComponent', () => {
       it(`when form nested, it updates the ${formName} form group correctly`, () => {
         component.updateForm(mockJobSchedulerStatus);
         fixture.detectChanges();
-        
+
         const newFormValues = component[formName].value;
 
         expect(newFormValues.disabled).toEqual(disabledStatus);
         expect(newFormValues.threshold).toEqual(threshold);
-      })
+      });
     });
 
     describe('when user applyChanges()', () => {
@@ -284,4 +285,4 @@ describe('AutomateSettingsComponent', () => {
     });
 
   });
-})
+});
