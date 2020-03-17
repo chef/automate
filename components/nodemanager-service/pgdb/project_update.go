@@ -285,7 +285,7 @@ func (db *DB) ListProjectUpdateTasks(ctx context.Context) ([]project_update_lib.
 		tasks[0] = project_update_lib.SerializedProjectUpdateTask{
 			Priority: 1 << 62,
 			Params: map[string]string{
-				"s": "a",
+				"s": "0",
 				"e": "g",
 			},
 		}
