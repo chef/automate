@@ -3,6 +3,8 @@ import { eventExist, uuidv4 } from '../../../support/helpers';
 
 const nodeStart = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
 const nodeEnd = Cypress.moment().utc().endOf('day').format();
+const eventStart = Cypress.moment().utc().subtract(3, 'day').valueOf().toString();
+const eventEnd = Cypress.moment().utc().endOf('day').valueOf().toString();
 const now = Cypress.moment().format('MMDDYYhhmm');
 
 describeIfIAMV2p1('Ingestion project tagging', () => {
@@ -295,7 +297,7 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     cy.waitForClientRunsNode(clientRunsNodeId, 30);
 
     // wait for the action to be ingested
-    cy.waitForAction(entityName, 30);
+    cy.waitForAction(entityName, eventStart, eventEnd, 30);
   });
 
   after(() => {
