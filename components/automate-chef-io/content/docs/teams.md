@@ -15,7 +15,7 @@ toc = true
 
 A Chef Automate team is an assigned grouping of users. You can import existing teams into Chef Automate with [Microsoft AD (LDAP)]({{< ref "ldap.md#microsoft-active-directory" >}}), [generic LDAP]({{< ref "ldap.md" >}}), or [SAML]({{< ref "saml.md" >}}). You can also create local Chef Automate teams that are independent of LDAP or SAML.
 
-Permission for the `iam:teams` action is required to interact with teams. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
+Permission for the `iam:teams` action is required to interact with teams. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 
 ## Managing Local Teams
 

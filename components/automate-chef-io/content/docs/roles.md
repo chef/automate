@@ -14,7 +14,7 @@ toc = true
 
 Chef Automate Identity and Access Management roles are named groups of actions used to define [policies]({{< relref "policies.md" >}}). Actions describe what is allowed by users in Automate.
 
-Permission for the `iam:roles` action is required to interact with roles. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
+Permission for the `iam:roles` action is required to interact with roles. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 
 ![](/images/docs/settings-roles.png)
 
@@ -32,7 +32,7 @@ Ingest        | Ingest data into the system
 
 ### Custom Roles
 
-Custom roles are roles that can be changed by anyone with the permission for `iam:roles:update`. 
+Custom roles are roles that can be changed by anyone with the permission for `iam:roles:update`.
 
 ## Managing Roles
 

@@ -12,9 +12,9 @@ toc = true
 
 ## Overview
 
-Identity and Access Management policies manage the resources and actions used by identities. Policies are composed of statements that specify permissions. 
+Identity and Access Management policies manage the resources and actions used by identities. Policies are composed of statements that specify permissions.
 
-Permission for the `iam:policies` action is required to interact with policies. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM v2 custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
+Permission for the `iam:policies` action is required to interact with policies. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 
 ![](/images/docs/settings-policies.png)
 

@@ -345,4 +345,4 @@ MIIDfDCCAmSgAcaSldKaf...
 If you are using a certificate signed by a trusted certificate authority instead of the default certificate,
 you can provide Builder with the root certificate authority for the signed certificate.
 
-For more information, check out this further explanation on how to [configure Builder to authenticate via Chef Automate]((https://github.com/habitat-sh/on-prem-builder).
+For more information, check out this further explanation on how to [configure Builder to authenticate via Chef Automate](https://github.com/habitat-sh/on-prem-builder).

@@ -1,11 +1,11 @@
 +++
-title = "IAM v1 Overview"
+title = "IAM v1 Overview (Deprecated)"
 aliases = [
     "/docs/authorization-overview/",
     "/docs/default-policies/",
     "/docs/iam-v1-policies/"
 ]
-description = "IAM v1 Overview"
+description = "IAM v1 Overview (Deprecated)"
 draft = false
 bref = ""
 toc = true
@@ -16,10 +16,11 @@ toc = true
 +++
 
 {{< warning >}}
-IAM v1 is deprecated and we recommend updating to the latest version of Automate to make use of [IAM v2]({{< relref "iam-v2-overview" >}}).
+This documentation and the feature it covers, IAM v1, are deprecated. This documentation will be removed soon. Most Chef Automate installations upgraded automatically to the current IAM implementation. The [Airgap Installation documentation {{< relref "airgapped-installation.md/#upgrades" >}} covers the manual upgrade process for systems without internet connectivity.
+The current IAM documentation pages are: the [IAM Overview]({{< relref "iam-v2-overview" >}}), the [IAM Guide]({{< relref "iam-v2-guide" >}}) and the [Chef Automate API]({{< relref "docs/api/#tag/teams" >}}).
 {{< /warning >}}
 
-This guide helps you understand and use Chef Automate's IAM v1 authorization system. 
+This guide helps you understand and use Chef Automate's IAM v1 authorization system.
 
 ## Overview
 
@@ -47,7 +48,7 @@ Policies can contain wildcards to match a range of values.
 
 ## Structure
 
-A policy is made up of three essential components: the **subjects**, which is
+A policy has three components: the **subjects**, which is
 a list of users and teams, the **action** that those users/team members are allowed to perform,
 and the **resource** on which they perform actions. Resources can be very granular,
 but for most instances, restricting at the uppermost namespace will suffice.
@@ -97,7 +98,7 @@ A wildcard can replace any term of the subject; however, no terms can follow the
 Each user or team must specify its _provider_: _local_, _ldap_, or _saml_.
 
 IAM v1 supports LDAP, SAML,
-and local users or teams. 
+and local users or teams.
 
 ### Resource
 
@@ -156,9 +157,9 @@ This may be a policy that gives permissions directly to a user, but more likely 
 
 Use the ID of the policy to delete it:
 
-    ```bash
-    curl -s -X DELETE -H "api-token: $TOKEN" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies/{id}?pretty
-    ```
+```bash
+curl -s -X DELETE -H "api-token: $TOKEN" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/policies/{id}?pretty
+```
 
 ### Open Permissions on All Resources
 
@@ -174,6 +175,7 @@ curl -s -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"subject
 ```
 
 ### Permission for an API Client on Compliance Resources
+
 To create a token that gives a client permission to read any Compliance resource.
 
 1. Create an API token.
@@ -393,6 +395,7 @@ UsersMgmt | UpdateUser | /auth/users/{username} | PUT | auth:users:{username} | 
 {{% /responsive-table %}}
 
 #### Teams
+
 Admins that are member of the admins team can perform any action on any resource including Authorization and Notifications resources, which are inaccessible to non-admins.
 
 {{% responsive-table %}}
@@ -435,4 +438,3 @@ Authorization | IntrospectAll | /auth/introspect | GET | auth_introspection:intr
 Authorization | IntrospectSome | /auth/introspect_some | POST | auth_introspection:introspect_some | read
 Authorization | Introspect | /auth/introspect | POST | auth_introspection:introspect | read
 {{% /responsive-table %}}
-
