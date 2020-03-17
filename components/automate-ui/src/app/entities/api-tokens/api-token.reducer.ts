@@ -52,7 +52,7 @@ export function apiTokenEntityReducer(
       return set(
         STATUS,
         EntityStatus.loadingSuccess,
-        apiTokenEntityAdapter.addAll(action.payload.tokens, state)
+        apiTokenEntityAdapter.setAll(action.payload.tokens, state)
       ) as ApiTokenEntityState;
     }
 

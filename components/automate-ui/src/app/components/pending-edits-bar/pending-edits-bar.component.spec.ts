@@ -86,11 +86,11 @@ describe('PendingEditsBarComponent', () => {
   }));
 
   beforeEach(() => {
-    projectService = TestBed.get(ProjectService);
+    projectService = TestBed.inject(ProjectService);
     fixture = TestBed.createComponent(PendingEditsBarComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement.query(By.css('#pending-edits-bar')).nativeElement;
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
 
     store.dispatch(new GetIamVersionSuccess({ version: { major: 'v2' } }));
     fixture.detectChanges();

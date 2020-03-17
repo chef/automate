@@ -28,7 +28,7 @@ export function roleEntityReducer(state: RoleEntityState = RoleEntityInitialStat
 
     case RoleActionTypes.GET_ALL_SUCCESS:
       return set('getAllStatus', EntityStatus.loadingSuccess,
-        roleEntityAdapter.addAll(action.payload.roles, state));
+        roleEntityAdapter.setAll(action.payload.roles, state));
 
     case RoleActionTypes.GET_ALL_FAILURE:
       return set('getAllStatus', EntityStatus.loadingFailure, state);

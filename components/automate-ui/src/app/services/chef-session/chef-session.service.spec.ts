@@ -20,7 +20,7 @@ describe('ChefSessionService', () => {
       ]
     });
 
-    service = TestBed.get(ChefSessionService);
+    service = TestBed.inject(ChefSessionService);
   });
 
   afterEach(() => {

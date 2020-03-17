@@ -25,7 +25,7 @@ export function profileEntityReducer(state: ProfileEntityState = ProfileEntityIn
 
     case ProfileActionTypes.PROFILES_SEARCH_SUCCESS:
       return set('status', EntityStatus.loadingSuccess,
-                 profileEntityAdapter.addAll(action.payload.profiles, state));
+                 profileEntityAdapter.setAll(action.payload.profiles, state));
 
     case ProfileActionTypes.PROFILES_SEARCH_FAILURE:
       return set('status', EntityStatus.loadingFailure, state);

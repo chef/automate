@@ -47,7 +47,7 @@ export function serverEntityReducer(
       return set(
         GET_ALL_STATUS,
         EntityStatus.loadingSuccess,
-        serverEntityAdapter.addAll(action.payload.servers, state)
+        serverEntityAdapter.setAll(action.payload.servers, state)
       ) as ServerEntityState;
     }
 
