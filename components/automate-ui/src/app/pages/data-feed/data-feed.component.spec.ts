@@ -4,7 +4,7 @@ import { MatDialog, MatSnackBar } from '@angular/material';
 import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { Store, StoreModule } from '@ngrx/store';
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 
 import { Destination } from './destination';
 import { DatafeedService } from '../../services/data-feed/data-feed.service';
@@ -12,9 +12,6 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { DatafeedComponent } from './data-feed.component';
 import { RouterTestingModule } from '@angular/router/testing';
-import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
-import * as fromNotifications from 'app/entities/notifications/notification.reducer';
-import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 describe('DatafeedComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -65,11 +62,7 @@ describe('DatafeedComponent', () => {
     TestBed.configureTestingModule({
       imports: [
         RouterTestingModule,
-        StoreModule.forRoot({
-          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
-          notifications: fromNotifications.notificationEntityReducer,
-          layout: fromLayout.layoutEntityReducer
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         DatafeedComponent

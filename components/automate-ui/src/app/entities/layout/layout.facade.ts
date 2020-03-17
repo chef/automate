@@ -1,6 +1,8 @@
-import { Injectable, OnDestroy, OnInit } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
+import { Observable } from 'rxjs';
+import { first, filter } from 'rxjs/operators';
+import { identity } from 'lodash/fp';
 
 import { LayoutSidebarService } from './layout-sidebar.service';
 import * as fromLayout from './layout.reducer';
@@ -30,7 +32,7 @@ export enum Sidebar {
 @Injectable({
   providedIn: 'root'
 })
-export class LayoutFacadeService implements OnInit, OnDestroy {
+export class LayoutFacadeService {
   public layout = {
     license: {
       display: true
@@ -53,7 +55,6 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
   public contentHeight = `calc(100% - ${Height.Navigation}px)`;
   public sidebar$: Observable<MenuItemGroup[]>;
   public showPageLoading$: Observable<boolean>;
-  private isDestroyed = new Subject<boolean>();
 
   constructor(
     private store: Store<fromLayout.LayoutEntityState>,
@@ -62,15 +63,13 @@ export class LayoutFacadeService implements OnInit, OnDestroy {
     this.sidebar$ = store.select(sidebar);
     this.showPageLoading$ = store.select(showPageLoading);
     this.updateDisplay();
-  }
-
-  ngOnInit(): void {
-    this.store.dispatch(new GetProjects());
-  }
-
-  ngOnDestroy(): void {
-    this.isDestroyed.next(true);
-    this.isDestroyed.complete();
+    this.store.select(isIAMv2)
+      .pipe(filter(identity), first())
+      .subscribe(isV2 => {
+        if (isV2) {
+          this.store.dispatch(new GetProjects());
+        }
+      });
   }
 
   getContentStyle(): any {

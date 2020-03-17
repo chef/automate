@@ -1,6 +1,6 @@
-import { Injectable, OnInit, OnDestroy } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { Subject, Observable, BehaviorSubject } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { isProductDeployed } from 'app/staticConfig';
@@ -14,12 +14,11 @@ import { MenuItemGroup } from 'app/entities/layout/layout.model';
 @Injectable({
     providedIn: 'root'
 })
-export class LayoutSidebarService implements OnInit, OnDestroy {
+export class LayoutSidebarService {
     public chefInfraServerViewsFeatureFlagOn: boolean;
     public ServiceNowFeatureFlagOn: boolean;
     private activeSidebar: string;
     private workflowEnabled$: Observable<boolean>;
-    private isDestroyed = new Subject<boolean>();
     private sidebars: Sidebars;
 
     constructor(
@@ -30,6 +29,7 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
         this.ServiceNowFeatureFlagOn = this.featureFlagsService.getFeatureStatus('servicenow_cmdb');
         this.chefInfraServerViewsFeatureFlagOn = this.featureFlagsService.getFeatureStatus('chefInfraServerViews');
         this.workflowEnabled$ = this.clientRunsStore.select(clientRunsWorkflowEnabled);
+        this.updateSidebars();
     }
 
     populateSidebar() {
@@ -236,15 +236,6 @@ export class LayoutSidebarService implements OnInit, OnDestroy {
         }]
       };
       this.sidebars = this.updateVisibleValues(sidebars);
-    }
-
-    ngOnInit() {
-      this.updateSidebars();
-    }
-
-    ngOnDestroy() {
-      this.isDestroyed.next(true);
-      this.isDestroyed.complete();
     }
 
     private updateVisibleValues(sidebars: Sidebars): Sidebars {

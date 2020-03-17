@@ -5,17 +5,13 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { runtimeChecks } from 'app/ngrx.reducers';
+import { runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
-import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
 import { GetProjectSuccess } from 'app/entities/projects/project.actions';
-import { projectEntityReducer } from 'app/entities/projects/project.reducer';
 import { Project } from 'app/entities/projects/project.model';
 import { Rule } from 'app/entities/rules/rule.model';
-import { ruleEntityReducer } from 'app/entities/rules/rule.reducer';
 import { GetRulesSuccess } from 'app/entities/rules/rule.actions';
 import { ProjectDetailsComponent } from './project-details.component';
 
@@ -105,6 +101,7 @@ describe('ProjectDetailsComponent', () => {
         RouterTestingModule,
         ChefPipesModule,
         StoreModule.forRoot({
+          ...ngrxReducers,
           router: () => ({
             state: {
               url: '/settings/projects/uuid-1',
@@ -115,12 +112,8 @@ describe('ProjectDetailsComponent', () => {
             },
             previousRoute: {},
             navigationId: 0
-          }),
-          projects: projectEntityReducer,
-          rules: ruleEntityReducer,
-          notifications: notificationEntityReducer, // not used here but needed to suppress warnings
-          clientRunsEntity: clientRunsEntityReducer // not used here but needed to suppress warnings
-        }, { runtimeChecks })
+          })
+         }, { runtimeChecks })
       ],
       providers: [
         FeatureFlagsService

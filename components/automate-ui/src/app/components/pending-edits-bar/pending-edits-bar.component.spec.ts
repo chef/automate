@@ -5,17 +5,15 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { StoreModule, Store } from '@ngrx/store';
 import { MockComponent } from 'ng2-mock-component';
 
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { using } from 'app/testing/spec-helpers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
-import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
-import { policyEntityReducer } from 'app/entities/policies/policy.reducer';
+import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { ProjectService } from 'app/entities/projects/project.service';
-import { projectEntityReducer, ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
+import { ApplyRulesStatusState } from 'app/entities/projects/project.reducer';
 import {
   GetProjectsSuccess,
   GetApplyRulesStatusSuccess,
@@ -78,13 +76,7 @@ describe('PendingEditsBarComponent', () => {
         ReactiveFormsModule,
         RouterTestingModule,
         ChefPipesModule,
-        StoreModule.forRoot(
-          {
-          policies: policyEntityReducer,
-          projects: projectEntityReducer,
-          notifications: notificationEntityReducer, // not used here but needed to suppress warnings
-          clientRunsEntity: clientRunsEntityReducer // not used here but needed to suppress warnings
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       providers: [
         FeatureFlagsService,

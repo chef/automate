@@ -1,5 +1,5 @@
 import { Store, StoreModule } from '@ngrx/store';
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { By } from '@angular/platform-browser';
@@ -11,9 +11,6 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { UploadService } from 'app/services/profiles/upload.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
-import * as fromNotifications from 'app/entities/notifications/notification.reducer';
-import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 class MockProfilesService {
   getAllProfiles(): Observable<Array<Object>> {
@@ -43,11 +40,7 @@ describe('ProfilesOverviewComponent', () => {
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
-        StoreModule.forRoot({
-          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
-          notifications: fromNotifications.notificationEntityReducer,
-          layout: fromLayout.layoutEntityReducer
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         ProfileOverviewComponent
