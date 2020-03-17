@@ -13,6 +13,10 @@
       "tags": ["NodeManagerService", "NodesService"]
     },
     {
+      "name": "Secrets",
+      "tags": ["SecretsService"]
+    },
+    {
       "name": "Applications",
       "tags": ["service_groups", "retention"]
     },
@@ -31,6 +35,7 @@
     { "name": "StatsService", "x-displayName": "Stats" },
     { "name": "ConfigMgmt", "x-displayName": "Nodes" },
     { "name": "NodesService", "x-displayName": "Managed Nodes" },
+    { "name": "SecretsService", "x-displayName": "Secrets" },
     { "name": "service_groups", "x-displayName": "Service Groups and Services" },
     { "name": "retention", "x-displayName": "Service Management" },
     { "name": "NodeManagerService", "x-displayName": "Node Managers" },
