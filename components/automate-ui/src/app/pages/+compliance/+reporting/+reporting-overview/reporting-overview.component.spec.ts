@@ -185,6 +185,7 @@ describe('ReportingOverviewComponent', () => {
           'noncompliant': 4,
           'compliant': 10,
           'skipped': 6,
+          'waived': 1,
           'high_risk': 4,
           'medium_risk': 2,
           'low_risk': 8
@@ -255,7 +256,7 @@ describe('ReportingOverviewComponent', () => {
           'failures': 9,
           'passed': 1,
           'skipped': 0,
-          'wavied': 1,
+          'waived': 1,
           'criticals': 2,
           'majors': 2,
           'minors': 5
