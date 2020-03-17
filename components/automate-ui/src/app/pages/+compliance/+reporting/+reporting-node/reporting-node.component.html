@@ -132,22 +132,10 @@
               <chef-icon class="filter-icon">storage</chef-icon> {{activeReport.controls.total | number}}
             </span>
           </chef-option>
-          <chef-option class="filter critical" value='critical'>
-            <span class="filter-label">Critical Controls</span>
+          <chef-option class="filter failed" value='failed'>
+            <span class="filter-label">Failed Controls</span>
             <span class="filter-total">
-              <chef-icon class="filter-icon">report_problem</chef-icon> {{activeReport.controls.failed.critical | number}}
-            </span>
-          </chef-option>
-          <chef-option class="filter major" value='major'>
-            <span class="filter-label">Major Controls</span>
-            <span class="filter-total">
-              <chef-icon class="filter-icon">report_problem</chef-icon> {{activeReport.controls.failed.major | number}}
-            </span>
-          </chef-option>
-          <chef-option class="filter minor" value='minor'>
-            <span class="filter-label">Minor Controls</span>
-            <span class="filter-total">
-              <chef-icon class="filter-icon">report_problem</chef-icon> {{activeReport.controls.failed.minor | number}}
+              <chef-icon class="filter-icon">report_problem</chef-icon> {{activeReport.controls.failed.total | number}}
             </span>
           </chef-option>
           <chef-option class="filter passed" value='passed'>

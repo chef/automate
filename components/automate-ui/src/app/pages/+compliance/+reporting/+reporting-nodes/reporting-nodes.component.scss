@@ -74,6 +74,10 @@
       &.passed .filter-total  {
         color: $chef-success;
       }
+
+      &.waived .filter-total  {
+        color: $chef-dark-grey;
+      }
     }
   }
 }

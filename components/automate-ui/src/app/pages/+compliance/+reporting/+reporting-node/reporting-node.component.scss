@@ -185,16 +185,8 @@ chef-tooltip[for='skipped-count'] {
         background: $chef-primary-bright;
       }
 
-      &.critical  {
+      &.failed  {
         background: $chef-critical;
-      }
-
-      &.major  {
-        background: $chef-major;
-      }
-
-      &.minor  {
-        background: $chef-minor;
       }
 
       &.skipped  {
@@ -215,16 +207,8 @@ chef-tooltip[for='skipped-count'] {
         color: $chef-primary-bright;
       }
 
-      &.critical .filter-total  {
+      &.failed .filter-total  {
         color: $chef-critical;
-      }
-
-      &.major .filter-total  {
-        color: $chef-major;
-      }
-
-      &.minor .filter-total  {
-        color: $chef-minor;
       }
 
       &.skipped .filter-total  {
@@ -233,6 +217,10 @@ chef-tooltip[for='skipped-count'] {
 
       &.passed .filter-total  {
         color: $chef-success;
+      }
+
+      &.waived .filter-total  {
+        color: $chef-dark-grey;
       }
     }
   }
