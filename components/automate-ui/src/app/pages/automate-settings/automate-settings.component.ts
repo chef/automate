@@ -18,6 +18,7 @@ import {
   IngestJobs
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { distinctUntilKeyChanged } from 'rxjs/operators';
 
 @Component({
   templateUrl: './automate-settings.component.html',
@@ -177,7 +178,7 @@ export class AutomateSettingsComponent implements OnInit {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetSettings({}));
 
-    this.store.select(automateSettingsState)
+    this.store.select(automateSettingsState).pipe(distinctUntilKeyChanged('jobSchedulerStatus'))
       .subscribe((automateSettingsSelector) => {
         if (automateSettingsSelector.errorResp !== null) {
           const error = automateSettingsSelector.errorResp;
@@ -186,8 +187,6 @@ export class AutomateSettingsComponent implements OnInit {
         } else {
           this.jobSchedulerStatus = automateSettingsSelector.jobSchedulerStatus;
           this.telemetryService.track('lifecycleConfiguration', this.jobSchedulerStatus);
-          console.log('----------------------');
-          console.log(automateSettingsSelector);
           this.updateForm(this.jobSchedulerStatus);
           this.onChanges();
         }
@@ -256,7 +255,6 @@ export class AutomateSettingsComponent implements OnInit {
 
 
     this.store.dispatch(new ConfigureSettings({jobs: jobs}));
-    console.log('dispatch');
     this.store.select(changeConfiguration)
       .subscribe((changeConfigurationSelector) => {
         if (changeConfigurationSelector.errorResp !== null) {
