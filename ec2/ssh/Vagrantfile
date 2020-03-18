@@ -9,16 +9,16 @@ if ['up', 'ssh', 'halt'].include?(ARGV[0])
 end
 
 ssh_host = ENV['SSH_HOST']
+ssh_user = ENV['SSH_USER']
 ssh_key_path = ENV['SSH_KEY_PATH']
-user_name = ENV['SSH_USER']
-home_dir = "/home/#{user_name}"
+home_dir = "/home/#{ssh_user}"
 current_branch = `git rev-parse --abbrev-ref HEAD`
 latest_head_commit = `git rev-parse HEAD`
 latest_origin_commit = `git rev-parse origin/#{current_branch}`
 clean_tree = system('git status | grep "nothing to commit"')
 stop_hours = 48  # if STOP_HOURS ENV is not specified, stop the instance after 2 days of running
 automate_license = ENV['AUTOMATE_LICENSE']
-automate_license_path = '../dev/license.jwt'
+automate_license_path = '../../dev/license.jwt'
 automate_channel = 'dev'
 automate_build = 'latest'
 manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/#{automate_build}.json"
@@ -163,7 +163,7 @@ SCRIPT
 $enter_hab_studio = <<SCRIPT
 export HAB_LICENSE=accept-no-persist
 cat<<EOF >/etc/profile.d/hab_studio_setup.sh
-if [ "\\$USER" == "#{user_name}" ]; then
+if [ "\\$USER" == "#{ssh_user}" ]; then
   export HAB_LICENSE=accept-no-persist
   export HAB_STUDIO_SECRET_GITHUB_TOKEN=#{ENV['GITHUB_TOKEN']}
   export AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']}
@@ -176,13 +176,13 @@ if [ "\\$USER" == "#{user_name}" ]; then
   cd #{home_dir}/automate
   source .envrc
   if [ ! -f ~/.hab/etc/cli.toml ]; then
-    echo "Setting up HAB_ORIGIN=#{user_name}"
+    echo "Setting up HAB_ORIGIN=#{ssh_user}"
     mkdir -p ~/.hab/etc
     cat<<'EOT' > ~/.hab/etc/cli.toml
-origin = "#{user_name}"
+origin = "#{ssh_user}"
 ctl_secret = "dev333ZZZ111"
 EOT
-    hab origin key generate #{user_name}
+    hab origin key generate #{ssh_user}
   fi
   hab studio run 'wget -O results/build.json "#{manifest_url}"'
   hab studio enter
@@ -197,12 +197,12 @@ echo 'Done, run `vagrant ssh` now to complete the setup.'
 SCRIPT
 
 Vagrant.configure('2') do |config|
-  config.vm.box = 'dummy'
+  config.vm.box = 'tknerr/managed-server-dummy'
 
   config.vm.provider :managed do |managed, override|
     managed.server = ssh_host
-    override.ssh.port = 22
-    override.ssh.username = user_name
+    override.ssh.port = "22"
+    override.ssh.username = ssh_user
     override.ssh.private_key_path = ssh_key_path
   end
 
