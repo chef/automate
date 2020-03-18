@@ -109,6 +109,10 @@ if ARGV[0] == "up"
     stop_hours = ENV['STOP_HOURS']
   end
 
+  if ENV['ES_HEAP_SIZE'].nil?
+    ENV['ES_HEAP_SIZE'] = "3"
+  end
+
   if !ENV['EBS_SNAPSHOT'].nil? && ENV['EBS_SNAPSHOT'] =~ /^snap-\w+$/
     es_ebs_snapshot = ENV['EBS_SNAPSHOT']
     puts " * Using specified EBS snapshot #{es_ebs_snapshot} for the ElasticSearch data directory"
@@ -225,6 +229,8 @@ else
 fi
 
 cat<<EOF >>dev/config.toml
+[compliance.v1.sys.logger]
+  level = "debug"
 
 [elasticsearch.v1.sys.path]
 data = "es_data"
@@ -232,6 +238,7 @@ EOF
 
 EC2HOSTNAME=`curl -Ss http://169.254.169.254/latest/meta-data/public-hostname`
 sed -i "s/fqdn = .*/fqdn = '$EC2HOSTNAME'/" dev/config.toml
+sed -i "s/heapsize = .*/heapsize = '#{ENV['ES_HEAP_SIZE']}g'/" dev/config.toml
 echo "#{automate_license}" > dev/license.jwt
 SCRIPT
 
