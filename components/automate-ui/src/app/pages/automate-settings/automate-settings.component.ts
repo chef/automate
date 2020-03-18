@@ -3,7 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
-import { distinctUntilKeyChanged, debounceTime } from 'rxjs/operators';
+import { distinctUntilKeyChanged } from 'rxjs/operators';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import {
   automateSettingsState,
@@ -381,7 +381,7 @@ export class AutomateSettingsComponent implements OnInit {
   private populateInfra(job: IngestJob): void {
     let formThreshold, formUnit;
 
-    switch (job.name) {
+    switch (job.name) { // strongly type this so that it throws error
       case 'missing_nodes': {
         this.handleDisable(this.clientRunsRemoveData, job.disabled);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
@@ -428,7 +428,7 @@ export class AutomateSettingsComponent implements OnInit {
         disabled: _job.disabled
       };
 
-      switch (_job.name) {
+      switch (_job.name) { // strongly type this so that it throws error
 
         case 'compliance-reports': {
           this.handleDisable(this.complianceRemoveReports, _job.disabled);
