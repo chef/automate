@@ -64,4 +64,7 @@ UPDATE iam_roles
     WHERE
         id = 'project-owner';
 
+-- update infra policy to use more granular actions (replaces "infra:*")
+UPDATE iam_statements SET actions='{"infra:nodes:*", "infra:nodeManagers:*"}' WHERE policy_id=policy_db_id('infrastructure-automation-access-legacy');
+
 COMMIT;

@@ -102,7 +102,7 @@ To see the actions comprising the roles, see [Chef-managed Roles]({{< relref "ap
 Role          | Description
 --------------|------------
 Viewer        | **View** everything in the system *except* IAM
-Editor        | **Do** everything in the system *except* IAM
+Editor        | **Do** everything in the system *except* IAM and license application
 Owner         | **Do** everything in the system *including* IAM
 Project Owner | Editor + **view** and **assign** projects
 Ingest        | Ingest data into the system
