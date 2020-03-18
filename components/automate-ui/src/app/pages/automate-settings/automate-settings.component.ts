@@ -319,6 +319,7 @@ export class AutomateSettingsComponent implements OnInit {
 
   // Update forms until we get the job scheduler status
   public updateForm(jobSchedulerStatus: JobSchedulerStatus) {
+
     if (jobSchedulerStatus === null) {
       return;
     }

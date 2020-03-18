@@ -31,7 +31,7 @@
             </chef-checkbox>
             </div>
               <p>Remove event feed data after
-                <input chefInput type="number" formControlName="threshold" />days</p>
+                <input chefInput type="number" min="1" formControlName="threshold" />days</p>
           </div>
 
           <div class="checkbox-row" [formGroup]="eventFeedServerActions">
@@ -41,7 +41,7 @@
                 (change)="toggleInput(eventFeedServerActions, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove Chef Server actions after<input chefInput type="number" formControlName="threshold" />days</p>
+            <p>Remove Chef Server actions after<input chefInput type="number" min="1" formControlName="threshold" />days</p>
           </div>
         </div>
 
@@ -57,7 +57,7 @@
             </div>
 
             <p>When no health check reports have been received for a service in
-              <input chefInput type="number" formControlName="threshold" />
+              <input chefInput type="number" min="1" formControlName="threshold" />
               <mat-form-field appearance="none">
                 <mat-select panelClass="chef-dropdown" formControlName="unit">
                   <mat-option value="m">minutes</mat-option>
@@ -77,7 +77,7 @@
               </chef-checkbox>
             </div>
             <p>Remove services labeled as disconnected after
-              <input chefInput type="number" formControlName="threshold" />
+              <input chefInput type="number" min="1" formControlName="threshold" />
               <mat-form-field appearance="none">
                 <mat-select panelClass="chef-dropdown" formControlName="unit">
                   <mat-option value="m">minutes</mat-option>
@@ -98,7 +98,7 @@
               (change)="toggleInput(clientRunsRemoveData, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove data for Chef Client runs after<input chefInput type="number" formControlName="threshold" />days</p>
+            <p>Remove data for Chef Client runs after<input chefInput type="number" min="1" formControlName="threshold" />days</p>
           </div>
 
           <div class="checkbox-row" [formGroup]="clientRunsLabelMissing">
@@ -110,7 +110,7 @@
             </div>
           
             <p>When no Chef Client run data has been received from a node in
-              <input chefInput type="number" formControlName="threshold" />
+              <input chefInput type="number" min="1" formControlName="threshold" />
               <mat-form-field appearance="none">
                 <mat-select panelClass="chef-dropdown" formControlName="unit">
                   <mat-option value="m">minutes</mat-option>
@@ -129,7 +129,7 @@
               (change)="toggleInput(clientRunsRemoveNodes, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove nodes labeled as missing after<input chefInput type="number" formControlName="threshold" />
+            <p>Remove nodes labeled as missing after<input chefInput type="number" min="1" formControlName="threshold" />
             <mat-form-field appearance="none">
               <mat-select panelClass="chef-dropdown" formControlName="unit">
                 <mat-option value="m">minutes</mat-option>
@@ -150,7 +150,7 @@
               (change)="toggleInput(complianceRemoveReports, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove compliance reports after<input chefInput type="number" formControlName="threshold" />days</p>
+            <p>Remove compliance reports after<input chefInput type="number" min="1" formControlName="threshold" />days</p>
           </div>
 
           <div class="checkbox-row" [formGroup]="complianceRemoveScans">
@@ -160,7 +160,7 @@
               (change)="toggleInput(complianceRemoveScans, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove compliance scans after<input chefInput type="number" formControlName="threshold" />days</p>
+            <p>Remove compliance scans after<input chefInput type="number" min="1" formControlName="threshold" />days</p>
           </div>
         </div>
 

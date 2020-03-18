@@ -33,7 +33,7 @@ export class AutomateSettingsEffects {
   configureSettings$ = this.actions$.pipe(
     ofType(AutomateSettingsActionTypes.CONFIGURE_SETTINGS),
     mergeMap((action: ConfigureSettings) => this.requests.configureIngestJobs(action.payload.jobs)),
-    map((_resp) => new ConfigureSettingsSuccess({})),
+    map((_resp) => (new ConfigureSettingsSuccess({}))),
     catchError((error) => of(new ConfigureSettingsFailure(error))
     ));
 
@@ -41,5 +41,6 @@ export class AutomateSettingsEffects {
   @Effect()
   configureSettingsSuccess$ = this.actions$.pipe(
     ofType(AutomateSettingsActionTypes.CONFIGURE_SETTINGS_SUCCESS),
-    map((_action) => new GetSettings({})));
+    map((_action) => new GetSettings({}))
+    );
 }
