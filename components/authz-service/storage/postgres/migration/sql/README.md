@@ -74,3 +74,4 @@
 - [`72_create_projects_graveyard_table.up.sql`](72_create_projects_graveyard_table.up.sql)
 - [`73_add_constraint_iam_role_projects.up.sql`](73_add_constraint_iam_role_projects.up.sql)
 - [`74_pre_force_upgrade.up.sql`](74_pre_force_upgrade.up.sql)
+- [`75_update_roles_pols.up.sql`](75_update_roles_pols.up.sql)
