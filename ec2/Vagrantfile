@@ -255,7 +255,6 @@ if [ "\\$USER" == "ubuntu" ]; then
     mkdir -p ~/.hab/etc
     cat<<'EOT' > ~/.hab/etc/cli.toml
 origin = "ubuntu"
-auth_token = "dev444BBB999"
 ctl_secret = "dev333ZZZ111"
 EOT
     echo " * Running: hab origin..."
