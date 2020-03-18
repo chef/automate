@@ -73,7 +73,7 @@ const routes: Routes = [
           component: SettingsLandingComponent
         },
         {
-          path: 'node-lifecycle',
+          path: 'data-lifecycle',
           component: AutomateSettingsComponent
         },
         {
@@ -320,7 +320,7 @@ const routes: Routes = [
   {
     path: 'admin/settings',
     pathMatch: 'full',
-    redirectTo: 'settings/node-lifecycle'
+    redirectTo: 'settings/data-lifecycle'
   },
   {
     path: 'admin',

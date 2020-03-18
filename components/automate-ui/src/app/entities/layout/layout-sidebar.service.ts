@@ -124,7 +124,7 @@ export class LayoutSidebarService {
               {
                 name: 'Data Lifecycle',
                 icon: 'storage',
-                route: '/settings/node-lifecycle',
+                route: '/settings/data-lifecycle',
                 authorized: {
                   anyOf: ['/retention/nodes/status', 'get']
                 }
