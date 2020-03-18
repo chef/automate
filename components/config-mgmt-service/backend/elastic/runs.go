@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 
@@ -82,15 +83,13 @@ func (es Backend) GetTimeseriCheckinCounts(startTime, endTime time.Time) ([]back
 
 	mainQuery = mainQuery.Must(rangeQuery)
 
-	timezone := getTimezoneSoStartAtMidnight(startTime)
-
 	bucketHist := elastic.NewDateHistogramAggregation().Field("end_time").
 		Interval("1d").
 		MinDocCount(0). // needed to return empty buckets
 		ExtendedBounds(
 			startTime.Format(time.RFC3339), endTime.Format(time.RFC3339)). // needed to return empty buckets
 		Format("yyyy-MM-dd'T'HH:mm:ssZ").
-		TimeZone(timezone). // needed start the buckets at the beginning of the day.
+		TimeZone(getTimezoneSoStartAtMidnight(startTime)). // needed start the buckets at the beginning of the day.
 		SubAggregation(eventTypeItems,
 			elastic.NewTermsAggregation().Field("entity_uuid"))
 
@@ -103,24 +102,42 @@ func (es Backend) GetTimeseriCheckinCounts(startTime, endTime time.Time) ([]back
 		return []backend.CheckInPeroid{}, err
 	}
 
+	numberOfHours := getNumberOfHoursBetween(startTime, endTime)
+	numberOfDays := int(math.Ceil(float64(numberOfHours) / 24.0))
+	checkInPeroids := make([]backend.CheckInPeroid, numberOfDays)
 	dateHistoRes, found := searchResult.Aggregations.DateHistogram(dateHistoTag)
 	if !found {
-		return []backend.CheckInPeroid{}, fmt.Errorf("no runs found")
+		for index := 0; index < numberOfDays; index++ {
+			checkInPeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
+			checkInPeroids[index].End = startTime.Add(time.Hour * 24 *
+				time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
+		}
+		return checkInPeroids, nil
 	}
 
-	checkInPeroids := make([]backend.CheckInPeroid, len(dateHistoRes.Buckets))
+	if len(dateHistoRes.Buckets) != numberOfDays {
+		return []backend.CheckInPeroid{}, errors.NewBackendError(
+			"The number of buckets found is incorrect expected %d actual %d",
+			numberOfDays, len(dateHistoRes.Buckets))
+	}
+
 	for index, bucket := range dateHistoRes.Buckets {
 		item, found := bucket.Aggregations.Terms(eventTypeItems)
-		if !found {
-			return []backend.CheckInPeroid{}, fmt.Errorf("no runs found")
+		if found {
+			checkInPeroids[index].CheckInCount = len(item.Buckets)
 		}
-		checkInPeroids[index].CheckInCount = len(item.Buckets)
+
 		checkInPeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
 		checkInPeroids[index].End = startTime.Add(time.Hour * 24 *
 			time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
 	}
 
 	return checkInPeroids, nil
+}
+
+func getNumberOfHoursBetween(start, end time.Time) int {
+
+	return int(math.Ceil(end.Sub(start).Hours()))
 }
 
 func getTimezoneSoStartAtMidnight(start time.Time) string {
