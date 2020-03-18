@@ -7,7 +7,6 @@ import (
 
 	grpc_status "google.golang.org/grpc/status"
 
-	authz_constants "github.com/chef/automate/components/authz-service/constants"
 	authz_constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
@@ -125,12 +124,12 @@ func UpdateAdminsPolicyIfNeeded(ctx context.Context,
 	if err != nil {
 		return false, wrapUnexpectedError(err, "Failed to verify members of chef-managed Admin policy")
 	}
-	found := stringutils.SliceContains(resp.Members, authz_constants.LocalAdminsTeamSubject)
+	found := stringutils.SliceContains(resp.Members, authz_constants_v2.LocalAdminsTeamSubject)
 
 	if !dryRun && !found {
 		_, err = apiClient.PoliciesClient().AddPolicyMembers(ctx, &iam_req.AddPolicyMembersReq{
 			Id:      authz_constants_v2.AdminPolicyID,
-			Members: []string{authz_constants.LocalAdminsTeamSubject},
+			Members: []string{authz_constants_v2.LocalAdminsTeamSubject},
 		})
 		if err != nil {
 			return false, wrapUnexpectedError(err, "Failed to add local team: admins to chef-managed Admin policy")

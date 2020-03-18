@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	authz_constants "github.com/chef/automate/components/authz-service/constants"
+	authz_constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/adminmgmt"
 	"github.com/chef/automate/components/automate-cli/pkg/client/mock"
 	iam_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"

@@ -18,7 +18,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
-	authzV1 "github.com/chef/automate/api/interservice/authz"
 	authz "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/event-gateway/pkg/config"
 
@@ -68,7 +67,6 @@ func ReadHealthCheckCredentials(c *config.EventGatewayConfig) (string, error) {
 type automateAuthenticator struct {
 	authnClient      authn.AuthenticationClient
 	authzClient      authz.AuthorizationClient
-	authzV1Client    authzV1.AuthorizationClient
 	healthCheckToken string
 }
 
@@ -99,7 +97,6 @@ func newAutomateAuthenticator(c *config.EventGatewayConfig) (*automateAuthentica
 	return &automateAuthenticator{
 		authnClient:      authn.NewAuthenticationClient(authnConn),
 		authzClient:      authz.NewAuthorizationClient(authzConn),
-		authzV1Client:    authzV1.NewAuthorizationClient(authzConn),
 		healthCheckToken: healthCheckToken,
 	}, nil
 }
@@ -270,19 +267,7 @@ func (a *automateAuthenticator) checkToken(token string) error {
 	if len(subjects) < 1 {
 		return errors.New("token did not resolve to an authorization subject after authentication request")
 	}
-	err, tryV1 := a.tryAuthzV2(ctx, subjects)
-	if err == nil {
-		return nil
-	}
-	if !tryV1 {
-		return err
-	}
 
-	v1err, _ := a.tryAuthzV1(ctx, subjects)
-	return v1err
-}
-
-func (a *automateAuthenticator) tryAuthzV2(ctx context.Context, subjects []string) (err error, shouldTryV1 bool) {
 	resp, err := a.authzClient.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
 		Subjects: subjects,
 		Resource: resourceV2,
@@ -292,36 +277,17 @@ func (a *automateAuthenticator) tryAuthzV2(ctx context.Context, subjects []strin
 	})
 	if err != nil {
 		if status.Convert(err).Code() == codes.FailedPrecondition {
-			return err, true
+			return err
 		}
-		return errors.Wrapf(err, "authorizing action %q on resource %q for members %q", actionV2, resourceV2, subjects), false
+		return errors.Wrapf(err, "authorizing action %q on resource %q for members %q", actionV2, resourceV2, subjects)
 	}
 	projects := resp.Projects
 
 	if len(projects) == 0 {
-		return errors.Errorf("unauthorized action %q on resource %q for members %q", actionV2, resourceV2, subjects), false
+		return errors.Errorf("unauthorized action %q on resource %q for members %q", actionV2, resourceV2, subjects)
 	}
-	return nil, false
-}
 
-func (a *automateAuthenticator) tryAuthzV1(ctx context.Context, subjects []string) (err error, shouldTryV2 bool) {
-	resp, err := a.authzV1Client.IsAuthorized(ctx, &authzV1.IsAuthorizedReq{
-		Subjects: subjects,
-		Resource: resourceV1,
-		Action:   actionV1,
-	})
-	if err != nil {
-		// FailedPrecondition will happen for an IAM v1 request when IAM v2 is enabled.
-		if status.Convert(err).Code() == codes.FailedPrecondition {
-			return errors.Wrap(err, "IAMv1 not available, try IAMv2"), true
-		}
-		log.WithError(err).Error("unauthorized")
-		return errors.Wrapf(err, "error authorizing action %q on resource %q for subjects %q", actionV1, resourceV1, subjects), false
-	}
-	if resp.GetAuthorized() {
-		return nil, false
-	}
-	return errors.Errorf("unauthorized action %q on resource %q for subjects %q", actionV1, resourceV1, subjects), false
+	return nil
 }
 
 func dialgRPC(connFactory *secureconn.Factory, service string, endpointTarget string) (*grpc.ClientConn, error) {

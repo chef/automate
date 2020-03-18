@@ -9,8 +9,10 @@ import (
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/stringutils"
+	"github.com/chef/automate/lib/version"
 	"github.com/pkg/errors"
 
+	ver_api "github.com/chef/automate/api/external/common/version"
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
@@ -43,6 +45,18 @@ func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, p api.ProjectsServer
 		engine:   e,
 		projects: p,
 		store:    s,
+	}, nil
+}
+
+// GetVersion returns the version of Authz GRPC API
+func (s *authzServer) GetVersion(
+	ctx context.Context,
+	req *ver_api.VersionInfoRequest) (*ver_api.VersionInfo, error) {
+	return &ver_api.VersionInfo{
+		Name:    constants.ServiceName,
+		Version: version.Version,
+		Sha:     version.GitSHA,
+		Built:   version.BuildTime,
 	}, nil
 }
 

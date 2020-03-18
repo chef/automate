@@ -2,15 +2,21 @@ package conformance_test
 
 import (
 	"context"
+	"fmt"
+	"io/ioutil"
+	"path/filepath"
 	"strconv"
 	"testing"
 
+	"github.com/open-policy-agent/opa/ast"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	constants "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/authz-service/engine"
+	"github.com/chef/automate/components/authz-service/engine/opa"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
+	"github.com/chef/automate/lib/logger"
 )
 
 /************ ************ ************ ************ ************ ************
@@ -747,6 +753,359 @@ func TestV2FilterAuthorizedProjects(t *testing.T) {
 	}
 }
 
+func TestHierarchicalResourcePolicies(t *testing.T) {
+	ctx, engines := setupV2p1(t)
+	sub, act, res, proj := "user:local:someid", "compliance:scans:read", "compliance:scans:123", "proj"
+	pair := engine.Pair{Resource: engine.Resource(res), Action: engine.Action(act)}
+	args := func() (context.Context, engine.Subjects, []engine.Pair) {
+		return ctx, engine.Subject(sub), []engine.Pair{pair}
+	}
+
+	// different hierarchical resources that each match the test resource
+	hierarchicalResources := []string{
+		"*",
+		"compliance:*",
+		"compliance:scans:*",
+	}
+
+	for desc, e := range engines {
+		t.Run(desc, func(t *testing.T) {
+
+			for _, hierarchicalResource := range hierarchicalResources {
+				t.Run(fmt.Sprintf("one policy with hierarchical resource %q, decision 'allow'", hierarchicalResource),
+					func(t *testing.T) {
+						policy := map[string]interface{}{
+							"members": engine.Subject(sub),
+							"statements": map[string]interface{}{
+								"statement-id-1": map[string]interface{}{
+									"actions":   []string{act},
+									"resources": []string{hierarchicalResource},
+									"effect":    "allow",
+									"projects":  engine.ProjectList(proj),
+								},
+							},
+						}
+						setPoliciesV2p1(t, e, policy)
+
+						filtered, err := e.V2FilterAuthorizedPairs(args())
+						require.NoError(t, err)
+						assert.Equal(t, []engine.Pair{pair}, filtered)
+					})
+
+				t.Run(fmt.Sprintf("two policies, one with specified resource, decision 'allow'; hierarchical resource %q, decision 'deny'", hierarchicalResource),
+					func(t *testing.T) {
+						allowPolicy := map[string]interface{}{
+							"members": engine.Subject(sub),
+							"statements": map[string]interface{}{
+								"statement-id-1": map[string]interface{}{
+									"actions":   []string{act},
+									"resources": []string{res},
+									"effect":    "allow",
+									"projects":  engine.ProjectList(proj),
+								},
+							},
+						}
+
+						denyPolicy := map[string]interface{}{
+							"members": engine.Subject(sub),
+							"statements": map[string]interface{}{
+								"statement-id-1": map[string]interface{}{
+									"actions":   []string{act},
+									"resources": []string{hierarchicalResource},
+									"effect":    "deny",
+									"projects":  engine.ProjectList(proj),
+								},
+							},
+						}
+
+						setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+
+						// now, having both the matching allow-policy, and a new deny-policy
+						// with a hierarchical resource, this should end in deny (no pairs)
+						filtered, err := e.V2FilterAuthorizedPairs(args())
+						require.NoError(t, err)
+						assert.Equal(t, []engine.Pair{}, filtered)
+					})
+
+				t.Run(fmt.Sprintf("two policies, one with specified resource, decision 'deny'; hierarchical resource %q, decision 'allow'", hierarchicalResource),
+					func(t *testing.T) {
+						allowPolicy := map[string]interface{}{
+							"members": engine.Subject(sub),
+							"statements": map[string]interface{}{
+								"statement-id-1": map[string]interface{}{
+									"actions":   []string{act},
+									"resources": []string{hierarchicalResource},
+									"effect":    "allow",
+									"projects":  engine.ProjectList(proj),
+								},
+							},
+						}
+
+						denyPolicy := map[string]interface{}{
+							"members": engine.Subject(sub),
+							"statements": map[string]interface{}{
+								"statement-id-1": map[string]interface{}{
+									"actions":   []string{act},
+									"resources": []string{res},
+									"effect":    "deny",
+									"projects":  engine.ProjectList(proj),
+								},
+							},
+						}
+
+						setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+
+						// now, having both the matching deny-policy for a specified resource,
+						// and a new allow-policy with a hierarchical resource, this should
+						// still end in deny (no pairs)
+						filtered, err := e.V2FilterAuthorizedPairs(args())
+						require.NoError(t, err)
+						assert.Equal(t, []engine.Pair{}, filtered)
+					})
+			}
+		})
+	}
+}
+
+func TestWildcardActionPolicies(t *testing.T) {
+	ctx, engines := setupV2p1(t)
+	sub, act, res, proj := "user:local:someid", "compliance:scans:read", "compliance:scans:123", "proj"
+	pair := engine.Pair{Resource: engine.Resource(res), Action: engine.Action(act)}
+	args := func() (context.Context, engine.Subjects, []engine.Pair) {
+		return ctx, engine.Subject(sub), []engine.Pair{pair}
+	}
+
+	for desc, e := range engines {
+		t.Run(desc, func(t *testing.T) {
+
+			t.Run("one policy with wildcard action, decision 'allow'",
+				func(t *testing.T) {
+					policy := map[string]interface{}{
+						"members": engine.Subject(sub),
+						"statements": map[string]interface{}{
+							"statement-id-1": map[string]interface{}{
+								"actions":   []string{"*"},
+								"resources": []string{res},
+								"effect":    "allow",
+								"projects":  engine.ProjectList(proj),
+							},
+						},
+					}
+					setPoliciesV2p1(t, e, policy)
+
+					filtered, err := e.V2FilterAuthorizedPairs(args())
+					require.NoError(t, err)
+					assert.Equal(t, []engine.Pair{pair}, filtered)
+				})
+
+			t.Run("two policies, one with specified action, decision 'allow'; one with wildcard action, decision 'deny'",
+				func(t *testing.T) {
+					allowPolicy := map[string]interface{}{
+						"members": engine.Subject(sub),
+						"statements": map[string]interface{}{
+							"statement-id-1": map[string]interface{}{
+								"actions":   []string{act},
+								"resources": []string{res},
+								"effect":    "allow",
+								"projects":  engine.ProjectList(proj),
+							},
+						},
+					}
+
+					// check that we get an allow, so this non-wildcard policy is matching
+					setPoliciesV2p1(t, e, allowPolicy)
+					filtered, err := e.V2FilterAuthorizedPairs(args())
+					require.NoError(t, err)
+					assert.Equal(t, []engine.Pair{pair}, filtered)
+
+					denyPolicy := map[string]interface{}{
+						"members": engine.Subject(sub),
+						"statements": map[string]interface{}{
+							"statement-id-1": map[string]interface{}{
+								"actions":   []string{"*"},
+								"resources": []string{res},
+								"effect":    "deny",
+								"projects":  engine.ProjectList(proj),
+							},
+						},
+					}
+
+					setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+
+					// now, having both the matching allow-policy, and a new deny-policy
+					// with a wildcard subject, this should end in deny (no pair)
+					filtered, err = e.V2FilterAuthorizedPairs(args())
+					require.NoError(t, err)
+					assert.Equal(t, []engine.Pair{}, filtered)
+				})
+
+			t.Run("two policies, one with specified action, decision 'deny'; one with wildcard action, decision 'allow'",
+				func(t *testing.T) {
+					allowPolicy := map[string]interface{}{
+						"members": engine.Subject(sub),
+						"statements": map[string]interface{}{
+							"statement-id-1": map[string]interface{}{
+								"actions":   []string{"*"},
+								"resources": []string{res},
+								"effect":    "allow",
+								"projects":  engine.ProjectList(proj),
+							},
+						},
+					}
+
+					// check that we get an allow, so this non-wildcard policy is matching
+					setPoliciesV2p1(t, e, allowPolicy)
+					filtered, err := e.V2FilterAuthorizedPairs(args())
+					require.NoError(t, err)
+					assert.Equal(t, []engine.Pair{pair}, filtered)
+
+					denyPolicy := map[string]interface{}{
+						"members": engine.Subject(sub),
+						"statements": map[string]interface{}{
+							"statement-id-1": map[string]interface{}{
+								"actions":   []string{act},
+								"resources": []string{res},
+								"effect":    "deny",
+								"projects":  engine.ProjectList(proj),
+							},
+						},
+					}
+
+					setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+
+					// now, having both the matching deny-policy for a specified action,
+					// and a new allow-policy with a wildcard action, this should still
+					// end in deny (no pair)
+					filtered, err = e.V2FilterAuthorizedPairs(args())
+					require.NoError(t, err)
+					assert.Equal(t, []engine.Pair{}, filtered)
+				})
+		})
+	}
+}
+
+func TestWildcardSubjectsPolicies(t *testing.T) {
+	ctx, engines := setupV2p1(t)
+	sub, act, res, proj := "user:local:someid", "compliance:scans:read", "compliance:scans:123", "proj"
+	pair := engine.Pair{Resource: engine.Resource(res), Action: engine.Action(act)}
+	args := func() (context.Context, engine.Subjects, []engine.Pair) {
+		return ctx, engine.Subject(sub), []engine.Pair{pair}
+	}
+
+	for desc, e := range engines {
+		t.Run(desc, func(t *testing.T) {
+			matchingSubjects := []string{
+				"*",
+				"user:*",
+				"user:local:*",
+			}
+			for _, matchingSub := range matchingSubjects {
+				t.Run(fmt.Sprintf("one policy with wildcard subject %q, decision 'allow'", matchingSub), func(t *testing.T) {
+					policy := map[string]interface{}{
+						"members": engine.Subject(matchingSub),
+						"statements": map[string]interface{}{
+							"statement-id-1": map[string]interface{}{
+								"actions":   []string{act},
+								"resources": []string{res},
+								"effect":    "allow",
+								"projects":  engine.ProjectList(proj),
+							},
+						},
+					}
+					setPoliciesV2p1(t, e, policy)
+
+					filtered, err := e.V2FilterAuthorizedPairs(args())
+					require.NoError(t, err)
+					assert.Equal(t, []engine.Pair{pair}, filtered)
+				})
+
+				t.Run(fmt.Sprintf("two policies, one with specified subject, decision 'allow'; one with wildcard subject %q, decision 'deny'", matchingSub), func(t *testing.T) {
+					allowPolicy := map[string]interface{}{
+						"members": engine.Subject(sub),
+						"statements": map[string]interface{}{
+							"statement-id-1": map[string]interface{}{
+								"actions":   []string{act},
+								"resources": []string{res},
+								"effect":    "allow",
+								"projects":  engine.ProjectList(proj),
+							},
+						},
+					}
+
+					// check that we get an allow
+					setPoliciesV2p1(t, e, allowPolicy)
+					filtered, err := e.V2FilterAuthorizedPairs(args())
+					require.NoError(t, err)
+					assert.Equal(t, []engine.Pair{pair}, filtered)
+
+					denyPolicy := map[string]interface{}{
+						"members": engine.Subject(matchingSub),
+						"statements": map[string]interface{}{
+							"statement-id-1": map[string]interface{}{
+								"actions":   []string{act},
+								"resources": []string{res},
+								"effect":    "deny",
+								"projects":  engine.ProjectList(proj),
+							},
+						},
+					}
+
+					setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+
+					// now, having both the matching allow-policy, and a new deny-policy
+					// with a wildcard subject, this should end in deny (no pair)
+					filtered, err = e.V2FilterAuthorizedPairs(args())
+					require.NoError(t, err)
+					assert.Equal(t, []engine.Pair{}, filtered)
+
+				})
+
+				t.Run(fmt.Sprintf("two policies, one with specified subject, decision 'deny'; one with wildcard subject %q, decision 'allow'", matchingSub), func(t *testing.T) {
+
+					allowPolicy := map[string]interface{}{
+						"members": engine.Subject(matchingSub),
+						"statements": map[string]interface{}{
+							"statement-id-1": map[string]interface{}{
+								"actions":   []string{act},
+								"resources": []string{res},
+								"effect":    "allow",
+								"projects":  engine.ProjectList(proj),
+							},
+						},
+					}
+
+					// check that we get an allow, so this non-wildcard policy is matching
+					setPoliciesV2p1(t, e, allowPolicy)
+					filtered, err := e.V2FilterAuthorizedPairs(args())
+					require.NoError(t, err)
+					assert.Equal(t, []engine.Pair{pair}, filtered)
+
+					denyPolicy := map[string]interface{}{
+						"members": engine.Subject(sub),
+						"statements": map[string]interface{}{
+							"statement-id-1": map[string]interface{}{
+								"actions":   []string{act},
+								"resources": []string{res},
+								"effect":    "deny",
+								"projects":  engine.ProjectList(proj),
+							},
+						},
+					}
+
+					setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+
+					// now, having both the matching deny-policy for a specified subject,
+					// and a new allow-policy with a wildcard subject, this should still
+					// end in deny (no pair)
+					filtered, err = e.V2FilterAuthorizedPairs(args())
+					require.NoError(t, err)
+					assert.Equal(t, []engine.Pair{}, filtered)
+				})
+			}
+		})
+	}
+}
+
 func setPoliciesV2p1(t testing.TB, e engine.Engine, policiesAndRoles ...interface{}) {
 	t.Helper()
 	ctx := context.Background()
@@ -780,6 +1139,34 @@ func setupV2p1(t testing.TB) (context.Context, map[string]engine.Engine) {
 	ctx, engines := setup(t)
 	if o, ok := engines["opa"]; ok {
 		o.V2p1SetPolicies(ctx, map[string]interface{}{}, map[string]interface{}{})
+	}
+	return ctx, engines
+}
+
+func setup(t testing.TB) (context.Context, map[string]engine.Engine) {
+	t.Helper()
+	ctx := context.Background()
+
+	l, err := logger.NewLogger("text", "debug")
+	require.NoError(t, err, "could not init logger")
+
+	mods := map[string]*ast.Module{}
+	files, err := filepath.Glob("../opa/policy/*.rego")
+	require.NoError(t, err, "could not glob *.rego files")
+
+	for _, file := range files {
+		data, err := ioutil.ReadFile(file)
+		require.NoErrorf(t, err, "could not read rego file %q", file)
+		parsed, err := ast.ParseModule(file, string(data))
+		require.NoErrorf(t, err, "could not parse rego file %q", file)
+		mods[file] = parsed
+	}
+
+	o, err := opa.New(ctx, l, opa.WithModules(mods))
+	require.NoError(t, err, "could not initialize OPA")
+
+	engines := map[string]engine.Engine{
+		"opa": o,
 	}
 	return ctx, engines
 }
