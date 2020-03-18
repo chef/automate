@@ -10,22 +10,6 @@ expeditor:
         workdir: /go/src/github.com/chef/automate
 
 steps:
-  # Building hugo currently depends on a github token
-  #     https://github.com/chef/chef-hugo-theme
-  # which is currently private.
-  - label: lint hugo site
-    command:
-      - .expeditor/buildkite/hugo_lint.sh
-      - cd components/automate-chef-io && make lint
-    timeout_in_minutes: 10
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      accounts:
-        - github
-      executor:
-        docker:
 
   # license scout requires github account access because we currently
   # rely on at least 2 private repositories.
