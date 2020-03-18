@@ -36,7 +36,7 @@ export class AutomateSettingsRequests {
   configureIngestJobs(jobs: IngestJob[]): Observable<any> {
     const url = '/api/v0/data-lifecycle/config';
 
-    const body = {
+    const body = {  // add strong typing
       'infra' : {
         'job_settings': [
           {
@@ -73,7 +73,7 @@ export class AutomateSettingsRequests {
       let thisJob;
       let matchedNest;
 
-      switch (job.name) {
+      switch (job.name) {  // ADD STRONG TYPING
         case 'delete_nodes':      // fallthrough
         case 'missing_nodes':     // fallthrough
         case 'missing_nodes_for_deletion':
