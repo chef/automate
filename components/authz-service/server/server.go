@@ -21,11 +21,9 @@ import (
 	"github.com/chef/automate/lib/logger"
 	"github.com/chef/automate/lib/tracing"
 
-	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/api/interservice/authz/common"
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/engine"
-	v1 "github.com/chef/automate/components/authz-service/server/v1"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
@@ -62,12 +60,7 @@ func NewGRPCServer(ctx context.Context,
 	dataMigrationsConfig datamigration.Config, cerealAddress string,
 	projectLimit int) (*grpc.Server, error) {
 
-	v1Server, err := v1.NewPostgresServer(ctx, l, e, migrationsConfig, dataMigrationsConfig)
-	if err != nil {
-		return nil, errors.Wrap(err, "could not initialize v1 server")
-	}
-
-	err = v2_postgres.Initialize(ctx, e, l, migrationsConfig, dataMigrationsConfig, projectLimit)
+	err := v2_postgres.Initialize(ctx, e, l, migrationsConfig, dataMigrationsConfig, projectLimit)
 	if err != nil {
 		return nil, errors.Wrap(err, "could not initialize v2 postgres singleton")
 	}
@@ -136,7 +129,6 @@ func NewGRPCServer(ctx context.Context,
 
 	// register all services
 	health.RegisterHealthServer(g, health.NewService())
-	authz.RegisterAuthorizationServer(g, v1Server)
 	api_v2.RegisterPoliciesServer(g, v2PolServer)
 	api_v2.RegisterProjectsServer(g, v2ProjectsServer)
 	api_v2.RegisterAuthorizationServer(g, v2AuthzServer)

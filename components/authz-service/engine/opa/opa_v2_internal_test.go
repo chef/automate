@@ -35,6 +35,13 @@ var (
 	projectsResponse []string
 )
 
+var filteredPairsResp []engine.Pair
+var errResult error
+
+// these package variables are required so the compiler does not optimize return values out
+var result ast.Value
+var authzResponse bool
+
 func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 	ctx := context.Background()
 

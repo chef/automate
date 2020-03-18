@@ -127,26 +127,26 @@ func (s *State) initModules() error {
 
 // initPartialResult allows caching things that don't change among multiple
 // query evaluations. We don't bother for the pairs query, but for
-// IsAuthorized(), we want to do as little work per call as possible.
-func (s *State) initPartialResult(ctx context.Context) error {
-	// Reset compiler to avoid state issues
-	compiler, err := s.newCompiler()
-	if err != nil {
-		return err
-	}
+// SetPolicies(), we want to do as little work per call as possible.
+// func (s *State) initPartialResult(ctx context.Context) error {
+// 	// Reset compiler to avoid state issues
+// 	compiler, err := s.newCompiler()
+// 	if err != nil {
+// 		return err
+// 	}
 
-	r := rego.New(
-		rego.ParsedQuery(s.queries[authzQuery]),
-		rego.Compiler(compiler),
-		rego.Store(s.store),
-	)
-	pr, err := r.PartialResult(ctx)
-	if err != nil {
-		return errors.Wrap(err, "partial eval")
-	}
-	s.partialAuth = pr
-	return nil
-}
+// 	r := rego.New(
+// 		rego.ParsedQuery(s.queries[authzQuery]),
+// 		rego.Compiler(compiler),
+// 		rego.Store(s.store),
+// 	)
+// 	pr, err := r.PartialResult(ctx)
+// 	if err != nil {
+// 		return errors.Wrap(err, "partial eval")
+// 	}
+// 	s.partialAuth = pr
+// 	return nil
+// }
 
 // Returns a prepared query that can be executed. The result set will contain a
 // binding for a variable named 'project' that contains the name (string) of a
@@ -264,43 +264,6 @@ func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
 	return store.Commit(ctx, txn)
 }
 
-// IsAuthorized evaluates whether a given [subject, resource, action] tuple
-// is authorized given the service's state
-func (s *State) IsAuthorized(
-	ctx context.Context,
-	subjects engine.Subjects,
-	action engine.Action,
-	resource engine.Resource) (bool, error) {
-
-	subs := make(ast.Array, len(subjects))
-	for i, sub := range subjects {
-		subs[i] = ast.NewTerm(ast.String(sub))
-	}
-	input := ast.NewObject(
-		[2]*ast.Term{ast.NewTerm(ast.String("subjects")), ast.NewTerm(subs)},
-		[2]*ast.Term{ast.NewTerm(ast.String("resource")), ast.NewTerm(ast.String(resource))},
-		[2]*ast.Term{ast.NewTerm(ast.String("action")), ast.NewTerm(ast.String(action))},
-	)
-	resultSet, err := s.partialAuth.Rego(rego.ParsedInput(input)).Eval(ctx)
-	if err != nil {
-		return false, &EvaluationError{e: err}
-	}
-
-	switch len(resultSet) {
-	case 0:
-		return false, nil
-	case 1:
-		exps := resultSet[0].Expressions
-		if len(exps) != 1 {
-			return false, &UnexpectedResultExpressionError{exps: exps}
-
-		}
-		return exps[0].Value == true, nil
-	default:
-		return false, &UnexpectedResultSetError{set: resultSet}
-	}
-}
-
 // V2ProjectsAuthorized evaluates whether a given [subject, resource, action,
 // projects] tuple is authorized and returns the list of associated allowed
 // projects from the set of requested projects passed in.
@@ -331,27 +294,6 @@ func (s *State) V2ProjectsAuthorized(
 	}
 
 	return s.projectsFromPreparedEvalQuery(resultSet)
-}
-
-// FilterAuthorizedPairs passes the pairs into OPA, lets it take care of the
-// filtering, and returns the result (sub)list
-func (s *State) FilterAuthorizedPairs(
-	ctx context.Context,
-	subjects engine.Subjects,
-	pairs []engine.Pair) ([]engine.Pair, error) {
-
-	opaInput := map[string]interface{}{
-		"subjects": subjects,
-		"pairs":    pairs,
-	}
-
-	// NB: V1 only, so s.store used here
-	rs, err := s.evalQuery(ctx, s.queries[filteredPairsQuery], opaInput, s.store)
-	if err != nil {
-		return nil, &EvaluationError{e: err}
-	}
-
-	return s.pairsFromResults(rs)
 }
 
 // V2FilterAuthorizedPairs passes the pairs into OPA, lets it take care of the
@@ -493,16 +435,6 @@ func (s *State) projectsFromPreparedEvalQuery(rs rego.ResultSet) ([]string, erro
 		}
 	}
 	return result, nil
-}
-
-// SetPolicies replaces OPA's data with a new set of policies, and resets the
-// partial evaluation cache
-func (s *State) SetPolicies(ctx context.Context, policies map[string]interface{}) error {
-	s.store = inmem.NewFromObject(map[string]interface{}{
-		"policies": policies,
-	})
-
-	return s.initPartialResult(ctx)
 }
 
 // V2p1SetPolicies replaces OPA's data with a new set of policies and roles
