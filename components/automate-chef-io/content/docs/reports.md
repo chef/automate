@@ -14,7 +14,10 @@ toc = true
 ## Overview
 
 The Reports view under the Compliance tab provides comprehensive insight into the compliance status of all scanned infrastructure.
-_Note: the count of controls in the overview pane represent how many controls have been executed, not the count of unique controls executed._
+
+{{% info %}}
+Note: The count of controls listed in the _Profile Status_ pane of the Reports Overview represents how many controls have been executed, and not the count of unique controls executed.
+{{% /info %}}
 
 ![Compliance](/images/docs/compliance.png)
 
@@ -34,7 +37,9 @@ Users with audit cookbook configurations can expect to see the results of those 
 
 ### Search Bar and Filters
 
-The Compliance search allows you to view and filter compliance scan results based on a defined set of filters. Wildcard searches on field values will not return suggestions, but they will filter the results. For example, you can search for `Node Name: prod*` to filter down to all the nodes that begin with `prod`.
+The Compliance search allows you to view and filter compliance scan results based on a defined set of filters.
+Wildcard searches on field values will not return suggestions, but they will filter the results.
+For example, you can search for `Node Name: prod*` and filter the results to list all the node names that begin with `prod`.
 
 Profile
 : Filter your results by profile. This list will include any executed profiles (a profile for which scan results have been received).
