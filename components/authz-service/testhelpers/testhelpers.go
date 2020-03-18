@@ -26,7 +26,6 @@ import (
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
-	postgres_v1 "github.com/chef/automate/components/authz-service/storage/v1/postgres"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -78,23 +77,15 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	ctx := context.Background()
 	seed := prng.GenSeed(t)
 
-	pg, testDB, opaInstance, _, migrationConfig := SetupTestDB(t)
+	pg, testDB, opaInstance, _, _ := SetupTestDB(t)
 
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
 
-	dataMigrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../storage/postgres/datamigration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
-	}
-
-	pgV1, err := postgres_v1.New(ctx, l, *migrationConfig, datamigration.Config(*dataMigrationConfig))
-	require.NoError(t, err)
-
 	polRefresher, err := v2.NewPostgresPolicyRefresher(ctx, l, opaInstance)
 	require.NoError(t, err)
 
-	polSrv, err := server.NewPoliciesServer(ctx, l, polRefresher, pg, opaInstance, pgV1)
+	polSrv, err := server.NewPoliciesServer(ctx, l, polRefresher, pg, opaInstance)
 	require.NoError(t, err)
 
 	projectUpdateManager := NewMockProjectUpdateManager()

@@ -116,8 +116,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 
 func setupV2p1AuthTests(t *testing.T, eng *responderEngine) (context.Context, testSetup) {
 	ctx := context.Background()
-	emptyV1List := v1Lister{}
-	ts := setupV2(t, eng, nil, &emptyV1List)
+	ts := setupV2(t, eng, nil)
 	return ctx, ts
 }
 
