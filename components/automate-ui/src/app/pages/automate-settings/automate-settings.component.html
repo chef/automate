@@ -17,8 +17,7 @@
       <div class="page-body">
 
         <div class="group-section">
-          <chef-button primary [disabled]="noChanges()" (click)="applyChanges()">Save Changes</chef-button>
-          <chef-button secondary [disabled]="noChanges()" (click)="testPrintValues()">Print Values</chef-button>
+          <chef-button primary [disabled]="!formChanged" (click)="applyChanges()">Save Changes</chef-button>
         </div>
 
         <div class="group-section">

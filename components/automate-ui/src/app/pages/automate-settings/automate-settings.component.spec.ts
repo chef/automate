@@ -145,15 +145,6 @@ describe('AutomateSettingsComponent', () => {
     });
   });
 
-  describe('noChanges()', () => {
-    it('reports if there has been any changes to the form', () => {
-      component.ngOnInit();
-      expect(component.noChanges()).toEqual(true);
-      component.toggleInput(component.eventFeedRemoveData, true);
-      expect(component.noChanges()).toEqual(false);
-    });
-  });
-
   describe('when jobSchedulerStatus is set', () => {
     beforeAll(() => {
       const eventFeedRemoveData: IngestJob = {

@@ -3,6 +3,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
+import { distinctUntilKeyChanged, debounceTime } from 'rxjs/operators';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import {
   automateSettingsState,
@@ -18,7 +19,6 @@ import {
   IngestJobs
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
-import { distinctUntilKeyChanged } from 'rxjs/operators';
 
 @Component({
   templateUrl: './automate-settings.component.html',
@@ -193,14 +193,6 @@ export class AutomateSettingsComponent implements OnInit {
       });
   }
 
-  testPrintValues() {
-    console.log(this.automateSettingsForm.value);
-  }
-
-  // Has the form changed?
-  public noChanges() {
-    return !this.formChanged;
-  }
 
   public toggleInput(form, checked: boolean) {
     // patchValue is a workaround for the chef-checkbox because we need to be
@@ -263,6 +255,7 @@ export class AutomateSettingsComponent implements OnInit {
           this.showErrorNotification(error, errMsg);
           // SHOULD RESET THE FORM HERE IF THERE IS AN ERROR
         } else {
+          console.log('set form to false');
           this.formChanged = false;
           this.showSuccessNotification();
         }
@@ -287,7 +280,10 @@ export class AutomateSettingsComponent implements OnInit {
   // Subscribes to any change inside the automateSettingsForm
   private onChanges() {
     this.automateSettingsForm.valueChanges
-      .subscribe(_change => this.formChanged = true);
+      .subscribe(_change => {
+        console.log('change recorded');
+        this.formChanged = true;
+      });
   }
 
   private showErrorNotification(error: HttpErrorResponse, msg: string) {
