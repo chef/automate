@@ -126,7 +126,6 @@ if ARGV[0] == "up"
   manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/#{automate_build}.json"
   hab_version_from_manifest, git_sha_from_manifest = extract_from_manifest(manifest_url, automate_build)
 
-  puts "==> Installing Automate services from #{manifest_url}"
   puts '==> Checking for ssh identities needed to clone the automate repo...'
 
   unless system('ssh-add -l')
@@ -165,6 +164,7 @@ if ARGV[0] == "up"
   if ENV['AWS_SSH_KEY_NAME'].nil?
     raise "ENV variable AWS_SSH_KEY_NAME must be defined for this. See README.md for more details. Aborting..."
   end
+  puts "==> Installing Automate services from #{manifest_url}"
 end
 
 $install_hab = <<SCRIPT

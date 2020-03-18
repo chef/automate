@@ -74,7 +74,6 @@ if ARGV[0] == "up"
     raise "ENV variable GITHUB_TOKEN must be defined for this, aborting..."
   end
 
-  puts "==> Installing Automate services from #{manifest_url}"
   if automate_license.nil?
     if(File.file?(automate_license_path))
       automate_license = File.read(automate_license_path)
@@ -85,6 +84,7 @@ if ARGV[0] == "up"
   else
     puts '==> Using Automate license from ENV variable AUTOMATE_LICENSE'
   end
+  puts "==> Installing Automate services from #{manifest_url}"
 end
 
 $install_hab = <<SCRIPT
