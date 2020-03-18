@@ -38,9 +38,9 @@ export class AutomateSettingsEffects {
     ));
 
 
-  @Effect()
-  configureSettingsSuccess$ = this.actions$.pipe(
-    ofType(AutomateSettingsActionTypes.CONFIGURE_SETTINGS_SUCCESS),
-    map((_action) => new GetSettings({}))
-    );
+  // @Effect()
+  // configureSettingsSuccess$ = this.actions$.pipe(
+  //   ofType(AutomateSettingsActionTypes.CONFIGURE_SETTINGS_SUCCESS),
+  //   map((_action) => new GetSettings({}))
+  //   );
 }

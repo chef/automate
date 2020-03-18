@@ -36,7 +36,7 @@ export class AutomateSettingsRequests {
   configureIngestJobs(jobs: IngestJob[]): Observable<any> {
     const url = '/api/v0/data-lifecycle/config';
 
-    const body = {  // add strong typing
+    const body = {  // add strong typing  --> see sidebar types
       'infra' : {
         'job_settings': [
           {

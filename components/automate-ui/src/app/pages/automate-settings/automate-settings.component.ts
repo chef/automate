@@ -254,8 +254,7 @@ export class AutomateSettingsComponent implements OnInit {
           const errMsg = 'Unable to update one or more settings.';
           this.showErrorNotification(error, errMsg);
           // SHOULD RESET THE FORM HERE IF THERE IS AN ERROR
-        } else {
-          console.log('set form to false');
+        } else if (changeConfigurationSelector.status === 'loadingSuccess') {
           this.formChanged = false;
           this.showSuccessNotification();
         }
