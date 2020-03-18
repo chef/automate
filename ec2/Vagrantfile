@@ -236,10 +236,10 @@ echo "#{automate_license}" > dev/license.jwt
 SCRIPT
 
 $enter_hab_studio = <<SCRIPT
+export HAB_LICENSE=accept-no-persist
 cat<<EOF >/etc/profile.d/hab_studio_setup.sh
 export HAB_LICENSE=accept-no-persist
 if [ "\\$USER" == "ubuntu" ]; then
-  export HAB_LICENSE=accept-no-persist
   export HAB_STUDIO_SECRET_GITHUB_TOKEN=#{ENV['GITHUB_TOKEN']}
   export AWS_ACCESS_KEY_ID=#{aws_access_key_id}
   export AWS_SECRET_ACCESS_KEY=#{aws_secret_access_key}
@@ -258,20 +258,25 @@ origin = "ubuntu"
 auth_token = "dev444BBB999"
 ctl_secret = "dev333ZZZ111"
 EOT
+    echo " * Running: hab origin..."
     hab origin key generate ubuntu
   fi
+  echo " * Running: hab studio run to wget the build.json"
   hab studio run 'wget -O results/build.json "#{manifest_url}"'
   hab studio run 'echo "https://$(curl -Ss http://169.254.169.254/latest/meta-data/public-hostname)" > url.txt'
   # captures an Amazon EBS volume that is not mounted and has a UUID(avoids matching the root EBS volume)
   device_to_mount=\\$(lsblk -o NAME,MODEL,MOUNTPOINT,UUID | grep -P "Amazon Elastic Block Store[^/]+\\w" | cut -f1 -d" ")
   if [ -n "\\$device_to_mount" ]; then
+    echo " * Running: hab studio runs for es data"
     hab studio run 'mkdir -p /hab/svc/automate-elasticsearch/data'
     hab studio run "mount -o discard /dev/\\$device_to_mount /hab/svc/automate-elasticsearch/data"
     hab studio run 'mkdir -p /hab/svc/automate-elasticsearch/data/es_data && chown -R hab:hab /hab/svc/automate-elasticsearch/data/es_data'
   fi
+  echo " * Running: hab studio enter"
   hab studio enter
 fi
 EOF
+echo " * Running: hab pkg install"
 hab pkg install -b core/git
 STUDIORC="#{home_dir}/automate/.studiorc"
 echo 'printf "\033[0;31m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n>>> TWO MORE STEPS NEEDED TO RUN A2 <<<\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\033[0m\n"' >> $STUDIORC
