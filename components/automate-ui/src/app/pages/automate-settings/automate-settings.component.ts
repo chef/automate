@@ -155,8 +155,6 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     this.complianceRemoveReports = this.fb.group(formDetails['complianceRemoveReports']);
     this.complianceRemoveScans = this.fb.group(formDetails['complianceRemoveScans']);
 
-
-
     // Put the whole form together
     this.automateSettingsForm = this.fb.group({
       // Event Feed
@@ -193,8 +191,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         } else {
           this.jobSchedulerStatus = automateSettingsSelector.jobSchedulerStatus;
           this.telemetryService.track('lifecycleConfiguration', this.jobSchedulerStatus);
-          this.updateForm(this.jobSchedulerStatus);
-          this.onChanges();
+          this.updateForm(this.jobSchedulerStatus, () => this.onChanges() );
         }
       });
   }
@@ -288,12 +285,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   }
 
   // Subscribes to any change inside the automateSettingsForm
-  private onChanges() {
-    this.automateSettingsForm.valueChanges
-      .subscribe(_change => {
-        console.log('change recorded');
-        this.formChanged = true;
-      });
+  private onChanges(): void {
+    this.automateSettingsForm.valueChanges.pipe(takeUntil(this.isDestroyed))
+      .subscribe(_change => this.formChanged = true);
   }
 
   private showErrorNotification(error: HttpErrorResponse, msg: string) {
@@ -322,7 +316,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   }
 
   // Update forms until we get the job scheduler status
-  public updateForm(jobSchedulerStatus: JobSchedulerStatus) {
+  public updateForm(jobSchedulerStatus: JobSchedulerStatus, cb: () => void ) {
 
     if (jobSchedulerStatus === null) {
       return;
@@ -347,6 +341,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       }
 
     });
+
+    cb();
   }
 
   private getJobForm(jobName: string) {

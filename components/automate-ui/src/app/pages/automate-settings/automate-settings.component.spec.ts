@@ -140,7 +140,7 @@ describe('AutomateSettingsComponent', () => {
   describe('when jobSchedulerStatus is null', () => {
     it('does not update the forms', () => {
       const formBeforeUpdate = component.automateSettingsForm;
-      component.updateForm(null);
+      component.updateForm(null, null);
       expect(component.automateSettingsForm).toEqual(formBeforeUpdate);
     });
   });
