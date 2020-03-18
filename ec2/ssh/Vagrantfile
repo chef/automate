@@ -1,16 +1,21 @@
 require 'json'
 require 'open-uri'
 
-# vagrant box add dummy https://github.com/tknerr/vagrant-managed-servers/raw/master/dummy.box --provider=managed
-# vagrant plugin install vagrant-managed-servers
+if ['up', 'ssh', 'halt'].include?(ARGV[0])
+  raise 'ENV variable SSH_HOST is not defined!' if ENV['SSH_HOST'].nil?
+  raise 'ENV variable SSH_KEY_PATH for the private key is not defined!' if ENV['SSH_KEY_PATH'].nil?
+  raise 'ENV variable SSH_USER is not defined!' if ENV['SSH_USER'].nil?
+  raise 'ENV variable SSH_USER can\'t be root!' if ENV['SSH_USER'] == 'root'
+end
 
-ssh_host = '192.168.56.90'
-user_name="vagrant"
-home_dir="/home/#{user_name}"
-current_branch=`git rev-parse --abbrev-ref HEAD`
-latest_head_commit=`git rev-parse HEAD`
-latest_origin_commit=`git rev-parse origin/#{current_branch}`
-clean_tree=system('git status | grep "nothing to commit"')
+ssh_host = ENV['SSH_HOST']
+ssh_key_path = ENV['SSH_KEY_PATH']
+user_name = ENV['SSH_USER']
+home_dir = "/home/#{user_name}"
+current_branch = `git rev-parse --abbrev-ref HEAD`
+latest_head_commit = `git rev-parse HEAD`
+latest_origin_commit = `git rev-parse origin/#{current_branch}`
+clean_tree = system('git status | grep "nothing to commit"')
 stop_hours = 48  # if STOP_HOURS ENV is not specified, stop the instance after 2 days of running
 automate_license = ENV['AUTOMATE_LICENSE']
 automate_license_path = '../dev/license.jwt'
@@ -37,8 +42,9 @@ def latest_build_from_versions(channel)
   return build
 end
 
+
 # Only run these checks on `vagrant up`
-if ARGV[0] == "up"
+if ARGV[0] == 'up'
   if !ENV['STOP_HOURS'].nil?
     stop_hours = ENV['STOP_HOURS']
   end
@@ -195,9 +201,9 @@ Vagrant.configure('2') do |config|
 
   config.vm.provider :managed do |managed, override|
     managed.server = ssh_host
-    override.ssh.username = "vagrant"
     override.ssh.port = 22
-    override.ssh.private_key_path = '/Users/apop/.ssh/id_rsa'
+    override.ssh.username = user_name
+    override.ssh.private_key_path = ssh_key_path
   end
 
   config.vm.synced_folder '.', '/vagrant', disabled: true
