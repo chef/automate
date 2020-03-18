@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormGroup, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
-import { distinctUntilKeyChanged } from 'rxjs/operators';
+import { Subject } from 'rxjs';
+import { distinctUntilKeyChanged, takeUntil } from 'rxjs/operators';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import {
   automateSettingsState,
@@ -25,7 +26,7 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
   styleUrls: ['./automate-settings.component.scss']
 })
 
-export class AutomateSettingsComponent implements OnInit {
+export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
   private defaultFormData = {
     eventFeedRemoveData: {
@@ -127,6 +128,8 @@ export class AutomateSettingsComponent implements OnInit {
   notificationType = 'info';
   notificationMessage = 'All settings have been updated successfully';
 
+  private isDestroyed = new Subject<boolean>();
+
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
@@ -178,7 +181,10 @@ export class AutomateSettingsComponent implements OnInit {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetSettings({}));
 
-    this.store.select(automateSettingsState).pipe(distinctUntilKeyChanged('jobSchedulerStatus'))
+    this.store.select(automateSettingsState).pipe(
+      takeUntil(this.isDestroyed),
+      distinctUntilKeyChanged('jobSchedulerStatus')
+      )
       .subscribe((automateSettingsSelector) => {
         if (automateSettingsSelector.errorResp !== null) {
           const error = automateSettingsSelector.errorResp;
@@ -191,6 +197,11 @@ export class AutomateSettingsComponent implements OnInit {
           this.onChanges();
         }
       });
+  }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
   }
 
 
@@ -247,7 +258,7 @@ export class AutomateSettingsComponent implements OnInit {
 
 
     this.store.dispatch(new ConfigureSettings({jobs: jobs}));
-    this.store.select(changeConfiguration)
+    this.store.select(changeConfiguration).pipe(takeUntil(this.isDestroyed))
       .subscribe((changeConfigurationSelector) => {
         if (changeConfigurationSelector.errorResp !== null) {
           const error = changeConfigurationSelector.errorResp;
