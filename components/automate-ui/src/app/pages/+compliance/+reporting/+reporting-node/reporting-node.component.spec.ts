@@ -3,7 +3,7 @@ import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Store, StoreModule } from '@ngrx/store';
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { CookieModule } from 'ngx-cookie';
 import { ReportingNodeComponent } from './reporting-node.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
@@ -11,9 +11,6 @@ import { of as observableOf } from 'rxjs';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { StatsService, ReportQueryService, ScanResultsService } from '../../shared/reporting';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
-import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
-import * as fromNotifications from 'app/entities/notifications/notification.reducer';
-import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 describe('ReportingNodeComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -28,11 +25,7 @@ describe('ReportingNodeComponent', () => {
         RouterTestingModule,
         CookieModule.forRoot(),
         HttpClientTestingModule,
-        StoreModule.forRoot({
-          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
-          notifications: fromNotifications.notificationEntityReducer,
-          layout: fromLayout.layoutEntityReducer
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         ReportingNodeComponent,
@@ -47,7 +40,7 @@ describe('ReportingNodeComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(ReportingNodeComponent);
     component = fixture.componentInstance;

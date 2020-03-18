@@ -29,6 +29,7 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.ProtoPackageIsVersion3 // please upgrade the proto package
 
+// Return the results in ascending or descending order.
 type Query_OrderType int32
 
 const (
@@ -117,6 +118,7 @@ func (m *DeleteResponse) XXX_DiscardUnknown() {
 var xxx_messageInfo_DeleteResponse proto.InternalMessageInfo
 
 type Id struct {
+	// Unique node ID (UUID).
 	Id                   string   `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
@@ -156,14 +158,18 @@ func (m *Id) GetId() string {
 }
 
 type Query struct {
-	Filters              []*query.Filter `protobuf:"bytes,20,rep,name=filters,proto3" json:"filters,omitempty"`
-	Order                Query_OrderType `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.secrets.Query_OrderType" json:"order,omitempty"`
-	Sort                 string          `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
-	Page                 int32           `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
-	PerPage              int32           `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}        `json:"-"`
-	XXX_unrecognized     []byte          `json:"-"`
-	XXX_sizecache        int32           `json:"-"`
+	// Use filters to limit the set of secrets.
+	Filters []*query.Filter `protobuf:"bytes,20,rep,name=filters,proto3" json:"filters,omitempty"`
+	Order   Query_OrderType `protobuf:"varint,21,opt,name=order,proto3,enum=chef.automate.api.secrets.Query_OrderType" json:"order,omitempty"`
+	// Sort the results on a specific field.
+	Sort string `protobuf:"bytes,22,opt,name=sort,proto3" json:"sort,omitempty"`
+	// The number of result pages to return.
+	Page int32 `protobuf:"varint,23,opt,name=page,proto3" json:"page,omitempty"`
+	// The number of results on each page.
+	PerPage              int32    `protobuf:"varint,24,opt,name=per_page,json=perPage,proto3" json:"per_page,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Query) Reset()         { *m = Query{} }
@@ -227,15 +233,21 @@ func (m *Query) GetPerPage() int32 {
 }
 
 type Secret struct {
-	Id                   string               `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Name                 string               `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
-	Type                 string               `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
-	LastModified         *timestamp.Timestamp `protobuf:"bytes,20,opt,name=last_modified,json=lastModified,proto3" json:"last_modified,omitempty"`
-	Tags                 []*query.Kv          `protobuf:"bytes,21,rep,name=tags,proto3" json:"tags,omitempty"`
-	Data                 []*query.Kv          `protobuf:"bytes,22,rep,name=data,proto3" json:"data,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}             `json:"-"`
-	XXX_unrecognized     []byte               `json:"-"`
-	XXX_sizecache        int32                `json:"-"`
+	// Unique node ID (UUID).
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// User-specified name for the secret.
+	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	// Type of credential: ssh, winrm, sudo, aws, azure, gcp, service_now
+	Type string `protobuf:"bytes,3,opt,name=type,proto3" json:"type,omitempty"`
+	// Timestamp denoting when the secret was last modified.
+	LastModified *timestamp.Timestamp `protobuf:"bytes,20,opt,name=last_modified,json=lastModified,proto3" json:"last_modified,omitempty"`
+	// Tags to associate with the secret.
+	Tags []*query.Kv `protobuf:"bytes,21,rep,name=tags,proto3" json:"tags,omitempty"`
+	// Secret data, where the kv structs for the credential data live.
+	Data                 []*query.Kv `protobuf:"bytes,22,rep,name=data,proto3" json:"data,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}    `json:"-"`
+	XXX_unrecognized     []byte      `json:"-"`
+	XXX_sizecache        int32       `json:"-"`
 }
 
 func (m *Secret) Reset()         { *m = Secret{} }
@@ -306,11 +318,13 @@ func (m *Secret) GetData() []*query.Kv {
 }
 
 type Secrets struct {
-	Secrets              []*Secret `protobuf:"bytes,1,rep,name=secrets,proto3" json:"secrets,omitempty"`
-	Total                int32     `protobuf:"varint,20,opt,name=total,proto3" json:"total,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}  `json:"-"`
-	XXX_unrecognized     []byte    `json:"-"`
-	XXX_sizecache        int32     `json:"-"`
+	// List of secrets.
+	Secrets []*Secret `protobuf:"bytes,1,rep,name=secrets,proto3" json:"secrets,omitempty"`
+	// Total count of secrets
+	Total                int32    `protobuf:"varint,20,opt,name=total,proto3" json:"total,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *Secrets) Reset()         { *m = Secrets{} }
@@ -431,10 +445,111 @@ const _ = grpc.SupportPackageIsVersion6
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type SecretsServiceClient interface {
+	//
+	//Create a secret
+	//
+	//Creates a secret. Requires values for name, type, and data.
+	//
+	//Supported types: ssh, winrm, sudo, aws, azure, gcp, service_now
+	//Supported keys by type:
+	//ssh: username, password, key
+	//winrm: username, password
+	//sudo: username, password
+	//service_now: username, password
+	//aws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
+	//azure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
+	//gcp: GOOGLE_CREDENTIALS_JSON
+	//
+	//Example:
+	//```
+	//{
+	//"name": "my ssh secret",
+	//"type": "ssh",
+	//"data": [
+	//{ "key": "username", "value": "vagrant" },
+	//{ "key": "password", "value": "vagrant"}
+	//]
+	//}
+	//```
+	//
+	//Authorization Action:
+	//```
+	//secrets:secrets:create
+	//```
 	Create(ctx context.Context, in *Secret, opts ...grpc.CallOption) (*Id, error)
+	//
+	//Read a secret
+	//
+	//Reads a secret given the ID of the secret.
+	//Note that the secret information (password and key values) will not be returned by the API, as a safety measure.
+	//
+	//Authorization Action:
+	//```
+	//secrets:secrets:get
+	//```
 	Read(ctx context.Context, in *Id, opts ...grpc.CallOption) (*Secret, error)
+	//
+	//Update a secret
+	//
+	//Updates a secret.
+	//This is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.
+	//Secret information that is not in the body of the request will persist.
+	//
+	//Example:
+	//```
+	//given a credential with a username and password, a user could update the password by passing in the following body,
+	//and the name of the secret as well as the username for the secret be unchanged:
+	//
+	//{
+	//"id": "525c013a-2ab3-4e6f-9005-51bc620e9157",
+	//"data": [
+	//{ "key": "password", "value": "new-value"}
+	//]
+	//}
+	//```
+	//
+	//Authorization Action:
+	//```
+	//secrets:secrets:update
+	//```
 	Update(ctx context.Context, in *Secret, opts ...grpc.CallOption) (*UpdateResponse, error)
+	//
+	//Delete a secret
+	//
+	//Deletes a secret given the ID of the secret.
+	//Note that any nodes that were using the secret will no longer be associated with the deleted secret.
+	//
+	//Authorization Action:
+	//```
+	//secrets:secrets:delete
+	//```
 	Delete(ctx context.Context, in *Id, opts ...grpc.CallOption) (*DeleteResponse, error)
+	//
+	//List and filter secrets
+	//
+	//Makes a list of secrets.
+	//Supports filtering, pagination, and sorting.
+	//Adding a filter narrows the list of secrets to only those that match the filter or filters.
+	//Supported filters: type
+	//Supported sort types: name, type, last modified
+	//
+	//Example:
+	//```
+	//{
+	//"sort": "type",
+	//"order": "ASC",
+	//"filters": [
+	//{ "key": "type", "values": ["ssh","winrm","sudo"] }
+	//],
+	//"page":1,
+	//"per_page":100
+	//}
+	//```
+	//
+	//Authorization Action:
+	//```
+	//secrets:secrets:list
+	//```
 	List(ctx context.Context, in *Query, opts ...grpc.CallOption) (*Secrets, error)
 }
 
@@ -493,10 +608,111 @@ func (c *secretsServiceClient) List(ctx context.Context, in *Query, opts ...grpc
 
 // SecretsServiceServer is the server API for SecretsService service.
 type SecretsServiceServer interface {
+	//
+	//Create a secret
+	//
+	//Creates a secret. Requires values for name, type, and data.
+	//
+	//Supported types: ssh, winrm, sudo, aws, azure, gcp, service_now
+	//Supported keys by type:
+	//ssh: username, password, key
+	//winrm: username, password
+	//sudo: username, password
+	//service_now: username, password
+	//aws: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
+	//azure: AZURE_CLIENT_ID, AZURE_CLIENT_SECRET, AZURE_TENANT_ID
+	//gcp: GOOGLE_CREDENTIALS_JSON
+	//
+	//Example:
+	//```
+	//{
+	//"name": "my ssh secret",
+	//"type": "ssh",
+	//"data": [
+	//{ "key": "username", "value": "vagrant" },
+	//{ "key": "password", "value": "vagrant"}
+	//]
+	//}
+	//```
+	//
+	//Authorization Action:
+	//```
+	//secrets:secrets:create
+	//```
 	Create(context.Context, *Secret) (*Id, error)
+	//
+	//Read a secret
+	//
+	//Reads a secret given the ID of the secret.
+	//Note that the secret information (password and key values) will not be returned by the API, as a safety measure.
+	//
+	//Authorization Action:
+	//```
+	//secrets:secrets:get
+	//```
 	Read(context.Context, *Id) (*Secret, error)
+	//
+	//Update a secret
+	//
+	//Updates a secret.
+	//This is a PATCH operation, meaning the details sent in will override/replace those stored in the DB.
+	//Secret information that is not in the body of the request will persist.
+	//
+	//Example:
+	//```
+	//given a credential with a username and password, a user could update the password by passing in the following body,
+	//and the name of the secret as well as the username for the secret be unchanged:
+	//
+	//{
+	//"id": "525c013a-2ab3-4e6f-9005-51bc620e9157",
+	//"data": [
+	//{ "key": "password", "value": "new-value"}
+	//]
+	//}
+	//```
+	//
+	//Authorization Action:
+	//```
+	//secrets:secrets:update
+	//```
 	Update(context.Context, *Secret) (*UpdateResponse, error)
+	//
+	//Delete a secret
+	//
+	//Deletes a secret given the ID of the secret.
+	//Note that any nodes that were using the secret will no longer be associated with the deleted secret.
+	//
+	//Authorization Action:
+	//```
+	//secrets:secrets:delete
+	//```
 	Delete(context.Context, *Id) (*DeleteResponse, error)
+	//
+	//List and filter secrets
+	//
+	//Makes a list of secrets.
+	//Supports filtering, pagination, and sorting.
+	//Adding a filter narrows the list of secrets to only those that match the filter or filters.
+	//Supported filters: type
+	//Supported sort types: name, type, last modified
+	//
+	//Example:
+	//```
+	//{
+	//"sort": "type",
+	//"order": "ASC",
+	//"filters": [
+	//{ "key": "type", "values": ["ssh","winrm","sudo"] }
+	//],
+	//"page":1,
+	//"per_page":100
+	//}
+	//```
+	//
+	//Authorization Action:
+	//```
+	//secrets:secrets:list
+	//```
 	List(context.Context, *Query) (*Secrets, error)
 }
 

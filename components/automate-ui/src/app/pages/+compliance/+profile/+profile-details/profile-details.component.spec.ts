@@ -2,16 +2,13 @@ import { TestBed } from '@angular/core/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Store, StoreModule } from '@ngrx/store';
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ProfileDetailsComponent } from './profile-details.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { Observable, throwError, of as observableOf } from 'rxjs';
 import { ProfilesService } from 'app/services/profiles/profiles.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
-import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
-import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
-import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 class MockProfilesService {
   getProfile(_owner: string, _name: string): Observable<Object> {
@@ -35,11 +32,7 @@ describe('ProfileDetailsComponent', () => {
       imports: [
         RouterTestingModule,
         HttpClientTestingModule,
-        StoreModule.forRoot({
-          clientRunsEntity: clientRunsEntityReducer, // not used but needed to suppress warnings
-          notifications: notificationEntityReducer, // not used but needed to suppress warnings
-          layout: fromLayout.layoutEntityReducer
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         ProfileDetailsComponent
@@ -51,7 +44,7 @@ describe('ProfileDetailsComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(ProfileDetailsComponent);
     component = fixture.componentInstance;

@@ -180,7 +180,7 @@ describe('LicenseApplyComponent', () => {
     const fixture = TestBed.createComponent(LicenseApplyComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
-    const store = TestBed.get(Store);
+    const store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     return { state: reducer(), store };
   }

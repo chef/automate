@@ -95,7 +95,7 @@ export function ruleEntityReducer(
       return pipe(
         set(GET_ALL_STATUS, EntityStatus.loadingSuccess),
         set(PROJECT_RULES_STATUS, action.payload.status))
-        (ruleEntityAdapter.addAll(action.payload.rules, state)) as RuleEntityState;
+        (ruleEntityAdapter.setAll(action.payload.rules, state)) as RuleEntityState;
 
     case RuleActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);

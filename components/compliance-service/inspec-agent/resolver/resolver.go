@@ -485,17 +485,28 @@ func (r *Resolver) handleAzureVmNodes(ctx context.Context, m *manager.NodeManage
 	return r.handleManagerNodes(ctx, m, nodeCollections, job)
 }
 
-func (r *Resolver) handleInstanceCredentials(ctx context.Context, instanceCreds []*manager.CredentialsByTags, node *manager.ManagerNode) ([]*inspec.Secrets, nodeInfo) {
-	var nodeInfo nodeInfo
+func nodeInfoFromManagerNode(node *manager.ManagerNode) nodeInfo {
+	var nodeDetails nodeInfo
+	if len(node.Name) == 0 {
+		nodeDetails.Name = node.Host
+	} else {
+		nodeDetails.Name = node.Name
+	}
+	for _, kv := range node.Tags {
+		if kv.Key == "Name" {
+			nodeDetails.Name = kv.Value
+		}
+		if kv.Key == "Environment" {
+			nodeDetails.Environment = kv.Value
+		}
+	}
+	return nodeDetails
+}
+
+func (r *Resolver) handleInstanceCredentials(ctx context.Context, instanceCreds []*manager.CredentialsByTags, node *manager.ManagerNode) []*inspec.Secrets {
 	credsArr := make([]*inspec.Secrets, 0)
 	for _, credTagGroup := range instanceCreds {
 		for _, kv := range node.Tags {
-			if kv.Key == "Name" {
-				nodeInfo.Name = kv.Value
-			}
-			if kv.Key == "Environment" {
-				nodeInfo.Environment = kv.Value
-			}
 			isMatch := utils.KvMatches(credTagGroup.TagKey, credTagGroup.TagValue, kv)
 			if isMatch {
 				for _, cred := range credTagGroup.CredentialIds {
@@ -514,7 +525,7 @@ func (r *Resolver) handleInstanceCredentials(ctx context.Context, instanceCreds 
 			}
 		}
 	}
-	return credsArr, nodeInfo
+	return credsArr
 }
 
 func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManager, nodeCollections map[string]managerNodes, job *jobs.Job) ([]*types.InspecJob, error) {
@@ -542,10 +553,8 @@ func (r *Resolver) handleManagerNodes(ctx context.Context, m *manager.NodeManage
 					backend = inspec.BackendWinRm
 				}
 				logrus.Debugf("inspec agent resolver handling node with backend: %s -- ssm ping status: %s", backend, node.Ssm)
-				credsArr, nodeDetails := r.handleInstanceCredentials(ctx, group.manager.InstanceCredentials, node)
-				if len(nodeDetails.Name) == 0 {
-					nodeDetails.Name = node.Host
-				}
+				nodeDetails := nodeInfoFromManagerNode(node)
+				credsArr := r.handleInstanceCredentials(ctx, group.manager.InstanceCredentials, node)
 				ssmJob := false
 				// if the user has specified ssh/winrm secrets to be associated with the node
 				// then let's prioritize that -- otherwise try ssm

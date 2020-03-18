@@ -38,7 +38,7 @@ describe('ReportingNodesComponent', () => {
 
     fixture = TestBed.createComponent(ReportingNodesComponent);
     component = fixture.componentInstance;
-    reportQueryService = TestBed.get(ReportQueryService);
+    reportQueryService = TestBed.inject(ReportQueryService);
   });
 
   describe('addProfileStatus', () => {

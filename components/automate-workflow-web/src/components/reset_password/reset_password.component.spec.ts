@@ -45,8 +45,8 @@ describe('ResetPasswordComponent', () => {
     fixture = TestBed.createComponent(ResetPasswordComponent);
     component = fixture.componentInstance;
     element = fixture.debugElement;
-    backend = TestBed.get(MockBackend);
-    http = TestBed.get(Http);
+    backend = TestBed.inject(MockBackend);
+    http = TestBed.inject(Http);
   });
 
   describe('submit', () => {

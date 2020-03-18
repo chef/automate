@@ -40,7 +40,7 @@ describe('ReportingProfilesComponent', () => {
 
     fixture = TestBed.createComponent(ReportingProfilesComponent);
     component = fixture.componentInstance;
-    reportQueryService = TestBed.get(ReportQueryService);
+    reportQueryService = TestBed.inject(ReportQueryService);
   });
 
   describe('onProfilesListPageChanged()', () => {
@@ -62,28 +62,6 @@ describe('ReportingProfilesComponent', () => {
       component.onProfilesListSortToggled({detail: { sort: 'platform', order: 'desc'}});
 
       expect(component.getData).toHaveBeenCalledWith(reportQuery);
-    });
-  });
-
-  describe('addControlStatus()', () => {
-    const data = {profiles: [
-      {
-        controls: [
-          { results: [ {status: 'skipped'}, {status: 'passed'} ] },
-          { results: [ {status: 'passed'}, {status: 'passed'} ] },
-          { results: [ {status: 'failed'}, {status: 'passed'} ] },
-          { results: [ {status: 'skipped'}, {status: 'skipped'} ] }
-        ]
-      }
-    ]};
-    const expected = [
-      { results: [ { status: 'skipped' }, { status: 'passed' } ], status: 'passed' },
-      { results: [ { status: 'passed' }, { status: 'passed' } ], status: 'passed' },
-      { results: [ { status: 'failed' }, { status: 'passed' } ], status: 'failed' },
-      { results: [ { status: 'skipped'}, {status: 'skipped'} ], status: 'skipped' }
-    ];
-    it('sets the status for the control according to results', () => {
-      expect(component.addControlStatus(data)).toEqual(expected);
     });
   });
 });

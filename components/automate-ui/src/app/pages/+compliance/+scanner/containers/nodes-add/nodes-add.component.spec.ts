@@ -3,16 +3,13 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { TestBed, ComponentFixture } from '@angular/core/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { Store, StoreModule } from '@ngrx/store';
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CookieModule } from 'ngx-cookie';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import { MockChefSessionService } from 'app/testing/mock-chef-session.service';
 import { NodesAddComponent } from './nodes-add.component';
-import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
-import * as fromNotifications from 'app/entities/notifications/notification.reducer';
-import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 describe('NodesAddComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -27,11 +24,7 @@ describe('NodesAddComponent', () => {
         ReactiveFormsModule,
         CookieModule.forRoot(),
         HttpClientTestingModule,
-        StoreModule.forRoot({
-          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
-          notifications: fromNotifications.notificationEntityReducer,
-          layout: fromLayout.layoutEntityReducer
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         NodesAddComponent
@@ -42,7 +35,7 @@ describe('NodesAddComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(NodesAddComponent);
     component = fixture.componentInstance;

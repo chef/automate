@@ -7,14 +7,12 @@ import { StoreModule } from '@ngrx/store';
 import { BehaviorSubject, Subject } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 
-import { runtimeChecks } from 'app/ngrx.reducers';
+import { runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { NodeRun } from 'app/types/types';
 import { NodeDetailsService } from 'app/services/node-details/node-details.service';
 import { AttributesService } from 'app/services/attributes/attributes.service';
 import { TelemetryService } from 'app/services/telemetry/telemetry.service';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { notificationEntityReducer } from 'app/entities/notifications/notification.reducer';
-import { clientRunsEntityReducer } from 'app/entities/client-runs/client-runs.reducer';
 import { NodeDetailsComponent  } from './node-details.component';
 
 class MockTelemetryService {
@@ -33,7 +31,7 @@ describe('NodeDetailsComponent', () => {
 
       fixture = createTestFixture(nodeRunSource);
       component = fixture.componentInstance;
-      eventService = TestBed.get(NodeDetailsService);
+      eventService = TestBed.inject(NodeDetailsService);
       nodeRunSource.next({ nodeRun: createNodeRun() });
     });
 
@@ -63,7 +61,7 @@ describe('NodeDetailsComponent', () => {
 
       fixture = createTestFixture(nodeRunSource);
       component = fixture.componentInstance;
-      eventService = TestBed.get(NodeDetailsService);
+      eventService = TestBed.inject(NodeDetailsService);
     });
 
     describe('nodeRun', () => {
@@ -84,8 +82,7 @@ function createTestFixture(
       FormsModule,
       RouterTestingModule,
       StoreModule.forRoot({
-        notifications: notificationEntityReducer, // not used here but needed to suppress warnings
-        clientRunsEntity: clientRunsEntityReducer, // not used here but needed to suppress warnings
+        ...ngrxReducers,
         router: () => ({
           state: {
             url: '/',

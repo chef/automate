@@ -91,7 +91,7 @@ describe('TeamManagementComponent', () => {
     };
 
     beforeEach(() => {
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
     });
 
     it('openCreateModal on v2 opens v2 modal', () => {
@@ -128,7 +128,7 @@ describe('TeamManagementComponent', () => {
 
 
     beforeEach(() => {
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
       store.dispatch(new GetTeamsSuccess({
         teams: []
       }));

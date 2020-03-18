@@ -1,7 +1,7 @@
 import { Component, Input, ViewChild, ElementRef, OnDestroy, OnInit } from '@angular/core';
 import { capitalize, getOr, endsWith, replace, concat } from 'lodash/fp';
 import { Subject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, takeUntil } from 'rxjs/operators';
 import { ChefEvent, ChefEventCollection, EventFeedFilter, Chicklet } from '../../types/types';
 import { EventFeedService } from '../../services/event-feed/event-feed.service';
 import * as moment from 'moment';
@@ -52,7 +52,9 @@ export class EventFeedTableComponent implements OnDestroy, OnInit {
     this.sidepanel.nativeElement.focus();
     this.groupedEventsButton = document.getElementById(clickEvent.target.id);
 
-    this.getGroupedEvents(event).subscribe((events: ChefEvent[]) => {
+    this.getGroupedEvents(event)
+      .pipe(takeUntil(this.isDestroyed))
+      .subscribe((events: ChefEvent[]) => {
       this.groupedEvents = events;
     });
 

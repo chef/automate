@@ -49,7 +49,7 @@ export function teamEntityReducer(state: TeamEntityState = TeamEntityInitialStat
       return set(
         'getAllStatus',
         EntityStatus.loadingSuccess,
-        teamEntityAdapter.addAll(action.payload.teams, state)
+        teamEntityAdapter.setAll(action.payload.teams, state)
       ) as TeamEntityState;
     }
 

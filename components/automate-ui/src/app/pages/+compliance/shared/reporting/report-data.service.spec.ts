@@ -27,8 +27,8 @@ describe('ReportDataService', () => {
       ]
     });
 
-    service = TestBed.get(ReportDataService);
-    statsService = TestBed.get(StatsService);
+    service = TestBed.inject(ReportDataService);
+    statsService = TestBed.inject(StatsService);
   });
 
   describe('by default', () => {

@@ -19,7 +19,7 @@ do
 
   npm install # get dependencies defined in e2e/package.json
 
-  if ! npm run cypress:record; then
+ if ! npm run cypress:record; then
       buildkite-agent artifact upload "cypress/videos/*;cypress/videos/**/*;cypress/screenshots/*;cypress/screenshots/**/*"
       exit 1
   fi

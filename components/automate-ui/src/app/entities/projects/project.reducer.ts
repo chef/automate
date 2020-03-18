@@ -69,7 +69,7 @@ export function projectEntityReducer(
 
     case ProjectActionTypes.GET_ALL_SUCCESS:
       return set(GET_ALL_STATUS, EntityStatus.loadingSuccess,
-        projectEntityAdapter.addAll(action.payload.projects, state));
+        projectEntityAdapter.setAll(action.payload.projects, state));
 
     case ProjectActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);

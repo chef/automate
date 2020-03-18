@@ -4,7 +4,7 @@ import { By } from '@angular/platform-browser';
 import { Observable, of as observableOf } from 'rxjs';
 import { MockComponent } from 'ng2-mock-component';
 import { Store, StoreModule } from '@ngrx/store';
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 
 import { using } from 'app/testing/spec-helpers';
 import { RulesService } from 'app/services/rules/rules.service';
@@ -14,9 +14,6 @@ import { NotificationFormComponent } from './notification-form.component';
 import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { FeatureFlagsService } from '../../services/feature-flags/feature-flags.service';
-import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
-import * as fromNotifications from 'app/entities/notifications/notification.reducer';
-import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 describe('NotificationFormComponent', () => {
   let store: Store<NgrxStateAtom>;
@@ -56,22 +53,18 @@ describe('NotificationFormComponent', () => {
       ],
       imports: [
         FormsModule,
-        StoreModule.forRoot({
-          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
-          notifications: fromNotifications.notificationEntityReducer,
-          layout: fromLayout.layoutEntityReducer
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     }).compileComponents();
-      store = TestBed.get(Store);
+      store = TestBed.inject(Store);
       spyOn(store, 'dispatch').and.callThrough();
   }));
 
   beforeEach(() => {
     fixture = TestBed.createComponent(NotificationFormComponent);
     component = fixture.componentInstance;
-    ruleService = TestBed.get(RulesService);
+    ruleService = TestBed.inject(RulesService);
     fixture.detectChanges();
   });
 

@@ -8,7 +8,7 @@ import { CookieModule } from 'ngx-cookie';
 import { Observable, of as observableOf } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { Store, StoreModule } from '@ngrx/store';
-import { NgrxStateAtom, runtimeChecks } from 'app/ngrx.reducers';
+import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { ReportingComponent } from '../+reporting/reporting.component';
 import { ChefSessionService } from 'app/services/chef-session/chef-session.service';
 import {
@@ -23,9 +23,6 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 import * as moment from 'moment';
 import { DatetimePipe } from 'app/pipes/datetime.pipe';
 import { using } from 'app/testing/spec-helpers';
-import * as fromClientRuns from 'app/entities/client-runs/client-runs.reducer';
-import * as fromNotifications from 'app/entities/notifications/notification.reducer';
-import * as fromLayout from 'app/entities/layout/layout.reducer';
 
 class MockTelemetryService {
   track() { }
@@ -47,11 +44,7 @@ describe('ReportingComponent', () => {
         RouterTestingModule,
         CookieModule.forRoot(),
         HttpClientTestingModule,
-        StoreModule.forRoot({
-          clientRunsEntity: fromClientRuns.clientRunsEntityReducer,
-          notifications: fromNotifications.notificationEntityReducer,
-          layout: fromLayout.layoutEntityReducer
-        }, { runtimeChecks })
+        StoreModule.forRoot(ngrxReducers, { runtimeChecks })
       ],
       declarations: [
         ReportingComponent,
@@ -68,7 +61,7 @@ describe('ReportingComponent', () => {
       ],
       schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
     });
-    store = TestBed.get(Store);
+    store = TestBed.inject(Store);
     spyOn(store, 'dispatch').and.callThrough();
     fixture = TestBed.createComponent(ReportingComponent);
     component = fixture.componentInstance;
@@ -76,8 +69,8 @@ describe('ReportingComponent', () => {
     statsService = element.injector.get(StatsService);
     suggestionsService = element.injector.get(SuggestionsService);
     reportQueryService = element.injector.get(ReportQueryService);
-    router = TestBed.get(Router);
-    route = TestBed.get(ActivatedRoute);
+    router = TestBed.inject(Router);
+    route = TestBed.inject(ActivatedRoute);
   });
 
   it('displays tabs', () => {

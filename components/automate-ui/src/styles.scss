@@ -328,3 +328,22 @@ input {
     display: none;
   }
 }
+
+.waived-icon {
+  border-radius: 2px;
+  height: 16px;
+  width: 16px;
+  background-color: #CDD7DD;
+  position: relative;
+}
+
+.waived-icon:before {
+  color: #26293A;
+  content: 'W';
+  font-size: 9px;
+  font-weight: bolder;
+  position: absolute;
+  right: 3px;
+  text-align: center;
+  top: -2px;
+}
