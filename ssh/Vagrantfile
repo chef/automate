@@ -174,7 +174,6 @@ if [ "\\$USER" == "#{user_name}" ]; then
     mkdir -p ~/.hab/etc
     cat<<'EOT' > ~/.hab/etc/cli.toml
 origin = "#{user_name}"
-auth_token = "dev444BBB999"
 ctl_secret = "dev333ZZZ111"
 EOT
     hab origin key generate #{user_name}

@@ -275,7 +275,6 @@ EOT
   hab studio enter
 fi
 EOF
-echo " * Running: hab pkg install"
 hab pkg install -b core/git
 STUDIORC="#{home_dir}/automate/.studiorc"
 echo 'printf "\033[0;31m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n>>> TWO MORE STEPS NEEDED TO RUN A2 <<<\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\033[0m\n"' >> $STUDIORC
