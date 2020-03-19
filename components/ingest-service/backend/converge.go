@@ -40,6 +40,7 @@ type Node struct {
 	DeprecationsCount int       `json:"deprecations_count"`
 	Projects          []string  `json:"projects"`
 	ErrorMessage      string    `json:"error_message,omitempty"`
+	ErrorType         string    `json:"error_type,omitempty"`
 }
 
 // NodeAttribute is the representation of the

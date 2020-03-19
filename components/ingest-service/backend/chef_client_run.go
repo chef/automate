@@ -154,6 +154,7 @@ func (ccr *ChefClientRun) ToNode() (nodeState Node, err error) {
 
 		if ccr.Status == "failure" {
 			nodeState.ErrorMessage = ccr.Error.Message
+			nodeState.ErrorType = ccr.Error.Class
 		}
 	}
 	return // nolint:nakedret

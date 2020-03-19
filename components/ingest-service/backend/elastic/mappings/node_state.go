@@ -159,6 +159,19 @@ var nodeProps = `
 			}
 		}
 	},
+	"error_type": {
+		"type": "keyword",
+		"fields": {
+			"engram" : {
+				"type": "text",
+				"analyzer": "autocomplete"
+			},
+			"lower": {
+				"normalizer": "case_insensitive",
+				"type": "keyword"
+			}
+		}
+	},
 	"recipes": {
 		"type": "keyword",
 		"fields": {
