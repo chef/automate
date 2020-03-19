@@ -10,7 +10,7 @@ ifdef CI
   verbose?="-v"
 endif
 
-PG_URL ?= "postgresql://postgres@127.0.0.1:5432/infra-proxy-test?sslmode=disable&password=docker"
+PG_URL ?= "postgresql://postgres@127.0.0.1:5432/infra_proxy_test?sslmode=disable&password=docker"
 
 all: lint build test
 
@@ -29,7 +29,7 @@ test:
 	@PG_URL=$(PG_URL) go test $(verbose) -cover -count=1 -parallel=1 -p 1 $(packages)
 
 setup_docker_pg:
-	docker run --name infra-proxy-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=infra-proxy-test -e POSTGRES_PASSWORD=docker -p 5432:5432 -d postgres:9
+	docker run --name infra-proxy-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=infra_proxy_test -e POSTGRES_PASSWORD=docker -p 5432:5432 -d postgres:9
 	sleep 15 # let docker come up
 	# This creates the extension we need to use UUIDs in the migrations.
 	# Done in habitat in prod. Not done in code because you must be a superuser.

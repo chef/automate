@@ -120,7 +120,7 @@ steps:
   - label: "[unit] infra-proxy-service"
     command:
       - scripts/install_golang.sh
-      - scripts/setup_buildkite_pg.sh infra-proxy-test
+      - scripts/setup_buildkite_pg.sh infra_proxy_test
       - cd components/infra-proxy-service
       - make static unit
     timeout_in_minutes: 10
