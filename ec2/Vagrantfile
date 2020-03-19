@@ -229,14 +229,12 @@ else
 fi
 
 cat<<EOF >>dev/config.toml
-[compliance.v1.sys.logger]
-  level = "debug"
 
 [compliance.v1.sys.logger]
   level = "debug"
 
 [elasticsearch.v1.sys.path]
-  data = "es_data"
+data = "es_data"
 EOF
 
 EC2HOSTNAME=`curl -Ss http://169.254.169.254/latest/meta-data/public-hostname`
