@@ -5,7 +5,6 @@ import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatSelectModule } from '@angular/material/select';
-// import { MatOptionModule } from '@angular/material;
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
@@ -50,7 +49,6 @@ describe('AutomateSettingsComponent', () => {
         ReactiveFormsModule,
         MatFormFieldModule,
         MatSelectModule,
-        // MatOptionModule,
         BrowserAnimationsModule,
         HttpClientTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
@@ -243,7 +241,7 @@ describe('AutomateSettingsComponent', () => {
     ], function(formName: string, disabledStatus: boolean, threshold: number | string) {
       it(`when form nested, it updates the ${formName} form group correctly`, () => {
         component.updateForm(mockJobSchedulerStatus);
-        fixture.detectChanges();
+        // fixture.detectChanges();
 
         const newFormValues = component[formName].value;
 
@@ -256,6 +254,7 @@ describe('AutomateSettingsComponent', () => {
       it('saves settings', () => {
         component.updateForm(mockJobSchedulerStatus);
         component.applyChanges();
+
         expect(component.formChanged).toEqual(false);
         expect(component.notificationType).toEqual('info');
         expect(component.notificationMessage)

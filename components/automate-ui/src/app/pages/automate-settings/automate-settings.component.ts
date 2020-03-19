@@ -20,6 +20,7 @@ import {
   IngestJobs
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { JobProfilesFormComponent } from 'app/page-components/job-profiles-form/job-profiles-form.component';
 
 @Component({
   templateUrl: './automate-settings.component.html',
@@ -220,7 +221,6 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     }
   }
 
-
   public toggleInput(form, checked: boolean) {
     // patchValue is a workaround for the chef-checkbox because we need to be
     // able to store a reference to it being checked or not
@@ -234,7 +234,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       if ( checked ) {
         form.get(control).enable();
       } else {
-          form.get(control).disable();
+        form.get(control).disable();
       }
     });
   }
@@ -264,13 +264,14 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       job.category = jobForm.category;
       job.name = jobForm.name;
       job.disabled = jobForm.disabled;
-      job.threshold = jobForm.threshold + jobForm.unit;
+
+      // If the user doesn't enter any number at all - this defaults to 0
+      job.threshold = jobForm.threshold === null 
+            ? '0' + jobForm.unit : jobForm.threshold + jobForm.unit;
       if ( isNested ) {
         job.nested_name = jobForm.nested_name;
-        job.threshold = jobForm.threshold;
+        job.threshold = job.threshold;
       }
-      // If the user doesn't enter any number at all - this defaults to 0
-      job.threshold = job.threshold === null ? '0' : job.threshold;
 
       return job;
     });
