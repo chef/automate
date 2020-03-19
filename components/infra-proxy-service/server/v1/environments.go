@@ -2,6 +2,7 @@ package v1
 
 import (
 	"context"
+	"encoding/json"
 	"sort"
 
 	chef "github.com/chef/go-chef"
@@ -42,12 +43,17 @@ func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	defaultAttributes, _ := json.Marshal(en.DefaultAttributes)
+	overrideAttributes, _ := json.Marshal(en.OverrideAttributes)
+
 	return &response.Environment{
-		Name:             en.Name,
-		ChefType:         en.ChefType,
-		Description:      en.Description,
-		CookbookVersions: fromAPIToListEnvCookbookVersions(en.CookbookVersions),
-		JsonClass:        en.JsonClass,
+		Name:               en.Name,
+		ChefType:           en.ChefType,
+		Description:        en.Description,
+		CookbookVersions:   fromAPIToListEnvCookbookVersions(en.CookbookVersions),
+		JsonClass:          en.JsonClass,
+		DefaultAttributes:  string(defaultAttributes),
+		OverrideAttributes: string(overrideAttributes),
 	}, nil
 
 }

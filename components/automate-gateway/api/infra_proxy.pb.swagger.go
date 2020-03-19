@@ -562,18 +562,21 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Id of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Id of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Name of the environment.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -598,12 +601,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Id of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Id of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1100,22 +1105,35 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the Environment."
         },
         "chef_type": {
-          "type": "string"
+          "type": "string",
+          "description": "Type of the object."
         },
         "description": {
-          "type": "string"
+          "type": "string",
+          "description": "Description of the node."
         },
         "json_class": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the class."
         },
         "cookbook_versions": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "title": "List of versioned cookbooks"
+        },
+        "default_attributes": {
+          "type": "string",
+          "description": "Stringified json of the default attributes."
+        },
+        "override_attributes": {
+          "type": "string",
+          "description": "Stringified json of the override attributes."
         }
       }
     },
@@ -1123,7 +1141,8 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the Environment."
         }
       }
     },
@@ -1134,7 +1153,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.EnvironmentListItem"
-          }
+          },
+          "description": "List of the EnvironmentListItem."
         }
       }
     },

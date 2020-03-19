@@ -36,11 +36,13 @@ func (a *InfraProxyServer) GetEnvironment(ctx context.Context, r *gwreq.Environm
 	}
 
 	return &gwres.Environment{
-		Name:             res.GetName(),
-		ChefType:         res.GetChefType(),
-		Description:      res.GetDescription(),
-		CookbookVersions: res.GetCookbookVersions(),
-		JsonClass:        res.GetJsonClass(),
+		Name:               res.GetName(),
+		ChefType:           res.GetChefType(),
+		Description:        res.GetDescription(),
+		CookbookVersions:   res.GetCookbookVersions(),
+		JsonClass:          res.GetJsonClass(),
+		DefaultAttributes:  res.GetDefaultAttributes(),
+		OverrideAttributes: res.GetOverrideAttributes(),
 	}, nil
 }
 
