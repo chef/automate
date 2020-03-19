@@ -20,7 +20,6 @@ import {
   IngestJobs
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
-import { JobProfilesFormComponent } from 'app/page-components/job-profiles-form/job-profiles-form.component';
 
 @Component({
   templateUrl: './automate-settings.component.html',
@@ -266,11 +265,12 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       job.disabled = jobForm.disabled;
 
       // If the user doesn't enter any number at all - this defaults to 0
-      job.threshold = jobForm.threshold === null 
-            ? '0' + jobForm.unit : jobForm.threshold + jobForm.unit;
+      job.threshold = jobForm.threshold === null
+            ? '0' + jobForm.unit
+            : jobForm.threshold + jobForm.unit;
       if ( isNested ) {
         job.nested_name = jobForm.nested_name;
-        job.threshold = job.threshold;
+        job.threshold = jobForm.threshold;  // Automatically becomes a 0 from parseInt in reqeust
       }
 
       return job;

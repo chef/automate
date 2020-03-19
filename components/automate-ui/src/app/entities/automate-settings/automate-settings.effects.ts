@@ -36,11 +36,4 @@ export class AutomateSettingsEffects {
     map((_resp) => (new ConfigureSettingsSuccess({}))),
     catchError((error) => of(new ConfigureSettingsFailure(error))
     ));
-
-
-  // @Effect()
-  // configureSettingsSuccess$ = this.actions$.pipe(
-  //   ofType(AutomateSettingsActionTypes.CONFIGURE_SETTINGS_SUCCESS),
-  //   map((_action) => new GetSettings({}))
-  //   );
 }
