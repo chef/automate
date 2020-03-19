@@ -24,7 +24,7 @@ You can also just install OPA in the studio and you should get the correct versi
 hab pkg install --binlink core/opa
 ```
 
-### REPL with V2
+### REPL
 
 NB: Assumes running from this directory; just adjust all paths if you want to start in a different directory.
 Note that the input still uses subjects as the field instead of members.
