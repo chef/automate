@@ -787,6 +787,10 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	filteredControls := elastic.NewFilterAggregation().Filter(controlsQuery)
 	filteredControls.SubAggregation("control", controlTermsAgg)
+	filteredControls.SubAggregation("skipped_total", waiverDataSkippedFilter)
+	filteredControls.SubAggregation("failed_total", waiverDataFailedFilter)
+	filteredControls.SubAggregation("passed_total", waiverDataPassedFilter)
+	filteredControls.SubAggregation("waived_total", waiverDataWaivedFilter)
 	controlsAgg := elastic.NewNestedAggregation().Path("profiles.controls")
 	controlsAgg.SubAggregation("filtered_controls", filteredControls)
 
@@ -833,6 +837,18 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		if outerFilteredProfiles, found := outerProfilesAggResult.Aggregations.Filter("filtered_profiles"); found {
 			if outerControlsAggResult, found := outerFilteredProfiles.Aggregations.Nested("controls"); found {
 				if filteredControls, found := outerControlsAggResult.Aggregations.Filter("filtered_controls"); found {
+					if totalPassedControls, found := filteredControls.Aggregations.Filter("passed_total"); found {
+						controlSummaryTotals.Passed.Total = int32(totalPassedControls.DocCount)
+					}
+					if totalFailedControls, found := filteredControls.Aggregations.Filter("failed_total"); found {
+						controlSummaryTotals.Failed.Total = int32(totalFailedControls.DocCount)
+					}
+					if totalSkippedControls, found := filteredControls.Aggregations.Filter("skipped_total"); found {
+						controlSummaryTotals.Skipped.Total = int32(totalSkippedControls.DocCount)
+					}
+					if totalWaivedControls, found := filteredControls.Aggregations.Filter("waived_total"); found {
+						controlSummaryTotals.Waived.Total = int32(totalWaivedControls.DocCount)
+					}
 					if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
 						for _, controlBucket := range controlBuckets.Buckets {
 							contListItem, err := backend.getControlItem(controlBucket)
@@ -840,11 +856,6 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 								return nil, err
 							}
 							contListItems = append(contListItems, &contListItem)
-							controlSummaryTotals.Passed.Total += contListItem.ControlSummary.Passed.Total
-							controlSummaryTotals.Failed.Total += contListItem.ControlSummary.Failed.Total
-							controlSummaryTotals.Skipped.Total += contListItem.ControlSummary.Skipped.Total
-							controlSummaryTotals.Waived.Total += contListItem.ControlSummary.Waived.Total
-							controlSummaryTotals.Total += contListItem.ControlSummary.Total
 						}
 					}
 				}
