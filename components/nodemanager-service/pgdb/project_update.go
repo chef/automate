@@ -231,7 +231,7 @@ func (iter *nodeDataIterator) Next() ([]*NodeProjectData, error) {
 	logrus.WithFields(logrus.Fields{
 		"start": iter.rangeStart,
 		"end":   iter.rangeEnd,
-	}).Info("Processing nodes for project update")
+	}).Debug("Processing nodes for project update")
 	_, err := iter.db.Select(&nodesDaos, selectNodesProjectDataRange, iter.rangeStart, iter.rangeEnd, defaultLimit)
 
 	if len(nodesDaos) == 0 {
@@ -292,7 +292,7 @@ func (db *DB) ListProjectUpdateTasks(ctx context.Context) ([]project_update_lib.
 	}
 
 	prefixes := uuidPrefixRanges16()
-	logrus.Infof("Found %d nodes, splitting into %d chunks", count, len(prefixes))
+	logrus.Debugf("Found %d nodes, splitting into %d chunks", count, len(prefixes))
 	tasks := make([]project_update_lib.SerializedProjectUpdateTask, len(prefixes))
 	for i := 0; i < len(prefixes); i++ {
 		start := prefixes[i]
@@ -330,7 +330,7 @@ func (db *DB) RunProjectUpdateTask(ctx context.Context, projectUpdateID string,
 	}).Info("Running project update task for nodemanager")
 
 	if start == "" || end == "" {
-		return "", project_update_lib.SerializedProjectUpdateTaskStatus{}, errors.New("Invalid params")
+		return "", project_update_lib.NoStatus, errors.New("Invalid params")
 	}
 
 	iter := nodeDataIterator{
@@ -353,11 +353,11 @@ func (db *DB) RunProjectUpdateTask(ctx context.Context, projectUpdateID string,
 				}, nil
 
 			}
-			return "", project_update_lib.SerializedProjectUpdateTaskStatus{}, err
+			return "", project_update_lib.NoStatus, err
 		}
 
 		if err := db.updateNodes(nodes, projectTaggingRules); err != nil {
-			return "", project_update_lib.SerializedProjectUpdateTaskStatus{}, err
+			return "", project_update_lib.NoStatus, err
 		}
 	}
 
