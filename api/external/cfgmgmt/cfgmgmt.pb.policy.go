@@ -118,4 +118,7 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetErrors", "infra:nodes", "infra:nodes:list", "GET", "/cfgmgmt/errors", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 }

@@ -125,6 +125,15 @@ func (s *CfgMgmtServer) GetNodes(ctx context.Context, request *cfgReq.Nodes) (*g
 	return s.cfgMgmtClient.GetNodes(ctx, &nodesRequest)
 }
 
+func (s *CfgMgmtServer) GetErrors(ctx context.Context, request *cfgReq.Errors) (*cfgRes.Errors, error) {
+	log.WithFields(log.Fields{
+		"request": request.String(),
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	return s.cfgMgmtClient.GetErrors(ctx, request)
+}
+
 func (s *CfgMgmtServer) GetAttributes(ctx context.Context, request *cfgReq.Node) (*cfgRes.NodeAttribute, error) {
 	log.WithFields(log.Fields{
 		"request": request.String(),

@@ -14,6 +14,45 @@ func init() {
     "application/json"
   ],
   "paths": {
+    "/cfgmgmt/errors": {
+      "get": {
+        "summary": "GetErrors",
+        "description": "Returns a list of the most common errors reported for infra nodes' most recent Chef Client runs.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetErrors",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.Errors"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "size",
+            "description": "The number of results to return.\nIf set to zero, the default size of 10 will be used. Set to a negative\nvalue for unlimited results.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "filter",
+            "description": "Filters in the request select the nodes from which the errors are\ncollected. The same filters may be specified for this request as for other\nNodes requests, with the exception of 'status' which is not valid for this\nrequest.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/cfgmgmt/nodes": {
       "get": {
         "summary": "GetNodes",
@@ -580,6 +619,34 @@ func init() {
           "description": "More information about the error."
         }
       }
+    },
+    "chef.automate.api.cfgmgmt.response.ErrorCount": {
+      "type": "object",
+      "properties": {
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "type": {
+          "type": "string"
+        },
+        "error_message": {
+          "type": "string"
+        }
+      },
+      "title": "ErrorCount gives the number of occurrences (count) of the error specified by\nthe type and message among the nodes included by the request parameters"
+    },
+    "chef.automate.api.cfgmgmt.response.Errors": {
+      "type": "object",
+      "properties": {
+        "errors": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.ErrorCount"
+          }
+        }
+      },
+      "description": "Errors contains a list of the most common Chef Infra error type/message\ncombinations among nodes in the active project as filtered according to the\nrequest."
     },
     "chef.automate.api.cfgmgmt.response.ExpandedRunList": {
       "type": "object",

@@ -12,6 +12,7 @@ import "api/interservice/cfgmgmt/response/actions.proto";
 import "api/interservice/cfgmgmt/response/event.proto";
 import "api/interservice/cfgmgmt/response/eventstrings.proto";
 import "api/interservice/cfgmgmt/response/inventory_nodes.proto";
+import "api/external/cfgmgmt/response/errors.proto";
 
 import "api/interservice/cfgmgmt/request/root.proto";
 import "api/interservice/cfgmgmt/request/stats.proto";
@@ -22,6 +23,7 @@ import "api/interservice/cfgmgmt/request/event.proto";
 import "api/interservice/cfgmgmt/request/eventstrings.proto";
 import "api/interservice/cfgmgmt/request/inventory_nodes.proto";
 import "api/interservice/cfgmgmt/request/node_export.proto";
+import "api/external/cfgmgmt/request/errors.proto";
 
 service CfgMgmt {
 	rpc GetVersion (chef.automate.domain.cfgmgmt.request.VersionInfo) returns (chef.automate.domain.cfgmgmt.response.VersionInfo);
@@ -44,4 +46,5 @@ service CfgMgmt {
 	rpc NodeExport(chef.automate.domain.cfgmgmt.request.NodeExport) returns (stream chef.automate.domain.cfgmgmt.response.ExportData);
 	rpc ReportExport(chef.automate.domain.cfgmgmt.request.ReportExport) returns (stream chef.automate.domain.cfgmgmt.response.ReportExportData);
 	rpc GetCheckInCountsTimeSeries(chef.automate.domain.cfgmgmt.request.CheckInCountsTimeSeries) returns (chef.automate.domain.cfgmgmt.response.CheckInCountsTimeSeries);
+	rpc GetErrors(chef.automate.api.cfgmgmt.request.Errors) returns (chef.automate.api.cfgmgmt.response.Errors);
 }

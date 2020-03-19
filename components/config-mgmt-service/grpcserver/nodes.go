@@ -13,6 +13,7 @@ import (
 	"github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
 
+	extReq "github.com/chef/automate/api/external/cfgmgmt/request"
 	externalResp "github.com/chef/automate/api/external/cfgmgmt/response"
 	pRequest "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	interserviceResp "github.com/chef/automate/api/interservice/cfgmgmt/response"
@@ -397,4 +398,8 @@ func (s *CfgMgmtServer) nodeExistsAsync(nodeID string, projectFilters map[string
 	}()
 
 	return nodeExistsChan
+}
+
+func (s *CfgMgmtServer) GetErrors(ctx context.Context, req *extReq.Errors) (*externalResp.Errors, error) {
+	return nil, nil
 }
