@@ -16,7 +16,6 @@ export enum AutomateSettingsActionTypes {
 
 export class GetSettings implements Action {
   readonly type = AutomateSettingsActionTypes.GET_SETTINGS;
-
   constructor(public payload: {}) {}
 }
 
