@@ -29,6 +29,7 @@ func TestInspecErrReturnsCorrectErr(t *testing.T) {
 	err = getInspecError("", stdErr, blankErr, target, time.Duration(90))
 	assert.Equal(t, &Error{Type: "connection refused", Message: "Failed to connect to test, connection refused.\n\nErrno::ECONNREFUSED"}, err)
 
+	// ssh auth error
 	stdErr = "/hab/pkgs/chef/inspec/4.18.51/20191211220937/lib/gems/ more words here Net::SSH::AuthenticationFailed other details"
 	err = getInspecError("", stdErr, blankErr, target, time.Duration(90))
 	assert.Equal(t, &Error{Type: "authentication failed", Message: "Authentication failed for test\n\nNet::SSH::AuthenticationFailed"}, err)
