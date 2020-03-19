@@ -1,29 +1,30 @@
 import { describeIfIAMV2p1 } from '../../../support/constants';
+import { Rule, Project } from '../../../support/types';
 
 // these tests are best read sequentially, as they share state
 describeIfIAMV2p1('projects API', () => {
   const cypressPrefix = 'test-projects-api';
-  interface Project {
-    id: string;
-    name: string;
-    status: string;
-  }
 
-  const projectWithOrgRule = {
+  const projectWithOrgRule: Project = {
     id: `${cypressPrefix}-project1-${Cypress.moment().format('MMDDYYhhmm')}`,
-    name: 'Test Avengers Project'
+    name: 'Test Avengers Project',
+    type: 'CUSTOM',
+    status: 'NO_RULES'
   };
 
-  const projectWithServerRule = {
+  const projectWithServerRule: Project = {
     id: `${cypressPrefix}-project2-${Cypress.moment().format('MMDDYYhhmm')}`,
-    name: 'Test X-men Project'
+    name: 'Test X-men Project',
+    type: 'CUSTOM',
+    status: 'NO_RULES'
   };
 
-  const orgRule = {
+  const orgRule: Rule = {
     id: 'org-rule-1',
     name: 'first rule of avengers project',
     type: 'NODE',
     project_id: projectWithOrgRule.id,
+    status: 'STAGED',
     conditions: [
       {
         attribute: 'CHEF_ORGANIZATION',
@@ -33,11 +34,12 @@ describeIfIAMV2p1('projects API', () => {
     ]
   };
 
-  const serverRule = {
+  const serverRule: Rule = {
     id: 'server-rule-1',
     name: 'first rule of xmen project',
     type: 'NODE',
     project_id: projectWithServerRule.id,
+    status: 'STAGED',
     conditions: [
       {
         attribute: 'CHEF_SERVER',

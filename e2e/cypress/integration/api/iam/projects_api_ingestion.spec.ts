@@ -1,5 +1,6 @@
 import { describeIfIAMV2p1 } from '../../../support/constants';
 import { eventExist, uuidv4 } from '../../../support/helpers';
+import { Rule, Project } from '../../../support/types';
 
 const nodeStart = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
 const nodeEnd = Cypress.moment().utc().endOf('day').format();
@@ -16,17 +17,25 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
   const actionId = uuidv4();
   const entityName = `ingest-action-${Cypress.moment().format('MMDDYYhhmmss')}`;
 
-  const projectsWithNodeRules = [
+  interface ProjectAndRule {
+    project: Project;
+    rule: Rule;
+  }
+
+  const projectsWithNodeRules: ProjectAndRule[] = [
     {
       project: {
         id: `${cypressPrefix}-project-org-${now}`,
-        name: 'project org'
+        name: 'project org',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-org',
         name: 'rule CHEF_ORGANIZATION',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-org-${now}`,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -39,13 +48,16 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     {
       project: {
         id: `${cypressPrefix}-project-chef-server-${now}`,
-        name: 'project chef server'
+        name: 'project chef server',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-chef-server',
         name: 'rule CHEF_SERVER',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-chef-server-${now}`,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_SERVER',
@@ -58,13 +70,16 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     {
       project: {
         id: `${cypressPrefix}-project-environment-${now}`,
-        name: 'project environment'
+        name: 'project environment',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-environment',
         name: 'rule ENVIRONMENT',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-environment-${now}`,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'ENVIRONMENT',
@@ -77,7 +92,9 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     {
       project: {
         id: `${cypressPrefix}-project-policy-group-${now}`,
-        name: 'project policy group'
+        name: 'project policy group',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-policy-group',
@@ -85,6 +102,7 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
         type: 'NODE',
         project_id:
         `${cypressPrefix}-project-policy-group-${now}`,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_POLICY_GROUP',
@@ -97,13 +115,16 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     {
       project: {
         id: `${cypressPrefix}-project-policy-name-${now}`,
-        name: 'project policy name'
+        name: 'project policy name',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-policy-name',
         name: 'rule CHEF_POLICY_NAME',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-policy-name-${now}`,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_POLICY_NAME',
@@ -116,13 +137,16 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     {
       project: {
         id: `${cypressPrefix}-project-role-${now}`,
-        name: 'project role'
+        name: 'project role',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-role',
         name: 'rule CHEF_ROLE',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-role-${now}`,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ROLE',
@@ -135,13 +159,16 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     {
       project: {
         id: `${cypressPrefix}-project-tag-${now}`,
-        name: 'project tag'
+        name: 'project tag',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-tag',
         name: 'rule CHEF_TAG',
         type: 'NODE',
         project_id: `${cypressPrefix}-project-tag-${now}`,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_TAG',
@@ -157,13 +184,16 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     {
       project: {
         id: `${cypressPrefix}-event-project-org-${now}`,
-        name: 'event project org'
+        name: 'event project org',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'event-rule-org',
         name: 'Chef Organization',
         type: 'EVENT',
         project_id: `${cypressPrefix}-event-project-org-${now}`,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -176,13 +206,16 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
     {
       project: {
         id: `${cypressPrefix}-event-project-chef-server-${now}`,
-        name: 'event project chef server'
+        name: 'event project chef server',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'event-rule-chef-server',
         name: 'Chef Server',
         type: 'EVENT',
         project_id: `${cypressPrefix}-event-project-chef-server-${now}`,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_SERVER',

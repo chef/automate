@@ -1,7 +1,7 @@
 import { describeIfIAMV2p1 } from '../../../support/constants';
 import { eventExist, uuidv4 } from '../../../support/helpers';
+import { Rule, Project } from '../../../support/types';
 
-// TODO rename file to projects_api_update.spec.ts
 describeIfIAMV2p1('project update re-tagging', () => {
   const cypressPrefix = 'test-project-update';
   const now = Cypress.moment().format('MMDDYYhhmm');
@@ -14,17 +14,25 @@ describeIfIAMV2p1('project update re-tagging', () => {
   const nodeRoleProjectID = `${cypressPrefix}-project-role-${now}`;
   const nodeTagProjectID = `${cypressPrefix}-project-tag-${now}`;
 
-  const projectsWithNodeRule = [
+  interface ProjectAndRule {
+    project: Project;
+    rule: Rule;
+  }
+
+  const projectsWithNodeRule: ProjectAndRule[] = [
     {
       project: {
         id: nodeOrgProjectID,
-        name: 'project org'
+        name: 'project org',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-org',
         name: 'rule CHEF_ORGANIZATION',
         type: 'NODE',
         project_id: nodeOrgProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -37,13 +45,16 @@ describeIfIAMV2p1('project update re-tagging', () => {
     {
       project: {
         id: nodeServerProjectID,
-        name: 'project chef server'
+        name: 'project chef server',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-chef-server',
         name: 'rule CHEF_SERVER',
         type: 'NODE',
         project_id: nodeServerProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_SERVER',
@@ -56,13 +67,16 @@ describeIfIAMV2p1('project update re-tagging', () => {
     {
       project: {
         id: nodeEnvProjectID,
-        name: 'project environment'
+        name: 'project environment',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-environment',
         name: 'rule ENVIRONMENT',
         type: 'NODE',
         project_id: nodeEnvProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'ENVIRONMENT',
@@ -75,14 +89,16 @@ describeIfIAMV2p1('project update re-tagging', () => {
     {
       project: {
         id: nodePolGroupProjectID,
-        name: 'project policy group'
+        name: 'project policy group',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-policy-group',
         name: 'rule CHEF_POLICY_GROUP',
         type: 'NODE',
-        project_id:
-          nodePolGroupProjectID,
+        project_id: nodePolGroupProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_POLICY_GROUP',
@@ -95,13 +111,16 @@ describeIfIAMV2p1('project update re-tagging', () => {
     {
       project: {
         id: nodePolNameProjectID,
-        name: 'project policy name'
+        name: 'project policy name',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-policy-name',
         name: 'rule CHEF_POLICY_NAME',
         type: 'NODE',
         project_id: nodePolNameProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_POLICY_NAME',
@@ -114,13 +133,16 @@ describeIfIAMV2p1('project update re-tagging', () => {
     {
       project: {
         id: nodeRoleProjectID,
-        name: 'project role'
+        name: 'project role',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-role',
         name: 'rule CHEF_ROLE',
         type: 'NODE',
         project_id: nodeRoleProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ROLE',
@@ -133,13 +155,16 @@ describeIfIAMV2p1('project update re-tagging', () => {
     {
       project: {
         id: nodeTagProjectID,
-        name: 'project tag'
+        name: 'project tag',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-tag',
         name: 'rule CHEF_TAG',
         type: 'NODE',
         project_id: nodeTagProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_TAG',
@@ -158,13 +183,16 @@ describeIfIAMV2p1('project update re-tagging', () => {
     {
       project: {
         id: eventOrgProjectID,
-        name: 'project org'
+        name: 'project org',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'event-rule-org',
         name: 'rule CHEF_ORGANIZATION',
         type: 'EVENT',
         project_id: eventOrgProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -177,13 +205,16 @@ describeIfIAMV2p1('project update re-tagging', () => {
     {
       project: {
         id: eventServerProjectID,
-        name: 'project chef server'
+        name: 'project chef server',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'event-rule-chef-server',
         name: 'rule CHEF_SERVER',
         type: 'EVENT',
         project_id: eventServerProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_SERVER',
@@ -231,7 +262,7 @@ describeIfIAMV2p1('project update re-tagging', () => {
       });
     });
 
-    // Ingest a node with attribues that match all the projects
+    // Ingest a node with attributes that match all the projects
     cy.fixture('converge/avengers1.json').then((node) => {
       node.organization_name = '75th Rangers';
       node.chef_server_fqdn = 'example.org';
