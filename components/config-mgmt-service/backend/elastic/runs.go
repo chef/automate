@@ -71,10 +71,11 @@ func (es Backend) GetRun(runID string, endTime time.Time) (backend.Run, error) {
 	return run, nil
 }
 
-func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time) ([]backend.CheckInPeroid, error) {
+func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
+	filters map[string][]string) ([]backend.CheckInPeroid, error) {
 	var (
 		dateHistoTag = "dateHisto"
-		mainQuery    = elastic.NewBoolQuery()
+		mainQuery    = newBoolQueryFromFilters(filters)
 		nodeID       = "node_id"
 	)
 
@@ -133,19 +134,6 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time) ([]ba
 	}
 
 	return checkInPeroids, nil
-}
-
-func getNumberOfHoursBetween(start, end time.Time) int {
-
-	return int(math.Ceil(end.Sub(start).Hours()))
-}
-
-func getTimezoneSoStartAtMidnight(start time.Time) string {
-	if start.Hour() < 12 {
-		return fmt.Sprintf("-%02d:00", start.Hour())
-	}
-
-	return fmt.Sprintf("+%02d:00", (24 - start.Hour()))
 }
 
 // GetRunsCounts returns a RunsCounts object that contains the number of success, failure, total runs for a node
@@ -333,4 +321,17 @@ func (es Backend) getAllConvergeIndiceNames() ([]string, error) {
 	}
 
 	return names, nil
+}
+
+func getNumberOfHoursBetween(start, end time.Time) int {
+
+	return int(math.Ceil(end.Sub(start).Hours()))
+}
+
+func getTimezoneSoStartAtMidnight(start time.Time) string {
+	if start.Hour() < 12 {
+		return fmt.Sprintf("-%02d:00", start.Hour())
+	}
+
+	return fmt.Sprintf("+%02d:00", (24 - start.Hour()))
 }

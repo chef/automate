@@ -175,7 +175,8 @@ func (m Backend) GetRunsPageByCursor(context.Context, string, time.Time,
 	return runs, nil
 }
 
-func (m Backend) GetCheckinCountsTimeSeries(time.Time, time.Time) ([]backend.CheckInPeroid, error) {
+func (m Backend) GetCheckinCountsTimeSeries(time.Time, time.Time,
+	map[string][]string) ([]backend.CheckInPeroid, error) {
 
 	return []backend.CheckInPeroid{}, nil
 }
