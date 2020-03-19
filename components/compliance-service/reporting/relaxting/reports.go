@@ -787,10 +787,10 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	filteredControls := elastic.NewFilterAggregation().Filter(controlsQuery)
 	filteredControls.SubAggregation("control", controlTermsAgg)
-	filteredControls.SubAggregation("skipped_total", waiverDataSkippedFilter)
-	filteredControls.SubAggregation("failed_total", waiverDataFailedFilter)
-	filteredControls.SubAggregation("passed_total", waiverDataPassedFilter)
-	filteredControls.SubAggregation("waived_total", waiverDataWaivedFilter)
+	filteredControls.SubAggregation("skipped_total", skippedFilter)
+	filteredControls.SubAggregation("failed_total", failedFilter)
+	filteredControls.SubAggregation("passed_total", passedFilter)
+	filteredControls.SubAggregation("waived_total", waivedFilter)
 	controlsAgg := elastic.NewNestedAggregation().Path("profiles.controls")
 	controlsAgg.SubAggregation("filtered_controls", filteredControls)
 
@@ -837,6 +837,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		if outerFilteredProfiles, found := outerProfilesAggResult.Aggregations.Filter("filtered_profiles"); found {
 			if outerControlsAggResult, found := outerFilteredProfiles.Aggregations.Nested("controls"); found {
 				if filteredControls, found := outerControlsAggResult.Aggregations.Filter("filtered_controls"); found {
+					controlSummaryTotals.Total = int32(filteredControls.DocCount)
 					if totalPassedControls, found := filteredControls.Aggregations.Filter("passed_total"); found {
 						controlSummaryTotals.Passed.Total = int32(totalPassedControls.DocCount)
 					}
