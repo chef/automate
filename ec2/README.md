@@ -16,6 +16,10 @@ vagrant plugin install vagrant-aws
 vagrant box add aws https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
 ```
 
+## Install okta_aws in order to login to AWS via Okta
+
+https://github.com/chef/okta_aws
+
 ## Variables
 
 ### Required ENV variables
@@ -30,7 +34,7 @@ vagrant box add aws https://github.com/mitchellh/vagrant-aws/raw/master/dummy.bo
 
 2. `AWS_ACCESS_KEY_ID` & `AWS_SECRET_ACCESS_KEY`. If not defined, authentication will fallback to `~/.aws/credentials`, created or auto-generated via `okta_aws`.
 
-3. `AWS_PROFILE` can be used to specify the profile to be used from `~/.aws/credentials`. Default: `chef-engineering`. If the `okta_aws` command is installed, it will be invoked with `AWS_PROFILE`.
+3. `AWS_PROFILE` can be used to specify the profile to be used from `~/.aws/credentials`. If the `okta_aws` command is installed, it will be invoked with `AWS_PROFILE`.
 
 4. `AWS_EC2_IP` can be used to specify an elastic IP that you prefer to be assigned to the box instead of an ephemeral public IP.
 
@@ -60,14 +64,14 @@ The Vagrantfile creates the instance in the `us-east-2`(Ohio) region.
 Destroy any previous instance and start it back up.
 ```
 vagrant destroy -f
-AWS_SSH_KEY_NAME='apop' VERSION='dev' vagrant up
+AWS_SSH_KEY_NAME='apop' AWS_PROFILE='chef-engineering' VERSION='dev' vagrant up
 vagrant ssh
 vagrant destroy -f
 ```
 
 or how I like to run it:
 ```
-vagrant destroy -f; AWS_SSH_KEY_NAME='apop' VERSION='dev' vagrant up; vagrant ssh
+vagrant destroy -f; AWS_SSH_KEY_NAME='apop' AWS_PROFILE='chef-engineering' VERSION='dev' vagrant up; vagrant ssh
 ```
 
 This will create the EC2 instance and connect to it via SSH.
