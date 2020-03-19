@@ -1,7 +1,7 @@
 require 'json'
 require 'open-uri'
 
-if ['up', 'ssh', 'halt'].include?(ARGV[0])
+if ['up', 'ssh', 'provision', 'halt'].include?(ARGV[0])
   raise 'ENV variable SSH_HOST is not defined!' if ENV['SSH_HOST'].nil?
   raise 'ENV variable SSH_KEY_PATH for the private key is not defined!' if ENV['SSH_KEY_PATH'].nil?
   raise 'ENV variable SSH_USER is not defined!' if ENV['SSH_USER'].nil?
@@ -44,7 +44,7 @@ end
 
 
 # Only run these checks on `vagrant up`
-if ARGV[0] == 'up'
+if ['up', 'provision'].include?(ARGV[0])
   if !ENV['STOP_HOURS'].nil?
     stop_hours = ENV['STOP_HOURS']
   end
