@@ -27,8 +27,8 @@ export class Regex {
     // Allows valid IP Address only (ipv4)
     VALID_IP_ADDRESS: '^((25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$',
 
-    // Positive Integers Only
-    POSITIVE_INT: '^[1-9][0-9]*$'
+    // Positive Integers Only including zero
+    POSITIVE_INT: '^[0-9][0-9]*$'
   };
 
 }

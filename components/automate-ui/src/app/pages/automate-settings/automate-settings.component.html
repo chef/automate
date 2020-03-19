@@ -18,7 +18,7 @@
 
         <div class="group-section">
           <chef-button primary [disabled]="!formChanged" (click)="applyChanges()">Save Changes</chef-button>
-          <chef-button secondary (click)="printValues()">Print Values</chef-button>
+          <!-- <chef-button secondary (click)="printValues()">Print Values</chef-button> -->
         </div>
 
         <div class="group-section">
@@ -31,7 +31,12 @@
             </chef-checkbox>
             </div>
               <p>Remove event feed data after
-                <input chefInput type="number" min="1" formControlName="threshold" />days</p>
+                <input chefInput 
+                  formControlName="threshold" 
+                  type="number" 
+                  min="0" 
+                  (keydown)="preventNegatives($event.key)"
+                  />days</p>
                 <chef-error
                   *ngIf="eventFeedRemoveData.get('threshold').hasError('pattern')">
                   Number must be positive integer.
@@ -45,7 +50,12 @@
                 (change)="toggleInput(eventFeedServerActions, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove Chef Server actions after<input chefInput type="number" min="1" formControlName="threshold" />days</p>
+            <p>Remove Chef Server actions after
+              <input chefInput 
+                type="number" 
+                min="0" 
+                formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)"/>days</p>
           </div>
         </div>
 
@@ -61,7 +71,11 @@
             </div>
 
             <p>When no health check reports have been received for a service in
-              <input chefInput type="number" min="1" formControlName="threshold" />
+              <input chefInput 
+                type="number" 
+                min="0" 
+                formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)" />
               <mat-form-field appearance="none">
                 <mat-select panelClass="chef-dropdown" formControlName="unit">
                   <mat-option value="m">minutes</mat-option>
@@ -81,7 +95,11 @@
               </chef-checkbox>
             </div>
             <p>Remove services labeled as disconnected after
-              <input chefInput type="number" min="1" formControlName="threshold" />
+              <input chefInput 
+                type="number" 
+                min="0" 
+                formControlName="threshold"
+                (keydown)="preventNegatives($event.key)" />
               <mat-form-field appearance="none">
                 <mat-select panelClass="chef-dropdown" formControlName="unit">
                   <mat-option value="m">minutes</mat-option>
@@ -102,7 +120,12 @@
               (change)="toggleInput(clientRunsRemoveData, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove data for Chef Client runs after<input chefInput type="number" min="1" formControlName="threshold" />days</p>
+            <p>Remove data for Chef Client runs after
+              <input chefInput 
+                type="number" 
+                min="0" 
+                formControlName="threshold"
+                (keydown)="preventNegatives($event.key)" />days</p>
           </div>
 
           <div class="checkbox-row" [formGroup]="clientRunsLabelMissing">
@@ -114,7 +137,11 @@
             </div>
           
             <p>When no Chef Client run data has been received from a node in
-              <input chefInput type="number" min="1" formControlName="threshold" />
+              <input chefInput 
+                type="number" 
+                min="0" 
+                formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)" />
               <mat-form-field appearance="none">
                 <mat-select panelClass="chef-dropdown" formControlName="unit">
                   <mat-option value="m">minutes</mat-option>
@@ -133,7 +160,12 @@
               (change)="toggleInput(clientRunsRemoveNodes, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove nodes labeled as missing after<input chefInput type="number" min="1" formControlName="threshold" />
+            <p>Remove nodes labeled as missing after
+              <input chefInput 
+                type="number" 
+                min="0" 
+                formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)" />
             <mat-form-field appearance="none">
               <mat-select panelClass="chef-dropdown" formControlName="unit">
                 <mat-option value="d">days</mat-option>
@@ -152,7 +184,12 @@
               (change)="toggleInput(complianceRemoveReports, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove compliance reports after<input chefInput type="number" min="1" formControlName="threshold" />days</p>
+            <p>Remove compliance reports after
+              <input chefInput 
+                type="number" 
+                min="0" 
+                formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)" />days</p>
           </div>
 
           <div class="checkbox-row" [formGroup]="complianceRemoveScans">
@@ -162,7 +199,12 @@
               (change)="toggleInput(complianceRemoveScans, $event.detail)">
               </chef-checkbox>
             </div>
-            <p>Remove compliance scans after<input chefInput type="number" min="1" formControlName="threshold" />days</p>
+            <p>Remove compliance scans after
+              <input chefInput 
+                type="number" 
+                min="0" 
+                formControlName="threshold" 
+                (keydown)="preventNegatives($event.key)" />days</p>
           </div>
         </div>
 
