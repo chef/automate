@@ -562,18 +562,21 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Id of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Id of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Name of the data bag.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -598,24 +601,28 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
+            "description": "Id of the Server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
+            "description": "Id of the Org.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "name",
+            "description": "Name of the data bag.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "item",
+            "description": "Name of the data bag item.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -1166,8 +1173,9 @@ func init() {
     "chef.automate.api.infra_proxy.response.DataBag": {
       "type": "object",
       "properties": {
-        "name": {
-          "type": "string"
+        "data": {
+          "type": "string",
+          "description": "Stringified json of the data bag item."
         }
       }
     },
@@ -1175,7 +1183,8 @@ func init() {
       "type": "object",
       "properties": {
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name of the data bag item."
         }
       }
     },
@@ -1186,7 +1195,8 @@ func init() {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBagListItem"
-          }
+          },
+          "description": "List of data bags item."
         }
       }
     },

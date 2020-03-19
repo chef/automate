@@ -2,7 +2,7 @@ package v1
 
 import (
 	"context"
-	"fmt"
+	"encoding/json"
 	"sort"
 
 	chef "github.com/chef/go-chef"
@@ -58,8 +58,10 @@ func (s *Server) GetDataBagItem(ctx context.Context, req *request.DataBag) (*res
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
+	data, _ := json.Marshal(ic)
+
 	return &response.DataBag{
-		Name: fmt.Sprintf("%v", ic),
+		Data: string(data),
 	}, nil
 
 }

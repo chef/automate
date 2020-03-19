@@ -36,7 +36,7 @@ func (a *InfraProxyServer) GetDataBagItem(ctx context.Context, r *gwreq.DataBag)
 	}
 
 	return &gwres.DataBag{
-		Name: res.GetName(),
+		Data: res.GetData(),
 	}, nil
 }
 
