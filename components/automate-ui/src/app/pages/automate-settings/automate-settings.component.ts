@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormGroup, FormBuilder, Validators } from '@angular/forms';
+import { FormGroup, FormBuilder } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Subject } from 'rxjs';
@@ -20,7 +20,6 @@ import {
   IngestJobs
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
-import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
   templateUrl: './automate-settings.component.html',
@@ -35,7 +34,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       name: 'periodic_purge',
       nested_name: 'feed',
       unit: { value: 'd', disabled: false },
-      threshold: [{ value: '30', disabled: false }, Validators.min(1)],
+      threshold: { value: '30', disabled: false },
       disabled: false
     },
     eventFeedServerActions: {
@@ -234,13 +233,6 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     pertinentGroups.forEach(control => {
       if ( checked ) {
         form.get(control).enable();
-
-        if (control === 'threshold') {
-          form.controls[control].setValidators([
-            Validators.pattern(Regex.patterns.POSITIVE_INT)]); // set validators here
-            form.controls[control].updateValueAndValidity();
-        }
-
       } else {
           form.get(control).disable();
       }
@@ -277,6 +269,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         job.nested_name = jobForm.nested_name;
         job.threshold = jobForm.threshold;
       }
+      // If the user doesn't enter any number at all - this defaults to 0
+      job.threshold = job.threshold === null ? '0' : job.threshold;
 
       return job;
     });
@@ -484,11 +478,6 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         case 'feed': {
           this.handleDisable(this.eventFeedRemoveData, _job.disabled);
           this.eventFeedRemoveData.patchValue(form);
-
-          // Set Validations Example
-          this.eventFeedRemoveData.controls['threshold'].setValidators([
-            Validators.pattern(Regex.patterns.POSITIVE_INT)]);
-          this.eventFeedRemoveData.controls['threshold'].updateValueAndValidity();
         }
         break;
 

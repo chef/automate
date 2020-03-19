@@ -37,8 +37,8 @@ export class AutomateSettingsRequests {
     const url = '/api/v0/data-lifecycle/config';
 
     const body = {  // add strong typing  --> see sidebar types
-      'infra' : {
-        'job_settings': [
+      infra : {
+        job_settings: [
           {
             'name': 'periodic_purge_timeseries',
             'purge_policies': {
@@ -78,13 +78,13 @@ export class AutomateSettingsRequests {
         case 'missing_nodes':     // fallthrough
         case 'missing_nodes_for_deletion':
           thisJob = this.unfurlIngestJob(job);
-          body[job.category]['job_settings'].push(thisJob);
+          body[job.category].job_settings.push(thisJob);
           break;
 
         case 'periodic_purge_timeseries': // fallthrough
         case 'periodic_purge':
           thisJob = this.unfurlIngestJob(job, true);
-          matchedNest = body[job.category]['job_settings'].find(item => item['name'] === job.name);
+          matchedNest = body[job.category].job_settings.find(item => item['name'] === job.name);
           matchedNest.purge_policies['elasticsearch'].push(thisJob);
           break;
 
