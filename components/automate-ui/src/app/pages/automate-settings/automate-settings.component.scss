@@ -15,8 +15,8 @@ h2 {
 
 .checkbox-row {
   display: flex;
-  
-  & + .checkbox-row {
+
+  &+.checkbox-row {
     margin-top: 12px;
   }
 
@@ -50,8 +50,8 @@ h2 {
 
 // temporary - needs to go in theme file for material
 mat-form-field {
-  width: 120px;
   margin: 0 8px 0 0;
+  width: 120px;
 
   ::ng-deep .mat-form-field-infix {
     padding: 0;
