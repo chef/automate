@@ -264,7 +264,8 @@ func getInspecError(stdOut string, stdErr string, err error, target *TargetConfi
 				"Failed to connect to "+target.Hostname+", connection timeout.")
 		}
 		authErr := "Net::SSH::AuthenticationFailed"
-		if strings.Index(serr, authErr) >= 0 {
+		winRmAuthErr := "WinRM::WinRMAuthorizationError"
+		if strings.Index(serr, authErr) >= 0 || strings.Index(serr, winRmAuthErr) >= 0 {
 			return NewInspecError(AUTH_FAILED,
 				"Authentication failed for "+target.Hostname)
 		}
