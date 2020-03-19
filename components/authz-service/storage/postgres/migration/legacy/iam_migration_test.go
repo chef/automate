@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"net/url"
+	"os"
 	"strings"
 	"testing"
 
@@ -23,7 +24,7 @@ const (
 	v2DefaultAndLegacyPolicyCount = 13 // owner, editor, viewer, ingest + legacy
 	v2DefaultRoleCount            = 4  // owner, editor, viewer, ingest
 	v2DefaultProjectCount         = 2  // ~~All Projects~~, (unassigned)
-	pgURL                         = "postgres://postgres@127.0.0.1:5432/authz_test?sslmode=disable"
+	ciPGURL                       = "postgres://postgres@127.0.0.1:5432/authz_test?sslmode=disable"
 )
 
 const resetDatabaseStatement = `DROP SCHEMA public CASCADE;
@@ -206,13 +207,19 @@ func setupDB(ctx context.Context, t *testing.T) (*sql.DB, error) {
 	// between database content and hardcoded storage default policies actually
 	// compares the migrated policies with the hardcoded ones (and NOT the
 	// hardcoded policies with the hardcoded policies).
-	db := openDB(t)
+	db, pgURL := openDB(t)
+
+	// if db is nil, we are not in CI or we did not request the tests that require the db to be up
+	if db == nil {
+		t.Log("Not in CI and PGURL not passed, skipping tests that depend on an active db")
+		t.SkipNow()
+	}
+
 	_, err = db.ExecContext(ctx, resetDatabaseStatement)
 	require.NoError(t, err, "error resetting database")
 	_, err = db.Exec(`CREATE EXTENSION IF NOT EXISTS "uuid-ossp"`)
 	require.NoError(t, err, "error creating extension")
 
-	pgURL := pgURL
 	migrationsPath := "../sql"
 	migrationsTable := ""
 
@@ -250,14 +257,31 @@ func addMigrationsTable(u, table string) (string, error) {
 	return pgURL.String(), nil
 }
 
-func openDB(t *testing.T) *sql.DB {
+func openDB(t *testing.T) (*sql.DB, string) {
 	t.Helper()
-	db, err := sql.Open("postgres", "postgres://postgres:postgres@127.0.0.1:5432/authz_test?sslmode=disable")
+
+	ciMode := os.Getenv("CI") == "true"
+
+	var customPGURL string
+	pgURLPassed := true
+	if ciMode {
+		customPGURL = ciPGURL
+	} else {
+		customPGURL, pgURLPassed = os.LookupEnv("PG_URL")
+	}
+
+	// If PG_URL wasn't passed (and we aren't in CI)
+	// we shouldn't run the postgres tests, return nil.
+	if !pgURLPassed {
+		return nil, customPGURL
+	}
+
+	db, err := sql.Open("postgres", customPGURL)
 	require.NoError(t, err, "error opening db")
 	err = db.Ping()
 	require.NoError(t, err, "error pinging db")
 
-	return db
+	return db, customPGURL
 }
 
 func addScheme(p string) string {
