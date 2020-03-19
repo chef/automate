@@ -122,19 +122,19 @@ export class LayoutSidebarService {
             name: 'General Settings',
             items: [
               {
-                name: 'Data Lifecycle',
-                icon: 'storage',
-                route: '/settings/data-lifecycle',
-                authorized: {
-                  anyOf: ['/retention/nodes/status', 'get']
-                }
-              },
-              {
                 name: 'Notifications',
                 icon: 'notifications',
                 route: '/settings/notifications',
                 authorized: {
                   anyOf: ['/notifications/rules', 'get']
+                }
+              },
+              {
+                name: 'Data Lifecycle',
+                icon: 'storage',
+                route: '/settings/data-lifecycle',
+                authorized: {
+                  anyOf: ['/retention/nodes/status', 'get']
                 }
               }
             ]
