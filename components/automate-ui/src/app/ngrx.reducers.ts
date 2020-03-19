@@ -27,7 +27,7 @@ import * as permEntity from './entities/userperms/userperms.reducer';
 import * as policyEntity from './entities/policies/policy.reducer';
 import * as profileEntity from './entities/profiles/profile.reducer';
 import * as projectEntity from './entities/projects/project.reducer';
-//import * as roleEntity from './entities/roles/role.reducer';
+import * as roleEntity from './entities/roles/role.reducer';
 import * as ruleEntity from './entities/rules/rule.reducer';
 import * as serverEntity from './entities/servers/server.reducer';
 import * as orgEntity from './entities/orgs/org.reducer';
@@ -59,7 +59,7 @@ export interface NgrxStateAtom {
   automateSettings: automateSettings.AutomateSettingsEntityState;
   clientRunsEntity: clientRuns.ClientRunsEntityState;
   cookbooks: cookbookEntity.CookbookEntityState;
-  roles: infraRoleEntity.InfraRoleEntityState;
+  infraroles: infraRoleEntity.InfraRoleEntityState;
   jobs: jobEntity.JobEntityState;
   licenseStatus: license.LicenseStatusEntityState;
   managers: manager.ManagerEntityState;
@@ -67,7 +67,7 @@ export interface NgrxStateAtom {
   policies: policyEntity.PolicyEntityState;
   profiles: profileEntity.ProfileEntityState;
   projects: projectEntity.ProjectEntityState;
-  //roles: roleEntity.RoleEntityState;
+  roles: roleEntity.RoleEntityState;
   rules: ruleEntity.RuleEntityState;
   servers: serverEntity.ServerEntityState;
   orgs: orgEntity.OrgEntityState;
@@ -168,7 +168,7 @@ export const defaultInitialState = {
   automateSettings: automateSettings.AutomateSettingsEntityInitialState,
   clientRunsEntity: clientRuns.ClientRunsEntityInitialState,
   cookbooks: cookbookEntity.CookbookEntityInitialState,
-  roles: infraRoleEntity.InfraRoleEntityInitialState,
+  infraroles: infraRoleEntity.InfraRoleEntityInitialState,
   jobs: jobEntity.JobEntityInitialState,
   licenseStatus: license.LicenseStatusEntityInitialState,
   managers: manager.ManagerEntityInitialState,
@@ -176,7 +176,7 @@ export const defaultInitialState = {
   policies: policyEntity.PolicyEntityInitialState,
   profiles: profileEntity.ProfileEntityInitialState,
   projects: projectEntity.ProjectEntityInitialState,
-  //roles: roleEntity.RoleEntityInitialState,
+  roles: roleEntity.RoleEntityInitialState,
   rules: ruleEntity.RuleEntityInitialState,
   servers: serverEntity.ServerEntityInitialState,
   orgs: orgEntity.OrgEntityInitialState,
@@ -210,7 +210,7 @@ export const ngrxReducers = {
   automateSettings: automateSettings.automateSettingsEntityReducer,
   clientRunsEntity: clientRuns.clientRunsEntityReducer,
   cookbooks: cookbookEntity.cookbookEntityReducer,
-  roles: infraRoleEntity.infraRoleEntityReducer,
+  infraroles: infraRoleEntity.infraRoleEntityReducer,
   credentialEntity: credential.credentialReducer,
   jobs: jobEntity.jobEntityReducer,
   managers: manager.managerEntityReducer,
@@ -219,7 +219,7 @@ export const ngrxReducers = {
   policies: policyEntity.policyEntityReducer,
   profiles: profileEntity.profileEntityReducer,
   projects: projectEntity.projectEntityReducer,
-  //roles: roleEntity.roleEntityReducer,
+  roles: roleEntity.roleEntityReducer,
   rules: ruleEntity.ruleEntityReducer,
   servers: serverEntity.serverEntityReducer,
   orgs: orgEntity.orgEntityReducer,

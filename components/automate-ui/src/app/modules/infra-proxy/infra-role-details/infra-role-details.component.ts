@@ -1,16 +1,14 @@
 import { Component, OnInit, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { Subject, combineLatest } from 'rxjs';
+import { combineLatest } from 'rxjs';
 import { Node, Options } from 'ng-material-treetable';
-
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams, routeURL } from 'app/route.selectors';
-import { filter, pluck, takeUntil } from 'rxjs/operators';
+import { filter, pluck } from 'rxjs/operators';
 import { EntityStatus } from 'app/entities/entities';
 import { identity, isNil } from 'lodash/fp';
-
 import { getStatus, infaRoleFromRoute } from 'app/entities/infra-roles/infra-role.selectors';
 import { GetRole } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
@@ -30,12 +28,12 @@ export interface Task {
   owner: string;
 }
 
-
 @Component({
   selector: 'app-infra-role-details',
   templateUrl: './infra-role-details.component.html',
   styleUrls: ['./infra-role-details.component.scss']
 })
+
 export class InfraRoleDetailsComponent implements OnInit {
   public role: InfraRole;
   public tabValue: InfraRoleTabName = 'runList';
@@ -47,7 +45,7 @@ export class InfraRoleDetailsComponent implements OnInit {
   public name;
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
-  private isDestroyed = new Subject<boolean>();
+
   treeOptions: Options<Report> = {
     capitalisedHeader: true,
     customColumnOrder: [
@@ -122,7 +120,6 @@ export class InfraRoleDetailsComponent implements OnInit {
     private store: Store<NgrxStateAtom>,
     private router: Router,
     private layoutFacade: LayoutFacadeService
-
   ) { }
 
   ngOnInit() {
@@ -140,10 +137,7 @@ export class InfraRoleDetailsComponent implements OnInit {
       this.store.select(routeParams).pipe(pluck('id'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('orgid'), filter(identity)),
       this.store.select(routeParams).pipe(pluck('name'), filter(identity))
-
-    ]).pipe(
-      takeUntil(this.isDestroyed)
-    ).subscribe(([server_id, org_id, name]: string[]) => {
+    ]).pipe().subscribe(([server_id, org_id, name]: string[]) => {
       this.serverId = server_id;
       this.OrgId = org_id;
       this.name = name;
@@ -156,15 +150,13 @@ export class InfraRoleDetailsComponent implements OnInit {
       this.store.select(getStatus),
       this.store.select(infaRoleFromRoute)
     ]).pipe(
-      filter(([status, role]) => status === EntityStatus.loadingSuccess && !isNil(role)),
-      takeUntil(this.isDestroyed))
+      filter(([status, role]) => status === EntityStatus.loadingSuccess && !isNil(role)))
       .subscribe(([_, role]) => {
         this.role = { ...role };
       });
-
-
   }
-    logNode(node: Node<Report>) {
+
+  logNode(node: Node<Report>) {
     console.log(node);
   }
 
