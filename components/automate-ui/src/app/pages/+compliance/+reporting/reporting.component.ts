@@ -415,6 +415,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     switch (status) {
       case 'failed': return 'report_problem';
       case 'passed': return 'check_circle';
+      case 'waived': return 'check_circle';
       case 'skipped': return 'help';
       case 'unknown': return 'help';
     }
@@ -424,6 +425,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     switch (status) {
       case 'failed': return 'Not Compliant';
       case 'passed': return 'Compliant';
+      case 'waived': return 'Compliant';
       case 'skipped': return 'Skipped';
       case 'unknown': return 'Unknown';
     }
