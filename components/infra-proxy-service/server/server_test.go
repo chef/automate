@@ -2,6 +2,9 @@ package server
 
 import (
 	"context"
+	"errors"
+	"net/url"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -31,7 +34,10 @@ func TestHealthGRPC(t *testing.T) {
 	l, err := logger.NewLogger("text", "debug")
 	require.NoError(t, err, "could not init logger", err)
 
-	_, _, conn, close, _ := setupInfraProxyService(ctx, t, l, nil)
+	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
+	require.NoError(t, err)
+
+	_, _, conn, close, _ := setupInfraProxyService(ctx, t, l, *migrationConfig)
 	defer close()
 
 	cl := healthpb.NewHealthClient(conn)
@@ -43,9 +49,44 @@ func TestHealthGRPC(t *testing.T) {
 	})
 }
 
+func migrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*migration.Config, error) {
+	customPGURL, pgURLPassed := os.LookupEnv("PG_URL")
+	ciMode := os.Getenv("CI") == "true"
+
+	// If in CI mode, use the default
+	if ciMode {
+		pgURL, err := url.Parse("postgres://postgres@127.0.0.1:5432/infra-proxy-postgres?sslmode=disable")
+		if err != nil {
+			return nil, err
+		}
+		return &migration.Config{
+			Path:   migrationPath,
+			Logger: l,
+			PGURL:  pgURL,
+		}, nil
+	}
+
+	// If PG_URL wasn't passed (and we aren't in CI)
+	// we shouldn't run the postgres tests, return nil.
+	if !pgURLPassed {
+		return nil, errors.New("was not CI and PG_URL not passed")
+	}
+
+	pgURL, err := url.Parse(customPGURL)
+	if err != nil {
+		return nil, err
+	}
+
+	return &migration.Config{
+		Path:   migrationPath,
+		Logger: l,
+		PGURL:  pgURL,
+	}, nil
+}
+
 func setupInfraProxyService(ctx context.Context,
 	t *testing.T, l logger.Logger,
-	migrationConfig *migration.Config) (*v1.Server, *service.Service, *grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
+	migrationConfig migration.Config) (*v1.Server, *service.Service, *grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
 
 	t.Helper()
 
@@ -81,7 +122,7 @@ func setupInfraProxyService(ctx context.Context,
 
 	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
 
-	serviceRef, err := service.Start(l, *migrationConfig, connFactory, secretsClient,
+	serviceRef, err := service.Start(l, migrationConfig, connFactory, secretsClient,
 		authzClient, authzV2AuthorizationClient)
 
 	if err != nil {
