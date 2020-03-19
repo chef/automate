@@ -5,9 +5,11 @@ description = "One platform with a unified workflow, end-to-end visibility, and 
 Paginate = 4
 theme = "chef"
 
-# To develop against a local copy of the chef hugo theme, uncomment this line
-# and set the value to the parent directory of where you have checked out the
-# chef-hugo-theme repository
+# To develop against a local copy of the chef hugo theme:
+# - clone the chef-hugo-theme repo with the "old_hugo_theme" branch
+# - checkout the "old_hugo_theme" branch
+# - uncomment this line below and set the value to the parent directory where
+#   you have checked out the chef-hugo-theme repository
 # themesDir = "../../../hugo-themes"
 
 [markup]
