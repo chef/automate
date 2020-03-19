@@ -5,6 +5,13 @@ import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 
 // Getting the most from an Angular form
 // *************************************
+//
+// WHAT YOU GET BY JUST ADDING 'formControlName' TO YOUR CONTROL
+//
+// Instrument a control by adding the directive with the form field name. Example:
+//
+//     <input chefInput name="firstName" formControlName="firstName" type="text" autofocus>
+//
 // Out of the box, this directive automatically provides "memory" to your form
 // controls (typically <chef-input>, <chef-radio>, and <chef-select> elements)
 // when a focussed control is being edited.
@@ -17,6 +24,9 @@ import { distinctUntilChanged, takeUntil } from 'rxjs/operators';
 // If, upon a successful operation, the user is taken elsewhere
 // (e.g. the modal closes, or the page navigates to a summary, etc.)
 // nothing further is required.
+//
+// ADDITIONAL INSTRUMENTATION NEEDED IF YOU HAVE RELEVANT STATE CHANGES
+//
 // If, however, the form (or modal) remains open, you typically want
 // to have the "pristine state" of the control be updated
 // to the newly processed value. Here's how to make that happen:
