@@ -55,7 +55,7 @@ func migrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*mi
 
 	// If in CI mode, use the default
 	if ciMode {
-		pgURL, err := url.Parse("postgres://postgres@127.0.0.1:5432/infra-proxy-postgres?sslmode=disable")
+		pgURL, err := url.Parse("postgres://postgres@127.0.0.1:5432/infra_proxy_test?sslmode=disable")
 		if err != nil {
 			return nil, err
 		}
