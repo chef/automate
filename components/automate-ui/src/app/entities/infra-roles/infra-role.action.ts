@@ -8,7 +8,7 @@ export enum RoleActionTypes {
   GET_ALL_FAILURE = 'ROLES::GET_ALL::FAILURE',
   GET = 'ROLES::GET',
   GET_SUCCESS = 'ROLES::GET::SUCCESS',
-  GET_FAILURE = 'ROLES::GET::FAILURE',
+  GET_FAILURE = 'ROLES::GET::FAILURE'
 }
 
 export interface RolesSuccessPayload {

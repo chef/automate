@@ -13,33 +13,25 @@
           <thead>
             <tr class="detail-row">
               <th class="id-column">Description</th>
-              <th class="id-column">Last updated</th>
-              <th class="id-column">Changed by</th>
-              <th class="id-column">Environment</th>
             </tr>
           </thead>
           <tbody>
             <tr class="detail-row">
               <td class="id-column">{{role?.description}}</td>
-              <td class="id-column">March 13, 2020 10:10 PM</td>
-              <td class="id-column">Vinay</td>
-              <td class="id-column">_default, Prod_env</td>
             </tr>
           </tbody>
         </table>
         <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
           <chef-option value='runList' data-cy="runList-tab">Run List</chef-option>
-          <chef-option value='attributes' data-cy="attributes-tab">Attributes</chef-option>
-          <chef-option value='affectedNodes' data-cy="affectedNodes-tab">Affected Nodes</chef-option>
         </chef-tab-selector>
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'runList'">
-
-<h2>Tree as Array of Nodes</h2>
-<treetable
-  [tree]="arrayOfNodesTree"
-  (nodeClicked)="logNode($event)">
-</treetable>
+        <div *ngIf="show">
+          <treetable 
+              [tree]="arrayOfNodesTree"
+                >
+          </treetable>
+      </div>
         
       </section>
       <section class="page-body" *ngIf="tabValue === 'attributes'">

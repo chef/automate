@@ -2,7 +2,7 @@ import { Component, OnInit, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest } from 'rxjs';
-import { Node, Options } from 'ng-material-treetable';
+import { Node } from 'ng-material-treetable';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams, routeURL } from 'app/route.selectors';
@@ -13,19 +13,10 @@ import { getStatus, infaRoleFromRoute } from 'app/entities/infra-roles/infra-rol
 import { GetRole } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 
-export type InfraRoleTabName = 'runList' | 'attributes' | 'affectedNodes';
+export type InfraRoleTabName = 'runList';
 
-export interface Report {
+export interface RoleList {
   name: string;
-  owner: string;
-  protected: boolean;
-  backup: boolean;
-}
-
-export interface Task {
-  name: string;
-  completed: boolean;
-  owner: string;
 }
 
 @Component({
@@ -45,76 +36,9 @@ export class InfraRoleDetailsComponent implements OnInit {
   public name;
   // isLoading represents the initial load as well as subsequent updates in progress.
   public isLoading = true;
-
-  treeOptions: Options<Report> = {
-    capitalisedHeader: true,
-    customColumnOrder: [
-      'owner', 'name', 'backup', 'protected'
-    ]
-  };
-
-  arrayOfNodesTree: Node<Task>[] = [
-    {
-      value: {
-        name: 'Tasks for Sprint 1',
-        completed: true,
-        owner: 'Marco'
-      },
-      children: [
-        {
-          value: {
-            name: 'Complete feature #123',
-            completed: true,
-            owner: 'Marco'
-          },
-          children: []
-        },
-        {
-          value: {
-            name: 'Update documentation',
-            completed: true,
-            owner: 'Jane'
-          },
-          children: [
-            {
-              value: {
-                name: 'Proofread documentation',
-                completed: true,
-                owner: 'Bob'
-              },
-              children: []
-            }
-          ]
-        }
-      ]
-    },
-    {
-      value: {
-        name: 'Tasks for Sprint 2',
-        completed: false,
-        owner: 'Erika',
-      },
-      children: [
-        {
-          value: {
-            name: 'Fix bug #567',
-            completed: false,
-            owner: 'Marco'
-          },
-          children: []
-        },
-        {
-          value: {
-            name: 'Speak with clients',
-            completed: true,
-            owner: 'James'
-          },
-          children: []
-        }
-      ]
-    }
-  ]
-
+  public runList: string[];
+  public show = false;
+  public arrayOfNodesTree: Node<RoleList>[] = [];
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -123,14 +47,12 @@ export class InfraRoleDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
+    this.arrayOfNodesTree  = [];
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
-    // Populate our tabValue from the fragment.
-
     this.store.select(routeURL).pipe()
     .subscribe((url: string) => {
       this.url = url;
-      const [, fragment] = url.split('#');
-      this.tabValue = (fragment === 'runList') ? 'runList' : 'attributes';
+      this.tabValue =  'runList';
     });
 
     combineLatest([
@@ -145,7 +67,7 @@ export class InfraRoleDetailsComponent implements OnInit {
         server_id: server_id, org_id: org_id, name: name
       }));
     });
-    
+
     combineLatest([
       this.store.select(getStatus),
       this.store.select(infaRoleFromRoute)
@@ -153,11 +75,25 @@ export class InfraRoleDetailsComponent implements OnInit {
       filter(([status, role]) => status === EntityStatus.loadingSuccess && !isNil(role)))
       .subscribe(([_, role]) => {
         this.role = { ...role };
+        this.runList = this.role.run_list;
+        if (this.runList && this.runList.length) {
+          this.treenodes(this.runList);
+        } else {
+          this.show = false;
+        }
       });
   }
 
-  logNode(node: Node<Report>) {
-    console.log(node);
+  treenodes(runList: string[]) {
+    this.show = true;
+    for ( let i = 0; i < runList.length; i++) {
+      this.arrayOfNodesTree.push({
+        value : {
+          name: runList[i]
+        },
+        children: []
+      });
+    }
   }
 
   onSelectedTab(event: { target: { value: InfraRoleTabName } }) {

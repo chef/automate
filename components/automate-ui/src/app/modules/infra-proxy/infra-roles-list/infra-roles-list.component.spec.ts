@@ -12,7 +12,6 @@ import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.se
 describe('InfraRolesListComponent', () => {
     let component: InfraRolesListComponent;
     let fixture: ComponentFixture<InfraRolesListComponent>;
-  
     beforeEach(async(() => {
       TestBed.configureTestingModule({
         declarations: [
@@ -50,15 +49,12 @@ describe('InfraRolesListComponent', () => {
       })
       .compileComponents();
     }));
-  
     beforeEach(() => {
       fixture = TestBed.createComponent(InfraRolesListComponent);
       component = fixture.componentInstance;
       fixture.detectChanges();
     });
-  
     it('should create', () => {
       expect(component).toBeTruthy();
     });
   });
-  

@@ -10,7 +10,6 @@
                 <chef-heading>{{ org?.name }}</chef-heading>
                 <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
                     <chef-option value='roles' data-cy="roles-tab">Roles</chef-option>
-                    <chef-option value='details' data-cy="details-tab">Details</chef-option>
                 </chef-tab-selector>
             </chef-page-header>
             <section class="page-body" *ngIf="tabValue === 'roles'">
