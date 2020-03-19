@@ -23,6 +23,9 @@ build:
 	mkdir -p bin/
 	go build -mod=vendor -o bin/infra-proxy-service ./cmd/infra-proxy-service
 
+test:
+	@go test $(verbose) -cover -count=1 -parallel=1 -p 1 $(packages)
+
 setup_docker_pg:
 	docker run --name infra-proxy-postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=infra_proxy_test -p 5432:5432 -d postgres:9
 	sleep 15 # let docker come up
