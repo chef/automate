@@ -96,10 +96,10 @@
     }
 
     &.waived {
-      color: $chef-darker;
+      color: $chef-darkest;
 
       .waived-icon:before {
-        color: $chef-darkest;
+        color: inherit;
       }
     }
 
