@@ -129,8 +129,6 @@ func TestDialWithNoEndpointsAndNullBackendSock(t *testing.T) {
 	require.NoError(t, err)
 	_, err = f.AuthorizationClient()
 	require.NoError(t, err)
-	_, err = f.AuthorizationV2Client()
-	require.NoError(t, err)
 	_, err = f.CfgMgmtClient()
 	require.NoError(t, err)
 	_, err = f.ChefIngesterClient()
