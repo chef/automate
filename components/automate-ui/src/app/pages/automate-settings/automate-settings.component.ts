@@ -180,9 +180,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetSettings({}));
 
     this.store.select(automateSettingsState).pipe(
-      takeUntil(this.isDestroyed),
-      distinctUntilKeyChanged('jobSchedulerStatus')
-      )
+        takeUntil(this.isDestroyed),
+        distinctUntilKeyChanged('jobSchedulerStatus')
+        )
       .subscribe((automateSettingsSelector) => {
         if (automateSettingsSelector.errorResp !== null) {
           const error = automateSettingsSelector.errorResp;
@@ -191,9 +191,10 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         } else {
           this.jobSchedulerStatus = automateSettingsSelector.jobSchedulerStatus;
           this.telemetryService.track('lifecycleConfiguration', this.jobSchedulerStatus);
-          this.updateForm(this.jobSchedulerStatus, () => this.onChanges() );
+          this.updateForm(this.jobSchedulerStatus);
         }
       });
+
   }
 
   ngOnDestroy(): void {
@@ -316,7 +317,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   }
 
   // Update forms until we get the job scheduler status
-  public updateForm(jobSchedulerStatus: JobSchedulerStatus, cb: () => void ) {
+  public updateForm(jobSchedulerStatus: JobSchedulerStatus) {
 
     if (jobSchedulerStatus === null) {
       return;
@@ -339,10 +340,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         default:
           break;
       }
-
     });
 
-    cb();
+    this.onChanges(); // Subscribe to new changes on the form;
   }
 
   private getJobForm(jobName: string) {

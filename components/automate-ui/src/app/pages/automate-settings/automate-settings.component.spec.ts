@@ -3,7 +3,9 @@ import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { StoreModule } from '@ngrx/store';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { FormGroup, FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MatFormFieldModule, MatSelectModule, MatOptionModule } from '@angular/material';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';
+// import { MatOptionModule } from '@angular/material;
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
@@ -48,7 +50,7 @@ describe('AutomateSettingsComponent', () => {
         ReactiveFormsModule,
         MatFormFieldModule,
         MatSelectModule,
-        MatOptionModule,
+        // MatOptionModule,
         BrowserAnimationsModule,
         HttpClientTestingModule,
         StoreModule.forRoot(ngrxReducers, { runtimeChecks })
@@ -140,7 +142,7 @@ describe('AutomateSettingsComponent', () => {
   describe('when jobSchedulerStatus is null', () => {
     it('does not update the forms', () => {
       const formBeforeUpdate = component.automateSettingsForm;
-      component.updateForm(null, null);
+      component.updateForm(null);
       expect(component.automateSettingsForm).toEqual(formBeforeUpdate);
     });
   });
