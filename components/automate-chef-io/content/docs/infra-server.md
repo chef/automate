@@ -12,6 +12,12 @@ toc = true
     weight = 60
 +++
 
+{{% warning %}}
+
+We do not support using the Chef Automate 2 deployment service to deploy Chef Infra Server with Chef Manage.
+
+{{% /warning %}}
+
 Use Chef Automate to install Chef Infra Server either for a single-host installation that contains both Chef Infra Server and Chef Automate, or for a standalone Chef Infra Server instance.
 See the [Chef Infra Server documentation](https://docs.chef.io/server_overview/) for instructions and guidance on using and managing your Chef Infra Server.
 
