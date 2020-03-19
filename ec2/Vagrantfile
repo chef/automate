@@ -229,6 +229,7 @@ else
 fi
 
 cat<<EOF >>dev/config.toml
+
 [compliance.v1.sys.logger]
   level = "debug"
 

@@ -153,8 +153,15 @@ else
   git reset dev/config.toml
 fi
 
+cat<<EOF >>dev/config.toml
+
+[compliance.v1.sys.logger]
+  level = "debug"
+EOF
+
 SSH_HOSTNAME="#{ssh_host}"
 sed -i "s/fqdn = .*/fqdn = '$SSH_HOSTNAME'/" dev/config.toml
+sed -i "s/heapsize = .*/heapsize = '#{ENV['ES_HEAP_SIZE']}g'/" dev/config.toml
 echo "#{automate_license}" > dev/license.jwt
 echo
 SCRIPT
