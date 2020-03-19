@@ -18,6 +18,7 @@
 
         <div class="group-section">
           <chef-button primary [disabled]="!formChanged" (click)="applyChanges()">Save Changes</chef-button>
+          <chef-button secondary (click)="printValues()">Print Values</chef-button>
         </div>
 
         <div class="group-section">
@@ -31,6 +32,10 @@
             </div>
               <p>Remove event feed data after
                 <input chefInput type="number" min="1" formControlName="threshold" />days</p>
+                <chef-error
+                  *ngIf="eventFeedRemoveData.get('threshold').hasError('pattern')">
+                  Number must be positive integer.
+                </chef-error>
           </div>
 
           <div class="checkbox-row" [formGroup]="eventFeedServerActions">

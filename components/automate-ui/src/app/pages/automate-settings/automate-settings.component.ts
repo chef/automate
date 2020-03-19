@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Subject } from 'rxjs';
@@ -20,6 +20,7 @@ import {
   IngestJobs
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+import { Regex } from 'app/helpers/auth/regex';
 
 @Component({
   templateUrl: './automate-settings.component.html',
@@ -34,7 +35,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       name: 'periodic_purge',
       nested_name: 'feed',
       unit: { value: 'd', disabled: false },
-      threshold: {value: '30', disabled: false},
+      threshold: [{ value: '30', disabled: false }, Validators.min(1)],
       disabled: false
     },
     eventFeedServerActions: {
@@ -48,7 +49,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     serviceGroupNoHealthChecks: {
       category: 'services',
       name: '',
-      unit: { value: 'm', disabled: true },
+      unit: { value: 'm', disabled: true},
       threshold: { value: '5', disabled: true },
       disabled: false // special case: only alterable by the API so we want to show as enabled
     },
@@ -202,6 +203,11 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
+  printValues() {
+    console.log(this.eventFeedRemoveData);
+    console.log(this.eventFeedServerActions);
+  }
+
 
   public toggleInput(form, checked: boolean) {
     // patchValue is a workaround for the chef-checkbox because we need to be
@@ -215,8 +221,15 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     pertinentGroups.forEach(control => {
       if ( checked ) {
         form.get(control).enable();
+
+        if (control === 'threshold') {
+          form.controls[control].setValidators([
+            Validators.pattern(Regex.patterns.POSITIVE_INT)]); // set validators here
+            form.controls[control].updateValueAndValidity();
+        }
+
       } else {
-        form.get(control).disable();
+          form.get(control).disable();
       }
     });
   }
@@ -288,7 +301,10 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   // Subscribes to any change inside the automateSettingsForm
   private onChanges(): void {
     this.automateSettingsForm.valueChanges.pipe(takeUntil(this.isDestroyed))
-      .subscribe(_change => this.formChanged = true);
+      .subscribe(_change => {
+        this.formChanged = true;
+        // Loop through forms and check for validity, then set to true or false
+      });
   }
 
   private showErrorNotification(error: HttpErrorResponse, msg: string) {
@@ -342,7 +358,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       }
     });
 
-    this.onChanges(); // Subscribe to new changes on the form;
+    // Subscribe to new changes on the form after the new values have been populated
+    this.onChanges();
   }
 
   private getJobForm(jobName: string) {
@@ -451,6 +468,11 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         case 'feed': {
           this.handleDisable(this.eventFeedRemoveData, _job.disabled);
           this.eventFeedRemoveData.patchValue(form);
+
+          // Set Validations Example
+          this.eventFeedRemoveData.controls['threshold'].setValidators([
+            Validators.pattern(Regex.patterns.POSITIVE_INT)]);
+          this.eventFeedRemoveData.controls['threshold'].updateValueAndValidity();
         }
         break;
 
