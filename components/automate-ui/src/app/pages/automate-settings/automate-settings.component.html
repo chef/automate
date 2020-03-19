@@ -17,7 +17,11 @@
       <div class="page-body">
 
         <div class="group-section">
-          <chef-button primary [disabled]="!formChanged" (click)="applyChanges()">Save Changes</chef-button>
+          <chef-button primary [disabled]="!formChanged || saving" (click)="applyChanges()">
+            <span *ngIf="!saving">Save Changes</span>
+            <span *ngIf="saving">Saving...</span>
+            <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
+          </chef-button>
           <!-- <chef-button secondary (click)="printValues()">Print Values</chef-button> -->
         </div>
 

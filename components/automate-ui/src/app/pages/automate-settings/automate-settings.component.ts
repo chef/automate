@@ -129,6 +129,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   notificationType = 'info';
   notificationMessage = 'All settings have been updated successfully';
 
+  saving = false;
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -248,6 +249,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
   // Apply the changes that the user updated in the forms
   public applyChanges() {
+    this.saving = true;
     // Note: Services are currently not enabled through the form
     const jobs: IngestJob[] = [
       // Event Feed
@@ -288,9 +290,11 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
           const errMsg = 'Unable to update one or more settings.';
           this.showErrorNotification(error, errMsg);
           this.store.dispatch(new GetSettings({})); // reset form to previously stored settings
+          this.saving = false;
         } else if (changeConfigurationSelector.status === 'loadingSuccess') {
           this.formChanged = false;
           this.showSuccessNotification();
+          this.saving = false;
         }
       });
   }
