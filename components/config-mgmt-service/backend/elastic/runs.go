@@ -95,7 +95,7 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 			elastic.NewTermsAggregation().Field(backend.Id))
 
 	searchResult, err := es.client.Search().
-		Index("converge-history-*").
+		Index(IndexConvergeHistory).
 		Query(mainQuery).
 		Aggregation(dateHistoTag, bucketHist).
 		Do(context.Background())

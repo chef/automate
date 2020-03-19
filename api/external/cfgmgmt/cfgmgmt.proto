@@ -121,6 +121,24 @@ service ConfigMgmt {
   };
 
   /*
+  GetCheckinCountsTimeSeries
+
+  Returns a daily time series of unique node check-ins for the number of day requested
+
+	Authorization Action:
+	```
+	infra:nodes:list
+	```
+	*/
+  rpc GetCheckInCountsTimeSeries(cfgmgmt.request.CheckInCountsTimeSeries) returns (cfgmgmt.response.CheckInCountsTimeSeries) {
+    option (google.api.http).get =  "/cfgmgmt/stats/checkin_counts_timeseries";
+    option (chef.automate.api.policy).resource = "cfgmgmt:stats:checkin_counts_timeseries";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  };
+
+  /*
   GetNodeRun
 
   Returns the infra run report for the provided node ID and run ID.

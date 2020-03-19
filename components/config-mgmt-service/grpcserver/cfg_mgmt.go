@@ -125,6 +125,45 @@ func (s *CfgMgmtServer) GetNodesCounts(ctx context.Context,
 	return nodesCounts, nil
 }
 
+// GetCheckInCountsTimeSeries - Returns a daily time series of unique node check-ins for the number of day requested
+func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
+	request *request.CheckInCountsTimeSeries) (*response.CheckInCountsTimeSeries, error) {
+	filters, err := stringutils.FormatFiltersWithKeyConverter(request.GetFilter(),
+		params.ConvertParamToNodeRunBackend)
+	if err != nil {
+		return &response.CheckInCountsTimeSeries{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+	}
+
+	daysAgo := request.GetDaysAgo()
+	if daysAgo < 0 {
+		return &response.CheckInCountsTimeSeries{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+	}
+
+	if daysAgo == 0 {
+		daysAgo = 1
+	}
+
+	now := time.Now()
+
+	startTime, endTime := findStartAndEndCheckInCountTimeSeries(daysAgo, now)
+
+	timeseries, err := s.client.GetCheckinCountsTimeSeries(startTime,
+		endTime.Add(-time.Millisecond), filters)
+
+	checkInCountsCollection := make([]*response.CheckInCounts, len(timeseries))
+	for index, period := range timeseries {
+		checkInCountsCollection[index] = &response.CheckInCounts{
+			Start: period.Start.Format(time.RFC3339),
+			End:   period.End.Format(time.RFC3339),
+			Count: int32(period.CheckInCount),
+		}
+	}
+
+	return &response.CheckInCountsTimeSeries{
+		Counts: checkInCountsCollection,
+	}, nil
+}
+
 // GetRunsCounts returns the runs counts for a node
 func (s *CfgMgmtServer) GetRunsCounts(ctx context.Context,
 	request *request.RunsCounts) (*response.RunsCounts, error) {
@@ -383,4 +422,13 @@ func (s *CfgMgmtServer) getNodeAsync(ctx context.Context, nodeID string, project
 	}()
 
 	return nodesChan
+}
+
+func findStartAndEndCheckInCountTimeSeries(daysAgo int32, now time.Time) (time.Time, time.Time) {
+	endTime := time.Date(now.Year(), now.Month(), now.Day(),
+		now.Hour(), 0, 0, 0, time.UTC).Add(time.Hour)
+
+	startTime := endTime.Add(-time.Hour * 24 * time.Duration(daysAgo))
+
+	return startTime, endTime
 }

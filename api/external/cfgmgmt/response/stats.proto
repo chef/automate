@@ -22,3 +22,14 @@ message NodesCounts {
   // Total count of nodes that have been labeled as 'missing' as determined by node lifecycle settings.
   int32 missing = 4;
 }
+
+message CheckInCountsTimeSeries {
+  // List of daily checkin counts
+  repeated CheckInCounts counts = 1;
+}
+
+message CheckInCounts {
+  string start = 1;
+  string end = 2;
+  int32 count = 3;
+}

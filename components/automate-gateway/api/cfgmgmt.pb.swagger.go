@@ -292,6 +292,45 @@ func init() {
         ]
       }
     },
+    "/cfgmgmt/stats/checkin_counts_timeseries": {
+      "get": {
+        "summary": "GetCheckinCountsTimeSeries",
+        "description": "Returns a daily time series of unique node check-ins for the number of day requested\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "operationId": "GetCheckInCountsTimeSeries",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CheckInCountsTimeSeries"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "filter",
+            "description": "List of filters to be applied to the time series.",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          },
+          {
+            "name": "days_ago",
+            "description": "Number of past days to create the time series.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "ConfigMgmt"
+        ]
+      }
+    },
     "/cfgmgmt/stats/node_counts": {
       "get": {
         "summary": "GetNodesCounts",
@@ -441,6 +480,33 @@ func init() {
     }
   },
   "definitions": {
+    "chef.automate.api.cfgmgmt.response.CheckInCounts": {
+      "type": "object",
+      "properties": {
+        "start": {
+          "type": "string"
+        },
+        "end": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "chef.automate.api.cfgmgmt.response.CheckInCountsTimeSeries": {
+      "type": "object",
+      "properties": {
+        "counts": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.cfgmgmt.response.CheckInCounts"
+          },
+          "title": "List of daily checkin counts"
+        }
+      }
+    },
     "chef.automate.api.cfgmgmt.response.ChefError": {
       "type": "object",
       "properties": {
