@@ -108,7 +108,7 @@ function compile_client_mocks() {
 
     pushd /src/components/automate-gateway || return 1
       mockgen_debug -source gateway/clients.go -destination gateway_mocks/mock_gateway/clients_mock.go -package mock_gateway
-    popd
+    popd || return 1
   )
 }
 
