@@ -71,27 +71,27 @@ func (es Backend) GetRun(runID string, endTime time.Time) (backend.Run, error) {
 	return run, nil
 }
 
-func (es Backend) GetTimeseriCheckinCounts(startTime, endTime time.Time) ([]backend.CheckInPeroid, error) {
+func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time) ([]backend.CheckInPeroid, error) {
 	var (
-		dateHistoTag   = "dateHisto"
-		mainQuery      = elastic.NewBoolQuery()
-		eventTypeItems = "items"
+		dateHistoTag = "dateHisto"
+		mainQuery    = elastic.NewBoolQuery()
+		nodeID       = "node_id"
 	)
 
 	rangeQuery, _ := newRangeQuery(startTime.Format(time.RFC3339),
-		endTime.Format(time.RFC3339), "end_time")
+		endTime.Format(time.RFC3339), backend.RunEndTime)
 
 	mainQuery = mainQuery.Must(rangeQuery)
 
-	bucketHist := elastic.NewDateHistogramAggregation().Field("end_time").
-		Interval("1d").
+	bucketHist := elastic.NewDateHistogramAggregation().Field(backend.RunEndTime).
+		Interval("24h").
 		MinDocCount(0). // needed to return empty buckets
 		ExtendedBounds(
 			startTime.Format(time.RFC3339), endTime.Format(time.RFC3339)). // needed to return empty buckets
 		Format("yyyy-MM-dd'T'HH:mm:ssZ").
 		TimeZone(getTimezoneSoStartAtMidnight(startTime)). // needed start the buckets at the beginning of the day.
-		SubAggregation(eventTypeItems,
-			elastic.NewTermsAggregation().Field("entity_uuid"))
+		SubAggregation(nodeID,
+			elastic.NewTermsAggregation().Field(backend.Id))
 
 	searchResult, err := es.client.Search().
 		Index("converge-history-*").
@@ -122,7 +122,7 @@ func (es Backend) GetTimeseriCheckinCounts(startTime, endTime time.Time) ([]back
 	}
 
 	for index, bucket := range dateHistoRes.Buckets {
-		item, found := bucket.Aggregations.Terms(eventTypeItems)
+		item, found := bucket.Aggregations.Terms(nodeID)
 		if found {
 			checkInPeroids[index].CheckInCount = len(item.Buckets)
 		}

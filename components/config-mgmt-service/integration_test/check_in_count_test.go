@@ -50,7 +50,7 @@ func TestCheckinCount(t *testing.T) {
 			}{},
 		},
 		{
-			description: "One node checks in all three days",
+			description: "One node checks-in all three days",
 			now:         parseTime(t, "2020-03-15T12:34:00Z"),
 			daysAgo:     3,
 			expectedResponse: []backend.CheckInPeroid{
@@ -96,7 +96,7 @@ func TestCheckinCount(t *testing.T) {
 			},
 		},
 		{
-			description: "One checks in twice in one day",
+			description: "One node checks-in twice in one day",
 			now:         parseTime(t, "2020-03-15T01:14:00Z"),
 			daysAgo:     1,
 			expectedResponse: []backend.CheckInPeroid{
@@ -128,7 +128,7 @@ func TestCheckinCount(t *testing.T) {
 			},
 		},
 		{
-			description: "Two nodes check in on the same day",
+			description: "Two nodes check-in on the same day",
 			now:         parseTime(t, "2020-03-15T11:59:00Z"),
 			daysAgo:     1,
 			expectedResponse: []backend.CheckInPeroid{
@@ -166,6 +166,98 @@ func TestCheckinCount(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "3 days over daylight savings hour forword",
+			now:         parseTime(t, "2020-03-09T12:34:00Z"),
+			daysAgo:     3,
+			expectedResponse: []backend.CheckInPeroid{
+				{
+					CheckInCount: 1,
+					Start:        parseTime(t, "2020-03-06T13:00:00Z"),
+					End:          parseTime(t, "2020-03-07T12:59:59Z"),
+				},
+				{
+					CheckInCount: 1,
+					Start:        parseTime(t, "2020-03-07T13:00:00Z"),
+					End:          parseTime(t, "2020-03-08T12:59:59Z"),
+				},
+				{
+					CheckInCount: 1,
+					Start:        parseTime(t, "2020-03-08T13:00:00Z"),
+					End:          parseTime(t, "2020-03-09T12:59:59Z"),
+				},
+			},
+			nodeSets: []struct {
+				node iBackend.Node
+				runs []iBackend.Run
+			}{
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-03T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-06T13:01:00Z"),
+							EndTime:   parseTime(t, "2020-03-06T13:02:59Z"),
+						},
+						{
+							StartTime: parseTime(t, "2020-03-08T12:01:00Z"),
+							EndTime:   parseTime(t, "2020-03-08T12:02:59Z"),
+						},
+						{
+							StartTime: parseTime(t, "2020-03-08T13:05:00Z"),
+							EndTime:   parseTime(t, "2020-03-08T13:06:59Z"),
+						},
+					},
+				},
+			},
+		},
+		{
+			description: "3 days over daylight savings hour back",
+			now:         parseTime(t, "2019-11-04T12:34:00Z"),
+			daysAgo:     3,
+			expectedResponse: []backend.CheckInPeroid{
+				{
+					CheckInCount: 1,
+					Start:        parseTime(t, "2019-11-01T13:00:00Z"),
+					End:          parseTime(t, "2019-11-02T12:59:59Z"),
+				},
+				{
+					CheckInCount: 1,
+					Start:        parseTime(t, "2019-11-02T13:00:00Z"),
+					End:          parseTime(t, "2019-11-03T12:59:59Z"),
+				},
+				{
+					CheckInCount: 1,
+					Start:        parseTime(t, "2019-11-03T13:00:00Z"),
+					End:          parseTime(t, "2019-11-04T12:59:59Z"),
+				},
+			},
+			nodeSets: []struct {
+				node iBackend.Node
+				runs []iBackend.Run
+			}{
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2019-11-01T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2019-11-01T13:01:00Z"),
+							EndTime:   parseTime(t, "2019-11-01T13:02:59Z"),
+						},
+						{
+							StartTime: parseTime(t, "2019-11-03T12:01:00Z"),
+							EndTime:   parseTime(t, "2019-11-03T12:02:59Z"),
+						},
+						{
+							StartTime: parseTime(t, "2019-11-03T13:05:00Z"),
+							EndTime:   parseTime(t, "2019-11-03T13:06:59Z"),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, testCase := range cases {
@@ -196,7 +288,8 @@ func TestCheckinCount(t *testing.T) {
 
 			startTime := endTime.Add(-time.Hour * 24 * time.Duration(testCase.daysAgo))
 
-			actualResponse, err := esBackend.GetTimeseriCheckinCounts(startTime, endTime.Add(-time.Millisecond))
+			actualResponse, err := esBackend.GetCheckinCountsTimeSeries(startTime,
+				endTime.Add(-time.Millisecond))
 			require.NoError(t, err)
 
 			assert.Equal(t, len(testCase.expectedResponse), len(actualResponse))
