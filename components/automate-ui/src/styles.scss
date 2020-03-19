@@ -333,12 +333,12 @@ input {
   border-radius: 2px;
   height: 16px;
   width: 16px;
-  background-color: #CDD7DD;
+  background-color: $chef-med-grey;
   position: relative;
 }
 
 .waived-icon:before {
-  color: #26293A;
+  color: $chef-darkest;
   content: 'W';
   font-size: 9px;
   font-weight: bolder;
