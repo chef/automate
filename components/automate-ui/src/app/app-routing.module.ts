@@ -249,7 +249,7 @@ const routes: Routes = [
             },
             {
               path: ':id/org/:orgid/role',
-              component: InfraRolesListComponent,
+              component: InfraRolesListComponent
 
             },
             {

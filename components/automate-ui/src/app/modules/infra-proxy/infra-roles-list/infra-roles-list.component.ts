@@ -22,7 +22,7 @@ import {
   getAllStatus as getAllRolesForOrgStatus
 } from 'app/entities/infra-roles/infra-role.selectors';
 
-export type OrgTabName = 'roles' | 'details';
+export type OrgTabName = 'roles';
 
 @Component({
   selector: 'app-infra-roles-list',
@@ -40,20 +40,17 @@ export class InfraRolesListComponent implements OnInit {
   public loading$: Observable<boolean>;
   public isLoading = true;
   public tabValue: OrgTabName = 'roles';
-  
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
     private router: Router
   ) { }
-    
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     this.store.select(routeURL).pipe()
     .subscribe((url: string) => {
       this.url = url;
-      const [, fragment] = url.split('#');
-      this.tabValue = (fragment === 'details') ? 'details' : 'roles';
+      this.tabValue = 'roles';
     });
 
     combineLatest([
@@ -76,7 +73,6 @@ export class InfraRolesListComponent implements OnInit {
       this.isLoading =
         !allLoaded([getOrgSt, getRolesSt]) || updateSt === EntityStatus.loading;
     });
-        
     combineLatest([
       this.store.select(getStatus),
       this.store.select(getAllRolesForOrgStatus),
@@ -91,7 +87,7 @@ export class InfraRolesListComponent implements OnInit {
     ).subscribe(([_getOrgSt, _getRolesSt, orgState, allInfraRolesState]) => {
       this.org = { ...orgState };
       this.roles = allInfraRolesState;
-    });    
+    });
   }
 
   onSelectedTab(event: { target: { value: OrgTabName } }) {
