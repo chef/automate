@@ -584,7 +584,7 @@ func TestValidationCreatePolicy_Members(t *testing.T) {
 			[]string{"tls:service:*"},
 		},
 		false: {
-			[]string{""}, // this it the same as "not provided"
+			[]string{""}, // this is the same as "not provided"
 			[]string{"user::"},
 			[]string{"user:local:"},
 			[]string{"user:ldap:"},
