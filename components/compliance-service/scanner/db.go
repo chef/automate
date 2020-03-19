@@ -221,7 +221,9 @@ func (s *Scanner) UpdateResult(ctx context.Context, job *types.InspecJob, output
 		}
 		connectionErr := ""
 		if inspecErr != nil {
-			connectionErr = fmt.Sprintf("%s:\n\n%s", inspecErr.Type, inspecErr.Message)
+			if len(inspecErr.Message) > 300 {
+				connectionErr = fmt.Sprintf("%s\n\n%s", inspecErr.Type, inspecErr.Message[0:300])
+			}
 		}
 		if connectionErr != "" {
 			_, err := s.nodesClient.UpdateNodeConnectionError(ctx, &nodes.NodeError{
