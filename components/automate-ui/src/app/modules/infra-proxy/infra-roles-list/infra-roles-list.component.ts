@@ -22,7 +22,11 @@ import {
   getAllStatus as getAllRolesForOrgStatus
 } from 'app/entities/infra-roles/infra-role.selectors';
 
+<<<<<<< HEAD
 export type OrgTabName = 'roles';
+=======
+export type OrgTabName = 'roles' | 'details';
+>>>>>>> fixed for roles duplicate issue + optimize some code part
 
 @Component({
   selector: 'app-infra-roles-list',
@@ -40,11 +44,19 @@ export class InfraRolesListComponent implements OnInit {
   public loading$: Observable<boolean>;
   public isLoading = true;
   public tabValue: OrgTabName = 'roles';
+<<<<<<< HEAD
+=======
+  
+>>>>>>> fixed for roles duplicate issue + optimize some code part
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
     private router: Router
   ) { }
+<<<<<<< HEAD
+=======
+    
+>>>>>>> fixed for roles duplicate issue + optimize some code part
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     this.store.select(routeURL).pipe()
@@ -73,6 +85,10 @@ export class InfraRolesListComponent implements OnInit {
       this.isLoading =
         !allLoaded([getOrgSt, getRolesSt]) || updateSt === EntityStatus.loading;
     });
+<<<<<<< HEAD
+=======
+        
+>>>>>>> fixed for roles duplicate issue + optimize some code part
     combineLatest([
       this.store.select(getStatus),
       this.store.select(getAllRolesForOrgStatus),
@@ -87,7 +103,11 @@ export class InfraRolesListComponent implements OnInit {
     ).subscribe(([_getOrgSt, _getRolesSt, orgState, allInfraRolesState]) => {
       this.org = { ...orgState };
       this.roles = allInfraRolesState;
+<<<<<<< HEAD
     });
+=======
+    });    
+>>>>>>> fixed for roles duplicate issue + optimize some code part
   }
 
   onSelectedTab(event: { target: { value: OrgTabName } }) {
