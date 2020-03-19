@@ -8,20 +8,6 @@
             </chef-breadcrumbs>
             <chef-page-header>
                 <chef-heading>{{ org?.name }}</chef-heading>
-                <table>
-                    <thead>
-                        <tr class="detail-row">
-                            <th class="id-column">Name</th>
-                            <th class="id-column">Admin User</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="detail-row">
-                            <td class="id-column">{{ org?.name }}</td>
-                            <td class="id-column">{{ org?.admin_user }}</td>
-                        </tr>
-                    </tbody>
-                </table>
                 <chef-tab-selector [value]="tabValue" (change)="onSelectedTab($event)">
                     <chef-option value='roles' data-cy="roles-tab">Roles</chef-option>
                     <chef-option value='details' data-cy="details-tab">Details</chef-option>

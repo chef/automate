@@ -3,7 +3,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of as observableOf } from 'rxjs';
 import { catchError, mergeMap, map } from 'rxjs/operators';
-
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
 
@@ -18,9 +17,7 @@ import {
   GetRoleFailure
 } from './infra-role.action';
 
-import {
-  InfraRoleRequests
-} from './infra-role.requests';
+import { InfraRoleRequests } from './infra-role.requests';
 
 @Injectable()
 export class InfraRoleEffects {
@@ -47,7 +44,6 @@ export class InfraRoleEffects {
           message: `Could not get cookbooks: ${msg || payload.error}`
         });
       }));
-
 
   @Effect()
   getRole$ = this.actions$.pipe(
