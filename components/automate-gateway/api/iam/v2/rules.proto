@@ -35,6 +35,32 @@ service Rules {
   ```
   */
   rpc CreateRule (CreateRuleReq) returns (CreateRuleResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "rules";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"id": "example-rule", "project-id": "example-project", "name": "My Example Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "MEMBER_OF", "values": ["example.co", "example.io"]}]}'
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       post: "/iam/v2/projects/{project_id}/rules"
       body: "*"
@@ -56,7 +82,7 @@ service Rules {
   Properties that you do not include are reset to empty values.
 
   The resulting change to the project's resources does not take effect immediately. 
-  Updates to project rules must be applied to ingested resources by a global project update.
+  Updates to project rules must be applied to ingested resources by a project update.
 
   Authorization Action:
   ```
@@ -64,6 +90,32 @@ service Rules {
   ```
   */
   rpc UpdateRule (UpdateRuleReq) returns (UpdateRuleResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+			tags: "rules";
+			extensions: {
+				key: "x-code-samples";
+				value {
+					list_value: {
+						values: {
+							struct_value {
+								fields {
+									key: "lang";
+									value {
+										string_value: "JSON";
+									}
+								}
+								fields {
+									key: "source";
+									value {
+                    string_value: '{"id": "example-rule", "project-id": "example-project", "name": "My Updated Rule", "type": "NODE", "conditions": [{"attribute": "CHEF_SERVER", "operator": "EQUALS", "values": ["example.co"]}]}'
+                  }
+								}
+							}
+						}
+					}
+				}
+			}
+		};
     option (google.api.http) = {
       put: "/iam/v2/projects/{project_id}/rules/{id}"
       body: "*"
@@ -85,6 +137,9 @@ service Rules {
   ```
   */
   rpc GetRule (GetRuleReq) returns (GetRuleResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
     option (google.api.http) = {
       get: "/iam/v2/projects/{project_id}/rules/{id}"
     };
@@ -105,6 +160,9 @@ service Rules {
   ```
   */
   rpc ListRulesForProject (ListRulesForProjectReq) returns (ListRulesForProjectResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
     option (google.api.http) = {
       get: "/iam/v2/projects/{id}/rules"
     };
@@ -118,7 +176,7 @@ service Rules {
   Deletes a project rule
 
   The resulting change to the project's resources does not take effect immediately. 
-  Updates to project rules must be applied to ingested resources by a global project update.
+  Updates to project rules must be applied to ingested resources by a project update.
 
   Authorization Action:
   ```
@@ -126,6 +184,9 @@ service Rules {
   ```
   */
   rpc DeleteRule (DeleteRuleReq) returns (DeleteRuleResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
     option (google.api.http) = {
       delete: "/iam/v2/projects/{project_id}/rules/{id}"
     };
@@ -136,7 +197,7 @@ service Rules {
   };
 
   /*
-  Applies pending rule edits to ingested resources
+  Starts project update
 
   Any changes to a project's rules are staged first. They do not take effect until 
   all projects are updated.
@@ -153,6 +214,9 @@ service Rules {
   ```
   */
   rpc ApplyRulesStart (ApplyRulesStartReq) returns (ApplyRulesStartResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
     option (google.api.http) = {
       post: "/iam/v2/apply-rules"
     };
@@ -163,7 +227,7 @@ service Rules {
   };
 
   /*
-  Cancels the application of rule edits to ingested resources
+  Cancels project update
 
   Cancels an ongoing project update. This action leaves the system in an unknown state that
   only another successful project update can rectify.
@@ -174,6 +238,9 @@ service Rules {
   ```
   */
   rpc ApplyRulesCancel (ApplyRulesCancelReq) returns (ApplyRulesCancelResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
     option (google.api.http) = {
       delete: "/iam/v2/apply-rules"
     };
@@ -184,7 +251,7 @@ service Rules {
   };
 
   /*
-  Gets the status of the application of rule edits
+  Gets the status of a project update
 
   Gets the percentage complete of an ongoing project update and whether or not it failed
 
@@ -194,6 +261,9 @@ service Rules {
   ```
   */
   rpc ApplyRulesStatus (ApplyRulesStatusReq) returns (ApplyRulesStatusResp) {
+    option (grpc.gateway.protoc_gen_swagger.options.openapiv2_operation) = {
+      tags: "rules";
+    };
     option (google.api.http) = {
       get: "/iam/v2/apply-rules"
     };
