@@ -488,41 +488,36 @@ control 'iam-chef-managed-access-1' do
       end
     end
 
-    describe 'requesting license' do
-      ALL_USERS_ACROSS_ROLES.each do |user|
-        it "get license does not return 403 for #{user}" do
-          expect(
-            automate_api_request(
-              "/api/v0/license/request",
-              http_method: "GET",
-              user: user
-            ).http_status
-          ).to_not eq 403
-        end
-      end
-    end
+    describe "requesting and applying license" do
+      {
+        'POST': %w(
+          /api/v0/license/apply
+          /api/v0/license/request
+        ),
+      }.each do |method, urls|
+        urls.each do |url|
+          ALL_NON_ADMIN_USERS_ACROSS_ROLES.each do |user|
+            it "#{method} #{url} returns 403 for #{user}" do
+              expect(
+                automate_api_request(
+                  url,
+                  http_method: method,
+                  user: user
+                ).http_status
+              ).to eq 403
+            end
 
-    describe 'applying license' do
-      ALL_NON_ADMIN_USERS_ACROSS_ROLES.each do |user|
-        it "apply license returns 403 for #{user}" do
-          expect(
-            automate_api_request(
-              "/api/v0/license/apply",
-              http_method: "POST",
-              user: user
-            ).http_status
-          ).to eq 403
+            it "#{method} #{url} does not return 403 for admin" do
+              expect(
+                automate_api_request(
+                  url,
+                  http_method: method,
+                  user: ADMIN_USER_ID
+                ).http_status
+              ).to_not eq 403
+            end
+          end
         end
-      end
-
-      it "apply license does not return 403 for admin" do
-        expect(
-          automate_api_request(
-            "/api/v0/license/apply",
-            http_method: "POST",
-            user: ADMIN_USER_ID
-          ).http_status
-        ).not_to eq 403
       end
     end
 
