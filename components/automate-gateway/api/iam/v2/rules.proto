@@ -4,6 +4,7 @@ package chef.automate.api.iam.v2;
 option go_package = "github.com/chef/automate/components/automate-gateway/api/iam/v2";
 
 import "google/api/annotations.proto";
+import "protoc-gen-swagger/options/annotations.proto";
 
 import "components/automate-gateway/api/iam/v2/request/rules.proto";
 import "components/automate-gateway/api/iam/v2/response/rules.proto";
