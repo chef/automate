@@ -148,7 +148,7 @@ EOF
 mkdir -p "/hab/user/${PG_PKG_NAME}/config/"
 cat > "/hab/user/${PG_PKG_NAME}/config/user.toml" <<EOF
 [superuser]
-password = 'thisisapassword'
+password = 'thisisapassword%u'
 [ssl]
 enable = true
 ssl_cert    = """$(cat /certificates/postgresql.pem)"""
