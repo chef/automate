@@ -67,7 +67,7 @@
           <input type="checkbox" formControlName="include" />
           End
         </label>
-        <div class="field" *ngIf="form.controls['end'].controls['include'].value">
+        <div class="field" *ngIf="subControls('end').controls['include'].value">
           <chef-form-field formGroupName="datetime">
             <div class="datetime">
               <select formControlName="date">
@@ -99,7 +99,7 @@
           <input type="checkbox" formControlName="include" />
           Repeat every
         </label>
-        <div class="field" *ngIf="form.controls['repeat'].controls['include'].value">
+        <div class="field" *ngIf="subControls('repeat').controls['include'].value">
           <chef-form-field>
             <input type="number" chefInput formControlName="interval" min="1" />
           </chef-form-field>
