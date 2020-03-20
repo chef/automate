@@ -2,6 +2,7 @@ package config
 
 import (
 	"fmt"
+	"net/url"
 	"os"
 	"path"
 	"strings"
@@ -165,9 +166,10 @@ func (c *PGConnInfo) String() string {
 }
 
 func externalConnURIRenderer(ip string, port int, user string, password string, opts []string) (pgConnURIRenderer, string) {
-	fmtStr := "postgresql://%s:%s@%s:%d/%s?%s"
+	fmtStr := "postgresql://%s@%s:%d/%s?%s"
+	userInfo := url.UserPassword(user, password)
 	return func(dbname string) string {
-		return fmt.Sprintf(fmtStr, user, password, ip, port, dbname, strings.Join(opts, "&"))
+		return fmt.Sprintf(fmtStr, userInfo.String(), ip, port, dbname, strings.Join(opts, "&"))
 	}, fmt.Sprintf(fmtStr, user, "<readacted>", ip, port, "<database>", strings.Join(opts, "&"))
 }
 
