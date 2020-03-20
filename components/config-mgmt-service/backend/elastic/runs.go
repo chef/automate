@@ -90,7 +90,7 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 		ExtendedBounds(
 			startTime.Format(time.RFC3339), endTime.Format(time.RFC3339)). // needed to return empty buckets
 		Format("yyyy-MM-dd'T'HH:mm:ssZ").
-		TimeZone(getTimezoneSoStartAtMidnight(startTime)). // needed start the buckets at the beginning of the day.
+		TimeZone(getTimezoneWithStartOfDayAtUtcHour(startTime)). // needed start the buckets at the beginning of the day.
 		SubAggregation(nodeID,
 			elastic.NewCardinalityAggregation().Field(backend.Id))
 
@@ -328,10 +328,13 @@ func getNumberOfHoursBetween(start, end time.Time) int {
 	return int(math.Ceil(end.Sub(start).Hours()))
 }
 
-func getTimezoneSoStartAtMidnight(start time.Time) string {
-	if start.Hour() < 12 {
-		return fmt.Sprintf("-%02d:00", start.Hour())
+// Get the timezone that has the start of the day (midnight) for the UTC time provided
+// Elasticsearch starts each bucket at the beginning of the day for the time zone used.
+// Using this time zone allows us to create elasticsearch buckets 24 hours from the time provided.
+func getTimezoneWithStartOfDayAtUtcHour(dateTime time.Time) string {
+	if dateTime.Hour() < 12 {
+		return fmt.Sprintf("-%02d:00", dateTime.Hour())
 	}
 
-	return fmt.Sprintf("+%02d:00", (24 - start.Hour()))
+	return fmt.Sprintf("+%02d:00", (24 - dateTime.Hour()))
 }
