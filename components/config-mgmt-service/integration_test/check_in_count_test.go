@@ -446,6 +446,145 @@ func TestCheckinCount(t *testing.T) {
 				},
 			},
 		},
+		{
+			description: "Over 10 nodes in one period",
+			now:         parseTime(t, "2020-03-15T12:34:00Z"),
+			daysAgo:     1,
+			expectedResponse: []backend.CheckInPeroid{
+				{
+					CheckInCount: 11,
+					Start:        parseTime(t, "2020-03-14T13:00:00Z"),
+					End:          parseTime(t, "2020-03-15T12:59:59Z"),
+				},
+			},
+			nodeSets: []struct {
+				node iBackend.Node
+				runs []iBackend.Run
+			}{
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-01T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-14T13:05:00Z"),
+							EndTime:   parseTime(t, "2020-03-14T13:06:59Z"),
+						},
+					},
+				},
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-02T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-15T01:05:00Z"),
+							EndTime:   parseTime(t, "2020-03-15T01:06:59Z"),
+						},
+					},
+				},
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-02T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-15T02:05:00Z"),
+							EndTime:   parseTime(t, "2020-03-15T02:06:59Z"),
+						},
+					},
+				},
+
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-02T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-15T02:15:00Z"),
+							EndTime:   parseTime(t, "2020-03-15T02:16:59Z"),
+						},
+					},
+				},
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-02T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-15T02:25:00Z"),
+							EndTime:   parseTime(t, "2020-03-15T02:26:59Z"),
+						},
+					},
+				},
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-02T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-15T02:35:00Z"),
+							EndTime:   parseTime(t, "2020-03-15T02:36:59Z"),
+						},
+					},
+				},
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-02T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-15T02:45:00Z"),
+							EndTime:   parseTime(t, "2020-03-15T02:46:59Z"),
+						},
+					},
+				},
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-02T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-15T02:55:00Z"),
+							EndTime:   parseTime(t, "2020-03-15T02:56:59Z"),
+						},
+					},
+				},
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-02T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-15T03:05:00Z"),
+							EndTime:   parseTime(t, "2020-03-15T03:06:59Z"),
+						},
+					},
+				},
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-02T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-15T03:15:00Z"),
+							EndTime:   parseTime(t, "2020-03-15T03:16:59Z"),
+						},
+					},
+				},
+				{
+					node: iBackend.Node{
+						Checkin: parseTime(t, "2020-03-02T16:02:59Z"),
+					},
+					runs: []iBackend.Run{
+						{
+							StartTime: parseTime(t, "2020-03-15T03:25:00Z"),
+							EndTime:   parseTime(t, "2020-03-15T03:26:59Z"),
+						},
+					},
+				},
+			},
+		},
 	}
 
 	for _, testCase := range cases {

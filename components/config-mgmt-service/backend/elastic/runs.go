@@ -92,7 +92,7 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 		Format("yyyy-MM-dd'T'HH:mm:ssZ").
 		TimeZone(getTimezoneSoStartAtMidnight(startTime)). // needed start the buckets at the beginning of the day.
 		SubAggregation(nodeID,
-			elastic.NewTermsAggregation().Field(backend.Id))
+			elastic.NewCardinalityAggregation().Field(backend.Id))
 
 	searchResult, err := es.client.Search().
 		Index(IndexConvergeHistory).
@@ -123,9 +123,9 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 	}
 
 	for index, bucket := range dateHistoRes.Buckets {
-		item, found := bucket.Aggregations.Terms(nodeID)
+		item, found := bucket.Aggregations.Cardinality(nodeID)
 		if found {
-			checkInPeroids[index].CheckInCount = len(item.Buckets)
+			checkInPeroids[index].CheckInCount = int(*item.Value)
 		}
 
 		checkInPeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
