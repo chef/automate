@@ -21,8 +21,6 @@ Whether or not you migrate your v1 policies, if at any time you decide to revert
 Reverting to v1 will remove any new v2 policies, roles, and projects created while using IAM v2.
 Users, teams, and API tokens are shared between v1 and v2, so changes to them will persist.
 
-The [IAM v2 API Reference]({{< relref "iam-v2-api-reference.md" >}}) details command line features.
-
 ## New Features in IAM v2
 
 IAM v2 policies allow multiple permissions, separating out policy membership from policy definition for fine-grained control, and includes roles for role-based access control.
@@ -108,7 +106,6 @@ A role is a named list of actions.
 This listing provides the benefits of *encapsulation*, where only the name is needed and is not encumbered by all the details after initial definition, and *reusability*, in applying the role to any statement that needs it.
 
 Chef Automate has 5 default roles.
-To see the actions comprising the roles, see [Chef-managed Roles]({{< relref "iam-v2-api-reference.md#default-chef-managed-roles" >}}).
 
 Role          | Description
 --------------|------------
@@ -266,8 +263,8 @@ It is also possible to filter APIs by project from the Chef Automate CLI. The fo
 
 To use these API requests, first:
 
-- [Create an admin token]({{< relref "iam-v2-api-reference.md#creating-a-token" >}}) and set the admin token to the environment variable `$TOKEN`
-- [Create two projects]({{< relref "iam-v2-api-reference.md#creating-a-project" >}}). In our examples below, we use two projects named `test-project-1` and `test-project-2`, respectively.
+- [Create an admin token](https://automate.chef.io/docs/cli-chef-automate/#chef-automate-iam-token-create) and set the admin token to the environment variable `$TOKEN`
+- [Create two projects](https://automate.chef.io/docs/api/#operation/CreateProject). In our examples below, we use two projects named `test-project-1` and `test-project-2`, respectively.
 - [Assign IAM resources]({{< relref "iam-v2-guide.md#assigning-resources-to-projects" >}}) to both projects
 - [Assign ingested resources]({{< relref "iam-v2-guide.md#assigning-ingested-resources-to-projects" >}}) to both projects
 
