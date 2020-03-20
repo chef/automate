@@ -125,12 +125,14 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   // Has the form changed?
   formChanged = false;
 
+  // Are settings currently saving
+  saving = false;
+
   // Notification bits
   notificationVisible = false;
   notificationType = 'info';
   notificationMessage = 'All settings have been updated successfully';
 
-  saving = false;
   private isDestroyed = new Subject<boolean>();
 
   constructor(
@@ -224,7 +226,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       disabled: !checked
     });
 
-    // this loops through the rest of the form to disable it
+    // this loops through the rest of the form to disable the relevant controls;
     const pertinentGroups = [ 'unit', 'threshold' ];
     pertinentGroups.forEach(control => {
       if ( checked ) {
@@ -440,7 +442,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       break;
 
       case InfraJobName.DeleteNodes: {
-        // delete_nodes not implemented
+        // delete_nodes not yet implemented
       }
       break;
 
@@ -501,7 +503,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   }
 
   private handleDisable(form, disabled: boolean = false): void {
-    // this loops through the rest of the form to disable/enable it
+    // this loops through the rest of the form to disable/enable relevant controls
     const pertinentGroups = ['unit', 'threshold'];
     pertinentGroups.forEach(control => {
       if ( disabled ) {
