@@ -139,13 +139,12 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 		return &response.CheckInCountsTimeSeries{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
 	}
 
+	// default to provide a time serise for the past 24 hours
 	if daysAgo == 0 {
 		daysAgo = 1
 	}
 
-	now := time.Now()
-
-	startTime, endTime := findStartAndEndCheckInCountTimeSeries(daysAgo, now)
+	startTime, endTime := calculateStartEndCheckInTimeSeries(daysAgo)
 
 	timeseries, err := s.client.GetCheckinCountsTimeSeries(startTime,
 		endTime.Add(-time.Millisecond), filters)
@@ -424,7 +423,11 @@ func (s *CfgMgmtServer) getNodeAsync(ctx context.Context, nodeID string, project
 	return nodesChan
 }
 
-func findStartAndEndCheckInCountTimeSeries(daysAgo int32, now time.Time) (time.Time, time.Time) {
+// Calculate the start and end times for the number of days back from now
+// end time will be the beginning of the next hour.
+// start time will be 24 hours multiples of daysAgo from the end time.
+func calculateStartEndCheckInTimeSeries(daysAgo int32) (time.Time, time.Time) {
+	now := time.Now()
 	endTime := time.Date(now.Year(), now.Month(), now.Day(),
 		now.Hour(), 0, 0, 0, time.UTC).Add(time.Hour)
 

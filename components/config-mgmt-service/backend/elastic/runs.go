@@ -71,6 +71,10 @@ func (es Backend) GetRun(runID string, endTime time.Time) (backend.Run, error) {
 	return run, nil
 }
 
+// GetCheckinCountsTimeSeries create a daily time series of unique nodes that have reported a runs
+// between the startTime and endTime provided.
+// The startTime and endTime must atleast be 24 hours apart. When greater than 24 hours, it must be in
+// multiples 24 hour blocks.
 func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 	filters map[string][]string) ([]backend.CheckInPeroid, error) {
 	var (
@@ -79,20 +83,21 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 		nodeID       = "node_id"
 	)
 
+	// Filters the runs down to the needed time range
 	rangeQuery, _ := newRangeQuery(startTime.Format(time.RFC3339),
 		endTime.Format(time.RFC3339), backend.RunEndTime)
 
 	mainQuery = mainQuery.Must(rangeQuery)
 
 	bucketHist := elastic.NewDateHistogramAggregation().Field(backend.RunEndTime).
-		Interval("24h").
-		MinDocCount(0). // needed to return empty buckets
+		Interval("24h"). // do not use "1d" because daylight savings time could have 23 or 25 hours
+		MinDocCount(0).  // needed to return empty buckets
 		ExtendedBounds(
 			startTime.Format(time.RFC3339), endTime.Format(time.RFC3339)). // needed to return empty buckets
 		Format("yyyy-MM-dd'T'HH:mm:ssZ").
-		TimeZone(getTimezoneWithStartOfDayAtUtcHour(startTime)). // needed start the buckets at the beginning of the day.
+		TimeZone(getTimezoneWithStartOfDayAtUtcHour(startTime)). // needed start the buckets at the beginning of the current hour.
 		SubAggregation(nodeID,
-			elastic.NewCardinalityAggregation().Field(backend.Id))
+			elastic.NewCardinalityAggregation().Field(backend.Id)) // count how many unique nodes are in this bucket
 
 	searchResult, err := es.client.Search().
 		Index(IndexConvergeHistory).
@@ -103,29 +108,32 @@ func (es Backend) GetCheckinCountsTimeSeries(startTime, endTime time.Time,
 		return []backend.CheckInPeroid{}, err
 	}
 
-	numberOfHours := getNumberOfHoursBetween(startTime, endTime)
-	numberOfDays := int(math.Ceil(float64(numberOfHours) / 24.0))
-	checkInPeroids := make([]backend.CheckInPeroid, numberOfDays)
+	checkInPeroids := make([]backend.CheckInPeroid, getNumberOf24hBetween(startTime, endTime))
 	dateHistoRes, found := searchResult.Aggregations.DateHistogram(dateHistoTag)
 	if !found {
-		for index := 0; index < numberOfDays; index++ {
+		// This case is if there are no runs for the entire range of the time series
+		// We are creating the buckets manually with zero check-ins
+		for index := 0; index < len(checkInPeroids); index++ {
 			checkInPeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
 			checkInPeroids[index].End = startTime.Add(time.Hour * 24 *
 				time.Duration(index)).Add(time.Hour * 24).Add(-time.Millisecond)
+			checkInPeroids[index].CheckInCount = 0
 		}
 		return checkInPeroids, nil
 	}
 
-	if len(dateHistoRes.Buckets) != numberOfDays {
+	if len(dateHistoRes.Buckets) != len(checkInPeroids) {
 		return []backend.CheckInPeroid{}, errors.NewBackendError(
 			"The number of buckets found is incorrect expected %d actual %d",
-			numberOfDays, len(dateHistoRes.Buckets))
+			len(checkInPeroids), len(dateHistoRes.Buckets))
 	}
 
 	for index, bucket := range dateHistoRes.Buckets {
 		item, found := bucket.Aggregations.Cardinality(nodeID)
 		if found {
 			checkInPeroids[index].CheckInCount = int(*item.Value)
+		} else {
+			checkInPeroids[index].CheckInCount = 0
 		}
 
 		checkInPeroids[index].Start = startTime.Add(time.Hour * 24 * time.Duration(index))
@@ -323,9 +331,10 @@ func (es Backend) getAllConvergeIndiceNames() ([]string, error) {
 	return names, nil
 }
 
-func getNumberOfHoursBetween(start, end time.Time) int {
-
-	return int(math.Ceil(end.Sub(start).Hours()))
+// The number of 24 hour blocks between the start and end times.
+func getNumberOf24hBetween(start, end time.Time) int {
+	numberOfHours := int(math.Ceil(end.Sub(start).Hours()))
+	return int(math.Ceil(float64(numberOfHours) / 24.0))
 }
 
 // Get the timezone that has the start of the day (midnight) for the UTC time provided
