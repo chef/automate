@@ -1,3 +1,6 @@
+-- replaces "infra:*" with "infra:nodes:*" and "infra:nodeManagers:*"
+-- removes incorrect action "telemetry:*"
+-- removes system permissions
 BEGIN;
 
 UPDATE iam_roles
