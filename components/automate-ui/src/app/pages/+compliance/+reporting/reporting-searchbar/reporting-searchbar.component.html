@@ -47,7 +47,7 @@
       <li *ngIf="inputText !== '' && isLoadingSuggestions" class="suggestion-status">
           Loading...
       </li>
-      <li *ngIf="inputText !== '' && delayForNoSuggestions && !filterValues.length > 0" class="no-category-items">
+      <li *ngIf="inputText !== '' && delayForNoSuggestions && filterValues.length === 0" class="no-category-items">
         No matching result found
       </li>
       <li *ngFor="let value of filterValues; let i = index"
