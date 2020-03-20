@@ -130,6 +130,15 @@ export class LayoutSidebarService {
                 }
               },
               {
+                name: 'Data Feeds',
+                icon: 'assignment',
+                route: '/settings/data-feed',
+                authorized: {
+                  anyOf: ['/datafeed/destinations', 'post']
+                },
+                visible$: new BehaviorSubject(this.ServiceNowFeatureFlagOn)
+              },
+              {
                 name: 'Data Lifecycle',
                 icon: 'storage',
                 route: '/settings/data-lifecycle',
@@ -142,15 +151,6 @@ export class LayoutSidebarService {
           {
             name: 'Node Management',
             items: [
-              {
-                name: 'Data Feeds',
-                icon: 'assignment',
-                route: '/settings/data-feed',
-                authorized: {
-                  anyOf: ['/datafeed/destinations', 'post']
-                },
-                visible$: new BehaviorSubject(this.ServiceNowFeatureFlagOn)
-              },
               {
                 name: 'Node Integrations',
                 icon: 'settings_input_component',
