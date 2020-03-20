@@ -27,7 +27,7 @@ h2 {
       margin-left: 69px;
     }
   }
-  
+
 
   .checkbox-container {
     margin-top: 12px;
@@ -67,7 +67,7 @@ mat-form-field {
     border-top: 0;
   }
 
-   ::ng-deep .mat-select-disabled {
+  ::ng-deep .mat-select-disabled {
     background-color: $chef-light-grey;
     opacity: 0.5;
   }
