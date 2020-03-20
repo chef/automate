@@ -72,27 +72,6 @@ func (s *Server) GetRule(ctx context.Context, req *pb_req.GetRuleReq) (*pb_resp.
 	return &pb_resp.GetRuleResp{Rule: rule}, nil
 }
 
-func (s *Server) ListRules(ctx context.Context, req *pb_req.ListRulesReq) (*pb_resp.ListRulesResp, error) {
-	resp, err := s.projects.ListRules(ctx, &authz.ListRulesReq{})
-	if err != nil {
-		return nil, err
-	}
-
-	rules := make([]*pb_common.Rule, len(resp.Rules))
-	for i, rule := range resp.Rules {
-		apiRule, err := fromInternal(rule)
-		if err != nil {
-			return nil, status.Error(codes.Internal, err.Error())
-		}
-
-		rules[i] = apiRule
-	}
-
-	return &pb_resp.ListRulesResp{
-		Rules: rules,
-	}, nil
-}
-
 func (s *Server) ListRulesForProject(ctx context.Context, req *pb_req.ListRulesForProjectReq) (*pb_resp.ListRulesForProjectResp, error) {
 	resp, err := s.projects.ListRulesForProject(ctx, &authz.ListRulesForProjectReq{Id: req.Id})
 	if err != nil {
