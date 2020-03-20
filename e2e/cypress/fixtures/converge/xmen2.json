@@ -1,5 +1,5 @@
 {
-  "chef_server_fqdn": "chef-server.chef.co",
+  "chef_server_fqdn": "xmen.co",
   "entity_uuid": "6453a764-2415-4934-8cee-2a008834a74a",
   "expanded_run_list": {
     "id": "manhattan",
