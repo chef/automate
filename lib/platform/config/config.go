@@ -149,17 +149,35 @@ func (c *Config) GetPGConnInfoForSuperuser() (*PGConnInfo, error) {
 	return connInfo, nil
 }
 
+type pgConnURIRenderer func(dbname string) string
+
 type PGConnInfo struct {
-	fmtStr   string
-	debugStr string
+	connURIRenderer pgConnURIRenderer
+	debugStr        string
 }
 
 func (c *PGConnInfo) ConnURI(dbname string) string {
-	return fmt.Sprintf(c.fmtStr, dbname)
+	return c.connURIRenderer(dbname)
 }
 
 func (c *PGConnInfo) String() string {
 	return c.debugStr
+}
+
+func externalConnURIRenderer(ip string, port int, user string, password string, opts []string) (pgConnURIRenderer, string) {
+	fmtStr := "postgresql://%s:%s@%s:%d/%s?%s"
+	return func(dbname string) string {
+		return fmt.Sprintf(fmtStr, user, password, ip, port, dbname, strings.Join(opts, "&"))
+	}, fmt.Sprintf(fmtStr, user, "<readacted>", ip, port, "<database>", strings.Join(opts, "&"))
+}
+
+func internalConnURIRenderer(ip string, port int, user string, certPath string,
+	keyPath string, rootCertPath string) (pgConnURIRenderer, string) {
+	fmtStr := "postgresql://%s@%s:%d/%s?sslmode=verify-ca&sslcert=%s&sslkey=%s&sslrootcert=%s"
+	return func(dbname string) string {
+		return fmt.Sprintf(fmtStr,
+			user, ip, port, dbname, certPath, keyPath, rootCertPath)
+	}, fmt.Sprintf(fmtStr, user, ip, port, "<database>", certPath, keyPath, rootCertPath)
 }
 
 func (c *Config) GetPGConnInfoURI(user string) (*PGConnInfo, error) {
@@ -199,14 +217,12 @@ func (c *Config) GetPGConnInfoURI(user string) (*PGConnInfo, error) {
 					return nil, errors.Errorf("External postgres password auth missing password")
 				}
 
-				fmtStr := fmt.Sprintf("postgresql://%s:%s@%s:%d/%%s?%s",
-					user, password, c.GetPostgresql().GetIp(), c.GetPostgresql().GetCfg().GetPort(), strings.Join(opts, "&"))
-				debugStr := fmt.Sprintf("postgresql://%s:<redacted>@%s:%d/<database>?%s",
-					user, c.GetPostgresql().GetIp(), c.GetPostgresql().GetCfg().GetPort(), strings.Join(opts, "&"))
+				connURIRenderer, debugStr := externalConnURIRenderer(c.GetPostgresql().GetIp(),
+					int(c.GetPostgresql().GetCfg().GetPort()), user, password, opts)
 
 				return &PGConnInfo{
-					debugStr: debugStr,
-					fmtStr:   fmtStr,
+					debugStr:        debugStr,
+					connURIRenderer: connURIRenderer,
 				}, nil
 			default:
 				return nil, errors.Errorf("Unsupported postgres auth mode %s", auth.GetScheme().GetValue())
@@ -224,12 +240,12 @@ func (c *Config) GetPGConnInfoURI(user string) (*PGConnInfo, error) {
 			rootCertPath = defaultPGSuperuserRootCertPath
 		}
 
-		fmtStr := fmt.Sprintf("postgresql://%s@%s:%d/%%s?sslmode=verify-ca&sslcert=%s&sslkey=%s&sslrootcert=%s",
-			user, c.GetPostgresql().GetIp(), c.GetPostgresql().GetCfg().GetPort(), certPath, keyPath, rootCertPath)
-
+		connURIRenderer, debugStr := internalConnURIRenderer(c.GetPostgresql().GetIp(),
+			int(c.GetPostgresql().GetCfg().GetPort()), user, certPath, keyPath, rootCertPath)
 		return &PGConnInfo{
-			debugStr: fmt.Sprintf(fmtStr, "<database>"),
-			fmtStr:   fmtStr}, nil
+			debugStr:        debugStr,
+			connURIRenderer: connURIRenderer,
+		}, nil
 
 	}
 }
