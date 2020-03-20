@@ -40,16 +40,28 @@ enum ProjectRulesStatus {
 }
 
 message Rule {
+    // Unique ID. Cannot be changed.
     string id = 1;
+    // Unique ID of the project this rule belongs to. Cannot be changed.
     string project_id = 2;
+    // Name for the project rule.
     string name = 3;
+    // Whether the rule applies to ingested `NODE` or `EVENT resources.
+    // Cannot be changed.
     RuleType type = 4;
+    // Conditions that ingested resources must match to belong to the project. 
+    // Will contain one or more.
     repeated Condition conditions = 5;
+    // Whether the rule is `STAGED` (not in effect) or `APPLIED` (in effect).
     RuleStatus status = 6;
 }
 
 message Condition {
+    // Represents a property of an ingested resource. Depends on the rule type.
     ConditionAttribute attribute = 1;
+    // The value(s) of the attribute that an ingested resource must match.
     repeated string values = 2;
+    // Whether the attribute matches a single value (`EQUALS`) or 
+    // matches at least one of a set of values (`MEMBER_OF`).
     ConditionOperator operator = 3;
 }
