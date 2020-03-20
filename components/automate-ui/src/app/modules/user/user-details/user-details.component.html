@@ -5,7 +5,7 @@
         <chef-breadcrumb [link]="['/settings/users']">Users</chef-breadcrumb>
         {{ userDetails.user?.name }}
       </chef-breadcrumbs>
-  
+
       <chef-page-header>
         <div class="detail-row">
           <div class="name-column">
@@ -58,7 +58,7 @@
           <chef-form-field class="password">
             <label>
               <span class="label">New Password <span aria-hidden="true">*</span></span>
-              <input chefInput formControlName="newPassword" type="password" (keyup)="handlePasswordInput($event)" />
+              <input chefInput formControlName="newPassword" type="password" (keyup)="handlePasswordInput()" />
             </label>
             <chef-error
               *ngIf="(userDetails.passwordForm.get('newPassword').hasError('required') || userDetails.passwordForm.get('newPassword').hasError('pattern')) && userDetails.passwordForm.get('newPassword').dirty">
