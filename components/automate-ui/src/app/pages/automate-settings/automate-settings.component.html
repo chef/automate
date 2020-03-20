@@ -66,11 +66,16 @@
           <h2>Service Groups</h2>
           <div class="checkbox-row" [formGroup]="serviceGroupNoHealthChecks">
             <div class="checkbox-container">
-              <chef-checkbox
-              [checked]="!serviceGroupNoHealthChecks.value.disabled"
-              disabled="true">
-              <!-- this is currently not changeable by the user -->
-              </chef-checkbox>
+              <chef-tooltip follow position="top" for='service-group-no-health'>
+                Changing this setting in the UI is not supported.
+              </chef-tooltip>
+              <span id="service-group-no-health">
+                <chef-checkbox
+                [checked]="!serviceGroupNoHealthChecks.value.disabled"
+                disabled="true">
+                <!-- this is currently not changeable by the user in the UI -->
+                </chef-checkbox>
+              </span>
             </div>
 
             <p>When no health check reports have been received for a service in
@@ -91,11 +96,17 @@
           
           <div class="checkbox-row secondary-row" [formGroup]="serviceGroupRemoveServices">
             <div class="checkbox-container">
-              <chef-checkbox
-              [checked]="!serviceGroupRemoveServices.value.disabled"
-              (change)="toggleInput(serviceGroupRemoveServices, $event.detail)"
-              disabled="true">
-              </chef-checkbox>
+              <chef-tooltip follow position="top" for='service-group-remove-services'>
+                Changing this setting in the UI is not supported.
+              </chef-tooltip>
+              <span id="service-group-remove-services">
+                <chef-checkbox
+                [checked]="!serviceGroupRemoveServices.value.disabled"
+                (change)="toggleInput(serviceGroupRemoveServices, $event.detail)"
+                disabled="true">
+                <!-- this is currently not changeable by the user in the UI -->
+                </chef-checkbox>
+              </span>
             </div>
             <p>Remove services labeled as disconnected after
               <input chefInput 
