@@ -1,4 +1,7 @@
+import { eventExist } from '../support/helpers';
+
 // Cypress Commands: any action that could be taken in any test
+// any command added in here must also have its signature added to index.d.ts
 
 Cypress.Commands.add('login', (url: string, username: string) => {
   // CYPRESS_BASE_URL environment variable must be set
@@ -248,8 +251,33 @@ Cypress.Commands.add('waitForComplianceNode', (nodeId: string, start: string, en
   });
 });
 
-// helpers
+Cypress.Commands.add('waitForAction', (entityName: string, start: string, end: string,
+  maxRetries: number) => {
+  cy.request({
+    headers: {
+      projects: ['*'],
+      'api-token': Cypress.env('ADMIN_TOKEN')
+    },
+    method: 'GET',
+    url: `api/v0/eventfeed?collapse=false&page_size=100&start=${start}&end=${end}`
+  })
+    .then((resp: Cypress.ObjectLike) => {
+      // to avoid getting stuck in an infinite loop
+      if (maxRetries === 0) {
+        expect(0).to.equal(1);
+        return;
+      }
+      if (resp.body.events && resp.body.events.length > 0 &&
+        eventExist(entityName, resp.body.events)) {
+        return;
+      }
+      cy.wait(1000);
+      cy.waitForAction(entityName, start, end, maxRetries - 1);
+    });
+});
 
+// the helpers below are used only in the Cypress commands defined in this file
+// other helpers for use in tests can be found in helpers.ts
 function waitUntilApplyRulesNotRunning(attempts: number): void {
   if (attempts === -1) {
     throw new Error('apply-rules never finished');
@@ -349,6 +377,17 @@ function deleteProjects(projectIdsToDelete: string[], index: number,
         // Delete all the rules then call the deleteProjects with the next project
         deleteProjectRules(projectId, rulesResp.body.rules, finish);
       } else {
+        // make sure there are no rules staged for deletion that need to be applied
+        cy.request({
+          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+          method: 'GET',
+          url: `/apis/iam/v2/projects/${projectId}`
+        }).then((projectResp) => {
+          if (projectResp.body.project.status === 'EDITS_PENDING') {
+            rulesWereDeleted = true;
+          }
+        });
+
         deleteProjects(projectIdsToDelete, index + 1, rulesWereDeleted);
       }
     });

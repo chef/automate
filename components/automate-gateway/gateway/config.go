@@ -45,7 +45,7 @@ func ConfigFromViper() (Config, error) {
 // New initializes a *Server from the passed options
 func New(cfg Config) *Server {
 	s := &Server{Config: cfg}
-	s.Config.OpenAPIUIDir = "./third_party/swagger-ui/"
+	s.Config.OpenAPIUIDir = "/src/components/automate-gateway/third_party/swagger-ui/"
 	s.logger = logrus.WithFields(logrus.Fields{
 		"hostname":            cfg.Hostname,
 		"https_port":          cfg.Port,

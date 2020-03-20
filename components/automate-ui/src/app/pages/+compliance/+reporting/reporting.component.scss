@@ -171,6 +171,10 @@ chef-subheading {
     background: $chef-success;
   }
 
+  .waived .summary-toggle {
+    background: $chef-success;
+  }
+
   .skipped .summary-toggle {
     background: $chef-dark-grey;
   }

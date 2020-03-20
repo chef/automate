@@ -1,0 +1,222 @@
+require 'json'
+require 'open-uri'
+
+if ['up', 'ssh', 'provision', 'halt'].include?(ARGV[0])
+  raise 'ENV variable SSH_HOST is not defined!' if ENV['SSH_HOST'].nil?
+  raise 'ENV variable SSH_KEY_PATH for the private key is not defined!' if ENV['SSH_KEY_PATH'].nil?
+  raise 'ENV variable SSH_USER is not defined!' if ENV['SSH_USER'].nil?
+  raise 'ENV variable SSH_USER can\'t be root!' if ENV['SSH_USER'] == 'root'
+end
+
+ssh_host = ENV['SSH_HOST']
+ssh_user = ENV['SSH_USER']
+ssh_key_path = ENV['SSH_KEY_PATH']
+home_dir = "/home/#{ssh_user}"
+current_branch = `git rev-parse --abbrev-ref HEAD`
+latest_head_commit = `git rev-parse HEAD`
+latest_origin_commit = `git rev-parse origin/#{current_branch}`
+clean_tree = system('git status | grep "nothing to commit"')
+stop_hours = 48  # if STOP_HOURS ENV is not specified, stop the instance after 2 days of running
+automate_license = ENV['AUTOMATE_LICENSE']
+automate_license_path = '../../dev/license.jwt'
+automate_channel = 'dev'
+automate_build = 'latest'
+manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/#{automate_build}.json"
+
+
+def extract_from_manifest(manifest, build)
+  manifest_json = JSON.parse(open(manifest).read)
+  hab_version = manifest_json["hab"].find {|x| x.start_with?("core/hab/") }.split("/")[2]
+  git_sha = 'HEAD'
+  git_sha = manifest_json["git_sha"] if build != 'latest'
+  return hab_version, git_sha
+end
+
+def latest_build_from_versions(channel)
+  raise "Invalid channel #{channel}, can only be 'dev', 'current' or 'acceptance'" unless ['dev', 'current', 'acceptance'].include?(channel)
+  versions_url = "https://packages.chef.io/manifests/#{channel}/automate/versions.json"
+  puts " * Getting latest build from #{versions_url}"
+  versions_json = JSON.parse(open(versions_url).read)
+  build = versions_json.last
+  raise "Invalid build '#{build}' found for channel '#{channel}'" unless build =~ /^\d+$/
+  return build
+end
+
+
+# Only run these checks on `vagrant up`
+if ['up', 'provision'].include?(ARGV[0])
+  if !ENV['STOP_HOURS'].nil?
+    stop_hours = ENV['STOP_HOURS']
+  end
+
+  if !ENV['VERSION'].nil?
+    version = ENV['VERSION'].strip.split('/')
+    automate_channel = version[0]
+    if version[1].to_s =~ /^\d+$/
+      automate_build = version[1]
+    else
+      automate_build = latest_build_from_versions(automate_channel)
+    end
+  end
+  manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/#{automate_build}.json"
+  hab_version_from_manifest, git_sha_from_manifest = extract_from_manifest(manifest_url, automate_build)
+
+  if !clean_tree
+    puts %q(
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      ! You have uncommitted changes that won't exist when we do the git clone on the remote instance !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    )
+  end
+  if latest_head_commit != latest_origin_commit
+    puts %q(
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+      ! You have unpushed commits that won't exist when we do the git clone on the remote instance !
+      !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    )
+  end
+
+  if ENV['GITHUB_TOKEN'].nil?
+    raise "ENV variable GITHUB_TOKEN must be defined for this, aborting..."
+  end
+
+  if automate_license.nil?
+    if(File.file?(automate_license_path))
+      automate_license = File.read(automate_license_path)
+      puts "==> Using Automate license file from #{automate_license_path}"
+    else
+      raise "A valid Automate JWT license is required. Provide the content in ENV variable AUTOMATE_LICENSE or save it in this file: #{automate_license_path}"
+    end
+  else
+    puts '==> Using Automate license from ENV variable AUTOMATE_LICENSE'
+  end
+  puts "==> Installing Automate services from #{manifest_url}"
+end
+
+$install_hab = <<SCRIPT
+# Install the hab version specifid in the automate manifest
+curl --silent https://raw.githubusercontent.com/habitat-sh/habitat/master/components/hab/install.sh | sudo bash -s -- -v #{hab_version_from_manifest}
+SCRIPT
+
+$install_victorias_bits = <<SCRIPT
+apt-get install git make -y
+snap install jq
+echo "* soft nofile 100000" >> /etc/security/limits.conf
+echo "* hard nofile 256000" >> /etc/security/limits.conf
+echo "root soft nofile 100000" >> /etc/security/limits.conf
+echo "root hard nofile 256000" >> /etc/security/limits.conf
+sysctl fs.inotify.max_user_watches=524288
+sysctl -p
+echo 'Defaults    env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/root_ssh_agent
+SSHD_CONFIG="/etc/ssh/sshd_config"
+if ! grep -q "^ClientAliveInterval" $SSHD_CONFIG; then
+  echo "ClientAliveInterval 60" >> $SSHD_CONFIG
+fi
+if ! grep -q "^ClientAliveCountMax" $SSHD_CONFIG; then
+  echo "ClientAliveCountMax 10000" >> $SSHD_CONFIG
+fi
+service ssh restart
+# permit root auth to bypass the hab studio if we wish so
+sed -r -i 's/^.+" ssh-/ssh-/' /root/.ssh/authorized_keys
+CRON_FILE="/etc/cron.hourly/auto-stop"
+if [ ! -f $CRON_FILE ]; then
+cat<<'EOF' > $CRON_FILE
+#!/bin/bash -e
+uptime_hours=$(($(awk '{print int($1)}' /proc/uptime) / 3600))
+# stop the instance if up for more than
+if [ $uptime_hours -gt #{stop_hours} ] ; then
+  wall "Automatically stopping instance after STOP_HOURS(#{stop_hours}) of uptime..."
+  halt -p
+fi
+EOF
+chmod +x $CRON_FILE
+fi
+echo
+SCRIPT
+
+$github_clone_automate = <<SCRIPT
+ssh-keyscan -H github.com >> ~/.ssh/known_hosts
+cd #{home_dir}
+echo " * Removing 'automate' and '.hab' directories from '#{home_dir}'"
+rm -rf automate .hab
+git clone https://github.com/chef/automate.git
+cd automate
+echo "export GITHUB_TOKEN=\"#{ENV['GITHUB_TOKEN']}\"" > .secrets
+git checkout #{latest_head_commit}
+
+if test "#{git_sha_from_manifest}" = "HEAD" ; then
+  echo " * Not overwriting dev/config.toml as latest deb build is being installed"
+else
+  echo " * Overwriting dev/config.toml with one compatible with this build from sha #{git_sha_from_manifest}"
+  # This will fail if the old commits have been squashed or truncated. For example, after we make the repository public.
+  git checkout #{git_sha_from_manifest} dev/config.toml
+  git reset dev/config.toml
+fi
+
+cat<<EOF >>dev/config.toml
+
+[compliance.v1.sys.logger]
+  level = "debug"
+EOF
+
+SSH_HOSTNAME="#{ssh_host}"
+sed -i "s/fqdn = .*/fqdn = '$SSH_HOSTNAME'/" dev/config.toml
+sed -i "s/heapsize = .*/heapsize = '#{ENV['ES_HEAP_SIZE']}g'/" dev/config.toml
+echo "#{automate_license}" > dev/license.jwt
+echo
+SCRIPT
+
+
+$enter_hab_studio = <<SCRIPT
+export HAB_LICENSE=accept-no-persist
+cat<<EOF >/etc/profile.d/hab_studio_setup.sh
+if [ "\\$USER" == "#{ssh_user}" ]; then
+  export HAB_LICENSE=accept-no-persist
+  export HAB_STUDIO_SECRET_GITHUB_TOKEN=#{ENV['GITHUB_TOKEN']}
+  export AWS_ACCESS_KEY_ID=#{ENV['AWS_ACCESS_KEY_ID']}
+  export AWS_SECRET_ACCESS_KEY=#{ENV['AWS_SECRET_ACCESS_KEY']}
+  export AWS_SESSION_TOKEN=#{ENV['AWS_SESSION_TOKEN']}
+  export AZURE_CLIENT_ID=#{ENV['AZURE_CLIENT_ID']}
+  export AZURE_CLIENT_SECRET=#{ENV['AZURE_CLIENT_SECRET']}
+  export AZURE_TENANT_ID=#{ENV['AZURE_TENANT_ID']}
+
+  cd #{home_dir}/automate
+  source .envrc
+  if [ ! -f ~/.hab/etc/cli.toml ]; then
+    echo "Setting up HAB_ORIGIN=#{ssh_user}"
+    mkdir -p ~/.hab/etc
+    cat<<'EOT' > ~/.hab/etc/cli.toml
+origin = "#{ssh_user}"
+ctl_secret = "dev333ZZZ111"
+EOT
+    hab origin key generate #{ssh_user}
+  fi
+  hab studio run 'wget -O results/build.json "#{manifest_url}"'
+  hab studio enter
+fi
+EOF
+hab pkg install -b core/git
+STUDIORC="#{home_dir}/automate/.studiorc"
+echo 'printf "\033[0;31m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n>>> TWO MORE STEPS NEEDED TO RUN A2 <<<\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\033[0m\n"' >> $STUDIORC
+echo 'printf "1. Run this here:\033[1;32m start_all_services \033[0m\n"' >> $STUDIORC
+echo 'printf "2. Run the A2 UI:\033[1;34m https://#{ssh_host} \033[0m\n"' >> $STUDIORC
+echo 'Done, run `vagrant ssh` now to complete the setup.'
+SCRIPT
+
+Vagrant.configure('2') do |config|
+  config.vm.box = 'tknerr/managed-server-dummy'
+
+  config.vm.provider :managed do |managed, override|
+    managed.server = ssh_host
+    override.ssh.port = "22"
+    override.ssh.username = ssh_user
+    override.ssh.private_key_path = ssh_key_path
+  end
+
+  config.vm.synced_folder '.', '/vagrant', disabled: true
+
+  config.vm.provision 'Install hab', type: 'shell', inline: $install_hab
+  config.vm.provision 'Install Victoria\'s bits', type: 'shell', inline: $install_victorias_bits, :privileged => true
+  config.vm.provision 'Github clone automate', type: 'shell', inline: $github_clone_automate
+  config.vm.provision 'Enter hab studio', type: 'shell', inline: $enter_hab_studio
+end

@@ -36,6 +36,7 @@ defmodule Notifications.Mixfile do
        :logger,
        :timex,
        :httpoison,
+       :google_protos,
        :uuid
      ],
      mod: {Notifications.Application, []}]
@@ -47,6 +48,7 @@ defmodule Notifications.Mixfile do
       #                used by ingest service to trigger
       #                notifications
       {:protobuf, github: "tony612/protobuf-elixir", override: true},
+      {:google_protos, github: "tony612/google-protos", override: true},
       {:grpc, github: "elixir-grpc/grpc"},
       # database w/ pooling for pgsql access
       {:sqerl, github: "chef/sqerl"},

@@ -1,19 +1,37 @@
-import { uuidv4 } from '../../../support/helpers';
+import { eventExist, uuidv4 } from '../../../support/helpers';
+import { Rule, Project } from '../../../support/types';
 
 describe('project update re-tagging', () => {
-  const cypressPrefix = 'test-node-update';
+  const cypressPrefix = 'test-project-update';
+  const now = Cypress.moment().format('MMDDYYhhmm');
 
-  const projectsWithRule = [
+  const nodeOrgProjectID = `${cypressPrefix}-project-org-${now}`;
+  const nodeServerProjectID = `${cypressPrefix}-project-server-${now}`;
+  const nodeEnvProjectID = `${cypressPrefix}-project-environment-${now}`;
+  const nodePolGroupProjectID = `${cypressPrefix}-project-policy-group-${now}`;
+  const nodePolNameProjectID = `${cypressPrefix}-project-policy-name-${now}`;
+  const nodeRoleProjectID = `${cypressPrefix}-project-role-${now}`;
+  const nodeTagProjectID = `${cypressPrefix}-project-tag-${now}`;
+
+  interface ProjectAndRule {
+    project: Project;
+    rule: Rule;
+  }
+
+  const projectsWithNodeRule: ProjectAndRule[] = [
     {
       project: {
-        id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
-        name: 'project org'
+        id: nodeOrgProjectID,
+        name: 'project org',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-org',
         name: 'rule CHEF_ORGANIZATION',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-org-${Cypress.moment().format('MMDDYYhhmm')}`,
+        project_id: nodeOrgProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ORGANIZATION',
@@ -25,14 +43,17 @@ describe('project update re-tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-chef-server-${Cypress.moment().format('MMDDYYhhmm')}`,
-        name: 'project chef server'
+        id: nodeServerProjectID,
+        name: 'project chef server',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-chef-server',
         name: 'rule CHEF_SERVER',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-chef-server-${Cypress.moment().format('MMDDYYhhmm')}`,
+        project_id: nodeServerProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_SERVER',
@@ -44,14 +65,17 @@ describe('project update re-tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-environment-${Cypress.moment().format('MMDDYYhhmm')}`,
-        name: 'project environment'
+        id: nodeEnvProjectID,
+        name: 'project environment',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-environment',
         name: 'rule ENVIRONMENT',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-environment-${Cypress.moment().format('MMDDYYhhmm')}`,
+        project_id: nodeEnvProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'ENVIRONMENT',
@@ -63,15 +87,17 @@ describe('project update re-tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-policy-group-${Cypress.moment().format('MMDDYYhhmm')}`,
-        name: 'project policy group'
+        id: nodePolGroupProjectID,
+        name: 'project policy group',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-policy-group',
         name: 'rule CHEF_POLICY_GROUP',
         type: 'NODE',
-        project_id:
-        `${cypressPrefix}-project-policy-group-${Cypress.moment().format('MMDDYYhhmm')}`,
+        project_id: nodePolGroupProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_POLICY_GROUP',
@@ -83,14 +109,17 @@ describe('project update re-tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-policy-name-${Cypress.moment().format('MMDDYYhhmm')}`,
-        name: 'project policy name'
+        id: nodePolNameProjectID,
+        name: 'project policy name',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-policy-name',
         name: 'rule CHEF_POLICY_NAME',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-policy-name-${Cypress.moment().format('MMDDYYhhmm')}`,
+        project_id: nodePolNameProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_POLICY_NAME',
@@ -102,14 +131,17 @@ describe('project update re-tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-role-${Cypress.moment().format('MMDDYYhhmm')}`,
-        name: 'project role'
+        id: nodeRoleProjectID,
+        name: 'project role',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-role',
         name: 'rule CHEF_ROLE',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-role-${Cypress.moment().format('MMDDYYhhmm')}`,
+        project_id: nodeRoleProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_ROLE',
@@ -121,14 +153,17 @@ describe('project update re-tagging', () => {
     },
     {
       project: {
-        id: `${cypressPrefix}-project-tag-${Cypress.moment().format('MMDDYYhhmm')}`,
-        name: 'project tag'
+        id: nodeTagProjectID,
+        name: 'project tag',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
       },
       rule: {
         id: 'rule-tag',
         name: 'rule CHEF_TAG',
         type: 'NODE',
-        project_id: `${cypressPrefix}-project-tag-${Cypress.moment().format('MMDDYYhhmm')}`,
+        project_id: nodeTagProjectID,
+        status: 'STAGED',
         conditions: [
           {
             attribute: 'CHEF_TAG',
@@ -140,12 +175,67 @@ describe('project update re-tagging', () => {
     }
   ];
 
+  const eventOrgProjectID = `${cypressPrefix}-project-event-org-${now}`;
+  const eventServerProjectID = `${cypressPrefix}-project-event-server-${now}`;
+
+  const projectsWithEventRule = [
+    {
+      project: {
+        id: eventOrgProjectID,
+        name: 'project org',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
+      },
+      rule: {
+        id: 'event-rule-org',
+        name: 'rule CHEF_ORGANIZATION',
+        type: 'EVENT',
+        project_id: eventOrgProjectID,
+        status: 'STAGED',
+        conditions: [
+          {
+            attribute: 'CHEF_ORGANIZATION',
+            operator: 'EQUALS',
+            values: ['75th Rangers']
+          }
+        ]
+      }
+    },
+    {
+      project: {
+        id: eventServerProjectID,
+        name: 'project chef server',
+        type: 'CUSTOM',
+        status: 'NO_RULES'
+      },
+      rule: {
+        id: 'event-rule-chef-server',
+        name: 'rule CHEF_SERVER',
+        type: 'EVENT',
+        project_id: eventServerProjectID,
+        status: 'STAGED',
+        conditions: [
+          {
+            attribute: 'CHEF_SERVER',
+            operator: 'EQUALS',
+            values: ['example.org']
+          }
+        ]
+      }
+    }
+  ];
+
   const complianceNodeId = uuidv4();
   const clientRunsNodeId = uuidv4();
   const reportId = uuidv4();
-  const nodeName = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmm')}`;
-  const start = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
-  const end = Cypress.moment().utc().endOf('day').format();
+  const nodeName = `${cypressPrefix}-${now}`;
+  const nodeStart = Cypress.moment().utc().subtract(3, 'day').startOf('day').format();
+  const nodeEnd = Cypress.moment().utc().endOf('day').format();
+
+  const actionStart = Cypress.moment().utc().subtract(3, 'day').valueOf().toString();
+  const actionEnd = Cypress.moment().utc().endOf('day').valueOf().toString();
+  const actionId = uuidv4();
+  const entityName = `entity_name-${Cypress.moment().format('MMDDYYhhmmss')}`;
 
   before(() => {
     cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
@@ -171,7 +261,7 @@ describe('project update re-tagging', () => {
       });
     });
 
-    // Ingest a node with attribues that match all the projects
+    // Ingest a node with attributes that match all the projects
     cy.fixture('converge/avengers1.json').then((node) => {
       node.organization_name = '75th Rangers';
       node.chef_server_fqdn = 'example.org';
@@ -189,15 +279,51 @@ describe('project update re-tagging', () => {
       });
     });
 
+    // Ingest an action with attributes that match all the projects
+    cy.fixture('action/environment_create.json').then((action) => {
+      action.organization_name = '75th Rangers';
+      action.remote_hostname = 'example.org';
+      action.id = actionId;
+      action.entity_name = entityName;
+      action.recorded_at = Cypress.moment().utc().subtract(1, 'day').format();
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: '/data-collector/v0',
+        body: action
+      });
+    });
+
     // wait for the report to be ingested
     cy.waitForNodemanagerNode(complianceNodeId, 30);
-    cy.waitForComplianceNode(complianceNodeId, start, end, 30);
+    cy.waitForComplianceNode(complianceNodeId, nodeStart, nodeEnd, 30);
+
     // wait for the client run report to be ingested
     cy.waitForNodemanagerNode(clientRunsNodeId, 30);
     cy.waitForClientRunsNode(clientRunsNodeId, 30);
 
-    // create the projects with one rule
-    projectsWithRule.forEach(projectWithRule => {
+    // wait for the action to be ingested
+    cy.waitForAction(entityName, actionStart, actionEnd, 30);
+
+    // create the projects with one node rule
+    projectsWithNodeRule.forEach(projectWithRule => {
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: '/apis/iam/v2/projects',
+        body: projectWithRule.project
+      });
+
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'POST',
+        url: `/apis/iam/v2/projects/${projectWithRule.rule.project_id}/rules`,
+        body: projectWithRule.rule
+      });
+    });
+
+    // create the projects with one event rule
+    projectsWithEventRule.forEach(projectWithRule => {
       cy.request({
         headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
         method: 'POST',
@@ -233,7 +359,7 @@ describe('project update re-tagging', () => {
   });
 
   describe('Node Manager', () => {
-    for ( const projectWithRule of projectsWithRule ) {
+    for (const projectWithRule of projectsWithNodeRule) {
       it(`when a project has a rule that matches a node's ${projectWithRule.rule.name},
       successfully associates that node with the project`, () => {
 
@@ -262,7 +388,7 @@ describe('project update re-tagging', () => {
   });
 
   describe('Client Runs', () => {
-    for ( const projectWithRule of projectsWithRule ) {
+    for (const projectWithRule of projectsWithNodeRule) {
       it(`when a project has a rule that matches a node's ${projectWithRule.rule.name},
       successfully associates that node with the project`, () => {
 
@@ -283,7 +409,7 @@ describe('project update re-tagging', () => {
   });
 
   describe('Compliance Runs', () => {
-    for ( const projectWithRule of projectsWithRule ) {
+    for (const projectWithRule of projectsWithNodeRule) {
       it(`when a project has a rule that matches a node's ${projectWithRule.rule.name},
       successfully associates that node with the project`, () => {
 
@@ -297,9 +423,9 @@ describe('project update re-tagging', () => {
           url: '/api/v0/compliance/reporting/nodes/search',
           body: {
             filters: [
-              { type: 'start_time', values: [start]},
-              { type: 'end_time', values: [end]},
-              { type: 'node_id', values: [complianceNodeId]}
+              { type: 'start_time', values: [nodeStart] },
+              { type: 'end_time', values: [nodeEnd] },
+              { type: 'node_id', values: [complianceNodeId] }
             ],
             order: 'DESC',
             page: 1,
@@ -308,6 +434,27 @@ describe('project update re-tagging', () => {
           }
         }).then((response) => {
           expect(response.body.nodes).to.have.length(1);
+        });
+      });
+    }
+  });
+
+  describe('Actions', () => {
+    for (const projectWithRule of projectsWithEventRule) {
+      it(`when a project has a rule that matches an action's ${projectWithRule.rule.name},
+      successfully associates that action with the project`, () => {
+
+        // Ensure the event is tagged with the correct project
+        cy.request({
+          headers: {
+            'api-token': Cypress.env('ADMIN_TOKEN'),
+            projects: [projectWithRule.project.id]
+          },
+          method: 'GET',
+          url: `api/v0/eventfeed?collapse=false&page_size=100&start=${actionStart}&end=${actionEnd}`
+        }).then((response) => {
+          expect(response.body.events.length).to.greaterThan(0);
+          expect(eventExist(entityName, response.body.events)).to.equal(true);
         });
       });
     }

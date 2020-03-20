@@ -9,16 +9,17 @@ const originalValue = 'originalValue';
 const newValue = 'newValue';
 
 @Component({
-  template: '<input [formControl]="control" />'
+  template: '<input [formControl]="control" [resetOrigin]="origin" />'
 })
 class InputFormControlHostComponent {
   control: FormControl = new FormControl(originalValue);
+  origin = false;
 }
 
 @Component({
   template: `
     <form [formGroup]="form">
-      <input formControlName="control" />
+      <input formControlName="control" [resetOrigin]="origin" />
     </form>
   `
 })
@@ -26,11 +27,12 @@ class InputFormControlNameHostComponent {
   form: FormGroup = new FormGroup({
     control: new FormControl(originalValue)
   });
+  origin = false;
 }
 
 @Component({
   template: `
-    <select [formControl]="control">
+    <select [formControl]="control" [resetOrigin]="origin">
       <option value="${originalValue}">${originalValue}</option>
       <option value="${newValue}">${newValue}</option>
     </select>
@@ -38,12 +40,13 @@ class InputFormControlNameHostComponent {
 })
 class SelectFormControlHostComponent {
   control: FormControl = new FormControl(originalValue);
+  origin = false;
 }
 
 @Component({
   template: `
     <form [formGroup]="form">
-      <select formControlName="control">
+      <select formControlName="control" [resetOrigin]="origin">
         <option value="${originalValue}">${originalValue}</option>
         <option value="${newValue}">${newValue}</option>
       </select>
@@ -54,6 +57,7 @@ class SelectFormControlNameHostComponent {
   form: FormGroup = new FormGroup({
     control: new FormControl(originalValue)
   });
+  origin = false;
 }
 
 type TestHostComponents =
@@ -63,9 +67,9 @@ type TestHostComponents =
   | SelectFormControlNameHostComponent;
 
 const scenarios = [
-  [InputFormControlHostComponent,      'input',                   'input' ],
-  [InputFormControlNameHostComponent,  'input[formcontrolname]',  'input' ],
-  [SelectFormControlHostComponent,     'select',                  'change'],
+  [InputFormControlHostComponent, 'input', 'input'],
+  [InputFormControlNameHostComponent, 'input[formcontrolname]', 'input'],
+  [SelectFormControlHostComponent, 'select', 'change'],
   [SelectFormControlNameHostComponent, 'select[formcontrolname]', 'change']
 ];
 
@@ -85,7 +89,7 @@ using(scenarios, (host, selector, eventName) => {
           FormControlDirective
         ]
       })
-      .compileComponents();
+        .compileComponents();
     }));
 
     beforeEach(fakeAsync(() => {
@@ -137,6 +141,27 @@ using(scenarios, (host, selector, eventName) => {
         expect(inputEl.classList.contains('ng-dirty')).toEqual(false);
         expect(inputEl.classList.contains('ng-pristine')).toEqual(true);
       }));
+
+      describe('when resetOrigin emits', () => {
+        it('is marked as pristine', fakeAsync(() => {
+          inputEl.value = newValue;
+          inputEl.dispatchEvent(new Event(eventName));
+          fixture.detectChanges();
+          tick();
+
+          expect(inputEl.value).toEqual(newValue);
+          expect(inputEl.classList.contains('ng-dirty')).toEqual(true);
+          expect(inputEl.classList.contains('ng-pristine')).toEqual(false);
+
+          input.componentInstance.origin = true;
+          fixture.detectChanges();
+          tick();
+
+          expect(inputEl.value).toEqual(newValue);
+          expect(inputEl.classList.contains('ng-dirty')).toEqual(false);
+          expect(inputEl.classList.contains('ng-pristine')).toEqual(true);
+        }));
+      });
     });
   });
 });

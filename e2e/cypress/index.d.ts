@@ -14,5 +14,7 @@ declare namespace Cypress {
     waitForClientRunsNode(nodeId: string, maxRetries: number): void
     waitForComplianceNode(nodeId: string, start: string, end: string,
       maxRetries: number): void
+    waitForAction(entityName: string, start: string, end: string, 
+      maxRetries: number): void
   }
 }

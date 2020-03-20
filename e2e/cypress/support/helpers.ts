@@ -8,3 +8,13 @@ export function uuidv4() {
     return v.toString(16);
   });
 }
+
+export function eventExist(entityName: string, events: any[]): boolean {
+  for (const event of events) {
+    if (event.entity_name === entityName) {
+      return true;
+    }
+  }
+
+  return false;
+}

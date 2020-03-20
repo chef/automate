@@ -67,11 +67,15 @@
     align-items: center;
     color: $chef-grey;
 
+    .waived-icon:before {
+      color: $chef-white;
+    }
+
     &:last-child {
       margin-right: 0;
     }
 
-    chef-icon {
+    chef-icon, .waived-icon {
       margin-right: 5px;
     }
   }
@@ -89,6 +93,14 @@
 
     &.skipped {
       color: $chef-dark-grey;
+    }
+
+    &.waived {
+      color: $chef-darkest;
+
+      .waived-icon:before {
+        color: inherit;
+      }
     }
 
     &.critical {

@@ -109,6 +109,10 @@ if ARGV[0] == "up"
     stop_hours = ENV['STOP_HOURS']
   end
 
+  if ENV['ES_HEAP_SIZE'].nil?
+    ENV['ES_HEAP_SIZE'] = "3"
+  end
+
   if !ENV['EBS_SNAPSHOT'].nil? && ENV['EBS_SNAPSHOT'] =~ /^snap-\w+$/
     es_ebs_snapshot = ENV['EBS_SNAPSHOT']
     puts " * Using specified EBS snapshot #{es_ebs_snapshot} for the ElasticSearch data directory"
@@ -126,7 +130,6 @@ if ARGV[0] == "up"
   manifest_url = "https://packages.chef.io/manifests/#{automate_channel}/automate/#{automate_build}.json"
   hab_version_from_manifest, git_sha_from_manifest = extract_from_manifest(manifest_url, automate_build)
 
-  puts "==> Installing Automate services from #{manifest_url}"
   puts '==> Checking for ssh identities needed to clone the automate repo...'
 
   unless system('ssh-add -l')
@@ -165,6 +168,7 @@ if ARGV[0] == "up"
   if ENV['AWS_SSH_KEY_NAME'].nil?
     raise "ENV variable AWS_SSH_KEY_NAME must be defined for this. See README.md for more details. Aborting..."
   end
+  puts "==> Installing Automate services from #{manifest_url}"
 end
 
 $install_hab = <<SCRIPT
@@ -179,6 +183,8 @@ echo "* soft nofile 100000" >> /etc/security/limits.conf
 echo "* hard nofile 256000" >> /etc/security/limits.conf
 echo "root soft nofile 100000" >> /etc/security/limits.conf
 echo "root hard nofile 256000" >> /etc/security/limits.conf
+sysctl fs.inotify.max_user_watches=524288
+sysctl -p
 echo 'Defaults    env_keep += "SSH_AUTH_SOCK"' > /etc/sudoers.d/root_ssh_agent
 SSHD_CONFIG="/etc/ssh/sshd_config"
 if ! grep -q "^ClientAliveInterval" $SSHD_CONFIG; then
@@ -224,19 +230,24 @@ fi
 
 cat<<EOF >>dev/config.toml
 
+[compliance.v1.sys.logger]
+  level = "debug"
+
 [elasticsearch.v1.sys.path]
 data = "es_data"
 EOF
 
 EC2HOSTNAME=`curl -Ss http://169.254.169.254/latest/meta-data/public-hostname`
 sed -i "s/fqdn = .*/fqdn = '$EC2HOSTNAME'/" dev/config.toml
+sed -i "s/heapsize = .*/heapsize = '#{ENV['ES_HEAP_SIZE']}g'/" dev/config.toml
 echo "#{automate_license}" > dev/license.jwt
 SCRIPT
 
-$enter_studio = <<SCRIPT
+$enter_hab_studio = <<SCRIPT
+export HAB_LICENSE=accept-no-persist
 cat<<EOF >/etc/profile.d/hab_studio_setup.sh
+export HAB_LICENSE=accept-no-persist
 if [ "\\$USER" == "ubuntu" ]; then
-  export GITHUB_TOKEN=#{ENV['GITHUB_TOKEN']}
   export HAB_STUDIO_SECRET_GITHUB_TOKEN=#{ENV['GITHUB_TOKEN']}
   export AWS_ACCESS_KEY_ID=#{aws_access_key_id}
   export AWS_SECRET_ACCESS_KEY=#{aws_secret_access_key}
@@ -252,20 +263,23 @@ if [ "\\$USER" == "ubuntu" ]; then
     mkdir -p ~/.hab/etc
     cat<<'EOT' > ~/.hab/etc/cli.toml
 origin = "ubuntu"
-auth_token = "dev444BBB999"
 ctl_secret = "dev333ZZZ111"
 EOT
+    echo " * Running: hab origin..."
     hab origin key generate ubuntu
   fi
+  echo " * Running: hab studio run to wget the build.json"
   hab studio run 'wget -O results/build.json "#{manifest_url}"'
   hab studio run 'echo "https://$(curl -Ss http://169.254.169.254/latest/meta-data/public-hostname)" > url.txt'
   # captures an Amazon EBS volume that is not mounted and has a UUID(avoids matching the root EBS volume)
   device_to_mount=\\$(lsblk -o NAME,MODEL,MOUNTPOINT,UUID | grep -P "Amazon Elastic Block Store[^/]+\\w" | cut -f1 -d" ")
   if [ -n "\\$device_to_mount" ]; then
+    echo " * Running: hab studio runs for es data"
     hab studio run 'mkdir -p /hab/svc/automate-elasticsearch/data'
     hab studio run "mount -o discard /dev/\\$device_to_mount /hab/svc/automate-elasticsearch/data"
     hab studio run 'mkdir -p /hab/svc/automate-elasticsearch/data/es_data && chown -R hab:hab /hab/svc/automate-elasticsearch/data/es_data'
   fi
+  echo " * Running: hab studio enter"
   hab studio enter
 fi
 EOF
@@ -274,6 +288,7 @@ STUDIORC="#{home_dir}/automate/.studiorc"
 echo 'printf "\033[0;31m>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n>>> TWO MORE STEPS NEEDED TO RUN A2 <<<\n<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<\033[0m\n"' >> $STUDIORC
 echo 'printf "1. Run this here:\033[1;32m start_all_services \033[0m\n"' >> $STUDIORC
 echo 'printf "2. Run the A2 UI:\033[1;34m $(cat /src/url.txt) \033[0m\n"' >> $STUDIORC
+echo 'Done, run `vagrant ssh` now to complete the setup.'
 SCRIPT
 
 if ENV['AWS_SSH_KEY_PATH'].nil?
@@ -323,8 +338,8 @@ Vagrant.configure('2') do |config|
   end
 
   config.ssh.forward_agent = true
-  config.vm.provision 'shell', inline: $install_hab
-  config.vm.provision 'shell', inline: $install_victorias_bits, :privileged => true
-  config.vm.provision 'shell', inline: $github_clone_automate
-  config.vm.provision 'shell', inline: $enter_studio
+  config.vm.provision 'Install hab', type: 'shell', inline: $install_hab
+  config.vm.provision 'Install Victoria\'s bits', type: 'shell', inline: $install_victorias_bits, :privileged => true
+  config.vm.provision 'Github clone automate', type: 'shell', inline: $github_clone_automate
+  config.vm.provision 'Enter hab studio', type: 'shell', inline: $enter_hab_studio
 end

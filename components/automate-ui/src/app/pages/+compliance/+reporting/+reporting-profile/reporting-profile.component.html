@@ -76,6 +76,10 @@
                   <chef-icon>help</chef-icon>
                   <span>{{ control.skipped | number }}</span>
                 </span>
+                <span class="control-result" [ngClass]="{'waived': control.waived > 0}">
+                  <div class="waived-icon"></div>
+                  <span>{{ control.waived | number }}</span>
+                </span>
               </chef-td>
               <chef-td>
                 <chef-button secondary (click)="onControlClick(control.control)">

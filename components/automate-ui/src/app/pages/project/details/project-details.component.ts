@@ -3,7 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest } from 'rxjs';
-import { filter, pluck, takeUntil } from 'rxjs/operators';
+import { filter, pluck, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
@@ -11,9 +11,7 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { routeParams, routeURL } from 'app/route.selectors';
 import { Regex } from 'app/helpers/auth/regex';
 import { EntityStatus, allLoaded, pending } from 'app/entities/entities';
-import {
-  getStatus, updateStatus, projectFromRoute
-} from 'app/entities/projects/project.selectors';
+import { getStatus, updateStatus, projectFromRoute } from 'app/entities/projects/project.selectors';
 import { Project } from 'app/entities/projects/project.model';
 import { GetProject, UpdateProject } from 'app/entities/projects/project.actions';
 import { GetRulesForProject, DeleteRule } from 'app/entities/rules/rule.actions';
@@ -131,6 +129,15 @@ export class ProjectDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed))
       .subscribe(() => {
         this.store.dispatch(new GetProject({ id: this.id }));
+      });
+
+    // when project becomes applied need to also mark rules applied
+    this.store.select(projectFromRoute).pipe(
+      distinctUntilChanged(),
+      filter(project => project && project.status === 'RULES_APPLIED'),
+      takeUntil(this.isDestroyed))
+      .subscribe(project => {
+        this.store.dispatch(new GetRulesForProject({ project_id: project.id }));
       });
   }
 

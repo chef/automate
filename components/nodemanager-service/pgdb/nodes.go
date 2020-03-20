@@ -1011,10 +1011,10 @@ func (tx *DBTrans) updateNodeProjects(nodeID string, projectIDs []string) error 
 	}
 
 	insertProject, err := tx.Prepare(`
-		INSERT into projects (id, project_id)
-		VALUES ($1, $2)
-		ON CONFLICT DO NOTHING
-	`)
+				INSERT into projects (id, project_id)
+				VALUES ($1, $2)
+				ON CONFLICT DO NOTHING
+			`)
 	if err != nil {
 		return err
 	}
@@ -1032,6 +1032,63 @@ func (tx *DBTrans) updateNodeProjects(nodeID string, projectIDs []string) error 
 		FROM projects
 		WHERE project_id = ANY($2)
 	`, nodeID, pq.Array(projectIDs))
+
+	return err
+}
+
+type nodeUpdate struct {
+	nodeID     string
+	projectIDs []string
+}
+
+func (tx *DBTrans) ensureProjects(allProjectIDs []string) error {
+	insertProject, err := tx.Prepare(`
+		INSERT into projects (id, project_id)
+		VALUES ($1, $2)
+		ON CONFLICT DO NOTHING`)
+	if err != nil {
+		return err
+	}
+	defer insertProject.Close()
+
+	for _, projectID := range allProjectIDs {
+		_, err := insertProject.Exec(createUUID(), projectID)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (tx *DBTrans) bulkUpdateNodeProjects(nodeUpdates []nodeUpdate) error {
+
+	deleteStmt, err := tx.Prepare(`DELETE FROM nodes_projects WHERE node_id = $1;`)
+	if err != nil {
+		return err
+	}
+	defer deleteStmt.Close()
+
+	updateStmt, err := tx.Prepare(`	
+		INSERT into nodes_projects (node_id, project_id)
+			SELECT $1, id
+			FROM projects
+			WHERE project_id = ANY($2)`)
+	if err != nil {
+		return err
+	}
+	defer updateStmt.Close()
+
+	for _, n := range nodeUpdates {
+		_, err := deleteStmt.Exec(n.nodeID)
+		if err != nil {
+			return err
+		}
+
+		if _, err := updateStmt.Exec(n.nodeID, pq.Array(n.projectIDs)); err != nil {
+			return err
+		}
+	}
 
 	return err
 }
