@@ -53,11 +53,11 @@ describe('projects API', () => {
     // it gets run every time:
     // tslint:disable-next-line:max-line-length
     // https://docs.cypress.io/guides/references/best-practices.html#Using-after-or-afterEach-hooks
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
   });
 
   describe('applying project rules', () => {
