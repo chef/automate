@@ -212,7 +212,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   public preventNegatives(key: string) {
     const allowedKeys = [
       '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',
-      'Backspace', 'ArrowLeft', 'ArrowRight'
+      'Backspace', 'ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Tab'
     ];
     if ( !allowedKeys.includes(key) ) {
       return false;
