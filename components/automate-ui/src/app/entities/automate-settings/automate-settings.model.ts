@@ -125,6 +125,13 @@ export interface JobRequestBody {
   };
 }
 
+export enum InfraJobName {
+  MissingNodes = 'missing_nodes',
+  MissingNodesForDeletion = 'missing_nodes_for_deletion',
+  DeleteNodes = 'delete_nodes',
+  PeriodicPurgeTimeseries = 'periodic_purge_timeseries'
+}
+
 export enum NestedJobName {
   ComplianceReports = 'compliance-reports',
   ComplianceScans = 'compliance-scans',

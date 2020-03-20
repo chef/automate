@@ -18,6 +18,7 @@ import {
   JobSchedulerStatus,
   IngestJob,
   IngestJobs,
+  InfraJobName,
   NestedJobName
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
@@ -416,8 +417,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   private populateInfra(job: IngestJob): void {
     let formThreshold, formUnit;
 
-    switch (job.name) { // strongly type this so that it throws error
-      case 'missing_nodes': {
+    switch (job.name) {
+      case InfraJobName.MissingNodes: {
         this.handleDisable(this.clientRunsRemoveData, job.disabled);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.clientRunsRemoveData.patchValue({
@@ -428,7 +429,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       }
       break;
 
-      case 'missing_nodes_for_deletion': {
+      case InfraJobName.MissingNodesForDeletion: {
         this.handleDisable(this.clientRunsLabelMissing, job.disabled);
         [formThreshold, formUnit] = this.splitThreshold(job.threshold);
         this.clientRunsLabelMissing.patchValue({
@@ -439,12 +440,12 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       }
       break;
 
-      case 'delete_nodes': {
+      case InfraJobName.DeleteNodes: {
         // delete_nodes not implemented
       }
       break;
 
-      case 'periodic_purge_timeseries': {
+      case InfraJobName.PeriodicPurgeTimeseries: {
         this.populateNested(job);
       }
       break;
@@ -463,9 +464,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         disabled: _job.disabled
       };
 
-      const nestedJobName: NestedJobName = _job.name; // Assigning early for strong typing
-      switch (nestedJobName) {
-
+      switch (_job.name) {
         case NestedJobName.ComplianceReports: {
           this.handleDisable(this.complianceRemoveReports, _job.disabled);
           this.complianceRemoveReports.patchValue(form);
