@@ -63,7 +63,7 @@ export class ServiceGroupsComponent implements OnInit, OnDestroy {
 
   // The currently selected health status filter
   public selectedStatus = 'total';
-  private selectedStatus$: Observable<string>;
+  public selectedStatus$: Observable<string>;
 
   // The collection of allowable status
   private allowedStatus = ['ok', 'critical', 'warning', 'unknown', 'disconnected'];
