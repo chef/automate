@@ -252,7 +252,14 @@ func serve(ctx context.Context, config *config.Nodemanager, connFactory *securec
 			return err
 		}
 
+		// deprecated stuff
 		err = project_update_lib.RegisterTaskExecutors(projectUpdateManager, "nodemanager",
+			db, authzProjectsClient)
+		if err != nil {
+			return err
+		}
+
+		err = project_update_lib.RegisterSerialTaskExecutors(projectUpdateManager, "nodemanager",
 			db, authzProjectsClient)
 		if err != nil {
 			return err

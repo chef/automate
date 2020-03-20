@@ -14,9 +14,19 @@ import (
 	"github.com/chef/automate/components/nodemanager-service/pgdb"
 	"github.com/gofrs/uuid"
 	"github.com/golang/protobuf/ptypes"
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
+
+func runProjectUpdate(t *testing.T, db *pgdb.DB, projectRules map[string]*iam_v2.ProjectRules) {
+	t.Helper()
+	ctx := context.Background()
+	tasks, err := db.ListProjectUpdateTasks(ctx)
+	require.NoError(t, err)
+	for _, task := range tasks {
+		_, _, err := db.RunProjectUpdateTask(ctx, "", task.Params, projectRules)
+		require.NoError(t, err)
+	}
+}
 
 func TestProjectUpdateDoesNotUpdateManagedNodes(t *testing.T) {
 	ctx := context.Background()
@@ -61,11 +71,7 @@ func TestProjectUpdateDoesNotUpdateManagedNodes(t *testing.T) {
 			defer db.DeleteNode(nodeID)
 
 			// Update project
-			jobIDs, err := db.UpdateProjectTags(ctx, projectRules)
-			require.NoError(t, err)
-			require.Equal(t, 1, len(jobIDs))
-
-			waitForJobToComplete(ctx, t, db, jobIDs[0])
+			runProjectUpdate(t, db, projectRules)
 
 			// Get node
 			processedNode, err := db.GetNode(ctx, nodeID)
@@ -91,7 +97,7 @@ func TestProjectUpdateDoesNotUpdateManagedNodes(t *testing.T) {
 			processedNode, err = db.GetNode(ctx, nodeID)
 			require.NoError(t, err)
 
-			assert.ElementsMatch(t, []string{}, processedNode.Projects)
+			require.ElementsMatch(t, []string{}, processedNode.Projects)
 		})
 
 }
@@ -2280,31 +2286,14 @@ func TestProjectUpdate(t *testing.T) {
 				defer db.DeleteNode(nodeID)
 
 				// Update project
-				jobIDs, err := db.UpdateProjectTags(ctx, test.projectRules)
-				require.NoError(t, err)
-				require.Equal(t, 1, len(jobIDs))
-
-				waitForJobToComplete(ctx, t, db, jobIDs[0])
+				runProjectUpdate(t, db, test.projectRules)
 
 				// Get Update node
 				processedNode, err := db.GetNode(ctx, nodeID)
 				require.NoError(t, err)
 
-				assert.ElementsMatch(t, test.expectedProjectIDs, processedNode.Projects)
+				require.ElementsMatch(t, test.expectedProjectIDs, processedNode.Projects)
 			})
-	}
-}
-
-func waitForJobToComplete(ctx context.Context, t *testing.T, db *pgdb.DB, jobID string) {
-	jobStatus, err := db.JobStatus(ctx, jobID)
-	assert.NoError(t, err)
-	for !jobStatus.Completed {
-		time.Sleep(time.Millisecond * 5)
-		jobStatus, err = db.JobStatus(ctx, jobID)
-		assert.NoError(t, err)
-		if err != nil {
-			assert.FailNow(t, "testing job status")
-		}
 	}
 }
 
