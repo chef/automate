@@ -4,11 +4,6 @@ export class JobSchedulerStatus {
   constructor(ingestJobs: IngestJob[]) {
     this.jobs = ingestJobs;
   }
-
-  // Will need to add category as an argument as well
-  getJob(name: string): IngestJob {
-    return this.jobs.find((job: IngestJob) => job.name === name);
-  }
 }
 
 export interface ConfigureSettingsRequest {
@@ -47,23 +42,6 @@ export interface RespJobSchedulerStatus {
 // IngestJobs is an enum that defines the list of jobs that the
 // JobScheduler has inside the ingest-service
 export enum IngestJobs {
-
-  // ***************** NEEDS UPDATE TO MATCH NEW JOB SCHEDULER ***************** //
-
-  // INFRA //
-  // DeleteNodes: Removes completely from elasticsearch nodes that
-  // have been marked for deletion
-  // DeleteNodes = 'delete_nodes',
-
-  // // MissingNodes: Checks when a node hasn't check-in
-  // // for a period of time
-  // MissingNodes = 'missing_nodes',
-
-  // // MissingNodesForDeletion: Checks when a node has been missing
-  // // for a period of time
-  // MissingNodesForDeletion = 'missing_nodes_for_deletion',
-
-
   //  EventFeed
   EventFeedRemoveData = 'eventFeedRemoveData',
   EventFeedServerActions = 'eventFeedServerActions',
@@ -112,4 +90,45 @@ export class IngestJob {
       this.last_ended_at = new Date(respJob.last_ended_at);
     }
   }
+}
+
+export class UnfurledJob {
+  disabled: boolean;
+  policy_name?: string;
+  older_than_days?: number;
+  name?: string;
+  threshold?: string;
+}
+
+export interface JobRequestComponent {
+  name: string;
+  purge_policies: {
+    elasticsearch: UnfurledJob[];
+  };
+}
+
+export interface JobRequestBody {
+  infra: {
+    // Infra is a special case and con contain a JobRequestComponent
+    // or an UnfurledJob depending on the API
+    job_settings: JobRequestComponent[] | UnfurledJob;
+  };
+  compliance: {
+    job_settings: JobRequestComponent[]
+  };
+  event_feed: {
+    job_settings: JobRequestComponent[]
+  };
+  // services has not yet been implemented so we will leave as optional for now
+  services?: {
+    job_settings: JobRequestComponent[]
+  };
+}
+
+export enum NestedJobName {
+  ComplianceReports = 'compliance-reports',
+  ComplianceScans = 'compliance-scans',
+  Feed = 'feed',
+  Actions = 'actions',
+  ConvergeHistory = 'converge-history'
 }

@@ -8,7 +8,9 @@ import {
   JobSchedulerStatus,
   RespJob,
   IngestJob,
-  RespJobSchedulerStatus
+  RespJobSchedulerStatus,
+  UnfurledJob,
+  JobRequestBody
 } from './automate-settings.model';
 
 // import { environment } from '../../../environments/environment';
@@ -36,40 +38,40 @@ export class AutomateSettingsRequests {
   configureIngestJobs(jobs: IngestJob[]): Observable<any> {
     const url = '/api/v0/data-lifecycle/config';
 
-    const body = {  // add strong typing  --> see sidebar types
+    const body: JobRequestBody = {
       infra : {
         job_settings: [
           {
-            'name': 'periodic_purge_timeseries',
-            'purge_policies': {
-              'elasticsearch': []
+            name: 'periodic_purge_timeseries',
+            purge_policies: {
+              elasticsearch: []
             }
           }
         ]
       },
-      'compliance': {
-        'job_settings': [
+      compliance: {
+        job_settings: [
           {
-            'name': 'periodic_purge',
-            'purge_policies': {
-            'elasticsearch': []
+            name: 'periodic_purge',
+            purge_policies: {
+            elasticsearch: []
             }
           }
         ]
       },
-      'event_feed': {
-        'job_settings': [
+      event_feed: {
+        job_settings: [
           {
-            'name': 'periodic_purge',
-            'purge_policies': {
-            'elasticsearch': []
+            name: 'periodic_purge',
+            purge_policies: {
+            elasticsearch: []
             }
           }
         ]
       }
     };
 
-    jobs.forEach((job: IngestJob) => {
+    jobs.forEach((job: IngestJob): void => {
       let thisJob;
       let matchedNest;
 
@@ -84,8 +86,8 @@ export class AutomateSettingsRequests {
         case 'periodic_purge_timeseries': // fallthrough
         case 'periodic_purge':
           thisJob = this.unfurlIngestJob(job, true);
-          matchedNest = body[job.category].job_settings.find(item => item['name'] === job.name);
-          matchedNest.purge_policies['elasticsearch'].push(thisJob);
+          matchedNest = body[job.category].job_settings.find(item => item.name === job.name);
+          matchedNest.purge_policies.elasticsearch.push(thisJob);
           break;
 
         default:
@@ -97,18 +99,18 @@ export class AutomateSettingsRequests {
     return this.http.put<any>(url, body);
   }
 
-  private unfurlIngestJob(job: IngestJob, nested: boolean = false) {
+  private unfurlIngestJob(job: IngestJob, nested: boolean = false): UnfurledJob {
     if (nested) {
       return {
-        'policy_name': job.nested_name,
-        'older_than_days': parseInt(job.threshold, 10),
-        'disabled': job.disabled
+        policy_name: job.nested_name,
+        older_than_days: parseInt(job.threshold, 10),
+        disabled: job.disabled
       };
     } else {
       return {
-        'name': job.name,
-        'threshold': job.threshold,
-        'disabled': job.disabled
+        name: job.name,
+        threshold: job.threshold,
+        disabled: job.disabled
       };
     }
   }

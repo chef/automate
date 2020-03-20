@@ -17,7 +17,8 @@ import {
 import {
   JobSchedulerStatus,
   IngestJob,
-  IngestJobs
+  IngestJobs,
+  NestedJobName
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
@@ -462,33 +463,34 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         disabled: _job.disabled
       };
 
-      switch (_job.name) { // strongly type this so that it throws error
+      const nestedJobName: NestedJobName = _job.name; // Assigning early for strong typing
+      switch (nestedJobName) {
 
-        case 'compliance-reports': {
+        case NestedJobName.ComplianceReports: {
           this.handleDisable(this.complianceRemoveReports, _job.disabled);
           this.complianceRemoveReports.patchValue(form);
         }
         break;
 
-        case 'compliance-scans': {
+        case NestedJobName.ComplianceScans: {
           this.handleDisable(this.complianceRemoveScans, _job.disabled);
           this.complianceRemoveScans.patchValue(form);
         }
         break;
 
-        case 'feed': {
+        case NestedJobName.Feed: {
           this.handleDisable(this.eventFeedRemoveData, _job.disabled);
           this.eventFeedRemoveData.patchValue(form);
         }
         break;
 
-        case 'actions': {
+        case NestedJobName.Actions: {
           this.handleDisable(this.eventFeedServerActions, _job.disabled);
           this.eventFeedServerActions.patchValue(form);
         }
         break;
 
-        case 'converge-history': {
+        case NestedJobName.ConvergeHistory: {
           this.handleDisable(this.clientRunsRemoveNodes, _job.disabled);
           this.clientRunsRemoveNodes.patchValue(form);
         }
