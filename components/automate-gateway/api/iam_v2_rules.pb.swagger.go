@@ -16,6 +16,8 @@ func init() {
   "paths": {
     "/iam/v2/apply-rules": {
       "get": {
+        "summary": "Gets the status of a project update",
+        "description": "Gets the percentage complete of an ongoing project update and whether or not it failed\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:rules:status\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ApplyRulesStatus",
         "responses": {
           "200": {
@@ -26,10 +28,12 @@ func init() {
           }
         },
         "tags": [
-          "Rules"
+          "rules"
         ]
       },
       "delete": {
+        "summary": "Cancels project update",
+        "description": "Cancels an ongoing project update. This action leaves the system in an unknown state that\nonly another successful project update can rectify.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:rules:cancel\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ApplyRulesCancel",
         "responses": {
           "200": {
@@ -40,10 +44,12 @@ func init() {
           }
         },
         "tags": [
-          "Rules"
+          "rules"
         ]
       },
       "post": {
+        "summary": "Starts project update",
+        "description": "Any changes to a project's rules are staged first. They do not take effect until \nall projects are updated.\n\nUpdating all projects begins an operation that applies all pending rule edits \nand then moves ingested resources into the correct projects according to those latest changes.\n\nWith a large amount of historical compliance data, rule application can take a considerable amount of time.\nIt’s best to batch up rule changes and apply them all at once.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:rules:apply\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ApplyRulesStart",
         "responses": {
           "200": {
@@ -54,12 +60,14 @@ func init() {
           }
         },
         "tags": [
-          "Rules"
+          "rules"
         ]
       }
     },
     "/iam/v2/projects/{id}/rules": {
       "get": {
+        "summary": "Lists a project's rules",
+        "description": "Lists all of the project rules of a specific project.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "ListRulesForProject",
         "responses": {
           "200": {
@@ -72,18 +80,21 @@ func init() {
         "parameters": [
           {
             "name": "id",
+            "description": "ID of the project.",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "Rules"
+          "rules"
         ]
       }
     },
     "/iam/v2/projects/{project_id}/rules": {
       "post": {
+        "summary": "Creates a project rule",
+        "description": "Creates a new project rule to be used to associate ingested resources with projects within Automate.\n\nA project rule contains conditions that determine if an ingested resource should be moved into the rule’s project. \n\nEach project rule condition specifies a value or values to match for a particular attribute on an ingested resource. \nThe choice of attributes depends on the rule type, either NODE or EVENT.\n\nEach rule condition also specifies an operator, either MEMBER_OF, \nin the case of multiple values, or EQUALS, in the case of a single value. \n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "CreateRule",
         "responses": {
           "200": {
@@ -96,6 +107,7 @@ func init() {
         "parameters": [
           {
             "name": "project_id",
+            "description": "Unique ID of the project this rule belongs to. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -110,12 +122,20 @@ func init() {
           }
         ],
         "tags": [
-          "Rules"
+          "rules"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Example Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"MEMBER_OF\", \"values\": [\"example.co\", \"example.io\"]}]}"
+          }
         ]
       }
     },
     "/iam/v2/projects/{project_id}/rules/{id}": {
       "get": {
+        "summary": "Gets a project rule",
+        "description": "Returns the details for a project rule.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:get\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetRule",
         "responses": {
           "200": {
@@ -128,22 +148,26 @@ func init() {
         "parameters": [
           {
             "name": "project_id",
+            "description": "ID of the project the rule belongs to.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "ID of the project rule.",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "Rules"
+          "rules"
         ]
       },
       "delete": {
+        "summary": "Deletes a project rule",
+        "description": "The resulting change to the project's resources does not take effect immediately. \nUpdates to project rules must be applied to ingested resources by a project update.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "DeleteRule",
         "responses": {
           "200": {
@@ -156,22 +180,26 @@ func init() {
         "parameters": [
           {
             "name": "project_id",
+            "description": "ID of the project the rule belongs to.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "ID of the project rule.",
             "in": "path",
             "required": true,
             "type": "string"
           }
         ],
         "tags": [
-          "Rules"
+          "rules"
         ]
       },
       "put": {
+        "summary": "Updates a project rule",
+        "description": "Updates the name and conditions of an existing project rule.\nNew conditions can be added. Existing conditions can be updated or removed.\n\nThis operation overwrites all fields excepting ID and Type,\nincluding those omitted from the request, so be sure to specify all properties.\nProperties that you do not include are reset to empty values.\n\nThe resulting change to the project's resources does not take effect immediately. \nUpdates to project rules must be applied to ingested resources by a project update.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\niam:projects:update\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "UpdateRule",
         "responses": {
           "200": {
@@ -184,12 +212,14 @@ func init() {
         "parameters": [
           {
             "name": "project_id",
+            "description": "Unique ID of the project this rule belongs to. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "id",
+            "description": "Unique ID. Cannot be changed.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -204,7 +234,13 @@ func init() {
           }
         ],
         "tags": [
-          "Rules"
+          "rules"
+        ],
+        "x-code-samples": [
+          {
+            "lang": "JSON",
+            "source": "{\"id\": \"example-rule\", \"project-id\": \"example-project\", \"name\": \"My Updated Rule\", \"type\": \"NODE\", \"conditions\": [{\"attribute\": \"CHEF_SERVER\", \"operator\": \"EQUALS\", \"values\": [\"example.co\"]}]}"
+          }
         ]
       }
     }
@@ -218,6 +254,14 @@ func init() {
     },
     "chef.automate.api.iam.v2.ApplyRulesStatusResp": {
       "type": "object",
+      "example": {
+        "state": "running",
+        "estimated_time_complete": "2020-03-20T19:24:55Z",
+        "percentage_complete": 0.5,
+        "failed": false,
+        "failure_message": "",
+        "cancelled": false
+      },
       "properties": {
         "state": {
           "type": "string"
@@ -247,16 +291,19 @@ func init() {
       "type": "object",
       "properties": {
         "attribute": {
-          "$ref": "#/definitions/chef.automate.api.iam.v2.ConditionAttribute"
+          "$ref": "#/definitions/chef.automate.api.iam.v2.ConditionAttribute",
+          "description": "Represents a property of an ingested resource. Depends on the rule type."
         },
         "values": {
           "type": "array",
           "items": {
             "type": "string"
-          }
+          },
+          "description": "The value(s) of the attribute that an ingested resource must match."
         },
         "operator": {
-          "$ref": "#/definitions/chef.automate.api.iam.v2.ConditionOperator"
+          "$ref": "#/definitions/chef.automate.api.iam.v2.ConditionOperator",
+          "description": "Whether the attribute matches a single value (` + "`" + `EQUALS` + "`" + `) or \nmatches at least one of a set of values (` + "`" + `MEMBER_OF` + "`" + `)."
         }
       }
     },
@@ -285,24 +332,45 @@ func init() {
     },
     "chef.automate.api.iam.v2.CreateRuleReq": {
       "type": "object",
+      "example": {
+        "id": "example-rule",
+        "project-id": "example-project",
+        "name": "My Example Rule",
+        "type": "NODE",
+        "conditions": [
+          {
+            "attribute": "CHEF_SERVER",
+            "operator": "MEMBER_OF",
+            "values": [
+              "example.co",
+              "example.io"
+            ]
+          }
+        ]
+      },
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID. Cannot be changed."
         },
         "project_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID of the project this rule belongs to. Cannot be changed."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the project rule."
         },
         "type": {
-          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType"
+          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType",
+          "description": "Whether the rule is ` + "`" + `STAGED` + "`" + ` (not in effect) or ` + "`" + `APPLIED` + "`" + ` (in effect)."
         },
         "conditions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Condition"
-          }
+          },
+          "description": "Conditions that ingested resources must match to belong to the project. \nWill contain one or more."
         }
       },
       "required": [
@@ -315,6 +383,23 @@ func init() {
     },
     "chef.automate.api.iam.v2.CreateRuleResp": {
       "type": "object",
+      "example": {
+        "id": "example-rule",
+        "project-id": "example-project",
+        "name": "My Example Rule",
+        "type": "NODE",
+        "conditions": [
+          {
+            "attribute": "CHEF_SERVER",
+            "operator": "MEMBER_OF",
+            "values": [
+              "example.co",
+              "example.io"
+            ]
+          }
+        ],
+        "status": "STAGED"
+      },
       "properties": {
         "rule": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Rule"
@@ -326,6 +411,22 @@ func init() {
     },
     "chef.automate.api.iam.v2.GetRuleResp": {
       "type": "object",
+      "example": {
+        "id": "example-rule",
+        "project-id": "example-project",
+        "name": "My Applied Rule",
+        "type": "NODE",
+        "conditions": [
+          {
+            "attribute": "CHEF_SERVER",
+            "operator": "EQUALS",
+            "values": [
+              "example.co"
+            ]
+          }
+        ],
+        "status": "APPLIED"
+      },
       "properties": {
         "rule": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Rule"
@@ -334,6 +435,44 @@ func init() {
     },
     "chef.automate.api.iam.v2.ListRulesForProjectResp": {
       "type": "object",
+      "example": {
+        "rules": [
+          {
+            "id": "example-rule",
+            "project-id": "example-project",
+            "name": "My Applied Rule",
+            "type": "NODE",
+            "conditions": [
+              {
+                "attribute": "CHEF_SERVER",
+                "operator": "EQUALS",
+                "values": [
+                  "example.co"
+                ]
+              }
+            ],
+            "status": "APPLIED"
+          },
+          {
+            "id": "example-rule-2",
+            "project-id": "example-project",
+            "name": "My 2nd Example Rule",
+            "type": "EVENT",
+            "conditions": [
+              {
+                "attribute": "CHEF_ORGANIZATION",
+                "operator": "MEMBER_OF",
+                "values": [
+                  "east",
+                  "west"
+                ]
+              }
+            ],
+            "status": "APPLIED"
+          }
+        ],
+        "status": "APPLIED"
+      },
       "properties": {
         "rules": {
           "type": "array",
@@ -360,25 +499,31 @@ func init() {
       "type": "object",
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID. Cannot be changed."
         },
         "project_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID of the project this rule belongs to. Cannot be changed."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the project rule."
         },
         "type": {
-          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType"
+          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType",
+          "description": "Whether the rule applies to ingested ` + "`" + `NODE` + "`" + ` or ` + "`" + `EVENT resources.\nCannot be changed."
         },
         "conditions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Condition"
-          }
+          },
+          "description": "Conditions that ingested resources must match to belong to the project. \nWill contain one or more."
         },
         "status": {
-          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleStatus"
+          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleStatus",
+          "description": "Whether the rule is ` + "`" + `STAGED` + "`" + ` (not in effect) or ` + "`" + `APPLIED` + "`" + ` (in effect)."
         }
       }
     },
@@ -402,24 +547,44 @@ func init() {
     },
     "chef.automate.api.iam.v2.UpdateRuleReq": {
       "type": "object",
+      "example": {
+        "id": "example-rule",
+        "project-id": "example-project",
+        "name": "My Updated Rule",
+        "type": "NODE",
+        "conditions": [
+          {
+            "attribute": "CHEF_SERVER",
+            "operator": "EQUALS",
+            "values": [
+              "example.co"
+            ]
+          }
+        ]
+      },
       "properties": {
         "id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID. Cannot be changed."
         },
         "project_id": {
-          "type": "string"
+          "type": "string",
+          "description": "Unique ID of the project this rule belongs to. Cannot be changed."
         },
         "name": {
-          "type": "string"
+          "type": "string",
+          "description": "Name for the project rule."
         },
         "type": {
-          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType"
+          "$ref": "#/definitions/chef.automate.api.iam.v2.RuleType",
+          "description": "Whether the rule applies to ingested ` + "`" + `NODE` + "`" + ` or ` + "`" + `EVENT resources.\nCannot be changed."
         },
         "conditions": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/chef.automate.api.iam.v2.Condition"
-          }
+          },
+          "description": "Conditions that ingested resources must match to belong to the project. \nWill contain one or more."
         }
       },
       "required": [
@@ -432,6 +597,22 @@ func init() {
     },
     "chef.automate.api.iam.v2.UpdateRuleResp": {
       "type": "object",
+      "example": {
+        "id": "example-rule",
+        "project-id": "example-project",
+        "name": "My Updated Rule",
+        "type": "NODE",
+        "conditions": [
+          {
+            "attribute": "CHEF_SERVER",
+            "operator": "EQUALS",
+            "values": [
+              "example.co"
+            ]
+          }
+        ],
+        "status": "STAGED"
+      },
       "properties": {
         "rule": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Rule"
