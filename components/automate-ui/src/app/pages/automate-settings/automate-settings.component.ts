@@ -205,11 +205,6 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     this.isDestroyed.complete();
   }
 
-  printValues() {
-    console.log(this.eventFeedRemoveData);
-    console.log(this.eventFeedServerActions);
-  }
-
   // This prevents a user from being allowed to enter negative numbers
   // or other actions that we dont want to allow
   public preventNegatives(key: string) {
@@ -222,7 +217,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  public toggleInput(form, checked: boolean) {
+  public toggleInput(form, checked: boolean): void {
     // patchValue is a workaround for the chef-checkbox because we need to be
     // able to store a reference to it being checked or not
     form.patchValue({
@@ -267,12 +262,16 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       job.disabled = jobForm.disabled;
 
       // If the user doesn't enter any number at all - this defaults to 0
-      job.threshold = jobForm.threshold === null
-            ? '0' + jobForm.unit
-            : jobForm.threshold + jobForm.unit;
+      if (jobForm.threshold === null) {
+        job.threshold = '0' + jobForm.unit;
+      } else {
+        job.threshold = jobForm.threshold + jobForm.unit;
+      }
+
       if ( isNested ) {
         job.nested_name = jobForm.nested_name;
-        job.threshold = jobForm.threshold;  // Automatically becomes a 0 from parseInt in reqeust
+        job.threshold = jobForm.threshold;  // Automatically becomes a 0 from
+                                            // parseInt in reqeust if left blank
       }
 
       return job;
@@ -289,8 +288,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
           this.store.dispatch(new GetSettings({})); // reset form to previously stored settings
           this.saving = false;
         } else if (changeConfigurationSelector.status === 'loadingSuccess') {
-          this.formChanged = false;
           this.showSuccessNotification();
+          this.formChanged = false;
           this.saving = false;
         }
       });

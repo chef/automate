@@ -241,7 +241,6 @@ describe('AutomateSettingsComponent', () => {
     ], function(formName: string, disabledStatus: boolean, threshold: number | string) {
       it(`when form nested, it updates the ${formName} form group correctly`, () => {
         component.updateForm(mockJobSchedulerStatus);
-        // fixture.detectChanges();
 
         const newFormValues = component[formName].value;
 
@@ -255,11 +254,12 @@ describe('AutomateSettingsComponent', () => {
         component.updateForm(mockJobSchedulerStatus);
         component.applyChanges();
 
-        expect(component.formChanged).toEqual(false);
+        // expect(component.notificationVisible).toBe(true);
         expect(component.notificationType).toEqual('info');
         expect(component.notificationMessage)
         .toEqual('All settings have been updated successfully');
-        expect(component.notificationVisible).toEqual(true);
+        expect(component.formChanged).toEqual(false);
+        // expect(component.saving).toEqual(false);
       });
 
       xdescribe('and there is an error', () => {
