@@ -386,7 +386,7 @@ func TestCheckinCount(t *testing.T) {
 			},
 		},
 		{
-			description: "filtering",
+			description: "filtering environment",
 			now:         parseTime(t, "2020-03-15T12:34:00Z"),
 			daysAgo:     3,
 			filter: map[string][]string{
