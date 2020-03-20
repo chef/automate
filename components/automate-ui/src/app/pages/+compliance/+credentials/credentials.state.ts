@@ -22,10 +22,10 @@ interface KVData {
 }
 
 export enum CredentialTypes {
-  None = <any>'none',
-  SSH = <any>'ssh',
-  WinRM = <any>'winrm',
-  Sudo = <any>'sudo'
+  None = 'none',
+  SSH = 'ssh',
+  WinRM = 'winrm',
+  Sudo = 'sudo'
 }
 
 export interface Credential {
