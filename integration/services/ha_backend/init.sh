@@ -10,6 +10,7 @@ ha_backend_container2=$(service_container_name "ha_backend_2")
 
 ha_backend_private=$(service_config_path "ha_backend_private")
 ha_backend_config=$(service_config_path "ha_backend.toml")
+ha_admin_pg_password='thisisapassword%u'
 
 ha_backend_setup() {
     mkdir -p "$ha_backend_private"
@@ -84,10 +85,10 @@ ha_backend_setup() {
     for try in {1..60}; do
         echo "Trying to create dbuser (attempt #${try})"
         errcode="0"
-        output="$(docker exec --env PGPASSWORD="thisisapassword" --env HAB_LICENSE=accept-no-persist "$ha_backend_container1" \
+        output="$(docker exec --env PGPASSWORD="$ha_admin_pg_password" --env HAB_LICENSE=accept-no-persist "$ha_backend_container1" \
 	hab pkg exec core/postgresql11 psql \
             -h 127.0.0.1 -p 7432 -U admin -d postgres -c \
-            "CREATE USER dbuser WITH PASSWORD 'thisisapassword'")" || errcode="$?"
+            "CREATE USER dbuser WITH PASSWORD '$ha_admin_pg_password'")" || errcode="$?"
         if [ "$errcode" -eq "0" ]; then
             break
         else
@@ -138,10 +139,10 @@ scheme = "password"
 
 [global.v1.external.postgresql.auth.password.superuser]
 username = "admin"
-password = "thisisapassword"
+password = "$ha_admin_pg_password"
 [global.v1.external.postgresql.auth.password.dbuser]
 username = "dbuser"
-password = "thisisapassword"
+password = "$ha_admin_pg_password"
 
 [global.v1.external.postgresql.backup]
 enable = true
