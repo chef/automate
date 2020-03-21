@@ -3,8 +3,8 @@
     <main>
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', org?.server_id]">Orgs</chef-breadcrumb>
-        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', org?.server_id, role?.name]">Roles</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
+        <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, role?.name]">Roles</chef-breadcrumb>
          {{role?.name}}
       </chef-breadcrumbs>
       <chef-page-header>
@@ -30,8 +30,7 @@
           <treetable 
             [tree]="arrayOfNodesTree">
           </treetable>
-      </div>
-        
+        </div>
       </section>
     </main>
   </div>
