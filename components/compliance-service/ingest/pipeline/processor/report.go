@@ -46,11 +46,13 @@ func ComplianceReport(in <-chan message.Compliance) <-chan message.Compliance {
 				ChefTags:         msg.Report.ChefTags,
 				FQDN:             msg.Report.Fqdn,
 			}
+
+			copyOfIpAddress := msg.Report.Ipaddress
 			// Elastic won't accept empty string for a field of data type 'ip'
-			if msg.Report.Ipaddress == "" {
+			if copyOfIpAddress == "" {
 				msg.InspecReport.IPAddress = nil
 			} else {
-				*msg.InspecReport.IPAddress = msg.Report.Ipaddress
+				msg.InspecReport.IPAddress = &copyOfIpAddress
 			}
 			msg.InspecReport.Platform.Name = msg.Report.GetPlatform().GetName()
 			msg.InspecReport.Platform.Release = msg.Report.GetPlatform().GetRelease()
