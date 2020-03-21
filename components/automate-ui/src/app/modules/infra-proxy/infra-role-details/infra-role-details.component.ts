@@ -2,7 +2,6 @@ import { Component, OnInit, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { combineLatest } from 'rxjs';
-import { Node } from 'ng-material-treetable';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { routeParams, routeURL } from 'app/route.selectors';
@@ -15,9 +14,6 @@ import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 
 export type InfraRoleTabName = 'runList';
 
-export interface RoleList {
-  name: string;
-}
 
 @Component({
   selector: 'app-infra-role-details',
@@ -38,7 +34,24 @@ export class InfraRoleDetailsComponent implements OnInit {
   public isLoading = true;
   public runList: string[];
   public show = false;
-  public arrayOfNodesTree: Node<RoleList>[] = [];
+  public data: any = [];
+
+  configs: any = {
+    id_field: 'id',
+    parent_id_field: 'parent',
+    parent_display_field: 'name',
+    css: { // Optional
+      expand_class: 'fa fa-caret-right',
+      collapse_class: 'fa fa-caret-down'
+    },
+    columns: [
+      {
+        name: 'name',
+        header: 'Name',
+        width: '50px'
+      }
+    ]
+  };
 
   constructor(
     private store: Store<NgrxStateAtom>,
@@ -47,7 +60,7 @@ export class InfraRoleDetailsComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    this.arrayOfNodesTree  = [];
+    this.data = [];
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     this.store.select(routeURL).pipe()
     .subscribe((url: string) => {
@@ -76,22 +89,22 @@ export class InfraRoleDetailsComponent implements OnInit {
       .subscribe(([_, role]) => {
         this.role = { ...role };
         this.runList = this.role.run_list;
+        this.show = true;
         if (this.runList && this.runList.length) {
-          this.treenodes(this.runList);
+          this.show = true;
+          this.treeNodes(this.runList);
         } else {
           this.show = false;
         }
       });
   }
 
-  treenodes(runList: string[]) {
-    this.show = true;
+  treeNodes(runList: string[]) {
     for ( let i = 0; i < runList.length; i++) {
-      this.arrayOfNodesTree.push({
-        value : {
-          name: runList[i]
-        },
-        children: []
+      this.data.push({
+        id : i + 1,
+        name: runList[i],
+        parent: 0
       });
     }
   }
