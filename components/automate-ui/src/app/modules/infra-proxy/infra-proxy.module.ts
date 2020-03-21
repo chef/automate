@@ -12,8 +12,7 @@ import { InfraRolesListComponent } from './infra-roles-list/infra-roles-list.com
 import { InfraRoleDetailsComponent } from './infra-role-details/infra-role-details.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
-import { TreetableModule } from 'ng-material-treetable';
-
+import { AngularTreeGridModule } from 'angular-tree-grid';
 
 @NgModule({
   declarations: [
@@ -30,7 +29,7 @@ import { TreetableModule } from 'ng-material-treetable';
     AppRoutingModule,
     ChefComponentsModule,
     ChefPipesModule,
-    TreetableModule,
+    AngularTreeGridModule,
     FormsModule,
     ReactiveFormsModule
   ],
