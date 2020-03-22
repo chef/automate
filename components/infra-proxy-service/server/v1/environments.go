@@ -43,8 +43,15 @@ func (s *Server) GetEnvironment(ctx context.Context, req *request.Environment) (
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	defaultAttributes, _ := json.Marshal(en.DefaultAttributes)
-	overrideAttributes, _ := json.Marshal(en.OverrideAttributes)
+	defaultAttributes, err := json.Marshal(en.DefaultAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	overrideAttributes, err := json.Marshal(en.OverrideAttributes)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 
 	return &response.Environment{
 		Name:               en.Name,
