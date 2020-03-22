@@ -14,6 +14,7 @@ toc = true
 +++
 
 ## Overview
+
 Data Lifecycle manages the retention of events, service groups, Chef Client runs, compliance reports and scans in Chef Automate. Chef Automate stores data from the ingest-service, event-feed-service, compliance-service and applications-service in ElasticSearch or PostgreSQL. Over time you may wish to remove that data from Chef Automate by using the data lifecycle settings.  
 
 {{% warning %}}
@@ -29,15 +30,19 @@ Only userse with `dataLifecycle:*` IAM access are able to see the data lifecycle
 ![](/images/docs/data-lifecycle.png)
 
 ### Event Feed
+
 The event feed data lifecycle settings allow you to remove all event feed data and chef server actions after a set amount of days. The default is to remove event feed data after 7 days, and Chef Infra Server actions after 30 days.
 
 ### Service Groups
+
 The service group data lifecycle settings are shown in the UI, but cannot be changed in the UI. Instead, you can use the API to adjust these settings. The default is to label health check reports as disconnected after 5 minutes, and remove disconnected services after 5 days.
 
 ### Client Runs
+
 The Client Runs data lifecycle settings allow you to remove data after a set amount of days. They also allow you to label nodes as missing and automatically remove them after a set amount of days. The default is to remove Chef Client run data after 1 day, to label nodes as missing after 30 days, and to remove nodes labeled as missing after 30 days.
 
 ### Compliance
+
 The Compliance data lifecycle settings allow you to remove compliance reports and compliance scans after a set amount of days. The default is to remove compliance reports after 60 days, and to remove compliance scans after 60 days.
 
 ## Data Lifecycle API
