@@ -103,7 +103,7 @@ See more about [policyfiles](https://docs.chef.io/policyfile/).
 
 ### Managing Missing Nodes
 
-Configure the timing for marking nodes as missing and then deleting them from [Node Lifecycle]({{< relref "node-lifecycle.md" >}}) on the Settings tab.
+Configure the timing for labeling nodes as missing and then deleting them from [Data Lifecycle]({{< relref "data-lifecycle.md" >}}) on the Settings tab.
 
 ### Deleting Missing Nodes
 

@@ -103,9 +103,7 @@ See the [Habitat CLI documentation](https://www.habitat.sh/docs/habitat-cli/#hab
 
 ### Marking a Service as Disconnected
 
-Configure the threshold for marking a service as disconnected through either Chef Automate or the Chef Automate API.
-To access the configuration settings in Chef Automate, navigate to the **Settings** tab and then select _Node Lifecycle_ on the left sidebar.
-Change the _Missing_ and _Delete_ settings for disconnected services under **Node Lifecycle**.
+Configure the threshold for marking a service as disconnected through the Chef Automate API.
 
 Using the API, change the `threshold` setting for marking a service as disconnected with an API call similar to:
 
@@ -123,9 +121,6 @@ Removing services disconnected after a period of time keeps the dashboard popula
 The removal threshold is optional. The default is 7 days. Disabling the threshold setting provides you with a long-term record of services.
 
 Configure the threshold  for removing a disconnected service through either Chef Automate or the Chef Automate API. The threshold is the amount of time from when a service was marked as disconnected.
-
-To access the configuration in Chef Automate, navigate to the **Settings** tab, then select _Node Lifecycle_ on the sidebar.
-Find the _Missing_ and _Delete_ Node settings under **Node Lifecycle**.
 
 Through the API, disable service removal by setting `"running": false`.
 
