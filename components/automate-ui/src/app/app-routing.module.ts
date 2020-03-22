@@ -252,12 +252,12 @@ const routes: Routes = [
               component: CookbooksListComponent
             },
             {
-              path: ':id/org/:orgid/role',
+              path: ':id/org/:orgid/roles',
               component: InfraRolesListComponent
 
             },
             {
-            path: ':id/org/:orgid/role/:name',
+            path: ':id/org/:orgid/roles/:name',
               component: InfraRoleDetailsComponent
             }
           ]

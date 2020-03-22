@@ -35,6 +35,7 @@ export class InfraRoleDetailsComponent implements OnInit {
   public runList: string[];
   public show = false;
   public data: any = [];
+  roleDetailsLoading = true;
 
   configs: any = {
     id_field: 'id',
@@ -48,7 +49,8 @@ export class InfraRoleDetailsComponent implements OnInit {
       {
         name: 'name',
         header: 'Name',
-        width: '50px'
+        width: '50px',
+        float: 'left'
       }
     ]
   };
@@ -93,6 +95,7 @@ export class InfraRoleDetailsComponent implements OnInit {
         if (this.runList && this.runList.length) {
           this.show = true;
           this.treeNodes(this.runList);
+          this.roleDetailsLoading = false;
         } else {
           this.show = false;
         }
