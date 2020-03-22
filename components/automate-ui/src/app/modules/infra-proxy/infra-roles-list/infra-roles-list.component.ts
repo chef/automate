@@ -22,15 +22,7 @@ import {
   getAllStatus as getAllRolesForOrgStatus
 } from 'app/entities/infra-roles/infra-role.selectors';
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 export type OrgTabName = 'roles';
-=======
-export type OrgTabName = 'roles' | 'details';
->>>>>>> fixed for roles duplicate issue + optimize some code part
-=======
-export type OrgTabName = 'roles';
->>>>>>> Role list tree structure
 
 @Component({
   selector: 'app-infra-roles-list',
@@ -48,25 +40,12 @@ export class InfraRolesListComponent implements OnInit {
   public loading$: Observable<boolean>;
   public isLoading = true;
   public tabValue: OrgTabName = 'roles';
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-  
->>>>>>> fixed for roles duplicate issue + optimize some code part
-=======
->>>>>>> Role list tree structure
+  rolesListLoading = true;
   constructor(
     private store: Store<NgrxStateAtom>,
     private layoutFacade: LayoutFacadeService,
     private router: Router
   ) { }
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    
->>>>>>> fixed for roles duplicate issue + optimize some code part
-=======
->>>>>>> Role list tree structure
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Infrastructure);
     this.store.select(routeURL).pipe()
@@ -95,13 +74,6 @@ export class InfraRolesListComponent implements OnInit {
       this.isLoading =
         !allLoaded([getOrgSt, getRolesSt]) || updateSt === EntityStatus.loading;
     });
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-        
->>>>>>> fixed for roles duplicate issue + optimize some code part
-=======
->>>>>>> Role list tree structure
     combineLatest([
       this.store.select(getStatus),
       this.store.select(getAllRolesForOrgStatus),
@@ -116,15 +88,8 @@ export class InfraRolesListComponent implements OnInit {
     ).subscribe(([_getOrgSt, _getRolesSt, orgState, allInfraRolesState]) => {
       this.org = { ...orgState };
       this.roles = allInfraRolesState;
-<<<<<<< HEAD
-<<<<<<< HEAD
+      this.rolesListLoading = false;
     });
-=======
-    });    
->>>>>>> fixed for roles duplicate issue + optimize some code part
-=======
-    });
->>>>>>> Role list tree structure
   }
 
   onSelectedTab(event: { target: { value: OrgTabName } }) {
