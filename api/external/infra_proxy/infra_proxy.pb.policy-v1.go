@@ -326,4 +326,36 @@ func init() {
 		}
 		return ""
 	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetEnvironments", "infra:chefServers:{server_id}:orgs:{org_id}/environments", "read", "GET", "/infra/servers/{server_id}/orgs/{org_id}/environments", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.Environments); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetEnvironment", "infra:chefServers:{server_id}:orgs:{org_id}/environments", "read", "GET", "/infra/servers/{server_id}/orgs/{org_id}/environment/{name}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.Environment); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "name":
+					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
 }
