@@ -32,4 +32,5 @@ message CheckInCounts {
   string start = 1;
   string end = 2;
   int32 count = 3;
+  int32 total = 4;
 }

@@ -17,6 +17,7 @@ type Client interface {
 	InitializeStore(context.Context) error
 	// @param (context, UTC time, data)
 	InsertNode(context.Context, Node) error
+	InsertIntialNode(ctx context.Context, node UpsertNode) error
 	// @param (context, UTC time, data)
 	InsertRun(context.Context, Run) error
 	// @param (context, UTC time, data)

@@ -17,6 +17,12 @@ type Run struct {
 	UpdatedResourceCount int        `json:"updated_resource_count"`
 }
 
+// UpsertNode Something inspirational
+type UpsertNode struct {
+	Node
+	Created time.Time `json:"created,omitempty"`
+}
+
 // Node is the representation of a Node
 type Node struct {
 	NodeInfo
