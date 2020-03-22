@@ -14,7 +14,7 @@
       </chef-page-header>
       <section class="page-body" *ngIf="tabValue === 'roles'">
         <chef-loading-spinner *ngIf="rolesListLoading" size="50"></chef-loading-spinner>
-        <ng-container>
+        <ng-container *ngIf="!rolesListLoading">
           <chef-table-new>
             <chef-table-header>
               <chef-table-row>
