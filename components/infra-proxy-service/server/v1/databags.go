@@ -58,7 +58,10 @@ func (s *Server) GetDataBagItem(ctx context.Context, req *request.DataBag) (*res
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	data, _ := json.Marshal(ic)
+	data, err := json.Marshal(ic)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
 
 	return &response.DataBag{
 		Data: string(data),
