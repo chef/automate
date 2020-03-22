@@ -1,0 +1,11 @@
+chef-loading-spinner {
+  z-index: 199;
+}
+
+.page-body {
+  chef-loading-spinner {
+    display: block;
+    margin: 100px auto;
+    width: 100px;
+  }
+}
