@@ -26,7 +26,7 @@ import (
 func bindataRead(data []byte, name string) ([]byte, error) {
 	gz, err := gzip.NewReader(bytes.NewBuffer(data))
 	if err != nil {
-		return nil, fmt.Errorf("read %q: %v", name, err)
+		return nil, fmt.Errorf("read %q: %w", name, err)
 	}
 
 	var buf bytes.Buffer
@@ -34,7 +34,7 @@ func bindataRead(data []byte, name string) ([]byte, error) {
 	clErr := gz.Close()
 
 	if err != nil {
-		return nil, fmt.Errorf("read %q: %v", name, err)
+		return nil, fmt.Errorf("read %q: %w", name, err)
 	}
 	if clErr != nil {
 		return nil, err
@@ -90,7 +90,7 @@ func dataA1_elasticsearch_mappingsComplianceTemplateJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/compliance-template.json", size: 5111, mode: os.FileMode(0644), modTime: time.Unix(1566886946, 0)}
+	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/compliance-template.json", size: 5111, mode: os.FileMode(0644), modTime: time.Unix(1554914043, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x80, 0x73, 0x93, 0x83, 0xd, 0xe8, 0x6a, 0x41, 0xce, 0x60, 0x54, 0x83, 0x5f, 0xfe, 0xad, 0x90, 0x12, 0x3a, 0x91, 0xf0, 0xf9, 0xae, 0x1e, 0x49, 0x0, 0x92, 0x72, 0xd8, 0xd2, 0x98, 0x5d, 0xbe}}
 	return a, nil
 }
@@ -110,7 +110,7 @@ func dataA1_elasticsearch_mappingsInsightsTemplateJson() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/insights-template.json", size: 2705, mode: os.FileMode(0644), modTime: time.Unix(1566886946, 0)}
+	info := bindataFileInfo{name: "data/a1_elasticsearch_mappings/insights-template.json", size: 2705, mode: os.FileMode(0644), modTime: time.Unix(1554914043, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x30, 0xf6, 0x70, 0xce, 0xf, 0x2b, 0x35, 0x79, 0x84, 0x27, 0x45, 0xe3, 0xc7, 0x5e, 0x15, 0x7c, 0x9f, 0x57, 0x4e, 0x57, 0x88, 0x17, 0x40, 0x66, 0x91, 0x8a, 0x58, 0x66, 0x54, 0xb5, 0xed, 0xe6}}
 	return a, nil
 }
@@ -130,7 +130,7 @@ func dataA1stub_certsChefautomateupgradefromv1selftestCrl() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crl", size: 958, mode: os.FileMode(0644), modTime: time.Unix(1566886946, 0)}
+	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crl", size: 958, mode: os.FileMode(0644), modTime: time.Unix(1554914043, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x77, 0xcc, 0x17, 0xf2, 0xe5, 0x86, 0x17, 0x26, 0xf6, 0x6, 0xa9, 0x30, 0x16, 0xf, 0x54, 0x6, 0x44, 0xf, 0x27, 0xb2, 0xdd, 0x5a, 0x31, 0x5a, 0x52, 0x7b, 0xac, 0x66, 0x40, 0x9d, 0x2e, 0x5a}}
 	return a, nil
 }
@@ -150,7 +150,7 @@ func dataA1stub_certsChefautomateupgradefromv1selftestCrt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crt", size: 1826, mode: os.FileMode(0644), modTime: time.Unix(1566886946, 0)}
+	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.crt", size: 1826, mode: os.FileMode(0644), modTime: time.Unix(1554914043, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x87, 0xb1, 0x2b, 0x70, 0xe3, 0xf2, 0x57, 0x2e, 0xdf, 0x85, 0xbb, 0x15, 0x84, 0x2d, 0x64, 0xa9, 0x16, 0xf6, 0x5e, 0x3f, 0xaf, 0x88, 0x2f, 0x24, 0xd7, 0x17, 0xf3, 0xf5, 0x4c, 0x1d, 0xe, 0x6}}
 	return a, nil
 }
@@ -170,7 +170,7 @@ func dataA1stub_certsChefautomateupgradefromv1selftestKey() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key", size: 3243, mode: os.FileMode(0644), modTime: time.Unix(1566886946, 0)}
+	info := bindataFileInfo{name: "data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key", size: 3243, mode: os.FileMode(0644), modTime: time.Unix(1554914043, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x4, 0x32, 0x66, 0x33, 0x9a, 0xb6, 0xc1, 0xae, 0x6e, 0x1a, 0x57, 0xe, 0xe2, 0x12, 0x25, 0xed, 0x8d, 0xc, 0x2d, 0x1c, 0x84, 0xac, 0xbd, 0xa4, 0x93, 0x9c, 0x43, 0xe0, 0x2d, 0x9b, 0xdf, 0x18}}
 	return a, nil
 }
@@ -190,7 +190,7 @@ func dataBindsTxt() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/binds.txt", size: 5201, mode: os.FileMode(0644), modTime: time.Unix(1580876820, 0)}
+	info := bindataFileInfo{name: "data/binds.txt", size: 5201, mode: os.FileMode(0644), modTime: time.Unix(1583185370, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0x82, 0xc8, 0x40, 0x97, 0xe5, 0xb6, 0xc8, 0x76, 0x3d, 0x29, 0x62, 0xc4, 0xb9, 0x2a, 0x53, 0x58, 0xcc, 0x34, 0xbb, 0xc8, 0xb2, 0x4a, 0x83, 0x54, 0xf5, 0x2f, 0x87, 0x59, 0x4, 0x9a, 0x29, 0xc2}}
 	return a, nil
 }
@@ -210,7 +210,7 @@ func dataInitConfigToml() (*asset, error) {
 		return nil, err
 	}
 
-	info := bindataFileInfo{name: "data/init-config.toml", size: 1825, mode: os.FileMode(0644), modTime: time.Unix(1578932251, 0)}
+	info := bindataFileInfo{name: "data/init-config.toml", size: 1825, mode: os.FileMode(0644), modTime: time.Unix(1575417674, 0)}
 	a := &asset{bytes: bytes, info: info, digest: [32]uint8{0xf5, 0x21, 0x9c, 0x73, 0xdf, 0xb0, 0xfd, 0xe7, 0xfc, 0xc5, 0xcb, 0xbf, 0x26, 0xc0, 0x6, 0x93, 0xf2, 0x24, 0x9a, 0x96, 0x67, 0x86, 0xa2, 0xae, 0x4e, 0x7c, 0xa0, 0xa8, 0xfd, 0x6, 0xcd, 0xce}}
 	return a, nil
 }
