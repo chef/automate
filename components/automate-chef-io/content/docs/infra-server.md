@@ -14,7 +14,7 @@ toc = true
 
 {{% warning %}}
 
-We do not support using the Chef Automate 2 deployment service to deploy Chef Infra Server with Chef Manage.
+Chef Automate does not deploy Chef Manage alongside Chef Infra Server.
 
 {{% /warning %}}
 
