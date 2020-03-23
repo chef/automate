@@ -19,7 +19,9 @@ UPDATE iam_roles
             ingest:*:get,
             ingest:*:list,
             iam:projects:list,
-            iam:projects:get
+            iam:projects:get,
+            applications:*:get,
+            applications:*:list
         }'
     WHERE
         id = 'viewer';
@@ -60,7 +62,8 @@ UPDATE iam_roles
             iam:teams:get,
             iam:teamUsers:*,
             iam:users:get,
-            iam:users:list
+            iam:users:list,
+            applications:*
         }'
     WHERE
         id = 'project-owner';
