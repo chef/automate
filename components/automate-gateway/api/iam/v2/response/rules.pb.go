@@ -281,15 +281,21 @@ func (m *ApplyRulesCancelResp) XXX_DiscardUnknown() {
 var xxx_messageInfo_ApplyRulesCancelResp proto.InternalMessageInfo
 
 type ApplyRulesStatusResp struct {
-	State                 string               `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty"`
+	// One of two states: `not_running` and `running`.
+	State string `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty"`
+	// Estimated time when the project update will complete.
 	EstimatedTimeComplete *timestamp.Timestamp `protobuf:"bytes,2,opt,name=estimated_time_complete,json=estimatedTimeComplete,proto3" json:"estimated_time_complete,omitempty"`
-	PercentageComplete    float32              `protobuf:"fixed32,3,opt,name=percentage_complete,json=percentageComplete,proto3" json:"percentage_complete,omitempty"`
-	Failed                bool                 `protobuf:"varint,4,opt,name=failed,proto3" json:"failed,omitempty"`
-	FailureMessage        string               `protobuf:"bytes,5,opt,name=failure_message,json=failureMessage,proto3" json:"failure_message,omitempty"`
-	Cancelled             bool                 `protobuf:"varint,6,opt,name=cancelled,proto3" json:"cancelled,omitempty"`
-	XXX_NoUnkeyedLiteral  struct{}             `json:"-"`
-	XXX_unrecognized      []byte               `json:"-"`
-	XXX_sizecache         int32                `json:"-"`
+	// The percentage complete in decimal format from 0 to 1.
+	PercentageComplete float32 `protobuf:"fixed32,3,opt,name=percentage_complete,json=percentageComplete,proto3" json:"percentage_complete,omitempty"`
+	// Whether or not the project update has failed.
+	Failed bool `protobuf:"varint,4,opt,name=failed,proto3" json:"failed,omitempty"`
+	// The error message from the failure.
+	FailureMessage string `protobuf:"bytes,5,opt,name=failure_message,json=failureMessage,proto3" json:"failure_message,omitempty"`
+	// Whether or not the project update was canceled.
+	Cancelled            bool     `protobuf:"varint,6,opt,name=cancelled,proto3" json:"cancelled,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
 }
 
 func (m *ApplyRulesStatusResp) Reset()         { *m = ApplyRulesStatusResp{} }

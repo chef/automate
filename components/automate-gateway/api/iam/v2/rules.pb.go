@@ -108,17 +108,21 @@ const _ = grpc.SupportPackageIsVersion6
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type RulesClient interface {
 	//
-	//Creates a project rule
+	//Create a project rule
 	//
-	//Creates a new project rule to be used to associate ingested resources with projects within Automate.
+	//Creates a new project rule to move ingested resources into projects.
 	//
 	//A project rule contains conditions that determine if an ingested resource should be moved into the rule’s project.
 	//
-	//Each project rule condition specifies a value or values to match for a particular attribute on an ingested resource.
-	//The choice of attributes depends on the rule type, either NODE or EVENT.
+	//Each condition specifies one or more values to match for a particular attribute on an ingested resource.
 	//
-	//Each rule condition also specifies an operator, either MEMBER_OF,
-	//in the case of multiple values, or EQUALS, in the case of a single value.
+	//The choice of attributes depends on the rule type.
+	//For NODE type, specify any of the available attributes.
+	//For EVENT type, specify either CHEF_ORGANIZATION or CHEF_SERVER.
+	//
+	//The choice of operator depends on how many values you provide.
+	//If you wish to match one among a group of values, set the operator to MEMBER_OF.
+	//For a single value, use EQUALS.
 	//
 	//Authorization Action:
 	//```
@@ -126,12 +130,12 @@ type RulesClient interface {
 	//```
 	CreateRule(ctx context.Context, in *request.CreateRuleReq, opts ...grpc.CallOption) (*response.CreateRuleResp, error)
 	//
-	//Updates a project rule
+	//Update a project rule
 	//
 	//Updates the name and conditions of an existing project rule.
 	//New conditions can be added. Existing conditions can be updated or removed.
 	//
-	//This operation overwrites all fields excepting ID and Type,
+	//This operation overwrites all fields excluding ID and Type,
 	//including those omitted from the request, so be sure to specify all properties.
 	//Properties that you do not include are reset to empty values.
 	//
@@ -144,7 +148,7 @@ type RulesClient interface {
 	//```
 	UpdateRule(ctx context.Context, in *request.UpdateRuleReq, opts ...grpc.CallOption) (*response.UpdateRuleResp, error)
 	//
-	//Gets a project rule
+	//Get a project rule
 	//
 	//Returns the details for a project rule.
 	//
@@ -154,7 +158,7 @@ type RulesClient interface {
 	//```
 	GetRule(ctx context.Context, in *request.GetRuleReq, opts ...grpc.CallOption) (*response.GetRuleResp, error)
 	//
-	//Lists a project's rules
+	//List a project's rules
 	//
 	//Lists all of the project rules of a specific project.
 	//
@@ -164,7 +168,7 @@ type RulesClient interface {
 	//```
 	ListRulesForProject(ctx context.Context, in *request.ListRulesForProjectReq, opts ...grpc.CallOption) (*response.ListRulesForProjectResp, error)
 	//
-	//Deletes a project rule
+	//Delete a project rule
 	//
 	//The resulting change to the project's resources does not take effect immediately.
 	//Updates to project rules must be applied to ingested resources by a project update.
@@ -175,7 +179,7 @@ type RulesClient interface {
 	//```
 	DeleteRule(ctx context.Context, in *request.DeleteRuleReq, opts ...grpc.CallOption) (*response.DeleteRuleResp, error)
 	//
-	//Starts project update
+	//Start project update
 	//
 	//Any changes to a project's rules are staged first. They do not take effect until
 	//all projects are updated.
@@ -192,10 +196,16 @@ type RulesClient interface {
 	//```
 	ApplyRulesStart(ctx context.Context, in *request.ApplyRulesStartReq, opts ...grpc.CallOption) (*response.ApplyRulesStartResp, error)
 	//
-	//Cancels project update
+	//Cancel project update
 	//
-	//Cancels an ongoing project update. This action leaves the system in an unknown state that
-	//only another successful project update can rectify.
+	//Cancels an ongoing project update.
+	//
+	//Warning! This action leaves the system in an unknown state that only another
+	//successful project update can rectify.
+	//
+	//This command exists really just for one scenario: you started a project update
+	//but shortly thereafter discovered that you had one more change to include in the
+	//batch of updates to be done.
 	//
 	//Authorization Action:
 	//```
@@ -203,9 +213,13 @@ type RulesClient interface {
 	//```
 	ApplyRulesCancel(ctx context.Context, in *request.ApplyRulesCancelReq, opts ...grpc.CallOption) (*response.ApplyRulesCancelResp, error)
 	//
-	//Gets the status of a project update
+	//Get the status of a project update
 	//
-	//Gets the percentage complete of an ongoing project update and whether or not it failed
+	//Returns details about a project update operation.
+	//
+	//You can poll this endpoint during a project update to monitor progress.
+	//Querying this endpoint when there is no update in progress will return details
+	//about the completion status of the most recent update.
 	//
 	//Authorization Action:
 	//```
@@ -297,17 +311,21 @@ func (c *rulesClient) ApplyRulesStatus(ctx context.Context, in *request.ApplyRul
 // RulesServer is the server API for Rules service.
 type RulesServer interface {
 	//
-	//Creates a project rule
+	//Create a project rule
 	//
-	//Creates a new project rule to be used to associate ingested resources with projects within Automate.
+	//Creates a new project rule to move ingested resources into projects.
 	//
 	//A project rule contains conditions that determine if an ingested resource should be moved into the rule’s project.
 	//
-	//Each project rule condition specifies a value or values to match for a particular attribute on an ingested resource.
-	//The choice of attributes depends on the rule type, either NODE or EVENT.
+	//Each condition specifies one or more values to match for a particular attribute on an ingested resource.
 	//
-	//Each rule condition also specifies an operator, either MEMBER_OF,
-	//in the case of multiple values, or EQUALS, in the case of a single value.
+	//The choice of attributes depends on the rule type.
+	//For NODE type, specify any of the available attributes.
+	//For EVENT type, specify either CHEF_ORGANIZATION or CHEF_SERVER.
+	//
+	//The choice of operator depends on how many values you provide.
+	//If you wish to match one among a group of values, set the operator to MEMBER_OF.
+	//For a single value, use EQUALS.
 	//
 	//Authorization Action:
 	//```
@@ -315,12 +333,12 @@ type RulesServer interface {
 	//```
 	CreateRule(context.Context, *request.CreateRuleReq) (*response.CreateRuleResp, error)
 	//
-	//Updates a project rule
+	//Update a project rule
 	//
 	//Updates the name and conditions of an existing project rule.
 	//New conditions can be added. Existing conditions can be updated or removed.
 	//
-	//This operation overwrites all fields excepting ID and Type,
+	//This operation overwrites all fields excluding ID and Type,
 	//including those omitted from the request, so be sure to specify all properties.
 	//Properties that you do not include are reset to empty values.
 	//
@@ -333,7 +351,7 @@ type RulesServer interface {
 	//```
 	UpdateRule(context.Context, *request.UpdateRuleReq) (*response.UpdateRuleResp, error)
 	//
-	//Gets a project rule
+	//Get a project rule
 	//
 	//Returns the details for a project rule.
 	//
@@ -343,7 +361,7 @@ type RulesServer interface {
 	//```
 	GetRule(context.Context, *request.GetRuleReq) (*response.GetRuleResp, error)
 	//
-	//Lists a project's rules
+	//List a project's rules
 	//
 	//Lists all of the project rules of a specific project.
 	//
@@ -353,7 +371,7 @@ type RulesServer interface {
 	//```
 	ListRulesForProject(context.Context, *request.ListRulesForProjectReq) (*response.ListRulesForProjectResp, error)
 	//
-	//Deletes a project rule
+	//Delete a project rule
 	//
 	//The resulting change to the project's resources does not take effect immediately.
 	//Updates to project rules must be applied to ingested resources by a project update.
@@ -364,7 +382,7 @@ type RulesServer interface {
 	//```
 	DeleteRule(context.Context, *request.DeleteRuleReq) (*response.DeleteRuleResp, error)
 	//
-	//Starts project update
+	//Start project update
 	//
 	//Any changes to a project's rules are staged first. They do not take effect until
 	//all projects are updated.
@@ -381,10 +399,16 @@ type RulesServer interface {
 	//```
 	ApplyRulesStart(context.Context, *request.ApplyRulesStartReq) (*response.ApplyRulesStartResp, error)
 	//
-	//Cancels project update
+	//Cancel project update
 	//
-	//Cancels an ongoing project update. This action leaves the system in an unknown state that
-	//only another successful project update can rectify.
+	//Cancels an ongoing project update.
+	//
+	//Warning! This action leaves the system in an unknown state that only another
+	//successful project update can rectify.
+	//
+	//This command exists really just for one scenario: you started a project update
+	//but shortly thereafter discovered that you had one more change to include in the
+	//batch of updates to be done.
 	//
 	//Authorization Action:
 	//```
@@ -392,9 +416,13 @@ type RulesServer interface {
 	//```
 	ApplyRulesCancel(context.Context, *request.ApplyRulesCancelReq) (*response.ApplyRulesCancelResp, error)
 	//
-	//Gets the status of a project update
+	//Get the status of a project update
 	//
-	//Gets the percentage complete of an ongoing project update and whether or not it failed
+	//Returns details about a project update operation.
+	//
+	//You can poll this endpoint during a project update to monitor progress.
+	//Querying this endpoint when there is no update in progress will return details
+	//about the completion status of the most recent update.
 	//
 	//Authorization Action:
 	//```
