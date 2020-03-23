@@ -47,10 +47,16 @@ message ApplyRulesStatusResp {
   option (grpc.gateway.protoc_gen_swagger.options.openapiv2_schema) = {
     example: { value: '{ "state": "running", "estimated_time_complete": "2020-03-20T19:24:55Z", "percentage_complete": 0.5, "failed": false, "failure_message": "", "cancelled": false}'}
   };
+  // One of two states: `not_running` and `running`.
   string state = 1;
+  // Estimated time when the project update will complete.
   google.protobuf.Timestamp estimated_time_complete = 2;
+  // The percentage complete in decimal format from 0 to 1.
   float percentage_complete = 3;
+  // Whether or not the project update has failed.
   bool failed = 4;
+  // The error message from the failure.
   string failure_message = 5;
+  // Whether or not the project update was canceled.
   bool cancelled = 6;
 }
