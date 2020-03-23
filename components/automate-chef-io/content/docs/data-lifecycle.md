@@ -1,5 +1,5 @@
 +++
-title = "Data Lifeycle"
+title = "Data Lifecycle"
 aliases = [
     "/docs/node-lifecycle/"
 ]
@@ -15,7 +15,7 @@ toc = true
 
 ## Overview
 
-Data Lifecycle manages the retention of events, service groups, Chef Client runs, compliance reports and scans in Chef Automate. Chef Automate stores data from the ingest-service, event-feed-service, compliance-service and applications-service in ElasticSearch or PostgreSQL. Over time you may wish to remove that data from Chef Automate by using the data lifecycle settings.  
+Data Lifecycle manages the retention of events, service groups, Chef Client runs, compliance reports and scans in Chef Automate. Chef Automate stores data from the ingest-service, event-feed-service, compliance-service and applications-service in ElasticSearch or PostgreSQL. Over time you may wish to remove that data from Chef Automate by using the data lifecycle settings.  
 
 {{% warning %}}
 Note: Chef Automate data retention processes changed in 20191129172405. The [upgrade documentation]({{< ref "install/#upgrades" >}}) covers configuring your system to install new Chef Automate versions. For guidance, contact your customer support agent. You can also use the [previous data retention documentation](https://github.com/chef/automate/blob/20191104205453/components/automate-chef-io/content/docs/configuration.md#data-retention) for help with configuring data retention on older Chef Automate installations.
@@ -25,7 +25,7 @@ Note: Chef Automate data retention processes changed in 20191129172405. The [upg
 
 Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes use the **Save Changes** button to apply your changes.
 
-Only userse with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs.
+Only users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs.
 
 ![](/images/docs/data-lifecycle.png)
 
