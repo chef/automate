@@ -180,7 +180,8 @@ type ConfigMgmtClient interface {
 	//
 	//GetCheckinCountsTimeSeries
 	//
-	//Returns a daily time series of unique node check-ins for the number of day requested
+	//Returns a daily time series of unique node check-ins for the number of days requested.
+	//If days ago value is empty, api will return the default 1 day ago results.
 	//
 	//Authorization Action:
 	//```
@@ -441,7 +442,8 @@ type ConfigMgmtServer interface {
 	//
 	//GetCheckinCountsTimeSeries
 	//
-	//Returns a daily time series of unique node check-ins for the number of day requested
+	//Returns a daily time series of unique node check-ins for the number of days requested.
+	//If days ago value is empty, api will return the default 1 day ago results.
 	//
 	//Authorization Action:
 	//```

@@ -295,7 +295,7 @@ func init() {
     "/cfgmgmt/stats/checkin_counts_timeseries": {
       "get": {
         "summary": "GetCheckinCountsTimeSeries",
-        "description": "Returns a daily time series of unique node check-ins for the number of day requested\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
+        "description": "Returns a daily time series of unique node check-ins for the number of days requested.\nIf days ago value is empty, api will return the default 1 day ago results.\n\nAuthorization Action:\n` + "`" + `` + "`" + `` + "`" + `\ninfra:nodes:list\n` + "`" + `` + "`" + `` + "`" + `",
         "operationId": "GetCheckInCountsTimeSeries",
         "responses": {
           "200": {
