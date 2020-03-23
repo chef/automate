@@ -103,7 +103,7 @@ message UpdatePolicyReq {
         }
        }];
     repeated Statement statements = 3 [(validate.rules).repeated.min_items = 1];
-    string name = 8;
+    string name = 8 [(validate.rules).string.min_len = 1];
     repeated string projects = 9 [(validate.rules).repeated = {
         unique: true,
         items: {
@@ -133,6 +133,7 @@ message ReplacePolicyMembersResp {
 message AddPolicyMembersReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
     repeated string members = 2 [(validate.rules).repeated = {
+        min_items: 1,
         unique: true,
         items: {
             string: {
@@ -178,6 +179,7 @@ message UpdateRoleReq {
     string name = 2 [(validate.rules).string.pattern = "\\S"];
     repeated string actions = 3
     [(validate.rules).repeated = {
+      min_items: 1,
       unique: true,
       // this RE means:  * OR *:verb OR svc:type:verb OR svc:* OR svc:*:verb OR svc:type:*
       items: {
@@ -206,6 +208,7 @@ message ListPolicyMembersResp {
 message RemovePolicyMembersReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
     repeated string members = 2 [(validate.rules).repeated = {
+        min_items: 1,
         unique: true,
         items: {
             string: {
@@ -245,6 +248,7 @@ message CreateRoleReq {
       [(validate.rules).string.pattern = "\\S"];;
     repeated string actions = 3
       [(validate.rules).repeated = {
+        min_items: 1,
         unique: true,
         // this RE means:  * OR *:verb OR svc:type:verb OR svc:* OR svc:*:verb OR svc:type:*
         items: {
