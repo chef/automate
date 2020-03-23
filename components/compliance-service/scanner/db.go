@@ -222,7 +222,7 @@ func (s *Scanner) UpdateResult(ctx context.Context, job *types.InspecJob, output
 		var connectionErr, errMsg string
 		if inspecErr != nil {
 			if len(inspecErr.Message) > 300 {
-				errMsg = inspecErr.Message[0:300]
+				errMsg = fmt.Sprintf("%s [truncated for length]", inspecErr.Message[0:300])
 			} else {
 				errMsg = inspecErr.Message
 			}
