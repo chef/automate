@@ -3,7 +3,7 @@
     <svg id="guitar-string-zoom-slider" width="100%" height="30">
       <ng-container *ngFor="let date of buttonDates; let i = index">
         <rect class="guitar-string-zoom-button"
-          [attr.width]="zoomButtonWidth(buttonDates)"
+          [attr.width]="zoomButtonWidth()"
           height="100%"
           [attr.x]="zoomButtonPosition(i)"
           y="0"
