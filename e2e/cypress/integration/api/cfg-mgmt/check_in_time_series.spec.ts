@@ -4,7 +4,7 @@ import { uuidv4 } from '../../../support/helpers';
 
 describeIfIAMV2p1('Config-mgmt check-in time series', () => {
 
-  describe('Normal ingest marking node missing', () => {
+  describe('two nodes 4 runs with two different environments', () => {
     const cypressPrefix = 'test-cfg-check-in';
     const clientRunsNodeId = uuidv4();
     const clientRunsFilteredOutNodeId = uuidv4();
@@ -94,7 +94,7 @@ describeIfIAMV2p1('Config-mgmt check-in time series', () => {
       deleteNode(10, clientRunsFilteredOutNodeId);
     });
 
-    it('nodemanager nodes state is missing', () => {
+    it('filter for the forest environment', () => {
       // request the check-in time series for the past three days with an
       // organization_name = "forest" filter
       cy.request({
