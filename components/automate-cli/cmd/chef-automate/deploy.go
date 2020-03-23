@@ -172,7 +172,6 @@ func newDeployCmd() *cobra.Command {
 			"enable-chef-server",
 			"enable-deploy-order-stress-mode",
 			"enable-workflow",
-			"product",
 			"bootstrap-bundle",
 		} {
 			err := cmd.PersistentFlags().MarkHidden(flagName)
