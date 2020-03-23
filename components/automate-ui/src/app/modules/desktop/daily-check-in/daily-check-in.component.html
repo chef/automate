@@ -1,0 +1,29 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      Daily Check-in
+      <div>
+        <div>
+          <div class="title">Unknown %</div>
+          <div class="total">{{ unknownPercentage$ | async }}%</div>
+        </div>
+        <div>
+          <div class="title">Checked-in %</div>
+          <div class="total">{{ checkedInPercentage$ | async }}%</div>
+        </div>
+        <div>
+          <div class="title">Checked-in Count</div>
+          <div class="total">{{ checkedInCount$ | async }}</div>
+        </div>
+        <div>
+          <div class="title">Unknown Count</div>
+          <div class="total">{{ unknownCount$ | async }}</div>
+        </div>
+        <div>
+          <div class="title">Total Count</div>
+          <div class="total">{{ totalCount$ | async }}</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
