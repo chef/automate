@@ -145,8 +145,10 @@ func (es Backend) GetCreateCountsTimeSeries(startTime, endTime time.Time,
 
 	createNodePeroids := make([]backend.CountPeroid, getNumberOf24hBetween(startTime, endTime))
 
-	dateRangeAgg := elastic.NewDateRangeAggregation().Field(backend.Created).
-		Format("yyyy-MM-dd'T'HH:mm:ssZ")
+	// This is using the custom_search_aggs_bucket_date_range because it need to set the missing option
+	dateRangeAgg := NewDateRangeAggregation().Field(backend.Created).
+		Format("yyyy-MM-dd'T'HH:mm:ssZ").
+		Missing(time.Time{}.Format(time.RFC3339)) // count all nodes that do not have a create date
 
 	for index := 0; index < len(createNodePeroids); index++ {
 		to := startTime.Add(time.Hour * 24 *
