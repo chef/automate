@@ -38,9 +38,9 @@
     {
       "name": "Identity",
       "tags": [
+        "users",
         "teams",
-        "tokens",
-        "users"
+        "tokens"
       ]
     },
     {
@@ -120,14 +120,14 @@
       "x-displayName": "Scan Jobs"
     },
     {
+      "name": "users",
+      "x-displayName": "IAM Users",
+      "description": "IAM local users are not attached to external identity providers. They can be members of IAM teams and IAM policies."
+    },
+    {
       "name": "teams",
       "x-displayName": "IAM Teams",
       "description": "Teams are used to group local users for policy membership."
-    },
-    {
-      "name": "users",
-      "x-displayName": "IAM Local Users",
-      "description": "IAM local users are not attached to external identity providers. They can be members of IAM teams and IAM policies."
-    }
+    } 
   ]
 }
