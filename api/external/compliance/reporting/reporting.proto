@@ -379,6 +379,8 @@ message ControlItem {
 message ControlItems {
 	// The paginated results of controls matching the filters.
 	repeated ControlItem control_items = 1;
+	// The summary totals for this list of control items
+	ControlSummary control_summary_totals = 2;
 }
 
 message TimeQuery {

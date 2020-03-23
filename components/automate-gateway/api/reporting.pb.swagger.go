@@ -419,6 +419,10 @@ func init() {
             "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlItem"
           },
           "description": "The paginated results of controls matching the filters."
+        },
+        "control_summary_totals": {
+          "$ref": "#/definitions/chef.automate.api.compliance.reporting.v1.ControlSummary",
+          "title": "The summary totals for this list of control items"
         }
       }
     },
