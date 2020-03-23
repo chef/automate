@@ -401,5 +401,28 @@ func (s *CfgMgmtServer) nodeExistsAsync(nodeID string, projectFilters map[string
 }
 
 func (s *CfgMgmtServer) GetErrors(ctx context.Context, req *extReq.Errors) (*externalResp.Errors, error) {
-	return nil, nil
+	log.WithFields(log.Fields{
+		"request": req,
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	chefErrors, err := s.client.GetErrors()
+	if err != nil {
+		return nil, err
+	}
+
+	res := externalResp.Errors{}
+	for _, chefErr := range chefErrors {
+		res.Errors = append(
+			res.Errors,
+			&externalResp.ErrorCount{
+				Count:        chefErr.Count,
+				Type:         chefErr.Type,
+				ErrorMessage: chefErr.Message,
+			},
+		)
+	}
+
+	return &res, nil
+
 }

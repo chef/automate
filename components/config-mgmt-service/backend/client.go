@@ -65,6 +65,7 @@ type Client interface {
 	GetCheckinCountsTimeSeries(time.Time, time.Time, map[string][]string) ([]CountPeroid, error)
 	GetDeletedCountsTimeSeries(time.Time, time.Time, map[string][]string) ([]CountPeroid, error)
 	GetCreateCountsTimeSeries(time.Time, time.Time, map[string][]string) ([]CountPeroid, error)
+	GetErrors() ([]*ChefErrorCount, error)
 }
 
 // Types that we consume from the ingest-service
@@ -167,4 +168,10 @@ type EventCollection struct {
 type EventCount struct {
 	Name  string `json:"name"`
 	Count int64  `json:"count"`
+}
+
+type ChefErrorCount struct {
+	Type    string
+	Message string
+	Count   int32
 }
