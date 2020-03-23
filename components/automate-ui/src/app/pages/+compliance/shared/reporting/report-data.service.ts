@@ -10,6 +10,7 @@ interface ReportingSummary {
     profiles: any;
     controls?: any;
   };
+  status: 'failed' | 'passed' | 'waived' | 'skipped' | 'unknown';
 }
 
 @Injectable()
