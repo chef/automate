@@ -50,6 +50,9 @@ func init() {
 		}
 		return ""
 	})
+	policyv2.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetCheckInCountsTimeSeries", "infra:nodes", "infra:nodes:list", "GET", "/cfgmgmt/stats/checkin_counts_timeseries", func(unexpandedResource string, input interface{}) string {
+		return unexpandedResource
+	})
 	policyv2.MapMethodTo("/chef.automate.api.cfgmgmt.ConfigMgmt/GetNodeRun", "infra:nodes:{node_id}", "infra:nodes:get", "GET", "/cfgmgmt/nodes/{node_id}/runs/{run_id}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.NodeRun); ok {
 			return policyv2.ExpandParameterizedResource(unexpandedResource, func(want string) string {

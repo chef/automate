@@ -58,6 +58,26 @@ func (mr *MockCfgMgmtClientMockRecorder) GetAttributes(arg0, arg1 interface{}, a
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAttributes", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetAttributes), varargs...)
 }
 
+// GetCheckInCountsTimeSeries mocks base method
+func (m *MockCfgMgmtClient) GetCheckInCountsTimeSeries(arg0 context.Context, arg1 *request.CheckInCountsTimeSeries, arg2 ...grpc.CallOption) (*response.CheckInCountsTimeSeries, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetCheckInCountsTimeSeries", varargs...)
+	ret0, _ := ret[0].(*response.CheckInCountsTimeSeries)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCheckInCountsTimeSeries indicates an expected call of GetCheckInCountsTimeSeries
+func (mr *MockCfgMgmtClientMockRecorder) GetCheckInCountsTimeSeries(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCheckInCountsTimeSeries", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetCheckInCountsTimeSeries), varargs...)
+}
+
 // GetEventFeed mocks base method
 func (m *MockCfgMgmtClient) GetEventFeed(arg0 context.Context, arg1 *request.EventFilter, arg2 ...grpc.CallOption) (*response.Events, error) {
 	m.ctrl.T.Helper()
@@ -700,6 +720,21 @@ func (m *MockCfgMgmtServer) GetAttributes(arg0 context.Context, arg1 *request.No
 func (mr *MockCfgMgmtServerMockRecorder) GetAttributes(arg0, arg1 interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAttributes", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetAttributes), arg0, arg1)
+}
+
+// GetCheckInCountsTimeSeries mocks base method
+func (m *MockCfgMgmtServer) GetCheckInCountsTimeSeries(arg0 context.Context, arg1 *request.CheckInCountsTimeSeries) (*response.CheckInCountsTimeSeries, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetCheckInCountsTimeSeries", arg0, arg1)
+	ret0, _ := ret[0].(*response.CheckInCountsTimeSeries)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetCheckInCountsTimeSeries indicates an expected call of GetCheckInCountsTimeSeries
+func (mr *MockCfgMgmtServerMockRecorder) GetCheckInCountsTimeSeries(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCheckInCountsTimeSeries", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetCheckInCountsTimeSeries), arg0, arg1)
 }
 
 // GetEventFeed mocks base method

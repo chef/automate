@@ -935,50 +935,6 @@
       "string_1": "Xen"
     }
   },
-  "ec2": {
-    "ami_id": "ami-4dbf9e7d",
-    "ami_launch_index": "0",
-    "ami_manifest_path": "(unknown)",
-    "block_device_mapping_ami": "/dev/sda1",
-    "block_device_mapping_root": "/dev/sda1",
-    "hostname": "ip-55-37-254-176.us-west-2.compute.internal",
-    "instance_action": "none",
-    "instance_id": "i-0aee75f0b4b0d9f22",
-    "instance_type": "t2.medium",
-    "local_hostname": "ip-55-37-254-176.us-west-2.compute.internal",
-    "local_ipv4": "55.37.254.176",
-    "mac": "02:42:c4:52:15:40",
-    "metrics_vhostmd": "<?xml version=\"1.0\" encoding=\"UTF-8\"?>",
-    "network_interfaces_macs": {
-      "02:42:c4:52:15:40": {
-        "device_number": "0",
-        "interface_id": "eni-89b50ba3",
-        "local_hostname": "ip-55-37-254-176.us-west-2.compute.internal",
-        "local_ipv4s": "55.37.254.176",
-        "mac": "02:42:c4:52:15:40",
-        "owner_id": "999999999999",
-        "security_group_ids": "sg-96274af3",
-        "security_groups": "default",
-        "subnet_id": "subnet-19ac017c",
-        "subnet_ipv4_cidr_block": "55.37.8.0/21",
-        "vpc_id": "vpc-2229ff47",
-        "vpc_ipv4_cidr_block": "55.37.0.0/16",
-        "vpc_ipv4_cidr_blocks": "55.37.0.0/16"
-      }
-    },
-    "placement_availability_zone": "us-west-2a",
-    "profile": "default-hvm",
-    "reservation_id": "r-0f3c151e78f186f3e",
-    "security_groups": [
-      "default"
-    ],
-    "services_domain": "amazonaws.com",
-    "services_partition": "aws",
-    "userdata": null,
-    "account_id": "999999999999",
-    "availability_zone": "us-west-2a",
-    "region": "us-west-2"
-  },
   "json?": "{\n  \"devpayProductCodes\" : null,\n  \"privateIp\" : \"55.37.254.176\",\n  \"availabilityZone\" : \"us-west-2a\",\n  \"version\" : \"2010-08-31\",\n  \"pendingTime\" : \"2017-06-05T23:37:13Z\",\n  \"instanceId\" : \"i-0aee75f0b4b0d9f22\",\n  \"billingProducts\" : [ \"bp-6fa54006\" ],\n  \"instanceType\" : \"t2.medium\",\n  \"accountId\" : \"999999999999\",\n  \"architecture\" : \"x86_64\",\n  \"kernelId\" : null,\n  \"ramdiskId\" : null,\n  \"imageId\" : \"ami-4dbf9e7d\",\n  \"region\" : \"us-west-2\"\n}",
   "etc": {
   },

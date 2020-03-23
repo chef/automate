@@ -18,3 +18,10 @@ message RunsCounts {
   // Node id associated with the run.
   string node_id = 4;
 }
+
+message CheckInCountsTimeSeries {
+  // List of filters to be applied to the time series.
+  repeated string filter = 1;
+  // Number of past days to create the time series
+  int32 days_ago = 2;
+}
