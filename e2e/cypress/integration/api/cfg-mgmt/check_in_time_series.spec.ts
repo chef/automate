@@ -10,15 +10,18 @@ describeIfIAMV2p1('Config-mgmt check-in time series', () => {
     const clientRunsFilteredOutNodeId = uuidv4();
     const nodeName = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmmss.sss')}`;
     before(() => {
+      const runId1 =  uuidv4();
+      const runId2 =  uuidv4();
+      const runId3 =  uuidv4();
+      const runId4 =  uuidv4();
 
       // Add three CCRs a day apart with environment "forest"
       cy.fixture('converge/avengers1.json').then((node: any) => {
-        const runId =  uuidv4();
         const runEndDate = Cypress.moment().subtract(65, 'minute');
         node.entity_uuid = clientRunsNodeId;
         node.node_name = nodeName;
-        node.id = runId;
-        node.run_id = runId;
+        node.id = runId1;
+        node.run_id = runId1;
         node.start_time = runEndDate.subtract(5, 'minute').toISOString();
         node.end_time = runEndDate.toISOString();
         node.node.chef_environment = 'forest';
@@ -31,12 +34,11 @@ describeIfIAMV2p1('Config-mgmt check-in time series', () => {
       });
 
       cy.fixture('converge/avengers1.json').then((node: any) => {
-        const runId =  uuidv4();
         const runEndDate = Cypress.moment().subtract(27, 'hours');
         node.entity_uuid = clientRunsNodeId;
         node.node_name = nodeName;
-        node.id = runId;
-        node.run_id = runId;
+        node.id = runId2;
+        node.run_id = runId2;
         node.end_time = runEndDate.toISOString();
         node.start_time = runEndDate.subtract(5, 'minute').toISOString();
         node.node.chef_environment = 'forest';
@@ -49,12 +51,11 @@ describeIfIAMV2p1('Config-mgmt check-in time series', () => {
       });
 
       cy.fixture('converge/avengers1.json').then((node: any) => {
-        const runId =  uuidv4();
         const runEndDate = Cypress.moment().subtract(50, 'hours');
         node.entity_uuid = clientRunsNodeId;
         node.node_name = nodeName;
-        node.id = runId;
-        node.run_id = runId;
+        node.id = runId3;
+        node.run_id = runId3;
         node.end_time = runEndDate.toISOString();
         node.start_time = runEndDate.subtract(5, 'minute').toISOString();
         node.node.chef_environment = 'forest';
@@ -68,12 +69,11 @@ describeIfIAMV2p1('Config-mgmt check-in time series', () => {
 
       // add a node within the three days with the environment "desert"
       cy.fixture('converge/avengers1.json').then((node: any) => {
-        const runId =  uuidv4();
         const runEndDate = Cypress.moment().subtract(75, 'minute');
         node.entity_uuid = clientRunsFilteredOutNodeId;
         node.node_name = nodeName;
-        node.id = runId;
-        node.run_id = runId;
+        node.id = runId4;
+        node.run_id = runId4;
         node.start_time = runEndDate.subtract(5, 'minute').toISOString();
         node.end_time = runEndDate.toISOString();
         node.node.chef_environment = 'desert';
@@ -85,7 +85,13 @@ describeIfIAMV2p1('Config-mgmt check-in time series', () => {
         });
       });
 
+      waitUntilNodeIsIngested(10, clientRunsNodeId);
+      waitUntilRunIsIngested(10, clientRunsNodeId, runId1);
+      waitUntilRunIsIngested(10, clientRunsNodeId, runId2);
+      waitUntilRunIsIngested(10, clientRunsNodeId, runId3);
+
       waitUntilNodeIsIngested(10, clientRunsFilteredOutNodeId);
+      waitUntilRunIsIngested(10, clientRunsFilteredOutNodeId, runId4);
     });
 
     after(() => {
@@ -126,6 +132,26 @@ function waitUntilNodeIsIngested(attempts: number, clientRunsNodeId: string): vo
       cy.log(`${attempts} attempts remaining: waiting for node ${clientRunsNodeId} to be ingested`);
       cy.wait(1000);
       waitUntilNodeIsIngested(--attempts, clientRunsNodeId);
+    }
+  });
+}
+
+function waitUntilRunIsIngested(attempts: number, clientRunsNodeId: string,
+  runId: string): void {
+  if (attempts === -1) {
+    throw new Error('run was never ingested');
+  }
+  cy.request({
+    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+    url: `/api/v0/cfgmgmt/nodes/${clientRunsNodeId}/runs/${runId}`,
+    failOnStatusCode: false
+  }).then((response) => {
+    if (response.status !== 404 && response.body.id === runId) {
+      return;
+    } else {
+      cy.log(`${attempts} attempts remaining: waiting for run ${runId} to be ingested`);
+      cy.wait(1000);
+      waitUntilRunIsIngested(--attempts, clientRunsNodeId, runId);
     }
   });
 }
