@@ -82,7 +82,7 @@ First follow the suggested setup on the plugin details page; the following notes
 2. OPA-the-plugin reads **all** your rego and JSON files.
    So if you skip the next steps when you attempt to evaluate an expression you will see merge errors.
 
-### VSCode with V2
+### VSCode
 
 - copy the example dir here: `cp -r ../example_v2 policies`
 - copy one of the input files from that new dir here: `cp policies/input_from_inline.json input.json`
