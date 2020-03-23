@@ -1518,6 +1518,7 @@ paths = [
   "vendor/github.com/go-gorp/gorp/*",
   "vendor/github.com/gofrs/uuid/*",
   "vendor/github.com/golang-migrate/migrate/*",
+  "vendor/github.com/golang/mock/*",
   "vendor/github.com/golang/protobuf/*",
   "vendor/github.com/grpc-ecosystem/grpc-gateway/*",
   "vendor/github.com/grpc-ecosystem/grpc-opentracing/*",
