@@ -9,18 +9,18 @@ export const {
   selectEntities: roleEntities
 } = infraRoleEntityAdapter.getSelectors(infraRoleState);
 
-export const apiTokenStatus = createSelector(
+export const infraRoleStatus = createSelector(
   infraRoleState,
   (state) => state.status
 );
 
 export const getAllStatus = createSelector(
-    infraRoleState,
+  infraRoleState,
   (state) => state.getAllStatus
 );
 
 export const getStatus = createSelector(
-    infraRoleState,
+  infraRoleState,
   (state) => state.getStatus
 );
 
