@@ -25,13 +25,15 @@ var (
 	// belong to the 'integration_test' package.
 	suite = NewSuite(elasticsearchUrl)
 
+	esBackend = cElastic.New(elasticsearchUrl)
+
 	// A global CfgMgmt Server instance to call any rpc function
 	//
 	// From any test you can directly call:
 	// ```
 	// res, err := cfgmgmt.GetNodesCounts(ctx, &req)
 	// ```
-	cfgmgmt = newCfgMgmtServer()
+	cfgmgmt = newCfgMgmtServer(esBackend)
 )
 
 // newCfgMgmtServer initialices a CfgMgmtServer with the default config
@@ -39,9 +41,9 @@ var (
 //
 // NOTE: This function expects ES to be already up and running.
 // (@afiune) We are going to start ES from the studio
-func newCfgMgmtServer() *grpc.CfgMgmtServer {
+func newCfgMgmtServer(esBackend *cElastic.Backend) *grpc.CfgMgmtServer {
 	cfg := config.Default()
-	cfg.SetBackend(cElastic.New(elasticsearchUrl))
+	cfg.SetBackend(esBackend)
 	return grpc.NewCfgMgmtServer(cfg)
 }
 

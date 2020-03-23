@@ -15,3 +15,14 @@ message NodesCounts {
   int32 failure = 3;
   int32 missing = 4;
 }
+
+message CheckInCountsTimeSeries {
+  // List of daily checkin counts
+  repeated CheckInCounts counts = 1;
+}
+
+message CheckInCounts {
+  string start = 1;
+  string end = 2;
+  int32 count = 3;
+}
