@@ -35,13 +35,13 @@ export class InfraRoleEffects {
           catchError((error: HttpErrorResponse) => observableOf(new GetRolesFailure(error))))));
 
   @Effect()
-  getCookbooksFailure$ = this.actions$.pipe(
+  getRolesFailure$ = this.actions$.pipe(
       ofType(RoleActionTypes.GET_ALL_FAILURE),
       map(({ payload }: GetRolesFailure) => {
         const msg = payload.error.error;
         return new CreateNotification({
           type: Type.error,
-          message: `Could not get cookbooks: ${msg || payload.error}`
+          message: `Could not get roles: ${msg || payload.error}`
         });
       }));
 
@@ -54,7 +54,7 @@ export class InfraRoleEffects {
           catchError((error: HttpErrorResponse) => observableOf(new GetRoleFailure(error))))));
 
  @Effect()
-  getOrgFailure$ = this.actions$.pipe(
+  getRoleFailure$ = this.actions$.pipe(
       ofType(RoleActionTypes.GET_FAILURE),
       map(({ payload }: GetRoleFailure) => {
         const msg = payload.error.error;
