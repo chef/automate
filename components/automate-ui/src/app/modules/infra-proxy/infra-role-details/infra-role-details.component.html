@@ -28,9 +28,7 @@
       <section class="page-body" *ngIf="tabValue === 'runList'">
         <chef-loading-spinner *ngIf="roleDetailsLoading" size="50"></chef-loading-spinner>
         <div *ngIf="show">
-          <treetable 
-            [tree]="arrayOfNodesTree">
-          </treetable>
+          <db-angular-tree-grid [data]="data" [configs]="configs"></db-angular-tree-grid>
         </div>
       </section>
     </main>

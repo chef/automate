@@ -10,16 +10,11 @@ export interface InfraRoleEntityState extends EntityState<InfraRole> {
   getStatus: EntityStatus;
 }
 
-export interface RoleItemEntityState extends EntityState<InfraRole> {
-  getAllStatus: EntityStatus;
-  getStatusItem: EntityStatus;
-}
-
 const GET_ALL_STATUS = 'getAllStatus';
 const GET_STATUS = 'getStatus';
 
 export const infraRoleEntityAdapter: EntityAdapter<InfraRole> = createEntityAdapter<InfraRole>({
-  selectId: (infraroles: InfraRole) => infraroles.name
+  selectId: (infrarole: InfraRole) => infrarole.name
 });
 
 export const InfraRoleEntityInitialState: InfraRoleEntityState =
@@ -45,7 +40,11 @@ export function infraRoleEntityReducer(
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
 
     case RoleActionTypes.GET:
-      return set(GET_STATUS, EntityStatus.loading, infraRoleEntityAdapter.removeAll(state));
+      return set(
+        GET_STATUS, 
+        EntityStatus.loading, 
+        infraRoleEntityAdapter.removeAll(state)
+      ) as InfraRoleEntityState;
 
     case RoleActionTypes.GET_SUCCESS:
        return set(GET_STATUS, EntityStatus.loadingSuccess,
@@ -57,5 +56,6 @@ export function infraRoleEntityReducer(
       return state;
   }
 }
+
 export const getEntityById = (name: string) =>
   (state: InfraRoleEntityState) => state.entities[name];
