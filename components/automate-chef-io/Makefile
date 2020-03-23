@@ -19,7 +19,7 @@ clean:
 	rm -rf public/
 
 sync: themes/chef
-	pushd themes/chef && git fetch && git reset --hard origin/master && popd
+	pushd themes/chef && git fetch origin old_hugo_theme && git reset --hard origin/old_hugo_theme && popd
 
 clean_swagger_files:
 	rm -rf ./$(SWAGGER_DIR)/*
