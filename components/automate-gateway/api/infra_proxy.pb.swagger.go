@@ -548,6 +548,162 @@ func init() {
         ]
       }
     },
+    "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
+      "get": {
+        "operationId": "GetDataBags",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBags"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Id of the Server.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Id of the Org.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Name of the data bag.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}": {
+      "get": {
+        "operationId": "GetDataBagItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBag"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Id of the Server.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Id of the Org.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Name of the data bag.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "item",
+            "description": "Name of the data bag item.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/infra/servers/{server_id}/orgs/{org_id}/environment/{name}": {
+      "get": {
+        "operationId": "GetEnvironment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environment"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Id of the Server.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Id of the Org.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Name of the environment.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
+    "/infra/servers/{server_id}/orgs/{org_id}/environments": {
+      "get": {
+        "operationId": "GetEnvironments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Environments"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Id of the Server.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Id of the Org.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/infra/servers/{server_id}/orgs/{org_id}/roles": {
       "get": {
         "operationId": "GetRoles",
@@ -1014,6 +1170,36 @@ func init() {
         }
       }
     },
+    "chef.automate.api.infra_proxy.response.DataBag": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "type": "string",
+          "description": "Stringified json of the data bag item."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.DataBagListItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the data bag item."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.DataBags": {
+      "type": "object",
+      "properties": {
+        "data_bags": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.DataBagListItem"
+          },
+          "description": "List of data bags item."
+        }
+      }
+    },
     "chef.automate.api.infra_proxy.response.DeleteOrg": {
       "type": "object",
       "properties": {
@@ -1027,6 +1213,63 @@ func init() {
       "properties": {
         "server": {
           "$ref": "#/definitions/chef.automate.api.infra_proxy.response.Server"
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Environment": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the Environment."
+        },
+        "chef_type": {
+          "type": "string",
+          "description": "Type of the object."
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the node."
+        },
+        "json_class": {
+          "type": "string",
+          "description": "Name of the class."
+        },
+        "cookbook_versions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "title": "List of versioned cookbooks"
+        },
+        "default_attributes": {
+          "type": "string",
+          "description": "Stringified json of the default attributes."
+        },
+        "override_attributes": {
+          "type": "string",
+          "description": "Stringified json of the override attributes."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.EnvironmentListItem": {
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Name of the Environment."
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.Environments": {
+      "type": "object",
+      "properties": {
+        "environments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/chef.automate.api.infra_proxy.response.EnvironmentListItem"
+          },
+          "description": "List of the EnvironmentListItem."
         }
       }
     },

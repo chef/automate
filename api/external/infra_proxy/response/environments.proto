@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package chef.automate.api.infra_proxy.response;
+option go_package = "github.com/chef/automate/api/external/infra_proxy/response";
+
+message Environments {
+    // List of the EnvironmentListItem.
+    repeated EnvironmentListItem environments = 1;
+}
+
+message EnvironmentListItem {
+    // Name of the Environment.
+    string name = 1;
+}
+
+message Environment {
+    // Name of the Environment.
+    string name = 1;
+    // Type of the object.
+    string chef_type = 2;
+    // Description of the node.
+    string description = 3;
+    // Name of the class.
+    string json_class = 5;
+    // List of versioned cookbooks
+    repeated string cookbook_versions = 6;
+    // Stringified json of the default attributes.
+    string default_attributes = 7;
+    // Stringified json of the override attributes.
+    string override_attributes = 8;
+}
