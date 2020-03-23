@@ -88,6 +88,9 @@ export class PolicyAddMembersComponent implements OnInit, OnDestroy {
   public nameOrId: string;
   public ldapOrSaml = false;
 
+  // Animation
+  public triggerValue: 'void' | '*';
+
 
   constructor(
     private store: Store<NgrxStateAtom>,
