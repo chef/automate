@@ -215,7 +215,7 @@ func (s *Suite) IngestNodes(nodes []iBackend.Node) {
 func (s *Suite) IngestInitialNodes(nodes []iBackend.UpsertNode) {
 	// Insert nodes
 	for _, node := range nodes {
-		s.ingest.InsertIntialNode(context.Background(), node)
+		s.ingest.InsertUpsertNode(context.Background(), node)
 	}
 
 	// Refresh Indices

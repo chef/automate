@@ -72,7 +72,11 @@ func (es Backend) GetRun(runID string, endTime time.Time) (backend.Run, error) {
 	return run, nil
 }
 
-// GetDeletedCountsTimeSeries - something interesting
+// GetDeletedCountsTimeSeries - creates a daily time series of the total amount of nodes that have
+// been deleted within or before the time range. The time series is between the startTime and endTime provided.
+// The startTime and endTime must atleast be 24 hours apart. When greater than 24 hours, it must be in
+// multiples 24 hour blocks.
+// A node is deleted if exists = false. The time the node was deleted is the "timestamp"
 func (es Backend) GetDeletedCountsTimeSeries(
 	startTime, endTime time.Time, filters map[string][]string) ([]backend.CountPeroid, error) {
 	var (
@@ -135,7 +139,10 @@ func (es Backend) GetDeletedCountsTimeSeries(
 	return deletedNodePeroids, nil
 }
 
-// GetCreateCountsTimeSeries - something interesting
+// GetCreateCountsTimeSeries - creates a daily time series of the total amount of nodes that have
+// been created within or before the time range. The time series is between the startTime and endTime provided.
+// The startTime and endTime must atleast be 24 hours apart. When greater than 24 hours, it must be in
+// multiples 24 hour blocks.
 func (es Backend) GetCreateCountsTimeSeries(startTime, endTime time.Time,
 	filters map[string][]string) ([]backend.CountPeroid, error) {
 	var (

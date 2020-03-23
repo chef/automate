@@ -25,8 +25,8 @@ func (es *Backend) InsertNode(ctx context.Context, node backend.Node) error {
 	return err
 }
 
-// InsertIntialNode inserts the state of the node as a result of a Chef Client Run into node-state index
-func (es *Backend) InsertIntialNode(ctx context.Context, node backend.UpsertNode) error {
+// InsertUpsertNode inserts the UpsertNode with the created date
+func (es *Backend) InsertUpsertNode(ctx context.Context, node backend.UpsertNode) error {
 	mapping := mappings.NodeState
 	err := es.upsertDataWithID(ctx, mapping, node.EntityUuid, node)
 	return err

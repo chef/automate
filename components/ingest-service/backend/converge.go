@@ -17,7 +17,7 @@ type Run struct {
 	UpdatedResourceCount int        `json:"updated_resource_count"`
 }
 
-// UpsertNode Something inspirational
+// UpsertNode The node data used when the node is first created in the node-state index.
 type UpsertNode struct {
 	Node
 	Created time.Time `json:"created,omitempty"`
