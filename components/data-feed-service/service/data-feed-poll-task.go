@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"net"
 	"strings"
 	"time"
 
@@ -23,9 +24,11 @@ var (
 )
 
 type DataFeedPollTask struct {
-	cfgMgmt   cfgmgmt.CfgMgmtClient
-	reporting reporting.ReportingServiceClient
-	db        *dao.DB
+	cfgMgmt           cfgmgmt.CfgMgmtClient
+	reporting         reporting.ReportingServiceClient
+	db                *dao.DB
+	disableCIDRFilter bool
+	cidrFilters       map[string]*net.IPNet
 }
 
 type DataFeedPollTaskParams struct {
@@ -50,10 +53,21 @@ type NodeIDs struct {
 }
 
 func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grpc.ClientConn, complianceConn *grpc.ClientConn, db *dao.DB, manager *cereal.Manager) *DataFeedPollTask {
+	cidrFilters := strings.Split(dataFeedConfig.ServiceConfig.CIDRFilter, ",")
+	ipNets := make(map[string]*net.IPNet)
+	for _, cidrFilter := range cidrFilters {
+		_, ipNet, err := net.ParseCIDR(cidrFilter)
+		if err != nil {
+			log.WithFields(log.Fields{"cidr_filter": cidrFilter}).Fatal("Cannot parse cidr_filter from config.toml")
+		}
+		ipNets[cidrFilter] = ipNet
+	}
 	return &DataFeedPollTask{
-		cfgMgmt:   cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
-		reporting: reporting.NewReportingServiceClient(complianceConn),
-		db:        db,
+		cfgMgmt:           cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
+		reporting:         reporting.NewReportingServiceClient(complianceConn),
+		db:                db,
+		disableCIDRFilter: dataFeedConfig.ServiceConfig.DisableCIDRFilter,
+		cidrFilters:       ipNets,
 	}
 }
 
@@ -182,7 +196,9 @@ func (d *DataFeedPollTask) GetChangedNodes(ctx context.Context, pageSize int32, 
 	for len(inventoryNodes.Nodes) > 0 {
 		for _, node := range inventoryNodes.Nodes {
 			log.Debugf("Inventory node %v", node.Id)
-			nodeIDs[node.Ipaddress] = NodeIDs{ClientID: node.Id}
+			if d.includeNode(node.Ipaddress) {
+				nodeIDs[node.Ipaddress] = NodeIDs{ClientID: node.Id}
+			}
 		}
 		lastNode := inventoryNodes.Nodes[len(inventoryNodes.Nodes)-1]
 		nodesRequest.CursorId = lastNode.Id
@@ -196,6 +212,18 @@ func (d *DataFeedPollTask) GetChangedNodes(ctx context.Context, pageSize int32, 
 	}
 	log.Debugf("found %v nodes", len(nodeIDs))
 	return nodeIDs, nil
+}
+
+func (d *DataFeedPollTask) includeNode(ipaddress string) bool {
+	if d.disableCIDRFilter {
+		return true
+	}
+	for _, ipNet := range d.cidrFilters {
+		if ipNet.Contains(net.ParseIP(ipaddress)) {
+			return true
+		}
+	}
+	return false
 }
 
 func (d *DataFeedPollTask) listReports(ctx context.Context, pageSize int32, feedStartTime time.Time, feedEndTime time.Time, nodeIDs map[string]NodeIDs) {
