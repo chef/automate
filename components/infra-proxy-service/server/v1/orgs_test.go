@@ -4,10 +4,13 @@ import (
 	"context"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 
+	"github.com/chef/automate/api/external/common/query"
+	secrets "github.com/chef/automate/api/external/secrets"
 	request "github.com/chef/automate/api/interservice/infra_proxy/request"
 	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/service"
 	"github.com/chef/automate/components/infra-proxy-service/constants"
@@ -26,6 +29,7 @@ func TestOrgs(t *testing.T) {
 	require.NoError(t, err)
 
 	_, serviceRef, conn, close, _ := test.SetupInfraProxyService(ctx, t, l, *migrationConfig)
+	secretsMock := serviceRef.Secrets.(*secrets.MockSecretsServiceClient)
 
 	cl := infra_proxy.NewInfraProxyClient(conn)
 
@@ -37,6 +41,23 @@ func TestOrgs(t *testing.T) {
 
 		t.Run("when a valid org is submitted", func(t *testing.T) {
 			ctx := context.Background()
+			secretID := &secrets.Id{
+				Id: "fake id",
+			}
+			newSecret := secrets.Secret{
+				Name: "infra-proxy-service-admin-key",
+				Type: "ssh",
+				Data: []*query.Kv{
+					{Key: "username", Value: "admin"},
+					{Key: "key", Value: "--KEY--"},
+				},
+			}
+			secretWithID := newSecret
+			secretWithID.Id = "fake id"
+
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
 				Name:        "Chef infra server",

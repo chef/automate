@@ -109,6 +109,11 @@ function compile_client_mocks() {
     pushd /src/components/automate-gateway/gateway_mocks || return 1
       make
     popd || return 1
+
+    # NOTE(ssd) 2020-03-23: The secrets-service only has external protobuf definitions
+    pushd /src/api/external || return 1
+      mockgen_debug -source secrets/secrets.pb.go -destination secrets/secrets.pb.client_mock.go -package secrets -self_package github.com/chef/automate/api/external/secrets
+    popd || return 1
   )
 }
 

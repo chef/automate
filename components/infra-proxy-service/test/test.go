@@ -7,6 +7,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 
@@ -80,10 +81,6 @@ func SetupInfraProxyService(ctx context.Context,
 	authzConnFactory := secureconn.NewFactory(*authzCerts)
 	grpcAuthz := authzConnFactory.NewServer()
 
-	secretsCerts := helpers.LoadDevCerts(t, "secrets-service")
-	secretsConnFactory := secureconn.NewFactory(*secretsCerts)
-	grpcSecrets := secretsConnFactory.NewServer()
-
 	mockCommon := authz.NewSubjectPurgeServerMock()
 	mockCommon.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
 	authz.RegisterSubjectPurgeServer(grpcAuthz, mockCommon)
@@ -99,12 +96,7 @@ func SetupInfraProxyService(ctx context.Context,
 	authzClient := authz.NewSubjectPurgeClient(authzConn)
 	authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
 
-	secretsServer := grpctest.NewServer(grpcSecrets)
-	secretsConn, err := secretsConnFactory.Dial("secrets-service", secretsServer.URL)
-	require.NoError(t, err)
-
-	secretsClient := secrets.NewSecretsServiceClient(secretsConn)
-
+	secretsClient := secrets.NewMockSecretsServiceClient(gomock.NewController(t))
 	serviceRef, err := service.Start(l, migrationConfig, connFactory, secretsClient,
 		authzClient, authzV2AuthorizationClient)
 
