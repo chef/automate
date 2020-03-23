@@ -28,10 +28,8 @@ import (
 // This auth policy is copied from gateway/datacollector.go
 // TODO: (dan) update this with applications resources/actions once we make them exist
 const (
-	resourceV1 = "ingest:unified_events"
-	actionV1   = "create"
-	resourceV2 = "ingest:unifiedEvents"
-	actionV2   = "ingest:unifiedEvents:create"
+	resource = "ingest:unifiedEvents"
+	action   = "ingest:unifiedEvents:create"
 )
 
 const authzClientTimeout = 60 * time.Second
@@ -270,8 +268,8 @@ func (a *automateAuthenticator) checkToken(token string) error {
 
 	resp, err := a.authzClient.ProjectsAuthorized(ctx, &authz.ProjectsAuthorizedReq{
 		Subjects: subjects,
-		Resource: resourceV2,
-		Action:   actionV2,
+		Resource: resource,
+		Action:   action,
 		// TODO (tc): This is broken. We need to populate this.
 		ProjectsFilter: []string{},
 	})
@@ -279,12 +277,12 @@ func (a *automateAuthenticator) checkToken(token string) error {
 		if status.Convert(err).Code() == codes.FailedPrecondition {
 			return err
 		}
-		return errors.Wrapf(err, "authorizing action %q on resource %q for members %q", actionV2, resourceV2, subjects)
+		return errors.Wrapf(err, "authorizing action %q on resource %q for members %q", action, resource, subjects)
 	}
 	projects := resp.Projects
 
 	if len(projects) == 0 {
-		return errors.Errorf("unauthorized action %q on resource %q for members %q", actionV2, resourceV2, subjects)
+		return errors.Errorf("unauthorized action %q on resource %q for members %q", action, resource, subjects)
 	}
 
 	return nil

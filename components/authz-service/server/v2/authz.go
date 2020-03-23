@@ -25,13 +25,13 @@ import (
 // but seems reasonable to make them the same by convention.
 type authzServer struct {
 	log      logger.Logger
-	engine   engine.V2Authorizer
+	engine   engine.Authorizer
 	projects api.ProjectsServer
 	store    storage.Storage
 }
 
 // NewPostgresAuthzServer returns a new IAM v2 Authz server.
-func NewPostgresAuthzServer(l logger.Logger, e engine.V2Authorizer, p api.ProjectsServer) (api.AuthorizationServer, error) {
+func NewPostgresAuthzServer(l logger.Logger, e engine.Authorizer, p api.ProjectsServer) (api.AuthorizationServer, error) {
 	s := postgres.GetInstance()
 	if s == nil {
 		return nil, errors.New("postgres v2 singleton not yet initialized for authz server")
@@ -39,7 +39,7 @@ func NewPostgresAuthzServer(l logger.Logger, e engine.V2Authorizer, p api.Projec
 	return NewAuthzServer(l, e, p, s)
 }
 
-func NewAuthzServer(l logger.Logger, e engine.V2Authorizer, p api.ProjectsServer, s storage.Storage) (api.AuthorizationServer, error) {
+func NewAuthzServer(l logger.Logger, e engine.Authorizer, p api.ProjectsServer, s storage.Storage) (api.AuthorizationServer, error) {
 	return &authzServer{
 		log:      l,
 		engine:   e,
@@ -78,7 +78,7 @@ func (s *authzServer) ProjectsAuthorized(
 		requestedProjects = allProjects
 	}
 
-	engineResp, err := s.engine.V2ProjectsAuthorized(ctx,
+	engineResp, err := s.engine.ProjectsAuthorized(ctx,
 		engine.Subjects(req.Subjects),
 		engine.Action(req.Action),
 		engine.Resource(req.Resource),
@@ -101,7 +101,7 @@ func (s *authzServer) ProjectsAuthorized(
 func (s *authzServer) FilterAuthorizedPairs(
 	ctx context.Context,
 	req *api.FilterAuthorizedPairsReq) (*api.FilterAuthorizedPairsResp, error) {
-	resp, err := s.engine.V2FilterAuthorizedPairs(ctx,
+	resp, err := s.engine.FilterAuthorizedPairs(ctx,
 		engine.Subjects(req.Subjects),
 		toEnginePairs(req.Pairs))
 	if err != nil {
@@ -120,7 +120,7 @@ func (s *authzServer) FilterAuthorizedProjects(
 	// Introspection needs unfiltered access.
 	ctx = auth_context.ContextWithoutProjects(ctx)
 
-	resp, err := s.engine.V2FilterAuthorizedProjects(ctx, engine.Subjects(req.Subjects))
+	resp, err := s.engine.FilterAuthorizedProjects(ctx, engine.Subjects(req.Subjects))
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

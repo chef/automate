@@ -162,7 +162,7 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 			"statements": statements,
 		}
 	}
-	require.NoError(t, opaInstance.V2p1SetPolicies(ctx, data, make(map[string]interface{})))
+	require.NoError(t, opaInstance.SetPolicies(ctx, data, make(map[string]interface{})))
 
 	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
 	if err != nil {

@@ -26,7 +26,7 @@ import (
 type policyServer struct {
 	log             logger.Logger
 	store           storage.Storage
-	engine          engine.V2p1Writer
+	engine          engine.Writer
 	policyRefresher PolicyRefresher
 }
 
@@ -43,7 +43,7 @@ func NewMemstorePolicyServer(
 	ctx context.Context,
 	l logger.Logger,
 	pr PolicyRefresher,
-	e engine.V2p1Writer) (PolicyServer, error) {
+	e engine.Writer) (PolicyServer, error) {
 
 	return NewPoliciesServer(ctx, l, pr, memstore.New(), e)
 }
@@ -53,7 +53,7 @@ func NewPostgresPolicyServer(
 	ctx context.Context,
 	l logger.Logger,
 	pr PolicyRefresher,
-	e engine.V2p1Writer) (PolicyServer, error) {
+	e engine.Writer) (PolicyServer, error) {
 
 	s := postgres.GetInstance()
 	if s == nil {
@@ -68,7 +68,7 @@ func NewPoliciesServer(
 	l logger.Logger,
 	pr PolicyRefresher,
 	s storage.Storage,
-	e engine.V2p1Writer) (PolicyServer, error) {
+	e engine.Writer) (PolicyServer, error) {
 
 	srv := &policyServer{
 		log:             l,

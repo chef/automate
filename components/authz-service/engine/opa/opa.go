@@ -125,29 +125,6 @@ func (s *State) initModules() error {
 	return nil
 }
 
-// initPartialResult allows caching things that don't change among multiple
-// query evaluations. We don't bother for the pairs query, but for
-// SetPolicies(), we want to do as little work per call as possible.
-// func (s *State) initPartialResult(ctx context.Context) error {
-// 	// Reset compiler to avoid state issues
-// 	compiler, err := s.newCompiler()
-// 	if err != nil {
-// 		return err
-// 	}
-
-// 	r := rego.New(
-// 		rego.ParsedQuery(s.queries[authzQuery]),
-// 		rego.Compiler(compiler),
-// 		rego.Store(s.store),
-// 	)
-// 	pr, err := r.PartialResult(ctx)
-// 	if err != nil {
-// 		return errors.Wrap(err, "partial eval")
-// 	}
-// 	s.partialAuth = pr
-// 	return nil
-// }
-
 // Returns a prepared query that can be executed. The result set will contain a
 // binding for a variable named 'project' that contains the name (string) of a
 // project the subject has access to.
@@ -264,10 +241,10 @@ func dumpData(ctx context.Context, store storage.Store, l logger.Logger) error {
 	return store.Commit(ctx, txn)
 }
 
-// V2ProjectsAuthorized evaluates whether a given [subject, resource, action,
+// ProjectsAuthorized evaluates whether a given [subject, resource, action,
 // projects] tuple is authorized and returns the list of associated allowed
 // projects from the set of requested projects passed in.
-func (s *State) V2ProjectsAuthorized(
+func (s *State) ProjectsAuthorized(
 	ctx context.Context,
 	subjects engine.Subjects,
 	action engine.Action,
@@ -296,9 +273,9 @@ func (s *State) V2ProjectsAuthorized(
 	return s.projectsFromPreparedEvalQuery(resultSet)
 }
 
-// V2FilterAuthorizedPairs passes the pairs into OPA, lets it take care of the
+// FilterAuthorizedPairs passes the pairs into OPA, lets it take care of the
 // filtering, and returns the result (sub)list
-func (s *State) V2FilterAuthorizedPairs(
+func (s *State) FilterAuthorizedPairs(
 	ctx context.Context,
 	subjects engine.Subjects,
 	pairs []engine.Pair,
@@ -317,10 +294,10 @@ func (s *State) V2FilterAuthorizedPairs(
 	return s.pairsFromResults(rs)
 }
 
-// V2FilterAuthorizedProjects passes the pairs of all action/resources into OPA,
+// FilterAuthorizedProjects passes the pairs of all action/resources into OPA,
 // lets it take care of the filtering,
 // and returns the projects associated with the resulting (sub)list.
-func (s *State) V2FilterAuthorizedProjects(
+func (s *State) FilterAuthorizedProjects(
 	ctx context.Context, subjects engine.Subjects) ([]string, error) {
 
 	opaInput := map[string]interface{}{
@@ -437,9 +414,9 @@ func (s *State) projectsFromPreparedEvalQuery(rs rego.ResultSet) ([]string, erro
 	return result, nil
 }
 
-// V2p1SetPolicies replaces OPA's data with a new set of policies and roles
+// SetPolicies replaces OPA's data with a new set of policies and roles
 // and resets the partial evaluation cache for v2.1
-func (s *State) V2p1SetPolicies(
+func (s *State) SetPolicies(
 	ctx context.Context, policyMap map[string]interface{},
 	roleMap map[string]interface{}) error {
 	s.v2p1Store = inmem.NewFromObject(map[string]interface{}{

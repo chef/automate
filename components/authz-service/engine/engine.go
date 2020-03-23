@@ -6,29 +6,29 @@ import (
 
 // Engine abstracts different v2 decision engines.
 type Engine interface {
-	// V2Authorizer and V2Writer are never used together (the authz section of the
-	// service needs V2Authorizer, the policy section cares about V2Writer), so we
+	// Authorizer and V2Writer are never used together (the authz section of the
+	// service needs Authorizer, the policy section cares about V2Writer), so we
 	// collect them here instead of introducing a V2Engine interface.
-	V2Authorizer
-	V2p1Writer
+	Authorizer
+	Writer
 }
 
-type V2Authorizer interface {
-	// V2ProjectsAuthorized returns a subset of the requested projects (Projects)
+type Authorizer interface {
+	// ProjectsAuthorized returns a subset of the requested projects (Projects)
 	// allowed by the subjects/action/resource tuple.
-	V2ProjectsAuthorized(context.Context, Subjects, Action, Resource, Projects) ([]string, error)
+	ProjectsAuthorized(context.Context, Subjects, Action, Resource, Projects) ([]string, error)
 
 	// FilterAuthorizedProjects returns a sublist of the passed-in pairs
 	// allowed by the subjects.
-	V2FilterAuthorizedPairs(context.Context, Subjects, []Pair) ([]Pair, error)
+	FilterAuthorizedPairs(context.Context, Subjects, []Pair) ([]Pair, error)
 
-	// V2FilterAuthorizedProjects returns a list of allowed projects
+	// FilterAuthorizedProjects returns a list of allowed projects
 	// for the given subjects
-	V2FilterAuthorizedProjects(context.Context, Subjects) ([]string, error)
+	FilterAuthorizedProjects(context.Context, Subjects) ([]string, error)
 }
 
-type V2p1Writer interface {
-	V2p1SetPolicies(context.Context, map[string]interface{}, map[string]interface{}) error
+type Writer interface {
+	SetPolicies(context.Context, map[string]interface{}, map[string]interface{}) error
 }
 
 // Subjects contains the requestor and all the teams they're a member of.
