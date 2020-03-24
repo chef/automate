@@ -29,5 +29,11 @@ kitchen destroy
 
 * Or from the Automate UI:
   1. Navigate to `Settings` > `API Tokens` > `Create Token`
-  1. Fill in the form.
-  1. Click the three dot menu on the right side and click `Copy Token`
+  1. Fill in the form. Remember or copy the ID.
+  1. Navigate to `Settings` > `Policies` > `Ingest` > `Members`
+    (or `Administrator` to grant admin permissions)
+  1. Click `Add Members`
+  1. In the page modal that opens, click `Add Member Expression`.
+    Select the Type `Token` and enter the ID of your new token.
+  1. Return to `Settings` > `API Tokens`
+  1. Click the three dot menu on the right side of your token's row and click `Copy Token`.
