@@ -8,6 +8,7 @@ describe('Deprecated routes redirect to the correct new route for backwards comp
   // Note: This is "old path" -> "new path", and the new path will be checked
   // using a regular expression: the string, anchored to the right by '$'.
   [
+    ['/settings/node-lifestyle',               '/settings/data-lifecycle'],
     ['/admin/settings',                        '/settings/data-lifecycle'],
     ['/admin/tokens',                          '/settings/tokens'],
     ['/admin/tokens/my-object',                '/settings/tokens/my-object'],
