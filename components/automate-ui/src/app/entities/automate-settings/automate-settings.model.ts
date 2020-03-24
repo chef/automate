@@ -60,8 +60,15 @@ export enum IngestJobs {
   ComplianceRemoveScans = 'complianceRemoveScans'
 }
 
+export enum JobCategories {
+  Infra = 'infra',
+  Compliance = 'compliance',
+  EventFeed = 'event_feed',
+  Services = 'services'
+}
+
 export class IngestJob {
-  category: string;
+  category: JobCategories;
   name: string;
   nested_name?: string;
   recurrence?: string;
@@ -74,7 +81,7 @@ export class IngestJob {
   last_started_at?: Date;
   last_ended_at?: Date;
 
-  constructor(category: string, respJob: RespJob) {
+  constructor(category: JobCategories, respJob: RespJob) {
     if (respJob !== null) {
       this.category = category;
       this.name = respJob.name;
@@ -111,7 +118,8 @@ export interface JobRequestBody {
   infra: {
     // Infra is a special case and can contain a list of JobRequestComponents
     // or an UnfurledJob depending on the API
-    job_settings: JobRequestComponent[] | UnfurledJob;
+    job_settings: any[] // <-- this actually needs to be an Array of
+                        // JobRequestComponents AND unFurlInjest Job
   };
   compliance: {
     job_settings: JobRequestComponent[]

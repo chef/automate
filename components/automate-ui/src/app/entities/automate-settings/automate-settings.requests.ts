@@ -10,7 +10,10 @@ import {
   IngestJob,
   RespJobSchedulerStatus,
   UnfurledJob,
-  JobRequestBody
+  JobRequestBody,
+  InfraJobName,
+  JobRequestComponent,
+  JobCategories
 } from './automate-settings.model';
 
 import { environment } from '../../../environments/environment';
@@ -71,22 +74,24 @@ export class AutomateSettingsRequests {
       }
     };
 
-    jobs.forEach((job: IngestJob): void => {
-      let thisJob;
-      let matchedNest;
+    jobs.forEach(job => {
+      let thisJob: UnfurledJob;
 
-      switch (job.name) {  // ADD STRONG TYPING
-        case 'delete_nodes':      // fallthrough
-        case 'missing_nodes':     // fallthrough
-        case 'missing_nodes_for_deletion':
+      switch (job.name) {
+        case InfraJobName.DeleteNodes:              // fallthrough
+        case InfraJobName.MissingNodes:             // fallthrough
+        case InfraJobName.MissingNodesForDeletion:
           thisJob = this.unfurlIngestJob(job);
           body[job.category].job_settings.push(thisJob);
           break;
 
-        case 'periodic_purge_timeseries': // fallthrough
-        case 'periodic_purge':
+        case InfraJobName.PeriodicPurgeTimeseries:  // fallthrough
+
+        case 'periodic_purge':                      // all other nested jobs are
+                                                    // contained in 'periodic_purge'
           thisJob = this.unfurlIngestJob(job, true);
-          matchedNest = body[job.category].job_settings.find(item => item.name === job.name);
+          const matchedNest: JobRequestComponent =
+            body[job.category].job_settings.find(item => item.name === job.name);
           matchedNest.purge_policies.elasticsearch.push(thisJob);
           break;
 
@@ -121,7 +126,7 @@ export class AutomateSettingsRequests {
 
     const allJobs = [];
 
-    Object.keys(respJobSchedulerStatus).forEach((category: string) => {
+    Object.keys(respJobSchedulerStatus).forEach((category: JobCategories) => {
       if (respJobSchedulerStatus[category]) {
         const catJobs = respJobSchedulerStatus[category].jobs
           .map((respJob: RespJob) => new IngestJob(category, respJob));
