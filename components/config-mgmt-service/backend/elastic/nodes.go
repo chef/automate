@@ -298,7 +298,7 @@ func (es Backend) GetAttribute(nodeID string) (backend.NodeAttribute, error) {
 	return nodeAttribute, nil
 }
 
-func (es Backend) GetErrors(filters map[string][]string) ([]*backend.ChefErrorCount, error) {
+func (es Backend) GetErrors(size int32, filters map[string][]string) ([]*backend.ChefErrorCount, error) {
 	// Return the top 10 most-frequently occurring combinations of Chef Infra
 	// error type (class) and error message.
 	//
@@ -414,8 +414,12 @@ func (es Backend) GetErrors(filters map[string][]string) ([]*backend.ChefErrorCo
 		}
 	})
 
-	if len(chefErrs) > 10 {
-		chefErrs = chefErrs[:10]
+	if size == 0 {
+		size = 10
+	}
+
+	if size > 0 && int32(len(chefErrs)) > size {
+		chefErrs = chefErrs[:size]
 	}
 
 	return chefErrs, nil

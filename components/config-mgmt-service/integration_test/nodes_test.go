@@ -2905,6 +2905,21 @@ func TestNodeRunErrors(t *testing.T) {
 		assert.Equal(t, int32(6), errInfo.Count)
 		assert.Equal(t, "FuntimeError6", errInfo.Type)
 		assert.Equal(t, "example-6 error occurred", errInfo.ErrorMessage)
+
+		// With a Size of 1, we should get one:
+
+		resExpectOne, err := cfgmgmt.GetErrors(context.Background(), &apiReq.Errors{Size: 1})
+		require.NoError(t, err)
+		assert.Len(t, resExpectOne.Errors, 1)
+		assert.Equal(t, "FuntimeError15", resExpectOne.Errors[0].Type)
+
+		// With a Size of -1, we should get all:
+
+		resExpectAll, err := cfgmgmt.GetErrors(context.Background(), &apiReq.Errors{Size: -1})
+		require.NoError(t, err)
+		require.Len(t, resExpectAll.Errors, 15)
+		assert.Equal(t, "FuntimeError15", resExpectAll.Errors[0].Type)
+		assert.Equal(t, "FuntimeError1", resExpectAll.Errors[14].Type)
 	})
 
 	// the request to elasticsearch will have to scroll over different pages when

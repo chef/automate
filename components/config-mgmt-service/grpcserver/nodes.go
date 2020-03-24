@@ -421,7 +421,7 @@ func (s *CfgMgmtServer) GetErrors(ctx context.Context, req *extReq.Errors) (*ext
 		return nil, status.Errorf(codes.InvalidArgument, "Cannot filter GetErrors request by 'status'")
 	}
 
-	chefErrors, err := s.client.GetErrors(filters)
+	chefErrors, err := s.client.GetErrors(req.Size, filters)
 	if err != nil {
 		return nil, err
 	}

@@ -191,6 +191,6 @@ func (es Backend) GetDeletedCountsTimeSeries(startTime, endTime time.Time,
 	return []backend.CountPeroid{}, nil
 }
 
-func (m Backend) GetErrors(map[string][]string) ([]*backend.ChefErrorCount, error) {
+func (m Backend) GetErrors(int32, map[string][]string) ([]*backend.ChefErrorCount, error) {
 	return nil, nil
 }
