@@ -149,3 +149,24 @@ export enum NestedJobName {
   Actions = 'actions',
   ConvergeHistory = 'converge-history'
 }
+
+export interface DefaultFormData {
+  eventFeedRemoveData: SingleDefaultForm;
+  eventFeedServerActions: SingleDefaultForm;
+  serviceGroupNoHealthChecks: SingleDefaultForm;
+  serviceGroupRemoveServices: SingleDefaultForm;
+  clientRunsRemoveData: SingleDefaultForm;
+  clientRunsLabelMissing: SingleDefaultForm;
+  clientRunsRemoveNodes: SingleDefaultForm;
+  complianceRemoveReports: SingleDefaultForm;
+  complianceRemoveScans: SingleDefaultForm;
+}
+
+export interface SingleDefaultForm {
+  category: JobCategories;
+  name: string;
+  nested_name?: NestedJobName;
+  unit: any;
+  threshold: any;
+  disabled: boolean;
+}

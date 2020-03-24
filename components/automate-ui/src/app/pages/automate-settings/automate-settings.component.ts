@@ -19,7 +19,9 @@ import {
   IngestJob,
   IngestJobs,
   InfraJobName,
-  NestedJobName
+  NestedJobName,
+  DefaultFormData,
+  JobCategories
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
@@ -30,71 +32,71 @@ import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
 export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
-  private defaultFormData = {
+  private defaultFormData: DefaultFormData = {
     eventFeedRemoveData: {
-      category: 'event_feed',
+      category: JobCategories.Infra,
       name: 'periodic_purge',
-      nested_name: 'feed',
+      nested_name: NestedJobName.Feed,
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
     },
     eventFeedServerActions: {
-      category: 'infra',
+      category: JobCategories.Infra,
       name: 'periodic_purge_timeseries',
-      nested_name: 'actions',
+      nested_name: NestedJobName.Actions,
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
     },
     serviceGroupNoHealthChecks: {
-      category: 'services',
+      category: JobCategories.Services,
       name: '',
       unit: { value: 'm', disabled: true},
       threshold: { value: '5', disabled: true },
       disabled: false // special case: only alterable by the API so we want to show as enabled
     },
     serviceGroupRemoveServices: {
-      category: 'services',
+      category: JobCategories.Services,
       name: '',
       unit: { value: 'd', disabled: true },
       threshold: { value: '5', disabled: true },
       disabled: false // special case: API not ready to alter
     },
     clientRunsRemoveData: {
-      category: 'infra',
+      category: JobCategories.Infra,
       name: 'missing_nodes',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
     },
     clientRunsLabelMissing: {
-      category: 'infra',
+      category: JobCategories.Infra,
       name: 'missing_nodes_for_deletion',
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
     },
     clientRunsRemoveNodes: {
-      category: 'infra',
+      category: JobCategories.Infra,
       name: 'periodic_purge_timeseries',
-      nested_name: 'converge-history',
+      nested_name: NestedJobName.ConvergeHistory,
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
     },
     complianceRemoveReports: {
-      category: 'compliance',
+      category: JobCategories.Compliance,
       name: 'periodic_purge',
-      nested_name: 'compliance-reports',
+      nested_name: NestedJobName.ComplianceReports,
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
     },
     complianceRemoveScans: {
-      category: 'compliance',
+      category: JobCategories.Compliance,
       name: 'periodic_purge',
-      nested_name: 'compliance-scans',
+      nested_name: NestedJobName.ComplianceScans,
       unit: { value: 'd', disabled: false },
       threshold: { value: '30', disabled: false },
       disabled: false
