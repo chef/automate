@@ -13,9 +13,9 @@ import {
   JobRequestBody
 } from './automate-settings.model';
 
-// import { environment } from '../../../environments/environment';
+import { environment } from '../../../environments/environment';
 
-// const RETENTION_URL = environment.retention_url;
+const RETENTION_URL = environment.retention_url;
 
 @Injectable()
 export class AutomateSettingsRequests {
@@ -25,8 +25,8 @@ export class AutomateSettingsRequests {
   // fetchJobSchedulerStatus sends an HTTP GET Request to read the status of the JobScheduler
   // living inside the ingest-service
   public fetchJobSchedulerStatus(_params): Observable<JobSchedulerStatus> {
-    // NEW ENDPOINT FOR DATA-LIFECYCLE
-    const url = '/api/v0/data-lifecycle/status';
+
+    const url = `${RETENTION_URL}/status`;
 
     return this.http
       .get<RespJobSchedulerStatus>(url).pipe(
@@ -36,7 +36,7 @@ export class AutomateSettingsRequests {
   // configureIngestJob sends an HTTP PUT Request to the provided ingest job to configure
   // it with the provided threshold and running state
   configureIngestJobs(jobs: IngestJob[]): Observable<any> {
-    const url = '/api/v0/data-lifecycle/config';
+    const url = `${RETENTION_URL}/config`;
 
     const body: JobRequestBody = {
       infra : {
