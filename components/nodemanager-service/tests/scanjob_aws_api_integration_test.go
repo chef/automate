@@ -138,10 +138,12 @@ func TestAWSAPIScanJob(t *testing.T) {
 		"expected reportingNodes.Total (%d) > originalReportingNodes.Total (%d)",
 		reportingNodes.GetTotal(), originalReportingNodes.GetTotal())
 
+	awsApiNodeFound := false
 	for _, listNode := range reportingNodes.GetNodes() {
 		endtime, err := ptypes.Timestamp(listNode.GetLatestReport().GetEndTime())
 		require.NoError(t, err)
 		if endtime.After(now) && listNode.GetEnvironment() == "aws-api" {
+			awsApiNodeFound = true
 			t.Logf("Beginning test time: %s", now)
 			t.Logf("Found node %s, end time: %s", listNode, endtime)
 			// check `/nodes` endpoint to ensure node marked as reachable
@@ -150,4 +152,5 @@ func TestAWSAPIScanJob(t *testing.T) {
 			require.Equal(t, "reachable", foundNode.GetStatus())
 		}
 	}
+	require.Equal(t, true, awsApiNodeFound)
 }
