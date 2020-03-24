@@ -339,7 +339,16 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		awsCreds = managers.GetAWSCreds(secret)
 	}
 
-	nodeInfo := nodeInfo{
+	nodeInfo, tc, secrets := assembleAwsApiNodeInfo(node, m, awsCreds)
+	inspecJob, err := assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc)
+	if err != nil {
+		return nil, errors.Wrapf(err, "error assembling job. aborting scan for node %s", node.Name)
+	}
+	return []*types.InspecJob{inspecJob}, nil
+}
+
+func assembleAwsApiNodeInfo(node *nodes.Node, m *manager.NodeManager, awsCreds awsec2.AwsCreds) (nodeInfo, inspec.TargetBaseConfig, inspec.Secrets) {
+	nodeDetails := nodeInfo{
 		UUID:           node.Id,
 		CloudID:        m.AccountId,
 		Name:           node.Name,
@@ -347,21 +356,21 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		ManagerID:      m.Id,
 		CloudAccountID: m.AccountId,
 	}
+	region := awsCreds.Region
+	if len(awsCreds.Region) == 0 {
+		region = awsec2.DefaultRegion
+	}
 	tc := inspec.TargetBaseConfig{
 		Backend: "aws",
-		Region:  awsCreds.Region,
+		Region:  region,
 	}
-	logrus.Infof("region being used for aws scan: %s", awsCreds.Region)
+	logrus.Infof("region being used for aws scan: %s", region)
 	secrets := inspec.Secrets{
 		AwsUser:         awsCreds.AccessKeyId,
 		AwsPassword:     awsCreds.SecretAccessKey,
 		AwsSessionToken: awsCreds.SessionToken,
 	}
-	inspecJob, err := assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc)
-	if err != nil {
-		return nil, errors.Wrapf(err, "error assembling job. aborting scan for node %s", node.Name)
-	}
-	return []*types.InspecJob{inspecJob}, nil
+	return nodeDetails, tc, secrets
 }
 
 func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.NodeManager, filters []*common.Filter, job *jobs.Job) ([]*types.InspecJob, error) {
