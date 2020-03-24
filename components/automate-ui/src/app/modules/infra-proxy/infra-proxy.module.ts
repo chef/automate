@@ -9,6 +9,7 @@ import { ChefServerDetailsComponent } from './chef-server-details/chef-server-de
 import { ChefServersListComponent } from './chef-servers-list/chef-servers-list.component';
 import { OrgDetailsComponent } from './org-details/org-details.component';
 import { InfraRoleDetailsComponent } from './infra-role-details/infra-role-details.component';
+import { CookbookDetailsComponent } from './cookbook-details/cookbook-details.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
 import { TreeTableModule } from './tree-table/tree-table.module';
@@ -20,6 +21,7 @@ import { JsonTreeTableComponent } from './json-tree-table/json-tree-table.compon
     ChefServerDetailsComponent,
     OrgDetailsComponent,
     InfraRoleDetailsComponent,
+    CookbookDetailsComponent,
     CreateChefServerModalComponent,
     CreateOrgModalComponent,
     JsonTreeTableComponent

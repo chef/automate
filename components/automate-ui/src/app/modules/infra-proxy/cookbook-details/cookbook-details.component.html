@@ -1,0 +1,33 @@
+<div class="content-container">
+    <div class="container">
+      <main>
+        <chef-breadcrumbs>
+          <chef-breadcrumb [link]="['/infrastructure/chef-servers']">Chef Server</chef-breadcrumb>
+          <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId]">Orgs</chef-breadcrumb>
+          <chef-breadcrumb [routerLink]="['/infrastructure/chef-servers', serverId, 'org', orgId, 'cookbooks']">Cookbooks</chef-breadcrumb>
+          {{ cookbooks?.name }}
+        </chef-breadcrumbs>
+        <chef-page-header>
+          <chef-heading>{{ cookbooks?.name }}</chef-heading>
+          <div class="version-dropdown">
+            <label>Version</label>
+            <chef-select *ngIf="cookbooks?.versions">
+              <chef-option *ngFor="let version of cookbooks?.versions" [value]="version">{{ version }}</chef-option>
+            </chef-select>
+          </div>
+          <chef-tab-selector [value]="tabValue">
+            <chef-option value='details' data-cy="content-tab">Details</chef-option>
+            <!-- <chef-option value='content' data-cy="content-tab">Content</chef-option> -->
+          </chef-tab-selector>
+        </chef-page-header>
+        <section class="page-body">
+          <!-- {{cookbookDetails?.chef_type}} -->
+        </section>
+        <!-- <section class="page-body" *ngIf="tabValue === 'details' && cookbookDetails">
+          {{ cookbookDetails?.chef_type }}
+        </section> -->
+        <!-- <section class="page-body" *ngIf="tabValue === 'content'">
+        </section> -->
+      </main>
+    </div>
+  </div>
