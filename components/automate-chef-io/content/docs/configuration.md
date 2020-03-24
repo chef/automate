@@ -84,7 +84,7 @@ To change the admin password from the command-line, first
 and copy the User ID, then use:
 
 ```bash
-export TOKEN=`chef-automate admin-token`
+export TOKEN=`chef-automate iam token create admin-token-1 --admin`
 
 curl -X PUT -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"name":"Local Administrator", "id": "<admin user ID>", "password":"<password>"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/users/admin?pretty
 ```

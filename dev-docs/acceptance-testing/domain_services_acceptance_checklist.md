@@ -20,7 +20,7 @@ settings: (node integrations) a few integrations\ already created, (node credent
 
     ```
     ssh your-ad-user@a2-local-inplace-upgrade-acceptance.cd.chef.co
-    sudo chef-automate admin-token
+    sudo chef-automate iam token create admin-token-1 --admin
     ```
 
     * Or [Use the Automate UI](https://github.com/chef/automate/blob/master/components/compliance-service/smokin/README.md#generating-a-token)

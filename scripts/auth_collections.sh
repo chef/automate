@@ -6,7 +6,7 @@
 #    jo pre-processor (for authGen function)
 #       https://github.com/jpmens/jo
 #    variable $TOK
-#       An admin token obtained from `get_admin_token` or `chef-automate admin-token`
+#       An admin token obtained from `get_admin_token` or `chef-automate iam token create admin-token-1 --admin`
 #    variable $TARGET_HOST
 #       A host running A2, either `https://a2-dev.test` or a remote machine.
 #
