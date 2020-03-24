@@ -8,7 +8,6 @@ import (
 	grpc_status "google.golang.org/grpc/status"
 
 	authz_constants "github.com/chef/automate/components/authz-service/constants"
-	authz_constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	iam_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
@@ -120,7 +119,7 @@ func AddUserToTeam(ctx context.Context,
 func UpdateAdminsPolicyIfNeeded(ctx context.Context,
 	apiClient client.APIClient, dryRun bool) (bool, error) {
 	resp, err := apiClient.PoliciesClient().ListPolicyMembers(ctx, &iam_req.ListPolicyMembersReq{
-		Id: authz_constants_v2.AdminPolicyID,
+		Id: authz_constants.AdminPolicyID,
 	})
 	if err != nil {
 		return false, wrapUnexpectedError(err, "Failed to verify members of chef-managed Admin policy")
@@ -129,7 +128,7 @@ func UpdateAdminsPolicyIfNeeded(ctx context.Context,
 
 	if !dryRun && !found {
 		_, err = apiClient.PoliciesClient().AddPolicyMembers(ctx, &iam_req.AddPolicyMembersReq{
-			Id:      authz_constants_v2.AdminPolicyID,
+			Id:      authz_constants.AdminPolicyID,
 			Members: []string{authz_constants.LocalAdminsTeamSubject},
 		})
 		if err != nil {

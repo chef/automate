@@ -14,7 +14,7 @@ import (
 	pgsgo "github.com/lyft/protoc-gen-star/lang/go"
 	options "google.golang.org/genproto/googleapis/api/annotations"
 
-	"github.com/chef/automate/api/interservice/authz"
+	authz "github.com/chef/automate/api/interservice/authz/v2"
 	policy "github.com/chef/automate/components/automate-grpc/protoc-gen-policy/api"
 	"github.com/chef/automate/components/automate-grpc/protoc-gen-policy/iam"
 )

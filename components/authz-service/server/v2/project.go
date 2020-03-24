@@ -19,7 +19,7 @@ import (
 	tspb "github.com/golang/protobuf/ptypes/timestamp"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/server/v2/project_purger_workflow"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
@@ -325,7 +325,7 @@ func (s *ProjectState) ListProjectsForIntrospection(
 		}
 		// Exclude all meta-projects from the API except "unassigned"
 		if !stringutils.SliceContains(systemProjects, apiProject.Id) ||
-			apiProject.Id == constants_v2.UnassignedProjectID {
+			apiProject.Id == constants.UnassignedProjectID {
 			resp.Projects = append(resp.Projects, apiProject)
 		}
 	}

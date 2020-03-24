@@ -173,10 +173,6 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 
 	authzClient, err := clients.AuthorizationClient()
 	if err != nil {
-		return errors.Wrap(err, "create client for authz service")
-	}
-	authzV2Client, err := clients.AuthorizationV2Client()
-	if err != nil {
 		return errors.Wrap(err, "create client for authzV2 service")
 	}
 	pb_authz.RegisterAuthorizationServer(grpcServer,
@@ -191,7 +187,7 @@ func (s *Server) RegisterGRPCServices(grpcServer *grpc.Server) error {
 		return errors.Wrap(err, "create projects client for authz-service")
 	}
 	pb_iam.RegisterPoliciesServer(grpcServer,
-		handler_policies.NewServer(policiesClient, projectsClient, authzV2Client))
+		handler_policies.NewServer(policiesClient, projectsClient, authzClient))
 	pb_iam.RegisterRulesServer(grpcServer, handler_rules.NewServer(projectsClient))
 
 	tokensMgmtClient, err := clients.TokensMgmtClient()

@@ -105,6 +105,7 @@ paths = [
   "components/authn-service/*",
   "api/config/platform/*",
   "api/config/shared/*",
+  "api/external/common/*",
   "api/interservice/authn/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
@@ -584,6 +585,7 @@ plan_path = "components/config-mgmt-service"
 paths = [
   "components/config-mgmt-service/*",
   "api/external/cfgmgmt/*",
+  "api/external/common/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
   "api/interservice/cfgmgmt/*",
@@ -822,6 +824,7 @@ paths = [
   "api/config/ui/*",
   "api/config/workflow_nginx/*",
   "api/config/workflow_server/*",
+  "api/external/common/*",
   "api/external/ingest/*",
   "api/interservice/authn/*",
   "api/interservice/authz/*",
@@ -1330,6 +1333,7 @@ paths = [
   "components/ingest-service/*",
   "api/config/platform/*",
   "api/config/shared/*",
+  "api/external/common/*",
   "api/external/ingest/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
@@ -1891,6 +1895,7 @@ paths = [
 plan_path = "components/event-feed-service"
 paths = [
   "components/event-feed-service/*",
+  "api/external/common/*",
   "api/interservice/authz/*",
   "api/interservice/cereal/*",
   "api/interservice/data_lifecycle/*",

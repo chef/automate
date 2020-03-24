@@ -6,7 +6,7 @@ import (
 
 	"github.com/pkg/errors"
 
-	constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 )
 
 func ValidateProjects(projects []string) error {

@@ -11,7 +11,7 @@ import (
 
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy"
-	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 )
 
 // Config holds the information needed to connect to the database (PGURL), to
@@ -104,22 +104,22 @@ func (c *Config) Migrate(dataMigConf datamigration.Config) error {
 			}
 		}
 
-		err = legacy.RecordMigrationStatus(ctx, constants_v2.EnumInProgress, db)
+		err = legacy.RecordMigrationStatus(ctx, constants.EnumInProgress, db)
 		if err != nil {
-			return errors.Wrapf(err, "failed to set IAM v2 migration_status to %s", constants_v2.EnumInProgress)
+			return errors.Wrapf(err, "failed to set IAM v2 migration_status to %s", constants.EnumInProgress)
 		}
 		l.Info("Setting up IAM data basics...")
 		err = legacy.MigrateToV2(ctx, db, migrateV1Policies)
 		if err != nil {
-			statusErr := legacy.RecordMigrationStatus(ctx, constants_v2.EnumFailed, db)
+			statusErr := legacy.RecordMigrationStatus(ctx, constants.EnumFailed, db)
 			if statusErr != nil {
-				return errors.Wrapf(statusErr, "failed to set IAM migration_status to %s:%s", constants_v2.EnumFailed, err.Error())
+				return errors.Wrapf(statusErr, "failed to set IAM migration_status to %s:%s", constants.EnumFailed, err.Error())
 			}
 			return errors.Wrap(err, "IAM data basics failed")
 		}
-		err = legacy.RecordMigrationStatus(ctx, constants_v2.EnumSuccessful, db)
+		err = legacy.RecordMigrationStatus(ctx, constants.EnumSuccessful, db)
 		if err != nil {
-			return errors.Wrapf(err, "failed to set IAM migration_status to %s", constants_v2.EnumSuccessful)
+			return errors.Wrapf(err, "failed to set IAM migration_status to %s", constants.EnumSuccessful)
 		}
 	}
 

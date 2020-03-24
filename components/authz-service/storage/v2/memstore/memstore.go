@@ -7,7 +7,7 @@ import (
 	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 )
@@ -25,7 +25,7 @@ type State struct {
 var ErrTypeAssertionFailed = errors.New("type assertion failed: could not convert interface{} to *storage.Policy")
 
 func New() *State {
-	return NewWithProjectLimit(constants_v2.DefaultProjectLimit)
+	return NewWithProjectLimit(constants.DefaultProjectLimit)
 }
 
 func NewWithProjectLimit(projectLimit int) *State {

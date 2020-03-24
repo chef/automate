@@ -13,7 +13,6 @@ import (
 	"github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/authz"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	cc_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
@@ -95,8 +94,7 @@ type ClientsFactory interface {
 	ComplianceIngesterClient() (cc_ingest.ComplianceIngesterClient, error)
 	NotificationsClient() (notifications.NotificationsClient, error)
 	AuthenticationClient() (authn.AuthenticationClient, error)
-	AuthorizationClient() (authz.AuthorizationClient, error)
-	AuthorizationV2Client() (iam_v2.AuthorizationClient, error)
+	AuthorizationClient() (iam_v2.AuthorizationClient, error)
 	PoliciesClient() (iam_v2.PoliciesClient, error)
 	ProjectsClient() (iam_v2.ProjectsClient, error)
 	TeamsClient() (teams.TeamsV2Client, error)
@@ -245,19 +243,9 @@ func (c *clientsFactory) AuthenticationClient() (authn.AuthenticationClient, err
 	return authn.NewAuthenticationClient(conn), nil
 }
 
-// AuthorizationClient returns a client for the Authorization service.
+// AuthorizationClient returns a client for the Authorization (IAMv2) service.
 // It requires the `authz` endpoint to be configured
-func (c *clientsFactory) AuthorizationClient() (authz.AuthorizationClient, error) {
-	conn, err := c.connectionByName("authz-service")
-	if err != nil {
-		return nil, err
-	}
-	return authz.NewAuthorizationClient(conn), nil
-}
-
-// AuthorizationV2Client returns a client for the Authorization (IAMv2) service.
-// It requires the `authz` endpoint to be configured
-func (c *clientsFactory) AuthorizationV2Client() (iam_v2.AuthorizationClient, error) {
+func (c *clientsFactory) AuthorizationClient() (iam_v2.AuthorizationClient, error) {
 	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err

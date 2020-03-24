@@ -15,7 +15,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/testhelpers"
 	"github.com/chef/automate/lib/grpc/auth_context"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -757,17 +757,17 @@ func rulesMatch(rules []api.CreateRuleReq, resp *api.ListRulesResp) bool {
 
 func createSystemRoles(ctx context.Context, polClient api.PoliciesClient) error {
 	_, err := polClient.CreateRole(ctx,
-		&api.CreateRoleReq{Id: constants_v2.ProjectOwnerRoleID, Name: "any", Actions: []string{"*"}, Projects: []string{}})
+		&api.CreateRoleReq{Id: constants.ProjectOwnerRoleID, Name: "any", Actions: []string{"*"}, Projects: []string{}})
 	if err != nil {
 		return err
 	}
 	_, err = polClient.CreateRole(ctx,
-		&api.CreateRoleReq{Id: constants_v2.EditorRoleID, Name: "any", Actions: []string{"*"}, Projects: []string{}})
+		&api.CreateRoleReq{Id: constants.EditorRoleID, Name: "any", Actions: []string{"*"}, Projects: []string{}})
 	if err != nil {
 		return err
 	}
 	_, err = polClient.CreateRole(ctx,
-		&api.CreateRoleReq{Id: constants_v2.ViewerRoleID, Name: "any", Actions: []string{"*"}, Projects: []string{}})
+		&api.CreateRoleReq{Id: constants.ViewerRoleID, Name: "any", Actions: []string{"*"}, Projects: []string{}})
 	if err != nil {
 		return err
 	}

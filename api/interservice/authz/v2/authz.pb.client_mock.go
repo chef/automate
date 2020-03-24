@@ -6,6 +6,7 @@ package v2
 
 import (
 	context "context"
+	version "github.com/chef/automate/api/external/common/version"
 	gomock "github.com/golang/mock/gomock"
 	grpc "google.golang.org/grpc"
 	reflect "reflect"
@@ -32,6 +33,26 @@ func NewMockAuthorizationClient(ctrl *gomock.Controller) *MockAuthorizationClien
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockAuthorizationClient) EXPECT() *MockAuthorizationClientMockRecorder {
 	return m.recorder
+}
+
+// GetVersion mocks base method
+func (m *MockAuthorizationClient) GetVersion(ctx context.Context, in *version.VersionInfoRequest, opts ...grpc.CallOption) (*version.VersionInfo, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{ctx, in}
+	for _, a := range opts {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetVersion", varargs...)
+	ret0, _ := ret[0].(*version.VersionInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetVersion indicates an expected call of GetVersion
+func (mr *MockAuthorizationClientMockRecorder) GetVersion(ctx, in interface{}, opts ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{ctx, in}, opts...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockAuthorizationClient)(nil).GetVersion), varargs...)
 }
 
 // FilterAuthorizedPairs mocks base method
@@ -135,6 +156,21 @@ func NewMockAuthorizationServer(ctrl *gomock.Controller) *MockAuthorizationServe
 // EXPECT returns an object that allows the caller to indicate expected use
 func (m *MockAuthorizationServer) EXPECT() *MockAuthorizationServerMockRecorder {
 	return m.recorder
+}
+
+// GetVersion mocks base method
+func (m *MockAuthorizationServer) GetVersion(arg0 context.Context, arg1 *version.VersionInfoRequest) (*version.VersionInfo, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetVersion", arg0, arg1)
+	ret0, _ := ret[0].(*version.VersionInfo)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetVersion indicates an expected call of GetVersion
+func (mr *MockAuthorizationServerMockRecorder) GetVersion(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetVersion", reflect.TypeOf((*MockAuthorizationServer)(nil).GetVersion), arg0, arg1)
 }
 
 // FilterAuthorizedPairs mocks base method

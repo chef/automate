@@ -83,8 +83,6 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 					return mockAuthorizationClient, nil
 				},
 			)
-			// note: the gateway's "reactive authorizer" requires both of these
-			mockClientsFactory.EXPECT().AuthorizationV2Client().AnyTimes()
 		case compliance_ingest.ComplianceIngesterClient:
 			// Mocking the provided mocked ComplianceIngesterClient
 			mockComplianceIngester := compliance_ingest.ComplianceIngesterClient(s)

@@ -87,23 +87,28 @@ function compile_client_mocks() {
   install_gomock
   (
     set -e
-    cd "/src/api/interservice"
-    mockgen_debug -source event/event.pb.go -destination event/event.pb.client_mock.go -package event -self_package github.com/chef/automate/api/interservice/event
-    mockgen_debug -source authz/v2/project.pb.go -destination authz/v2/project.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
-    mockgen_debug -source authz/v2/authz.pb.go -destination authz/v2/authz.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
-    mockgen_debug -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
-    mockgen_debug -source compliance/ingest/ingest/compliance.pb.go -destination compliance/ingest/ingest/compliance.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/compliance/ingest/ingest ProjectUpdateStatusReq,ProjectUpdateStatusResp
-    # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt because of
-    # an issue with source-mode's ability to parse interfaces from the
-    # grpc package. Details here:
-    #
-    # https://github.com/golang/mock/issues/156#issuecomment-586213812
-    #
-    mockgen_debug -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service -self_package github.com/chef/automate/api/interservice/cfgmgmt/service github.com/chef/automate/api/interservice/cfgmgmt/service CfgMgmtClient,CfgMgmt_NodeExportClient,CfgMgmt_ReportExportClient,CfgMgmtServer,CfgMgmt_NodeExportServer,CfgMgmt_ReportExportServer
-    mockgen_debug -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/ingest
-    mockgen_debug -source event_feed/event_feed.pb.go -destination event_feed/event_feed.pb.client_mock.go -package event_feed -self_package github.com/chef/automate/api/interservice/event_feed
-    mockgen_debug -source nodemanager/manager/manager.pb.go -destination nodemanager/manager/manager.pb.client_mock.go -package manager -self_package github.com/chef/automate/api/interservice/nodemanager/manager
-    mockgen_debug -source nodemanager/nodes/nodes.pb.go -destination nodemanager/nodes/nodes.pb.client_mock.go -package nodes -self_package github.com/chef/automate/api/interservice/nodemanager/nodes
+    pushd /src/api/interservice || return 1
+      mockgen_debug -source event/event.pb.go -destination event/event.pb.client_mock.go -package event -self_package github.com/chef/automate/api/interservice/event
+      mockgen_debug -source authz/v2/project.pb.go -destination authz/v2/project.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
+      mockgen_debug -source authz/v2/authz.pb.go -destination authz/v2/authz.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
+      mockgen_debug -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
+      mockgen_debug -source compliance/ingest/ingest/compliance.pb.go -destination compliance/ingest/ingest/compliance.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/compliance/ingest/ingest ProjectUpdateStatusReq,ProjectUpdateStatusResp
+      # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt because of
+      # an issue with source-mode's ability to parse interfaces from the
+      # grpc package. Details here:
+      #
+      # https://github.com/golang/mock/issues/156#issuecomment-586213812
+      #
+      mockgen_debug -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service -self_package github.com/chef/automate/api/interservice/cfgmgmt/service github.com/chef/automate/api/interservice/cfgmgmt/service CfgMgmtClient,CfgMgmt_NodeExportClient,CfgMgmt_ReportExportClient,CfgMgmtServer,CfgMgmt_NodeExportServer,CfgMgmt_ReportExportServer
+      mockgen_debug -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/ingest
+      mockgen_debug -source event_feed/event_feed.pb.go -destination event_feed/event_feed.pb.client_mock.go -package event_feed -self_package github.com/chef/automate/api/interservice/event_feed
+      mockgen_debug -source nodemanager/manager/manager.pb.go -destination nodemanager/manager/manager.pb.client_mock.go -package manager -self_package github.com/chef/automate/api/interservice/nodemanager/manager
+      mockgen_debug -source nodemanager/nodes/nodes.pb.go -destination nodemanager/nodes/nodes.pb.client_mock.go -package nodes -self_package github.com/chef/automate/api/interservice/nodemanager/nodes
+    popd || return 1
+
+    pushd /src/components/automate-gateway || return 1
+      mockgen_debug -source gateway/clients.go -destination gateway_mocks/mock_gateway/clients_mock.go -package mock_gateway
+    popd || return 1
   )
 }
 

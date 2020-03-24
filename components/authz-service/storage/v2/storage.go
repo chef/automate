@@ -4,7 +4,6 @@ import (
 	"context"
 
 	constants "github.com/chef/automate/components/authz-service/constants"
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 )
 
 // Storage is the interface that both our postgres and memstore storage
@@ -87,26 +86,26 @@ func DefaultPolicies() ([]Policy, error) {
 	if err != nil {
 		return nil, err
 	}
-	s2, err := NewStatement(Deny, "", []string{}, []string{"iam:policies:" + constants_v2.AdminPolicyID},
+	s2, err := NewStatement(Deny, "", []string{}, []string{"iam:policies:" + constants.AdminPolicyID},
 		[]string{"iam:policies:delete", "iam:policies:update"})
 	if err != nil {
 		return nil, err
 	}
 
 	// editor policy statements
-	s3, err := NewStatement(Allow, constants_v2.EditorRoleID, []string{}, []string{"*"}, []string{})
+	s3, err := NewStatement(Allow, constants.EditorRoleID, []string{}, []string{"*"}, []string{})
 	if err != nil {
 		return nil, err
 	}
 
 	// viewer policy statements
-	s4, err := NewStatement(Allow, constants_v2.ViewerRoleID, []string{}, []string{"*"}, []string{})
+	s4, err := NewStatement(Allow, constants.ViewerRoleID, []string{}, []string{"*"}, []string{})
 	if err != nil {
 		return nil, err
 	}
 
 	// ingest policy statements
-	s5, err := NewStatement(Allow, constants_v2.IngestRoleID, []string{}, []string{"*"}, []string{})
+	s5, err := NewStatement(Allow, constants.IngestRoleID, []string{}, []string{"*"}, []string{})
 	if err != nil {
 		return nil, err
 	}
@@ -132,7 +131,7 @@ func DefaultPolicies() ([]Policy, error) {
 	}
 
 	adminPol := Policy{
-		ID:         constants_v2.AdminPolicyID,
+		ID:         constants.AdminPolicyID,
 		Name:       "Administrator",
 		Members:    []Member{member},
 		Statements: []Statement{s1, s2},
@@ -140,7 +139,7 @@ func DefaultPolicies() ([]Policy, error) {
 	}
 
 	editorPol := Policy{
-		ID:         constants_v2.EditorPolicyID,
+		ID:         constants.EditorPolicyID,
 		Name:       "Editors",
 		Members:    []Member{editors},
 		Statements: []Statement{s3},
@@ -148,7 +147,7 @@ func DefaultPolicies() ([]Policy, error) {
 	}
 
 	viewerPol := Policy{
-		ID:         constants_v2.ViewerPolicyID,
+		ID:         constants.ViewerPolicyID,
 		Name:       "Viewers",
 		Members:    []Member{viewers},
 		Statements: []Statement{s4},
@@ -156,7 +155,7 @@ func DefaultPolicies() ([]Policy, error) {
 	}
 
 	ingestPol := Policy{
-		ID:         constants_v2.IngestPolicyID,
+		ID:         constants.IngestPolicyID,
 		Name:       "Ingest",
 		Members:    []Member{},
 		Statements: []Statement{s5},
@@ -170,14 +169,14 @@ func DefaultPolicies() ([]Policy, error) {
 // At present, this list contains internally required projects only, hidden from the user.
 func DefaultProjects() []Project {
 	allProjects := Project{
-		ID:   constants_v2.AllProjectsID,
+		ID:   constants.AllProjectsID,
 		Name: "All Projects",
 		Type: ChefManaged,
 	}
 
 	unassignedProject := Project{
-		ID:   constants_v2.UnassignedProjectID,
-		Name: constants_v2.UnassignedProjectID,
+		ID:   constants.UnassignedProjectID,
+		Name: constants.UnassignedProjectID,
 		Type: ChefManaged,
 	}
 

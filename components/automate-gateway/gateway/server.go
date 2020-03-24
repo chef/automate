@@ -201,7 +201,7 @@ func (s *Server) setLogLevel() {
 func (s *Server) loadAuthorizer() error {
 	s.logger.Info("loading authorizer")
 
-	authzClient, err := s.clientsFactory.AuthorizationV2Client()
+	authzClient, err := s.clientsFactory.AuthorizationClient()
 	if err != nil {
 		return errors.Wrap(err, "create authz client")
 	}
