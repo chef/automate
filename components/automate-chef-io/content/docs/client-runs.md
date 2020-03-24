@@ -154,7 +154,7 @@ curl -sSX POST "https://automate-url/api/v0/ingest/events/chef/nodedelete" -d
 '{
   "node_name": "somenode",
   "organization_name": "yourorg",
-  "service_hostname": "chef-server-fqdn"
+  "service_hostname": "chef-infra-server-fqdn"
 }'
 -H "X-Data-Collector-Token: $TOKEN"
 ```

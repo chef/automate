@@ -72,7 +72,7 @@ Then, on the Chef server:
 
 2. Creating a user in previous step displays a private key to stdout. Copy this content and and save it on the **Chef Automate** server as: `/hab/svc/automate-workflow-server/var/etc/delivery.pem`
 
-3. If this is a new chef-server, create an organization on the chef server with:
+3. If this is a new Chef Server, create an organization on the chef server with:
 
     ```shell
     `sudo chef-server-ctl org-create workflow workflow
@@ -168,7 +168,7 @@ Selecting **Workflow** opens the legacy Workflow screen.
 
     ```text
       192.168.0.20    automate-test
-      192.168.1.100   chef-server
+      192.168.1.100   chef-infra-server
     ```
 
 #### On the Automate 2 server
