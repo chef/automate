@@ -215,4 +215,34 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:chefServers:{server_id}:orgs:{org_id}:environments";
     option (chef.automate.api.iam.policy).action = "infra:chefServerOrgEnvironments:get";
   };
+
+  rpc GetDataBags (infra_proxy.request.DataBags) returns (infra_proxy.response.DataBags) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}";
+    option (chef.automate.api.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}/data_bags";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgDataBags:list";
+  };
+  rpc GetDataBagItem (infra_proxy.request.DataBag) returns (infra_proxy.response.DataBag) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}/{item}";
+    option (chef.automate.api.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}/data_bags";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:data_bags";
+    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgDataBags:get";
+  };
+
+  rpc GetEnvironments (infra_proxy.request.Environments) returns (infra_proxy.response.Environments) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/environments";
+    option (chef.automate.api.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}/environments";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
+    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgEnvironments:list";
+  };
+  rpc GetEnvironment (infra_proxy.request.Environment) returns (infra_proxy.response.Environment) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/environment/{name}";
+    option (chef.automate.api.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}/environments";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:environments";
+    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgEnvironments:get";
+  };
 }
