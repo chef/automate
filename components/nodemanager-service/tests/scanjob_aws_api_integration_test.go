@@ -116,6 +116,7 @@ func TestAWSAPIScanJob(t *testing.T) {
 	}
 	// ensure the job
 	require.Equal(t, "completed", status)
+	t.Logf("job status: %s", status)
 
 	// check reporting nodes. if job completed we should have an extra node in reporting nodes
 	reportingNodes, err := reportingClient.ListNodes(ctx, &reporting.Query{})
@@ -144,6 +145,7 @@ func TestAWSAPIScanJob(t *testing.T) {
 		require.NoError(t, err)
 		if endtime.After(now) && listNode.GetEnvironment() == "aws-api" {
 			awsApiNodeFound = true
+			t.Log("aws api node found")
 			t.Logf("Beginning test time: %s", now)
 			t.Logf("Found node %s, end time: %s", listNode, endtime)
 			// check `/nodes` endpoint to ensure node marked as reachable
