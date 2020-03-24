@@ -9,6 +9,8 @@ interface ReportingSummary {
     nodes: any;
     profiles: any;
     controls?: any;
+    platforms: number;
+    environments: number;
   };
   status: 'failed' | 'passed' | 'waived' | 'skipped' | 'unknown';
 }
