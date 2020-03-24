@@ -2947,23 +2947,142 @@ func TestNodeRunErrors(t *testing.T) {
 		require.NoError(t, err)
 
 		require.Len(t, res.Errors, 10)
-		errInfo := res.Errors[0]
 
+		// Sorting: error counts are first sorted on number of occurrences, then
+		// lexically on error type as a string. Shorter strings sort before longer
+		// ones. So you get:
+		// FuntimeError100, FuntimeError1000, FuntimeError200, .. FuntimeError800
+		// and FuntimeError900 is omitted because it's the 11th item.
+
+		errInfo := res.Errors[0]
 		assert.Equal(t, int32(2), errInfo.Count)
 		assert.Equal(t, "FuntimeError100", errInfo.Type)
 		assert.Equal(t, "example-100 error occurred", errInfo.ErrorMessage)
 
 		errInfo = res.Errors[1]
-
 		assert.Equal(t, int32(2), errInfo.Count)
 		assert.Equal(t, "FuntimeError1000", errInfo.Type)
 		assert.Equal(t, "example-1000 error occurred", errInfo.ErrorMessage)
 
 		errInfo = res.Errors[9]
-
 		assert.Equal(t, int32(2), errInfo.Count)
 		assert.Equal(t, "FuntimeError800", errInfo.Type)
 		assert.Equal(t, "example-800 error occurred", errInfo.ErrorMessage)
+	})
+
+	// Errors are only collected from nodes when the most recent run has status
+	// failure. So you can't filter them on status.
+	t.Run("Get errors with invalid filters returns error", func(t *testing.T) {
+		var req apiReq.Errors
+
+		req.Filter = []string{"status:success"}
+		_, err := cfgmgmt.GetErrors(context.Background(), &req)
+		require.Error(t, err)
+
+		req.Filter = []string{"status:aliens"}
+		_, err = cfgmgmt.GetErrors(context.Background(), &req)
+		require.Error(t, err)
+	})
+
+	// node filters (other than 'status') should work
+	t.Run("Get errors with filters", func(t *testing.T) {
+		nodeOne := iBackend.Node{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName:         "a",
+				Status:           "failure",
+				EntityUuid:       newUUID(),
+				Platform:         "ubuntu",
+				OrganizationName: "org1",
+			},
+			ErrorMessage: "an example error occurred",
+			ErrorType:    "NodeAError",
+			Exists:       true,
+		}
+
+		nodeTwo := iBackend.Node{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName:         "b",
+				Status:           "failure",
+				EntityUuid:       newUUID(),
+				Platform:         "centos",
+				OrganizationName: "org1",
+			},
+			ErrorMessage: "an example error occurred",
+			ErrorType:    "NodeBError",
+			Exists:       true,
+		}
+
+		nodes := []iBackend.Node{nodeOne, nodeTwo}
+
+		suite.IngestNodes(nodes)
+		defer suite.DeleteAllDocuments()
+
+		var req apiReq.Errors
+
+		req.Filter = []string{"name:a"}
+		res, err := cfgmgmt.GetErrors(context.Background(), &req)
+		require.NoError(t, err)
+		require.Len(t, res.Errors, 1)
+		assert.Equal(t, "NodeAError", res.Errors[0].Type)
+
+		req.Filter = []string{"name:b"}
+		res, err = cfgmgmt.GetErrors(context.Background(), &req)
+		require.NoError(t, err)
+		require.Len(t, res.Errors, 1)
+		assert.Equal(t, "NodeBError", res.Errors[0].Type)
+
+		req.Filter = []string{"organization:org1"}
+		res, err = cfgmgmt.GetErrors(context.Background(), &req)
+		require.NoError(t, err)
+		require.Len(t, res.Errors, 2)
+		assert.Equal(t, "NodeAError", res.Errors[0].Type)
+		assert.Equal(t, "NodeBError", res.Errors[1].Type)
+
+		req.Filter = []string{"organization:org2"}
+		res, err = cfgmgmt.GetErrors(context.Background(), &req)
+		require.NoError(t, err)
+		require.Len(t, res.Errors, 0)
+
+		req.Filter = []string{"platform:centos"}
+		res, err = cfgmgmt.GetErrors(context.Background(), &req)
+		require.NoError(t, err)
+		require.Len(t, res.Errors, 1)
+		assert.Equal(t, "NodeBError", res.Errors[0].Type)
+
+	})
+
+	t.Run("Get errors with project filters", func(t *testing.T) {
+		nodeOne := iBackend.Node{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName:   "a",
+				Status:     "failure",
+				EntityUuid: newUUID(),
+			},
+			ErrorMessage: "an example error occurred",
+			ErrorType:    "FuntimeError",
+			Exists:       true,
+			Projects:     []string{"projectOne"},
+		}
+
+		nodes := []iBackend.Node{nodeOne}
+
+		suite.IngestNodes(nodes)
+		defer suite.DeleteAllDocuments()
+
+		ctx := contextWithProjects([]string{"projectOne"})
+		res, err := cfgmgmt.GetErrors(ctx, &apiReq.Errors{})
+		require.NoError(t, err)
+		assert.Len(t, res.Errors, 1)
+
+		ctx = contextWithProjects([]string{"projectOne", "projectTwo"})
+		res, err = cfgmgmt.GetErrors(ctx, &apiReq.Errors{})
+		require.NoError(t, err)
+		assert.Len(t, res.Errors, 1)
+
+		ctx = contextWithProjects([]string{"projectNOPE", "projectTwo"})
+		res, err = cfgmgmt.GetErrors(ctx, &apiReq.Errors{})
+		require.NoError(t, err)
+		assert.Len(t, res.Errors, 0) // filtered out
 	})
 
 }

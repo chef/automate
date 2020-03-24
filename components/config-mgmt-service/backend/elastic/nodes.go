@@ -298,7 +298,7 @@ func (es Backend) GetAttribute(nodeID string) (backend.NodeAttribute, error) {
 	return nodeAttribute, nil
 }
 
-func (es Backend) GetErrors() ([]*backend.ChefErrorCount, error) {
+func (es Backend) GetErrors(filters map[string][]string) ([]*backend.ChefErrorCount, error) {
 	// Return the top 10 most-frequently occurring combinations of Chef Infra
 	// error type (class) and error message.
 	//
@@ -340,8 +340,8 @@ func (es Backend) GetErrors() ([]*backend.ChefErrorCount, error) {
 	//   }
 	// }
 	// '
-	boolQuery := elastic.NewBoolQuery()
-	boolQuery = boolQuery.Must(elastic.NewTermQuery("status", "failure"))
+	queryWithFilters := newBoolQueryFromFilters(filters)
+	queryWithFilters.Must(elastic.NewTermQuery("status", "failure"))
 
 	agg := elastic.NewCompositeAggregation()
 	agg.Sources(
@@ -355,12 +355,14 @@ func (es Backend) GetErrors() ([]*backend.ChefErrorCount, error) {
 	chefErrs := []*backend.ChefErrorCount{}
 
 	for !allResultsCollected {
-		if totalQueriesRan > 10 {
+		// Don't hammer elastic too bad if there is a bug or other unforeseen
+		// condition.
+		if totalQueriesRan > 50 {
 			return nil, fmt.Errorf("attempted too many queries to fetch top Chef error counts")
 		}
 
 		result, err := es.client.Search().
-			Query(boolQuery).
+			Query(queryWithFilters).
 			Index(IndexNodeState).
 			Aggregation("group_by_error_type_and_message", agg).
 			Size(0).

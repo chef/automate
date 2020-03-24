@@ -406,7 +406,22 @@ func (s *CfgMgmtServer) GetErrors(ctx context.Context, req *extReq.Errors) (*ext
 		"func":    nameOfFunc(),
 	}).Debug("rpc call")
 
-	chefErrors, err := s.client.GetErrors()
+	filters, err := stringutils.FormatFiltersWithKeyConverter(req.Filter,
+		params.ConvertParamToNodeStateBackendLowerFilter)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	if _, filterRequested := filters["status"]; filterRequested {
+		return nil, status.Errorf(codes.InvalidArgument, "Cannot filter GetErrors request by 'status'")
+	}
+
+	chefErrors, err := s.client.GetErrors(filters)
 	if err != nil {
 		return nil, err
 	}
