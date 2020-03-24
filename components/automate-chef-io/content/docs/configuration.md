@@ -65,7 +65,7 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 To upgrade a Chef Automate installation with `upgrade_strategy` set to `none`, run:
 
 ```bash
-chef-automate upgrade
+chef-automate upgrade run
 ```
 
 This command will upgrade Chef Automate to the latest version from your install channel.
