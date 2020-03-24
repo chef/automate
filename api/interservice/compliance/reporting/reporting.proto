@@ -83,6 +83,7 @@ message ControlItem {
 
 message ControlItems {
 	repeated ControlItem control_items = 1;
+	ControlSummary control_summary_totals = 2;
 }
 
 message Reports {
