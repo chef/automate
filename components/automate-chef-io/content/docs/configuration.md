@@ -62,7 +62,7 @@ upgrade_strategy = "at-once"
 
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
-To upgrade a Chef Automate installation with the `upgrade_strategy` set to `none`, run:
+To upgrade a Chef Automate installation with `upgrade_strategy` set to `none`, run:
 
 ```bash
 chef-automate upgrade
@@ -80,11 +80,13 @@ The only supported `deployment_type` is `local`.
 You cannot change the admin username, name, and password set during initial deployment.
 
 To change the admin password after deployment, use the Automate UI.
-Log in as the admin user, navigate to the _User_ page under the **Settings** tab.
-Selecting "Local Administrator" opens a form for updating the password.
-Enter and confirm your new password in the interface, and then select the **Update Password** button to save your changes.
+Sign in as the admin user, navigate to the _Users_ page under the **Settings** tab.
+Select "Local Administrator" to show the admin's _User Details_ page. 
+Navigate to the _Reset Password_ tab. 
+Enter your previous password, and enter and confirm your new password in the interface. 
+Select the **Reset Password** button to save your changes.
 
-To change the admin password from the command-line, first [fetch the admin user record]({{< relref "users.md#fetching-users" >}}), copy the User ID, and then use:
+To change the admin password from the command-line, first [fetch the admin user record](https://automate.chef.io/docs/api/), copy the User ID, and then use:
 
 ```bash
 export TOKEN=`chef-automate iam token create admin-token-1 --admin`
