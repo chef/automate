@@ -122,14 +122,14 @@ export interface JobRequestBody {
                         // JobRequestComponents AND unFurlInjest Job
   };
   compliance: {
-    job_settings: JobRequestComponent[]
+    job_settings: any[]
   };
   event_feed: {
-    job_settings: JobRequestComponent[]
+    job_settings: any[]
   };
   // services has not yet been implemented so we will leave as optional for now
   services?: {
-    job_settings: JobRequestComponent[]
+    job_settings: any[]
   };
 }
 
