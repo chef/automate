@@ -1,6 +1,7 @@
 package server
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"sort"
@@ -134,6 +135,31 @@ func (s *Server) GetCookbookAffectedNodes(ctx context.Context, req *request.Cook
 
 	return &response.CookbookAffectedNodes{
 		Nodes: fromSearchAPIToCookbookNodes(res),
+	}, nil
+}
+
+// GetCookbookFileContent get the data file content of the cookbook
+func (s *Server) GetCookbookFileContent(ctx context.Context, req *request.CookbookFileContent) (*response.CookbookFileContent, error) {
+	var writer bytes.Buffer
+	client, err := s.createClient(ctx, req.OrgId)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+	}
+
+	clientReq, err := client.NewRequest("GET", req.Url, nil)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "client request error: %s", err.Error())
+	}
+	clientReq.Header.Set("Accept", "text/plain")
+
+	res, err := client.Do(clientReq, &writer)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "unable to fetch: %s", err.Error())
+	}
+	defer res.Body.Close()
+
+	return &response.CookbookFileContent{
+		Content: writer.String(),
 	}, nil
 }
 

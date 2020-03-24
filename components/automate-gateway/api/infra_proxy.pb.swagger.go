@@ -548,6 +548,59 @@ func init() {
         ]
       }
     },
+    "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content": {
+      "get": {
+        "operationId": "GetCookbookFileContent",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/chef.automate.api.infra_proxy.response.CookbookFileContent"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "server_id",
+            "description": "Id of the server.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "org_id",
+            "description": "Id of the org.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "description": "Name of the cookbook.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "version",
+            "description": "Version of the cookbook.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "url",
+            "description": "Cookbook data file url.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "InfraProxy"
+        ]
+      }
+    },
     "/infra/servers/{server_id}/orgs/{org_id}/data_bags/{name}": {
       "get": {
         "operationId": "GetDataBags",
@@ -1084,6 +1137,15 @@ func init() {
           "items": {
             "type": "string"
           }
+        }
+      }
+    },
+    "chef.automate.api.infra_proxy.response.CookbookFileContent": {
+      "type": "object",
+      "properties": {
+        "content": {
+          "type": "string",
+          "description": "Cookbook data file content."
         }
       }
     },
