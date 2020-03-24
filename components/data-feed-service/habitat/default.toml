@@ -6,10 +6,8 @@ asset_page_size = 100
 reports_page_size = 1000
 node_batch_size = 100
 updated_nodes_only = true
-#disable_cidr_filter = true
-#cidr_filter = "0.0.0.0/0"
-disable_cidr_filter = false
-cidr_filter = "172.18.2.120/29,172.18.2.128/29,172.18.2.140/30,172.18.2.144/30,172.18.2.148/31,172.18.2.150/32"
+disable_cidr_filter = true
+cidr_filter = "0.0.0.0/0"
 
 [tls]
 key_contents =""
