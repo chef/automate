@@ -13,7 +13,6 @@ import (
 	secrets "github.com/chef/automate/api/external/secrets"
 	request "github.com/chef/automate/api/interservice/infra_proxy/request"
 	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/service"
-	"github.com/chef/automate/components/infra-proxy-service/constants"
 	"github.com/chef/automate/components/infra-proxy-service/test"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/logger"
@@ -36,37 +35,36 @@ func TestOrgs(t *testing.T) {
 	t.Helper()
 	defer close()
 
+	serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
+		Name:        "Chef infra server",
+		Description: "Chef infra server",
+		Fqdn:        "domain.com",
+		IpAddress:   "0.0.0.0",
+	})
+	require.NoError(t, err)
+	require.NotNil(t, serverRes)
+
+	secretID := &secrets.Id{
+		Id: "fake id",
+	}
+	newSecret := secrets.Secret{
+		Name: "infra-proxy-service-admin-key",
+		Type: "ssh",
+		Data: []*query.Kv{
+			{Key: "username", Value: "admin"},
+			{Key: "key", Value: "--KEY--"},
+		},
+	}
+	secretWithID := newSecret
+	secretWithID.Id = "fake id"
+
 	t.Run("CreateOrg", func(t *testing.T) {
-		test.ResetState(context.Background(), t, serviceRef)
+		test.ResetState(ctx, t, serviceRef)
 
 		t.Run("when a valid org is submitted", func(t *testing.T) {
-			ctx := context.Background()
-			secretID := &secrets.Id{
-				Id: "fake id",
-			}
-			newSecret := secrets.Secret{
-				Name: "infra-proxy-service-admin-key",
-				Type: "ssh",
-				Data: []*query.Kv{
-					{Key: "username", Value: "admin"},
-					{Key: "key", Value: "--KEY--"},
-				},
-			}
-			secretWithID := newSecret
-			secretWithID.Id = "fake id"
-
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
-
-			serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-				Name:        "Chef infra server",
-				Description: "Chef infra server",
-				Fqdn:        "domain.com",
-				IpAddress:   "0.0.0.0",
-			})
-			require.NoError(t, err)
-			require.NotNil(t, serverRes)
 
 			req := &request.CreateOrg{
 				Name:      "4thcoffee",
@@ -81,25 +79,17 @@ func TestOrgs(t *testing.T) {
 			org := resp.Org
 			assert.Equal(t, req.Name, org.Name)
 			assert.Equal(t, req.AdminUser, org.AdminUser)
-			assert.Equal(t, req.AdminKey, org.AdminKey)
+			assert.Equal(t, req.AdminKey, secretWithID.Data[1].Value)
 			assert.Equal(t, req.ServerId, org.ServerId)
 			assert.Equal(t, 2, len(org.Projects))
 
 			cleanupOrg(ctx, t, cl, resp.Org.Id)
-			cleanupServer(ctx, t, cl, serverRes.Server.Id)
 		})
 
 		t.Run("when no projects are passed", func(t *testing.T) {
-			ctx := context.Background()
-
-			serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-				Name:        "Chef infra server",
-				Description: "Chef infra server",
-				Fqdn:        "domain.com",
-				IpAddress:   "0.0.0.0",
-			})
-			require.NoError(t, err)
-			require.NotNil(t, serverRes)
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
 				Name:      "4thcoffee",
@@ -117,20 +107,12 @@ func TestOrgs(t *testing.T) {
 			assert.Equal(t, 0, len(org.Projects))
 
 			cleanupOrg(ctx, t, cl, resp.Org.Id)
-			cleanupServer(ctx, t, cl, serverRes.Server.Id)
 		})
 
-		t.Run("when the  exists", func(t *testing.T) {
-			ctx := context.Background()
-
-			serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-				Name:        "Chef infra server",
-				Description: "Chef infra server",
-				Fqdn:        "domain.com",
-				IpAddress:   "0.0.0.0",
-			})
-			require.NoError(t, err)
-			require.NotNil(t, serverRes)
+		t.Run("when the org exists", func(t *testing.T) {
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
 				Name:      "4thcoffee",
@@ -140,6 +122,10 @@ func TestOrgs(t *testing.T) {
 				Projects:  []string{},
 			})
 			require.NoError(t, err)
+
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			resp2, err := cl.CreateOrg(ctx, &request.CreateOrg{
 				Name:      "4thcoffee",
@@ -152,7 +138,46 @@ func TestOrgs(t *testing.T) {
 			grpctest.AssertCode(t, codes.AlreadyExists, err)
 
 			cleanupOrg(ctx, t, cl, resp.Org.Id)
-			cleanupServer(ctx, t, cl, serverRes.Server.Id)
+		})
+	})
+
+	t.Run("GetOrgs", func(t *testing.T) {
+		test.ResetState(context.Background(), t, serviceRef)
+
+		t.Run("when there is org exists", func(t *testing.T) {
+			resp, err := cl.GetOrgs(ctx, &request.GetOrgs{
+				ServerId: serverRes.Server.Id,
+			})
+			require.Nil(t, err)
+			require.NotNil(t, resp)
+
+			assert.Equal(t, 0, len(resp.GetOrgs()))
+		})
+
+		t.Run("when the org exists", func(t *testing.T) {
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req := &request.CreateOrg{
+				Name:      "4thcoffee",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{},
+			}
+			resp, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp)
+
+			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+				ServerId: serverRes.Server.Id,
+			})
+			require.NoError(t, err)
+			require.NotNil(t, orgs)
+			assert.Equal(t, 1, len(orgs.GetOrgs()))
+
+			cleanupOrg(ctx, t, cl, resp.Org.Id)
 		})
 	})
 
@@ -160,7 +185,6 @@ func TestOrgs(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 
 		t.Run("when there is no id in the request", func(t *testing.T) {
-			ctx := context.Background()
 			resp, err := cl.GetOrg(ctx, &request.GetOrg{
 				Id: "",
 			})
@@ -170,7 +194,6 @@ func TestOrgs(t *testing.T) {
 		})
 
 		t.Run("when the submitted ID is not a UUIDv4", func(t *testing.T) {
-			ctx := context.Background()
 			resp, err := cl.GetOrg(ctx, &request.GetOrg{
 				Id: "35bffbab-3a49-dd8a-94a1-9ea87ec5c3cc",
 			})
@@ -180,7 +203,6 @@ func TestOrgs(t *testing.T) {
 		})
 
 		t.Run("when the org does not exist", func(t *testing.T) {
-			ctx := context.Background()
 			resp, err := cl.GetOrg(ctx, &request.GetOrg{
 				Id: "97e01ea1-976e-4626-88c8-43345c5d934f",
 			})
@@ -190,41 +212,36 @@ func TestOrgs(t *testing.T) {
 		})
 
 		t.Run("when the org exists", func(t *testing.T) {
-			serverRes, err := cl.CreateServer(ctx, &request.CreateServer{
-				Name:        "Chef infra server",
-				Description: "Chef infra server",
-				Fqdn:        "domain.com",
-				IpAddress:   "0.0.0.0",
-			})
-			require.NoError(t, err)
-			require.NotNil(t, serverRes)
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
-			initResp, err := cl.CreateOrg(ctx, &request.CreateOrg{
-				Name:      "infra_org",
-				AdminUser: "admin_user",
-				AdminKey:  "admin_key",
+			req := &request.CreateOrg{
+				Name:      "4thcoffee",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
-				Projects:  []string{constants.UnassignedProjectID},
-			})
-			require.NoError(t, err)
-			require.NotNil(t, initResp)
-
-			resp, err := cl.GetOrg(ctx, &request.GetOrg{
-				Id: initResp.Org.Id,
-			})
-
+				Projects:  []string{"project1", "project2"},
+			}
+			resp, err := cl.CreateOrg(ctx, req)
 			require.NoError(t, err)
 			require.NotNil(t, resp)
-			assert.Equal(t, initResp.Org.Name, resp.Org.Name)
-			assert.Equal(t, initResp.Org.Id, resp.Org.Id)
-			assert.Equal(t, initResp.Org.AdminUser, resp.Org.AdminUser)
-			assert.Equal(t, initResp.Org.AdminKey, resp.Org.AdminKey)
-			assert.Equal(t, initResp.Org.Projects, resp.Org.Projects)
 
-			cleanupOrg(ctx, t, cl, initResp.Org.Id)
-			cleanupServer(ctx, t, cl, serverRes.Server.Id)
+			org, err := cl.GetOrg(ctx, &request.GetOrg{
+				Id: resp.Org.Id,
+			})
+			require.NoError(t, err)
+			require.NotNil(t, org)
+			assert.Equal(t, resp.Org.Name, org.Org.Name)
+			assert.Equal(t, resp.Org.Id, org.Org.Id)
+			assert.Equal(t, resp.Org.AdminUser, org.Org.AdminUser)
+			assert.Equal(t, resp.Org.AdminKey, secretWithID.GetId())
+			assert.Equal(t, resp.Org.Projects, org.Org.Projects)
+
+			cleanupOrg(ctx, t, cl, resp.Org.Id)
 		})
 	})
+	cleanupServer(ctx, t, cl, serverRes.Server.Id)
 }
 
 func cleanupOrg(ctx context.Context, t *testing.T, cl infra_proxy.InfraProxyClient, orgID string) {
