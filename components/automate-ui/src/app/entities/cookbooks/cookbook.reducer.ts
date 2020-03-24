@@ -11,6 +11,7 @@ export interface CookbookEntityState extends EntityState<Cookbook> {
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
+const GET_STATUS = 'getStatus';
 
 export const cookbookEntityAdapter: EntityAdapter<Cookbook> = createEntityAdapter<Cookbook>({
   selectId: (cookbook: Cookbook) => cookbook.name
@@ -33,10 +34,21 @@ export function cookbookEntityReducer(
     case CookbookActionTypes.GET_ALL_SUCCESS:
       return pipe(
         set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
-        (cookbookEntityAdapter.setAll(action.payload.cookbooks, state)) as CookbookEntityState;
+        (cookbookEntityAdapter.addAll(action.payload.cookbooks, state)) as CookbookEntityState;
 
     case CookbookActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
+
+    case CookbookActionTypes.GET:
+      return set(GET_STATUS, EntityStatus.loading, cookbookEntityAdapter.removeAll(state));
+
+    case CookbookActionTypes.GET_SUCCESS:
+      return pipe(
+        set(GET_STATUS, EntityStatus.loadingSuccess))
+        (cookbookEntityAdapter.addOne(action.payload.cookbook, state)) as CookbookEntityState;
+
+    case CookbookActionTypes.GET_FAILURE:
+      return set(GET_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;

@@ -10,6 +10,7 @@ import { ChefServersListComponent } from './chef-servers-list/chef-servers-list.
 import { CookbooksListComponent } from './cookbook-list/cookbooks-list.component';
 import { InfraRolesListComponent } from './infra-roles-list/infra-roles-list.component';
 import { InfraRoleDetailsComponent } from './infra-role-details/infra-role-details.component';
+import { CookbookDetailsComponent } from './cookbook-details/cookbook-details.component';
 import { CreateChefServerModalComponent } from './create-chef-server-modal/create-chef-server-modal.component';
 import { CreateOrgModalComponent } from './create-org-modal/create-org-modal.component';
 import { AngularTreeGridModule } from 'angular-tree-grid';
@@ -21,6 +22,7 @@ import { AngularTreeGridModule } from 'angular-tree-grid';
     CookbooksListComponent,
     InfraRolesListComponent,
     InfraRoleDetailsComponent,
+    CookbookDetailsComponent,
     CreateChefServerModalComponent,
     CreateOrgModalComponent
   ],

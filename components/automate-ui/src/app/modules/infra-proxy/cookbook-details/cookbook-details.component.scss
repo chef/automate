@@ -1,0 +1,22 @@
+@import "~styles/variables";
+
+chef-page-header {
+  padding-bottom: 0;
+}
+
+.version-dropdown {
+    color: $chef-primary-dark;
+    ::ng-deep label {
+        margin-right: 15px;
+        color: $chef-primary-dark;
+        display: inline;
+        font-size: 15px;
+    }
+    chef-select {
+        margin-bottom: 12px;
+        width: 150px;
+        font-size: 12px;
+    }
+}
+
+

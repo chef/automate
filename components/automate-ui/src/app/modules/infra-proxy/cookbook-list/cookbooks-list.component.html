@@ -88,8 +88,10 @@
                         </chef-table-header>
                         <chef-table-body>
                             <chef-table-row *ngFor="let cookbook of cookbooks">
-                                <chef-table-cell>{{ cookbook.name }}</chef-table-cell>
-                                <chef-table-cell>{{ cookbook.version }}</chef-table-cell>
+                                <chef-table-cell>
+                                    <a [routerLink]="['/infrastructure','chef-servers', serverId, 'org', org.id, 'cookbooks', cookbook.name]">{{ cookbook.name }}</a>
+                                </chef-table-cell>
+                                <chef-table-cell>{{ cookbook.current_version }}</chef-table-cell>
                             </chef-table-row>
                         </chef-table-body>
                     </chef-table-new>
