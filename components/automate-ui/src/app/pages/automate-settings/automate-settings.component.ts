@@ -144,21 +144,21 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     const formDetails = this.defaultFormData;
 
 //  EventFeed
-    this.eventFeedRemoveData = this.fb.group(formDetails['eventFeedRemoveData']);
-    this.eventFeedServerActions = this.fb.group(formDetails['eventFeedServerActions']);
+    this.eventFeedRemoveData = this.fb.group(formDetails.eventFeedRemoveData);
+    this.eventFeedServerActions = this.fb.group(formDetails.eventFeedServerActions);
 
     // Service Groups
-    this.serviceGroupNoHealthChecks = this.fb.group(formDetails['serviceGroupNoHealthChecks']);
-    this.serviceGroupRemoveServices = this.fb.group(formDetails['serviceGroupRemoveServices']);
+    this.serviceGroupNoHealthChecks = this.fb.group(formDetails.serviceGroupNoHealthChecks);
+    this.serviceGroupRemoveServices = this.fb.group(formDetails.serviceGroupRemoveServices);
 
     // Client Runs
-    this.clientRunsRemoveData = this.fb.group(formDetails['clientRunsRemoveData']);
-    this.clientRunsLabelMissing = this.fb.group(formDetails['clientRunsLabelMissing']);
-    this.clientRunsRemoveNodes = this.fb.group(formDetails['clientRunsRemoveNodes']);
+    this.clientRunsRemoveData = this.fb.group(formDetails.clientRunsRemoveData);
+    this.clientRunsLabelMissing = this.fb.group(formDetails.clientRunsLabelMissing);
+    this.clientRunsRemoveNodes = this.fb.group(formDetails.clientRunsRemoveNodes);
 
     // Compliance
-    this.complianceRemoveReports = this.fb.group(formDetails['complianceRemoveReports']);
-    this.complianceRemoveScans = this.fb.group(formDetails['complianceRemoveScans']);
+    this.complianceRemoveReports = this.fb.group(formDetails.complianceRemoveReports);
+    this.complianceRemoveScans = this.fb.group(formDetails.complianceRemoveScans);
 
     // Put the whole form together
     this.automateSettingsForm = this.fb.group({
