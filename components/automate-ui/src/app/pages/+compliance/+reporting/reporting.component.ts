@@ -30,6 +30,7 @@ import {
 import { DateTime } from 'app/helpers/datetime/datetime';
 import { pickBy } from 'lodash/fp';
 import { FilterC } from './types';
+import { ReportingSummaryStatus } from '../shared/reporting/report-data.service';
 
 @Component({
   templateUrl: './reporting.component.html',
@@ -411,7 +412,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.showSummary = !this.showSummary;
   }
 
-  getIcon(status) {
+  getIcon(status: ReportingSummaryStatus) {
     switch (status) {
       case 'failed': return 'report_problem';
       case 'passed': return 'check_circle';
@@ -421,7 +422,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatSummaryPhrase(status) {
+  formatSummaryPhrase(status: ReportingSummaryStatus) {
     switch (status) {
       case 'failed': return 'Not Compliant';
       case 'passed': return 'Compliant';
