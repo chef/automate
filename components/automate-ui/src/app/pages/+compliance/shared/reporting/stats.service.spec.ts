@@ -44,17 +44,19 @@ describe('StatsService', () => {
       const listParams = {perPage: 10, page: 1};
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/nodes/search`;
-      const expectedTotal = 20;
+      const expectedTotal = 21;
       const expectedTotalFailed = 1;
       const expectedTotalPassed = 18;
       const expectedTotalSkipped = 2;
+      const expectedTotalWaived = 1;
       const expectedItems = [{}, {}];
       const mockResp = {
         nodes: expectedItems,
         total: expectedTotal,
         total_failed: expectedTotalFailed,
         total_passed: expectedTotalPassed,
-        total_skipped: expectedTotalSkipped
+        total_skipped: expectedTotalSkipped,
+        total_waived: expectedTotalWaived
       };
 
       service.getNodes(reportQuery, listParams).subscribe(data => {
@@ -63,7 +65,8 @@ describe('StatsService', () => {
           items: expectedItems,
           total_failed: expectedTotalFailed,
           total_passed: expectedTotalPassed,
-          total_skipped: expectedTotalSkipped
+          total_skipped: expectedTotalSkipped,
+          total_waived: expectedTotalWaived
         });
       });
 
