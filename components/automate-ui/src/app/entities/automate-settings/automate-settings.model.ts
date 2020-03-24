@@ -16,7 +16,7 @@ export interface RespJob {
   disabled: boolean;
   recurrence: string;
   threshold: string;
-  purge_policies: any; // needs specific type
+  purge_policies: any; // TODO needs specific type
   last_elapsed?: Date;
   next_due_at?: Date;
   last_enqueued_at?: Date;
@@ -67,7 +67,7 @@ export class IngestJob {
   recurrence?: string;
   threshold: string;
   disabled: boolean;
-  purge_policies?: any; // needs specific type
+  purge_policies?: any; // TODO needs specific type
   last_elapsed?: Date;
   next_due_at?: Date;
   last_enqueued_at?: Date;
@@ -109,7 +109,7 @@ export interface JobRequestComponent {
 
 export interface JobRequestBody {
   infra: {
-    // Infra is a special case and con contain a JobRequestComponent
+    // Infra is a special case and can contain a list of JobRequestComponents
     // or an UnfurledJob depending on the API
     job_settings: JobRequestComponent[] | UnfurledJob;
   };
@@ -132,6 +132,8 @@ export enum InfraJobName {
   PeriodicPurgeTimeseries = 'periodic_purge_timeseries'
 }
 
+// Actions and ConvergeHistory are nested, but contained inside
+// the InfraJobName of PeriodicPurgeTimeseries
 export enum NestedJobName {
   ComplianceReports = 'compliance-reports',
   ComplianceScans = 'compliance-scans',
