@@ -262,7 +262,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetCookbookFileContent", "infra:servers:{server_id}:orgs:{org_id}:cookbooks", "infra:serverOrgCookbooks:get", "GET", "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetCookbookFileContent", "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks", "infra:infraServerOrgCookbooks:get", "GET", "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CookbookFileContent); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
