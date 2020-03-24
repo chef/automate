@@ -10,7 +10,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import {
   IngestJob,
-  JobSchedulerStatus
+  JobSchedulerStatus,
+  JobCategories
 } from 'app/entities/automate-settings/automate-settings.model';
 
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
@@ -90,48 +91,32 @@ describe('AutomateSettingsComponent', () => {
 
   describe('toggleInput(form, value)', () => {
 
-    using([
-      ['eventFeedRemoveData', false, true],
-      ['eventFeedRemoveData', false, true ],
-      ['eventFeedServerActions', false, true ],
-      // Service Groups on not currently uncheckable through the UI
-      // ['serviceGroupNoHealthChecks', false, true ],
-      // ['serviceGroupRemoveServices', false, true ],
-      ['clientRunsRemoveData', false, true ],
-      ['clientRunsLabelMissing', false, true ],
-      ['clientRunsRemoveNodes', false, true ],
-      ['complianceRemoveReports', false, true ],
-      ['complianceRemoveScans', false, true ]
-    ], function( form: string, currentState: boolean, expectedState: boolean) {
-      it('deactivates the asociated form', () => {
-        expect(component[form].value.disabled).toEqual(currentState);
-        component.toggleInput(component[form], currentState);
-        expect(component[form].value.disabled).toEqual(expectedState);
-        expect(component[form].get('unit').disabled).toBe(expectedState);
-        expect(component[form].get('threshold').disabled).toBe(expectedState);
+    using(ALL_FORMS
+        // Service Groups on not currently uncheckable through the UI
+        .filter( form => !['serviceGroupNoHealthChecks', 'serviceGroupRemoveServices']
+        .includes(form)),
+        function( form: string) {
+      it(`deactivates the associated ${form} form`, () => {
+        expect(component[form].value.disabled).toEqual(false);
+        component.toggleInput(component[form], false);
+        expect(component[form].value.disabled).toEqual(true);
+        expect(component[form].get('unit').disabled).toBe(true);
+        expect(component[form].get('threshold').disabled).toBe(true);
       });
     });
 
-    using([
-      ['eventFeedRemoveData', true, false ],
-      ['eventFeedRemoveData', true, false ],
-      ['eventFeedServerActions', true, false ],
-      // Service Groups on not currently uncheckable through the UI
-      // ['serviceGroupNoHealthChecks', true, false ],
-      // ['serviceGroupRemoveServices', true, false ],
-      ['clientRunsRemoveData', true, false ],
-      ['clientRunsLabelMissing', true, false ],
-      ['clientRunsRemoveNodes', true, false ],
-      ['complianceRemoveReports', true, false ],
-      ['complianceRemoveScans', true, false ]
-    ], function (form: string, currentState: boolean, expectedState: boolean) {
-      it('deactivates the asociated form', () => {
-        component[form].patchValue({disabled: true}); // Set each form to Activated to start
-        expect(component[form].value.disabled).toEqual(currentState);
-        component.toggleInput(component[form], currentState);
-        expect(component[form].value.disabled).toEqual(expectedState);
-        expect(component[form].get('unit').disabled).toBe(expectedState);
-        expect(component[form].get('threshold').disabled).toBe(expectedState);
+    using(ALL_FORMS
+        // Service Groups on not currently uncheckable through the UI
+        .filter( form => !['serviceGroupsNoHealthChecks', 'serviceGroupRemoveServices']
+        .includes(form)),
+        function (form: string) {
+          it(`activates the associated ${form} form`, () => {
+        component[form].patchValue({disabled: true}); // Deactivate form to start
+        expect(component[form].value.disabled).toEqual(true);
+        component.toggleInput(component[form], true);
+        expect(component[form].value.disabled).toEqual(false);
+        expect(component[form].get('unit').disabled).toBe(false);
+        expect(component[form].get('threshold').disabled).toBe(false);
       });
     });
 
@@ -149,7 +134,7 @@ describe('AutomateSettingsComponent', () => {
     beforeAll(() => {
       const eventFeedRemoveData: IngestJob = {
         name: 'periodic_purge',
-        category: 'event_feed',
+        category: JobCategories.EventFeed,
         disabled: true,
         threshold: '',
         purge_policies: {
@@ -165,7 +150,7 @@ describe('AutomateSettingsComponent', () => {
 
       const infraNestedForms: IngestJob = {
         name: 'periodic_purge_timeseries',
-        category: 'infra',
+        category: JobCategories.Infra,
         disabled: false,
         threshold: '',
         purge_policies: {
@@ -185,7 +170,7 @@ describe('AutomateSettingsComponent', () => {
       };
 
       const complianceForms: IngestJob = {
-        category: 'compliance',
+        category: JobCategories.Compliance,
         name: 'periodic_purge',
         threshold: '',
         disabled: true,
@@ -206,14 +191,14 @@ describe('AutomateSettingsComponent', () => {
       };
 
       const clientRunsRemoveData: IngestJob = {
-        category: 'infra',
+        category: JobCategories.Infra,
         name: 'missing_nodes',
         disabled : false,
         threshold : '7d'
       };
 
       const clientRunsLabelMissing: IngestJob = {
-        category: 'infra',
+        category: JobCategories.Infra,
         name: 'missing_nodes_for_deletion',
         disabled: false,
         threshold: '14m'
