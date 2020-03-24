@@ -14,7 +14,10 @@ toc = true
 
 {{% warning %}}
 
-Chef Automate does not deploy Chef Manage alongside Chef Infra Server.
+Chef Automate will not deploy the following Chef Infra Server add-ons:
+- Chef Manage
+- Push Jobs Server
+- Supermarket
 
 {{% /warning %}}
 
