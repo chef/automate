@@ -1,4 +1,4 @@
-package v2
+package constants
 
 const (
 	// LocalAdminsTeamSubject is the member for the local admins team.

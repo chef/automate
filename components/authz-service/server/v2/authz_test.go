@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 )

@@ -3,7 +3,7 @@ package v2
 import (
 	"context"
 
-	constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 )
 
 // Storage is the interface that both our postgres and memstore storage

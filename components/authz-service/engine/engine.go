@@ -4,7 +4,7 @@ import (
 	"context"
 )
 
-// Engine abstracts different v2 decision engines.
+// Engine abstracts different decision engines.
 type Engine interface {
 	// Authorizer and V2Writer are never used together (the authz section of the
 	// service needs Authorizer, the policy section cares about V2Writer), so we

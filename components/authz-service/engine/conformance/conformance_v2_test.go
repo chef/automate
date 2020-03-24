@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/engine/opa"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
@@ -84,7 +84,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 					}
 				}
 
-				setPoliciesV2p1(t, e, genericSysPols...)
+				setPolicies(t, e, genericSysPols...)
 
 				cases := map[string]func(t *testing.T){
 					"service version":                       isAuthorized("user:ldap:alice", "system:serviceVersion:get", "system:service:version"),
@@ -121,7 +121,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, pol)
+				setPolicies(t, e, pol)
 				actual, err := e.ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.Equal(t, []string{proj1}, actual)
@@ -143,7 +143,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act},
 				}
-				setPoliciesV2p1(t, e, pol, role)
+				setPolicies(t, e, pol, role)
 				actual, err := e.ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{proj1, proj2}, actual)
@@ -176,7 +176,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act},
 				}
-				setPoliciesV2p1(t, e, pol1, pol2, role)
+				setPolicies(t, e, pol1, pol2, role)
 				actual, err := e.ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{proj1}, actual)
@@ -209,7 +209,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act},
 				}
-				setPoliciesV2p1(t, e, pol1, pol2, role)
+				setPolicies(t, e, pol1, pol2, role)
 				actual, err := e.ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{proj1, proj2}, actual)
@@ -231,7 +231,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act},
 				}
-				setPoliciesV2p1(t, e, pol, role)
+				setPolicies(t, e, pol, role)
 				actual, err := e.ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.Equal(t, []string{}, actual)
@@ -253,7 +253,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act},
 				}
-				setPoliciesV2p1(t, e, pol, role)
+				setPolicies(t, e, pol, role)
 				actual, err := e.ProjectsAuthorized(args(allProjects))
 				require.NoError(t, err)
 				assert.Equal(t, []string{proj1}, actual)
@@ -276,7 +276,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act},
 				}
-				setPoliciesV2p1(t, e, pol, role)
+				setPolicies(t, e, pol, role)
 				actual, err := e.ProjectsAuthorized(args([]string{"*"}))
 				require.NoError(t, err)
 				assert.Equal(t, []string{}, actual)
@@ -294,7 +294,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, pol)
+				setPolicies(t, e, pol)
 				actual, err := e.ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.Equal(t, []string{}, actual)
@@ -312,7 +312,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, pol)
+				setPolicies(t, e, pol)
 				actual, err := e.ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{}, actual)
@@ -336,7 +336,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, pol)
+				setPolicies(t, e, pol)
 				actual, err := e.ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{proj2}, actual)
@@ -360,7 +360,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, pol)
+				setPolicies(t, e, pol)
 				actual, err := e.ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{}, actual)
@@ -384,7 +384,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, pol)
+				setPolicies(t, e, pol)
 				actual, err := e.ProjectsAuthorized(args(allProjects))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{}, actual)
@@ -408,7 +408,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, pol)
+				setPolicies(t, e, pol)
 				// in the server, we fetch the list of all projects when the projects filter is empty
 				actual, err := e.ProjectsAuthorized(args(allProjects))
 				require.NoError(t, err)
@@ -427,7 +427,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, pol)
+				setPolicies(t, e, pol)
 				actual, err := e.ProjectsAuthorized(args([]string{proj1, proj2}))
 				require.NoError(t, err)
 				assert.ElementsMatch(t, []string{proj1, proj2}, actual)
@@ -445,7 +445,7 @@ func TestV2p1ProjectsAuthorized(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, pol)
+				setPolicies(t, e, pol)
 				// in the server, we fetch the list of all projects when the projects filter is empty
 				actual, err := e.ProjectsAuthorized(args(allProjects))
 				require.NoError(t, err)
@@ -489,7 +489,7 @@ func TestFilterAuthorizedPairs(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, policy0, policy1)
+				setPolicies(t, e, policy0, policy1)
 
 				filtered, err := e.FilterAuthorizedPairs(args())
 				require.NoError(t, err)
@@ -507,7 +507,7 @@ func TestFilterAuthorizedPairs(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, policy)
+				setPolicies(t, e, policy)
 
 				filtered, err := e.FilterAuthorizedPairs(args())
 				require.NoError(t, err)
@@ -529,7 +529,7 @@ func TestFilterAuthorizedPairs(t *testing.T) {
 					"id":      "handyman",
 					"actions": []string{act0},
 				}
-				setPoliciesV2p1(t, e, policy, role)
+				setPolicies(t, e, policy, role)
 
 				filtered, err := e.FilterAuthorizedPairs(args())
 				require.NoError(t, err)
@@ -557,7 +557,7 @@ func TestFilterAuthorizedPairs(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, policy0, policy1)
+				setPolicies(t, e, policy0, policy1)
 
 				filtered, err := e.FilterAuthorizedPairs(args())
 				require.NoError(t, err)
@@ -604,7 +604,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, policy0, policy1)
+				setPolicies(t, e, policy0, policy1)
 				expectedProjects := []string{}
 
 				filtered, err := e.FilterAuthorizedProjects(args())
@@ -635,7 +635,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, policy0, policy1)
+				setPolicies(t, e, policy0, policy1)
 				expectedProjects := []string{proj0, proj1, proj2}
 
 				filtered, err := e.FilterAuthorizedProjects(args())
@@ -667,7 +667,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, policy0, policy1)
+				setPolicies(t, e, policy0, policy1)
 				expectedProjects := []string{proj0, proj1}
 
 				filtered, err := e.FilterAuthorizedProjects(args())
@@ -699,7 +699,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, policy0, policy1)
+				setPolicies(t, e, policy0, policy1)
 				expectedProjects := []string{proj0, proj1}
 
 				filtered, err := e.FilterAuthorizedProjects(args())
@@ -742,7 +742,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 						},
 					},
 				}
-				setPoliciesV2p1(t, e, policy0, policy1)
+				setPolicies(t, e, policy0, policy1)
 				expectedProjects := []string{proj0, proj1, proj2}
 
 				filtered, err := e.FilterAuthorizedProjects(args())
@@ -785,7 +785,7 @@ func TestHierarchicalResourcePolicies(t *testing.T) {
 								},
 							},
 						}
-						setPoliciesV2p1(t, e, policy)
+						setPolicies(t, e, policy)
 
 						filtered, err := e.FilterAuthorizedPairs(args())
 						require.NoError(t, err)
@@ -818,7 +818,7 @@ func TestHierarchicalResourcePolicies(t *testing.T) {
 							},
 						}
 
-						setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+						setPolicies(t, e, allowPolicy, denyPolicy)
 
 						// now, having both the matching allow-policy, and a new deny-policy
 						// with a hierarchical resource, this should end in deny (no pairs)
@@ -853,7 +853,7 @@ func TestHierarchicalResourcePolicies(t *testing.T) {
 							},
 						}
 
-						setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+						setPolicies(t, e, allowPolicy, denyPolicy)
 
 						// now, having both the matching deny-policy for a specified resource,
 						// and a new allow-policy with a hierarchical resource, this should
@@ -891,7 +891,7 @@ func TestWildcardActionPolicies(t *testing.T) {
 							},
 						},
 					}
-					setPoliciesV2p1(t, e, policy)
+					setPolicies(t, e, policy)
 
 					filtered, err := e.FilterAuthorizedPairs(args())
 					require.NoError(t, err)
@@ -913,7 +913,7 @@ func TestWildcardActionPolicies(t *testing.T) {
 					}
 
 					// check that we get an allow, so this non-wildcard policy is matching
-					setPoliciesV2p1(t, e, allowPolicy)
+					setPolicies(t, e, allowPolicy)
 					filtered, err := e.FilterAuthorizedPairs(args())
 					require.NoError(t, err)
 					assert.Equal(t, []engine.Pair{pair}, filtered)
@@ -930,7 +930,7 @@ func TestWildcardActionPolicies(t *testing.T) {
 						},
 					}
 
-					setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+					setPolicies(t, e, allowPolicy, denyPolicy)
 
 					// now, having both the matching allow-policy, and a new deny-policy
 					// with a wildcard subject, this should end in deny (no pair)
@@ -954,7 +954,7 @@ func TestWildcardActionPolicies(t *testing.T) {
 					}
 
 					// check that we get an allow, so this non-wildcard policy is matching
-					setPoliciesV2p1(t, e, allowPolicy)
+					setPolicies(t, e, allowPolicy)
 					filtered, err := e.FilterAuthorizedPairs(args())
 					require.NoError(t, err)
 					assert.Equal(t, []engine.Pair{pair}, filtered)
@@ -971,7 +971,7 @@ func TestWildcardActionPolicies(t *testing.T) {
 						},
 					}
 
-					setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+					setPolicies(t, e, allowPolicy, denyPolicy)
 
 					// now, having both the matching deny-policy for a specified action,
 					// and a new allow-policy with a wildcard action, this should still
@@ -1012,7 +1012,7 @@ func TestWildcardSubjectsPolicies(t *testing.T) {
 							},
 						},
 					}
-					setPoliciesV2p1(t, e, policy)
+					setPolicies(t, e, policy)
 
 					filtered, err := e.FilterAuthorizedPairs(args())
 					require.NoError(t, err)
@@ -1033,7 +1033,7 @@ func TestWildcardSubjectsPolicies(t *testing.T) {
 					}
 
 					// check that we get an allow
-					setPoliciesV2p1(t, e, allowPolicy)
+					setPolicies(t, e, allowPolicy)
 					filtered, err := e.FilterAuthorizedPairs(args())
 					require.NoError(t, err)
 					assert.Equal(t, []engine.Pair{pair}, filtered)
@@ -1050,7 +1050,7 @@ func TestWildcardSubjectsPolicies(t *testing.T) {
 						},
 					}
 
-					setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+					setPolicies(t, e, allowPolicy, denyPolicy)
 
 					// now, having both the matching allow-policy, and a new deny-policy
 					// with a wildcard subject, this should end in deny (no pair)
@@ -1075,7 +1075,7 @@ func TestWildcardSubjectsPolicies(t *testing.T) {
 					}
 
 					// check that we get an allow, so this non-wildcard policy is matching
-					setPoliciesV2p1(t, e, allowPolicy)
+					setPolicies(t, e, allowPolicy)
 					filtered, err := e.FilterAuthorizedPairs(args())
 					require.NoError(t, err)
 					assert.Equal(t, []engine.Pair{pair}, filtered)
@@ -1092,7 +1092,7 @@ func TestWildcardSubjectsPolicies(t *testing.T) {
 						},
 					}
 
-					setPoliciesV2p1(t, e, allowPolicy, denyPolicy)
+					setPolicies(t, e, allowPolicy, denyPolicy)
 
 					// now, having both the matching deny-policy for a specified subject,
 					// and a new allow-policy with a wildcard subject, this should still
@@ -1106,7 +1106,7 @@ func TestWildcardSubjectsPolicies(t *testing.T) {
 	}
 }
 
-func setPoliciesV2p1(t testing.TB, e engine.Engine, policiesAndRoles ...interface{}) {
+func setPolicies(t testing.TB, e engine.Engine, policiesAndRoles ...interface{}) {
 	t.Helper()
 	ctx := context.Background()
 

@@ -8,7 +8,7 @@ import (
 
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	constants_v1 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v1"
-	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 	"github.com/chef/automate/lib/logger"
 	uuid "github.com/chef/automate/lib/uuid4"
 	"github.com/pkg/errors"
@@ -119,7 +119,7 @@ func addTokenToAdminPolicy(ctx context.Context, tok string, db *sql.DB) error {
 	if err != nil {
 		return errors.Wrap(err, "format v2 member for admin team")
 	}
-	mems, err := addPolicyMembers(ctx, db, constants_v2.AdminPolicyID, []v2Member{m})
+	mems, err := addPolicyMembers(ctx, db, constants.AdminPolicyID, []v2Member{m})
 	if err != nil {
 		return errors.Wrapf(err, "could not add members %q to admin policy", mems)
 	}
@@ -208,7 +208,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (cfgmgmt)")
 		}
-		cfgmgmtPolicy, err := newV2Policy(constants_v2.CfgmgmtPolicyID,
+		cfgmgmtPolicy, err := newV2Policy(constants.CfgmgmtPolicyID,
 			"[Legacy] Infrastructure Automation Access",
 			Custom, []v2Member{member},
 			[]v2Statement{cfgmgmtStatement}, noProjects)
@@ -225,7 +225,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (compliance)")
 		}
-		compliancePolicy, err := newV2Policy(constants_v2.CompliancePolicyID,
+		compliancePolicy, err := newV2Policy(constants.CompliancePolicyID,
 			"[Legacy] Compliance Access",
 			Custom, []v2Member{member}, []v2Statement{complianceStatement}, noProjects)
 		if err != nil {
@@ -241,7 +241,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 		if err != nil {
 			return nil, errors.Wrap(err, "format v2 member (events)")
 		}
-		eventsPolicy, err := newV2Policy(constants_v2.EventsPolicyID,
+		eventsPolicy, err := newV2Policy(constants.EventsPolicyID,
 			"[Legacy] Events Access",
 			Custom, []v2Member{member}, []v2Statement{eventsStatement}, noProjects)
 		if err != nil {
@@ -258,7 +258,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 			return nil, errors.Wrap(err, "format v2 member (ingest)")
 		}
 
-		ingestPolicy, err := newV2Policy(constants_v2.LegacyIngestPolicyID,
+		ingestPolicy, err := newV2Policy(constants.LegacyIngestPolicyID,
 			"[Legacy] Ingest Access",
 			Custom, []v2Member{member}, []v2Statement{ingestStatement}, noProjects)
 		if err != nil {
@@ -275,7 +275,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 			return nil, errors.Wrap(err, "format v2 member (nodes)")
 		}
 		nodesPolicy, err := newV2Policy(
-			constants_v2.NodesPolicyID,
+			constants.NodesPolicyID,
 			"[Legacy] Nodes Access",
 			Custom,
 			[]v2Member{member},
@@ -296,7 +296,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 			return nil, errors.Wrap(err, "format v2 member (nodemanagers)")
 		}
 		nodeManagersPolicy, err := newV2Policy(
-			constants_v2.NodeManagersPolicyID,
+			constants.NodeManagersPolicyID,
 			"[Legacy] Node Managers Access",
 			Custom,
 			[]v2Member{member},
@@ -317,7 +317,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 			return nil, errors.Wrap(err, "format v2 member (secrets)")
 		}
 		secretsPolicy, err := newV2Policy(
-			constants_v2.SecretsPolicyID,
+			constants.SecretsPolicyID,
 			"[Legacy] Secrets Access",
 			Custom,
 			[]v2Member{member},
@@ -338,7 +338,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 			return nil, errors.Wrap(err, "format v2 member (telemetry)")
 		}
 		telemetryPolicy, err := newV2Policy(
-			constants_v2.TelemetryPolicyID,
+			constants.TelemetryPolicyID,
 			"[Legacy] Telemetry Access",
 			Custom,
 			[]v2Member{member},
@@ -359,7 +359,7 @@ func legacyPolicyFromV1(pol *v1Policy) (*v2Policy, error) {
 			return nil, errors.Wrap(err, "format v2 member (compliance token)")
 		}
 		complianceTokenPolicy, err := newV2Policy(
-			constants_v2.ComplianceTokenPolicyID,
+			constants.ComplianceTokenPolicyID,
 			"[Legacy] Compliance Profile Access",
 			Custom,
 			[]v2Member{member},

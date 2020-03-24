@@ -9,7 +9,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
@@ -1517,17 +1517,17 @@ func (p *pg) addSupportPolicies(ctx context.Context, project *v2.Project, q Quer
 		{
 			id:   fmt.Sprintf("%s-%s", project.ID, "project-owners"),
 			name: fmt.Sprintf("%s %s", project.Name, "Project Owners"),
-			role: constants_v2.ProjectOwnerRoleID,
+			role: constants.ProjectOwnerRoleID,
 		},
 		{
 			id:   fmt.Sprintf("%s-%s", project.ID, "project-editors"),
 			name: fmt.Sprintf("%s %s", project.Name, "Project Editors"),
-			role: constants_v2.EditorRoleID,
+			role: constants.EditorRoleID,
 		},
 		{
 			id:   fmt.Sprintf("%s-%s", project.ID, "project-viewers"),
 			name: fmt.Sprintf("%s %s", project.Name, "Project Viewers"),
-			role: constants_v2.ViewerRoleID,
+			role: constants.ViewerRoleID,
 		},
 	}
 

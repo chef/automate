@@ -12,7 +12,7 @@ import (
 	_ "github.com/golang-migrate/migrate/database/postgres" // make driver available
 	_ "github.com/golang-migrate/migrate/source/file"       // make source available
 
-	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 	"github.com/chef/automate/lib/logger"
 	"github.com/golang-migrate/migrate"
 	"github.com/pkg/errors"
@@ -143,7 +143,7 @@ func TestMigrateToV2(t *testing.T) {
 			// members should be added to default admin policy
 			assert.Equal(t, v2DefaultAndLegacyPolicyCount, v2PolicyCount)
 
-			adminPol, err := queryTestPolicy(ctx, constants_v2.AdminPolicyID, db)
+			adminPol, err := queryTestPolicy(ctx, constants.AdminPolicyID, db)
 			require.NoError(t, err)
 			require.NotNil(t, adminPol)
 
@@ -428,7 +428,7 @@ func v1LegacyPolicies() []v2Policy {
 
 	s1 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"compliance:*"})
 	compliancePol := v2Policy{
-		ID:         constants_v2.CompliancePolicyID,
+		ID:         constants.CompliancePolicyID,
 		Name:       "[Legacy] Compliance Access",
 		Members:    []v2Member{allUsers},
 		Statements: []v2Statement{s1},
@@ -437,7 +437,7 @@ func v1LegacyPolicies() []v2Policy {
 
 	s2 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"compliance:profiles:*"})
 	complianceProfilePol := v2Policy{
-		ID:         constants_v2.ComplianceTokenPolicyID,
+		ID:         constants.ComplianceTokenPolicyID,
 		Name:       "[Legacy] Compliance Profile Access",
 		Members:    []v2Member{allTokens},
 		Statements: []v2Statement{s2},
@@ -446,7 +446,7 @@ func v1LegacyPolicies() []v2Policy {
 
 	s3 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"event:*"})
 	eventPol := v2Policy{
-		ID:         constants_v2.EventsPolicyID,
+		ID:         constants.EventsPolicyID,
 		Name:       "[Legacy] Events Access",
 		Members:    []v2Member{allUsers},
 		Statements: []v2Statement{s3},
@@ -455,7 +455,7 @@ func v1LegacyPolicies() []v2Policy {
 
 	s4 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"infra:*"})
 	infraPol := v2Policy{
-		ID:         constants_v2.CfgmgmtPolicyID,
+		ID:         constants.CfgmgmtPolicyID,
 		Name:       "[Legacy] Infrastructure Automation Access",
 		Members:    []v2Member{allUsers},
 		Statements: []v2Statement{s4},
@@ -464,7 +464,7 @@ func v1LegacyPolicies() []v2Policy {
 
 	s5 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"ingest:*"})
 	ingestPol := v2Policy{
-		ID:         constants_v2.IngestPolicyID,
+		ID:         constants.IngestPolicyID,
 		Name:       "[Legacy] Ingest Access",
 		Members:    []v2Member{allTokens},
 		Statements: []v2Statement{s5},
@@ -473,7 +473,7 @@ func v1LegacyPolicies() []v2Policy {
 
 	s6 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"infra:nodes:*"})
 	nodePol := v2Policy{
-		ID:         constants_v2.NodesPolicyID,
+		ID:         constants.NodesPolicyID,
 		Name:       "[Legacy] Nodes Access",
 		Members:    []v2Member{allUsers},
 		Statements: []v2Statement{s6},
@@ -482,7 +482,7 @@ func v1LegacyPolicies() []v2Policy {
 
 	s7 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"infra:nodeManagers:*"})
 	nodeManagerPol := v2Policy{
-		ID:         constants_v2.NodeManagersPolicyID,
+		ID:         constants.NodeManagersPolicyID,
 		Name:       "[Legacy] Node Managers Access",
 		Members:    []v2Member{allUsers},
 		Statements: []v2Statement{s7},
@@ -491,7 +491,7 @@ func v1LegacyPolicies() []v2Policy {
 
 	s8 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"secrets:*"})
 	secretPol := v2Policy{
-		ID:         constants_v2.SecretsPolicyID,
+		ID:         constants.SecretsPolicyID,
 		Name:       "[Legacy] Secrets Access",
 		Members:    []v2Member{allUsers},
 		Statements: []v2Statement{s8},
@@ -500,7 +500,7 @@ func v1LegacyPolicies() []v2Policy {
 
 	s9 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"system:telemetryConfig:*"})
 	telemetryPol := v2Policy{
-		ID:         constants_v2.TelemetryPolicyID,
+		ID:         constants.TelemetryPolicyID,
 		Name:       "[Legacy] Telemetry Access",
 		Members:    []v2Member{allUsers},
 		Statements: []v2Statement{s9},

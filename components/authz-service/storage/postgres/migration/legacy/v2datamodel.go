@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 	"github.com/pkg/errors"
 )
 
@@ -226,14 +226,14 @@ func newV2Statement(effect v2Effect, role string, projects, resources, actions [
 // DefaultRoles defines the default Chef-managed roles provided on storage reset
 func defaultRoles() []v2Role {
 	owner := v2Role{
-		ID:      constants_v2.OwnerRoleID,
+		ID:      constants.OwnerRoleID,
 		Name:    "Owner",
 		Actions: []string{"*"},
 		Type:    ChefManaged,
 	}
 
 	editor := v2Role{
-		ID:   constants_v2.EditorRoleID,
+		ID:   constants.EditorRoleID,
 		Name: "Editor",
 		Actions: []string{
 			"infra:*",
@@ -248,7 +248,7 @@ func defaultRoles() []v2Role {
 	}
 
 	viewer := v2Role{
-		ID:   constants_v2.ViewerRoleID,
+		ID:   constants.ViewerRoleID,
 		Name: "Viewer",
 		Actions: []string{
 			"secrets:*:get",
@@ -268,7 +268,7 @@ func defaultRoles() []v2Role {
 	}
 
 	ingest := v2Role{
-		ID:   constants_v2.IngestRoleID,
+		ID:   constants.IngestRoleID,
 		Name: "Ingest",
 		Actions: []string{
 			"ingest:*",
@@ -286,24 +286,24 @@ func defaultRoles() []v2Role {
 func v2DefaultPolicies() []v2Policy {
 	// admin policy statements
 	s1 := newV2Statement(Allow, "", []string{}, []string{"*"}, []string{"*"})
-	s2 := newV2Statement(Deny, "", []string{}, []string{"iam:policies:" + constants_v2.AdminPolicyID},
+	s2 := newV2Statement(Deny, "", []string{}, []string{"iam:policies:" + constants.AdminPolicyID},
 		[]string{"iam:policies:delete", "iam:policies:update"})
 
 	// editor policy statements
-	s3 := newV2Statement(Allow, constants_v2.EditorRoleID, []string{}, []string{"*"}, []string{})
+	s3 := newV2Statement(Allow, constants.EditorRoleID, []string{}, []string{"*"}, []string{})
 
 	// viewer policy statements
-	s4 := newV2Statement(Allow, constants_v2.ViewerRoleID, []string{}, []string{"*"}, []string{})
+	s4 := newV2Statement(Allow, constants.ViewerRoleID, []string{}, []string{"*"}, []string{})
 
 	// ingest policy statements
-	s5 := newV2Statement(Allow, constants_v2.IngestRoleID, []string{}, []string{"*"}, []string{})
+	s5 := newV2Statement(Allow, constants.IngestRoleID, []string{}, []string{"*"}, []string{})
 
-	admin := v2Member{Name: constants_v2.LocalAdminsTeamSubject}
-	editors := v2Member{Name: constants_v2.LocalEditorsTeamSubject}
-	viewers := v2Member{Name: constants_v2.LocalViewersTeamSubject}
+	admin := v2Member{Name: constants.LocalAdminsTeamSubject}
+	editors := v2Member{Name: constants.LocalEditorsTeamSubject}
+	viewers := v2Member{Name: constants.LocalViewersTeamSubject}
 
 	adminPol := v2Policy{
-		ID:         constants_v2.AdminPolicyID,
+		ID:         constants.AdminPolicyID,
 		Name:       "Administrator",
 		Members:    []v2Member{admin},
 		Statements: []v2Statement{s1, s2},
@@ -311,7 +311,7 @@ func v2DefaultPolicies() []v2Policy {
 	}
 
 	editorPol := v2Policy{
-		ID:         constants_v2.EditorPolicyID,
+		ID:         constants.EditorPolicyID,
 		Name:       "Editors",
 		Members:    []v2Member{editors},
 		Statements: []v2Statement{s3},
@@ -319,7 +319,7 @@ func v2DefaultPolicies() []v2Policy {
 	}
 
 	viewerPol := v2Policy{
-		ID:         constants_v2.ViewerPolicyID,
+		ID:         constants.ViewerPolicyID,
 		Name:       "Viewers",
 		Members:    []v2Member{viewers},
 		Statements: []v2Statement{s4},
@@ -327,7 +327,7 @@ func v2DefaultPolicies() []v2Policy {
 	}
 
 	ingestPol := v2Policy{
-		ID:         constants_v2.IngestPolicyID,
+		ID:         constants.IngestPolicyID,
 		Name:       "Ingest",
 		Members:    []v2Member{},
 		Statements: []v2Statement{s5},

@@ -7,7 +7,7 @@ import (
 
 	"github.com/chef/automate/components/authz-service/storage"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	constants_v2 "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/storage/postgres/migration/legacy/constants/v2"
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 )
@@ -20,15 +20,15 @@ func MigrationStatus(ctx context.Context, db *sql.DB) (isOnV1, isDirty bool, err
 		return false, false, err // shouldn't happen, migration initializes state
 	}
 	switch status {
-	case constants_v2.EnumPristine:
+	case constants.EnumPristine:
 		return true, false, nil
-	case constants_v2.EnumSuccessful:
+	case constants.EnumSuccessful:
 		return false, false, nil
-	case constants_v2.EnumSuccessfulBeta1:
+	case constants.EnumSuccessfulBeta1:
 		return false, false, nil
-	case constants_v2.EnumInProgress:
+	case constants.EnumInProgress:
 		return true, true, nil
-	case constants_v2.EnumFailed:
+	case constants.EnumFailed:
 		return true, true, nil
 	}
 	return false, false, fmt.Errorf("unexpected migration status: %q", status)

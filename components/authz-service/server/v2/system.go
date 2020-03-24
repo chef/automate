@@ -1,7 +1,7 @@
 package v2
 
 import (
-	constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
