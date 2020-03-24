@@ -52,15 +52,10 @@ type NodeIDs struct {
 	ComplianceID string
 }
 
-func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grpc.ClientConn, complianceConn *grpc.ClientConn, db *dao.DB, manager *cereal.Manager) *DataFeedPollTask {
-	cidrFilters := strings.Split(dataFeedConfig.ServiceConfig.CIDRFilter, ",")
-	ipNets := make(map[string]*net.IPNet)
-	for _, cidrFilter := range cidrFilters {
-		_, ipNet, err := net.ParseCIDR(cidrFilter)
-		if err != nil {
-			log.WithFields(log.Fields{"cidr_filter": cidrFilter}).Fatal("Cannot parse cidr_filter from config.toml")
-		}
-		ipNets[cidrFilter] = ipNet
+func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grpc.ClientConn, complianceConn *grpc.ClientConn, db *dao.DB, manager *cereal.Manager) (*DataFeedPollTask, error) {
+	ipNets, err := parseCIDRFilters(dataFeedConfig)
+	if err != nil {
+		return nil, err
 	}
 	return &DataFeedPollTask{
 		cfgMgmt:           cfgmgmt.NewCfgMgmtClient(cfgMgmtConn),
@@ -68,7 +63,21 @@ func NewDataFeedPollTask(dataFeedConfig *config.DataFeedConfig, cfgMgmtConn *grp
 		db:                db,
 		disableCIDRFilter: dataFeedConfig.ServiceConfig.DisableCIDRFilter,
 		cidrFilters:       ipNets,
+	}, nil
+}
+
+func parseCIDRFilters(config *config.DataFeedConfig) (map[string]*net.IPNet, error) {
+	cidrFilters := strings.Split(config.ServiceConfig.CIDRFilter, ",")
+	ipNets := make(map[string]*net.IPNet)
+	for _, cidrFilter := range cidrFilters {
+		_, ipNet, err := net.ParseCIDR(cidrFilter)
+		if err != nil {
+			log.WithFields(log.Fields{"cidr_filter": cidrFilter}).Error("Cannot parse cidr_filter from config.toml")
+			return nil, err
+		}
+		ipNets[cidrFilter] = ipNet
 	}
+	return ipNets, nil
 }
 
 func (d *DataFeedPollTask) Run(ctx context.Context, task cereal.Task) (interface{}, error) {
