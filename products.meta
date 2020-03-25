@@ -150,7 +150,7 @@
     {
       "name": "chef-server",
       "type": "product",
-      "aliases": ["chef-infra-server"],
+      "aliases": ["chef-infra-server", "infra-server"],
       "dependencies": ["core", "postgresql", "elasticsearch"],
       "services": [
         "chef/automate-cs-bookshelf",

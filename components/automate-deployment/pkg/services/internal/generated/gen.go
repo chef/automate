@@ -534,7 +534,8 @@ var ProductMetadataJSON = `
     {
       "name": "chef-server",
       "aliases": [
-        "chef-infra-server"
+        "chef-infra-server",
+        "infra-server"
       ],
       "type": "product",
       "services": [

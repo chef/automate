@@ -45,7 +45,7 @@ A single-host installation that contains Chef Infra Server and Chef Automate req
 Install Chef Automate and Chef Infra Server on the same host with this command:
 
 ```shell
-sudo chef-automate deploy --product automate --product chef-server
+sudo chef-automate deploy --product automate --product infra-server
 ```
 
 ### Configuration File Install of Chef Automate and Infra Server
@@ -63,7 +63,7 @@ Installations require elevated privileges, so run the commands as the superuser 
 
     ```toml
       [deployment.v1.svc]
-      products=["automate", "chef-server"]
+      products=["automate", "infra-server"]
     ```
 
 1. Make any other configuration changes desired.
@@ -102,7 +102,7 @@ Installations require elevated privileges, so run the commands as the superuser 
 1. Use the configuration file to deploy Chef Infra Server by running the following command:
 
     ```shell
-       sudo chef-automate deploy --product chef-server <configuration_file>
+       sudo chef-automate deploy --product infra-server <configuration_file>
     ```
 
 ### Configuration File Install of Standalone Chef Infra Server
@@ -122,7 +122,7 @@ Installations require elevated privileges, so run the commands as the superuser 
 
     ```toml
        [deployment.v1.svc]
-       products=["chef-server"]
+       products=["infra-server"]
 
        # Disable Automate data collection as Automate will not be deployed
        [erchef.v1.sys.data_collector]
