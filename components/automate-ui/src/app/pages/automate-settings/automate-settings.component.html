@@ -29,9 +29,9 @@
           <div class="checkbox-row" [formGroup]="eventFeedRemoveData">
             <div class="checkbox-container">
               <chef-checkbox
-              [checked]="!eventFeedRemoveData.value.disabled"
-              (change)="toggleInput(eventFeedRemoveData, $event.detail)">
-            </chef-checkbox>
+                [checked]="!eventFeedRemoveData.value.disabled"
+                (change)="toggleInput(eventFeedRemoveData, $event.detail)">
+              </chef-checkbox>
             </div>
               <p>Remove event feed data after
                 <input chefInput 

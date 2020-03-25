@@ -1,6 +1,6 @@
 @import "~styles/variables";
 
-.page-body {
+.container {
   background-color: $chef-white;
 }
 
@@ -15,40 +15,46 @@ h2 {
   chef-button {
     margin: 0;
   }
-}
 
-.checkbox-row {
-  display: flex;
+  .checkbox-row {
+    display: flex;
 
-  &+.checkbox-row {
-    margin-top: 12px;
-
-    &.secondary-row {
-      margin-left: 69px;
+    input {
+      width: 60px;
     }
-  }
+
+    p {
+      margin: 0;
+    }
+
+    &+.checkbox-row {
+      margin-top: 12px;
+
+      &.secondary-row {
+        margin-left: 69px;
+      }
+    }
 
 
-  .checkbox-container {
-    margin-top: 12px;
-  }
+    .checkbox-container {
+      margin-top: 12px;
+    }
 
-  chef-checkbox {
-    margin-right: 8px;
-    font-size: 17px;
-  }
-
-  input {
-    width: 60px;
-  }
-
-  p {
-    margin: 0;
+    chef-checkbox {
+      margin-right: 8px;
+      font-size: 17px;
+    }
   }
 }
 
 .chef-input {
   margin: 0 8px;
+}
+
+chef-checkbox {
+  ::ng-deep .mat-checkbox-layout {
+    padding-bottom: 0;
+  }
 }
 
 
@@ -92,11 +98,3 @@ mat-form-field {
 }
 
 // end temporary
-
-
-
-chef-checkbox {
-  ::ng-deep .mat-checkbox-layout {
-    padding-bottom: 0;
-  }
-}
