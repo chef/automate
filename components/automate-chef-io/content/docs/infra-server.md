@@ -12,6 +12,20 @@ toc = true
     weight = 60
 +++
 
+{{% warning %}}
+
+Chef Automate will not deploy the Chef Infra Server add-ons Chef Manage
+and Push Jobs Server.
+
+{{% /warning %}}
+
+{{% warning %}}
+
+Supermarket cannot authenticate users on Chef Infra Server that is deployed
+with Chef Automate.
+
+{{% /warning %}}
+
 Use Chef Automate to install Chef Infra Server either for a single-host installation that contains both Chef Infra Server and Chef Automate, or for a standalone Chef Infra Server instance.
 See the [Chef Infra Server documentation](https://docs.chef.io/server_overview/) for instructions and guidance on using and managing your Chef Infra Server.
 
