@@ -34,7 +34,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
   private defaultFormData: DefaultFormData = {
     eventFeedRemoveData: {
-      category: JobCategories.Infra,
+      category: JobCategories.EventFeed,
       name: 'periodic_purge',
       nested_name: NestedJobName.Feed,
       unit: { value: 'd', disabled: false },

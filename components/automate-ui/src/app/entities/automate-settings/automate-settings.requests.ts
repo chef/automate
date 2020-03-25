@@ -75,7 +75,8 @@ export class AutomateSettingsRequests {
     };
 
     jobs.forEach(job => {
-      let thisJob: UnfurledJob;
+      // let thisJob: UnfurledJob;
+      let thisJob;
 
       switch (job.name) {
         case InfraJobName.DeleteNodes:              // fallthrough

@@ -67,6 +67,23 @@ export enum JobCategories {
   Services = 'services'
 }
 
+export enum InfraJobName {
+  MissingNodes = 'missing_nodes',
+  MissingNodesForDeletion = 'missing_nodes_for_deletion',
+  DeleteNodes = 'delete_nodes',
+  PeriodicPurgeTimeseries = 'periodic_purge_timeseries'
+}
+
+// Actions and ConvergeHistory are nested, but contained inside
+// the InfraJobName of PeriodicPurgeTimeseries
+export enum NestedJobName {
+  ComplianceReports = 'compliance-reports',
+  ComplianceScans = 'compliance-scans',
+  Feed = 'feed',
+  Actions = 'actions',
+  ConvergeHistory = 'converge-history'
+}
+
 export class IngestJob {
   category: JobCategories;
   name: string;
@@ -133,21 +150,19 @@ export interface JobRequestBody {
   };
 }
 
-export enum InfraJobName {
-  MissingNodes = 'missing_nodes',
-  MissingNodesForDeletion = 'missing_nodes_for_deletion',
-  DeleteNodes = 'delete_nodes',
-  PeriodicPurgeTimeseries = 'periodic_purge_timeseries'
-}
-
-// Actions and ConvergeHistory are nested, but contained inside
-// the InfraJobName of PeriodicPurgeTimeseries
-export enum NestedJobName {
-  ComplianceReports = 'compliance-reports',
-  ComplianceScans = 'compliance-scans',
-  Feed = 'feed',
-  Actions = 'actions',
-  ConvergeHistory = 'converge-history'
+export interface SingleDefaultForm {
+  category: JobCategories;
+  name?: string;                  // TODO; make stricter after services implemented
+  nested_name?: NestedJobName;
+  unit: {
+    value: string;
+    disabled: boolean;
+  };
+  threshold: {
+    value: string;
+    disabled: boolean;
+  };
+  disabled: boolean;
 }
 
 export interface DefaultFormData {
@@ -162,11 +177,3 @@ export interface DefaultFormData {
   complianceRemoveScans: SingleDefaultForm;
 }
 
-export interface SingleDefaultForm {
-  category: JobCategories;
-  name: string;
-  nested_name?: NestedJobName;
-  unit: any;
-  threshold: any;
-  disabled: boolean;
-}
