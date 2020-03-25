@@ -5,6 +5,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ChefComponentsModule } from 'app/components/chef-components.module';
 
 import { DailyCheckInComponent } from './daily-check-in/daily-check-in.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 import { DesktopRoutingModule } from './desktop-routing.module';
 
@@ -17,10 +18,12 @@ import { DesktopRoutingModule } from './desktop-routing.module';
     DesktopRoutingModule
   ],
   exports: [
-    DailyCheckInComponent
+    DailyCheckInComponent,
+    DashboardComponent
   ],
   declarations: [
-    DailyCheckInComponent
+    DailyCheckInComponent,
+    DashboardComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })

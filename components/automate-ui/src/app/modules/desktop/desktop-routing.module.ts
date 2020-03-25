@@ -1,12 +1,12 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 
-import { DailyCheckInComponent } from './daily-check-in/daily-check-in.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
 
 const desktopRoutes: Routes = [
   {
     path: '',
-    component: DailyCheckInComponent
+    component: DashboardComponent
   }
 ];
 

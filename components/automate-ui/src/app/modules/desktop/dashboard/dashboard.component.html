@@ -1,0 +1,13 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <app-daily-check-in
+      [unknownPercentage] = "unknownPercentage$ | async"
+      [checkedInPercentage] = "checkedInPercentage$ | async"
+      [totalCount] = "totalCount$ | async"
+      [unknownCount] = "unknownCount$ | async"
+      [checkedInCount] = "checkedInCount$ | async"
+      ></app-daily-check-in>
+    </main>
+  </div>
+</div>
