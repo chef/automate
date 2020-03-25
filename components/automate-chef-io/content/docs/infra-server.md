@@ -14,10 +14,15 @@ toc = true
 
 {{% warning %}}
 
-Chef Automate will not deploy the following Chef Infra Server add-ons:
-- Chef Manage
-- Push Jobs Server
-- Supermarket
+Chef Automate will not deploy the Chef Infra Server add-ons Chef Manage
+and Push Jobs Server.
+
+{{% /warning %}}
+
+{{% warning %}}
+
+Supermarket cannot authenticate users on Chef Infra Server that is deployed
+with Chef Automate.
 
 {{% /warning %}}
 
