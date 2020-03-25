@@ -13,6 +13,7 @@ import (
 	secrets "github.com/chef/automate/api/external/secrets"
 	request "github.com/chef/automate/api/interservice/infra_proxy/request"
 	infra_proxy "github.com/chef/automate/api/interservice/infra_proxy/service"
+	"github.com/chef/automate/components/infra-proxy-service/constants"
 	"github.com/chef/automate/components/infra-proxy-service/test"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/logger"
@@ -144,7 +145,7 @@ func TestOrgs(t *testing.T) {
 	t.Run("GetOrgs", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 
-		t.Run("when there is org exists", func(t *testing.T) {
+		t.Run("when there is no orgs exists", func(t *testing.T) {
 			resp, err := cl.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
 			})
@@ -154,7 +155,7 @@ func TestOrgs(t *testing.T) {
 			assert.Equal(t, 0, len(resp.GetOrgs()))
 		})
 
-		t.Run("when the org exists", func(t *testing.T) {
+		t.Run("when the project filter is empty returns all orgs", func(t *testing.T) {
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
@@ -179,6 +180,249 @@ func TestOrgs(t *testing.T) {
 
 			cleanupOrg(ctx, t, cl, resp.Org.Id)
 		})
+
+		t.Run("when the project filter is filtered by * returns all orgs", func(t *testing.T) {
+			ctx := context.Background()
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req := &request.CreateOrg{
+				Name:      "4thcoffee",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"project1", "project2"},
+			}
+			resp1, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp1)
+
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+			req = &request.CreateOrg{
+				Name:      "other-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"project2"},
+			}
+			resp2, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp2)
+
+			ctx = test.InsertProjectsIntoNewContext([]string{"*"})
+			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+				ServerId: serverRes.Server.Id,
+			})
+			require.NoError(t, err)
+			require.NotNil(t, orgs)
+			assert.Contains(t, orgs.Orgs, resp1.Org)
+			assert.Contains(t, orgs.Orgs, resp2.Org)
+			assert.Equal(t, 2, len(orgs.Orgs))
+
+			cleanupOrg(ctx, t, cl, resp1.Org.Id)
+			cleanupOrg(ctx, t, cl, resp2.Org.Id)
+		})
+
+		t.Run("when the project filter is filtered by (unassigned) returns all (unassigned) orgs", func(t *testing.T) {
+			ctx := context.Background()
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req := &request.CreateOrg{
+				Name:      "4thcoffee",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+			}
+			resp1, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp1)
+
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req = &request.CreateOrg{
+				Name:      "other-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"other_project"},
+			}
+			resp2, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp2)
+
+			ctx = test.InsertProjectsIntoNewContext([]string{constants.UnassignedProjectID})
+			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+				ServerId: serverRes.Server.Id,
+			})
+			require.NoError(t, err)
+			require.NotNil(t, orgs)
+			assert.Contains(t, orgs.Orgs, resp1.Org)
+			assert.Equal(t, 1, len(orgs.Orgs))
+
+			cleanupOrg(ctx, t, cl, resp1.Org.Id)
+			cleanupOrg(ctx, t, cl, resp2.Org.Id)
+		})
+
+		t.Run("when the project filter has one project returns only the orgs with the same project as the filter", func(t *testing.T) {
+			ctx := context.Background()
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req := &request.CreateOrg{
+				Name:      "4thcoffee",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"project1", "project2"},
+			}
+			resp1, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp1)
+
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req = &request.CreateOrg{
+				Name:      "other-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"project2"},
+			}
+			resp2, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp2)
+
+			ctx = test.InsertProjectsIntoNewContext([]string{"project1"})
+			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+				ServerId: serverRes.Server.Id,
+			})
+			require.NoError(t, err)
+			require.NotNil(t, orgs)
+			assert.Contains(t, orgs.Orgs, resp1.Org)
+			assert.Equal(t, 1, len(orgs.Orgs))
+
+			cleanupOrg(ctx, t, cl, resp1.Org.Id)
+			cleanupOrg(ctx, t, cl, resp2.Org.Id)
+		})
+
+		t.Run("when the project filter has mutiple projects returns only the orgs with at least one of the projects from the filter", func(t *testing.T) {
+			ctx := context.Background()
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req := &request.CreateOrg{
+				Name:      "4thcoffee",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"project1", "project2"},
+			}
+			resp1, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp1)
+
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req = &request.CreateOrg{
+				Name:      "other-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"project3"},
+			}
+			resp2, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp2)
+
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req = &request.CreateOrg{
+				Name:      "another-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"other_project"},
+			}
+			resp3, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp3)
+
+			ctx = test.InsertProjectsIntoNewContext([]string{"project1", "project3"})
+			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+				ServerId: serverRes.Server.Id,
+			})
+			require.NoError(t, err)
+			require.NotNil(t, orgs)
+			assert.Contains(t, orgs.Orgs, resp1.Org)
+			assert.Contains(t, orgs.Orgs, resp2.Org)
+			assert.Equal(t, 2, len(orgs.Orgs))
+
+			cleanupOrg(ctx, t, cl, resp1.Org.Id)
+			cleanupOrg(ctx, t, cl, resp2.Org.Id)
+			cleanupOrg(ctx, t, cl, resp3.Org.Id)
+		})
+
+		t.Run("when the project filter has one project and none of the orgs in the db have that project, returns empty orgs", func(t *testing.T) {
+			ctx := context.Background()
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req := &request.CreateOrg{
+				Name:      "4thcoffee",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"project1"},
+			}
+			resp1, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp1)
+
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			req = &request.CreateOrg{
+				Name:      "other-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{"project2"},
+			}
+			resp2, err := cl.CreateOrg(ctx, req)
+			require.NoError(t, err)
+			require.NotNil(t, resp2)
+
+			ctx = test.InsertProjectsIntoNewContext([]string{"other_project"})
+			orgs, err := cl.GetOrgs(ctx, &request.GetOrgs{
+				ServerId: serverRes.Server.Id,
+			})
+			require.NoError(t, err)
+			require.NotNil(t, orgs)
+			assert.NotContains(t, orgs.Orgs, resp1.Org)
+			assert.NotContains(t, orgs.Orgs, resp2.Org)
+			assert.Equal(t, 0, len(orgs.Orgs))
+
+			cleanupOrg(ctx, t, cl, resp1.Org.Id)
+			cleanupOrg(ctx, t, cl, resp2.Org.Id)
+		})
+
 	})
 
 	t.Run("GetOrg", func(t *testing.T) {

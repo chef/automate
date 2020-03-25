@@ -129,6 +129,12 @@ func ResetState(ctx context.Context, t *testing.T, serviceRef *service.Service) 
 	}
 }
 
+// InsertProjectsIntoNewContext insert the projects into context.
+func InsertProjectsIntoNewContext(projects []string) context.Context {
+	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
+		[]string{}, projects, "resource", "action", "pol"))
+}
+
 func defaultMockPurgeFunc(context.Context,
 	*authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
 	return &authz.PurgeSubjectFromPoliciesResp{}, nil
@@ -137,9 +143,4 @@ func defaultMockPurgeFunc(context.Context,
 func defaultValidateProjectAssignmentFunc(context.Context,
 	*authz_v2.ValidateProjectAssignmentReq) (*authz_v2.ValidateProjectAssignmentResp, error) {
 	return &authz_v2.ValidateProjectAssignmentResp{}, nil
-}
-
-func insertProjectsIntoNewContext(projects []string) context.Context {
-	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
-		[]string{}, projects, "resource", "action", "pol"))
 }
