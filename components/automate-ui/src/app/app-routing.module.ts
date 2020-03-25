@@ -323,6 +323,11 @@ const routes: Routes = [
     redirectTo: 'settings/data-lifecycle'
   },
   {
+    path: 'settings/node-lifecycle',
+    pathMatch: 'full',
+    redirectTo: 'settings/data-lifecycle'
+  },
+  {
     path: 'admin',
     pathMatch: 'prefix',
     redirectTo: 'settings'
