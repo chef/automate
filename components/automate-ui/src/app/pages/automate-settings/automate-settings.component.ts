@@ -1,10 +1,10 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FormGroup, FormBuilder } from '@angular/forms';
-import { Store } from '@ngrx/store';
+import { Store, select } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Subject } from 'rxjs';
-import { distinctUntilKeyChanged, takeUntil } from 'rxjs/operators';
+import { distinctUntilKeyChanged, takeUntil, filter } from 'rxjs/operators';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import {
   automateSettingsState,
@@ -24,6 +24,8 @@ import {
   JobCategories
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
+
+import { pendingState } from 'app/entities/entities';
 
 @Component({
   templateUrl: './automate-settings.component.html',
@@ -202,6 +204,26 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
         }
       });
 
+      // subscribe to changeConfiguration
+      this.store.pipe(
+        select(changeConfiguration),
+        filter(change => this.saving && !pendingState(change)),
+        takeUntil(this.isDestroyed)
+        )
+        .subscribe((changeConfigurationSelector) => {
+          if (changeConfigurationSelector.errorResp !== null) {
+            const error = changeConfigurationSelector.errorResp;
+            const errMsg = 'Unable to update one or more settings.';
+            this.showErrorNotification(error, errMsg);
+            this.store.dispatch(new GetSettings({})); // reset form to previously stored settings
+            this.saving = false;
+          } else if (changeConfigurationSelector.status === 'loadingSuccess') {
+            this.showSuccessNotification();
+            this.formChanged = false;
+            this.saving = false;
+          }
+        });
+
   }
 
   ngOnDestroy(): void {
@@ -281,20 +303,20 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
 
     this.store.dispatch(new ConfigureSettings({jobs: jobs}));
-    this.store.select(changeConfiguration).pipe(takeUntil(this.isDestroyed))
-      .subscribe((changeConfigurationSelector) => {
-        if (changeConfigurationSelector.errorResp !== null) {
-          const error = changeConfigurationSelector.errorResp;
-          const errMsg = 'Unable to update one or more settings.';
-          this.showErrorNotification(error, errMsg);
-          this.store.dispatch(new GetSettings({})); // reset form to previously stored settings
-          this.saving = false;
-        } else if (changeConfigurationSelector.status === 'loadingSuccess') {
-          this.showSuccessNotification();
-          this.formChanged = false;
-          this.saving = false;
-        }
-      });
+    // this.store.select(changeConfiguration).pipe(takeUntil(this.isDestroyed))
+    //   .subscribe((changeConfigurationSelector) => {
+    //     if (changeConfigurationSelector.errorResp !== null) {
+    //       const error = changeConfigurationSelector.errorResp;
+    //       const errMsg = 'Unable to update one or more settings.';
+    //       this.showErrorNotification(error, errMsg);
+    //       this.store.dispatch(new GetSettings({})); // reset form to previously stored settings
+    //       this.saving = false;
+    //     } else if (changeConfigurationSelector.status === 'loadingSuccess') {
+    //       this.showSuccessNotification();
+    //       this.formChanged = false;
+    //       this.saving = false;
+    //     }
+    //   });
   }
 
   // Hides the notification banner
