@@ -38,17 +38,16 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/reporting"
 	deploy_api "github.com/chef/automate/api/interservice/deployment"
 	swagger "github.com/chef/automate/components/automate-gateway/api"
-	policy "github.com/chef/automate/components/automate-gateway/api/authz/policy"
 	pb_deployment "github.com/chef/automate/components/automate-gateway/api/deployment"
 	pb_eventfeed "github.com/chef/automate/components/automate-gateway/api/event_feed"
 	pb_gateway "github.com/chef/automate/components/automate-gateway/api/gateway"
 	pb_authz "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	pb_iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
+	policy "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 	pb_legacy "github.com/chef/automate/components/automate-gateway/api/legacy"
 	pb_license "github.com/chef/automate/components/automate-gateway/api/license"
 	pb_notifications "github.com/chef/automate/components/automate-gateway/api/notifications"
 	pb_telemetry "github.com/chef/automate/components/automate-gateway/api/telemetry"
-	policyv2 "github.com/chef/automate/components/automate-gateway/authz/policy_v2"
 
 	// handlers
 	"github.com/chef/automate/components/automate-gateway/handler"
@@ -822,9 +821,7 @@ func init() {
 	// - These values originate from the ProfileCreateHandler method elsewhere in this file.
 	// - There is nothing special about the "streaming::" notation; it just needs to be
 	//   the same notation used in an introspection path in the front-end.
-	policy.MapMethodTo("UNUSED_METHOD", "compliance:profiles:storage", "upload", "POST", "streaming::/compliance/profiles",
-		func(unexpandedResource string, input interface{}) string { return unexpandedResource })
-	policyv2.MapMethodTo("UNUSED_METHOD", "compliance:profiles", "compliance:profiles:create", "POST", "streaming::/compliance/profiles",
+	policy.MapMethodTo("UNUSED_METHOD", "compliance:profiles", "compliance:profiles:create", "POST", "streaming::/compliance/profiles",
 		func(unexpandedResource string, input interface{}) string { return unexpandedResource })
 }
 

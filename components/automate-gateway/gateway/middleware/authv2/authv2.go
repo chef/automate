@@ -10,8 +10,8 @@ import (
 	"google.golang.org/grpc/status"
 
 	authz "github.com/chef/automate/api/interservice/authz/v2"
-	"github.com/chef/automate/components/automate-gateway/api/authz/pairs"
-	policy "github.com/chef/automate/components/automate-gateway/authz/policy_v2"
+	"github.com/chef/automate/components/automate-gateway/api/iam/v2/pairs"
+	"github.com/chef/automate/components/automate-gateway/api/iam/v2/policy"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
@@ -34,14 +34,14 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 
 	polInfo := policy.InfoForMethod(method, req)
 	if polInfo == nil {
-		log.Warnf("no v2 policy annotation for method %s", method)
+		log.Warnf("no policy annotation for method %s", method)
 		return nil, status.Errorf(codes.Internal,
 			"missing policy info for method %q", method)
 	}
 
 	action, resource := polInfo.Action, polInfo.Resource
 	if action == "" || resource == "" {
-		log.Warnf("no v2 policy annotation for method %s", method)
+		log.Warnf("no policy annotation for method %s", method)
 		return nil, status.Errorf(codes.Internal,
 			"missing policy info for method %q", method)
 	}
