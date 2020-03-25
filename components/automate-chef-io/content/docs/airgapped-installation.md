@@ -13,20 +13,19 @@ toc = true
 ## Overview
 
 An airgapped host is one that has no direct inbound or outbound internet
-traffic. To install or upgrade Chef Automate on an airgapped host, create an Airgap
-Installation Bundle (AIB) on an internet-connected host. Transfer the Airgap Installation
-Bundle and the `chef-automate` binary used to create it to the airgapped host for use.
+traffic.
+To install or upgrade Chef Automate on an airgapped host, you will need to create an Airgap Installation Bundle (`.aib`) on an internet-connected host and then transfer both the Airgap Installation Bundle and the `chef-automate` binary that you used to create it to the airgapped host for use.
 
-## Obtain a License
+## Get a License
 
-To obtain a trial license for an airgapped host [contact Chef](https://www.chef.io/contact-us/).
+To get a trial license for an airgapped host [contact Chef](https://www.chef.io/contact-us/).
 
 ## Create an Airgap Installation Bundle
 
 On an internet-connected host, download the Chef Automate command-line tool and use it to
 prepare an Airgap Installation Bundle.
 
-### Obtain Chef Automate installation and admin tool
+### Get Chef Automate Installer and Admin Tool
 
 Download the Chef Automate command-line tool from the `current` [release channel]({{< relref "install.md#release-channels" >}}).
 
@@ -42,13 +41,13 @@ To download and bundle the software included in a Chef Automate release, run:
 ./chef-automate airgap bundle create
 ```
 
-A successful execution of this command produces an Airgap Installation Bundle named
+This command produces an Airgap Installation Bundle named
 `automate-<timestamp>.aib`.
 
 ## Deploy the Airgap Installation Bundle
 
-Transfer the `chef-automate` binary and the Airgap Installation Bundle to the airgapped
-host. Put the chef-automate command line tool in a directory that is NOT in $PATH. The Automate installation process will put its own copy of `chef-automate` in /bin and manage it.
+Transfer the `chef-automate` binary and the Airgap Installation Bundle to the airgapped host.
+Save the Chef Automate command-line tool in a directory that is NOT in $PATH. The Chef Automate installation process puts a copy of `chef-automate` into `/bin` and manages it.
 
 ### Create Default Configuration
 
@@ -68,9 +67,9 @@ Edit `config.toml` to make changes to FQDN and other configuration settings. See
 sudo ./chef-automate deploy config.toml --airgap-bundle </path/to/airgap-install-bundle>
 ```
 
-Deployment takes a few minutes. The first step is accepting the terms of service in the
-command line, after which the installer performs a series of pre-flight checks.
-Unsuccessful checks have information for resolving issues or skipping the check.
+Deploying Chef Automate takes ten minutes for a clean install.
+At the command prompt, accept the terms of service with a `y`, The installer then performs a series of pre-flight checks. Any
+unsuccessful checks offer information for resolving issues or skipping the check.
 After resolving any pre-flight issues, run the deploy command again.
 
 At the end of the deployment process you will see:
@@ -94,6 +93,8 @@ To send data from your Chef Infra Server or Chef Infra Clients to Chef Automate 
 See [Configure Data Collection]({{< relref "data-collection.md" >}}) for more information.
 
 ### Upgrades
+
+We've committed to ensuring the stability of the upgrade and to supporting Chef Automate's automatic upgrades.
 To upgrade an airgapped install, you must supply an airgap bundle.
 
 On an internet-connected host, follow the steps in [Create an Airgap
@@ -104,9 +105,6 @@ bundle and Chef Automate command-line tool to the airgapped host and run:
 ```shell
 sudo chef-automate upgrade run --airgap-bundle </path/to/bundle>
 ```
-
-Upgrades can be taken safely. We've committed to ensuring the stability of the upgrade
-process to support Chef Automate's automatic upgrades feature.
 
 ### Common Problems
 
