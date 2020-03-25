@@ -90,12 +90,32 @@ describe('StatsService', () => {
       const listParams = {perPage: 10, page: 1};
 
       const expectedUrl = `${COMPLIANCE_URL}/reporting/profiles`;
-      const expectedTotal = 20;
+      const expectedTotal = 21;
+      const expectedFailed = 3;
+      const expectedPassed = 10;
+      const expectedSkipped = 7;
+      const expectedWaived = 1;
       const expectedItems = [{}, {}];
-      const mockResp = { profiles: expectedItems, counts: { total: expectedTotal }};
+      const mockResp = {
+        profiles: expectedItems,
+        counts: {
+          total: expectedTotal,
+          failed: expectedFailed,
+          passed: expectedPassed,
+          skipped: expectedSkipped,
+          waived: expectedWaived
+        }
+      };
 
       service.getProfiles(reportQuery, listParams).subscribe(data => {
-        expect(data).toEqual({total: expectedTotal, items: expectedItems});
+        expect(data).toEqual({
+          total: expectedTotal,
+          failed: expectedFailed,
+          passed: expectedPassed,
+          skipped: expectedSkipped,
+          waived: expectedWaived,
+          items: expectedItems
+        });
       });
 
       const req = httpTestingController.expectOne(expectedUrl);
