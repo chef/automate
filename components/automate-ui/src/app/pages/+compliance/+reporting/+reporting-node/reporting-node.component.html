@@ -129,37 +129,31 @@
           <chef-option class="filter all" value='all'>
             <span class="filter-label">Total Controls</span>
             <span class="filter-total">
-              <chef-icon>storage</chef-icon> {{activeReport.controls.total | number}}
+              <chef-icon class="filter-icon">storage</chef-icon> {{activeReport.controls.total | number}}
             </span>
           </chef-option>
-          <chef-option class="filter critical" value='critical'>
-            <span class="filter-label">Critical Controls</span>
+          <chef-option class="filter failed" value='failed'>
+            <span class="filter-label">Failed Controls</span>
             <span class="filter-total">
-              <chef-icon>report_problem</chef-icon> {{activeReport.controls.failed.critical | number}}
-            </span>
-          </chef-option>
-          <chef-option class="filter major" value='major'>
-            <span class="filter-label">Major Controls</span>
-            <span class="filter-total">
-              <chef-icon>check_circle</chef-icon> {{activeReport.controls.failed.major | number}}
-            </span>
-          </chef-option>
-          <chef-option class="filter minor" value='minor'>
-            <span class="filter-label">Minor Controls</span>
-            <span class="filter-total">
-              <chef-icon>help</chef-icon> {{activeReport.controls.failed.minor | number}}
-            </span>
-          </chef-option>
-          <chef-option class="filter skipped" value='skipped'>
-            <span class="filter-label">Skipped Controls</span>
-            <span class="filter-total">
-              <chef-icon>help</chef-icon> {{activeReport.controls.skipped.total | number}}
+              <chef-icon class="filter-icon">report_problem</chef-icon> {{activeReport.controls.failed.total | number}}
             </span>
           </chef-option>
           <chef-option class="filter passed" value='passed'>
             <span class="filter-label">Passed Controls</span>
             <span class="filter-total">
-              <chef-icon>help</chef-icon> {{activeReport.controls.passed.total | number}}
+              <chef-icon class="filter-icon">check_circle</chef-icon> {{activeReport.controls.passed.total | number}}
+            </span>
+          </chef-option>
+          <chef-option class="filter skipped" value='skipped'>
+            <span class="filter-label">Skipped Controls</span>
+            <span class="filter-total">
+              <chef-icon class="filter-icon">help</chef-icon> {{activeReport.controls.skipped.total | number}}
+            </span>
+          </chef-option>
+          <chef-option class="filter waived" value='waived'>
+            <span class="filter-label">Waived Controls</span>
+            <span class="filter-total">
+              <div class="filter-icon waived-icon"></div> {{activeReport.controls.waived.total | number}}
             </span>
           </chef-option>
         </chef-phat-radio>
@@ -179,9 +173,10 @@
               <ng-container *ngFor="let control of filteredControls(profile.controls, activeStatusFilter)">
                 <chef-tr>
                   <chef-td>
-                    <chef-icon class="status-icon" [ngClass]="control.status">
+                    <chef-icon *ngIf="control.status !== 'waived'" class="status-icon" [ngClass]="control.status">
                       {{ statusIcon(control.status) }}
                     </chef-icon>
+                    <div *ngIf="control.status === 'waived'" class="status-icon waived-icon"></div>
                     <span><strong>{{ control.id }}:</strong> {{ control.title }}</span>
                   </chef-td>
                   <chef-td class="impact-status" [ngClass]="impactStatus(control)">
@@ -206,16 +201,25 @@
                   </chef-toggle>
                   <ng-container [ngSwitch]="openControlPane(control)">
                     <div *ngSwitchCase="'results'">
-                      <div class="result-item" *ngFor="let result of control.results">
-                        <div class="result-item-header">
-                          <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
-                          <p>{{ result.code_desc }}</p>
+                      <ng-container *ngIf="control.status !== 'waived'">
+                        <div class="result-item" *ngFor="let result of control.results">
+                          <div class="result-item-header">
+                            <chef-icon class="status-icon" [ngClass]="result.status">{{ statusIcon(result.status) }}</chef-icon>
+                            <p>{{ result.code_desc }}</p>
+                          </div>
+                          <div class="result-item-body" *ngIf="result.message.length || result.skip_message.length">
+                            <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
+                          </div>
                         </div>
-                        <div
-                          class="result-item-body"
-                          *ngIf="result.message.length || result.skip_message.length">
-                          <chef-snippet [code]="result.message + result.skip_message"></chef-snippet>
-                        </div>
+                      </ng-container>
+                      <div *ngIf="control.status === 'waived'">
+                        <p>This control was waived.</p>
+                        <dl class="waiver-details">
+                          <dt>Expires:</dt>
+                          <dd>{{ control.waiver_data.expiration_date | datetime: RFC2822 }}</dd>
+                          <dt>Reason:</dt>
+                          <dd>{{ control.waiver_data.justification }}</dd>
+                        </dl>
                       </div>
                     </div>
                     <chef-snippet

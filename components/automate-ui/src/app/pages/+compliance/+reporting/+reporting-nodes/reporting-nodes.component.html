@@ -7,32 +7,38 @@
 </div>
 
 <ng-container *ngIf="!reportData.nodesListEmpty">
-    <chef-phat-radio
+  <chef-phat-radio
     class="nodes-list-status-filters"
     [value]="nodeFilterStatus"
     (change)="filterNodeStatus($event, $event.target.value)">
     <chef-option class="filter all" value='all'>
       <span class="filter-label">Total Nodes</span>
       <span class="filter-total">
-        <chef-icon>storage</chef-icon> {{ reportData.nodesList.total | number}}
+        <chef-icon class="filter-icon">storage</chef-icon> {{ reportData.nodesList.total | number}}
       </span>
     </chef-option>
     <chef-option class="filter critical" value='failed'>
       <span class="filter-label">Failed Nodes</span>
       <span class="filter-total">
-        <chef-icon>report_problem</chef-icon> {{ reportData.nodesList.total_failed | number}}
+        <chef-icon class="filter-icon">report_problem</chef-icon> {{ reportData.nodesList.total_failed | number}}
       </span>
     </chef-option>
     <chef-option class="filter passed" value='passed'>
       <span class="filter-label">Passed Nodes</span>
       <span class="filter-total">
-        <chef-icon>check_circle</chef-icon> {{ reportData.nodesList.total_passed | number}}
+        <chef-icon class="filter-icon">check_circle</chef-icon> {{ reportData.nodesList.total_passed | number}}
       </span>
     </chef-option>
     <chef-option class="filter skipped" value='skipped'>
       <span class="filter-label">Skipped Nodes</span>
       <span class="filter-total">
-        <chef-icon>help</chef-icon> {{ reportData.nodesList.total_skipped | number}}
+        <chef-icon class="filter-icon">help</chef-icon> {{ reportData.nodesList.total_skipped | number}}
+      </span>
+    </chef-option>
+    <chef-option class="filter waived" value='waived'>
+      <span class="filter-label">Waived Nodes</span>
+      <span class="filter-total">
+        <div class="filter-icon waived-icon"></div> {{ reportData.nodesList.total_waived | number}}
       </span>
     </chef-option>
   </chef-phat-radio>
@@ -81,9 +87,10 @@
     <chef-tbody *ngIf="!reportData.nodesListLoading">
       <chef-tr *ngFor="let node of filteredNodes(reportData.nodesList.items)">
         <chef-td>
-          <chef-icon class="status-icon" [ngClass]="node.latest_report.status">
+          <chef-icon *ngIf="node.latest_report.status !== 'waived'" class="status-icon" [ngClass]="node.latest_report.status">
             {{ statusIcon(node.latest_report.status) }}
           </chef-icon>
+          <div *ngIf="node.latest_report.status === 'waived'" class="status-icon waived-icon"></div>
           <a [routerLink]="['/compliance/reports/nodes', node.id]">{{ node.name }}</a>
         </chef-td>
         <chef-td>{{ node.platform.name }} {{ node.platform.release }}</chef-td>

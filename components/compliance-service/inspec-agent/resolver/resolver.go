@@ -343,7 +343,7 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		UUID:           node.Id,
 		CloudID:        m.AccountId,
 		Name:           node.Name,
-		Environment:    "gcp-api",
+		Environment:    "aws-api",
 		ManagerID:      m.Id,
 		CloudAccountID: m.AccountId,
 	}
@@ -351,6 +351,7 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		Backend: "aws",
 		Region:  awsCreds.Region,
 	}
+	logrus.Infof("region being used for aws scan: %s", awsCreds.Region)
 	secrets := inspec.Secrets{
 		AwsUser:         awsCreds.AccessKeyId,
 		AwsPassword:     awsCreds.SecretAccessKey,

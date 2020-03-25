@@ -82,7 +82,8 @@ describe('ReportingNodeComponent', () => {
       {id: 3, controls: [ {status: 'failed', impact: 0.7} ]},
       {id: 4, controls: [ {status: 'failed', impact: 0.3} ]},
       {id: 5, controls: [ {status: 'passed', impact: 0.5} ]},
-      {id: 6, controls: [ {status: 'failed', impact: 0.5} ]}
+      {id: 6, controls: [ {status: 'failed', impact: 0.5} ]},
+      {id: 7, controls: [ {status: 'waived', impact: 0.5} ]}
     ];
 
     it('returns controls with a matching passed status', () => {
@@ -100,24 +101,19 @@ describe('ReportingNodeComponent', () => {
         ]);
     });
 
-    it('returns controls with a matching critical status', () => {
-      expect(component.filteredProfiles(profiles, 'critical')).toEqual(
+    it('returns controls with a matching failed status', () => {
+      expect(component.filteredProfiles(profiles, 'failed')).toEqual(
         [
-          {id: 3, controls: [ {status: 'failed', impact: 0.7} ]}
-        ]);
-    });
-
-    it('returns controls with a matching major status', () => {
-      expect(component.filteredProfiles(profiles, 'major')).toEqual(
-        [
+          {id: 3, controls: [ {status: 'failed', impact: 0.7} ]},
+          {id: 4, controls: [ {status: 'failed', impact: 0.3} ]},
           {id: 6, controls: [ {status: 'failed', impact: 0.5} ]}
         ]);
     });
 
-    it('returns controls with a matching minor status', () => {
-      expect(component.filteredProfiles(profiles, 'minor')).toEqual(
+    it('returns controls with a matching waived status', () => {
+      expect(component.filteredProfiles(profiles, 'waived')).toEqual(
         [
-          {id: 4, controls: [ {status: 'failed', impact: 0.3} ]}
+          { id: 7, controls: [{ status: 'waived', impact: 0.5 }] }
         ]);
     });
   });
