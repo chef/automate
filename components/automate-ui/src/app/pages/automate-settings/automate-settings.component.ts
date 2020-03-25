@@ -4,7 +4,8 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Subject } from 'rxjs';
-import { distinctUntilKeyChanged, takeUntil, filter } from 'rxjs/operators';
+import { distinctUntilKeyChanged, takeUntil, filter, debounceTime } from 'rxjs/operators';
+import { pendingState } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import {
   automateSettingsState,
@@ -24,8 +25,6 @@ import {
   JobCategories
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
-
-import { pendingState } from 'app/entities/entities';
 
 @Component({
   templateUrl: './automate-settings.component.html',
@@ -132,6 +131,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   // Are settings currently saving
   saving = false;
 
+  // have the initial values been loaded
+  private valuesLoaded = false;
+
   // Notification bits
   notificationVisible = false;
   notificationType = 'info';
@@ -189,14 +191,15 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     this.store.dispatch(new GetSettings({}));
 
     this.store.select(automateSettingsState).pipe(
-        takeUntil(this.isDestroyed),
-        distinctUntilKeyChanged('jobSchedulerStatus')
-        )
+      takeUntil(this.isDestroyed),
+      distinctUntilKeyChanged('jobSchedulerStatus')
+      )
       .subscribe((automateSettingsSelector) => {
         if (automateSettingsSelector.errorResp !== null) {
           const error = automateSettingsSelector.errorResp;
           const errMsg = 'Unable to load settings.';
           this.showErrorNotification(error, errMsg);
+          this.valuesLoaded = true;
         } else {
           this.jobSchedulerStatus = automateSettingsSelector.jobSchedulerStatus;
           this.telemetryService.track('lifecycleConfiguration', this.jobSchedulerStatus);
@@ -216,6 +219,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
             const errMsg = 'Unable to update one or more settings.';
             this.showErrorNotification(error, errMsg);
             this.store.dispatch(new GetSettings({})); // reset form to previously stored settings
+            this.formChanged = false;
             this.saving = false;
           } else if (changeConfigurationSelector.status === 'loadingSuccess') {
             this.showSuccessNotification();
@@ -224,6 +228,14 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
           }
         });
 
+  // Subscribes to any change inside the automateSettingsForm
+  // AFTER our form is finished being populated the first time
+    this.automateSettingsForm.valueChanges.pipe(
+      filter(() => this.valuesLoaded),
+      debounceTime(150),
+      takeUntil(this.isDestroyed)
+      )
+      .subscribe(_change => this.formChanged = true);
   }
 
   ngOnDestroy(): void {
@@ -301,22 +313,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       return job;
     });
 
-
     this.store.dispatch(new ConfigureSettings({jobs: jobs}));
-    // this.store.select(changeConfiguration).pipe(takeUntil(this.isDestroyed))
-    //   .subscribe((changeConfigurationSelector) => {
-    //     if (changeConfigurationSelector.errorResp !== null) {
-    //       const error = changeConfigurationSelector.errorResp;
-    //       const errMsg = 'Unable to update one or more settings.';
-    //       this.showErrorNotification(error, errMsg);
-    //       this.store.dispatch(new GetSettings({})); // reset form to previously stored settings
-    //       this.saving = false;
-    //     } else if (changeConfigurationSelector.status === 'loadingSuccess') {
-    //       this.showSuccessNotification();
-    //       this.formChanged = false;
-    //       this.saving = false;
-    //     }
-    //   });
   }
 
   // Hides the notification banner
@@ -334,14 +331,14 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Subscribes to any change inside the automateSettingsForm
-  private onChanges(): void {
-    this.automateSettingsForm.valueChanges.pipe(takeUntil(this.isDestroyed))
-      .subscribe(_change => {
-        this.formChanged = true;
-        // Loop through forms and check for validity, then set to true or false
-      });
-  }
+  // // Subscribes to any change inside the automateSettingsForm
+  // private onChanges(): void {
+  //   this.automateSettingsForm.valueChanges.pipe(takeUntil(this.isDestroyed))
+  //     .subscribe(_change => {
+  //       this.formChanged = true;
+  //       // Loop through forms and check for validity, then set to true or false
+  //     });
+  // }
 
   private showErrorNotification(error: HttpErrorResponse, msg: string) {
     // Extract the error message from the HttpErrorResponse
@@ -394,8 +391,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Subscribe to new changes on the form after the new values have been populated
-    this.onChanges();
+    // valuesLoaded is a flag we only need set once, after we populate
+    // the form for the first time, and now can listen for changes
+    this.valuesLoaded = true;
   }
 
   private getJobForm(jobName: string) {
