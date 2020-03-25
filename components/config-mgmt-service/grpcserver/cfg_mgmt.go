@@ -136,7 +136,8 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 
 	daysAgo := request.GetDaysAgo()
 	if daysAgo < 0 {
-		return &response.CheckInCountsTimeSeries{}, errors.GrpcErrorFromErr(codes.InvalidArgument, err)
+		return &response.CheckInCountsTimeSeries{}, errors.GrpcError(codes.InvalidArgument,
+			"daysAgo needs to be greater than zero")
 	}
 
 	// default to provide a time serise for the past 24 hours
@@ -146,15 +147,39 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 
 	startTime, endTime := calculateStartEndCheckInTimeSeries(daysAgo)
 
-	timeseries, err := s.client.GetCheckinCountsTimeSeries(startTime,
+	checkinTimeseries, err := s.client.GetCheckinCountsTimeSeries(startTime,
 		endTime.Add(-time.Millisecond), filters)
+	if err != nil {
+		return &response.CheckInCountsTimeSeries{}, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
 
-	checkInCountsCollection := make([]*response.CheckInCounts, len(timeseries))
-	for index, period := range timeseries {
+	deleteTimeseries, err := s.client.GetDeletedCountsTimeSeries(startTime,
+		endTime.Add(-time.Millisecond), filters)
+	if err != nil {
+		return &response.CheckInCountsTimeSeries{}, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
+	createTimeseries, err := s.client.GetCreateCountsTimeSeries(startTime,
+		endTime.Add(-time.Millisecond), filters)
+	if err != nil {
+		return &response.CheckInCountsTimeSeries{}, errors.GrpcErrorFromErr(codes.Internal, err)
+	}
+
+	if len(checkinTimeseries) != len(deleteTimeseries) &&
+		len(checkinTimeseries) != len(createTimeseries) {
+		return &response.CheckInCountsTimeSeries{}, errors.GrpcErrorf(codes.Internal,
+			"time series bucket lenghts do not match %d, %d, %d", len(checkinTimeseries),
+			len(deleteTimeseries), len(createTimeseries))
+	}
+
+	checkInCountsCollection := make([]*response.CheckInCounts, len(checkinTimeseries))
+	for index, period := range checkinTimeseries {
+		total := int32(createTimeseries[index].Count - deleteTimeseries[index].Count)
 		checkInCountsCollection[index] = &response.CheckInCounts{
 			Start: period.Start.Format(time.RFC3339),
 			End:   period.End.Format(time.RFC3339),
-			Count: int32(period.CheckInCount),
+			Count: int32(period.Count),
+			Total: total,
 		}
 	}
 

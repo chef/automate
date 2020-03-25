@@ -176,7 +176,17 @@ func (m Backend) GetRunsPageByCursor(context.Context, string, time.Time,
 }
 
 func (m Backend) GetCheckinCountsTimeSeries(time.Time, time.Time,
-	map[string][]string) ([]backend.CheckInPeroid, error) {
+	map[string][]string) ([]backend.CountPeroid, error) {
 
-	return []backend.CheckInPeroid{}, nil
+	return []backend.CountPeroid{}, nil
+}
+
+func (es Backend) GetCreateCountsTimeSeries(startTime, endTime time.Time,
+	filters map[string][]string) ([]backend.CountPeroid, error) {
+	return []backend.CountPeroid{}, nil
+}
+
+func (es Backend) GetDeletedCountsTimeSeries(startTime, endTime time.Time,
+	filters map[string][]string) ([]backend.CountPeroid, error) {
+	return []backend.CountPeroid{}, nil
 }

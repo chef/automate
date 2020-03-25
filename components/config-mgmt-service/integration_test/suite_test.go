@@ -211,6 +211,17 @@ func (s *Suite) IngestNodes(nodes []iBackend.Node) {
 	s.RefreshIndices(mappings.NodeState.Index)
 }
 
+// IngestInitialNodes ingests a number of nodes and at the end, refreshes the node-state index
+func (s *Suite) IngestInitialNodes(nodes []iBackend.UpsertNode) {
+	// Insert nodes
+	for _, node := range nodes {
+		s.ingest.InsertUpsertNode(context.Background(), node)
+	}
+
+	// Refresh Indices
+	s.RefreshIndices(mappings.NodeState.Index)
+}
+
 // IngestRuns ingests a number of runs and at the end, refreshes converge-history index
 func (s *Suite) IngestRuns(runs []iBackend.Run) {
 	// Insert runs

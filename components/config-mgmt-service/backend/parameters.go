@@ -42,6 +42,8 @@ var (
 	ChefServer         string = NodeFieldToJson("SourceFqdn")
 	EntityTypeName     string = "entity_type"
 	RunEndTime         string = "end_time"
+	Timestamp          string = "timestamp"
+	Created            string = "created"
 )
 
 // NodeFieldToJson returns the value associated with key in the tag

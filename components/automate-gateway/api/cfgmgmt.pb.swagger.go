@@ -492,6 +492,10 @@ func init() {
         "count": {
           "type": "integer",
           "format": "int32"
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
         }
       }
     },
