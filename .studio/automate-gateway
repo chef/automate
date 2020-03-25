@@ -51,6 +51,13 @@ function gateway_integration() {
   set +o pipefail # reset
 }
 
+document "get_service_versions" <<DOC
+  Get all the service versions running in automate
+DOC
+function get_service_versions() {
+  curl -f --insecure -H "api-token: $(get_api_token)" "${GATEWAY_URL}/deployment/service_versions"
+}
+
 document "gateway_version" <<DOC
   Display the automate-gateway service version.
 
@@ -133,6 +140,24 @@ function send_chef_action_example() {
     --data "@-" "${GATEWAY_URL}${endpoint}" <<< "$tmp_action_json"
 }
 
+document "generate_chef_run_example" <<DOC
+  Generates a unique Chef run report by updating the example document with new
+  UUIDS.
+
+  Example: Generate the document and pretty print:
+  ------------------------------------------------
+  generate_chef_run_example | jq .
+
+  Example: Generate the document and send to automate:
+  ----------------------------------------------------
+  generate_chef_run_example | send_chef_data_raw
+DOC
+function generate_chef_run_example() {
+  local node_name="insights.success.$((RANDOM % 100))"
+  local examples_json_path=${JSON_FILE:-/src/components/ingest-service/examples/converge-success-report.json}
+  uniqify_chef_run_report "$node_name" < "$examples_json_path"
+}
+
 document "send_chef_run_example" <<DOC
   Send the example chef run message to the chef run rest endpoint.
 
@@ -157,27 +182,14 @@ document "send_chef_run_example" <<DOC
 DOC
 # shellcheck disable=SC2120
 function send_chef_run_example() {
-  install_if_missing core/curl curl
+  generate_chef_run_example | send_chef_data_raw "$1"
+}
 
-  local examples_json_path=${JSON_FILE:-/src/components/ingest-service/examples/converge-success-report.json}
-
-  if [[ "$1" == "legacy" ]]; then
-    endpoint=${GATEWAY_URL}"/events/data-collector"
-  elif [[ "$1" == "lb" ]]; then
-    endpoint="https://localhost/data-collector/v0"
-  else
-    endpoint=${GATEWAY_URL}"/ingest/events/chef/run"
-  fi
-
-  uuid=$(uuidgen)
-  entity_uuid=$(uuidgen)
-
-  tmp_ccr_json="$(jq --arg id "$uuid" '.id = $id' <"$examples_json_path")"
-  tmp_ccr_json="$(echo "$tmp_ccr_json" | jq --arg id "$entity_uuid" '.entity_uuid = $id')"
-
-  echo "$tmp_ccr_json" \
-       | curl -f --insecure -H "api-token: $(get_admin_token)" \
-       --data "@-" "${endpoint}"
+document "generate_chef_run_start_example" <<DOC
+  Returns a chef run start document from the examples.
+DOC
+function generate_chef_run_start_example() {
+  cat /src/components/ingest-service/examples/chef_client_run_start.json
 }
 
 document "send_chef_run_start_example" <<DOC
@@ -196,26 +208,32 @@ document "send_chef_run_start_example" <<DOC
   # send_chef_run_start_example lb
 DOC
 function send_chef_run_start_example() {
-  install_if_missing core/curl curl
-
-  local examples_path="/src/components/ingest-service/examples"
-  if [[ "$1" == "legacy" ]]; then
-    endpoint=${GATEWAY_URL}"/events/data-collector"
-  elif [[ "$1" == "lb" ]]; then
-    endpoint="https://localhost/data-collector/v0"
-  else
-    endpoint=${GATEWAY_URL}"/ingest/events/chef/run"
-  fi
-
-  curl -f --insecure -H "api-token: $(get_api_token)" \
-       --data @$examples_path/chef_client_run_start.json "${endpoint}"
+  generate_chef_run_start_example | send_chef_data_raw "$1"
 }
 
-document "get_service_versions" <<DOC
-  Get all the service versions running in automate
+# shellcheck disable=SC2154
+document "generate_chef_run_failure_example" <<DOC
+  Generate a unique chef run failure report by updating the example with new
+  UUIDs and times/dates. You can send it automate directly or modify it as you
+  wish.
+
+  Example: Send a Chef Run example to the new ingest endpoint:
+  --------------------------------------------------------
+  # generate_chef_run_failure_example | send_chef_data_raw
+
+  Example: Generate run data and modify it
+  --------------------------------------------------------
+  # generate_chef_run_failure_example | jq --arg error_message "example error1" '.error.message = $error_message'
+
+  Example: Generate run data, modify it, and send it to ingest
+  --------------------------------------------------------
+  generate_chef_run_failure_example | jq --arg error_message "example error1" '.error.message = $error_message' | send_chef_data_raw
 DOC
-function get_service_versions() {
-  curl -f --insecure -H "api-token: $(get_api_token)" "${GATEWAY_URL}/deployment/service_versions"
+# shellcheck disable=SC2120
+function generate_chef_run_failure_example() {
+  local node_name="node_failed_$((RANDOM % 100))"
+  local examples_path="/src/components/ingest-service/examples"
+  uniqify_chef_run_report "$node_name" < $examples_path/converge-failure-report.json
 }
 
 document "send_chef_run_failure_example" <<DOC
@@ -226,27 +244,14 @@ document "send_chef_run_failure_example" <<DOC
   # send_chef_run_failure_example legacy
 DOC
 function send_chef_run_failure_example() {
-  install_if_missing core/curl curl
-  install_if_missing core/jq-static jq
+  generate_chef_run_failure_example| send_chef_data_raw "$1"
+}
 
-  local run_uuid
-  run_uuid=$(uuidgen)
-  local node_uuid
-  node_uuid=$(uuidgen)
-
-  local node_name="node_failed_$((RANDOM % 100))"
-  local rfc_time
-  rfc_time=$(date +%FT%TZ -d "$((RANDOM % 144)) hour ago")
-
-  local examples_path="/src/components/ingest-service/examples"
-  [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/run"
-
-  # Update the IDs, names, and dates
-  tmp_ccr_json="$(jq --arg rfc_time "$rfc_time" --arg run_uuid "$run_uuid" --arg node_name "$node_name" --arg node_uuid "$node_uuid" '.end_time = $rfc_time | .start_time = $rfc_time | .entity_uuid = $node_uuid | .id = $run_uuid | .run_id = $run_uuid | .node_name = $node_name' <$examples_path/converge-failure-report.json)"
-
-  echo "$tmp_ccr_json" \
-       | curl -f --insecure -H "api-token: $(get_api_token)" \
-       --data "@-" "${GATEWAY_URL}${endpoint}"
+document "generate_chef_liveness_example" <<DOC
+  Prints the example chef liveness message to stdout
+DOC
+function generate_chef_liveness_example() {
+  cat "/src/components/ingest-service/examples/liveness_ping.json"
 }
 
 document "send_chef_liveness_example" <<DOC
@@ -257,13 +262,65 @@ document "send_chef_liveness_example" <<DOC
   # send_chef_liveness_example legacy
 DOC
 function send_chef_liveness_example() {
+  generate_chef_liveness_example | send_chef_data_raw "$1"
+}
+
+document "send_chef_data_raw" <<DOC
+  Send data from stdin to the given endpoint.
+
+  One optional argument can be given to send the data via different paths:
+  * 'send_chef_data_raw legacy': send to automate-gateway's events/data-collector endpoint
+  * 'send_chef_data_raw lb': send to automate-load-balancer (nginx) data-collector/v0 endpoint
+  * 'send_chef_data_raw SOME/PATH': send to automate-gateway at the given path
+  * 'send_chef_data_raw' (default): send to new ingest/events/chef/run endpoint
+
+  Example: Send a Chef Run failure example to the new ingest endpoint:
+  --------------------------------------------------------
+  # generate_chef_run_failure_example | send_chef_data_raw
+
+  Example: Same but via the load balancer
+  --------------------------------------------------------
+  # generate_chef_run_failure_example | send_chef_data_raw lb
+DOC
+function send_chef_data_raw() {
   install_if_missing core/curl curl
 
-  local examples_path="/src/components/ingest-service/examples"
-  [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/liveness"
+  local endpoint=$1
+  if [[ "$1" == "legacy" ]]; then
+    endpoint="${GATEWAY_URL}/events/data-collector"
+  elif [[ "$1" == "lb" ]]; then
+    endpoint="https://localhost/data-collector/v0"
+  elif [[ "$1x" == "x" ]]; then
+    endpoint="${GATEWAY_URL}/ingest/events/chef/run"
+  else
+    endpoint="${GATEWAY_URL}$1"
+  fi
 
   curl -f --insecure -H "api-token: $(get_api_token)" \
-       --data @$examples_path/liveness_ping.json "${GATEWAY_URL}${endpoint}"
+  --data "@-" "${endpoint}"
+}
+
+function uniqify_chef_run_report() {
+  install_if_missing core/jq-static jq
+
+  local node_name="$1"
+
+  local run_uuid
+  run_uuid=$(uuidgen)
+  local node_uuid
+  node_uuid=$(uuidgen)
+
+  local rfc_time
+  rfc_time=$(date +%FT%TZ -d "$((RANDOM % 144)) hour ago")
+
+  local examples_path="/src/components/ingest-service/examples"
+
+  # Update the IDs, names, and dates
+  jq --arg rfc_time "$rfc_time" \
+     --arg run_uuid "$run_uuid" \
+     --arg node_name "$node_name" \
+     --arg node_uuid "$node_uuid" \
+     '.end_time = $rfc_time | .start_time = $rfc_time | .entity_uuid = $node_uuid | .id = $run_uuid | .run_id = $run_uuid | .node_name = $node_name'
 }
 
 document "delete_multiple_nodes" <<DOC
