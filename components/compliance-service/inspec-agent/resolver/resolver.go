@@ -356,10 +356,18 @@ func assembleAwsApiNodeInfo(node *nodes.Node, m *manager.NodeManager, awsCreds a
 		ManagerID:      m.Id,
 		CloudAccountID: m.AccountId,
 	}
+	// we want to prioritize using the region as it was saved
+	// in the credential for the nodemanager
 	region := awsCreds.Region
-	if len(awsCreds.Region) == 0 {
+	if len(region) == 0 && node.TargetConfig != nil {
+		// set region to the value saved on the node's target config
+		region = node.TargetConfig.Region
+	}
+	if len(region) == 0 {
+		// no other values found, set to default
 		region = awsec2.DefaultRegion
 	}
+
 	tc := inspec.TargetBaseConfig{
 		Backend: "aws",
 		Region:  region,

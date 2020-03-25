@@ -58,6 +58,16 @@ func TestAssembleAwsApiNodeInfo(t *testing.T) {
 		Backend: "aws",
 		Region:  "us-east-1",
 	}, tc)
+
+	node.TargetConfig = &nodes.TargetConfig{
+		Region: "node-set-region",
+	}
+	nodeDetails, tc, secrets = assembleAwsApiNodeInfo(node, m, awsCreds)
+	assert.Equal(t, inspec.TargetBaseConfig{
+		Backend: "aws",
+		Region:  "node-set-region",
+	}, tc)
+
 }
 func TestHandleSSMNodes(t *testing.T) {
 	ssmJob, skip := false, false
