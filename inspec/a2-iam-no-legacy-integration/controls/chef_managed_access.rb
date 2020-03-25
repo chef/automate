@@ -15,6 +15,7 @@ control 'iam-chef-managed-access-1' do
   PROJECT_OWNER_USER_ID = "inspec-project-owner-#{TIMESTAMP}"
 
   ALL_USERS_ACROSS_ROLES = [ADMIN_USER_ID, VIEWER_USER_ID, EDITOR_USER_ID, PROJECT_OWNER_USER_ID]
+  ALL_NON_ADMIN_USERS_ACROSS_ROLES = ALL_USERS_ACROSS_ROLES - [ADMIN_USER_ID]
 
   PROJECT_ID = "inspec-project-#{TIMESTAMP}"
 
@@ -344,7 +345,31 @@ control 'iam-chef-managed-access-1' do
       end
     end
 
-    describe 'version, health, and status endpoints' do
+    describe 'gateway health' do
+      it 'GET gateway/health for ADMIN' do
+        expect(
+          automate_api_request(
+            '/api/v0/gateway/health',
+            http_method: 'GET',
+            user: ADMIN_USER_ID
+          ).http_status
+        ).not_to eq 403
+      end
+
+      it 'GET gateway/health NON-ADMIN' do
+        ALL_NON_ADMIN_USERS_ACROSS_ROLES.each do |user|
+          expect(
+            automate_api_request(
+              '/api/v0/gateway/health',
+              http_method: 'GET',
+              user: user
+            ).http_status
+          ).to eq 403
+        end
+      end
+    end
+
+    describe 'version and status endpoints' do
       {
         'GET': %w[
           cfgmgmt/version
@@ -352,7 +377,6 @@ control 'iam-chef-managed-access-1' do
           deployment/service_versions
           license/status
           gateway/version
-          gateway/health
           ingest/version
           notifications/version
           telemetry/config
@@ -464,33 +488,33 @@ control 'iam-chef-managed-access-1' do
       end
     end
 
-    describe 'applying and requesting license' do
+    describe "requesting and applying license" do
       {
-        'POST': %w[
-          apply
-          request
-        ]
+        'POST': %w(
+          /api/v0/license/apply
+          /api/v0/license/request
+        ),
       }.each do |method, urls|
         urls.each do |url|
-          it "#{method} #{url} returns 403 for viewer" do
-            expect(
-              automate_api_request(
-                "/api/v0/license/#{url}",
-                http_method: method,
-                user: VIEWER_USER_ID
-              ).http_status
-            ).to eq 403
-          end
-
-          [ADMIN_USER_ID, EDITOR_USER_ID, PROJECT_OWNER_USER_ID].each do |user|
-            it "#{method} #{url} does not return 403 for #{user}" do
+          ALL_NON_ADMIN_USERS_ACROSS_ROLES.each do |user|
+            it "#{method} #{url} returns 403 for #{user}" do
               expect(
                 automate_api_request(
-                  "/api/v0/license/#{url}",
+                  url,
                   http_method: method,
                   user: user
                 ).http_status
-              ).not_to eq 403
+              ).to eq 403
+            end
+
+            it "#{method} #{url} does not return 403 for admin" do
+              expect(
+                automate_api_request(
+                  url,
+                  http_method: method,
+                  user: ADMIN_USER_ID
+                ).http_status
+              ).to_not eq 403
             end
           end
         end

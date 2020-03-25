@@ -25,7 +25,7 @@ Chef-managed roles are roles provided by Chef that cannot be changed.
 Role          | Description
 --------------|------------
 Viewer        | **View** everything in the system *except* IAM
-Editor        | **Do** everything in the system *except* IAM
+Editor        | **Do** everything in the system *except* IAM and license application
 Owner         | **Do** everything in the system *including* IAM
 Project Owner | Editor + **view** and **assign** projects
 Ingest        | Ingest data into the system

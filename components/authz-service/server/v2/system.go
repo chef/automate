@@ -50,6 +50,12 @@ func SystemPolicies() []*storage.Policy {
 			},
 			{
 				Effect:    storage.Allow,
+				Actions:   []string{"system:telemetryConfig:get"},
+				Resources: []string{"system:config"},
+				Projects:  []string{constants.AllProjectsID},
+			},
+			{
+				Effect:    storage.Allow,
 				Actions:   []string{"system:license:get"},
 				Resources: []string{"system:status"},
 				Projects:  []string{constants.AllProjectsID},
