@@ -76,6 +76,10 @@ mat-form-field {
   ::ng-deep .mat-select-disabled {
     background-color: $chef-light-grey;
     opacity: 0.5;
+
+    .mat-select-value {
+      color: rgb(84,84,84)
+    }
   }
 }
 
