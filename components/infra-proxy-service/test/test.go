@@ -82,7 +82,7 @@ func SetupInfraProxyService(ctx context.Context,
 	grpcAuthz := authzConnFactory.NewServer()
 
 	mockCommon := authz.NewSubjectPurgeServerMock()
-	mockCommon.PurgeSubjectFromPoliciesFunc = defaultMockPurgeFunc
+	mockCommon.PurgeSubjectFromPoliciesFunc = DefaultMockPurgeFunc
 	authz.RegisterSubjectPurgeServer(grpcAuthz, mockCommon)
 
 	mockV2Authz := authz_v2.NewAuthorizationServerMock()
@@ -135,7 +135,8 @@ func InsertProjectsIntoNewContext(projects []string) context.Context {
 		[]string{}, projects, "resource", "action", "pol"))
 }
 
-func defaultMockPurgeFunc(context.Context,
+// DefaultMockPurgeFunc authz defualt mock purge func.
+func DefaultMockPurgeFunc(context.Context,
 	*authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
 	return &authz.PurgeSubjectFromPoliciesResp{}, nil
 }

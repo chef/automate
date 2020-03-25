@@ -88,10 +88,15 @@ func (p *postgres) GetOrgByName(ctx context.Context, orgName string, serverID uu
 
 // DeleteOrg deletes an org from the DB.
 func (p *postgres) DeleteOrg(ctx context.Context, orgID uuid.UUID) (storage.Org, error) {
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return storage.Org{}, p.processError(err)
+	}
+
 	var org storage.Org
-	err := p.db.QueryRowContext(ctx,
-		`DELETE FROM orgs WHERE id = $1
-		RETURNING id, name, admin_user, admin_key, server_id, projects, created_at, updated_at`, orgID).
+	err = p.db.QueryRowContext(ctx,
+		`DELETE FROM orgs WHERE id = $1 AND projects_match(projects, $2::TEXT[])
+		RETURNING id, name, admin_user, admin_key, server_id, projects, created_at, updated_at`, orgID, pq.Array(projectsFilter)).
 		Scan(&org.ID, &org.Name, &org.AdminUser, &org.AdminKey, &org.ServerId, pq.Array(&org.Projects), &org.CreatedAt, &org.UpdatedAt)
 	if err != nil {
 		return storage.Org{}, p.processError(err)
@@ -102,21 +107,60 @@ func (p *postgres) DeleteOrg(ctx context.Context, orgID uuid.UUID) (storage.Org,
 
 // EditOrg does a full update on a database org.
 func (p *postgres) EditOrg(ctx context.Context, org storage.Org) (storage.Org, error) {
-	var o storage.Org
+	ctx, cancel := context.WithCancel(ctx)
+	defer cancel()
 
 	// ensure we do not pass null projects to db
 	if org.Projects == nil {
 		org.Projects = []string{}
 	}
 
-	err := p.db.QueryRowContext(ctx,
+	tx, err := p.db.BeginTx(ctx, nil)
+	if err != nil {
+		return storage.Org{}, p.processError(err)
+	}
+
+	projectsFilter, err := ProjectsListFromContext(ctx)
+	if err != nil {
+		return storage.Org{}, p.processError(err)
+	}
+
+	var oldProjects []string
+
+	err = tx.QueryRowContext(ctx,
+		`SELECT projects FROM orgs
+		WHERE id = $1 AND projects_match(projects, $2::TEXT[])
+		FOR UPDATE;`,
+		org.ID, pq.Array(projectsFilter)).
+		Scan(pq.Array(&oldProjects))
+	if err != nil {
+		return storage.Org{}, p.processError(err)
+	}
+
+	_, err = p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
+		OldProjects:     oldProjects,
+		NewProjects:     org.Projects,
+		IsUpdateRequest: true,
+	})
+	if err != nil {
+		// return error unaltered because it's already a GRPC status code
+		return storage.Org{}, err
+	}
+
+	var o storage.Org
+	err = tx.QueryRowContext(ctx,
 		`UPDATE orgs
-		SET name = $2, admin_user = $3, admin_key = $4, server_id = $5, projects = $6, updated_at = now()
-		WHERE id = $1
-		RETURNING id, name, admin_user, admin_key, server_id, projects, created_at, updated_at`,
-		org.ID, org.Name, org.AdminUser, org.AdminKey, org.ServerId, pq.Array(org.Projects)).
+		SET name = $2, admin_user = $3, admin_key = $4, projects = $5, updated_at = now()
+		WHERE id = $1 AND projects_match(projects, $6::TEXT[])
+		RETURNING id, name, admin_user, admin_key, server_id, projects, created_at, updated_at;`,
+		org.ID, org.Name, org.AdminUser, org.AdminKey, pq.Array(org.Projects), pq.Array(projectsFilter)).
 		Scan(&o.ID, &o.Name, &o.AdminUser, &o.AdminKey, &o.ServerId, pq.Array(&o.Projects), &o.CreatedAt, &o.UpdatedAt)
 	if err != nil {
+		return storage.Org{}, p.processError(err)
+	}
+
+	if err := tx.Commit(); err != nil {
 		return storage.Org{}, p.processError(err)
 	}
 
