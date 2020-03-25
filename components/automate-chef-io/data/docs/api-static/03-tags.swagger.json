@@ -128,6 +128,6 @@
       "name": "teams",
       "x-displayName": "IAM Teams",
       "description": "Teams are used to group local users for policy membership."
-    } 
+    }
   ]
 }
