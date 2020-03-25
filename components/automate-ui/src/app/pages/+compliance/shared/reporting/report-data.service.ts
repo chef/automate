@@ -4,12 +4,17 @@ import { StatsService } from './stats.service';
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 import { ReportQuery } from './report-query.service';
 
+export type ReportingSummaryStatus = 'failed' | 'passed' | 'waived' | 'skipped' | 'unknown';
+
 interface ReportingSummary {
   stats: {
     nodes: any;
     profiles: any;
     controls?: any;
+    platforms: number;
+    environments: number;
   };
+  status: ReportingSummaryStatus;
 }
 
 @Injectable()

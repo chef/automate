@@ -33,6 +33,7 @@ export interface ServiceGroupsHealthSummary {
   warning: number;
   critical: number;
   unknown: number;
+  disconnected: number;
 }
 
 export interface ServiceGroupsSuggestions {
