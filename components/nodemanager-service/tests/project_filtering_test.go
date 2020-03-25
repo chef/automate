@@ -395,5 +395,5 @@ func TestListProjectFilteringIngestedNodes(t *testing.T) {
 
 func contextWithProjects(projects []string) context.Context {
 	ctx := context.Background()
-	return auth_context.NewContext(ctx, []string{}, projects, "", "", "")
+	return auth_context.NewContext(ctx, []string{}, projects, "", "")
 }

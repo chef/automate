@@ -37,7 +37,7 @@ var createRuleReqGen, createProjectReqGen, createProjectAndRulesGen, createProje
 
 func TestCreateRuleProperties(t *testing.T) {
 	ctx := auth_context.NewOutgoingContext(auth_context.NewContext(context.Background(),
-		[]string{SuperuserSubject}, []string{}, "*", "*", "v2.1"))
+		[]string{SuperuserSubject}, []string{}, "*", "*"))
 
 	projectClient, policyClient, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	properties := getGopterParams(seed)
@@ -101,7 +101,7 @@ func TestCreateRuleProperties(t *testing.T) {
 
 func TestGetRuleProperties(t *testing.T) {
 	ctx := auth_context.NewOutgoingContext(auth_context.NewContext(context.Background(),
-		[]string{SuperuserSubject}, []string{}, "*", "*", "v2.1"))
+		[]string{SuperuserSubject}, []string{}, "*", "*"))
 	projectClient, policyClient, testDB, store, seed := testhelpers.SetupProjectsAndRulesWithDB(t)
 	defer testDB.CloseDB(t)
 	defer store.Close()

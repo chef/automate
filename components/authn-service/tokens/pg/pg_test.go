@@ -885,5 +885,5 @@ func assertCount(t *testing.T, db *sql.DB, expected int, id string) {
 func insertProjectsIntoNewContext(projects []string) context.Context {
 	return auth_context.NewOutgoingProjectsContext(
 		auth_context.NewContext(
-			context.Background(), []string{}, projects, "resource", "action", "pol"))
+			context.Background(), []string{}, projects, "resource", "action"))
 }

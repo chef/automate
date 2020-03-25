@@ -33,7 +33,7 @@ func generateAdminToken(ctx context.Context,
 	req *api.GenerateAdminTokenRequest, connFactory *secureconn.Factory,
 	authNAddress, authZAddress string) (*api.GenerateAdminTokenResponse, error) {
 
-	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx, []string{"tls:service:deployment-service:internal"}, []string{}, "", "", "v2.1"))
+	ctx = auth_context.NewOutgoingContext(auth_context.NewContext(ctx, []string{"tls:service:deployment-service:internal"}, []string{}, "", ""))
 	authnConnection, err := connFactory.DialContext(
 		ctx,
 		"authn-service",
