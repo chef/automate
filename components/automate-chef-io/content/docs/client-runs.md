@@ -9,7 +9,7 @@ toc = true
 
 ## Overview
 
-The client runs page shows all of the nodes connected to Chef Automate, either directly or via a Chef Server proxy. Nodes appear in this view after chef-client run has been executed.
+The client runs page shows all of the nodes connected to Chef Automate, either directly or via a Chef Infra Server proxy. Nodes appear in this view after a `chef-client` run has completed.
 
 ## Chef Client Run Status Overview
 
@@ -27,7 +27,7 @@ It is possible for a node to be present in this table without any associated run
 This happens when data retention settings erase the most recent run history for that node.
 In this case, a **no data** icon appears and you will be unable to view any node details.
 The node remains listed as a missing node until it is deleted from Automate.
-Automate automatically removes any modes deleted from the Chef Server.
+Automate automatically removes any modes deleted from the Chef Infra Server.
 
 ## Node Details
 
@@ -62,10 +62,10 @@ To save a search, select the share button to the right of the search bar, and co
 : Search for an attribute key, this will not search across attribute values.
 
 [Chef Organization](https://docs.chef.io/server_orgs/)
-: A Chef Server organization name.
+: A Chef Infra Server organization name.
 
-[Chef Server](https://docs.chef.io/server_overview/)
-: A Chef Server URL.
+[Chef Infra Server](https://docs.chef.io/server_overview/)
+: A Chef Infra Server URL.
 
 [Cookbook](https://docs.chef.io/cookbooks/)
 : A cookbook name.
@@ -125,7 +125,7 @@ chef-automate infrastructure node-delete 3f2a2830-0ef3-474a-a835-3a7dd25361fe
 
 To delete nodes using the REST API, use the `"https://automate-url/api/v0/ingest/events/chef/nodedelete"` endpoint to delete a single node, or the `"https://automate-url/api/v0/ingest/events/chef/node-multiple-deletes"` endpoint to delete multiple nodes.
 Identify your node or nodes, with either the _node\_id_ --which is the UUID of the node as it appears in Automate--or the combination of _node name_, _organization name_, and _service hostname_.
-The _service hostname_ is the `fqdn` of your Chef Server or, in the case of chef-solo nodes, `localhost`.
+The _service hostname_ is the `fqdn` of your Chef Infra Server or, in the case of chef-solo nodes, `localhost`.
 
 #### Request for deleting a node using the _node\_id_
 

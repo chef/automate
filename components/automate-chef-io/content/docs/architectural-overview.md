@@ -26,11 +26,11 @@ This service collects the initial service configuration from the user. It does e
 
 ### Configuration Management Service
 
-This service serves all configuration management related information to the API and user interface, including Chef Server action data and Chef Client run data.
+This service serves all configuration management related information to the API and user interface, including Chef Infra Server action data and Chef Infra Client run data.
 
 ### Ingest Service
 
-This service is the primary ingress event handler for configuration management related events such as Chef Client runs and Chef Server actions. It also manages the data related to these domains, such as cleanup, migration and index initialization.
+This service is the primary ingress event handler for configuration management related events such as Chef Infra Client runs and Chef Infra Server actions. It also manages the data related to these domains, such as cleanup, migration and index initialization.
 
 ### Compliance Service
 

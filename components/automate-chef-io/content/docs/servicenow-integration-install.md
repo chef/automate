@@ -12,7 +12,7 @@ toc = true
 
 ## Overview
 
-This guide helps you set up a ServiceNow instance that creates incidents from Chef Automate failure notifications on failed Chef Client runs and Compliance scans.
+This guide helps you set up a ServiceNow instance that creates incidents from Chef Automate failure notifications on failed Chef Infra Client runs and Compliance scans.
 
 ### Chef Automate - ServiceNow Integration
 
@@ -70,7 +70,7 @@ The admin role grants a user access to the:
 The role is suitable for users that require application access without administration access. The role grants a user access to the:
 
 * Chef Incidents menu
-* Chef Client runs menu item
+* Chef Infra Client runs menu item
 * InSpec scans menu item
 * Support menu item
 
@@ -100,18 +100,18 @@ The application system properties are:
 
 #### Property x_chef_incident.association
 
-The `x_chef_incident.association` property defines how a Chef Client run record is associated with an Incident record. The possible values are:
+The `x_chef_incident.association` property defines how a Chef Infra Client run record is associated with an Incident record. The possible values are:
 
 * `cookbook` (default)
 * `node`
 
-Setting the value to `cookbook` creates an incident for the failed cookbook. All failing Chef Client runs on nodes are associated with the corresponding incident. `cookbook` is the default value because the number of nodes is likely to exceed the number of cookbooks. The short description of the incident will indicate the failed cookbook:
+Setting the value to `cookbook` creates an incident for the failed cookbook. All failing Chef Infra Client runs on nodes are associated with the corresponding incident. `cookbook` is the default value because the number of nodes is likely to exceed the number of cookbooks. The short description of the incident will indicate the failed cookbook:
 
 ![CCR Failed Cookbook Description](/images/docs/SNOW_Failed_Cookbook.png)
 
 The associated client runs are shown on the 'Chef Client runs' tab of the incident.
 
-Setting the value to `node` creates an incident for each failed node. All failing Chef Client runs for a node are associated with the corresponding incident. The short description of the incident will indicate the failed node:
+Setting the value to `node` creates an incident for each failed node. All failing Chef Infra Client runs for a node are associated with the corresponding incident. The short description of the incident will indicate the failed node:
 
 ![CCR Failed Node Description](/images/docs/SNOW_Failed_Node_CCR.png)
 
@@ -156,11 +156,11 @@ The `x_chef_incident.urgency` property is the value to set in an incident raised
 
 #### Property x_chef_incident.retention_days
 
-The `x_chef_incident.retention_days` property is the number of days to retain Chef Client run and Chef InSpec scan records in ServiceNow after the corresponding incident is closed or after the association with an incident is removed. The default is set to 30 days and Chef Client run and InSpec scan records will remain in ServiceNow and be deleted after 30 days when the following conditions are met:
+The `x_chef_incident.retention_days` property is the number of days to retain Chef Infra Client run and Chef InSpec scan records in ServiceNow after the corresponding incident is closed or after the association with an incident is removed. The default is set to 30 days and Chef Infra Client run and InSpec scan records will remain in ServiceNow and be deleted after 30 days when the following conditions are met:
 
 * The corresponding incident is closed
 * The corresponding incident is deleted
-* The incident has been removed from the Chef Client run or InSpec scan record by a user update
+* The incident has been removed from the Chef Infra Client run or InSpec scan record by a user update
 
 #### Property x_chef_incident.logging.enabled
 
@@ -179,10 +179,10 @@ The `x_chef_incident.logging.verbosity` property sets the logging level when log
 
 Chef Automate can be configured to send a notification to the REST APIs exposed by the application. There are two REST APIs:
 
-* Chef Client run API /api/x_chef_incident/client_run
+* Chef Infra Client run API /api/x_chef_incident/client_run
 * InSpec scan API /api/x_chef_incident/inspec_scan
 
-#### Chef Client Run API
+#### Chef Infra Client Run API
 
 The Chef Automate notifications configuration UI for client runs
 
@@ -194,7 +194,7 @@ To report failed client runs on nodes managed by Chef Automate:
 * Select the 'Add Notification' button
 * Select the ServiceNow notification type
 * Assign a unique name for the notification
-* Select 'Chef Client run failures' as the failure type
+* Select 'Chef Infra Client run failures' as the failure type
 * Enter the ServiceNow client run API address in the ServiceNow webhook field
 * Enter the credentials of a user with the x_chef_incident.api role
 * Save the notification

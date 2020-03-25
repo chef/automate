@@ -1,6 +1,6 @@
 +++
 title = "Publish Cookbooks"
-description = "Publishing Cookbooks to Multiple Chef Servers"
+description = "Publishing Cookbooks to Multiple Chef Infra Servers"
 draft = false
 bref = ""
 toc = true
@@ -18,9 +18,9 @@ Workflow is available in Chef Automate for existing users. If you are not alread
 
 The `delivery-sugar` cookbook exposes some libraries and a resource that
 you can use to publish a cookbook (or multiple cookbooks) to multiple
-Chef servers or organizations. The following examples show how to
-publish to both a single Chef server and how to extend that methodology
-to publish to multiple Chef servers.
+Chef Infra Servers or organizations. The following examples show how to
+publish to both a single Chef Infra Server and how to extend that methodology
+to publish to multiple Chef Infra Servers.
 
 ## Prerequisites
 
@@ -31,7 +31,7 @@ manually by logging in to the build nodes/runners and copying the files
 or automated through the use of a secure copy tool like `scp`.
 
 The following is an example of a `config.rb` file for a `test` user that
-points to the Chef server `chef-test-server.example.com` and the
+points to the Chef Infra Server `chef-test-server.example.com` and the
 organization `your_org`. The `test.pem` file is the value specified in
 the `client_key` setting.
 
@@ -44,14 +44,14 @@ trusted_certs_dir '/etc/chef/trusted_certs'
 chef_server_url   'https://chef-test-server.example.com/organizations/your_org'
 ```
 
-## Publish a cookbook to a single Chef server
+## Publish a cookbook to a single Chef Infra Server
 
-To publish a cookbook to a Chef server, use the `delivery_chef_cookbook`
+To publish a cookbook to a Chef Infra Server, use the `delivery_chef_cookbook`
 resource and reference the `config.rb` file that you copied to your
 build node/runner.
 
 This example shows how to publish a cookbook called `rally` to a single
-Chef server.
+Chef Infra Server.
 
 ```ruby
 knife_rb = '/path/to/the/knife_rb/file/in/the/build-node/config.rb'
@@ -68,16 +68,16 @@ not need to explicitly include that in your `delivery_chef_cookbook`
 implementation.
 {{% /info %}}
 
-## Publish Cookbook to Multiple Chef servers
+## Publish Cookbook to Multiple Chef Infra Servers
 
 Publishing to multiple servers uses the `delivery_chef_cookbook` in much
-the same way as publishing to a single Chef server except you reference
-multiple Chef server objects through an array.
+the same way as publishing to a single Chef Infra Server except you reference
+multiple Chef Infra Server objects through an array.
 
-In the following example, imagine you have two Chef servers, one in San
+In the following example, imagine you have two Chef Infra Servers, one in San
 Francisco and another one in New York. Also, assume you have copied the
 correct `config.rb` and `client_key` files to the build nodes/runners
-for each Chef server.
+for each Chef Infra Server.
 
 For this particular example, you want the cookbook uploaded at the very
 end of the workflow pipeline, in the **Functional** phase of the

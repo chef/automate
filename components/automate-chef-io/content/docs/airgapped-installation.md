@@ -90,7 +90,7 @@ Once you log in, Chef Automate prompts you for a license.
 
 #### Configure Data Collection
 
-To send data from your Chef Server or Chef Clients to Chef Automate 2, the process is the same as Chef Automate 1.
+To send data from your Chef Infra Server or Chef Infra Clients to Chef Automate 2, the process is the same as Chef Automate 1.
 See [Configure Data Collection]({{< relref "data-collection.md" >}}) for more information.
 
 ### Upgrades
