@@ -30,7 +30,7 @@
             <div class="checkbox-container">
               <chef-checkbox
                 [checked]="!eventFeedRemoveData.value.disabled"
-                (change)="toggleInput(eventFeedRemoveData, $event.detail)">
+                (change)="handleFormActivation(eventFeedRemoveData, $event.detail)">
               </chef-checkbox>
             </div>
               <p>Remove event feed data after
@@ -50,7 +50,7 @@
             <div class="checkbox-container">
               <chef-checkbox
                 [checked]="!eventFeedServerActions.value.disabled"
-                (change)="toggleInput(eventFeedServerActions, $event.detail)">
+                (change)="handleFormActivation(eventFeedServerActions, $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove Chef Server actions after
@@ -102,7 +102,7 @@
               <span id="service-group-remove-services">
                 <chef-checkbox
                 [checked]="!serviceGroupRemoveServices.value.disabled"
-                (change)="toggleInput(serviceGroupRemoveServices, $event.detail)"
+                (change)="handleFormActivation(serviceGroupRemoveServices, $event.detail)"
                 disabled="true">
                 <!-- this is currently not changeable by the user in the UI -->
                 </chef-checkbox>
@@ -131,7 +131,7 @@
             <div class="checkbox-container">
               <chef-checkbox
               [checked]="!clientRunsRemoveData.value.disabled"
-              (change)="toggleInput(clientRunsRemoveData, $event.detail)">
+              (change)="handleFormActivation(clientRunsRemoveData, $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove data for Chef Client runs after
@@ -146,7 +146,7 @@
             <div class="checkbox-container">
               <chef-checkbox
               [checked]="!clientRunsLabelMissing.value.disabled"
-              (change)="toggleInput(clientRunsLabelMissing, $event.detail)">
+              (change)="handleFormActivation(clientRunsLabelMissing, $event.detail)">
               </chef-checkbox>
             </div>
           
@@ -171,7 +171,7 @@
             <div class="checkbox-container">
               <chef-checkbox
               [checked]="!clientRunsRemoveNodes.value.disabled"
-              (change)="toggleInput(clientRunsRemoveNodes, $event.detail)">
+              (change)="handleFormActivation(clientRunsRemoveNodes, $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove nodes labeled as missing after
@@ -196,7 +196,7 @@
             <div class="checkbox-container">
               <chef-checkbox
               [checked]="!complianceRemoveReports.value.disabled"
-              (change)="toggleInput(complianceRemoveReports, $event.detail)">
+              (change)="handleFormActivation(complianceRemoveReports, $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove compliance reports after
@@ -211,7 +211,7 @@
             <div class="checkbox-container">
               <chef-checkbox
               [checked]="!complianceRemoveScans.value.disabled"
-              (change)="toggleInput(complianceRemoveScans, $event.detail)">
+              (change)="handleFormActivation(complianceRemoveScans, $event.detail)">
               </chef-checkbox>
             </div>
             <p>Remove compliance scans after

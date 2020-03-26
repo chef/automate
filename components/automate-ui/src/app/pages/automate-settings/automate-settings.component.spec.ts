@@ -89,7 +89,7 @@ describe('AutomateSettingsComponent', () => {
     expect(Object.keys(component.automateSettingsForm.controls)).toEqual(ALL_FORMS);
   });
 
-  describe('toggleInput(form, value)', () => {
+  describe('handleFormActivation(form, value)', () => {
 
     using(ALL_FORMS
         // Service Groups on not currently uncheckable through the UI
@@ -98,7 +98,7 @@ describe('AutomateSettingsComponent', () => {
         function( form: string) {
       it(`deactivates the associated ${form} form`, () => {
         expect(component[form].value.disabled).toEqual(false);
-        component.toggleInput(component[form], false);
+        component.handleFormActivation(component[form], false);
         expect(component[form].value.disabled).toEqual(true);
         expect(component[form].get('unit').disabled).toBe(true);
         expect(component[form].get('threshold').disabled).toBe(true);
@@ -113,7 +113,7 @@ describe('AutomateSettingsComponent', () => {
           it(`activates the associated ${form} form`, () => {
         component[form].patchValue({disabled: true}); // Deactivate form to start
         expect(component[form].value.disabled).toEqual(true);
-        component.toggleInput(component[form], true);
+        component.handleFormActivation(component[form], true);
         expect(component[form].value.disabled).toEqual(false);
         expect(component[form].get('unit').disabled).toBe(false);
         expect(component[form].get('threshold').disabled).toBe(false);

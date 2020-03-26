@@ -253,7 +253,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     return allowedKeys.includes(key);
   }
 
-  public toggleInput(form, checked: boolean): void {
+  public handleFormActivation(form, checked: boolean): void {
     // patchValue is a workaround for the chef-checkbox because we need to be
     // able to store a reference to it being checked or not
     form.patchValue({
