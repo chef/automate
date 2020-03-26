@@ -1,22 +1,24 @@
 import { createSelector, createFeatureSelector } from '@ngrx/store';
-import { InfraRoleEntityState, infraRoleEntityAdapter } from './infra-role.reducer';
+import { InfraRoleDetailsEntityState, infraRoleDetailsEntityAdapter } from './infra-role-details.reducer';
 import { routeParams } from 'app/route.selectors';
 import { find } from 'lodash/fp';
 
-export const infraRoleState = createFeatureSelector<InfraRoleEntityState>('infraroles');
+export const infraRoleState =
+createFeatureSelector<InfraRoleDetailsEntityState>('infraroledetails');
+
 export const {
   selectAll: allInfraRoles,
   selectEntities: roleEntities
-} = infraRoleEntityAdapter.getSelectors(infraRoleState);
+} = infraRoleDetailsEntityAdapter.getSelectors(infraRoleState);
 
 export const infraRoleStatus = createSelector(
   infraRoleState,
   (state) => state.status
 );
 
-export const getAllStatus = createSelector(
+export const getStatus = createSelector(
   infraRoleState,
-  (state) => state.getAllStatus
+  (state) => state.getStatus
 );
 
 export const infaRoleFromRoute = createSelector(
