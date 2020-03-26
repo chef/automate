@@ -58,7 +58,7 @@ export class DestinationRequests {
       .pipe(mergeMap((secretId: string) => {
         destinationData.secret_id = secretId;
         return this.http.post<DestinationResponse>(
-          this.joinToDatafeedUrl(['destination']), Destination.fromResponse(destinationData));
+          this.joinToDatafeedUrl(['destination']), destinationData.toRequest());
       }));
   }
 

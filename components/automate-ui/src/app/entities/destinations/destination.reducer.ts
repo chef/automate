@@ -22,7 +22,9 @@ const GET_STATUS = 'getStatus';
 const DELETE_STATUS = 'deleteStatus';
 
 export const destinationEntityAdapter: EntityAdapter<Destination> =
-  createEntityAdapter<Destination>();
+  createEntityAdapter<Destination>({
+    selectId: (destination: Destination) => destination.name
+  });
 
 export const DestinationEntityInitialState: DestinationEntityState =
 destinationEntityAdapter.getInitialState({

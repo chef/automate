@@ -142,12 +142,12 @@ export class DatafeedComponent implements OnInit, OnDestroy {
     }
   }
 
-  public startDataFeedSendTest($event: ChefKeyboardEvent, destination: Destination) {
+  public startDataFeedSendTest($event: ChefKeyboardEvent, destination: any) {
     if ($event.isUserInput) {
       this.hookStatus = UrlTestState.Loading;
       if (destination) {
         this.datafeedService.testDestinationWithSecretId(destination.url,
-          destination.secret_id)
+          destination.secret)
           .subscribe(
             () => this.revealUrlStatusUsingSecretId(UrlTestState.Success),
             () => this.revealUrlStatusUsingSecretId(UrlTestState.Failure)
