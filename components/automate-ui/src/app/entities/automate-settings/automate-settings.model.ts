@@ -125,29 +125,31 @@ export class UnfurledJob {
   threshold?: string;
 }
 
+// A JobRequestComponent is very flexible
+  // It needs to be able to contain an older API Job object
+  // And a newer API Job Object
 export class JobRequestComponent {
-  name: string;
-  purge_policies: {
-    elasticsearch: UnfurledJob[];
+  disabled?: boolean;
+  name?: string;
+  threshold?: string | number;
+  purge_policies?: {
+    elasticsearch?: UnfurledJob[];
   };
 }
 
 export interface JobRequestBody {
   infra: {
-    // Infra is a special case and can contain a list of JobRequestComponents
-    // or an UnfurledJob depending on the API
-    job_settings: any[] // <-- this actually needs to be an Array of
-                        // JobRequestComponents AND unFurlInjest Job
+    job_settings: JobRequestComponent[];
   };
   compliance: {
-    job_settings: any[]
+    job_settings: JobRequestComponent[];
   };
   event_feed: {
-    job_settings: any[]
+    job_settings: JobRequestComponent[];
   };
   // services has not yet been implemented so we will leave as optional for now
   services?: {
-    job_settings: any[]
+    job_settings: JobRequestComponent[];
   };
 }
 

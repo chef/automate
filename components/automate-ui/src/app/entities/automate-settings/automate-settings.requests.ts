@@ -12,7 +12,6 @@ import {
   UnfurledJob,
   JobRequestBody,
   InfraJobName,
-  JobRequestComponent,
   JobCategories
 } from './automate-settings.model';
 
@@ -76,14 +75,18 @@ export class AutomateSettingsRequests {
 
     jobs.forEach(job => {
       let thisJob = new UnfurledJob;
-      let matchedNest = new JobRequestComponent;
 
       switch (job.name) {
         case InfraJobName.DeleteNodes:              // fallthrough
         case InfraJobName.MissingNodes:             // fallthrough
         case InfraJobName.MissingNodesForDeletion:
           thisJob = this.unfurlIngestJob(job);
-          body[job.category].job_settings.push(thisJob);
+          // Protect against an undefined value
+          if (body[job.category].job_settings) {
+            body[job.category].job_settings.push(thisJob);
+          } else {
+            console.log('TODO: send an error');
+          }
           break;
 
         case InfraJobName.PeriodicPurgeTimeseries:  // fallthrough
@@ -91,8 +94,14 @@ export class AutomateSettingsRequests {
         case 'periodic_purge':                      // all other nested jobs are
                                                     // contained in 'periodic_purge'
           thisJob = this.unfurlIngestJob(job, true);
-          matchedNest = body[job.category].job_settings.find(item => item.name === job.name);
-          matchedNest.purge_policies.elasticsearch.push(thisJob);
+
+          const thisObject = body[job.category].job_settings.find(item => item.name === job.name);
+          // Protect against an undefined value
+          if (thisObject) {
+            thisObject.purge_policies.elasticsearch.push(thisJob);
+          } else {
+            console.log('TDODO: send an error');
+          }
           break;
 
         default:
