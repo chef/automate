@@ -51,7 +51,10 @@ export class DashboardComponent implements OnInit {
     this.days$ = this.checkInCountCollection$.pipe(
       map(collection =>
         reverse(collection.buckets).map((bucket, index) => {
-          const percentage = (bucket.checkInCount / bucket.total) * 100;
+          let percentage = 100;
+          if (bucket.total > 0) {
+            percentage = (bucket.checkInCount / bucket.total) * 100;
+          }
           return {daysAgo: index, percentage: percentage};
         }))
     );
@@ -61,11 +64,21 @@ export class DashboardComponent implements OnInit {
     );
 
     this.unknownPercentage$ = this.last24HourCheckInCount$.pipe(
-        map(count => ((count.total - count.checkInCount) / count.total) * 100)
+        map(count => {
+          if (count.total > 0) {
+            return ((count.total - count.checkInCount) / count.total) * 100;
+          }
+          return 100;
+        })
       );
 
     this.checkedInPercentage$ = this.last24HourCheckInCount$.pipe(
-      map(count => (count.checkInCount / count.total) * 100)
+      map(count => {
+        if (count.total > 0) {
+          return (count.checkInCount / count.total) * 100;
+        }
+        return 100;
+      })
     );
 
     this.totalCount$ = this.last24HourCheckInCount$.pipe(
