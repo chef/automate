@@ -286,6 +286,52 @@ describe('AutomateSettingsComponent', () => {
       });
     });
 
+    using([
+      // Event Feed
+      ['eventFeedRemoveData', 'nested', 'feed',
+        genNestedIngestJob('event_feed', 'periodic_purge', 'feed', 1, true)],
+      ['eventFeedServerActions', 'nested', 'actions',
+        genNestedIngestJob('infra', 'periodic_purge_timeseries', 'actions', 2, true)],
+
+      // Services --> not yet enabled
+      // ['serviceGroupNoHealthChecks'],
+      // ['serviceGroupRemoveServices'],
+
+      // Client Runs
+      ['clientRunsRemoveData', 'non-nested', 'not applicable',
+        genInjestJob('infra', 'missing_nodes', '5m', true)],
+      ['clientRunsLabelMissing', 'non-nested', 'not applicable',
+        genInjestJob('infra', 'missing_nodes_for_deletion', '6h', true)],
+      ['clientRunsRemoveNodes', 'nested', 'converge-history',
+        genNestedIngestJob('infra', 'periodic_purge_timeseries', 'converge-history', 7, true)],
+
+      // Compliance
+      ['complianceRemoveReports', 'nested', 'compliance-reports',
+        genNestedIngestJob('compliance', 'periodic_purge', 'compliance-reports', 8, true)],
+      ['complianceRemoveScans', 'nested', 'compliance-scans',
+        genNestedIngestJob('compliance', 'periodic_purge', 'compliance-scans', 9, true)]
+    ], function (formName: string, jobType: string, nestedName: string, job: IngestJob) {
+        it(`when ${formName} form is saved as disabled, unit and threshold are undefined
+            because they are not present in the form anymore`, () => {
+        const thisJobScheduler = new JobSchedulerStatus([job]);
+        component.updateForm(thisJobScheduler);
+
+        const newFormValues = component[formName].value;
+
+        let jobData = job;
+        if (jobType === 'nested') {
+          jobData = job.purge_policies.elasticsearch.find(item => item.name === nestedName);
+          expect(newFormValues.threshold).toEqual(undefined);
+        } else {
+          expect(newFormValues.threshold).toEqual(undefined);
+          expect(newFormValues.unit).toEqual(undefined);
+        }
+
+        // all forms share the same expectation of being disabled
+        expect(newFormValues.disabled).toEqual(jobData.disabled);
+      });
+    });
+
     describe('when user applyChanges()', () => {
       it('saves settings', () => {
         component.updateForm(mockJobSchedulerStatus);
