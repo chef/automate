@@ -239,7 +239,7 @@ describe('AutomateSettingsComponent', () => {
       // Event Feed
       ['eventFeedRemoveData', 'nested', 'feed',
           genNestedIngestJob('event_feed', 'periodic_purge', 'feed', 1, false)] ,
-      ['eventFeedServerActions', 'nested', 'actions', 
+      ['eventFeedServerActions', 'nested', 'actions',
           genNestedIngestJob('infra', 'periodic_purge_timeseries', 'actions', 2, false)],
 
       // Services --> not yet enabled
