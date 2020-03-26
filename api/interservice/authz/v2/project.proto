@@ -15,7 +15,7 @@ message Project {
 }
 
 message CreateProjectReq {
-    string name = 1 [(validate.rules).string.min_len = 1];
+    string name = 1 [(validate.rules).string.pattern = "\\S"];
     string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
 }
 
@@ -38,7 +38,7 @@ message ListProjectsResp {
 }
 
 message UpdateProjectReq {
-    string name = 1 [(validate.rules).string.min_len = 1];
+    string name = 1 [(validate.rules).string.pattern = "\\S"];
     string id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
 }
 
@@ -144,7 +144,7 @@ message Condition {
 message CreateRuleReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
     string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
-    string name = 3 [(validate.rules).string.min_len = 1];
+    string name = 3 [(validate.rules).string.pattern = "\\S"];
     ProjectRuleTypes type = 4;
     repeated Condition conditions = 5 [(validate.rules).repeated.min_items = 1];
 }
@@ -156,7 +156,7 @@ message CreateRuleResp {
 message UpdateRuleReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
     string project_id = 2 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
-    string name = 3 [(validate.rules).string.min_len = 1];
+    string name = 3 [(validate.rules).string.pattern = "\\S"];
     ProjectRuleTypes type = 4;
     repeated Condition conditions = 5 [(validate.rules).repeated.min_items = 1];
 }

@@ -9,7 +9,7 @@ option go_package = "github.com/chef/automate/api/interservice/authn";
 message CreateTokenReq {
   // Match either a completely empty string or a valid id.
   string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$|^$"];
-  string description = 2 [(validate.rules).string.min_len = 1];
+  string description = 2 [(validate.rules).string.pattern = "\\S"];
   bool active = 3;
   repeated string projects = 4 [(validate.rules).repeated = {
     unique: true,
@@ -19,7 +19,7 @@ message CreateTokenReq {
 
 message CreateTokenWithValueReq {
   string id = 1;
-  string description = 2 [(validate.rules).string.min_len = 1];
+  string description = 2 [(validate.rules).string.pattern = "\\S"];
   bool active = 3;
   string value = 4;
   repeated string projects = 5 [(validate.rules).repeated = {
@@ -31,7 +31,7 @@ message CreateTokenWithValueReq {
 message UpdateTokenReq {
   string id = 1;
   bool active = 2;
-  string description = 3 [(validate.rules).string.min_len = 1];
+  string description = 3 [(validate.rules).string.pattern = "\\S"];
   repeated string projects = 4 [(validate.rules).repeated = {
     unique: true,
     items: {string: {pattern: "^[a-z0-9-_]{1,64}$"}}

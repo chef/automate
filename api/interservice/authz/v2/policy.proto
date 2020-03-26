@@ -25,7 +25,7 @@ message Role {
 
 message CreatePolicyReq {
     string id = 1 [(validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
-    string name = 2 [(validate.rules).string.min_len = 1];
+    string name = 2 [(validate.rules).string.pattern = "\\S"];
     repeated string members = 3 [(validate.rules).repeated = {
         unique: true,
         items: {
@@ -103,7 +103,7 @@ message UpdatePolicyReq {
         }
        }];
     repeated Statement statements = 3 [(validate.rules).repeated.min_items = 1];
-    string name = 8 [(validate.rules).string.min_len = 1];
+    string name = 8 [(validate.rules).string.pattern = "\\S"];
     repeated string projects = 9 [(validate.rules).repeated = {
         unique: true,
         items: {

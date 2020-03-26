@@ -7,7 +7,7 @@ package chef.automate.domain.local_user;
 option go_package = "github.com/chef/automate/api/interservice/local_user";
 
 message Email  {
-  string email = 1 [(validate.rules).string.min_len = 1]; // forbid empty strings;
+  string email = 1 [(validate.rules).string.pattern = "\\S"];
 };
 
 message GetUsersReq {
@@ -24,7 +24,7 @@ message CreateUserReq {
   string id = 1;
 
   // forbid empty strings
-  string name = 2 [(validate.rules).string.min_len = 1];
+  string name = 2 [(validate.rules).string.pattern = "\\S"];
 
   // Note: we're explicitly more strict than email (RFC 1034), although PGV
   // knows how to validate an email address using
@@ -51,13 +51,13 @@ message UpdateUserReq {
   // update to get the ID, then deprecate the ID field as in input into our update APIs.
   // This is probably the best option.
   // https://github.com/dexidp/dex/pull/1271
-  string id = 1 [(validate.rules).string.min_len = 1];
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
 
   // Currently, this validation doesn't make much sense, since user's can't change their
   // email (aka username) via update, but leaving it in since 1) it doesn't hurt and
   // 2) keep it consistent if we allow it in the future.
   string email = 2 [(validate.rules).string.pattern = "^[[:alnum:]_.+@-]+$"];
-  string name = 3 [(validate.rules).string.min_len = 1];
+  string name = 3 [(validate.rules).string.pattern = "\\S"];
 
   // Note: for UpdateUserReq, the password is optional
   string password = 4;
@@ -65,9 +65,9 @@ message UpdateUserReq {
 
 // See UpdateUserReq for other relevant comments.
 message UpdateSelfReq {
-  string id = 1 [(validate.rules).string.min_len = 1];
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
   string email = 2 [(validate.rules).string.pattern = "^[[:alnum:]_.+@-]+$"];
-  string name = 3 [(validate.rules).string.min_len = 1];
+  string name = 3 [(validate.rules).string.pattern = "\\S"];
 
   // Note: for UpdateSelfReq, the password and previous_password are optional,
   // but if passed, they must both be passed.
