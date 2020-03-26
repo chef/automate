@@ -130,12 +130,7 @@ describe('ProjectListComponent', () => {
       });
     });
 
-    it('does not display project data for v1', () => {
-      store.dispatch(new GetProjectsSuccess({ projects: projectList }));
-      expect(element).not.toContainPath('chef-table-new');
-    });
-
-    describe('create modal', () => {
+   describe('create modal', () => {
       it('opens upon clicking create button', () => {
         store.dispatch(new GetProjectsSuccess({ projects: projectList }));
         fixture.detectChanges();
