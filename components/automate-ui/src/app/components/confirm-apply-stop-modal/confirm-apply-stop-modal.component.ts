@@ -49,12 +49,13 @@ export class ConfirmApplyStopModalComponent implements OnChanges {
 
     if (Math.floor(percentageComplete) === 0) {
       this.progressPrefixText = 'Preparing...';
+      this.progressSuffixText = '';
     } else if (Math.ceil(percentageComplete) === 100) {
       this.progressPrefixText = 'Finishing Up...';
+      this.progressSuffixText = '';
     } else {
       this.progressPrefixText = `${Math.floor(percentageComplete)}% complete`;
+      this.progressSuffixText = `${durCountdown} until finished`;
     }
-
-    this.progressSuffixText = `${durCountdown} until finished`;
   }
 }
