@@ -35,7 +35,6 @@ module "single_local_fresh_install" {
     X-Deployment-Type  = "local"
     X-Channel          = "${var.channel}"
     X-CI-Test          = "e2e"
-    X-IAM              = "v1"
   }
 }
 
