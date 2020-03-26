@@ -7,11 +7,9 @@ import { InfraRole } from './infra-role.model';
 export interface InfraRoleEntityState extends EntityState<InfraRole> {
   status: EntityStatus;
   getAllStatus: EntityStatus;
-  getStatus: EntityStatus;
 }
 
 const GET_ALL_STATUS = 'getAllStatus';
-const GET_STATUS = 'getStatus';
 
 export const infraRoleEntityAdapter: EntityAdapter<InfraRole> = createEntityAdapter<InfraRole>({
   selectId: (infrarole: InfraRole) => infrarole.name
@@ -19,8 +17,7 @@ export const infraRoleEntityAdapter: EntityAdapter<InfraRole> = createEntityAdap
 
 export const InfraRoleEntityInitialState: InfraRoleEntityState =
   infraRoleEntityAdapter.getInitialState(<InfraRoleEntityState>{
-  getAllStatus: EntityStatus.notLoaded,
-  getStatus: EntityStatus.notLoaded
+  getAllStatus: EntityStatus.notLoaded
 });
 
 export function infraRoleEntityReducer(
@@ -34,23 +31,10 @@ export function infraRoleEntityReducer(
     case RoleActionTypes.GET_ALL_SUCCESS:
       return pipe(
         set(GET_ALL_STATUS, EntityStatus.loadingSuccess))
-        (infraRoleEntityAdapter.addAll(action.payload.roles, state)) as InfraRoleEntityState;
+        (infraRoleEntityAdapter.setAll(action.payload.roles, state)) as InfraRoleEntityState;
 
     case RoleActionTypes.GET_ALL_FAILURE:
       return set(GET_ALL_STATUS, EntityStatus.loadingFailure, state);
-
-    case RoleActionTypes.GET:
-      return set(
-        GET_STATUS, 
-        EntityStatus.loading, 
-        infraRoleEntityAdapter.removeAll(state)
-      ) as InfraRoleEntityState;
-
-    case RoleActionTypes.GET_SUCCESS:
-       return set(GET_STATUS, EntityStatus.loadingSuccess,
-        infraRoleEntityAdapter.addOne(action.payload, state));
-    case RoleActionTypes.GET_FAILURE:
-      return set(GET_STATUS, EntityStatus.loadingFailure, state);
 
     default:
       return state;
