@@ -19,7 +19,5 @@ inherited_options:
 see_also:
 - chef-automate - Chef Automate CLI
 - admin-access - Manage and restore default admin access
-- reset-to-v1 - Reset to IAM v1
 - token - Manage tokens
-- upgrade-to-v2 - Upgrade to IAM v2
 - version - Retrieve IAM version in use
