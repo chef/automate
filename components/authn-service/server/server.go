@@ -48,7 +48,7 @@ type Server struct {
 	authenticators     map[string]authenticator.Authenticator
 	logger             *zap.Logger
 	connFactory        *secureconn.Factory
-	teamsClient        teams.TeamsV2Client
+	teamsClient        teams.TeamsClient
 	authzSubjectClient authz.SubjectPurgeClient
 	authzV2Client      authz_v2.AuthorizationClient
 	health             *health.Service
@@ -167,7 +167,7 @@ func newServer(ctx context.Context, c Config, authzV2Client authz_v2.Authorizati
 		authenticators:     authenticators,
 		logger:             c.Logger,
 		connFactory:        factory,
-		teamsClient:        teams.NewTeamsV2Client(teamsConn),
+		teamsClient:        teams.NewTeamsClient(teamsConn),
 		health:             health.NewService(),
 	}
 

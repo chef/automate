@@ -42,7 +42,7 @@ type Server struct {
 	validator       *password.Validator
 	connFactory     *secureconn.Factory
 	health          *health.Service
-	teamsClient     teams.TeamsV2Client
+	teamsClient     teams.TeamsClient
 	a1UserData      string
 	a1UserRolesData string
 	authzClient     authz.SubjectPurgeClient
@@ -94,7 +94,7 @@ func newServer(ctx context.Context, c Config) (*Server, error) {
 		users:           usrs,
 		validator:       val,
 		connFactory:     secureconn.NewFactory(*c.ServiceCerts),
-		teamsClient:     teams.NewTeamsV2Client(conn),
+		teamsClient:     teams.NewTeamsClient(conn),
 		a1UserData:      c.A1UserData,
 		a1UserRolesData: c.A1UserRolesData,
 		authzClient:     authz.NewSubjectPurgeClient(authzConn),
