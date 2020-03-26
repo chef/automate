@@ -6,11 +6,13 @@ import { map, filter } from 'rxjs/operators';
 import { last, reverse } from 'lodash/fp';
 
 import {
-  GetDailyCheckInTimeSeries
+  GetDailyCheckInTimeSeries,
+  SetDaysAgoSelected
 } from 'app/entities/desktop/desktop.actions';
 
 import {
-  dailyCheckInCountCollection
+  dailyCheckInCountCollection,
+  getSelectedDaysAgo
 } from 'app/entities/desktop/desktop.selectors';
 
 import {
@@ -32,14 +34,16 @@ export class DashboardComponent implements OnInit {
   public unknownCount$: Observable<number>;
   public checkedInCount$: Observable<number>;
   public days$: Observable<DayPercentage[]>;
-  public selectedDaysAgo = 7;
+  public selectedDaysAgo$: Observable<number>;
 
   constructor(
     private store: Store<NgrxStateAtom>
   ) { }
 
   ngOnInit() {
-    this.store.dispatch(new GetDailyCheckInTimeSeries({daysAgo: this.selectedDaysAgo}));
+    this.store.dispatch(new GetDailyCheckInTimeSeries());
+
+    this.selectedDaysAgo$ = this.store.select(getSelectedDaysAgo);
 
     this.checkInCountCollection$ = this.store.select(dailyCheckInCountCollection).pipe(
       filter(collection => collection.buckets.length > 0));
@@ -78,8 +82,6 @@ export class DashboardComponent implements OnInit {
   }
 
   handleDaysAgoChange(daysAgo: number) {
-    this.selectedDaysAgo = daysAgo;
-    this.store.dispatch(new GetDailyCheckInTimeSeries({daysAgo: this.selectedDaysAgo}));
-    console.info('handleDaysAgoChange: ' + daysAgo);
+    this.store.dispatch(new SetDaysAgoSelected({daysAgo}));
   }
 }

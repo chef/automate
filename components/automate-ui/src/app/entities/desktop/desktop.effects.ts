@@ -1,7 +1,9 @@
 import { catchError, mergeMap, map } from 'rxjs/operators';
 import { Injectable } from '@angular/core';
 import { Actions, Effect, ofType } from '@ngrx/effects';
-import { of } from 'rxjs';
+import { of, combineLatest } from 'rxjs';
+import { NgrxStateAtom } from 'app/ngrx.reducers';
+import { Store } from '@ngrx/store';
 
 import {
   GetDailyCheckInTimeSeries,
@@ -12,22 +14,34 @@ import {
 import { DesktopRequests } from './desktop.requests';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
+import { getSelectedDaysAgo } from 'app/entities/desktop/desktop.selectors';
 
 @Injectable()
 export class DesktopEffects {
   constructor(
     private actions$: Actions,
-    private requests: DesktopRequests
+    private requests: DesktopRequests,
+    private store$: Store<NgrxStateAtom>
   ) { }
 
   @Effect()
-  getDailyCheckInTimeSeries$ = this.actions$.pipe(
-    ofType<GetDailyCheckInTimeSeries>(DesktopActionTypes.GET_DAILY_CHECK_IN_TIME_SERIES),
-    mergeMap((action) => this.requests.getDailyCheckInCountCollection(action.payload.daysAgo)),
-    map(dailyCheckInCountCollection =>
-      new GetDailyCheckInTimeSeriesSuccess(dailyCheckInCountCollection)),
-    catchError((error) => of(new GetDailyCheckInTimeSeriesFailure(error)))
+  setDaysAgoSelected$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.SET_DAYS_AGO_SELECTED),
+    map(() => new GetDailyCheckInTimeSeries())
   );
+
+  @Effect()
+  getDailyCheckInTimeSeries$ = combineLatest([
+    this.actions$.pipe(ofType<GetDailyCheckInTimeSeries>(
+      DesktopActionTypes.GET_DAILY_CHECK_IN_TIME_SERIES)),
+    this.store$.select(getSelectedDaysAgo)])
+    .pipe(
+      mergeMap(([_action, selectedDaysAgo]) =>
+        this.requests.getDailyCheckInCountCollection(selectedDaysAgo).pipe(
+          map(dailyCheckInCountCollection =>
+        new GetDailyCheckInTimeSeriesSuccess(dailyCheckInCountCollection)),
+        catchError((error) => of(new GetDailyCheckInTimeSeriesFailure(error)))))
+    );
 
   @Effect()
   getDailyCheckInTimeSeriesFailure$ = this.actions$.pipe(

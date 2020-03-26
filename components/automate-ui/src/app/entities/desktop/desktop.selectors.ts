@@ -13,3 +13,8 @@ export const dailyCheckInCountCollection = createSelector(
   desktopState,
   (state) => state.dailyCheckInCountCollection
 );
+
+export const getSelectedDaysAgo = createSelector(
+  desktopState,
+  (state) => state.selectedDaysAgo
+);
