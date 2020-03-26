@@ -10,6 +10,10 @@ toc = true
     weight = 20
 +++
 
+{{< info >}}
+Chef Automate releases later than 20200326170928 contain the version of IAM described on this page.
+{{< /info >}}
+
 This guide shows you how to perform important administrative operations.
 You will add members to Chef-managed v2 policies, delete a legacy policy, and write a Team Admin v2 policy that lets a Team Admin manage their users and teams.
 

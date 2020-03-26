@@ -1,6 +1,6 @@
 +++
-title = "IAM v2 Overview"
-description = "IAM v2 Overview"
+title = "IAM Overview"
+description = "IAM Overview"
 draft = false
 bref = ""
 toc = true
@@ -9,6 +9,10 @@ toc = true
     parent = "authorization"
     weight = 10
 +++
+
+{{< info >}}
+Chef Automate releases later than 20200326170928 contain the version of IAM described on this page.
+{{< /info >}}
 
 Chef Automate's Identity and Access Managment (IAM) allows direct management of policy members from Chef Automate in the browser.
 IAM supports the projects feature, which allow for filtering and segregation of your data amongst your user base.
