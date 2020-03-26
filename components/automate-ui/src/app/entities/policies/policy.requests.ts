@@ -3,13 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { environment as env } from 'environments/environment';
-import { Policy, IAMMajorVersion } from './policy.model';
-
-export interface IamVersionResponse {
-  version: {
-    major: IAMMajorVersion;
-  };
-}
+import { Policy } from './policy.model';
 
 export interface PoliciesResponse {
   policies: Policy[];
@@ -28,29 +22,25 @@ export class PolicyRequests {
 
   constructor(private http: HttpClient) { }
 
-  public getIamVersion(): Observable<IamVersionResponse> {
-    return this.http.get<IamVersionResponse>(`${env.auth_v2_url}/policy_version`);
-  }
-
   public getPolicies(): Observable<PoliciesResponse> {
-    return this.http.get<PoliciesResponse>(`${env.auth_v2_url}/policies`);
+    return this.http.get<PoliciesResponse>(`${env.iam_url}/policies`);
   }
 
   public getPolicy(id: string): Observable<PolicyResponse> {
-    return this.http.get<PolicyResponse>(`${env.auth_v2_url}/policies/${id}`);
+    return this.http.get<PolicyResponse>(`${env.iam_url}/policies/${id}`);
   }
 
   public removePolicyMembers(id: string, members: string[]): Observable<MembersResponse> {
-    return this.http.post<MembersResponse>(`${env.auth_v2_url}/policies/${id}/members:remove`,
+    return this.http.post<MembersResponse>(`${env.iam_url}/policies/${id}/members:remove`,
       {'members': members});
   }
 
   public addPolicyMembers(id: string, members: string[]): Observable<MembersResponse> {
-    return this.http.post<MembersResponse>(`${env.auth_v2_url}/policies/${id}/members:add`,
+    return this.http.post<MembersResponse>(`${env.iam_url}/policies/${id}/members:add`,
       {'members': members});
   }
 
   public deletePolicy(id: string): Observable<{}> {
-    return this.http.delete(`${env.auth_v2_url}/policies/${id}`);
+    return this.http.delete(`${env.iam_url}/policies/${id}`);
   }
 }

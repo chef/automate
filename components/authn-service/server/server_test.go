@@ -22,7 +22,7 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	teams_api "github.com/chef/automate/api/interservice/teams/v1"
+	teams_api "github.com/chef/automate/api/interservice/teams/v2"
 	teams_server "github.com/chef/automate/components/teams-service/server"
 	teams_service "github.com/chef/automate/components/teams-service/service"
 	teams_logger "github.com/chef/automate/lib/logger"
@@ -112,14 +112,14 @@ func TestFetchLocalTeamsInAuthenticate(t *testing.T) {
 
 		t.Run("with an existing team that has this member", func(t *testing.T) {
 			// arrange
-			teamAdmins, err := srv.teamsClient.GetTeamByName(ctx,
-				&teams_api.GetTeamByNameReq{
-					Name: "admins",
+			teamAdmins, err := srv.teamsClient.GetTeam(ctx,
+				&teams_api.GetTeamReq{
+					Id: "admins",
 				})
 			require.Nil(t, err, "arrange: create team in teams-service")
 
-			_, err = srv.teamsClient.AddUsers(ctx,
-				&teams_api.AddUsersReq{
+			_, err = srv.teamsClient.AddTeamMembers(ctx,
+				&teams_api.AddTeamMembersReq{
 					Id:      teamAdmins.GetTeam().GetId(),
 					UserIds: []string{mockUserID},
 				})
@@ -139,7 +139,7 @@ func TestFetchLocalTeamsInAuthenticate(t *testing.T) {
 func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 	ctx := context.Background()
 
-	mockTeams := teams_api.NewTeamsV1ServerMock()
+	mockTeams := teams_api.NewTeamsV2ServerMock()
 	teams := newTeamService(t, mockTeams)
 	defer teams.Close()
 
@@ -165,21 +165,20 @@ func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 	client := auth.NewAuthenticationClient(conn)
 
 	tests := map[string]struct {
-		teamsResp *teams_api.GetTeamsForUserResp
+		teamsResp *teams_api.GetTeamsForMemberResp
 		checks    []checkFunc
 	}{
 		"when the user has no teams": {
-			&teams_api.GetTeamsForUserResp{},
+			&teams_api.GetTeamsForMemberResp{},
 			check(
 				hasTeams(0),
 			),
 		},
 		"when the user has exactly one team": {
-			&teams_api.GetTeamsForUserResp{Teams: []*teams_api.Team{
+			&teams_api.GetTeamsForMemberResp{Teams: []*teams_api.Team{
 				{
-					Id:          "32b93d9b-cd3d-4d3b-aa8d-eb0c553f7afa",
-					Name:        "admins",
-					Description: "admins",
+					Id:   "admins",
+					Name: "admins",
 				},
 			}},
 			check(
@@ -188,11 +187,10 @@ func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 			),
 		},
 		"when the user has a team that has a space in it": {
-			&teams_api.GetTeamsForUserResp{Teams: []*teams_api.Team{
+			&teams_api.GetTeamsForMemberResp{Teams: []*teams_api.Team{
 				{
-					Id:          "32b93d9b-cd3d-4d3b-aa8d-eb0c553f7afa",
-					Name:        "ad mins",
-					Description: "admins",
+					Id:   "ad mins",
+					Name: "admins",
 				},
 			}},
 			check(
@@ -201,16 +199,14 @@ func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 			),
 		},
 		"when the user has two teams": {
-			&teams_api.GetTeamsForUserResp{Teams: []*teams_api.Team{
+			&teams_api.GetTeamsForMemberResp{Teams: []*teams_api.Team{
 				{
-					Id:          "32b93d9b-cd3d-4d3b-aa8d-eb0c553f7afa",
-					Name:        "admins",
-					Description: "admins",
+					Id:   "admins",
+					Name: "admins",
 				},
 				{
-					Id:          "ee28d5ee-d15b-4704-b4f2-3104454f3c49",
-					Name:        "überadmins",
-					Description: "they can do so much more",
+					Id:   "überadmins",
+					Name: "they can do so much more",
 				},
 			}},
 			check(
@@ -224,8 +220,8 @@ func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 		t.Run(name, func(t *testing.T) {
 			// arrange
 			mockTeams.Reset()
-			mockTeams.GetTeamsForUserFunc = func(
-				context.Context, *teams_api.GetTeamsForUserReq) (*teams_api.GetTeamsForUserResp, error) {
+			mockTeams.GetTeamsForMemberFunc = func(
+				context.Context, *teams_api.GetTeamsForMemberReq) (*teams_api.GetTeamsForMemberResp, error) {
 				return tc.teamsResp, nil
 			}
 
@@ -244,7 +240,7 @@ func TestTeamsLookupForLocalUsersInAuthenticate(t *testing.T) {
 func TestNoTeamsLookupForNonLocalUsersInAuthenticate(t *testing.T) {
 	ctx := context.Background()
 
-	mockTeams := teams_api.NewTeamsV1ServerMock()
+	mockTeams := teams_api.NewTeamsV2ServerMock()
 	teams := newTeamService(t, mockTeams)
 	defer teams.Close()
 
@@ -279,8 +275,8 @@ func TestNoTeamsLookupForNonLocalUsersInAuthenticate(t *testing.T) {
 		// arrange
 		mockTeams.Reset()
 		// setup our teams-service mock so that everything goes to hell if it's called
-		mockTeams.GetTeamsForUserFunc = func(
-			context.Context, *teams_api.GetTeamsForUserReq) (*teams_api.GetTeamsForUserResp, error) {
+		mockTeams.GetTeamsForMemberFunc = func(
+			context.Context, *teams_api.GetTeamsForMemberReq) (*teams_api.GetTeamsForMemberResp, error) {
 			assert.True(t, false, "don't call this")
 			return nil, status.Error(codes.Internal, "shouldn't have called this service")
 		}
@@ -318,13 +314,13 @@ func containsTeam(team string) checkFunc {
 
 // mini-factories
 
-func newTeamService(t *testing.T, m *teams_api.TeamsV1ServerMock) *grpctest.Server {
+func newTeamService(t *testing.T, m *teams_api.TeamsV2ServerMock) *grpctest.Server {
 	t.Helper()
 
 	serviceCerts := helpers.LoadDevCerts(t, "teams-service")
 	connFactory := secureconn.NewFactory(*serviceCerts)
 	g := connFactory.NewServer()
-	teams_api.RegisterTeamsV1Server(g, m)
+	teams_api.RegisterTeamsV2Server(g, m)
 	return grpctest.NewServer(g)
 }
 

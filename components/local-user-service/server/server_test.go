@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	teams_api "github.com/chef/automate/api/interservice/teams/v1"
+	teams_api "github.com/chef/automate/api/interservice/teams/v2"
 	"github.com/chef/automate/components/local-user-service/server"
 	"github.com/chef/automate/components/local-user-service/users"
 	usersMock "github.com/chef/automate/components/local-user-service/users/mock"
@@ -366,13 +366,13 @@ func TestA1RoleMigrationHappyPath(t *testing.T) {
 		id, err := uuid.NewV4()
 		require.NoError(t, err)
 
-		mock.GetTeamByNameFunc = adminsTeam(adminsTeamID)
-		mock.AddUsersFunc = func(_ context.Context,
-			req *teams_api.AddUsersReq) (*teams_api.AddUsersResp, error) {
+		mock.GetTeamFunc = adminsTeam(adminsTeamID)
+		mock.AddTeamMembersFunc = func(_ context.Context,
+			req *teams_api.AddTeamMembersReq) (*teams_api.AddTeamMembersResp, error) {
 			if len(req.UserIds) != 1 || req.UserIds[0] != id.String() {
 				return nil, errors.New("unexpected argument")
 			}
-			return &teams_api.AddUsersResp{Team: &teams_api.Team{Id: adminsTeamID.String()}}, nil
+			return &teams_api.AddTeamMembersResp{UserIds: []string{adminsTeamID.String()}}, nil
 		}
 
 		serv, adp := setupRolesFile(t, dataFile, teams.URL)
@@ -416,9 +416,9 @@ func TestA1RoleMigrationHappyPath(t *testing.T) {
 			ids[i] = id.String()
 		}
 
-		mock.GetTeamByNameFunc = adminsTeam(adminsTeamID)
-		mock.AddUsersFunc = func(_ context.Context,
-			req *teams_api.AddUsersReq) (*teams_api.AddUsersResp, error) {
+		mock.GetTeamFunc = adminsTeam(adminsTeamID)
+		mock.AddTeamMembersFunc = func(_ context.Context,
+			req *teams_api.AddTeamMembersReq) (*teams_api.AddTeamMembersResp, error) {
 
 			set := map[string]bool{}
 			for _, id := range req.UserIds {
@@ -428,7 +428,7 @@ func TestA1RoleMigrationHappyPath(t *testing.T) {
 			if !set[ids[admin]] || !set[ids[alice]] || !set[ids[cathy]] || set[ids[bob]] {
 				return nil, errors.New("unexpected arguments")
 			}
-			return &teams_api.AddUsersResp{Team: &teams_api.Team{Id: adminsTeamID.String()}}, nil
+			return &teams_api.AddTeamMembersResp{UserIds: []string{adminsTeamID.String()}}, nil
 		}
 
 		serv, adp := setupRolesFile(t, dataFile, teams.URL)
@@ -472,14 +472,14 @@ func TestA1RoleMigrationHappyPath(t *testing.T) {
 		id, err := uuid.NewV4()
 		require.NoError(t, err)
 
-		mock.GetTeamByNameFunc = adminsTeamNotFound
+		mock.GetTeamFunc = adminsTeamNotFound
 		mock.CreateTeamFunc = createAdminsTeam(adminsTeamID)
-		mock.AddUsersFunc = func(_ context.Context,
-			req *teams_api.AddUsersReq) (*teams_api.AddUsersResp, error) {
+		mock.AddTeamMembersFunc = func(_ context.Context,
+			req *teams_api.AddTeamMembersReq) (*teams_api.AddTeamMembersResp, error) {
 			if len(req.UserIds) != 1 || req.UserIds[0] != id.String() {
 				return nil, errors.New("unexpected argument")
 			}
-			return &teams_api.AddUsersResp{Team: &teams_api.Team{Id: adminsTeamID.String()}}, nil
+			return &teams_api.AddTeamMembersResp{UserIds: []string{adminsTeamID.String()}}, nil
 		}
 
 		serv, adp := setupRolesFile(t, dataFile, teams.URL)
@@ -506,8 +506,8 @@ func TestA1RoleMigrationTeamsAPIFailures(t *testing.T) {
 		teams, mock := setupTeamsMock(t)
 		defer teams.Close()
 
-		mock.GetTeamByNameFunc = func(context.Context,
-			*teams_api.GetTeamByNameReq) (*teams_api.GetTeamByNameResp, error) {
+		mock.GetTeamFunc = func(context.Context,
+			*teams_api.GetTeamReq) (*teams_api.GetTeamResp, error) {
 			return nil, errors.New("unknown failure")
 		}
 
@@ -524,7 +524,7 @@ func TestA1RoleMigrationTeamsAPIFailures(t *testing.T) {
 		defer teams.Close()
 
 		// a NotFound here triggers the creation of the admins team
-		mock.GetTeamByNameFunc = adminsTeamNotFound
+		mock.GetTeamFunc = adminsTeamNotFound
 		mock.CreateTeamFunc = func(context.Context,
 			*teams_api.CreateTeamReq) (*teams_api.CreateTeamResp, error) {
 			return nil, errors.New("unknown failure")
@@ -546,7 +546,7 @@ func TestA1RoleMigrationTeamsAPIFailures(t *testing.T) {
 		require.NoError(t, err)
 
 		// a NotFound here triggers the creation of the admins team
-		mock.GetTeamByNameFunc = adminsTeamNotFound
+		mock.GetTeamFunc = adminsTeamNotFound
 		mock.CreateTeamFunc = func(_ context.Context,
 			req *teams_api.CreateTeamReq) (*teams_api.CreateTeamResp, error) {
 			if req.Name != "admins" {
@@ -559,8 +559,8 @@ func TestA1RoleMigrationTeamsAPIFailures(t *testing.T) {
 				}}, nil
 		}
 
-		mock.AddUsersFunc = func(context.Context,
-			*teams_api.AddUsersReq) (*teams_api.AddUsersResp, error) {
+		mock.AddTeamMembersFunc = func(context.Context,
+			*teams_api.AddTeamMembersReq) (*teams_api.AddTeamMembersResp, error) {
 			return nil, errors.New("unknown failure")
 		}
 
@@ -578,35 +578,35 @@ func TestA1RoleMigrationTeamsAPIFailures(t *testing.T) {
 	})
 }
 
-func setupTeamsMock(t *testing.T) (*grpctest.Server, *teams_api.TeamsV1ServerMock) {
+func setupTeamsMock(t *testing.T) (*grpctest.Server, *teams_api.TeamsV2ServerMock) {
 	serviceCertsTS := helpers.LoadDevCerts(t, "teams-service")
-	mockTeams := teams_api.NewTeamsV1ServerMock()
+	mockTeams := teams_api.NewTeamsV2ServerMock()
 	connFactoryTS := secureconn.NewFactory(*serviceCertsTS)
 	gTS := connFactoryTS.NewServer()
-	teams_api.RegisterTeamsV1Server(gTS, mockTeams)
+	teams_api.RegisterTeamsV2Server(gTS, mockTeams)
 	teams := grpctest.NewServer(gTS)
 	return teams, mockTeams
 }
 
-func adminsTeamNotFound(context.Context, *teams_api.GetTeamByNameReq) (*teams_api.GetTeamByNameResp, error) {
+func adminsTeamNotFound(context.Context, *teams_api.GetTeamReq) (*teams_api.GetTeamResp, error) {
 	return nil, status.Error(codes.NotFound, "team not found")
 }
 
 func adminsTeam(id uuid.UUID) func(context.Context,
-	*teams_api.GetTeamByNameReq) (*teams_api.GetTeamByNameResp, error) {
+	*teams_api.GetTeamReq) (*teams_api.GetTeamResp, error) {
 	return func(_ context.Context,
-		req *teams_api.GetTeamByNameReq) (*teams_api.GetTeamByNameResp, error) {
-		if req.Name != "admins" {
+		req *teams_api.GetTeamReq) (*teams_api.GetTeamResp, error) {
+		if req.Id != "admins" {
 			return nil, errors.New("unexpected argument")
 		}
-		return &teams_api.GetTeamByNameResp{Team: &teams_api.Team{Id: id.String()}}, nil
+		return &teams_api.GetTeamResp{Team: &teams_api.Team{Id: id.String()}}, nil
 	}
 }
 
 func createAdminsTeam(id uuid.UUID) func(context.Context,
 	*teams_api.CreateTeamReq) (*teams_api.CreateTeamResp, error) {
 	return func(_ context.Context, req *teams_api.CreateTeamReq) (*teams_api.CreateTeamResp, error) {
-		if req.Name != "admins" {
+		if req.Id != "admins" {
 			return nil, errors.New("unexpected argument")
 		}
 		return &teams_api.CreateTeamResp{

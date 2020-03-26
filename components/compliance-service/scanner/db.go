@@ -219,9 +219,14 @@ func (s *Scanner) UpdateResult(ctx context.Context, job *types.InspecJob, output
 		} else {
 			result.Result = fmt.Sprintf("unable to complete scan on node. please check the logs for more information. node id ref: %s", job.NodeID)
 		}
-		connectionErr := ""
+		var connectionErr, errMsg string
 		if inspecErr != nil {
-			connectionErr = inspecErr.Type
+			if len(inspecErr.Message) > 300 {
+				errMsg = fmt.Sprintf("%s [truncated for length]", inspecErr.Message[0:300])
+			} else {
+				errMsg = inspecErr.Message
+			}
+			connectionErr = fmt.Sprintf("%s\n\n%s", inspecErr.Type, errMsg)
 		}
 		if connectionErr != "" {
 			_, err := s.nodesClient.UpdateNodeConnectionError(ctx, &nodes.NodeError{

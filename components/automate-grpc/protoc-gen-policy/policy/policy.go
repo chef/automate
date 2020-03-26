@@ -14,8 +14,6 @@ import (
 	pgsgo "github.com/lyft/protoc-gen-star/lang/go"
 	options "google.golang.org/genproto/googleapis/api/annotations"
 
-	"github.com/chef/automate/api/interservice/authz"
-	policy "github.com/chef/automate/components/automate-grpc/protoc-gen-policy/api"
 	"github.com/chef/automate/components/automate-grpc/protoc-gen-policy/iam"
 )
 
@@ -48,56 +46,28 @@ type policyBundle struct {
 	validate  policyInfoValidator
 }
 
-// policyVersions lets us differentiate between "v1" and "v2" policies, which
-// each use their own specific "policy package" and annotations.
-var policyVersions = map[string]policyBundle{
-	"v1": {
-		pkg:       "github.com/chef/automate/components/automate-gateway/api/authz/policy",
-		extension: policy.E_Policy,
-		convert: func(x interface{}) *policyInfo {
-			if y, ok := x.(*policy.PolicyInfo); ok {
-				return &policyInfo{action: y.Action, resource: y.Resource}
-			}
-			return nil
-		},
-		validate: func(msg pgs.Message, pi *policyInfo) error {
-			expanded, err := dummyExpand(msg, pi.resource)
-			if err != nil {
-				return err
-			}
-			// borrowing IsAuthorizedReq's protobuf validation to ensure
-			// our resource and action annotations are correct.
-			req := &authz.IsAuthorizedReq{
-				Subjects: []string{"user:local:albertine"}, // this won't fail validation
-				Resource: expanded,                         // resource and
-				Action:   pi.action,                        // action could
-			}
-			return req.Validate()
-		},
+var policyVersion = policyBundle{
+	pkg:       "github.com/chef/automate/components/automate-gateway/api/iam/v2/policy",
+	extension: iam.E_Policy,
+	convert: func(x interface{}) *policyInfo {
+		if y, ok := x.(*iam.PolicyInfo); ok {
+			return &policyInfo{action: y.Action, resource: y.Resource}
+		}
+		return nil
 	},
-	"v2": {
-		pkg:       "github.com/chef/automate/components/automate-gateway/authz/policy_v2",
-		extension: iam.E_Policy,
-		convert: func(x interface{}) *policyInfo {
-			if y, ok := x.(*iam.PolicyInfo); ok {
-				return &policyInfo{action: y.Action, resource: y.Resource}
-			}
-			return nil
-		},
-		validate: func(msg pgs.Message, pi *policyInfo) error {
-			expanded, err := dummyExpand(msg, pi.resource)
-			if err != nil {
-				return err
-			}
-			// using a preserved version of the protobuf validation for IAM V2 IsAuthorized
-			// which was removed (see below).
-			req := &ValidateV2ResourceAndActions{
-				Subjects: []string{"user:local:albertine"}, // this won't fail validation
-				Resource: expanded,                         // resource and
-				Action:   pi.action,                        // action could
-			}
-			return req.validateV2()
-		},
+	validate: func(msg pgs.Message, pi *policyInfo) error {
+		expanded, err := dummyExpand(msg, pi.resource)
+		if err != nil {
+			return err
+		}
+		// using a preserved version of the protobuf validation for IAM V2 IsAuthorized
+		// which was removed (see below).
+		req := &ValidateV2ResourceAndActions{
+			Subjects: []string{"user:local:albertine"}, // this won't fail validation
+			Resource: expanded,                         // resource and
+			Action:   pi.action,                        // action could
+		}
+		return req.validateV2()
 	},
 }
 
@@ -157,22 +127,14 @@ func (m *Module) Execute(targets map[string]pgs.File, pkgs map[string]pgs.Packag
 }
 
 func (m *Module) processFile(f pgs.File) {
-	// We attempt to extract info and generate code for all policy versions. If
-	// NONE of these attempts are successful, we error out.
-	errors := []error{}
-	for vsn, pol := range policyVersions {
-		out := bytes.Buffer{}
-		err := m.applyTemplate(&out, pol, f)
-		if err != nil {
-			m.Logf("couldn't apply %v template: %s", vsn, err)
-			errors = append(errors, err)
-			continue
-		}
-		generatedFileName := m.ctx.OutputPath(f).SetExt(fmt.Sprintf(".%s-%s.go", moduleName, vsn)).String()
+	out := bytes.Buffer{}
+	err := m.applyTemplate(&out, policyVersion, f)
+	if err != nil {
+		m.Logf("couldn't apply template: %s", err)
+		m.Fail("code generation failed")
+	} else {
+		generatedFileName := m.ctx.OutputPath(f).SetExt(fmt.Sprintf(".%s.go", moduleName)).String()
 		m.AddGeneratorFile(generatedFileName, out.String())
-	}
-	if len(errors) == len(policyVersions) {
-		m.Fail("code generation failed for all policy versions")
 	}
 }
 

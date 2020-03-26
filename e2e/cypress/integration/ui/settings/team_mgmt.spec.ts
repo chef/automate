@@ -1,10 +1,10 @@
-import { describeIfIAMV2p1, itFlaky, isV1 } from '../../../support/constants';
+import { itFlaky } from '../../../support/constants';
 
 describe('team management', () => {
   const now = Cypress.moment().format('MMDDYYhhmm');
   const cypressPrefix = 'test-team-mgmt';
   const teamName = `${cypressPrefix} team ${now}`;
-  const customTeamID = `${cypressPrefix}-testing-team-custom-id-${now}`;
+  const customTeamID = `${cypressPrefix}-custom-id-${now}`;
   const project1ID = `${cypressPrefix}-project1-${now}`;
   const project1Name = `${cypressPrefix} project1 ${now}`;
   const project2ID = `${cypressPrefix}-project2-${now}`;
@@ -15,31 +15,30 @@ describe('team management', () => {
   before(() => {
     cy.adminLogin('/settings/teams').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
-      cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
-      if (!isV1()) {
-        cy.request({
-          auth: { bearer: admin.id_token },
-          method: 'POST',
-          url: '/apis/iam/v2/projects',
-          body: {
-            id: project1ID,
-            name: project1Name
-          }
-        });
-        cy.request({
-          auth: { bearer: admin.id_token },
-          method: 'POST',
-          url: '/apis/iam/v2/projects',
-          body: {
-            id: project2ID,
-            name: project2Name
-          }
-        });
+      cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['teams', 'projects']);
 
-        // reload so we get projects in project filter
-        cy.reload(true);
-      }
+      cy.request({
+        auth: { bearer: admin.id_token },
+        method: 'POST',
+        url: '/apis/iam/v2/projects',
+        body: {
+          id: project1ID,
+          name: project1Name
+        }
+      });
+      cy.request({
+        auth: { bearer: admin.id_token },
+        method: 'POST',
+        url: '/apis/iam/v2/projects',
+        body: {
+          id: project2ID,
+          name: project2Name
+        }
+      });
+
+      // reload so we get projects in project filter
+      cy.reload(true);
+
       cy.get('app-welcome-modal').invoke('hide');
     });
     cy.restoreStorage();
@@ -51,39 +50,28 @@ describe('team management', () => {
 
   afterEach(() => {
     cy.saveStorage();
-    cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['teams']);
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
   });
 
   describe('no custom initial page state', () => {
     it('lists system teams', () => {
       cy.get('[data-cy=team-create-button]').contains('Create Team');
-      if (!isV1()) {
-        cy.get('#table-container chef-table-header-cell').contains('ID');
-        cy.get('#table-container chef-table-header-cell').contains('Name');
+      cy.get('#table-container chef-table-header-cell').contains('ID');
+      cy.get('#table-container chef-table-header-cell').contains('Name');
 
-        const systemTeams = ['admins', 'editors', 'viewers'];
-        systemTeams.forEach(name => {
-          cy.get('#table-container chef-table-row').contains(name)
-            .parent().parent().find('mat-select').as('control-menu');
-        });
-      } else {
-        cy.get('#table-container chef-table-header-cell').contains('Name');
-        cy.get('#table-container chef-table-header-cell').contains('Description');
-
-        const systemTeams = ['admins'];
-        systemTeams.forEach(name => {
-          cy.get('#table-container chef-table-row').contains(name)
-            .parent().parent().find('mat-select').as('control-menu');
-        });
-      }
+      const systemTeams = ['admins', 'editors', 'viewers'];
+      systemTeams.forEach(name => {
+        cy.get('#table-container chef-table-row').contains(name)
+          .parent().parent().find('mat-select').as('control-menu');
+      });
     });
   });
 
-  describeIfIAMV2p1('teams list page', () => {
+  describe('teams list page', () => {
     const dropdownNameUntilEllipsisLen = 25;
     const projectDropdown = 'app-team-management app-projects-dropdown ';
 
@@ -158,11 +146,11 @@ describe('team management', () => {
       });
 
       after(() => {
-        cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+        cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
       });
 
       afterEach(() => {
-        cy.cleanupTeamsByDescriptionPrefix(cypressPrefix);
+        cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['teams']);
       });
 
       itFlaky('can create a team with multiple projects', () => {

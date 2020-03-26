@@ -82,28 +82,14 @@ Cypress.Commands.add('generateAdminToken', (idToken: string) => {
     Cypress.env('ADMIN_TOKEN', resp.body.token.value);
   });
 
-  // grant permissions based on IAM version
-  if (Cypress.env('IAM_VERSION') === 'v1') {
-    cy.request({
-      auth: { bearer: idToken },
-      method: 'POST',
-      url: '/api/v0/auth/policies',
-      body: {
-        action: '*',
-        resource: '*',
-        subjects: [`token:${adminTokenObj.id}`]
-      }
-    });
-  } else {
-    cy.request({
-      auth: { bearer: idToken },
-      method: 'POST',
-      url: '/apis/iam/v2/policies/administrator-access/members:add',
-      body: {
-        members: [`token:${adminTokenObj.id}`]
-      }
-    });
-  }
+  cy.request({
+    auth: { bearer: idToken },
+    method: 'POST',
+    url: '/apis/iam/v2/policies/administrator-access/members:add',
+    body: {
+      members: [`token:${adminTokenObj.id}`]
+    }
+  });
 
   waitUntilAdminTokenPermissioned(100);
 });
@@ -145,73 +131,29 @@ Cypress.Commands.add('restoreStorage', () => {
     }
   });
 
-  if (Cypress.env('IAM_VERSION') === 'v2.1') {
-    // mock background polling since it's frequent and can interfere with loading wait time
-    cy.route({
-      method: 'GET',
-      url: '**/apply-rules',
-      status: 200,
-      response: {
-        state: 'not_running',
-        estimated_time_complete: '0001-01-01T00:00:00Z',
-        percentage_complete: 1,
-        failed: false,
-        failure_message: ''
-      }
-    });
-  }
+  // mock background polling since it's frequent and can interfere with loading wait time
+  cy.route({
+    method: 'GET',
+    url: '**/apply-rules',
+    status: 200,
+    response: {
+      state: 'not_running',
+      estimated_time_complete: '0001-01-01T00:00:00Z',
+      percentage_complete: 1,
+      failed: false,
+      failure_message: ''
+    }
+  });
 });
 
-Cypress.Commands.add('cleanupV2IAMObjectsByIDPrefixes',
+Cypress.Commands.add('cleanupIAMObjectsByIDPrefixes',
   (idPrefix: string, iamObjects: string[]) => {
 
   iamObjects.forEach((iamObject) => {
     if (iamObject === 'projects') {
       cleanupProjectsByIDPrefixes(idPrefix);
     } else {
-      cleanupV2IAMObjectByIDPrefix(idPrefix, iamObject);
-    }
-  });
-});
-
-Cypress.Commands.add('cleanupUsersByNamePrefix', (namePrefix: string) => {
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'GET',
-    url: '/api/v0/auth/users',
-    failOnStatusCode: false
-  }).then((resp) => {
-    const body = resp.body;
-    for (const user of body.users) {
-      if (user.name.startsWith(namePrefix)) {
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'DELETE',
-          url: `/api/v0/auth/users/${user.username}`,
-          failOnStatusCode: false
-        });
-      }
-    }
-  });
-});
-
-Cypress.Commands.add('cleanupTeamsByDescriptionPrefix', (namePrefix: string) => {
-  cy.request({
-    headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-    method: 'GET',
-    url: '/api/v0/auth/teams',
-    failOnStatusCode: false
-  }).then((resp) => {
-    const body = resp.body;
-    for (const team of body.teams) {
-      if (team.description.startsWith(namePrefix)) {
-        cy.request({
-          headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
-          method: 'DELETE',
-          url: `/api/v0/auth/teams/${team.id}`,
-          failOnStatusCode: false
-        });
-      }
+      cleanupIAMObjectByIDPrefix(idPrefix, iamObject);
     }
   });
 });
@@ -357,8 +299,8 @@ function waitUntilApplyRulesNotRunning(attempts: number): void {
 function LoginHelper(username: string) {
   cy.url().should('include', '/dex/auth/local');
   cy.server();
-  // the gloabl permissions for the user that populates the initial permissions cache
-  cy.route('GET', '/api/v0/auth/introspect').as('getAuthPopulateCache');
+  // the global permissions for the user that populates the initial permissions cache
+  cy.route('GET', '/apis/iam/v2/introspect').as('getAuthPopulateCache');
 
   // login
   cy.get('#login').type(username);
@@ -480,13 +422,14 @@ function deleteProject(projectId: string) {
   });
 }
 
-function cleanupV2IAMObjectByIDPrefix(idPrefix: string, iamObject: string): void {
+function cleanupIAMObjectByIDPrefix(idPrefix: string, iamObject: string): void {
   cy.request({
     headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
     method: 'GET',
     url: `/apis/iam/v2/${iamObject}`
   }).then((resp) => {
     for (const object of resp.body[iamObject]) {
+      console.log(object);
       if (object.id.startsWith(idPrefix)) {
         cy.request({
           headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },

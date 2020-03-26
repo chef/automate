@@ -111,23 +111,7 @@ export class ReportingNodeComponent implements OnInit, OnDestroy {
   }
 
   filteredControls(controls, status) {
-    return controls.filter(c => {
-      if (status === 'all') {
-        return true;
-      }
-      if (status === 'passed' || status === 'skipped') {
-        return c.status === status;
-      }
-      if (status === 'critical') {
-        return c.status === 'failed' && c.impact >= 0.7;
-      }
-      if (status === 'major') {
-        return c.status === 'failed' && c.impact >= 0.4 && c.impact < 0.7;
-      }
-      if (status === 'minor') {
-        return c.status === 'failed' && c.impact < 0.4;
-      }
-    });
+    return controls.filter(c => status === 'all' || c.status === status);
   }
 
   profilesByStatus(profiles, status) {

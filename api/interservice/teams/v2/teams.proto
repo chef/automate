@@ -141,6 +141,14 @@ message ResetToV1Req { }
 
 message ResetToV1Resp { }
 
+message PurgeUserMembershipReq {
+    string user_id = 1;
+}
+
+message PurgeUserMembershipResp {
+    repeated string ids = 1;
+}
+
 service TeamsV2 {
   rpc GetTeam (GetTeamReq) returns (GetTeamResp) {};
   rpc ListTeams (ListTeamsReq) returns (ListTeamsResp) {};
@@ -151,6 +159,5 @@ service TeamsV2 {
   rpc RemoveTeamMembers (RemoveTeamMembersReq) returns (RemoveTeamMembersResp) {};
   rpc GetTeamsForMember (GetTeamsForMemberReq) returns (GetTeamsForMemberResp) {};
   rpc GetTeamMembership (GetTeamMembershipReq) returns (GetTeamMembershipResp) {};
-  rpc UpgradeToV2 (UpgradeToV2Req) returns (UpgradeToV2Resp) {};
-  rpc ResetToV1 (ResetToV1Req) returns (ResetToV1Resp) {};
+  rpc PurgeUserMembership (PurgeUserMembershipReq) returns (PurgeUserMembershipResp) {};
 }

@@ -2,6 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 import { ReportQueryService, ReportDataService, ReportQuery } from '../../shared/reporting';
 
@@ -12,6 +13,7 @@ import { ReportQueryService, ReportDataService, ReportQuery } from '../../shared
 })
 export class ReportingControlsComponent implements OnInit, OnDestroy {
 
+  public Datetime = DateTime;
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 
   constructor(

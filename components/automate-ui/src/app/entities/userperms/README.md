@@ -14,9 +14,9 @@ what the user has permissions for.
 The endpoint is "/auth/introspect" and supports two methods:
 
 1. GET - Does an "IntrospectAll", returning data for all non-parameterized endpoints
-   (i.e. concrete endpoints like "/auth/teams" but not abstract endpoints like "/auth/users/{email}").
+   (i.e. concrete endpoints like "/iam/v2/teams" but not abstract endpoints like "/iam/v2/users/{email}").
 2. POST - Does an "Introspect", returning data for the single endpoint path specified in the payload
-   (an example payload might be "path=/auth/users/foo@bar.com" corresponding to "/auth/users/{email}").
+   (an example payload might be "path=/iam/v2/users/foo@bar.com" corresponding to "/iam/v2/users/{email}").
 
 Data from either call returns the same structure:
 
@@ -45,8 +45,8 @@ Example:
 ```json
 {
   "endpoints": {
-    "/auth/tokens": { "delete": false, "get": true, "post": true, "put": false },
-    "/auth/policies": { "delete": false, "get": true, "post": true, "put": false },
+    "/iam/v2/tokens": { "delete": false, "get": true, "post": true, "put": false },
+    "/iam/v2/policies": { "delete": false, "get": true, "post": true, "put": false },
     "/cfgmgmt/stats/run_counts": { "delete": false, "get": true, "post": false, "put": false },
     "/cfgmgmt/suggestions": { "delete": false, "get": true, "post": false, "put": false },
     "/cfgmgmt/version": { "delete": false, "get": true, "post": false, "put": false }

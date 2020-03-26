@@ -410,6 +410,10 @@ var nodeProps = `
 	"deprecations_count": {
 		"type": "integer",
 		"null_value": 0
+	},
+	"created": {
+		"type": "date",
+		"format": "strict_date_optional_time||epoch_millis"
 	}
 }`
 

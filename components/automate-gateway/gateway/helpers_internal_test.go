@@ -16,11 +16,10 @@ import (
 	"github.com/golang/mock/gomock"
 
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/authz"
+	authz "github.com/chef/automate/api/interservice/authz/v2"
 	compliance_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
 	ingest "github.com/chef/automate/api/interservice/ingest"
-	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv1"
-	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
+	auth "github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
 	mock_gateway "github.com/chef/automate/components/automate-gateway/gateway_mocks/mock_gateway"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
 	"github.com/chef/automate/components/notifications-client/notifier"
@@ -59,11 +58,10 @@ var (
 // }
 func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 	var (
-		ctrl                      = gomock.NewController(t)
-		mockClientsFactory        = mock_gateway.NewMockClientsFactory(ctrl)
-		mockAuthorizationClientV1 authz.AuthorizationClient
-		// mockAuthorizationClientV2 authz_v2.AuthorizationClient
-		cfg = Config{}
+		ctrl                    = gomock.NewController(t)
+		mockClientsFactory      = mock_gateway.NewMockClientsFactory(ctrl)
+		mockAuthorizationClient authz.AuthorizationClient
+		cfg                     = Config{}
 	)
 
 	// Add the provided mocked services
@@ -79,14 +77,12 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 			)
 		case authz.AuthorizationClient:
 			// Mocking the provided mocked AuthorizationClient
-			mockAuthorizationClientV1 = authz.AuthorizationClient(s)
+			mockAuthorizationClient = authz.AuthorizationClient(s)
 			mockClientsFactory.EXPECT().AuthorizationClient().DoAndReturn(
 				func() (authz.AuthorizationClient, error) {
-					return mockAuthorizationClientV1, nil
+					return mockAuthorizationClient, nil
 				},
 			)
-			// note: the gateway's "reactive authorizer" requires both of these
-			mockClientsFactory.EXPECT().AuthorizationV2Client().AnyTimes()
 		case compliance_ingest.ComplianceIngesterClient:
 			// Mocking the provided mocked ComplianceIngesterClient
 			mockComplianceIngester := compliance_ingest.ComplianceIngesterClient(s)
@@ -120,10 +116,7 @@ func newMockGatewayServer(t *testing.T, services ...interface{}) Server {
 
 	gw := New(cfg)
 	gw.clientsFactory = mockClientsFactory
-	gw.authorizer = authorizer.NewAuthorizer(
-		authv1.AuthorizationHandler(mockAuthorizationClientV1),
-		authv2.AuthorizationHandler(nil),
-	)
+	gw.authorizer = authorizer.NewAuthorizer(auth.AuthorizationHandler(mockAuthorizationClient))
 
 	return *gw
 }
@@ -145,16 +138,17 @@ func newAuthorizationMocks(t *testing.T, resource, action string) (
 		})
 
 	// Mocking AuthZ Calls
-	mockAuthzClient.EXPECT().IsAuthorized(
+	mockAuthzClient.EXPECT().ProjectsAuthorized(
 		gomock.Any(),
-		&authz.IsAuthorizedReq{
-			Subjects: []string{"mock"},
-			Resource: resource,
-			Action:   action,
+		&authz.ProjectsAuthorizedReq{
+			Subjects:       []string{"mock"},
+			Resource:       resource,
+			Action:         action,
+			ProjectsFilter: []string{},
 		},
 	).DoAndReturn(
-		func(_ context.Context, _ *authz.IsAuthorizedReq) (*authz.IsAuthorizedResp, error) {
-			return &authz.IsAuthorizedResp{Authorized: true}, nil
+		func(_ context.Context, _ *authz.ProjectsAuthorizedReq) (*authz.ProjectsAuthorizedResp, error) {
+			return &authz.ProjectsAuthorizedResp{Projects: []string{"any"}}, nil
 		},
 	)
 

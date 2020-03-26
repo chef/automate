@@ -13,10 +13,12 @@ type Client interface {
 	project_update_lib.SerializedProjectUpdate
 	// @param None
 	Initializing() bool
-	// @param (context, UTC time)
+	// @param (context)
 	InitializeStore(context.Context) error
-	// @param (context, UTC time, data)
+	// @param (context, node)
 	InsertNode(context.Context, Node) error
+	// @param (context, node)
+	InsertUpsertNode(ctx context.Context, node UpsertNode) error
 	// @param (context, UTC time, data)
 	InsertRun(context.Context, Run) error
 	// @param (context, UTC time, data)

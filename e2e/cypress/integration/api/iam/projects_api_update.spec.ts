@@ -1,8 +1,7 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { eventExist, uuidv4 } from '../../../support/helpers';
 import { Rule, Project } from '../../../support/types';
 
-describeIfIAMV2p1('project update re-tagging', () => {
+describe('project update re-tagging', () => {
   const cypressPrefix = 'test-project-update';
   const now = Cypress.moment().format('MMDDYYhhmm');
 
@@ -239,7 +238,7 @@ describeIfIAMV2p1('project update re-tagging', () => {
   const entityName = `entity_name-${Cypress.moment().format('MMDDYYhhmmss')}`;
 
   before(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
     // Ingest a InSpec report with attribues that match all the projects
     cy.fixture('compliance/inspec-report.json').then((report) => {
@@ -344,7 +343,7 @@ describeIfIAMV2p1('project update re-tagging', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',

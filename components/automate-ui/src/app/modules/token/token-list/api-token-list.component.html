@@ -3,7 +3,7 @@
     <main>
       <chef-page-header contrastingBackground>
         <chef-heading>API Tokens</chef-heading>
-        <chef-subheading>API tokens grant authorized access to the Chef Automate API.</chef-subheading>
+        <chef-subheading>API Tokens are used to access the Chef Automate API.</chef-subheading>
       </chef-page-header>
 
     <app-create-object-modal
@@ -12,7 +12,6 @@
       [conflictErrorEvent]="conflictErrorEvent"
       objectNoun="token"
       [createForm]="createTokenForm"
-      [showProjectsDropdown]="isIAMv2$ | async"
       [assignableProjects]="dropdownProjects"
       (close)="closeCreateModal()"
       (createClicked)="createToken()">
@@ -29,7 +28,7 @@
 
     <div class="page-body">
       <chef-toolbar>
-        <app-authorized [anyOf]="[['/iam/v2/tokens', 'post'], ['/auth/tokens', 'post']]">
+        <app-authorized [anyOf]="['/iam/v2/tokens', 'post']">
           <div *ngIf="(apiTokenCount$ | async) === 0" class="empty-state">
             <p>Create the first token to get started!</p>
           </div>
@@ -38,13 +37,13 @@
           </div>
         </app-authorized>
       </chef-toolbar>
-      <app-authorized [anyOf]="[['/iam/v2/tokens', 'get'], ['/auth/tokens', 'get']]">
+      <app-authorized [allOf]="['/iam/v2/tokens', 'get']">
         <chef-table-new *ngIf="(apiTokenCount$ | async) > 0">
           <chef-table-header>
             <chef-table-row>
               <chef-table-header-cell>Name</chef-table-header-cell>
-              <chef-table-header-cell *ngIf="isIAMv2$ | async">ID</chef-table-header-cell>
-              <chef-table-header-cell *ngIf="isIAMv2$ | async">Projects</chef-table-header-cell>
+              <chef-table-header-cell>ID</chef-table-header-cell>
+              <chef-table-header-cell>Projects</chef-table-header-cell>
               <chef-table-header-cell>Created Date</chef-table-header-cell>
               <chef-table-header-cell>Status</chef-table-header-cell>
               <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
@@ -55,8 +54,8 @@
               <chef-table-cell>
                 <a [routerLink]="['/settings/tokens', token.id]">{{ token.name }}</a>
               </chef-table-cell>
-              <chef-table-cell *ngIf="isIAMv2$ | async">{{ token.id }}</chef-table-cell>
-              <chef-table-cell *ngIf="isIAMv2$ | async" class="projects-column">
+              <chef-table-cell>{{ token.id }}</chef-table-cell>
+              <chef-table-cell class="projects-column">
                 <span *ngIf="token.projects.length === 0">{{ unassigned }}</span>
                 <span *ngIf="token.projects.length === 1">{{ token.projects[0] }}</span>
                 <span *ngIf="token.projects.length > 1">{{ token.projects.length }} projects</span>

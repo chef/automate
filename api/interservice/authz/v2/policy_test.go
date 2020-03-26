@@ -341,31 +341,80 @@ func TestValidationCreatePolicy_Actions(t *testing.T) {
 	// simple checks
 	classes := map[bool][]string{
 		true: {
+			"a:b:c",
 			"*",
-			"infra:ingestNodeRuns:create",
+			"ingest:camelCaseThings:create",
 			"no:camels:here",
 			"*:mark-for-deletion", // legacy
 			"infra:*:create",
-			"infra:ingestNodeRuns:*",
+			"ingest:camelCaseThings:*",
+			// v1 actions that were previously invalid
+			"*:foo",
+			"*",
+			"a:*",
+			"a:b:*",
 		},
 		false: {
+			"",
+			"nodes::foo",
+			"nodes:foo:",
+			"nodes:",
+			"nodes::",
+			":foo",
+			"::foo",
+			"Abc:z",
+			"0a:z",
+			"-a:z",
+			"_a:z",
+			"nodes:fo*",
+			"nodes:f*o",
+			"nodes:*oo",
+			"**",
+			"*:*",
+			"%nodes:foo",
+			"a::c",
+			"a:b::",
 			"*:*:*",
 			"infra:*:*",
 			"infra:**",
 			"*:*:create",
 			"**:create",
-			"*:ingestNodeRuns:*",
-			"*:ingestNodeRuns:create",
-			":ingestNodeRuns:create",
+			"*:camelCaseThings:*",
+			"*:camelCaseThings:create",
+			":camelCaseThings:create",
 			"infra::create",
-			"infra:ingestNodeRuns:",
-			"Infra:ingestNodeRuns:create",
-			"infra:IngestNodeRuns:create",
-			"infra:ingestNodeRuns:Create",
-			"Infra:ingestNodeRuns:*",
-			"infra:IngestNodeRuns:*",
+			"ingest:camelCaseThings:",
+			"Ingest:camelCaseThings:create",
+			"ingest:CamelCaseThings:create",
+			"ingest:camelCaseThings:Create",
+			"Ingest:camelCaseThings:*",
+			"ingest:CamelCaseThings:*",
 			"infra:*:Create",
 			"*:Create",
+			// no longer valid v1 actions
+			"a1a:z",
+			"nodes#:foo",
+			"a:test@foo.com:bar",
+			"a_a:z",
+			"a-a:z",
+			"a:_",
+			"a:-",
+			"a:run_list",
+			"a:run-list",
+			"a:test@foo.com",
+			"nodes:#oo",
+			"nodes:f#o",
+			"nodes:fo#",
+			"cfgmgmt:nodes:f9047a75-44c5-4626-8b1a-b08a67d4270d:runs:d9047a75-44c5-4626-8b1a-b08a67d4270f",
+			"a:0",
+			"aAa:z",
+			"nodes",
+			"n",
+			"a:Z",
+			"a:b",
+			"compliance:profiles:storage:OWNER:NAME:VERSION",
+			"a:b:c:*",
+			"a:b:c:d:*",
 		},
 	}
 
@@ -486,6 +535,92 @@ func TestValidationCreatePolicy_Resources(t *testing.T) {
 				t.Run(resource, func(t *testing.T) {
 					req := validCreatePolicyReq()
 					req.Statements[0].Resources = []string{resource}
+					err := req.Validate()
+					if expectedSuccess {
+						assert.NoError(t, err)
+					} else {
+						assert.Error(t, err)
+					}
+				})
+			}
+		})
+	}
+}
+
+func TestValidationCreatePolicy_Members(t *testing.T) {
+	classes := map[bool][][]string{
+		true: {
+			[]string{"team:local:admins"},
+			[]string{"team:local:admins", "team:local:ops"},
+			[]string{"team:local:admins", "team:local:ops", "team:local:local1"},
+			[]string{"team:ldap:admins"},
+			[]string{"team:ldap:admins", "team:ldap:ops"},
+			[]string{"team:ldap:admins", "team:ldap:ops", "team:ldap:ldap2"},
+			[]string{"team:saml:admins"},
+			[]string{"team:saml:admins", "team:saml:ops"},
+			[]string{"team:saml:admins", "team:saml:ops", "team:saml:saml3"},
+			[]string{"team:local:schmocal", "team:ldap:ldap2", "team:saml:saml3"},
+			[]string{"user:local:local-user-id"},
+			[]string{"user:local:local-user-id", "user:local:other-local-user-id"},
+			[]string{"user:local:local-user-id", "team:local:ops"},
+			[]string{"user:saml:CiQzMGY5ODgzNC1iNGFiLTQxZTMtODgzNC00Njc0M2YyNGNkN2YSBWxvY2Fs"},
+			[]string{"user:ldap:CiQzMGY5ODgzNC1iNGFiLTQxZTMtODgzNC00Njc0M2YyNGNkN2YSBWxvY2Fs"},
+			[]string{"team:ldap:foo!@#$=+"},
+			[]string{"team:ldap:üßë mïñë"},
+			[]string{"team:ldap:    "},
+			[]string{"token:9c2a3dae-cef1-4eb1-853a-79849de14bd1"},
+			[]string{"tls:service:automate-deployment:65dda02fcf830b3bcab2b96517d020ade2ede626f8b5aea3258b75acc8caccd0"},
+			[]string{"*"},
+			[]string{"token:*"},
+			[]string{"user:*"},
+			[]string{"user:local:*"},
+			[]string{"user:ldap:*"},
+			[]string{"user:saml:*"},
+			[]string{"team:*"},
+			[]string{"team:local:*"},
+			[]string{"team:ldap:*"},
+			[]string{"team:saml:*"},
+			[]string{"tls:service:automate-deployment:*"},
+			[]string{"tls:service:*"},
+		},
+		false: {
+			[]string{""}, // this is the same as "not provided"
+			[]string{"user::"},
+			[]string{"user:local:"},
+			[]string{"user:ldap:"},
+			[]string{"user:saml:"},
+			[]string{"user:mammel:alice"},
+			[]string{"user:mammel:"},
+			[]string{"team:local:"},
+			[]string{"team:ldap:"},
+			[]string{"team:saml:"},
+			[]string{"team::"},
+			[]string{"team::admins"},
+			[]string{"muppet:kermit"},
+			[]string{"user:muppet:kermit"},
+			[]string{"team:muppets:ops"},
+			[]string{"team:ldap:muppets:ops"},
+			[]string{"team:local:muppets:ops"},
+			[]string{"team:*:ops"},
+			[]string{"*:local:ops"},
+			[]string{"user:local:fo*"},
+			[]string{"user:ldap:f*o"},
+			[]string{"user:saml:*oo"},
+			[]string{"token"},
+			[]string{"token:"},
+			[]string{"token:middle:*"},
+			[]string{"token:fo*"},
+			// no longer valid v1 subjects
+			[]string{"service:*"},
+		},
+	}
+
+	for expectedSuccess, cases := range classes {
+		t.Run(fmt.Sprintf("%v", expectedSuccess), func(t *testing.T) {
+			for _, members := range cases {
+				t.Run(strings.Join(members, ","), func(t *testing.T) {
+					req := validCreatePolicyReq()
+					req.Members = members
 					err := req.Validate()
 					if expectedSuccess {
 						assert.NoError(t, err)

@@ -24,7 +24,8 @@ export class ReportDataService {
     total: 0,
     total_failed: 0,
     total_passed: 0,
-    total_skipped: 0
+    total_skipped: 0,
+    total_waived: 0
   };
   nodesListParams: any = {
     perPage: 100,
@@ -41,7 +42,11 @@ export class ReportDataService {
   profilesListEmpty = false;
   profilesList: any = {
     items: [],
-    total: 0
+    total: 0,
+    failed: 0,
+    passed: 0,
+    skipped: 0,
+    waived: 0
   };
 
   controlsListLoading = true;

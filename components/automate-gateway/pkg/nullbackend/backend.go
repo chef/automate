@@ -11,7 +11,6 @@ import (
 	"github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/authz"
 	authzv2 "github.com/chef/automate/api/interservice/authz/v2"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	"github.com/chef/automate/api/interservice/data_lifecycle"
@@ -28,8 +27,7 @@ import (
 	cc_version "github.com/chef/automate/api/interservice/compliance/version"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	teamsv1 "github.com/chef/automate/api/interservice/teams/v1"
-	teamsv2 "github.com/chef/automate/api/interservice/teams/v2"
+	teams "github.com/chef/automate/api/interservice/teams/v2"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 )
 
@@ -39,7 +37,6 @@ func NewServer() *grpc.Server {
 
 	applications.RegisterApplicationsServiceServer(s, &applications.UnimplementedApplicationsServiceServer{})
 	authn.RegisterAuthenticationServer(s, &authn.UnimplementedAuthenticationServer{})
-	authz.RegisterAuthorizationServer(s, &authz.UnimplementedAuthorizationServer{})
 	authzv2.RegisterPoliciesServer(s, &authzv2.UnimplementedPoliciesServer{})
 	cc_ingest.RegisterComplianceIngesterServer(s, &cc_ingest.UnimplementedComplianceIngesterServer{})
 	cc_jobs.RegisterJobsServiceServer(s, &cc_jobs.UnimplementedJobsServiceServer{})
@@ -59,8 +56,7 @@ func NewServer() *grpc.Server {
 	manager.RegisterNodeManagerServiceServer(s, &manager.UnimplementedNodeManagerServiceServer{})
 	nodes.RegisterNodesServiceServer(s, &nodes.UnimplementedNodesServiceServer{})
 	notifications.RegisterNotificationsServer(s, &notifications.UnimplementedNotificationsServer{})
-	teamsv1.RegisterTeamsV1Server(s, &teamsv1.UnimplementedTeamsV1Server{})
-	teamsv2.RegisterTeamsV2Server(s, &teamsv2.UnimplementedTeamsV2Server{})
+	teams.RegisterTeamsV2Server(s, &teams.UnimplementedTeamsV2Server{})
 	secrets.RegisterSecretsServiceServer(s, &secrets.UnimplementedSecretsServiceServer{})
 
 	return s

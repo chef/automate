@@ -98,7 +98,7 @@ func (db *DB) AddManagerSubscriptionsToDB(subs []*manager.ManagerNode, managerId
 	return nodeIds
 }
 
-func (db *DB) AddManagerNodeToDB(managerId string, managerAcctId string, credential string, acctAlias string) ([]string, error) {
+func (db *DB) AddManagerNodeToDB(managerId string, managerAcctId string, credential string, acctAlias string, region string) ([]string, error) {
 	nodeIds := make([]string, 0)
 	var name string
 	uuid := uuid.Must(uuid.NewV4()).String()
@@ -109,7 +109,7 @@ func (db *DB) AddManagerNodeToDB(managerId string, managerAcctId string, credent
 	}
 	tc := nodes.TargetConfig{
 		Backend: "aws",
-		Region:  "us-east-1",
+		Region:  region,
 	}
 	jsonTc, err := json.Marshal(tc)
 	if err != nil {

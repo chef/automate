@@ -14,7 +14,6 @@ import (
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/teams-service/server"
 	"github.com/chef/automate/components/teams-service/service"
-	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	authz_library "github.com/chef/automate/lib/authz"
 	"github.com/chef/automate/lib/authz/project_purge"
@@ -56,16 +55,15 @@ func main() {
 }
 
 type config struct {
-	GRPC               string `mapstructure:"grpc"`
-	LogFormat          string `mapstructure:"log-format"`
-	LogLevel           string `mapstructure:"log-level"`
-	certs.TLSConfig    `mapstructure:"tls"`
-	PGURL              string `mapstructure:"pg_url"`
-	Database           string `mapstructure:"database"`
-	MigrationsPath     string `mapstructure:"migrations-path"`
-	DataMigrationsPath string `mapstructure:"data-migrations-path"`
-	AuthzAddress       string `mapstructure:"authz-address"`
-	CerealAddress      string `mapstructure:"cereal-address"`
+	GRPC            string `mapstructure:"grpc"`
+	LogFormat       string `mapstructure:"log-format"`
+	LogLevel        string `mapstructure:"log-level"`
+	certs.TLSConfig `mapstructure:"tls"`
+	PGURL           string `mapstructure:"pg_url"`
+	Database        string `mapstructure:"database"`
+	MigrationsPath  string `mapstructure:"migrations-path"`
+	AuthzAddress    string `mapstructure:"authz-address"`
+	CerealAddress   string `mapstructure:"cereal-address"`
 }
 
 func serve(_ *cobra.Command, args []string) {
@@ -136,7 +134,6 @@ Please pass a config file as the only argument to this command.`))
 	authzV2AuthorizationClient := authz_v2.NewAuthorizationClient(authzConn)
 
 	mustBeADirectory(cfg.MigrationsPath)
-	mustBeADirectory(cfg.DataMigrationsPath)
 	u, err := url.Parse(cfg.PGURL)
 	if err != nil {
 		msg := fmt.Sprintf("could not parse pg_url %s from config", cfg.PGURL)
@@ -148,17 +145,9 @@ Please pass a config file as the only argument to this command.`))
 		Logger: l,
 	}
 
-	// NOTE (TC): These are IAM V2 specific data migrations.
-	// Read more in v2_data_migrations.md.
-	dataMigrationConfig := datamigration.Config{
-		Path:   cfg.DataMigrationsPath,
-		PGURL:  u,
-		Logger: l,
-	}
-
 	service, err := service.NewPostgresService(l, connFactory,
-		migrationConfig, dataMigrationConfig,
-		authzClient, authzV2PoliciesClient, authzV2AuthorizationClient)
+		migrationConfig, authzClient, authzV2PoliciesClient,
+		authzV2AuthorizationClient)
 	if err != nil {
 		fail(errors.Wrap(err, "could not initialize storage"))
 	}

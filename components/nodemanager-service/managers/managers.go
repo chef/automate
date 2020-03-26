@@ -42,6 +42,9 @@ func GetAWSCreds(secret *secrets.Secret) awsec2.AwsCreds {
 			logrus.Errorf("GetAwsCreds insufficient creds available; len(accessKeyID) %d len(secretKey) %d", len(accessKeyID), len(secretKey))
 		}
 	}
+	if len(region) == 0 {
+		region = awsec2.DefaultRegion
+	}
 	return awsec2.AwsCreds{
 		AccessKeyId:     accessKeyID,
 		SecretAccessKey: secretKey,

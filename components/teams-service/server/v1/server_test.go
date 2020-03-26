@@ -25,7 +25,6 @@ import (
 
 	"github.com/chef/automate/components/teams-service/service"
 	"github.com/chef/automate/components/teams-service/storage"
-	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	"github.com/chef/automate/components/teams-service/test"
 )
@@ -36,7 +35,7 @@ func TestHealthGRPC(t *testing.T) {
 	l, err := logger.NewLogger("text", "debug")
 	require.NoError(t, err, "could not init logger", err)
 
-	_, _, conn, close, _ := setupTeamsService(ctx, t, l, nil, nil)
+	_, _, conn, close, _ := setupTeamsService(ctx, t, l, nil)
 	defer close()
 
 	cl := healthpb.NewHealthClient(conn)
@@ -59,23 +58,18 @@ func TestTeamsGRPC(t *testing.T) {
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
-	dataMigrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../../storage/postgres/datamigration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg data config for tests: %s", err.Error())
-	}
-
 	if migrationConfig == nil {
-		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil, nil)
+		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil)
 		runAllServerTests(ctx, t, serv, serviceRef, authzMock, teams.NewTeamsV1Client(conn), close)
 	} else {
 		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx,
-			t, l, migrationConfig, (*datamigration.Config)(dataMigrationConfig))
+			t, l, migrationConfig)
 		runAllServerTests(ctx, t, serv, serviceRef, authzMock, teams.NewTeamsV1Client(conn), close)
 
 		// If ciMode, run in-memory AND PG
 		// else just run PG.
 		if os.Getenv("CI") == "true, *authz.SubjectPurgeServerMock" {
-			serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil, nil)
+			serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil)
 			runAllServerTests(ctx, t, serv, serviceRef, authzMock, teams.NewTeamsV1Client(conn), close)
 		}
 	}
@@ -1040,8 +1034,7 @@ func cleanupTeam(ctx context.Context, t *testing.T, cl teams.TeamsV1Client, team
 func setupTeamsService(ctx context.Context,
 	t *testing.T,
 	l logger.Logger,
-	migrationConfig *migration.Config,
-	dataMigrationConfig *datamigration.Config) (*Server, *service.Service, *grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
+	migrationConfig *migration.Config) (*Server, *service.Service, *grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
 
 	t.Helper()
 
@@ -1077,7 +1070,7 @@ func setupTeamsService(ctx context.Context,
 		serviceRef, err = service.NewInMemoryService(l, connFactory, authzClient)
 	} else {
 		serviceRef, err = service.NewPostgresService(l, connFactory,
-			*migrationConfig, *dataMigrationConfig, authzClient,
+			*migrationConfig, authzClient,
 			authzV2PoliciesClient, authzV2AuthorizationClient)
 	}
 	if err != nil {

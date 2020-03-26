@@ -1,8 +1,16 @@
 describe('user management', () => {
+  const now = Cypress.moment().format('MMDDYYhhmm');
+  const typeDelay = 50;
+  const cypressPrefix = 'user-mgmt';
+  const name = `cypress test user ${now}`;
+  const username = `${cypressPrefix}-test-${now}`;
+  const password = 'testing!';
+
   before(() => {
     cy.adminLogin('/settings/users').then(() => {
-      cy.cleanupUsersByNamePrefix('cypress test user ');
+      cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['users']);
     });
+    cy.restoreStorage();
   });
 
   beforeEach(() => {
@@ -12,11 +20,9 @@ describe('user management', () => {
     cy.saveStorage();
   });
 
-  const now = Cypress.moment().format('MMDDYYhhmm');
-  const typeDelay = 50;
-  const name = `cypress test user ${now}`;
-  const username = `testing${now}`;
-  const password = 'testing!';
+  after(() => {
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['users']);
+  });
 
   it('can create a user', () => {
     cy.get('app-user-table').should('exist');

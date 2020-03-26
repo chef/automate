@@ -179,15 +179,23 @@ func (ProjectRulesStatus) EnumDescriptor() ([]byte, []int) {
 }
 
 type Rule struct {
-	Id                   string       `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	ProjectId            string       `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
-	Name                 string       `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Type                 RuleType     `protobuf:"varint,4,opt,name=type,proto3,enum=chef.automate.api.iam.v2.RuleType" json:"type,omitempty"`
-	Conditions           []*Condition `protobuf:"bytes,5,rep,name=conditions,proto3" json:"conditions,omitempty"`
-	Status               RuleStatus   `protobuf:"varint,6,opt,name=status,proto3,enum=chef.automate.api.iam.v2.RuleStatus" json:"status,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}     `json:"-"`
-	XXX_unrecognized     []byte       `json:"-"`
-	XXX_sizecache        int32        `json:"-"`
+	// Unique ID. Cannot be changed.
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	// Unique ID of the project this rule belongs to. Cannot be changed.
+	ProjectId string `protobuf:"bytes,2,opt,name=project_id,json=projectId,proto3" json:"project_id,omitempty"`
+	// Name for the project rule.
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// Whether the rule applies to ingested `NODE` or `EVENT resources.
+	// Cannot be changed.
+	Type RuleType `protobuf:"varint,4,opt,name=type,proto3,enum=chef.automate.api.iam.v2.RuleType" json:"type,omitempty"`
+	// Conditions that ingested resources must match to belong to the project.
+	// Will contain one or more.
+	Conditions []*Condition `protobuf:"bytes,5,rep,name=conditions,proto3" json:"conditions,omitempty"`
+	// Whether the rule is `STAGED` (not in effect) or `APPLIED` (in effect).
+	Status               RuleStatus `protobuf:"varint,6,opt,name=status,proto3,enum=chef.automate.api.iam.v2.RuleStatus" json:"status,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}   `json:"-"`
+	XXX_unrecognized     []byte     `json:"-"`
+	XXX_sizecache        int32      `json:"-"`
 }
 
 func (m *Rule) Reset()         { *m = Rule{} }
@@ -258,12 +266,16 @@ func (m *Rule) GetStatus() RuleStatus {
 }
 
 type Condition struct {
-	Attribute            ConditionAttribute `protobuf:"varint,1,opt,name=attribute,proto3,enum=chef.automate.api.iam.v2.ConditionAttribute" json:"attribute,omitempty"`
-	Values               []string           `protobuf:"bytes,2,rep,name=values,proto3" json:"values,omitempty"`
-	Operator             ConditionOperator  `protobuf:"varint,3,opt,name=operator,proto3,enum=chef.automate.api.iam.v2.ConditionOperator" json:"operator,omitempty"`
-	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
-	XXX_unrecognized     []byte             `json:"-"`
-	XXX_sizecache        int32              `json:"-"`
+	// Represents a property of an ingested resource. Depends on the rule type.
+	Attribute ConditionAttribute `protobuf:"varint,1,opt,name=attribute,proto3,enum=chef.automate.api.iam.v2.ConditionAttribute" json:"attribute,omitempty"`
+	// The value(s) of the attribute that an ingested resource must match.
+	Values []string `protobuf:"bytes,2,rep,name=values,proto3" json:"values,omitempty"`
+	// Whether the attribute matches a single value (`EQUALS`) or
+	// matches at least one of a set of values (`MEMBER_OF`).
+	Operator             ConditionOperator `protobuf:"varint,3,opt,name=operator,proto3,enum=chef.automate.api.iam.v2.ConditionOperator" json:"operator,omitempty"`
+	XXX_NoUnkeyedLiteral struct{}          `json:"-"`
+	XXX_unrecognized     []byte            `json:"-"`
+	XXX_sizecache        int32             `json:"-"`
 }
 
 func (m *Condition) Reset()         { *m = Condition{} }

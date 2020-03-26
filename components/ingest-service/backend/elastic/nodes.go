@@ -25,9 +25,17 @@ func (es *Backend) InsertNode(ctx context.Context, node backend.Node) error {
 	return err
 }
 
+// InsertUpsertNode inserts the UpsertNode with the created date
+func (es *Backend) InsertUpsertNode(ctx context.Context, node backend.UpsertNode) error {
+	mapping := mappings.NodeState
+	err := es.upsertDataWithID(ctx, mapping, node.EntityUuid, node)
+	return err
+}
+
 func (es *Backend) CreateBulkNodeUpdateRequest(node backend.Node) elastic.BulkableRequest {
 	mapping := mappings.NodeState
-	return es.createBulkRequestUpsertDataWithID(mapping, node.EntityUuid, node)
+	return es.createBulkRequestUpsertDataWithID(mapping, node.EntityUuid, node,
+		backend.UpsertNode{Node: node, Created: time.Now()})
 }
 
 // InsertNodeAttribute inserts the ohai attributes from a CCR into the node-attribute index

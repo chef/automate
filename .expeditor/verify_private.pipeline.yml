@@ -224,34 +224,13 @@ steps:
             - HAB_STUDIO_SUP=false
             - HAB_NONINTERACTIVE=true
 
-  - label: "automate-gateway-iam-v1"
+  - label: "iam automate-gateway integration"
     command:
       - . scripts/verify_setup.sh
       - |
         hab studio run "source scripts/verify_studio_init.sh &&
           start_deployment_service &&
           chef-automate dev deployinate &&
-          gateway_integration"
-    timeout_in_minutes: 20
-    retry:
-      automatic:
-        limit: 1
-    expeditor:
-      executor:
-        docker:
-          privileged: true
-          environment:
-            - HAB_STUDIO_SUP=false
-            - HAB_NONINTERACTIVE=true
-
-  - label: "automate-gateway-iam-v2"
-    command:
-      - . scripts/verify_setup.sh
-      - |
-        hab studio run "source scripts/verify_studio_init.sh &&
-          start_deployment_service &&
-          chef-automate dev deployinate &&
-          chef-automate iam upgrade-to-v2 --skip-policy-migration &&
           gateway_integration"
     timeout_in_minutes: 20
     retry:
@@ -410,9 +389,9 @@ steps:
   # end-to-end testing. These tests all test full deployments of
   # Automate in different configurations.
   #
-  - label: ":cypress: (flaky included) IAMv1"
+  - label: "cypress (flaky included) :cypress:"
     command:
-      - FLAKY=yes IAM=v1 integration/run_test integration/tests/cypress_e2e.sh
+      - FLAKY=yes integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 35
     soft_fail: true
     expeditor:
@@ -433,42 +412,9 @@ steps:
         linux:
           privileged: true
 
-  - label: ":cypress: (flaky included) IAMv2"
+  - label: "cypress :cypress:"
     command:
-      - FLAKY=yes IAM=v2.1 integration/run_test integration/tests/cypress_e2e.sh
-    timeout_in_minutes: 35
-    soft_fail: true
-    expeditor:
-      secrets: *cypress_secrets
-      executor:
-        linux:
-          privileged: true
-
-  - label: ":cypress: IAMv1"
-    command:
-      - FLAKY=no IAM=v1 integration/run_test integration/tests/cypress_e2e.sh
-    timeout_in_minutes: 35
-    expeditor:
-      secrets: &cypress_secrets
-        A2_LICENSE:
-          path: secret/a2/license
-          field: license
-        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_HOST:
-          path: secret/a2/testing/target_host
-          field: data
-        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_USER:
-          path: secret/a2/testing/target_user
-          field: data
-        CYPRESS_AUTOMATE_ACCEPTANCE_TARGET_KEY:
-          path: secret/a2/testing/target_key
-          field: data
-      executor:
-        linux:
-          privileged: true
-
-  - label: ":cypress: IAMv2"
-    command:
-      - FLAKY=no IAM=v2.1 integration/run_test integration/tests/cypress_e2e.sh
+      - FLAKY=no integration/run_test integration/tests/cypress_e2e.sh
     timeout_in_minutes: 35
     expeditor:
       secrets: *cypress_secrets
@@ -476,18 +422,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2 (migrated w/ v1 policies)"
+  - label: "iam v1 to v2 force-upgrade"
     command:
-      - integration/run_test integration/tests/iam_v2_with_v1_policies.sh
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          privileged: true
-
-  - label: "iam v2"
-    command:
-      - integration/run_test integration/tests/iam_v2_no_legacy_policies.sh
+      - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
@@ -498,9 +435,48 @@ steps:
         linux:
           privileged: true
 
-  - label: "iam v2 (v2 only, diagnostics)"
+  - label: "iam v1 to v2 force-upgrade (diagnostics only)"
     command:
-      - integration/run_test integration/tests/iam_v2_upgrade_diagnostics.sh
+      - integration/run_test integration/tests/iam_v1_to_v2_force_upgrade_diagnostics.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
+  - label: "iam v2 with no legacy policies force-upgrade to v2"
+    command:
+      - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
+  - label: "iam v2 with no legacy policies force upgrade to v2 (diagnostics only)"
+    command:
+      - integration/run_test integration/tests/iam_v2_no_legacy_to_v2_force_upgrade_diagnostics.sh
+    timeout_in_minutes: 20
+    expeditor:
+      secrets:
+        A2_LICENSE:
+          path: secret/a2/license
+          field: license
+      executor:
+        linux:
+          privileged: true
+
+  - label: "iam v2 with legacy policies force upgrade to v2"
+    command:
+      - integration/run_test integration/tests/iam_v2_legacy_to_v2_force_upgrade.sh
     timeout_in_minutes: 20
     expeditor:
       secrets:
@@ -786,27 +762,9 @@ steps:
         linux:
           privileged: true
 
-  - label: "reset admin access v1"
+  - label: "iam reset admin access"
     command:
-      - integration/run_test integration/tests/reset_admin_access_v1.sh
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          privileged: true
-
-  - label: "reset admin access v2"
-    command:
-      - integration/run_test integration/tests/reset_admin_access_v2.sh
-    timeout_in_minutes: 20
-    expeditor:
-      executor:
-        linux:
-          privileged: true
-
-  - label: "upgrade / reset IAM v2"
-    command:
-      - integration/run_test integration/tests/upgrade_reset_iam_v2.sh
+      - integration/run_test integration/tests/iam_reset_admin_access.sh
     timeout_in_minutes: 20
     expeditor:
       executor:

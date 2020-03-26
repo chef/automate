@@ -19,27 +19,25 @@
     </app-authorized>
 
     <div class="group" *ngIf="users.visible || teams.visible || tokens.visible">Identity</div>
-    <app-authorized #users [allOf]="['/auth/users', 'get']">
+    <app-authorized #users [allOf]="['/iam/v2/users', 'get']">
       <chef-sidebar-entry route="/settings/users" icon="person">Users</chef-sidebar-entry>
     </app-authorized>
-    <app-authorized  #teams [allOf]="['/auth/teams', 'get']">
+    <app-authorized  #teams [allOf]="['/iam/v2/teams', 'get']">
       <chef-sidebar-entry route="/settings/teams" icon="people">Teams</chef-sidebar-entry>
     </app-authorized>
-    <app-authorized  #tokens [anyOf]="[['/auth/tokens', 'get'], ['/iam/v2/tokens', 'get']]">
+    <app-authorized  #tokens [allOf]="['/iam/v2/tokens', 'get']">
       <chef-sidebar-entry route="/settings/tokens" icon="vpn_key">API Tokens</chef-sidebar-entry>
     </app-authorized>
 
-    <div *ngIf="isIAMv2$ | async">
-      <div class="group" *ngIf="policies.visible || roles.visible || projects.visible">Access Management</div>
-      <app-authorized #policies [allOf]="['/iam/v2/policies', 'get']">
-        <chef-sidebar-entry route="/settings/policies" icon="security">Policies</chef-sidebar-entry>
-      </app-authorized>
-      <app-authorized #roles [allOf]="['/iam/v2/roles', 'get']">
-        <chef-sidebar-entry route="/settings/roles" icon="assignment_ind">Roles</chef-sidebar-entry>
-      </app-authorized>
-      <app-authorized #projects [allOf]="['/iam/v2/projects', 'get']">
-        <chef-sidebar-entry route="/settings/projects" icon="work">Projects</chef-sidebar-entry>
-      </app-authorized>
-    </div>
+    <div class="group" *ngIf="policies.visible || roles.visible || projects.visible">Access Management</div>
+    <app-authorized #policies [allOf]="['/iam/v2/policies', 'get']">
+      <chef-sidebar-entry route="/settings/policies" icon="security">Policies</chef-sidebar-entry>
+    </app-authorized>
+    <app-authorized #roles [allOf]="['/iam/v2/roles', 'get']">
+      <chef-sidebar-entry route="/settings/roles" icon="assignment_ind">Roles</chef-sidebar-entry>
+    </app-authorized>
+    <app-authorized #projects [allOf]="['/iam/v2/projects', 'get']">
+      <chef-sidebar-entry route="/settings/projects" icon="work">Projects</chef-sidebar-entry>
+    </app-authorized>
   </div>
 </chef-sidebar>

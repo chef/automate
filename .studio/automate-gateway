@@ -532,7 +532,7 @@ function get_api_token() {
   if [ -f /tmp/api_token ]; then
     cat /tmp/api_token
   else
-    chef-automate admin-token >/tmp/api_token
+    date +%s | xargs -I % chef-automate iam token create admin-token-% --admin >/tmp/api_token
     if [ $? -ne 0 ]; then
       get_api_token_with_policy ingest-access >/tmp/api_token || return 1
     fi
@@ -548,35 +548,23 @@ document "get_api_token_with_policy" <<DOC
   ----------------------------------------------------
   # get_api_token_with_policy editor-access
 
-  Note: if NOT using IAM v2, this token will just be an admin token.
 DOC
 function get_api_token_with_policy() {
   check_if_deployinate_started || return 1
 
-  local policy=${1:?"usage: get_api_token_with_policy POLICYNAME"}
-  local iam_version
-  iam_version="$(chef-automate iam version | awk '{print $2}')"
-  local token_description="api-token-$$-${policy}"
-  local token_file="/tmp/api_token_${iam_version}_${policy}"
+  local policy_id=${1:?"usage: get_api_token_with_policy POLICY_ID"}
+  local token_id="api-token-id-${policy_id}"
+  local token_file="/tmp/api_token_${policy_id}"
 
   if [ -f "$token_file" ]; then
     cat "$token_file"
   else
-    if [ "$iam_version" == "v1.0" ]; then
-      chef-automate admin-token >"$token_file"
-    else
-      # create standard api token
-      chef-automate iam token create "$token_description" >"$token_file" || return 1
-      # retrieve the tokens' ID
-      local token_id
-      token_id="$(curl -fsS --insecure -H "api-token: $(get_admin_token)" \
-       "${GATEWAY_URL}/auth/tokens" |\
-         jq -er --arg token "$token_description" '[.tokens[] | select(.description == $token) | .id] | first' )"
-      # and add it to policy
-      curl -fsS --insecure -H "api-token: $(get_admin_token)" \
-        --data "$(jq -nc --arg token "$token_id"  '{ members: [ "token:\($token)" ]}')" \
-       "${GATEWAY_URL}/apis/iam/v2/policies/${policy}/members:add" >/dev/null
-    fi
+    # create standard api token
+    chef-automate iam token create "$token_id" --id "$token_id" >"$token_file" || return 1
+    # and add it to policy
+    curl -fsS --insecure -H "api-token: $(get_admin_token)" \
+      --data "$(jq -nc --arg token "$token_id"  '{ members: [ "token:\($token)" ]}')" \
+      "${GATEWAY_URL}/apis/iam/v2/policies/${policy_id}/members:add" >/dev/null
     cat "$token_file"
   fi
 }

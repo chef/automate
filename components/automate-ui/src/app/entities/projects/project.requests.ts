@@ -21,38 +21,38 @@ export class ProjectRequests {
   constructor(private http: HttpClient) { }
 
   public getProjects(): Observable<GetProjectsSuccessPayload> {
-    return this.http.get<GetProjectsSuccessPayload>(`${env.auth_v2_url}/projects`);
+    return this.http.get<GetProjectsSuccessPayload>(`${env.iam_url}/projects`);
   }
 
   public getProject(id: string): Observable<ProjectSuccessPayload> {
-    return this.http.get<ProjectSuccessPayload>(`${env.auth_v2_url}/projects/${id}`);
+    return this.http.get<ProjectSuccessPayload>(`${env.iam_url}/projects/${id}`);
   }
 
   public createProject(id: string, name: string): Observable<ProjectSuccessPayload> {
     return this.http.post<ProjectSuccessPayload>(
-      `${env.auth_v2_url}/projects`,
+      `${env.iam_url}/projects`,
       { id, name });
   }
 
   public deleteProject(id: string): Observable<{}> {
-    return this.http.delete(`${env.auth_v2_url}/projects/${id}`);
+    return this.http.delete(`${env.iam_url}/projects/${id}`);
   }
 
   public updateProject(id: string, name: string): Observable<ProjectSuccessPayload> {
     return this.http.put<ProjectSuccessPayload>(
-      `${env.auth_v2_url}/projects/${id}`,
+      `${env.iam_url}/projects/${id}`,
       { name });
   }
 
   public applyRulesStart(): Observable<{}> {
-    return this.http.post<any>(`${env.auth_v2_url}/apply-rules`, '{}');
+    return this.http.post<any>(`${env.iam_url}/apply-rules`, '{}');
   }
 
   public applyRulesStop(): Observable<{}> {
-    return this.http.delete<any>(`${env.auth_v2_url}/apply-rules`);
+    return this.http.delete<any>(`${env.iam_url}/apply-rules`);
   }
 
   public getApplyRulesStatus(): Observable<GetApplyRulesStatusSuccessPayload> {
-    return this.http.get<GetApplyRulesStatusSuccessPayload>(`${env.auth_v2_url}/apply-rules`);
+    return this.http.get<GetApplyRulesStatusSuccessPayload>(`${env.iam_url}/apply-rules`);
   }
 }

@@ -247,6 +247,7 @@ func (s *CfgMgmtServer) GetCheckInCountsTimeSeries(ctx context.Context,
 			Start: cfgCount.Start,
 			End:   cfgCount.End,
 			Count: cfgCount.Count,
+			Total: cfgCount.Total,
 		}
 	}
 

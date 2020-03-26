@@ -11,17 +11,11 @@ import (
 	"google.golang.org/grpc/status"
 
 	authz_constants "github.com/chef/automate/components/authz-service/constants"
-	authz_constants_v1 "github.com/chef/automate/components/authz-service/constants/v1"
 	"github.com/chef/automate/components/automate-cli/pkg/adminmgmt"
 	"github.com/chef/automate/components/automate-cli/pkg/client/mock"
-	teams_req "github.com/chef/automate/components/automate-gateway/api/auth/teams/request"
-	teams_resp "github.com/chef/automate/components/automate-gateway/api/auth/teams/response"
-	users_req "github.com/chef/automate/components/automate-gateway/api/auth/users/request"
-	users_resp "github.com/chef/automate/components/automate-gateway/api/auth/users/response"
-	authz_req "github.com/chef/automate/components/automate-gateway/api/authz/request"
-	authz_resp "github.com/chef/automate/components/automate-gateway/api/authz/response"
-	policies_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
-	policies_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
+	iam_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
+	iam_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
+	iam_resp "github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
 )
 
 func TestCreateAdminUserOrUpdatePassword(t *testing.T) {
@@ -32,18 +26,18 @@ func TestCreateAdminUserOrUpdatePassword(t *testing.T) {
 
 	pw := "newPassword"
 
-	t.Run("when GetUserByUsername fails with an unexpected error then raise that error", func(t *testing.T) {
-		serverMocks.UsersMock.GetUserByUsernameFunc = getUserByUsernameError(codes.Internal)
+	t.Run("when GetUser fails with an unexpected error then raise that error", func(t *testing.T) {
+		serverMocks.UsersMock.GetUserFunc = getUserError(codes.Internal)
 		_, _, err := adminmgmt.CreateAdminUserOrUpdatePassword(ctx, apiClient, pw, false)
 		require.Error(t, err)
 	})
 
 	t.Run("when the admin doesn't exist but creating it throws an error then return the error", func(t *testing.T) {
-		serverMocks.UsersMock.GetUserByUsernameFunc = getUserByUsernameError(codes.NotFound)
+		serverMocks.UsersMock.GetUserFunc = getUserError(codes.NotFound)
 		serverMocks.UsersMock.CreateUserFunc = func(
-			_ context.Context, req *users_req.CreateUser) (*users_resp.User, error) {
-			if "Local Administrator" != req.Name || "admin" != req.Username || pw != req.Password {
-				return &users_resp.User{}, nil // this would be unexpected, we want this to return an error
+			_ context.Context, req *iam_req.CreateUserReq) (*iam_resp.CreateUserResp, error) {
+			if "Local Administrator" != req.Name || "admin" != req.Id || pw != req.Password {
+				return &iam_resp.CreateUserResp{}, nil // this would be unexpected, we want this to return an error
 			}
 			return nil, status.Error(codes.Internal, "unexpected error")
 		}
@@ -53,25 +47,27 @@ func TestCreateAdminUserOrUpdatePassword(t *testing.T) {
 	})
 
 	t.Run("when the admin doesn't exist", func(t *testing.T) {
-		id := "mocked_id"
-		serverMocks.UsersMock.GetUserByUsernameFunc = getUserByUsernameError(codes.NotFound)
+		membershipID := "mocked_id"
+		serverMocks.UsersMock.GetUserFunc = getUserError(codes.NotFound)
 		serverMocks.UsersMock.CreateUserFunc = func(
-			_ context.Context, req *users_req.CreateUser) (*users_resp.User, error) {
+			_ context.Context, req *iam_req.CreateUserReq) (*iam_resp.CreateUserResp, error) {
 
-			if "Local Administrator" != req.Name || "admin" != req.Username || pw != req.Password {
+			if "Local Administrator" != req.Name || "admin" != req.Id || pw != req.Password {
 				return nil, errors.New("unexpected arguments")
 			}
-			return &users_resp.User{
-				Id:       id,
-				Name:     req.Name,
-				Username: req.Username,
+			return &iam_resp.CreateUserResp{
+				User: &iam_common.User{
+					Id:           "wrong_id",
+					Name:         req.Name,
+					MembershipId: membershipID,
+				},
 			}, nil
 		}
 
-		t.Run("it returns the id and found=false", func(t *testing.T) {
+		t.Run("it returns the membership id and found=false", func(t *testing.T) {
 			returnID, returnFound, err := adminmgmt.CreateAdminUserOrUpdatePassword(ctx, apiClient, pw, false)
 			require.NoError(t, err)
-			assert.Equal(t, id, returnID)
+			assert.Equal(t, membershipID, returnID)
 			assert.False(t, returnFound)
 		})
 
@@ -85,45 +81,49 @@ func TestCreateAdminUserOrUpdatePassword(t *testing.T) {
 	})
 
 	t.Run("when the admin is found", func(t *testing.T) {
-		id := "mocked_id"
-		serverMocks.UsersMock.GetUserByUsernameFunc = func(
-			_ context.Context, req *users_req.Username) (*users_resp.User, error) {
+		membershipID := "mocked_id"
+		serverMocks.UsersMock.GetUserFunc = func(
+			_ context.Context, req *iam_req.GetUserReq) (*iam_resp.GetUserResp, error) {
 
-			if "admin" != req.Username {
+			if "admin" != req.Id {
 				return nil, errors.New("unexpected arguments")
 			}
-			return &users_resp.User{
-				Id:       id,
-				Name:     "Some out of date name",
-				Username: "admin",
+			return &iam_resp.GetUserResp{
+				User: &iam_common.User{
+					Id:           "admin",
+					Name:         "Some out of date name",
+					MembershipId: membershipID,
+				},
 			}, nil
 		}
 
 		serverMocks.UsersMock.UpdateUserFunc = func(
-			_ context.Context, req *users_req.UpdateUser) (*users_resp.User, error) {
+			_ context.Context, req *iam_req.UpdateUserReq) (*iam_resp.UpdateUserResp, error) {
 
-			if "Local Administrator" != req.Name || "admin" != req.Username || pw != req.Password {
+			if "Local Administrator" != req.Name || "admin" != req.Id || pw != req.Password {
 				return nil, errors.New("unexpected arguments")
 			}
 
-			return &users_resp.User{
-				Id:       id,
-				Name:     req.Name,
-				Username: req.Username,
+			return &iam_resp.UpdateUserResp{
+				User: &iam_common.User{
+					Id:           req.Id,
+					Name:         req.Name,
+					MembershipId: membershipID,
+				},
 			}, nil
 		}
 
-		t.Run("it returns the id and found=true", func(t *testing.T) {
+		t.Run("it returns the membership id and found=true", func(t *testing.T) {
 			returnID, returnFound, err := adminmgmt.CreateAdminUserOrUpdatePassword(ctx, apiClient, pw, false)
 			require.NoError(t, err)
-			assert.Equal(t, id, returnID)
+			assert.Equal(t, membershipID, returnID)
 			assert.True(t, returnFound)
 		})
 
-		t.Run("when in dry run mode it returns the id and found=true", func(t *testing.T) {
+		t.Run("when in dry run mode it returns the membership id and found=true", func(t *testing.T) {
 			returnID, returnFound, err := adminmgmt.CreateAdminUserOrUpdatePassword(ctx, apiClient, pw, true)
 			require.NoError(t, err)
-			assert.Equal(t, id, returnID)
+			assert.Equal(t, membershipID, returnID)
 			assert.True(t, returnFound)
 		})
 	})
@@ -135,97 +135,89 @@ func TestEnsureTeam(t *testing.T) {
 	require.NoError(t, err)
 	defer apiClient.CloseConnection()
 
-	t.Run("when GetTeams fails with an unexpected error then raise that error", func(t *testing.T) {
-		serverMocks.TeamsMock.GetTeamsFunc = getTeamsError(codes.Internal)
+	t.Run("when ListTeams fails with an unexpected error then raise that error", func(t *testing.T) {
+		serverMocks.TeamsMock.ListTeamsFunc = listTeamsError(codes.Internal)
 
-		_, _, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, false)
+		_, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, false)
 		require.Error(t, err)
 	})
 
 	t.Run("when the admins team does not exist", func(t *testing.T) {
-		serverMocks.TeamsMock.GetTeamsFunc = func(
-			context.Context, *teams_req.GetTeamsReq) (*teams_resp.Teams, error) {
+		serverMocks.TeamsMock.ListTeamsFunc = func(
+			context.Context, *iam_req.ListTeamsReq) (*iam_resp.ListTeamsResp, error) {
 
-			return &teams_resp.Teams{
-				Teams: []*teams_resp.Team{
+			return &iam_resp.ListTeamsResp{
+				Teams: []*iam_common.Team{
 					{
-						Id:          "mocked-not-admin-id",
-						Name:        "not-admin",
-						Description: "some other team",
+						Id:       "mocked-not-admin-id",
+						Name:     "not-admin",
+						Projects: []string{},
 					},
 				},
 			}, nil
 		}
 
-		t.Run("it is created and its id and found=false are returned", func(t *testing.T) {
+		t.Run("it is created and found=false is returned", func(t *testing.T) {
 			createAdminID := "mocked-admin-id"
 			serverMocks.TeamsMock.CreateTeamFunc = func(
-				_ context.Context, req *teams_req.CreateTeamReq) (*teams_resp.CreateTeamResp, error) {
+				_ context.Context, req *iam_req.CreateTeamReq) (*iam_resp.CreateTeamResp, error) {
 
 				if "admins" != req.Name ||
-					"admins" != req.Description {
+					"admins" != req.Id {
 					return nil, errors.New("unexpected arguments")
 				}
 
-				return &teams_resp.CreateTeamResp{
-					Team: &teams_resp.Team{
-						Id:          createAdminID,
-						Name:        req.Name,
-						Description: req.Description,
+				return &iam_resp.CreateTeamResp{
+					Team: &iam_common.Team{
+						Id:       createAdminID,
+						Name:     req.Name,
+						Projects: []string{},
 					},
 				}, nil
 			}
 
-			id, found, err := adminmgmt.CreateAdminTeamIfMissing(ctx, apiClient, false)
+			serverMocks.TeamsMock.GetTeamFunc = func(
+				_ context.Context, req *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
+				return nil, status.Error(codes.NotFound, "Not Found")
+			}
+
+			found, err := adminmgmt.CreateAdminTeamIfMissing(ctx, apiClient, false)
 			require.NoError(t, err)
-			assert.Equal(t, createAdminID, id)
 			assert.False(t, found)
 		})
 
 		t.Run("and dry run mode is on it is not created, id is empty, and found=false are returned", func(t *testing.T) {
 			serverMocks.TeamsMock.CreateTeamFunc = createTeamCallUnexpected
 
-			id, found, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, true)
+			found, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, true)
 			require.NoError(t, err)
-			assert.Equal(t, "", id)
 			assert.False(t, found)
 		})
 	})
 
 	t.Run("when the admins team exists already", func(t *testing.T) {
-		mockedAdminsID := "mocked-admin-id"
-		serverMocks.TeamsMock.GetTeamsFunc = func(
-			context.Context, *teams_req.GetTeamsReq) (*teams_resp.Teams, error) {
-
-			return &teams_resp.Teams{
-				Teams: []*teams_resp.Team{
-					{
-						Id:          "mocked-not-admin-id",
-						Name:        "not-admin",
-						Description: "some other team",
-					},
-					{
-						Id:          mockedAdminsID,
-						Name:        "admins",
-						Description: "admins",
-					},
+		serverMocks.TeamsMock.GetTeamFunc = func(
+			_ context.Context, req *iam_req.GetTeamReq) (*iam_resp.GetTeamResp, error) {
+			return &iam_resp.GetTeamResp{
+				Team: &iam_common.Team{
+					Id:       "admins",
+					Name:     "admins",
+					Projects: []string{},
 				},
 			}, nil
 		}
 
 		serverMocks.TeamsMock.CreateTeamFunc = createTeamCallUnexpected
 
-		t.Run("it returns the team id and found=true", func(t *testing.T) {
-			id, found, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, false)
+		t.Run("it returns found=true", func(t *testing.T) {
+			found, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, false)
 			require.NoError(t, err)
-			assert.Equal(t, mockedAdminsID, id)
 			assert.True(t, found)
 		})
 
-		t.Run("when in dry run mode it returns and empty id and found=true", func(t *testing.T) {
-			id, found, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, false)
+		t.Run("when in dry run mode it returns found=true", func(t *testing.T) {
+			found, err := adminmgmt.EnsureTeam(ctx, "admins", "the admin team", apiClient, false)
 			require.NoError(t, err)
-			assert.Equal(t, mockedAdminsID, id)
 			assert.True(t, found)
 		})
 	})
@@ -238,12 +230,12 @@ func TestAddAdminUserToTeam(t *testing.T) {
 
 	teamsID := "teams-id"
 	userID := "user-id"
-	t.Run("when GetUsers fails with an unexpected error then raise that error", func(t *testing.T) {
-		serverMocks.TeamsMock.GetUsersFunc = func(
-			_ context.Context, req *teams_req.GetUsersReq) (*teams_resp.GetUsersResp, error) {
+	t.Run("when GetTeamMembership fails with an unexpected error then raise that error", func(t *testing.T) {
+		serverMocks.TeamsMock.GetTeamMembershipFunc = func(
+			_ context.Context, req *iam_req.GetTeamMembershipReq) (*iam_resp.GetTeamMembershipResp, error) {
 
 			if teamsID != req.Id {
-				return &teams_resp.GetUsersResp{}, nil // unexpected arguments
+				return &iam_resp.GetTeamMembershipResp{}, nil // unexpected arguments
 			}
 			return nil, status.Error(codes.Internal, "unexpected error")
 		}
@@ -253,13 +245,13 @@ func TestAddAdminUserToTeam(t *testing.T) {
 	})
 
 	t.Run("when the admin is on the team", func(t *testing.T) {
-		serverMocks.TeamsMock.GetUsersFunc = func(
-			_ context.Context, req *teams_req.GetUsersReq) (*teams_resp.GetUsersResp, error) {
+		serverMocks.TeamsMock.GetTeamMembershipFunc = func(
+			_ context.Context, req *iam_req.GetTeamMembershipReq) (*iam_resp.GetTeamMembershipResp, error) {
 
 			if teamsID != req.Id {
 				return nil, errors.New("unexpected arguments")
 			}
-			return &teams_resp.GetUsersResp{
+			return &iam_resp.GetTeamMembershipResp{
 				UserIds: []string{"1", userID, "3"},
 			}, nil
 		}
@@ -278,28 +270,26 @@ func TestAddAdminUserToTeam(t *testing.T) {
 	})
 
 	t.Run("when the admin is not on the team", func(t *testing.T) {
-		serverMocks.TeamsMock.GetUsersFunc = func(
-			_ context.Context, req *teams_req.GetUsersReq) (*teams_resp.GetUsersResp, error) {
+		serverMocks.TeamsMock.GetTeamMembershipFunc = func(
+			_ context.Context, req *iam_req.GetTeamMembershipReq) (*iam_resp.GetTeamMembershipResp, error) {
 
 			if teamsID != req.Id {
 				return nil, errors.New("unexpected arguments")
 			}
-			return &teams_resp.GetUsersResp{
+			return &iam_resp.GetTeamMembershipResp{
 				UserIds: []string{"1", "3"},
 			}, nil
 		}
 
-		t.Run("it calls AddUsers returns addUser=true", func(t *testing.T) {
-			serverMocks.TeamsMock.AddUsersFunc = func(
-				_ context.Context, req *teams_req.AddUsersReq) (*teams_resp.AddUsersResp, error) {
+		t.Run("it calls AddTeamMembers returns addUser=true", func(t *testing.T) {
+			serverMocks.TeamsMock.AddTeamMembersFunc = func(
+				_ context.Context, req *iam_req.AddTeamMembersReq) (*iam_resp.AddTeamMembersResp, error) {
 
 				if teamsID != req.Id || len(req.UserIds) != 1 || userID != req.UserIds[0] {
 					return nil, errors.New("unexpected arguments")
 				}
-				return &teams_resp.AddUsersResp{
-					Team: &teams_resp.Team{
-						Id: teamsID,
-					},
+				return &iam_resp.AddTeamMembersResp{
+					UserIds: req.UserIds,
 				}, nil
 			}
 
@@ -308,12 +298,12 @@ func TestAddAdminUserToTeam(t *testing.T) {
 			assert.True(t, addUser)
 		})
 
-		t.Run("when AddUsers returns an unexpected error it raises the error", func(t *testing.T) {
-			serverMocks.TeamsMock.AddUsersFunc = func(
-				_ context.Context, req *teams_req.AddUsersReq) (*teams_resp.AddUsersResp, error) {
+		t.Run("when AddTeamMembers returns an unexpected error it raises the error", func(t *testing.T) {
+			serverMocks.TeamsMock.AddTeamMembersFunc = func(
+				_ context.Context, req *iam_req.AddTeamMembersReq) (*iam_resp.AddTeamMembersResp, error) {
 
 				if teamsID != req.Id || len(req.UserIds) != 1 || userID != req.UserIds[0] {
-					return &teams_resp.AddUsersResp{}, nil // unexpected arguments
+					return &iam_resp.AddTeamMembersResp{}, nil // unexpected arguments
 				}
 				return nil, status.Error(codes.Internal, "unexpected error")
 			}
@@ -323,8 +313,8 @@ func TestAddAdminUserToTeam(t *testing.T) {
 		})
 
 		t.Run("and dry run is enabled it returns addUser=false", func(t *testing.T) {
-			serverMocks.TeamsMock.AddUsersFunc = func(
-				context.Context, *teams_req.AddUsersReq) (*teams_resp.AddUsersResp, error) {
+			serverMocks.TeamsMock.AddTeamMembersFunc = func(
+				_ context.Context, req *iam_req.AddTeamMembersReq) (*iam_resp.AddTeamMembersResp, error) {
 
 				return nil, errors.New("unexpected call")
 			}
@@ -335,114 +325,7 @@ func TestAddAdminUserToTeam(t *testing.T) {
 		})
 	})
 }
-
-func TestUpdateV1AdminsPolicyIfNeeded(t *testing.T) {
-	ctx := context.Background()
-	apiClient, serverMocks, err := mock.CreateMockConn(t)
-	require.NoError(t, err)
-	defer apiClient.CloseConnection()
-
-	t.Run("when ListPolicies fails with an unexpected error then raise that error", func(t *testing.T) {
-		serverMocks.AuthzMock.ListPoliciesFunc = func(
-			context.Context, *authz_req.ListPoliciesReq) (*authz_resp.ListPoliciesResp, error) {
-			return nil, status.Error(codes.Internal, "unexpected error")
-		}
-
-		_, _, err := adminmgmt.UpdateV1AdminsPolicyIfNeeded(ctx, apiClient, false)
-		require.Error(t, err)
-	})
-
-	t.Run("when the original admins policy does not exist it returns false, true, nil", func(t *testing.T) {
-		serverMocks.AuthzMock.ListPoliciesFunc = func(
-			context.Context, *authz_req.ListPoliciesReq) (*authz_resp.ListPoliciesResp, error) {
-
-			return &authz_resp.ListPoliciesResp{
-				Policies: []*authz_resp.Policy{
-					{
-						Id:       "wrong-id",
-						Subjects: []string{authz_constants.LocalAdminsTeamSubject, "some:other:subject"},
-					},
-				},
-			}, nil
-		}
-
-		serverMocks.AuthzMock.CreatePolicyFunc = createDefaultAdminPolicy
-
-		foundPolicy, createdNewPolicy, err := adminmgmt.UpdateV1AdminsPolicyIfNeeded(ctx, apiClient, false)
-		require.NoError(t, err)
-		assert.False(t, foundPolicy)
-		assert.True(t, createdNewPolicy)
-	})
-
-	t.Run("when the original admins policy exists and contains the admins team it returns true, false, nil", func(t *testing.T) {
-		serverMocks.AuthzMock.ListPoliciesFunc = func(
-			context.Context, *authz_req.ListPoliciesReq) (*authz_resp.ListPoliciesResp, error) {
-
-			return &authz_resp.ListPoliciesResp{
-				Policies: []*authz_resp.Policy{
-					{
-						Id:       authz_constants_v1.AdminPolicyID,
-						Subjects: []string{authz_constants.LocalAdminsTeamSubject, "some:other:subject"},
-					},
-				},
-			}, nil
-		}
-
-		serverMocks.AuthzMock.CreatePolicyFunc = func(
-			context.Context, *authz_req.CreatePolicyReq) (*authz_resp.CreatePolicyResp, error) {
-			return nil, errors.New("unexpected call")
-		}
-
-		foundPolicy, createdNewPolicy, err := adminmgmt.UpdateV1AdminsPolicyIfNeeded(ctx, apiClient, false)
-		require.NoError(t, err)
-		assert.True(t, foundPolicy)
-		assert.False(t, createdNewPolicy)
-	})
-
-	t.Run("when the original admins policy exists and does not contain the admins team it returns true, true, nil", func(t *testing.T) {
-		serverMocks.AuthzMock.ListPoliciesFunc = func(
-			context.Context, *authz_req.ListPoliciesReq) (*authz_resp.ListPoliciesResp, error) {
-
-			return &authz_resp.ListPoliciesResp{
-				Policies: []*authz_resp.Policy{
-					{
-						Id:       authz_constants_v1.AdminPolicyID,
-						Subjects: []string{"some:other:subject"},
-					},
-				},
-			}, nil
-		}
-		serverMocks.AuthzMock.CreatePolicyFunc = createDefaultAdminPolicy
-
-		foundPolicy, createdNewPolicy, err := adminmgmt.UpdateV1AdminsPolicyIfNeeded(ctx, apiClient, false)
-		require.NoError(t, err)
-		assert.True(t, foundPolicy)
-		assert.True(t, createdNewPolicy)
-	})
-
-	t.Run("when the original admins policy exists and does not contain the admins team it returns true, true, nil", func(t *testing.T) {
-		serverMocks.AuthzMock.ListPoliciesFunc = func(
-			context.Context, *authz_req.ListPoliciesReq) (*authz_resp.ListPoliciesResp, error) {
-
-			return &authz_resp.ListPoliciesResp{
-				Policies: []*authz_resp.Policy{
-					{
-						Id:       authz_constants_v1.AdminPolicyID,
-						Subjects: []string{"some:other:subject"},
-					},
-				},
-			}, nil
-		}
-		serverMocks.AuthzMock.CreatePolicyFunc = createDefaultAdminPolicy
-
-		foundPolicy, createdNewPolicy, err := adminmgmt.UpdateV1AdminsPolicyIfNeeded(ctx, apiClient, false)
-		require.NoError(t, err)
-		assert.True(t, foundPolicy)
-		assert.True(t, createdNewPolicy)
-	})
-}
-
-func TestUpdateV2AdminsPolicyIfNeeded(t *testing.T) {
+func TestUpdateAdminsPolicyIfNeeded(t *testing.T) {
 	ctx := context.Background()
 	apiClient, serverMocks, err := mock.CreateMockConn(t)
 	require.NoError(t, err)
@@ -450,80 +333,71 @@ func TestUpdateV2AdminsPolicyIfNeeded(t *testing.T) {
 
 	t.Run("when ListPolicyMembers fails with an unexpected error then raise that error", func(t *testing.T) {
 		serverMocks.PoliciesMock.ListPolicyMembersFunc = func(
-			context.Context, *policies_req.ListPolicyMembersReq) (*policies_resp.ListPolicyMembersResp, error) {
+			context.Context, *iam_req.ListPolicyMembersReq) (*iam_resp.ListPolicyMembersResp, error) {
 			return nil, status.Error(codes.Internal, "unexpected error")
 		}
 
-		_, err := adminmgmt.UpdateV2AdminsPolicyIfNeeded(ctx, apiClient, false)
+		_, err := adminmgmt.UpdateAdminsPolicyIfNeeded(ctx, apiClient, false)
 		require.Error(t, err)
 	})
 
 	t.Run("when AddPolicyMembers fails with an unexpected error then raise that error", func(t *testing.T) {
 		serverMocks.PoliciesMock.AddPolicyMembersFunc = func(
-			context.Context, *policies_req.AddPolicyMembersReq) (*policies_resp.AddPolicyMembersResp, error) {
+			context.Context, *iam_req.AddPolicyMembersReq) (*iam_resp.AddPolicyMembersResp, error) {
 			return nil, status.Error(codes.Internal, "unexpected error")
 		}
 
-		_, err := adminmgmt.UpdateV2AdminsPolicyIfNeeded(ctx, apiClient, false)
+		_, err := adminmgmt.UpdateAdminsPolicyIfNeeded(ctx, apiClient, false)
 		require.Error(t, err)
 	})
 
 	t.Run("returns true (found) when ListPolicyMembers returns with admins team in Admin policy", func(t *testing.T) {
 		serverMocks.PoliciesMock.ListPolicyMembersFunc = func(
-			context.Context, *policies_req.ListPolicyMembersReq) (*policies_resp.ListPolicyMembersResp, error) {
-			return &policies_resp.ListPolicyMembersResp{
+			context.Context, *iam_req.ListPolicyMembersReq) (*iam_resp.ListPolicyMembersResp, error) {
+			return &iam_resp.ListPolicyMembersResp{
 				Members: []string{authz_constants.LocalAdminsTeamSubject},
 			}, nil
 		}
 
-		foundInPolicy, err := adminmgmt.UpdateV2AdminsPolicyIfNeeded(ctx, apiClient, false)
+		foundInPolicy, err := adminmgmt.UpdateAdminsPolicyIfNeeded(ctx, apiClient, false)
 		require.NoError(t, err)
 		assert.True(t, foundInPolicy)
 	})
 
 	t.Run("returns false (not found) when admins team must be added to Admin policy", func(t *testing.T) {
 		serverMocks.PoliciesMock.ListPolicyMembersFunc = func(
-			context.Context, *policies_req.ListPolicyMembersReq) (*policies_resp.ListPolicyMembersResp, error) {
-			return &policies_resp.ListPolicyMembersResp{
+			context.Context, *iam_req.ListPolicyMembersReq) (*iam_resp.ListPolicyMembersResp, error) {
+			return &iam_resp.ListPolicyMembersResp{
 				Members: []string{},
 			}, nil
 		}
 
 		serverMocks.PoliciesMock.AddPolicyMembersFunc = func(
-			context.Context, *policies_req.AddPolicyMembersReq) (*policies_resp.AddPolicyMembersResp, error) {
-			return &policies_resp.AddPolicyMembersResp{
+			context.Context, *iam_req.AddPolicyMembersReq) (*iam_resp.AddPolicyMembersResp, error) {
+			return &iam_resp.AddPolicyMembersResp{
 				Members: []string{authz_constants.LocalAdminsTeamSubject},
 			}, nil
 		}
 
-		foundInPolicy, err := adminmgmt.UpdateV2AdminsPolicyIfNeeded(ctx, apiClient, false)
+		foundInPolicy, err := adminmgmt.UpdateAdminsPolicyIfNeeded(ctx, apiClient, false)
 		require.NoError(t, err)
 		assert.False(t, foundInPolicy)
 	})
 }
 
-func getUserByUsernameError(c codes.Code) func(context.Context, *users_req.Username) (*users_resp.User, error) {
-	return func(context.Context, *users_req.Username) (*users_resp.User, error) {
+func getUserError(c codes.Code) func(context.Context, *iam_req.GetUserReq) (*iam_resp.GetUserResp, error) {
+	return func(context.Context, *iam_req.GetUserReq) (*iam_resp.GetUserResp, error) {
 		return nil, status.Error(c, "unexpected error")
 	}
 }
 
-func getTeamsError(c codes.Code) func(context.Context, *teams_req.GetTeamsReq) (*teams_resp.Teams, error) {
-	return func(context.Context, *teams_req.GetTeamsReq) (*teams_resp.Teams, error) {
+func listTeamsError(c codes.Code) func(context.Context, *iam_req.ListTeamsReq) (*iam_resp.ListTeamsResp, error) {
+	return func(context.Context, *iam_req.ListTeamsReq) (*iam_resp.ListTeamsResp, error) {
 		return nil, status.Error(c, "unexpected error")
 	}
 }
 
 func createTeamCallUnexpected(
-	context.Context, *teams_req.CreateTeamReq) (*teams_resp.CreateTeamResp, error) {
+	context.Context, *iam_req.CreateTeamReq) (*iam_resp.CreateTeamResp, error) {
 	return nil, errors.New("unexpected call")
-}
-
-func createDefaultAdminPolicy(_ context.Context, req *authz_req.CreatePolicyReq) (*authz_resp.CreatePolicyResp, error) {
-	if req.Action != "*" || req.Resource != "*" || len(req.Subjects) != 1 ||
-		req.Subjects[0] != authz_constants.LocalAdminsTeamSubject {
-		return nil, errors.New("unexpected arguments")
-	}
-	// We don't care about content of response, just that no error was returned.
-	return &authz_resp.CreatePolicyResp{}, nil
 }

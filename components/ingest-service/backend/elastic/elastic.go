@@ -204,12 +204,14 @@ func (es *Backend) upsertDataWithID(ctx context.Context,
 func (es *Backend) createBulkRequestUpsertDataWithID(
 	mapping mappings.Mapping,
 	ID string,
-	data interface{}) elastic.BulkableRequest {
+	data interface{}, upsertData interface{}) elastic.BulkableRequest {
 	return elastic.NewBulkUpdateRequest().
 		Index(mapping.Alias).
 		Type(mapping.Type).
 		Id(ID).
-		Doc(data).DocAsUpsert(true).RetryOnConflict(3)
+		Upsert(upsertData). // Data used when the node is first created
+		Doc(data).          // Data used to update the node
+		RetryOnConflict(3)
 }
 
 // This method will support adding a document with a specified ID

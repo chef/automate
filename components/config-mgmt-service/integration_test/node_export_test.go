@@ -14,7 +14,7 @@ import (
 	"github.com/buger/jsonparser"
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
 	api "github.com/chef/automate/api/interservice/cfgmgmt/service"
-	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
+	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/backend/elastic"
 	"github.com/chef/automate/components/config-mgmt-service/config"

@@ -1,43 +1,23 @@
 +++
-title = "IAM v2 Users Guide"
-description = "IAM v2 Users Guide"
+title = "IAM Users Guide"
+description = "IAM Users Guide"
 draft = false
 bref = ""
 toc = true
 [menu]
   [menu.docs]
     parent = "authorization"
-    weight = 40
+    weight = 20
 +++
 
-This guide shows you how to upgrade Chef Automate to IAM v2, perform important administrative operations, and revert back to IAM v1.
-After upgrading to IAM v2, you will add members to Chef-managed v2 policies, delete a legacy policy, and write a Team Admin v2 policy that lets a Team Admin manage their users and teams.
-
-## Upgrade to IAM v2
-
-{{< info >}}
-To get the best possible IAM v2 experience, Chef Automate should be running the latest version before upgrading to IAM v2.
-{{< /info >}}
-
-Perform the upgrade to IAM v2 with `chef-automate iam upgrade-to-v2`. The response from your terminal should look something like:
-
-```terminal
-Upgrading to IAM v2.1
-Migrating v1 policies...
-Creating default teams Editors and Viewers...
-
-Migrating existing teams...
-
-Success: Enabled IAM v2.1
-```
-
-To upgrade without porting existing policies, use the command: `chef-automate iam upgrade-to-v2 --skip-policy-migration`.
+This guide shows you how to perform important administrative operations.
+You will add members to Chef-managed v2 policies, delete a legacy policy, and write a Team Admin v2 policy that lets a Team Admin manage their users and teams.
 
 ## View Policies
 
 After you have signed in to Chef Automate, select the **Settings** tab in the top navigation bar, and then select and locate the `Policies` section in the left navigation.
 
-In this section, you can view all of your v2 policies. If you have upgraded without using the `--skip-policy-migration` flag, you will also see v1 policies.
+In this section, you can view all of your v2 policies.
 
 This policy display includes the following:
 
@@ -49,20 +29,12 @@ This policy display includes the following:
 
 ## Policy Conversion
 
-After upgrading, we recommend that you reconstitute your v1 policies as v2 policies.
-Once this policy conversion is done, delete the old legacy v1 policies and you will have an up-to-date system.
+If you started on IAM v1 and migrated your IAM v1 policies to IAM v2, then you should move any members of your IAM v1 legacy policies to the appropriate IAM v2 policies, and afterwards, delete the IAM v1 legacy policies.
 
-To delete a legacy policy, open the menu on any custom policy, which is located at the end of the policy row, and select **Delete Policy** from the menu. You will not have this option for Chef-managed policies.
+To delete a legacy policy, open the menu on any custom policy, which is located at the end of the policy row, and select **Delete Policy** from the menu.
 
 A warning appears if members are still attached to the policy because deleting that policy disrupts access for all of its members.
 However, you will still be able to delete the policy.
-
-In the rare situation that you include the command `--skip-policy-migration` when upgrading, no existing v1 policies will be migrated.
-You will still need to create new v2 policies to preserve any IAM behavior from v1.
-
-{{% warning %}}
-Note: Several legacy policies, including *Compliance Profile Access* and *Ingest Access*, have API tokens that will stop working if not ported.
-{{% /warning %}}
 
 The next few sections explain how to use Chef-managed policies and how to create custom policies.
 
@@ -139,7 +111,7 @@ The statement allows us to specify the `actions` a user is permitted to take upo
 The `projects` field on a statement is an array that may contain more than one existing project, a wildcard `*` to indicate permission to resources in _any project_, or `(unassigned)` to indicate permission to resources that have not been assigned to a project.
 
 Note that the `projects` property in statements designates permission for the resources within the statement (here, that is `iam:users` and `iam:teams`), _not_ for the policy itself, and _cannot_ be left empty.
-For more about projects, please see [Projects]({{< relref "iam-v2-guide.md#projects" >}}) or [Projects Property]({{< relref "iam-v2-api-reference#projects-property" >}}) documentation.
+For more about projects, see [Projects in the IAM Guide]({{< relref "iam-v2-guide.md#projects" >}} documentation.
 
 In this case, we only need a single statement providing access to the _get_, _list_, and _update_ actions for _users_ and _teams_ that have been assigned to the project `project-devops`.
 
@@ -186,7 +158,7 @@ In this case, we only need a single statement providing access to the _get_, _li
 }
 ```
 
-Save your JSON file and follow the steps in [Creating a Policy]({{< relref "iam-v2-api-reference.md#creating-a-policy" >}}) to send that policy data to Chef Automate.
+Save your JSON file and refer to the [IAM Policies API reference](https://automate.chef.io/docs/api/#tag/Policies) to send that policy data to Chef Automate.
 
 ### Policy Membership
 
@@ -291,7 +263,7 @@ If you would like to delegate ownership of a project to another user so that the
 While Automate's local teams and tokens can be directly assigned to a project, ingested resources must be assigned to projects using ingest rules.
 
 Project ingest rules are used to associate ingested resources with projects within Automate. An ingest rule contains conditions that determine if an ingested resource should be moved into the rule's project.
-Each condition contains an attribute, operator, and value. See [Project Rules]({{< relref "iam-v2-api-reference.md#project-rules" >}}) for details on how to manage project rules.
+Each condition contains an attribute, operator, and value. See [IAM Project Rules API reference](https://automate.chef.io/docs/api/#tag/Project_rules) for details on how to manage project rules.
 
 In this example, after [creating a project]({{< relref "iam-v2-guide.md#creating-a-project" >}}) with the ID `project-devops`, you will add an ingest rule to this new project.
 You will update projects to apply this new project rule, causing all matching ingested resources to be associated with `project-devops`.
@@ -388,7 +360,7 @@ Setting the project rule `Resource Type` determines what condition attributes ar
 
 Rules of type `Node` can have conditions with attributes `Chef Organization`, `Chef Server`, `Environment`, `Chef Role`, `Chef Tag`, `Chef Policy Name`, `Chef Policy Group`.
 
-Select the `Update Projects` button from the bottom banner. 
+Select the `Update Projects` button from the bottom banner.
 Upon completion of the update, you should be able to filter by `project-devops` across Automate's dashboards and see only the ingested data that you expect.
 
 #### Effortless Infra Project
@@ -397,9 +369,9 @@ To create a project that contains all Effortless Infra nodes, create a ingest ru
 
 ![](/images/docs/effortless-project-rule.png)
 
-The above rule matches on a node's Chef Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Server` attribute as `localhost`. 
+The above rule matches on a node's Chef Server field, which is set to `localhost`. This rule works because all Effortless Infra nodes list the `Chef Server` attribute as `localhost`.
 
-If desired, create subgroups of Effortless Infra nodes by adding a second condition that matches a specific `Chef Policy Name`. 
+If desired, create subgroups of Effortless Infra nodes by adding a second condition that matches a specific `Chef Policy Name`.
 
 #### Project Policies
 
@@ -425,24 +397,14 @@ See [Policy Membership]({{< relref "iam-v2-guide.md#policy-membership" >}}) for 
 While we have safeguards to prevent it, it is possible to lock yourself out of Chef Automate.
 If you have root access to the node where Chef Automate is installed, use the following commands to restore admin access:
 
-This command, which is also available on IAM v1, resets the local `admin` user's password and ensures that user is a member of the local `admins` team, which is a permanent member of the Chef-managed `Administrator` policy.
+This command resets the local `admin` user's password and ensures that the user is a member of the local `admins` team, which is a permanent member of the Chef-managed `Administrator` policy.
 
 ```bash
   chef-automate iam admin-access restore <your new password here>
 ```
 
-Generate a new token and add that token as a new member of the Chef-managed `Administrator` policy. This command is the equivalent of the v1 command `chef-automate admin-token`.
+Generate a new token and add that token as a new member of the Chef-managed `Administrator` policy.
 
 ```bash
   chef-automate iam token create <your token name here> --admin
-```
-
-## Reverting to IAM v1
-
-Reverting to IAM v1 discards your IAM v2 policies, roles, and projects, and re-configures Chef Automate to use your v1 policies again.
-
-To revert back to IAM v1, use:
-
-```console
-$ chef-automate iam reset-to-v1
 ```

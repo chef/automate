@@ -3,6 +3,13 @@
 # who possess the key for a certificate part of the a2 deployment
 # can use the certificate to authenticate either through the
 # automate-load-balancer or automate-gateway
+
+# (YZL, 2.28.2020) Since we have turned off client certificate auth at the load balancer,
+# sending a request with a client cert to the load balancer results in a request with an
+# empty X-Client-Cert header being made to the gateway via nginx. The empty header causes
+# the gateway to expect token auth. If no token has been specified, as in these tests, the
+# gateway returns a 401.
+
 cert_auth_tests() {
     log_info "Starting the Certificate Authentication test suite"
     hab pkg install core/curl
@@ -26,14 +33,23 @@ hab_curl() {
 
 grant_permissions() {
     local token
-    token="$(chef-automate admin-token)"
-    hab_curl --insecure -H "api-token: $token" https://localhost/api/v0/auth/policies --data @<(cat <<EOF
+    token="$(date +%s | xargs -I % chef-automate iam token create admin-token-% --admin)"
+
+    hab_curl --insecure -H "api-token: $token" https://localhost/apis/iam/v2/policies --data @<(cat <<EOF
     {
-        "subjects": [
+        "id": "cert_auth_test_policy",
+        "name": "cert_auth_test_policy",
+        "members": [
             "tls:service:$(authorized_service_name):*"
         ],
-        "resource": "ingest:status",
-        "action": "read"
+        "statements": [
+            {
+                "effect": "ALLOW",
+                "actions": [ "ingest:*" ],
+
+                "projects": [ "*" ]
+            }
+        ]
     }
 EOF
 )
@@ -57,10 +73,10 @@ EOF
 invalid_cert_test_load_balancer() {
     local result
     result=$(hab_curl -sS --insecure --cert "$(invalid_cert_path)" --key "$(invalid_key_path)" "https://localhost/data-collector/v0")
-    if ! echo "$result" | grep -q "SSL certificate error"; then
+    if ! echo "$result" | grep -q "request not authenticated"; then
         cat <<EOF
         ...Failed
-        Expected response to contain "SSL certificate error"
+        Expected response to contain "request not authenticated"
 
         Got:
         ${result}
@@ -101,20 +117,22 @@ test_authorized_cert() {
     accepted
 EOF
 
-    authorized_cert_test "https://localhost/data-collector/v0"
-    authorized_cert_test "https://localhost:2000/events/data-collector"
+    authorized_cert_test "https://localhost/data-collector/v0" "401"
+    authorized_cert_test "https://localhost:2000/events/data-collector" "200"
 }
 
 authorized_cert_test() {
     local endpoint="$1"
     echo "...Checking ${endpoint}"
 
+    local expected_result="$2"
+
     local result
     result=$(hab_curl -o /dev/null -w "%{http_code}" -sS --insecure --cert "$(authorized_cert_path)" --key "$(authorized_key_path)" "${endpoint}" )
-    if [ "$result" != "200" ]; then
+    if [ "$result" != "$expected_result" ]; then
         cat <<EOF
         ...Failed
-        Expected http code 200
+        Expected http code $expected_result
 
         Got:
         ${result}
@@ -169,23 +187,25 @@ test_authorized_cert_in_header_authenticated() {
     scenario, we will authenticate with a valid cert, and pass a cert that
     is authorized to hit the endpoint. The authenticated cert is not authorized
 EOF
-    authorized_cert_in_header_authenticated_test "https://localhost/data-collector/v0"
-    authorized_cert_in_header_authenticated_test "https://localhost:2000/events/data-collector"
+    authorized_cert_in_header_authenticated_test "https://localhost/data-collector/v0" "401"
+    authorized_cert_in_header_authenticated_test "https://localhost:2000/events/data-collector" "403"
 }
 
 authorized_cert_in_header_authenticated_test() {
     local endpoint="$1"
     echo "...Checking ${endpoint}"
 
+    local expected_result="$2"
+
     local result
     result=$(hab_curl -o /dev/null -w "%{http_code}" -sS --insecure \
         --cert "$(authenticated_cert_path)" --key "$(authenticated_key_path)" \
         -H "X-Client-Cert: $(urlencode "$(cat "$(authorized_cert_path)")")"  \
         "${endpoint}" )
-    if [ "$result" != "403" ]; then
+    if [ "$result" != "$2" ]; then
         cat <<EOF
         ...Failed
-        Expected http code 403
+        Expected http code $expected_result
 
         Got:
         ${result}

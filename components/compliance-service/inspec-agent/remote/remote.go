@@ -13,7 +13,6 @@ import (
 	"github.com/sirupsen/logrus"
 
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/authz"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/inspec-agent/types"
 	"github.com/chef/automate/components/nodemanager-service/managers"
@@ -21,7 +20,6 @@ import (
 
 type RemoteJob struct {
 	TokensMgmtClient authn.TokensMgmtClient
-	AuthzClient      authz.AuthorizationClient
 	AutomateFQDN     string
 }
 

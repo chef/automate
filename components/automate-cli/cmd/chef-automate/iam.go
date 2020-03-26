@@ -8,18 +8,16 @@ import (
 
 	"github.com/golang/protobuf/ptypes/wrappers"
 	"github.com/spf13/cobra"
-	"google.golang.org/grpc/codes"
-	grpc_status "google.golang.org/grpc/status"
 
-	authz_constants "github.com/chef/automate/components/authz-service/constants"
-	v2_constants "github.com/chef/automate/components/authz-service/constants/v2"
+	v2_constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/automate-cli/pkg/adminmgmt"
-	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/client/apiclient"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	iam_common "github.com/chef/automate/components/automate-gateway/api/iam/v2/common"
 	iam_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 )
+
+const adminsID = "admins"
 
 var iamCmdFlags = struct {
 	dryRun            bool
@@ -87,43 +85,6 @@ func newIAMRestoreDefaultAdminAccessCmd() *cobra.Command {
 	return cmd
 }
 
-func newIAMUpgradeToV2Cmd() *cobra.Command {
-	cmd := &cobra.Command{
-		Use:   "upgrade-to-v2",
-		Short: "Upgrade to IAM v2",
-		Long: "Upgrade to IAM v2 and migrate existing v1 policies. " +
-			"On downgrade, any new v2 policies will be reverted.",
-		RunE: runIAMUpgradeToV2Cmd,
-		Args: cobra.ExactArgs(0),
-	}
-	cmd.PersistentFlags().BoolVar(
-		&iamCmdFlags.skipLegacyUpgrade,
-		"skip-policy-migration",
-		false,
-		"Do not migrate policies from IAM v1.")
-
-	// this flag is deprecated and does nothing but we don't wanna error on it
-	cmd.PersistentFlags().BoolVar(
-		&iamCmdFlags.betaVersion,
-		"beta2.1",
-		false,
-		"Upgrade to version 2.1 with beta project authorization.")
-	_ = cmd.PersistentFlags().MarkHidden("beta2.1")
-
-	return cmd
-}
-
-func newIAMResetToV1Cmd() *cobra.Command {
-	return &cobra.Command{
-		Use:   "reset-to-v1",
-		Short: "Reset to IAM v1",
-		Long: "Reset to IAM v1. This will revert to policies in place before upgrade to IAM v2 " +
-			"and will remove any v2 policies in place, even if upgrade is re-applied.",
-		RunE: runIAMResetToV1Cmd,
-		Args: cobra.ExactArgs(0),
-	}
-}
-
 func newIAMVersionCmd() *cobra.Command {
 	return &cobra.Command{
 		Use:   "version",
@@ -135,8 +96,6 @@ func newIAMVersionCmd() *cobra.Command {
 
 func init() {
 	iamCommand := newIAMCommand()
-	iamCommand.AddCommand(newIAMUpgradeToV2Cmd())
-	iamCommand.AddCommand(newIAMResetToV1Cmd())
 	iamCommand.AddCommand(newIAMVersionCmd())
 
 	iamAdminAccessCommand := newIAMAdminAccessCommand()
@@ -149,11 +108,6 @@ func init() {
 
 	RootCmd.AddCommand(iamCommand)
 }
-
-// Note: the indentation is to keep this in line with writer.Body()
-const alreadyMigratedMessage = "You are already on IAM version %s."
-
-const failedToResetDomainMessage = "PLEASE RUN THIS COMMAND AGAIN: There was an unexpected error resetting the projects for %s"
 
 type vsn struct {
 	Major iam_common.Version_VersionNumber
@@ -171,127 +125,6 @@ func display(v *iam_common.Version) string {
 	default:
 		return "v1.0"
 	}
-}
-
-func runIAMUpgradeToV2Cmd(cmd *cobra.Command, args []string) error {
-	upgradeReq := &iam_req.UpgradeToV2Req{
-		Flag:           iam_common.Flag_VERSION_2_1,
-		SkipV1Policies: iamCmdFlags.skipLegacyUpgrade,
-	}
-
-	writer.Title("Upgrading to IAM v2.1")
-
-	if !iamCmdFlags.skipLegacyUpgrade {
-		writer.Println("Migrating v1 policies...")
-	}
-
-	ctx := context.Background()
-	apiClient, err := apiclient.OpenConnection(ctx)
-	if err != nil {
-		return err
-	}
-
-	resp, err := apiClient.PoliciesClient().UpgradeToV2(ctx, upgradeReq)
-	switch grpc_status.Convert(err).Code() {
-	case codes.OK:
-		if len(resp.GetReports()) > 0 {
-			writer.Println("\nSkipped policies:")
-		}
-		for i, report := range resp.GetReports() {
-			if i > 0 {
-				writer.Print("\n")
-			}
-			outputReport(report)
-		}
-	case codes.FailedPrecondition:
-		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
-			"Migration to IAM v2.1 already in progress")
-	case codes.AlreadyExists:
-		writer.Failf(alreadyMigratedMessage, "v2.1")
-		return nil
-	default: // something else: fail
-		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
-			"Failed to reset IAM v2.1 database state")
-	}
-
-	writer.Println("Creating default teams Editors and Viewers...")
-	for id, description := range map[string]string{
-		"editors": "Editors",
-		"viewers": "Viewers",
-	} {
-		_, found, err := adminmgmt.EnsureTeam(ctx, id, description, apiClient, false /* no dryrun here */)
-		if err != nil {
-			return err
-		}
-		if found {
-			writer.Skippedf("%s team already exists", description)
-		}
-	}
-	writer.Print("\n")
-
-	writer.Print("Migrating existing teams...\n\n")
-	_, err = apiClient.TeamsV2Client().ApplyV2DataMigrations(ctx,
-		&iam_req.ApplyV2DataMigrationsReq{})
-	if err != nil {
-		return status.Wrap(err, status.IAMUpgradeV2DatabaseError,
-			"Failed to migrate teams service")
-	}
-
-	writer.Success("Enabled IAM v2.1")
-	return nil
-}
-
-func outputReport(report string) {
-	// if it's got ":" in it, split on the first
-	parts := strings.SplitN(report, ":", 2)
-	writer.Body(parts[0])
-	if len(parts) >= 2 {
-		writer.Body(strings.TrimSpace(parts[1]))
-	}
-}
-
-func runIAMResetToV1Cmd(cmd *cobra.Command, args []string) error {
-	writer.Title("Resetting to IAM v1.0 (with pre-upgrade v1 policies)...")
-	ctx := context.Background()
-	apiClient, err := apiclient.OpenConnection(ctx)
-	if err != nil {
-		return status.Wrap(err, status.APIUnreachableError,
-			"Failed to create a connection to the API")
-	}
-
-	_, err = apiClient.PoliciesClient().ResetToV1(ctx, &iam_req.ResetToV1Req{})
-	switch grpc_status.Convert(err).Code() {
-	case codes.OK:
-		return resetDomainsToV1(ctx, apiClient)
-	case codes.FailedPrecondition:
-		return status.Wrap(err, status.IAMResetV1DatabaseError,
-			"Migration to IAMv2 in progress")
-	case codes.AlreadyExists:
-		// Reset domain projects to be idempotent on crash of initial attempt
-		err := resetDomainsToV1(ctx, apiClient)
-		if err == nil {
-			writer.Failf(alreadyMigratedMessage, "v1.0")
-		}
-		return err
-	default: // something else: fail
-		return status.Wrap(err, status.IAMResetV1DatabaseError,
-			"Failed to reset IAM state to v1")
-	}
-}
-
-func resetDomainsToV1(ctx context.Context, apiClient client_type.APIClient) error {
-	_, err := apiClient.TeamsV2Client().ResetAllTeamProjects(ctx, &iam_req.ResetAllTeamProjectsReq{})
-	if err != nil {
-		writer.Failf(failedToResetDomainMessage, "teams")
-		return err
-	}
-
-	_, err = apiClient.TokensV2Client().ResetAllTokenProjects(ctx, &iam_req.ResetAllTokenProjectsReq{})
-	if err != nil {
-		writer.Failf(failedToResetDomainMessage, "tokens")
-		return err
-	}
-	return nil
 }
 
 func runIAMVersionCmd(cmd *cobra.Command, args []string) error {
@@ -325,7 +158,7 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 	}
 
 	// restore admin user and team if needed
-	userID, adminUserFound, err := adminmgmt.CreateAdminUserOrUpdatePassword(ctx,
+	membershipID, adminUserFound, err := adminmgmt.CreateAdminUserOrUpdatePassword(ctx,
 		apiClient, newAdminPassword, iamCmdFlags.dryRun)
 	if err != nil {
 		return err
@@ -337,8 +170,7 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 		writer.Success("Created new admin user with specified password")
 	}
 
-	adminsTeamID, adminsTeamFound, err := adminmgmt.CreateAdminTeamIfMissing(ctx,
-		apiClient, iamCmdFlags.dryRun)
+	adminsTeamFound, err := adminmgmt.CreateAdminTeamIfMissing(ctx, apiClient, iamCmdFlags.dryRun)
 	if err != nil {
 		return err
 	}
@@ -351,11 +183,11 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 
 	// In dry-run mode, we might be missing some IDs that would have been created.
 	// We'll only hit this condition in dry-run mode.
-	if iamCmdFlags.dryRun && (userID == "" || adminsTeamID == "") {
+	if iamCmdFlags.dryRun && (membershipID == "" || !adminsTeamFound) {
 		writer.Success("Added admin user to admins team")
 	} else { // non-dry-run mode or dry-run mode where user and team already existed.
 		userAdded, err := adminmgmt.AddAdminUserToTeam(ctx,
-			apiClient, adminsTeamID, userID, iamCmdFlags.dryRun)
+			apiClient, adminsID, membershipID, iamCmdFlags.dryRun)
 		if err != nil {
 			return err
 		}
@@ -367,51 +199,17 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 		}
 	}
 
-	// grant access to admins team if needed
-	resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &iam_req.GetPolicyVersionReq{})
+	foundAdminsTeaminV2AdminPolicy, err := adminmgmt.UpdateAdminsPolicyIfNeeded(ctx,
+		apiClient, iamCmdFlags.dryRun)
 	if err != nil {
-		return status.Wrap(err, status.APIError, "Failed to verify IAM version")
+		return err
 	}
 
-	writer.Titlef("Checking IAM %s policies for admin policy with admins team.\n", display(resp.Version))
-
-	switch resp.Version.Major {
-	case iam_common.Version_V1:
-		foundV1AdminPolicy, createdNewV1Policy, err := adminmgmt.UpdateV1AdminsPolicyIfNeeded(ctx,
-			apiClient, iamCmdFlags.dryRun)
-		if err != nil {
-			return err
-		}
-
-		if foundV1AdminPolicy {
-			writer.Skipped("Found admin policy that contains the admins team")
-		} else {
-			// Note: (tc) This should never happen currently since we currently don't support
-			// editing policies but adding for future-proofing against the functionality.
-			// Note: (sr) PurgeSubjectFromPolicies can alter policies -- when a user or a
-			// team is removed; so, this could be more realistic than we think.
-			writer.Successf("Found default admins team policy but it did not contain "+
-				"the admins team subject (%s). Added admins team to default admin policy.",
-				authz_constants.LocalAdminsTeamSubject)
-		}
-		if createdNewV1Policy {
-			writer.Success("Created new admins policy")
-		}
-	case iam_common.Version_V2:
-		foundAdminsTeaminV2AdminPolicy, err := adminmgmt.UpdateV2AdminsPolicyIfNeeded(ctx,
-			apiClient, iamCmdFlags.dryRun)
-		if err != nil {
-			return err
-		}
-
-		if !foundAdminsTeaminV2AdminPolicy {
-			writer.Success("Added local team: admins to Chef-managed policy: Admin")
-		}
-
-		writer.Skipped("Found local team: admins in Chef-managed policy: Admin")
-	default:
-		// do nothing
+	if !foundAdminsTeaminV2AdminPolicy {
+		writer.Success("Added local 'admins' team to Chef-managed 'Administrator' policy")
 	}
+
+	writer.Skipped("Found local 'admins' team in Chef-managed 'Administrator' policy")
 
 	if err := apiClient.CloseConnection(); err != nil {
 		return status.Wrap(err, status.APIUnreachableError, "Failed to close connection to the API")
@@ -419,9 +217,6 @@ func runRestoreDefaultAdminAccessAdminCmd(cmd *cobra.Command, args []string) err
 
 	return nil
 }
-
-const adminTokenIAMPreconditionError = "`chef-automate iam token create NAME --admin` is an IAM v2 command.\n" +
-	"For v1 use `chef-automate admin-token`.\n"
 
 func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
 	name := args[0]
@@ -442,7 +237,7 @@ func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
 		id = iamCmdFlags.tokenID
 	}
 
-	tokenResp, err := apiClient.TokensV2Client().CreateToken(ctx, &iam_req.CreateTokenReq{
+	tokenResp, err := apiClient.TokensClient().CreateToken(ctx, &iam_req.CreateTokenReq{
 		Id:     id,
 		Name:   name,
 		Active: &wrappers.BoolValue{Value: true},
@@ -454,14 +249,6 @@ func runCreateTokenCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	if iamCmdFlags.adminToken {
-		resp, err := apiClient.PoliciesClient().GetPolicyVersion(ctx, &iam_req.GetPolicyVersionReq{})
-		if err != nil {
-			return status.Wrap(err, status.APIError, "Failed to retrieve IAM version")
-		}
-		if resp.Version.Major == iam_common.Version_V1 {
-			return status.New(status.APIError, adminTokenIAMPreconditionError)
-		}
-
 		member := fmt.Sprintf("token:%s", tokenResp.Token.Id)
 		_, err = apiClient.PoliciesClient().AddPolicyMembers(ctx, &iam_req.AddPolicyMembersReq{
 			Id:      v2_constants.AdminPolicyID,

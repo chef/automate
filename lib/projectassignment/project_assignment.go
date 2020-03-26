@@ -8,7 +8,7 @@ import (
 
 const UnassignedProjectID = "(unassigned)"
 
-func AuthorizeProjectAssignment(ctx context.Context, authorizer engine.V2Authorizer,
+func AuthorizeProjectAssignment(ctx context.Context, authorizer engine.Authorizer,
 	subjects, oldProjects, newProjects []string, isUpdateRequest bool) error {
 
 	if len(oldProjects) != 0 && !isUpdateRequest {
@@ -19,7 +19,7 @@ func AuthorizeProjectAssignment(ctx context.Context, authorizer engine.V2Authori
 		return nil
 	}
 
-	engineResp, err := authorizer.V2ProjectsAuthorized(ctx,
+	engineResp, err := authorizer.ProjectsAuthorized(ctx,
 		engine.Subjects(subjects),
 		engine.Action("iam:projects:assign"),
 		engine.Resource("*"),

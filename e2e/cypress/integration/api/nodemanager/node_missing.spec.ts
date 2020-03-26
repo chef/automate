@@ -1,7 +1,6 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { uuidv4 } from '../../../support/helpers';
 
-describeIfIAMV2p1('Nodemanager node missing', () => {
+describe('Nodemanager node missing', () => {
 
   describe('Normal ingest marking node missing', () => {
     const cypressPrefix = 'test-nodemanager-node-missing-normal';

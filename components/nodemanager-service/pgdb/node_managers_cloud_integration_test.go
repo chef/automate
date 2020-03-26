@@ -211,7 +211,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodeToDBAddsANodeWithCor
 		suite.FailNow(err.Error())
 	}
 
-	nodeIds, err := suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "account alias")
+	nodeIds, err := suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "account alias", "us-east-1")
 	if err != nil {
 		suite.FailNow(err.Error())
 	}
@@ -587,7 +587,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodeToDBResetsManagerFie
 		suite.FailNow(err.Error())
 	}
 
-	nodeIds, err := suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "account alias")
+	nodeIds, err := suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "account alias", "us-west-1")
 	if err != nil {
 		suite.FailNow(err.Error())
 	}
@@ -615,7 +615,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodeToDBResetsManagerFie
 		suite.FailNow(err.Error())
 	}
 
-	nodeIds, err = suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "account alias")
+	nodeIds, err = suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "account alias", "us-east-2")
 	if err != nil {
 		suite.FailNow(err.Error())
 	}
@@ -636,7 +636,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodeToDBName() {
 		suite.FailNow(err.Error())
 	}
 
-	nodeIds, err := suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "")
+	nodeIds, err := suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "", "us-east-1")
 	if err != nil {
 		suite.FailNow(err.Error())
 	}
@@ -649,7 +649,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodeToDBName() {
 
 	suite.Equal("aws-account-242403433", n.Name)
 
-	nodeIds, err = suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "a cool alias")
+	nodeIds, err = suite.Database.AddManagerNodeToDB(mgrId, "242403433", secretId, "a cool alias", "us-west-2")
 	if err != nil {
 		suite.FailNow(err.Error())
 	}
@@ -661,6 +661,7 @@ func (suite *NodeManagersAndNodesDBSuite) TestAddManagerNodeToDBName() {
 	}
 
 	suite.Equal("aws-account-a cool alias", n.Name)
+	suite.Equal("us-west-2", n.TargetConfig.Region)
 
 }
 func (suite *NodeManagersAndNodesDBSuite) TestRemoveStaleNodeAssociationsUpdatesOrphanNodes() {

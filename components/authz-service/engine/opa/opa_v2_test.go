@@ -5,16 +5,19 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"strings"
 	"testing"
 	"time"
 
+	"github.com/chef/automate/components/authz-service/engine/opa"
 	"github.com/mitchellh/mapstructure"
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/open-policy-agent/opa/storage/inmem"
 	"github.com/open-policy-agent/opa/topdown"
+	"github.com/pmezard/go-difflib/difflib"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -34,6 +37,40 @@ import (
 // interface -- like what's happening in engine/conformance. For now, however,
 // the gap between the GRPC API and the OPA engine hasn't been closed, so we'll
 // have some tests here, closely aligned with the Rego code.
+
+// This checks that the policy/*.rego files match their compiled-in versions
+// so we don't accidentally forget updating the bindata file.
+// (All rego files are compiled into the single policy.bindata.go file.)
+// This also allows us to use the file in tests.
+// Test cycles are hence faster, since they don't
+// require you to call `go generate ./...` or a Makefile target.
+func TestCompiledInOPAPolicy(t *testing.T) {
+	// authz_v2.rego, common.rego, introspection_v2.rego
+	an := opa.AssetNames()
+	assert.Equal(t, 3, len(an), "expecting 3 assets")
+
+	for _, asset := range opa.AssetNames() {
+		compiled := opa.MustAsset(asset)
+
+		onDisk, err := ioutil.ReadFile(asset)
+		require.NoErrorf(t, err, "read asset %v from disk", asset)
+
+		diff := difflib.UnifiedDiff{
+			A:        difflib.SplitLines(string(onDisk)),
+			B:        difflib.SplitLines(string(compiled)),
+			FromFile: asset,
+			FromDate: "on disk",
+			ToFile:   asset,
+			ToDate:   "generated",
+			Context:  3,
+		}
+		text, err := difflib.GetUnifiedDiffString(diff)
+		require.NoError(t, err, "error generating diff")
+		if text != "" {
+			t.Error("expected no difference, got diff:\n" + text)
+		}
+	}
+}
 
 func TestAuthorizedWithStatements(t *testing.T) {
 
@@ -398,7 +435,75 @@ func TestActionsMatching(t *testing.T) {
 	}
 }
 
-// TestHasAction is focussing on finding the matching action in a policy (with
+func TestSubjectsMatching(t *testing.T) {
+	// This test, which checks a function's outputs given certain inputs,
+	// does not depend on the OPA input or OPA data -- since the function
+	// doesn't.
+	input := map[string]interface{}{}
+	data := "{}"
+
+	// we're testing subjets_matches(in, stored)
+	in := "user:local:someid" // "in" argument
+
+	// expectedSuccess => "stored" argument
+	classes := map[bool][]string{
+		true: {
+			"user:local:someid",
+			"user:local:*",
+			"user:*",
+			"*",
+		},
+		false: {
+			"user:*:someid",
+			"*:someid",
+			"user:local:wrongid",
+			"user:ldap:*",
+			"user:local:SOMEID",
+			"user:local:someid ",
+			" user:local:someid",
+			"USER:SOMEID",
+			"user:local:someotherid",
+			"user:local:some*",
+			"user:l*",
+			"use*",
+			"team:local:some*",
+			"team:l*",
+			"tea*",
+			"team:*",
+			"team:local:*",
+			"team:local:someid",
+			"token:*",
+			"tok*",
+			"token:someid",
+			"token:some*",
+			"*:*",
+			"*:*:*",
+		},
+	}
+
+	for expectedSuccess, actions := range classes {
+		t.Run(fmt.Sprintf("%v", expectedSuccess), func(t *testing.T) {
+			for _, stored := range actions {
+				t.Run(stored, func(t *testing.T) {
+
+					query := fmt.Sprintf("data.common.subject_matches(%q, %q)", in, stored)
+					rs := resultSetV2(t, input, strings.NewReader(data), query)
+					if expectedSuccess {
+						require.Equal(t, 1, len(rs))
+						require.Equal(t, 1, len(rs[0].Expressions), "expected one result expression")
+						result, ok := rs[0].Expressions[0].Value.(bool)
+						require.True(t, ok, "expected result expression value to be boolean")
+						assert.True(t, result)
+					} else {
+						require.Equal(t, 0, len(rs), "no result expected")
+					}
+				})
+			}
+		})
+	}
+}
+
+// TestHasAction is focusing on finding the matching action in a policy (with
 // one or more statements)
 
 // Note: the policy evaluation logic this tests is the same used by
@@ -543,4 +648,24 @@ func compilerV2(t *testing.T) *ast.Compiler {
 		"introspection_v2.rego": "../opa/policy/introspection_v2.rego",
 		"common.rego":           "../opa/policy/common.rego",
 	})
+}
+
+func compilerWithModules(t *testing.T, modules map[string]string) *ast.Compiler {
+	t.Helper()
+	compiler := ast.NewCompiler()
+	parsedModules := map[string]*ast.Module{}
+
+	for name, path := range modules {
+		moduleData, err := ioutil.ReadFile(path)
+		require.NoErrorf(t, err, "could not read module %q", name)
+		parsed, err := ast.ParseModule(name, string(moduleData))
+		require.NoErrorf(t, err, "could not parse module %q", name)
+
+		parsedModules[name] = parsed
+	}
+
+	compiler.Compile(parsedModules)
+	require.Falsef(t, compiler.Failed(), "compile policies: %s", compiler.Errors)
+
+	return compiler
 }

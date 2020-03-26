@@ -24,7 +24,6 @@ import (
 	"github.com/chef/automate/components/teams-service/constants"
 	"github.com/chef/automate/components/teams-service/service"
 	"github.com/chef/automate/components/teams-service/storage"
-	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	"github.com/chef/automate/components/teams-service/test"
 )
@@ -40,23 +39,18 @@ func TestTeamsGRPC(t *testing.T) {
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
-	dataMigrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../../storage/postgres/datamigration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg data config for tests: %s", err.Error())
-	}
-
 	if migrationConfig == nil {
-		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil, nil)
+		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil)
 		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
 	} else {
 		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx,
-			t, l, migrationConfig, (*datamigration.Config)(dataMigrationConfig))
+			t, l, migrationConfig)
 		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
 
 		// If ciMode, run in-memory AND PG
 		// else just run PG.
 		if os.Getenv("CI") == "true, *authz.SubjectPurgeServerMock" {
-			serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil, nil)
+			serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil)
 			runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
 		}
 	}
@@ -1790,11 +1784,9 @@ func cleanupTeamV2(t *testing.T, cl teams.TeamsV2Client, teamName string) {
 }
 
 // Pass nil for migrationConfig if you want in-memory server.
-func setupTeamsService(ctx context.Context,
-	t *testing.T,
-	l logger.Logger,
-	migrationConfig *migration.Config,
-	dataMigrationConfig *datamigration.Config) (*Server, *service.Service, *grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
+func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
+	migrationConfig *migration.Config) (*Server, *service.Service,
+	*grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
 
 	t.Helper()
 
@@ -1830,7 +1822,7 @@ func setupTeamsService(ctx context.Context,
 		serviceRef, err = service.NewInMemoryService(l, connFactory, authzClient)
 	} else {
 		serviceRef, err = service.NewPostgresService(l, connFactory,
-			*migrationConfig, *dataMigrationConfig, authzClient, authzV2PoliciesClient, authzV2AuthorizationClient)
+			*migrationConfig, authzClient, authzV2PoliciesClient, authzV2AuthorizationClient)
 	}
 	if err != nil {
 		t.Fatalf("could not create server: %s", err)

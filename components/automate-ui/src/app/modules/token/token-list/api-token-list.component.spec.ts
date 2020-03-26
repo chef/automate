@@ -40,7 +40,7 @@ describe('ApiTokenListComponent', () => {
         MockComponent({ selector: 'app-create-object-modal',
                         inputs: ['creating', 'createForm',
                                  'visible', 'objectNoun', 'conflictErrorEvent',
-                                 'showProjectsDropdown', 'assignableProjects'],
+                                 'assignableProjects'],
                         outputs: ['close', 'createClicked'] }),
         MockComponent({ selector: 'chef-button', inputs: ['disabled'] }),
         MockComponent({ selector: 'chef-clipboard', inputs: ['value'] }),

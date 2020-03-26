@@ -10,13 +10,14 @@ import (
 	"testing"
 	"time"
 
+	"github.com/gofrs/uuid"
 	natsc "github.com/nats-io/nats.go"
 	stan "github.com/nats-io/stan.go"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
 
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/authz"
+	policies "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/lib/grpc/auth_context"
 )
 
@@ -30,28 +31,9 @@ import (
 // (otherwise the default policy would always give permissions so auth would
 // succeed). We stash the policy on the Suite and restore it in the teardown
 func (s *Suite) initNATSAuthTest() error {
-	ctx := context.Background()
 	err := s.initAuthzClient()
 	if err != nil {
 		return err
-	}
-
-	policiesResp, err := s.AuthzClient.ListPolicies(ctx, &authz.ListPoliciesReq{})
-	if err != nil {
-		return err
-	}
-
-	for _, p := range policiesResp.Policies {
-		if p.Resource == "ingest:*" {
-			s.AuthPoliciesToRestore = append(s.AuthPoliciesToRestore, p)
-		}
-	}
-
-	for _, p := range s.AuthPoliciesToRestore {
-		_, err := s.AuthzClient.DeletePolicy(ctx, &authz.DeletePolicyReq{Id: p.Id})
-		if err != nil {
-			return err
-		}
 	}
 
 	return nil
@@ -60,20 +42,7 @@ func (s *Suite) initNATSAuthTest() error {
 // teardownNATSAuthTest re-creates any auth policies that were deleted in the
 // initNATSAuthTest step.
 func (s *Suite) teardownNATSAuthTest() {
-	ctx := context.Background()
 	defer s.authzConn.Close()
-
-	for _, p := range s.AuthPoliciesToRestore {
-		_, err := s.AuthzClient.CreatePolicy(ctx, &authz.CreatePolicyReq{
-			Action:   p.Action,
-			Subjects: p.Subjects,
-			Resource: p.Resource,
-		})
-		if err != nil {
-			fmt.Printf("Error in NATS Auth Test teardown: %s\n", err)
-		}
-	}
-
 }
 
 func (s *Suite) initAuthzClient() error {
@@ -89,7 +58,7 @@ func (s *Suite) initAuthzClient() error {
 		return err
 	}
 
-	authzClient := authz.NewAuthorizationClient(authzConn)
+	authzClient := policies.NewPoliciesClient(authzConn)
 
 	s.authzConn = authzConn
 	s.AuthzClient = authzClient
@@ -175,7 +144,7 @@ func TestEventGatewayAuth(t *testing.T) {
 
 	t.Run("when the authZ subject doesn't have permissions for ingest, cannot connect to NATS", func(t *testing.T) {
 		// only allowing read should make this token invalid for ingest
-		notAuthorizedToken := getNewToken(t, "read")
+		notAuthorizedToken := getNewToken(t, "*:read")
 
 		natsURLNotAuthorized := fmt.Sprintf(natsURLfmt, notAuthorizedToken)
 		_, err := natsc.Connect(natsURLNotAuthorized)
@@ -212,10 +181,19 @@ func getNewToken(t *testing.T, authorizedAction string) string {
 	})
 	require.NoError(t, err)
 
-	_, err = suite.AuthzClient.CreatePolicy(ctx, &authz.CreatePolicyReq{
-		Action:   authorizedAction,
-		Subjects: []string{fmt.Sprintf("token:%s", response.Id)},
-		Resource: "*",
+	polID := "nats-test-policy-" + uuid.Must(uuid.NewV4()).String()
+	_, err = suite.AuthzClient.CreatePolicy(ctx, &policies.CreatePolicyReq{
+		Id:      polID,
+		Name:    polID,
+		Members: []string{fmt.Sprintf("token:%s", response.Id)},
+		Statements: []*policies.Statement{
+			&policies.Statement{
+				Effect:   policies.Statement_ALLOW,
+				Actions:  []string{authorizedAction},
+				Projects: []string{"*"},
+			},
+		},
+		Projects: []string{},
 	})
 	require.NoError(t, err)
 

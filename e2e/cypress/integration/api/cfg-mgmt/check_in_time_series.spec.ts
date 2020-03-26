@@ -1,8 +1,7 @@
 
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { uuidv4 } from '../../../support/helpers';
 
-describeIfIAMV2p1('Config-mgmt check-in time series', () => {
+describe('Config-mgmt check-in time series', () => {
 
   describe('two nodes 4 runs with two different environments', () => {
     const cypressPrefix = 'test-cfg-check-in';
@@ -113,6 +112,19 @@ describeIfIAMV2p1('Config-mgmt check-in time series', () => {
         expect(resp.body.counts[0].count).to.equal(1);
         expect(resp.body.counts[1].count).to.equal(1);
         expect(resp.body.counts[2].count).to.equal(1);
+        expect(resp.body.counts[2].total).to.equal(1);
+      });
+
+      cy.request({
+        headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
+        method: 'GET',
+        url: 'api/v0/cfgmgmt/stats/checkin_counts_timeseries?days_ago=3'
+      }).then((resp: Cypress.ObjectLike) => {
+        expect(resp.body.counts.length).to.equal(3);
+        expect(resp.body.counts[0].count).to.equal(1);
+        expect(resp.body.counts[1].count).to.equal(1);
+        expect(resp.body.counts[2].count).to.equal(2); // include the filtered out node
+        expect(resp.body.counts[2].total).to.equal(2);
       });
     });
   });

@@ -19,14 +19,14 @@ export class RoleRequests {
   constructor(private http: HttpClient) { }
 
   public getRoles(): Observable<RolesResponse> {
-    return this.http.get<RolesResponse>(`${env.auth_v2_url}/roles`);
+    return this.http.get<RolesResponse>(`${env.iam_url}/roles`);
   }
 
   public getRole(id: string): Observable<RoleResponse> {
-    return this.http.get<RoleResponse>(`${env.auth_v2_url}/roles/${id}`);
+    return this.http.get<RoleResponse>(`${env.iam_url}/roles/${id}`);
   }
 
   public deleteRole(id: string): Observable<RoleResponse> {
-    return this.http.delete<RoleResponse>(`${env.auth_v2_url}/roles/${id}`);
+    return this.http.delete<RoleResponse>(`${env.iam_url}/roles/${id}`);
   }
 }

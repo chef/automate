@@ -8,7 +8,6 @@ import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading } from 'app/entities/entities';
 import { GetRoles, DeleteRole } from 'app/entities/roles/role.actions';
-import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { allRoles, getAllStatus } from 'app/entities/roles/role.selectors';
 import { Role } from 'app/entities/roles/role.model';
 import { ChefKeyboardEvent } from 'app/types/material-types';
@@ -22,7 +21,6 @@ import { ChefKeyboardEvent } from 'app/types/material-types';
 export class RolesListComponent implements OnInit, OnDestroy {
   public loading$: Observable<boolean>;
   public sortedRoles$: Observable<Role[]>;
-  public isIAMv2$: Observable<boolean>;
   public roleToDelete: Role;
   public deleteModalVisible = false;
   private isDestroyed = new Subject<boolean>();
@@ -38,8 +36,6 @@ export class RolesListComponent implements OnInit, OnDestroy {
 
     this.sortedRoles$ = store.select(allRoles).pipe(
       map((roles: Role[]) => ChefSorters.naturalSort(roles, 'name')));
-
-    this.isIAMv2$ = store.select(isIAMv2);
   }
 
   ngOnInit(): void {

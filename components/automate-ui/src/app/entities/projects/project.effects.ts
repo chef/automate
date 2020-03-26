@@ -9,7 +9,6 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { HttpStatus } from 'app/types/types';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
 import { Type } from 'app/entities/notifications/notification.model';
-import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { ProjectRequests } from './project.requests';
 
 import {
@@ -49,7 +48,7 @@ import { applyRulesStatus } from './project.selectors';
 import { ApplyRulesStatusState } from './project.reducer';
 
 const ACTIVE_RULE_STATUS_INTERVAL = 5; // seconds between checks while update is in progress
-const DORMANT_RULE_STATUS_INTERVAL = 60; // seconds between checks while update is dormant
+const DORMANT_RULE_STATUS_INTERVAL = 120; // seconds between checks while update is dormant
 
 @Injectable()
 export class ProjectEffects {
@@ -205,21 +204,23 @@ export class ProjectEffects {
 
   @Effect()
   getActiveApplyRulesStatus$ = observableInterval(1000 * ACTIVE_RULE_STATUS_INTERVAL).pipe(
-    withLatestFrom(this.store.select(isIAMv2)),
     withLatestFrom(this.store.select(applyRulesStatus)),
-    filter(([[_, isV2], { state }]) =>
-      isV2 && state === ApplyRulesStatusState.Running
+    filter(([_, { state }]) =>
+      state === ApplyRulesStatusState.Running
     ),
     switchMap(this.getRulesStatus$()));
 
   @Effect()
   getDormantApplyRulesStatus$ = observableInterval(1000 * DORMANT_RULE_STATUS_INTERVAL).pipe(
-    withLatestFrom(this.store.select(isIAMv2)),
     withLatestFrom(this.store.select(applyRulesStatus)),
-    filter(([[_, isV2], { state }]) =>
-      isV2 && state === ApplyRulesStatusState.NotRunning
+    filter(([_, { state }]) =>
+      state === ApplyRulesStatusState.NotRunning
     ),
-    switchMap(this.getRulesStatus$()));
+    switchMap(() => [
+      new GetProjects(),
+      new GetApplyRulesStatus()
+    ]),
+    catchError((error: HttpErrorResponse) => observableOf(new GetApplyRulesStatusFailure(error))));
 
   private getRulesStatus$(): () => Observable<ProjectActions> {
     return () => this.requests.getApplyRulesStatus().pipe(

@@ -898,14 +898,6 @@ func init() {
         ]
       }
     },
-    "chef.automate.api.iam.v2.Flag": {
-      "type": "string",
-      "enum": [
-        "VERSION_2_0",
-        "VERSION_2_1"
-      ],
-      "default": "VERSION_2_0"
-    },
     "chef.automate.api.iam.v2.GetPolicyResp": {
       "type": "object",
       "example": {
@@ -1263,9 +1255,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.iam.v2.ResetToV1Resp": {
-      "type": "object"
-    },
     "chef.automate.api.iam.v2.Role": {
       "type": "object",
       "properties": {
@@ -1532,17 +1521,6 @@ func init() {
         }
       }
     },
-    "chef.automate.api.iam.v2.UpgradeToV2Resp": {
-      "type": "object",
-      "properties": {
-        "reports": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        }
-      }
-    },
     "chef.automate.api.iam.v2.Version": {
       "type": "object",
       "properties": {
@@ -1552,7 +1530,8 @@ func init() {
         "minor": {
           "$ref": "#/definitions/chef.automate.api.iam.v2.Version.VersionNumber"
         }
-      }
+      },
+      "title": "the only values that may be returned by GetPolicyVersion"
     },
     "chef.automate.api.iam.v2.Version.VersionNumber": {
       "type": "string",

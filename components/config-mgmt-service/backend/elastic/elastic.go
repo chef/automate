@@ -14,7 +14,7 @@ import (
 
 	elastic "gopkg.in/olivere/elastic.v6"
 
-	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
+	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/config-mgmt-service/backend"
 	"github.com/chef/automate/components/config-mgmt-service/errors"
 	"github.com/chef/automate/lib/stringutils"

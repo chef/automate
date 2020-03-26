@@ -215,27 +215,6 @@ func (p *Server) RemovePolicyMembers(
 	}, nil
 }
 
-// UpgradeToV2 resets the IAM v2 database to its factory default state, and
-// migrates existing V1 policies
-func (p *Server) UpgradeToV2(
-	ctx context.Context, in *pb_req.UpgradeToV2Req) (*pb_resp.UpgradeToV2Resp, error) {
-	if in.Flag == pb_common.Flag_VERSION_2_0 {
-		return nil, errors.New("cannot upgrade to IAM v2.0, only v2.1")
-	}
-	// as of release of beta2.1, must pass this flag every time
-	upgradeReq := &authz.MigrateToV2Req{
-		Flag:           authz.Flag_VERSION_2_1,
-		SkipV1Policies: in.SkipV1Policies,
-	}
-
-	resp, err := p.policies.MigrateToV2(ctx, upgradeReq)
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb_resp.UpgradeToV2Resp{Reports: resp.GetReports()}, nil
-}
-
 func (p *Server) GetPolicyVersion(
 	ctx context.Context, in *pb_req.GetPolicyVersionReq) (*pb_resp.GetPolicyVersionResp, error) {
 	resp, err := p.policies.GetPolicyVersion(ctx, &authz.GetPolicyVersionReq{})
@@ -258,16 +237,6 @@ func (p *Server) GetPolicyVersion(
 			Minor: minor,
 		},
 	}, nil
-}
-
-func (p *Server) ResetToV1(
-	ctx context.Context, in *pb_req.ResetToV1Req) (*pb_resp.ResetToV1Resp, error) {
-	_, err := p.policies.ResetToV1(ctx, &authz.ResetToV1Req{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &pb_resp.ResetToV1Resp{}, nil
 }
 
 // CreateRole creates a new role.
@@ -540,7 +509,7 @@ func convertAPIStatementSliceToDomain(external []*pb_common.Statement) ([]*authz
 	for i, statement := range external {
 		// lest former v1 users attempt to create policy with resources (which are ignored)
 		if len(statement.Resources) > 0 {
-			return nil, errors.New("cannot define resources on v2 policy")
+			return nil, errors.New("cannot define resources on policy")
 		}
 		effectValue, ok := authz.Statement_Effect_value[statement.Effect.String()]
 		if !ok {

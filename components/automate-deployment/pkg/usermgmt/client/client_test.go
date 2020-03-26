@@ -10,7 +10,7 @@ import (
 	"google.golang.org/grpc/status"
 
 	local_users_api "github.com/chef/automate/api/interservice/local_user"
-	teams_api "github.com/chef/automate/api/interservice/teams/v1"
+	teams_api "github.com/chef/automate/api/interservice/teams/v2"
 	"github.com/chef/automate/lib/grpc/grpctest"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/test/helpers"
@@ -24,10 +24,10 @@ func TestUserMgmtClient(t *testing.T) {
 	// https://github.com/chef/automate/blob/master/components/automate-grpc/protoc-gen-grpc-mock/README.md
 	serviceCerts := helpers.LoadDevCerts(t, "teams-service")
 
-	mockTeams := teams_api.NewTeamsV1ServerMock()
+	mockTeams := teams_api.NewTeamsV2ServerMock()
 	connFactory := secureconn.NewFactory(*serviceCerts)
 	g := connFactory.NewServer()
-	teams_api.RegisterTeamsV1Server(g, mockTeams)
+	teams_api.RegisterTeamsV2Server(g, mockTeams)
 	teams := grpctest.NewServer(g)
 	defer teams.Close()
 
@@ -156,10 +156,10 @@ func TestUserMgmtClient(t *testing.T) {
 		userID := "a7cd7698-6c8a-4720-970e-5d8315caa92c"
 
 		t.Run("when the admins team can't be retrieved it returns the original error", func(t *testing.T) {
-			mockTeams.GetTeamByNameFunc = func(
-				_ context.Context, req *teams_api.GetTeamByNameReq) (*teams_api.GetTeamByNameResp, error) {
+			mockTeams.GetTeamFunc = func(
+				_ context.Context, req *teams_api.GetTeamReq) (*teams_api.GetTeamResp, error) {
 
-				assert.Equal(t, req.Name, "admins")
+				assert.Equal(t, req.Id, "admins")
 				return nil, status.Error(codes.Internal, "unexpected error")
 			}
 
@@ -169,32 +169,27 @@ func TestUserMgmtClient(t *testing.T) {
 		})
 
 		t.Run("when the admins team is properly retrieved", func(t *testing.T) {
-			mockTeams.GetTeamByNameFunc = func(
-				_ context.Context, req *teams_api.GetTeamByNameReq) (*teams_api.GetTeamByNameResp, error) {
+			mockTeams.GetTeamFunc = func(
+				_ context.Context, req *teams_api.GetTeamReq) (*teams_api.GetTeamResp, error) {
 
-				assert.Equal(t, req.Name, "admins")
-				return &teams_api.GetTeamByNameResp{
+				assert.Equal(t, req.Id, "admins")
+				return &teams_api.GetTeamResp{
 					Team: &teams_api.Team{
-						Id:          teamID,
-						Name:        "admins",
-						Description: "don't care",
+						Id:   teamID,
+						Name: "admins",
 					},
 				}, nil
 			}
 
 			t.Run("when add users succeeds it returns nil", func(t *testing.T) {
-				mockTeams.AddUsersFunc = func(
-					_ context.Context, req *teams_api.AddUsersReq) (*teams_api.AddUsersResp, error) {
+				mockTeams.AddTeamMembersFunc = func(
+					_ context.Context, req *teams_api.AddTeamMembersReq) (*teams_api.AddTeamMembersResp, error) {
 
 					assert.Equal(t, req.Id, teamID)
 					assert.Equal(t, req.UserIds, []string{userID})
 
-					return &teams_api.AddUsersResp{
-						Team: &teams_api.Team{
-							Id:          teamID,
-							Name:        "admins",
-							Description: "don't care",
-						},
+					return &teams_api.AddTeamMembersResp{
+						UserIds: []string{userID},
 					}, nil
 				}
 
@@ -203,8 +198,8 @@ func TestUserMgmtClient(t *testing.T) {
 			})
 
 			t.Run("when add users fails it returns the original error", func(t *testing.T) {
-				mockTeams.AddUsersFunc = func(
-					_ context.Context, req *teams_api.AddUsersReq) (*teams_api.AddUsersResp, error) {
+				mockTeams.AddTeamMembersFunc = func(
+					_ context.Context, req *teams_api.AddTeamMembersReq) (*teams_api.AddTeamMembersResp, error) {
 
 					assert.Equal(t, req.Id, teamID)
 					assert.Equal(t, req.UserIds, []string{userID})

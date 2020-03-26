@@ -9,7 +9,7 @@ import (
 
 	external_response "github.com/chef/automate/api/external/cfgmgmt/response"
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
-	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
+	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"

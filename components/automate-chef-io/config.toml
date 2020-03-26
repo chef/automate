@@ -126,13 +126,11 @@ url = "/docs/client-runs"
 name = "Compliance"
 weight = 60
 identifier = "compliance"
-url = "/docs/compliance"
 
 [[menu.docs]]
 name = "Settings"
 weight = 90
 identifier = "settings"
-url = "/docs/settings"
 
 [[menu.docs]]
 name = "Authorization"

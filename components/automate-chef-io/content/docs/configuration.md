@@ -11,21 +11,21 @@ toc = true
     weight = 10
 +++
 
-# Overview
-
 The `chef-automate` CLI provides commands to help you work with your existing Chef Automate configuration:
 
-* `chef-automate config show` shows you your current configuration, with the exception of default settings
-* `chef-automate config patch </path/to/partial-config.toml>` updates an existing Chef Automate configuration by merging the contents of`</path/to/partial-config.toml>` with your current Chef Automate configuration, and applying any changes. This command is sufficient in most situations
+* `chef-automate config show` shows your current configuration, not including default settings
+* `chef-automate config patch </path/to/partial-config.toml>` updates an existing Chef Automate configuration by merging the contents of`</path/to/partial-config.toml>` with your current Chef Automate configuration, and applying any changes. This command is enough in most situations
 * `chef-automate config set </path/to/full-config.toml>` replaces the current Chef Automate configuration with the provided configuration, and applies any changes. Use this command to replace your Chef Automate configuration
 
-Update your Chef Automate configuration by generating a section of a configuration, and applying it with `chef-automate config patch`. The rest of this document describes how to make common configuration changes.
+Update your Chef Automate configuration by generating a section of a configuration, and applying it with `chef-automate config patch`. 
+The rest of this document describes how to make common configuration changes.
 
 ## Use Cases
 
 ### Minimal Configuration
 
-The `chef-automate init-config` command generates an annotated Chef Automate configuration file with the minimum settings needed to deploy Chef Automate. This section describes those settings and how to change them on an existing Chef Automate installation.
+The `chef-automate init-config` command generates an annotated Chef Automate configuration file with the basic settings needed to deploy Chef Automate. 
+This section describes those settings and how to change them on an existing Chef Automate installation.
 
 #### Chef Automate FQDN
 
@@ -40,16 +40,18 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 #### Install Channel
 
-Chef Automate is made up of [Habitat](https://www.habitat.sh/) packages installed from a release channel. The default channel is `current`, but we will introduce additional channels in the future.
+Chef Automate consists of [Habitat](https://www.habitat.sh/) packages installed from a release channel. 
+The default channel is `current`.
 
 #### Upgrade Strategy
 
-The upgrade strategy determines when a Chef Automate installation is upgraded. The upgrade strategy can be set to:
+The upgrade strategy determines when a Chef Automate installation upgrades. 
+The upgrade strategy settings include:
 
-* `at-once` (default) upgrades the installation when new packages are detected in your install channel
+* `at-once` (default) upgrades the installation after detecting new packages in the install channel
 * `none` freezes the installation with its current set of packages
 
-Changing the upgrade strategy from `none` to `at-once` will install the latest packages from your install channel.
+Changing the upgrade strategy from `none` to `at-once` will install the latest packages from the install channel.
 
 To change the upgrade strategy of your Chef Automate installation, create a TOML file that contains the partial configuration:
 
@@ -60,31 +62,34 @@ upgrade_strategy = "at-once"
 
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
-To upgrade a Chef Automate installation when the `upgrade_strategy` is set to `none`, run:
+To upgrade a Chef Automate installation with `upgrade_strategy` set to `none`, run:
 
 ```bash
-chef-automate upgrade
+chef-automate upgrade run
 ```
 
-This will upgrade Chef Automate to the latest version from your install channel.
+This command will upgrade Chef Automate to the latest version from your install channel.
 
 #### Deployment Type
 
-Do not change `deployment_type` at this time. Currently, the only supported `deployment_type` is `local`.
+Do not change `deployment_type`. 
+The only supported `deployment_type` is `local`.
 
 #### Settings
 
-Currently, you cannot change the admin username, name, and password set during initial deployment.
+You cannot change the admin username, name, and password set during initial deployment.
 
 To change the admin password after deployment, use the Automate UI.
-Log in as the admin user, navigate to the _User_ page under the **Settings**  tab. Selecting "Local Administrator" opens a form for updating the password. Enter and confirm your new password in the interface, and then select the **Update Password** button to save your changes.
+Sign in as the admin user, navigate to the _Users_ page under the **Settings** tab.
+Select "Local Administrator" to show the admin's _User Details_ page. 
+Navigate to the _Reset Password_ tab. 
+Enter your previous password, and enter and confirm your new password in the interface. 
+Select the **Reset Password** button to save your changes.
 
-To change the admin password from the command-line, first
-[fetch the admin user record]({{< relref "users.md#fetching-users" >}})
-and copy the User ID, then use:
+To change the admin password from the command-line, first [fetch the admin user record](https://automate.chef.io/docs/api/), copy the User ID, and then use:
 
 ```bash
-export TOKEN=`chef-automate admin-token`
+export TOKEN=`chef-automate iam token create admin-token-1 --admin`
 
 curl -X PUT -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"name":"Local Administrator", "id": "<admin user ID>", "password":"<password>"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/users/admin?pretty
 ```
@@ -117,7 +122,7 @@ You can apply your Chef Automate license with the `chef-automate license apply` 
 * `chef-automate license apply </path/to/license-file`
 * `chef-automate license apply <content-of-license>`
 
-Currently you cannot apply a license after your initial deployment by patching the configuration file.
+You cannot apply a license after your initial deployment by patching the configuration file.
 
 #### Proxy Settings
 
@@ -129,11 +134,9 @@ The command `chef-automate deploy` without a configuration file will respect the
 * `HTTP_PROXY`/`http_proxy`
 * `NO_PROXY`/`no_proxy` (See [Required Sites and Domains]({{< relref "#required-sites-and-domains" >}}).)
 
-Setting these environment variables prior to initial deployment of Chef Automate
-adds them to the configuration that Chef Automate generates.
+Setting these environment variables before the initial deployment of Chef Automate adds them to the configuration that Chef Automate generates.
 
-If you provide a configuration file during deployment (`chef-automate deploy
-/path/to/config.toml`), you must specify any proxy settings in that configuration file.
+If you provide a configuration file during deployment (`chef-automate deploy /path/to/config.toml`), you must specify any proxy settings in that configuration file.
 
 ```toml
 [global.v1.proxy]
@@ -144,8 +147,7 @@ no_proxy = ["0.0.0.0", "127.0.0.1"]
 # password = "<your proxy password>"
 ```
 
-To patch the proxy settings, create a TOML file that contains the `[global.v1.proxy]`
-section and settings.
+To patch the proxy settings, create a TOML file that contains the `[global.v1.proxy]` section and settings.
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ##### Required Sites and Domains
@@ -166,7 +168,8 @@ Chef Automate must be able to access the following:
 
 #### Global Log Level
 
-Configure the log level for all Chef Automate services by creating a TOML file. By default each service will initialize at the `info` level, but the following settings are available: `debug`, `info`, `warning`, `panic`, or `fatal`.
+Configure the log level for all Chef Automate services by creating a TOML file.
+By default each service will initialize at the `info` level, but the following settings are available: `debug`, `info`, `warning`, `panic`, or `fatal`.
 
 ```toml
 [global.v1.log]
@@ -221,7 +224,8 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 #### General Elasticsearch Configuration
 
-To configure Elasticsearch for your Chef Automate installation, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+To configure Elasticsearch for your Chef Automate installation, create a TOML file that contains the partial configuration below.
+Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
 [elasticsearch.v1.sys.proxy]
@@ -280,8 +284,9 @@ To configure Elasticsearch for your Chef Automate installation, create a TOML fi
 
 #### Setting Elasticsearch Heap
 
-Per the Elasticsearch documentation, the [Elasticsearch heap size](https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html) should be up to 50% of the available RAM, up to 32GB. To set the Elasticsearch heap size, create a TOML file that contains the partial configuration below.
-Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+Per the Elasticsearch documentation, the [Elasticsearch heap size](https://www.elastic.co/guide/en/elasticsearch/guide/current/heap-sizing.html) should be up to 50% of the available RAM, up to 32GB. 
+To set the Elasticsearch heap size, create a TOML file that contains the partial configuration below.
+Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
 [elasticsearch.v1.sys.runtime]
@@ -290,10 +295,10 @@ Uncomment and change settings as needed, then run `chef-automate config patch </
 
 #### PostgreSQL
 
-To configure PostgreSQL for your Chef Automate installation, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, with the following caveats:
+To configure PostgreSQL for your Chef Automate installation, create a TOML file that contains the partial configuration below. 
+Uncomment and change settings as needed, with the following caveats:
 
-* These configuration settings affect only the Automate-deployed PostgreSQL database. They
- do not affect an [externally-deployed PostgreSQL database]({{< relref "install.md#configuring-an-external-postgresql-database" >}}).
+* These configuration settings affect only the Automate-deployed PostgreSQL database. They do not affect an [externally-deployed PostgreSQL database]({{< relref "install.md#configuring-an-external-postgresql-database" >}}).
 * Chef Automate uses TLS mutual authentication to communicate with its PostgreSQL database.
 
 Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
@@ -319,7 +324,8 @@ Then run `chef-automate config patch </path/to/your-file.toml>` to deploy your c
 
 #### Load Balancer
 
-To configure your Chef Automate installation's load balancer, create a TOML file that contains the partial configuration below. Uncomment and change settings as needed, then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
+To configure your Chef Automate installation's load balancer, create a TOML file that contains the partial configuration below. 
+Uncomment and change settings as needed, and then run `chef-automate config patch </path/to/your-file.toml>` to deploy your change.
 
 ```toml
 [load_balancer.v1.sys.service]
