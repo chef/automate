@@ -27,7 +27,7 @@ EOF
 do_deploy() {
     #shellcheck disable=SC2154
     chef-automate deploy config.toml \
-        --product chef-server \
+        --product infra-server \
         --hartifacts "$test_hartifacts_path" \
         --override-origin "$HAB_ORIGIN" \
         --manifest-dir "$test_manifest_path" \

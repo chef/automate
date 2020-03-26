@@ -659,7 +659,7 @@ func (srv *Server) addNodeForAccount(ctx context.Context, managerId string, mana
 		// the user may have never set an alias for their account, and that's ok, but we should log it out
 		logrus.Warnf("addNodeForAccount; no account aliases found for manager: %s", managerName)
 	}
-	nodeIds, err := srv.DB.AddManagerNodeToDB(managerId, managerAcctId, credential, acctAlias)
+	nodeIds, err := srv.DB.AddManagerNodeToDB(managerId, managerAcctId, credential, acctAlias, myaws.Region)
 	if err != nil {
 		return nil, err
 	}

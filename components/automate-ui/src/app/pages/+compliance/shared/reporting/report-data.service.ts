@@ -42,7 +42,11 @@ export class ReportDataService {
   profilesListEmpty = false;
   profilesList: any = {
     items: [],
-    total: 0
+    total: 0,
+    failed: 0,
+    passed: 0,
+    skipped: 0,
+    waived: 0
   };
 
   controlsListLoading = true;

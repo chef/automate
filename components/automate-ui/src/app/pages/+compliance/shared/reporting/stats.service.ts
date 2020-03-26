@@ -134,7 +134,8 @@ export class StatsService {
     }
 
     return this.httpClient.post<any>(url, body).pipe(
-      map(({ profiles, counts: { total }}) => ({total, items: profiles})));
+      map(({ profiles, counts: { total, failed, passed, skipped, waived } }) =>
+        ({ total, failed, passed, skipped, waived, items: profiles })));
   }
 
   getControls(reportQuery: ReportQuery) {
