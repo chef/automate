@@ -92,6 +92,7 @@ export class IngestJob {
   threshold: string;
   disabled: boolean;
   purge_policies?: any; // TODO needs specific type
+  older_than_days?: number;
   last_elapsed?: Date;
   next_due_at?: Date;
   last_enqueued_at?: Date;
