@@ -1,14 +1,16 @@
 <div class="content-container">
   <div class="container">
     <main>
-      Daily Check-in by Day
+      <div class="page-title">Last Check-in by Day</div>
 
-      <select (change)="dateChanged($event.target.value)">
-        <option *ngFor="let selectableDaysAgo of selectableDaysAgoCollection"
-          [value]="selectableDaysAgo" [selected]="selectableDaysAgo == selectedDaysAgo">
-          Last {{ selectableDaysAgo }} Days
-        </option>
-      </select>
+      <div>
+        <select (change)="dateChanged($event.target.value)">
+          <option *ngFor="let selectableDaysAgo of selectableDaysAgoCollection"
+            [value]="selectableDaysAgo" [selected]="selectableDaysAgo == selectedDaysAgo">
+            Last {{ selectableDaysAgo }} Days
+          </option>
+        </select>
+      </div>
 
       <table>
         <thead>
