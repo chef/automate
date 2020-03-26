@@ -32,13 +32,14 @@ export class DashboardComponent implements OnInit {
   public unknownCount$: Observable<number>;
   public checkedInCount$: Observable<number>;
   public days$: Observable<DayPercentage[]>;
+  public selectedDaysAgo = 7;
 
   constructor(
     private store: Store<NgrxStateAtom>
   ) { }
 
   ngOnInit() {
-    this.store.dispatch(new GetDailyCheckInTimeSeries());
+    this.store.dispatch(new GetDailyCheckInTimeSeries({daysAgo: this.selectedDaysAgo}));
 
     this.checkInCountCollection$ = this.store.select(dailyCheckInCountCollection).pipe(
       filter(collection => collection.buckets.length > 0));
@@ -76,7 +77,9 @@ export class DashboardComponent implements OnInit {
     );
   }
 
-  handleDaysAgoChange(event) {
-    console.info('handleDaysAgoChange: ' + event);
+  handleDaysAgoChange(daysAgo: number) {
+    this.selectedDaysAgo = daysAgo;
+    this.store.dispatch(new GetDailyCheckInTimeSeries({daysAgo: this.selectedDaysAgo}));
+    console.info('handleDaysAgoChange: ' + daysAgo);
   }
 }

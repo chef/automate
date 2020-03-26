@@ -11,6 +11,7 @@ export enum DesktopActionTypes {
 
 export class GetDailyCheckInTimeSeries implements Action {
   readonly type = DesktopActionTypes.GET_DAILY_CHECK_IN_TIME_SERIES;
+  constructor(public payload: {daysAgo: number}) { }
 }
 
 export class GetDailyCheckInTimeSeriesSuccess implements Action {

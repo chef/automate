@@ -4,7 +4,7 @@ import { Actions, Effect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
 
 import {
-  // GetDailyCheckInTimeSeries,
+  GetDailyCheckInTimeSeries,
   GetDailyCheckInTimeSeriesSuccess,
   GetDailyCheckInTimeSeriesFailure,
   DesktopActionTypes
@@ -22,8 +22,8 @@ export class DesktopEffects {
 
   @Effect()
   getDailyCheckInTimeSeries$ = this.actions$.pipe(
-    ofType(DesktopActionTypes.GET_DAILY_CHECK_IN_TIME_SERIES),
-    mergeMap(() => this.requests.getDailyCheckInCountCollection()),
+    ofType<GetDailyCheckInTimeSeries>(DesktopActionTypes.GET_DAILY_CHECK_IN_TIME_SERIES),
+    mergeMap((action) => this.requests.getDailyCheckInCountCollection(action.payload.daysAgo)),
     map(dailyCheckInCountCollection =>
       new GetDailyCheckInTimeSeriesSuccess(dailyCheckInCountCollection)),
     catchError((error) => of(new GetDailyCheckInTimeSeriesFailure(error)))
