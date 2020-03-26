@@ -15,7 +15,7 @@ message Team {
 message GetTeamReq {
   // TODO (tc): We can't make this more restrictive until we migrate
   // existing IDs post-GA.
-  string id = 1 [(validate.rules).string.min_len = 1];
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
 }
 
 message GetTeamResp {
@@ -31,8 +31,8 @@ message ListTeamsResp {
 message UpdateTeamReq {
   // TODO (tc): We can't make this more restrictive until we migrate
   // existing IDs post-GA.
-  string id = 1 [(validate.rules).string.min_len = 1];
-  string name = 2 [(validate.rules).string.min_len = 1];
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
+  string name = 2 [(validate.rules).string.pattern = "\\S"];
   repeated string projects = 3 [(validate.rules).repeated = {
     unique: true,
     items: {
@@ -50,7 +50,7 @@ message UpdateTeamResp {
 message DeleteTeamReq {
   // TODO (tc): We can't make this more restrictive until we migrate
   // existing IDs post-GA.
-  string id = 1 [(validate.rules).string.min_len = 1];
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
 }
 
 message DeleteTeamResp {
@@ -60,7 +60,7 @@ message DeleteTeamResp {
 message CreateTeamReq {
   string id = 1 [(validate.rules).string.min_len = 1,
                  (validate.rules).string.pattern = "^[a-z0-9-_]{1,64}$"];
-  string name = 2 [(validate.rules).string.min_len = 1];
+  string name = 2 [(validate.rules).string.pattern = "\\S"];
   repeated string projects = 3 [(validate.rules).repeated = {
     unique: true,
     items: {
@@ -78,7 +78,7 @@ message CreateTeamResp {
 message AddTeamMembersReq {
   // TODO (tc): We can't make this more restrictive until we migrate
   // existing IDs post-GA.
-  string id = 1 [(validate.rules).string.min_len = 1];
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
   // However, this regex works for V1 and V2 User IDs.
   repeated string user_ids = 2 [(validate.rules).repeated = {
     min_items: 1,
@@ -98,7 +98,7 @@ message AddTeamMembersResp {
 message RemoveTeamMembersReq {
   // TODO (tc): We can't make this more restrictive until we migrate
   // existing IDs post-GA.
-  string id = 1 [(validate.rules).string.min_len = 1];
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
   // However, this regex works for V1 and V2 User IDs.
   repeated string user_ids = 2 [(validate.rules).repeated = {
     unique: true,
@@ -126,7 +126,7 @@ message GetTeamsForMemberResp {
 message GetTeamMembershipReq {
   // TODO (tc): We can't make this more restrictive until we migrate
   // existing IDs post-GA.
-  string id = 1 [(validate.rules).string.min_len = 1];
+  string id = 1 [(validate.rules).string.pattern = "\\S"];
 }
 
 message GetTeamMembershipResp {
