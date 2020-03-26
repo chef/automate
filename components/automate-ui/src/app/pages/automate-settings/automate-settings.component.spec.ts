@@ -218,11 +218,8 @@ describe('AutomateSettingsComponent', () => {
     }
 
 
-    function genNestedIngestJob(category: string,
-                                name: string,
-                                nested_name: string,
-                                threshold: number,
-                                disabled: boolean) {
+    function genNestedIngestJob(category: string, name: string, nested_name: string,
+                                threshold: number, disabled: boolean) {
       return {
         name,
         category,
@@ -241,9 +238,9 @@ describe('AutomateSettingsComponent', () => {
     using([
       // Event Feed
       ['eventFeedRemoveData', 'nested', 'feed',
-                  genNestedIngestJob('event_feed', 'periodic_purge', 'feed', 1, false)] ,
+          genNestedIngestJob('event_feed', 'periodic_purge', 'feed', 1, false)] ,
       ['eventFeedServerActions', 'nested', 'actions', 
-                  genNestedIngestJob('infra', 'periodic_purge_timeseries', 'actions', 2, false)],
+          genNestedIngestJob('infra', 'periodic_purge_timeseries', 'actions', 2, false)],
 
       // Services --> not yet enabled
       // ['serviceGroupNoHealthChecks'],
@@ -251,14 +248,17 @@ describe('AutomateSettingsComponent', () => {
 
       // Client Runs
       ['clientRunsRemoveData', 'non-nested', 'not applicable',
-                  genInjestJob('infra', 'missing_nodes', '5m', false) ],
-      // ['clientRunsRemoveData', false, '7' ], // Infra Remove data
-      // ['clientRunsLabelMissing', false, '14' ], // Infra label as missing data
-      // ['clientRunsRemoveNodes', false, 12 ], // Infra purge_timeseries -> converge_history
-      // ['complianceRemoveReports', false, 105 ], // Compliance
-      // ['complianceRemoveScans', false, 92 ] // Compliance
+          genInjestJob('infra', 'missing_nodes', '5m', false)],
+      ['clientRunsLabelMissing', 'non-nested', 'not applicable',
+          genInjestJob('infra', 'missing_nodes_for_deletion', '6h', false)],
+      ['clientRunsRemoveNodes', 'nested', 'converge-history',
+          genNestedIngestJob('infra', 'periodic_purge_timeseries', 'converge-history', 7, false)],
+
+        // Compliance
+      ['complianceRemoveReports', 'nested', 'compliance-reports',
+          genNestedIngestJob('compliance', 'periodic_purge', 'compliance-reports', 8, false)],
       ['complianceRemoveScans', 'nested', 'compliance-scans',
-                  genNestedIngestJob('compliance', 'periodic_purge', 'compliance-scans', 7, false)]
+          genNestedIngestJob('compliance', 'periodic_purge', 'compliance-scans', 9, false)]
     ], function(formName: string, jobType: string, nestedName: string, job: IngestJob) {
       it(`when updating ${formName} form,
             the form data is extracted from the ${jobType} form`, () => {
