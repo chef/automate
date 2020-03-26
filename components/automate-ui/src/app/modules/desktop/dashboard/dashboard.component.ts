@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { Store } from '@ngrx/store';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { map, filter } from 'rxjs/operators';
+import { last, reverse } from 'lodash/fp';
 
 import {
   GetDailyCheckInTimeSeries
@@ -13,7 +14,7 @@ import {
 } from 'app/entities/desktop/desktop.selectors';
 
 import {
-  DailyCheckInCount
+  DailyCheckInCount, DailyCheckInCountCollection, DayPercentage
 } from 'app/entities/desktop/desktop.model';
 
 @Component({
@@ -23,12 +24,14 @@ import {
 })
 export class DashboardComponent implements OnInit {
 
-  public last24HourCheckInCount$: Observable<DailyCheckInCount>;
+  private checkInCountCollection$: Observable<DailyCheckInCountCollection>;
+  private last24HourCheckInCount$: Observable<DailyCheckInCount>;
   public unknownPercentage$: Observable<number>;
   public checkedInPercentage$: Observable<number>;
   public totalCount$: Observable<number>;
   public unknownCount$: Observable<number>;
   public checkedInCount$: Observable<number>;
+  public days$: Observable<DayPercentage[]>;
 
   constructor(
     private store: Store<NgrxStateAtom>
@@ -37,9 +40,20 @@ export class DashboardComponent implements OnInit {
   ngOnInit() {
     this.store.dispatch(new GetDailyCheckInTimeSeries());
 
-    this.last24HourCheckInCount$ = this.store.select(dailyCheckInCountCollection).pipe(
-      filter(collection => collection.buckets.length > 0),
-      map(collection => collection.buckets[0]));
+    this.checkInCountCollection$ = this.store.select(dailyCheckInCountCollection).pipe(
+      filter(collection => collection.buckets.length > 0));
+
+    this.days$ = this.checkInCountCollection$.pipe(
+      map(collection =>
+        reverse(collection.buckets).map((bucket, index) => {
+          const percentage = (bucket.checkInCount / bucket.total) * 100;
+          return {daysAgo: index, percentage: percentage};
+        }))
+    );
+
+    this.last24HourCheckInCount$ = this.checkInCountCollection$.pipe(
+      map(collection => last(collection.buckets))
+    );
 
     this.unknownPercentage$ = this.last24HourCheckInCount$.pipe(
         map(count => ((count.total - count.checkInCount) / count.total) * 100)
@@ -60,5 +74,9 @@ export class DashboardComponent implements OnInit {
     this.unknownCount$ = this.last24HourCheckInCount$.pipe(
       map(count => count.total - count.checkInCount)
     );
+  }
+
+  handleDaysAgoChange(event) {
+    console.info('handleDaysAgoChange: ' + event);
   }
 }

@@ -8,3 +8,8 @@ export interface DailyCheckInCount {
   checkInCount: number;
   total: number;
 }
+
+export interface DayPercentage {
+  daysAgo: number;
+  percentage: number;
+}

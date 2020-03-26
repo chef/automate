@@ -26,7 +26,7 @@ export class DesktopRequests {
 
   public getDailyCheckInCountCollection(): Observable<DailyCheckInCountCollection> {
     return this.http.get<RespDailyCheckInCountCollection>(
-      `${CONFIG_MGMT_URL}/stats/checkin_counts_timeseries?days_ago=1`)
+      `${CONFIG_MGMT_URL}/stats/checkin_counts_timeseries?days_ago=7`)
       .pipe(map(respDailyCheckInCountCollection =>
         this.createDailyCheckInCountCollection(respDailyCheckInCountCollection)));
   }
