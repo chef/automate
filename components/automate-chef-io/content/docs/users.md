@@ -1,6 +1,6 @@
 +++
 title = "Users"
-description = "Manage Chef Automate Users."
+description = "Manage Chef Automate Users"
 date = 2018-05-16T16:03:13-07:00
 draft = false
 bref = ""
@@ -11,113 +11,41 @@ toc = true
     weight = 50
 +++
 
-{{< info >}}
-This content is specific to IAM v1. See [IAM v2 Overview]({{< ref "iam-v2-overview.md#" >}}) for IAM v2 specific information.
-{{< /info >}}
+## Overview
 
-This guide will show you how to manage Chef Automate users. Import existing users into Chef Automate with [Microsoft AD (LDAP)]({{< ref "configuration.md#microsoft-active-directory" >}}), [generic LDAP]({{< ref "configuration.md#ldap" >}}) or [SAML]({{< ref "configuration.md#saml" >}}).
+Chef Automate supports three different types of users: local users, [LDAP users]({{< relref "ldap.md" >}}), and [SAML users]({{< relref "saml.md" >}}). Manage local users from the **Settings** tab.
 
-You can create local Chef Automate users that can log in and interact with the system independent of LDAP or SAML.
+Local users can sign in and interact with the system independent of LDAP or SAML.
 
-## Prerequisites
+Permission for the `iam:users` action is required to interact with users other than yourself. Any user that is part of the `admins` team or the `Administrator` policy will have this permission. Otherwise, [IAM custom policies]({{< relref "iam-v2-guide.md#creating-custom-policies" >}}) can be created to assign this permission.
 
-You will need administrative access to interact with users other than yourself. An existing administrative user can provide that access. If you are already an administrative user, you can [create users in the UI]({{< relref "#with-the-browser" >}}) by logging into Chef Automate with your admin credentials.
+## Managing Local Users
 
-## Users
+### Creating Local Users
 
-Chef Automate supports three different types of users: local users, [LDAP users]({{< relref "ldap.md" >}}), and [SAML users]({{< relref "configuration.md#saml" >}}). Manage local users from the **Settings** tab.
-
-### Manage Local Users from the UI
-
-Navigate to _Users_ in the **Settings** tab.
-
-To add a local user, use the **Create User** button, which opens a helper window for entering the user's _full name_, a unique _username_, _password_ and _confirm password_.
-Once you've filled in the information, use the **Save and Close** button.
+Navigate to _Users_ in the **Settings** tab. Select the **Create User** button, which opens a dialog box for entering the user's _display name_, and _password_. A username automatically generates upon creation. If you would like to change the username, use the **Edit Username** button.
 
 ![Add Local User](/images/docs/admin-tab-users-list.png)
 
-To change or delete a user account, select their name from the _Users_ page. You can also delete users from the _Users_ page by using the menu at the end of the table row.
+### Changing Display Names
 
-![Modify Local User](/images/docs/admin-tab-user-edit.png)
+Navigate to _Users_ in the **Settings** tab and locate the user who needs their display name changed. Navigate to their user page, provide a new display name, and select the **Save** button.
 
-### Manage Local Users from the Command Line with cURL
+All local users can also change their own display names from the _Profile_ menu.
 
-Before you follow these instructions, we recommend you install the JSON processor [jq](https://stedolan.github.io/jq/) to ensure readable output. Without it, some commands may need to be modified.
+### Resetting Passwords
 
-To interact with the user API using cURL, fetch an admin API token available from the `chef-automate` CLI, and set it to a usable variable:
+Navigate to _Users_ in the **Settings** tab and locate the user who needs a password reset. Navigate to their user page, and then the **Reset Password** tab. Provide a new password, confirm the new password, and then select the **Reset Password** button.
 
-```bash
-export TOKEN=`chef-automate admin-token`
-```
+All local users can also reset their own passwords from the _Profile_ menu.
 
-#### Create a User
+### Deleting Local Users
 
-To create a Chef Automate user, you'll need a name, username, and password.
-The username must be unique.
+Navigate to _Users_ in the **Settings** tab. Then open the menu at the end of the table row and select **Delete User**.
 
-```bash
-curl -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"name":"Your Name", "username":"username001rulez", "password":"password"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/users?pretty
-```
+## User Self-Maintenance
 
-#### Fetching Users
-
-You can fetch a single user by username. Keep in mind that certain characters
-in a username (such as a space) may need to be escaped in the URL.
-
-```bash
-curl -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/username001rulez?pretty
-```
-
-More generally, here is the format showing a `{username}` placeholder:
-
-```bash
-curl -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{username}?pretty
-```
-
-You can also fetch a list of all users by omitting the final username segment of the URL:
-
-```bash
-curl -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/auth/users?pretty
-```
-
-#### Updating Users
-
-You can update a user's full name (`name` property) and/or password (`password` property).
-To identify the proper user record, supply the username in the URL _and_ the user's `id` in the payload.
-Then, also in the payload, you must specify the full name--_even if you do not want to change it!_
-Finally, include the password in the payload, but only if you do want to change it.
-
-```bash
-curl -X PUT -H "api-token: $TOKEN" -H "Content-Type: application/json" -d '{"name":"Revised Full Name", "id": "userID", "password": "another_pwd"}' https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{username}?pretty
-```
-
-A non-admin user is also able to change their own password through the UI.
-For completeness, here is the API call to perform the same action.
-
-```bash
-curl -X PUT -H "api-token: $TOKEN" -H "Content-Type: application/json" -XPUT -d'{"id":"userID","name":"Revised Full Name","username":"username001rulez","password":"another_pwd","previous_password":"password"}' https://{{< example_fqdn "automate" >}}/api/v0/users/{username}?pretty
-```
-
-### Deleting Users
-
-To delete a user, supply the `username`:
-
-```bash
-curl -X DELETE -H "api-token: $TOKEN" -H "Content-Type: application/json" https://{{< example_fqdn "automate" >}}/api/v0/auth/users/{username}?pretty
-```
-
-### User Self-Maintenance
-
-Local Automate users can manage their own name and password through the Chef Automate user interface.
-Select the user icon in the top navigation bar,
-then select **Profile** from the drop-down.
+Local Automate users can manage their own display name and password.
+Select the user icon in the top navigation bar, and then select **Profile** from the drop-down menu.
 
 ![Navigate to user profile](/images/docs/user-profile-navigation.png)
-
-The sidebar should reflect **Your Profile** as the active panel,
-and you should see your user name,
-your avatar (if your username is your email address), and your full name.
-Use the **Edit** button to edit your full name,
-while the lower portion of the page allows you to update your password.
-
-![View user details](/images/docs/user-profile-view.png)

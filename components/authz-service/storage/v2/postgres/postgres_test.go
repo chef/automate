@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	"github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/prng"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
@@ -258,7 +258,7 @@ func TestGetPolicy(t *testing.T) {
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
 			insertPolicyProject(t, db, polID, projID1)
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 			resp, err := store.GetPolicy(ctx, polID)
 
 			require.NoError(t, err)
@@ -270,7 +270,7 @@ func TestGetPolicy(t *testing.T) {
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
 
-			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID1, constants.UnassignedProjectID})
 			resp, err := store.GetPolicy(ctx, polID)
 
 			require.NoError(t, err)
@@ -286,7 +286,7 @@ func TestGetPolicy(t *testing.T) {
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
 
-			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID2, constants.UnassignedProjectID})
 			resp, err := store.GetPolicy(ctx, polID)
 
 			assert.Nil(t, resp)
@@ -377,7 +377,7 @@ func TestListPolicyMembers(t *testing.T) {
 			member1 := insertTestPolicyMember(t, db, polID, "user:local:fred")
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 			resp, err := store.ListPolicyMembers(ctx, polID)
 
 			require.NoError(t, err)
@@ -390,7 +390,7 @@ func TestListPolicyMembers(t *testing.T) {
 			member2 := insertTestPolicyMember(t, db, polID, "user:local:mary")
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
-			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID1, constants.UnassignedProjectID})
 			resp, err := store.ListPolicyMembers(ctx, polID)
 
 			require.NoError(t, err)
@@ -406,7 +406,7 @@ func TestListPolicyMembers(t *testing.T) {
 			insertTestPolicyMember(t, db, polID, "user:local:mary")
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
-			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID2, constants.UnassignedProjectID})
 			resp, err := store.ListPolicyMembers(ctx, polID)
 
 			assert.Nil(t, resp)
@@ -736,7 +736,7 @@ func TestListPolicies(t *testing.T) {
 				},
 			}
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 			resp, err := store.ListPolicies(ctx)
 			require.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
@@ -762,7 +762,7 @@ func TestListPolicies(t *testing.T) {
 				},
 			}
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.UnassignedProjectID})
 			resp, err := store.ListPolicies(ctx)
 			require.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
@@ -801,7 +801,7 @@ func TestListPolicies(t *testing.T) {
 				},
 			}
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID, projID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.UnassignedProjectID, projID})
 			resp, err := store.ListPolicies(ctx)
 			require.NoError(t, err)
 			assertPolicies(t, expectedPolicies, resp)
@@ -989,7 +989,7 @@ func TestDeletePolicy(t *testing.T) {
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.UnassignedProjectID})
 			assertPolicyChange(t, store, func() {
 				err := store.DeletePolicy(ctx, polID)
 				require.NoError(t, err)
@@ -1005,7 +1005,7 @@ func TestDeletePolicy(t *testing.T) {
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
 			insertPolicyProject(t, db, polID, projID1)
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 			err := store.DeletePolicy(ctx, polID)
 			require.NoError(t, err)
 			assertEmpty(t, db.QueryRow(policyWithID, polID))
@@ -1863,7 +1863,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
 			assertCount(t, 2, db.QueryRow(membersCount))
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 			assertPolicyChange(t, store, func() {
 				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
 				require.NoError(t, err)
@@ -1884,7 +1884,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
-			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID1, constants.UnassignedProjectID})
 			assertPolicyChange(t, store, func() {
 				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
 				require.NoError(t, err)
@@ -1908,7 +1908,7 @@ func TestReplacePolicyMembers(t *testing.T) {
 
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
-			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID2, constants.UnassignedProjectID})
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.ReplacePolicyMembers(ctx, polID, []storage.Member{})
 				assert.Nil(t, resp)
@@ -2114,7 +2114,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 			assertCount(t, 2, db.QueryRow(policyMembersByPolicyID, polID))
 			assertCount(t, 2, db.QueryRow(membersCount))
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 			assertPolicyChange(t, store, func() {
 				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
 				require.NoError(t, err)
@@ -2133,7 +2133,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
-			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID1, constants.UnassignedProjectID})
 			assertPolicyChange(t, store, func() {
 				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
 				require.NoError(t, err)
@@ -2155,7 +2155,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
-			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID2, constants.UnassignedProjectID})
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.RemovePolicyMembers(ctx, polID, []storage.Member{member1, member2})
 				assert.Nil(t, resp)
@@ -2447,7 +2447,7 @@ func TestAddPolicyMembers(t *testing.T) {
 			member2 := genMember(t, "user:local:sue")
 			members := []storage.Member{member1, member2}
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 			assertPolicyChange(t, store, func() {
 				resp, err := store.AddPolicyMembers(ctx, polID, members)
 				require.NoError(t, err)
@@ -2470,7 +2470,7 @@ func TestAddPolicyMembers(t *testing.T) {
 
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
-			ctx = insertProjectsIntoContext(ctx, []string{projID1, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID1, constants.UnassignedProjectID})
 			assertPolicyChange(t, store, func() {
 				resp, err := store.AddPolicyMembers(ctx, polID, members)
 				require.NoError(t, err)
@@ -2496,7 +2496,7 @@ func TestAddPolicyMembers(t *testing.T) {
 
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
-			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID2, constants.UnassignedProjectID})
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.AddPolicyMembers(ctx, polID, members)
 				assert.Nil(t, resp)
@@ -3020,7 +3020,7 @@ func TestUpdatePolicy(t *testing.T) {
 			projID1 := "team-rocket"
 			insertTestProject(t, db, projID1, "blasting off again", storage.Custom)
 			insertPolicyProject(t, db, polID, projID1)
-			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{v2.AllProjectsExternalID}, []string{SuperuserSubject})
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{constants.AllProjectsExternalID}, []string{SuperuserSubject})
 
 			name, typeVal := "new-name", storage.Custom
 			pol := storage.Policy{
@@ -3047,7 +3047,7 @@ func TestUpdatePolicy(t *testing.T) {
 				Members: []storage.Member{},
 			}
 			projID1 := "team-rocket"
-			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{projID1, v2.UnassignedProjectID}, []string{SuperuserSubject})
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{projID1, constants.UnassignedProjectID}, []string{SuperuserSubject})
 			assertPolicyChange(t, store, func() {
 				resp, err := store.UpdatePolicy(ctx, &pol)
 				require.NoError(t, err)
@@ -3065,14 +3065,14 @@ func TestUpdatePolicy(t *testing.T) {
 			projID2 := "team-montag"
 			insertTestProject(t, db, projID2, "we like dags", storage.Custom)
 
-			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID2, constants.UnassignedProjectID})
 			pol := storage.Policy{
 				ID:      polID,
 				Name:    "new-name",
 				Type:    storage.Custom,
 				Members: []storage.Member{},
 			}
-			ctx = insertProjectsIntoContext(ctx, []string{projID2, v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{projID2, constants.UnassignedProjectID})
 			assertNoPolicyChange(t, store, func() {
 				resp, err := store.UpdatePolicy(ctx, &pol)
 				assert.Nil(t, resp)
@@ -4457,9 +4457,9 @@ func TestCreateProject(t *testing.T) {
 	}
 
 	for name, test := range cases {
-		insertTestRole(t, db, v2.ViewerRoleID, "viewer", []string{"any"}, []string{})
-		insertTestRole(t, db, v2.EditorRoleID, "editor", []string{"any"}, []string{})
-		insertTestRole(t, db, v2.ProjectOwnerRoleID, "project owner", []string{"any"}, []string{})
+		insertTestRole(t, db, constants.ViewerRoleID, "viewer", []string{"any"}, []string{})
+		insertTestRole(t, db, constants.EditorRoleID, "editor", []string{"any"}, []string{})
+		insertTestRole(t, db, constants.ProjectOwnerRoleID, "project owner", []string{"any"}, []string{})
 		t.Run(name, test)
 		db.Flush(t)
 	}
@@ -4514,7 +4514,7 @@ func TestUpdateProject(t *testing.T) {
 				Type:   storage.Custom,
 				Status: storage.NoRules.String(),
 			}
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 
 			resp, err := store.UpdateProject(ctx, &project)
 			require.NoError(t, err)
@@ -4671,7 +4671,7 @@ func TestGetProject(t *testing.T) {
 			ctx := context.Background()
 			insertTestProject(t, db, "foo", "my foo project", storage.Custom)
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 
 			p, err := store.GetProject(ctx, "foo")
 			require.NoError(t, err)
@@ -4927,7 +4927,7 @@ func TestDeleteProject(t *testing.T) {
 			insertTestProject(t, db, "my-id-2", "name", storage.Custom)
 			insertTestProject(t, db, "my-id-3", "name", storage.Custom)
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 
 			err := store.DeleteProject(ctx, "test-project")
 
@@ -4992,7 +4992,7 @@ func TestListProjects(t *testing.T) {
 			p1 := insertTestProject(t, db, "foo", "my foo project", storage.ChefManaged)
 			p2 := insertTestProject(t, db, "bar", "my bar project", storage.Custom)
 			p3 := insertTestProject(t, db, "baz", "my baz project", storage.Custom)
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 
 			ps, err := store.ListProjects(ctx)
 			require.NoError(t, err)
@@ -5425,7 +5425,7 @@ func TestListRoles(t *testing.T) {
 				insertTestRole(t, db, role.ID, role.Name, role.Actions, role.Projects)
 			}
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 			resp, err := store.ListRoles(ctx)
 
 			require.NoError(t, err)
@@ -5472,7 +5472,7 @@ func TestListRoles(t *testing.T) {
 				insertTestRole(t, db, role.ID, role.Name, role.Actions, role.Projects)
 			}
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.UnassignedProjectID})
 			resp, err := store.ListRoles(ctx)
 
 			expected := []*storage.Role{
@@ -5660,7 +5660,7 @@ func TestGetRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{project1.ID})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 			resp, err := store.GetRole(ctx, "my-id-1")
 
 			require.NoError(t, err)
@@ -5684,7 +5684,7 @@ func TestGetRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{project1.ID})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 			resp, err := store.GetRole(ctx, "my-id-1")
 
 			require.NoError(t, err)
@@ -5708,7 +5708,7 @@ func TestGetRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{project1.ID})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.UnassignedProjectID})
 			resp, err := store.GetRole(ctx, "my-id-1")
 
 			require.NoError(t, err)
@@ -6002,7 +6002,7 @@ func TestDeleteRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.UnassignedProjectID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.UnassignedProjectID})
 			err = store.DeleteRole(ctx, role.ID)
 
 			require.NoError(t, err)
@@ -6040,7 +6040,7 @@ func TestDeleteRole(t *testing.T) {
 			insertTestRole(t, db, "my-id-3", "name", []string{"action3"}, []string{})
 			insertTestRole(t, db, "my-id-4", "name", []string{"action4"}, []string{})
 
-			ctx = insertProjectsIntoContext(ctx, []string{v2.AllProjectsExternalID})
+			ctx = insertProjectsIntoContext(ctx, []string{constants.AllProjectsExternalID})
 			err = store.DeleteRole(ctx, role.ID)
 
 			require.NoError(t, err)
@@ -6348,7 +6348,7 @@ func TestUpdateRole(t *testing.T) {
 				Actions:  []string{"newaction"},
 				Projects: []string{project1.ID},
 			}
-			ctx = insertProjectsAndSubjectsIntoContext(context.Background(), []string{v2.AllProjectsExternalID}, []string{SuperuserSubject})
+			ctx = insertProjectsAndSubjectsIntoContext(context.Background(), []string{constants.AllProjectsExternalID}, []string{SuperuserSubject})
 			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
@@ -6367,7 +6367,7 @@ func TestUpdateRole(t *testing.T) {
 				Actions:  []string{"newaction"},
 				Projects: []string{},
 			}
-			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{v2.UnassignedProjectID}, []string{SuperuserSubject})
+			ctx := insertProjectsAndSubjectsIntoContext(context.Background(), []string{constants.UnassignedProjectID}, []string{SuperuserSubject})
 			updatedRole, err := store.UpdateRole(ctx, &r)
 
 			require.NoError(t, err)
@@ -6452,127 +6452,6 @@ func TestUpdateRole(t *testing.T) {
 	for name, test := range cases {
 		t.Run(name, test)
 		db.Flush(t)
-	}
-}
-
-func TestMigrationStatusProvider(t *testing.T) {
-	store, db, _, _, _ := testhelpers.SetupTestDB(t)
-	defer db.CloseDB(t)
-	defer store.Close()
-	ctx := context.Background()
-
-	_, err := db.Exec(`DELETE FROM migration_status; INSERT INTO migration_status(state) VALUES ('init')`)
-	require.NoError(t, err)
-
-	cases := map[string]func(*testing.T){
-		"when nothing was ever stored, returns pristine": func(t *testing.T) {
-			ms, err := store.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Pristine, ms)
-		},
-		"record in-progress, read back": func(t *testing.T) {
-			require.NoError(t, store.InProgress(ctx))
-
-			ms, err := store.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.InProgress, ms)
-		},
-		"record success, read back": func(t *testing.T) {
-			require.NoError(t, store.InProgress(ctx))
-			require.NoError(t, store.Success(ctx))
-
-			ms, err := store.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Successful, ms)
-		},
-		"record failure, read back": func(t *testing.T) {
-			require.NoError(t, store.InProgress(ctx))
-			require.NoError(t, store.Failure(ctx))
-
-			ms, err := store.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Failed, ms)
-		},
-		"record pristine, read back": func(t *testing.T) {
-			require.NoError(t, store.InProgress(ctx))
-			require.NoError(t, store.Failure(ctx))
-			require.NoError(t, store.Pristine(ctx))
-
-			ms, err := store.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Pristine, ms)
-		},
-		"record failure, record in-progress, record success, read back": func(t *testing.T) {
-			require.NoError(t, store.InProgress(ctx))
-			require.NoError(t, store.Failure(ctx))
-			require.NoError(t, store.InProgress(ctx))
-			require.NoError(t, store.Success(ctx))
-
-			ms, err := store.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Successful, ms)
-		},
-		"cannot go straight to failure": func(t *testing.T) {
-			require.Error(t, store.Failure(ctx))
-
-			ms, err := store.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Pristine, ms)
-		},
-		"cannot go straight to success": func(t *testing.T) {
-			require.Error(t, store.Success(ctx))
-
-			ms, err := store.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Pristine, ms)
-		},
-		"cannot go from failure to success": func(t *testing.T) {
-			require.NoError(t, store.InProgress(ctx))
-			require.NoError(t, store.Failure(ctx))
-			require.Error(t, store.Success(ctx))
-
-			ms, err := store.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Failed, ms)
-		},
-		"cannot go from success to in-progress": func(t *testing.T) {
-			require.NoError(t, store.InProgress(ctx))
-			require.NoError(t, store.Success(ctx))
-			require.Error(t, store.InProgress(ctx))
-
-			ms, err := store.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Successful, ms)
-		},
-		"cannot go from in-progress to pristine": func(t *testing.T) {
-			require.NoError(t, store.InProgress(ctx))
-			require.Error(t, store.Pristine(ctx))
-
-			ms, err := store.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.InProgress, ms)
-		},
-		"can go from success to pristine": func(t *testing.T) {
-			require.NoError(t, store.InProgress(ctx))
-			require.NoError(t, store.Success(ctx))
-			require.NoError(t, store.Pristine(ctx))
-		},
-		"can go from failure to pristine": func(t *testing.T) {
-			require.NoError(t, store.InProgress(ctx))
-			require.NoError(t, store.Failure(ctx))
-			require.NoError(t, store.Pristine(ctx))
-		},
-		// This is debatable, let's see what suits us best
-		"cannot go from pristine to pristine": func(t *testing.T) {
-			require.Error(t, store.Pristine(ctx))
-		},
-	}
-
-	for name, test := range cases {
-		t.Run(name, test)
-		db.Flush(t)
-		_, err := db.Exec(`DELETE FROM migration_status; INSERT INTO migration_status(state) VALUES ('init')`)
-		require.NoError(t, err)
 	}
 }
 

@@ -1,8 +1,7 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { Rule, Project } from '../../../support/types';
 
 // these tests are best read sequentially, as they share state
-describeIfIAMV2p1('projects API', () => {
+describe('projects API', () => {
   const cypressPrefix = 'test-projects-api';
 
   const projectWithOrgRule: Project = {
@@ -54,11 +53,11 @@ describeIfIAMV2p1('projects API', () => {
     // it gets run every time:
     // tslint:disable-next-line:max-line-length
     // https://docs.cypress.io/guides/references/best-practices.html#Using-after-or-afterEach-hooks
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects']);
   });
 
   describe('applying project rules', () => {

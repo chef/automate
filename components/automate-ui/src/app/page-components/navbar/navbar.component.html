@@ -23,14 +23,14 @@
 
         <app-authorized
           [anyOf]="[['/datafeed/destinations', 'post'], ['/notifications/rules', 'get'], ['/secrets/search', 'post'], ['/nodemanagers/search', 'post'], ['/retention/nodes/status', 'get'],
-            ['/auth/users', 'get'], ['/auth/teams', 'get'], ['/auth/tokens', 'get'], ['/iam/v2/tokens', 'get'],
+            ['/iam/v2/users', 'get'], ['/iam/v2/teams', 'get'], ['/iam/v2/tokens', 'get'],
             ['/iam/v2/policies', 'get'], ['/iam/v2/roles', 'get'], ['/iam/v2/projects', 'get']] ">
           <div role="menuitem" class="nav-link"><a routerLink="/settings" routerLinkActive="active" tabindex="0">Settings</a></div>
         </app-authorized>
       </div>
     </div>
     <div class="right-nav" role="menubar">
-      <app-projects-filter *ngIf="isIAMv2$ | async"></app-projects-filter>
+      <app-projects-filter></app-projects-filter>
       <app-profile></app-profile>
     </div>
   </nav>

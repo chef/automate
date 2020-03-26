@@ -994,23 +994,23 @@ func runCreateIAMDevUsersCmd(*cobra.Command, []string) error {
 		return err
 	}
 	for username, data := range map[string]struct {
-		displayName, password, team string
+		displayName, password, teamID string
 	}{
 		"viewer": {"Viewer User", "chefautomate", "viewers"},
 		"editor": {"Editor User", "chefautomate", "editors"},
 	} {
 		userID, _, err := adminmgmt.CreateUserOrUpdatePassword(ctx,
-			apiClient, username, data.displayName, data.password, false /* dry run */)
+			apiClient, username, data.displayName, data.password, false)
 		if err != nil {
 			return err
 		}
 		// Note: the teams SHOULD exist. But since you never know what happens in a
 		// long running acceptance env, we'll better ensure them:
-		teamID, _, err := adminmgmt.EnsureTeam(ctx, data.team, data.team /* description */, apiClient, false /* dry run */)
+		_, err = adminmgmt.EnsureTeam(ctx, data.teamID, data.teamID, apiClient, false)
 		if err != nil {
 			return err
 		}
-		_, err = adminmgmt.AddUserToTeam(ctx, apiClient, teamID, userID, false /* dry run */)
+		_, err = adminmgmt.AddUserToTeam(ctx, apiClient, data.teamID, userID, false)
 		if err != nil {
 			return err
 		}

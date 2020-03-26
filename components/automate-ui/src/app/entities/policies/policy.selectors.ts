@@ -11,17 +11,6 @@ export const {
   selectEntities: policyEntities
 } = policyEntityAdapter.getSelectors(policyState);
 
-export const iamMajorVersion = createSelector(
-  policyState,
-  (state) => state.iamMajorVersion
-);
-
-// This is used early enough that we have to guard against undefined (at least for unit tests)
-export const isIAMv2 = createSelector(
-  policyState,
-  (state) => (state && state.iamMajorVersion === 'v2')
-);
-
 export const getAllStatus = createSelector(
   policyState,
   (state) => state.getAllStatus

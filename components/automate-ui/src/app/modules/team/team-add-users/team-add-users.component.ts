@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy, EventEmitter } from '@angular/core';
 import { Store, select } from '@ngrx/store';
 import { Router } from '@angular/router';
 import { combineLatest, Subject, Observable } from 'rxjs';
-import { keyBy, at } from 'lodash/fp';
+import { keyBy, at, identity } from 'lodash/fp';
 import { filter, map, takeUntil, distinctUntilChanged } from 'rxjs/operators';
 import { filter as lodashFilter } from 'lodash/fp';
 
@@ -13,10 +13,8 @@ import { EntityStatus, allLoadedSuccessfully, pending } from 'app/entities/entit
 import { User, HashMapOfUsers, userArrayToHash } from 'app/entities/users/user.model';
 import { allUsers, getStatus as getAllUsersStatus } from 'app/entities/users/user.selectors';
 import { GetUsers } from 'app/entities/users/user.actions';
-import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import {
-  v1TeamFromRoute,
-  v2TeamFromRoute,
+  teamFromRoute,
   teamUsers,
   addUsersStatus,
   getUsersStatus as getTeamUsersStatus
@@ -39,7 +37,6 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
   public team: Team;
   public users: User[] = [];
   private mapOfUsersToFilter: HashMapOfUsers = {};
-  public isIAMv2$: Observable<boolean>;
   private isDestroyed = new Subject<boolean>();
   public addingUsers = false;
   private usersToAdd: { [id: string]: User } = {};
@@ -56,26 +53,18 @@ export class TeamAddUsersComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.store.dispatch(new GetUsers());
-    this.isIAMv2$ = this.store.select(isIAMv2);
-
-    combineLatest([
-      this.isIAMv2$,
-      this.store.select(v2TeamFromRoute),
-      this.store.select(v1TeamFromRoute)
-    ]).pipe(
-        takeUntil(this.isDestroyed),
-        filter(([isV2, _v2TeamFromRoute, _v1TeamFromRoute]) => isV2 !== null),
-        map(([isV2, v2Team, v1Team]) =>
-          isV2 ? [v2Team, v2Team ? v2Team.id : null] : [v1Team, v1Team ? v1Team.guid : null]),
-        filter(([team, _teamId]) => team != null),
-        distinctUntilChanged(
-          ([_teamA, teamIdA]: [Team, string], [_teamB, teamIdB]: [Team, string]) =>
-          teamIdA === teamIdB)
-      ).subscribe(([team, teamId]) => {
-        this.team = team;
-        this.teamId = teamId;
-        this.store.dispatch(new GetTeamUsers({ id: teamId}));
-      });
+    this.store.select(teamFromRoute).pipe(
+      takeUntil(this.isDestroyed),
+      filter(identity),
+      map(team => [team, team ? team.id : null]),
+      distinctUntilChanged(
+        ([_teamA, teamIdA]: [Team, string], [_teamB, teamIdB]: [Team, string]) =>
+        teamIdA === teamIdB)
+    ).subscribe(([team, teamId]) => {
+      this.team = team;
+      this.teamId = teamId;
+      this.store.dispatch(new GetTeamUsers({ id: teamId}));
+    });
 
     this.store.select(routeState).pipe(
       takeUntil(this.isDestroyed),

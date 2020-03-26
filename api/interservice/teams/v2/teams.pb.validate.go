@@ -1819,3 +1819,139 @@ var _ interface {
 	Cause() error
 	ErrorName() string
 } = ResetToV1RespValidationError{}
+
+// Validate checks the field values on PurgeUserMembershipReq with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *PurgeUserMembershipReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	// no validation rules for UserId
+
+	return nil
+}
+
+// PurgeUserMembershipReqValidationError is the validation error returned by
+// PurgeUserMembershipReq.Validate if the designated constraints aren't met.
+type PurgeUserMembershipReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PurgeUserMembershipReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PurgeUserMembershipReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PurgeUserMembershipReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PurgeUserMembershipReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PurgeUserMembershipReqValidationError) ErrorName() string {
+	return "PurgeUserMembershipReqValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PurgeUserMembershipReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPurgeUserMembershipReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PurgeUserMembershipReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PurgeUserMembershipReqValidationError{}
+
+// Validate checks the field values on PurgeUserMembershipResp with the rules
+// defined in the proto definition for this message. If any rules are
+// violated, an error is returned.
+func (m *PurgeUserMembershipResp) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// PurgeUserMembershipRespValidationError is the validation error returned by
+// PurgeUserMembershipResp.Validate if the designated constraints aren't met.
+type PurgeUserMembershipRespValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e PurgeUserMembershipRespValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e PurgeUserMembershipRespValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e PurgeUserMembershipRespValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e PurgeUserMembershipRespValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e PurgeUserMembershipRespValidationError) ErrorName() string {
+	return "PurgeUserMembershipRespValidationError"
+}
+
+// Error satisfies the builtin error interface
+func (e PurgeUserMembershipRespValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sPurgeUserMembershipResp.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = PurgeUserMembershipRespValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = PurgeUserMembershipRespValidationError{}

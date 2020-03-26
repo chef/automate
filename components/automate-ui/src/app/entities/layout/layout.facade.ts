@@ -1,10 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { first, filter } from 'rxjs/operators';
-import { identity } from 'lodash/fp';
 
-import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import { LayoutSidebarService } from './layout-sidebar.service';
 import * as fromLayout from './layout.reducer';
 import { MenuItemGroup } from './layout.model';
@@ -64,13 +61,7 @@ export class LayoutFacadeService {
     this.sidebar$ = store.select(sidebar);
     this.showPageLoading$ = store.select(showPageLoading);
     this.updateDisplay();
-    this.store.select(isIAMv2)
-      .pipe(filter(identity), first())
-      .subscribe(isV2 => {
-        if (isV2) {
-          this.store.dispatch(new GetProjects());
-        }
-      });
+    this.store.dispatch(new GetProjects());
   }
 
   getContentStyle(): any {

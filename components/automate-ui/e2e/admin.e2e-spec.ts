@@ -10,22 +10,12 @@ describe('Admin pages', () => {
   describe('User Management', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .many()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V1',
-            'minor': 'V0'
-          }
-        }));
-
-      fakeServer()
-        .get('/api/v0/auth/introspect')
+        .get('/apis/iam/v2/introspect')
         .many()
         .reply(200, JSON.stringify(
           {
             endpoints: {
-              '/auth/users': {
+              '/iam/v2/users': {
                 get: true,
                 put: false,
                 post: true,
@@ -37,16 +27,15 @@ describe('Admin pages', () => {
         ));
 
       fakeServer()
-        .get('/api/v0/auth/users')
+        .get('/apis/iam/v2/users')
         .many()
         .reply(200, JSON.stringify(
           {
             users: [
               {
-                id: 'b369ef15-6323-4c31-bcbc-23fb0c9ba55d',
+                id: 'admin',
                 name: 'Local Administrator',
-                email: 'admin',
-                username: 'admin'
+                membership_id: '38d792f7-85b4-4127-9c4e-110118e3cca4'
               }
             ]
           }
@@ -106,7 +95,7 @@ describe('Admin pages', () => {
   describe('Policies list', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/api/v0/auth/introspect')
+        .get('/apis/iam/v2/introspect')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -143,21 +132,6 @@ describe('Admin pages', () => {
             ]
           }
         ));
-
-      // Note(sr): Technically, this isn't required: the crucial check in the
-      // policy-list component only checks '=== "v1"' and '!== "v1"', and
-      // undefined, or whatever it ends up being when the endpoint is not found,
-      // is unequal "v1". But this is more correct, and less dependant on that
-      // specific detail.
-      fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .many()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V2',
-            'minor': 'V0'
-          }
-        }));
 
       browser.waitForAngularEnabled(false);
       browser.get('/settings/policies');
@@ -288,16 +262,6 @@ describe('Admin pages', () => {
           }
         ));
 
-      fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .many()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V2',
-            'minor': 'V0'
-          }
-        }));
-
       browser.waitForAngularEnabled(false);
       browser.get('/settings/policies/some-test-policy');
     });
@@ -330,280 +294,10 @@ describe('Admin pages', () => {
     });
   });
 
-  // Note(sr): this is exploding in the console, but not failing the test.
-  // Let's revisit this red herring, please! =)
-  xdescribe('Policy members add', () => {
-    beforeEach(() => {
-
-      fakeServer()
-        .get('/apis/iam/v2/policies/some-test-policy')
-        .many()
-        .reply(200, JSON.stringify(
-          {
-            policy:
-            {
-              id: 'some-test-policy',
-              name: 'Test Policy',
-              members: ['team:local:testteam', 'user:local:testuser'],
-              type: 'CUSTOM'
-            }
-          }
-        ));
-
-      fakeServer()
-        .get('/api/v0/auth/users')
-        .many()
-        .reply(200, JSON.stringify(
-          {
-            users: [
-              {
-                id: 'otheruser',
-                name: 'Otheruser',
-                email: 'otheruser',
-                username: 'otheruser'
-              },
-              {
-                id: 'admin',
-                name: 'Local Administrator',
-                email: 'admin',
-                username: 'admin'
-              },
-              {
-                id: 'testuser',
-                name: 'Testuser',
-                email: 'testuser',
-                username: 'testuser'
-              }
-            ]
-          }
-        ));
-
-      fakeServer()
-        .get('/api/v0/auth/teams')
-        .many()
-        .reply(200, JSON.stringify(
-          {
-            teams: [
-              {
-                id: 'testteam',
-                name: 'testteam',
-                description: 'Testteam'
-              },
-              {
-                id: 'admins',
-                name: 'admins',
-                description: 'admins'
-              }
-            ]
-          }
-        ));
-
-      browser.waitForAngularEnabled(false);
-      browser.get('/settings/policies/some-test-policy/add-members');
-    });
-
-    it('displays heading', () => {
-      const heading = $('chef-heading h1');
-      expect(heading.getText()).toBe('Add Members to Test Policy');
-    });
-
-    it('displays the local teams and users that are not yet ' +
-      'members in sorted order as links', () => {
-
-        expect($('chef-table-new chef-table-body chef-table-row:nth-child(1) chef-table-cell:nth-child(2) a')
-          .getText()).toBe('admin');
-        expect($('chef-table-new chef-table-row:nth-child(1) chef-table-cell:nth-child(3)')
-          .getText()).toBe('Local user');
-
-        expect($('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(2) a')
-          .getText()).toBe('admins');
-        expect($('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(3)')
-          .getText()).toBe('Local team');
-
-        expect($('chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(2) a')
-          .getText()).toBe('otheruser');
-        expect($('chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(3)')
-          .getText()).toBe('Local user');
-      });
-
-    describe('when a single member is added and submitted', () => {
-      beforeEach(() => {
-        fakeServer()
-          .post('/apis/iam/v2/policies/some-test-policy/members:add',
-            {
-              'members': ['user:local:admin']
-            })
-          .many()
-          .reply(200, JSON.stringify(
-            {
-              policy:
-              {
-                id: 'some-test-policy',
-                name: 'Test Policy',
-                members: ['team:local:admin', 'team:local:testteam', 'user:local:testuser'],
-                type: 'CUSTOM'
-              }
-            }
-          ));
-      });
-
-      it('it enables the add button, changes its text, and sends the request', () => {
-        expect($('#right-buttons chef-button:first-child').getAttribute('disabled')).toBe('true');
-
-        $('chef-table-new chef-table-body chef-table-row:nth-child(1) chef-table-cell:nth-child(1) chef-checkbox').click();
-        expect($('#right-buttons chef-button:first-child').getText()).toBe('Add Member');
-        expect($('#right-buttons chef-button:first-child').getAttribute('disabled')).toBeNull();
-
-        $('#right-buttons chef-button:first-child').click();
-      });
-    });
-
-    describe('when multiple members are selected and added', () => {
-      beforeEach(() => {
-        fakeServer()
-          .post('/apis/iam/v2/policies/some-test-policy/members:add',
-            {
-              'members': ['user:local:admin', 'team:local:admins']
-            })
-          .many()
-          .reply(200, JSON.stringify(
-            {
-              policy:
-              {
-                id: 'some-test-policy',
-                name: 'Test Policy',
-                members: ['team:local:admin', 'team:local:testteam', 'user:local:testuser'],
-                type: 'CUSTOM'
-              }
-            }
-          ));
-      });
-
-      it('it enables the add button, changes its text to indicate multiple members, ' +
-        'and sends the request', () => {
-          expect($('#right-buttons chef-button:first-child').getAttribute('disabled'))
-            .toBe('true');
-
-          $('chef-table-new chef-table-body chef-table-row:nth-child(1) chef-table-cell:nth-child(1) chef-checkbox')
-            .click();
-          $('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(1) chef-checkbox')
-            .click();
-
-          expect($('#right-buttons chef-button:first-child').getAttribute('disabled')).toBeNull();
-          expect($('#right-buttons chef-button:first-child').getText()).toBe('Add 2 Members');
-
-          $('#right-buttons chef-button:first-child').click();
-        });
-    });
-
-    describe('when a custom expression is added and submitted' +
-      'with incorrect expressions initially inputted', () => {
-
-        beforeEach(() => {
-          fakeServer()
-            .post('/apis/iam/v2/policies/some-test-policy/members:add',
-              {
-                'members': ['user:ldap:*']
-              })
-            .many()
-            .reply(200, JSON.stringify(
-              {
-                policy:
-                {
-                  id: 'some-test-policy',
-                  name: 'Test Policy',
-                  members: ['team:local:admin', 'team:local:testteam', 'user:local:testuser'],
-                  type: 'CUSTOM'
-                }
-              }
-            ));
-        });
-
-        it('shows errors for the incorrect inputs, adds and pre-selects the ' +
-          'valid member to the table, and submits the request', () => {
-
-            // Open modal
-            $('#footer .add-member-button').click();
-
-            // Button starts out disabled
-            expect($('app-policy-add-members chef-modal chef-button:first-child')
-              .getAttribute('disabled')).toBe('true');
-
-            // Type an invalid expression, press submit and see error
-            $('app-policy-add-members chef-modal chef-form-field input').sendKeys('something:invalid');
-            expect($('app-policy-add-members chef-modal chef-button:first-child')
-              .getAttribute('disabled')).toBeNull();
-            $('app-policy-add-members chef-modal chef-button:first-child').click();
-            expect($('app-policy-add-members chef-form-field .errors chef-error').getText())
-              .toBe('Invalid member expression.');
-
-            // When the member is already in the policy, you'll get an error
-            $('app-policy-add-members chef-modal chef-form-field input').clear();
-            $('app-policy-add-members chef-modal chef-form-field input')
-              .sendKeys('team:local:testteam');
-            expect($('app-policy-add-members chef-modal chef-button:first-child')
-              .getAttribute('disabled')).toBeNull();
-            $('app-policy-add-members chef-modal chef-button:first-child').click();
-            expect($('app-policy-add-members chef-form-field .errors chef-error').getText())
-              .toBe('Member already in policy.');
-
-            // When the member is already in the table, you'll get an error
-            $('app-policy-add-members chef-modal chef-form-field input').clear();
-            $('app-policy-add-members chef-modal chef-form-field input').sendKeys('team:local:admins');
-            expect($('app-policy-add-members chef-modal chef-button:first-child')
-              .getAttribute('disabled')).toBeNull();
-            $('app-policy-add-members chef-modal chef-button:first-child').click();
-            expect($('app-policy-add-members chef-form-field .errors chef-error').getText())
-              .toBe('Member expression already in table.');
-
-            // Type a valid expression and submit
-            $('app-policy-add-members chef-modal chef-form-field input').clear();
-            $('app-policy-add-members chef-modal chef-form-field input').sendKeys('user:ldap:*');
-            expect($('app-policy-add-members chef-modal chef-button:first-child')
-              .getAttribute('disabled')).toBeNull();
-            $('app-policy-add-members chef-modal chef-button:first-child').click();
-
-            // Add members button should be enabled and should be added to table in sorted way
-            expect($('#right-buttons chef-button:first-child').getText()).toBe('Add Member');
-
-            expect($('chef-table-new chef-table-body chef-table-row:nth-child(1) chef-table-cell:nth-child(2) a').getText())
-              .toBe('admin');
-            expect($('chef-table-new chef-table-row:nth-child(1) chef-table-cell:nth-child(3)')
-              .getText())
-              .toBe('Local user');
-
-            expect($('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(2) a').getText())
-              .toBe('admins');
-            expect($('chef-table-new chef-table-body chef-table-row:nth-child(2) chef-table-cell:nth-child(3)').getText())
-              .toBe('Local team');
-
-            // Non-local users / teams don't have a link and are pre-selected
-            expect(
-              $('chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(1) chef-checkbox')
-                .getAttribute('ng-reflect-checked')).toBe('true');
-            expect($('chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(2)')
-              .getText()).toBe('All LDAP users');
-            expect($('chef-table-new chef-table-body chef-table-row:nth-child(3) chef-table-cell:nth-child(3)')
-              .getText()).toBe('All LDAP users');
-
-            expect($('chef-table-new chef-table-body chef-table-row:nth-child(4) chef-table-cell:nth-child(2) a').getText())
-              .toBe('otheruser');
-            expect($('chef-table-new chef-table-body chef-table-row:nth-child(4) chef-table-cell:nth-child(3)').getText())
-              .toBe('Local user');
-
-            expect($('#right-buttons chef-button:first-child').getAttribute('disabled')).toBeNull();
-            expect($('#right-buttons chef-button:first-child').getText()).toBe('Add Member');
-
-            // Submit to API
-            $('#right-buttons chef-button:first-child').click();
-          });
-      });
-  });
-
   describe('Roles list', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/api/v0/auth/introspect')
+        .get('/apis/iam/v2/introspect')
         .many()
         .reply(200, JSON.stringify(
           {
@@ -640,16 +334,6 @@ describe('Admin pages', () => {
             ]
           }
         ));
-
-      fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .many()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V2',
-            'minor': 'V0'
-          }
-        }));
 
       browser.waitForAngularEnabled(false);
       browser.get('/settings/roles');
@@ -701,16 +385,6 @@ describe('Admin pages', () => {
           }
         ));
 
-      fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .many()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V2',
-            'minor': 'V0'
-          }
-        }));
-
       browser.waitForAngularEnabled(false);
       browser.get('/settings/roles/some-test-role');
     });
@@ -742,7 +416,7 @@ describe('Admin pages', () => {
   describe('Projects list', () => {
     beforeEach(() => {
       fakeServer()
-        .get('/api/v0/auth/introspect')
+        .get('/apis/iam/v2/introspect')
         .any()
         .reply(200, JSON.stringify(
           {
@@ -800,7 +474,7 @@ describe('Admin pages', () => {
           }
         };
         fakeServer()
-          .post('/api/v0/auth/introspect', JSON.stringify(
+          .post('/apis/iam/v2/introspect', JSON.stringify(
             {
               path,
               parameters: []
@@ -809,16 +483,6 @@ describe('Admin pages', () => {
           .any()
           .reply(200, JSON.stringify({ endpoints }));
       });
-
-      fakeServer()
-        .get('/apis/iam/v2/policy_version')
-        .any()
-        .reply(200, JSON.stringify({
-          'version': {
-            'major': 'V2',
-            'minor': 'V1'
-          }
-        }));
 
       browser.waitForAngularEnabled(false);
       browser.get('/settings/projects');

@@ -7,7 +7,6 @@ import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { Feature } from 'app/services/feature-flags/types';
 import { LayoutFacadeService } from 'app/entities/layout/layout.facade';
 
-import { GetIamVersion } from 'app/entities/policies/policy.actions';
 import { GetAllUserPerms } from './entities/userperms/userperms.actions';
 
 @Component({
@@ -66,8 +65,5 @@ export class UIComponent implements OnInit {
 
     // Initial call
     this.store.dispatch(new GetAllUserPerms());
-
-    // Initial calls for polled events
-    this.store.dispatch(new GetIamVersion());
   }
 }

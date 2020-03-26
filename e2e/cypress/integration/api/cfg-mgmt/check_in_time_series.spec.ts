@@ -1,8 +1,7 @@
 
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { uuidv4 } from '../../../support/helpers';
 
-describeIfIAMV2p1('Config-mgmt check-in time series', () => {
+describe('Config-mgmt check-in time series', () => {
 
   describe('two nodes 4 runs with two different environments', () => {
     const cypressPrefix = 'test-cfg-check-in';

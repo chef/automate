@@ -23,8 +23,7 @@ import (
 	"google.golang.org/grpc/codes"
 
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
-	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv1"
-	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
+	auth "github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
 	"github.com/chef/automate/components/automate-gateway/pkg/nullbackend"
 	"github.com/chef/automate/lib/grpc/debug/debug_api"
@@ -146,7 +145,7 @@ func (s *Server) Start() error {
 
 	err = s.loadAuthorizer()
 	if err != nil {
-		return errors.Wrap(err, "loading authorizor")
+		return errors.Wrap(err, "loading authorizer")
 	}
 
 	err = s.startGRPCServer()
@@ -202,19 +201,12 @@ func (s *Server) setLogLevel() {
 func (s *Server) loadAuthorizer() error {
 	s.logger.Info("loading authorizer")
 
-	authzClientV1, err := s.clientsFactory.AuthorizationClient()
+	authzClient, err := s.clientsFactory.AuthorizationClient()
 	if err != nil {
 		return errors.Wrap(err, "create authz client")
 	}
-	authzClientV2, err := s.clientsFactory.AuthorizationV2Client()
-	if err != nil {
-		return errors.Wrap(err, "create authz_v2 client")
-	}
 
-	s.authorizer = authorizer.NewAuthorizer(
-		authv1.AuthorizationHandler(authzClientV1),
-		authv2.AuthorizationHandler(authzClientV2),
-	)
+	s.authorizer = authorizer.NewAuthorizer(auth.AuthorizationHandler(authzClient))
 
 	return nil
 }

@@ -30,18 +30,16 @@ func NewTeamsServerMockWithoutValidation() *TeamsServerMock {
 // TeamsServerMock is the mock-what-you-want struct that stubs all not-overridden
 // methods with "not implemented" returns
 type TeamsServerMock struct {
-	validateRequests          bool
-	CreateTeamFunc            func(context.Context, *request.CreateTeamReq) (*response.CreateTeamResp, error)
-	ListTeamsFunc             func(context.Context, *request.ListTeamsReq) (*response.ListTeamsResp, error)
-	GetTeamFunc               func(context.Context, *request.GetTeamReq) (*response.GetTeamResp, error)
-	UpdateTeamFunc            func(context.Context, *request.UpdateTeamReq) (*response.UpdateTeamResp, error)
-	DeleteTeamFunc            func(context.Context, *request.DeleteTeamReq) (*response.DeleteTeamResp, error)
-	GetTeamMembershipFunc     func(context.Context, *request.GetTeamMembershipReq) (*response.GetTeamMembershipResp, error)
-	AddTeamMembersFunc        func(context.Context, *request.AddTeamMembersReq) (*response.AddTeamMembersResp, error)
-	RemoveTeamMembersFunc     func(context.Context, *request.RemoveTeamMembersReq) (*response.RemoveTeamMembersResp, error)
-	GetTeamsForMemberFunc     func(context.Context, *request.GetTeamsForMemberReq) (*response.GetTeamsForMemberResp, error)
-	ApplyV2DataMigrationsFunc func(context.Context, *request.ApplyV2DataMigrationsReq) (*response.ApplyV2DataMigrationsResp, error)
-	ResetAllTeamProjectsFunc  func(context.Context, *request.ResetAllTeamProjectsReq) (*response.ResetAllTeamProjectsResp, error)
+	validateRequests      bool
+	CreateTeamFunc        func(context.Context, *request.CreateTeamReq) (*response.CreateTeamResp, error)
+	ListTeamsFunc         func(context.Context, *request.ListTeamsReq) (*response.ListTeamsResp, error)
+	GetTeamFunc           func(context.Context, *request.GetTeamReq) (*response.GetTeamResp, error)
+	UpdateTeamFunc        func(context.Context, *request.UpdateTeamReq) (*response.UpdateTeamResp, error)
+	DeleteTeamFunc        func(context.Context, *request.DeleteTeamReq) (*response.DeleteTeamResp, error)
+	GetTeamMembershipFunc func(context.Context, *request.GetTeamMembershipReq) (*response.GetTeamMembershipResp, error)
+	AddTeamMembersFunc    func(context.Context, *request.AddTeamMembersReq) (*response.AddTeamMembersResp, error)
+	RemoveTeamMembersFunc func(context.Context, *request.RemoveTeamMembersReq) (*response.RemoveTeamMembersResp, error)
+	GetTeamsForMemberFunc func(context.Context, *request.GetTeamsForMemberReq) (*response.GetTeamsForMemberResp, error)
 }
 
 func (m *TeamsServerMock) CreateTeam(ctx context.Context, req *request.CreateTeamReq) (*response.CreateTeamResp, error) {
@@ -152,30 +150,6 @@ func (m *TeamsServerMock) GetTeamsForMember(ctx context.Context, req *request.Ge
 	return nil, status.Error(codes.Internal, "mock: 'GetTeamsForMember' not implemented")
 }
 
-func (m *TeamsServerMock) ApplyV2DataMigrations(ctx context.Context, req *request.ApplyV2DataMigrationsReq) (*response.ApplyV2DataMigrationsResp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.ApplyV2DataMigrationsFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'ApplyV2DataMigrations' not implemented")
-}
-
-func (m *TeamsServerMock) ResetAllTeamProjects(ctx context.Context, req *request.ResetAllTeamProjectsReq) (*response.ResetAllTeamProjectsResp, error) {
-	if msg, ok := interface{}(req).(interface{ Validate() error }); m.validateRequests && ok {
-		if err := msg.Validate(); err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-	}
-	if f := m.ResetAllTeamProjectsFunc; f != nil {
-		return f(ctx, req)
-	}
-	return nil, status.Error(codes.Internal, "mock: 'ResetAllTeamProjects' not implemented")
-}
-
 // Reset resets all overridden functions
 func (m *TeamsServerMock) Reset() {
 	m.CreateTeamFunc = nil
@@ -187,6 +161,4 @@ func (m *TeamsServerMock) Reset() {
 	m.AddTeamMembersFunc = nil
 	m.RemoveTeamMembersFunc = nil
 	m.GetTeamsForMemberFunc = nil
-	m.ApplyV2DataMigrationsFunc = nil
-	m.ResetAllTeamProjectsFunc = nil
 }

@@ -13,7 +13,6 @@ import (
 	"github.com/chef/automate/api/external/data_feed"
 	"github.com/chef/automate/api/external/secrets"
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/authz"
 	iam_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	cfgmgmt "github.com/chef/automate/api/interservice/cfgmgmt/service"
 	cc_ingest "github.com/chef/automate/api/interservice/compliance/ingest/ingest"
@@ -31,8 +30,7 @@ import (
 	"github.com/chef/automate/api/interservice/local_user"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
 	"github.com/chef/automate/api/interservice/nodemanager/nodes"
-	teams_v1 "github.com/chef/automate/api/interservice/teams/v1"
-	teams_v2 "github.com/chef/automate/api/interservice/teams/v2"
+	teams "github.com/chef/automate/api/interservice/teams/v2"
 	notifications "github.com/chef/automate/components/notifications-client/api"
 	"github.com/chef/automate/components/notifications-client/notifier"
 	"github.com/chef/automate/lib/grpc/secureconn"
@@ -96,12 +94,10 @@ type ClientsFactory interface {
 	ComplianceIngesterClient() (cc_ingest.ComplianceIngesterClient, error)
 	NotificationsClient() (notifications.NotificationsClient, error)
 	AuthenticationClient() (authn.AuthenticationClient, error)
-	AuthorizationClient() (authz.AuthorizationClient, error)
-	AuthorizationV2Client() (iam_v2.AuthorizationClient, error)
+	AuthorizationClient() (iam_v2.AuthorizationClient, error)
 	PoliciesClient() (iam_v2.PoliciesClient, error)
 	ProjectsClient() (iam_v2.ProjectsClient, error)
-	TeamsV1Client() (teams_v1.TeamsV1Client, error)
-	TeamsV2Client() (teams_v2.TeamsV2Client, error)
+	TeamsClient() (teams.TeamsV2Client, error)
 	TokensMgmtClient() (authn.TokensMgmtClient, error)
 	UsersMgmtClient() (local_user.UsersMgmtClient, error)
 	Notifier() (notifier.Notifier, error)
@@ -247,19 +243,9 @@ func (c *clientsFactory) AuthenticationClient() (authn.AuthenticationClient, err
 	return authn.NewAuthenticationClient(conn), nil
 }
 
-// AuthorizationClient returns a client for the Authorization service.
+// AuthorizationClient returns a client for the Authorization (IAMv2) service.
 // It requires the `authz` endpoint to be configured
-func (c *clientsFactory) AuthorizationClient() (authz.AuthorizationClient, error) {
-	conn, err := c.connectionByName("authz-service")
-	if err != nil {
-		return nil, err
-	}
-	return authz.NewAuthorizationClient(conn), nil
-}
-
-// AuthorizationV2Client returns a client for the Authorization (IAMv2) service.
-// It requires the `authz` endpoint to be configured
-func (c *clientsFactory) AuthorizationV2Client() (iam_v2.AuthorizationClient, error) {
+func (c *clientsFactory) AuthorizationClient() (iam_v2.AuthorizationClient, error) {
 	conn, err := c.connectionByName("authz-service")
 	if err != nil {
 		return nil, err
@@ -287,24 +273,14 @@ func (c *clientsFactory) ProjectsClient() (iam_v2.ProjectsClient, error) {
 	return iam_v2.NewProjectsClient(conn), nil
 }
 
-// TeamsV1Client returns a V1 client for the Teams service.
+// TeamsClient returns a client for the Teams Mgmt service.
 // It requires the `teams` endpoint to be configured
-func (c *clientsFactory) TeamsV1Client() (teams_v1.TeamsV1Client, error) {
+func (c *clientsFactory) TeamsClient() (teams.TeamsV2Client, error) {
 	conn, err := c.connectionByName("teams-service")
 	if err != nil {
 		return nil, err
 	}
-	return teams_v1.NewTeamsV1Client(conn), nil
-}
-
-// TeamsV2Client returns a V2 client for the Teams service.
-// It requires the `teams` endpoint to be configured
-func (c *clientsFactory) TeamsV2Client() (teams_v2.TeamsV2Client, error) {
-	conn, err := c.connectionByName("teams-service")
-	if err != nil {
-		return nil, err
-	}
-	return teams_v2.NewTeamsV2Client(conn), nil
+	return teams.NewTeamsV2Client(conn), nil
 }
 
 // TokensMgmtClient returns a client for the Tokens Mgmt service.

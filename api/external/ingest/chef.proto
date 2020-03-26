@@ -28,8 +28,8 @@ service ChefIngester {
     };
     option (chef.automate.api.policy).resource = "ingest:nodes:{entity_uuid}:runs";
     option (chef.automate.api.policy).action = "create";
-    option (chef.automate.api.iam.policy).resource = "infra:nodes:{entity_uuid}:runs";
-    option (chef.automate.api.iam.policy).action = "infra:ingest:create";
+    option (chef.automate.api.iam.policy).resource = "ingest:nodes:{entity_uuid}:runs";
+    option (chef.automate.api.iam.policy).action = "ingest:nodes:create";
   };
   rpc ProcessChefAction (ingest.request.Action) returns (ingest.response.ProcessChefActionResponse) {
     option (google.api.http) = {
@@ -40,8 +40,8 @@ service ChefIngester {
     // not necessarily related to nodes
     option (chef.automate.api.policy).resource = "ingest:actions";
     option (chef.automate.api.policy).action = "create";
-    option (chef.automate.api.iam.policy).resource = "infra:actions";
-    option (chef.automate.api.iam.policy).action = "infra:ingest:create";
+    option (chef.automate.api.iam.policy).resource = "ingest:actions";
+    option (chef.automate.api.iam.policy).action = "ingest:actions:create";
   };
   rpc ProcessNodeDelete (ingest.request.Delete) returns (ingest.response.ProcessNodeDeleteResponse) {
     option (google.api.http) = {
@@ -54,8 +54,8 @@ service ChefIngester {
     // for now we cannot enforce deleting a specific node, just any node or none
     option (chef.automate.api.policy).resource = "ingest:nodes";
     option (chef.automate.api.policy).action = "delete";
-    option (chef.automate.api.iam.policy).resource = "infra:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:ingest:delete";
+    option (chef.automate.api.iam.policy).resource = "ingest:nodes";
+    option (chef.automate.api.iam.policy).action = "ingest:nodes:delete";
   };
   rpc ProcessMultipleNodeDeletes (ingest.request.MultipleNodeDeleteRequest) returns (ingest.response.ProcessMultipleNodeDeleteResponse) {
     option (google.api.http) = {
@@ -64,8 +64,8 @@ service ChefIngester {
     };
     option (chef.automate.api.policy).resource = "ingest:nodes";
     option (chef.automate.api.policy).action = "delete";
-    option (chef.automate.api.iam.policy).resource = "infra:nodes";
-    option (chef.automate.api.iam.policy).action = "infra:ingestNodes:delete";
+    option (chef.automate.api.iam.policy).resource = "ingest:nodes";
+    option (chef.automate.api.iam.policy).action = "ingest:nodes:delete";
   };
   rpc ProcessLivenessPing(ingest.request.Liveness) returns (ingest.response.ProcessLivenessResponse) {
     option (google.api.http) = {
@@ -74,8 +74,8 @@ service ChefIngester {
     };
     option (chef.automate.api.policy).resource = "ingest:nodes:{entity_uuid}:liveness";
     option (chef.automate.api.policy).action = "create";
-    option (chef.automate.api.iam.policy).resource = "infra:nodes:{entity_uuid}:liveness";
-    option (chef.automate.api.iam.policy).action = "infra:ingest:create";
+    option (chef.automate.api.iam.policy).resource = "ingest:nodes:{entity_uuid}:liveness";
+    option (chef.automate.api.iam.policy).action = "ingest:nodes:create";
   }
   rpc GetVersion (common.version.VersionInfoRequest) returns (common.version.VersionInfo) {
     option (google.api.http).get = "/ingest/version";

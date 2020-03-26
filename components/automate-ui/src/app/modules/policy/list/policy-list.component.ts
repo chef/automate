@@ -7,7 +7,7 @@ import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading } from 'app/entities/entities';
 import { DeletePolicy, GetPolicies } from 'app/entities/policies/policy.actions';
-import { allPolicies, getAllStatus, isIAMv2 } from 'app/entities/policies/policy.selectors';
+import { allPolicies, getAllStatus } from 'app/entities/policies/policy.selectors';
 import { Policy } from 'app/entities/policies/policy.model';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { ChefKeyboardEvent } from 'app/types/material-types';
@@ -19,7 +19,6 @@ import { ChefKeyboardEvent } from 'app/types/material-types';
 })
 export class PolicyListComponent implements OnInit, OnDestroy {
   public sortedPolicies$: Observable<Policy[]>;
-  public isIAMv2$: Observable<boolean>;
   public policyToDelete: Policy;
   public deleteModalVisible = false;
   private isDestroyed = new Subject<boolean>();
@@ -39,8 +38,6 @@ export class PolicyListComponent implements OnInit, OnDestroy {
     this.sortedPolicies$ = store.pipe(
       select(allPolicies),
       map(policies => ChefSorters.naturalSort(policies, 'name')));
-
-    this.isIAMv2$ = store.pipe(select(isIAMv2));
   }
 
   ngOnInit(): void {

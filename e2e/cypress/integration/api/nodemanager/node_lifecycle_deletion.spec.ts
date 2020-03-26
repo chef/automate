@@ -1,7 +1,6 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { uuidv4 } from '../../../support/helpers';
 
-describeIfIAMV2p1('Nodemanager config mgmt node lifecycle deletion', () => {
+describe('Nodemanager config mgmt node deletion', () => {
   const cypressPrefix = 'test-nodemanager-node-lifecycle-delete';
   const clientRunsNodeId = uuidv4();
   const nodeName = `${cypressPrefix}-${Cypress.moment().format('MMDDYYhhmmss.sss')}`;

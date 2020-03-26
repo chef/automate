@@ -71,11 +71,7 @@ message Project {
     ProjectRulesStatus status = 4;
 }
 
-enum Flag {
-    VERSION_2_0 = 0;
-    VERSION_2_1 = 1;
-}
-
+// the only values that may be returned by GetPolicyVersion
 message Version {
     enum VersionNumber {
         V0 = 0;

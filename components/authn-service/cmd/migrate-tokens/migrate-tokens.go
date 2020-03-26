@@ -15,7 +15,7 @@ var (
 )
 
 const (
-	tokensURL  = "https://localhost/api/v0/auth/tokens"    // nolint
+	tokensURL  = "https://localhost/iam/v2/tokens"         // nolint
 	secretsURL = "https://localhost/api/v0/secrets/search" // nolint
 )
 

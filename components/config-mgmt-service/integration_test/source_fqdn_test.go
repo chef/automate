@@ -12,7 +12,7 @@ import (
 	"testing"
 
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
-	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
+	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
 	gpStruct "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"

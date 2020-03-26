@@ -9,7 +9,6 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { ChefSorters } from 'app/helpers/auth/sorter';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { loading, EntityStatus, pending } from 'app/entities/entities';
-import { isIAMv2 } from 'app/entities/policies/policy.selectors';
 import {
   createError,
   createStatus,
@@ -35,13 +34,10 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   public deleteModalVisible = false;
   public createModalVisible = false;
   public createTeamForm: FormGroup;
-  public createV1TeamForm: FormGroup;
-  public createV1TeamModalVisible = false;
   public creatingTeam = false;
   public conflictErrorEvent = new EventEmitter<boolean>();
   public dropdownProjects: Project[] = [];
   public unassigned = ProjectConstants.UNASSIGNED_PROJECT_ID;
-  public isIAMv2: boolean;
 
   private isDestroyed = new Subject<boolean>();
 
@@ -68,28 +64,11 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
         [Validators.required, Validators.pattern(Regex.patterns.ID), Validators.maxLength(64)]],
       projects: [[]]
     });
-    this.createV1TeamForm = fb.group({
-      name: ['', [Validators.required, Validators.pattern(Regex.patterns.NON_BLANK)]],
-      description: ['',
-        [
-          Validators.required,
-          Validators.pattern(Regex.patterns.NON_BLANK),
-          Validators.maxLength(64)
-        ]
-      ]
-    });
   }
 
   ngOnInit() {
     this.layoutFacade.showSidebar(Sidebar.Settings);
     this.store.dispatch(new GetTeams());
-
-    this.store.pipe(
-      select(isIAMv2),
-      takeUntil(this.isDestroyed))
-      .subscribe(latest => {
-        this.isIAMv2 = latest;
-    });
 
     this.store.select(assignableProjects)
       .subscribe((assignable: ProjectsFilterOption[]) => {
@@ -107,7 +86,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
       select(createStatus),
       takeUntil(this.isDestroyed),
       filter(state => {
-        return (this.createModalVisible || this.createV1TeamModalVisible) && !pending(state);
+        return (this.createModalVisible) && !pending(state);
       }))
       .subscribe(state => {
         this.creatingTeam = false;
@@ -122,7 +101,7 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
       this.store.select(createError)
     ]).pipe(
       takeUntil(this.isDestroyed),
-      filter(() => (this.createModalVisible || this.createV1TeamModalVisible)),
+      filter(() => (this.createModalVisible)),
       filter (([state, error]) => state === EntityStatus.loadingFailure && !isNil(error)))
       .subscribe(([_, error]) => {
         if (error.status === HttpStatus.CONFLICT) {
@@ -155,20 +134,11 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
     this.store.dispatch(new DeleteTeam(this.teamToDelete));
   }
 
-  public createV2Team(): void {
+  public createTeam(): void {
     this.createTeamCommon({
       id: this.createTeamForm.controls.id.value,
       name: this.createTeamForm.controls.name.value.trim(),
       projects: this.createTeamForm.controls.projects.value,
-      guid: null
-    });
-  }
-
-  public createV1Team(): void {
-    this.createTeamCommon({
-      id: this.createV1TeamForm.controls.name.value,
-      name: this.createV1TeamForm.controls.description.value.trim(),
-      projects: [],
       guid: null
     });
   }
@@ -179,16 +149,11 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   }
 
   public openCreateModal(): void {
-    if (this.isIAMv2) {
-      this.createModalVisible = true;
-    } else {
-      this.createV1TeamModalVisible = true;
-    }
+    this.createModalVisible = true;
     this.resetCreateModal();
   }
 
   public closeCreateModal(): void {
-    this.createV1TeamModalVisible = false;
     this.createModalVisible = false;
     this.resetCreateModal();
   }
@@ -196,7 +161,6 @@ export class TeamManagementComponent implements OnInit, OnDestroy {
   resetCreateModal(): void {
     this.creatingTeam = false;
     this.createTeamForm.reset();
-    this.createV1TeamForm.reset();
     this.conflictErrorEvent.emit(false);
   }
 }

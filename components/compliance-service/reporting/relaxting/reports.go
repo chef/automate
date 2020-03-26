@@ -15,7 +15,7 @@ import (
 	elastic "gopkg.in/olivere/elastic.v6"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
-	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
+	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"

@@ -7,7 +7,7 @@ import (
 	cache "github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 )
@@ -19,14 +19,13 @@ type State struct {
 	roles          *cache.Cache
 	projects       *cache.Cache
 	rules          *cache.Cache
-	ms             storage.MigrationStatus
 	projectLimit   int
 }
 
 var ErrTypeAssertionFailed = errors.New("type assertion failed: could not convert interface{} to *storage.Policy")
 
 func New() *State {
-	return NewWithProjectLimit(constants_v2.DefaultProjectLimit)
+	return NewWithProjectLimit(constants.DefaultProjectLimit)
 }
 
 func NewWithProjectLimit(projectLimit int) *State {
@@ -551,39 +550,8 @@ func (s *State) Reset(ctx context.Context) error {
 	return nil
 }
 
-func (s *State) ApplyV2DataMigrations(context.Context) error {
-	return nil
-}
-
 func (s *State) Close() error {
 	return nil
-}
-
-func (s *State) Success(context.Context) error {
-	s.ms = storage.Successful
-	return nil
-}
-
-func (s *State) SuccessBeta1(context.Context) error {
-	s.ms = storage.SuccessfulBeta1
-	return nil
-}
-
-func (s *State) InProgress(context.Context) error {
-	s.ms = storage.InProgress
-	return nil
-}
-
-func (s *State) Failure(context.Context) error {
-	if s.ms == storage.InProgress {
-		s.ms = storage.Failed
-		return nil
-	}
-	return errors.New("cannot transition to failure")
-}
-
-func (s *State) MigrationStatus(context.Context) (storage.MigrationStatus, error) {
-	return s.ms, nil
 }
 
 // PoliciesCache is used in testing
@@ -604,8 +572,4 @@ func (s *State) ProjectsCache() *cache.Cache {
 // RulesCache is used in testing
 func (s *State) RulesCache() *cache.Cache {
 	return s.rules
-}
-func (s *State) Pristine(context.Context) error {
-	s.ms = storage.Pristine
-	return nil
 }

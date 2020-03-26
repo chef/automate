@@ -5,10 +5,8 @@
   "main": "index.js",
   "scripts": {
     "cypress:open": "cypress open",
-    "cypress:local:v1": "CYPRESS_BASE_URL=https://a2-dev.test CYPRESS_IAM_VERSION=v1 CYPRESS_RUN_FLAKY=no cypress open",
-    "cypress:local:v1:flaky": "CYPRESS_BASE_URL=https://a2-dev.test CYPRESS_IAM_VERSION=v2.1 CYPRESS_RUN_FLAKY=yes cypress open",
-    "cypress:local:v2": "CYPRESS_BASE_URL=https://a2-dev.test CYPRESS_IAM_VERSION=v2.1 CYPRESS_RUN_FLAKY=no cypress open",
-    "cypress:local:v2:flaky": "CYPRESS_BASE_URL=https://a2-dev.test CYPRESS_IAM_VERSION=v2.1 CYPRESS_RUN_FLAKY=yes cypress open",
+    "cypress:local": "CYPRESS_BASE_URL=https://a2-dev.test CYPRESS_RUN_FLAKY=no cypress open",
+    "cypress:local:flaky": "CYPRESS_BASE_URL=https://a2-dev.test CYPRESS_RUN_FLAKY=yes cypress open",
     "cypress:run": "cypress run",
     "cypress:record": "cypress run --record",
     "lint": "tslint -p tsconfig.json"

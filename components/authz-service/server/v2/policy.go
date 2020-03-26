@@ -2,7 +2,6 @@ package v2
 
 import (
 	"context"
-	"fmt"
 	"strings"
 
 	"github.com/pkg/errors"
@@ -13,10 +12,9 @@ import (
 	"github.com/chef/automate/lib/logger"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
-	storage_v1 "github.com/chef/automate/components/authz-service/storage/v1"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	v2 "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/memstore"
@@ -28,10 +26,7 @@ import (
 type policyServer struct {
 	log             logger.Logger
 	store           storage.Storage
-	engine          engine.V2p1Writer
-	v1              storage_v1.PoliciesLister
-	vSwitch         *VersionSwitch
-	vChan           chan api.Version
+	engine          engine.Writer
 	policyRefresher PolicyRefresher
 }
 
@@ -48,12 +43,9 @@ func NewMemstorePolicyServer(
 	ctx context.Context,
 	l logger.Logger,
 	pr PolicyRefresher,
-	e engine.V2p1Writer,
-	pl storage_v1.PoliciesLister,
-	vSwitch *VersionSwitch,
-	vChan chan api.Version) (PolicyServer, error) {
+	e engine.Writer) (PolicyServer, error) {
 
-	return NewPoliciesServer(ctx, l, pr, memstore.New(), e, pl, vSwitch, vChan)
+	return NewPoliciesServer(ctx, l, pr, memstore.New(), e)
 }
 
 // NewPostgresPolicyServer instantiates a server.Server that connects to a postgres backend
@@ -61,16 +53,13 @@ func NewPostgresPolicyServer(
 	ctx context.Context,
 	l logger.Logger,
 	pr PolicyRefresher,
-	e engine.V2p1Writer,
-	pl storage_v1.PoliciesLister,
-	vSwitch *VersionSwitch,
-	vChan chan api.Version) (PolicyServer, error) {
+	e engine.Writer) (PolicyServer, error) {
 
 	s := postgres.GetInstance()
 	if s == nil {
 		return nil, errors.New("postgres v2 singleton not yet initialized for policy server")
 	}
-	return NewPoliciesServer(ctx, l, pr, s, e, pl, vSwitch, vChan)
+	return NewPoliciesServer(ctx, l, pr, s, e)
 }
 
 // NewPoliciesServer returns a new IAM v2 Policy server.
@@ -79,57 +68,17 @@ func NewPoliciesServer(
 	l logger.Logger,
 	pr PolicyRefresher,
 	s storage.Storage,
-	e engine.V2p1Writer,
-	pl storage_v1.PoliciesLister,
-	vSwitch *VersionSwitch,
-	vChan chan api.Version) (PolicyServer, error) {
+	e engine.Writer) (PolicyServer, error) {
 
 	srv := &policyServer{
 		log:             l,
 		store:           s,
 		engine:          e,
-		v1:              pl,
-		vSwitch:         vSwitch,
-		vChan:           vChan,
 		policyRefresher: pr,
 	}
 
-	// If we *could* transition to failure, it means we had an in-progress state
-	// on service startup.
-	if s.Failure(ctx) == nil {
-		l.Warn("cleaned up in-progress migration status")
-	}
-
-	// check migration status
-	ms, err := srv.store.MigrationStatus(ctx)
-	if err != nil {
-		return nil, errors.Wrap(err, "retrieve migration status from storage")
-	}
-	var v api.Version
-	switch ms {
-	case storage.SuccessfulBeta1:
-		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
-	case storage.Successful:
-		// auto-upgrade a 2.0 installation to 2.1
-		_, err := srv.handleMinorUpgrade(ctx, ms, api.Flag_VERSION_2_1)
-		if err != nil {
-			return nil, errors.Wrap(err, "auto-upgrade a 2.0 installation to 2.1")
-		}
-		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
-	default:
-		v = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
-	}
-	srv.setVersionForInterceptorSwitch(v)
-
-	if v.Major == api.Version_V2 {
-		if err := srv.store.ApplyV2DataMigrations(ctx); err != nil {
-			return nil, errors.Wrap(err, "error migrating v2 data")
-		}
-	}
-
-	// now that the data is all set, attempt to feed it into OPA:
 	if err := srv.updateEngineStore(ctx); err != nil {
-		return nil, errors.Wrapf(err, "initialize engine storage (%v)", v)
+		return nil, errors.Wrapf(err, "initialize engine storage")
 	}
 
 	return srv, nil
@@ -383,7 +332,7 @@ func (s *policyServer) RemovePolicyMembers(ctx context.Context,
 	if req.Id == constants.AdminPolicyID {
 		for _, member := range members {
 			if member.Name == "team:local:admins" {
-				return nil, status.Error(codes.PermissionDenied, `cannot remove local team: 
+				return nil, status.Error(codes.PermissionDenied, `cannot remove local team:
 				admins from Chef-managed policy: Admin`)
 			}
 		}
@@ -532,172 +481,15 @@ func (s *policyServer) UpdateRole(
 /* * * * * * * * * * * * * * * * * *   MIGRATION   * * * * * * * * * * * * * * * * * * */
 /* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
-// MigrateToV2 sets the V2 store to its factory defaults and then migrates
-// any existing V1 policies.
-func (s *policyServer) MigrateToV2(ctx context.Context,
-	req *api.MigrateToV2Req) (*api.MigrateToV2Resp, error) {
-	ms, err := s.store.MigrationStatus(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "retrieve migration status: %s", err.Error())
-	}
-
-	// the 2.1 flag is not related to migration or major version;
-	// it acts as a feature flag around project authz, so no need to migrate
-	// if we're already on some version of v2
-	upgraded, err := s.handleMinorUpgrade(ctx, ms, req.Flag)
-	if err != nil {
-		return nil, err
-	}
-	if upgraded {
-		return &api.MigrateToV2Resp{}, nil
-	}
-
-	if err := s.okToMigrate(ctx, ms); err != nil {
-		return nil, err
-	}
-
-	if err := s.store.InProgress(ctx); err != nil {
-		return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
-	}
-
-	defaultPolicies, err := storage.DefaultPolicies()
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "retrieve default policies: %s", err.Error())
-	}
-
-	for _, role := range storage.DefaultRoles() {
-		if _, err := s.store.CreateRole(ctx, &role, true); err != nil {
-			return nil, status.Errorf(codes.Internal, "reset to default roles: %s", err.Error())
-		}
-	}
-
-	for _, pol := range defaultPolicies {
-		if _, err := s.store.CreatePolicy(ctx, &pol, true); err != nil {
-			return nil, status.Errorf(codes.Internal, "reset to default policies: %s", err.Error())
-		}
-	}
-
-	// Added for testing only; these are handled by data migrations.
-	for _, project := range storage.DefaultProjects() {
-		if _, err := s.store.CreateProject(ctx, &project, false); err != nil {
-			return nil, status.Errorf(codes.Internal, "reset to default project: %s", err.Error())
-		}
-	}
-
-	recordFailure := func() {
-		// This should be unlikely, and it doesn't affect our returned error, which,
-		// in any case, is the more interesting error -- so, we merely log it.
-		if err := s.store.Failure(ctx); err != nil {
-			s.log.Errorf("failed to record migration failure status: %s", err)
-		}
-	}
-
-	var reports []string
-	if !req.SkipV1Policies {
-		errs, err := s.migrateV1Policies(ctx)
-		if err != nil {
-			recordFailure()
-			return nil, status.Errorf(codes.Internal, "migrate v1 policies: %s", err.Error())
-		}
-		for _, e := range errs {
-			reports = append(reports, e.Error())
-		}
-	} else {
-		// Note 2019/05/22 (sr): policies without subjects are silently ignored -- this
-		// is to be in line with the migration case, that does the same. However, this
-		// could be worth revisiting?
-		pols, err := s.v1.ListPoliciesWithSubjects(ctx)
-		if err != nil {
-			recordFailure()
-			return nil, status.Errorf(codes.Internal, "list v1 policies: %s", err.Error())
-		}
-		reports = append(reports, fmt.Sprintf("%d v1 policies", len(pols)))
-
-	}
-
-	err = s.store.ApplyV2DataMigrations(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "apply v2 data migrations: %s", err.Error())
-	}
-
-	// we've made it!
-	var v api.Version
-	switch req.Flag {
-	case api.Flag_VERSION_2_1:
-		err = s.store.SuccessBeta1(ctx)
-		v = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
-	default:
-		err = s.store.Success(ctx)
-		v = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
-	}
-	if err != nil {
-		recordFailure()
-		return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
-	}
-
-	s.setVersionForInterceptorSwitch(v)
-	return &api.MigrateToV2Resp{Reports: reports}, nil
-}
-
-func (s *policyServer) handleMinorUpgrade(ctx context.Context, ms storage.MigrationStatus, f api.Flag) (upgraded bool, err error) {
-	var version api.Version
-	upgraded = true
-	if f == api.Flag_VERSION_2_1 && ms == storage.Successful {
-		err = s.store.SuccessBeta1(ctx)
-		version = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
-	} else if f == api.Flag_VERSION_2_0 && ms == storage.SuccessfulBeta1 {
-		err = s.store.Success(ctx)
-		version = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
-	} else {
-		upgraded = false
-	}
-
-	if err != nil {
-		return false, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
-	}
-
-	if upgraded {
-		s.setVersionForInterceptorSwitch(version)
-	}
-	return upgraded, nil
-}
-
-// ResetToV1 will mark the migration status as "pristine", which means a
-// following MigrateToV2 call will be accepted.
-func (s *policyServer) ResetToV1(ctx context.Context,
-	req *api.ResetToV1Req) (*api.ResetToV1Resp, error) {
-
-	ms, err := s.store.MigrationStatus(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "retrieve migration status: %s", err.Error())
-	}
-	switch ms {
-	case storage.Pristine:
-		return nil, status.Error(codes.AlreadyExists, "already reset")
-	case storage.InProgress:
-		return nil, status.Error(codes.FailedPrecondition, "migration in progress")
-	case storage.Successful, storage.SuccessfulBeta1, storage.Failed:
-		err := s.store.Pristine(ctx)
-		if err != nil {
-			return nil, status.Errorf(codes.Internal, "record migration status: %s", err.Error())
-		}
-	}
-	if err := s.store.Reset(ctx); err != nil {
-		return nil, status.Errorf(codes.Internal, "reset database state: %s", err.Error())
-	}
-	s.setVersionForInterceptorSwitch(api.Version{Major: api.Version_V1, Minor: api.Version_V0})
-	return &api.ResetToV1Resp{}, nil
-}
-
+// TODO Delete
 // GetPolicyVersion returns the status of the data store.
 func (s *policyServer) GetPolicyVersion(ctx context.Context,
 	req *api.GetPolicyVersionReq) (*api.GetPolicyVersionResp, error) {
-	ms, err := s.store.MigrationStatus(ctx)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "retrieve migration status: %s", err.Error())
-	}
 	return &api.GetPolicyVersionResp{
-		Version: versionFromInternal(ms),
+		Version: &api.Version{
+			Major: api.Version_V2,
+			Minor: api.Version_V1,
+		},
 	}, nil
 }
 
@@ -725,8 +517,6 @@ func (s *policyServer) EngineUpdateInterceptor() grpc.UnaryServerInterceptor {
 			"/chef.automate.domain.authz.v2.Policies/CreatePolicy",
 			"/chef.automate.domain.authz.v2.Policies/DeletePolicy",
 			"/chef.automate.domain.authz.v2.Policies/UpdatePolicy",
-			"/chef.automate.domain.authz.v2.Policies/MigrateToV2",
-			"/chef.automate.domain.authz.v2.Policies/ResetToV1",
 			"/chef.automate.domain.authz.v2.Policies/CreateRole",
 			"/chef.automate.domain.authz.v2.Policies/DeleteRole",
 			"/chef.automate.domain.authz.v2.Policies/UpdateRole",
@@ -852,28 +642,6 @@ func roleFromInternal(role *storage.Role) (*api.Role, error) {
 	return resp, nil
 }
 
-func versionFromInternal(ms storage.MigrationStatus) *api.Version {
-	switch ms {
-	// the `Successful` status can only be directly set in the database
-	// since the API can only upgrade to v2.1 or revert to v1
-	case storage.Successful:
-		return &api.Version{
-			Major: api.Version_V2,
-			Minor: api.Version_V0,
-		}
-	case storage.SuccessfulBeta1:
-		return &api.Version{
-			Major: api.Version_V2,
-			Minor: api.Version_V1,
-		}
-	default:
-		return &api.Version{
-			Major: api.Version_V1,
-			Minor: api.Version_V0,
-		}
-	}
-}
-
 func membersFromAPI(apiMembers []string) ([]storage.Member, error) {
 	members := make([]storage.Member, len(apiMembers))
 	for i, member := range apiMembers {
@@ -937,12 +705,4 @@ func (s *policyServer) logPolicies(policies []*storage.Policy) {
 		}
 	}
 	s.log.WithFields(kv).Info("Policy definition")
-}
-
-// setVersionForInterceptorSwitch informs the interceptor piece of this server
-// to deny v1 requests if set to v2.1 and vice-versa.
-func (s *policyServer) setVersionForInterceptorSwitch(v api.Version) {
-	if s.vChan != nil {
-		s.vChan <- v
-	}
 }

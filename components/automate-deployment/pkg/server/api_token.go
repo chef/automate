@@ -9,8 +9,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/chef/automate/api/interservice/authn"
-	"github.com/chef/automate/api/interservice/authz"
-	"github.com/chef/automate/api/interservice/authz/common"
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	api "github.com/chef/automate/api/interservice/deployment"
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -62,7 +60,6 @@ func generateAdminToken(ctx context.Context,
 
 	defer authzConnection.Close() // nolint: errcheck
 
-	authzClient := authz.NewAuthorizationClient(authzConnection)
 	authzV2Client := authz_v2.NewPoliciesClient(authzConnection)
 
 	response, err := authnClient.CreateToken(ctx, &authn.CreateTokenReq{
@@ -74,26 +71,20 @@ func generateAdminToken(ctx context.Context,
 	}
 	tokenID := response.Id
 
-	_, err = authzClient.CreatePolicy(ctx, &authz.CreatePolicyReq{
-		Action:   "*",
-		Subjects: []string{"token:" + tokenID},
-		Resource: "*",
-	})
-	if isUseV2Error(err) {
-		_, err = authzV2Client.CreatePolicy(ctx, &authz_v2.CreatePolicyReq{
-			Id:   "admin-token-" + tokenID,
-			Name: "admin policy for token " + tokenID,
-			Statements: []*authz_v2.Statement{
-				{
-					Effect:    authz_v2.Statement_ALLOW,
-					Resources: []string{"*"},
-					Actions:   []string{"*"},
-					Projects:  []string{"*"},
-				},
+	_, err = authzV2Client.CreatePolicy(ctx, &authz_v2.CreatePolicyReq{
+		Id:   "admin-token-" + tokenID,
+		Name: "admin policy for token " + tokenID,
+		Statements: []*authz_v2.Statement{
+			{
+				Effect:    authz_v2.Statement_ALLOW,
+				Resources: []string{"*"},
+				Actions:   []string{"*"},
+				Projects:  []string{"*"},
 			},
-			Members: []string{"token:" + tokenID},
-		})
-	}
+		},
+		Members: []string{"token:" + tokenID},
+	})
+
 	if err != nil && status.Convert(err).Code() != codes.AlreadyExists {
 		// Attempt to be transactional
 		_, deleteTokenError := authnClient.DeleteToken(ctx, &authn.DeleteTokenReq{
@@ -108,13 +99,4 @@ func generateAdminToken(ctx context.Context,
 	return &api.GenerateAdminTokenResponse{
 		ApiToken: response.Value,
 	}, nil
-}
-
-func isUseV2Error(err error) bool {
-	for _, detail := range status.Convert(err).Details() {
-		if _, ok := detail.(*common.ErrorShouldUseV2); ok {
-			return true
-		}
-	}
-	return false
 }

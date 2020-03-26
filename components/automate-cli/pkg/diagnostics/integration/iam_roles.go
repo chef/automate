@@ -29,9 +29,10 @@ type RoleInfo struct {
 	}
 }
 
-type iamRoleSave struct {
+type generatedRoleData struct {
 	ID      string   `json:"id"`
 	Actions []string `json:"actions"`
+	Skipped bool     `json:"skipped"`
 }
 
 // CreateRole creates a role with the given id and action
@@ -94,6 +95,25 @@ func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 			if err != nil {
 				return false, "", err
 			}
+
+			// the Skip function is run before each step: Generate, Verify, and Cleanup
+			loaded := generatedRoleData{}
+			err = tstCtx.GetValue("iam-roles", &loaded)
+			if err != nil {
+				// this is the first time running this diagnostic,
+				// so we save whether or not we're skipping it
+				tstCtx.SetValue("iam-roles", &generatedRoleData{
+					Skipped: !isV2,
+				})
+			} else {
+				// the diagnostic has been run before, so we keep track of its saved values
+				tstCtx.SetValue("iam-roles", &generatedRoleData{
+					ID:      loaded.ID,
+					Actions: loaded.Actions,
+					Skipped: loaded.Skipped,
+				})
+			}
+
 			return !isV2, "requires IAM v2", nil
 		},
 		Generate: func(tstCtx diagnostics.TestContext) error {
@@ -103,16 +123,32 @@ func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 				return err
 			}
 
-			tstCtx.SetValue("iam-roles", &iamRoleSave{
+			loaded := generatedRoleData{}
+			err = tstCtx.GetValue("iam-roles", &loaded)
+			if err != nil {
+				return errors.Errorf(err.Error(), "could not find generated context")
+			}
+
+			tstCtx.SetValue("iam-roles", &generatedRoleData{
 				ID:      roleInfo.Role.ID,
 				Actions: roleInfo.Role.Actions,
+				Skipped: loaded.Skipped,
 			})
 			return nil
 		},
 		Verify: func(tstCtx diagnostics.VerificationTestContext) {
-			loaded := iamRoleSave{}
+			loaded := generatedRoleData{}
 			err := tstCtx.GetValue("iam-roles", &loaded)
 			require.NoError(tstCtx, err, "Could not find generated context")
+			if loaded.Skipped {
+				// this happens in the v1->v2 force upgrade scenario:
+				// when we run generate diagnostic data while on v1
+				// then force-upgrade to v2
+				// then run verify and cleanup on that data
+				// for roles, since the Generate step was skipped
+				// there is nothing to verify on v2
+				return
+			}
 
 			roleInfo, err := GetRole(tstCtx, loaded.ID)
 			require.NoError(tstCtx, err)
@@ -121,8 +157,13 @@ func CreateIAMRolesDiagnostic() diagnostics.Diagnostic {
 			assert.Equal(tstCtx, loaded.Actions, roleInfo.Role.Actions)
 		},
 		Cleanup: func(tstCtx diagnostics.TestContext) error {
-			loaded := iamRoleSave{}
+			loaded := generatedRoleData{}
 			err := tstCtx.GetValue("iam-roles", &loaded)
+			if loaded.Skipped {
+				// if diagnostic was run on v1, generating roles was skipped
+				// so nothing to clean up here
+				return nil
+			}
 			if err != nil {
 				return errors.Wrap(err, "Could not find generated context")
 			}

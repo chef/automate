@@ -33,14 +33,23 @@ hab_curl() {
 
 grant_permissions() {
     local token
-    token="$(chef-automate admin-token)"
-    hab_curl --insecure -H "api-token: $token" https://localhost/api/v0/auth/policies --data @<(cat <<EOF
+    token="$(date +%s | xargs -I % chef-automate iam token create admin-token-% --admin)"
+
+    hab_curl --insecure -H "api-token: $token" https://localhost/apis/iam/v2/policies --data @<(cat <<EOF
     {
-        "subjects": [
+        "id": "cert_auth_test_policy",
+        "name": "cert_auth_test_policy",
+        "members": [
             "tls:service:$(authorized_service_name):*"
         ],
-        "resource": "ingest:status",
-        "action": "read"
+        "statements": [
+            {
+                "effect": "ALLOW",
+                "actions": [ "ingest:*" ],
+
+                "projects": [ "*" ]
+            }
+        ]
     }
 EOF
 )

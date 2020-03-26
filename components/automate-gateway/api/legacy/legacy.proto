@@ -26,7 +26,7 @@ service LegacyDataCollector {
 		option (google.api.http).get = "/events/data-collector";
 		option (chef.automate.api.policy).resource = "ingest:status";
 		option (chef.automate.api.policy).action = "read";
-		option (chef.automate.api.iam.policy).resource = "infra:status";
-		option (chef.automate.api.iam.policy).action = "infra:ingest:get";
+		option (chef.automate.api.iam.policy).resource = "ingest:status";
+		option (chef.automate.api.iam.policy).action = "ingest:status:get";
 	};
 }

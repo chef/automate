@@ -157,28 +157,6 @@ func (a *Server) GetTeamsForMember(ctx context.Context,
 	}, nil
 }
 
-func (a *Server) ApplyV2DataMigrations(ctx context.Context,
-	r *gwreq.ApplyV2DataMigrationsReq) (*gwres.ApplyV2DataMigrationsResp, error) {
-
-	_, err := a.client.UpgradeToV2(ctx, &teams.UpgradeToV2Req{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &gwres.ApplyV2DataMigrationsResp{}, nil
-}
-
-func (a *Server) ResetAllTeamProjects(ctx context.Context,
-	r *gwreq.ResetAllTeamProjectsReq) (*gwres.ResetAllTeamProjectsResp, error) {
-
-	_, err := a.client.ResetToV1(ctx, &teams.ResetToV1Req{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &gwres.ResetAllTeamProjectsResp{}, nil
-}
-
 func fromUpstreamTeam(t *teams.Team) *gwcommon.Team {
 	return &gwcommon.Team{
 		Id:       t.GetId(),

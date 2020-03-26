@@ -320,22 +320,4 @@ service Teams {
     option (chef.automate.api.iam.policy).resource = "iam:users:{id}:teams";
     option (chef.automate.api.iam.policy).action = "iam:userTeams:get";
   };
-
-  // Expose on GRPC API only so we don't expose this to the enduser.
-  // Just want to be able to trigger this via automate-cli.
-  rpc ApplyV2DataMigrations (ApplyV2DataMigrationsReq) returns (ApplyV2DataMigrationsResp) {
-    option (chef.automate.api.policy).resource = "auth:teams";
-    option (chef.automate.api.policy).action = "update";
-    option (chef.automate.api.iam.policy).resource = "iam:teams";
-    option (chef.automate.api.iam.policy).action = "iam:teams:update";
-  };
-
-  // Expose on GRPC API only so we don't expose this to the enduser.
-  // Just want to be able to trigger this via automate-cli.
-  rpc ResetAllTeamProjects (ResetAllTeamProjectsReq) returns (ResetAllTeamProjectsResp) {
-    option (chef.automate.api.policy).resource = "auth:teams";
-    option (chef.automate.api.policy).action = "update";
-    option (chef.automate.api.iam.policy).resource = "iam:teams";
-    option (chef.automate.api.iam.policy).action = "iam:teams:update";
-  };
 }
