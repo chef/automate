@@ -7,7 +7,7 @@ import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade'
 import { routeParams, routeURL } from 'app/route.selectors';
 import { filter, pluck, takeUntil } from 'rxjs/operators';
 import { identity } from 'lodash/fp';
-import { infaRoleFromRoute } from 'app/entities/infra-roles/infra-role.selectors';
+import { infaRoleFromRoute } from 'app/entities/infra-roles/infra-role-details.selectors';
 import { GetRole } from 'app/entities/infra-roles/infra-role.action';
 import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
 
@@ -91,9 +91,7 @@ export class InfraRoleDetailsComponent implements OnInit, OnDestroy {
       takeUntil(this.isDestroyed)
     ).subscribe(role => {
       this.show = true;
-      if (this.role === undefined) {
-        this.role = role;
-      }
+      this.role = role;
 
       this.runList = this.role.run_list;
       if (this.runList && this.runList.length) {
