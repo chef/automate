@@ -125,7 +125,7 @@ export class UnfurledJob {
   threshold?: string;
 }
 
-export interface JobRequestComponent {
+export class JobRequestComponent {
   name: string;
   purge_policies: {
     elasticsearch: UnfurledJob[];

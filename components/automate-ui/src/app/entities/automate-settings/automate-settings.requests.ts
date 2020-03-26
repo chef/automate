@@ -75,8 +75,8 @@ export class AutomateSettingsRequests {
     };
 
     jobs.forEach(job => {
-      // let thisJob: UnfurledJob;
-      let thisJob;
+      let thisJob = new UnfurledJob;
+      let matchedNest = new JobRequestComponent;
 
       switch (job.name) {
         case InfraJobName.DeleteNodes:              // fallthrough
@@ -91,8 +91,7 @@ export class AutomateSettingsRequests {
         case 'periodic_purge':                      // all other nested jobs are
                                                     // contained in 'periodic_purge'
           thisJob = this.unfurlIngestJob(job, true);
-          const matchedNest: JobRequestComponent =
-            body[job.category].job_settings.find(item => item.name === job.name);
+          matchedNest = body[job.category].job_settings.find(item => item.name === job.name);
           matchedNest.purge_policies.elasticsearch.push(thisJob);
           break;
 
