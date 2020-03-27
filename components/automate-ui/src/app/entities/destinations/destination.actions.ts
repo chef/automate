@@ -87,12 +87,12 @@ export class CreateDestinationFailure implements Action {
 
 export class DeleteDestination implements Action {
   readonly type = DestinationActionTypes.DELETE;
-  constructor(public payload: { id?: number, name: string }) { }
+  constructor(public payload: { id: number, name: string }) { }
 }
 
 export class DeleteDestinationSuccess implements Action {
   readonly type = DestinationActionTypes.DELETE_SUCCESS;
-  constructor(public payload: { id?: number, name: string } ) { }
+  constructor(public payload: { id: number, name: string } ) { }
 }
 
 export class DeleteDestinationFailure implements Action {

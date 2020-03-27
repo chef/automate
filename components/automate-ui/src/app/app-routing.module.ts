@@ -176,11 +176,11 @@ const routes: Routes = [
           ]
         },
         {
-          path: 'data-feed/:id',
+          path: 'data-feeds/:id',
           component: DataFeedDetailsComponent
         },
         {
-          path: 'data-feed',
+          path: 'data-feeds',
           children: [
             {
               path: '',
