@@ -341,8 +341,6 @@ describe('AutomateSettingsComponent', () => {
         expect(component.notificationType).toEqual('info');
         expect(component.notificationMessage)
         .toEqual('All settings have been updated successfully');
-        expect(component.formChanged).toEqual(false);
-        // expect(component.saving).toEqual(false);
       });
 
       xdescribe('and there is an error', () => {
