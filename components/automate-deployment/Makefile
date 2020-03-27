@@ -166,7 +166,7 @@ linux darwin windows:
 tools:
 	mkdir -p bin/linux && cd bin/linux && GOOS=linux GOARCH=amd64 go build ../../tools/upgrade-test-scaffold/upgrade-test-scaffold.go
 
-generate: do_generate fmt
+generate: update-bindings do_generate fmt
 
 do_generate:
 	go generate ./...
@@ -177,8 +177,7 @@ automate-ctl:
 	go build -o automate-ctl -i ../../cmd/automate-ctl
 
 update-bindings:
-	@bash ./scripts/agg_bindings.sh
-	@go generate ./...
+	bash ./scripts/agg_bindings.sh
 
 check-bindings:
 	@bash ./scripts/agg_bindings.sh -n

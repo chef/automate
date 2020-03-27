@@ -148,7 +148,10 @@ Note: deployment-team has added some code that makes tests use a locally-generat
 
 ### Recompiling Binds
 
-You need to run `make update-bindings` from `components/automate-deployment` whenever you add/change/remove bindings. You don't necessarily need to change the bindings when first adding your service, but when you start to wire up your new service to other services this will be needed.
+You need to run `make generate` from `components/automate-deployment`
+whenever you add/change/remove bindings. You don't necessarily need to
+change the bindings when first adding your service, but when you start
+to wire up your new service to other services this will be needed.
 
 ### The product.meta File
 

@@ -75,7 +75,7 @@ var a2Config = config{
 		{regex: `components/automate-deployment/cmd/chef-server-ctl/secrets.go`},
 		{regex: `components/automate-deployment/pkg/a1stub/test_harness.go`},
 		{regex: `components/automate-deployment/pkg/a1upgrade/a1commands_test.go`},
-		{regex: `components/automate-deployment/pkg/assets/data/a1stub_certs/ChefAutomateUpgradeFromv1SelfTest.key`},
+		{regex: `components/automate-deployment/pkg/assets/assets.go`},
 		{regex: `components/automate-deployment/testdata/hab_responses/all_up.json`},
 		{regex: `components/automate-deployment/tools/upgrade-test-scaffold/upgrade-test-scaffold.go`},
 		{regex: `components/automate-ui/src/app/pages/\+compliance/\+credentials/components/credentials-form.html`},

@@ -25,7 +25,6 @@ import (
 	license_control "github.com/chef/automate/api/config/license_control"
 	global "github.com/chef/automate/api/config/shared"
 	w "github.com/chef/automate/api/config/shared/wrappers"
-	"github.com/chef/automate/components/automate-deployment/pkg/assets"
 	"github.com/chef/automate/lib/platform/command"
 	"github.com/chef/automate/lib/platform/sys"
 	"github.com/chef/automate/lib/proxy"
@@ -139,15 +138,11 @@ func GenerateInitConfig(channel string, upgradeStrategy string, opts ...InitConf
 
 // Render returns a user facing subset of the AutomateConfig as a TOML string.
 func (c InitConfig) Render() (string, error) {
-	b := assets.MustAsset("data/init-config.toml")
-	tempRaw := string(b)
-
-	var buf bytes.Buffer
-
 	temp := template.Must(template.New("init").
 		Funcs(template.FuncMap{"StringsJoin": strings.Join}).
-		Parse(tempRaw))
+		Parse(configTemplate))
 
+	var buf bytes.Buffer
 	err := temp.Execute(&buf, c)
 	if err != nil {
 		return "", err
