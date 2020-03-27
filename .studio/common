@@ -168,6 +168,8 @@ DOC
 function verify_all_protobuf_components() {
   install_if_missing core/git git
 
+  clean_all_compiled_protos || return $?
+  bootstrap_proto_compilers || return $?
   compile_all_protobuf_components || return $?
 
   git add .
