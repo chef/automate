@@ -21,7 +21,7 @@
           </chef-tab-selector>
         </chef-page-header>
         <section class="page-body">
-          <!-- {{cookbookDetails?.chef_type}} -->
+          <chef-markdown *ngIf="readFileContent" [text]="readFileContent.content"></chef-markdown>
         </section>
         <!-- <section class="page-body" *ngIf="tabValue === 'details' && cookbookDetails">
           {{ cookbookDetails?.chef_type }}
