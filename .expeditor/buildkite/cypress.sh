@@ -16,6 +16,7 @@ do
   echo "--- Executing Cypress tests against $instance"
   export CYPRESS_BASE_URL="https://$instance"
   export CYPRESS_RECORD_KEY="$CYPRESS_RECORD_KEY"
+  export CYPRESS_RUN_FLAKY="no"
 
   npm install # get dependencies defined in e2e/package.json
 
