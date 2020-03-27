@@ -36,10 +36,16 @@ curl https://packages.chef.io/files/current/latest/chef-automate-cli/chef-automa
 
 ### Prepare Airgap Installation Bundle
 
-To download and bundle the software included in a Chef Automate release, run:
+To download and bundle the software included in the most recent Chef Automate release, run:
 
 ```shell
 ./chef-automate airgap bundle create
+```
+
+To download and bundle the software included in a specific Chef Automate release, run
+
+```shell
+./chef-automate airgap bundle create --version VERSION
 ```
 
 A successful execution of this command produces an Airgap Installation Bundle named
