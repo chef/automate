@@ -77,7 +77,8 @@
                 </form>
             </section>
             <section class="page-body" *ngIf="tabValue === 'cookbooks'">
-                <ng-container>
+                <chef-loading-spinner *ngIf="cookbooksListLoading" size="50"></chef-loading-spinner>
+                <ng-container  *ngIf="!cookbooksListLoading">
                     <chef-table-new>
                         <chef-table-header>
                             <chef-table-row>
