@@ -3,6 +3,28 @@
 # This file is the place we will put all the common functionality that
 # two or more components share/require (ex. install elasticsearch)
 
+document "clean_all_compiled_protos" <<DOC
+  Delete all the files with extensions matching '*pb*go' in the repo (except in vendor/)
+DOC
+function clean_all_compiled_protos() {
+  install_if_missing core/git git
+
+  find /src/{api,components,lib} -name '*pb*go' -exec rm '{}' \; 
+  git clean -fdx
+}
+
+document "bootstrap_proto_compilers" <<DOC
+  Builds everything you need to start recompiling protos from scratch (e.g.,
+  after running clean_all_compiled_protos). Our custom protoc-gen-* tools have
+  to be built in a certain order or else they will fail on circular dependencies.
+DOC
+function bootstrap_proto_compilers() {
+  compile_go_protobuf components/automate-grpc/scripts/bootstrap_protoc.sh
+  install_go_tool github.com/chef/automate/components/automate-grpc/protoc-gen-policy
+  install_go_tool github.com/chef/automate/components/automate-grpc/protoc-gen-grpc-mock
+  compile_go_protobuf components/automate-grpc/scripts/grpc.sh
+}
+
 # TODO (tc) Please take a pass @afiune and Infra Auto team to see if some of these other helpers
 # can be deleted in the new world.
 # Compile protobuf definitions
