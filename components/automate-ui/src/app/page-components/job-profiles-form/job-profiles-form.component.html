@@ -1,33 +1,35 @@
 <div [formGroup]="form">
   <h3>Select one or multiple profiles to scan your nodes</h3>
-  <chef-table>
-    <chef-tr>
-      <chef-th>
-        <input type="checkbox" formControlName="allSelected" data-cy="select-all-profiles"
-          [indeterminate]="form.controls['someSelected'].value" />
-        Profile Name
-      </chef-th>
-      <chef-th>
-        Profile ID
-      </chef-th>
-      <chef-th>
-        Version
-      </chef-th>
-    </chef-tr>
-    <chef-tbody formArrayName="profiles">
-      <chef-tr *ngFor="let profileGroup of form.controls['profiles']['controls']; let pIndex = index;"
+  <chef-table-new>
+    <chef-table-header>
+      <chef-table-row>
+        <chef-table-header-cell class="flex-for-checkbox">
+          <input type="checkbox" formControlName="allSelected" data-cy="select-all-profiles"
+            [indeterminate]="form.controls['someSelected'].value" />
+          Profile Name
+        </chef-table-header-cell>
+        <chef-table-header-cell>
+          Profile ID
+        </chef-table-header-cell>
+        <chef-table-header-cell>
+          Version
+        </chef-table-header-cell>
+      </chef-table-row>
+    </chef-table-header>
+    <chef-table-body formArrayName="profiles">
+      <chef-table-row *ngFor="let profileGroup of form.controls['profiles']['controls']; let pIndex = index;"
         [formGroup]="profileGroup">
-        <chef-td>
+        <chef-table-cell class="flex-for-checkbox">
           <input type="checkbox" formControlName="include" />
           {{profileGroup.value.title}}
-        </chef-td>
-        <chef-td>
+        </chef-table-cell>
+        <chef-table-cell>
           {{profileGroup.value.owner}}/{{profileGroup.value.name}}
-        </chef-td>
-        <chef-td>
+        </chef-table-cell>
+        <chef-table-cell>
           {{profileGroup.value.version}}
-        </chef-td>
-      </chef-tr>
-    </chef-tbody>
-  </chef-table>
+        </chef-table-cell>
+      </chef-table-row>
+    </chef-table-body>
+  </chef-table-new>
 </div>
