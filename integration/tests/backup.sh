@@ -75,4 +75,8 @@ do_test_restore() {
     delete_backup_and_assert_idempotent
     test_delete_broken_backups
     test_can_regenerate_cert_after_restore
+
+    # verifies IAM force-upgrade was applied
+    # and the restored system demonstrates expected behavior around IAM permissions
+    run_inspec_tests "${A2_ROOT_DIR}" "a2-iam-no-legacy-integration"
 }
