@@ -161,6 +161,7 @@ It is safe to run this command multiple times in a row while fixing syntax error
 * **Example API Proto File**: automate/components/automate-gateway/api/compliance/reporting/
 * **Meta Swagger**: automate/components/automate-chef-io/data/docs/api-static/01-meta-swagger.json
 * **Reporting Export**: automate/components/automate-chef-io/data/docs/api-static/01-reporting-export.swagger.json
+* **Node Export**: automate/components/automate-chef-io/data/docs/api-static/05-node-export.swagger.json
 * **Description**: automate/components/automate-chef-io/data/docs/api-static/02-meta-description.yaml
 * **Tags**: automate/components/automate-chef-io/data/docs/api-static/03-tags.swagger.json
 * **Compiled Swagger**: automate/static/api-docs/all-apis.swagger.json

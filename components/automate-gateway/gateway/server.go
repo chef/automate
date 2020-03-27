@@ -416,7 +416,7 @@ func (s *Server) startHTTPServer() error {
 
 	// custom mux route for export (ignores its request method)
 	// needed b/c gateway does not support stream; corresponds to
-	// https://github.com/chef/automate/blob/master/components/automate-gateway/api/compliance/reporting/reporting.proto
+	// https://github.com/chef/automate/blob/master/api/interservice/compliance/reporting/reporting.proto#L15
 	// `rpc Export(Query) returns (stream ExportData) {};`
 	mux.HandleFunc("/compliance/reporting/export", s.ReportExportHandler)
 
