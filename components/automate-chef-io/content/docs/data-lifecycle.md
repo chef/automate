@@ -13,9 +13,9 @@ toc = true
     weight = 20
 +++
 
-## Overview
-
-Data Lifecycle manages the retention of events, service groups, Chef Client runs, compliance reports and scans in Chef Automate. Chef Automate stores data from the ingest-service, event-feed-service, compliance-service and applications-service in ElasticSearch or PostgreSQL. Over time you may wish to remove that data from Chef Automate by using the data lifecycle settings.
+Data Lifecycle manages the retention of events, service groups, Chef Client runs, compliance reports and scans in Chef Automate.
+Chef Automate stores data from the ingest-service,event-feed-service, compliance-service and applications-service in ElasticSearch or PostgreSQL.
+Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
 
 {{% warning %}}
 Note: Chef Automate data retention processes changed in 20191129172405. The [upgrade documentation]({{< ref "install/#upgrades" >}}) covers configuring your system to install new Chef Automate versions. For guidance, contact your customer support agent. You can also use the [previous data retention documentation](https://github.com/chef/automate/blob/20191104205453/components/automate-chef-io/content/docs/configuration.md#data-retention) for help with configuring data retention on older Chef Automate installations.
@@ -23,7 +23,7 @@ Note: Chef Automate data retention processes changed in 20191129172405. The [upg
 
 ## Data Lifecycle UI
 
-Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes use the **Save Changes** button to apply your changes.
+Navigate to _Settings_ > _Data Lifecycle_ and adjust any settings you would like to change. After making changes, use the **Save Changes** button to apply your changes.
 
 Only users with `dataLifecycle:*` IAM access are able to see the data lifecycle job statuses, configure jobs, or run jobs.
 
@@ -31,11 +31,13 @@ Only users with `dataLifecycle:*` IAM access are able to see the data lifecycle 
 
 ### Event Feed
 
-The event feed data lifecycle settings allow you to remove all event feed data and chef server actions after a set amount of days. The default is to remove event feed data after 7 days, and Chef Infra Server actions after 30 days.
+The event feed data lifecycle settings allow you to remove all event feed data and chef server actions after a set amount of days.
+The default is to remove event feed data after 7 days, and Chef Infra Server actions after 30 days.
 
 ### Service Groups
 
-The service group data lifecycle settings are shown in the UI, but cannot be changed in the UI. Instead, you can use the API to adjust these settings. The default is to label health check reports as disconnected after 5 minutes, and remove disconnected services after 5 days.
+The service group data lifecycle settings appear in the browser, but you cannot change these settings in the browser.
+Instead, you use the API to adjust these settings. The default is to label health check reports as disconnected after 5 minutes, and remove disconnected services after 5 days.
 
 ### Client Runs
 
@@ -47,27 +49,26 @@ The Compliance data lifecycle settings allow you to remove compliance reports an
 
 ## Data Lifecycle API
 
-Chef Automate stores data from the `ingest-service`, `event-feed-service`,
-`compliance-service` and `applications-service` in ElasticSearch or PostgreSQL.
+Chef Automate stores data from the `ingest-service`, `event-feed-service`, `compliance-service` and `applications-service` in ElasticSearch or PostgreSQL.
 
 The `data-lifecycle` API allows configuring and running lifecycle jobs by data type:
 
-* `infra` Chef Infra Server actions and Chef Client converge data
-* `compliance` Chef Inspec reports and Chef Compliance scans
-* `event-feed` Event metadata that powers the operational visibility and query language
+* `infra` - Chef Infra Server actions and Chef Client converge data
+* `compliance` - Chef InSpec reports and Chef Compliance scans
+* `event-feed` - Event metadata that powers the operational visibility and query language
 
 
-An [api token]({{< relref "api-tokens.md" >}}) with `dataLifecycle:*` IAM access is required to see the data lifecycle job statuses, configure jobs, or run jobs.
-
+To see the data lifecycle job statuses, configure jobs, or run jobs requires an [api token]({{< relref "api-tokens.md" >}}) with `dataLifecycle:*` IAM access.
 
 ### Status
 
-To see the combined status and configuration for all data lifecycle jobs you can use the global status endpoint
+To see the combined status and configuration for all data lifecycle jobs, you can use the global status endpoint:
+
 ```bash
 curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/status
 ```
 
-To see individual statuses by data type you can access the data type sub-status endpoints:
+To see individual statuses by data type, you can access the data type sub-status endpoints:
 
 ```bash
 curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/event-feed/status
@@ -75,8 +76,7 @@ curl -s -H "api-token: $TOKEN" https://{{< example_fqdn "automate" >}}/api/v0/da
 
 Swap `event-feed` for `infra` or `compliance` to see their corresponding jobs.
 
-The status in an aggregate of the job configuration, details about it's next scheduled run, and details about
-any previous runs.
+The status is an aggregate of the job configuration, details about its next scheduled run, and details about any previous runs.
 
 ### Configuration
 
@@ -164,15 +164,15 @@ Configure the data lifecycle job settings by creating a JSON file with the desir
 }
 ```
 
-Configure the jobs by sending the JSON payload to the `configure` endpoint. Save the JSON file as `config.json`
-in the current working directory.
+Configure the jobs by sending the JSON payload to the `configure` endpoint.
+Save the JSON file as `config.json` in the current working directory:
+
 ```bash
 curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/config
 ```
 
-If you wish to configure a specific endpoint only, you can specify the `job_settings` for that
-data type and configure it using data types sub-resource. For example, if you want to configure
-compliance settings create a smaller JSON payload:
+If you wish to configure a specific endpoint only, you can specify the `job_settings` for that data type and configure it using data types sub-resource. 
+For example, if you want to configure compliance settings, create a smaller JSON payload:
 
 ```json
 { "job_settings": [
@@ -199,7 +199,8 @@ compliance settings create a smaller JSON payload:
 }
 ```
 
-And update it using the `compliance` sub-resource
+And update the specific endpoint using the `compliance` sub-resource:
+
 ```bash
 curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/compliance/config
 ```
@@ -208,25 +209,24 @@ curl -s -H "api-token: $TOKEN" -X PUT --data "@config.json" https://{{< example_
 
 All jobs have the following options:
 
-* `recurrence` (string) A recurrence rule that determines how often, at what interval, and when to initially start a scheduled
-  job. Any valid recurrence rule [as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt) is valid in this field.
-* `disabled` (bool) Whether or not this job should be enabled
+* `recurrence` (string) - A recurrence rule that determines how often, at what interval, and when to initially start a scheduled job. Any valid recurrence rule [as defined in section 4.3.10 of RFC 2445](https://www.ietf.org/rfc/rfc2445.txt) is valid in this field.
+* `disabled` (bool) - Whether or not this job should be enabled
 
 Infra node lifecycle jobs have the following options:
 
-* `threshold` (string) setting that allows the user to use `1w` style notation to denote how long before the infra job is trigged.
+* `threshold` (string) - Setting that allows the user to use `1w` style notation to denote how long before the infra job is triggered.
 
 Purge jobs have the following options:
 
-* `purge_polices` (map) configures how old the corresponding data must be in the configured storage backend before it is purged.
-  * `elasticsearch` (array) an array of ElasticSearch purge policies
-    * `disabled` (bool) Whether or not this job should be enabled
-    * `policy_name` (string) The name of the purge policy you wish to update
-    * `older_than_days` (int) The name of the purge policy you wish to update
+* `purge_polices` (map) - Configures how old the corresponding data must be in the configured storage backend before it is purged.
+  * `elasticsearch` (array) - An array of ElasticSearch purge policies
+    * `disabled` (bool) - Whether or not this job should be enabled
+    * `policy_name` (string) - The name of the purge policy you wish to update
+    * `older_than_days` (int) - The name of the purge policy you wish to update
 
 ##### Infra Job Settings
 
-The `infra` data type has four data lifecycle jobs, three are for node lifecycle and one is purge job with two ElasticSearch purge policies.
+The `infra` data type has four data lifecycle jobs: three are for node lifecycle and one is for purge job with two ElasticSearch purge policies.
 
 ```json
 { "job_settings": [
@@ -267,13 +267,12 @@ The `infra` data type has four data lifecycle jobs, three are for node lifecycle
 }
 ```
 
-* `delete_nodes` how long a node can exist before it is deleted.
-* `missing_nodes` how long between a node's last check-in before it
-  is marked as missing.
-* `missing_nodes_for_deletion` how long a node can be missing before it is deleted
-* `periodic_purge_timeseries` how often to run the purge job
-  * `actions` Chef Infra Server actions
-  * `converge-history` Chef Infra Client converge data
+* `delete_nodes` - How long a node can exist before deletion.
+* `missing_nodes` - How long between a node's last check-in before it is marked as missing.
+* `missing_nodes_for_deletion` - How long a node can be missing before it is deleted
+* `periodic_purge_timeseries` - How often to run the purge job
+  * `actions` - Chef Infra Server actions
+  * `converge-history` - Chef Infra Client converge data
 
 ##### Compliance Job Settings
 
@@ -304,9 +303,9 @@ The `compliance` data type has one compliance purge job with two ElasticSearch p
 }
 ```
 
-* `periodic_purge` how often to run the purge job
-  * `compliance-reports` Chef Inspec reports
-  * `compliance-scans` Chef Compliance scans
+* `periodic_purge` - How often to run the purge job
+  * `compliance-reports` - Chef Inspec reports
+  * `compliance-scans` - Chef Compliance scans
 
 ##### Event Feed Job Settings
 
@@ -331,20 +330,20 @@ The `event_feed` data type has one event feed purge job with one ElasticSearch p
 }
 ```
 
-* `periodic_purge` how often to run the purge job
-  * `feed` Queryable event feed
+* `periodic_purge` - How often to run the purge job
+  * `feed` - Queryable event feed
 
 ### Run
 
 As with `status` and `configure`, you can run data lifecycle jobs globally across all data or by using the data type sub-resource.
 
-To run all data lifecycle jobs immediately run the following command:
+To run all data lifecycle jobs, immediately run the following command:
 
 ```bash
 curl -s -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/run
 ```
 
-To only run jobs for a specific data type you can make the request to the sub-resource:
+To only run jobs for a specific data type, you can make the request to the sub-resource:
 
 ```bash
 curl -s -H "api-token: $TOKEN" -X POST https://{{< example_fqdn "automate" >}}/api/v0/data-lifecycle/infra/run
