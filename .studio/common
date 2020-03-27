@@ -106,8 +106,8 @@ function compile_client_mocks() {
       mockgen_debug -source nodemanager/nodes/nodes.pb.go -destination nodemanager/nodes/nodes.pb.client_mock.go -package nodes -self_package github.com/chef/automate/api/interservice/nodemanager/nodes
     popd || return 1
 
-    pushd /src/components/automate-gateway || return 1
-      mockgen_debug -source gateway/clients.go -destination gateway_mocks/mock_gateway/clients_mock.go -package mock_gateway
+    pushd /src/components/automate-gateway/gateway_mocks || return 1
+      make
     popd || return 1
   )
 }
