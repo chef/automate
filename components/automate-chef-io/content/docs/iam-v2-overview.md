@@ -11,7 +11,7 @@ toc = true
 +++
 
 {{< info >}}
-Chef Automate releases later than 20200326170928 contain the version of IAM described on this page.
+This documentation covers Chef Automate's IAM feature in release 20200326170928 and later.
 {{< /info >}}
 
 Chef Automate's Identity and Access Managment (IAM) allows direct management of policy members from Chef Automate in the browser.
