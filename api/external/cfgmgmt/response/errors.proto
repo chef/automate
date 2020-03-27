@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package chef.automate.api.cfgmgmt.response;
+option go_package = "github.com/chef/automate/api/external/cfgmgmt/response";
+
+// Errors contains a list of the most common Chef Infra error type/message
+// combinations among nodes in the active project as filtered according to the
+// request.
+message Errors {
+  repeated ErrorCount errors = 1;
+}
+
+// ErrorCount gives the number of occurrences (count) of the error specified by
+// the type and message among the nodes included by the request parameters
+message ErrorCount {
+  int32 count = 1;
+  string type = 2;
+  string error_message = 3;
+}
+

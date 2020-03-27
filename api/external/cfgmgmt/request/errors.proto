@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package chef.automate.api.cfgmgmt.request;
+option go_package = "github.com/chef/automate/api/external/cfgmgmt/request";
+
+message Errors {
+  // The number of results to return.
+  // If set to zero, the default size of 10 will be used. Set to a negative
+  // value for unlimited results.
+  int32 size = 1;
+  // Filters in the request select the nodes from which the errors are
+  // collected. The same filters may be specified for this request as for other
+  // Nodes requests, with the exception of 'status' which is not valid for this
+  // request.
+  repeated string filter = 2;
+}

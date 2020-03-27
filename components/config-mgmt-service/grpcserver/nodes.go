@@ -13,6 +13,7 @@ import (
 	"github.com/golang/protobuf/ptypes/timestamp"
 	log "github.com/sirupsen/logrus"
 
+	extReq "github.com/chef/automate/api/external/cfgmgmt/request"
 	externalResp "github.com/chef/automate/api/external/cfgmgmt/response"
 	pRequest "github.com/chef/automate/api/interservice/cfgmgmt/request"
 	interserviceResp "github.com/chef/automate/api/interservice/cfgmgmt/response"
@@ -397,4 +398,46 @@ func (s *CfgMgmtServer) nodeExistsAsync(nodeID string, projectFilters map[string
 	}()
 
 	return nodeExistsChan
+}
+
+func (s *CfgMgmtServer) GetErrors(ctx context.Context, req *extReq.Errors) (*externalResp.Errors, error) {
+	log.WithFields(log.Fields{
+		"request": req,
+		"func":    nameOfFunc(),
+	}).Debug("rpc call")
+
+	filters, err := stringutils.FormatFiltersWithKeyConverter(req.Filter,
+		params.ConvertParamToNodeStateBackendLowerFilter)
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, err.Error())
+	}
+
+	filters, err = filterByProjects(ctx, filters)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, err.Error())
+	}
+
+	if _, filterRequested := filters["status"]; filterRequested {
+		return nil, status.Errorf(codes.InvalidArgument, "Cannot filter GetErrors request by 'status'")
+	}
+
+	chefErrors, err := s.client.GetErrors(req.Size, filters)
+	if err != nil {
+		return nil, err
+	}
+
+	res := externalResp.Errors{}
+	for _, chefErr := range chefErrors {
+		res.Errors = append(
+			res.Errors,
+			&externalResp.ErrorCount{
+				Count:        chefErr.Count,
+				Type:         chefErr.Type,
+				ErrorMessage: chefErr.Message,
+			},
+		)
+	}
+
+	return &res, nil
+
 }
