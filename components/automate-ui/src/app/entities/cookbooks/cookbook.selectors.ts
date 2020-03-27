@@ -15,11 +15,6 @@ export const getAllStatus = createSelector(
   (state) => state.getAllStatus
 );
 
-export const getStatus = createSelector(
-  cookbookState,
-  (state) => state.getStatus
-);
-
 export const cookbookFromRoute = createSelector(
   cookbookEntities,
   routeParams,

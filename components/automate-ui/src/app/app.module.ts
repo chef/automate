@@ -70,6 +70,7 @@ import { ApiTokenRequests } from './entities/api-tokens/api-token.requests';
 import { AutomateSettingsRequests } from './entities/automate-settings/automate-settings.requests';
 import { CookbookRequests } from './entities/cookbooks/cookbook.requests';
 import { InfraRoleRequests } from './entities/infra-roles/infra-role.requests';
+import { CookbookDetailsRequests } from './entities/cookbooks/cookbookdetails.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
 import { JobRequests } from './entities/jobs/job.requests';
@@ -295,6 +296,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     ClientRunsRequests,
     CookbookRequests,
     InfraRoleRequests,
+    CookbookDetailsRequests,
     CredentialRequests,
     DatafeedService,
     EventFeedService,

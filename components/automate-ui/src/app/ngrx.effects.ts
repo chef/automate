@@ -6,6 +6,7 @@ import { AutomateSettingsEffects } from './entities/automate-settings/automate-s
 import { ClientRunsEffects } from './entities/client-runs/client-runs.effects';
 import { CookbookEffects } from './entities/cookbooks/cookbook.effects';
 import { InfraRoleEffects } from './entities/infra-roles/infra-role.effects';
+import { CookbookDetailsEffects } from './entities/cookbooks/cookbookdetails.effects';
 import { CredentialsEffects } from './pages/+compliance/+credentials/credentials.state';
 // CredentialEffect is for the credential entities. Don't confuse it with CredentialsEffects.
 // CredentialsEffects will be removed when the credentials page is refactored.
@@ -38,6 +39,7 @@ import { UserPermEffects } from './entities/userperms/userperms.effects';
       ClientRunsEffects,
       CookbookEffects,
       InfraRoleEffects,
+      CookbookDetailsEffects,
       CredentialsEffects,
       CredentialEffects,
       EventFeedEffects,

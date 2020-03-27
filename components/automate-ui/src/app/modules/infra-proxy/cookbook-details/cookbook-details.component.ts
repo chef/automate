@@ -1,6 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 // import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { environment as env } from 'environments/environment';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
@@ -8,11 +10,16 @@ import { routeURL, routeParams } from 'app/route.selectors';
 import { filter, takeUntil, pluck } from 'rxjs/operators';
 import { identity, isNil } from 'lodash/fp';
 // import { EntityStatus } from 'app/entities/entities';
-import { GetCookbookDetails } from 'app/entities/cookbooks/cookbook.actions';
 import { Cookbook } from 'app/entities/cookbooks/cookbook.model';
 import {
   cookbookFromRoute
 } from 'app/entities/cookbooks/cookbook.selectors';
+import { CookbookDetails, RootFiles } from 'app/entities/cookbooks/cookbookdetails.model';
+import {
+  allCookbookDetails,
+  getStatus as getAllCookbooksDetailsForVersionStatus
+} from 'app/entities/cookbooks/cookbookdetails.selectors';
+import { GetCookbookDetailsForVersion } from 'app/entities/cookbooks/cookbookdetails.actions';
 export type CookbookDetailsTab = 'details' | 'content';
 
 @Component({
@@ -30,11 +37,15 @@ export class CookbookDetailsComponent implements OnInit {
   public url: string;
   public serverId: string;
   public orgId: string;
-  public cookbookDetails: Cookbook[];
+  public cookbookDetails: CookbookDetails;
   public tabValue: CookbookDetailsTab = 'details';
+  public readFile: RootFiles;
+  public readFileUrl: string;
+  public readFileContent;
   constructor(
     private store: Store<NgrxStateAtom>,
-    private layoutFacade: LayoutFacadeService
+    private layoutFacade: LayoutFacadeService,
+    private http: HttpClient
   ) {}
 
   ngOnInit() {
@@ -81,31 +92,41 @@ export class CookbookDetailsComponent implements OnInit {
           this.serverId = server_id;
           this.orgId = org_id;
           this.cookbooks = allCookbooksState;
-          this.store.dispatch(new GetCookbookDetails({
+          this.store.dispatch(new GetCookbookDetailsForVersion({
             server_id: server_id,
             org_id: org_id,
             cookbook_name: this.cookbooks.name,
             cookbook_version: this.cookbooks.current_version
           }));
-          // console.log('asdfasdf', this.cookbooks);
-          // this.onCookbookVersionChange();
+          this.onCookbookVersionChange(this.serverId, this.orgId, this.cookbooks.name, this.cookbooks.current_version);
       });
   }
 
-  // public onCookbookVersionChange(): void {
-  //   combineLatest([
-  //     this.store.select(cookbookFromRoute)
-  //   ]).pipe(
-  //       filter(([ allCookbooksState]) => !isNil(allCookbooksState)),
-  //       takeUntil(this.isDestroyed)
-  //       ).subscribe(([ allCookbooksState ]) => {
-  //         this.cookbookDetails = <Cookbook>Object.assign({}, allCookbooksState);
-  //         console.log(this.cookbookDetails);
-  //     });
-  // }
+  public onCookbookVersionChange(server_id:string, org_id:string, cookbook_name:string, cookbook_version:string): void {
+    combineLatest([
+      this.store.select(getAllCookbooksDetailsForVersionStatus),
+      this.store.select(allCookbookDetails)
+    ]).pipe().subscribe(([_getCookbooksSt, allCookbooksState]) => {
+        this.cookbookDetails = allCookbooksState[0];
+        this.readFile = allCookbooksState[0]?.root_files.find(data => data.name === 'README.md');
+        if(this.readFile) {
+          this.readFileUrl = encodeURIComponent(this.readFile?.url);
+          this.http.get(
+            `${env.infra_proxy_url}/servers/${server_id}/orgs/${org_id}/cookbooks/${cookbook_name}/${cookbook_version}/file-content?url=${this.readFileUrl}`).subscribe
+            (fileContent => {
+              this.readFileContent = fileContent;
+            });
+        }        
+      });
+  }
 
   // onSelectedTab(event: { target: { value: CookbookDetailsTab } }) {
   //   this.tabValue = event.target.value;
   //   this.router.navigate([this.url.split('#')[0]], { fragment: event.target.value });
   // }
+
+  ngOnDestroy(): void {
+    this.isDestroyed.next(true);
+    this.isDestroyed.complete();
+  }
 }
