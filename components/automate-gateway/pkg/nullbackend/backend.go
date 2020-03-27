@@ -56,7 +56,7 @@ func NewServer() *grpc.Server {
 	manager.RegisterNodeManagerServiceServer(s, &manager.UnimplementedNodeManagerServiceServer{})
 	nodes.RegisterNodesServiceServer(s, &nodes.UnimplementedNodesServiceServer{})
 	notifications.RegisterNotificationsServer(s, &notifications.UnimplementedNotificationsServer{})
-	teams.RegisterTeamsV2Server(s, &teams.UnimplementedTeamsV2Server{})
+	teams.RegisterTeamsServer(s, &teams.UnimplementedTeamsServer{})
 	secrets.RegisterSecretsServiceServer(s, &secrets.UnimplementedSecretsServiceServer{})
 
 	return s
