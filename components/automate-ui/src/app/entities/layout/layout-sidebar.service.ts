@@ -132,7 +132,7 @@ export class LayoutSidebarService {
               {
                 name: 'Data Feeds',
                 icon: 'assignment',
-                route: '/settings/data-feed',
+                route: '/settings/data-feeds',
                 authorized: {
                   anyOf: ['/datafeed/destinations', 'post']
                 },

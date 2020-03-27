@@ -43,7 +43,7 @@
           <chef-table-body>
             <chef-table-row *ngFor= "let destination of sortedDestinations$ | async">
               <chef-table-cell>
-                <a [routerLink]="['/settings/data-feed/', destination.id]">{{ destination.name }}</a>
+                <a [routerLink]="['/settings/data-feeds/', destination.id]">{{ destination.name }}</a>
               </chef-table-cell>
               <chef-modal label="url-modal-label" [visible]="urlStatusModalVisible" (closeModal)="closeModal('url')">
                 <div class="status-modal">

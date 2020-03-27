@@ -14,7 +14,7 @@ import { GetDestination, UpdateDestination } from 'app/entities/destinations/des
 import { destinationFromRoute, getStatus, updateStatus } from 'app/entities/destinations/destination.selectors';
 import { Destination } from 'app/entities/destinations/destination.model';
 
-type TokenTabName = 'details';
+type DestinationTabName = 'details';
 
 @Component({
   selector: 'app-data-feed-details',
@@ -22,7 +22,7 @@ type TokenTabName = 'details';
   styleUrls: ['./data-feed-details.component.scss']
 })
 export class DataFeedDetailsComponent implements OnInit {
-  public tabValue: TokenTabName = 'details';
+  public tabValue: DestinationTabName = 'details';
   public destination: Destination;
   private isDestroyed = new Subject<boolean>();
   public updateForm: FormGroup;

@@ -11,7 +11,7 @@ export class SettingsLandingComponent {
   // order determined by settings-sidebar template and is vetted by settings-sidebar unit tests
   public routeList: RoutePerms[] = [
     { anyOfCheck: [['/notifications/rules', 'get', '']], route: '/settings/notifications' },
-    { anyOfCheck: [['/datafeed/destinations', 'post', '']], route: '/settings/data-feed' },
+    { anyOfCheck: [['/datafeed/destinations', 'post', '']], route: '/settings/data-feeds' },
     { anyOfCheck: [['/nodemanagers/search', 'post', '']], route: '/settings/node-integrations' },
     { anyOfCheck: [['/secrets/search', 'post', '']], route: '/settings/node-credentials' },
     { anyOfCheck: [['/retention/nodes/status', 'get', '']], route: '/settings/data-lifecycle' },
