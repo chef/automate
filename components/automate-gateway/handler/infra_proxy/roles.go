@@ -36,11 +36,13 @@ func (a *InfraProxyServer) GetRole(ctx context.Context, r *gwreq.Role) (*gwres.R
 	}
 
 	return &gwres.Role{
-		Name:        res.GetName(),
-		ChefType:    res.GetChefType(),
-		Description: res.GetDescription(),
-		RunList:     res.GetRunList(),
-		JsonClass:   res.GetJsonClass(),
+		Name:               res.GetName(),
+		ChefType:           res.GetChefType(),
+		Description:        res.GetDescription(),
+		DefaultAttributes:  res.GetDefaultAttributes(),
+		OverrideAttributes: res.GetOverrideAttributes(),
+		RunList:            res.GetRunList(),
+		JsonClass:          res.GetJsonClass(),
 	}, nil
 }
 
@@ -49,7 +51,9 @@ func fromUpstreamRoles(roles []*infra_res.RoleListItem) []*gwres.RoleListItem {
 
 	for i, c := range roles {
 		ts[i] = &gwres.RoleListItem{
-			Name: c.GetName(),
+			Name:         c.GetName(),
+			Description:  c.GetDescription(),
+			Environments: c.GetEnvironments(),
 		}
 	}
 
