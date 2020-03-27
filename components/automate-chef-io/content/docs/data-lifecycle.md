@@ -18,7 +18,10 @@ Chef Automate stores data from the ingest-service,event-feed-service, compliance
 Over time, you may wish to remove that data from Chef Automate by using the data lifecycle settings.
 
 {{% warning %}}
-Note: Chef Automate data retention processes changed in 20191129172405. The [upgrade documentation]({{< ref "install/#upgrades" >}}) covers configuring your system to install new Chef Automate versions. For guidance, contact your customer support agent. You can also use the [previous data retention documentation](https://github.com/chef/automate/blob/20191104205453/components/automate-chef-io/content/docs/configuration.md#data-retention) for help with configuring data retention on older Chef Automate installations.
+Note: Chef Automate data retention processes changed in 20191129172405.
+The [upgrade documentation]({{< ref "install/#upgrades" >}}) covers configuring your system to install new Chef Automate versions.
+For guidance, contact your customer support agent.
+You can also use the [previous data retention documentation](https://github.com/chef/automate/blob/20191104205453/components/automate-chef-io/content/docs/configuration.md#data-retention) for help with configuring data retention on older Chef Automate installations.
 {{% /warning %}}
 
 ## Data Lifecycle UI
@@ -37,15 +40,19 @@ The default is to remove event feed data after 7 days, and Chef Infra Server act
 ### Service Groups
 
 The service group data lifecycle settings appear in the browser, but you cannot change these settings in the browser.
-Instead, you use the API to adjust these settings. The default is to label health check reports as disconnected after 5 minutes, and remove disconnected services after 5 days.
+Instead, you use the API to adjust these settings.
+The default is to label health check reports as disconnected after 5 minutes, and remove disconnected services after 5 days.
 
 ### Client Runs
 
-The Client Runs data lifecycle settings allow you to remove data after a set amount of days. They also allow you to label nodes as missing and automatically remove them after a set amount of days. The default is to remove Chef Client run data after 1 day, to label nodes as missing after 30 days, and to remove nodes labeled as missing after 30 days.
+The Client Runs data lifecycle settings allow you to remove data after a set amount of days.
+They also allow you to label nodes as missing and automatically remove them after a set amount of days.
+The default is to remove Chef Client run data after 1 day, to label nodes as missing after 30 days, and to remove nodes labeled as missing after 30 days.
 
 ### Compliance
 
-The Compliance data lifecycle settings allow you to remove compliance reports and compliance scans after a set amount of days. The default is to remove compliance reports after 60 days, and to remove compliance scans after 60 days.
+The Compliance data lifecycle settings allow you to remove compliance reports and compliance scans after a set amount of days.
+The default is to remove compliance reports after 60 days, and to remove compliance scans after 60 days.
 
 ## Data Lifecycle API
 
