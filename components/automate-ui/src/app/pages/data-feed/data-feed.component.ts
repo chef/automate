@@ -121,8 +121,8 @@ export class DatafeedComponent implements OnInit, OnDestroy {
   public createDataFeed(): void {
     this.creatingDataFeed = true;
     const destinationObj = new Destination(undefined, '', '', '');
-    destinationObj.name = this.createDataFeedForm.controls['username'].value.trim();
-    destinationObj.url = this.createDataFeedForm.controls['url'].value.trim();
+    destinationObj.name = this.createDataFeedForm.controls['name'].value.trim();
+    destinationObj.targetUrl = this.createDataFeedForm.controls['url'].value.trim();
     const username: string = this.createDataFeedForm.controls['username'].value.trim();
     const password: string = this.createDataFeedForm.controls['password'].value.trim();
     this.store.dispatch(new CreateDestination(destinationObj, username, password));

@@ -1,17 +1,18 @@
 export interface DestinationInterface {
-  id?: number;
+  id: number;
   name: string; // name of the destination
-  url?: string; // URL of the endpoint
-  secret_id?: string; // Slack or Custom
+  targetUrl: string; // URL of the endpoint
+  targetSecretId: string; // Slack or Custom
 }
+
 
 export class Destination implements DestinationInterface {
 
   constructor(
     public id: number,
     public name: string,
-    public url: string,
-    public secret_id: string
+    public targetUrl: string,
+    public targetSecretId: string
   ) {
   }
 
@@ -24,8 +25,8 @@ export class Destination implements DestinationInterface {
     return {
         'id': this.id,
         'name': this.name,
-        'url': this.url,
-        'secret': this.secret_id
+        'url': this.targetUrl,
+        'secret': this.targetSecretId
     };
   }
 }
