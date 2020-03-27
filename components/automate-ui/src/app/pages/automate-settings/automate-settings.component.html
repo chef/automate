@@ -17,7 +17,7 @@
       <div class="page-body">
 
         <div class="group-section">
-          <chef-button primary [disabled]="!formChanged || saving" (click)="applyChanges()">
+          <chef-button primary [disabled]="!automateSettingsForm.dirty || saving" (click)="applyChanges()">
             <chef-loading-spinner *ngIf="saving"></chef-loading-spinner>
             <span *ngIf="!saving">Save Changes</span>
             <span *ngIf="saving">Saving...</span>

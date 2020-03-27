@@ -4,7 +4,7 @@ import { FormGroup, FormBuilder } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Subject } from 'rxjs';
-import { distinctUntilKeyChanged, takeUntil, filter, debounceTime } from 'rxjs/operators';
+import { distinctUntilKeyChanged, takeUntil, filter } from 'rxjs/operators';
 import { pendingState } from 'app/entities/entities';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import {
@@ -125,14 +125,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   automateSettingsForm: FormGroup;
   jobSchedulerStatus: JobSchedulerStatus;
 
-  // Has the form changed?
-  formChanged = false;
-
   // Are settings currently saving
   saving = false;
-
-  // have the initial values been loaded
-  private valuesLoaded = false;
 
   // Notification bits
   notificationVisible = false;
@@ -199,7 +193,6 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
           const error = automateSettingsSelector.errorResp;
           const errMsg = 'Unable to load settings.';
           this.showErrorNotification(error, errMsg);
-          this.valuesLoaded = true;
         } else {
           this.jobSchedulerStatus = automateSettingsSelector.jobSchedulerStatus;
           this.telemetryService.track('lifecycleConfiguration', this.jobSchedulerStatus);
@@ -219,23 +212,14 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
             const errMsg = 'Unable to update one or more settings.';
             this.showErrorNotification(error, errMsg);
             this.store.dispatch(new GetSettings({})); // reset form to previously stored settings
-            this.formChanged = false;
+            this.automateSettingsForm.markAsPristine();
             this.saving = false;
           } else if (changeConfigurationSelector.status === 'loadingSuccess') {
             this.showSuccessNotification();
-            this.formChanged = false;
+            this.automateSettingsForm.markAsPristine();
             this.saving = false;
           }
         });
-
-  // Subscribes to any change inside the automateSettingsForm
-  // AFTER our form is finished being populated the first time
-    this.automateSettingsForm.valueChanges.pipe(
-      filter(() => this.valuesLoaded),
-      debounceTime(150),
-      takeUntil(this.isDestroyed)
-      )
-      .subscribe(_change => this.formChanged = true);
   }
 
   ngOnDestroy(): void {
@@ -254,6 +238,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   }
 
   public handleFormActivation(form, checked: boolean): void {
+    // patchValue does not mark the form dirty, so we need to do it manually;
+    form.get('disabled').markAsDirty();
     // patchValue is a workaround for the chef-checkbox because we need to be
     // able to store a reference to it being checked or not
     form.patchValue({
@@ -331,15 +317,6 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     }
   }
 
-  // // Subscribes to any change inside the automateSettingsForm
-  // private onChanges(): void {
-  //   this.automateSettingsForm.valueChanges.pipe(takeUntil(this.isDestroyed))
-  //     .subscribe(_change => {
-  //       this.formChanged = true;
-  //       // Loop through forms and check for validity, then set to true or false
-  //     });
-  // }
-
   private showErrorNotification(error: HttpErrorResponse, msg: string) {
     // Extract the error message from the HttpErrorResponse
     // if it is available inside the body.
@@ -390,10 +367,6 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
           break;
       }
     });
-
-    // valuesLoaded is a flag we only need set once, after we populate
-    // the form for the first time, and now can listen for changes
-    this.valuesLoaded = true;
   }
 
   private getJobForm(jobName: string) {
