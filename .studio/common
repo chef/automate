@@ -34,10 +34,10 @@ DOC
 function compile_go_protobuf_component() {
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
 
-  # FIXME: this comment is wrong
-  # Note: while we remove all pb-derived files before regenerating, we're
-  # actually cheating a bit: the protoc-gen-* executables built above do partly
-  # depend on them.
+  # NOTE: To (re)build the world from scratch, automate-grpc must first be
+  # bootstrapped so that our custom protoc-gen-* commands can be used in later
+  # build steps. See `bootstrap_proto_compilers` above.
+
   local path
   if [ "$1" == "api" ]; then
     path=api
@@ -54,11 +54,6 @@ function compile_go_protobuf_component() {
     fi
   fi
 
-  # FIXME: this comment is wrong
-  # prep policy generation (only automate-gateway needs that right now)
-  # Note: the actual generation is triggered by a call to protoc with the
-  # parameter '--policy_out=...'. Only if the service's methods has the proper
-  # annotations will the generated code not be a NO-OP.
   local proto_go_tools=(
     github.com/chef/automate/components/automate-grpc/protoc-gen-policy
     github.com/chef/automate/components/automate-grpc/protoc-gen-grpc-mock # generate mock grpc server implementations
