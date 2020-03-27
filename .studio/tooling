@@ -29,6 +29,52 @@ function ps() {
   $TOOL_BIN "$@"
 }
 
+document "manifest_for_channel"<<DOC
+  Returns the Chef Automate manifest for the latest version in the given channel
+DOC
+function manifest_for_channel() {
+    local channel=$1
+    if [[ -z "$channel" ]]; then
+        log_error "No channel provided"
+        log_error "Usage: manifest_for_channel CHANNEL"
+        return 1
+    fi
+
+    install_if_missing core/curl curl
+    curl -sS "https://packages.chef.io/manifests/$channel/automate/latest.json"
+}
+
+document "versions_for_channel"<<DOC
+  Returns the list of Chef Automate versions in a given channel
+DOC
+function versions_for_channel() {
+    local channel=$1
+    if [[ -z "$channel" ]]; then
+        log_error "No channel provided"
+        log_error "Usage: versions_for_channel CHANNEL"
+        return 1
+    fi
+
+    install_if_missing core/curl curl
+    install_if_missing core/jq-static jq
+    curl -sS "https://packages.chef.io/manifests/$channel/automate/versions.json" | jq -r '.[]'
+}
+
+document "manifest_for_version"<<DOC
+  Returns the Chef Automate manifest for a given version
+DOC
+function manifest_for_version() {
+    local version=$1
+    if [[ -z "$version" ]]; then
+        log_error "No version provided"
+        log_error "Usage: manifest_for_version VERSION"
+        return 1
+    fi
+
+    install_if_missing core/curl curl
+    curl -sS "https://packages.chef.io/manifests/automate/$version.json"
+}
+
 document "channel_contains_commit" <<DOC
   Given a "commit-ish" git identifier, it shows which channels (dev, acceptance, current) the commit is present in.
 DOC
@@ -36,12 +82,11 @@ function channel_contains_commit() {
     commit=$1
 
     install_if_missing core/jq-static jq
-    install_if_missing core/curl curl
     install_if_missing core/git git
 
-    dev=$(curl https://packages.chef.io/manifests/dev/automate/latest.json 2>/dev/null | jq -r '.git_sha')
-    current=$(curl https://packages.chef.io/manifests/current/automate/latest.json 2>/dev/null | jq -r '.git_sha')
-    acceptance=$(curl https://packages.chef.io/manifests/acceptance/automate/latest.json 2>/dev/null | jq -r '.git_sha')
+    dev=$(manifest_for_channel dev | jq -r '.git_sha')
+    current=$(manifest_for_channel current | jq -r '.git_sha')
+    acceptance=$(manifest_for_channel acceptance | jq -r '.git_sha')
 
     if git merge-base --is-ancestor "$commit" "$dev"; then
         echo -e '       dev: \033[0;32m✓\033[0m'
@@ -72,8 +117,8 @@ function get_release_diff_url()
 {
     install_if_missing core/jq-static jq
     install_if_missing core/curl curl
-    current=$(curl https://packages.chef.io/manifests/current/automate/latest.json 2>/dev/null | jq -r '.git_sha')
-    acceptance=$(curl https://packages.chef.io/manifests/acceptance/automate/latest.json 2>/dev/null | jq -r '.git_sha')
+    current=$(manifest_for_channel current | jq -r '.git_sha')
+    acceptance=$(manifest_for_channel acceptance | jq -r '.git_sha')
 
     echo "https://github.com/chef/automate/compare/$current...$acceptance"
 }
