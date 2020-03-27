@@ -6,7 +6,7 @@ import { ReportQuery } from './report-query.service';
 
 export type ReportingSummaryStatus = 'failed' | 'passed' | 'waived' | 'skipped' | 'unknown';
 
-interface ReportingSummary {
+export interface ReportingSummary {
   stats: {
     nodes: any;
     profiles: any;
