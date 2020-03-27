@@ -41,6 +41,8 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
   public OrgId;
   public updateOrgForm: FormGroup;
   public tabValue: OrgTabName = 'cookbooks';
+  cookbooksListLoading = true;
+
   constructor(
     private fb: FormBuilder,
     private store: Store<NgrxStateAtom>,
@@ -103,6 +105,7 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
         this.updateOrgForm.controls['name'].setValue(this.org.name);
         this.updateOrgForm.controls['admin_user'].setValue(this.org.admin_user);
         this.updateOrgForm.controls['admin_key'].setValue(this.org.admin_key);
+        this.cookbooksListLoading = false;
       });
 
     combineLatest([
