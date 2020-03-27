@@ -7,7 +7,7 @@ import (
 	"github.com/lib/pq" // adapter for database/sql
 	"github.com/pkg/errors"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	authz "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/db"
@@ -17,7 +17,7 @@ import (
 type postgres struct {
 	db          *sql.DB
 	logger      logger.Logger
-	authzClient authz_v2.AuthorizationClient
+	authzClient authz.AuthorizationClient
 }
 
 type querier interface {
@@ -25,7 +25,7 @@ type querier interface {
 }
 
 // New instantiates and returns a postgres storage implementation
-func New(logger logger.Logger, migrationConfig migration.Config, authzClient authz_v2.AuthorizationClient) (storage.Storage, error) {
+func New(logger logger.Logger, migrationConfig migration.Config, authzClient authz.AuthorizationClient) (storage.Storage, error) {
 
 	db, err := initPostgresDB(migrationConfig.PGURL.String())
 	if err != nil {

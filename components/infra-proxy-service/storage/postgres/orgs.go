@@ -6,7 +6,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
+	authz "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -26,8 +26,7 @@ func (p *postgres) insertOrg(ctx context.Context,
 		projects = []string{}
 	}
 
-	// will only return an error if authz is in v2.1 mode
-	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+	_, err := p.authzClient.ValidateProjectAssignment(ctx, &authz.ValidateProjectAssignmentReq{
 		Subjects:    auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 		OldProjects: []string{},
 		NewProjects: projects,
@@ -137,7 +136,7 @@ func (p *postgres) EditOrg(ctx context.Context, org storage.Org) (storage.Org, e
 		return storage.Org{}, p.processError(err)
 	}
 
-	_, err = p.authzClient.ValidateProjectAssignment(ctx, &authz_v2.ValidateProjectAssignmentReq{
+	_, err = p.authzClient.ValidateProjectAssignment(ctx, &authz.ValidateProjectAssignmentReq{
 		Subjects:        auth_context.FromContext(auth_context.FromIncomingMetadata(ctx)).Subjects,
 		OldProjects:     oldProjects,
 		NewProjects:     org.Projects,

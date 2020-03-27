@@ -64,7 +64,7 @@ func TestOrgs(t *testing.T) {
 	t.Run("CreateOrg", func(t *testing.T) {
 		test.ResetState(ctx, t, serviceRef)
 
-		t.Run("when a valid org is submitted", func(t *testing.T) {
+		t.Run("when a valid org is submitted, creates the new org successfully", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
@@ -150,7 +150,7 @@ func TestOrgs(t *testing.T) {
 	t.Run("GetOrgs", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 
-		t.Run("when there is no orgs exists", func(t *testing.T) {
+		t.Run("when no orgs exist", func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := cl.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
@@ -838,7 +838,7 @@ func TestOrgs(t *testing.T) {
 	t.Run("UpdateOrg", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 
-		t.Run("when a valid org update request is submitted", func(t *testing.T) {
+		t.Run("when a valid org update request is submitted, updates the org successfully", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
