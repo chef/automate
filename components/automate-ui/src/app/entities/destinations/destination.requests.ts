@@ -4,9 +4,7 @@ import { of as observableOf, Observable } from 'rxjs';
 import { map, mergeMap } from 'rxjs/operators';
 import { environment } from 'environments/environment';
 import { compact, concat } from 'lodash';
-// import { mapKeys, snakeCase } from 'lodash/fp';
-import { Destination } from './destination.model';
-import { DestinationSuccessPayload } from './destination.actions';
+import { Destination } from '../../pages/data-feed/destination';
 
 export interface DestinationsResponse {
   destinations: Destination[];
@@ -56,13 +54,13 @@ export class DestinationRequests {
     Observable<DestinationResponse> {
     return this.createSecret(destinationData, targetUsername, targetPassword)
       .pipe(mergeMap((secretId: string) => {
-        destinationData.secret_id = secretId;
+        destinationData.targetSecretId = secretId;
         return this.http.post<DestinationResponse>(
           this.joinToDatafeedUrl(['destination']), destinationData.toRequest());
       }));
   }
 
-  public updateDestination(destination: Destination): Observable<DestinationSuccessPayload> {
+  public updateDestination(destination: Destination): Observable<DestinationResponse> {
     const response: any = destination.toRequest();
     return this.http.patch<DestinationResponse>(encodeURI(
       this.joinToDatafeedUrl(['destination', destination.id.toString()])), response);

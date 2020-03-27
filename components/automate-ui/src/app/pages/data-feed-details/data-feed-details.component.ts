@@ -67,7 +67,7 @@ export class DataFeedDetailsComponent implements OnInit {
       .subscribe(([_, destination]) => {
         this.destination = destination;
         this.updateForm.controls.name.setValue(this.destination.name);
-        this.updateForm.controls.url.setValue(this.destination.url);
+        this.updateForm.controls.url.setValue(this.destination.targetUrl);
       });
 
     this.store.pipe(
@@ -90,7 +90,8 @@ export class DataFeedDetailsComponent implements OnInit {
     const destinationObj = new Destination(undefined, '', '', '');
     destinationObj.id = this.destination.id;
     destinationObj.name = this.updateForm.controls['name'].value.trim();
-    destinationObj.url = this.updateForm.controls['url'].value.trim();
+    destinationObj.targetUrl = this.updateForm.controls['url'].value.trim();
+    destinationObj.targetSecretId = this.destination.targetSecretId;
     this.store.dispatch(new UpdateDestination({ destination: destinationObj }));
   }
 
