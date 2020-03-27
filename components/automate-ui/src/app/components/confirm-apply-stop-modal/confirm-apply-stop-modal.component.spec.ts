@@ -49,12 +49,12 @@ describe('ConfirmApplyStopModalComponent', () => {
 
   describe('progress bar', () => {
     using([
-      [0,     '0% complete'],
-      [0.75,  '0% complete'],
+      [0,    'Preparing...'],
+      [0.75, 'Preparing...'],
       [10,   '10% complete'],
       [91.9, '91% complete'],
       [92,   '92% complete'],
-      [100, '100% complete']
+      [100,  'Finishing Up...']
     ], (percentageComplete, progressPrefixText) => {
       it('displays correct percentage', () => {
         component.updateProgress({ ...component.applyRulesStatus, percentageComplete });
@@ -70,19 +70,25 @@ describe('ConfirmApplyStopModalComponent', () => {
     const NOW = '2019-01-01T00:00:00Z';
 
     using([
-      ['0001-01-01T00:00:00Z', '00:00:00 until finished'],
-      ['1970-01-01T00:00:00Z', '00:00:00 until finished'],
-      ['2019-01-01T00:00:00Z', '00:00:00 until finished'],
-      ['2019-01-01T00:15:00Z', '00:15:00 until finished'],
-      ['2019-01-01T12:30:45Z', '12:30:45 until finished'],
-      ['2019-01-02T06:45:15Z', '30:45:15 until finished']
-    ], (estimatedTimeComplete, progressSuffixText) => {
+      // floor(0) percent and ceil(100) percent don't have time estimates
+      [0, '0001-01-01T00:00:00Z', ''],
+      [0, '1970-01-01T00:00:00Z', ''],
+      [0.5, '2019-01-01T00:00:00Z', ''],
+      [10, '2019-01-01T00:15:00Z', '00:15:00 until finished'],
+      [50, '2019-01-01T12:30:45Z', '12:30:45 until finished'],
+      [99.9, '2019-01-02T06:45:15Z', '']
+    ], (percentageComplete, estimatedTimeComplete, progressSuffixText) => {
       beforeEach(() => jasmine.clock().mockDate(new Date(NOW)));
 
       afterEach(() => jasmine.clock().uninstall());
 
       it('displays correct suffix text', () => {
-        component.updateProgress({ ...component.applyRulesStatus, estimatedTimeComplete });
+        component.updateProgress({
+          ...component.applyRulesStatus,
+          percentageComplete,
+          estimatedTimeComplete
+        });
+        expect(component.progressValue).toEqual(percentageComplete);
         expect(component.progressSuffixText).toEqual(progressSuffixText);
       });
     });
@@ -100,18 +106,19 @@ describe('ConfirmApplyStopModalComponent', () => {
     });
 
     it('does not update time once update is cancelled', () => {
+      const percentageComplete = 30;
       jasmine.clock().mockDate(new Date(NOW));
       component.updateProgress(
-        { ...component.applyRulesStatus, estimatedTimeComplete: '2019-01-01T12:30:45Z' });
+        { ...component.applyRulesStatus, percentageComplete, estimatedTimeComplete: '2019-01-01T12:30:45Z' });
       expect(component.progressSuffixText).toContain('12:30:45');
       component.updateProgress(
-        { ...component.applyRulesStatus, estimatedTimeComplete: '2019-01-01T11:30:45Z' });
+        { ...component.applyRulesStatus, percentageComplete, estimatedTimeComplete: '2019-01-01T11:30:45Z' });
       expect(component.progressSuffixText).toContain('11:30:45');
 
       component.stopRulesInProgress = true;
 
       component.updateProgress(
-        { ...component.applyRulesStatus, estimatedTimeComplete: '2019-01-01T09:30:45Z' });
+        { ...component.applyRulesStatus, percentageComplete, estimatedTimeComplete: '2019-01-01T09:30:45Z' });
       expect(component.progressSuffixText).toContain('11:30:45');
     });
   });
