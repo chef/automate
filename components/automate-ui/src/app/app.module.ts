@@ -71,6 +71,7 @@ import { AutomateSettingsRequests } from './entities/automate-settings/automate-
 import { CookbookRequests } from './entities/cookbooks/cookbook.requests';
 import { ClientRunsRequests } from './entities/client-runs/client-runs.requests';
 import { CredentialRequests } from './entities/credentials/credential.requests';
+import { DesktopRequests } from './entities/desktop/desktop.requests';
 import { JobRequests } from './entities/jobs/job.requests';
 import { LicenseStatusRequests } from './entities/license/license.requests';
 import { ManagerRequests } from './entities/managers/manager.requests';
@@ -295,6 +296,7 @@ import { WelcomeModalComponent } from './page-components/welcome-modal/welcome-m
     CookbookRequests,
     CredentialRequests,
     DatafeedService,
+    DesktopRequests,
     EventFeedService,
     FeatureFlagsService,
     HistorySelection,

@@ -10,6 +10,7 @@ import * as apiToken from './entities/api-tokens/api-token.reducer';
 import * as automateSettings from './entities/automate-settings/automate-settings.reducer';
 import * as clientRuns from './entities/client-runs/client-runs.reducer';
 import * as cookbookEntity from './entities/cookbooks/cookbook.reducer';
+import * as desktopEntity from './entities/desktop/desktop.reducer';
 import * as integrationsAdd from './pages/integrations/add/integration-add.reducer';
 import * as integrationsDetail from './pages/integrations/detail/integrations-detail.reducer';
 import * as integrationsEdit from './pages/integrations/edit/integrations-edit.reducer';
@@ -72,6 +73,7 @@ export interface NgrxStateAtom {
   orgs: orgEntity.OrgEntityState;
   serviceGroups: serviceGroups.ServiceGroupsEntityState;
   teams: teamEntity.TeamEntityState;
+  desktops: desktopEntity.DesktopEntityState;
   userperms: permEntity.PermEntityState;
   users: userEntity.UserEntityState;
   userSelf: userSelfEntity.UserSelfEntityState;
@@ -180,6 +182,7 @@ export const defaultInitialState = {
   orgs: orgEntity.OrgEntityInitialState,
   serviceGroups: serviceGroups.ServiceGroupEntityInitialState,
   teams: teamEntity.TeamEntityInitialState,
+  desktops: desktopEntity.desktopEntityInitialState,
   userperms: permEntity.initialState,
   users: userEntity.UserEntityInitialState,
   userSelf: userSelfEntity.UserSelfEntityInitialState
@@ -222,6 +225,7 @@ export const ngrxReducers = {
   orgs: orgEntity.orgEntityReducer,
   serviceGroups: serviceGroups.serviceGroupsEntityReducer,
   teams: teamEntity.teamEntityReducer,
+  desktops: desktopEntity.userEntityReducer,
   userperms: permEntity.permEntityReducer,
   users: userEntity.userEntityReducer,
   userSelf: userSelfEntity.userSelfEntityReducer
