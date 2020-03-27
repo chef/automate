@@ -34,6 +34,7 @@ DOC
 function compile_go_protobuf_component() {
   [ "x$1" == "x" ] && error "Missing component name argument; try 'describe ${FUNCNAME[0]}'" && return 1
 
+  # FIXME: this comment is wrong
   # Note: while we remove all pb-derived files before regenerating, we're
   # actually cheating a bit: the protoc-gen-* executables built above do partly
   # depend on them.
@@ -42,6 +43,8 @@ function compile_go_protobuf_component() {
     path=api
   elif [ "$1" == "config" ]; then
     path=api/config
+  elif [ "$1" == "license" ]; then
+    path=lib/license
   else
     path="components/$1"
     if [ ! -f "/src/$path/scripts/grpc.sh" ]; then
@@ -51,6 +54,7 @@ function compile_go_protobuf_component() {
     fi
   fi
 
+  # FIXME: this comment is wrong
   # prep policy generation (only automate-gateway needs that right now)
   # Note: the actual generation is triggered by a call to protoc with the
   # parameter '--policy_out=...'. Only if the service's methods has the proper
