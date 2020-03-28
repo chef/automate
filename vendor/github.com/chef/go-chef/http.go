@@ -20,7 +20,7 @@ import (
 )
 
 // ChefVersion that we pretend to emulate
-const ChefVersion = "11.12.0"
+const ChefVersion = "14.0.0"
 
 // Body wraps io.Reader and adds methods for calculating hashes and detecting content
 type Body struct {
@@ -40,22 +40,28 @@ type Client struct {
 	BaseURL *url.URL
 	client  *http.Client
 
-	ACLs          *ACLService
-	Clients       *ApiClientService
-	Cookbooks     *CookbookService
-	DataBags      *DataBagService
-	Environments  *EnvironmentService
-	Groups        *GroupService
-	Nodes         *NodeService
-	Organizations *OrganizationService
-	Principals    *PrincipalService
-	Roles         *RoleService
-	Sandboxes     *SandboxService
-	Search        *SearchService
-	Users         *UserService
+	ACLs             *ACLService
+	Associations     *AssociationService
+	AuthenticateUser *AuthenticateUserService
+	Clients          *ApiClientService
+	Cookbooks        *CookbookService
+	DataBags         *DataBagService
+	Environments     *EnvironmentService
+	Groups           *GroupService
+	License          *LicenseService
+	Nodes            *NodeService
+	Organizations    *OrganizationService
+	Principals       *PrincipalService
+	Roles            *RoleService
+	Sandboxes        *SandboxService
+	Search           *SearchService
+	Status           *StatusService
+	Universe         *UniverseService
+	UpdatedSince     *UpdatedSinceService
+	Users            *UserService
 }
 
-// Config contains the configuration options for a chef client. This is Used primarily in the NewClient() constructor in order to setup a proper client object
+// Config contains the configuration options for a chef client. This structure is used primarily in the NewClient() constructor in order to setup a proper client object
 type Config struct {
 	// This should be the user ID on the chef server
 	Name string
@@ -63,11 +69,14 @@ type Config struct {
 	// This is the plain text private Key for the user
 	Key string
 
-	// BaseURL is the chef server URL used to connect to. If using orgs you should include your org in the url
+	// BaseURL is the chef server URL used to connect to. If using orgs you should include your org in the url and terminate the url with a "/"
 	BaseURL string
 
 	// When set to false (default) this will enable SSL Cert Verification. If you need to disable Cert Verification set to true
 	SkipSSL bool
+
+	// RootCAs is a reference to x509.CertPool for TLS
+	RootCAs *x509.CertPool
 
 	// Time to wait in seconds before giving up on a request to the server
 	Timeout int
@@ -132,13 +141,17 @@ func NewClient(cfg *Config) (*Client, error) {
 
 	baseUrl, _ := url.Parse(cfg.BaseURL)
 
+	tlsConfig := &tls.Config{InsecureSkipVerify: cfg.SkipSSL}
+	if cfg.RootCAs != nil {
+		tlsConfig.RootCAs = cfg.RootCAs
+	}
 	tr := &http.Transport{
 		Proxy: http.ProxyFromEnvironment,
 		Dial: (&net.Dialer{
 			Timeout:   30 * time.Second,
 			KeepAlive: 30 * time.Second,
 		}).Dial,
-		TLSClientConfig:     &tls.Config{InsecureSkipVerify: cfg.SkipSSL},
+		TLSClientConfig:     tlsConfig,
 		TLSHandshakeTimeout: 10 * time.Second,
 	}
 
@@ -154,17 +167,23 @@ func NewClient(cfg *Config) (*Client, error) {
 		BaseURL: baseUrl,
 	}
 	c.ACLs = &ACLService{client: c}
+	c.AuthenticateUser = &AuthenticateUserService{client: c}
+	c.Associations = &AssociationService{client: c}
 	c.Clients = &ApiClientService{client: c}
 	c.Cookbooks = &CookbookService{client: c}
 	c.DataBags = &DataBagService{client: c}
 	c.Environments = &EnvironmentService{client: c}
 	c.Groups = &GroupService{client: c}
+	c.License = &LicenseService{client: c}
 	c.Nodes = &NodeService{client: c}
 	c.Organizations = &OrganizationService{client: c}
 	c.Principals = &PrincipalService{client: c}
 	c.Roles = &RoleService{client: c}
 	c.Sandboxes = &SandboxService{client: c}
 	c.Search = &SearchService{client: c}
+	c.Status = &StatusService{client: c}
+	c.UpdatedSince = &UpdatedSinceService{client: c}
+	c.Universe = &UniverseService{client: c}
 	c.Users = &UserService{client: c}
 	return c, nil
 }
@@ -176,12 +195,12 @@ func (c *Client) magicRequestDecoder(method, path string, body io.Reader, v inte
 		return err
 	}
 
-	debug("Request: %+v \n", req)
+	debug("\n\nRequest: %+v \n", req)
 	res, err := c.Do(req, v)
 	if res != nil {
 		defer res.Body.Close()
 	}
-	debug("Response: %+v \n", res)
+	debug("Response: %+v\n", res)
 	if err != nil {
 		return err
 	}
@@ -205,7 +224,7 @@ func (c *Client) NewRequest(method string, requestUrl string, body io.Reader) (*
 	// parse and encode Querystring Values
 	values := req.URL.Query()
 	req.URL.RawQuery = values.Encode()
-	debug("Encoded url %+v", u)
+	debug("Encoded url %+v\n", u)
 
 	myBody := &Body{body}
 
@@ -243,16 +262,22 @@ func (c *Client) Do(req *http.Request, v interface{}) (*http.Response, error) {
 	}
 
 	// BUG(fujin) tightly coupled
-	err = CheckResponse(res) // <--
+	err = CheckResponse(res)
 	if err != nil {
 		return res, err
 	}
 
+	var resbuf bytes.Buffer
+	restee := io.TeeReader(res.Body, &resbuf)
 	if v != nil {
 		if w, ok := v.(io.Writer); ok {
-			io.Copy(w, res.Body)
+			io.Copy(w, restee)
 		} else {
-			err = json.NewDecoder(res.Body).Decode(v)
+			err = json.NewDecoder(restee).Decode(v)
+			if debug_on() {
+				resbody, _ := ioutil.ReadAll(&resbuf)
+				debug("Response body: %+v\n", string(resbody))
+			}
 			if err != nil {
 				return res, err
 			}
@@ -274,17 +299,18 @@ func (ac AuthConfig) SignRequest(request *http.Request) error {
 	}
 
 	vals := map[string]string{
-		"Method":             request.Method,
-		"Hashed Path":        HashStr(endpoint),
-		"Accept":             "application/json",
-		"X-Chef-Version":     ChefVersion,
-		"X-Ops-Timestamp":    time.Now().UTC().Format(time.RFC3339),
-		"X-Ops-UserId":       ac.ClientName,
-		"X-Ops-Sign":         "algorithm=sha1;version=1.0",
-		"X-Ops-Content-Hash": request.Header.Get("X-Ops-Content-Hash"),
+		"Method":                   request.Method,
+		"Hashed Path":              HashStr(endpoint),
+		"Accept":                   "application/json",
+		"X-Chef-Version":           ChefVersion,
+		"X-Ops-Server-API-Version": "1",
+		"X-Ops-Timestamp":          time.Now().UTC().Format(time.RFC3339),
+		"X-Ops-UserId":             ac.ClientName,
+		"X-Ops-Sign":               "algorithm=sha1;version=1.0",
+		"X-Ops-Content-Hash":       request.Header.Get("X-Ops-Content-Hash"),
 	}
 
-	for _, key := range []string{"Method", "Accept", "X-Chef-Version", "X-Ops-Timestamp", "X-Ops-UserId", "X-Ops-Sign"} {
+	for _, key := range []string{"Method", "Accept", "X-Chef-Version", "X-Ops-Server-API-Version", "X-Ops-Timestamp", "X-Ops-UserId", "X-Ops-Sign"} {
 		request.Header.Set(key, vals[key])
 	}
 

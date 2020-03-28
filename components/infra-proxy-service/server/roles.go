@@ -6,6 +6,7 @@ import (
 	"reflect"
 	"sort"
 
+	chef "github.com/chef/go-chef"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -47,6 +48,7 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 	}
 
 	result := RoleListResult{}
+	// Fetch roles using search API
 	newReq, err := client.NewRequest("GET", "search/role", nil)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -64,17 +66,33 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 	}, nil
 }
 
-// GetRole get role
+// GetRole get role appended with expanded runlist
+// In order to get expanded runlist it required to have all roles if any
+// RunList contains the another Role's RunList.
 func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role, error) {
 	client, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
 	}
 
-	role, err := client.Roles.Get(req.Name)
+	result := RoleListResult{}
+	newReq, err := client.NewRequest("GET", "search/role", nil)
 	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, err.Error())
+		return nil, status.Error(codes.Internal, err.Error())
 	}
+
+	res1, err := client.Do(newReq, &result)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	defer res1.Body.Close()
+
+	if result.Total == 0 {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
+	role := findRoleFromRoleList(req.Name, &result)
 
 	defaultAttributes, err := json.Marshal(role.DefaultAttributes)
 	if err != nil {
@@ -86,14 +104,20 @@ func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
+	expandedRunList, err := toResponseExpandedRunList(role, &result)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+
 	return &response.Role{
 		Name:               role.Name,
 		ChefType:           role.ChefType,
 		Description:        role.Description,
 		DefaultAttributes:  string(defaultAttributes),
 		OverrideAttributes: string(overrideAttributes),
-		JsonClass:          role.JsonClass,
+		JsonClass:          role.JSONClass,
 		RunList:            role.RunList,
+		ExpandedRunList:    expandedRunList,
 	}, nil
 
 }
@@ -125,4 +149,66 @@ func fromAPIToListRoles(result RoleListResult) []*response.RoleListItem {
 	})
 
 	return cl
+}
+
+func findRoleFromRoleList(name string, result *RoleListResult) *Role {
+	for _, rItem := range result.Rows {
+		if rItem.Name == name {
+			return rItem
+		}
+	}
+	return nil
+}
+
+func toResponseExpandedRunList(role *Role, result *RoleListResult) ([]*response.ExpandedRunList, error) {
+	envResExpandedRunList := make([]*response.ExpandedRunList, len(role.EnvRunList)+1)
+
+	runList, err := expandRunlistFromRole(role.RunList, result)
+	if err != nil {
+		return nil, err
+	}
+
+	envResExpandedRunList[0] = &response.ExpandedRunList{
+		Id:      "_default",
+		RunList: runList,
+	}
+	index := 0
+	for key, value := range role.EnvRunList {
+		eRunList, err := expandRunlistFromRole(value, result)
+		if err != nil {
+			return nil, err
+		}
+
+		envResExpandedRunList[index+1] = &response.ExpandedRunList{
+			Id:      key,
+			RunList: eRunList,
+		}
+		index++
+	}
+
+	return envResExpandedRunList, nil
+}
+
+func expandRunlistFromRole(runlist []string, result *RoleListResult) ([]*response.RunList, error) {
+	runList := make([]*response.RunList, len(runlist))
+	for i, item := range runlist {
+
+		newItem, err := chef.NewRunListItem(item)
+		if err != nil {
+			return nil, err
+		}
+		newRunList := response.RunList{
+			Type:    newItem.Type,
+			Name:    newItem.Name,
+			Version: newItem.Version,
+		}
+
+		if newItem.IsRole() {
+			currentRole := findRoleFromRoleList(newItem.Name, result)
+			newRunList.Children, _ = expandRunlistFromRole(currentRole.RunList, result)
+		}
+
+		runList[i] = &newRunList
+	}
+	return runList, nil
 }

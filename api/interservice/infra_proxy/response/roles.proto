@@ -32,8 +32,8 @@ message Role {
     string json_class = 6;
     // Run list for the role.
     repeated string run_list  = 7;
-    // Expanded run list for the role.
-    ExpandedRunList expanded_run_list = 8;	
+    // List of expanded run list for the role.
+    repeated ExpandedRunList expanded_run_list = 8;
 }
 
 message ExpandedRunList {
