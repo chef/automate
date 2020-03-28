@@ -96,3 +96,13 @@ function load_compliance_reports() {
     ./send_to_data_collector.sh https://a2-dev.test "$(get_admin_token)"
     popd &> /dev/null
 }
+
+document "load_scan_jobs" <<DOC
+  Loads scan jobs.
+DOC
+function load_scan_jobs() {
+  source dev/secrets-env.sh
+  pushd dev-docs/adding-data &> /dev/null
+  go run add_scanjobs.go
+  popd &> /dev/null
+}
