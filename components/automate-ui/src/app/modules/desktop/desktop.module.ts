@@ -7,6 +7,7 @@ import { ChefComponentsModule } from 'app/components/chef-components.module';
 import { DailyCheckInComponent } from './daily-check-in/daily-check-in.component';
 import { CheckInTimeSeriesComponent } from './check-in-time-series/check-in-time-series.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
+import { TopErrorsComponent } from './top-errors/top-errors.component';
 
 import { DesktopRoutingModule } from './desktop-routing.module';
 
@@ -21,12 +22,14 @@ import { DesktopRoutingModule } from './desktop-routing.module';
   exports: [
     DailyCheckInComponent,
     DashboardComponent,
-    CheckInTimeSeriesComponent
+    CheckInTimeSeriesComponent,
+    TopErrorsComponent
   ],
   declarations: [
     DailyCheckInComponent,
     DashboardComponent,
-    CheckInTimeSeriesComponent
+    CheckInTimeSeriesComponent,
+    TopErrorsComponent
   ],
   schemas: [ CUSTOM_ELEMENTS_SCHEMA ]
 })
