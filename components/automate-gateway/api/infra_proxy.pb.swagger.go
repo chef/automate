@@ -1495,7 +1495,7 @@ func init() {
           "items": {
             "$ref": "#/definitions/chef.automate.api.infra_proxy.response.ExpandedRunList"
           },
-          "description": "Expanded run list for the role."
+          "description": "List of expanded run list for the role."
         }
       }
     },

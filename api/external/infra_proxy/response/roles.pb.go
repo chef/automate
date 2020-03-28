@@ -133,7 +133,7 @@ type Role struct {
 	JsonClass string `protobuf:"bytes,6,opt,name=json_class,json=jsonClass,proto3" json:"json_class,omitempty"`
 	// Run list for the role.
 	RunList []string `protobuf:"bytes,7,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty"`
-	// Expanded run list for the role.
+	// List of expanded run list for the role.
 	ExpandedRunList      []*ExpandedRunList `protobuf:"bytes,8,rep,name=expanded_run_list,json=expandedRunList,proto3" json:"expanded_run_list,omitempty"`
 	XXX_NoUnkeyedLiteral struct{}           `json:"-"`
 	XXX_unrecognized     []byte             `json:"-"`
