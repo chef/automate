@@ -101,6 +101,7 @@ document "load_scan_jobs" <<DOC
   Loads scan jobs.
 DOC
 function load_scan_jobs() {
+  # shellcheck disable=SC1091
   FILE=./dev/secrets-env.sh
   if [ ! -e "$FILE" ]; then
     echo "secrets file not found; pls run the get_secrets script"
