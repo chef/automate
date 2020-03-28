@@ -81,7 +81,7 @@ describe('TeamManagementComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('create v2 team', () => {
+  describe('create team', () => {
     let store: Store<NgrxStateAtom>;
     const team: Team = {
       guid: 'uuid-1',
@@ -94,7 +94,7 @@ describe('TeamManagementComponent', () => {
       store = TestBed.inject(Store);
     });
 
-    it('openCreateModal on v2 opens v2 modal', () => {
+    it('openCreateModal opens modal', () => {
       expect(component.createModalVisible).toBe(false);
       component.openCreateModal();
       expect(component.createModalVisible).toBe(true);

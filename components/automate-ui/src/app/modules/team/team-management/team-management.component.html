@@ -56,7 +56,6 @@
                       <ng-container *ngIf="team.projects.length > 1">{{ team.projects.length }} projects</ng-container>
                     </chef-table-cell>
                     <chef-table-cell class="three-dot-column">
-                      <!-- TODO: Need to account for v1 / v2 in the app-authorized path -->
                       <!-- <app-authorized [allOf]="['/iam/v2/teams/{id}', 'delete', team.id]"> -->
                       <mat-select panelClass="chef-control-menu">
                         <mat-option (onSelectionChange)="startTeamDelete($event, team)">Delete Team</mat-option>
