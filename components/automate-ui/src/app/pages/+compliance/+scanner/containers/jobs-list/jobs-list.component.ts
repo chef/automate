@@ -8,6 +8,7 @@ import { NgrxStateAtom } from '../../../../../ngrx.reducers';
 import * as moment from 'moment';
 import * as selectors from '../../state/scanner.selectors';
 import * as actions from '../../state/scanner.actions';
+import { DateTime } from 'app/helpers/datetime/datetime';
 
 @Component({
   templateUrl: './jobs-list.component.html',
@@ -118,7 +119,7 @@ export class JobsListComponent implements OnInit, OnDestroy {
       this.router.navigate(['/compliance', 'reports', 'overview'],
         {queryParams: {job_id: jobID}});
     } else {
-      const endDateString = moment.utc(endDate).format('YYYY-MM-DD');
+      const endDateString = moment.utc(endDate).format(DateTime.REPORT_DATE);
 
       this.router.navigate(['/compliance', 'reports', 'overview'],
         {queryParams: {job_id: jobID, end_time: endDateString}});
