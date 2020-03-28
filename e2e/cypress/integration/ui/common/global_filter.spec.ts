@@ -40,21 +40,6 @@ describe('global projects filter', () => {
     });
     cy.logout();
   });
-
-  // TODO can uncomment when we have a flag to remove legacy policies,
-  // which are currently allowing full project access to all users.
-  // it('shows allowed projects for non-admin', () => {
-  //   cy.login('/settings', nonAdminUsername);
-  //   // hide modal unrelated to test flow
-  //   cy.get('app-welcome-modal').invoke('hide');
-  //   cy.get('chef-sidebar');
-  //   const allowedProjects = [proj1.name, proj2.name];
-  //   cy.get('.dropdown-label').click();
-  //   allowedProjects.forEach(project => {
-  //     cy.get('#projects-filter-dropdown').contains(project);
-  //   });
-  //   cy.logout();
-  // });
 });
 
 function cleanupProjects(id_token: string): void {
