@@ -6,11 +6,11 @@
       <div>
         <div class="item">
           <div class="title">Unknown %</div>
-          <div class="total">{{ unknownPercentage }}%</div>
+          <div class="total">{{ unknownPercentage | number:'1.0-0' }}%</div>
         </div>
         <div class="item">
           <div class="title">Checked-in %</div>
-          <div class="total">{{ checkedInPercentage }}%</div>
+          <div class="total">{{ checkedInPercentage | number:'1.0-0' }}%</div>
         </div>
         <div class="item">
           <div class="title">Checked-in Count</div>

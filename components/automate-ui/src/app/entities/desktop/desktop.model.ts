@@ -13,3 +13,13 @@ export interface DayPercentage {
   daysAgo: number;
   percentage: number;
 }
+
+export interface TopErrorsCollection {
+  items: TopErrorsItem[];
+}
+
+export interface TopErrorsItem {
+  count: number;
+  type: string;
+  message: string;
+}
