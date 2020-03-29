@@ -17,13 +17,13 @@ import (
 
 // NodeAttribute attributes of the node
 type NodeAttribute struct {
-	Name            string `json:"name"`
-	ChefGUID        string `json:"chef_guid"`
-	CheckIn         string `json:"checkin"`
-	ChefEnvironment string `json:"chef_environment"`
-	Platform        string `json:"platform"`
-	PolicyGroup     string `json:"policy_group"`
-	Uptime          string `json:"uptime"`
+	Name            string
+	ChefGUID        string
+	CheckIn         string
+	ChefEnvironment string
+	Platform        string
+	PolicyGroup     string
+	Uptime          string
 }
 
 // GetCookbooks get cookbooks list
@@ -53,7 +53,6 @@ func (s *Server) GetCookbooksAvailableVersions(ctx context.Context, req *request
 	}
 
 	numVersions := req.NumVersions
-
 	if numVersions == "" {
 		numVersions = "all"
 	}
@@ -82,7 +81,6 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 	}
 
 	version := req.Version
-
 	if version == "" {
 		version = "_latest"
 	}
@@ -115,7 +113,6 @@ func (s *Server) GetCookbook(ctx context.Context, req *request.Cookbook) (*respo
 
 // GetCookbookAffectedNodes get the nodes using cookbook
 func (s *Server) GetCookbookAffectedNodes(ctx context.Context, req *request.Cookbook) (*response.CookbookAffectedNodes, error) {
-
 	query := map[string]interface{}{
 		"name":             []string{"name"},
 		"platform":         []string{"platform"},
@@ -204,7 +201,6 @@ func fromAPIToListCookbooks(al chef.CookbookListResult) []*response.CookbookVers
 	cl := make([]*response.CookbookVersion, len(al))
 
 	index := 0
-
 	for k, v := range al {
 		cl[index] = &response.CookbookVersion{
 			Name:    k,
@@ -251,15 +247,15 @@ func fromSearchAPIToCookbookNodes(sr chef.SearchResult) []*response.NodeAttribut
 	results := make([]*response.NodeAttribute, len(sr.Rows))
 	index := 0
 	for _, element := range sr.Rows {
-		node := getNodeAttributeFromRes(element)
+		m := element.(map[string]interface{})["data"].(map[string]interface{})
 		results[index] = &response.NodeAttribute{
-			Name:        node.Name,
-			CheckIn:     node.CheckIn,
-			ChefGuid:    node.ChefGUID,
-			Environment: node.ChefEnvironment,
-			Platform:    node.Platform,
-			PolicyGroup: node.PolicyGroup,
-			Uptime:      node.Uptime,
+			Name:        safeStringFromMap(m, "name"),
+			CheckIn:     safeStringFromMapFloat(m, "ohai_time"),
+			ChefGuid:    safeStringFromMap(m, "chef_guid"),
+			Environment: safeStringFromMap(m, "chef_environment"),
+			Platform:    safeStringFromMap(m, "platform"),
+			PolicyGroup: safeStringFromMap(m, "policy_group"),
+			Uptime:      safeStringFromMap(m, "uptime"),
 		}
 		index++
 	}
@@ -267,36 +263,20 @@ func fromSearchAPIToCookbookNodes(sr chef.SearchResult) []*response.NodeAttribut
 	return results
 }
 
-func getNodeAttributeFromRes(data interface{}) NodeAttribute {
-	m := data.(map[string]interface{})["data"].(map[string]interface{})
-	node := NodeAttribute{}
-	if name, ok := m["name"].(string); ok {
-		node.Name = name
+// This returns the value referenced by `key` in `values`. If value is nil,
+// it returns an empty string; otherwise it returns the original string.
+func safeStringFromMap(values map[string]interface{}, key string) string {
+	if values[key] == nil {
+		return ""
 	}
+	return values[key].(string)
+}
 
-	if checkin, ok := m["ohai_time"].(float64); ok {
-		node.CheckIn = strconv.FormatFloat(checkin, 'E', -1, 64)
+// This returns the value referenced by `key` in `values`. If value is nil,
+// it returns an empty string; otherwise it returns the base 64 float string.
+func safeStringFromMapFloat(values map[string]interface{}, key string) string {
+	if values[key] == nil {
+		return ""
 	}
-
-	if chefGUID, ok := m["chef_guid"].(string); ok {
-		node.ChefGUID = chefGUID
-	}
-
-	if environment, ok := m["chef_environment"].(string); ok {
-		node.ChefEnvironment = environment
-	}
-
-	if platform, ok := m["platform"].(string); ok {
-		node.Platform = platform
-	}
-
-	if policyGroup, ok := m["policy_group"].(string); ok {
-		node.PolicyGroup = policyGroup
-	}
-
-	if uptime, ok := m["uptime"].(string); ok {
-		node.Uptime = uptime
-	}
-
-	return node
+	return strconv.FormatFloat(values[key].(float64), 'E', -1, 64)
 }
