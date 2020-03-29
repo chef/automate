@@ -115,12 +115,15 @@ export class ChefModal {
     if (visible) {
       this.prevFocusedElement = document.activeElement as HTMLElement;
 
-      // sets the focus on the close button once Angular has detected modal is open
-      const focusCloseButton = setInterval(() => {
-        const close = this.el.getElementsByClassName('close').item(0).firstElementChild as HTMLElement;
-        close.focus();
-        if (close === document.activeElement) {
-          clearInterval(focusCloseButton);
+      // when Angular detects the modal is open
+      // sets the focus on the close button for unlocked modals,
+      // or the div for locked modals
+      const focusElement = (this.locked ? this.el.getElementsByClassName('modal').item(0) : this.el.getElementsByClassName('close').item(0).firstElementChild) as HTMLElement
+
+      const focusElementInterval = setInterval(() => {
+        focusElement.focus();
+        if (focusElement === document.activeElement) {
+          clearInterval(focusElementInterval);
         }
       }, 1);
     }
@@ -137,7 +140,8 @@ export class ChefModal {
           class="modal"
           aria-modal="true"
           role="dialog"
-          aria-labelledby={this.label}>
+          aria-labelledby={this.label}
+          tabindex="0">
           <chef-trap-focus>
             {
               this.renderButton()
