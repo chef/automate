@@ -23,7 +23,6 @@ func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*respo
 
 	if req.Name != "" {
 		dataBags, err := client.DataBags.ListItems(req.Name)
-
 		if err != nil {
 			return nil, status.Error(codes.InvalidArgument, err.Error())
 		}
@@ -32,18 +31,16 @@ func (s *Server) GetDataBags(ctx context.Context, req *request.DataBags) (*respo
 			DataBags: fromAPIToListDatabags(*dataBags),
 		}, nil
 
-	} else {
-
-		dataBags, err := client.DataBags.List()
-
-		if err != nil {
-			return nil, status.Error(codes.InvalidArgument, err.Error())
-		}
-
-		return &response.DataBags{
-			DataBags: fromAPIToListDatabags(*dataBags),
-		}, nil
 	}
+
+	dataBags, err := client.DataBags.List()
+	if err != nil {
+		return nil, status.Error(codes.InvalidArgument, err.Error())
+	}
+
+	return &response.DataBags{
+		DataBags: fromAPIToListDatabags(*dataBags),
+	}, nil
 }
 
 // GetDataBagItem get data bag
