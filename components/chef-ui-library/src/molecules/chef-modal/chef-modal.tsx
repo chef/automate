@@ -118,7 +118,9 @@ export class ChefModal {
       // when Angular detects the modal is open
       // sets the focus on the close button for unlocked modals,
       // or the div for locked modals
-      const focusElement = (this.locked ? this.el.getElementsByClassName('modal').item(0) : this.el.getElementsByClassName('close').item(0).firstElementChild) as HTMLElement
+      const focusElement =
+        (this.locked ? this.el.getElementsByClassName('modal').item(0) :
+        this.el.getElementsByClassName('close').item(0).firstElementChild) as HTMLElement;
 
       const focusElementInterval = setInterval(() => {
         focusElement.focus();
