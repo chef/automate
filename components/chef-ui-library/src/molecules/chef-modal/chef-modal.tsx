@@ -115,13 +115,17 @@ export class ChefModal {
     if (visible) {
       this.prevFocusedElement = document.activeElement as HTMLElement;
 
-      // sets the focus on the modal once Angular has detected modal is open
-      const focusModal = setInterval(() => {
-        const modal = this.el.getElementsByClassName('modal').item(0) as HTMLElement;
-        modal.focus();
+      // when Angular detects the modal is open
+      // sets the focus on the close button for unlocked modals,
+      // or the div for locked modals
+      const focusElement =
+        (this.locked ? this.el.getElementsByClassName('modal').item(0) :
+        this.el.getElementsByClassName('close').item(0).firstElementChild) as HTMLElement;
 
-        if (modal === document.activeElement) {
-          clearInterval(focusModal);
+      const focusElementInterval = setInterval(() => {
+        focusElement.focus();
+        if (focusElement === document.activeElement) {
+          clearInterval(focusElementInterval);
         }
       }, 1);
     }
