@@ -145,6 +145,71 @@ func TestOrgs(t *testing.T) {
 
 			cleanupOrg(ctx, t, cl, resp.Org.Id)
 		})
+
+		t.Run("when the org required field name is missing or empty, raise an invalid argument error", func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{},
+			})
+			require.Nil(t, resp)
+			assert.Contains(t, err.Error(), "must supply org name")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+
+			resp2, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				Name:      "",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{},
+			})
+			assert.Nil(t, resp2)
+			assert.Contains(t, err.Error(), "must supply org name")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+
+		t.Run("when the org required field server id is missing or empty, raise an invalid argument error", func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				Projects:  []string{},
+			})
+			require.Nil(t, resp)
+			assert.Contains(t, err.Error(), "must supply server id")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+
+			resp2, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  "",
+				Projects:  []string{},
+			})
+			assert.Nil(t, resp2)
+			assert.Contains(t, err.Error(), "must supply server id")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+
+		t.Run("when the server does not exist, raise server not found error", func(t *testing.T) {
+			ctx := context.Background()
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  "97e01ea1-976e-4626-88c8-43345c5d934f",
+				Projects:  []string{},
+			})
+			require.Nil(t, resp)
+			grpctest.AssertCode(t, codes.NotFound, err)
+		})
 	})
 
 	t.Run("GetOrgs", func(t *testing.T) {
@@ -887,6 +952,116 @@ func TestOrgs(t *testing.T) {
 			updateOrg, err := cl.UpdateOrg(ctx, updateReq)
 
 			require.Nil(t, updateOrg)
+			grpctest.AssertCode(t, codes.NotFound, err)
+		})
+
+		t.Run("when the org Id is missing or empty, raise an invalid argument error", func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+				Name:      "update-infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{},
+			})
+			require.Nil(t, resp)
+			assert.Contains(t, err.Error(), "must supply org id")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+
+			resp2, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+				Id:        "",
+				Name:      "update-infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{},
+			})
+			assert.Nil(t, resp2)
+			assert.Contains(t, err.Error(), "must supply org id")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+
+		t.Run("when the submitted ID is not a UUIDv4, raise an invalid argument error", func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+				Id:        "35bffbab-3a49-dd8a-94a1-9ea87ec5c3cc",
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{},
+			})
+			require.Nil(t, resp)
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+
+		t.Run("when the org required field name is missing or empty, raise an invalid argument error", func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{},
+			})
+			require.Nil(t, resp)
+			assert.Contains(t, err.Error(), "must supply org name")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+
+			resp2, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
+				Name:      "",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  serverRes.Server.Id,
+				Projects:  []string{},
+			})
+			assert.Nil(t, resp2)
+			assert.Contains(t, err.Error(), "must supply org name")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+
+		t.Run("when the org required field server id is missing or empty, raise an invalid argument error", func(t *testing.T) {
+			ctx := context.Background()
+			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				Projects:  []string{},
+			})
+			require.Nil(t, resp)
+			assert.Contains(t, err.Error(), "must supply server id")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+
+			resp2, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  "",
+				Projects:  []string{},
+			})
+			assert.Nil(t, resp2)
+			assert.Contains(t, err.Error(), "must supply server id")
+			grpctest.AssertCode(t, codes.InvalidArgument, err)
+		})
+
+		t.Run("when the server does not exist, raise server not found error", func(t *testing.T) {
+			ctx := context.Background()
+			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
+			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
+			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
+
+			resp, err := cl.UpdateOrg(ctx, &request.UpdateOrg{
+				Id:        "23e01ea1-976e-4626-88c8-43345c5d912e",
+				Name:      "infra-org",
+				AdminUser: "admin",
+				AdminKey:  "--KEY--",
+				ServerId:  "97e01ea1-976e-4626-88c8-43345c5d934f",
+				Projects:  []string{},
+			})
+			require.Nil(t, resp)
 			grpctest.AssertCode(t, codes.NotFound, err)
 		})
 	})

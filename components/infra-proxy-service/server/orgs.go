@@ -36,8 +36,8 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 	}
 
 	if req.ServerId == "" {
-		s.service.Logger.Debug("incomplete create org request: missing org server id")
-		return nil, status.Error(codes.InvalidArgument, "must supply org server id")
+		s.service.Logger.Debug("incomplete create org request: missing server id")
+		return nil, status.Error(codes.InvalidArgument, "must supply server id")
 	}
 
 	newSecret := &secrets.Secret{
@@ -199,8 +199,8 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		return nil, status.Error(codes.InvalidArgument, "must supply org admin_key")
 	}
 	if req.ServerId == "" {
-		s.service.Logger.Debug("incomplete update org request: missing org server_id")
-		return nil, status.Error(codes.InvalidArgument, "must supply org server_id")
+		s.service.Logger.Debug("incomplete update org request: missing server id")
+		return nil, status.Error(codes.InvalidArgument, "must supply server id")
 	}
 
 	id, err := uuid.FromString(req.Id)
