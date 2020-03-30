@@ -170,15 +170,15 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
 
   addProfileStatus(data) {
     return data.items.map(profile => {
-      if (profile.failures === 0) {
-        if (profile.passed > 0) {
-          profile.status = 'passed';
-        } else {
-          profile.status = 'skipped';
-        }
-      } else {
+      if (profile.failures > 0) {
         profile.status = 'failed';
-      }
+      } else if (profile.passed > 0) {
+          profile.status = 'passed';
+      } else if (profile.waived > 0) {
+          profile.status = 'waived';
+      } else {
+          profile.status = 'skipped';
+      }    
       return profile;
     });
   }

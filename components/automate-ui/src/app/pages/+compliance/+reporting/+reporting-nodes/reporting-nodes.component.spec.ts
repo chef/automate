@@ -61,10 +61,22 @@ describe('ReportingNodesComponent', () => {
 
     describe('if all are skipped', () => {
       const data = {items: [
-        { failures: 0, passed: 0, skipped: 30, name: 'linux-baseline' }
+        { failures: 0, passed: 0, skipped: 30, waived: 0, name: 'linux-baseline' }
       ]};
       const expected = [
-        { failures: 0, passed: 0, skipped: 30, name: 'linux-baseline', status: 'skipped' }
+        { failures: 0, passed: 0, skipped: 30, waived: 0, name: 'linux-baseline', status: 'skipped' }
+      ];
+      it('sets the status for the profile to skipped', () => {
+        expect(component.addProfileStatus(data)).toEqual(expected);
+      });
+    });
+
+    describe('if all are waived', () => {
+      const data = {items: [
+        { failures: 0, passed: 0, skipped: 0, waived: 1, name: 'linux-baseline' }
+      ]};
+      const expected = [
+        { failures: 0, passed: 0, skipped: 0, waived: 1, name: 'linux-baseline', status: 'waived' }
       ];
       it('sets the status for the profile to skipped', () => {
         expect(component.addProfileStatus(data)).toEqual(expected);
