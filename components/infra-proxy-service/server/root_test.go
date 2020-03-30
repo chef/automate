@@ -1,4 +1,4 @@
-package v1_test
+package server_test
 
 import (
 	"context"
@@ -19,7 +19,7 @@ func TestVersion(t *testing.T) {
 	l, err := logger.NewLogger("text", "debug")
 	require.NoError(t, err, "could not init logger", err)
 
-	migrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../../storage/postgres/migration/sql")
+	migrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
 	require.NoError(t, err)
 
 	_, _, conn, close, _ := test.SetupInfraProxyService(ctx, t, l, *migrationConfig)

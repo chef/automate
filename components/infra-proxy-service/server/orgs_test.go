@@ -1,4 +1,4 @@
-package v1_test
+package server_test
 
 import (
 	"context"
@@ -27,7 +27,7 @@ func TestOrgs(t *testing.T) {
 	l, err := logger.NewLogger("text", "debug")
 	require.NoError(t, err, "could not init logger", err)
 
-	migrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../../storage/postgres/migration/sql")
+	migrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
 	require.NoError(t, err)
 
 	_, serviceRef, conn, close, authzMock := test.SetupInfraProxyService(ctx, t, l, *migrationConfig)
@@ -71,7 +71,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -90,14 +90,14 @@ func TestOrgs(t *testing.T) {
 			cleanupOrg(ctx, t, cl, resp.Org.Id)
 		})
 
-		t.Run("when no projects are passed", func(t *testing.T) {
+		t.Run("when no projects are passed, creates the new org successfully with empty projects", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -114,14 +114,14 @@ func TestOrgs(t *testing.T) {
 			cleanupOrg(ctx, t, cl, resp.Org.Id)
 		})
 
-		t.Run("when the org exists", func(t *testing.T) {
+		t.Run("when the org exists, raise the error org already exists", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			resp, err := cl.CreateOrg(ctx, &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -134,7 +134,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			resp2, err := cl.CreateOrg(ctx, &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -150,7 +150,7 @@ func TestOrgs(t *testing.T) {
 	t.Run("GetOrgs", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 
-		t.Run("when no orgs exist", func(t *testing.T) {
+		t.Run("when no orgs exist returns empty list", func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := cl.GetOrgs(ctx, &request.GetOrgs{
 				ServerId: serverRes.Server.Id,
@@ -168,7 +168,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -195,7 +195,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -240,7 +240,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -284,7 +284,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -322,14 +322,14 @@ func TestOrgs(t *testing.T) {
 			cleanupOrg(ctx, t, cl, resp2.Org.Id)
 		})
 
-		t.Run("when the project filter has mutiple projects returns only the orgs with at least one of the projects from the filter", func(t *testing.T) {
+		t.Run("when the project filter has multiple projects returns only the orgs with at least one of the projects from the filter", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -391,7 +391,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -435,7 +435,7 @@ func TestOrgs(t *testing.T) {
 	t.Run("GetOrg", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 
-		t.Run("when there is no id in the request", func(t *testing.T) {
+		t.Run("when there is no id in the request, raise an invalid argument error", func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := cl.GetOrg(ctx, &request.GetOrg{
 				Id: "",
@@ -445,7 +445,7 @@ func TestOrgs(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 
-		t.Run("when the submitted ID is not a UUIDv4", func(t *testing.T) {
+		t.Run("when the submitted ID is not a UUIDv4, raise an invalid argument error", func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := cl.GetOrg(ctx, &request.GetOrg{
 				Id: "35bffbab-3a49-dd8a-94a1-9ea87ec5c3cc",
@@ -455,7 +455,7 @@ func TestOrgs(t *testing.T) {
 			grpctest.AssertCode(t, codes.InvalidArgument, err)
 		})
 
-		t.Run("when the org does not exist", func(t *testing.T) {
+		t.Run("when the org does not exists, return org not found", func(t *testing.T) {
 			ctx := context.Background()
 			resp, err := cl.GetOrg(ctx, &request.GetOrg{
 				Id: "97e01ea1-976e-4626-88c8-43345c5d934f",
@@ -465,14 +465,14 @@ func TestOrgs(t *testing.T) {
 			grpctest.AssertCode(t, codes.NotFound, err)
 		})
 
-		t.Run("when the org exists", func(t *testing.T) {
+		t.Run("when the org exists, returns the org successfully", func(t *testing.T) {
 			ctx := context.Background()
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -500,7 +500,7 @@ func TestOrgs(t *testing.T) {
 	t.Run("DeleteOrg", func(t *testing.T) {
 		test.ResetState(context.Background(), t, serviceRef)
 
-		t.Run("when an existing org is deleted", func(t *testing.T) {
+		t.Run("when an existing org is deleted, deletes the org successfully", func(t *testing.T) {
 			ctx := context.Background()
 
 			authzMock.PurgeSubjectFromPoliciesFunc = func(
@@ -516,7 +516,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -566,7 +566,7 @@ func TestOrgs(t *testing.T) {
 			cleanupOrg(ctx, t, cl, resp2.Org.Id)
 		})
 
-		t.Run("when an existing org is deleted and is in the project filter", func(t *testing.T) {
+		t.Run("when an existing org is deleted and is in the project filter, deletes the org successfully", func(t *testing.T) {
 			ctx := context.Background()
 			authzMock.PurgeSubjectFromPoliciesFunc = func(
 				_ context.Context, req *authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
@@ -581,7 +581,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -633,7 +633,7 @@ func TestOrgs(t *testing.T) {
 			cleanupOrg(ctx, t, cl, resp2.Org.Id)
 		})
 
-		t.Run("when an existing org is deleted and the project filter is *", func(t *testing.T) {
+		t.Run("when an existing org is deleted and the project filter is *, deletes the org successfully", func(t *testing.T) {
 			ctx := context.Background()
 			authzMock.PurgeSubjectFromPoliciesFunc = func(
 				_ context.Context, req *authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
@@ -648,7 +648,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -700,7 +700,7 @@ func TestOrgs(t *testing.T) {
 			cleanupOrg(ctx, t, cl, resp2.Org.Id)
 		})
 
-		t.Run("when an existing org is deleted and the project filter is (unassigned)", func(t *testing.T) {
+		t.Run("when an existing org is deleted and the project filter is (unassigned), deletes the org successfully", func(t *testing.T) {
 			ctx := context.Background()
 			authzMock.PurgeSubjectFromPoliciesFunc = func(
 				_ context.Context, req *authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
@@ -715,7 +715,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -780,7 +780,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Delete(gomock.Any(), secretID, gomock.Any())
 
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -823,7 +823,7 @@ func TestOrgs(t *testing.T) {
 			cleanupOrg(ctx, t, cl, resp2.Org.Id)
 		})
 
-		t.Run("when the org to delete is not found", func(t *testing.T) {
+		t.Run("when the org to delete is does not exist, returns org not found", func(t *testing.T) {
 			ctx := context.Background()
 			resp, err2 := cl.DeleteOrg(ctx, &request.DeleteOrg{
 				Id:       "97e01ea1-976e-4626-88c8-43345c5d934f",
@@ -843,7 +843,7 @@ func TestOrgs(t *testing.T) {
 			secretsMock.EXPECT().Create(gomock.Any(), &newSecret, gomock.Any()).Return(secretID, nil)
 			secretsMock.EXPECT().Read(gomock.Any(), secretID, gomock.Any()).Return(&secretWithID, nil)
 			req := &request.CreateOrg{
-				Name:      "4thcoffee",
+				Name:      "infra-org",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,
@@ -874,11 +874,11 @@ func TestOrgs(t *testing.T) {
 			cleanupOrg(ctx, t, cl, resp.Org.Id)
 		})
 
-		t.Run("when org to update does not exist", func(t *testing.T) {
+		t.Run("when org to update does not exist, raise org not found", func(t *testing.T) {
 			ctx := context.Background()
 			updateReq := &request.UpdateOrg{
 				Id:        "97e01ea1-976e-4626-88c8-43345c5d934f",
-				Name:      "New Org Name",
+				Name:      "new-org-name",
 				AdminUser: "admin",
 				AdminKey:  "--KEY--",
 				ServerId:  serverRes.Server.Id,

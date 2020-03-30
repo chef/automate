@@ -23,7 +23,7 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 	"github.com/chef/automate/lib/tracing"
 
-	v1 "github.com/chef/automate/components/infra-proxy-service/server/v1"
+	server "github.com/chef/automate/components/infra-proxy-service/server"
 	"github.com/chef/automate/components/infra-proxy-service/service"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
@@ -70,7 +70,7 @@ func MigrationConfigIfPGTestsToBeRun(l logger.Logger, migrationPath string) (*mi
 // SetupInfraProxyService provides the connection service client.
 func SetupInfraProxyService(ctx context.Context,
 	t *testing.T, l logger.Logger,
-	migrationConfig migration.Config) (*v1.Server, *service.Service, *grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
+	migrationConfig migration.Config) (*server.Server, *service.Service, *grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
 
 	t.Helper()
 
@@ -104,8 +104,8 @@ func SetupInfraProxyService(ctx context.Context,
 		t.Fatalf("could not create server: %s", err)
 	}
 	grpcServ := serviceRef.ConnFactory.NewServer(tracing.GlobalServerInterceptor())
-	server := v1.NewServer(serviceRef)
-	infra_proxy.RegisterInfraProxyServer(grpcServ, server)
+	newServer := server.NewServer(serviceRef)
+	infra_proxy.RegisterInfraProxyServer(grpcServ, newServer)
 	health.RegisterHealthServer(grpcServ, health.NewService())
 
 	ResetState(ctx, t, serviceRef)
@@ -116,7 +116,7 @@ func SetupInfraProxyService(ctx context.Context,
 	if err != nil {
 		t.Fatalf("connecting to grpc endpoint: %s", err)
 	}
-	return server, serviceRef, conn, func() { g.Close(); authzServer.Close() }, mockCommon
+	return newServer, serviceRef, conn, func() { g.Close(); authzServer.Close() }, mockCommon
 }
 
 // ResetState reset the state
@@ -135,7 +135,7 @@ func InsertProjectsIntoNewContext(projects []string) context.Context {
 		[]string{}, projects, "resource", "action", "pol"))
 }
 
-// DefaultMockPurgeFunc authz defualt mock purge func.
+// DefaultMockPurgeFunc is the authz default mock purge function.
 func DefaultMockPurgeFunc(context.Context,
 	*authz.PurgeSubjectFromPoliciesReq) (*authz.PurgeSubjectFromPoliciesResp, error) {
 	return &authz.PurgeSubjectFromPoliciesResp{}, nil
