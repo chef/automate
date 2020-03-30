@@ -1,4 +1,4 @@
-package v1
+package server
 
 import (
 	"context"
@@ -36,8 +36,8 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 	}
 
 	if req.ServerId == "" {
-		s.service.Logger.Debug("incomplete create org request: missing org server id")
-		return nil, status.Error(codes.InvalidArgument, "must supply org server id")
+		s.service.Logger.Debug("incomplete create org request: missing server id")
+		return nil, status.Error(codes.InvalidArgument, "must supply server id")
 	}
 
 	newSecret := &secrets.Secret{
@@ -54,7 +54,7 @@ func (s *Server) CreateOrg(ctx context.Context, req *request.CreateOrg) (*respon
 		return nil, err
 	}
 
-	org, err := s.service.Storage.StoreOrg(ctx, req.Name, req.AdminUser, secretID.GetId(), req.ServerId)
+	org, err := s.service.Storage.StoreOrg(ctx, req.Name, req.AdminUser, secretID.GetId(), req.ServerId, req.Projects)
 	if err != nil {
 		return nil, service.ParseStorageError(err, req.Name, "org")
 	}
@@ -84,7 +84,7 @@ func (s *Server) GetOrgs(ctx context.Context, req *request.GetOrgs) (*response.G
 	}, nil
 }
 
-// GetOrg takes an ID and returns a org object
+// GetOrg takes an ID and returns an org object
 func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.GetOrg, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -111,11 +111,12 @@ func (s *Server) GetOrg(ctx context.Context, req *request.GetOrg) (*response.Get
 			AdminUser: org.AdminUser,
 			AdminKey:  GetOrgAdminKeyFrom(secret),
 			ServerId:  org.ServerId,
+			Projects:  org.Projects,
 		},
 	}, nil
 }
 
-// GetOrgByName takes a org name, server_id and returns a org object
+// GetOrgByName takes an org name, server_id and returns an org object
 func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*response.GetOrg, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -151,7 +152,7 @@ func (s *Server) GetOrgByName(ctx context.Context, req *request.GetOrgByName) (*
 	}, nil
 }
 
-// DeleteOrg deletes a org from the db
+// DeleteOrg deletes an org from the db
 func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*response.DeleteOrg, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -176,7 +177,7 @@ func (s *Server) DeleteOrg(ctx context.Context, req *request.DeleteOrg) (*respon
 	}, nil
 }
 
-// UpdateOrg updates a org in the db via post
+// UpdateOrg updates an org in the db via post
 func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*response.UpdateOrg, error) {
 	ctx, cancel := context.WithCancel(ctx)
 	defer cancel()
@@ -198,8 +199,8 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		return nil, status.Error(codes.InvalidArgument, "must supply org admin_key")
 	}
 	if req.ServerId == "" {
-		s.service.Logger.Debug("incomplete update org request: missing org server_id")
-		return nil, status.Error(codes.InvalidArgument, "must supply org server_id")
+		s.service.Logger.Debug("incomplete update org request: missing server id")
+		return nil, status.Error(codes.InvalidArgument, "must supply server id")
 	}
 
 	id, err := uuid.FromString(req.Id)
@@ -240,6 +241,7 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 		AdminUser: req.AdminUser,
 		AdminKey:  oldOrg.AdminKey,
 		ServerId:  req.ServerId,
+		Projects:  req.Projects,
 	}
 
 	org, err := s.service.Storage.EditOrg(ctx, orgStruct)
@@ -254,17 +256,9 @@ func (s *Server) UpdateOrg(ctx context.Context, req *request.UpdateOrg) (*respon
 			AdminUser: org.AdminUser,
 			AdminKey:  rawAdminKey,
 			ServerId:  org.ServerId,
+			Projects:  org.Projects,
 		},
 	}, nil
-}
-
-func (s *Server) GetAdminKeyFromSecretService(ctx context.Context, id string, secretsClient secrets.SecretsServiceClient) (*secrets.Secret, error) {
-	secret, err := secretsClient.Read(ctx, &secrets.Id{Id: id})
-	if err != nil {
-		return secret, err
-	}
-
-	return secret, nil
 }
 
 // Create a response.Org from a storage.Org
@@ -275,6 +269,7 @@ func fromStorageOrg(s storage.Org) *response.Org {
 		AdminUser: s.AdminUser,
 		AdminKey:  s.AdminKey,
 		ServerId:  s.ServerId,
+		Projects:  s.Projects,
 	}
 }
 

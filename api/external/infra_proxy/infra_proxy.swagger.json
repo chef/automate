@@ -816,6 +816,12 @@
         },
         "server_id": {
           "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -853,6 +859,12 @@
         },
         "server_id": {
           "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },
@@ -1354,6 +1366,12 @@
         },
         "server_id": {
           "type": "string"
+        },
+        "projects": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       }
     },

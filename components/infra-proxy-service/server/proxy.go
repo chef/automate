@@ -1,4 +1,4 @@
-package v1
+package server
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"github.com/chef/automate/components/infra-proxy-service/service"
 )
 
-// ChefConfig is a V1 infra-proxy server
+// ChefConfig is an infra-proxy server
 type ChefConfig struct {
 	Name    string
 	Key     string
@@ -22,7 +22,7 @@ type ChefConfig struct {
 	BaseURL string
 }
 
-// NewChefClient is a V1 infra-proxy server
+// NewChefClient is an infra-proxy server
 func NewChefClient(config *ChefConfig) (*chef.Client, error) {
 
 	// build a client

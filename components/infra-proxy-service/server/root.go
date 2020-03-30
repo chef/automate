@@ -1,4 +1,4 @@
-package v1
+package server
 
 import (
 	"context"
@@ -8,12 +8,12 @@ import (
 	"github.com/chef/automate/lib/version"
 )
 
-// Server is a V1 infra-proxy server
+// Server is an infra-proxy server
 type Server struct {
 	service *service.Service
 }
 
-// NewServer returns a V1 infra-proxy server
+// NewServer returns an infra-proxy server
 func NewServer(service *service.Service) *Server {
 	return &Server{service: service}
 }

@@ -23,6 +23,7 @@ pkg_exposes=(
 pkg_binds=(
   [automate-pg-gateway]="port"
   [pg-sidecar-service]="port"
+  [authz-service]="port"
   [secrets-service]="port"
 )
 
