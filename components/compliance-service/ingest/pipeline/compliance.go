@@ -29,7 +29,7 @@ func NewCompliancePipeline(client *ingestic.ESClient, authzClient iam_v2.Project
 		processor.ComplianceProfile,
 		processor.BundleReportProjectTagger(authzClient),
 		publisher.BuildNodeManagerPublisher(nodeMgrClient),
-		publisher.BuildCompliance(client, 100))
+		publisher.StoreCompliance(client, 100))
 	return Compliance{in: in}
 }
 

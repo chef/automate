@@ -14,9 +14,9 @@ import (
 	"google.golang.org/grpc/status"
 )
 
-// BuildChefRun Builds the publishers
-func BuildCompliance(client *ingestic.ESClient, numberOfPublishers int) message.CompliancePipe {
-	logrus.Debugf("BuildCompliance started with numberOfPublishers = %d", numberOfPublishers)
+// StoreCompliance uses the publishers to save the data in ElasticSearch
+func StoreCompliance(client *ingestic.ESClient, numberOfPublishers int) message.CompliancePipe {
+	logrus.Debugf("StoreCompliance started with numberOfPublishers = %d", numberOfPublishers)
 	return func(in <-chan message.Compliance) <-chan message.Compliance {
 		out := make(chan message.Compliance, 100)
 
