@@ -16,13 +16,13 @@
         <thead>
           <tr >
             <th>Days Ago</th>
-            <th>Percentage Of Total</th>
+            <th>Percentage of Total</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let day of days">
             <td>{{ day.daysAgo }}</td>
-            <td>{{ day.percentage }}%</td>
+            <td>{{ day.percentage | number:'1.0-0' }}%</td>
             <td></td>
           </tr>
         </tbody>

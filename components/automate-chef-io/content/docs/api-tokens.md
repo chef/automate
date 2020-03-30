@@ -20,7 +20,7 @@ Permission for the `iam:tokens` action is required to interact with tokens. Any 
 
 ### Creating API Tokens
 
-Navigate to _API Tokens_ in the **Settings** tab. Then use the **Create Token** button, which opens a dialog box for entering the token's _name_ and optionally assigning the API token to some _Projects_. A team ID automatically generates upon creation. If you would like to change the team ID, select the **Edit ID** button.
+Navigate to _API Tokens_ in the **Settings** tab. Then use the **Create Token** button, which opens a dialog box for entering the token's _name_ and optionally assigning the API token to some _Projects_. A token ID automatically generates upon creation. If you would like to change the token ID, select the **Edit ID** button.
 
 After a token is created from the UI, it will have no permissions. To assign the token permissions, navigate to _Policies_ in the **Settings** tab, locate the appropriate policy, and then add the token as a member of the policy using a [member expression]({{< relref "iam-v2-guide.md#member-expressions" >}}).
 

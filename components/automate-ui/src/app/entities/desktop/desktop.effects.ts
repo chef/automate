@@ -9,7 +9,10 @@ import {
   GetDailyCheckInTimeSeries,
   GetDailyCheckInTimeSeriesSuccess,
   GetDailyCheckInTimeSeriesFailure,
-  DesktopActionTypes
+  DesktopActionTypes,
+  GetTopErrorsCollection,
+  GetTopErrorsCollectionSuccess,
+  GetTopErrorsCollectionFailure
 } from './desktop.actions';
 import { DesktopRequests } from './desktop.requests';
 import { CreateNotification } from 'app/entities/notifications/notification.actions';
@@ -51,6 +54,28 @@ export class DesktopEffects {
       return new CreateNotification({
         type: Type.error,
         message: `Could not get time series: ${msg || error}`
+      });
+    }));
+
+  @Effect()
+  getTopErrorCollection$ =
+    this.actions$.pipe(ofType<GetTopErrorsCollection>(
+      DesktopActionTypes.GET_TOP_ERRORS_COLLECTION),
+      mergeMap((_action) =>
+        this.requests.getTopErrorsCollection().pipe(
+          map(topErrorsCollection =>
+        new GetTopErrorsCollectionSuccess(topErrorsCollection)),
+        catchError((error) => of(new GetTopErrorsCollectionFailure(error)))))
+    );
+
+  @Effect()
+  getTopErrorCollectionFailure$ = this.actions$.pipe(
+    ofType(DesktopActionTypes.GET_TOP_ERRORS_COLLECTION_FAILURE),
+    map(({ payload: { error } }: GetTopErrorsCollectionFailure) => {
+      const msg = error.error;
+      return new CreateNotification({
+        type: Type.error,
+        message: `Could not get top errors: ${msg || error}`
       });
     }));
 }

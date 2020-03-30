@@ -23,6 +23,7 @@ type airgapFlags struct {
 	channel        string
 	overrideOrigin string
 	hartifactsPath string
+	version        string
 	verbose        bool
 	hartsOnly      bool
 	retries        int
@@ -32,6 +33,14 @@ type airgapFlags struct {
 func (f airgapFlags) validateArgs() error {
 	if f.manifestPath != "" && f.channel != "" {
 		return status.New(status.AirgapCreateInstallBundleError, "You cannot provide both a manifest.json and a release channel")
+	}
+
+	if f.manifestPath != "" && f.version != "" {
+		return status.New(status.AirgapCreateInstallBundleError, "You cannot provide both a manifest.json and a version")
+	}
+
+	if f.channel != "" && f.version != "" {
+		return status.New(status.AirgapCreateInstallBundleError, "You cannot provide both a channel and a version")
 	}
 
 	if f.hartifactsPath != "" && f.overrideOrigin == "" {
@@ -104,6 +113,11 @@ func newAirgapCmd() *cobra.Command {
 	bundleCreateCmd.PersistentFlags().IntVar(
 		&airgapCmdFlags.retryDelay, "retry-delay", -1,
 		"Number of seconds to wait between retries (exponential backoff is used if not provided)",
+	)
+
+	bundleCreateCmd.PersistentFlags().StringVar(
+		&airgapCmdFlags.version, "version", "",
+		"Chef Automate version to create an airgap bundle for",
 	)
 
 	if !isDevMode() {
@@ -200,6 +214,13 @@ func runAirgapCreateInstallBundle(cmd *cobra.Command, args []string) error {
 		opts = append(
 			opts,
 			airgap.WithInstallBundleChannel(airgapCmdFlags.channel),
+		)
+	}
+
+	if airgapCmdFlags.version != "" {
+		opts = append(
+			opts,
+			airgap.WithInstallBundleVersion(airgapCmdFlags.version),
 		)
 	}
 

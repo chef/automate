@@ -7,16 +7,18 @@ import { last, reverse } from 'lodash/fp';
 
 import {
   GetDailyCheckInTimeSeries,
-  SetDaysAgoSelected
+  SetDaysAgoSelected,
+  GetTopErrorsCollection
 } from 'app/entities/desktop/desktop.actions';
 
 import {
   dailyCheckInCountCollection,
-  getSelectedDaysAgo
+  getSelectedDaysAgo,
+  topErrorsCollection
 } from 'app/entities/desktop/desktop.selectors';
 
 import {
-  DailyCheckInCount, DailyCheckInCountCollection, DayPercentage
+  DailyCheckInCount, DailyCheckInCountCollection, DayPercentage, TopErrorsItem
 } from 'app/entities/desktop/desktop.model';
 
 @Component({
@@ -35,6 +37,7 @@ export class DashboardComponent implements OnInit {
   public checkedInCount$: Observable<number>;
   public days$: Observable<DayPercentage[]>;
   public selectedDaysAgo$: Observable<number>;
+  public topErrorsItems$: Observable<TopErrorsItem[]>;
 
   constructor(
     private store: Store<NgrxStateAtom>
@@ -42,6 +45,7 @@ export class DashboardComponent implements OnInit {
 
   ngOnInit() {
     this.store.dispatch(new GetDailyCheckInTimeSeries());
+    this.store.dispatch(new GetTopErrorsCollection());
 
     this.selectedDaysAgo$ = this.store.select(getSelectedDaysAgo);
 
@@ -91,6 +95,10 @@ export class DashboardComponent implements OnInit {
 
     this.unknownCount$ = this.last24HourCheckInCount$.pipe(
       map(count => count.total - count.checkInCount)
+    );
+
+    this.topErrorsItems$ = this.store.select(topErrorsCollection).pipe(
+      map(collection => collection.items)
     );
   }
 

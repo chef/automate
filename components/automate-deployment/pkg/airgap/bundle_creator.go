@@ -150,6 +150,7 @@ var _ InstallBundleCreatorProgress = noopInstallBundleCreatorProgress{}
 type InstallBundleCreator struct {
 	manifestFile        string
 	channel             string
+	version             string
 	outputFile          string
 	workspacePath       string
 	depotClient         depot.Client
@@ -194,6 +195,13 @@ func WithInstallBundleManifestFile(path string) InstallBundleCreatorOpt {
 func WithInstallBundleChannel(channel string) InstallBundleCreatorOpt {
 	return func(c *InstallBundleCreator) {
 		c.channel = channel
+	}
+}
+
+// WithInstallBundleVersion sets the version whose manifest should be used.
+func WithInstallBundleVersion(version string) InstallBundleCreatorOpt {
+	return func(c *InstallBundleCreator) {
+		c.version = version
 	}
 }
 
@@ -368,6 +376,9 @@ func (creator *InstallBundleCreator) loadManifest() (*manifest.A2, error) {
 		manifestProvider = manifest.NewLocalHartManifestProvider(manifestProvider, creator.hartifactsPath, creator.overrideOrigin)
 	}
 
+	if creator.version != "" {
+		return manifestProvider.GetManifest(context.Background(), creator.version)
+	}
 	return manifestProvider.GetCurrentManifest(context.Background(), creator.channel)
 }
 

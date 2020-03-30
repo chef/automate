@@ -66,4 +66,13 @@ export class ProcessProgressBarComponent implements OnInit, OnDestroy {
   public cancelApplyStop(): void {
     this.closeConfirmApplyStopModal();
   }
+
+  public displayPercent(): string {
+    if (Math.floor(this.percentageComplete) === 0) {
+      return 'Preparing...';
+    } else if (Math.ceil(this.percentageComplete) === 100) {
+      return 'Finishing Up...';
+    }
+    return `${this.percentageComplete.toString()}%`;
+  }
 }

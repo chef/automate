@@ -18,3 +18,8 @@ export const getSelectedDaysAgo = createSelector(
   desktopState,
   (state) => state.selectedDaysAgo
 );
+
+export const topErrorsCollection = createSelector(
+  desktopState,
+  (state) => state.topErrorCollection
+);
