@@ -374,7 +374,7 @@ document "build_all_changed_components" <<DOC
   build_all_changed_components automate-gateway automate-deployment
 DOC
 function build_all_changed_components() {
-  local whitelist=$@
+  local whitelist=$*
 
   install_if_missing core/git git
   install_if_missing core/ruby ruby
