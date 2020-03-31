@@ -21,7 +21,7 @@ require (
 	github.com/briandowns/spinner v0.0.0-20180123222039-b3ed21e9d3b2
 	github.com/buger/goterm v0.0.0-20180307092342-c9def0117b24
 	github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44
-	github.com/chef/go-chef v0.3.1-0.20191115205148-7ac24fba7a27
+	github.com/chef/go-chef v0.4.1-0.20200330214506-13464279d3bb
 	github.com/chef/toml v0.3.1-0.20180511201931-e53972c43816
 	github.com/ckaznocha/protoc-gen-lint v0.2.1
 	github.com/codahale/hdrhistogram v0.0.0-20161010025455-3a0bb77429bd // indirect
@@ -130,7 +130,7 @@ require (
 	gopkg.in/olivere/elastic.v6 v6.2.28
 	gopkg.in/segmentio/analytics-go.v3 v3.0.1
 	gopkg.in/square/go-jose.v2 v2.1.3
-	gopkg.in/yaml.v2 v2.2.5
+	gopkg.in/yaml.v2 v2.2.7
 )
 
 replace github.com/dexidp/dex => github.com/ryancragun/dex v2.19.0-incompatible+incompatible

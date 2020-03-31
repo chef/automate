@@ -53,7 +53,7 @@ func (q SearchQuery) DoPartial(client *Client, params map[string]interface{}) (r
 
 	body, err := JSONReader(params)
 	if err != nil {
-		debug("Problem encoding params for body", err.Error())
+		debug("Problem encoding params for body %v", err.Error())
 		return
 	}
 
@@ -81,10 +81,10 @@ func (e SearchService) NewQuery(idx, statement string) (query SearchQuery, err e
 	return
 }
 
-// Exec runs the query on the index passed in. This is a helper method. If you want more controll over the query  use NewQuery and its Do() method.
-// BUG(spheromak): Should we use exec or SearchQuery.Do() or have both ?
+// Exec runs the query on the index passed in. This is a helper method. If you want more control over the query  use NewQuery and its Do() method.
+// BUG(spheromak): Should we use Exec or SearchQuery.Do() or have both ?
 func (e SearchService) Exec(idx, statement string) (res SearchResult, err error) {
-	//  Copy-paste here till We decide which way to go with exec vs Do
+	//  Copy-paste here till We decide which way to go with Exec vs Do
 	if !strings.Contains(statement, ":") {
 		err = errors.New("statement is malformed")
 		return
@@ -136,6 +136,27 @@ func (e SearchService) PartialExec(idx, statement string, params map[string]inte
 	}
 
 	err = e.client.magicRequestDecoder("POST", fullUrl, body, &res)
+	if err != nil {
+		return
+	}
+
+	// the total rows available for this query across all pages
+	total := res.Total
+	// the maximum number of rows in each page
+	inc := query.Rows
+	paged_res := SearchResult{}
+
+	for start := res.Start; start+inc <= total; start += inc {
+		query.Start = start + inc
+		fullUrl = fmt.Sprintf("search/%s", query)
+
+		err = e.client.magicRequestDecoder("POST", fullUrl, body, &paged_res)
+		if err != nil {
+			return
+		}
+		// accumulate this page of results into the primary SearchResult instance
+		res.Rows = append(res.Rows, paged_res.Rows...)
+	}
 	return
 }
 

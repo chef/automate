@@ -15,20 +15,20 @@ type SandboxRequest struct {
 	Checksums map[string]interface{} `json:"checksums"`
 }
 
-// SandboxPostResponse is the struct returned from the chef-server for Post Requests to /sandbox
+// SandboxPostResponse is the struct returned from the chef-server for Post Requests to /sandboxes
 type SandboxPostResponse struct {
 	ID        string `json:"sandbox_id"`
 	Uri       string `json:"uri"`
 	Checksums map[string]SandboxItem
 }
 
-// A SandbooxItem is embeddedinto  the response from the chef-server and the actual sandbox It is the Url and state for a specific Item.
+// A SandboxItem is embedded into the response from the chef-server and the actual sandbox is the Url and state for a specific Item.
 type SandboxItem struct {
 	Url    string `json:"url"`
 	Upload bool   `json:"needs_upload"`
 }
 
-// Sandbox Is the structure of an actul sandbox that has been created and returned by the final PUT to the sandbox ID
+// Sandbox Is the structure of an actual sandbox that has been created and returned by the final PUT to the sandbox ID
 type Sandbox struct {
 	ID           string    `json:"guid"`
 	Name         string    `json:"name"`
@@ -51,11 +51,11 @@ func (s SandboxService) Post(sums []string) (data SandboxPostResponse, err error
 		return
 	}
 
-	err = s.client.magicRequestDecoder("POST", "/sandboxes", body, &data)
+	err = s.client.magicRequestDecoder("POST", "sandboxes", body, &data)
 	return
 }
 
-// Put is used to commit a sandbox ID to the chef server. To singal that the sandox you have Posted is now uploaded.
+// Put is used to commit a sandbox ID to the chef server. To signal that the sandbox you have Posted is now uploaded.
 func (s SandboxService) Put(id string) (box Sandbox, err error) {
 	answer := make(map[string]bool)
 	answer["is_completed"] = true
@@ -65,6 +65,6 @@ func (s SandboxService) Put(id string) (box Sandbox, err error) {
 		return box, fmt.Errorf("must supply sandbox id to PUT request.")
 	}
 
-	err = s.client.magicRequestDecoder("PUT", "/sandboxes/"+id, body, &box)
+	err = s.client.magicRequestDecoder("PUT", "sandboxes/"+id, body, &box)
 	return
 }
