@@ -562,14 +562,14 @@ func init() {
         "parameters": [
           {
             "name": "server_id",
-            "description": "Id of the server.",
+            "description": "ID of the server.",
             "in": "path",
             "required": true,
             "type": "string"
           },
           {
             "name": "org_id",
-            "description": "Id of the org.",
+            "description": "ID of the org.",
             "in": "path",
             "required": true,
             "type": "string"
@@ -590,7 +590,7 @@ func init() {
           },
           {
             "name": "url",
-            "description": "Cookbook data file url.",
+            "description": "Cookbook data file URL.",
             "in": "query",
             "required": false,
             "type": "string"

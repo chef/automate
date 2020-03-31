@@ -186,15 +186,15 @@ func (m *Cookbook) GetVersion() string {
 }
 
 type CookbookFileContent struct {
-	// Id of the org.
+	// ID of the org.
 	OrgId string `protobuf:"bytes,1,opt,name=org_id,json=orgId,proto3" json:"org_id,omitempty"`
-	// Id of the server.
+	// ID of the server.
 	ServerId string `protobuf:"bytes,2,opt,name=server_id,json=serverId,proto3" json:"server_id,omitempty"`
 	// Name of the cookbook.
 	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
 	// Version of the cookbook.
 	Version string `protobuf:"bytes,4,opt,name=version,proto3" json:"version,omitempty"`
-	// Cookbook data file url.
+	// Cookbook data file URL.
 	Url                  string   `protobuf:"bytes,5,opt,name=url,proto3" json:"url,omitempty"`
 	XXX_NoUnkeyedLiteral struct{} `json:"-"`
 	XXX_unrecognized     []byte   `json:"-"`
