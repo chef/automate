@@ -222,7 +222,7 @@ func (m *Role) GetExpandedRunList() []*ExpandedRunList {
 }
 
 type ExpandedRunList struct {
-	// Id of the run list collection.
+	// ID of the run list collection.
 	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty" toml:"id,omitempty" mapstructure:"id,omitempty"`
 	// List of the run list.
 	RunList              []*RunList `protobuf:"bytes,2,rep,name=run_list,json=runList,proto3" json:"run_list,omitempty" toml:"run_list,omitempty" mapstructure:"run_list,omitempty"`

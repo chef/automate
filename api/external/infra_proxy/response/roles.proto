@@ -37,7 +37,7 @@ message Role {
 }
 
 message ExpandedRunList {
-    // Id of the run list collection.
+    // ID of the run list collection.
     string id = 1;
     // List of the run list.
     repeated RunList run_list = 2;

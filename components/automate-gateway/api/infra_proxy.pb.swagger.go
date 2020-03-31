@@ -1352,7 +1352,7 @@ func init() {
       "properties": {
         "id": {
           "type": "string",
-          "description": "Id of the run list collection."
+          "description": "ID of the run list collection."
         },
         "run_list": {
           "type": "array",
