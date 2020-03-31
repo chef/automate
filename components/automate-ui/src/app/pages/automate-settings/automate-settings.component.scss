@@ -49,6 +49,10 @@ h2 {
 
 .chef-input {
   margin: 0 8px;
+
+  &.ng-invalid {
+    border: 1px solid $chef-critical;
+  }
 }
 
 chef-checkbox {

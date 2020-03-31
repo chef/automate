@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
+import { FormGroup, FormBuilder, AbstractControl, Validators } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Subject } from 'rxjs';
@@ -39,7 +39,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       name: 'periodic_purge',
       nested_name: NestedJobName.Feed,
       unit: { value: 'd', disabled: false },
-      threshold: { value: '30', disabled: false },
+      threshold: [{ value: '30', disabled: false}, Validators.required],
       disabled: false
     },
     eventFeedServerActions: {
@@ -47,35 +47,35 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       name: 'periodic_purge_timeseries',
       nested_name: NestedJobName.Actions,
       unit: { value: 'd', disabled: false },
-      threshold: { value: '30', disabled: false },
+      threshold: [{ value: '30', disabled: false }, Validators.required],
       disabled: false
     },
     serviceGroupNoHealthChecks: {
       category: JobCategories.Services,
       name: '',
       unit: { value: 'm', disabled: true},
-      threshold: { value: '5', disabled: true },
+      threshold: [{ value: '5', disabled: true }, Validators.required],
       disabled: false // special case: only alterable by the API so we want to show as enabled
     },
     serviceGroupRemoveServices: {
       category: JobCategories.Services,
       name: '',
       unit: { value: 'd', disabled: true },
-      threshold: { value: '5', disabled: true },
+      threshold: [{ value: '5', disabled: true }, Validators.required],
       disabled: false // special case: API not ready to alter
     },
     clientRunsRemoveData: {
       category: JobCategories.Infra,
       name: 'missing_nodes',
       unit: { value: 'd', disabled: false },
-      threshold: { value: '30', disabled: false },
+      threshold: [{ value: '30', disabled: false }, Validators.required],
       disabled: false
     },
     clientRunsLabelMissing: {
       category: JobCategories.Infra,
       name: 'missing_nodes_for_deletion',
       unit: { value: 'd', disabled: false },
-      threshold: { value: '30', disabled: false },
+      threshold: [{ value: '30', disabled: false }, Validators.required],
       disabled: false
     },
     clientRunsRemoveNodes: {
@@ -83,7 +83,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       name: 'periodic_purge_timeseries',
       nested_name: NestedJobName.ConvergeHistory,
       unit: { value: 'd', disabled: false },
-      threshold: { value: '30', disabled: false },
+      threshold: [{ value: '30', disabled: false }, Validators.required],
       disabled: false
     },
     complianceRemoveReports: {
@@ -91,7 +91,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       name: 'periodic_purge',
       nested_name: NestedJobName.ComplianceReports,
       unit: { value: 'd', disabled: false },
-      threshold: { value: '30', disabled: false },
+      threshold: [{ value: '30', disabled: false }, Validators.required],
       disabled: false
     },
     complianceRemoveScans: {
@@ -99,7 +99,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       name: 'periodic_purge',
       nested_name: NestedJobName.ComplianceScans,
       unit: { value: 'd', disabled: false },
-      threshold: { value: '30', disabled: false },
+      threshold: [{ value: '30', disabled: false }, Validators.required],
       disabled: false
     }
   };
@@ -240,6 +240,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   private setEnabled(control: AbstractControl, enabled: boolean): void {
     if (enabled) {
       control.enable();
+      control.setValidators([Validators.required]);
+      control.updateValueAndValidity();
     } else {
       control.disable();
     }
@@ -253,6 +255,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     form.patchValue({
       disabled: !checked
     });
+
 
     // this disables the relevant controls;
     this.setEnabled(form.controls.unit, checked);
@@ -289,11 +292,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       job.disabled = jobForm.disabled;
 
       // If the user doesn't enter any number at all - this defaults to 0
-      if (jobForm.threshold === null) {
-        job.threshold = '0' + jobForm.unit;
-      } else {
-        job.threshold = jobForm.threshold + jobForm.unit;
-      }
+      jobForm.threshold === null
+        ? job.threshold = '0' + jobForm.unit
+        : job.threshold = jobForm.threshold + jobForm.unit;
 
       if ( isNested ) {
         job.nested_name = jobForm.nested_name;

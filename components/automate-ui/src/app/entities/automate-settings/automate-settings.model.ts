@@ -1,3 +1,5 @@
+import { Validators } from '@angular/forms';
+
 export class JobSchedulerStatus {
   jobs: IngestJob[];
 
@@ -160,10 +162,10 @@ export interface SingleDefaultForm {
     value: string;
     disabled: boolean;
   };
-  threshold: {
+  threshold: [{
     value: string;
     disabled: boolean;
-  };
+  }, Validators];
   disabled: boolean;
 }
 
