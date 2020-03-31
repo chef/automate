@@ -375,7 +375,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     return this.automateSettingsForm.getRawValue()[jobName];
   }
 
-  private splitThreshold(threshold: string) {
+  private splitThreshold(threshold: string): [string, string] {
     return [
       threshold.slice(0, threshold.length - 1),
       threshold.slice(-1)
