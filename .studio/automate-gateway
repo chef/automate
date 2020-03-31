@@ -89,7 +89,7 @@ document "gateway_get" <<DOC
 
   Example: Send a GET Request to $GATEWAY_URL/version using a specific token
   --------------------------------------------------------------------------
-  # gateway_get "/version" "$TOKEN"
+  # gateway_get "/version" "$token"
 DOC
 function gateway_get() {
   install_if_missing core/curl curl >/dev/null 2>&1
