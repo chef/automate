@@ -16,7 +16,6 @@ import (
 	"github.com/alexedwards/scs/stores/memstore"
 	"github.com/alexedwards/scs/stores/pgstore"
 	"github.com/gorilla/mux"
-	"github.com/patrickmn/go-cache"
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
 
@@ -46,7 +45,6 @@ type Server struct {
 	signInURL         *url.URL
 	remainingDuration time.Duration
 	serviceCerts      *certs.ServiceCerts
-	tokenCache        *cache.Cache
 }
 
 const (
@@ -106,7 +104,6 @@ func New(
 
 		mgr:          scsManager,
 		serviceCerts: serviceCerts,
-		tokenCache:   cache.New(1*time.Minute, 5*time.Minute),
 	}
 	s.initHandlers()
 
@@ -137,8 +134,7 @@ func NewInMemory(
 		bldrClient:        bldrClient,
 		remainingDuration: remainingDuration,
 
-		mgr:        scsManager,
-		tokenCache: cache.New(1*time.Minute, 5*time.Minute),
+		mgr: scsManager,
 	}
 	s.initHandlers()
 
@@ -209,6 +205,7 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	sess := s.mgr.Load(r)
+
 	code := r.FormValue("code")
 	if code == "" {
 		s.log.Debugf("no code in request: %q", r.Form)
@@ -234,21 +231,48 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	s.log.Debugf("relay state %q known", state)
 
+	redirectURI, err := sess.GetString(redirectURIKey)
+	s.log.Infof("retrieved redirectURI %q", redirectURI)
+	if err != nil {
+		s.log.Debugf("bad session data (redirect uri): %v", err)
+		http.Error(w, "bad session data (redirect uri)", http.StatusBadRequest)
+		return
+	}
+
+	clientState, err := sess.GetString(clientStateKeyPrefix + state)
+	s.log.Debugf("retrieved clientState %q", clientState)
+	if err != nil {
+		s.log.Debugf("bad session data (client state): %v", err)
+		http.Error(w, "bad session data (client state)", http.StatusBadRequest)
+		return
+	}
+
+	if redirectURI != "" {
+		// This case is for bldr. We will not exchange the code for a token yet.
+		// This will happen only when needed in the /token endpoint
+		u := new(url.URL)
+
+		*u = *s.bldrClient.SignInURL
+
+		u.RawQuery = fmt.Sprintf("state=%s&code=%s", clientState, code)
+
+		// In this flow, we don't need to keep a session -- there's no refresh yet.
+		err = sess.Destroy(w)
+		if err != nil {
+			s.log.Debugf("failed to destroy session: %v", err)
+			http.Error(w, "failed to destroy session", http.StatusInternalServerError)
+			return
+		}
+		http.Redirect(w, r, u.String(), http.StatusSeeOther)
+		return
+	}
+
 	token, err := s.client.Exchange(r.Context(), code)
 	if err != nil {
 		s.log.Debugf("failed to get token: %v", err)
 		http.Error(w, fmt.Sprintf("failed to get token: %v", err), http.StatusInternalServerError)
 		return
 	}
-
-	// this code variable is stored for use by the builder authn flow in the token handler
-	code2, err := generateRelayState()
-	if err != nil {
-		s.log.Errorf("couldn't generate random relay state: %s", err)
-		httpError(w, http.StatusInternalServerError)
-		return
-	}
-	s.tokenCache.Set(code2, token, cache.DefaultExpiration)
 
 	rawIDToken, ok := token.Extra("id_token").(string)
 	if !ok {
@@ -278,14 +302,6 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	clientState, err := sess.GetString(clientStateKeyPrefix + state)
-	s.log.Debugf("retrieved clientState %q", clientState)
-	if err != nil {
-		s.log.Debugf("bad session data (client state): %v", err)
-		http.Error(w, "bad session data (client state)", http.StatusBadRequest)
-		return
-	}
-
 	// remove used relay_state + client_state
 	if err := sess.Remove(w, relayStateKeyPrefix+state); err != nil { // nolint: vetshadow
 		s.log.Debugf("failed to remove relay state: %v", err)
@@ -298,35 +314,12 @@ func (s *Server) callbackHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	redirectURI, err := sess.GetString(redirectURIKey)
-	s.log.Debugf("retrieved redirectURI %q", redirectURI)
-	if err != nil {
-		s.log.Debugf("bad session data (redirect uri): %v", err)
-		http.Error(w, "bad session data (redirect uri)", http.StatusBadRequest)
-		return
-	}
-
 	u := new(url.URL)
-	// different responses based on if the auth request came from builder or automate
-	if redirectURI != "" {
-		*u = *s.bldrClient.SignInURL
 
-		u.RawQuery = fmt.Sprintf("state=%s&code=%s", clientState, code2)
+	*u = *s.signInURL
 
-		// In this flow, we don't need to keep a session -- there's no refresh yet.
-		err = sess.Destroy(w)
-		if err != nil {
-			s.log.Debugf("failed to destroy session: %v", err)
-			http.Error(w, "failed to destroy session", http.StatusInternalServerError)
-			return
-		}
-		http.Redirect(w, r, u.String(), http.StatusSeeOther)
-	} else {
-		*u = *s.signInURL
-
-		u.Fragment = fmt.Sprintf("id_token=%s&state=%s", rawIDToken, clientState)
-		http.Redirect(w, r, u.String(), http.StatusSeeOther)
-	}
+	u.Fragment = fmt.Sprintf("id_token=%s&state=%s", rawIDToken, clientState)
+	http.Redirect(w, r, u.String(), http.StatusSeeOther)
 }
 
 func (s *Server) tokenHandler(w http.ResponseWriter, r *http.Request) {
@@ -381,19 +374,20 @@ func (s *Server) tokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	// need to grab 'code' from the request body, exchange for token, return token
 	code := r.PostFormValue("code")
+	fmt.Printf("code:%s\n", code)
 	if "" == code {
 		http.Error(w, fmt.Sprint("no code in request"), http.StatusBadRequest)
 		return
 	}
 
-	token, ok := s.tokenCache.Get(code)
-	if !ok {
-		s.log.Debugf("failed to get token %v from map", code)
-		http.Error(w, fmt.Sprint("failed to get token"), http.StatusInternalServerError)
+	token, err := s.client.Exchange(r.Context(), code)
+	if err != nil {
+		s.log.Debugf("failed to get token: %v", err)
+		http.Error(w, fmt.Sprintf("failed to get token: %v", err), http.StatusInternalServerError)
 		return
 	}
 
-	rawIDToken, ok := token.(*oauth2.Token).Extra("id_token").(string)
+	rawIDToken, ok := token.Extra("id_token").(string)
 	if !ok {
 		s.log.Debug("no id_token in token response")
 		http.Error(w, "no id_token in token response", http.StatusInternalServerError)
