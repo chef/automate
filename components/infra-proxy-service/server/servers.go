@@ -36,8 +36,8 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 	}
 
 	if req.IpAddress == "" {
-		s.service.Logger.Debug("incomplete create server request: missing server ip address")
-		return nil, status.Error(codes.InvalidArgument, "must supply server ip address")
+		s.service.Logger.Debug("incomplete create server request: missing server IP address")
+		return nil, status.Error(codes.InvalidArgument, "must supply server IP address")
 	}
 
 	server, err := s.service.Storage.StoreServer(ctx, req.Name, req.Description, req.Fqdn, req.IpAddress)
@@ -72,7 +72,7 @@ func (s *Server) GetServer(ctx context.Context, req *request.GetServer) (*respon
 
 	UUID, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid server id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid server ID: %s", err.Error())
 	}
 
 	server, err := s.service.Storage.GetServer(ctx, UUID)
@@ -112,7 +112,7 @@ func (s *Server) DeleteServer(ctx context.Context, req *request.DeleteServer) (*
 
 	UUID, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid server id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid server ID: %s", err.Error())
 	}
 
 	server, err := s.service.Storage.DeleteServer(ctx, UUID)
@@ -131,8 +131,8 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 	defer cancel()
 
 	if req.Id == "" {
-		s.service.Logger.Debug("incomplete update server request: missing server id")
-		return nil, status.Error(codes.InvalidArgument, "must supply server id")
+		s.service.Logger.Debug("incomplete update server request: missing server ID")
+		return nil, status.Error(codes.InvalidArgument, "must supply server ID")
 	}
 	if req.Name == "" {
 		s.service.Logger.Debug("incomplete update server request: missing server name")
@@ -147,13 +147,13 @@ func (s *Server) UpdateServer(ctx context.Context, req *request.UpdateServer) (*
 		return nil, status.Error(codes.InvalidArgument, "must supply server fqdn")
 	}
 	if req.IpAddress == "" {
-		s.service.Logger.Debug("incomplete update server request: missing server ip_address")
-		return nil, status.Error(codes.InvalidArgument, "must supply server ip_address")
+		s.service.Logger.Debug("incomplete update server request: missing server IP address")
+		return nil, status.Error(codes.InvalidArgument, "must supply server IP address")
 	}
 
 	id, err := uuid.FromString(req.Id)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid server id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid server ID: %s", err.Error())
 	}
 
 	serverStruct := storage.Server{
