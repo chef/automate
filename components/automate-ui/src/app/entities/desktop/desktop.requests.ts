@@ -50,7 +50,8 @@ export class DesktopRequests {
 
   private createTopErrorCollection(respTopNodeErrors: RespTopNodeErrors): TopErrorsCollection {
     return {
-      items: respTopNodeErrors.errors.map(respItem => this.createErrorItem(respItem))
+      items: respTopNodeErrors.errors.map(respItem => this.createErrorItem(respItem)),
+      updated: new Date()
     };
   }
 
@@ -66,7 +67,8 @@ export class DesktopRequests {
     respDailyCheckInCountCollection: RespDailyCheckInCountCollection): DailyCheckInCountCollection {
     return {
       buckets: respDailyCheckInCountCollection.counts.map(respDailyCheckInCount =>
-        this.createDailyCheckInCount(respDailyCheckInCount))
+        this.createDailyCheckInCount(respDailyCheckInCount)),
+      updated: new Date()
     };
   }
 
