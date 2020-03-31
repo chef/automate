@@ -77,11 +77,12 @@ func (depth *ReportDepth) getProfileMinsFromNodesResults(
 					logrus.Debugf("getProfileMinsFromNodesResults profile_name=%s, status=%s (sumFailures=%d, sumPassed=%d, sumSkipped=%d, sumWaived=%d)", profileName, profileStatus, int32(*sumFailures.Value), int32(*sumPassed.Value), int32(*sumSkipped.Value), int32(*sumWaived.Value))
 				}
 
+				//let's keep track of the counts even if they're not in the filter so that we may know that they're there for UI chicklets
+				statusMap[profileStatus]++
+
 				if len(statusFilters) > 0 && !stringutils.SliceContains(statusFilters, profileStatus) {
 					continue
 				}
-
-				statusMap[profileStatus]++
 
 				summary := reporting.ProfileMin{
 					Name:   profileName,

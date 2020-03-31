@@ -80,11 +80,12 @@ func (depth *ProfileDepth) getProfileMinsFromNodesResults(
 						int32(*sumSkipped.Value), int32(*sumWaived.Value))
 				}
 
+				//let's keep track of the counts even if they're not in the filter so that we may know that they're there for UI chicklets
+				statusMap[profileStatus]++
+
 				if len(statusFilters) > 0 && !stringutils.SliceContains(statusFilters, profileStatus) {
 					continue
 				}
-
-				statusMap[profileStatus]++
 
 				summary := reporting.ProfileMin{
 					Name:   profileName,

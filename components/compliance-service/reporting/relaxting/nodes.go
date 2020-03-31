@@ -175,6 +175,8 @@ func (backend *ES2Backend) GetNodes(from int32, size int32, filters map[string][
 			}
 
 		}
+		//take status out of filters similar to why we remove them from suggestions.. we want to always see what's available in this context
+		delete(filters, "status")
 		// get node counts of passed/failed/skipped/waived nodes to append to totals response
 		nodeSummary, err := backend.GetStatsSummaryNodes(filters)
 		if err != nil {

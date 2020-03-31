@@ -57,6 +57,7 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 
 	profileMins := make(map[string]reporting.ProfileMin)
 	var counts *reportingapi.ProfileCounts
+	statusMap := make(map[string]int, 4)
 
 	if aggRoot, found := depth.unwrap(&searchResult.Aggregations); found {
 		if impactBuckets, found := aggRoot.Aggregations.Terms("impact"); found && len(impactBuckets.Buckets) > 0 {
@@ -109,12 +110,15 @@ func (depth *ControlDepth) getProfileMinsFromNodesResults(
 				Status: profileStatus,
 			}
 			profileMins[summary.Id] = summaryRep
+
+			//let's keep track of the counts even if they're not in the filter so that we may know that they're there for UI chicklets
+			statusMap[profileStatus]++
 			counts = &reportingapi.ProfileCounts{
-				Total:   summary.Failures + summary.Passed + summary.Skipped + summary.Waived,
-				Failed:  summary.Failures,
-				Passed:  summary.Passed,
-				Skipped: summary.Skipped,
-				Waived:  summary.Waived,
+				Total:   int32(statusMap["failed"] + statusMap["passed"] + statusMap["skipped"]),
+				Failed:  int32(statusMap["failed"]),
+				Passed:  int32(statusMap["passed"]),
+				Skipped: int32(statusMap["skipped"]),
+				Waived:  int32(statusMap["waived"]),
 			}
 		}
 	}
