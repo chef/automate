@@ -372,35 +372,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   }
 
   private getJobForm(jobName: string) {
-    switch (jobName) {
-      case IngestJobs.EventFeedRemoveData: {
-        return this.automateSettingsForm.getRawValue()['eventFeedRemoveData'];
-      }
-      case IngestJobs.EventFeedServerActions: {
-        return this.automateSettingsForm.getRawValue()['eventFeedServerActions'];
-      }
-      case IngestJobs.ServiceGroupNoHealthChecks: {
-        return this.automateSettingsForm.getRawValue()['serviceGroupNoHealthChecks'];
-      }
-      case IngestJobs.ServiceGroupRemoveServices: {
-        return this.automateSettingsForm.getRawValue()['serviceGroupRemoveServices'];
-      }
-      case IngestJobs.ClientRunsRemoveData: {
-        return this.automateSettingsForm.getRawValue()['clientRunsRemoveData'];
-      }
-      case IngestJobs.ClientRunsLabelMissing: {
-        return this.automateSettingsForm.getRawValue()['clientRunsLabelMissing'];
-      }
-      case IngestJobs.ClientRunsRemoveNodes: {
-        return this.automateSettingsForm.getRawValue()['clientRunsRemoveNodes'];
-      }
-      case IngestJobs.ComplianceRemoveReports: {
-        return this.automateSettingsForm.getRawValue()['complianceRemoveReports'];
-      }
-      case IngestJobs.ComplianceRemoveScans: {
-        return this.automateSettingsForm.getRawValue()['complianceRemoveScans'];
-      }
-    }
+    return this.automateSettingsForm.getRawValue()[jobName];
   }
 
   private splitThreshold(threshold: string) {
