@@ -406,9 +406,3 @@ This command resets the local `admin` user's password and ensures that the user 
 ```bash
   chef-automate iam admin-access restore <your new password here>
 ```
-
-Generate a new token and add that token as a new member of the Chef-managed `Administrator` policy.
-
-```bash
-  chef-automate iam token create <your token name here> --admin
-```
