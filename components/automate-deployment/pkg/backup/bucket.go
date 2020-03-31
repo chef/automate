@@ -18,8 +18,9 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/s3"
-	"github.com/google/go-cloud/blob"
-	"github.com/google/go-cloud/blob/s3blob"
+	"gocloud.dev/blob"
+	"gocloud.dev/blob/s3blob"
+	"gocloud.dev/gcerrors"
 
 	"github.com/chef/automate/lib/io/fileutils"
 
@@ -84,7 +85,7 @@ type Bucket interface {
 // does not exist
 func IsNotExist(err error) bool {
 	return os.IsNotExist(err) ||
-		blob.IsNotExist(err) ||
+		gcerrors.Code(err) == gcerrors.NotFound ||
 		// blob.IsNotExist returns the wrong answer for minio's NoSuchKey error
 		strings.Contains(err.Error(), "NoSuchKey")
 }
@@ -350,7 +351,7 @@ func NewS3Bucket(name string, basePath string, c *aws.Config) (Bucket, error) {
 		return nil, err
 	}
 
-	bucket, err := s3blob.OpenBucket(context.Background(), s, name)
+	bucket, err := s3blob.OpenBucket(context.Background(), s, name, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -368,7 +369,7 @@ func NewS3Bucket(name string, basePath string, c *aws.Config) (Bucket, error) {
 func (bkt *s3Bucket) NewReader(ctx context.Context, name string, verifier ObjectVerifier) (io.ReadCloser, error) {
 	relPath := path.Join(bkt.basePath, name)
 	validatePath(relPath)
-	r, err := bkt.bucket.NewReader(ctx, relPath)
+	r, err := bkt.bucket.NewReader(ctx, relPath, nil)
 	if err != nil {
 		return nil, err
 	}

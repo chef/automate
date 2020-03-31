@@ -1,21 +1,24 @@
-# cloud.google.com/go v0.34.0
+# cloud.google.com/go v0.44.3
 cloud.google.com/go/compute/metadata
-# github.com/Azure/azure-sdk-for-go v19.1.0+incompatible
+# contrib.go.opencensus.io/exporter/ocagent v0.5.0
+contrib.go.opencensus.io/exporter/ocagent
+# github.com/Azure/azure-sdk-for-go v30.1.0+incompatible
 github.com/Azure/azure-sdk-for-go/services/compute/mgmt/2017-12-01/compute
 github.com/Azure/azure-sdk-for-go/services/network/mgmt/2017-11-01/network
 github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2016-06-01/subscriptions
 github.com/Azure/azure-sdk-for-go/services/resources/mgmt/2017-05-10/resources
 github.com/Azure/azure-sdk-for-go/version
-# github.com/Azure/go-autorest v10.15.0+incompatible
+# github.com/Azure/go-autorest v12.0.0+incompatible
 github.com/Azure/go-autorest/autorest
 github.com/Azure/go-autorest/autorest/adal
 github.com/Azure/go-autorest/autorest/azure
 github.com/Azure/go-autorest/autorest/azure/auth
+github.com/Azure/go-autorest/autorest/azure/cli
 github.com/Azure/go-autorest/autorest/date
 github.com/Azure/go-autorest/autorest/to
 github.com/Azure/go-autorest/autorest/validation
 github.com/Azure/go-autorest/logger
-github.com/Azure/go-autorest/version
+github.com/Azure/go-autorest/tracing
 # github.com/BurntSushi/toml v0.3.1
 github.com/BurntSushi/toml
 # github.com/Masterminds/squirrel v1.1.0
@@ -31,7 +34,7 @@ github.com/alexedwards/scs/stores/pgstore
 github.com/apache/thrift/lib/go/thrift
 # github.com/armon/go-metrics v0.3.2
 github.com/armon/go-metrics
-# github.com/aws/aws-sdk-go v1.13.42
+# github.com/aws/aws-sdk-go v1.19.45
 github.com/aws/aws-sdk-go/aws
 github.com/aws/aws-sdk-go/aws/awserr
 github.com/aws/aws-sdk-go/aws/awsutil
@@ -41,18 +44,25 @@ github.com/aws/aws-sdk-go/aws/corehandlers
 github.com/aws/aws-sdk-go/aws/credentials
 github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds
 github.com/aws/aws-sdk-go/aws/credentials/endpointcreds
+github.com/aws/aws-sdk-go/aws/credentials/processcreds
 github.com/aws/aws-sdk-go/aws/credentials/stscreds
+github.com/aws/aws-sdk-go/aws/csm
 github.com/aws/aws-sdk-go/aws/defaults
 github.com/aws/aws-sdk-go/aws/ec2metadata
 github.com/aws/aws-sdk-go/aws/endpoints
 github.com/aws/aws-sdk-go/aws/request
 github.com/aws/aws-sdk-go/aws/session
 github.com/aws/aws-sdk-go/aws/signer/v4
+github.com/aws/aws-sdk-go/internal/ini
+github.com/aws/aws-sdk-go/internal/s3err
 github.com/aws/aws-sdk-go/internal/sdkio
 github.com/aws/aws-sdk-go/internal/sdkrand
+github.com/aws/aws-sdk-go/internal/sdkuri
 github.com/aws/aws-sdk-go/internal/shareddefaults
 github.com/aws/aws-sdk-go/private/protocol
 github.com/aws/aws-sdk-go/private/protocol/ec2query
+github.com/aws/aws-sdk-go/private/protocol/eventstream
+github.com/aws/aws-sdk-go/private/protocol/eventstream/eventstreamapi
 github.com/aws/aws-sdk-go/private/protocol/json/jsonutil
 github.com/aws/aws-sdk-go/private/protocol/jsonrpc
 github.com/aws/aws-sdk-go/private/protocol/query
@@ -81,6 +91,13 @@ github.com/briandowns/spinner
 github.com/buger/goterm
 # github.com/buger/jsonparser v0.0.0-20180808090653-f4dd9f5a6b44
 github.com/buger/jsonparser
+# github.com/census-instrumentation/opencensus-proto v0.2.1
+github.com/census-instrumentation/opencensus-proto/gen-go/agent/common/v1
+github.com/census-instrumentation/opencensus-proto/gen-go/agent/metrics/v1
+github.com/census-instrumentation/opencensus-proto/gen-go/agent/trace/v1
+github.com/census-instrumentation/opencensus-proto/gen-go/metrics/v1
+github.com/census-instrumentation/opencensus-proto/gen-go/resource/v1
+github.com/census-instrumentation/opencensus-proto/gen-go/trace/v1
 # github.com/cespare/xxhash/v2 v2.1.1
 github.com/cespare/xxhash/v2
 # github.com/chef/go-chef v0.3.1-0.20191115205148-7ac24fba7a27
@@ -123,7 +140,7 @@ github.com/dexidp/dex/storage/memory
 github.com/dexidp/dex/version
 # github.com/dgrijalva/jwt-go v3.2.0+incompatible
 github.com/dgrijalva/jwt-go
-# github.com/dimchansky/utfbom v0.0.0-20170328061312-6c6132ff69f0
+# github.com/dimchansky/utfbom v1.1.0
 github.com/dimchansky/utfbom
 # github.com/envoyproxy/protoc-gen-validate v0.1.0
 github.com/envoyproxy/protoc-gen-validate
@@ -176,8 +193,6 @@ github.com/go-delve/delve/service/rpc2
 github.com/go-delve/delve/service/rpccommon
 # github.com/go-gorp/gorp v2.0.1-0.20180410155428-6032c66e0f5f+incompatible
 github.com/go-gorp/gorp
-# github.com/go-ini/ini v1.37.0
-github.com/go-ini/ini
 # github.com/gobwas/glob v0.2.3
 github.com/gobwas/glob
 github.com/gobwas/glob/compiler
@@ -203,7 +218,9 @@ github.com/golang-migrate/migrate/source
 github.com/golang-migrate/migrate/source/file
 # github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
 github.com/golang/glog
-# github.com/golang/mock v1.2.1-0.20190311213431-837231f7bb37
+# github.com/golang/groupcache v0.0.0-20190702054246-869f871628b6
+github.com/golang/groupcache/lru
+# github.com/golang/mock v1.3.1
 github.com/golang/mock/gomock
 github.com/golang/mock/mockgen
 github.com/golang/mock/mockgen/model
@@ -224,10 +241,12 @@ github.com/golang/protobuf/ptypes/empty
 github.com/golang/protobuf/ptypes/struct
 github.com/golang/protobuf/ptypes/timestamp
 github.com/golang/protobuf/ptypes/wrappers
-# github.com/google/go-cloud v0.1.1
-github.com/google/go-cloud/blob
-github.com/google/go-cloud/blob/driver
-github.com/google/go-cloud/blob/s3blob
+# github.com/google/wire v0.3.0
+github.com/google/wire
+# github.com/googleapis/gax-go v2.0.2+incompatible
+github.com/googleapis/gax-go
+# github.com/googleapis/gax-go/v2 v2.0.5
+github.com/googleapis/gax-go/v2
 # github.com/gorilla/context v1.1.1
 github.com/gorilla/context
 # github.com/gorilla/handlers v1.3.0
@@ -324,7 +343,7 @@ github.com/lyft/protoc-gen-star
 github.com/lyft/protoc-gen-star/lang/go
 # github.com/magiconair/properties v1.7.4
 github.com/magiconair/properties
-# github.com/mailru/easyjson v0.0.0-20180723221831-d5012789d665
+# github.com/mailru/easyjson v0.7.1
 github.com/mailru/easyjson
 github.com/mailru/easyjson/buffer
 github.com/mailru/easyjson/jlexer
@@ -337,7 +356,9 @@ github.com/mattn/go-isatty
 github.com/mattn/go-runewidth
 # github.com/matttproud/golang_protobuf_extensions v1.0.1
 github.com/matttproud/golang_protobuf_extensions/pbutil
-# github.com/mitchellh/mapstructure v0.0.0-20180220230111-00c29f56e238
+# github.com/mitchellh/go-homedir v1.1.0
+github.com/mitchellh/go-homedir
+# github.com/mitchellh/mapstructure v1.1.2
 github.com/mitchellh/mapstructure
 # github.com/muesli/crunchy v0.0.0-20170927092902-4ec98f770e27
 github.com/muesli/crunchy
@@ -467,7 +488,7 @@ github.com/spf13/jwalterweatherman
 github.com/spf13/pflag
 # github.com/spf13/viper v1.0.1-0.20171207042631-1a0c4a370c3e
 github.com/spf13/viper
-# github.com/stretchr/objx v0.1.1
+# github.com/stretchr/objx v0.2.0
 github.com/stretchr/objx
 # github.com/stretchr/testify v1.4.0
 github.com/stretchr/testify/assert
@@ -500,6 +521,25 @@ github.com/xtgo/uuid
 github.com/yashtewari/glob-intersection
 # go.etcd.io/bbolt v1.3.3
 go.etcd.io/bbolt
+# go.opencensus.io v0.22.2
+go.opencensus.io
+go.opencensus.io/internal
+go.opencensus.io/internal/tagencoding
+go.opencensus.io/metric/metricdata
+go.opencensus.io/metric/metricproducer
+go.opencensus.io/plugin/ocgrpc
+go.opencensus.io/plugin/ochttp
+go.opencensus.io/plugin/ochttp/propagation/b3
+go.opencensus.io/plugin/ochttp/propagation/tracecontext
+go.opencensus.io/resource
+go.opencensus.io/stats
+go.opencensus.io/stats/internal
+go.opencensus.io/stats/view
+go.opencensus.io/tag
+go.opencensus.io/trace
+go.opencensus.io/trace/internal
+go.opencensus.io/trace/propagation
+go.opencensus.io/trace/tracestate
 # go.starlark.net v0.0.0-20190702223751-32f345186213
 go.starlark.net/internal/compile
 go.starlark.net/internal/spell
@@ -517,6 +557,17 @@ go.uber.org/zap/internal/bufferpool
 go.uber.org/zap/internal/color
 go.uber.org/zap/internal/exit
 go.uber.org/zap/zapcore
+# gocloud.dev v0.19.0
+gocloud.dev/aws
+gocloud.dev/blob
+gocloud.dev/blob/driver
+gocloud.dev/blob/s3blob
+gocloud.dev/gcerrors
+gocloud.dev/internal/escape
+gocloud.dev/internal/gcerr
+gocloud.dev/internal/oc
+gocloud.dev/internal/openurl
+gocloud.dev/internal/retry
 # golang.org/x/arch v0.0.0-20171004143515-077ac972c2e4
 golang.org/x/arch/x86/x86asm
 # golang.org/x/crypto v0.0.0-20200214034016-1d94cc7ab1c6
@@ -563,6 +614,8 @@ golang.org/x/perf/benchstat
 golang.org/x/perf/cmd/benchstat
 golang.org/x/perf/internal/stats
 golang.org/x/perf/storage/benchfmt
+# golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
+golang.org/x/sync/semaphore
 # golang.org/x/sys v0.0.0-20200212091648-12a6c2dcc1e4
 golang.org/x/sys/cpu
 golang.org/x/sys/unix
@@ -572,13 +625,13 @@ golang.org/x/sys/windows/svc
 golang.org/x/sys/windows/svc/debug
 golang.org/x/sys/windows/svc/eventlog
 golang.org/x/sys/windows/svc/mgr
-# golang.org/x/text v0.3.1-0.20171218113626-eb22672bea55
+# golang.org/x/text v0.3.2
 golang.org/x/text/secure/bidirule
 golang.org/x/text/transform
 golang.org/x/text/unicode/bidi
 golang.org/x/text/unicode/norm
 golang.org/x/text/unicode/rangetable
-# golang.org/x/tools v0.0.0-20190524140312-2c0ae7006135
+# golang.org/x/tools v0.0.0-20190628153133-6cdbf07be9d0
 golang.org/x/tools/go/gcexportdata
 golang.org/x/tools/go/internal/gcimporter
 golang.org/x/tools/go/internal/packagesdriver
@@ -586,12 +639,21 @@ golang.org/x/tools/go/packages
 golang.org/x/tools/internal/fastwalk
 golang.org/x/tools/internal/gopathwalk
 golang.org/x/tools/internal/semver
-# google.golang.org/api v0.0.0-20180829000535-087779f1d2c9
+# golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543
+golang.org/x/xerrors
+golang.org/x/xerrors/internal
+# google.golang.org/api v0.9.0
 google.golang.org/api/compute/v1
 google.golang.org/api/gensupport
 google.golang.org/api/googleapi
 google.golang.org/api/googleapi/internal/uritemplates
-# google.golang.org/appengine v1.4.0
+google.golang.org/api/googleapi/transport
+google.golang.org/api/internal
+google.golang.org/api/option
+google.golang.org/api/support/bundler
+google.golang.org/api/transport/http
+google.golang.org/api/transport/http/internal/propagation
+# google.golang.org/appengine v1.6.1
 google.golang.org/appengine
 google.golang.org/appengine/internal
 google.golang.org/appengine/internal/app_identity

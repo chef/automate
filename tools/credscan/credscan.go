@@ -105,6 +105,8 @@ var a2Config = config{
 
 		// It's an example in the readme of a crypto lib
 		{regex: `vendor/github.com/nats-io/nkeys/README.md`},
+
+		{regex: `vendor/google.golang.org/api/internal/service-account.json`},
 	},
 	contentInclude: []pattern{
 		{
