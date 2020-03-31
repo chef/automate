@@ -178,13 +178,3 @@ export interface DefaultFormData {
   complianceRemoveReports: SingleDefaultForm;
   complianceRemoveScans: SingleDefaultForm;
 }
-
-export interface RawJobFormGroupValues {
-  category: JobCategories;
-  name: string;
-  nested_name?: string;
-  unit: 'm' | 'd' | 'm';
-  threshold: string;
-  disabled: boolean;
-}
-

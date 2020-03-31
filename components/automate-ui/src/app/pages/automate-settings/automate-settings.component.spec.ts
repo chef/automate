@@ -9,8 +9,8 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 import { ngrxReducers, runtimeChecks } from 'app/ngrx.reducers';
 import {
-  IngestJob,
   JobSchedulerStatus,
+  IngestJob,
   JobCategories
 } from 'app/entities/automate-settings/automate-settings.model';
 

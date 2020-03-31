@@ -22,8 +22,7 @@ import {
   InfraJobName,
   NestedJobName,
   DefaultFormData,
-  JobCategories,
-  RawJobFormGroupValues
+  JobCategories
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
@@ -279,7 +278,10 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       IngestJobs.ComplianceRemoveReports,
       IngestJobs.ComplianceRemoveScans
     ].map(jobName => {
-      const jobForm = this.getJobForm(jobName);
+      // Extract the raw values from the formGroup so that
+      // we can make sure to keep disabled inputs populated in the UI
+      const jobForm = this.getJobForm(jobName).getRawValue();
+
       const isNested = jobForm.nested_name ? true : false;
       const job = new IngestJob(null, null);
       job.category = jobForm.category;
@@ -372,8 +374,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getJobForm(jobName: string): RawJobFormGroupValues {
-    return this.automateSettingsForm.getRawValue()[jobName];
+  // private getJobForm(jobName: string): RawJobFormGroupValues {
+  private getJobForm(jobName: string): FormGroup {
+    return this[jobName];
   }
 
   private splitThreshold(threshold: string): [string, string] {
