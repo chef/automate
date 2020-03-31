@@ -32,7 +32,7 @@
         Set schedule
       </label>
     </div>
-    <div class="schedule-body" *ngIf="form.controls['include'].value">
+    <div class="schedule-body" *ngIf="form.get('include').value">
       <fieldset formGroupName="start">
         <label>Start</label>
         <div class="field">
@@ -67,7 +67,7 @@
           <input type="checkbox" formControlName="include" />
           End
         </label>
-        <div class="field" *ngIf="subControls('end').controls['include'].value">
+        <div class="field" *ngIf="form.get('end.include').value">
           <chef-form-field formGroupName="datetime">
             <div class="datetime">
               <select formControlName="date">
@@ -99,7 +99,7 @@
           <input type="checkbox" formControlName="include" />
           Repeat every
         </label>
-        <div class="field" *ngIf="subControls('repeat').controls['include'].value">
+        <div class="field" *ngIf="form.get('repeat.include').value">
           <chef-form-field>
             <input type="number" chefInput formControlName="interval" min="1" />
           </chef-form-field>

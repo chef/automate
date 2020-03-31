@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { FormGroup, AbstractControl } from '@angular/forms';
+import { FormGroup } from '@angular/forms';
 import { RRule } from 'rrule';
 import * as moment from 'moment';
 
@@ -25,9 +25,5 @@ export class JobScheduleFormComponent {
   public hours = Array(24).fill(1).map((_, i) => i);
 
   public minutes = Array(60).fill(1).map((_, i) => i);
-
-  public subControls(name: string): { [key: string]: AbstractControl } {
-    return (this.form.get(name) as FormGroup).controls;
-  }
 
 }
