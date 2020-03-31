@@ -255,6 +255,7 @@ document "download_and_install_A1_backup" <<DOC
   ------------------------------------
   download_and_install_A1_backup a1_BIG_elasticsearch_backup
 DOC
+# shellcheck disable=SC2120
 function download_and_install_A1_backup() {
   local backup_name=${1-a1_10_nodes_elasticsearch_backup}
 
