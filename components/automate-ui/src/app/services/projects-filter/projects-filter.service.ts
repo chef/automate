@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { NgrxStateAtom } from 'app/ngrx.reducers';
 import { ProjectsFilterOption } from './projects-filter.reducer';
 import * as selectors from './projects-filter.selectors';
-import { LoadOptions, SaveOptions, UpdateSelectionCount } from './projects-filter.actions';
+import { InitOptions, LoadOptions, SaveOptions, UpdateSelectionCount } from './projects-filter.actions';
 
 const STORE_OPTIONS_KEY = 'projectsFilter.options';
 
@@ -29,6 +29,9 @@ export class ProjectsFilterService {
   constructor(private store: Store<NgrxStateAtom>, private router: Router) { }
 
   loadOptions() {
+    // fast load of project selection just from local storage
+    this.store.dispatch(new InitOptions());
+    // leisurely load of updated projects from back-end refining above
     this.store.dispatch(new LoadOptions());
   }
 

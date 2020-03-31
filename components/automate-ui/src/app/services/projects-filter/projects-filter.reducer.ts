@@ -58,19 +58,15 @@ export function projectsFilterReducer(
       return set('optionsLoadingStatus', EntityStatus.loading, state);
     }
 
+    case ProjectsFilterActionTypes.INIT_OPTIONS_SUCCESS: {
+      const sortedOptions = sortOptions(action.payload.restored);
+      return setDropdownProperties(sortedOptions, state);
+    }
+
     case ProjectsFilterActionTypes.LOAD_OPTIONS_SUCCESS: {
       const mergedOptions = mergeOptions(action.payload.fetched, action.payload.restored);
       const sortedOptions = sortOptions(mergedOptions);
-      return pipe(
-        set('options', sortedOptions),
-        set('optionsLoadingStatus', EntityStatus.loadingSuccess),
-        set('selectionLabel', selectionLabel(sortedOptions)),
-        set('selectionCount', selectionCount(sortedOptions)),
-        set('selectionCountVisible', selectionCountVisible(sortedOptions)),
-        set('selectionCountActive', selectionCountActive(sortedOptions)),
-        set('dropdownCaretVisible', dropdownCaretVisible(sortedOptions)),
-        set('filterVisible', filterVisible(sortedOptions))
-      )(state) as ProjectsFilterState;
+      return setDropdownProperties(sortedOptions, state);
     }
 
     case ProjectsFilterActionTypes.LOAD_OPTIONS_FAILURE: {
@@ -105,6 +101,20 @@ export function projectsFilterReducer(
   }
 
   return state;
+}
+
+function setDropdownProperties(
+  sortedOptions: ProjectsFilterOption[], state: ProjectsFilterState): ProjectsFilterState {
+  return pipe(
+    set('options', sortedOptions),
+    set('optionsLoadingStatus', EntityStatus.loadingSuccess),
+    set('selectionLabel', selectionLabel(sortedOptions)),
+    set('selectionCount', selectionCount(sortedOptions)),
+    set('selectionCountVisible', selectionCountVisible(sortedOptions)),
+    set('selectionCountActive', selectionCountActive(sortedOptions)),
+    set('dropdownCaretVisible', dropdownCaretVisible(sortedOptions)),
+    set('filterVisible', filterVisible(sortedOptions)
+    ))(state) as ProjectsFilterState;
 }
 
 function selectionLabel(options: ProjectsFilterOption[]): string {
@@ -187,11 +197,11 @@ function filterVisible(options: ProjectsFilterOption[]): boolean {
   return hasSomePermissions && !hasOnlyUnassignedPermission;
 }
 
+// Grab previously saved options from localstorage (restored) and,
+// if any has the same value as one of the newly fetched options (fetched),
+// merge its current checked status with the fetched option
+// to create the final list of available options.
 function mergeOptions(
-  // Grab previously saved options from localstorage (restored) and,
-  // if any has the same value as one of the newly fetched options (fetched),
-  // merge its current checked status with the fetched option
-  // to create the final list of available options.
   fetched: ProjectsFilterOption[], restored: ProjectsFilterOption[]): ProjectsFilterOption[] {
   return fetched.map(fetchedOpt => {
     const restoredOpt = find(['value', fetchedOpt.value], restored);
