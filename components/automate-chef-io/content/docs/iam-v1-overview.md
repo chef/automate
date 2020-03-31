@@ -16,7 +16,7 @@ toc = true
 +++
 
 {{< warning >}}
-This documentation and the feature it covers, IAM v1, are deprecated. This documentation will be removed soon. Most Chef Automate installations upgraded automatically to the current IAM implementation. The [Airgap Installation documentation {{< relref "airgapped-installation.md/#upgrades" >}} covers the manual upgrade process for systems without internet connectivity.
+This documentation and the feature it covers, IAM v1, are deprecated. This documentation will be removed soon. Most Chef Automate installations upgraded automatically to the current IAM implementation. The [Airgap Installation documentation]({{< relref "airgapped-installation#upgrades" >}}) covers the manual upgrade process for systems without internet connectivity.
 The current IAM documentation pages are: the [IAM Overview]({{< relref "iam-v2-overview" >}}), the [IAM Guide]({{< relref "iam-v2-guide" >}}) and the [Chef Automate API](https://automate.chef.io/docs/api/).
 {{< /warning >}}
 
