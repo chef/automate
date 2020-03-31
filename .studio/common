@@ -329,14 +329,13 @@ function generate_dev_service_cert() {
 
 _component_auto_complete()
 {
-    local cur prev opts
+    local cur opts
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts=$(ls /src/components | tr "\\n" " ")
 
     if [[ ${cur} == * ]]; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
         return 0
     fi
 }
@@ -385,7 +384,6 @@ function build_all_changed_components() {
   mkdir -p /usr/bin
   ln -sv "$(hab pkg path core/coreutils)/bin/env" /usr/bin/env 2>/dev/null
 
-  build_commands=""
   pushd /src >/dev/null
     for component in $(./scripts/changed_components.rb)
     do
@@ -395,13 +393,13 @@ function build_all_changed_components() {
       fi
 
       if [[ -n "$whitelist" ]]; then
-        if [[ "$whitelist" == *"$(basename $component)"* ]]; then
+        if [[ "$whitelist" == *"$(basename "$component")"* ]]; then
           log_line "Building $component"
-          build $component
+          build "$component"
         fi
       else
         log_line "Building $component"
-        build $component
+        build "$component"
       fi
     done
   popd >/dev/null

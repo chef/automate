@@ -209,11 +209,13 @@ function auto_go_update_component() {
 
   install_if_missing core/inotify-tools inotifywait
   log_line "Starting file watch for $component"
+
+  # shellcheck disable=SC2034  # Unused variables left for readability
   inotifywait -m -r /src/components/$component -e create -e moved_to -e close_write |
     while read -r path action file; do
         if [[ "$file" =~ .*go$ ]]; then
           log_line "File: $file change in $component"
-          go_update_component $component
+          go_update_component "$component"
           log_line "Finished update"
         fi
     done
