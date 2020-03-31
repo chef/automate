@@ -237,7 +237,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     return allowedKeys.includes(key);
   }
 
-  public handleFormActivation(form, checked: boolean): void {
+  public handleFormActivation(form: FormGroup, checked: boolean): void {
     // patchValue does not mark the form dirty, so we need to do it manually;
     form.get('disabled').markAsDirty();
     // patchValue is a workaround for the chef-checkbox because we need to be
@@ -495,7 +495,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private handleDisable(form, disabled: boolean = false): void {
+  private handleDisable(form: FormGroup, disabled: boolean = false): void {
     // this loops through the rest of the form to disable/enable relevant controls
     const pertinentGroups = ['unit', 'threshold'];
     pertinentGroups.forEach(control => {
