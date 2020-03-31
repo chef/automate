@@ -187,6 +187,7 @@ DOC
 function ingest_test_A1_migration() {
   install_if_missing core/jq-static jq
 
+  # shellcheck disable=SC2119
   download_and_install_A1_backup || return 1
   ingest_load_A1_data || return 1
 
