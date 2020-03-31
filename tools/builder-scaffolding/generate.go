@@ -116,7 +116,7 @@ func initS3Bucket(bucketName string) (*blob.Bucket, error) {
 		return nil, err
 	}
 
-	bucket, err := s3blob.OpenBucket(context.Background(), s, bucketName)
+	bucket, err := s3blob.OpenBucket(context.Background(), s, bucketName, nil)
 	if err != nil {
 		return nil, err
 	}
