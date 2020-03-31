@@ -11,6 +11,7 @@ import { ProjectsFilterRequests, AuthorizedProjectsResponse } from './projects-f
 import {
   ProjectsFilterActionTypes,
   ProjectsFilterActions,
+  InitOptionsSuccess,
   LoadOptions,
   LoadOptionsSuccess,
   LoadOptionsFailure,
@@ -30,6 +31,18 @@ export class ProjectsFilterEffects {
   @Effect()
   latestOptions$ = observableInterval(1000 * this.POLLING_INTERVAL_IN_SECONDS).pipe(
     mergeMap(this.loadOptionsAction$()));
+
+  // Fast-initialize project filter just from local storage
+  @Effect()
+  initOptions$ = this.actions$.pipe(
+    ofType<LoadOptions>(ProjectsFilterActionTypes.INIT_OPTIONS),
+    map(() => {
+      return new InitOptionsSuccess({
+        fetched: [],
+        restored: this.projectsFilter.restoreOptions() || []
+      });
+    })
+  );
 
   @Effect()
   loadOptions$ = this.actions$.pipe(
