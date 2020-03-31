@@ -19,6 +19,8 @@
             <chef-table-header>
               <chef-table-row>
                 <chef-table-header-cell>Role Name</chef-table-header-cell>
+                <chef-table-header-cell>Description</chef-table-header-cell>
+                <chef-table-header-cell>Environments</chef-table-header-cell>
               </chef-table-row>
             </chef-table-header>
             <chef-table-body>
@@ -26,6 +28,8 @@
                 <chef-table-cell>
                     <a [routerLink]="['/infrastructure','chef-servers', serverId, 'org', OrgId, 'roles', role.name]">{{ role.name }}</a>
                 </chef-table-cell>
+                <chef-table-cell>{{ role.description == '' ?  'N/A' : role.description }}</chef-table-cell>
+                <chef-table-cell>{{ role.environments }}</chef-table-cell>
               </chef-table-row>
             </chef-table-body>
           </chef-table-new>
