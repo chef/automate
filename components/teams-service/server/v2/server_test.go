@@ -1873,5 +1873,5 @@ func defaultValidateProjectAssignmentFunc(context.Context,
 
 func insertProjectsIntoNewContext(projects []string) context.Context {
 	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
-		[]string{}, projects, "resource", "action", "pol"))
+		[]string{}, projects, "resource", "action"))
 }

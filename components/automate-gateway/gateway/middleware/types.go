@@ -14,37 +14,3 @@ type AuthorizationInterceptor interface {
 type DeploymentCertAuthOnly interface {
 	MustUseDeploymentCertAuth()
 }
-
-// AuthMiddleware is an enum of valid auth middleware values.
-type AuthMiddleware int
-
-const (
-	// Unknown is the zero value for the AuthMiddleware  enum
-	Unknown AuthMiddleware = iota
-	// AuthV1 is the AuthMiddleware enum value representing v1 of the middleware.
-	AuthV1
-	// AuthV2 is the AuthMiddleware enum value representing v2 of the middleware.
-	AuthV2
-)
-
-func (middleware AuthMiddleware) String() string {
-	switch middleware {
-	case AuthV1:
-		return "AuthV1"
-	case AuthV2:
-		return "AuthV2"
-	default:
-		return "Unknown"
-	}
-}
-
-func ToAuthMiddleware(s string) AuthMiddleware {
-	switch s {
-	case "AuthV1":
-		return AuthV1
-	case "AuthV2":
-		return AuthV2
-	default:
-		return Unknown
-	}
-}

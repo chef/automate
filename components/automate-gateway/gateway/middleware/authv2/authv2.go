@@ -79,7 +79,7 @@ func (c *client) Handle(ctx context.Context, subjects []string, projectsToFilter
 	}
 	projects := filteredResp.Projects
 
-	return auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV2.String()), nil
+	return auth_context.NewContext(ctx, subjects, projects, resource, action), nil
 }
 
 type resp struct {
@@ -116,7 +116,7 @@ func (c *client) IsAuthorized(ctx context.Context, subjects []string, resource, 
 	projects := filteredResp.Projects
 
 	return &resp{
-		ctx:        auth_context.NewContext(ctx, subjects, projects, resource, action, middleware.AuthV2.String()),
+		ctx:        auth_context.NewContext(ctx, subjects, projects, resource, action),
 		authorized: len(projects) != 0,
 	}, nil
 }

@@ -10,7 +10,6 @@ import (
 	authz "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 	"github.com/chef/automate/components/automate-gateway/api/iam/v2/response"
-	"github.com/chef/automate/components/automate-gateway/gateway/middleware"
 	"github.com/chef/automate/components/automate-gateway/gateway/middleware/authv2"
 	"github.com/chef/automate/components/automate-gateway/handler/iam/v2/introspect"
 	"github.com/chef/automate/components/automate-gateway/pkg/authorizer"
@@ -71,7 +70,7 @@ func TestIntrospectAll(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action:do", middleware.AuthV2.String())
+				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action:do")
 			req := &request.IntrospectAllReq{}
 			authzSrv.FilterAuthorizedPairsFunc = func(
 				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
@@ -155,7 +154,7 @@ func TestIntrospectSome(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", middleware.AuthV2.String())
+				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action")
 			authzSrv.FilterAuthorizedPairsFunc = func(
 				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil
@@ -223,7 +222,7 @@ func TestIntrospect(t *testing.T) {
 	for name, tc := range cases {
 		t.Run(name, func(t *testing.T) {
 			ctx := auth_context.NewContext(
-				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action", "Auth")
+				context.Background(), []string{"user:local:admin"}, []string{"project"}, "some:resource", "some:action")
 			authzSrv.FilterAuthorizedPairsFunc = func(
 				context.Context, *authz.FilterAuthorizedPairsReq) (*authz.FilterAuthorizedPairsResp, error) {
 				return tc.authzResp, nil

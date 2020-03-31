@@ -6938,7 +6938,7 @@ func createRuleObjectWithMultipleConditions(t *testing.T, id, projID string, rul
 }
 
 func insertProjectsAndSubjectsIntoContext(ctx context.Context, projects []string, subjects []string) context.Context {
-	return auth_context.NewOutgoingContext(auth_context.NewContext(ctx, subjects, projects, "res", "act", "v2.1"))
+	return auth_context.NewOutgoingContext(auth_context.NewContext(ctx, subjects, projects, "res", "act"))
 }
 
 func insertProjectsIntoContext(ctx context.Context, projects []string) context.Context {
