@@ -82,3 +82,8 @@ message NodeAttribute {
     string environment  = 7;
     string policy_group = 8;
 }
+
+message CookbookFileContent {
+    // Cookbook data file content.
+    string content = 2;
+}

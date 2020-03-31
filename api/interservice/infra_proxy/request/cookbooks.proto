@@ -20,3 +20,16 @@ message Cookbook {
     string name = 3;
     string version = 4;
 }
+
+message CookbookFileContent {
+    // ID of the org.
+    string org_id = 1;
+    // ID of the server.
+    string server_id = 2;
+    // Name of the cookbook.
+    string name = 3;
+    // Version of the cookbook.
+    string version = 4;
+    // Cookbook data file URL.
+    string url = 5;
+}

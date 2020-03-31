@@ -155,6 +155,13 @@ service InfraProxy {
     option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
     option (chef.automate.api.iam.policy).action = "infra:infraServerOrgCookbooks:get";
   };
+  rpc GetCookbookFileContent (infra_proxy.request.CookbookFileContent) returns (infra_proxy.response.CookbookFileContent) {
+    option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content";
+    option (chef.automate.api.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}/cookbooks";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks";
+    option (chef.automate.api.iam.policy).action = "infra:infraServerOrgCookbooks:get";
+  };
 
   rpc GetRoles (infra_proxy.request.Roles) returns (infra_proxy.response.Roles) {
     option (google.api.http).get = "/infra/servers/{server_id}/orgs/{org_id}/roles";
