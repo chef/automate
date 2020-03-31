@@ -22,7 +22,8 @@ import {
   InfraJobName,
   NestedJobName,
   DefaultFormData,
-  JobCategories
+  JobCategories,
+  RawJobFormGroupValues
 } from '../../entities/automate-settings/automate-settings.model';
 import { TelemetryService } from '../../services/telemetry/telemetry.service';
 
@@ -371,7 +372,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     });
   }
 
-  private getJobForm(jobName: string) {
+  private getJobForm(jobName: string): RawJobFormGroupValues {
     return this.automateSettingsForm.getRawValue()[jobName];
   }
 
