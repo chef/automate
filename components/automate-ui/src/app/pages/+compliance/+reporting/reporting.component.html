@@ -70,27 +70,34 @@
             </p>
           </div>
           <div class="summary-body" *ngIf="showSummary">
-            <chef-table>
-              <chef-tr>
-                <chef-th>
+            <chef-table-new>
+              <chef-table-header>
+              <chef-table-row>
+                <chef-table-header-cell>
                   Nodes
-                </chef-th>
-                <chef-td>{{ reportData.reportingSummary.stats.nodes | number }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th id="report-date-label">
+                </chef-table-header-cell>
+                <chef-table-cell>{{ reportData.reportingSummary.stats.nodes | number }}</chef-table-cell>
+              </chef-table-row>
+            </chef-table-header>
+            <chef-table-header>
+              <chef-table-row>
+                <chef-table-header-cell id="report-date-label">
                   Report Date
                   <chef-tooltip for="report-date-label">Latest information available for everything at this date.</chef-tooltip>
-                </chef-th>
-                <chef-td>{{ endDate$ | async | datetime: ChefDateTime }}</chef-td>
-              </chef-tr>
-              <chef-tr>
-                <chef-th>
+                </chef-table-header-cell>
+                <chef-table-cell>{{ endDate$ | async | datetime: ChefDateTime }}</chef-table-cell>
+              </chef-table-row>
+            </chef-table-header>
+            <chef-table-header>
+              <chef-table-row>
+                <chef-table-header-cell>
                   Status
-                </chef-th>
-                <chef-td>{{ reportData.reportingSummary.status | titlecase }}</chef-td>
-              </chef-tr>
-            </chef-table>
+                </chef-table-header-cell>
+                <chef-table-cell>{{ reportData.reportingSummary.status | titlecase }}</chef-table-cell>
+              </chef-table-row>
+            </chef-table-header>
+            </chef-table-new>
+            <!--  end new first new table -->
             <chef-table>
               <chef-tr>
                 <chef-th>
