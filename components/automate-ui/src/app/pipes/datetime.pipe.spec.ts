@@ -23,4 +23,11 @@ describe('DatetimePipe', () => {
     expect(result).toEqual('2018, April 9');
   });
 
+  it('returns a formatted string when given a Date', () => {
+    const datetime = new Date(2018, 3, 9);
+    const formatStr = 'YYYY, MMMM D';
+    const result = pipe.transform(datetime, formatStr);
+    expect(result).toEqual('2018, April 9');
+  });
+
 });

@@ -581,7 +581,7 @@ export class EventFeedGuitarStringsComponent implements OnInit, OnChanges {
     });
   }
 
-  zoomButtonWidth(_length: number) {
+  zoomButtonWidth() {
     return this.sliderGrid + '%';
   }
 

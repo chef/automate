@@ -74,7 +74,7 @@
 
             <div class="condition-item"
               [formGroupName]="i"
-              *ngFor="let condition of ruleForm.get('conditions').controls; let i = index">
+              *ngFor="let condition of conditionControls; let i = index">
 
               <chef-form-field class="attribute-field">
                 <label>
@@ -89,7 +89,7 @@
                   </span>
                 </label>
                 <chef-error
-                  *ngIf="ruleForm.get('conditions').controls[i].get('attribute').hasError('required') && ruleForm.get('conditions').controls[i].get('attribute').touched"
+                  *ngIf="conditionControls[i].get('attribute').hasError('required') && conditionControls[i].get('attribute').touched"
                 >Attribute is required.</chef-error>
               </chef-form-field>
 
@@ -105,21 +105,21 @@
                   </span>
                 </label>
                 <chef-error
-                  *ngIf="ruleForm.get('conditions').controls[i].get('operator').hasError('required') && ruleForm.get('conditions').controls[i].get('operator').touched"
+                  *ngIf="conditionControls[i].get('operator').hasError('required') && conditionControls[i].get('operator').touched"
                 >Operator is required.</chef-error>
               </chef-form-field>
 
               <chef-form-field class="attribute-field">
                 <label>
                   <span class="label">Value</span>
-                  <input chefInput formControlName="values" 
+                  <input chefInput formControlName="values"
                         [value]="condition.controls.values.value" data-cy="rule-value"
                   />
                 </label>
                 <div>
                   <chef-error
-                      *ngIf="( ruleForm.get('conditions').controls[i].get('values').hasError('required') && ruleForm.get('conditions').controls[i].get('values').touched )
-                              || ( ruleForm.get('conditions').controls[i].get('values').hasError('pattern') && ruleForm.get('conditions').controls[i].get('values').dirty )"
+                      *ngIf="( conditionControls[i].get('values').hasError('required') && conditionControls[i].get('values').touched )
+                              || ( conditionControls[i].get('values').hasError('pattern') && conditionControls[i].get('values').dirty )"
                     >Value is required.</chef-error>
                 </div>
                 <small class="help"

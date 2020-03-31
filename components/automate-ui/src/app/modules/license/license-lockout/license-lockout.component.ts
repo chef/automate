@@ -205,7 +205,7 @@ export class LicenseLockoutComponent implements AfterViewInit {
     }
   }
 
-  private openModal() {
+  public openModal() {
     this.startListening();
     this.modalVisible = true;
     this.sessionStorage.putBoolean(this.chefSessionService.userWelcomeModalSeenKey(), true);
