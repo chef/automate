@@ -44,14 +44,20 @@ describe('ReportingNodesComponent', () => {
   describe('addProfileStatus', () => {
     describe('if there are any failures', () => {
       const data = {items: [
-        { failures: 23, passed: 29, skipped: 3, name: 'linux-baseline' },
-        { failures: 1, passed: 20, skipped: 3, name: 'ssh-baseline' },
-        { failures: 3, passed: 0, skipped: 24, name: 'apache-baseline' }
+        { failures: 23, passed: 29, skipped: 3, waived: 1,
+          name: 'linux-baseline' },
+        { failures: 1, passed: 20, skipped: 3, waived: 1,
+          name: 'ssh-baseline' },
+        { failures: 3, passed: 0, skipped: 24, waived: 1,
+          name: 'apache-baseline' }
       ]};
       const expected = [
-        { failures: 23, passed: 29, skipped: 3, name: 'linux-baseline', status: 'failed' },
-        { failures: 1, passed: 20, skipped: 3, name: 'ssh-baseline', status: 'failed' },
-        { failures: 3, passed: 0, skipped: 24, name: 'apache-baseline', status: 'failed' }
+        { failures: 23, passed: 29, skipped: 3, waived: 1,
+          name: 'linux-baseline', status: 'failed' },
+        { failures: 1, passed: 20, skipped: 3, waived: 1,
+          name: 'ssh-baseline', status: 'failed' },
+        { failures: 3, passed: 0, skipped: 24, waived: 1,
+          name: 'apache-baseline', status: 'failed' }
       ];
 
       it('sets the status for the profile to failed', () => {
@@ -61,10 +67,12 @@ describe('ReportingNodesComponent', () => {
 
     describe('if all are skipped', () => {
       const data = {items: [
-        { failures: 0, passed: 0, skipped: 30, waived: 0, name: 'linux-baseline' }
+        { failures: 0, passed: 0, skipped: 30, waived: 0,
+          name: 'linux-baseline' }
       ]};
       const expected = [
-        { failures: 0, passed: 0, skipped: 30, waived: 0, name: 'linux-baseline', status: 'skipped' }
+        { failures: 0, passed: 0, skipped: 30, waived: 0,
+          name: 'linux-baseline', status: 'skipped' }
       ];
       it('sets the status for the profile to skipped', () => {
         expect(component.addProfileStatus(data)).toEqual(expected);
@@ -73,10 +81,12 @@ describe('ReportingNodesComponent', () => {
 
     describe('if all are waived', () => {
       const data = {items: [
-        { failures: 0, passed: 0, skipped: 0, waived: 1, name: 'linux-baseline' }
+        { failures: 0, passed: 0, skipped: 0, waived: 1,
+          name: 'linux-baseline' }
       ]};
       const expected = [
-        { failures: 0, passed: 0, skipped: 0, waived: 1, name: 'linux-baseline', status: 'waived' }
+        { failures: 0, passed: 0, skipped: 0, waived: 1,
+          name: 'linux-baseline', status: 'waived' }
       ];
       it('sets the status for the profile to skipped', () => {
         expect(component.addProfileStatus(data)).toEqual(expected);
@@ -85,12 +95,16 @@ describe('ReportingNodesComponent', () => {
 
     describe('if there are no failures and one or more passed', () => {
       const data = {items: [
-        { failures: 0, passed: 29, skipped: 0, name: 'linux-baseline' },
-        { failures: 0, passed: 20, skipped: 3, name: 'ssh-baseline' }
+        { failures: 0, passed: 29, skipped: 0, waived: 1,
+          name: 'linux-baseline' },
+        { failures: 0, passed: 20, skipped: 3, waived: 1,
+          name: 'ssh-baseline' }
       ]};
       const expected = [
-        { failures: 0, passed: 29, skipped: 0, name: 'linux-baseline', status: 'passed' },
-        { failures: 0, passed: 20, skipped: 3, name: 'ssh-baseline', status: 'passed' }
+        { failures: 0, passed: 29, skipped: 0, waived: 1,
+          name: 'linux-baseline', status: 'passed' },
+        { failures: 0, passed: 20, skipped: 3, waived: 1,
+          name: 'ssh-baseline', status: 'passed' }
       ];
       it('sets the status for the profile to passed', () => {
         expect(component.addProfileStatus(data)).toEqual(expected);

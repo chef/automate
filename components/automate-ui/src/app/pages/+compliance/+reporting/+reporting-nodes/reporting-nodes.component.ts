@@ -178,7 +178,7 @@ export class ReportingNodesComponent implements OnInit, OnDestroy {
           profile.status = 'waived';
       } else {
           profile.status = 'skipped';
-      }    
+      }
       return profile;
     });
   }
