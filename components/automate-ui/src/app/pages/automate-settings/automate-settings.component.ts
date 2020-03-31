@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FormGroup, FormBuilder } from '@angular/forms';
+import { FormGroup, FormBuilder, AbstractControl } from '@angular/forms';
 import { Store, select } from '@ngrx/store';
 import { NgrxStateAtom } from '../../ngrx.reducers';
 import { Subject } from 'rxjs';
@@ -237,6 +237,14 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     return allowedKeys.includes(key);
   }
 
+  private setEnabled(control: AbstractControl, enabled: boolean): void {
+    if (enabled) {
+      control.enable();
+    } else {
+      control.disable();
+    }
+  }
+
   public handleFormActivation(form: FormGroup, checked: boolean): void {
     // patchValue does not mark the form dirty, so we need to do it manually;
     form.get('disabled').markAsDirty();
@@ -246,15 +254,9 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       disabled: !checked
     });
 
-    // this loops through the rest of the form to disable the relevant controls;
-    const pertinentGroups = [ 'unit', 'threshold' ];
-    pertinentGroups.forEach(control => {
-      if ( checked ) {
-        form.get(control).enable();
-      } else {
-        form.get(control).disable();
-      }
-    });
+    // this disables the relevant controls;
+    this.setEnabled(form.controls.unit, checked);
+    this.setEnabled(form.controls.threshold, checked);
   }
 
   // Apply the changes that the user updated in the forms
@@ -496,16 +498,10 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   }
 
   private handleDisable(form: FormGroup, disabled: boolean = false): void {
-    // this loops through the rest of the form to disable/enable relevant controls
-    const pertinentGroups = ['unit', 'threshold'];
-    pertinentGroups.forEach(control => {
-      if ( disabled ) {
-        form.get(control).disable();
-      } else {
-        form.get(control).enable();
-      }
-    });
-    return;
+    // this disables the relevant controls
+    // We have to pass in !disabled because the function is initially build for enabling
+    this.setEnabled(form.controls.unit, !disabled);
+    this.setEnabled(form.controls.threshold, !disabled);
   }
 
 }
