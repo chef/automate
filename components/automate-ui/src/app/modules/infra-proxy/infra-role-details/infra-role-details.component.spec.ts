@@ -63,8 +63,12 @@ describe('InfraRoleDetailsComponent', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('should be created', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('defaults to showing run_list section', () => {
+    expect(component.tabValue).toBe('runList');
   });
 
 });
