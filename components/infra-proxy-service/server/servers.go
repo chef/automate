@@ -35,6 +35,11 @@ func (s *Server) CreateServer(ctx context.Context, req *request.CreateServer) (*
 		return nil, status.Error(codes.InvalidArgument, "must supply server fqdn")
 	}
 
+	if req.IpAddress == "" {
+		s.service.Logger.Debug("incomplete create server request: missing server ip address")
+		return nil, status.Error(codes.InvalidArgument, "must supply server ip address")
+	}
+
 	server, err := s.service.Storage.StoreServer(ctx, req.Name, req.Description, req.Fqdn, req.IpAddress)
 	if err == storage.ErrConflict {
 		return nil, service.ParseStorageError(err, req.Name, "server")
