@@ -33,7 +33,7 @@ func NewGRPCServer(s *service.Service) *grpc.Server {
 	)
 	health.RegisterHealthServer(g, health.NewService())
 	grpc_v1.RegisterTeamsV1Server(g, v1.NewServer(s))
-	grpc_v2.RegisterTeamsV2Server(g, v2.NewServer(s))
+	grpc_v2.RegisterTeamsServer(g, v2.NewServer(s))
 	reflection.Register(g)
 	return g
 }
