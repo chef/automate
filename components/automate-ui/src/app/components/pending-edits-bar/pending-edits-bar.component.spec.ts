@@ -9,7 +9,6 @@ import { NgrxStateAtom, runtimeChecks, ngrxReducers } from 'app/ngrx.reducers';
 import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { using } from 'app/testing/spec-helpers';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
-import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
 import { Project } from 'app/entities/projects/project.model';
 import { ProjectStatus } from 'app/entities/rules/rule.model';
 import { ProjectService } from 'app/entities/projects/project.service';
@@ -91,8 +90,6 @@ describe('PendingEditsBarComponent', () => {
     component = fixture.componentInstance;
     element = fixture.debugElement.query(By.css('#pending-edits-bar')).nativeElement;
     store = TestBed.inject(Store);
-
-    store.dispatch(new GetIamVersionSuccess({ version: { major: 'v2' } }));
     fixture.detectChanges();
   });
 

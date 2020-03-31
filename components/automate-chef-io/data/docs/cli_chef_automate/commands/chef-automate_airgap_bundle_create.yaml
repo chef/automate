@@ -20,6 +20,8 @@ options:
   default_value: "-1"
   usage: |
     Number of seconds to wait between retries (exponential backoff is used if not provided)
+- name: version
+  usage: Chef Automate version to create an airgap bundle for
 - name: workspace
   shorthand: w
   usage: |

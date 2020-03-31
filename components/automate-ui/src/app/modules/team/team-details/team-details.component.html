@@ -3,40 +3,32 @@
     <main>
       <chef-breadcrumbs>
         <chef-breadcrumb [link]="['/settings/teams']">Teams</chef-breadcrumb>
-        <span *ngIf="!(isIAMv2$ | async)">{{ team?.id }}</span>
-        <span *ngIf="isIAMv2$ | async">{{ team?.name }}</span>
+        <span>{{ team?.name }}</span>
       </chef-breadcrumbs>
 
       <chef-page-header>
-        <chef-heading *ngIf="!(isIAMv2$ | async)">{{ team?.id }}</chef-heading>
-        <chef-heading *ngIf="isIAMv2$ | async">{{ team?.name }}</chef-heading>
+        <chef-heading>{{ team?.name }}</chef-heading>
         <table>
           <thead>
             <tr class="detail-row">
-              <th *ngIf="!(isIAMv2$ | async)" class="id-column">Description</th>
-              <ng-container *ngIf="isIAMv2$ | async">
-                <th class="id-column">ID</th>
-                <th class="projects-column">Projects</th>
-              </ng-container>
+              <th class="id-column">ID</th>
+              <th class="projects-column">Projects</th>
             </tr>
           </thead>
           <tbody>
             <tr class="detail-row">
-              <td *ngIf="!(isIAMv2$ | async)" class="id-column">{{ team?.name }}</td>
-              <ng-container *ngIf="isIAMv2$ | async">
-                <td class="id-column">{{ team?.id }}</td>
-                <td class="projects-column" data-cy="team-details-projects">
-                  <ng-container *ngIf="team?.projects.length === 0">
-                    {{ unassigned }}
-                  </ng-container>
-                  <ng-container *ngIf="team?.projects.length === 1">
-                    {{ team?.projects[0] }}
-                  </ng-container>
-                  <ng-container *ngIf="team?.projects.length > 1">
-                    {{ team?.projects.length }} projects
-                  </ng-container>
-                </td>
-              </ng-container>
+              <td class="id-column">{{ team?.id }}</td>
+              <td class="projects-column" data-cy="team-details-projects">
+                <ng-container *ngIf="team?.projects.length === 0">
+                  {{ unassigned }}
+                </ng-container>
+                <ng-container *ngIf="team?.projects.length === 1">
+                  {{ team?.projects[0] }}
+                </ng-container>
+                <ng-container *ngIf="team?.projects.length > 1">
+                  {{ team?.projects.length }} projects
+                </ng-container>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -50,9 +42,9 @@
         <div id="users-list">
           <div>
             <!-- TODO remove [overridePermissionsCheck]=true once the UI is able to check specific objects
-            since the path to permission on here is /auth/teams/:id/users we'll have to show everything for now. -->
+            since the path to permission on here is /iam/v2/teams/:id/users we'll have to show everything for now. -->
             <app-user-table [addButtonText]="addButtonText" [removeText]="removeText" [users]="users"
-              [baseUrl]="'/auth/users/' + team?.id" [overridePermissionsCheck]=true [showTable]="showUsersTable()"
+              [baseUrl]="'/iam/v2/users/' + team?.id" [overridePermissionsCheck]=true [showTable]="showUsersTable()"
               [showEmptyMessage]="showEmptyStateMessage()" (addClicked)="toggleUserMembershipView()"
               (removeClicked)="removeUser($event)">
             </app-user-table>
@@ -62,15 +54,15 @@
       <section class="page-body" *ngIf="tabValue === 'details'">
         <form [formGroup]="updateNameForm">
           <chef-form-field>
-            <label>{{ descriptionOrName | titlecase }} <span aria-hidden="true">*</span></label>
+            <label>Name <span aria-hidden="true">*</span></label>
             <input chefInput formControlName="name" type="text" [resetOrigin]="saveSuccessful" autocomplete="off"
               data-cy="team-details-name-input">
             <chef-error
               *ngIf="(updateNameForm.get('name').hasError('required') || updateNameForm.get('name').hasError('pattern')) && updateNameForm.get('name').dirty">
-              {{ descriptionOrName | titlecase }} is required.
+              Name is required.
             </chef-error>
           </chef-form-field>
-          <div id='projects-container' *ngIf="isIAMv2$ | async">
+          <div id='projects-container'>
             <app-projects-dropdown [projects]="projects" (onProjectChecked)="onProjectChecked($event)"
               [disabled]="dropdownDisabled()">
             </app-projects-dropdown>

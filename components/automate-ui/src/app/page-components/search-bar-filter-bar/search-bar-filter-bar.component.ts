@@ -23,4 +23,9 @@ export class SearchBarFilterBarComponent {
   onRemoveFilterClick(filter: any): void {
     this.filterRemoved.emit({ detail: filter});
   }
+
+  trackBy(_index: number, filter: Chicklet): string {
+    return filter.text;
+  }
+
 }

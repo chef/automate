@@ -61,9 +61,6 @@ do_deploy() {
             --accept-terms-and-mlsa
 
     docker exec -t "$_frontend1_container_name" \
-        "$cli_bin" iam upgrade-to-v2
-
-    docker exec -t "$_frontend1_container_name" \
         "$cli_bin" bootstrap bundle create -o bootstrap.abb
 
     docker exec -t "$_frontend2_container_name" \
@@ -103,24 +100,25 @@ do_test_deploy() {
     # * https://github.com/lib/pq/issues/870
     # * https://github.com/lib/pq/pull/871
     # * https://github.com/lib/pq/issues/939
-    docker exec -t "$_frontend1_container_name" "$cli_bin" iam token create --admin "$(date +%s)" || true
-    docker exec -t "$_frontend1_container_name" "$cli_bin" iam token create --admin "$(date +%s)" || true
-    docker exec -t "$_frontend2_container_name" "$cli_bin" iam token create --admin "$(date +%s)" || true
-    docker exec -t "$_frontend2_container_name" "$cli_bin" iam token create --admin "$(date +%s)" || true
+    docker exec -t "$_frontend1_container_name" "$cli_bin" iam token create --admin "$(date +%s)-1a" || true
+    docker exec -t "$_frontend1_container_name" "$cli_bin" iam token create --admin "$(date +%s)-1b" || true
+    docker exec -t "$_frontend2_container_name" "$cli_bin" iam token create --admin "$(date +%s)-2a" || true
+    docker exec -t "$_frontend2_container_name" "$cli_bin" iam token create --admin "$(date +%s)-2b" || true
 
     local admin_token
     admin_token=$(docker exec -t "$_frontend1_container_name" \
         "$cli_bin" iam token create --admin "diagnostics-test-$RANDOM")
 
     docker exec -t "$_frontend1_container_name" \
-        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~applications"
+        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam" "~applications"
 
     docker exec -t "$_frontend2_container_name" \
-        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~applications"
+        "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam" "~applications"
 
-    run_inspec_tests "${A2_ROOT_DIR}" "a2-iam-v2-integration"
+    declare -a inspec_tests=(a2-api-integration a2-iam-no-legacy-integration);
+    run_inspec_tests "${A2_ROOT_DIR}" "${inspec_tests[@]}"
 
-    "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam-v1" "~purge" "~cli" "~grpc" "~deployment" "~applications"
+    "$cli_bin" diagnostics run --admin-token "$admin_token" "~iam" "~purge" "~cli" "~grpc" "~deployment" "~applications"
 
 }
 

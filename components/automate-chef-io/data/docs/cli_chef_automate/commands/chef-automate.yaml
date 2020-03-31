@@ -17,7 +17,6 @@ options:
 - name: result-json
   usage: Write command result as JSON to PATH
 see_also:
-- admin-token - generate an admin token for use against the Automate API
 - 'airgap - '
 - applications - Manage applications observability features
 - backup - Chef Automate backup

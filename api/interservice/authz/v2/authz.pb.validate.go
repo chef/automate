@@ -33,6 +33,175 @@ var (
 	_ = ptypes.DynamicAny{}
 )
 
+// Validate checks the field values on IsAuthorizedReq with the rules defined
+// in the proto definition for this message. If any rules are violated, an
+// error is returned.
+func (m *IsAuthorizedReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	if len(m.GetSubjects()) < 1 {
+		return IsAuthorizedReqValidationError{
+			field:  "Subjects",
+			reason: "value must contain at least 1 item(s)",
+		}
+	}
+
+	for idx, item := range m.GetSubjects() {
+		_, _ = idx, item
+
+		if !_IsAuthorizedReq_Subjects_Pattern.MatchString(item) {
+			return IsAuthorizedReqValidationError{
+				field:  fmt.Sprintf("Subjects[%v]", idx),
+				reason: "value does not match regex pattern \"^(?:team|user):(?:local|ldap|saml):[^:*]+$|^token:[^:*]+$|^tls:service:[^:*]+:[^:*]+$\"",
+			}
+		}
+
+	}
+
+	if !_IsAuthorizedReq_Resource_Pattern.MatchString(m.GetResource()) {
+		return IsAuthorizedReqValidationError{
+			field:  "Resource",
+			reason: "value does not match regex pattern \"^[a-z][^:*]*(?::[^:*]+)*$\"",
+		}
+	}
+
+	if !_IsAuthorizedReq_Action_Pattern.MatchString(m.GetAction()) {
+		return IsAuthorizedReqValidationError{
+			field:  "Action",
+			reason: "value does not match regex pattern \"^[a-z][^:*]*(?::[^:*]+)*$\"",
+		}
+	}
+
+	return nil
+}
+
+// IsAuthorizedReqValidationError is the validation error returned by
+// IsAuthorizedReq.Validate if the designated constraints aren't met.
+type IsAuthorizedReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e IsAuthorizedReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e IsAuthorizedReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e IsAuthorizedReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e IsAuthorizedReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e IsAuthorizedReqValidationError) ErrorName() string { return "IsAuthorizedReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e IsAuthorizedReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sIsAuthorizedReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = IsAuthorizedReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = IsAuthorizedReqValidationError{}
+
+var _IsAuthorizedReq_Subjects_Pattern = regexp.MustCompile("^(?:team|user):(?:local|ldap|saml):[^:*]+$|^token:[^:*]+$|^tls:service:[^:*]+:[^:*]+$")
+
+var _IsAuthorizedReq_Resource_Pattern = regexp.MustCompile("^[a-z][^:*]*(?::[^:*]+)*$")
+
+var _IsAuthorizedReq_Action_Pattern = regexp.MustCompile("^[a-z][^:*]*(?::[^:*]+)*$")
+
+// Validate checks the field values on GetVersionReq with the rules defined in
+// the proto definition for this message. If any rules are violated, an error
+// is returned.
+func (m *GetVersionReq) Validate() error {
+	if m == nil {
+		return nil
+	}
+
+	return nil
+}
+
+// GetVersionReqValidationError is the validation error returned by
+// GetVersionReq.Validate if the designated constraints aren't met.
+type GetVersionReqValidationError struct {
+	field  string
+	reason string
+	cause  error
+	key    bool
+}
+
+// Field function returns field value.
+func (e GetVersionReqValidationError) Field() string { return e.field }
+
+// Reason function returns reason value.
+func (e GetVersionReqValidationError) Reason() string { return e.reason }
+
+// Cause function returns cause value.
+func (e GetVersionReqValidationError) Cause() error { return e.cause }
+
+// Key function returns key value.
+func (e GetVersionReqValidationError) Key() bool { return e.key }
+
+// ErrorName returns error name.
+func (e GetVersionReqValidationError) ErrorName() string { return "GetVersionReqValidationError" }
+
+// Error satisfies the builtin error interface
+func (e GetVersionReqValidationError) Error() string {
+	cause := ""
+	if e.cause != nil {
+		cause = fmt.Sprintf(" | caused by: %v", e.cause)
+	}
+
+	key := ""
+	if e.key {
+		key = "key for "
+	}
+
+	return fmt.Sprintf(
+		"invalid %sGetVersionReq.%s: %s%s",
+		key,
+		e.field,
+		e.reason,
+		cause)
+}
+
+var _ error = GetVersionReqValidationError{}
+
+var _ interface {
+	Field() string
+	Reason() string
+	Key() bool
+	Cause() error
+	ErrorName() string
+} = GetVersionReqValidationError{}
+
 // Validate checks the field values on ProjectsAuthorizedReq with the rules
 // defined in the proto definition for this message. If any rules are
 // violated, an error is returned.

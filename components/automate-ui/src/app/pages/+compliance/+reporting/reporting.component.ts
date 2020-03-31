@@ -20,7 +20,8 @@ import {
   SuggestionsService,
   ReportDataService,
   ReportQueryService,
-  ReportQuery
+  ReportQuery,
+  ReportingSummaryStatus
 } from '../shared/reporting';
 import { LayoutFacadeService, Sidebar } from 'app/entities/layout/layout.facade';
 import { saveAs } from 'file-saver';
@@ -411,7 +412,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     this.showSummary = !this.showSummary;
   }
 
-  getIcon(status) {
+  getIcon(status: ReportingSummaryStatus): string {
     switch (status) {
       case 'failed': return 'report_problem';
       case 'passed': return 'check_circle';
@@ -421,7 +422,7 @@ export class ReportingComponent implements OnInit, OnDestroy {
     }
   }
 
-  formatSummaryPhrase(status) {
+  formatSummaryPhrase(status: ReportingSummaryStatus): string {
     switch (status) {
       case 'failed': return 'Not Compliant';
       case 'passed': return 'Compliant';

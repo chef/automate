@@ -3,6 +3,7 @@ log-format = "{{cfg.log.format}}"
 log-level = "{{cfg.log.level}}"
 database = "{{cfg.storage.database}}"
 migrations-path = "{{pkg.path}}/migrations"
+authz-address = "{{cfg.authz.host}}:{{cfg.authz.port}}"
 secrets-address = "{{cfg.secrets.host}}:{{cfg.secrets.port}}"
 
 [tls]

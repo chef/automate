@@ -252,7 +252,7 @@ func findAllProtoFiles(t *testing.T, base string, dirs ...string) []string {
 }
 
 // ParseProtoFiles takes a slice of string filenames, like
-//   "api/interservice/authz/authz.proto"
+//   "api/interservice/authz/v2/authz.proto"
 // attempts to parse them, and returns a slice of *desc.FileDescriptor on
 // success.
 func ParseProtoFiles(files []string) ([]*desc.FileDescriptor, error) {

@@ -6,31 +6,21 @@
           <chef-subheading>Chef Automate only displays local teams.</chef-subheading>
         </chef-page-header>
 
-      <app-create-v1-team-modal
-        [visible]="createV1TeamModalVisible"
-        [creating]="creatingTeam"
-        [conflictErrorEvent]="conflictErrorEvent"
-        [createForm]="createV1TeamForm"
-        (close)="closeCreateModal()"
-        (createClicked)="createV1Team()">
-      </app-create-v1-team-modal>
-
       <app-create-object-modal
         [visible]="createModalVisible"
         [creating]="creatingTeam"
         [conflictErrorEvent]="conflictErrorEvent"
         objectNoun="team"
         [createForm]="createTeamForm"
-        [showProjectsDropdown]="isIAMv2"
         [assignableProjects]="dropdownProjects"
         (close)="closeCreateModal()"
-        (createClicked)="createV2Team()">
+        (createClicked)="createTeam()">
       </app-create-object-modal>
 
       <app-delete-object-modal
         [visible]="deleteModalVisible"
         objectNoun="team"
-        [objectName]="isIAMv2 ? teamToDelete?.name : teamToDelete?.id"
+        [objectName]="teamToDelete?.name"
         (close)="closeDeleteModal()"
         (deleteClicked)="deleteTeam()"
         objectAction="Delete">
@@ -40,7 +30,7 @@
         <ng-container *ngIf="(sortedTeams$ | async)?.length > 0">
           <section>
             <chef-toolbar>
-              <app-authorized [allOf]="['/auth/teams', 'post']">
+              <app-authorized [allOf]="['/iam/v2/teams', 'post']">
                 <chef-button primary (click)="openCreateModal()" data-cy="team-create-button">Create Team</chef-button>
               </app-authorized>
             </chef-toolbar>
@@ -48,37 +38,24 @@
               <chef-table-new>
                 <chef-table-header>
                   <chef-table-row>
-                    <chef-table-header-cell class="id-column">
-                      <span>Name</span>
-                    </chef-table-header-cell>
-                    <chef-table-header-cell class="name-column">
-                      <span *ngIf="isIAMv2">ID</span>
-                      <span *ngIf="!isIAMv2">Description</span>
-                    </chef-table-header-cell>
-                    <chef-table-header-cell *ngIf="isIAMv2" class="projects-column">
-                      <span>Projects</span>
-                    </chef-table-header-cell>
+                    <chef-table-header-cell class="id-column">Name</chef-table-header-cell>
+                    <chef-table-header-cell class="name-column">ID</chef-table-header-cell>
+                    <chef-table-header-cell class="projects-column">Projects</chef-table-header-cell>
                     <chef-table-header-cell class="three-dot-column"></chef-table-header-cell>
                   </chef-table-row>
                 </chef-table-header>
                 <chef-table-body>
                   <chef-table-row *ngFor="let team of sortedTeams$ | async">
                     <chef-table-cell class="id-column">
-                      <!-- we must continue to use the guid as the identifier for teams while on v1 -->
-                      <a *ngIf="!isIAMv2" [routerLink]="['/settings/teams', team.guid]">{{ team.id }}</a>
-                      <a *ngIf="isIAMv2" [routerLink]="['/settings/teams', team.id]">{{ team.name }}</a>
+                      <a [routerLink]="['/settings/teams', team.id]">{{ team.name }}</a>
                     </chef-table-cell>
-                    <chef-table-cell class="name-column">
-                      <span *ngIf="!isIAMv2">{{ team.name }}</span>
-                      <span *ngIf="isIAMv2">{{ team.id }}</span>
-                    </chef-table-cell>
-                    <chef-table-cell *ngIf="isIAMv2" class="projects-column">
-                      <span *ngIf="team.projects.length === 0">{{ unassigned }}</span>
-                      <span *ngIf="team.projects.length === 1">{{ team.projects[0] }}</span>
-                      <span *ngIf="team.projects.length > 1">{{ team.projects.length }} projects</span>
+                    <chef-table-cell class="name-column">{{ team.id }}</chef-table-cell>
+                    <chef-table-cell class="projects-column">
+                      <ng-container *ngIf="team.projects.length === 0">{{ unassigned }}</ng-container>
+                      <ng-container *ngIf="team.projects.length === 1">{{ team.projects[0] }}</ng-container>
+                      <ng-container *ngIf="team.projects.length > 1">{{ team.projects.length }} projects</ng-container>
                     </chef-table-cell>
                     <chef-table-cell class="three-dot-column">
-                      <!-- TODO: Need to account for v1 / v2 in the app-authorized path -->
                       <!-- <app-authorized [allOf]="['/iam/v2/teams/{id}', 'delete', team.id]"> -->
                       <mat-select panelClass="chef-control-menu">
                         <mat-option (onSelectionChange)="startTeamDelete($event, team)">Delete Team</mat-option>
@@ -92,7 +69,7 @@
           </section>
         </ng-container>
         <ng-container *ngIf="(sortedTeams$ | async)?.length === 0">
-            <app-authorized [allOf]="['/auth/teams', 'post']">
+            <app-authorized [allOf]="['/iam/v2/teams', 'post']">
               <div class="empty-case-container">
                 <p>Create the first team to get started!</p>
               </div>
@@ -100,7 +77,7 @@
                   <chef-button primary (click)="openCreateModal()">Create Team</chef-button>
               </div>
             </app-authorized>
-            <app-authorized not [allOf]="['/auth/teams', 'post']">
+            <app-authorized not [allOf]="['/iam/v2/teams', 'post']">
               <div class="empty-case-container">
                 <p>It looks like no one has created any teams yet and you<br/>
                   don't have permission to create them.<br/><br/>

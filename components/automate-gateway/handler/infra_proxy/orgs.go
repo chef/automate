@@ -53,13 +53,14 @@ func (a *InfraProxyServer) GetOrgByName(ctx context.Context, r *gwreq.GetOrgByNa
 	}, nil
 }
 
-// CreateOrg posts a org upstream
+// CreateOrg posts an org upstream
 func (a *InfraProxyServer) CreateOrg(ctx context.Context, r *gwreq.CreateOrg) (*gwres.CreateOrg, error) {
 	req := &infra_req.CreateOrg{
 		Name:      r.Name,
 		AdminUser: r.AdminUser,
 		AdminKey:  r.AdminKey,
 		ServerId:  r.ServerId,
+		Projects:  r.Projects,
 	}
 	res, err := a.client.CreateOrg(ctx, req)
 	if err != nil {
@@ -70,7 +71,7 @@ func (a *InfraProxyServer) CreateOrg(ctx context.Context, r *gwreq.CreateOrg) (*
 	}, nil
 }
 
-// UpdateOrg updates a org upstream
+// UpdateOrg updates an org upstream
 func (a *InfraProxyServer) UpdateOrg(ctx context.Context, r *gwreq.UpdateOrg) (*gwres.UpdateOrg, error) {
 	req := &infra_req.UpdateOrg{
 		Id:        r.Id,
@@ -78,6 +79,7 @@ func (a *InfraProxyServer) UpdateOrg(ctx context.Context, r *gwreq.UpdateOrg) (*
 		AdminUser: r.AdminUser,
 		AdminKey:  r.AdminKey,
 		ServerId:  r.ServerId,
+		Projects:  r.Projects,
 	}
 	res, err := a.client.UpdateOrg(ctx, req)
 	if err != nil {
@@ -88,7 +90,7 @@ func (a *InfraProxyServer) UpdateOrg(ctx context.Context, r *gwreq.UpdateOrg) (*
 	}, nil
 }
 
-// DeleteOrg deletes a org upstream
+// DeleteOrg deletes an org upstream
 func (a *InfraProxyServer) DeleteOrg(ctx context.Context, r *gwreq.DeleteOrg) (*gwres.DeleteOrg, error) {
 	req := &infra_req.DeleteOrg{
 		Id: r.Id,
@@ -109,6 +111,7 @@ func fromUpstreamOrg(t *infra_res.Org) *gwres.Org {
 		AdminUser: t.GetAdminUser(),
 		AdminKey:  t.GetAdminKey(),
 		ServerId:  t.GetServerId(),
+		Projects:  t.GetProjects(),
 	}
 }
 

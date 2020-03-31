@@ -225,10 +225,3 @@ message DeleteProjectReq {
     // ID of the project.
     string id = 1;
 }
-
-message UpgradeToV2Req {
-  Flag flag = 1;
-  bool skip_v1_policies = 2;
-}
-
-message ResetToV1Req {}

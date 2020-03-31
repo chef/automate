@@ -8,16 +8,9 @@ import (
 	grpc_status "google.golang.org/grpc/status"
 
 	authz_constants "github.com/chef/automate/components/authz-service/constants"
-	authz_constants_v1 "github.com/chef/automate/components/authz-service/constants/v1"
-	authz_constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 	"github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
-	teams "github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	teams_req "github.com/chef/automate/components/automate-gateway/api/auth/teams/request"
-	users_req "github.com/chef/automate/components/automate-gateway/api/auth/users/request"
-	"github.com/chef/automate/components/automate-gateway/api/authz"
-	authz_req "github.com/chef/automate/components/automate-gateway/api/authz/request"
-	authz_v2_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
+	iam_req "github.com/chef/automate/components/automate-gateway/api/iam/v2/request"
 	"github.com/chef/automate/lib/stringutils"
 )
 
@@ -35,11 +28,11 @@ func CreateAdminUserOrUpdatePassword(ctx context.Context,
 func CreateUserOrUpdatePassword(ctx context.Context,
 	apiClient client.APIClient, username, displayName, newPassword string, dryRun bool) (string, bool, error) {
 
-	var userID string
+	var membershipID string
 	var found bool
 
-	getUserResp, err := apiClient.UsersClient().GetUserByUsername(ctx, &users_req.Username{
-		Username: username,
+	getUserResp, err := apiClient.UsersClient().GetUser(ctx, &iam_req.GetUserReq{
+		Id: username,
 	})
 
 	s := grpc_status.Convert(err)
@@ -48,26 +41,25 @@ func CreateUserOrUpdatePassword(ctx context.Context,
 		found = false
 
 		if !dryRun {
-			createUserResp, err := apiClient.UsersClient().CreateUser(ctx, &users_req.CreateUser{
+			createUserResp, err := apiClient.UsersClient().CreateUser(ctx, &iam_req.CreateUserReq{
 				Name:     displayName,
-				Username: username,
+				Id:       username,
 				Password: newPassword,
 			})
 			if err != nil {
 				return "", false, wrapUnexpectedError(err, "Failed to create the user")
 			}
-			userID = createUserResp.Id
+			membershipID = createUserResp.User.MembershipId
 		}
 
 	case codes.OK: // user found, update password
-		userID = getUserResp.Id
+		membershipID = getUserResp.User.MembershipId
 		found = true
 
 		if !dryRun {
-			_, err = apiClient.UsersClient().UpdateUser(ctx, &users_req.UpdateUser{
-				Id:       userID,
+			_, err = apiClient.UsersClient().UpdateUser(ctx, &iam_req.UpdateUserReq{
+				Id:       username,
 				Name:     displayName,
-				Username: username,
 				Password: newPassword,
 			})
 			if err != nil {
@@ -80,40 +72,39 @@ func CreateUserOrUpdatePassword(ctx context.Context,
 		return "", false, wrapUnexpectedError(err, "Failed to check if user exists")
 	}
 
-	return userID, found, nil
+	return membershipID, found, nil
 }
 
 // CreateAdminTeamIfMissing creates the admins team if it is missing.
-// It returns the team ID in either case and a boolean for if it was
-// found or created.
+// It returns a boolean for if it was found or created.
 func CreateAdminTeamIfMissing(ctx context.Context,
-	apiClient client.APIClient, dryRun bool) (string, bool, error) {
+	apiClient client.APIClient, dryRun bool) (bool, error) {
 	return EnsureTeam(ctx, "admins", "admins", apiClient, dryRun)
 }
 
 func AddAdminUserToTeam(ctx context.Context,
-	apiClient client.APIClient, adminTeamID, adminUserID string, dryRun bool) (bool, error) {
-	return AddUserToTeam(ctx, apiClient, adminTeamID, adminUserID, dryRun)
+	apiClient client.APIClient, adminTeamID, adminMembershipID string, dryRun bool) (bool, error) {
+	return AddUserToTeam(ctx, apiClient, adminTeamID, adminMembershipID, dryRun)
 }
 
 // AddUserToTeam adds the user to a team by its ID, unless they are already in
 // the team. It returns a boolean representing whether or not the user needed to
 // be added.
 func AddUserToTeam(ctx context.Context,
-	apiClient client.APIClient, teamID, userID string, dryRun bool) (bool, error) {
+	apiClient client.APIClient, teamID, membershipID string, dryRun bool) (bool, error) {
 
-	getUsersResp, err := apiClient.TeamsClient().GetUsers(ctx, &teams_req.GetUsersReq{
+	getUsersResp, err := apiClient.TeamsClient().GetTeamMembership(ctx, &iam_req.GetTeamMembershipReq{
 		Id: teamID,
 	})
 	if err != nil {
 		return false, wrapUnexpectedError(err, "Failed to check team membership")
 	}
 
-	addUser := !stringutils.SliceContains(getUsersResp.UserIds, userID)
+	addUser := !stringutils.SliceContains(getUsersResp.UserIds, membershipID)
 	if addUser && !dryRun {
-		_, err := apiClient.TeamsClient().AddUsers(ctx, &teams_req.AddUsersReq{
+		_, err := apiClient.TeamsClient().AddTeamMembers(ctx, &iam_req.AddTeamMembersReq{
 			Id:      teamID,
-			UserIds: []string{userID},
+			UserIds: []string{membershipID},
 		})
 		if err != nil {
 			return false, wrapUnexpectedError(err, "Failed to add user to team")
@@ -123,55 +114,12 @@ func AddUserToTeam(ctx context.Context,
 	return addUser, nil
 }
 
-// UpdateV1AdminsPolicyIfNeeded either creates a new admins policy if one doesn't
-// exist anymore or creates a new admin policy with the admins team as a subject
-//  if the admins team is not already a subject.
-// It returns two booleans: one representing if the original policy was found
-// and the other representing if a new policy was created.
-func UpdateV1AdminsPolicyIfNeeded(ctx context.Context,
-	apiClient client.APIClient, dryRun bool) (bool, bool, error) {
-
-	var foundOriginalTeamsPolicy,
-		foundTeamInOriginalPolicy,
-		createdNewPolicy bool
-
-	policySubjects, foundOriginalTeamsPolicy, err := getOriginalTeamsPolicySubjects(ctx, apiClient.AuthzClient())
-	if err != nil {
-		return false, false, err
-	}
-
-	if foundOriginalTeamsPolicy {
-		for _, subject := range policySubjects {
-			if subject == authz_constants.LocalAdminsTeamSubject {
-				foundTeamInOriginalPolicy = true
-				break
-			}
-		}
-	}
-
-	if !foundOriginalTeamsPolicy || !foundTeamInOriginalPolicy {
-		createdNewPolicy = true
-		if !dryRun {
-			_, err := apiClient.AuthzClient().CreatePolicy(ctx, &authz_req.CreatePolicyReq{
-				Action:   "*",
-				Resource: "*",
-				Subjects: []string{authz_constants.LocalAdminsTeamSubject},
-			})
-			if err != nil {
-				return false, false, wrapUnexpectedError(err, "Failed to create new admins policy")
-			}
-		}
-	}
-
-	return foundOriginalTeamsPolicy, createdNewPolicy, nil
-}
-
-// UpdateV2AdminsPolicyIfNeeded fetches the chef-managed Admin policy's members
+// UpdateAdminsPolicyIfNeeded fetches the chef-managed Admin policy's members
 // and adds the admins team if it's missing from that list
-func UpdateV2AdminsPolicyIfNeeded(ctx context.Context,
+func UpdateAdminsPolicyIfNeeded(ctx context.Context,
 	apiClient client.APIClient, dryRun bool) (bool, error) {
-	resp, err := apiClient.PoliciesClient().ListPolicyMembers(ctx, &authz_v2_req.ListPolicyMembersReq{
-		Id: authz_constants_v2.AdminPolicyID,
+	resp, err := apiClient.PoliciesClient().ListPolicyMembers(ctx, &iam_req.ListPolicyMembersReq{
+		Id: authz_constants.AdminPolicyID,
 	})
 	if err != nil {
 		return false, wrapUnexpectedError(err, "Failed to verify members of chef-managed Admin policy")
@@ -179,8 +127,8 @@ func UpdateV2AdminsPolicyIfNeeded(ctx context.Context,
 	found := stringutils.SliceContains(resp.Members, authz_constants.LocalAdminsTeamSubject)
 
 	if !dryRun && !found {
-		_, err = apiClient.PoliciesClient().AddPolicyMembers(ctx, &authz_v2_req.AddPolicyMembersReq{
-			Id:      authz_constants_v2.AdminPolicyID,
+		_, err = apiClient.PoliciesClient().AddPolicyMembers(ctx, &iam_req.AddPolicyMembersReq{
+			Id:      authz_constants.AdminPolicyID,
 			Members: []string{authz_constants.LocalAdminsTeamSubject},
 		})
 		if err != nil {
@@ -192,68 +140,39 @@ func UpdateV2AdminsPolicyIfNeeded(ctx context.Context,
 	return found, nil
 }
 
-// EnsureTeam creates the desired team if it is missing, and returns the team's
-// ID, together with a boolean indicating if the team was created by this call
+// EnsureTeam creates the desired team if it is missing,
+// together with a boolean indicating if the team was created by this call
 func EnsureTeam(ctx context.Context,
-	id, description string,
+	id, name string,
 	apiClient client.APIClient,
-	dryRun bool) (string, bool, error) {
+	dryRun bool) (bool, error) {
 
-	teamID, found, err := getTeamIDByName(ctx, apiClient.TeamsClient(), id)
+	found := true
+	_, err := apiClient.TeamsClient().GetTeam(ctx, &iam_req.GetTeamReq{
+		Id: id,
+	})
 	if err != nil {
-		return "", false, wrapUnexpectedError(err, "Failed to retrieve team %q", id)
+		if grpc_status.Convert(err).Code() == codes.NotFound {
+			found = false
+		} else {
+			return false, wrapUnexpectedError(err, "Failed to retrieve team %q", id)
+		}
 	}
 
 	if !found && !dryRun {
-		createTeamsResp, err := apiClient.TeamsClient().CreateTeam(ctx, &teams_req.CreateTeamReq{
-			Name:        id,
-			Description: description,
+		_, err := apiClient.TeamsClient().CreateTeam(ctx, &iam_req.CreateTeamReq{
+			Id:       id,
+			Name:     name,
+			Projects: []string{},
 		})
 		if err != nil {
-			return "", false, wrapUnexpectedError(err, "Failed to create team %q", id)
+			return false, wrapUnexpectedError(err, "Failed to create team %q", id)
 		}
-
-		teamID = createTeamsResp.Team.Id
 	}
 
-	return teamID, found, nil
+	return found, nil
 }
 
 func wrapUnexpectedError(err error, wrap string, args ...interface{}) error {
 	return status.Wrapf(err, status.APIError, wrap, args...)
-}
-
-func getTeamIDByName(ctx context.Context, tc teams.TeamsClient, name string) (string, bool, error) {
-	var id string
-	var found bool
-
-	getTeamsResp, err := tc.GetTeams(ctx, &teams_req.GetTeamsReq{})
-	if err != nil {
-		return "", false, wrapUnexpectedError(err, "Failed to retrieve admins team")
-	}
-
-	for _, team := range getTeamsResp.Teams {
-		if team.Name == name {
-			id = team.Id
-			found = true
-			break
-		}
-	}
-
-	return id, found, nil
-}
-
-func getOriginalTeamsPolicySubjects(ctx context.Context,
-	ac authz.AuthorizationClient) ([]string, bool, error) {
-	authzListResp, err := ac.ListPolicies(ctx, &authz_req.ListPoliciesReq{})
-	if err != nil {
-		return nil, false, wrapUnexpectedError(err, "Failed to retrieve policies")
-	}
-
-	for _, policy := range authzListResp.Policies {
-		if policy.Id == authz_constants_v1.AdminPolicyID {
-			return policy.Subjects, true, nil
-		}
-	}
-	return nil, false, nil
 }

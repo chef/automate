@@ -1,0 +1,26 @@
+@import "~styles/variables";
+
+.page-title {
+  color: var(--chef-primary-dark);
+  margin-top: 0;
+  margin-bottom: 12px;
+  font-weight: inherit;
+  font-style: inherit;
+  font-size: 18px;
+}
+
+.content-container {
+  margin: 10px;
+  padding: 10px;
+  font-family: Muli;
+  font-size: 13px;
+  font-weight: 100;
+  background-color: $chef-med-grey;
+  border: 1px solid $chef-blue-medium;
+  border-radius: 4px;
+}
+
+.item {
+  margin: 8px;
+  padding: 3px;
+}

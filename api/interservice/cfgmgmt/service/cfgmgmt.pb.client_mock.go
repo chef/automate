@@ -6,8 +6,10 @@ package service
 
 import (
 	context "context"
-	request "github.com/chef/automate/api/interservice/cfgmgmt/request"
-	response "github.com/chef/automate/api/interservice/cfgmgmt/response"
+	request "github.com/chef/automate/api/external/cfgmgmt/request"
+	response "github.com/chef/automate/api/external/cfgmgmt/response"
+	request0 "github.com/chef/automate/api/interservice/cfgmgmt/request"
+	response0 "github.com/chef/automate/api/interservice/cfgmgmt/response"
 	gomock "github.com/golang/mock/gomock"
 	struct0 "github.com/golang/protobuf/ptypes/struct"
 	grpc "google.golang.org/grpc"
@@ -39,14 +41,14 @@ func (m *MockCfgMgmtClient) EXPECT() *MockCfgMgmtClientMockRecorder {
 }
 
 // GetAttributes mocks base method
-func (m *MockCfgMgmtClient) GetAttributes(arg0 context.Context, arg1 *request.Node, arg2 ...grpc.CallOption) (*response.NodeAttribute, error) {
+func (m *MockCfgMgmtClient) GetAttributes(arg0 context.Context, arg1 *request0.Node, arg2 ...grpc.CallOption) (*response0.NodeAttribute, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetAttributes", varargs...)
-	ret0, _ := ret[0].(*response.NodeAttribute)
+	ret0, _ := ret[0].(*response0.NodeAttribute)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -59,14 +61,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetAttributes(arg0, arg1 interface{}, a
 }
 
 // GetCheckInCountsTimeSeries mocks base method
-func (m *MockCfgMgmtClient) GetCheckInCountsTimeSeries(arg0 context.Context, arg1 *request.CheckInCountsTimeSeries, arg2 ...grpc.CallOption) (*response.CheckInCountsTimeSeries, error) {
+func (m *MockCfgMgmtClient) GetCheckInCountsTimeSeries(arg0 context.Context, arg1 *request0.CheckInCountsTimeSeries, arg2 ...grpc.CallOption) (*response0.CheckInCountsTimeSeries, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetCheckInCountsTimeSeries", varargs...)
-	ret0, _ := ret[0].(*response.CheckInCountsTimeSeries)
+	ret0, _ := ret[0].(*response0.CheckInCountsTimeSeries)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -78,15 +80,35 @@ func (mr *MockCfgMgmtClientMockRecorder) GetCheckInCountsTimeSeries(arg0, arg1 i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCheckInCountsTimeSeries", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetCheckInCountsTimeSeries), varargs...)
 }
 
+// GetErrors mocks base method
+func (m *MockCfgMgmtClient) GetErrors(arg0 context.Context, arg1 *request.Errors, arg2 ...grpc.CallOption) (*response.Errors, error) {
+	m.ctrl.T.Helper()
+	varargs := []interface{}{arg0, arg1}
+	for _, a := range arg2 {
+		varargs = append(varargs, a)
+	}
+	ret := m.ctrl.Call(m, "GetErrors", varargs...)
+	ret0, _ := ret[0].(*response.Errors)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetErrors indicates an expected call of GetErrors
+func (mr *MockCfgMgmtClientMockRecorder) GetErrors(arg0, arg1 interface{}, arg2 ...interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	varargs := append([]interface{}{arg0, arg1}, arg2...)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetErrors", reflect.TypeOf((*MockCfgMgmtClient)(nil).GetErrors), varargs...)
+}
+
 // GetEventFeed mocks base method
-func (m *MockCfgMgmtClient) GetEventFeed(arg0 context.Context, arg1 *request.EventFilter, arg2 ...grpc.CallOption) (*response.Events, error) {
+func (m *MockCfgMgmtClient) GetEventFeed(arg0 context.Context, arg1 *request0.EventFilter, arg2 ...grpc.CallOption) (*response0.Events, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetEventFeed", varargs...)
-	ret0, _ := ret[0].(*response.Events)
+	ret0, _ := ret[0].(*response0.Events)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -99,14 +121,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetEventFeed(arg0, arg1 interface{}, ar
 }
 
 // GetEventStringBuckets mocks base method
-func (m *MockCfgMgmtClient) GetEventStringBuckets(arg0 context.Context, arg1 *request.EventStrings, arg2 ...grpc.CallOption) (*response.EventStrings, error) {
+func (m *MockCfgMgmtClient) GetEventStringBuckets(arg0 context.Context, arg1 *request0.EventStrings, arg2 ...grpc.CallOption) (*response0.EventStrings, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetEventStringBuckets", varargs...)
-	ret0, _ := ret[0].(*response.EventStrings)
+	ret0, _ := ret[0].(*response0.EventStrings)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -119,14 +141,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetEventStringBuckets(arg0, arg1 interf
 }
 
 // GetEventTaskCounts mocks base method
-func (m *MockCfgMgmtClient) GetEventTaskCounts(arg0 context.Context, arg1 *request.EventCountsFilter, arg2 ...grpc.CallOption) (*response.EventCounts, error) {
+func (m *MockCfgMgmtClient) GetEventTaskCounts(arg0 context.Context, arg1 *request0.EventCountsFilter, arg2 ...grpc.CallOption) (*response0.EventCounts, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetEventTaskCounts", varargs...)
-	ret0, _ := ret[0].(*response.EventCounts)
+	ret0, _ := ret[0].(*response0.EventCounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -139,14 +161,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetEventTaskCounts(arg0, arg1 interface
 }
 
 // GetEventTypeCounts mocks base method
-func (m *MockCfgMgmtClient) GetEventTypeCounts(arg0 context.Context, arg1 *request.EventCountsFilter, arg2 ...grpc.CallOption) (*response.EventCounts, error) {
+func (m *MockCfgMgmtClient) GetEventTypeCounts(arg0 context.Context, arg1 *request0.EventCountsFilter, arg2 ...grpc.CallOption) (*response0.EventCounts, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetEventTypeCounts", varargs...)
-	ret0, _ := ret[0].(*response.EventCounts)
+	ret0, _ := ret[0].(*response0.EventCounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -159,14 +181,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetEventTypeCounts(arg0, arg1 interface
 }
 
 // GetHealth mocks base method
-func (m *MockCfgMgmtClient) GetHealth(arg0 context.Context, arg1 *request.Health, arg2 ...grpc.CallOption) (*response.Health, error) {
+func (m *MockCfgMgmtClient) GetHealth(arg0 context.Context, arg1 *request0.Health, arg2 ...grpc.CallOption) (*response0.Health, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetHealth", varargs...)
-	ret0, _ := ret[0].(*response.Health)
+	ret0, _ := ret[0].(*response0.Health)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -179,14 +201,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetHealth(arg0, arg1 interface{}, arg2 
 }
 
 // GetInventoryNodes mocks base method
-func (m *MockCfgMgmtClient) GetInventoryNodes(arg0 context.Context, arg1 *request.InventoryNodes, arg2 ...grpc.CallOption) (*response.InventoryNodes, error) {
+func (m *MockCfgMgmtClient) GetInventoryNodes(arg0 context.Context, arg1 *request0.InventoryNodes, arg2 ...grpc.CallOption) (*response0.InventoryNodes, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetInventoryNodes", varargs...)
-	ret0, _ := ret[0].(*response.InventoryNodes)
+	ret0, _ := ret[0].(*response0.InventoryNodes)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -199,14 +221,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetInventoryNodes(arg0, arg1 interface{
 }
 
 // GetNodeRun mocks base method
-func (m *MockCfgMgmtClient) GetNodeRun(arg0 context.Context, arg1 *request.NodeRun, arg2 ...grpc.CallOption) (*response.Run, error) {
+func (m *MockCfgMgmtClient) GetNodeRun(arg0 context.Context, arg1 *request0.NodeRun, arg2 ...grpc.CallOption) (*response0.Run, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetNodeRun", varargs...)
-	ret0, _ := ret[0].(*response.Run)
+	ret0, _ := ret[0].(*response0.Run)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -219,7 +241,7 @@ func (mr *MockCfgMgmtClientMockRecorder) GetNodeRun(arg0, arg1 interface{}, arg2
 }
 
 // GetNodes mocks base method
-func (m *MockCfgMgmtClient) GetNodes(arg0 context.Context, arg1 *request.Nodes, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtClient) GetNodes(arg0 context.Context, arg1 *request0.Nodes, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -239,14 +261,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetNodes(arg0, arg1 interface{}, arg2 .
 }
 
 // GetNodesCounts mocks base method
-func (m *MockCfgMgmtClient) GetNodesCounts(arg0 context.Context, arg1 *request.NodesCounts, arg2 ...grpc.CallOption) (*response.NodesCounts, error) {
+func (m *MockCfgMgmtClient) GetNodesCounts(arg0 context.Context, arg1 *request0.NodesCounts, arg2 ...grpc.CallOption) (*response0.NodesCounts, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetNodesCounts", varargs...)
-	ret0, _ := ret[0].(*response.NodesCounts)
+	ret0, _ := ret[0].(*response0.NodesCounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -259,7 +281,7 @@ func (mr *MockCfgMgmtClientMockRecorder) GetNodesCounts(arg0, arg1 interface{}, 
 }
 
 // GetOrganizations mocks base method
-func (m *MockCfgMgmtClient) GetOrganizations(arg0 context.Context, arg1 *request.Organizations, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtClient) GetOrganizations(arg0 context.Context, arg1 *request0.Organizations, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -279,14 +301,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetOrganizations(arg0, arg1 interface{}
 }
 
 // GetPolicyCookbooks mocks base method
-func (m *MockCfgMgmtClient) GetPolicyCookbooks(arg0 context.Context, arg1 *request.PolicyRevision, arg2 ...grpc.CallOption) (*response.PolicyCookbooks, error) {
+func (m *MockCfgMgmtClient) GetPolicyCookbooks(arg0 context.Context, arg1 *request0.PolicyRevision, arg2 ...grpc.CallOption) (*response0.PolicyCookbooks, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetPolicyCookbooks", varargs...)
-	ret0, _ := ret[0].(*response.PolicyCookbooks)
+	ret0, _ := ret[0].(*response0.PolicyCookbooks)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -299,7 +321,7 @@ func (mr *MockCfgMgmtClientMockRecorder) GetPolicyCookbooks(arg0, arg1 interface
 }
 
 // GetRuns mocks base method
-func (m *MockCfgMgmtClient) GetRuns(arg0 context.Context, arg1 *request.Runs, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtClient) GetRuns(arg0 context.Context, arg1 *request0.Runs, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -319,14 +341,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetRuns(arg0, arg1 interface{}, arg2 ..
 }
 
 // GetRunsCounts mocks base method
-func (m *MockCfgMgmtClient) GetRunsCounts(arg0 context.Context, arg1 *request.RunsCounts, arg2 ...grpc.CallOption) (*response.RunsCounts, error) {
+func (m *MockCfgMgmtClient) GetRunsCounts(arg0 context.Context, arg1 *request0.RunsCounts, arg2 ...grpc.CallOption) (*response0.RunsCounts, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetRunsCounts", varargs...)
-	ret0, _ := ret[0].(*response.RunsCounts)
+	ret0, _ := ret[0].(*response0.RunsCounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -339,7 +361,7 @@ func (mr *MockCfgMgmtClientMockRecorder) GetRunsCounts(arg0, arg1 interface{}, a
 }
 
 // GetSourceFqdns mocks base method
-func (m *MockCfgMgmtClient) GetSourceFqdns(arg0 context.Context, arg1 *request.SourceFQDNS, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtClient) GetSourceFqdns(arg0 context.Context, arg1 *request0.SourceFQDNS, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -359,7 +381,7 @@ func (mr *MockCfgMgmtClientMockRecorder) GetSourceFqdns(arg0, arg1 interface{}, 
 }
 
 // GetSuggestions mocks base method
-func (m *MockCfgMgmtClient) GetSuggestions(arg0 context.Context, arg1 *request.Suggestion, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtClient) GetSuggestions(arg0 context.Context, arg1 *request0.Suggestion, arg2 ...grpc.CallOption) (*struct0.ListValue, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -379,14 +401,14 @@ func (mr *MockCfgMgmtClientMockRecorder) GetSuggestions(arg0, arg1 interface{}, 
 }
 
 // GetVersion mocks base method
-func (m *MockCfgMgmtClient) GetVersion(arg0 context.Context, arg1 *request.VersionInfo, arg2 ...grpc.CallOption) (*response.VersionInfo, error) {
+func (m *MockCfgMgmtClient) GetVersion(arg0 context.Context, arg1 *request0.VersionInfo, arg2 ...grpc.CallOption) (*response0.VersionInfo, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
 		varargs = append(varargs, a)
 	}
 	ret := m.ctrl.Call(m, "GetVersion", varargs...)
-	ret0, _ := ret[0].(*response.VersionInfo)
+	ret0, _ := ret[0].(*response0.VersionInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -399,7 +421,7 @@ func (mr *MockCfgMgmtClientMockRecorder) GetVersion(arg0, arg1 interface{}, arg2
 }
 
 // NodeExport mocks base method
-func (m *MockCfgMgmtClient) NodeExport(arg0 context.Context, arg1 *request.NodeExport, arg2 ...grpc.CallOption) (CfgMgmt_NodeExportClient, error) {
+func (m *MockCfgMgmtClient) NodeExport(arg0 context.Context, arg1 *request0.NodeExport, arg2 ...grpc.CallOption) (CfgMgmt_NodeExportClient, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -419,7 +441,7 @@ func (mr *MockCfgMgmtClientMockRecorder) NodeExport(arg0, arg1 interface{}, arg2
 }
 
 // ReportExport mocks base method
-func (m *MockCfgMgmtClient) ReportExport(arg0 context.Context, arg1 *request.ReportExport, arg2 ...grpc.CallOption) (CfgMgmt_ReportExportClient, error) {
+func (m *MockCfgMgmtClient) ReportExport(arg0 context.Context, arg1 *request0.ReportExport, arg2 ...grpc.CallOption) (CfgMgmt_ReportExportClient, error) {
 	m.ctrl.T.Helper()
 	varargs := []interface{}{arg0, arg1}
 	for _, a := range arg2 {
@@ -505,10 +527,10 @@ func (mr *MockCfgMgmt_NodeExportClientMockRecorder) Header() *gomock.Call {
 }
 
 // Recv mocks base method
-func (m *MockCfgMgmt_NodeExportClient) Recv() (*response.ExportData, error) {
+func (m *MockCfgMgmt_NodeExportClient) Recv() (*response0.ExportData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Recv")
-	ret0, _ := ret[0].(*response.ExportData)
+	ret0, _ := ret[0].(*response0.ExportData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -628,10 +650,10 @@ func (mr *MockCfgMgmt_ReportExportClientMockRecorder) Header() *gomock.Call {
 }
 
 // Recv mocks base method
-func (m *MockCfgMgmt_ReportExportClient) Recv() (*response.ReportExportData, error) {
+func (m *MockCfgMgmt_ReportExportClient) Recv() (*response0.ReportExportData, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Recv")
-	ret0, _ := ret[0].(*response.ReportExportData)
+	ret0, _ := ret[0].(*response0.ReportExportData)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -708,10 +730,10 @@ func (m *MockCfgMgmtServer) EXPECT() *MockCfgMgmtServerMockRecorder {
 }
 
 // GetAttributes mocks base method
-func (m *MockCfgMgmtServer) GetAttributes(arg0 context.Context, arg1 *request.Node) (*response.NodeAttribute, error) {
+func (m *MockCfgMgmtServer) GetAttributes(arg0 context.Context, arg1 *request0.Node) (*response0.NodeAttribute, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetAttributes", arg0, arg1)
-	ret0, _ := ret[0].(*response.NodeAttribute)
+	ret0, _ := ret[0].(*response0.NodeAttribute)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -723,10 +745,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetAttributes(arg0, arg1 interface{}) *
 }
 
 // GetCheckInCountsTimeSeries mocks base method
-func (m *MockCfgMgmtServer) GetCheckInCountsTimeSeries(arg0 context.Context, arg1 *request.CheckInCountsTimeSeries) (*response.CheckInCountsTimeSeries, error) {
+func (m *MockCfgMgmtServer) GetCheckInCountsTimeSeries(arg0 context.Context, arg1 *request0.CheckInCountsTimeSeries) (*response0.CheckInCountsTimeSeries, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetCheckInCountsTimeSeries", arg0, arg1)
-	ret0, _ := ret[0].(*response.CheckInCountsTimeSeries)
+	ret0, _ := ret[0].(*response0.CheckInCountsTimeSeries)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -737,11 +759,26 @@ func (mr *MockCfgMgmtServerMockRecorder) GetCheckInCountsTimeSeries(arg0, arg1 i
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetCheckInCountsTimeSeries", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetCheckInCountsTimeSeries), arg0, arg1)
 }
 
+// GetErrors mocks base method
+func (m *MockCfgMgmtServer) GetErrors(arg0 context.Context, arg1 *request.Errors) (*response.Errors, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "GetErrors", arg0, arg1)
+	ret0, _ := ret[0].(*response.Errors)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// GetErrors indicates an expected call of GetErrors
+func (mr *MockCfgMgmtServerMockRecorder) GetErrors(arg0, arg1 interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetErrors", reflect.TypeOf((*MockCfgMgmtServer)(nil).GetErrors), arg0, arg1)
+}
+
 // GetEventFeed mocks base method
-func (m *MockCfgMgmtServer) GetEventFeed(arg0 context.Context, arg1 *request.EventFilter) (*response.Events, error) {
+func (m *MockCfgMgmtServer) GetEventFeed(arg0 context.Context, arg1 *request0.EventFilter) (*response0.Events, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventFeed", arg0, arg1)
-	ret0, _ := ret[0].(*response.Events)
+	ret0, _ := ret[0].(*response0.Events)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -753,10 +790,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetEventFeed(arg0, arg1 interface{}) *g
 }
 
 // GetEventStringBuckets mocks base method
-func (m *MockCfgMgmtServer) GetEventStringBuckets(arg0 context.Context, arg1 *request.EventStrings) (*response.EventStrings, error) {
+func (m *MockCfgMgmtServer) GetEventStringBuckets(arg0 context.Context, arg1 *request0.EventStrings) (*response0.EventStrings, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventStringBuckets", arg0, arg1)
-	ret0, _ := ret[0].(*response.EventStrings)
+	ret0, _ := ret[0].(*response0.EventStrings)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -768,10 +805,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetEventStringBuckets(arg0, arg1 interf
 }
 
 // GetEventTaskCounts mocks base method
-func (m *MockCfgMgmtServer) GetEventTaskCounts(arg0 context.Context, arg1 *request.EventCountsFilter) (*response.EventCounts, error) {
+func (m *MockCfgMgmtServer) GetEventTaskCounts(arg0 context.Context, arg1 *request0.EventCountsFilter) (*response0.EventCounts, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventTaskCounts", arg0, arg1)
-	ret0, _ := ret[0].(*response.EventCounts)
+	ret0, _ := ret[0].(*response0.EventCounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -783,10 +820,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetEventTaskCounts(arg0, arg1 interface
 }
 
 // GetEventTypeCounts mocks base method
-func (m *MockCfgMgmtServer) GetEventTypeCounts(arg0 context.Context, arg1 *request.EventCountsFilter) (*response.EventCounts, error) {
+func (m *MockCfgMgmtServer) GetEventTypeCounts(arg0 context.Context, arg1 *request0.EventCountsFilter) (*response0.EventCounts, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetEventTypeCounts", arg0, arg1)
-	ret0, _ := ret[0].(*response.EventCounts)
+	ret0, _ := ret[0].(*response0.EventCounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -798,10 +835,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetEventTypeCounts(arg0, arg1 interface
 }
 
 // GetHealth mocks base method
-func (m *MockCfgMgmtServer) GetHealth(arg0 context.Context, arg1 *request.Health) (*response.Health, error) {
+func (m *MockCfgMgmtServer) GetHealth(arg0 context.Context, arg1 *request0.Health) (*response0.Health, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetHealth", arg0, arg1)
-	ret0, _ := ret[0].(*response.Health)
+	ret0, _ := ret[0].(*response0.Health)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -813,10 +850,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetHealth(arg0, arg1 interface{}) *gomo
 }
 
 // GetInventoryNodes mocks base method
-func (m *MockCfgMgmtServer) GetInventoryNodes(arg0 context.Context, arg1 *request.InventoryNodes) (*response.InventoryNodes, error) {
+func (m *MockCfgMgmtServer) GetInventoryNodes(arg0 context.Context, arg1 *request0.InventoryNodes) (*response0.InventoryNodes, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetInventoryNodes", arg0, arg1)
-	ret0, _ := ret[0].(*response.InventoryNodes)
+	ret0, _ := ret[0].(*response0.InventoryNodes)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -828,10 +865,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetInventoryNodes(arg0, arg1 interface{
 }
 
 // GetNodeRun mocks base method
-func (m *MockCfgMgmtServer) GetNodeRun(arg0 context.Context, arg1 *request.NodeRun) (*response.Run, error) {
+func (m *MockCfgMgmtServer) GetNodeRun(arg0 context.Context, arg1 *request0.NodeRun) (*response0.Run, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNodeRun", arg0, arg1)
-	ret0, _ := ret[0].(*response.Run)
+	ret0, _ := ret[0].(*response0.Run)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -843,7 +880,7 @@ func (mr *MockCfgMgmtServerMockRecorder) GetNodeRun(arg0, arg1 interface{}) *gom
 }
 
 // GetNodes mocks base method
-func (m *MockCfgMgmtServer) GetNodes(arg0 context.Context, arg1 *request.Nodes) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtServer) GetNodes(arg0 context.Context, arg1 *request0.Nodes) (*struct0.ListValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNodes", arg0, arg1)
 	ret0, _ := ret[0].(*struct0.ListValue)
@@ -858,10 +895,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetNodes(arg0, arg1 interface{}) *gomoc
 }
 
 // GetNodesCounts mocks base method
-func (m *MockCfgMgmtServer) GetNodesCounts(arg0 context.Context, arg1 *request.NodesCounts) (*response.NodesCounts, error) {
+func (m *MockCfgMgmtServer) GetNodesCounts(arg0 context.Context, arg1 *request0.NodesCounts) (*response0.NodesCounts, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetNodesCounts", arg0, arg1)
-	ret0, _ := ret[0].(*response.NodesCounts)
+	ret0, _ := ret[0].(*response0.NodesCounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -873,7 +910,7 @@ func (mr *MockCfgMgmtServerMockRecorder) GetNodesCounts(arg0, arg1 interface{}) 
 }
 
 // GetOrganizations mocks base method
-func (m *MockCfgMgmtServer) GetOrganizations(arg0 context.Context, arg1 *request.Organizations) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtServer) GetOrganizations(arg0 context.Context, arg1 *request0.Organizations) (*struct0.ListValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetOrganizations", arg0, arg1)
 	ret0, _ := ret[0].(*struct0.ListValue)
@@ -888,10 +925,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetOrganizations(arg0, arg1 interface{}
 }
 
 // GetPolicyCookbooks mocks base method
-func (m *MockCfgMgmtServer) GetPolicyCookbooks(arg0 context.Context, arg1 *request.PolicyRevision) (*response.PolicyCookbooks, error) {
+func (m *MockCfgMgmtServer) GetPolicyCookbooks(arg0 context.Context, arg1 *request0.PolicyRevision) (*response0.PolicyCookbooks, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetPolicyCookbooks", arg0, arg1)
-	ret0, _ := ret[0].(*response.PolicyCookbooks)
+	ret0, _ := ret[0].(*response0.PolicyCookbooks)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -903,7 +940,7 @@ func (mr *MockCfgMgmtServerMockRecorder) GetPolicyCookbooks(arg0, arg1 interface
 }
 
 // GetRuns mocks base method
-func (m *MockCfgMgmtServer) GetRuns(arg0 context.Context, arg1 *request.Runs) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtServer) GetRuns(arg0 context.Context, arg1 *request0.Runs) (*struct0.ListValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRuns", arg0, arg1)
 	ret0, _ := ret[0].(*struct0.ListValue)
@@ -918,10 +955,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetRuns(arg0, arg1 interface{}) *gomock
 }
 
 // GetRunsCounts mocks base method
-func (m *MockCfgMgmtServer) GetRunsCounts(arg0 context.Context, arg1 *request.RunsCounts) (*response.RunsCounts, error) {
+func (m *MockCfgMgmtServer) GetRunsCounts(arg0 context.Context, arg1 *request0.RunsCounts) (*response0.RunsCounts, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetRunsCounts", arg0, arg1)
-	ret0, _ := ret[0].(*response.RunsCounts)
+	ret0, _ := ret[0].(*response0.RunsCounts)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -933,7 +970,7 @@ func (mr *MockCfgMgmtServerMockRecorder) GetRunsCounts(arg0, arg1 interface{}) *
 }
 
 // GetSourceFqdns mocks base method
-func (m *MockCfgMgmtServer) GetSourceFqdns(arg0 context.Context, arg1 *request.SourceFQDNS) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtServer) GetSourceFqdns(arg0 context.Context, arg1 *request0.SourceFQDNS) (*struct0.ListValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSourceFqdns", arg0, arg1)
 	ret0, _ := ret[0].(*struct0.ListValue)
@@ -948,7 +985,7 @@ func (mr *MockCfgMgmtServerMockRecorder) GetSourceFqdns(arg0, arg1 interface{}) 
 }
 
 // GetSuggestions mocks base method
-func (m *MockCfgMgmtServer) GetSuggestions(arg0 context.Context, arg1 *request.Suggestion) (*struct0.ListValue, error) {
+func (m *MockCfgMgmtServer) GetSuggestions(arg0 context.Context, arg1 *request0.Suggestion) (*struct0.ListValue, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSuggestions", arg0, arg1)
 	ret0, _ := ret[0].(*struct0.ListValue)
@@ -963,10 +1000,10 @@ func (mr *MockCfgMgmtServerMockRecorder) GetSuggestions(arg0, arg1 interface{}) 
 }
 
 // GetVersion mocks base method
-func (m *MockCfgMgmtServer) GetVersion(arg0 context.Context, arg1 *request.VersionInfo) (*response.VersionInfo, error) {
+func (m *MockCfgMgmtServer) GetVersion(arg0 context.Context, arg1 *request0.VersionInfo) (*response0.VersionInfo, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetVersion", arg0, arg1)
-	ret0, _ := ret[0].(*response.VersionInfo)
+	ret0, _ := ret[0].(*response0.VersionInfo)
 	ret1, _ := ret[1].(error)
 	return ret0, ret1
 }
@@ -978,7 +1015,7 @@ func (mr *MockCfgMgmtServerMockRecorder) GetVersion(arg0, arg1 interface{}) *gom
 }
 
 // NodeExport mocks base method
-func (m *MockCfgMgmtServer) NodeExport(arg0 *request.NodeExport, arg1 CfgMgmt_NodeExportServer) error {
+func (m *MockCfgMgmtServer) NodeExport(arg0 *request0.NodeExport, arg1 CfgMgmt_NodeExportServer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "NodeExport", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -992,7 +1029,7 @@ func (mr *MockCfgMgmtServerMockRecorder) NodeExport(arg0, arg1 interface{}) *gom
 }
 
 // ReportExport mocks base method
-func (m *MockCfgMgmtServer) ReportExport(arg0 *request.ReportExport, arg1 CfgMgmt_ReportExportServer) error {
+func (m *MockCfgMgmtServer) ReportExport(arg0 *request0.ReportExport, arg1 CfgMgmt_ReportExportServer) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "ReportExport", arg0, arg1)
 	ret0, _ := ret[0].(error)
@@ -1057,7 +1094,7 @@ func (mr *MockCfgMgmt_NodeExportServerMockRecorder) RecvMsg(arg0 interface{}) *g
 }
 
 // Send mocks base method
-func (m *MockCfgMgmt_NodeExportServer) Send(arg0 *response.ExportData) error {
+func (m *MockCfgMgmt_NodeExportServer) Send(arg0 *response0.ExportData) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Send", arg0)
 	ret0, _ := ret[0].(error)
@@ -1176,7 +1213,7 @@ func (mr *MockCfgMgmt_ReportExportServerMockRecorder) RecvMsg(arg0 interface{}) 
 }
 
 // Send mocks base method
-func (m *MockCfgMgmt_ReportExportServer) Send(arg0 *response.ReportExportData) error {
+func (m *MockCfgMgmt_ReportExportServer) Send(arg0 *response0.ReportExportData) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Send", arg0)
 	ret0, _ := ret[0].(error)

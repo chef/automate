@@ -7,6 +7,7 @@ import (
 	"github.com/lib/pq" // adapter for database/sql
 	"github.com/pkg/errors"
 
+	authz "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/infra-proxy-service/storage"
 	"github.com/chef/automate/components/infra-proxy-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/db"
@@ -14,8 +15,9 @@ import (
 )
 
 type postgres struct {
-	db     *sql.DB
-	logger logger.Logger
+	db          *sql.DB
+	logger      logger.Logger
+	authzClient authz.AuthorizationClient
 }
 
 type querier interface {
@@ -23,7 +25,7 @@ type querier interface {
 }
 
 // New instantiates and returns a postgres storage implementation
-func New(logger logger.Logger, migrationConfig migration.Config) (storage.Storage, error) {
+func New(logger logger.Logger, migrationConfig migration.Config, authzClient authz.AuthorizationClient) (storage.Storage, error) {
 
 	db, err := initPostgresDB(migrationConfig.PGURL.String())
 	if err != nil {
@@ -34,7 +36,7 @@ func New(logger logger.Logger, migrationConfig migration.Config) (storage.Storag
 		return nil, errors.Wrap(err, "database migrations")
 	}
 
-	return &postgres{db, logger}, nil
+	return &postgres{db, logger, authzClient}, nil
 }
 
 func initPostgresDB(pgURL string) (*sql.DB, error) {
@@ -58,8 +60,9 @@ func parsePQError(e *pq.Error) error {
 		return storage.ErrConflict
 	case "foreign_key_violation":
 		// in this piece of code, a foreign key violation means the server the org
+		// should be added to doesn't exist; a "not found" seems like an OK
 		// approximation for now
-		return storage.ErrCannotDelete
+		return storage.ErrNotFound
 	}
 
 	return e

@@ -1,4 +1,3 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
 import { eventExist, uuidv4 } from '../../../support/helpers';
 import { Rule, Project } from '../../../support/types';
 
@@ -8,7 +7,7 @@ const eventStart = Cypress.moment().utc().subtract(3, 'day').valueOf().toString(
 const eventEnd = Cypress.moment().utc().endOf('day').valueOf().toString();
 const now = Cypress.moment().format('MMDDYYhhmm');
 
-describeIfIAMV2p1('Ingestion project tagging', () => {
+describe('Ingestion project tagging', () => {
   const cypressPrefix = 'test-ingestion-projects';
   const complianceNodeId = uuidv4();
   const clientRunsNodeId = uuidv4();
@@ -228,7 +227,7 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
   ];
 
   before(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
     // create the projects with one node rule each
     projectsWithNodeRules.forEach(project => {
@@ -334,7 +333,7 @@ describeIfIAMV2p1('Ingestion project tagging', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
     cy.request({
       headers: { 'api-token': Cypress.env('ADMIN_TOKEN') },
       method: 'POST',

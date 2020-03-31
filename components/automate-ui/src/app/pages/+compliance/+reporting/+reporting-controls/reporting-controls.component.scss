@@ -25,11 +25,15 @@
     align-items: center;
     color: $chef-grey;
 
+    .waived-icon:before {
+      color: $chef-white;
+    }
+
     &:last-child {
       margin-right: 0;
     }
 
-    chef-icon {
+    chef-icon, .waived-icon {
       margin-right: 5px;
     }
   }
@@ -49,6 +53,14 @@
       color: $chef-dark-grey;
     }
 
+    &.waived {
+      color: $chef-darkest;
+
+      .waived-icon:before {
+        color: inherit;
+      }
+    }
+
     &.critical {
       color: $chef-critical;
     }
@@ -66,4 +78,49 @@
 .item-count-warning {
   margin: 35px 0;
   text-align: center;
+}
+
+chef-tooltip {
+  width: 400px;
+}
+
+.control-waiver-details {
+  border-bottom: 1px solid $chef-grey;
+  font-size: 14px;
+  padding-bottom: 15px;
+
+  &:last-of-type {
+    border: none;
+    padding-top: 10px;
+  }
+
+  .waiver-details {
+    .label {
+      display: inline-block;
+      font-weight: bold;
+      line-height: 8px;
+      text-align: left;
+      width: 105px;
+    }
+
+    .status-details {
+      display: inline-flex;
+      margin-right: 1em;
+      align-items: center;
+
+      &.failed {
+        color: $chef-critical;
+      }
+
+      &.passed {
+        color: $chef-success;
+      }
+
+      &.skipped {
+        color: $chef-dark-grey;
+      }
+
+    }
+  }
+
 }

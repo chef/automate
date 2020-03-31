@@ -79,7 +79,8 @@ describe('ServiceGroupsComponent', () => {
           ok: 10,
           warning: 5,
           critical: 5,
-          unknown: 1
+          unknown: 1,
+          disconnected: 0
         }));
       });
 

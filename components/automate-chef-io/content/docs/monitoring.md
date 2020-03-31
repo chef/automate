@@ -24,24 +24,20 @@ To use `/status`, set up an authentication token that can be used with your moni
 
 1. Generate a token:
 
-```bash
-chef-automate iam token create --id <token-id> <token-name>
-```
+    ```bash
+    chef-automate iam token create --id <token-id> <token-name>
+    ```
 
 2. Create a policy that allows your created token to access the `/status` endpoint.
-If you are using IAM v1, the command is:
-```bash
-curl -k -H "api-token: <admin-token>" -H "Content-Type: application/json" -d '{ "action": "read", "resource":     "service_info:status", "subjects": [ "token:<token-id>" ] }' https://automate.example.com/api/v0/auth/policies?pretty
-```
-If you are using IAM v2, the command is:
-```bash
-curl -k -H "api-token: <admin-token>" -d '{ "name": "Monitoring", "id": "monitoring", "members": [ "token:<token-id>" ], "statements": [ { "effect": "ALLOW", "actions": [ "system:status:get" ], "projects": [ "*" ] } ] }' -X POST https://automate.example.com/apis/iam/v2/policies?pretty
-```
+
+    ```bash
+    curl -k -H "api-token: <admin-token>" -d '{ "name": "Monitoring", "id": "monitoring", "members": [ "token:<token-id>" ], "statements": [ { "effect": "ALLOW", "actions": [ "system:status:get" ], "projects": [ "*" ] } ] }' -X POST https://automate.example.com/apis/iam/v2/policies?pretty
+    ```
 
 3. Test that your token and policy give you access to the `/status` endpoint by running the following command:
-```bash
-curl -k -H "api-token: <token-id>" https://automate.example.com/api/v0/status?pretty
-```
+    ```bash
+    curl -k -H "api-token: <token-id>" https://automate.example.com/api/v0/status?pretty
+    ```
 The output appears in the following JSON format:
 
 ```json

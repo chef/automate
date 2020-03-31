@@ -242,55 +242,60 @@ func Archive(profilePath string, outputPath string) error {
 }
 
 func getInspecError(stdOut string, stdErr string, err error, target *TargetConfig, timeout time.Duration) *Error {
-	connErr := "Errno::ECONNREFUSED"
 	for _, serr := range []string{stdOut, stdErr} {
+		connErr := "Errno::ECONNREFUSED"
 		if strings.Index(serr, connErr) >= 0 {
 			return NewInspecError(CONN_REFUSED,
-				"Failed to connect to "+target.Hostname+", connection refused.")
+				"Failed to connect to "+target.Hostname+", connection refused."+"\n\n"+connErr)
 		}
 		noTTYErr := "Errno::ENOTTY"
 		if strings.Index(serr, noTTYErr) >= 0 {
 			return NewInspecError(AUTH_FAILED,
-				"Authentication failed for "+target.Hostname)
+				"Authentication failed for "+target.Hostname+"\n\n"+noTTYErr)
 		}
 		hostDownErr := "Errno::EHOSTDOWN"
 		if strings.Index(serr, hostDownErr) >= 0 {
 			return NewInspecError(UNREACHABLE_HOST,
-				"Failed to connect to "+target.Hostname+", host is unreachable.")
+				"Failed to connect to "+target.Hostname+", host is unreachable."+"\n\n"+hostDownErr)
 		}
 		connTimeoutErr := "Net::SSH::ConnectionTimeout"
 		if strings.Index(serr, connTimeoutErr) >= 0 {
 			return NewInspecError(CONN_TIMEOUT,
-				"Failed to connect to "+target.Hostname+", connection timeout.")
+				"Failed to connect to "+target.Hostname+", connection timeout."+"\n\n"+connTimeoutErr)
 		}
 		authErr := "Net::SSH::AuthenticationFailed"
 		if strings.Index(serr, authErr) >= 0 {
 			return NewInspecError(AUTH_FAILED,
-				"Authentication failed for "+target.Hostname)
+				"Authentication failed for "+target.Hostname+"\n\n"+authErr)
+		}
+		winRmAuthErr := "WinRM::WinRMAuthorizationError"
+		if strings.Index(serr, winRmAuthErr) >= 0 {
+			return NewInspecError(AUTH_FAILED,
+				"Authentication failed for "+target.Hostname+"\n\n"+winRmAuthErr)
 		}
 		sudoErr := "Sudo requires a password"
 		if strings.Index(serr, sudoErr) >= 0 {
 			return NewInspecError(SUDO_PW_REQUIRED,
 				"Failed to run commands on "+target.Hostname+
-					": The node is configured to use sudo, but sudo requires a password to run commands.")
+					": The node is configured to use sudo, but sudo requires a password to run commands."+"\n\n"+sudoErr)
 		}
 		pwErr := "Wrong sudo password"
 		if strings.Index(serr, pwErr) >= 0 {
 			return NewInspecError(WRONG_SUDO_PW,
 				"Failed to run commands on "+target.Hostname+
-					": Sudo password is incorrect.")
+					": Sudo password is incorrect."+"\n\n"+pwErr)
 		}
 		nosudoErr := "Can't find sudo command"
 		if strings.Index(serr, nosudoErr) >= 0 {
 			return NewInspecError(NO_SUDO,
 				"Failed to run commands on "+target.Hostname+
-					": Cannot use sudo, please deactivate it or configure sudo for this user.")
+					": Cannot use sudo, please deactivate it or configure sudo for this user."+"\n\n"+nosudoErr)
 		}
 		notInSudoersErr := "is not in the sudoers file"
 		if strings.Index(serr, notInSudoersErr) >= 0 {
 			return NewInspecError(NO_SUDO,
 				"Failed to run commands on "+target.Hostname+
-					": User is not in sudoers file.")
+					": User is not in sudoers file."+"\n\n"+notInSudoersErr)
 		}
 	}
 

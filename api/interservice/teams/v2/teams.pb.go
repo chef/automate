@@ -961,6 +961,84 @@ func (m *ResetToV1Resp) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_ResetToV1Resp proto.InternalMessageInfo
 
+type PurgeUserMembershipReq struct {
+	UserId               string   `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty" toml:"user_id,omitempty" mapstructure:"user_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *PurgeUserMembershipReq) Reset()         { *m = PurgeUserMembershipReq{} }
+func (m *PurgeUserMembershipReq) String() string { return proto.CompactTextString(m) }
+func (*PurgeUserMembershipReq) ProtoMessage()    {}
+func (*PurgeUserMembershipReq) Descriptor() ([]byte, []int) {
+	return fileDescriptor_87f9ac935e91df24, []int{23}
+}
+
+func (m *PurgeUserMembershipReq) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PurgeUserMembershipReq.Unmarshal(m, b)
+}
+func (m *PurgeUserMembershipReq) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PurgeUserMembershipReq.Marshal(b, m, deterministic)
+}
+func (m *PurgeUserMembershipReq) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PurgeUserMembershipReq.Merge(m, src)
+}
+func (m *PurgeUserMembershipReq) XXX_Size() int {
+	return xxx_messageInfo_PurgeUserMembershipReq.Size(m)
+}
+func (m *PurgeUserMembershipReq) XXX_DiscardUnknown() {
+	xxx_messageInfo_PurgeUserMembershipReq.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PurgeUserMembershipReq proto.InternalMessageInfo
+
+func (m *PurgeUserMembershipReq) GetUserId() string {
+	if m != nil {
+		return m.UserId
+	}
+	return ""
+}
+
+type PurgeUserMembershipResp struct {
+	Ids                  []string `protobuf:"bytes,1,rep,name=ids,proto3" json:"ids,omitempty" toml:"ids,omitempty" mapstructure:"ids,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_unrecognized     []byte   `json:"-" toml:"-" mapstructure:"-,omitempty"`
+	XXX_sizecache        int32    `json:"-" toml:"-" mapstructure:"-,omitempty"`
+}
+
+func (m *PurgeUserMembershipResp) Reset()         { *m = PurgeUserMembershipResp{} }
+func (m *PurgeUserMembershipResp) String() string { return proto.CompactTextString(m) }
+func (*PurgeUserMembershipResp) ProtoMessage()    {}
+func (*PurgeUserMembershipResp) Descriptor() ([]byte, []int) {
+	return fileDescriptor_87f9ac935e91df24, []int{24}
+}
+
+func (m *PurgeUserMembershipResp) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_PurgeUserMembershipResp.Unmarshal(m, b)
+}
+func (m *PurgeUserMembershipResp) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_PurgeUserMembershipResp.Marshal(b, m, deterministic)
+}
+func (m *PurgeUserMembershipResp) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PurgeUserMembershipResp.Merge(m, src)
+}
+func (m *PurgeUserMembershipResp) XXX_Size() int {
+	return xxx_messageInfo_PurgeUserMembershipResp.Size(m)
+}
+func (m *PurgeUserMembershipResp) XXX_DiscardUnknown() {
+	xxx_messageInfo_PurgeUserMembershipResp.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PurgeUserMembershipResp proto.InternalMessageInfo
+
+func (m *PurgeUserMembershipResp) GetIds() []string {
+	if m != nil {
+		return m.Ids
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Team)(nil), "chef.automate.domain.teams.v2.Team")
 	proto.RegisterType((*GetTeamReq)(nil), "chef.automate.domain.teams.v2.GetTeamReq")
@@ -985,6 +1063,8 @@ func init() {
 	proto.RegisterType((*UpgradeToV2Resp)(nil), "chef.automate.domain.teams.v2.UpgradeToV2Resp")
 	proto.RegisterType((*ResetToV1Req)(nil), "chef.automate.domain.teams.v2.ResetToV1Req")
 	proto.RegisterType((*ResetToV1Resp)(nil), "chef.automate.domain.teams.v2.ResetToV1Resp")
+	proto.RegisterType((*PurgeUserMembershipReq)(nil), "chef.automate.domain.teams.v2.PurgeUserMembershipReq")
+	proto.RegisterType((*PurgeUserMembershipResp)(nil), "chef.automate.domain.teams.v2.PurgeUserMembershipResp")
 }
 
 func init() {
@@ -992,57 +1072,58 @@ func init() {
 }
 
 var fileDescriptor_87f9ac935e91df24 = []byte{
-	// 794 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x96, 0x5f, 0x4f, 0xd3, 0x50,
-	0x18, 0xc6, 0xd7, 0x6d, 0x32, 0xf6, 0xce, 0x0d, 0x38, 0x82, 0xcc, 0x0a, 0x71, 0xa9, 0x90, 0x80,
-	0xb0, 0x16, 0xca, 0xd4, 0xc0, 0x85, 0x41, 0x34, 0x18, 0x8c, 0xdc, 0x54, 0xe4, 0x42, 0x04, 0xd2,
-	0xad, 0xc7, 0xad, 0xba, 0xfe, 0xa1, 0xa7, 0x9b, 0x89, 0xc6, 0xc4, 0x2f, 0xe0, 0x0d, 0x1f, 0xc2,
-	0x0f, 0xe1, 0x95, 0x5f, 0xc7, 0xaf, 0xe0, 0x95, 0x39, 0xed, 0xd6, 0x9d, 0xc2, 0xe0, 0x6c, 0x59,
-	0xc2, 0xdd, 0x69, 0xf7, 0x3e, 0xef, 0xf3, 0xbc, 0x6f, 0xda, 0xdf, 0x0a, 0x8b, 0xba, 0x6b, 0x2a,
-	0xa6, 0xed, 0x63, 0x8f, 0x60, 0xaf, 0x6d, 0xd6, 0xb0, 0xe2, 0x63, 0xdd, 0x22, 0x4a, 0x5b, 0x0d,
-	0x0f, 0xb2, 0xeb, 0x39, 0xbe, 0x83, 0xe6, 0x6b, 0x0d, 0xfc, 0x51, 0xd6, 0x5b, 0xbe, 0x63, 0xe9,
-	0x3e, 0x96, 0x0d, 0xc7, 0xd2, 0x4d, 0x5b, 0x0e, 0x2b, 0xda, 0xaa, 0x38, 0x57, 0x77, 0x9c, 0x7a,
-	0x13, 0x2b, 0xb4, 0x99, 0x6e, 0xdb, 0x8e, 0xaf, 0xfb, 0xa6, 0x63, 0x77, 0xc4, 0xe2, 0x6c, 0x5b,
-	0x6f, 0x9a, 0x86, 0xee, 0x63, 0xa5, 0x7b, 0x08, 0x7f, 0x90, 0x76, 0x21, 0x7d, 0x80, 0x75, 0x0b,
-	0x15, 0x20, 0x69, 0x1a, 0x45, 0xa1, 0x24, 0x2c, 0x65, 0xb5, 0xa4, 0x69, 0x20, 0x04, 0x69, 0x5b,
-	0xb7, 0x70, 0x31, 0x19, 0xdc, 0x09, 0xce, 0x48, 0x84, 0x71, 0xd7, 0x73, 0x3e, 0xe1, 0x9a, 0x4f,
-	0x8a, 0xa9, 0x52, 0x6a, 0x29, 0xab, 0x45, 0xd7, 0xd2, 0x32, 0xc0, 0x2b, 0xec, 0xd3, 0x56, 0x1a,
-	0x3e, 0x43, 0xf7, 0x7b, 0xdd, 0x76, 0x72, 0xbf, 0xff, 0xfe, 0x49, 0x8d, 0x79, 0x69, 0x35, 0xf9,
-	0xe1, 0x2d, 0x6d, 0x2d, 0xed, 0x42, 0x2e, 0x2a, 0x25, 0x2e, 0x7a, 0x0a, 0x69, 0x3a, 0x44, 0x50,
-	0x9d, 0x53, 0x1f, 0xca, 0xd7, 0x8e, 0x29, 0x07, 0xb2, 0x40, 0x20, 0x15, 0xe0, 0xf6, 0x1b, 0x93,
-	0x04, 0x8d, 0x88, 0x86, 0xcf, 0xa4, 0xd7, 0x90, 0x67, 0xae, 0x89, 0x8b, 0x36, 0xe1, 0x56, 0xa0,
-	0x2b, 0x0a, 0xa5, 0xd4, 0xa0, 0xad, 0x43, 0x85, 0xf4, 0x53, 0x80, 0xfc, 0x3b, 0x97, 0xee, 0x69,
-	0x90, 0x91, 0xd0, 0x03, 0x76, 0x5b, 0xf1, 0x9f, 0xc3, 0xd5, 0x3d, 0xbb, 0xb8, 0xba, 0x1d, 0x89,
-	0x16, 0xcd, 0x9f, 0x0b, 0x62, 0x51, 0x90, 0xee, 0x7a, 0xd3, 0x2a, 0x3a, 0x39, 0xd2, 0xcb, 0x5f,
-	0xd7, 0xca, 0x9b, 0xe5, 0xd3, 0xe3, 0x6f, 0xeb, 0xab, 0x4f, 0x2a, 0xdf, 0x17, 0x98, 0xf5, 0xee,
-	0x41, 0x81, 0x8d, 0x33, 0xca, 0xda, 0x56, 0x21, 0xff, 0x12, 0x37, 0xf1, 0x60, 0x93, 0x51, 0x63,
-	0xb6, 0x7a, 0x14, 0xe3, 0x5f, 0x02, 0xe4, 0x5f, 0x78, 0x98, 0xd9, 0x69, 0x85, 0x71, 0x5e, 0xa0,
-	0xce, 0x69, 0x2f, 0x39, 0x29, 0xd0, 0xc3, 0x55, 0x1b, 0xb9, 0xa9, 0x65, 0xb3, 0x39, 0x47, 0x99,
-	0xd9, 0x83, 0xa9, 0xe7, 0x86, 0x41, 0x6f, 0xec, 0x63, 0xab, 0x8a, 0x3d, 0xc2, 0x7d, 0x94, 0xb6,
-	0x61, 0xbc, 0x45, 0xb0, 0x77, 0x6a, 0x1a, 0xa4, 0x98, 0x0c, 0xc2, 0x2f, 0xd2, 0x92, 0xd2, 0xb9,
-	0x30, 0x3f, 0x2e, 0x14, 0x05, 0x69, 0xd6, 0x9b, 0x51, 0xef, 0x9c, 0x1c, 0x1d, 0x6d, 0xe9, 0x4d,
-	0xbb, 0x65, 0x6d, 0x1d, 0x9f, 0xca, 0x2b, 0xdb, 0xe5, 0xe3, 0x95, 0x05, 0x2d, 0x43, 0x65, 0x7b,
-	0x06, 0x91, 0x14, 0x40, 0x17, 0x3d, 0x89, 0x8b, 0xee, 0x31, 0x7d, 0x85, 0xe0, 0xe5, 0x8d, 0x04,
-	0x2d, 0x98, 0xd6, 0xb0, 0xe5, 0xb4, 0xf1, 0xcd, 0xe6, 0x54, 0x61, 0xa6, 0x8f, 0xed, 0xf5, 0x51,
-	0xf7, 0x61, 0xba, 0xc3, 0x0e, 0xb2, 0xeb, 0x78, 0xa1, 0x88, 0x46, 0x7d, 0x0c, 0x99, 0x8e, 0xa4,
-	0x93, 0x77, 0x8e, 0x86, 0xb9, 0x32, 0xc3, 0x58, 0xd8, 0x4f, 0xd2, 0x60, 0xa6, 0x4f, 0xbb, 0xd1,
-	0xd0, 0xb1, 0x11, 0x45, 0xec, 0xcc, 0xd4, 0x30, 0x5d, 0xee, 0x6b, 0xa6, 0x46, 0x41, 0x58, 0xd1,
-	0xf5, 0xbb, 0x98, 0xa4, 0x4c, 0xa8, 0x7b, 0xba, 0x81, 0x0f, 0x9c, 0x43, 0x95, 0x12, 0x70, 0x0a,
-	0x26, 0x62, 0x77, 0x88, 0x4b, 0x21, 0xa9, 0x61, 0x82, 0xfd, 0x03, 0xe7, 0x70, 0x9d, 0x96, 0x4c,
-	0x40, 0x9e, 0xb9, 0x26, 0xae, 0xfa, 0x2f, 0x0b, 0x99, 0x60, 0x01, 0x87, 0x2a, 0xaa, 0x42, 0xa6,
-	0x93, 0x02, 0x2d, 0x73, 0x26, 0xee, 0xc1, 0x5e, 0x7c, 0x34, 0x68, 0x29, 0x71, 0xa5, 0x04, 0x6a,
-	0x40, 0x36, 0xa2, 0x34, 0x5a, 0xe1, 0x48, 0x59, 0xbe, 0x8b, 0xab, 0x83, 0x17, 0x07, 0x4e, 0x9f,
-	0x01, 0x7a, 0xaf, 0x31, 0xe2, 0xa9, 0x63, 0x64, 0x12, 0xcb, 0x43, 0x54, 0x77, 0xcd, 0x7a, 0x80,
-	0xe6, 0x9a, 0xc5, 0xfe, 0x5a, 0xb8, 0x66, 0x71, 0xf2, 0x87, 0x66, 0x3d, 0x28, 0x73, 0xcd, 0x62,
-	0xb4, 0xe7, 0x9a, 0xc5, 0x69, 0x2f, 0x25, 0xd0, 0x17, 0x28, 0xc4, 0x71, 0x82, 0xd6, 0x38, 0x2d,
-	0x2e, 0x11, 0x4f, 0x5c, 0x1f, 0x52, 0x11, 0x18, 0xff, 0x10, 0x60, 0xea, 0x12, 0x20, 0xd0, 0x06,
-	0xa7, 0x55, 0x3f, 0x92, 0x89, 0x95, 0xe1, 0x45, 0x51, 0x84, 0x4b, 0x80, 0xe0, 0x46, 0xe8, 0x47,
-	0x28, 0x6e, 0x84, 0xbe, 0x1c, 0x8a, 0x47, 0xe8, 0xa1, 0x61, 0xd0, 0x08, 0x31, 0x02, 0x0d, 0x1a,
-	0x21, 0x4e, 0x20, 0x29, 0x81, 0x6c, 0xc8, 0x31, 0x58, 0x41, 0xfc, 0xc7, 0x95, 0x85, 0x92, 0x28,
-	0x0f, 0x53, 0xde, 0x45, 0x44, 0xc4, 0x28, 0x2e, 0x22, 0x58, 0xba, 0x71, 0x11, 0x11, 0x43, 0x9f,
-	0x94, 0xd8, 0xa9, 0xbc, 0x57, 0xeb, 0xa6, 0xdf, 0x68, 0x55, 0xe5, 0x9a, 0x63, 0x29, 0x54, 0xab,
-	0x74, 0xb5, 0xca, 0x95, 0x5f, 0xe5, 0xd5, 0xb1, 0xe0, 0xd3, 0x79, 0xe3, 0x7f, 0x00, 0x00, 0x00,
-	0xff, 0xff, 0x97, 0x33, 0x07, 0xca, 0xb9, 0x0b, 0x00, 0x00,
+	// 816 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x56, 0x4d, 0x4f, 0xdb, 0x48,
+	0x18, 0xc6, 0x49, 0xf8, 0xc8, 0xcb, 0x26, 0xc0, 0xf0, 0x91, 0xac, 0x17, 0xb4, 0xd1, 0x2c, 0x48,
+	0xb0, 0x21, 0x36, 0x31, 0x81, 0x15, 0x1c, 0x56, 0x2c, 0x5b, 0x51, 0x51, 0x15, 0xa9, 0x72, 0x81,
+	0x43, 0x29, 0x20, 0x27, 0x9e, 0x26, 0x6e, 0xe3, 0xd8, 0xcc, 0x38, 0xa9, 0xd4, 0xaa, 0x52, 0x4f,
+	0xbd, 0xf5, 0xc2, 0x8f, 0x68, 0xff, 0x43, 0x4f, 0xfd, 0x3b, 0xfd, 0x17, 0xd5, 0xd8, 0xc1, 0xb1,
+	0xc1, 0xe0, 0xd0, 0x48, 0xdc, 0xc6, 0xce, 0xfb, 0x7c, 0xcc, 0xa3, 0xcc, 0x33, 0x86, 0x25, 0xcd,
+	0x36, 0x64, 0xa3, 0xe5, 0x10, 0xca, 0x08, 0xed, 0x18, 0x35, 0x22, 0x3b, 0x44, 0x33, 0x99, 0xdc,
+	0x51, 0xbc, 0x85, 0x64, 0x53, 0xcb, 0xb1, 0xd0, 0x42, 0xad, 0x41, 0x5e, 0x49, 0x5a, 0xdb, 0xb1,
+	0x4c, 0xcd, 0x21, 0x92, 0x6e, 0x99, 0x9a, 0xd1, 0x92, 0xbc, 0x89, 0x8e, 0x22, 0xce, 0xd7, 0x2d,
+	0xab, 0xde, 0x24, 0x32, 0x27, 0xd3, 0x5a, 0x2d, 0xcb, 0xd1, 0x1c, 0xc3, 0x6a, 0x75, 0xc1, 0x62,
+	0xae, 0xa3, 0x35, 0x0d, 0x5d, 0x73, 0x88, 0x7c, 0xb5, 0xf0, 0x7e, 0xc0, 0x7b, 0x90, 0x3a, 0x24,
+	0x9a, 0x89, 0xb2, 0x90, 0x30, 0xf4, 0xbc, 0x50, 0x10, 0x96, 0xd3, 0x6a, 0xc2, 0xd0, 0x11, 0x82,
+	0x54, 0x4b, 0x33, 0x49, 0x3e, 0xe1, 0xbe, 0x71, 0xd7, 0x48, 0x84, 0x31, 0x9b, 0x5a, 0xaf, 0x49,
+	0xcd, 0x61, 0xf9, 0x64, 0x21, 0xb9, 0x9c, 0x56, 0xfd, 0x67, 0xbc, 0x02, 0xf0, 0x98, 0x38, 0x9c,
+	0x4a, 0x25, 0x17, 0xe8, 0x8f, 0x1e, 0xdb, 0xee, 0xf8, 0xb7, 0x1f, 0xdf, 0x93, 0x23, 0x34, 0xa5,
+	0x24, 0x5e, 0x3e, 0xe7, 0xd4, 0x78, 0x0f, 0xc6, 0xfd, 0x51, 0x66, 0xa3, 0x7f, 0x20, 0xc5, 0x37,
+	0xe1, 0x4e, 0x8f, 0x2b, 0x7f, 0x49, 0x77, 0x6e, 0x53, 0x72, 0x61, 0x2e, 0x00, 0x67, 0xe1, 0xb7,
+	0xa7, 0x06, 0x73, 0x89, 0x98, 0x4a, 0x2e, 0xf0, 0x13, 0xc8, 0x04, 0x9e, 0x99, 0x8d, 0xb6, 0x60,
+	0xd8, 0xc5, 0xe5, 0x85, 0x42, 0xb2, 0x5f, 0x6a, 0x0f, 0x81, 0x3f, 0x0b, 0x90, 0x39, 0xb2, 0x79,
+	0x4e, 0xfd, 0x6c, 0x09, 0xfd, 0x19, 0x4c, 0x2b, 0xfc, 0xb3, 0x17, 0xdd, 0xbf, 0xd7, 0xa3, 0xdb,
+	0xc5, 0x7c, 0x68, 0xe1, 0x52, 0x10, 0xf3, 0x02, 0x9e, 0xa3, 0x33, 0x0a, 0x3a, 0x3b, 0xd1, 0x4a,
+	0xef, 0xd6, 0x4a, 0x5b, 0xa5, 0xf3, 0xd3, 0xf7, 0xe5, 0xd5, 0xcd, 0xca, 0x87, 0xc5, 0x40, 0xbc,
+	0xfb, 0x90, 0x0d, 0xda, 0x19, 0x24, 0xb6, 0x55, 0xc8, 0x3c, 0x22, 0x4d, 0xd2, 0xdf, 0xce, 0xb8,
+	0x70, 0x70, 0x7a, 0x10, 0xe1, 0x2f, 0x02, 0x64, 0xfe, 0xa7, 0x24, 0x90, 0x69, 0x25, 0xa0, 0xbc,
+	0xc8, 0x95, 0x53, 0x34, 0x31, 0x29, 0xf0, 0xc5, 0x6d, 0x89, 0x3c, 0x54, 0xd8, 0x41, 0x9f, 0x83,
+	0xec, 0x99, 0xc2, 0xd4, 0x7f, 0xba, 0xce, 0x5f, 0x1c, 0x10, 0xb3, 0x4a, 0x28, 0x8b, 0xfd, 0x2b,
+	0xed, 0xc0, 0x58, 0x9b, 0x11, 0x7a, 0x6e, 0xe8, 0x2c, 0x9f, 0x70, 0xcd, 0x2f, 0xf1, 0x91, 0xc2,
+	0xa5, 0xb0, 0x30, 0x26, 0xe4, 0x05, 0x9c, 0xa3, 0xb3, 0xca, 0xf4, 0xd9, 0xc9, 0xc9, 0xb6, 0xd6,
+	0x6c, 0xb5, 0xcd, 0xed, 0xd3, 0x73, 0xa9, 0xb8, 0x53, 0x3a, 0x2d, 0x2e, 0xaa, 0xa3, 0x1c, 0xb6,
+	0xaf, 0x33, 0x2c, 0x03, 0xba, 0xae, 0xc9, 0x6c, 0xf4, 0x7b, 0x80, 0x57, 0x70, 0x0f, 0xaf, 0x0f,
+	0x68, 0xc3, 0x8c, 0x4a, 0x4c, 0xab, 0x43, 0x1e, 0xd6, 0xa7, 0x02, 0xb3, 0x11, 0xb2, 0x77, 0x5b,
+	0x3d, 0x80, 0x99, 0x6e, 0x77, 0xb0, 0x3d, 0x8b, 0x7a, 0x20, 0x6e, 0x75, 0x03, 0x46, 0xbb, 0x90,
+	0xae, 0xdf, 0x79, 0x6e, 0xe6, 0x56, 0x0f, 0x23, 0x1e, 0x1f, 0x56, 0x61, 0x36, 0x82, 0x6e, 0xb0,
+	0xea, 0x58, 0xf7, 0x2d, 0x76, 0xf7, 0xd4, 0x30, 0xec, 0xd8, 0x63, 0xa6, 0xf8, 0x46, 0x82, 0xa0,
+	0xbb, 0xb3, 0x98, 0xe4, 0x9d, 0x50, 0xa7, 0x9a, 0x4e, 0x0e, 0xad, 0x63, 0x85, 0x37, 0xe0, 0x14,
+	0x4c, 0x84, 0xde, 0x30, 0x9b, 0x97, 0xa4, 0x4a, 0x18, 0x71, 0x0e, 0xad, 0xe3, 0x32, 0x1f, 0x99,
+	0x80, 0x4c, 0xe0, 0x99, 0xd9, 0xb8, 0x0c, 0x73, 0xcf, 0xda, 0xb4, 0x4e, 0x8e, 0x18, 0xa1, 0x61,
+	0xc3, 0xb9, 0x6b, 0x99, 0xfa, 0xa9, 0x15, 0x21, 0x17, 0x09, 0x61, 0x36, 0x9a, 0x84, 0x64, 0xcf,
+	0x29, 0x5f, 0x2a, 0x5f, 0xd3, 0x30, 0xec, 0x06, 0x8c, 0xaa, 0x30, 0xda, 0xdd, 0x23, 0x5a, 0x89,
+	0xc9, 0xb3, 0x77, 0x95, 0x88, 0x7f, 0xf7, 0x3b, 0xca, 0x6c, 0x3c, 0x84, 0x1a, 0x90, 0xf6, 0xef,
+	0x00, 0x54, 0x8c, 0x81, 0x06, 0x6f, 0x0f, 0x71, 0xb5, 0xff, 0x61, 0x57, 0xe9, 0x0d, 0x40, 0xaf,
+	0x24, 0x50, 0x1c, 0x3a, 0xd4, 0x7b, 0x62, 0xe9, 0x1e, 0xd3, 0x57, 0x62, 0xbd, 0xfa, 0x8f, 0x15,
+	0x0b, 0x5d, 0x5c, 0xb1, 0x62, 0xe1, 0x7b, 0xc5, 0x13, 0xeb, 0x55, 0x7e, 0xac, 0x58, 0xe8, 0x2e,
+	0x89, 0x15, 0x0b, 0xdf, 0x25, 0x78, 0x08, 0xbd, 0x85, 0x6c, 0xb8, 0xac, 0xd0, 0x5a, 0x0c, 0xc5,
+	0x8d, 0x3e, 0x15, 0xcb, 0xf7, 0x44, 0xb8, 0xc2, 0x1f, 0x05, 0x98, 0xba, 0x51, 0x3f, 0x68, 0x3d,
+	0x86, 0x2a, 0xaa, 0x27, 0xc5, 0xca, 0xfd, 0x41, 0xbe, 0x85, 0x1b, 0xf5, 0x13, 0x6b, 0x21, 0xaa,
+	0xff, 0x62, 0x2d, 0x44, 0xb6, 0x5c, 0xd8, 0x42, 0xef, 0x24, 0xf7, 0x6b, 0x21, 0x54, 0x17, 0xfd,
+	0x5a, 0x08, 0x17, 0x06, 0x1e, 0x42, 0x9f, 0x04, 0x98, 0x8e, 0xa8, 0x13, 0xb4, 0x11, 0xc3, 0x17,
+	0xdd, 0x5a, 0xe2, 0xe6, 0xaf, 0xc0, 0xb8, 0x91, 0xdd, 0xca, 0x0b, 0xa5, 0x6e, 0x38, 0x8d, 0x76,
+	0x55, 0xaa, 0x59, 0xa6, 0xcc, 0x59, 0xe4, 0x2b, 0x16, 0xf9, 0xd6, 0x4f, 0xf4, 0xea, 0x88, 0xfb,
+	0x1d, 0xbd, 0xfe, 0x33, 0x00, 0x00, 0xff, 0xff, 0x20, 0xef, 0xa1, 0x30, 0xc6, 0x0b, 0x00, 0x00,
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -1053,10 +1134,10 @@ var _ grpc.ClientConnInterface
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion6
 
-// TeamsV2Client is the client API for TeamsV2 service.
+// TeamsClient is the client API for Teams service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
-type TeamsV2Client interface {
+type TeamsClient interface {
 	GetTeam(ctx context.Context, in *GetTeamReq, opts ...grpc.CallOption) (*GetTeamResp, error)
 	ListTeams(ctx context.Context, in *ListTeamsReq, opts ...grpc.CallOption) (*ListTeamsResp, error)
 	CreateTeam(ctx context.Context, in *CreateTeamReq, opts ...grpc.CallOption) (*CreateTeamResp, error)
@@ -1066,119 +1147,109 @@ type TeamsV2Client interface {
 	RemoveTeamMembers(ctx context.Context, in *RemoveTeamMembersReq, opts ...grpc.CallOption) (*RemoveTeamMembersResp, error)
 	GetTeamsForMember(ctx context.Context, in *GetTeamsForMemberReq, opts ...grpc.CallOption) (*GetTeamsForMemberResp, error)
 	GetTeamMembership(ctx context.Context, in *GetTeamMembershipReq, opts ...grpc.CallOption) (*GetTeamMembershipResp, error)
-	UpgradeToV2(ctx context.Context, in *UpgradeToV2Req, opts ...grpc.CallOption) (*UpgradeToV2Resp, error)
-	ResetToV1(ctx context.Context, in *ResetToV1Req, opts ...grpc.CallOption) (*ResetToV1Resp, error)
+	PurgeUserMembership(ctx context.Context, in *PurgeUserMembershipReq, opts ...grpc.CallOption) (*PurgeUserMembershipResp, error)
 }
 
-type teamsV2Client struct {
+type teamsClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewTeamsV2Client(cc grpc.ClientConnInterface) TeamsV2Client {
-	return &teamsV2Client{cc}
+func NewTeamsClient(cc grpc.ClientConnInterface) TeamsClient {
+	return &teamsClient{cc}
 }
 
-func (c *teamsV2Client) GetTeam(ctx context.Context, in *GetTeamReq, opts ...grpc.CallOption) (*GetTeamResp, error) {
+func (c *teamsClient) GetTeam(ctx context.Context, in *GetTeamReq, opts ...grpc.CallOption) (*GetTeamResp, error) {
 	out := new(GetTeamResp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.TeamsV2/GetTeam", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.Teams/GetTeam", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamsV2Client) ListTeams(ctx context.Context, in *ListTeamsReq, opts ...grpc.CallOption) (*ListTeamsResp, error) {
+func (c *teamsClient) ListTeams(ctx context.Context, in *ListTeamsReq, opts ...grpc.CallOption) (*ListTeamsResp, error) {
 	out := new(ListTeamsResp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.TeamsV2/ListTeams", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.Teams/ListTeams", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamsV2Client) CreateTeam(ctx context.Context, in *CreateTeamReq, opts ...grpc.CallOption) (*CreateTeamResp, error) {
+func (c *teamsClient) CreateTeam(ctx context.Context, in *CreateTeamReq, opts ...grpc.CallOption) (*CreateTeamResp, error) {
 	out := new(CreateTeamResp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.TeamsV2/CreateTeam", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.Teams/CreateTeam", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamsV2Client) UpdateTeam(ctx context.Context, in *UpdateTeamReq, opts ...grpc.CallOption) (*UpdateTeamResp, error) {
+func (c *teamsClient) UpdateTeam(ctx context.Context, in *UpdateTeamReq, opts ...grpc.CallOption) (*UpdateTeamResp, error) {
 	out := new(UpdateTeamResp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.TeamsV2/UpdateTeam", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.Teams/UpdateTeam", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamsV2Client) DeleteTeam(ctx context.Context, in *DeleteTeamReq, opts ...grpc.CallOption) (*DeleteTeamResp, error) {
+func (c *teamsClient) DeleteTeam(ctx context.Context, in *DeleteTeamReq, opts ...grpc.CallOption) (*DeleteTeamResp, error) {
 	out := new(DeleteTeamResp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.TeamsV2/DeleteTeam", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.Teams/DeleteTeam", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamsV2Client) AddTeamMembers(ctx context.Context, in *AddTeamMembersReq, opts ...grpc.CallOption) (*AddTeamMembersResp, error) {
+func (c *teamsClient) AddTeamMembers(ctx context.Context, in *AddTeamMembersReq, opts ...grpc.CallOption) (*AddTeamMembersResp, error) {
 	out := new(AddTeamMembersResp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.TeamsV2/AddTeamMembers", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.Teams/AddTeamMembers", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamsV2Client) RemoveTeamMembers(ctx context.Context, in *RemoveTeamMembersReq, opts ...grpc.CallOption) (*RemoveTeamMembersResp, error) {
+func (c *teamsClient) RemoveTeamMembers(ctx context.Context, in *RemoveTeamMembersReq, opts ...grpc.CallOption) (*RemoveTeamMembersResp, error) {
 	out := new(RemoveTeamMembersResp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.TeamsV2/RemoveTeamMembers", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.Teams/RemoveTeamMembers", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamsV2Client) GetTeamsForMember(ctx context.Context, in *GetTeamsForMemberReq, opts ...grpc.CallOption) (*GetTeamsForMemberResp, error) {
+func (c *teamsClient) GetTeamsForMember(ctx context.Context, in *GetTeamsForMemberReq, opts ...grpc.CallOption) (*GetTeamsForMemberResp, error) {
 	out := new(GetTeamsForMemberResp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.TeamsV2/GetTeamsForMember", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.Teams/GetTeamsForMember", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamsV2Client) GetTeamMembership(ctx context.Context, in *GetTeamMembershipReq, opts ...grpc.CallOption) (*GetTeamMembershipResp, error) {
+func (c *teamsClient) GetTeamMembership(ctx context.Context, in *GetTeamMembershipReq, opts ...grpc.CallOption) (*GetTeamMembershipResp, error) {
 	out := new(GetTeamMembershipResp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.TeamsV2/GetTeamMembership", in, out, opts...)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.Teams/GetTeamMembership", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamsV2Client) UpgradeToV2(ctx context.Context, in *UpgradeToV2Req, opts ...grpc.CallOption) (*UpgradeToV2Resp, error) {
-	out := new(UpgradeToV2Resp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.TeamsV2/UpgradeToV2", in, out, opts...)
+func (c *teamsClient) PurgeUserMembership(ctx context.Context, in *PurgeUserMembershipReq, opts ...grpc.CallOption) (*PurgeUserMembershipResp, error) {
+	out := new(PurgeUserMembershipResp)
+	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.Teams/PurgeUserMembership", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *teamsV2Client) ResetToV1(ctx context.Context, in *ResetToV1Req, opts ...grpc.CallOption) (*ResetToV1Resp, error) {
-	out := new(ResetToV1Resp)
-	err := c.cc.Invoke(ctx, "/chef.automate.domain.teams.v2.TeamsV2/ResetToV1", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// TeamsV2Server is the server API for TeamsV2 service.
-type TeamsV2Server interface {
+// TeamsServer is the server API for Teams service.
+type TeamsServer interface {
 	GetTeam(context.Context, *GetTeamReq) (*GetTeamResp, error)
 	ListTeams(context.Context, *ListTeamsReq) (*ListTeamsResp, error)
 	CreateTeam(context.Context, *CreateTeamReq) (*CreateTeamResp, error)
@@ -1188,297 +1259,271 @@ type TeamsV2Server interface {
 	RemoveTeamMembers(context.Context, *RemoveTeamMembersReq) (*RemoveTeamMembersResp, error)
 	GetTeamsForMember(context.Context, *GetTeamsForMemberReq) (*GetTeamsForMemberResp, error)
 	GetTeamMembership(context.Context, *GetTeamMembershipReq) (*GetTeamMembershipResp, error)
-	UpgradeToV2(context.Context, *UpgradeToV2Req) (*UpgradeToV2Resp, error)
-	ResetToV1(context.Context, *ResetToV1Req) (*ResetToV1Resp, error)
+	PurgeUserMembership(context.Context, *PurgeUserMembershipReq) (*PurgeUserMembershipResp, error)
 }
 
-// UnimplementedTeamsV2Server can be embedded to have forward compatible implementations.
-type UnimplementedTeamsV2Server struct {
+// UnimplementedTeamsServer can be embedded to have forward compatible implementations.
+type UnimplementedTeamsServer struct {
 }
 
-func (*UnimplementedTeamsV2Server) GetTeam(ctx context.Context, req *GetTeamReq) (*GetTeamResp, error) {
+func (*UnimplementedTeamsServer) GetTeam(ctx context.Context, req *GetTeamReq) (*GetTeamResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeam not implemented")
 }
-func (*UnimplementedTeamsV2Server) ListTeams(ctx context.Context, req *ListTeamsReq) (*ListTeamsResp, error) {
+func (*UnimplementedTeamsServer) ListTeams(ctx context.Context, req *ListTeamsReq) (*ListTeamsResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListTeams not implemented")
 }
-func (*UnimplementedTeamsV2Server) CreateTeam(ctx context.Context, req *CreateTeamReq) (*CreateTeamResp, error) {
+func (*UnimplementedTeamsServer) CreateTeam(ctx context.Context, req *CreateTeamReq) (*CreateTeamResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateTeam not implemented")
 }
-func (*UnimplementedTeamsV2Server) UpdateTeam(ctx context.Context, req *UpdateTeamReq) (*UpdateTeamResp, error) {
+func (*UnimplementedTeamsServer) UpdateTeam(ctx context.Context, req *UpdateTeamReq) (*UpdateTeamResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateTeam not implemented")
 }
-func (*UnimplementedTeamsV2Server) DeleteTeam(ctx context.Context, req *DeleteTeamReq) (*DeleteTeamResp, error) {
+func (*UnimplementedTeamsServer) DeleteTeam(ctx context.Context, req *DeleteTeamReq) (*DeleteTeamResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteTeam not implemented")
 }
-func (*UnimplementedTeamsV2Server) AddTeamMembers(ctx context.Context, req *AddTeamMembersReq) (*AddTeamMembersResp, error) {
+func (*UnimplementedTeamsServer) AddTeamMembers(ctx context.Context, req *AddTeamMembersReq) (*AddTeamMembersResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddTeamMembers not implemented")
 }
-func (*UnimplementedTeamsV2Server) RemoveTeamMembers(ctx context.Context, req *RemoveTeamMembersReq) (*RemoveTeamMembersResp, error) {
+func (*UnimplementedTeamsServer) RemoveTeamMembers(ctx context.Context, req *RemoveTeamMembersReq) (*RemoveTeamMembersResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method RemoveTeamMembers not implemented")
 }
-func (*UnimplementedTeamsV2Server) GetTeamsForMember(ctx context.Context, req *GetTeamsForMemberReq) (*GetTeamsForMemberResp, error) {
+func (*UnimplementedTeamsServer) GetTeamsForMember(ctx context.Context, req *GetTeamsForMemberReq) (*GetTeamsForMemberResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeamsForMember not implemented")
 }
-func (*UnimplementedTeamsV2Server) GetTeamMembership(ctx context.Context, req *GetTeamMembershipReq) (*GetTeamMembershipResp, error) {
+func (*UnimplementedTeamsServer) GetTeamMembership(ctx context.Context, req *GetTeamMembershipReq) (*GetTeamMembershipResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetTeamMembership not implemented")
 }
-func (*UnimplementedTeamsV2Server) UpgradeToV2(ctx context.Context, req *UpgradeToV2Req) (*UpgradeToV2Resp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method UpgradeToV2 not implemented")
-}
-func (*UnimplementedTeamsV2Server) ResetToV1(ctx context.Context, req *ResetToV1Req) (*ResetToV1Resp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method ResetToV1 not implemented")
+func (*UnimplementedTeamsServer) PurgeUserMembership(ctx context.Context, req *PurgeUserMembershipReq) (*PurgeUserMembershipResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method PurgeUserMembership not implemented")
 }
 
-func RegisterTeamsV2Server(s *grpc.Server, srv TeamsV2Server) {
-	s.RegisterService(&_TeamsV2_serviceDesc, srv)
+func RegisterTeamsServer(s *grpc.Server, srv TeamsServer) {
+	s.RegisterService(&_Teams_serviceDesc, srv)
 }
 
-func _TeamsV2_GetTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Teams_GetTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetTeamReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamsV2Server).GetTeam(ctx, in)
+		return srv.(TeamsServer).GetTeam(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.teams.v2.TeamsV2/GetTeam",
+		FullMethod: "/chef.automate.domain.teams.v2.Teams/GetTeam",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsV2Server).GetTeam(ctx, req.(*GetTeamReq))
+		return srv.(TeamsServer).GetTeam(ctx, req.(*GetTeamReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamsV2_ListTeams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Teams_ListTeams_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListTeamsReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamsV2Server).ListTeams(ctx, in)
+		return srv.(TeamsServer).ListTeams(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.teams.v2.TeamsV2/ListTeams",
+		FullMethod: "/chef.automate.domain.teams.v2.Teams/ListTeams",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsV2Server).ListTeams(ctx, req.(*ListTeamsReq))
+		return srv.(TeamsServer).ListTeams(ctx, req.(*ListTeamsReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamsV2_CreateTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Teams_CreateTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateTeamReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamsV2Server).CreateTeam(ctx, in)
+		return srv.(TeamsServer).CreateTeam(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.teams.v2.TeamsV2/CreateTeam",
+		FullMethod: "/chef.automate.domain.teams.v2.Teams/CreateTeam",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsV2Server).CreateTeam(ctx, req.(*CreateTeamReq))
+		return srv.(TeamsServer).CreateTeam(ctx, req.(*CreateTeamReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamsV2_UpdateTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Teams_UpdateTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateTeamReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamsV2Server).UpdateTeam(ctx, in)
+		return srv.(TeamsServer).UpdateTeam(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.teams.v2.TeamsV2/UpdateTeam",
+		FullMethod: "/chef.automate.domain.teams.v2.Teams/UpdateTeam",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsV2Server).UpdateTeam(ctx, req.(*UpdateTeamReq))
+		return srv.(TeamsServer).UpdateTeam(ctx, req.(*UpdateTeamReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamsV2_DeleteTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Teams_DeleteTeam_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(DeleteTeamReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamsV2Server).DeleteTeam(ctx, in)
+		return srv.(TeamsServer).DeleteTeam(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.teams.v2.TeamsV2/DeleteTeam",
+		FullMethod: "/chef.automate.domain.teams.v2.Teams/DeleteTeam",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsV2Server).DeleteTeam(ctx, req.(*DeleteTeamReq))
+		return srv.(TeamsServer).DeleteTeam(ctx, req.(*DeleteTeamReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamsV2_AddTeamMembers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Teams_AddTeamMembers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(AddTeamMembersReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamsV2Server).AddTeamMembers(ctx, in)
+		return srv.(TeamsServer).AddTeamMembers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.teams.v2.TeamsV2/AddTeamMembers",
+		FullMethod: "/chef.automate.domain.teams.v2.Teams/AddTeamMembers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsV2Server).AddTeamMembers(ctx, req.(*AddTeamMembersReq))
+		return srv.(TeamsServer).AddTeamMembers(ctx, req.(*AddTeamMembersReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamsV2_RemoveTeamMembers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Teams_RemoveTeamMembers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(RemoveTeamMembersReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamsV2Server).RemoveTeamMembers(ctx, in)
+		return srv.(TeamsServer).RemoveTeamMembers(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.teams.v2.TeamsV2/RemoveTeamMembers",
+		FullMethod: "/chef.automate.domain.teams.v2.Teams/RemoveTeamMembers",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsV2Server).RemoveTeamMembers(ctx, req.(*RemoveTeamMembersReq))
+		return srv.(TeamsServer).RemoveTeamMembers(ctx, req.(*RemoveTeamMembersReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamsV2_GetTeamsForMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Teams_GetTeamsForMember_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetTeamsForMemberReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamsV2Server).GetTeamsForMember(ctx, in)
+		return srv.(TeamsServer).GetTeamsForMember(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.teams.v2.TeamsV2/GetTeamsForMember",
+		FullMethod: "/chef.automate.domain.teams.v2.Teams/GetTeamsForMember",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsV2Server).GetTeamsForMember(ctx, req.(*GetTeamsForMemberReq))
+		return srv.(TeamsServer).GetTeamsForMember(ctx, req.(*GetTeamsForMemberReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamsV2_GetTeamMembership_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Teams_GetTeamMembership_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetTeamMembershipReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamsV2Server).GetTeamMembership(ctx, in)
+		return srv.(TeamsServer).GetTeamMembership(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.teams.v2.TeamsV2/GetTeamMembership",
+		FullMethod: "/chef.automate.domain.teams.v2.Teams/GetTeamMembership",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsV2Server).GetTeamMembership(ctx, req.(*GetTeamMembershipReq))
+		return srv.(TeamsServer).GetTeamMembership(ctx, req.(*GetTeamMembershipReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamsV2_UpgradeToV2_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(UpgradeToV2Req)
+func _Teams_PurgeUserMembership_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(PurgeUserMembershipReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(TeamsV2Server).UpgradeToV2(ctx, in)
+		return srv.(TeamsServer).PurgeUserMembership(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/chef.automate.domain.teams.v2.TeamsV2/UpgradeToV2",
+		FullMethod: "/chef.automate.domain.teams.v2.Teams/PurgeUserMembership",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsV2Server).UpgradeToV2(ctx, req.(*UpgradeToV2Req))
+		return srv.(TeamsServer).PurgeUserMembership(ctx, req.(*PurgeUserMembershipReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _TeamsV2_ResetToV1_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ResetToV1Req)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(TeamsV2Server).ResetToV1(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/chef.automate.domain.teams.v2.TeamsV2/ResetToV1",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(TeamsV2Server).ResetToV1(ctx, req.(*ResetToV1Req))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-var _TeamsV2_serviceDesc = grpc.ServiceDesc{
-	ServiceName: "chef.automate.domain.teams.v2.TeamsV2",
-	HandlerType: (*TeamsV2Server)(nil),
+var _Teams_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "chef.automate.domain.teams.v2.Teams",
+	HandlerType: (*TeamsServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "GetTeam",
-			Handler:    _TeamsV2_GetTeam_Handler,
+			Handler:    _Teams_GetTeam_Handler,
 		},
 		{
 			MethodName: "ListTeams",
-			Handler:    _TeamsV2_ListTeams_Handler,
+			Handler:    _Teams_ListTeams_Handler,
 		},
 		{
 			MethodName: "CreateTeam",
-			Handler:    _TeamsV2_CreateTeam_Handler,
+			Handler:    _Teams_CreateTeam_Handler,
 		},
 		{
 			MethodName: "UpdateTeam",
-			Handler:    _TeamsV2_UpdateTeam_Handler,
+			Handler:    _Teams_UpdateTeam_Handler,
 		},
 		{
 			MethodName: "DeleteTeam",
-			Handler:    _TeamsV2_DeleteTeam_Handler,
+			Handler:    _Teams_DeleteTeam_Handler,
 		},
 		{
 			MethodName: "AddTeamMembers",
-			Handler:    _TeamsV2_AddTeamMembers_Handler,
+			Handler:    _Teams_AddTeamMembers_Handler,
 		},
 		{
 			MethodName: "RemoveTeamMembers",
-			Handler:    _TeamsV2_RemoveTeamMembers_Handler,
+			Handler:    _Teams_RemoveTeamMembers_Handler,
 		},
 		{
 			MethodName: "GetTeamsForMember",
-			Handler:    _TeamsV2_GetTeamsForMember_Handler,
+			Handler:    _Teams_GetTeamsForMember_Handler,
 		},
 		{
 			MethodName: "GetTeamMembership",
-			Handler:    _TeamsV2_GetTeamMembership_Handler,
+			Handler:    _Teams_GetTeamMembership_Handler,
 		},
 		{
-			MethodName: "UpgradeToV2",
-			Handler:    _TeamsV2_UpgradeToV2_Handler,
-		},
-		{
-			MethodName: "ResetToV1",
-			Handler:    _TeamsV2_ResetToV1_Handler,
+			MethodName: "PurgeUserMembership",
+			Handler:    _Teams_PurgeUserMembership_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

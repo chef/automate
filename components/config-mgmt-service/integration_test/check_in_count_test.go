@@ -22,27 +22,27 @@ func TestCheckinCount(t *testing.T) {
 			node iBackend.Node
 			runs []iBackend.Run
 		}
-		expectedResponse []backend.CheckInPeroid
+		expectedResponse []backend.CountPeroid
 	}{
 		{
 			description: "Zero nodes three days window",
 			now:         parseTime(t, "2020-03-15T12:34:00Z"),
 			daysAgo:     3,
-			expectedResponse: []backend.CheckInPeroid{
+			expectedResponse: []backend.CountPeroid{
 				{
-					CheckInCount: 0,
-					Start:        parseTime(t, "2020-03-12T13:00:00Z"),
-					End:          parseTime(t, "2020-03-13T12:59:59Z"),
+					Count: 0,
+					Start: parseTime(t, "2020-03-12T13:00:00Z"),
+					End:   parseTime(t, "2020-03-13T12:59:59Z"),
 				},
 				{
-					CheckInCount: 0,
-					Start:        parseTime(t, "2020-03-13T13:00:00Z"),
-					End:          parseTime(t, "2020-03-14T12:59:59Z"),
+					Count: 0,
+					Start: parseTime(t, "2020-03-13T13:00:00Z"),
+					End:   parseTime(t, "2020-03-14T12:59:59Z"),
 				},
 				{
-					CheckInCount: 0,
-					Start:        parseTime(t, "2020-03-14T13:00:00Z"),
-					End:          parseTime(t, "2020-03-15T12:59:59Z"),
+					Count: 0,
+					Start: parseTime(t, "2020-03-14T13:00:00Z"),
+					End:   parseTime(t, "2020-03-15T12:59:59Z"),
 				},
 			},
 			nodeSets: []struct {
@@ -54,21 +54,21 @@ func TestCheckinCount(t *testing.T) {
 			description: "One node checks-in all three days",
 			now:         parseTime(t, "2020-03-15T12:34:00Z"),
 			daysAgo:     3,
-			expectedResponse: []backend.CheckInPeroid{
+			expectedResponse: []backend.CountPeroid{
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-12T13:00:00Z"),
-					End:          parseTime(t, "2020-03-13T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-12T13:00:00Z"),
+					End:   parseTime(t, "2020-03-13T12:59:59Z"),
 				},
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-13T13:00:00Z"),
-					End:          parseTime(t, "2020-03-14T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-13T13:00:00Z"),
+					End:   parseTime(t, "2020-03-14T12:59:59Z"),
 				},
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-14T13:00:00Z"),
-					End:          parseTime(t, "2020-03-15T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-14T13:00:00Z"),
+					End:   parseTime(t, "2020-03-15T12:59:59Z"),
 				},
 			},
 			nodeSets: []struct {
@@ -100,21 +100,21 @@ func TestCheckinCount(t *testing.T) {
 			description: "Empty last bucket",
 			now:         parseTime(t, "2020-03-15T12:34:00Z"),
 			daysAgo:     3,
-			expectedResponse: []backend.CheckInPeroid{
+			expectedResponse: []backend.CountPeroid{
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-12T13:00:00Z"),
-					End:          parseTime(t, "2020-03-13T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-12T13:00:00Z"),
+					End:   parseTime(t, "2020-03-13T12:59:59Z"),
 				},
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-13T13:00:00Z"),
-					End:          parseTime(t, "2020-03-14T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-13T13:00:00Z"),
+					End:   parseTime(t, "2020-03-14T12:59:59Z"),
 				},
 				{
-					CheckInCount: 0,
-					Start:        parseTime(t, "2020-03-14T13:00:00Z"),
-					End:          parseTime(t, "2020-03-15T12:59:59Z"),
+					Count: 0,
+					Start: parseTime(t, "2020-03-14T13:00:00Z"),
+					End:   parseTime(t, "2020-03-15T12:59:59Z"),
 				},
 			},
 			nodeSets: []struct {
@@ -142,21 +142,21 @@ func TestCheckinCount(t *testing.T) {
 			description: "Empty start bucket",
 			now:         parseTime(t, "2020-03-15T12:34:00Z"),
 			daysAgo:     3,
-			expectedResponse: []backend.CheckInPeroid{
+			expectedResponse: []backend.CountPeroid{
 				{
-					CheckInCount: 0,
-					Start:        parseTime(t, "2020-03-12T13:00:00Z"),
-					End:          parseTime(t, "2020-03-13T12:59:59Z"),
+					Count: 0,
+					Start: parseTime(t, "2020-03-12T13:00:00Z"),
+					End:   parseTime(t, "2020-03-13T12:59:59Z"),
 				},
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-13T13:00:00Z"),
-					End:          parseTime(t, "2020-03-14T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-13T13:00:00Z"),
+					End:   parseTime(t, "2020-03-14T12:59:59Z"),
 				},
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-14T13:00:00Z"),
-					End:          parseTime(t, "2020-03-15T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-14T13:00:00Z"),
+					End:   parseTime(t, "2020-03-15T12:59:59Z"),
 				},
 			},
 			nodeSets: []struct {
@@ -184,21 +184,21 @@ func TestCheckinCount(t *testing.T) {
 			description: "Empty center bucket",
 			now:         parseTime(t, "2020-03-15T12:34:00Z"),
 			daysAgo:     3,
-			expectedResponse: []backend.CheckInPeroid{
+			expectedResponse: []backend.CountPeroid{
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-12T13:00:00Z"),
-					End:          parseTime(t, "2020-03-13T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-12T13:00:00Z"),
+					End:   parseTime(t, "2020-03-13T12:59:59Z"),
 				},
 				{
-					CheckInCount: 0,
-					Start:        parseTime(t, "2020-03-13T13:00:00Z"),
-					End:          parseTime(t, "2020-03-14T12:59:59Z"),
+					Count: 0,
+					Start: parseTime(t, "2020-03-13T13:00:00Z"),
+					End:   parseTime(t, "2020-03-14T12:59:59Z"),
 				},
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-14T13:00:00Z"),
-					End:          parseTime(t, "2020-03-15T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-14T13:00:00Z"),
+					End:   parseTime(t, "2020-03-15T12:59:59Z"),
 				},
 			},
 			nodeSets: []struct {
@@ -226,11 +226,11 @@ func TestCheckinCount(t *testing.T) {
 			description: "One node checks-in twice in one day",
 			now:         parseTime(t, "2020-03-15T01:14:00Z"),
 			daysAgo:     1,
-			expectedResponse: []backend.CheckInPeroid{
+			expectedResponse: []backend.CountPeroid{
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-14T02:00:00Z"),
-					End:          parseTime(t, "2020-03-15T01:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-14T02:00:00Z"),
+					End:   parseTime(t, "2020-03-15T01:59:59Z"),
 				},
 			},
 			nodeSets: []struct {
@@ -258,11 +258,11 @@ func TestCheckinCount(t *testing.T) {
 			description: "Two nodes check-in on the same day",
 			now:         parseTime(t, "2020-03-15T11:59:00Z"),
 			daysAgo:     1,
-			expectedResponse: []backend.CheckInPeroid{
+			expectedResponse: []backend.CountPeroid{
 				{
-					CheckInCount: 2,
-					Start:        parseTime(t, "2020-03-14T12:00:00Z"),
-					End:          parseTime(t, "2020-03-15T11:59:59Z"),
+					Count: 2,
+					Start: parseTime(t, "2020-03-14T12:00:00Z"),
+					End:   parseTime(t, "2020-03-15T11:59:59Z"),
 				},
 			},
 			nodeSets: []struct {
@@ -297,21 +297,21 @@ func TestCheckinCount(t *testing.T) {
 			description: "3 days over daylight savings hour forword",
 			now:         parseTime(t, "2020-03-09T12:34:00Z"),
 			daysAgo:     3,
-			expectedResponse: []backend.CheckInPeroid{
+			expectedResponse: []backend.CountPeroid{
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-06T13:00:00Z"),
-					End:          parseTime(t, "2020-03-07T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-06T13:00:00Z"),
+					End:   parseTime(t, "2020-03-07T12:59:59Z"),
 				},
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-07T13:00:00Z"),
-					End:          parseTime(t, "2020-03-08T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-07T13:00:00Z"),
+					End:   parseTime(t, "2020-03-08T12:59:59Z"),
 				},
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-08T13:00:00Z"),
-					End:          parseTime(t, "2020-03-09T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-08T13:00:00Z"),
+					End:   parseTime(t, "2020-03-09T12:59:59Z"),
 				},
 			},
 			nodeSets: []struct {
@@ -343,21 +343,21 @@ func TestCheckinCount(t *testing.T) {
 			description: "3 days over daylight savings hour back",
 			now:         parseTime(t, "2019-11-04T12:34:00Z"),
 			daysAgo:     3,
-			expectedResponse: []backend.CheckInPeroid{
+			expectedResponse: []backend.CountPeroid{
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2019-11-01T13:00:00Z"),
-					End:          parseTime(t, "2019-11-02T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2019-11-01T13:00:00Z"),
+					End:   parseTime(t, "2019-11-02T12:59:59Z"),
 				},
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2019-11-02T13:00:00Z"),
-					End:          parseTime(t, "2019-11-03T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2019-11-02T13:00:00Z"),
+					End:   parseTime(t, "2019-11-03T12:59:59Z"),
 				},
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2019-11-03T13:00:00Z"),
-					End:          parseTime(t, "2019-11-04T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2019-11-03T13:00:00Z"),
+					End:   parseTime(t, "2019-11-04T12:59:59Z"),
 				},
 			},
 			nodeSets: []struct {
@@ -392,21 +392,21 @@ func TestCheckinCount(t *testing.T) {
 			filter: map[string][]string{
 				"environment": {"forest"},
 			},
-			expectedResponse: []backend.CheckInPeroid{
+			expectedResponse: []backend.CountPeroid{
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-12T13:00:00Z"),
-					End:          parseTime(t, "2020-03-13T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-12T13:00:00Z"),
+					End:   parseTime(t, "2020-03-13T12:59:59Z"),
 				},
 				{
-					CheckInCount: 0,
-					Start:        parseTime(t, "2020-03-13T13:00:00Z"),
-					End:          parseTime(t, "2020-03-14T12:59:59Z"),
+					Count: 0,
+					Start: parseTime(t, "2020-03-13T13:00:00Z"),
+					End:   parseTime(t, "2020-03-14T12:59:59Z"),
 				},
 				{
-					CheckInCount: 1,
-					Start:        parseTime(t, "2020-03-14T13:00:00Z"),
-					End:          parseTime(t, "2020-03-15T12:59:59Z"),
+					Count: 1,
+					Start: parseTime(t, "2020-03-14T13:00:00Z"),
+					End:   parseTime(t, "2020-03-15T12:59:59Z"),
 				},
 			},
 			nodeSets: []struct {
@@ -450,11 +450,11 @@ func TestCheckinCount(t *testing.T) {
 			description: "Over 10 nodes in one period",
 			now:         parseTime(t, "2020-03-15T12:34:00Z"),
 			daysAgo:     1,
-			expectedResponse: []backend.CheckInPeroid{
+			expectedResponse: []backend.CountPeroid{
 				{
-					CheckInCount: 11,
-					Start:        parseTime(t, "2020-03-14T13:00:00Z"),
-					End:          parseTime(t, "2020-03-15T12:59:59Z"),
+					Count: 11,
+					Start: parseTime(t, "2020-03-14T13:00:00Z"),
+					End:   parseTime(t, "2020-03-15T12:59:59Z"),
 				},
 			},
 			nodeSets: []struct {
@@ -625,8 +625,371 @@ func TestCheckinCount(t *testing.T) {
 					actualResponse[index].Start.Format(time.RFC3339))
 				assert.Equal(t, testCase.expectedResponse[index].End.Format(time.RFC3339),
 					actualResponse[index].End.Format(time.RFC3339))
-				assert.Equal(t, testCase.expectedResponse[index].CheckInCount,
-					actualResponse[index].CheckInCount)
+				assert.Equal(t, testCase.expectedResponse[index].Count,
+					actualResponse[index].Count)
+			}
+		})
+	}
+}
+
+func TestTimeSeriesDeletedNodes(t *testing.T) {
+	cases := []struct {
+		description      string
+		filter           map[string][]string
+		nodes            []iBackend.Node
+		datetime         time.Time
+		daysAgo          int
+		expectedResponse []backend.CountPeroid
+	}{
+		{
+			description: "Three daily buckets with one node deleted each day",
+			datetime:    parseTime(t, "2020-03-15T20:02:59Z"),
+			daysAgo:     3,
+			nodes: []iBackend.Node{
+				{
+					Exists: false,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-03-15T16:02:59Z"),
+					},
+				},
+				{
+					Exists: false,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-03-14T16:02:59Z"),
+					},
+				},
+				{
+					Exists: false,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-03-13T16:02:59Z"),
+					},
+				},
+			},
+			expectedResponse: []backend.CountPeroid{
+				{
+					Start: parseTime(t, "2020-03-12T21:00:00Z"),
+					End:   parseTime(t, "2020-03-13T20:59:59Z"),
+					Count: 1,
+				},
+				{
+					Start: parseTime(t, "2020-03-13T21:00:00Z"),
+					End:   parseTime(t, "2020-03-14T20:59:59Z"),
+					Count: 2,
+				},
+				{
+					Start: parseTime(t, "2020-03-14T21:00:00Z"),
+					End:   parseTime(t, "2020-03-15T20:59:59Z"),
+					Count: 3,
+				},
+			},
+		},
+		{
+			description: "All but one node is deleted",
+			datetime:    parseTime(t, "2020-03-15T20:02:59Z"),
+			daysAgo:     3,
+			nodes: []iBackend.Node{
+				{
+					Exists: false,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-03-15T16:02:59Z"),
+					},
+				},
+				{
+					Exists: true,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-03-14T16:02:59Z"),
+					},
+				},
+				{
+					Exists: false,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-03-13T16:02:59Z"),
+					},
+				},
+			},
+			expectedResponse: []backend.CountPeroid{
+				{
+					Start: parseTime(t, "2020-03-12T21:00:00Z"),
+					End:   parseTime(t, "2020-03-13T20:59:59Z"),
+					Count: 1,
+				},
+				{
+					Start: parseTime(t, "2020-03-13T21:00:00Z"),
+					End:   parseTime(t, "2020-03-14T20:59:59Z"),
+					Count: 1,
+				},
+				{
+					Start: parseTime(t, "2020-03-14T21:00:00Z"),
+					End:   parseTime(t, "2020-03-15T20:59:59Z"),
+					Count: 2,
+				},
+			},
+		},
+		{
+			description: "All nodes deleted in last 24 hours",
+			datetime:    parseTime(t, "2020-03-15T20:02:59Z"),
+			daysAgo:     3,
+			nodes: []iBackend.Node{
+				{
+					Exists: false,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-03-15T16:02:59Z"),
+					},
+				},
+				{
+					Exists: false,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-03-15T16:12:59Z"),
+					},
+				},
+				{
+					Exists: false,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-03-15T16:22:59Z"),
+					},
+				},
+			},
+			expectedResponse: []backend.CountPeroid{
+				{
+					Start: parseTime(t, "2020-03-12T21:00:00Z"),
+					End:   parseTime(t, "2020-03-13T20:59:59Z"),
+					Count: 0,
+				},
+				{
+					Start: parseTime(t, "2020-03-13T21:00:00Z"),
+					End:   parseTime(t, "2020-03-14T20:59:59Z"),
+					Count: 0,
+				},
+				{
+					Start: parseTime(t, "2020-03-14T21:00:00Z"),
+					End:   parseTime(t, "2020-03-15T20:59:59Z"),
+					Count: 3,
+				},
+			},
+		},
+		{
+			description: "All nodes deleted before time series",
+			datetime:    parseTime(t, "2020-03-15T20:02:59Z"),
+			daysAgo:     3,
+			nodes: []iBackend.Node{
+				{
+					Exists: false,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-01-15T16:02:59Z"),
+					},
+				},
+				{
+					Exists: false,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-01-15T16:12:59Z"),
+					},
+				},
+				{
+					Exists: false,
+					NodeInfo: iBackend.NodeInfo{
+						Timestamp: parseTime(t, "2020-01-15T16:22:59Z"),
+					},
+				},
+			},
+			expectedResponse: []backend.CountPeroid{
+				{
+					Start: parseTime(t, "2020-03-12T21:00:00Z"),
+					End:   parseTime(t, "2020-03-13T20:59:59Z"),
+					Count: 3,
+				},
+				{
+					Start: parseTime(t, "2020-03-13T21:00:00Z"),
+					End:   parseTime(t, "2020-03-14T20:59:59Z"),
+					Count: 3,
+				},
+				{
+					Start: parseTime(t, "2020-03-14T21:00:00Z"),
+					End:   parseTime(t, "2020-03-15T20:59:59Z"),
+					Count: 3,
+				},
+			},
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.description, func(t *testing.T) {
+			// Adding required nodes
+			for index := range testCase.nodes {
+				nodeID := newUUID()
+				testCase.nodes[index].NodeInfo.EntityUuid = nodeID
+				testCase.nodes[index].NodeName = strconv.Itoa(index)
+			}
+
+			suite.IngestNodes(testCase.nodes)
+			defer suite.DeleteAllDocuments()
+
+			endTime := time.Date(testCase.datetime.Year(), testCase.datetime.Month(), testCase.datetime.Day(),
+				testCase.datetime.Hour(), 0, 0, 0, time.UTC).Add(time.Hour)
+
+			startTime := endTime.Add(-time.Hour * 24 * time.Duration(testCase.daysAgo))
+
+			if testCase.filter == nil {
+				testCase.filter = map[string][]string{}
+			}
+			actualResponse, err := esBackend.GetDeletedCountsTimeSeries(startTime,
+				endTime.Add(-time.Millisecond), testCase.filter)
+			require.NoError(t, err)
+
+			assert.Equal(t, len(testCase.expectedResponse), len(actualResponse))
+			for index := range actualResponse {
+				assert.Equal(t, testCase.expectedResponse[index].Start.Format(time.RFC3339),
+					actualResponse[index].Start.Format(time.RFC3339))
+				assert.Equal(t, testCase.expectedResponse[index].End.Format(time.RFC3339),
+					actualResponse[index].End.Format(time.RFC3339))
+				assert.Equal(t, testCase.expectedResponse[index].Count,
+					actualResponse[index].Count)
+			}
+		})
+	}
+}
+
+func TestTimeSeriesCreatedNodes(t *testing.T) {
+	cases := []struct {
+		description      string
+		filter           map[string][]string
+		nodes            []iBackend.UpsertNode
+		datetime         time.Time
+		daysAgo          int
+		expectedResponse []backend.CountPeroid
+	}{
+		{
+			description: "Three daily buckets with one node created each day",
+			datetime:    parseTime(t, "2020-03-15T20:02:59Z"),
+			daysAgo:     3,
+			nodes: []iBackend.UpsertNode{
+				{
+					Created: parseTime(t, "2020-03-15T16:02:59Z"),
+				},
+				{
+					Created: parseTime(t, "2020-03-14T16:02:59Z"),
+				},
+				{
+					Created: parseTime(t, "2020-03-13T16:02:59Z"),
+				},
+			},
+			expectedResponse: []backend.CountPeroid{
+				{
+					Start: parseTime(t, "2020-03-12T21:00:00Z"),
+					End:   parseTime(t, "2020-03-13T20:59:59Z"),
+					Count: 1,
+				},
+				{
+					Start: parseTime(t, "2020-03-13T21:00:00Z"),
+					End:   parseTime(t, "2020-03-14T20:59:59Z"),
+					Count: 2,
+				},
+				{
+					Start: parseTime(t, "2020-03-14T21:00:00Z"),
+					End:   parseTime(t, "2020-03-15T20:59:59Z"),
+					Count: 3,
+				},
+			},
+		},
+		{
+			description: "All nodes created in last 24 hours",
+			datetime:    parseTime(t, "2020-03-15T20:02:59Z"),
+			daysAgo:     3,
+			nodes: []iBackend.UpsertNode{
+				{
+					Created: parseTime(t, "2020-03-15T16:02:59Z"),
+				},
+				{
+					Created: parseTime(t, "2020-03-15T16:12:59Z"),
+				},
+				{
+					Created: parseTime(t, "2020-03-15T16:22:59Z"),
+				},
+			},
+			expectedResponse: []backend.CountPeroid{
+				{
+					Start: parseTime(t, "2020-03-12T21:00:00Z"),
+					End:   parseTime(t, "2020-03-13T20:59:59Z"),
+					Count: 0,
+				},
+				{
+					Start: parseTime(t, "2020-03-13T21:00:00Z"),
+					End:   parseTime(t, "2020-03-14T20:59:59Z"),
+					Count: 0,
+				},
+				{
+					Start: parseTime(t, "2020-03-14T21:00:00Z"),
+					End:   parseTime(t, "2020-03-15T20:59:59Z"),
+					Count: 3,
+				},
+			},
+		},
+		{
+			description: "All nodes created before time series",
+			datetime:    parseTime(t, "2020-03-15T20:02:59Z"),
+			daysAgo:     3,
+			nodes: []iBackend.UpsertNode{
+				{
+					Created: parseTime(t, "2020-01-15T16:02:59Z"),
+				},
+				{
+					Created: parseTime(t, "2020-01-15T16:12:59Z"),
+				},
+				{
+					Created: parseTime(t, "2020-01-15T16:22:59Z"),
+				},
+			},
+			expectedResponse: []backend.CountPeroid{
+				{
+					Start: parseTime(t, "2020-03-12T21:00:00Z"),
+					End:   parseTime(t, "2020-03-13T20:59:59Z"),
+					Count: 3,
+				},
+				{
+					Start: parseTime(t, "2020-03-13T21:00:00Z"),
+					End:   parseTime(t, "2020-03-14T20:59:59Z"),
+					Count: 3,
+				},
+				{
+					Start: parseTime(t, "2020-03-14T21:00:00Z"),
+					End:   parseTime(t, "2020-03-15T20:59:59Z"),
+					Count: 3,
+				},
+			},
+		},
+	}
+
+	for _, testCase := range cases {
+		t.Run(testCase.description, func(t *testing.T) {
+			// Adding required nodes
+			for index := range testCase.nodes {
+				nodeID := newUUID()
+				testCase.nodes[index].NodeInfo.EntityUuid = nodeID
+				testCase.nodes[index].NodeName = strconv.Itoa(index)
+			}
+
+			suite.IngestInitialNodes(testCase.nodes)
+			defer suite.DeleteAllDocuments()
+
+			endTime := time.Date(testCase.datetime.Year(), testCase.datetime.Month(), testCase.datetime.Day(),
+				testCase.datetime.Hour(), 0, 0, 0, time.UTC).Add(time.Hour)
+
+			startTime := endTime.Add(-time.Hour * 24 * time.Duration(testCase.daysAgo))
+
+			if testCase.filter == nil {
+				testCase.filter = map[string][]string{}
+			}
+			actualResponse, err := esBackend.GetCreateCountsTimeSeries(startTime,
+				endTime.Add(-time.Millisecond), testCase.filter)
+			require.NoError(t, err)
+
+			assert.Equal(t, len(testCase.expectedResponse), len(actualResponse))
+			for index := range actualResponse {
+				assert.Equal(t, testCase.expectedResponse[index].Start.Format(time.RFC3339),
+					actualResponse[index].Start.Format(time.RFC3339))
+				assert.Equal(t, testCase.expectedResponse[index].End.Format(time.RFC3339),
+					actualResponse[index].End.Format(time.RFC3339))
+				assert.Equal(t, testCase.expectedResponse[index].Count,
+					actualResponse[index].Count)
 			}
 		})
 	}

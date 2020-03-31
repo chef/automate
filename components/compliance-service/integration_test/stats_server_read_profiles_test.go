@@ -13,7 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
+	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	statsServer "github.com/chef/automate/components/compliance-service/api/stats/server"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 )

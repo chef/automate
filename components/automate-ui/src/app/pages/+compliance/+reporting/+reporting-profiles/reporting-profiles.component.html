@@ -7,6 +7,42 @@
 </div>
 
 <ng-container *ngIf="!reportData.profilesListEmpty">
+  <chef-phat-radio
+    class="profiles-list-status-filters"
+    [value]="profileFilterStatus"
+    (change)="filterProfileStatus($event, $event.target.value)">
+    <chef-option class="filter all" value='all'>
+      <span class="filter-label">Total Profiles</span>
+      <span class="filter-total">
+        <chef-icon class="filter-icon">storage</chef-icon> {{ reportData.profilesList.total | number}}
+      </span>
+    </chef-option>
+    <chef-option class="filter critical" value='failed'>
+      <span class="filter-label">Failed Profiles</span>
+      <span class="filter-total">
+        <chef-icon class="filter-icon">report_problem</chef-icon> {{ reportData.profilesList.failed | number}}
+      </span>
+    </chef-option>
+    <chef-option class="filter passed" value='passed'>
+      <span class="filter-label">Passed Profiles</span>
+      <span class="filter-total">
+        <chef-icon class="filter-icon">check_circle</chef-icon> {{ reportData.profilesList.passed | number}}
+      </span>
+    </chef-option>
+    <chef-option class="filter skipped" value='skipped'>
+      <span class="filter-label">Skipped Profiles</span>
+      <span class="filter-total">
+        <chef-icon class="filter-icon">help</chef-icon> {{ reportData.profilesList.skipped | number}}
+      </span>
+    </chef-option>
+    <chef-option class="filter waived" value='waived'>
+      <span class="filter-label">Waived Profiles</span>
+      <span class="filter-total">
+        <div class="filter-icon waived-icon"></div> {{ reportData.profilesList.waived | number}}
+      </span>
+    </chef-option>
+  </chef-phat-radio>
+
   <chef-table class="reporting-profiles-table" (sort-toggled)="onProfilesListSortToggled($event)">
     <chef-thead>
       <chef-tr>
@@ -20,7 +56,7 @@
       </chef-tr>
     </chef-thead>
     <chef-tbody *ngIf="!reportData.profilesListLoading">
-      <chef-tr *ngFor="let profile of reportData.profilesList.items">
+      <chef-tr *ngFor="let profile of filteredProfiles(reportData.profilesList.items)">
         <chef-td class="title-cell">
           <!-- Material Icon Font -->
           <chef-icon *ngIf="profile.status !== 'waived'" class="status-icon" [ngClass]="profile.status">

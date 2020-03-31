@@ -1,5 +1,5 @@
 <div id="process-progress-bar" [hidden]="!layoutFacade.layout.userNotifications.updatesProcessing">
-  <span class="info">Updating resources across all projects ({{ percentageComplete }}%)</span>
+  <span class="info">Updating resources across all projects ({{ displayPercent() }})</span>
   <app-authorized [allOf]="['/iam/v2/apply-rules', 'delete']">
     <button mat-button (click)="openConfirmUpdateStopModal()">Stop Project Update</button>
   </app-authorized>

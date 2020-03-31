@@ -17,7 +17,7 @@ import (
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
 	automate_event "github.com/chef/automate/api/interservice/event"
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/engine/opa"
 	"github.com/chef/automate/components/authz-service/prng"
@@ -26,7 +26,6 @@ import (
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
 	"github.com/chef/automate/components/authz-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/authz-service/storage/postgres/migration"
-	postgres_v1 "github.com/chef/automate/components/authz-service/storage/v1/postgres"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
 	"github.com/chef/automate/lib/grpc/grpctest"
@@ -78,21 +77,15 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 	ctx := context.Background()
 	seed := prng.GenSeed(t)
 
-	pg, testDB, opaInstance, _, migrationConfig := SetupTestDB(t)
+	pg, testDB, opaInstance, _, _ := SetupTestDB(t)
 
 	l, err := logger.NewLogger("text", "error")
 	require.NoError(t, err, "init logger for storage")
 
-	pgV1, err := postgres_v1.New(ctx, l, *migrationConfig)
-	require.NoError(t, err)
-
-	vChan := make(chan api.Version, 1)
-	vSwitch := server.NewSwitch(vChan)
-
 	polRefresher, err := v2.NewPostgresPolicyRefresher(ctx, l, opaInstance)
 	require.NoError(t, err)
 
-	polSrv, err := server.NewPoliciesServer(ctx, l, polRefresher, pg, opaInstance, pgV1, vSwitch, vChan)
+	polSrv, err := server.NewPoliciesServer(ctx, l, polRefresher, pg, opaInstance)
 	require.NoError(t, err)
 
 	projectUpdateManager := NewMockProjectUpdateManager()
@@ -122,7 +115,7 @@ func SetupProjectsAndRulesWithDB(t *testing.T) (
 }
 
 func SetupTestDB(t *testing.T) (storage.Storage, *TestDB, *opa.State, *prng.Prng, *migration.Config) {
-	return SetupTestDBWithLimit(t, constants_v2.DefaultProjectLimit)
+	return SetupTestDBWithLimit(t, constants.DefaultProjectLimit)
 }
 
 func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *TestDB, *opa.State, *prng.Prng, *migration.Config) {
@@ -169,7 +162,7 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 			"statements": statements,
 		}
 	}
-	require.NoError(t, opaInstance.V2p1SetPolicies(ctx, data, make(map[string]interface{})))
+	require.NoError(t, opaInstance.SetPolicies(ctx, data, make(map[string]interface{})))
 
 	migrationConfig, err := migrationConfigIfPGTestsToBeRun(l, "../storage/postgres/migration/sql")
 	if err != nil {
@@ -197,10 +190,14 @@ func SetupTestDBWithLimit(t *testing.T, projectLimit int) (storage.Storage, *Tes
 
 	err = postgres.Initialize(ctx, opaInstance, l, *migrationConfig, datamigration.Config(*dataMigrationConfig), projectLimit)
 	require.NoError(t, err)
-	return postgres.GetInstance(), &TestDB{
-			DB:      db,
-			ConnURI: migrationConfig.PGURL.String(),
-		},
+	testDB := &TestDB{
+		DB:      db,
+		ConnURI: migrationConfig.PGURL.String(),
+	}
+
+	// drop default IAM V1 migrated policies since our tests don't assume they are there
+	testDB.Flush(t)
+	return postgres.GetInstance(), testDB,
 		opaInstance, prng.Seed(t), migrationConfig
 }
 

@@ -34,7 +34,7 @@ export class PolicyDetailsComponent implements OnInit, OnDestroy {
   private url: string;
   // Map of local user and team member IDs to URLs.
   // Will not contain LDAP, SAML, or * members.
-  private memberURLs: { [id: string]: string[] } = {};
+  public memberURLs: { [id: string]: string[] } = {};
 
   private isDestroyed: Subject<boolean> = new Subject<boolean>();
 

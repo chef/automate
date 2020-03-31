@@ -8,11 +8,67 @@ import (
 	"github.com/chef/automate/api/interservice/compliance/common"
 	"github.com/chef/automate/api/interservice/compliance/jobs"
 	"github.com/chef/automate/api/interservice/nodemanager/manager"
+	"github.com/chef/automate/api/interservice/nodemanager/nodes"
 	"github.com/chef/automate/components/compliance-service/inspec"
+	"github.com/chef/automate/components/nodemanager-service/managers/awsec2"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func TestAssembleAwsApiNodeInfo(t *testing.T) {
+	node := &nodes.Node{
+		Id:   "123",
+		Name: "test-node-name",
+	}
+	m := &manager.NodeManager{
+		Id:        "12300",
+		Name:      "test-name",
+		AccountId: "1234",
+	}
+	awsCreds := awsec2.AwsCreds{
+		AccessKeyId:     "456",
+		SecretAccessKey: "789",
+		Region:          "test-region",
+	}
+	nodeDetails, tc, secrets := assembleAwsApiNodeInfo(node, m, awsCreds)
+
+	assert.Equal(t, nodeInfo{
+		UUID:           "123",
+		CloudID:        "1234",
+		Name:           "test-node-name",
+		Environment:    "aws-api",
+		ManagerID:      "12300",
+		CloudAccountID: "1234",
+	}, nodeDetails)
+
+	assert.Equal(t, inspec.TargetBaseConfig{
+		Backend: "aws",
+		Region:  "test-region",
+	}, tc)
+
+	assert.Equal(t, inspec.Secrets{
+		AwsUser:     "456",
+		AwsPassword: "789",
+	}, secrets)
+
+	// test the case when no creds were provided
+	awsCreds = awsec2.AwsCreds{}
+	nodeDetails, tc, secrets = assembleAwsApiNodeInfo(node, m, awsCreds)
+	assert.Equal(t, inspec.TargetBaseConfig{
+		Backend: "aws",
+		Region:  "us-east-1",
+	}, tc)
+
+	node.TargetConfig = &nodes.TargetConfig{
+		Region: "node-set-region",
+	}
+	nodeDetails, tc, secrets = assembleAwsApiNodeInfo(node, m, awsCreds)
+	assert.Equal(t, inspec.TargetBaseConfig{
+		Backend: "aws",
+		Region:  "node-set-region",
+	}, tc)
+
+}
 func TestHandleSSMNodes(t *testing.T) {
 	ssmJob, skip := false, false
 	node := &manager.ManagerNode{

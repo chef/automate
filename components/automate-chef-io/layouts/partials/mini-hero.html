@@ -33,6 +33,7 @@
     <div class="cell medium-12">
       <ul class="vertical medium-horizontal menu align-center">
         <li class="{{ if $currentPage.IsHome }}active{{ end }}"><a href="/">About Chef Automate</a></li>
+        <li class="{{ if eq $currentSection "API" }}active{{end}}"><a href="/docs/api/">API</a></li>
         <li class="{{ if eq $currentSection "docs" }}active{{end}}"><a href="/docs/quickstart/">Docs</a></li>
         <li class="{{ if eq $currentSection "release-notes" }}active{{end}}"><a href="/release-notes/">Release Notes</a></li>
       </ul>

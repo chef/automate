@@ -291,50 +291,57 @@ describe File.basename(__FILE__) do
         size: 3
     )
 
-    expected_data =
-    { "controlItems"=>
-      [{"id"=>"apache-01",
-        "title"=>"Apache should be running",
-        "profile"=>
-         {"title"=>"DevSec Apache Baseline",
-          "id"=>"41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
-          "version"=>"2.0.0"},
-        "impact"=>1,
-        "endTime"=>"2018-02-09T09:18:41Z",
-        "controlSummary"=>
-         {"total"=>1,
-          "passed"=>{},
-          "skipped"=>{"total"=>1},
-          "failed"=>{},
-          "waived"=>{}}},
-       {"id"=>"apache-02",
-        "title"=>"Apache should be enabled",
-        "profile"=>
-         {"title"=>"DevSec Apache Baseline",
-          "id"=>"41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
-          "version"=>"2.0.0"},
-        "impact"=>1,
-        "endTime"=>"2018-02-09T09:18:41Z",
-        "controlSummary"=>
-         {"total"=>1,
-          "passed"=>{},
-          "skipped"=>{"total"=>1},
-          "failed"=>{},
-          "waived"=>{}}},
-       {"id"=>"apache-03",
-        "title"=>"Apache should start max. 1 root-task different",
-        "profile"=>
-         {"title"=>"DevSec Apache Baseline",
-          "id"=>"41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
-          "version"=>"2.0.0"},
-        "impact"=>0.5,
-        "endTime"=>"2018-02-09T09:18:41Z",
-        "controlSummary"=>
-         {"total"=>1,
-          "passed"=>{"total"=>1},
-          "skipped"=>{},
-          "failed"=>{},
-          "waived"=>{}}}]
+    expected_data = {
+        "controlItems" =>
+            [{"id" => "apache-01",
+              "title" => "Apache should be running",
+              "profile" =>
+                  {"title" => "DevSec Apache Baseline",
+                   "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
+                   "version" => "2.0.0"},
+              "impact" => 1,
+              "endTime" => "2018-02-09T09:18:41Z",
+              "controlSummary" =>
+                  {"total" => 1,
+                   "passed" => {},
+                   "skipped" => {"total" => 1},
+                   "failed" => {},
+                   "waived" => {}}},
+             {"id" => "apache-02",
+              "title" => "Apache should be enabled",
+              "profile" =>
+                  {"title" => "DevSec Apache Baseline",
+                   "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
+                   "version" => "2.0.0"},
+              "impact" => 1,
+              "endTime" => "2018-02-09T09:18:41Z",
+              "controlSummary" =>
+                  {"total" => 1,
+                   "passed" => {},
+                   "skipped" => {"total" => 1},
+                   "failed" => {},
+                   "waived" => {}}},
+             {"id" => "apache-03",
+              "title" => "Apache should start max. 1 root-task different",
+              "profile" =>
+                  {"title" => "DevSec Apache Baseline",
+                   "id" => "41a02784bfea15592ba2748d55927d8d1f9da205816ef18d3bb2ebe4c5ce18a8",
+                   "version" => "2.0.0"},
+              "impact" => 0.5,
+              "endTime" => "2018-02-09T09:18:41Z",
+              "controlSummary" =>
+                  {"total" => 1,
+                   "passed" => {"total" => 1},
+                   "skipped" => {},
+                   "failed" => {},
+                   "waived" => {}}}],
+        "controlSummaryTotals" =>
+            {"total" => 59,
+             "passed" => {"total" => 24},
+             "skipped" => {"total" => 13},
+             "failed" => {"total" => 22},
+             "waived" => {}
+            }
     }
     assert_equal_json_content(expected_data, actual_data)
   end

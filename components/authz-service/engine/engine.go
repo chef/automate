@@ -5,63 +5,30 @@ import (
 )
 
 // Engine abstracts different decision engines.
-//
-// Currently, a full-featured engine needs to support both v1 and v2. These are
-// split to allow for a better decoupling in wiring up things -- i.e., the v2
-// authz and policy implementations only require V2Authorizer and V2Writer,
-// respectively. Our OPA implementation of engine.Engine supports all of those
-// interfaces, and can thus be plugged into either of those constructors.
 type Engine interface {
-	V1Engine
-
-	// V2Authorizer and V2Writer are never used together (the authz section of the
-	// service needs V2Authorizer, the policy section cares about V2Writer), so we
+	// Authorizer and V2Writer are never used together (the authz section of the
+	// service needs Authorizer, the policy section cares about V2Writer), so we
 	// collect them here instead of introducing a V2Engine interface.
-	V2Authorizer
-	V2p1Writer
-}
-
-// V1Engine is the interface representing the IAM v1 backing engine methods:
-// updating the engine store (engine.Writer) and querying it for certain
-// authorization requests (engine.Authorizer).
-type V1Engine interface {
 	Authorizer
 	Writer
 }
 
-// Authorizer is the interface for asking whether a concrete SAR tuple is
-// authorized or not; and for filtering a given set of resource/action pairs,
-// together with subjects, according to its authorization status.
 type Authorizer interface {
-	IsAuthorized(context.Context, Subjects, Action, Resource) (bool, error)
-
-	// FilterAuthorizedPairs returns the sublist of authorized Pairs from the
-	// passed-in list. It takes the subjects into account, and follows the same
-	// logic a sequence of IsAuthorized() calls would use.
-	FilterAuthorizedPairs(context.Context, Subjects, []Pair) ([]Pair, error)
-}
-
-type V2Authorizer interface {
-	// V2ProjectsAuthorized returns a subset of the requested projects (Projects)
+	// ProjectsAuthorized returns a subset of the requested projects (Projects)
 	// allowed by the subjects/action/resource tuple.
-	V2ProjectsAuthorized(context.Context, Subjects, Action, Resource, Projects) ([]string, error)
+	ProjectsAuthorized(context.Context, Subjects, Action, Resource, Projects) ([]string, error)
 
 	// FilterAuthorizedProjects returns a sublist of the passed-in pairs
 	// allowed by the subjects.
-	V2FilterAuthorizedPairs(context.Context, Subjects, []Pair) ([]Pair, error)
+	FilterAuthorizedPairs(context.Context, Subjects, []Pair) ([]Pair, error)
 
-	// V2FilterAuthorizedProjects returns a list of allowed projects
+	// FilterAuthorizedProjects returns a list of allowed projects
 	// for the given subjects
-	V2FilterAuthorizedProjects(context.Context, Subjects) ([]string, error)
+	FilterAuthorizedProjects(context.Context, Subjects) ([]string, error)
 }
 
-// Writer is the interface for writing policies to a decision engine
 type Writer interface {
-	SetPolicies(context.Context, map[string]interface{}) error
-}
-
-type V2p1Writer interface {
-	V2p1SetPolicies(context.Context, map[string]interface{}, map[string]interface{}) error
+	SetPolicies(context.Context, map[string]interface{}, map[string]interface{}) error
 }
 
 // Subjects contains the requestor and all the teams they're a member of.

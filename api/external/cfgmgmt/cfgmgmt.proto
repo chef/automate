@@ -7,11 +7,13 @@ option go_package = "github.com/chef/automate/api/external/cfgmgmt";
 import "api/external/cfgmgmt/request/actions.proto";
 import "api/external/cfgmgmt/request/nodes.proto";
 import "api/external/cfgmgmt/request/stats.proto";
+import "api/external/cfgmgmt/request/errors.proto";
 import "api/external/cfgmgmt/request/root.proto";
 
 import "api/external/cfgmgmt/response/actions.proto";
 import "api/external/cfgmgmt/response/nodes.proto";
 import "api/external/cfgmgmt/response/stats.proto";
+import "api/external/cfgmgmt/response/errors.proto";
 
 import "api/external/common/query/parameters.proto";
 import "api/external/common/version/version.proto";
@@ -268,4 +270,22 @@ service ConfigMgmt {
     option (chef.automate.api.iam.policy).resource = "infra:nodes:{revision_id}";
     option (chef.automate.api.iam.policy).action = "infra:nodes:list";
   };
+
+  /*
+  GetErrors
+
+  Returns a list of the most common errors reported for infra nodes' most recent Chef Client runs.
+
+  Authorization Action:
+  ```
+  infra:nodes:list
+  ```
+  */
+  rpc GetErrors(cfgmgmt.request.Errors) returns (cfgmgmt.response.Errors) {
+    option (google.api.http).get = "/cfgmgmt/errors";
+    option (chef.automate.api.policy).resource = "cfgmgmt:nodes";
+    option (chef.automate.api.policy).action = "read";
+    option (chef.automate.api.iam.policy).resource = "infra:nodes";
+    option (chef.automate.api.iam.policy).action = "infra:nodes:list";
+  }
 }

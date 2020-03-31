@@ -3,7 +3,9 @@ package elastic
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"reflect"
+	"sort"
 	"strings"
 	"time"
 
@@ -294,4 +296,131 @@ func (es Backend) GetAttribute(nodeID string) (backend.NodeAttribute, error) {
 	}
 
 	return nodeAttribute, nil
+}
+
+func (es Backend) GetErrors(size int32, filters map[string][]string) ([]*backend.ChefErrorCount, error) {
+	// Return the top 10 most-frequently occurring combinations of Chef Infra
+	// error type (class) and error message.
+	//
+	// Elasticsearch's clustered design makes this query kind of awkward. Though
+	// this query could be done with a nested terms aggregation, that has some
+	// accuracy issues when clustered:
+	// https://www.elastic.co/guide/en/elasticsearch/reference/current/search-aggregations-bucket-terms-aggregation.html#search-aggregations-bucket-terms-aggregation-approximate-counts
+	//
+	// One option is to concatenate the fields on ingest into a single field so
+	// we can do a single term aggregation on that. But that approach is pretty
+	// ugly and requires some unappealing tradeoffs when we want to fetch/display
+	// the data.
+	//
+	// Contrarily, the composite aggregation matches our use case here more
+	// closely, but it doesn't provide any helpful ordering and forces you to
+	// scroll large result sets. So we fetch all pages of the result and sort
+	// them here.
+	//
+	// The curl version of this query is kinda like this:
+	// curl -X GET "localhost:10141/node-state/_search?pretty" -H 'Content-Type: application/json' -d'
+	// {
+	//   "size": 10,
+	//   "query": {
+	//     "bool": {
+	//       "must": [
+	//         { "match": { "status": "failure" } }
+	//       ]
+	//     }
+	//   },
+	//   "aggs": {
+	//     "group_by_error_type_and_message": {
+	//       "composite": {
+	//         "sources": [
+	//           { "error_type": {"terms": { "field": "error_type" } } },
+	//           { "error_message": { "terms": { "field": "error_message" } } }
+	//         ]
+	//       }
+	//     }
+	//   }
+	// }
+	// '
+	queryWithFilters := newBoolQueryFromFilters(filters)
+	queryWithFilters.Must(elastic.NewTermQuery("status", "failure"))
+
+	agg := elastic.NewCompositeAggregation()
+	agg.Sources(
+		elastic.NewCompositeAggregationTermsValuesSource("error_type").Field("error_type"),
+		elastic.NewCompositeAggregationTermsValuesSource("error_message").Field("error_message"),
+	)
+	agg.Size(1000)
+
+	var allResultsCollected bool
+	var totalQueriesRan int
+	chefErrs := []*backend.ChefErrorCount{}
+
+	for !allResultsCollected {
+		// Don't hammer elastic too bad if there is a bug or other unforeseen
+		// condition.
+		if totalQueriesRan > 50 {
+			return nil, fmt.Errorf("attempted too many queries to fetch top Chef error counts")
+		}
+
+		result, err := es.client.Search().
+			Query(queryWithFilters).
+			Index(IndexNodeState).
+			Aggregation("group_by_error_type_and_message", agg).
+			Size(0).
+			Do(context.Background())
+
+		if err != nil {
+			return nil, err
+		}
+
+		totalQueriesRan++
+
+		aggs := result.Aggregations
+
+		c, aggFound := aggs.Composite("group_by_error_type_and_message")
+		if !aggFound {
+			return nil, fmt.Errorf("elasticsearch result for 'group_by_error_type_and_message' query did not contain the expected aggregation information")
+		}
+
+		if len(c.AfterKey) == 0 {
+			allResultsCollected = true
+		} else {
+			agg.AggregateAfter(c.AfterKey)
+		}
+
+		for _, chefErrItem := range c.Buckets {
+			errorType, ok := chefErrItem.Key["error_type"].(string)
+			if !ok {
+				return nil, fmt.Errorf("invalid elasticsearch response for 'group_by_error_type_and_message' aggregation query")
+			}
+			errorMessage, ok := chefErrItem.Key["error_message"].(string)
+			if !ok {
+				return nil, fmt.Errorf("invalid elasticsearch response for 'group_by_error_type_and_message' aggregation query")
+			}
+
+			chefErrs = append(chefErrs, &backend.ChefErrorCount{
+				Count:   int32(chefErrItem.DocCount),
+				Type:    errorType,
+				Message: errorMessage,
+			})
+		}
+	}
+
+	sort.Slice(chefErrs, func(i, j int) bool {
+		if chefErrs[i].Count != chefErrs[j].Count {
+			// sort more errors first to get descending order
+			return chefErrs[i].Count > chefErrs[j].Count
+		} else {
+			return chefErrs[i].Type < chefErrs[j].Type
+		}
+	})
+
+	if size == 0 {
+		size = 10
+	}
+
+	if size > 0 && int32(len(chefErrs)) > size {
+		chefErrs = chefErrs[:size]
+	}
+
+	return chefErrs, nil
 }

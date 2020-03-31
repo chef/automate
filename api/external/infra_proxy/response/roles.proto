@@ -4,17 +4,54 @@ package chef.automate.api.infra_proxy.response;
 option go_package = "github.com/chef/automate/api/external/infra_proxy/response";
 
 message Roles {
+    // List of the roles item.
     repeated RoleListItem roles = 1;
 }
 
 message RoleListItem {
+    // Name of the role.
     string name = 1;
+    // Desscription of the role.
+    string description = 2;
+    // Environment for the role.
+    repeated string environments = 3;
 }
 
 message Role {
+    // Name of the role.
     string name = 1;
-	string chef_type = 2;
-	string description = 3;
-    repeated string run_list  = 4;
-	string json_class = 5;
+    // Type of the chef object.
+    string chef_type = 2;
+    // Descrption of the role.
+    string description = 3;
+    // Stringified json of the default attributes.
+    string default_attributes = 4;
+    // Stringified json of the override attributes.
+    string override_attributes = 5;
+    // Json class name.
+    string json_class = 6;
+    // Run list for the role.
+    repeated string run_list  = 7;
+    // List of expanded run list for the role.
+    repeated ExpandedRunList expanded_run_list = 8;
+}
+
+message ExpandedRunList {
+    // ID of the run list collection.
+    string id = 1;
+    // List of the run list.
+    repeated RunList run_list = 2;
+}
+
+message RunList {
+    // Type of run list item (e.g. 'recipe').
+    string type = 1;
+    // Name of run list item.
+    string name = 2;
+    // Version of run list item.
+    string version = 3;
+    // Boolean denoting whether or not the run list item was skipped.
+    bool skipped = 4;
+    // List of the run list.
+    repeated RunList children = 5;
 }

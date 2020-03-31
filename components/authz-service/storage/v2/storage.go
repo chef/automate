@@ -4,7 +4,6 @@ import (
 	"context"
 
 	constants "github.com/chef/automate/components/authz-service/constants"
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
 )
 
 // Storage is the interface that both our postgres and memstore storage
@@ -21,8 +20,6 @@ type Storage interface {
 
 	// Close closes the connection to the backend
 	Close() error
-
-	MigrationStatusProvider
 }
 
 type PolicyChangeNotification struct{}
@@ -43,7 +40,6 @@ type policyStorage interface {
 	UpdatePolicy(context.Context, *Policy) (*Policy, error)
 	ListPolicyMembers(context.Context, string) ([]Member, error)
 	AddPolicyMembers(context.Context, string, []Member) ([]Member, error)
-	ApplyV2DataMigrations(context.Context) error
 
 	// Removes passed subject from all 'members' fields, returning affected
 	// policies
@@ -82,28 +78,6 @@ type ruleStorage interface {
 	FetchAppliedRulesByProjectIDs(context.Context) (map[string][]*Rule, error)
 }
 
-type MigrationStatusProvider interface {
-	// record migration status
-	Pristine(context.Context) error // for reset
-	InProgress(context.Context) error
-	Success(context.Context) error
-	SuccessBeta1(context.Context) error
-	Failure(context.Context) error
-
-	// retrieve migration status
-	MigrationStatus(context.Context) (MigrationStatus, error)
-}
-
-type MigrationStatus int8
-
-const (
-	Pristine MigrationStatus = iota
-	InProgress
-	Successful
-	SuccessfulBeta1
-	Failed
-)
-
 // DefaultPolicies shipped with IAM v2, and also the set of policies to which we
 // factory-reset our storage.
 func DefaultPolicies() ([]Policy, error) {
@@ -112,26 +86,26 @@ func DefaultPolicies() ([]Policy, error) {
 	if err != nil {
 		return nil, err
 	}
-	s2, err := NewStatement(Deny, "", []string{}, []string{"iam:policies:" + constants_v2.AdminPolicyID},
+	s2, err := NewStatement(Deny, "", []string{}, []string{"iam:policies:" + constants.AdminPolicyID},
 		[]string{"iam:policies:delete", "iam:policies:update"})
 	if err != nil {
 		return nil, err
 	}
 
 	// editor policy statements
-	s3, err := NewStatement(Allow, constants_v2.EditorRoleID, []string{}, []string{"*"}, []string{})
+	s3, err := NewStatement(Allow, constants.EditorRoleID, []string{}, []string{"*"}, []string{})
 	if err != nil {
 		return nil, err
 	}
 
 	// viewer policy statements
-	s4, err := NewStatement(Allow, constants_v2.ViewerRoleID, []string{}, []string{"*"}, []string{})
+	s4, err := NewStatement(Allow, constants.ViewerRoleID, []string{}, []string{"*"}, []string{})
 	if err != nil {
 		return nil, err
 	}
 
 	// ingest policy statements
-	s5, err := NewStatement(Allow, constants_v2.IngestRoleID, []string{}, []string{"*"}, []string{})
+	s5, err := NewStatement(Allow, constants.IngestRoleID, []string{}, []string{"*"}, []string{})
 	if err != nil {
 		return nil, err
 	}
@@ -157,7 +131,7 @@ func DefaultPolicies() ([]Policy, error) {
 	}
 
 	adminPol := Policy{
-		ID:         constants_v2.AdminPolicyID,
+		ID:         constants.AdminPolicyID,
 		Name:       "Administrator",
 		Members:    []Member{member},
 		Statements: []Statement{s1, s2},
@@ -165,7 +139,7 @@ func DefaultPolicies() ([]Policy, error) {
 	}
 
 	editorPol := Policy{
-		ID:         constants_v2.EditorPolicyID,
+		ID:         constants.EditorPolicyID,
 		Name:       "Editors",
 		Members:    []Member{editors},
 		Statements: []Statement{s3},
@@ -173,7 +147,7 @@ func DefaultPolicies() ([]Policy, error) {
 	}
 
 	viewerPol := Policy{
-		ID:         constants_v2.ViewerPolicyID,
+		ID:         constants.ViewerPolicyID,
 		Name:       "Viewers",
 		Members:    []Member{viewers},
 		Statements: []Statement{s4},
@@ -181,7 +155,7 @@ func DefaultPolicies() ([]Policy, error) {
 	}
 
 	ingestPol := Policy{
-		ID:         constants_v2.IngestPolicyID,
+		ID:         constants.IngestPolicyID,
 		Name:       "Ingest",
 		Members:    []Member{},
 		Statements: []Statement{s5},
@@ -195,14 +169,14 @@ func DefaultPolicies() ([]Policy, error) {
 // At present, this list contains internally required projects only, hidden from the user.
 func DefaultProjects() []Project {
 	allProjects := Project{
-		ID:   constants_v2.AllProjectsID,
+		ID:   constants.AllProjectsID,
 		Name: "All Projects",
 		Type: ChefManaged,
 	}
 
 	unassignedProject := Project{
-		ID:   constants_v2.UnassignedProjectID,
-		Name: constants_v2.UnassignedProjectID,
+		ID:   constants.UnassignedProjectID,
+		Name: constants.UnassignedProjectID,
 		Type: ChefManaged,
 	}
 
@@ -216,62 +190,4 @@ func DefaultProjectIDs() []string {
 		ids[i] = projects[i].ID
 	}
 	return ids
-}
-
-// DefaultRoles defines the default Chef-managed roles provided on storage reset
-func DefaultRoles() []Role {
-	owner := Role{
-		ID:      constants_v2.OwnerRoleID,
-		Name:    "Owner",
-		Actions: []string{"*"},
-		Type:    ChefManaged,
-	}
-
-	editor := Role{
-		ID:   constants_v2.EditorRoleID,
-		Name: "Editor",
-		Actions: []string{
-			"infra:*",
-			"compliance:*",
-			"system:*",
-			"event:*",
-			"ingest:*",
-			"secrets:*",
-			"telemetry:*",
-		},
-		Type: ChefManaged,
-	}
-
-	viewer := Role{
-		ID:   constants_v2.ViewerRoleID,
-		Name: "Viewer",
-		Actions: []string{
-			"secrets:*:get",
-			"secrets:*:list",
-			"infra:*:get",
-			"infra:*:list",
-			"compliance:*:get",
-			"compliance:*:list",
-			"system:*:get",
-			"system:*:list",
-			"event:*:get",
-			"event:*:list",
-			"ingest:*:get",
-			"ingest:*:list",
-		},
-		Type: ChefManaged,
-	}
-
-	ingest := Role{
-		ID:   constants_v2.IngestRoleID,
-		Name: "Ingest",
-		Actions: []string{
-			"infra:ingest:*",
-			"compliance:profiles:get",
-			"compliance:profiles:list",
-		},
-		Type: ChefManaged,
-	}
-
-	return []Role{owner, editor, viewer, ingest}
 }

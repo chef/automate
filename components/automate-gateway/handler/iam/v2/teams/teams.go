@@ -12,10 +12,10 @@ import (
 )
 
 type Server struct {
-	client teams.TeamsV2Client
+	client teams.TeamsClient
 }
 
-func NewServer(client teams.TeamsV2Client) *Server {
+func NewServer(client teams.TeamsClient) *Server {
 	return &Server{
 		client: client,
 	}
@@ -155,28 +155,6 @@ func (a *Server) GetTeamsForMember(ctx context.Context,
 	return &gwres.GetTeamsForMemberResp{
 		Teams: fromUpstreamTeams(res.Teams),
 	}, nil
-}
-
-func (a *Server) ApplyV2DataMigrations(ctx context.Context,
-	r *gwreq.ApplyV2DataMigrationsReq) (*gwres.ApplyV2DataMigrationsResp, error) {
-
-	_, err := a.client.UpgradeToV2(ctx, &teams.UpgradeToV2Req{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &gwres.ApplyV2DataMigrationsResp{}, nil
-}
-
-func (a *Server) ResetAllTeamProjects(ctx context.Context,
-	r *gwreq.ResetAllTeamProjectsReq) (*gwres.ResetAllTeamProjectsResp, error) {
-
-	_, err := a.client.ResetToV1(ctx, &teams.ResetToV1Req{})
-	if err != nil {
-		return nil, err
-	}
-
-	return &gwres.ResetAllTeamProjectsResp{}, nil
 }
 
 func fromUpstreamTeam(t *teams.Team) *gwcommon.Team {

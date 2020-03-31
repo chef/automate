@@ -1,4 +1,4 @@
-import { Component, Element, Prop, h } from '@stencil/core';
+import { Component, Element, h } from '@stencil/core';
 
 /**
  * @description
@@ -57,12 +57,6 @@ import { Component, Element, Prop, h } from '@stencil/core';
   styleUrl: './chef-page-header.scss'
 })
 export class ChefPageHeader {
-  /**
-   * Toggles a white/transparent background. The background is white by default, it will
-   * be transparent if you set this to 'false'.
-   */
-  @Prop() contrastingBackground = true;
-
   @Element() el: HTMLElement;
 
   componentDidLoad() {

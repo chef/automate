@@ -9,7 +9,7 @@ import (
 	"github.com/lib/pq"
 	"github.com/pkg/errors"
 
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage_errors "github.com/chef/automate/components/authz-service/storage"
 	"github.com/chef/automate/components/authz-service/storage/postgres"
@@ -44,7 +44,7 @@ func GetInstance() *pg {
 	return singletonInstance
 }
 
-// New instantiates the singleton postgres storage backend.
+// Initialize instantiates the singleton postgres storage backend.
 // Will only initialize once. Will simply return nil if already initialized.
 func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf migration.Config,
 	dataMigConf datamigration.Config, projectLimit int) error {
@@ -53,7 +53,7 @@ func Initialize(ctx context.Context, e engine.Engine, l logger.Logger, migConf m
 	once.Do(func() {
 		l.Infof("applying database migrations from %s", migConf.Path)
 		var db *sql.DB
-		db, err = postgres.New(ctx, migConf)
+		db, err = postgres.New(ctx, migConf, dataMigConf)
 		singletonInstance = &pg{
 			db:           db,
 			engine:       e,
@@ -336,10 +336,6 @@ func (p *pg) UpdatePolicy(ctx context.Context, pol *v2.Policy) (*v2.Policy, erro
 
 	// Currently, we don't change anything from what is passed in.
 	return pol, nil
-}
-
-func (p *pg) ApplyV2DataMigrations(_ context.Context) error {
-	return p.dataMigConf.Migrate()
 }
 
 func (p *pg) GetPolicyChangeID(ctx context.Context) (string, error) {
@@ -1521,17 +1517,17 @@ func (p *pg) addSupportPolicies(ctx context.Context, project *v2.Project, q Quer
 		{
 			id:   fmt.Sprintf("%s-%s", project.ID, "project-owners"),
 			name: fmt.Sprintf("%s %s", project.Name, "Project Owners"),
-			role: constants_v2.ProjectOwnerRoleID,
+			role: constants.ProjectOwnerRoleID,
 		},
 		{
 			id:   fmt.Sprintf("%s-%s", project.ID, "project-editors"),
 			name: fmt.Sprintf("%s %s", project.Name, "Project Editors"),
-			role: constants_v2.EditorRoleID,
+			role: constants.EditorRoleID,
 		},
 		{
 			id:   fmt.Sprintf("%s-%s", project.ID, "project-viewers"),
 			name: fmt.Sprintf("%s %s", project.Name, "Project Viewers"),
-			role: constants_v2.ViewerRoleID,
+			role: constants.ViewerRoleID,
 		},
 	}
 
@@ -1788,10 +1784,6 @@ func (p *pg) Close() error {
 	return err
 }
 
-func (p *pg) Pristine(ctx context.Context) error {
-	return p.recordMigrationStatus(ctx, enumPristine)
-}
-
 func (p *pg) singleRowResultOrNotFoundErr(result sql.Result) error {
 	count, err := result.RowsAffected()
 	if err != nil {
@@ -1818,81 +1810,6 @@ func (p *pg) getMapOfRuleAssociations(ctx context.Context, q Querier, id string,
 		set[s] = true
 	}
 	return set, nil
-}
-
-func (p *pg) recordMigrationStatusAndNotifyPG(ctx context.Context, ms string) error {
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
-
-	tx, err := p.db.BeginTx(ctx, nil /* use driver default */)
-	if err != nil {
-		return p.processError(err)
-	}
-	if err := p.recordMigrationStatusWithQuerier(ctx, ms, tx); err != nil {
-		return p.processError(err)
-	}
-	if err := p.notifyPolicyChange(ctx, tx); err != nil {
-		return p.processError(err)
-	}
-	if err := tx.Commit(); err != nil {
-		return storage_errors.NewTxCommitError(err)
-	}
-	return nil
-}
-
-func (p *pg) Success(ctx context.Context) error {
-	return p.recordMigrationStatusAndNotifyPG(ctx, enumSuccessful)
-}
-
-func (p *pg) SuccessBeta1(ctx context.Context) error {
-	return p.recordMigrationStatusAndNotifyPG(ctx, enumSuccessfulBeta1)
-}
-
-func (p *pg) InProgress(ctx context.Context) error {
-	return p.recordMigrationStatus(ctx, enumInProgress)
-}
-
-func (p *pg) Failure(ctx context.Context) error {
-	return p.recordMigrationStatus(ctx, enumFailed)
-}
-
-func (p *pg) MigrationStatus(ctx context.Context) (v2.MigrationStatus, error) {
-	var status string
-	row := p.db.QueryRowContext(ctx, `SELECT state FROM migration_status`)
-	err := row.Scan(&status)
-	if err != nil {
-		return 0, err // shouldn't happen, migration initializes state
-	}
-	switch status {
-	case enumPristine:
-		return v2.Pristine, nil
-	case enumSuccessful:
-		return v2.Successful, nil
-	case enumSuccessfulBeta1:
-		return v2.SuccessfulBeta1, nil
-	case enumInProgress:
-		return v2.InProgress, nil
-	case enumFailed:
-		return v2.Failed, nil
-	}
-	return 0, fmt.Errorf("unexpected migration status: %q", status)
-}
-
-const (
-	enumPristine        = "init"
-	enumInProgress      = "in-progress"
-	enumSuccessful      = "successful"
-	enumSuccessfulBeta1 = "successful-beta1"
-	enumFailed          = "failed"
-)
-
-func (p *pg) recordMigrationStatus(ctx context.Context, ms string) error {
-	return p.recordMigrationStatusWithQuerier(ctx, ms, p.db)
-}
-
-func (p *pg) recordMigrationStatusWithQuerier(ctx context.Context, ms string, q Querier) error {
-	_, err := q.ExecContext(ctx, `UPDATE migration_status SET state=$1`, ms)
-	return err
 }
 
 func (p *pg) processError(err error) error {

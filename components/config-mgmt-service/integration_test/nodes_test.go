@@ -7,15 +7,18 @@ import (
 	"testing"
 	"time"
 
+	apiReq "github.com/chef/automate/api/external/cfgmgmt/request"
 	external_response "github.com/chef/automate/api/external/cfgmgmt/response"
 	"github.com/chef/automate/api/interservice/cfgmgmt/request"
-	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
+	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	iBackend "github.com/chef/automate/components/ingest-service/backend"
+
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/golang/protobuf/proto"
 	"github.com/golang/protobuf/ptypes"
 	gp "github.com/golang/protobuf/ptypes/struct"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestNodesReturnsEmptyList(t *testing.T) {
@@ -2759,6 +2762,344 @@ func TestNodesMissingRunsLatestRunIDEmpty(t *testing.T) {
 		assert.True(t, !ok || !value.GetBoolValue(),
 			"'has_runs_data' should be missing or set to false")
 	}
+}
+
+func TestNodeRunErrors(t *testing.T) {
+	t.Run("Get errors with zero errors in the database", func(t *testing.T) {
+		nodes := []iBackend.Node{}
+
+		suite.IngestNodes(nodes)
+		defer suite.DeleteAllDocuments()
+
+		res, err := cfgmgmt.GetErrors(context.Background(), &apiReq.Errors{})
+		require.NoError(t, err)
+
+		assert.Len(t, res.Errors, 0)
+	})
+
+	t.Run("Get errors with one error in the database", func(t *testing.T) {
+		nodeOne := iBackend.Node{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName:   "a",
+				Status:     "failure",
+				EntityUuid: newUUID(),
+			},
+			ErrorMessage: "an example error occurred",
+			ErrorType:    "FuntimeError",
+			Exists:       true,
+		}
+
+		nodes := []iBackend.Node{nodeOne}
+
+		suite.IngestNodes(nodes)
+		defer suite.DeleteAllDocuments()
+
+		res, err := cfgmgmt.GetErrors(context.Background(), &apiReq.Errors{})
+		require.NoError(t, err)
+
+		require.Len(t, res.Errors, 1)
+		errInfo := res.Errors[0]
+
+		assert.Equal(t, int32(1), errInfo.Count)
+		assert.Equal(t, "FuntimeError", errInfo.Type)
+		assert.Equal(t, "an example error occurred", errInfo.ErrorMessage)
+	})
+
+	t.Run("Get errors with several errors in the database", func(t *testing.T) {
+		nodeOne := iBackend.Node{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName:   "one",
+				Status:     "failure",
+				EntityUuid: newUUID(),
+			},
+			ErrorMessage: "an example error occurred",
+			ErrorType:    "FuntimeError",
+			Exists:       true,
+		}
+		nodeTwo := iBackend.Node{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName:   "two",
+				Status:     "failure",
+				EntityUuid: newUUID(),
+			},
+			ErrorMessage: "an example error occurred",
+			ErrorType:    "FuntimeError",
+			Exists:       true,
+		}
+		nodeThree := iBackend.Node{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName:   "three",
+				Status:     "failure",
+				EntityUuid: newUUID(),
+			},
+			ErrorMessage: "an different error occurred",
+			ErrorType:    "PuntimeError",
+			Exists:       true,
+		}
+
+		nodes := []iBackend.Node{nodeOne, nodeTwo, nodeThree}
+
+		suite.IngestNodes(nodes)
+		defer suite.DeleteAllDocuments()
+
+		res, err := cfgmgmt.GetErrors(context.Background(), &apiReq.Errors{})
+		require.NoError(t, err)
+
+		require.Len(t, res.Errors, 2)
+		errInfo := res.Errors[0]
+
+		assert.Equal(t, int32(2), errInfo.Count)
+		assert.Equal(t, "FuntimeError", errInfo.Type)
+		assert.Equal(t, "an example error occurred", errInfo.ErrorMessage)
+
+		errInfoTwo := res.Errors[1]
+
+		assert.Equal(t, int32(1), errInfoTwo.Count)
+		assert.Equal(t, "PuntimeError", errInfoTwo.Type)
+		assert.Equal(t, "an different error occurred", errInfoTwo.ErrorMessage)
+	})
+
+	t.Run("Get errors with more than 10 error type/message combos in the database", func(t *testing.T) {
+		var nodes []iBackend.Node
+
+		for i := 1; i < 16; i++ {
+			for j := 0; j <= (i - 1); j++ {
+				node := iBackend.Node{
+					NodeInfo: iBackend.NodeInfo{
+						NodeName:   fmt.Sprintf("node-group-%d-instance-%d", i, j),
+						Status:     "failure",
+						EntityUuid: newUUID(),
+					},
+					ErrorMessage: fmt.Sprintf("example-%d error occurred", i),
+					ErrorType:    fmt.Sprintf("FuntimeError%d", i),
+					Exists:       true,
+				}
+				nodes = append(nodes, node)
+			}
+		}
+
+		suite.IngestNodes(nodes)
+		defer suite.DeleteAllDocuments()
+
+		res, err := cfgmgmt.GetErrors(context.Background(), &apiReq.Errors{})
+		require.NoError(t, err)
+
+		// The 10 top errors are returned
+		// They are sorted by total count descending
+
+		require.Len(t, res.Errors, 10)
+		errInfo := res.Errors[0]
+
+		assert.Equal(t, int32(15), errInfo.Count)
+		assert.Equal(t, "FuntimeError15", errInfo.Type)
+		assert.Equal(t, "example-15 error occurred", errInfo.ErrorMessage)
+
+		errInfo = res.Errors[1]
+
+		assert.Equal(t, int32(14), errInfo.Count)
+		assert.Equal(t, "FuntimeError14", errInfo.Type)
+		assert.Equal(t, "example-14 error occurred", errInfo.ErrorMessage)
+
+		errInfo = res.Errors[9]
+
+		assert.Equal(t, int32(6), errInfo.Count)
+		assert.Equal(t, "FuntimeError6", errInfo.Type)
+		assert.Equal(t, "example-6 error occurred", errInfo.ErrorMessage)
+
+		// With a Size of 1, we should get one:
+
+		resExpectOne, err := cfgmgmt.GetErrors(context.Background(), &apiReq.Errors{Size: 1})
+		require.NoError(t, err)
+		assert.Len(t, resExpectOne.Errors, 1)
+		assert.Equal(t, "FuntimeError15", resExpectOne.Errors[0].Type)
+
+		// With a Size of -1, we should get all:
+
+		resExpectAll, err := cfgmgmt.GetErrors(context.Background(), &apiReq.Errors{Size: -1})
+		require.NoError(t, err)
+		require.Len(t, resExpectAll.Errors, 15)
+		assert.Equal(t, "FuntimeError15", resExpectAll.Errors[0].Type)
+		assert.Equal(t, "FuntimeError1", resExpectAll.Errors[14].Type)
+	})
+
+	// the request to elasticsearch will have to scroll over different pages when
+	// there are more than 1000 total buckets of error type+message combination
+	t.Run("Get errors with more than 1000 error type/message combos in the database", func(t *testing.T) {
+		var nodes []iBackend.Node
+
+		for i := 1; i < 1101; i++ {
+			node := iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					NodeName:   fmt.Sprintf("node-instance-%d", i),
+					Status:     "failure",
+					EntityUuid: newUUID(),
+				},
+				ErrorMessage: fmt.Sprintf("example-%d error occurred", i),
+				ErrorType:    fmt.Sprintf("FuntimeError%d", i),
+				Exists:       true,
+			}
+			nodes = append(nodes, node)
+		}
+		// when i is a multiple of 100, add 1 to its count
+		for i := 100; i < 1200; i += 100 {
+			node := iBackend.Node{
+				NodeInfo: iBackend.NodeInfo{
+					NodeName:   fmt.Sprintf("node-instance-%d", i),
+					Status:     "failure",
+					EntityUuid: newUUID(),
+				},
+				ErrorMessage: fmt.Sprintf("example-%d error occurred", i),
+				ErrorType:    fmt.Sprintf("FuntimeError%d", i),
+				Exists:       true,
+			}
+			nodes = append(nodes, node)
+		}
+
+		suite.IngestNodes(nodes)
+		defer suite.DeleteAllDocuments()
+
+		res, err := cfgmgmt.GetErrors(context.Background(), &apiReq.Errors{})
+		require.NoError(t, err)
+
+		require.Len(t, res.Errors, 10)
+
+		// Sorting: error counts are first sorted on number of occurrences, then
+		// lexically on error type as a string. Shorter strings sort before longer
+		// ones. So you get:
+		// FuntimeError100, FuntimeError1000, FuntimeError200, .. FuntimeError800
+		// and FuntimeError900 is omitted because it's the 11th item.
+
+		errInfo := res.Errors[0]
+		assert.Equal(t, int32(2), errInfo.Count)
+		assert.Equal(t, "FuntimeError100", errInfo.Type)
+		assert.Equal(t, "example-100 error occurred", errInfo.ErrorMessage)
+
+		errInfo = res.Errors[1]
+		assert.Equal(t, int32(2), errInfo.Count)
+		assert.Equal(t, "FuntimeError1000", errInfo.Type)
+		assert.Equal(t, "example-1000 error occurred", errInfo.ErrorMessage)
+
+		errInfo = res.Errors[9]
+		assert.Equal(t, int32(2), errInfo.Count)
+		assert.Equal(t, "FuntimeError800", errInfo.Type)
+		assert.Equal(t, "example-800 error occurred", errInfo.ErrorMessage)
+	})
+
+	// Errors are only collected from nodes when the most recent run has status
+	// failure. So you can't filter them on status.
+	t.Run("Get errors with invalid filters returns error", func(t *testing.T) {
+		var req apiReq.Errors
+
+		req.Filter = []string{"status:success"}
+		_, err := cfgmgmt.GetErrors(context.Background(), &req)
+		require.Error(t, err)
+
+		req.Filter = []string{"status:aliens"}
+		_, err = cfgmgmt.GetErrors(context.Background(), &req)
+		require.Error(t, err)
+	})
+
+	// node filters (other than 'status') should work
+	t.Run("Get errors with filters", func(t *testing.T) {
+		nodeOne := iBackend.Node{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName:         "a",
+				Status:           "failure",
+				EntityUuid:       newUUID(),
+				Platform:         "ubuntu",
+				OrganizationName: "org1",
+			},
+			ErrorMessage: "an example error occurred",
+			ErrorType:    "NodeAError",
+			Exists:       true,
+		}
+
+		nodeTwo := iBackend.Node{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName:         "b",
+				Status:           "failure",
+				EntityUuid:       newUUID(),
+				Platform:         "centos",
+				OrganizationName: "org1",
+			},
+			ErrorMessage: "an example error occurred",
+			ErrorType:    "NodeBError",
+			Exists:       true,
+		}
+
+		nodes := []iBackend.Node{nodeOne, nodeTwo}
+
+		suite.IngestNodes(nodes)
+		defer suite.DeleteAllDocuments()
+
+		var req apiReq.Errors
+
+		req.Filter = []string{"name:a"}
+		res, err := cfgmgmt.GetErrors(context.Background(), &req)
+		require.NoError(t, err)
+		require.Len(t, res.Errors, 1)
+		assert.Equal(t, "NodeAError", res.Errors[0].Type)
+
+		req.Filter = []string{"name:b"}
+		res, err = cfgmgmt.GetErrors(context.Background(), &req)
+		require.NoError(t, err)
+		require.Len(t, res.Errors, 1)
+		assert.Equal(t, "NodeBError", res.Errors[0].Type)
+
+		req.Filter = []string{"organization:org1"}
+		res, err = cfgmgmt.GetErrors(context.Background(), &req)
+		require.NoError(t, err)
+		require.Len(t, res.Errors, 2)
+		assert.Equal(t, "NodeAError", res.Errors[0].Type)
+		assert.Equal(t, "NodeBError", res.Errors[1].Type)
+
+		req.Filter = []string{"organization:org2"}
+		res, err = cfgmgmt.GetErrors(context.Background(), &req)
+		require.NoError(t, err)
+		require.Len(t, res.Errors, 0)
+
+		req.Filter = []string{"platform:centos"}
+		res, err = cfgmgmt.GetErrors(context.Background(), &req)
+		require.NoError(t, err)
+		require.Len(t, res.Errors, 1)
+		assert.Equal(t, "NodeBError", res.Errors[0].Type)
+
+	})
+
+	t.Run("Get errors with project filters", func(t *testing.T) {
+		nodeOne := iBackend.Node{
+			NodeInfo: iBackend.NodeInfo{
+				NodeName:   "a",
+				Status:     "failure",
+				EntityUuid: newUUID(),
+			},
+			ErrorMessage: "an example error occurred",
+			ErrorType:    "FuntimeError",
+			Exists:       true,
+			Projects:     []string{"projectOne"},
+		}
+
+		nodes := []iBackend.Node{nodeOne}
+
+		suite.IngestNodes(nodes)
+		defer suite.DeleteAllDocuments()
+
+		ctx := contextWithProjects([]string{"projectOne"})
+		res, err := cfgmgmt.GetErrors(ctx, &apiReq.Errors{})
+		require.NoError(t, err)
+		assert.Len(t, res.Errors, 1)
+
+		ctx = contextWithProjects([]string{"projectOne", "projectTwo"})
+		res, err = cfgmgmt.GetErrors(ctx, &apiReq.Errors{})
+		require.NoError(t, err)
+		assert.Len(t, res.Errors, 1)
+
+		ctx = contextWithProjects([]string{"projectNOPE", "projectTwo"})
+		res, err = cfgmgmt.GetErrors(ctx, &apiReq.Errors{})
+		require.NoError(t, err)
+		assert.Len(t, res.Errors, 0) // filtered out
+	})
+
 }
 
 func ingestNodeArrayToMessageArray(nodes []iBackend.Node, hasRunsData bool) []proto.Message {

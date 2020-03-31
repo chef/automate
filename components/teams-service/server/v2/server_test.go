@@ -24,7 +24,6 @@ import (
 	"github.com/chef/automate/components/teams-service/constants"
 	"github.com/chef/automate/components/teams-service/service"
 	"github.com/chef/automate/components/teams-service/storage"
-	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	"github.com/chef/automate/components/teams-service/test"
 )
@@ -40,31 +39,26 @@ func TestTeamsGRPC(t *testing.T) {
 		t.Fatalf("couldn't initialize pg config for tests: %s", err.Error())
 	}
 
-	dataMigrationConfig, err := test.MigrationConfigIfPGTestsToBeRun(l, "../../storage/postgres/datamigration/sql")
-	if err != nil {
-		t.Fatalf("couldn't initialize pg data config for tests: %s", err.Error())
-	}
-
 	if migrationConfig == nil {
-		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil, nil)
-		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
+		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil)
+		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsClient(conn), close)
 	} else {
 		serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx,
-			t, l, migrationConfig, (*datamigration.Config)(dataMigrationConfig))
-		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
+			t, l, migrationConfig)
+		runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsClient(conn), close)
 
 		// If ciMode, run in-memory AND PG
 		// else just run PG.
 		if os.Getenv("CI") == "true, *authz.SubjectPurgeServerMock" {
-			serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil, nil)
-			runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsV2Client(conn), close)
+			serv, serviceRef, conn, close, authzMock := setupTeamsService(ctx, t, l, nil)
+			runAllServerTests(t, serv, serviceRef, authzMock, teams.NewTeamsClient(conn), close)
 		}
 	}
 }
 
 func runAllServerTests(
 	t *testing.T, serv *Server, serviceRef *service.Service,
-	authzMock *authz.SubjectPurgeServerMock, cl teams.TeamsV2Client, close func()) {
+	authzMock *authz.SubjectPurgeServerMock, cl teams.TeamsClient, close func()) {
 
 	t.Helper()
 	defer close()
@@ -1774,14 +1768,14 @@ func runAllServerTests(
 	})
 }
 
-func cleanupTeam(ctx context.Context, t *testing.T, cl teams.TeamsV2Client, teamID string) {
+func cleanupTeam(ctx context.Context, t *testing.T, cl teams.TeamsClient, teamID string) {
 	t.Helper()
 	deleteReq := teams.DeleteTeamReq{Id: teamID}
 	_, err := cl.DeleteTeam(ctx, &deleteReq)
 	require.NoError(t, err)
 }
 
-func cleanupTeamV2(t *testing.T, cl teams.TeamsV2Client, teamName string) {
+func cleanupTeamV2(t *testing.T, cl teams.TeamsClient, teamName string) {
 	t.Helper()
 
 	deleteReq := teams.DeleteTeamReq{Id: teamName}
@@ -1790,11 +1784,9 @@ func cleanupTeamV2(t *testing.T, cl teams.TeamsV2Client, teamName string) {
 }
 
 // Pass nil for migrationConfig if you want in-memory server.
-func setupTeamsService(ctx context.Context,
-	t *testing.T,
-	l logger.Logger,
-	migrationConfig *migration.Config,
-	dataMigrationConfig *datamigration.Config) (*Server, *service.Service, *grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
+func setupTeamsService(ctx context.Context, t *testing.T, l logger.Logger,
+	migrationConfig *migration.Config) (*Server, *service.Service,
+	*grpc.ClientConn, func(), *authz.SubjectPurgeServerMock) {
 
 	t.Helper()
 
@@ -1830,14 +1822,14 @@ func setupTeamsService(ctx context.Context,
 		serviceRef, err = service.NewInMemoryService(l, connFactory, authzClient)
 	} else {
 		serviceRef, err = service.NewPostgresService(l, connFactory,
-			*migrationConfig, *dataMigrationConfig, authzClient, authzV2PoliciesClient, authzV2AuthorizationClient)
+			*migrationConfig, authzClient, authzV2PoliciesClient, authzV2AuthorizationClient)
 	}
 	if err != nil {
 		t.Fatalf("could not create server: %s", err)
 	}
 	grpcServ := serviceRef.ConnFactory.NewServer(tracing.GlobalServerInterceptor())
 	v2Server := NewServer(serviceRef)
-	teams.RegisterTeamsV2Server(grpcServ, v2Server)
+	teams.RegisterTeamsServer(grpcServ, v2Server)
 
 	resetState(ctx, t, serviceRef)
 
@@ -1881,5 +1873,5 @@ func defaultValidateProjectAssignmentFunc(context.Context,
 
 func insertProjectsIntoNewContext(projects []string) context.Context {
 	return auth_context.NewOutgoingProjectsContext(auth_context.NewContext(context.Background(),
-		[]string{}, projects, "resource", "action", "pol"))
+		[]string{}, projects, "resource", "action"))
 }

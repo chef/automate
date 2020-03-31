@@ -1,4 +1,3 @@
-import { iamVersion } from '../../../support/constants';
 import { itFlaky } from '../../../support/constants';
 
 describe('token management', () => {
@@ -19,10 +18,10 @@ describe('token management', () => {
       cy.request({
         auth: { bearer: admin.id_token },
         method: 'POST',
-        url: '/api/v0/auth/tokens',
+        url: '/apis/iam/v2/tokens',
         body: {
           id: tokenID1,
-          description: tokenName1,
+          name: tokenName1,
           active: true
         }
       });
@@ -30,10 +29,10 @@ describe('token management', () => {
       cy.request({
         auth: { bearer: admin.id_token },
         method: 'POST',
-        url: '/api/v0/auth/tokens',
+        url: '/apis/iam/v2/tokens',
         body: {
           id: tokenID2,
-          description: tokenName2,
+          name: tokenName2,
           active: false
         }
       });
@@ -53,8 +52,7 @@ describe('token management', () => {
   });
 
   after(() => {
-    // can still use v2 APIs while on v1
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['tokens']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['tokens']);
   });
 
   it('displays token table', () => {
@@ -62,10 +60,8 @@ describe('token management', () => {
     cy.get(tokensTable).should('exist');
     cy.get(tokensTable).contains('Name');
     cy.get(tokensTable).contains('Status');
-    if (iamVersion === 'v2.1') {
-        cy.get(tokensTable).contains('ID');
-        cy.get(tokensTable).contains('Projects');
-    }
+    cy.get(tokensTable).contains('ID');
+    cy.get(tokensTable).contains('Projects');
   });
 
   it('displays the returned tokens info', () => {

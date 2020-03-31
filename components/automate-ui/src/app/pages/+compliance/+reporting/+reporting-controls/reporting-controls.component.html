@@ -41,6 +41,39 @@
             <chef-icon>help</chef-icon>
             <span>{{ summary.skipped.total | number }}</span>
           </span>
+          <span *ngIf="summary.waived.total > 0" class="control-result" [ngClass]="{'waived': summary.waived.total > 0}">
+            <div [attr.id]="'waived-icon' + control.id" class="waived-icon"></div>
+            <chef-tooltip
+              [attr.for]="'waived-icon' + control.id"
+              position="left">
+              <div class="control-waiver-details" *ngFor="let waiver of control.waivers">
+                <div class="waiver-details">
+                  <span class="label">Expires:</span>
+                  <span class="message">{{ waiver.expiration_date | datetime: Datetime.RFC2822 }}</span>
+                </div>
+                <div class="waiver-details">
+                  <span class="label">Reason:</span>
+                  <span class="message">{{ waiver.justification }}</span>
+                </div>
+                <div *ngIf="waiver.waived_str === 'yes_run'" class="waiver-details">
+                  <span class="label">Node Status:</span>
+                  <span class="status-details failed">
+                    <chef-icon>report_problem</chef-icon>
+                    <span>{{ waiver.waiver_summary.failed.total | number }}</span>
+                  </span>
+                  <span class="status-details passed">
+                    <chef-icon>check_circle</chef-icon>
+                    <span>{{ waiver.waiver_summary.passed.total | number }}</span>
+                  </span>
+                  <span class="status-details skipped">
+                    <chef-icon>help</chef-icon>
+                    <span>{{ waiver.waiver_summary.skipped.total | number }}</span>
+                  </span>
+                </div>
+              </div>
+            </chef-tooltip>
+            <span>{{ summary.waived.total | number }}</span>
+          </span>
         </chef-td>
         <chef-td class="actions-cell three-dot-column">
           <mat-select panelClass="chef-control-menu">

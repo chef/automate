@@ -21,7 +21,7 @@ function gateway_integration() {
   # The main tests here is to send a ChefRun Message and a
   # Inspec Message through the legacy endpoint, so we need
   # the relevant services up and running:
-  wait_or_fail_for_port_to_listen $GATEWAY_PORT
+  wait_or_fail_for_port_to_listen "$GATEWAY_PORT"
   # Make sure that the gateway is accepting requests
   wait_for_success gateway_get /gateway/version || return 1
   log_line "The automate-gateway version"
@@ -31,12 +31,14 @@ function gateway_integration() {
   viewer_token="$(get_api_token_with_policy viewer-access)"
 
   log_line "Sending 30 Chef Action Messages"
-  for i in {1..30}; do
+  for _ in {1..30}; do
+    # shellcheck disable=SC2119
     send_chef_action_example || return 1
   done
   log_line "List Cfgmgmt Nodes (Empty)"
   gateway_get /cfgmgmt/nodes "$viewer_token" | jq || return 1
   log_line "Sending a Chef Run Message"
+  # shellcheck disable=SC2119
   send_chef_run_example || return 1
   log_line "Sending an Inspec Message through the Legacy endpoint"
   send_inspec_example legacy || return 1
@@ -47,6 +49,13 @@ function gateway_integration() {
   gateway_get '/eventfeed?collapse=true&page_size=1000' "$viewer_token" | jq || return 1
 
   set +o pipefail # reset
+}
+
+document "get_service_versions" <<DOC
+  Get all the service versions running in automate
+DOC
+function get_service_versions() {
+  curl -f --insecure -H "api-token: $(get_api_token)" "${GATEWAY_URL}/deployment/service_versions"
 }
 
 document "gateway_version" <<DOC
@@ -86,7 +95,7 @@ function gateway_get() {
   install_if_missing core/curl curl >/dev/null 2>&1
   # use admin token only if not provided as second argument
   local api_token="${2:-$(get_admin_token)}"
-  curl -fsS --insecure -H "api-token: ${api_token}" ${GATEWAY_URL}${1}
+  curl -fsS --insecure -H "api-token: ${api_token}" "${GATEWAY_URL}${1}"
 }
 
 document "send_chef_action_example" <<DOC
@@ -100,6 +109,7 @@ document "send_chef_action_example" <<DOC
   --------------------------------------------------------
   # send_chef_action_example cookbook create
 DOC
+# shellcheck disable=SC2120
 function send_chef_action_example() {
   install_if_missing core/curl curl
   install_if_missing core/jq-static jq
@@ -127,7 +137,25 @@ function send_chef_action_example() {
   # note: this needs to be fed in via stdin, as passing it in as --data "$tmp_action_json"
   # will exceed argmax
   curl -f --insecure -H "api-token: $(get_api_token)" \
-    --data "@-" ${GATEWAY_URL}${endpoint} <<< "$tmp_action_json"
+    --data "@-" "${GATEWAY_URL}${endpoint}" <<< "$tmp_action_json"
+}
+
+document "generate_chef_run_example" <<DOC
+  Generates a unique Chef run report by updating the example document with new
+  UUIDS.
+
+  Example: Generate the document and pretty print:
+  ------------------------------------------------
+  generate_chef_run_example | jq .
+
+  Example: Generate the document and send to automate:
+  ----------------------------------------------------
+  generate_chef_run_example | send_chef_data_raw
+DOC
+function generate_chef_run_example() {
+  local node_name="insights.success.$((RANDOM % 100))"
+  local examples_json_path=${JSON_FILE:-/src/components/ingest-service/examples/converge-success-report.json}
+  uniqify_chef_run_report "$node_name" < "$examples_json_path"
 }
 
 document "send_chef_run_example" <<DOC
@@ -152,28 +180,16 @@ document "send_chef_run_example" <<DOC
   --------------------------------------------------------
   # send_chef_run_example lb
 DOC
+# shellcheck disable=SC2120
 function send_chef_run_example() {
-  install_if_missing core/curl curl
+  generate_chef_run_example | send_chef_data_raw "$1"
+}
 
-  local examples_json_path=${JSON_FILE:-/src/components/ingest-service/examples/converge-success-report.json}
-
-  if [[ "$1" == "legacy" ]]; then
-    endpoint=${GATEWAY_URL}"/events/data-collector"
-  elif [[ "$1" == "lb" ]]; then
-    endpoint="https://localhost/data-collector/v0"
-  else
-    endpoint=${GATEWAY_URL}"/ingest/events/chef/run"
-  fi
-
-  uuid=$(uuidgen)
-  entity_uuid=$(uuidgen)
-
-  tmp_ccr_json="$(jq --arg id "$uuid" '.id = $id' <$examples_json_path)"
-  tmp_ccr_json="$(echo $tmp_ccr_json | jq --arg id "$entity_uuid" '.entity_uuid = $id')"
-
-  echo "$tmp_ccr_json" \
-       | curl -f --insecure -H "api-token: $(get_admin_token)" \
-       --data "@-" ${endpoint}
+document "generate_chef_run_start_example" <<DOC
+  Returns a chef run start document from the examples.
+DOC
+function generate_chef_run_start_example() {
+  cat /src/components/ingest-service/examples/chef_client_run_start.json
 }
 
 document "send_chef_run_start_example" <<DOC
@@ -192,26 +208,32 @@ document "send_chef_run_start_example" <<DOC
   # send_chef_run_start_example lb
 DOC
 function send_chef_run_start_example() {
-  install_if_missing core/curl curl
-
-  local examples_path="/src/components/ingest-service/examples"
-  if [[ "$1" == "legacy" ]]; then
-    endpoint=${GATEWAY_URL}"/events/data-collector"
-  elif [[ "$1" == "lb" ]]; then
-    endpoint="https://localhost/data-collector/v0"
-  else
-    endpoint=${GATEWAY_URL}"/ingest/events/chef/run"
-  fi
-
-  curl -f --insecure -H "api-token: $(get_api_token)" \
-       --data @$examples_path/chef_client_run_start.json ${endpoint}
+  generate_chef_run_start_example | send_chef_data_raw "$1"
 }
 
-document "get_service_versions" <<DOC
-  Get all the service versions running in automate
+# shellcheck disable=SC2154
+document "generate_chef_run_failure_example" <<DOC
+  Generate a unique chef run failure report by updating the example with new
+  UUIDs and times/dates. You can send it automate directly or modify it as you
+  wish.
+
+  Example: Send a Chef Run example to the new ingest endpoint:
+  --------------------------------------------------------
+  # generate_chef_run_failure_example | send_chef_data_raw
+
+  Example: Generate run data and modify it
+  --------------------------------------------------------
+  # generate_chef_run_failure_example | jq --arg error_message "example error1" '.error.message = $error_message'
+
+  Example: Generate run data, modify it, and send it to ingest
+  --------------------------------------------------------
+  generate_chef_run_failure_example | jq --arg error_message "example error1" '.error.message = $error_message' | send_chef_data_raw
 DOC
-function get_service_versions() {
-  curl -f --insecure -H "api-token: $(get_api_token)" ${GATEWAY_URL}"/deployment/service_versions"
+# shellcheck disable=SC2120
+function generate_chef_run_failure_example() {
+  local node_name="node_failed_$((RANDOM % 100))"
+  local examples_path="/src/components/ingest-service/examples"
+  uniqify_chef_run_report "$node_name" < $examples_path/converge-failure-report.json
 }
 
 document "send_chef_run_failure_example" <<DOC
@@ -222,27 +244,14 @@ document "send_chef_run_failure_example" <<DOC
   # send_chef_run_failure_example legacy
 DOC
 function send_chef_run_failure_example() {
-  install_if_missing core/curl curl
-  install_if_missing core/jq-static jq
+  generate_chef_run_failure_example| send_chef_data_raw "$1"
+}
 
-  local run_uuid
-  run_uuid=$(uuidgen)
-  local node_uuid
-  node_uuid=$(uuidgen)
-
-  local node_name="node_failed_$((RANDOM % 100))"
-  local rfc_time
-  rfc_time=$(date +%FT%TZ -d "$((RANDOM % 144)) hour ago")
-
-  local examples_path="/src/components/ingest-service/examples"
-  [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/run"
-
-  # Update the IDs, names, and dates
-  tmp_ccr_json="$(jq --arg rfc_time "$rfc_time" --arg run_uuid "$run_uuid" --arg node_name "$node_name" --arg node_uuid "$node_uuid" '.end_time = $rfc_time | .start_time = $rfc_time | .entity_uuid = $node_uuid | .id = $run_uuid | .run_id = $run_uuid | .node_name = $node_name' <$examples_path/converge-failure-report.json)"
-
-  echo "$tmp_ccr_json" \
-       | curl -f --insecure -H "api-token: $(get_api_token)" \
-       --data "@-" "${GATEWAY_URL}${endpoint}"
+document "generate_chef_liveness_example" <<DOC
+  Prints the example chef liveness message to stdout
+DOC
+function generate_chef_liveness_example() {
+  cat "/src/components/ingest-service/examples/liveness_ping.json"
 }
 
 document "send_chef_liveness_example" <<DOC
@@ -253,13 +262,65 @@ document "send_chef_liveness_example" <<DOC
   # send_chef_liveness_example legacy
 DOC
 function send_chef_liveness_example() {
+  generate_chef_liveness_example | send_chef_data_raw "$1"
+}
+
+document "send_chef_data_raw" <<DOC
+  Send data from stdin to the given endpoint.
+
+  One optional argument can be given to send the data via different paths:
+  * 'send_chef_data_raw legacy': send to automate-gateway's events/data-collector endpoint
+  * 'send_chef_data_raw lb': send to automate-load-balancer (nginx) data-collector/v0 endpoint
+  * 'send_chef_data_raw SOME/PATH': send to automate-gateway at the given path
+  * 'send_chef_data_raw' (default): send to new ingest/events/chef/run endpoint
+
+  Example: Send a Chef Run failure example to the new ingest endpoint:
+  --------------------------------------------------------
+  # generate_chef_run_failure_example | send_chef_data_raw
+
+  Example: Same but via the load balancer
+  --------------------------------------------------------
+  # generate_chef_run_failure_example | send_chef_data_raw lb
+DOC
+function send_chef_data_raw() {
   install_if_missing core/curl curl
 
-  local examples_path="/src/components/ingest-service/examples"
-  [[ "$1" == "legacy" ]] && endpoint="/events/data-collector" || endpoint="/ingest/events/chef/liveness"
+  local endpoint=$1
+  if [[ "$1" == "legacy" ]]; then
+    endpoint="${GATEWAY_URL}/events/data-collector"
+  elif [[ "$1" == "lb" ]]; then
+    endpoint="https://localhost/data-collector/v0"
+  elif [[ "$1x" == "x" ]]; then
+    endpoint="${GATEWAY_URL}/ingest/events/chef/run"
+  else
+    endpoint="${GATEWAY_URL}$1"
+  fi
 
   curl -f --insecure -H "api-token: $(get_api_token)" \
-       --data @$examples_path/liveness_ping.json "${GATEWAY_URL}${endpoint}"
+  --data "@-" "${endpoint}"
+}
+
+function uniqify_chef_run_report() {
+  install_if_missing core/jq-static jq
+
+  local node_name="$1"
+
+  local run_uuid
+  run_uuid=$(uuidgen)
+  local node_uuid
+  node_uuid=$(uuidgen)
+
+  local rfc_time
+  rfc_time=$(date +%FT%TZ -d "$((RANDOM % 144)) hour ago")
+
+  local examples_path="/src/components/ingest-service/examples"
+
+  # Update the IDs, names, and dates
+  jq --arg rfc_time "$rfc_time" \
+     --arg run_uuid "$run_uuid" \
+     --arg node_name "$node_name" \
+     --arg node_uuid "$node_uuid" \
+     '.end_time = $rfc_time | .start_time = $rfc_time | .entity_uuid = $node_uuid | .id = $run_uuid | .run_id = $run_uuid | .node_name = $node_name'
 }
 
 document "delete_multiple_nodes" <<DOC
@@ -275,7 +336,7 @@ function delete_multiple_nodes() {
 
   endpoint="/ingest/events/chef/node-multiple-deletes"
 
-  jo node_ids=$(jo -a "$@") \
+  jo "node_ids=$(jo -a "$@")" \
     | curl -X POST -f --insecure -H "api-token: $(get_api_token)" \
     --data "@-" "${GATEWAY_URL}${endpoint}"
 }
@@ -296,7 +357,7 @@ function send_inspec_example() {
   report_uuid=$(uuidgen)
   rfc_time=$(date +%FT%TZ -d "$((RANDOM % 144)) hour ago")
 
-  tmp_inspec_json="$(jq --arg id "$uuid" --arg report_uuid "$report_uuid" --arg rfc_time "$rfc_time" '.node_uuid = $id | .report_uuid = $report_uuid | .end_time = $rfc_time' <$examples_json_path)"
+  tmp_inspec_json="$(jq --arg id "$uuid" --arg report_uuid "$report_uuid" --arg rfc_time "$rfc_time" '.node_uuid = $id | .report_uuid = $report_uuid | .end_time = $rfc_time' <"$examples_json_path")"
 
   echo "$tmp_inspec_json" | curl -f --insecure -H "api-token: $(get_admin_token)" \
        --data "@-" "${GATEWAY_URL}${endpoint}"
@@ -354,6 +415,7 @@ function gateway_create_secret() {
 
   endpoint="/secrets"
 
+  # shellcheck disable=SC2086
   echo '{"name": "bob", "type": "service_now", "data": [{"key": "username", "value": "'$username'"}, {"key": "password", "value": "'$password'"}] }' |\
     curl -X POST -f --insecure -H "api-token: $(get_admin_token)" \
     --data "@-" "${GATEWAY_URL}${endpoint}" | jq
@@ -372,6 +434,7 @@ function gateway_delete_secret() {
 
   endpoint="/secrets/id/$id"
 
+  # shellcheck disable=SC2086
   echo '{"id": "'$id'"}' |\
     curl -X DELETE -f --insecure -H "api-token: $(get_admin_token)" \
     --data "@-" "${GATEWAY_URL}${endpoint}"
@@ -391,6 +454,7 @@ function gateway_read_secret() {
 
   endpoint="/secrets/id/$id"
 
+  # shellcheck disable=SC2086
   echo '{"id": "'$id'"}' |\
     curl -X GET -f --insecure -H "api-token: $(get_admin_token)" \
     --data "@-" "${GATEWAY_URL}${endpoint}" | jq
@@ -411,6 +475,7 @@ function gateway_update_secret() {
 
   endpoint="/secrets/id/$id"
 
+  # shellcheck disable=SC2086
   echo '{"id": "'$id'", "name": "bob", "type": "service_now", "data": [{"key": "username", "value": "'$username'"}, {"key": "password", "value": "'$password'"}] }' |\
     curl -X PATCH -f --insecure -H "api-token: $(get_admin_token)" \
     --data "@-" ${GATEWAY_URL}${endpoint} | jq
@@ -430,6 +495,7 @@ function gateway_delete_notification_rule() {
 
   endpoint="/notifications/rules/$id"
 
+  # shellcheck disable=SC2086
   echo '{"id": "'$id'"}' |\
     curl -X DELETE -f --insecure -H "api-token: $(get_admin_token)" \
     --data "@-" ${GATEWAY_URL}${endpoint} | jq
@@ -444,9 +510,10 @@ function gateway_create_notification_rule() {
 
   endpoint="/notifications/rules"
 
+  # shellcheck disable=SC2154,SC2086
   echo '{"rule": { "name": "'$name'", "event": "CCRFailure", "SlackAlert": { "url": "http://localhost:55565"} }}' |\
     curl -X POST -f --insecure -H "api-token: $(get_admin_token)" \
-    --data "@-" ${GATEWAY_URL}${endpoint} | jq
+    --data "@-" "${GATEWAY_URL}${endpoint}" | jq
 }
 
 document "gateway_get_notification_rule" <<DOC
@@ -463,9 +530,10 @@ function gateway_get_notification_rule() {
 
   endpoint="/notifications/rules/$id"
 
+  # shellcheck disable=SC2086
   echo '{"id": "'$id'"}' |\
     curl -X GET -f --insecure -H "api-token: $(get_admin_token)" \
-    --data "@-" ${GATEWAY_URL}${endpoint} | jq
+    --data "@-" "${GATEWAY_URL}${endpoint}" | jq
 }
 
 
@@ -532,7 +600,8 @@ function get_api_token() {
   if [ -f /tmp/api_token ]; then
     cat /tmp/api_token
   else
-    chef-automate admin-token >/tmp/api_token
+    date +%s | xargs -I % chef-automate iam token create admin-token-% --admin >/tmp/api_token
+    # shellcheck disable=SC2181
     if [ $? -ne 0 ]; then
       get_api_token_with_policy ingest-access >/tmp/api_token || return 1
     fi
@@ -548,35 +617,23 @@ document "get_api_token_with_policy" <<DOC
   ----------------------------------------------------
   # get_api_token_with_policy editor-access
 
-  Note: if NOT using IAM v2, this token will just be an admin token.
 DOC
 function get_api_token_with_policy() {
   check_if_deployinate_started || return 1
 
-  local policy=${1:?"usage: get_api_token_with_policy POLICYNAME"}
-  local iam_version
-  iam_version="$(chef-automate iam version | awk '{print $2}')"
-  local token_description="api-token-$$-${policy}"
-  local token_file="/tmp/api_token_${iam_version}_${policy}"
+  local policy_id=${1:?"usage: get_api_token_with_policy POLICY_ID"}
+  local token_id="api-token-id-${policy_id}"
+  local token_file="/tmp/api_token_${policy_id}"
 
   if [ -f "$token_file" ]; then
     cat "$token_file"
   else
-    if [ "$iam_version" == "v1.0" ]; then
-      chef-automate admin-token >"$token_file"
-    else
-      # create standard api token
-      chef-automate iam token create "$token_description" >"$token_file" || return 1
-      # retrieve the tokens' ID
-      local token_id
-      token_id="$(curl -fsS --insecure -H "api-token: $(get_admin_token)" \
-       "${GATEWAY_URL}/auth/tokens" |\
-         jq -er --arg token "$token_description" '[.tokens[] | select(.description == $token) | .id] | first' )"
-      # and add it to policy
-      curl -fsS --insecure -H "api-token: $(get_admin_token)" \
-        --data "$(jq -nc --arg token "$token_id"  '{ members: [ "token:\($token)" ]}')" \
-       "${GATEWAY_URL}/apis/iam/v2/policies/${policy}/members:add" >/dev/null
-    fi
+    # create standard api token
+    chef-automate iam token create "$token_id" --id "$token_id" >"$token_file" || return 1
+    # and add it to policy
+    curl -fsS --insecure -H "api-token: $(get_admin_token)" \
+      --data "$(jq -nc --arg token "$token_id"  '{ members: [ "token:\($token)" ]}')" \
+      "${GATEWAY_URL}/apis/iam/v2/policies/${policy_id}/members:add" >/dev/null
     cat "$token_file"
   fi
 }

@@ -34,7 +34,7 @@ func init() {
 
 // newMockGatewayServerWithAuth Is a Slick Wrapper that injects Auth for this particular test suite
 func newMockGatewayServerWithAuth(t *testing.T, services ...interface{}) Server {
-	mockAuthClient, mockAuthzClient := newAuthorizationMocks(t, "ingest:unified_events", "create")
+	mockAuthClient, mockAuthzClient := newAuthorizationMocks(t, "ingest:unifiedEvents", "ingest:unifiedEvents:create")
 
 	// Append Auth/AuthZ to Authorize the above resource
 	services = append(services, mockAuthClient, mockAuthzClient)

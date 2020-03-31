@@ -10,11 +10,7 @@ import (
 	client_type "github.com/chef/automate/components/automate-cli/pkg/client"
 	"github.com/chef/automate/components/automate-cli/pkg/status"
 	"github.com/chef/automate/components/automate-deployment/pkg/constants"
-	"github.com/chef/automate/components/automate-gateway/api/auth/teams"
-	"github.com/chef/automate/components/automate-gateway/api/auth/tokens"
-	"github.com/chef/automate/components/automate-gateway/api/auth/users"
-	"github.com/chef/automate/components/automate-gateway/api/authz"
-	v2 "github.com/chef/automate/components/automate-gateway/api/iam/v2"
+	iam "github.com/chef/automate/components/automate-gateway/api/iam/v2"
 	"github.com/chef/automate/lib/grpc/secureconn"
 	"github.com/chef/automate/lib/tls/certs"
 )
@@ -22,13 +18,11 @@ import (
 type client struct {
 	apiClientConn *grpc.ClientConn
 	// TODO (tc): Add other service clients here as needed.
-	authzClient        authz.AuthorizationClient
-	teamsClient        teams.TeamsClient
-	teamsV2Client      v2.TeamsClient
-	tokensClient       tokens.TokensMgmtClient
-	tokensV2Client     v2.TokensClient
-	usersClient        users.UsersMgmtClient
-	policiesClient     v2.PoliciesClient
+	authzClient        iam.AuthorizationClient
+	teamsClient        iam.TeamsClient
+	tokensClient       iam.TokensClient
+	usersClient        iam.UsersClient
+	policiesClient     iam.PoliciesClient
 	reportingClient    reporting.ReportingServiceClient
 	applicationsClient applications.ApplicationsServiceClient
 }
@@ -56,43 +50,33 @@ func OpenConnection(ctx context.Context) (client_type.APIClient, error) {
 	return client{
 		apiClientConn: apiClientConn,
 		// TODO (tc): Add other service clients here as needed.
-		authzClient:        authz.NewAuthorizationClient(apiClientConn),
-		teamsClient:        teams.NewTeamsClient(apiClientConn),
-		teamsV2Client:      v2.NewTeamsClient(apiClientConn),
-		tokensClient:       tokens.NewTokensMgmtClient(apiClientConn),
-		tokensV2Client:     v2.NewTokensClient(apiClientConn),
-		usersClient:        users.NewUsersMgmtClient(apiClientConn),
-		policiesClient:     v2.NewPoliciesClient(apiClientConn),
+		authzClient:        iam.NewAuthorizationClient(apiClientConn),
+		teamsClient:        iam.NewTeamsClient(apiClientConn),
+		tokensClient:       iam.NewTokensClient(apiClientConn),
+		usersClient:        iam.NewUsersClient(apiClientConn),
+		policiesClient:     iam.NewPoliciesClient(apiClientConn),
 		reportingClient:    reporting.NewReportingServiceClient(apiClientConn),
 		applicationsClient: applications.NewApplicationsServiceClient(apiClientConn),
 	}, nil
 }
 
-func (c client) AuthzClient() authz.AuthorizationClient {
+func (c client) AuthzClient() iam.AuthorizationClient {
 	return c.authzClient
 }
 
-func (c client) TeamsClient() teams.TeamsClient {
+func (c client) TeamsClient() iam.TeamsClient {
 	return c.teamsClient
 }
 
-func (c client) TeamsV2Client() v2.TeamsClient {
-	return c.teamsV2Client
-}
-
-func (c client) TokensClient() tokens.TokensMgmtClient {
+func (c client) TokensClient() iam.TokensClient {
 	return c.tokensClient
 }
 
-func (c client) TokensV2Client() v2.TokensClient {
-	return c.tokensV2Client
-}
-
-func (c client) UsersClient() users.UsersMgmtClient {
+func (c client) UsersClient() iam.UsersClient {
 	return c.usersClient
 }
 
-func (c client) PoliciesClient() v2.PoliciesClient {
+func (c client) PoliciesClient() iam.PoliciesClient {
 	return c.policiesClient
 }
 

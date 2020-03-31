@@ -77,7 +77,11 @@ func Start(dataFeedConfig *config.DataFeedConfig, connFactory *secureconn.Factor
 		return errors.Wrap(err, "could not connect to secrets-service")
 	}
 
-	dataFeedPollTask := NewDataFeedPollTask(dataFeedConfig, cfgMgmtConn, complianceConn, db, manager)
+	dataFeedPollTask, err := NewDataFeedPollTask(dataFeedConfig, cfgMgmtConn, complianceConn, db, manager)
+	if err != nil {
+		return errors.Wrap(err, "could not create data feed poll task")
+	}
+
 	dataFeedAggregateTask := NewDataFeedAggregateTask(dataFeedConfig, cfgMgmtConn, complianceConn, secretsConn, db)
 
 	err = manager.RegisterWorkflowExecutor(dataFeedWorkflowName, &DataFeedWorkflowExecutor{workflowName: dataFeedWorkflowName, dataFeedConfig: dataFeedConfig, manager: manager})

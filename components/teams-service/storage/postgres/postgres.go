@@ -9,7 +9,6 @@ import (
 
 	authz_v2 "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/teams-service/storage"
-	"github.com/chef/automate/components/teams-service/storage/postgres/datamigration"
 	"github.com/chef/automate/components/teams-service/storage/postgres/migration"
 	"github.com/chef/automate/lib/db"
 	"github.com/chef/automate/lib/grpc/auth_context"
@@ -27,10 +26,9 @@ import (
 // - CREATE EXTENSION "uuid-ossp"; (currently done via Makefile for tests)
 
 type postgres struct {
-	db                  *sql.DB
-	logger              logger.Logger
-	dataMigrationConfig datamigration.Config
-	authzClient         authz_v2.AuthorizationClient
+	db          *sql.DB
+	logger      logger.Logger
+	authzClient authz_v2.AuthorizationClient
 }
 
 type querier interface {
@@ -38,18 +36,11 @@ type querier interface {
 }
 
 // New instantiates and returns a postgres storage implementation
-func New(logger logger.Logger, migrationConfig migration.Config,
-	dataMigrationConfig datamigration.Config, isAuthZV2 bool,
+func New(logger logger.Logger, migrationConfig migration.Config, isAuthZV2 bool,
 	authzClient authz_v2.AuthorizationClient) (storage.Storage, error) {
 
 	if err := migrationConfig.Migrate(); err != nil {
 		return nil, errors.Wrap(err, "database migrations")
-	}
-
-	if isAuthZV2 {
-		if err := dataMigrationConfig.Migrate(); err != nil {
-			return nil, errors.Wrap(err, "database v2 data migrations")
-		}
 	}
 
 	db, err := initPostgresDB(migrationConfig.PGURL.String())
@@ -57,7 +48,7 @@ func New(logger logger.Logger, migrationConfig migration.Config,
 		return nil, errors.Wrap(err, "initialize database")
 	}
 
-	return &postgres{db, logger, dataMigrationConfig, authzClient}, nil
+	return &postgres{db, logger, authzClient}, nil
 }
 
 func initPostgresDB(pgURL string) (*sql.DB, error) {
@@ -71,18 +62,6 @@ func initPostgresDB(pgURL string) (*sql.DB, error) {
 	}
 
 	return d, nil
-}
-
-func (p *postgres) UpgradeToV2(ctx context.Context) error {
-	if err := p.dataMigrationConfig.Migrate(); err != nil {
-		return errors.Wrap(err, "database v2 data migrations")
-	}
-	return nil
-}
-
-func (p *postgres) ResetToV1(ctx context.Context) error {
-	_, err := p.db.ExecContext(ctx, "UPDATE teams SET projects='{}'")
-	return err
 }
 
 // StoreTeam saves a team to the DB. This is used by IAM v1 ONLY!

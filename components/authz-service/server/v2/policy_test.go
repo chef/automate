@@ -21,13 +21,11 @@ import (
 	uuid "github.com/chef/automate/lib/uuid4"
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	constants_v1 "github.com/chef/automate/components/authz-service/constants/v1"
-	constants_v2 "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"
-	storage_v1 "github.com/chef/automate/components/authz-service/storage/v1"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	memstore_v2 "github.com/chef/automate/components/authz-service/storage/v2/memstore"
 	"github.com/chef/automate/components/authz-service/testhelpers"
@@ -36,7 +34,7 @@ import (
 	"github.com/chef/automate/lib/tls/test/helpers"
 )
 
-var dummyWriter engine.V2p1Writer = nil
+var dummyWriter engine.Writer = nil
 
 func TestCreatePolicy(t *testing.T) {
 	ctx := context.Background()
@@ -437,7 +435,7 @@ func TestCreatePolicy(t *testing.T) {
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
-				Projects:  []string{constants_v2.UnassignedProjectID},
+				Projects:  []string{constants.UnassignedProjectID},
 			}
 			req := api_v2.CreatePolicyReq{
 				Id:         "policy1",
@@ -451,7 +449,7 @@ func TestCreatePolicy(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, resp)
 			assert.Equal(t, len(items)+1, store.ItemCount())
-			assert.ElementsMatch(t, []string{constants_v2.UnassignedProjectID}, resp.Statements[0].Projects)
+			assert.ElementsMatch(t, []string{constants.UnassignedProjectID}, resp.Statements[0].Projects)
 		}},
 
 		{"successfully creates policy with wildcard projects", func(t *testing.T) {
@@ -464,7 +462,7 @@ func TestCreatePolicy(t *testing.T) {
 				Effect:    api_v2.Statement_DENY,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
-				Projects:  []string{constants_v2.AllProjectsExternalID},
+				Projects:  []string{constants.AllProjectsExternalID},
 			}
 			statement2 := api_v2.Statement{
 				Effect:   api_v2.Statement_ALLOW,
@@ -493,21 +491,21 @@ func TestCreatePolicy(t *testing.T) {
 			assertPoliciesMatch(t, &pol, resp)
 			// check internal vs external representation: the alignment of these two fields
 			// is covered by assertPoliciesMatch, but important to check the specific expectations here, too
-			assert.ElementsMatch(t, []string{constants_v2.AllProjectsID}, pol.Statements[1].Projects)
-			assert.ElementsMatch(t, []string{constants_v2.AllProjectsExternalID}, resp.Statements[1].Projects)
+			assert.ElementsMatch(t, []string{constants.AllProjectsID}, pol.Statements[1].Projects)
+			assert.ElementsMatch(t, []string{constants.AllProjectsExternalID}, resp.Statements[1].Projects)
 		}},
 		{"successfully creates policy with assorted projects", func(t *testing.T) {
 			statement0 := api_v2.Statement{
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
-				Projects:  []string{constants_v2.UnassignedProjectID},
+				Projects:  []string{constants.UnassignedProjectID},
 			}
 			statement1 := api_v2.Statement{
 				Effect:    api_v2.Statement_DENY,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
-				Projects:  []string{constants_v2.AllProjectsExternalID},
+				Projects:  []string{constants.AllProjectsExternalID},
 			}
 			statement2 := api_v2.Statement{
 				Effect:   api_v2.Statement_ALLOW,
@@ -707,7 +705,7 @@ func TestListPolicies(t *testing.T) {
 		{"returns mapped meta-project when present", func(t *testing.T) {
 			_, items := addSomePoliciesToStore(t, store, prng)
 			storedPol := genPolicy(t, "", prng)
-			storedPol.Statements[0].Projects = []string{constants_v2.AllProjectsID}
+			storedPol.Statements[0].Projects = []string{constants.AllProjectsID}
 			store.Add(storedPol.ID, &storedPol, cache.NoExpiration)
 
 			resp, err := cl.ListPolicies(ctx, &req)
@@ -716,7 +714,7 @@ func TestListPolicies(t *testing.T) {
 			require.Equal(t, len(items)+1, len(resp.Policies))
 			for _, pol := range resp.Policies {
 				if pol.Id == storedPol.ID {
-					assert.Equal(t, constants_v2.AllProjectsExternalID, pol.Statements[0].Projects[0])
+					assert.Equal(t, constants.AllProjectsExternalID, pol.Statements[0].Projects[0])
 				} else {
 					p := items[pol.Id]
 					assertPoliciesMatch(t, &p, pol)
@@ -851,7 +849,7 @@ func TestGetPolicy(t *testing.T) {
 		}},
 		{"returns mapped meta-project when present", func(t *testing.T) {
 			storedPol := genPolicy(t, "", prng)
-			storedPol.Statements[0].Projects = []string{constants_v2.AllProjectsID}
+			storedPol.Statements[0].Projects = []string{constants.AllProjectsID}
 			require.Zero(t, store.ItemCount())
 			store.Add(storedPol.ID, &storedPol, cache.NoExpiration)
 			req := api_v2.GetPolicyReq{
@@ -861,7 +859,7 @@ func TestGetPolicy(t *testing.T) {
 			pol, err := cl.GetPolicy(ctx, &req)
 			require.NoError(t, err)
 
-			assert.Equal(t, constants_v2.AllProjectsExternalID, pol.Statements[0].Projects[0])
+			assert.Equal(t, constants.AllProjectsExternalID, pol.Statements[0].Projects[0])
 		}},
 		{"fails with NotFound when ID doesn't match any policies", func(t *testing.T) {
 			addSomePoliciesToStore(t, store, prng)
@@ -910,7 +908,7 @@ func TestUpdatePolicy(t *testing.T) {
 			Effect:    api_v2.Statement_ALLOW,
 			Resources: []string{"compliance:profiles"},
 			Actions:   []string{"compliance:profiles:upload"},
-			Projects:  []string{constants_v2.AllProjectsExternalID},
+			Projects:  []string{constants.AllProjectsExternalID},
 		},
 	}
 	ctx := context.Background()
@@ -930,7 +928,7 @@ func TestUpdatePolicy(t *testing.T) {
 						Effect:    api_v2.Statement_ALLOW,
 						Resources: []string{"compliance:profiles"},
 						Actions:   []string{"compliance:profiles:upload"},
-						Projects:  []string{constants_v2.AllProjectsExternalID},
+						Projects:  []string{constants.AllProjectsExternalID},
 					},
 				},
 			}
@@ -1017,13 +1015,13 @@ func TestUpdatePolicy(t *testing.T) {
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"compliance:profiles"},
 				Actions:   []string{"compliance:profiles:upload"},
-				Projects:  []string{constants_v2.AllProjectsExternalID},
+				Projects:  []string{constants.AllProjectsExternalID},
 			}
 			statement1 := api_v2.Statement{
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
-				Projects:  []string{constants_v2.UnassignedProjectID},
+				Projects:  []string{constants.UnassignedProjectID},
 			}
 			req := api_v2.UpdatePolicyReq{
 				Id:         storedPol.ID,
@@ -1041,13 +1039,13 @@ func TestUpdatePolicy(t *testing.T) {
 			assert.Equal(t, api_v2.Statement_ALLOW, s0.Effect)
 			assert.Equal(t, []string{"compliance:profiles"}, s0.Resources)
 			assert.Equal(t, []string{"compliance:profiles:upload"}, s0.Actions)
-			assert.Equal(t, []string{constants_v2.AllProjectsExternalID}, s0.Projects)
+			assert.Equal(t, []string{constants.AllProjectsExternalID}, s0.Projects)
 
 			s1 := pol.Statements[1]
 			assert.Equal(t, api_v2.Statement_ALLOW, s1.Effect)
 			assert.Equal(t, []string{"cfgmgmt:delete", "cfgmgmt:list"}, s1.Resources)
 			assert.Equal(t, []string{"cfgmgmt:nodes:*"}, s1.Actions)
-			assert.Equal(t, []string{constants_v2.UnassignedProjectID}, s1.Projects)
+			assert.Equal(t, []string{constants.UnassignedProjectID}, s1.Projects)
 
 			storedPol = getPolicyFromStore(t, store, storedPol.ID)
 			assertPoliciesMatch(t, &storedPol, pol)
@@ -1098,13 +1096,13 @@ func TestUpdatePolicy(t *testing.T) {
 				Effect:    api_v2.Statement_ALLOW,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
-				Projects:  []string{constants_v2.UnassignedProjectID},
+				Projects:  []string{constants.UnassignedProjectID},
 			}
 			statement1 := api_v2.Statement{
 				Effect:    api_v2.Statement_DENY,
 				Resources: []string{"cfgmgmt:delete", "cfgmgmt:list"},
 				Actions:   []string{"cfgmgmt:nodes:*"},
-				Projects:  []string{constants_v2.AllProjectsExternalID},
+				Projects:  []string{constants.AllProjectsExternalID},
 			}
 			statement2 := api_v2.Statement{
 				Effect:   api_v2.Statement_ALLOW,
@@ -1305,7 +1303,7 @@ func TestRemovePolicyMembers(t *testing.T) {
 		}},
 		{"fails when one of the members is the admin", func(t *testing.T) {
 			// this policy acts as a stand-in for the default admin policy
-			adminPolicyID := constants_v2.AdminPolicyID
+			adminPolicyID := constants.AdminPolicyID
 			adminPolicy := genPolicy(t, adminPolicyID, prng)
 			store.Add(adminPolicyID, &adminPolicy, cache.NoExpiration)
 
@@ -2099,550 +2097,6 @@ func TestGetRole(t *testing.T) {
 	}
 }
 
-type v1Lister struct {
-	pols []*storage_v1.Policy
-	err  error
-}
-
-func (pl *v1Lister) ListPolicies(context.Context) ([]*storage_v1.Policy, error) {
-	return pl.pols, pl.err
-}
-
-func (pl *v1Lister) ListPoliciesWithSubjects(context.Context) ([]*storage_v1.Policy, error) {
-	pols := []*storage_v1.Policy{}
-	for _, p := range pl.pols {
-		if len(p.Subjects) > 0 {
-			pols = append(pols, p)
-		}
-	}
-	return pols, pl.err
-}
-
-func TestMigrateToV2(t *testing.T) {
-	ctx := context.Background()
-	prng := prng.Seed(t)
-	emptyV1List := v1Lister{}
-	v1List := v1Lister{}
-	ts := setupV2(t, nil, nil, &v1List, nil)
-	cl := ts.policy
-	policyStore := ts.policyCache
-	roleStore := ts.roleCache
-	projectStore := ts.projectCache
-	status := ts.status
-
-	defaultPolicies, err := storage.DefaultPolicies()
-	require.NoError(t, err)
-	defaultPolicyCount := len(defaultPolicies)
-	defaultRoleCount := len(storage.DefaultRoles())
-	defaultProjectCount := len(storage.DefaultProjects())
-
-	cases := map[string]func(*testing.T){
-		"empty store/default state": func(t *testing.T) {
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-
-			assert.Equal(t, defaultPolicyCount, policyStore.ItemCount())
-			for _, pol := range defaultPolicies {
-				_, found := policyStore.Get(pol.ID)
-				assert.True(t, found)
-			}
-
-			assert.Equal(t, defaultRoleCount, roleStore.ItemCount())
-			for _, role := range storage.DefaultRoles() {
-				_, found := roleStore.Get(role.ID)
-				assert.True(t, found)
-			}
-
-			assert.Equal(t, defaultProjectCount, projectStore.ItemCount())
-			for _, project := range storage.DefaultProjects() {
-				_, found := projectStore.Get(project.ID)
-				assert.True(t, found)
-			}
-		},
-		"non-empty store is kept (ResetToV1 resets it)": func(t *testing.T) {
-			_, policies := addSomePoliciesToStore(t, policyStore, prng)
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-
-			assert.Equal(t, defaultPolicyCount+len(policies), policyStore.ItemCount())
-			for id := range policies {
-				_, found := policyStore.Get(id)
-				assert.True(t, found)
-			}
-			assert.Equal(t, defaultRoleCount, roleStore.ItemCount())
-			assert.Equal(t, defaultProjectCount, projectStore.ItemCount())
-		},
-		"empty store, custom v1 policy": func(t *testing.T) {
-			polID := genUUID(t)
-			v1List = v1Lister{pols: []*storage_v1.Policy{
-				{
-					ID:       polID,
-					Subjects: []string{"user:ldap:bob", "team:ldap:ops"},
-					Action:   "create",
-					Resource: "ingest:nodes",
-				},
-			}}
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-
-			assert.Equal(t, defaultPolicyCount+1, policyStore.ItemCount())
-
-			migratedPol := getPolicyFromStore(t, policyStore, polID.String())
-			assert.Equal(t, polID.String(), migratedPol.ID)
-			assert.Equal(t, polID.String()+" (custom)", migratedPol.Name)
-			assert.ElementsMatch(t, []string{"user:ldap:bob", "team:ldap:ops"}, storage.MemberSliceToStringSlice(migratedPol.Members))
-			require.Equal(t, 1, len(migratedPol.Statements))
-			statement := migratedPol.Statements[0]
-			assert.Equal(t, storage.Allow, statement.Effect, "effect is allow")
-			assert.Equal(t, []string{"*:create"}, statement.Actions)
-			assert.Equal(t, []string{"infra:nodes"}, statement.Resources)
-		},
-		"on admin token policy, adds members to admin policy": func(t *testing.T) {
-			polID := genUUID(t)
-			tok := "token:282f41f1-e763-4094-9c59-c4eec1b71532"
-			v1List = v1Lister{pols: []*storage_v1.Policy{
-				{
-					ID:       polID,
-					Subjects: []string{tok},
-					Action:   "*",
-					Resource: "*",
-				},
-			}}
-
-			_, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			adminPol := getPolicyFromStore(t, policyStore, constants_v2.AdminPolicyID)
-
-			require.NoError(t, err)
-			assert.Equal(t, defaultPolicyCount, policyStore.ItemCount(), "additional policy stored")
-
-			memberNames := make([]string, len(adminPol.Members))
-			for _, mem := range adminPol.Members {
-				memberNames = append(memberNames, mem.Name)
-			}
-			assert.Contains(t, memberNames, tok)
-		},
-		"does not migrate policies without subjects": func(t *testing.T) {
-			polID := genUUID(t)
-			v1List = v1Lister{pols: []*storage_v1.Policy{
-				{
-					ID:       polID,
-					Subjects: []string{},
-					Action:   "*",
-					Resource: "*",
-				},
-			}}
-
-			_, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-
-			assert.Equal(t, defaultPolicyCount, policyStore.ItemCount(), "additional policy stored")
-		},
-		"two unconvertible custom v1 policies have their errors collected": func(t *testing.T) {
-			polID := genUUID(t)
-			v1List = v1Lister{pols: []*storage_v1.Policy{
-				{
-					ID:       polID,
-					Subjects: []string{"user:ldap:bob"},
-					Action:   "create",
-					Resource: "injest:nodes",
-				},
-				{
-					ID:       polID,
-					Subjects: []string{"team:ldap:ops"},
-					Action:   "mewantfood",
-					Resource: "ingest:nodes",
-				},
-			}}
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			require.Equal(t, 2, len(resp.GetReports()))
-			for _, rep := range resp.Reports {
-				assert.Regexp(t, `convert v1 policy "[^"]+":`, rep)
-			}
-			assert.Equal(t, defaultPolicyCount, policyStore.ItemCount(), "no additional policy stored")
-		},
-		// --------- default policy merging related tests ---------
-		"three default cfgmgmt v1 policies are combined into one": func(t *testing.T) {
-			v1List = v1Lister{pols: []*storage_v1.Policy{
-				wellknown(t, constants_v1.CfgmgmtNodesContainerPolicyID),
-				wellknown(t, constants_v1.CfgmgmtNodesWildcardPolicyID),
-				wellknown(t, constants_v1.CfgmgmtStatsWildcardPolicyID),
-			}}
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-			// Note that the three v1 policies are adding up to ONE additional policy
-			assert.Equal(t, defaultPolicyCount+1, policyStore.ItemCount())
-
-			pol := getPolicyFromStore(t, policyStore, constants_v2.CfgmgmtPolicyID)
-			assert.Equal(t, "[Legacy] Infrastructure Automation Access", pol.Name)
-		},
-		"only one default cfgmgmt v1 policy (stats) also leads to the v2 policy in store": func(t *testing.T) {
-			v1List = v1Lister{pols: []*storage_v1.Policy{wellknown(t, constants_v1.CfgmgmtStatsWildcardPolicyID)}}
-			_, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.Equal(t, defaultPolicyCount+1, policyStore.ItemCount())
-		},
-		"only one default cfgmgmt v1 policy (nodes:*) also leads to the v2 policy in store": func(t *testing.T) {
-			v1List = v1Lister{pols: []*storage_v1.Policy{wellknown(t, constants_v1.CfgmgmtNodesWildcardPolicyID)}}
-			_, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.Equal(t, defaultPolicyCount+1, policyStore.ItemCount())
-		},
-		"only one default cfgmgmt v1 policy (nodes container) also leads to the v2 policy in store": func(t *testing.T) {
-			v1List = v1Lister{pols: []*storage_v1.Policy{wellknown(t, constants_v1.CfgmgmtNodesContainerPolicyID)}}
-			_, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.Equal(t, defaultPolicyCount+1, policyStore.ItemCount())
-		},
-		"two default events v1 policies are combined into one": func(t *testing.T) {
-			v1List = v1Lister{pols: []*storage_v1.Policy{
-				wellknown(t, constants_v1.EventsContainerPolicyID),
-				wellknown(t, constants_v1.EventsWildcardPolicyID),
-			}}
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-			// Note that the two v1 policies are adding up to ONE additional policy
-			assert.Equal(t, defaultPolicyCount+1, policyStore.ItemCount())
-
-			pol := getPolicyFromStore(t, policyStore, constants_v2.EventsPolicyID)
-			assert.Equal(t, "[Legacy] Events Access", pol.Name)
-		},
-		"two default nodes v1 policies are combined into one": func(t *testing.T) {
-			v1List = v1Lister{pols: []*storage_v1.Policy{
-				wellknown(t, constants_v1.NodesContainerPolicyID),
-				wellknown(t, constants_v1.NodesWildcardPolicyID),
-			}}
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-			// Note that the two v1 policies are adding up to ONE additional policy
-			assert.Equal(t, defaultPolicyCount+1, policyStore.ItemCount())
-
-			pol := getPolicyFromStore(t, policyStore, constants_v2.NodesPolicyID)
-			assert.Equal(t, "[Legacy] Nodes Access", pol.Name)
-		},
-		"two default node managers v1 policies are combined into one": func(t *testing.T) {
-			v1List = v1Lister{pols: []*storage_v1.Policy{
-				wellknown(t, constants_v1.NodeManagersContainerPolicyID),
-				wellknown(t, constants_v1.NodeManagersWildcardPolicyID),
-			}}
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-			// Note that the two v1 policies are adding up to ONE additional policy
-			assert.Equal(t, defaultPolicyCount+1, policyStore.ItemCount())
-
-			pol := getPolicyFromStore(t, policyStore, constants_v2.NodeManagersPolicyID)
-			assert.Equal(t, "[Legacy] Node Managers Access", pol.Name)
-		},
-		"two default secrets v1 policies are combined into one": func(t *testing.T) {
-			v1List = v1Lister{pols: []*storage_v1.Policy{
-				wellknown(t, constants_v1.SecretsContainerPolicyID),
-				wellknown(t, constants_v1.SecretsWildcardPolicyID),
-			}}
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-			// Note that the two v1 policies are adding up to ONE additional policy
-			assert.Equal(t, defaultPolicyCount+1, policyStore.ItemCount())
-
-			pol := getPolicyFromStore(t, policyStore, constants_v2.SecretsPolicyID)
-			assert.Equal(t, "[Legacy] Secrets Access", pol.Name)
-		},
-		"three default compliance token v1 policies are combined into one": func(t *testing.T) {
-			v1List = v1Lister{pols: []*storage_v1.Policy{
-				wellknown(t, constants_v1.ComplianceTokenReadProfilesPolicyID),
-				wellknown(t, constants_v1.ComplianceTokenSearchProfilesPolicyID),
-				wellknown(t, constants_v1.ComplianceTokenUploadProfilesPolicyID),
-			}}
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-			// Note that the three v1 policies are adding up to ONE additional policy
-			assert.Equal(t, defaultPolicyCount+1, policyStore.ItemCount())
-
-			pol := getPolicyFromStore(t, policyStore, constants_v2.ComplianceTokenPolicyID)
-			assert.Equal(t, "[Legacy] Compliance Profile Access", pol.Name)
-		},
-		"legacy default and custom v1 policies are skipped when asked to skip them": func(t *testing.T) {
-			polID := genUUID(t)
-			v1List = v1Lister{pols: []*storage_v1.Policy{
-				wellknown(t, constants_v1.ComplianceTokenReadProfilesPolicyID),
-				{
-					ID:       polID,
-					Subjects: []string{"user:ldap:bob", "team:ldap:ops"},
-					Action:   "create",
-					Resource: "ingest:nodes",
-				},
-			}}
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{SkipV1Policies: true})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-			assert.Equal(t, defaultPolicyCount, policyStore.ItemCount()) // nothing extra
-		},
-		// --------- migration status related tests ---------
-		"when no migration has been run, migration status is set to v1": func(t *testing.T) {
-			s, err := status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			require.NotNil(t, s)
-
-			assert.Equal(t, storage.Pristine, s)
-		},
-		"when migration recorded as in progress, it's not run": func(t *testing.T) {
-			require.NoError(t, status.InProgress(ctx))
-
-			_, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			grpctest.AssertCode(t, codes.FailedPrecondition, err)
-
-			assert.Zero(t, policyStore.ItemCount())
-			assert.Zero(t, roleStore.ItemCount())
-		},
-		"when migration recorded as failed, it is run": func(t *testing.T) {
-			require.NoError(t, status.InProgress(ctx))
-			require.NoError(t, status.Failure(ctx))
-
-			_, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-
-			assert.Equal(t, defaultPolicyCount, policyStore.ItemCount())
-			assert.Equal(t, defaultRoleCount, roleStore.ItemCount())
-		},
-		"when on 1.0 and flag is 2.0, migration recorded as successful": func(t *testing.T) {
-			s, err := status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Pristine, s)
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-
-			s, err = status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Successful, s)
-		},
-		"when on 1.0 and flag is 2.1, migration recorded as successful-beta2.1": func(t *testing.T) {
-			s, err := status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Pristine, s)
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-
-			s, err = status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.SuccessfulBeta1, s)
-		},
-		"when on 2.0 and flag is 2.0, no migration run": func(t *testing.T) {
-			require.NoError(t, status.Success(ctx))
-
-			_, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
-			grpctest.AssertCode(t, codes.AlreadyExists, err)
-
-			s, err := status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Successful, s)
-		},
-		"when on 2.0 and flag is 2.1, migration recorded as successful-beta2.1": func(t *testing.T) {
-			require.NoError(t, status.Success(ctx))
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-
-			s, err := status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.SuccessfulBeta1, s)
-		},
-		"when on 2.1 and flag is 2.1, no migration run": func(t *testing.T) {
-			require.NoError(t, status.SuccessBeta1(ctx))
-
-			_, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-			grpctest.AssertCode(t, codes.AlreadyExists, err)
-
-			s, err := status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.SuccessfulBeta1, s)
-		},
-		"when on 2.1 and flag is 2.0, migration recorded as successful": func(t *testing.T) {
-			require.NoError(t, status.SuccessBeta1(ctx))
-
-			resp, err := cl.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
-			require.NoError(t, err)
-			assert.NotNil(t, resp)
-
-			s, err := status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Successful, s)
-		},
-	}
-
-	for desc, test := range cases {
-		// reset memstore to "no migrations ever attempted" status
-		require.NoError(t, status.Pristine(ctx))
-
-		// this is the default -- it might be overwritten by the test cases
-		v1List = emptyV1List
-
-		t.Run(desc, test)
-		policyStore.Flush()
-		roleStore.Flush()
-		projectStore.Flush()
-	}
-}
-
-func TestGetPolicyVersion(t *testing.T) {
-	ctx := context.Background()
-	ts := setupV2p1WithWriter(t, dummyWriter)
-	cl := ts.policy
-	store := ts.policyCache
-	status := ts.status
-
-	expectedV1 := &api_v2.Version{
-		Major: api_v2.Version_V1,
-		Minor: api_v2.Version_V0,
-	}
-	expectedV2 := &api_v2.Version{
-		Major: api_v2.Version_V2,
-		Minor: api_v2.Version_V0,
-	}
-	expectedV2p1 := &api_v2.Version{
-		Major: api_v2.Version_V2,
-		Minor: api_v2.Version_V1,
-	}
-
-	cases := map[string]func(*testing.T){
-		"reports initial migration status as v1": func(t *testing.T) {
-			resp, err := cl.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
-			require.NoError(t, err)
-
-			assert.Equal(t, expectedV1, resp.Version)
-		},
-		"reports in-progress migration as still v1": func(t *testing.T) {
-			require.NoError(t, status.InProgress(ctx))
-			resp, err := cl.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
-			require.NoError(t, err)
-			assert.Equal(t, expectedV1, resp.Version)
-		},
-		"reports successful migration as v2": func(t *testing.T) {
-			require.NoError(t, status.Success(ctx))
-			resp, err := cl.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
-			require.NoError(t, err)
-			assert.Equal(t, expectedV2, resp.Version)
-		},
-		"reports successful migration with flag as beta2.1": func(t *testing.T) {
-			require.NoError(t, status.SuccessBeta1(ctx))
-			resp, err := cl.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
-			require.NoError(t, err)
-			assert.Equal(t, expectedV2p1, resp.Version)
-		},
-		"reports failed migration as v1": func(t *testing.T) {
-			require.NoError(t, status.InProgress(ctx))
-			require.NoError(t, status.Failure(ctx))
-			resp, err := cl.GetPolicyVersion(ctx, &api_v2.GetPolicyVersionReq{})
-			require.NoError(t, err)
-			assert.Equal(t, expectedV1, resp.Version)
-		},
-	}
-
-	for desc, test := range cases {
-		// reset memstore to "no migrations ever attempted" status
-		require.NoError(t, status.Pristine(ctx))
-
-		t.Run(desc, test)
-		store.Flush()
-	}
-}
-
-func TestResetToV1(t *testing.T) {
-	ctx := context.Background()
-	prng := prng.Seed(t)
-	ts := setupV2p1WithWriter(t, dummyWriter)
-	cl := ts.policy
-	policyStore := ts.policyCache
-	roleStore := ts.roleCache
-	status := ts.status
-
-	cases := map[string]func(*testing.T){
-		"initial migration status returns AlreadyExists to indicate no-op": func(t *testing.T) {
-			ms, err := status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Pristine, ms)
-
-			resp, err := cl.ResetToV1(ctx, &api_v2.ResetToV1Req{})
-			assert.Nil(t, resp)
-			grpctest.AssertCode(t, codes.AlreadyExists, err)
-
-			ms, err = status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Pristine, ms)
-		},
-		"resets store to empty state when on v2.1": func(t *testing.T) {
-			// Note (sr): concrete "storage Reset" assertions don't belong here, we're
-			// merely asserting that the underlying storage's Reset was called at all.
-			require.NoError(t, status.SuccessBeta1(ctx))
-			addSomePoliciesToStore(t, policyStore, prng)
-
-			_, err := cl.ResetToV1(ctx, &api_v2.ResetToV1Req{})
-			require.NoError(t, err)
-
-			assert.Zero(t, policyStore.ItemCount())
-			assert.Zero(t, roleStore.ItemCount())
-		},
-		"migration status in-progress, returns error": func(t *testing.T) {
-			require.NoError(t, status.InProgress(ctx))
-
-			_, err := cl.ResetToV1(ctx, &api_v2.ResetToV1Req{})
-			require.Error(t, err)
-		},
-		"migration status successful, resets to pristine": func(t *testing.T) {
-			require.NoError(t, status.Success(ctx))
-
-			_, err := cl.ResetToV1(ctx, &api_v2.ResetToV1Req{})
-			require.NoError(t, err)
-
-			ms, err := status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Pristine, ms)
-		},
-		"migration status failure, resets to pristine": func(t *testing.T) {
-			require.NoError(t, status.InProgress(ctx))
-			require.NoError(t, status.Failure(ctx))
-
-			_, err := cl.ResetToV1(ctx, &api_v2.ResetToV1Req{})
-			require.NoError(t, err)
-
-			ms, err := status.MigrationStatus(ctx)
-			require.NoError(t, err)
-			assert.Equal(t, storage.Pristine, ms)
-		},
-	}
-
-	for desc, test := range cases {
-		// reset memstore to "no migrations ever attempted" status
-		require.NoError(t, status.Pristine(ctx))
-
-		t.Run(desc, test)
-		policyStore.Flush()
-		roleStore.Flush()
-	}
-}
-
 func TestTypeConversion(t *testing.T) {
 	cases := map[string]storage.Type{
 		"custom":       storage.Custom,
@@ -2862,168 +2316,6 @@ func TestPurgeSubjectFromPolicies(t *testing.T) {
 	}
 }
 
-func TestV1AndV2Queries(t *testing.T) {
-	ctx := context.Background()
-	_ = prng.Seed(t) // used indirectly with rand.Shuffle
-	vChan := make(chan api_v2.Version, 1)
-	emptyV1List := v1Lister{}
-	ts := setupV2(t, &responderEngine{}, nil, &emptyV1List, vChan)
-	status := ts.status
-
-	// Note(sr): We're a bit lazy here -- only checking that v2 calls (do not)
-	// fail if we're (not) set to v1. However, these are the low-hanging fruit
-	// when it comes to how our test setup currently works.
-	// We've got pretty extensive integration tests, and when this overarching
-	// issue is resolved -- ie., when automate-gateway properly reacts to these,
-	// and switches to using v1 or v2 accordingly -- we should be on the safe
-	// side.
-	cases := []struct {
-		desc string
-		f    func(*testing.T)
-	}{
-		{"when set to v1, declines v2 ProjectsAuthorized calls", func(t *testing.T) {
-			req := api_v2.ProjectsAuthorizedReq{Subjects: []string{"user:local:alice"},
-				Resource: "iam:users:foobar",
-				Action:   "iam:users:get",
-			}
-			_, err := ts.authz.ProjectsAuthorized(ctx, &req)
-			grpctest.AssertCode(t, codes.FailedPrecondition, err)
-		}},
-		{"when upgraded to v2, accepts v2 ProjectsAuthorized calls", func(t *testing.T) {
-			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			req := api_v2.ProjectsAuthorizedReq{Subjects: []string{"user:local:alice"},
-				Resource: "iam:users:foobar",
-				Action:   "iam:users:get",
-			}
-			_, err = ts.authz.ProjectsAuthorized(ctx, &req)
-			require.NoError(t, err)
-		}},
-		{"when upgraded to v2, accepts GetPolicyVersion calls", func(t *testing.T) {
-			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{})
-			require.NoError(t, err)
-			req := api_v2.GetPolicyVersionReq{}
-			_, err = ts.policy.GetPolicyVersion(ctx, &req)
-			require.NoError(t, err)
-		}},
-		{"when set to v1, accepts GetPolicyVersion calls", func(t *testing.T) {
-			req := api_v2.GetPolicyVersionReq{}
-			_, err := ts.policy.GetPolicyVersion(ctx, &req)
-			require.NoError(t, err)
-		}},
-	}
-
-	rand.Shuffle(len(cases), func(i, j int) {
-		cases[i], cases[j] = cases[j], cases[i]
-	})
-
-	for _, test := range cases {
-		// reset memstore to "no migrations ever attempted" status
-		require.NoError(t, status.Pristine(ctx))
-
-		// reset (v2) store to empty
-		ts.policyCache.Flush()
-		ts.roleCache.Flush()
-		ts.projectCache.Flush()
-
-		// reset to v1
-		vChan <- api_v2.Version{Major: api_v2.Version_V1, Minor: api_v2.Version_V0}
-
-		t.Run(test.desc, test.f)
-	}
-}
-
-func TestVersionChannel(t *testing.T) {
-	ctx := context.Background()
-	_ = prng.Seed(t) // used indirectly with rand.Shuffle
-	vChan := make(chan api_v2.Version, 1)
-	emptyV1List := v1Lister{}
-	ts := setupV2(t, &responderEngine{}, nil, &emptyV1List, vChan)
-	status := ts.status
-	assert := assert.New(t)
-	require := require.New(t)
-
-	iamV1 := api_v2.Version{Major: api_v2.Version_V1, Minor: api_v2.Version_V0}
-	// this version cannot be set via the API any longer
-	// upgrade-to-v2 automatically sets the IAM version to v2.1
-	iamV2 := api_v2.Version{Major: api_v2.Version_V2, Minor: api_v2.Version_V0}
-	iamV2Beta := api_v2.Version{Major: api_v2.Version_V2, Minor: api_v2.Version_V1}
-
-	cases := []struct {
-		desc string
-		f    func(*testing.T)
-	}{
-		{"when not upgraded, the channel is set to v1.0", func(t *testing.T) {
-			assert.Equal(iamV1, ts.switcher.Version)
-		}},
-		{"when upgraded from v1.0 to v2.0, the channel is set to v2.0", func(t *testing.T) {
-			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
-			require.NoError(err)
-
-			assert.Equal(iamV2, ts.switcher.Version)
-		}},
-		{"when reset from v2.0 to v1.0, channel changes to v1.0", func(t *testing.T) {
-			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
-			require.NoError(err)
-			require.Equal(iamV2, ts.switcher.Version)
-			ts.policy.ResetToV1(ctx, &api_v2.ResetToV1Req{})
-
-			assert.Equal(iamV1, ts.switcher.Version)
-		}},
-		{"when upgraded from v1.0 to v2.1, channel changes to v2.1", func(t *testing.T) {
-			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-			require.NoError(err)
-
-			assert.Equal(iamV2Beta, ts.switcher.Version)
-		}},
-		{"when reset from v2.1 to v1.0, channel changes to v1.0", func(t *testing.T) {
-			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-			require.NoError(err)
-			require.Equal(iamV2Beta, ts.switcher.Version)
-			ts.policy.ResetToV1(ctx, &api_v2.ResetToV1Req{})
-
-			assert.Equal(iamV1, ts.switcher.Version)
-		}},
-		{"when upgraded from v2.0 to v2.1, channel changes to v2.1", func(t *testing.T) {
-			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
-			require.NoError(err)
-			require.Equal(iamV2, ts.switcher.Version)
-			_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-			require.NoError(err)
-
-			assert.Equal(iamV2Beta, ts.switcher.Version)
-		}},
-		{"when downgraded from v2.1 to v2.0, channel changes to v2.0", func(t *testing.T) {
-			_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-			require.NoError(err)
-			require.Equal(iamV2Beta, ts.switcher.Version)
-			_, err = ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_0})
-			require.NoError(err)
-
-			assert.Equal(iamV2, ts.switcher.Version)
-		}},
-	}
-
-	rand.Shuffle(len(cases), func(i, j int) {
-		cases[i], cases[j] = cases[j], cases[i]
-	})
-
-	for _, test := range cases {
-		// reset memstore to "no migrations ever attempted" status
-		require.NoError(status.Pristine(ctx))
-
-		// reset (v2) store to empty
-		ts.policyCache.Flush()
-		ts.roleCache.Flush()
-		ts.projectCache.Flush()
-
-		// reset to v1
-		ts.switcher.Version = iamV1
-
-		t.Run(test.desc, test.f)
-	}
-}
-
 func getPolicyFromStore(t *testing.T, store *cache.Cache, id string) storage.Policy {
 	t.Helper()
 	storedPol, ok := store.Get(id)
@@ -3034,8 +2326,8 @@ func getPolicyFromStore(t *testing.T, store *cache.Cache, id string) storage.Pol
 }
 
 func assertProjectsMatch(t *testing.T, storageProject string, apiProject string) {
-	if storageProject == constants_v2.AllProjectsID {
-		storageProject = constants_v2.AllProjectsExternalID
+	if storageProject == constants.AllProjectsID {
+		storageProject = constants.AllProjectsExternalID
 	}
 	assert.Equal(t, storageProject, apiProject, "statement projects differ")
 }
@@ -3102,31 +2394,16 @@ type testSetup struct {
 	policyCache  *cache.Cache
 	roleCache    *cache.Cache
 	projectCache *cache.Cache
-	status       storage.MigrationStatusProvider
-	switcher     *v2.VersionSwitch
 }
 
 func setupV2p1WithWriter(t *testing.T,
-	writer engine.V2p1Writer) testSetup {
-	return setupV2WithMigrationState(t, nil, writer, nil, make(chan api_v2.Version, 1),
-		// Returning MigrationStatus of "SuccessBeta2.1" means we've migrated successfully to IAM v2.1
-		func(s storage.MigrationStatusProvider) error { return s.SuccessBeta1(context.Background()) })
+	writer engine.Writer) testSetup {
+	return setupV2(t, nil, writer)
 }
 
 func setupV2(t *testing.T,
-	authorizer engine.V2Authorizer,
-	writer engine.V2p1Writer,
-	pl storage_v1.PoliciesLister,
-	vChan chan api_v2.Version) testSetup {
-	return setupV2WithMigrationState(t, authorizer, writer, pl, vChan, nil)
-}
-
-func setupV2WithMigrationState(t *testing.T,
-	authorizer engine.V2Authorizer,
-	writer engine.V2p1Writer,
-	pl storage_v1.PoliciesLister,
-	vChan chan api_v2.Version,
-	migration func(storage.MigrationStatusProvider) error) testSetup {
+	authorizer engine.Authorizer,
+	writer engine.Writer) testSetup {
 
 	t.Helper()
 	ctx := context.Background()
@@ -3139,16 +2416,11 @@ func setupV2WithMigrationState(t *testing.T,
 	}
 
 	mem_v2 := memstore_v2.New()
-	if migration != nil {
-		require.NoError(t, migration(mem_v2)) // this is IAM v2
-	}
-
-	vSwitch := v2.NewSwitch(vChan)
 
 	polRefresher, err := v2.NewPolicyRefresher(ctx, l, writer, mem_v2)
 	require.NoError(t, err)
 
-	polV2, err := v2.NewPoliciesServer(ctx, l, polRefresher, mem_v2, writer, pl, vSwitch, vChan)
+	polV2, err := v2.NewPoliciesServer(ctx, l, polRefresher, mem_v2, writer)
 	require.NoError(t, err)
 
 	require.NoError(t, err)
@@ -3156,7 +2428,7 @@ func setupV2WithMigrationState(t *testing.T,
 		testhelpers.NewMockProjectUpdateManager(), testhelpers.NewMockProjectPurger(true), testhelpers.NewMockPolicyRefresher())
 	require.NoError(t, err)
 
-	authzV2, err := v2.NewAuthzServer(l, authorizer, vSwitch, projectsSrv, mem_v2)
+	authzV2, err := v2.NewAuthzServer(l, authorizer, projectsSrv, mem_v2)
 	require.NoError(t, err)
 
 	serviceCerts := helpers.LoadDevCerts(t, "authz-service")
@@ -3167,7 +2439,6 @@ func setupV2WithMigrationState(t *testing.T,
 	serv := connFactory.NewServer(grpc.UnaryInterceptor(
 		grpc_middleware.ChainUnaryServer(
 			grpc_server.InputValidationInterceptor(),
-			vSwitch.Interceptor,
 			polV2.EngineUpdateInterceptor(),
 		),
 	))
@@ -3191,8 +2462,6 @@ func setupV2WithMigrationState(t *testing.T,
 		policyCache:  mem_v2.PoliciesCache(),
 		roleCache:    mem_v2.RolesCache(),
 		projectCache: mem_v2.ProjectsCache(),
-		status:       mem_v2,
-		switcher:     vSwitch,
 	}
 }
 
@@ -3399,7 +2668,7 @@ type testEngine struct {
 	ruleMap   map[string][]storage.Rule
 }
 
-func (te *testEngine) V2p1SetPolicies(
+func (te *testEngine) SetPolicies(
 	ctx context.Context, policies map[string]interface{},
 	roles map[string]interface{}) error {
 	te.policyMap = policies
@@ -3425,13 +2694,4 @@ func genUUID(t *testing.T) uuid.UUID {
 	i, err := uuid.NewV4()
 	require.NoError(t, err)
 	return i
-}
-
-func wellknown(t *testing.T, wellknownID string) *storage_v1.Policy {
-	t.Helper()
-	v1DefaultPols, err := storage_v1.DefaultPolicies()
-	require.NoError(t, err)
-	inputPol, found := v1DefaultPols[wellknownID]
-	require.True(t, found)
-	return inputPol
 }

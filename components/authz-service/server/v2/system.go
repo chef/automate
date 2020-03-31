@@ -1,7 +1,7 @@
 package v2
 
 import (
-	constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 )
 
@@ -46,6 +46,12 @@ func SystemPolicies() []*storage.Policy {
 				Effect:    storage.Allow,
 				Actions:   []string{"system:serviceVersion:get", "system:serviceVersion:list"},
 				Resources: []string{"system:service:version"},
+				Projects:  []string{constants.AllProjectsID},
+			},
+			{
+				Effect:    storage.Allow,
+				Actions:   []string{"system:telemetryConfig:get"},
+				Resources: []string{"system:config"},
 				Projects:  []string{constants.AllProjectsID},
 			},
 			{
@@ -109,7 +115,7 @@ func SystemPolicies() []*storage.Policy {
 		Statements: []storage.Statement{
 			{
 				Effect:    storage.Allow,
-				Actions:   []string{"infra:ingest:*", "compliance:profiles:get", "compliance:profiles:list"},
+				Actions:   []string{"ingest:*", "compliance:profiles:get", "compliance:profiles:list"},
 				Resources: []string{"*"},
 				Projects:  []string{constants.AllProjectsID},
 			},

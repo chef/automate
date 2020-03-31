@@ -1,11 +1,11 @@
-import { describeIfIAMV2p1, itFlaky } from '../../../support/constants';
+import { itFlaky } from '../../../support/constants';
 interface Project {
   id: string;
   name: string;
   type: string;
 }
 
-describeIfIAMV2p1('project management', () => {
+describe('project management', () => {
   // we increase the default delay to mimic the average human's typing speed
   // only need this for input values upon which later test assertions depend
   // ref: https://github.com/cypress-io/cypress/issues/534
@@ -23,7 +23,7 @@ describeIfIAMV2p1('project management', () => {
     cy.adminLogin('/settings/projects').then(() => {
       const admin = JSON.parse(<string>localStorage.getItem('chef-automate-user'));
       adminIdToken = admin.id_token;
-      cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+      cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
       // Set the projects filter to all projects
       cy.applyProjectsFilter([]);
     });
@@ -38,7 +38,7 @@ describeIfIAMV2p1('project management', () => {
   });
 
   after(() => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
   });
 
   it('displays a list of projects', () => {
@@ -244,7 +244,7 @@ describeIfIAMV2p1('project management', () => {
 
   // these tests are currently interdependent so mark as flaky until the above isn't
   itFlaky('can create a project with a custom ID', () => {
-    cy.cleanupV2IAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
+    cy.cleanupIAMObjectsByIDPrefixes(cypressPrefix, ['projects', 'policies']);
 
     cy.get('[data-cy=create-project]').contains('Create Project').click();
     cy.get('app-project-list chef-modal').should('have.class', 'visible');

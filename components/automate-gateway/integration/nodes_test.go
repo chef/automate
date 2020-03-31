@@ -168,7 +168,7 @@ func (suite *GatewayTestSuite) TestGatewayNodesClient() {
 	node.LastJob = nil
 	node.TargetConfig = nil
 	suite.Equal(&nodes.Node{
-		ConnectionError: "authentication failed",
+		ConnectionError: "authentication failed\n\nAuthentication failed for inspec-target-rhel7-dev.cd.chef.co\n\nNet::SSH::AuthenticationFailed",
 		Id:              nodeID.Id,
 		Name:            "test node",
 		Manager:         "automate",

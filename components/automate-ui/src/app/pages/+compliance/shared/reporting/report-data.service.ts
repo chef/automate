@@ -4,12 +4,17 @@ import { StatsService } from './stats.service';
 import { TelemetryService } from '../../../../services/telemetry/telemetry.service';
 import { ReportQuery } from './report-query.service';
 
-interface ReportingSummary {
+export type ReportingSummaryStatus = 'failed' | 'passed' | 'waived' | 'skipped' | 'unknown';
+
+export interface ReportingSummary {
   stats: {
     nodes: any;
     profiles: any;
     controls?: any;
+    platforms: number;
+    environments: number;
   };
+  status: ReportingSummaryStatus;
 }
 
 @Injectable()
@@ -24,7 +29,8 @@ export class ReportDataService {
     total: 0,
     total_failed: 0,
     total_passed: 0,
-    total_skipped: 0
+    total_skipped: 0,
+    total_waived: 0
   };
   nodesListParams: any = {
     perPage: 100,
@@ -41,7 +47,11 @@ export class ReportDataService {
   profilesListEmpty = false;
   profilesList: any = {
     items: [],
-    total: 0
+    total: 0,
+    failed: 0,
+    passed: 0,
+    skipped: 0,
+    waived: 0
   };
 
   controlsListLoading = true;

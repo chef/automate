@@ -1,11 +1,9 @@
-import { describeIfIAMV2p1 } from '../../../support/constants';
-
 interface CreateProject {
   id: string;
   name: string;
 }
 
-describeIfIAMV2p1('global projects filter', () => {
+describe('global projects filter', () => {
   const proj1 = <CreateProject>
     { id: 'cypress-project-1', name: 'Cypress Project 1 ' + Cypress.moment().format('MMDDYYhhmm') };
   const proj2 = <CreateProject>
@@ -33,39 +31,15 @@ describeIfIAMV2p1('global projects filter', () => {
   it('shows all projects for admin', () => {
     cy.adminLogin('/settings');
     cy.get('chef-sidebar');
-      const allowedProjects = [proj1.name, proj2.name, proj3.name, '(unassigned)'];
-      // we don't check that projects in dropdown match *exactly* as
-      // we can't control creation of other projects in the test env
+    const allowedProjects = [proj1.name, proj2.name, proj3.name, '(unassigned)'];
+    // we don't check that projects in dropdown match *exactly* as
+    // we can't control creation of other projects in the test env
     cy.get('.dropdown-label').click();
-      allowedProjects.forEach(project => {
-        cy.get('#projects-filter-dropdown').contains(project);
-      });
+    allowedProjects.forEach(project => {
+      cy.get('#projects-filter-dropdown').contains(project);
+    });
     cy.logout();
   });
-
-  // TODO can uncomment when we have a flag to remove legacy policies,
-  // which are currently allowing full project access to all users.
-  // it('shows allowed projects for non-admin', () => {
-  //   cy.login('/settings', nonAdminUsername)
-  //   // hide modal unrelated to test flow
-  //   cy.get('app-welcome-modal').invoke('hide')
-
-  //   cy.get('chef-sidebar')
-  //     .should('have.attr', 'minor-version')
-  //     .then((version) => {
-  //       if (version === 'v1') {
-  //         cy.get('[data-cy=projects-filter-button]').click()
-
-  //         const allowedProjects = [proj1, proj2];
-  //         cy.get('[data-cy=projects-filter-dropdown] chef-checkbox')
-  //           .should(($elements) => { expect($elements).to.have.length(allowedProjects.length) })
-  //         allowedProjects.forEach(project => {
-  //           cy.get('[data-cy=projects-filter-dropdown]').contains(project)
-  //         })
-  //       }
-  //     })
-  //   cy.logout()
-  // })
 });
 
 function cleanupProjects(id_token: string): void {

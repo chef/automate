@@ -17,6 +17,12 @@ type Run struct {
 	UpdatedResourceCount int        `json:"updated_resource_count"`
 }
 
+// UpsertNode The node data used when the node is first created in the node-state index.
+type UpsertNode struct {
+	Node
+	Created time.Time `json:"created,omitempty"`
+}
+
 // Node is the representation of a Node
 type Node struct {
 	NodeInfo
@@ -34,6 +40,7 @@ type Node struct {
 	DeprecationsCount int       `json:"deprecations_count"`
 	Projects          []string  `json:"projects"`
 	ErrorMessage      string    `json:"error_message,omitempty"`
+	ErrorType         string    `json:"error_type,omitempty"`
 }
 
 // NodeAttribute is the representation of the

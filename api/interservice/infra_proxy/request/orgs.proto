@@ -8,6 +8,7 @@ message CreateOrg {
     string admin_user = 2;
     string admin_key = 3;
     string server_id = 4;
+    repeated string projects = 5;
 }
 
 message UpdateOrg {
@@ -16,6 +17,7 @@ message UpdateOrg {
     string admin_user = 3;
     string admin_key = 4;
     string server_id = 5;
+    repeated string projects = 6;
 }
 
 message DeleteOrg {

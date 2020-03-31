@@ -86,7 +86,21 @@ describe File.basename(__FILE__) do
                     "waived" => {}
                 }
             }
-        ]
+        ],
+        "controlSummaryTotals" =>
+            {
+                "total" => 86,
+                "passed" => {
+                    "total" => 7
+                },
+                "skipped" => {
+                    "total" => 73
+                },
+                "failed" => {
+                    "total" => 6
+                },
+                "waived" => {}
+            }
     }
     control_item_array = actual_data['control_items']
     assert_equal(2, control_item_array.size)
@@ -147,7 +161,19 @@ describe File.basename(__FILE__) do
                     "waived" => {}
                 }
             }
-        ]
+        ],
+        "controlSummaryTotals" =>
+            {
+                "total" => 4,
+                "passed" => {
+                    "total" => 3
+                },
+                "skipped" => {
+                    "total" => 1
+                },
+                "failed" => {},
+                "waived" => {}
+            }
     }
 
     control_item_array = actual_data['control_items']
@@ -206,7 +232,16 @@ describe File.basename(__FILE__) do
                     "waived" => {}
                 }
             }
-        ]
+        ],
+        "controlSummaryTotals" => {
+            "total" => 73,
+            "passed" => {},
+            "skipped" => {
+                "total" => 73
+            },
+            "failed" => {},
+            "waived" => {}
+        }
     }
 
     control_item_array = actual_data['control_items']
@@ -268,7 +303,14 @@ describe File.basename(__FILE__) do
                     "waived" => {}
                 }
             }
-        ]
+        ],
+        "controlSummaryTotals" => {
+            "total" => 6,
+            "passed" => {},
+            "skipped" => {},
+            "failed" => {"total" => 6},
+            "waived" => {}
+        }
     }
 
     control_item_array = actual_data['control_items']
@@ -309,7 +351,16 @@ describe File.basename(__FILE__) do
                     "waived" => {}
                 }
             }
-        ]
+        ],
+        "controlSummaryTotals" => {
+            "total" => 1,
+            "passed" => {},
+            "skipped" => {},
+            "failed" => {
+                "total" => 1
+            },
+            "waived" => {}
+        }
     }
     control_item_array = actual_data['control_items']
     assert_equal(1, control_item_array.size)
@@ -348,7 +399,16 @@ describe File.basename(__FILE__) do
                         "waived" => {}
                     }
                 }
-            ]
+            ],
+        "controlSummaryTotals" => {
+            "total" => 1,
+            "passed" => {},
+            "skipped" => {
+                "total" => 1
+            },
+            "failed" => {},
+            "waived" => {}
+        }
     }
     assert_equal_json_content(expected_data, actual_data)
   end
@@ -388,7 +448,16 @@ describe File.basename(__FILE__) do
                         "waived" => {}
                     }
                 }
-            ]
+            ],
+        "controlSummaryTotals" => {
+            "total" => 1,
+            "passed" => {},
+            "skipped" => {},
+            "failed" => {
+                "total" => 1
+            },
+            "waived" => {}
+        }
     }
 
     assert_equal_json_content(expected_data, actual_data)
@@ -613,7 +682,18 @@ describe File.basename(__FILE__) do
                             }
                         ]
                 }
-            ]
+            ],
+        "controlSummaryTotals" => {
+            "total" => 7,
+            "passed" => {},
+            "skipped" => {},
+            "failed" => {
+                "total" => 2
+            },
+            "waived" => {
+                "total" => 5
+            }
+        }
     }
     assert_equal_json_content(expected_data, actual_data)
   end

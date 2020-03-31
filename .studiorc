@@ -55,7 +55,12 @@ export GO111MODULE=on
 # Specify where to put 'go installed' binaries
 setup_gobin() {
     local vendor_hash
-    vendor_hash=$(sha256sum /src/vendor/modules.txt | cut -c1-16)
+    vendor_hash=$(cat \
+      /src/vendor/modules.txt \
+      /src/components/automate-grpc/protoc-gen-policy/policy/policy.go \
+      /src/components/automate-grpc/protoc-gen-policy/api/policy.proto \
+      /src/components/automate-grpc/protoc-gen-policy/iam/policy.proto \
+    | sha256sum | cut -c1-16)
     export GOBIN_BASE="/src/bin"
     GOBIN="${GOBIN_BASE}/${vendor_hash}"
     export GOBIN
@@ -157,7 +162,6 @@ start_all_services() {
      chef-automate license apply "/src/dev/license.jwt"
   fi
   chef-automate dev create-iam-dev-users
-  chef-automate iam upgrade-to-v2 --skip-policy-migration
 }
 
 document "get_admin_token" <<DOC
@@ -169,10 +173,7 @@ get_admin_token() {
     cat /tmp/admin_token
   else
     # note: we don't have to suppress stderr, $(get_api_token) won't capture it.
-    if ! chef-automate admin-token >/tmp/admin_token; then
-      # attempt iam v2 cmd
-      chef-automate iam token create "api-token-$$" --admin >/tmp/admin_token || return 1
-    fi
+    date +%s | xargs -I % chef-automate iam token create admin-token-% --admin >/tmp/admin_token || return 1
     cat /tmp/admin_token
   fi
 }

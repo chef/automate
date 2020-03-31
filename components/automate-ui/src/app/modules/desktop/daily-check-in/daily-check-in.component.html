@@ -1,0 +1,30 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <div class="page-title">Daily Check-in</div>
+
+      <div>
+        <div class="item">
+          <div class="title">Unknown %</div>
+          <div class="total">{{ unknownPercentage | number:'1.0-0' }}%</div>
+        </div>
+        <div class="item">
+          <div class="title">Checked-in %</div>
+          <div class="total">{{ checkedInPercentage | number:'1.0-0' }}%</div>
+        </div>
+        <div class="item">
+          <div class="title">Checked-in Count</div>
+          <div class="total">{{ checkedInCount }}</div>
+        </div>
+        <div class="item">
+          <div class="title">Unknown Count</div>
+          <div class="total">{{ unknownCount }}</div>
+        </div>
+        <div class="item">
+          <div class="title">Total Count</div>
+          <div class="total">{{ totalCount }}</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>

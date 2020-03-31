@@ -23,6 +23,7 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
   layerOneData: any = {};
   layerTwoData: any = {};
   control: any = {};
+  profileFilterStatus = 'all';
 
   scanResultsPane = 0;
   openControls = {};
@@ -48,6 +49,20 @@ export class ReportingProfilesComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.isDestroyed.next(true);
     this.isDestroyed.complete();
+  }
+
+  filterProfileStatus(_event, status) {
+    this.profileFilterStatus = status;
+  }
+
+  isProfileStatusSelected(status): boolean {
+    return this.profileFilterStatus === status;
+  }
+
+  filteredProfiles(profiles) {
+    return this.profileFilterStatus === 'all'
+      ? profiles
+      : profiles.filter((profile) => profile.status === this.profileFilterStatus);
   }
 
   onProfilesListPageChanged(event) {

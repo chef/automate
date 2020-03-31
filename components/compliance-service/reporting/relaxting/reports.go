@@ -15,7 +15,7 @@ import (
 	elastic "gopkg.in/olivere/elastic.v6"
 
 	reportingapi "github.com/chef/automate/api/interservice/compliance/reporting"
-	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
+	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/compliance-service/ingest/ingestic/mappings"
 	"github.com/chef/automate/components/compliance-service/inspec"
 	"github.com/chef/automate/components/compliance-service/reporting"
@@ -652,6 +652,13 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	contListItems := make([]*reportingapi.ControlItem, 0)
 
+	controlSummaryTotals := &reportingapi.ControlSummary{
+		Passed:  &reportingapi.Total{},
+		Skipped: &reportingapi.Total{},
+		Failed:  &reportingapi.Failed{},
+		Waived:  &reportingapi.Total{},
+	}
+
 	client, err := backend.ES2Client()
 	if err != nil {
 		logrus.Errorf("Cannot connect to ElasticSearch: %s", err)
@@ -780,6 +787,10 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 
 	filteredControls := elastic.NewFilterAggregation().Filter(controlsQuery)
 	filteredControls.SubAggregation("control", controlTermsAgg)
+	filteredControls.SubAggregation("skipped_total", skippedFilter)
+	filteredControls.SubAggregation("failed_total", failedFilter)
+	filteredControls.SubAggregation("passed_total", passedFilter)
+	filteredControls.SubAggregation("waived_total", waivedFilter)
 	controlsAgg := elastic.NewNestedAggregation().Path("profiles.controls")
 	controlsAgg.SubAggregation("filtered_controls", filteredControls)
 
@@ -826,6 +837,19 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		if outerFilteredProfiles, found := outerProfilesAggResult.Aggregations.Filter("filtered_profiles"); found {
 			if outerControlsAggResult, found := outerFilteredProfiles.Aggregations.Nested("controls"); found {
 				if filteredControls, found := outerControlsAggResult.Aggregations.Filter("filtered_controls"); found {
+					controlSummaryTotals.Total = int32(filteredControls.DocCount)
+					if totalPassedControls, found := filteredControls.Aggregations.Filter("passed_total"); found {
+						controlSummaryTotals.Passed.Total = int32(totalPassedControls.DocCount)
+					}
+					if totalFailedControls, found := filteredControls.Aggregations.Filter("failed_total"); found {
+						controlSummaryTotals.Failed.Total = int32(totalFailedControls.DocCount)
+					}
+					if totalSkippedControls, found := filteredControls.Aggregations.Filter("skipped_total"); found {
+						controlSummaryTotals.Skipped.Total = int32(totalSkippedControls.DocCount)
+					}
+					if totalWaivedControls, found := filteredControls.Aggregations.Filter("waived_total"); found {
+						controlSummaryTotals.Waived.Total = int32(totalWaivedControls.DocCount)
+					}
 					if controlBuckets, found := filteredControls.Aggregations.Terms("control"); found && len(controlBuckets.Buckets) > 0 {
 						for _, controlBucket := range controlBuckets.Buckets {
 							contListItem, err := backend.getControlItem(controlBucket)
@@ -840,7 +864,7 @@ func (backend *ES2Backend) GetControlListItems(ctx context.Context, filters map[
 		}
 	}
 
-	contListItemList := &reportingapi.ControlItems{ControlItems: contListItems}
+	contListItemList := &reportingapi.ControlItems{ControlItems: contListItems, ControlSummaryTotals: controlSummaryTotals}
 	return contListItemList, nil
 }
 

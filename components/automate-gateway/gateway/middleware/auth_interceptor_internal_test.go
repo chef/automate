@@ -51,7 +51,7 @@ func (t testAuthzHandler) Handle(ctx context.Context, subjects []string, project
 	// changes.
 	resource := "test resource"
 	action := "test action"
-	return auth_context.NewContext(ctx, subjects, projects, resource, action, "middleware test instance"), nil
+	return auth_context.NewContext(ctx, subjects, projects, resource, action), nil
 }
 
 func TestHeaderAuthValidForClientAndPeer(t *testing.T) {
@@ -170,7 +170,6 @@ func TestComboAuth(t *testing.T) {
 		assert.Equal(t, expectedProjects, authInfo.Projects)
 		assert.Equal(t, "test resource", authInfo.Resource)
 		assert.Equal(t, "test action", authInfo.Action)
-		assert.Equal(t, "middleware test instance", authInfo.PolicyVersion)
 	})
 
 	t.Run("It forwards metadata correctly for successful auth for direct requests using certificate auth", func(t *testing.T) {
@@ -191,7 +190,6 @@ func TestComboAuth(t *testing.T) {
 		assert.Equal(t, expectedProjects, authInfo.Projects)
 		assert.Equal(t, "test resource", authInfo.Resource)
 		assert.Equal(t, "test action", authInfo.Action)
-		assert.Equal(t, "middleware test instance", authInfo.PolicyVersion)
 	})
 }
 

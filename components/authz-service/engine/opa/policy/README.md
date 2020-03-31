@@ -24,30 +24,7 @@ You can also just install OPA in the studio and you should get the correct versi
 hab pkg install --binlink core/opa
 ```
 
-### REPL with V1
-
-NB: Assumes running from this directory; just adjust all paths if you want to start in a different directory.
-
-```opa
-$ opa run -w authz.rego common.rego policies:../example/policies.json
-OPA 0.9.2 (commit 9fbff4c3, built at 2018-09-24T16:12:26Z)
-
-> data.authz.authorized
-false
-> data.authz.authorized with input as { "resource": "automate:nodes", "subjects": ["team:local:admins"], "action": "node:read" }
-true
-> data.authz.authorized with input as { "resource": "automate:nodes", "subjects": ["team:local:other"], "action": "node:read" }
-false
->
-```
-
-Note that the `-w` switch in the command invocation above makes the REPL watch and reload the files as changes occur.
-This mode makes it easy to iterate on editing OPA files.
-
-To get more insights into the execution, use `trace` to toggle tracing, then run a command.
-(Watch out--the output is voluminous!)
-
-### REPL with V2
+### REPL
 
 NB: Assumes running from this directory; just adjust all paths if you want to start in a different directory.
 Note that the input still uses subjects as the field instead of members.
@@ -105,62 +82,7 @@ First follow the suggested setup on the plugin details page; the following notes
 2. OPA-the-plugin reads **all** your rego and JSON files.
    So if you skip the next steps when you attempt to evaluate an expression you will see merge errors.
 
-### VSCode with V1
-
-- copy the example dir here: `cp -r ../example policies`
-- move the input file from that new dir here: `mv policies/input.json input.json`
-- open `authz.rego` in VSCode
-
-With your cursor in the authz.rego file run `OPA: Evaluate package` to see everything evaluated.
-A successful setup will yield something like this, showing everything in the `authz` package
-evaluated (which means authz.rego **and** authz_test.rego).
-
-```json
-// Evaluated package in 3.17557ms.
-{
-  "allow": true,
-  "authorized": true,
-  "has_action": [
-    "a3e1556f-190b-4ad0-a356-a6bed9618e8c",
-    "651589f0-4f98-4a33-910e-db4011601381"
-  ],
-  "has_resource": [
-    "a3e1556f-190b-4ad0-a356-a6bed9618e8c"
-  ],
-  "has_subject": [
-    "a3e1556f-190b-4ad0-a356-a6bed9618e8c",
-    "651589f0-4f98-4a33-910e-db4011601381"
-  ],
-  "introspection": {
-    "allowed_pair": [],
-    "authorized_pair": [],
-    "denied_pair": [],
-    "pair_matches_action": [],
-    "pair_matches_resource": []
-  },
-  "test_action_matches_direct_match": true,
-  "test_action_matches_wildcard": true,
-  "test_allow_matches_all_properties_and_effect_allow": true,
-  "test_deny_matches_all_properties_and_effect_deny": true,
-  . . . and the rest of the unit tests
-}
-```
-
-With just a particular rule name selected in authz.rego (e.g. `allow` or `authorized`)
-run `OPA: Evaluate selection` to see just that rule evaluated, e.g.:
-
-```json
-[
-  [
-    true
-  ]
-]
-```
-
-Similarly, and saving the best to last, you can run an individual unit test by selecting
-a unit test name in auth_test.rego and running `OPA: Evaluate selection` to see that test evaluated.
-
-### VSCode with V2
+### VSCode
 
 - copy the example dir here: `cp -r ../example_v2 policies`
 - copy one of the input files from that new dir here: `cp policies/input_from_inline.json input.json`

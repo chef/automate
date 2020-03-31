@@ -19,15 +19,12 @@ describe('LandingComponent', () => {
   const targetRoute = '/settings/teams';
   const routePerms: RoutePerms[] = [
     {
-      allOfCheck: [['/auth/teams', 'get', '']],
-      anyOfCheck: [['/auth/something-else', 'get', '']],
+      allOfCheck: [['/iam/v2/teams', 'get', '']],
+      anyOfCheck: [['/iam/v2/something-else', 'get', '']],
       route: '/settings/teams'
     },
-    { allOfCheck: [['/auth/users', 'get', '']], route: '/settings/users' },
-    {
-      anyOfCheck: [['/auth/tokens', 'get', ''], ['/iam/v2/tokens', 'get', '']],
-      route: '/settings/tokens'
-    }
+    { anyOfCheck: [['/iam/v2/tokens', 'get', '']], route: '/settings/tokens' },
+    { allOfCheck: [['/iam/v2/users', 'get', '']], route: '/settings/users' }
   ];
 
 
@@ -37,10 +34,10 @@ describe('LandingComponent', () => {
 
     beforeEach(async(() => {
       configureWith({
-        '/auth/users': genPerm('/auth/users', false),
-        '/auth/teams': genPerm('/auth/teams', true),
-        '/auth/tokens': genPerm('/auth/tokens', false),
-        '/auth/something-else': genPerm('/auth/something-else', true)
+        '/iam/v2/users': genPerm('/iam/v2/users', false),
+        '/iam/v2/teams': genPerm('/iam/v2/teams', true),
+        '/iam/v2/tokens': genPerm('/iam/v2/tokens', false),
+        '/iam/v2/something-else': genPerm('/iam/v2/something-else', true)
       });
 
     }));
@@ -72,10 +69,10 @@ describe('LandingComponent', () => {
 
     beforeEach(async(() => {
       configureWith({
-        '/auth/users': genPerm('/auth/users', true),
-        '/auth/teams': genPerm('/auth/teams', true),
-        '/auth/tokens': genPerm('/auth/tokens', true),
-        '/auth/something-else': genPerm('/auth/something-else', true)
+        '/iam/v2/users': genPerm('/iam/v2/users', true),
+        '/iam/v2/teams': genPerm('/iam/v2/teams', true),
+        '/iam/v2/tokens': genPerm('/iam/v2/tokens', true),
+        '/iam/v2/something-else': genPerm('/iam/v2/something-else', true)
       });
     }));
 
@@ -106,17 +103,17 @@ describe('LandingComponent', () => {
   describe('with second page allowed and all others denied', () => {
     const targetIndex = 1;
     const newRoutePerms: RoutePerms[] = [
-      { allOfCheck: [['/auth/teams', 'get', '']], route: '/settings/teams' },
-      { allOfCheck: [['/auth/users', 'get', '']], route: '/settings/users' },
-      { anyOfCheck: [['/auth/tokens', 'get', '']], route: '/settings/tokens' }
+      { allOfCheck: [['/iam/v2/teams', 'get', '']], route: '/settings/teams' },
+      { anyOfCheck: [['/iam/v2/tokens', 'get', '']], route: '/settings/tokens' },
+      { allOfCheck: [['/iam/v2/users', 'get', '']], route: '/settings/users' }
     ];
 
     beforeEach(async(() => {
       configureWith({
-        '/auth/users': genPerm('/auth/users', true),
-        '/auth/teams': genPerm('/auth/teams', false),
-        '/auth/tokens': genPerm('/auth/tokens', false),
-        '/auth/something-else': genPerm('/auth/something-else', true)
+        '/iam/v2/users': genPerm('/iam/v2/users', true),
+        '/iam/v2/teams': genPerm('/iam/v2/teams', false),
+        '/iam/v2/tokens': genPerm('/iam/v2/tokens', false),
+        '/iam/v2/something-else': genPerm('/iam/v2/something-else', true)
       });
     }));
 

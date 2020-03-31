@@ -113,8 +113,8 @@ export class StatsService {
     }
 
     return this.httpClient.post<any>(url, body).pipe(
-      map(({ nodes, total, total_failed, total_passed, total_skipped }) =>
-        ({total, total_failed, total_passed, total_skipped, items: nodes})));
+      map(({ nodes, total, total_failed, total_passed, total_skipped, total_waived }) =>
+        ({ total, total_failed, total_passed, total_skipped, total_waived, items: nodes })));
   }
 
   getProfiles(reportQuery: ReportQuery, listParams: any): Observable<any> {
@@ -134,7 +134,8 @@ export class StatsService {
     }
 
     return this.httpClient.post<any>(url, body).pipe(
-      map(({ profiles, counts: { total }}) => ({total, items: profiles})));
+      map(({ profiles, counts: { total, failed, passed, skipped, waived } }) =>
+        ({ total, failed, passed, skipped, waived, items: profiles })));
   }
 
   getControls(reportQuery: ReportQuery) {
@@ -216,6 +217,8 @@ export class StatsService {
      them private? */
   getControlStatus(control): string {
     const statuses = control.results.map(r => r.status);
+    const waived = control.waiver_data && control.waiver_data.skipped_due_to_waiver;
+    if (waived) { return 'waived'; }
     if (statuses.every(s => s === 'passed')) { return 'passed'; }
     if (statuses.every(s => s === 'skipped')) { return 'skipped'; }
     return 'failed';

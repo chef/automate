@@ -491,7 +491,7 @@ describe File.basename(__FILE__) do
           "managerIds": [
             "e69dc612-7e67-43f2-9b19-256afd385820"
           ],
-          "connectionError": "unknown error",
+          "connectionError": "unknown error\n\nUnknown inspec error for cc_pggggggggg: exit status 1\n\nSTDERR: /hab/pkgs/chef/inspec/4.18.51/20191211220937/lib/gems/docker-api-1.34.2/lib/docker/connection.rb:46:in `rescue in request': No such container: cc_pggggggggg (Docker::Error::NotFoundError)\n\tfrom /hab/pkgs/chef/inspec/4.18.51/2019121122093 [truncated for length]",
           "runData": {},
           "scanData": {
             "id": "some-id",

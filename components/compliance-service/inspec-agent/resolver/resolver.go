@@ -339,28 +339,46 @@ func (r *Resolver) handleAwsApiNodesSingleNode(ctx context.Context, m *manager.N
 		awsCreds = managers.GetAWSCreds(secret)
 	}
 
-	nodeInfo := nodeInfo{
-		UUID:           node.Id,
-		CloudID:        m.AccountId,
-		Name:           node.Name,
-		Environment:    "gcp-api",
-		ManagerID:      m.Id,
-		CloudAccountID: m.AccountId,
-	}
-	tc := inspec.TargetBaseConfig{
-		Backend: "aws",
-		Region:  awsCreds.Region,
-	}
-	secrets := inspec.Secrets{
-		AwsUser:         awsCreds.AccessKeyId,
-		AwsPassword:     awsCreds.SecretAccessKey,
-		AwsSessionToken: awsCreds.SessionToken,
-	}
+	nodeInfo, tc, secrets := assembleAwsApiNodeInfo(node, m, awsCreds)
 	inspecJob, err := assembleJob(job, nodeInfo, []*inspec.Secrets{&secrets}, tc)
 	if err != nil {
 		return nil, errors.Wrapf(err, "error assembling job. aborting scan for node %s", node.Name)
 	}
 	return []*types.InspecJob{inspecJob}, nil
+}
+
+func assembleAwsApiNodeInfo(node *nodes.Node, m *manager.NodeManager, awsCreds awsec2.AwsCreds) (nodeInfo, inspec.TargetBaseConfig, inspec.Secrets) {
+	nodeDetails := nodeInfo{
+		UUID:           node.Id,
+		CloudID:        m.AccountId,
+		Name:           node.Name,
+		Environment:    "aws-api",
+		ManagerID:      m.Id,
+		CloudAccountID: m.AccountId,
+	}
+	// we want to prioritize using the region as it was saved
+	// in the credential for the nodemanager
+	region := awsCreds.Region
+	if len(region) == 0 && node.TargetConfig != nil {
+		// set region to the value saved on the node's target config
+		region = node.TargetConfig.Region
+	}
+	if len(region) == 0 {
+		// no other values found, set to default
+		region = awsec2.DefaultRegion
+	}
+
+	tc := inspec.TargetBaseConfig{
+		Backend: "aws",
+		Region:  region,
+	}
+	logrus.Infof("region being used for aws scan: %s", region)
+	secrets := inspec.Secrets{
+		AwsUser:         awsCreds.AccessKeyId,
+		AwsPassword:     awsCreds.SecretAccessKey,
+		AwsSessionToken: awsCreds.SessionToken,
+	}
+	return nodeDetails, tc, secrets
 }
 
 func (r *Resolver) handleAwsApiNodesMultiNode(ctx context.Context, m *manager.NodeManager, filters []*common.Filter, job *jobs.Job) ([]*types.InspecJob, error) {

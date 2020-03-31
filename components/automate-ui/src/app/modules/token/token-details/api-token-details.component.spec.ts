@@ -17,8 +17,6 @@ import { ChefPipesModule } from 'app/pipes/chef-pipes.module';
 import { FeatureFlagsService } from 'app/services/feature-flags/feature-flags.service';
 import { Project } from 'app/entities/projects/project.model';
 import { GetProjectsSuccess, GetProjects } from 'app/entities/projects/project.actions';
-import { IamVersionResponse } from 'app/entities/policies/policy.requests';
-import { GetIamVersionSuccess } from 'app/entities/policies/policy.actions';
 import { GetTokenSuccess } from 'app/entities/api-tokens/api-token.actions';
 import { ApiToken } from 'app/entities/api-tokens/api-token.model';
 import { ApiTokenDetailsComponent } from './api-token-details.component';
@@ -109,20 +107,8 @@ describe('ApiTokenDetailsComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  it('does not fetch projects in v1', () => {
+  it('fills in token on load', () => {
     spyOn(store, 'dispatch').and.callThrough();
-    const version: IamVersionResponse = { version: { major: 'v1' } };
-    store.dispatch(new GetIamVersionSuccess(version));
-
-    const token = { ...someToken, projects: ['b-proj', 'd-proj'] };
-    store.dispatch(new GetTokenSuccess(token));
-    expect(store.dispatch).not.toHaveBeenCalledWith(new GetProjects());
-  });
-
-  it('fills in token on load for v2', () => {
-    spyOn(store, 'dispatch').and.callThrough();
-    const version: IamVersionResponse = { version: { major: 'v2' } };
-    store.dispatch(new GetIamVersionSuccess(version));
 
     expect(component.token).toEqual(undefined);
     const token = { ...someToken, projects: ['b-proj', 'd-proj']};
@@ -131,10 +117,8 @@ describe('ApiTokenDetailsComponent', () => {
     expect(component.token).toEqual(token);
   });
 
-  it('initializes dropdown with those included on the token checked for v2p1', () => {
+  it('initializes dropdown with those checked on the token', () => {
     spyOn(store, 'dispatch').and.callThrough();
-    const version: IamVersionResponse = { version: { major: 'v2' } };
-    store.dispatch(new GetIamVersionSuccess(version));
     const tokenProjects  = ['b-proj', 'd-proj'];
     store.dispatch(new GetTokenSuccess({...someToken, projects: tokenProjects}));
 
@@ -145,7 +129,7 @@ describe('ApiTokenDetailsComponent', () => {
     projectList.forEach(p => {
       expect(component.projects[p.id].checked).toEqual(tokenProjects.includes(p.id));
     });
-   });
+  });
 
   it('sets projects dirty when an unchecked project is checked', () => {
     store.dispatch(new GetTokenSuccess(

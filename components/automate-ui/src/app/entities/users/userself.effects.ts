@@ -24,8 +24,6 @@ import {
 } from './userself.actions';
 import { UserRequests } from './user.requests';
 import { SelfUser } from './userself.model';
-import { iamMajorVersion } from 'app/entities/policies/policy.selectors';
-import { IAMMajorVersion } from 'app/entities/policies/policy.model';
 
 @Injectable()
 export class UserSelfEffects {
@@ -67,14 +65,13 @@ export class UserSelfEffects {
     map(() => new GetUserSelf()));
 
   @Effect()
-  updatePasswordSelf$ = combineLatest([
-    this.actions$.pipe(ofType<UpdatePasswordSelf>(UserSelfActionTypes.UPDATE_PASSWORD_SELF)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([action, version]: [UpdatePasswordSelf, IAMMajorVersion]) =>
-      this.requests.updateSelf(action.payload, version).pipe(
+  updatePasswordSelf$ = this.actions$.pipe(
+    ofType<UpdatePasswordSelf>(UserSelfActionTypes.UPDATE_PASSWORD_SELF),
+    mergeMap((action: UpdatePasswordSelf) =>
+      this.requests.updateSelf(action.payload).pipe(
         map((resp: SelfUser) => new UpdatePasswordSelfSuccess(resp)),
-        catchError((error: HttpErrorResponse) => of(new UpdatePasswordSelfFailure(error))))));
+        catchError((error: HttpErrorResponse) => of(new UpdatePasswordSelfFailure(error))))
+    ));
 
   @Effect()
   updatePasswordSelfSuccess$ = this.actions$.pipe(
@@ -96,14 +93,12 @@ export class UserSelfEffects {
     }));
 
   @Effect()
-  updateNameSelf$ = combineLatest([
-    this.actions$.pipe(ofType<UpdateNameSelf>(UserSelfActionTypes.UPDATE_NAME_SELF)),
-    this.store$.select(iamMajorVersion).pipe(filter(identity))])
-    .pipe(
-      mergeMap(([action, version]: [UpdateNameSelf, IAMMajorVersion]) =>
-      this.requests.updateSelf(action.payload, version).pipe(
-        map((resp: SelfUser) => new UpdateNameSelfSuccess(resp)),
-        catchError((error: HttpErrorResponse) => of(new UpdateNameSelfFailure(error))))));
+  updateNameSelf$ = this.actions$.pipe(ofType<UpdateNameSelf>(UserSelfActionTypes.UPDATE_NAME_SELF),
+    mergeMap((action: UpdateNameSelf) =>
+    this.requests.updateSelf(action.payload).pipe(
+      map((resp: SelfUser) => new UpdateNameSelfSuccess(resp)),
+      catchError((error: HttpErrorResponse) => of(new UpdateNameSelfFailure(error))))
+    ));
 
   // We are intentionally not sending a notification to the banner for
   // UpdateNameSelfSuccess actions. A notification is provided next to the save button

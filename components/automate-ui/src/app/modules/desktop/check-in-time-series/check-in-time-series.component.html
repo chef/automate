@@ -1,0 +1,32 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <div class="page-title">Last Check-in by Day</div>
+
+      <div>
+        <select (change)="dateChanged($event.target.value)">
+          <option *ngFor="let selectableDaysAgo of selectableDaysAgoCollection"
+            [value]="selectableDaysAgo" [selected]="selectableDaysAgo == selectedDaysAgo">
+            Last {{ selectableDaysAgo }} Days
+          </option>
+        </select>
+      </div>
+
+      <table>
+        <thead>
+          <tr >
+            <th>Days Ago</th>
+            <th>Percentage of Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let day of days">
+            <td>{{ day.daysAgo }}</td>
+            <td>{{ day.percentage | number:'1.0-0' }}%</td>
+            <td></td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+  </div>
+</div>

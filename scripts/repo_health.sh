@@ -59,7 +59,7 @@ shellcheck -s bash -ax \
 # help, choose one of the violations excluded here and fix all
 # instances of it.
 shellcheck -s bash -ax \
-  -e SC2012,SC2034,SC2046,SC2086,SC2119,SC2120,SC2124,SC2128,SC2154,SC2164,SC2181,SC2207 \
+  -e SC2012,SC2086,SC2128,SC2164,SC2181,SC2207 \
   .studiorc .studio/*
 
 echo "Checking for possible credentials in the source code"

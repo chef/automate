@@ -8,7 +8,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	api_v2 "github.com/chef/automate/api/interservice/authz/v2"
-	constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 )
@@ -116,11 +116,7 @@ func TestFilterAuthorizedProjects(t *testing.T) {
 
 func setupV2p1AuthTests(t *testing.T, eng *responderEngine) (context.Context, testSetup) {
 	ctx := context.Background()
-	vChan := make(chan api_v2.Version, 1)
-	emptyV1List := v1Lister{}
-	ts := setupV2(t, eng, nil, &emptyV1List, vChan)
-	_, err := ts.policy.MigrateToV2(ctx, &api_v2.MigrateToV2Req{Flag: api_v2.Flag_VERSION_2_1})
-	require.NoError(t, err)
+	ts := setupV2(t, eng, nil)
 	return ctx, ts
 }
 
@@ -130,7 +126,7 @@ type responderEngine struct {
 	projects   []string
 }
 
-func (e *responderEngine) V2ProjectsAuthorized(
+func (e *responderEngine) ProjectsAuthorized(
 	context.Context,
 	engine.Subjects,
 	engine.Action,
@@ -139,14 +135,14 @@ func (e *responderEngine) V2ProjectsAuthorized(
 	return e.projects, nil
 }
 
-func (e *responderEngine) V2FilterAuthorizedPairs(
+func (e *responderEngine) FilterAuthorizedPairs(
 	context.Context,
 	engine.Subjects,
 	[]engine.Pair) ([]engine.Pair, error) {
 	return e.pairs, nil
 }
 
-func (e *responderEngine) V2FilterAuthorizedProjects(
+func (e *responderEngine) FilterAuthorizedProjects(
 	context.Context, engine.Subjects) ([]string, error) {
 	return e.projects, nil
 }

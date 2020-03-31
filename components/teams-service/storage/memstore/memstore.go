@@ -310,19 +310,6 @@ func (m *memstore) EnsureAdminsTeam(ctx context.Context) error {
 	return nil
 }
 
-func (m *memstore) UpgradeToV2(ctx context.Context) error {
-	return nil
-}
-
-func (m *memstore) ResetToV1(ctx context.Context) error {
-	for _, team := range m.teams {
-		team.Projects = []string{}
-		m.teams[team.ID] = team
-		m.teamsV2[team.Name] = team
-	}
-	return nil
-}
-
 func (m *memstore) PurgeProject(ctx context.Context, projectID string) error {
 	for _, team := range m.teams {
 		for i, v := range team.Projects {

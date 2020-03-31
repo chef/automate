@@ -35,6 +35,13 @@ var (
 	projectsResponse []string
 )
 
+var filteredPairsResp []engine.Pair
+var errResult error
+
+// these package variables are required so the compiler does not optimize return values out
+var result ast.Value
+var authzResponse bool
+
 func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 	ctx := context.Background()
 
@@ -51,7 +58,7 @@ func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 		engine.Pair{Resource: "compliance:profiles:market", Action: "compliance:marketProfiles:get"},
 		engine.Pair{Resource: "retention:nodes", Action: "retention:nodes:update"},
 		engine.Pair{Resource: "compliance:reporting:reports", Action: "compliance:reports:list"},
-		engine.Pair{Resource: "infra:actions", Action: "infra:ingest:create"},
+		engine.Pair{Resource: "ingest:actions", Action: "ingest:actions:create"},
 		engine.Pair{Resource: "system:service:logLevel", Action: "system:serviceLogLevel:set"},
 		engine.Pair{Resource: "iam:rules", Action: "iam:rules:apply"},
 		engine.Pair{Resource: "secrets:secrets", Action: "secrets:secrets:create"},
@@ -72,7 +79,7 @@ func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 		engine.Pair{Resource: "iam:projects", Action: "iam:projects:create"},
 		engine.Pair{Resource: "system:iam:resetToV1", Action: "system:iam:reset"},
 		engine.Pair{Resource: "compliance:reporting:stats:profiles", Action: "compliance:reportProfiles:get"},
-		engine.Pair{Resource: "infra:status", Action: "infra:ingest:get"},
+		engine.Pair{Resource: "ingest:status", Action: "ingest:status:get"},
 		engine.Pair{Resource: "compliance:reporting:licenseusage", Action: "compliance:reportingLicenseUsage:list"},
 		engine.Pair{Resource: "iam:policyVersion", Action: "iam:policies:get"},
 		engine.Pair{Resource: "iam:projects", Action: "iam:projects:list"},
@@ -92,14 +99,14 @@ func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 		engine.Pair{Resource: "compliance:reporting:profiles", Action: "compliance:reportProfiles:list"},
 		engine.Pair{Resource: "system:license", Action: "system:license:apply"},
 		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getAll"},
-		engine.Pair{Resource: "infra:nodes", Action: "infra:ingestNodes:delete"},
+		engine.Pair{Resource: "ingest:nodes", Action: "ingest:nodes:delete"},
 		engine.Pair{Resource: "iam:roles", Action: "iam:roles:list"},
 		engine.Pair{Resource: "retention:serviceGroups", Action: "retention:serviceGroups:get"},
 		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:validate"},
 		engine.Pair{Resource: "compliance:reporting:suggestions", Action: "compliance:reportSuggestions:list"},
 		engine.Pair{Resource: "system:service:version", Action: "system:serviceVersion:list"},
 		engine.Pair{Resource: "iam:users", Action: "iam:users:list"},
-		engine.Pair{Resource: "infra:nodes", Action: "infra:ingest:delete"},
+		engine.Pair{Resource: "ingest:nodes", Action: "ingest:nodes:delete"},
 		engine.Pair{Resource: "notifications:rules", Action: "notifications:notifyRules:create"},
 		engine.Pair{Resource: "iam:rules", Action: "iam:rules:status"},
 		engine.Pair{Resource: "iam:introspect", Action: "iam:introspect:getSome"},
@@ -127,7 +134,7 @@ func BenchmarkFilterAuthorizedPairsRealWorldExample(b *testing.B) {
 			var resp []engine.Pair
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(count)...), pairs)
+				resp, err = s.FilterAuthorizedPairs(ctx, append([]string{"user:local:test@example.com"}, randomTeams(count)...), pairs)
 				if err != nil {
 					b.Error(err)
 				}
@@ -260,7 +267,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingPolicies(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2ProjectsAuthorized(ctx, []string{"user:local:test"}, "compliance:profiles:list", "compliance:profiles", allProjects)
+				resp, err = s.ProjectsAuthorized(ctx, []string{"user:local:test"}, "compliance:profiles:list", "compliance:profiles", allProjects)
 				if err != nil {
 					b.Error(err)
 				}
@@ -305,7 +312,7 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingPolicies(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedProjects(ctx, []string{"user:local:test"})
+				resp, err = s.FilterAuthorizedProjects(ctx, []string{"user:local:test"})
 				if err != nil {
 					b.Error(err)
 				}
@@ -390,7 +397,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingRoles(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2ProjectsAuthorized(ctx, []string{"user:local:test"}, "compliance:profiles:list", "compliance:profiles", allProjects)
+				resp, err = s.ProjectsAuthorized(ctx, []string{"user:local:test"}, "compliance:profiles:list", "compliance:profiles", allProjects)
 				if err != nil {
 					b.Error(err)
 				}
@@ -433,7 +440,7 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingRoles(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedProjects(ctx, []string{"user:local:test"})
+				resp, err = s.FilterAuthorizedProjects(ctx, []string{"user:local:test"})
 				if err != nil {
 					b.Error(err)
 				}
@@ -480,7 +487,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingProjects(b *testing.B) {
 			var err error
 			for n := 0; n < b.N; n++ {
 				// include all projects in the filter to test the most amount of work the function might have to undertake
-				resp, err = s.V2ProjectsAuthorized(ctx, []string{member}, "secrets:secrets:create", "secrets:secrets", projectIDs)
+				resp, err = s.ProjectsAuthorized(ctx, []string{member}, "secrets:secrets:create", "secrets:secrets", projectIDs)
 				if err != nil {
 					b.Error(err)
 				}
@@ -525,7 +532,7 @@ func BenchmarkFilterAuthorizedProjectsIncreasingProjects(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedProjects(ctx, []string{member})
+				resp, err = s.FilterAuthorizedProjects(ctx, []string{member})
 				if err != nil {
 					b.Error(err)
 				}
@@ -569,7 +576,7 @@ func BenchmarkProjectsAuthorizedWithIncreasingSubjects(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2ProjectsAuthorized(ctx, append([]string{"user:local:test"}, randomTeams(subjectCount)...),
+				resp, err = s.ProjectsAuthorized(ctx, append([]string{"user:local:test"}, randomTeams(subjectCount)...),
 					"iam:projects:delete", "iam:projects", allProjects)
 				if err != nil {
 					b.Error(err)
@@ -620,7 +627,7 @@ func BenchmarkFilterAuthorizedProjectsWithIncreasingSubjects(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2FilterAuthorizedProjects(ctx, append([]string{"user:local:test"}, randomTeams(subjectCount)...))
+				resp, err = s.FilterAuthorizedProjects(ctx, append([]string{"user:local:test"}, randomTeams(subjectCount)...))
 				if err != nil {
 					b.Error(err)
 				}
@@ -696,7 +703,7 @@ func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
 		var resp []string
 		var err error
 		for n := 0; n < b.N; n++ {
-			resp, err = s.V2ProjectsAuthorized(ctx, []string{"user:local:test"}, "iam:projects:delete", "iam:projects", allProjects)
+			resp, err = s.ProjectsAuthorized(ctx, []string{"user:local:test"}, "iam:projects:delete", "iam:projects", allProjects)
 			if err != nil {
 				b.Error(err)
 			}
@@ -721,7 +728,7 @@ func BenchmarkAuthorizedProjectsIncreasingMembershipFrequency(b *testing.B) {
 			var resp []string
 			var err error
 			for n := 0; n < b.N; n++ {
-				resp, err = s.V2ProjectsAuthorized(ctx, []string{"user:local:test"}, "iam:projects:delete", "iam:projects", allProjects)
+				resp, err = s.ProjectsAuthorized(ctx, []string{"user:local:test"}, "iam:projects:delete", "iam:projects", allProjects)
 				if err != nil {
 					b.Error(err)
 				}

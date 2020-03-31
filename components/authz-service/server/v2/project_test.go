@@ -19,7 +19,7 @@ import (
 	"github.com/chef/automate/lib/logger"
 
 	api "github.com/chef/automate/api/interservice/authz/v2"
-	constants "github.com/chef/automate/components/authz-service/constants/v2"
+	constants "github.com/chef/automate/components/authz-service/constants"
 	"github.com/chef/automate/components/authz-service/prng"
 	grpc_server "github.com/chef/automate/components/authz-service/server"
 	v2 "github.com/chef/automate/components/authz-service/server/v2"

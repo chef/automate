@@ -8,7 +8,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/sirupsen/logrus"
 
-	api "github.com/chef/automate/api/interservice/authz/v2"
 	"github.com/chef/automate/components/authz-service/engine"
 	storage "github.com/chef/automate/components/authz-service/storage/v2"
 	"github.com/chef/automate/components/authz-service/storage/v2/postgres"
@@ -26,7 +25,7 @@ type PolicyRefresher interface {
 type policyRefresher struct {
 	log                      logger.Logger
 	store                    storage.Storage
-	engine                   engine.V2p1Writer
+	engine                   engine.Writer
 	refreshRequests          chan policyRefresherMessageRefresh
 	antiEntropyTimerDuration time.Duration
 	changeNotifier           storage.PolicyChangeNotifier
@@ -51,7 +50,7 @@ func (m *policyRefresherMessageRefresh) Err() error {
 	return <-m.status
 }
 
-func NewPostgresPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.V2p1Writer) (PolicyRefresher, error) {
+func NewPostgresPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.Writer) (PolicyRefresher, error) {
 	store := postgres.GetInstance()
 	if store == nil {
 		return nil, errors.New("postgres v2 singleton not yet initialized for policy refresher")
@@ -59,7 +58,7 @@ func NewPostgresPolicyRefresher(ctx context.Context, log logger.Logger, engine e
 	return NewPolicyRefresher(ctx, log, engine, store)
 }
 
-func NewPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.V2p1Writer, store storage.Storage) (PolicyRefresher, error) {
+func NewPolicyRefresher(ctx context.Context, log logger.Logger, engine engine.Writer, store storage.Storage) (PolicyRefresher, error) {
 	changeNotifier, err := store.GetPolicyChangeNotifier(ctx)
 	if err != nil {
 		return nil, err
@@ -175,7 +174,7 @@ func (refresher *policyRefresher) updateEngineStore(ctx context.Context) error {
 		return err
 	}
 
-	return refresher.engine.V2p1SetPolicies(ctx, policyMap, roleMap)
+	return refresher.engine.SetPolicies(ctx, policyMap, roleMap)
 
 	// Note 2019/06/04 (sr): v1?! Yes, IAM v1. Our POC code depends on this query
 	// to be answered regardless of whether IAM is v1 or v2.
@@ -245,23 +244,4 @@ func (refresher *policyRefresher) getRoleMap(ctx context.Context) (map[string]in
 		}
 	}
 	return data, nil
-}
-
-func (refresher *policyRefresher) getIAMVersion(ctx context.Context) (api.Version, error) {
-	var vsn api.Version
-	ms, err := refresher.store.MigrationStatus(ctx)
-	if err != nil {
-		return vsn, err
-	}
-	switch ms {
-	// this case should no longer happen
-	// since the iam v2 upgrade command always upgrades to v2.1
-	case storage.Successful:
-		vsn = api.Version{Major: api.Version_V2, Minor: api.Version_V0}
-	case storage.SuccessfulBeta1:
-		vsn = api.Version{Major: api.Version_V2, Minor: api.Version_V1}
-	default:
-		vsn = api.Version{Major: api.Version_V1, Minor: api.Version_V0}
-	}
-	return vsn, nil
 }

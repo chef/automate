@@ -25,6 +25,9 @@ options:
 - name: private-key
   usage: |
     The path to a private key corresponding to the TLS certificate.
+- name: product
+  default_value: '[]'
+  usage: Product to deploy
 - name: skip-preflight
   default_value: "false"
   usage: Deploy regardless of pre-flight conditions

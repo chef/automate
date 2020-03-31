@@ -1,5 +1,5 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators, AbstractControl } from '@angular/forms';
 import { Router, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Subject, combineLatest, Observable } from 'rxjs';
@@ -307,6 +307,10 @@ export class ProjectRulesComponent implements OnInit, OnDestroy {
 
   private isNavigationKey(event: KeyboardEvent): boolean {
     return event.key === 'Shift' || event.key === 'Tab';
+  }
+
+  get conditionControls(): { [key: string]: AbstractControl } {
+    return (this.ruleForm.get('conditions') as FormGroup).controls;
   }
 
 }

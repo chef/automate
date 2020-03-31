@@ -16,7 +16,7 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 
 	"github.com/chef/automate/api/interservice/compliance/reporting"
-	authzConstants "github.com/chef/automate/components/authz-service/constants/v2"
+	authzConstants "github.com/chef/automate/components/authz-service/constants"
 	reportingServer "github.com/chef/automate/components/compliance-service/api/reporting/server"
 	"github.com/chef/automate/components/compliance-service/reporting/relaxting"
 	"github.com/chef/automate/lib/grpc/auth_context"

@@ -87,23 +87,33 @@ function compile_client_mocks() {
   install_gomock
   (
     set -e
-    cd "/src/api/interservice"
-    mockgen_debug -source event/event.pb.go -destination event/event.pb.client_mock.go -package event -self_package github.com/chef/automate/api/interservice/event
-    mockgen_debug -source authz/v2/project.pb.go -destination authz/v2/project.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
-    mockgen_debug -source authz/authz.pb.go -destination authz/authz.pb.client_mock.go -package authz -self_package github.com/chef/automate/api/interservice/authz
-    mockgen_debug -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
-    mockgen_debug -source compliance/ingest/ingest/compliance.pb.go -destination compliance/ingest/ingest/compliance.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/compliance/ingest/ingest ProjectUpdateStatusReq,ProjectUpdateStatusResp
-    # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt because of
-    # an issue with source-mode's ability to parse interfaces from the
-    # grpc package. Details here:
-    #
-    # https://github.com/golang/mock/issues/156#issuecomment-586213812
-    #
-    mockgen_debug -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service -self_package github.com/chef/automate/api/interservice/cfgmgmt/service github.com/chef/automate/api/interservice/cfgmgmt/service CfgMgmtClient,CfgMgmt_NodeExportClient,CfgMgmt_ReportExportClient,CfgMgmtServer,CfgMgmt_NodeExportServer,CfgMgmt_ReportExportServer
-    mockgen_debug -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/ingest
-    mockgen_debug -source event_feed/event_feed.pb.go -destination event_feed/event_feed.pb.client_mock.go -package event_feed -self_package github.com/chef/automate/api/interservice/event_feed
-    mockgen_debug -source nodemanager/manager/manager.pb.go -destination nodemanager/manager/manager.pb.client_mock.go -package manager -self_package github.com/chef/automate/api/interservice/nodemanager/manager
-    mockgen_debug -source nodemanager/nodes/nodes.pb.go -destination nodemanager/nodes/nodes.pb.client_mock.go -package nodes -self_package github.com/chef/automate/api/interservice/nodemanager/nodes
+    pushd /src/api/interservice || return 1
+      mockgen_debug -source event/event.pb.go -destination event/event.pb.client_mock.go -package event -self_package github.com/chef/automate/api/interservice/event
+      mockgen_debug -source authz/v2/project.pb.go -destination authz/v2/project.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
+      mockgen_debug -source authz/v2/authz.pb.go -destination authz/v2/authz.pb.client_mock.go -package v2 -self_package github.com/chef/automate/api/interservice/authz/v2
+      mockgen_debug -source authn/authenticate.pb.go -destination authn/authenticate.pb.client_mock.go -package authn -self_package github.com/chef/automate/api/interservice/authn
+      mockgen_debug -source compliance/ingest/ingest/compliance.pb.go -destination compliance/ingest/ingest/compliance.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/compliance/ingest/ingest ProjectUpdateStatusReq,ProjectUpdateStatusResp
+      # NOTE(ssd) 2020-02-17: Use "reflect-mode" for cfgmgmt because of
+      # an issue with source-mode's ability to parse interfaces from the
+      # grpc package. Details here:
+      #
+      # https://github.com/golang/mock/issues/156#issuecomment-586213812
+      #
+      mockgen_debug -destination cfgmgmt/service/cfgmgmt.pb.client_mock.go -package service -self_package github.com/chef/automate/api/interservice/cfgmgmt/service github.com/chef/automate/api/interservice/cfgmgmt/service CfgMgmtClient,CfgMgmt_NodeExportClient,CfgMgmt_ReportExportClient,CfgMgmtServer,CfgMgmt_NodeExportServer,CfgMgmt_ReportExportServer
+      mockgen_debug -source ingest/chef.pb.go -destination ingest/chef.pb.client_mock.go -package ingest -self_package github.com/chef/automate/api/interservice/ingest
+      mockgen_debug -source event_feed/event_feed.pb.go -destination event_feed/event_feed.pb.client_mock.go -package event_feed -self_package github.com/chef/automate/api/interservice/event_feed
+      mockgen_debug -source nodemanager/manager/manager.pb.go -destination nodemanager/manager/manager.pb.client_mock.go -package manager -self_package github.com/chef/automate/api/interservice/nodemanager/manager
+      mockgen_debug -source nodemanager/nodes/nodes.pb.go -destination nodemanager/nodes/nodes.pb.client_mock.go -package nodes -self_package github.com/chef/automate/api/interservice/nodemanager/nodes
+    popd || return 1
+
+    pushd /src/components/automate-gateway/gateway_mocks || return 1
+      make
+    popd || return 1
+
+    # NOTE(ssd) 2020-03-23: The secrets-service only has external protobuf definitions
+    pushd /src/api/external || return 1
+      mockgen_debug -source secrets/secrets.pb.go -destination secrets/secrets.pb.client_mock.go -package secrets -self_package github.com/chef/automate/api/external/secrets
+    popd || return 1
   )
 }
 
@@ -319,14 +329,13 @@ function generate_dev_service_cert() {
 
 _component_auto_complete()
 {
-    local cur prev opts
+    local cur opts
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"
-    prev="${COMP_WORDS[COMP_CWORD-1]}"
     opts=$(ls /src/components | tr "\\n" " ")
 
     if [[ ${cur} == * ]]; then
-        COMPREPLY=( $(compgen -W "${opts}" -- ${cur}) )
+        COMPREPLY=( $(compgen -W "${opts}" -- "${cur}") )
         return 0
     fi
 }
@@ -365,7 +374,7 @@ document "build_all_changed_components" <<DOC
   build_all_changed_components automate-gateway automate-deployment
 DOC
 function build_all_changed_components() {
-  local whitelist=$@
+  local whitelist=$*
 
   install_if_missing core/git git
   install_if_missing core/ruby ruby
@@ -375,7 +384,6 @@ function build_all_changed_components() {
   mkdir -p /usr/bin
   ln -sv "$(hab pkg path core/coreutils)/bin/env" /usr/bin/env 2>/dev/null
 
-  build_commands=""
   pushd /src >/dev/null
     for component in $(./scripts/changed_components.rb)
     do
@@ -385,13 +393,13 @@ function build_all_changed_components() {
       fi
 
       if [[ -n "$whitelist" ]]; then
-        if [[ "$whitelist" == *"$(basename $component)"* ]]; then
+        if [[ "$whitelist" == *"$(basename "$component")"* ]]; then
           log_line "Building $component"
-          build $component
+          build "$component"
         fi
       else
         log_line "Building $component"
-        build $component
+        build "$component"
       fi
     done
   popd >/dev/null

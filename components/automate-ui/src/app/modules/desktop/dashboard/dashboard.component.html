@@ -1,0 +1,20 @@
+<div class="content-container">
+  <div class="container">
+    <main>
+      <app-daily-check-in
+        [unknownPercentage] = "unknownPercentage$ | async"
+        [checkedInPercentage] = "checkedInPercentage$ | async"
+        [totalCount] = "totalCount$ | async"
+        [unknownCount] = "unknownCount$ | async"
+        [checkedInCount] = "checkedInCount$ | async">
+      </app-daily-check-in>
+      <app-check-in-time-series
+        [days] = "days$ | async"
+        [selectedDaysAgo] = "selectedDaysAgo$ | async"
+        (daysAgoChanged)="handleDaysAgoChange($event)">
+      </app-check-in-time-series>
+      <app-top-errors
+        [topErrorsItems] = "topErrorsItems$ | async"></app-top-errors>
+    </main>
+  </div>
+</div>

@@ -32,22 +32,9 @@ if you need to add reports to a non-dev-env instance, you can use the following 
 
 # Adding nodes to populate the nodes and scan jobs pages
 
-option 1:
-if you don't care if the nodes are reachable and scan jobs are successful, do the following:
-- create an ssh or winrm credential in your Automate GUI at `a2-url/settings/node-credentials` with fake data
-- create a node in your Automate GUI at `a2-url/compliance/scan-jobs/nodes/add` with host `fake-localhost` and attach your fake credential 
-- ensure you've installed a profile or two in your Automate GUI under `a2-url/compliance/compliance-profiles`
-- create a scan job at `a2-url/jobs/add` using the profile and node 
+from hab studio:
 
-option 2:
-this should give you some reachable nodes and successful scan jobs, and some unreachable nodes/unsuccessful jobs:
-ensure you have `jq` installed locally (`brew install jq`)
-get a token for the api call: `get_admin_token` from within the studio is the quickest way
-get the secrets: run `cat dev/secrets-env.sh` - if there's nothing there, run `CHEF_USERNAME=username scripts/get_secrets.sh`
-
-_note: this should be run on your local system, not from within the studio. you will need to be on the vpn_
-`source dev/secrets-env.sh`
-`A2_URL='https://a2-dev.test' A2_TOKEN='token_val' components/compliance-service/scripts/create-pg-data.sh`
+run `load_scan_jobs`
 
 # Adding profiles
 
