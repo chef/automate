@@ -293,5 +293,5 @@ service ConfigMgmt {
 
   rpc NodeExport(cfgmgmt.request.NodeExport) returns (stream chef.automate.api.compliance.reporting.v1.ExportData) {};
 
-	rpc ReportExport(cfgmgmt.request.ReportExport) returns (stream chef.automate.api.compliance.reporting.v1.ExportData) {};
+  rpc ReportExport(cfgmgmt.request.ReportExport) returns (stream chef.automate.api.compliance.reporting.v1.ExportData) {};
 }
