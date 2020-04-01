@@ -85,7 +85,7 @@ export class AutomateSettingsRequests {
           if (body[job.category].job_settings) {
             body[job.category].job_settings.push(thisJob);
           } else {
-            console.log('TODO: send an error');
+            console.error(`Error: unable to save ${job.name}.`);
           }
           break;
 
@@ -100,7 +100,7 @@ export class AutomateSettingsRequests {
           if (thisObject) {
             thisObject.purge_policies.elasticsearch.push(thisJob);
           } else {
-            console.log('TODO: send an error');
+            console.error(`Error: unable to save ${job.name}.`);
           }
           break;
 
