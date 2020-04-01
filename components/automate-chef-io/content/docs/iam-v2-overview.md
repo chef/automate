@@ -211,5 +211,5 @@ Property               | Description
 -----------------------|------------
 Event Attribute        | Chef Organization or Chef Server
 Node Attribute         | Chef Organization, Chef Server, Environment, Chef Role, Chef Tag, Chef Policy Name, or Chef Policy Group
-Operator               | equals of member of
+Operator               | equals or member of
 Values                 | list of one or more values to match on the specified attribute

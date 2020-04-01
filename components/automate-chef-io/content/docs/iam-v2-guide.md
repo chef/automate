@@ -49,7 +49,7 @@ Note that you could also add users directly to policies without the intermediate
 
 #### Create Users
 
-Follow the instructions on [Creating Users]({{< relref "users.md#manage-local-users-from-the-ui" >}}) to:
+Follow the instructions on [Creating Users]({{< relref "users.md#creating-local-users" >}}) to:
 
 * Create a local user with the username `test_viewer`.
 * Create a local user with the username `test_editor`.
@@ -59,7 +59,7 @@ Follow the instructions on [Creating Users]({{< relref "users.md#manage-local-us
 Select `Teams` from the left navigation of the **Settings** tab.
 Three teams are provided by default: `admins`, `viewers`, and `editors`.
 
-Follow the instructions for [Adding Users to a Team]({{< relref "teams.md#adding-users-to-a-team" >}}) to:
+Follow the instructions for [Adding Users to a Team]({{< relref "teams.md#adding-local-users-to-teams" >}}) to:
 
 * Add the user `test_viewer` to the Chef-managed `viewers` team.
 * Add the user `test_editor` to the Chef-managed `editors` team.
@@ -162,7 +162,7 @@ In this case, we only need a single statement providing access to the _get_, _li
 }
 ```
 
-Save your JSON file and refer to the [IAM Policies API reference](https://automate.chef.io/docs/api/#tag/Policies) to send that policy data to Chef Automate.
+Save your JSON file and refer to the [IAM Policies API reference](https://automate.chef.io/docs/api/#tag/policies) to send that policy data to Chef Automate.
 
 ### Policy Membership
 
@@ -267,7 +267,7 @@ If you would like to delegate ownership of a project to another user so that the
 While Automate's local teams and tokens can be directly assigned to a project, ingested resources must be assigned to projects using ingest rules.
 
 Project ingest rules are used to associate ingested resources with projects within Automate. An ingest rule contains conditions that determine if an ingested resource should be moved into the rule's project.
-Each condition contains an attribute, operator, and value. See [IAM Project Rules API reference](https://automate.chef.io/docs/api/#tag/Project_rules) for details on how to manage project rules.
+Each condition contains an attribute, operator, and value. See [IAM Project Rules API reference](https://automate.chef.io/docs/api/#tag/rules) for details on how to manage project rules.
 
 In this example, after [creating a project]({{< relref "iam-v2-guide.md#creating-a-project" >}}) with the ID `project-devops`, you will add an ingest rule to this new project.
 You will update projects to apply this new project rule, causing all matching ingested resources to be associated with `project-devops`.
