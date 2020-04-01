@@ -299,7 +299,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
       if ( isNested ) {
         job.nested_name = jobForm.nested_name;
         job.threshold = jobForm.threshold;  // Automatically becomes a 0 from
-                                            // parseInt in reqeust if left blank
+                                            // parseInt in request if left blank
       }
 
       return job;
@@ -380,6 +380,8 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
     return this[jobName];
   }
 
+  // Splits a packed threshold into a number and a unit, where unit is a single character
+  // example: '12d' => ['12', 'd']
   private splitThreshold(threshold: string): [string, string] {
     return [
       threshold.slice(0, threshold.length - 1),
