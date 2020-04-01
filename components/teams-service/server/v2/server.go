@@ -3,9 +3,11 @@ package v2
 import (
 	"context"
 
+	"github.com/chef/automate/lib/version"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	ver_api "github.com/chef/automate/api/external/common/version"
 	authz "github.com/chef/automate/api/interservice/authz/common"
 	teams "github.com/chef/automate/api/interservice/teams/v2"
 	"github.com/chef/automate/components/teams-service/service"
@@ -20,6 +22,18 @@ type Server struct {
 // NewServer returns a V2 Teams server
 func NewServer(service *service.Service) *Server {
 	return &Server{service: service}
+}
+
+// GetVersion returns the version of Teams GRPC API
+func (s *Server) GetVersion(
+	ctx context.Context,
+	_ *ver_api.VersionInfoRequest) (*ver_api.VersionInfo, error) {
+	return &ver_api.VersionInfo{
+		Name:    "teams-service",
+		Version: version.Version,
+		Sha:     version.GitSHA,
+		Built:   version.BuildTime,
+	}, nil
 }
 
 // GetTeam takes an ID and returns a Team object

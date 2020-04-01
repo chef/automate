@@ -6,6 +6,7 @@ import (
 	"os"
 	"testing"
 
+	"github.com/chef/automate/api/external/common/version"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc"
@@ -62,6 +63,13 @@ func runAllServerTests(
 
 	t.Helper()
 	defer close()
+
+	t.Run("GetVersion", func(t *testing.T) {
+		resp, err := cl.GetVersion(context.Background(), &version.VersionInfoRequest{})
+		require.NoError(t, err)
+		// Version is injected via linker flags that we don't set during tests
+		require.Equal(t, "unknown", resp.Version)
+	})
 
 	t.Run("GetTeam", func(t *testing.T) {
 		resetState(context.Background(), t, serviceRef)

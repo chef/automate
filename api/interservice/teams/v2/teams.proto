@@ -2,6 +2,7 @@ syntax = "proto3";
 
 import "google/api/annotations.proto";
 import "validate/validate.proto";
+import "api/external/common/version/version.proto";
 
 package chef.automate.domain.teams.v2;
 option go_package = "github.com/chef/automate/api/interservice/teams/v2";
@@ -149,6 +150,7 @@ message PurgeUserMembershipResp {
 }
 
 service Teams {
+  rpc GetVersion (chef.automate.api.common.version.VersionInfoRequest) returns (chef.automate.api.common.version.VersionInfo) {};
   rpc GetTeam (GetTeamReq) returns (GetTeamResp) {};
   rpc ListTeams (ListTeamsReq) returns (ListTeamsResp) {};
   rpc CreateTeam (CreateTeamReq) returns (CreateTeamResp) {};
