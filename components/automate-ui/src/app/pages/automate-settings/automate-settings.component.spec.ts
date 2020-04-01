@@ -238,7 +238,7 @@ describe('AutomateSettingsComponent', () => {
     using([
       // Event Feed
       ['eventFeedRemoveData', 'feed',
-          genNestedIngestJob('event_feed', 'periodic_purge', 'feed', 1, false)] ,
+          genNestedIngestJob('event_feed', 'periodic_purge', 'feed', 1, false)],
       ['eventFeedServerActions', 'actions',
           genNestedIngestJob('infra', 'periodic_purge_timeseries', 'actions', 2, false)],
 
@@ -328,7 +328,7 @@ describe('AutomateSettingsComponent', () => {
     using([
       // Client Runs
       ['clientRunsRemoveData', genInjestJob('infra', 'missing_nodes', '5m', true)],
-      ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes_for_deletion', '6h', true)],
+      ['clientRunsLabelMissing', genInjestJob('infra', 'missing_nodes_for_deletion', '6h', true)]
     ], function (formName: string, job: IngestJob) {
       it(`when ${formName} form is saved as disabled, unit and threshold are undefined
             because they are not present in the non-nested form anymore`, () => {

@@ -18,7 +18,9 @@ export interface RespJob {
   disabled: boolean;
   recurrence: string;
   threshold: string;
-  purge_policies: any; // TODO needs specific type
+  purge_policies?: {
+    elasticsearch?: UnfurledJob[];
+  };
   last_elapsed?: Date;
   next_due_at?: Date;
   last_enqueued_at?: Date;
@@ -93,7 +95,9 @@ export class IngestJob {
   recurrence?: string;
   threshold: string;
   disabled: boolean;
-  purge_policies?: any; // TODO needs specific type
+  purge_policies?: {
+    elasticsearch?: UnfurledJob[];
+  };
   older_than_days?: number;
   last_elapsed?: Date;
   next_due_at?: Date;
