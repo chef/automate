@@ -44,17 +44,17 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 
 	client, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
 	result := RoleListResult{}
 	// Fetch roles using search API
-	newReq, err := client.NewRequest("GET", "search/role", nil)
+	newReq, err := client.client.NewRequest("GET", "search/role", nil)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	res, err := client.Do(newReq, &result)
+	res, err := client.client.Do(newReq, &result)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -70,18 +70,18 @@ func (s *Server) GetRoles(ctx context.Context, req *request.Roles) (*response.Ro
 // In order to get expanded runlist it required to have all roles if any
 // RunList contains the another Role's RunList.
 func (s *Server) GetRole(ctx context.Context, req *request.Role) (*response.Role, error) {
-	client, err := s.createClient(ctx, req.OrgId)
+	c, err := s.createClient(ctx, req.OrgId)
 	if err != nil {
-		return nil, status.Errorf(codes.InvalidArgument, "invalid org id: %s", err.Error())
+		return nil, status.Errorf(codes.InvalidArgument, "invalid org ID: %s", err.Error())
 	}
 
 	result := RoleListResult{}
-	newReq, err := client.NewRequest("GET", "search/role", nil)
+	newReq, err := c.client.NewRequest("GET", "search/role", nil)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 
-	res1, err := client.Do(newReq, &result)
+	res1, err := c.client.Do(newReq, &result)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

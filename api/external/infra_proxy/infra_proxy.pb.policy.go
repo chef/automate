@@ -243,25 +243,6 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetCookbookAffectedNodes", "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks", "infra:infraServerOrgCookbooks:get", "GET", "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/affected-nodes", func(unexpandedResource string, input interface{}) string {
-		if m, ok := input.(*request.Cookbook); ok {
-			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
-				switch want {
-				case "org_id":
-					return m.OrgId
-				case "server_id":
-					return m.ServerId
-				case "name":
-					return m.Name
-				case "version":
-					return m.Version
-				default:
-					return ""
-				}
-			})
-		}
-		return ""
-	})
 	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetCookbookFileContent", "infra:infraServers:{server_id}:orgs:{org_id}:cookbooks", "infra:infraServerOrgCookbooks:get", "GET", "/infra/servers/{server_id}/orgs/{org_id}/cookbooks/{name}/{version}/file-content", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.CookbookFileContent); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
@@ -398,7 +379,7 @@ func init() {
 		}
 		return ""
 	})
-	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetEnvironment", "infra:infraServers:{server_id}:orgs:{org_id}:environments", "infra:infraServerOrgEnvironments:get", "GET", "/infra/servers/{server_id}/orgs/{org_id}/environment/{name}", func(unexpandedResource string, input interface{}) string {
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetEnvironment", "infra:infraServers:{server_id}:orgs:{org_id}:environments", "infra:infraServerOrgEnvironments:get", "GET", "/infra/servers/{server_id}/orgs/{org_id}/environments/{name}", func(unexpandedResource string, input interface{}) string {
 		if m, ok := input.(*request.Environment); ok {
 			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
 				switch want {
@@ -408,6 +389,27 @@ func init() {
 					return m.ServerId
 				case "name":
 					return m.Name
+				default:
+					return ""
+				}
+			})
+		}
+		return ""
+	})
+	policy.MapMethodTo("/chef.automate.api.infra_proxy.InfraProxy/GetAffectedNodes", "infra:infraServers:{server_id}:orgs:{org_id}:nodes", "infra:infraServerOrgNodes:get", "GET", "/infra/servers/{server_id}/orgs/{org_id}/affected-nodes/{resource}/{name}/{version}", func(unexpandedResource string, input interface{}) string {
+		if m, ok := input.(*request.AffectedNodes); ok {
+			return policy.ExpandParameterizedResource(unexpandedResource, func(want string) string {
+				switch want {
+				case "org_id":
+					return m.OrgId
+				case "server_id":
+					return m.ServerId
+				case "resource":
+					return m.Resource
+				case "name":
+					return m.Name
+				case "version":
+					return m.Version
 				default:
 					return ""
 				}
