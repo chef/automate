@@ -128,7 +128,7 @@ export class UnfurledJob {
 }
 
 // A JobRequestComponent is very flexible so that it may contain
-// contain an older API Job object and a newer API Job Object
+// contain an older API Job object or a newer API Job Object
 export class JobRequestComponent {
   disabled?: boolean;
   name?: string;

@@ -15,7 +15,7 @@ import {
   JobCategories
 } from './automate-settings.model';
 
-import { environment } from '../../../environments/environment';
+import { environment } from 'environments/environment';
 
 const RETENTION_URL = environment.retention_url;
 

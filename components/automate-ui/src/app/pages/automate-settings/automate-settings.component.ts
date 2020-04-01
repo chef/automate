@@ -228,7 +228,7 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
   }
 
   // This prevents a user from being allowed to enter negative numbers
-  // or other actions that we dont want to allow
+  // or other actions that we don't want to allow
   public preventNegatives(key: string) {
     const allowedKeys = [
       '1', '2', '3', '4', '5', '6', '7', '8', '9', '0',

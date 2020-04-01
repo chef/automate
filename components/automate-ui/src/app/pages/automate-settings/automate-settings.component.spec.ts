@@ -89,10 +89,10 @@ describe('AutomateSettingsComponent', () => {
     expect(Object.keys(component.automateSettingsForm.controls)).toEqual(ALL_FORMS);
   });
 
-  describe('handleFormActivation(form, value)', () => {
+  describe('handleFormActivation()', () => {
 
     using(ALL_FORMS
-        // Service Groups on not currently uncheckable through the UI
+        // Service Groups are not currently uncheckable through the UI
         .filter( form => !['serviceGroupNoHealthChecks', 'serviceGroupRemoveServices']
         .includes(form)),
         function( form: string) {
@@ -106,7 +106,7 @@ describe('AutomateSettingsComponent', () => {
     });
 
     using(ALL_FORMS
-        // Service Groups on not currently uncheckable through the UI
+        // Service Groups are not currently uncheckable through the UI
         .filter( form => !['serviceGroupsNoHealthChecks', 'serviceGroupRemoveServices']
         .includes(form)),
         function (form: string) {
