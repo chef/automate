@@ -1416,17 +1416,13 @@ func init() {
     "chef.automate.api.infra_proxy.response.NodeAttribute": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of the node."
+        },
         "name": {
           "type": "string",
           "description": "Name of the node."
-        },
-        "chef_guid": {
-          "type": "string",
-          "description": "ChefGUID of the node."
-        },
-        "url": {
-          "type": "string",
-          "description": "URL which point to client-runs node."
         },
         "check_in": {
           "type": "string",

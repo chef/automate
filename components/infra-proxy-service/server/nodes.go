@@ -13,17 +13,6 @@ import (
 	"github.com/chef/automate/api/interservice/infra_proxy/response"
 )
 
-// NodeAttribute attributes of the node
-type NodeAttribute struct {
-	Name            string
-	ChefGUID        string
-	CheckIn         string
-	ChefEnvironment string
-	Platform        string
-	PolicyGroup     string
-	Uptime          string
-}
-
 // GetAffectedNodes get the nodes using resource
 func (s *Server) GetAffectedNodes(ctx context.Context, req *request.AffectedNodes) (*response.AffectedNodes, error) {
 	c, err := s.createClient(ctx, req.OrgId)
@@ -72,9 +61,9 @@ func fromSearchAPIToAffectedNodes(sr chef.SearchResult) []*response.NodeAttribut
 	for _, element := range sr.Rows {
 		m := element.(map[string]interface{})["data"].(map[string]interface{})
 		results[index] = &response.NodeAttribute{
+			Id:          safeStringFromMap(m, "chef_guid"),
 			Name:        safeStringFromMap(m, "name"),
 			CheckIn:     safeStringFromMapFloat(m, "ohai_time"),
-			ChefGuid:    safeStringFromMap(m, "chef_guid"),
 			Environment: safeStringFromMap(m, "chef_environment"),
 			Platform:    safeStringFromMap(m, "platform"),
 			PolicyGroup: safeStringFromMap(m, "policy_group"),

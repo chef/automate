@@ -33,9 +33,9 @@ func parseNodeAttributeFromRes(nodes []*infra_res.NodeAttribute) []*gwres.NodeAt
 
 	for i, node := range nodes {
 		nl[i] = &gwres.NodeAttribute{
+			Id:          node.Id,
 			Name:        node.Name,
 			CheckIn:     node.CheckIn,
-			ChefGuid:    node.ChefGuid,
 			Environment: node.Environment,
 			Platform:    node.Platform,
 			PolicyGroup: node.PolicyGroup,

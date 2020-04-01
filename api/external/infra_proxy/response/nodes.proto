@@ -9,20 +9,18 @@ message AffectedNodes {
 }
 
 message NodeAttribute {
+    // ID of the node.
+    string id = 1;
     // Name of the node.
-    string name = 1;
-    // ChefGUID of the node.
-    string chef_guid = 2;
-    // URL which point to client-runs node.
-    string url = 3;
+    string name = 2;
     // Last checked in of the node. 
-    string check_in = 4;
+    string check_in = 3;
     // Uptime of the node.
-    string uptime = 5;
+    string uptime = 4;
     // Name of the platform of the node.
-    string platform = 6;
+    string platform = 5;
     // Environment name of the node.
-    string environment = 7;
+    string environment = 6;
     // Policy group name of the node.
-    string policy_group = 8;
+    string policy_group = 7;
 }
