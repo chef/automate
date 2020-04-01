@@ -74,11 +74,11 @@
           "items": {
             "type": "string"
           },
-          "description": "Filters to apply to the request for nodes list."
+          "description": "Filters to apply to the request for nodes list. May be empty."
         },
         "sorting": {
           "$ref": "#/definitions/chef.automate.api.common.query.Sorting",
-          "description": "sorting parameters to apply to the returned node list."
+          "description": "sorting parameters to apply to the returned node list. Defaults to Asc and 'name'"
         },
         "output_type": {
           "type": "string",
@@ -99,11 +99,11 @@
           "items": {
             "type": "string"
           },
-          "description": "Filters to apply to the request for nodes list."
+          "description": "Filters to apply to the request for nodes list. May be empty."
         },
         "node_id": {
           "type": "string",
-          "description": "The node ID of the reports"
+          "description": "The node ID of the reports. Required."
         },
         "output_type": {
           "type": "string",
@@ -117,12 +117,12 @@
         "start": {
           "type": "string",
           "format": "date-time",
-          "description": "Earliest (in history) run information to return for the runs list."
+          "description": "Earliest (in history) run information to return for the runs list. Not required."
         },
         "end": {
           "type": "string",
           "format": "date-time",
-          "description": "Latest (in history) run information to return for the runs list."
+          "description": "Latest (in history) run information to return for the runs list. Not required."
         }
       }
     }
