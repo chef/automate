@@ -20,19 +20,27 @@ import {
   allCookbooks,
   getAllStatus as getAllCookbooksForOrgStatus
 } from 'app/entities/cookbooks/cookbook.selectors';
+import { GetRolesForOrg } from 'app/entities/infra-roles/infra-role.action';
+import { InfraRole } from 'app/entities/infra-roles/infra-role.model';
+import {
+  allInfraRoles,
+  getAllStatus as getAllRolesForOrgStatus
+} from 'app/entities/infra-roles/infra-role.selectors';
 
-export type OrgTabName = 'cookbooks' | 'details';
+export type OrgTabName = 'cookbooks' | 'roles' | 'details';
+
 @Component({
-  selector: 'app-cookbooks-list',
-  templateUrl: './cookbooks-list.component.html',
-  styleUrls: ['./cookbooks-list.component.scss']
+  selector: 'app-org-details',
+  templateUrl: './org-details.component.html',
+  styleUrls: ['./org-details.component.scss']
 })
-export class CookbooksListComponent implements OnInit, OnDestroy {
+
+export class OrgDetailsComponent implements OnInit, OnDestroy {
   public org: Org;
   public cookbooks: Cookbook[] = [];
+  public roles: InfraRole[] = [];
   public loading$: Observable<boolean>;
   public sortedCookbooks$: Observable<Cookbook[]>;
-  private isDestroyed = new Subject<boolean>();
   public saveSuccessful = false;
   public saveInProgress = false;
   public isLoading = true;
@@ -41,7 +49,10 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
   public OrgId;
   public updateOrgForm: FormGroup;
   public tabValue: OrgTabName = 'cookbooks';
+  private isDestroyed = new Subject<boolean>();
+
   cookbooksListLoading = true;
+  rolesListLoading = true;
 
   constructor(
     private fb: FormBuilder,
@@ -63,7 +74,20 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
     .subscribe((url: string) => {
       this.url = url;
       const [, fragment] = url.split('#');
-      this.tabValue = (fragment === 'details') ? 'details' : 'cookbooks';
+      switch (fragment) {
+        case 'details': {
+          this.tabValue = 'details';
+          break;
+        }
+        case 'cookbooks': {
+          this.tabValue = 'cookbooks';
+          break;
+        }
+        case 'roles': {
+          this.tabValue = 'roles';
+          break;
+        }
+      }
     });
 
     combineLatest([
@@ -78,60 +102,76 @@ export class CookbooksListComponent implements OnInit, OnDestroy {
       this.store.dispatch(new GetCookbooksForOrg({
         server_id: server_id, org_id: org_id
       }));
+      this.store.dispatch(new GetRolesForOrg({
+        server_id: server_id, org_id: org_id
+      }));
     });
 
     combineLatest([
       this.store.select(getStatus),
       this.store.select(updateStatus),
-      this.store.select(getAllCookbooksForOrgStatus)
+      this.store.select(getAllCookbooksForOrgStatus),
+      this.store.select(getAllRolesForOrgStatus)
     ]).pipe(
       takeUntil(this.isDestroyed)
-    ).subscribe(([getOrgSt, updateSt, getCookbooksSt]) => {
+    ).subscribe(([getOrgSt, updateSt, getCookbooksSt, getRolesSt]) => {
         this.isLoading =
-          !allLoaded([getOrgSt, getCookbooksSt]) || updateSt === EntityStatus.loading;
+          !allLoaded([getOrgSt, getCookbooksSt, getRolesSt]) || updateSt === EntityStatus.loading;
       });
 
     combineLatest([
       this.store.select(getStatus),
       this.store.select(orgFromRoute)
     ]).pipe(
-        filter(([getOrgSt, _orgState]) =>
-          getOrgSt === EntityStatus.loadingSuccess),
-        filter(([_getOrgSt, orgState]) =>
-          !isNil(orgState)),
-        takeUntil(this.isDestroyed)
-      ).subscribe(([_getOrgSt, orgState]) => {
-        this.org = { ...orgState };
-        this.updateOrgForm.controls['name'].setValue(this.org.name);
-        this.updateOrgForm.controls['admin_user'].setValue(this.org.admin_user);
-        this.updateOrgForm.controls['admin_key'].setValue(this.org.admin_key);
-        this.cookbooksListLoading = false;
-      });
+      filter(([getOrgSt, _orgState]) =>
+        getOrgSt === EntityStatus.loadingSuccess),
+      filter(([_getOrgSt, orgState]) =>
+        !isNil(orgState)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([_getOrgSt, orgState]) => {
+      this.org = { ...orgState };
+      this.updateOrgForm.controls['name'].setValue(this.org.name);
+      this.updateOrgForm.controls['admin_user'].setValue(this.org.admin_user);
+      this.updateOrgForm.controls['admin_key'].setValue(this.org.admin_key);
+    });
 
     combineLatest([
       this.store.select(getAllCookbooksForOrgStatus),
       this.store.select(allCookbooks)
     ]).pipe(
-        filter(([getCookbooksSt, _allCookbooksState]) =>
-          getCookbooksSt === EntityStatus.loadingSuccess),
-        filter(([_getCookbooksSt, allCookbooksState]) =>
-          !isNil(allCookbooksState)),
-        takeUntil(this.isDestroyed)
-      ).subscribe(([ _getCookbooksSt, allCookbooksState]) => {
-        this.cookbooks = allCookbooksState;
+      filter(([getCookbooksSt, _allCookbooksState]) =>
+        getCookbooksSt === EntityStatus.loadingSuccess),
+      filter(([_getCookbooksSt, allCookbooksState]) =>
+        !isNil(allCookbooksState)),
+      takeUntil(this.isDestroyed)
+    ).subscribe(([ _getCookbooksSt, allCookbooksState]) => {
+      this.cookbooks = allCookbooksState;
+      this.cookbooksListLoading = false;
+    });
+
+    combineLatest([
+      this.store.select(getAllRolesForOrgStatus),
+      this.store.select(allInfraRoles)
+    ]).pipe(
+      filter(([getRolesSt, _allInfraRolesState]) =>
+        getRolesSt === EntityStatus.loadingSuccess),
+      filter(([_getRolesSt, allInfraRolesState]) =>
+        !isNil(allInfraRolesState))
+    ).subscribe(([ _getRolesSt, allInfraRolesState]) => {
+      this.roles = allInfraRolesState;
+      this.rolesListLoading = false;
+    });
+
+    this.store.select(updateStatus).pipe(
+      takeUntil(this.isDestroyed),
+      filter(state => this.saveInProgress && !pending(state)))
+      .subscribe((state) => {
+        this.saveInProgress = false;
+        this.saveSuccessful = (state === EntityStatus.loadingSuccess);
+        if (this.saveSuccessful) {
+          this.updateOrgForm.markAsPristine();
+        }
       });
-
-      this.store.select(updateStatus).pipe(
-        takeUntil(this.isDestroyed),
-        filter(state => this.saveInProgress && !pending(state)))
-        .subscribe((state) => {
-          this.saveInProgress = false;
-          this.saveSuccessful = (state === EntityStatus.loadingSuccess);
-          if (this.saveSuccessful) {
-            this.updateOrgForm.markAsPristine();
-          }
-        });
-
   }
 
   onSelectedTab(event: { target: { value: OrgTabName } }) {

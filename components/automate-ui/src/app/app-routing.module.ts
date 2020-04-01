@@ -27,7 +27,7 @@ import { SigninComponent } from './pages/signin/signin.component';
 import { AutomateSettingsComponent } from './pages/automate-settings/automate-settings.component';
 import { ChefServersListComponent } from './modules/infra-proxy/chef-servers-list/chef-servers-list.component';
 import { ChefServerDetailsComponent } from './modules/infra-proxy/chef-server-details/chef-server-details.component';
-import { CookbooksListComponent } from './modules/infra-proxy/cookbook-list/cookbooks-list.component';
+import { OrgDetailsComponent } from './modules/infra-proxy/org-details/org-details.component';
 import { NodeDetailsComponent } from './pages/node-details/node-details.component';
 import {
   NodeNoRunsDetailsComponent
@@ -53,7 +53,6 @@ import {
 
 // Other
 import { SettingsLandingComponent } from './pages/settings-landing/settings-landing.component';
-import { InfraRolesListComponent } from './modules/infra-proxy/infra-roles-list/infra-roles-list.component';
 import { InfraRoleDetailsComponent } from './modules/infra-proxy/infra-role-details/infra-role-details.component';
 
 const routes: Routes = [
@@ -248,13 +247,8 @@ const routes: Routes = [
               component: ChefServerDetailsComponent
             },
             {
-              path: ':id/org/:orgid/cookbooks',
-              component: CookbooksListComponent
-            },
-            {
-              path: ':id/org/:orgid/roles',
-              component: InfraRolesListComponent
-
+              path: ':id/org/:orgid',
+              component: OrgDetailsComponent
             },
             {
             path: ':id/org/:orgid/roles/:name',
