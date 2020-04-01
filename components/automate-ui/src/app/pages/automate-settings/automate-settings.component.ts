@@ -293,10 +293,12 @@ export class AutomateSettingsComponent implements OnInit, OnDestroy {
 
       // If the user doesn't enter any number at all - this defaults to 0
       jobForm.threshold === null
+        // When not nested, threshold needs to be a string ex: '4w'
         ? job.threshold = '0' + jobForm.unit
         : job.threshold = jobForm.threshold + jobForm.unit;
 
       if ( isNested ) {
+        // When nested, threshold needs to be a number ex: 16
         job.nested_name = jobForm.nested_name;
         job.threshold = jobForm.threshold;  // Automatically becomes a 0 from
                                             // parseInt in request if left blank
